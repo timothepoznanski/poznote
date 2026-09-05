@@ -691,6 +691,12 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 					</button>
 					<div id="dashboardModifiedFilterMenu" class="dashboard-color-filter-menu" hidden></div>
 				</div>
+				<div class="dashboard-color-filter-wrap">
+					<button type="button" id="dashboardTagFilterBtn" class="dashboard-color-filter-btn" title="<?php echo t_h('dashboard.tag_filter.button', [], 'Filter by tag'); ?>" aria-label="<?php echo t_h('dashboard.tag_filter.button', [], 'Filter by tag'); ?>" aria-haspopup="true" aria-expanded="false">
+						<i class="lucide lucide-tag"></i>
+					</button>
+					<div id="dashboardTagFilterMenu" class="dashboard-color-filter-menu dashboard-tag-filter-menu" hidden></div>
+				</div>
 				<div id="dashboardTopbarFilter" class="dashboard-topbar-filter">
 					<i class="lucide lucide-search dashboard-filter-icon"></i>
 					<input
@@ -809,6 +815,12 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 			month: <?php echo json_encode(t('dashboard.modified.month', [], 'Last 30 days')); ?>,
 			quarter: <?php echo json_encode(t('dashboard.modified.quarter', [], 'Last 90 days')); ?>,
 			year: <?php echo json_encode(t('dashboard.modified.year', [], 'Last 12 months')); ?>
+		};
+		window.DASHBOARD_TAG_FILTER_TXT = {
+			all: <?php echo json_encode(t('dashboard.tag_filter.all', [], 'All tags')); ?>,
+			empty: <?php echo json_encode(t('dashboard.tag_filter.empty', [], 'No tags on this board.')); ?>,
+			search: <?php echo json_encode(t('dashboard.tag_filter.search', [], 'Filter tags...')); ?>,
+			noMatch: <?php echo json_encode(t('dashboard.tag_filter.no_match', [], 'No matching tag.')); ?>
 		};
 		window.DASHBOARD_USER = {
 			isAdmin: <?php echo (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) ? 'true' : 'false'; ?>

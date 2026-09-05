@@ -110,22 +110,105 @@ body {
     min-width: 200px;
 }
 
-.ws-col-action {
-    flex: 1;
-    justify-content: flex-end;
-    min-width: 150px;
-}
-
 .ws-col-background {
     flex: 0 0 auto;
     justify-content: center;
     min-width: 50px;
 }
 
-.ws-col-share {
+/* Row actions: one icon per action (share, rename, tags, background, move
+   notes, delete). The delegated click handlers read the button from
+   event.target, hence the pointer-events on the icons. */
+.ws-col-actions {
     flex: 0 0 auto;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.ws-icon-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ws-icon-btn {
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
-    min-width: 90px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--pz-text-muted);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.ws-icon-btn .lucide {
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+}
+
+.ws-icon-btn:hover,
+.ws-icon-btn:focus-visible {
+    background: var(--pz-surface-hover);
+    border-color: var(--pz-border);
+    color: var(--pz-text);
+}
+
+/* A public workspace: the share icon stays tinted */
+.ws-icon-btn.is-shared {
+    color: #d97706;
+}
+
+.ws-icon-btn.is-shared:hover,
+.ws-icon-btn.is-shared:focus-visible {
+    color: #b45309;
+}
+
+.ws-icon-btn.ws-icon-btn-danger:hover,
+.ws-icon-btn.ws-icon-btn-danger:focus-visible {
+    color: var(--pz-danger);
+    background: rgba(220, 53, 69, 0.08);
+    border-color: transparent;
+}
+
+.ws-icon-btn[disabled] {
+    opacity: 0.4;
+    cursor: default;
+    background: transparent;
+    border-color: transparent;
+    color: var(--pz-text-muted);
+}
+
+:root[data-theme='dark'] .ws-icon-btn,
+body.dark-mode .ws-icon-btn {
+    color: #a8a8a8;
+}
+
+:root[data-theme='dark'] .ws-icon-btn:hover,
+body.dark-mode .ws-icon-btn:hover,
+:root[data-theme='dark'] .ws-icon-btn:focus-visible,
+body.dark-mode .ws-icon-btn:focus-visible {
+    background: var(--dm-surface-hover);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+:root[data-theme='dark'] .ws-icon-btn.is-shared,
+body.dark-mode .ws-icon-btn.is-shared {
+    color: #fbbf24;
+}
+
+:root[data-theme='dark'] .ws-icon-btn.ws-icon-btn-danger:hover,
+body.dark-mode .ws-icon-btn.ws-icon-btn-danger:hover,
+:root[data-theme='dark'] .ws-icon-btn.ws-icon-btn-danger:focus-visible,
+body.dark-mode .ws-icon-btn.ws-icon-btn-danger:focus-visible {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.12);
 }
 
 .workspace-share-toggle-form {
@@ -203,6 +286,11 @@ a.workspace-name-link:focus-visible {
     margin-top: 8px;
     font-size: 12px;
     color: #6b7280;
+}
+
+/* Tags modal: Poznote button row (right-aligned), spaced from the list */
+#workspaceTagsModal .modal-buttons {
+    margin-top: 20px;
 }
 
 :root[data-theme='dark'] .ws-tag-chip,
@@ -996,9 +1084,19 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
         flex-basis: auto !important;
     }
 
-    .workspace-list .ws-col-share,
-    .workspace-list .ws-col-action {
+    .workspace-list .ws-col-actions {
         flex-basis: auto !important;
+        justify-content: flex-start;
+    }
+
+    .workspace-list .ws-icon-actions {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .workspace-list .ws-icon-btn {
+        width: 40px;
+        height: 40px;
     }
     
     .workspace-list .btn {

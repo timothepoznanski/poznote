@@ -703,14 +703,13 @@
       }
     },
     "tags": {
-      "label": "Tags",
       "action": "Tags",
       "modal_title": "Tags de l’espace de travail",
       "placeholder": "Tags séparés par des virgules (optionnel, ex. école, psycho)",
-      "input_placeholder": "école, psycho",
       "help": "Les tags regroupent les espaces de travail sur le dashboard : choisissez-y un tag pour voir tous les espaces qui le portent.",
       "saved": "Tags mis à jour",
-      "save_error": "Impossible de mettre à jour les tags"
+      "save_error": "Impossible de mettre à jour les tags",
+      "empty": "Aucun tag pour le moment."
     }
   },
   "display": {
@@ -4030,6 +4029,13 @@
       "month": "30 derniers jours",
       "quarter": "90 derniers jours",
       "year": "12 derniers mois"
+    },
+    "tag_filter": {
+      "button": "Filtrer par tag",
+      "all": "Tous les tags",
+      "empty": "Aucun tag sur ce tableau.",
+      "search": "Filtrer les tags...",
+      "no_match": "Aucun tag ne correspond."
     }
   },
   "graph": {

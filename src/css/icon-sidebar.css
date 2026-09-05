@@ -380,12 +380,36 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
        let the ellipsis take over (the full name stays in the tooltip). */
     min-width: 0;
     max-width: 40vw;
-    overflow: hidden;
+    /* clip rather than hidden: a scroll container has no text baseline of its
+       own, and the baseline alignment below needs one. */
+    overflow: clip;
     text-overflow: ellipsis;
     white-space: nowrap;
     font-size: 15px;
     font-weight: 400;
     color: var(--pz-text-muted, #6b7280);
+}
+
+/* Box-centring the smaller suffix leaves it floating above the page name's
+   baseline. Only titles carrying the suffix switch to baseline alignment, so
+   the other pages (settings.php and its user badge) keep their centring. The
+   icon has no baseline and would otherwise sit on its bottom edge: keep it
+   centred on its own. */
+.poznote-page-title:has(.poznote-page-title-workspace) {
+    align-items: baseline;
+}
+
+.poznote-page-title:has(.poznote-page-title-workspace) > i {
+    align-self: center;
+}
+
+/* On the shared baseline the suffix still reads low: at 15px next to 24px its
+   lowercase sits 2.6px under the title's, and the parentheses hang 2px below
+   the baseline. Raising it by that 2px puts the parentheses' feet on the
+   title's baseline and lines up the two x-height centres (checked on Inter). */
+.poznote-page-title:has(.poznote-page-title-workspace) > .poznote-page-title-workspace {
+    position: relative;
+    top: -2px;
 }
 
 /* trash.php, diary.php and graph.php give their container no top padding, so

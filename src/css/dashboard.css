@@ -2249,6 +2249,111 @@ body.dark-mode .dashboard-mobile-back:hover {
     color: var(--pz-text-subtle);
 }
 
+/* Tag filter: a checklist, so the menu stays open while tags are combined */
+.dashboard-tag-filter-menu {
+    min-width: 220px;
+    max-width: min(320px, calc(100vw - 16px));
+    overflow-x: hidden;
+}
+
+/* Rows are labels, so they need the border-box a <button> gets for free
+   (width: 100% plus padding would otherwise overflow sideways) */
+.dashboard-tag-filter-item {
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+/* The search hides rows through the hidden attribute, which the display:
+   flex of .dashboard-color-filter-item would otherwise override */
+.dashboard-tag-filter-item[hidden],
+.dashboard-tag-filter-empty[hidden] {
+    display: none;
+}
+
+/* Search box pinned at the top while the list scrolls; the negative margin
+   cancels the menu padding so it sits flush against the edge */
+.dashboard-tag-filter-search-wrap {
+    position: sticky;
+    top: -6px;
+    z-index: 1;
+    margin: -6px 0 4px;
+    padding: 6px 0;
+    background: #ffffff;
+}
+
+.dashboard-tag-filter-search {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 6px 9px;
+    border: 1px solid var(--pz-border);
+    border-radius: 6px;
+    background: #ffffff;
+    color: inherit;
+    font: inherit;
+    font-size: 13px;
+    outline: none;
+}
+
+.dashboard-tag-filter-search:focus {
+    border-color: var(--pz-accent);
+}
+
+:root[data-theme='dark'] .dashboard-tag-filter-search-wrap,
+body.dark-mode .dashboard-tag-filter-search-wrap {
+    background: var(--dm-surface);
+}
+
+:root[data-theme='dark'] .dashboard-tag-filter-search,
+body.dark-mode .dashboard-tag-filter-search {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+.dashboard-tag-filter-check {
+    width: 15px;
+    height: 15px;
+    margin: 0;
+    flex-shrink: 0;
+    accent-color: var(--pz-accent);
+}
+
+.dashboard-tag-filter-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.dashboard-tag-filter-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dashboard-tag-filter-count {
+    font-size: 11px;
+    color: var(--pz-text-subtle);
+    flex-shrink: 0;
+}
+
+.dashboard-tag-filter-empty {
+    padding: 7px 9px;
+    font-size: 13px;
+    color: var(--pz-text-subtle);
+}
+
+:root[data-theme='dark'] .dashboard-tag-filter-count,
+body.dark-mode .dashboard-tag-filter-count,
+:root[data-theme='dark'] .dashboard-tag-filter-empty,
+body.dark-mode .dashboard-tag-filter-empty {
+    color: #a8a8a8;
+}
+
 /* Dark mode */
 :root[data-theme='dark'] .dash-group-title,
 body.dark-mode .dash-group-title {

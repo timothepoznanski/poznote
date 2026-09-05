@@ -646,18 +646,21 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
-<!-- Workspace tags modal (for workspaces.php) -->
+<!-- Workspace tags modal (for workspaces.php): same list as the note
+     "Manage tags" modal (css/notes/tags.css), saved as a whole on Save -->
 <div id="workspaceTagsModal" class="modal initially-hidden">
     <div class="modal-content">
         <h3><?php echo t_h('workspaces.tags.modal_title', [], 'Workspace tags'); ?> <span id="workspaceTagsSource"></span></h3>
         <p class="ws-tags-help"><?php echo t_h('workspaces.tags.help', [], 'Tags group workspaces on the dashboard: pick a tag there to see every workspace carrying it.'); ?></p>
-        <div class="form-group">
-            <label for="workspaceTagsInput"><?php echo t_h('workspaces.tags.label', [], 'Tags'); ?></label>
-            <input id="workspaceTagsInput" type="text" autocomplete="off" placeholder="<?php echo t_h('workspaces.tags.input_placeholder', [], 'school, psycho'); ?>" />
+        <div class="modal-body">
+            <div id="workspaceTagsList" class="tags-modal-list"></div>
+            <div class="tags-modal-input-wrapper">
+                <input id="workspaceTagsInput" type="text" autocomplete="off" placeholder="<?php echo t_h('tags.add_single', [], 'Add tag...'); ?>" />
+            </div>
         </div>
-        <div class="buttons-with-margin">
-            <button id="confirmWorkspaceTagsBtn" class="btn btn-primary"><?php echo t_h('common.save', [], 'Save'); ?></button>
-            <button data-action="close-workspace-tags-modal" class="btn btn-secondary"><?php echo t_h('common.cancel'); ?></button>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-workspace-tags-modal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="confirmWorkspaceTagsBtn"><?php echo t_h('common.save', [], 'Save'); ?></button>
         </div>
     </div>
 </div>
@@ -1784,6 +1787,8 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardViewLayoutBtn" checked><span><?php echo t_h('modals.ui_customization.view_layout_toggle', [], 'View toggle (grid / list, card size)'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardViewColumnsBtn" checked><span><?php echo t_h('dashboard.view.columns', [], 'Maximum columns'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardColorFilterBtn" checked><span><?php echo t_h('note_color.filter', [], 'Filter by color'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardModifiedFilterBtn" checked><span><?php echo t_h('dashboard.modified.button', [], 'Filter by last modification'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardTagFilterBtn" checked><span><?php echo t_h('dashboard.tag_filter.button', [], 'Filter by tag'); ?></span></label>
                 </div>
                 </div>
 

@@ -691,14 +691,13 @@
       }
     },
     "tags": {
-      "label": "Etiquetas",
       "action": "Etiquetas",
       "modal_title": "Etiquetas del espacio de trabajo",
       "placeholder": "Etiquetas separadas por comas (opcional, p. ej. escuela, psico)",
-      "input_placeholder": "escuela, psico",
       "help": "Las etiquetas agrupan espacios de trabajo en el panel: elige allí una etiqueta para ver todos los espacios que la llevan.",
       "saved": "Etiquetas actualizadas",
-      "save_error": "No se pudieron actualizar las etiquetas"
+      "save_error": "No se pudieron actualizar las etiquetas",
+      "empty": "Todavía no hay etiquetas."
     }
   },
   "display": {
@@ -3807,6 +3806,13 @@
       "month": "Últimos 30 días",
       "quarter": "Últimos 90 días",
       "year": "Últimos 12 meses"
+    },
+    "tag_filter": {
+      "button": "Filtrar por etiqueta",
+      "all": "Todas las etiquetas",
+      "empty": "No hay etiquetas en este tablero.",
+      "search": "Filtrar etiquetas...",
+      "no_match": "Ninguna etiqueta coincide."
     }
   },
   "graph": {

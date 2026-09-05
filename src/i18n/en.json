@@ -326,14 +326,13 @@
       }
     },
     "tags": {
-      "label": "Tags",
       "action": "Tags",
       "modal_title": "Workspace tags",
       "placeholder": "Tags, comma separated (optional, e.g. school, psycho)",
-      "input_placeholder": "school, psycho",
       "help": "Tags group workspaces on the dashboard: pick a tag there to see every workspace carrying it.",
       "saved": "Tags updated",
-      "save_error": "Could not update the tags"
+      "save_error": "Could not update the tags",
+      "empty": "No tags yet."
     }
   },
   "display": {
@@ -3525,6 +3524,13 @@
       "month": "Last 30 days",
       "quarter": "Last 90 days",
       "year": "Last 12 months"
+    },
+    "tag_filter": {
+      "button": "Filter by tag",
+      "all": "All tags",
+      "empty": "No tags on this board.",
+      "search": "Filter tags...",
+      "no_match": "No matching tag."
     }
   },
   "graph": {

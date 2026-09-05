@@ -6,6 +6,7 @@
     var NAV_PATH_KEY = 'dashboard_nav_path';
     var COLOR_FILTER_KEY = 'dashboard_color_filter';
     var MODIFIED_FILTER_KEY = 'dashboard_modified_filter';
+    var TAG_FILTER_KEY = 'dashboard_tag_filter';
 
     // The favorites preference used to be persisted for a toggle button in the
     // dashboard topbar, and was replayed onto the URL on every load. That button
@@ -291,12 +292,12 @@
         // A text term, a color filter or a modification-date filter all search
         // the whole tree rather than the current folder, so results are never
         // hidden behind navigation.
-        if (activeFilterTerm || activeColorFilter || activeModifiedFilter) {
+        if (activeFilterTerm || activeColorFilter || activeModifiedFilter || activeTagFilter.length) {
             // Folders carry colors too, so a pure color filter lists the
-            // matching folders alongside the matching notes. A text term or a
-            // date filter searches notes only.
+            // matching folders alongside the matching notes. A text term, a
+            // date or a tag filter searches notes only.
             var matchingFolders = [];
-            if (activeColorFilter && !activeFilterTerm && !activeModifiedFilter) {
+            if (activeColorFilter && !activeFilterTerm && !activeModifiedFilter && !activeTagFilter.length) {
                 collectAllFolders(matchingFolders);
                 matchingFolders = matchingFolders.filter(folderMatchesColor);
             }
@@ -306,6 +307,7 @@
             var matchingNotes = sortPinnedFirst(getAllNotes().filter(function (note) {
                 if (activeFilterTerm && !noteMatchesSearch(note, activeFilterTerm)) return false;
                 if (!noteMatchesModified(note)) return false;
+                if (!noteMatchesTags(note)) return false;
                 return noteMatchesColor(note);
             }), 'globalOrder');
 
@@ -372,7 +374,7 @@
         var bc = document.getElementById('dashboardBreadcrumb');
         if (!bc) return;
 
-        if (activeFilterTerm || activeColorFilter || activeModifiedFilter || navStack.length === 0) {
+        if (activeFilterTerm || activeColorFilter || activeModifiedFilter || activeTagFilter.length || navStack.length === 0) {
             bc.style.display = 'none';
             bc.innerHTML = '';
             return;
@@ -516,6 +518,11 @@
             saveModifiedFilter();
             updateModifiedFilterButtonState();
         }
+        if (activeTagFilter.length) {
+            activeTagFilter = [];
+            saveTagFilter();
+            updateTagFilterButtonState();
+        }
         navStack = path;
         saveNavigationPath();
         renderAll();
@@ -614,6 +621,53 @@
     function noteMatchesModified(note) {
         if (!activeModifiedFilter) return true;
         return (note.updatedAt || 0) >= modifiedFilterThreshold();
+    }
+
+    // Note tag filter: lowercased tags, a note passes when it carries any of
+    // them. Persisted per scope like the other filters.
+    var activeTagFilter = [];
+
+    function saveTagFilter() {
+        try {
+            var key = dashboardStorageKey(TAG_FILTER_KEY);
+            if (activeTagFilter.length) {
+                localStorage.setItem(key, JSON.stringify(activeTagFilter));
+            } else {
+                localStorage.removeItem(key);
+            }
+        } catch (e) { /* localStorage unavailable */ }
+    }
+
+    function restoreTagFilter() {
+        try {
+            var stored = JSON.parse(localStorage.getItem(dashboardStorageKey(TAG_FILTER_KEY)) || '[]');
+            activeTagFilter = Array.isArray(stored)
+                ? stored.map(function (tag) { return String(tag).toLowerCase().trim(); }).filter(Boolean)
+                : [];
+        } catch (e) {
+            activeTagFilter = [];
+        }
+        updateTagFilterButtonState();
+    }
+
+    function noteMatchesTags(note) {
+        if (!activeTagFilter.length) return true;
+        var tags = (note.tags || []).map(function (tag) { return String(tag).toLowerCase(); });
+        return activeTagFilter.some(function (tag) { return tags.indexOf(tag) !== -1; });
+    }
+
+    // Every tag carried by the notes of the board: lowercased key -> label, count
+    function collectBoardTags() {
+        var index = {};
+        getAllNotes().forEach(function (note) {
+            (note.tags || []).forEach(function (tag) {
+                var key = String(tag).toLowerCase().trim();
+                if (!key) return;
+                if (!index[key]) index[key] = { label: String(tag).trim(), count: 0 };
+                index[key].count++;
+            });
+        });
+        return index;
     }
 
     function saveColorFilter() {
@@ -1063,6 +1117,7 @@
             e.stopPropagation();
             if (menu.hidden) {
                 closeColorFilterMenu();
+                closeTagFilterMenu();
                 buildModifiedFilterMenu();
                 menu.hidden = false;
                 positionModifiedFilterMenu();
@@ -1080,6 +1135,180 @@
 
         window.addEventListener('resize', positionModifiedFilterMenu);
         window.addEventListener('scroll', positionModifiedFilterMenu, true);
+    }
+
+    function updateTagFilterButtonState() {
+        var btn = document.getElementById('dashboardTagFilterBtn');
+        if (!btn) return;
+        btn.classList.toggle('active', activeTagFilter.length > 0);
+        var base = btn.getAttribute('data-title') || btn.getAttribute('title') || '';
+        if (!btn.getAttribute('data-title')) btn.setAttribute('data-title', base);
+        btn.title = activeTagFilter.length ? base + ': ' + activeTagFilter.join(', ') : base;
+    }
+
+    function closeTagFilterMenu() {
+        var menu = document.getElementById('dashboardTagFilterMenu');
+        var btn = document.getElementById('dashboardTagFilterBtn');
+        if (menu) menu.hidden = true;
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+
+    function positionTagFilterMenu() {
+        positionFilterMenu(document.getElementById('dashboardTagFilterBtn'),
+            document.getElementById('dashboardTagFilterMenu'));
+    }
+
+    // Checklist of the board's tags. Checking one filters right away and keeps
+    // the menu open so several tags can be combined (a note matches any of them).
+    function buildTagFilterMenu() {
+        var menu = document.getElementById('dashboardTagFilterMenu');
+        if (!menu) return;
+        menu.innerHTML = '';
+
+        var txt = window.DASHBOARD_TAG_FILTER_TXT || {};
+        var index = collectBoardTags();
+        // A remembered tag that left the board stays listed so it can be unchecked
+        activeTagFilter.forEach(function (key) {
+            if (!index[key]) index[key] = { label: key, count: 0 };
+        });
+        var keys = Object.keys(index).sort(function (a, b) { return a.localeCompare(b); });
+
+        // Search box pinned at the top: narrows the list as you type
+        var searchWrap = document.createElement('div');
+        searchWrap.className = 'dashboard-tag-filter-search-wrap';
+        var search = document.createElement('input');
+        search.type = 'text';
+        search.className = 'dashboard-tag-filter-search';
+        search.placeholder = txt.search || 'Filter tags...';
+        search.setAttribute('autocomplete', 'off');
+        search.setAttribute('aria-label', txt.search || 'Filter tags...');
+        searchWrap.appendChild(search);
+        if (keys.length) menu.appendChild(searchWrap);
+
+        var all = document.createElement('button');
+        all.type = 'button';
+        all.className = 'dashboard-color-filter-item' + (activeTagFilter.length ? '' : ' active');
+        all.innerHTML = '<span class="note-color-swatch note-color-swatch-empty"></span>' +
+            '<span>' + esc(txt.all || 'All tags') + '</span>';
+        all.addEventListener('click', function () {
+            activeTagFilter = [];
+            saveTagFilter();
+            closeTagFilterMenu();
+            updateTagFilterButtonState();
+            renderAll();
+        });
+        menu.appendChild(all);
+
+        if (!keys.length) {
+            var empty = document.createElement('div');
+            empty.className = 'dashboard-tag-filter-empty';
+            empty.textContent = txt.empty || 'No tags on this board.';
+            menu.appendChild(empty);
+            return;
+        }
+
+        var rows = [];
+        var noMatch = document.createElement('div');
+        noMatch.className = 'dashboard-tag-filter-empty';
+        noMatch.textContent = txt.noMatch || 'No matching tag.';
+        noMatch.hidden = true;
+
+        search.addEventListener('input', function () {
+            var term = normalizeSearchText(search.value.trim());
+            var visible = 0;
+            rows.forEach(function (row) {
+                var match = !term || row.text.indexOf(term) !== -1;
+                row.item.hidden = !match;
+                if (match) visible++;
+            });
+            noMatch.hidden = visible > 0;
+        });
+        search.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                closeTagFilterMenu();
+            }
+        });
+
+        keys.forEach(function (key) {
+            var entry = index[key];
+            var item = document.createElement('label');
+            item.className = 'dashboard-color-filter-item dashboard-tag-filter-item' +
+                (activeTagFilter.indexOf(key) !== -1 ? ' active' : '');
+
+            var box = document.createElement('input');
+            box.type = 'checkbox';
+            box.className = 'dashboard-tag-filter-check';
+            box.checked = activeTagFilter.indexOf(key) !== -1;
+            box.addEventListener('change', function () {
+                if (box.checked) {
+                    if (activeTagFilter.indexOf(key) === -1) activeTagFilter.push(key);
+                } else {
+                    activeTagFilter = activeTagFilter.filter(function (tag) { return tag !== key; });
+                }
+                saveTagFilter();
+                updateTagFilterButtonState();
+                item.classList.toggle('active', box.checked);
+                all.classList.toggle('active', activeTagFilter.length === 0);
+                renderAll();
+            });
+            item.appendChild(box);
+
+            var hex = resolveDashboardTagColorHex(entry.label);
+            if (hex) {
+                var dot = document.createElement('span');
+                dot.className = 'dashboard-tag-filter-dot';
+                dot.style.backgroundColor = hex;
+                item.appendChild(dot);
+            }
+
+            var name = document.createElement('span');
+            name.className = 'dashboard-tag-filter-name';
+            name.textContent = entry.label;
+            item.appendChild(name);
+
+            var count = document.createElement('span');
+            count.className = 'dashboard-tag-filter-count';
+            count.textContent = entry.count;
+            item.appendChild(count);
+
+            rows.push({ item: item, text: normalizeSearchText(entry.label) });
+            menu.appendChild(item);
+        });
+        menu.appendChild(noMatch);
+    }
+
+    function initTagFilter() {
+        var btn = document.getElementById('dashboardTagFilterBtn');
+        var menu = document.getElementById('dashboardTagFilterMenu');
+        if (!btn || !menu) return;
+
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (menu.hidden) {
+                closeColorFilterMenu();
+                closeModifiedFilterMenu();
+                buildTagFilterMenu();
+                menu.hidden = false;
+                positionTagFilterMenu();
+                btn.setAttribute('aria-expanded', 'true');
+                // Desktop only: on mobile the keyboard would cover the list
+                var search = menu.querySelector('.dashboard-tag-filter-search');
+                if (search && window.innerWidth > 800) search.focus();
+            } else {
+                closeTagFilterMenu();
+            }
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!menu.hidden && !menu.contains(e.target) && !btn.contains(e.target)) {
+                closeTagFilterMenu();
+            }
+        });
+
+        window.addEventListener('resize', positionTagFilterMenu);
+        window.addEventListener('scroll', positionTagFilterMenu, true);
     }
 
     function updateColorFilterButtonState() {
@@ -1104,6 +1333,7 @@
             e.stopPropagation();
             if (menu.hidden) {
                 closeModifiedFilterMenu();
+                closeTagFilterMenu();
                 buildColorFilterMenu();
                 menu.hidden = false;
                 positionColorFilterMenu();
@@ -1428,10 +1658,12 @@
         // Restore before the first render so the board comes up already filtered.
         restoreColorFilter();
         restoreModifiedFilter();
+        restoreTagFilter();
         renderAll();
         initNoteColorPicker();
         initColorFilter();
         initModifiedFilter();
+        initTagFilter();
         window.addEventListener('pagehide', saveNavigationPath);
 
         var filterInput     = document.getElementById('filterInput');

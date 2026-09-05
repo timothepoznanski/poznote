@@ -687,14 +687,13 @@ function updateWorkspaceShareToggleButton(button, isShared, shareState) {
 
     button.setAttribute('data-action', 'upsert_readonly_share');
     button.setAttribute('data-shared', isShared ? '1' : '0');
-    button.textContent = isShared
+    // Icon button: the state shows through its tooltip and the is-shared tint
+    var shareLabel = isShared
         ? getWorkspaceShareText('workspace-share-edit-btn', 'Edit share')
         : getWorkspaceShareText('workspace-share-enable-btn', 'Share');
-    button.classList.toggle('btn-orange', isShared);
-    button.classList.toggle('btn-success', !isShared);
-    button.classList.remove('btn-danger');
-    button.classList.remove('btn-warning');
-    button.classList.remove('btn-primary');
+    button.title = shareLabel;
+    button.setAttribute('aria-label', shareLabel);
+    button.classList.toggle('is-shared', isShared);
 
     if (shareState && Object.prototype.hasOwnProperty.call(shareState, 'url')) {
         button.setAttribute('data-url', isShared ? (shareState.url || '') : '');
@@ -1665,11 +1664,96 @@ function handleRenameButtonClick(e) {
     }
 }
 
-// Workspace tags modal ("Tags" entry of the Actions menu): comma-separated
-// list, replaced as a whole through the set_tags action
+// Workspace tags modal ("Tags" entry of the Actions menu). Same list as the
+// note "Manage tags" modal: one row per tag, editable in place, a cross to
+// remove it, an input to add one. The whole list is sent on Save.
+var workspaceTagsState = { name: '', tags: [] };
+
 function closeWorkspaceTagsModal() {
     var modal = document.getElementById('workspaceTagsModal');
     if (modal) modal.style.display = 'none';
+}
+
+function parseWorkspaceTagInput(value) {
+    return String(value || '').split(',').map(function (tag) {
+        return tag.replace(/\s+/g, ' ').trim();
+    }).filter(Boolean);
+}
+
+function workspaceTagIndex(tag) {
+    var key = tag.toLowerCase();
+    for (var i = 0; i < workspaceTagsState.tags.length; i++) {
+        if (workspaceTagsState.tags[i].toLowerCase() === key) return i;
+    }
+    return -1;
+}
+
+function addWorkspaceTags(value) {
+    parseWorkspaceTagInput(value).forEach(function (tag) {
+        if (workspaceTagIndex(tag) === -1 && workspaceTagsState.tags.length < 20) {
+            workspaceTagsState.tags.push(tag.substring(0, 50));
+        }
+    });
+    renderWorkspaceTagsList();
+}
+
+function renderWorkspaceTagsList() {
+    var container = document.getElementById('workspaceTagsList');
+    if (!container) return;
+    container.innerHTML = '';
+
+    if (!workspaceTagsState.tags.length) {
+        var empty = document.createElement('div');
+        empty.className = 'tags-modal-empty';
+        empty.textContent = wsTr('workspaces.tags.empty', {}, 'No tags yet.');
+        empty.style.textAlign = 'center';
+        empty.style.padding = '10px';
+        empty.style.color = '#94a3b8';
+        container.appendChild(empty);
+        return;
+    }
+
+    workspaceTagsState.tags.forEach(function (tag, index) {
+        var item = document.createElement('div');
+        item.className = 'tags-modal-item';
+
+        var name = document.createElement('span');
+        name.className = 'tags-modal-item-name';
+        name.textContent = tag;
+        name.contentEditable = 'true';
+        name.spellcheck = false;
+
+        name.onkeydown = function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                name.blur();
+            } else if (e.key === 'Escape') {
+                name.textContent = workspaceTagsState.tags[index];
+                name.blur();
+            }
+        };
+        name.onblur = function () {
+            var newValue = parseWorkspaceTagInput(name.textContent)[0] || '';
+            var current = workspaceTagsState.tags[index];
+            var duplicate = workspaceTagIndex(newValue);
+            if (newValue && newValue !== current && (duplicate === -1 || duplicate === index)) {
+                workspaceTagsState.tags[index] = newValue.substring(0, 50);
+            }
+            renderWorkspaceTagsList();
+        };
+
+        var delBtn = document.createElement('span');
+        delBtn.className = 'tags-modal-item-delete lucide lucide-x';
+        delBtn.title = wsTr('common.delete', {}, 'Delete');
+        delBtn.onclick = function () {
+            workspaceTagsState.tags.splice(index, 1);
+            renderWorkspaceTagsList();
+        };
+
+        item.appendChild(name);
+        item.appendChild(delBtn);
+        container.appendChild(item);
+    });
 }
 
 function handleWorkspaceTagsButtonClick(e) {
@@ -1691,17 +1775,27 @@ function handleWorkspaceTagsButtonClick(e) {
     var confirmBtn = document.getElementById('confirmWorkspaceTagsBtn');
     if (!workspaceName || !modal || !input || !confirmBtn) return;
 
+    workspaceTagsState = {
+        name: workspaceName,
+        tags: parseWorkspaceTagInput(button.getAttribute('data-tags') || '')
+    };
+
     var source = document.getElementById('workspaceTagsSource');
     if (source) source.textContent = workspaceName;
-    input.value = button.getAttribute('data-tags') || '';
+    input.value = '';
+    renderWorkspaceTagsList();
 
     modal.style.display = 'flex';
-    setTimeout(function () { input.focus(); }, 0);
+    setTimeout(function () { input.focus(); }, 100);
 
+    // Enter or a comma adds what was typed; Escape closes
     input.onkeydown = function (event) {
-        if (event.key === 'Enter') {
+        if (event.key === 'Enter' || event.key === ',') {
             event.preventDefault();
-            confirmBtn.click();
+            if (input.value.trim()) {
+                addWorkspaceTags(input.value);
+                input.value = '';
+            }
         } else if (event.key === 'Escape') {
             event.preventDefault();
             closeWorkspaceTagsModal();
@@ -1709,12 +1803,17 @@ function handleWorkspaceTagsButtonClick(e) {
     };
 
     confirmBtn.onclick = function () {
+        // A tag still sitting in the input counts too
+        if (input.value.trim()) {
+            addWorkspaceTags(input.value);
+            input.value = '';
+        }
         confirmBtn.disabled = true;
 
         var params = new URLSearchParams({
             action: 'set_tags',
-            name: workspaceName,
-            tags: input.value.trim()
+            name: workspaceTagsState.name,
+            tags: workspaceTagsState.tags.join(',')
         });
 
         fetch('workspaces.php', {
@@ -2188,32 +2287,6 @@ function initializeWorkspacesPage() {
     document.addEventListener('click', handleMoveButtonClick);
     document.addEventListener('click', handleWorkspaceShareToggleClick);
     
-    // Toggle dropdowns
-    document.addEventListener('click', function (e) {
-        var toggle = e.target.closest('.dropdown-toggle-btn');
-        if (toggle) {
-            var menu = toggle.nextElementSibling;
-            var isShown = menu.classList.contains('show');
-            
-            // Close all other dropdowns
-            document.querySelectorAll('.dropdown-menu.show').forEach(function (m) {
-                m.classList.remove('show');
-            });
-            
-            if (!isShown) {
-                menu.classList.add('show');
-            }
-            return;
-        }
-
-        // Close dropdowns when clicking outside
-        if (!e.target.closest('.ws-action-dropdown')) {
-            document.querySelectorAll('.dropdown-menu.show').forEach(function (m) {
-                m.classList.remove('show');
-            });
-        }
-    });
-
     document.addEventListener('submit', handleWorkspaceShareToggleSubmit, true);
     document.addEventListener('click', function (event) {
         if (handleWorkspaceReadonlyShareSave(event)) return;

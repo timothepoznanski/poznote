@@ -781,6 +781,7 @@ try {
     <link rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/workspaces.css?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('css/workspaces.css') ?: time(); ?>">
     <link rel="stylesheet" href="css/modals/base.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/notes/tags.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modals/specific-modals.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modals/attachments.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modals/share-modal.css?v=<?php echo $cache_v; ?>">
@@ -903,55 +904,49 @@ try {
                                         <?php endif; ?>
                                     </div>
                                 </div>
-                                <div class="ws-col ws-col-share">
-                                    <button type="button"
-                                            class="btn action-btn btn-share-toggle <?php echo $workspaceReadonlyEnabled ? 'btn-orange' : 'btn-success'; ?>"
-                                            data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"
-                                            data-shared="<?php echo $workspaceReadonlyEnabled ? '1' : '0'; ?>"
-                                            data-url="<?php echo htmlspecialchars((string)($workspaceRow['readonly_url'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>"
-                                            data-preview-url="<?php echo htmlspecialchars((string)($workspaceRow['readonly_preview_url'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>"
-                                            data-has-password="<?php echo !empty($workspaceRow['readonly_has_password']) ? '1' : '0'; ?>"
-                                            data-password-value="<?php echo htmlspecialchars((string)($workspaceRow['readonly_password_value'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>"
-                                            data-login-required="<?php echo !empty($workspaceRow['readonly_login_required']) ? '1' : '0'; ?>"
-                                            data-allowed-users="<?php echo htmlspecialchars(json_encode($workspaceRow['readonly_allowed_users'] ?? [], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP), ENT_QUOTES, 'UTF-8'); ?>"
-                                            data-action="upsert_readonly_share">
-                                        <?php echo $workspaceReadonlyEnabled
-                                            ? t_h('workspaces.share.actions.edit', [], 'Edit share', $currentLang)
-                                            : t_h('workspaces.share.actions.enable', [], 'Share', $currentLang); ?>
-                                    </button>
-                                </div>
-                                <div class="ws-col ws-col-action">
-                                    <div class="ws-action-dropdown">
-                                        <button class="btn btn-secondary dropdown-toggle-btn" type="button" aria-haspopup="true" aria-expanded="false">
-                                            <?php echo t_h('common.actions', [], 'Actions', $currentLang); ?>
-                                            <i class="lucide lucide-chevron-down" style="margin-left: 5px;"></i>
+                                <?php
+                                    $shareLabel = $workspaceReadonlyEnabled
+                                        ? t_h('workspaces.share.actions.edit', [], 'Edit share', $currentLang)
+                                        : t_h('workspaces.share.actions.enable', [], 'Share', $currentLang);
+                                    $renameLabel = t_h('common.rename', [], 'Rename', $currentLang);
+                                    $tagsLabel = t_h('workspaces.tags.action', [], 'Tags', $currentLang);
+                                    $backgroundLabel = t_h('workspaces.actions.background', [], 'Background', $currentLang);
+                                    $moveLabel = t_h('workspaces.actions.move_notes', [], 'Move notes', $currentLang);
+                                    $deleteLabel = t_h('common.delete', [], 'Delete', $currentLang);
+                                ?>
+                                <div class="ws-col ws-col-actions">
+                                    <div class="ws-icon-actions">
+                                        <button type="button"
+                                                class="ws-icon-btn btn-share-toggle<?php echo $workspaceReadonlyEnabled ? ' is-shared' : ''; ?>"
+                                                data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"
+                                                data-shared="<?php echo $workspaceReadonlyEnabled ? '1' : '0'; ?>"
+                                                data-url="<?php echo htmlspecialchars((string)($workspaceRow['readonly_url'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>"
+                                                data-preview-url="<?php echo htmlspecialchars((string)($workspaceRow['readonly_preview_url'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>"
+                                                data-has-password="<?php echo !empty($workspaceRow['readonly_has_password']) ? '1' : '0'; ?>"
+                                                data-password-value="<?php echo htmlspecialchars((string)($workspaceRow['readonly_password_value'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>"
+                                                data-login-required="<?php echo !empty($workspaceRow['readonly_login_required']) ? '1' : '0'; ?>"
+                                                data-allowed-users="<?php echo htmlspecialchars(json_encode($workspaceRow['readonly_allowed_users'] ?? [], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP), ENT_QUOTES, 'UTF-8'); ?>"
+                                                data-action="upsert_readonly_share"
+                                                title="<?php echo $shareLabel; ?>" aria-label="<?php echo $shareLabel; ?>">
+                                            <i class="lucide lucide-share-2"></i>
                                         </button>
-                                        <div class="dropdown-menu">
-                                            <button class="dropdown-item dropdown-item-neutral workspace-rename-action" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
-                                                <i class="lucide lucide-pencil"></i> <?php echo t_h('common.rename', [], 'Rename', $currentLang); ?>
+                                        <button type="button" class="ws-icon-btn workspace-rename-action" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo $renameLabel; ?>" aria-label="<?php echo $renameLabel; ?>">
+                                            <i class="lucide lucide-pencil"></i>
+                                        </button>
+                                        <button type="button" class="ws-icon-btn workspace-tags-action" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" data-tags="<?php echo htmlspecialchars(implode(', ', $workspaceRow['tags'] ?? []), ENT_QUOTES, 'UTF-8'); ?>" title="<?php echo $tagsLabel; ?>" aria-label="<?php echo $tagsLabel; ?>">
+                                            <i class="lucide lucide-tag"></i>
+                                        </button>
+                                        <button type="button" class="ws-icon-btn workspace-background-action" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo $backgroundLabel; ?>" aria-label="<?php echo $backgroundLabel; ?>">
+                                            <i class="lucide lucide-image"></i>
+                                        </button>
+                                        <button type="button" class="ws-icon-btn btn-move" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo $moveLabel; ?>" aria-label="<?php echo $moveLabel; ?>" <?php echo ($cnt === 0 || count($workspaces) <= 1) ? 'disabled' : ''; ?>>
+                                            <i class="lucide lucide-move"></i>
+                                        </button>
+                                        <?php if (count($workspaces) > 1): ?>
+                                            <button type="button" class="ws-icon-btn ws-icon-btn-danger btn-delete" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo $deleteLabel; ?>" aria-label="<?php echo $deleteLabel; ?>">
+                                                <i class="lucide lucide-trash-2"></i>
                                             </button>
-
-                                            <button class="dropdown-item dropdown-item-neutral workspace-tags-action" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" data-tags="<?php echo htmlspecialchars(implode(', ', $workspaceRow['tags'] ?? []), ENT_QUOTES, 'UTF-8'); ?>">
-                                                <i class="lucide lucide-tag"></i> <?php echo t_h('workspaces.tags.action', [], 'Tags', $currentLang); ?>
-                                            </button>
-                                            
-                                            <button class="dropdown-item dropdown-item-neutral workspace-background-action" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
-                                                <i class="lucide lucide-image"></i> <?php echo t_h('workspaces.actions.background', [], 'Background', $currentLang); ?>
-                                            </button>
-                                            
-                                            <div class="dropdown-divider"></div>
-
-                                            <button class="dropdown-item btn-move" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" <?php echo ($cnt === 0 || count($workspaces) <= 1) ? 'disabled' : ''; ?>>
-                                                <i class="lucide lucide-move"></i> <?php echo t_h('workspaces.actions.move_notes', [], 'Move notes', $currentLang); ?>
-                                            </button>
-                                            
-                                            <?php if (count($workspaces) > 1): ?>
-                                                <div class="dropdown-divider"></div>
-                                                <button type="button" class="dropdown-item btn-delete text-danger" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
-                                                    <i class="lucide lucide-trash-2"></i> <?php echo t_h('common.delete', [], 'Delete', $currentLang); ?>
-                                                </button>
-                                            <?php endif; ?>
-                                        </div>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </li>

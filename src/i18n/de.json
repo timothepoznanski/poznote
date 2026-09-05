@@ -690,14 +690,13 @@
       }
     },
     "tags": {
-      "label": "Tags",
       "action": "Tags",
       "modal_title": "Tags des Arbeitsbereichs",
       "placeholder": "Tags, durch Kommas getrennt (optional, z. B. schule, psycho)",
-      "input_placeholder": "schule, psycho",
       "help": "Tags gruppieren Arbeitsbereiche im Dashboard: Wähle dort einen Tag, um alle Arbeitsbereiche mit diesem Tag zu sehen.",
       "saved": "Tags aktualisiert",
-      "save_error": "Die Tags konnten nicht aktualisiert werden"
+      "save_error": "Die Tags konnten nicht aktualisiert werden",
+      "empty": "Noch keine Tags."
     }
   },
   "display": {
@@ -3807,6 +3806,13 @@
       "month": "Letzte 30 Tage",
       "quarter": "Letzte 90 Tage",
       "year": "Letzte 12 Monate"
+    },
+    "tag_filter": {
+      "button": "Nach Tag filtern",
+      "all": "Alle Tags",
+      "empty": "Keine Tags auf diesem Board.",
+      "search": "Tags filtern...",
+      "no_match": "Kein passender Tag."
     }
   },
   "graph": {

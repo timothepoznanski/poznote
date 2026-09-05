@@ -81,7 +81,6 @@ $currentLang = getUserLanguage();
 			</div>
 			<div id="attachmentsContainer" class="attachments-list-container"></div>
 			<div id="emptyMessage" class="empty-message initially-hidden">
-				<i class="lucide lucide-paperclip"></i>
 				<p><?php echo t_h('attachments.list.no_attachments', [], 'No notes with attachments yet.'); ?></p>
 			</div>
 		</div>

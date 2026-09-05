@@ -688,14 +688,13 @@
       }
     },
     "tags": {
-      "label": "Tags",
       "action": "Tags",
       "modal_title": "Tags do espaço de trabalho",
       "placeholder": "Tags separadas por vírgulas (opcional, ex.: escola, psico)",
-      "input_placeholder": "escola, psico",
       "help": "As tags agrupam espaços de trabalho no painel: escolha lá uma tag para ver todos os espaços que a possuem.",
       "saved": "Tags atualizadas",
-      "save_error": "Não foi possível atualizar as tags"
+      "save_error": "Não foi possível atualizar as tags",
+      "empty": "Ainda não há tags."
     }
   },
   "display": {
@@ -3810,6 +3809,13 @@
       "month": "Últimos 30 dias",
       "quarter": "Últimos 90 dias",
       "year": "Últimos 12 meses"
+    },
+    "tag_filter": {
+      "button": "Filtrar por tag",
+      "all": "Todas as tags",
+      "empty": "Nenhuma tag neste painel.",
+      "search": "Filtrar tags...",
+      "no_match": "Nenhuma tag corresponde."
     }
   },
   "graph": {

@@ -691,14 +691,13 @@
       }
     },
     "tags": {
-      "label": "标签",
       "action": "标签",
       "modal_title": "工作区标签",
       "placeholder": "标签，用逗号分隔（可选，例如：学校, 心理）",
-      "input_placeholder": "学校, 心理",
       "help": "标签用于在仪表盘中对工作区分组：在仪表盘选择一个标签，即可查看所有带该标签的工作区。",
       "saved": "标签已更新",
-      "save_error": "无法更新标签"
+      "save_error": "无法更新标签",
+      "empty": "还没有标签。"
     }
   },
   "display": {
@@ -3928,6 +3927,13 @@
       "month": "最近 30 天",
       "quarter": "最近 90 天",
       "year": "最近 12 个月"
+    },
+    "tag_filter": {
+      "button": "按标签筛选",
+      "all": "全部标签",
+      "empty": "此看板上没有标签。",
+      "search": "筛选标签...",
+      "no_match": "没有匹配的标签。"
     }
   },
   "graph": {
