@@ -710,6 +710,15 @@
       "saved": "Tags mis à jour",
       "save_error": "Impossible de mettre à jour les tags",
       "empty": "Aucun tag pour le moment."
+    },
+    "color": {
+      "action": "Couleur",
+      "modal_title": "Couleur de l’espace de travail",
+      "help": "La couleur identifie les notes et dossiers de cet espace de travail sur le dashboard quand plusieurs espaces sont affichés ensemble.",
+      "custom": "Couleur personnalisée",
+      "saved": "Couleur mise à jour",
+      "save_error": "Impossible de mettre à jour la couleur",
+      "invalid": "Couleur invalide"
     }
   },
   "display": {
@@ -3645,6 +3654,13 @@
       "in_progress": "Déconnexion..."
     }
   },
+  "support_modal": {
+    "question": "Si vous aimez Poznote, voulez-vous lui offrir un petit café pour le soutenir ? ☕",
+    "yes": "Oui !",
+    "no": "Non...",
+    "thanks": "Merci ! ❤️",
+    "thanks_sub": "Vous êtes formidable."
+  },
   "password": {
     "status": {
       "custom": "Mot de passe personnalisé",
@@ -3988,6 +4004,7 @@
     "pin_note": "Épingler en haut",
     "unpin_note": "Désépingler",
     "pin_error": "Impossible de mettre à jour l'épinglage.",
+    "reorder_error": "Impossible d'enregistrer l'ordre des cartes.",
     "others_section": "Autres",
     "unpin": "Retirer des favoris",
     "no_folder": "Autres notes",
@@ -3999,6 +4016,7 @@
       "size_small": "Petites",
       "size_medium": "Moyennes",
       "size_large": "Grandes",
+      "size_wide": "Larges",
       "columns": "Colonnes maximum",
       "layout": "Disposition",
       "layout_grid": "Grille",
@@ -4121,7 +4139,7 @@
   "ai_chat": {
     "title": "Assistant IA",
     "toolbar_button": "Assistant IA",
-    "empty": "Posez une question.\nL'assistant peut chercher, lire, créer, renommer et modifier vos notes.",
+    "empty": "Posez une question.\nL'assistant peut chercher, lire, créer, modifier, organiser et supprimer vos notes.",
     "empty_open_note": "Dites « cette note » pour parler de celle qui est ouverte.",
     "placeholder": "Demandez à l'assistant...",
     "send": "Envoyer",
@@ -4136,11 +4154,33 @@
     "tool_rename": "Renommage de la note #{{id}} en « {{title}} »",
     "tool_update": "Modification de la note #{{id}}",
     "tool_create": "Création de la note : {{title}}",
-    "context_label": "Contexte :",
+    "context_label": "Note :",
     "model_label": "Modèle :",
     "model_hint": "Ouvrir les réglages de l’assistant IA.",
     "back_to_assistant": "Retour à l’assistant IA",
-    "context_hint": "La note que l'assistant utilise quand vous dites « cette note »."
+    "context_hint": "La note que l'assistant utilise quand vous dites « cette note ».",
+    "workspace_label": "Espace de travail :",
+    "tool_tags": "Mise à jour des tags de la note #{{id}}",
+    "tool_list_tags": "Liste des tags",
+    "tool_list_folders": "Liste des dossiers",
+    "tool_create_folder": "Création du dossier : {{path}}",
+    "tool_rename_folder": "Renommage du dossier « {{folder}} » en « {{name}} »",
+    "tool_move": "Déplacement de la note #{{id}} vers {{folder}}",
+    "tool_move_root": "Sortie de la note #{{id}} de son dossier",
+    "tool_favorite_on": "Ajout de la note #{{id}} aux favoris",
+    "tool_favorite_off": "Retrait de la note #{{id}} des favoris",
+    "tool_folder_favorite": "Mise à jour du favori du dossier « {{folder}} »",
+    "tool_reminder": "Programmation d'un rappel sur la note #{{id}}",
+    "tool_reminder_remove": "Suppression du rappel de la note #{{id}}",
+    "tool_task_add": "Ajout de la tâche : {{text}}",
+    "tool_task_update": "Mise à jour de la tâche « {{task}} »",
+    "tool_task_delete": "Suppression de la tâche « {{task}} »",
+    "tool_checklist": "Mise à jour d'une case de la note #{{id}}",
+    "tool_delete": "Mise à la corbeille de la note #{{id}}",
+    "tool_delete_folder": "Mise à la corbeille du dossier « {{folder}} » et de ses notes",
+    "scope_modal_title": "Un seul espace de travail à la fois",
+    "scope_modal_text": "L'assistant ne peut pas agir sur plusieurs espaces de travail à la fois. Ici, il ne cherchera, lira et modifiera que les notes de l'espace de travail « {{workspace}} ».",
+    "scope_modal_continue": "Continuer"
   },
   "diary": {
     "title": "Journal",

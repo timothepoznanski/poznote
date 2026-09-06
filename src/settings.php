@@ -46,7 +46,7 @@ if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
         $spCacheV = urlencode(poznoteBuildAssetCacheVersion(trim($spCacheV)));
         $spBackHref = $note_id
             ? 'index.php?note=' . intval($note_id)
-            : 'dashboard.php?workspace=' . urlencode($pageWorkspace);
+            : 'index.php?workspace=' . urlencode($pageWorkspace);
         ?>
         <!doctype html>
         <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">

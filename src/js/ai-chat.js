@@ -11,6 +11,10 @@
  * On desktop the panel is docked as the rightmost column of the page (like
  * the outline panel), resizable by its left edge, and its open state and
  * width survive reloads. On phones it overlays the page.
+ *
+ * The panel is included by index.php and dashboard.php; the same stored
+ * state and conversation follow the user from one page to the other. On the
+ * dashboard no note is open, so "this note" has no target there.
  */
 (function () {
     'use strict';
@@ -18,6 +22,9 @@
     var conversation = [];   // [{role: 'user'|'assistant', content: string}]
     var streaming = false;
     var abortController = null;
+    // The multi-workspace notice of the dashboard has been answered with
+    // Continue on this page: not asked again until the next load
+    var scopeAcknowledged = false;
 
     var STORAGE_KEY = 'poznote-ai-chat-conversation';
     var MAX_STORED_MESSAGES = 40; // matches the backend's conversation window
@@ -35,8 +42,16 @@
      */
     function currentWorkspace() {
         var ws = '';
-        if (typeof window.getSelectedWorkspace === 'function') ws = window.getSelectedWorkspace() || '';
+        var isDashboard = document.body && document.body.classList.contains('dashboard-page');
+        if (isDashboard) {
+            ws = document.body.getAttribute('data-ai-workspace') || '';
+        }
+        if (!ws && typeof window.getSelectedWorkspace === 'function') ws = window.getSelectedWorkspace() || '';
         if (!ws && document.body && document.body.dataset) ws = document.body.dataset.workspace || '';
+        if (!ws) {
+            var workspaceName = document.getElementById('ai-chat-workspace-name');
+            if (workspaceName) ws = workspaceName.getAttribute('data-fallback') || '';
+        }
         return ws;
     }
 
@@ -85,6 +100,21 @@
         if (titleEl) titleEl.textContent = noteTitle(id);
         box.title = t('ai_chat.context_hint', {}, 'The note the assistant uses when you say "this note".');
         box.hidden = false;
+    }
+
+    /**
+     * The line naming the workspace the assistant is scoped to (every tool
+     * runs in it). The page renders the server-resolved name as a fallback:
+     * an empty client value means the backend picks its first workspace,
+     * which is what the fallback holds.
+     */
+    function updateWorkspaceIndicator() {
+        var nameEl = document.getElementById('ai-chat-workspace-name');
+        if (!nameEl) return;
+        var ws = currentWorkspace() || nameEl.getAttribute('data-fallback') || '';
+        nameEl.textContent = ws;
+        var box = document.getElementById('ai-chat-workspace');
+        if (box) box.hidden = ws === '';
     }
 
     /** One stored conversation per workspace, so switching back restores it. */
@@ -221,6 +251,56 @@
         } else if (name === 'create_note') {
             label = t('ai_chat.tool_create', {}, 'Creating note: {{title}}')
                 .replace('{{title}}', args.title || '');
+        } else if (name === 'delete_note') {
+            label = t('ai_chat.tool_delete', {}, 'Moving note #{{id}} to the trash')
+                .replace('{{id}}', args.note_id || '?');
+        } else if (name === 'delete_folder') {
+            label = t('ai_chat.tool_delete_folder', {}, 'Moving folder "{{folder}}" and its notes to the trash')
+                .replace('{{folder}}', args.folder || '?');
+        } else if (name === 'update_note_tags') {
+            label = t('ai_chat.tool_tags', {}, 'Updating the tags of note #{{id}}')
+                .replace('{{id}}', args.note_id || '?');
+        } else if (name === 'list_tags') {
+            label = t('ai_chat.tool_list_tags', {}, 'Listing tags');
+        } else if (name === 'list_folders') {
+            label = t('ai_chat.tool_list_folders', {}, 'Listing folders');
+        } else if (name === 'create_folder') {
+            label = t('ai_chat.tool_create_folder', {}, 'Creating folder: {{path}}')
+                .replace('{{path}}', args.path || '');
+        } else if (name === 'rename_folder') {
+            label = t('ai_chat.tool_rename_folder', {}, 'Renaming folder "{{folder}}" to "{{name}}"')
+                .replace('{{folder}}', args.folder || '?')
+                .replace('{{name}}', args.new_name || '');
+        } else if (name === 'move_note_to_folder') {
+            var target = String(args.folder || '').trim();
+            label = (target === '' || /^(root|none|\/)$/i.test(target))
+                ? t('ai_chat.tool_move_root', {}, 'Moving note #{{id}} out of its folder').replace('{{id}}', args.note_id || '?')
+                : t('ai_chat.tool_move', {}, 'Moving note #{{id}} to {{folder}}').replace('{{id}}', args.note_id || '?').replace('{{folder}}', target);
+        } else if (name === 'set_note_favorite') {
+            label = (args.favorite === false || args.favorite === 'false')
+                ? t('ai_chat.tool_favorite_off', {}, 'Removing note #{{id}} from the favorites').replace('{{id}}', args.note_id || '?')
+                : t('ai_chat.tool_favorite_on', {}, 'Adding note #{{id}} to the favorites').replace('{{id}}', args.note_id || '?');
+        } else if (name === 'set_folder_favorite') {
+            label = t('ai_chat.tool_folder_favorite', {}, 'Updating the favorite state of folder "{{folder}}"')
+                .replace('{{folder}}', args.folder || '?');
+        } else if (name === 'set_note_reminder') {
+            label = t('ai_chat.tool_reminder', {}, 'Setting a reminder on note #{{id}}')
+                .replace('{{id}}', args.note_id || '?');
+        } else if (name === 'remove_note_reminder') {
+            label = t('ai_chat.tool_reminder_remove', {}, 'Removing the reminder of note #{{id}}')
+                .replace('{{id}}', args.note_id || '?');
+        } else if (name === 'add_task') {
+            label = t('ai_chat.tool_task_add', {}, 'Adding task: {{text}}')
+                .replace('{{text}}', args.text || '');
+        } else if (name === 'update_task') {
+            label = t('ai_chat.tool_task_update', {}, 'Updating task "{{task}}"')
+                .replace('{{task}}', args.task || '?');
+        } else if (name === 'delete_task') {
+            label = t('ai_chat.tool_task_delete', {}, 'Removing task "{{task}}"')
+                .replace('{{task}}', args.task || '?');
+        } else if (name === 'set_checklist_item') {
+            label = t('ai_chat.tool_checklist', {}, 'Updating a checkbox of note #{{id}}')
+                .replace('{{id}}', args.note_id || '?');
         } else {
             label = String(name || '');
         }
@@ -228,7 +308,23 @@
             get_note: 'lucide-file-text',
             rename_note: 'lucide-pencil',
             update_note_content: 'lucide-pencil',
-            create_note: 'lucide-plus-circle'
+            create_note: 'lucide-plus-circle',
+            delete_note: 'lucide-trash-2',
+            delete_folder: 'lucide-trash-2',
+            update_note_tags: 'lucide-tag',
+            list_tags: 'lucide-tags',
+            list_folders: 'lucide-folder-open',
+            create_folder: 'lucide-folder-plus',
+            rename_folder: 'lucide-pencil',
+            move_note_to_folder: 'lucide-folder-output',
+            set_note_favorite: 'lucide-star',
+            set_folder_favorite: 'lucide-star',
+            set_note_reminder: 'lucide-bell',
+            remove_note_reminder: 'lucide-bell',
+            add_task: 'lucide-plus-circle',
+            update_task: 'lucide-check-square',
+            delete_task: 'lucide-x-circle',
+            set_checklist_item: 'lucide-check-square'
         };
         var div = document.createElement('div');
         div.className = 'ai-chat-tool';
@@ -301,6 +397,7 @@
                 renderAssistantBubble(bubble, msg.content);
             }
         });
+        scrollToBottom();
     }
 
     function setStreaming(on) {
@@ -326,9 +423,6 @@
         if (!p) return;
         p.classList.toggle('ai-chat-open', open);
         document.documentElement.classList.remove('ai-chat-open');
-        document.querySelectorAll('.icon-sidebar-btn[data-action="toggle-ai-chat"]').forEach(function (b) {
-            b.classList.toggle('icon-sidebar-btn-active', open);
-        });
         if (isDesktop()) {
             try { localStorage.setItem(OPEN_KEY, open ? 'true' : 'false'); } catch (e) { /* ignore */ }
         }
@@ -336,17 +430,50 @@
             // The empty hint mentions the open note, which changed since the
             // panel was last rendered: redraw it while the chat is still empty.
             if (!conversation.length) resetMessages();
+            updateWorkspaceIndicator();
             updateContextIndicator();
         }
     }
 
     function toggle() {
         var open = !isOpen();
+        if (open && askScope()) return;
         setOpen(open);
         if (open) {
             var input = document.getElementById('ai-chat-input');
             if (input && isDesktop()) input.focus();
         }
+    }
+
+    /**
+     * dashboard.php renders #aiChatScopeModal when the board shows several
+     * workspaces: the assistant only ever acts on one, so the first click on
+     * the rail button says which one and asks whether to go on. Continue
+     * opens the panel (and stops asking for the rest of the page), Cancel,
+     * the backdrop and Escape leave it closed. Returns true when the notice
+     * took the click.
+     */
+    function scopeModal() {
+        return document.getElementById('aiChatScopeModal');
+    }
+
+    function askScope() {
+        var modal = scopeModal();
+        if (!modal || scopeAcknowledged) return false;
+        modal.style.display = 'flex';
+        var btn = modal.querySelector('[data-action="ai-chat-scope-continue"]');
+        if (btn) btn.focus();
+        return true;
+    }
+
+    function closeScopeModal() {
+        var modal = scopeModal();
+        if (modal) modal.style.display = 'none';
+    }
+
+    function isScopeModalOpen() {
+        var modal = scopeModal();
+        return !!modal && modal.style.display === 'flex';
     }
 
     /**
@@ -402,7 +529,7 @@
         el.innerHTML = '';
         var hint = document.createElement('div');
         hint.className = 'ai-chat-empty';
-        var text = t('ai_chat.empty', {}, 'Ask a question.\nThe assistant can search, read, create, rename and edit your notes.');
+        var text = t('ai_chat.empty', {}, 'Ask a question.\nThe assistant can search, read, create, edit, organize and delete your notes.');
         if (currentNoteId()) {
             text += '\n' + t('ai_chat.empty_open_note', {}, 'Say "this note" for the one you have open.');
         }
@@ -430,6 +557,7 @@
         conversation = [];
         resetMessages();
         restoreConversation();
+        updateWorkspaceIndicator();
     }
 
     function send() {
@@ -584,18 +712,43 @@
             if (clearBtn) {
                 e.preventDefault();
                 clear();
+                return;
             }
+            var scopeBtn = e.target.closest('[data-action="ai-chat-scope-continue"], [data-action="ai-chat-scope-cancel"]');
+            if (scopeBtn) {
+                e.preventDefault();
+                closeScopeModal();
+                if (scopeBtn.getAttribute('data-action') === 'ai-chat-scope-continue') {
+                    scopeAcknowledged = true;
+                    toggle();
+                }
+                return;
+            }
+            if (e.target === scopeModal()) {
+                closeScopeModal();
+            }
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && isScopeModalOpen()) closeScopeModal();
         });
 
         restoreConversation();
 
-        // Docked state applied by index.php before the first paint: carry it
+        // Docked state applied by the page before the first paint: carry it
         // on the panel from now on (same width, so nothing animates)
         if (document.documentElement.classList.contains('ai-chat-open')) {
             setOpen(true);
         }
         initResize();
 
+        // The translations arrive after the first render (js/globals.js
+        // fetches them): the hint drawn above with the English fallbacks is
+        // redrawn in the user's language once they are in.
+        document.addEventListener('poznote:i18n:loaded', function () {
+            if (!conversation.length) resetMessages();
+        });
+
+        updateWorkspaceIndicator();
         updateContextIndicator();
         document.addEventListener('noteLoaded', updateContextIndicator);
         // The open note's title is edited in place: keep the shown one current
@@ -605,8 +758,9 @@
             }
         });
 
-        // Arriving from the dashboard's AI button: open the panel and drop
-        // the parameter so a plain reload doesn't reopen it
+        // Arriving from the "Back to AI Assistant" link of the settings pages
+        // (back_to_settings.php): open the panel and drop the parameter so a
+        // plain reload doesn't reopen it
         var params = new URLSearchParams(window.location.search);
         if (params.get('ai_chat') === '1') {
             if (!isOpen()) toggle();

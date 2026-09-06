@@ -3,9 +3,9 @@
  * WorkspacesController - RESTful API controller for workspaces
  * 
  * Endpoints:
- *   GET    /api/v1/workspaces          - List all workspaces (with their tags)
- *   POST   /api/v1/workspaces          - Create a new workspace (optional tags)
- *   PATCH  /api/v1/workspaces/{name}   - Rename a workspace and/or set its tags
+ *   GET    /api/v1/workspaces          - List all workspaces (with their tags and color)
+ *   POST   /api/v1/workspaces          - Create a new workspace (optional tags and color)
+ *   PATCH  /api/v1/workspaces/{name}   - Rename a workspace and/or set its tags or color
  *   DELETE /api/v1/workspaces/{name}   - Delete a workspace
  */
 
@@ -40,18 +40,22 @@ class WorkspacesController {
                 $rows = [];
 
                 if (is_string($publicWorkspaceName) && $publicWorkspaceName !== '') {
-                    $stmt = $this->con->prepare('SELECT name, created, tags FROM workspaces WHERE name = ? ORDER BY name');
+                    $stmt = $this->con->prepare('SELECT name, created, tags, color FROM workspaces WHERE name = ? ORDER BY name');
                     $stmt->execute([$publicWorkspaceName]);
                     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 }
             } else {
-                $stmt = $this->con->query("SELECT name, created, tags FROM workspaces ORDER BY name");
+                $stmt = $this->con->query("SELECT name, created, tags, color FROM workspaces ORDER BY name");
                 $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
             }
 
-            // Tags are stored comma-separated; expose them as a list
+            // Tags are stored comma-separated; expose them as a list. The
+            // color is the stored value (palette id or '#rrggbb') plus the hex
+            // it resolves to, null when the workspace has none.
             $rows = array_map(function ($row) {
                 $row['tags'] = poznoteParseWorkspaceTags($row['tags'] ?? '');
+                $row['color'] = ($row['color'] ?? '') !== '' ? (string)$row['color'] : null;
+                $row['color_hex'] = $row['color'] !== null ? (resolveNoteColorHex($row['color']) ?: null) : null;
                 return $row;
             }, $rows);
             
@@ -88,8 +92,9 @@ class WorkspacesController {
     /**
      * POST /api/v1/workspaces
      * Create a new workspace
-     * Body: { "name": "workspace_name", "tags": ["school", "psycho"] }
-     * (tags optional: an array or a comma-separated string)
+     * Body: { "name": "workspace_name", "tags": ["school", "psycho"], "color": "blue" }
+     * (tags optional: an array or a comma-separated string; color optional: a
+     * palette id or '#rrggbb')
      */
     public function store() {
         if (!$this->requireActiveAccountOwner()) {
@@ -121,6 +126,14 @@ class WorkspacesController {
             return;
         }
         
+        $hasColor = false;
+        $color = self::parseColorInput($input, $hasColor);
+        if ($color === false) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Invalid color: use a palette id or #rrggbb']);
+            return;
+        }
+
         try {
             // Check if workspace already exists
             $check = $this->con->prepare("SELECT COUNT(*) FROM workspaces WHERE name = ?");
@@ -133,13 +146,13 @@ class WorkspacesController {
             
             $tags = poznoteParseWorkspaceTags($input['tags'] ?? []);
 
-            $stmt = $this->con->prepare("INSERT INTO workspaces (name, tags) VALUES (?, ?)");
-            if ($stmt->execute([$name, poznoteSerializeWorkspaceTags($tags)])) {
+            $stmt = $this->con->prepare("INSERT INTO workspaces (name, tags, color) VALUES (?, ?, ?)");
+            if ($stmt->execute([$name, poznoteSerializeWorkspaceTags($tags), $color])) {
                 require_once dirname(__DIR__, 3) . '/ActivityLog.php';
                 logActivity(ACTIVITY_WORKSPACE_CREATED, ['workspace' => $name], 'api');
 
                 http_response_code(201);
-                echo json_encode(['success' => true, 'name' => $name, 'tags' => $tags]);
+                echo json_encode(['success' => true, 'name' => $name, 'tags' => $tags, 'color' => $color]);
             } else {
                 http_response_code(500);
                 echo json_encode(['success' => false, 'message' => 'Error creating workspace']);
@@ -152,9 +165,10 @@ class WorkspacesController {
     
     /**
      * PATCH /api/v1/workspaces/{name}
-     * Rename a workspace and/or replace its tags
-     * Body: { "new_name": "new_workspace_name", "tags": ["school"] }
-     * (both optional, at least one required; tags replace the whole list)
+     * Rename a workspace and/or replace its tags and/or set its color
+     * Body: { "new_name": "new_workspace_name", "tags": ["school"], "color": "#3b82f6" }
+     * (all optional, at least one required; tags replace the whole list, an
+     * empty color clears it)
      */
     public function update($name) {
         if (!$this->requireActiveAccountOwner()) {
@@ -173,6 +187,13 @@ class WorkspacesController {
         $newName = trim($input['new_name'] ?? '');
         $hasTags = array_key_exists('tags', $input);
         $tags = $hasTags ? poznoteParseWorkspaceTags($input['tags']) : null;
+        $hasColor = false;
+        $color = self::parseColorInput($input, $hasColor);
+        if ($color === false) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Invalid color: use a palette id or #rrggbb']);
+            return;
+        }
 
         if ($name === '') {
             http_response_code(400);
@@ -180,9 +201,9 @@ class WorkspacesController {
             return;
         }
 
-        if ($newName === '' && !$hasTags) {
+        if ($newName === '' && !$hasTags && !$hasColor) {
             http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'new_name or tags is required']);
+            echo json_encode(['success' => false, 'message' => 'new_name, tags or color is required']);
             return;
         }
 
@@ -208,15 +229,22 @@ class WorkspacesController {
                 return;
             }
             
-            // Tags only: no rename involved
+            // Tags and/or color only: no rename involved
             if ($newName === '' || $newName === $name) {
-                $stmt = $this->con->prepare("UPDATE workspaces SET tags = ? WHERE name = ?");
-                $stmt->execute([poznoteSerializeWorkspaceTags($tags ?? []), $name]);
+                if ($hasTags) {
+                    $stmt = $this->con->prepare("UPDATE workspaces SET tags = ? WHERE name = ?");
+                    $stmt->execute([poznoteSerializeWorkspaceTags($tags ?? []), $name]);
+                }
+                if ($hasColor) {
+                    $stmt = $this->con->prepare("UPDATE workspaces SET color = ? WHERE name = ?");
+                    $stmt->execute([$color, $name]);
+                }
                 echo json_encode([
                     'success' => true,
                     'old_name' => $name,
                     'new_name' => $name,
-                    'tags' => $tags ?? []
+                    'tags' => $hasTags ? $tags : null,
+                    'color' => $hasColor ? $color : null
                 ]);
                 return;
             }
@@ -256,11 +284,16 @@ class WorkspacesController {
                     $stmt = $this->con->prepare("UPDATE workspaces SET tags = ? WHERE name = ?");
                     $stmt->execute([poznoteSerializeWorkspaceTags($tags), $newName]);
                 }
+                if ($hasColor) {
+                    $stmt = $this->con->prepare("UPDATE workspaces SET color = ? WHERE name = ?");
+                    $stmt->execute([$color, $newName]);
+                }
                 echo json_encode([
                     'success' => true,
                     'old_name' => $name,
                     'new_name' => $newName,
-                    'tags' => $hasTags ? $tags : null
+                    'tags' => $hasTags ? $tags : null,
+                    'color' => $hasColor ? $color : null
                 ]);
             } else {
                 http_response_code(500);
@@ -272,6 +305,25 @@ class WorkspacesController {
         }
     }
     
+    /**
+     * Color field of a request body. Sets $present to whether the field was
+     * sent at all. Returns null when absent or empty (clears the color), the
+     * value to store (palette id or normalized '#rrggbb') otherwise, or false
+     * when the value is not a color.
+     */
+    private static function parseColorInput(array $input, bool &$present) {
+        $present = array_key_exists('color', $input);
+        if (!$present) {
+            return null;
+        }
+        $raw = trim((string)($input['color'] ?? ''));
+        if ($raw === '') {
+            return null;
+        }
+        $normalized = normalizeStoredNoteColor($raw);
+        return $normalized === null ? false : $normalized;
+    }
+
     /**
      * DELETE /api/v1/workspaces/{name}
      * Delete a workspace

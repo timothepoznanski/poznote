@@ -695,6 +695,15 @@
       "saved": "Tags atualizadas",
       "save_error": "Não foi possível atualizar as tags",
       "empty": "Ainda não há tags."
+    },
+    "color": {
+      "action": "Cor",
+      "modal_title": "Cor do espaço de trabalho",
+      "help": "A cor identifica as notas e pastas deste espaço de trabalho no painel quando vários espaços são exibidos juntos.",
+      "custom": "Cor personalizada",
+      "saved": "Cor atualizada",
+      "save_error": "Não foi possível atualizar a cor",
+      "invalid": "Cor inválida"
     }
   },
   "display": {
@@ -3425,6 +3434,13 @@
       "in_progress": "Saindo..."
     }
   },
+  "support_modal": {
+    "question": "Se você gosta do Poznote, que tal pagar um cafezinho para apoiá-lo? ☕",
+    "yes": "Sim!",
+    "no": "Não...",
+    "thanks": "Obrigado! ❤️",
+    "thanks_sub": "Você é incrível."
+  },
   "password": {
     "status": {
       "custom": "Senha personalizada",
@@ -3768,6 +3784,7 @@
     "pin_note": "Fixar no topo",
     "unpin_note": "Desafixar",
     "pin_error": "Não foi possível atualizar o estado de fixação.",
+    "reorder_error": "Não foi possível salvar a ordem dos cartões.",
     "others_section": "Outros",
     "unpin": "Remover dos favoritos",
     "no_folder": "Outras notas",
@@ -3779,6 +3796,7 @@
       "size_small": "Pequenos",
       "size_medium": "Médios",
       "size_large": "Grandes",
+      "size_wide": "Largos",
       "columns": "Colunas máximas",
       "layout": "Disposição",
       "layout_grid": "Grelha",
@@ -3916,7 +3934,7 @@
     "tool_rename": "Renomeando a nota #{{id}} para \"{{title}}\"",
     "tool_update": "Editando a nota #{{id}}",
     "tool_create": "Criando a nota: {{title}}",
-    "context_label": "Contexto:",
+    "context_label": "Nota:",
     "context_hint": "A nota que o assistente usa quando diz \"esta nota\"."
   },
   "diary": {

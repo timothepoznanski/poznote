@@ -118,6 +118,17 @@
     color: #666;
 }
 
+/* Color dot of a colored workspace, taking the icon's slot (3 + 10 + 11 =
+   the icon's 16px plus its 8px margin, so labels stay aligned) */
+.workspace-menu-item .workspace-menu-dot {
+    width: 10px;
+    height: 10px;
+    margin: 0 11px 0 3px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
 /* min-width: 0 defeats the flex item's automatic min-content floor, without
    which the label would push the menu wider instead of ellipsizing. */
 .workspace-menu-item span {

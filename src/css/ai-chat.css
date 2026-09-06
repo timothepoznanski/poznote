@@ -291,9 +291,10 @@ a.ai-chat-header-btn {
     white-space: nowrap;
 }
 
-/* Which note "this note" means, right above the input. Quiet on purpose:
-   one muted line, the title cut with an ellipsis. Hidden when no note is
-   open (js/ai-chat.js toggles the hidden attribute). */
+/* Two muted lines right above the input: the workspace every tool runs in,
+   then which note "this note" means (hidden when no note is open,
+   js/ai-chat.js toggles the hidden attribute). Titles are cut with an
+   ellipsis. */
 .ai-chat-context {
     flex-shrink: 0;
     display: flex;
@@ -324,6 +325,10 @@ a.ai-chat-header-btn {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.ai-chat-workspace {
+    padding-bottom: 4px;
 }
 
 /* Input bar */
@@ -426,6 +431,17 @@ a.ai-chat-header-btn {
     border: 1px solid #f0e0b0;
     border-radius: 8px;
     padding: 6px 10px;
+}
+
+/* dashboard.php: the board is a normal document-flow page that scrolls the
+   body (see css/icon-sidebar-page.css), so the docked column is pinned to
+   the viewport instead of scrolling away with it. Desktop only: phones get
+   the overlay below. */
+@media (min-width: 801px) {
+    body.dashboard-page #ai-chat-panel {
+        position: sticky;
+        top: 0;
+    }
 }
 
 /* Phones: the note pane has no room to give, so the panel slides over it */

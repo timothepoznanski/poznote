@@ -132,12 +132,18 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
+    gap: 0;
     flex-shrink: 0;
     align-self: stretch;
     margin: 8px 4px 0;
-    padding: 8px 0 0;
+    padding: 6px 0 0;
     border-top: 1px solid var(--pz-border);
+}
+
+/* Tighter than the navigation entries above: six account actions at the
+   rail's full 40px pitch would eat a third of a laptop screen. */
+.icon-sidebar-bottom .icon-sidebar-btn {
+    height: 36px;
 }
 
 /* display:flex would otherwise beat the browser's [hidden] rule (index.php

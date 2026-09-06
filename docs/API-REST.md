@@ -635,6 +635,8 @@ POST /notes/reorder
 
 Move a note before or after another note (manual drag-and-drop order). The note lands in the target note's folder (or at the root when the target has none), every note there is renumbered, and that folder switches to the `manual` sort so the position sticks. For a root note the global note sort setting becomes `manual`; folders that were following the global default keep their current ordering.
 
+With `"scope": "dashboard"` the request reorders the note's card on the dashboard instead: the rank is written to the note's `dashboard_order` (a column of its own, the sidebar's `display_order` is untouched), the target must be in the same folder, and neither the folder's sort setting nor the note's `updated` date change. The dashboard shows pinned cards first, then placed cards in saved order, with cards that were never placed ahead of them by newest update.
+
 **Request Body (JSON):**
 
 | Field | Type | Required | Description |
@@ -643,6 +645,7 @@ Move a note before or after another note (manual drag-and-drop order). The note 
 | `target_note_id` | integer | Yes | Note used as anchor (same workspace) |
 | `position` | string | Yes | `before` or `after` the target note |
 | `workspace` | string | No | Workspace check (must match target note) |
+| `scope` | string | No | `sidebar` (default) or `dashboard`, see above |
 
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \
@@ -2043,7 +2046,7 @@ curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
 GET /workspaces
 ```
 
-Get all workspaces. Each workspace carries its `tags` (a list of labels, empty when none). Tags group workspaces on the dashboard scope selector.
+Get all workspaces. Each workspace carries its `tags` (a list of labels, empty when none) and its `color` (a palette id or `#rrggbb`, `null` when none) with the hex it resolves to in `color_hex`. Tags group workspaces on the dashboard scope selector; the color marks the workspace's cards when several workspaces are shown together.
 
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \
@@ -2056,8 +2059,8 @@ curl -u 'username:password' -H "X-User-ID: 1" \
 {
   "success": true,
   "workspaces": [
-    { "name": "Psycho 101", "created": "2026-09-01 10:00:00", "tags": ["school", "psycho"] },
-    { "name": "Poznote", "created": "2026-01-01 09:00:00", "tags": [] }
+    { "name": "Psycho 101", "created": "2026-09-01 10:00:00", "tags": ["school", "psycho"], "color": "blue", "color_hex": "#3b82f6" },
+    { "name": "Poznote", "created": "2026-01-01 09:00:00", "tags": [], "color": null, "color_hex": null }
   ]
 }
 ```
@@ -2074,6 +2077,7 @@ POST /workspaces
 |-------|------|----------|-------------|
 | `name` | string | Yes | Workspace name |
 | `tags` | array or string | No | Tags of the workspace, as a list or a comma-separated string (max 20 tags, 50 characters each) |
+| `color` | string | No | Palette id (`blue`, ...) or `#rrggbb` |
 
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \
@@ -2082,7 +2086,7 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/workspaces
 ```
 
-### Rename Workspace / Set Tags
+### Rename Workspace / Set Tags / Set Color
 
 ```
 PATCH /workspaces/{name}
@@ -2094,6 +2098,7 @@ PATCH /workspaces/{name}
 |-------|------|-------------|
 | `new_name` | string | New workspace name |
 | `tags` | array or string | Replaces the whole tag list (send an empty list to clear the tags) |
+| `color` | string | Palette id (`blue`, ...) or `#rrggbb`; an empty string clears the color |
 
 ```bash
 curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \

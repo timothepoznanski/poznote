@@ -698,6 +698,15 @@
       "saved": "标签已更新",
       "save_error": "无法更新标签",
       "empty": "还没有标签。"
+    },
+    "color": {
+      "action": "颜色",
+      "modal_title": "工作区颜色",
+      "help": "同时显示多个工作区时，该颜色用于在仪表盘中标识此工作区的笔记和文件夹。",
+      "custom": "自定义颜色",
+      "saved": "颜色已更新",
+      "save_error": "无法更新颜色",
+      "invalid": "无效的颜色"
     }
   },
   "display": {
@@ -3543,6 +3552,13 @@
       "in_progress": "正在退出登录..."
     }
   },
+  "support_modal": {
+    "question": "如果你喜欢 Poznote，愿意请它喝杯小咖啡来支持一下吗？☕",
+    "yes": "是的！",
+    "no": "否...",
+    "thanks": "谢谢！❤️",
+    "thanks_sub": "你真棒。"
+  },
   "password": {
     "status": {
       "custom": "自定义密码",
@@ -3886,6 +3902,7 @@
     "pin_note": "置顶",
     "unpin_note": "取消置顶",
     "pin_error": "无法更新置顶状态。",
+    "reorder_error": "无法保存卡片顺序。",
     "others_section": "其他",
     "unpin": "取消收藏",
     "no_folder": "其他笔记",
@@ -3897,6 +3914,7 @@
       "size_small": "小",
       "size_medium": "中",
       "size_large": "大",
+      "size_wide": "宽",
       "columns": "最大列数",
       "layout": "布局",
       "layout_grid": "网格",
@@ -4034,7 +4052,7 @@
     "tool_rename": "正在将笔记 #{{id}} 重命名为“{{title}}”",
     "tool_update": "正在编辑笔记 #{{id}}",
     "tool_create": "正在创建笔记：{{title}}",
-    "context_label": "上下文：",
+    "context_label": "笔记：",
     "context_hint": "当您说“这条笔记”时，助手使用的笔记。"
   },
   "diary": {

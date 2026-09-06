@@ -199,9 +199,15 @@ function displayWorkspaceMenu(menu, workspaces, username, actingAs) {
         var currentClass = isCurrent ? ' current-workspace' : '';
         var icon = isCurrent ? 'lucide-check-circle' : 'lucide-layers';
         var safeName = escapeWorkspaceMenuText(workspace.name);
+        // A colored workspace (workspaces.php > Color) shows its dot in the
+        // icon slot, as on the dashboard; the current one is still told apart
+        // by its bold accent label
+        var mark = workspace.color_hex
+            ? '<span class="workspace-menu-dot" style="background-color:' + escapeWorkspaceMenuText(workspace.color_hex) + '"></span>'
+            : '<i class="' + icon + '"></i>';
 
         menuHtml += '<div class="workspace-menu-item' + currentClass + '" data-workspace-name="' + safeName + '">';
-        menuHtml += '<i class="' + icon + '"></i>';
+        menuHtml += mark;
         menuHtml += '<span>' + safeName + '</span>';
         menuHtml += '</div>';
     }
@@ -1885,6 +1891,132 @@ function handleWorkspaceTagsButtonClick(e) {
     };
 }
 
+// Workspace color modal ("Color" action): one swatch per entry of the note
+// color palette plus a custom color. Saved like the tags (set_color POST to
+// workspaces.php); the dot marks the workspace's cards on multi-workspace
+// dashboard views.
+var workspaceColorState = { name: '', color: '' };
+
+function closeWorkspaceColorModal() {
+    var modal = document.getElementById('workspaceColorModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function isWorkspaceColorHex(value) {
+    return /^#[0-9a-f]{6}$/i.test(value || '');
+}
+
+// Highlight the swatch matching the pending value: a palette entry by id (or
+// by its hex), else the custom swatch, tinted with the value
+function renderWorkspaceColorSelection() {
+    var grid = document.getElementById('workspaceColorGrid');
+    if (!grid) return;
+    var value = (workspaceColorState.color || '').toLowerCase();
+    var matchedPalette = false;
+    Array.prototype.forEach.call(grid.querySelectorAll('.ws-color-option[data-color]'), function (option) {
+        var isSelected = value !== '' && (
+            option.getAttribute('data-color') === value ||
+            (option.getAttribute('data-hex') || '').toLowerCase() === value
+        );
+        option.classList.toggle('selected', isSelected);
+        option.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+        if (isSelected) matchedPalette = true;
+    });
+    var isCustom = !matchedPalette && isWorkspaceColorHex(value);
+    var custom = grid.querySelector('.ws-color-option-custom');
+    var customSwatch = grid.querySelector('.ws-color-swatch-custom');
+    var customInput = document.getElementById('workspaceColorCustom');
+    if (custom) custom.classList.toggle('selected', isCustom);
+    if (customSwatch) customSwatch.style.background = isCustom ? value : '';
+    if (customInput && isCustom) customInput.value = value;
+}
+
+function saveWorkspaceColor(color, buttons) {
+    buttons.forEach(function (button) { button.disabled = true; });
+    var params = new URLSearchParams({
+        action: 'set_color',
+        name: workspaceColorState.name,
+        color: color || ''
+    });
+
+    fetch('workspaces.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        },
+        body: params.toString()
+    })
+        .then(function (resp) { return resp.json(); })
+        .then(function (json) {
+            buttons.forEach(function (button) { button.disabled = false; });
+            if (json && json.success) {
+                closeWorkspaceColorModal();
+                showAjaxAlert(wsTr('workspaces.color.saved', {}, 'Color updated'), 'success');
+                // Reload so the row dot and the action's data-color follow
+                setTimeout(function () { window.location.reload(); }, 600);
+            } else {
+                showAjaxAlert(wsTr('workspaces.alerts.error_prefix', { error: (json && json.error) || wsTr('workspaces.alerts.unknown_error', {}, 'Unknown error') }, 'Error: {{error}}'), 'danger');
+            }
+        })
+        .catch(function () {
+            buttons.forEach(function (button) { button.disabled = false; });
+            showAjaxAlert(wsTr('workspaces.color.save_error', {}, 'Could not update the color'), 'danger');
+        });
+}
+
+function handleWorkspaceColorButtonClick(e) {
+    var closeBtn = e.target && e.target.closest ? e.target.closest('[data-action="close-workspace-color-modal"]') : null;
+    if (closeBtn) {
+        e.preventDefault();
+        closeWorkspaceColorModal();
+        return;
+    }
+
+    // A palette swatch: select it (the custom swatch is a label around the
+    // native color input, which opens on its own)
+    var option = e.target && e.target.closest ? e.target.closest('#workspaceColorGrid .ws-color-option[data-color]') : null;
+    if (option) {
+        e.preventDefault();
+        workspaceColorState.color = (option.getAttribute('data-color') || '').toLowerCase();
+        renderWorkspaceColorSelection();
+        return;
+    }
+
+    var button = e.target && e.target.closest ? e.target.closest('.workspace-color-action') : null;
+    if (!button) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    var workspaceName = button.getAttribute('data-ws');
+    var modal = document.getElementById('workspaceColorModal');
+    var confirmBtn = document.getElementById('confirmWorkspaceColorBtn');
+    var clearBtn = document.getElementById('workspaceColorClearBtn');
+    var customInput = document.getElementById('workspaceColorCustom');
+    if (!workspaceName || !modal || !confirmBtn || !clearBtn) return;
+
+    workspaceColorState = {
+        name: workspaceName,
+        color: (button.getAttribute('data-color') || '').toLowerCase()
+    };
+
+    var source = document.getElementById('workspaceColorSource');
+    if (source) source.textContent = workspaceName;
+    if (customInput) {
+        customInput.value = isWorkspaceColorHex(workspaceColorState.color) ? workspaceColorState.color : '#94a3b8';
+        customInput.oninput = function () {
+            workspaceColorState.color = (customInput.value || '').toLowerCase();
+            renderWorkspaceColorSelection();
+        };
+    }
+    renderWorkspaceColorSelection();
+    modal.style.display = 'flex';
+
+    confirmBtn.onclick = function () { saveWorkspaceColor(workspaceColorState.color, [confirmBtn, clearBtn]); };
+    clearBtn.onclick = function () { saveWorkspaceColor('', [confirmBtn, clearBtn]); };
+}
+
 // The workspace name is the link that opens it (a plain click; modified
 // clicks keep the browser's open-in-new-tab behaviour)
 function handleSelectButtonClick(e) {
@@ -2323,6 +2455,7 @@ function initializeWorkspacesPage() {
     // Add event listeners for buttons
     document.addEventListener('click', handleRenameButtonClick);
     document.addEventListener('click', handleWorkspaceTagsButtonClick);
+    document.addEventListener('click', handleWorkspaceColorButtonClick);
     document.addEventListener('click', handleSelectButtonClick);
     document.addEventListener('click', handleDeleteButtonClick);
     document.addEventListener('click', handleMoveButtonClick);

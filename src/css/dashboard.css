@@ -695,7 +695,7 @@ body.dark-mode .dash-section-title {
     -webkit-line-clamp: 1;
 }
 
-.view-size-small .dash-folder-card .dash-card-count {
+.view-size-small .dash-folder-card .dash-card-meta {
     margin-top: 2px;
 }
 
@@ -715,6 +715,19 @@ body.dark-mode .dash-section-title {
 .view-size-large .dash-card-thumb {
     width: 104px;
     height: 104px;
+}
+
+/* Wide: wider than a large card but at the medium height (the default
+   132px rows), so long titles and excerpt lines get room without the cards
+   growing taller. Everything else keeps the medium defaults. */
+.view-size-wide {
+    --dash-col-min: 320px;
+    --dash-col-gap: 16px;
+}
+
+.view-size-wide .dash-card-thumb {
+    width: 88px;
+    height: 88px;
 }
 
 /* ---------- View variants: list layout ---------- */
@@ -821,7 +834,7 @@ body.dark-mode .dash-section-title {
     margin: 0;
 }
 
-.view-layout-list .dash-folder-card .dash-card-count {
+.view-layout-list .dash-folder-card .dash-card-meta {
     margin: 0 0 0 auto;
 }
 
@@ -1098,7 +1111,8 @@ body.dark-mode .note-color-name {
 /* First footer button: pushed left, quiet outlined style. The extra
    .modal-buttons scope out-specifies the blue button:first-child rule
    in css/modals/base.css. */
-.modal-buttons button.note-color-manage-btn {
+.modal-buttons button.note-color-manage-btn,
+.modal-buttons button.dashboard-scope-manage-btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -1111,26 +1125,32 @@ body.dark-mode .note-color-name {
     transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-.modal-buttons button.note-color-manage-btn:hover {
+.modal-buttons button.note-color-manage-btn:hover,
+.modal-buttons button.dashboard-scope-manage-btn:hover {
     border-color: var(--pz-text-subtle);
     background: #f9fafb;
 }
 
-.note-color-manage-btn .lucide {
+.note-color-manage-btn .lucide,
+.dashboard-scope-manage-btn .lucide {
     width: 14px;
     height: 14px;
     flex-shrink: 0;
 }
 
 :root[data-theme='dark'] .modal-buttons button.note-color-manage-btn,
-body.dark-mode .modal-buttons button.note-color-manage-btn {
+body.dark-mode .modal-buttons button.note-color-manage-btn,
+:root[data-theme='dark'] .modal-buttons button.dashboard-scope-manage-btn,
+body.dark-mode .modal-buttons button.dashboard-scope-manage-btn {
     border-color: var(--dm-border);
     background: transparent;
     color: var(--dm-text);
 }
 
 :root[data-theme='dark'] .modal-buttons button.note-color-manage-btn:hover,
-body.dark-mode .modal-buttons button.note-color-manage-btn:hover {
+body.dark-mode .modal-buttons button.note-color-manage-btn:hover,
+:root[data-theme='dark'] .modal-buttons button.dashboard-scope-manage-btn:hover,
+body.dark-mode .modal-buttons button.dashboard-scope-manage-btn:hover {
     border-color: var(--dm-text-muted);
     background: var(--dm-surface-hover);
 }
@@ -1153,8 +1173,38 @@ body.dark-mode .modal-buttons button.note-color-manage-btn:hover {
     margin-top: -2px;
 }
 
-.dash-folder-card .dash-card-count {
+/* Count and, on multi-workspace boards, the workspace badge on one row */
+.dash-folder-card .dash-card-meta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    max-width: 100%;
+    min-width: 0;
     margin-top: 6px;
+}
+
+.dash-card-ws {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    font-size: 11px;
+    color: var(--pz-text-muted);
+}
+
+.dash-card-ws .lucide {
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
+}
+
+/* The name is the part that gives way when the row is too narrow */
+.dash-card-ws .dash-ws-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .dash-card-icon {
@@ -1268,6 +1318,58 @@ body.dark-mode .modal-buttons button.note-color-manage-btn:hover {
 /* A pinned card reads as pinned even before the button is noticed. */
 .dash-card.is-pinned {
     border-color: rgba(var(--pz-accent-rgb), 0.45);
+}
+
+/* ---------- Card drag-and-drop (manual board order) ----------
+   Note cards can be dragged among their siblings (initCardReorder in
+   js/dashboard-page.js); the position goes to entries.dashboard_order. The
+   card being dragged fades, and the drop target shows an accent bar on the
+   edge the card will land on: left or right in the grid, top or bottom in
+   the list layout. The bar is a pseudo-element inside the card, which already
+   clips its overflow and is positioned, so it needs no extra wrapper. */
+.dash-note-card.is-dragging {
+    opacity: 0.45;
+    transform: none;
+    box-shadow: none;
+}
+
+.dash-note-card.drop-before::after,
+.dash-note-card.drop-after::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    width: 3px;
+    border-radius: 2px;
+    background: var(--pz-accent);
+    z-index: 3;
+    pointer-events: none;
+}
+
+.dash-note-card.drop-before::after {
+    left: 0;
+}
+
+.dash-note-card.drop-after::after {
+    right: 0;
+}
+
+.view-layout-list .dash-note-card.drop-before::after,
+.view-layout-list .dash-note-card.drop-after::after {
+    top: auto;
+    bottom: auto;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    height: 3px;
+}
+
+.view-layout-list .dash-note-card.drop-before::after {
+    top: 0;
+}
+
+.view-layout-list .dash-note-card.drop-after::after {
+    bottom: 0;
 }
 
 .dash-note-icon {
@@ -1921,6 +2023,15 @@ body.dark-mode .dashboard-version-badge {
     white-space: nowrap;
 }
 
+/* Small chevron after the workspace name: says the name is a control that
+   opens the scope switcher. Sits closer to the name than the icon on the
+   left, and keeps its size when a long name is ellipsised. */
+.dashboard-top-info-item .dashboard-top-info-chevron {
+    width: 13px;
+    height: 13px;
+    margin-left: -3px;
+}
+
 .dashboard-workspace-trigger,
 .dashboard-user-trigger {
     background: none;
@@ -2052,7 +2163,7 @@ body.dark-mode .dashboard-mobile-back:hover {
     color: var(--pz-text-subtle);
 }
 
-/* Workspace badge on cards of a mixed (filtered) multi-workspace view */
+/* Workspace badge on note cards of a multi-workspace view */
 .board-card-ws {
     display: inline-flex;
     align-items: center;
@@ -2062,6 +2173,38 @@ body.dark-mode .dashboard-mobile-back:hover {
 .board-card-ws .lucide {
     width: 10px;
     height: 10px;
+}
+
+/* The name gives way inside the chip (a flex container cannot ellipsise a
+   bare text node) */
+.board-card-ws .dash-ws-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Color dot of a workspace (workspaces.php > Color), wherever its name shows:
+   card badges, group titles, the breadcrumb and the scope selector */
+.dash-ws-dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.dash-group-dot,
+.bc-workspace-dot,
+.dashboard-scope-dot {
+    width: 12px;
+    height: 12px;
+}
+
+:root[data-theme='dark'] .dash-ws-dot,
+body.dark-mode .dash-ws-dot {
+    border-color: rgba(255, 255, 255, 0.18);
 }
 
 /* Workspace crumb ahead of the folder path */

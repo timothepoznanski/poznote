@@ -161,7 +161,12 @@
             pinBtn +
             '<div class="dash-card-icon"><i class="' + esc(folder.icon) + '"' + iconStyle + '></i></div>' +
             '<span class="dash-card-name">' + esc(folder.name) + '</span>' +
-            '<span class="dash-card-count">' + count + '</span>' +
+            // Count and, on multi-workspace boards, the workspace side by side:
+            // the card has no room for another line under a two-line name
+            '<span class="dash-card-meta">' +
+                '<span class="dash-card-count">' + count + '</span>' +
+                (isMultiScope() && folder.workspace ? buildWorkspaceBadge(folder.workspace, 'dash-card-ws') : '') +
+            '</span>' +
         '</button>';
     }
 
@@ -173,7 +178,7 @@
         return lines.join('\n');
     }
 
-    function buildNoteCard(note, showWorkspace) {
+    function buildNoteCard(note) {
         var tags      = note.tags || [];
         var searchVal = getNoteSearchValue(note);
         var tooltip   = buildNoteTooltip(note, tags);
@@ -195,18 +200,20 @@
         // First image of the note as a thumbnail next to the excerpt
         if (note.image) {
             content = '<div class="dash-card-body">' + content +
-                '<div class="dash-card-thumb"><img src="' + esc(note.image) + '" alt="" loading="lazy" decoding="async"></div>' +
+                '<div class="dash-card-thumb"><img src="' + esc(note.image) + '" alt="" loading="lazy" decoding="async" draggable="false"></div>' +
             '</div>';
         }
 
         var footer = '';
-        var workspaceBadge = showWorkspace && note.workspace;
+        // Every multi-workspace view says where a card comes from, not only
+        // the mixed (filtered) ones: inside a folder or under a group title
+        // the workspace is otherwise easy to lose track of. The badge leads
+        // the tags row.
+        var workspaceBadge = isMultiScope() && note.workspace;
         if (tags.length > 0 || note.updated || workspaceBadge) {
             footer = '<div class="board-card-footer">';
-            // Mixed views list notes from several workspaces: say which one
             if (workspaceBadge) {
-                footer += '<span class="board-card-tag board-card-ws" title="' + esc(note.workspace) + '">' +
-                    '<i class="lucide lucide-layers"></i>' + esc(note.workspace) + '</span>';
+                footer += buildWorkspaceBadge(note.workspace, 'board-card-tag board-card-ws');
             }
             tags.slice(0, 3).forEach(function (tag) {
                 var tagHex = resolveDashboardTagColorHex(tag);
@@ -248,6 +255,11 @@
                 ' style="--note-color:' + esc(note.colorHex) + '"';
         }
 
+        // Draggable only where the order can be saved (see cardsReorderable).
+        // The link and the thumbnail are natively draggable and would start a
+        // link or image drag instead of the card's, hence draggable="false".
+        var dragAttr = cardsReorderable() ? ' draggable="true"' : '';
+
         // The pin button sits outside .dash-card-link so clicking it never
         // navigates to the note.
         var pinTxt = window.DASHBOARD_PIN_TXT || {};
@@ -259,9 +271,9 @@
 
         return '<div class="dash-card dash-note-card' + (note.colorHex ? ' has-note-color' : '') +
             (note.pinned ? ' is-pinned' : '') + '"' +
-            ' data-note-id="' + note.id + '" data-search="' + esc(searchVal) + '" title="' + esc(tooltip) + '"' + colorAttrs + '>' +
+            ' data-note-id="' + note.id + '" data-search="' + esc(searchVal) + '" title="' + esc(tooltip) + '"' + colorAttrs + dragAttr + '>' +
             pinBtn +
-            '<a class="dash-card-link" href="' + esc(note.url) + '"' + linkTarget + '>' +
+            '<a class="dash-card-link" href="' + esc(note.url) + '"' + linkTarget + ' draggable="false">' +
                 '<div class="dash-card-note-title">' + iconHtml + esc(note.heading) + '</div>' +
                 content +
             '</a>' +
@@ -274,7 +286,7 @@
     // Heading of one workspace group in a multi-workspace scope
     function buildGroupTitle(group) {
         var html = '<div class="dash-section-title dash-group-title">' +
-            '<i class="lucide lucide-layers"></i>' +
+            buildWorkspaceMark(group.workspace, 'dash-group-dot') +
             '<span class="dash-group-name">' + esc(group.workspace || '') + '</span>';
         (group.tags || []).forEach(function (tag) {
             html += '<span class="dash-group-tag">' + esc(tag) + '</span>';
@@ -311,12 +323,10 @@
                 return noteMatchesColor(note);
             }), 'globalOrder');
 
-            // Several workspaces mixed together: each card says which one
-            var showWorkspace = isMultiScope();
             matchingFolders.forEach(function (folder) {
                 html += buildFolderCard(folder, findFolderIndexInParent(folder));
             });
-            matchingNotes.forEach(function (note) { html += buildNoteCard(note, showWorkspace); });
+            matchingNotes.forEach(function (note) { html += buildNoteCard(note); });
             setNoResultsVisible(matchingFolders.length === 0 && matchingNotes.length === 0);
         } else if (navStack.length === 0 && isMultiScope()) {
             // Root of a multi-workspace scope: one titled section per workspace
@@ -385,7 +395,7 @@
         // Inside a multi-workspace scope, say which workspace the path belongs to
         if (isMultiScope() && navStack[0] && navStack[0].workspace) {
             html += '<i class="lucide lucide-chevron-right bc-sep"></i>' +
-                '<span class="bc-workspace"><i class="lucide lucide-layers"></i>' + esc(navStack[0].workspace) + '</span>';
+                '<span class="bc-workspace">' + buildWorkspaceMark(navStack[0].workspace, 'bc-workspace-dot') + esc(navStack[0].workspace) + '</span>';
         }
         navStack.forEach(function (folder, i) {
             html += '<i class="lucide lucide-chevron-right bc-sep"></i>';
@@ -713,6 +723,27 @@
 
     // Tag colors share the note color semantics: window.TAG_COLORS maps a
     // lowercased tag name to a palette id or a literal '#rrggbb'.
+    // Color assigned to a workspace (workspaces.php > Color), as hex, or ''
+    function workspaceColorHex(name) {
+        var colors = rootData.scope && rootData.scope.colors;
+        return (name && colors && typeof colors === 'object' && colors[name]) || '';
+    }
+
+    // The workspace's color dot when it has one, a layers icon otherwise:
+    // the mark that goes ahead of a workspace name everywhere on the board
+    function buildWorkspaceMark(name, dotClass) {
+        var hex = workspaceColorHex(name);
+        return hex
+            ? '<span class="dash-ws-dot' + (dotClass ? ' ' + dotClass : '') + '" style="background-color:' + esc(hex) + '"></span>'
+            : '<i class="lucide lucide-layers"></i>';
+    }
+
+    // Badge naming the workspace a card belongs to, on multi-workspace boards
+    function buildWorkspaceBadge(name, className) {
+        return '<span class="' + className + '" title="' + esc(name) + '">' +
+            buildWorkspaceMark(name) + '<span class="dash-ws-name">' + esc(name) + '</span></span>';
+    }
+
     function resolveDashboardTagColorHex(tag) {
         var map = window.TAG_COLORS;
         if (!map || typeof map !== 'object') return '';
@@ -740,17 +771,19 @@
     // already delivers them in that order; this re-sorts in place after a
     // toggle so the card moves without a page reload.
 
-    // Rank each note by its position in the server's updated-DESC order, once,
-    // before any pinning reorders the arrays. Without this, unpinning could only
-    // restore the order the array happened to be in, not the original one.
-    // Both ranks come from the server (see dashboardBuildNoteData in
-    // dashboard.php) and describe the updated-DESC order with pinning ignored:
-    // baseOrder within a note's own folder, globalOrder across the whole tree.
-    // Sorting on them means unpinning restores the original position rather
-    // than whatever order the array was left in.
+    // Rank each note by its position in the server's order, once, before any
+    // pinning reorders the arrays. Without this, unpinning could only restore
+    // the order the array happened to be in, not the original one. Both ranks
+    // come from the server (see dashboardBuildNoteData in dashboard.php) with
+    // pinning ignored: baseOrder is the board order within a note's own folder
+    // (cards placed by dragging, then the rest by newest update, see
+    // dashboardSortRows), globalOrder the updated-DESC rank across the whole
+    // tree, used by the filtered views. Sorting on them means unpinning
+    // restores the original position rather than whatever order the array was
+    // left in. reorderCard() re-ranks baseOrder after a drop.
 
     // Same grouping as dashboardSortPinnedFirst() in dashboard.php: pinned
-    // first, each group falling back to the original updated-DESC order.
+    // first, each group falling back to the original order.
     function sortPinnedFirst(notes, orderKey) {
         var key = orderKey || 'baseOrder';
         return (notes || []).slice().sort(function (a, b) {
@@ -764,6 +797,247 @@
         var node = level || rootData;
         node.notes = sortPinnedFirst(node.notes);
         (node.folders || []).forEach(resortLevel);
+    }
+
+    // --- Card drag-and-drop (manual board order) ---
+    //
+    // Note cards can be dragged among their siblings: the same folder (or the
+    // root, or the same workspace group), and the same pinned state, since
+    // pinned cards always render in their own section ahead of the others.
+    // The drop position is persisted in entries.dashboard_order through
+    // POST /api/v1/notes/reorder with scope=dashboard, a column of its own, so
+    // arranging the board never touches the sidebar's manual order and the
+    // sidebar's sort setting never rearranges the board. The filtered views
+    // mix cards from the whole tree, where a rank among siblings has no
+    // meaning, so dragging is only offered on the plain folder view. Desktop
+    // only: on touch, the long press that starts an HTML5 drag fights the tap
+    // that opens the note, as in the sidebar.
+
+    var cardDrag = null; // { noteId, level, pinned } while a card is dragged
+
+    function isFilteredView() {
+        return !!(activeFilterTerm || activeColorFilter || activeModifiedFilter || activeTagFilter.length);
+    }
+
+    function cardsReorderable() {
+        return window.innerWidth > 800 && !isFilteredView();
+    }
+
+    // Level (root, workspace group or folder) whose .notes holds the note
+    function findNoteLevel(noteId, level) {
+        var id = String(noteId);
+        var levels = level ? [level] : rootLevels();
+        for (var i = 0; i < levels.length; i++) {
+            var notes = levels[i].notes || [];
+            for (var j = 0; j < notes.length; j++) {
+                if (String(notes[j].id) === id) return levels[i];
+            }
+            var folders = levels[i].folders || [];
+            for (var k = 0; k < folders.length; k++) {
+                var found = findNoteLevel(noteId, folders[k]);
+                if (found) return found;
+            }
+        }
+        return null;
+    }
+
+    function indexOfNote(notes, noteId) {
+        for (var i = 0; i < notes.length; i++) {
+            if (String(notes[i].id) === String(noteId)) return i;
+        }
+        return -1;
+    }
+
+    function isListLayout() {
+        var container = document.querySelector('.dashboard-container');
+        return !!(container && container.classList.contains('view-layout-list'));
+    }
+
+    // 'before' or 'after' from where the pointer is relative to a card: left or
+    // right half in the grid, top or bottom half in the list layout. Also
+    // valid for a pointer outside the card (over a gap), where the ratio just
+    // falls below 0 or above 1.
+    function cardDropPosition(e, card) {
+        var rect = card.getBoundingClientRect();
+        var ratio = isListLayout()
+            ? (e.clientY - rect.top) / Math.max(rect.height, 1)
+            : (e.clientX - rect.left) / Math.max(rect.width, 1);
+        return ratio < 0.5 ? 'before' : 'after';
+    }
+
+    // Whether a card can receive the dragged one: a sibling with the same
+    // pinned state, other than the dragged card itself
+    function isCardDropTarget(card) {
+        if (!cardDrag || !card) return false;
+        var noteId = card.getAttribute('data-note-id');
+        if (!noteId || noteId === cardDrag.noteId) return false;
+        var note = findNoteById(noteId);
+        if (!note || !!note.pinned !== cardDrag.pinned) return false;
+        return findNoteLevel(noteId) === cardDrag.level;
+    }
+
+    // Card under the pointer or, over a gap, the nearest eligible card of the
+    // same section, so a drop between two cards still lands somewhere. Folder
+    // cards take nothing: the board does not move notes across folders.
+    function findCardDropTarget(e) {
+        if (!e.target || !e.target.closest) return null;
+        if (e.target.closest('.dash-folder-card')) return null;
+        var direct = e.target.closest('.dash-note-card');
+        if (direct && isCardDropTarget(direct)) {
+            return { card: direct, position: cardDropPosition(e, direct) };
+        }
+        var section = e.target.closest('.dashboard-grid-container');
+        if (!section) return null;
+        var best = null;
+        Array.prototype.forEach.call(section.querySelectorAll('.dash-note-card'), function (card) {
+            if (!isCardDropTarget(card)) return;
+            var rect = card.getBoundingClientRect();
+            var dx = e.clientX < rect.left ? rect.left - e.clientX : (e.clientX > rect.right ? e.clientX - rect.right : 0);
+            var dy = e.clientY < rect.top ? rect.top - e.clientY : (e.clientY > rect.bottom ? e.clientY - rect.bottom : 0);
+            var distance = dx * dx + dy * dy;
+            if (!best || distance < best.distance) {
+                best = { card: card, distance: distance };
+            }
+        });
+        if (!best) return null;
+        return { card: best.card, position: cardDropPosition(e, best.card) };
+    }
+
+    function clearCardDropIndicators() {
+        Array.prototype.forEach.call(document.querySelectorAll('.dash-note-card.drop-before, .dash-note-card.drop-after'), function (card) {
+            card.classList.remove('drop-before');
+            card.classList.remove('drop-after');
+        });
+    }
+
+    function showCardDropIndicator(target) {
+        clearCardDropIndicators();
+        if (target) target.card.classList.add(target.position === 'before' ? 'drop-before' : 'drop-after');
+    }
+
+    function endCardDrag() {
+        clearCardDropIndicators();
+        Array.prototype.forEach.call(document.querySelectorAll('.dash-note-card.is-dragging'), function (card) {
+            card.classList.remove('is-dragging');
+        });
+        cardDrag = null;
+    }
+
+    // Move the dragged note next to the target in its level, re-rank the
+    // siblings and persist. The grid is redrawn at once; on failure the
+    // previous order comes back and the error is shown.
+    function reorderCard(noteId, targetNoteId, position) {
+        var level = findNoteLevel(noteId);
+        if (!level || level !== findNoteLevel(targetNoteId)) return;
+
+        var notes = level.notes;
+        var fromIndex = indexOfNote(notes, noteId);
+        if (fromIndex === -1) return;
+        var previousNotes = notes.slice();
+        var previousOrders = notes.map(function (note) { return note.baseOrder; });
+
+        var moved = notes.splice(fromIndex, 1)[0];
+        var targetIndex = indexOfNote(notes, targetNoteId);
+        if (targetIndex === -1 || !!notes[targetIndex].pinned !== !!moved.pinned) {
+            level.notes = previousNotes;
+            return;
+        }
+        notes.splice(position === 'before' ? targetIndex : targetIndex + 1, 0, moved);
+        // Ranks follow the new arrangement, so a later pin toggle re-sorts on
+        // this order rather than the one the page loaded with
+        notes.forEach(function (note, index) { note.baseOrder = index; });
+        renderAll();
+
+        function restore(detail) {
+            level.notes = previousNotes;
+            previousNotes.forEach(function (note, index) { note.baseOrder = previousOrders[index]; });
+            renderAll();
+            var message = (window.DASHBOARD_REORDER_TXT && window.DASHBOARD_REORDER_TXT.error) ||
+                'Could not save the card order.';
+            if (typeof window.showNotificationPopup === 'function') {
+                window.showNotificationPopup(detail ? message + ' ' + detail : message, 'error');
+            }
+        }
+
+        var body = {
+            scope: 'dashboard',
+            note_id: parseInt(noteId, 10),
+            target_note_id: parseInt(targetNoteId, 10),
+            position: position
+        };
+        if (moved.workspace) body.workspace = moved.workspace;
+        fetch('api/v1/notes/reorder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify(body)
+        }).then(function (response) {
+            return response.json().then(function (data) {
+                if (!response.ok || !data || !data.success) {
+                    throw new Error((data && (data.error || data.message)) || '');
+                }
+            });
+        }).catch(function (error) {
+            restore(error && error.message);
+        });
+    }
+
+    function initCardReorder() {
+        var grid = document.getElementById('dashboardGrid');
+        if (!grid) return;
+
+        grid.addEventListener('dragstart', function (e) {
+            var card = e.target && e.target.closest ? e.target.closest('.dash-note-card') : null;
+            if (!card) return;
+            var noteId = card.getAttribute('data-note-id');
+            var note = noteId ? findNoteById(noteId) : null;
+            var level = noteId ? findNoteLevel(noteId) : null;
+            if (!note || !level || !cardsReorderable()) {
+                e.preventDefault();
+                return;
+            }
+            cardDrag = { noteId: noteId, level: level, pinned: !!note.pinned };
+            // Firefox needs data for the drag to start at all
+            try {
+                e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'dashboard-card', noteId: noteId }));
+                e.dataTransfer.effectAllowed = 'move';
+            } catch (err) { /* ignore */ }
+            // Faded once the browser has taken its drag image of the card
+            setTimeout(function () { card.classList.add('is-dragging'); }, 0);
+        });
+
+        grid.addEventListener('dragover', function (e) {
+            if (!cardDrag) return;
+            var target = findCardDropTarget(e);
+            if (!target) {
+                clearCardDropIndicators();
+                return;
+            }
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            showCardDropIndicator(target);
+        });
+
+        grid.addEventListener('dragleave', function (e) {
+            if (!cardDrag) return;
+            // Moving between children of the grid is not leaving it
+            if (e.relatedTarget && grid.contains(e.relatedTarget)) return;
+            clearCardDropIndicators();
+        });
+
+        grid.addEventListener('drop', function (e) {
+            if (!cardDrag) return;
+            var target = findCardDropTarget(e);
+            var dragged = cardDrag.noteId;
+            e.preventDefault();
+            // Cleared before the grid is redrawn: the source card is replaced
+            // by the render, so its dragend never reaches the grid.
+            endCardDrag();
+            if (target) reorderCard(dragged, target.card.getAttribute('data-note-id'), target.position);
+        });
+
+        // Cancelled drags (Escape, drop outside the grid)
+        grid.addEventListener('dragend', endCardDrag);
     }
 
     function toggleNotePinned(noteId) {
@@ -1441,12 +1715,15 @@
         return url.toString();
     }
 
-    // Checked workspaces to URL: one is a plain workspace, every one is
-    // scope=all, anything else an explicit list
+    // Checked workspaces to URL: one is a single workspace, every one is
+    // scope=all, anything else an explicit list. scope=single marks the
+    // choice as deliberate: the server remembers it, where a plain
+    // ?workspace= link from the rail would not override the saved scope
+    // (see dashboardResolveRememberedScope in dashboard.php).
     function applyScopeSelection(names, allNames) {
         if (!names.length) return;
         if (names.length === 1) {
-            window.location.href = buildDashboardUrl({ workspace: names[0] });
+            window.location.href = buildDashboardUrl({ scope: 'single', workspace: names[0] });
         } else if (names.length === allNames.length) {
             window.location.href = buildDashboardUrl({ scope: 'all' });
         } else {
@@ -1534,6 +1811,7 @@
                     html += '<div class="move-task-item dashboard-scope-row' + (isSelected ? ' selected' : '') + '">' +
                         '<label class="dashboard-scope-row-main">' +
                             '<input type="checkbox" class="dashboard-scope-check" value="' + esc(ws.name) + '"' + (isSelected ? ' checked' : '') + '>' +
+                            (ws.color_hex ? '<span class="dash-ws-dot dashboard-scope-dot" style="background-color:' + esc(ws.color_hex) + '"></span>' : '') +
                             '<span class="dashboard-scope-name">' + esc(ws.name) + '</span>' +
                             (tags ? '<small>' + esc(tags) + '</small>' : '') +
                         '</label>' +
@@ -1550,7 +1828,7 @@
                     btn.addEventListener('click', function (e) {
                         e.preventDefault();
                         var ws = btn.getAttribute('data-workspace');
-                        if (ws) window.location.href = buildDashboardUrl({ workspace: ws });
+                        if (ws) window.location.href = buildDashboardUrl({ scope: 'single', workspace: ws });
                     });
                 });
 
@@ -1664,6 +1942,7 @@
         initColorFilter();
         initModifiedFilter();
         initTagFilter();
+        initCardReorder();
         window.addEventListener('pagehide', saveNavigationPath);
 
         var filterInput     = document.getElementById('filterInput');
