@@ -442,8 +442,10 @@ function handleResizeOutline(e) {
     const minWidth = 200;
     const maxWidth = 500;
 
-    // Calculate new width based on distance from right edge
-    const newWidth = Math.min(Math.max(window.innerWidth - e.clientX, minWidth), maxWidth);
+    // Calculate from the outline's own right edge so a docked AI panel to
+    // its right does not get included in the width.
+    const rightEdge = outlinePanel ? outlinePanel.getBoundingClientRect().right : window.innerWidth;
+    const newWidth = Math.min(Math.max(rightEdge - e.clientX, minWidth), maxWidth);
 
     // Update CSS variable and element width
     document.documentElement.style.setProperty('--outline-width', newWidth + 'px');

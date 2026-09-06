@@ -4033,7 +4033,9 @@
     "no_tools_reasoning_notice": "此模型在当前推理强度下拒绝工具调用，助手因此无法浏览您的笔记。请在 AI 助手设置中将推理强度设为“无”。",
     "tool_rename": "正在将笔记 #{{id}} 重命名为“{{title}}”",
     "tool_update": "正在编辑笔记 #{{id}}",
-    "tool_create": "正在创建笔记：{{title}}"
+    "tool_create": "正在创建笔记：{{title}}",
+    "context_label": "上下文：",
+    "context_hint": "当您说“这条笔记”时，助手使用的笔记。"
   },
   "diary": {
     "title": "日记",

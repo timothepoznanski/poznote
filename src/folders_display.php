@@ -523,6 +523,12 @@ function renderFolderActionsMenu() {
     $menu .= "<span>" . t_h('notes_list.folder_actions.download_folder', [], 'Download folder') . "</span>";
     $menu .= "</div>";
 
+    // Add tags to every note in the folder (shown only if folder has notes)
+    $menu .= "<div class='folder-actions-menu-item requires-notes' data-action='tag-folder-notes'>";
+    $menu .= "<i class='lucide lucide-tag'></i>";
+    $menu .= "<span>" . t_h('modals.tag_folder_notes.title', [], 'Tag all notes') . "</span>";
+    $menu .= "</div>";
+
     // Share folder action: two variants, the client shows the one matching
     // the folder's shared state (data-shared on the toggle)
     $menu .= "<div class='folder-actions-menu-item shared share-state-shared' data-action='share-folder'>";

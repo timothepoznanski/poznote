@@ -3912,7 +3912,9 @@
     "no_tools_reasoning_notice": "Este modelo rechaza las herramientas con el esfuerzo de razonamiento actual, por lo que el asistente no puede consultar sus notas. Ponga el esfuerzo de razonamiento en Ninguno en los ajustes del asistente de IA.",
     "tool_rename": "Renombrando la nota #{{id}} a «{{title}}»",
     "tool_update": "Editando la nota #{{id}}",
-    "tool_create": "Creando la nota: {{title}}"
+    "tool_create": "Creando la nota: {{title}}",
+    "context_label": "Contexto:",
+    "context_hint": "La nota que el asistente usa cuando dices \"esta nota\"."
   },
   "diary": {
     "title": "Diario",

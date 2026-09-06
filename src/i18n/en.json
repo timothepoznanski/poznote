@@ -3642,7 +3642,12 @@
     "no_tools_reasoning_notice": "This model refuses tools at the current reasoning effort, so the assistant cannot browse your notes. Set the reasoning effort to None in the AI Assistant settings.",
     "tool_rename": "Renaming note #{{id}} to \"{{title}}\"",
     "tool_update": "Editing note #{{id}}",
-    "tool_create": "Creating note: {{title}}"
+    "tool_create": "Creating note: {{title}}",
+    "context_label": "Context:",
+    "model_label": "Model:",
+    "model_hint": "Open AI Assistant settings.",
+    "back_to_assistant": "Back to AI Assistant",
+    "context_hint": "The note the assistant uses when you say \"this note\"."
   },
   "diary": {
     "title": "Diary",

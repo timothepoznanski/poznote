@@ -3486,6 +3486,100 @@ function closeFolderActionsMenu(folderId) {
     clearFolderActionsToggleOpen();
 }
 
+function showTagFolderNotesDialog(folderId, folderName, noteCount) {
+    var modal = document.getElementById('tagFolderNotesModal');
+    var input = document.getElementById('tagFolderNotesInput');
+    if (!modal || !input) return;
+
+    modal.dataset.folderId = String(folderId || '');
+    modal.dataset.folderName = folderName || '';
+    modal.dataset.noteCount = String(parseInt(noteCount, 10) || 0);
+
+    var sourceName = document.getElementById('tagFolderNotesSourceName');
+    var countText = document.getElementById('tagFolderNotesCountText');
+    var errorMessage = document.getElementById('tagFolderNotesErrorMessage');
+    var suggestions = document.getElementById('tagFolderNotesSuggestions');
+    var includeSubfolders = document.getElementById('tagFolderNotesIncludeSubfolders');
+
+    if (sourceName) sourceName.textContent = folderName || '';
+    if (countText) {
+        var count = parseInt(noteCount, 10) || 0;
+        var message = count === 1 ? modal.dataset.msgCountOne : modal.dataset.msgCountOther;
+        countText.textContent = (message || '').replace('{{count}}', String(count));
+    }
+    if (errorMessage) errorMessage.textContent = '';
+    if (suggestions) suggestions.style.display = 'none';
+    if (includeSubfolders) includeSubfolders.checked = false;
+    input.value = '';
+
+    if (typeof openModal === 'function') {
+        openModal('tagFolderNotesModal');
+    } else {
+        modal.style.display = 'flex';
+    }
+    input.focus();
+}
+
+function executeTagFolderNotes() {
+    var modal = document.getElementById('tagFolderNotesModal');
+    var input = document.getElementById('tagFolderNotesInput');
+    if (!modal || !input) return;
+
+    var tags = input.value.split(',').map(function(tag) { return tag.trim(); }).filter(Boolean);
+    var errorMessage = document.getElementById('tagFolderNotesErrorMessage');
+    if (!tags.length) {
+        if (errorMessage) errorMessage.textContent = modal.dataset.msgNoTags || 'Enter at least one tag';
+        input.focus();
+        return;
+    }
+
+    var applyButton = modal.querySelector('[data-action="execute-tag-folder-notes"]');
+    var defaultLabel = applyButton ? applyButton.textContent : 'Add tags';
+    if (applyButton) {
+        applyButton.disabled = true;
+        applyButton.textContent = modal.dataset.msgApplying || 'Tagging...';
+    }
+
+    var workspace = document.body.getAttribute('data-workspace') || '';
+    var includeSubfolders = document.getElementById('tagFolderNotesIncludeSubfolders');
+    fetch('/api/v1/folders/' + encodeURIComponent(modal.dataset.folderId) + '/tags', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+            tags: tags,
+            workspace: workspace,
+            include_subfolders: !!(includeSubfolders && includeSubfolders.checked)
+        })
+    })
+        .then(function(response) {
+            return response.json().then(function(data) {
+                if (!response.ok || !data.success) throw new Error(data.message || modal.dataset.msgError || 'Could not tag the notes');
+                return data;
+            });
+        })
+        .then(function(data) {
+            var message = data.updated_count === 1 ? modal.dataset.msgSuccessOne : modal.dataset.msgSuccessOther;
+            if (data.updated_count === 0) message = modal.dataset.msgSuccessNone;
+            if (typeof showNotificationPopup === 'function') {
+                showNotificationPopup((message || '').replace('{{count}}', String(data.updated_count || 0)), 'success');
+            }
+            if (typeof closeModal === 'function') closeModal('tagFolderNotesModal');
+        })
+        .catch(function(error) {
+            if (errorMessage) errorMessage.textContent = error.message;
+        })
+        .finally(function() {
+            if (applyButton) {
+                applyButton.disabled = false;
+                applyButton.textContent = defaultLabel;
+            }
+        });
+}
+
+window.showTagFolderNotesDialog = showTagFolderNotesDialog;
+window.executeTagFolderNotes = executeTagFolderNotes;
+
 // Close folder menus when clicking outside
 document.addEventListener('click', function (event) {
     // If click is neither on a folder-actions toggle nor inside the shared

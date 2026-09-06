@@ -1,30 +1,66 @@
 /**
  * AI Chat Panel Styles
  *
- * Slide-in panel on the right side of the notes page, used to chat
- * with the configured AI assistant (see ai_settings.php).
+ * Panel on the right side of the notes page, used to chat with the
+ * configured AI assistant (see ai_settings.php).
  */
 
+/* Docked as the rightmost column of the page, a flex sibling of the note
+   pane like the outline panel: opening it pushes the note over instead of
+   covering it. Closed is zero width; the children keep the open width so
+   the content slides behind the clip while the width animates instead of
+   reflowing. index.php sets html.ai-chat-open from the saved state before
+   the first paint, js/ai-chat.js then carries the state on the panel itself.
+   Phones get an overlay instead (media query at the end of this file). */
 #ai-chat-panel {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 380px;
-    max-width: 100vw;
+    position: relative;
+    width: 0;
+    min-width: 0;
     height: 100vh;
     height: 100dvh;
-    z-index: 1200;
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
     background: var(--pz-surface);
-    border-left: 1px solid #dee2e6;
-    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.08);
-    transform: translateX(100%);
-    transition: transform 0.25s ease;
+    box-sizing: border-box;
+    overflow: hidden;
+    transition: width 0.25s ease;
 }
 
+html.ai-chat-open #ai-chat-panel,
 #ai-chat-panel.ai-chat-open {
-    transform: translateX(0);
+    width: var(--ai-chat-width, 380px);
+}
+
+#ai-chat-panel.ai-chat-resizing {
+    transition: none;
+}
+
+#ai-chat-panel > :not(.ai-chat-resize-handle) {
+    width: var(--ai-chat-width, 380px);
+    box-sizing: border-box;
+}
+
+/* Drag edge: doubles as the panel's left border */
+.ai-chat-resize-handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 6px;
+    z-index: 2;
+    cursor: col-resize;
+    border-left: 1px solid #dee2e6;
+    transition: border-color 0.15s ease;
+}
+
+.ai-chat-resize-handle:hover,
+.ai-chat-resize-handle:focus {
+    border-left-color: #dee2e6;
+}
+
+#ai-chat-panel.ai-chat-resizing .ai-chat-resize-handle {
+    border-left-color: var(--pz-accent);
 }
 
 /* Header */
@@ -225,6 +261,71 @@ a.ai-chat-header-btn {
     to { visibility: hidden; }
 }
 
+/* The configured model, linked to the instance AI settings. */
+.ai-chat-model {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    padding: 0 16px 4px;
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.ai-chat-model i {
+    flex-shrink: 0;
+    width: 13px;
+    height: 13px;
+}
+
+.ai-chat-model-label {
+    flex-shrink: 0;
+}
+
+.ai-chat-model-link {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--pz-accent);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Which note "this note" means, right above the input. Quiet on purpose:
+   one muted line, the title cut with an ellipsis. Hidden when no note is
+   open (js/ai-chat.js toggles the hidden attribute). */
+.ai-chat-context {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    padding: 0 16px 6px;
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.ai-chat-context[hidden] {
+    display: none;
+}
+
+.ai-chat-context i {
+    flex-shrink: 0;
+    width: 13px;
+    height: 13px;
+}
+
+.ai-chat-context-label {
+    flex-shrink: 0;
+}
+
+.ai-chat-context-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 /* Input bar */
 .ai-chat-inputbar {
     flex-shrink: 0;
@@ -327,9 +428,30 @@ a.ai-chat-header-btn {
     padding: 6px 10px;
 }
 
+/* Phones: the note pane has no room to give, so the panel slides over it */
 @media (max-width: 800px) {
-    #ai-chat-panel {
+    #ai-chat-panel,
+    html.ai-chat-open #ai-chat-panel,
+    #ai-chat-panel.ai-chat-open {
+        position: fixed;
+        top: 0;
+        right: 0;
         width: 100%;
-        border-left: none;
+        z-index: 1200;
+        box-shadow: -4px 0 16px rgba(0, 0, 0, 0.08);
+        transform: translateX(100%);
+        transition: transform 0.25s ease;
+    }
+
+    #ai-chat-panel.ai-chat-open {
+        transform: translateX(0);
+    }
+
+    #ai-chat-panel > :not(.ai-chat-resize-handle) {
+        width: 100%;
+    }
+
+    .ai-chat-resize-handle {
+        display: none;
     }
 }

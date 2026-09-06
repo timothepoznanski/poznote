@@ -30,12 +30,20 @@ if ($backToSettingsWs === '__last_opened__') {
     $backToSettingsWs = '';
 }
 
-$backToSettingsHref = $backToSettingsBase . 'settings.php'
-    . ($backToSettingsWs !== '' ? '?workspace=' . urlencode($backToSettingsWs) : '');
+$backToAiChat = isset($_GET['from']) && $_GET['from'] === 'ai-chat';
+if ($backToAiChat) {
+    $backToSettingsHref = $backToSettingsBase . 'index.php?ai_chat=1'
+        . ($backToSettingsWs !== '' ? '&workspace=' . urlencode($backToSettingsWs) : '');
+    $backToSettingsLabel = t_h('ai_chat.back_to_assistant', [], 'Back to AI Assistant');
+} else {
+    $backToSettingsHref = $backToSettingsBase . 'settings.php'
+        . ($backToSettingsWs !== '' ? '?workspace=' . urlencode($backToSettingsWs) : '');
+    $backToSettingsLabel = t_h('common.back_to_settings', [], 'Back to Settings');
+}
 ?>
 <div class="poznote-back-bar poznote-back-to-settings-bar">
     <a href="<?php echo htmlspecialchars($backToSettingsHref, ENT_QUOTES, 'UTF-8'); ?>" class="poznote-back-btn">
         <i class="lucide lucide-arrow-left"></i>
-        <?php echo t_h('common.back_to_settings', [], 'Back to Settings'); ?>
+        <?php echo $backToSettingsLabel; ?>
     </a>
 </div>

@@ -4,8 +4,13 @@
  * Chat with the configured OpenAI-compatible AI server (see ai_settings.php)
  * about the notes of the current workspace. The id of the note open in the
  * editor travels with every message so the user can say "this note" without
- * naming it. The backend (api_ai_chat.php) proxies the conversation and
- * streams the answer back as Server-Sent Events.
+ * naming it, and a line above the input shows which note that is. The
+ * backend (api_ai_chat.php) proxies the conversation and streams the answer
+ * back as Server-Sent Events.
+ *
+ * On desktop the panel is docked as the rightmost column of the page (like
+ * the outline panel), resizable by its left edge, and its open state and
+ * width survive reloads. On phones it overlays the page.
  */
 (function () {
     'use strict';
@@ -16,6 +21,12 @@
 
     var STORAGE_KEY = 'poznote-ai-chat-conversation';
     var MAX_STORED_MESSAGES = 40; // matches the backend's conversation window
+
+    // Docked panel state, also read by the first-paint script in index.php
+    var OPEN_KEY = 'aiChatOpen';
+    var WIDTH_KEY = 'aiChatWidth';
+    var MIN_WIDTH = 300;
+    var MAX_WIDTH = 700;
 
     /**
      * Workspace the chat is scoped to. The workspace menu switches without a
@@ -31,12 +42,49 @@
 
     /**
      * Note open in the editor, resolved at send time so it follows the user
-     * from note to note within one conversation. window.noteid is -1 (or
-     * absent) when the right column shows no note.
+     * from note to note within one conversation. The note rendered in the
+     * right column is the open one; window.noteid only tracks the last note
+     * the user interacted with (-1 after a page load until the first click
+     * in the note, and again after a focus in the search bar) and is the
+     * fallback when the column holds no single note.
      */
     function currentNoteId() {
+        var rightCol = document.getElementById('right_col');
+        var entries = rightCol ? rightCol.querySelectorAll('.noteentry[data-note-id]') : [];
+        if (entries.length === 1) {
+            var shownId = parseInt(entries[0].getAttribute('data-note-id'), 10);
+            if (shownId > 0) return shownId;
+        }
         var id = parseInt(window.noteid, 10);
         return id > 0 ? id : 0;
+    }
+
+    /** Title of a note as shown in the editor (its heading input). */
+    function noteTitle(id) {
+        var input = document.getElementById('inp' + id);
+        var title = input ? (input.value || '').trim() : '';
+        if (!title && input) title = (input.getAttribute('placeholder') || '').trim();
+        return title || ('#' + id);
+    }
+
+    /**
+     * The line above the input naming the note "this note" refers to, i.e.
+     * what currentNoteId() will send with the next message. Hidden when no
+     * note is open. Refreshed when a note loads, when its title is edited,
+     * and whenever the panel opens or a message is sent.
+     */
+    function updateContextIndicator() {
+        var box = document.getElementById('ai-chat-context');
+        if (!box) return;
+        var id = currentNoteId();
+        if (!id) {
+            box.hidden = true;
+            return;
+        }
+        var titleEl = document.getElementById('ai-chat-context-title');
+        if (titleEl) titleEl.textContent = noteTitle(id);
+        box.title = t('ai_chat.context_hint', {}, 'The note the assistant uses when you say "this note".');
+        box.hidden = false;
     }
 
     /** One stored conversation per workspace, so switching back restores it. */
@@ -55,6 +103,11 @@
     function isOpen() {
         var p = panel();
         return !!p && p.classList.contains('ai-chat-open');
+    }
+
+    /** Same breakpoint as css/ai-chat.css: docked above it, overlay below. */
+    function isDesktop() {
+        return window.matchMedia('(min-width: 801px)').matches;
     }
 
     function scrollToBottom() {
@@ -263,21 +316,84 @@
             : t('ai_chat.send', {}, 'Send');
     }
 
-    function toggle(noteId) {
+    /**
+     * Open or close the panel. On desktop the state is saved so index.php
+     * can restore it before the first paint of the next page load (as
+     * html.ai-chat-open, which the panel's own class supersedes here).
+     */
+    function setOpen(open) {
         var p = panel();
         if (!p) return;
-        var open = !isOpen();
         p.classList.toggle('ai-chat-open', open);
-        document.querySelectorAll('.btn-ai-chat').forEach(function (b) {
-            b.classList.toggle('ai-chat-active', open);
+        document.documentElement.classList.remove('ai-chat-open');
+        document.querySelectorAll('.icon-sidebar-btn[data-action="toggle-ai-chat"]').forEach(function (b) {
+            b.classList.toggle('icon-sidebar-btn-active', open);
         });
+        if (isDesktop()) {
+            try { localStorage.setItem(OPEN_KEY, open ? 'true' : 'false'); } catch (e) { /* ignore */ }
+        }
         if (open) {
             // The empty hint mentions the open note, which changed since the
             // panel was last rendered: redraw it while the chat is still empty.
             if (!conversation.length) resetMessages();
-            var input = document.getElementById('ai-chat-input');
-            if (input && window.matchMedia('(min-width: 801px)').matches) input.focus();
+            updateContextIndicator();
         }
+    }
+
+    function toggle() {
+        var open = !isOpen();
+        setOpen(open);
+        if (open) {
+            var input = document.getElementById('ai-chat-input');
+            if (input && isDesktop()) input.focus();
+        }
+    }
+
+    /**
+     * Drag the panel's left edge to resize it (desktop only, the handle is
+     * hidden on phones). The width lives in a CSS variable on <html>, which
+     * index.php also sets from the saved value before the first paint.
+     */
+    function initResize() {
+        var handle = document.getElementById('aiChatResizeHandle');
+        var p = panel();
+        if (!handle || !p) return;
+        var startX = 0;
+        var startWidth = 0;
+
+        function onMove(e) {
+            var width = Math.round(startWidth + (startX - e.clientX));
+            width = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, width));
+            document.documentElement.style.setProperty('--ai-chat-width', width + 'px');
+        }
+
+        function onUp(e) {
+            handle.removeEventListener('pointermove', onMove);
+            handle.removeEventListener('pointerup', onUp);
+            handle.removeEventListener('pointercancel', onUp);
+            try { handle.releasePointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+            p.classList.remove('ai-chat-resizing');
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+            try {
+                localStorage.setItem(WIDTH_KEY, String(Math.round(p.getBoundingClientRect().width)));
+            } catch (err) { /* ignore */ }
+        }
+
+        handle.addEventListener('pointerdown', function (e) {
+            if (e.button !== 0 || !isOpen()) return;
+            e.preventDefault();
+            startX = e.clientX;
+            startWidth = p.getBoundingClientRect().width;
+            p.classList.add('ai-chat-resizing');
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+            // Keep receiving moves when the pointer leaves the 6px handle
+            try { handle.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+            handle.addEventListener('pointermove', onMove);
+            handle.addEventListener('pointerup', onUp);
+            handle.addEventListener('pointercancel', onUp);
+        });
     }
 
     function resetMessages() {
@@ -336,6 +452,7 @@
         if (workspace) {
             body.workspace = workspace;
         }
+        updateContextIndicator();
         var openNoteId = currentNoteId();
         if (openNoteId) {
             body.note_id = openNoteId;
@@ -472,6 +589,22 @@
 
         restoreConversation();
 
+        // Docked state applied by index.php before the first paint: carry it
+        // on the panel from now on (same width, so nothing animates)
+        if (document.documentElement.classList.contains('ai-chat-open')) {
+            setOpen(true);
+        }
+        initResize();
+
+        updateContextIndicator();
+        document.addEventListener('noteLoaded', updateContextIndicator);
+        // The open note's title is edited in place: keep the shown one current
+        document.addEventListener('input', function (e) {
+            if (e.target && e.target.classList && e.target.classList.contains('css-title')) {
+                updateContextIndicator();
+            }
+        });
+
         // Arriving from the dashboard's AI button: open the panel and drop
         // the parameter so a plain reload doesn't reopen it
         var params = new URLSearchParams(window.location.search);
@@ -489,6 +622,7 @@
 
         var input = document.getElementById('ai-chat-input');
         if (input) {
+            input.addEventListener('focus', updateContextIndicator);
             input.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
