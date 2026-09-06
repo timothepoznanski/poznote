@@ -3431,13 +3431,6 @@
       "in_progress": "Cerrando sesión..."
     }
   },
-  "support_modal": {
-    "question": "Si te gusta Poznote, ¿quieres invitarle a un cafecito para apoyarlo? ☕",
-    "yes": "¡Sí!",
-    "no": "No...",
-    "thanks": "¡Gracias! ❤️",
-    "thanks_sub": "Eres genial."
-  },
   "password": {
     "status": {
       "custom": "Contraseña personalizada",
