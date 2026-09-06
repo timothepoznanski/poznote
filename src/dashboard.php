@@ -689,6 +689,12 @@ $dashboardScopeIsMulti = $dashboardScope['mode'] !== 'single';
 if (!$dashboardScopeIsMulti) {
     $pageWorkspace = $dashboardScope['workspaces'][0] ?? $pageWorkspace;
 }
+$aiPanelWorkspace = $pageWorkspace !== ''
+    ? $pageWorkspace
+    : ($dashboardScope['workspaces'][0] ?? '');
+if ($aiPanelWorkspace === '') {
+    $aiPanelWorkspace = (string)getFirstWorkspaceName();
+}
 
 $dashboardData = ['folders' => [], 'notes' => [], 'groups' => []];
 $isEmpty = true;
@@ -801,6 +807,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 </head>
 <body class="favorites-page dashboard-page has-icon-sidebar"
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
+    data-ai-workspace="<?php echo htmlspecialchars($aiPanelWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
       data-scope="<?php echo htmlspecialchars($dashboardScope['key'], ENT_QUOTES, 'UTF-8'); ?>">
     <?php
     // Same entry, same id and same place as on index.php, so the UI
@@ -892,6 +899,22 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 	<?php if ($aiChatEnabled): ?>
 	<?php // Last flex child of <body>: docks as the rightmost column next to the board ?>
 	<?php include 'ai_chat_panel.php'; ?>
+	<?php if ($dashboardScopeIsMulti): ?>
+	<!-- The board shows several workspaces but the assistant only ever acts
+	     on one: js/ai-chat.js opens this notice instead of the panel on the
+	     first click of the rail button, and the panel from its Continue
+	     button only. $aiPanelWorkspace is the workspace the panel resolved. -->
+	<div id="aiChatScopeModal" class="modal">
+		<div class="modal-content">
+			<h3><?php echo t_h('ai_chat.scope_modal_title', [], 'One workspace at a time'); ?></h3>
+			<p style="margin: 16px 0; color: #4b5563; font-size: 14px; line-height: 1.5;"><?php echo t_h('ai_chat.scope_modal_text', ['workspace' => $aiPanelWorkspace], 'The assistant cannot act on several workspaces at once. Here it will only search, read and change the notes of the workspace "{{workspace}}".'); ?></p>
+			<div class="modal-buttons">
+				<button type="button" class="btn-cancel" data-action="ai-chat-scope-cancel"><?php echo t_h('common.cancel'); ?></button>
+				<button type="button" class="btn-primary" data-action="ai-chat-scope-continue"><?php echo t_h('ai_chat.scope_modal_continue', [], 'Continue'); ?></button>
+			</div>
+		</div>
+	</div>
+	<?php endif; ?>
 	<?php endif; ?>
 
 

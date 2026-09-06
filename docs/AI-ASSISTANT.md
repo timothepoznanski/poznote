@@ -27,7 +27,7 @@ When the assistant edits or creates a note, the open note and the sidebar refres
 
 The assistant reads and writes note content as Markdown. Rich-text (HTML) notes are converted on the fly in both directions, with the same converter as the **Convert note** action, so a rewrite keeps headings, lists, links, tables and images; rich formatting such as colors or fonts is not kept. A note too long for the assistant to read in full is refused for rewriting rather than truncated.
 
-The assistant is **scoped to the current workspace**: it only sees, searches and edits the notes of the workspace you opened the chat in, and new notes are created there. To ask about another workspace, switch to it first.
+The assistant is **scoped to the current workspace**: it only sees, searches and edits the notes of the workspace you opened the chat in, and new notes are created there. To ask about another workspace, switch to it first. On a dashboard showing several workspaces, the first click on the button says which workspace the assistant will act on and asks whether to continue.
 
 The conversation is kept while your browser tab stays open (it survives page reloads) and can be wiped at any time with the trash button in the panel header.
 

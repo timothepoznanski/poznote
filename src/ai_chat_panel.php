@@ -16,10 +16,14 @@ $aiPanelSettingsQuery = 'from=ai-chat'
 
 // Workspace the assistant is scoped to, resolved the way api_ai_chat.php
 // resolves an empty one (its first workspace). js/ai-chat.js prefers the
-// live client value and falls back to this on pages without one.
-$aiPanelWorkspace = trim((string)getWorkspaceFilter());
-if ($aiPanelWorkspace === '' || $aiPanelWorkspace === '__last_opened__') {
-    $aiPanelWorkspace = (string)getFirstWorkspaceName();
+// live client value and falls back to this on pages without one. The
+// including page may set it beforehand (dashboard.php reuses it in its
+// multi-workspace notice).
+if (!isset($aiPanelWorkspace)) {
+    $aiPanelWorkspace = trim((string)getWorkspaceFilter());
+    if ($aiPanelWorkspace === '' || $aiPanelWorkspace === '__last_opened__') {
+        $aiPanelWorkspace = (string)getFirstWorkspaceName();
+    }
 }
 ?>
     <!-- AI CHAT PANEL -->

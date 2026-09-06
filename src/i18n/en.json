@@ -3684,7 +3684,10 @@
     "tool_task_delete": "Removing task \"{{task}}\"",
     "tool_checklist": "Updating a checkbox of note #{{id}}",
     "tool_delete": "Moving note #{{id}} to the trash",
-    "tool_delete_folder": "Moving folder \"{{folder}}\" and its notes to the trash"
+    "tool_delete_folder": "Moving folder \"{{folder}}\" and its notes to the trash",
+    "scope_modal_title": "One workspace at a time",
+    "scope_modal_text": "The assistant cannot act on several workspaces at once. Here it will only search, read and change the notes of the workspace \"{{workspace}}\".",
+    "scope_modal_continue": "Continue"
   },
   "diary": {
     "title": "Diary",

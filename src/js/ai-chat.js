@@ -22,6 +22,9 @@
     var conversation = [];   // [{role: 'user'|'assistant', content: string}]
     var streaming = false;
     var abortController = null;
+    // The multi-workspace notice of the dashboard has been answered with
+    // Continue on this page: not asked again until the next load
+    var scopeAcknowledged = false;
 
     var STORAGE_KEY = 'poznote-ai-chat-conversation';
     var MAX_STORED_MESSAGES = 40; // matches the backend's conversation window
@@ -39,8 +42,16 @@
      */
     function currentWorkspace() {
         var ws = '';
-        if (typeof window.getSelectedWorkspace === 'function') ws = window.getSelectedWorkspace() || '';
+        var isDashboard = document.body && document.body.classList.contains('dashboard-page');
+        if (isDashboard) {
+            ws = document.body.getAttribute('data-ai-workspace') || '';
+        }
+        if (!ws && typeof window.getSelectedWorkspace === 'function') ws = window.getSelectedWorkspace() || '';
         if (!ws && document.body && document.body.dataset) ws = document.body.dataset.workspace || '';
+        if (!ws) {
+            var workspaceName = document.getElementById('ai-chat-workspace-name');
+            if (workspaceName) ws = workspaceName.getAttribute('data-fallback') || '';
+        }
         return ws;
     }
 
@@ -412,9 +423,6 @@
         if (!p) return;
         p.classList.toggle('ai-chat-open', open);
         document.documentElement.classList.remove('ai-chat-open');
-        document.querySelectorAll('.icon-sidebar-btn[data-action="toggle-ai-chat"]').forEach(function (b) {
-            b.classList.toggle('icon-sidebar-btn-active', open);
-        });
         if (isDesktop()) {
             try { localStorage.setItem(OPEN_KEY, open ? 'true' : 'false'); } catch (e) { /* ignore */ }
         }
@@ -429,11 +437,43 @@
 
     function toggle() {
         var open = !isOpen();
+        if (open && askScope()) return;
         setOpen(open);
         if (open) {
             var input = document.getElementById('ai-chat-input');
             if (input && isDesktop()) input.focus();
         }
+    }
+
+    /**
+     * dashboard.php renders #aiChatScopeModal when the board shows several
+     * workspaces: the assistant only ever acts on one, so the first click on
+     * the rail button says which one and asks whether to go on. Continue
+     * opens the panel (and stops asking for the rest of the page), Cancel,
+     * the backdrop and Escape leave it closed. Returns true when the notice
+     * took the click.
+     */
+    function scopeModal() {
+        return document.getElementById('aiChatScopeModal');
+    }
+
+    function askScope() {
+        var modal = scopeModal();
+        if (!modal || scopeAcknowledged) return false;
+        modal.style.display = 'flex';
+        var btn = modal.querySelector('[data-action="ai-chat-scope-continue"]');
+        if (btn) btn.focus();
+        return true;
+    }
+
+    function closeScopeModal() {
+        var modal = scopeModal();
+        if (modal) modal.style.display = 'none';
+    }
+
+    function isScopeModalOpen() {
+        var modal = scopeModal();
+        return !!modal && modal.style.display === 'flex';
     }
 
     /**
@@ -672,7 +712,24 @@
             if (clearBtn) {
                 e.preventDefault();
                 clear();
+                return;
             }
+            var scopeBtn = e.target.closest('[data-action="ai-chat-scope-continue"], [data-action="ai-chat-scope-cancel"]');
+            if (scopeBtn) {
+                e.preventDefault();
+                closeScopeModal();
+                if (scopeBtn.getAttribute('data-action') === 'ai-chat-scope-continue') {
+                    scopeAcknowledged = true;
+                    toggle();
+                }
+                return;
+            }
+            if (e.target === scopeModal()) {
+                closeScopeModal();
+            }
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && isScopeModalOpen()) closeScopeModal();
         });
 
         restoreConversation();
