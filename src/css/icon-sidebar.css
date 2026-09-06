@@ -140,7 +140,7 @@
     border-top: 1px solid var(--pz-border);
 }
 
-/* Tighter than the navigation entries above: six account actions at the
+/* Tighter than the navigation entries above: five account actions at the
    rail's full 40px pitch would eat a third of a laptop screen. */
 .icon-sidebar-bottom .icon-sidebar-btn {
     height: 36px;

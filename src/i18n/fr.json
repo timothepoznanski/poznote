@@ -3654,13 +3654,6 @@
       "in_progress": "Déconnexion..."
     }
   },
-  "support_modal": {
-    "question": "Si vous aimez Poznote, voulez-vous lui offrir un petit café pour le soutenir ? ☕",
-    "yes": "Oui !",
-    "no": "Non...",
-    "thanks": "Merci ! ❤️",
-    "thanks_sub": "Vous êtes formidable."
-  },
   "password": {
     "status": {
       "custom": "Mot de passe personnalisé",

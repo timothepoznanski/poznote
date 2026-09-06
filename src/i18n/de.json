@@ -3431,13 +3431,6 @@
       "in_progress": "Abmeldung..."
     }
   },
-  "support_modal": {
-    "question": "Wenn Ihnen Poznote gefällt, möchten Sie ihm einen kleinen Kaffee spendieren, um es zu unterstützen? ☕",
-    "yes": "Ja!",
-    "no": "Nein...",
-    "thanks": "Danke! ❤️",
-    "thanks_sub": "Sie sind wunderbar."
-  },
   "password": {
     "status": {
       "custom": "Benutzerdefiniertes Passwort",

@@ -3149,13 +3149,6 @@
       "in_progress": "Logging out..."
     }
   },
-  "support_modal": {
-    "question": "If you enjoy Poznote, would you like to buy it a little coffee to support it? ☕",
-    "yes": "Yes!",
-    "no": "No...",
-    "thanks": "Thank you! ❤️",
-    "thanks_sub": "You are wonderful."
-  },
   "password": {
     "status": {
       "custom": "Custom password",

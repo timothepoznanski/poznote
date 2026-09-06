@@ -209,10 +209,6 @@ $iconSidebarBottomItems = [
     // lights up on ?open=about, Settings on every other settings.php visit.
     ['id' => 'iconSidebarSettingsBtn', 'url' => $iconSidebarUrl('settings.php'), 'icon' => 'lucide-settings', 'label' => t('sidebar.settings', [], 'Settings'), 'activeFlag' => $iconSidebarCurrentPage === 'settings.php' && !$iconSidebarIsAboutView, 'updateBadge' => function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()],
     ['id' => 'iconSidebarAboutBtn', 'url' => $iconSidebarUrl('settings.php', ['open' => 'about']), 'icon' => 'lucide-info-circle', 'label' => t('settings.categories.documentation', [], 'About'), 'activeFlag' => $iconSidebarIsAboutView],
-    // Support: js/support-modal.js, loaded below, turns the click into a
-    // little joke (No runs away from the pointer, Yes sticks to it) that ends
-    // on the Ko-fi page. The href is the no-JS fallback, hence 'external'.
-    ['id' => 'iconSidebarSupportBtn', 'url' => 'https://ko-fi.com/timothepoznanski', 'external' => true, 'icon' => 'lucide-heart', 'label' => t('home.support_poznote', [], 'Support Poznote')],
     ['id' => 'iconSidebarLogoutBtn', 'url' => $iconSidebarBasePath . 'logout.php', 'icon' => 'lucide-log-out', 'label' => t('workspace_menu.logout', [], 'Logout')],
 ];
 
@@ -257,25 +253,12 @@ $iconSidebarProfileStrings = [
     'common.loading' => t('common.loading', [], 'Loading...'),
     'common.error' => t('common.error', [], 'Error'),
 ];
-
-// Same arrangement for the Support modal (js/support-modal.js).
-$iconSidebarSupportStrings = [
-    'home.support_poznote' => t('home.support_poznote', [], 'Support Poznote'),
-    'support_modal.question' => t('support_modal.question', [], 'If you enjoy Poznote, would you like to buy it a little coffee to support it?'),
-    'support_modal.yes' => t('support_modal.yes', [], 'Yes!'),
-    'support_modal.thanks' => t('support_modal.thanks', [], 'Thank you!'),
-    'support_modal.thanks_sub' => t('support_modal.thanks_sub', [], 'You are wonderful.'),
-    'support_modal.no' => t('support_modal.no', [], 'No...'),
-    'common.close' => t('common.close', [], 'Close'),
-];
 ?>
 <link rel="stylesheet" href="<?php echo $iconSidebarAsset('css/profile-modal.css'); ?>">
 <script>
 window.PoznoteProfileI18n = <?php echo json_encode($iconSidebarProfileStrings, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;
-window.PoznoteSupportI18n = <?php echo json_encode($iconSidebarSupportStrings, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;
 </script>
 <script src="<?php echo $iconSidebarAsset('js/profile.js'); ?>" defer></script>
-<script src="<?php echo $iconSidebarAsset('js/support-modal.js'); ?>" defer></script>
 <script>
 // Apply the collapsed state before the rail paints; js/icon-sidebar-toggle.js
 // owns it afterwards.
@@ -350,7 +333,7 @@ try {
        id="<?php echo $iconSidebarItem['id']; ?>"
        class="<?php echo $iconSidebarClass; ?>"
        title="<?php echo $iconSidebarLabel; ?>"
-       aria-label="<?php echo $iconSidebarLabel; ?>"<?php echo $iconSidebarIsCurrent ? ' aria-current="page"' : ''; ?><?php echo !empty($iconSidebarItem['external']) ? ' target="_blank" rel="noopener noreferrer"' : ''; ?>>
+       aria-label="<?php echo $iconSidebarLabel; ?>"<?php echo $iconSidebarIsCurrent ? ' aria-current="page"' : ''; ?>>
         <i class="lucide <?php echo $iconSidebarIcon; ?>"></i>
         <?php if (!empty($iconSidebarItem['updateBadge'])): ?>
         <span class="update-badge update-badge-hidden"></span>
