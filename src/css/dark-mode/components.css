@@ -835,8 +835,21 @@ body.dark-mode .info-box {
 html[data-theme='dark'] #ai-chat-panel,
 body.dark-mode #ai-chat-panel {
     background: var(--dm-bg);
+}
+
+html[data-theme='dark'] .ai-chat-resize-handle,
+body.dark-mode .ai-chat-resize-handle {
     border-left-color: var(--dm-border);
-    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme='dark'] .ai-chat-resize-handle:hover,
+body.dark-mode .ai-chat-resize-handle:hover {
+    border-left-color: var(--dm-border);
+}
+
+html[data-theme='dark'] #ai-chat-panel.ai-chat-resizing .ai-chat-resize-handle,
+body.dark-mode #ai-chat-panel.ai-chat-resizing .ai-chat-resize-handle {
+    border-left-color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .ai-chat-title,
@@ -908,7 +921,9 @@ body.dark-mode .ai-chat-md a {
 }
 
 html[data-theme='dark'] .ai-chat-tool,
-body.dark-mode .ai-chat-tool {
+html[data-theme='dark'] .ai-chat-context,
+body.dark-mode .ai-chat-tool,
+body.dark-mode .ai-chat-context {
     color: var(--dm-text-muted);
 }
 
@@ -947,11 +962,6 @@ html[data-theme='dark'] .ai-chat-send-btn:disabled,
 body.dark-mode .ai-chat-send-btn:disabled {
     background: var(--dm-surface-hover);
     color: var(--dm-text-muted);
-}
-
-html[data-theme='dark'] .toolbar-btn.btn-ai-chat.ai-chat-active i,
-body.dark-mode .toolbar-btn.btn-ai-chat.ai-chat-active i {
-    color: var(--dm-accent);
 }
 
 /* ============================================

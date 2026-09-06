@@ -18,7 +18,7 @@
     padding: 10px 5px;
     box-sizing: border-box;
     background: var(--pz-surface);
-    border-right: 1px solid var(--pz-border);
+    border-right: 1px solid #dee2e6;
     flex-shrink: 0;
     overflow: hidden;
 }

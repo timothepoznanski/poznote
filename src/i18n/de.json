@@ -3912,7 +3912,9 @@
     "no_tools_reasoning_notice": "Dieses Modell lehnt Tools beim aktuellen Denkaufwand ab, der Assistent kann Ihre Notizen daher nicht durchsuchen. Stellen Sie den Denkaufwand in den Einstellungen des KI-Assistenten auf „Keiner“.",
     "tool_rename": "Notiz #{{id}} wird umbenannt in „{{title}}“",
     "tool_update": "Notiz #{{id}} wird bearbeitet",
-    "tool_create": "Notiz wird erstellt: {{title}}"
+    "tool_create": "Notiz wird erstellt: {{title}}",
+    "context_label": "Kontext:",
+    "context_hint": "Die Notiz, die der Assistent verwendet, wenn Sie „diese Notiz“ sagen."
   },
   "diary": {
     "title": "Tagebuch",

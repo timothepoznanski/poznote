@@ -1366,6 +1366,47 @@ function handleWorkspaceShareToggleSubmit(event) {
     }
 }
 
+function handleWorkspaceInfoButtonClick(event) {
+    var button = event.target && event.target.closest ? event.target.closest('.workspace-info-action') : null;
+    var modal = document.getElementById('workspaceInfoModal');
+    if (!button || !modal) return;
+
+    var tags = [];
+    var sharedWith = [];
+    try {
+        tags = JSON.parse(button.getAttribute('data-tags') || '[]');
+        sharedWith = JSON.parse(button.getAttribute('data-shared-with') || '[]');
+    } catch (error) {
+        tags = [];
+        sharedWith = [];
+    }
+
+    document.getElementById('workspaceInfoTitle').textContent = button.getAttribute('data-ws') || '';
+    document.getElementById('workspaceInfoNotes').textContent = button.getAttribute('data-notes-count') || '0';
+    document.getElementById('workspaceInfoFolders').textContent = button.getAttribute('data-folders-count') || '0';
+    document.getElementById('workspaceInfoTags').textContent = tags.length ? tags.join(', ') : 'None';
+
+    var isShared = button.getAttribute('data-shared') === '1';
+    document.getElementById('workspaceInfoShared').textContent = isShared ? 'Yes' : 'No';
+    document.getElementById('workspaceInfoSharedWith').textContent = !isShared
+        ? 'Not shared'
+        : (sharedWith.length ? sharedWith.join(', ') : 'Anyone with the link');
+
+    modal.style.display = 'flex';
+}
+
+function closeWorkspaceInfoModal() {
+    var modal = document.getElementById('workspaceInfoModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function handleWorkspaceInfoCloseButtonClick(event) {
+    var button = event.target && event.target.closest ? event.target.closest('[data-action="close-workspace-info-modal"]') : null;
+    if (!button) return;
+    event.preventDefault();
+    closeWorkspaceInfoModal();
+}
+
 function setWorkspaceShareVisibility(element, visible) {
     if (!element) return;
     if (visible) {
@@ -2286,6 +2327,8 @@ function initializeWorkspacesPage() {
     document.addEventListener('click', handleDeleteButtonClick);
     document.addEventListener('click', handleMoveButtonClick);
     document.addEventListener('click', handleWorkspaceShareToggleClick);
+    document.addEventListener('click', handleWorkspaceInfoButtonClick);
+    document.addEventListener('click', handleWorkspaceInfoCloseButtonClick);
     
     document.addEventListener('submit', handleWorkspaceShareToggleSubmit, true);
     document.addEventListener('click', function (event) {

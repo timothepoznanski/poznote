@@ -97,6 +97,12 @@ function folderListInlineActions() {
 			'requires_notes' => true,
 		],
 		[
+			'action' => 'tag-folder-notes',
+			'icon' => 'lucide-tag',
+			'label' => t_h('modals.tag_folder_notes.title', [], 'Tag all notes'),
+			'requires_notes' => true,
+		],
+		[
 			'action' => 'share-folder',
 			'icon' => 'lucide-share-2',
 			'label' => t_h('notes_list.folder_actions.is_public', [], 'Is public'),
@@ -648,6 +654,10 @@ $currentLang = getUserLanguage();
 						<i class="lucide lucide-download"></i>
 						<span><?php echo t_h('notes_list.folder_actions.download_folder', [], 'Download folder'); ?></span>
 					</div>
+					<div class="folder-actions-menu-item requires-notes" data-action="tag-folder-notes">
+						<i class="lucide lucide-tag"></i>
+						<span><?php echo t_h('modals.tag_folder_notes.title', [], 'Tag all notes'); ?></span>
+					</div>
 					<div class="folder-actions-menu-item shared share-state-shared" data-action="share-folder">
 						<i class="lucide lucide-share-2"></i>
 						<span><?php echo t_h('notes_list.folder_actions.is_public', [], 'Is public'); ?></span>
@@ -761,6 +771,7 @@ $currentLang = getUserLanguage();
 	<?php
 	// Folder icon picker markup, shared with index.php
 	include 'modals/folder_icon_modal.php';
+	include 'modals/tag_folder_notes_modal.php';
 	?>
 
 	<script src="<?php echo poznoteAsset('js/globals.js'); ?>"></script>

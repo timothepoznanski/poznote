@@ -194,6 +194,9 @@
         'download-folder': function(folder) {
             callFn('downloadFolder', folder.id, folder.name);
         },
+        'tag-folder-notes': function(folder) {
+            callFn('showTagFolderNotesDialog', folder.id, folder.name, folder.noteCount);
+        },
         'share-folder': function(folder) {
             callFn('openPublicFolderShareModal', folder.id);
         },

@@ -5,7 +5,7 @@
 /* Main containers */
 html[data-theme='dark'] #left_col,
 body.dark-mode #left_col {
-    background-color: var(--dm-sidebar-bg);
+    background-color: var(--dm-bg);
     color: var(--dm-text);
 }
 
@@ -406,7 +406,7 @@ body.dark-mode .toggle-sidebar-btn:hover {
 
 html[data-theme='dark'] #icon_sidebar,
 body.dark-mode #icon_sidebar {
-    background-color: var(--dm-sidebar-bg);
+    background-color: var(--dm-bg);
     border-right: 1px solid var(--dm-border);
 }
 

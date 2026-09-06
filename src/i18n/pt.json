@@ -3915,7 +3915,9 @@
     "no_tools_reasoning_notice": "Este modelo recusa as ferramentas com o esforço de raciocínio atual, pelo que o assistente não consegue consultar as suas notas. Defina o esforço de raciocínio como Nenhum nas definições do assistente de IA.",
     "tool_rename": "Renomeando a nota #{{id}} para \"{{title}}\"",
     "tool_update": "Editando a nota #{{id}}",
-    "tool_create": "Criando a nota: {{title}}"
+    "tool_create": "Criando a nota: {{title}}",
+    "context_label": "Contexto:",
+    "context_hint": "A nota que o assistente usa quando diz \"esta nota\"."
   },
   "diary": {
     "title": "Diário",

@@ -186,7 +186,7 @@ body {
     cursor: col-resize;
     position: relative;
     flex-shrink: 0;
-    border-right: 1px solid #ccc;
+    border-right: 1px solid #dee2e6;
 }
 
 /* Extend hover area for easier button access */

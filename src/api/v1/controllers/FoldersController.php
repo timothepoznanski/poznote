@@ -22,6 +22,7 @@
  *   GET    /api/v1/folders/counts       - Get note counts for all folders
  *   GET    /api/v1/folders/suggested    - Get suggested folders
  *   POST   /api/v1/folders/move-files   - Move all files from one folder to another
+ *   POST   /api/v1/folders/{id}/tags   - Add tags to every note of a folder
  *   POST   /api/v1/notes/{id}/folder    - Move note to folder (in NotesController)
  *   POST   /api/v1/notes/{id}/archive   - Move note to the Archives workspace
  *   POST   /api/v1/notes/{id}/kanban-completed - Mark a Kanban card completed/active
@@ -1805,10 +1806,20 @@ class FoldersController {
         
         $totalCount = $this->countNotesRecursive($folderId, $workspace);
         $subfolderCount = $this->countSubfoldersRecursive($folderId, $workspace);
+
+        // Notes sitting directly in the folder, subfolders left out
+        [$wsCond, $wsParams] = $this->buildWorkspaceCondition($workspace);
+        $directQuery = "SELECT COUNT(*) FROM entries WHERE folder_id = ? AND trash = 0" . $wsCond;
+        $directParams = array_merge([$folderId], $wsParams);
+        $this->appendPublicWorkspaceAgeFilter($directQuery, $directParams);
+        $directStmt = $this->db->prepare($directQuery);
+        $directStmt->execute($directParams);
+        $directCount = (int)$directStmt->fetchColumn();
         
         $this->sendJson([
             'success' => true,
             'count' => $totalCount,
+            'direct_count' => $directCount,
             'subfolder_count' => $subfolderCount
         ]);
     }
@@ -2098,6 +2109,140 @@ class FoldersController {
             'moved_count' => $movedCount,
             'share_delta' => $shareDelta
         ]);
+    }
+
+    /**
+     * POST /api/v1/folders/{id}/tags - Add tags to every note of a folder
+     *
+     * Body (JSON):
+     *   - tags: Array of tag strings, or a comma-separated string
+     *   - workspace: Optional workspace check
+     *   - include_subfolders: Also tag the notes of the nested folders (default false)
+     *
+     * Tags are merged into what each note already has: a note keeps its own
+     * tags and only gains the ones it lacks, so applying the same tags twice
+     * is a no-op. Notes left unchanged keep their modification date.
+     */
+    public function addTags(string $id): void {
+        $folderId = (int)$id;
+        if ($folderId <= 0) {
+            $this->sendError('Invalid folder ID', 400);
+            return;
+        }
+
+        $data = $this->getInputData();
+        $tags = $this->normalizeTagList($data['tags'] ?? null);
+        if (empty($tags)) {
+            $this->sendError('At least one tag is required', 400);
+            return;
+        }
+
+        $workspace = isset($data['workspace']) ? trim((string)$data['workspace']) : '';
+        $includeSubfolders = !empty($data['include_subfolders'])
+            && filter_var($data['include_subfolders'], FILTER_VALIDATE_BOOLEAN);
+
+        $folderStmt = $this->db->prepare("SELECT id, workspace FROM folders WHERE id = ?");
+        $folderStmt->execute([$folderId]);
+        $folder = $folderStmt->fetch(PDO::FETCH_ASSOC);
+        if (!$folder) {
+            $this->sendError('Folder not found', 404);
+            return;
+        }
+        if ($workspace !== '' && $folder['workspace'] !== $workspace) {
+            $this->sendError('Folder belongs to a different workspace', 400);
+            return;
+        }
+
+        $folderIds = [$folderId];
+        if ($includeSubfolders) {
+            $folderIds = $this->collectFolderTreeIds($folderId);
+        }
+
+        $placeholders = implode(',', array_fill(0, count($folderIds), '?'));
+        $notesStmt = $this->db->prepare("SELECT id, tags FROM entries WHERE trash = 0 AND folder_id IN ($placeholders)");
+        $notesStmt->execute($folderIds);
+        $notes = $notesStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $actorUserId = (int)(getAuthenticatedUserId() ?? getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0));
+        $updateStmt = $this->db->prepare(
+            "UPDATE entries SET tags = ?, updated = CURRENT_TIMESTAMP, updated_by_user_id = ? WHERE id = ?"
+        );
+
+        $updatedCount = 0;
+        foreach ($notes as $note) {
+            $current = $this->normalizeTagList($note['tags'] ?? '');
+            $merged = $current;
+            foreach ($tags as $tag) {
+                if (!in_array($tag, $merged, true)) {
+                    $merged[] = $tag;
+                }
+            }
+            if (count($merged) === count($current)) {
+                continue;
+            }
+            if ($updateStmt->execute([implode(', ', $merged), $actorUserId, (int)$note['id']])) {
+                $updatedCount++;
+            }
+        }
+
+        $this->sendJson([
+            'success' => true,
+            'message' => "Tagged $updatedCount notes",
+            'tags' => $tags,
+            'notes_count' => count($notes),
+            'updated_count' => $updatedCount,
+            'include_subfolders' => $includeSubfolders
+        ]);
+    }
+
+    /**
+     * Normalize a tags value (array or comma/space separated string) into a
+     * list of distinct tags, using the same rules as the note tag endpoints:
+     * spaces inside a tag become underscores, blanks are dropped.
+     *
+     * @param mixed $tags
+     * @return string[]
+     */
+    private function normalizeTagList($tags): array {
+        if ($tags === null || $tags === '' || $tags === []) {
+            return [];
+        }
+        $items = is_array($tags) ? $tags : preg_split('/[,\s]+/', (string)$tags);
+        $result = [];
+        foreach ($items as $tag) {
+            $tag = is_string($tag) ? trim($tag) : '';
+            if ($tag === '') {
+                continue;
+            }
+            $tag = str_replace(' ', '_', $tag);
+            if (!in_array($tag, $result, true)) {
+                $result[] = $tag;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * The folder and every folder nested under it, at any depth.
+     *
+     * @return int[] Folder ids, the root first
+     */
+    private function collectFolderTreeIds(int $folderId): array {
+        $ids = [$folderId];
+        $queue = [$folderId];
+        $stmt = $this->db->prepare("SELECT id FROM folders WHERE parent_id = ?");
+        while (!empty($queue)) {
+            $stmt->execute([array_shift($queue)]);
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $childId = (int)$row['id'];
+                if (in_array($childId, $ids, true)) {
+                    continue;
+                }
+                $ids[] = $childId;
+                $queue[] = $childId;
+            }
+        }
+        return $ids;
     }
     
     /**

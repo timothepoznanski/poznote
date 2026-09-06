@@ -112,6 +112,11 @@
                     executeMoveFolderToSubfolder();
                 }
                 break;
+            case 'execute-tag-folder-notes':
+                if (typeof executeTagFolderNotes === 'function') {
+                    executeTagFolderNotes();
+                }
+                break;
 
             case 'toggle-move-create-workspace':
                 if (typeof toggleMoveCreateWorkspace === 'function') {

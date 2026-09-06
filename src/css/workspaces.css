@@ -141,14 +141,14 @@ body {
     border: 1px solid transparent;
     border-radius: 6px;
     background: transparent;
-    color: var(--pz-text-muted);
+    color: var(--pz-accent);
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
 .ws-icon-btn .lucide {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     pointer-events: none;
 }
 
@@ -156,7 +156,7 @@ body {
 .ws-icon-btn:focus-visible {
     background: var(--pz-surface-hover);
     border-color: var(--pz-border);
-    color: var(--pz-text);
+    color: var(--pz-accent);
 }
 
 /* A public workspace: the share icon stays tinted */
@@ -186,7 +186,7 @@ body {
 
 :root[data-theme='dark'] .ws-icon-btn,
 body.dark-mode .ws-icon-btn {
-    color: #a8a8a8;
+    color: var(--pz-accent);
 }
 
 :root[data-theme='dark'] .ws-icon-btn:hover,
@@ -195,7 +195,7 @@ body.dark-mode .ws-icon-btn:hover,
 body.dark-mode .ws-icon-btn:focus-visible {
     background: var(--dm-surface-hover);
     border-color: var(--dm-border);
-    color: var(--dm-text);
+    color: var(--pz-accent);
 }
 
 :root[data-theme='dark'] .ws-icon-btn.is-shared,
@@ -209,6 +209,42 @@ body.dark-mode .ws-icon-btn.ws-icon-btn-danger:hover,
 body.dark-mode .ws-icon-btn.ws-icon-btn-danger:focus-visible {
     color: #ff6b6b;
     background: rgba(255, 107, 107, 0.12);
+}
+
+.workspace-info-modal-content {
+    max-width: 520px;
+}
+
+.workspace-info-modal-content .modal-buttons {
+    margin-top: 24px;
+}
+
+.workspace-info-modal-content h3 .lucide {
+    color: var(--pz-accent);
+    vertical-align: -2px;
+}
+
+.workspace-info-list {
+    margin: 20px 0 0;
+}
+
+.workspace-info-list > div {
+    display: grid;
+    grid-template-columns: minmax(110px, 0.35fr) 1fr;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--pz-border);
+}
+
+.workspace-info-list dt {
+    color: var(--pz-text-muted);
+    font-weight: 600;
+}
+
+.workspace-info-list dd {
+    margin: 0;
+    color: var(--pz-text);
+    overflow-wrap: anywhere;
 }
 
 .workspace-share-toggle-form {
@@ -262,7 +298,7 @@ a.workspace-name-link:focus-visible {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    margin-top: 6px;
+    margin-top: 0;
 }
 
 .ws-tag-chip {

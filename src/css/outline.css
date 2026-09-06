@@ -20,7 +20,7 @@
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    border-left: 1px solid #dee2e6;
+    border-left: none;
     /* Hide scrollbars but keep scroll functionality */
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
@@ -382,13 +382,13 @@ body.kanban-active .toggle-outline-btn {
 
 body.dark-mode #outline-panel,
 html[data-theme='dark'] #outline-panel {
-    background: var(--dm-sidebar-bg);
-    border-left-color: var(--dm-border);
+    background: var(--dm-bg);
+    border-left: none;
 }
 
 body.dark-mode .outline-header,
 html[data-theme='dark'] .outline-header {
-    background: var(--dm-sidebar-bg);
+    background: var(--dm-bg);
     border-bottom-color: var(--dm-border);
 }
 
@@ -426,7 +426,7 @@ html[data-theme='dark'] .outline-empty {
 
 body.dark-mode .outline-resize-handle,
 html[data-theme='dark'] .outline-resize-handle {
-    background: var(--dm-sidebar-bg);
+    background: var(--dm-bg);
     border-left-color: var(--dm-border);
 }
 

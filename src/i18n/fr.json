@@ -4135,7 +4135,12 @@
     "no_tools_reasoning_notice": "Ce modèle refuse les outils avec l'effort de raisonnement actuel, l'assistant ne peut donc pas parcourir vos notes. Réglez l'effort de raisonnement sur Aucun dans les paramètres de l'assistant IA.",
     "tool_rename": "Renommage de la note #{{id}} en « {{title}} »",
     "tool_update": "Modification de la note #{{id}}",
-    "tool_create": "Création de la note : {{title}}"
+    "tool_create": "Création de la note : {{title}}",
+    "context_label": "Contexte :",
+    "model_label": "Modèle :",
+    "model_hint": "Ouvrir les réglages de l’assistant IA.",
+    "back_to_assistant": "Retour à l’assistant IA",
+    "context_hint": "La note que l'assistant utilise quand vous dites « cette note »."
   },
   "diary": {
     "title": "Journal",

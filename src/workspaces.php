@@ -751,6 +751,17 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $workspaces[] = $workspaceName;
 }
 
+$sharedUsernamesById = [];
+try {
+    require_once __DIR__ . '/users/db_master.php';
+    $masterUsers = getMasterConnection()->query('SELECT id, username FROM users')->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($masterUsers as $masterUser) {
+        $sharedUsernamesById[(int)$masterUser['id']] = (string)$masterUser['username'];
+    }
+} catch (Exception $e) {
+    // Sharing details remain usable even if the master user database is unavailable.
+}
+
 // Count notes per workspace, excluding trashed notes.
 $workspace_counts = [];
 try {
@@ -762,6 +773,16 @@ try {
 } catch (Exception $e) {
     // If entries table does not exist or query fails, default to empty counts
     $workspace_counts = [];
+}
+
+$workspace_folder_counts = [];
+try {
+    $folderCountStmt = $con->query('SELECT workspace, COUNT(*) as cnt FROM folders WHERE workspace IS NOT NULL GROUP BY workspace');
+    while ($r = $folderCountStmt->fetch(PDO::FETCH_ASSOC)) {
+        $workspace_folder_counts[$r['workspace']] = (int)$r['cnt'];
+    }
+} catch (Exception $e) {
+    $workspace_folder_counts = [];
 }
 
 ?>
@@ -880,28 +901,26 @@ try {
                             <li>
                                 <?php
                                     $cnt = isset($workspace_counts[$ws]) ? (int)$workspace_counts[$ws] : 0;
-                                    if ($cnt === 0) {
-                                        $cnt_text = t('workspaces.count.notes_0', [], '0 notes', $currentLang);
-                                    } elseif ($cnt === 1) {
-                                        $cnt_text = t('workspaces.count.notes_1', [], '1 note', $currentLang);
-                                    } else {
-                                        $cnt_text = t('workspaces.count.notes_n', ['count' => $cnt], '{{count}} notes', $currentLang);
+                                    $folderCount = isset($workspace_folder_counts[$ws]) ? (int)$workspace_folder_counts[$ws] : 0;
+                                    $wsTags = $workspaceRow['tags'] ?? [];
+                                    $allowedUserIds = $workspaceRow['readonly_allowed_users'] ?? [];
+                                    $sharedWith = [];
+                                    foreach ($allowedUserIds as $allowedUserId) {
+                                        $sharedWith[] = $sharedUsernamesById[(int)$allowedUserId] ?? ('User #' . (int)$allowedUserId);
                                     }
                                 ?>
                                 <div class="ws-col ws-col-name">
                                     <div class="ws-name-block">
                                         <div class="ws-name-row">
                                             <a class="workspace-name-item workspace-name-link" href="index.php?workspace=<?php echo rawurlencode($ws); ?>" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo t_h('workspaces.actions.select', [], 'Select', $currentLang); ?>"><?php echo $ws_display; ?></a>
-                                            <span class="workspace-count"><?php echo htmlspecialchars($cnt_text); ?></span>
+                                            <?php if (!empty($wsTags)): ?>
+                                                <div class="ws-tags-row">
+                                                    <?php foreach ($wsTags as $wsTag): ?>
+                                                        <span class="ws-tag-chip"><i class="lucide lucide-tag"></i><?php echo htmlspecialchars($wsTag, ENT_QUOTES, 'UTF-8'); ?></span>
+                                                    <?php endforeach; ?>
+                                                </div>
+                                            <?php endif; ?>
                                         </div>
-                                        <?php $wsTags = $workspaceRow['tags'] ?? []; ?>
-                                        <?php if (!empty($wsTags)): ?>
-                                        <div class="ws-tags-row">
-                                            <?php foreach ($wsTags as $wsTag): ?>
-                                                <span class="ws-tag-chip"><i class="lucide lucide-tag"></i><?php echo htmlspecialchars($wsTag, ENT_QUOTES, 'UTF-8'); ?></span>
-                                            <?php endforeach; ?>
-                                        </div>
-                                        <?php endif; ?>
                                     </div>
                                 </div>
                                 <?php
@@ -947,6 +966,16 @@ try {
                                                 <i class="lucide lucide-trash-2"></i>
                                             </button>
                                         <?php endif; ?>
+                                        <button type="button" class="ws-icon-btn workspace-info-action"
+                                                data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"
+                                                data-notes-count="<?php echo $cnt; ?>"
+                                                data-folders-count="<?php echo $folderCount; ?>"
+                                                data-tags="<?php echo htmlspecialchars(json_encode($wsTags, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP), ENT_QUOTES, 'UTF-8'); ?>"
+                                                data-shared="<?php echo $workspaceReadonlyEnabled ? '1' : '0'; ?>"
+                                                data-shared-with="<?php echo htmlspecialchars(json_encode($sharedWith, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP), ENT_QUOTES, 'UTF-8'); ?>"
+                                                title="<?php echo t_h('common.information', [], 'Information'); ?>" aria-label="<?php echo t_h('common.information', [], 'Information'); ?>">
+                                            <i class="lucide lucide-info"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </li>
@@ -973,6 +1002,22 @@ try {
 
     <div id="ajaxAlert" class="initially-hidden alert-with-margin"></div>
     <div class="section-bottom-spacer"></div>
+    </div>
+
+    <div id="workspaceInfoModal" class="modal initially-hidden">
+        <div class="modal-content workspace-info-modal-content">
+            <h3><i class="lucide lucide-info"></i> <span id="workspaceInfoTitle"></span></h3>
+            <dl class="workspace-info-list">
+                <div><dt><?php echo t_h('workspaces.info.notes', [], 'Notes'); ?></dt><dd id="workspaceInfoNotes"></dd></div>
+                <div><dt><?php echo t_h('workspaces.info.folders', [], 'Folders'); ?></dt><dd id="workspaceInfoFolders"></dd></div>
+                <div><dt><?php echo t_h('workspaces.info.tags', [], 'Tags'); ?></dt><dd id="workspaceInfoTags"></dd></div>
+                <div><dt><?php echo t_h('workspaces.info.shared', [], 'Shared'); ?></dt><dd id="workspaceInfoShared"></dd></div>
+                <div><dt><?php echo t_h('workspaces.info.shared_with', [], 'Shared with'); ?></dt><dd id="workspaceInfoSharedWith"></dd></div>
+            </dl>
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" data-action="close-workspace-info-modal"><?php echo t_h('common.close', [], 'Close'); ?></button>
+            </div>
+        </div>
     </div>
 
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>

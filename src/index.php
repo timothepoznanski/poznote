@@ -283,6 +283,19 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
                 if (shouldCollapseOutline) {
                     document.documentElement.classList.add('outline-collapsed');
                 }
+
+                // Docked AI chat panel, same idea: restore its open state and
+                // width before the first paint so the note does not render
+                // full width and then jump. js/ai-chat.js takes the state
+                // over on DOMContentLoaded. Never restored on phones, where
+                // the panel overlays the note.
+                if (isDesktop && localStorage.getItem('aiChatOpen') === 'true') {
+                    document.documentElement.classList.add('ai-chat-open');
+                }
+                var aiChatWidth = parseInt(localStorage.getItem('aiChatWidth'), 10);
+                if (aiChatWidth >= 300 && aiChatWidth <= 700) {
+                    document.documentElement.style.setProperty('--ai-chat-width', aiChatWidth + 'px');
+                }
             } catch (_error) {
                 // Ignore localStorage access errors during early paint.
             }

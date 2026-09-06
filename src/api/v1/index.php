@@ -636,6 +636,11 @@ $router->post('/folders/{id}/empty', function($params) use ($foldersController) 
     $foldersController->empty($params['id']);
 });
 
+// Add tags to every note of a folder (optionally its subfolders too)
+$router->post('/folders/{id}/tags', function($params) use ($foldersController) {
+    $foldersController->addTags($params['id']);
+});
+
 // Update folder icon
 $router->put('/folders/{id}/icon', function($params) use ($foldersController) {
     $foldersController->updateIcon($params['id']);

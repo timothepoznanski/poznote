@@ -46,7 +46,8 @@
 
         return {
             id: folderId ? parseInt(folderId, 10) : null,
-            name: folderName
+            name: folderName,
+            noteCount: parseInt(element.getAttribute('data-note-count'), 10) || 0
         };
     }
 
@@ -304,6 +305,11 @@
             'download-folder': function () {
                 if (typeof window.downloadFolder === 'function') {
                     window.downloadFolder(folderData.id, folderData.name);
+                }
+            },
+            'tag-folder-notes': function () {
+                if (typeof window.showTagFolderNotesDialog === 'function') {
+                    window.showTagFolderNotesDialog(folderData.id, folderData.name, folderData.noteCount);
                 }
             },
             'rename-folder': function () {
@@ -566,7 +572,7 @@
         // Folder menu actions
         var folderMenuActions = [
             'create-note-in-folder', 'move-folder-files', 'move-entire-folder',
-            'duplicate-folder', 'download-folder', 'rename-folder', 'delete-folder',
+            'duplicate-folder', 'download-folder', 'tag-folder-notes', 'rename-folder', 'delete-folder',
             'change-folder-icon', 'share-folder', 'favorite-folder',
             'show-only-folder'
         ];
