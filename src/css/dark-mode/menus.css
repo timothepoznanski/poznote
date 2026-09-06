@@ -268,6 +268,11 @@ body.dark-mode .workspace-menu-item i {
     color: #b0b0b0;
 }
 
+html[data-theme='dark'] .workspace-menu-item .workspace-menu-dot,
+body.dark-mode .workspace-menu-item .workspace-menu-dot {
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
 html[data-theme='dark'] .workspace-menu-item:hover i,
 body.dark-mode .workspace-menu-item:hover i {
     color: var(--dm-text);

@@ -16,9 +16,9 @@
  *   $iconSidebarExtraItems buttons appended after the navigation entries, in
  *                          the scrolling part of the rail (the account group at
  *                          the bottom is fixed and defined here).
- *                          index.php uses this for its notifications /
- *                          git-sync / AI-chat buttons, which depend on
- *                          handlers that only that page loads. Each entry is
+ *                          index.php uses this for its git-sync buttons and,
+ *                          like dashboard.php, for the AI-chat button: they
+ *                          depend on handlers only those pages load. Each entry is
  *                          ['id', 'icon', 'label'] plus exactly one of
  *                          'action' (=> data-action), 'gitAction'
  *                          (=> data-icon-sidebar-git-action, index.php) or
@@ -30,9 +30,9 @@
  *                          toggles it on workspace switch).
  *                          An entry may also add 'after' => '<entry id>' to sit
  *                          right below that navigation entry instead of at the
- *                          end of the rail (index.php uses it for the AI
- *                          assistant, pinned under Dashboard). A pinned entry
- *                          is not part of the rail's custom ordering.
+ *                          end of the rail (index.php and dashboard.php use it
+ *                          for the AI assistant, pinned under Dashboard). A
+ *                          pinned entry is not part of the rail's custom ordering.
  *
  * Requires: css/icon-sidebar.css in <head> (plus css/icon-sidebar-page.css on
  *           the secondary pages, which pin the rail instead of laying it out
@@ -209,6 +209,10 @@ $iconSidebarBottomItems = [
     // lights up on ?open=about, Settings on every other settings.php visit.
     ['id' => 'iconSidebarSettingsBtn', 'url' => $iconSidebarUrl('settings.php'), 'icon' => 'lucide-settings', 'label' => t('sidebar.settings', [], 'Settings'), 'activeFlag' => $iconSidebarCurrentPage === 'settings.php' && !$iconSidebarIsAboutView, 'updateBadge' => function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()],
     ['id' => 'iconSidebarAboutBtn', 'url' => $iconSidebarUrl('settings.php', ['open' => 'about']), 'icon' => 'lucide-info-circle', 'label' => t('settings.categories.documentation', [], 'About'), 'activeFlag' => $iconSidebarIsAboutView],
+    // Support: js/support-modal.js, loaded below, turns the click into a
+    // little joke (No runs away from the pointer, Yes sticks to it) that ends
+    // on the Ko-fi page. The href is the no-JS fallback, hence 'external'.
+    ['id' => 'iconSidebarSupportBtn', 'url' => 'https://ko-fi.com/timothepoznanski', 'external' => true, 'icon' => 'lucide-heart', 'label' => t('home.support_poznote', [], 'Support Poznote')],
     ['id' => 'iconSidebarLogoutBtn', 'url' => $iconSidebarBasePath . 'logout.php', 'icon' => 'lucide-log-out', 'label' => t('workspace_menu.logout', [], 'Logout')],
 ];
 
@@ -253,12 +257,25 @@ $iconSidebarProfileStrings = [
     'common.loading' => t('common.loading', [], 'Loading...'),
     'common.error' => t('common.error', [], 'Error'),
 ];
+
+// Same arrangement for the Support modal (js/support-modal.js).
+$iconSidebarSupportStrings = [
+    'home.support_poznote' => t('home.support_poznote', [], 'Support Poznote'),
+    'support_modal.question' => t('support_modal.question', [], 'If you enjoy Poznote, would you like to buy it a little coffee to support it?'),
+    'support_modal.yes' => t('support_modal.yes', [], 'Yes!'),
+    'support_modal.thanks' => t('support_modal.thanks', [], 'Thank you!'),
+    'support_modal.thanks_sub' => t('support_modal.thanks_sub', [], 'You are wonderful.'),
+    'support_modal.no' => t('support_modal.no', [], 'No...'),
+    'common.close' => t('common.close', [], 'Close'),
+];
 ?>
 <link rel="stylesheet" href="<?php echo $iconSidebarAsset('css/profile-modal.css'); ?>">
 <script>
 window.PoznoteProfileI18n = <?php echo json_encode($iconSidebarProfileStrings, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;
+window.PoznoteSupportI18n = <?php echo json_encode($iconSidebarSupportStrings, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;
 </script>
 <script src="<?php echo $iconSidebarAsset('js/profile.js'); ?>" defer></script>
+<script src="<?php echo $iconSidebarAsset('js/support-modal.js'); ?>" defer></script>
 <script>
 // Apply the collapsed state before the rail paints; js/icon-sidebar-toggle.js
 // owns it afterwards.
@@ -333,7 +350,7 @@ try {
        id="<?php echo $iconSidebarItem['id']; ?>"
        class="<?php echo $iconSidebarClass; ?>"
        title="<?php echo $iconSidebarLabel; ?>"
-       aria-label="<?php echo $iconSidebarLabel; ?>"<?php echo $iconSidebarIsCurrent ? ' aria-current="page"' : ''; ?>>
+       aria-label="<?php echo $iconSidebarLabel; ?>"<?php echo $iconSidebarIsCurrent ? ' aria-current="page"' : ''; ?><?php echo !empty($iconSidebarItem['external']) ? ' target="_blank" rel="noopener noreferrer"' : ''; ?>>
         <i class="lucide <?php echo $iconSidebarIcon; ?>"></i>
         <?php if (!empty($iconSidebarItem['updateBadge'])): ?>
         <span class="update-badge update-badge-hidden"></span>

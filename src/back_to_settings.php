@@ -32,7 +32,11 @@ if ($backToSettingsWs === '__last_opened__') {
 
 $backToAiChat = isset($_GET['from']) && $_GET['from'] === 'ai-chat';
 if ($backToAiChat) {
-    $backToSettingsHref = $backToSettingsBase . 'index.php?ai_chat=1'
+    // The panel lives on the notes page and on the dashboard; ai_chat_panel.php
+    // adds back=dashboard when it was opened from the latter. ?ai_chat=1 makes
+    // js/ai-chat.js open the panel on arrival.
+    $backToAiChatPage = (($_GET['back'] ?? '') === 'dashboard') ? 'dashboard.php' : 'index.php';
+    $backToSettingsHref = $backToSettingsBase . $backToAiChatPage . '?ai_chat=1'
         . ($backToSettingsWs !== '' ? '&workspace=' . urlencode($backToSettingsWs) : '');
     $backToSettingsLabel = t_h('ai_chat.back_to_assistant', [], 'Back to AI Assistant');
 } else {

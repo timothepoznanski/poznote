@@ -7,11 +7,21 @@ Integrated AI chat that can search and read your notes. It works with a local [O
 
 ## What it does
 
-Once configured, an **AI** button appears in the dashboard toolbar and opens the chat panel right there.
+Once configured, an **AI assistant** button appears in the left icon rail, on the notes page and on the dashboard, and opens the chat panel right there. The panel is docked on the right, keeps its open state and width from one page to the other, and the conversation follows you between the two.
 
-The assistant has tools to **search and read your notes**, and uses them on its own: ask "what do my notes say about X?", request a summary across several notes, or let it find that note you half remember. When you explicitly ask for it, it can also **create a note, rename one, or rewrite its content** (there is deliberately no delete tool). Answers are streamed and rendered as Markdown.
+The assistant has tools to **search and read your notes**, and uses them on its own: ask "what do my notes say about X?", request a summary across several notes, or let it find that note you half remember. Answers are streamed and rendered as Markdown.
 
-The note you have open is part of the context: say "improve the formatting of this note" or "add a conclusion here" and the assistant works on it, no id or title needed. It reads the version last saved by the editor, and "this note" follows you if you open another note during the conversation. Naming another note in your question still takes precedence.
+When you explicitly ask for it, it can also act on your notes:
+
+- **write**: create a note, rename one, or rewrite its content;
+- **organize**: add or remove tags, list, create and rename folders, move notes between them, mark notes and folders as favorites;
+- **dates**: set or remove a reminder on a note (one-time or repeating), with the current date and time in your timezone known to the assistant, so "remind me next Monday at 9" works;
+- **tasks**: add, check, uncheck, rename or remove the tasks of a task list note, including their due dates and reminders, and check or uncheck a checkbox inside a regular note, without rewriting the rest of it;
+- **delete**: move a note to the trash, or a folder with its subfolders and all their notes. Everything can be restored from the Trash page: the assistant has no way to delete anything for good, and no tool to empty the trash.
+
+The note you have open is part of the context: say "improve the formatting of this note" or "add a conclusion here" and the assistant works on it, no id or title needed. It reads the version last saved by the editor, and "this note" follows you if you open another note during the conversation. Naming another note in your question still takes precedence. On the dashboard no note is open, so name the note you mean there.
+
+Two lines above the input show what the assistant is working with: the **workspace** every tool runs in, and the **note** "this note" refers to when one is open.
 
 When the assistant edits or creates a note, the open note and the sidebar refresh on their own once the answer is complete, no page reload needed. If you have unsaved changes in the note it just edited, a banner appears instead: reload the note, or keep and save your own version.
 

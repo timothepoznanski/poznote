@@ -5590,6 +5590,28 @@ function poznoteGetWorkspaceTagsMap(PDO $con): array {
 }
 
 /**
+ * Color of every colored workspace, keyed by name: the stored value (palette
+ * id or '#rrggbb', same semantics as entries.color) and the hex it resolves
+ * to. Workspaces without a color, or whose palette entry was deleted, are
+ * absent.
+ */
+function poznoteGetWorkspaceColorsMap(PDO $con): array {
+    $map = [];
+    try {
+        $stmt = $con->query("SELECT name, color FROM workspaces WHERE color IS NOT NULL AND color != ''");
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $hex = resolveNoteColorHex((string)$row['color']);
+            if ($hex !== '') {
+                $map[(string)$row['name']] = ['color' => (string)$row['color'], 'hex' => $hex];
+            }
+        }
+    } catch (Exception $e) {
+        // Column missing on a not-yet-migrated database: no colors
+    }
+    return $map;
+}
+
+/**
  * Resolve which workspaces a multi-workspace page shows, from its request
  * parameters:
  *   workspace=X                 one workspace (the default)
@@ -5604,13 +5626,14 @@ function poznoteGetWorkspaceTagsMap(PDO $con): array {
  *   query       the URL parameters reproducing this scope
  *   key         a short stable identifier for per-scope client preferences
  *   tags_map    name => tags for every workspace (for selectors)
+ *   colors_map  name => ['color' => stored value, 'hex' => resolved] for colored workspaces
  */
 function poznoteResolveWorkspaceScope(PDO $con, array $params, string $fallbackWorkspace): array {
     $mode = isset($params['scope']) ? strtolower(trim((string)$params['scope'])) : '';
     $tagsMap = poznoteGetWorkspaceTagsMap($con);
     $allNames = array_keys($tagsMap);
 
-    $scope = ['mode' => 'single', 'workspaces' => [], 'tag' => '', 'query' => [], 'key' => '', 'tags_map' => $tagsMap];
+    $scope = ['mode' => 'single', 'workspaces' => [], 'tag' => '', 'query' => [], 'key' => '', 'tags_map' => $tagsMap, 'colors_map' => poznoteGetWorkspaceColorsMap($con)];
 
     if ($mode === 'all' && !empty($allNames)) {
         $scope['mode'] = 'all';
@@ -5670,7 +5693,8 @@ function renderBoardViewMenu(string $prefix) {
             ' data-label-list="' . t_h('dashboard.view.layout_list', [], 'List') . '"' .
             ' data-label-small="' . t_h('dashboard.view.size_small', [], 'Small') . '"' .
             ' data-label-medium="' . t_h('dashboard.view.size_medium', [], 'Medium') . '"' .
-            ' data-label-large="' . t_h('dashboard.view.size_large', [], 'Large') . '">' .
+            ' data-label-large="' . t_h('dashboard.view.size_large', [], 'Large') . '"' .
+            ' data-label-wide="' . t_h('dashboard.view.size_wide', [], 'Wide') . '">' .
             '<i class="lucide lucide-grid"></i>' .
             '<i class="lucide lucide-layout-list"></i>' .
             '<span class="board-view-size-letter"></span>' .

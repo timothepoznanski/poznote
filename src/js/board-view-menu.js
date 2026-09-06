@@ -1,8 +1,9 @@
 /**
  * View controls for the dashboard / diary boards, next to the filter bar:
- * - a single view toggle cycling grid small -> medium -> large -> list,
- *   showing the grid icon plus the size letter in grid layout and the list
- *   icon in list layout
+ * - a single view toggle cycling grid small -> medium -> large -> wide ->
+ *   list, showing the grid icon plus the size letter in grid layout and the
+ *   list icon in list layout (wide: the width beyond large at the medium
+ *   height)
  * - a column button cycling 1..8, capping how many columns the grid splits
  *   the width into, hidden in list layout
  * Settings persist in localStorage (separate ViewLayout / ViewSize keys, so
@@ -15,10 +16,10 @@
 (function () {
     'use strict';
 
-    var SIZES = ['small', 'medium', 'large'];
+    var SIZES = ['small', 'medium', 'large', 'wide'];
     var LAYOUTS = ['grid', 'list'];
-    // The single toggle walks through every view: the three grid sizes, then list.
-    var VIEWS = ['small', 'medium', 'large', 'list'];
+    // The single toggle walks through every view: the four grid sizes, then list.
+    var VIEWS = ['small', 'medium', 'large', 'wide', 'list'];
     // Maximum columns: the grid still drops to fewer when the width can't fit
     // that many, so cards keep their width instead of being squeezed.
     var COLUMNS = ['1', '2', '3', '4', '5', '6', '7', '8'];

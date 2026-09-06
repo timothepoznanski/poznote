@@ -665,6 +665,37 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
+<!-- Workspace color modal (for workspaces.php): one swatch per entry of the
+     note color palette (Settings > Note colors) plus a custom color. The dot
+     marks the workspace's notes and folders on multi-workspace dashboard
+     views (css/workspaces.css, handleWorkspaceColorButtonClick in
+     js/workspaces.js) -->
+<div id="workspaceColorModal" class="modal initially-hidden">
+    <div class="modal-content">
+        <h3><?php echo t_h('workspaces.color.modal_title', [], 'Workspace color'); ?> <span id="workspaceColorSource"></span></h3>
+        <p class="ws-tags-help"><?php echo t_h('workspaces.color.help', [], 'The color marks the notes and folders of this workspace on the dashboard when several workspaces are shown together.'); ?></p>
+        <div class="modal-body">
+            <div id="workspaceColorGrid" class="ws-color-grid">
+                <?php foreach ((function_exists('getNoteColorPalette') ? getNoteColorPalette() : []) as $paletteEntry): ?>
+                <?php $paletteLabel = htmlspecialchars((string)($paletteEntry['name'] ?? $paletteEntry['id']), ENT_QUOTES, 'UTF-8'); ?>
+                <button type="button" class="ws-color-option" data-color="<?php echo htmlspecialchars($paletteEntry['id'], ENT_QUOTES, 'UTF-8'); ?>" data-hex="<?php echo htmlspecialchars($paletteEntry['hex'], ENT_QUOTES, 'UTF-8'); ?>" title="<?php echo $paletteLabel; ?>" aria-label="<?php echo $paletteLabel; ?>" aria-pressed="false">
+                    <span class="ws-color-swatch" style="background-color: <?php echo htmlspecialchars($paletteEntry['hex'], ENT_QUOTES, 'UTF-8'); ?>"></span>
+                </button>
+                <?php endforeach; ?>
+                <label class="ws-color-option ws-color-option-custom" title="<?php echo t_h('workspaces.color.custom', [], 'Custom color'); ?>">
+                    <input type="color" id="workspaceColorCustom" aria-label="<?php echo t_h('workspaces.color.custom', [], 'Custom color'); ?>">
+                    <span class="ws-color-swatch ws-color-swatch-custom"></span>
+                </label>
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-danger" id="workspaceColorClearBtn"><?php echo t_h('note_color.remove', [], 'Remove color'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-workspace-color-modal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="confirmWorkspaceColorBtn"><?php echo t_h('common.save', [], 'Save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Delete confirmation modal (for workspaces.php) -->
 <div id="deleteModal" class="modal initially-hidden">
     <div class="modal-content">

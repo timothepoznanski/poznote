@@ -2668,7 +2668,12 @@ class FoldersController {
      *     they show today by having it copied into their own sort_setting.
      *
      * Body: { "note_id": 12, "target_note_id": 34, "position": "before"|"after",
-     *         "workspace": "Poznote" (optional check) }
+     *         "workspace": "Poznote" (optional check),
+     *         "scope": "sidebar" (default) | "dashboard" }
+     *
+     * With scope "dashboard" the rank goes to entries.dashboard_order, the
+     * column the dashboard sorts its cards on, and nothing else changes (see
+     * reorderNoteOnDashboard); the target must be a sibling.
      */
     public function reorderNote(): void {
         if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
@@ -2682,6 +2687,7 @@ class FoldersController {
         $targetNoteId = isset($data['target_note_id']) ? (int)$data['target_note_id'] : 0;
         $position = isset($data['position']) ? strtolower(trim((string)$data['position'])) : '';
         $workspaceParam = isset($data['workspace']) ? trim((string)$data['workspace']) : null;
+        $scope = isset($data['scope']) ? strtolower(trim((string)$data['scope'])) : 'sidebar';
 
         if ($noteId <= 0 || $targetNoteId <= 0) {
             $this->sendError('note_id and target_note_id are required', 400);
@@ -2695,6 +2701,11 @@ class FoldersController {
 
         if ($noteId === $targetNoteId) {
             $this->sendError('Note cannot be reordered relative to itself', 400);
+            return;
+        }
+
+        if (!in_array($scope, ['sidebar', 'dashboard'], true)) {
+            $this->sendError('scope must be sidebar or dashboard', 400);
             return;
         }
 
@@ -2723,6 +2734,18 @@ class FoldersController {
         $targetFolderId = $targetNote['folder_id'] !== null ? (int)$targetNote['folder_id'] : null;
         $currentFolderId = $note['folder_id'] !== null ? (int)$note['folder_id'] : null;
         $changesFolder = $currentFolderId !== $targetFolderId;
+
+        if ($scope === 'dashboard') {
+            // Cards are only rearranged among the siblings shown together on
+            // the board; moving a note to another folder stays a sidebar (or
+            // move endpoint) operation.
+            if ($changesFolder) {
+                $this->sendError('Dashboard reordering keeps the note in its folder: target_note_id must be a sibling', 400);
+                return;
+            }
+            $this->reorderNoteOnDashboard($note, $targetNoteId, $position, $targetWorkspace, $targetFolderId);
+            return;
+        }
 
         // Folder name for the legacy entries.folder column, read from the
         // folders table rather than copied from the target note (whose own
@@ -2834,6 +2857,96 @@ class FoldersController {
     }
 
     /**
+     * Dashboard variant of reorderNote(): same before/after contract, but the
+     * rank goes to entries.dashboard_order, the column the board sorts its
+     * cards on, and nothing else changes. The sidebar order (display_order),
+     * the folder's sort setting and the note's 'updated' date are untouched,
+     * so arranging the board never reorders the sidebar, and the sidebar's
+     * sort setting never rearranges the board.
+     *
+     * Siblings are renumbered from 1 following what the board displays:
+     * pinned cards first, then placed cards in saved order, unplaced ones
+     * ahead of them by newest update (see dashboardSortRows in dashboard.php).
+     */
+    private function reorderNoteOnDashboard(array $note, int $targetNoteId, string $position, string $workspace, ?int $folderId): void {
+        $noteId = (int)$note['id'];
+        $orderedIds = $this->getOrderedDashboardSiblingNoteIds($workspace, $folderId, $noteId);
+        $targetIndex = array_search($targetNoteId, $orderedIds, true);
+        if ($targetIndex === false) {
+            $this->sendError('Target note is not available in the destination order', 404);
+            return;
+        }
+
+        $insertIndex = $position === 'before' ? $targetIndex : $targetIndex + 1;
+        array_splice($orderedIds, $insertIndex, 0, [$noteId]);
+
+        try {
+            $this->db->beginTransaction();
+            $update = $this->db->prepare('UPDATE entries SET dashboard_order = ? WHERE id = ?');
+            foreach ($orderedIds as $index => $id) {
+                $update->execute([$index + 1, $id]);
+            }
+            $this->db->commit();
+        } catch (Exception $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            $this->sendError('Failed to reorder note: ' . $e->getMessage(), 500);
+            return;
+        }
+
+        $this->sendJson([
+            'success' => true,
+            'message' => 'Note reordered successfully',
+            'note' => [
+                'id' => $noteId,
+                'workspace' => $workspace,
+                'folder_id' => $folderId,
+                'folder' => $note['folder'] ?? null,
+                'position' => $position,
+                'target_note_id' => $targetNoteId,
+                'scope' => 'dashboard',
+                'dashboard_order' => $insertIndex + 1,
+            ],
+            'share_delta' => 0
+        ]);
+    }
+
+    /**
+     * Ids of the notes shown next to a note on the dashboard (same folder, or
+     * the root), in the order the board displays them, excluding one note.
+     */
+    private function getOrderedDashboardSiblingNoteIds(string $workspace, ?int $folderId, int $excludeNoteId): array {
+        $sql = 'SELECT id, pinned, updated, dashboard_order FROM entries WHERE trash = 0 AND workspace = ? AND id != ? AND '
+            . ($folderId === null ? 'folder_id IS NULL' : 'folder_id = ?')
+            . ' ORDER BY updated DESC, id DESC';
+        $params = [$workspace, $excludeNoteId];
+        if ($folderId !== null) {
+            $params[] = $folderId;
+        }
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        usort($rows, [self::class, 'compareNotesDashboardOrder']);
+
+        return array_map(function ($row) {
+            return (int)$row['id'];
+        }, $rows);
+    }
+
+    /**
+     * Board order: pinned cards first, then compareNotesPlacedOrder() on
+     * dashboard_order. Mirrors dashboardSortRows() + dashboardSortPinnedFirst()
+     * in dashboard.php.
+     */
+    private static function compareNotesDashboardOrder(array $a, array $b): int {
+        $pinDiff = (int)!empty($b['pinned']) - (int)!empty($a['pinned']);
+        if ($pinDiff !== 0) return $pinDiff;
+        return self::compareNotesPlacedOrder($a, $b, 'dashboard_order');
+    }
+
+    /**
      * Raw global note_list_sort setting ('updated_desc' when unset).
      */
     private function getGlobalNoteListSort(): string {
@@ -2926,8 +3039,17 @@ class FoldersController {
      * newest update.
      */
     private static function compareNotesManualOrder(array $a, array $b): int {
-        $orderA = (int)($a['display_order'] ?? 0);
-        $orderB = (int)($b['display_order'] ?? 0);
+        return self::compareNotesPlacedOrder($a, $b, 'display_order');
+    }
+
+    /**
+     * Placed notes ($column > 0) in saved order, unplaced ones first by newest
+     * update; ties broken on id so the order is total. Shared by the sidebar
+     * (display_order) and the dashboard (dashboard_order).
+     */
+    private static function compareNotesPlacedOrder(array $a, array $b, string $column): int {
+        $orderA = (int)($a[$column] ?? 0);
+        $orderB = (int)($b[$column] ?? 0);
         if ($orderA > 0 && $orderB > 0) {
             if ($orderA !== $orderB) return $orderA <=> $orderB;
             return ((int)($a['id'] ?? 0)) <=> ((int)($b['id'] ?? 0));

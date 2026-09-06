@@ -14,6 +14,23 @@ require_once 'version_helper.php';
 $pageWorkspace = trim(getWorkspaceFilter());
 $currentLang = getUserLanguage();
 
+// AI assistant availability, resolved the same way index.php does (the user's
+// own configuration, or the instance one granted to this user). Drives the
+// rail button, the docked chat panel and its assets below.
+$aiChatEnabled = false;
+$aiChatConfig = [];
+try {
+    require_once 'users/db_master.php';
+    require_once 'ai_config.php';
+    if (isset($con)) {
+        $aiChatConfig = poznoteResolveAiChatConfig($con, (int)(getAuthenticatedUserId() ?? 0));
+        $aiChatEnabled = !empty($aiChatConfig['available']);
+    }
+} catch (Throwable $e) {
+    // A broken AI configuration must never take the board down with it.
+    $aiChatEnabled = false;
+}
+
 // Whether a local password is of any use to this user. Hidden in two cases:
 // the instance is SSO-only, so no password would ever be accepted at login; or
 // this profile was provisioned without a credential, so there is no current
@@ -117,8 +134,32 @@ function dashboardBuildNoteData(array $note, string $pageWorkspace): array {
 }
 
 /**
- * Pinned notes first, each group keeping the order it already had
- * (updated DESC, as returned by the query).
+ * Board order of the raw note rows of one folder (or of the root): cards the
+ * user placed by dragging (dashboard_order > 0) in saved order, the others
+ * first by newest update so a fresh note stays visible until it is placed.
+ * Same rule as the sidebar's manual sort, on the dashboard's own column, and
+ * the one FoldersController::compareNotesDashboardOrder renumbers with.
+ */
+function dashboardSortRows(array $rows): array {
+    usort($rows, function (array $a, array $b): int {
+        $orderA = (int)($a['dashboard_order'] ?? 0);
+        $orderB = (int)($b['dashboard_order'] ?? 0);
+        if ($orderA > 0 && $orderB > 0) {
+            if ($orderA !== $orderB) return $orderA <=> $orderB;
+            return ((int)$a['id']) <=> ((int)$b['id']);
+        }
+        if ($orderA > 0) return 1;
+        if ($orderB > 0) return -1;
+        $cmp = strcmp((string)($b['updated'] ?? ''), (string)($a['updated'] ?? ''));
+        if ($cmp !== 0) return $cmp;
+        return ((int)$b['id']) <=> ((int)$a['id']);
+    });
+    return $rows;
+}
+
+/**
+ * Pinned notes first, each group keeping the order it already had (the
+ * board order of dashboardSortRows).
  *
  * Each note also carries 'baseOrder', its rank in that unpinned order. The
  * board JS sorts on it after a pin toggle, so unpinning drops a note back
@@ -141,7 +182,7 @@ function dashboardBuildTree(int $folderId, array &$folders, array $insertOrder, 
     usort($childIds, fn($a, $b) => ($insertOrder[$a] ?? 0) - ($insertOrder[$b] ?? 0));
 
     $notes = dashboardSortPinnedFirst(
-        array_map(fn($n) => dashboardBuildNoteData($n, $pageWorkspace), $f['notes'])
+        array_map(fn($n) => dashboardBuildNoteData($n, $pageWorkspace), dashboardSortRows($f['notes']))
     );
 
     $childFolders = [];
@@ -209,6 +250,88 @@ function dashboardScopeLabel(array $scope, string $pageWorkspace): string {
         default:
             return $pageWorkspace !== '' ? $pageWorkspace : t('dashboard.scope.title', [], 'Scope');
     }
+}
+
+/**
+ * Last scope chosen on the dashboard, as the query parameters reproducing it
+ * (see poznoteResolveWorkspaceScope), from the 'dashboard_scope' setting.
+ */
+function dashboardLoadSavedScopeQuery(PDO $con): ?array {
+    try {
+        $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+        $stmt->execute(['dashboard_scope']);
+        $raw = $stmt->fetchColumn();
+        if ($raw === false || $raw === '') return null;
+        $decoded = json_decode((string)$raw, true);
+        return is_array($decoded) && !empty($decoded['scope']) ? $decoded : null;
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
+function dashboardSaveScopeQuery(PDO $con, array $query): void {
+    try {
+        $encoded = json_encode($query, JSON_UNESCAPED_UNICODE);
+        $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+        $stmt->execute(['dashboard_scope']);
+        if ($stmt->fetchColumn() === $encoded) return;
+        $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)')->execute(['dashboard_scope', $encoded]);
+    } catch (Exception $e) {
+        // Remembering the scope is a convenience: never fail the page over it
+    }
+}
+
+/**
+ * Scope of this page load, remembering the user's last explicit choice so the
+ * board comes back as it was left.
+ *
+ * A URL carrying scope= (all, tag, list, or single with a workspace) is an
+ * explicit choice made in the scope selector: it is resolved as is and saved
+ * in the 'dashboard_scope' setting. A URL without it is implicit (the rail
+ * button, a "back" link, a bookmark of dashboard.php): a saved multi-workspace
+ * scope takes over; a saved single workspace is only used when the URL names
+ * none, since a link from inside a workspace keeps showing that workspace.
+ * The per-scope filters and navigation path live in the browser under the
+ * scope key (see dashboardStorageKey in js/dashboard-page.js), so restoring
+ * the scope restores them too.
+ */
+function dashboardResolveRememberedScope(PDO $con, array $params, string $pageWorkspace): array {
+    if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
+        return poznoteResolveWorkspaceScope($con, $params, $pageWorkspace);
+    }
+
+    $requested = strtolower(trim((string)($params['scope'] ?? '')));
+    if (!in_array($requested, ['all', 'tag', 'list', 'single'], true)) {
+        $saved = dashboardLoadSavedScopeQuery($con);
+        if ($saved !== null) {
+            if (($saved['scope'] ?? '') === 'single') {
+                if (empty($params['workspace']) && !empty($saved['workspace'])) {
+                    $pageWorkspace = (string)$saved['workspace'];
+                    $params['workspace'] = $pageWorkspace;
+                }
+            } else {
+                $restored = poznoteResolveWorkspaceScope($con, $saved, $pageWorkspace);
+                // A tag or list that no longer matches anything falls through
+                // to the plain URL rather than reopening on an empty board
+                if ($restored['mode'] !== 'single' && !empty($restored['workspaces'])) {
+                    return $restored;
+                }
+            }
+        }
+        return poznoteResolveWorkspaceScope($con, $params, $pageWorkspace);
+    }
+
+    $scope = poznoteResolveWorkspaceScope($con, $params, $pageWorkspace);
+    $query = $scope['query'];
+    if ($scope['mode'] === 'single') {
+        // The resolver's single query carries no scope= marker; keep one so
+        // the saved value is recognisable when read back
+        $query = !empty($scope['workspaces']) ? ['scope' => 'single', 'workspace' => $scope['workspaces'][0]] : [];
+    }
+    if (!empty($query)) {
+        dashboardSaveScopeQuery($con, $query);
+    }
+    return $scope;
 }
 
 function dashboardBuildContextItems(string $pageWorkspace, array $scope = []): array {
@@ -499,7 +622,7 @@ function dashboardBuildWorkspaceBoard(PDO $con, string $pageWorkspace, bool $fav
     }
     unset($fd);
 
-    $query = "SELECT id, heading, type, tags, folder_id, folder, updated, icon, icon_color, color, pinned FROM entries WHERE trash = 0";
+    $query = "SELECT id, heading, type, tags, folder_id, folder, updated, icon, icon_color, color, pinned, dashboard_order FROM entries WHERE trash = 0";
     $params = [];
     if ($favoritesOnly) {
         // A favorite note qualifies on its own; a note also qualifies when it
@@ -544,7 +667,7 @@ function dashboardBuildWorkspaceBoard(PDO $con, string $pageWorkspace, bool $fav
         $board['folders'][] = dashboardBuildTree($rootId, $folders, $folderInsertOrder, $pageWorkspace);
     }
 
-    foreach ($noFolderNotes as $note) {
+    foreach (dashboardSortRows($noFolderNotes) as $note) {
         $board['notes'][] = dashboardBuildNoteData($note, $pageWorkspace);
     }
     $board['notes'] = dashboardSortPinnedFirst($board['notes']);
@@ -554,11 +677,12 @@ function dashboardBuildWorkspaceBoard(PDO $con, string $pageWorkspace, bool $fav
 
 // Scope: one workspace (default), every workspace, the workspaces carrying a
 // tag, or an explicit list (see poznoteResolveWorkspaceScope). A multi
-// workspace scope renders one group per workspace.
-$dashboardScope = ['mode' => 'single', 'workspaces' => $pageWorkspace !== '' ? [$pageWorkspace] : [], 'tag' => '', 'query' => [], 'key' => '', 'tags_map' => []];
+// workspace scope renders one group per workspace. The last explicit choice
+// is remembered across visits (dashboardResolveRememberedScope).
+$dashboardScope = ['mode' => 'single', 'workspaces' => $pageWorkspace !== '' ? [$pageWorkspace] : [], 'tag' => '', 'query' => [], 'key' => '', 'tags_map' => [], 'colors_map' => []];
 try {
     if (isset($con)) {
-        $dashboardScope = poznoteResolveWorkspaceScope($con, $_GET, $pageWorkspace);
+        $dashboardScope = dashboardResolveRememberedScope($con, $_GET, $pageWorkspace);
     }
 } catch (Exception $e) {}
 $dashboardScopeIsMulti = $dashboardScope['mode'] !== 'single';
@@ -578,6 +702,7 @@ try {
                 $dashboardData['groups'][] = [
                     'workspace' => $scopeWorkspace,
                     'tags'      => $dashboardScope['tags_map'][$scopeWorkspace] ?? [],
+                    'color'     => $dashboardScope['colors_map'][$scopeWorkspace]['hex'] ?? '',
                     'folders'   => $board['folders'],
                     'notes'     => $board['notes'],
                 ];
@@ -602,6 +727,10 @@ $dashboardData['scope'] = [
     'tag'        => $dashboardScope['tag'],
     'workspaces' => $dashboardScope['workspaces'],
     'key'        => $dashboardScope['key'],
+    // name => hex of every colored workspace (workspaces.php > Color), for
+    // the dot next to workspace names on multi-workspace views. Cast so an
+    // empty map still encodes as an object.
+    'colors'     => (object)array_map(fn($c) => $c['hex'], $dashboardScope['colors_map'] ?? []),
 ];
 
 // Tag scope with no workspace carrying the tag: say so instead of the
@@ -646,11 +775,42 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 	<link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $cache_v; ?>">
 	<link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $cache_v; ?>">
 	<link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $cache_v; ?>">
+	<?php if ($aiChatEnabled): ?>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/ai-chat.css'); ?>"/>
+	<script>
+		// Docked AI chat panel: restore its open state and width before the
+		// first paint so the board does not render full width and then jump
+		// (same keys as index.php, the panel is one and the same across pages).
+		// js/ai-chat.js takes the state over on DOMContentLoaded. Never
+		// restored on phones, where the panel overlays the page.
+		(function () {
+			try {
+				if (window.innerWidth > 800 && localStorage.getItem('aiChatOpen') === 'true') {
+					document.documentElement.classList.add('ai-chat-open');
+				}
+				var aiChatWidth = parseInt(localStorage.getItem('aiChatWidth'), 10);
+				if (aiChatWidth >= 300 && aiChatWidth <= 700) {
+					document.documentElement.style.setProperty('--ai-chat-width', aiChatWidth + 'px');
+				}
+			} catch (_error) {
+				// Ignore localStorage access errors during early paint.
+			}
+		})();
+	</script>
+	<?php endif; ?>
 </head>
 <body class="favorites-page dashboard-page has-icon-sidebar"
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
       data-scope="<?php echo htmlspecialchars($dashboardScope['key'], ENT_QUOTES, 'UTF-8'); ?>">
-    <?php include 'icon_sidebar.php'; ?>
+    <?php
+    // Same entry, same id and same place as on index.php, so the UI
+    // Customization preference saved against it applies here too.
+    $iconSidebarExtraItems = [];
+    if ($aiChatEnabled) {
+        $iconSidebarExtraItems[] = ['id' => 'sidebarAiChatBtn', 'after' => 'iconSidebarDashboardBtn', 'action' => 'toggle-ai-chat', 'icon' => 'lucide-bot', 'label' => t('ai_chat.toolbar_button', [], 'AI assistant')];
+    }
+    include 'icon_sidebar.php';
+    ?>
 
 		<div class="favorites-container dashboard-container">
 			<?php $dashboardContextItems = dashboardBuildContextItems($pageWorkspace, $dashboardScope); ?>
@@ -660,6 +820,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 					<button type="button" id="dashboardWorkspaceBtn" class="dashboard-top-info-item dashboard-workspace-trigger" title="<?php echo htmlspecialchars($item['label'] . ': ' . $item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" data-action="open-workspace-switcher-modal">
 						<i class="lucide <?php echo htmlspecialchars($item['icon'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" aria-hidden="true"></i>
 						<span><?php echo htmlspecialchars($item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
+						<i class="lucide lucide-chevron-down dashboard-top-info-chevron" aria-hidden="true"></i>
 					</button>
 					<?php elseif ($item['icon'] === 'lucide-user'): ?>
 					<button type="button" id="dashboardUserBtn" class="dashboard-top-info-item dashboard-user-trigger" title="<?php echo htmlspecialchars($item['label'] . ': ' . $item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" data-action="open-user-info-modal">
@@ -728,6 +889,11 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 		<?php endif; ?>
 	</div>
 
+	<?php if ($aiChatEnabled): ?>
+	<?php // Last flex child of <body>: docks as the rightmost column next to the board ?>
+	<?php include 'ai_chat_panel.php'; ?>
+	<?php endif; ?>
+
 
 		<div id="workspaceSwitcherModal" class="modal">
 			<div class="modal-content dashboard-scope-modal">
@@ -739,6 +905,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 					</div>
 				</div>
 				<div class="modal-buttons">
+					<button type="button" class="dashboard-scope-manage-btn" onclick="window.location.href='workspaces.php'"><i class="lucide lucide-layers"></i> <?php echo t_h('dashboard.scope.manage_workspaces', [], 'Manage workspaces'); ?></button>
 					<button type="button" class="btn-cancel" data-action="close-workspace-switcher-modal"><?php echo t_h('common.close'); ?></button>
 					<button type="button" class="btn-primary" id="dashboardScopeApplyBtn" disabled><?php echo t_h('common.apply', [], 'Apply'); ?></button>
 				</div>
@@ -796,6 +963,9 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 			error: <?php echo json_encode(t('dashboard.pin_error', [], 'Could not update the pinned state.')); ?>,
 			others: <?php echo json_encode(t('dashboard.others_section', [], 'Others')); ?>
 		};
+		window.DASHBOARD_REORDER_TXT = {
+			error: <?php echo json_encode(t('dashboard.reorder_error', [], 'Could not save the card order.')); ?>
+		};
 		window.DASHBOARD_SCOPE_TXT = {
 			all: <?php echo json_encode(t('dashboard.scope.all', [], 'All workspaces')); ?>,
 			byTag: <?php echo json_encode(t('dashboard.scope.by_tag', [], 'By tag')); ?>,
@@ -836,6 +1006,14 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 		<script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
 		<script src="<?php echo poznoteAsset('js/dashboard-page.js'); ?>"></script>
 		<script src="<?php echo poznoteAsset('js/board-view-menu.js'); ?>"></script>
+		<?php if ($aiChatEnabled): ?>
+		<!-- AI chat panel: js/globals.js brings the i18n runtime (window.t) and
+		     getSelectedWorkspace(), js/markdown-handler.js the parser that renders
+		     the assistant's answers (window.parseMarkdown). -->
+		<script src="<?php echo poznoteAsset('js/globals.js'); ?>"></script>
+		<script src="<?php echo poznoteAsset('js/markdown-handler.js'); ?>"></script>
+		<script src="<?php echo poznoteAsset('js/ai-chat.js'); ?>"></script>
+		<?php endif; ?>
     <script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
 </body>
 </html>

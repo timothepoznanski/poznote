@@ -333,6 +333,33 @@ if ($_POST) {
                 echo json_encode(['success' => true, 'message' => $message, 'name' => $name, 'tags' => $tags]);
                 exit;
             }
+        } elseif (isset($_POST['action']) && $_POST['action'] === 'set_color') {
+            // Set or clear the color of a workspace (the dot marking its cards
+            // on multi-workspace dashboard views). Same values as note
+            // colors: a palette id or '#rrggbb'; empty clears.
+            $name = trim($_POST['name'] ?? '');
+            if ($name === '') throw new Exception(t('workspaces.errors.name_required', [], 'Workspace name required', $currentLang));
+
+            $workspaceCheck = $con->prepare('SELECT COUNT(*) FROM workspaces WHERE name = ?');
+            $workspaceCheck->execute([$name]);
+            if ((int)$workspaceCheck->fetchColumn() === 0) {
+                throw new Exception(t('api.errors.workspace_not_found', [], 'Workspace not found', $currentLang));
+            }
+
+            $rawColor = trim((string)($_POST['color'] ?? ''));
+            $color = $rawColor === '' ? null : normalizeStoredNoteColor($rawColor);
+            if ($rawColor !== '' && $color === null) {
+                throw new Exception(t('workspaces.color.invalid', [], 'Invalid color', $currentLang));
+            }
+            $upd = $con->prepare('UPDATE workspaces SET color = ? WHERE name = ?');
+            $upd->execute([$color, $name]);
+
+            $message = t('workspaces.color.saved', [], 'Color updated', $currentLang);
+            if (!empty($isAjax)) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true, 'message' => $message, 'name' => $name, 'color' => $color]);
+                exit;
+            }
         } elseif (isset($_POST['action']) && $_POST['action'] === 'rename') {
             $name = trim($_POST['name'] ?? '');
             $new_name = trim($_POST['new_name'] ?? '');
@@ -732,7 +759,7 @@ if (!function_exists('buildWorkspaceShareRegistryKey')) {
 // Read existing workspaces and share state
 $workspaces = [];
 $workspaceRows = [];
-$stmt = $con->query('SELECT w.name, w.tags, sw.token AS readonly_token, sw.password AS readonly_password, sw.password_encrypted AS readonly_password_encrypted, sw.login_required AS readonly_login_required, sw.allowed_users AS readonly_allowed_users FROM workspaces w LEFT JOIN shared_workspaces sw ON sw.workspace_name = w.name ORDER BY w.name');
+$stmt = $con->query('SELECT w.name, w.tags, w.color, sw.token AS readonly_token, sw.password AS readonly_password, sw.password_encrypted AS readonly_password_encrypted, sw.login_required AS readonly_login_required, sw.allowed_users AS readonly_allowed_users FROM workspaces w LEFT JOIN shared_workspaces sw ON sw.workspace_name = w.name ORDER BY w.name');
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $workspaceName = $row['name'];
     $readonlyToken = $row['readonly_token'] ?? '';
@@ -740,6 +767,8 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $workspaceRows[] = [
         'name' => $workspaceName,
         'tags' => poznoteParseWorkspaceTags($row['tags'] ?? ''),
+        'color' => (string)($row['color'] ?? ''),
+        'color_hex' => ($row['color'] ?? '') !== '' ? resolveNoteColorHex((string)$row['color']) : '',
         'readonly_token' => $readonlyToken,
         'readonly_url' => $readonlyToken !== '' ? buildWorkspaceSharePublicUrl($workspaceName) : '',
         'readonly_preview_url' => buildWorkspaceSharePublicUrl($workspaceName),
@@ -912,6 +941,9 @@ try {
                                 <div class="ws-col ws-col-name">
                                     <div class="ws-name-block">
                                         <div class="ws-name-row">
+                                            <?php if (!empty($workspaceRow['color_hex'])): ?>
+                                                <span class="ws-color-dot" style="background-color: <?php echo htmlspecialchars($workspaceRow['color_hex'], ENT_QUOTES, 'UTF-8'); ?>" title="<?php echo t_h('workspaces.color.action', [], 'Color', $currentLang); ?>"></span>
+                                            <?php endif; ?>
                                             <a class="workspace-name-item workspace-name-link" href="index.php?workspace=<?php echo rawurlencode($ws); ?>" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo t_h('workspaces.actions.select', [], 'Select', $currentLang); ?>"><?php echo $ws_display; ?></a>
                                             <?php if (!empty($wsTags)): ?>
                                                 <div class="ws-tags-row">
@@ -929,6 +961,7 @@ try {
                                         : t_h('workspaces.share.actions.enable', [], 'Share', $currentLang);
                                     $renameLabel = t_h('common.rename', [], 'Rename', $currentLang);
                                     $tagsLabel = t_h('workspaces.tags.action', [], 'Tags', $currentLang);
+                                    $colorLabel = t_h('workspaces.color.action', [], 'Color', $currentLang);
                                     $backgroundLabel = t_h('workspaces.actions.background', [], 'Background', $currentLang);
                                     $moveLabel = t_h('workspaces.actions.move_notes', [], 'Move notes', $currentLang);
                                     $deleteLabel = t_h('common.delete', [], 'Delete', $currentLang);
@@ -955,11 +988,14 @@ try {
                                         <button type="button" class="ws-icon-btn workspace-tags-action" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" data-tags="<?php echo htmlspecialchars(implode(', ', $workspaceRow['tags'] ?? []), ENT_QUOTES, 'UTF-8'); ?>" title="<?php echo $tagsLabel; ?>" aria-label="<?php echo $tagsLabel; ?>">
                                             <i class="lucide lucide-tag"></i>
                                         </button>
+                                        <button type="button" class="ws-icon-btn workspace-color-action" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" data-color="<?php echo htmlspecialchars($workspaceRow['color'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" title="<?php echo $colorLabel; ?>" aria-label="<?php echo $colorLabel; ?>">
+                                            <i class="lucide lucide-palette"></i>
+                                        </button>
                                         <button type="button" class="ws-icon-btn workspace-background-action" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo $backgroundLabel; ?>" aria-label="<?php echo $backgroundLabel; ?>">
                                             <i class="lucide lucide-image"></i>
                                         </button>
                                         <button type="button" class="ws-icon-btn btn-move" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo $moveLabel; ?>" aria-label="<?php echo $moveLabel; ?>" <?php echo ($cnt === 0 || count($workspaces) <= 1) ? 'disabled' : ''; ?>>
-                                            <i class="lucide lucide-move"></i>
+                                            <i class="lucide lucide-folder-output"></i>
                                         </button>
                                         <?php if (count($workspaces) > 1): ?>
                                             <button type="button" class="ws-icon-btn ws-icon-btn-danger btn-delete" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo $deleteLabel; ?>" aria-label="<?php echo $deleteLabel; ?>">

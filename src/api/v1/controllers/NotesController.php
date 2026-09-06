@@ -558,7 +558,7 @@ class NotesController {
             }
             
             // Build query for notes
-            $sql = "SELECT id, heading, type, tags, folder, folder_id, workspace, updated, created, favorite, icon, icon_color, color, content_width, display_order FROM entries WHERE trash = 0";
+            $sql = "SELECT id, heading, type, tags, folder, folder_id, workspace, updated, created, favorite, icon, icon_color, color, content_width, display_order, dashboard_order FROM entries WHERE trash = 0";
             $params = [];
             
             if ($workspace) {
@@ -745,13 +745,13 @@ class NotesController {
             if ($id !== null && is_numeric($id)) {
                 $noteId = (int)$id;
                 if ($useWorkspaceFilter) {
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
                     $params = [$noteId, $workspace];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
                 } else {
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, entry FROM entries WHERE id = ? AND trash = 0";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, entry FROM entries WHERE id = ? AND trash = 0";
                     $params = [$noteId];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $stmt = $this->con->prepare($sql);
@@ -769,13 +769,13 @@ class NotesController {
                 
                 if (is_numeric($reference)) {
                     $refId = (int)$reference;
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
                     $params = [$refId, $workspace];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
                 } else {
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, entry FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ?";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, entry FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ?";
                     $params = ['%' . $reference . '%', $workspace];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $sql .= " ORDER BY updated DESC LIMIT 1";
@@ -845,6 +845,7 @@ class NotesController {
                     'reminder_at' => $row['reminder_at'] ?? null,
                     'content_width' => isset($row['content_width']) ? (int)$row['content_width'] : null,
                     'display_order' => (int)($row['display_order'] ?? 0),
+                    'dashboard_order' => (int)($row['dashboard_order'] ?? 0),
                     'content' => $content
                 ]
             ], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);

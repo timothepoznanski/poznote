@@ -180,7 +180,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 35; // 35: workspaces.tags (dashboard scope by tag)
+    $CURRENT_SCHEMA_VERSION = 37; // 37: workspaces.color (dot on multi-workspace dashboard views)
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -241,7 +241,8 @@ try {
             kanban_completed DATETIME,
             trashed_at DATETIME,
             content_width INTEGER,
-            display_order INTEGER DEFAULT 0
+            display_order INTEGER DEFAULT 0,
+            dashboard_order INTEGER DEFAULT 0
         )');
 
         // Create folders table for empty folders (scoped by workspace)
@@ -647,6 +648,19 @@ try {
             error_log('Could not add workspaces.tags column: ' . $e->getMessage());
         }
 
+        // Workspace color: a palette id or '#rrggbb' (same semantics as
+        // entries.color), shown as a dot next to the workspace name on the
+        // dashboard when several workspaces are displayed together.
+        try {
+            $cols = $con->query("PRAGMA table_info(workspaces)")->fetchAll(PDO::FETCH_ASSOC);
+            $existingColumns = array_column($cols, 'name');
+            if (!in_array('color', $existingColumns)) {
+                $con->exec("ALTER TABLE workspaces ADD COLUMN color TEXT");
+            }
+        } catch (Exception $e) {
+            error_log('Could not add workspaces.color column: ' . $e->getMessage());
+        }
+
         // Ensure linked_note_id column exists (may be missing from restored backups)
         try {
             $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
@@ -717,6 +731,23 @@ try {
             $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_folder_order ON entries(workspace, folder_id, display_order)');
         } catch (Exception $e) {
             error_log('Could not add display_order column to entries: ' . $e->getMessage());
+        }
+
+        // Ensure dashboard_order column exists: the position of a note card on
+        // the dashboard, set by dragging cards there. Independent from
+        // display_order (the sidebar's manual order), so the board can be
+        // arranged by hand while the sidebar keeps its own sort. Same
+        // convention: 0 = not placed yet, siblings renumbered from 1 on drop
+        // (see FoldersController::reorderNoteOnDashboard).
+        try {
+            $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
+            $existingColumns = array_column($cols, 'name');
+            if (!in_array('dashboard_order', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN dashboard_order INTEGER DEFAULT 0");
+            }
+            $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_folder_dashboard_order ON entries(workspace, folder_id, dashboard_order)');
+        } catch (Exception $e) {
+            error_log('Could not add dashboard_order column to entries: ' . $e->getMessage());
         }
 
         // === DATA DIRECTORIES ===

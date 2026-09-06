@@ -333,6 +333,15 @@
       "saved": "Tags updated",
       "save_error": "Could not update the tags",
       "empty": "No tags yet."
+    },
+    "color": {
+      "action": "Color",
+      "modal_title": "Workspace color",
+      "help": "The color marks the notes and folders of this workspace on the dashboard when several workspaces are shown together.",
+      "custom": "Custom color",
+      "saved": "Color updated",
+      "save_error": "Could not update the color",
+      "invalid": "Invalid color"
     }
   },
   "display": {
@@ -3140,6 +3149,13 @@
       "in_progress": "Logging out..."
     }
   },
+  "support_modal": {
+    "question": "If you enjoy Poznote, would you like to buy it a little coffee to support it? ☕",
+    "yes": "Yes!",
+    "no": "No...",
+    "thanks": "Thank you! ❤️",
+    "thanks_sub": "You are wonderful."
+  },
   "password": {
     "status": {
       "custom": "Custom password",
@@ -3483,6 +3499,7 @@
     "pin_note": "Pin to top",
     "unpin_note": "Unpin",
     "pin_error": "Could not update the pinned state.",
+    "reorder_error": "Could not save the card order.",
     "others_section": "Others",
     "unpin": "Remove from favorites",
     "no_folder": "Other notes",
@@ -3494,6 +3511,7 @@
       "size_small": "Small",
       "size_medium": "Medium",
       "size_large": "Large",
+      "size_wide": "Wide",
       "columns": "Maximum columns",
       "layout": "Layout",
       "layout_grid": "Grid",
@@ -3628,7 +3646,7 @@
   "ai_chat": {
     "title": "AI Assistant",
     "toolbar_button": "AI assistant",
-    "empty": "Ask a question.\nThe assistant can search, read, create, rename and edit your notes.",
+    "empty": "Ask a question.\nThe assistant can search, read, create, edit, organize and delete your notes.",
     "empty_open_note": "Say \"this note\" for the one you have open.",
     "placeholder": "Ask the assistant...",
     "send": "Send",
@@ -3643,11 +3661,30 @@
     "tool_rename": "Renaming note #{{id}} to \"{{title}}\"",
     "tool_update": "Editing note #{{id}}",
     "tool_create": "Creating note: {{title}}",
-    "context_label": "Context:",
+    "context_label": "Note:",
     "model_label": "Model:",
     "model_hint": "Open AI Assistant settings.",
     "back_to_assistant": "Back to AI Assistant",
-    "context_hint": "The note the assistant uses when you say \"this note\"."
+    "context_hint": "The note the assistant uses when you say \"this note\".",
+    "workspace_label": "Workspace:",
+    "tool_tags": "Updating the tags of note #{{id}}",
+    "tool_list_tags": "Listing tags",
+    "tool_list_folders": "Listing folders",
+    "tool_create_folder": "Creating folder: {{path}}",
+    "tool_rename_folder": "Renaming folder \"{{folder}}\" to \"{{name}}\"",
+    "tool_move": "Moving note #{{id}} to {{folder}}",
+    "tool_move_root": "Moving note #{{id}} out of its folder",
+    "tool_favorite_on": "Adding note #{{id}} to the favorites",
+    "tool_favorite_off": "Removing note #{{id}} from the favorites",
+    "tool_folder_favorite": "Updating the favorite state of folder \"{{folder}}\"",
+    "tool_reminder": "Setting a reminder on note #{{id}}",
+    "tool_reminder_remove": "Removing the reminder of note #{{id}}",
+    "tool_task_add": "Adding task: {{text}}",
+    "tool_task_update": "Updating task \"{{task}}\"",
+    "tool_task_delete": "Removing task \"{{task}}\"",
+    "tool_checklist": "Updating a checkbox of note #{{id}}",
+    "tool_delete": "Moving note #{{id}} to the trash",
+    "tool_delete_folder": "Moving folder \"{{folder}}\" and its notes to the trash"
   },
   "diary": {
     "title": "Diary",
