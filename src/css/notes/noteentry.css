@@ -77,6 +77,16 @@ p.code-block-placeholder-after[data-ph]:empty:before {
         right: calc(var(--outline-width, 280px) + 10px);
     }
 
+    html.ai-chat-open .note-scroll-edge-controls,
+    body:has(#ai-chat-panel.ai-chat-open) .note-scroll-edge-controls {
+        right: calc(var(--ai-chat-width, 380px) + 10px);
+    }
+
+    html.ai-chat-open:not(.outline-collapsed) .note-scroll-edge-controls,
+    body:has(#ai-chat-panel.ai-chat-open):not(.outline-collapsed) .note-scroll-edge-controls {
+        right: calc(var(--outline-width, 280px) + var(--ai-chat-width, 380px) + 10px);
+    }
+
     .note-scroll-edge-btn {
         width: 32px;
         height: 32px;
