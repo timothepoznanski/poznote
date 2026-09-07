@@ -1135,6 +1135,17 @@
       "no_note": "Aucune note ouverte.",
       "empty": "Le presse-papiers est vide."
     },
+    "insert_markdown": {
+      "title": "Insérer du Markdown",
+      "menu_item": "Insérer du Markdown",
+      "hint": "Collez ou saisissez du Markdown dans le champ ci-dessous. Il est converti en HTML que vous pouvez prévisualiser, puis insérer dans votre note.",
+      "placeholder": "Collez ou saisissez du Markdown ici",
+      "preview_label": "Aperçu",
+      "insert": "Insérer",
+      "converting": "Conversion en cours...",
+      "error": "La conversion a échoué. Veuillez réessayer.",
+      "no_note": "Aucune note ouverte."
+    },
     "update": {
       "title": "📱 Version de l’application",
       "backup_warning": "Faites une sauvegarde de vos données.",
@@ -3452,6 +3463,11 @@
     "acting_as": " (en tant que {{user}})",
     "workspaces": "Espaces de travail",
     "logout": "Déconnexion"
+  },
+  "page_title": {
+    "switch_workspace": "Changer d'espace de travail",
+    "workspaces": "Espaces de travail",
+    "manage_workspaces": "Gérer les espaces de travail"
   },
   "admin_tools": {
     "orphan_scanner": {

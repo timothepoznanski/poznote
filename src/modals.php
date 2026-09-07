@@ -864,6 +864,27 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
+<!-- Insert Markdown Modal (HTML notes): the mirror of the modal above -->
+<div id="insertMarkdownModal" class="modal">
+    <div class="modal-content paste-markdown-modal-content">
+        <h3><?php echo t_h('modals.insert_markdown.title', [], 'Insert Markdown'); ?></h3>
+        <div class="modal-body">
+            <p class="paste-markdown-hint"><?php echo t_h('modals.insert_markdown.hint', [], 'Paste or type Markdown in the box below. It is converted to HTML that you can preview, then insert into your note.'); ?></p>
+            <!-- Markdown is plain text, so a textarea is enough to capture it. -->
+            <textarea id="insertMarkdownSource" class="paste-markdown-preview" spellcheck="false" aria-label="<?php echo t_h('modals.insert_markdown.title', [], 'Insert Markdown'); ?>" placeholder="<?php echo t_h('modals.insert_markdown.placeholder', [], 'Paste or type Markdown here'); ?>"></textarea>
+            <div id="insertMarkdownPreviewWrapper" class="paste-markdown-preview-wrapper is-hidden">
+                <div class="paste-markdown-preview-label"><?php echo t_h('modals.insert_markdown.preview_label', [], 'Preview'); ?></div>
+                <div id="insertMarkdownPreview" class="insert-markdown-preview"></div>
+            </div>
+            <p id="insertMarkdownError" class="paste-markdown-error" role="alert"></p>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="insertMarkdownModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="insertMarkdownInsertBtn" disabled><?php echo t_h('modals.insert_markdown.insert', [], 'Insert'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Edit Task Modal -->
 <div id="taskEditModal" class="modal">
     <div class="modal-content task-edit-modal-content">

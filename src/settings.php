@@ -338,7 +338,7 @@ if ($canUseUserWebhooks) {
     <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $cache_v; ?>">
     <?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
-<body class="home-page has-icon-sidebar"
+<body class="home-page settings-page has-icon-sidebar"
       data-txt-enabled="<?php echo t_h('common.enabled'); ?>"
       data-txt-disabled="<?php echo t_h('common.disabled'); ?>"
       data-txt-not-defined="<?php echo t_h('common.not_defined'); ?>"

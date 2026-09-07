@@ -2523,6 +2523,39 @@ class NotesController {
     }
 
     /**
+     * Convert a Markdown fragment to HTML without touching any note.
+     *
+     * Backs the "Insert Markdown" modal of HTML notes, the mirror of
+     * convertHtml(): the user pastes or types Markdown, previews the HTML
+     * that comes back and inserts it at the caret. Reusing parseMarkdown()
+     * keeps a single converter for both this and whole-note conversion, so
+     * the two can never drift apart.
+     */
+    public function convertMarkdown(): void {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $markdown = isset($input['markdown']) ? (string) $input['markdown'] : '';
+
+        if (trim($markdown) === '') {
+            $this->sendError(400, 'Missing "markdown" field');
+            return;
+        }
+
+        // Bounded so a runaway paste cannot tie up the regex pipeline.
+        if (strlen($markdown) > 2000000) {
+            $this->sendError(413, 'Markdown content too large');
+            return;
+        }
+
+        try {
+            require_once __DIR__ . '/../../../markdown_parser.php';
+            $this->sendSuccess(['html' => parseMarkdown($markdown)]);
+        } catch (Exception $e) {
+            error_log('convertMarkdown error: ' . $e->getMessage());
+            $this->sendError(500, 'Conversion failed');
+        }
+    }
+
+    /**
      * Convert HTML to Markdown. The converter lives in html_to_markdown.php,
      * shared with the AI assistant (which reads rich-text notes through it),
      * so the two can never drift apart.

@@ -1109,6 +1109,17 @@
       "no_note": "Es ist keine Notiz geöffnet.",
       "empty": "Die Zwischenablage ist leer."
     },
+    "insert_markdown": {
+      "title": "Markdown einfügen",
+      "menu_item": "Markdown einfügen",
+      "hint": "Fügen Sie Markdown in das Feld unten ein oder geben Sie es ein. Es wird in HTML umgewandelt, das Sie in der Vorschau prüfen und dann in Ihre Notiz einfügen können.",
+      "placeholder": "Markdown hier einfügen oder eingeben",
+      "preview_label": "Vorschau",
+      "insert": "Einfügen",
+      "converting": "Wird umgewandelt...",
+      "error": "Die Umwandlung ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "no_note": "Es ist keine Notiz geöffnet."
+    },
     "update": {
       "title": "📱 Anwendungsversion",
       "backup_warning": "Erstellen Sie ein Backup Ihrer Daten.",
@@ -3227,6 +3238,11 @@
     "acting_as": " (als {{user}})",
     "workspaces": "Arbeitsbereiche",
     "logout": "Abmelden"
+  },
+  "page_title": {
+    "switch_workspace": "Arbeitsbereich wechseln",
+    "workspaces": "Arbeitsbereiche",
+    "manage_workspaces": "Arbeitsbereiche verwalten"
   },
   "admin_tools": {
     "orphan_scanner": {

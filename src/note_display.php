@@ -375,6 +375,11 @@
                         }
                     }
 
+                    // HTML notes get the mirror action: paste Markdown, insert it as HTML.
+                    if ($note_type === 'note' && !$isPublicWorkspaceReadonly) {
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="show-insert-markdown-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-clipboard"></i> '.t_h('modals.insert_markdown.menu_item', [], 'Insert Markdown').'</button>';
+                    }
+
                     // Search and replace button (only for note and markdown types, shown in mobile menu)
                     if ($note_type === 'note' || $note_type === 'markdown') {
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-search-replace"><i class="lucide lucide-search"></i> '.t_h('editor.toolbar.search_replace', [], 'Search and replace').'</button>';

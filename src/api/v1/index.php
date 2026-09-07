@@ -446,6 +446,11 @@ $router->post('/convert-html', function($params) use ($notesController) {
     $notesController->convertHtml();
 });
 
+// Convert a Markdown fragment to HTML (used by the "Insert Markdown" modal of HTML notes)
+$router->post('/convert-markdown', function($params) use ($notesController) {
+    $notesController->convertMarkdown();
+});
+
 // ======================
 // Snapshots Routes
 // ======================

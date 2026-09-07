@@ -34,6 +34,67 @@ body.dark-mode .poznote-page-title-workspace {
     opacity: 0.65;
 }
 
+/* Hovered or open, the suffix button comes back to full strength. */
+html[data-theme='dark'] .poznote-page-title-workspace:hover,
+html[data-theme='dark'] .poznote-page-title-workspace[aria-expanded="true"],
+body.dark-mode .poznote-page-title-workspace:hover,
+body.dark-mode .poznote-page-title-workspace[aria-expanded="true"] {
+    color: var(--dm-accent);
+    opacity: 1;
+}
+
+html[data-theme='dark'] .poznote-page-title-workspace-static:hover,
+body.dark-mode .poznote-page-title-workspace-static:hover {
+    color: var(--dm-text);
+    opacity: 0.65;
+}
+
+/* Its workspace menu: a floating surface, like the rail's overflow menu. */
+html[data-theme='dark'] .poznote-page-title-workspace-menu,
+body.dark-mode .poznote-page-title-workspace-menu {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme='dark'] .poznote-page-title-workspace-item,
+body.dark-mode .poznote-page-title-workspace-item {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .poznote-page-title-workspace-item:hover,
+html[data-theme='dark'] .poznote-page-title-workspace-item:focus-visible,
+body.dark-mode .poznote-page-title-workspace-item:hover,
+body.dark-mode .poznote-page-title-workspace-item:focus-visible {
+    background: var(--dm-surface-hover);
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .poznote-page-title-workspace-item .lucide-check,
+body.dark-mode .poznote-page-title-workspace-item .lucide-check {
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .poznote-page-title-workspace-item-manage .lucide,
+body.dark-mode .poznote-page-title-workspace-item-manage .lucide {
+    color: inherit;
+}
+
+html[data-theme='dark'] .poznote-page-title-workspace-dot,
+body.dark-mode .poznote-page-title-workspace-dot {
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+html[data-theme='dark'] .poznote-page-title-workspace-dot-none,
+body.dark-mode .poznote-page-title-workspace-dot-none {
+    border-color: transparent;
+}
+
+html[data-theme='dark'] .poznote-page-title-workspace-menu-sep,
+body.dark-mode .poznote-page-title-workspace-menu-sep {
+    background: var(--dm-border);
+}
+
 html[data-theme='dark'] .settings-current-user-badge,
 body.dark-mode .settings-current-user-badge {
     background: var(--dm-surface-hover);

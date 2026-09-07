@@ -107,6 +107,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/ui-customization.js',
         'js/welcome-setup.js',
         'js/paste-markdown-modal.js',
+        'js/insert-markdown-modal.js',
     ],
     ];
 }

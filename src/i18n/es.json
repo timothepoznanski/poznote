@@ -1110,6 +1110,17 @@
       "no_note": "No hay ninguna nota abierta.",
       "empty": "El portapapeles está vacío."
     },
+    "insert_markdown": {
+      "title": "Insertar Markdown",
+      "menu_item": "Insertar Markdown",
+      "hint": "Pega o escribe Markdown en el campo de abajo. Se convierte a HTML que puedes previsualizar e insertar en tu nota.",
+      "placeholder": "Pega o escribe Markdown aquí",
+      "preview_label": "Vista previa",
+      "insert": "Insertar",
+      "converting": "Convirtiendo...",
+      "error": "La conversión falló. Inténtalo de nuevo.",
+      "no_note": "No hay ninguna nota abierta."
+    },
     "update": {
       "title": "📱 Versión de la aplicación",
       "backup_warning": "Haz una copia de seguridad de tus datos.",
@@ -3227,6 +3238,11 @@
     "acting_as": " (como {{user}})",
     "workspaces": "Espacios de trabajo",
     "logout": "Cerrar sesión"
+  },
+  "page_title": {
+    "switch_workspace": "Cambiar de espacio de trabajo",
+    "workspaces": "Espacios de trabajo",
+    "manage_workspaces": "Gestionar espacios de trabajo"
   },
   "admin_tools": {
     "orphan_scanner": {

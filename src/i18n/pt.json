@@ -1108,6 +1108,17 @@
       "no_note": "Nenhuma nota aberta.",
       "empty": "A área de transferência está vazia."
     },
+    "insert_markdown": {
+      "title": "Inserir Markdown",
+      "menu_item": "Inserir Markdown",
+      "hint": "Cole ou escreva Markdown no campo abaixo. É convertido em HTML que pode pré-visualizar e depois inserir na sua nota.",
+      "placeholder": "Cole ou escreva Markdown aqui",
+      "preview_label": "Pré-visualização",
+      "insert": "Inserir",
+      "converting": "A converter...",
+      "error": "A conversão falhou. Tente novamente.",
+      "no_note": "Nenhuma nota aberta."
+    },
     "update": {
       "title": "📱 Versão da Aplicação",
       "backup_warning": "Faça um backup dos seus dados.",
@@ -3230,6 +3241,11 @@
     "acting_as": " (como {{user}})",
     "workspaces": "Espaços de trabalho",
     "logout": "Sair"
+  },
+  "page_title": {
+    "switch_workspace": "Mudar de espaço de trabalho",
+    "workspaces": "Espaços de trabalho",
+    "manage_workspaces": "Gerenciar espaços de trabalho"
   },
   "admin_tools": {
     "orphan_scanner": {

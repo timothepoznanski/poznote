@@ -595,6 +595,17 @@
       "no_note": "No note is open.",
       "empty": "The clipboard is empty."
     },
+    "insert_markdown": {
+      "title": "Insert Markdown",
+      "menu_item": "Insert Markdown",
+      "hint": "Paste or type Markdown in the box below. It is converted to HTML that you can preview, then insert into your note.",
+      "placeholder": "Paste or type Markdown here",
+      "preview_label": "Preview",
+      "insert": "Insert",
+      "converting": "Converting...",
+      "error": "Conversion failed. Please try again.",
+      "no_note": "No note is open."
+    },
     "update": {
       "title": "📱 Application Version",
       "backup_warning": "Make a backup of your data.",
@@ -2832,6 +2843,11 @@
     "acting_as": " (acting as {{user}})",
     "workspaces": "Workspaces",
     "logout": "Logout"
+  },
+  "page_title": {
+    "switch_workspace": "Switch workspace",
+    "workspaces": "Workspaces",
+    "manage_workspaces": "Manage workspaces"
   },
   "admin_tools": {
     "orphan_scanner": {

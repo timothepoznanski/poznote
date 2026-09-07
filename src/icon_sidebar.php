@@ -42,6 +42,11 @@
  * Requires: css/icon-sidebar.css in <head> (plus css/icon-sidebar-page.css on
  *           the secondary pages, which pin the rail instead of laying it out
  *           as a flex child of <body>), and js/icon-sidebar-toggle.js.
+ *
+ * Also loads js/page-title-workspace-menu.js, the workspace menu behind the
+ * "(workspace)" suffix of the secondary pages' titles
+ * (poznoteRenderPageTitleWorkspace() in functions.php): every page with such a
+ * title includes this partial, and the script is a no-op on the others.
  */
 
 if (!isset($iconSidebarWorkspace)) {
@@ -314,6 +319,7 @@ $iconSidebarProfileStrings = [
 window.PoznoteProfileI18n = <?php echo json_encode($iconSidebarProfileStrings, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;
 </script>
 <script src="<?php echo $iconSidebarAsset('js/profile.js'); ?>" defer></script>
+<script src="<?php echo $iconSidebarAsset('js/page-title-workspace-menu.js'); ?>" defer></script>
 <script>
 // Apply the collapsed state before the rail paints; js/icon-sidebar-toggle.js
 // owns it afterwards.

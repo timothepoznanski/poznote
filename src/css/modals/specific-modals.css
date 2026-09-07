@@ -1360,6 +1360,39 @@
     display: none;
 }
 
+/* "Insert Markdown" modal of HTML notes, the mirror of the paste modal above.
+   It reuses the paste-markdown-* layout classes (the Markdown source box is
+   the same monospace textarea) and only adds the rendered HTML preview. */
+.insert-markdown-preview {
+    min-height: 80px;
+    max-height: 38vh;
+    overflow-y: auto;
+    padding: 10px 12px;
+    border: 1px solid rgba(127, 127, 127, 0.35);
+    border-radius: 6px;
+    background: transparent;
+    color: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    box-sizing: border-box;
+}
+
+/* Rendered markup must not blow out the modal width. */
+.insert-markdown-preview img {
+    max-width: 100%;
+    height: auto;
+}
+
+.insert-markdown-preview table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.insert-markdown-preview pre {
+    overflow-x: auto;
+}
+
 .code-block-language-filter {
     width: 100%;
     padding: 8px 12px;

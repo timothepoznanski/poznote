@@ -34,6 +34,15 @@
 }
 
 /* Settings Status Badges */
+/* The settings page follows the App font setting: its body names Inter
+   first, unlike the shared .home-page system stack in css/home/base.css, so
+   the 'Inter' @font-face swap done by js/theme-init.js applies to the whole
+   page (nav, cards, icon sidebar). css/fonts.css, loaded by settings.php,
+   provides the face itself. */
+body.settings-page {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
 /* Text sizes follow --settings-font-scale (Font size card, set on :root by
    js/font-size-settings.js); the icons and spacings keep their size. */
 .setting-status {

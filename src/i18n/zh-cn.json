@@ -1110,6 +1110,17 @@
       "no_note": "没有打开的笔记。",
       "empty": "剪贴板为空。"
     },
+    "insert_markdown": {
+      "title": "插入 Markdown",
+      "menu_item": "插入 Markdown",
+      "hint": "请在下方的框中粘贴或输入 Markdown。它将被转换为 HTML，你可以预览后再插入笔记。",
+      "placeholder": "在此粘贴或输入 Markdown",
+      "preview_label": "预览",
+      "insert": "插入",
+      "converting": "正在转换...",
+      "error": "转换失败，请重试。",
+      "no_note": "没有打开的笔记。"
+    },
     "update": {
       "title": "📱 应用程序版本",
       "backup_warning": "请备份您的数据。",
@@ -3351,6 +3362,11 @@
     "acting_as": "（以 {{user}} 身份）",
     "workspaces": "工作区",
     "logout": "退出登录"
+  },
+  "page_title": {
+    "switch_workspace": "切换工作区",
+    "workspaces": "工作区",
+    "manage_workspaces": "管理工作区"
   },
   "admin_tools": {
     "orphan_scanner": {
