@@ -34,8 +34,19 @@
 }
 
 /* Settings Status Badges */
+/* The settings page follows the App font setting: its body names Inter
+   first, unlike the shared .home-page system stack in css/home/base.css, so
+   the 'Inter' @font-face swap done by js/theme-init.js applies to the whole
+   page (nav, cards, icon sidebar). css/fonts.css, loaded by settings.php,
+   provides the face itself. */
+body.settings-page {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Text sizes follow --settings-font-scale (Font size card, set on :root by
+   js/font-size-settings.js); the icons and spacings keep their size. */
 .setting-status {
-    font-size: 0.75rem;
+    font-size: calc(0.75rem * var(--settings-font-scale, 1));
     padding: 2px 6px;
     border-radius: 4px;
     font-weight: 600;
@@ -150,7 +161,7 @@ body:not(.dark-mode) #changePasswordModal .change-password-status-sso {
 
 /* Settings Category Titles */
 .settings-category-title {
-    font-size: 1.1rem;
+    font-size: calc(1.1rem * var(--settings-font-scale, 1));
     font-weight: 600;
     color: #374151;
     margin: 1.5rem 0 0.75rem 0;
@@ -544,7 +555,7 @@ body.dark-mode .home-card.is-pinned .settings-card-pin i {
         background: transparent;
         color: #4b5563;
         font: inherit;
-        font-size: 14px;
+        font-size: calc(14px * var(--settings-font-scale, 1));
         line-height: 1.3;
         text-align: left;
         cursor: pointer;
@@ -573,40 +584,26 @@ body.dark-mode .home-card.is-pinned .settings-card-pin i {
         flex-shrink: 0;
     }
 
-    /* Only the selected section shows. Two exceptions show every section,
+    /* Only the selected section shows. The one exception shows every section,
        each under its own title: an active filter term (settings-page.js
-       toggles .settings-filtering on the container, matches only) and the
-       "All" entry of the list (.settings-show-all). */
-    .home-container.settings-with-nav:not(.settings-filtering):not(.settings-show-all) .settings-category-title:not(.settings-section-active),
-    .home-container.settings-with-nav:not(.settings-filtering):not(.settings-show-all) .home-grid:not(.settings-section-active) {
+       toggles .settings-filtering on the container, matches only). */
+    .home-container.settings-with-nav:not(.settings-filtering) .settings-category-title:not(.settings-section-active),
+    .home-container.settings-with-nav:not(.settings-filtering) .home-grid:not(.settings-section-active) {
         display: none;
     }
 
     /* One section at a time, so the titles neither collapse nor look
        clickable: no chevron, no pointer. The collapsed state saved by the
        stacked layout is ignored (the grid rule below outranks
-       .section-collapsed). "All" lists every section and brings the chevrons
-       back, with the same saved state as the stacked layout. */
+       .section-collapsed). */
     .settings-with-nav .settings-section-toggle {
         display: none;
-    }
-
-    .settings-with-nav.settings-show-all .settings-section-toggle {
-        display: inline-flex;
     }
 
     .home-container.settings-with-nav .settings-category-title.settings-section-header {
         cursor: default;
         margin: 0 0 0.75rem 0;
-        font-size: 1.2rem;
-    }
-
-    .home-container.settings-with-nav.settings-show-all .settings-category-title.settings-section-header {
-        cursor: pointer;
-    }
-
-    .home-container.settings-with-nav.settings-show-all:not(.settings-filtering) .home-grid.section-collapsed {
-        display: none;
+        font-size: calc(1.2rem * var(--settings-font-scale, 1));
     }
 
     /* The section's cards become the rows of one bordered panel */
@@ -691,7 +688,7 @@ body.dark-mode .home-card.is-pinned .settings-card-pin i {
     }
 
     .home-container.settings-with-nav .home-card-title {
-        font-size: 15px;
+        font-size: calc(15px * var(--settings-font-scale, 1));
         -webkit-line-clamp: 1;
         line-clamp: 1;
     }

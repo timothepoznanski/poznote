@@ -444,8 +444,6 @@
                         rules.push('#outlineMobileBackdrop { display: none !important; }');
                     } else if (id === 'tasklist-progress') {
                         rules.push('.tasklist-progress { display: none !important; }');
-                    } else if (id === 'settings-recent-section') {
-                        rules.push('#settings-recent-section-title, #settings-recent-section-grid { display: none !important; }');
                     }
                 }
             });

@@ -31,52 +31,6 @@ try {
     $aiChatEnabled = false;
 }
 
-// Whether a local password is of any use to this user. Hidden in two cases:
-// the instance is SSO-only, so no password would ever be accepted at login; or
-// this profile was provisioned without a credential, so there is no current
-// password to authenticate the change with. Must stay in sync with the
-// matching check that hides the Change Password card in settings.php.
-$dashboardPasswordDisabledReason = '';
-try {
-    $dashboardOidcPath = __DIR__ . '/oidc.php';
-    if (is_file($dashboardOidcPath)) {
-        require_once $dashboardOidcPath;
-    }
-    if (!function_exists('hasCustomPassword')) {
-        require_once __DIR__ . '/users/db_master.php';
-    }
-    $dashboardSsoOnly = function_exists('oidc_is_enabled')
-        && oidc_is_enabled()
-        && defined('OIDC_DISABLE_NORMAL_LOGIN')
-        && OIDC_DISABLE_NORMAL_LOGIN;
-
-    $dashboardNoLocalCredential = false;
-    $dashboardPwUserId = function_exists('getCurrentUserId') ? getCurrentUserId() : null;
-    if ($dashboardPwUserId && function_exists('hasCustomPassword')) {
-        $dashboardPwProfile = function_exists('getUserProfileById') ? getUserProfileById((int)$dashboardPwUserId) : null;
-        $dashboardNoLocalCredential = !(hasCustomPassword((int)$dashboardPwUserId)
-            || !(is_array($dashboardPwProfile) && isPasswordLoginDisabled($dashboardPwProfile)));
-    }
-
-    if ($dashboardSsoOnly) {
-        $dashboardPasswordDisabledReason = 'sso_only';
-    } elseif ($dashboardNoLocalCredential) {
-        $dashboardPasswordDisabledReason = 'no_local_password';
-    }
-} catch (Throwable $e) {
-    // Never let this check disable a button that should be usable.
-    $dashboardPasswordDisabledReason = '';
-}
-$dashboardPasswordDisabled = $dashboardPasswordDisabledReason !== '';
-// Short one-liner for the info box; the full explanation goes in the button
-// tooltip so the modal stays scannable.
-$dashboardPasswordDisabledNote = $dashboardPasswordDisabledReason === 'sso_only'
-    ? t_h('settings.card_help.password_note_sso_only', [], 'Password sign-in is disabled on this instance.')
-    : t_h('settings.card_help.password_note_no_local', [], 'Your password is managed by your identity provider.');
-$dashboardPasswordDisabledHelp = $dashboardPasswordDisabledReason === 'sso_only'
-    ? t_h('settings.card_help.change_password_sso_only', [], 'This instance uses SSO only, so a local password would never be accepted at sign-in. Password changes are disabled.')
-    : t_h('settings.card_help.change_password_no_local', [], 'Your account signs in through your identity provider and has no local password, so there is no current password to confirm a change with. An administrator can set one for you from Admin Tools > Users.');
-
 /**
  * Build a short plain-text excerpt (or task preview) for a board card.
  * @return array{text: string, tasks: ?array, search: string}
@@ -209,36 +163,6 @@ function dashboardBuildPageUrl(string $page, string $pageWorkspace): string {
     return $page . ($pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : '');
 }
 
-function dashboardGetCurrentUsername(): string {
-    $sessionUser = $_SESSION['user'] ?? null;
-    if (is_array($sessionUser)) {
-        $name = trim((string)($sessionUser['display_name'] ?? ''));
-        if ($name === '') {
-            $name = trim((string)($sessionUser['username'] ?? ''));
-        }
-        if ($name !== '') {
-            return $name;
-        }
-    }
-
-    $userId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
-    if ($userId > 0) {
-        try {
-            require_once __DIR__ . '/users/db_master.php';
-            $profile = getUserProfileById($userId);
-            $name = trim((string)($profile['display_name'] ?? ''));
-            if ($name === '' && is_array($profile)) {
-                $name = trim((string)($profile['username'] ?? ''));
-            }
-            if ($name !== '') {
-                return $name;
-            }
-        } catch (Exception $e) {}
-    }
-
-    return '';
-}
-
 function dashboardScopeLabel(array $scope, string $pageWorkspace): string {
     switch ($scope['mode'] ?? 'single') {
         case 'all':
@@ -332,28 +256,6 @@ function dashboardResolveRememberedScope(PDO $con, array $params, string $pageWo
         dashboardSaveScopeQuery($con, $query);
     }
     return $scope;
-}
-
-function dashboardBuildContextItems(string $pageWorkspace, array $scope = []): array {
-    $items = [];
-    // The scope button is always there: it is the way to the multi-workspace
-    // selector even when no workspace is set
-    $items[] = [
-        'icon'  => 'lucide-layers',
-        'label' => t('dashboard.scope.title', [], 'Scope'),
-        'value' => dashboardScopeLabel($scope, $pageWorkspace),
-    ];
-
-    $username = dashboardGetCurrentUsername();
-    if ($username !== '') {
-        $items[] = [
-            'icon'  => 'lucide-user',
-            'label' => 'User',
-            'value' => $username,
-        ];
-    }
-
-    return $items;
 }
 
 function dashboardGetTopbarCounts($con, string $pageWorkspace): array {
@@ -820,29 +722,19 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
     ?>
 
 		<div class="favorites-container dashboard-container">
-			<?php $dashboardContextItems = dashboardBuildContextItems($pageWorkspace, $dashboardScope); ?>
-			<div class="dashboard-top-info">
-				<?php foreach ($dashboardContextItems as $item): ?>
-					<?php if ($item['icon'] === 'lucide-layers'): ?>
-					<button type="button" id="dashboardWorkspaceBtn" class="dashboard-top-info-item dashboard-workspace-trigger" title="<?php echo htmlspecialchars($item['label'] . ': ' . $item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" data-action="open-workspace-switcher-modal">
-						<i class="lucide <?php echo htmlspecialchars($item['icon'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" aria-hidden="true"></i>
-						<span><?php echo htmlspecialchars($item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
-						<i class="lucide lucide-chevron-down dashboard-top-info-chevron" aria-hidden="true"></i>
-					</button>
-					<?php elseif ($item['icon'] === 'lucide-user'): ?>
-					<button type="button" id="dashboardUserBtn" class="dashboard-top-info-item dashboard-user-trigger" title="<?php echo htmlspecialchars($item['label'] . ': ' . $item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" data-action="open-user-info-modal">
-						<i class="lucide <?php echo htmlspecialchars($item['icon'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" aria-hidden="true"></i>
-						<span><?php echo htmlspecialchars($item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
-					</button>
-					<?php else: ?>
-					<div class="dashboard-top-info-item" title="<?php echo htmlspecialchars($item['label'] . ': ' . $item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
-						<i class="lucide <?php echo htmlspecialchars($item['icon'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" aria-hidden="true"></i>
-						<span><?php echo htmlspecialchars($item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
-					</div>
-					<?php endif; ?>
-				<?php endforeach; ?>
-							</div>
-			<h1 class="poznote-page-title"><i class="lucide lucide-layout-dashboard"></i> <?php echo t_h('common.back_to_home', [], 'Dashboard'); ?></h1>
+			<?php
+			// Same "(workspace)" switch as the other pages, with two dashboard twists:
+			// the links carry scope=single so the choice overrides a remembered
+			// multi-workspace scope (dashboardResolveRememberedScope), and an entry
+			// opens the scope modal for several workspaces or a tag. In a multi scope
+			// the label is the scope's, which matches no workspace, so no entry is
+			// ticked; with no workspace at all it reads "Scope" and still opens.
+			$dashboardTitleWorkspace = poznoteRenderPageTitleWorkspace(dashboardScopeLabel($dashboardScope, $pageWorkspace), [
+				'query' => ['scope' => 'single'],
+				'items' => [['icon' => 'lucide-layers', 'label' => t('dashboard.scope.menu_item', [], 'Several workspaces...'), 'action' => 'open-workspace-switcher-modal']],
+			]);
+			?>
+			<h1 class="poznote-page-title"><i class="lucide lucide-layout-dashboard"></i> <?php echo t_h('common.back_to_home', [], 'Dashboard'); ?> <?php echo $dashboardTitleWorkspace; ?></h1>
 
 			<header class="dashboard-topbar">
 				<div class="board-filter-row">
@@ -935,25 +827,6 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 			</div>
 		</div>
 
-		<div id="dashboardUserInfoModal" class="modal">
-			<div class="modal-content">
-				<h3><?php echo t_h('modals.user_settings_info.title', [], 'Account Settings'); ?></h3>
-				<p style="margin: 16px 0; color: #4b5563; font-size: 14px; line-height: 1.5;"><?php echo $dashboardPasswordDisabled
-					? t_h('modals.user_settings_info.message_sso_only', [], 'You can change your username and name from Settings.')
-					: t_h('modals.user_settings_info.message', [], 'You can change your username, name and password from Settings.'); ?></p>
-				<?php if ($dashboardPasswordDisabled): ?>
-				<div class="modal-info-note"><i class="lucide lucide-info"></i><span><?php echo $dashboardPasswordDisabledNote; ?></span></div>
-				<?php endif; ?>
-				<div class="modal-buttons">
-					<button type="button" class="btn-primary" onclick="window.location.href='settings.php?open=profile#my-profile-card'"><?php echo t_h('modals.user_settings_info.edit_profile_button', [], 'Edit Profile'); ?></button>
-					<button type="button" class="btn-primary"<?php echo $dashboardPasswordDisabled
-						? ' disabled aria-disabled="true" title="' . $dashboardPasswordDisabledHelp . '"'
-						: ' onclick="window.location.href=\'settings.php?open=change-password#change-password-card\'"'; ?>><?php echo t_h('modals.user_settings_info.change_password_button', [], 'Change Password'); ?></button>
-					<button type="button" class="btn-danger" data-action="close-dashboard-user-info-modal"><?php echo t_h('common.close'); ?></button>
-				</div>
-			</div>
-		</div>
-
 		<div id="noteColorModal" class="modal">
 			<div class="modal-content">
 				<h3 id="noteColorModalTitle"><?php echo t_h('note_color.modal_title', [], 'Note color'); ?></h3>
@@ -1014,9 +887,6 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 			empty: <?php echo json_encode(t('dashboard.tag_filter.empty', [], 'No tags on this board.')); ?>,
 			search: <?php echo json_encode(t('dashboard.tag_filter.search', [], 'Filter tags...')); ?>,
 			noMatch: <?php echo json_encode(t('dashboard.tag_filter.no_match', [], 'No matching tag.')); ?>
-		};
-		window.DASHBOARD_USER = {
-			isAdmin: <?php echo (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) ? 'true' : 'false'; ?>
 		};
 		window.NOTIFICATIONS_TXT = {
 			dismiss: <?php echo json_encode(t('reminder.dismiss', [], 'Dismiss')); ?>,

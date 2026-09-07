@@ -1863,12 +1863,6 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
                 $rules[] = '#outlineMobileBackdrop { display: none !important; }';
             } elseif ($id === 'tasklist-progress') {
                 $rules[] = '.tasklist-progress { display: none !important; }';
-            } elseif ($id === 'settings-recent-section') {
-                // The "Recent" band on the settings page. Both the title and
-                // the grid are toggled by settings-page.js through the hidden
-                // attribute, so !important is what keeps them down once the
-                // click history refills them.
-                $rules[] = '#settings-recent-section-title, #settings-recent-section-grid { display: none !important; }';
             }
         } elseif ($type === 'share') {
             // Share dialog blocks are built in JS. The CSS rule covers pages that
@@ -3760,17 +3754,37 @@ function getWorkspaceFilter() {
 }
 
 /**
- * Render the current workspace name as a discreet suffix for a page title.
+ * Render the current workspace as a small chip after a page title.
  *
  * The workspace-scoped pages (Notes, Folders, Tags, Tasks, ...) all show the
  * same heading whatever workspace is open, so the name is the only thing that
- * tells two visits apart. Returns an empty string when there is no workspace to
- * name, which leaves pages reached without one untouched.
+ * tells two visits apart. The chip carries the workspace colour (a layers
+ * glyph when it has none), the name and a chevron: a button whose chevron opens a menu
+ * listing every workspace as a link to this same page (page.php?workspace=X),
+ * plus a shortcut to workspaces.php, so the page can be re-scoped in place.
+ * js/page-title-workspace-menu.js (loaded by icon_sidebar.php) opens and
+ * positions the menu; it is rendered here rather than fetched so it needs no
+ * i18n runtime, which half of these pages never load.
+ *
+ * Returns an empty string when there is no workspace to name, which leaves
+ * pages reached without one untouched. A public (password-protected) workspace
+ * visitor gets the plain name: there is no other workspace to switch to.
  *
  * @param string|null $workspace Workspace name; defaults to getWorkspaceFilter().
+ *                               A page whose scope is wider than one workspace
+ *                               (dashboard.php) passes its scope label instead:
+ *                               it is shown as is and, matching no workspace,
+ *                               ticks no entry.
+ * @param array $options 'query' extra query parameters carried by every
+ *                               workspace link (dashboard.php: scope=single, so
+ *                               the choice overrides a remembered multi-scope);
+ *                       'items' action entries appended after the workspaces,
+ *                               each ['icon', 'label', 'action'], rendered as a
+ *                               button carrying data-action for the page's own
+ *                               handler (dashboard.php: its scope modal).
  * @return string HTML fragment, or '' when there is nothing to show.
  */
-function poznoteRenderPageTitleWorkspace($workspace = null) {
+function poznoteRenderPageTitleWorkspace($workspace = null, array $options = []) {
     if ($workspace === null) {
         $workspace = getWorkspaceFilter();
     }
@@ -3779,8 +3793,99 @@ function poznoteRenderPageTitleWorkspace($workspace = null) {
         return '';
     }
 
-    $escaped = htmlspecialchars($workspace, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-    return '<span class="poznote-page-title-workspace" title="' . $escaped . '">(' . $escaped . ')</span>';
+    $esc = static function ($value): string {
+        return htmlspecialchars((string)$value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    };
+    $escaped = $esc($workspace);
+
+    global $con;
+    $colors = isset($con) ? poznoteGetWorkspaceColorsMap($con) : [];
+    $colorOf = static function ($name) use ($colors): string {
+        $hex = isset($colors[$name]) ? (string)$colors[$name]['hex'] : '';
+        return preg_match('/^#[0-9a-f]{3,8}$/i', $hex) ? $hex : '';
+    };
+
+    // The chip leads with the workspace colour (workspaces.php) when it has
+    // one, else with a layers glyph; the dashboard's multi-workspace labels
+    // ("All workspaces") match no workspace and get the glyph too.
+    $chipHex = $colorOf($workspace);
+    $chipLead = $chipHex !== ''
+        ? '<span class="poznote-page-title-workspace-dot" style="background-color: ' . $esc($chipHex) . '"></span>'
+        : '<i class="lucide lucide-layers poznote-page-title-workspace-icon" aria-hidden="true"></i>';
+    $chipName = '<span class="poznote-page-title-workspace-name">' . $escaped . '</span>';
+
+    if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
+        return '<span class="poznote-page-title-workspace poznote-page-title-workspace-static" title="' . $escaped . '">' . $chipLead . $chipName . '</span>';
+    }
+
+    $names = [];
+    if (isset($con)) {
+        try {
+            $stmt = $con->query('SELECT name FROM workspaces ORDER BY name COLLATE NOCASE');
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $name = (string)$row['name'];
+                if ($name !== '') {
+                    $names[] = $name;
+                }
+            }
+        } catch (Exception $e) {
+            $names = [];
+        }
+    }
+    // Dots only when there is a colour to show: an empty slot on every row
+    // would just indent the names.
+    $showDots = !empty($colors);
+
+    // Same page, only the workspace changes. The other parameters (a search, a
+    // folder, a date) belong to the workspace being left; the rail's links drop
+    // them the same way.
+    $page = basename((string)parse_url($_SERVER['SCRIPT_NAME'] ?? '', PHP_URL_PATH));
+    if ($page === '') {
+        $page = 'index.php';
+    }
+
+    $html = '<button type="button" class="poznote-page-title-workspace" id="poznotePageTitleWorkspaceBtn"'
+        . ' title="' . $esc(t('page_title.switch_workspace', [], 'Switch workspace')) . '"'
+        . ' aria-haspopup="menu" aria-expanded="false" aria-controls="poznotePageTitleWorkspaceMenu">'
+        . $chipLead . $chipName
+        . '<i class="lucide lucide-chevron-down poznote-page-title-workspace-chevron" aria-hidden="true"></i>'
+        . '</button>';
+
+    // <span>s throughout: the fragment sits inside an <h1>, which only takes
+    // phrasing content. The script moves the menu under <body> anyway.
+    $html .= '<span class="poznote-page-title-workspace-menu" id="poznotePageTitleWorkspaceMenu" role="menu"'
+        . ' aria-label="' . $esc(t('page_title.workspaces', [], 'Workspaces')) . '">';
+    foreach ($names as $name) {
+        $isCurrent = $name === $workspace;
+        $hex = $colorOf($name);
+        $html .= '<a class="poznote-page-title-workspace-item' . ($isCurrent ? ' poznote-page-title-workspace-item-current' : '') . '"'
+            . ' role="menuitemradio" aria-checked="' . ($isCurrent ? 'true' : 'false') . '"'
+            . ' href="' . $esc($page . '?' . http_build_query(array_merge($options['query'] ?? [], ['workspace' => $name]))) . '"'
+            . ' data-workspace="' . $esc($name) . '">';
+        if ($showDots) {
+            $html .= $hex !== ''
+                ? '<span class="poznote-page-title-workspace-dot" style="background-color: ' . $esc($hex) . '"></span>'
+                : '<span class="poznote-page-title-workspace-dot poznote-page-title-workspace-dot-none"></span>';
+        }
+        $html .= '<span class="poznote-page-title-workspace-item-name">' . $esc($name) . '</span>'
+            . ($isCurrent ? '<i class="lucide lucide-check" aria-hidden="true"></i>' : '')
+            . '</a>';
+    }
+    $html .= '<span class="poznote-page-title-workspace-menu-sep" role="separator"></span>';
+    foreach (($options['items'] ?? []) as $item) {
+        $html .= '<button type="button" class="poznote-page-title-workspace-item poznote-page-title-workspace-item-action" role="menuitem"'
+            . (!empty($item['action']) ? ' data-action="' . $esc($item['action']) . '"' : '') . '>'
+            . (!empty($item['icon']) ? '<i class="lucide ' . $esc($item['icon']) . '" aria-hidden="true"></i>' : '')
+            . '<span class="poznote-page-title-workspace-item-name">' . $esc($item['label'] ?? '') . '</span>'
+            . '</button>';
+    }
+    $html .= '<a class="poznote-page-title-workspace-item poznote-page-title-workspace-item-manage" role="menuitem" href="workspaces.php">'
+        . '<i class="lucide lucide-layers" aria-hidden="true"></i>'
+        . '<span class="poznote-page-title-workspace-item-name">' . $esc(t('page_title.manage_workspaces', [], 'Manage workspaces')) . '</span>'
+        . '</a>'
+        . '</span>';
+
+    return $html;
 }
 
 /**

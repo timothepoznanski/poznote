@@ -746,6 +746,18 @@
                 }
                 break;
             }
+            case 'show-insert-markdown-modal': {
+                // Close the dropdown first, or it stays open behind the modal.
+                var toolbarElForInsertMd = target.closest('.note-edit-toolbar');
+                if (toolbarElForInsertMd) {
+                    var menuElForInsertMd = toolbarElForInsertMd.querySelector('.mobile-toolbar-menu');
+                    if (menuElForInsertMd) menuElForInsertMd.hidden = true;
+                }
+                if (typeof window.showInsertMarkdownModal === 'function') {
+                    window.showInsertMarkdownModal(noteId);
+                }
+                break;
+            }
             case 'rename-note':
                 if (isPublicWorkspaceReadOnly()) {
                     break;

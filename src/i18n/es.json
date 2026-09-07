@@ -429,7 +429,7 @@
       "language": "Cambia el idioma de la interfaz.",
       "main_font": "Elige la fuente utilizada en toda la aplicación.",
       "markdown_font": "Elige la fuente utilizada en el editor markdown.",
-      "font_size": "Ajusta el tamaño de fuente de las notas, la barra lateral y los bloques de código.",
+      "font_size": "Ajusta el tamaño de fuente de las notas, la barra lateral, los bloques de código y la página de configuración.",
       "index_icon_scale": "Ajusta el tamaño de los iconos en la lista de notas.",
       "timezone": "Define la zona horaria utilizada para mostrar fechas y horas.",
       "date_time_format": "Elige cómo se muestran las fechas y horas.",
@@ -490,8 +490,6 @@
     "expand_section": "Expandir la sección",
     "categories": {
       "pinned": "Fijados",
-      "recent": "Recientes",
-      "all": "Todo",
       "actions": "Acciones",
       "admin_tools": "Herramientas de administración",
       "display": "Pantalla",
@@ -1112,6 +1110,17 @@
       "no_note": "No hay ninguna nota abierta.",
       "empty": "El portapapeles está vacío."
     },
+    "insert_markdown": {
+      "title": "Insertar Markdown",
+      "menu_item": "Insertar Markdown",
+      "hint": "Pega o escribe Markdown en el campo de abajo. Se convierte a HTML que puedes previsualizar e insertar en tu nota.",
+      "placeholder": "Pega o escribe Markdown aquí",
+      "preview_label": "Vista previa",
+      "insert": "Insertar",
+      "converting": "Convirtiendo...",
+      "error": "La conversión falló. Inténtalo de nuevo.",
+      "no_note": "No hay ninguna nota abierta."
+    },
     "update": {
       "title": "📱 Versión de la aplicación",
       "backup_warning": "Haz una copia de seguridad de tus datos.",
@@ -1167,7 +1176,6 @@
       "locked_by_tenant_isolation": "Oculto automáticamente mientras esta capacidad esté bloqueada por el aislamiento de cuentas",
       "toolbar_hint": "Los botones de formato (negrita, listas, código…) solo aparecen mientras hay texto seleccionado en una nota. Las demás acciones están agrupadas en el menú ⋮.",
       "reminder_bell": "Icono de campana (recordatorio)",
-      "dashboard_user": "Usuario",
       "dashboard_filter_bar": "Barra de filtro",
       "view_layout_toggle": "Alternar vista (cuadrícula / lista, tamaño de tarjetas)",
       "index_search_bar": "Barra de búsqueda",
@@ -3230,6 +3238,11 @@
     "workspaces": "Espacios de trabajo",
     "logout": "Cerrar sesión"
   },
+  "page_title": {
+    "switch_workspace": "Cambiar de espacio de trabajo",
+    "workspaces": "Espacios de trabajo",
+    "manage_workspaces": "Gestionar espacios de trabajo"
+  },
   "admin_tools": {
     "orphan_scanner": {
       "title": "Escáner de archivos adjuntos huérfanos",
@@ -3799,6 +3812,7 @@
     "scope": {
       "title": "Ámbito",
       "hint": "Elige los espacios de trabajo que quieres ver. Una etiqueta selecciona todos los que la llevan.",
+      "menu_item": "Varios espacios de trabajo...",
       "all": "Todos los espacios de trabajo",
       "by_tag": "Por etiqueta",
       "workspaces": "Espacios de trabajo",

@@ -143,7 +143,7 @@
       "language": "Change the language of the interface.",
       "main_font": "Choose the font used throughout the application.",
       "markdown_font": "Choose the font used in the markdown editor.",
-      "font_size": "Adjust the font size of notes, sidebar and code blocks.",
+      "font_size": "Adjust the font size of notes, sidebar, code blocks and the settings page.",
       "index_icon_scale": "Adjust the size of the icons in the note list.",
       "timezone": "Set the timezone used to display dates and times.",
       "date_time_format": "Choose how dates and times are displayed.",
@@ -204,8 +204,6 @@
     "expand_section": "Expand section",
     "categories": {
       "pinned": "Pinned",
-      "recent": "Recent",
-      "all": "All",
       "actions": "Actions",
       "admin_tools": "Admin Tools",
       "display": "Display",
@@ -392,6 +390,7 @@
       "note_font_size": "{{size}}px",
       "sidebar_font_size": "{{size}}px",
       "code_block_font_size": "{{size}}px",
+      "settings_font_size": "{{size}}px",
       "ui_customization_configure": "Configure",
       "icon_sidebar_order_configure": "Configure",
       "slash_menu_alt_slash": "Alt + /",
@@ -596,6 +595,17 @@
       "no_note": "No note is open.",
       "empty": "The clipboard is empty."
     },
+    "insert_markdown": {
+      "title": "Insert Markdown",
+      "menu_item": "Insert Markdown",
+      "hint": "Paste or type Markdown in the box below. It is converted to HTML that you can preview, then insert into your note.",
+      "placeholder": "Paste or type Markdown here",
+      "preview_label": "Preview",
+      "insert": "Insert",
+      "converting": "Converting...",
+      "error": "Conversion failed. Please try again.",
+      "no_note": "No note is open."
+    },
     "update": {
       "title": "📱 Application Version",
       "backup_warning": "Make a backup of your data.",
@@ -651,7 +661,6 @@
       "locked_by_tenant_isolation": "Hidden automatically while this capability is blocked by Tenant isolation",
       "toolbar_hint": "Formatting buttons (bold, lists, code…) only appear while text is selected in a note. Other actions are grouped in the ⋮ menu.",
       "reminder_bell": "Bell icon (reminder)",
-      "dashboard_user": "User",
       "dashboard_filter_bar": "Filter bar",
       "view_layout_toggle": "View toggle (grid / list, card size)",
       "index_search_bar": "Search bar",
@@ -731,6 +740,7 @@
       "note_label": "Note content (px):",
       "sidebar_label": "Sidebar (px):",
       "code_block_label": "Code blocks (px):",
+      "settings_label": "Settings page (px):",
       "default_value": "{{size}} px is the Default value",
       "preview": "Preview"
     },
@@ -2833,6 +2843,11 @@
     "workspaces": "Workspaces",
     "logout": "Logout"
   },
+  "page_title": {
+    "switch_workspace": "Switch workspace",
+    "workspaces": "Workspaces",
+    "manage_workspaces": "Manage workspaces"
+  },
   "admin_tools": {
     "orphan_scanner": {
       "title": "Orphan attachments scanner",
@@ -3517,6 +3532,7 @@
     "scope": {
       "title": "Scope",
       "hint": "Pick the workspaces to show. A tag selects every workspace carrying it.",
+      "menu_item": "Several workspaces...",
       "all": "All workspaces",
       "by_tag": "By tag",
       "workspaces": "Workspaces",

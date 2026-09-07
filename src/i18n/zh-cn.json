@@ -430,7 +430,7 @@
       "language": "更改界面语言。",
       "main_font": "选择整个应用使用的字体。",
       "markdown_font": "选择 Markdown 编辑器使用的字体。",
-      "font_size": "调整笔记、侧边栏和代码块的字体大小。",
+      "font_size": "调整笔记、侧边栏、代码块和设置页面的字体大小。",
       "index_icon_scale": "调整笔记列表中图标的大小。",
       "timezone": "设置用于显示日期和时间的时区。",
       "date_time_format": "选择日期和时间的显示格式。",
@@ -491,8 +491,6 @@
     "expand_section": "展开此部分",
     "categories": {
       "pinned": "已固定",
-      "recent": "最近使用",
-      "all": "全部",
       "actions": "操作",
       "admin_tools": "管理工具",
       "display": "显示",
@@ -1112,6 +1110,17 @@
       "no_note": "没有打开的笔记。",
       "empty": "剪贴板为空。"
     },
+    "insert_markdown": {
+      "title": "插入 Markdown",
+      "menu_item": "插入 Markdown",
+      "hint": "请在下方的框中粘贴或输入 Markdown。它将被转换为 HTML，你可以预览后再插入笔记。",
+      "placeholder": "在此粘贴或输入 Markdown",
+      "preview_label": "预览",
+      "insert": "插入",
+      "converting": "正在转换...",
+      "error": "转换失败，请重试。",
+      "no_note": "没有打开的笔记。"
+    },
     "update": {
       "title": "📱 应用程序版本",
       "backup_warning": "请备份您的数据。",
@@ -1167,7 +1176,6 @@
       "locked_by_tenant_isolation": "该功能已被租户隔离阻止，因此自动隐藏",
       "toolbar_hint": "格式按钮（加粗、列表、代码等）仅在笔记中选中文本时显示。其他操作在 ⋮ 菜单中。",
       "reminder_bell": "铃铛图标（提醒）",
-      "dashboard_user": "用户",
       "dashboard_filter_bar": "筛选栏",
       "view_layout_toggle": "视图切换（网格 / 列表、卡片大小）",
       "index_search_bar": "搜索栏",
@@ -3354,6 +3362,11 @@
     "workspaces": "工作区",
     "logout": "退出登录"
   },
+  "page_title": {
+    "switch_workspace": "切换工作区",
+    "workspaces": "工作区",
+    "manage_workspaces": "管理工作区"
+  },
   "admin_tools": {
     "orphan_scanner": {
       "title": "孤立附件扫描器",
@@ -3920,6 +3933,7 @@
     "scope": {
       "title": "范围",
       "hint": "选择要显示的工作区。点击标签会选中所有带该标签的工作区。",
+      "menu_item": "多个工作区...",
       "all": "全部工作区",
       "by_tag": "按标签",
       "workspaces": "工作区",

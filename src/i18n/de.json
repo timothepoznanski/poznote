@@ -428,7 +428,7 @@
       "language": "Ändern Sie die Sprache der Oberfläche.",
       "main_font": "Wählen Sie die Schriftart für die gesamte Anwendung.",
       "markdown_font": "Wählen Sie die Schriftart für den Markdown-Editor.",
-      "font_size": "Passen Sie die Schriftgröße von Notizen, Seitenleiste und Codeblöcken an.",
+      "font_size": "Passen Sie die Schriftgröße von Notizen, Seitenleiste, Codeblöcken und der Einstellungsseite an.",
       "index_icon_scale": "Passen Sie die Größe der Symbole in der Notizenliste an.",
       "timezone": "Legen Sie die Zeitzone für die Anzeige von Datum und Uhrzeit fest.",
       "date_time_format": "Wählen Sie, wie Datum und Uhrzeit angezeigt werden.",
@@ -489,8 +489,6 @@
     "expand_section": "Bereich ausklappen",
     "categories": {
       "pinned": "Angepinnt",
-      "recent": "Zuletzt verwendet",
-      "all": "Alle",
       "actions": "Aktionen",
       "admin_tools": "Admin-Werkzeuge",
       "display": "Anzeige",
@@ -1111,6 +1109,17 @@
       "no_note": "Es ist keine Notiz geöffnet.",
       "empty": "Die Zwischenablage ist leer."
     },
+    "insert_markdown": {
+      "title": "Markdown einfügen",
+      "menu_item": "Markdown einfügen",
+      "hint": "Fügen Sie Markdown in das Feld unten ein oder geben Sie es ein. Es wird in HTML umgewandelt, das Sie in der Vorschau prüfen und dann in Ihre Notiz einfügen können.",
+      "placeholder": "Markdown hier einfügen oder eingeben",
+      "preview_label": "Vorschau",
+      "insert": "Einfügen",
+      "converting": "Wird umgewandelt...",
+      "error": "Die Umwandlung ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "no_note": "Es ist keine Notiz geöffnet."
+    },
     "update": {
       "title": "📱 Anwendungsversion",
       "backup_warning": "Erstellen Sie ein Backup Ihrer Daten.",
@@ -1166,7 +1175,6 @@
       "locked_by_tenant_isolation": "Automatisch ausgeblendet, solange diese Funktion durch die Mandantentrennung blockiert ist",
       "toolbar_hint": "Formatierungsschaltflächen (Fett, Listen, Code…) erscheinen nur, wenn Text in einer Notiz markiert ist. Weitere Aktionen befinden sich im ⋮-Menü.",
       "reminder_bell": "Glockensymbol (Erinnerung)",
-      "dashboard_user": "Benutzer",
       "dashboard_filter_bar": "Filterleiste",
       "view_layout_toggle": "Ansichtsumschalter (Raster / Liste, Kartengröße)",
       "index_search_bar": "Suchleiste",
@@ -3230,6 +3238,11 @@
     "workspaces": "Arbeitsbereiche",
     "logout": "Abmelden"
   },
+  "page_title": {
+    "switch_workspace": "Arbeitsbereich wechseln",
+    "workspaces": "Arbeitsbereiche",
+    "manage_workspaces": "Arbeitsbereiche verwalten"
+  },
   "admin_tools": {
     "orphan_scanner": {
       "title": "Verwaiste Anhänge-Scanner",
@@ -3799,6 +3812,7 @@
     "scope": {
       "title": "Bereich",
       "hint": "Wähle die anzuzeigenden Arbeitsbereiche. Ein Tag wählt alle Arbeitsbereiche aus, die ihn tragen.",
+      "menu_item": "Mehrere Arbeitsbereiche...",
       "all": "Alle Arbeitsbereiche",
       "by_tag": "Nach Tag",
       "workspaces": "Arbeitsbereiche",

@@ -2010,30 +2010,6 @@
             });
         }
 
-        var userInfoTrigger = document.querySelector('[data-action="open-user-info-modal"]');
-        var userInfoModal = document.getElementById('dashboardUserInfoModal');
-        if (userInfoTrigger) {
-            userInfoTrigger.addEventListener('click', function (e) {
-                e.preventDefault();
-                var isAdmin = window.DASHBOARD_USER && window.DASHBOARD_USER.isAdmin;
-                if (isAdmin) {
-                    window.location.href = 'admin/users.php';
-                } else if (userInfoModal) {
-                    userInfoModal.style.display = 'flex';
-                }
-            });
-        }
-        Array.prototype.forEach.call(document.querySelectorAll('[data-action="close-dashboard-user-info-modal"]'), function (closeBtn) {
-            closeBtn.addEventListener('click', function () {
-                if (userInfoModal) userInfoModal.style.display = 'none';
-            });
-        });
-        if (userInfoModal) {
-            userInfoModal.addEventListener('click', function (e) {
-                if (e.target === userInfoModal) userInfoModal.style.display = 'none';
-            });
-        }
-
         document.addEventListener('click', function (e) {
             // Checked first: the pin button sits inside a card, so letting the
             // event fall through would also open the note.

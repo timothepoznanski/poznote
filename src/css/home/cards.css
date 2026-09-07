@@ -228,8 +228,10 @@ body.dark-mode .home-card-green .home-card-icon {
     min-width: 0;
 }
 
+/* --settings-font-scale is set on :root by the settings page (Font size
+   card, js/font-size-settings.js); it stays at 1 on the other pages. */
 .home-card-title {
-    font-size: 16px;
+    font-size: calc(16px * var(--settings-font-scale, 1));
     font-weight: 400;
     color: #1f2937;
     display: -webkit-box;
@@ -240,7 +242,7 @@ body.dark-mode .home-card-green .home-card-icon {
 }
 
 .home-card-description {
-    font-size: 11px;
+    font-size: calc(11px * var(--settings-font-scale, 1));
     color: var(--pz-text-muted);
     font-weight: 500;
     margin-top: 2px;
@@ -248,7 +250,7 @@ body.dark-mode .home-card-green .home-card-icon {
 }
 
 .home-card-count {
-    font-size: 14px;
+    font-size: calc(14px * var(--settings-font-scale, 1));
     color: var(--pz-text-muted);
 }
 

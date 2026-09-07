@@ -352,6 +352,10 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
                     <label for="codeBlockFontSizeInput"><?php echo t_h('modals.font_size.code_block_label'); ?></label>
                     <input type="number" id="codeBlockFontSizeInput" min="10" max="32" step="1" value="15">
                 </div>
+                <div class="font-size-row">
+                    <label for="settingsFontSizeInput"><?php echo t_h('modals.font_size.settings_label', [], 'Settings page (px):'); ?></label>
+                    <input type="number" id="settingsFontSizeInput" min="10" max="32" step="1" value="15">
+                </div>
             </div>
         </div>
         <div class="modal-buttons">
@@ -856,6 +860,27 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="pasteMarkdownModal"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" id="pasteMarkdownInsertBtn" disabled><?php echo t_h('modals.paste_markdown.insert', [], 'Insert'); ?></button>
+        </div>
+    </div>
+</div>
+
+<!-- Insert Markdown Modal (HTML notes): the mirror of the modal above -->
+<div id="insertMarkdownModal" class="modal">
+    <div class="modal-content paste-markdown-modal-content">
+        <h3><?php echo t_h('modals.insert_markdown.title', [], 'Insert Markdown'); ?></h3>
+        <div class="modal-body">
+            <p class="paste-markdown-hint"><?php echo t_h('modals.insert_markdown.hint', [], 'Paste or type Markdown in the box below. It is converted to HTML that you can preview, then insert into your note.'); ?></p>
+            <!-- Markdown is plain text, so a textarea is enough to capture it. -->
+            <textarea id="insertMarkdownSource" class="paste-markdown-preview" spellcheck="false" aria-label="<?php echo t_h('modals.insert_markdown.title', [], 'Insert Markdown'); ?>" placeholder="<?php echo t_h('modals.insert_markdown.placeholder', [], 'Paste or type Markdown here'); ?>"></textarea>
+            <div id="insertMarkdownPreviewWrapper" class="paste-markdown-preview-wrapper is-hidden">
+                <div class="paste-markdown-preview-label"><?php echo t_h('modals.insert_markdown.preview_label', [], 'Preview'); ?></div>
+                <div id="insertMarkdownPreview" class="insert-markdown-preview"></div>
+            </div>
+            <p id="insertMarkdownError" class="paste-markdown-error" role="alert"></p>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="insertMarkdownModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="insertMarkdownInsertBtn" disabled><?php echo t_h('modals.insert_markdown.insert', [], 'Insert'); ?></button>
         </div>
     </div>
 </div>
@@ -1607,7 +1632,6 @@ include __DIR__ . '/modals/tag_folder_notes_modal.php';
                 <div class="ui-custom-section">
                 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.settings_cards', [], 'Settings Cards'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
                 <div class="ui-custom-items">
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:settings-recent-section" checked><span><?php echo t_h('settings.categories.recent', [], 'Recent'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:my-profile-card" checked><span><?php echo t_h('profile.card', [], 'My Profile'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:welcome-setup-card" checked><span><?php echo t_h('settings.cards.welcome_setup', [], 'Startup guide'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:change-password-card" checked><span><?php echo t_h('settings.cards.change_password', [], 'Change Password'); ?></span></label>
@@ -1812,8 +1836,6 @@ include __DIR__ . '/modals/tag_folder_notes_modal.php';
                 <div class="ui-custom-section">
                 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.dashboard_toolbar', [], 'Dashboard'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
                 <div class="ui-custom-items">
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardWorkspaceBtn" checked><span><?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardUserBtn" checked><span><?php echo t_h('modals.ui_customization.dashboard_user', [], 'User'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardTopbarFilter" checked><span><?php echo t_h('modals.ui_customization.dashboard_filter_bar', [], 'Filter bar'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardViewLayoutBtn" checked><span><?php echo t_h('modals.ui_customization.view_layout_toggle', [], 'View toggle (grid / list, card size)'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardViewColumnsBtn" checked><span><?php echo t_h('dashboard.view.columns', [], 'Maximum columns'); ?></span></label>

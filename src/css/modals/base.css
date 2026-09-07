@@ -157,20 +157,17 @@
     background-color: #e9ecef;
 }
 
-/* Account-settings info modals hold three buttons: keep them on a single
+/* Account-settings info modal holds three buttons: keep them on a single
    row (widened modal + compact buttons); stack them on small screens. */
-#userSettingsInfoModal .modal-content,
-#dashboardUserInfoModal .modal-content {
+#userSettingsInfoModal .modal-content {
     max-width: 560px;
 }
 
-#userSettingsInfoModal .modal-buttons,
-#dashboardUserInfoModal .modal-buttons {
+#userSettingsInfoModal .modal-buttons {
     flex-wrap: nowrap;
 }
 
-#userSettingsInfoModal .modal-buttons button,
-#dashboardUserInfoModal .modal-buttons button {
+#userSettingsInfoModal .modal-buttons button {
     flex: 1 1 auto;
     text-align: center;
     white-space: nowrap;
@@ -179,8 +176,7 @@
 }
 
 @media (max-width: 480px) {
-    #userSettingsInfoModal .modal-buttons,
-    #dashboardUserInfoModal .modal-buttons {
+    #userSettingsInfoModal .modal-buttons {
         flex-direction: column;
     }
 }

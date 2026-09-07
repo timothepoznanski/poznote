@@ -440,7 +440,7 @@
       "language": "Changez la langue de l'interface.",
       "main_font": "Choisissez la police utilisée dans toute l'application.",
       "markdown_font": "Choisissez la police utilisée dans l'éditeur markdown.",
-      "font_size": "Ajustez la taille de police des notes, de la barre latérale et des blocs de code.",
+      "font_size": "Ajustez la taille de police des notes, de la barre latérale, des blocs de code et de la page des paramètres.",
       "index_icon_scale": "Ajustez la taille des icônes dans la liste des notes.",
       "timezone": "Définissez le fuseau horaire utilisé pour afficher les dates et heures.",
       "date_time_format": "Choisissez le format d'affichage des dates et heures.",
@@ -501,8 +501,6 @@
     "expand_section": "Développer la section",
     "categories": {
       "pinned": "Épinglés",
-      "recent": "Récents",
-      "all": "Tout",
       "actions": "Actions",
       "admin_tools": "Outils d'administration",
       "display": "Affichage",
@@ -769,6 +767,7 @@
       "note_font_size": "{{size}}px",
       "sidebar_font_size": "{{size}}px",
       "code_block_font_size": "{{size}}px",
+      "settings_font_size": "{{size}}px",
       "ui_customization_configure": "Configurer",
       "icon_sidebar_order_configure": "Configurer",
       "toolbar_mode": {
@@ -1136,6 +1135,17 @@
       "no_note": "Aucune note ouverte.",
       "empty": "Le presse-papiers est vide."
     },
+    "insert_markdown": {
+      "title": "Insérer du Markdown",
+      "menu_item": "Insérer du Markdown",
+      "hint": "Collez ou saisissez du Markdown dans le champ ci-dessous. Il est converti en HTML que vous pouvez prévisualiser, puis insérer dans votre note.",
+      "placeholder": "Collez ou saisissez du Markdown ici",
+      "preview_label": "Aperçu",
+      "insert": "Insérer",
+      "converting": "Conversion en cours...",
+      "error": "La conversion a échoué. Veuillez réessayer.",
+      "no_note": "Aucune note ouverte."
+    },
     "update": {
       "title": "📱 Version de l’application",
       "backup_warning": "Faites une sauvegarde de vos données.",
@@ -1191,7 +1201,6 @@
       "locked_by_tenant_isolation": "Masqué automatiquement tant que cette capacité est bloquée par l'isolation des comptes",
       "toolbar_hint": "Les boutons de mise en forme (gras, listes, code…) n'apparaissent que lorsque du texte est sélectionné dans une note. Les autres actions sont regroupées dans le menu ⋮.",
       "reminder_bell": "Icône cloche (rappel)",
-      "dashboard_user": "Utilisateur",
       "dashboard_filter_bar": "Barre de filtre",
       "view_layout_toggle": "Bascule de vue (grille / liste, taille des cartes)",
       "index_search_bar": "Barre de recherche",
@@ -1270,6 +1279,7 @@
       "note_label": "Contenu de la note (px) :",
       "sidebar_label": "Barre latérale (px) :",
       "code_block_label": "Blocs de code (px) :",
+      "settings_label": "Page des paramètres (px) :",
       "default_value": "{{size}} px est la valeur par défaut",
       "preview": "Aperçu"
     },
@@ -3453,6 +3463,11 @@
     "workspaces": "Espaces de travail",
     "logout": "Déconnexion"
   },
+  "page_title": {
+    "switch_workspace": "Changer d'espace de travail",
+    "workspaces": "Espaces de travail",
+    "manage_workspaces": "Gérer les espaces de travail"
+  },
   "admin_tools": {
     "orphan_scanner": {
       "title": "Scanner de pièces jointes orphelines",
@@ -4022,6 +4037,7 @@
     "scope": {
       "title": "Périmètre",
       "hint": "Choisissez les espaces de travail à afficher. Un tag sélectionne tous ceux qui le portent.",
+      "menu_item": "Plusieurs espaces de travail...",
       "all": "Tous les espaces de travail",
       "by_tag": "Par tag",
       "workspaces": "Espaces de travail",

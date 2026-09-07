@@ -6,6 +6,18 @@
 // localStorage keys on pages loaded without theme-init.js.
 const fontSizeStore = window.__poznoteUserStorage || window.localStorage;
 
+// The settings page scales its text through a unitless factor (15px is the
+// size of a card title in the desktop layout), so every existing px/rem size
+// in css/settings.css and css/home/cards.css keeps its default at 15.
+// settings.php applies the same factor inline before the first paint.
+const SETTINGS_FONT_SIZE_BASE = 15;
+
+function settingsFontScale(size) {
+    const parsed = parseInt(size, 10);
+    const safe = (parsed >= 10 && parsed <= 32) ? parsed : SETTINGS_FONT_SIZE_BASE;
+    return String(Math.round((safe / SETTINGS_FONT_SIZE_BASE) * 1000) / 1000);
+}
+
 // Function to show font size settings prompt
 function showNoteFontSizePrompt() {
     // Close settings menus
@@ -18,11 +30,12 @@ function showNoteFontSizePrompt() {
     const fontSizeInput = document.getElementById('fontSizeInput');
     const sidebarFontSizeInput = document.getElementById('sidebarFontSizeInput');
     const codeBlockFontSizeInput = document.getElementById('codeBlockFontSizeInput');
+    const settingsFontSizeInput = document.getElementById('settingsFontSizeInput');
     const closeFontSizeBtn = document.getElementById('closeFontSizeModal');
     const cancelFontSizeBtn = document.getElementById('cancelFontSizeBtn');
     const saveFontSizeBtn = document.getElementById('saveFontSizeBtn');
 
-    if (!modal || !fontSizeInput || !sidebarFontSizeInput || !codeBlockFontSizeInput) {
+    if (!modal || !fontSizeInput || !sidebarFontSizeInput || !codeBlockFontSizeInput || !settingsFontSizeInput) {
         return;
     }
 
@@ -73,7 +86,8 @@ function updateFontSizePreview() {
     const previewMap = [
         { inputId: 'fontSizeInput', previewId: 'fontSizePreview' },
         { inputId: 'sidebarFontSizeInput', previewId: 'sidebarFontSizePreview' },
-        { inputId: 'codeBlockFontSizeInput', previewId: 'codeBlockFontSizePreview' }
+        { inputId: 'codeBlockFontSizeInput', previewId: 'codeBlockFontSizePreview' },
+        { inputId: 'settingsFontSizeInput', previewId: 'settingsFontSizePreview' }
     ];
 
     previewMap.forEach(function (entry) {
@@ -109,6 +123,13 @@ function loadCurrentFontSizes() {
         codeBlockFontSizeInput.value = codeBlockFontSize;
     }
 
+    // Load settings page font size from localStorage
+    const settingsFontSize = fontSizeStore.getItem('settings_font_size') || String(SETTINGS_FONT_SIZE_BASE);
+    const settingsFontSizeInput = document.getElementById('settingsFontSizeInput');
+    if (settingsFontSizeInput) {
+        settingsFontSizeInput.value = settingsFontSize;
+    }
+
     updateFontSizePreview();
 }
 
@@ -117,17 +138,22 @@ function saveFontSize() {
     const fontSizeInput = document.getElementById('fontSizeInput');
     const sidebarFontSizeInput = document.getElementById('sidebarFontSizeInput');
     const codeBlockFontSizeInput = document.getElementById('codeBlockFontSizeInput');
+    const settingsFontSizeInput = document.getElementById('settingsFontSizeInput');
 
-    if (!fontSizeInput || !sidebarFontSizeInput || !codeBlockFontSizeInput) {
+    if (!fontSizeInput || !sidebarFontSizeInput || !codeBlockFontSizeInput || !settingsFontSizeInput) {
         return;
     }
 
     const fontSize = fontSizeInput.value;
     const sidebarFontSize = sidebarFontSizeInput.value;
     const codeBlockFontSize = codeBlockFontSizeInput.value;
+    const settingsFontSize = settingsFontSizeInput.value;
 
     // Validate inputs
-    if (fontSize < 10 || fontSize > 32 || sidebarFontSize < 10 || sidebarFontSize > 32 || codeBlockFontSize < 10 || codeBlockFontSize > 32) {
+    const outOfRange = [fontSize, sidebarFontSize, codeBlockFontSize, settingsFontSize].some(function (value) {
+        return value < 10 || value > 32;
+    });
+    if (outOfRange) {
         safeShowNotification('Font size must be between 10 and 32 pixels', 'error');
         return;
     }
@@ -137,6 +163,7 @@ function saveFontSize() {
         fontSizeStore.setItem('note_font_size', fontSize);
         fontSizeStore.setItem('sidebar_font_size', sidebarFontSize);
         fontSizeStore.setItem('code_block_font_size', codeBlockFontSize);
+        fontSizeStore.setItem('settings_font_size', settingsFontSize);
 
         closeFontSizeModal();
 
@@ -148,6 +175,7 @@ function saveFontSize() {
         document.documentElement.style.setProperty('--note-font-size', noteSize);
         document.documentElement.style.setProperty('--sidebar-font-size', sidebarSize);
         document.documentElement.style.setProperty('--code-block-font-size', codeBlockSize);
+        document.documentElement.style.setProperty('--settings-font-scale', settingsFontScale(settingsFontSize));
 
         // Direct application as fallback for existing elements
         document.querySelectorAll('.noteentry').forEach(el => el.style.fontSize = noteSize);
@@ -174,6 +202,9 @@ function applyFontSizeToNotes() {
 
     const codeBlockFontSize = fontSizeStore.getItem('code_block_font_size') || '15';
     document.documentElement.style.setProperty('--code-block-font-size', codeBlockFontSize + 'px');
+
+    const settingsFontSize = fontSizeStore.getItem('settings_font_size') || String(SETTINGS_FONT_SIZE_BASE);
+    document.documentElement.style.setProperty('--settings-font-scale', settingsFontScale(settingsFontSize));
 }
 
 // Function to apply font size on page load
@@ -190,11 +221,12 @@ function initFontSizeSettings() {
     const fontSizeInput = document.getElementById('fontSizeInput');
     const sidebarFontSizeInput = document.getElementById('sidebarFontSizeInput');
     const codeBlockFontSizeInput = document.getElementById('codeBlockFontSizeInput');
+    const settingsFontSizeInput = document.getElementById('settingsFontSizeInput');
     const closeFontSizeBtn = document.getElementById('closeFontSizeModal');
     const cancelFontSizeBtn = document.getElementById('cancelFontSizeBtn');
     const saveFontSizeBtn = document.getElementById('saveFontSizeBtn');
 
-    if (!fontSizeModal || !fontSizeInput || !sidebarFontSizeInput || !codeBlockFontSizeInput || !cancelFontSizeBtn || !saveFontSizeBtn) {
+    if (!fontSizeModal || !fontSizeInput || !sidebarFontSizeInput || !codeBlockFontSizeInput || !settingsFontSizeInput || !cancelFontSizeBtn || !saveFontSizeBtn) {
         return;
     }
 
@@ -209,6 +241,7 @@ function initFontSizeSettings() {
         fontSizeInput.addEventListener('input', updateFontSizePreview);
         sidebarFontSizeInput.addEventListener('input', updateFontSizePreview);
         codeBlockFontSizeInput.addEventListener('input', updateFontSizePreview);
+        settingsFontSizeInput.addEventListener('input', updateFontSizePreview);
 
         fontSizeModal.setAttribute('data-initialized', 'true');
     }

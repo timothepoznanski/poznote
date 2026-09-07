@@ -118,7 +118,6 @@
             'hidden_ui_elements',
             'icon_sidebar_order',
             'settings_pinned_cards',
-            'settings_recent_cards',
             'spellcheck_html_notes',
             'slash_menu_require_alt',
             'note_nav_shortcuts_enabled',
@@ -434,7 +433,8 @@
         var fontBadges = [
             { id: 'font-size-badge', key: 'note_font_size', default: '15', i18nKey: 'display.badges.note_font_size', fallback: '' },
             { id: 'sidebar-font-size-badge', key: 'sidebar_font_size', default: '13', i18nKey: 'display.badges.sidebar_font_size', fallback: '' },
-            { id: 'code-block-font-size-badge', key: 'code_block_font_size', default: '15', i18nKey: 'display.badges.code_block_font_size', fallback: '' }
+            { id: 'code-block-font-size-badge', key: 'code_block_font_size', default: '15', i18nKey: 'display.badges.code_block_font_size', fallback: '' },
+            { id: 'settings-font-size-badge', key: 'settings_font_size', default: '15', i18nKey: 'display.badges.settings_font_size', fallback: '' }
         ];
 
         fontBadges.forEach(function (config) {
@@ -2762,9 +2762,9 @@
         // Search functionality - filters settings cards
         var searchInput = document.getElementById('home-search-input');
         var cards = document.querySelectorAll('.home-grid .home-card');
-        // Skip the pinned and recent grids: they may be empty/hidden, and the
-        // "no results" element must live in an always-rendered grid.
-        var grid = document.querySelector('.home-grid:not(#settings-pinned-section-grid):not(#settings-recent-section-grid)');
+        // Skip the pinned grid: it may be empty/hidden, and the "no results"
+        // element must live in an always-rendered grid.
+        var grid = document.querySelector('.home-grid:not(#settings-pinned-section-grid)');
 
         if (searchInput && grid) {
             // Create "no results" message element
@@ -2848,17 +2848,11 @@
         // migrated on first load.
         var pinnedGrid = document.getElementById('settings-pinned-section-grid');
         var pinnedTitle = document.getElementById('settings-pinned-section-title');
-        var recentGrid = document.getElementById('settings-recent-section-grid');
-        var recentTitle = document.getElementById('settings-recent-section-title');
-        var RECENT_CARDS_LIMIT = 4;
         if (pinnedGrid && pinnedTitle) {
             var pinnedCardIds = [];
-            var recentCardIds = [];
 
             var pinnedClones = {};    // card id -> clone element in the pinned grid
             var cloneObservers = {};  // card id -> MutationObserver keeping the clone in sync
-            var recentClones = {};    // card id -> clone element in the recent grid
-            var recentObservers = {}; // card id -> MutationObserver keeping the recent clone in sync
 
             var parsePinnedCardIds = function (raw) {
                 try {
@@ -2906,8 +2900,8 @@
                 stripIds(clone);
             };
 
-            // Shared by the "Pinned" and "Recent" sections: both show live
-            // clones of cards that stay in place in their own section.
+            // The "Pinned" section shows live clones of cards that stay in
+            // place in their own section.
             var buildClone = function (orig) {
                 var clone = orig.cloneNode(true);
                 stripIds(clone);
@@ -2945,62 +2939,6 @@
                 if (pinnedClones[id]) { pinnedClones[id].remove(); delete pinnedClones[id]; }
             };
 
-            // "Recent": the last RECENT_CARDS_LIMIT cards the user clicked,
-            // most recent first, persisted per user in the settings table.
-            // Most cards navigate away on click, which cancels a plain fetch,
-            // so the save is sent with keepalive to outlive the page.
-            var saveRecentCards = function () {
-                var body = JSON.stringify({ value: JSON.stringify(recentCardIds) });
-                try {
-                    fetch('/api/v1/settings/settings_recent_cards', {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                        credentials: 'same-origin',
-                        keepalive: true,
-                        body: body
-                    }).catch(function () { /* best effort */ });
-                } catch (e) {
-                    setSetting('settings_recent_cards', JSON.stringify(recentCardIds));
-                }
-            };
-
-            var renderRecentSection = function () {
-                if (!recentGrid || !recentTitle) return;
-                Object.keys(recentObservers).forEach(function (id) {
-                    recentObservers[id].disconnect();
-                    delete recentObservers[id];
-                });
-                Object.keys(recentClones).forEach(function (id) {
-                    recentClones[id].remove();
-                    delete recentClones[id];
-                });
-                recentCardIds.forEach(function (id) {
-                    var card = document.getElementById(id);
-                    if (!card || !card.classList.contains('home-card')) return;
-                    var built = buildClone(card);
-                    recentClones[id] = built.clone;
-                    recentObservers[id] = built.observer;
-                    recentGrid.appendChild(built.clone);
-                });
-                var empty = recentGrid.children.length === 0;
-                recentTitle.hidden = empty;
-                recentGrid.hidden = empty;
-            };
-
-            // Recorded on the original card; clones forward their clicks to it,
-            // so a click on a pinned or recent clone counts too.
-            var recordRecentCard = function (id) {
-                if (!recentGrid || !id) return;
-                var idx = recentCardIds.indexOf(id);
-                if (idx !== -1) recentCardIds.splice(idx, 1);
-                recentCardIds.unshift(id);
-                if (recentCardIds.length > RECENT_CARDS_LIMIT) {
-                    recentCardIds.length = RECENT_CARDS_LIMIT;
-                }
-                saveRecentCards();
-                renderRecentSection();
-            };
-
             var togglePin = function (card) {
                 var idx = pinnedCardIds.indexOf(card.id);
                 if (idx === -1) {
@@ -3016,7 +2954,7 @@
             };
 
             var pinnableCards = [];
-            document.querySelectorAll('.home-grid:not(#settings-pinned-section-grid):not(#settings-recent-section-grid) .home-card').forEach(function (card) {
+            document.querySelectorAll('.home-grid:not(#settings-pinned-section-grid) .home-card').forEach(function (card) {
                 if (!card.id) return;
                 pinnableCards.push(card);
                 // A real <button> is not allowed inside the <a> cards, so the
@@ -3043,13 +2981,6 @@
                 });
                 card.appendChild(btn);
                 applyPinState(card);
-                // Capture phase: some card handlers navigate away, so the
-                // history has to be recorded before they run.
-                card.addEventListener('click', function (e) {
-                    if (e.target.closest('.settings-card-pin')) return;
-                    if (e.target.closest('.setting-help')) return;
-                    recordRecentCard(card.id);
-                }, true);
             });
 
             // Load saved pins, then build the pinned section in saved order.
@@ -3079,15 +3010,6 @@
                 refreshPinnedSection();
             });
 
-            // Load the saved click history and build the "Recent" section.
-            if (recentGrid && recentTitle) {
-                getSetting('settings_recent_cards', function (value) {
-                    recentCardIds = parsePinnedCardIds(typeof value === 'string' ? value : '')
-                        .slice(0, RECENT_CARDS_LIMIT);
-                    renderRecentSection();
-                });
-            }
-
             document.addEventListener('poznote:i18n:loaded', function () {
                 pinnableCards.forEach(applyPinState);
             });
@@ -3095,9 +3017,9 @@
 
         // Collapsible sections: each category title gets a chevron button that
         // collapses the grid below it. The expanded/collapsed state is kept per
-        // user across loads. Sections default to collapsed (except "Pinned" and
-        // "Recent"), so the saved list holds the EXPANDED keys: a section added
-        // by a later version, absent from that list, still starts collapsed.
+        // user across loads. Sections default to collapsed (except "Pinned"),
+        // so the saved list holds the EXPANDED keys: a section added by a
+        // later version, absent from that list, still starts collapsed.
         var sectionStore = window.__poznoteUserStorage || window.localStorage;
         var SECTION_STATE_KEY = 'settingsExpandedSections';
         var expandedSections = [];
@@ -3118,7 +3040,7 @@
             sectionStore.removeItem('settingsCollapsedSections');
         } catch (e) { /* storage unavailable */ }
 
-        var alwaysExpandedSections = ['settings-pinned-section-grid', 'settings-recent-section-grid'];
+        var alwaysExpandedSections = ['settings-pinned-section-grid'];
 
         var sectionLabelRefreshers = [];
 
@@ -3170,12 +3092,9 @@
 
             // The button's click bubbles up here, so one listener covers both.
             // The desktop layout shows one section at a time: nothing to
-            // collapse, and the saved state must not change under it. Its
-            // "All" entry lists every section and collapses like this layout.
+            // collapse, and the saved state must not change under it.
             title.addEventListener('click', function () {
-                var container = title.closest('.home-container');
-                var showAll = !!(container && container.classList.contains('settings-show-all'));
-                if (isSettingsNavLayout() && !showAll) return;
+                if (isSettingsNavLayout()) return;
                 applySectionState(!title.classList.contains('section-collapsed'));
                 persistSectionStates();
             });
@@ -3187,7 +3106,7 @@
 
         // Deep link from the rail's About button: settings.php?open=about shows
         // the About section on its own, instead of the default view where only
-        // "Pinned" and "Recent" are expanded.
+        // "Pinned" is expanded.
         if (new URLSearchParams(window.location.search || '').get('open') === 'about') {
             var aboutGrid = document.getElementById('settings-documentation-section-grid');
             document.querySelectorAll('.settings-category-title').forEach(function (title) {
@@ -3249,18 +3168,13 @@
             var navStore = window.__poznoteUserStorage || window.localStorage;
             var NAV_ICONS = {
                 'settings-pinned-section-grid': 'lucide-pin',
-                'settings-recent-section-grid': 'lucide-history',
-                'all': 'lucide-layout-list',
                 'settings-actions-section-grid': 'lucide-zap',
                 'settings-display-section-grid': 'lucide-monitor',
                 'settings-behavior-section-grid': 'lucide-settings-2',
                 'admin-tools-grid': 'lucide-wrench',
                 'settings-documentation-section-grid': 'lucide-info'
             };
-            // "All" is a virtual entry with no section of its own: it shows
-            // every section at once (.settings-show-all on the container).
-            var ALL_KEY = 'all';
-            var navSections = []; // { key, title, grid, item }; title/grid null for "All"
+            var navSections = []; // { key, title, grid, item }
             var activeSectionKey = null;
 
             var findSection = function (key) {
@@ -3271,20 +3185,18 @@
             };
 
             // A section is listed while it has something to show: "Pinned"
-            // and "Recent" carry the hidden attribute while empty, and
+            // carries the hidden attribute while empty, and
             // ui-customization.js sets an inline display:none on a section
             // whose cards are all hidden.
             var isSectionAvailable = function (section) {
-                if (!section.title) return true;
                 return !section.title.hidden && section.title.style.display !== 'none';
             };
 
             var applyActiveSection = function () {
-                homeContainer.classList.toggle('settings-show-all', activeSectionKey === ALL_KEY);
                 navSections.forEach(function (section) {
                     var active = section.key === activeSectionKey;
-                    if (section.title) section.title.classList.toggle('settings-section-active', active);
-                    if (section.grid) section.grid.classList.toggle('settings-section-active', active);
+                    section.title.classList.toggle('settings-section-active', active);
+                    section.grid.classList.toggle('settings-section-active', active);
                     section.item.classList.toggle('is-active', active);
                     section.item.setAttribute('aria-current', active ? 'true' : 'false');
                     section.item.hidden = !isSectionAvailable(section);
@@ -3355,15 +3267,6 @@
                 navSections.push({ key: key, title: title, grid: grid, item: item });
             });
 
-            // "All" goes right under "Recent" (its title is always in the
-            // DOM, hidden or not), ahead of the real sections.
-            var allItem = buildNavItem(ALL_KEY, settingsNav.getAttribute('data-label-all') || 'All');
-            var recentSection = findSection('settings-recent-section-grid');
-            var allAnchor = recentSection ? recentSection.item.nextSibling : settingsNav.firstChild;
-            settingsNav.insertBefore(allItem, allAnchor);
-            navSections.splice(recentSection ? navSections.indexOf(recentSection) + 1 : 0, 0,
-                { key: ALL_KEY, title: null, grid: null, item: allItem });
-
             // Initial section: the rail's About deep link, then a #hash naming
             // a section (title or grid id), then the saved choice, then the
             // first listed section.
@@ -3375,8 +3278,8 @@
                 var hashId = decodeURIComponent(window.location.hash.slice(1));
                 navSections.forEach(function (section) {
                     if (section.key === hashId) initialKey = section.key;
-                    else if (section.grid && section.grid.id === hashId) initialKey = section.key;
-                    else if (section.title && section.title.id === hashId) initialKey = section.key;
+                    else if (section.grid.id === hashId) initialKey = section.key;
+                    else if (section.title.id === hashId) initialKey = section.key;
                 });
             }
             if (!initialKey) {
@@ -3387,7 +3290,6 @@
             if (typeof MutationObserver !== 'undefined') {
                 var navObserver = new MutationObserver(refreshNav);
                 navSections.forEach(function (section) {
-                    if (!section.title) return;
                     navObserver.observe(section.title, { attributes: true, attributeFilter: ['hidden', 'style'] });
                 });
             }

@@ -137,7 +137,6 @@ $settingsPageUserKeys = [
     'hidden_ui_elements',
     'icon_sidebar_order',
     'settings_pinned_cards',
-    'settings_recent_cards',
     'spellcheck_html_notes',
     'slash_menu_require_alt',
     'note_nav_shortcuts_enabled',
@@ -286,6 +285,22 @@ if ($canUseUserWebhooks) {
     <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
     <link rel="apple-touch-icon" href="pwa/poznote.png?v=<?php echo $cache_v; ?>">
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
+    <script>
+        // Settings page text size (Font size card): applied before the first
+        // paint so the page does not render at the default size and then
+        // jump. js/font-size-settings.js re-applies it on load and on save.
+        (function () {
+            try {
+                var store = window.__poznoteUserStorage || window.localStorage;
+                var size = parseInt(store.getItem('settings_font_size'), 10);
+                if (size >= 10 && size <= 32 && size !== 15) {
+                    document.documentElement.style.setProperty('--settings-font-scale', String(Math.round((size / 15) * 1000) / 1000));
+                }
+            } catch (_error) {
+                // Ignore storage access errors during early paint.
+            }
+        })();
+    </script>
     <script src="pwa/pwa.js?v=<?php echo $cache_v; ?>" defer></script>
     <link rel="stylesheet" href="css/fonts.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>">
@@ -323,7 +338,7 @@ if ($canUseUserWebhooks) {
     <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $cache_v; ?>">
     <?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
-<body class="home-page has-icon-sidebar"
+<body class="home-page settings-page has-icon-sidebar"
       data-txt-enabled="<?php echo t_h('common.enabled'); ?>"
       data-txt-disabled="<?php echo t_h('common.disabled'); ?>"
       data-txt-not-defined="<?php echo t_h('common.not_defined'); ?>"
@@ -359,17 +374,12 @@ if ($canUseUserWebhooks) {
              titles below, and only the selected section shows, its cards as
              rows. Narrow screens hide the list and stack the sections. -->
         <div class="settings-layout">
-        <nav id="settings-nav" class="settings-nav" aria-label="<?php echo t_h('settings.title', [], 'Settings'); ?>"
-             data-label-all="<?php echo t_h('settings.categories.all', [], 'All'); ?>"></nav>
+        <nav id="settings-nav" class="settings-nav" aria-label="<?php echo t_h('settings.title', [], 'Settings'); ?>"></nav>
         <div class="settings-content">
 
         <!-- PINNED CARDS (filled by settings-page.js from the per-user pin list) -->
         <h2 class="settings-category-title" id="settings-pinned-section-title" hidden><?php echo t_h('settings.categories.pinned', [], 'Pinned'); ?></h2>
         <div class="home-grid" id="settings-pinned-section-grid" hidden></div>
-
-        <!-- RECENT CARDS (filled by settings-page.js from the per-user click history) -->
-        <h2 class="settings-category-title" id="settings-recent-section-title" hidden><?php echo t_h('settings.categories.recent', [], 'Recent'); ?></h2>
-        <div class="home-grid" id="settings-recent-section-grid" hidden></div>
 
         <!-- ACTIONS CATEGORY -->
         <h2 class="settings-category-title" id="settings-actions-section-title"><?php echo t_h('settings.categories.actions'); ?></h2>
@@ -602,7 +612,7 @@ if ($canUseUserWebhooks) {
 
             <!-- Font Size -->
             <div class="home-card" id="font-size-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.font_size', [], 'Adjust the font size of notes, sidebar and code blocks.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.font_size', [], 'Adjust the font size of notes, sidebar, code blocks and the settings page.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-type-height"></i>
                 </div>
@@ -612,6 +622,7 @@ if ($canUseUserWebhooks) {
                         <span id="font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                         <span id="sidebar-font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                         <span id="code-block-font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                        <span id="settings-font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                     </div>
                 </div>
             </div>
