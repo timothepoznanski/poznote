@@ -379,36 +379,40 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     top: 2px;
 }
 
-/* Name of the workspace the page is scoped to, appended by
-   poznoteRenderPageTitleWorkspace(). Deliberately quiet: the page name stays
-   what you read first. It is a button: its chevron opens a menu listing the
-   workspaces (js/page-title-workspace-menu.js), so the page can be re-scoped
-   in place. The negative margin trims the flex gap above, which is sized for
-   the icon and reads as too wide between two pieces of text. */
+/* Workspace chip after the page name, appended by
+   poznoteRenderPageTitleWorkspace(): a small pill with the workspace colour
+   (or a layers glyph when it has none), its name and a chevron, so it reads
+   as the control it is. The chevron opens a menu listing the workspaces
+   (js/page-title-workspace-menu.js). Being a box, it centres on the title's
+   box; the text-only suffix it replaces needed baseline alignment instead. */
 .poznote-page-title-workspace {
     display: inline-flex;
     align-items: center;
-    gap: 2px;
-    margin: 0 0 0 -4px;
-    padding: 0;
-    border: 0;
-    border-radius: 4px;
-    background: none;
+    gap: 6px;
+    margin: 0;
+    padding: 4px 8px 4px 9px;
+    border: 1px solid var(--pz-border);
+    border-radius: 999px;
+    background: var(--pz-surface);
     /* A long workspace name must not push the page name off screen: cap it and
        let the ellipsis take over (the full name is readable in the menu). */
     min-width: 0;
     max-width: 40vw;
     font: inherit;
-    font-size: 15px;
-    font-weight: 400;
-    color: var(--pz-text-muted, #6b7280);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--pz-text);
     cursor: pointer;
     appearance: none;
     -webkit-appearance: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .poznote-page-title-workspace:hover,
 .poznote-page-title-workspace[aria-expanded="true"] {
+    background: rgba(var(--pz-accent-rgb), 0.08);
+    border-color: rgba(var(--pz-accent-rgb), 0.4);
     color: var(--pz-accent);
 }
 
@@ -417,57 +421,44 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     outline-offset: 2px;
 }
 
-/* Plain name for a public-workspace visitor, who has nothing to switch to. */
+/* Plain chip for a public-workspace visitor, who has nothing to switch to. */
 .poznote-page-title-workspace-static,
 .poznote-page-title-workspace-static:hover {
-    color: var(--pz-text-muted, #6b7280);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
+    color: var(--pz-text);
     cursor: default;
 }
 
 .poznote-page-title-workspace-name {
     min-width: 0;
-    /* clip rather than hidden: a scroll container has no text baseline of its
-       own, and the baseline alignment below needs one. The button takes its
-       baseline from this span, its first item. */
-    overflow: clip;
+    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-/* The title's own rule paints its icons in the accent colour; the chevron
-   belongs to the suffix and follows its text instead. */
+/* The title paints its icons in the accent colour; the chip's glyphs follow
+   its own text instead. */
+.poznote-page-title .poznote-page-title-workspace-icon,
 .poznote-page-title .poznote-page-title-workspace-chevron {
-    width: 14px;
-    height: 14px;
+    width: 13px;
+    height: 13px;
     flex-shrink: 0;
     color: inherit;
+}
+
+.poznote-page-title .poznote-page-title-workspace-icon {
+    opacity: 0.75;
+}
+
+.poznote-page-title .poznote-page-title-workspace-chevron {
+    margin-left: -2px;
+    opacity: 0.7;
     transition: transform 0.15s ease;
 }
 
 .poznote-page-title-workspace[aria-expanded="true"] .poznote-page-title-workspace-chevron {
     transform: rotate(180deg);
-}
-
-/* Box-centring the smaller suffix leaves it floating above the page name's
-   baseline. Only titles carrying the suffix switch to baseline alignment, so
-   the other pages (settings.php and its user badge) keep their centring. The
-   icon has no baseline and would otherwise sit on its bottom edge: keep it
-   centred on its own. */
-.poznote-page-title:has(.poznote-page-title-workspace) {
-    align-items: baseline;
-}
-
-.poznote-page-title:has(.poznote-page-title-workspace) > i {
-    align-self: center;
-}
-
-/* On the shared baseline the suffix still reads low: at 15px next to 24px its
-   lowercase sits 2.6px under the title's, and the parentheses hang 2px below
-   the baseline. Raising it by that 2px puts the parentheses' feet on the
-   title's baseline and lines up the two x-height centres (checked on Inter). */
-.poznote-page-title:has(.poznote-page-title-workspace) > .poznote-page-title-workspace {
-    position: relative;
-    top: -2px;
 }
 
 /* Menu opened by the suffix's chevron: every workspace as a link to this same
@@ -522,6 +513,16 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     font-weight: 600;
 }
 
+/* Action entries a page adds (dashboard.php's scope modal) are buttons. */
+button.poznote-page-title-workspace-item {
+    width: 100%;
+    border: 0;
+    background: none;
+    font: inherit;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
 .poznote-page-title-workspace-item-name {
     min-width: 0;
     overflow: hidden;
@@ -565,12 +566,15 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     background: var(--pz-border);
 }
 
-.poznote-page-title-workspace-item-manage .lucide {
+.poznote-page-title-workspace-item-manage .lucide,
+.poznote-page-title-workspace-item-action .lucide {
     color: var(--pz-text-muted, #6b7280);
 }
 
 .poznote-page-title-workspace-item-manage:hover .lucide,
-.poznote-page-title-workspace-item-manage:focus-visible .lucide {
+.poznote-page-title-workspace-item-manage:focus-visible .lucide,
+.poznote-page-title-workspace-item-action:hover .lucide,
+.poznote-page-title-workspace-item-action:focus-visible .lucide {
     color: var(--pz-accent);
 }
 
@@ -640,10 +644,9 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     margin-bottom: 4px;
 }
 
-/* dashboard.php only: sit the title a little higher, trading space above for
-   space below. diary.php keeps the 20px/4px pairing set above. */
+/* dashboard.php only: more room below the title, whose filter row sits right
+   under it. diary.php keeps the 4px set above. */
 body:not(.diary-page) .dashboard-container > .poznote-page-title {
-    padding-top: 12px;
     margin-bottom: 22px;
 }
 

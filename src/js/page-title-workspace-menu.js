@@ -139,8 +139,16 @@
         // the link is about to make. Best effort: the link works without it.
         menu.addEventListener('click', function (e) {
             var target = e.target;
-            var item = target && target.closest ? target.closest(ITEM_SELECTOR + '[data-workspace]') : null;
+            var item = target && target.closest ? target.closest(ITEM_SELECTOR) : null;
             if (!item) return;
+
+            // Action entries (dashboard.php's scope modal) belong to the page's
+            // own handler, bound on their data-action: the menu just gets out
+            // of the way.
+            if (item.tagName !== 'A') {
+                close(false);
+                return;
+            }
 
             var name = item.getAttribute('data-workspace');
             if (!name) return;

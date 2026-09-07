@@ -1174,7 +1174,6 @@
       "locked_by_tenant_isolation": "Oculto automaticamente enquanto este recurso estiver bloqueado pelo isolamento de contas",
       "toolbar_hint": "Os botões de formatação (negrito, listas, código…) só aparecem enquanto há texto selecionado em uma nota. As outras ações estão agrupadas no menu ⋮.",
       "reminder_bell": "Ícone de sino (lembrete)",
-      "dashboard_user": "Usuário",
       "dashboard_filter_bar": "Barra de filtro",
       "view_layout_toggle": "Alternar vista (grade / lista, tamanho dos cartões)",
       "index_search_bar": "Barra de pesquisa",
@@ -3816,6 +3815,7 @@
     "scope": {
       "title": "Escopo",
       "hint": "Escolha os espaços de trabalho a exibir. Uma tag seleciona todos os que a possuem.",
+      "menu_item": "Vários espaços de trabalho...",
       "all": "Todos os espaços de trabalho",
       "by_tag": "Por tag",
       "workspaces": "Espaços de trabalho",

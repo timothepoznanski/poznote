@@ -1201,7 +1201,6 @@
       "locked_by_tenant_isolation": "Masqué automatiquement tant que cette capacité est bloquée par l'isolation des comptes",
       "toolbar_hint": "Les boutons de mise en forme (gras, listes, code…) n'apparaissent que lorsque du texte est sélectionné dans une note. Les autres actions sont regroupées dans le menu ⋮.",
       "reminder_bell": "Icône cloche (rappel)",
-      "dashboard_user": "Utilisateur",
       "dashboard_filter_bar": "Barre de filtre",
       "view_layout_toggle": "Bascule de vue (grille / liste, taille des cartes)",
       "index_search_bar": "Barre de recherche",
@@ -4038,6 +4037,7 @@
     "scope": {
       "title": "Périmètre",
       "hint": "Choisissez les espaces de travail à afficher. Un tag sélectionne tous ceux qui le portent.",
+      "menu_item": "Plusieurs espaces de travail...",
       "all": "Tous les espaces de travail",
       "by_tag": "Par tag",
       "workspaces": "Espaces de travail",

@@ -1175,7 +1175,6 @@
       "locked_by_tenant_isolation": "Automatisch ausgeblendet, solange diese Funktion durch die Mandantentrennung blockiert ist",
       "toolbar_hint": "Formatierungsschaltflächen (Fett, Listen, Code…) erscheinen nur, wenn Text in einer Notiz markiert ist. Weitere Aktionen befinden sich im ⋮-Menü.",
       "reminder_bell": "Glockensymbol (Erinnerung)",
-      "dashboard_user": "Benutzer",
       "dashboard_filter_bar": "Filterleiste",
       "view_layout_toggle": "Ansichtsumschalter (Raster / Liste, Kartengröße)",
       "index_search_bar": "Suchleiste",
@@ -3813,6 +3812,7 @@
     "scope": {
       "title": "Bereich",
       "hint": "Wähle die anzuzeigenden Arbeitsbereiche. Ein Tag wählt alle Arbeitsbereiche aus, die ihn tragen.",
+      "menu_item": "Mehrere Arbeitsbereiche...",
       "all": "Alle Arbeitsbereiche",
       "by_tag": "Nach Tag",
       "workspaces": "Arbeitsbereiche",

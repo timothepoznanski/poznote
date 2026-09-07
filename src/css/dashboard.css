@@ -1088,7 +1088,7 @@ body.dark-mode .note-color-name {
 }
 
 /* Four footer buttons: widen the modal so they fit on one row (same
-   recipe as #dashboardUserInfoModal in css/modals/base.css), stacking
+   recipe as #userSettingsInfoModal in css/modals/base.css), stacking
    them on small screens. */
 #noteColorModal .modal-content {
     max-width: 560px;
@@ -1808,16 +1808,12 @@ body.dark-mode .dashboard-empty {
 }
 
 :root[data-theme='dark'] .dashboard-mobile-back:hover,
-body.dark-mode .dashboard-mobile-back:hover,
-:root[data-theme='dark'] .dashboard-top-info-link:hover,
-body.dark-mode .dashboard-top-info-link:hover {
+body.dark-mode .dashboard-mobile-back:hover {
     color: var(--dm-accent, #60a5fa);
 }
 
 :root[data-theme='dark'] .dashboard-mobile-back:hover .lucide,
-body.dark-mode .dashboard-mobile-back:hover .lucide,
-:root[data-theme='dark'] .dashboard-top-info-link:hover .lucide,
-body.dark-mode .dashboard-top-info-link:hover .lucide {
+body.dark-mode .dashboard-mobile-back:hover .lucide {
     color: var(--dm-accent, #60a5fa);
 }
 
@@ -1981,136 +1977,6 @@ body.dark-mode .dashboard-top-info-link:hover .lucide {
 :root[data-theme='dark'] .dashboard-version-badge,
 body.dark-mode .dashboard-version-badge {
     color: var(--dm-text-muted, #9ca3af);
-}
-
-/* ============================================
-   Top info bar (user / workspace / version)
-   ============================================ */
-
-.dashboard-top-info {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 32px;
-    padding: 12px 16px;
-    border-bottom: 1px solid #e5e7eb;
-    flex-shrink: 0;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.dashboard-top-info-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 15px;
-    color: var(--pz-text-muted);
-    white-space: nowrap;
-    max-width: 220px;
-    overflow: hidden;
-}
-
-.dashboard-top-info-item .lucide {
-    width: 17px;
-    height: 17px;
-    flex-shrink: 0;
-    color: var(--pz-text-subtle);
-}
-
-.dashboard-top-info-item span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-/* Small chevron after the workspace name: says the name is a control that
-   opens the scope switcher. Sits closer to the name than the icon on the
-   left, and keeps its size when a long name is ellipsised. */
-.dashboard-top-info-item .dashboard-top-info-chevron {
-    width: 13px;
-    height: 13px;
-    margin-left: -3px;
-}
-
-.dashboard-workspace-trigger,
-.dashboard-user-trigger {
-    background: none;
-    border: none;
-    font-family: inherit;
-    cursor: pointer;
-    padding: 0;
-    transition: color 0.15s ease;
-}
-
-.dashboard-top-info-link {
-    text-decoration: none;
-    cursor: pointer;
-    transition: color 0.15s ease;
-}
-
-.dashboard-workspace-trigger:hover,
-.dashboard-user-trigger:hover,
-.dashboard-top-info-link:hover {
-    color: var(--pz-accent);
-}
-
-.dashboard-workspace-trigger:hover .lucide,
-.dashboard-user-trigger:hover .lucide,
-.dashboard-top-info-link:hover .lucide {
-    color: var(--pz-accent);
-}
-
-/* Scroll the top info bar horizontally instead of truncating its items,
-   matching the icon bar below it */
-@media (max-width: 800px) {
-    .dashboard-top-info {
-        /* "safe" centres while the items fit and falls back to flex-start once
-           they overflow, so the first one stays reachable when scrolling. */
-        justify-content: safe center;
-        flex-wrap: nowrap;
-        gap: 20px;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-    }
-
-    .dashboard-top-info::-webkit-scrollbar {
-        display: none;
-    }
-
-    .dashboard-top-info-item {
-        flex: 0 0 auto;
-    }
-}
-
-/* Dark mode */
-:root[data-theme='dark'] .dashboard-workspace-trigger:hover,
-body.dark-mode .dashboard-workspace-trigger:hover,
-:root[data-theme='dark'] .dashboard-user-trigger:hover,
-body.dark-mode .dashboard-user-trigger:hover {
-    color: var(--dm-accent, #60a5fa);
-}
-
-:root[data-theme='dark'] .dashboard-workspace-trigger:hover .lucide,
-body.dark-mode .dashboard-workspace-trigger:hover .lucide,
-:root[data-theme='dark'] .dashboard-user-trigger:hover .lucide,
-body.dark-mode .dashboard-user-trigger:hover .lucide {
-    color: var(--dm-accent, #60a5fa);
-}
-
-:root[data-theme='dark'] .dashboard-top-info,
-body.dark-mode .dashboard-top-info {
-    border-bottom-color: var(--dm-border, #2d2d44);
-}
-
-:root[data-theme='dark'] .dashboard-top-info-item,
-body.dark-mode .dashboard-top-info-item {
-    color: var(--dm-text-muted, #9ca3af);
-}
-
-:root[data-theme='dark'] .dashboard-top-info-item .lucide,
-body.dark-mode .dashboard-top-info-item .lucide {
-    color: var(--dm-text-muted, #6b7280);
 }
 
 :root[data-theme='dark'] .dashboard-mobile-back:hover,

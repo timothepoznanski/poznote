@@ -661,7 +661,6 @@
       "locked_by_tenant_isolation": "Hidden automatically while this capability is blocked by Tenant isolation",
       "toolbar_hint": "Formatting buttons (bold, lists, code…) only appear while text is selected in a note. Other actions are grouped in the ⋮ menu.",
       "reminder_bell": "Bell icon (reminder)",
-      "dashboard_user": "User",
       "dashboard_filter_bar": "Filter bar",
       "view_layout_toggle": "View toggle (grid / list, card size)",
       "index_search_bar": "Search bar",
@@ -3533,6 +3532,7 @@
     "scope": {
       "title": "Scope",
       "hint": "Pick the workspaces to show. A tag selects every workspace carrying it.",
+      "menu_item": "Several workspaces...",
       "all": "All workspaces",
       "by_tag": "By tag",
       "workspaces": "Workspaces",

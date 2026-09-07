@@ -1176,7 +1176,6 @@
       "locked_by_tenant_isolation": "Oculto automáticamente mientras esta capacidad esté bloqueada por el aislamiento de cuentas",
       "toolbar_hint": "Los botones de formato (negrita, listas, código…) solo aparecen mientras hay texto seleccionado en una nota. Las demás acciones están agrupadas en el menú ⋮.",
       "reminder_bell": "Icono de campana (recordatorio)",
-      "dashboard_user": "Usuario",
       "dashboard_filter_bar": "Barra de filtro",
       "view_layout_toggle": "Alternar vista (cuadrícula / lista, tamaño de tarjetas)",
       "index_search_bar": "Barra de búsqueda",
@@ -3813,6 +3812,7 @@
     "scope": {
       "title": "Ámbito",
       "hint": "Elige los espacios de trabajo que quieres ver. Una etiqueta selecciona todos los que la llevan.",
+      "menu_item": "Varios espacios de trabajo...",
       "all": "Todos los espacios de trabajo",
       "by_tag": "Por etiqueta",
       "workspaces": "Espacios de trabajo",

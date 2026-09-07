@@ -1176,7 +1176,6 @@
       "locked_by_tenant_isolation": "该功能已被租户隔离阻止，因此自动隐藏",
       "toolbar_hint": "格式按钮（加粗、列表、代码等）仅在笔记中选中文本时显示。其他操作在 ⋮ 菜单中。",
       "reminder_bell": "铃铛图标（提醒）",
-      "dashboard_user": "用户",
       "dashboard_filter_bar": "筛选栏",
       "view_layout_toggle": "视图切换（网格 / 列表、卡片大小）",
       "index_search_bar": "搜索栏",
@@ -3934,6 +3933,7 @@
     "scope": {
       "title": "范围",
       "hint": "选择要显示的工作区。点击标签会选中所有带该标签的工作区。",
+      "menu_item": "多个工作区...",
       "all": "全部工作区",
       "by_tag": "按标签",
       "workspaces": "工作区",
