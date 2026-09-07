@@ -277,7 +277,37 @@
         }
     }
 
+    // ========== Desktop layout (section list + rows) ==========
+
+    // settings.php on a wide screen shows one section at a time, picked from
+    // the list on the left (css/settings.css, .settings-with-nav). Narrow
+    // screens keep the stacked, collapsible sections; the breakpoint matches
+    // the stylesheet.
+    var settingsNavMedia = window.matchMedia ? window.matchMedia('(min-width: 801px)') : null;
+
+    function isSettingsNavLayout() {
+        return !!(settingsNavMedia && settingsNavMedia.matches
+            && document.querySelector('.home-container.settings-with-nav'));
+    }
+
     // ========== Toggle Cards ==========
+
+    // A card that flips a boolean setting on click: the desktop rows draw its
+    // badge as a switch (.settings-toggle-card in css/settings.css), and the
+    // card gets the matching switch semantics and keyboard handling.
+    function markToggleCard(card) {
+        if (!card) return;
+        card.classList.add('settings-toggle-card');
+        card.setAttribute('role', 'switch');
+        if (!card.hasAttribute('tabindex')) card.setAttribute('tabindex', '0');
+        card.addEventListener('keydown', function (e) {
+            if (e.target !== card) return;
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                card.click();
+            }
+        });
+    }
 
     // Helper function to determine if a setting is enabled
     function isSettingEnabled(value, invertLogic, defaultValue) {
@@ -306,6 +336,7 @@
                     status.textContent = enabled ? txt.enabled : txt.disabled;
                     status.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled');
                 }
+                if (card) card.setAttribute('aria-checked', enabled ? 'true' : 'false');
 
                 // Special handling for folder actions visibility
                 if (cardId === 'folder-actions-card') {
@@ -315,6 +346,7 @@
         }
 
         if (card) {
+            markToggleCard(card);
             card.addEventListener('click', function () {
                 getSetting(settingKey, function (currentValue) {
                     var currently = isSettingEnabled(currentValue, invertLogic, defaultValue);
@@ -1137,6 +1169,8 @@
             var enabled = value === '1' || value === 'true';
             badge.textContent = enabled ? txt.enabled : txt.disabled;
             badge.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled');
+            var card = document.getElementById('git-sync-enabled-card');
+            if (card) card.setAttribute('aria-checked', enabled ? 'true' : 'false');
         });
     }
 
@@ -2032,6 +2066,7 @@
         // Git sync global toggle
         var gitSyncEnabledCard = document.getElementById('git-sync-enabled-card');
         if (gitSyncEnabledCard) {
+            markToggleCard(gitSyncEnabledCard);
             gitSyncEnabledCard.addEventListener('click', function () {
                 getSetting('git_sync_enabled', function (currentValue) {
                     var currently = currentValue === '1' || currentValue === 'true';
@@ -2742,7 +2777,9 @@
             noResults.style.color = '#6b7280';
             noResults.innerHTML = '<i class="lucide lucide-search" style="font-size: 24px; display: block; margin-bottom: 10px; opacity: 0.5;"></i>'
                 + tr('public.no_filter_results', {}, 'No results found.');
-            grid.appendChild(noResults);
+            // Outside the grids: a grid with no match is hidden along with
+            // its title, which would take the message down with it.
+            (document.querySelector('.settings-content') || grid).appendChild(noResults);
 
             var searchWrapper = searchInput.closest('.home-search-wrapper');
             var searchClearBtn = document.getElementById('home-search-clear');
@@ -3131,8 +3168,14 @@
                 applySectionState(title.classList.contains('section-collapsed'));
             });
 
-            // The button's click bubbles up here, so one listener covers both
+            // The button's click bubbles up here, so one listener covers both.
+            // The desktop layout shows one section at a time: nothing to
+            // collapse, and the saved state must not change under it. Its
+            // "All" entry lists every section and collapses like this layout.
             title.addEventListener('click', function () {
+                var container = title.closest('.home-container');
+                var showAll = !!(container && container.classList.contains('settings-show-all'));
+                if (isSettingsNavLayout() && !showAll) return;
                 applySectionState(!title.classList.contains('section-collapsed'));
                 persistSectionStates();
             });
@@ -3193,6 +3236,168 @@
                 } catch (e) { /* storage unavailable */ }
                 applyViewLayout();
             });
+        }
+
+        // Desktop layout: the section list on the left, one section shown at
+        // a time with its cards as rows (css/settings.css, .settings-with-nav).
+        // The items come from the category titles, so they follow the
+        // server-side translation and the admin-only sections. Narrow screens
+        // hide the list and keep the stacked sections above.
+        var settingsNav = document.getElementById('settings-nav');
+        if (settingsNav && homeContainer && homeContainer.classList.contains('settings-with-nav')) {
+            var NAV_STATE_KEY = 'settingsActiveSection';
+            var navStore = window.__poznoteUserStorage || window.localStorage;
+            var NAV_ICONS = {
+                'settings-pinned-section-grid': 'lucide-pin',
+                'settings-recent-section-grid': 'lucide-history',
+                'all': 'lucide-layout-list',
+                'settings-actions-section-grid': 'lucide-zap',
+                'settings-display-section-grid': 'lucide-monitor',
+                'settings-behavior-section-grid': 'lucide-settings-2',
+                'admin-tools-grid': 'lucide-wrench',
+                'settings-documentation-section-grid': 'lucide-info'
+            };
+            // "All" is a virtual entry with no section of its own: it shows
+            // every section at once (.settings-show-all on the container).
+            var ALL_KEY = 'all';
+            var navSections = []; // { key, title, grid, item }; title/grid null for "All"
+            var activeSectionKey = null;
+
+            var findSection = function (key) {
+                for (var i = 0; i < navSections.length; i++) {
+                    if (navSections[i].key === key) return navSections[i];
+                }
+                return null;
+            };
+
+            // A section is listed while it has something to show: "Pinned"
+            // and "Recent" carry the hidden attribute while empty, and
+            // ui-customization.js sets an inline display:none on a section
+            // whose cards are all hidden.
+            var isSectionAvailable = function (section) {
+                if (!section.title) return true;
+                return !section.title.hidden && section.title.style.display !== 'none';
+            };
+
+            var applyActiveSection = function () {
+                homeContainer.classList.toggle('settings-show-all', activeSectionKey === ALL_KEY);
+                navSections.forEach(function (section) {
+                    var active = section.key === activeSectionKey;
+                    if (section.title) section.title.classList.toggle('settings-section-active', active);
+                    if (section.grid) section.grid.classList.toggle('settings-section-active', active);
+                    section.item.classList.toggle('is-active', active);
+                    section.item.setAttribute('aria-current', active ? 'true' : 'false');
+                    section.item.hidden = !isSectionAvailable(section);
+                });
+            };
+
+            var activateSection = function (key, persist) {
+                var section = findSection(key);
+                if (!section || !isSectionAvailable(section)) return false;
+                activeSectionKey = key;
+                applyActiveSection();
+                if (persist) {
+                    try { navStore.setItem(NAV_STATE_KEY, key); } catch (e) { /* storage unavailable */ }
+                }
+                return true;
+            };
+
+            // Sections come and go (pins added or removed, cards hidden through
+            // UI Customization): their items follow, and the selection falls
+            // back to the first listed section when its own is gone. Left
+            // alone while a filter term is active: the filter hides the titles
+            // without matches, which is not the sections vanishing.
+            var refreshNav = function () {
+                if (homeContainer.classList.contains('settings-filtering')) return;
+                var current = findSection(activeSectionKey);
+                if (!current || !isSectionAvailable(current)) {
+                    var fallback = null;
+                    for (var i = 0; i < navSections.length && !fallback; i++) {
+                        if (isSectionAvailable(navSections[i])) fallback = navSections[i];
+                    }
+                    activeSectionKey = fallback ? fallback.key : null;
+                }
+                applyActiveSection();
+            };
+
+            var buildNavItem = function (key, labelText) {
+                var item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'settings-nav-item';
+                item.setAttribute('data-section', key);
+                var icon = document.createElement('i');
+                icon.className = 'lucide ' + (NAV_ICONS[key] || 'lucide-settings');
+                var label = document.createElement('span');
+                label.className = 'settings-nav-label';
+                label.textContent = labelText;
+                item.appendChild(icon);
+                item.appendChild(label);
+                item.addEventListener('click', function () {
+                    // Picking a section replaces the filter: its rows are
+                    // what was asked for.
+                    if (searchInput && searchInput.value !== '') {
+                        searchInput.value = '';
+                        searchInput.dispatchEvent(new Event('input'));
+                    }
+                    activateSection(key, true);
+                });
+                return item;
+            };
+
+            document.querySelectorAll('.settings-category-title').forEach(function (title) {
+                var grid = title.nextElementSibling;
+                if (!grid || !grid.classList.contains('home-grid')) return;
+                var key = grid.id || title.id;
+                if (!key) return;
+                // The chevron button appended above holds no text
+                var item = buildNavItem(key, (title.textContent || '').trim());
+                settingsNav.appendChild(item);
+                navSections.push({ key: key, title: title, grid: grid, item: item });
+            });
+
+            // "All" goes right under "Recent" (its title is always in the
+            // DOM, hidden or not), ahead of the real sections.
+            var allItem = buildNavItem(ALL_KEY, settingsNav.getAttribute('data-label-all') || 'All');
+            var recentSection = findSection('settings-recent-section-grid');
+            var allAnchor = recentSection ? recentSection.item.nextSibling : settingsNav.firstChild;
+            settingsNav.insertBefore(allItem, allAnchor);
+            navSections.splice(recentSection ? navSections.indexOf(recentSection) + 1 : 0, 0,
+                { key: ALL_KEY, title: null, grid: null, item: allItem });
+
+            // Initial section: the rail's About deep link, then a #hash naming
+            // a section (title or grid id), then the saved choice, then the
+            // first listed section.
+            var initialKey = null;
+            if (new URLSearchParams(window.location.search || '').get('open') === 'about') {
+                initialKey = 'settings-documentation-section-grid';
+            }
+            if (!initialKey && window.location.hash) {
+                var hashId = decodeURIComponent(window.location.hash.slice(1));
+                navSections.forEach(function (section) {
+                    if (section.key === hashId) initialKey = section.key;
+                    else if (section.grid && section.grid.id === hashId) initialKey = section.key;
+                    else if (section.title && section.title.id === hashId) initialKey = section.key;
+                });
+            }
+            if (!initialKey) {
+                try { initialKey = navStore.getItem(NAV_STATE_KEY); } catch (e) { /* storage unavailable */ }
+            }
+            if (!initialKey || !activateSection(initialKey, false)) refreshNav();
+
+            if (typeof MutationObserver !== 'undefined') {
+                var navObserver = new MutationObserver(refreshNav);
+                navSections.forEach(function (section) {
+                    if (!section.title) return;
+                    navObserver.observe(section.title, { attributes: true, attributeFilter: ['hidden', 'style'] });
+                });
+            }
+            // Runs after the filter's own input listener: once the term is
+            // cleared the titles are back, and the list can settle again.
+            if (searchInput) {
+                searchInput.addEventListener('input', function () {
+                    if (searchInput.value.trim() === '') refreshNav();
+                });
+            }
         }
 
         // Re-translate badges when i18n is loaded
@@ -3859,56 +4064,126 @@
 
     // ========== Icon Sidebar Order ==========
     // The rows are rendered server-side by modals.php from the very list
-    // icon_sidebar.php used for the rail, so this only has to reorder them.
-    // The rail itself is rendered in PHP, hence the reload after saving.
+    // icon_sidebar.php used for the rail, separators included, so this only
+    // has to reorder them. The rail itself is rendered in PHP, hence the
+    // reload after saving.
+
+    // Same token as POZNOTE_ICON_SIDEBAR_DIVIDER in functions.php: the
+    // data-entry-id of a separator row, repeated in the saved order for each
+    // line the user placed.
+    var ICON_SIDEBAR_DIVIDER = 'divider';
 
     function getIconSidebarOrderList() {
         return document.getElementById('iconSidebarOrderList');
+    }
+
+    function isIconSidebarDividerRow(row) {
+        return row.getAttribute('data-entry-id') === ICON_SIDEBAR_DIVIDER;
+    }
+
+    // A separator before the first entry, after the last, or right after
+    // another one draws nothing, and the rail drops them
+    // (poznoteTidyIconSidebarDividers()); do the same so the list shows what
+    // the rail will.
+    function tidyIconSidebarOrder(order) {
+        var tidy = [];
+        order.forEach(function (id) {
+            if (id !== ICON_SIDEBAR_DIVIDER) {
+                tidy.push(id);
+            } else if (tidy.length && tidy[tidy.length - 1] !== ICON_SIDEBAR_DIVIDER) {
+                tidy.push(id);
+            }
+        });
+        if (tidy.length && tidy[tidy.length - 1] === ICON_SIDEBAR_DIVIDER) {
+            tidy.pop();
+        }
+        return tidy;
     }
 
     function getIconSidebarOrderIds() {
         var list = getIconSidebarOrderList();
         if (!list) return [];
 
-        return Array.prototype.map.call(list.querySelectorAll('.icon-sidebar-order-item'), function (row) {
+        return tidyIconSidebarOrder(Array.prototype.map.call(list.querySelectorAll('.icon-sidebar-order-item'), function (row) {
             return row.getAttribute('data-entry-id');
         }).filter(function (id) {
             return !!id;
-        });
+        }));
+    }
+
+    function createIconSidebarDividerRow() {
+        var template = document.getElementById('iconSidebarOrderDividerTemplate');
+        if (!template || !template.content) return null;
+        var row = template.content.firstElementChild;
+        return row ? row.cloneNode(true) : null;
     }
 
     // The saved order can name entries this page does not render (the git
-    // buttons only exist on index.php) and can miss ones it does. Sort what is
-    // present by its saved rank and leave the rest in declared order after it,
-    // matching poznoteApplyIconSidebarOrder() in functions.php.
+    // buttons only exist on index.php) and can miss ones it does. Walk the
+    // saved order, placing each entry it names and a separator row for each
+    // divider token, then leave the rest in declared order after it, matching
+    // poznoteApplyIconSidebarOrder() in functions.php. With no saved order the
+    // server-rendered list already shows the declared layout, so it is kept.
     function applyIconSidebarOrderToList(order) {
         var list = getIconSidebarOrderList();
         if (!list) return;
 
+        order = tidyIconSidebarOrder(order);
+        if (!order.length) {
+            syncIconSidebarOrderMoveButtons();
+            return;
+        }
+
         var rows = Array.prototype.slice.call(list.querySelectorAll('.icon-sidebar-order-item'));
-        var rank = {};
-        order.forEach(function (id, index) {
-            if (!(id in rank)) rank[id] = index;
-        });
-
-        rows.forEach(function (row, index) {
-            row.dataset.declaredIndex = String(index);
-        });
-
-        rows.sort(function (a, b) {
-            var ra = rank[a.getAttribute('data-entry-id')];
-            var rb = rank[b.getAttribute('data-entry-id')];
-            var ka = ra === undefined ? Infinity : ra;
-            var kb = rb === undefined ? Infinity : rb;
-            if (ka !== kb) return ka - kb;
-            return Number(a.dataset.declaredIndex) - Number(b.dataset.declaredIndex);
-        });
-
+        var byId = {};
+        var spareDividers = [];
         rows.forEach(function (row) {
+            if (isIconSidebarDividerRow(row)) {
+                spareDividers.push(row);
+            } else if (!(row.getAttribute('data-entry-id') in byId)) {
+                byId[row.getAttribute('data-entry-id')] = row;
+            }
+        });
+
+        var placed = {};
+        var ordered = [];
+        order.forEach(function (id) {
+            if (id === ICON_SIDEBAR_DIVIDER) {
+                var divider = spareDividers.shift() || createIconSidebarDividerRow();
+                if (divider) ordered.push(divider);
+            } else if (byId[id] && !placed[id]) {
+                placed[id] = true;
+                ordered.push(byId[id]);
+            }
+        });
+        rows.forEach(function (row) {
+            if (!isIconSidebarDividerRow(row) && !placed[row.getAttribute('data-entry-id')]) {
+                ordered.push(row);
+            }
+        });
+
+        // Separator rows the saved order has no place for go away; the rest
+        // are re-appended in order.
+        spareDividers.forEach(function (row) {
+            row.remove();
+        });
+        ordered.forEach(function (row) {
             list.appendChild(row);
         });
 
         syncIconSidebarOrderMoveButtons();
+    }
+
+    // A new separator lands at the bottom, ready to be dragged (or moved up)
+    // to where the line should go.
+    function addIconSidebarDividerRow() {
+        var list = getIconSidebarOrderList();
+        var row = createIconSidebarDividerRow();
+        if (!list || !row) return;
+
+        list.appendChild(row);
+        syncIconSidebarOrderMoveButtons();
+        try { row.scrollIntoView({ block: 'nearest' }); } catch (e) { }
     }
 
     // The first row cannot move up and the last cannot move down; disabling
@@ -4019,8 +4294,19 @@
             list.addEventListener('click', function (event) {
                 var button = event.target.closest('.icon-sidebar-order-move');
                 if (!button || button.disabled) return;
-                moveIconSidebarOrderRow(button.closest('.icon-sidebar-order-item'), button.getAttribute('data-move'));
+                var row = button.closest('.icon-sidebar-order-item');
+                if (button.hasAttribute('data-remove-divider')) {
+                    if (row) row.remove();
+                    syncIconSidebarOrderMoveButtons();
+                    return;
+                }
+                moveIconSidebarOrderRow(row, button.getAttribute('data-move'));
             });
+        }
+
+        var addDividerBtn = document.getElementById('addIconSidebarDividerBtn');
+        if (addDividerBtn) {
+            addDividerBtn.addEventListener('click', addIconSidebarDividerRow);
         }
 
         var saveBtn = document.getElementById('saveIconSidebarOrderBtn');

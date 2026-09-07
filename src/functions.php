@@ -1655,13 +1655,26 @@ function poznoteGetHiddenUiElements() {
 }
 
 /**
+ * Token a saved icon rail order uses for a separator line between two entries.
+ * It can appear any number of times, unlike the button ids around it. Never a
+ * button id itself: those all end in "Btn".
+ */
+const POZNOTE_ICON_SIDEBAR_DIVIDER = 'divider';
+
+/**
  * User-chosen order of the icon rail's navigation entries, as a list of the
- * button ids declared in icon_sidebar.php.
+ * button ids declared in icon_sidebar.php, with POZNOTE_ICON_SIDEBAR_DIVIDER
+ * wherever the user placed a separator line.
  *
  * Stored under the 'icon_sidebar_order' user setting by the Icon Sidebar Order
  * card in settings.php. Only the scrolling navigation group is reorderable:
  * the account group at the bottom of the rail (Profile, Settings, About,
  * Logout) is fixed, so a user cannot bury the way back into settings.
+ *
+ * An empty list means "no preference": icon_sidebar.php then uses its declared
+ * order and draws a separator at each change of group. A saved order carries
+ * its own separators instead, so a user who arranged the entries their way is
+ * not second-guessed by group lines falling between every other button.
  */
 function poznoteGetIconSidebarOrder() {
     static $order = null;
@@ -1675,10 +1688,16 @@ function poznoteGetIconSidebarOrder() {
     if (is_array($decoded)) {
         $seen = [];
         foreach ($decoded as $id) {
-            if (!is_string($id) || $id === '' || isset($seen[$id])) {
+            if (!is_string($id) || $id === '') {
                 continue;
             }
-            $seen[$id] = true;
+            // Separators repeat by nature; only the button ids are deduped.
+            if ($id !== POZNOTE_ICON_SIDEBAR_DIVIDER) {
+                if (isset($seen[$id])) {
+                    continue;
+                }
+                $seen[$id] = true;
+            }
             $order[] = $id;
         }
     }
@@ -1692,6 +1711,10 @@ function poznoteGetIconSidebarOrder() {
  * Ids the preference does not mention keep their declared position relative to
  * one another and follow the ordered ones, so an entry added by a later release
  * appears at the end rather than vanishing, and a stale id is simply ignored.
+ * Each POZNOTE_ICON_SIDEBAR_DIVIDER in the order becomes a ['divider' => true]
+ * item at that position; divider items already in $items are dropped, so the
+ * saved order is the only source of separators once one is applied (and the
+ * function can safely run twice over the same list).
  */
 function poznoteApplyIconSidebarOrder(array $items, array $order) {
     if (!$order) {
@@ -1708,6 +1731,10 @@ function poznoteApplyIconSidebarOrder(array $items, array $order) {
     $ordered = [];
     $placed = [];
     foreach ($order as $id) {
+        if ($id === POZNOTE_ICON_SIDEBAR_DIVIDER) {
+            $ordered[] = ['divider' => true];
+            continue;
+        }
         if (isset($byId[$id]) && !isset($placed[$id])) {
             $placed[$id] = true;
             $ordered[] = $byId[$id];
@@ -1715,12 +1742,38 @@ function poznoteApplyIconSidebarOrder(array $items, array $order) {
     }
 
     foreach ($items as $item) {
+        if (!empty($item['divider'])) {
+            continue;
+        }
         if (!isset($item['id']) || !isset($placed[$item['id']])) {
             $ordered[] = $item;
         }
     }
 
     return $ordered;
+}
+
+/**
+ * Drop the separators that would draw nothing useful: one before the first
+ * entry, one after the last, or two in a row. Entries the UI Customization
+ * modal hides are still in the list here (they are hidden by CSS), so
+ * js/icon-sidebar-toggle.js repeats this on the rendered rail.
+ */
+function poznoteTidyIconSidebarDividers(array $items) {
+    $tidy = [];
+    foreach ($items as $item) {
+        if (empty($item['divider'])) {
+            $tidy[] = $item;
+            continue;
+        }
+        if ($tidy && empty($tidy[count($tidy) - 1]['divider'])) {
+            $tidy[] = $item;
+        }
+    }
+    if ($tidy && !empty($tidy[count($tidy) - 1]['divider'])) {
+        array_pop($tidy);
+    }
+    return $tidy;
 }
 
 function poznoteBuildUiCustomizationRules(array $hiddenKeys) {

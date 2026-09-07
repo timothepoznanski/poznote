@@ -331,7 +331,7 @@ if ($canUseUserWebhooks) {
       data-txt-error="<?php echo t_h('common.error'); ?>"
     data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php $iconSidebarWorkspace = $pageWorkspace; include 'icon_sidebar.php'; ?>
-    <div class="home-container">
+    <div class="home-container settings-with-nav">
 
         <h1 class="poznote-page-title">
             <i class="lucide lucide-settings"></i> <?php echo t_h('settings.title', [], 'Settings'); ?>
@@ -353,6 +353,15 @@ if ($canUseUserWebhooks) {
                 </button>
             </div>
         </div>
+
+        <!-- Desktop layout (css/settings.css, .settings-with-nav): the section
+             list on the left is filled by settings-page.js from the category
+             titles below, and only the selected section shows, its cards as
+             rows. Narrow screens hide the list and stack the sections. -->
+        <div class="settings-layout">
+        <nav id="settings-nav" class="settings-nav" aria-label="<?php echo t_h('settings.title', [], 'Settings'); ?>"
+             data-label-all="<?php echo t_h('settings.categories.all', [], 'All'); ?>"></nav>
+        <div class="settings-content">
 
         <!-- PINNED CARDS (filled by settings-page.js from the per-user pin list) -->
         <h2 class="settings-category-title" id="settings-pinned-section-title" hidden><?php echo t_h('settings.categories.pinned', [], 'Pinned'); ?></h2>
@@ -1288,6 +1297,9 @@ if ($canUseUserWebhooks) {
             </a>
 
         </div>
+
+        </div><!-- /.settings-content -->
+        </div><!-- /.settings-layout -->
 
     </div>
 

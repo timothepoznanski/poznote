@@ -8,7 +8,9 @@
  * settings.php).
  *
  * Every page gets the same navigation entries, so this file is the single
- * place to add or reorder one.
+ * place to add or reorder one. Each entry names a 'group'; a separator line is
+ * drawn where the group changes, so the rail reads as a few short blocks
+ * rather than one long column of icons (see $iconSidebarItems below).
  *
  * Optional variables the caller may set before including this file:
  *   $iconSidebarWorkspace  workspace to carry in the links; defaults to
@@ -32,7 +34,10 @@
  *                          right below that navigation entry instead of at the
  *                          end of the rail (index.php and dashboard.php use it
  *                          for the AI assistant, pinned under Dashboard). A
- *                          pinned entry is not part of the rail's custom ordering.
+ *                          pinned entry is not part of the rail's custom ordering
+ *                          and joins the group of the entry it sits under. Any
+ *                          other extra may set 'group'; it defaults to 'extras',
+ *                          a block of its own at the end of the rail.
  *
  * Requires: css/icon-sidebar.css in <head> (plus css/icon-sidebar-page.css on
  *           the secondary pages, which pin the rail instead of laying it out
@@ -69,22 +74,24 @@ $iconSidebarCurrentPage = $iconSidebarBasePath === '' ? basename($iconSidebarScr
 // over to the About button to keep the rail matching the cleaned URL.
 $iconSidebarIsAboutView = $iconSidebarCurrentPage === 'settings.php' && (($_GET['open'] ?? '') === 'about');
 
+// Four groups, top to bottom: the entry points into the app (Home, Dashboard,
+// Graph), the views that hold the content itself (Notes, Tasks, Folders,
+// Diary), the collections derived from that content (Tags, Shares,
+// Attachments), and the Trash on its own. A separator is drawn between two
+// consecutive entries of different groups. Favorites has no entry: it is a
+// dashboard filter, reached from the notes list's system folder.
 $iconSidebarItems = [
-    ['id' => 'iconSidebarHomeBtn', 'url' => $iconSidebarUrl('index.php'), 'page' => 'index.php', 'icon' => 'lucide-home', 'label' => t('common.home', [], 'Home')],
-    ['id' => 'iconSidebarDashboardBtn', 'url' => $iconSidebarUrl('dashboard.php'), 'page' => 'dashboard.php', 'icon' => 'lucide-layout-dashboard', 'label' => t('common.back_to_home', [], 'Dashboard')],
-    ['id' => 'iconSidebarNotesBtn', 'url' => $iconSidebarUrl('notes_manager.php'), 'page' => 'notes_manager.php', 'icon' => 'lucide-sticky-note', 'label' => t('common.notes', [], 'Notes')],
-    // Favorites is dashboard.php with a filter, not a page of its own, so it is
-    // flagged active by the query string rather than by 'page' (which would
-    // otherwise light up on every dashboard visit).
-    ['id' => 'iconSidebarFavoritesBtn', 'url' => $iconSidebarUrl('dashboard.php', ['favorites' => '1']), 'icon' => 'lucide-star', 'label' => t('notes_list.system_folders.favorites', [], 'Favorites'), 'activeFavorite' => $iconSidebarCurrentPage === 'dashboard.php' && (($_GET['favorites'] ?? '') === '1')],
-    ['id' => 'iconSidebarTagsBtn', 'url' => $iconSidebarUrl('list_tags.php'), 'page' => 'list_tags.php', 'icon' => 'lucide-tags', 'label' => t('notes_list.system_folders.tags', [], 'Tags')],
-    ['id' => 'iconSidebarFoldersBtn', 'url' => $iconSidebarUrl('list_folders.php'), 'page' => 'list_folders.php', 'icon' => 'lucide-folder-open', 'label' => t('home.folders', [], 'Folders')],
-    ['id' => 'iconSidebarSharesBtn', 'url' => $iconSidebarUrl('shared.php'), 'page' => 'shared.php', 'icon' => 'lucide-share-2', 'label' => t('home.shares', [], 'Shares')],
-    ['id' => 'iconSidebarAttachmentsBtn', 'url' => $iconSidebarUrl('attachments_list.php'), 'page' => 'attachments_list.php', 'icon' => 'lucide-paperclip', 'label' => t('notes_list.system_folders.attachments', [], 'Attachments')],
-    ['id' => 'iconSidebarTrashBtn', 'url' => $iconSidebarUrl('trash.php'), 'page' => 'trash.php', 'icon' => 'lucide-trash-2', 'label' => t('notes_list.system_folders.trash', [], 'Trash')],
-    ['id' => 'iconSidebarDiaryBtn', 'url' => $iconSidebarUrl('diary.php'), 'page' => 'diary.php', 'icon' => 'lucide-book-open', 'label' => t('diary.title', [], 'Diary')],
-    ['id' => 'iconSidebarTasksBtn', 'url' => $iconSidebarUrl('tasks.php'), 'page' => 'tasks.php', 'icon' => 'lucide-list-todo', 'label' => t('tasks_page.title', [], 'Tasks')],
-    ['id' => 'iconSidebarGraphBtn', 'url' => $iconSidebarUrl('graph.php'), 'page' => 'graph.php', 'icon' => 'lucide-network', 'label' => t('home.graph', [], 'Graph')],
+    ['id' => 'iconSidebarHomeBtn', 'group' => 'home', 'url' => $iconSidebarUrl('index.php'), 'page' => 'index.php', 'icon' => 'lucide-home', 'label' => t('common.home', [], 'Home')],
+    ['id' => 'iconSidebarDashboardBtn', 'group' => 'home', 'url' => $iconSidebarUrl('dashboard.php'), 'page' => 'dashboard.php', 'icon' => 'lucide-layout-dashboard', 'label' => t('common.back_to_home', [], 'Dashboard')],
+    ['id' => 'iconSidebarGraphBtn', 'group' => 'home', 'url' => $iconSidebarUrl('graph.php'), 'page' => 'graph.php', 'icon' => 'lucide-network', 'label' => t('home.graph', [], 'Graph')],
+    ['id' => 'iconSidebarNotesBtn', 'group' => 'content', 'url' => $iconSidebarUrl('notes_manager.php'), 'page' => 'notes_manager.php', 'icon' => 'lucide-sticky-note', 'label' => t('common.notes', [], 'Notes')],
+    ['id' => 'iconSidebarTasksBtn', 'group' => 'content', 'url' => $iconSidebarUrl('tasks.php'), 'page' => 'tasks.php', 'icon' => 'lucide-list-todo', 'label' => t('tasks_page.title', [], 'Tasks')],
+    ['id' => 'iconSidebarFoldersBtn', 'group' => 'content', 'url' => $iconSidebarUrl('list_folders.php'), 'page' => 'list_folders.php', 'icon' => 'lucide-folder-open', 'label' => t('home.folders', [], 'Folders')],
+    ['id' => 'iconSidebarDiaryBtn', 'group' => 'content', 'url' => $iconSidebarUrl('diary.php'), 'page' => 'diary.php', 'icon' => 'lucide-book-open', 'label' => t('diary.title', [], 'Diary')],
+    ['id' => 'iconSidebarTagsBtn', 'group' => 'collections', 'url' => $iconSidebarUrl('list_tags.php'), 'page' => 'list_tags.php', 'icon' => 'lucide-tags', 'label' => t('notes_list.system_folders.tags', [], 'Tags')],
+    ['id' => 'iconSidebarSharesBtn', 'group' => 'collections', 'url' => $iconSidebarUrl('shared.php'), 'page' => 'shared.php', 'icon' => 'lucide-share-2', 'label' => t('home.shares', [], 'Shares')],
+    ['id' => 'iconSidebarAttachmentsBtn', 'group' => 'collections', 'url' => $iconSidebarUrl('attachments_list.php'), 'page' => 'attachments_list.php', 'icon' => 'lucide-paperclip', 'label' => t('notes_list.system_folders.attachments', [], 'Attachments')],
+    ['id' => 'iconSidebarTrashBtn', 'group' => 'utility', 'url' => $iconSidebarUrl('trash.php'), 'page' => 'trash.php', 'icon' => 'lucide-trash-2', 'label' => t('notes_list.system_folders.trash', [], 'Trash')],
 ];
 
 // Extras carrying an 'after' are pinned next to a navigation entry and are
@@ -94,6 +101,7 @@ foreach (($iconSidebarExtraItems ?? []) as $iconSidebarExtraItem) {
     if (isset($iconSidebarExtraItem['after'])) {
         $iconSidebarPinnedItems[] = $iconSidebarExtraItem;
     } else {
+        $iconSidebarExtraItem['group'] = $iconSidebarExtraItem['group'] ?? 'extras';
         $iconSidebarItems[] = $iconSidebarExtraItem;
     }
 }
@@ -101,27 +109,55 @@ foreach (($iconSidebarExtraItems ?? []) as $iconSidebarExtraItem) {
 // The Icon Sidebar Order card in settings.php lets the user rearrange these.
 // Applied after the extras are merged so index.php's git buttons can be placed
 // among the navigation entries too. Entries the preference does not mention
-// keep their declared order and follow the ones it does.
-if (function_exists('poznoteApplyIconSidebarOrder')) {
-    $iconSidebarItems = poznoteApplyIconSidebarOrder($iconSidebarItems, poznoteGetIconSidebarOrder());
-}
+// keep their declared order and follow the ones it does. A saved order also
+// carries its own separators (poznoteApplyIconSidebarOrder() turns each one
+// into a ['divider' => true] item); without one, $iconSidebarGroupDividers
+// below draws them from the groups instead.
+$iconSidebarOrder = function_exists('poznoteGetIconSidebarOrder') ? poznoteGetIconSidebarOrder() : [];
+
+// A ['divider' => true] item between two consecutive entries of different
+// groups. Entries with no group at all are left ungrouped: they never get a
+// line on either side of their own.
+$iconSidebarGroupDividers = static function (array $items): array {
+    $grouped = [];
+    $previousGroup = null;
+    foreach ($items as $item) {
+        $group = $item['group'] ?? null;
+        if ($grouped && $group !== null && $previousGroup !== null && $group !== $previousGroup) {
+            $grouped[] = ['divider' => true];
+        }
+        $grouped[] = $item;
+        if ($group !== null) {
+            $previousGroup = $group;
+        }
+    }
+    return $grouped;
+};
 
 // Published for the Icon Sidebar Order modal in modals.php, which settings.php
 // includes long after this file. Taking the list from here rather than
 // restating it means the modal always offers exactly the entries the rail
-// renders, in the order it renders them, whatever a later release adds.
+// renders, in the order it renders them, separators included, whatever a later
+// release adds. Built from the declared list, before the order is applied:
+// the git entries are appended below and the whole list is ordered once, so
+// the saved separators land exactly once.
 $iconSidebarOrderable = array_values(array_map(
     static function (array $item): array {
         return [
             'id' => $item['id'],
             'icon' => $item['icon'],
             'label' => $item['label'],
+            'group' => $item['group'] ?? null,
         ];
     },
     array_filter($iconSidebarItems, static function ($item): bool {
         return is_array($item) && isset($item['id'], $item['icon'], $item['label']);
     })
 ));
+
+if ($iconSidebarOrder && function_exists('poznoteApplyIconSidebarOrder')) {
+    $iconSidebarItems = poznoteApplyIconSidebarOrder($iconSidebarItems, $iconSidebarOrder);
+}
 
 // Push and Pull are rail entries too, but index.php is the only page that adds
 // them (their handlers live there), so the modal, rendered on settings.php,
@@ -143,8 +179,8 @@ if (!isset($GLOBALS['poznoteIconSidebarGitOrderables'])) {
             $iconSidebarGitSync = new GitSync($GLOBALS['con'] ?? null, $_SESSION['user_id'] ?? null);
             if ($iconSidebarGitSync->isConfigured()) {
                 foreach ([
-                    ['id' => 'iconSidebarGitPushBtn', 'icon' => 'lucide-upload', 'label' => 'Push'],
-                    ['id' => 'iconSidebarGitPullBtn', 'icon' => 'lucide-download', 'label' => 'Pull'],
+                    ['id' => 'iconSidebarGitPushBtn', 'icon' => 'lucide-upload', 'label' => 'Push', 'group' => 'extras'],
+                    ['id' => 'iconSidebarGitPullBtn', 'icon' => 'lucide-download', 'label' => 'Pull', 'group' => 'extras'],
                 ] as $iconSidebarGitOrderable) {
                     $iconSidebarGitOrderables[$iconSidebarGitOrderable['id']] = $iconSidebarGitOrderable;
                 }
@@ -162,10 +198,17 @@ foreach ($GLOBALS['poznoteIconSidebarGitOrderables'] as $iconSidebarGitId => $ic
     }
 }
 
-// Re-sort: the entries just appended have to take their saved position rather
+// Sort: the entries just appended have to take their saved position rather
 // than sit at the end, or the modal would misreport where they actually are.
-if (function_exists('poznoteApplyIconSidebarOrder')) {
-    $iconSidebarOrderable = poznoteApplyIconSidebarOrder($iconSidebarOrderable, poznoteGetIconSidebarOrder());
+// The separators come from the same place as the rail's: the saved order when
+// there is one, the groups otherwise.
+if ($iconSidebarOrder && function_exists('poznoteApplyIconSidebarOrder')) {
+    $iconSidebarOrderable = poznoteApplyIconSidebarOrder($iconSidebarOrderable, $iconSidebarOrder);
+} else {
+    $iconSidebarOrderable = $iconSidebarGroupDividers($iconSidebarOrderable);
+}
+if (function_exists('poznoteTidyIconSidebarDividers')) {
+    $iconSidebarOrderable = poznoteTidyIconSidebarDividers($iconSidebarOrderable);
 }
 
 $GLOBALS['poznoteIconSidebarOrderableItems'] = $iconSidebarOrderable;
@@ -182,10 +225,22 @@ foreach ($iconSidebarPinnedItems as $iconSidebarPinnedItem) {
     foreach ($iconSidebarItems as $iconSidebarIndex => $iconSidebarCandidate) {
         if (($iconSidebarCandidate['id'] ?? null) === $iconSidebarPinnedItem['after']) {
             $iconSidebarPosition = $iconSidebarIndex + 1;
+            // Same block as the entry it sits under, so no line comes between.
+            $iconSidebarPinnedItem['group'] = $iconSidebarCandidate['group'] ?? null;
             break;
         }
     }
     array_splice($iconSidebarItems, $iconSidebarPosition, 0, [$iconSidebarPinnedItem]);
+}
+
+// Default layout: a separator wherever the group changes. Runs after the
+// pinned entries are in so the AI assistant, under Dashboard, stays inside
+// that block. A saved order brought its own separators above.
+if (!$iconSidebarOrder) {
+    $iconSidebarItems = $iconSidebarGroupDividers($iconSidebarItems);
+}
+if (function_exists('poznoteTidyIconSidebarDividers')) {
+    $iconSidebarItems = poznoteTidyIconSidebarDividers($iconSidebarItems);
 }
 
 // Account actions, in their own group pinned to the bottom of the rail: only
@@ -205,7 +260,7 @@ $iconSidebarBottomItems = [
     // ?open=about lands on settings.php with the About section expanded and
     // every other section collapsed (js/settings-page.js). It is settings.php
     // with a query flag rather than a page of its own, so the two entries below
-    // split the active state by that flag, the way Favorites does above: About
+    // split the active state by that flag: About
     // lights up on ?open=about, Settings on every other settings.php visit.
     ['id' => 'iconSidebarSettingsBtn', 'url' => $iconSidebarUrl('settings.php'), 'icon' => 'lucide-settings', 'label' => t('sidebar.settings', [], 'Settings'), 'activeFlag' => $iconSidebarCurrentPage === 'settings.php' && !$iconSidebarIsAboutView, 'updateBadge' => function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()],
     ['id' => 'iconSidebarAboutBtn', 'url' => $iconSidebarUrl('settings.php', ['open' => 'about']), 'icon' => 'lucide-info-circle', 'label' => t('settings.categories.documentation', [], 'About'), 'activeFlag' => $iconSidebarIsAboutView],
@@ -271,14 +326,18 @@ try {
 <nav id="icon_sidebar">
     <div class="icon-sidebar-scroll">
     <?php foreach ($iconSidebarItems as $iconSidebarItem): ?>
+    <?php if (!empty($iconSidebarItem['divider'])): ?>
+    <!-- Group separator. js/icon-sidebar-toggle.js hides it when the entries
+         on one side of it are all hidden (UI Customization, git scope). -->
+    <div class="icon-sidebar-divider" role="separator"></div>
+    <?php continue; ?>
+    <?php endif; ?>
     <?php
     $iconSidebarLabel = htmlspecialchars($iconSidebarItem['label'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $iconSidebarIcon = htmlspecialchars($iconSidebarItem['icon'], ENT_QUOTES, 'UTF-8');
     // Only the navigation entries carry a 'page'; the extras never highlight.
     $iconSidebarIsCurrent = isset($iconSidebarItem['page']) && $iconSidebarItem['page'] === $iconSidebarCurrentPage;
-    $iconSidebarClass = 'icon-sidebar-btn'
-        . ($iconSidebarIsCurrent ? ' icon-sidebar-btn-active' : '')
-        . (!empty($iconSidebarItem['activeFavorite']) ? ' icon-sidebar-btn-active-favorite' : '');
+    $iconSidebarClass = 'icon-sidebar-btn' . ($iconSidebarIsCurrent ? ' icon-sidebar-btn-active' : '');
     ?>
     <?php if (isset($iconSidebarItem['gitAction'])): ?>
     <button type="button" id="<?php echo $iconSidebarItem['id']; ?>" class="<?php echo $iconSidebarClass; ?>" data-icon-sidebar-git-action="<?php echo htmlspecialchars($iconSidebarItem['gitAction'], ENT_QUOTES, 'UTF-8'); ?>" title="<?php echo $iconSidebarLabel; ?>" aria-label="<?php echo $iconSidebarLabel; ?>"<?php echo !empty($iconSidebarItem['hidden']) ? ' hidden' : ''; ?>>

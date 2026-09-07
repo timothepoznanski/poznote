@@ -456,7 +456,7 @@
       "note_nav_shortcuts": "Vá para a nota anterior ou seguinte da pasta atual com Alt + ↑/↓.",
       "ctrl_s_save": "Salve imediatamente a nota atual com Ctrl + S (Cmd + S no Mac).",
       "ui_customization": "Oculte os elementos da interface que você não usa.",
-      "icon_sidebar_order": "Alterar a ordem dos botões da barra de ícones.",
+      "icon_sidebar_order": "Altere a ordem dos botões da barra de ícones e coloque separadores entre eles.",
       "users_admin": "Crie, edite e gerencie contas de usuário.",
       "oidc_config": "Configure o login único com um provedor OpenID Connect.",
       "smtp_config": "Configure o servidor SMTP usado para enviar e-mails como lembretes.",
@@ -489,6 +489,7 @@
     "categories": {
       "pinned": "Fixados",
       "recent": "Recentes",
+      "all": "Tudo",
       "actions": "Ações",
       "admin_tools": "Ferramentas de administração",
       "display": "Tela",
@@ -1208,10 +1209,13 @@
     },
     "icon_sidebar_order": {
       "title": "Ordem da barra de ícones",
-      "description": "Arraste as entradas para alterar a ordem dos botões da barra de ícones. Os botões de conta na parte inferior da barra permanecem no lugar.",
+      "description": "Arraste as entradas para alterar a ordem dos botões da barra de ícones. Os separadores desenham uma linha fina entre dois grupos de botões. Os botões de conta na parte inferior da barra permanecem no lugar.",
       "move_up": "Mover para cima",
       "move_down": "Mover para baixo",
-      "reset": "Repor a ordem"
+      "reset": "Repor a ordem",
+      "divider": "Separador",
+      "add_divider": "Adicionar um separador",
+      "remove_divider": "Remover o separador"
     },
     "language": {
       "description": "Selecione seu idioma preferido:"
