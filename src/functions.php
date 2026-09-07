@@ -3818,6 +3818,20 @@ function poznoteRenderPageTitleWorkspace($workspace = null, array $options = [])
         return '<span class="poznote-page-title-workspace poznote-page-title-workspace-static" title="' . $escaped . '">' . $chipLead . $chipName . '</span>';
     }
 
+    // A page can take the whole switch over ('button_action'): the chip then
+    // fires that action straight away instead of opening the menu below. The
+    // dashboard uses it so one click lands on its scope modal, which already
+    // offers a single workspace, several, all of them, or a tag.
+    if (!empty($options['button_action'])) {
+        return '<button type="button" class="poznote-page-title-workspace" id="poznotePageTitleWorkspaceBtn"'
+            . ' data-action="' . $esc($options['button_action']) . '"'
+            . ' title="' . $esc($options['button_title'] ?? t('page_title.switch_workspace', [], 'Switch workspace')) . '"'
+            . ' aria-haspopup="dialog">'
+            . $chipLead . $chipName
+            . '<i class="lucide lucide-chevron-down poznote-page-title-workspace-chevron" aria-hidden="true"></i>'
+            . '</button>';
+    }
+
     $names = [];
     if (isset($con)) {
         try {

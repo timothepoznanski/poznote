@@ -129,7 +129,7 @@ try {
                         <div class="error"><?php echo t_h('public.protection.error_incorrect', [], 'Incorrect password. Please try again.', $currentLang); ?></div>
                     <?php endif; ?>
                     <form method="POST" class="password-form">
-                        <input type="password" name="folder_password" placeholder="<?php echo t_h('public.protection.placeholder', [], 'Enter password', $currentLang); ?>" required autofocus>
+                        <input type="password" name="folder_password" placeholder="<?php echo t_h('public.protection.placeholder', [], 'Enter password', $currentLang); ?>" required autofocus autocomplete="current-password">
                         <button type="submit"><?php echo t_h('public.protection.unlock', [], 'Unlock', $currentLang); ?></button>
                     </form>
                 </div>

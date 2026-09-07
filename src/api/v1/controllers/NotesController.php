@@ -2454,7 +2454,7 @@ class NotesController {
                 // and keep the attachment URLs intact
                 
                 require_once __DIR__ . '/../../../markdown_parser.php';
-                $convertedContent = parseMarkdown($content);
+                $convertedContent = parseMarkdownForRichText($content);
                 $newType = 'note';
                 
                 // Note: Attachments are preserved during conversion
@@ -2548,7 +2548,7 @@ class NotesController {
 
         try {
             require_once __DIR__ . '/../../../markdown_parser.php';
-            $this->sendSuccess(['html' => parseMarkdown($markdown)]);
+            $this->sendSuccess(['html' => parseMarkdownForRichText($markdown)]);
         } catch (Exception $e) {
             error_log('convertMarkdown error: ' . $e->getMessage());
             $this->sendError(500, 'Conversion failed');

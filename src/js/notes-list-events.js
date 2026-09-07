@@ -1012,7 +1012,7 @@
         noteItems.forEach(function (item) {
             // Remove existing spacer after this item
             var next = item.nextElementSibling;
-            if (next && next.id === 'pxbetweennotes') {
+            if (next && next.classList.contains('pxbetweennotes')) {
                 next.remove();
             }
 
@@ -1020,7 +1020,7 @@
 
             // Add spacer between notes
             var spacer = document.createElement('div');
-            spacer.id = 'pxbetweennotes';
+            spacer.className = 'pxbetweennotes';
             fragment.appendChild(spacer);
         });
 

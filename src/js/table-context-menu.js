@@ -276,7 +276,10 @@
             const cell = e.target.closest('td, th');
             if (!cell) return;
 
-            const table = cell.closest('table.inserted-table');
+            // Any table inside the note, not just the ones built by the
+            // toolbar: tables coming from a Markdown conversion, an import or
+            // a paste carry no .inserted-table class and must be editable too
+            const table = cell.closest('table');
             if (!table) return;
 
             // Check that we are in an editable note

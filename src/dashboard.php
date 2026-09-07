@@ -723,15 +723,14 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 
 		<div class="favorites-container dashboard-container">
 			<?php
-			// Same "(workspace)" switch as the other pages, with two dashboard twists:
-			// the links carry scope=single so the choice overrides a remembered
-			// multi-workspace scope (dashboardResolveRememberedScope), and an entry
-			// opens the scope modal for several workspaces or a tag. In a multi scope
-			// the label is the scope's, which matches no workspace, so no entry is
-			// ticked; with no workspace at all it reads "Scope" and still opens.
+			// Same "(workspace)" chip as the other pages, but the dashboard skips the
+			// workspace menu: the scope modal already covers a single workspace,
+			// several, all of them or a tag, so one click opens it directly. The
+			// label is the scope's ("All workspaces", "3 workspaces", a tag), and
+			// with no workspace at all it reads "Scope" and still opens.
 			$dashboardTitleWorkspace = poznoteRenderPageTitleWorkspace(dashboardScopeLabel($dashboardScope, $pageWorkspace), [
-				'query' => ['scope' => 'single'],
-				'items' => [['icon' => 'lucide-layers', 'label' => t('dashboard.scope.menu_item', [], 'Several workspaces...'), 'action' => 'open-workspace-switcher-modal']],
+				'button_action' => 'open-workspace-switcher-modal',
+				'button_title' => t('dashboard.scope.title', [], 'Scope'),
 			]);
 			?>
 			<h1 class="poznote-page-title"><i class="lucide lucide-layout-dashboard"></i> <?php echo t_h('common.back_to_home', [], 'Dashboard'); ?> <?php echo $dashboardTitleWorkspace; ?></h1>

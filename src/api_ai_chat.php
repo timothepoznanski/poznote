@@ -953,7 +953,7 @@ function aiExecuteTool($con, $name, $args, $chatWorkspace) {
             // to HTML" action. A model that sent HTML anyway is taken at its
             // word, parseMarkdown() would only escape its tags.
             if (!aiLooksLikeHtml($content)) {
-                $content = parseMarkdown($content);
+                $content = parseMarkdownForRichText($content);
             }
             $content = sanitizeHtml($content);
             if (strpos($content, AI_INLINE_IMAGE_PREFIX) !== false) {

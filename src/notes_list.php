@@ -188,7 +188,7 @@ function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $f
     echo "</a>";
     echo generateNoteActions($noteDbId, $noteTitle, $noteType, $folderId, $folderName, !empty($row1['favorite']));
     echo "</div>";
-    echo "<div id=pxbetweennotes></div>";
+    echo "<div class='pxbetweennotes'></div>";
 }
 
 // Render favorite folders as shortcut links inside the Favorites section.
@@ -209,7 +209,7 @@ function renderFavoriteFolderItems($favorite_folders, $workspace_filter) {
         echo "<span class='note-title'><i class='$customIcon favorite-folder-icon'$iconStyle></i>" . htmlspecialchars($favName, ENT_QUOTES) . "</span>";
         echo "</a>";
         echo "</div>";
-        echo "<div id=pxbetweennotes></div>";
+        echo "<div class='pxbetweennotes'></div>";
     }
 }
 

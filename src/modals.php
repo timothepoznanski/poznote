@@ -597,7 +597,6 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="moveFolderModal"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" data-action="execute-move-folder-to-subfolder"><?php echo t_h('modals.move_folder.move', [], 'Move Folder'); ?></button>
         </div>
-        <div id="moveFolderErrorMessage" class="modal-error-message"></div>
     </div>
 </div>
 

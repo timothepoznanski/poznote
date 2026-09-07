@@ -499,7 +499,7 @@ try {
                         <div class="info"><?php echo t_h('public.protection.additional_password_required', [], 'This note requires an additional password. Please enter the next password to continue.', $currentLang); ?></div>
                     <?php endif; ?>
                     <form method="POST" class="password-form">
-                        <input type="password" name="note_password" placeholder="<?php echo t_h('public.protection.placeholder', [], 'Enter password', $currentLang); ?>" required autofocus>
+                        <input type="password" name="note_password" placeholder="<?php echo t_h('public.protection.placeholder', [], 'Enter password', $currentLang); ?>" required autofocus autocomplete="current-password">
                         <button type="submit"><?php echo t_h('public.protection.unlock', [], 'Unlock', $currentLang); ?></button>
                     </form>
                 </div>

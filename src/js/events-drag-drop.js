@@ -837,14 +837,14 @@ function moveNoteRowInDom(noteId, targetNoteId, position) {
     if (!parent || parent !== targetRow.parentElement) return false;
 
     var spacer = dragRow.nextElementSibling;
-    if (!spacer || spacer.id !== 'pxbetweennotes') spacer = null;
+    if (!spacer || !spacer.classList.contains('pxbetweennotes')) spacer = null;
 
     var reference;
     if (position === 'before') {
         reference = targetRow;
     } else {
         reference = targetRow.nextElementSibling;
-        if (reference && reference.id === 'pxbetweennotes') {
+        if (reference && reference.classList.contains('pxbetweennotes')) {
             reference = reference.nextElementSibling;
         }
     }

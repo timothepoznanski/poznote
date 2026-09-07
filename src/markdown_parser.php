@@ -1401,3 +1401,66 @@ function parseMarkdown($text) {
     
     return restoreMarkdownBackslashEscapes(implode("\n", $result), $protectedEscapes);
 }
+
+/**
+ * Adapts parseMarkdown() output for a rich-text (HTML) note.
+ *
+ * In the Markdown preview a code block gets its breathing room from the CSS
+ * margins of <pre>, but ".noteentry pre" forces "margin: 0 !important", so a
+ * converted note glues the code block to the paragraph above it and welds two
+ * consecutive code blocks together. Rich-text notes have no such margin to
+ * lean on, so the empty lines have to be real: an empty paragraph, the same
+ * one parseMarkdown() already emits for authored blank lines.
+ *
+ * Used by every path that turns Markdown into the content of an HTML note
+ * (the "Convert to HTML" action, the "Insert Markdown" modal, the AI
+ * assistant), so the three can never drift apart.
+ */
+function parseMarkdownForRichText($text) {
+    return addRichTextCodeBlockSpacing(parseMarkdown($text));
+}
+
+/**
+ * Inserts an empty paragraph above and below each top-level code block of an
+ * HTML fragment, unless one is already there (or the block sits at an edge of
+ * the fragment, where there is nothing to separate it from).
+ */
+function addRichTextCodeBlockSpacing($html) {
+    $spacer = '<p class="blank-line">&nbsp;</p>';
+
+    // Odd indexes hold the code blocks, even indexes the content between them
+    $parts = preg_split('/(<pre\b[^>]*>.*?<\/pre>)/s', $html, -1, PREG_SPLIT_DELIM_CAPTURE);
+    if ($parts === false || count($parts) < 2) {
+        return $html;
+    }
+
+    $out = '';
+    for ($i = 0, $n = count($parts); $i < $n; $i++) {
+        $part = $parts[$i];
+
+        if ($i % 2 === 1) {
+            // A code block: make sure an empty line precedes it
+            $needsSpacer = trim($out) !== ''
+                && !preg_match('/<p class="blank-line">(?:&nbsp;|\s)*<\/p>\s*$/', $out);
+            if ($needsSpacer) {
+                $out = rtrim($out, "\n") . "\n" . $spacer . "\n";
+            }
+            $out .= $part;
+            continue;
+        }
+
+        // Content following a code block: make sure an empty line separates it.
+        // Two consecutive code blocks leave only a newline here, and the next
+        // block adds the spacer itself through the branch above.
+        $needsSpacer = $i > 0
+            && trim($part) !== ''
+            && !preg_match('/^\s*<p class="blank-line">/', $part);
+        if ($needsSpacer) {
+            $out .= "\n" . $spacer . "\n" . ltrim($part, "\n");
+        } else {
+            $out .= $part;
+        }
+    }
+
+    return $out;
+}

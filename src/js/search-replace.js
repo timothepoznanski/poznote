@@ -110,7 +110,7 @@
     const pendingSelectionByNote = new Map();
 
     document.addEventListener('mousedown', captureSelectionForSearchButton, true);
-    document.addEventListener('touchstart', captureSelectionForSearchButton, true);
+    document.addEventListener('touchstart', captureSelectionForSearchButton, { capture: true, passive: true });
 
     function captureSelectionForSearchButton(e) {
         const button = e.target && e.target.closest
