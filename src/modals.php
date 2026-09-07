@@ -352,6 +352,10 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
                     <label for="codeBlockFontSizeInput"><?php echo t_h('modals.font_size.code_block_label'); ?></label>
                     <input type="number" id="codeBlockFontSizeInput" min="10" max="32" step="1" value="15">
                 </div>
+                <div class="font-size-row">
+                    <label for="settingsFontSizeInput"><?php echo t_h('modals.font_size.settings_label', [], 'Settings page (px):'); ?></label>
+                    <input type="number" id="settingsFontSizeInput" min="10" max="32" step="1" value="15">
+                </div>
             </div>
         </div>
         <div class="modal-buttons">

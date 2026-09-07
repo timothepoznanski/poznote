@@ -430,7 +430,7 @@
       "language": "更改界面语言。",
       "main_font": "选择整个应用使用的字体。",
       "markdown_font": "选择 Markdown 编辑器使用的字体。",
-      "font_size": "调整笔记、侧边栏和代码块的字体大小。",
+      "font_size": "调整笔记、侧边栏、代码块和设置页面的字体大小。",
       "index_icon_scale": "调整笔记列表中图标的大小。",
       "timezone": "设置用于显示日期和时间的时区。",
       "date_time_format": "选择日期和时间的显示格式。",

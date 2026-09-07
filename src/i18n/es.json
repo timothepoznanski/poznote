@@ -429,7 +429,7 @@
       "language": "Cambia el idioma de la interfaz.",
       "main_font": "Elige la fuente utilizada en toda la aplicación.",
       "markdown_font": "Elige la fuente utilizada en el editor markdown.",
-      "font_size": "Ajusta el tamaño de fuente de las notas, la barra lateral y los bloques de código.",
+      "font_size": "Ajusta el tamaño de fuente de las notas, la barra lateral, los bloques de código y la página de configuración.",
       "index_icon_scale": "Ajusta el tamaño de los iconos en la lista de notas.",
       "timezone": "Define la zona horaria utilizada para mostrar fechas y horas.",
       "date_time_format": "Elige cómo se muestran las fechas y horas.",

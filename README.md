@@ -596,7 +596,7 @@ Poznote offers several built-in personalization options directly from the applic
 Under **Settings > Display**, you can configure:
 
 - **Theme:** switch between light and dark mode
-- **Font size:** adjust text size for notes, sidebar, and code blocks
+- **Font size:** adjust text size for notes, sidebar, code blocks, and the settings page
 - **Note sorting:** choose how notes are ordered in the list
 - **Task list insert order:** control where new tasks are inserted
 - **Show creation date:** toggle the creation date badge on notes

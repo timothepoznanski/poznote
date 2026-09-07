@@ -143,7 +143,7 @@
       "language": "Изменить язык интерфейса.",
       "main_font": "Выберите шрифт для всего приложения.",
       "markdown_font": "Выберите шрифт для редактора Markdown.",
-      "font_size": "Настройте размер шрифта заметок, боковой панели и блоков кода.",
+      "font_size": "Настройте размер шрифта заметок, боковой панели, блоков кода и страницы настроек.",
       "index_icon_scale": "Настройте размер значков в списке заметок.",
       "timezone": "Установите часовой пояс для отображения даты и времени.",
       "date_time_format": "Выберите формат отображения даты и времени.",
@@ -391,6 +391,7 @@
       "note_font_size": "{{size}}px",
       "sidebar_font_size": "{{size}}px",
       "code_block_font_size": "{{size}}px",
+      "settings_font_size": "{{size}}px",
       "slash_menu_alt_slash": "Alt + /",
       "slash_menu_slash": "/"
     }
@@ -722,6 +723,7 @@
       "note_label": "Содержимое заметки (px):",
       "sidebar_label": "Боковая панель (px):",
       "code_block_label": "Блоки кода (px):",
+      "settings_label": "Страница настроек (px):",
       "default_value": "{{size}} пикс. — значение по умолчанию",
       "preview": "Предпросмотр"
     },

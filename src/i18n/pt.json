@@ -427,7 +427,7 @@
       "language": "Altere o idioma da interface.",
       "main_font": "Escolha a fonte usada em todo o aplicativo.",
       "markdown_font": "Escolha a fonte usada no editor markdown.",
-      "font_size": "Ajuste o tamanho da fonte das notas, da barra lateral e dos blocos de código.",
+      "font_size": "Ajuste o tamanho da fonte das notas, da barra lateral, dos blocos de código e da página de configurações.",
       "index_icon_scale": "Ajuste o tamanho dos ícones na lista de notas.",
       "timezone": "Defina o fuso horário usado para exibir datas e horas.",
       "date_time_format": "Escolha como as datas e horas são exibidas.",

@@ -176,8 +176,20 @@
     line-height: 1.5;
 }
 
+/* Vertical rhythm: the title keeps its default top margin but not the
+   bottom one, the rows follow at 16px and the buttons sit 28px below them
+   (the shared .font-size-controls margins are neutralised here so the gaps
+   above are the only ones in play). */
+#fontSizeModal .modal-header h2 {
+    margin-bottom: 0;
+}
+
+#fontSizeModal .font-size-controls {
+    margin: 16px 0 0;
+}
+
 #fontSizeModal .modal-buttons {
-    margin-top: 20px;
+    margin-top: 28px;
 }
 
 /* ============================================

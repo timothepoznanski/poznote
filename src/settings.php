@@ -285,6 +285,22 @@ if ($canUseUserWebhooks) {
     <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
     <link rel="apple-touch-icon" href="pwa/poznote.png?v=<?php echo $cache_v; ?>">
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
+    <script>
+        // Settings page text size (Font size card): applied before the first
+        // paint so the page does not render at the default size and then
+        // jump. js/font-size-settings.js re-applies it on load and on save.
+        (function () {
+            try {
+                var store = window.__poznoteUserStorage || window.localStorage;
+                var size = parseInt(store.getItem('settings_font_size'), 10);
+                if (size >= 10 && size <= 32 && size !== 15) {
+                    document.documentElement.style.setProperty('--settings-font-scale', String(Math.round((size / 15) * 1000) / 1000));
+                }
+            } catch (_error) {
+                // Ignore storage access errors during early paint.
+            }
+        })();
+    </script>
     <script src="pwa/pwa.js?v=<?php echo $cache_v; ?>" defer></script>
     <link rel="stylesheet" href="css/fonts.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>">
@@ -596,7 +612,7 @@ if ($canUseUserWebhooks) {
 
             <!-- Font Size -->
             <div class="home-card" id="font-size-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.font_size', [], 'Adjust the font size of notes, sidebar and code blocks.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.font_size', [], 'Adjust the font size of notes, sidebar, code blocks and the settings page.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-type-height"></i>
                 </div>
@@ -606,6 +622,7 @@ if ($canUseUserWebhooks) {
                         <span id="font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                         <span id="sidebar-font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                         <span id="code-block-font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                        <span id="settings-font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                     </div>
                 </div>
             </div>

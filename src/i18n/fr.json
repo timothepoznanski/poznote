@@ -440,7 +440,7 @@
       "language": "Changez la langue de l'interface.",
       "main_font": "Choisissez la police utilisée dans toute l'application.",
       "markdown_font": "Choisissez la police utilisée dans l'éditeur markdown.",
-      "font_size": "Ajustez la taille de police des notes, de la barre latérale et des blocs de code.",
+      "font_size": "Ajustez la taille de police des notes, de la barre latérale, des blocs de code et de la page des paramètres.",
       "index_icon_scale": "Ajustez la taille des icônes dans la liste des notes.",
       "timezone": "Définissez le fuseau horaire utilisé pour afficher les dates et heures.",
       "date_time_format": "Choisissez le format d'affichage des dates et heures.",
@@ -767,6 +767,7 @@
       "note_font_size": "{{size}}px",
       "sidebar_font_size": "{{size}}px",
       "code_block_font_size": "{{size}}px",
+      "settings_font_size": "{{size}}px",
       "ui_customization_configure": "Configurer",
       "icon_sidebar_order_configure": "Configurer",
       "toolbar_mode": {
@@ -1268,6 +1269,7 @@
       "note_label": "Contenu de la note (px) :",
       "sidebar_label": "Barre latérale (px) :",
       "code_block_label": "Blocs de code (px) :",
+      "settings_label": "Page des paramètres (px) :",
       "default_value": "{{size}} px est la valeur par défaut",
       "preview": "Aperçu"
     },
