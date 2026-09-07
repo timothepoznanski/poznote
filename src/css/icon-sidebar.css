@@ -146,6 +146,23 @@
     height: 36px;
 }
 
+/* Separator between two groups of navigation entries (icon_sidebar.php draws
+   one where the group changes, or wherever a saved order puts one). Same inset
+   line as the account group's divider below. js/icon-sidebar-toggle.js sets
+   [hidden] on the ones left with no visible entry on one side once UI
+   Customization or the git scope has hidden buttons. */
+.icon-sidebar-divider {
+    flex-shrink: 0;
+    align-self: stretch;
+    height: 1px;
+    margin: 3px 4px;
+    background: var(--pz-border);
+}
+
+.icon-sidebar-divider[hidden] {
+    display: none;
+}
+
 /* display:flex would otherwise beat the browser's [hidden] rule (index.php
    hides the git Push/Pull entries in workspaces outside the sync scope) */
 .icon-sidebar-btn[hidden] {
@@ -186,20 +203,6 @@
 .icon-sidebar-btn-active {
     color: var(--pz-accent);
     background: rgba(var(--pz-accent-rgb), 0.12);
-}
-
-/* Favorites view active: amber rather than the usual blue, matching the star.
-   The icons are CSS masks, so background-color is what actually tints them;
-   :hover must be included or it would revert to blue on pointer-over. */
-.icon-sidebar-btn-active-favorite,
-.icon-sidebar-btn-active-favorite:hover,
-.icon-sidebar-btn-active-favorite:focus-visible {
-    color: #f59e0b;
-    background: rgba(245, 158, 11, 0.14);
-}
-
-.icon-sidebar-btn-active-favorite .lucide {
-    background-color: #f59e0b;
 }
 
 /* Update badge on the Settings entry (admins only). css/settings.css owns the

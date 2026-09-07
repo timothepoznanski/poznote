@@ -568,3 +568,61 @@
     opacity: 0.35;
     cursor: default;
 }
+
+/* Separator row: a dashed, unfilled box with a line through it, so it reads as
+   the gap between two entries rather than as an entry of its own. */
+.icon-sidebar-order-divider {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    border-style: dashed;
+    background: transparent;
+}
+
+.icon-sidebar-order-divider-line {
+    flex: 1;
+    height: 1px;
+    background: rgba(128, 128, 128, 0.45);
+}
+
+.icon-sidebar-order-divider-label {
+    flex: 0 0 auto;
+    font-size: 0.85em;
+    color: #9aa1ab;
+}
+
+.icon-sidebar-order-remove:hover:not(:disabled) {
+    color: #dc3545;
+}
+
+/* Under the list, styled like a quiet link rather than a third primary button
+   next to Save. */
+.icon-sidebar-order-add-divider {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    margin-top: 8px;
+    padding: 6px 8px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--pz-accent);
+    font-family: inherit;
+    font-size: 0.92em;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.icon-sidebar-order-add-divider:hover,
+.icon-sidebar-order-add-divider:focus-visible {
+    background: rgba(var(--pz-accent-rgb), 0.08);
+}
+
+.icon-sidebar-order-add-divider .lucide {
+    width: 14px;
+    height: 14px;
+    background-color: currentColor;
+    filter: none !important;
+    transform: none !important;
+}

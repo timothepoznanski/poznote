@@ -1791,7 +1791,6 @@ include __DIR__ . '/modals/tag_folder_notes_modal.php';
                 <div class="ui-custom-items">
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarDashboardBtn" checked><span><?php echo t_h('common.back_to_home', [], 'Dashboard'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarNotesBtn" checked><span><?php echo t_h('common.notes', [], 'Notes'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarFavoritesBtn" checked><span><?php echo t_h('notes_list.system_folders.favorites', [], 'Favorites'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarTagsBtn" checked><span><?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarFoldersBtn" checked><span><?php echo t_h('home.folders', [], 'Folders'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarSharesBtn" checked><span><?php echo t_h('home.shares', [], 'Shares'); ?></span></label>
@@ -1880,6 +1879,29 @@ include __DIR__ . '/modals/tag_folder_notes_modal.php';
 // group is listed: the account group at the bottom of the rail is fixed, which
 // keeps Settings reachable no matter how the rest is arranged.
 $iconSidebarOrderItems = $GLOBALS['poznoteIconSidebarOrderableItems'] ?? [];
+
+// A separator row: the list carries them among the entries (icon_sidebar.php
+// draws a line in the rail at each), and they drag and move like any entry.
+// Its data-entry-id is the token poznoteGetIconSidebarOrder() reads, so the
+// list's ids are the saved order as is. Rendered by a closure so the
+// <template> js/settings-page.js clones for "Add separator" is the same markup.
+$iconSidebarOrderDividerRow = static function (): string {
+    $moveUp = t_h('modals.icon_sidebar_order.move_up', [], 'Move up');
+    $moveDown = t_h('modals.icon_sidebar_order.move_down', [], 'Move down');
+    $remove = t_h('modals.icon_sidebar_order.remove_divider', [], 'Remove separator');
+    $token = htmlspecialchars(defined('POZNOTE_ICON_SIDEBAR_DIVIDER') ? POZNOTE_ICON_SIDEBAR_DIVIDER : 'divider', ENT_QUOTES, 'UTF-8');
+    return '<li class="icon-sidebar-order-item icon-sidebar-order-divider" data-entry-id="' . $token . '">'
+        . '<span class="icon-sidebar-order-handle" aria-hidden="true"><i class="lucide lucide-grip-vertical"></i></span>'
+        . '<span class="icon-sidebar-order-divider-line" aria-hidden="true"></span>'
+        . '<span class="icon-sidebar-order-divider-label">' . t_h('modals.icon_sidebar_order.divider', [], 'Separator') . '</span>'
+        . '<span class="icon-sidebar-order-divider-line" aria-hidden="true"></span>'
+        . '<span class="icon-sidebar-order-moves">'
+        . '<button type="button" class="icon-sidebar-order-move" data-move="up" title="' . $moveUp . '" aria-label="' . $moveUp . '"><i class="lucide lucide-chevron-up"></i></button>'
+        . '<button type="button" class="icon-sidebar-order-move" data-move="down" title="' . $moveDown . '" aria-label="' . $moveDown . '"><i class="lucide lucide-chevron-down"></i></button>'
+        . '<button type="button" class="icon-sidebar-order-move icon-sidebar-order-remove" data-remove-divider title="' . $remove . '" aria-label="' . $remove . '"><i class="lucide lucide-x"></i></button>'
+        . '</span>'
+        . '</li>';
+};
 ?>
 <!-- Icon Sidebar Order Modal -->
 <div id="iconSidebarOrderModal" class="modal">
@@ -1888,9 +1910,13 @@ $iconSidebarOrderItems = $GLOBALS['poznoteIconSidebarOrderableItems'] ?? [];
             <h3><?php echo t_h('modals.icon_sidebar_order.title', [], 'Icon sidebar order'); ?></h3>
         </div>
         <div class="modal-body">
-            <p class="ui-custom-description"><?php echo t_h('modals.icon_sidebar_order.description', [], 'Drag the entries to change the order of the buttons in the icon sidebar. The account buttons at the bottom of the sidebar stay in place.'); ?></p>
+            <p class="ui-custom-description"><?php echo t_h('modals.icon_sidebar_order.description', [], 'Drag the entries to change the order of the buttons in the icon sidebar. Separators draw a thin line between two groups of buttons. The account buttons at the bottom of the sidebar stay in place.'); ?></p>
             <ul class="icon-sidebar-order-list" id="iconSidebarOrderList">
             <?php foreach ($iconSidebarOrderItems as $iconSidebarOrderItem): ?>
+                <?php if (!empty($iconSidebarOrderItem['divider'])): ?>
+                <?php echo $iconSidebarOrderDividerRow(); ?>
+                <?php continue; ?>
+                <?php endif; ?>
                 <li class="icon-sidebar-order-item" data-entry-id="<?php echo htmlspecialchars($iconSidebarOrderItem['id'], ENT_QUOTES, 'UTF-8'); ?>">
                     <span class="icon-sidebar-order-handle" aria-hidden="true"><i class="lucide lucide-grip-vertical"></i></span>
                     <i class="lucide <?php echo htmlspecialchars($iconSidebarOrderItem['icon'], ENT_QUOTES, 'UTF-8'); ?> icon-sidebar-order-icon"></i>
@@ -1902,6 +1928,11 @@ $iconSidebarOrderItems = $GLOBALS['poznoteIconSidebarOrderableItems'] ?? [];
                 </li>
             <?php endforeach; ?>
             </ul>
+            <template id="iconSidebarOrderDividerTemplate"><?php echo $iconSidebarOrderDividerRow(); ?></template>
+            <button type="button" class="icon-sidebar-order-add-divider" id="addIconSidebarDividerBtn">
+                <i class="lucide lucide-plus"></i>
+                <span><?php echo t_h('modals.icon_sidebar_order.add_divider', [], 'Add separator'); ?></span>
+            </button>
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" id="resetIconSidebarOrderBtn"><?php echo t_h('modals.icon_sidebar_order.reset', [], 'Reset order'); ?></button>

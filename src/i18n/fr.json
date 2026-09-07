@@ -469,7 +469,7 @@
       "note_nav_shortcuts": "Passez à la note précédente ou suivante du dossier courant avec Alt + ↑/↓.",
       "ctrl_s_save": "Enregistrez immédiatement la note courante avec Ctrl + S (Cmd + S sur Mac).",
       "ui_customization": "Masquez les éléments de l'interface que vous n'utilisez pas.",
-      "icon_sidebar_order": "Modifier l'ordre des boutons de la barre d'icônes.",
+      "icon_sidebar_order": "Modifiez l'ordre des boutons de la barre d'icônes et placez des séparateurs entre eux.",
       "users_admin": "Créez, modifiez et gérez les comptes utilisateurs.",
       "oidc_config": "Configurez l'authentification unique avec un fournisseur OpenID Connect.",
       "smtp_config": "Configurez le serveur SMTP utilisé pour envoyer des e-mails comme les rappels.",
@@ -502,6 +502,7 @@
     "categories": {
       "pinned": "Épinglés",
       "recent": "Récents",
+      "all": "Tout",
       "actions": "Actions",
       "admin_tools": "Outils d'administration",
       "display": "Affichage",
@@ -1234,10 +1235,13 @@
     },
     "icon_sidebar_order": {
       "title": "Ordre de la barre d'icônes",
-      "description": "Faites glisser les entrées pour modifier l'ordre des boutons de la barre d'icônes. Les boutons de compte en bas de la barre restent en place.",
+      "description": "Faites glisser les entrées pour modifier l'ordre des boutons de la barre d'icônes. Les séparateurs tracent une fine ligne entre deux groupes de boutons. Les boutons de compte en bas de la barre restent en place.",
       "move_up": "Monter",
       "move_down": "Descendre",
-      "reset": "Réinitialiser l'ordre"
+      "reset": "Réinitialiser l'ordre",
+      "divider": "Séparateur",
+      "add_divider": "Ajouter un séparateur",
+      "remove_divider": "Supprimer le séparateur"
     },
     "language": {
       "description": "Sélectionnez votre langue préférée :"

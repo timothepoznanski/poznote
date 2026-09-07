@@ -172,7 +172,7 @@
       "note_nav_shortcuts": "Switch to the previous or next note in the current folder with Alt + ↑/↓.",
       "ctrl_s_save": "Save the current note immediately with Ctrl + S (Cmd + S on Mac).",
       "ui_customization": "Hide interface elements you do not use.",
-      "icon_sidebar_order": "Change the order of the buttons in the icon sidebar.",
+      "icon_sidebar_order": "Change the order of the buttons in the icon sidebar and place separators between them.",
       "users_admin": "Create, edit and manage user accounts.",
       "oidc_config": "Configure single sign-on with an OpenID Connect provider.",
       "smtp_config": "Configure the SMTP server used to send emails such as reminders.",
@@ -205,6 +205,7 @@
     "categories": {
       "pinned": "Pinned",
       "recent": "Recent",
+      "all": "All",
       "actions": "Actions",
       "admin_tools": "Admin Tools",
       "display": "Display",
@@ -694,10 +695,13 @@
     },
     "icon_sidebar_order": {
       "title": "Icon sidebar order",
-      "description": "Drag the entries to change the order of the buttons in the icon sidebar. The account buttons at the bottom of the sidebar stay in place.",
+      "description": "Drag the entries to change the order of the buttons in the icon sidebar. Separators draw a thin line between two groups of buttons. The account buttons at the bottom of the sidebar stay in place.",
       "move_up": "Move up",
       "move_down": "Move down",
-      "reset": "Reset order"
+      "reset": "Reset order",
+      "divider": "Separator",
+      "add_divider": "Add separator",
+      "remove_divider": "Remove separator"
     },
     "language": {
       "title": "Language Selection",

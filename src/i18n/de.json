@@ -457,7 +457,7 @@
       "note_nav_shortcuts": "Wechseln Sie mit Alt + ↑/↓ zur vorherigen oder nächsten Notiz im aktuellen Ordner.",
       "ctrl_s_save": "Speichern Sie die aktuelle Notiz sofort mit Strg + S (Cmd + S auf dem Mac).",
       "ui_customization": "Blenden Sie Oberflächenelemente aus, die Sie nicht verwenden.",
-      "icon_sidebar_order": "Die Reihenfolge der Schaltflächen in der Icon-Seitenleiste ändern.",
+      "icon_sidebar_order": "Ändern Sie die Reihenfolge der Schaltflächen in der Icon-Seitenleiste und setzen Sie Trennlinien dazwischen.",
       "users_admin": "Benutzerkonten erstellen, bearbeiten und verwalten.",
       "oidc_config": "Konfigurieren Sie Single Sign-On mit einem OpenID-Connect-Anbieter.",
       "smtp_config": "Konfigurieren Sie den SMTP-Server für den E-Mail-Versand, z. B. für Erinnerungen.",
@@ -490,6 +490,7 @@
     "categories": {
       "pinned": "Angepinnt",
       "recent": "Zuletzt verwendet",
+      "all": "Alle",
       "actions": "Aktionen",
       "admin_tools": "Admin-Werkzeuge",
       "display": "Anzeige",
@@ -1209,10 +1210,13 @@
     },
     "icon_sidebar_order": {
       "title": "Reihenfolge der Icon-Seitenleiste",
-      "description": "Ziehen Sie die Einträge, um die Reihenfolge der Schaltflächen in der Icon-Seitenleiste zu ändern. Die Konto-Schaltflächen am unteren Rand der Leiste bleiben an ihrem Platz.",
+      "description": "Ziehen Sie die Einträge, um die Reihenfolge der Schaltflächen in der Icon-Seitenleiste zu ändern. Trennlinien ziehen eine dünne Linie zwischen zwei Gruppen von Schaltflächen. Die Konto-Schaltflächen am unteren Rand der Leiste bleiben an ihrem Platz.",
       "move_up": "Nach oben",
       "move_down": "Nach unten",
-      "reset": "Reihenfolge zurücksetzen"
+      "reset": "Reihenfolge zurücksetzen",
+      "divider": "Trennlinie",
+      "add_divider": "Trennlinie hinzufügen",
+      "remove_divider": "Trennlinie entfernen"
     },
     "language": {
       "description": "Wählen Sie Ihre bevorzugte Sprache:"

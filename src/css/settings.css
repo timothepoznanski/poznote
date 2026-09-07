@@ -220,9 +220,15 @@ body:not(.dark-mode) #changePasswordModal .change-password-status-sso {
 }
 
 /* The row's bottom margin collapses with the first category title's larger
-   top margin (1.5rem), so shrink the title's margin for the gap to change */
-.settings-filter-row + .settings-category-title {
+   top margin (1.5rem), so shrink that title's margin for the gap to change.
+   The first title may be the hidden "Pinned" one: the shrunk margin goes to
+   every title that no visible title precedes, i.e. the first shown. */
+.settings-content > .settings-category-title {
     margin-top: 1rem;
+}
+
+.settings-content > .settings-category-title:not([hidden]) ~ .settings-category-title {
+    margin-top: 1.5rem;
 }
 
 /* home/responsive.css hides .home-search-container on desktop; the settings
@@ -362,11 +368,11 @@ body.dark-mode .settings-view-toggle:hover {
 
 /* ---------- Pin button ----------
    Added by settings-page.js on every card. Styled exactly like the help icon
-   above (same size, same muted grey) and, like it, revealed on card hover in
-   desktop view (see the media query below); a pinned card shows it in blue
-   instead (same pattern as the dashboard pin).
+   (same size, same muted grey, always visible); a pinned card shows it in
+   blue instead (same pattern as the dashboard pin).
    Absolutely positioned, so it reserves no space: bottom-right corner in grid
-   view, hidden in list view. */
+   view, hidden in list view, in the flow at the end of the row in the desktop
+   layout. */
 
 /* The empty pinned section is hidden through the `hidden` attribute, but the
    .home-grid display rules above are author styles and would win over the
@@ -410,27 +416,6 @@ body.dark-mode .settings-view-toggle:hover {
 
 /* A pinned card keeps the plain card border: the blue pin icon is the only
    pinned indicator, on the source card and on its clone alike. */
-
-/* Desktop (hover-capable) grid view: the help icon and the pin only appear
-   while the card is hovered (or holds keyboard focus), keeping the cards
-   clean at rest. A pinned card keeps its blue pin visible so the pinned
-   state stays readable. Mobile/touch never sees the help icon anyway
-   (hidden in cards.css) and taps the pin without a hover state. */
-@media (min-width: 801px) and (hover: hover) {
-    .home-card .setting-help,
-    .home-card .settings-card-pin {
-        opacity: 0;
-        transition: opacity 0.15s ease;
-    }
-
-    .home-card:hover .setting-help,
-    .home-card:hover .settings-card-pin,
-    .home-card:focus-within .setting-help,
-    .home-card:focus-within .settings-card-pin,
-    .home-card.is-pinned .settings-card-pin {
-        opacity: 1;
-    }
-}
 
 :root[data-theme='dark'] .home-card.is-pinned .settings-card-pin i,
 body.dark-mode .home-card.is-pinned .settings-card-pin i {
@@ -494,4 +479,359 @@ body.dark-mode .home-card.is-pinned .settings-card-pin i {
    carries the gap to the Cancel/Save buttons that .radio-options usually does. */
 #snapshotsSettingsModal .delete-warning-box {
     margin-bottom: 24px;
+}
+
+/* ==========================================================================
+   Desktop layout: section list on the left, rows on the right
+   settings.php only (.settings-with-nav on the container). settings-page.js
+   builds the list from the category titles, marks the selected title and grid
+   with .settings-section-active and keeps the choice per user. Below 801px
+   the list is hidden and the sections stack as before (collapsible, grid or
+   list through the toggle), so nothing in the media query applies there.
+   ========================================================================== */
+
+.settings-nav {
+    display: none;
+}
+
+@media (min-width: 801px) {
+    /* A little wider than the plain page (800px): the list takes its 220px
+       and the rows keep about the width of the old list view (600px), so a
+       value stays close to its label. Also outranks the 600px cap of
+       .view-list, which is a mobile preference here. */
+    .home-container.settings-with-nav {
+        --settings-nav-width: 220px;
+        --settings-nav-gap: 32px;
+        max-width: 900px;
+    }
+
+    /* Rows are the only layout here: the grid/list toggle stays mobile-only */
+    .settings-with-nav .settings-view-toggle {
+        display: none;
+    }
+
+    /* The page title and the filter row sit above the content column, not
+       above the whole container: same left offset as the content, so they
+       centre on the rows rather than on the list + rows. */
+    .settings-with-nav .poznote-page-title,
+    .settings-with-nav .settings-filter-row {
+        margin-left: calc(var(--settings-nav-width) + var(--settings-nav-gap));
+    }
+
+    .settings-with-nav .settings-layout {
+        display: grid;
+        grid-template-columns: var(--settings-nav-width) minmax(0, 1fr);
+        gap: var(--settings-nav-gap);
+        align-items: start;
+    }
+
+    .settings-with-nav .settings-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        position: sticky;
+        top: 24px;
+    }
+
+    .settings-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 9px 12px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: #4b5563;
+        font: inherit;
+        font-size: 14px;
+        line-height: 1.3;
+        text-align: left;
+        cursor: pointer;
+        transition: background-color 0.12s ease, color 0.12s ease;
+    }
+
+    /* Author display rules beat the browser's [hidden] { display: none } */
+    .settings-nav-item[hidden] {
+        display: none;
+    }
+
+    .settings-nav-item:hover {
+        background: rgba(0, 0, 0, 0.04);
+        color: #1f2937;
+    }
+
+    .settings-nav-item.is-active {
+        background: rgba(var(--pz-accent-rgb), 0.1);
+        color: var(--pz-accent);
+        font-weight: 600;
+    }
+
+    .settings-nav-item .lucide {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+    }
+
+    /* Only the selected section shows. Two exceptions show every section,
+       each under its own title: an active filter term (settings-page.js
+       toggles .settings-filtering on the container, matches only) and the
+       "All" entry of the list (.settings-show-all). */
+    .home-container.settings-with-nav:not(.settings-filtering):not(.settings-show-all) .settings-category-title:not(.settings-section-active),
+    .home-container.settings-with-nav:not(.settings-filtering):not(.settings-show-all) .home-grid:not(.settings-section-active) {
+        display: none;
+    }
+
+    /* One section at a time, so the titles neither collapse nor look
+       clickable: no chevron, no pointer. The collapsed state saved by the
+       stacked layout is ignored (the grid rule below outranks
+       .section-collapsed). "All" lists every section and brings the chevrons
+       back, with the same saved state as the stacked layout. */
+    .settings-with-nav .settings-section-toggle {
+        display: none;
+    }
+
+    .settings-with-nav.settings-show-all .settings-section-toggle {
+        display: inline-flex;
+    }
+
+    .home-container.settings-with-nav .settings-category-title.settings-section-header {
+        cursor: default;
+        margin: 0 0 0.75rem 0;
+        font-size: 1.2rem;
+    }
+
+    .home-container.settings-with-nav.settings-show-all .settings-category-title.settings-section-header {
+        cursor: pointer;
+    }
+
+    .home-container.settings-with-nav.settings-show-all:not(.settings-filtering) .home-grid.section-collapsed {
+        display: none;
+    }
+
+    /* The section's cards become the rows of one bordered panel */
+    .home-container.settings-with-nav .home-grid:not([hidden]) {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        margin-bottom: 1.5rem;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+    }
+
+    .home-container.settings-with-nav .home-card {
+        position: relative;
+        isolation: isolate;
+        gap: 12px;
+        padding: 10px 16px;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    /* The hover highlight is drawn inset, so it never pokes out of the
+       panel's rounded corners; z-index -1 keeps it under the row's content
+       within the row's own stacking context (isolation: isolate). */
+    .home-container.settings-with-nav .home-card::before {
+        content: '';
+        position: absolute;
+        inset: 3px 6px;
+        z-index: -1;
+        border-radius: 8px;
+        background: var(--pz-surface-hover);
+        opacity: 0;
+        transition: opacity 0.12s ease;
+        pointer-events: none;
+    }
+
+    .home-container.settings-with-nav .home-card:hover::before,
+    .home-container.settings-with-nav .home-card:focus-visible::before {
+        opacity: 1;
+    }
+
+    /* cards.css lifts a hovered card and raises its z-index for the help
+       tooltip; the lift goes, the z-index stays so the tooltip paints over
+       the rows below. */
+    .home-container.settings-with-nav .home-card:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* Divider between rows, inset like the hover highlight */
+    .home-container.settings-with-nav .home-card + .home-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 16px;
+        right: 16px;
+        height: 1px;
+        background: #eef0f3;
+        pointer-events: none;
+    }
+
+    .home-container.settings-with-nav .home-card-icon {
+        width: 30px;
+        height: 30px;
+        order: 0;
+    }
+
+    .home-container.settings-with-nav .home-card-icon i {
+        font-size: 15px;
+    }
+
+    .home-container.settings-with-nav .home-card-content {
+        flex: 1;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+        order: 1;
+    }
+
+    .home-container.settings-with-nav .home-card-title {
+        font-size: 15px;
+        -webkit-line-clamp: 1;
+        line-clamp: 1;
+    }
+
+    /* Badges sit at the right edge of the row */
+    .home-container.settings-with-nav .home-card-content > .setting-status,
+    .home-container.settings-with-nav .home-card-content > .home-card-count,
+    .home-container.settings-with-nav .home-card-content > div {
+        margin-left: auto;
+    }
+
+    .home-container.settings-with-nav .home-card-content > div {
+        display: flex;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    .home-container.settings-with-nav .setting-status {
+        align-self: center;
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
+    /* Help icon and pin sit in the flow after the badge (the markup puts the
+       help span first, hence the explicit order), always visible. */
+    .home-container.settings-with-nav .setting-help,
+    .home-container.settings-with-nav .settings-card-pin {
+        position: relative;
+        top: auto;
+        right: auto;
+        bottom: auto;
+        display: inline-flex;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    .home-container.settings-with-nav .setting-help {
+        order: 2;
+        margin-left: 4px;
+    }
+
+    .home-container.settings-with-nav .settings-card-pin {
+        order: 3;
+    }
+
+    /* Boolean settings: the Enabled/Disabled badge is drawn as a switch (the
+       whole row stays the click target; settings-page.js marks the cards
+       with .settings-toggle-card). Clones in Pinned/Recent copy the badge
+       classes, so they get the switch too. */
+    .home-container.settings-with-nav .settings-toggle-card .setting-status {
+        position: relative;
+        width: 36px;
+        height: 20px;
+        padding: 0;
+        border-radius: 999px;
+        background: #d1d5db;
+        color: transparent;
+        font-size: 0;
+        line-height: 0;
+        overflow: hidden;
+        transition: background-color 0.15s ease;
+    }
+
+    .home-container.settings-with-nav .settings-toggle-card .setting-status::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #ffffff;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+        transition: transform 0.15s ease;
+    }
+
+    .home-container.settings-with-nav .settings-toggle-card .setting-status.enabled {
+        background: var(--pz-accent);
+    }
+
+    .home-container.settings-with-nav .settings-toggle-card .setting-status.enabled::after {
+        transform: translateX(16px);
+    }
+
+    /* ----- Dark mode ----- */
+
+    html[data-theme='dark'] .home-container.settings-with-nav .home-grid:not([hidden]),
+    body.dark-mode .home-container.settings-with-nav .home-grid:not([hidden]) {
+        background: var(--dm-surface);
+        border-color: var(--dm-border);
+    }
+
+    html[data-theme='dark'] .home-container.settings-with-nav .home-card::before,
+    body.dark-mode .home-container.settings-with-nav .home-card::before {
+        background: var(--dm-surface-hover);
+    }
+
+    html[data-theme='dark'] .home-container.settings-with-nav .home-card + .home-card::after,
+    body.dark-mode .home-container.settings-with-nav .home-card + .home-card::after {
+        background: var(--dm-border);
+    }
+
+    html[data-theme='dark'] .settings-nav-item,
+    body.dark-mode .settings-nav-item {
+        color: var(--dm-text);
+    }
+
+    html[data-theme='dark'] .settings-nav-item:hover,
+    body.dark-mode .settings-nav-item:hover {
+        background: var(--dm-surface-hover);
+        color: var(--dm-text);
+    }
+
+    html[data-theme='dark'] .settings-nav-item.is-active,
+    body.dark-mode .settings-nav-item.is-active {
+        background: rgba(74, 158, 255, 0.16);
+        color: var(--dm-accent);
+    }
+
+    html[data-theme='dark'] .home-container.settings-with-nav .settings-toggle-card .setting-status,
+    body.dark-mode .home-container.settings-with-nav .settings-toggle-card .setting-status {
+        background: #555555;
+        color: transparent;
+    }
+
+    html[data-theme='dark'] .home-container.settings-with-nav .settings-toggle-card .setting-status::after,
+    body.dark-mode .home-container.settings-with-nav .settings-toggle-card .setting-status::after {
+        background: #e5e7eb;
+    }
+
+    html[data-theme='dark'] .home-container.settings-with-nav .settings-toggle-card .setting-status.enabled,
+    body.dark-mode .home-container.settings-with-nav .settings-toggle-card .setting-status.enabled {
+        background: var(--dm-accent);
+    }
+}
+
+/* No hover on touch screens: the help tooltip cannot open, so the icon goes
+   (cards.css does the same for the grid, with a weaker selector). */
+@media (hover: none) {
+    .home-container.settings-with-nav .setting-help {
+        display: none;
+    }
 }

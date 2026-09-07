@@ -9,6 +9,10 @@
  * scrollbar is hidden, so on a short screen the last few icons are simply
  * invisible above the account group's divider. #iconSidebarOverflowBtn appears
  * in that case and opens a labelled menu of whatever is currently out of view.
+ *
+ * The group separators icon_sidebar.php draws between the entries are also
+ * kept honest here: once UI Customization (or the git scope) has hidden every
+ * entry on one side of a line, that line is hidden too.
  */
 (function () {
     'use strict';
@@ -118,8 +122,63 @@
                 || workspace === '' || workspace === '__last_opened__'
                 || syncedWorkspaces.indexOf(workspace) !== -1;
             gitButtons.forEach(function (button) { button.hidden = !visible; });
+            syncDividers();
             syncOverflowButton();
         }
+    }
+
+    // --- Group separators --------------------------------------------------
+
+    function isEntryShown(entry) {
+        // Own display only: an entry hidden by its [hidden] attribute or by a
+        // UI Customization rule (#id { display: none }) is out, whatever the
+        // rail itself is doing (collapsed, mobile) at the time.
+        return !entry.hidden && window.getComputedStyle(entry).display !== 'none';
+    }
+
+    /**
+     * Hide the separators left with nothing visible on one side.
+     *
+     * icon_sidebar.php already drops the ones that would sit first, last or
+     * back to back, but it cannot see which entries the UI Customization CSS
+     * hides, nor the git buttons index.php toggles per workspace. Walk the
+     * scroll area: a separator is shown only if a visible entry precedes it
+     * since the last shown separator, and another follows it before the next.
+     */
+    function syncDividers() {
+        var scrollArea = getScrollArea();
+        if (!scrollArea) return;
+
+        var shown = [];
+        var pending = null;
+        var entrySince = false;
+
+        Array.prototype.forEach.call(scrollArea.children, function (child) {
+            if (child.classList.contains('icon-sidebar-divider')) {
+                // A visible entry since the last kept line makes this one a
+                // candidate; it is kept once an entry shows up after it. With
+                // none since, an earlier candidate is still waiting for its
+                // entry and this one is redundant.
+                if (entrySince) {
+                    pending = child;
+                    entrySince = false;
+                }
+                return;
+            }
+            if (!child.classList.contains('icon-sidebar-btn') || !isEntryShown(child)) return;
+            if (pending) {
+                shown.push(pending);
+                pending = null;
+            }
+            entrySince = true;
+        });
+
+        Array.prototype.forEach.call(scrollArea.querySelectorAll('.icon-sidebar-divider'), function (divider) {
+            var hide = shown.indexOf(divider) === -1;
+            // Only touch what changes: the MutationObserver below watches
+            // [hidden] and would otherwise loop on a no-op write.
+            if (divider.hidden !== hide) divider.hidden = hide;
+        });
     }
 
     // The overflow menu reads each entry's href when the copy is clicked, so
@@ -177,8 +236,7 @@
         item.className = 'icon-sidebar-overflow-item';
         item.setAttribute('role', 'menuitem');
 
-        if (entry.classList.contains('icon-sidebar-btn-active') ||
-            entry.classList.contains('icon-sidebar-btn-active-favorite')) {
+        if (entry.classList.contains('icon-sidebar-btn-active')) {
             item.classList.add('icon-sidebar-overflow-item-active');
         }
 
@@ -320,15 +378,22 @@
             syncOverflowButton();
         });
 
+        // Separators first: hiding one changes the scroll height the overflow
+        // measurement reads.
+        function syncLayout() {
+            syncDividers();
+            syncOverflowButton();
+        }
+
         // UI Customization hides entries after load (js/ui-customization.js),
         // and index.php appends its own extras, so re-measure on both.
-        document.addEventListener('poznote-ui-customization-updated', syncOverflowButton);
+        document.addEventListener('poznote-ui-customization-updated', syncLayout);
 
         if (typeof ResizeObserver === 'function') {
             new ResizeObserver(syncOverflowButton).observe(scrollArea);
         }
         if (typeof MutationObserver === 'function') {
-            new MutationObserver(syncOverflowButton).observe(scrollArea, {
+            new MutationObserver(syncLayout).observe(scrollArea, {
                 childList: true,
                 subtree: true,
                 attributes: true,
@@ -336,7 +401,7 @@
             });
         }
 
-        syncOverflowButton();
+        syncLayout();
     }
 
     function init() {

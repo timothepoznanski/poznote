@@ -374,7 +374,9 @@ class SettingsController {
 
         // icon_sidebar_order is an ordered list rather than a set, but the
         // element-key handling below is the same and its dedupe preserves the
-        // first occurrence, which is the order the client sent.
+        // first occurrence, which is the order the client sent. Its separator
+        // token is the one key allowed to repeat: it marks a line between two
+        // buttons and the user may want several (poznoteGetIconSidebarOrder()).
         if ($key === 'hidden_ui_elements' || $key === 'hidden_ui_elements_global' || $key === 'settings_pinned_cards'
             || $key === 'settings_recent_cards' || $key === 'tenant_isolation_applied_ui_keys'
             || $key === 'icon_sidebar_order') {
@@ -386,17 +388,27 @@ class SettingsController {
             if (!is_array($decoded)) {
                 throw new InvalidArgumentException('value must be a JSON array of element keys', 400);
             }
+            $repeatable = $key === 'icon_sidebar_order' && defined('POZNOTE_ICON_SIDEBAR_DIVIDER')
+                ? POZNOTE_ICON_SIDEBAR_DIVIDER
+                : null;
             $keys = [];
+            $ordered = [];
             foreach ($decoded as $entry) {
                 if (!is_string($entry) || $entry === '' || strlen($entry) > 200) {
                     throw new InvalidArgumentException('value must be a JSON array of element keys', 400);
                 }
-                $keys[$entry] = true;
-                if (count($keys) > 500) {
+                if ($entry !== $repeatable) {
+                    if (isset($keys[$entry])) {
+                        continue;
+                    }
+                    $keys[$entry] = true;
+                }
+                $ordered[] = $entry;
+                if (count($ordered) > 500) {
                     throw new InvalidArgumentException('too many element keys', 400);
                 }
             }
-            return json_encode(array_keys($keys), JSON_UNESCAPED_SLASHES);
+            return json_encode($ordered, JSON_UNESCAPED_SLASHES);
         }
 
         return is_string($value) ? $value : (string) $value;
