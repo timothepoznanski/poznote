@@ -490,8 +490,6 @@
     "expand_section": "Expandir la sección",
     "categories": {
       "pinned": "Fijados",
-      "recent": "Recientes",
-      "all": "Todo",
       "actions": "Acciones",
       "admin_tools": "Herramientas de administración",
       "display": "Pantalla",

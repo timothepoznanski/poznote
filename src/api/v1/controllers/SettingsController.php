@@ -378,8 +378,7 @@ class SettingsController {
         // token is the one key allowed to repeat: it marks a line between two
         // buttons and the user may want several (poznoteGetIconSidebarOrder()).
         if ($key === 'hidden_ui_elements' || $key === 'hidden_ui_elements_global' || $key === 'settings_pinned_cards'
-            || $key === 'settings_recent_cards' || $key === 'tenant_isolation_applied_ui_keys'
-            || $key === 'icon_sidebar_order') {
+            || $key === 'tenant_isolation_applied_ui_keys' || $key === 'icon_sidebar_order') {
             $raw = is_string($value) ? trim($value) : $value;
             if ($raw === '' || $raw === null || $raw === '[]') {
                 return '[]';

@@ -491,8 +491,6 @@
     "expand_section": "展开此部分",
     "categories": {
       "pinned": "已固定",
-      "recent": "最近使用",
-      "all": "全部",
       "actions": "操作",
       "admin_tools": "管理工具",
       "display": "显示",

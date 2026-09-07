@@ -1863,12 +1863,6 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
                 $rules[] = '#outlineMobileBackdrop { display: none !important; }';
             } elseif ($id === 'tasklist-progress') {
                 $rules[] = '.tasklist-progress { display: none !important; }';
-            } elseif ($id === 'settings-recent-section') {
-                // The "Recent" band on the settings page. Both the title and
-                // the grid are toggled by settings-page.js through the hidden
-                // attribute, so !important is what keeps them down once the
-                // click history refills them.
-                $rules[] = '#settings-recent-section-title, #settings-recent-section-grid { display: none !important; }';
             }
         } elseif ($type === 'share') {
             // Share dialog blocks are built in JS. The CSS rule covers pages that

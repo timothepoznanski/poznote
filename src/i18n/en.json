@@ -204,8 +204,6 @@
     "expand_section": "Expand section",
     "categories": {
       "pinned": "Pinned",
-      "recent": "Recent",
-      "all": "All",
       "actions": "Actions",
       "admin_tools": "Admin Tools",
       "display": "Display",

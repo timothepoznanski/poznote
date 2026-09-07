@@ -137,7 +137,6 @@ $settingsPageUserKeys = [
     'hidden_ui_elements',
     'icon_sidebar_order',
     'settings_pinned_cards',
-    'settings_recent_cards',
     'spellcheck_html_notes',
     'slash_menu_require_alt',
     'note_nav_shortcuts_enabled',
@@ -359,17 +358,12 @@ if ($canUseUserWebhooks) {
              titles below, and only the selected section shows, its cards as
              rows. Narrow screens hide the list and stack the sections. -->
         <div class="settings-layout">
-        <nav id="settings-nav" class="settings-nav" aria-label="<?php echo t_h('settings.title', [], 'Settings'); ?>"
-             data-label-all="<?php echo t_h('settings.categories.all', [], 'All'); ?>"></nav>
+        <nav id="settings-nav" class="settings-nav" aria-label="<?php echo t_h('settings.title', [], 'Settings'); ?>"></nav>
         <div class="settings-content">
 
         <!-- PINNED CARDS (filled by settings-page.js from the per-user pin list) -->
         <h2 class="settings-category-title" id="settings-pinned-section-title" hidden><?php echo t_h('settings.categories.pinned', [], 'Pinned'); ?></h2>
         <div class="home-grid" id="settings-pinned-section-grid" hidden></div>
-
-        <!-- RECENT CARDS (filled by settings-page.js from the per-user click history) -->
-        <h2 class="settings-category-title" id="settings-recent-section-title" hidden><?php echo t_h('settings.categories.recent', [], 'Recent'); ?></h2>
-        <div class="home-grid" id="settings-recent-section-grid" hidden></div>
 
         <!-- ACTIONS CATEGORY -->
         <h2 class="settings-category-title" id="settings-actions-section-title"><?php echo t_h('settings.categories.actions'); ?></h2>

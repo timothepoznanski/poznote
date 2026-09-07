@@ -573,40 +573,26 @@ body.dark-mode .home-card.is-pinned .settings-card-pin i {
         flex-shrink: 0;
     }
 
-    /* Only the selected section shows. Two exceptions show every section,
+    /* Only the selected section shows. The one exception shows every section,
        each under its own title: an active filter term (settings-page.js
-       toggles .settings-filtering on the container, matches only) and the
-       "All" entry of the list (.settings-show-all). */
-    .home-container.settings-with-nav:not(.settings-filtering):not(.settings-show-all) .settings-category-title:not(.settings-section-active),
-    .home-container.settings-with-nav:not(.settings-filtering):not(.settings-show-all) .home-grid:not(.settings-section-active) {
+       toggles .settings-filtering on the container, matches only). */
+    .home-container.settings-with-nav:not(.settings-filtering) .settings-category-title:not(.settings-section-active),
+    .home-container.settings-with-nav:not(.settings-filtering) .home-grid:not(.settings-section-active) {
         display: none;
     }
 
     /* One section at a time, so the titles neither collapse nor look
        clickable: no chevron, no pointer. The collapsed state saved by the
        stacked layout is ignored (the grid rule below outranks
-       .section-collapsed). "All" lists every section and brings the chevrons
-       back, with the same saved state as the stacked layout. */
+       .section-collapsed). */
     .settings-with-nav .settings-section-toggle {
         display: none;
-    }
-
-    .settings-with-nav.settings-show-all .settings-section-toggle {
-        display: inline-flex;
     }
 
     .home-container.settings-with-nav .settings-category-title.settings-section-header {
         cursor: default;
         margin: 0 0 0.75rem 0;
         font-size: 1.2rem;
-    }
-
-    .home-container.settings-with-nav.settings-show-all .settings-category-title.settings-section-header {
-        cursor: pointer;
-    }
-
-    .home-container.settings-with-nav.settings-show-all:not(.settings-filtering) .home-grid.section-collapsed {
-        display: none;
     }
 
     /* The section's cards become the rows of one bordered panel */
