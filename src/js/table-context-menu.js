@@ -12,6 +12,29 @@
     };
 
     /**
+     * Asks the user to confirm deleting a whole table, through the app's styled
+     * modal (falls back to the native dialog if modal-alerts.js is missing)
+     * @returns {Promise<boolean>}
+     */
+    function confirmDeleteTable() {
+        const message = tr('table.context_menu.confirm.delete_table', 'Do you really want to delete this table?');
+
+        if (window.modalAlert && typeof window.modalAlert.confirm === 'function') {
+            return window.modalAlert.confirm(
+                message,
+                tr('table.context_menu.delete_table', 'Delete table'),
+                {
+                    alertType: 'warning',
+                    confirmText: tr('common.delete', {}, 'Delete'),
+                    confirmButtonClass: 'danger'
+                }
+            );
+        }
+
+        return Promise.resolve(confirm(message));
+    }
+
+    /**
      * Creates the context menu for tables
      */
     function createTableContextMenu() {
@@ -138,8 +161,9 @@
                 deleteColumn(rows, cellIndex);
                 break;
             case 'deleteTable':
+                // Asynchronous (styled confirmation): it saves the note itself
                 deleteTable();
-                break;
+                return;
         }
 
         // Trigger input event to save
@@ -226,15 +250,21 @@
      * Deletes the entire table
      */
     function deleteTable() {
-        if (confirm(tr('table.context_menu.confirm.delete_table', 'Do you really want to delete this table?'))) {
-            activeTable.remove();
-            
+        // Cached now: hideTableContextMenu() clears activeTable before the user answers
+        const table = activeTable;
+        if (!table) return;
+
+        confirmDeleteTable().then((confirmed) => {
+            if (!confirmed) return;
+
+            const noteentry = table.closest('.noteentry') || document.querySelector('.noteentry');
+            table.remove();
+
             // Trigger input event to save
-            const noteentry = document.querySelector('.noteentry');
             if (noteentry) {
                 noteentry.dispatchEvent(new Event('input', { bubbles: true }));
             }
-        }
+        });
     }
 
     /**
@@ -330,6 +360,8 @@
             menuItems.push({ label: tr('table.context_menu.delete_row', 'Delete row'), action: 'deleteRow', icon: '🗑️', danger: true });
         }
         menuItems.push({ label: tr('table.context_menu.delete_column', 'Delete column'), action: 'deleteCol', icon: '🗑️', danger: true });
+        menuItems.push({ separator: true });
+        menuItems.push({ label: tr('table.context_menu.delete_table', 'Delete table'), action: 'deleteTable', icon: '🗑️', danger: true });
 
         menuItems.forEach(item => {
             if (item.separator) {
@@ -343,8 +375,7 @@
                 el.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    executeMdTableAction(item.action);
-                    hideMdTableContextMenu();
+                    runMdTableAction(item.action);
                 });
                 mdContextMenu.appendChild(el);
             }
@@ -476,6 +507,32 @@
         }
     }
 
+    /**
+     * Runs a menu action, asking for confirmation first when the whole table goes
+     */
+    function runMdTableAction(action) {
+        if (action !== 'deleteTable') {
+            executeMdTableAction(action);
+            hideMdTableContextMenu();
+            return;
+        }
+
+        // The modal is asynchronous, so keep the targets hideMdTableContextMenu() clears
+        const table = mdActiveTable;
+        const cell = mdActiveCell;
+        const noteEntry = mdActiveNoteEntry;
+        hideMdTableContextMenu();
+
+        confirmDeleteTable().then((confirmed) => {
+            if (!confirmed) return;
+            mdActiveTable = table;
+            mdActiveCell = cell;
+            mdActiveNoteEntry = noteEntry;
+            executeMdTableAction('deleteTable');
+            hideMdTableContextMenu();
+        });
+    }
+
     function executeMdTableAction(action) {
         if (!mdActiveTable || !mdActiveCell || !mdActiveNoteEntry) return;
 
@@ -603,10 +660,22 @@
                 }
                 break;
             }
+            case 'deleteTable': {
+                // Confirmation already handled by runMdTableAction()
+                lines.splice(tableStart, tableEnd - tableStart + 1);
+                // Removing the block would otherwise leave the blank line before
+                // and the blank line after stacked into an empty paragraph
+                const isBlank = l => String(l || '').trim() === '';
+                if (tableStart > 0 && tableStart < lines.length &&
+                    isBlank(lines[tableStart - 1]) && isBlank(lines[tableStart])) {
+                    lines.splice(tableStart, 1);
+                }
+                break;
+            }
         }
 
         // Re-align every column of the (possibly resized) table so pipes line up in the source
-        if (typeof window.formatMarkdownTableAtLine === 'function') {
+        if (action !== 'deleteTable' && typeof window.formatMarkdownTableAtLine === 'function') {
             window.formatMarkdownTableAtLine(lines, tableStart);
         }
 

@@ -5393,20 +5393,32 @@ function setupPreviewInteractivity(noteId) {
         }
     }
 
-    // Left-click context menu on tables in preview
+    // Right-click context menu on tables in preview (same gesture as HTML tables)
     var previewTables = previewDiv.querySelectorAll('table[data-start-line]');
     previewTables.forEach(function(table) {
-        table.removeEventListener('click', table._mdTableClickHandler);
-        table._mdTableClickHandler = function(e) {
+        if (table._mdTableClickHandler) {
+            table.removeEventListener('click', table._mdTableClickHandler);
+            table._mdTableClickHandler = null;
+        }
+        table.removeEventListener('contextmenu', table._mdTableContextMenuHandler);
+        table._mdTableContextMenuHandler = function(e) {
             const cell = e.target.closest('td, th');
             if (!cell) return;
+
+            // Keep the browser's default menu when text is selected in the
+            // table (so the user can copy the selection)
+            var sel = window.getSelection();
+            if (sel && !sel.isCollapsed && sel.rangeCount > 0 && sel.getRangeAt(0).intersectsNode(table)) {
+                return;
+            }
+
             e.preventDefault();
             e.stopPropagation();
             if (typeof window.showMdTableContextMenu === 'function') {
                 window.showMdTableContextMenu(e.clientX, e.clientY, table, cell, noteEntry);
             }
         };
-        table.addEventListener('click', table._mdTableClickHandler);
+        table.addEventListener('contextmenu', table._mdTableContextMenuHandler);
         table.style.cursor = 'default';
     });
 
