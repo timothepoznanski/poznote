@@ -2800,18 +2800,17 @@ class NotesController {
      * Send a success response
      */
     private function sendSuccess(array $data): void {
-        echo json_encode(array_merge(['success' => true], $data));
+        apiSuccess($data);
     }
     
     /**
      * Send an error response
      */
     private function sendError(int $code, string $message): void {
-        http_response_code($code);
-        echo json_encode([
-            'success' => false,
-            'error' => $message
-        ]);
+        // Delegates to lib/api-response.php. Note that FoldersController and
+        // TrashController declare the arguments the other way round; the
+        // signatures are typed, so a call in the wrong order fails loudly.
+        apiFail($message, $code);
     }
 
     /**

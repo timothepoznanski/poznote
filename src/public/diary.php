@@ -5,14 +5,7 @@
  * "Today's entry" button that opens (or creates) the note titled with
  * today's date.
  */
-require_once __DIR__ . '/../auth.php';
-requireAuth();
-
-ob_start();
-require_once __DIR__ . '/../functions.php';
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../db_connect.php';
-require_once __DIR__ . '/../version_helper.php';
+require_once __DIR__ . '/../page_bootstrap.php';
 
 $pageWorkspace = trim(getWorkspaceFilter());
 $currentLang = getUserLanguage();

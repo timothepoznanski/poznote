@@ -3,14 +3,7 @@
  * Unified Shares page - Shows both shared notes and shared folders
  * with a filter bar to search and toggle between notes/folders/all.
  */
-require_once __DIR__ . '/../auth.php';
-requireAuth();
-
-ob_start();
-require_once __DIR__ . '/../functions.php';
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../db_connect.php';
-require_once __DIR__ . '/../version_helper.php';
+require_once __DIR__ . '/../page_bootstrap.php';
 require_once __DIR__ . '/../share_passwords.php';
 
 $pageWorkspace = trim(getWorkspaceFilter());

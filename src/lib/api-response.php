@@ -38,3 +38,19 @@ if (!function_exists('apiFail')) {
         echo json_encode(['success' => false, 'error' => $error], JSON_UNESCAPED_UNICODE);
     }
 }
+
+if (!function_exists('apiSuccess')) {
+    /**
+     * Answers a request that worked, merging the payload into {"success": true}.
+     *
+     * This body was built by a private sendSuccess() copied into six
+     * controllers, and the copies had drifted: TasksController serialised with
+     * JSON_UNESCAPED_UNICODE and the other five escaped every accent. Both parse
+     * the same, but there is no reason for the same helper to disagree with
+     * itself.
+     */
+    function apiSuccess(array $data): void
+    {
+        apiSendJson(array_merge(['success' => true], $data));
+    }
+}

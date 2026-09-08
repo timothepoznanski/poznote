@@ -30,7 +30,7 @@ class TrashController {
      * Send error response
      */
     private function sendError(string $message, int $code = 400): void {
-        $this->sendJson(['success' => false, 'error' => $message], $code);
+        apiFail($message, $code);
     }
     
     /**
