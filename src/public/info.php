@@ -154,23 +154,7 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
     $v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     ?>
     <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
-    <link rel="stylesheet" href="css/lucide.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/info.css'); ?>">
-    <link rel="stylesheet" href="css/home/buttons.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>">
-    <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $v; ?>">
+    <?php poznoteRenderStylesheets('info'); ?>
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 </head>
 <body class="has-icon-sidebar" data-note-id="<?php echo $note_id; ?>" data-workspace="<?php echo htmlspecialchars($workspace ?? '', ENT_QUOTES, 'UTF-8'); ?>">

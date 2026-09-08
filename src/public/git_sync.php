@@ -190,31 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     ?>
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
-    <link rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/home/base.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/home/search.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/home/alerts.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/home/cards.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/home/buttons.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/home/dark-mode.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/home/responsive.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/settings.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/git-sync.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $cache_v; ?>">
+    <?php poznoteRenderStylesheets('git_sync'); ?>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body class="home-page git-sync-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">

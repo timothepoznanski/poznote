@@ -191,35 +191,7 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
     <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/lucide.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/restore_import/base.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/restore_import/cards.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/restore_import/forms-buttons.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/restore_import/modals.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/restore_import/progress.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/restore_import/drag-drop.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/restore_import/utilities.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/restore_import/responsive.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/modals/base.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/modals/specific-modals.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/modals/attachments.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/modals/share-modal.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/modals/alerts-utilities.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/modals/responsive.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/modal-alerts.css'); ?>">
-    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/layout.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/menus.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/editor.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/modals.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/components.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/pages.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/markdown.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/kanban.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/icons.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar-page.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar-mobile.css'); ?>">
+    <?php poznoteRenderStylesheets('restore_import'); ?>
     <script src="<?php echo poznoteAsset('js/globals.js'); ?>"></script>
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 </head>

@@ -26,10 +26,25 @@ themes work and which variables a custom stylesheet can rely on.
   there and matters for the cascade), `index-mobile.css` as a media-scoped link
   between them, then `dark_mode_css.php` (all of `dark-mode/`) and
   `syntax-highlight.css`.
-- Every other page links its stylesheets one by one in its `<head>` (look at
-  `favorites.php` for the usual set: lucide, the modal files, the page file, the
-  ten `dark-mode/*.css`, the icon sidebar). Cache-busting goes through
-  `poznoteAsset('css/...')` in `config.php`.
+- **Every other page names itself and `src/css_assets.php` says what that
+  means.** The `<head>` holds one call:
+
+      <?php poznoteRenderStylesheets('trash'); ?>
+      <?php poznoteRenderStylesheets('admin/users', ['prefix' => '../']); ?>
+
+  `poznoteCssManifest()` maps the page key (its path under `src/public/`,
+  without the extension) to an ordered list; entries starting with `@` are
+  groups (`@modals`, `@theme`, `@icon-sidebar`, `@home`) expanded in place.
+  Order is cascade order. To give every page a new stylesheet, add it to a
+  group; to change one page, edit its list. Cache-busting goes through
+  `poznoteAsset()`, one scheme for all of them.
+- Exceptions that still link by hand: `index.php` (bundles, a media-scoped
+  link and an inline `<style>` in the middle), `api_export_attachments.php`
+  (writes a standalone document), and the password-gate `<head>` of
+  `settings.php`, `public_note.php` and `public_folder.php`.
+- `tests/css-manifest.test.php` checks the manifest: every file exists, no
+  group is undefined, no page lists a stylesheet twice, the dark layer is never
+  loaded before its tokens, and each key belongs to a page that renders it.
 - An admin-uploaded custom stylesheet (Settings > Custom CSS) is injected last
   in `<head>` on every page by `config.php`, so it overrides everything here.
 - Because bundles are plain concatenation, one unbalanced brace silently

@@ -145,22 +145,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<title><?php echo getPageTitle(); ?></title>
 	<meta name="color-scheme" content="dark light">
 	<script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
-	<link type="text/css" rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>"/>
-	<link type="text/css" rel="stylesheet" href="css/modals/base.css?v=<?php echo $cache_v; ?>"/>
-	<link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>"/>
-	<link type="text/css" rel="stylesheet" href="css/favorites.css?v=<?php echo $cache_v; ?>"/>
-	<link type="text/css" rel="stylesheet" href="css/home/alerts.css?v=<?php echo $cache_v; ?>"/>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dashboard.css'); ?>"/>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/diary.css'); ?>"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $cache_v; ?>"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $cache_v; ?>"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $cache_v; ?>"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $cache_v; ?>"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $cache_v; ?>"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $cache_v; ?>"/>
-	<link type="text/css" rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $cache_v; ?>"/>
-	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $cache_v; ?>"/>
-	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $cache_v; ?>"/>
+	<?php poznoteRenderStylesheets('diary'); ?>
 	<script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>

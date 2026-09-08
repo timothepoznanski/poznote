@@ -54,34 +54,7 @@ if (!$note) {
     $v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     ?>
     <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
-    <link rel="stylesheet" href="css/lucide.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/attachments/base.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/attachments/upload.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/attachments/usage-notice.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/attachments/display.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/attachments/buttons-alerts.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/home/buttons.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/attachments/preview-modal.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/attachments/responsive.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/modals/base.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/modals/specific-modals.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/modals/attachments.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/modals/share-modal.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/modals/alerts-utilities.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/modals/responsive.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>">
-    <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $v; ?>">
+    <?php poznoteRenderStylesheets('attachments'); ?>
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <style>
         .file-icon-placeholder {

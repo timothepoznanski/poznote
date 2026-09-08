@@ -1,4 +1,8 @@
 <?php
+// Which stylesheets each page loads. Kept next to the asset helpers below
+// because poznoteRenderStylesheets() builds its hrefs with poznoteAsset().
+require_once __DIR__ . '/css_assets.php';
+
 // ============================================================
 // HELPER: Read environment variable safely
 // ============================================================

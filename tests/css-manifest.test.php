@@ -1,0 +1,98 @@
+<?php
+require_once dirname(__DIR__) . '/src/config.php';
+
+// src/css_assets.php replaced 778 hand-written <link> tags spread over 39
+// <head> blocks. The point of moving them into one list is that the list can
+// now be checked, so these are the checks the old copy-paste could not have.
+
+$docroot = dirname(__DIR__) . '/src/public/';
+
+test('every stylesheet in the manifest exists on disk', function () use ($docroot) {
+    $missing = [];
+    foreach (array_keys(poznoteCssManifest()) as $page) {
+        foreach (poznoteCssResolve($page) as $file) {
+            if (!is_file($docroot . $file)) {
+                $missing[] = "$page -> $file";
+            }
+        }
+    }
+    assertSame([], $missing, 'stylesheets linked but not present');
+});
+
+test('every group referenced by a page is defined', function () {
+    $groups = poznoteCssGroups();
+    $unknown = [];
+    foreach (poznoteCssManifest() as $page => $items) {
+        foreach ($items as $item) {
+            if (str_starts_with($item, '@') && !isset($groups[$item])) {
+                $unknown[] = "$page -> $item";
+            }
+        }
+    }
+    assertSame([], $unknown, 'undefined group names');
+});
+
+test('no page links the same stylesheet twice', function () {
+    // Six pages linked lucide.css twice and settings.php also linked
+    // dark-mode/variables.css twice. poznoteCssResolve() drops the repeat, but
+    // a duplicate in the manifest is still a mistake worth catching.
+    $dupes = [];
+    foreach (poznoteCssManifest() as $page => $items) {
+        $seen = [];
+        foreach ($items as $item) {
+            if (in_array($item, $seen, true)) {
+                $dupes[] = "$page -> $item";
+            }
+            $seen[] = $item;
+        }
+    }
+    assertSame([], $dupes, 'stylesheet listed twice for one page');
+});
+
+test('a page using the dark layer declares the theme tokens first', function () {
+    // dark-mode/*.css consume --dm-* from dark-mode/variables.css. Loading any
+    // of them without it, or after it, leaves the dark theme unstyled.
+    $wrong = [];
+    foreach (array_keys(poznoteCssManifest()) as $page) {
+        $dark = array_values(array_filter(
+            poznoteCssResolve($page),
+            fn($f) => str_starts_with($f, 'css/dark-mode/')
+        ));
+        if (!$dark) {
+            continue;
+        }
+        if ($dark[0] !== 'css/dark-mode/variables.css') {
+            $wrong[] = "$page (first is {$dark[0]})";
+        }
+    }
+    assertSame([], $wrong, 'dark layer loaded before its tokens');
+});
+
+test('every page key matches an entry point that renders it', function () use ($docroot) {
+    $wrong = [];
+    foreach (array_keys(poznoteCssManifest()) as $page) {
+        $file = $docroot . $page . '.php';
+        if (!is_file($file)) {
+            $wrong[] = "$page (no such entry point)";
+            continue;
+        }
+        if (!str_contains(file_get_contents($file), "poznoteRenderStylesheets('$page'")) {
+            $wrong[] = "$page (entry point does not render its own key)";
+        }
+    }
+    assertSame([], $wrong, 'manifest keys without a matching page');
+});
+
+test('rendered links are versioned and honour the subdirectory prefix', function () {
+    ob_start();
+    poznoteRenderStylesheets('admin/users', ['prefix' => '../']);
+    $html = ob_get_clean();
+    assertContains('<link rel="stylesheet" href="../css/lucide.css?v=', $html);
+    if (!preg_match('/\?v=[^"&]*-\d{9,}"/', $html)) {
+        fail('expected app-version + mtime cache busting, got: ' . substr($html, 0, 200));
+    }
+});
+
+test('an unknown page key resolves to nothing rather than half a page', function () {
+    assertSame([], poznoteCssResolve('does-not-exist'));
+});
