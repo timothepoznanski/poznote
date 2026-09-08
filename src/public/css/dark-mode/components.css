@@ -351,7 +351,7 @@ html[data-theme='dark'] .btn-rename {
 }
 
 html[data-theme='dark'] .btn-rename:disabled {
-    background-color: #4a4a4a;
+    background-color: var(--dm-surface-raised);
     color: var(--dm-text-subtle);
     border-color: var(--dm-border-light);
     opacity: 0.6;
@@ -371,7 +371,7 @@ html[data-theme='dark'] .btn-background {
 
 html[data-theme='dark'] .btn-background:hover {
     background-color: #5a6268;
-    border-color: #545b62;
+    border-color: var(--dm-border-light);
 }
 
 html[data-theme='dark'] .btn-danger,
@@ -405,7 +405,7 @@ html[data-theme='dark'] .btn-cancel {
 }
 
 html[data-theme='dark'] .btn-cancel:hover {
-    background-color: #4a4a4a;
+    background-color: var(--dm-surface-raised);
 }
 
 /* ============================================
@@ -599,7 +599,7 @@ html[data-theme='dark'] .noteentry table.inserted-table th {
 /* Table context menu */
 html[data-theme='dark'] .table-context-menu {
     background: var(--dm-surface) !important;
-    border-color: #444 !important;
+    border-color: var(--dm-border) !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
 }
 
@@ -630,7 +630,7 @@ html[data-theme='dark'] ::-webkit-scrollbar-thumb {
 }
 
 html[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
-    background: #4a4a4a;
+    background: var(--dm-surface-raised);
 }
 
 /* ============================================

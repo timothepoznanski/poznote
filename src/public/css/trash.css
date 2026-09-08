@@ -668,7 +668,7 @@ html[data-theme='dark'] .trash-no-notes {
 }
 
 html[data-theme='dark'] .trash-search-notice {
-    background-color: #1a2a3a !important;
+    background-color: var(--dm-content-bg) !important;
     border-color: #2c5282 !important;
     color: #9cc6ef !important;
 }

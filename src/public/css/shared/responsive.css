@@ -264,7 +264,7 @@
     }
 
     [data-theme="dark"] .shared-note-item {
-        background: #2b2b2b;
+        background: var(--dm-content-bg);
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
     }
 

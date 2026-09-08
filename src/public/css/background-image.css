@@ -117,8 +117,8 @@
 
 /* Dark mode support */
 html[data-theme='dark'] .background-preview-container {
-    border-color: #444;
-    background-color: #2a2a2a;
+    border-color: var(--dm-border);
+    background-color: var(--dm-content-bg);
 }
 
 html[data-theme='dark'] .background-preview .no-background-text {
@@ -130,6 +130,6 @@ html[data-theme='dark'] .background-opacity-control label {
 }
 
 html[data-theme='dark'] .background-opacity-control input[type="range"] {
-    background: #444;
+    background: var(--dm-surface-raised);
 }
 

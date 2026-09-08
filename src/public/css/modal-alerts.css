@@ -195,7 +195,7 @@ html[data-theme='dark'] .note-creation-loading-content {
 /* Dark mode support */
 html[data-theme='dark'] .alert-modal,
 .dark-mode .alert-modal {
-    background: #2d3748;
+    background: var(--dm-surface);
     color: var(--dm-text-bright);
 }
 
@@ -455,8 +455,8 @@ html[data-theme='dark'] .spinner,
     font-size: 0.9em;
 }
 html[data-theme='dark'] .admin-contact-option {
-    background: var(--dm-surface, #1f2937);
-    border-color: var(--dm-border, #374151);
+    background: var(--dm-surface, var(--dm-content-bg));
+    border-color: var(--dm-border, var(--dm-border));
 }
 html[data-theme='dark'] .admin-contact-option-desc {
     color: var(--dm-text-muted);
@@ -464,5 +464,5 @@ html[data-theme='dark'] .admin-contact-option-desc {
 html[data-theme='dark'] .admin-contact-email,
 html[data-theme='dark'] .admin-contact-copy {
     background: transparent;
-    border-color: var(--dm-border, #374151);
+    border-color: var(--dm-border, var(--dm-border));
 }

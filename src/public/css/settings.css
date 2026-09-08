@@ -250,7 +250,7 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
 }
 
 html[data-theme='dark'] .settings-view-toggle {
-    background: var(--dm-surface, #262626);
+    background: var(--dm-surface, var(--dm-content-bg));
     border-color: var(--dm-border, var(--dm-border));
     color: var(--dm-text-muted, var(--dm-text-muted));
 }

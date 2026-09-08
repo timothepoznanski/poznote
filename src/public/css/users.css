@@ -884,12 +884,12 @@ input:disabled+.slider {
     }
 
     html[data-theme='dark'] .actions-center .btn-secondary {
-        background: #3b3f45;
+        background: var(--dm-surface-hover);
         color: var(--dm-text-bright) !important;
     }
 
     html[data-theme='dark'] .actions-center .btn-secondary:hover {
-        background: #4a5058;
+        background: var(--dm-surface-raised);
     }
 
     html[data-theme='dark'] .actions-center .btn-danger {

@@ -151,8 +151,8 @@ html[data-theme='dark'] .noteentry table th.pz-cell-selected {
 
 /* Dark mode */
 html[data-theme='dark'] .table-context-menu {
-    background: #1f2937;
-    border-color: #374151;
+    background: var(--dm-content-bg);
+    border-color: var(--dm-border);
     box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
 
@@ -161,7 +161,7 @@ html[data-theme='dark'] .table-context-menu-item {
 }
 
 html[data-theme='dark'] .table-context-menu-item:hover {
-    background: #374151;
+    background: var(--dm-surface-hover);
 }
 
 html[data-theme='dark'] .table-context-menu-item.danger {
@@ -173,5 +173,5 @@ html[data-theme='dark'] .table-context-menu-item.danger:hover {
 }
 
 html[data-theme='dark'] .table-context-menu-separator {
-    background: #374151;
+    background: var(--dm-surface-hover);
 }

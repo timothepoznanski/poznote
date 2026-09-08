@@ -82,7 +82,7 @@
 }
 
 html[data-theme='dark'] .direct-copy-command {
-    background-color: #1f2937;
-    border-color: #4b5563;
+    background-color: var(--dm-content-bg);
+    border-color: var(--dm-border-light);
     color: var(--dm-text-bright);
 }

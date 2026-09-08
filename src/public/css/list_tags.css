@@ -288,8 +288,8 @@ html[data-theme='dark'] .tag-color-swatch.selected {
 
 /* Dark mode */
 html[data-theme='dark'] .tag-context-menu {
-    background: #2a2a2a;
-    border-color: #444;
+    background: var(--dm-content-bg);
+    border-color: var(--dm-border);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
@@ -306,7 +306,7 @@ html[data-theme='dark'] .tag-context-menu-item.danger {
 }
 
 html[data-theme='dark'] .tag-context-menu-item.danger:hover {
-    background: #3a2828;
+    background: var(--dm-content-bg);
 }
 
 /* Rename input inside the modal */

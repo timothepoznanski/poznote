@@ -663,7 +663,7 @@ a.workspace-name-link:focus-visible {
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-modal-content {
-    background: linear-gradient(180deg, #2a2d31 0%, #23262a 100%);
+    background: linear-gradient(180deg, var(--dm-surface) 0%, var(--dm-content-bg) 100%);
     color: var(--dm-text-bright);
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 28px 64px rgba(0, 0, 0, 0.48);
@@ -700,7 +700,7 @@ html[data-theme='dark'] .shared-edit-token-modal a.workspace-share-modal-url:hov
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .modal-password-input {
-    background: #34383d;
+    background: var(--dm-surface-hover);
     border-color: #5b636d;
     color: var(--dm-text-bright);
 }
@@ -718,7 +718,7 @@ html[data-theme='dark'] .shared-edit-token-modal .modal-password-input:focus {
 
 html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-password-toggle,
 html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-copy-btn {
-    background: #454b52;
+    background: var(--dm-surface-raised);
     border-color: #5b636d;
     color: var(--dm-text-bright);
 }
@@ -736,7 +736,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-restrict-users-wrap {
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .share-user-list-container {
-    background: #2d3136;
+    background: var(--dm-surface);
     border-color: rgba(255, 255, 255, 0.08);
 }
 

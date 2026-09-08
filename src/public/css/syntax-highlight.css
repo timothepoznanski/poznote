@@ -122,7 +122,7 @@ code.hljs {
 /* Dark theme - Applied when data-theme="dark" is set on html element */
 html[data-theme="dark"] .hljs {
     color: var(--dm-text-muted);
-    background: #161b22;
+    background: var(--dm-content-bg);
 }
 
 html[data-theme="dark"] .hljs-doctag,

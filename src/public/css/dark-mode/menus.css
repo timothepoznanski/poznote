@@ -160,7 +160,7 @@ html[data-theme='dark'] .image-menu-item i {
 
 html[data-theme='dark'] .image-submenu {
     background: var(--dm-content-bg);
-    border-color: #444;
+    border-color: var(--dm-border);
 }
 
 html[data-theme='dark'] .image-submenu-item {
@@ -178,12 +178,12 @@ html[data-theme='dark'] .image-menu-item[data-action='delete-image'] i {
 }
 
 html[data-theme='dark'] img.img-with-border {
-    border-color: #444;
-    background: #1b1b1b;
+    border-color: var(--dm-border);
+    background: var(--dm-content-bg);
 }
 
 html[data-theme='dark'] img.img-with-border-no-padding {
-    border-color: #444;
+    border-color: var(--dm-border);
 }
 
 /* ============================================

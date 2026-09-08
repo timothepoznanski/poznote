@@ -326,7 +326,7 @@
 
 [data-theme="dark"] .ui-custom-filter-input,
 .dark-mode .ui-custom-filter-input {
-    background: #111827;
+    background: var(--dm-content-bg);
     border-color: rgba(255, 255, 255, 0.14);
     color: var(--dm-text-bright);
 }

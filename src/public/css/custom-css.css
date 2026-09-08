@@ -90,7 +90,7 @@ html[data-theme='dark'] #customCssModal p {
 
 html[data-theme='dark'] .no-css-text {
     background: rgba(255, 255, 255, 0.05);
-    border-color: #444;
+    border-color: var(--dm-border);
     color: var(--dm-text-subtle);
 }
 

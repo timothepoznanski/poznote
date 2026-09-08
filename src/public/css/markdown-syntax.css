@@ -163,8 +163,8 @@ html[data-theme='dark'] .syntax-card h2 {
 }
 
 html[data-theme='dark'] .syntax-card {
-    border-color: var(--dm-border, #30363d);
-    background: var(--dm-surface, #161b22);
+    border-color: var(--dm-border, var(--dm-border));
+    background: var(--dm-surface, var(--dm-content-bg));
 }
 
 html[data-theme='dark'] .syntax-card p {
@@ -176,13 +176,13 @@ html[data-theme='dark'] .syntax-card-category {
 }
 
 html[data-theme='dark'] .syntax-card pre {
-    border-color: var(--dm-border, #30363d);
-    background: var(--dm-bg, #0d1117);
+    border-color: var(--dm-border, var(--dm-border));
+    background: var(--dm-bg, var(--dm-content-bg));
     color: var(--dm-text, var(--dm-text-bright));
 }
 
 html[data-theme='dark'] .markdown-syntax-empty {
-    border-color: var(--dm-border, #30363d);
-    background: var(--dm-surface, #161b22);
+    border-color: var(--dm-border, var(--dm-border));
+    background: var(--dm-surface, var(--dm-content-bg));
     color: var(--dm-text-muted, var(--dm-text-subtle));
 }

@@ -265,12 +265,12 @@ a.note-internal-link:hover {
 }
 
 [data-theme="dark"] .note-reference-list {
-    border-color: #444;
+    border-color: var(--dm-border);
     background-color: var(--dm-surface);
 }
 
 [data-theme="dark"] .note-reference-item {
-    border-bottom-color: #444;
+    border-bottom-color: var(--dm-border);
 }
 
 [data-theme="dark"] .note-reference-item:hover {

@@ -173,7 +173,7 @@
 
 [data-theme="dark"] .search-replace-btn {
     background: var(--dm-surface);
-    border-color: #444;
+    border-color: var(--dm-border);
     color: var(--dm-text-bright);
 }
 

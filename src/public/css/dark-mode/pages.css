@@ -419,7 +419,7 @@ html[data-theme='dark'] .backup-section input[type="file"]::file-selector-button
 }
 
 html[data-theme='dark'] .backup-section input[type="file"]::file-selector-button:hover {
-    background-color: #4a4a4a;
+    background-color: var(--dm-surface-raised);
 }
 
 /* Card containers (backup/export) */

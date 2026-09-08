@@ -100,7 +100,7 @@ html[data-theme='dark'] .modal-buttons button.btn-cancel {
 }
 
 html[data-theme='dark'] .modal-buttons button.btn-cancel:hover {
-    background-color: #4a4a4a;
+    background-color: var(--dm-surface-raised);
 }
 
 /* ============================================
@@ -109,7 +109,7 @@ html[data-theme='dark'] .modal-buttons button.btn-cancel:hover {
 
 html[data-theme='dark'] #reminderModal .modal-content,
 html[data-theme='dark'] #taskDueModal .modal-content {
-    background: linear-gradient(180deg, #26282d 0%, #202226 100%);
+    background: linear-gradient(180deg, var(--dm-content-bg) 0%, var(--dm-content-bg) 100%);
     border: 1px solid rgba(255, 255, 255, 0.06);
     box-shadow: 0 18px 44px rgba(0, 0, 0, 0.38);
 }
@@ -121,8 +121,8 @@ html[data-theme='dark'] #taskDueModal .modal-content h3 {
 
 html[data-theme='dark'] #reminderModal .reminder-datetime-input,
 html[data-theme='dark'] #taskDueModal .reminder-datetime-input {
-    background: #313338;
-    border-color: #464b53;
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
     color: var(--dm-text-bright);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
     color-scheme: dark;
@@ -142,8 +142,8 @@ html[data-theme='dark'] #taskDueModal .reminder-datetime-input::-webkit-calendar
 
 html[data-theme='dark'] #reminderModal .reminder-datetime-part,
 html[data-theme='dark'] #taskDueModal .reminder-datetime-part {
-    background: #313338;
-    border-color: #464b53;
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
     color: var(--dm-text-bright);
 }
 
@@ -163,8 +163,8 @@ html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-unit
 html[data-theme='dark'] :is(#taskDueModal, #taskDueModal) .reminder-repeat-unit,
 html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-interval,
 html[data-theme='dark'] :is(#taskDueModal, #taskDueModal) .reminder-repeat-interval {
-    background: #313338;
-    border-color: #464b53;
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
     color: var(--dm-text-bright);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
     color-scheme: dark;
@@ -187,7 +187,7 @@ html[data-theme='dark'] :is(#taskDueModal, #taskDueModal) .reminder-repeat-label
 
 html[data-theme='dark'] #reminderModal .reminder-email-option,
 html[data-theme='dark'] #taskDueModal .reminder-email-option {
-    background: #2b2f35;
+    background: var(--dm-surface);
     border-color: rgba(255, 255, 255, 0.08);
     color: var(--dm-text-bright);
 }
@@ -196,7 +196,7 @@ html[data-theme='dark'] #reminderModal .reminder-email-option:hover,
 html[data-theme='dark'] #taskDueModal .reminder-email-option:hover,
 html[data-theme='dark'] #reminderModal .reminder-email-option:focus-within,
 html[data-theme='dark'] #taskDueModal .reminder-email-option:focus-within {
-    background: #31363d;
+    background: var(--dm-surface);
     border-color: rgba(74, 158, 255, 0.24);
 }
 
@@ -234,15 +234,15 @@ html[data-theme='dark'] #taskDueModal .reminder-modal-action {
 
 html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-cancel,
 html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-cancel {
-    background: #4c5057;
-    border-color: #4c5057;
+    background: var(--dm-surface-raised);
+    border-color: var(--dm-border-light);
     color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-cancel:hover,
 html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-cancel:hover {
     background: #595e67;
-    border-color: #595e67;
+    border-color: var(--dm-border-light);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-primary,
@@ -270,7 +270,7 @@ html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-danger:hover 
    ============================================ */
 
 html[data-theme='dark'] #notificationsModal .modal-content {
-    background: linear-gradient(180deg, #26282d 0%, #202226 100%);
+    background: linear-gradient(180deg, var(--dm-content-bg) 0%, var(--dm-content-bg) 100%);
     border: 1px solid rgba(255, 255, 255, 0.06);
     box-shadow: 0 18px 44px rgba(0, 0, 0, 0.38);
 }
@@ -280,12 +280,12 @@ html[data-theme='dark'] #notificationsModal .modal-content h3 {
 }
 
 html[data-theme='dark'] #notificationsModal .notification-item {
-    background: #2b2f35;
+    background: var(--dm-surface);
     border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 html[data-theme='dark'] #notificationsModal .notification-item:hover {
-    background: #31363d;
+    background: var(--dm-surface);
 }
 
 html[data-theme='dark'] #notificationsModal .notification-item.unread {
@@ -325,14 +325,14 @@ html[data-theme='dark'] #notificationsModal .notifications-empty {
 }
 
 html[data-theme='dark'] #notificationsModal .modal-buttons .btn-cancel {
-    background: #4c5057;
-    border-color: #4c5057;
+    background: var(--dm-surface-raised);
+    border-color: var(--dm-border-light);
     color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] #notificationsModal .modal-buttons .btn-cancel:hover {
     background: #595e67;
-    border-color: #595e67;
+    border-color: var(--dm-border-light);
 }
 
 /* ============================================
@@ -734,13 +734,13 @@ html[data-theme='dark'] #deleteFolderModal .btn-cancel {
 }
 
 html[data-theme='dark'] #deleteFolderModal .btn-cancel:hover {
-    background-color: #4a4a4a !important;
-    border-color: #4a4a4a !important;
+    background-color: var(--dm-surface-raised) !important;
+    border-color: var(--dm-border) !important;
 }
 
 /* Snapshot Modal Dark Mode */
 html[data-theme='dark'] #snapshotModal .snapshot-modal-content {
-    background: linear-gradient(180deg, #262a31 0%, #1f2329 100%);
+    background: linear-gradient(180deg, var(--dm-content-bg) 0%, var(--dm-content-bg) 100%);
     border: 1px solid rgba(255, 255, 255, 0.06);
     box-shadow: 0 18px 44px rgba(0, 0, 0, 0.38);
 }
@@ -772,7 +772,7 @@ html[data-theme='dark'] #snapshotModal .snapshot-meta-item .lucide {
 
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview {
     border-color: var(--dm-border);
-    background: #11161d !important;
+    background: var(--dm-content-bg) !important;
     color: var(--dm-text, var(--dm-text-bright)) !important;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
 }
@@ -804,18 +804,18 @@ html[data-theme='dark'] #snapshotModal .snapshot-content-preview a {
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview blockquote {
-    border-left-color: var(--dm-border, #30363d) !important;
+    border-left-color: var(--dm-border, var(--dm-border)) !important;
     color: var(--dm-text-muted, var(--dm-text)) !important;
     background: transparent !important;
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview pre {
-    background-color: var(--dm-surface, #1b222c) !important;
-    border-color: var(--dm-border, #30363d) !important;
+    background-color: var(--dm-surface, var(--dm-content-bg)) !important;
+    border-color: var(--dm-border, var(--dm-border)) !important;
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview code:not([class*="hljs"]):not([class*="language-"]) {
-    background-color: var(--dm-surface, #1b222c) !important;
+    background-color: var(--dm-surface, var(--dm-content-bg)) !important;
     color: var(--dm-text, var(--dm-text-bright)) !important;
 }
 
@@ -827,17 +827,17 @@ html[data-theme='dark'] #snapshotModal .snapshot-content-preview pre code:not([c
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview table,
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview th,
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview td {
-    border-color: var(--dm-border, #30363d) !important;
+    border-color: var(--dm-border, var(--dm-border)) !important;
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview th,
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview td {
-    background-color: var(--dm-surface, #1b222c) !important;
+    background-color: var(--dm-surface, var(--dm-content-bg)) !important;
     color: var(--dm-text, var(--dm-text-bright)) !important;
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview hr {
-    border-top-color: var(--dm-border, #30363d) !important;
+    border-top-color: var(--dm-border, var(--dm-border)) !important;
 }
 
 html[data-theme='dark'] .snapshot-modal-actions {
@@ -889,8 +889,8 @@ html[data-theme='dark'] #snapshotModal .snapshot-state-hint {
 
 /* Update Modal Specific */
 html[data-theme='dark'] #updateModal .version-info {
-    background-color: #2a2d32 !important;
-    border: 1px solid #40444b !important;
+    background-color: var(--dm-surface) !important;
+    border: 1px solid var(--dm-border) !important;
 }
 
 html[data-theme='dark'] #updateModal .version-info p {
@@ -902,7 +902,7 @@ html[data-theme='dark'] #updateModal .modal-content p {
 }
 
 html[data-theme='dark'] #updateModal .backup-warning {
-    background-color: #2d2a1e;
+    background-color: var(--dm-content-bg);
     border-color: #5a4e1a;
 }
 

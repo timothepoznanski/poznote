@@ -308,8 +308,8 @@ html[data-theme='dark'] .webhooks-section-hint {
     color: rgba(255, 255, 255, 0.62);
 }
 html[data-theme='dark'] .webhooks-field input {
-    background: var(--input-bg, #2a2a2a);
-    border-color: var(--border-color, #444);
+    background: var(--input-bg, var(--dm-content-bg));
+    border-color: var(--border-color, var(--dm-border));
     color: var(--dm-text-bright);
 }
 html[data-theme='dark'] .webhooks-item-description {
@@ -321,7 +321,7 @@ html[data-theme='dark'] .webhooks-item-event {
     color: rgba(255, 255, 255, 0.75);
 }
 html[data-theme='dark'] .webhooks-actions-menu {
-    background: var(--dm-surface, #2a2a2a);
+    background: var(--dm-surface, var(--dm-content-bg));
     border-color: rgba(255, 255, 255, 0.14);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
 }

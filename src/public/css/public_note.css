@@ -735,7 +735,7 @@ html[data-theme='dark'] .theme-toggle-btn:hover {
 
 html[data-theme='dark'] .public-note audio {
     background: #5f6368;
-    border-color: #4b5563;
+    border-color: var(--dm-border-light);
 }
 
 html[data-theme='dark'] .public-note audio::-webkit-media-controls-enclosure,
@@ -777,7 +777,7 @@ html[data-theme='dark'] .public-note-attachments h2 {
 /* Dark mode styles for important tasks */
 html[data-theme='dark'] .public-note .content .task-item.important {
     border-color: #5a2a2a;
-    background: #2d1a1a;
+    background: var(--dm-content-bg);
 }
 
 html[data-theme='dark'] .public-note .content .task-item.important .task-text {
@@ -790,7 +790,7 @@ html[data-theme='dark'] .public-task-edit-title {
 }
 
 html[data-theme='dark'] .public-task-edit-cancel {
-    background: #4c5057;
+    background: var(--dm-surface-raised);
     color: var(--dm-text-bright);
 }
 
@@ -909,7 +909,7 @@ html[data-theme='dark'] .public-note .content [style*="color:black"] {
 }
 
 html[data-theme='dark'] .public-note-editor-markdown {
-    background: var(--dm-surface, #1e293b);
+    background: var(--dm-surface, var(--dm-content-bg));
     color: var(--dm-text, var(--dm-text-bright));
     border-color: var(--dm-border, #475569);
 }

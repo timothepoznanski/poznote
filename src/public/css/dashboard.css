@@ -719,7 +719,7 @@ body.dashboard-page {
 }
 
 :root[data-theme='dark'] .note-color-swatch-empty {
-    background: repeating-linear-gradient(45deg, #374151 0 4px, #1f2937 4px 8px);
+    background: repeating-linear-gradient(45deg, var(--dm-surface-hover) 0 4px, var(--dm-content-bg) 4px 8px);
 }
 
 /* ---------- Note color picker modal ---------- */
@@ -1351,7 +1351,7 @@ body.dashboard-page .notifications-empty i {
 }
 
 :root[data-theme='dark'] .board-view-btn {
-    background: var(--dm-surface, #262626);
+    background: var(--dm-surface, var(--dm-content-bg));
     border-color: var(--dm-border, var(--dm-border));
     color: var(--dm-text-muted, var(--dm-text-muted));
 }

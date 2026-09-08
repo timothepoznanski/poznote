@@ -355,8 +355,8 @@ html[data-theme='dark'] .debug-info {
 }
 
 html.theme-black[data-theme='dark'] .debug-info {
-    background: #141821;
-    border-color: #2a3140;
+    background: var(--dm-content-bg);
+    border-color: var(--dm-border);
     color: var(--dm-text-bright);
 }
 

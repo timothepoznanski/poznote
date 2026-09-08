@@ -304,7 +304,7 @@ body.app-tab-reordering {
 }
 
 [data-theme="dark"] .app-tab-close-all {
-    background: var(--dm-content-bg, #1e293b);
+    background: var(--dm-content-bg, var(--dm-content-bg));
     border-color: var(--dm-border, #334155);
     color: var(--dm-text-muted);
     box-shadow: 9px 0 0 0 var(--dm-tabbar-bg);
@@ -320,7 +320,7 @@ body.app-tab-reordering {
 }
 
 [data-theme="dark"] .app-tab-context-menu {
-    background: #2a2a2a;
+    background: var(--dm-content-bg);
     border-color: var(--dm-surface-hover);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
