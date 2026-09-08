@@ -68,7 +68,7 @@ html[data-theme='dark'] .markdown-preview table td {
 html[data-theme='dark'] .noteentry table th,
 html[data-theme='dark'] .markdown-preview table th {
     background-color: var(--dm-surface);
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
 }
 
 html[data-theme='dark'] .markdown-preview a {

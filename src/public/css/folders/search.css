@@ -16,11 +16,11 @@ html[data-theme='dark'] .search-highlight,
 html[data-theme='dark'] .noteentry .search-highlight {
     background-color: var(--dm-warning);
     color: #000000; /* Force black text for readability on yellow */
-    font-weight: normal !important;
+    font-weight: var(--pz-weight-normal) !important;
     font-family: inherit !important;
     font-style: normal !important;
     text-decoration: none !important;
-    border-radius: 2px;
+    border-radius: var(--pz-radius-sm);
     padding: 1px 2px;
     box-shadow: 0 1px 3px rgba(255, 255, 0, 0.3);
     display: inline !important;
@@ -36,11 +36,11 @@ html[data-theme='dark'] .search-highlight-active,
 html[data-theme='dark'] .noteentry .search-highlight-active {
     background-color: var(--dm-warning-hover); /* Bright orange */
     color: #000000;
-    font-weight: bold !important;
+    font-weight: var(--pz-weight-bold) !important;
     box-shadow: 0 0 10px rgba(255, 157, 0, 0.8);
     z-index: 1000 !important;
     border: 1px solid var(--dm-warning-hover);
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
 }
 
 /* Ensure text color inside tags follows the active highlight style */
@@ -56,7 +56,7 @@ html[data-theme='dark'] .note-header .input-highlight-overlay {
     background-color: var(--dm-warning);
     color: #000000;
     opacity: 0.7;
-    border-radius: 2px;
+    border-radius: var(--pz-radius-sm);
     box-shadow: 0 1px 3px rgba(255, 255, 0, 0.3);
     pointer-events: none; /* Let clicks pass through to the input */
 }
@@ -69,5 +69,5 @@ html[data-theme='dark'] .note-header .input-highlight-overlay.search-highlight-a
     opacity: 0.9;
     z-index: 10 !important;
     box-shadow: 0 0 5px rgba(255, 157, 0, 0.7);
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
 }

@@ -40,7 +40,7 @@
     align-items: center;
     gap: 6px;
     padding: 5px 8px 5px 12px;
-    border-radius: 6px 6px 0 0;
+    border-radius: var(--pz-radius) var(--pz-radius) 0 0;
     background: var(--pz-surface-hover);
     cursor: pointer;
     max-width: 200px;
@@ -64,7 +64,7 @@
     background: var(--pz-bg);
     border-color: var(--pz-border-strong);
     border-top: 2px solid var(--pz-accent);
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     z-index: 1;
 }
 
@@ -88,7 +88,7 @@
     color: var(--pz-text-subtle);
     font-size: 1rem;
     line-height: 1;
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -121,7 +121,7 @@
     padding: 4px 10px;
     margin-bottom: 4px;
     border: 1px solid var(--pz-border);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: var(--pz-bg);
     box-shadow: 9px 0 0 0 #fff;
     color: var(--pz-text-muted);
@@ -206,7 +206,7 @@ body.app-tab-reordering {
     position: fixed;
     background: var(--pz-bg);
     border: 1px solid var(--pz-border-strong);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 10px 15px -3px rgba(var(--pz-shadow-rgb), 0.1), 0 4px 6px -2px rgba(var(--pz-shadow-rgb), 0.05);
     min-width: 160px;
     padding: 4px 0;

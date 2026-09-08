@@ -42,7 +42,7 @@ p.code-block-placeholder-after[data-ph]:empty:before {
     margin-right: 1%;
     margin-bottom: 20px;
     background: var(--pz-bg);
-    border-radius: 5px;
+    border-radius: var(--pz-radius-sm);
     font-family: 'Inter', sans-serif;
 }
 
@@ -92,7 +92,7 @@ p.code-block-placeholder-after[data-ph]:empty:before {
         height: 32px;
         padding: 0;
         border: 1px solid rgba(var(--pz-shadow-rgb), 0.12);
-        border-radius: 7px;
+        border-radius: var(--pz-radius);
         background: rgba(var(--pz-highlight-rgb), 0.96);
         color: var(--pz-accent);
         box-shadow: 0 5px 14px rgba(15, 23, 42, 0.14);
@@ -180,37 +180,37 @@ textarea:focus {
 /* Heading styles - higher specificity to override font-size */
 .noteentry h1 {
     font-size: 2em !important;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 0.67em 0;
 }
 
 .noteentry h2 {
     font-size: 1.5em !important;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 0.83em 0;
 }
 
 .noteentry h3 {
     font-size: 1.17em !important;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 1em 0;
 }
 
 .noteentry h4 {
     font-size: 1em !important;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 1.33em 0;
 }
 
 .noteentry h5 {
     font-size: 0.83em !important;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 1.67em 0;
 }
 
 .noteentry h6 {
     font-size: 0.67em !important;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 2.33em 0;
 }
 
@@ -298,7 +298,7 @@ textarea:focus {
 .noteentry .note-video-embed {
     max-width: 100%;
     height: auto;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.1);
     background: #000;
     display: block;
@@ -314,7 +314,7 @@ textarea:focus {
     overflow: hidden;
     margin: 8px 0;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: var(--pz-surface-hover);
 }
 
@@ -331,7 +331,7 @@ textarea:focus {
     margin: 0;
     overflow: hidden;
     border: 1px solid var(--pz-border);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: var(--pz-bg);
 }
 
@@ -401,7 +401,7 @@ textarea:focus {
     min-width: 0;
     overflow-wrap: anywhere;
     font-size: 0.86rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     line-height: 1.25;
 }
 

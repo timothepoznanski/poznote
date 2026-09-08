@@ -64,7 +64,7 @@
     white-space: nowrap;
     padding: 4px 8px;
     border: 1px solid var(--pz-border-light);
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
 }
 
 .attachment-link:hover {
@@ -92,5 +92,5 @@
 .icon-attachment-btn:focus {
     outline: 2px solid rgba(var(--pz-accent-rgb), 0.25);
     outline-offset: 2px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
 }

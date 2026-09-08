@@ -9,7 +9,7 @@
     font-size: 12px;
     margin-left: 4px;
     padding: 2px 4px;
-    border-radius: 2px;
+    border-radius: var(--pz-radius-sm);
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
@@ -42,7 +42,7 @@
 
 .noteentry .tasklist-progress-bar {
     height: 8px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background-color: var(--pz-surface-sunken);
     overflow: hidden;
 }
@@ -50,7 +50,7 @@
 .noteentry .tasklist-progress-fill {
     height: 100%;
     width: 0;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background-color: var(--pz-accent);
     transition: width 0.3s ease;
 }
@@ -76,7 +76,7 @@
     width: 95%;
     padding: 8px 12px;
     border: 1px solid var(--pz-border);
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     font-size: 14px;
     font-family: inherit;
     background: var(--pz-bg);
@@ -106,7 +106,7 @@
     padding: 6px 12px !important;
     margin-bottom: 8px;
     border: 1px solid var(--pz-border);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: var(--pz-surface);
     transition: all 0.2s ease;
     user-select: none;
@@ -122,7 +122,7 @@
     margin-right: 2px;
     margin-left: 2px;
     padding: 2px 4px;
-    border-radius: 2px;
+    border-radius: var(--pz-radius-sm);
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
@@ -228,7 +228,7 @@
     flex: 1;
     padding: 2px 4px;
     border: 1px solid var(--pz-accent);
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
     font-size: 14px;
     font-family: inherit;
     background: var(--pz-bg);
@@ -275,7 +275,7 @@
     flex: 0 1 auto;
     padding: 10px 12px;
     border: 1px solid var(--pz-border);
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     font-size: var(--note-font-size, 15px);
     font-family: inherit;
     line-height: 1.5;
@@ -340,7 +340,7 @@
     padding: 4px 8px;
     background: transparent;
     border: none;
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     font-size: 12px;
     opacity: 0.7;
@@ -354,7 +354,7 @@
     padding: 4px 8px;
     background: transparent;
     border: none;
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     font-size: 12px;
     opacity: 0.7;
@@ -402,7 +402,7 @@
     padding: 4px 8px;
     background: transparent;
     border: none;
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     font-size: 12px;
     opacity: 0.7;
@@ -432,7 +432,7 @@
     margin-left: 10px;
     padding: 2px 8px;
     border: 1px solid var(--pz-border-strong);
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
     background: var(--pz-surface);
     color: var(--pz-text-secondary);
     font-size: 12px;
@@ -477,7 +477,7 @@
     padding: 4px 8px;
     background: transparent;
     border: none;
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     font-size: 12px;
     opacity: 0.7;
@@ -505,7 +505,7 @@
     min-width: 210px;
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
-    border-radius: 10px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 12px 30px rgba(var(--pz-shadow-rgb), 0.12);
     padding: 6px;
     display: flex;
@@ -519,7 +519,7 @@
     padding: 10px 12px;
     background: none;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     cursor: pointer;
     font-family: inherit;
     font-size: 14px;
@@ -590,12 +590,12 @@
 .task-item.important .task-text {
     color: var(--pz-danger-hover);
     /* red text for important tasks */
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .task-item.important .task-text a {
     color: var(--pz-danger-hover);
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .task-item.important .task-text a:hover {
@@ -607,7 +607,7 @@
     padding: 4px 8px;
     background: transparent;
     border: none;
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     font-size: 12px;
     opacity: 0.8;
@@ -664,7 +664,7 @@
 }
 
 .callout .callout-title {
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
     margin-bottom: 15px;
     display: flex;
     align-items: center;
@@ -704,7 +704,7 @@
 }
 
 .callout .callout-title-text {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     font-size: 14px;
 }
 
@@ -801,7 +801,7 @@ details.callout:not([open]) .callout-fold-icon {
     /* padding-left: 10px; */
     /* padding-right: 10px; */
     /* border: 1px solid #e1e4e8; */
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
 }
 
 /* Ensure caret is visible at the bottom of the open block */
@@ -814,7 +814,7 @@ details.callout:not([open]) .callout-fold-icon {
     display: flex;
     align-items: center;
     padding: 10px 0px 0px 1px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     cursor: pointer;
     list-style: none;
     /* Hide default marker in Firefox */
@@ -944,7 +944,7 @@ html[data-theme='dark'] .toggle-block[open]>summary {
 
 .noteentry .tasklist-embed-widget {
     border: 1px solid var(--pz-border);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     padding: 12px 16px;
 }
 
@@ -969,7 +969,7 @@ html[data-theme='dark'] .toggle-block[open]>summary {
     height: 22px;
     padding: 0;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background: transparent;
     color: var(--pz-text-muted);
     cursor: pointer;
@@ -996,7 +996,7 @@ html[data-theme='dark'] .toggle-block[open]>summary {
 }
 
 .tasklist-embed-title {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: inherit;
     text-decoration: none;
     overflow: hidden;
@@ -1030,7 +1030,7 @@ html[data-theme='dark'] .toggle-block[open]>summary {
     align-items: flex-start;
     gap: 10px;
     padding: 4px 2px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     min-width: 0;
 }
 
@@ -1113,7 +1113,7 @@ html[data-theme='dark'] .toggle-block[open]>summary {
     height: 22px;
     padding: 0;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background: transparent;
     color: var(--pz-text-subtle);
     cursor: pointer;

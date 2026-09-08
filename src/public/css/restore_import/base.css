@@ -7,14 +7,14 @@
 @font-face {
     font-family: 'Inter';
     src: url('../../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Inter';
     src: url('../../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     font-style: normal;
 }
 
@@ -34,7 +34,7 @@ body {
     margin: 20px auto;
     padding: 20px;
     background: var(--pz-bg);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
 }
 
 /* Sections de sauvegarde - Modern Cards */
@@ -43,5 +43,5 @@ body {
     margin-top: 20px;
     margin-bottom: 24px;
     border: none;
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
 }

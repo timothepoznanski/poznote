@@ -72,7 +72,7 @@
     box-sizing: border-box;
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 6px 20px rgba(var(--pz-shadow-rgb), 0.15);
 }
 
@@ -88,7 +88,7 @@
     box-sizing: border-box;
     padding: 8px 10px;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: transparent;
     /* Same resting grey as .icon-sidebar-btn: the menu is the rail's own
        entries relabelled, so it must not read as a different palette. The icon
@@ -178,7 +178,7 @@
     padding: 0;
     margin: 0;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     color: var(--pz-text-subtle);
     background: transparent;
     text-decoration: none;
@@ -217,7 +217,7 @@
     right: 4px;
     width: 8px;
     height: 8px;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     background: var(--pz-danger);
     display: block;
     pointer-events: none;
@@ -250,7 +250,7 @@
     height: 25px;
     padding: 0;
     border: 1px solid var(--pz-border-strong);
-    border-radius: 0 4px 4px 0;
+    border-radius: 0 var(--pz-radius-sm) var(--pz-radius-sm) 0;
     background: var(--pz-bg);
     color: var(--pz-text-muted);
     cursor: pointer;
@@ -303,12 +303,12 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     gap: 8px;
     padding: 8px 16px;
     border: 1px solid var(--pz-border-strong);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: var(--pz-bg);
     color: var(--pz-text);
     font-family: inherit;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     text-decoration: none;
     cursor: pointer;
 }
@@ -361,7 +361,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     justify-content: center;
     gap: 10px;
     font-size: 24px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text);
     margin: 0 0 20px 0;
 }
@@ -390,7 +390,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     margin: 0;
     padding: 4px 8px 4px 9px;
     border: 1px solid var(--pz-border);
-    border-radius: 999px;
+    border-radius: var(--pz-radius-pill);
     background: var(--pz-surface);
     /* A long workspace name must not push the page name off screen: cap it and
        let the ellipsis take over (the full name is readable in the menu). */
@@ -398,7 +398,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     max-width: 40vw;
     font: inherit;
     font-size: 13px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     line-height: 1.2;
     color: var(--pz-text);
     cursor: pointer;
@@ -476,11 +476,11 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     box-sizing: border-box;
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 6px 20px rgba(var(--pz-shadow-rgb), 0.15);
     /* Explicit: once moved, the menu no longer inherits from the title. */
     font-size: 14px;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     line-height: 1.35;
     text-align: left;
 }
@@ -494,7 +494,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     align-items: center;
     gap: 8px;
     padding: 7px 10px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     color: var(--pz-text);
     text-decoration: none;
     cursor: pointer;
@@ -508,7 +508,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
 }
 
 .poznote-page-title-workspace-item-current {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 /* Action entries a page adds (dashboard.php's scope modal) are buttons. */
@@ -546,7 +546,7 @@ button.poznote-page-title-workspace-item {
     width: 9px;
     height: 9px;
     box-sizing: border-box;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     border: 1px solid rgba(var(--pz-shadow-rgb), 0.12);
     flex-shrink: 0;
 }

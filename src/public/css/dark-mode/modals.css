@@ -229,7 +229,7 @@ html[data-theme='dark'] #taskDueModal .reminder-current-info {
 
 html[data-theme='dark'] #reminderModal .reminder-modal-action,
 html[data-theme='dark'] #taskDueModal .reminder-modal-action {
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-cancel,
@@ -405,7 +405,7 @@ html[data-theme='dark'] #createWorkspaceModal .modal-error-message {
     background-color: rgba(255, 77, 77, 0.08);
     color: var(--dm-danger);
     border: 1px solid var(--dm-danger-soft);
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     padding: 8px 10px;
 }
 

@@ -127,6 +127,11 @@ them and a background there breaks their native rendering.
 - no empty rule. A declaration block with nothing in it says nothing to anyone
   but the parser, and an empty `@keyframes` is how the first of those two bugs
   stayed hidden.
+- the radius and weight scales hold. 27 different corner radii were in use, 14
+  of them on buttons alone, so the same `.btn` rendered at 4px, 6px or 8px
+  depending on the page; and eight spellings of `font-weight` for what the
+  shipped font renders as two, since `fonts.css` declares Inter at 400 and 600
+  only. Both are scales in `tokens.css` now, and a literal value is rejected;
 - a generic dark rule may not outweigh its light twin. Page stylesheets load
   after the light bases and before the dark layer, so at equal specificity a page
   rule wins in light and loses in dark; and the carrier itself adds (0,1,1), so

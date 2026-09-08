@@ -44,7 +44,7 @@ html[data-theme='dark'] .mini-calendar-day-today {
 
 html[data-theme='dark'] .mini-calendar-day-today .mini-calendar-day-number {
     color: var(--dm-accent, var(--dm-accent));
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
 }
 
 /* Note dots in dark mode */
@@ -62,7 +62,7 @@ html[data-theme='dark'] .mini-calendar-day-has-notes:hover {
 }
 
 html[data-theme='dark'] .mini-calendar-day-has-notes .mini-calendar-day-number {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--dm-text, var(--dm-text-bright));
 }
 

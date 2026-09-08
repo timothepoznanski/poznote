@@ -1,7 +1,7 @@
 @font-face {
     font-family: 'Inter';
     font-style: normal;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     font-display: swap;
     src: url('../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
 }
@@ -9,7 +9,7 @@
 @font-face {
     font-family: 'Inter';
     font-style: normal;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     font-display: swap;
     src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
 }
@@ -61,7 +61,7 @@ body {
 .login-title {
     color: var(--pz-text);
     font-size: 1.875rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     margin: 0;
 }
 
@@ -76,7 +76,7 @@ label {
     display: block;
     margin-bottom: 0.5rem;
     color: var(--pz-text-secondary);
-    font-weight: 500;
+    font-weight: var(--pz-weight-semibold);
     font-size: 0.875rem;
 }
 
@@ -85,7 +85,7 @@ input[type="password"] {
     width: 100%;
     padding: 0.875rem 1rem;
     border: 1px solid var(--pz-border-light);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     font-size: 1rem;
     font-family: inherit;
     transition: all 0.2s ease;
@@ -149,7 +149,7 @@ input[type="password"]::placeholder {
     display: flex;
     align-items: center;
     cursor: pointer;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     color: var(--pz-text-secondary);
     font-size: 0.875rem;
     margin-bottom: 0;
@@ -202,7 +202,7 @@ input[type="password"]::placeholder {
 .oidc-divider span {
     color: var(--pz-text-muted);
     font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     background: var(--pz-bg);
     padding: 0 0.75rem;
     position: relative;
@@ -214,9 +214,9 @@ input[type="password"]::placeholder {
     background: var(--pz-accent);
     color: var(--pz-text-inverse);
     border: none;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     font-size: 1rem;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     cursor: pointer;
     transition: all 0.2s ease;
     margin-top: 0.5rem;
@@ -294,7 +294,7 @@ input[type="password"]::placeholder {
     gap: 0.75rem;
     padding: 0.875rem 1rem;
     border: 1px solid var(--pz-border-light);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: var(--pz-bg);
     color: var(--pz-text);
     font: inherit;
@@ -317,17 +317,17 @@ input[type="password"]::placeholder {
 .account-option-name {
     min-width: 0;
     overflow-wrap: anywhere;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .account-option-badge {
     flex: 0 0 auto;
     padding: 0.2rem 0.45rem;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background: #ebf8ff;
     color: var(--pz-accent);
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .account-select-logout {
@@ -348,7 +348,7 @@ input[type="password"]::placeholder {
     color: var(--pz-danger);
     margin-top: 0.5rem;
     font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     text-align: left;
 }
 
@@ -357,7 +357,7 @@ input[type="password"]::placeholder {
     border: 1px solid var(--pz-danger-soft);
     color: var(--pz-danger-hover);
     padding: 1rem;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     margin-bottom: 1.5rem;
     font-size: 0.875rem;
     text-align: left;
@@ -368,8 +368,8 @@ input[type="password"]::placeholder {
     background: var(--pz-danger-soft);
     color: var(--pz-danger-hover);
     padding: 0.125rem 0.25rem;
-    border-radius: 4px;
-    font-weight: 600;
+    border-radius: var(--pz-radius-sm);
+    font-weight: var(--pz-weight-semibold);
 }
 
 .info {
@@ -377,7 +377,7 @@ input[type="password"]::placeholder {
     padding: 1rem;
     background: var(--pz-surface);
     border: 1px solid var(--pz-border-light);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     font-size: 0.875rem;
     color: var(--pz-text-secondary);
     line-height: 1.5;
@@ -396,7 +396,7 @@ input[type="password"]::placeholder {
 .info code {
     background: var(--pz-surface-hover);
     padding: 0.125rem 0.25rem;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
     font-size: 0.8125rem;
 }
@@ -410,7 +410,7 @@ input[type="password"]::placeholder {
 .github-link a {
     color: var(--pz-accent);
     text-decoration: none;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;

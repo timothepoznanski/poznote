@@ -147,7 +147,7 @@
         align-items: start;
         gap: 10px 12px;
         padding: 16px;
-        border-radius: 14px;
+        border-radius: var(--pz-radius-xl);
         margin-bottom: 12px;
         background: var(--input-bg, var(--pz-bg));
         box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
@@ -204,7 +204,7 @@
     .shared-folder-toggle {
         width: 26px;
         height: 26px;
-        border-radius: 8px;
+        border-radius: var(--pz-radius-lg);
     }
 
     .folder-badge {
@@ -218,7 +218,7 @@
         width: 100%;
         min-width: 0;
         padding: 10px 12px;
-        border-radius: 10px;
+        border-radius: var(--pz-radius-lg);
         background: transparent;
         border: none;
     }

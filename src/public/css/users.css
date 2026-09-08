@@ -3,14 +3,14 @@
 @font-face {
     font-family: 'Inter';
     src: url('../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Inter';
     src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     font-style: normal;
 }
 
@@ -103,7 +103,7 @@ html[data-theme='dark'] {
 
 .users-table th {
     background: transparent;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     border-top: 2px solid var(--border-color, var(--pz-border-light));
     white-space: nowrap;
 }
@@ -176,7 +176,7 @@ html[data-theme='dark'] {
 
 /* Bold the header of the column the table is currently sorted on. */
 .users-sort-link.users-sort-active {
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
 }
 
 .users-table-header-with-help {
@@ -208,12 +208,12 @@ html[data-theme='dark'] {
     min-width: 300px;
     max-width: 380px;
     padding: 10px 12px;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: rgba(20, 20, 20, 0.94);
     color: var(--pz-text-inverse);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-size: 0.95rem;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     letter-spacing: normal;
     line-height: 1.45;
     text-transform: none;
@@ -247,7 +247,7 @@ html[data-theme='dark'] .users-header-help:focus-visible {
     font-family: monospace;
     color: var(--text-color, var(--pz-text));
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .users-table td.user-created-cell {
@@ -264,7 +264,7 @@ html[data-theme='dark'] .users-header-help:focus-visible {
    .users-sort-active above). Declared after .user-id-cell so it still wins
    when the table is sorted on the ID column. */
 .users-table td.sorted-column-cell {
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
 }
 
 .users-table tbody tr {
@@ -288,14 +288,14 @@ html[data-theme='dark'] .users-table td {
 }
 
 .user-name {
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
 }
 
 .user-username {
     color: var(--text-color, var(--pz-text));
     font-size: 0.95em;
     padding: 4px 8px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     display: inline-block;
     white-space: nowrap;
 }
@@ -304,7 +304,7 @@ html[data-theme='dark'] .users-table td {
     color: var(--text-muted, var(--pz-text-muted));
     font-size: 0.9em;
     padding: 4px 8px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     display: inline-block;
 }
 
@@ -336,9 +336,9 @@ html[data-theme='dark'] .users-table td {
 .badge {
     display: inline-block;
     padding: 4px 8px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     font-size: 11px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
 }
 
 .badge-active {
@@ -379,7 +379,7 @@ html[data-theme='dark'] .users-table td {
 /* Messages */
 .message {
     padding: 15px;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     margin-bottom: 20px;
 }
 
@@ -409,7 +409,7 @@ html[data-theme='dark'] .users-table td {
 
 .modal-content {
     background: var(--bg-color, var(--pz-bg));
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
     padding: 30px;
     max-width: 500px;
     width: 90%;
@@ -498,7 +498,7 @@ html[data-theme='dark'] .users-table td {
 }
 
 .password-feedback {
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     padding: 10px 12px;
     margin-bottom: 12px;
     font-size: 0.95rem;
@@ -549,7 +549,7 @@ html[data-theme='dark'] .users-table td {
     gap: 10px;
     padding: 10px 12px;
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     color: var(--text-color, var(--pz-text));
     cursor: pointer;
 }
@@ -570,10 +570,10 @@ html[data-theme='dark'] .users-table td {
 
 .account-access-state,
 .account-access-own-label {
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     padding: 2px 6px;
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .account-access-state {
@@ -624,7 +624,7 @@ html[data-theme='dark'] .account-access-own-label {
 .form-group label {
     display: block;
     margin-bottom: 8px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-semibold);
     color: var(--text-color, var(--pz-text));
 }
 
@@ -634,7 +634,7 @@ html[data-theme='dark'] .account-access-own-label {
     width: 100%;
     padding: 10px 12px;
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     font-size: 14px;
     background: var(--bg-color, var(--pz-bg));
     color: var(--text-color, var(--pz-text));
@@ -705,7 +705,7 @@ html[data-theme='dark'] .account-access-own-label {
 
 .delete-warning {
     color: var(--pz-danger);
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     margin-top: 15px;
 }
 
@@ -721,7 +721,7 @@ html[data-theme='dark'] .account-access-own-label {
 .delete-confirm-group label {
     display: block;
     margin-bottom: 6px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-semibold);
 }
 
 /* Back Link */
@@ -761,7 +761,7 @@ html[data-theme='dark'] .account-access-own-label {
     bottom: 0;
     background-color: var(--pz-disabled);
     transition: .4s;
-    border-radius: 20px;
+    border-radius: var(--pz-radius-2xl);
 }
 
 .slider:before {
@@ -773,7 +773,7 @@ html[data-theme='dark'] .account-access-own-label {
     bottom: 3px;
     background-color: var(--pz-bg);
     transition: .4s;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
 }
 
 input:checked+.slider {
@@ -826,7 +826,7 @@ input:disabled+.slider {
         justify-content: center !important;
         text-align: center;
         box-sizing: border-box;
-        border-radius: 4px;
+        border-radius: var(--pz-radius-sm);
     }
 
     .admin-nav .btn {
@@ -863,7 +863,7 @@ input:disabled+.slider {
         max-width: 40px !important;
         height: 34px !important;
         padding: 0 !important;
-        border-radius: 10px;
+        border-radius: var(--pz-radius-sm);
         border: 1px solid rgba(var(--pz-highlight-rgb), 0.08);
         box-shadow: inset 0 1px 0 rgba(var(--pz-highlight-rgb), 0.04);
     }
@@ -963,7 +963,7 @@ input:disabled+.slider {
 /* The badge whose filter is applied. The greyed-out sibling already carries
    most of the signal, so this only firms up the selected label. */
 .users-stat-badge.users-stat-selected {
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
 }
 
 /* The other status while a filter is applied: greyed out rather than hidden,

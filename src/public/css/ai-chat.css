@@ -75,7 +75,7 @@ html.ai-chat-open #ai-chat-panel,
 .ai-chat-title {
     flex: 1;
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -91,7 +91,7 @@ html.ai-chat-open #ai-chat-panel,
     border: none;
     background: transparent;
     color: var(--pz-text-muted);
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -134,7 +134,7 @@ a.ai-chat-header-btn {
 .ai-chat-msg {
     max-width: 90%;
     padding: 8px 12px;
-    border-radius: 10px;
+    border-radius: var(--pz-radius-lg);
     font-size: 13.5px;
     line-height: 1.45;
     white-space: pre-wrap;
@@ -145,7 +145,7 @@ a.ai-chat-header-btn {
     align-self: flex-end;
     background: var(--pz-accent);
     color: var(--pz-text-inverse);
-    border-bottom-right-radius: 3px;
+    border-bottom-right-radius: var(--pz-radius-sm);
 }
 
 .ai-chat-msg-assistant {
@@ -153,7 +153,7 @@ a.ai-chat-header-btn {
     background: var(--pz-bg);
     color: var(--pz-text);
     border: 1px solid var(--pz-border);
-    border-bottom-left-radius: 3px;
+    border-bottom-left-radius: var(--pz-radius-sm);
 }
 
 /* Assistant bubbles rendered as markdown: block elements provide the
@@ -182,7 +182,7 @@ a.ai-chat-header-btn {
 .ai-chat-md h5,
 .ai-chat-md h6 {
     font-size: 1em;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     margin: 10px 0 6px;
 }
 
@@ -193,7 +193,7 @@ a.ai-chat-header-btn {
 
 .ai-chat-md code {
     background: rgba(var(--pz-shadow-rgb), 0.06);
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     padding: 1px 4px;
     font-size: 0.9em;
     color: inherit; /* the global `code` rule hardcodes var(--pz-text), unreadable on dark bubbles */
@@ -201,7 +201,7 @@ a.ai-chat-header-btn {
 
 .ai-chat-md pre {
     background: rgba(var(--pz-shadow-rgb), 0.06);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     padding: 8px 10px;
     overflow-x: auto;
     white-space: pre;
@@ -346,7 +346,7 @@ a.ai-chat-header-btn {
     flex: 1;
     resize: none;
     border: 1px solid var(--pz-border-strong);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     padding: 8px 10px;
     font-size: 13.5px;
     font-family: inherit;
@@ -370,7 +370,7 @@ a.ai-chat-header-btn {
     height: 34px;
     flex-shrink: 0;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: var(--pz-accent);
     color: var(--pz-text-inverse);
     cursor: pointer;
@@ -402,7 +402,7 @@ a.ai-chat-header-btn {
     display: inline-block;
     width: 10px;
     height: 10px;
-    border-radius: 2px;
+    border-radius: var(--pz-radius-sm);
     background: currentColor;
 }
 
@@ -429,7 +429,7 @@ a.ai-chat-header-btn {
     color: var(--pz-warning-strong);
     background: var(--pz-warning-soft);
     border: 1px solid var(--pz-warning-soft);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     padding: 6px 10px;
 }
 

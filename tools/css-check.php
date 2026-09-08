@@ -502,6 +502,49 @@ foreach ($files as $file) {
     }
 }
 
+// ---------------------------------------------------------------------------
+// The radius and weight scales hold.
+//
+// The stylesheets carried 27 different corner radii, 14 of them on buttons
+// alone, so the same .btn rendered at 4px, 6px or 8px depending on the page.
+// And eight spellings of font-weight for what the shipped font renders as two,
+// since fonts.css declares Inter at 400 and 600 only. Both are now scales in
+// tokens.css, and both stay scales: a literal value here is how 27 of them
+// happened. 0 and inherit are not values, they are the absence of one.
+$scales = [
+    'border-radius'  => '/(?:^|[;{\s])border(?:-(?:top|bottom|start|end)-(?:left|right|start|end))?-radius\s*:\s*([^;!}]+)/i',
+    'font-weight'    => '/(?:^|[;{\s])font-weight\s*:\s*([^;!}]+)/i',
+];
+foreach ($files as $file) {
+    if (str_ends_with(str_replace('\\', '/', $file), '/tokens.css')) {
+        continue;                       // where the scales are declared
+    }
+    $rel = str_starts_with($file, $root) ? 'src/public/css' . substr($file, strlen($root)) : $file;
+    $css = preg_replace('!/\*.*?\*/!s', '', (string) file_get_contents($file));
+    foreach ($scales as $prop => $rx) {
+        if (!preg_match_all($rx, $css, $hits)) {
+            continue;
+        }
+        foreach ($hits[1] as $value) {
+            $value = trim($value);
+            if ($value === '' || str_contains($value, 'var(')) {
+                continue;
+            }
+            $bare = preg_replace('/\s+/', ' ', $value);
+            if (in_array($bare, ['0', '0px', 'inherit', 'initial', 'unset', 'revert'], true)) {
+                continue;
+            }
+            // une liste comme "0 var(--pz-radius-sm)" est deja tokenisee
+            if (preg_match('/^(?:0|0px)(?:\s+(?:0|0px))*$/', $bare)) {
+                continue;
+            }
+            echo "$rel: $prop: $bare. Use the scale in css/tokens.css "
+               . "(--pz-radius-* / --pz-weight-*), that is what it is for.\n";
+            $errors++;
+        }
+    }
+}
+
 if ($errors === 0) {
     echo count($files) . " stylesheet(s) balanced, $literals colour literal(s) in CSS, $markup in PHP/JS\n";
     exit(0);

@@ -21,7 +21,7 @@
     margin-top: 8px;
     background: var(--pz-bg);
     border: 1px solid var(--pz-border-strong);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.15);
     min-width: 200px;
     max-width: 250px;
@@ -74,7 +74,7 @@
     color: var(--pz-accent);
     padding: 1px 4px;
     font-size: 9px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     min-width: 14px;
     text-align: center;
     line-height: 1.2;

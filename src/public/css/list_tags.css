@@ -1,14 +1,14 @@
 @font-face {
     font-family: 'Inter';
     src: url('../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Inter';
     src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     font-style: normal;
 }
 
@@ -58,7 +58,7 @@ html.tags-page {
 .tag-item {
     background: var(--pz-bg);
     border: 2px solid var(--pz-border);
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
     padding: 15px;
     text-align: center;
     cursor: pointer;
@@ -78,7 +78,7 @@ html.tags-page {
 }
 
 .tag-name {
-    font-weight: normal;
+    font-weight: var(--pz-weight-normal);
     font-size: 1.1em;
     color: var(--pz-text);
     margin-bottom: 0;
@@ -95,7 +95,7 @@ html.tags-page {
     display: inline-block;
     width: 10px;
     height: 10px;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     margin-right: 7px;
     vertical-align: baseline;
     flex: 0 0 auto;
@@ -122,7 +122,7 @@ html.tags-page {
 .tag-color-filter-swatch {
     width: 22px;
     height: 22px;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     border: 2px solid transparent;
     background: var(--filter-color, transparent);
     box-shadow: inset 0 0 0 1px rgba(var(--pz-shadow-rgb), 0.12);
@@ -193,7 +193,7 @@ html[data-theme='dark'] .tag-color-filter-clear:hover {
 .tag-color-swatch {
     width: 34px;
     height: 34px;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     border: 2px solid transparent;
     box-shadow: inset 0 0 0 1px rgba(var(--pz-shadow-rgb), 0.12);
     cursor: pointer;
@@ -238,7 +238,7 @@ html[data-theme='dark'] .tag-color-swatch.selected {
     margin-top: 50px;
     padding: 40px;
     background: var(--pz-surface);
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
 }
 
 /* Tag context menu */
@@ -247,7 +247,7 @@ html[data-theme='dark'] .tag-color-swatch.selected {
     z-index: 9999;
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 4px 16px rgba(var(--pz-shadow-rgb), 0.15);
     padding: 4px 0;
     min-width: 150px;
@@ -310,7 +310,7 @@ html[data-theme='dark'] .tag-context-menu-item.danger:hover {
     width: 100%;
     padding: 8px 10px;
     border: 1px solid var(--pz-border-strong);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-size: 14px;
     font-family: 'Inter', sans-serif;
     box-sizing: border-box;

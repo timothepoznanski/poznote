@@ -30,7 +30,7 @@
 
 .modal-content {
     background-color: var(--pz-bg);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 4px 16px rgba(var(--pz-shadow-rgb), 0.2);
     max-width: 500px;
     width: 90%;
@@ -48,7 +48,7 @@ body.shared-page .modal {
 .modal-header h3 {
     margin: 0;
     font-size: 20px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--text-color, var(--pz-text));
 }
 
@@ -66,12 +66,12 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title-link {
     text-decoration: none;
     color: var(--text-color, var(--pz-text));
     font-size: 15px;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     line-height: 1.45;
     letter-spacing: 0;
     font-family: "JetBrains Mono", "Fira Code", monospace;
     background: rgba(var(--pz-accent-rgb), 0.06);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     padding: 8px 10px;
     cursor: default;
 }
@@ -148,7 +148,7 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-field-row {
 body.shared-page .shared-edit-token-modal .shared-edit-token-field-label {
     flex: 0 0 170px;
     font-size: 15px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     color: var(--text-color, var(--pz-text));
     white-space: nowrap;
 }
@@ -184,7 +184,7 @@ body.shared-page .shared-edit-token-modal .modal-password-input,
 body.shared-page .shared-edit-token-modal .shared-edit-token-field-value select {
     min-height: 44px;
     padding: 10px 12px;
-    border-radius: 10px;
+    border-radius: var(--pz-radius-lg);
     border: 1px solid var(--pz-border-strong);
     background: var(--pz-bg);
     color: var(--text-color, var(--pz-text));
@@ -257,7 +257,7 @@ body.shared-page .shared-edit-token-modal .indexable-label-text {
 body.shared-page .shared-edit-token-modal .share-user-list-container {
     margin-top: 12px;
     padding: 12px 14px;
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
     border: 1px solid rgba(15, 23, 42, 0.1);
     background: rgba(15, 23, 42, 0.025);
     max-height: 220px;
@@ -376,7 +376,7 @@ body.shared-page .shared-revoke-modal .shared-revoke-modal-actions > .btn {
         max-width: none;
         width: 100%;
         max-height: calc(100vh - 20px);
-        border-radius: 16px;
+        border-radius: var(--pz-radius-2xl);
         padding: 16px;
     }
 

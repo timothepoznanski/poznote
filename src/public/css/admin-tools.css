@@ -15,7 +15,7 @@
 .dr-hero h1 {
     margin: 0 0 8px;
     font-size: 1.6rem;
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
 }
 .dr-hero p {
     margin: 0;
@@ -36,9 +36,9 @@ html[data-theme='dark'] .dr-hero p {
     align-items: center;
     gap: 4px;
     padding: 3px 10px;
-    border-radius: 999px;
+    border-radius: var(--pz-radius-pill);
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 /* ── Orphan Scanner ── */
@@ -49,7 +49,7 @@ html[data-theme='dark'] .dr-hero p {
     color: var(--pz-text); 
     background: var(--bg-color, var(--pz-bg));
     border: 1.5px solid var(--border-color, var(--pz-border));
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
     overflow: hidden;
 }
 .results-table th, 
@@ -61,7 +61,7 @@ html[data-theme='dark'] .dr-hero p {
 .results-table th { 
     background: var(--bg-secondary, var(--pz-surface));
     font-size: 0.7rem;
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--text-muted, var(--pz-text-muted));
@@ -76,7 +76,7 @@ html[data-theme='dark'] .dr-hero p {
     padding: 8px 12px;
     background: rgba(59,130,246,.1);
     border-left: 3px solid var(--pz-accent);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-size: 0.85rem;
     color: var(--pz-accent-hover);
     display: flex;
@@ -93,7 +93,7 @@ html[data-theme='dark'] .deletion-notice {
     background: var(--bg-secondary, var(--pz-surface-hover));
     border: 1px solid var(--border-color, var(--pz-border));
     padding: 6px 14px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius-sm);
     font-size: 0.85rem;
     cursor: pointer;
     color: var(--pz-text);
@@ -142,7 +142,7 @@ html[data-theme='dark'] .btn-view-files:hover {
 .orphan-modal-content {
     position: relative;
     background: var(--bg-color, var(--pz-bg));
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
     max-width: 600px;
     width: 90%;
     max-height: 80vh;
@@ -163,7 +163,7 @@ html[data-theme='dark'] .btn-view-files:hover {
 .orphan-modal-header h3 {
     margin: 0;
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text);
 }
 
@@ -180,7 +180,7 @@ html[data-theme='dark'] .btn-view-files:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     transition: all 0.2s;
     font-family: inherit;
 }
@@ -254,9 +254,9 @@ html[data-theme='dark'] .btn-view-files:hover {
 
 .status-badge { 
     padding: 4px 10px; 
-    border-radius: 999px; 
+    border-radius: var(--pz-radius-pill); 
     font-size: 0.75rem; 
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     display: inline-block;
 }
 .status-clean { 
@@ -337,7 +337,7 @@ html[data-theme='dark'] .status-warning {
     
     .results-table {
         font-size: 0.8rem;
-        border-radius: 8px;
+        border-radius: var(--pz-radius-lg);
     }
     
     .results-table th,

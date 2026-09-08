@@ -27,14 +27,14 @@
 
 .reminder-input-row label {
     font-size: 13px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-semibold);
     opacity: 0.7;
 }
 
 .reminder-datetime-input {
     padding: 8px 12px;
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-size: 14px;
     background: var(--input-bg, var(--pz-bg));
     color: inherit;
@@ -61,7 +61,7 @@
     gap: 6px;
     padding: 8px 12px;
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-family: inherit;
     font-size: 14px;
     background: var(--input-bg, var(--pz-bg));
@@ -104,7 +104,7 @@
     align-items: center;
     gap: 8px;
     font-size: 13px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     flex-shrink: 0;
 }
 
@@ -126,7 +126,7 @@
     padding: 4px 8px !important;
     margin: 0;
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-size: 13px !important;
     background: var(--input-bg, var(--pz-bg));
     color: inherit;
@@ -196,7 +196,7 @@
 
 .reminder-email-option {
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: var(--pz-surface);
     padding: 10px 12px;
 }
@@ -221,7 +221,7 @@
     align-items: center;
     gap: 8px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .reminder-email-title i {
@@ -248,7 +248,7 @@
     gap: 8px;
     padding: 8px 12px;
     background: rgba(74, 144, 217, 0.08);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-size: 13px;
     color: var(--pz-accent);
     margin: 8px 0;
@@ -292,8 +292,8 @@
     min-width: fit-content;
     min-height: 34px;
     padding: 10px 14px !important;
-    border-radius: 10px;
-    font-weight: 600;
+    border-radius: var(--pz-radius-sm);
+    font-weight: var(--pz-weight-semibold);
 }
 
 /* ---- Notification Items ---- */
@@ -302,7 +302,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 10px 12px;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     cursor: pointer;
     transition: background 0.15s;
     gap: 8px;
@@ -336,7 +336,7 @@
     flex-shrink: 0;
     width: 32px;
     height: 32px;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     background: rgba(74, 144, 217, 0.1);
     display: flex;
     align-items: center;
@@ -356,7 +356,7 @@
 
 .notification-heading {
     font-size: 13px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -373,7 +373,7 @@
     border: none;
     cursor: pointer;
     padding: 4px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     color: inherit;
     opacity: 0;
     transition: opacity 0.15s;
@@ -456,7 +456,7 @@
 }
 
 #notificationsModal .notification-heading {
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -475,7 +475,7 @@
     cursor: pointer;
     padding: 4px;
     color: var(--pz-text-subtle);
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     flex-shrink: 0;
     opacity: 0.65;
     min-width: 32px;

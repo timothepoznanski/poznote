@@ -141,7 +141,7 @@ body.center-note-content #right_col .notecard {
     color: var(--pz-text-inverse);
     font-size: 0.82rem;
     padding: 0.4em 0.9em;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     pointer-events: none;
     z-index: 9999;
     opacity: 0;

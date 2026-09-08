@@ -43,7 +43,7 @@
 
 .diary-month-title {
     font-size: 15px;
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
     color: var(--pz-text);
     margin: 0 0 2px;
     padding-bottom: 6px;
@@ -96,9 +96,9 @@
     gap: 6px;
     padding: 5px 14px;
     border: 1.5px solid var(--pz-border);
-    border-radius: 999px;
+    border-radius: var(--pz-radius-pill);
     font-size: 13px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text);
     text-decoration: none;
     white-space: nowrap;
@@ -130,7 +130,7 @@
 
 .diary-new-modal {
     background: var(--pz-bg);
-    border-radius: 10px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 10px 30px rgba(var(--pz-shadow-rgb), 0.25);
     width: min(92vw, 380px);
     padding: 18px 20px;
@@ -139,7 +139,7 @@
 .diary-new-modal .modal-title {
     margin: 0 0 14px;
     font-size: 16px;
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
     color: var(--pz-text);
 }
 
@@ -155,7 +155,7 @@
     box-sizing: border-box;
     padding: 8px 10px;
     border: 1.5px solid var(--pz-border-strong);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-size: 14px;
     background: transparent;
     color: inherit;

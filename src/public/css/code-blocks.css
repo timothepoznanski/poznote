@@ -14,7 +14,7 @@ pre.code-block,
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
     background-color: var(--pz-surface);
     /* border: 1px solid #e1e1e1; */
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     padding: 20px 20px;
     margin: 0;
     color: var(--pz-text);
@@ -101,7 +101,7 @@ pre.code-block .code-block-line-numbers-btn,
     height: 28px;
     background: transparent;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -154,7 +154,7 @@ pre.code-block .code-block-delete-btn,
     margin: 0;
     background: transparent;
     border: none;
-    border-radius: 0 0 4px 0;
+    border-radius: 0 0 var(--pz-radius-sm) 0;
     box-sizing: content-box;
     cursor: pointer;
     z-index: 11;
@@ -274,7 +274,7 @@ code {
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
     background-color: var(--pz-surface-hover);
     padding: 2px 4px;
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
     color: var(--pz-text);
     font-size: var(--code-block-font-size, 15px) !important;
 }
@@ -284,7 +284,7 @@ pre code,
 .noteentry pre code {
     background-color: transparent;
     padding: 0 !important;
-    border-radius: 0 !important;
+    border-radius: 0!important;
     font-size: inherit !important;
 }
 
@@ -446,7 +446,7 @@ code *[style*="color"],
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
     font-size: var(--code-block-font-size, 15px) !important;
     font-style: normal !important;
-    font-weight: normal !important;
+    font-weight: var(--pz-weight-normal) !important;
     white-space: pre-wrap !important;
     word-wrap: break-word !important;
     overflow-wrap: break-word !important;
@@ -505,7 +505,7 @@ pre.code-block::-webkit-scrollbar-track,
 pre.code-block::-webkit-scrollbar-thumb,
 .code-block::-webkit-scrollbar-thumb {
     background: rgba(var(--pz-shadow-rgb), 0.15);
-    border-radius: 2px;
+    border-radius: var(--pz-radius-sm);
 }
 
 .noteentry pre::-webkit-scrollbar-thumb:hover,

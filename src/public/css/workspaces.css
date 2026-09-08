@@ -1,14 +1,14 @@
 @font-face {
     font-family: 'Inter';
     src: url('../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     font-style: normal;
 }
 
 @font-face {
   font-family: 'Inter';
   src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
-  font-weight: 600;
+  font-weight: var(--pz-weight-semibold);
   font-style: normal;
 }
 
@@ -27,7 +27,7 @@ body {
     margin: 20px auto;
     padding: 20px;
     background: var(--pz-bg);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     /* box-shadow: 0 2px 10px rgba(var(--pz-shadow-rgb), 0.1); */
 }
 
@@ -36,7 +36,7 @@ body {
     margin-bottom: 30px;
     padding: 20px;
     border: 1px solid var(--pz-border);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
 }
 
 .settings-section h3 {
@@ -54,7 +54,7 @@ body {
 .form-group label {
     display: block;
     margin-bottom: 5px;
-    font-weight: bold;
+    font-weight: var(--pz-weight-semibold);
 }
 
 /* The inputs and the button share one row; the tags hint sits under the whole
@@ -88,7 +88,7 @@ body {
     align-items: center;
     padding: 15px;
     border: 1px solid var(--pz-border);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     margin-bottom: 10px;
     background-color: var(--pz-bg);
     transition: box-shadow 0.2s;
@@ -133,7 +133,7 @@ body {
     height: 36px;
     padding: 0;
     border: 1px solid transparent;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: transparent;
     color: var(--pz-accent);
     cursor: pointer;
@@ -226,7 +226,7 @@ html[data-theme='dark'] .ws-icon-btn.ws-icon-btn-danger:focus-visible {
 
 .workspace-info-list dt {
     color: var(--pz-text-muted);
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .workspace-info-list dd {
@@ -252,7 +252,7 @@ html[data-theme='dark'] .ws-icon-btn.ws-icon-btn-danger:focus-visible {
 }
 
 .workspace-name-item {
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     color: var(--pz-text);
     font-size: 16px;
 }
@@ -261,7 +261,7 @@ html[data-theme='dark'] .ws-icon-btn.ws-icon-btn-danger:focus-visible {
 a.workspace-name-link {
     text-decoration: none;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     transition: color 0.15s ease;
 }
 
@@ -277,7 +277,7 @@ a.workspace-name-link:focus-visible {
     color: var(--pz-text-muted);
     background-color: var(--pz-surface-sunken);
     padding: 2px 8px;
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
     margin-left: 8px;
 }
 
@@ -296,7 +296,7 @@ a.workspace-name-link:focus-visible {
     font-size: 12px;
     color: var(--pz-text-secondary);
     background: var(--pz-surface-hover);
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
     padding: 2px 9px;
 }
 
@@ -310,7 +310,7 @@ a.workspace-name-link:focus-visible {
 .ws-color-dot {
     width: 10px;
     height: 10px;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     flex-shrink: 0;
     border: 1px solid rgba(var(--pz-shadow-rgb), 0.12);
 }
@@ -331,7 +331,7 @@ a.workspace-name-link:focus-visible {
     height: 34px;
     padding: 0;
     border: 2px solid transparent;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     background: none;
     cursor: pointer;
     transition: border-color 0.15s ease, transform 0.15s ease;
@@ -348,7 +348,7 @@ a.workspace-name-link:focus-visible {
 .ws-color-swatch {
     width: 24px;
     height: 24px;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     border: 1px solid rgba(var(--pz-shadow-rgb), 0.12);
 }
 
@@ -396,7 +396,7 @@ html[data-theme='dark'] .ws-tags-help {
     margin-top: 12px;
     padding: 12px;
     border: 1px solid var(--pz-border);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: var(--pz-surface);
     width: 100%;
 }
@@ -405,9 +405,9 @@ html[data-theme='dark'] .ws-tags-help {
     display: inline-flex;
     align-items: center;
     padding: 3px 10px;
-    border-radius: 999px;
+    border-radius: var(--pz-radius-pill);
     font-size: 12px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .workspace-share-badge.is-enabled {
@@ -465,7 +465,7 @@ html[data-theme='dark'] .ws-tags-help {
 }
 
 .shared-edit-token-modal .shared-edit-token-field-label {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text);
 }
 
@@ -504,7 +504,7 @@ html[data-theme='dark'] .ws-tags-help {
     text-overflow: ellipsis;
     white-space: nowrap;
     text-decoration: none;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     margin: 0;
     padding: 0;
 }
@@ -520,7 +520,7 @@ html[data-theme='dark'] .ws-tags-help {
     max-width: 40px;
     height: 40px;
     min-height: 40px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -547,7 +547,7 @@ html[data-theme='dark'] .ws-tags-help {
     height: 40px;
     padding: 8px 10px;
     border: 1px solid var(--pz-border-strong);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-size: 14px;
     margin: 0;
     width: 100%;
@@ -571,7 +571,7 @@ html[data-theme='dark'] .ws-tags-help {
     background: var(--pz-surface-hover);
     border: 1px solid var(--pz-border-strong);
     color: var(--pz-text);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
 }
 
 .shared-edit-token-modal .shared-edit-token-password-toggle:hover:not(:disabled),
@@ -602,7 +602,7 @@ html[data-theme='dark'] .ws-tags-help {
 .shared-edit-token-modal .share-restrict-users-wrap {
     padding: 12px;
     border: 1px solid var(--pz-border);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: var(--pz-surface);
 }
 
@@ -619,7 +619,7 @@ html[data-theme='dark'] .ws-tags-help {
     max-height: 180px;
     overflow-y: auto;
     border: 1px solid var(--pz-border);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: var(--pz-bg);
 }
 
@@ -758,7 +758,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
 .action-btn {
     padding: 6px 12px;
     font-size: 12px;
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
     border: 1px solid var(--pz-border);
     background-color: var(--pz-bg);
     color: var(--pz-text-inverse);
@@ -818,7 +818,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        border-radius: 6px;
+        border-radius: var(--pz-radius);
         background: var(--pz-surface-hover);
         border: 1px solid var(--pz-border-strong);
         align-self: center;
@@ -886,7 +886,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
     width: 32px;
     height: 32px;
     border: 1px solid var(--pz-border);
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background: var(--pz-bg);
     color: var(--pz-text-muted);
     cursor: pointer;
@@ -929,7 +929,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
     width: 100%;
     padding: 10px 40px 10px 10px;
     border: 1px solid var(--pz-border);
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     font-size: 14px;
     box-sizing: border-box;
 }
@@ -1002,7 +1002,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
         margin-bottom: 0 !important;
         padding: 12px !important;
         font-size: 15px !important;
-        font-weight: 500 !important;
+        font-weight: var(--pz-weight-medium) !important;
         min-height: 44px !important;
         display: flex !important;
         align-items: center !important;
@@ -1083,7 +1083,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
     width: 36px !important; /* Slightly larger on mobile for easier touch */
     height: 36px !important;
     border: 1px solid var(--pz-border);
-    border-radius: 4px !important;
+    border-radius: var(--pz-radius-sm)!important;
     background: var(--pz-bg);
     color: var(--pz-text-muted);
     cursor: pointer !important;

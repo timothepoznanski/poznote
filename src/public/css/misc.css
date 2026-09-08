@@ -70,7 +70,7 @@ img {
     height: 28px;
     background: var(--pz-accent);
     border: 2px solid var(--pz-bg);
-    border-radius: 4px 0 4px 0;
+    border-radius: var(--pz-radius-sm) 0 var(--pz-radius-sm) 0;
     cursor: nwse-resize;
     touch-action: none;
     display: flex;
@@ -81,7 +81,7 @@ img {
     transition: all 0.2s ease;
     color: var(--pz-text-inverse);
     font-size: 20px;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     line-height: 1;
 }
 
@@ -121,7 +121,7 @@ img {
     z-index: 1000;
     font-size: 1em;
     text-align: center;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 4px 16px rgba(var(--pz-accent-rgb), 0.2);
     max-width: 400px;
     min-width: 200px;
@@ -153,7 +153,7 @@ img {
 .create-note-option .create-note-subtitle {
     font-size: 13px !important;
     color: var(--text-muted, var(--pz-danger));
-    font-weight: 300 !important;
+    font-weight: var(--pz-weight-normal) !important;
     margin-left: 4px;
     opacity: 0.7;
     display: inline;
@@ -168,7 +168,7 @@ html[data-theme='dark'] .create-note-subtitle {
     position: absolute;
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.15);
     z-index: 1000;
     min-width: 160px;
@@ -217,7 +217,7 @@ html[data-theme='dark'] .create-note-subtitle {
     position: fixed;
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.15);
     min-width: 180px;
     padding: 8px 0;
@@ -253,7 +253,7 @@ html[data-theme='dark'] .create-note-subtitle {
 /* Image border helpers (used by image menu actions) */
 img.img-with-border {
     border: 1px solid var(--pz-border);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     padding: 6px;
     background: var(--pz-bg);
     box-sizing: border-box;
@@ -280,7 +280,7 @@ img.img-with-border-no-padding {
     gap: 12px;
     padding: 12px;
     border: 1px solid var(--pz-border);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     cursor: pointer;
     transition: all 0.15s ease;
 }
@@ -304,7 +304,7 @@ img.img-with-border-no-padding {
 
 .export-option span {
     display: block;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     font-size: 1em;
     color: var(--pz-text);
     margin-bottom: 4px;
@@ -334,12 +334,12 @@ img.img-with-border-no-padding {
     background: var(--pz-accent);
     color: var(--pz-text-inverse);
     padding: 15px 20px;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.3);
     z-index: 10000;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     max-width: 300px;
     animation: slideInRight 0.3s ease;
 }
@@ -353,14 +353,14 @@ img.img-with-border-no-padding {
     height: 16px;
     border: 2px solid var(--pz-bg);
     border-top: 2px solid transparent;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     animation: spin 1s linear infinite;
 }
 .save-notification-check {
     width: 16px;
     height: 16px;
     color: var(--pz-text-inverse);
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
 }
 
 /* Audio iframe styling - prevent black background */
@@ -374,7 +374,7 @@ iframe.note-audio-embed,
     display: block;
     margin: 8px 0;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: transparent;
 }
 

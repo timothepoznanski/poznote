@@ -56,7 +56,7 @@
     color: var(--pz-text-subtle);
     float: right;
     font-size: 28px;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     line-height: 1;
     margin-top: -5px;
     cursor: pointer;

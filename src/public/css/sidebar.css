@@ -51,7 +51,7 @@
     font-size: 1.3rem;
     cursor: pointer;
     padding: 6px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -83,7 +83,7 @@
     font-size: 1.2rem;
     cursor: pointer;
     padding: 4px 5px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     position: relative;
     min-width: 30px;
     min-height: 30px;
@@ -169,7 +169,7 @@
 .folder-header {
     /* margin-top: 6px; */
     /* padding: 6px 4px; */
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
 }
 
 .folder-toggle {
@@ -180,7 +180,7 @@
 }
 
 .folder-name {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text);
     font-size: var(--sidebar-font-size, 13px);
 }
@@ -188,7 +188,7 @@
 .folder-note-count {
     color: var(--pz-text-muted);
     margin-left: 6px;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
 }
 
 .hide-folder-counts .folder-note-count {
@@ -222,7 +222,7 @@
 /* For keyboard-only users, provide a visible focus outline on the folder-toggle */
 .hide-folder-counts .folder-toggle:focus-within {
     outline: 2px solid rgba(59, 130, 246, 0.18);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
 }
 
 /* Folder content / notes styling */
@@ -237,7 +237,7 @@
 }
 
 .links_arbo_left .note-title {
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     color: var(--pz-text);
     font-size: var(--sidebar-font-size, 13px);
 }
@@ -299,5 +299,5 @@
 
 .links_arbo_left.selected-note .note-title {
     color: var(--pz-accent-strong);
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }

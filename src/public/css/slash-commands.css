@@ -16,7 +16,7 @@
     overflow: visible;
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
-    border-radius: 10px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 12px 30px rgba(var(--pz-shadow-rgb), 0.12);
     padding: 6px;
     opacity: 0;
@@ -36,7 +36,7 @@
     align-items: center;
     gap: 10px;
     padding: 8px 10px;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     cursor: pointer;
     user-select: none;
     position: relative;
@@ -67,7 +67,7 @@
 
 .slash-command-item[data-command-id="cancel"] .slash-command-label {
     color: var(--pz-danger);
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .slash-command-submenu-indicator {
@@ -102,7 +102,7 @@
     width: 252px;
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
-    border-radius: 10px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 12px 30px rgba(var(--pz-shadow-rgb), 0.12);
     padding: 10px;
     user-select: none;
@@ -117,7 +117,7 @@
 
 .slash-date-picker-title {
     font-size: 13px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text);
 }
 
@@ -127,7 +127,7 @@
     border: none;
     background: none;
     cursor: pointer;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-family: inherit;
 }
 
@@ -169,7 +169,7 @@
 .slash-date-picker-day.today {
     background: rgba(11, 120, 230, 0.1);
     color: var(--pz-accent);
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
 }
 
 .slash-date-picker-day.today:hover {
@@ -180,7 +180,7 @@
 .slash-date-picker-day.selected:hover {
     background: var(--pz-accent);
     color: var(--pz-text-inverse);
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
 }
 
 .slash-date-picker-footer {
@@ -212,7 +212,7 @@
     gap: 4px;
     padding: 2px 8px;
     border: 1px solid var(--pz-border);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-family: inherit;
     font-size: 12px;
     color: var(--pz-text);
@@ -253,7 +253,7 @@
     border: none;
     background: none;
     cursor: pointer;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-family: inherit;
     font-size: 13px;
     color: var(--pz-text);
@@ -268,16 +268,16 @@
 .slash-time-cell.selected:hover {
     background: var(--pz-accent);
     color: var(--pz-text-inverse);
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
 }
 
 .slash-date-picker-apply-btn {
     border: none;
     cursor: pointer;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-family: inherit;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text-inverse);
     background: var(--pz-accent);
     padding: 4px 12px;
@@ -294,7 +294,7 @@
     align-items: center;
     gap: 4px;
     padding: 2px 8px;
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
     font-family: inherit;
     font-size: 12px;
     line-height: 1.4;

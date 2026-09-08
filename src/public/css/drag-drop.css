@@ -31,7 +31,7 @@
 .folder-header.folder-source-drag {
     background-color: rgba(255, 152, 0, 0.08);
     border: 2px solid rgba(255, 152, 0, 0.3);
-    border-radius: 8px !important;
+    border-radius: var(--pz-radius-lg)!important;
     padding: 4px !important;
     margin: 2px 0 !important;
     box-shadow: 0 0 6px rgba(255, 152, 0, 0.2);
@@ -41,7 +41,7 @@
 .folder-header.drag-over {
     background-color: rgba(var(--pz-accent-rgb), 0.12);
     border: 2px dashed var(--pz-accent);
-    border-radius: 8px !important;
+    border-radius: var(--pz-radius-lg)!important;
     box-shadow: 0 0 8px rgba(var(--pz-accent-rgb), 0.3);
     padding: 4px !important;
     margin: 2px 0 !important;
@@ -60,7 +60,7 @@
 
 .folder-header.folder-drop-before,
 .folder-header.folder-drop-after {
-    border-radius: 8px !important;
+    border-radius: var(--pz-radius-lg)!important;
     transition: all 0.2s ease !important;
 }
 
@@ -72,7 +72,7 @@
     right: 6px;
     height: 3px;
     background: var(--pz-accent);
-    border-radius: 999px;
+    border-radius: var(--pz-radius-pill);
     box-shadow: 0 0 8px rgba(var(--pz-accent-rgb), 0.45);
     pointer-events: none;
     z-index: 2;
@@ -101,7 +101,7 @@
     right: 6px;
     height: 3px;
     background: var(--pz-accent);
-    border-radius: 999px;
+    border-radius: var(--pz-radius-pill);
     box-shadow: 0 0 8px rgba(var(--pz-accent-rgb), 0.45);
     pointer-events: none;
     z-index: 5;
@@ -165,7 +165,7 @@ html[data-theme='dark'] .folder-header.folder-drop-after>.folder-toggle::after {
     padding: 3px 6px;
     margin: 6px 0 4px;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background-color: transparent;
     transition: background-color 0.2s;
     user-select: none;
@@ -192,7 +192,7 @@ html[data-theme='dark'] .folder-header.folder-drop-after>.folder-toggle::after {
     padding: 15px;
     margin: 10px 5px;
     border: 2px dashed var(--pz-border);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background-color: var(--pz-surface);
     text-align: center;
     transition: all 0.3s ease;
@@ -241,7 +241,7 @@ html[data-theme='dark'] .folder-header.folder-drop-after>.folder-toggle::after {
 
 .drop-zone-text {
     font-size: 12px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
 }
 
 /* Dark mode for drop zone */
@@ -379,7 +379,7 @@ a.links_arbo_left.dragging,
 .folder-header.file-import-drop-target {
     background-color: rgba(var(--pz-accent-rgb), 0.15);
     border: 2px dashed var(--pz-accent);
-    border-radius: 8px !important;
+    border-radius: var(--pz-radius-lg)!important;
     box-shadow: 0 0 12px rgba(var(--pz-accent-rgb), 0.35);
     padding: 4px !important;
     margin: 2px 0 !important;
@@ -411,7 +411,7 @@ a.links_arbo_left.dragging,
     gap: 10px;
     padding: 18px 22px;
     border: 2px dashed var(--pz-accent);
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
     background: rgba(var(--pz-accent-rgb), 0.06);
     max-width: 100%;
 }
@@ -424,7 +424,7 @@ a.links_arbo_left.dragging,
 
 .sidebar-file-import-overlay-text {
     font-size: 14px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-accent-strong);
     overflow-wrap: anywhere;
 }

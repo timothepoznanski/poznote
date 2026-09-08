@@ -60,7 +60,7 @@
     bottom: 0;
     background-color: var(--pz-disabled);
     transition: all 0.3s ease;
-    border-radius: 24px;
+    border-radius: var(--pz-radius-2xl);
 }
 
 .toggle-slider:before {
@@ -72,7 +72,7 @@
     bottom: 3px;
     background-color: var(--pz-bg);
     transition: all 0.3s ease;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
 }
 
 input:checked+.toggle-slider {

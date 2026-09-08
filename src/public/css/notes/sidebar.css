@@ -9,7 +9,7 @@
 .workspace-list .action-btn {
     min-width: 140px;
     padding: 10px 16px;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     font-size: 1rem;
     display: inline-flex;
     align-items: center;

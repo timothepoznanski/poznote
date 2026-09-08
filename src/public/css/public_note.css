@@ -4,14 +4,14 @@
 @font-face {
     font-family: 'Inter';
     src: url('../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Inter';
     src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     font-style: normal;
 }
 
@@ -116,7 +116,7 @@ body.public-note-page {
 
 .public-note img.img-with-border {
     border: 1px solid var(--pz-border);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     padding: 6px;
     background: var(--pz-bg);
     box-sizing: border-box;
@@ -133,7 +133,7 @@ body.public-note-page {
 .public-note video {
     max-width: 100%;
     height: auto;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.1);
     background: #000;
     margin: 10px 0;
@@ -149,7 +149,7 @@ body.public-note-page {
     padding: 0;
     border: 1px solid var(--pz-border-strong);
     box-sizing: border-box;
-    border-radius: 999px;
+    border-radius: var(--pz-radius-pill);
     background: var(--pz-bg);
 }
 
@@ -162,7 +162,7 @@ body.public-note-page {
 .public-note .note-audio-embed {
     max-width: 280px;
     display: block;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: var(--pz-surface-hover);
     margin: 8px 0;
 }
@@ -180,7 +180,7 @@ body.public-note-page {
     height: auto !important;
     aspect-ratio: 16 / 9;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     margin: 10px 0;
 }
 
@@ -198,7 +198,7 @@ body.public-note-page {
     overflow: hidden;
     margin: 8px 0;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: transparent;
 }
 
@@ -210,7 +210,7 @@ body.public-note-page {
     overflow: hidden;
     margin: 8px 0;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: transparent;
 }
 
@@ -243,7 +243,7 @@ body.public-note-page {
 
 :where(.public-note .content) table th {
     background-color: var(--pz-surface-hover);
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 /* Code block styles for public notes */
@@ -253,7 +253,7 @@ body.public-note-page {
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
     font-size: 0.9em;
     color: var(--pz-text);
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
 }
 
 .public-note .content pre {
@@ -261,7 +261,7 @@ body.public-note-page {
     background: var(--pz-surface);
     padding: 30px !important;
     padding-bottom: 20px !important;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     overflow-x: auto;
     margin: 0.75em 0;
     position: relative;
@@ -284,7 +284,7 @@ body.public-note-page {
     background-color: transparent;
     padding: 0 !important;
     color: inherit;
-    border-radius: 0 !important;
+    border-radius: 0!important;
     border: none;
     display: block;
     line-height: 1.4;
@@ -307,7 +307,7 @@ body.public-note-page {
     padding: 6px 10px;
     background: rgba(var(--pz-highlight-rgb), 0.9);
     border: 1px solid var(--pz-border);
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     opacity: 1;
     transition: background-color 0.2s;
@@ -498,7 +498,7 @@ body.public-note-page {
     margin: 0 0 8px 0;
     color: var(--text-color, var(--pz-text));
     font-size: 18px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .public-task-edit-footer {
@@ -522,7 +522,7 @@ body.public-note-page {
 
 .public-note .content .task-item.important .task-text {
     color: var(--pz-danger-hover);
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 /* Horizontal rule */
@@ -534,7 +534,7 @@ body.public-note-page {
 
 /* Text formatting */
 .public-note .content strong {
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
 }
 
 .public-note .content em {
@@ -565,7 +565,7 @@ body.public-note-page {
 /* Headings in content */
 .public-note .content h1 {
     font-size: 2em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 0.67em 0;
     border-bottom: 2px solid var(--pz-border);
     padding-bottom: 0.3em;
@@ -573,7 +573,7 @@ body.public-note-page {
 
 .public-note .content h2 {
     font-size: 1.5em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 0.75em 0;
     border-bottom: 1px solid var(--pz-border);
     padding-bottom: 0.3em;
@@ -581,25 +581,25 @@ body.public-note-page {
 
 .public-note .content h3 {
     font-size: 1.25em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 0.83em 0;
 }
 
 .public-note .content h4 {
     font-size: 1em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 1em 0;
 }
 
 .public-note .content h5 {
     font-size: 0.875em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 1.33em 0;
 }
 
 .public-note .content h6 {
     font-size: 0.75em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 1.67em 0;
     color: var(--pz-text-muted);
 }
@@ -671,7 +671,7 @@ body.public-note-page {
     margin: 0 0 12px;
     color: var(--pz-text);
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 /* Theme toggle button */
@@ -702,7 +702,7 @@ body.public-note-page {
 .theme-toggle-btn {
     background: transparent;
     border: 1px solid var(--pz-border);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     padding: 8px 12px;
     cursor: pointer;
     font-size: 18px;
@@ -781,7 +781,7 @@ html[data-theme='dark'] .public-note .content .task-item.important {
 
 html[data-theme='dark'] .public-note .content .task-item.important .task-text {
     color: var(--dm-danger);
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 html[data-theme='dark'] .public-task-edit-title {
@@ -868,7 +868,7 @@ html[data-theme='dark'] .public-note .content [style*="color:black"] {
     min-height: 60vh;
     padding: 12px;
     border: 1px solid var(--pz-border);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: var(--pz-bg);
     color: var(--pz-text);
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -886,7 +886,7 @@ html[data-theme='dark'] .public-note .content [style*="color:black"] {
     min-height: 40vh;
     padding: 12px;
     border: 1px dashed var(--pz-border-strong);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
 }
 
 .public-note-editor-html:focus {

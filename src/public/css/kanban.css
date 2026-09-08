@@ -9,7 +9,7 @@
     gap: 12px;
     margin: 0;
     font-size: 1.5rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text);
 }
 
@@ -34,12 +34,12 @@
 
 .kanban-board::-webkit-scrollbar-track {
     background: var(--pz-surface-hover);
-    border-radius: 10px;
+    border-radius: var(--pz-radius-lg);
 }
 
 .kanban-board::-webkit-scrollbar-thumb {
     background: #cbd5e1;
-    border-radius: 10px;
+    border-radius: var(--pz-radius-lg);
 }
 
 .kanban-board::-webkit-scrollbar-thumb:hover {
@@ -57,7 +57,7 @@
     display: flex;
     flex-direction: column;
     background: var(--pz-bg);
-    border-radius: 16px;
+    border-radius: var(--pz-radius-2xl);
     box-shadow: 0 4px 6px -1px rgba(var(--pz-shadow-rgb), 0.05), 0 2px 4px -1px rgba(var(--pz-shadow-rgb), 0.03);
     border: 1px solid var(--pz-border-light);
     transition: box-shadow 0.2s ease;
@@ -88,7 +88,7 @@
     align-items: center;
     gap: 10px;
     min-width: 0;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     font-size: 1rem;
     color: var(--pz-text);
 }
@@ -119,7 +119,7 @@
     border: none;
     background: transparent;
     color: var(--pz-text-muted);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     cursor: pointer;
     transition: all 0.2s ease;
     font-size: 1.2rem;
@@ -150,8 +150,8 @@
     background: var(--pz-surface-hover);
     color: var(--pz-text-muted);
     font-size: 0.8rem;
-    font-weight: 600;
-    border-radius: 13px;
+    font-weight: var(--pz-weight-semibold);
+    border-radius: var(--pz-radius-xl);
 }
 
 .kanban-column-content {
@@ -179,7 +179,7 @@
 .kanban-subfolder-content.drag-over {
     background: var(--pz-surface);
     border: 2px dashed var(--pz-accent);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
 }
 
 /* ===== Nested subfolder groups ===== */
@@ -190,7 +190,7 @@
     flex-direction: column;
     gap: 10px;
     border: 1px solid var(--pz-border-light);
-    border-radius: 10px;
+    border-radius: var(--pz-radius-lg);
     background: var(--pz-surface);
     padding: 4px;
 }
@@ -218,10 +218,10 @@
     background: transparent;
     color: var(--pz-text);
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     text-align: left;
     cursor: pointer;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     transition: background 0.15s ease, color 0.15s ease;
 }
 
@@ -274,8 +274,8 @@
     background: #e2e8f0;
     color: var(--pz-text-muted);
     font-size: 0.75rem;
-    font-weight: 600;
-    border-radius: 11px;
+    font-weight: var(--pz-weight-semibold);
+    border-radius: var(--pz-radius-xl);
 }
 
 .kanban-subfolder-add-btn {
@@ -305,7 +305,7 @@
 .kanban-subfolder-section.is-expanded > .kanban-subfolder-content:empty {
     min-height: 36px;
     border: 1px dashed var(--pz-border-strong);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     margin: 0 4px 4px;
     padding: 0;
 }
@@ -322,7 +322,7 @@
     overflow: hidden;
     background: var(--pz-bg);
     border: 1px solid var(--pz-border-light);
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
     padding: 14px 16px;
     /* Room for the completion button in the top-right corner */
     padding-right: 36px;
@@ -359,7 +359,7 @@
     height: 18px;
     padding: 0;
     border: 1px solid var(--pz-border-strong);
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     background: var(--pz-bg);
     color: var(--pz-text-subtle);
     cursor: pointer;
@@ -447,7 +447,7 @@
     background: transparent;
     color: var(--pz-text-muted);
     font-size: 0.82rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     text-align: left;
     cursor: pointer;
     border-radius: 0;
@@ -487,8 +487,8 @@
     background: var(--pz-surface-hover);
     color: var(--pz-text-muted);
     font-size: 0.75rem;
-    font-weight: 600;
-    border-radius: 11px;
+    font-weight: var(--pz-weight-semibold);
+    border-radius: var(--pz-radius-xl);
 }
 
 .kanban-completed-content {
@@ -503,7 +503,7 @@
 
 .kanban-card-title {
     font-size: 0.95rem;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     color: var(--pz-text);
     line-height: 1.4;
     margin-bottom: 8px;
@@ -613,7 +613,7 @@
 }
 
 .kanban-task-preview-item.important .kanban-task-preview-text {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 /* Own row, directly above the card title. */
@@ -638,8 +638,8 @@
     background: var(--pz-surface-hover);
     color: var(--pz-text-secondary);
     font-size: 0.7rem;
-    font-weight: 500;
-    border-radius: 4px;
+    font-weight: var(--pz-weight-medium);
+    border-radius: var(--pz-radius-sm);
     border: 1px solid var(--pz-border-light);
 }
 
@@ -660,8 +660,8 @@
     background: var(--pz-surface);
     color: var(--pz-text-secondary);
     font-size: 0.7rem;
-    font-weight: 500;
-    border-radius: 4px;
+    font-weight: var(--pz-weight-medium);
+    border-radius: var(--pz-radius-sm);
     border: 1px solid var(--pz-border-light);
     white-space: nowrap;
 }
@@ -693,7 +693,7 @@
     text-align: center;
     padding: 60px 40px;
     background: var(--pz-bg);
-    border-radius: 20px;
+    border-radius: var(--pz-radius-2xl);
     box-shadow: 0 4px 6px -1px rgba(var(--pz-shadow-rgb), 0.05);
     margin: auto;
     max-width: 500px;
@@ -708,7 +708,7 @@
 .kanban-empty-state h2 {
     margin: 0 0 12px 0;
     font-size: 1.5rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text);
 }
 
@@ -790,7 +790,7 @@
 .kanban-scroll-btn-header {
     width: 28px;
     height: 28px;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     background: var(--bg-secondary, var(--pz-surface-hover));
     color: var(--pz-text-muted);
     border: 1px solid var(--pz-border-light);
@@ -824,10 +824,10 @@
     background: var(--bg-secondary, var(--pz-surface-hover));
     color: var(--pz-text);
     border: 1px solid var(--border-color, var(--pz-border-light));
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     cursor: pointer;
     font-size: 0.85rem;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     transition: all 0.2s ease;
 }
 
@@ -857,7 +857,7 @@
     gap: 12px;
     margin: 0;
     font-size: 1.25rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text);
 }
 
@@ -994,10 +994,10 @@ html[data-theme='dark'] .kanban-inline-header .kanban-title {
     background: var(--bg-secondary, var(--pz-surface-hover));
     color: var(--pz-text-muted);
     border: 1px solid var(--border-color, var(--pz-border-light));
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     cursor: pointer;
     font-size: 0.8rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     transition: all 0.2s ease;
 }
 
@@ -1019,7 +1019,7 @@ html[data-theme='dark'] .kanban-inline-header .kanban-title {
     background: var(--bg-secondary, var(--pz-surface-hover));
     color: var(--pz-text-muted);
     border: 1px solid var(--border-color, var(--pz-border-light));
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     cursor: pointer;
     font-size: 0.9rem;
     transition: all 0.2s ease;

@@ -4,14 +4,14 @@
 @font-face {
     font-family: 'Inter';
     src: url('../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Inter';
     src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     font-style: normal;
 }
 
@@ -40,7 +40,7 @@
     width: min(420px, 100%);
     padding: 32px;
     border: 1px solid var(--password-border);
-    border-radius: 10px;
+    border-radius: var(--pz-radius-lg);
     background: var(--password-card-bg);
     box-shadow: var(--password-shadow);
     text-align: center;
@@ -69,7 +69,7 @@
     width: 100%;
     padding: 12px;
     border: 1px solid var(--password-border);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     box-sizing: border-box;
     font-size: 14px;
     margin: 0;
@@ -85,10 +85,10 @@
     background: var(--password-accent);
     color: var(--pz-text-inverse);
     border: none;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-size: 14px;
     cursor: pointer;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
 }
 
 .password-container button:hover {
@@ -102,7 +102,7 @@
     line-height: 40px;
     padding: 0 16px;
     border: 1px solid var(--password-border);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     box-sizing: border-box;
     color: var(--password-muted);
     font-size: 14px;
@@ -118,7 +118,7 @@
     color: var(--pz-danger-hover);
     background: #fef3f2;
     border-left: 3px solid var(--pz-danger);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     padding: 12px 14px;
     margin-bottom: 14px;
     font-size: 14px;
@@ -130,7 +130,7 @@
     color: var(--password-muted);
     background: var(--pz-surface);
     border-left: 3px solid var(--password-accent);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     padding: 12px 14px;
     margin-bottom: 14px;
     font-size: 14px;
@@ -171,7 +171,7 @@ html[data-theme='dark'] .password-container .error {
 @media (max-width: 640px) {
     .password-container {
         padding: 24px;
-        border-radius: 8px;
+        border-radius: var(--pz-radius-lg);
     }
 }
 
@@ -203,7 +203,7 @@ html[data-theme='dark'] .password-container .error {
     width: min(560px, 100%);
     padding: 32px;
     border: 1px solid var(--status-card-border);
-    border-radius: 10px;
+    border-radius: var(--pz-radius-lg);
     background: var(--status-card-bg);
     box-shadow: var(--status-shadow);
 }
@@ -226,7 +226,7 @@ html[data-theme='dark'] .password-container .error {
     margin: 16px 0 0;
     padding: 12px 14px;
     border-left: 3px solid var(--status-accent);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: var(--pz-surface);
     color: var(--status-muted);
     line-height: 1.55;
@@ -247,11 +247,11 @@ html[data-theme='dark'] .password-container .error {
     justify-content: center;
     min-height: 40px;
     padding: 0 16px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: var(--status-accent);
     color: var(--pz-text-inverse);
     text-decoration: none;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     transition: background-color 0.18s ease;
     box-sizing: border-box;
 }
@@ -273,7 +273,7 @@ html[data-theme='dark'] .password-container .error {
 @media (max-width: 640px) {
     .status-card {
         padding: 24px;
-        border-radius: 8px;
+        border-radius: var(--pz-radius-lg);
     }
 
     .status-card h1 {
@@ -386,7 +386,7 @@ html[data-theme='light'].public-folder-html {
     width: 100%;
     padding: 10px 40px 10px 12px;
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     font-size: 14px;
     color: var(--text-color, var(--pz-text));
     background-color: var(--panel-bg, var(--pz-bg));
@@ -415,7 +415,7 @@ html[data-theme='light'].public-folder-html {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     transition: all 0.2s ease;
 }
 
@@ -430,9 +430,9 @@ html[data-theme='light'].public-folder-html {
     white-space: nowrap;
     padding: 4px 10px;
     background-color: rgba(var(--pz-accent-rgb), 0.08);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     align-self: flex-start;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
 }
 
 .public-folder-toggle-all {
@@ -440,7 +440,7 @@ html[data-theme='light'].public-folder-html {
     padding: 0 12px;
     margin-left: auto;
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: var(--panel-bg, var(--pz-bg));
     color: var(--text-color, var(--pz-text));
     display: inline-flex;
@@ -526,7 +526,7 @@ html[data-theme='light'].public-folder-html {
 
 .public-folder-group-title {
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     margin-bottom: 6px;
     color: var(--text-color);
     opacity: 0.8;
@@ -541,7 +541,7 @@ html[data-theme='light'].public-folder-html {
     width: 28px;
     height: 28px;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: transparent;
     color: var(--muted-color);
     display: inline-flex;
@@ -596,7 +596,7 @@ body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.i
     background: var(--toggle-bg, var(--pz-surface-sunken));
     border: 1px solid var(--border-color, var(--pz-border));
     padding: 10px 15px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     cursor: pointer;
     color: var(--text-color);
     display: flex;
@@ -628,7 +628,7 @@ html[data-theme='dark'] .view-toggle {
 .kanban-col {
     flex: 0 0 280px;
     background: var(--kanban-col-bg, var(--pz-surface-hover));
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     display: flex;
     flex-direction: column;
     max-height: 80vh;
@@ -647,7 +647,7 @@ html[data-theme='dark'] .kanban-col {
 }
 
 .kanban-col-title {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     font-size: 0.9rem;
     display: flex;
     align-items: center;
@@ -659,7 +659,7 @@ html[data-theme='dark'] .kanban-col {
     color: var(--muted-color);
     background: var(--badge-bg, var(--pz-surface-sunken));
     padding: 2px 6px;
-    border-radius: 10px;
+    border-radius: var(--pz-radius-lg);
 }
 
 html[data-theme='dark'] .kanban-col-count {
@@ -675,7 +675,7 @@ html[data-theme='dark'] .kanban-col-count {
 .kanban-public-card {
     background: var(--card-bg, var(--pz-bg));
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     padding: 12px;
     margin-bottom: 8px;
     text-decoration: none;
@@ -695,7 +695,7 @@ html[data-theme='dark'] .kanban-public-card {
 
 .kanban-card-title {
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     display: block;
     margin-bottom: 4px;
 }
@@ -716,7 +716,7 @@ html[data-theme='dark'] .kanban-public-card {
 .note-item {
     background: var(--note-bg);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     padding: 20px;
     transition: box-shadow 0.2s;
 }
@@ -748,7 +748,7 @@ html[data-theme='dark'] .kanban-public-card {
     align-items: center;
     padding: 2px 8px;
     background: var(--tag-bg);
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
 }
 
 .note-preview {
@@ -785,7 +785,7 @@ html[data-theme='dark'] .kanban-public-card {
     border: 1px solid var(--border-color);
     color: var(--text-color);
     padding: 10px 15px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     cursor: pointer;
     transition: all 0.2s;
     font-size: 1.2rem;
@@ -836,7 +836,7 @@ html[data-theme='light'] {
 }
 
 .note-item .task-item.important {
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
 }
 
 .note-item .task-text {

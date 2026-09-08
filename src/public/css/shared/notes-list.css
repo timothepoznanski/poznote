@@ -26,7 +26,7 @@
 
 .shared-notes-header-cell {
     font-size: 12px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--text-muted, var(--pz-text-muted));
@@ -75,12 +75,12 @@
     min-width: 260px;
     max-width: 320px;
     padding: 10px 12px;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: rgba(20, 20, 20, 0.94);
     color: var(--pz-text-inverse);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-size: 0.95rem;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     letter-spacing: normal;
     line-height: 1.45;
     text-transform: none;
@@ -166,7 +166,7 @@
     height: 22px;
     padding: 0;
     border: none;
-    border-radius: 7px;
+    border-radius: var(--pz-radius);
     background: rgba(var(--pz-accent-rgb), 0.08);
     color: var(--pz-accent);
     cursor: pointer;
@@ -202,7 +202,7 @@
 }
 
 .note-name {
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     font-size: 13px;
     color: var(--pz-accent);
     text-decoration: none;
@@ -286,7 +286,7 @@
     white-space: nowrap;
     cursor: text;
     padding: 0;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background: transparent;
     transition: color 0.2s;
 }
@@ -322,7 +322,7 @@ html[data-theme='dark'] .shared-via-parent {
 }
 
 .folder-name-path {
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     color: var(--pz-accent);
     white-space: nowrap;
     overflow: hidden;
@@ -336,7 +336,7 @@ html[data-theme='dark'] .shared-via-parent {
 }
 
 .shared-folder-row[data-collapsible="1"] .folder-name-path {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 html[data-theme='dark'] .folder-name-path {
@@ -499,7 +499,7 @@ html[data-theme='dark'] .folder-name-path {
     /* Soft action buttons: tinted background with a colored icon, full color
        on hover. Much lighter than a saturated chip on every row. */
     .note-actions .btn {
-        border-radius: 8px;
+        border-radius: var(--pz-radius-sm);
     }
 
     .note-actions .btn-success {

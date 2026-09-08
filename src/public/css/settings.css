@@ -10,11 +10,11 @@
     right: -2px;
     background: var(--pz-danger);
     color: var(--pz-text-inverse);
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     width: 12px;
     height: 12px;
     font-size: 10px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     display: none;
     align-items: center;
     justify-content: center;
@@ -50,8 +50,8 @@ body.settings-page {
 .setting-status {
     font-size: calc(0.75rem * var(--settings-font-scale, 1));
     padding: 2px 6px;
-    border-radius: 4px;
-    font-weight: 600;
+    border-radius: var(--pz-radius-sm);
+    font-weight: var(--pz-weight-semibold);
     display: inline-block; /* Ensure it respects padding/dimensions */
     align-self: flex-start; /* Align to left in flex column */
 }
@@ -71,9 +71,9 @@ body.settings-page {
     align-items: center;
     gap: 5px;
     font-size: 0.8rem;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     padding: 3px 10px;
-    border-radius: 999px;
+    border-radius: var(--pz-radius-pill);
     background: var(--pz-surface-hover);
     color: var(--pz-text-secondary);
 }
@@ -103,7 +103,7 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
 #changePasswordModal .change-password-status {
     margin: 0 0 10px 0;
     padding: 8px 10px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     border-left: 3px solid transparent;
     font-size: 0.9rem;
     line-height: 1.45;
@@ -112,7 +112,7 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
 /* Settings Category Titles */
 .settings-category-title {
     font-size: calc(1.1rem * var(--settings-font-scale, 1));
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text);
     margin: 1.5rem 0 0.75rem 0;
     padding-bottom: 0.5rem;
@@ -212,7 +212,7 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     width: 42px;
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     color: var(--pz-text-muted);
     cursor: pointer;
     flex-shrink: 0;
@@ -271,7 +271,7 @@ html[data-theme='dark'] .settings-view-toggle:hover {
 
 .view-list .home-card {
     padding: 8px 14px;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
 }
 
 .view-list .home-card:hover {
@@ -404,7 +404,7 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
     padding: 12px 14px;
     border: 1px solid rgba(220, 53, 69, 0.35);
     border-left: 3px solid var(--pz-danger);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: rgba(220, 53, 69, 0.06);
     text-align: left;
 }
@@ -412,7 +412,7 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
 .delete-warning-box .delete-warning {
     margin: 0 0 8px;
     color: var(--pz-danger);
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
 }
 
 /* The dark-mode recolor of .delete-warning lives with its peers in
@@ -430,7 +430,7 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
 .delete-warning-recovery {
     margin: 0;
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
 }
 
 /* Snapshots settings modal: the warning is the last thing in the body, so it
@@ -498,7 +498,7 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
         width: 100%;
         padding: 9px 12px;
         border: none;
-        border-radius: 8px;
+        border-radius: var(--pz-radius-lg);
         background: transparent;
         color: var(--pz-text-secondary);
         font: inherit;
@@ -522,7 +522,7 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
     .settings-nav-item.is-active {
         background: rgba(var(--pz-accent-rgb), 0.1);
         color: var(--pz-accent);
-        font-weight: 600;
+        font-weight: var(--pz-weight-semibold);
     }
 
     .settings-nav-item .lucide {
@@ -561,7 +561,7 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
         margin-bottom: 1.5rem;
         background: var(--pz-bg);
         border: 1px solid var(--pz-border);
-        border-radius: 12px;
+        border-radius: var(--pz-radius-xl);
     }
 
     .home-container.settings-with-nav .home-card {
@@ -583,7 +583,7 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
         position: absolute;
         inset: 3px 6px;
         z-index: -1;
-        border-radius: 8px;
+        border-radius: var(--pz-radius-lg);
         background: var(--pz-surface-hover);
         opacity: 0;
         transition: opacity 0.12s ease;
@@ -690,7 +690,7 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
         width: 36px;
         height: 20px;
         padding: 0;
-        border-radius: 999px;
+        border-radius: var(--pz-radius-pill);
         background: var(--pz-border-strong);
         color: transparent;
         font-size: 0;
@@ -706,7 +706,7 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
         left: 2px;
         width: 16px;
         height: 16px;
-        border-radius: 50%;
+        border-radius: var(--pz-radius-circle);
         background: var(--pz-bg);
         box-shadow: 0 1px 2px rgba(var(--pz-shadow-rgb), 0.25);
         transition: transform 0.15s ease;

@@ -166,7 +166,7 @@
 
 .noteentry ol>li::before {
     content: counters(item, ".") ". ";
-    font-weight: normal;
+    font-weight: var(--pz-weight-normal);
     margin-right: 4px;
 }
 

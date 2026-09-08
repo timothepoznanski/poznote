@@ -28,7 +28,7 @@
     .home-search-input {
         width: 100%;
         padding: 10px 14px 10px 40px;
-        border-radius: 8px;
+        border-radius: var(--pz-radius-lg);
         box-sizing: border-box;
     }
 

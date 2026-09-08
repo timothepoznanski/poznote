@@ -26,7 +26,7 @@ body {
 }
 
 .info-label {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text-secondary);
     flex: 0 0 210px;
     margin-right: 32px;
@@ -41,13 +41,13 @@ body {
 
 .favorite-yes {
     color: var(--pz-warning);
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .favorite-no {
     /* Use the same color as regular info values to match surrounding text */
     color: inherit;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
 }
 
 .action-buttons {

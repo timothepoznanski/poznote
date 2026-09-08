@@ -48,7 +48,7 @@ body.tasks-page {
 
 .tasks-progress-bar {
     height: 8px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background-color: var(--pz-surface-sunken);
     overflow: hidden;
     order: 2;
@@ -58,7 +58,7 @@ body.tasks-page {
 .tasks-progress-fill {
     height: 100%;
     width: 0;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background-color: var(--pz-accent);
     transition: width 0.3s ease;
 }
@@ -110,7 +110,7 @@ html[data-theme='dark'] .tasks-progress-option {
 .tasks-filter-chip {
     padding: 6px 14px;
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 16px;
+    border-radius: var(--pz-radius-2xl);
     background: transparent;
     color: var(--text-color, var(--pz-text));
     font-size: 13px;
@@ -143,7 +143,7 @@ html[data-theme='dark'] .tasks-progress-option {
        both end up the same height on the shared row */
     padding: 6px 36px 6px 12px;
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     font-size: 13px;
     color: var(--text-color, var(--pz-text));
     background-color: var(--input-bg, var(--pz-bg));
@@ -168,7 +168,7 @@ html[data-theme='dark'] .tasks-progress-option {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
 }
 
 .clear-filter-btn:hover {
@@ -190,7 +190,7 @@ html[data-theme='dark'] .tasks-progress-option {
     height: 29px;
     padding: 0;
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: transparent;
     color: var(--text-color, var(--pz-text));
     cursor: pointer;
@@ -209,7 +209,7 @@ html[data-theme='dark'] .tasks-progress-option {
     margin: 0 auto 18px auto;
     padding: 12px 16px;
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 10px;
+    border-radius: var(--pz-radius-lg);
     background-color: var(--pz-surface);
 }
 
@@ -240,7 +240,7 @@ html[data-theme='dark'] .tasks-progress-option {
     height: 24px;
     padding: 0;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background: transparent;
     color: var(--pz-text-muted);
     font-size: 16px;
@@ -265,7 +265,7 @@ html[data-theme='dark'] .tasks-progress-option {
 }
 
 .note-name {
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     font-size: 16px;
     color: var(--pz-accent);
     text-decoration: none;
@@ -286,7 +286,7 @@ html[data-theme='dark'] .tasks-progress-option {
     color: var(--pz-text-muted);
     background-color: var(--pz-surface-hover);
     padding: 2px 8px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
 }
 
 /* Groups built from the checklist items of a regular note (as opposed to a
@@ -299,7 +299,7 @@ html[data-theme='dark'] .tasks-progress-option {
     color: var(--pz-accent);
     background-color: rgba(var(--pz-accent-rgb), 0.1);
     padding: 2px 8px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     white-space: nowrap;
     flex-shrink: 0;
 }
@@ -365,7 +365,7 @@ html[data-theme='dark'] .tasks-note-source-badge {
 
 .tasks-task-item.important .tasks-task-text {
     color: var(--pz-danger-hover);
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .tasks-task-star {
@@ -381,7 +381,7 @@ html[data-theme='dark'] .tasks-note-source-badge {
     justify-content: center;
     padding: 4px 8px;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background: transparent;
     color: var(--pz-text-subtle);
     font-size: 14px;
@@ -403,7 +403,7 @@ html[data-theme='dark'] .tasks-note-source-badge {
     gap: 4px;
     padding: 2px 8px;
     border: 1px solid var(--pz-border-strong);
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
     background: var(--pz-surface);
     color: var(--pz-text-secondary);
     font-size: 12px;
@@ -438,7 +438,7 @@ html[data-theme='dark'] .tasks-note-source-badge {
     display: flex;
     flex-shrink: 0;
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     overflow: hidden;
 }
 
@@ -496,7 +496,7 @@ html[data-theme='dark'] .tasks-note-source-badge {
     justify-content: center;
     height: 28px;
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: transparent;
     color: var(--text-color, var(--pz-text));
     cursor: pointer;
@@ -522,7 +522,7 @@ html[data-theme='dark'] .tasks-note-source-badge {
 
 .tasks-cal-title {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     min-width: 160px;
     text-align: center;
 }
@@ -534,7 +534,7 @@ html[data-theme='dark'] .tasks-note-source-badge {
     grid-template-columns: repeat(7, 1fr);
     gap: 1px;
     border: 1px solid var(--pz-border-strong);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     overflow: hidden;
     background: #c6ccd2;
 }
@@ -542,7 +542,7 @@ html[data-theme='dark'] .tasks-note-source-badge {
 .tasks-cal-weekday {
     text-align: center;
     font-size: 11px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text-muted);
     padding: 6px 0;
     background: var(--bg-color, var(--pz-bg));
@@ -579,7 +579,7 @@ html[data-theme='dark'] .tasks-note-source-badge {
     height: 22px;
     line-height: 22px;
     text-align: center;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     font-size: 12px;
     color: var(--pz-text-secondary);
     flex-shrink: 0;
@@ -588,7 +588,7 @@ html[data-theme='dark'] .tasks-note-source-badge {
 .tasks-cal-day.today .tasks-cal-day-num {
     background-color: var(--pz-accent);
     color: var(--pz-text-inverse);
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .tasks-cal-day.other-month .tasks-cal-day-num {
@@ -608,7 +608,7 @@ html[data-theme='dark'] .tasks-note-source-badge {
     padding: 2px 6px;
     border: none;
     border-left: 3px solid var(--pz-accent);
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background: rgba(var(--pz-accent-rgb), 0.1);
     color: var(--text-color, var(--pz-text));
     font-size: 11px;
@@ -621,7 +621,7 @@ html[data-theme='dark'] .tasks-note-source-badge {
 }
 
 .tasks-cal-chip-time {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-accent);
     flex-shrink: 0;
 }
@@ -640,7 +640,7 @@ html[data-theme='dark'] .tasks-note-source-badge {
 
 .tasks-cal-chip.important .tasks-cal-chip-text {
     color: var(--pz-danger-hover);
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .tasks-cal-chip.overdue {
@@ -694,7 +694,7 @@ html[data-theme='dark'] .tasks-note-source-badge {
     color: var(--pz-text-muted);
     background-color: var(--pz-surface-hover);
     padding: 2px 8px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     white-space: nowrap;
     max-width: 140px;
     overflow: hidden;
@@ -721,7 +721,7 @@ html[data-theme='dark'] .tasks-note-source-badge {
         height: 5px;
         padding: 0;
         border-left: none;
-        border-radius: 2px;
+        border-radius: var(--pz-radius-sm);
         background: var(--pz-accent);
     }
 

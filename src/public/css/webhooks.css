@@ -18,7 +18,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     border-bottom: 2px solid var(--pz-accent);
     padding-bottom: 10px;
     font-size: 1.15rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 .webhooks-section-hint {
     margin: 0 0 16px;
@@ -29,7 +29,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
 .webhooks-field { margin-bottom: 16px; }
 .webhooks-field label {
     display: block;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     font-size: 0.92rem;
     margin-bottom: 4px;
 }
@@ -46,7 +46,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     padding: 10px 12px;
     font-size: 14px;
     border: 1px solid var(--pz-border);
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background: var(--pz-bg);
     color: var(--pz-text);
     box-sizing: border-box;
@@ -62,7 +62,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     gap: 8px;
     padding: 8px 12px;
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     font-size: 0.9rem;
 }
 /* Beats the .webhooks-field label rule above, which would otherwise
@@ -73,7 +73,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     gap: 8px;
     margin-bottom: 0;
     cursor: pointer;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
 }
 .webhooks-event input[type="checkbox"] {
     margin: 0;
@@ -113,12 +113,12 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     border: 1px solid rgba(var(--pz-highlight-rgb), 0.15);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-size: 0.95rem;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     line-height: 1.4;
     text-align: left;
     white-space: normal;
     padding: 8px 10px;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.25);
     opacity: 0;
     visibility: hidden;
@@ -151,7 +151,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
    instead of flowing underneath the actions. */
 .webhooks-item {
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     padding: 14px 16px;
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
@@ -165,7 +165,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     min-width: 0;
 }
 .webhooks-item-url {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     font-size: 0.95rem;
     word-break: break-all;
 }
@@ -187,7 +187,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     display: inline-block;
     max-width: 100%;
     padding: 2px 7px;
-    border-radius: 5px;
+    border-radius: var(--pz-radius-sm);
     background: rgba(0, 124, 186, 0.08);
     border: 1px solid rgba(0, 124, 186, 0.18);
     color: var(--pz-text-secondary);
@@ -205,7 +205,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
 .webhooks-item-meta code { font-size: 0.8rem; }
 .webhooks-state {
     font-size: 0.78rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     letter-spacing: 0.04em;
     text-transform: uppercase;
 }
@@ -242,7 +242,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     min-width: 190px;
     background: var(--pz-bg);
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 6px 18px rgba(var(--pz-shadow-rgb), 0.15);
     padding: 6px 0;
     overflow: hidden;

@@ -13,12 +13,12 @@
     box-sizing: border-box;
     padding: 1px 6px;
     border: 1px solid var(--pz-accent);
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background: var(--pz-bg);
     color: var(--pz-text);
     font-family: inherit;
     font-size: var(--sidebar-font-size, 13px);
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     line-height: 1.5;
     outline: none;
     box-shadow: 0 0 0 2px rgba(var(--pz-accent-rgb), 0.15);
@@ -26,7 +26,7 @@
 
 .tree-inline-input::placeholder {
     color: var(--pz-text-subtle);
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
 }
 
 .tree-inline-input.is-busy {
@@ -73,7 +73,7 @@ a.links_arbo_left .note-title.tree-inline-editing,
    come from css/folders/animations.css. */
 .note-list-item.tree-reveal-highlight {
     animation: folderRevealFlash 1.6s ease-out;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
 }
 
 /* Dark and black themes */

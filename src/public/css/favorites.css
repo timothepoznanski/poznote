@@ -34,7 +34,7 @@ body.favorites-page {
     width: 100%;
     padding: 10px 40px 10px 12px;
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     font-size: 14px;
     color: var(--text-color, var(--pz-text));
     background-color: var(--input-bg, var(--pz-bg));
@@ -59,7 +59,7 @@ body.favorites-page {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
 }
 
 .filter-stats {
@@ -68,8 +68,8 @@ body.favorites-page {
     white-space: nowrap;
     padding: 6px 12px;
     background-color: #f0f7ff;
-    border-radius: 6px;
-    font-weight: 500;
+    border-radius: var(--pz-radius);
+    font-weight: var(--pz-weight-medium);
 }
 
 /* Favorites Notes List */
@@ -101,7 +101,7 @@ body.favorites-page {
 }
 
 .note-name {
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     font-size: 16px;
     color: var(--pz-accent);
     text-decoration: none;
@@ -122,7 +122,7 @@ body.favorites-page {
     color: var(--pz-text-muted);
     background-color: var(--pz-surface-hover);
     padding: 2px 8px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
 }
 
 .note-meta {
@@ -142,7 +142,7 @@ body.favorites-page {
     height: 38px;
     background-color: var(--pz-surface);
     border: 1px solid var(--pz-danger-soft);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-sm);
     color: var(--pz-danger);
     font-size: 18px;
     cursor: pointer;

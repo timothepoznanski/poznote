@@ -31,7 +31,7 @@
     right: 0;
     color: var(--pz-text-inverse);
     font-size: 35px;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     cursor: pointer;
     z-index: 1001;
 }
@@ -43,7 +43,7 @@
 .image-preview-large {
     max-width: 100%;
     max-height: 80vh;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 4px 20px rgba(var(--pz-shadow-rgb), 0.5);
 }
 
@@ -51,14 +51,14 @@
     color: var(--pz-text-inverse);
     margin-top: 15px;
     font-size: 16px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
 }
 
 /* PDF preview modal */
 .pdf-preview-content {
     position: relative;
     background: var(--pz-bg);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     width: 90vw;
     max-width: 1200px;
     height: 90vh;
@@ -98,7 +98,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     transition: all 0.2s ease;
 }
 

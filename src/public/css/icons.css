@@ -110,7 +110,7 @@
 .slash-command-icon.lucide-times-circle,
 .slash-command-item .slash-command-icon.lucide-times-circle {
     color: var(--pz-danger) !important;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
 }
 
 .lucide-plus {

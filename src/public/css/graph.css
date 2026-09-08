@@ -47,7 +47,7 @@ body.graph-page {
     box-sizing: border-box;
     padding: 8px 12px;
     border: 1px solid var(--pz-border-strong);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-size: 14px;
     background: var(--pz-bg);
     color: var(--pz-text);
@@ -62,7 +62,7 @@ body.graph-page {
     max-width: 220px;
     padding: 7px 10px;
     border: 1px solid var(--pz-border-strong);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-size: 13px;
     background: var(--pz-bg);
     color: var(--pz-text-secondary);
@@ -105,7 +105,7 @@ body.graph-page {
     gap: 6px;
     padding: 5px 10px;
     border: 1px solid var(--pz-border-strong);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: var(--pz-bg);
     font-size: 13px;
     color: var(--pz-text-secondary);
@@ -230,7 +230,7 @@ body.graph-page {
     padding: 8px 10px;
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.12);
     font-size: 13px;
     pointer-events: none;
@@ -238,7 +238,7 @@ body.graph-page {
 }
 
 .graph-tooltip-title {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text);
 }
 

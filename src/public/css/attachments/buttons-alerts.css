@@ -13,7 +13,7 @@
     display: inline-flex !important;
     align-items: center !important;
     padding: 12px 25px !important;
-    border-radius: 4px !important;
+    border-radius: var(--pz-radius-sm)!important;
     text-decoration: none !important;
     cursor: pointer !important;
 }
@@ -33,7 +33,7 @@
 /* Alert messages */
 .alert {
     padding: 12px 16px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     margin-bottom: 20px;
     display: flex;
     align-items: center;
@@ -59,7 +59,7 @@
     border-left: 6px solid var(--pz-danger-hover);
     box-shadow: 0 6px 18px rgba(200, 36, 51, 0.12);
     padding: 14px 18px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
 }
 
 .alert-error.attention {
@@ -76,7 +76,7 @@
     background: var(--pz-warning-soft);
     color: var(--pz-warning-strong);
     border: 1px solid var(--pz-warning-soft);
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     padding: 15px;
     margin-bottom: 20px;
 }

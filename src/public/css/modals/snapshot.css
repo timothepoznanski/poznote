@@ -41,7 +41,7 @@
 .snapshot-date-list-header {
     padding: 14px 16px 10px;
     font-size: 11px;
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
     text-transform: uppercase;
     letter-spacing: 0.4px;
     color: var(--pz-text-muted);
@@ -63,11 +63,11 @@
     padding: 8px 12px;
     border: none;
     background: transparent;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     cursor: pointer;
     font-size: 13px;
     color: var(--pz-text);
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     text-align: left;
     line-height: 1.3;
     transition: background-color 0.12s;
@@ -87,7 +87,7 @@
     display: block;
     margin-top: 1px;
     font-size: 11px;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     opacity: 0.72;
 }
 
@@ -202,7 +202,7 @@
 
 .snapshot-state-title {
     font-size: 15px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     margin-bottom: 6px !important;
 }
 
@@ -252,7 +252,7 @@
     align-items: flex-start;
     color: var(--pz-text);
     font-size: 17px;
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
     line-height: 1.28;
 }
 
@@ -295,7 +295,7 @@
     padding: 20px;
     margin: 0;
     border: 1px solid var(--pz-border);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: var(--pz-bg);
     color: var(--pz-text);
     font-size: var(--note-font-size, 15px);
@@ -333,14 +333,14 @@
 .snapshot-content-preview img {
     max-width: 100%;
     height: auto;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
 }
 
 .snapshot-content-preview pre {
     margin: 1em 0 !important;
     padding: 18px 20px;
     border: 1px solid var(--pz-border);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: var(--pz-surface);
     overflow-x: auto;
     box-sizing: border-box;
@@ -352,7 +352,7 @@
     background: transparent !important;
     border: none !important;
     padding: 0 !important;
-    border-radius: 0 !important;
+    border-radius: 0!important;
 }
 
 .snapshot-content-preview:empty::before {
@@ -461,7 +461,7 @@
 /* Kept-count number in the description, links to its setting */
 .snapshot-keep-count-link {
     color: var(--pz-accent);
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     text-decoration: underline dotted;
     text-underline-offset: 2px;
     cursor: pointer;
@@ -555,7 +555,7 @@
         width: 100% !important;
         max-height: 92vh;
         margin-top: 0 !important;
-        border-radius: 10px;
+        border-radius: var(--pz-radius-lg);
     }
 
     .snapshot-modal-header {

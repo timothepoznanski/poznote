@@ -20,7 +20,7 @@
 .welcome-setup-logo {
     width: 56px;
     height: 56px;
-    border-radius: 14px;
+    border-radius: var(--pz-radius-xl);
     margin-bottom: 12px;
     box-shadow: 0 2px 10px rgba(var(--pz-shadow-rgb), 0.12);
 }
@@ -56,7 +56,7 @@
     align-items: center;
     gap: 7px;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text);
 }
 
@@ -96,7 +96,7 @@
     gap: 10px;
     padding: 10px 12px;
     border: 1px solid var(--pz-border);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: var(--pz-surface);
     color: var(--pz-text);
     text-decoration: none;

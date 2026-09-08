@@ -48,7 +48,7 @@
     min-width: 0;
     padding: 6px 10px;
     border: 1px solid var(--border-color, var(--pz-border-strong));
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     font-size: 13px;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--input-bg, var(--pz-bg));
@@ -86,7 +86,7 @@
 .search-replace-btn {
     padding: 6px 10px;
     border: 1px solid var(--border-color, var(--pz-border-strong));
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background: var(--pz-bg);
     color: var(--text-color, var(--pz-text));
     font-size: 12px;
@@ -139,7 +139,7 @@
     background-color: var(--pz-warning);
     color: var(--pz-text);
     padding: 1px 0;
-    border-radius: 2px;
+    border-radius: var(--pz-radius-sm);
 }
 
 .search-replace-highlight.active {

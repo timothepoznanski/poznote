@@ -10,7 +10,7 @@
 .alert {
     padding: 12px;
     margin-bottom: 12px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-size: 14px;
 }
 
@@ -33,7 +33,7 @@
 .modal-footer .btn {
     padding: 8px 16px;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     margin-left: 10px;
     display: inline-flex;
@@ -61,7 +61,7 @@
     color: var(--pz-text-muted);
     border: none;
     padding: 8px 12px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius-sm);
     cursor: not-allowed !important;
     opacity: 0.6;
 }
@@ -78,7 +78,7 @@
    a live button with a pointer cursor. */
 .modal .btn-danger {
     padding: 8px 12px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius-sm);
 }
 
 /* ============================================
@@ -162,7 +162,7 @@
     padding: 8px 12px;
     margin-bottom: 0;
     border: 1px solid var(--pz-border);
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     font-size: 14px;
     font-family: 'Inter', sans-serif;
     box-sizing: border-box;
@@ -173,7 +173,7 @@
     padding: 8px;
     margin-top: 10px;
     border: 1px solid var(--pz-border);
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     font-size: 14px;
 }
 

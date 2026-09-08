@@ -67,7 +67,7 @@ body {
 
 .sidebar-title {
     font-size: 1.25rem;
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
     color: var(--pz-text);
     /* dark */
     display: flex;
@@ -115,7 +115,7 @@ body {
     font-size: 1.3rem;
     cursor: pointer;
     padding: 6px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -129,7 +129,7 @@ body {
     font-size: 1.2rem;
     cursor: pointer;
     padding: 6px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
 }
 
 /* Hover and focus states for sidebar buttons */
@@ -205,7 +205,7 @@ body {
     height: 25px;
     background: var(--pz-bg);
     border: 1px solid var(--pz-border-strong);
-    border-radius: 0 4px 4px 0;
+    border-radius: 0 var(--pz-radius-sm) var(--pz-radius-sm) 0;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -269,7 +269,7 @@ body.sidebar-collapsed .resize-handle {
    side, rail toggle first. See #iconSidebarToggle in css/icon-sidebar.css. */
 body.sidebar-collapsed .toggle-sidebar-btn {
     left: 20px;
-    border-radius: 0 4px 4px 0;
+    border-radius: 0 var(--pz-radius-sm) var(--pz-radius-sm) 0;
     opacity: 1;
     pointer-events: auto;
     z-index: 12;

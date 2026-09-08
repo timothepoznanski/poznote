@@ -62,7 +62,7 @@
     margin: 0;
     padding: 2px 10px 2px 0;
     min-height: calc(1.4em + 4px);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     overflow: hidden;
     user-select: none;
 }
@@ -211,7 +211,7 @@ html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::befor
 
 .markdown-codemirror-host .poznote-cm-heading {
     color: var(--poznote-cm-heading);
-    font-weight: 700 !important;
+    font-weight: var(--pz-weight-bold) !important;
 }
 
 /* Per-level heading colors; each level falls back to the shared heading color
@@ -250,7 +250,7 @@ html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::befor
 }
 
 .markdown-codemirror-host .poznote-cm-strong {
-    font-weight: 700 !important;
+    font-weight: var(--pz-weight-bold) !important;
 }
 
 .markdown-codemirror-host .poznote-cm-monospace {
@@ -268,7 +268,7 @@ html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::befor
 
 .cm-tooltip {
     border: 1px solid var(--pz-border);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.15);
     overflow: hidden;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -291,7 +291,7 @@ body.slash-menu-cursor-hidden * {
 /* Markdown rendered content styles */
 .markdown-preview h1 {
     font-size: 2em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 0.67em 0;
     border-bottom: 2px solid var(--pz-border);
     padding-bottom: 0.3em;
@@ -299,7 +299,7 @@ body.slash-menu-cursor-hidden * {
 
 .markdown-preview h2 {
     font-size: 1.5em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 0.75em 0;
     border-bottom: 1px solid var(--pz-border);
     padding-bottom: 0.3em;
@@ -307,25 +307,25 @@ body.slash-menu-cursor-hidden * {
 
 .markdown-preview h3 {
     font-size: 1.25em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 0.83em 0;
 }
 
 .markdown-preview h4 {
     font-size: 1em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 1em 0;
 }
 
 .markdown-preview h5 {
     font-size: 0.875em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 1.33em 0;
 }
 
 .markdown-preview h6 {
     font-size: 0.75em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 1.67em 0;
     color: var(--pz-text-muted);
 }
@@ -406,7 +406,7 @@ body.slash-menu-cursor-hidden * {
 .markdown-preview pre {
     background-color: var(--pz-surface-hover);
     padding: 12px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     overflow-x: auto;
     margin: 1em 0 !important;
 }
@@ -416,7 +416,7 @@ body.slash-menu-cursor-hidden * {
     background: none;
     background-color: transparent;
     border: none;
-    border-radius: 0 !important;
+    border-radius: 0!important;
     padding: 0 !important;
     margin: 0 0 1em 0 !important;
     font-family: monospace !important;
@@ -511,7 +511,7 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
 .markdown-preview iframe {
     max-width: 100%;
     height: auto;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     margin: 0;
 }
 
@@ -522,7 +522,7 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
 .markdown-preview video {
     max-width: 100%;
     height: auto;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     margin: 1em 0;
     background: #000;
     box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.1);
@@ -533,7 +533,7 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
     max-width: 280px;
     display: block;
     margin: 8px 0;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: var(--pz-surface-hover);
 }
 
@@ -553,7 +553,7 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
     overflow: hidden;
     margin: 8px 0;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: transparent;
 }
 
@@ -565,7 +565,7 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
     overflow: hidden;
     margin: 8px 0;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: transparent;
 }
 
@@ -586,7 +586,7 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
 }
 
 .markdown-preview strong {
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
 }
 
 .markdown-preview em {
@@ -618,7 +618,7 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
 .noteentry table th,
 .markdown-preview table th {
     background-color: var(--pz-surface-hover);
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
 }
 
 .noteentry table tr:nth-child(even),
@@ -702,7 +702,7 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, pre:not(.
 body.markdown-colored .markdown-preview :not(pre) > :is(#poznote-md-colored-boost, code:not([class*="hljs"]):not([class*="language-"])) {
     color: var(--mdc-code);
     background-color: color-mix(in srgb, var(--mdc-code) 9%, transparent);
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
 }
 
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, blockquote) {
@@ -773,7 +773,7 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
 
 .noteentry.markdown-split-mode .markdown-preview [data-line]:not(.markdown-task-checkbox):not(summary):not(details):hover {
     background-color: rgba(var(--pz-accent-rgb), 0.05);
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
 }
 
 /* Indicateur visuel pour le drag & drop */
@@ -828,7 +828,7 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
     background-color: var(--pz-bg);
     /* Ensure visibility in dark mode if mermaid doesn't handle it */
     padding: 10px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
 }
 
 /* Dark mode adjustment for mermaid container */
@@ -1009,7 +1009,7 @@ body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
     box-sizing: border-box !important;
     max-height: var(--markdown-split-pane-height, calc(100vh - 240px)) !important;
     border: 1px solid var(--pz-border);
-    border-radius: 16px !important;
+    border-radius: var(--pz-radius-2xl)!important;
     background: var(--pz-bg);
 }
 

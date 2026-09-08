@@ -95,7 +95,7 @@
         width: auto !important;
         min-width: 120px !important;
         font-size: 14px !important;
-        font-weight: 500 !important;
+        font-weight: var(--pz-weight-medium) !important;
         padding: 8px 16px !important;
         text-align: center !important;
         min-height: 36px !important;
@@ -114,7 +114,7 @@
         margin-bottom: 8px !important;
         padding: 12px !important;
         font-size: 15px !important;
-        font-weight: 500 !important;
+        font-weight: var(--pz-weight-medium) !important;
         min-height: 44px !important;
         display: flex !important;
         align-items: center !important;

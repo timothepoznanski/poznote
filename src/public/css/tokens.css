@@ -13,6 +13,29 @@
    Keep the names stable: they are part of the custom-CSS contract. */
 
 :root {
+    /* Corner radius. Twenty-seven different values were in use, fourteen of them
+       on buttons alone, so the same kind of control was rounded differently from
+       one page to the next. Six steps, and every value snapped to its nearest
+       one; nothing moved by more than 2px. */
+    --pz-radius-sm: 4px;      /* inputs, small controls, buttons */
+    --pz-radius: 6px;         /* default */
+    --pz-radius-lg: 8px;      /* cards, panels */
+    --pz-radius-xl: 12px;     /* dialogs */
+    --pz-radius-2xl: 16px;    /* the largest surfaces */
+    --pz-radius-pill: 999px;  /* chips and pills */
+    --pz-radius-circle: 50%;
+
+    /* Type weight. The stylesheets used eight spellings, 300 / 400 / 500 / 600 /
+       700 / normal / bold / inherit, for what the shipped font renders as two:
+       fonts.css declares Inter at 400 and 600 only, so 300 and 500 come out as
+       Regular and 700 as SemiBold. Naming the four steps keeps every rendering
+       exactly as it is while making the scale visible, and gives the day a
+       Medium and a Bold face ship somewhere to change. */
+    --pz-weight-normal: 400;
+    --pz-weight-medium: 500;
+    --pz-weight-semibold: 600;
+    --pz-weight-bold: 700;
+
     /* Layout. The resizable sidebar: js/resize-column.js overwrites this on
        :root at runtime, this is the default it starts from. */
     --left-col-width: 370px;

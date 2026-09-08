@@ -18,7 +18,7 @@
     align-items: center;
     justify-content: center;
     border: 1px solid rgba(229, 231, 235, 0.85);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: var(--pz-bg);
     box-shadow: 0 18px 40px rgba(15, 23, 42, 0.22);
 }
@@ -30,7 +30,7 @@
     gap: 12px;
     color: var(--pz-text-secondary);
     font-size: 13px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
 }
 
 .note-creation-loading-content i {
@@ -72,7 +72,7 @@ html[data-theme='dark'] .note-creation-loading-dialog {
 
 .alert-modal {
     background: var(--bg-color, var(--pz-bg));
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 10px 30px rgba(var(--pz-shadow-rgb), 0.3);
     max-width: 400px;
     width: 90%;
@@ -94,7 +94,7 @@ html[data-theme='dark'] .note-creation-loading-dialog {
 .alert-modal-title {
     margin: 0 0 16px 0;
     font-size: 18px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--text-color, var(--pz-text));
     display: flex;
     align-items: center;
@@ -137,10 +137,10 @@ html[data-theme='dark'] .note-creation-loading-dialog {
 .alert-modal-button {
     padding: 10px 20px;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     font-size: 14px;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     transition: all 0.2s ease;
     min-width: 80px;
 }
@@ -306,7 +306,7 @@ html[data-theme='dark'] .alert-modal-button.primary.snapshot-restore-confirm-but
     width: 100%;
     height: 12px;
     background: var(--border-color, var(--pz-border));
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     overflow: hidden;
     margin: 15px 0;
     position: relative;
@@ -337,7 +337,7 @@ html[data-theme='dark'] .progress-container,
     height: 20px;
     border: 2px solid var(--border-color, var(--pz-border));
     border-top: 2px solid var(--pz-accent);
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     animation: spin 1s linear infinite;
 }
 
@@ -374,7 +374,7 @@ html[data-theme='dark'] .spinner,
     align-items: flex-start;
     padding: 14px;
     border: 1px solid var(--pz-border);
-    border-radius: 10px;
+    border-radius: var(--pz-radius-lg);
     background: var(--pz-surface);
 }
 
@@ -388,7 +388,7 @@ html[data-theme='dark'] .spinner,
 
 .admin-contact-option-title {
     display: block;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     margin-bottom: 3px;
 }
 
@@ -405,7 +405,7 @@ html[data-theme='dark'] .spinner,
     gap: 5px;
     margin-top: 8px;
     color: var(--pz-accent);
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     text-decoration: none;
 }
 
@@ -426,10 +426,10 @@ html[data-theme='dark'] .spinner,
 }
 
 .admin-contact-email {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     padding: 4px 10px;
     border: 1px solid var(--pz-border);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: var(--pz-bg);
 }
 
@@ -439,7 +439,7 @@ html[data-theme='dark'] .spinner,
     gap: 5px;
     padding: 4px 10px;
     border: 1px solid var(--pz-border);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: var(--pz-bg);
     cursor: pointer;
     font: inherit;

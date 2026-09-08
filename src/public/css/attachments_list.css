@@ -14,7 +14,7 @@ body.attachments-page::-webkit-scrollbar {
 
 body.attachments-page::-webkit-scrollbar-thumb {
     background-color: var(--pz-scrollbar);
-    border-radius: 8px !important;
+    border-radius: var(--pz-radius-lg)!important;
 }
 
 body.attachments-page::-webkit-scrollbar-thumb:hover {
@@ -34,7 +34,7 @@ body.attachments-page html::-webkit-scrollbar {
 
 body.attachments-page html::-webkit-scrollbar-thumb {
     background-color: var(--pz-scrollbar);
-    border-radius: 8px !important;
+    border-radius: var(--pz-radius-lg)!important;
 }
 
 body.attachments-page html::-webkit-scrollbar-thumb:hover {
@@ -54,7 +54,7 @@ body.attachments-page {
     margin: -8px auto 20px auto;
     padding: 10px 12px;
     border: 1px solid #dbeafe;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: #eff6ff;
     color: var(--pz-accent-strong);
     font-size: 0.88rem;
@@ -78,7 +78,7 @@ body.attachments-page {
     max-width: 180px;
     padding: 10px 34px 10px 12px;
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     font-size: 14px;
     color: var(--text-color, var(--pz-text));
     background-color: var(--input-bg, var(--pz-bg));
@@ -104,8 +104,8 @@ body.attachments-page {
     white-space: nowrap;
     padding: 6px 12px;
     background-color: #f0f7ff;
-    border-radius: 6px;
-    font-weight: 500;
+    border-radius: var(--pz-radius);
+    font-weight: var(--pz-weight-medium);
 }
 
 .note-header {
@@ -118,7 +118,7 @@ body.attachments-page {
 }
 
 .note-name {
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     font-size: 16px;
     color: var(--pz-accent);
     text-decoration: none;
@@ -141,7 +141,7 @@ body.attachments-page {
     gap: 12px;
     padding: 10px 12px;
     background-color: var(--pz-surface);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     transition: background-color 0.2s ease;
 }
 
@@ -203,7 +203,7 @@ body.attachments-page {
     padding: 20px;
     background-color: var(--pz-danger-soft);
     color: var(--pz-danger-strong);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     border: 1px solid var(--pz-danger-soft);
 }
 
@@ -307,7 +307,7 @@ html[data-theme='dark'] body.attachments-page::-webkit-scrollbar-thumb:hover {
 
 .attachment-note-name {
     display: block;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     color: var(--pz-accent);
     text-decoration: none;
     margin-bottom: 8px;
@@ -346,7 +346,7 @@ html[data-theme='dark'] body.attachments-page::-webkit-scrollbar-thumb:hover {
 .attachment-image-preview img {
     max-width: 150px;
     max-height: 150px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     border: 1px solid var(--border-color, var(--pz-border));
     background: var(--pz-surface);
     display: block;
@@ -420,5 +420,5 @@ html[data-theme='dark'] .attachment-image-preview img {
 }
 
 .toggle-label {
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
 }

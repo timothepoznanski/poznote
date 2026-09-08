@@ -47,7 +47,7 @@
 /* Highlight flash when a folder is revealed from the note header breadcrumb */
 .folder-header.folder-reveal-highlight > .folder-toggle {
     animation: folderRevealFlash 1.6s ease-out;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
 }
 
 @keyframes folderRevealFlash {

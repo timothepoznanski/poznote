@@ -9,7 +9,7 @@
 .card-container {
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
     box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.08);
     transition: all 0.3s ease;
     overflow: hidden;
@@ -39,7 +39,7 @@
     margin: 0;
     color: var(--pz-text);
     font-size: 18px;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     display: flex;
     align-items: center;
     gap: 12px;
@@ -97,7 +97,7 @@
 .sub-card {
     background: var(--pz-surface);
     border: 1px solid var(--pz-border-light);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     margin-bottom: 16px;
     overflow: hidden;
 }
@@ -121,7 +121,7 @@
     margin: 0;
     color: var(--pz-text);
     font-size: 16px;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     display: flex;
     align-items: center;
     gap: 8px;

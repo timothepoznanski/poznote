@@ -25,7 +25,7 @@
     margin: 0;
     padding: 20px;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     width: 90%;
     max-width: 400px;
     max-height: 90vh;
@@ -41,7 +41,7 @@
     margin-bottom: 15px;
     color: var(--pz-text);
     font-size: 18px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .import-confirm-modal-content p {
@@ -59,7 +59,7 @@
 .import-confirm-buttons button {
     padding: 8px 16px;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     font-size: 14px;
     font-family: 'Inter', sans-serif;
@@ -87,7 +87,7 @@
     height: 16px;
     border: 2px solid rgba(var(--pz-shadow-rgb), 0.12);
     border-top-color: var(--pz-accent);
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     animation: direct-copy-restore-spin 0.8s linear infinite;
 }
 
@@ -145,7 +145,7 @@
     margin: 0 auto;
     padding: 20px;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     width: 350px;
     max-width: 90%;
     max-height: 80vh;
@@ -160,7 +160,7 @@
     margin-bottom: 15px;
     color: var(--pz-danger);
     font-size: 18px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .custom-alert-content p {
@@ -172,7 +172,7 @@
 .alert-ok-button {
     padding: 8px 20px;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     font-size: 14px;
     font-family: 'Inter', sans-serif;

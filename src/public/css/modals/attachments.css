@@ -12,7 +12,7 @@
     margin-bottom: 20px;
     padding: 15px;
     border: 2px dashed var(--pz-border);
-    border-radius: 5px;
+    border-radius: var(--pz-radius-sm);
     background: var(--pz-surface);
 }
 
@@ -29,7 +29,7 @@
     width: 100%;
     padding: 8px;
     border: 1px solid var(--pz-border);
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
     box-sizing: border-box;
 }
 
@@ -38,7 +38,7 @@
     background: var(--pz-accent);
     color: var(--pz-text-inverse);
     border: none;
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
 }
 
@@ -58,7 +58,7 @@
     justify-content: space-between;
     padding: 10px;
     border: 1px solid var(--pz-border-light);
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
     margin-bottom: 5px;
     background: var(--pz-surface);
 }
@@ -88,6 +88,6 @@
     padding: 4px 8px;
     font-size: 0.8em;
     border: none;
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
 }

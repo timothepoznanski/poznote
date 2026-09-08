@@ -15,7 +15,7 @@
     position: relative;
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
     padding: 12px 16px;
     text-decoration: none;
     color: inherit;
@@ -57,7 +57,7 @@
     margin-left: -9px;
     border: 2px solid rgba(var(--pz-accent-rgb), 0.22);
     border-top-color: var(--pz-accent);
-    border-radius: 999px;
+    border-radius: var(--pz-radius-pill);
     animation: lucide-spin 0.8s linear infinite;
 }
 
@@ -69,7 +69,7 @@
     align-items: center;
     justify-content: center;
     background: rgba(var(--pz-accent-rgb), 0.1);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     flex-shrink: 0;
     position: relative;
 }
@@ -134,7 +134,7 @@ html[data-theme='dark'] #support-card .home-card-icon {
    card, js/font-size-settings.js); it stays at 1 on the other pages. */
 .home-card-title {
     font-size: calc(16px * var(--settings-font-scale, 1));
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     color: var(--pz-text);
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -146,7 +146,7 @@ html[data-theme='dark'] #support-card .home-card-icon {
 .home-card-description {
     font-size: calc(11px * var(--settings-font-scale, 1));
     color: var(--pz-text-muted);
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     margin-top: 2px;
     display: block;
 }
@@ -185,12 +185,12 @@ html[data-theme='dark'] #support-card .home-card-icon {
     border: 1px solid rgba(var(--pz-highlight-rgb), 0.15);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-size: 0.95rem;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     line-height: 1.4;
     text-align: left;
     white-space: normal;
     padding: 8px 10px;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.25);
     opacity: 0;
     visibility: hidden;

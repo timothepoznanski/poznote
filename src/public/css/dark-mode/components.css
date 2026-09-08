@@ -253,12 +253,12 @@ html[data-theme='dark'] .task-item.important {
 
 html[data-theme='dark'] .task-item.important .task-text {
     color: var(--dm-danger);
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 html[data-theme='dark'] .task-item.important .task-text a {
     color: var(--dm-danger);
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 html[data-theme='dark'] .task-item.important .task-text a:hover {
@@ -630,7 +630,7 @@ html[data-theme='dark'] ::-webkit-scrollbar {
 
 :where(html[data-theme='dark']) ::-webkit-scrollbar-thumb {
     background: var(--dm-border);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
 }
 
 :where(html[data-theme='dark']) ::-webkit-scrollbar-thumb:hover {
