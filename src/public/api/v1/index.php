@@ -117,25 +117,27 @@ if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessA
     }
 }
 
+require_once dirname(__DIR__, 3) . '/api/v1/ApiResponse.php';
+
 // Include controllers
-require_once __DIR__ . '/controllers/NotesController.php';
-require_once __DIR__ . '/controllers/FoldersController.php';
-require_once __DIR__ . '/controllers/TrashController.php';
-require_once __DIR__ . '/controllers/WorkspacesController.php';
-require_once __DIR__ . '/controllers/TagsController.php';
-require_once __DIR__ . '/controllers/AttachmentsController.php';
-require_once __DIR__ . '/controllers/ShareController.php';
-require_once __DIR__ . '/controllers/FolderShareController.php';
-require_once __DIR__ . '/controllers/SettingsController.php';
-require_once __DIR__ . '/controllers/BackupController.php';
-require_once __DIR__ . '/controllers/SystemController.php';
-require_once __DIR__ . '/controllers/GitSyncController.php';
-require_once __DIR__ . '/controllers/PublicController.php';
-require_once __DIR__ . '/controllers/BacklinksController.php';
-require_once __DIR__ . '/controllers/GraphController.php';
-require_once __DIR__ . '/controllers/SnapshotsController.php';
-require_once __DIR__ . '/controllers/RemindersController.php';
-require_once __DIR__ . '/controllers/TasksController.php';
+require_once __DIR__ . '/../../../api/v1/controllers/NotesController.php';
+require_once __DIR__ . '/../../../api/v1/controllers/FoldersController.php';
+require_once __DIR__ . '/../../../api/v1/controllers/TrashController.php';
+require_once __DIR__ . '/../../../api/v1/controllers/WorkspacesController.php';
+require_once __DIR__ . '/../../../api/v1/controllers/TagsController.php';
+require_once __DIR__ . '/../../../api/v1/controllers/AttachmentsController.php';
+require_once __DIR__ . '/../../../api/v1/controllers/ShareController.php';
+require_once __DIR__ . '/../../../api/v1/controllers/FolderShareController.php';
+require_once __DIR__ . '/../../../api/v1/controllers/SettingsController.php';
+require_once __DIR__ . '/../../../api/v1/controllers/BackupController.php';
+require_once __DIR__ . '/../../../api/v1/controllers/SystemController.php';
+require_once __DIR__ . '/../../../api/v1/controllers/GitSyncController.php';
+require_once __DIR__ . '/../../../api/v1/controllers/PublicController.php';
+require_once __DIR__ . '/../../../api/v1/controllers/BacklinksController.php';
+require_once __DIR__ . '/../../../api/v1/controllers/GraphController.php';
+require_once __DIR__ . '/../../../api/v1/controllers/SnapshotsController.php';
+require_once __DIR__ . '/../../../api/v1/controllers/RemindersController.php';
+require_once __DIR__ . '/../../../api/v1/controllers/TasksController.php';
 
 /**
  * Simple Router class for handling RESTful routes
@@ -923,7 +925,7 @@ $router->put('/git-sync/config', function($params) use ($gitSyncController) {
 // User Profile Routes
 // ======================
 
-require_once __DIR__ . '/controllers/UsersController.php';
+require_once __DIR__ . '/../../../api/v1/controllers/UsersController.php';
 $usersController = new UsersController($con);
 
 // Get available user profiles for login selector (public endpoint)

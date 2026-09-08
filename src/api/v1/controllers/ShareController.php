@@ -9,7 +9,7 @@
  *   PATCH  /api/v1/notes/{noteId}/share          - Update share settings (indexable, password)
  */
 
-require_once dirname(__DIR__, 4) . '/share_passwords.php';
+require_once dirname(__DIR__, 3) . '/share_passwords.php';
 
 class ShareController {
     private $con;
@@ -121,7 +121,7 @@ class ShareController {
             }
 
             // Register in global registry (master.db)
-            require_once dirname(__DIR__, 4) . '/users/db_master.php';
+            require_once dirname(__DIR__, 3) . '/users/db_master.php';
             
             // Check global uniqueness (across all users)
             if (!isTokenAvailable($token, $_SESSION['user_id'], 'note', (int)$noteId)) {
@@ -173,7 +173,7 @@ class ShareController {
             // break a share that already succeeded. Delivery is scoped to the
             // webhooks of the account owning the note.
             try {
-                require_once dirname(__DIR__, 4) . '/WebhookDispatcher.php';
+                require_once dirname(__DIR__, 3) . '/WebhookDispatcher.php';
                 (new WebhookDispatcher())->dispatchNoteShared(
                     (int)(getCurrentUserId() ?? 0),
                     [
@@ -234,7 +234,7 @@ class ShareController {
             $stmtToken->execute([$noteId]);
             $token = $stmtToken->fetchColumn();
             if ($token) {
-                require_once dirname(__DIR__, 4) . '/users/db_master.php';
+                require_once dirname(__DIR__, 3) . '/users/db_master.php';
                 unregisterSharedLink($token);
             }
 
@@ -312,7 +312,7 @@ class ShareController {
                         return;
                     }
 
-                    require_once dirname(__DIR__, 4) . '/users/db_master.php';
+                    require_once dirname(__DIR__, 3) . '/users/db_master.php';
 
                     if (!isTokenAvailable($custom, $_SESSION['user_id'], 'note', (int)$noteId)) {
                         http_response_code(409);
@@ -390,7 +390,7 @@ class ShareController {
 
             if (isset($input['custom_token'])) {
                 $newToken = trim($input['custom_token']);
-                require_once dirname(__DIR__, 4) . '/users/db_master.php';
+                require_once dirname(__DIR__, 3) . '/users/db_master.php';
 
                 if ($oldToken && $oldToken !== $newToken) {
                     unregisterSharedLink($oldToken);

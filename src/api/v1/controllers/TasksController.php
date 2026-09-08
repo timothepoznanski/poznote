@@ -11,7 +11,7 @@
  * used as a fallback (it can be stale, see kanban_content.php).
  */
 
-require_once __DIR__ . '/../../../../users/db_master.php';
+require_once __DIR__ . '/../../../users/db_master.php';
 
 class TasksController
 {
@@ -696,7 +696,7 @@ class TasksController
     private function isReminderEmailAvailable(): bool
     {
         if (!function_exists('getGlobalSetting')) {
-            require_once dirname(__DIR__, 4) . '/users/db_master.php';
+            require_once dirname(__DIR__, 3) . '/users/db_master.php';
         }
         if (!function_exists('getGlobalSetting')) {
             return false;

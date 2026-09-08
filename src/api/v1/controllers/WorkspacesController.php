@@ -148,7 +148,7 @@ class WorkspacesController {
 
             $stmt = $this->con->prepare("INSERT INTO workspaces (name, tags, color) VALUES (?, ?, ?)");
             if ($stmt->execute([$name, poznoteSerializeWorkspaceTags($tags), $color])) {
-                require_once dirname(__DIR__, 4) . '/ActivityLog.php';
+                require_once dirname(__DIR__, 3) . '/ActivityLog.php';
                 logActivity(ACTIVITY_WORKSPACE_CREATED, ['workspace' => $name], 'api');
 
                 http_response_code(201);
@@ -424,7 +424,7 @@ class WorkspacesController {
             if ($stmt->execute([$name])) {
                 // notes_moved, not notes_deleted: this endpoint reassigns the
                 // notes to $targetWorkspace instead of destroying them.
-                require_once dirname(__DIR__, 4) . '/ActivityLog.php';
+                require_once dirname(__DIR__, 3) . '/ActivityLog.php';
                 logActivity(ACTIVITY_WORKSPACE_DELETED, [
                     'workspace' => $name,
                     'notes_moved' => $movedNotes,

@@ -285,7 +285,7 @@ class SettingsController {
             // Keys of getDiaryDateFormats() in functions.php
             $allowedFormats = ['ymd', 'dmy_slash', 'mdy_slash', 'dmy_dot', 'ymd_slash'];
             if (strpos($normalized, 'custom:') === 0) {
-                require_once __DIR__ . '/../../../../functions.php';
+                require_once __DIR__ . '/../../../functions.php';
                 $customPattern = trim(substr($normalized, 7));
                 // Rejects patterns that could not be parsed back into a day
                 // (no year/month/day, a part twice, illegal characters).
@@ -448,7 +448,7 @@ class SettingsController {
 
     private function loadGlobalSettings(?array $keys): array {
         $this->requireGlobalSettingsAdmin();
-        require_once dirname(__DIR__, 4) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
 
         $settings = [];
         $masterCon = getMasterConnection();
@@ -552,7 +552,7 @@ class SettingsController {
             // For global settings, use getGlobalSetting function
             if ($this->isGlobalSetting($key)) {
                 $this->requireGlobalSettingsAdmin();
-                require_once dirname(__DIR__, 4) . '/users/db_master.php';
+                require_once dirname(__DIR__, 3) . '/users/db_master.php';
                 $value = getGlobalSetting($key, '');
                 if ($key === 'smtp_password' && $value !== '') {
                     $value = '';
@@ -608,7 +608,7 @@ class SettingsController {
             // For global settings, use setGlobalSetting function
             if ($this->isGlobalSetting($key)) {
                 $this->requireGlobalSettingsAdmin();
-                require_once dirname(__DIR__, 4) . '/users/db_master.php';
+                require_once dirname(__DIR__, 3) . '/users/db_master.php';
                 setGlobalSetting($key, $value);
             } else {
                 $previousLanguage = null;
@@ -650,7 +650,7 @@ class SettingsController {
                     $stmt = $this->con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
                     $stmt->execute(['language_source', 'user']);
 
-                    require_once dirname(__DIR__, 4) . '/users/db_master.php';
+                    require_once dirname(__DIR__, 3) . '/users/db_master.php';
                     $languageUserId = function_exists('getCurrentUserId') ? (int) getCurrentUserId() : 0;
                     setUserProfileLanguage($languageUserId, $value);
 
@@ -683,7 +683,7 @@ class SettingsController {
      */
     private function dispatchLanguageChangedWebhook(int $userId, string $previous, string $language): void {
         try {
-            require_once dirname(__DIR__, 4) . '/WebhookDispatcher.php';
+            require_once dirname(__DIR__, 3) . '/WebhookDispatcher.php';
             // Bearer/Basic credentials mean an external API client; the web UI
             // reaches the same endpoint through its session cookie.
             $source = (function_exists('hasApiAuthCredentials') && hasApiAuthCredentials()) ? 'api' : 'ui';

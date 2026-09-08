@@ -111,7 +111,7 @@ class BackupController {
         // attachments stored in the S3 bucket are fetched into the archive,
         // and a bucket read failure refuses the backup instead of shipping
         // one that silently misses files.
-        require_once dirname(__DIR__, 4) . '/backup_zip.php';
+        require_once dirname(__DIR__, 3) . '/backup_zip.php';
         $build = buildUserBackupZip($userId);
         if (empty($build['success'])) {
             http_response_code(500);
@@ -136,7 +136,7 @@ class BackupController {
         }
 
         if (file_exists($zipFilePath) && filesize($zipFilePath) > 0) {
-            require_once dirname(__DIR__, 4) . '/ActivityLog.php';
+            require_once dirname(__DIR__, 3) . '/ActivityLog.php';
             logActivity(ACTIVITY_BACKUP_CREATED, [
                 'filename' => $zipFileName,
                 'size' => filesize($zipFilePath),
@@ -318,7 +318,7 @@ class BackupController {
             $result = restoreCompleteBackup($fileInfo, true);
             
             if ($result['success']) {
-                require_once dirname(__DIR__, 4) . '/ActivityLog.php';
+                require_once dirname(__DIR__, 3) . '/ActivityLog.php';
                 logActivity(ACTIVITY_BACKUP_RESTORED, [
                     'filename' => $filename,
                     'source' => 'server',

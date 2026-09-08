@@ -11,7 +11,7 @@
  *   2. URL-based link                — ?note={id} or &note={id}
  *   3. Wiki-link syntax              — [[Note Title]]
  */
-require_once __DIR__ . '/../../../../note_loader.php';
+require_once __DIR__ . '/../../../note_loader.php';
 
 class GraphController
 {

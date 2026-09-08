@@ -9,7 +9,7 @@
  *   GET  /api/v1/shared               - List shared notes
  */
 
-require_once dirname(__DIR__, 4) . '/share_passwords.php';
+require_once dirname(__DIR__, 3) . '/share_passwords.php';
 
 class SystemController {
     private $con;
@@ -31,7 +31,7 @@ class SystemController {
         ];
         
         // Get current version
-        $versionFile = __DIR__ . '/../../../../version.txt';
+        $versionFile = __DIR__ . '/../../../version.txt';
         if (file_exists($versionFile)) {
             $result['current_version'] = trim(file_get_contents($versionFile));
         }
@@ -74,7 +74,7 @@ class SystemController {
         ];
         
         // Get current version
-        $versionFile = __DIR__ . '/../../../../version.txt';
+        $versionFile = __DIR__ . '/../../../version.txt';
         if (file_exists($versionFile)) {
             $result['current_version'] = trim(file_get_contents($versionFile));
         }
@@ -501,8 +501,8 @@ class SystemController {
             return ['success' => false, 'error' => 'Not authenticated'];
         }
 
-        require_once dirname(__DIR__, 4) . '/users/db_master.php';
-        require_once dirname(__DIR__, 4) . '/users/UserDataManager.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/UserDataManager.php';
 
         $allUsers = getAllUserProfiles();
 

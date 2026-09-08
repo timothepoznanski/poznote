@@ -40,7 +40,7 @@ class UsersController {
      * GET /api/v1/users/me - Get current authenticated user's profile
      */
     public function me() {
-        require_once dirname(__DIR__, 4) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
         
         $userId = getCurrentUserId();
         if (!$userId) {
@@ -74,7 +74,7 @@ class UsersController {
     public function updateMe() {
         if ($err = $this->requireActiveAccountOwner()) return $err;
 
-        require_once dirname(__DIR__, 4) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
 
         $userId = getCurrentUserId();
         if (!$userId) {
@@ -159,7 +159,7 @@ class UsersController {
 
         // Best-effort: notify outgoing webhooks of the change.
         try {
-            require_once dirname(__DIR__, 4) . '/WebhookDispatcher.php';
+            require_once dirname(__DIR__, 3) . '/WebhookDispatcher.php';
             (new WebhookDispatcher())->dispatchUserProfileChanged((int)$userId, 'self', $profileBefore);
         } catch (Throwable $e) {
             error_log('Webhook dispatch failed after self profile update: ' . $e->getMessage());
@@ -249,8 +249,8 @@ class UsersController {
     public function list($params = []) {
         if ($err = $this->requireAdmin()) return $err;
 
-        require_once dirname(__DIR__, 4) . '/users/db_master.php';
-        require_once dirname(__DIR__, 4) . '/users/UserDataManager.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/UserDataManager.php';
 
         $search = trim((string)($params['q'] ?? ''));
 
@@ -293,8 +293,8 @@ class UsersController {
     public function get($id) {
         if ($err = $this->requireAdmin()) return $err;
         
-        require_once dirname(__DIR__, 4) . '/users/db_master.php';
-        require_once dirname(__DIR__, 4) . '/users/UserDataManager.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/UserDataManager.php';
         
         $user = getUserProfileById((int)$id);
         
@@ -317,7 +317,7 @@ class UsersController {
     public function create($data) {
         if ($err = $this->requireAdmin()) return $err;
         
-        require_once dirname(__DIR__, 4) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
         
         $username = $data['username'] ?? '';
         $email = $data['email'] ?? null;
@@ -336,7 +336,7 @@ class UsersController {
 
         // Best-effort: notify outgoing webhooks of the new account.
         try {
-            require_once dirname(__DIR__, 4) . '/WebhookDispatcher.php';
+            require_once dirname(__DIR__, 3) . '/WebhookDispatcher.php';
             (new WebhookDispatcher())->dispatchUserCreated((int)$result['user_id'], 'api');
         } catch (Throwable $e) {
             error_log('Webhook dispatch failed after API user creation: ' . $e->getMessage());
@@ -355,7 +355,7 @@ class UsersController {
     public function update($id, $data) {
         if ($err = $this->requireAdmin()) return $err;
         
-        require_once dirname(__DIR__, 4) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
         
         // Check if user exists
         $user = getUserProfileById((int)$id);
@@ -379,7 +379,7 @@ class UsersController {
         // Best-effort: notify outgoing webhooks of the change ($user was
         // loaded above, before the update).
         try {
-            require_once dirname(__DIR__, 4) . '/WebhookDispatcher.php';
+            require_once dirname(__DIR__, 3) . '/WebhookDispatcher.php';
             (new WebhookDispatcher())->dispatchUserProfileChanged((int)$id, 'api', $user);
         } catch (Throwable $e) {
             error_log('Webhook dispatch failed after API profile update: ' . $e->getMessage());
@@ -394,7 +394,7 @@ class UsersController {
     public function delete($id, $params = []) {
         if ($err = $this->requireAdmin()) return $err;
         
-        require_once dirname(__DIR__, 4) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
         
         // Cannot delete yourself
         if ((int)$id === getCurrentUserId()) {
@@ -417,7 +417,7 @@ class UsersController {
             return ['error' => $result['error']];
         }
 
-        require_once dirname(__DIR__, 4) . '/ActivityLog.php';
+        require_once dirname(__DIR__, 3) . '/ActivityLog.php';
         [, $actingAdminName] = currentActivityActor();
         // s3_error is recorded on partial failure so the audit trail never
         // claims a cleanup that did not complete.
@@ -440,7 +440,7 @@ class UsersController {
         // Best-effort: notify outgoing webhooks of the deletion.
         if ($deletedProfile) {
             try {
-                require_once dirname(__DIR__, 4) . '/WebhookDispatcher.php';
+                require_once dirname(__DIR__, 3) . '/WebhookDispatcher.php';
                 (new WebhookDispatcher())->dispatchUserDeleted($deletedProfile, 'api');
             } catch (Throwable $e) {
                 error_log('Webhook dispatch failed after API user deletion: ' . $e->getMessage());
@@ -465,8 +465,8 @@ class UsersController {
     public function stats() {
         if ($err = $this->requireAdmin()) return $err;
         
-        require_once dirname(__DIR__, 4) . '/users/db_master.php';
-        require_once dirname(__DIR__, 4) . '/users/UserDataManager.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/UserDataManager.php';
         
         $users = listAllUserProfiles();
         
@@ -505,7 +505,7 @@ class UsersController {
      * other customers, so only admins may read it.
      */
     public function profiles() {
-        require_once dirname(__DIR__, 4) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
 
         if (defined('TENANT_ISOLATION') && TENANT_ISOLATION) {
             if (!function_exists('isCurrentUserAdmin') || !isCurrentUserAdmin()) {
@@ -533,7 +533,7 @@ class UsersController {
     public function changePassword() {
         if ($err = $this->requireActiveAccountOwner()) return $err;
 
-        require_once dirname(__DIR__, 4) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
         
         $userId = getCurrentUserId();
         if (!$userId) {
@@ -545,7 +545,7 @@ class UsersController {
         // provisioned without a credential has no current password to
         // authenticate the change with. Say so instead of failing later with a
         // misleading "current password is incorrect".
-        $oidcPath = dirname(__DIR__, 3) . '/oidc.php';
+        $oidcPath = dirname(__DIR__, 3) . '/public/oidc.php';
         if (is_file($oidcPath)) {
             require_once $oidcPath;
         }
@@ -601,7 +601,7 @@ class UsersController {
     public function deleteMe() {
         if ($err = $this->requireActiveAccountOwner()) return $err;
 
-        require_once dirname(__DIR__, 4) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
 
         $userId = getCurrentUserId();
         if (!$userId) {
@@ -655,7 +655,7 @@ class UsersController {
         // Identity comes from $user, captured before the row disappeared; the
         // session is about to be destroyed so currentActivityActor() cannot
         // resolve it here.
-        require_once dirname(__DIR__, 4) . '/ActivityLog.php';
+        require_once dirname(__DIR__, 3) . '/ActivityLog.php';
         // s3_error must land in the log: after a self-deletion there is no
         // user left to warn, so the activity log is the only place an admin
         // can learn that bucket objects were left behind.
@@ -677,7 +677,7 @@ class UsersController {
         // Best-effort: notify outgoing webhooks of the deletion ($user was
         // loaded above, before the row disappeared).
         try {
-            require_once dirname(__DIR__, 4) . '/WebhookDispatcher.php';
+            require_once dirname(__DIR__, 3) . '/WebhookDispatcher.php';
             (new WebhookDispatcher())->dispatchUserDeleted($user, 'self');
         } catch (Throwable $e) {
             error_log('Webhook dispatch failed after account self-deletion: ' . $e->getMessage());
@@ -687,7 +687,7 @@ class UsersController {
         // destination as JSON instead of redirecting (this is an API call).
         $redirect = 'login.php';
         if ($isOidcSession) {
-            $oidcPath = dirname(__DIR__, 3) . '/oidc.php';
+            $oidcPath = dirname(__DIR__, 3) . '/public/oidc.php';
             if (is_file($oidcPath)) {
                 require_once $oidcPath;
                 if (function_exists('oidc_logout_redirect_url')) {
@@ -728,7 +728,7 @@ class UsersController {
     public function passwordStatus() {
         if ($err = $this->requireActiveAccountOwner()) return $err;
 
-        require_once dirname(__DIR__, 4) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
         
         $userId = getCurrentUserId();
         if (!$userId) {
@@ -755,7 +755,7 @@ class UsersController {
     public function adminResetPassword($id) {
         if ($err = $this->requireAdmin()) return $err;
         
-        require_once dirname(__DIR__, 4) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
         
         $user = getUserProfileById((int)$id);
         if (!$user) {
@@ -809,7 +809,7 @@ class UsersController {
     public function adminPasswordStatus($id) {
         if ($err = $this->requireAdmin()) return $err;
         
-        require_once dirname(__DIR__, 4) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
         
         $user = getUserProfileById((int)$id);
         if (!$user) {
@@ -834,7 +834,7 @@ class UsersController {
     public function repair() {
         if ($err = $this->requireAdmin()) return $err;
         
-        require_once dirname(__DIR__, 4) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
         try {
             $masterCon = getMasterConnection();
         } catch (Exception $e) {
@@ -958,7 +958,7 @@ class UsersController {
      * Accessible to administrators only (no X-User-ID required)
      */
     public function lookup($username) {
-        require_once dirname(__DIR__, 4) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
         
         if (empty($username)) {
             http_response_code(400);

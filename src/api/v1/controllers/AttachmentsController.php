@@ -9,8 +9,8 @@
  *   DELETE /api/v1/notes/{noteId}/attachments/{attachmentId}    - Delete an attachment
  */
 
-require_once __DIR__ . '/../../../../note_loader.php';
-require_once __DIR__ . '/../../../../storage/AttachmentStorage.php';
+require_once __DIR__ . '/../../../note_loader.php';
+require_once __DIR__ . '/../../../storage/AttachmentStorage.php';
 
 class AttachmentsController {
     private $con;
@@ -406,7 +406,7 @@ class AttachmentsController {
             if (!$isAuthenticated) {
                 $basicCredentials = getApiBasicCredentials();
                 if ($basicCredentials !== null) {
-                    require_once __DIR__ . '/../../../../users/db_master.php';
+                    require_once __DIR__ . '/../../../users/db_master.php';
                     $loginIdentifier = $basicCredentials['username'];
                     $authUser = ctype_digit($loginIdentifier)
                         ? getUserProfileById((int) $loginIdentifier)
@@ -648,7 +648,7 @@ class AttachmentsController {
 
     private function getSharedLinkRegistryRow(string $token, string $targetType): ?array {
         try {
-            require_once __DIR__ . '/../../../../users/db_master.php';
+            require_once __DIR__ . '/../../../users/db_master.php';
             $masterCon = getMasterConnection();
             $stmt = $masterCon->prepare('SELECT user_id, target_type, target_id FROM shared_links WHERE token = ? AND target_type = ? LIMIT 1');
             $stmt->execute([$token, $targetType]);
@@ -665,7 +665,7 @@ class AttachmentsController {
             return false;
         }
 
-        require_once __DIR__ . '/../../../../users/UserDataManager.php';
+        require_once __DIR__ . '/../../../users/UserDataManager.php';
         $userDataManager = new UserDataManager($userId);
         $dbPath = $userDataManager->getUserDatabasePath();
 
@@ -960,7 +960,7 @@ class AttachmentsController {
     private function triggerGitSync(int $noteId, string $action = 'push', string $filename = ''): void {
         error_log("[Poznote Git] AttachmentsController: triggerGitSync called for note $noteId with action $action, filename $filename");
         try {
-            $gitSyncFile = dirname(__DIR__, 4) . '/GitSync.php';
+            $gitSyncFile = dirname(__DIR__, 3) . '/GitSync.php';
             if (!file_exists($gitSyncFile)) {
                 error_log("[Poznote Git] AttachmentsController: GitSync.php not found at $gitSyncFile");
                 return;

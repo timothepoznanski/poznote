@@ -40,7 +40,7 @@ class GitSyncController {
             return;
         }
 
-        require_once dirname(__DIR__, 4) . '/GitSync.php';
+        require_once dirname(__DIR__, 3) . '/GitSync.php';
         
         if (!GitSync::isEnabled()) {
             echo json_encode([
@@ -72,7 +72,7 @@ class GitSyncController {
             return;
         }
 
-        require_once dirname(__DIR__, 4) . '/GitSync.php';
+        require_once dirname(__DIR__, 3) . '/GitSync.php';
         
         if (!GitSync::isEnabled()) {
             http_response_code(403);
@@ -99,7 +99,7 @@ class GitSyncController {
             return;
         }
 
-        require_once dirname(__DIR__, 4) . '/GitSync.php';
+        require_once dirname(__DIR__, 3) . '/GitSync.php';
         
         if (!GitSync::isEnabled()) {
             http_response_code(403);
@@ -141,7 +141,7 @@ class GitSyncController {
             return;
         }
 
-        require_once dirname(__DIR__, 4) . '/GitSync.php';
+        require_once dirname(__DIR__, 3) . '/GitSync.php';
         
         if (!GitSync::isEnabled()) {
             http_response_code(403);
@@ -368,7 +368,7 @@ class GitSyncController {
             return;
         }
 
-        require_once dirname(__DIR__, 4) . '/GitSync.php';
+        require_once dirname(__DIR__, 3) . '/GitSync.php';
         
         if (!GitSync::isEnabled()) {
             http_response_code(403);

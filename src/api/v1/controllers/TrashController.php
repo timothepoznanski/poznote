@@ -21,9 +21,9 @@ class TrashController {
     /**
      * Send JSON response
      */
+    /** Delegates to the shared helper in api/v1/ApiResponse.php. */
     private function sendJson(array $data, int $code = 200): void {
-        http_response_code($code);
-        echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        apiSendJson($data, $code);
     }
     
     /**
@@ -170,7 +170,7 @@ class TrashController {
             
             // Free any share tokens in the master registry before the entries
             // are deleted (the ON DELETE CASCADE only removes shared_notes rows)
-            require_once dirname(__DIR__, 4) . '/users/db_master.php';
+            require_once dirname(__DIR__, 3) . '/users/db_master.php';
             unregisterSharedLinksForNotes($this->db, array_column($rows, 'id'));
 
             // Delete all trash entries from database
@@ -183,7 +183,7 @@ class TrashController {
             }
             
             if ($success) {
-                require_once dirname(__DIR__, 4) . '/ActivityLog.php';
+                require_once dirname(__DIR__, 3) . '/ActivityLog.php';
                 logActivity(ACTIVITY_TRASH_EMPTIED, [
                     'deleted_count' => $deletedCount,
                     'workspace' => $workspace,
@@ -247,7 +247,7 @@ class TrashController {
 
             // Free any share token in the master registry before the entry is
             // deleted (the ON DELETE CASCADE only removes the shared_notes row)
-            require_once dirname(__DIR__, 4) . '/users/db_master.php';
+            require_once dirname(__DIR__, 3) . '/users/db_master.php';
             unregisterSharedLinksForNotes($this->db, [$noteId]);
 
             // Delete database entry
@@ -260,7 +260,7 @@ class TrashController {
             }
             
             if ($success) {
-                require_once dirname(__DIR__, 4) . '/ActivityLog.php';
+                require_once dirname(__DIR__, 3) . '/ActivityLog.php';
                 logActivity(ACTIVITY_NOTE_DELETED, [
                     'note_id' => $noteId,
                     'title' => $note['heading'] ?? null,

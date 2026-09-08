@@ -5,7 +5,7 @@
  * Handles public interactions with shared notes (like checking tasks).
  */
 
-require_once __DIR__ . '/../../../../users/db_master.php';
+require_once __DIR__ . '/../../../users/db_master.php';
 
 class PublicController {
     private PDO $con;

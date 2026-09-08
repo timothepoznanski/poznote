@@ -9,7 +9,7 @@
  *   PATCH  /api/v1/folders/{folderId}/share      - Update share settings (indexable, password)
  */
 
-require_once dirname(__DIR__, 4) . '/share_passwords.php';
+require_once dirname(__DIR__, 3) . '/share_passwords.php';
 
 class FolderShareController {
     private $con;
@@ -110,7 +110,7 @@ class FolderShareController {
             }
 
             // Register in global registry (master.db)
-            require_once dirname(__DIR__, 4) . '/users/db_master.php';
+            require_once dirname(__DIR__, 3) . '/users/db_master.php';
             
             // Check global uniqueness (across all users)
             if (!isTokenAvailable($token, $_SESSION['user_id'], 'folder', (int)$folderId)) {
@@ -204,7 +204,7 @@ class FolderShareController {
             $stmtToken->execute([$folderId]);
             $token = $stmtToken->fetchColumn();
             if ($token) {
-                require_once dirname(__DIR__, 4) . '/users/db_master.php';
+                require_once dirname(__DIR__, 3) . '/users/db_master.php';
                 unregisterSharedLink($token);
             }
 
@@ -255,7 +255,7 @@ class FolderShareController {
                     }
                     
                     // Register in global registry (master.db)
-                    require_once dirname(__DIR__, 4) . '/users/db_master.php';
+                    require_once dirname(__DIR__, 3) . '/users/db_master.php';
 
                     // Check global uniqueness (across all users)
                     if (!isTokenAvailable($custom, $_SESSION['user_id'], 'folder', (int)$folderId)) {
@@ -335,7 +335,7 @@ class FolderShareController {
             // Update global registry if token changed
             if (isset($input['custom_token'])) {
                 $newToken = trim($input['custom_token']);
-                require_once dirname(__DIR__, 4) . '/users/db_master.php';
+                require_once dirname(__DIR__, 3) . '/users/db_master.php';
                 
                 if ($oldToken && $oldToken !== $newToken) {
                     unregisterSharedLink($oldToken);
@@ -409,7 +409,7 @@ class FolderShareController {
             $implicitToken = $checkStmt->fetchColumn();
 
             if ($implicitToken) {
-                require_once dirname(__DIR__, 4) . '/users/db_master.php';
+                require_once dirname(__DIR__, 3) . '/users/db_master.php';
                 unregisterSharedLink($implicitToken);
 
                 $deleteStmt = $this->con->prepare('DELETE FROM shared_notes WHERE note_id = ? AND access_mode IS NULL');
@@ -443,7 +443,7 @@ class FolderShareController {
             $checkStmt->execute([$note['id']]);
             $token = $checkStmt->fetchColumn();
             if ($token) {
-                require_once dirname(__DIR__, 4) . '/users/db_master.php';
+                require_once dirname(__DIR__, 3) . '/users/db_master.php';
                 unregisterSharedLink($token);
 
                 $deleteStmt = $this->con->prepare('DELETE FROM shared_notes WHERE note_id = ? AND access_mode IS NULL');

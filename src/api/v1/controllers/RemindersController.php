@@ -692,7 +692,7 @@ class RemindersController {
 
     private function isReminderEmailAvailable(): bool {
         if (!function_exists('getGlobalSetting')) {
-            require_once dirname(__DIR__, 4) . '/users/db_master.php';
+            require_once dirname(__DIR__, 3) . '/users/db_master.php';
         }
 
         if (!function_exists('getGlobalSetting')) {
@@ -721,7 +721,7 @@ class RemindersController {
 
     private function rememberDetectedAppUrl(): void {
         if (!function_exists('setGlobalSetting') || !function_exists('getGlobalSetting')) {
-            require_once dirname(__DIR__, 4) . '/users/db_master.php';
+            require_once dirname(__DIR__, 3) . '/users/db_master.php';
         }
 
         if (!function_exists('setGlobalSetting') || !function_exists('getGlobalSetting')) {

@@ -5,8 +5,8 @@
  * Handles all CRUD operations for notes.
  */
 
-require_once __DIR__ . '/../../../../note_loader.php';
-require_once __DIR__ . '/../../../../users/db_master.php';
+require_once __DIR__ . '/../../../note_loader.php';
+require_once __DIR__ . '/../../../users/db_master.php';
 
 class NotesController {
     private PDO $con;
@@ -48,7 +48,7 @@ class NotesController {
      */
     private function dispatchNoteCreatedWebhook(array $note): void {
         try {
-            require_once __DIR__ . '/../../../../WebhookDispatcher.php';
+            require_once __DIR__ . '/../../../WebhookDispatcher.php';
             $ownerUserId = (int)(getCurrentUserId() ?? 0);
             // Bearer/Basic credentials mean an external API client; the web UI
             // reaches the same endpoint through its session cookie.
@@ -1144,7 +1144,7 @@ class NotesController {
             // Check if auto-push is enabled on the server
             $autoPushEnabled = false;
             try {
-                require_once dirname(__DIR__, 4) . '/GitSync.php';
+                require_once dirname(__DIR__, 3) . '/GitSync.php';
                 $gitSync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
                 $autoPushEnabled = $gitSync->isAutoPushEnabled();
             } catch (Exception $e) {
@@ -1733,7 +1733,7 @@ class NotesController {
 
         // Free any share tokens in the master registry before the entries are
         // deleted (the ON DELETE CASCADE only removes the shared_notes rows)
-        require_once dirname(__DIR__, 4) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
         unregisterSharedLinksForNotes($this->con, array_merge([$noteId], array_column($linkedNotes, 'id')));
 
         $deletedLinkedCount = 0;
@@ -1796,7 +1796,7 @@ class NotesController {
         }
         
         if ($success) {
-            require_once dirname(__DIR__, 4) . '/ActivityLog.php';
+            require_once dirname(__DIR__, 3) . '/ActivityLog.php';
             logActivity(ACTIVITY_NOTE_DELETED, [
                 'note_id' => $noteId,
                 'title' => $note['heading'] ?? null,
@@ -2455,7 +2455,7 @@ class NotesController {
                 // The parseMarkdown function will convert markdown image syntax to HTML img tags
                 // and keep the attachment URLs intact
                 
-                require_once __DIR__ . '/../../../../markdown_parser.php';
+                require_once __DIR__ . '/../../../markdown_parser.php';
                 $convertedContent = parseMarkdownForRichText($content);
                 $newType = 'note';
                 
@@ -2549,7 +2549,7 @@ class NotesController {
         }
 
         try {
-            require_once __DIR__ . '/../../../../markdown_parser.php';
+            require_once __DIR__ . '/../../../markdown_parser.php';
             $this->sendSuccess(['html' => parseMarkdownForRichText($markdown)]);
         } catch (Exception $e) {
             error_log('convertMarkdown error: ' . $e->getMessage());
@@ -2563,7 +2563,7 @@ class NotesController {
      * so the two can never drift apart.
      */
     private function htmlToMarkdown(string $html): string {
-        require_once __DIR__ . '/../../../../html_to_markdown.php';
+        require_once __DIR__ . '/../../../html_to_markdown.php';
         return poznoteHtmlToMarkdown($html);
     }
     
@@ -2828,7 +2828,7 @@ class NotesController {
      */
     private function triggerGitSyncWithResult(int $noteId, string $action = 'push'): array {
         try {
-            $gitSyncFile = dirname(__DIR__, 4) . '/GitSync.php';
+            $gitSyncFile = dirname(__DIR__, 3) . '/GitSync.php';
             if (!file_exists($gitSyncFile)) {
                 return ['triggered' => false, 'reason' => 'GitSync not found'];
             }
@@ -2882,7 +2882,7 @@ class NotesController {
 
         // Continue executing in background - push to Git
         try {
-            $gitSyncFile = dirname(__DIR__, 4) . '/GitSync.php';
+            $gitSyncFile = dirname(__DIR__, 3) . '/GitSync.php';
             if (!file_exists($gitSyncFile)) {
                 error_log("Git auto-sync: GitSync.php not found");
                 return;
