@@ -4,7 +4,7 @@ body.notes-manager-page {
     margin: 0;
     padding: 20px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background-color: var(--bg-color, #ffffff);
+    background-color: var(--bg-color, var(--pz-bg));
     color: var(--text-color, var(--pz-text));
 }
 
@@ -46,7 +46,7 @@ body.notes-manager-page {
     border-radius: 8px;
     font-size: 14px;
     color: var(--text-color, var(--pz-text));
-    background-color: var(--input-bg, #ffffff);
+    background-color: var(--input-bg, var(--pz-bg));
     transition: border-color 0.2s;
     box-sizing: border-box;
 }
@@ -84,7 +84,7 @@ body.notes-manager-page {
     border-radius: 8px;
     font-size: 14px;
     color: var(--text-color, var(--pz-text));
-    background-color: var(--input-bg, #ffffff);
+    background-color: var(--input-bg, var(--pz-bg));
     box-sizing: border-box;
 }
 
@@ -155,7 +155,7 @@ body.notes-manager-page {
     padding: 9px 12px;
     border: 1px solid var(--action-border, #cbd5e1);
     border-radius: 8px;
-    background: var(--action-bg, #ffffff);
+    background: var(--action-bg, var(--pz-bg));
     color: var(--action-color, #334155);
     font-size: 14px;
     font-weight: 500;
@@ -197,7 +197,7 @@ body.notes-manager-page {
     border-radius: 8px;
     font-size: 14px;
     color: var(--text-color, var(--pz-text));
-    background-color: var(--input-bg, #ffffff);
+    background-color: var(--input-bg, var(--pz-bg));
     box-sizing: border-box;
 }
 
@@ -236,7 +236,7 @@ html[data-theme='dark'] .nm-filter-bar .clear-filter-btn {
 }
 
 html[data-theme='dark'] .nm-selected-count {
-    color: #fff;
+    color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .nm-note-link {

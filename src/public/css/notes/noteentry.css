@@ -332,7 +332,7 @@ textarea:focus {
     overflow: hidden;
     border: 1px solid #d8dee4;
     border-radius: 8px;
-    background: #ffffff;
+    background: var(--pz-bg);
 }
 
 .note-attachment-preview-media {
@@ -349,7 +349,7 @@ textarea:focus {
     display: block;
     height: auto;
     border: 0;
-    background: #ffffff;
+    background: var(--pz-bg);
     pointer-events: none;
 }
 

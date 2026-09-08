@@ -89,7 +89,7 @@ body.dashboard-page {
     border-radius: 8px;
     font-size: 13px;
     color: #1f2937;
-    background: #ffffff;
+    background: var(--pz-bg);
     box-sizing: border-box;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -306,7 +306,7 @@ body.dashboard-page {
     justify-content: center;
     width: 36px;
     height: 33px;
-    background: #ffffff;
+    background: var(--pz-bg);
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     color: var(--pz-text-muted);
@@ -560,7 +560,7 @@ body.dashboard-page {
 /* ---------- Base card ---------- */
 
 .dash-card {
-    background: #ffffff;
+    background: var(--pz-bg);
     border: 1.5px solid #e5e7eb;
     border-radius: 14px;
     position: relative;
@@ -584,19 +584,19 @@ body.dashboard-page {
    dark surface instead, which keeps text contrast intact in both themes. */
 
 .dash-card.has-note-color {
-    background: color-mix(in srgb, var(--note-color) 12%, #ffffff);
-    border-color: color-mix(in srgb, var(--note-color) 45%, #ffffff);
+    background: color-mix(in srgb, var(--note-color) 12%, var(--pz-bg));
+    border-color: color-mix(in srgb, var(--note-color) 45%, var(--pz-bg));
 }
 
 .dash-card.has-note-color:hover {
-    background: color-mix(in srgb, var(--note-color) 18%, #ffffff);
-    border-color: color-mix(in srgb, var(--note-color) 70%, #ffffff);
+    background: color-mix(in srgb, var(--note-color) 18%, var(--pz-bg));
+    border-color: color-mix(in srgb, var(--note-color) 70%, var(--pz-bg));
     box-shadow: 0 3px 12px color-mix(in srgb, var(--note-color) 28%, transparent);
 }
 
 /* Tag chips sit on the tinted background, so lift them slightly */
 .dash-card.has-note-color .board-card-tag {
-    background: color-mix(in srgb, var(--note-color) 16%, #ffffff);
+    background: color-mix(in srgb, var(--note-color) 16%, var(--pz-bg));
 }
 
 /* ---------- Note color filter (topbar) ---------- */
@@ -615,7 +615,7 @@ body.dashboard-page {
     justify-content: center;
     width: 36px;
     height: 33px;
-    background: #ffffff;
+    background: var(--pz-bg);
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     color: var(--pz-text-muted);
@@ -665,7 +665,7 @@ body.dashboard-page {
     overflow-y: auto;
     overscroll-behavior: contain;
     padding: 6px;
-    background: #ffffff;
+    background: var(--pz-bg);
     border: 1.5px solid #e5e7eb;
     border-radius: 10px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
@@ -745,7 +745,7 @@ body.dashboard-page {
     padding: 7px 9px;
     border: 1.5px solid #e5e7eb;
     border-radius: 9px;
-    background: #ffffff;
+    background: var(--pz-bg);
     cursor: pointer;
     font-size: 13px;
     text-align: left;
@@ -1213,7 +1213,7 @@ body.dashboard-page {
 
 /* Per-tag color (--tag-color set inline from the tag_colors setting) */
 .board-card-tag-colored {
-    background: color-mix(in srgb, var(--tag-color) 16%, #ffffff);
+    background: color-mix(in srgb, var(--tag-color) 16%, var(--pz-bg));
     color: color-mix(in srgb, var(--tag-color) 72%, #1f2937);
 }
 
@@ -1368,7 +1368,7 @@ body.dashboard-page .notifications-empty i {
 
 :root[data-theme='dark'] .board-card-tag-colored {
     background: color-mix(in srgb, var(--tag-color) 26%, var(--dm-surface));
-    color: color-mix(in srgb, var(--tag-color) 70%, #ffffff);
+    color: color-mix(in srgb, var(--tag-color) 70%, var(--pz-text-inverse));
 }
 
 :root[data-theme='dark'] .board-card-date {
@@ -1769,7 +1769,7 @@ body.dashboard-page .notifications-empty i {
     z-index: 1;
     margin: -6px 0 4px;
     padding: 6px 0;
-    background: #ffffff;
+    background: var(--pz-bg);
 }
 
 .dashboard-tag-filter-search {
@@ -1780,7 +1780,7 @@ body.dashboard-page .notifications-empty i {
     padding: 6px 9px;
     border: 1px solid var(--pz-border);
     border-radius: 6px;
-    background: #ffffff;
+    background: var(--pz-bg);
     color: inherit;
     font: inherit;
     font-size: 13px;

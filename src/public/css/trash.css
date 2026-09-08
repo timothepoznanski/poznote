@@ -194,7 +194,7 @@ body.trash-page {
 }
 
 .trash-sort-option.is-active {
-    background-color: #fff;
+    background-color: var(--pz-bg);
     color: var(--pz-accent);
     font-weight: 600;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
@@ -329,7 +329,7 @@ body.trash-page {
     right: 0;
     bottom: 0;
     height: 60px;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff);
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), var(--pz-bg));
     pointer-events: none;
 }
 

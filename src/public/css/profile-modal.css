@@ -70,7 +70,7 @@
     padding: 8px 12px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    background-color: #fff;
+    background-color: var(--pz-bg);
     color: rgb(55, 53, 47);
     font-size: 14px;
     font-family: 'Inter', sans-serif;
@@ -103,7 +103,7 @@
 
 :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-primary {
     background-color: var(--pz-accent);
-    color: #fff;
+    color: var(--pz-text-inverse);
 }
 
 :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-primary:hover {
@@ -112,7 +112,7 @@
 
 :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-danger {
     background-color: var(--pz-danger);
-    color: #fff;
+    color: var(--pz-text-inverse);
 }
 
 :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-danger:hover {

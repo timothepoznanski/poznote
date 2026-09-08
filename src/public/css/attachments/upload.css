@@ -173,7 +173,7 @@
     align-items: center;
     justify-content: center;
     background: rgba(0,0,0,0.3);
-    color: #fff;
+    color: var(--pz-text-inverse);
     font-size: 14px;
     pointer-events: none;
 }

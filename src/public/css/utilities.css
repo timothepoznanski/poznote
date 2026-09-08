@@ -138,7 +138,7 @@ body.center-note-content #right_col .notecard {
     left: 50%;
     transform: translateX(-50%) translateY(0.5rem);
     background: var(--pz-text);
-    color: #fff;
+    color: var(--pz-text-inverse);
     font-size: 0.82rem;
     padding: 0.4em 0.9em;
     border-radius: 6px;
@@ -160,6 +160,6 @@ body.center-note-content #right_col .notecard {
 }
 
 html[data-theme='dark'] #note-width-toast {
-    background: #555;
+    background: var(--dm-border-light);
     color: #f0f0f0;
 }

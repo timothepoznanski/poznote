@@ -152,7 +152,7 @@ body {
     height: 100vh;
     display: flex;
     flex-direction: column;
-    background-color: #FFFFFF;
+    background-color: var(--pz-bg);
     overflow: hidden;
 }
 
@@ -203,7 +203,7 @@ body {
     left: 0;
     width: 16px;
     height: 25px;
-    background: #fff;
+    background: var(--pz-bg);
     border: 1px solid #ccc;
     border-radius: 0 4px 4px 0;
     cursor: pointer;

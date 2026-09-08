@@ -249,7 +249,7 @@ html[data-theme='dark'] .tag-color-swatch.selected {
 .tag-context-menu {
     position: fixed;
     z-index: 9999;
-    background: #fff;
+    background: var(--pz-bg);
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
@@ -298,7 +298,7 @@ html[data-theme='dark'] .tag-context-menu-item {
 }
 
 html[data-theme='dark'] .tag-context-menu-item:hover {
-    background: #383838;
+    background: var(--dm-tab-active-bg);
 }
 
 html[data-theme='dark'] .tag-context-menu-item.danger {
@@ -327,8 +327,8 @@ html[data-theme='dark'] .tag-context-menu-item.danger:hover {
 }
 
 html[data-theme='dark'] .tag-rename-input {
-    background: #333;
-    border-color: #555;
+    background: var(--dm-surface);
+    border-color: var(--dm-border-light);
     color: #e0e0e0;
 }
 

@@ -36,7 +36,7 @@
     border: 1px solid var(--border-color, #ddd);
     border-radius: 6px;
     font-size: 14px;
-    background: var(--input-bg, #fff);
+    background: var(--input-bg, var(--pz-bg));
     color: inherit;
     width: 100%;
     box-sizing: border-box;
@@ -64,7 +64,7 @@
     border-radius: 6px;
     font-family: inherit;
     font-size: 14px;
-    background: var(--input-bg, #fff);
+    background: var(--input-bg, var(--pz-bg));
     color: inherit;
     cursor: pointer;
     box-sizing: border-box;
@@ -128,7 +128,7 @@
     border: 1px solid var(--border-color, #ddd);
     border-radius: 6px;
     font-size: 13px !important;
-    background: var(--input-bg, #fff);
+    background: var(--input-bg, var(--pz-bg));
     color: inherit;
     box-sizing: border-box;
 }

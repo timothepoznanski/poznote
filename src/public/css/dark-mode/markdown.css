@@ -154,7 +154,7 @@ html[data-theme='dark'] .cm-tooltip {
 
 html[data-theme='dark'] .cm-tooltip-autocomplete ul li[aria-selected] {
     background: var(--dm-accent);
-    color: #fff;
+    color: var(--pz-text-inverse);
 }
 
 /* Checked task item text */

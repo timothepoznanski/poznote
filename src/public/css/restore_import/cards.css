@@ -7,7 +7,7 @@
 
 /* Card Container */
 .card-container {
-    background: #fff;
+    background: var(--pz-bg);
     border: 1px solid var(--pz-border);
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -24,7 +24,7 @@
 /* Card Header */
 .card-header {
     padding: 20px 24px;
-    background: linear-gradient(135deg, var(--pz-surface) 0%, #ffffff 100%);
+    background: linear-gradient(135deg, var(--pz-surface) 0%, var(--pz-bg) 100%);
     border-bottom: 1px solid var(--pz-border);
     cursor: pointer;
     user-select: none;
@@ -70,7 +70,7 @@
 
 /* Card Content */
 .card-content {
-    background: #ffffff;
+    background: var(--pz-bg);
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.4s ease-out, padding 0.3s ease;

@@ -29,7 +29,7 @@
 }
 
 .color-palette-popup {
-    background: #fff;
+    background: var(--pz-bg);
     border: 1px solid rgba(0, 0, 0, 0.12);
     border-radius: 6px;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
@@ -112,7 +112,7 @@
     position: absolute;
     top: calc(100% + 8px);
     right: 0;
-    background: #ffffff;
+    background: var(--pz-bg);
     border: 1px solid #e6e6e6;
     border-radius: 8px;
     box-shadow: 0 8px 20px rgba(20, 20, 20, 0.12);
@@ -228,7 +228,7 @@
 
 /* Only apply header background if no workspace background image is set */
 body:not(.has-background-image) .note-header {
-    background: #fff;
+    background: var(--pz-bg);
 }
 
 .note-edit-toolbar {
@@ -319,7 +319,7 @@ body:not(.has-background-image) .note-header {
 .note-header-spacer {
     width: 100%;
     height: 15px;
-    background: #fff;
+    background: var(--pz-bg);
 }
 
 a.links_arbo_left,

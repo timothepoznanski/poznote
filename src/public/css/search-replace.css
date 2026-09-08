@@ -54,7 +54,7 @@
     border-radius: 4px;
     font-size: 13px;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--input-bg, #fff);
+    background: var(--input-bg, var(--pz-bg));
     color: var(--text-color, var(--pz-text));
     transition: border-color 0.2s;
 }
@@ -90,7 +90,7 @@
     padding: 6px 10px;
     border: 1px solid var(--border-color, #d0d0d0);
     border-radius: 4px;
-    background: #fff;
+    background: var(--pz-bg);
     color: var(--text-color, var(--pz-text));
     font-size: 12px;
     cursor: pointer;
@@ -147,7 +147,7 @@
 
 .search-replace-highlight.active {
     background-color: #ff9800;
-    color: #fff;
+    color: var(--pz-text-inverse);
 }
 
 /* Dark mode adjustments */

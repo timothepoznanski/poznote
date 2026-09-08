@@ -78,7 +78,7 @@
     padding: 10px 12px;
     border-radius: 8px;
     background: rgba(20, 20, 20, 0.94);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-size: 0.95rem;
     font-weight: 400;
@@ -510,17 +510,17 @@
 
     .note-actions .btn-success:hover {
         background: #2e7d32;
-        color: #ffffff;
+        color: var(--pz-text-inverse);
     }
 
     .note-actions .btn-primary {
         background: rgba(var(--pz-accent-rgb), 0.13);
-        color: var(--pz-accent, #007db8);
+        color: var(--pz-accent, var(--pz-accent));
     }
 
     .note-actions .btn-primary:hover {
-        background: var(--pz-accent, #007db8);
-        color: #ffffff;
+        background: var(--pz-accent, var(--pz-accent));
+        color: var(--pz-text-inverse);
     }
 
     .note-actions .btn-danger {
@@ -530,6 +530,6 @@
 
     .note-actions .btn-danger:hover {
         background: #e04b4b;
-        color: #ffffff;
+        color: var(--pz-text-inverse);
     }
 }

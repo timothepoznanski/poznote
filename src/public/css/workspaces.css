@@ -375,7 +375,7 @@ a.workspace-name-link:focus-visible {
     display: block;
     margin-top: 8px;
     font-size: 12px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
 }
 
 /* Tags modal: Poznote button row (right-aligned), spaced from the list */
@@ -620,7 +620,7 @@ a.workspace-name-link:focus-visible {
     overflow-y: auto;
     border: 1px solid #e5e7eb;
     border-radius: 6px;
-    background: #fff;
+    background: var(--pz-bg);
 }
 
 .shared-edit-token-modal .share-user-list-message {
@@ -726,7 +726,7 @@ html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-copy-btn
 html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-password-toggle:hover,
 html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-copy-btn:hover {
     background: #535b64;
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .share-indexable-wrap,
@@ -761,7 +761,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
     border-radius: 3px;
     border: 1px solid #dee2e6;
     background-color: white;
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     cursor: pointer;
     transition: all 0.2s;
     margin-left: 0;

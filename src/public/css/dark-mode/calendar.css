@@ -103,7 +103,7 @@
 
 :root[data-theme='dark'] .calendar-note-open-btn {
     background: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 :root[data-theme='dark'] .calendar-note-open-btn:hover {
@@ -112,7 +112,7 @@
 
 :root[data-theme='dark'] .calendar-notes-modal .btn-open-all {
     background: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 :root[data-theme='dark'] .calendar-notes-modal .btn-open-all:hover {
@@ -121,7 +121,7 @@
 
 :root[data-theme='dark'] .calendar-notes-modal .btn-close-red {
     background: #ef4444;
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 :root[data-theme='dark'] .calendar-notes-modal .btn-close-red:hover {

@@ -79,7 +79,7 @@
    turned all of those into white-on-pale. */
 .btn-primary {
     background: var(--pz-accent);
-    color: #fff;
+    color: var(--pz-text-inverse);
 }
 
 .btn-primary:hover {
@@ -88,7 +88,7 @@
 
 .btn-secondary {
     background: #6c757d;
-    color: #fff;
+    color: var(--pz-text-inverse);
 }
 
 .btn-secondary:hover {
@@ -97,7 +97,7 @@
 
 .btn-danger {
     background: var(--pz-danger);
-    color: #fff;
+    color: var(--pz-text-inverse);
 }
 
 .btn-danger:hover {
@@ -114,7 +114,7 @@
 
 .btn-success {
     background: var(--pz-success);
-    color: #fff;
+    color: var(--pz-text-inverse);
 }
 
 .btn-success:hover {

@@ -280,7 +280,7 @@ html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::befor
 
 .cm-tooltip-autocomplete ul li[aria-selected] {
     background: var(--pz-accent);
-    color: #fff;
+    color: var(--pz-text-inverse);
 }
 
 body.slash-menu-cursor-hidden,
@@ -1011,7 +1011,7 @@ body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
     max-height: var(--markdown-split-pane-height, calc(100vh - 240px)) !important;
     border: 1px solid #d9dee7 !important;
     border-radius: 16px !important;
-    background: #ffffff !important;
+    background: var(--pz-bg) !important;
 }
 
 body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor-container {

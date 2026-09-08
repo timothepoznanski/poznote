@@ -20,13 +20,13 @@
 
 .settings-container > a.btn-primary {
     background: var(--pz-accent) !important;
-    color: #fff !important;
+    color: var(--pz-text-inverse) !important;
     border: none !important;
 }
 
 .settings-container > a.btn-secondary {
     background: #6c757d !important;
-    color: #fff !important;
+    color: var(--pz-text-inverse) !important;
     border: none !important;
 }
 

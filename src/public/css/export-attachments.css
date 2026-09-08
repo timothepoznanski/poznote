@@ -43,7 +43,7 @@
 
 /* Dark mode support */
 [data-theme="dark"] .empty-state-title {
-    color: #fff;
+    color: var(--pz-text-inverse);
 }
 
 [data-theme="dark"] .empty-state-description {

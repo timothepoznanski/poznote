@@ -79,7 +79,7 @@
     border-radius: 4px;
     font-size: 14px;
     font-family: inherit;
-    background: #fff;
+    background: var(--pz-bg);
     transition: border-color 0.2s ease;
 }
 
@@ -231,7 +231,7 @@
     border-radius: 3px;
     font-size: 14px;
     font-family: inherit;
-    background: #fff;
+    background: var(--pz-bg);
     outline: none;
 }
 
@@ -503,7 +503,7 @@
     position: fixed;
     z-index: 9999;
     min-width: 210px;
-    background: #ffffff;
+    background: var(--pz-bg);
     border: 1px solid #e5e7eb;
     border-radius: 10px;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);

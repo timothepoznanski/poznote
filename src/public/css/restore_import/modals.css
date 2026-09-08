@@ -117,7 +117,7 @@
 
 .import-confirm-modal-content .btn-cancel {
     background-color: #e04b4b;
-    color: #fff;
+    color: var(--pz-text-inverse);
     border: none;
 }
 
@@ -229,7 +229,7 @@ html[data-theme='dark'] .import-confirm-modal .import-confirm-modal-content .btn
 html[data-theme='dark'] .import-confirm-modal .btn-confirm,
 html[data-theme='dark'] .alert-ok-button {
     background-color: #0e87cb;
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .import-confirm-modal .btn-confirm:hover,

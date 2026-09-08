@@ -105,7 +105,7 @@
 .diary-switch-btn.diary-switch-active {
     background: var(--pz-accent);
     border-color: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 /* New-diary modal. The generic .modal-overlay/.modal-dialog styling is not
@@ -122,7 +122,7 @@
 }
 
 .diary-new-modal {
-    background: #ffffff;
+    background: var(--pz-bg);
     border-radius: 10px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
     width: min(92vw, 380px);
@@ -172,7 +172,7 @@
 
 .diary-today-tag {
     background: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 .diary-empty .lucide {

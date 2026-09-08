@@ -356,7 +356,7 @@ html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-cancel:hover {
 
 html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-primary {
     background-color: var(--dm-active);
-    color: #fff;
+    color: var(--pz-text-inverse);
     border: none;
 }
 
@@ -565,7 +565,7 @@ html[data-theme='dark'] #noteWidthModal .note-width-unit {
 
 html[data-theme='dark'] #fontSizeModal .modal-footer .btn-primary {
     background-color: var(--dm-active);
-    color: #fff;
+    color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] #fontSizeModal .modal-footer .btn-primary:hover {
@@ -598,7 +598,7 @@ html[data-theme='dark'] #shareModal h3 {
 
 /* Toggle switch: shared component, also used outside the share modals */
 html[data-theme='dark'] .toggle-slider {
-    background-color: #555;
+    background-color: var(--dm-border-light);
 }
 
 html[data-theme='dark'] input:checked+.toggle-slider {
@@ -661,7 +661,7 @@ html[data-theme='dark'] #deleteConfirmModal .btn-cancel,
 html[data-theme='dark'] #emptyTrashConfirmModal .btn-cancel,
 html[data-theme='dark'] #restoreConfirmModal .btn-cancel {
     background-color: #e04b4b !important;
-    color: #fff !important;
+    color: var(--pz-text-inverse) !important;
     border-color: #e04b4b !important;
 }
 
@@ -678,7 +678,7 @@ html[data-theme='dark'] #restoreConfirmModal .btn-cancel:hover {
 html[data-theme='dark'] #deleteFolderModal .btn-cancel {
     background-color: var(--dm-border) !important;
     color: var(--dm-text) !important;
-    border-color: #555 !important;
+    border-color: var(--dm-border-light) !important;
 }
 
 html[data-theme='dark'] #deleteFolderModal .btn-cancel:hover {
@@ -819,7 +819,7 @@ html[data-theme='dark'] .snapshot-date-btn:hover {
 
 html[data-theme='dark'] .snapshot-date-btn.active {
     background-color: var(--pz-accent);
-    color: #fff;
+    color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-date-btn [class*="lucide-"] {

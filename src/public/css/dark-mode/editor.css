@@ -152,7 +152,7 @@ html[data-theme='dark'] .code-block-actions-host > .code-block-delete-btn:hover,
 html[data-theme='dark'] .code-block-line-numbers-btn:hover,
 html[data-theme='dark'] .code-block-actions-host > .code-block-line-numbers-btn:hover {
     background: transparent !important;
-    color: #ffffff !important;
+    color: var(--pz-text-inverse) !important;
     opacity: 1 !important;
 }
 
@@ -233,12 +233,12 @@ html[data-theme='dark'] .note-attachment-preview-size {
 
 html[data-theme='dark'] ::selection {
     background-color: #264f78;
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] ::-moz-selection {
     background-color: #264f78;
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 /* Search highlights */

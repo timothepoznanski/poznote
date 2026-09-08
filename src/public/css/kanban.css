@@ -56,7 +56,7 @@
     max-height: calc(100vh - 140px);
     display: flex;
     flex-direction: column;
-    background: #ffffff;
+    background: var(--pz-bg);
     border-radius: 16px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     border: 1px solid #e2e8f0;
@@ -320,7 +320,7 @@
     max-width: 100%;
     min-width: 0;
     overflow: hidden;
-    background: #ffffff;
+    background: var(--pz-bg);
     border: 1px solid #e2e8f0;
     border-radius: 12px;
     padding: 14px 16px;
@@ -360,7 +360,7 @@
     padding: 0;
     border: 1px solid #cbd5e1;
     border-radius: 50%;
-    background: #ffffff;
+    background: var(--pz-bg);
     color: #94a3b8;
     cursor: pointer;
     /* Always visible so the action is discoverable without hovering */
@@ -407,7 +407,7 @@
     opacity: 1;
     border-color: #16a34a;
     background: #16a34a;
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 /* ===== Completed cards ===== */
@@ -645,8 +645,8 @@
 
 /* Per-tag color (--tag-color set inline from the tag_colors setting) */
 .kanban-tag-colored {
-    background: color-mix(in srgb, var(--tag-color) 15%, #ffffff);
-    border-color: color-mix(in srgb, var(--tag-color) 45%, #ffffff);
+    background: color-mix(in srgb, var(--tag-color) 15%, var(--pz-bg));
+    border-color: color-mix(in srgb, var(--tag-color) 45%, var(--pz-bg));
     color: color-mix(in srgb, var(--tag-color) 72%, #1e293b);
 }
 
@@ -692,7 +692,7 @@
     justify-content: center;
     text-align: center;
     padding: 60px 40px;
-    background: #ffffff;
+    background: var(--pz-bg);
     border-radius: 20px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     margin: auto;
@@ -776,7 +776,7 @@
     justify-content: space-between;
     gap: 16px;
     padding: 16px 24px;
-    background: #ffffff;
+    background: var(--pz-bg);
     border-bottom: 1px solid var(--border-color, #e2e8f0);
     flex-shrink: 0;
 }

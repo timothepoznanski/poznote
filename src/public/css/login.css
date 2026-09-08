@@ -295,7 +295,7 @@ input[type="password"]::placeholder {
     padding: 0.875rem 1rem;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
-    background: #fff;
+    background: var(--pz-bg);
     color: #252526;
     font: inherit;
     cursor: pointer;
@@ -487,7 +487,7 @@ html[data-theme='dark'] .admin-warning {
 
 html[data-theme='dark'] .admin-warning code {
     background: rgba(254, 215, 215, 0.2);
-    color: #fff;
+    color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .account-select-intro,

@@ -99,5 +99,5 @@ html[data-theme='dark'] .public-workspace-theme-toggle {
 html[data-theme='dark'] .public-workspace-theme-toggle:hover,
 html[data-theme='dark'] .public-workspace-theme-toggle:focus-visible {
     background: transparent !important;
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }

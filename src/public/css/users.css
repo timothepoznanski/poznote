@@ -213,7 +213,7 @@ html[data-theme='dark'] {
     padding: 10px 12px;
     border-radius: 8px;
     background: rgba(20, 20, 20, 0.94);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-size: 0.95rem;
     font-weight: 400;
@@ -243,7 +243,7 @@ html[data-theme='dark'] .users-header-help {
 html[data-theme='dark'] .users-header-help:hover,
 html[data-theme='dark'] .users-header-help:focus,
 html[data-theme='dark'] .users-header-help:focus-visible {
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 .users-table td.user-id-cell {
@@ -411,7 +411,7 @@ html[data-theme='dark'] .users-table td {
 }
 
 .modal-content {
-    background: var(--bg-color, #fff);
+    background: var(--bg-color, var(--pz-bg));
     border-radius: 12px;
     padding: 30px;
     max-width: 500px;
@@ -639,7 +639,7 @@ html[data-theme='dark'] .account-access-own-label {
     border: 1px solid var(--border-color, #ddd);
     border-radius: 8px;
     font-size: 14px;
-    background: var(--bg-color, #fff);
+    background: var(--bg-color, var(--pz-bg));
     color: var(--text-color, var(--pz-text));
     box-sizing: border-box;
 }
@@ -894,7 +894,7 @@ input:disabled+.slider {
 
     html[data-theme='dark'] .actions-center .btn-danger {
         background: #c93a4a;
-        color: #fff !important;
+        color: var(--pz-text-inverse) !important;
     }
 
     html[data-theme='dark'] .actions-center .btn-danger:hover {

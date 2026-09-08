@@ -118,7 +118,7 @@ body.public-note-page {
     border: 1px solid #ddd;
     border-radius: 6px;
     padding: 6px;
-    background: #fff;
+    background: var(--pz-bg);
     box-sizing: border-box;
 }
 
@@ -150,13 +150,13 @@ body.public-note-page {
     border: 1px solid #d0d7de;
     box-sizing: border-box;
     border-radius: 999px;
-    background: #ffffff;
+    background: var(--pz-bg);
 }
 
 .public-note audio::-webkit-media-controls-enclosure,
 .public-note audio::-webkit-media-controls-panel {
     border-radius: inherit;
-    background: #ffffff;
+    background: var(--pz-bg);
 }
 
 .public-note .note-audio-embed {
@@ -327,7 +327,7 @@ body.public-note-page {
 
 .public-note .content .code-block-copy-btn:hover,
 .code-block-copy-btn:hover {
-    background-color: #fff;
+    background-color: var(--pz-bg);
     color: var(--pz-text);
 }
 
@@ -507,7 +507,7 @@ body.public-note-page {
 
 .public-task-edit-cancel {
     background: #6c757d;
-    color: #fff;
+    color: var(--pz-text-inverse);
 }
 
 .public-task-edit-cancel:hover {
@@ -870,7 +870,7 @@ html[data-theme='dark'] .public-note .content [style*="color:black"] {
     padding: 12px;
     border: 1px solid #ddd;
     border-radius: 6px;
-    background: #fff;
+    background: var(--pz-bg);
     color: var(--pz-text);
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 14px;

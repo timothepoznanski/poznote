@@ -14,7 +14,7 @@
     padding: 1px 6px;
     border: 1px solid var(--pz-accent);
     border-radius: 4px;
-    background: #fff;
+    background: var(--pz-bg);
     color: var(--pz-text);
     font-family: inherit;
     font-size: var(--sidebar-font-size, 13px);

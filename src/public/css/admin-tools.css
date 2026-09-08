@@ -47,7 +47,7 @@ html[data-theme='dark'] .dr-hero p {
     border-collapse: collapse; 
     margin-top: 20px; 
     color: var(--pz-text); 
-    background: var(--bg-color, #fff);
+    background: var(--bg-color, var(--pz-bg));
     border: 1.5px solid var(--border-color, #e5e7eb);
     border-radius: 12px;
     overflow: hidden;
@@ -141,7 +141,7 @@ html[data-theme='dark'] .btn-view-files:hover {
 
 .orphan-modal-content {
     position: relative;
-    background: var(--bg-color, #fff);
+    background: var(--bg-color, var(--pz-bg));
     border-radius: 12px;
     max-width: 600px;
     width: 90%;

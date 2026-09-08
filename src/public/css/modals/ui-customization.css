@@ -114,7 +114,7 @@
     padding: 10px 12px;
     font-size: 0.92em;
     outline: none;
-    background: #fff;
+    background: var(--pz-bg);
     transition: border-color 0.15s, box-shadow 0.15s;
 }
 
@@ -591,7 +591,7 @@
 }
 
 .icon-sidebar-order-remove:hover:not(:disabled) {
-    color: #dc3545;
+    color: var(--pz-danger);
 }
 
 /* Under the list, styled like a quiet link rather than a third primary button

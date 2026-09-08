@@ -721,7 +721,7 @@ html[data-theme='dark'] .modal .modal-info-note {
 
 .modal .btn-danger {
     background: #e04b4b !important;
-    color: #fff !important;
+    color: var(--pz-text-inverse) !important;
     border: none;
     padding: 8px 12px;
     border-radius: 6px;

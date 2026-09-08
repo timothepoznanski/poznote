@@ -49,7 +49,7 @@ body.graph-page {
     border: 1px solid var(--pz-border-strong);
     border-radius: 6px;
     font-size: 14px;
-    background: #ffffff;
+    background: var(--pz-bg);
     color: #111827;
 }
 
@@ -64,7 +64,7 @@ body.graph-page {
     border: 1px solid var(--pz-border-strong);
     border-radius: 6px;
     font-size: 13px;
-    background: #ffffff;
+    background: var(--pz-bg);
     color: #4b5563;
     cursor: pointer;
 }
@@ -106,7 +106,7 @@ body.graph-page {
     padding: 5px 10px;
     border: 1px solid var(--pz-border-strong);
     border-radius: 6px;
-    background: #ffffff;
+    background: var(--pz-bg);
     font-size: 13px;
     color: #4b5563;
     cursor: pointer;
@@ -228,7 +228,7 @@ body.graph-page {
     left: 0;
     max-width: 280px;
     padding: 8px 10px;
-    background: #ffffff;
+    background: var(--pz-bg);
     border: 1px solid #e5e7eb;
     border-radius: 6px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);

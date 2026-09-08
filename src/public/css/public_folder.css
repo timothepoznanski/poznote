@@ -250,7 +250,7 @@
     padding: 0 16px;
     border-radius: 6px;
     background: var(--status-accent);
-    color: #fff;
+    color: var(--pz-text-inverse);
     text-decoration: none;
     font-weight: 500;
     transition: background-color 0.18s ease;
@@ -262,7 +262,7 @@
 }
 
 .status-card-action.secondary {
-    background: #ffffff;
+    background: var(--pz-bg);
     color: var(--status-text);
     border: 1px solid var(--status-card-border);
 }
@@ -312,7 +312,7 @@
     max-width: 800px;
     margin: 0 auto;
     padding: 40px 20px;
-    background: var(--bg-color, #ffffff);
+    background: var(--bg-color, var(--pz-bg));
     color: var(--text-color, var(--pz-text));
     transition: max-width 0.3s ease;
 }
@@ -391,7 +391,7 @@ body.view-kanban .public-folder-body {
     border-radius: 8px;
     font-size: 14px;
     color: var(--text-color, var(--pz-text));
-    background-color: var(--panel-bg, #ffffff);
+    background-color: var(--panel-bg, var(--pz-bg));
     transition: all 0.2s ease;
     box-sizing: border-box;
 }
@@ -443,7 +443,7 @@ body.view-kanban .public-folder-body {
     margin-left: auto;
     border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 8px;
-    background: var(--panel-bg, #ffffff);
+    background: var(--panel-bg, var(--pz-bg));
     color: var(--text-color, var(--pz-text));
     display: inline-flex;
     align-items: center;
@@ -470,7 +470,7 @@ body.view-kanban .public-folder-body {
     .public-folder-toggle-all:not(.is-disabled):hover,
     .public-folder-toggle-all:not(.is-disabled):active,
     .public-folder-toggle-all:not(.is-disabled):focus {
-        background: var(--panel-bg, #ffffff);
+        background: var(--panel-bg, var(--pz-bg));
         box-shadow: none;
         outline: none;
     }
@@ -482,7 +482,7 @@ body.view-kanban .public-folder-body {
 }
 
 .public-folder-toggle-all.is-disabled:hover {
-    background: var(--panel-bg, #ffffff);
+    background: var(--panel-bg, var(--pz-bg));
 }
 
 .notes-list {
@@ -675,7 +675,7 @@ body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.i
 }
 
 .kanban-public-card {
-    background: var(--card-bg, #fff);
+    background: var(--card-bg, var(--pz-bg));
     border: 1px solid var(--border-color);
     border-radius: 6px;
     padding: 12px;

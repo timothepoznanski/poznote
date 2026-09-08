@@ -70,7 +70,7 @@
     overflow-y: auto;
     padding: 6px;
     box-sizing: border-box;
-    background: #fff;
+    background: var(--pz-bg);
     border: 1px solid var(--pz-border);
     border-radius: 8px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
@@ -252,7 +252,7 @@
     padding: 0;
     border: 1px solid #ccc;
     border-radius: 0 4px 4px 0;
-    background: #fff;
+    background: var(--pz-bg);
     color: #6c757d;
     cursor: pointer;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -306,7 +306,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     padding: 8px 16px;
     border: 1px solid var(--pz-border-strong);
     border-radius: 6px;
-    background: #fff;
+    background: var(--pz-bg);
     color: #374151;
     font-family: inherit;
     font-size: 14px;
@@ -476,7 +476,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     overflow-y: auto;
     padding: 6px;
     box-sizing: border-box;
-    background: #fff;
+    background: var(--pz-bg);
     border: 1px solid var(--pz-border);
     border-radius: 8px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
@@ -568,7 +568,7 @@ button.poznote-page-title-workspace-item {
 
 .poznote-page-title-workspace-item-manage .lucide,
 .poznote-page-title-workspace-item-action .lucide {
-    color: var(--pz-text-muted, #6b7280);
+    color: var(--pz-text-muted, var(--pz-text-muted));
 }
 
 .poznote-page-title-workspace-item-manage:hover .lucide,

@@ -131,7 +131,7 @@
 
 .note-width-unit {
     font-size: 1.2rem;
-    color: #6b7280;
+    color: var(--pz-text-muted);
 }
 
 .note-width-input-container input {
@@ -191,7 +191,7 @@
     padding: 10px 12px;
     border: 1px solid #ddd;
     border-radius: 6px;
-    background: #fff;
+    background: var(--pz-bg);
     margin: 10px 0 12px 0;
     font-size: 14px;
     box-sizing: border-box;
@@ -420,7 +420,7 @@
 #noteInfoModal .info-value {
     color: #555;
     font-family: monospace;
-    background-color: #fff;
+    background-color: var(--pz-bg);
     padding: 4px 8px;
     border-radius: 3px;
     border: 1px solid #ddd;
@@ -563,7 +563,7 @@
 
 #confirmModal .btn-danger {
     background-color: #e04b4b !important;
-    color: #fff !important;
+    color: var(--pz-text-inverse) !important;
     border: none !important;
     padding: 8px 12px;
     border-radius: 6px;
@@ -575,7 +575,7 @@
 
 #confirmModal #confirmButton.btn-danger {
     background-color: #e04b4b !important;
-    color: #fff !important;
+    color: var(--pz-text-inverse) !important;
     border: none !important;
 }
 
@@ -585,7 +585,7 @@
 
 #confirmModal #confirmButton.btn-primary {
     background-color: var(--pz-accent) !important;
-    color: #fff !important;
+    color: var(--pz-text-inverse) !important;
     border: none !important;
 }
 
@@ -625,7 +625,7 @@
 
 #confirmModal .modal-buttons .btn-cancel {
     background-color: #e04b4b !important;
-    color: #fff !important;
+    color: var(--pz-text-inverse) !important;
     border: none !important;
     min-width: 90px !important;
     flex: 0 0 110px !important;
@@ -654,7 +654,7 @@
 
 #deleteFolderModal .btn-cancel {
     background-color: #6c757d !important;
-    color: #fff !important;
+    color: var(--pz-text-inverse) !important;
     border: 1px solid #6c757d !important;
 }
 
@@ -665,7 +665,7 @@
 
 #deleteFolderModal .btn-danger {
     background-color: var(--pz-danger) !important;
-    color: #fff !important;
+    color: var(--pz-text-inverse) !important;
     border: none !important;
     padding: 8px 12px;
     border-radius: 6px;
@@ -687,7 +687,7 @@
 
 #deleteConfirmModal .btn-cancel {
     background-color: #6c757d !important;
-    color: #fff !important;
+    color: var(--pz-text-inverse) !important;
     border: 1px solid #6c757d !important;
 }
 
@@ -698,7 +698,7 @@
 
 #deleteConfirmModal .btn-danger {
     background-color: #e04b4b !important;
-    color: #fff !important;
+    color: var(--pz-text-inverse) !important;
     border: none !important;
     padding: 8px 12px;
     border-radius: 6px;
@@ -720,7 +720,7 @@
 
 #emptyTrashConfirmModal .btn-cancel {
     background-color: #6c757d !important;
-    color: #fff !important;
+    color: var(--pz-text-inverse) !important;
     border: 1px solid #6c757d !important;
 }
 
@@ -731,7 +731,7 @@
 
 #emptyTrashConfirmModal .btn-danger {
     background-color: #e04b4b !important;
-    color: #fff !important;
+    color: var(--pz-text-inverse) !important;
     border: none !important;
     padding: 8px 12px;
     border-radius: 6px;
@@ -753,7 +753,7 @@
 
 #restoreConfirmModal .btn-cancel {
     background-color: #e04b4b !important;
-    color: #fff !important;
+    color: var(--pz-text-inverse) !important;
     border: none !important;
 }
 
@@ -763,7 +763,7 @@
 
 #deleteAttachmentConfirmModal .btn-cancel {
     background-color: #6c757d !important;
-    color: #fff !important;
+    color: var(--pz-text-inverse) !important;
     border: 1px solid #6c757d !important;
 }
 
@@ -805,7 +805,7 @@
 
 #deleteModal .modal-buttons .btn-danger {
     background: #e04b4b;
-    color: #fff;
+    color: var(--pz-text-inverse);
     border: none;
 }
 
@@ -946,7 +946,7 @@
     border-radius: 4px;
     box-sizing: border-box;
     margin-bottom: 12px;
-    background-color: #fff;
+    background-color: var(--pz-bg);
     color: #222;
 }
 
@@ -981,7 +981,7 @@
 
 .workspace-list .btn-danger {
     background: #e04b4b;
-    color: #fff;
+    color: var(--pz-text-inverse);
     border: none;
 }
 

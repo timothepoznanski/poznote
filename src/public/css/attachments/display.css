@@ -185,17 +185,17 @@
 /* Ensure action icon buttons keep their background/color */
 .btn-icon.btn-view {
     background: var(--pz-accent) !important;
-    color: #fff !important;
+    color: var(--pz-text-inverse) !important;
 }
 
 .btn-icon.btn-download {
     background: var(--pz-success) !important;
-    color: #fff !important;
+    color: var(--pz-text-inverse) !important;
 }
 
 .btn-icon.btn-delete {
     background: var(--pz-danger) !important;
-    color: #fff !important;
+    color: var(--pz-text-inverse) !important;
 }
 
 /* Prevent modal global rules from making .btn-icon full width */

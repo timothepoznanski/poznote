@@ -23,7 +23,7 @@ html[data-theme='dark'] .slash-command-item[data-command-id='cancel'].selected {
 
 html[data-theme='dark'] .slash-command-item .slash-command-label,
 html[data-theme='dark'] .slash-command-label {
-    color: #ffffff !important;
+    color: var(--pz-text-inverse) !important;
 }
 
 html[data-theme='dark'] .slash-command-item[data-command-id='cancel'] .slash-command-label {
@@ -41,7 +41,7 @@ html[data-theme='dark'] .slash-date-picker {
 
 html[data-theme='dark'] .slash-date-picker-title,
 html[data-theme='dark'] .slash-date-picker-day {
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .slash-date-picker-nav:hover,
@@ -57,7 +57,7 @@ html[data-theme='dark'] .slash-date-picker-day.today {
 html[data-theme='dark'] .slash-date-picker-day.selected,
 html[data-theme='dark'] .slash-date-picker-day.selected:hover {
     background: #2563eb;
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .slash-date-picker-today-btn {
@@ -111,7 +111,7 @@ html[data-theme='dark'] .slash-time-cell:hover {
 html[data-theme='dark'] .slash-time-cell.selected,
 html[data-theme='dark'] .slash-time-cell.selected:hover {
     background: #2563eb;
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .slash-date-picker-actions-row {
@@ -120,7 +120,7 @@ html[data-theme='dark'] .slash-date-picker-actions-row {
 
 html[data-theme='dark'] .slash-date-picker-apply-btn {
     background: #2563eb;
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .slash-date-picker-apply-btn:hover {
@@ -418,7 +418,7 @@ html[data-theme='dark'] .emoji-autocomplete-item.selected {
 }
 
 html[data-theme='dark'] .emoji-autocomplete-name {
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 /* Create menu: the same dropdown as .folder-actions-menu / .note-actions-menu

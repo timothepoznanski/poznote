@@ -23,7 +23,7 @@
     border-radius: 8px;
     font-size: 15px;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--input-bg, #fff);
+    background: var(--input-bg, var(--pz-bg));
     color: var(--text-color, var(--pz-text));
     transition: border-color 0.2s, box-shadow 0.2s;
     box-sizing: border-box;
@@ -96,7 +96,7 @@
     border-radius: 8px;
     font-size: 15px;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--input-bg, #fff);
+    background: var(--input-bg, var(--pz-bg));
     color: var(--text-color, var(--pz-text));
     transition: border-color 0.2s, box-shadow 0.2s;
     box-sizing: border-box;
@@ -125,7 +125,7 @@
     overflow-y: auto;
     border-radius: 8px;
     border: 1px solid var(--border-color, #eee);
-    background-color: var(--input-bg, #fff);
+    background-color: var(--input-bg, var(--pz-bg));
 }
 
 .note-reference-loading,

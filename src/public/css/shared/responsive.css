@@ -149,7 +149,7 @@
         padding: 16px;
         border-radius: 14px;
         margin-bottom: 12px;
-        background: var(--input-bg, #ffffff);
+        background: var(--input-bg, var(--pz-bg));
         box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
     }
 
@@ -292,7 +292,7 @@
 
     /* Dark mode on mobile */
     [data-theme="dark"] .shared-header {
-        color: #ffffff;
+        color: var(--pz-text-inverse);
     }
 
     [data-theme="dark"] body.shared-page {

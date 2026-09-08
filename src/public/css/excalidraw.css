@@ -13,7 +13,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 12px 20px;
-    background: #ffffff;
+    background: var(--pz-bg);
     border-bottom: 1px solid var(--border-color, var(--pz-border));
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     z-index: 10;
@@ -57,7 +57,7 @@
 
 .excalidraw-toolbar .btn-save {
     background: var(--pz-success);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     border-color: var(--pz-success);
 }
 
@@ -146,7 +146,7 @@ div[onclick*="openExcalidrawNote"] {
 
 .excalidraw-preview-overlay {
     font-size: 16px;
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 .excalidraw-preview-container:hover .excalidraw-preview-overlay {
@@ -161,7 +161,7 @@ div[onclick*="openExcalidrawNote"] {
     font-size: 12px;
     font-weight: 600;
     background: #6366f1;
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     border-radius: 4px;
     margin-bottom: 8px;
 }
@@ -202,7 +202,7 @@ div[onclick*="openExcalidrawNote"] {
         left: 0 !important;
         right: 0 !important;
         z-index: 10000 !important; /* Cohérent avec la hiérarchie z-index */
-        background: #ffffff !important;
+        background: var(--pz-bg) !important;
         border-bottom: 1px solid #e1e4e8 !important;
         box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
         height: 50px !important; /* Hauteur réduite sur mobile */
@@ -314,7 +314,7 @@ div[onclick*="openExcalidrawNote"] {
     left: 0 !important;
     right: 0 !important;
     z-index: 10000 !important; /* Keep high to stay above everything */
-    background: #ffffff !important;
+    background: var(--pz-bg) !important;
     border-bottom: 1px solid var(--border-color, var(--pz-border)) !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
     box-sizing: border-box !important;
@@ -448,7 +448,7 @@ body.excalidraw-editor-page {
     --excalidraw-note-background: #ffffff;
     --excalidraw-canvas-background: #ffffff;
     margin: 0;
-    background: #ffffff;
+    background: var(--pz-bg);
     color: #24292f;
     overflow: hidden;
 }
@@ -461,7 +461,7 @@ body.excalidraw-editor-page {
 
 body.excalidraw-editor-page #app,
 body.excalidraw-editor-page .excalidraw {
-    background: var(--excalidraw-note-background, #ffffff) !important;
+    background: var(--excalidraw-note-background, var(--pz-bg)) !important;
     color-scheme: light;
 }
 
@@ -472,12 +472,12 @@ body.excalidraw-editor-page.excalidraw-shell-dark .excalidraw {
 body.excalidraw-editor-page .excalidraw .excalidraw-canvas-container,
 body.excalidraw-editor-page .excalidraw .excalidraw-canvas-wrapper,
 body.excalidraw-editor-page .excalidraw .excalidraw__canvas-wrapper {
-    background: var(--excalidraw-note-background, #ffffff) !important;
+    background: var(--excalidraw-note-background, var(--pz-bg)) !important;
 }
 
 body.excalidraw-editor-page .excalidraw canvas[data-excalidraw-canvas],
 body.excalidraw-editor-page .excalidraw canvas.static {
-    background: var(--excalidraw-canvas-background, #ffffff) !important;
+    background: var(--excalidraw-canvas-background, var(--pz-bg)) !important;
 }
 
 body.excalidraw-editor-page .excalidraw canvas.interactive {
@@ -510,7 +510,7 @@ body.excalidraw-editor-page.excalidraw-shell-dark .excalidraw {
 }
 
 html body.excalidraw-editor-page.excalidraw-shell-light {
-    background: #ffffff;
+    background: var(--pz-bg);
     color: #24292f;
 }
 
@@ -563,7 +563,7 @@ html body.excalidraw-editor-page.excalidraw-shell-light .excalidraw {
     justify-content: space-between;
     align-items: center;
     padding: 8px 20px;
-    background: #ffffff;
+    background: var(--pz-bg);
     border-bottom: 1px solid #e1e4e8;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     position: relative;
@@ -578,7 +578,7 @@ body.excalidraw-editor-page.excalidraw-shell-dark .poznote-toolbar {
 }
 
 html body.excalidraw-editor-page.excalidraw-shell-light .poznote-toolbar {
-    background: #ffffff !important;
+    background: var(--pz-bg) !important;
     border-bottom-color: #e1e4e8 !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
 }
@@ -655,7 +655,7 @@ html body.excalidraw-editor-page.excalidraw-shell-light .poznote-toolbar-title {
     cursor: pointer;
     font-size: 13px;
     font-weight: 400;
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     transition: all 0.2s;
     white-space: nowrap;
 }
@@ -701,7 +701,7 @@ html body.excalidraw-editor-page.excalidraw-shell-light .poznote-toolbar-title {
 /* Excalidraw app container */
 .excalidraw-app-container {
     flex: 1;
-    background: #fff;
+    background: var(--pz-bg);
 }
 
 html[data-theme='dark'] body.excalidraw-editor-page .excalidraw-app-container,
@@ -710,7 +710,7 @@ body.excalidraw-editor-page.excalidraw-shell-dark .excalidraw-app-container {
 }
 
 html body.excalidraw-editor-page.excalidraw-shell-light .excalidraw-app-container {
-    background: #ffffff;
+    background: var(--pz-bg);
 }
 
 /* Loading state */

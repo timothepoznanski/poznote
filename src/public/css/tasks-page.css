@@ -4,7 +4,7 @@ body.tasks-page {
     margin: 0;
     padding: 20px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background-color: var(--bg-color, #ffffff);
+    background-color: var(--bg-color, var(--pz-bg));
     color: var(--text-color, var(--pz-text));
 }
 
@@ -126,7 +126,7 @@ body.tasks-page {
 .tasks-filter-chip.active {
     background-color: var(--pz-accent);
     border-color: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 .filter-input-wrapper {
@@ -146,7 +146,7 @@ body.tasks-page {
     border-radius: 8px;
     font-size: 13px;
     color: var(--text-color, var(--pz-text));
-    background-color: var(--input-bg, #ffffff);
+    background-color: var(--input-bg, var(--pz-bg));
     transition: all 0.2s ease;
     box-sizing: border-box;
 }
@@ -462,7 +462,7 @@ body.tasks-page {
 
 .tasks-view-btn.active {
     background-color: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 /* Collapse/expand only makes sense for the note groups of the list view */
@@ -545,7 +545,7 @@ body.tasks-page {
     font-weight: 600;
     color: var(--pz-text-muted);
     padding: 6px 0;
-    background: var(--bg-color, #ffffff);
+    background: var(--bg-color, var(--pz-bg));
 }
 
 .tasks-cal-day {
@@ -555,7 +555,7 @@ body.tasks-page {
     min-height: 92px;
     min-width: 0;
     padding: 4px;
-    background: var(--bg-color, #ffffff);
+    background: var(--bg-color, var(--pz-bg));
     cursor: pointer;
     overflow: hidden;
 }
@@ -587,7 +587,7 @@ body.tasks-page {
 
 .tasks-cal-day.today .tasks-cal-day-num {
     background-color: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     font-weight: 600;
 }
 
@@ -886,7 +886,7 @@ html[data-theme="dark"]:has(body.tasks-page) {
 [data-theme="dark"] .tasks-filter-chip.active {
     background-color: var(--pz-accent);
     border-color: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 [data-theme="dark"] .tasks-collapse-btn {
@@ -967,7 +967,7 @@ html[data-theme="dark"]:has(body.tasks-page) {
 
 [data-theme="dark"] .tasks-view-btn.active {
     background-color: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 [data-theme="dark"] .tasks-cal-nav,
@@ -1007,7 +1007,7 @@ html[data-theme="dark"]:has(body.tasks-page) {
 
 [data-theme="dark"] .tasks-cal-day.today .tasks-cal-day-num {
     background-color: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 [data-theme="dark"] .tasks-cal-day.other-month .tasks-cal-day-num {

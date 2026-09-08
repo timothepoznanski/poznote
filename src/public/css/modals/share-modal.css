@@ -90,13 +90,13 @@ input:checked+.toggle-slider:before {
 /* Button Variants */
 #shareModal .btn-cancel {
     background: var(--pz-danger);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     border: none;
 }
 
 #shareModal .btn-create-share {
     background: var(--pz-success);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     border: none;
 }
 
@@ -111,7 +111,7 @@ html[data-theme='dark'] #shareModal h3 {
 }
 
 html[data-theme='dark'] .toggle-slider {
-    background-color: #555;
+    background-color: var(--dm-border-light);
 }
 
 html[data-theme='dark'] input:checked+.toggle-slider {
@@ -144,13 +144,13 @@ html[data-theme='dark'] input:checked+.toggle-slider {
 /* Button Variants */
 #folderShareModal .btn-cancel {
     background: var(--pz-danger);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     border: none;
 }
 
 #folderShareModal .btn-primary {
     background: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     border: none;
 }
 
@@ -178,7 +178,7 @@ html[data-theme='dark'] #folderShareModal h3 {
 
 #sharedViaFolderModal .btn-view-shares {
     background: var(--pz-success);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     border: none;
 }
 

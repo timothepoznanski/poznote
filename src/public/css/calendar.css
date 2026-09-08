@@ -27,7 +27,7 @@
     left: 0;
     right: 0;
     margin: 8px -16px -16px -16px;
-    background: #ffffff;
+    background: var(--pz-bg);
     border-top: 1px solid #e6eef8;
     padding: 4px 8px 8px 8px;
     z-index: 10;
@@ -249,7 +249,7 @@
 }
 
 .calendar-notes-modal {
-    background: #ffffff;
+    background: var(--pz-bg);
     border-radius: 8px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
     max-width: 500px;
@@ -318,7 +318,7 @@
 
 .calendar-note-open-btn {
     background: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     border: none;
     padding: 6px 16px;
     border-radius: 4px;
@@ -350,7 +350,7 @@
 }
 .calendar-notes-modal .btn-open-all {
     background: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     border: none;
     padding: 8px 20px;
     border-radius: 6px;
@@ -366,7 +366,7 @@
 
 .calendar-notes-modal .btn-close-red {
     background: #dc2626;
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     border: none;
     padding: 8px 20px;
     border-radius: 6px;

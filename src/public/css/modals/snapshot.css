@@ -101,7 +101,7 @@
 
 .snapshot-date-btn.active {
     background-color: var(--pz-accent);
-    color: #fff;
+    color: var(--pz-text-inverse);
 }
 
 .snapshot-date-btn .lucide {

@@ -10,7 +10,7 @@
     z-index: 9999;
     min-width: 180px;
     max-width: 260px;
-    background: #ffffff;
+    background: var(--pz-bg);
     border: 1px solid #e5e7eb;
     border-radius: 10px;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);

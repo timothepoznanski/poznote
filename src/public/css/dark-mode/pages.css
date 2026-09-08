@@ -373,13 +373,13 @@ html[data-theme='dark'] .backup-section small {
 html[data-theme='dark'] .backup-section select {
     background-color: var(--dm-surface);
     color: var(--dm-text);
-    border-color: #555;
+    border-color: var(--dm-border-light);
 }
 
 html[data-theme='dark'] .form-select-styled {
     background-color: var(--dm-surface);
     color: var(--dm-text);
-    border-color: #555;
+    border-color: var(--dm-border-light);
 }
 
 html[data-theme='dark'] .form-select-styled:focus {
@@ -389,7 +389,7 @@ html[data-theme='dark'] .form-select-styled:focus {
 
 html[data-theme='dark'] .form-file-input {
     background-color: var(--dm-surface);
-    border-color: #555;
+    border-color: var(--dm-border-light);
     color: var(--dm-text);
 }
 
@@ -406,13 +406,13 @@ html[data-theme='dark'] .backup-section select option {
 html[data-theme='dark'] .backup-section input[type="file"] {
     background-color: var(--dm-surface);
     color: var(--dm-text);
-    border-color: #555;
+    border-color: var(--dm-border-light);
 }
 
 html[data-theme='dark'] .backup-section input[type="file"]::file-selector-button {
     background-color: var(--dm-border);
     color: var(--dm-text);
-    border: 1px solid #555;
+    border: 1px solid var(--dm-border-light);
     padding: 6px 12px;
     border-radius: 4px;
     cursor: pointer;

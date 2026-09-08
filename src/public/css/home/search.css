@@ -34,7 +34,7 @@
     padding: 10px 12px 10px 36px;
     border-radius: 8px;
     border: 1px solid #e5e7eb;
-    background: #ffffff;
+    background: var(--pz-bg);
     font-size: 15px;
     color: #1f2937;
     outline: none;

@@ -2,7 +2,7 @@
 
 /* Remove gray background for git sync page */
 body.git-sync-page {
-    background: #fff;
+    background: var(--pz-bg);
 }
 
 .git-sync-container {
@@ -76,7 +76,7 @@ body.git-sync-page {
 
 /* Sections */
 .git-sync-section {
-    background: #fff;
+    background: var(--pz-bg);
     border-radius: 12px;
     border: 1px solid #e5e7eb;
     padding: 24px;
@@ -191,7 +191,7 @@ body.git-sync-page {
 
 .debug-controls .btn[aria-pressed="true"] {
     background: var(--pz-accent);
-    color: #fff;
+    color: var(--pz-text-inverse);
 }
 
 .debug-info {
@@ -239,7 +239,7 @@ body.git-sync-page {
     border: 1px solid #ddd;
     border-radius: 6px;
     font-size: 0.95rem;
-    background: #fff;
+    background: var(--pz-bg);
 }
 
 .form-group select:focus {
@@ -335,7 +335,7 @@ html[data-theme='dark'] .form-group select:focus {
 }
 
 html[data-theme='dark'] .btn-secondary {
-    background: #333;
+    background: var(--dm-surface);
     color: #e0e0e0;
 }
 
@@ -345,7 +345,7 @@ html[data-theme='dark'] .btn-secondary:hover {
 
 html[data-theme='dark'] .debug-controls .btn[aria-pressed="true"] {
     background: var(--pz-accent);
-    color: #fff;
+    color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .debug-info {
@@ -387,7 +387,7 @@ html[data-theme='dark'] .alert-warning {
 }
 
 html[data-theme='dark'] .git-sync-footer-note {
-    border-top-color: #333;
+    border-top-color: var(--dm-surface);
     color: #999;
 }
 
@@ -401,7 +401,7 @@ html[data-theme='dark'] .badge-success {
 }
 
 html[data-theme='dark'] .badge-disabled {
-    background: #333;
+    background: var(--dm-surface);
     color: #888;
 }
 
@@ -430,7 +430,7 @@ html[data-theme='dark'] .badge-disabled {
 }
 
 html[data-theme='dark'] .auto-sync-settings {
-    border-top-color: #333;
+    border-top-color: var(--dm-surface);
 }
 
 .auto-sync-settings h4 {
@@ -625,7 +625,7 @@ input:checked+.slider:before {
 .git-field-input:focus {
     outline: none;
     border-color: var(--pz-accent);
-    background: #fff;
+    background: var(--pz-bg);
     box-shadow: none;
 }
 

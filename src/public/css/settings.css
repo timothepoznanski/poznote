@@ -216,7 +216,7 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     align-items: center;
     justify-content: center;
     width: 42px;
-    background: #ffffff;
+    background: var(--pz-bg);
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     color: var(--pz-text-muted);
@@ -565,7 +565,7 @@ html[data-theme='dark'] .settings-view-toggle:hover {
         flex-direction: column;
         gap: 0;
         margin-bottom: 1.5rem;
-        background: #ffffff;
+        background: var(--pz-bg);
         border: 1px solid #e5e7eb;
         border-radius: 12px;
     }
@@ -697,7 +697,7 @@ html[data-theme='dark'] .settings-view-toggle:hover {
         height: 20px;
         padding: 0;
         border-radius: 999px;
-        background: #d1d5db;
+        background: var(--pz-border-strong);
         color: transparent;
         font-size: 0;
         line-height: 0;
@@ -713,7 +713,7 @@ html[data-theme='dark'] .settings-view-toggle:hover {
         width: 16px;
         height: 16px;
         border-radius: 50%;
-        background: #ffffff;
+        background: var(--pz-bg);
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
         transition: transform 0.15s ease;
     }
@@ -756,7 +756,7 @@ html[data-theme='dark'] .settings-view-toggle:hover {
     }
 
     html[data-theme='dark'] .home-container.settings-with-nav .settings-toggle-card .setting-status {
-        background: #555555;
+        background: var(--dm-border-light);
         color: transparent;
     }
 

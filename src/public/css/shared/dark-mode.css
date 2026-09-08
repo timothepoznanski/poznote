@@ -98,17 +98,17 @@
 
 [data-theme="dark"] .note-actions .btn-success:hover {
     background: #2f9e44;
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 [data-theme="dark"] .note-actions .btn-primary {
     background: rgba(74, 158, 255, 0.14);
-    color: #4a9eff;
+    color: var(--dm-accent);
 }
 
 [data-theme="dark"] .note-actions .btn-primary:hover {
     background: #1d6fa5;
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 [data-theme="dark"] .note-actions .btn-danger {
@@ -118,7 +118,7 @@
 
 [data-theme="dark"] .note-actions .btn-danger:hover {
     background: #dc2626;
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 [data-theme="dark"] .indexable-label-text {
@@ -167,7 +167,7 @@
 [data-theme="dark"] .shared-header-help:hover,
 [data-theme="dark"] .shared-header-help:focus,
 [data-theme="dark"] .shared-header-help:focus-visible {
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 /* Type filter buttons - dark mode */
@@ -185,7 +185,7 @@
 
 [data-theme="dark"] .filter-type-btn.active {
     background: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     border-color: var(--pz-accent);
 }
 
@@ -264,7 +264,7 @@
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-url-copy:hover,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-password-toggle:hover {
     background: #535353;
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .share-protocol-wrap,

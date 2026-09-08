@@ -55,7 +55,7 @@ body.shared-page {
     margin: 0;
     padding: 20px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background-color: var(--bg-color, #ffffff);
+    background-color: var(--bg-color, var(--pz-bg));
     color: var(--text-color, var(--pz-text));
 }
 
@@ -97,7 +97,7 @@ body.shared-page {
     font-weight: 500;
     border: 1px solid var(--border-color, #d0d0d0);
     border-radius: 20px;
-    background: var(--input-bg, #ffffff);
+    background: var(--input-bg, var(--pz-bg));
     color: var(--text-muted, #666666);
     cursor: pointer;
     transition: all 0.2s ease;
@@ -112,7 +112,7 @@ body.shared-page {
 
 .filter-type-btn.active {
     background: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     border-color: var(--pz-accent);
 }
 
@@ -220,7 +220,7 @@ body.shared-page {
     border-radius: 8px;
     font-size: 14px;
     color: var(--text-color, var(--pz-text));
-    background-color: var(--input-bg, #ffffff);
+    background-color: var(--input-bg, var(--pz-bg));
     transition: all 0.2s ease;
     box-sizing: border-box;
 }

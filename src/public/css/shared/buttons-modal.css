@@ -29,7 +29,7 @@
 }
 
 .modal-content {
-    background-color: #ffffff;
+    background-color: var(--pz-bg);
     border-radius: 8px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     max-width: 500px;
@@ -186,7 +186,7 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-field-value select 
     padding: 10px 12px;
     border-radius: 10px;
     border: 1px solid #cfd6de;
-    background: #ffffff;
+    background: var(--pz-bg);
     color: var(--text-color, var(--pz-text));
     box-sizing: border-box;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
@@ -313,7 +313,7 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-modal-actions {
     margin-bottom: -20px;
     padding: 14px 20px 20px;
     border-top: 1px solid var(--border-color, #dee2e6);
-    background: #ffffff;
+    background: var(--pz-bg);
 }
 
 body.shared-page .shared-edit-token-modal .shared-edit-token-modal-actions > .btn {

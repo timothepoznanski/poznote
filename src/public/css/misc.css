@@ -116,7 +116,7 @@ img {
     transform: translate(-50%, -50%);
     padding: 16px 24px;
     color: var(--pz-accent);
-    background-color: #fff;
+    background-color: var(--pz-bg);
     border: 2px solid var(--pz-accent);
     z-index: 1000;
     font-size: 1em;
@@ -255,7 +255,7 @@ img.img-with-border {
     border: 1px solid #ddd;
     border-radius: 6px;
     padding: 6px;
-    background: #fff;
+    background: var(--pz-bg);
     box-sizing: border-box;
 }
 
@@ -351,7 +351,7 @@ img.img-with-border-no-padding {
 .save-notification-spinner {
     width: 16px;
     height: 16px;
-    border: 2px solid #fff;
+    border: 2px solid var(--pz-bg);
     border-top: 2px solid transparent;
     border-radius: 50%;
     animation: spin 1s linear infinite;
@@ -359,7 +359,7 @@ img.img-with-border-no-padding {
 .save-notification-check {
     width: 16px;
     height: 16px;
-    color: #fff;
+    color: var(--pz-text-inverse);
     font-weight: bold;
 }
 

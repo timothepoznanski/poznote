@@ -201,7 +201,7 @@
     transform: translateY(-50%);
     width: 16px;
     height: 25px;
-    background: #fff;
+    background: var(--pz-bg);
     border: 1px solid #ccc;
     border-radius: 4px 0 0 4px;
     cursor: pointer;
@@ -483,7 +483,7 @@ html[data-theme='dark'] .toggle-outline-btn[aria-disabled="true"]:hover {
     left: 50%;
     transform: translateX(-50%) translateY(0.5rem);
     background: var(--pz-text);
-    color: #fff;
+    color: var(--pz-text-inverse);
     font-size: 0.82rem;
     padding: 0.4em 0.9em;
     border-radius: 6px;
@@ -505,6 +505,6 @@ html[data-theme='dark'] .toggle-outline-btn[aria-disabled="true"]:hover {
 }
 
 html[data-theme='dark'] #heading-copy-toast {
-    background: #555;
+    background: var(--dm-border-light);
     color: #f0f0f0;
 }

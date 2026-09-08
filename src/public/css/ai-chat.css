@@ -144,13 +144,13 @@ a.ai-chat-header-btn {
 .ai-chat-msg-user {
     align-self: flex-end;
     background: var(--pz-accent);
-    color: #fff;
+    color: var(--pz-text-inverse);
     border-bottom-right-radius: 3px;
 }
 
 .ai-chat-msg-assistant {
     align-self: flex-start;
-    background: #ffffff;
+    background: var(--pz-bg);
     color: #212529;
     border: 1px solid #dee2e6;
     border-bottom-left-radius: 3px;
@@ -355,7 +355,7 @@ a.ai-chat-header-btn {
     /* No scrollbar while auto-growing (Windows shows arrow buttons on any
        sub-pixel overflow); the JS switches it to auto at max height */
     overflow-y: hidden;
-    background: #ffffff;
+    background: var(--pz-bg);
     color: #212529;
     box-sizing: border-box;
 }
@@ -372,7 +372,7 @@ a.ai-chat-header-btn {
     border: none;
     border-radius: 8px;
     background: var(--pz-accent);
-    color: #fff;
+    color: var(--pz-text-inverse);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
