@@ -33,14 +33,14 @@
     margin-right: 20px;
     padding: 4px 8px;
     border-radius: 12px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--pz-border-light);
     display: inline-block;
     line-height: 1.2;
     transition: all 0.2s ease;
 }
 
 .folder_name:hover {
-    border-color: #cbd5e1;
+    border-color: var(--pz-border-strong);
 }
 
 /* Folder breadcrumb (segmented path inside the folder badge) */
@@ -142,14 +142,14 @@
 .clickable-tag-wrapper {
     display: inline-flex;
     align-items: center;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--pz-border-light);
     border-radius: 12px;
     transition: all 0.2s ease;
     flex-shrink: 0;
 }
 
 .clickable-tag-wrapper:hover {
-    border-color: #cbd5e1;
+    border-color: var(--pz-border-strong);
 }
 
 .clickable-tag {
@@ -269,7 +269,7 @@
     padding: 8px 12px;
     background: #f8fafc;
     border-radius: 6px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--pz-border-light);
 }
 
 /* Colored-tag dot in the manage-tags modal (see js/tags-modal.js). It is a
@@ -317,7 +317,7 @@
 #tagsModalInput {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--pz-border-light);
     border-radius: 6px;
     font-size: 14px;
     outline: none;

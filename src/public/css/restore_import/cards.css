@@ -96,7 +96,7 @@
 /* Sub-cards (for nested sections) */
 .sub-card {
     background: var(--pz-surface);
-    border: 1px solid #e9ecef;
+    border: 1px solid var(--pz-border-light);
     border-radius: 8px;
     margin-bottom: 16px;
     overflow: hidden;

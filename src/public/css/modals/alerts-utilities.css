@@ -165,7 +165,7 @@
     width: 100%;
     padding: 8px 12px;
     margin-bottom: 0;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 4px;
     font-size: 14px;
     font-family: 'Inter', sans-serif;
@@ -176,7 +176,7 @@
     width: 100%;
     padding: 8px;
     margin-top: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 4px;
     font-size: 14px;
 }

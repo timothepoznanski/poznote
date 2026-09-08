@@ -45,7 +45,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     width: 100%;
     padding: 10px 12px;
     font-size: 14px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 4px;
     background: var(--pz-bg);
     color: var(--pz-text);
@@ -61,7 +61,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
-    border: 1px solid var(--border-color, #ddd);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 8px;
     font-size: 0.9rem;
 }
@@ -150,7 +150,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
    sized to the menu button. A long event list wraps inside its own column
    instead of flowing underneath the actions. */
 .webhooks-item {
-    border: 1px solid var(--border-color, #ddd);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 8px;
     padding: 14px 16px;
     display: grid;
@@ -241,7 +241,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     z-index: 60;
     min-width: 190px;
     background: var(--pz-bg);
-    border: 1px solid var(--border-color, #ddd);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 8px;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
     padding: 6px 0;
@@ -289,7 +289,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     grid-column: 1 / -1;
     margin-top: 6px;
     padding-top: 14px;
-    border-top: 1px solid var(--border-color, #eee);
+    border-top: 1px solid var(--border-color, var(--pz-border-light));
 }
 .webhooks-edit[hidden] { display: none; }
 .webhooks-edit .webhooks-field:last-of-type { margin-bottom: 8px; }

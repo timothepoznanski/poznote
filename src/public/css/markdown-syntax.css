@@ -37,7 +37,7 @@
 .markdown-syntax-filter-bar .filter-input {
     width: 100%;
     padding: 11px 42px 11px 38px;
-    border: 1px solid #d7dee5;
+    border: 1px solid var(--pz-border);
     border-radius: 10px;
     font-size: 14px;
     color: var(--text-color, var(--pz-text));
@@ -84,7 +84,7 @@
 }
 
 .syntax-card {
-    border: 1px solid #e9eef3;
+    border: 1px solid var(--pz-border-light);
     border-radius: 10px;
     background: var(--pz-bg);
     padding: 18px;
@@ -115,7 +115,7 @@
 .syntax-card pre {
     margin: 0;
     overflow-x: auto;
-    border: 1px solid #f0f0f0;
+    border: 1px solid var(--pz-border-light);
     border-radius: 4px;
     background: var(--pz-surface);
     color: var(--pz-text);
@@ -132,7 +132,7 @@
 .markdown-syntax-empty {
     margin: 0;
     padding: 16px 18px;
-    border: 1px dashed #d7dee5;
+    border: 1px dashed var(--pz-border);
     border-radius: 10px;
     background: #f8fafc;
     color: var(--pz-text-secondary);

@@ -11,7 +11,7 @@
 .attachment-upload {
     margin-bottom: 20px;
     padding: 15px;
-    border: 2px dashed #ddd;
+    border: 2px dashed var(--pz-border);
     border-radius: 5px;
     background: #f9f9f9;
 }
@@ -28,7 +28,7 @@
 .attachment-upload input[type="file"] {
     width: 100%;
     padding: 8px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 3px;
     box-sizing: border-box;
 }
@@ -57,7 +57,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 10px;
-    border: 1px solid #eee;
+    border: 1px solid var(--pz-border-light);
     border-radius: 3px;
     margin-bottom: 5px;
     background: #f9f9f9;

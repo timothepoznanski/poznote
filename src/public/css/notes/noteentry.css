@@ -330,7 +330,7 @@ textarea:focus {
     min-width: 0;
     margin: 0;
     overflow: hidden;
-    border: 1px solid #d8dee4;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     background: var(--pz-bg);
 }
@@ -412,7 +412,7 @@ textarea:focus {
     row-gap: 2px;
     min-height: 42px;
     padding: 7px 8px;
-    border-top: 1px solid #d8dee4;
+    border-top: 1px solid var(--pz-border);
     color: var(--pz-text-muted);
     font-size: 0.78rem;
     line-height: 1.2;

@@ -84,7 +84,7 @@ input[type="text"],
 input[type="password"] {
     width: 100%;
     padding: 0.875rem 1rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--pz-border-light);
     border-radius: 8px;
     font-size: 1rem;
     font-family: inherit;
@@ -239,7 +239,7 @@ input[type="password"]::placeholder {
 .oidc-other-account-button.oidc-other-account-button {
     background: transparent;
     color: var(--pz-text);
-    border: 1px solid #cbd5e0;
+    border: 1px solid var(--pz-border-strong);
 }
 
 .oidc-other-account-button.oidc-other-account-button:hover {
@@ -293,7 +293,7 @@ input[type="password"]::placeholder {
     justify-content: space-between;
     gap: 0.75rem;
     padding: 0.875rem 1rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--pz-border-light);
     border-radius: 8px;
     background: var(--pz-bg);
     color: var(--pz-text);
@@ -376,7 +376,7 @@ input[type="password"]::placeholder {
     margin-top: 2rem;
     padding: 1rem;
     background: #f7fafc;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--pz-border-light);
     border-radius: 8px;
     font-size: 0.875rem;
     color: var(--pz-text-secondary);

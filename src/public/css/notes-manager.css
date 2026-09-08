@@ -107,7 +107,7 @@ body.notes-manager-page {
     margin: 0 auto 16px;
     padding: 12px 14px;
     background: var(--bulk-bar-bg, #f8fafc);
-    border: 1px solid var(--bulk-bar-border, #dbe3ec);
+    border: 1px solid var(--bulk-bar-border, var(--pz-border));
     border-radius: 10px;
     transition: opacity 0.2s, transform 0.2s;
 }
@@ -153,7 +153,7 @@ body.notes-manager-page {
     min-width: 240px;
     max-width: 100%;
     padding: 9px 12px;
-    border: 1px solid var(--action-border, #cbd5e1);
+    border: 1px solid var(--action-border, var(--pz-border-strong));
     border-radius: 8px;
     background: var(--action-bg, var(--pz-bg));
     color: var(--action-color, var(--pz-text));
@@ -266,7 +266,7 @@ html[data-theme='dark'] .nm-folder-option-selected {
 /* ── Folder section ──────────────────────────────────────────────────── */
 .nm-folder-section {
     margin-bottom: 8px;
-    border: 1px solid var(--border-color, #e5e7eb);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 10px;
     overflow: hidden;
 }
@@ -335,7 +335,7 @@ html[data-theme='dark'] .nm-folder-option-selected {
 
 /* ── Note rows ───────────────────────────────────────────────────────── */
 .nm-notes-list {
-    border-top: 1px solid var(--border-color, #e5e7eb);
+    border-top: 1px solid var(--border-color, var(--pz-border));
 }
 
 .nm-note-row {
@@ -343,7 +343,7 @@ html[data-theme='dark'] .nm-folder-option-selected {
     align-items: center;
     gap: 10px;
     padding: 9px 14px;
-    border-bottom: 1px solid var(--border-color-light, #f0f0f0);
+    border-bottom: 1px solid var(--border-color-light, var(--pz-border-light));
     transition: background 0.1s;
 }
 

@@ -18,7 +18,7 @@
     padding: 10px 5px;
     box-sizing: border-box;
     background: var(--pz-surface);
-    border-right: 1px solid #dee2e6;
+    border-right: 1px solid var(--pz-border);
     flex-shrink: 0;
     overflow: hidden;
 }
@@ -250,7 +250,7 @@
     width: 16px;
     height: 25px;
     padding: 0;
-    border: 1px solid #ccc;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 0 4px 4px 0;
     background: var(--pz-bg);
     color: var(--pz-text-muted);

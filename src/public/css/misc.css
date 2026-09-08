@@ -167,7 +167,7 @@ html[data-theme='dark'] .create-note-subtitle {
 .image-menu {
     position: absolute;
     background: white;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 1000;
@@ -187,7 +187,7 @@ html[data-theme='dark'] .create-note-subtitle {
     cursor: pointer;
     font-size: 14px;
     color: var(--pz-text);
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--pz-border-light);
     transition: background-color 0.2s;
     font-family: 'Inter', sans-serif;
 }
@@ -216,7 +216,7 @@ html[data-theme='dark'] .create-note-subtitle {
 .image-submenu {
     position: fixed;
     background: white;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     min-width: 180px;
@@ -236,7 +236,7 @@ html[data-theme='dark'] .create-note-subtitle {
     cursor: pointer;
     font-size: 14px;
     color: var(--pz-text);
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--pz-border-light);
     transition: background-color 0.2s;
     font-family: 'Inter', sans-serif;
 }
@@ -252,7 +252,7 @@ html[data-theme='dark'] .create-note-subtitle {
 
 /* Image border helpers (used by image menu actions) */
 img.img-with-border {
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 6px;
     padding: 6px;
     background: var(--pz-bg);
@@ -260,7 +260,7 @@ img.img-with-border {
 }
 
 img.img-with-border-no-padding {
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 0;
     box-sizing: border-box;
     padding: 0 !important;
@@ -279,7 +279,7 @@ img.img-with-border-no-padding {
     align-items: flex-start;
     gap: 12px;
     padding: 12px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--pz-border);
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.15s ease;

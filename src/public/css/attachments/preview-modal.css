@@ -72,7 +72,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--pz-border-light);
     background: var(--pz-surface);
 }
 
@@ -109,7 +109,7 @@
 
 .pdf-preview-actions {
     padding: 15px 20px;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--pz-border-light);
     background: var(--pz-surface);
     display: flex;
     gap: 10px;

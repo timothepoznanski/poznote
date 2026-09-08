@@ -83,7 +83,7 @@
 .modal-content select {
     padding: 8px 12px;
     margin-bottom: 15px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 4px;
     font-size: 14px;
     font-family: 'Inter', sans-serif;
@@ -150,7 +150,7 @@
 .modal-buttons button:last-child {
     background-color: var(--pz-surface);
     color: var(--pz-text);
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
 }
 
 .modal-buttons button:last-child:hover {
@@ -199,7 +199,7 @@
 .modal-buttons button.btn-primary:disabled:hover {
     background-color: #eceff3;
     color: var(--pz-text-subtle);
-    border: 1px solid #dfe3e8;
+    border: 1px solid var(--pz-border);
     cursor: not-allowed;
     opacity: 1;
 }
@@ -372,7 +372,7 @@ html[data-theme='dark'] .modal .modal-info-note {
     height: 26px;
     padding: 0 !important;
     margin: 0 !important;
-    border: 1px solid #d7dee5;
+    border: 1px solid var(--pz-border);
     border-radius: 6px;
     background: none;
     cursor: pointer;
@@ -485,7 +485,7 @@ html[data-theme='dark'] .modal .modal-info-note {
     gap: 6px;
     margin: 4px 0 6px;
     padding: 7px 12px;
-    border: 1px dashed #cbd5e1;
+    border: 1px dashed var(--pz-border-strong);
     border-radius: 7px;
     background: transparent;
     color: var(--pz-text-secondary) !important;
@@ -511,7 +511,7 @@ html[data-theme='dark'] .modal .modal-info-note {
 #noteColorPaletteModal .modal-buttons {
     margin-top: 14px;
     padding-top: 14px;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--pz-border);
 }
 
 /* Four footer buttons: widen the modal so they fit on one row, stacking
@@ -603,7 +603,7 @@ html[data-theme='dark'] .modal .modal-info-note {
 .move-task-list {
     max-height: 260px;
     overflow: auto;
-    border: 1px solid #eee;
+    border: 1px solid var(--pz-border-light);
     border-radius: 6px;
     padding: 6px;
     margin-top: 6px;

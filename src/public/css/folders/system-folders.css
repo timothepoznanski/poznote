@@ -20,7 +20,7 @@
     position: fixed;
     margin-top: 8px;
     background: white;
-    border: 1px solid #d3d6db;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     min-width: 200px;

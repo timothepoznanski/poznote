@@ -122,7 +122,7 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     color: var(--pz-text);
     margin: 1.5rem 0 0.75rem 0;
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--pz-border);
 }
 
 /* Collapsible sections: the whole title toggles, the chevron shows state */
@@ -217,7 +217,7 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     justify-content: center;
     width: 42px;
     background: var(--pz-bg);
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     color: var(--pz-text-muted);
     cursor: pointer;
@@ -566,7 +566,7 @@ html[data-theme='dark'] .settings-view-toggle:hover {
         gap: 0;
         margin-bottom: 1.5rem;
         background: var(--pz-bg);
-        border: 1px solid #e5e7eb;
+        border: 1px solid var(--pz-border);
         border-radius: 12px;
     }
 

@@ -33,7 +33,7 @@
     flex-direction: column;
     width: 190px;
     min-width: 190px;
-    border-right: 1px solid #e5e5e5;
+    border-right: 1px solid var(--pz-border);
     overflow-y: auto;
     flex-shrink: 0;
 }
@@ -294,7 +294,7 @@
     max-height: none;
     padding: 20px;
     margin: 0;
-    border: 1px solid #e5e5e5;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     background: #fcfcfc;
     color: var(--pz-text);
@@ -339,7 +339,7 @@
 .snapshot-content-preview pre {
     margin: 1em 0 !important;
     padding: 18px 20px;
-    border: 1px solid #d9e2ec;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     background: #f8fafc;
     overflow-x: auto;
@@ -570,7 +570,7 @@
         width: 100%;
         min-width: unset;
         border-right: none;
-        border-bottom: 1px solid #e5e5e5;
+        border-bottom: 1px solid var(--pz-border);
         max-height: 120px;
         overflow-y: auto;
     }

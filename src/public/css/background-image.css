@@ -6,7 +6,7 @@
 
 .background-preview-container {
     margin: 20px auto !important;
-    border: 2px dashed #ddd;
+    border: 2px dashed var(--pz-border);
     border-radius: 8px;
     overflow: hidden;
     max-width: 100% !important;

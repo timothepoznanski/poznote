@@ -50,7 +50,7 @@
     flex: 1;
     min-width: 0;
     padding: 6px 10px;
-    border: 1px solid var(--border-color, #d0d0d0);
+    border: 1px solid var(--border-color, var(--pz-border-strong));
     border-radius: 4px;
     font-size: 13px;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -88,7 +88,7 @@
 /* Buttons */
 .search-replace-btn {
     padding: 6px 10px;
-    border: 1px solid var(--border-color, #d0d0d0);
+    border: 1px solid var(--border-color, var(--pz-border-strong));
     border-radius: 4px;
     background: var(--pz-bg);
     color: var(--text-color, var(--pz-text));

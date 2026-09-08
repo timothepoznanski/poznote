@@ -19,7 +19,7 @@
 .form-group input[type="file"] {
     width: 100%;
     padding: 8px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 4px;
 }
 
@@ -35,7 +35,7 @@
 .form-file-input {
     width: 100%;
     padding: 0.5rem;
-    border: 2px dashed #d0d0d0;
+    border: 2px dashed var(--pz-border-strong);
     border-radius: 8px;
     background: #fafafa;
     transition: all 0.3s ease;
@@ -51,7 +51,7 @@
 .form-select-styled {
     width: 100%;
     padding: 0.5rem;
-    border: 1px solid #d0d0d0;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 6px;
     background: white;
     font-size: 15px;

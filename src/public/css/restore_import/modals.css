@@ -108,7 +108,7 @@
 .import-confirm-modal-content .btn-cancel {
     background-color: var(--pz-surface);
     color: var(--pz-text);
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
 }
 
 .import-confirm-modal-content .btn-cancel:hover {

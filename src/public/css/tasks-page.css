@@ -402,7 +402,7 @@ body.tasks-page {
     align-items: center;
     gap: 4px;
     padding: 2px 8px;
-    border: 1px solid #d0d7de;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 12px;
     background: #f6f8fa;
     color: var(--pz-text-secondary);
@@ -533,7 +533,7 @@ body.tasks-page {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 1px;
-    border: 1px solid #c6ccd2;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 8px;
     overflow: hidden;
     background: #c6ccd2;

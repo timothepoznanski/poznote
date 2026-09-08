@@ -50,13 +50,13 @@ html.ai-chat-open #ai-chat-panel,
     width: 6px;
     z-index: 2;
     cursor: col-resize;
-    border-left: 1px solid #dee2e6;
+    border-left: 1px solid var(--pz-border);
     transition: border-color 0.15s ease;
 }
 
 .ai-chat-resize-handle:hover,
 .ai-chat-resize-handle:focus {
-    border-left-color: #dee2e6;
+    border-left-color: var(--pz-border);
 }
 
 #ai-chat-panel.ai-chat-resizing .ai-chat-resize-handle {
@@ -152,7 +152,7 @@ a.ai-chat-header-btn {
     align-self: flex-start;
     background: var(--pz-bg);
     color: var(--pz-text);
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--pz-border);
     border-bottom-left-radius: 3px;
 }
 
@@ -213,7 +213,7 @@ a.ai-chat-header-btn {
 }
 
 .ai-chat-md blockquote {
-    border-left: 3px solid #ced4da;
+    border-left: 3px solid var(--pz-border-strong);
     padding-left: 10px;
     color: var(--pz-text-muted);
 }
@@ -225,7 +225,7 @@ a.ai-chat-header-btn {
 
 .ai-chat-md th,
 .ai-chat-md td {
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--pz-border);
     padding: 3px 8px;
 }
 
@@ -338,14 +338,14 @@ a.ai-chat-header-btn {
     align-items: center;
     gap: 8px;
     padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
-    border-top: 1px solid #dee2e6;
+    border-top: 1px solid var(--pz-border);
     background: var(--pz-surface);
 }
 
 #ai-chat-input {
     flex: 1;
     resize: none;
-    border: 1px solid #ced4da;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 8px;
     padding: 8px 10px;
     font-size: 13.5px;

@@ -63,13 +63,13 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     padding: 4px 8px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--pz-border-light);
     border-radius: 12px;
 }
 
 .attachment-link:hover {
     color: #005a8b !important;
-    border-color: #cbd5e1;
+    border-color: var(--pz-border-strong);
 }
 
 .attachment-link:visited {

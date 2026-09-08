@@ -85,7 +85,7 @@ body.dashboard-page {
 .dashboard-filter-input {
     width: 100%;
     padding: 7px 38px 7px 40px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     font-size: 13px;
     color: var(--pz-text);
@@ -307,7 +307,7 @@ body.dashboard-page {
     width: 36px;
     height: 33px;
     background: var(--pz-bg);
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     color: var(--pz-text-muted);
     cursor: pointer;
@@ -561,7 +561,7 @@ body.dashboard-page {
 
 .dash-card {
     background: var(--pz-bg);
-    border: 1.5px solid #e5e7eb;
+    border: 1.5px solid var(--pz-border);
     border-radius: 14px;
     position: relative;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
@@ -616,7 +616,7 @@ body.dashboard-page {
     width: 36px;
     height: 33px;
     background: var(--pz-bg);
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     color: var(--pz-text-muted);
     cursor: pointer;
@@ -666,7 +666,7 @@ body.dashboard-page {
     overscroll-behavior: contain;
     padding: 6px;
     background: var(--pz-bg);
-    border: 1.5px solid #e5e7eb;
+    border: 1.5px solid var(--pz-border);
     border-radius: 10px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
@@ -743,7 +743,7 @@ body.dashboard-page {
     align-items: center;
     gap: 8px;
     padding: 7px 9px;
-    border: 1.5px solid #e5e7eb;
+    border: 1.5px solid var(--pz-border);
     border-radius: 9px;
     background: var(--pz-bg);
     cursor: pointer;

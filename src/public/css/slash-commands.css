@@ -15,7 +15,7 @@
     width: 280px;
     overflow: visible;
     background: var(--pz-bg);
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--pz-border);
     border-radius: 10px;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
     padding: 6px;
@@ -101,7 +101,7 @@
     z-index: 10001;
     width: 252px;
     background: var(--pz-bg);
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--pz-border);
     border-radius: 10px;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
     padding: 10px;
@@ -211,7 +211,7 @@
     align-items: center;
     gap: 4px;
     padding: 2px 8px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--pz-border);
     border-radius: 6px;
     font-family: inherit;
     font-size: 12px;
@@ -319,7 +319,7 @@
 }
 
 .slash-date-picker-remove-time-btn {
-    border: 1px solid #d0d7de;
+    border: 1px solid var(--pz-border-strong);
     background: #f6f8fa;
     color: var(--pz-text-secondary);
 }

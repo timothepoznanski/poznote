@@ -33,7 +33,7 @@
     width: 100%;
     padding: 10px 12px 10px 36px;
     border-radius: 8px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--pz-border);
     background: var(--pz-bg);
     font-size: 15px;
     color: var(--pz-text);

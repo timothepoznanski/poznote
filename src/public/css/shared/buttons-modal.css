@@ -42,7 +42,7 @@ body.shared-page .modal {
 
 .modal-header {
     padding: 16px 20px;
-    border-bottom: 1px solid var(--border-color, #dee2e6);
+    border-bottom: 1px solid var(--border-color, var(--pz-border));
 }
 
 .modal-header h3 {
@@ -87,7 +87,7 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title-link {
 
 .modal-footer {
     padding: 16px 20px;
-    border-top: 1px solid var(--border-color, #dee2e6);
+    border-top: 1px solid var(--border-color, var(--pz-border));
     display: flex;
     gap: 10px;
     justify-content: flex-end;
@@ -185,7 +185,7 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-field-value select 
     min-height: 44px;
     padding: 10px 12px;
     border-radius: 10px;
-    border: 1px solid #cfd6de;
+    border: 1px solid var(--pz-border-strong);
     background: var(--pz-bg);
     color: var(--text-color, var(--pz-text));
     box-sizing: border-box;
@@ -312,7 +312,7 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-modal-actions {
     margin-right: -20px;
     margin-bottom: -20px;
     padding: 14px 20px 20px;
-    border-top: 1px solid var(--border-color, #dee2e6);
+    border-top: 1px solid var(--border-color, var(--pz-border));
     background: var(--pz-bg);
 }
 

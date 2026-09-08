@@ -43,7 +43,7 @@
 
 .excalidraw-toolbar .toolbar-btn:hover {
     background: var(--bg-hover, #e8e8e8);
-    border-color: #d0d0d0;
+    border-color: var(--pz-border-strong);
 }
 
 .excalidraw-toolbar .toolbar-btn:active {
@@ -203,7 +203,7 @@ div[onclick*="openExcalidrawNote"] {
         right: 0 !important;
         z-index: 10000 !important; /* Cohérent avec la hiérarchie z-index */
         background: var(--pz-bg) !important;
-        border-bottom: 1px solid #e1e4e8 !important;
+        border-bottom: 1px solid var(--pz-border) !important;
         box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
         height: 50px !important; /* Hauteur réduite sur mobile */
     }
@@ -564,7 +564,7 @@ html body.excalidraw-editor-page.excalidraw-shell-light .excalidraw {
     align-items: center;
     padding: 8px 20px;
     background: var(--pz-bg);
-    border-bottom: 1px solid #e1e4e8;
+    border-bottom: 1px solid var(--pz-border);
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     position: relative;
     z-index: 5000;
@@ -579,7 +579,7 @@ body.excalidraw-editor-page.excalidraw-shell-dark .poznote-toolbar {
 
 html body.excalidraw-editor-page.excalidraw-shell-light .poznote-toolbar {
     background: var(--pz-bg) !important;
-    border-bottom-color: #e1e4e8 !important;
+    border-bottom-color: var(--pz-border) !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
 }
 

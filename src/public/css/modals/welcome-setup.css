@@ -95,7 +95,7 @@
     align-items: center;
     gap: 10px;
     padding: 10px 12px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     background: #f8fafc;
     color: var(--pz-text);

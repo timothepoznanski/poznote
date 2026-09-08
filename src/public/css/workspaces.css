@@ -35,7 +35,7 @@ body {
 .settings-section {
     margin-bottom: 30px;
     padding: 20px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 6px;
 }
 
@@ -87,7 +87,7 @@ body {
     display: flex;
     align-items: center;
     padding: 15px;
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--pz-border);
     border-radius: 6px;
     margin-bottom: 10px;
     background-color: white;
@@ -395,7 +395,7 @@ a.workspace-name-link:focus-visible {
 .workspace-share-panel {
     margin-top: 12px;
     padding: 12px;
-    border: 1px solid #d8e3ea;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     background: #f7fafc;
     width: 100%;
@@ -601,7 +601,7 @@ a.workspace-name-link:focus-visible {
 .shared-edit-token-modal .share-indexable-wrap,
 .shared-edit-token-modal .share-restrict-users-wrap {
     padding: 12px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     background: #f9fafb;
 }
@@ -618,7 +618,7 @@ a.workspace-name-link:focus-visible {
     margin-top: 10px;
     max-height: 180px;
     overflow-y: auto;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--pz-border);
     border-radius: 6px;
     background: var(--pz-bg);
 }
@@ -759,7 +759,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
     padding: 6px 12px;
     font-size: 12px;
     border-radius: 3px;
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--pz-border);
     background-color: white;
     color: var(--pz-text-inverse);
     cursor: pointer;
@@ -885,7 +885,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
     justify-content: center;
     width: 32px;
     height: 32px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 4px;
     background: white;
     color: var(--pz-text-muted);
@@ -920,7 +920,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
 .btn[disabled], .btn.disabled {
     background: #e9ecef !important;
     color: var(--pz-text-muted) !important;
-    border-color: #ddd !important;
+    border-color: var(--pz-border) !important;
     cursor: not-allowed;
     box-shadow: none !important;
     opacity: 0.95;
@@ -933,7 +933,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
 .form-group input[type="password"] {
     width: 100%;
     padding: 10px 40px 10px 10px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 4px;
     font-size: 14px;
     box-sizing: border-box;
@@ -1087,7 +1087,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
     justify-content: center !important;
     width: 36px !important; /* Slightly larger on mobile for easier touch */
     height: 36px !important;
-    border: 1px solid #ddd !important;
+    border: 1px solid var(--pz-border) !important;
     border-radius: 4px !important;
     background: white !important;
     color: var(--pz-text-muted) !important;
@@ -1121,7 +1121,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
     grid-auto-rows: auto;
     gap: 8px;
     padding: 10px 6px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--pz-border-light);
 }
 
 /* ===========================================

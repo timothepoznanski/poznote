@@ -9,7 +9,7 @@
 .table-picker-popup {
     position: fixed;
     background: white;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     z-index: 1000;
@@ -48,7 +48,7 @@
 .table-picker-input-field {
     width: 50px;
     padding: 6px 8px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 4px;
     font-size: 13px;
     text-align: center;
@@ -92,7 +92,7 @@
 .table-context-menu {
     position: fixed;
     background: var(--pz-bg);
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 6px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     padding: 4px 0;

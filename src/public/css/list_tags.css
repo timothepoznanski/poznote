@@ -250,7 +250,7 @@ html[data-theme='dark'] .tag-color-swatch.selected {
     position: fixed;
     z-index: 9999;
     background: var(--pz-bg);
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
     padding: 4px 0;
@@ -313,7 +313,7 @@ html[data-theme='dark'] .tag-context-menu-item.danger:hover {
 .tag-rename-input {
     width: 100%;
     padding: 8px 10px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 6px;
     font-size: 14px;
     font-family: 'Inter', sans-serif;

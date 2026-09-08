@@ -179,7 +179,7 @@
     cursor: col-resize;
     position: relative;
     flex-shrink: 0;
-    border-left: 1px solid #dee2e6;
+    border-left: 1px solid var(--pz-border);
 }
 
 /* Extend hover area for easier button access */
@@ -202,7 +202,7 @@
     width: 16px;
     height: 25px;
     background: var(--pz-bg);
-    border: 1px solid #ccc;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 4px 0 0 4px;
     cursor: pointer;
     display: flex;
@@ -242,7 +242,7 @@ html.outline-collapsed .toggle-outline-btn:disabled,
 body.outline-collapsed .toggle-outline-btn:disabled {
     background: #f1f3f5;
     color: var(--pz-text-subtle);
-    border-color: #dee2e6;
+    border-color: var(--pz-border);
     box-shadow: none;
     cursor: not-allowed;
     opacity: 0.65;

@@ -120,7 +120,7 @@ body.trash-page {
 .trash-search-input {
     width: 100%;
     padding: 10px 40px 10px 12px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     font-size: 14px;
     color: var(--pz-text);
@@ -173,7 +173,7 @@ body.trash-page {
     display: inline-flex;
     flex: 0 0 auto;
     padding: 3px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     background-color: #f8f8f8;
 }
@@ -216,7 +216,7 @@ body.trash-page {
 
 .trash-notecard {
     position: relative;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     margin-bottom: 15px;
     border-radius: 10px;
     background: white;
@@ -243,7 +243,7 @@ body.trash-page {
     justify-content: space-between;
     gap: 16px;
     padding-bottom: 12px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--pz-border-light);
     margin-bottom: 12px;
 }
 

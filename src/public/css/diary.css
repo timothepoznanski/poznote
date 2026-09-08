@@ -40,7 +40,7 @@
     color: var(--pz-text);
     margin: 0 0 2px;
     padding-bottom: 6px;
-    border-bottom: 1.5px solid #e5e7eb;
+    border-bottom: 1.5px solid var(--pz-border);
 }
 
 /* Header actions: same .btn style as admin/users.php, centered.
@@ -88,7 +88,7 @@
     align-items: center;
     gap: 6px;
     padding: 5px 14px;
-    border: 1.5px solid #e5e7eb;
+    border: 1.5px solid var(--pz-border);
     border-radius: 999px;
     font-size: 13px;
     font-weight: 600;

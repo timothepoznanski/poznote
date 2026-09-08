@@ -95,7 +95,7 @@ body.shared-page {
     padding: 7px 16px;
     font-size: 13px;
     font-weight: 500;
-    border: 1px solid var(--border-color, #d0d0d0);
+    border: 1px solid var(--border-color, var(--pz-border-strong));
     border-radius: 20px;
     background: var(--input-bg, var(--pz-bg));
     color: var(--text-muted, var(--pz-text-muted));

@@ -180,7 +180,7 @@ body {
     cursor: col-resize;
     position: relative;
     flex-shrink: 0;
-    border-right: 1px solid #dee2e6;
+    border-right: 1px solid var(--pz-border);
 }
 
 /* Extend hover area for easier button access */
@@ -204,7 +204,7 @@ body {
     width: 16px;
     height: 25px;
     background: var(--pz-bg);
-    border: 1px solid #ccc;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 0 4px 4px 0;
     cursor: pointer;
     display: flex;

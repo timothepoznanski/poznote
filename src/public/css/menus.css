@@ -15,7 +15,7 @@
     top: 100%;
     right: 0;
     background: white;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     min-width: 200px;
@@ -30,7 +30,7 @@
     cursor: pointer;
     font-size: 14px;
     color: var(--pz-text);
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--pz-border-light);
     transition: background-color 0.2s;
     font-style: normal;
 }
@@ -191,7 +191,7 @@
     left: 50%;
     transform: translateX(-50%);
     background: white;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 9999;
@@ -208,7 +208,7 @@
     cursor: pointer;
     font-size: 14px;
     color: var(--pz-text);
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--pz-border-light);
     transition: background-color 0.2s;
     font-family: 'Inter', sans-serif;
 }

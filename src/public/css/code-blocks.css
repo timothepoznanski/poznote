@@ -35,7 +35,7 @@ pre.code-block,
     padding: 30px 30px !important;
     /* border-radius: 6px; */
     background: #F8FAFC !important;
-    border: 1px solid #e9ecef;
+    border: 1px solid var(--pz-border-light);
     overflow-x: auto;
     position: relative;
     width: 100%;

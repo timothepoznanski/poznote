@@ -23,7 +23,7 @@
 #inputModal .modal-body input {
     width: 100%;
     padding: 8px 12px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 4px;
     font-size: 14px;
     box-sizing: border-box;
@@ -96,7 +96,7 @@
     padding: 6px 10px;
     margin: 0;
     font-size: 14px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 4px;
     text-align: center;
 }
@@ -189,7 +189,7 @@
 #moveFolderFilesModal select#moveFolderFilesTargetSelect {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 6px;
     background: var(--pz-bg);
     margin: 10px 0 12px 0;
@@ -308,7 +308,7 @@
 #moveNoteFolderModal .move-note-inline-create button.btn-cancel {
     background-color: var(--pz-surface);
     color: var(--pz-text);
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
 }
 
 #moveNoteFolderModal .move-note-inline-create button.btn-cancel:hover {
@@ -342,7 +342,7 @@
     max-width: 100%;
     min-height: 34px;
     padding: 6px 10px;
-    border: 1px solid #d7dde3;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     background: #f7f9fb;
     color: var(--pz-text);
@@ -423,7 +423,7 @@
     background-color: var(--pz-bg);
     padding: 4px 8px;
     border-radius: 3px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     flex: 1;
     margin-left: 10px;
 }
@@ -813,7 +813,7 @@
 #deleteModal .modal-buttons .btn-secondary {
     background: var(--pz-surface);
     color: var(--pz-text);
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
 }
 
 #deleteModal .modal-content>div>button {
@@ -894,7 +894,7 @@
 #moveNotesModal .modal-buttons .btn-cancel {
     background: var(--pz-surface);
     color: var(--pz-text);
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
 }
 
 #renameModal .modal-content>div>button,
@@ -942,7 +942,7 @@
     width: 100%;
     padding: 8px 12px;
     font-size: 14px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 4px;
     box-sizing: border-box;
     margin-bottom: 12px;
@@ -957,7 +957,7 @@
 .workspace-select {
     width: 100%;
     padding: 8px 12px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 4px;
     background: white;
     font-size: 14px;

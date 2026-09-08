@@ -21,7 +21,11 @@
     --pz-text-secondary: #4b5563;  /* supporting text that still reads as content */
     --pz-text-muted: #6b7280;      /* secondary text, icons */
     --pz-text-subtle: #9ca3af;     /* placeholders, hints */
-    --pz-border: #e0e0e0;          /* default borders, separators */
+    /* Border scale, three steps by lightness. 43 grey values were in use for
+       these three jobs. Anything darker, or tinted, is a border matching a
+       filled control and is not part of this scale. */
+    --pz-border-light: #eeeeee;    /* separators inside a surface */
+    --pz-border: #e0e0e0;          /* default borders */
     --pz-border-strong: #d1d5db;   /* inputs, menus, cards */
     --pz-surface: #f8f9fa;         /* panels, cards, code backgrounds */
     --pz-surface-hover: #f3f4f6;   /* hover rows and items */

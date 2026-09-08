@@ -19,7 +19,7 @@
 .note-reference-search-input {
     width: 100%;
     padding: 12px 16px;
-    border: 1px solid var(--border-color, #ddd);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 8px;
     font-size: 15px;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -92,7 +92,7 @@
 .note-reference-search input {
     width: 100%;
     padding: 12px 16px;
-    border: 1px solid var(--border-color, #ddd);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 8px;
     font-size: 15px;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -124,7 +124,7 @@
     max-height: 400px;
     overflow-y: auto;
     border-radius: 8px;
-    border: 1px solid var(--border-color, #eee);
+    border: 1px solid var(--border-color, var(--pz-border-light));
     background-color: var(--input-bg, var(--pz-bg));
 }
 
@@ -148,7 +148,7 @@
     padding: 14px 16px;
     cursor: pointer;
     transition: all 0.15s ease;
-    border-bottom: 1px solid var(--border-color, #eee);
+    border-bottom: 1px solid var(--border-color, var(--pz-border-light));
 }
 
 .note-reference-item:last-child {

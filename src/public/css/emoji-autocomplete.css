@@ -11,7 +11,7 @@
     min-width: 180px;
     max-width: 260px;
     background: var(--pz-bg);
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--pz-border);
     border-radius: 10px;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
     padding: 4px;

@@ -31,7 +31,7 @@
     font-size: 0.9rem;
     padding: 15px;
     background: rgba(0, 0, 0, 0.03);
-    border: 1px dashed #ccc;
+    border: 1px dashed var(--pz-border-strong);
     border-radius: 8px;
     text-align: center;
 }

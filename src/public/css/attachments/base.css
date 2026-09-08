@@ -38,7 +38,7 @@ body {
 .settings-section {
     margin-bottom: 30px;
     padding: 20px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 6px;
     background: #f9f9f9;
 }

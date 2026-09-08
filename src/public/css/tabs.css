@@ -12,7 +12,7 @@
     gap: 5px;
     padding: 6px 8px 0;
     background: var(--pz-bg);
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--pz-border);
     overflow-x: auto;
     flex-shrink: 0;
     min-height: 32px;
@@ -45,7 +45,7 @@
     cursor: pointer;
     max-width: 200px;
     min-width: 80px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--pz-border);
     border-bottom: none;
     font-size: 0.825rem;
     user-select: none;
@@ -120,7 +120,7 @@
     flex-shrink: 0;
     padding: 4px 10px;
     margin-bottom: 4px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--pz-border);
     border-radius: 6px;
     background: var(--pz-bg);
     box-shadow: 9px 0 0 0 #fff;

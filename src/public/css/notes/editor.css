@@ -37,7 +37,7 @@ input[type="radio"] {
 /* Horizontal Rule */
 hr {
     margin: 0;
-    border-top: 1px solid #ccc;
+    border-top: 1px solid var(--pz-border-strong);
 }
 
 /* Last Updated Dates */

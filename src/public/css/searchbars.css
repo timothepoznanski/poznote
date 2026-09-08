@@ -23,7 +23,7 @@
 .searchbar-input {
     padding: 10px 12px 10px 83px;
     border-radius: 8px;
-    border: 1px solid #d3d6db;
+    border: 1px solid var(--pz-border-strong);
     background: var(--pz-bg);
     font-size: 0.8em;
     transition: border-color 0.18s, box-shadow 0.18s, padding-left 0.2s;
@@ -308,7 +308,7 @@
     box-sizing: border-box;
     margin: 0 0 6px 0;
     padding: 3px 3px 3px 8px;
-    border: 1px solid #e4e7ea;
+    border: 1px solid var(--pz-border);
     border-radius: 6px;
     background: transparent;
     color: var(--pz-text-muted);
@@ -375,7 +375,7 @@
     width: 100%;
     margin: 0 0 8px 0;
     padding: 8px;
-    border: 1px solid #d3d6db;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 8px;
     background: #f8fafc;
     box-sizing: border-box;
@@ -413,7 +413,7 @@
     min-width: 0;
     height: 34px;
     padding: 6px 8px;
-    border: 1px solid #d3d6db;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 6px;
     background: var(--pz-bg);
     color: var(--pz-text-secondary);

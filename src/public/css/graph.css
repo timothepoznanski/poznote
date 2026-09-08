@@ -229,7 +229,7 @@ body.graph-page {
     max-width: 280px;
     padding: 8px 10px;
     background: var(--pz-bg);
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--pz-border);
     border-radius: 6px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     font-size: 13px;

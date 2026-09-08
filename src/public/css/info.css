@@ -18,7 +18,7 @@ body {
     display: flex;
     align-items: center;
     padding: 15px 30px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--pz-border-light);
 }
 
 .info-row:last-child {

@@ -33,7 +33,7 @@
 
 .reminder-datetime-input {
     padding: 8px 12px;
-    border: 1px solid var(--border-color, #ddd);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 6px;
     font-size: 14px;
     background: var(--input-bg, var(--pz-bg));
@@ -60,7 +60,7 @@
     justify-content: center;
     gap: 6px;
     padding: 8px 12px;
-    border: 1px solid var(--border-color, #ddd);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 6px;
     font-family: inherit;
     font-size: 14px;
@@ -125,7 +125,7 @@
 #taskDueModal .reminder-repeat-interval {
     padding: 4px 8px !important;
     margin: 0;
-    border: 1px solid var(--border-color, #ddd);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 6px;
     font-size: 13px !important;
     background: var(--input-bg, var(--pz-bg));
@@ -195,7 +195,7 @@
 }
 
 .reminder-email-option {
-    border: 1px solid var(--border-color, #ddd);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 8px;
     background: var(--card-bg, var(--pz-surface));
     padding: 10px 12px;
@@ -426,7 +426,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 12px 16px;
-    border-bottom: 1px solid var(--border-color, #e5e7eb);
+    border-bottom: 1px solid var(--border-color, var(--pz-border));
     cursor: pointer;
     transition: background 0.15s;
 }

@@ -596,7 +596,7 @@ body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.i
 
 .theme-toggle, .view-toggle {
     background: var(--toggle-bg, #eee);
-    border: 1px solid var(--border-color, #ddd);
+    border: 1px solid var(--border-color, var(--pz-border));
     padding: 10px 15px;
     border-radius: 6px;
     cursor: pointer;

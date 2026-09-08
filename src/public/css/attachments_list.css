@@ -114,7 +114,7 @@ body.attachments-page {
     align-items: center;
     margin-bottom: 12px;
     padding-bottom: 12px;
-    border-bottom: 1px solid var(--border-color-light, #f0f0f0);
+    border-bottom: 1px solid var(--border-color-light, var(--pz-border-light));
 }
 
 .note-name {

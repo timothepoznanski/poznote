@@ -191,7 +191,7 @@ html[data-theme='dark'] .folder-header.folder-drop-after>.folder-toggle::after {
 .root-drop-zone {
     padding: 15px;
     margin: 10px 5px;
-    border: 2px dashed #ddd;
+    border: 2px dashed var(--pz-border);
     border-radius: 8px;
     background-color: #f9f9f9;
     text-align: center;

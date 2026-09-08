@@ -68,7 +68,7 @@
     margin-top: 10px;
     margin-bottom: 15px;
     padding: 8px 12px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 4px;
     background-color: var(--pz-bg);
     color: rgb(55, 53, 47);

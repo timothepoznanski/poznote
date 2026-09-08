@@ -78,7 +78,7 @@ body.git-sync-page {
 .git-sync-section {
     background: var(--pz-bg);
     border-radius: 12px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--pz-border);
     padding: 24px;
     margin: 20px 0;
 }
@@ -113,7 +113,7 @@ body.git-sync-page {
     justify-content: space-between;
     align-items: center;
     padding: 10px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--pz-border-light);
 }
 
 .config-item:last-child {
@@ -196,7 +196,7 @@ body.git-sync-page {
 
 .debug-info {
     background: var(--pz-surface);
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--pz-border);
     border-radius: 4px;
     padding: 15px;
     margin: 20px 0;
@@ -236,7 +236,7 @@ body.git-sync-page {
 .form-group select {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 6px;
     font-size: 0.95rem;
     background: var(--pz-bg);
@@ -426,7 +426,7 @@ html[data-theme='dark'] .badge-disabled {
 .auto-sync-settings {
     margin-top: 24px;
     padding-top: 24px;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--pz-border);
 }
 
 html[data-theme='dark'] .auto-sync-settings {

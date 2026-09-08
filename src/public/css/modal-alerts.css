@@ -383,7 +383,7 @@ html[data-theme='dark'] .spinner,
     gap: 12px;
     align-items: flex-start;
     padding: 14px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--pz-border);
     border-radius: 10px;
     background: #f9fafb;
 }
@@ -430,7 +430,7 @@ html[data-theme='dark'] .spinner,
 .admin-contact-email {
     font-weight: 600;
     padding: 4px 10px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--pz-border);
     border-radius: 6px;
     background: var(--pz-bg);
 }
@@ -439,7 +439,7 @@ html[data-theme='dark'] .spinner,
     align-items: center;
     gap: 5px;
     padding: 4px 10px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--pz-border);
     border-radius: 6px;
     background: var(--pz-bg);
     cursor: pointer;

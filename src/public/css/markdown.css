@@ -267,7 +267,7 @@ html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::befor
 }
 
 .cm-tooltip {
-    border: 1px solid #d9dee7;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.15);
     overflow: hidden;
@@ -445,7 +445,7 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
 
 .markdown-preview blockquote,
 .noteentry blockquote {
-    border-left: 4px solid #ddd;
+    border-left: 4px solid var(--pz-border);
     padding-left: 16px;
     margin: 1em 0;
     color: var(--pz-text-muted);
@@ -609,7 +609,7 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
 .noteentry table td,
 .markdown-preview table th,
 .markdown-preview table td {
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     padding: 8px 12px;
     text-align: left;
     white-space: pre-line;
@@ -1009,7 +1009,7 @@ body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
     min-height: 0 !important;
     box-sizing: border-box !important;
     max-height: var(--markdown-split-pane-height, calc(100vh - 240px)) !important;
-    border: 1px solid #d9dee7 !important;
+    border: 1px solid var(--pz-border) !important;
     border-radius: 16px !important;
     background: var(--pz-bg) !important;
 }
