@@ -824,24 +824,7 @@ function importNotesZip($uploadedFile) {
     $maxFiles = (int)(poznoteResolveGlobalSetting('import_max_zip_files', 'POZNOTE_IMPORT_MAX_ZIP_FILES', '300'));
     
     // First pass: count valid files in the ZIP to enforce limit BEFORE importing anything
-    $validFileCount = 0;
-    for ($i = 0; $i < $zip->numFiles; $i++) {
-        $stat = $zip->statIndex($i);
-        $filename = $stat['name'];
-        
-        // Skip directories and non-note files
-        if (substr($filename, -1) === '/' || !preg_match('/\.(html|md)$/i', $filename)) {
-            continue;
-        }
-        
-        // Get the base filename without path
-        $baseFilename = basename($filename);
-        
-        // Only count files that follow the ID.extension pattern
-        if (preg_match('/^(\d+)\.(html|md)$/i', $baseFilename)) {
-            $validFileCount++;
-        }
-    }
+    $validFileCount = poznoteCountImportableZipEntries($zip);
     
     // Check if the number of valid files exceeds the limit
     if ($validFileCount > $maxFiles) {
@@ -1114,6 +1097,325 @@ function importAttachmentsZip($uploadedFile) {
     return ['success' => true, 'message' => $message, 'skipped_attachments' => $skippedFiles];
 }
 
+/**
+ * Works out whether an archive carries a folder structure, and its common root.
+ *
+ * Extracted from importIndividualNotesZip(). The dead $filesAnalyzed list it
+ * used to build was dropped, nothing ever read it.
+ *
+ * @return array{has_subfolders: bool, root_folder: ?string}
+ */
+function poznoteAnalyzeImportZipStructure(ZipArchive $zip): array
+{
+    // Detect if ZIP contains folder structure and find common root
+    $hasSubfolders = false;
+    $hasFilesAtRoot = false;
+    $rootFolderName = null;
+    $allFilesShareSameRoot = true;
+
+    // Analyze ZIP structure - collect all file paths
+    for ($i = 0; $i < $zip->numFiles; $i++) {
+        $stat = $zip->statIndex($i);
+        $fileName = $stat['name'];
+    
+        // Skip directories themselves and hidden files
+        if (substr($fileName, -1) === '/' || basename($fileName)[0] === '.') {
+            continue;
+        }
+    
+        // Get file extension
+        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+    
+        // Only consider valid note files
+        if (!in_array($fileExtension, ['html', 'md', 'markdown', 'txt'])) {
+            continue;
+        }
+    
+    
+        // Check if file is in a subdirectory
+        $dirPath = dirname($fileName);
+        if ($dirPath !== '.' && $dirPath !== '') {
+            $hasSubfolders = true;
+        
+            // Extract root folder name
+            $parts = explode('/', $fileName);
+            if (count($parts) > 1) {
+                $firstSegment = $parts[0];
+            
+                if ($rootFolderName === null) {
+                    $rootFolderName = $firstSegment;
+                } else if ($rootFolderName !== $firstSegment) {
+                    // Found a file with a different root folder
+                    $allFilesShareSameRoot = false;
+                }
+            }
+        } else {
+            // File is at root level - mark that we have files at root
+            $hasFilesAtRoot = true;
+        }
+    }
+
+    // If we have files at both root level and in subfolders, they don't share the same root
+    if ($hasFilesAtRoot && $hasSubfolders) {
+        $allFilesShareSameRoot = false;
+    }
+
+    // Only use rootFolderName if ALL files share the same root
+    if (!$allFilesShareSameRoot || $rootFolderName === null) {
+        $rootFolderName = null;
+    }
+
+    return ['has_subfolders' => $hasSubfolders, 'root_folder' => $rootFolderName];
+}
+
+/**
+ * Counts the note files an archive holds, before importing anything.
+ *
+ * Extracted from importIndividualNotesZip() so the file-count limit can be
+ * checked without reading the import loop.
+ */
+function poznoteCountImportableZipEntries(ZipArchive $zip): int
+{
+    $validFileCount = 0;
+    for ($i = 0; $i < $zip->numFiles; $i++) {
+        $stat = $zip->statIndex($i);
+        $filename = $stat['name'];
+    
+        // Skip directories and non-note files
+        if (substr($filename, -1) === '/' || !preg_match('/\.(html|md)$/i', $filename)) {
+            continue;
+        }
+    
+        // Get the base filename without path
+        $baseFilename = basename($filename);
+    
+        // Only count files that follow the ID.extension pattern
+        if (preg_match('/^(\d+)\.(html|md)$/i', $baseFilename)) {
+            $validFileCount++;
+        }
+    }
+
+    return $validFileCount;
+}
+
+/**
+ * Rewrites the image references of a freshly imported Markdown note and records
+ * the attachments it ends up pointing at.
+ *
+ * Handles Obsidian wikilinks (![[image.png]]) and plain relative Markdown links,
+ * mapping both onto the attachments pre-extracted from the archive. Extracted
+ * from importIndividualNotesZip(), where it was 200 lines nested three levels
+ * deep inside the import loop.
+ *
+ * @return string The content with every reference rewritten.
+ */
+function poznoteResolveImportedImageReferences($con, string $content, $noteId, string $noteType, array $importedImages, array $attachmentIdMap): string
+{
+        $noteAttachments = [];
+        if ($noteType === 'markdown' && (!empty($importedImages) || !empty($attachmentIdMap))) {
+            if (!empty($importedImages)) {
+            // Match Obsidian wikilink image syntax: ![[filename.ext]] or ![[filename.ext|alt text]]
+            $content = preg_replace_callback('/!\[\[([^\]|]+)(?:\|([^\]]*))?\]\]/', function($matches) use ($noteId, $importedImages, &$noteAttachments) {
+                $imageName = trim($matches[1]);
+                $altText = isset($matches[2]) ? trim($matches[2]) : $imageName;
+            
+                // Look up the image in our imported images (case-insensitive)
+                $imageKey = strtolower(basename($imageName));
+            
+                if (isset($importedImages[$imageKey])) {
+                    $imageInfo = $importedImages[$imageKey];
+                
+                    // Add to note's attachments if not already added
+                    $alreadyAdded = false;
+                    foreach ($noteAttachments as $att) {
+                        if ($att['filename'] === $imageInfo['unique_filename']) {
+                            $alreadyAdded = true;
+                            break;
+                        }
+                    }
+                
+                    if (!$alreadyAdded) {
+                        $attachmentId = uniqid();
+                        $noteAttachments[] = [
+                            'id' => $attachmentId,
+                            'filename' => $imageInfo['unique_filename'],
+                            'original_filename' => $imageInfo['original_filename'],
+                            'file_size' => $imageInfo['file_size'],
+                            'file_type' => $imageInfo['file_type'],
+                            'uploaded_at' => date('Y-m-d H:i:s')
+                        ];
+                    } else {
+                        // Find the existing attachment ID
+                        foreach ($noteAttachments as $att) {
+                            if ($att['filename'] === $imageInfo['unique_filename']) {
+                                $attachmentId = $att['id'];
+                                break;
+                            }
+                        }
+                    }
+                
+                    // Convert to standard markdown with API path
+                    return '![' . $altText . '](/api/v1/notes/' . $noteId . '/attachments/' . $attachmentId . ')';
+                }
+            
+                // Image not found in imported images, keep original syntax but convert to standard markdown
+                return '![' . $altText . '](' . $imageName . ')';
+            }, $content);
+        
+            // Also handle standard markdown images that reference local files
+            // ![alt](image.png) or ![alt](./image.png)
+            $content = preg_replace_callback('/!\[([^\]]*)\]\((?:\.\/)?([^)\/][^)]*\.(?:png|jpg|jpeg|gif|webp|svg|bmp|ico))\)/i', function($matches) use ($noteId, $importedImages, &$noteAttachments) {
+                $altText = $matches[1];
+                $imageName = $matches[2];
+            
+                // Look up the image in our imported images (case-insensitive)
+                $imageKey = strtolower(basename($imageName));
+            
+                if (isset($importedImages[$imageKey])) {
+                    $imageInfo = $importedImages[$imageKey];
+                
+                    // Add to note's attachments if not already added
+                    $alreadyAdded = false;
+                    $attachmentId = null;
+                    foreach ($noteAttachments as $att) {
+                        if ($att['filename'] === $imageInfo['unique_filename']) {
+                            $alreadyAdded = true;
+                            $attachmentId = $att['id'];
+                            break;
+                        }
+                    }
+                
+                    if (!$alreadyAdded) {
+                        $attachmentId = uniqid();
+                        $noteAttachments[] = [
+                            'id' => $attachmentId,
+                            'filename' => $imageInfo['unique_filename'],
+                            'original_filename' => $imageInfo['original_filename'],
+                            'file_size' => $imageInfo['file_size'],
+                            'file_type' => $imageInfo['file_type'],
+                            'uploaded_at' => date('Y-m-d H:i:s')
+                        ];
+                    }
+                
+                    // Convert to API path
+                    return '![' . $altText . '](/api/v1/notes/' . $noteId . '/attachments/' . $attachmentId . ')';
+                }
+            
+                // Image not found, keep original
+                return $matches[0];
+            }, $content);
+            }
+        
+            // Handle Poznote-exported markdown images: (../)attachments/{attachmentId}.ext
+            if (!empty($attachmentIdMap)) {
+                $content = preg_replace_callback('/!\[([^\]]*)\]\((?:\.\.\/|\.\/|\/)*attachments\/([^\)]+)\)/i', function($matches) use ($noteId, $attachmentIdMap, &$noteAttachments) {
+                    $altText = $matches[1];
+                    $oldAttachmentId = resolveImportedPoznoteAttachmentId($matches[2], $attachmentIdMap);
+                
+                    if (isset($attachmentIdMap[$oldAttachmentId])) {
+                        $imageInfo = $attachmentIdMap[$oldAttachmentId];
+                        $newAttachmentId = addImportedPoznoteAttachmentToNote($noteAttachments, $imageInfo);
+                        if ($newAttachmentId === null) {
+                            return $matches[0];
+                        }
+                    
+                        // Convert to API path
+                        return '![' . $altText . '](/api/v1/notes/' . $noteId . '/attachments/' . $newAttachmentId . ')';
+                    }
+                
+                    // Attachment not found, keep original
+                    return $matches[0];
+                }, $content);
+
+                // Plain links, notably the "## Attachments" list appended to
+                // exported markdown notes: [real name.pdf](attachments/id.pdf)
+                $content = preg_replace_callback('/(?<!\!)\[([^\]]*)\]\((?:\.\.\/|\.\/|\/)*attachments\/([^\)\s]+)\)/i', function($matches) use ($noteId, $attachmentIdMap, &$noteAttachments) {
+                    $label = $matches[1];
+                    $oldAttachmentId = resolveImportedPoznoteAttachmentId($matches[2], $attachmentIdMap);
+
+                    if (isset($attachmentIdMap[$oldAttachmentId])) {
+                        $imageInfo = $attachmentIdMap[$oldAttachmentId];
+                        // The link label is the original filename
+                        $newAttachmentId = addImportedPoznoteAttachmentToNote($noteAttachments, $imageInfo, $label);
+                        if ($newAttachmentId === null) {
+                            return $matches[0];
+                        }
+
+                        return '[' . $label . '](/api/v1/notes/' . $noteId . '/attachments/' . $newAttachmentId . ')';
+                    }
+
+                    return $matches[0];
+                }, $content);
+
+                // Markdown notes can contain raw HTML blocks (notably Excalidraw containers).
+                $content = preg_replace_callback('#(src|href)=(["\']?)(?:\.\.\/|\.\/|\/)*attachments/([^"\'>\s]+)\2#i', function($matches) use ($noteId, $attachmentIdMap, &$noteAttachments) {
+                    $attr = $matches[1];
+                    $quote = $matches[2];
+                    $oldAttachmentId = resolveImportedPoznoteAttachmentId($matches[3], $attachmentIdMap);
+
+                    if (isset($attachmentIdMap[$oldAttachmentId])) {
+                        $imageInfo = $attachmentIdMap[$oldAttachmentId];
+                        $newAttachmentId = addImportedPoznoteAttachmentToNote($noteAttachments, $imageInfo);
+                        if ($newAttachmentId === null) {
+                            return $matches[0];
+                        }
+
+                        return $attr . '=' . $quote . '/api/v1/notes/' . $noteId . '/attachments/' . $newAttachmentId . $quote;
+                    }
+
+                    return $matches[0];
+                }, $content);
+            }
+        
+            // Update the note's attachments in the database if any were added
+            if (!empty($noteAttachments)) {
+                $attachmentsJson = json_encode($noteAttachments);
+                $updateStmt = $con->prepare("UPDATE entries SET attachments = ? WHERE id = ?");
+                $updateStmt->execute([$attachmentsJson, $noteId]);
+            }
+        } else if ($noteType === 'note' && !empty($attachmentIdMap)) {
+            // Exported attachment links carry the real filename in their
+            // download attribute; collect it before rewriting the hrefs
+            $downloadNames = extractImportedAttachmentDownloadNames($content, $attachmentIdMap);
+
+            // For HTML notes, handle Poznote-exported attachments: (../)attachments/{attachmentId}.ext
+            $content = preg_replace_callback('#(src|href)=(["\']?)(?:\.\.\/|\.\/|\/)*attachments/([^"\'>\s]+)\2#i', function($matches) use ($noteId, $attachmentIdMap, &$noteAttachments, $downloadNames) {
+                $attr = $matches[1];
+                $quote = $matches[2];
+                $oldAttachmentId = resolveImportedPoznoteAttachmentId($matches[3], $attachmentIdMap);
+
+                if (isset($attachmentIdMap[$oldAttachmentId])) {
+                    $imageInfo = $attachmentIdMap[$oldAttachmentId];
+
+                    $newAttachmentId = addImportedPoznoteAttachmentToNote(
+                        $noteAttachments,
+                        $imageInfo,
+                        $downloadNames[$oldAttachmentId] ?? null
+                    );
+                    if ($newAttachmentId === null) {
+                        return $matches[0];
+                    }
+
+                    // Return full src/href attribute with API URL
+                    return $attr . '=' . $quote . '/api/v1/notes/' . $noteId . '/attachments/' . $newAttachmentId . $quote;
+                }
+
+                // Attachment not found, keep original
+                return $matches[0];
+            }, $content);
+        
+            // Update the note's attachments in the database if any were added
+            if (!empty($noteAttachments)) {
+                $attachmentsJson = json_encode($noteAttachments);
+                $updateStmt = $con->prepare("UPDATE entries SET attachments = ? WHERE id = ?");
+                $updateStmt->execute([$attachmentsJson, $noteId]);
+            }
+        }
+
+    return $content;
+}
+
+
 function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = null, $isLocalFile = false) {
     global $con;
 
@@ -1172,65 +1474,9 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
     // Track if we started a transaction for cleanup purposes
     $transactionStarted = false;
     
-    // Detect if ZIP contains folder structure and find common root
-    $hasSubfolders = false;
-    $hasFilesAtRoot = false;
-    $rootFolderName = null;
-    $allFilesShareSameRoot = true;
-    $filesAnalyzed = [];
-    
-    // Analyze ZIP structure - collect all file paths
-    for ($i = 0; $i < $zip->numFiles; $i++) {
-        $stat = $zip->statIndex($i);
-        $fileName = $stat['name'];
-        
-        // Skip directories themselves and hidden files
-        if (substr($fileName, -1) === '/' || basename($fileName)[0] === '.') {
-            continue;
-        }
-        
-        // Get file extension
-        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        
-        // Only consider valid note files
-        if (!in_array($fileExtension, ['html', 'md', 'markdown', 'txt'])) {
-            continue;
-        }
-        
-        $filesAnalyzed[] = $fileName;
-        
-        // Check if file is in a subdirectory
-        $dirPath = dirname($fileName);
-        if ($dirPath !== '.' && $dirPath !== '') {
-            $hasSubfolders = true;
-            
-            // Extract root folder name
-            $parts = explode('/', $fileName);
-            if (count($parts) > 1) {
-                $firstSegment = $parts[0];
-                
-                if ($rootFolderName === null) {
-                    $rootFolderName = $firstSegment;
-                } else if ($rootFolderName !== $firstSegment) {
-                    // Found a file with a different root folder
-                    $allFilesShareSameRoot = false;
-                }
-            }
-        } else {
-            // File is at root level - mark that we have files at root
-            $hasFilesAtRoot = true;
-        }
-    }
-    
-    // If we have files at both root level and in subfolders, they don't share the same root
-    if ($hasFilesAtRoot && $hasSubfolders) {
-        $allFilesShareSameRoot = false;
-    }
-    
-    // Only use rootFolderName if ALL files share the same root
-    if (!$allFilesShareSameRoot || $rootFolderName === null) {
-        $rootFolderName = null;
-    }
+    $zipStructure = poznoteAnalyzeImportZipStructure($zip);
+    $hasSubfolders = $zipStructure['has_subfolders'];
+    $rootFolderName = $zipStructure['root_folder'];
     
     // Map to store folder paths to folder IDs
     $folderMap = [];
@@ -1537,206 +1783,7 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
             
             // Process Obsidian-style image references ![[image.png]] and convert to standard markdown
             // Also build the attachments array for this note
-            $noteAttachments = [];
-            if ($noteType === 'markdown' && (!empty($importedImages) || !empty($attachmentIdMap))) {
-                if (!empty($importedImages)) {
-                // Match Obsidian wikilink image syntax: ![[filename.ext]] or ![[filename.ext|alt text]]
-                $content = preg_replace_callback('/!\[\[([^\]|]+)(?:\|([^\]]*))?\]\]/', function($matches) use ($noteId, $importedImages, &$noteAttachments) {
-                    $imageName = trim($matches[1]);
-                    $altText = isset($matches[2]) ? trim($matches[2]) : $imageName;
-                    
-                    // Look up the image in our imported images (case-insensitive)
-                    $imageKey = strtolower(basename($imageName));
-                    
-                    if (isset($importedImages[$imageKey])) {
-                        $imageInfo = $importedImages[$imageKey];
-                        
-                        // Add to note's attachments if not already added
-                        $alreadyAdded = false;
-                        foreach ($noteAttachments as $att) {
-                            if ($att['filename'] === $imageInfo['unique_filename']) {
-                                $alreadyAdded = true;
-                                break;
-                            }
-                        }
-                        
-                        if (!$alreadyAdded) {
-                            $attachmentId = uniqid();
-                            $noteAttachments[] = [
-                                'id' => $attachmentId,
-                                'filename' => $imageInfo['unique_filename'],
-                                'original_filename' => $imageInfo['original_filename'],
-                                'file_size' => $imageInfo['file_size'],
-                                'file_type' => $imageInfo['file_type'],
-                                'uploaded_at' => date('Y-m-d H:i:s')
-                            ];
-                        } else {
-                            // Find the existing attachment ID
-                            foreach ($noteAttachments as $att) {
-                                if ($att['filename'] === $imageInfo['unique_filename']) {
-                                    $attachmentId = $att['id'];
-                                    break;
-                                }
-                            }
-                        }
-                        
-                        // Convert to standard markdown with API path
-                        return '![' . $altText . '](/api/v1/notes/' . $noteId . '/attachments/' . $attachmentId . ')';
-                    }
-                    
-                    // Image not found in imported images, keep original syntax but convert to standard markdown
-                    return '![' . $altText . '](' . $imageName . ')';
-                }, $content);
-                
-                // Also handle standard markdown images that reference local files
-                // ![alt](image.png) or ![alt](./image.png)
-                $content = preg_replace_callback('/!\[([^\]]*)\]\((?:\.\/)?([^)\/][^)]*\.(?:png|jpg|jpeg|gif|webp|svg|bmp|ico))\)/i', function($matches) use ($noteId, $importedImages, &$noteAttachments) {
-                    $altText = $matches[1];
-                    $imageName = $matches[2];
-                    
-                    // Look up the image in our imported images (case-insensitive)
-                    $imageKey = strtolower(basename($imageName));
-                    
-                    if (isset($importedImages[$imageKey])) {
-                        $imageInfo = $importedImages[$imageKey];
-                        
-                        // Add to note's attachments if not already added
-                        $alreadyAdded = false;
-                        $attachmentId = null;
-                        foreach ($noteAttachments as $att) {
-                            if ($att['filename'] === $imageInfo['unique_filename']) {
-                                $alreadyAdded = true;
-                                $attachmentId = $att['id'];
-                                break;
-                            }
-                        }
-                        
-                        if (!$alreadyAdded) {
-                            $attachmentId = uniqid();
-                            $noteAttachments[] = [
-                                'id' => $attachmentId,
-                                'filename' => $imageInfo['unique_filename'],
-                                'original_filename' => $imageInfo['original_filename'],
-                                'file_size' => $imageInfo['file_size'],
-                                'file_type' => $imageInfo['file_type'],
-                                'uploaded_at' => date('Y-m-d H:i:s')
-                            ];
-                        }
-                        
-                        // Convert to API path
-                        return '![' . $altText . '](/api/v1/notes/' . $noteId . '/attachments/' . $attachmentId . ')';
-                    }
-                    
-                    // Image not found, keep original
-                    return $matches[0];
-                }, $content);
-                }
-                
-                // Handle Poznote-exported markdown images: (../)attachments/{attachmentId}.ext
-                if (!empty($attachmentIdMap)) {
-                    $content = preg_replace_callback('/!\[([^\]]*)\]\((?:\.\.\/|\.\/|\/)*attachments\/([^\)]+)\)/i', function($matches) use ($noteId, $attachmentIdMap, &$noteAttachments) {
-                        $altText = $matches[1];
-                        $oldAttachmentId = resolveImportedPoznoteAttachmentId($matches[2], $attachmentIdMap);
-                        
-                        if (isset($attachmentIdMap[$oldAttachmentId])) {
-                            $imageInfo = $attachmentIdMap[$oldAttachmentId];
-                            $newAttachmentId = addImportedPoznoteAttachmentToNote($noteAttachments, $imageInfo);
-                            if ($newAttachmentId === null) {
-                                return $matches[0];
-                            }
-                            
-                            // Convert to API path
-                            return '![' . $altText . '](/api/v1/notes/' . $noteId . '/attachments/' . $newAttachmentId . ')';
-                        }
-                        
-                        // Attachment not found, keep original
-                        return $matches[0];
-                    }, $content);
-
-                    // Plain links, notably the "## Attachments" list appended to
-                    // exported markdown notes: [real name.pdf](attachments/id.pdf)
-                    $content = preg_replace_callback('/(?<!\!)\[([^\]]*)\]\((?:\.\.\/|\.\/|\/)*attachments\/([^\)\s]+)\)/i', function($matches) use ($noteId, $attachmentIdMap, &$noteAttachments) {
-                        $label = $matches[1];
-                        $oldAttachmentId = resolveImportedPoznoteAttachmentId($matches[2], $attachmentIdMap);
-
-                        if (isset($attachmentIdMap[$oldAttachmentId])) {
-                            $imageInfo = $attachmentIdMap[$oldAttachmentId];
-                            // The link label is the original filename
-                            $newAttachmentId = addImportedPoznoteAttachmentToNote($noteAttachments, $imageInfo, $label);
-                            if ($newAttachmentId === null) {
-                                return $matches[0];
-                            }
-
-                            return '[' . $label . '](/api/v1/notes/' . $noteId . '/attachments/' . $newAttachmentId . ')';
-                        }
-
-                        return $matches[0];
-                    }, $content);
-
-                    // Markdown notes can contain raw HTML blocks (notably Excalidraw containers).
-                    $content = preg_replace_callback('#(src|href)=(["\']?)(?:\.\.\/|\.\/|\/)*attachments/([^"\'>\s]+)\2#i', function($matches) use ($noteId, $attachmentIdMap, &$noteAttachments) {
-                        $attr = $matches[1];
-                        $quote = $matches[2];
-                        $oldAttachmentId = resolveImportedPoznoteAttachmentId($matches[3], $attachmentIdMap);
-
-                        if (isset($attachmentIdMap[$oldAttachmentId])) {
-                            $imageInfo = $attachmentIdMap[$oldAttachmentId];
-                            $newAttachmentId = addImportedPoznoteAttachmentToNote($noteAttachments, $imageInfo);
-                            if ($newAttachmentId === null) {
-                                return $matches[0];
-                            }
-
-                            return $attr . '=' . $quote . '/api/v1/notes/' . $noteId . '/attachments/' . $newAttachmentId . $quote;
-                        }
-
-                        return $matches[0];
-                    }, $content);
-                }
-                
-                // Update the note's attachments in the database if any were added
-                if (!empty($noteAttachments)) {
-                    $attachmentsJson = json_encode($noteAttachments);
-                    $updateStmt = $con->prepare("UPDATE entries SET attachments = ? WHERE id = ?");
-                    $updateStmt->execute([$attachmentsJson, $noteId]);
-                }
-            } else if ($noteType === 'note' && !empty($attachmentIdMap)) {
-                // Exported attachment links carry the real filename in their
-                // download attribute; collect it before rewriting the hrefs
-                $downloadNames = extractImportedAttachmentDownloadNames($content, $attachmentIdMap);
-
-                // For HTML notes, handle Poznote-exported attachments: (../)attachments/{attachmentId}.ext
-                $content = preg_replace_callback('#(src|href)=(["\']?)(?:\.\.\/|\.\/|\/)*attachments/([^"\'>\s]+)\2#i', function($matches) use ($noteId, $attachmentIdMap, &$noteAttachments, $downloadNames) {
-                    $attr = $matches[1];
-                    $quote = $matches[2];
-                    $oldAttachmentId = resolveImportedPoznoteAttachmentId($matches[3], $attachmentIdMap);
-
-                    if (isset($attachmentIdMap[$oldAttachmentId])) {
-                        $imageInfo = $attachmentIdMap[$oldAttachmentId];
-
-                        $newAttachmentId = addImportedPoznoteAttachmentToNote(
-                            $noteAttachments,
-                            $imageInfo,
-                            $downloadNames[$oldAttachmentId] ?? null
-                        );
-                        if ($newAttachmentId === null) {
-                            return $matches[0];
-                        }
-
-                        // Return full src/href attribute with API URL
-                        return $attr . '=' . $quote . '/api/v1/notes/' . $noteId . '/attachments/' . $newAttachmentId . $quote;
-                    }
-
-                    // Attachment not found, keep original
-                    return $matches[0];
-                }, $content);
-                
-                // Update the note's attachments in the database if any were added
-                if (!empty($noteAttachments)) {
-                    $attachmentsJson = json_encode($noteAttachments);
-                    $updateStmt = $con->prepare("UPDATE entries SET attachments = ? WHERE id = ?");
-                    $updateStmt->execute([$attachmentsJson, $noteId]);
-                }
-            }
+            $content = poznoteResolveImportedImageReferences($con, $content, $noteId, $noteType, $importedImages, $attachmentIdMap);
             
             // Save content to file
             if (writeNoteToFile($entriesPath, $noteId, $noteType, $title, $content)) {

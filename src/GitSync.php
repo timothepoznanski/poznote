@@ -1021,6 +1021,172 @@ class GitSync {
      * All entries and attachments are pulled regardless of workspace.
      * @return array Results with success status, counts, and errors
      */
+    /**
+     * Recreates the folders described by the remote metadata, parents first.
+     *
+     * Extracted from pullNotes(). Insertion runs in passes because a child can
+     * appear before its parent in the metadata.
+     */
+    private function restoreRemoteFolders(array $foldersSource, array &$results): void
+    {
+        // ── 2c. Recreate folders (parents before children) ──
+        if (!empty($foldersSource)) {
+            // Insert in multiple passes: root folders first, then children
+            $toInsert = $foldersSource;
+            $maxPasses = 10;
+            $folderParentStmt = $this->con->prepare('SELECT id FROM folders WHERE id = ?');
+            $folderInsertStmt = $this->con->prepare(
+                'INSERT OR IGNORE INTO folders (id, name, workspace, parent_id, icon, icon_color, display_order) VALUES (?, ?, ?, ?, ?, ?, ?)'
+            );
+            while (!empty($toInsert) && $maxPasses-- > 0) {
+                $remaining = [];
+                foreach ($toInsert as $folder) {
+                    // If it has a parent, make sure the parent exists first
+                    if ($folder['parent_id'] !== null) {
+                        $folderParentStmt->execute([$folder['parent_id']]);
+                        if ($folderParentStmt->fetchColumn() === false) {
+                            $remaining[] = $folder; // parent not yet inserted, retry later
+                            continue;
+                        }
+                    }
+                    // INSERT OR IGNORE preserves existing folders
+                    $folderInsertStmt->execute([
+                        $folder['id'],
+                        $folder['name'],
+                        $folder['workspace'] ?? 'Poznote',
+                        $folder['parent_id'],
+                        $folder['icon'],
+                        $folder['icon_color'],
+                        (int)($folder['display_order'] ?? 0),
+                    ]);
+                    $results['debug'][] = "  Folder #{$folder['id']} '{$folder['name']}' → restored";
+                }
+                $toInsert = $remaining;
+            }
+            if (!empty($toInsert)) {
+                $results['debug'][] = '  WARNING: ' . count($toInsert) . ' folder(s) could not be inserted (circular parent_id?)';
+            }
+        }
+    }
+
+    /**
+     * Downloads the attachments the remote holds and that the local copy lacks.
+     *
+     * Extracted from pullNotes(). Skips a file whose Git blob sha already matches
+     * the local one, and validates every filename and payload before writing.
+     *
+     * @return int The progress step reached.
+     */
+    private function downloadRemoteAttachments(array $attachmentFiles, string $attachmentsPath, array $remoteShaMap, array &$results, int $currentStep, int $totalSteps): int
+    {
+        // ── 4. Download attachments ──
+        if (!is_dir($attachmentsPath)) mkdir($attachmentsPath, 0755, true);
+        foreach ($attachmentFiles as $path) {
+            $currentStep++;
+            $filename  = basename($path);
+            $filenameValidation = poznoteValidateAttachmentFilename($filename);
+            if (!$filenameValidation['success']) {
+                $results['errors'][] = ['attachment' => $filename, 'error' => $filenameValidation['error']];
+                $results['debug'][]  = "  Attachment SKIPPED {$filename}: " . $filenameValidation['error'];
+                continue;
+            }
+
+            $filename = $filenameValidation['filename'];
+            $localFile = $attachmentsPath . '/' . $filename;
+            if (file_exists($localFile)) {
+                $remoteSha = $remoteShaMap[$path] ?? null;
+                $localSha = $remoteSha ? $this->calculateGitFileSha($localFile) : null;
+                if ($remoteSha && $localSha === $remoteSha) {
+                    $this->updateProgress($currentStep, $totalSteps, "Attachment unchanged: {$filename}");
+                    $results['unchanged']++;
+                    $results['debug'][] = "  Attachment unchanged: {$filename}";
+                    continue;
+                }
+            }
+            $this->updateProgress($currentStep, $totalSteps, "Downloading attachment: {$filename}");
+            $raw = $this->getFileContent($path);
+            if (isset($raw['error'])) {
+                $results['errors'][] = ['attachment' => $filename, 'error' => $raw['error']];
+                $results['debug'][]  = "  Attachment ERROR {$filename}: " . $raw['error'];
+                continue;
+            }
+
+            $attachmentValidation = poznoteValidateAttachmentFile($filename, null, $raw['content']);
+            if (!$attachmentValidation['success']) {
+                $results['errors'][] = ['attachment' => $filename, 'error' => $attachmentValidation['error']];
+                $results['debug'][]  = "  Attachment SKIPPED {$filename}: " . $attachmentValidation['error'];
+                continue;
+            }
+
+            file_put_contents($localFile, $raw['content']);
+            $results['debug'][] = "  Attachment saved: {$filename}";
+        }
+
+        return $currentStep;
+    }
+
+    /**
+     * Trashes the local notes the remote no longer has.
+     *
+     * Extracted from pullNotes() precisely because it is the destructive step and
+     * deserves a name and a boundary of its own. It may only touch workspaces the
+     * remote is authoritative for: both synced AND present in the remote metadata.
+     * Notes excluded from Git sync, or never pushed, must never be trashed here.
+     */
+    private function trashNotesMissingFromRemote(?array $syncedWorkspaces, ?array $remoteWorkspaces, array $pulledNoteIds, array &$results, int $currentStep, int $totalSteps): void
+    {
+        // ── 5. Trash local notes not on remote ──
+        // A pull may only trash notes in workspaces the remote is
+        // authoritative for: workspaces that are both synced AND known to
+        // the remote metadata. Notes in workspaces excluded from Git sync,
+        // or never pushed (e.g. freshly created or freshly added to the
+        // sync scope), must never be trashed by a pull.
+        $this->updateProgress($currentStep, $totalSteps, 'Cleaning up local notes...');
+        try {
+            $cleanupWorkspaces = $syncedWorkspaces; // null = no restriction
+            if ($remoteWorkspaces !== null) {
+                $remoteNames = array_keys($remoteWorkspaces);
+                $cleanupWorkspaces = ($syncedWorkspaces === null)
+                    ? $remoteNames
+                    : array_values(array_intersect($syncedWorkspaces, $remoteNames));
+            }
+            if ($cleanupWorkspaces === null) {
+                $localIds = $this->con->query('SELECT id FROM entries WHERE trash = 0')->fetchAll(PDO::FETCH_COLUMN);
+            } elseif (empty($cleanupWorkspaces)) {
+                $localIds = [];
+            } else {
+                $placeholders = implode(',', array_fill(0, count($cleanupWorkspaces), '?'));
+                $localStmt = $this->con->prepare("SELECT id FROM entries WHERE trash = 0 AND COALESCE(workspace, 'Poznote') IN ($placeholders)");
+                $localStmt->execute($cleanupWorkspaces);
+                $localIds = $localStmt->fetchAll(PDO::FETCH_COLUMN);
+            }
+            $pulledNoteSet = array_fill_keys(array_map('intval', $pulledNoteIds), true);
+            $toTrash = [];
+            foreach ($localIds as $localId) {
+                if (!isset($pulledNoteSet[(int) $localId])) {
+                    $toTrash[] = (int) $localId;
+                }
+            }
+            if (!empty($toTrash)) {
+                $this->con->exec('BEGIN IMMEDIATE');
+                $trashStmt = $this->con->prepare("UPDATE entries SET trash = 1, trashed_at = datetime('now') WHERE id = ?");
+                foreach ($toTrash as $trashId) {
+                    $trashStmt->execute([$trashId]);
+                    $results['deleted']++;
+                    $results['debug'][] = "  Trashed local note id={$trashId} (not on remote)";
+                }
+                $this->con->exec('COMMIT');
+            }
+        } catch (Exception $trashEx) {
+            try { $this->con->exec('ROLLBACK'); } catch (Exception $ignored) {
+                error_log('GitSync: pullNotes() failed: ' . $ignored->getMessage());
+            }
+            $results['errors'][] = ['path' => 'trash_cleanup', 'error' => $trashEx->getMessage()];
+            $results['debug'][]  = 'Trash cleanup failed: ' . $trashEx->getMessage();
+        }
+    }
+
+
     public function pullNotes() {
         set_time_limit(0);
 
@@ -1204,44 +1370,7 @@ class GitSync {
             $totalSteps  = count($noteFiles) + count($attachmentFiles) + 5;
             $currentStep = 0;
 
-            // ── 2c. Recreate folders (parents before children) ──
-            if (!empty($foldersSource)) {
-                // Insert in multiple passes: root folders first, then children
-                $toInsert = $foldersSource;
-                $maxPasses = 10;
-                $folderParentStmt = $this->con->prepare('SELECT id FROM folders WHERE id = ?');
-                $folderInsertStmt = $this->con->prepare(
-                    'INSERT OR IGNORE INTO folders (id, name, workspace, parent_id, icon, icon_color, display_order) VALUES (?, ?, ?, ?, ?, ?, ?)'
-                );
-                while (!empty($toInsert) && $maxPasses-- > 0) {
-                    $remaining = [];
-                    foreach ($toInsert as $folder) {
-                        // If it has a parent, make sure the parent exists first
-                        if ($folder['parent_id'] !== null) {
-                            $folderParentStmt->execute([$folder['parent_id']]);
-                            if ($folderParentStmt->fetchColumn() === false) {
-                                $remaining[] = $folder; // parent not yet inserted, retry later
-                                continue;
-                            }
-                        }
-                        // INSERT OR IGNORE preserves existing folders
-                        $folderInsertStmt->execute([
-                            $folder['id'],
-                            $folder['name'],
-                            $folder['workspace'] ?? 'Poznote',
-                            $folder['parent_id'],
-                            $folder['icon'],
-                            $folder['icon_color'],
-                            (int)($folder['display_order'] ?? 0),
-                        ]);
-                        $results['debug'][] = "  Folder #{$folder['id']} '{$folder['name']}' → restored";
-                    }
-                    $toInsert = $remaining;
-                }
-                if (!empty($toInsert)) {
-                    $results['debug'][] = '  WARNING: ' . count($toInsert) . ' folder(s) could not be inserted (circular parent_id?)';
-                }
-            }
+            $this->restoreRemoteFolders($foldersSource, $results);
 
             $pulledNoteIds = [];
 
@@ -1416,98 +1545,9 @@ class GitSync {
                 }
             }
 
-            // ── 4. Download attachments ──
-            if (!is_dir($attachmentsPath)) mkdir($attachmentsPath, 0755, true);
-            foreach ($attachmentFiles as $path) {
-                $currentStep++;
-                $filename  = basename($path);
-                $filenameValidation = poznoteValidateAttachmentFilename($filename);
-                if (!$filenameValidation['success']) {
-                    $results['errors'][] = ['attachment' => $filename, 'error' => $filenameValidation['error']];
-                    $results['debug'][]  = "  Attachment SKIPPED {$filename}: " . $filenameValidation['error'];
-                    continue;
-                }
+            $currentStep = $this->downloadRemoteAttachments($attachmentFiles, $attachmentsPath, $remoteShaMap, $results, $currentStep, $totalSteps);
 
-                $filename = $filenameValidation['filename'];
-                $localFile = $attachmentsPath . '/' . $filename;
-                if (file_exists($localFile)) {
-                    $remoteSha = $remoteShaMap[$path] ?? null;
-                    $localSha = $remoteSha ? $this->calculateGitFileSha($localFile) : null;
-                    if ($remoteSha && $localSha === $remoteSha) {
-                        $this->updateProgress($currentStep, $totalSteps, "Attachment unchanged: {$filename}");
-                        $results['unchanged']++;
-                        $results['debug'][] = "  Attachment unchanged: {$filename}";
-                        continue;
-                    }
-                }
-                $this->updateProgress($currentStep, $totalSteps, "Downloading attachment: {$filename}");
-                $raw = $this->getFileContent($path);
-                if (isset($raw['error'])) {
-                    $results['errors'][] = ['attachment' => $filename, 'error' => $raw['error']];
-                    $results['debug'][]  = "  Attachment ERROR {$filename}: " . $raw['error'];
-                    continue;
-                }
-
-                $attachmentValidation = poznoteValidateAttachmentFile($filename, null, $raw['content']);
-                if (!$attachmentValidation['success']) {
-                    $results['errors'][] = ['attachment' => $filename, 'error' => $attachmentValidation['error']];
-                    $results['debug'][]  = "  Attachment SKIPPED {$filename}: " . $attachmentValidation['error'];
-                    continue;
-                }
-
-                file_put_contents($localFile, $raw['content']);
-                $results['debug'][] = "  Attachment saved: {$filename}";
-            }
-
-            // ── 5. Trash local notes not on remote ──
-            // A pull may only trash notes in workspaces the remote is
-            // authoritative for: workspaces that are both synced AND known to
-            // the remote metadata. Notes in workspaces excluded from Git sync,
-            // or never pushed (e.g. freshly created or freshly added to the
-            // sync scope), must never be trashed by a pull.
-            $this->updateProgress($currentStep, $totalSteps, 'Cleaning up local notes...');
-            try {
-                $cleanupWorkspaces = $syncedWorkspaces; // null = no restriction
-                if ($remoteWorkspaces !== null) {
-                    $remoteNames = array_keys($remoteWorkspaces);
-                    $cleanupWorkspaces = ($syncedWorkspaces === null)
-                        ? $remoteNames
-                        : array_values(array_intersect($syncedWorkspaces, $remoteNames));
-                }
-                if ($cleanupWorkspaces === null) {
-                    $localIds = $this->con->query('SELECT id FROM entries WHERE trash = 0')->fetchAll(PDO::FETCH_COLUMN);
-                } elseif (empty($cleanupWorkspaces)) {
-                    $localIds = [];
-                } else {
-                    $placeholders = implode(',', array_fill(0, count($cleanupWorkspaces), '?'));
-                    $localStmt = $this->con->prepare("SELECT id FROM entries WHERE trash = 0 AND COALESCE(workspace, 'Poznote') IN ($placeholders)");
-                    $localStmt->execute($cleanupWorkspaces);
-                    $localIds = $localStmt->fetchAll(PDO::FETCH_COLUMN);
-                }
-                $pulledNoteSet = array_fill_keys(array_map('intval', $pulledNoteIds), true);
-                $toTrash = [];
-                foreach ($localIds as $localId) {
-                    if (!isset($pulledNoteSet[(int) $localId])) {
-                        $toTrash[] = (int) $localId;
-                    }
-                }
-                if (!empty($toTrash)) {
-                    $this->con->exec('BEGIN IMMEDIATE');
-                    $trashStmt = $this->con->prepare("UPDATE entries SET trash = 1, trashed_at = datetime('now') WHERE id = ?");
-                    foreach ($toTrash as $trashId) {
-                        $trashStmt->execute([$trashId]);
-                        $results['deleted']++;
-                        $results['debug'][] = "  Trashed local note id={$trashId} (not on remote)";
-                    }
-                    $this->con->exec('COMMIT');
-                }
-            } catch (Exception $trashEx) {
-                try { $this->con->exec('ROLLBACK'); } catch (Exception $ignored) {
-                    error_log('GitSync: pullNotes() failed: ' . $ignored->getMessage());
-                }
-                $results['errors'][] = ['path' => 'trash_cleanup', 'error' => $trashEx->getMessage()];
-                $results['debug'][]  = 'Trash cleanup failed: ' . $trashEx->getMessage();
-            }
+            $this->trashNotesMissingFromRemote($syncedWorkspaces, $remoteWorkspaces, $pulledNoteIds, $results, $currentStep, $totalSteps);
 
             // ── 6. Save sync info ──
             $this->updateProgress($totalSteps, $totalSteps, 'Pull complete!');
