@@ -406,11 +406,15 @@ html[data-theme='dark'] .btn-cancel:hover {
    Links
    ============================================ */
 
-html[data-theme='dark'] a {
+/* Buttons are excluded: an <a class="btn"> is a button, and letting the generic
+   link colour reach it is what used to force components/buttons.css to defend
+   its label colour with !important, which in turn overrode every contextual
+   button style (the tinted action buttons of the shared page, for one). */
+html[data-theme='dark'] a:not(.btn) {
     color: var(--dm-accent);
 }
 
-html[data-theme='dark'] a:hover {
+html[data-theme='dark'] a:not(.btn):hover {
     color: #6ab3ff;
 }
 

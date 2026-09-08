@@ -59,23 +59,27 @@
 .btn.disabled,
 .btn:disabled {
     opacity: 0.5;
-    cursor: not-allowed !important;
-    background: #ccc !important;
-    color: #666 !important;
+    cursor: not-allowed;
+    background: #ccc;
+    color: #666;
+}
+
+/* An <a> cannot be disabled natively, so the class has to stop the click.
+   Native :disabled buttons already ignore clicks, and taking pointer events
+   from them would also suppress the title tooltip that explains why they are
+   inert (the shared page relies on that). */
+.btn.disabled {
     pointer-events: none;
 }
 
-/* The label colour is !important because these buttons are often <a>
-   elements and page stylesheets set link colours with descendant selectors
-   that would otherwise win. It is held off disabled buttons on purpose: a
-   disabled one is greyed out by its context (modals/base.css paints it pale),
-   and forcing white there would leave an unreadable label. */
+/* Plain weight on purpose. These colours have to lose to any rule that styles
+   a button in context: the tinted action buttons of the shared page
+   (.note-actions .btn-danger), a disabled dialog button
+   (.modal-buttons button.btn-primary:disabled), and so on. !important here
+   turned all of those into white-on-pale. */
 .btn-primary {
     background: var(--pz-accent);
-}
-
-.btn-primary:not(:disabled) {
-    color: #fff !important;
+    color: #fff;
 }
 
 .btn-primary:hover {
@@ -84,10 +88,7 @@
 
 .btn-secondary {
     background: #6c757d;
-}
-
-.btn-secondary:not(:disabled) {
-    color: #fff !important;
+    color: #fff;
 }
 
 .btn-secondary:hover {
@@ -96,10 +97,7 @@
 
 .btn-danger {
     background: var(--pz-danger);
-}
-
-.btn-danger:not(:disabled) {
-    color: #fff !important;
+    color: #fff;
 }
 
 .btn-danger:hover {
@@ -116,10 +114,7 @@
 
 .btn-success {
     background: var(--pz-success);
-}
-
-.btn-success:not(:disabled) {
-    color: #fff !important;
+    color: #fff;
 }
 
 .btn-success:hover {
