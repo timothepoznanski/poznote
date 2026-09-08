@@ -19,4 +19,4 @@ echo "Building bundle..."
 npm run build
 
 echo "Build completed!"
-echo "Bundle location: src/js/codemirror-dist/markdown-codemirror.iife.js"
+echo "Bundle location: src/public/js/codemirror-dist/markdown-codemirror.iife.js"

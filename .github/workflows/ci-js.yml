@@ -56,7 +56,7 @@ on:
 #
 # Do not "fix" a new error by editing anything under excalidraw-build/ or
 # markdown-editor-build/ without rebuilding the corresponding bundle: those
-# sources compile into src/js/excalidraw-dist and src/js/codemirror-dist, and
+# sources compile into src/public/js/excalidraw-dist and src/public/js/codemirror-dist, and
 # editing one without the other leaves the shipped bundle out of sync.
 #
 # --- Upgrading node-version ----------------------------------------------
@@ -82,7 +82,7 @@ jobs:
       # Vendored bundles (swagger-ui, mermaid, katex, highlight.js, excalidraw,
       # codemirror, *.min.js) and node_modules are excluded via .oxlintrc.json.
       # The *-build directories hold the hand-written sources that compile into
-      # src/js/{excalidraw,codemirror}-dist, so they are linted too.
+      # src/public/js/{excalidraw,codemirror}-dist, so they are linted too.
       - name: Lint JavaScript
         run: |
           npx --yes "oxlint@${OXLINT_VERSION}" \

@@ -1,0 +1,86 @@
+<?php
+require_once __DIR__ . '/../auth.php';
+require_once __DIR__ . '/../functions.php';
+require_once __DIR__ . '/oidc.php';
+require_once __DIR__ . '/../version_helper.php';
+
+if (!oidc_is_enabled()) {
+    header('Location: login.php');
+    exit;
+}
+
+// Provider error
+if (isset($_GET['error'])) {
+    header('Location: login.php?oidc_error=1');
+    exit;
+}
+
+$state = $_GET['state'] ?? '';
+$code = $_GET['code'] ?? '';
+
+if (!is_string($state) || !is_string($code) || $state === '' || $code === '') {
+    header('Location: login.php?oidc_error=1');
+    exit;
+}
+
+$expectedState = $_SESSION['oidc_state'] ?? '';
+if (!is_string($expectedState) || $expectedState === '' || !hash_equals($expectedState, $state)) {
+    header('Location: login.php?oidc_error=1');
+    exit;
+}
+
+try {
+    $tokens = oidc_exchange_code_for_tokens($code);
+    $claims = oidc_parse_and_verify_id_token($tokens['id_token']);
+    oidc_finish_login($claims, $tokens);
+
+    $redirectAfter = $_SESSION['oidc_redirect_after'] ?? null;
+    unset($_SESSION['oidc_redirect_after']);
+    $sanitizedRedirectAfter = oidc_sanitize_redirect($redirectAfter);
+
+    // CSP-compliant redirect using external script with JSON config
+    if (isAccountSelectionRequired()) {
+        if ($sanitizedRedirectAfter !== null) {
+            $_SESSION['post_login_redirect'] = $sanitizedRedirectAfter;
+        }
+        $redirectConfig = ['redirectAfter' => 'login.php?select_account=1'];
+    } else {
+        $redirectConfig = ['redirectAfter' => $sanitizedRedirectAfter];
+    }
+    
+    // Remember the account email on this device so future SSO logins can send a
+    // login_hint and skip the provider's account chooser (which escapes the PWA
+    // Custom Tab on mobile)
+    $loginHintEmail = $_SESSION['oidc_claims']['email'] ?? null;
+
+    echo '<!DOCTYPE html><html><head>';
+    echo '<script type="application/json" id="workspace-redirect-data">' . json_encode($redirectConfig) . '</script>';
+    if (is_string($loginHintEmail) && $loginHintEmail !== '') {
+        echo '<script type="application/json" id="oidc-login-hint-data">' . json_encode(['email' => $loginHintEmail], JSON_HEX_TAG | JSON_HEX_AMP) . '</script>';
+        echo '<script src="js/oidc-login-hint.js?v=' . rawurlencode(getAppVersion()) . '"></script>';
+    }
+    echo '<script src="js/workspace-redirect.js?v=' . rawurlencode(getAppVersion()) . '"></script>';
+    echo '</head><body>' . t_h('login.redirecting', [], 'Redirecting...', getUserLanguage()) . '</body></html>';
+    exit;
+} catch (Exception $e) {
+    // Log the error for debugging
+    error_log("OIDC Callback Error: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
+    
+    // Check if the error is due to unauthorized user
+    if (strpos($e->getMessage(), 'not authorized') !== false) {
+        header('Location: login.php?oidc_error=unauthorized');
+    } elseif (strpos($e->getMessage(), 'signup limit reached') !== false) {
+        header('Location: login.php?oidc_error=signup_limit');
+    } elseif (strpos($e->getMessage(), 'No user profile found') !== false) {
+        preg_match('/"([^"]+)"/', $e->getMessage(), $matches);
+        $identifier = $matches[1] ?? 'unknown';
+        header('Location: login.php?oidc_error=no_profile&identifier=' . urlencode($identifier));
+    } elseif (strpos($e->getMessage(), 'profile is disabled') !== false) {
+        header('Location: login.php?oidc_error=disabled');
+    } else {
+        // Redirect to login with error parameter
+        header('Location: login.php?oidc_error=1&msg=' . urlencode($e->getMessage()));
+    }
+    exit;
+}

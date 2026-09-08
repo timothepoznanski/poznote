@@ -7,46 +7,10 @@ parameters:
 			path: src/WebhookDispatcher.php
 
 		-
-			message: '#^Anonymous function has an unused use \$attachmentsDir\.$#'
-			identifier: closure.unusedUse
-			count: 2
-			path: src/api/v1/controllers/NotesController.php
-
-		-
-			message: '#^Variable \$gitPushResult on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.variable
-			count: 1
-			path: src/api/v1/controllers/NotesController.php
-
-		-
-			message: '#^Variable \$http_response_header on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.variable
-			count: 1
-			path: src/api/v1/controllers/SystemController.php
-
-		-
-			message: '#^Variable \$job might not be defined\.$#'
-			identifier: variable.undefined
-			count: 2
-			path: src/api_restore_upload.php
-
-		-
-			message: '#^Variable \$image_data in isset\(\) always exists and is not nullable\.$#'
-			identifier: isset.variable
-			count: 1
-			path: src/api_save_excalidraw.php
-
-		-
 			message: '#^Variable \$configured_port on left side of \?\? always exists and is not nullable\.$#'
 			identifier: nullCoalesce.variable
 			count: 1
 			path: src/auth.php
-
-		-
-			message: '#^Variable \$message in empty\(\) always exists and is always falsy\.$#'
-			identifier: empty.variable
-			count: 1
-			path: src/backup_export.php
 
 		-
 			message: '#^Variable \$attachmentId might not be defined\.$#'
@@ -55,34 +19,10 @@ parameters:
 			path: src/import_helpers.php
 
 		-
-			message: '#^Variable \$labels might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: src/index.php
-
-		-
-			message: '#^Variable \$workspaces might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: src/index.php
-
-		-
-			message: '#^Variable \$currentLang on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.variable
-			count: 31
-			path: src/login.php
-
-		-
 			message: '#^Variable \$updatedContent on left side of \?\? always exists and is not nullable\.$#'
 			identifier: nullCoalesce.variable
 			count: 1
 			path: src/maintenance/convert-base64-images.php
-
-		-
-			message: '#^Variable \$E might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: src/markdown_syntax.php
 
 		-
 			message: '#^Variable \$attachment_previews_in_note_setting might not be defined\.$#'
@@ -223,61 +163,121 @@ parameters:
 			path: src/notes_list.php
 
 		-
+			message: '#^Anonymous function has an unused use \$attachmentsDir\.$#'
+			identifier: closure.unusedUse
+			count: 2
+			path: src/public/api/v1/controllers/NotesController.php
+
+		-
+			message: '#^Variable \$gitPushResult on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: src/public/api/v1/controllers/NotesController.php
+
+		-
+			message: '#^Variable \$http_response_header on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: src/public/api/v1/controllers/SystemController.php
+
+		-
+			message: '#^Variable \$job might not be defined\.$#'
+			identifier: variable.undefined
+			count: 2
+			path: src/public/api_restore_upload.php
+
+		-
+			message: '#^Variable \$image_data in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.variable
+			count: 1
+			path: src/public/api_save_excalidraw.php
+
+		-
+			message: '#^Variable \$message in empty\(\) always exists and is always falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: src/public/backup_export.php
+
+		-
+			message: '#^Variable \$labels might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: src/public/index.php
+
+		-
+			message: '#^Variable \$workspaces might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: src/public/index.php
+
+		-
+			message: '#^Variable \$currentLang on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 31
+			path: src/public/login.php
+
+		-
+			message: '#^Variable \$E might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: src/public/markdown_syntax.php
+
+		-
 			message: '#^Variable \$http_response_header in isset\(\) always exists and is not nullable\.$#'
 			identifier: isset.variable
 			count: 1
-			path: src/oidc.php
+			path: src/public/oidc.php
 
 		-
 			message: '#^Variable \$activeUserId might not be defined\.$#'
 			identifier: variable.undefined
 			count: 1
-			path: src/public_folder.php
+			path: src/public/public_folder.php
 
 		-
 			message: '#^Variable \$activeUserId might not be defined\.$#'
 			identifier: variable.undefined
 			count: 2
-			path: src/public_note.php
+			path: src/public/public_note.php
 
 		-
 			message: '#^Variable \$indexable might not be defined\.$#'
 			identifier: variable.undefined
 			count: 1
-			path: src/public_note.php
+			path: src/public/public_note.php
 
 		-
 			message: '#^Variable \$note might not be defined\.$#'
 			identifier: variable.undefined
 			count: 2
-			path: src/public_note.php
+			path: src/public/public_note.php
 
 		-
 			message: '#^Variable \$noteIdParam in empty\(\) always exists and is always falsy\.$#'
 			identifier: empty.variable
 			count: 1
-			path: src/public_note.php
+			path: src/public/public_note.php
 
 		-
 			message: '#^Variable \$note_id might not be defined\.$#'
 			identifier: variable.undefined
 			count: 4
-			path: src/public_note.php
+			path: src/public/public_note.php
 
 		-
 			message: '#^Variable \$taskAccessMode might not be defined\.$#'
 			identifier: variable.undefined
 			count: 6
-			path: src/public_note.php
+			path: src/public/public_note.php
+
+		-
+			message: '#^Variable \$moved on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: src/public/workspaces.php
 
 		-
 			message: '#^Variable \$con in isset\(\) always exists and is not nullable\.$#'
 			identifier: isset.variable
 			count: 5
 			path: src/users/db_master.php
-
-		-
-			message: '#^Variable \$moved on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.variable
-			count: 1
-			path: src/workspaces.php

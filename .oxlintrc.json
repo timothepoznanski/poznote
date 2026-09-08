@@ -19,12 +19,12 @@
   // NB: the *sources* under excalidraw-build/ and markdown-editor-build/ are
   // ours and are linted; only their node_modules are skipped.
   "ignorePatterns": [
-    "src/api-docs/**",
-    "src/js/codemirror-dist/**",
-    "src/js/excalidraw-dist/**",
-    "src/js/highlight/**",
-    "src/js/katex/**",
-    "src/js/mermaid/**",
+    "src/public/api-docs/**",
+    "src/public/js/codemirror-dist/**",
+    "src/public/js/excalidraw-dist/**",
+    "src/public/js/highlight/**",
+    "src/public/js/katex/**",
+    "src/public/js/mermaid/**",
     "**/node_modules/**",
     "**/*.min.js"
   ],
@@ -44,7 +44,7 @@
     // Cannot see through a `method` variable, flags POST calls as invalid GETs.
     "unicorn/no-invalid-fetch-options": "warn",
     // Style only: `...(x || {})` in the excalidraw build sources. Editing them
-    // without rebuilding the bundle would desync src/js/excalidraw-dist.
+    // without rebuilding the bundle would desync src/public/js/excalidraw-dist.
     "unicorn/no-useless-fallback-in-spread": "warn",
 
     // Off: every hit in this codebase is a deliberate idiom.

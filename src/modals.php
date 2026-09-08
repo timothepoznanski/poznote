@@ -27,7 +27,7 @@ try {
 // matching check that hides the Change Password card in settings.php.
 $modalsPasswordDisabledReason = '';
 try {
-    $modalsOidcPath = __DIR__ . '/oidc.php';
+    $modalsOidcPath = __DIR__ . '/public/oidc.php';
     if (is_file($modalsOidcPath)) {
         require_once $modalsOidcPath;
     }

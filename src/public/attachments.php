@@ -1,0 +1,269 @@
+<?php
+require_once __DIR__ . '/../auth.php';
+requireAuth();
+
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../functions.php';
+require_once __DIR__ . '/../db_connect.php';
+
+// GitHub Sync Logic
+require_once __DIR__ . '/../GitSync.php';
+$gitSync = new GitSync($con, $_SESSION['user_id'] ?? null);
+$gitEnabled = GitSync::isEnabled() && $gitSync->isConfigured();
+$showGitSync = $gitEnabled;
+
+// Get note ID from URL
+$note_id = isset($_GET['note_id']) ? (int)$_GET['note_id'] : 0;
+$workspace = isset($_GET['workspace']) ? trim($_GET['workspace']) : null;
+
+if (!$note_id) {
+    header('Location: index.php');
+    exit;
+}
+
+// Get note details
+$query = "SELECT heading, type FROM entries WHERE id = ?";
+if ($workspace) {
+    $query = "SELECT heading, type FROM entries WHERE id = ? AND workspace = ?";
+    $stmt = $con->prepare($query);
+    $stmt->execute([$note_id, $workspace]);
+} else {
+    $stmt = $con->prepare($query);
+    $stmt->execute([$note_id]);
+}
+$note = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$note) {
+    header('Location: index.php');
+    exit;
+}
+
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title><?php echo htmlspecialchars($note['heading']); ?> - Poznote</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark light">
+    <?php 
+    $v = @file_get_contents('version.txt');
+    if ($v === false) $v = time();
+    $v = urlencode(poznoteBuildAssetCacheVersion(trim($v)));
+    ?>
+    <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
+    <link rel="stylesheet" href="css/lucide.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/attachments/base.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/attachments/upload.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/attachments/usage-notice.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/attachments/display.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/attachments/buttons-alerts.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/home/buttons.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/attachments/preview-modal.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/attachments/responsive.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/modals/base.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/modals/specific-modals.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/modals/attachments.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/modals/share-modal.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/modals/alerts-utilities.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/modals/responsive.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>">
+    <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $v; ?>">
+    <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
+    <style>
+        .file-icon-placeholder {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f1f5f9;
+            border-radius: 4px;
+            color: #94a3b8;
+            font-size: 24px;
+        }
+        [data-theme="dark"] .file-icon-placeholder {
+            background-color: #1e293b;
+            color: #64748b;
+        }
+
+        /* Keep the attachment delete modal cancel action neutral. */
+        #deleteAttachmentConfirmModal .btn-cancel {
+            background-color: #6c757d !important;
+            color: #fff !important;
+            border: 1px solid #6c757d !important;
+        }
+
+        #deleteAttachmentConfirmModal .btn-cancel:hover {
+            background-color: #5a6268 !important;
+            border-color: #545b62 !important;
+        }
+
+        .attachments-inline-notice {
+            margin: 18px 0 20px;
+            padding: 10px 12px;
+            border: 1px solid #dbeafe;
+            border-radius: 6px;
+            background: #eff6ff;
+            color: #1e40af;
+            font-size: 0.88rem;
+            line-height: 1.45;
+        }
+
+        [data-theme="dark"] .attachments-inline-notice {
+            border-color: #1e3a8a;
+            background: #172554;
+            color: #bfdbfe;
+        }
+
+        /* The bar sits outside .settings-container so it floats above the white
+           card rather than inside it, matching info.php. That card owns the
+           page's top spacing, so the bar supplies its own. */
+        .attachments-back-to-note-bar {
+            margin: 20px 0 0 0;
+        }
+
+        /* Tighten the gap between the button and the card below it: the card's
+           own 20px top margin sat them further apart than on info.php. */
+        .attachments-back-to-note-bar + .settings-container {
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body class="has-icon-sidebar" data-note-id="<?php echo $note_id; ?>"
+      data-note-type="<?php echo htmlspecialchars($note['type'] ?? 'note', ENT_QUOTES); ?>"
+      data-workspace="<?php echo $workspace ? htmlspecialchars($workspace, ENT_QUOTES) : ''; ?>"
+      data-txt-uploading="<?php echo t_h('attachments.upload.button_uploading', [], 'Uploading...'); ?>"
+      data-txt-select-file="<?php echo t_h('attachments.errors.select_file', [], 'Please select a file to upload.'); ?>"
+      data-txt-file-too-large="<?php echo t_h('attachments.errors.file_too_large', ['maxSize' => '200MB'], 'The file is too large (max: {{maxSize}}).'); ?>"
+      data-txt-upload-success="<?php echo t_h('attachments.messages.upload_success', [], 'File uploaded successfully!'); ?>"
+      data-txt-upload-failed-prefix="<?php echo t_h('attachments.errors.upload_failed', ['error' => '{{error}}'], 'Upload failed: {{error}}'); ?>"
+      data-txt-upload-failed-generic="<?php echo t_h('attachments.errors.upload_failed_generic', [], 'Upload failed. Please try again.'); ?>"
+      data-txt-upload-failed-connection="<?php echo t_h('attachments.errors.upload_failed_connection', [], 'Upload failed. Please check your connection.'); ?>"
+      data-txt-loading-failed="<?php echo t_h('attachments.errors.loading_failed', [], 'Failed to load attachments'); ?>"
+      data-txt-loading-error="<?php echo t_h('attachments.errors.loading_error', [], 'Error loading attachments'); ?>"
+      data-txt-no-attachments="<?php echo t_h('attachments.empty', [], 'No attachments.'); ?>"
+      data-txt-preview-alt="<?php echo t_h('attachments.page.preview_alt', [], 'Preview'); ?>"
+      data-txt-uploaded-prefix="<?php echo t_h('attachments.page.uploaded_prefix', [], 'Uploaded: '); ?>"
+      data-txt-view="<?php echo t_h('attachments.actions.view', [], 'View'); ?>"
+      data-txt-delete="<?php echo t_h('attachments.actions.delete', [], 'Delete'); ?>"
+      data-txt-open-new-tab="<?php echo t_h('attachments.page.open_in_new_tab', [], 'Open in new tab'); ?>"
+      data-txt-download="<?php echo t_h('common.download', [], 'Download'); ?>"
+      data-txt-pdf-label="<?php echo t_h('attachments.page.pdf_label', [], 'PDF'); ?>"
+      data-txt-deleted-success="<?php echo t_h('attachments.messages.deleted_success', [], 'Attachment deleted successfully'); ?>"
+      data-txt-delete-failed-prefix="<?php echo t_h('attachments.errors.deletion_failed', ['error' => '{{error}}'], 'Deletion failed: {{error}}'); ?>"
+      data-txt-delete-failed-generic="<?php echo t_h('attachments.errors.deletion_failed_generic', [], 'Deletion failed.'); ?>"
+      data-txt-confirm-action="<?php echo t_h('common.confirm_action', [], 'Confirm Action'); ?>"
+      data-txt-delete-button="<?php echo t_h('common.delete', [], 'Delete'); ?>"
+      data-txt-cancel="<?php echo t_h('common.cancel', [], 'Cancel'); ?>"
+      data-filesize-units="<?php echo htmlspecialchars(json_encode([
+          t('attachments.size.units.bytes', [], 'bytes'),
+          t('attachments.size.units.kb', [], 'KB'),
+          t('attachments.size.units.mb', [], 'MB'),
+          t('attachments.size.units.gb', [], 'GB'),
+      ]), ENT_QUOTES); ?>">
+    <?php include __DIR__ . '/../icon_sidebar.php'; ?>
+    
+    <!-- Global configuration (CSP compliant) -->
+    <script type="application/json" id="poznote-config"><?php
+        echo json_encode([
+            'gitSyncAutoPush' => ($showGitSync && $gitSync->isAutoPushEnabled()),
+            'dateTimeFormat' => getUserDateTimeFormat()
+        ], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP) ?: '{}';
+    ?></script>
+    <script src="js/error-handler.js?v=<?php echo $v; ?>"></script>
+    
+    <?php
+    // Built server-side rather than through navigation.js's goBackToNote():
+    // this page does not load that script, and the note id and workspace are
+    // already known here.
+    $backParams = ['note' => $note_id];
+    if ($workspace) {
+        $backParams['workspace'] = $workspace;
+    }
+    $backToNoteUrl = 'index.php?' . http_build_query($backParams);
+    ?>
+    <div class="poznote-back-to-note-bar attachments-back-to-note-bar">
+        <a href="<?php echo htmlspecialchars($backToNoteUrl, ENT_QUOTES, 'UTF-8'); ?>" class="poznote-back-to-note-btn">
+            <i class="lucide lucide-arrow-left"></i>
+            <?php echo t_h('info.actions.back_to_note', [], 'Go back to the note'); ?>
+        </a>
+    </div>
+
+    <div class="settings-container">
+        <!-- Upload Section -->
+        <div class="settings-section">
+            <h3><?php echo t_h('attachments.page.upload_section_title'); ?></h3>
+            
+            <div class="attachment-upload-section">
+                <div class="drag-drop-info"><?php echo t_h('attachments.page.drag_drop_info'); ?></div><br>
+                <div class="form-group">
+                    <input type="file" id="attachmentFile" class="file-input">
+                    <div class="accepted-types">
+                        <?php echo t_h('attachments.page.all_types_accepted'); ?>
+                    </div>
+                    <?php if (poznoteSaasNoticesEnabled()): ?>
+                    <div class="attachment-usage-notice">
+                        <i class="lucide lucide-alert-triangle"></i>
+                        <span><?php echo t_h('attachments.page.note_taking_notice', [], 'You can store media, but large files fill up your space quickly.'); ?>
+                            <a href="storage-stats-user.php"><?php echo t_h('attachments.page.note_taking_notice_link', [], 'View my storage'); ?></a></span>
+                    </div>
+                    <?php endif; ?>
+                    <br>
+                    <div class="selected-filename" id="selectedFileName"></div>
+                </div>
+                
+                <button type="button" class="btn btn-primary" id="uploadBtn" disabled>
+                    <?php echo t_h('attachments.page.upload_button'); ?>
+                </button>
+            </div>
+            
+            <div id="uploadProgress" class="upload-progress initially-hidden">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText"><?php echo t_h('attachments.upload.button_uploading', [], 'Uploading...'); ?></div>
+            </div>
+        </div>
+
+        <!-- Attachments List Section -->
+        <div class="settings-section">
+            <h3><?php echo t_h('attachments.page.current_attachments', [], 'Current Attachments'); ?></h3>
+            <div id="attachmentsList" class="attachments-display">
+                <div class="loading-attachments">
+                    <?php echo t_h('attachments.page.loading_attachments', [], 'Loading attachments...'); ?>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom padding for better spacing -->
+        <div class="section-bottom-spacer"></div>
+    </div>
+
+    <script src="<?php echo poznoteAsset('js/date-time-format.js'); ?>"></script>
+    <script src="js/attachments-page.js?v=<?php echo $v; ?>"></script>
+    
+    <!-- Delete Attachment Confirmation Modal -->
+    <div id="deleteAttachmentConfirmModal" class="modal">
+        <div class="modal-content">
+            <h3><?php echo t_h('attachments.modals.delete.title', [], 'Delete Attachment'); ?></h3>
+            <p><?php echo t_h('attachments.modals.delete.message', [], 'Do you want to delete this attachment? This action cannot be undone.'); ?></p>
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel"><?php echo t_h('common.cancel'); ?></button>
+                <button type="button" class="btn-danger"><?php echo t_h('attachments.actions.delete', [], 'Delete'); ?></button>
+            </div>
+        </div>
+    </div>
+    <script src="js/icon-sidebar-toggle.js?v=<?php echo $v; ?>"></script>
+</body>
+</html>

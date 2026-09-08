@@ -1,0 +1,399 @@
+<?php
+/**
+ * GitSyncController - RESTful API controller for Git sync operations
+ * 
+ * Endpoints:
+ *   GET  /api/v1/git-sync/status   - Get sync status and configuration
+ *   POST /api/v1/git-sync/test     - Test Git connection
+ *   POST /api/v1/git-sync/push     - Push notes to Git
+ *   POST /api/v1/git-sync/pull     - Pull notes from Git
+ */
+
+class GitSyncController {
+    private const ASYNC_STALE_AFTER = 7200;
+
+    private $con;
+    
+    public function __construct($con) {
+        $this->con = $con;
+    }
+
+    private function requireActiveAccountOwner(): bool {
+        if (function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser()) {
+            http_response_code(403);
+            $message = function_exists('getActiveAccountOwnerRequiredMessage')
+                ? getActiveAccountOwnerRequiredMessage()
+                : 'This account\'s settings are not accessible because you are not the owner of this account.';
+            echo json_encode(['success' => false, 'error' => $message]);
+            return false;
+        }
+
+        return true;
+    }
+    
+    /**
+     * GET /api/v1/git-sync/status
+     * Get sync status and configuration (without sensitive data)
+     */
+    public function status() {
+        if (!$this->requireActiveAccountOwner()) {
+            return;
+        }
+
+        require_once dirname(__DIR__, 4) . '/GitSync.php';
+        
+        if (!GitSync::isEnabled()) {
+            echo json_encode([
+                'success' => true,
+                'enabled' => false,
+                'message' => 'Git sync is not enabled'
+            ]);
+            return;
+        }
+        
+        $sync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
+        $config = $sync->getConfigStatus();
+        $lastSync = $sync->getLastSyncInfo();
+        
+        echo json_encode([
+            'success' => true,
+            'enabled' => true,
+            'config' => $config,
+            'lastSync' => $lastSync
+        ]);
+    }
+    
+    /**
+     * POST /api/v1/git-sync/test
+     * Test Git connection
+     */
+    public function test() {
+        if (!$this->requireActiveAccountOwner()) {
+            return;
+        }
+
+        require_once dirname(__DIR__, 4) . '/GitSync.php';
+        
+        if (!GitSync::isEnabled()) {
+            http_response_code(403);
+            echo json_encode([
+                'success' => false,
+                'error' => 'Git sync is not enabled'
+            ]);
+            return;
+        }
+        
+        $sync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
+        $result = $sync->testConnection();
+        
+        echo json_encode($result);
+    }
+    
+    /**
+     * POST /api/v1/git-sync/push
+     * Push notes to Git
+     * Body: { "async": true } to run in the background
+     */
+    public function push() {
+        if (!$this->requireActiveAccountOwner()) {
+            return;
+        }
+
+        require_once dirname(__DIR__, 4) . '/GitSync.php';
+        
+        if (!GitSync::isEnabled()) {
+            http_response_code(403);
+            echo json_encode([
+                'success' => false,
+                'error' => 'Git sync is not enabled'
+            ]);
+            return;
+        }
+        
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($input)) $input = [];
+
+        if (!empty($input['async'])) {
+            $this->startAsyncSync('push');
+            return;
+        }
+
+        $sync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
+        $result = $sync->pushNotes();
+
+        // Store result in session for display after page reload if requested
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        $_SESSION['last_sync_result'] = [
+            'action' => 'push',
+            'result' => $result
+        ];
+
+        echo json_encode($result);
+    }
+    
+    /**
+     * POST /api/v1/git-sync/pull
+     * Pull notes from Git
+     * Body: { "async": true } to run in the background
+     */
+    public function pull() {
+        if (!$this->requireActiveAccountOwner()) {
+            return;
+        }
+
+        require_once dirname(__DIR__, 4) . '/GitSync.php';
+        
+        if (!GitSync::isEnabled()) {
+            http_response_code(403);
+            echo json_encode([
+                'success' => false,
+                'error' => 'Git sync is not enabled'
+            ]);
+            return;
+        }
+        
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($input)) $input = [];
+
+        if (!empty($input['async'])) {
+            $this->startAsyncSync('pull');
+            return;
+        }
+
+        $sync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
+        $result = $sync->pullNotes();
+
+        // Store result in session for display after page reload if requested
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        $_SESSION['last_sync_result'] = [
+            'action' => 'pull',
+            'result' => $result
+        ];
+
+        echo json_encode($result);
+    }
+    
+    /**
+     * GET /api/v1/git-sync/progress
+     * Get current sync progress from session
+     */
+    public function progress() {
+        if (!$this->requireActiveAccountOwner()) {
+            return;
+        }
+
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        $progress = $_SESSION['git_sync_progress'] ?? null;
+        $running = $_SESSION['git_sync_running'] ?? null;
+        $result = $_SESSION['git_sync_async_result'] ?? null;
+
+        $stateFile = $_SESSION['git_sync_state_file'] ?? null;
+        if (is_string($stateFile) && is_file($stateFile)) {
+            $state = $this->readAsyncStateFile($stateFile);
+            if (is_array($state)) {
+                $progress = array_key_exists('progress', $state) ? $state['progress'] : $progress;
+                $running = array_key_exists('running', $state) ? $state['running'] : $running;
+                $result = array_key_exists('result', $state) ? $state['result'] : $result;
+
+                if ($running && $this->isAsyncStateStale($state)) {
+                    $running = null;
+                    $result = [
+                        'id' => $state['running']['id'] ?? null,
+                        'action' => $state['running']['action'] ?? 'sync',
+                        'result' => [
+                            'success' => false,
+                            'errors' => [['error' => 'Git sync was interrupted or timed out.']]
+                        ],
+                        'finished' => time()
+                    ];
+                    $state['running'] = null;
+                    $state['result'] = $result;
+                    $this->writeAsyncStateFile($stateFile, $state);
+                }
+
+                if ($result && isset($result['action'], $result['result'])) {
+                    $_SESSION['last_sync_result'] = [
+                        'action' => $result['action'],
+                        'result' => $result['result']
+                    ];
+                    $_SESSION['git_sync_async_result'] = $result;
+                    unset($_SESSION['git_sync_running'], $_SESSION['git_sync_state_file']);
+                    @unlink($stateFile);
+                }
+            }
+        }
+        
+        // If progress is older than 5 minutes and no async job is marked running, consider it stale.
+        if (!$running && $progress && (time() - ($progress['timestamp'] ?? 0) > 300)) {
+            unset($_SESSION['git_sync_progress']);
+            $progress = null;
+        }
+        
+        echo json_encode([
+            'success' => true,
+            'progress' => $progress,
+            'running' => $running,
+            'result' => $result
+        ]);
+        
+        session_write_close();
+    }
+
+    private function startAsyncSync(string $action): void {
+        if (!function_exists('fastcgi_finish_request')) {
+            $sync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
+            $result = $action === 'push' ? $sync->pushNotes() : $sync->pullNotes();
+            $this->storeSyncResult($action, $result);
+            echo json_encode($result);
+            return;
+        }
+
+        ignore_user_abort(true);
+        set_time_limit(0);
+
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        $stateFile = $this->getAsyncStateFile();
+
+        $existingState = $this->readAsyncStateFile($stateFile);
+        if ($existingState && !empty($existingState['running']) && !$this->isAsyncStateStale($existingState)) {
+            http_response_code(409);
+            echo json_encode([
+                'success' => false,
+                'error' => 'A Git sync is already running.',
+                'running' => $existingState['running']
+            ]);
+            session_write_close();
+            return;
+        }
+
+        $jobId = bin2hex(random_bytes(12));
+        $running = [
+            'id' => $jobId,
+            'action' => $action,
+            'started' => time()
+        ];
+
+        $this->writeAsyncStateFile($stateFile, [
+            'running' => $running,
+            'progress' => null,
+            'result' => null
+        ]);
+        unset($_SESSION['git_sync_progress'], $_SESSION['git_sync_async_result']);
+        $_SESSION['git_sync_state_file'] = $stateFile;
+        $_SESSION['git_sync_running'] = $running;
+        session_write_close();
+
+        echo json_encode([
+            'success' => true,
+            'started' => true,
+            'action' => $action,
+            'id' => $jobId,
+            'startedAt' => $running['started']
+        ]);
+        fastcgi_finish_request();
+
+        $sync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
+        $sync->setProgressStateFile($stateFile);
+        $result = $action === 'push' ? $sync->pushNotes() : $sync->pullNotes();
+        $this->storeAsyncFileResult($stateFile, $jobId, $action, $result);
+    }
+
+    private function storeSyncResult(string $action, array $result): void {
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        $_SESSION['last_sync_result'] = [
+            'action' => $action,
+            'result' => $result
+        ];
+        $_SESSION['git_sync_async_result'] = [
+            'action' => $action,
+            'result' => $result,
+            'finished' => time()
+        ];
+        unset($_SESSION['git_sync_running']);
+        session_write_close();
+    }
+
+    private function storeAsyncFileResult(string $stateFile, string $jobId, string $action, array $result): void {
+        $state = $this->readAsyncStateFile($stateFile) ?: [];
+
+        $state['running'] = null;
+        $state['result'] = [
+            'id' => $jobId,
+            'action' => $action,
+            'result' => $result,
+            'finished' => time()
+        ];
+        $this->writeAsyncStateFile($stateFile, $state);
+    }
+
+    private function getAsyncStateFile(): string {
+        $sessionId = session_id() ?: bin2hex(random_bytes(16));
+        return rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'poznote_git_sync_' . hash('sha256', $sessionId) . '.json';
+    }
+
+    private function readAsyncStateFile(string $stateFile): array {
+        if (!is_file($stateFile)) return [];
+        $decoded = json_decode((string) @file_get_contents($stateFile), true);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    private function writeAsyncStateFile(string $stateFile, array $state): void {
+        $tmpFile = $stateFile . '.' . getmypid() . '.tmp';
+        @file_put_contents($tmpFile, json_encode($state), LOCK_EX);
+        @rename($tmpFile, $stateFile);
+    }
+
+    private function isAsyncStateStale(array $state): bool {
+        $progressTimestamp = (int) ($state['progress']['timestamp'] ?? 0);
+        $startedTimestamp = (int) ($state['running']['started'] ?? 0);
+        $lastActivity = max($progressTimestamp, $startedTimestamp);
+        return $lastActivity > 0 && (time() - $lastActivity) > self::ASYNC_STALE_AFTER;
+    }
+    
+    /**
+     * PUT /api/v1/git-sync/config
+     * Save per-user Git sync configuration
+     * Body: { "provider": "github", "repo": "owner/repo", "token": "...", "branch": "main", "api_base": "", "author_name": "...", "author_email": "...", "workspaces": ["Homelab"] }
+     * "workspaces" restricts sync to the listed workspaces; null or an empty list syncs all of them.
+     */
+    public function saveConfig() {
+        if (!$this->requireActiveAccountOwner()) {
+            return;
+        }
+
+        require_once dirname(__DIR__, 4) . '/GitSync.php';
+        
+        if (!GitSync::isEnabled()) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Git sync is not enabled']);
+            return;
+        }
+        
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (!$input) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Invalid JSON body']);
+            return;
+        }
+        
+        $sync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
+        $result = $sync->saveUserGitConfig($input);
+
+        if (array_key_exists('workspaces', $input)) {
+            $workspaces = $input['workspaces'];
+            $result = $sync->setSyncedWorkspaces(is_array($workspaces) ? $workspaces : null) && $result;
+        }
+
+        echo json_encode([
+            'success' => $result,
+            'config' => $sync->getConfigStatus()
+        ]);
+    }
+}
