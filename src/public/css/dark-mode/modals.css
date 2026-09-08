@@ -428,7 +428,6 @@ html[data-theme='dark'] #moveNotesModal .modal-content label {
 
 html[data-theme='dark'] #moveNotesModal select {
     background-color: var(--dm-surface);
-    color: var(--dm-text);
     border-color: var(--dm-border);
 }
 
@@ -459,9 +458,7 @@ html[data-theme='dark'] #moveNoteFolderModal .move-note-inline-create-toggle:hov
 }
 
 html[data-theme='dark'] #moveNoteFolderModal .move-note-inline-create button.btn-cancel {
-    background-color: var(--dm-surface);
     border-color: var(--dm-border);
-    color: var(--dm-text);
 }
 
 html[data-theme='dark'] #moveNoteFolderModal .move-note-inline-create button.btn-cancel:hover {
@@ -469,9 +466,7 @@ html[data-theme='dark'] #moveNoteFolderModal .move-note-inline-create button.btn
 }
 
 html[data-theme='dark'] #moveNoteFolderModal .move-note-recent-folder {
-    background: var(--dm-surface);
     border-color: var(--dm-border);
-    color: var(--dm-text);
 }
 
 html[data-theme='dark'] #moveNoteFolderModal .move-note-recent-folder:hover,
@@ -613,6 +608,7 @@ html[data-theme='dark'] #fontSizeModal .modal-buttons .btn-primary {
     color: var(--pz-text-inverse) !important;
     border-color: var(--dm-danger-hover) !important;
 }
+
 html[data-theme='dark'] #fontSizeModal .modal-buttons .btn-primary:hover {
     background-color: var(--dm-danger-hover) !important;
     border-color: var(--dm-danger-hover) !important;
@@ -678,11 +674,6 @@ html[data-theme='dark'] .custom-alert-content {
     background-color: var(--dm-surface);
     color: var(--dm-text);
     border: 1px solid var(--dm-border);
-}
-
-html[data-theme='dark'] .import-confirm-modal-content h3,
-html[data-theme='dark'] .custom-alert-content h3 {
-    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .import-confirm-modal-content p,
@@ -870,10 +861,6 @@ html[data-theme='dark'] #updateModal .modal-content p {
 html[data-theme='dark'] #updateModal .backup-warning {
     background-color: var(--dm-content-bg);
     border-color: var(--dm-warning-soft);
-}
-
-html[data-theme='dark'] #updateModal .backup-warning p {
-    color: var(--dm-text) !important;
 }
 
 /* Update Check Modal Specific */

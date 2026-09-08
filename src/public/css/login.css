@@ -436,10 +436,6 @@ html[data-theme='dark'] body {
     --text-muted: #a0aec0;
 }
 
-html[data-theme='dark'] .login-title {
-    color: var(--dm-text);
-}
-
 html[data-theme='dark'] label,
 html[data-theme='dark'] .remember-me-label {
     color: var(--dm-text);
@@ -449,11 +445,6 @@ html[data-theme='dark'] input[type="text"],
 html[data-theme='dark'] input[type="password"] {
     background-color: var(--dm-surface);
     border-color: var(--dm-border);
-    color: var(--dm-text);
-}
-
-html[data-theme='dark'] .password-toggle {
-    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .password-toggle:hover {
@@ -464,11 +455,6 @@ html[data-theme='dark'] input[type="text"]:focus,
 html[data-theme='dark'] input[type="password"]:focus {
     border-color: var(--dm-accent);
     box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.18);
-}
-
-html[data-theme='dark'] input[type="text"]::placeholder,
-html[data-theme='dark'] input[type="password"]::placeholder {
-    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .github-link a {
@@ -490,11 +476,6 @@ html[data-theme='dark'] .admin-warning code {
     color: var(--pz-text-inverse);
 }
 
-html[data-theme='dark'] .account-select-intro,
-html[data-theme='dark'] .account-select-logout {
-    color: var(--dm-text-muted);
-}
-
 html[data-theme='dark'] .account-select-logout:hover {
     color: var(--dm-accent);
 }
@@ -502,7 +483,6 @@ html[data-theme='dark'] .account-select-logout:hover {
 html[data-theme='dark'] .account-option {
     background: var(--dm-surface);
     border-color: var(--dm-border);
-    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .account-option:hover,
@@ -522,7 +502,6 @@ html[data-theme='dark'] .oidc-divider::after {
 }
 
 html[data-theme='dark'] .oidc-divider span {
-    color: var(--dm-text-muted);
     background: var(--dm-bg);
 }
 

@@ -93,6 +93,7 @@
 
 @keyframes direct-copy-restore-spin {
     from { transform: rotate(0deg); }
+
     to { transform: rotate(360deg); }
 }
 
@@ -199,11 +200,6 @@ html[data-theme='dark'] .custom-alert-content {
 
 html[data-theme='dark'] .import-confirm-modal .import-confirm-modal-content h3 {
     color: var(--dm-text-bright);
-}
-
-html[data-theme='dark'] .import-confirm-modal .import-confirm-modal-content p,
-html[data-theme='dark'] .custom-alert-content p {
-    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .direct-copy-restore-processing {

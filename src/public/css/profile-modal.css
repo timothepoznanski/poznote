@@ -138,26 +138,15 @@ html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) {
 
 html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) .modal-content {
     background-color: var(--dm-content-bg);
-    color: var(--dm-text);
-}
-
-html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) .modal-content h3 {
-    color: var(--dm-accent);
-}
-
-html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) .text-small-muted {
-    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) input {
     background-color: var(--dm-surface);
-    color: var(--dm-text);
     border-color: var(--dm-border);
 }
 
 html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-cancel {
     background-color: var(--dm-surface);
-    color: var(--dm-text);
 }
 
 html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-cancel:hover {

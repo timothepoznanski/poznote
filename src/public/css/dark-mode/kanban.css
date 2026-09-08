@@ -12,7 +12,6 @@ html[data-theme='dark'] .kanban-column-header {
 
 html[data-theme='dark'] .kanban-column-count {
     background: var(--dm-surface);
-    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .kanban-add-card-btn:hover {
@@ -109,7 +108,6 @@ html[data-theme='dark'] .kanban-scroll-btn:hover {
 
 html[data-theme='dark'] .kanban-scroll-btn-header {
     background: var(--dm-surface);
-    color: var(--dm-text-muted);
     border-color: var(--dm-border);
 }
 
@@ -133,7 +131,6 @@ html[data-theme='dark'] .kanban-board::-webkit-scrollbar-thumb:hover {
 
 html[data-theme='dark'] .kanban-column-content.drag-over,
 html[data-theme='dark'] .kanban-subfolder-content.drag-over {
-    background: var(--dm-surface);
     border-color: var(--dm-accent);
 }
 
@@ -170,7 +167,6 @@ html[data-theme='dark'] .kanban-completed-toggle {
 
 html[data-theme='dark'] .kanban-completed-count {
     background: var(--dm-border);
-    color: var(--dm-text-muted);
 }
 
 /* ===== Nested subfolder groups ===== */
@@ -185,7 +181,6 @@ html[data-theme='dark'] .kanban-subfolder-toggle:hover {
 
 html[data-theme='dark'] .kanban-subfolder-count {
     background: var(--dm-border);
-    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .kanban-subfolder-section.is-expanded > .kanban-subfolder-content:empty {

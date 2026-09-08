@@ -29,7 +29,9 @@
 
 @keyframes pulse {
     0% { transform: scale(1); }
+
     50% { transform: scale(1.1); }
+
     100% { transform: scale(1); }
 }
 
@@ -84,9 +86,13 @@ body.settings-page {
 
 @keyframes heartbeat {
     0% { opacity: 1; transform: scale(1); }
+
     25% { opacity: 0.6; transform: scale(0.9); }
+
     50% { opacity: 1; transform: scale(1); }
+
     75% { opacity: 0.6; transform: scale(0.9); }
+
     100% { opacity: 1; transform: scale(1); }
 }
 
@@ -733,10 +739,6 @@ html[data-theme='dark'] .settings-view-toggle:hover {
         border-color: var(--dm-border);
     }
 
-    html[data-theme='dark'] .home-container.settings-with-nav .home-card::before {
-        background: var(--dm-surface-hover);
-    }
-
     html[data-theme='dark'] .home-container.settings-with-nav .home-card + .home-card::after {
         background: var(--dm-border);
     }
@@ -746,9 +748,8 @@ html[data-theme='dark'] .settings-view-toggle:hover {
     }
 
     html[data-theme='dark'] .settings-nav-item:hover {
-        background: var(--dm-surface-hover);
-        color: var(--dm-text);
-    }
+    background: var(--dm-surface-hover);
+}
 
     html[data-theme='dark'] .settings-nav-item.is-active {
         background: rgba(var(--dm-accent-rgb), 0.16);
@@ -756,9 +757,8 @@ html[data-theme='dark'] .settings-view-toggle:hover {
     }
 
     html[data-theme='dark'] .home-container.settings-with-nav .settings-toggle-card .setting-status {
-        background: var(--dm-border-light);
-        color: transparent;
-    }
+    color: transparent;
+}
 
     html[data-theme='dark'] .home-container.settings-with-nav .settings-toggle-card .setting-status::after {
         background: #e5e7eb;

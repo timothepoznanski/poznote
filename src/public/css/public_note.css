@@ -729,7 +729,6 @@ html[data-theme='dark'] .theme-toggle-btn {
 }
 
 html[data-theme='dark'] .theme-toggle-btn:hover {
-    background: var(--dm-surface-hover);
     border-color: var(--dm-border-light);
 }
 

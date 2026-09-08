@@ -21,14 +21,6 @@ html[data-theme='dark'] .home-card:hover {
     border-color: var(--pz-accent);
 }
 
-html[data-theme='dark'] .home-card-title {
-    color: var(--dm-text);
-}
-
-html[data-theme='dark'] .home-card-description {
-    color: var(--dm-text-muted);
-}
-
 html[data-theme='dark'] .home-card-icon {
     background: rgba(var(--pz-accent-rgb), 0.2);
 }

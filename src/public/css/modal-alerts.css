@@ -49,10 +49,6 @@ html[data-theme='dark'] .note-creation-loading-dialog {
     box-shadow: 0 18px 40px rgba(var(--pz-shadow-rgb), 0.42);
 }
 
-html[data-theme='dark'] .note-creation-loading-content {
-    color: var(--dm-text-muted);
-}
-
 .alert-modal-overlay {
     position: fixed;
     top: 0;
@@ -304,7 +300,9 @@ html[data-theme='dark'] .alert-modal-button.primary.snapshot-restore-confirm-but
 /* Base animation for indeterminate progress bars */
 @keyframes indeterminate-progress {
     0% { left: -30%; width: 30%; }
+
     50% { left: 40%; width: 60%; }
+
     100% { left: 100%; width: 30%; }
 }
 
@@ -378,6 +376,7 @@ html[data-theme='dark'] .spinner,
     text-align: left;
     white-space: normal;
 }
+
 .admin-contact-option {
     display: flex;
     gap: 12px;
@@ -387,6 +386,7 @@ html[data-theme='dark'] .spinner,
     border-radius: 10px;
     background: var(--pz-surface);
 }
+
 .admin-contact-option > .lucide {
     flex: none;
     margin-top: 3px;
@@ -394,17 +394,20 @@ html[data-theme='dark'] .spinner,
     color: var(--pz-accent);
     background-color: var(--pz-accent);
 }
+
 .admin-contact-option-title {
     display: block;
     font-weight: 600;
     margin-bottom: 3px;
 }
+
 .admin-contact-option-desc {
     display: block;
     color: var(--pz-text-muted);
     font-size: 0.92rem;
     line-height: 1.45;
 }
+
 .admin-contact-option a {
     display: inline-flex;
     align-items: center;
@@ -414,12 +417,15 @@ html[data-theme='dark'] .spinner,
     font-weight: 600;
     text-decoration: none;
 }
+
 .admin-contact-option a:hover {
     text-decoration: underline;
 }
+
 .admin-contact-option a .lucide {
     font-size: 0.85em;
 }
+
 .admin-contact-email-row {
     display: flex;
     align-items: center;
@@ -427,6 +433,7 @@ html[data-theme='dark'] .spinner,
     margin-top: 8px;
     flex-wrap: wrap;
 }
+
 .admin-contact-email {
     font-weight: 600;
     padding: 4px 10px;
@@ -434,6 +441,7 @@ html[data-theme='dark'] .spinner,
     border-radius: 6px;
     background: var(--pz-bg);
 }
+
 .admin-contact-copy {
     display: inline-flex;
     align-items: center;
@@ -447,21 +455,20 @@ html[data-theme='dark'] .spinner,
     font-size: 0.85rem;
     color: inherit;
 }
+
 .admin-contact-copy:hover {
     border-color: var(--pz-accent);
     color: var(--pz-accent);
 }
+
 .admin-contact-copy .lucide {
     font-size: 0.9em;
 }
+
 html[data-theme='dark'] .admin-contact-option {
     background: var(--dm-surface, var(--dm-content-bg));
     border-color: var(--dm-border, var(--dm-border));
-}
-html[data-theme='dark'] .admin-contact-option-desc {
-    color: var(--dm-text-muted);
-}
-html[data-theme='dark'] .admin-contact-email,
+}html[data-theme='dark'] .admin-contact-email,
 html[data-theme='dark'] .admin-contact-copy {
     background: transparent;
     border-color: var(--dm-border, var(--dm-border));

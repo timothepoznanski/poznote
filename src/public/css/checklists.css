@@ -109,12 +109,6 @@
     color: var(--pz-text-subtle);
 }
 
-/* Dark mode */
-html[data-theme='dark'] .checklist-item-checked > .checklist-text,
-html[data-theme='dark'] .checklist-checkbox:checked+.checklist-text {
-    color: var(--dm-text-subtle);
-}
-
 /* Nested checklist indentation */
 .checklist-item .checklist {
     margin-top: 4px;

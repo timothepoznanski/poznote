@@ -71,13 +71,6 @@ html[data-theme='dark'] .markdown-preview table th {
     font-weight: bold;
 }
 
-html[data-theme='dark'] .noteentry table tr:nth-child(even),
-html[data-theme='dark'] .noteentry table tr:nth-child(even) td,
-html[data-theme='dark'] .markdown-preview table tr:nth-child(even),
-html[data-theme='dark'] .markdown-preview table tr:nth-child(even) td {
-    background-color: var(--dm-surface);
-}
-
 html[data-theme='dark'] .markdown-preview a {
     color: var(--dm-accent);
 }

@@ -109,7 +109,6 @@ html[data-theme='dark'] .noteentry code[class*="language-"] {
 html[data-theme='dark'] p.code-block-placeholder-before[data-ph]:empty:before,
 html[data-theme='dark'] p.code-block-placeholder-after[data-ph]:empty:before,
 html[data-theme='dark'] .excalidraw-placeholder[data-ph]:empty:before {
-    color: var(--dm-text-subtle) !important;
     opacity: 0.6;
 }
 
@@ -125,7 +124,6 @@ html[data-theme='dark'] .noteentry pre .code-block-line-numbers-btn,
 html[data-theme='dark'] .code-block-actions-host > .code-block-line-numbers-btn {
     background: transparent !important;
     border: none !important;
-    color: var(--dm-text-muted) !important;
     opacity: 0.55 !important;
 }
 
@@ -194,17 +192,11 @@ html[data-theme='dark'] .note-attachment-preview {
 
 html[data-theme='dark'] .note-attachment-preview-file-card:hover,
 html[data-theme='dark'] .note-attachment-preview-file-card:focus {
-    background: var(--dm-surface-hover);
     color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .note-attachment-preview-caption {
     border-top-color: var(--dm-border);
-    color: var(--dm-text-muted);
-}
-
-html[data-theme='dark'] .note-attachment-preview-caption a {
-    color: var(--dm-text) !important;
 }
 
 html[data-theme='dark'] .note-attachment-preview-caption a:hover,
@@ -329,7 +321,6 @@ html[data-theme='dark'] .font-size-popup .font-size-item:hover {
 
 html[data-theme='dark'] .font-size-popup .size-preview {
     border-color: var(--dm-border);
-    color: var(--dm-text);
     background-color: var(--dm-content-bg);
 }
 

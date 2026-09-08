@@ -177,10 +177,6 @@ html[data-theme='dark'] .tag-color-filter-swatch.active {
     border-color: #e2e8f0;
 }
 
-html[data-theme='dark'] .tag-color-filter-clear {
-    color: var(--dm-text-muted);
-}
-
 html[data-theme='dark'] .tag-color-filter-clear:hover {
     color: var(--dm-text-bright);
 }

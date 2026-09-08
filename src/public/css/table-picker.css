@@ -160,10 +160,6 @@ html[data-theme='dark'] .table-context-menu-item {
     color: var(--dm-text-bright);
 }
 
-html[data-theme='dark'] .table-context-menu-item:hover {
-    background: var(--dm-surface-hover);
-}
-
 html[data-theme='dark'] .table-context-menu-item.danger {
     color: var(--dm-danger);
 }

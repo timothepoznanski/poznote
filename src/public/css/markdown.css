@@ -821,7 +821,6 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
     justify-content: flex-start;
 }
 
-
 /* Mermaid diagrams */
 .mermaid {
     margin: 1em 0;
@@ -1053,7 +1052,6 @@ body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
 html[data-theme='dark'] body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor-container,
 html[data-theme='dark'] body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
     border-color: var(--dm-border);
-    background: var(--dm-content-bg);
 }
 
 /* Scrollbar styling for split view columns */

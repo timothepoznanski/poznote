@@ -231,10 +231,6 @@ body.notes-manager-page {
     --muted-color: #888888;
 }
 
-html[data-theme='dark'] .nm-filter-bar .clear-filter-btn {
-    color: var(--dm-text-muted);
-}
-
 html[data-theme='dark'] .nm-selected-count {
     color: var(--pz-text-inverse);
 }
@@ -246,10 +242,6 @@ html[data-theme='dark'] .nm-note-link {
 html[data-theme='dark'] .nm-tag-chip {
     background: var(--dm-surface);
     color: var(--dm-text-muted);
-}
-
-html[data-theme='dark'] .nm-folder-option:hover {
-    background: var(--dm-surface-hover);
 }
 
 html[data-theme='dark'] .nm-folder-option-selected {
@@ -444,6 +436,7 @@ html[data-theme='dark'] .nm-folder-option-selected {
 .nm-note-tags:has(.nm-tag-chip:nth-child(4)) .nm-tag-chip:nth-child(n+4) {
     display: none;
 }
+
 .nm-note-tags:has(.nm-tag-chip:nth-child(4))::after {
     content: '…';
     font-size: 12px;
@@ -616,13 +609,21 @@ html[data-theme='dark'] .nm-folder-option-selected {
 /* ── Responsive ───────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
     body.notes-manager-page    { padding: 10px; }
+
     .notes-manager-container   { padding: 10px; }
+
     .nm-folder-header          { padding: 10px; }
+
     .nm-note-row               { padding: 8px 10px; }
+
     .nm-note-meta              { display: none; }
+
     .nm-bulk-bar               { align-items: stretch; }
+
     .nm-bulk-actions           { width: 100%; }
+
     #nmBulkBar .nm-bulk-btn    { flex: 1 1 100%; justify-content: center; }
+
     .nm-bulk-select            { width: 100%; }
 
     /* Fix note layout to keep checkbox and title/tags on the same line */
@@ -632,6 +633,7 @@ html[data-theme='dark'] .nm-folder-option-selected {
         padding-top: 12px;
         padding-bottom: 12px;
     }
+
     
     .nm-note-checkbox {
         margin-top: 3px;

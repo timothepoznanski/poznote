@@ -388,10 +388,6 @@ html[data-theme='dark'] .outline-header {
     border-bottom-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .outline-title {
-    color: var(--dm-text-muted);
-}
-
 html[data-theme='dark'] .outline-nav-link {
     color: var(--dm-text-bright);
 }
@@ -410,10 +406,6 @@ html[data-theme='dark'] .outline-nav-link.active {
     color: var(--dm-accent);
 }
 
-html[data-theme='dark'] .outline-empty {
-    color: var(--dm-text-subtle);
-}
-
 html[data-theme='dark'] .outline-resize-handle {
     background: var(--dm-bg);
     border-left-color: var(--dm-border);
@@ -422,7 +414,6 @@ html[data-theme='dark'] .outline-resize-handle {
 html[data-theme='dark'] .toggle-outline-btn {
     background: var(--dm-sidebar-surface);
     border-color: var(--dm-border);
-    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .toggle-outline-btn:hover {
@@ -433,14 +424,11 @@ html[data-theme='dark'] .toggle-outline-btn:hover {
 html[data-theme='dark'] .toggle-outline-btn:disabled,
 html[data-theme='dark'] .toggle-outline-btn[aria-disabled="true"] {
     background: var(--dm-sidebar-surface);
-    border-color: var(--dm-border);
-    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .toggle-outline-btn:disabled:hover,
 html[data-theme='dark'] .toggle-outline-btn[aria-disabled="true"]:hover {
     background: var(--dm-sidebar-surface);
-    color: var(--dm-text-subtle);
 }
 
 .heading-anchor--floating {
