@@ -40,7 +40,7 @@ body.tasks-page {
 
 .tasks-progress-label {
     font-size: 13px;
-    color: #666;
+    color: var(--pz-text-muted);
     white-space: nowrap;
     order: 3;
     flex-shrink: 0;
@@ -72,7 +72,7 @@ body.tasks-page {
     order: 4;
     flex-shrink: 0;
     font-size: 13px;
-    color: #666;
+    color: var(--pz-text-muted);
     white-space: nowrap;
     cursor: pointer;
     user-select: none;
@@ -164,7 +164,7 @@ body.tasks-page {
     border: none;
     padding: 6px 8px;
     cursor: pointer;
-    color: #666;
+    color: var(--pz-text-muted);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -242,7 +242,7 @@ body.tasks-page {
     border: none;
     border-radius: 4px;
     background: transparent;
-    color: #888;
+    color: var(--pz-text-muted);
     font-size: 16px;
     cursor: pointer;
     flex-shrink: 0;
@@ -283,7 +283,7 @@ body.tasks-page {
     align-items: center;
     gap: 5px;
     font-size: 11px;
-    color: #666;
+    color: var(--pz-text-muted);
     background-color: #f0f0f0;
     padding: 2px 8px;
     border-radius: 4px;
@@ -312,7 +312,7 @@ body.tasks-page {
 .tasks-note-count {
     margin-left: auto;
     font-size: 12px;
-    color: #888;
+    color: var(--pz-text-muted);
     white-space: nowrap;
 }
 
@@ -359,7 +359,7 @@ body.tasks-page {
 }
 
 .tasks-task-item.completed .tasks-task-text {
-    color: #999;
+    color: var(--pz-text-subtle);
     text-decoration: line-through;
 }
 
@@ -383,7 +383,7 @@ body.tasks-page {
     border: none;
     border-radius: 4px;
     background: transparent;
-    color: #999;
+    color: var(--pz-text-subtle);
     font-size: 14px;
     cursor: pointer;
     flex-shrink: 0;
@@ -405,7 +405,7 @@ body.tasks-page {
     border: 1px solid #d0d7de;
     border-radius: 12px;
     background: #f6f8fa;
-    color: #57606a;
+    color: var(--pz-text-secondary);
     font-size: 12px;
     font-family: inherit;
     line-height: 1.4;
@@ -581,7 +581,7 @@ body.tasks-page {
     text-align: center;
     border-radius: 50%;
     font-size: 12px;
-    color: #555;
+    color: var(--pz-text-secondary);
     flex-shrink: 0;
 }
 
@@ -592,7 +592,7 @@ body.tasks-page {
 }
 
 .tasks-cal-day.other-month .tasks-cal-day-num {
-    color: #bbb;
+    color: var(--pz-text-subtle);
 }
 
 .tasks-cal-day.other-month .tasks-cal-chip {
@@ -684,14 +684,14 @@ body.tasks-page {
 }
 
 .tasks-cal-modal-empty {
-    color: #666;
+    color: var(--pz-text-muted);
     font-size: 13px;
     margin: 0 0 10px 0;
 }
 
 .tasks-task-note-badge {
     font-size: 11px;
-    color: #666;
+    color: var(--pz-text-muted);
     background-color: #f0f0f0;
     padding: 2px 8px;
     border-radius: 4px;
@@ -743,7 +743,7 @@ body.tasks-page {
 .empty-message {
     text-align: center;
     margin-top: 50px;
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 .error-message {
@@ -755,7 +755,7 @@ body.tasks-page {
 .loading-spinner {
     text-align: center;
     padding: 40px;
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 /* Mobile: dated tasks show the due date on the first line, then the task

@@ -59,7 +59,7 @@ body {
 }
 
 .login-title {
-    color: #252526;
+    color: var(--pz-text);
     font-size: 1.875rem;
     font-weight: 600;
     margin: 0;
@@ -75,7 +75,7 @@ body {
 label {
     display: block;
     margin-bottom: 0.5rem;
-    color: #4a5568;
+    color: var(--pz-text-secondary);
     font-weight: 500;
     font-size: 0.875rem;
 }
@@ -110,7 +110,7 @@ input[type="password"] {
     border: none;
     padding: 0.5rem;
     margin: 0;
-    color: #a0aec0;
+    color: var(--pz-text-subtle);
     cursor: pointer;
     transition: color 0.2s ease;
     display: flex;
@@ -122,7 +122,7 @@ input[type="password"] {
 
 .password-toggle:hover,
 .password-toggle:focus {
-    color: #4a5568;
+    color: var(--pz-text-secondary);
 }
 
 .password-toggle i {
@@ -138,7 +138,7 @@ input[type="password"]:focus {
 
 input[type="text"]::placeholder,
 input[type="password"]::placeholder {
-    color: #a0aec0;
+    color: var(--pz-text-subtle);
 }
 
 .remember-me-group {
@@ -150,7 +150,7 @@ input[type="password"]::placeholder {
     align-items: center;
     cursor: pointer;
     font-weight: 400;
-    color: #4a5568;
+    color: var(--pz-text-secondary);
     font-size: 0.875rem;
     margin-bottom: 0;
 }
@@ -200,7 +200,7 @@ input[type="password"]::placeholder {
 }
 
 .oidc-divider span {
-    color: #718096;
+    color: var(--pz-text-muted);
     font-size: 0.875rem;
     font-weight: 500;
     background: white;
@@ -264,7 +264,7 @@ input[type="password"]::placeholder {
 }
 
 .account-select-intro {
-    color: #4a5568;
+    color: var(--pz-text-secondary);
     font-size: 0.95rem;
     line-height: 1.5;
     margin: 0 0 1rem;
@@ -296,7 +296,7 @@ input[type="password"]::placeholder {
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     background: var(--pz-bg);
-    color: #252526;
+    color: var(--pz-text);
     font: inherit;
     cursor: pointer;
     text-align: left;
@@ -333,7 +333,7 @@ input[type="password"]::placeholder {
 .account-select-logout {
     display: block;
     margin-top: 1rem;
-    color: #4a5568;
+    color: var(--pz-text-secondary);
     font-size: 0.9rem;
     text-align: center;
     text-decoration: none;
@@ -379,7 +379,7 @@ input[type="password"]::placeholder {
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     font-size: 0.875rem;
-    color: #4a5568;
+    color: var(--pz-text-secondary);
     line-height: 1.5;
     text-align: left;
 }

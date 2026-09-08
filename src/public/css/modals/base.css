@@ -198,7 +198,7 @@
 .modal-buttons button.btn-primary:disabled,
 .modal-buttons button.btn-primary:disabled:hover {
     background-color: #eceff3;
-    color: #9aa5b1;
+    color: var(--pz-text-subtle);
     border: 1px solid #dfe3e8;
     cursor: not-allowed;
     opacity: 1;
@@ -488,7 +488,7 @@ html[data-theme='dark'] .modal .modal-info-note {
     border: 1px dashed #cbd5e1;
     border-radius: 7px;
     background: transparent;
-    color: #4b5563 !important;
+    color: var(--pz-text-secondary) !important;
     font-size: 13px;
     cursor: pointer;
     transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
@@ -544,7 +544,7 @@ html[data-theme='dark'] .modal .modal-info-note {
     margin-right: auto;
     border: 1px solid var(--pz-border-strong);
     background: transparent;
-    color: #374151;
+    color: var(--pz-text);
     cursor: pointer;
     transition: border-color 0.15s ease, background-color 0.15s ease;
 }
@@ -706,7 +706,7 @@ html[data-theme='dark'] .modal .modal-info-note {
 
 .modal .btn-disabled {
     background: #cccccc !important;
-    color: #888888 !important;
+    color: var(--pz-text-muted) !important;
     border: none;
     padding: 8px 12px;
     border-radius: 6px;

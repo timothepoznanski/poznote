@@ -13,7 +13,7 @@
 }
 
 #customCssModal p {
-    color: #666;
+    color: var(--pz-text-muted);
     font-size: 0.95rem;
     line-height: 1.5;
     margin-bottom: 25px;
@@ -27,7 +27,7 @@
 }
 
 .no-css-text {
-    color: #888;
+    color: var(--pz-text-muted);
     font-size: 0.9rem;
     padding: 15px;
     background: rgba(0, 0, 0, 0.03);

@@ -14,7 +14,7 @@
 .loading-attachments {
     text-align: center;
     padding: 40px;
-    color: #666;
+    color: var(--pz-text-muted);
     font-style: italic;
 }
 
@@ -26,7 +26,7 @@
 .no-attachments {
     text-align: center;
     padding: 40px;
-    color: #999;
+    color: var(--pz-text-subtle);
     font-style: italic;
 }
 
@@ -117,7 +117,7 @@
     display: flex;
     gap: 15px;
     font-size: 13px;
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 .attachment-actions {

@@ -44,7 +44,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.4px;
-    color: #667085;
+    color: var(--pz-text-muted);
     opacity: 0.9;
 }
 
@@ -66,7 +66,7 @@
     border-radius: 6px;
     cursor: pointer;
     font-size: 13px;
-    color: #344054;
+    color: var(--pz-text);
     font-weight: 500;
     text-align: left;
     line-height: 1.3;
@@ -164,7 +164,7 @@
     margin: 0;
     font-size: 13px;
     line-height: 1.5;
-    color: #667085;
+    color: var(--pz-text-muted);
     white-space: pre-line;
 }
 
@@ -238,7 +238,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    color: #475467;
+    color: var(--pz-text-secondary);
 }
 
 .snapshot-meta-item .lucide {
@@ -250,7 +250,7 @@
 .snapshot-meta-title {
     max-width: 100%;
     align-items: flex-start;
-    color: #1d2939;
+    color: var(--pz-text);
     font-size: 17px;
     font-weight: 700;
     line-height: 1.28;
@@ -297,7 +297,7 @@
     border: 1px solid #e5e5e5;
     border-radius: 8px;
     background: #fcfcfc;
-    color: #1f2937;
+    color: var(--pz-text);
     font-size: var(--note-font-size, 15px);
     line-height: normal;
     word-wrap: break-word;
@@ -357,7 +357,7 @@
 
 .snapshot-content-preview:empty::before {
     content: attr(data-empty-text);
-    color: #999;
+    color: var(--pz-text-subtle);
     font-style: italic;
 }
 

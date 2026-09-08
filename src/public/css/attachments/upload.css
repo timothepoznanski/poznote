@@ -41,7 +41,7 @@
 .accepted-types {
     margin-top: 8px;
     font-size: 12px;
-    color: #666;
+    color: var(--pz-text-muted);
     line-height: 1.4;
 }
 

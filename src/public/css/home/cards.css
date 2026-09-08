@@ -133,7 +133,7 @@ html[data-theme='dark'] #support-card .home-card-icon {
 .home-card-title {
     font-size: calc(16px * var(--settings-font-scale, 1));
     font-weight: 400;
-    color: #1f2937;
+    color: var(--pz-text);
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;

@@ -23,7 +23,7 @@
 .note-actions .btn:disabled,
 .note-actions .btn:disabled:hover {
     background: rgba(108, 117, 125, 0.25);
-    color: #6c757d;
+    color: var(--pz-text-muted);
     cursor: not-allowed;
     opacity: 1;
 }
@@ -341,7 +341,7 @@ body.shared-page .shared-revoke-modal .shared-revoke-modal-content {
 
 body.shared-page .shared-revoke-modal .shared-revoke-modal-text {
     margin: 10px 0 18px;
-    color: var(--text-muted, #666666);
+    color: var(--text-muted, var(--pz-text-muted));
     line-height: 1.5;
 }
 

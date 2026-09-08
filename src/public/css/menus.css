@@ -115,7 +115,7 @@
     width: 16px;
     flex-shrink: 0;
     text-align: center;
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 /* Color dot of a colored workspace, taking the icon's slot (3 + 10 + 11 =

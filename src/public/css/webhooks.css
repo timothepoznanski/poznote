@@ -24,7 +24,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     margin: 0 0 16px;
     font-size: 0.92rem;
     line-height: 1.45;
-    color: #666;
+    color: var(--pz-text-muted);
 }
 .webhooks-field { margin-bottom: 16px; }
 .webhooks-field label {
@@ -36,7 +36,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
 .webhooks-hint {
     display: block;
     font-size: 0.82rem;
-    color: #888;
+    color: var(--pz-text-muted);
     margin-top: 4px;
     line-height: 1.4;
 }
@@ -172,7 +172,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
 .webhooks-item-description {
     font-size: 0.88rem;
     line-height: 1.4;
-    color: #666;
+    color: var(--pz-text-muted);
     overflow-wrap: anywhere;
 }
 /* Events as their own wrapping row of pills: the previous single-line code
@@ -190,14 +190,14 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     border-radius: 5px;
     background: rgba(0, 124, 186, 0.08);
     border: 1px solid rgba(0, 124, 186, 0.18);
-    color: #4a5568;
+    color: var(--pz-text-secondary);
     font-size: 0.76rem;
     line-height: 1.5;
     overflow-wrap: anywhere;
 }
 .webhooks-item-meta {
     font-size: 0.82rem;
-    color: #888;
+    color: var(--pz-text-muted);
     display: flex;
     gap: 12px;
     flex-wrap: wrap;

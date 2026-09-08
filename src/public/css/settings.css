@@ -73,11 +73,11 @@ body.settings-page {
     padding: 3px 10px;
     border-radius: 999px;
     background: #eef2f7;
-    color: #4b5563;
+    color: var(--pz-text-secondary);
 }
 
 .settings-current-user-badge i {
-    color: #4b5563;
+    color: var(--pz-text-secondary);
     width: 14px;
     height: 14px;
 }
@@ -119,7 +119,7 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
 .settings-category-title {
     font-size: calc(1.1rem * var(--settings-font-scale, 1));
     font-weight: 600;
-    color: #374151;
+    color: var(--pz-text);
     margin: 1.5rem 0 0.75rem 0;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid #e5e7eb;
@@ -506,7 +506,7 @@ html[data-theme='dark'] .settings-view-toggle:hover {
         border: none;
         border-radius: 8px;
         background: transparent;
-        color: #4b5563;
+        color: var(--pz-text-secondary);
         font: inherit;
         font-size: calc(14px * var(--settings-font-scale, 1));
         line-height: 1.3;
@@ -522,7 +522,7 @@ html[data-theme='dark'] .settings-view-toggle:hover {
 
     .settings-nav-item:hover {
         background: rgba(0, 0, 0, 0.04);
-        color: #1f2937;
+        color: var(--pz-text);
     }
 
     .settings-nav-item.is-active {

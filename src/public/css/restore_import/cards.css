@@ -37,7 +37,7 @@
 
 .card-header h3 {
     margin: 0;
-    color: #252526;
+    color: var(--pz-text);
     font-size: 18px;
     font-weight: 400;
     display: flex;
@@ -53,7 +53,7 @@
 .card-header h3 i.chevron {
     margin-left: auto;
     font-size: 16px;
-    color: #666;
+    color: var(--pz-text-muted);
     transition: transform 0.3s ease;
 }
 
@@ -63,7 +63,7 @@
 
 .card-header p {
     margin: 8px 0 0 32px;
-    color: #666;
+    color: var(--pz-text-muted);
     font-size: 14px;
     line-height: 1.5;
 }
@@ -130,7 +130,7 @@
 .sub-card h4 i.chevron {
     margin-left: auto;
     font-size: 14px;
-    color: #666;
+    color: var(--pz-text-muted);
     transition: transform 0.3s ease;
 }
 

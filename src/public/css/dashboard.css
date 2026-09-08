@@ -88,7 +88,7 @@ body.dashboard-page {
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     font-size: 13px;
-    color: #1f2937;
+    color: var(--pz-text);
     background: var(--pz-bg);
     box-sizing: border-box;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -211,7 +211,7 @@ body.dashboard-page {
 .bc-current {
     font-size: 13px;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--pz-text);
     padding: 4px 8px;
 }
 
@@ -685,7 +685,7 @@ body.dashboard-page {
     border-radius: 7px;
     background: none;
     font-size: 13px;
-    color: #1f2937;
+    color: var(--pz-text);
     text-align: left;
     cursor: pointer;
 }
@@ -773,7 +773,7 @@ body.dashboard-page {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: #1f2937;
+    color: var(--pz-text);
 }
 
 :root[data-theme='dark'] .note-color-modal-subtitle {
@@ -827,7 +827,7 @@ body.dashboard-page {
     white-space: nowrap;
     border: 1px solid var(--pz-border-strong);
     background: transparent;
-    color: #374151;
+    color: var(--pz-text);
     cursor: pointer;
     transition: border-color 0.15s ease, background-color 0.15s ease;
 }
@@ -931,7 +931,7 @@ body.dashboard-page {
 .dash-card-name {
     font-size: 13px;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--pz-text);
     line-height: 1.3;
     overflow: hidden;
     display: -webkit-box;
@@ -977,7 +977,7 @@ body.dashboard-page {
     font-size: 14px;
     line-height: 1.35;
     margin-bottom: 7px;
-    color: #1f2937;
+    color: var(--pz-text);
     word-break: break-word;
     /* Room for the pin button, which overlays the card's top-right corner. */
     padding-right: 22px;
@@ -1157,7 +1157,7 @@ body.dashboard-page {
     padding: 0;
     font-size: 12.5px;
     line-height: 1.45;
-    color: #4b5563;
+    color: var(--pz-text-secondary);
     overflow: hidden;
     flex: 1;
     min-height: 0;
@@ -1203,7 +1203,7 @@ body.dashboard-page {
     font-weight: 500;
     padding: 1px 8px;
     border-radius: 9px;
-    color: #4b5563;
+    color: var(--pz-text-secondary);
     background: var(--pz-surface-hover);
     white-space: nowrap;
     max-width: 110px;
@@ -1214,7 +1214,7 @@ body.dashboard-page {
 /* Per-tag color (--tag-color set inline from the tag_colors setting) */
 .board-card-tag-colored {
     background: color-mix(in srgb, var(--tag-color) 16%, var(--pz-bg));
-    color: color-mix(in srgb, var(--tag-color) 72%, #1f2937);
+    color: color-mix(in srgb, var(--tag-color) 72%, var(--pz-text));
 }
 
 .board-card-date {
@@ -1493,7 +1493,7 @@ body.dashboard-page .notifications-empty i {
     font-weight: 500;
     padding: 1px 8px;
     border-radius: 9px;
-    color: #4b5563;
+    color: var(--pz-text-secondary);
     background: var(--pz-surface-hover);
 }
 

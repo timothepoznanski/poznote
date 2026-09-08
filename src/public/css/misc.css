@@ -27,7 +27,7 @@
 /* File upload styling */
 .accepted-types {
     font-size: 0.85em;
-    color: #888;
+    color: var(--pz-text-muted);
     text-align: center;
     margin-top: 4px;
 }
@@ -35,7 +35,7 @@
 .selected-filename {
     margin: 0 0 18px 0;
     font-size: 0.95em;
-    color: #444;
+    color: var(--pz-text);
     text-align: center;
     min-height: 1.5em;
 }
@@ -306,7 +306,7 @@ img.img-with-border-no-padding {
     display: block;
     font-weight: 600;
     font-size: 1em;
-    color: #1f2937;
+    color: var(--pz-text);
     margin-bottom: 4px;
 }
 

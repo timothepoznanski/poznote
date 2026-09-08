@@ -144,7 +144,7 @@ html[data-theme='dark'] {
     align-items: center;
     gap: 7px;
     font-size: 14px;
-    color: var(--text-color, #4b5563);
+    color: var(--text-color, var(--pz-text-secondary));
     cursor: pointer;
     white-space: nowrap;
     user-select: none;
@@ -195,7 +195,7 @@ html[data-theme='dark'] {
     justify-content: center;
     width: 16px;
     height: 16px;
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
     cursor: help;
 }
 
@@ -304,7 +304,7 @@ html[data-theme='dark'] .users-table td {
 }
 
 .user-email {
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
     font-size: 0.9em;
     padding: 4px 8px;
     border-radius: 4px;
@@ -316,17 +316,17 @@ html[data-theme='dark'] .users-table td {
 }
 
 .user-name-value {
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
     font-size: 0.9em;
 }
 
 .user-created-date {
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
     font-size: 0.9em;
 }
 
 .account-access-summary {
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
     font-size: 0.9em;
     line-height: 1.45;
     max-width: 260px;
@@ -444,7 +444,7 @@ html[data-theme='dark'] .users-table td {
     display: block;
     margin-bottom: -6px;
     font-size: 0.9rem;
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
 }
 
 .profile-modal-help {
@@ -452,7 +452,7 @@ html[data-theme='dark'] .users-table td {
     margin-top: -2px;
     font-size: 0.78rem;
     line-height: 1.45;
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
 }
 
 .password-modal-content {
@@ -476,7 +476,7 @@ html[data-theme='dark'] .users-table td {
 
 .password-status-summary {
     margin: 0;
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
     font-size: 0.92rem;
     line-height: 1.45;
 }
@@ -490,7 +490,7 @@ html[data-theme='dark'] .users-table td {
 }
 
 .password-status-text {
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
     font-size: 0.85rem;
     text-align: left;
 }
@@ -529,7 +529,7 @@ html[data-theme='dark'] .users-table td {
 }
 
 .account-access-help {
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
     font-size: 0.92rem;
     line-height: 1.5;
     margin: 14px 0 18px;

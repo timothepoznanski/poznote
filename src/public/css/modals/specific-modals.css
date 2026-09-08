@@ -144,13 +144,13 @@
 
 .btn-full-width-footer {
     background-color: var(--pz-surface-hover) !important;
-    color: #4b5563 !important;
+    color: var(--pz-text-secondary) !important;
     border: 1px solid var(--pz-border-strong) !important;
 }
 
 .btn-full-width-footer:hover {
     background-color: #e5e7eb !important;
-    color: #111827 !important;
+    color: var(--pz-text) !important;
 }
 
 .btn-full-width-footer.active {
@@ -324,7 +324,7 @@
     align-items: center;
     gap: 6px;
     margin-bottom: 8px;
-    color: #555;
+    color: var(--pz-text-secondary);
     font-size: 13px;
     font-weight: 600;
 }
@@ -345,7 +345,7 @@
     border: 1px solid #d7dde3;
     border-radius: 8px;
     background: #f7f9fb;
-    color: #263238;
+    color: var(--pz-text);
     cursor: pointer;
     font-size: 13px;
     line-height: 1.2;
@@ -418,7 +418,7 @@
 }
 
 #noteInfoModal .info-value {
-    color: #555;
+    color: var(--pz-text-secondary);
     font-family: monospace;
     background-color: var(--pz-bg);
     padding: 4px 8px;
@@ -447,7 +447,7 @@
 #updateModal .modal-content p {
     margin: 15px 0;
     line-height: 1.6;
-    color: #555;
+    color: var(--pz-text-secondary);
 }
 
 #updateModal .version-info {
@@ -528,7 +528,7 @@
 #updateCheckModal .modal-content p {
     margin: 15px 0;
     line-height: 1.5;
-    color: #555;
+    color: var(--pz-text-secondary);
 }
 
 /* ============================================
@@ -547,7 +547,7 @@
 
 #confirmModal .modal-content p {
     line-height: 1.5;
-    color: #555;
+    color: var(--pz-text-secondary);
     font-size: 16px;
 }
 
@@ -947,7 +947,7 @@
     box-sizing: border-box;
     margin-bottom: 12px;
     background-color: var(--pz-bg);
-    color: #222;
+    color: var(--pz-text);
 }
 
 /* ============================================

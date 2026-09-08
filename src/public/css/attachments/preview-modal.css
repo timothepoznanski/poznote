@@ -90,7 +90,7 @@
     background: none;
     border: none;
     font-size: 24px;
-    color: #666;
+    color: var(--pz-text-muted);
     cursor: pointer;
     padding: 0;
     width: 30px;

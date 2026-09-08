@@ -24,7 +24,7 @@ input[type="radio"] {
     margin-left: -3px;
     font-size: 24px;
     font-weight: 600;
-    color: #37352F;
+    color: var(--pz-text);
     font-family: 'Inter', sans-serif;
 }
 

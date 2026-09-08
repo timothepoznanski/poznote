@@ -100,7 +100,7 @@ body.attachments-page {
 
 .filter-stats {
     font-size: 13px;
-    color: var(--text-muted, #666666);
+    color: var(--text-muted, var(--pz-text-muted));
     white-space: nowrap;
     padding: 6px 12px;
     background-color: #f0f7ff;
@@ -151,7 +151,7 @@ body.attachments-page {
 
 .attachment-item i {
     font-size: 18px;
-    color: #6c757d;
+    color: var(--pz-text-muted);
     width: 20px;
     text-align: center;
     flex-shrink: 0;
@@ -159,7 +159,7 @@ body.attachments-page {
 
 .attachment-size {
     font-size: 13px;
-    color: var(--text-muted, #666666);
+    color: var(--text-muted, var(--pz-text-muted));
     white-space: nowrap;
     flex-shrink: 0;
 }
@@ -178,7 +178,7 @@ body.attachments-page {
 .loading-spinner {
     text-align: center;
     padding: 40px;
-    color: var(--text-muted, #666666);
+    color: var(--text-muted, var(--pz-text-muted));
     font-size: 16px;
 }
 
@@ -195,7 +195,7 @@ body.attachments-page {
 
 .empty-hint {
     font-size: 14px;
-    color: var(--text-muted, #999999);
+    color: var(--text-muted, var(--pz-text-subtle));
 }
 
 .error-message {
@@ -325,7 +325,7 @@ body.attachments-page {
 }
 
 .attachment-file-item {
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
     font-size: 14px;
     display: flex;
     align-items: flex-start;
@@ -362,7 +362,7 @@ body.attachments-page {
 }
 
 .attachment-file-link {
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
     text-decoration: none;
     cursor: pointer;
 }

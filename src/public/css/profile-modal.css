@@ -53,7 +53,7 @@
 
 :is(#editProfileModal, #confirmLogoutModal) .text-small-muted {
     margin-top: 8px;
-    color: #6c757d;
+    color: var(--pz-text-muted);
     font-size: 14px;
 }
 

@@ -27,14 +27,14 @@ body {
 
 .info-label {
     font-weight: 600;
-    color: #495057;
+    color: var(--pz-text-secondary);
     flex: 0 0 210px;
     margin-right: 32px;
 }
 
 .info-value {
     flex: 1;
-    color: #212529;
+    color: var(--pz-text);
     display: flex;
     align-items: center;
 }

@@ -53,7 +53,7 @@
 }
 
 .close {
-    color: #aaa;
+    color: var(--pz-text-subtle);
     float: right;
     font-size: 28px;
     font-weight: bold;
@@ -87,6 +87,6 @@
 
 .folder-item i {
     margin-right: 8px;
-    color: #666;
+    color: var(--pz-text-muted);
     width: 12px;
 }

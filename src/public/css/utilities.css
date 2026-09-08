@@ -7,7 +7,7 @@
 
 /* Placeholder color for tags input to match note title */
 .name_tags input::placeholder {
-    color: #bababa;
+    color: var(--pz-text-subtle);
 }
 
 /* Hidden elements: JS toggles this instead of writing inline styles, so it has

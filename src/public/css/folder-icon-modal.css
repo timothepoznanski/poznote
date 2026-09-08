@@ -17,7 +17,7 @@
     gap: 10px;
     margin: 0 0 12px 0;
     font-size: 1.3em;
-    color: #1f2937;
+    color: var(--pz-text);
 }
 
 .folder-icon-modal-content h3 i {
@@ -90,7 +90,7 @@
     cursor: pointer;
     transition: all 0.2s ease;
     font-size: 18px;
-    color: #374151;
+    color: var(--pz-text);
 }
 
 .folder-icon-item.hidden {
@@ -121,7 +121,7 @@
 
 .folder-icon-modal-content .modal-buttons .btn-secondary {
     background: #e5e7eb;
-    color: #374151;
+    color: var(--pz-text);
     border: none;
     padding: 10px 20px;
     border-radius: 6px;
@@ -212,7 +212,7 @@
 }
 
 .folder-color-option.selected .folder-color-default::after {
-    color: #374151;
+    color: var(--pz-text);
 }
 
 .folder-color-swatch {

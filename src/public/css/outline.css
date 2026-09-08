@@ -46,7 +46,7 @@
 .outline-title {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #6c757d;
+    color: var(--pz-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin: 0;
@@ -61,7 +61,7 @@
     height: 24px;
     border: none;
     background: transparent;
-    color: #6c757d;
+    color: var(--pz-text-muted);
     border-radius: 4px;
     cursor: pointer;
     display: inline-flex;
@@ -99,7 +99,7 @@
 .outline-nav-link {
     display: block;
     padding: 6px 12px;
-    color: #495057;
+    color: var(--pz-text-secondary);
     text-decoration: none;
     border-radius: 4px;
     font-size: 0.875rem;
@@ -158,7 +158,7 @@
 .outline-empty {
     padding: 32px 12px;
     text-align: center;
-    color: #adb5bd;
+    color: var(--pz-text-subtle);
     font-size: 0.875rem;
 }
 
@@ -208,7 +208,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #6c757d;
+    color: var(--pz-text-muted);
     font-size: 0.875rem;
     padding: 0;
     transition: all 0.2s ease;
@@ -241,7 +241,7 @@ body:not(.outline-collapsed) .toggle-outline-btn {
 html.outline-collapsed .toggle-outline-btn:disabled,
 body.outline-collapsed .toggle-outline-btn:disabled {
     background: #f1f3f5;
-    color: #adb5bd;
+    color: var(--pz-text-subtle);
     border-color: #dee2e6;
     box-shadow: none;
     cursor: not-allowed;
@@ -251,7 +251,7 @@ body.outline-collapsed .toggle-outline-btn:disabled {
 .toggle-outline-btn:disabled:hover,
 .toggle-outline-btn[aria-disabled="true"]:hover {
     background: #f1f3f5;
-    color: #adb5bd;
+    color: var(--pz-text-subtle);
     box-shadow: none;
 }
 

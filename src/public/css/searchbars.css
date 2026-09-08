@@ -32,7 +32,7 @@
     width: 100%;
     min-width: 0;
     font-family: 'Inter', sans-serif !important;
-    color: #6c7580;
+    color: var(--pz-text-muted);
     caret-color: #6c7580;
     height: 40px;
     box-sizing: border-box;
@@ -48,12 +48,12 @@
 
 .searchbar-input:disabled {
     background-color: #f5f5f5;
-    color: #999;
+    color: var(--pz-text-subtle);
     cursor: not-allowed;
 }
 
 .searchbar-input::placeholder {
-    color: #6c7580;
+    color: var(--pz-text-muted);
     opacity: 1;
     font-size: 1em;
 }
@@ -81,7 +81,7 @@
     border: none;
     padding: 6px 6px;
     cursor: pointer;
-    color: #9aa3a8;
+    color: var(--pz-text-subtle);
     font-size: 14px;
     transition: color 0.2s;
     display: flex;
@@ -126,7 +126,7 @@
     border: none;
     padding: 6px 4px;
     cursor: pointer;
-    color: #9aa3a8;
+    color: var(--pz-text-subtle);
     font-size: 16px;
     transition: color 0.2s;
     display: flex;
@@ -172,7 +172,7 @@
     left: 16px;
     top: 50%;
     transform: translateY(-50%);
-    color: #6c7580;
+    color: var(--pz-text-muted);
     font-size: 1.2em;
     pointer-events: none;
 }
@@ -200,7 +200,7 @@
     right: auto;
     top: 50%;
     transform: translateY(-50%);
-    color: #9aa3a8;
+    color: var(--pz-text-subtle);
     /* allow clicks on the icon so JS listeners can attach */
     pointer-events: auto;
     z-index: 2;
@@ -218,7 +218,7 @@
     padding: 2px 6px;
     border-radius: 6px;
     box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.03);
-    color: #2b2b2b;
+    color: var(--pz-text);
 }
 
 .searchbar-row {
@@ -269,7 +269,7 @@
     border: none;
     border-radius: 50%;
     background: transparent;
-    color: #9aa3a8;
+    color: var(--pz-text-subtle);
     cursor: pointer;
     z-index: 3;
     transition: color 0.18s;
@@ -311,7 +311,7 @@
     border: 1px solid #e4e7ea;
     border-radius: 6px;
     background: transparent;
-    color: #6b7379;
+    color: var(--pz-text-muted);
 }
 
 .folder-filter-banner-name {
@@ -332,7 +332,7 @@
 .folder-filter-banner-name i {
     flex: 0 0 auto;
     /* Lucide icons are CSS masks: background-color is what actually paints them */
-    color: #8a9299;
+    color: var(--pz-text-subtle);
     background-color: #8a9299;
     font-size: 13px;
 }
@@ -397,13 +397,13 @@
     align-items: center;
     gap: 4px;
     min-height: 18px;
-    color: #6c7580;
+    color: var(--pz-text-muted);
     font-size: 0.74em;
     line-height: 1.2;
 }
 
 .search-date-field label i {
-    color: #9aa3a8;
+    color: var(--pz-text-subtle);
     font-size: 14px;
     flex: 0 0 auto;
 }
@@ -416,7 +416,7 @@
     border: 1px solid #d3d6db;
     border-radius: 6px;
     background: var(--pz-bg);
-    color: #4b5563;
+    color: var(--pz-text-secondary);
     font-family: 'Inter', sans-serif !important;
     font-size: 0.78em;
     box-sizing: border-box;
@@ -468,7 +468,7 @@
     padding: 4px 6px;
     cursor: pointer;
     transition: all 0.2s ease;
-    color: #b0b0b0;
+    color: var(--pz-text-subtle);
     font-size: 0.85em;
     min-width: 28px;
     height: 28px;

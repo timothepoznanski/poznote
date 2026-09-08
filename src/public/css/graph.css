@@ -50,7 +50,7 @@ body.graph-page {
     border-radius: 6px;
     font-size: 14px;
     background: var(--pz-bg);
-    color: #111827;
+    color: var(--pz-text);
 }
 
 .graph-search-input:focus {
@@ -65,7 +65,7 @@ body.graph-page {
     border-radius: 6px;
     font-size: 13px;
     background: var(--pz-bg);
-    color: #4b5563;
+    color: var(--pz-text-secondary);
     cursor: pointer;
 }
 
@@ -87,7 +87,7 @@ body.graph-page {
     align-items: center;
     gap: 6px;
     font-size: 13px;
-    color: #4b5563;
+    color: var(--pz-text-secondary);
     cursor: pointer;
     user-select: none;
     white-space: nowrap;
@@ -108,7 +108,7 @@ body.graph-page {
     border-radius: 6px;
     background: var(--pz-bg);
     font-size: 13px;
-    color: #4b5563;
+    color: var(--pz-text-secondary);
     cursor: pointer;
     white-space: nowrap;
 }
@@ -239,7 +239,7 @@ body.graph-page {
 
 .graph-tooltip-title {
     font-weight: 600;
-    color: #111827;
+    color: var(--pz-text);
 }
 
 .graph-tooltip-meta {

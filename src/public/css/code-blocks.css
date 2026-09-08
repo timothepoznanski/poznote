@@ -80,7 +80,7 @@ pre.code-block::-webkit-scrollbar-thumb:horizontal:active,
     top: 0;
     width: var(--code-line-number-digits, 2ch);
     text-align: right;
-    color: #9aa3af;
+    color: var(--pz-text-subtle);
     user-select: none;
     -webkit-user-select: none;
 }
@@ -111,7 +111,7 @@ pre.code-block .code-block-line-numbers-btn,
     z-index: 10;
     padding: 0;
     font-size: 14px;
-    color: #586069;
+    color: var(--pz-text-secondary);
 }
 
 .code-block-copy-btn,
@@ -170,7 +170,7 @@ pre.code-block .code-block-delete-btn,
 }
 
 .code-block-copy-btn:hover {
-    color: #24292e;
+    color: var(--pz-text);
 }
 
 .code-block-delete-btn:hover {
@@ -205,7 +205,7 @@ pre.code-block .code-block-delete-btn,
     padding: 0 !important;
     background: transparent !important;
     border: none !important;
-    color: #8a8f98 !important;
+    color: var(--pz-text-subtle) !important;
     opacity: 0.55 !important;
 }
 
@@ -221,7 +221,7 @@ pre.code-block .code-block-delete-btn,
 
 .code-block-actions-host > .code-block-copy-btn:hover,
 .code-block-actions-host > .code-block-line-numbers-btn:hover {
-    color: #24292e !important;
+    color: var(--pz-text) !important;
 }
 
 .code-block-actions-host > .code-block-delete-btn:hover {

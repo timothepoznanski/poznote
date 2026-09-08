@@ -21,14 +21,14 @@
     flex-shrink: 0;
     align-self: center;
     line-height: 1;
-    color: #6c757d;
+    color: var(--pz-text-muted);
     cursor: pointer;
 }
 
 /* Folder Name badge */
 .folder_name {
     font-size: 13px;
-    color: #37352F;
+    color: var(--pz-text);
     flex-shrink: 0;
     margin-right: 20px;
     padding: 4px 8px;
@@ -59,7 +59,7 @@
 
 .folder-path-separator {
     margin: 0 4px;
-    color: #94a3b8;
+    color: var(--pz-text-subtle);
 }
 
 .folder-wrapper {
@@ -84,7 +84,7 @@
     align-self: center;
     line-height: 1;
     cursor: pointer;
-    color: #6c757d;
+    color: var(--pz-text-muted);
 }
 
 .lucide-tag.icon_tag:hover {
@@ -191,7 +191,7 @@
 
 /* Tag Delete Button */
 .tag-delete-button {
-    color: #94a3b8;
+    color: var(--pz-text-subtle);
     padding: 4px 6px 4px 2px;
     font-size: 14px;
     font-weight: bold;
@@ -215,7 +215,7 @@
 }
 
 .clickable-tag-wrapper.tag-highlight .clickable-tag {
-    color: #2b2b2b;
+    color: var(--pz-text);
 }
 
 .clickable-tag-wrapper.tag-highlight .tag-delete-button {
@@ -232,7 +232,7 @@
     padding: 4px 8px;
     font-size: 13px;
     font-family: 'Inter', sans-serif;
-    color: #37352F;
+    color: var(--pz-text);
     min-width: 60px;
     max-width: 150px;
     flex-shrink: 0;
@@ -242,7 +242,7 @@
 }
 
 .tag-input::placeholder {
-    color: #bababa;
+    color: var(--pz-text-subtle);
     font-style: italic;
 }
 
@@ -285,7 +285,7 @@
 
 .tags-modal-item-name {
     font-size: 14px;
-    color: #334155;
+    color: var(--pz-text);
     flex-grow: 1;
     margin-right: 10px;
     outline: none;
@@ -300,7 +300,7 @@
 }
 
 .tags-modal-item-delete {
-    color: #94a3b8;
+    color: var(--pz-text-subtle);
     cursor: pointer;
     transition: color 0.2s;
     font-size: 16px;

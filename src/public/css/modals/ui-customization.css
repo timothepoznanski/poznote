@@ -503,7 +503,7 @@
 .icon-sidebar-order-handle {
     display: inline-flex;
     align-items: center;
-    color: #9aa1ab;
+    color: var(--pz-text-subtle);
     cursor: grab;
     flex-shrink: 0;
 }
@@ -587,7 +587,7 @@
 .icon-sidebar-order-divider-label {
     flex: 0 0 auto;
     font-size: 0.85em;
-    color: #9aa1ab;
+    color: var(--pz-text-subtle);
 }
 
 .icon-sidebar-order-remove:hover:not(:disabled) {

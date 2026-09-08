@@ -5,7 +5,7 @@
 
 .task-drag-handle {
     cursor: grab;
-    color: #999;
+    color: var(--pz-text-subtle);
     font-size: 12px;
     margin-left: 4px;
     padding: 2px 4px;
@@ -35,7 +35,7 @@
 }
 
 .noteentry .tasklist-progress-label {
-    color: #666;
+    color: var(--pz-text-muted);
     text-align: left;
     margin-bottom: 6px;
 }
@@ -117,7 +117,7 @@
 
 .task-drag-handle {
     cursor: grab;
-    color: #999;
+    color: var(--pz-text-subtle);
     font-size: 18px;
     margin-right: 2px;
     margin-left: 2px;
@@ -131,7 +131,7 @@
 }
 
 .task-drag-handle:hover {
-    color: #666;
+    color: var(--pz-text-muted);
     background: rgba(0, 0, 0, 0.05);
 }
 
@@ -172,15 +172,15 @@
 
 .task-item.completed .task-text {
     text-decoration: line-through;
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 .task-item.completed .task-text a {
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 .task-item.completed .task-text a:hover {
-    color: #444;
+    color: var(--pz-text);
     text-decoration: underline;
 }
 
@@ -295,7 +295,7 @@
 
 .task-edit-hint {
     margin: 0;
-    color: #6c757d;
+    color: var(--pz-text-muted);
     font-size: 12px;
     line-height: 1.35;
 }
@@ -380,7 +380,7 @@
 .task-important-btn i,
 .task-move-btn i,
 .task-drag-handle i {
-    color: #999;
+    color: var(--pz-text-subtle);
     font-family: "Font Awesome 5 Pro" !important;
     font-style: normal !important;
     display: inline-block;
@@ -414,7 +414,7 @@
 
 .task-due-btn i {
     font-size: 16px !important;
-    color: #999;
+    color: var(--pz-text-subtle);
     font-family: "Font Awesome 5 Pro" !important;
     font-style: normal !important;
     display: inline-block;
@@ -434,7 +434,7 @@
     border: 1px solid #d0d7de;
     border-radius: 12px;
     background: #f6f8fa;
-    color: #57606a;
+    color: var(--pz-text-secondary);
     font-size: 12px;
     line-height: 1.4;
     cursor: pointer;
@@ -488,7 +488,7 @@
 
 .task-menu-btn i {
     font-size: 16px !important;
-    color: #999;
+    color: var(--pz-text-subtle);
     font-family: "Font Awesome 5 Pro" !important;
     font-style: normal !important;
     display: inline-block;
@@ -523,7 +523,7 @@
     cursor: pointer;
     font-family: inherit;
     font-size: 14px;
-    color: #111827;
+    color: var(--pz-text);
     text-align: left;
 }
 
@@ -887,7 +887,7 @@ details.callout:not([open]) .callout-fold-icon {
 /* Placeholder for empty toggle content */
 .toggle-block>.toggle-content[data-ph]:empty:before {
     content: attr(data-ph);
-    color: #999;
+    color: var(--pz-text-subtle);
     font-style: italic;
     opacity: 0.6;
 }
@@ -913,7 +913,7 @@ details.callout:not([open]) .callout-fold-icon {
 .toggle-before-placeholder:empty:before,
 .toggle-after-placeholder:empty:before {
     content: attr(data-ph);
-    color: #999;
+    color: var(--pz-text-subtle);
     font-style: italic;
     opacity: 0.6;
 }
@@ -971,7 +971,7 @@ html[data-theme='dark'] .toggle-block[open]>summary {
     border: none;
     border-radius: 4px;
     background: transparent;
-    color: #888;
+    color: var(--pz-text-muted);
     cursor: pointer;
     flex-shrink: 0;
 }
@@ -1014,7 +1014,7 @@ html[data-theme='dark'] .toggle-block[open]>summary {
 
 .noteentry .tasklist-embed-count {
     margin-left: auto;
-    color: #666;
+    color: var(--pz-text-muted);
     flex-shrink: 0;
 }
 
@@ -1062,7 +1062,7 @@ html[data-theme='dark'] .toggle-block[open]>summary {
 
 .noteentry .tasklist-embed-task.completed .tasklist-embed-text {
     text-decoration: line-through;
-    color: #888;
+    color: var(--pz-text-muted);
 }
 
 /* Due date chip (a button opening the due-date modal) */
@@ -1078,7 +1078,7 @@ html[data-theme='dark'] .toggle-block[open]>summary {
     padding: 0;
     border: none;
     background: transparent;
-    color: #666;
+    color: var(--pz-text-muted);
     font-family: inherit;
     flex-shrink: 0;
     white-space: nowrap;
@@ -1115,7 +1115,7 @@ html[data-theme='dark'] .toggle-block[open]>summary {
     border: none;
     border-radius: 4px;
     background: transparent;
-    color: #999;
+    color: var(--pz-text-subtle);
     cursor: pointer;
     opacity: 0;
     transition: opacity 0.15s ease, color 0.15s ease;
@@ -1154,11 +1154,11 @@ html[data-theme='dark'] .toggle-block[open]>summary {
     gap: 10px;
     margin: 4px 0 0;
     padding: 4px 2px;
-    color: #999;
+    color: var(--pz-text-subtle);
 }
 
 .noteentry .tasklist-embed-add:focus-within {
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 /* Same footprint as the row checkboxes so the field lines up with the tasks */
@@ -1188,7 +1188,7 @@ html[data-theme='dark'] .toggle-block[open]>summary {
 }
 
 .noteentry .tasklist-embed-add-input::placeholder {
-    color: #999;
+    color: var(--pz-text-subtle);
     opacity: 1;
 }
 
@@ -1208,7 +1208,7 @@ html[data-theme='dark'] .toggle-block[open]>summary {
 
 .noteentry .tasklist-embed-empty,
 .noteentry .tasklist-embed-unavailable {
-    color: #888;
+    color: var(--pz-text-muted);
     font-style: italic;
     margin-top: 8px;
 }

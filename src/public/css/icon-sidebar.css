@@ -94,7 +94,7 @@
        entries relabelled, so it must not read as a different palette. The icon
        is a mask tinted by currentColor, so this colours the label and the
        glyph together. */
-    color: #9aa1ab;
+    color: var(--pz-text-subtle);
     font-family: inherit;
     font-size: 14px;
     text-align: left;
@@ -180,7 +180,7 @@
     margin: 0;
     border: none;
     border-radius: 8px;
-    color: #9aa1ab;
+    color: var(--pz-text-subtle);
     background: transparent;
     text-decoration: none;
     cursor: pointer;
@@ -253,7 +253,7 @@
     border: 1px solid #ccc;
     border-radius: 0 4px 4px 0;
     background: var(--pz-bg);
-    color: #6c757d;
+    color: var(--pz-text-muted);
     cursor: pointer;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     transition: left 0.3s ease, background 0.2s ease, color 0.2s ease;
@@ -307,7 +307,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     border: 1px solid var(--pz-border-strong);
     border-radius: 6px;
     background: var(--pz-bg);
-    color: #374151;
+    color: var(--pz-text);
     font-family: inherit;
     font-size: 14px;
     font-weight: 500;
@@ -318,7 +318,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
 .poznote-back-to-note-btn:hover,
 .poznote-back-btn:hover {
     background: var(--pz-surface-hover);
-    color: #111827;
+    color: var(--pz-text);
     text-decoration: none;
 }
 
@@ -364,7 +364,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     gap: 10px;
     font-size: 24px;
     font-weight: 600;
-    color: #374151;
+    color: var(--pz-text);
     margin: 0 0 20px 0;
 }
 
@@ -497,7 +497,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     gap: 8px;
     padding: 7px 10px;
     border-radius: 6px;
-    color: #374151;
+    color: var(--pz-text);
     text-decoration: none;
     cursor: pointer;
 }

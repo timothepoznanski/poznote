@@ -133,7 +133,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .note-actions-toggle:hover,
 .note-actions-item:hover {
     background: rgba(107, 114, 128, 0.12);
-    color: #374151;
+    color: var(--pz-text);
 }
 
 .folder-actions-toggle i,
@@ -195,7 +195,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #374151;
+    color: var(--pz-text);
     transition: background-color 0.15s ease;
     font-size: 0.9em;
     white-space: nowrap;
@@ -219,7 +219,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .folder-actions-menu-item:hover i,
 .note-actions-menu-item:hover i,
 .create-menu-item:hover i {
-    color: #374151;
+    color: var(--pz-text);
 }
 
 /* Destructive and "already shared" items */

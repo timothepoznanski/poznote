@@ -53,7 +53,7 @@
 
 .markdown-editor:empty:before {
     content: attr(data-ph);
-    color: #999;
+    color: var(--pz-text-subtle);
 }
 
 .markdown-editor .markdown-excalidraw-placeholder {
@@ -77,7 +77,7 @@
     display: flex;
     align-items: center;
     line-height: 1.4;
-    color: #5f6b76;
+    color: var(--pz-text-muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -164,7 +164,7 @@ html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::befor
 }
 
 .markdown-codemirror-host .cm-placeholder {
-    color: #999;
+    color: var(--pz-text-subtle);
     opacity: 1;
 }
 
@@ -327,7 +327,7 @@ body.slash-menu-cursor-hidden * {
     font-size: 0.75em;
     font-weight: bold;
     margin: 1.67em 0;
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 /* Heading anchor links (GitHub-style) */
@@ -448,7 +448,7 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
     border-left: 4px solid #ddd;
     padding-left: 16px;
     margin: 1em 0;
-    color: #666;
+    color: var(--pz-text-muted);
     font-style: italic;
 }
 
@@ -595,7 +595,7 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
 
 .markdown-preview del {
     text-decoration: line-through;
-    color: #999;
+    color: var(--pz-text-subtle);
 }
 
 .noteentry table,
@@ -763,7 +763,7 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
 /* Style for checked task items */
 .markdown-preview li.task-list-item input[type="checkbox"]:checked+span {
     text-decoration: line-through;
-    color: #888;
+    color: var(--pz-text-muted);
 }
 
 /* Click-to-navigate hint in split mode */
@@ -809,7 +809,7 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
 
 /* Placeholder for empty preview */
 .markdown-preview-placeholder {
-    color: #999;
+    color: var(--pz-text-subtle);
     padding: 0;
     text-align: left;
     opacity: 0.6;

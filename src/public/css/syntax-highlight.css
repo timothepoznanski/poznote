@@ -28,7 +28,7 @@ code.hljs {
 
 /* Light theme (default) */
 .hljs {
-    color: #24292e;
+    color: var(--pz-text);
     background: #f6f8fa;
 }
 
@@ -76,7 +76,7 @@ code.hljs {
 .hljs-code,
 .hljs-comment,
 .hljs-formula {
-    color: #6a737d;
+    color: var(--pz-text-muted);
 }
 
 .hljs-name,
@@ -87,7 +87,7 @@ code.hljs {
 }
 
 .hljs-subst {
-    color: #24292e;
+    color: var(--pz-text);
 }
 
 .hljs-section {
@@ -100,12 +100,12 @@ code.hljs {
 }
 
 .hljs-emphasis {
-    color: #24292e;
+    color: var(--pz-text);
     font-style: italic;
 }
 
 .hljs-strong {
-    color: #24292e;
+    color: var(--pz-text);
     font-weight: 700;
 }
 
@@ -222,7 +222,7 @@ pre.code-block:not([data-language])::before {
     left: 0;
     padding: 2px 8px;
     font-size: 0.75em;
-    color: #6e7681;
+    color: var(--pz-text-muted);
     background: rgba(0, 0, 0, 0.05);
     border-bottom-right-radius: 4px;
     text-transform: uppercase;

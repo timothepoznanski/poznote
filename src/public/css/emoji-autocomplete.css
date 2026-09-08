@@ -41,7 +41,7 @@
 
 .emoji-autocomplete-name {
     font-size: 13px;
-    color: #374151;
+    color: var(--pz-text);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

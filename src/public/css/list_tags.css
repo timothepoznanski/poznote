@@ -44,7 +44,7 @@ html.tags-page {
 .search-results {
     text-align: center;
     margin-top: 10px;
-    color: #666;
+    color: var(--pz-text-muted);
     font-size: 0.95em;
 }
 
@@ -87,7 +87,7 @@ html.tags-page {
 .tag-note-count {
     margin-left: 5px;
     font-size: 0.85em;
-    color: #888;
+    color: var(--pz-text-muted);
 }
 
 /* Colored dot shown on tags that have an assigned color */
@@ -162,7 +162,7 @@ html.tags-page {
 .tag-color-filter-clear {
     background: none;
     border: none;
-    color: #64748b;
+    color: var(--pz-text-muted);
     font-size: 0.85rem;
     cursor: pointer;
     padding: 2px 6px;
@@ -170,7 +170,7 @@ html.tags-page {
 }
 
 .tag-color-filter-clear:hover {
-    color: #1e293b;
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .tag-color-filter-swatch.active {
@@ -237,7 +237,7 @@ html[data-theme='dark'] .tag-color-swatch.selected {
 
 .no-tags {
     text-align: center;
-    color: #666;
+    color: var(--pz-text-muted);
     font-size: 1.2em;
     margin-top: 50px;
     padding: 40px;

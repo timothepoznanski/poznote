@@ -61,7 +61,7 @@
     opacity: 0.5;
     cursor: not-allowed;
     background: #ccc;
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 /* An <a> cannot be disabled natively, so the class has to stop the click.

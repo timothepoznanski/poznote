@@ -8,7 +8,7 @@
 
 .markdown-syntax-intro {
     margin: 0 0 18px;
-    color: #495057;
+    color: var(--pz-text-secondary);
     line-height: 1.65;
     max-width: 72ch;
 }
@@ -30,7 +30,7 @@
 .markdown-syntax-filter-icon {
     position: absolute;
     left: 12px;
-    color: #94a3b8;
+    color: var(--pz-text-subtle);
     pointer-events: none;
 }
 
@@ -62,13 +62,13 @@
     border: none;
     padding: 4px 6px;
     border-radius: 6px;
-    color: #667085;
+    color: var(--pz-text-muted);
     cursor: pointer;
 }
 
 .markdown-syntax-filter-bar .clear-filter-btn:hover {
     background: #eef2f6;
-    color: #1f2937;
+    color: var(--pz-text);
 }
 
 .markdown-syntax-filter-bar .filter-stats {
@@ -108,7 +108,7 @@
 
 .syntax-card p {
     margin: 0 0 12px;
-    color: #495057;
+    color: var(--pz-text-secondary);
     line-height: 1.55;
 }
 
@@ -118,7 +118,7 @@
     border: 1px solid #f0f0f0;
     border-radius: 4px;
     background: var(--pz-surface);
-    color: #212529;
+    color: var(--pz-text);
     padding: 12px;
     font-size: 13px;
     line-height: 1.55;
@@ -135,7 +135,7 @@
     border: 1px dashed #d7dee5;
     border-radius: 10px;
     background: #f8fafc;
-    color: #52606d;
+    color: var(--pz-text-secondary);
     line-height: 1.6;
 }
 

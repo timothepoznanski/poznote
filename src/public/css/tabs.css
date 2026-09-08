@@ -73,11 +73,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: #374151;
+    color: var(--pz-text);
 }
 
 .app-tab.active .app-tab-title {
-    color: #111827;
+    color: var(--pz-text);
 }
 
 .app-tab-close {
@@ -97,7 +97,7 @@
 
 .app-tab-close:hover {
     background: rgba(0, 0, 0, 0.08);
-    color: #374151;
+    color: var(--pz-text);
 }
 
 /* ── "Close all tabs" button ── */
@@ -220,7 +220,7 @@ body.app-tab-reordering {
     gap: 8px;
     padding: 7px 14px;
     cursor: pointer;
-    color: #374151;
+    color: var(--pz-text);
     transition: background-color 0.1s ease;
     white-space: nowrap;
 }

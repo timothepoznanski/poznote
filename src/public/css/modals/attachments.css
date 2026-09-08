@@ -69,7 +69,7 @@
 
 .attachment-size {
     font-size: 0.8em;
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 .attachment-info strong {

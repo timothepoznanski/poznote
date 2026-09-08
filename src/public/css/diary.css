@@ -37,7 +37,7 @@
 .diary-month-title {
     font-size: 15px;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--pz-text);
     margin: 0 0 2px;
     padding-bottom: 6px;
     border-bottom: 1.5px solid #e5e7eb;
@@ -92,7 +92,7 @@
     border-radius: 999px;
     font-size: 13px;
     font-weight: 600;
-    color: #374151;
+    color: var(--pz-text);
     text-decoration: none;
     white-space: nowrap;
 }
@@ -133,7 +133,7 @@
     margin: 0 0 14px;
     font-size: 16px;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--pz-text);
 }
 
 .diary-new-modal .modal-footer {

@@ -14,7 +14,11 @@
     /* Same colour as RGB channels, for tints: rgba(var(--pz-accent-rgb), 0.1) */
     --pz-accent-rgb: 0, 125, 184;
     /* Neutral palette of the light theme. Dark and black use --dm-* below. */
-    --pz-text: #333333;            /* main text */
+    /* Text scale, four steps. Contrast on white is 12.6 / 7.6 / 4.8 / 2.5, and
+       the app used 62 different greys to express them. Pick by role, not by
+       taste, so a theme only has to redefine four values. */
+    --pz-text: #333333;            /* body text, headings */
+    --pz-text-secondary: #4b5563;  /* supporting text that still reads as content */
     --pz-text-muted: #6b7280;      /* secondary text, icons */
     --pz-text-subtle: #9ca3af;     /* placeholders, hints */
     --pz-border: #e0e0e0;          /* default borders, separators */

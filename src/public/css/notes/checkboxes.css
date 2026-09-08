@@ -29,6 +29,6 @@
 
 .noteentry label span[contenteditable="true"]:empty:before {
     content: "Type your task here";
-    color: #999;
+    color: var(--pz-text-subtle);
     font-style: italic;
 }

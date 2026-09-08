@@ -68,7 +68,7 @@
 /* Count display */
 .search-replace-count {
     font-size: 12px;
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
     white-space: nowrap;
     min-width: 60px;
     text-align: right;
@@ -129,7 +129,7 @@
 .search-replace-close-btn {
     background: transparent;
     border: none;
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
 }
 
 .search-replace-close-btn:hover {
@@ -140,7 +140,7 @@
 /* Highlight for search results in note */
 .search-replace-highlight {
     background-color: #ffeb3b;
-    color: #000;
+    color: var(--pz-text);
     padding: 1px 0;
     border-radius: 2px;
 }

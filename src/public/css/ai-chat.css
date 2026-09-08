@@ -76,7 +76,7 @@ html.ai-chat-open #ai-chat-panel,
     flex: 1;
     font-size: 0.875rem;
     font-weight: 600;
-    color: #6c757d;
+    color: var(--pz-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin: 0;
@@ -90,7 +90,7 @@ html.ai-chat-open #ai-chat-panel,
     height: 26px;
     border: none;
     background: transparent;
-    color: #6c757d;
+    color: var(--pz-text-muted);
     border-radius: 4px;
     cursor: pointer;
     display: inline-flex;
@@ -123,7 +123,7 @@ a.ai-chat-header-btn {
 }
 
 .ai-chat-empty {
-    color: #6c757d;
+    color: var(--pz-text-muted);
     font-size: 13px;
     text-align: center;
     margin-top: 40px;
@@ -151,7 +151,7 @@ a.ai-chat-header-btn {
 .ai-chat-msg-assistant {
     align-self: flex-start;
     background: var(--pz-bg);
-    color: #212529;
+    color: var(--pz-text);
     border: 1px solid #dee2e6;
     border-bottom-left-radius: 3px;
 }
@@ -215,7 +215,7 @@ a.ai-chat-header-btn {
 .ai-chat-md blockquote {
     border-left: 3px solid #ced4da;
     padding-left: 10px;
-    color: #6c757d;
+    color: var(--pz-text-muted);
 }
 
 .ai-chat-md table {
@@ -270,7 +270,7 @@ a.ai-chat-header-btn {
     min-width: 0;
     padding: 0 16px 4px;
     font-size: 12px;
-    color: #6c757d;
+    color: var(--pz-text-muted);
 }
 
 .ai-chat-model i {
@@ -303,7 +303,7 @@ a.ai-chat-header-btn {
     min-width: 0;
     padding: 0 16px 6px;
     font-size: 12px;
-    color: #6c757d;
+    color: var(--pz-text-muted);
 }
 
 .ai-chat-context[hidden] {
@@ -356,7 +356,7 @@ a.ai-chat-header-btn {
        sub-pixel overflow); the JS switches it to auto at max height */
     overflow-y: hidden;
     background: var(--pz-bg);
-    color: #212529;
+    color: var(--pz-text);
     box-sizing: border-box;
 }
 
@@ -413,7 +413,7 @@ a.ai-chat-header-btn {
     align-items: center;
     gap: 6px;
     font-size: 12px;
-    color: #6c757d;
+    color: var(--pz-text-muted);
     padding: 0 4px;
     max-width: 90%;
     overflow-wrap: anywhere;

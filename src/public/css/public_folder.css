@@ -403,7 +403,7 @@ body.view-kanban .public-folder-body {
 }
 
 .filter-input::placeholder {
-    color: var(--muted-color, #999999);
+    color: var(--muted-color, var(--pz-text-subtle));
 }
 
 .clear-filter-btn {
@@ -413,7 +413,7 @@ body.view-kanban .public-folder-body {
     border: none;
     padding: 6px 8px;
     cursor: pointer;
-    color: var(--muted-color, #666666);
+    color: var(--muted-color, var(--pz-text-muted));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -428,7 +428,7 @@ body.view-kanban .public-folder-body {
 
 .filter-stats {
     font-size: 12px;
-    color: var(--muted-color, #666666);
+    color: var(--muted-color, var(--pz-text-muted));
     white-space: nowrap;
     padding: 4px 10px;
     background-color: rgba(0, 123, 255, 0.08);

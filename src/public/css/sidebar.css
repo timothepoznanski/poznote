@@ -79,7 +79,7 @@
 .sidebar-plus {
     background: transparent;
     border: none;
-    color: #6c757d !important;
+    color: var(--pz-text-muted) !important;
     font-size: 1.2rem;
     cursor: pointer;
     padding: 4px 5px;
@@ -148,7 +148,7 @@
 .sidebar-plus [class*="lucide-"],
 .sidebar-plus .lucide-plus-circle {
     font-size: 1.1em !important;
-    color: #6c757d !important;
+    color: var(--pz-text-muted) !important;
 }
 
 /* .sidebar-plus:hover { background: rgba(0,0,0,0.04); color: var(--pz-accent-hover); } /* Display background button plus on hover */
@@ -181,7 +181,7 @@
 
 .folder-name {
     font-weight: 600;
-    color: #111827;
+    color: var(--pz-text);
     font-size: var(--sidebar-font-size, 13px);
 }
 
@@ -238,7 +238,7 @@
 
 .links_arbo_left .note-title {
     font-weight: 500;
-    color: #1f2937;
+    color: var(--pz-text);
     font-size: var(--sidebar-font-size, 13px);
 }
 

@@ -98,7 +98,7 @@ body.shared-page {
     border: 1px solid var(--border-color, #d0d0d0);
     border-radius: 20px;
     background: var(--input-bg, var(--pz-bg));
-    color: var(--text-muted, #666666);
+    color: var(--text-muted, var(--pz-text-muted));
     cursor: pointer;
     transition: all 0.2s ease;
     font-family: inherit;
@@ -123,7 +123,7 @@ body.shared-page {
 /* Shared type icon in rows */
 .shared-type-icon {
     font-size: 14px;
-    color: var(--text-muted, #999);
+    color: var(--text-muted, var(--pz-text-subtle));
     flex-shrink: 0;
     margin-right: 2px;
 }
@@ -164,7 +164,7 @@ body.shared-page {
     border: 1px solid rgba(148, 163, 184, 0.34);
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.76);
-    color: var(--text-muted, #5f6b76);
+    color: var(--text-muted, var(--pz-text-muted));
     box-shadow: none;
 }
 
@@ -200,7 +200,7 @@ body.shared-page {
     .shared-filter-tree-actions .btn:not(:disabled):focus {
         border-color: rgba(148, 163, 184, 0.34);
         background: rgba(255, 255, 255, 0.76);
-        color: var(--text-muted, #5f6b76);
+        color: var(--text-muted, var(--pz-text-muted));
         box-shadow: none;
         outline: none;
     }
@@ -209,7 +209,7 @@ body.shared-page {
 .shared-filter-tree-actions .btn:disabled {
     border-color: rgba(148, 163, 184, 0.2);
     background: rgba(248, 250, 252, 0.72);
-    color: #94a3b8;
+    color: var(--pz-text-subtle);
     opacity: 1;
 }
 
@@ -232,7 +232,7 @@ body.shared-page {
 }
 
 .filter-input::placeholder {
-    color: var(--text-muted, #999999);
+    color: var(--text-muted, var(--pz-text-subtle));
 }
 
 .clear-filter-btn {
@@ -242,7 +242,7 @@ body.shared-page {
     border: none;
     padding: 6px 8px;
     cursor: pointer;
-    color: var(--text-muted, #666666);
+    color: var(--text-muted, var(--pz-text-muted));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -258,7 +258,7 @@ body.shared-page {
 .filter-stats {
     flex: 0 0 auto;
     font-size: 13px;
-    color: var(--text-muted, #666666);
+    color: var(--text-muted, var(--pz-text-muted));
     white-space: nowrap;
     padding: 6px 12px;
     background-color: #f0f7ff;

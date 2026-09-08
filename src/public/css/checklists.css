@@ -54,7 +54,7 @@
 
 .checklist-text:empty:before {
     content: attr(data-placeholder);
-    color: #999;
+    color: var(--pz-text-subtle);
     pointer-events: none;
 }
 
@@ -99,14 +99,14 @@
 .checklist-checkbox:checked+.checklist-text {
     text-decoration: line-through;
     opacity: 0.6;
-    color: #999;
+    color: var(--pz-text-subtle);
 }
 
 /* Legacy support */
 .checklist-checkbox:checked+.checklist-input {
     text-decoration: line-through;
     opacity: 0.6;
-    color: #999;
+    color: var(--pz-text-subtle);
 }
 
 /* Dark mode */

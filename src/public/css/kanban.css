@@ -10,7 +10,7 @@
     margin: 0;
     font-size: 1.5rem;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--pz-text);
 }
 
 .kanban-title i {
@@ -90,7 +90,7 @@
     min-width: 0;
     font-weight: 600;
     font-size: 1rem;
-    color: #334155;
+    color: var(--pz-text);
 }
 
 .kanban-column-title span {
@@ -118,7 +118,7 @@
     min-height: 26px;
     border: none;
     background: transparent;
-    color: #6c757d;
+    color: var(--pz-text-muted);
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -148,7 +148,7 @@
     height: 26px;
     padding: 0 8px;
     background: #f1f5f9;
-    color: #64748b;
+    color: var(--pz-text-muted);
     font-size: 0.8rem;
     font-weight: 600;
     border-radius: 13px;
@@ -216,7 +216,7 @@
     padding: 6px 6px;
     border: none;
     background: transparent;
-    color: #334155;
+    color: var(--pz-text);
     font-size: 0.85rem;
     font-weight: 600;
     text-align: left;
@@ -272,7 +272,7 @@
     height: 22px;
     padding: 0 7px;
     background: #e2e8f0;
-    color: #64748b;
+    color: var(--pz-text-muted);
     font-size: 0.75rem;
     font-weight: 600;
     border-radius: 11px;
@@ -361,7 +361,7 @@
     border: 1px solid #cbd5e1;
     border-radius: 50%;
     background: var(--pz-bg);
-    color: #94a3b8;
+    color: var(--pz-text-subtle);
     cursor: pointer;
     /* Always visible so the action is discoverable without hovering */
     opacity: 0.65;
@@ -418,13 +418,13 @@
 }
 
 .kanban-card-completed .kanban-card-title {
-    color: #94a3b8;
+    color: var(--pz-text-subtle);
     text-decoration: line-through;
 }
 
 .kanban-card-completed .kanban-card-snippet,
 .kanban-card-completed .kanban-card-date {
-    color: #a8b3c2;
+    color: var(--pz-text-subtle);
 }
 
 /* ===== Completed section ===== */
@@ -445,7 +445,7 @@
     border: none;
     border-top: 1px solid #e2e8f0;
     background: transparent;
-    color: #64748b;
+    color: var(--pz-text-muted);
     font-size: 0.82rem;
     font-weight: 600;
     text-align: left;
@@ -455,7 +455,7 @@
 }
 
 .kanban-completed-toggle:hover {
-    color: #334155;
+    color: var(--pz-text);
 }
 
 .kanban-completed-toggle:focus-visible {
@@ -485,7 +485,7 @@
     height: 22px;
     padding: 0 7px;
     background: #f1f5f9;
-    color: #64748b;
+    color: var(--pz-text-muted);
     font-size: 0.75rem;
     font-weight: 600;
     border-radius: 11px;
@@ -504,7 +504,7 @@
 .kanban-card-title {
     font-size: 0.95rem;
     font-weight: 500;
-    color: #1e293b;
+    color: var(--pz-text);
     line-height: 1.4;
     margin-bottom: 8px;
     word-break: break-word;
@@ -517,7 +517,7 @@
     gap: 6px;
     flex-wrap: nowrap;
     font-size: 0.8rem;
-    color: #94a3b8;
+    color: var(--pz-text-subtle);
     margin-bottom: 10px;
     width: 100%;
     max-width: 100%;
@@ -536,7 +536,7 @@
 
 .kanban-card-snippet {
     font-size: 0.8rem;
-    color: #64748b;
+    color: var(--pz-text-muted);
     line-height: 1.5;
     margin-bottom: 10px;
     display: -webkit-box;
@@ -582,7 +582,7 @@
     gap: 6px;
     min-width: 0;
     min-height: 20px;
-    color: #475569;
+    color: var(--pz-text-secondary);
     cursor: pointer;
 }
 
@@ -608,7 +608,7 @@
 }
 
 .kanban-task-preview-item.completed .kanban-task-preview-text {
-    color: #94a3b8;
+    color: var(--pz-text-subtle);
     text-decoration: line-through;
 }
 
@@ -636,7 +636,7 @@
     white-space: nowrap;
     padding: 2px 8px;
     background: #f1f5f9;
-    color: #475569;
+    color: var(--pz-text-secondary);
     font-size: 0.7rem;
     font-weight: 500;
     border-radius: 4px;
@@ -647,7 +647,7 @@
 .kanban-tag-colored {
     background: color-mix(in srgb, var(--tag-color) 15%, var(--pz-bg));
     border-color: color-mix(in srgb, var(--tag-color) 45%, var(--pz-bg));
-    color: color-mix(in srgb, var(--tag-color) 72%, #1e293b);
+    color: color-mix(in srgb, var(--tag-color) 72%, var(--pz-text));
 }
 
 /* ===== Due date badge ===== */
@@ -658,7 +658,7 @@
     flex: 0 0 auto;
     padding: 1px 6px;
     background: #f8fafc;
-    color: #475569;
+    color: var(--pz-text-secondary);
     font-size: 0.7rem;
     font-weight: 500;
     border-radius: 4px;
@@ -709,13 +709,13 @@
     margin: 0 0 12px 0;
     font-size: 1.5rem;
     font-weight: 600;
-    color: #334155;
+    color: var(--pz-text);
 }
 
 .kanban-empty-state p {
     margin: 0 0 24px 0;
     font-size: 1rem;
-    color: #64748b;
+    color: var(--pz-text-muted);
     line-height: 1.6;
 }
 
@@ -792,7 +792,7 @@
     height: 28px;
     border-radius: 50%;
     background: var(--bg-secondary, #f1f5f9);
-    color: #64748b;
+    color: var(--pz-text-muted);
     border: 1px solid #e2e8f0;
     display: flex;
     align-items: center;
@@ -812,7 +812,7 @@
 
 .kanban-scroll-btn-header:hover {
     background: #e2e8f0;
-    color: #1e293b;
+    color: var(--pz-text);
     border-color: #64748b;
 }
 
@@ -822,7 +822,7 @@
     gap: 6px;
     padding: 6px 12px;
     background: var(--bg-secondary, #f1f5f9);
-    color: #1e293b;
+    color: var(--pz-text);
     border: 1px solid var(--border-color, #e2e8f0);
     border-radius: 6px;
     cursor: pointer;
@@ -858,7 +858,7 @@
     margin: 0;
     font-size: 1.25rem;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--pz-text);
 }
 
 .kanban-inline-view .kanban-board {
@@ -992,7 +992,7 @@ html[data-theme='dark'] .kanban-inline-header .kanban-title {
     min-width: 32px;
     padding: 6px 10px;
     background: var(--bg-secondary, #f1f5f9);
-    color: #64748b;
+    color: var(--pz-text-muted);
     border: 1px solid var(--border-color, #e2e8f0);
     border-radius: 6px;
     cursor: pointer;
@@ -1017,7 +1017,7 @@ html[data-theme='dark'] .kanban-inline-header .kanban-title {
     min-width: 32px;
     padding: 6px 10px;
     background: var(--bg-secondary, #f1f5f9);
-    color: #64748b;
+    color: var(--pz-text-muted);
     border: 1px solid var(--border-color, #e2e8f0);
     border-radius: 6px;
     cursor: pointer;

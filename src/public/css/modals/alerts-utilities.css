@@ -58,7 +58,7 @@
 /* Disabled & Danger in modals */
 .modal .btn-disabled {
     background: #cccccc !important;
-    color: #888888 !important;
+    color: var(--pz-text-muted) !important;
     border: none;
     padding: 8px 12px;
     border-radius: 6px;
@@ -102,7 +102,7 @@
 }
 
 .text-muted {
-    color: #6c757d;
+    color: var(--pz-text-muted);
 }
 
 .text-small {
@@ -110,7 +110,7 @@
 }
 
 .text-small-muted {
-    color: #6c757d;
+    color: var(--pz-text-muted);
     font-size: 14px;
     margin-top: 8px;
 }
@@ -144,7 +144,7 @@
 .delete-folder-note {
     margin-top: 10px;
     font-size: 0.9em;
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 /* ============================================
@@ -154,7 +154,7 @@
 .modal-info-message {
     margin-top: 12px;
     font-size: 0.9em;
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 .modal-body-spaced {

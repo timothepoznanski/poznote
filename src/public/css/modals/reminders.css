@@ -90,7 +90,7 @@
 /* Preview block placeholder when no reminder is configured yet */
 .reminder-current-info.is-empty {
     font-style: italic;
-    color: #888;
+    color: var(--pz-text-muted);
 }
 
 .reminder-repeat-row {
@@ -162,7 +162,7 @@
 .reminder-repeat-hint {
     font-size: 11.5px;
     line-height: 1.4;
-    color: #777;
+    color: var(--pz-text-muted);
     margin-top: -6px;
 }
 
@@ -232,7 +232,7 @@
 }
 
 .reminder-email-hint {
-    color: #777;
+    color: var(--pz-text-muted);
     font-size: 12px;
     line-height: 1.35;
     overflow-wrap: anywhere;

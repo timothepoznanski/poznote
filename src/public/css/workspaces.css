@@ -274,7 +274,7 @@ a.workspace-name-link:focus-visible {
 
 .workspace-count {
     font-size: 12px;
-    color: #666;
+    color: var(--pz-text-muted);
     background-color: #e9ecef;
     padding: 2px 8px;
     border-radius: 12px;
@@ -294,7 +294,7 @@ a.workspace-name-link:focus-visible {
     align-items: center;
     gap: 4px;
     font-size: 12px;
-    color: #4b5563;
+    color: var(--pz-text-secondary);
     background: #eef2f7;
     border-radius: 12px;
     padding: 2px 9px;
@@ -417,12 +417,12 @@ a.workspace-name-link:focus-visible {
 
 .workspace-share-badge.is-disabled {
     background: #eceff1;
-    color: #475569;
+    color: var(--pz-text-secondary);
 }
 
 .workspace-share-help {
     margin: 8px 0 0;
-    color: #64748b;
+    color: var(--pz-text-muted);
     font-size: 13px;
 }
 
@@ -452,7 +452,7 @@ a.workspace-name-link:focus-visible {
 
 .shared-edit-token-modal .shared-edit-token-modal-content p {
     margin: 0 0 16px;
-    color: #4b5563;
+    color: var(--pz-text-secondary);
     line-height: 1.5;
 }
 
@@ -466,7 +466,7 @@ a.workspace-name-link:focus-visible {
 
 .shared-edit-token-modal .shared-edit-token-field-label {
     font-weight: 600;
-    color: #374151;
+    color: var(--pz-text);
 }
 
 .shared-edit-token-modal .workspace-share-modal-url-row {
@@ -512,7 +512,7 @@ a.workspace-name-link:focus-visible {
 .shared-edit-token-modal .workspace-share-modal-copy-btn {
     background: var(--pz-surface-hover);
     border: 1px solid var(--pz-border-strong);
-    color: #374151;
+    color: var(--pz-text);
     flex-shrink: 0;
     align-self: center;
     width: 40px;
@@ -527,7 +527,7 @@ a.workspace-name-link:focus-visible {
 }
 
 .shared-edit-token-modal .workspace-share-modal-url.is-preview {
-    color: #374151;
+    color: var(--pz-text);
 }
 
 .shared-edit-token-modal a.workspace-share-modal-url:hover {
@@ -570,7 +570,7 @@ a.workspace-name-link:focus-visible {
     align-self: stretch;
     background: var(--pz-surface-hover);
     border: 1px solid var(--pz-border-strong);
-    color: #374151;
+    color: var(--pz-text);
     border-radius: 6px;
 }
 
@@ -578,7 +578,7 @@ a.workspace-name-link:focus-visible {
 .shared-edit-token-modal .workspace-share-modal-copy-btn:hover:not(:disabled) {
     background: #e5e7eb;
     border-color: var(--pz-text-subtle);
-    color: #111827;
+    color: var(--pz-text);
 }
 
 .shared-edit-token-modal .workspace-share-modal-copy-btn {
@@ -611,7 +611,7 @@ a.workspace-name-link:focus-visible {
 }
 
 .shared-edit-token-modal .indexable-label-text {
-    color: #374151;
+    color: var(--pz-text);
 }
 
 .shared-edit-token-modal .share-user-list-container {
@@ -638,7 +638,7 @@ a.workspace-name-link:focus-visible {
     align-items: center;
     gap: 8px;
     padding: 9px 10px;
-    color: #374151;
+    color: var(--pz-text);
 }
 
 .shared-edit-token-modal .share-user-list-row + .share-user-list-row {
@@ -888,7 +888,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
     border: 1px solid #ddd;
     border-radius: 4px;
     background: white;
-    color: #666;
+    color: var(--pz-text-muted);
     cursor: pointer;
     transition: all 0.2s ease;
     margin-right: 5px;
@@ -919,7 +919,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
 /* Disabled / grayed buttons */
 .btn[disabled], .btn.disabled {
     background: #e9ecef !important;
-    color: #6c757d !important;
+    color: var(--pz-text-muted) !important;
     border-color: #ddd !important;
     cursor: not-allowed;
     box-shadow: none !important;
@@ -927,7 +927,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
 }
 
 /* Lock icon for default workspace */
-.locked-icon { color: #777; margin-left: 8px; font-size: 0.9rem; }
+.locked-icon { color: var(--pz-text-muted); margin-left: 8px; font-size: 0.9rem; }
 
 .form-group input[type="text"], 
 .form-group input[type="password"] {
@@ -1090,7 +1090,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
     border: 1px solid #ddd !important;
     border-radius: 4px !important;
     background: white !important;
-    color: #666 !important;
+    color: var(--pz-text-muted) !important;
     cursor: pointer !important;
     transition: all 0.2s ease !important;
     margin-right: 8px !important; /* More spacing on mobile */

@@ -162,7 +162,7 @@
     padding: 4px 8px;
     border-radius: 4px;
     border: 1px solid #eee;
-    color: #222;
+    color: var(--pz-text);
     background: #fafafa;
 }
 
@@ -253,7 +253,7 @@ body:not(.has-background-image) .note-header {
 
 .note-header>#lastupdated {
     font-size: 0.95em;
-    color: #888;
+    color: var(--pz-text-muted);
 }
 
 /* Toolbar Buttons */

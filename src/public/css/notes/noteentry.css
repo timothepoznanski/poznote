@@ -10,13 +10,13 @@
 /* ContentEditable Placeholder */
 div[contentEditable=true]:empty:before {
     content: attr(data-ph);
-    color: #bababa;
+    color: var(--pz-text-subtle);
 }
 
 /* Placeholder lines around embedded Excalidraw diagrams */
 .excalidraw-placeholder:empty:before {
     content: attr(data-ph);
-    color: #999;
+    color: var(--pz-text-subtle);
     font-style: italic;
     opacity: 0.6;
 }
@@ -31,7 +31,7 @@ div[contentEditable=true]:empty:before {
 p.code-block-placeholder-before[data-ph]:empty:before,
 p.code-block-placeholder-after[data-ph]:empty:before {
     content: attr(data-ph);
-    color: #999;
+    color: var(--pz-text-subtle);
     font-style: italic;
     opacity: 0.6;
 }
@@ -369,7 +369,7 @@ textarea:focus {
     min-height: 132px;
     padding: 12px;
     background: #f8fafc;
-    color: #1f2937;
+    color: var(--pz-text);
     text-decoration: none;
 }
 
@@ -383,7 +383,7 @@ textarea:focus {
 .note-attachment-preview-file-card i,
 .note-attachment-preview-caption i {
     flex: 0 0 auto;
-    color: #64748b;
+    color: var(--pz-text-muted);
 }
 
 .note-attachment-preview-file-card i {
@@ -413,7 +413,7 @@ textarea:focus {
     min-height: 42px;
     padding: 7px 8px;
     border-top: 1px solid #d8dee4;
-    color: #64748b;
+    color: var(--pz-text-muted);
     font-size: 0.78rem;
     line-height: 1.2;
 }
@@ -427,7 +427,7 @@ textarea:focus {
 .note-attachment-preview-caption a {
     min-width: 0;
     overflow: hidden;
-    color: #0f172a;
+    color: var(--pz-text);
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
@@ -444,7 +444,7 @@ textarea:focus {
 
 .note-attachment-preview-size {
     flex: 0 0 auto;
-    color: #64748b;
+    color: var(--pz-text-muted);
     font-size: 0.72rem;
 }
 

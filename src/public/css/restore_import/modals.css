@@ -46,7 +46,7 @@
 
 .import-confirm-modal-content p {
     margin-bottom: 20px;
-    color: #555;
+    color: var(--pz-text-secondary);
     line-height: 1.5;
 }
 
@@ -164,7 +164,7 @@
 
 .custom-alert-content p {
     margin-bottom: 20px;
-    color: #555;
+    color: var(--pz-text-secondary);
     line-height: 1.5;
 }
 

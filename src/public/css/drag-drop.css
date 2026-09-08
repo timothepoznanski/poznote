@@ -180,7 +180,7 @@ html[data-theme='dark'] .folder-header.folder-drop-after>.folder-toggle::after {
 }
 
 .folder-icon {
-    color: #b0b0b0;
+    color: var(--pz-text-subtle);
     margin-right: 8px;
     transition: transform 0.2s;
     align-content: center;
@@ -231,7 +231,7 @@ html[data-theme='dark'] .folder-header.folder-drop-after>.folder-toggle::after {
     flex-direction: column;
     align-items: center;
     gap: 8px;
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 .drop-zone-icon {

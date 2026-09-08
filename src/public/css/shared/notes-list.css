@@ -30,7 +30,7 @@
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: var(--text-muted, #666666);
+    color: var(--text-muted, var(--pz-text-muted));
     text-align: center;
 }
 
@@ -60,7 +60,7 @@
     justify-content: center;
     width: 16px;
     height: 16px;
-    color: var(--text-muted, #666666);
+    color: var(--text-muted, var(--pz-text-muted));
     cursor: help;
 }
 
@@ -240,7 +240,7 @@
     align-items: center;
     gap: 5px;
     font-size: 13px;
-    color: #6c757d;
+    color: var(--pz-text-muted);
     background-color: transparent;
     padding: 0;
     margin-right: 5px;
@@ -281,7 +281,7 @@
     min-width: 0;
     font-family: monospace;
     font-size: 13px;
-    color: var(--text-muted, #666666);
+    color: var(--text-muted, var(--pz-text-muted));
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -383,7 +383,7 @@
 .note-actions-placeholder {
     font-size: 12px;
     font-style: italic;
-    color: var(--text-muted, #666666);
+    color: var(--text-muted, var(--pz-text-muted));
     text-align: center;
     white-space: nowrap;
 }
@@ -391,12 +391,12 @@
 .empty-message {
     text-align: center;
     padding: 60px 20px;
-    color: var(--text-muted, #666666);
+    color: var(--text-muted, var(--pz-text-muted));
 }
 
 .empty-message i {
     font-size: 48px;
-    color: var(--text-muted, #cccccc);
+    color: var(--text-muted, var(--pz-text-subtle));
     margin-bottom: 16px;
 }
 

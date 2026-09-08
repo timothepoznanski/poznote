@@ -75,7 +75,7 @@ body.trash-page {
 
 .trash-page-count {
     font-size: 13px;
-    color: #888;
+    color: var(--pz-text-muted);
     text-align: center;
     width: 100%;
     margin-top: 10px;
@@ -83,7 +83,7 @@ body.trash-page {
 
 .trash-search-results {
     font-size: 13px;
-    color: #666;
+    color: var(--pz-text-muted);
     white-space: nowrap;
     padding: 6px 12px;
     background-color: #f0f7ff;
@@ -142,7 +142,7 @@ body.trash-page {
     border: none;
     padding: 6px 8px;
     cursor: pointer;
-    color: #666;
+    color: var(--pz-text-muted);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -150,21 +150,21 @@ body.trash-page {
 }
 
 .trash-search-input::placeholder {
-    color: #999 !important;
+    color: var(--pz-text-subtle) !important;
     opacity: 1;
 }
 
 .trash-search-input::-webkit-input-placeholder {
-    color: #999 !important;
+    color: var(--pz-text-subtle) !important;
 }
 
 .trash-search-input::-moz-placeholder {
-    color: #999 !important;
+    color: var(--pz-text-subtle) !important;
     opacity: 1;
 }
 
 .trash-search-input:-ms-input-placeholder {
-    color: #999 !important;
+    color: var(--pz-text-subtle) !important;
 }
 
 /* Sort toggle: two links styled as one segmented control, sitting next to the
@@ -183,7 +183,7 @@ body.trash-page {
     border-radius: 6px;
     font-size: 13px;
     line-height: 1.2;
-    color: #666;
+    color: var(--pz-text-muted);
     text-decoration: none;
     white-space: nowrap;
     transition: all 0.2s ease;
@@ -259,7 +259,7 @@ body.trash-page {
 
 .trash-note-header .lastupdated {
     font-size: 12.5px;
-    color: #888;
+    color: var(--pz-text-muted);
 }
 
 .trash-action-icons {
@@ -287,7 +287,7 @@ body.trash-page {
 .trash-action-btn .lucide {
     width: 17px;
     height: 17px;
-    color: #666;
+    color: var(--pz-text-muted);
     background-color: #666;
     pointer-events: none;
 }
@@ -387,7 +387,7 @@ body.trash-page {
 /* Empty state */
 .trash-no-notes {
     text-align: center;
-    color: #666;
+    color: var(--pz-text-muted);
     margin-top: 60px;
     font-size: 1.05em;
     padding-bottom: 100px;
@@ -412,13 +412,13 @@ body.trash-page {
 }
 
 .trash-no-notes-text {
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 .trash-limit-notice {
     text-align: center;
     font-size: 13px;
-    color: #888;
+    color: var(--pz-text-muted);
     margin: 10px 0 30px 0;
 }
 
@@ -449,7 +449,7 @@ body.trash-page {
 .trash-clear-search {
     cursor: pointer;
     margin-left: 10px;
-    color: #666;
+    color: var(--pz-text-muted);
     transition: color 0.2s;
 }
 

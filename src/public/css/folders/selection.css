@@ -35,7 +35,7 @@
 .folder-option i {
     margin-right: 10px;
     width: 16px;
-    color: #666;
+    color: var(--pz-text-muted);
     flex-shrink: 0;
 }
 

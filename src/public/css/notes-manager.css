@@ -27,7 +27,7 @@ body.notes-manager-page {
 .nm-filter-icon {
     position: absolute;
     left: 10px;
-    color: #94a3b8;
+    color: var(--pz-text-subtle);
     pointer-events: none;
 }
 
@@ -64,7 +64,7 @@ body.notes-manager-page {
     border: none;
     padding: 4px 6px;
     cursor: pointer;
-    color: #666;
+    color: var(--pz-text-muted);
     display: flex;
     align-items: center;
     border-radius: 4px;
@@ -131,7 +131,7 @@ body.notes-manager-page {
 .nm-selected-count {
     font-size: 14px;
     font-weight: 600;
-    color: var(--text-color, #334155);
+    color: var(--text-color, var(--pz-text));
 }
 
 #nmBulkBar .nm-bulk-btn {
@@ -139,13 +139,13 @@ body.notes-manager-page {
     padding: 8px 14px;
     font-weight: 500;
     background: transparent;
-    color: #64748b;
+    color: var(--pz-text-muted);
     border: 1px solid var(--pz-border-strong);
 }
 
 #nmBulkBar .nm-bulk-btn:hover {
     background: #f1f5f9;
-    color: #475569;
+    color: var(--pz-text-secondary);
     border-color: #94a3b8;
 }
 
@@ -156,7 +156,7 @@ body.notes-manager-page {
     border: 1px solid var(--action-border, #cbd5e1);
     border-radius: 8px;
     background: var(--action-bg, var(--pz-bg));
-    color: var(--action-color, #334155);
+    color: var(--action-color, var(--pz-text));
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
@@ -175,7 +175,7 @@ body.notes-manager-page {
 }
 
 .nm-bulk-select option {
-    color: #111827;
+    color: var(--pz-text);
 }
 
 :root[data-theme='dark'] .nm-bulk-select {
@@ -518,7 +518,7 @@ html[data-theme='dark'] .nm-folder-option-selected {
 
 .nm-folder-option-selected {
     background: var(--selected-bg, #eef2f6);
-    color: var(--selected-color, #334155);
+    color: var(--selected-color, var(--pz-text));
     font-weight: 500;
 }
 
