@@ -641,6 +641,7 @@ class NotesController {
                     }
                 } catch (Exception $e) {
                     // ignore
+                    error_log('NotesController: index() failed: ' . $e->getMessage());
                 }
             }
             
@@ -1148,6 +1149,7 @@ class NotesController {
                 $autoPushEnabled = $gitSync->isAutoPushEnabled();
             } catch (Exception $e) {
                 // Silently fail if GitSync is not available
+                error_log('NotesController: update() failed: ' . $e->getMessage());
             }
             
             // Validate workspace if changed
@@ -1731,7 +1733,7 @@ class NotesController {
 
         // Free any share tokens in the master registry before the entries are
         // deleted (the ON DELETE CASCADE only removes the shared_notes rows)
-        require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
         unregisterSharedLinksForNotes($this->con, array_merge([$noteId], array_column($linkedNotes, 'id')));
 
         $deletedLinkedCount = 0;
@@ -2454,7 +2456,7 @@ class NotesController {
                 // and keep the attachment URLs intact
                 
                 require_once __DIR__ . '/../../../markdown_parser.php';
-                $convertedContent = parseMarkdown($content);
+                $convertedContent = parseMarkdownForRichText($content);
                 $newType = 'note';
                 
                 // Note: Attachments are preserved during conversion
@@ -2548,7 +2550,7 @@ class NotesController {
 
         try {
             require_once __DIR__ . '/../../../markdown_parser.php';
-            $this->sendSuccess(['html' => parseMarkdown($markdown)]);
+            $this->sendSuccess(['html' => parseMarkdownForRichText($markdown)]);
         } catch (Exception $e) {
             error_log('convertMarkdown error: ' . $e->getMessage());
             $this->sendError(500, 'Conversion failed');
@@ -2798,18 +2800,17 @@ class NotesController {
      * Send a success response
      */
     private function sendSuccess(array $data): void {
-        echo json_encode(array_merge(['success' => true], $data));
+        apiSuccess($data);
     }
     
     /**
      * Send an error response
      */
     private function sendError(int $code, string $message): void {
-        http_response_code($code);
-        echo json_encode([
-            'success' => false,
-            'error' => $message
-        ]);
+        // Delegates to lib/api-response.php. Note that FoldersController and
+        // TrashController declare the arguments the other way round; the
+        // signatures are typed, so a call in the wrong order fails loudly.
+        apiFail($message, $code);
     }
 
     /**

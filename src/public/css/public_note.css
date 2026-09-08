@@ -1,0 +1,927 @@
+/* Styles for the public (shared) note view */
+
+/* Load Inter font */
+@font-face {
+    font-family: 'Inter';
+    src: url('../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
+
+body {
+    /* background: #f7f7f7; */
+    font-family: 'Inter', sans-serif;
+}
+
+body.public-note-page {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.public-note-layout {
+    display: flex;
+    align-items: stretch;
+    min-height: 100vh;
+    height: 100vh;
+}
+
+.public-note-main {
+    flex: 1;
+    min-width: 0;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.public-note {
+    max-width: 900px;
+    margin: 18px auto;
+    padding: 24px;
+    /* background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(16,24,40,0.04); */
+}
+
+.public-note h1 {
+    margin-top: 0;
+    font-size: 1.4rem;
+    color: #0f172a;
+}
+
+.public-note .meta {
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 12px;
+}
+
+.public-note .content {
+    /* container for note HTML */
+    line-height: 1.2;
+    white-space: normal;
+}
+
+.public-note .content.public-note-markdown {
+    padding-bottom: 16px;
+    box-sizing: border-box;
+}
+
+@media screen and (max-width: 800px) {
+    body.public-note-page {
+        height: auto;
+        overflow: auto;
+    }
+
+    .public-note-layout {
+        min-height: auto;
+        height: auto;
+    }
+
+    .public-note-main {
+        height: auto;
+        overflow: visible;
+    }
+}
+
+.public-note img {
+    max-width: 100%;
+    height: auto;
+    cursor: default !important;
+}
+
+.public-note .content .excalidraw-container {
+    display: block;
+    max-width: 100%;
+    margin: 5px 0;
+    text-align: left !important;
+    cursor: default !important;
+}
+
+.public-note .content .excalidraw-container img,
+.public-note .content img[data-is-excalidraw="true"] {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    cursor: default !important;
+}
+
+.public-note img.img-with-border {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 6px;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+.public-note img.img-with-border-no-padding {
+    border: 1px solid #ddd;
+    border-radius: 0;
+    padding: 0 !important;
+    vertical-align: middle;
+    box-sizing: border-box;
+}
+
+.public-note video {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: #000;
+    margin: 10px 0;
+}
+
+.public-note audio {
+    max-width: 280px;
+    width: 100%;
+    height: 54px;
+    display: block;
+    overflow: hidden;
+    margin: 8px 0;
+    padding: 0;
+    border: 1px solid #d0d7de;
+    box-sizing: border-box;
+    border-radius: 999px;
+    background: #ffffff;
+}
+
+.public-note audio::-webkit-media-controls-enclosure,
+.public-note audio::-webkit-media-controls-panel {
+    border-radius: inherit;
+    background: #ffffff;
+}
+
+.public-note .note-audio-embed {
+    max-width: 280px;
+    display: block;
+    border-radius: 8px;
+    background: #f1f3f4;
+    margin: 8px 0;
+}
+
+@media screen and (max-width: 768px) {
+    .public-note audio,
+    .public-note .note-audio-embed {
+        max-width: 240px;
+    }
+}
+
+.public-note iframe:not([data-is-audio]):not(.note-audio-embed) {
+    width: 100% !important;
+    max-width: 50%;
+    height: auto !important;
+    aspect-ratio: 16 / 9;
+    border: none;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+@media screen and (max-width: 768px) {
+    .public-note iframe:not([data-is-audio]):not(.note-audio-embed) {
+        max-width: 100%;
+    }
+}
+
+.public-note iframe[data-is-audio] {
+    max-width: 280px;
+    width: 100%;
+    height: 54px;
+    display: block;
+    overflow: hidden;
+    margin: 8px 0;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+}
+
+.public-note iframe.note-audio-embed {
+    max-width: 280px;
+    width: 100%;
+    height: 54px;
+    display: block;
+    overflow: hidden;
+    margin: 8px 0;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+}
+
+@media screen and (max-width: 768px) {
+    .public-note iframe[data-is-audio] {
+        max-width: 240px;
+    }
+
+    .public-note iframe.note-audio-embed {
+        max-width: 240px;
+    }
+}
+
+/* Default table styles for public notes. Keep specificity low so custom CSS can override them. */
+:where(.public-note .content) table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 12px 0;
+    border-spacing: 0;
+}
+
+:where(.public-note .content) table td,
+:where(.public-note .content) table th {
+    border: 1px solid #ddd;
+    padding: 8px;
+    min-width: 50px;
+    text-align: left;
+    white-space: pre-line;
+}
+
+:where(.public-note .content) table th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+}
+
+/* Code block styles for public notes */
+.public-note .content code {
+    background-color: transparent;
+    padding: 2px 6px;
+    font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
+    font-size: 0.9em;
+    color: var(--pz-text);
+    border-radius: 3px;
+}
+
+.public-note .content pre {
+    font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
+    background: #F8FAFC !important;
+    padding: 30px !important;
+    padding-bottom: 20px !important;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: 0.75em 0;
+    position: relative;
+    border: 1px solid #e9ecef;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    font-size: var(--code-block-font-size, 15px) !important;
+    color: var(--pz-text);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Extra padding for code blocks with language badge */
+.public-note .content pre[data-language] {
+    padding-top: 32px;
+}
+
+.public-note .content pre code {
+    background-color: transparent !important;
+    padding: 0 !important;
+    color: inherit;
+    border-radius: 0 !important;
+    border: none !important;
+    display: block;
+    line-height: 1.4;
+    white-space: inherit !important;
+    font-size: inherit !important;
+}
+
+/* Remove Highlight.js background in public notes */
+.public-note .content pre code.hljs,
+.public-note .content pre .hljs {
+    background: transparent !important;
+}
+
+/* Copy button for code blocks */
+.public-note .content .code-block-copy-btn,
+.code-block-copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 1;
+    transition: background-color 0.2s;
+    font-size: 12px;
+    color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.public-note .content .code-block-copy-btn {
+    background: transparent;
+    border: none;
+    color: #8a8f98;
+}
+
+.public-note .content .code-block-copy-btn:hover,
+.code-block-copy-btn:hover {
+    background-color: #fff;
+    color: var(--pz-text);
+}
+
+.public-note .content .code-block-copy-btn:hover {
+    background: transparent;
+    border: none;
+}
+
+.public-note .content .code-block-copy-btn.copied,
+.code-block-copy-btn.copied {
+    background-color: #4caf50;
+    color: white;
+    border-color: #4caf50;
+}
+
+.public-note .content .code-block-copy-btn.copied {
+    background: transparent;
+    border: none;
+    color: var(--pz-success);
+}
+
+.public-note .content .code-block-copy-btn svg,
+.code-block-copy-btn svg {
+    width: 16px;
+    height: 16px;
+    display: block;
+    stroke: currentColor;
+    fill: none;
+}
+
+/* Blockquote styles */
+.public-note .content blockquote {
+    border-left: 4px solid #ddd;
+    padding-left: 16px;
+    margin: 1em 0;
+    color: #666;
+    font-style: italic;
+}
+
+/* List styles */
+.public-note .content ul,
+.public-note .content ol {
+    margin: 1em 0;
+    padding-left: 2em;
+    line-height: 1.6;
+}
+
+.public-note .content li {
+    margin: 0.5em 0;
+}
+
+/* Task list styles */
+.public-note .content ul.task-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.public-note .content li.task-list-item {
+    list-style: none;
+    position: relative;
+    padding-left: 0;
+}
+
+.public-note .content li.task-list-item input[type="checkbox"] {
+    margin-right: 0.8em;
+    cursor: pointer;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+/* Nested task lists need indentation */
+.public-note .content li.task-list-item>ul.task-list,
+.public-note .content li.task-list-item>ul,
+.public-note .content li.task-list-item>ol {
+    padding-left: 1.5em;
+    margin: 0.5em 0;
+}
+
+/* Style for checked task items */
+.public-note .content li.task-list-item input[type="checkbox"]:checked+span {
+    text-decoration: line-through;
+    color: #888;
+}
+
+/* Tasklist note styles (JSON-based tasklists) */
+.public-note .content .task-item input[type="checkbox"] {
+    margin-right: 0.8em;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.public-note .content .task-item.completed .task-text {
+    text-decoration: line-through;
+    color: #888;
+}
+
+/* Task actions (edit/delete buttons) */
+.task-actions {
+    display: flex;
+    gap: 5px;
+    margin-left: auto;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.task-item:hover .task-actions,
+.task-item.completed .task-actions {
+    opacity: 1;
+}
+
+.task-action-btn {
+    background: transparent;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 5px;
+    transition: color 0.2s;
+}
+
+.task-action-btn:hover {
+    color: #666;
+}
+
+.public-task-delete-btn {
+    display: none;
+}
+
+.task-item.completed .public-task-delete-btn {
+    display: flex;
+    opacity: 1;
+    /* Ensure opacity is 1 */
+}
+
+.public-task-delete-btn:hover {
+    color: var(--pz-danger);
+}
+
+/* Interactive task text */
+.task-text {
+    cursor: text;
+}
+
+.public-note-page[data-task-access-mode='read_only'] .task-text,
+.public-note-page[data-task-access-mode='check_only'] .task-text {
+    cursor: default;
+}
+
+.public-note-page[data-task-access-mode='read_only'] .task-item input[type="checkbox"] {
+    cursor: default;
+}
+
+/* .alert-modal.* specificity needed: modal-alerts.css loads after this file
+   and its .alert-modal { max-width: 400px } would win otherwise */
+.alert-modal.public-task-edit-modal {
+    width: min(92vw, 720px);
+    max-width: 720px;
+}
+
+.alert-modal-body.public-task-edit-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 24px !important;
+}
+
+.public-task-edit-title {
+    margin: 0 0 8px 0;
+    color: var(--text-color, var(--pz-text));
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.public-task-edit-footer {
+    padding: 0 24px 24px 24px;
+}
+
+.public-task-edit-cancel {
+    background: #6c757d;
+    color: #fff;
+}
+
+.public-task-edit-cancel:hover {
+    background: #5a6268;
+}
+
+/* Important task styling for public view */
+.public-note .content .task-item.important {
+    border-color: #ffcccc;
+    background: #fff6f6;
+}
+
+.public-note .content .task-item.important .task-text {
+    color: #c62828;
+    font-weight: 600;
+}
+
+/* Horizontal rule */
+.public-note .content hr {
+    border: 0;
+    border-top: 2px solid var(--pz-border);
+    margin: 2em 0;
+}
+
+/* Text formatting */
+.public-note .content strong {
+    font-weight: bold;
+}
+
+.public-note .content em {
+    font-style: italic;
+}
+
+.public-note .content del {
+    text-decoration: line-through;
+    color: #999;
+}
+
+/* Links */
+.public-note .content a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.public-note .content a:hover {
+    text-decoration: underline;
+}
+
+/* Remove underline for image links */
+.public-note .content a[data-image-link],
+.public-note .content a[data-image-link]:hover {
+    text-decoration: none;
+}
+
+/* Headings in content */
+.public-note .content h1 {
+    font-size: 2em;
+    font-weight: bold;
+    margin: 0.67em 0;
+    border-bottom: 2px solid var(--pz-border);
+    padding-bottom: 0.3em;
+}
+
+.public-note .content h2 {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 0.75em 0;
+    border-bottom: 1px solid var(--pz-border);
+    padding-bottom: 0.3em;
+}
+
+.public-note .content h3 {
+    font-size: 1.25em;
+    font-weight: bold;
+    margin: 0.83em 0;
+}
+
+.public-note .content h4 {
+    font-size: 1em;
+    font-weight: bold;
+    margin: 1em 0;
+}
+
+.public-note .content h5 {
+    font-size: 0.875em;
+    font-weight: bold;
+    margin: 1.33em 0;
+}
+
+.public-note .content h6 {
+    font-size: 0.75em;
+    font-weight: bold;
+    margin: 1.67em 0;
+    color: #666;
+}
+
+.public-note .content .heading-anchor {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.45em;
+    vertical-align: middle;
+    color: inherit;
+    text-decoration: none;
+}
+
+.public-note .content .heading-anchor svg {
+    width: 0.4em;
+    height: 0.4em;
+    fill: currentColor;
+}
+
+/* Desktop: the "Copy section link" anchor only shows while its heading is
+   hovered, like in the editor. Touch devices have no hover, so the
+   anchor stays visible there. */
+@media screen and (min-width: 801px) and (hover: hover) {
+    .public-note .content .heading-anchor {
+        opacity: 0;
+        transition: opacity 0.15s;
+    }
+
+    .public-note .content :is(h1, h2, h3, h4, h5, h6):hover .heading-anchor {
+        opacity: 0.5;
+    }
+
+    /* Same heading scope plus the anchor's own state, so it outranks the
+       heading-hover rule above without !important. */
+    .public-note .content :is(h1, h2, h3, h4, h5, h6) .heading-anchor:hover,
+    .public-note .content :is(h1, h2, h3, h4, h5, h6) .heading-anchor:focus-visible {
+        opacity: 1;
+    }
+}
+
+/* Paragraphs */
+.public-note .content p {
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* Blank lines to preserve spacing in markdown */
+.public-note .content p.blank-line {
+    margin: 0;
+    min-height: 1.2em; /* Match the line-height */
+    line-height: 1.2;
+}
+
+.public-note-attachments-row {
+    margin-top: 0;
+    margin-bottom: 14px;
+}
+
+.public-note-attachments {
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #d8dee4;
+}
+
+.public-note-attachments h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px;
+    color: #0f172a;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* Theme toggle button */
+.public-note-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.public-note-header h1 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.public-note-header h1 i {
+    flex: 0 0 auto;
+}
+
+.public-note-header h1 .public-note-title-icon {
+    flex: 0 0 auto;
+    font-style: normal;
+    line-height: 1;
+}
+
+.theme-toggle-btn {
+    background: transparent;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 18px;
+    color: var(--pz-text);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle-btn:hover {
+    background: #f5f5f5;
+    border-color: #999;
+}
+
+.theme-toggle-btn i {
+    pointer-events: none;
+}
+
+/* Dark mode styles for theme toggle */
+html[data-theme='dark'] .theme-toggle-btn {
+    color: #e0e0e0;
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .theme-toggle-btn:hover {
+    background: var(--dm-surface-hover);
+    border-color: var(--dm-border-light);
+}
+
+html[data-theme='dark'] .public-note audio {
+    background: #5f6368;
+    border-color: #4b5563;
+}
+
+html[data-theme='dark'] .public-note audio::-webkit-media-controls-enclosure,
+html[data-theme='dark'] .public-note audio::-webkit-media-controls-panel {
+    background: #5f6368;
+}
+
+html[data-theme='dark'] .public-note .content pre {
+    background-color: var(--dm-code-bg) !important;
+    border-color: var(--dm-border) !important;
+    color: var(--dm-text-muted) !important;
+}
+
+html[data-theme='dark'] .public-note .content code:not([class*="hljs"]):not([class*="language-"]) {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .public-note .content pre code:not([class*="hljs"]):not([class*="language-"]) {
+    background-color: transparent !important;
+    color: var(--dm-text-muted) !important;
+    border-color: transparent !important;
+}
+
+html[data-theme='dark'] .public-note .content pre code[class*="language-"],
+html[data-theme='dark'] .public-note .content code[class*="language-"] {
+    color: var(--dm-text-muted) !important;
+}
+
+html[data-theme='dark'] .public-note-attachments {
+    border-bottom-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .public-note-attachments h2 {
+    color: #e5e7eb;
+}
+
+/* Dark mode styles for important tasks */
+html[data-theme='dark'] .public-note .content .task-item.important {
+    border-color: #5a2a2a;
+    background: #2d1a1a;
+}
+
+html[data-theme='dark'] .public-note .content .task-item.important .task-text {
+    color: #ff6b6b;
+    font-weight: 600;
+}
+
+html[data-theme='dark'] .public-task-edit-title {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .public-task-edit-cancel {
+    background: #4c5057;
+    color: #f4f6f8;
+}
+
+html[data-theme='dark'] .public-task-edit-cancel:hover {
+    background: #595e67;
+}
+
+/* Dark mode styles for tables */
+.alert-modal-header {
+    display: none !important;
+}
+
+.alert-modal-body {
+    padding-top: 30px !important;
+}
+
+:where(html[data-theme='dark']) :where(.public-note .content) table td,
+:where(html[data-theme='dark']) :where(.public-note .content) table th {
+    border-color: var(--dm-border);
+    background: var(--dm-content-bg);
+    color: #e0e0e0;
+}
+
+:where(html[data-theme='dark']) :where(.public-note .content) table th {
+    background-color: var(--dm-surface);
+}
+
+html[data-theme='dark'] .public-note .content .heading-anchor {
+    color: #e5e7eb;
+}
+
+html[data-theme='dark'] .public-note .content blockquote {
+    border-left-color: var(--dm-border);
+    color: #b0b0b0;
+}
+
+/* Text pasted from external editors carries near-black inline colors (e.g.
+   Notion's rgb(55, 53, 47)) that are invisible on the dark background. Inline
+   styles beat any stylesheet rule, so the dark themes must neutralize the
+   known-dark values explicitly. Only these near-black colors are matched:
+   deliberate colors (red, blue, highlights) keep rendering as authored. */
+html[data-theme='dark'] .public-note .content [style*="color: rgb(55, 53, 47)"],
+html[data-theme='dark'] .public-note .content [style*="color:rgb(55,53,47)"],
+html[data-theme='dark'] .public-note .content [style*="color: rgb(0, 0, 0)"],
+html[data-theme='dark'] .public-note .content [style*="color:rgb(0,0,0)"],
+html[data-theme='dark'] .public-note .content [style*="color: #000"],
+html[data-theme='dark'] .public-note .content [style*="color:#000"],
+html[data-theme='dark'] .public-note .content [style*="color: black"],
+html[data-theme='dark'] .public-note .content [style*="color:black"] {
+    color: var(--dm-text) !important;
+}
+
+/* ============================================================================
+   Public note editing (shares with access_mode 'edit')
+   ============================================================================ */
+
+.public-note-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+/* .theme-toggle-btn forces display:flex, which would defeat the hidden
+   attribute used to swap the edit/save/cancel buttons. */
+.public-note-header-actions .theme-toggle-btn[hidden] {
+    display: none;
+}
+
+.public-note-editor {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.public-note-editor-markdown {
+    min-height: 60vh;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--pz-text);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    resize: vertical;
+}
+
+.public-note-editor-markdown:focus {
+    outline: none;
+    border-color: #999;
+}
+
+.public-note-editor-html {
+    min-height: 40vh;
+    padding: 12px;
+    border: 1px dashed #ccc;
+    border-radius: 6px;
+}
+
+.public-note-editor-html:focus {
+    outline: none;
+    border-color: #999;
+}
+
+.public-edit-save-btn {
+    color: #16a34a;
+}
+
+.public-edit-cancel-btn {
+    color: #dc2626;
+}
+
+.public-edit-save-btn.is-saving {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+html[data-theme='dark'] .public-note-editor-markdown {
+    background: var(--dm-surface, #1e293b);
+    color: var(--dm-text, #e0e0e0);
+    border-color: var(--dm-border, #475569);
+}
+
+html[data-theme='dark'] .public-note-editor-html {
+    border-color: var(--dm-border, #475569);
+}
+
+html[data-theme='dark'] .public-edit-save-btn {
+    color: #4ade80;
+}
+
+html[data-theme='dark'] .public-edit-cancel-btn {
+    color: #f87171;
+}

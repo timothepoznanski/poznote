@@ -1,0 +1,130 @@
+/**
+ * Icon Styles
+ * 
+ * Icon filters and icon color customizations
+ * for the Poznote application.
+ */
+
+/* Custom SVG icons for index.php */
+
+/* Blue color for favorite star when it's marked as favorite - var(--pz-accent) */
+.toolbar-btn.btn-favorite.is-favorite i.lucide-star,
+.toolbar-btn.btn-favorite.is-favorite .lucide-star,
+.toolbar-btn.btn-publish.is-shared i.lucide-share-2,
+.toolbar-btn.btn-publish.is-shared .lucide-share-2,
+.toolbar-btn.btn-attachment.has-attachments i,
+.toolbar-btn.btn-reminder.has-reminder i {
+    color: var(--pz-accent) !important;
+    filter: none !important;
+}
+
+/* Markdown split view button - normal icon color (not blue) */
+.toolbar-btn.markdown-split-btn i,
+.toolbar-btn.markdown-split-btn [class*="lucide-"] {
+    /* Use default icon color */
+}
+
+/* Apply default gray filter (lighter gray) to all icons not on hover */
+/* Exclude folder icons with custom colors from the filter */
+[class*="lucide-"]:not(.folder-icon[data-icon-color]):not(.note-icon[data-icon-color]):not(.shared-password-icon) {
+    filter: brightness(0) saturate(100%) invert(50%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(85%);
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+/* Keep sidebar icons crisp (avoid thick-looking filter) */
+.sidebar-howto [class*="lucide-"],
+.sidebar-folder-toggle [class*="lucide-"],
+.sidebar-plus [class*="lucide-"],
+.icon-sidebar-btn [class*="lucide-"] {
+    filter: none !important;
+    color: inherit;
+    font-size: inherit;
+}
+
+[class*="lucide-"]:not(.folder-icon[data-icon-color]):not(.note-icon[data-icon-color]):not(.shared-password-icon):hover {
+    transform: scale(1.18);
+    filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
+}
+
+/* The icon rail colours its icons via currentColor, not the global filter. The
+   rail's overflow menu clones those icons, so it needs the same exemption. */
+#icon_sidebar .icon-sidebar-btn [class*="lucide-"],
+#icon_sidebar .icon-sidebar-btn [class*="lucide-"]:hover,
+#iconSidebarOverflowMenu .icon-sidebar-overflow-item [class*="lucide-"],
+#iconSidebarOverflowMenu .icon-sidebar-overflow-item [class*="lucide-"]:hover {
+    transform: none;
+    filter: none !important;
+}
+
+/* Ensure search type button icons are not recolored by the global fa filter */
+.searchbar-type-btn i,
+.searchbar-type-btn i::before,
+.searchbar-type-btn.active i,
+.searchbar-type-btn.active i::before,
+.searchbar-type-btn:hover i,
+.searchbar-type-btn:hover i::before {
+    filter: none !important;
+}
+
+/* Exception: Remove filter for slash command color icons (so they show their iconColor) */
+.slash-command-item i[style*="color:"],
+.slash-command-submenu i[style*="color:"] {
+    filter: none !important;
+}
+
+/* Exception: Remove filter for favorite/share/attachment (to show blue color) */
+.toolbar-btn.is-favorite .lucide-star,
+.toolbar-btn.is-shared .lucide-share-2,
+.toolbar-btn.has-attachments .lucide-paperclip {
+    filter: none !important;
+}
+
+.sidebar-plus {
+    /* transform: scale(1.18); */
+    filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
+}
+
+/* Make markdown toggle icons blue */
+.markdown-edit-btn [class*="lucide-"],
+.markdown-preview-btn [class*="lucide-"],
+.markdown-view-mode-btn i {
+    color: var(--pz-accent) !important;
+    filter: none !important;
+}
+
+.markdown-edit-btn:hover [class*="lucide-"],
+.markdown-preview-btn:hover [class*="lucide-"],
+.markdown-view-mode-btn:hover i {
+    color: var(--pz-accent) !important;
+    filter: none !important;
+    transform: scale(1.18);
+}
+
+/* Split view button - normal icon color */
+.markdown-split-btn:hover i {
+    transform: scale(1.18);
+}
+
+.lucide-bold {
+    transition: transform 0.2s ease;
+}
+
+.lucide-bold:hover {
+    transform: scale(1.2);
+    color: var(--pz-accent) !important;
+}
+
+/* Red color for cancel icon in mobile slash menu */
+.slash-command-icon.lucide-times-circle,
+.slash-command-item .slash-command-icon.lucide-times-circle {
+    color: #ef4444 !important;
+    font-weight: 400;
+}
+
+.lucide-plus {
+    font-size: 1em !important;
+}
+
+.lucide-star {
+    font-size: 0.95em !important;
+}

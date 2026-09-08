@@ -1,0 +1,89 @@
+name: CI - JavaScript
+
+# Same idea as ci-php.yml, for the browser sources: catch the mistakes that
+# actually break a page (syntax errors, duplicate object keys, unreachable
+# code, invalid regexes) before a PR is merged.
+#
+# oxlint is a single binary run through npx: no package.json, no node_modules
+# and no runtime dependency added to the app. It parses the whole first-party
+# JS in about 200ms.
+#
+# Severity policy lives in .oxlintrc.json: the "correctness" category fails the
+# build, while stylistic rules stay warnings so the ~270 pre-existing ones do
+# not block anything. That is the equivalent of the PHPStan baseline, without
+# needing a baseline file.
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - '**.js'
+      - '**.jsx'
+      - '.oxlintrc.json'
+      - '.github/workflows/ci-js.yml'
+  pull_request:
+    paths:
+      - '**.js'
+      - '**.jsx'
+      - '.oxlintrc.json'
+      - '.github/workflows/ci-js.yml'
+
+# ==========================================================================
+# PINNED VERSION - READ THIS BEFORE CHANGING THE VALUE BELOW
+# ==========================================================================
+#
+# oxlint is pinned on purpose. It ships new rules in almost every minor
+# release, and because .oxlintrc.json promotes the whole "correctness"
+# category to error, a single new rule matching existing code would fail
+# every open PR at once. Unlike the PHP side there is no baseline file to
+# absorb that, so the pin IS the safety net.
+#
+# --- Upgrading OXLINT_VERSION --------------------------------------------
+#
+#   1. Set OXLINT_VERSION to the new release.
+#   2. Run the exact same command as the job below, from the repo root:
+#        npx --yes oxlint@<VERSION> \
+#          src poznote-url-saver excalidraw-build markdown-editor-build
+#   3. Read the ERROR lines only. Warnings never fail the build and can be
+#      left alone. For each new error, decide:
+#        - a genuine bug        -> fix the code
+#        - a style rule         -> downgrade it to "warn" in .oxlintrc.json,
+#                                  with a comment saying why, next to the
+#                                  ones already listed there
+#   4. Re-run until the command exits 0, then commit ci-js.yml and
+#      .oxlintrc.json in the SAME commit.
+#
+# Do not "fix" a new error by editing anything under excalidraw-build/ or
+# markdown-editor-build/ without rebuilding the corresponding bundle: those
+# sources compile into src/public/js/excalidraw-dist and src/public/js/codemirror-dist, and
+# editing one without the other leaves the shipped bundle out of sync.
+#
+# --- Upgrading node-version ----------------------------------------------
+# Only affects which Node runs npx. Any maintained LTS works; it has no
+# bearing on what the linted code targets.
+# ==========================================================================
+env:
+  OXLINT_VERSION: 1.55.0
+
+jobs:
+  javascript:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Vendored bundles (swagger-ui, mermaid, katex, highlight.js, excalidraw,
+      # codemirror, *.min.js) and node_modules are excluded via .oxlintrc.json.
+      # The *-build directories hold the hand-written sources that compile into
+      # src/public/js/{excalidraw,codemirror}-dist, so they are linted too.
+      - name: Lint JavaScript
+        run: |
+          npx --yes "oxlint@${OXLINT_VERSION}" \
+            src poznote-url-saver excalidraw-build markdown-editor-build

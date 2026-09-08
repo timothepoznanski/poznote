@@ -1,0 +1,124 @@
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+.info-page {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.info-content {
+    /* Removed background, border-radius, and border */
+    overflow: hidden;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    padding: 15px 30px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #495057;
+    flex: 0 0 210px;
+    margin-right: 32px;
+}
+
+.info-value {
+    flex: 1;
+    color: #212529;
+    display: flex;
+    align-items: center;
+}
+
+.favorite-yes {
+    color: var(--pz-warning);
+    font-weight: 600;
+}
+
+.favorite-no {
+    /* Use the same color as regular info values to match surrounding text */
+    color: inherit;
+    font-weight: 400;
+}
+
+.action-buttons {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: none;
+    font-weight: 400;
+    margin: 0 10px;
+}
+
+.btn-primary {
+    background: var(--pz-accent);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--pz-accent-hover);
+    text-decoration: none;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+/* Responsive adjustments for mobile: stack label/value and make inputs full-width */
+@media (max-width: 800px) {
+    .info-row {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 12px 16px;
+    }
+
+    .info-label {
+        flex: 0 1 auto;
+        margin-right: 0;
+        margin-bottom: 8px;
+    }
+
+    .info-value {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+}
+
+/* ===========================================
+   UTILITY CLASSES FOR INLINE STYLE EXTRACTION
+   =========================================== */
+
+/* Hidden by default */
+.initially-hidden {
+    display: none;
+}
+
+/* Cursor pointer */
+.cursor-pointer {
+    cursor: pointer;
+}

@@ -1,0 +1,497 @@
+/* ============================================
+   Reminders & Notifications Styles
+   ============================================ */
+
+/* ---- Reminder button in toolbar ---- */
+.btn-reminder.has-reminder {
+    color: var(--accent-color, #4a90d9) !important;
+}
+
+.btn-reminder.has-reminder i {
+    position: relative;
+}
+
+/* ---- Reminder Modal ---- */
+.reminder-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 16px 0;
+}
+
+.reminder-input-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.reminder-input-row label {
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0.7;
+}
+
+.reminder-datetime-input {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 6px;
+    font-size: 14px;
+    background: var(--input-bg, #fff);
+    color: inherit;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.reminder-datetime-input:focus {
+    outline: none;
+    border-color: var(--accent-color, #4a90d9);
+    box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.15);
+}
+
+/* Split date / time triggers driven by the shared calendar popup */
+.reminder-input-row {
+    display: flex;
+    gap: 8px;
+}
+
+.reminder-datetime-part {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    background: var(--input-bg, #fff);
+    color: inherit;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.reminder-datetime-part:first-of-type {
+    flex: 1;
+}
+
+.reminder-datetime-part i {
+    font-size: 14px;
+    color: var(--pz-text-muted);
+}
+
+.reminder-datetime-part:hover {
+    border-color: var(--accent-color, #4a90d9);
+}
+
+.reminder-datetime-part.initially-hidden {
+    display: none;
+}
+
+/* Preview block placeholder when no reminder is configured yet */
+.reminder-current-info.is-empty {
+    font-style: italic;
+    color: #888;
+}
+
+.reminder-repeat-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.reminder-repeat-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.reminder-repeat-label i {
+    width: 16px;
+    height: 16px;
+    color: var(--accent-color, #4a90d9);
+    flex-shrink: 0;
+}
+
+/* Compact sizing must out-rank the global iOS-zoom rule
+   (.modal-content select { font-size:16px/padding:12px !important } in responsive.css) */
+#reminderModal .reminder-repeat-select,
+#reminderModal .reminder-repeat-unit,
+#reminderModal .reminder-repeat-interval,
+#taskDueModal .reminder-repeat-select,
+#taskDueModal .reminder-repeat-unit,
+#taskDueModal .reminder-repeat-interval {
+    padding: 4px 8px !important;
+    margin: 0;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 6px;
+    font-size: 13px !important;
+    background: var(--input-bg, #fff);
+    color: inherit;
+    box-sizing: border-box;
+}
+
+/* Touch devices keep 16px to avoid iOS focus zoom */
+@media (pointer: coarse) {
+    #reminderModal .reminder-repeat-select,
+    #reminderModal .reminder-repeat-unit,
+    #reminderModal .reminder-repeat-interval,
+    #taskDueModal .reminder-repeat-select,
+    #taskDueModal .reminder-repeat-unit,
+    #taskDueModal .reminder-repeat-interval {
+        padding: 8px 10px !important;
+        font-size: 16px !important;
+    }
+}
+
+.reminder-repeat-select:focus,
+.reminder-repeat-unit:focus,
+.reminder-repeat-interval:focus {
+    outline: none;
+    border-color: var(--accent-color, #4a90d9);
+    box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.15);
+}
+
+.reminder-repeat-select {
+    flex: 1;
+    min-width: 0;
+}
+
+.reminder-repeat-hint {
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: var(--text-secondary, #777);
+    margin-top: -6px;
+}
+
+.reminder-repeat-custom {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.reminder-repeat-custom.initially-hidden {
+    display: none;
+}
+
+.reminder-repeat-interval {
+    width: 72px;
+}
+
+.reminder-repeat-unit {
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-repeat-icon {
+    width: 12px;
+    height: 12px;
+    vertical-align: -2px;
+    margin-left: 6px;
+    opacity: 0.7;
+}
+
+.reminder-email-option {
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 8px;
+    background: var(--card-bg, var(--pz-surface));
+    padding: 10px 12px;
+}
+
+.reminder-email-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    cursor: pointer;
+}
+
+.reminder-email-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.reminder-email-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.reminder-email-title i {
+    width: 16px;
+    height: 16px;
+    color: var(--accent-color, #4a90d9);
+    flex-shrink: 0;
+}
+
+.reminder-email-hint {
+    color: var(--text-secondary, #777);
+    font-size: 12px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.reminder-email-switch {
+    flex: 0 0 auto;
+}
+
+.reminder-current-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(74, 144, 217, 0.08);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--accent-color, #4a90d9);
+    margin: 8px 0;
+}
+
+.reminder-current-info i {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+/* Three localized action buttons ("Supprimer la date", "Annuler",
+   "Enregistrer") need more room than the 420px modal default */
+#reminderModal .modal-content,
+#taskDueModal .modal-content {
+    max-width: 500px;
+}
+
+/* The due modal can be opened from inside the tasks-page day modal; it must
+   stack above it (both share the .modal 9999 base) */
+#taskDueModal.modal {
+    z-index: 10001 !important;
+}
+
+#taskDueModal .modal-content {
+    z-index: 10002 !important;
+}
+
+/* Long localized labels must never clip: buttons keep at least their natural
+   width (beats the .modal-buttons button min-width: 0) and the row wraps
+   when the modal is too narrow */
+.reminder-modal-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.reminder-modal-actions .reminder-modal-action {
+    flex: 1 1 auto;
+    white-space: nowrap;
+    min-width: fit-content;
+    min-height: 34px;
+    padding: 10px 14px !important;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+/* ---- Notification Items ---- */
+.notification-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+    gap: 8px;
+}
+
+.notification-item + .notification-item {
+    margin-top: 6px;
+}
+
+.notification-item:hover {
+    background: var(--hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+.notification-item.unread {
+    background: rgba(74, 144, 217, 0.06);
+}
+
+.notification-item.unread:hover {
+    background: rgba(74, 144, 217, 0.1);
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(74, 144, 217, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-color, #4a90d9);
+}
+
+.notification-icon i {
+    width: 16px;
+    height: 16px;
+}
+
+.notification-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-heading {
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.notification-time {
+    font-size: 11px;
+    opacity: 0.5;
+    margin-top: 2px;
+}
+
+.notification-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    color: inherit;
+    opacity: 0;
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.notification-item:hover .notification-action-btn {
+    opacity: 0.5;
+}
+
+.notification-action-btn:hover {
+    opacity: 1 !important;
+    background: var(--hover-bg, rgba(0, 0, 0, 0.08));
+}
+
+/* ---- Empty State ---- */
+.notifications-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    opacity: 0.4;
+    gap: 12px;
+}
+
+.notifications-empty i {
+    width: 40px;
+    height: 40px;
+}
+
+.notifications-empty p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* ---- Home page notification card ---- */
+#home-notifications-card.has-notifications .home-card-icon i {
+    color: #f59e0b;
+}
+
+#notificationsModal .modal-content {
+    position: relative;
+}
+
+#notificationsModal .notification-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+#notificationsModal .notification-item:hover {
+    background: var(--hover-bg, var(--pz-surface-hover));
+}
+
+#notificationsModal .notification-item.unread {
+    background: var(--unread-bg, #eff6ff);
+}
+
+#notificationsModal .notification-item.unread:hover {
+    background: var(--unread-hover-bg, #dbeafe);
+}
+
+#notificationsModal .notification-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+
+#notificationsModal .notification-icon {
+    flex-shrink: 0;
+    color: var(--accent-color, #4a90d9);
+}
+
+#notificationsModal .notification-text {
+    min-width: 0;
+}
+
+#notificationsModal .notification-heading {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 350px;
+}
+
+#notificationsModal .notification-time {
+    font-size: 12px;
+    color: var(--pz-text-muted);
+    margin-top: 2px;
+}
+
+#notificationsModal .notification-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: var(--pz-text-subtle);
+    border-radius: 4px;
+    flex-shrink: 0;
+    opacity: 0.65;
+    min-width: 32px;
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
+}
+
+#notificationsModal .notification-action-btn:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}

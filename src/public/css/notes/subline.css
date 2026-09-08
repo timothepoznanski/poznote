@@ -1,0 +1,53 @@
+/**
+ * Notes - Subline & Title Spacing
+ *
+ * Styles for the note subline (created date) with show/hide logic
+ * controlled by body class, and innernote h4 title spacing.
+ */
+
+/* Note list subline (created date) */
+.note-subline {
+    font-size: 0.95em;
+    color: var(--pz-text-muted);
+    margin-top: -2px;
+    margin-bottom: 18px;
+    display: none;
+}
+
+/* When enabled via settings, show the created date */
+body.show-note-created .note-subline {
+    display: inline-block;
+}
+
+/* Hide separator when created date is not shown or solo */
+body:not(.show-note-created) .note-sub-created {
+    display: none;
+}
+
+/* Right-column title spacing adjustments */
+.innernote h4 {
+    margin: 0 0 8px 0;
+}
+
+.innernote .note-title-heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.innernote h4 .css-title {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.innernote .note-title-heading .css-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+}
+
+.innernote .note-title-heading .note-title-icon {
+    flex: 0 0 auto;
+    font-size: 20px;
+    margin: 15px 0 20px 0;
+}

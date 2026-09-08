@@ -28,7 +28,9 @@ function buildPublicAppHref($path) {
 function getVersionedPublicAppAssetHref($relativePath) {
     $relativePath = ltrim((string)$relativePath, '/');
     $href = getPublicAppPathPrefix() . '/' . $relativePath;
-    $path = __DIR__ . '/' . $relativePath;
+    // Same docroot split as poznoteAsset(): without the public/ segment this
+    // found no file and the public pages served their assets with no ?v= at all.
+    $path = __DIR__ . '/public/' . $relativePath;
 
     if (file_exists($path)) {
         $href .= '?v=' . filemtime($path);

@@ -65,7 +65,11 @@ function poznoteGetThemeAssetVersion() {
 
     $version = 0;
     foreach ($paths as $relativePath) {
-        $absolutePath = __DIR__ . '/' . $relativePath;
+        // These are docroot-relative: the assets live in src/public/, config.php
+        // does not. Resolving them against __DIR__ alone found nothing after the
+        // docroot split, so this returned '' and editing a theme stylesheet no
+        // longer busted the cache.
+        $absolutePath = __DIR__ . '/public/' . $relativePath;
         if (is_file($absolutePath)) {
             $version = max($version, (int) filemtime($absolutePath));
         }
@@ -127,7 +131,10 @@ function poznoteAsset($path) {
     // Keep the caller's leading slash (some pages are served from a nested URL
     // and rely on root-relative asset paths) but strip it to find the file.
     $relativePath = ltrim($path, '/');
-    $absolutePath = __DIR__ . '/' . $relativePath;
+    // Docroot-relative, and the docroot is src/public/ while this file is not in
+    // it: resolving against __DIR__ alone silently found nothing, so every asset
+    // lost its per-file mtime and only carried the app version.
+    $absolutePath = __DIR__ . '/public/' . $relativePath;
 
     // Loaded on demand: config.php is included by pages that do not all pull in
     // version_helper.php themselves, and the helper must not depend on that.
@@ -202,6 +209,7 @@ function poznoteResolveCustomCssPath() {
         }
     } catch (Exception $e) {
         // Fall back to environment-based configuration when the master DB is unavailable.
+        error_log('config: poznoteResolveCustomCssPath() failed: ' . $e->getMessage());
     }
 
     return $fallbackPath;
@@ -237,6 +245,7 @@ function _oidc(string $dbKey, string $default = ''): string {
         }
     } catch (Exception $e) {
         // Return default when the master DB is unavailable.
+        error_log('config: _oidc() failed: ' . $e->getMessage());
     }
     return $default;
 }
@@ -250,6 +259,7 @@ function _oidcBool(string $dbKey, bool $default = false): bool {
         }
     } catch (Exception $e) {
         // Return default when the master DB is unavailable.
+        error_log('config: _oidcBool() failed: ' . $e->getMessage());
     }
     return $default;
 }
@@ -305,6 +315,7 @@ function poznoteResolveGlobalSetting(string $dbKey, string $envKey, $default = '
         }
     } catch (Exception $e) {
         // Fall back to environment-based configuration when the master DB is unavailable.
+        error_log('config: poznoteResolveGlobalSetting() failed: ' . $e->getMessage());
     }
     return _env($envKey, $default);
 }
@@ -329,6 +340,7 @@ function poznoteResolveTenantIsolationFeatures(): array {
         $raw = getGlobalSetting('tenant_isolation_features', null);
     } catch (Exception $e) {
         // Master DB unavailable: fall through to the environment.
+        error_log('config: poznoteResolveTenantIsolationFeatures() failed: ' . $e->getMessage());
     }
     if ($raw === null) {
         $envRaw = _env('POZNOTE_TENANT_ISOLATION_FEATURES', null);
@@ -406,7 +418,7 @@ function poznoteGetCustomCssHref() {
     }
 
     // Fall back to the css/ directory bundled in the image (development / legacy).
-    $absoluteFilePath = __DIR__ . '/css/' . $filename;
+    $absoluteFilePath = __DIR__ . '/public/css/' . $filename;
     if (!is_file($absoluteFilePath)) {
         return '';
     }

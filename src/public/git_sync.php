@@ -1,0 +1,633 @@
+<?php
+/**
+ * Git Sync Status and Actions Page
+ * 
+ * Accessible from settings, this page shows Git sync status and allows manual sync operations.
+ * Each user can configure their own Git repository settings.
+ */
+
+require_once __DIR__ . '/../auth.php';
+requireAuth();
+requireActiveAccountOwner();
+
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../functions.php';
+require_once __DIR__ . '/../version_helper.php';
+requireSettingsPassword();
+require_once __DIR__ . '/../db_connect.php';
+require_once __DIR__ . '/../GitSync.php';
+
+$currentLang = getUserLanguage();
+$currentUser = getCurrentUser();
+$username = htmlspecialchars(($currentUser['display_name'] ?? '') ?: $currentUser['username']);
+$pageWorkspace = trim(getWorkspaceFilter());
+
+// Initialize GitSync
+$gitSync = new GitSync($con, $_SESSION['user_id'] ?? null);
+$configStatus = $gitSync->getConfigStatus();
+$lastSync = $gitSync->getLastSyncInfo();
+
+// Workspace list for the sync scope selector
+$workspacesList = [];
+try {
+    $workspacesList = $con->query('SELECT name FROM workspaces ORDER BY name COLLATE NOCASE')->fetchAll(PDO::FETCH_COLUMN);
+} catch (Exception $e) {
+    $workspacesList = [];
+}
+
+// Determine provider name for display
+$provider = $configStatus['provider'] ?? 'github';
+$providerName = getGitProviderName($provider);
+
+// Helper for translations with provider
+function tp($key, $vars = []) {
+    global $providerName;
+    if (!isset($vars['provider'])) $vars['provider'] = $providerName;
+    return t($key, $vars);
+}
+
+function tp_h($key, $vars = []) {
+    return htmlspecialchars(tp($key, $vars), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}
+
+// Handle form submissions
+$message = '';
+$warning = '';
+$error = '';
+$result = null;
+
+// Handle result from AJAX sync session
+if (isset($_SESSION['last_sync_result'])) {
+    $lastSync = $_SESSION['last_sync_result'];
+    $action = $lastSync['action'];
+    $result = $lastSync['result'];
+    unset($_SESSION['last_sync_result']);
+
+    $errorCount = count($result['errors'] ?? []);
+    if ($result['success']) {
+        if ($action === 'push') {
+            $message = tp('git_sync.messages.push_success', [
+                'count' => $result['pushed'],
+                'attachments' => $result['attachments_pushed'] ?? 0,
+                'deleted' => $result['deleted'] ?? 0,
+                'errors' => $errorCount
+            ]);
+        } else if ($action === 'pull') {
+            $message = tp('git_sync.messages.pull_success', [
+                'pulled' => $result['pulled'],
+                'updated' => $result['updated'],
+                'deleted' => $result['deleted'] ?? 0,
+                'errors' => $errorCount
+            ]);
+        }
+        // Downgrade to warning if there were partial errors
+        if ($errorCount > 0) {
+            $warning = $message;
+            $message = '';
+        }
+    } else {
+        $error = tp('git_sync.messages.' . $action . '_error', [
+            'error' => $result['errors'][0]['error'] ?? 'Unknown error'
+        ]);
+    }
+    // Refresh last sync info since we have new results
+    $lastSyncInfo = $gitSync->getLastSyncInfo();
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    $action = $_POST['action'];
+    
+    switch ($action) {
+        case 'test':
+            $result = $gitSync->testConnection();
+            if ($result['success']) {
+                $message = tp('git_sync.messages.connection_success', ['repo' => $result['repo']]);
+            } else {
+                $error = tp('git_sync.messages.connection_error', ['error' => $result['error']]);
+            }
+            break;
+            
+        case 'update_auto_settings':
+            $autoPush = isset($_POST['auto_push']) ? true : false;
+            $autoPull = isset($_POST['auto_pull']) ? true : false;
+            $gitSync->setAutoPushEnabled($autoPush);
+            $gitSync->setAutoPullEnabled($autoPull);
+            // Re-fetch config status to update badges
+            $configStatus = $gitSync->getConfigStatus();
+            $message = tp('git_sync.auto_sync.saving');
+            break;
+
+        case 'update_workspaces':
+            $workspaceMode = $_POST['workspace_mode'] ?? 'all';
+            if ($workspaceMode === 'selected') {
+                $selected = $_POST['synced_workspaces'] ?? [];
+                if (!is_array($selected)) $selected = [];
+                $selected = array_values(array_filter(array_map(function ($ws) {
+                    return trim((string) $ws);
+                }, $selected), function ($ws) {
+                    return $ws !== '';
+                }));
+                if (empty($selected)) {
+                    $error = t('git_sync.workspaces.none_selected', [], 'Select at least one workspace to sync.');
+                    break;
+                }
+                $gitSync->setSyncedWorkspaces($selected);
+            } else {
+                $gitSync->setSyncedWorkspaces(null);
+            }
+            $configStatus = $gitSync->getConfigStatus();
+            $message = t('git_sync.workspaces.saved', [], 'Synced workspaces updated.');
+            break;
+            
+        case 'save_config':
+            $newConfig = [
+                'provider' => $_POST['git_provider'] ?? 'github',
+                'api_base' => $_POST['git_api_base'] ?? '',
+                'token' => $_POST['git_token'] ?? '',
+                'repo' => $_POST['git_repo'] ?? '',
+                'branch' => $_POST['git_branch'] ?? 'main',
+                'author_name' => $_POST['git_author_name'] ?? 'Poznote',
+                'author_email' => $_POST['git_author_email'] ?? 'poznote@localhost',
+            ];
+            // If token field is the masked placeholder, keep existing token
+            if ($newConfig['token'] === '••••••••') {
+                unset($newConfig['token']);
+            }
+            // Do not persist an API URL that only restates the provider default
+            if ($newConfig['api_base'] === GitSync::defaultApiBaseFor($newConfig['provider'])) {
+                $newConfig['api_base'] = '';
+            }
+            if ($gitSync->saveUserGitConfig($newConfig)) {
+                $message = t('git_sync.messages.config_saved', [], 'Configuration saved successfully.');
+                // Reload config status after save
+                $configStatus = $gitSync->getConfigStatus();
+                $lastSync = $gitSync->getLastSyncInfo();
+            } else {
+                $error = t('git_sync.messages.config_save_error', [], 'Failed to save configuration.');
+            }
+            // Re-determine provider name after config change
+            $provider = $configStatus['provider'] ?? 'github';
+            $providerName = getGitProviderName($provider);
+            break;
+    }
+}
+
+
+?>
+<!DOCTYPE html>
+<html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
+    <title><?php echo tp_h('git_sync.title'); ?> - <?php echo getPageTitle(); ?></title>
+    <meta name="color-scheme" content="dark light">
+    <?php 
+    // getAppVersion() reads version.txt through an absolute path. Reading it
+    // relatively broke when the entry points moved into src/public/: the file
+    // stayed one level up, so this fell back to time() and changed the asset
+    // URL on every single page load.
+    $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
+    ?>
+    <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
+    <link rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/base.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/search.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/alerts.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/cards.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/buttons.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/dark-mode.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/responsive.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/settings.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/git-sync.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $cache_v; ?>">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body class="home-page git-sync-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+    <?php $iconSidebarWorkspace = $pageWorkspace; include __DIR__ . '/../icon_sidebar.php'; ?>
+    <div class="home-container git-sync-container">
+    <?php include __DIR__ . '/../back_to_settings.php'; ?>
+    <h1 class="poznote-page-title"><i class="lucide lucide-git-branch"></i> <?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?></h1>
+
+
+        <div class="git-sync-header">
+            <p class="git-sync-description"><?php echo tp_h('git_sync.description'); ?></p>
+            <?php
+            require_once __DIR__ . '/../storage/AttachmentStorage.php';
+            if (AttachmentStorage::isEnabled()): ?>
+                <div class="config-hint">
+                    <i class="lucide lucide-info"></i>
+                    <?php echo t_h('s3_settings.git_sync_note', [], 'Git sync ignores attachments while S3 storage is enabled.'); ?>
+                </div>
+            <?php endif; ?>
+        </div>
+
+
+
+        <?php if ($message): ?>
+        <div class="alert alert-success">
+            <i class="lucide lucide-check-circle"></i>
+            <?php echo htmlspecialchars($message); ?>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($warning): ?>
+        <div class="alert alert-warning">
+            <i class="lucide lucide-alert-triangle-triangle"></i>
+            <?php echo htmlspecialchars($warning); ?>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($error): ?>
+        <div class="alert alert-error">
+            <i class="lucide lucide-alert-triangle-circle"></i>
+            <?php echo htmlspecialchars($error); ?>
+        </div>
+        <?php endif; ?>
+        
+        <?php if ($result && isset($result['debug']) && !empty($result['debug'])): ?>
+        <div class="debug-controls">
+            <button id="debug-toggle-btn" class="btn btn-secondary" style="font-size: 12px;">
+                <i class="lucide lucide-bug"></i> <span id="debug-toggle-text"><?php echo tp_h('git_sync.debug.show'); ?></span>
+            </button>
+            <button id="debug-changes-btn" class="btn btn-secondary" style="font-size: 12px;" aria-pressed="false" hidden>
+                <i class="lucide lucide-filter"></i> <span id="debug-changes-text"><?php echo t_h('git_sync.debug.show_changes', [], 'Only changes'); ?></span>
+            </button>
+            <button id="debug-copy-btn" class="btn btn-secondary" style="font-size: 12px;" hidden>
+                <i class="lucide lucide-copy"></i> <?php echo tp_h('git_sync.debug.copy'); ?>
+            </button>
+        </div>
+        <div id="debug-info" class="debug-info" hidden>
+            <h4><?php echo tp_h('git_sync.debug.title'); ?>:</h4>
+            <pre id="debug-output"><?php echo htmlspecialchars(implode("\n", $result['debug'])); ?></pre>
+        </div>
+        <script>
+        const debugLines = <?php echo json_encode($result['debug'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+        const debugContent = debugLines.join("\n");
+        const debugChangesContent = debugLines.filter(function(line) {
+            const normalized = line.trim();
+            if (!normalized) return false;
+            if (/→\s*unchanged\b/i.test(normalized)) return false;
+            if (/^Attachment unchanged:/i.test(normalized)) return false;
+            if (/^Loaded metadata\.json/i.test(normalized)) return false;
+            if (/^Skipped /i.test(normalized)) return false;
+            return /→|Attachment saved:|Trashed local note|ERROR|WARNING|failed/i.test(normalized);
+        }).join("\n");
+        const debugNoChangesText = <?php echo json_encode(t('git_sync.debug.no_changes', [], 'No changes found in debug.'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+        let debugChangesOnly = false;
+
+        function updateDebugOutput() {
+            const debugOutput = document.getElementById('debug-output');
+            const changesBtn = document.getElementById('debug-changes-btn');
+            const changesText = document.getElementById('debug-changes-text');
+            if (!debugOutput) return;
+
+            debugOutput.textContent = debugChangesOnly
+                ? (debugChangesContent || debugNoChangesText)
+                : debugContent;
+
+            if (changesBtn) changesBtn.setAttribute('aria-pressed', debugChangesOnly ? 'true' : 'false');
+            if (changesText) {
+                changesText.textContent = debugChangesOnly
+                    ? <?php echo json_encode(t('git_sync.debug.show_all', [], 'Show all'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>
+                    : <?php echo json_encode(t('git_sync.debug.show_changes', [], 'Only changes'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+            }
+        }
+        
+        document.getElementById('debug-toggle-btn')?.addEventListener('click', function() {
+            const debugDiv = document.getElementById('debug-info');
+            const toggleText = document.getElementById('debug-toggle-text');
+            const copyBtn = document.getElementById('debug-copy-btn');
+            const changesBtn = document.getElementById('debug-changes-btn');
+            if (debugDiv.hidden) {
+                debugDiv.hidden = false;
+                if (changesBtn) changesBtn.hidden = false;
+                if (copyBtn) copyBtn.hidden = false;
+                updateDebugOutput();
+                toggleText.textContent = <?php echo json_encode(tp('git_sync.debug.hide'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+            } else {
+                debugDiv.hidden = true;
+                if (changesBtn) changesBtn.hidden = true;
+                if (copyBtn) copyBtn.hidden = true;
+                toggleText.textContent = <?php echo json_encode(tp('git_sync.debug.show'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+            }
+        });
+
+        document.getElementById('debug-changes-btn')?.addEventListener('click', function() {
+            debugChangesOnly = !debugChangesOnly;
+            updateDebugOutput();
+        });
+        
+        document.getElementById('debug-copy-btn')?.addEventListener('click', function() {
+            const debugOutput = document.getElementById('debug-output');
+            navigator.clipboard.writeText(debugOutput ? debugOutput.textContent : debugContent).then(function() {
+                const btn = document.getElementById('debug-copy-btn');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="lucide lucide-check"></i> ' + <?php echo json_encode(tp('git_sync.debug.copied'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+                setTimeout(function() {
+                    btn.innerHTML = originalHTML;
+                }, 2000);
+            }).catch(function(err) {
+                console.error('Failed to copy:', err);
+            });
+        });
+        </script>
+        <?php endif; ?>
+
+        <!-- Configuration Form -->
+        <div class="git-sync-section">
+            <form method="post" class="git-config-form">
+                <input type="hidden" name="action" value="save_config">
+                
+                <div class="config-grid">
+                    <div class="config-item">
+                        <span class="config-label"><?php echo tp_h('git_sync.config.status'); ?></span>
+                        <span class="config-value">
+                            <?php if ($configStatus['enabled']): ?>
+                                <span class="badge badge-success"><?php echo t_h('common.enabled'); ?></span>
+                            <?php else: ?>
+                                <span class="badge badge-disabled"><?php echo t_h('common.disabled'); ?></span>
+                            <?php endif; ?>
+                        </span>
+                    </div>
+                </div>
+                    
+                <?php if (!$configStatus['enabled']): ?>
+                <div class="config-hint">
+                    <i class="lucide lucide-info"></i>
+                    <?php echo t_h('git_sync.config.hint_enable', [], 'Git sync is disabled. An administrator can enable it in Settings > Advanced Settings.'); ?>
+                </div>
+                <?php else: ?>
+                
+                <div class="git-config-fields">
+                    <div class="git-field-group">
+                        <label class="git-field-label" for="git_provider"><?php echo t_h('git_sync.config.provider', [], 'Provider'); ?></label>
+                        <select name="git_provider" id="git_provider" class="git-field-input">
+                            <option value="github" <?php echo ($configStatus['provider'] === 'github') ? 'selected' : ''; ?>>GitHub</option>
+                            <option value="gitlab" <?php echo ($configStatus['provider'] === 'gitlab') ? 'selected' : ''; ?>>GitLab</option>
+                            <option value="forgejo" <?php echo ($configStatus['provider'] === 'forgejo') ? 'selected' : ''; ?>>Forgejo</option>
+                        </select>
+                    </div>
+                    
+                    <div class="git-field-group" id="api-base-row">
+                        <label class="git-field-label" for="git_api_base"><?php echo t_h('git_sync.config.api_base', [], 'API Base URL'); ?></label>
+                        <input type="text" name="git_api_base" id="git_api_base" class="git-field-input" 
+                               value="<?php echo htmlspecialchars($configStatus['apiBase'] ?? ''); ?>" 
+                               placeholder="http://localhost:3000/api/v1">
+                    </div>
+                    
+                    <div class="git-field-group">
+                        <label class="git-field-label" for="git_token"><?php echo tp_h('git_sync.config.token'); ?></label>
+                        <input type="password" name="git_token" id="git_token" class="git-field-input" 
+                               value="<?php echo $configStatus['hasToken'] ? '••••••••' : ''; ?>" 
+                               placeholder="ghp_xxxx..." autocomplete="off">
+                    </div>
+                    
+                    <div class="git-field-group">
+                        <label class="git-field-label" for="git_repo"><?php echo tp_h('git_sync.config.repository'); ?></label>
+                        <input type="text" name="git_repo" id="git_repo" class="git-field-input" 
+                               value="<?php echo htmlspecialchars($configStatus['repo'] ?? ''); ?>" 
+                               placeholder="owner/repo">
+                    </div>
+                    
+                    <div class="git-field-row">
+                        <div class="git-field-group">
+                            <label class="git-field-label" for="git_branch"><?php echo tp_h('git_sync.config.branch'); ?></label>
+                            <input type="text" name="git_branch" id="git_branch" class="git-field-input" 
+                                   value="<?php echo htmlspecialchars($configStatus['branch'] ?? 'main'); ?>" 
+                                   placeholder="main">
+                        </div>
+                        
+                        <div class="git-field-group">
+                            <label class="git-field-label" for="git_author_name"><?php echo t_h('git_sync.config.author_name', [], 'Author Name'); ?></label>
+                            <input type="text" name="git_author_name" id="git_author_name" class="git-field-input" 
+                                   value="<?php echo htmlspecialchars($configStatus['authorName'] ?? 'Poznote'); ?>" 
+                                   placeholder="Poznote">
+                        </div>
+                    </div>
+                    
+                    <div class="git-field-group">
+                        <label class="git-field-label" for="git_author_email"><?php echo t_h('git_sync.config.author_email', [], 'Author Email'); ?></label>
+                        <input type="text" name="git_author_email" id="git_author_email" class="git-field-input" 
+                               value="<?php echo htmlspecialchars($configStatus['authorEmail'] ?? 'poznote@localhost'); ?>" 
+                               placeholder="poznote@localhost">
+                    </div>
+                    
+                    <div class="git-field-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="lucide lucide-save"></i>
+                            <?php echo t_h('git_sync.config.save', [], 'Save Configuration'); ?>
+                        </button>
+                        <?php if ($configStatus['enabled'] && $configStatus['configured']): ?>
+                        <button type="submit" name="action" value="test" class="btn btn-primary">
+                            <?php echo tp_h('git_sync.test.button'); ?>
+                        </button>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                
+                <?php endif; ?>
+            </form>
+            
+            <?php if ($configStatus['enabled'] && $configStatus['configured']): ?>
+            <div class="auto-sync-settings">
+                <h4><?php echo tp_h('git_sync.auto_sync.title'); ?></h4>
+                <form method="post" class="auto-sync-form">
+                    <input type="hidden" name="action" value="update_auto_settings">
+                    
+                    <div class="form-check">
+                        <label class="switch">
+                            <input type="checkbox" name="auto_push" onchange="this.form.submit()" <?php echo ($configStatus['autoPush'] ?? false) ? 'checked' : ''; ?>>
+                            <span class="slider round"></span>
+                        </label>
+                        <div class="check-label">
+                            <span class="label-title"><?php echo tp_h('git_sync.auto_sync.push_label'); ?></span>
+                            <span class="label-desc"><?php echo tp_h('git_sync.auto_sync.push_description'); ?></span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-check">
+                        <label class="switch">
+                            <input type="checkbox" name="auto_pull" onchange="this.form.submit()" <?php echo ($configStatus['autoPull'] ?? false) ? 'checked' : ''; ?>>
+                            <span class="slider round"></span>
+                        </label>
+                        <div class="check-label">
+                            <span class="label-title"><?php echo tp_h('git_sync.auto_sync.pull_label'); ?></span>
+                            <span class="label-desc"><?php echo tp_h('git_sync.auto_sync.pull_description'); ?></span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <?php
+            $syncedWorkspacesSetting = $configStatus['syncedWorkspaces'] ?? null;
+            $workspaceOptions = $workspacesList;
+            if (is_array($syncedWorkspacesSetting)) {
+                // Keep synced names whose workspace was deleted visible so they can be unchecked
+                $workspaceOptions = array_values(array_unique(array_merge($workspaceOptions, $syncedWorkspacesSetting)));
+            }
+            ?>
+            <div class="auto-sync-settings">
+                <h4><?php echo t_h('git_sync.workspaces.title', [], 'Synced workspaces'); ?></h4>
+                <form method="post" class="auto-sync-form" id="workspace-sync-form">
+                    <input type="hidden" name="action" value="update_workspaces">
+
+                    <label class="form-check workspace-mode-check">
+                        <input type="radio" name="workspace_mode" value="all" <?php echo ($syncedWorkspacesSetting === null) ? 'checked' : ''; ?>>
+                        <div class="check-label">
+                            <span class="label-title"><?php echo t_h('git_sync.workspaces.all_label', [], 'All workspaces'); ?></span>
+                            <span class="label-desc"><?php echo t_h('git_sync.workspaces.all_desc', [], 'Every workspace is synced, including ones created later.'); ?></span>
+                        </div>
+                    </label>
+
+                    <label class="form-check workspace-mode-check">
+                        <input type="radio" name="workspace_mode" value="selected" <?php echo ($syncedWorkspacesSetting !== null) ? 'checked' : ''; ?>>
+                        <div class="check-label">
+                            <span class="label-title"><?php echo t_h('git_sync.workspaces.selected_label', [], 'Selected workspaces only'); ?></span>
+                            <span class="label-desc"><?php echo t_h('git_sync.workspaces.selected_desc', [], 'Only notes and attachments from the checked workspaces are pushed and pulled. Notes in other workspaces are never touched by a pull, and a push removes them from the repository.'); ?></span>
+                        </div>
+                    </label>
+
+                    <div class="workspace-checkbox-list" id="workspace-checkbox-list" <?php echo ($syncedWorkspacesSetting === null) ? 'hidden' : ''; ?>>
+                        <?php foreach ($workspaceOptions as $workspaceName): ?>
+                        <label class="workspace-checkbox-item">
+                            <input type="checkbox" name="synced_workspaces[]"
+                                   value="<?php echo htmlspecialchars($workspaceName, ENT_QUOTES, 'UTF-8'); ?>"
+                                   <?php echo ($syncedWorkspacesSetting === null || in_array($workspaceName, $syncedWorkspacesSetting, true)) ? 'checked' : ''; ?>>
+                            <span><?php echo htmlspecialchars($workspaceName, ENT_QUOTES, 'UTF-8'); ?></span>
+                        </label>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <div class="git-field-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="lucide lucide-save"></i>
+                            <?php echo t_h('git_sync.workspaces.save', [], 'Save Workspaces'); ?>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <?php endif; ?>
+        </div>
+
+        <?php if ($configStatus['enabled'] && $configStatus['configured']): ?>
+        <div class="alert alert-warning" style="justify-content: center; text-align: center; margin-top: 20px;">
+            <span>
+                <strong><?php echo t_h('git_sync.actions.home_hint', [], 'Push and Pull can be done from home sidebar', $currentLang); ?></strong>
+            </span>
+        </div>
+        <?php endif; ?>
+
+        <div class="git-sync-footer-note">
+            <strong><?php echo t_h('slash_menu.callout_important'); ?> :</strong><br>
+            <?php echo nl2br(tp_h('git_sync.warning')); ?>
+        </div>
+
+    </div>
+    
+    <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle API base URL field based on provider selection
+        const providerSelect = document.getElementById('git_provider');
+        const apiBaseInput = document.getElementById('git_api_base');
+        const providerDefaults = <?php echo json_encode([
+            'github'  => GitSync::defaultApiBaseFor('github'),
+            'gitlab'  => GitSync::defaultApiBaseFor('gitlab'),
+            'forgejo' => GitSync::defaultApiBaseFor('forgejo'),
+        ]); ?>;
+        const providerHints = {
+            github:  { api: providerDefaults.github, token: 'ghp_xxxx... (github.com/settings/tokens)', repo: 'owner/repo' },
+            gitlab:  { api: 'https://gitlab.example.com/api/v4', token: 'glpat-xxxx... (User Settings > Access Tokens, scope: api)', repo: 'group/project' },
+            forgejo: { api: providerDefaults.forgejo, token: 'a1b2c3d4e5f6... (Settings > Applications)', repo: 'owner/repo' }
+        };
+
+        // reset=true (provider switched): start from the new provider's suggestion.
+        // reset=false (page load): keep whatever is saved, just adjust the field state.
+        function updateApiBaseField(provider, reset) {
+            if (!apiBaseInput) return;
+            const hints = providerHints[provider] || providerHints.github;
+            apiBaseInput.placeholder = hints.api;
+            if (provider === 'github') {
+                apiBaseInput.readOnly = true;
+                apiBaseInput.value = providerDefaults.github;
+                return;
+            }
+            apiBaseInput.readOnly = false;
+            if (reset) {
+                // gitlab.com is a real target, so show it; Forgejo is almost always self-hosted
+                apiBaseInput.value = provider === 'gitlab' ? providerDefaults.gitlab : '';
+            }
+        }
+
+        function updateTokenPlaceholder(provider) {
+            const tokenInput = document.getElementById('git_token');
+            const repoInput = document.getElementById('git_repo');
+            const hints = providerHints[provider] || providerHints.github;
+            if (tokenInput) tokenInput.placeholder = hints.token;
+            if (repoInput) repoInput.placeholder = hints.repo;
+        }
+
+        // Clear masked placeholder on focus so user can type new token
+        const tokenField = document.getElementById('git_token');
+        if (tokenField) {
+            tokenField.addEventListener('focus', function() {
+                if (this.value === '••••••••') {
+                    this.value = '';
+                }
+            });
+            tokenField.addEventListener('blur', function() {
+                if (this.value === '') {
+                    <?php if ($configStatus['hasToken']): ?>
+                    this.value = '••••••••';
+                    <?php endif; ?>
+                }
+            });
+        }
+
+        if (providerSelect) {
+            // Init on page load
+            updateApiBaseField(providerSelect.value, false);
+            updateTokenPlaceholder(providerSelect.value);
+
+            providerSelect.addEventListener('change', function() {
+                const tokenInput = document.getElementById('git_token');
+                const repoInput = document.getElementById('git_repo');
+                if (tokenInput) tokenInput.value = '';
+                if (repoInput) repoInput.value = '';
+                updateApiBaseField(this.value, true);
+                updateTokenPlaceholder(this.value);
+            });
+        }
+
+        // Show the workspace checkbox list only in "selected workspaces" mode
+        const workspaceForm = document.getElementById('workspace-sync-form');
+        if (workspaceForm) {
+            const checkboxList = document.getElementById('workspace-checkbox-list');
+            workspaceForm.querySelectorAll('input[name="workspace_mode"]').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    if (checkboxList) checkboxList.hidden = (this.value !== 'selected');
+                });
+            });
+        }
+
+    });
+    </script>
+    <script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
+</body>
+</html>

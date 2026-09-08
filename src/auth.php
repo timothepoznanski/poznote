@@ -778,7 +778,7 @@ function renderPublicWorkspacePasswordPage(array $workspaceAccess, bool $passwor
             <form method="POST" class="password-form">
                 <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($workspaceName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
                 <input type="hidden" name="public_workspace" value="1">
-                <input type="password" name="workspace_password" placeholder="<?php echo t_h('public.protection.placeholder', [], 'Enter password', $currentLang); ?>" required autofocus>
+                <input type="password" name="workspace_password" placeholder="<?php echo t_h('public.protection.placeholder', [], 'Enter password', $currentLang); ?>" required autofocus autocomplete="current-password">
                 <button type="submit"><?php echo t_h('public.protection.unlock', [], 'Unlock', $currentLang); ?></button>
             </form>
         </div>
@@ -952,9 +952,9 @@ function denyPublicWorkspaceAccessResponse(string $message, int $code = 403): vo
     } else {
         $v = @file_get_contents(__DIR__ . '/version.txt') ?: time();
         $themeAssetVersion = max(
-            (int) (@filemtime(__DIR__ . '/js/theme-init.js') ?: 0),
-            (int) (@filemtime(__DIR__ . '/css/dark-mode/variables.css') ?: 0),
-            (int) (@filemtime(__DIR__ . '/css/public_folder.css') ?: 0)
+            (int) (@filemtime(__DIR__ . '/public/js/theme-init.js') ?: 0),
+            (int) (@filemtime(__DIR__ . '/public/css/dark-mode/variables.css') ?: 0),
+            (int) (@filemtime(__DIR__ . '/public/css/public_folder.css') ?: 0)
         );
         $v = urlencode(trim($v) . ($themeAssetVersion > 0 ? '-' . $themeAssetVersion : ''));
         $currentLang = (function_exists('getUserLanguage')) ? getUserLanguage() : 'en';
@@ -1291,7 +1291,7 @@ function logout() {
 
     $oidcLogoutUrl = null;
     if (isset($_SESSION['auth_method']) && $_SESSION['auth_method'] === 'oidc') {
-        $oidcPath = __DIR__ . '/oidc.php';
+        $oidcPath = __DIR__ . '/public/oidc.php';
         if (is_file($oidcPath)) {
             require_once $oidcPath;
             if (function_exists('oidc_logout_redirect_url')) {
@@ -1487,7 +1487,7 @@ function authenticateApiOidcJwtBearerToken(string $providedToken, bool $requireA
         return null;
     }
 
-    $oidcPath = __DIR__ . '/oidc.php';
+    $oidcPath = __DIR__ . '/public/oidc.php';
     if (!is_file($oidcPath)) {
         return null;
     }

@@ -1,0 +1,93 @@
+/* ============================================
+   Modal System - Attachments Modal
+   Upload, display, and manage file attachments
+   ============================================ */
+
+#attachmentModal .modal-content {
+    margin: 5% auto !important;
+}
+
+/* Upload Section */
+.attachment-upload {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 2px dashed #ddd;
+    border-radius: 5px;
+    background: #f9f9f9;
+}
+
+.upload-button-container {
+    text-align: center;
+    display: none;
+}
+
+.upload-button-container.show {
+    display: block;
+}
+
+.attachment-upload input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+
+.attachment-upload button {
+    padding: 8px 16px;
+    background: var(--pz-accent);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.attachment-upload button:hover {
+    background: var(--pz-accent-hover);
+}
+
+/* Attachments List */
+.attachments-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.attachment-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 3px;
+    margin-bottom: 5px;
+    background: #f9f9f9;
+}
+
+.attachment-info {
+    flex: 1;
+}
+
+.attachment-size {
+    font-size: 0.8em;
+    color: #666;
+}
+
+.attachment-info strong {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Action Buttons */
+.attachment-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.attachment-actions button {
+    padding: 4px 8px;
+    font-size: 0.8em;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}

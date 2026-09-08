@@ -26,6 +26,14 @@ mcp-server
 poznote-url-saver
 tools
 
+# Tests and static analysis tooling - never part of the runtime image
+tests
+.oxlintrc.json
+phpstan.neon
+phpstan-baseline.neon
+phpstan-bootstrap.php
+phpstan.phar
+
 .env
 .env.*
 *.log

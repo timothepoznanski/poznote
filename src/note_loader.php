@@ -70,7 +70,7 @@ function ensureAutomaticSnapshotForOpenedNote($con, $noteId) {
     }
 
     try {
-        require_once __DIR__ . '/api/v1/controllers/SnapshotsController.php';
+        require_once __DIR__ . '/public/api/v1/controllers/SnapshotsController.php';
 
         if (!$snapshotController instanceof SnapshotsController) {
             $snapshotController = new SnapshotsController($con);

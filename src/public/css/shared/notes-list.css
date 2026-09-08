@@ -1,0 +1,535 @@
+/**
+ * Shared Page - Notes List
+ *
+ * Shared note items, name, token, indexable toggle,
+ * password button, and action buttons.
+ */
+
+/* Shared Notes List */
+.shared-notes-list {
+    --shared-column-gap: 48px;
+    --shared-divider-padding: 14px;
+    --shared-name-width: 220px;
+    --shared-folder-width: 190px;
+    --shared-token-width: 210px;
+    --shared-actions-width: 228px;
+    max-width: var(--shared-content-max-width, 980px);
+    margin: 0 auto;
+}
+
+.shared-notes-header {
+    display: flex;
+    align-items: center;
+    gap: var(--shared-column-gap);
+    padding: 0 0 12px 0;
+    margin-bottom: 4px;
+}
+
+.shared-notes-header-cell {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted, #666666);
+    text-align: center;
+}
+
+.shared-notes-header-note {
+    flex: 0 0 var(--shared-name-width);
+    min-width: var(--shared-name-width);
+    width: var(--shared-name-width);
+    box-sizing: border-box;
+}
+
+.shared-notes-header-token {
+    flex: 0 0 var(--shared-token-width);
+    min-width: var(--shared-token-width);
+    width: var(--shared-token-width);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding-left: var(--shared-divider-padding);
+}
+
+.shared-header-help {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    color: var(--text-muted, #666666);
+    cursor: help;
+}
+
+.shared-header-help i {
+    font-size: 14px;
+}
+
+.shared-header-help-tooltip {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 260px;
+    max-width: 320px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgba(20, 20, 20, 0.94);
+    color: #ffffff;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 400;
+    letter-spacing: normal;
+    line-height: 1.45;
+    text-transform: none;
+    white-space: normal;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.16s ease, visibility 0.16s ease;
+    z-index: 20;
+}
+
+.shared-header-help:hover .shared-header-help-tooltip,
+.shared-header-help:focus .shared-header-help-tooltip,
+.shared-header-help:focus-visible .shared-header-help-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+.shared-notes-header-actions {
+    flex: 0 0 var(--shared-actions-width);
+    width: var(--shared-actions-width);
+    box-sizing: border-box;
+    text-align: center;
+    padding: 0 8px;
+}
+
+.shared-note-item {
+    display: flex;
+    align-items: center;
+    gap: var(--shared-column-gap);
+    padding: 5px;
+    transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.shared-note-item:hover {
+    background-color: rgba(var(--pz-accent-rgb), 0.035);
+}
+
+.shared-note-item.shared-hierarchy-item {
+    position: relative;
+}
+
+.shared-note-item.shared-hierarchy-item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-image: repeating-linear-gradient(
+        to right,
+        rgba(13, 110, 253, 0.22) 0 2px,
+        transparent 2px 32px
+    );
+    background-size: calc(var(--shared-indent-level, 0) * 32px) 100%;
+    background-position: 22px 0;
+    background-repeat: no-repeat;
+    pointer-events: none;
+}
+
+#foldersList .shared-folder-icon {
+    background: transparent !important;
+}
+
+.note-name-container {
+    flex: 0 0 var(--shared-name-width);
+    box-sizing: border-box;
+    min-width: var(--shared-name-width);
+    width: var(--shared-name-width);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.shared-folder-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    border-radius: 7px;
+    background: rgba(var(--pz-accent-rgb), 0.08);
+    color: var(--link-color, #007bff);
+    cursor: pointer;
+    transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+}
+
+.shared-folder-toggle:hover {
+    background: rgba(var(--pz-accent-rgb), 0.14);
+}
+
+.shared-folder-toggle:focus-visible {
+    outline: 2px solid rgba(0, 123, 255, 0.45);
+    outline-offset: 2px;
+}
+
+.shared-folder-toggle i {
+    font-size: 13px;
+}
+
+.shared-folder-toggle.is-placeholder {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.shared-folder-toggle-placeholder {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.shared-note-item.shared-hierarchy-item .note-name-container {
+    padding-left: calc(8px + var(--shared-indent-level, 0) * 32px);
+}
+
+.note-name {
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--link-color, #007bff);
+    text-decoration: none;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.note-name:hover {
+    text-decoration: underline;
+}
+
+.shared-password-icon.is-password-protected,
+.shared-restricted-icon.is-restricted {
+    filter: none !important;
+    color: #ef4444 !important;
+}
+
+/* Disabled (inaccessible) share: the row stays listed, the badge and the
+   struck-through token signal that the public link no longer resolves. */
+.shared-disabled-icon {
+    filter: none !important;
+    color: #f59e0b !important;
+}
+
+.shared-note-item.is-share-disabled .note-token {
+    opacity: 0.55;
+    text-decoration: line-through;
+}
+
+.folder-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    color: #6c757d;
+    background-color: transparent;
+    padding: 0;
+    margin-right: 5px;
+    border-radius: 0;
+    text-decoration: none;
+    max-width: 100%;
+    transition: all 0.2s ease;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.35;
+}
+
+.folder-badge:hover {
+    background-color: transparent;
+    color: inherit;
+}
+
+.folder-badge i {
+    font-size: 10px;
+}
+
+.note-token-wrap {
+    flex: 0 0 var(--shared-token-width);
+    min-width: var(--shared-token-width);
+    width: var(--shared-token-width);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px 4px var(--shared-divider-padding);
+    border: none;
+    border-radius: 0;
+    transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.note-token {
+    flex: 1;
+    min-width: 0;
+    font-family: monospace;
+    font-size: 13px;
+    color: var(--text-muted, #666666);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: text;
+    padding: 0;
+    border-radius: 4px;
+    background: transparent;
+    transition: color 0.2s;
+}
+
+.note-token:focus {
+    outline: none;
+}
+
+.note-token.read-only {
+    cursor: default;
+    background-color: transparent !important;
+    opacity: 0.7;
+}
+
+.note-token-wrap.read-only {
+    background-color: transparent;
+    border-top-color: transparent;
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+    padding-left: var(--shared-divider-padding);
+    padding-right: 8px;
+}
+
+.shared-via-parent {
+    padding-left: 0;
+    border-left: none;
+    background-color: transparent;
+}
+
+[data-theme="dark"] .shared-via-parent {
+    border-left-color: transparent;
+    background-color: transparent;
+}
+
+.folder-name-path {
+    font-weight: 500;
+    color: var(--link-color, #007bff);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.folder-name-path:hover {
+    text-decoration: underline;
+}
+
+.shared-folder-row[data-collapsible="1"] .folder-name-path {
+    font-weight: 600;
+}
+
+[data-theme="dark"] .folder-name-path {
+    color: #5daaff;
+}
+
+.folder-name-path i {
+    margin-right: 6px;
+    opacity: 0.7;
+}
+
+.toggle-switch.disabled {
+    opacity: 0.5;
+    font-size: 13px;
+}
+
+.folder-name-text {
+    font-size: 13px;
+    color: var(--text-color, var(--dm-text, var(--pz-text)));
+    cursor: pointer;
+    user-select: none;
+}
+
+.indexable-label-text {
+    white-space: nowrap;
+}
+
+.note-actions {
+    flex: 0 0 var(--shared-actions-width);
+    width: var(--shared-actions-width);
+    box-sizing: border-box;
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    padding-left: 0;
+}
+
+.note-actions .btn-sm {
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+.note-actions-placeholder {
+    font-size: 12px;
+    font-style: italic;
+    color: var(--text-muted, #666666);
+    text-align: center;
+    white-space: nowrap;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted, #666666);
+}
+
+.empty-message i {
+    font-size: 48px;
+    color: var(--text-muted, #cccccc);
+    margin-bottom: 16px;
+}
+
+.empty-message p {
+    font-size: 16px;
+    margin: 8px 0;
+}
+
+/* Measurement pass (desktop): cells briefly hug their content on a single
+   line so JS can read the widest cell of each column, then the column width
+   variables are set from those readings. Never painted: the class is added
+   and removed within the same frame. */
+.shared-notes-list.shared-measure .shared-notes-header-note,
+.shared-notes-list.shared-measure .note-name-container,
+.shared-notes-list.shared-measure .shared-notes-header-token,
+.shared-notes-list.shared-measure .note-token-wrap,
+.shared-notes-list.shared-measure .shared-notes-header-actions,
+.shared-notes-list.shared-measure .note-actions {
+    flex: 0 0 auto !important;
+    width: max-content !important;
+    min-width: 0 !important;
+    max-width: none !important;
+}
+
+.shared-notes-list.shared-measure .note-token {
+    flex: 0 0 auto !important;
+    overflow: visible !important;
+}
+
+.shared-notes-list.shared-measure .folder-badge,
+.shared-notes-list.shared-measure .note-name {
+    white-space: nowrap !important;
+    overflow: visible !important;
+    max-width: none !important;
+}
+
+/* ── Desktop layout: cells stretch to the full row height and carry the
+   vertical padding themselves; no card outline, no column separators, no
+   horizontal row lines. ── */
+@media (min-width: 801px) {
+    .shared-notes-list {
+        padding: 5px 8px 28px 28px;
+    }
+
+    .shared-notes-header {
+        align-items: stretch;
+        /* Same horizontal padding as the rows so header and row cells line
+           up. */
+        padding: 0 5px;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .shared-notes-header-cell {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+
+    .shared-note-item {
+        align-items: stretch;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+    .note-name-container,
+    .note-token-wrap,
+    .note-actions {
+        padding-top: 6px;
+        padding-bottom: 6px;
+    }
+
+    /* Link column: token centered under its header (symmetric padding so
+       the centre of the cell matches the centre of the header). */
+    .shared-notes-header-token,
+    .note-token-wrap,
+    .note-token-wrap.read-only {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .note-token-wrap {
+        justify-content: center;
+    }
+
+    .note-token {
+        flex: 0 1 auto;
+        text-align: center;
+    }
+
+    .note-actions {
+        align-items: center;
+        /* Breathing room on both sides of the buttons; the measurement pass
+           includes it, so the column width follows. */
+        padding-left: 34px;
+        padding-right: 18px;
+    }
+
+    /* Soft action buttons: tinted background with a colored icon, full color
+       on hover. Much lighter than a saturated chip on every row. */
+    .note-actions .btn {
+        border-radius: 8px;
+    }
+
+    .note-actions .btn-success {
+        background: rgba(46, 125, 50, 0.13);
+        color: #2e7d32;
+    }
+
+    .note-actions .btn-success:hover {
+        background: #2e7d32;
+        color: #ffffff;
+    }
+
+    .note-actions .btn-primary {
+        background: rgba(var(--pz-accent-rgb), 0.13);
+        color: var(--pz-accent, #007db8);
+    }
+
+    .note-actions .btn-primary:hover {
+        background: var(--pz-accent, #007db8);
+        color: #ffffff;
+    }
+
+    .note-actions .btn-danger {
+        background: rgba(224, 75, 75, 0.13);
+        color: #e04b4b;
+    }
+
+    .note-actions .btn-danger:hover {
+        background: #e04b4b;
+        color: #ffffff;
+    }
+}

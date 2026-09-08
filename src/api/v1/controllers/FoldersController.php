@@ -311,16 +311,16 @@ class FoldersController {
     /**
      * Send JSON response
      */
+    /** Delegates to the shared helper in api/v1/ApiResponse.php. */
     private function sendJson(array $data, int $code = 200): void {
-        http_response_code($code);
-        echo json_encode($data, JSON_UNESCAPED_UNICODE);
+        apiSendJson($data, $code);
     }
     
     /**
      * Send error response
      */
     private function sendError(string $message, int $code = 400): void {
-        $this->sendJson(['success' => false, 'error' => $message], $code);
+        apiFail($message, $code);
     }
     
     /**
@@ -840,7 +840,7 @@ class FoldersController {
             // Free any folder share tokens in the master registry before the
             // folders are deleted (the ON DELETE CASCADE only removes the
             // shared_folders rows)
-            require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+            require_once dirname(__DIR__, 3) . '/users/db_master.php';
             unregisterSharedLinksForFolders($this->db, !empty($allFolderIds) ? $allFolderIds : [$folderId]);
 
             // Explicitly delete ALL folders in the hierarchy to be safe (regardless of CASCADE)
@@ -2096,7 +2096,7 @@ class FoldersController {
             $checkSharedStmt->execute([$note['id']]);
             $existingToken = $checkSharedStmt->fetchColumn();
             if ($existingToken) {
-                require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+                require_once dirname(__DIR__, 3) . '/users/db_master.php';
                 unregisterSharedLink($existingToken);
                 $deleteShareStmt = $this->db->prepare("DELETE FROM shared_notes WHERE note_id = ? AND access_mode IS NULL");
                 $deleteShareStmt->execute([$note['id']]);
@@ -2346,7 +2346,7 @@ class FoldersController {
             $checkWasSharedStmt->execute([$noteId]);
             $existingToken = $checkWasSharedStmt->fetchColumn();
             if ($existingToken) {
-                require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+                require_once dirname(__DIR__, 3) . '/users/db_master.php';
                 unregisterSharedLink($existingToken);
                 $deleteShareStmt = $this->db->prepare("DELETE FROM shared_notes WHERE note_id = ? AND access_mode IS NULL");
                 $deleteShareStmt->execute([$noteId]);
@@ -2513,7 +2513,7 @@ class FoldersController {
         $sharedStmt = $this->db->prepare("SELECT token FROM shared_notes WHERE note_id = ? AND access_mode IS NULL LIMIT 1");
         $sharedStmt->execute([(int)$note['id']]);
         if ($sharedStmt->fetchColumn()) {
-            require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+            require_once dirname(__DIR__, 3) . '/users/db_master.php';
             $tokenStmt = $this->db->prepare("SELECT token FROM shared_notes WHERE note_id = ? AND access_mode IS NULL");
             $tokenStmt->execute([(int)$note['id']]);
             foreach ($tokenStmt->fetchAll(PDO::FETCH_COLUMN) as $token) {
@@ -2524,7 +2524,7 @@ class FoldersController {
         }
 
         if ($workspaceCreated) {
-            require_once dirname(dirname(dirname(__DIR__))) . '/ActivityLog.php';
+            require_once dirname(__DIR__, 3) . '/ActivityLog.php';
             logActivity(ACTIVITY_WORKSPACE_CREATED, ['workspace' => $archiveWorkspace], 'api');
         }
 
@@ -2639,7 +2639,7 @@ class FoldersController {
             $checkWasSharedStmt->execute([$noteId]);
             $existingToken = $checkWasSharedStmt->fetchColumn();
             if ($existingToken) {
-                require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+                require_once dirname(__DIR__, 3) . '/users/db_master.php';
                 unregisterSharedLink($existingToken);
                 $deleteShareStmt = $this->db->prepare("DELETE FROM shared_notes WHERE note_id = ? AND access_mode IS NULL");
                 $deleteShareStmt->execute([$noteId]);
@@ -2833,7 +2833,7 @@ class FoldersController {
             $checkWasSharedStmt->execute([$noteId]);
             $existingToken = $checkWasSharedStmt->fetchColumn();
             if ($existingToken) {
-                require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+                require_once dirname(__DIR__, 3) . '/users/db_master.php';
                 unregisterSharedLink($existingToken);
                 $deleteShareStmt = $this->db->prepare("DELETE FROM shared_notes WHERE note_id = ? AND access_mode IS NULL");
                 $deleteShareStmt->execute([$noteId]);
@@ -2959,6 +2959,7 @@ class FoldersController {
             }
         } catch (Exception $e) {
             // fall through to the default
+            error_log('FoldersController: getGlobalNoteListSort() failed: ' . $e->getMessage());
         }
         return 'updated_desc';
     }

@@ -1,0 +1,99 @@
+/**
+ * Attachments - Responsive & Utilities
+ *
+ * Mobile responsive styles and utility classes.
+ */
+
+/* Mobile responsiveness */
+@media (max-width: 800px) {
+    .settings-container {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    .settings-container h1 {
+        font-size: 24px;
+    }
+
+    .settings-section {
+        padding: 15px;
+    }
+
+    .attachment-card {
+        padding: 10px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .attachment-icon {
+        align-self: flex-start;
+    }
+
+    .attachment-details {
+        width: 100%;
+    }
+
+    .attachment-actions {
+        align-self: flex-end;
+        margin-left: 0;
+    }
+
+    .attachment-meta {
+        flex-direction: column;
+        gap: 4px;
+        font-size: 12px;
+    }
+
+    .attachment-name {
+        font-size: 14px;
+    }
+
+    .btn-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    /* Mobile attachment display rules */
+    .note-attachments-row {
+        margin-top: 10px !important;
+        margin-bottom: 5px !important;
+    }
+
+    /* Hover/focus visual for attachment button (mobile) */
+    .btn-attachment:hover,
+    .btn-attachment:focus {
+        background: rgba(var(--pz-accent-rgb), 0.1) !important;
+        color: var(--pz-accent-hover) !important;
+    }
+
+    /* Attachment indicators (use app blue) */
+    .btn-settings.has-attachments i,
+    .btn-attachment.has-attachments i {
+        filter: none !important;
+        color: var(--pz-accent) !important;
+    }
+
+    .btn-settings.has-attachments:hover i,
+    .btn-settings.has-attachments:focus i,
+    .btn-attachment.has-attachments:hover i,
+    .btn-attachment.has-attachments:focus i {
+        filter: none !important;
+        color: var(--pz-accent-hover) !important;
+    }
+}
+
+/* ===========================================
+   UTILITY CLASSES
+   =========================================== */
+
+/* Hidden by default */
+.initially-hidden {
+    display: none;
+}
+
+/* Section bottom spacer */
+.section-bottom-spacer {
+    padding-bottom: 50px;
+}

@@ -9,7 +9,7 @@
  *   GET  /api/v1/shared               - List shared notes
  */
 
-require_once dirname(dirname(dirname(__DIR__))) . '/share_passwords.php';
+require_once dirname(__DIR__, 3) . '/share_passwords.php';
 
 class SystemController {
     private $con;
@@ -501,8 +501,8 @@ class SystemController {
             return ['success' => false, 'error' => 'Not authenticated'];
         }
 
-        require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
-        require_once dirname(dirname(dirname(__DIR__))) . '/users/UserDataManager.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/UserDataManager.php';
 
         $allUsers = getAllUserProfiles();
 
@@ -540,7 +540,9 @@ class SystemController {
                     if (in_array('disabled', $snCols)) $snDisabledFilter = ' AND COALESCE(sn.disabled, 0) = 0';
                     $sfCols = array_column($ownerCon->query('PRAGMA table_info(shared_folders)')->fetchAll(PDO::FETCH_ASSOC), 'name');
                     if (in_array('disabled', $sfCols)) $sfDisabledFilter = ' AND COALESCE(sf.disabled, 0) = 0';
-                } catch (Exception $e) {}
+                } catch (Exception $e) {
+                    error_log('SystemController: listSharedWithMe() failed: ' . $e->getMessage());
+                }
 
                 // Check shared_notes
                 $stmt = $ownerCon->prepare(

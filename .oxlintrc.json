@@ -1,0 +1,57 @@
+{
+  // Lint config for the first-party browser JavaScript.
+  //
+  // Severity policy: "correctness" fails CI (see .github/workflows/ci-js.yml),
+  // everything else stays a warning so the ~270 pre-existing stylistic hits do
+  // not block merges. Fix them opportunistically, do not gate on them.
+  //
+  // Run locally the way CI does (keep the paths in sync with ci-js.yml):
+  //   npx --yes oxlint@1.55.0 \
+  //     src poznote-url-saver excalidraw-build markdown-editor-build
+  //
+  // The oxlint version is PINNED in .github/workflows/ci-js.yml (env block).
+  // That block also holds the procedure to follow when upgrading it: a new
+  // release adds rules, and since "correctness" is an error here, one new
+  // rule can fail every open PR. Read it before bumping the version above or
+  // touching the severities below.
+
+  // Vendored bundles and installed packages - never hand-edited.
+  // NB: the *sources* under excalidraw-build/ and markdown-editor-build/ are
+  // ours and are linted; only their node_modules are skipped.
+  "ignorePatterns": [
+    "src/public/api-docs/**",
+    "src/public/js/codemirror-dist/**",
+    "src/public/js/excalidraw-dist/**",
+    "src/public/js/highlight/**",
+    "src/public/js/katex/**",
+    "src/public/js/mermaid/**",
+    "**/node_modules/**",
+    "**/*.min.js"
+  ],
+
+  "categories": {
+    "correctness": "error"
+  },
+
+  "rules": {
+    // Downgraded to warnings: real signal, but hundreds of pre-existing hits.
+    // caughtErrors/args off, otherwise 557 of them are just `catch (e) {}`.
+    "no-unused-vars": ["warn", { "caughtErrors": "none", "args": "none" }],
+    "no-useless-escape": "warn",
+    "no-control-regex": "warn",
+    "unicorn/prefer-string-starts-ends-with": "warn",
+    "unicorn/no-new-array": "warn",
+    // Cannot see through a `method` variable, flags POST calls as invalid GETs.
+    "unicorn/no-invalid-fetch-options": "warn",
+    // Style only: `...(x || {})` in the excalidraw build sources. Editing them
+    // without rebuilding the bundle would desync src/public/js/excalidraw-dist.
+    "unicorn/no-useless-fallback-in-spread": "warn",
+
+    // Off: every hit in this codebase is a deliberate idiom.
+    // `while (node = walker.nextNode())` on a TreeWalker, 6 occurrences.
+    "no-cond-assign": "off",
+    // `toast.offsetHeight;` to force a reflow and restart a CSS transition,
+    // and `console.debug && console.debug(...)` guards.
+    "no-unused-expressions": "off"
+  }
+}

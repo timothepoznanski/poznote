@@ -1,0 +1,1148 @@
+/**
+ * Search and Replace functionality for notes (inline bar version)
+ */
+
+(function() {
+    'use strict';
+
+    // Use global translation function from globals.js
+    const tr = window.t || function(key, vars, fallback) {
+        return fallback || key;
+    };
+
+    // Store state for each note
+    const noteStates = new Map();
+
+    function getNoteState(noteId) {
+        if (!noteStates.has(noteId)) {
+            noteStates.set(noteId, {
+                matches: [],
+                currentIndex: -1,
+                replaceVisible: false,
+                suppressClearOnInput: false
+            });
+        }
+        return noteStates.get(noteId);
+    }
+
+    /**
+     * Get the note entry element
+     */
+    function getNoteEntry(noteId) {
+        return document.getElementById('entry' + noteId);
+    }
+
+    function getMarkdownEditorElement(noteId) {
+        const noteEntry = getNoteEntry(noteId);
+        if (!noteEntry || noteEntry.getAttribute('data-note-type') !== 'markdown') return null;
+
+        return noteEntry.querySelector('.markdown-editor');
+    }
+
+    function getMarkdownCodeMirrorEditor(noteId) {
+        const editor = getMarkdownEditorElement(noteId);
+        const api = window.PoznoteMarkdownCodeMirror;
+        if (!editor || !api) {
+            return null;
+        }
+
+        // Primary check: WeakMap instance registry
+        if (typeof api.isCodeMirrorEditor === 'function' && api.isCodeMirrorEditor(editor)) {
+            return editor;
+        }
+
+        // Fallback: DOM attribute set by createEditor — handles cases where the WeakMap
+        // reference is stale (e.g. after a DOM rebuild) but CM still owns this host element
+        if (editor.hasAttribute('data-codemirror-enabled')) {
+            return editor;
+        }
+
+        return null;
+    }
+
+    /**
+     * Text currently selected inside the note, or '' when the selection is empty,
+     * multi-line or sits outside the note content.
+     */
+    function getSelectedNoteText(noteId) {
+        const cmEditor = getActiveCodeMirrorEditor(noteId);
+        const cmApi = window.PoznoteMarkdownCodeMirror;
+        if (cmEditor && cmApi && typeof cmApi.getSelectionOffsets === 'function' && typeof cmApi.getValue === 'function') {
+            const offsets = cmApi.getSelectionOffsets(cmEditor);
+            if (!offsets) return '';
+            const start = Math.min(offsets.start, offsets.end);
+            const end = Math.max(offsets.start, offsets.end);
+            if (start === end) return '';
+            return sanitizeSelectedText(String(cmApi.getValue(cmEditor) || '').slice(start, end));
+        }
+
+        const selection = window.getSelection ? window.getSelection() : null;
+        if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return '';
+
+        // Accept the rendered markdown preview too (split mode): the same text is then
+        // searched in the source.
+        const noteEntry = getNoteEntry(noteId);
+        const searchRoot = getSearchContentRoot(noteId);
+        const roots = [searchRoot, getMarkdownPreviewElement(noteId)];
+
+        // Only prefill from a selection that belongs to this note's content
+        const range = selection.getRangeAt(0);
+        const anchor = range.commonAncestorContainer;
+        const anchorEl = anchor && anchor.nodeType === 3 ? anchor.parentElement : anchor;
+        if (!anchorEl) return '';
+        if (!roots.some(root => root && root.contains(anchorEl))) return '';
+
+        return sanitizeSelectedText(selection.toString());
+    }
+
+    /**
+     * Matching is line-scoped, so a multi-line selection could never match.
+     * Keep only a single-line selection and drop the surrounding whitespace.
+     */
+    function sanitizeSelectedText(text) {
+        const value = String(text || '');
+        if (/[\r\n]/.test(value)) return '';
+        return value.trim();
+    }
+
+    // The click on the toolbar button moves focus and drops the selection, so remember
+    // the selected text while it is still live (mousedown fires before the blur).
+    const pendingSelectionByNote = new Map();
+
+    document.addEventListener('mousedown', captureSelectionForSearchButton, true);
+    document.addEventListener('touchstart', captureSelectionForSearchButton, { capture: true, passive: true });
+
+    function captureSelectionForSearchButton(e) {
+        const button = e.target && e.target.closest
+            ? e.target.closest('[data-action="open-search-replace-modal"]')
+            : null;
+        if (!button) return;
+
+        const noteId = button.getAttribute('data-note-id');
+        if (!noteId) return;
+
+        pendingSelectionByNote.set(String(noteId), getSelectedNoteText(noteId));
+    }
+
+    function isMarkdownEditorVisible(noteId) {
+        const noteEntry = getNoteEntry(noteId);
+        const editor = getMarkdownEditorElement(noteId);
+        if (!noteEntry || !editor) return false;
+
+        if (noteEntry.classList.contains('markdown-split-mode')) return true;
+
+        const editorContainer = editor.closest('.markdown-editor-container') || editor;
+        try {
+            return window.getComputedStyle(editorContainer).display !== 'none';
+        } catch (e) {
+            return editorContainer.style.display !== 'none';
+        }
+    }
+
+    function getMarkdownPreviewElement(noteId) {
+        const noteEntry = getNoteEntry(noteId);
+        if (!noteEntry || noteEntry.getAttribute('data-note-type') !== 'markdown') return null;
+
+        return noteEntry.querySelector('.markdown-preview');
+    }
+
+    /**
+     * A markdown note showing only its rendered preview (editor hidden, no split).
+     * The search then runs on the preview DOM instead of switching to the editor.
+     */
+    function isMarkdownPreviewMode(noteId) {
+        if (!getMarkdownEditorElement(noteId) || !getMarkdownPreviewElement(noteId)) return false;
+
+        return !isMarkdownEditorVisible(noteId);
+    }
+
+    /**
+     * CodeMirror editor to search in, or null when the preview is the visible pane
+     * (the hidden editor must not be searched then).
+     */
+    function getActiveCodeMirrorEditor(noteId) {
+        if (isMarkdownPreviewMode(noteId)) return null;
+
+        return getMarkdownCodeMirrorEditor(noteId);
+    }
+
+    function getSearchContentRoot(noteId) {
+        if (isMarkdownPreviewMode(noteId)) {
+            return getMarkdownPreviewElement(noteId);
+        }
+
+        return getMarkdownEditorElement(noteId) || getNoteEntry(noteId);
+    }
+
+    /**
+     * Replacing edits the source, so leave the preview-only view for the editor and
+     * rebuild the matches there, keeping the current position when possible.
+     */
+    function ensureEditModeForReplace(noteId) {
+        if (!isMarkdownPreviewMode(noteId) || typeof window.switchToEditMode !== 'function') return;
+
+        clearHighlights(noteId);
+        window.switchToEditMode(noteId);
+        findMatches(noteId, { preserveIndex: true, skipScroll: true });
+
+        const state = getNoteState(noteId);
+        if (state.matches.length > 0 && state.currentIndex >= 0) {
+            scrollToMatch(noteId, state.currentIndex);
+        }
+    }
+
+    /**
+     * Get the search bar element
+     */
+    function getSearchBar(noteId) {
+        return document.getElementById('searchReplaceBar' + noteId);
+    }
+
+    /**
+     * Open the search and replace bar
+     */
+    window.openSearchReplaceModal = function(noteId) {
+        const bar = getSearchBar(noteId);
+        // Consume the selection captured on mousedown even on the early returns below,
+        // otherwise a stale value would prefill the next opening.
+        const capturedKey = String(noteId);
+        const hadCapture = pendingSelectionByNote.has(capturedKey);
+        const capturedSelection = hadCapture ? pendingSelectionByNote.get(capturedKey) : '';
+        pendingSelectionByNote.delete(capturedKey);
+
+        if (!bar) return;
+
+        const isOpen = window.getComputedStyle(bar).display !== 'none';
+        if (isOpen) {
+            closeSearchBar(noteId);
+            return;
+        }
+
+        // Prefer the live selection when the caller did not go through the toolbar button
+        const initialSearchText = hadCapture ? capturedSelection : getSelectedNoteText(noteId);
+
+        // Make sure listeners are initialized
+        initNoteListeners(noteId);
+
+        // Clear previous state
+        clearHighlights(noteId);
+        const state = getNoteState(noteId);
+        state.matches = [];
+        state.currentIndex = -1;
+        state.replaceVisible = false;
+
+        // Reset UI
+        const searchInput = document.getElementById('searchInput' + noteId);
+        const replaceInput = document.getElementById('replaceInput' + noteId);
+        const replaceRow = document.getElementById('searchReplaceRow' + noteId);
+        const countEl = document.getElementById('searchCount' + noteId);
+
+        if (searchInput) searchInput.value = initialSearchText;
+        if (replaceInput) replaceInput.value = '';
+        if (replaceRow) replaceRow.style.display = 'none';
+        if (countEl) countEl.textContent = '';
+
+        // Reset the replace-toggle chevron to its collapsed state
+        const toggleBtn = document.getElementById('searchToggleReplaceBtn' + noteId);
+        if (toggleBtn) {
+            toggleBtn.setAttribute('aria-expanded', 'false');
+            const icon = toggleBtn.querySelector('i.lucide');
+            if (icon) {
+                icon.classList.remove('lucide-chevron-up');
+                icon.classList.add('lucide-chevron-down');
+            }
+        }
+
+        // Show bar with animation
+        bar.style.display = 'block';
+
+        // The bar lives in the sticky .note-header, above the split panes. Showing it grows
+        // the header, so recompute the split pane height — otherwise the panes keep their old
+        // (too tall) height, #right_col overflows and can be scrolled, carrying the sticky
+        // header (and this bar) off the top of the viewport when a match is revealed.
+        refreshMarkdownSplitPaneHeight(noteId);
+
+        // Focus search input
+        setTimeout(() => {
+            if (!searchInput) return;
+            searchInput.focus();
+            if (initialSearchText) {
+                // Keep the prefilled term selected so typing replaces it straight away
+                searchInput.select();
+                findMatches(noteId);
+            }
+        }, 100);
+    };
+
+    /**
+     * Recompute the markdown split pane height (no-op outside split mode) so the panes
+     * shrink to fit the space left below the (now taller/shorter) note-header.
+     */
+    function refreshMarkdownSplitPaneHeight(noteId) {
+        if (typeof window.updateMarkdownSplitPaneHeight === 'function') {
+            window.updateMarkdownSplitPaneHeight(noteId);
+        }
+    }
+
+    /**
+     * Reset the outer scroll of the split-mode note back to the top. The split panes own
+     * their own scrolling, so any scroll on #right_col / .innernote is spurious and would
+     * push the sticky note-header (with the search bar) out of view.
+     */
+    function pinSplitOuterScroll(noteId) {
+        const noteEntry = getNoteEntry(noteId);
+        const containers = [
+            document.getElementById('right_col'),
+            noteEntry ? noteEntry.closest('.innernote') : null
+        ];
+        containers.forEach(el => {
+            if (el && el.scrollTop) el.scrollTop = 0;
+        });
+    }
+
+    /**
+     * Close the search and replace bar
+     */
+    function closeSearchBar(noteId) {
+        const bar = getSearchBar(noteId);
+        
+        // Clear highlights first
+        const hadHighlights = clearHighlights(noteId);
+        
+        // Save the note if highlights were removed (to persist the cleanup)
+        if (hadHighlights && typeof window.saveNote === 'function') {
+            window.saveNote(noteId);
+        }
+        
+        // Clear state
+        const state = getNoteState(noteId);
+        state.matches = [];
+        state.currentIndex = -1;
+        
+        // Hide bar
+        if (bar) {
+            bar.style.display = 'none';
+        }
+
+        // Clear inputs
+        const searchInput = document.getElementById('searchInput' + noteId);
+        const replaceInput = document.getElementById('replaceInput' + noteId);
+        const countEl = document.getElementById('searchCount' + noteId);
+
+        if (searchInput) searchInput.value = '';
+        if (replaceInput) replaceInput.value = '';
+        if (countEl) countEl.textContent = '';
+
+        // Header shrank back — give the split panes the reclaimed space.
+        refreshMarkdownSplitPaneHeight(noteId);
+    }
+
+    /**
+     * Toggle replace row visibility
+     */
+    function toggleReplaceRow(noteId) {
+        const state = getNoteState(noteId);
+        state.replaceVisible = !state.replaceVisible;
+
+        if (state.replaceVisible) {
+            ensureEditModeForReplace(noteId);
+        }
+
+        const replaceRow = document.getElementById('searchReplaceRow' + noteId);
+
+        if (replaceRow) {
+            replaceRow.style.display = state.replaceVisible ? 'flex' : 'none';
+        }
+
+        // Update the chevron icon and aria state
+        const toggleBtn = document.getElementById('searchToggleReplaceBtn' + noteId);
+        if (toggleBtn) {
+            toggleBtn.setAttribute('aria-expanded', state.replaceVisible ? 'true' : 'false');
+            const icon = toggleBtn.querySelector('i.lucide');
+            if (icon) {
+                icon.classList.toggle('lucide-chevron-up', state.replaceVisible);
+                icon.classList.toggle('lucide-chevron-down', !state.replaceVisible);
+            }
+        }
+
+        // Toggling the replace row changes the header height too.
+        refreshMarkdownSplitPaneHeight(noteId);
+
+        // Focus replace input when shown
+        if (state.replaceVisible) {
+            const replaceInput = document.getElementById('replaceInput' + noteId);
+            if (replaceInput) {
+                setTimeout(() => replaceInput.focus(), 100);
+            }
+        }
+    }
+
+    /**
+     * Clear all search highlights
+     */
+    function clearHighlights(noteId) {
+        const noteEntry = getNoteEntry(noteId);
+        if (!noteEntry) return false;
+
+        // Returns whether the note content itself carried highlights (the caller then
+        // saves the cleanup). Preview highlights live in rendered HTML only, so they
+        // never count, and CodeMirror decorations are cleared even when the preview is
+        // shown, in case the view mode changed while matches were active.
+        let hadContentHighlights = false;
+
+        const cmEditor = getMarkdownCodeMirrorEditor(noteId);
+        if (cmEditor && window.PoznoteMarkdownCodeMirror && typeof window.PoznoteMarkdownCodeMirror.clearSearch === 'function') {
+            const cmApi = window.PoznoteMarkdownCodeMirror;
+            hadContentHighlights = (getNoteState(noteId).matches || []).some(match => match && match.isCodeMirrorMatch);
+            cmApi.clearSearch(cmEditor);
+        }
+
+        const highlights = noteEntry.querySelectorAll('.search-replace-highlight');
+
+        highlights.forEach(highlight => {
+            const parent = highlight.parentNode;
+            if (!parent) return;
+            if (!highlight.closest('.markdown-preview')) {
+                hadContentHighlights = true;
+            }
+            parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
+            parent.normalize();
+        });
+
+        return hadContentHighlights;
+    }
+
+    /**
+     * Find all matches in the note
+     */
+    function findMatches(noteId, options) {
+        const searchInput = document.getElementById('searchInput' + noteId);
+        if (!searchInput) return;
+
+        const searchText = searchInput.value;
+        const state = getNoteState(noteId);
+        const preserveIndex = options && options.preserveIndex === true;
+        const skipScroll = options && options.skipScroll === true;
+        const previousIndex = state.currentIndex;
+        if (!searchText) {
+            const countEl = document.getElementById('searchCount' + noteId);
+            if (countEl) countEl.textContent = '';
+            clearHighlights(noteId);
+            state.matches = [];
+            state.currentIndex = -1;
+            return;
+        }
+
+        const noteEntry = getNoteEntry(noteId);
+        const searchRoot = getSearchContentRoot(noteId);
+        if (!noteEntry || !searchRoot) return;
+
+        clearHighlights(noteId);
+        state.matches = [];
+        state.currentIndex = preserveIndex ? previousIndex : -1;
+
+        const cmEditor = getActiveCodeMirrorEditor(noteId);
+        const cmApi = window.PoznoteMarkdownCodeMirror;
+        if (cmEditor && cmApi && typeof cmApi.findMatches === 'function') {
+            let cmMatches = cmApi.findMatches(cmEditor, searchText).map(match => ({
+                from: match.from,
+                to: match.to,
+                isCodeMirrorMatch: true
+            }));
+
+            // Fallback: if WeakMap instance is gone but the editor is still a CM host,
+            // search the stored text value directly so we don't fall through to DOM search.
+            // Only when the instance is really gone: on a live editor findMatches() is
+            // authoritative and data-codemirror-value may be stale (set at creation only).
+            if (cmMatches.length === 0 &&
+                cmEditor.hasAttribute('data-codemirror-enabled') &&
+                !(typeof cmApi.isCodeMirrorEditor === 'function' && cmApi.isCodeMirrorEditor(cmEditor))) {
+                const storedText = cmEditor.getAttribute('data-codemirror-value') || '';
+                if (storedText) {
+                    const needle = searchText.toLowerCase();
+                    const haystack = storedText.toLowerCase();
+                    let idx = 0;
+                    const fallbackMatches = [];
+                    while ((idx = haystack.indexOf(needle, idx)) !== -1) {
+                        fallbackMatches.push({ from: idx, to: idx + needle.length, isCodeMirrorMatch: true });
+                        idx += Math.max(needle.length, 1);
+                    }
+                    cmMatches = fallbackMatches;
+                }
+            }
+
+            state.matches = cmMatches;
+
+            const countEl = document.getElementById('searchCount' + noteId);
+            const count = state.matches.length;
+            if (countEl) {
+                if (count > 0) {
+                    if (preserveIndex) {
+                        let nextIndex = previousIndex;
+                        if (nextIndex >= count) nextIndex = count - 1;
+                        if (nextIndex < -1) nextIndex = -1;
+                        state.currentIndex = nextIndex;
+                    } else {
+                        state.currentIndex = 0;
+                    }
+                    countEl.textContent = `${count} ${count > 1 ? tr('search_replace.results', {}, 'results') : tr('search_replace.result', {}, 'result')}`;
+                    if (typeof cmApi.setSearchMatches === 'function') {
+                        cmApi.setSearchMatches(cmEditor, state.matches, state.currentIndex);
+                    }
+                    if (!skipScroll && state.currentIndex >= 0) {
+                        scrollToMatch(noteId, state.currentIndex);
+                    }
+                } else {
+                    state.currentIndex = -1;
+                    countEl.textContent = tr('search_replace.no_matches', {}, 'No results');
+                }
+            }
+
+            return;
+        }
+
+        // Build regex pattern - escape special chars
+        let pattern = searchText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(pattern, 'gi'); // Case insensitive for now
+
+        // Search in the note (or in the rendered preview when that is the visible pane)
+        highlightMatches(searchRoot, regex, noteId, searchRoot);
+
+        // Update count
+        const countEl = document.getElementById('searchCount' + noteId);
+        const count = state.matches.length;
+        if (countEl) {
+            if (count > 0) {
+                if (preserveIndex) {
+                    let nextIndex = previousIndex;
+                    if (nextIndex >= count) nextIndex = count - 1;
+                    if (nextIndex < -1) nextIndex = -1;
+                    state.currentIndex = nextIndex;
+                } else {
+                    state.currentIndex = 0;
+                }
+                countEl.textContent = `${count} ${count > 1 ? tr('search_replace.results', {}, 'results') : tr('search_replace.result', {}, 'result')}`;
+                if (!skipScroll && state.currentIndex >= 0) {
+                    scrollToMatch(noteId, state.currentIndex);
+                }
+            } else {
+                state.currentIndex = -1;
+                countEl.textContent = tr('search_replace.no_matches', {}, 'No results');
+            }
+        }
+    }
+
+    /**
+     * Highlight matches in a node
+     */
+    function highlightMatches(node, regex, noteId, root) {
+        const state = getNoteState(noteId);
+
+        if (node.nodeType === Node.TEXT_NODE) {
+            const text = node.textContent;
+            const matches = [...text.matchAll(regex)];
+
+            if (matches.length > 0) {
+                const fragment = document.createDocumentFragment();
+                let lastIndex = 0;
+
+                matches.forEach(match => {
+                    // Text before match
+                    if (match.index > lastIndex) {
+                        fragment.appendChild(document.createTextNode(
+                            text.substring(lastIndex, match.index)
+                        ));
+                    }
+
+                    // Highlighted match
+                    const highlight = document.createElement('span');
+                    highlight.className = 'search-replace-highlight';
+                    highlight.textContent = match[0];
+                    fragment.appendChild(highlight);
+                    state.matches.push(highlight);
+
+                    lastIndex = match.index + match[0].length;
+                });
+
+                // Text after last match
+                if (lastIndex < text.length) {
+                    fragment.appendChild(document.createTextNode(
+                        text.substring(lastIndex)
+                    ));
+                }
+
+                node.parentNode.replaceChild(fragment, node);
+            }
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+            // Skip script, style, and input elements
+            if (['SCRIPT', 'STYLE', 'INPUT', 'TEXTAREA'].includes(node.tagName)) {
+                return;
+            }
+
+            // Skip the markdown preview pane (rendered HTML) unless it is the search root,
+            // i.e. the note is in preview-only mode: with the editor visible the source is searched
+            if (node !== root && node.classList && node.classList.contains('markdown-preview')) {
+                return;
+            }
+
+            // Skip CodeMirror host — the CM path handles search in CM editors
+            if (node.hasAttribute('data-codemirror-enabled')) {
+                return;
+            }
+
+            // Skip hidden containers (e.g. markdown editor while preview is visible)
+            try {
+                const style = window.getComputedStyle(node);
+                if (style.display === 'none' || style.visibility === 'hidden') {
+                    return;
+                }
+            } catch (e) { /* ignore */ }
+
+            // Skip elements explicitly hidden via the hidden attribute
+            if (node.hidden) {
+                return;
+            }
+
+            // Process child nodes
+            const children = Array.from(node.childNodes);
+            children.forEach(child => highlightMatches(child, regex, noteId, root));
+        }
+    }
+
+    /**
+     * Go to next match
+     */
+    function nextMatch(noteId) {
+        // Relancer la recherche pour avoir les résultats à jour
+        findMatches(noteId, { preserveIndex: true, skipScroll: true });
+        
+        const state = getNoteState(noteId);
+        if (state.matches.length === 0) return;
+
+        state.currentIndex = (state.currentIndex + 1) % state.matches.length;
+        scrollToMatch(noteId, state.currentIndex);
+    }
+
+    /**
+     * Go to previous match
+     */
+    function prevMatch(noteId) {
+        // Relancer la recherche pour avoir les résultats à jour
+        findMatches(noteId, { preserveIndex: true, skipScroll: true });
+        
+        const state = getNoteState(noteId);
+        if (state.matches.length === 0) return;
+
+        state.currentIndex = state.currentIndex - 1;
+        if (state.currentIndex < 0) {
+            state.currentIndex = state.matches.length - 1;
+        }
+        scrollToMatch(noteId, state.currentIndex);
+    }
+
+    /**
+     * Scroll to and highlight a specific match
+     */
+    function scrollToMatch(noteId, index) {
+        const state = getNoteState(noteId);
+        if (index < 0 || index >= state.matches.length) return;
+
+        const noteEntryEl = getNoteEntry(noteId);
+        const inSplit = !!(noteEntryEl && noteEntryEl.classList.contains('markdown-split-mode'));
+
+        const cmEditor = getActiveCodeMirrorEditor(noteId);
+        const cmApi = window.PoznoteMarkdownCodeMirror;
+        const cmMatch = state.matches[index];
+        if (cmMatch && cmMatch.isCodeMirrorMatch && cmEditor && cmApi) {
+            if (typeof cmApi.setSearchMatches === 'function') {
+                cmApi.setSearchMatches(cmEditor, state.matches, index);
+            }
+            if (typeof cmApi.revealPos === 'function') {
+                cmApi.revealPos(cmEditor, cmMatch.from, 'center');
+            }
+            // In split mode the panes scroll internally; the outer containers must not.
+            // CodeMirror's reveal can nudge #right_col/.innernote to bring the match into
+            // view, which would carry the sticky note-header (and the search bar) off-screen.
+            // Pin now and again next frame, since the reveal may scroll asynchronously.
+            if (inSplit) {
+                pinSplitOuterScroll(noteId);
+                window.requestAnimationFrame(() => pinSplitOuterScroll(noteId));
+            }
+            return;
+        }
+
+        // Remove active class from all
+        state.matches.forEach(m => m.classList.remove('active'));
+
+        // Add active class to current
+        const match = state.matches[index];
+        match.classList.add('active');
+
+        const noteEntry = getNoteEntry(noteId);
+        const isMobile = window.innerWidth <= 800;
+        const behavior = isMobile ? 'auto' : 'smooth';
+        const inSplitMode = !!(noteEntry && noteEntry.classList.contains('markdown-split-mode'));
+
+        if (inSplitMode) {
+            // In split mode, scroll only the local pane to avoid hiding sticky toolbar/search bar
+            let pane = null;
+            let current = match.parentElement;
+            while (current && current !== noteEntry) {
+                const style = window.getComputedStyle(current);
+                const canScroll = (style.overflowY === 'auto' || style.overflowY === 'scroll') &&
+                    current.scrollHeight > current.clientHeight;
+                if (canScroll) {
+                    pane = current;
+                    break;
+                }
+                current = current.parentElement;
+            }
+
+            if (pane) {
+                const paneRect = pane.getBoundingClientRect();
+                const matchRect = match.getBoundingClientRect();
+                let targetTop = pane.scrollTop + (matchRect.top - paneRect.top) - 16;
+                const maxTop = Math.max(0, pane.scrollHeight - pane.clientHeight);
+                targetTop = Math.max(0, Math.min(targetTop, maxTop));
+                pane.scrollTo({ top: targetTop, behavior });
+                return;
+            }
+        }
+
+        // Normal mode: scroll manually so the match stays below the sticky tab bar + note header/search bar.
+        // scrollIntoView with block:'start' moves the match to the top of the scroll container,
+        // which can push the note-header/search bar off screen. We instead compute the target
+        // scroll position ourselves and only scroll if the match is not already visible.
+        let stickyOffset = 0;
+        const tabBar = document.getElementById('app-tab-bar');
+        if (tabBar) {
+            stickyOffset += tabBar.offsetHeight;
+        }
+        const noteCard = match.closest('.notecard');
+        if (noteCard) {
+            const noteHeader = noteCard.querySelector('.note-header');
+            if (noteHeader) {
+                stickyOffset += noteHeader.offsetHeight;
+            }
+        }
+
+        const scrollContainer = document.getElementById('right_col') || document.documentElement;
+        const containerRect = scrollContainer.getBoundingClientRect
+            ? scrollContainer.getBoundingClientRect()
+            : { top: 0, bottom: window.innerHeight };
+        const matchRect = match.getBoundingClientRect();
+        const visibleTop = containerRect.top + stickyOffset;
+        const visibleBottom = containerRect.bottom - 12;
+
+        // Only scroll if the match is outside the visible area
+        if (matchRect.top < visibleTop || matchRect.bottom > visibleBottom) {
+            const currentScroll = scrollContainer.scrollTop !== undefined
+                ? scrollContainer.scrollTop
+                : window.scrollY;
+            const targetScroll = currentScroll + (matchRect.top - visibleTop) - 12;
+            if (scrollContainer.scrollTop !== undefined) {
+                scrollContainer.scrollTo({ top: Math.max(0, targetScroll), behavior });
+            } else {
+                window.scrollTo({ top: Math.max(0, targetScroll), behavior });
+            }
+        }
+    }
+
+    /**
+     * Replace current match
+     */
+    function replaceOne(noteId) {
+        ensureEditModeForReplace(noteId);
+
+        const state = getNoteState(noteId);
+        if (state.matches.length === 0 || state.currentIndex < 0) return;
+
+        const replaceInput = document.getElementById('replaceInput' + noteId);
+        if (!replaceInput) return;
+
+        const replaceText = replaceInput.value;
+        const currentMatch = state.matches[state.currentIndex];
+        const noteEntry = getNoteEntry(noteId);
+
+        const cmEditor = getMarkdownCodeMirrorEditor(noteId);
+        const cmApi = window.PoznoteMarkdownCodeMirror;
+        if (currentMatch && currentMatch.isCodeMirrorMatch && cmEditor && cmApi && typeof cmApi.replaceRange === 'function') {
+            state.suppressClearOnInput = true;
+            cmApi.replaceRange(cmEditor, currentMatch.from, currentMatch.to, replaceText);
+            state.suppressClearOnInput = false;
+
+            if (typeof window.markNoteAsModified === 'function') {
+                window.markNoteAsModified();
+            }
+
+            findMatches(noteId, { preserveIndex: true, skipScroll: true });
+            if (state.matches.length > 0 && state.currentIndex >= 0) {
+                scrollToMatch(noteId, state.currentIndex);
+            }
+            return;
+        }
+
+        if (currentMatch && currentMatch.parentNode && noteEntry) {
+            const editableTarget = currentMatch.closest && currentMatch.closest('.markdown-editor');
+
+            // Replace the highlight span with a text node first
+            const matchText = currentMatch.textContent;
+            const textNode = document.createTextNode(matchText);
+            const parent = currentMatch.parentNode;
+            parent.replaceChild(textNode, currentMatch);
+
+            // Select the exact text node we just inserted
+            const range = document.createRange();
+            range.setStart(textNode, 0);
+            range.setEnd(textNode, textNode.length);
+
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            // Use execCommand to make the replacement undoable
+            state.suppressClearOnInput = true;
+            (editableTarget || noteEntry).focus();
+            document.execCommand('insertText', false, replaceText);
+            state.suppressClearOnInput = false;
+            parent.normalize();
+
+            // Remove from matches array
+            state.matches.splice(state.currentIndex, 1);
+
+            // Adjust current index and update display
+            const countEl = document.getElementById('searchCount' + noteId);
+            if (state.matches.length > 0) {
+                // Keep current index, or adjust if needed
+                if (state.currentIndex >= state.matches.length) {
+                    state.currentIndex = state.matches.length - 1;
+                }
+                // Update count
+                if (countEl) {
+                    countEl.textContent = `${state.matches.length} ${state.matches.length > 1 ? tr('search_replace.results', {}, 'results') : tr('search_replace.result', {}, 'result')}`;
+                }
+                // Rebuild highlights and move to the next match
+                findMatches(noteId, { preserveIndex: true, skipScroll: true });
+                if (state.matches.length > 0 && state.currentIndex >= 0) {
+                    scrollToMatch(noteId, state.currentIndex);
+                }
+            } else {
+                // No more matches - clear any remaining highlights
+                clearHighlights(noteId);
+                if (countEl) countEl.textContent = tr('search_replace.no_matches', {}, 'No results');
+                state.currentIndex = -1;
+                
+                // Save the note to persist the cleanup
+                if (typeof window.saveNote === 'function') {
+                    setTimeout(() => window.saveNote(noteId), 100);
+                }
+            }
+
+            // Mark note as modified
+            if (typeof window.markNoteAsModified === 'function') {
+                window.markNoteAsModified();
+            }
+        }
+    }
+
+    /**
+     * Replace all matches
+     */
+    function replaceAll(noteId) {
+        ensureEditModeForReplace(noteId);
+
+        const state = getNoteState(noteId);
+        if (state.matches.length === 0) return;
+
+        const replaceInput = document.getElementById('replaceInput' + noteId);
+        if (!replaceInput) return;
+
+        const replaceText = replaceInput.value;
+        const count = state.matches.length;
+        const noteEntry = getNoteEntry(noteId);
+
+        if (!noteEntry) return;
+
+        const cmEditor = getMarkdownCodeMirrorEditor(noteId);
+        const cmApi = window.PoznoteMarkdownCodeMirror;
+        if (cmEditor && cmApi && state.matches[0] && state.matches[0].isCodeMirrorMatch && typeof cmApi.getValue === 'function' && typeof cmApi.setValue === 'function') {
+            const searchInput = document.getElementById('searchInput' + noteId);
+            const searchText = searchInput ? searchInput.value : '';
+            if (!searchText) return;
+
+            const originalContent = cmApi.getValue(cmEditor);
+            const cmMatches = state.matches
+                .filter(match => match && match.isCodeMirrorMatch && Number.isFinite(match.from) && Number.isFinite(match.to))
+                .sort((a, b) => b.from - a.from);
+            let actualCount = 0;
+            let nextContent = originalContent;
+
+            cmMatches.forEach(match => {
+                if (match.from < 0 || match.to > originalContent.length || match.to <= match.from) return;
+                nextContent = nextContent.slice(0, match.from) + replaceText + nextContent.slice(match.to);
+                actualCount++;
+            });
+
+            state.suppressClearOnInput = true;
+            cmApi.setValue(cmEditor, nextContent, { preserveSelection: false });
+            if (typeof cmApi.clearSearch === 'function') {
+                cmApi.clearSearch(cmEditor);
+            }
+            state.suppressClearOnInput = false;
+
+            state.matches = [];
+            state.currentIndex = -1;
+
+            const countEl = document.getElementById('searchCount' + noteId);
+            if (countEl) {
+                countEl.textContent = tr('search_replace.replaced_all', { count: actualCount },
+                    `Replaced ${actualCount} match${actualCount > 1 ? 'es' : ''}`);
+            }
+
+            if (typeof window.markNoteAsModified === 'function') {
+                window.markNoteAsModified();
+            }
+            return;
+        }
+
+        // Focus the note to enable execCommand
+        const searchRoot = getSearchContentRoot(noteId);
+        (searchRoot || noteEntry).focus();
+        state.suppressClearOnInput = true;
+
+        // Replace all matches in reverse order to maintain correct positions
+        for (let i = state.matches.length - 1; i >= 0; i--) {
+            const match = state.matches[i];
+            if (match && match.parentNode) {
+                // Replace the highlight span with text node first
+                const matchText = match.textContent;
+                const textNode = document.createTextNode(matchText);
+                const parent = match.parentNode;
+                parent.replaceChild(textNode, match);
+
+                // Select the exact text node we just inserted
+                const range = document.createRange();
+                range.setStart(textNode, 0);
+                range.setEnd(textNode, textNode.length);
+
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+
+                document.execCommand('insertText', false, replaceText);
+                parent.normalize();
+            }
+        }
+
+        state.suppressClearOnInput = false;
+        
+        // Clear matches
+        state.matches = [];
+        state.currentIndex = -1;
+
+        // Update display
+        const countEl = document.getElementById('searchCount' + noteId);
+        if (countEl) {
+            countEl.textContent = tr('search_replace.replaced_all', { count: count },
+                `Replaced ${count} match${count > 1 ? 'es' : ''}`);
+        }
+
+        // Mark note as modified
+        if (typeof window.markNoteAsModified === 'function') {
+            window.markNoteAsModified();
+        }
+        
+        // Save the note
+        if (typeof window.saveNote === 'function') {
+            setTimeout(() => window.saveNote(noteId), 100);
+        }
+    }
+
+    /**
+     * Initialize event listeners for a specific note
+     */
+    function initNoteListeners(noteId) {
+        // Prevent double initialization
+        const bar = getSearchBar(noteId);
+        if (!bar || bar.dataset.initialized === 'true') {
+            return;
+        }
+
+        // Close button
+        const closeBtn = document.getElementById('searchCloseBtn' + noteId);
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => closeSearchBar(noteId));
+        }
+
+        // Previous button
+        const prevBtn = document.getElementById('searchPrevBtn' + noteId);
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => prevMatch(noteId));
+        }
+
+        // Next button
+        const nextBtn = document.getElementById('searchNextBtn' + noteId);
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => nextMatch(noteId));
+        }
+
+        // Toggle replace row button (chevron)
+        const toggleReplaceBtn = document.getElementById('searchToggleReplaceBtn' + noteId);
+        if (toggleReplaceBtn) {
+            toggleReplaceBtn.addEventListener('click', () => toggleReplaceRow(noteId));
+        }
+
+        // Replace button
+        const replaceBtn = document.getElementById('replaceBtn' + noteId);
+        if (replaceBtn) {
+            replaceBtn.addEventListener('click', () => replaceOne(noteId));
+        }
+
+        // Replace all button
+        const replaceAllBtn = document.getElementById('replaceAllBtn' + noteId);
+        if (replaceAllBtn) {
+            replaceAllBtn.addEventListener('click', () => replaceAll(noteId));
+        }
+
+        // Search input - find on input
+        const searchInput = document.getElementById('searchInput' + noteId);
+        if (searchInput) {
+            searchInput.addEventListener('input', () => findMatches(noteId));
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeSearchBar(noteId);
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (e.shiftKey) {
+                        prevMatch(noteId);
+                    } else {
+                        nextMatch(noteId);
+                    }
+                }
+            });
+        }
+
+        // Replace input - replace on Enter
+        const replaceInput = document.getElementById('replaceInput' + noteId);
+        if (replaceInput) {
+            replaceInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    replaceOne(noteId);
+                } else if (e.key === 'Escape') {
+                    closeSearchBar(noteId);
+                }
+            });
+        }
+
+        // Listen to note edits - clear highlights when user starts editing
+        const noteEntry = getNoteEntry(noteId);
+        if (noteEntry) {
+            const clearHighlightsOnEdit = function() {
+                const state = getNoteState(noteId);
+                if (state.suppressClearOnInput) {
+                    return;
+                }
+                // Only clear if there are active matches
+                if (state.matches.length > 0) {
+                    clearHighlights(noteId);
+                    state.matches = [];
+                    state.currentIndex = -1;
+                    
+                    // Update count display
+                    const countEl = document.getElementById('searchCount' + noteId);
+                    if (countEl) countEl.textContent = '';
+                    
+                    // Save the note to persist the cleanup
+                    if (typeof window.saveNote === 'function') {
+                        setTimeout(() => window.saveNote(noteId), 100);
+                    }
+                }
+            };
+            
+            // Attach listeners for user input
+            noteEntry.addEventListener('input', clearHighlightsOnEdit);
+            noteEntry.addEventListener('paste', clearHighlightsOnEdit);
+        }
+
+        // Mark as initialized
+        bar.dataset.initialized = 'true';
+    }
+
+    /**
+     * Initialize all search bars on the page
+     */
+    function initAllSearchBars() {
+        const searchBars = document.querySelectorAll('[id^="searchReplaceBar"]');
+        searchBars.forEach(bar => {
+            const noteId = bar.id.replace('searchReplaceBar', '');
+            initNoteListeners(noteId);
+        });
+    }
+
+    /**
+     * The sidebar menu's "Search and replace" on a note that was not loaded
+     * navigates here with open_search=1; open the loaded note's bar now.
+     * The param is then dropped from the URL so a reload doesn't reopen it.
+     */
+    function openSearchFromUrlParam() {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('open_search') !== '1') return;
+
+            const loadedNoteId = window.noteid;
+            if (loadedNoteId && loadedNoteId !== -1 && loadedNoteId !== 'search' &&
+                getSearchBar(loadedNoteId)) {
+                window.openSearchReplaceModal(String(loadedNoteId));
+            }
+
+            params.delete('open_search');
+            const qs = params.toString();
+            history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash);
+        } catch (e) {
+            // The bar simply stays closed
+            console.debug('search-replace: openSearchFromUrlParam() failed:', e);
+        }
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function () {
+            initAllSearchBars();
+            openSearchFromUrlParam();
+        });
+    } else {
+        initAllSearchBars();
+        openSearchFromUrlParam();
+    }
+
+    // Re-initialize when new notes are loaded
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            mutation.addedNodes.forEach(function(node) {
+                if (node.nodeType === 1 && node.id && node.id.startsWith('searchReplaceBar')) {
+                    const noteId = node.id.replace('searchReplaceBar', '');
+                    initNoteListeners(noteId);
+                }
+            });
+        });
+    });
+
+    // Start observing only when document.body is available
+    if (document.body) {
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    } else {
+        // If body is not yet available, wait for DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', function() {
+            if (document.body) {
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+            }
+        });
+    }
+})();

@@ -1,0 +1,748 @@
+/* ============================================
+   Modal System - Base Styles
+   Core modal overlay, content, buttons, form
+   controls, error messages, and radio options.
+   ============================================ */
+
+/* Utility class for hiding elements */
+.hidden {
+    display: none !important;
+}
+
+/* ============================================
+   CSS Variables
+   ============================================ */
+
+:root {
+    /* Central modal max width for standard dialogs */
+    --modal-max-width: 420px;
+}
+
+/* Create dropdown (#create-menu in modals.php). Its look lives in
+   css/folders/actions-menu.css, which only the notes list bundles; the hidden
+   base state has to sit here next to .modal instead, or the markup renders as
+   loose text on every other page that includes modals.php (settings, about...).
+   .create-menu.show wins over this by specificity, whatever the file order. */
+.create-menu {
+    display: none;
+}
+
+/* ============================================
+   Modal Overlay
+   ============================================ */
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999 !important;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 20px 16px 16px 16px;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+/* ============================================
+   Modal Content
+   ============================================ */
+
+.modal-content {
+    background-color: #fefefe;
+    padding: 28px;
+    border: none;
+    border-radius: 8px;
+    width: 90%;
+    max-width: var(--modal-max-width);
+    margin: 0 auto;
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-sizing: border-box;
+    overflow-x: hidden;
+    z-index: 10000 !important;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: rgb(55, 53, 47);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* ============================================
+   Modal Form Controls
+   ============================================ */
+
+.modal-content input,
+.modal-content select {
+    padding: 8px 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
+    margin-top: 10px;
+}
+
+.modal-content input:focus,
+.modal-content select:focus {
+    outline: none;
+    border-color: var(--pz-accent);
+}
+
+.modal .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+/* Ensure controls inside modals never exceed the modal width */
+.modal-content .btn,
+.modal-content button,
+.modal-content input,
+.modal-content select,
+.modal-content textarea {
+    max-width: 100% !important;
+    box-sizing: border-box;
+}
+
+/* ============================================
+   Modal Buttons
+   ============================================ */
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    margin-top: auto;
+    flex-wrap: wrap;
+}
+
+.modal-buttons button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.2s;
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+.modal-buttons button:first-child {
+    background-color: var(--pz-accent);
+    color: white;
+}
+
+.modal-buttons button:first-child:hover {
+    background-color: var(--pz-accent-hover);
+}
+
+.modal-buttons button:last-child {
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
+    border: 1px solid #ddd;
+}
+
+.modal-buttons button:last-child:hover {
+    background-color: #e9ecef;
+}
+
+/* Account-settings info modal holds three buttons: keep them on a single
+   row (widened modal + compact buttons); stack them on small screens. */
+#userSettingsInfoModal .modal-content {
+    max-width: 560px;
+}
+
+#userSettingsInfoModal .modal-buttons {
+    flex-wrap: nowrap;
+}
+
+#userSettingsInfoModal .modal-buttons button {
+    flex: 1 1 auto;
+    text-align: center;
+    white-space: nowrap;
+    font-size: 14px;
+    padding: 10px 12px;
+}
+
+@media (max-width: 480px) {
+    #userSettingsInfoModal .modal-buttons {
+        flex-direction: column;
+    }
+}
+
+/* Explicit button classes (take precedence over first/last child rules) */
+.modal-buttons button.btn-primary {
+    background-color: var(--pz-accent);
+    color: white;
+    border: none;
+}
+
+.modal-buttons button.btn-primary:hover {
+    background-color: var(--pz-accent-hover);
+}
+
+/* Actions kept visible but unavailable (e.g. Change Password on an account
+   that has no local password to change). The hover rule above still matches a
+   disabled button, so the flat colour has to be re-asserted here. */
+.modal-buttons button.btn-primary:disabled,
+.modal-buttons button.btn-primary:disabled:hover {
+    background-color: #eceff3;
+    color: #9aa5b1;
+    border: 1px solid #dfe3e8;
+    cursor: not-allowed;
+    opacity: 1;
+}
+
+/* dark-mode/components.css sets .btn-primary colours with !important, so the
+   disabled state has to re-assert them the same way to win. */
+html[data-theme='dark'] .modal-buttons button.btn-primary:disabled,
+html[data-theme='dark'] .modal-buttons button.btn-primary:disabled:hover,
+body.dark-mode .modal-buttons button.btn-primary:disabled,
+body.dark-mode .modal-buttons button.btn-primary:disabled:hover {
+    background-color: rgba(255, 255, 255, 0.06) !important;
+    color: #6b7280 !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Info box explaining why a disabled action in this modal is unavailable. */
+.modal .modal-info-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 12px 0 10px 0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #eff6ff;
+    color: #1e40af;
+    font-size: 0.85rem;
+    line-height: 1.45;
+}
+
+.modal .modal-info-note .lucide {
+    flex-shrink: 0;
+    width: 15px;
+    height: 15px;
+    margin-top: 2px;
+}
+
+html[data-theme='dark'] .modal .modal-info-note,
+body.dark-mode .modal .modal-info-note {
+    background: rgba(59, 130, 246, 0.14);
+    color: #93c5fd;
+}
+
+.modal-buttons button.btn-cancel {
+    background-color: #6c757d;
+    color: white;
+    border: 1px solid #6c757d;
+}
+
+.modal-buttons button.btn-cancel:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+.modal-buttons button.btn-success {
+    background-color: var(--pz-success);
+    color: white;
+    border: none;
+}
+
+.modal-buttons button.btn-success:hover {
+    background-color: #218838;
+}
+
+.modal-buttons button.btn-danger {
+    background-color: var(--pz-danger);
+    color: white;
+    border: none;
+}
+
+.modal-buttons button.btn-danger:hover {
+    background-color: #c82333;
+}
+
+/* ============================================
+   Error & Info Messages
+   ============================================ */
+
+.modal-error-message {
+    display: none;
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+    border: 1px solid #f5c6cb;
+}
+
+/* ============================================
+   Radio Buttons
+   ============================================ */
+
+.radio-options {
+    margin-top: 8px;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.radio-options label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    line-height: 1.2;
+}
+
+.radio-options input[type="radio"] {
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    flex: 0 0 auto;
+}
+
+/* Legend of the tokens a custom date pattern accepts. The tokens themselves
+   stay literal, only their meaning is translated. */
+.date-format-tokens {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2px 10px;
+    margin: 4px 0;
+    font-size: 13px;
+    color: var(--pz-text-muted);
+}
+
+.date-format-tokens dt {
+    margin: 0;
+}
+
+.date-format-tokens dt code {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 3px;
+    padding: 1px 5px;
+    white-space: nowrap;
+}
+
+.date-format-tokens dd {
+    margin: 0;
+}
+
+/* Colored markdown per-element color pickers */
+.mdc-custom-row {
+    display: none;
+    margin: -8px 0 24px 26px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px 24px;
+}
+
+.mdc-custom-row.visible {
+    display: grid;
+}
+
+.mdc-custom-row label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    max-width: 240px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* css/modals/responsive.css forces `padding: 12px !important` on all modal
+   inputs (iOS zoom guard); with border-box that leaves the swatch 0px tall,
+   so padding and margin must win with !important at higher specificity. */
+.mdc-custom-row input[type="color"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 36px;
+    height: 26px;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 1px solid #d7dee5;
+    border-radius: 6px;
+    background: none;
+    cursor: pointer;
+}
+
+.mdc-custom-row input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 2px;
+}
+
+.mdc-custom-row input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 4px;
+}
+
+.mdc-custom-row input[type="color"]::-moz-color-swatch {
+    border: none;
+    border-radius: 4px;
+}
+
+/* ============================================
+   Note color palette editor
+   ============================================ */
+
+.note-palette-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 12px 0;
+    max-height: 42vh;
+    overflow-y: auto;
+    /* room for the scrollbar so it never sits on the remove buttons */
+    padding-right: 4px;
+}
+
+.note-palette-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* .modal-content input above sets padding/margins that would squash these,
+   so both rules re-assert what the row needs at a higher specificity. */
+.modal-content .note-palette-row input.note-palette-color {
+    width: 44px;
+    height: 34px;
+    flex: 0 0 auto;
+    padding: 0;
+    margin: 0;
+    border: 1px solid var(--pz-border-strong);
+    border-radius: 7px;
+    background: none;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+/* Let the chosen color fill the control instead of sitting in a small inset
+   square, which is the browser default for input[type=color]. */
+.modal-content .note-palette-row input.note-palette-color::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.modal-content .note-palette-row input.note-palette-color::-webkit-color-swatch {
+    border: none;
+    border-radius: 6px;
+}
+
+.modal-content .note-palette-row input.note-palette-color::-moz-color-swatch {
+    border: none;
+    border-radius: 6px;
+}
+
+.modal-content .note-palette-row input.note-palette-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 34px;
+    padding: 0 10px;
+    margin: 0;
+    border: 1px solid var(--pz-border-strong);
+    border-radius: 7px;
+    font-size: 14px;
+}
+
+.note-palette-remove {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--pz-border-strong);
+    border-radius: 7px;
+    background: none;
+    color: #b91c1c;
+    cursor: pointer;
+}
+
+.note-palette-remove:hover {
+    background: #fef2f2;
+    border-color: #fca5a5;
+}
+
+/* "Add color" is a secondary action inside the modal body, not a footer
+   button. css/home/buttons.css gives every .btn-secondary a solid grey fill,
+   which reads as a primary action here, so this overrides it with a quiet
+   outlined style. The extra .modal-content scope wins on specificity. */
+.modal-content .note-palette-add,
+.modal-content button.note-palette-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 4px 0 6px;
+    padding: 7px 12px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 7px;
+    background: transparent;
+    color: #4b5563 !important;
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+.modal-content .note-palette-add:hover,
+.modal-content button.note-palette-add:hover {
+    border-color: var(--pz-accent);
+    color: var(--pz-accent) !important;
+    background: #f0f9ff;
+}
+
+.modal-content .note-palette-add .lucide {
+    width: 15px;
+    height: 15px;
+}
+
+/* .modal-buttons uses margin-top:auto, which collapses to nothing here and
+   leaves the footer flush against "Add color". Scoped to this modal only. */
+#noteColorPaletteModal .modal-buttons {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #e5e7eb;
+}
+
+/* Four footer buttons: widen the modal so they fit on one row, stacking
+   back to wrap on small screens. */
+#noteColorPaletteModal .modal-content {
+    max-width: 560px;
+}
+
+#noteColorPaletteModal .modal-buttons {
+    flex-wrap: nowrap;
+}
+
+#noteColorPaletteModal .modal-buttons button {
+    white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+    #noteColorPaletteModal .modal-buttons {
+        flex-wrap: wrap;
+    }
+}
+
+/* "Back to dashboard" footer button: pushed left, quiet outlined style.
+   The .modal-buttons scope out-specifies the blue button:first-child rule
+   above. */
+.modal-buttons button.note-palette-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: auto;
+    border: 1px solid var(--pz-border-strong);
+    background: transparent;
+    color: #374151;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.modal-buttons button.note-palette-back:hover {
+    border-color: var(--pz-text-subtle);
+    background: #f9fafb;
+}
+
+:root[data-theme='dark'] #noteColorPaletteModal .modal-buttons button.note-palette-back,
+body.dark-mode #noteColorPaletteModal .modal-buttons button.note-palette-back {
+    border-color: var(--dm-border);
+    background: transparent;
+    color: var(--dm-text);
+}
+
+:root[data-theme='dark'] #noteColorPaletteModal .modal-buttons button.note-palette-back:hover,
+body.dark-mode #noteColorPaletteModal .modal-buttons button.note-palette-back:hover {
+    border-color: var(--dm-text-muted);
+    background: var(--dm-surface-hover);
+}
+
+:root[data-theme='dark'] #noteColorPaletteModal .modal-buttons,
+body.dark-mode #noteColorPaletteModal .modal-buttons {
+    border-top-color: var(--dm-border);
+}
+
+:root[data-theme='dark'] .modal-content .note-palette-add,
+body.dark-mode .modal-content .note-palette-add,
+:root[data-theme='dark'] .modal-content button.note-palette-add,
+body.dark-mode .modal-content button.note-palette-add {
+    border-color: var(--dm-border);
+    background: transparent;
+    color: var(--dm-text-muted) !important;
+}
+
+:root[data-theme='dark'] .modal-content .note-palette-add:hover,
+body.dark-mode .modal-content .note-palette-add:hover,
+:root[data-theme='dark'] .modal-content button.note-palette-add:hover,
+body.dark-mode .modal-content button.note-palette-add:hover {
+    border-color: var(--pz-accent);
+    color: var(--pz-accent) !important;
+    background: var(--dm-surface-hover);
+}
+
+:root[data-theme='dark'] .note-palette-row input.note-palette-name,
+body.dark-mode .note-palette-row input.note-palette-name,
+:root[data-theme='dark'] .note-palette-row input.note-palette-color,
+body.dark-mode .note-palette-row input.note-palette-color,
+:root[data-theme='dark'] .note-palette-remove,
+body.dark-mode .note-palette-remove {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+:root[data-theme='dark'] .note-palette-remove:hover,
+body.dark-mode .note-palette-remove:hover {
+    background: var(--dm-surface-hover);
+    color: #fca5a5;
+}
+
+/* ============================================
+   Move Task List (used in multiple modals)
+   ============================================ */
+
+.move-task-list {
+    max-height: 260px;
+    overflow: auto;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    padding: 6px;
+    margin-top: 6px;
+}
+
+.move-task-item {
+    width: 100%;
+    text-align: left;
+    padding: 8px 10px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.move-task-item:hover {
+    background: var(--pz-surface-hover);
+}
+
+.move-task-item.selected {
+    background: #e0f2fe;
+}
+
+.move-task-item small {
+    color: var(--pz-text-muted);
+    font-size: 0.8rem;
+}
+
+.move-task-empty {
+    color: var(--pz-text-muted);
+    font-size: 0.9rem;
+    padding: 8px;
+}
+
+/* "Create task list ..." row appended after the search results */
+.move-task-item.move-task-create {
+    justify-content: flex-start;
+    color: #2563eb;
+}
+
+.move-task-item.move-task-create span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.move-task-item.move-task-create:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+/* ============================================
+   Modal Footer
+   ============================================ */
+
+.modal-footer .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.modal-footer .btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.modal-footer .btn-primary {
+    background: var(--pz-accent);
+    color: white;
+}
+
+.modal-footer .btn:hover {
+    opacity: 0.9;
+}
+
+.modal-footer .btn-cancel {
+    background-color: var(--pz-danger) !important;
+    color: white !important;
+    border: 1px solid var(--pz-danger) !important;
+}
+
+.modal-footer .btn-cancel:hover {
+    background-color: #c82333 !important;
+    border-color: #bd2130 !important;
+    opacity: 1 !important;
+}
+
+/* ============================================
+   Disabled & Danger buttons in modals
+   ============================================ */
+
+.modal .btn-disabled {
+    background: #cccccc !important;
+    color: #888888 !important;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: not-allowed !important;
+    opacity: 0.6;
+}
+
+.modal .btn-disabled:hover {
+    background: #cccccc !important;
+    cursor: not-allowed !important;
+}
+
+.modal .btn-danger {
+    background: #e04b4b !important;
+    color: #fff !important;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    opacity: 1;
+}
+
+.modal .btn-danger:hover {
+    background: #c43b3b !important;
+}

@@ -1,0 +1,44 @@
+/**
+ * Folder Selection & Options
+ *
+ * Folder option items, suggested folder pills, and create folder option.
+ */
+
+.folder-option {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--pz-border);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 14px;
+    color: var(--pz-text);
+}
+
+.folder-option:last-child {
+    border-bottom: none;
+}
+
+.folder-option:hover {
+    background-color: #f0f6ff;
+}
+
+.folder-option.selected {
+    background-color: var(--pz-accent);
+    color: white;
+}
+
+.folder-option.selected:hover {
+    background-color: var(--pz-accent-hover);
+}
+
+.folder-option i {
+    margin-right: 10px;
+    width: 16px;
+    color: #666;
+    flex-shrink: 0;
+}
+
+.folder-option.selected i {
+    color: white;
+}

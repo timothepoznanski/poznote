@@ -545,7 +545,7 @@ class UsersController {
         // provisioned without a credential has no current password to
         // authenticate the change with. Say so instead of failing later with a
         // misleading "current password is incorrect".
-        $oidcPath = dirname(__DIR__, 3) . '/oidc.php';
+        $oidcPath = dirname(__DIR__, 3) . '/public/oidc.php';
         if (is_file($oidcPath)) {
             require_once $oidcPath;
         }
@@ -687,7 +687,7 @@ class UsersController {
         // destination as JSON instead of redirecting (this is an API call).
         $redirect = 'login.php';
         if ($isOidcSession) {
-            $oidcPath = dirname(__DIR__, 3) . '/oidc.php';
+            $oidcPath = dirname(__DIR__, 3) . '/public/oidc.php';
             if (is_file($oidcPath)) {
                 require_once $oidcPath;
                 if (function_exists('oidc_logout_redirect_url')) {

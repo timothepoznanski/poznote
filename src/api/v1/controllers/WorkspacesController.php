@@ -276,6 +276,7 @@ class WorkspacesController {
                 }
             } catch (Exception $e) {
                 // Non-fatal
+                error_log('WorkspacesController: update() failed: ' . $e->getMessage());
             }
             
             $stmt = $this->con->prepare("UPDATE workspaces SET name = ? WHERE name = ?");
@@ -373,6 +374,7 @@ class WorkspacesController {
                 $currentDefaultWorkspace = $stmt->fetchColumn();
             } catch (Exception $e) {
                 // Settings table may not exist - ignore
+                error_log('WorkspacesController: destroy() failed: ' . $e->getMessage());
             }
             
             // Check if this workspace is set as the last opened workspace
@@ -383,6 +385,7 @@ class WorkspacesController {
                 $currentLastOpened = $stmt->fetchColumn();
             } catch (Exception $e) {
                 // Settings table may not exist - ignore
+                error_log('WorkspacesController: destroy() failed: ' . $e->getMessage());
             }
             
             // Find another workspace to move notes to
@@ -402,6 +405,7 @@ class WorkspacesController {
                     $resetStmt->execute(['default_workspace', '__last_opened__']);
                 } catch (Exception $e) {
                     // If settings update fails, continue - it's not critical for workspace deletion
+                    error_log('WorkspacesController: destroy() failed: ' . $e->getMessage());
                 }
             }
             
@@ -412,6 +416,7 @@ class WorkspacesController {
                     $resetStmt->execute(['last_opened_workspace', $targetWorkspace]);
                 } catch (Exception $e) {
                     // If settings update fails, continue - it's not critical for workspace deletion
+                    error_log('WorkspacesController: destroy() failed: ' . $e->getMessage());
                 }
             }
             

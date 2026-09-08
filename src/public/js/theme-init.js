@@ -1,0 +1,296 @@
+// Per-user localStorage wrapper so display preferences (theme, font sizes,
+// icon scale) don't leak between accounts sharing the same browser.
+// The user id comes from the poznote_uid cookie set by auth.php; without it
+// (login page, public pages) the legacy shared keys are used as before.
+// On first read for a given user, the legacy shared value is migrated to the
+// user-scoped key so existing preferences are kept.
+window.__poznoteUserId = (function () {
+    try {
+        var match = document.cookie.match(/(?:^|;\s*)poznote_uid=(\d+)/);
+        return match ? match[1] : '';
+    } catch (e) {
+        return '';
+    }
+})();
+
+window.__poznoteUserStorage = window.__poznoteUserStorage || (function () {
+    var uid = window.__poznoteUserId;
+
+    function scopedKey(key) {
+        return uid ? key + '::u' + uid : key;
+    }
+
+    return {
+        getItem: function (key) {
+            try {
+                var value = localStorage.getItem(scopedKey(key));
+                if (value === null && uid) {
+                    var legacy = localStorage.getItem(key);
+                    if (legacy !== null) {
+                        localStorage.setItem(scopedKey(key), legacy);
+                        return legacy;
+                    }
+                }
+                return value;
+            } catch (e) {
+                return null;
+            }
+        },
+        setItem: function (key, value) {
+            try { localStorage.setItem(scopedKey(key), value); } catch (e) {
+                console.debug('theme-init: scopedKey() failed:', e);
+            }
+        },
+        removeItem: function (key) {
+            try { localStorage.removeItem(scopedKey(key)); } catch (e) {
+                console.debug('theme-init: scopedKey() failed:', e);
+            }
+        }
+    };
+})();
+
+// Open tabs are stored per user and per workspace. Unlike the display
+// preferences above there is no migration from the legacy shared key: adopting
+// the tabs of whoever used the browser before is exactly the leak this scoping
+// prevents, since a tab title exposes another account's note. Tabs left under
+// the legacy key are dropped once so they cannot resurface later.
+window.__poznoteTabsStorageKey = function (workspace) {
+    var key = 'poznote_tabs_' + (workspace || 'default');
+    return window.__poznoteUserId ? key + '::u' + window.__poznoteUserId : key;
+};
+
+(function purgeLegacyTabKeys() {
+    if (!window.__poznoteUserId) return;
+
+    try {
+        for (var i = localStorage.length - 1; i >= 0; i--) {
+            var key = localStorage.key(i);
+            if (key && key.indexOf('poznote_tabs_') === 0 && key.indexOf('::u') === -1) {
+                localStorage.removeItem(key);
+            }
+        }
+    } catch (e) {
+        console.debug('theme-init: purgeLegacyTabKeys() failed:', e);
+    }
+})();
+
+// Drop everything this browser holds for a user id, so deleting an account
+// does not leave its tabs and display preferences behind for the next account.
+window.__poznoteClearUserStorage = function (userId) {
+    var suffix = '::u' + (userId || window.__poznoteUserId);
+    if (suffix === '::u') return;
+
+    try {
+        for (var i = localStorage.length - 1; i >= 0; i--) {
+            var key = localStorage.key(i);
+            if (key && key.length > suffix.length && key.indexOf(suffix, key.length - suffix.length) !== -1) {
+                localStorage.removeItem(key);
+            }
+        }
+    } catch (e) {
+        console.debug('theme-init: purgeLegacyTabKeys() failed:', e);
+    }
+};
+
+// Theme initialization - runs synchronously in <head> to prevent FOUC
+(function () {
+    try {
+        var palettes = {
+            dark: {
+                contentBg: '#252526',
+                sidebarBg: '#252526',
+                text: '#e0e0e0'
+            },
+            black: {
+                contentBg: '#141821',
+                sidebarBg: '#0b0d12',
+                text: '#d8dee8'
+            }
+        };
+
+        function normalizeTheme(value) {
+            value = String(value || '').toLowerCase();
+            return value === 'black' || value === 'dark' || value === 'light' || value === 'system'
+                ? value
+                : null;
+        }
+
+        function getSystemTheme() {
+            return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+
+        var forcedTheme = window.__poznoteForcedTheme;
+        var t = normalizeTheme(forcedTheme) || normalizeTheme(window.__poznoteUserStorage.getItem('poznote-theme')) || 'system';
+        if (t === 'system') {
+            t = getSystemTheme();
+        }
+        var isDark = t === 'dark' || t === 'black';
+        var effectiveTheme = isDark ? 'dark' : 'light';
+        var palette = t === 'black' ? palettes.black : palettes.dark;
+        var r = document.documentElement;
+        r.setAttribute('data-theme', effectiveTheme);
+        r.style.colorScheme = effectiveTheme;
+        r.style.backgroundColor = isDark ? palette.contentBg : '#ffffff';
+
+        // Add theme class for pages that need it (settings, display)
+        if (isDark) {
+            r.classList.add('theme-dark');
+            r.classList.remove('theme-light');
+            r.classList.toggle('theme-black', t === 'black');
+
+            // Inject critical CSS to prevent white flash on all key elements
+            var style = document.createElement('style');
+            style.id = 'theme-init-critical-css';
+            style.textContent = [
+                'body { background-color: ' + palette.contentBg + ' !important; color: ' + palette.text + ' !important; }',
+                '#left_col { background-color: ' + palette.sidebarBg + ' !important; }',
+                '#right_col, #right_pane { background-color: ' + palette.contentBg + ' !important; }',
+                '.note-header { background-color: ' + palette.contentBg + ' !important; }',
+                '.note-edit-toolbar { background-color: ' + palette.contentBg + ' !important; }',
+                '.note-header-spacer { background-color: ' + palette.contentBg + ' !important; }',
+                '.notecard { background-color: ' + palette.contentBg + ' !important; }',
+                '.innernote { background-color: ' + palette.contentBg + ' !important; color: ' + palette.text + ' !important; }',
+                '.css-title { background-color: ' + palette.contentBg + ' !important; color: ' + palette.text + ' !important; }'
+            ].join(' ');
+            document.head.appendChild(style);
+        } else {
+            r.classList.add('theme-light');
+            r.classList.remove('theme-dark');
+            r.classList.remove('theme-black');
+        }
+    } catch (e) {
+        // Fallback silently if localStorage unavailable
+        console.debug('theme-init: getSystemTheme() failed:', e);
+    }
+})();
+
+// Main app font - runs synchronously in <head> to avoid a font flash.
+// Every stylesheet references the 'Inter' family by name (often with
+// !important), so the font is swapped globally by re-declaring the 'Inter'
+// @font-face with local system fonts instead of touching font-family rules.
+// The <style> element is appended to <html> (not <head>), so it always sits
+// after the stylesheet <link>s in document order and wins the @font-face
+// cascade, even though this script runs before the links are parsed.
+(function () {
+    // local() matches exact family or PostScript names only (no fontconfig
+    // aliasing), so each stack lists Windows/macOS names plus their
+    // metric-compatible Linux equivalents (Liberation, Arimo/Tinos/Gelasio,
+    // DejaVu).
+    var FONTS = {
+        system: {
+            regular: ['Segoe UI', 'Roboto', 'Helvetica Neue', 'Ubuntu', 'Cantarell', 'Noto Sans', 'Liberation Sans', 'DejaVu Sans', 'Arial'],
+            semibold: ['Segoe UI Semibold', 'SegoeUI-SemiBold', 'Roboto Medium', 'Roboto-Medium', 'HelveticaNeue-Medium', 'Ubuntu Medium', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Ubuntu', 'Cantarell', 'Noto Sans', 'Liberation Sans', 'DejaVu Sans', 'Arial']
+        },
+        arial: {
+            regular: ['Arial', 'ArialMT', 'Helvetica', 'Liberation Sans', 'Arimo'],
+            semibold: ['Arial Bold', 'Arial-BoldMT', 'Helvetica Bold', 'Liberation Sans Bold', 'Arimo Bold', 'Arial', 'Liberation Sans', 'Arimo']
+        },
+        verdana: {
+            regular: ['Verdana', 'DejaVu Sans'],
+            semibold: ['Verdana Bold', 'Verdana-Bold', 'DejaVu Sans Bold', 'Verdana', 'DejaVu Sans']
+        },
+        trebuchet: {
+            regular: ['Trebuchet MS', 'TrebuchetMS'],
+            semibold: ['Trebuchet MS Bold', 'TrebuchetMS-Bold', 'Trebuchet MS']
+        },
+        georgia: {
+            regular: ['Georgia', 'Gelasio', 'DejaVu Serif'],
+            semibold: ['Georgia Bold', 'Georgia-Bold', 'Gelasio Bold', 'DejaVu Serif Bold', 'Georgia', 'Gelasio', 'DejaVu Serif']
+        },
+        times: {
+            regular: ['Times New Roman', 'TimesNewRomanPSMT', 'Liberation Serif', 'Tinos'],
+            semibold: ['Times New Roman Bold', 'TimesNewRomanPS-BoldMT', 'Liberation Serif Bold', 'Tinos Bold', 'Times New Roman', 'Liberation Serif', 'Tinos']
+        }
+    };
+
+    function localSrc(names) {
+        var parts = [];
+        for (var i = 0; i < names.length; i++) {
+            parts.push("local('" + names[i] + "')");
+        }
+        return parts.join(', ');
+    }
+
+    function applyMainFont(fontKey) {
+        var existing = document.getElementById('main-font-override');
+        if (existing && existing.parentNode) {
+            existing.parentNode.removeChild(existing);
+        }
+        var def = FONTS[fontKey];
+        if (!def) return; // 'inter' or unknown value -> bundled Inter
+
+        var style = document.createElement('style');
+        style.id = 'main-font-override';
+        style.textContent =
+            "@font-face { font-family: 'Inter'; src: " + localSrc(def.regular) + "; font-weight: 400; font-style: normal; } " +
+            "@font-face { font-family: 'Inter'; src: " + localSrc(def.semibold) + "; font-weight: 600; font-style: normal; }";
+        document.documentElement.appendChild(style);
+    }
+
+    window.__poznoteApplyMainFont = applyMainFont;
+    window.__poznoteMainFonts = FONTS;
+
+    try {
+        applyMainFont(window.__poznoteUserStorage.getItem('main_font'));
+    } catch (e) {
+        // Fallback silently if localStorage unavailable
+        console.debug('theme-init: applyMainFont() failed:', e);
+    }
+})();
+
+// Markdown editor font - runs synchronously in <head> to avoid a font flash.
+// Only the editing view (the CodeMirror instance) is affected, the rendered
+// preview keeps the app font. Unlike the app font above, this targets a
+// specific selector instead of the 'Inter' @font-face, because the editor
+// font must change without touching the rest of the interface.
+// Default ('inherit') keeps the app font, which is what the editor shows
+// today: noteentry.css forces 'Inter' with !important on every element inside
+// a note, so the plain .cm-editor rule in markdown.css never takes effect.
+(function () {
+    // Each stack lists the Windows/macOS names plus common Linux equivalents,
+    // then a generic family as a last resort. These go into a font-family
+    // declaration (not local()), so generic names like monospace work.
+    // There is no entry for 'inherit': it is the default and means "no
+    // override", which is what the editor already shows today.
+    var EDITOR_FONTS = {
+        courier: "'Courier New', Courier, monospace",
+        consolas: "Consolas, 'Liberation Mono', 'DejaVu Sans Mono', monospace",
+        menlo: "Menlo, 'DejaVu Sans Mono', monospace",
+        monaco: "Monaco, 'DejaVu Sans Mono', monospace",
+        jetbrains: "'JetBrains Mono', 'DejaVu Sans Mono', monospace",
+        cascadia: "'Cascadia Code', 'Cascadia Mono', 'DejaVu Sans Mono', monospace",
+        fira: "'Fira Code', 'Fira Mono', 'DejaVu Sans Mono', monospace",
+        sourcecodepro: "'Source Code Pro', 'DejaVu Sans Mono', monospace",
+        ubuntumono: "'Ubuntu Mono', 'DejaVu Sans Mono', monospace",
+        monospace: "monospace"
+    };
+
+    function applyEditorFont(fontKey) {
+        var existing = document.getElementById('markdown-font-override');
+        if (existing && existing.parentNode) {
+            existing.parentNode.removeChild(existing);
+        }
+        var stack = EDITOR_FONTS[fontKey];
+        if (!stack) return; // 'inherit' or unknown value -> app font
+
+        // noteentry.css forces 'Inter' with !important on nearly every element
+        // inside a note, including the editor's own divs. The :is() list plus
+        // the repeated id raises specificity above that rule so this wins.
+        var style = document.createElement('style');
+        style.id = 'markdown-font-override';
+        style.textContent =
+            '.markdown-codemirror-host :is(.cm-editor, .cm-scroller, .cm-content, .cm-line, .cm-line *, ' +
+            '#markdown-font#markdown-font#markdown-font) { font-family: ' + stack + ' !important; }';
+        document.documentElement.appendChild(style);
+    }
+
+    window.__poznoteApplyEditorFont = applyEditorFont;
+    window.__poznoteEditorFonts = EDITOR_FONTS;
+
+    try {
+        applyEditorFont(window.__poznoteUserStorage.getItem('markdown_font'));
+    } catch (e) {
+        // Fallback silently if localStorage unavailable
+        console.debug('theme-init: applyEditorFont() failed:', e);
+    }
+})();

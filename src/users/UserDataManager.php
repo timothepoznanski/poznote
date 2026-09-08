@@ -179,6 +179,7 @@ class UserDataManager {
             }
         } catch (Exception $e) {
             // Stats input only: never break the caller
+            error_log('UserDataManager: sumAttachmentBytesFromDb() failed: ' . $e->getMessage());
         }
         return $total;
     }

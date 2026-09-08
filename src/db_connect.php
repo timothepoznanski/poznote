@@ -206,6 +206,7 @@ try {
         }
     } catch (Exception $e) {
         // settings table doesn't exist yet (fresh or very old database)
+        error_log('db_connect: failed: ' . $e->getMessage());
     }
 
     // Run the bootstrap whenever the stored version differs from the code's

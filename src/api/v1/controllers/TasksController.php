@@ -517,7 +517,7 @@ class TasksController
      * Restore the order the UI maintains: important-incomplete, then normal
      * incomplete, then completed. Order inside each group is preserved, so a
      * manual drag-and-drop arrangement survives untouched groups.
-     * Mirrors groupTasksByStatus() in js/tasklist.js.
+     * Mirrors groupTasksByStatus() in js/tasklist-core.js.
      */
     private function regroupTasks(array $tasks): array
     {
@@ -732,13 +732,15 @@ class TasksController
 
     private function sendSuccess(array $data): void
     {
-        echo json_encode(array_merge(['success' => true], $data), JSON_UNESCAPED_UNICODE);
+        apiSuccess($data);
     }
 
     private function sendError(int $code, string $message): void
     {
-        http_response_code($code);
-        echo json_encode(['success' => false, 'error' => $message]);
+        // Delegates to lib/api-response.php. Note that FoldersController and
+        // TrashController declare the arguments the other way round; the
+        // signatures are typed, so a call in the wrong order fails loudly.
+        apiFail($message, $code);
     }
 
     /**

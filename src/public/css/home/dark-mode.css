@@ -1,0 +1,58 @@
+/**
+ * Home - Dark Mode
+ *
+ * Dark mode overrides for the home page layout, header,
+ * workspace name, notes count, cards, card icons, and debug info.
+ * (Search and alert dark mode styles are in their respective sub-files.)
+ */
+
+/* Dark mode - base */
+html[data-theme='dark'] .home-page,
+body.dark-mode .home-page {
+    background: var(--dm-content-bg);
+}
+
+/* Dark mode - cards */
+html[data-theme='dark'] .home-card,
+body.dark-mode .home-card {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .home-card:hover,
+body.dark-mode .home-card:hover {
+    border-color: var(--pz-accent);
+}
+
+html[data-theme='dark'] .home-card-title,
+body.dark-mode .home-card-title {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .home-card-description,
+body.dark-mode .home-card-description {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .home-card-icon,
+body.dark-mode .home-card-icon {
+    background: rgba(var(--pz-accent-rgb), 0.2);
+}
+
+/* Dark mode - debug info */
+html[data-theme='dark'] .debug-info,
+body.dark-mode .debug-info {
+    background: var(--dm-sidebar-surface) !important;
+    border-color: var(--dm-border) !important;
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .debug-info h4,
+body.dark-mode .debug-info h4 {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .debug-info pre,
+body.dark-mode .debug-info pre {
+    color: var(--dm-text-muted);
+}

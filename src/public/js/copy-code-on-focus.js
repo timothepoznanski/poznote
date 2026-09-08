@@ -1,0 +1,728 @@
+/* copy-code-on-focus.js
+   Adds copy buttons to code blocks and provides clipboard functionality.
+*/
+(function () {
+    'use strict';
+
+    var COPY_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+    var CHECK_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+    var DELETE_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>';
+
+    // Gutter toggle: a "list with numbers" glyph, shown struck through when the
+    // block currently hides its line numbers.
+    var LINE_NUMBERS_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"></line><line x1="10" y1="12" x2="21" y2="12"></line><line x1="10" y1="18" x2="21" y2="18"></line><path d="M4 6h1v4"></path><path d="M4 10h2"></path><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"></path></svg>';
+    var LINE_NUMBERS_OFF_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"></line><line x1="10" y1="12" x2="21" y2="12"></line><line x1="10" y1="18" x2="21" y2="18"></line><path d="M4 6h1v4"></path><path d="M4 10h2"></path><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"></path><line x1="2" y1="22" x2="22" y2="2"></line></svg>';
+
+    function tl(key, fallback) {
+        return window.t ? window.t(key, {}, fallback) : fallback;
+    }
+
+    function getPreForBlock(block) {
+        if (!block) return null;
+        if (block.tagName === 'PRE') return block;
+        return block.closest ? block.closest('pre') : null;
+    }
+
+    /**
+     * Current gutter state for a block: the per-block data-line-numbers
+     * override when present, otherwise the global code_block_line_numbers
+     * setting carried by the body class.
+     */
+    function areLineNumbersVisible(block) {
+        var pre = getPreForBlock(block);
+        if (pre && pre.hasAttribute('data-line-numbers')) {
+            return pre.getAttribute('data-line-numbers') === '1';
+        }
+        return !!(document.body && document.body.classList.contains('code-block-line-numbers'));
+    }
+
+    function setLineNumbersButtonState(btn, visible) {
+        var label = visible
+            ? tl('editor.code_block_line_numbers.hide', 'Hide line numbers')
+            : tl('editor.code_block_line_numbers.show', 'Show line numbers');
+        btn.innerHTML = visible ? LINE_NUMBERS_ICON_SVG : LINE_NUMBERS_OFF_ICON_SVG;
+        btn.setAttribute('aria-label', label);
+        btn.setAttribute('title', label);
+        btn.setAttribute('aria-pressed', visible ? 'true' : 'false');
+    }
+
+    /**
+     * Write the per-block override and redraw the gutter. The attribute is
+     * always written explicitly (never removed) so the choice survives a
+     * change to the global setting.
+     */
+    function toggleLineNumbers(block) {
+        var pre = getPreForBlock(block);
+        if (!pre) return;
+
+        var next = !areLineNumbersVisible(pre);
+        pre.setAttribute('data-line-numbers', next ? '1' : '0');
+
+        var noteentry = pre.closest ? pre.closest('.noteentry') : null;
+
+        if (typeof window.applyCodeLineNumbers === 'function') {
+            window.applyCodeLineNumbers(noteentry || pre.parentElement || pre);
+        }
+
+        if (!noteentry) return;
+
+        if (typeof window.markNoteAsModified === 'function') {
+            window.markNoteAsModified();
+        }
+        // Autosave listens for input on the note body; without this the new
+        // attribute stays in the DOM and is never persisted.
+        noteentry.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    function setCopyIcon(btn) {
+        btn.innerHTML = COPY_ICON_SVG;
+    }
+
+    function setCheckIcon(btn) {
+        btn.innerHTML = CHECK_ICON_SVG;
+    }
+
+    async function copyText(text) {
+        // Prefer navigator.clipboard when available
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            try {
+                await navigator.clipboard.writeText(text);
+                return true;
+            } catch (e) {
+                // fallthrough to execCommand fallback
+                console.debug('copy-code-on-focus: copyText() failed:', e);
+            }
+        }
+        // Fallback copy using a temporary textarea + execCommand('copy')
+        return copyViaTextarea(text);
+    }
+
+    function copyViaTextarea(text) {
+        try {
+            var ta = document.createElement('textarea');
+            // Place off-screen
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            ta.style.top = '0';
+            ta.setAttribute('readonly', '');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            ta.setSelectionRange(0, ta.value.length);
+            var ok = false;
+            try {
+                ok = document.execCommand('copy');
+            } catch (e) {
+                ok = false;
+            }
+            try { document.body.removeChild(ta); } catch (e) {
+                console.debug('copy-code-on-focus: copyViaTextarea() failed:', e);
+            }
+            return !!ok;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    // Lightweight accessible toast helper
+    function ensureToastContainer() {
+        var id = 'copy-toast-container';
+        var container = document.getElementById(id);
+        if (container) return container;
+        container = document.createElement('div');
+        container.id = id;
+        container.setAttribute('aria-live', 'polite');
+        container.setAttribute('aria-atomic', 'true');
+        container.style.position = 'fixed';
+        container.style.top = '16px';
+        container.style.right = '16px';
+        container.style.zIndex = 2147483647; // very high
+        container.style.pointerEvents = 'none';
+        document.body.appendChild(container);
+        return container;
+    }
+
+    function showToast(message, duration) {
+        try {
+            duration = duration || 1800;
+            var container = ensureToastContainer();
+            var toast = document.createElement('div');
+            toast.className = 'copy-toast-message';
+            toast.style.pointerEvents = 'auto';
+            toast.style.background = '#2d3748';
+            toast.style.color = '#e2e8f0';
+            toast.style.padding = '10px 16px';
+            toast.style.marginTop = '8px';
+            toast.style.borderRadius = '8px';
+            toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+            toast.style.fontSize = '14px';
+            toast.style.fontWeight = '500';
+            toast.style.maxWidth = '280px';
+            toast.style.wordBreak = 'break-word';
+            toast.style.border = '1px solid rgba(255,255,255,0.1)';
+            toast.style.userSelect = 'none';
+            toast.style.webkitUserSelect = 'none';
+            toast.style.mozUserSelect = 'none';
+            toast.style.msUserSelect = 'none';
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 160ms ease-in-out, transform 160ms ease-in-out';
+            toast.style.transform = 'translateY(-6px)';
+            toast.textContent = message;
+            container.appendChild(toast);
+            // Force reflow to enable transition
+            // eslint-disable-next-line no-unused-expressions
+            toast.offsetHeight;
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+
+            // Each toast has its own timer so multiple toasts can appear independently
+            setTimeout(function () {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-6px)';
+                setTimeout(function () { try { container.removeChild(toast); } catch (e) {
+                    console.debug('copy-code-on-focus: showToast() failed:', e);
+                } }, 220);
+            }, duration);
+
+            // toast shown (silent)
+        } catch (e) { /* ignore */ }
+    }
+
+    function normalizeCodeText(el) {
+        if (!el) return '';
+        // Clone the element to avoid modifying the original
+        var clone = el.cloneNode(true);
+        
+        // Remove the copy button from the clone if present
+        var btn = clone.querySelector('.code-block-copy-btn');
+        if (btn) {
+            btn.remove();
+        }
+        
+        // Remove the delete button from the clone if present
+        var delBtn = clone.querySelector('.code-block-delete-btn');
+        if (delBtn) {
+            delBtn.remove();
+        }
+        
+        // Get text content and preserve visual line breaks from editable code blocks.
+        var codeElement = clone.tagName && clone.tagName.toLowerCase() === 'code'
+            ? clone
+            : clone.querySelector('code');
+        var text = (typeof window.getCodeBlockSourceText === 'function' && codeElement)
+            ? window.getCodeBlockSourceText(codeElement)
+            : (clone.textContent || clone.innerText || '');
+        
+        // Replace non-breaking spaces with regular spaces
+        text = text.replace(/\u00A0/g, ' ');
+        
+        // Remove trailing whitespace from each line but keep line breaks
+        text = text.split('\n').map(function(line) {
+            return line.trimEnd();
+        }).join('\n');
+        
+        // Remove leading/trailing empty lines
+        text = text.trim();
+        
+        return text;
+    }
+
+    function getCodeBlockElement(candidate) {
+        if (!candidate || !candidate.tagName) return null;
+
+        var tagName = candidate.tagName.toLowerCase();
+        if (tagName === 'pre') {
+            return candidate;
+        }
+
+        if (tagName === 'code' && candidate.parentElement && candidate.parentElement.tagName.toLowerCase() === 'pre') {
+            return candidate.parentElement;
+        }
+
+        return candidate;
+    }
+
+    function getCodeBlockElements(container) {
+        var blocks = [];
+        var root = container || document;
+
+        root.querySelectorAll('pre:not(.indented-pre), .code-block').forEach(function(candidate) {
+            var block = getCodeBlockElement(candidate);
+            if (block && blocks.indexOf(block) === -1) {
+                blocks.push(block);
+            }
+        });
+
+        return blocks;
+    }
+
+    function isDedicatedActionHost(host, block) {
+        if (!host || !host.classList || !host.classList.contains('code-block-actions-host')) {
+            return false;
+        }
+
+        var hostedBlocks = getCodeBlockElements(host);
+        return hostedBlocks.length === 1 && hostedBlocks[0] === block;
+    }
+
+    function styleActionHost(host) {
+        host.style.position = 'relative';
+        host.style.maxWidth = '100%';
+        host.style.boxSizing = 'border-box';
+    }
+
+    function findActionButton(block, actionHost, className) {
+        var selector = '.' + className;
+        var button = block.querySelector ? block.querySelector(selector) : null;
+        if (button) return button;
+
+        if (!actionHost || !actionHost.children) return null;
+
+        for (var i = 0; i < actionHost.children.length; i++) {
+            var child = actionHost.children[i];
+            if (child.classList && child.classList.contains(className)) {
+                return child;
+            }
+        }
+
+        return null;
+    }
+
+    function isActionButtonNode(node) {
+        return !!(node && node.nodeType === 1 && node.classList &&
+            (node.classList.contains('code-block-copy-btn') ||
+             node.classList.contains('code-block-delete-btn') ||
+             node.classList.contains('code-block-lang-btn') ||
+             node.classList.contains('code-block-line-numbers-btn')));
+    }
+
+    function isDisposableActionHost(host) {
+        if (!host || !host.classList || !host.classList.contains('code-block-actions-host')) {
+            return false;
+        }
+
+        return Array.from(host.childNodes).every(function(node) {
+            return (node.nodeType === 3 && node.textContent.trim() === '') || isActionButtonNode(node);
+        });
+    }
+
+    function removeNode(node) {
+        if (node && node.parentNode) {
+            node.parentNode.removeChild(node);
+        }
+    }
+
+    function removeDirectActionButtons(host) {
+        if (!host || !host.children) return;
+
+        Array.from(host.children).forEach(function(child) {
+            if (isActionButtonNode(child)) {
+                removeNode(child);
+            }
+        });
+    }
+
+    function removeCodeBlockDom(block, copyButton, deleteButton) {
+        var targetBlock = getCodeBlockElement(block);
+        if (!targetBlock) return;
+
+        var actionHost = targetBlock.parentElement;
+        if (!actionHost || !actionHost.classList || !actionHost.classList.contains('code-block-actions-host')) {
+            actionHost = null;
+        }
+
+        removeNode(copyButton || findActionButton(targetBlock, actionHost, 'code-block-copy-btn'));
+        removeNode(deleteButton || findActionButton(targetBlock, actionHost, 'code-block-delete-btn'));
+        removeNode(findActionButton(targetBlock, actionHost, 'code-block-lang-btn'));
+        removeNode(findActionButton(targetBlock, actionHost, 'code-block-line-numbers-btn'));
+        removeNode(targetBlock);
+
+        if (isDisposableActionHost(actionHost)) {
+            removeNode(actionHost);
+        }
+    }
+
+    function findMarkdownFenceRange(lines, targetIndex) {
+        var currentIndex = -1;
+        var inBlock = false;
+        var startLine = -1;
+
+        for (var i = 0; i < lines.length; i++) {
+            if (!/^\s*```/.test(lines[i])) {
+                continue;
+            }
+
+            if (!inBlock) {
+                currentIndex++;
+                startLine = i;
+                inBlock = true;
+            } else {
+                if (currentIndex === targetIndex) {
+                    return { start: startLine, end: i };
+                }
+                inBlock = false;
+                startLine = -1;
+            }
+        }
+
+        if (inBlock && currentIndex === targetIndex) {
+            return { start: startLine, end: lines.length - 1 };
+        }
+
+        return null;
+    }
+
+    function deleteMarkdownCodeBlock(markdownPreview, block) {
+        var targetPre = getCodeBlockElement(block);
+        if (!markdownPreview || !targetPre || targetPre.tagName.toLowerCase() !== 'pre') {
+            return false;
+        }
+
+        var noteEntry = markdownPreview.closest('.noteentry');
+        if (!noteEntry) return false;
+
+        var noteId = noteEntry.id.replace('entry', '');
+        var editorDiv = noteEntry.querySelector('.markdown-editor');
+        if (!editorDiv) return false;
+
+        var allPres = Array.from(markdownPreview.querySelectorAll('pre:not(.indented-pre)'));
+        var preIndex = allPres.indexOf(targetPre);
+        if (preIndex === -1) return false;
+
+        var content = typeof window.getMarkdownContent === 'function'
+            ? window.getMarkdownContent(noteId)
+            : editorDiv.textContent;
+        var lines = content.split('\n');
+        var range = findMarkdownFenceRange(lines, preIndex);
+
+        if (!range) {
+            showToast('Could not find the source code block to delete');
+            return true;
+        }
+
+        lines.splice(range.start, range.end - range.start + 1);
+        var newContent = lines.join('\n');
+        if (typeof window.renderMarkdownEditorContent === 'function') {
+            window.renderMarkdownEditorContent(editorDiv, newContent);
+        } else {
+            editorDiv.textContent = newContent;
+        }
+        noteEntry.setAttribute('data-markdown-content', newContent);
+
+        if (typeof window.markNoteAsModified === 'function') {
+            window.markNoteAsModified();
+        }
+
+        if (noteEntry.classList.contains('markdown-split-mode')) {
+            editorDiv.dispatchEvent(new Event('input', { bubbles: true }));
+        } else if (typeof window.switchToPreviewMode === 'function') {
+            window.switchToPreviewMode(noteId);
+        }
+
+        return true;
+    }
+
+    function ensureCodeBlockActionHost(block) {
+        block = getCodeBlockElement(block);
+        if (!block || !block.parentNode) return block;
+
+        var host = block.parentElement;
+        if (isDedicatedActionHost(host, block)) {
+            styleActionHost(host);
+            return host;
+        }
+
+        if (host && host.classList && host.classList.contains('code-block-actions-host')) {
+            removeDirectActionButtons(host);
+        }
+
+        host = document.createElement('div');
+        host.className = 'code-block-actions-host';
+        styleActionHost(host);
+
+        block.parentNode.insertBefore(host, block);
+        host.appendChild(block);
+
+        return host;
+    }
+
+    function canDeleteCodeBlock(block) {
+        return !!(block && block.closest('.noteentry'));
+    }
+
+    // Add copy button to code blocks
+    function addCopyButtonToCodeBlocks() {
+        // Find all code blocks
+        var codeBlocks = getCodeBlockElements(document);
+        
+        codeBlocks.forEach(function(block) {
+            // Skip inline code elements
+            if (block.tagName.toLowerCase() === 'code' && block.parentElement.tagName.toLowerCase() !== 'pre') {
+                return;
+            }
+
+            var actionHost = ensureCodeBlockActionHost(block);
+            var allowDelete = canDeleteCodeBlock(block);
+            
+            // Check if button already exists
+            var existingBtn = findActionButton(block, actionHost, 'code-block-copy-btn');
+            var existingDelBtn = findActionButton(block, actionHost, 'code-block-delete-btn');
+            var existingLineBtn = findActionButton(block, actionHost, 'code-block-line-numbers-btn');
+            var btn;
+            var delBtn;
+            var lineBtn;
+            
+            if (existingBtn) {
+                btn = existingBtn;
+                // Remove old event listeners by cloning the button
+                var newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+                btn = newBtn;
+                btn.setAttribute('aria-label', 'Copy code to clipboard');
+                btn.setAttribute('title', 'Copy code');
+                setCopyIcon(btn);
+            } else {
+                // Create copy button
+                btn = document.createElement('button');
+                btn.className = 'code-block-copy-btn';
+                btn.setAttribute('type', 'button');
+                btn.setAttribute('aria-label', 'Copy code to clipboard');
+                btn.setAttribute('title', 'Copy code');
+                
+                // SVG icon for copy
+                setCopyIcon(btn);
+            }
+
+            if (btn.parentNode !== actionHost) {
+                if (btn.parentNode) {
+                    btn.parentNode.removeChild(btn);
+                }
+                actionHost.appendChild(btn);
+            }
+
+            // Line-numbers toggle, sitting left of the copy button
+            if (existingLineBtn) {
+                lineBtn = existingLineBtn;
+                var newLineBtn = lineBtn.cloneNode(false);
+                lineBtn.parentNode.replaceChild(newLineBtn, lineBtn);
+                lineBtn = newLineBtn;
+            } else {
+                lineBtn = document.createElement('button');
+                lineBtn.className = 'code-block-line-numbers-btn';
+                lineBtn.setAttribute('type', 'button');
+                lineBtn.setAttribute('contenteditable', 'false');
+            }
+            setLineNumbersButtonState(lineBtn, areLineNumbersVisible(block));
+
+            if (lineBtn.parentNode !== actionHost) {
+                if (lineBtn.parentNode) {
+                    lineBtn.parentNode.removeChild(lineBtn);
+                }
+                actionHost.appendChild(lineBtn);
+            }
+
+            lineBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleLineNumbers(block);
+                setLineNumbersButtonState(lineBtn, areLineNumbersVisible(block));
+            });
+
+            if (!allowDelete) {
+                if (existingDelBtn && existingDelBtn.parentNode) {
+                    existingDelBtn.parentNode.removeChild(existingDelBtn);
+                }
+            } else {
+                var deleteBtnLabel = tl('editor.code_block_delete.title', 'Delete code block');
+
+                if (existingDelBtn) {
+                    delBtn = existingDelBtn;
+                    var newDelBtn = delBtn.cloneNode(true);
+                    delBtn.parentNode.replaceChild(newDelBtn, delBtn);
+                    delBtn = newDelBtn;
+                    delBtn.setAttribute('aria-label', deleteBtnLabel);
+                    delBtn.setAttribute('title', deleteBtnLabel);
+                    delBtn.innerHTML = DELETE_ICON_SVG;
+                } else {
+                    delBtn = document.createElement('button');
+                    delBtn.className = 'code-block-delete-btn';
+                    delBtn.setAttribute('type', 'button');
+                    delBtn.setAttribute('aria-label', deleteBtnLabel);
+                    delBtn.setAttribute('title', deleteBtnLabel);
+                    delBtn.innerHTML = DELETE_ICON_SVG;
+                }
+
+                if (delBtn.parentNode !== actionHost) {
+                    if (delBtn.parentNode) {
+                        delBtn.parentNode.removeChild(delBtn);
+                    }
+                    actionHost.appendChild(delBtn);
+                }
+            }
+            
+            // Add/re-attach click handler for copy
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                var text = normalizeCodeText(block);
+                
+                if (!text) {
+                    showToast('No text found to copy');
+                    return;
+                }
+                
+                copyText(text).then(function (ok) {
+                    if (ok) {
+                        // Visual feedback on button
+                        btn.classList.add('copied');
+                        setCheckIcon(btn);
+                        
+                        showToast('Copied to clipboard!');
+                        
+                        // Reset button after 2 seconds
+                        setTimeout(function() {
+                            btn.classList.remove('copied');
+                            setCopyIcon(btn);
+                        }, 2000);
+                    } else {
+                        showToast('Copy failed — select the code and press Ctrl+C');
+                    }
+                }).catch(function () {
+                    showToast('Copy failed — select the code and press Ctrl+C');
+                });
+            });
+
+            // Add delete click handler
+            if (!allowDelete || !delBtn) {
+                return;
+            }
+
+            delBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                var confirmTitle = tl('editor.code_block_delete.confirm_title', 'Delete code block');
+                var confirmMsg   = tl('editor.code_block_delete.confirm_message', 'Do you want to delete this code block?');
+
+                var doDelete = function() {
+                    // --- Markdown mode: update source and re-render ---
+                    var markdownPreview = block.closest('.markdown-preview');
+                    if (markdownPreview && deleteMarkdownCodeBlock(markdownPreview, block)) {
+                        return;
+                    }
+
+                    // --- Rich-text mode: remove the DOM block directly ---
+                    var noteentry = block.closest('.noteentry') || document.querySelector('.noteentry');
+                    removeCodeBlockDom(block, btn, delBtn);
+                    if (typeof window.markNoteAsModified === 'function') {
+                        window.markNoteAsModified();
+                    }
+                    if (noteentry) {
+                        noteentry.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                };
+
+                if (window.modalAlert && typeof window.modalAlert.confirm === 'function') {
+                    window.modalAlert.confirm(confirmMsg, confirmTitle).then(function(confirmed) {
+                        if (confirmed) doDelete();
+                    });
+                } else if (confirm(confirmMsg)) {
+                    doDelete();
+                }
+            });
+        });
+
+        refreshLanguageButtons();
+    }
+
+    // Detect horizontal overflow on code blocks and toggle 'has-x-overflow' class
+    // to avoid reserving scrollbar space when no horizontal scroll is needed.
+    function updateCodeBlockOverflow() {
+        var blocks = getCodeBlockElements(document);
+        var highlightedCodeBlocks = document.querySelectorAll('pre code.hljs.has-x-overflow');
+
+        highlightedCodeBlocks.forEach(function(codeBlock) {
+            codeBlock.classList.remove('has-x-overflow');
+        });
+
+        blocks.forEach(function(block) {
+            if (block.scrollWidth > block.clientWidth) {
+                block.classList.add('has-x-overflow');
+            } else {
+                block.classList.remove('has-x-overflow');
+            }
+        });
+    }
+
+    // Expose the function globally so it can be called after AJAX note loads
+    window.reinitializeCodeCopyButtons = function() {
+        addCopyButtonToCodeBlocks();
+        updateCodeBlockOverflow();
+    };
+
+    // The clickable language badge lives in the same action host, so it is
+    // (re)built whenever the copy/delete buttons are (js/code-block-language.js)
+    function refreshLanguageButtons() {
+        if (typeof window.refreshCodeBlockLanguageButtons === 'function') {
+            window.refreshCodeBlockLanguageButtons(document);
+        }
+    }
+
+    // Watch for dynamically added code blocks
+    function observeCodeBlocks() {
+        var observer = new MutationObserver(function(mutations) {
+            var shouldUpdate = false;
+            
+            mutations.forEach(function(mutation) {
+                if (mutation.addedNodes.length > 0) {
+                    mutation.addedNodes.forEach(function(node) {
+                        if (node.nodeType === 1) { // Element node
+                            var tagName = node.tagName ? node.tagName.toLowerCase() : '';
+                            if (tagName === 'pre' || node.classList && node.classList.contains('code-block')) {
+                                shouldUpdate = true;
+                            } else if (node.querySelectorAll) {
+                                var hasCodeBlocks = node.querySelectorAll('pre, .code-block').length > 0;
+                                if (hasCodeBlocks) {
+                                    shouldUpdate = true;
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+            
+            if (shouldUpdate) {
+                addCopyButtonToCodeBlocks();
+                updateCodeBlockOverflow();
+            }
+        });
+        
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function () { 
+            try { ensureToastContainer(); } catch (e) {
+                console.debug('copy-code-on-focus: observeCodeBlocks() failed:', e);
+            } 
+            addCopyButtonToCodeBlocks();
+            updateCodeBlockOverflow();
+            observeCodeBlocks();
+            window.addEventListener('resize', updateCodeBlockOverflow);
+        });
+    } else {
+        try { ensureToastContainer(); } catch (e) {
+            console.debug('copy-code-on-focus: observeCodeBlocks() failed:', e);
+        }
+        addCopyButtonToCodeBlocks();
+        updateCodeBlockOverflow();
+        observeCodeBlocks();
+        window.addEventListener('resize', updateCodeBlockOverflow);
+    }
+
+})();

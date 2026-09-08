@@ -1,0 +1,577 @@
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
+}
+
+:root {
+    --text-muted: #4a5568;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #f8fafc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.login-header {
+    margin-bottom: 2rem;
+}
+
+.logo {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-favicon {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+}
+
+.login-title {
+    color: #252526;
+    font-size: 1.875rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Make the login display name visually consistent with other modal/section headings */
+
+.form-group {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #4a5568;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-wrapper input {
+    padding-right: 3rem !important;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    margin: 0;
+    color: #a0aec0;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: auto;
+    outline: none;
+}
+
+.password-toggle:hover,
+.password-toggle:focus {
+    color: #4a5568;
+}
+
+.password-toggle i {
+    font-size: 1.1rem;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    outline: none;
+    border-color: #3182ce;
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+input[type="text"]::placeholder,
+input[type="password"]::placeholder {
+    color: #a0aec0;
+}
+
+.remember-me-group {
+    margin-bottom: 1rem;
+}
+
+.remember-me-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 400;
+    color: #4a5568;
+    font-size: 0.875rem;
+    margin-bottom: 0;
+}
+
+.remember-me-label input[type="checkbox"] {
+    width: auto;
+    margin-right: 0.5rem;
+    cursor: pointer;
+}
+
+.remember-me-label span {
+    user-select: none;
+}
+
+.remember-me-unified {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.remember-me-unified .remember-me-label {
+    justify-content: center;
+}
+
+.oidc-divider {
+    text-align: center;
+    margin: 1.25rem 0;
+    position: relative;
+}
+
+.oidc-divider::before,
+.oidc-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 42%;
+    height: 1px;
+    background: #e2e8f0;
+}
+
+.oidc-divider::before {
+    left: 0;
+}
+
+.oidc-divider::after {
+    right: 0;
+}
+
+.oidc-divider span {
+    color: #718096;
+    font-size: 0.875rem;
+    font-weight: 500;
+    background: white;
+    padding: 0 0.75rem;
+    position: relative;
+}
+
+.login-button {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: #3182ce;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 0.5rem;
+}
+
+.oidc-button {
+    display: block;
+    text-decoration: none;
+    text-align: center;
+    background: var(--pz-text);
+    margin-top: 0.75rem;
+}
+
+.oidc-button:hover {
+    background: #252526;
+}
+
+/* Secondary variant shown when a previous SSO account is remembered.
+   Doubled class keeps these rules above .login-button:hover below. */
+.oidc-other-account-button.oidc-other-account-button {
+    background: transparent;
+    color: var(--pz-text);
+    border: 1px solid #cbd5e0;
+}
+
+.oidc-other-account-button.oidc-other-account-button:hover {
+    background: rgba(0, 0, 0, 0.06);
+    border-color: #a0aec0;
+}
+
+.oidc-other-account-button[hidden] {
+    display: none;
+}
+
+.login-button:hover {
+    background: #2c5282;
+}
+
+.login-button:active {
+    transform: translateY(1px);
+}
+
+.account-select-panel {
+    text-align: left;
+}
+
+.account-select-intro {
+    color: #4a5568;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0 0 1rem;
+    text-align: center;
+}
+
+.account-select-error {
+    margin: 0 0 1rem;
+    text-align: center;
+}
+
+.account-select-form {
+    margin: 0;
+}
+
+.account-select-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.account-option {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fff;
+    color: #252526;
+    font: inherit;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.account-option:hover,
+.account-option:focus {
+    border-color: #3182ce;
+    background: #f7fafc;
+    outline: none;
+}
+
+.account-option:active {
+    transform: translateY(1px);
+}
+
+.account-option-name {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    font-weight: 600;
+}
+
+.account-option-badge {
+    flex: 0 0 auto;
+    padding: 0.2rem 0.45rem;
+    border-radius: 4px;
+    background: #ebf8ff;
+    color: #2b6cb0;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.account-select-logout {
+    display: block;
+    margin-top: 1rem;
+    color: #4a5568;
+    font-size: 0.9rem;
+    text-align: center;
+    text-decoration: none;
+}
+
+.account-select-logout:hover {
+    color: #2c5282;
+    text-decoration: underline;
+}
+
+.error {
+    color: #e53e3e;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-align: left;
+}
+
+.admin-warning {
+    background: #fff5f5;
+    border: 1px solid #feb2b2;
+    color: #c53030;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    text-align: left;
+    line-height: 1.5;
+}
+
+.admin-warning code {
+    background: #fed7d7;
+    color: #c53030;
+    padding: 0.125rem 0.25rem;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.info {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: #4a5568;
+    line-height: 1.5;
+    text-align: left;
+}
+
+.info a {
+    color: #3182ce;
+    text-decoration: none;
+}
+
+.info a:hover {
+    text-decoration: underline;
+}
+
+.info code {
+    background: #edf2f7;
+    padding: 0.125rem 0.25rem;
+    border-radius: 4px;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+    font-size: 0.8125rem;
+}
+
+.github-link {
+    margin-top: 1rem !important;
+    padding-top: 0.75rem;
+    /* border-top: 1px solid #e2e8f0; */
+}
+
+.github-link a {
+    color: #3182ce;
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.2s ease;
+}
+
+.github-link a:hover {
+    color: #2c5282;
+    text-decoration: underline;
+}
+
+.github-link i {
+    font-size: 1rem;
+}
+
+/* ============================================
+   Dark Mode (Login Page)
+   ============================================ */
+
+html[data-theme='dark'] body {
+    background-color: var(--dm-bg);
+    color: var(--dm-text);
+    --text-muted: #a0aec0;
+}
+
+html[data-theme='dark'] .login-title {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] label,
+html[data-theme='dark'] .remember-me-label {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] input[type="text"],
+html[data-theme='dark'] input[type="password"] {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .password-toggle {
+    color: #808080;
+}
+
+html[data-theme='dark'] .password-toggle:hover {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] input[type="text"]:focus,
+html[data-theme='dark'] input[type="password"]:focus {
+    border-color: var(--dm-accent);
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.18);
+}
+
+html[data-theme='dark'] input[type="text"]::placeholder,
+html[data-theme='dark'] input[type="password"]::placeholder {
+    color: #808080;
+}
+
+html[data-theme='dark'] .github-link a {
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .github-link a:hover {
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .admin-warning {
+    background: rgba(197, 48, 48, 0.1);
+    border-color: #c53030;
+    color: #feb2b2;
+}
+
+html[data-theme='dark'] .admin-warning code {
+    background: rgba(254, 215, 215, 0.2);
+    color: #fff;
+}
+
+html[data-theme='dark'] .account-select-intro,
+html[data-theme='dark'] .account-select-logout {
+    color: #a0aec0;
+}
+
+html[data-theme='dark'] .account-select-logout:hover {
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .account-option {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .account-option:hover,
+html[data-theme='dark'] .account-option:focus {
+    background: var(--dm-surface-hover);
+    border-color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .account-option-badge {
+    background: rgba(74, 158, 255, 0.16);
+    color: #9cc7ff;
+}
+
+html[data-theme='dark'] .oidc-divider::before,
+html[data-theme='dark'] .oidc-divider::after {
+    background: #4a5568;
+}
+
+html[data-theme='dark'] .oidc-divider span {
+    color: #a0aec0;
+    background: var(--dm-bg);
+}
+
+html[data-theme='dark'] .oidc-other-account-button {
+    background: transparent;
+    color: #e2e8f0;
+    border-color: #4a5568;
+}
+
+html[data-theme='dark'] .oidc-other-account-button:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* Responsive Design */
+@media (max-width: 800px) {
+    body {
+        padding: 16px;
+    }
+
+    .login-header {
+        margin-bottom: 2rem;
+    }
+
+    .logo {
+        width: 40px;
+        height: 40px;
+    }
+
+    .logo-favicon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .login-title {
+        font-size: 1.5rem;
+    }
+
+    .info {
+        font-size: 0.8125rem;
+    }
+
+}
+
+/* ===========================================
+   UTILITY CLASSES FOR INLINE STYLE EXTRACTION
+   =========================================== */
+
+/* OIDC error message */
+.oidc-error {
+    margin-top: 0.75rem;
+    text-align: center;
+}

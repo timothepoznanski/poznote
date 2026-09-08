@@ -1,0 +1,1082 @@
+/* Styles for the global tasks page */
+
+body.tasks-page {
+    margin: 0;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--bg-color, #ffffff);
+    color: var(--text-color, var(--pz-text));
+}
+
+.tasks-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Progress section. On desktop the title, progress bar and label share one
+   row (the header wrapper is flattened with display: contents); the mobile
+   media query restores the stacked layout. */
+.tasks-progress-section {
+    max-width: 900px;
+    margin: 0 auto 25px auto;
+    align-items: center;
+    gap: 16px;
+}
+
+/* :not() keeps the initially-hidden utility (display: none) in charge until
+   the first load reveals the section */
+.tasks-progress-section:not(.initially-hidden) {
+    display: flex;
+}
+
+.tasks-progress-header {
+    display: contents;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 10px;
+}
+
+.tasks-progress-label {
+    font-size: 13px;
+    color: #666;
+    white-space: nowrap;
+    order: 3;
+    flex-shrink: 0;
+}
+
+.tasks-progress-bar {
+    height: 8px;
+    border-radius: 4px;
+    background-color: #e9ecef;
+    overflow: hidden;
+    order: 2;
+    flex: 1;
+}
+
+.tasks-progress-fill {
+    height: 100%;
+    width: 0;
+    border-radius: 4px;
+    background-color: var(--pz-accent);
+    transition: width 0.3s ease;
+}
+
+/* "Display tasks in notes" toggle, right of the progress label: shows or
+   hides the groups built from the checklists of regular notes */
+.tasks-progress-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    order: 4;
+    flex-shrink: 0;
+    font-size: 13px;
+    color: #666;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+}
+
+.tasks-progress-option input {
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: var(--pz-accent);
+}
+
+[data-theme="dark"] .tasks-progress-option {
+    color: #aaa;
+}
+
+/* Filter bar. On desktop the filter input sits on the same row, to the right
+   of the filter chips; the mobile media query restores the stacked layout. */
+.tasks-filter-bar {
+    max-width: 900px;
+    margin: 0 auto 25px auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.tasks-filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.tasks-filter-chip {
+    padding: 6px 14px;
+    border: 1px solid var(--border-color, var(--pz-border));
+    border-radius: 16px;
+    background: transparent;
+    color: var(--text-color, var(--pz-text));
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tasks-filter-chip:hover {
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
+}
+
+.tasks-filter-chip.active {
+    background-color: var(--pz-accent);
+    border-color: var(--pz-accent);
+    color: #ffffff;
+}
+
+.filter-input-wrapper {
+    position: relative;
+    flex: 1;
+    min-width: 180px;
+    display: flex;
+    align-items: center;
+}
+
+.filter-input {
+    width: 100%;
+    /* Same vertical metrics as the filter chips (6px padding, 13px font) so
+       both end up the same height on the shared row */
+    padding: 6px 36px 6px 12px;
+    border: 1px solid var(--border-color, var(--pz-border));
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--text-color, var(--pz-text));
+    background-color: var(--input-bg, #ffffff);
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.filter-input:focus {
+    outline: none;
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
+}
+
+.clear-filter-btn {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    padding: 6px 8px;
+    cursor: pointer;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+}
+
+.clear-filter-btn:hover {
+    color: var(--pz-accent);
+}
+
+/* Collapse-all / expand-all chevrons, right of the filter input */
+.tasks-collapse-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.tasks-collapse-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 29px;
+    height: 29px;
+    padding: 0;
+    border: 1px solid var(--border-color, var(--pz-border));
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-color, var(--pz-text));
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tasks-collapse-btn:hover {
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
+}
+
+/* Note groups. Each group is framed as a card so consecutive sections read
+   as distinct blocks rather than one continuous list. */
+.tasks-note-group {
+    max-width: 900px;
+    margin: 0 auto 18px auto;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color, var(--pz-border));
+    border-radius: 10px;
+    background-color: #fafafa;
+}
+
+.tasks-note-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color, var(--pz-border));
+}
+
+/* A collapsed card only shows its header: drop the separator under it */
+.tasks-note-group.collapsed .tasks-note-header {
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+/* The card border already closes the list: no divider under the last row */
+.tasks-note-list > .tasks-task-item:last-child {
+    border-bottom: none;
+}
+
+.tasks-note-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: #888;
+    font-size: 16px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.tasks-note-toggle:hover {
+    color: var(--pz-accent);
+}
+
+.tasks-note-toggle i {
+    transition: transform 0.2s ease;
+}
+
+.tasks-note-group.collapsed .tasks-note-toggle i {
+    transform: rotate(-90deg);
+}
+
+.tasks-note-group.collapsed .tasks-note-list {
+    display: none;
+}
+
+.note-name {
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--pz-accent);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.note-name:hover {
+    text-decoration: underline;
+}
+
+.folder-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: #666;
+    background-color: #f0f0f0;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+/* Groups built from the checklist items of a regular note (as opposed to a
+   tasklist note) carry a "Note" badge next to the folder */
+.tasks-note-source-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--pz-accent);
+    background-color: rgba(var(--pz-accent-rgb), 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+[data-theme="dark"] .tasks-note-source-badge {
+    color: #5cb8ea;
+    background-color: rgba(92, 184, 234, 0.15);
+}
+
+.tasks-note-count {
+    margin-left: auto;
+    font-size: 12px;
+    color: #888;
+    white-space: nowrap;
+}
+
+/* Task rows. The whole row (outside links/buttons/checkbox) navigates to the
+   task's note. Top-aligned so the checkbox sits on the first line of
+   multi-line tasks. */
+.tasks-task-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 4px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    cursor: pointer;
+}
+
+.tasks-task-checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--pz-accent);
+    flex-shrink: 0;
+    /* Center on the first text line now that the row is top-aligned */
+    margin-top: 2px;
+}
+
+.tasks-task-text {
+    flex: 1;
+    min-width: 0;
+    font-size: 14px;
+    overflow-wrap: break-word;
+    /* Keep the line breaks entered in the tasklist note */
+    white-space: pre-wrap;
+}
+
+.tasks-task-text a {
+    color: var(--pz-accent);
+    text-decoration: none;
+    word-break: break-all;
+}
+
+.tasks-task-text a:hover {
+    color: var(--pz-accent-hover);
+    text-decoration: underline;
+}
+
+.tasks-task-item.completed .tasks-task-text {
+    color: #999;
+    text-decoration: line-through;
+}
+
+.tasks-task-item.important .tasks-task-text {
+    color: #c62828;
+    font-weight: 600;
+}
+
+.tasks-task-star {
+    color: #ff0000;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+/* Calendar button to add a due date to an undated open task */
+.tasks-task-due-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: #999;
+    font-size: 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+.tasks-task-due-btn:hover {
+    color: var(--pz-accent);
+    opacity: 1;
+}
+
+/* Due date pill (shared visual language with in-note chips) */
+.task-due-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border: 1px solid #d0d7de;
+    border-radius: 12px;
+    background: #f6f8fa;
+    color: #57606a;
+    font-size: 12px;
+    font-family: inherit;
+    line-height: 1.4;
+    white-space: nowrap;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.task-due-chip:hover {
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
+}
+
+.task-due-chip i {
+    font-size: 12px;
+}
+
+.task-due-chip.overdue {
+    border-color: #f1b8b8;
+    background: #fdf2f2;
+    color: #c62828;
+}
+
+.tasks-task-item.completed .task-due-chip {
+    opacity: 0.6;
+}
+
+/* View toggle (list / calendar), a small segmented control */
+.tasks-view-toggle {
+    display: flex;
+    flex-shrink: 0;
+    border: 1px solid var(--border-color, var(--pz-border));
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.tasks-view-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 29px;
+    height: 27px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--text-color, var(--pz-text));
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tasks-view-btn:hover {
+    color: var(--pz-accent);
+}
+
+.tasks-view-btn.active {
+    background-color: var(--pz-accent);
+    color: #ffffff;
+}
+
+/* Collapse/expand only makes sense for the note groups of the list view */
+.tasks-container.view-calendar .tasks-collapse-actions {
+    display: none;
+}
+
+/* Calendar view: month grid. It spans the full viewport width; the body and
+   container paddings keep the side margins, and the container's usual width
+   cap is lifted while the calendar is shown. */
+.tasks-container.view-calendar {
+    max-width: none;
+}
+
+.tasks-calendar {
+    margin: 0 0 25px 0;
+}
+
+.tasks-cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.tasks-cal-nav,
+.tasks-cal-today-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 28px;
+    border: 1px solid var(--border-color, var(--pz-border));
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-color, var(--pz-text));
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tasks-cal-nav {
+    width: 28px;
+    padding: 0;
+}
+
+.tasks-cal-today-btn {
+    padding: 0 12px;
+    font-size: 13px;
+    margin-left: 8px;
+}
+
+.tasks-cal-nav:hover,
+.tasks-cal-today-btn:hover {
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
+}
+
+.tasks-cal-title {
+    font-size: 16px;
+    font-weight: 600;
+    min-width: 160px;
+    text-align: center;
+}
+
+/* The 1px gap over the grid's own background draws the cell separators
+   (a shade darker than the usual --border-color so the grid reads clearly) */
+.tasks-cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    border: 1px solid #c6ccd2;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #c6ccd2;
+}
+
+.tasks-cal-weekday {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--pz-text-muted);
+    padding: 6px 0;
+    background: var(--bg-color, #ffffff);
+}
+
+.tasks-cal-day {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-height: 92px;
+    min-width: 0;
+    padding: 4px;
+    background: var(--bg-color, #ffffff);
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.tasks-cal-day:hover {
+    background-color: rgba(var(--pz-accent-rgb), 0.05);
+}
+
+.tasks-cal-day.selected {
+    box-shadow: inset 0 0 0 2px var(--pz-accent);
+}
+
+.tasks-cal-day.drag-over {
+    box-shadow: inset 0 0 0 2px var(--pz-accent);
+    background-color: rgba(var(--pz-accent-rgb), 0.08);
+}
+
+.tasks-cal-day-num {
+    align-self: flex-end;
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+    text-align: center;
+    border-radius: 50%;
+    font-size: 12px;
+    color: #555;
+    flex-shrink: 0;
+}
+
+.tasks-cal-day.today .tasks-cal-day-num {
+    background-color: var(--pz-accent);
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.tasks-cal-day.other-month .tasks-cal-day-num {
+    color: #bbb;
+}
+
+.tasks-cal-day.other-month .tasks-cal-chip {
+    opacity: 0.55;
+}
+
+/* Task chips inside day cells */
+.tasks-cal-chip {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    width: 100%;
+    padding: 2px 6px;
+    border: none;
+    border-left: 3px solid var(--pz-accent);
+    border-radius: 4px;
+    background: rgba(var(--pz-accent-rgb), 0.1);
+    color: var(--text-color, var(--pz-text));
+    font-size: 11px;
+    font-family: inherit;
+    line-height: 1.5;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.tasks-cal-chip-time {
+    font-weight: 600;
+    color: var(--pz-accent);
+    flex-shrink: 0;
+}
+
+.tasks-cal-chip-text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tasks-cal-chip.important {
+    border-left-color: #c62828;
+    background: rgba(198, 40, 40, 0.08);
+}
+
+.tasks-cal-chip.important .tasks-cal-chip-text {
+    color: #c62828;
+    font-weight: 600;
+}
+
+.tasks-cal-chip.overdue {
+    border-left-color: #c62828;
+    background: #fdf2f2;
+}
+
+.tasks-cal-chip.completed {
+    opacity: 0.55;
+}
+
+.tasks-cal-chip.completed .tasks-cal-chip-text {
+    text-decoration: line-through;
+}
+
+.tasks-cal-chip.dragging {
+    opacity: 0.4;
+}
+
+/* Day modal: the clicked day's tasks */
+#calDayModal .modal-content {
+    max-width: 600px;
+}
+
+#calDayModalList {
+    margin-bottom: 16px;
+}
+
+/* Modal rows are short one-liners: center the checkbox, text, note badge
+   and time chip on one axis (the list view stays top-aligned for
+   multi-line tasks) */
+#calDayModalList .tasks-task-item {
+    align-items: center;
+    padding: 10px 4px;
+}
+
+/* margin: 0 also cancels the .modal-content input bottom margin that would
+   push the checkbox off-center */
+#calDayModalList .tasks-task-checkbox {
+    margin: 0;
+}
+
+.tasks-cal-modal-empty {
+    color: #666;
+    font-size: 13px;
+    margin: 0 0 10px 0;
+}
+
+.tasks-task-note-badge {
+    font-size: 11px;
+    color: #666;
+    background-color: #f0f0f0;
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 0;
+}
+
+/* Mobile: day cells are too narrow for text, so chips collapse into small
+   colored bars; tapping the day opens the modal listing its tasks */
+@media (max-width: 768px) {
+    .tasks-cal-day {
+        min-height: 56px;
+        padding: 2px;
+    }
+
+    .tasks-cal-day-num {
+        width: 18px;
+        height: 18px;
+        line-height: 18px;
+        font-size: 11px;
+    }
+
+    .tasks-cal-chip {
+        height: 5px;
+        padding: 0;
+        border-left: none;
+        border-radius: 2px;
+        background: var(--pz-accent);
+    }
+
+    .tasks-cal-chip .tasks-cal-chip-time,
+    .tasks-cal-chip .tasks-cal-chip-text {
+        display: none;
+    }
+
+    .tasks-cal-chip.important,
+    .tasks-cal-chip.overdue {
+        background: #c62828;
+    }
+
+    .tasks-cal-chip.completed {
+        background: var(--pz-text-subtle);
+    }
+}
+
+.empty-message {
+    text-align: center;
+    margin-top: 50px;
+    color: #666;
+}
+
+.error-message {
+    text-align: center;
+    margin-top: 50px;
+    color: #d32f2f;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 400;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.loading-spinner {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+/* Mobile: dated tasks show the due date on the first line, then the task
+   text on the next line (same layout as in tasklist notes) */
+@media (max-width: 768px) {
+    .tasks-task-item.has-due {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        grid-template-areas:
+            "chip chip star"
+            "check text text";
+        row-gap: 6px;
+        align-items: center;
+    }
+
+    .tasks-task-item.has-due .task-due-chip {
+        grid-area: chip;
+        justify-self: start;
+    }
+
+    .tasks-task-item.has-due .tasks-task-checkbox {
+        grid-area: check;
+        align-self: start;
+    }
+
+    .tasks-task-item.has-due .tasks-task-text {
+        grid-area: text;
+    }
+
+    .tasks-task-item.has-due .tasks-task-star {
+        grid-area: star;
+        justify-self: end;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+    /* The desktop spacing above the nav buttons stacks twice over
+       (body padding + container padding); collapse it */
+    body.tasks-page {
+        padding: 10px;
+    }
+
+    .tasks-container {
+        padding: 5px;
+    }
+
+    .tasks-note-group {
+        padding: 10px 12px;
+        margin-bottom: 12px;
+    }
+
+    /* Stacked layout: title and label above the full-width progress bar.
+       The bottom margin matches the filter input's total bottom spacing
+       (8px bar gap + 6px margin) so the input breathes equally on both sides */
+    .tasks-progress-section:not(.initially-hidden) {
+        display: block;
+        margin-bottom: 14px;
+    }
+
+    /* Filter input first (full width, right below the progress bar), then
+       one wrapping row where the collapse/expand chevrons flow right after
+       the filter chips (display: contents merges both groups into the bar) */
+    .tasks-filter-bar {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .filter-input-wrapper {
+        order: -1;
+        flex-basis: 100%;
+        /* With the 8px bar gap: 14px below the input, same as above it */
+        margin-bottom: 6px;
+    }
+
+    .tasks-filter-chips,
+    .tasks-collapse-actions {
+        display: contents;
+    }
+
+    .tasks-progress-header {
+        display: flex;
+        gap: 20px;
+    }
+
+    .tasks-progress-option {
+        margin-top: 10px;
+    }
+
+    .btn {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+}
+
+/* Dark mode */
+html[data-theme="dark"]:has(body.tasks-page) {
+    background-color: var(--dm-content-bg);
+}
+
+[data-theme="dark"] body.tasks-page {
+    background-color: var(--dm-content-bg);
+    color: var(--dm-text);
+}
+
+[data-theme="dark"] .note-name {
+    color: #0ea5e9;
+}
+
+/* One shade above the card background so the badge stays visible */
+[data-theme="dark"] .folder-badge {
+    background-color: var(--dm-surface-hover);
+    color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .filter-input {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+[data-theme="dark"] .tasks-filter-chip {
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+[data-theme="dark"] .tasks-filter-chip.active {
+    background-color: var(--pz-accent);
+    border-color: var(--pz-accent);
+    color: #ffffff;
+}
+
+[data-theme="dark"] .tasks-collapse-btn {
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+[data-theme="dark"] .tasks-collapse-btn:hover {
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
+}
+
+[data-theme="dark"] .tasks-progress-bar {
+    background-color: var(--dm-surface);
+}
+
+[data-theme="dark"] .tasks-note-group {
+    border-color: var(--dm-border);
+    background-color: var(--dm-surface);
+}
+
+[data-theme="dark"] .tasks-note-header {
+    border-bottom-color: var(--dm-border);
+}
+
+[data-theme="dark"] .tasks-note-toggle {
+    color: #b0b0b0;
+}
+
+[data-theme="dark"] .tasks-note-toggle:hover {
+    color: #4da3d0;
+}
+
+[data-theme="dark"] .tasks-task-item {
+    border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .tasks-task-item.completed .tasks-task-text {
+    color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .tasks-task-text a {
+    color: #4da3d0;
+}
+
+[data-theme="dark"] .task-due-chip {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .task-due-chip:hover {
+    border-color: #4da3d0;
+    color: #4da3d0;
+}
+
+[data-theme="dark"] .tasks-task-due-btn {
+    color: #b0b0b0;
+}
+
+[data-theme="dark"] .tasks-task-due-btn:hover {
+    color: #4da3d0;
+}
+
+[data-theme="dark"] .task-due-chip.overdue {
+    background-color: #3b1d1d;
+    border-color: #7f1d1d;
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .tasks-view-toggle {
+    border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .tasks-view-btn {
+    color: var(--dm-text);
+}
+
+[data-theme="dark"] .tasks-view-btn.active {
+    background-color: var(--pz-accent);
+    color: #ffffff;
+}
+
+[data-theme="dark"] .tasks-cal-nav,
+[data-theme="dark"] .tasks-cal-today-btn {
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+[data-theme="dark"] .tasks-cal-nav:hover,
+[data-theme="dark"] .tasks-cal-today-btn:hover {
+    border-color: #4da3d0;
+    color: #4da3d0;
+}
+
+/* Translucent white separators stay visible over both dark palettes */
+[data-theme="dark"] .tasks-cal-grid {
+    border-color: rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.18);
+}
+
+[data-theme="dark"] .tasks-cal-weekday,
+[data-theme="dark"] .tasks-cal-day {
+    background: var(--dm-content-bg);
+}
+
+[data-theme="dark"] .tasks-cal-weekday {
+    color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .tasks-cal-day:hover {
+    background-color: rgba(14, 165, 233, 0.08);
+}
+
+[data-theme="dark"] .tasks-cal-day-num {
+    color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .tasks-cal-day.today .tasks-cal-day-num {
+    background-color: var(--pz-accent);
+    color: #ffffff;
+}
+
+[data-theme="dark"] .tasks-cal-day.other-month .tasks-cal-day-num {
+    color: #4b5563;
+}
+
+[data-theme="dark"] .tasks-cal-chip {
+    background: rgba(14, 165, 233, 0.15);
+    border-left-color: #0ea5e9;
+    color: var(--dm-text);
+}
+
+[data-theme="dark"] .tasks-cal-chip-time {
+    color: #4da3d0;
+}
+
+[data-theme="dark"] .tasks-cal-chip.important {
+    border-left-color: #7f1d1d;
+    background: rgba(198, 40, 40, 0.18);
+}
+
+[data-theme="dark"] .tasks-cal-chip.important .tasks-cal-chip-text {
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .tasks-cal-chip.overdue {
+    border-left-color: #7f1d1d;
+    background: #3b1d1d;
+}
+
+[data-theme="dark"] .tasks-cal-modal-empty {
+    color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .tasks-task-note-badge {
+    background-color: var(--dm-surface);
+    color: var(--dm-text-muted);
+}
+
+/* Mobile bars again, with enough specificity to beat the dark chip rules */
+@media (max-width: 768px) {
+    [data-theme="dark"] .tasks-cal-chip {
+        background: #0ea5e9;
+    }
+
+    [data-theme="dark"] .tasks-cal-chip.important,
+    [data-theme="dark"] .tasks-cal-chip.overdue {
+        background: #dc2626;
+    }
+
+    [data-theme="dark"] .tasks-cal-chip.completed {
+        background: #4b5563;
+    }
+}

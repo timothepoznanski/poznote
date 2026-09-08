@@ -1,0 +1,1052 @@
+/**
+ * Notes List Event Delegation
+ * CSP-compliant event handling for notes_list.php
+ * 
+ * This module handles all click and double-click events using event delegation
+ * for better performance and maintainability.
+ */
+(function () {
+    'use strict';
+
+    // =====================================================
+    // DOUBLE-CLICK DETECTION
+    // =====================================================
+
+    var clickTimer = null;
+    var lastClickedElement = null;
+    var DOUBLE_CLICK_DELAY = 200; // milliseconds
+    var suppressNextEditorTitleIconClick = false;
+
+    // =====================================================
+    // HELPER FUNCTIONS
+    // =====================================================
+
+    /**
+     * Close all open note action dropdown menus
+     */
+    function closeAllNoteActionMenus() {
+        var openMenus = document.querySelectorAll('.note-actions-menu.show');
+        openMenus.forEach(function (menu) {
+            menu.classList.remove('show');
+        });
+        var openToggles = document.querySelectorAll('.note-actions-toggle.open');
+        openToggles.forEach(function (btn) {
+            btn.classList.remove('open');
+        });
+    }
+
+    /**
+     * Extract folder data from an action element
+     * @param {HTMLElement} element - The element containing data attributes
+     * @returns {{id: number|null, name: string|null}} Folder data
+     */
+    function getFolderData(element) {
+        var folderId = element.getAttribute('data-folder-id');
+        var folderName = element.getAttribute('data-folder-name');
+
+        return {
+            id: folderId ? parseInt(folderId, 10) : null,
+            name: folderName,
+            noteCount: parseInt(element.getAttribute('data-note-count'), 10) || 0
+        };
+    }
+
+    /**
+     * Execute a folder action with menu cleanup
+     * @param {number} folderId - The folder ID
+     * @param {Function} callback - The action to execute
+     */
+    function executeFolderAction(folderId, callback) {
+        if (typeof window.closeFolderActionsMenu === 'function') {
+            window.closeFolderActionsMenu(folderId);
+        }
+        if (typeof callback === 'function') {
+            callback();
+        }
+    }
+
+    function getNoteIconActionElement(target) {
+        if (!target || !target.closest) return null;
+        return target.closest('.note-icon[data-action="open-note-icon-picker"]');
+    }
+
+    function isEditorTitleNoteIcon(element) {
+        return !!(
+            element &&
+            element.classList &&
+            element.classList.contains('note-title-icon') &&
+            element.closest('.note-title-heading')
+        );
+    }
+
+    function blurActiveNoteTitle() {
+        if (
+            document.activeElement &&
+            document.activeElement.classList &&
+            document.activeElement.classList.contains('css-title') &&
+            typeof document.activeElement.blur === 'function'
+        ) {
+            document.activeElement.blur();
+        }
+    }
+
+    function openNoteIconPicker(event, actionElement) {
+        if (event) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        }
+
+        blurActiveNoteTitle();
+
+        var noteIdForIcon = actionElement.getAttribute('data-note-id');
+        var noteTitleForIcon = actionElement.getAttribute('data-note-title') || '';
+        if (noteIdForIcon && typeof window.showChangeNoteIconModal === 'function') {
+            window.showChangeNoteIconModal(noteIdForIcon, noteTitleForIcon);
+        }
+    }
+
+    /**
+     * Reuse current tab when the opposite side of a linked/source pair is already open.
+     * - linked -> source already open
+     * - source -> one of its linked notes already open
+     * @param {HTMLElement} actionElement - The clicked note link element
+     * @returns {boolean}
+     */
+    function shouldReuseTabForLinkedPair(actionElement) {
+        if (!actionElement) return false;
+        if (!window.tabManager || typeof window.tabManager.isNoteOpen !== 'function') return false;
+
+        var currentType = actionElement.getAttribute('data-note-type');
+
+        // Case 1: clicked note is linked, source tab already open
+        if (currentType === 'linked') {
+            var linkedSourceNoteId = actionElement.getAttribute('data-linked-note-id');
+            return !!(linkedSourceNoteId && window.tabManager.isNoteOpen(linkedSourceNoteId));
+        }
+
+        // Case 2: clicked note is source, one of its linked-note tabs already open
+        var currentNoteId = actionElement.getAttribute('data-note-db-id') || actionElement.getAttribute('data-note-id');
+        if (!currentNoteId) return false;
+
+        var linkedCandidates = document.querySelectorAll(
+            '.links_arbo_left[data-note-type="linked"][data-linked-note-id="' + currentNoteId + '"]'
+        );
+
+        for (var i = 0; i < linkedCandidates.length; i++) {
+            var linkedNoteId = linkedCandidates[i].getAttribute('data-note-db-id') || linkedCandidates[i].getAttribute('data-note-id');
+            if (linkedNoteId && window.tabManager.isNoteOpen(linkedNoteId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // =====================================================
+    // SEARCH BAR MANAGEMENT
+    // =====================================================
+
+    /**
+     * Toggle search bar visibility
+     */
+    function toggleSearchBar() {
+        var searchContainer = document.getElementById('search-bar-container');
+        var searchInput = document.getElementById('unified-search');
+        if (!searchContainer) return;
+
+        var currentDisplay = window.getComputedStyle(searchContainer).display;
+
+        if (currentDisplay === 'none') {
+            searchContainer.style.display = 'block';
+            localStorage.setItem('searchBarVisible', 'true');
+
+            if (searchInput) {
+                setTimeout(function () {
+                    searchInput.focus();
+                }, 100);
+            }
+        } else {
+            searchContainer.style.display = 'none';
+            localStorage.setItem('searchBarVisible', 'false');
+
+            if (window.isSearchMode && typeof window.clearUnifiedSearch === 'function') {
+                window.clearUnifiedSearch();
+            }
+        }
+    }
+
+    window.toggleSearchBar = toggleSearchBar;
+
+    /**
+     * Handle search type toggle between notes and tags
+     * @param {Event} event - The click event
+     */
+    function handleSearchTypeToggle(event) {
+        var button = event.target.closest('.searchbar-type-btn');
+        if (!button) return;
+
+        var searchType = button.getAttribute('data-search-type');
+        if (!searchType) return;
+
+        // Use SearchManager if available (handles both button state and search execution)
+        if (window.searchManager && typeof window.searchManager.handleButtonClick === 'function') {
+            window.searchManager.handleButtonClick(searchType, false);
+            return;
+        }
+
+        // Fallback: manual update if SearchManager not available
+        updateSearchTypeUI(button, searchType);
+    }
+
+    /**
+     * Update search type UI manually (fallback when SearchManager not available)
+     * @param {HTMLElement} activeButton - The button that was clicked
+     * @param {string} searchType - Either 'notes' or 'tags'
+     */
+    function updateSearchTypeUI(activeButton, searchType) {
+        // Update button states
+        var allButtons = document.querySelectorAll('.searchbar-type-btn');
+        allButtons.forEach(function (btn) {
+            btn.classList.remove('active');
+        });
+        activeButton.classList.add('active');
+
+        // Update hidden fields and placeholder
+        var searchInNotes = document.getElementById('search-in-notes');
+        var searchInTags = document.getElementById('search-in-tags');
+        var searchInput = document.getElementById('unified-search');
+
+        if (searchType === 'notes') {
+            if (searchInNotes) searchInNotes.value = '1';
+            if (searchInTags) searchInTags.value = '';
+            if (searchInput) {
+                searchInput.placeholder = window.t
+                    ? window.t('search.placeholder_notes', null, 'Search for one or more words...')
+                    : 'Search for one or more words...';
+            }
+        } else if (searchType === 'tags') {
+            if (searchInNotes) searchInNotes.value = '';
+            if (searchInTags) searchInTags.value = '1';
+            if (searchInput) {
+                searchInput.placeholder = window.t
+                    ? window.t('search.placeholder_tags', null, 'Search for one or more tags...')
+                    : 'Search for one or more tags...';
+            }
+        }
+
+        if (searchInput) {
+            searchInput.focus();
+        }
+    }
+
+    // =====================================================
+    // EVENT HANDLERS
+    // =====================================================
+
+    /**
+     * Handle navigation actions
+     * @param {Event} event - The click event
+     * @param {HTMLElement} element - The action element
+     */
+    function handleNavigation(event, element) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        var url = element.getAttribute('data-url');
+        if (url) {
+            window.location = url;
+        }
+    }
+
+    /**
+     * Handle folder menu actions that require folder data
+     * @param {Event} event - The click event
+     * @param {string} action - The action type
+     * @param {HTMLElement} element - The action element
+     */
+    function handleFolderMenuAction(event, action, element) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        var folderData = getFolderData(element);
+        if (!folderData.id) return;
+
+        // executeFolderAction() below closes the folder actions menu before it
+        // runs the callback, so by then this row is display:none and measures
+        // zero on every side. Read it now, while it is still on screen, so the
+        // create menu can open where the entry the user clicked actually was.
+        var elementRect = element.getBoundingClientRect();
+
+        var actionMap = {
+            'create-note-in-folder': function () {
+                if (typeof window.openCreateMenu !== 'function') return;
+                window.openCreateMenu({
+                    x: elementRect.left,
+                    y: elementRect.top,
+                    folderId: folderData.id,
+                    folderName: folderData.name
+                });
+            },
+            'move-folder-files': function () {
+                if (typeof window.showMoveFolderFilesDialog === 'function') {
+                    window.showMoveFolderFilesDialog(folderData.id, folderData.name);
+                }
+            },
+            'move-entire-folder': function () {
+                if (typeof window.showMoveEntireFolderDialog === 'function') {
+                    window.showMoveEntireFolderDialog(folderData.id, folderData.name);
+                }
+            },
+            'duplicate-folder': function () {
+                if (typeof window.duplicateFolder === 'function') {
+                    window.duplicateFolder(folderData.id, folderData.name);
+                }
+            },
+            'download-folder': function () {
+                if (typeof window.downloadFolder === 'function') {
+                    window.downloadFolder(folderData.id, folderData.name);
+                }
+            },
+            'tag-folder-notes': function () {
+                if (typeof window.showTagFolderNotesDialog === 'function') {
+                    window.showTagFolderNotesDialog(folderData.id, folderData.name, folderData.noteCount);
+                }
+            },
+            'rename-folder': function () {
+                if (typeof window.editFolderName === 'function') {
+                    window.editFolderName(folderData.id, folderData.name);
+                }
+            },
+            'delete-folder': function () {
+                if (typeof window.deleteFolder === 'function') {
+                    window.deleteFolder(folderData.id, folderData.name);
+                }
+            },
+            'change-folder-icon': function () {
+                if (typeof window.showChangeFolderIconModal === 'function') {
+                    window.showChangeFolderIconModal(folderData.id, folderData.name);
+                }
+            },
+            'share-folder': function () {
+                if (typeof window.openPublicFolderShareModal === 'function') {
+                    window.openPublicFolderShareModal(folderData.id);
+                }
+            },
+            'favorite-folder': function () {
+                if (typeof window.toggleFolderFavorite === 'function') {
+                    window.toggleFolderFavorite(folderData.id);
+                }
+            },
+            'show-only-folder': function () {
+                if (!folderData.name) return;
+                var url = 'index.php?folder=' + encodeURIComponent(folderData.name);
+                var workspace = typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '';
+                if (workspace) {
+                    url += '&workspace=' + encodeURIComponent(workspace);
+                }
+                // Open the folder's Kanban board alongside the filtered list
+                if (folderData.id) {
+                    url += '&kanban=' + encodeURIComponent(folderData.id);
+                }
+                window.location.href = url;
+            }
+        };
+
+        if (actionMap[action]) {
+            executeFolderAction(folderData.id, actionMap[action]);
+        }
+    }
+
+    /**
+     * Handle Kanban view opening
+     * @param {Event} event - The click event
+     * @param {HTMLElement} element - The action element
+     */
+    function handleOpenKanban(event, element) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        var folderData = getFolderData(element);
+
+        // Close folder actions menu if opened from there
+        if (folderData.id && typeof window.closeFolderActionsMenu === 'function') {
+            window.closeFolderActionsMenu(folderData.id);
+        }
+
+        if (folderData.id && typeof window.openKanbanView === 'function') {
+            window.openKanbanView(folderData.id, folderData.name);
+        }
+    }
+
+    /**
+     * Handle folder sorting
+     * @param {Event} event - The click event
+     * @param {HTMLElement} element - The action element
+     */
+    function handleFolderSort(event, element) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        var folderId = parseInt(element.getAttribute('data-folder-id'), 10);
+        var sortType = element.getAttribute('data-sort-type') || 'modified';
+
+        // Persist the new sort on the folder's toggle so the shared menu shows
+        // the right active option next time it opens for this folder
+        var folderToggle = document.querySelector('.folder-actions-toggle[data-folder-id="' + folderId + '"]');
+        if (folderToggle) {
+            folderToggle.setAttribute('data-current-sort', sortType);
+        }
+
+        // Update UI: checkmark and active highlighting
+        var parentMenu = element.closest('.folder-actions-menu');
+        if (parentMenu) {
+            var siblings = parentMenu.querySelectorAll('[data-action="sort-folder"]');
+            siblings.forEach(function (el) {
+                el.classList.remove('active');
+            });
+            element.classList.add('active');
+
+            // Update header label
+            var submenuContainer = element.parentElement;
+            if (submenuContainer && submenuContainer.classList.contains('sort-submenu')) {
+                var toggleBtn = submenuContainer.previousElementSibling;
+                if (toggleBtn && toggleBtn.getAttribute('data-action') === 'toggle-sort-submenu') {
+                    var headerLabel = toggleBtn.querySelector('.sort-header-label');
+                    var optionLabel = element.querySelector('.sort-option-label');
+                    if (headerLabel && optionLabel) {
+                        headerLabel.textContent = optionLabel.textContent;
+                    }
+                }
+            }
+        }
+
+        if (typeof window.closeFolderActionsMenu === 'function') {
+            window.closeFolderActionsMenu(folderId);
+        }
+
+        if (!folderId) return;
+
+        // Save sort setting to database
+        var saved = fetch('api_save_folder_sort.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                folder_id: folderId,
+                sort_type: sortType
+            })
+        }).catch(function (err) {
+            console.error('Failed to save sort setting', err);
+        });
+
+        if (sortType === 'manual') {
+            // Drag-and-drop positions live in the database (entries.display_order),
+            // so there is nothing to sort client-side: reload the list once saved.
+            saved.then(function () {
+                if (typeof window.refreshNotesListAfterFolderAction === 'function') {
+                    window.refreshNotesListAfterFolderAction(folderId);
+                } else {
+                    location.reload();
+                }
+            });
+        } else if (typeof window.sortNotesInFolder === 'function') {
+            window.sortNotesInFolder(folderId, sortType);
+        }
+    }
+
+    /**
+     * Handle opening all notes in a folder in tabs
+     * @param {Event} event - The click event
+     * @param {HTMLElement} element - The action element
+     */
+    function handleOpenAllNotesInTabs(event, element) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        var folderData = getFolderData(element);
+
+        // Close folder actions menu
+        if (folderData.id && typeof window.closeFolderActionsMenu === 'function') {
+            window.closeFolderActionsMenu(folderData.id);
+        }
+
+        if (folderData.id && typeof window.openAllFolderNotesInTabs === 'function') {
+            window.openAllFolderNotesInTabs(folderData.id, folderData.name);
+        }
+    }
+
+    /**
+     * Main click event handler using event delegation
+     * @param {Event} event - The click event
+     */
+    function handleNotesListClick(event) {
+        var target = event.target;
+        var actionElement = target.closest('[data-action]');
+        if (!actionElement) return;
+
+        var action = actionElement.getAttribute('data-action');
+
+        // Prevent handling nested actions - only handle the innermost action
+        var parentAction = actionElement.parentElement ? actionElement.parentElement.closest('[data-action]') : null;
+        if (parentAction && target.closest('[data-action]') !== actionElement) {
+            return;
+        }
+
+        // Simple actions that just call global functions
+        var simpleActions = {
+            'toggle-search-bar': function () {
+                event.preventDefault();
+                event.stopPropagation();
+                if (typeof window.toggleSearchBar === 'function') {
+                    window.toggleSearchBar();
+                }
+            },
+            'toggle-system-menu': function () {
+                event.preventDefault();
+                event.stopPropagation();
+                if (typeof window.toggleSystemMenu === 'function') {
+                    window.toggleSystemMenu();
+                }
+            },
+            'clear-search': function () {
+                event.preventDefault();
+                event.stopPropagation();
+                if (typeof window.clearUnifiedSearch === 'function') {
+                    window.clearUnifiedSearch();
+                }
+            },
+            'close-kanban-view': function () {
+                event.preventDefault();
+                event.stopPropagation();
+                if (typeof window.closeKanbanView === 'function') {
+                    window.closeKanbanView();
+                }
+            },
+            'toggle-folder-actions-menu': function () {
+                event.preventDefault();
+                event.stopPropagation();
+                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
+                if (folderId && typeof window.toggleFolderActionsMenu === 'function') {
+                    window.toggleFolderActionsMenu(folderId);
+                }
+            },
+            'toggle-sort-submenu': function () {
+                event.preventDefault();
+                event.stopPropagation();
+                var chevron = actionElement.querySelector('.sort-chevron');
+                var submenu = actionElement.nextElementSibling;
+
+                if (submenu && submenu.classList.contains('sort-submenu')) {
+                    var isVisible = submenu.style.display === 'block';
+                    submenu.style.display = isVisible ? 'none' : 'block';
+                    if (chevron) {
+                        chevron.style.transform = isVisible ? 'rotate(0deg)' : 'rotate(90deg)';
+                    }
+                }
+            },
+            'toggle-note-actions-menu': function () {
+                event.preventDefault();
+                event.stopPropagation();
+                var noteId = actionElement.getAttribute('data-note-id');
+                if (noteId && typeof window.toggleNoteActionsMenu === 'function') {
+                    // Pass the element: a favorited note has a second row in
+                    // the Favorites section with the same note id.
+                    window.toggleNoteActionsMenu(noteId, actionElement);
+                }
+            }
+        };
+
+        // Execute simple action if found
+        if (simpleActions[action]) {
+            simpleActions[action]();
+            return;
+        }
+
+        // Navigation actions
+        if (['navigate-tags', 'navigate-shared', 'navigate-trash', 'navigate-attachments'].indexOf(action) !== -1) {
+            handleNavigation(event, actionElement);
+            return;
+        }
+
+        // Folder menu actions
+        var folderMenuActions = [
+            'create-note-in-folder', 'move-folder-files', 'move-entire-folder',
+            'duplicate-folder', 'download-folder', 'tag-folder-notes', 'rename-folder', 'delete-folder',
+            'change-folder-icon', 'share-folder', 'favorite-folder',
+            'show-only-folder'
+        ];
+        if (folderMenuActions.indexOf(action) !== -1) {
+            handleFolderMenuAction(event, action, actionElement);
+            return;
+        }
+
+        // Special cases that need custom handling
+        switch (action) {
+            case 'select-folder':
+                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
+                var folderName = actionElement.getAttribute('data-folder');
+                if (typeof window.selectFolder === 'function') {
+                    window.selectFolder(folderId, folderName, actionElement);
+                }
+                break;
+
+            case 'toggle-folder':
+                event.preventDefault();
+                event.stopPropagation();
+                var folderDomId = actionElement.getAttribute('data-folder-dom-id');
+                if (folderDomId && typeof window.toggleFolder === 'function') {
+                    window.toggleFolder(folderDomId);
+                }
+                break;
+
+            case 'open-folder-icon-picker':
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                var folderData = getFolderData(actionElement);
+                if (folderData.id && folderData.name && typeof window.showChangeFolderIconModal === 'function') {
+                    window.showChangeFolderIconModal(folderData.id, folderData.name);
+                }
+                break;
+
+            case 'open-note-icon-picker':
+                if (suppressNextEditorTitleIconClick && isEditorTitleNoteIcon(actionElement)) {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    suppressNextEditorTitleIconClick = false;
+                    break;
+                }
+                openNoteIconPicker(event, actionElement);
+                break;
+
+            case 'load-note':
+                event.preventDefault(); // Always prevent default navigation
+                
+                var noteLink = actionElement.getAttribute('href');
+                var noteId = actionElement.getAttribute('data-note-db-id');
+                
+                if (!noteLink || !noteId || typeof window.loadNoteDirectly !== 'function') {
+                    break;
+                }
+                
+                // Check if this is a double-click (same element clicked within delay)
+                if (clickTimer !== null && lastClickedElement === actionElement) {
+                    // Double-click detected - open in new tab
+                    clearTimeout(clickTimer);
+                    clickTimer = null;
+                    lastClickedElement = null;
+
+                    if (shouldReuseTabForLinkedPair(actionElement)) {
+                        window.loadNoteDirectly(noteLink, noteId, event, actionElement);
+                    } else if (typeof openNoteInNewTab === 'function') {
+                        openNoteInNewTab(noteId);
+                    }
+                } else {
+                    // First click - start timer to load note
+                    if (clickTimer !== null) {
+                        clearTimeout(clickTimer);
+                    }
+                    
+                    lastClickedElement = actionElement;
+                    clickTimer = setTimeout(function() {
+                        clickTimer = null;
+                        lastClickedElement = null;
+                        window.loadNoteDirectly(noteLink, noteId, event, actionElement);
+                    }, DOUBLE_CLICK_DELAY);
+                }
+                break;
+
+            case 'open-kanban-view':
+                handleOpenKanban(event, actionElement);
+                break;
+
+            case 'sort-folder':
+                handleFolderSort(event, actionElement);
+                break;
+
+            case 'open-all-notes-in-tabs':
+                handleOpenAllNotesInTabs(event, actionElement);
+                break;
+
+        }
+    }
+
+    /**
+     * Handle double-click events (e.g., folder renaming)
+     * @param {Event} event - The double-click event
+     */
+    function handleNotesListDblClick(event) {
+        var target = event.target;
+        var actionElement = target.closest('[data-dblaction]');
+        if (!actionElement) return;
+
+        var action = actionElement.getAttribute('data-dblaction');
+
+        if (action === 'edit-folder-name') {
+            var folderData = getFolderData(actionElement);
+            if (folderData.id && folderData.name && typeof window.editFolderName === 'function') {
+                window.editFolderName(folderData.id, folderData.name);
+            }
+        } else if (action === 'open-note-new-tab') {
+            event.preventDefault();
+            var noteId = actionElement.getAttribute('data-note-id');
+
+            var noteLink = actionElement.getAttribute('href');
+            if (noteId && noteLink && shouldReuseTabForLinkedPair(actionElement) && typeof window.loadNoteDirectly === 'function') {
+                window.loadNoteDirectly(noteLink, noteId, event, actionElement);
+            } else if (noteId && typeof openNoteInNewTab === 'function') {
+                openNoteInNewTab(noteId);
+            }
+        }
+    }
+
+    /**
+     * Resolve a middle-clicked tree element to its target: a note link, or a
+     * folder row (regular header or favorite-folder shortcut, never a system
+     * folder and never the folder ⋮ actions area).
+     * @param {EventTarget} target - The event target
+     * @returns {{type: string, element: HTMLElement}|null}
+     */
+    function getMiddleClickTreeTarget(target) {
+        if (!target || !target.closest) return null;
+
+        var noteEl = target.closest('a[data-dblaction="open-note-new-tab"]');
+        if (noteEl) return { type: 'note', element: noteEl };
+
+        if (target.closest('.folder-actions')) return null;
+        var folderEl = target.closest('.folder-header:not(.system-folder), a.favorite-folder-link');
+        if (folderEl && folderEl.getAttribute('data-folder-id')) {
+            return { type: 'folder', element: folderEl };
+        }
+
+        return null;
+    }
+
+    /**
+     * Handle middle-click in the tree: a note opens in a new in-app tab,
+     * exactly like a double-click does, and a folder opens its Kanban view.
+     * The browser's own middle-click defaults (open link in a real browser
+     * tab) are cancelled.
+     * @param {MouseEvent} event - The auxclick event
+     */
+    function handleNotesListAuxClick(event) {
+        if (event.button !== 1) return;
+
+        var treeTarget = getMiddleClickTreeTarget(event.target);
+        if (!treeTarget) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (treeTarget.type === 'folder') {
+            var folderId = treeTarget.element.getAttribute('data-folder-id');
+            var folderName = treeTarget.element.getAttribute('data-folder');
+            if (folderId && typeof window.openKanbanView === 'function') {
+                window.openKanbanView(parseInt(folderId, 10), folderName);
+            }
+            return;
+        }
+
+        var actionElement = treeTarget.element;
+        var noteId = actionElement.getAttribute('data-note-id');
+        if (!noteId) return;
+
+        var noteLink = actionElement.getAttribute('href');
+        if (noteLink && shouldReuseTabForLinkedPair(actionElement) && typeof window.loadNoteDirectly === 'function') {
+            window.loadNoteDirectly(noteLink, noteId, event, actionElement);
+        } else if (typeof openNoteInNewTab === 'function') {
+            openNoteInNewTab(noteId);
+        }
+    }
+
+    /**
+     * Swallow the middle-button mousedown on note links and folder rows so the
+     * browser doesn't start autoscroll before handleNotesListAuxClick acts.
+     * @param {MouseEvent} event - The mousedown event
+     */
+    function preventNoteMiddleClickAutoscroll(event) {
+        if (event.button !== 1) return;
+        if (!getMiddleClickTreeTarget(event.target)) return;
+        event.preventDefault();
+    }
+
+    function preventEditorTitleIconFocus(event) {
+        var actionElement = getNoteIconActionElement(event.target);
+        if (!isEditorTitleNoteIcon(actionElement)) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+        blurActiveNoteTitle();
+    }
+
+    function handleEditorTitleIconTouchEnd(event) {
+        var actionElement = getNoteIconActionElement(event.target);
+        if (!isEditorTitleNoteIcon(actionElement)) return;
+
+        suppressNextEditorTitleIconClick = true;
+        setTimeout(function () {
+            suppressNextEditorTitleIconClick = false;
+        }, 350);
+
+        openNoteIconPicker(event, actionElement);
+    }
+
+    // =====================================================
+    // INITIALIZATION
+    // =====================================================
+
+    /**
+     * Initialize all event listeners and UI state
+     */
+    function initNotesListEvents() {
+        // Restore search bar visibility from localStorage
+        var searchContainer = document.getElementById('search-bar-container');
+        if (searchContainer) {
+            var searchBarVisible = localStorage.getItem('searchBarVisible');
+            searchContainer.style.display = (searchBarVisible === 'false') ? 'none' : 'block';
+        }
+
+        // Initialize search type button states
+        initializeSearchTypeButtons();
+
+        // Clean up the old favorites section collapsed state
+        restoreFavoritesState();
+
+        // Attach event listeners
+        attachEventListeners();
+    }
+
+    /**
+     * Initialize search type buttons (notes/tags) state
+     */
+    function initializeSearchTypeButtons() {
+        var searchInNotes = document.getElementById('search-in-notes');
+        var searchInTags = document.getElementById('search-in-tags');
+        var notesBtn = document.querySelector('.searchbar-type-notes');
+        var tagsBtn = document.querySelector('.searchbar-type-tags');
+
+        if (searchInTags && searchInTags.value === '1') {
+            if (notesBtn) notesBtn.classList.remove('active');
+            if (tagsBtn) tagsBtn.classList.add('active');
+        } else {
+            if (notesBtn) notesBtn.classList.add('active');
+            if (tagsBtn) tagsBtn.classList.remove('active');
+        }
+
+        // Attach click handlers to type buttons
+        var typeButtons = document.querySelectorAll('.searchbar-type-btn');
+        typeButtons.forEach(function (btn) {
+            btn.addEventListener('click', handleSearchTypeToggle);
+        });
+    }
+
+    /**
+     * Keep favorites visible now that the separator toggle has been removed.
+     */
+    function restoreFavoritesState() {
+        var favoritesHeader = document.querySelector('[data-folder="Favorites"]');
+        if (!favoritesHeader) return;
+        favoritesHeader.classList.remove('favorites-collapsed');
+        localStorage.removeItem('favorites_collapsed');
+    }
+
+    /**
+     * Right-click on a tree row opens that row's actions menu at the cursor,
+     * instead of the browser's own context menu (discussion #1251).
+     *
+     * Notes are tested first: .folder-header wraps .folder-content, so a note
+     * row is inside its folder's header too. .folder-toggle is the header line
+     * alone, which is what should answer for the folder.
+     *
+     * Left alone, so the native menu still shows: touch devices, where the
+     * event comes from a long press and would fight note drag-and-drop; rows
+     * whose menu is fully hidden by UI customization; and the favorite folder
+     * shortcuts, which have no actions toggle of their own.
+     */
+    function handleTreeContextMenu(event) {
+        if (window.matchMedia && window.matchMedia('(hover: none)').matches) {
+            return;
+        }
+
+        var target = event.target;
+        if (!target || !target.closest) return;
+
+        // Folder shortcuts in the Favorites section share the note row markup
+        // but carry no toggle of their own (renderFavoriteFolderItems in
+        // notes_list.php): open the folder menu through the folder's real
+        // toggle in the tree instead, keyed by data-folder-id on the link.
+        var favoriteFolderLink = target.closest('.favorite-folder-link');
+        if (favoriteFolderLink) {
+            var favoriteFolderId = parseInt(favoriteFolderLink.getAttribute('data-folder-id'), 10);
+            if (favoriteFolderId && typeof window.openFolderActionsMenuAtPoint === 'function' &&
+                window.openFolderActionsMenuAtPoint(favoriteFolderId, event.clientX, event.clientY)) {
+                event.preventDefault();
+            }
+            return;
+        }
+
+        var noteItem = target.closest('.note-list-item');
+        if (noteItem) {
+            var noteToggle = noteItem.querySelector('.note-actions-toggle');
+            if (noteToggle && typeof window.openNoteActionsMenuAtPoint === 'function' &&
+                window.openNoteActionsMenuAtPoint(noteToggle, event.clientX, event.clientY)) {
+                event.preventDefault();
+            }
+            return;
+        }
+
+        var folderRow = target.closest('.folder-toggle');
+        if (!folderRow) return;
+
+        var folderId = parseInt(folderRow.getAttribute('data-folder-id'), 10);
+        if (folderId && typeof window.openFolderActionsMenuAtPoint === 'function' &&
+            window.openFolderActionsMenuAtPoint(folderId, event.clientX, event.clientY)) {
+            event.preventDefault();
+        }
+    }
+
+    /**
+     * Attach all event listeners
+     */
+    function attachEventListeners() {
+        // Prevent mobile browsers from focusing the adjacent note title input
+        // before the icon click opens the picker.
+        document.addEventListener('touchstart', preventEditorTitleIconFocus, { capture: true, passive: false });
+        document.addEventListener('touchend', handleEditorTitleIconTouchEnd, { capture: true, passive: false });
+        document.addEventListener('mousedown', preventEditorTitleIconFocus, true);
+
+        // Main click event delegation
+        document.addEventListener('click', handleNotesListClick);
+
+        // Right-click menus on the tree rows
+        document.addEventListener('contextmenu', handleTreeContextMenu);
+
+        // Double-click event delegation
+        document.addEventListener('dblclick', handleNotesListDblClick);
+
+        // Middle-click: a note opens in a new in-app tab, a folder in Kanban view
+        document.addEventListener('mousedown', preventNoteMiddleClickAutoscroll);
+        document.addEventListener('auxclick', handleNotesListAuxClick);
+
+        // Close note action menus when clicking outside or on a menu item
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.note-actions') || e.target.closest('.note-actions-menu-item')) {
+                closeAllNoteActionMenus();
+            }
+        });
+    }
+
+
+    /**
+     * Reinitialize favorites toggle button event listener
+     * NOTE: This function is now deprecated and does nothing.
+     * Event delegation on document handles all favorites toggle clicks automatically,
+     * even after AJAX refreshes. Keeping this as a no-op for backward compatibility.
+     */
+    function reinitializeFavoritesToggle() {
+        // No operation needed - event delegation handles this automatically
+    }
+
+    // =====================================================
+    // UTILITY FUNCTIONS
+    // =====================================================
+
+    /**
+     * Sort notes within a folder DOM element
+     * @param {number} folderId - The ID of the folder to sort
+     * @param {string} sortType - The sort criteria ('alphabet', 'created', 'modified');
+     *   'manual' is server-side only (handleFolderSort reloads the list instead)
+     */
+    function sortNotesInFolder(folderId, sortType) {
+        var folderContentId = 'folder-' + folderId;
+        var folderContent = document.getElementById(folderContentId);
+        if (!folderContent) return;
+
+        // Get all note wrapper items (only direct children to avoid subfolder notes)
+        // Notes are wrapped in .note-list-item divs; fall back to bare <a> for compatibility
+        var noteItems = Array.from(folderContent.querySelectorAll(':scope > .note-list-item'));
+        if (noteItems.length === 0) {
+            noteItems = Array.from(folderContent.querySelectorAll(':scope > a.links_arbo_left'));
+        }
+        if (noteItems.length === 0) return;
+
+        // Helper: get the <a> link from a note item (wrapper div or bare anchor)
+        function getNoteLink(item) {
+            return item.tagName === 'A' ? item : item.querySelector('a.links_arbo_left');
+        }
+
+        // Sort the items array based on sort type
+        noteItems.sort(function (a, b) {
+            var linkA = getNoteLink(a);
+            var linkB = getNoteLink(b);
+            var valA, valB;
+
+            switch (sortType) {
+                case 'alphabet':
+                    valA = ((linkA && linkA.querySelector('.note-title')) ? linkA.querySelector('.note-title').textContent : '').toLowerCase();
+                    valB = ((linkB && linkB.querySelector('.note-title')) ? linkB.querySelector('.note-title').textContent : '').toLowerCase();
+                    return valA.localeCompare(valB);
+
+                case 'created':
+                    // Descending order (newest first)
+                    valA = (linkA && linkA.getAttribute('data-created')) || '';
+                    valB = (linkB && linkB.getAttribute('data-created')) || '';
+                    return valA < valB ? 1 : (valA > valB ? -1 : 0);
+
+                case 'modified':
+                default:
+                    // Descending order (newest first)
+                    valA = (linkA && linkA.getAttribute('data-updated')) || '';
+                    valB = (linkB && linkB.getAttribute('data-updated')) || '';
+                    return valA < valB ? 1 : (valA > valB ? -1 : 0);
+            }
+        });
+
+        // Find insertion point (before first subfolder if exists)
+        var firstSubfolder = folderContent.querySelector(':scope > .folder-header');
+
+        // Use document fragment for better performance
+        var fragment = document.createDocumentFragment();
+
+        // Reorder note items with spacers
+        noteItems.forEach(function (item) {
+            // Remove existing spacer after this item
+            var next = item.nextElementSibling;
+            if (next && next.classList.contains('pxbetweennotes')) {
+                next.remove();
+            }
+
+            fragment.appendChild(item);
+
+            // Add spacer between notes
+            var spacer = document.createElement('div');
+            spacer.className = 'pxbetweennotes';
+            fragment.appendChild(spacer);
+        });
+
+        // Insert sorted content at appropriate position
+        if (firstSubfolder) {
+            folderContent.insertBefore(fragment, firstSubfolder);
+        } else {
+            folderContent.appendChild(fragment);
+        }
+    }
+
+    // =====================================================
+    // EXPOSE PUBLIC API
+    // =====================================================
+
+    window.sortNotesInFolder = sortNotesInFolder;
+    window.reinitializeFavoritesToggle = reinitializeFavoritesToggle;
+
+    // =====================================================
+    // AUTO-INITIALIZATION
+    // =====================================================
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initNotesListEvents);
+    } else {
+        initNotesListEvents();
+    }
+
+})();

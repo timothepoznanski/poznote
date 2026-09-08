@@ -188,7 +188,7 @@ function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $f
     echo "</a>";
     echo generateNoteActions($noteDbId, $noteTitle, $noteType, $folderId, $folderName, !empty($row1['favorite']));
     echo "</div>";
-    echo "<div id=pxbetweennotes></div>";
+    echo "<div class='pxbetweennotes'></div>";
 }
 
 // Render favorite folders as shortcut links inside the Favorites section.
@@ -209,7 +209,7 @@ function renderFavoriteFolderItems($favorite_folders, $workspace_filter) {
         echo "<span class='note-title'><i class='$customIcon favorite-folder-icon'$iconStyle></i>" . htmlspecialchars($favName, ENT_QUOTES) . "</span>";
         echo "</a>";
         echo "</div>";
-        echo "<div id=pxbetweennotes></div>";
+        echo "<div class='pxbetweennotes'></div>";
     }
 }
 
@@ -525,7 +525,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
 
 <?php
 // Single shared dropdown for the per-folder three-dot toggles (position:fixed,
-// populated and placed by toggleFolderActionsMenu in js/utils.js). Kept
+// populated and placed by toggleFolderActionsMenu in js/utils-menus.js). Kept
 // outside the scrollable container so no ancestor can clip or transform it.
 echo renderFolderActionsMenu();
 // Same arrangement for the per-note three-dot toggles.

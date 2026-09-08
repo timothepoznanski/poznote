@@ -908,6 +908,7 @@ function updateUserLastLogin(int $userId): void {
         $stmt->execute([$userId]);
     } catch (Exception $e) {
         // Ignore errors
+        error_log('db_master: updateUserLastLogin() failed: ' . $e->getMessage());
     }
 }
 
@@ -1747,6 +1748,7 @@ function recordWebhookDelivery(int $id, string $status): void {
         $stmt->execute([mb_substr($status, 0, 200), $id]);
     } catch (Exception $e) {
         // Delivery bookkeeping must never break the dispatch itself.
+        error_log('db_master: recordWebhookDelivery() failed: ' . $e->getMessage());
     }
 }
 
@@ -1923,6 +1925,7 @@ function getUserQuotaOverrides(int $userId): array {
         }
     } catch (Exception $e) {
         // Fall through to "no overrides"
+        error_log('db_master: getUserQuotaOverrides() failed: ' . $e->getMessage());
     }
     return ['max_notes' => null, 'max_storage_mb' => null, 'max_storage_s3_mb' => null, 'max_backups_s3_mb' => null];
 }

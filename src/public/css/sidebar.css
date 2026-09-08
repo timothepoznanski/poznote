@@ -1,0 +1,303 @@
+/**
+ * Sidebar Styles
+ * 
+ * Styles for the left sidebar including header, action buttons,
+ * update badge, new note/folder buttons, searchbar, and footer.
+ */
+
+/* Read-only public workspace: the title is plain text, not a dropdown trigger */
+.sidebar-title.sidebar-title-static {
+    cursor: default;
+}
+
+.sidebar-title-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    position: relative;
+}
+
+/* The bell glyph reads heavier than the thin chevron and plus it sits between,
+   so it is scaled down to balance the row optically.
+   !important because js/index-icon-scale-settings.js injects an !important
+   font-size on .sidebar-folder-toggle when the user picks a non-default icon
+   scale. The em here is relative to the button, not to that injected value, so
+   the id below would freeze the glyph at 0.85em; the scale script restates it
+   with the same id specificity to keep the two in step. */
+#sidebarNotificationsBtn .lucide {
+    font-size: 0.85em !important;
+    width: 1em;
+    height: 1em;
+}
+
+/* display:inline-flex below would otherwise beat the browser's [hidden] rule
+   (index.php hides the bell while there is no notification to open). */
+.sidebar-folder-toggle[hidden] {
+    display: none !important;
+}
+
+/* Unread reminders: amber bell, mirroring .icon-sidebar-btn.has-notifications.
+   Needs !important to beat the shared var(--pz-accent) below. */
+#sidebarNotificationsBtn.has-notifications .lucide-bell {
+    color: #f59e0b !important;
+    background-color: #f59e0b;
+}
+
+.sidebar-folder-toggle,
+.sidebar-howto{
+    background: transparent;
+    border: none;
+    color: var(--pz-accent) !important;
+    font-size: 1.3rem;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Hover and focus states for sidebar buttons */
+.sidebar-howto:hover,
+.sidebar-folder-toggle:hover,
+.sidebar-plus:hover {
+    background: rgba(var(--pz-accent-rgb), 0.1);
+}
+
+.sidebar-folder-toggle:focus,
+.sidebar-howto:focus,
+.sidebar-plus:focus {
+    outline: 2px solid var(--pz-accent);
+    outline-offset: 2px;
+}
+
+/* Sidebar menu button (hamburger) */
+/* Sidebar action buttons (Home, Settings, Create) - visible on all screens */
+.sidebar-folder-toggle,
+.sidebar-howto,
+.sidebar-plus {
+    background: transparent;
+    border: none;
+    color: #6c757d !important;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px 5px;
+    border-radius: 6px;
+    position: relative;
+    min-width: 30px;
+    min-height: 30px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.sidebar-howto {
+    font-size: 1.15rem;
+}
+
+.sidebar-folder-toggle:hover,
+.sidebar-howto:hover,
+.sidebar-plus:hover {
+    background: rgba(var(--pz-accent-rgb), 0.1);
+}
+
+.sidebar-folder-toggle:focus,
+.sidebar-howto:focus,
+.sidebar-plus:focus {
+    outline: 2px solid var(--pz-accent);
+    outline-offset: 2px;
+}
+
+.sidebar-folder-toggle:focus:not(:focus-visible) {
+    outline: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .sidebar-folder-toggle {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .sidebar-folder-toggle:hover,
+    .sidebar-folder-toggle:active,
+    .sidebar-folder-toggle:focus {
+        background: transparent;
+        box-shadow: none;
+        outline: none;
+    }
+}
+
+/* Hide mobile burger menu completely */
+/* Reduce the size of Lucide icons in the sidebar */
+.sidebar-title-actions i,
+.sidebar-title-actions [class*="lucide-"],
+.sidebar-folder-toggle i,
+.sidebar-folder-toggle [class*="lucide-"]{
+    font-size: 0.875em !important;
+}
+
+.sidebar-folder-toggle i,
+.sidebar-folder-toggle [class*="lucide-"] {
+    font-size: 1.05em !important;
+}
+
+/* Icône plus-circle un peu plus grande */
+.sidebar-plus i,
+.sidebar-plus [class*="lucide-"],
+.sidebar-plus .lucide-plus-circle {
+    font-size: 1.1em !important;
+    color: #6c757d !important;
+}
+
+/* .sidebar-plus:hover { background: rgba(0,0,0,0.04); color: var(--pz-accent-hover); } /* Display background button plus on hover */
+
+/* Make search bar full width of sidebar and align spacing with buttons */
+.searchbar-row {
+    margin-bottom: 8px;
+    max-width: 100%;
+}
+
+.searchbar-input-wrapper {
+    width: 100%;
+}
+
+/* Make the unified search placeholder French when shown in left column */
+
+/* Folder header adjustments to match visual spacing */
+.folder-header {
+    /* margin-top: 6px; */
+    /* padding: 6px 4px; */
+    border-radius: 8px;
+}
+
+.folder-toggle {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    cursor: pointer;
+}
+
+.folder-name {
+    font-weight: 600;
+    color: #111827;
+    font-size: var(--sidebar-font-size, 13px);
+}
+
+.folder-note-count {
+    color: var(--pz-text-muted);
+    margin-left: 6px;
+    font-weight: 400;
+}
+
+.hide-folder-counts .folder-note-count {
+    display: none;
+}
+
+/* When folder counts are globally hidden, reveal them when the user hovers the folder
+   or focuses it via keyboard for accessibility. Use opacity + transform for a smooth
+   unobtrusive transition rather than abruptly toggling display. */
+.hide-folder-counts .folder-note-count {
+    /* keep them removed from layout by default */
+    display: inline-block;
+    /* ensure inline layout for transition */
+    opacity: 0;
+    transform: translateY(-2px) scale(0.98);
+    transition: opacity 120ms ease, transform 120ms ease;
+    pointer-events: none;
+    /* avoid interfering with folder clicks */
+}
+
+/* Keyed on .folder-toggle (the visible row), NOT .folder-header: the header
+   wraps .folder-content and thus the whole subtree, so hovering or focusing
+   any note revealed every ancestor folder's count at once. */
+.hide-folder-counts .folder-toggle:hover .folder-note-count,
+.hide-folder-counts .folder-toggle:focus-within .folder-note-count {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+/* For keyboard-only users, provide a visible focus outline on the folder-toggle */
+.hide-folder-counts .folder-toggle:focus-within {
+    outline: 2px solid rgba(59, 130, 246, 0.18);
+    border-radius: 6px;
+}
+
+/* Folder content / notes styling */
+.note-in-folder {
+    padding-left: 26px;
+    display: block;
+}
+
+.links_arbo_left {
+    padding: 8px 10px;
+    margin: 4px 0 0 0;
+}
+
+.links_arbo_left .note-title {
+    font-weight: 500;
+    color: #1f2937;
+    font-size: var(--sidebar-font-size, 13px);
+}
+
+/* Icon for linked notes */
+.note-type-icon-inline {
+    font-size: 0.85em;
+    color: var(--pz-text-muted);
+    margin-right: 4px;
+    opacity: 0.8;
+}
+
+/* Light separator between the Favorites section and the notes/folders below.
+   Only rendered by notes_list.php when the Favorites section is displayed. */
+.favorites-separator {
+    border-bottom: 1px solid var(--pz-border);
+    margin: 6px 4px 6px 0;
+}
+
+/* Favorite folder shortcuts inside the Favorites section */
+.favorite-folder-item .favorite-folder-icon {
+    font-size: 0.95em;
+    margin-right: 5px;
+    vertical-align: -0.1em;
+}
+
+.note-icon {
+    cursor: pointer;
+    font-size: 1em;
+    margin-right: 5px;
+    vertical-align: -0.1em;
+}
+
+.note-icon:hover {
+    transform: scale(1.15);
+    color: var(--pz-accent) !important;
+}
+
+/* Notes without folder - indent to align with folder items */
+.links_arbo_left.note-without-folder {
+    margin-left: 0px !important;
+    padding-left: 7px !important;
+}
+
+/* Hover effect: keep text metrics stable while changing only the color */
+.links_arbo_left:hover .note-title {
+    color: var(--pz-accent-strong) !important;
+    transition: color 0.2s ease;
+}
+
+/* Selected note style matching light blue band from screenshot */
+.links_arbo_left.selected-note {
+    background-color: transparent;
+    /* remove blue background */
+    /* keep layout consistent but remove rounded background */
+    border-radius: 0;
+    color: var(--pz-accent-strong);
+}
+
+.links_arbo_left.selected-note .note-title {
+    color: var(--pz-accent-strong);
+    font-weight: 600;
+}

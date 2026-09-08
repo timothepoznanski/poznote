@@ -1,0 +1,47 @@
+# Static analysis config for the PHP sources.
+#
+# Level 1 is deliberate: Poznote is procedural PHP with no Composer autoloader,
+# so higher levels mostly produce noise about types that are never declared.
+# Level 1 still catches the things that actually break the app - calls to
+# unknown functions/methods, wrong argument counts, undefined constants and
+# typos in variable names.
+#
+# Existing violations are frozen in phpstan-baseline.neon, so CI only fails on
+# *new* ones. When you fix a batch, regenerate the baseline:
+#   php phpstan.phar analyse --generate-baseline
+#
+# The PHPStan version is PINNED in .github/workflows/ci-php.yml (env block),
+# with its sha256. That block also holds the upgrade procedure, for PHPStan
+# itself and for the production PHP version. Read it before bumping anything,
+# in particular before touching `phpVersion` below: it must match the PHP
+# major in the Dockerfile, and changing it means regenerating the baseline.
+includes:
+    - phpstan-baseline.neon
+
+parameters:
+    level: 1
+
+    # A baselined error that gets fixed must not turn CI red: with the default
+    # (true), removing a violation fails the build with "Ignored error pattern
+    # was not matched". Regenerate the baseline when you want it tidied up.
+    reportUnmatchedIgnoredErrors: false
+
+    # Production runs PHP 8.4 (see Dockerfile), analyse against the same target.
+    phpVersion: 80400
+
+    # Declares the constants config.php defines at runtime (see the file).
+    bootstrapFiles:
+        - phpstan-bootstrap.php
+
+    paths:
+        - src
+        - tools
+        - tests
+
+    ignoreErrors:
+        # $con is the shared SQLite handle created in db_connect.php and used by
+        # every page that includes it. PHPStan cannot follow globals across
+        # includes, so it flags ~200 legitimate uses. Architectural, not a bug.
+        -
+            message: '#^Variable \$con might not be defined\.$#'
+            reportUnmatched: false

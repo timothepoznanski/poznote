@@ -1,0 +1,30 @@
+/**
+ * Home - Base Layout
+ *
+ * Core layout styles for the home page including container,
+ * version display, header, info line, back link, page title,
+ * username/workspace display, notes count, and grid layout.
+ */
+
+/* Base layout */
+.home-page {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--pz-surface);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+.home-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* Grid layout for cards */
+.home-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+    /* margin-bottom: 40px; */
+}

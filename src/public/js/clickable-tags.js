@@ -1,0 +1,1029 @@
+/**
+ * Clickable Tags System with Inline Editing
+ * Tags are displayed as clickable elements with inline editing capability
+ * 
+ * This module provides:
+ * - Conversion of tag inputs to clickable, editable tag elements
+ * - Tag autocomplete with keyboard navigation
+ * - Tag search and filtering
+ * - Auto-save integration for tag changes
+ */
+
+// ============================================
+// Global State
+// ============================================
+
+let notesWithClickableTags = new Set();
+
+// ============================================
+// Sidebar Tags Count Management
+// ============================================
+
+/**
+ * Refresh the tags count from the server
+ * Fetches the actual count of unique tags and updates the sidebar badge
+ */
+function refreshTagsCount() {
+    // Get current workspace from URL or default
+    const urlParams = new URLSearchParams(window.location.search);
+    const workspace = urlParams.get('workspace') || '';
+
+    const url = '/api/v1/tags' + (workspace ? ('?workspace=' + encodeURIComponent(workspace)) : '');
+
+    fetch(url, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+        .then(r => r.json())
+        .then(data => {
+            if (data && data.success && Array.isArray(data.tags)) {
+                const countEl = document.getElementById('count-tags');
+                if (countEl) {
+                    countEl.textContent = data.tags.length.toString();
+                }
+            }
+        })
+        .catch(err => {
+            // Ignore fetch errors during page navigation (Failed to fetch during unload)
+            // These are expected when the page is navigating away
+            if (err.message && err.message.includes('Failed to fetch')) {
+                console.debug('[Poznote] Tags count refresh aborted (page navigation in progress)');
+            } else {
+                console.error('Error refreshing tags count:', err);
+            }
+        });
+}
+
+// ============================================
+// Initialization
+// ============================================
+
+/**
+ * Initialize clickable tags system
+ * Converts all tag inputs to editable tag elements
+ */
+function initializeClickableTags() {
+    // Convert tags to clickable format for all notes that have a tags input.
+    // Search for inputs with id starting with 'tags' so hidden inputs still initialize.
+    const tagsInputs = document.querySelectorAll('input[id^="tags"]');
+    tagsInputs.forEach((tagsInput) => {
+        const noteId = tagsInput.id.replace('tags', '');
+        convertTagsToEditable(noteId);
+    });
+}
+
+/**
+ * Convert tags input to editable tags display with inline editing
+ * @param {string} noteId - The ID of the note to convert tags for
+ */
+function convertTagsToEditable(noteId) {
+    const tagsInput = document.getElementById('tags' + noteId);
+    const nameTagsContainer = tagsInput ? tagsInput.closest('.name_tags') : null;
+
+    if (!tagsInput || !nameTagsContainer) {
+        return;
+    }
+
+    const tagsValue = tagsInput.value.trim();
+
+    // Remove existing editable container if it exists
+    const existingContainer = nameTagsContainer.querySelector('.editable-tags-container');
+    if (existingContainer) {
+        existingContainer.remove();
+    }
+
+    // Create editable tags container
+    const editableContainer = document.createElement('div');
+    editableContainer.className = 'editable-tags-container';
+
+    // Add existing tags as clickable elements
+    if (tagsValue) {
+        const tags = tagsValue.split(/[,\s]+/).filter(tag => tag.trim() !== '');
+
+        tags.forEach(tag => {
+            addTagElement(editableContainer, tag.trim(), noteId);
+        });
+    }
+
+    // Add input field for adding new tags
+    const tagInput = document.createElement('input');
+    tagInput.className = 'tag-input';
+    tagInput.type = 'text';
+    tagInput.placeholder = tagsValue
+        ? (window.t ? window.t('tags.add_single', null, 'Add tag...') : 'Add tag...')
+        : (window.t ? window.t('tags.add_multiple', null, 'Add tags...') : 'Add tags...');
+    tagInput.setAttribute('autocomplete', 'off');
+    tagInput.setAttribute('autocorrect', 'off');
+    tagInput.setAttribute('spellcheck', 'false');
+
+    // Prevent line breaks
+    tagInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+        // Space key will be handled in keydown to create tag
+    });
+
+    tagInput.addEventListener('keydown', function (e) {
+        handleTagInput(e, noteId, editableContainer);
+    });
+    // Show suggestions while typing
+    tagInput.addEventListener('input', function (e) {
+        try {
+            showTagSuggestions(tagInput, editableContainer, _tagSuggestionWorkspace(), noteId);
+        } catch (err) {
+            // Silently ignore autocomplete errors to not disrupt user experience
+            console.debug('clickable-tags: convertTagsToEditable() failed:', err);
+        }
+    });
+    // Show suggestions on focus (and load the tag list, so the first character
+    // typed already has something to match against)
+    tagInput.addEventListener('focus', function () {
+        try {
+            showTagSuggestions(tagInput, editableContainer, _tagSuggestionWorkspace(), noteId);
+        } catch (e) {
+            console.warn('Failed to show tag suggestions on focus:', e);
+        }
+    });
+    // Hovering the field is the earliest reliable hint that tags are about to
+    // be typed, so warm the list before the click even lands.
+    tagInput.addEventListener('pointerenter', function () {
+        try {
+            prefetchAllTags(_tagSuggestionWorkspace());
+        } catch (e) {
+            // Prefetching is best-effort
+            console.debug('clickable-tags: convertTagsToEditable() failed:', e);
+        }
+    });
+
+    // Handle blur: hide suggestions and process any remaining text
+    tagInput.addEventListener('blur', function (e) {
+        // Hide suggestions after a short delay to allow mousedown on suggestions
+        setTimeout(() => {
+            const dropdown = editableContainer.querySelector('.tag-suggestions');
+            if (dropdown) dropdown.style.display = 'none';
+        }, 150);
+
+        // Process any remaining text in the input
+        handleTagInputBlur(e, noteId, editableContainer);
+    });
+
+    editableContainer.appendChild(tagInput);
+
+    // Add the editable container to the name_tags element
+    nameTagsContainer.appendChild(editableContainer);
+    nameTagsContainer.classList.add('showing-editable-tags');
+    notesWithClickableTags.add(noteId);
+}
+
+// ============================================
+// Tag Autocomplete System
+// ============================================
+
+// Cache of the workspace's existing tags, shared by every tag input on the
+// page. `pending` holds the in-flight request so that typing several characters
+// in a row reuses one call instead of firing (and waiting on) one per keystroke:
+// the API scans every note, and concurrent calls also queue behind each other on
+// the PHP session lock, which is what used to delay the first suggestions.
+const _tagCache = { tags: null, workspace: null, pending: null, pendingWorkspace: null };
+
+/**
+ * Normalize a workspace name for the tags API. '__last_opened__' is a UI
+ * placeholder, not a real workspace: sending it as a filter would match no note
+ * and yield an empty suggestion list.
+ * @param {string} workspace - The raw workspace value
+ * @returns {string} The workspace to filter on, or '' for "all workspaces"
+ */
+function _normalizeTagWorkspace(workspace) {
+    const ws = (workspace === null || workspace === undefined) ? '' : String(workspace);
+    if (ws === 'undefined' || ws === 'null' || ws === '__last_opened__') return '';
+    return ws;
+}
+
+/**
+ * The workspace whose tags should be suggested on this page.
+ * @returns {string} The workspace name, or '' for "all workspaces"
+ */
+function _tagSuggestionWorkspace() {
+    return _normalizeTagWorkspace(window.selectedWorkspace || window.pageWorkspace);
+}
+
+/**
+ * Ask the server for the workspace tags, reusing any request already in flight.
+ * @param {string} workspace - The normalized workspace to fetch tags for
+ * @returns {Promise<Array<string>>} Array of tag names
+ */
+function _requestAllTags(workspace) {
+    if (_tagCache.pending && _tagCache.pendingWorkspace === workspace) {
+        return _tagCache.pending;
+    }
+
+    const url = '/api/v1/tags' + (workspace ? ('?workspace=' + encodeURIComponent(workspace)) : '');
+    const request = fetch(url, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+        .then(r => r.json())
+        .then(data => {
+            const tags = (data && data.success && Array.isArray(data.tags)) ? data.tags : [];
+            _tagCache.tags = tags;
+            _tagCache.workspace = workspace;
+            return tags;
+        })
+        .catch(err => {
+            console.warn('Failed to fetch tags:', err);
+            // Keep serving what we already have rather than dropping suggestions
+            return (_tagCache.workspace === workspace && _tagCache.tags) ? _tagCache.tags : [];
+        })
+        .then(tags => {
+            if (_tagCache.pending === request) {
+                _tagCache.pending = null;
+                _tagCache.pendingWorkspace = null;
+            }
+            return tags;
+        });
+
+    _tagCache.pending = request;
+    _tagCache.pendingWorkspace = workspace;
+    return request;
+}
+
+/**
+ * Fetch tags from server (cached per workspace)
+ * @param {string} workspace - The workspace to fetch tags for
+ * @returns {Promise<Array<string>>} Array of tag names
+ */
+function fetchAllTags(workspace) {
+    const ws = _normalizeTagWorkspace(workspace);
+    if (_tagCache.tags !== null && _tagCache.workspace === ws) {
+        return Promise.resolve(_tagCache.tags);
+    }
+    return _requestAllTags(ws);
+}
+
+/**
+ * Warm the cache before the user types, so the first character can be answered
+ * from memory instead of waiting on a round trip.
+ * @param {string} workspace - The workspace to fetch tags for
+ */
+function prefetchAllTags(workspace) {
+    const ws = _normalizeTagWorkspace(workspace);
+    if (_tagCache.tags === null || _tagCache.workspace !== ws) {
+        _requestAllTags(ws);
+    }
+}
+
+/**
+ * Add tags the user just created to the cache, so they are suggested in the
+ * other notes of this page without waiting for a refetch.
+ * @param {Array<string>} tags - The tags currently set on a note
+ */
+function rememberTagsForSuggestions(tags) {
+    if (!Array.isArray(_tagCache.tags)) return;
+
+    const known = new Set(_tagCache.tags.map(t => t.toLowerCase()));
+    let added = false;
+    tags.forEach(tag => {
+        const clean = (tag || '').trim();
+        if (clean && !known.has(clean.toLowerCase())) {
+            _tagCache.tags.push(clean);
+            known.add(clean.toLowerCase());
+            added = true;
+        }
+    });
+    if (added) {
+        _tagCache.tags.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+    }
+}
+
+/**
+ * Create or reuse a suggestions dropdown for a given container
+ * @param {HTMLElement} container - The container to attach the dropdown to
+ * @returns {HTMLElement} The suggestions dropdown element
+ */
+function getOrCreateSuggestions(container) {
+    let dd = container.querySelector('.tag-suggestions');
+    if (!dd) {
+        dd = document.createElement('div');
+        dd.className = 'tag-suggestions';
+        dd.style.position = 'absolute';
+        dd.style.zIndex = '10000';
+        dd.style.background = '#fff';
+        dd.style.border = '1px solid #ddd';
+        dd.style.borderRadius = '4px';
+        dd.style.boxShadow = '0 4px 8px rgba(0,0,0,0.08)';
+        dd.style.maxHeight = '200px';
+        dd.style.overflow = 'auto';
+        dd.style.display = 'none';
+        dd.style.minWidth = '150px';
+        dd.style.fontSize = '0.95em';
+        container.appendChild(dd);
+    }
+    return dd;
+}
+
+/**
+ * Highlight clickable tags that match the provided searchTerm (case-insensitive).
+ * If searchTerm is falsy, remove any existing highlight classes.
+ * @param {string} searchTerm - The search term to highlight
+ * @param {number} _attempt - Internal retry counter for async tag loading
+ */
+function highlightMatchingTags(searchTerm, _attempt = 0) {
+    const normalized = searchTerm ? searchTerm.toString().trim().toLowerCase() : '';
+    const tagEls = document.querySelectorAll('.clickable-tag');
+
+    // If no tag elements yet, retry a few times (they may be created asynchronously after AJAX)
+    if (tagEls.length === 0 && _attempt < 6) {
+        // Elements not yet present; retry shortly
+        setTimeout(() => highlightMatchingTags(searchTerm, _attempt + 1), 80);
+        return;
+    }
+
+    if (!normalized) {
+        tagEls.forEach(el => el.classList.remove('tag-highlight'));
+        return;
+    }
+
+    // Support multiple tokens separated by commas or whitespace (e.g. "tag1, tag2" or "tag1 tag2")
+    const tokens = normalized.split(/[\,\s]+/).map(t => t.trim()).filter(t => t.length > 0);
+    if (tokens.length === 0) {
+        tagEls.forEach(el => el.classList.remove('tag-highlight'));
+        return;
+    }
+
+    let matched = 0;
+    tagEls.forEach(el => {
+        const text = (el.textContent || '').trim().toLowerCase();
+        const isMatch = tokens.some(tok => text === tok || text.includes(tok));
+        const wrapper = el.closest('.clickable-tag-wrapper');
+        const target = wrapper || el;
+
+        if (isMatch) {
+            target.classList.add('tag-highlight');
+            matched++;
+        } else {
+            target.classList.remove('tag-highlight');
+            target.classList.remove('search-highlight-active');
+        }
+    });
+
+    // Refresh navigation list if highlighter is available
+    if (typeof updateHighlightsList === 'function') {
+        updateHighlightsList();
+
+        // If we have a pending scroll from a new search, and we just found tag matches
+        // (but no content matches were found yet, or we're in unified mode), trigger the scroll.
+        if (window.searchNavigation && window.searchNavigation.pendingAutoScroll && window.searchNavigation.highlights.length > 0) {
+            // Use the standard scroll function if available
+            if (typeof scrollToFirstHighlight === 'function') {
+                scrollToFirstHighlight();
+            }
+        }
+    }
+}
+
+// Expose helper so other modules can call it after AJAX reinit
+window.highlightMatchingTags = highlightMatchingTags;
+
+/**
+ * Show suggestions filtered by prefix
+ * @param {HTMLInputElement} inputEl - The input element for tag entry
+ * @param {HTMLElement} container - The container holding the tags
+ * @param {string} workspace - The current workspace
+ * @param {string} noteId - The ID of the note being edited
+ */
+function showTagSuggestions(inputEl, container, workspace, noteId) {
+    const dd = getOrCreateSuggestions(container);
+    const value = inputEl.value.trim().toLowerCase();
+    if (!value) {
+        dd.style.display = 'none';
+        // Nothing to match yet, but load the list now so the first character
+        // typed can be answered without a round trip.
+        prefetchAllTags(workspace);
+        return;
+    }
+
+    fetchAllTags(workspace).then(allTags => {
+        // A slow response must not overwrite the dropdown of what is now a
+        // different prefix (or of an input the user has already left).
+        if (!inputEl.isConnected || inputEl.value.trim().toLowerCase() !== value) return;
+
+        // Exclude tags already present
+        const existing = Array.from(container.querySelectorAll('.clickable-tag')).map(t => (t.getAttribute('data-tag') || t.textContent).trim().toLowerCase());
+        const matches = allTags.filter(t => t.toLowerCase().includes(value) && !existing.includes(t.toLowerCase()));
+
+        dd.innerHTML = '';
+        if (matches.length === 0) { dd.style.display = 'none'; return; }
+
+        matches.slice(0, 50).forEach((tag, idx) => {
+            const item = document.createElement('div');
+            item.className = 'tag-suggestion-item';
+            item.textContent = tag;
+            item.style.padding = '6px 8px';
+            item.style.cursor = 'pointer';
+            item.addEventListener('mousedown', function (e) {
+                e.preventDefault();
+                // The dropdown is deliberately left visible here: see the click
+                // handler below.
+                applyTagSuggestion(container, inputEl, tag, noteId, null);
+            });
+            item.addEventListener('click', function (e) {
+                // Hiding the dropdown on mousedown would make the browser
+                // resolve this click against whatever sits under it (the note
+                // body), and the "clicked the note background" handler would
+                // then move the caret out of the tag field. Keeping the item
+                // hit-testable until here also lets stopPropagation() shield
+                // the click from that handler.
+                e.preventDefault();
+                e.stopPropagation();
+                dd.style.display = 'none';
+                focusTagInput(container, inputEl);
+            });
+            dd.appendChild(item);
+        });
+
+        // Position the dropdown under the input
+        dd.style.display = 'block';
+
+        // Check if we're in mobile view (horizontal scrolling container)
+        const isMobile = window.innerWidth <= 800;
+
+        if (isMobile) {
+            // Mobile: calculate position relative to container with scroll offset
+            const containerRect = container.getBoundingClientRect();
+            const inputRect = inputEl.getBoundingClientRect();
+            dd.style.left = (inputRect.left - containerRect.left + container.scrollLeft) + 'px';
+            dd.style.top = (inputRect.bottom - containerRect.top + container.scrollTop + 4) + 'px';
+        } else {
+            // Desktop: use simple offset positioning
+            dd.style.left = inputEl.offsetLeft + 'px';
+            dd.style.top = (inputEl.offsetTop + inputEl.offsetHeight + 4) + 'px';
+        }
+        // Note: No item is highlighted by default, user must use arrow keys to highlight
+        // Reset highlight index whenever suggestions are rebuilt
+        inputEl._highlightedIdx = -1;
+
+        // Only add navigation handler once per input element
+        if (!inputEl.hasNavigationHandler) {
+            inputEl.addEventListener('keydown', function navHandler(ev) {
+                const items = dd.querySelectorAll('.tag-suggestion-item');
+                if (!items || items.length === 0) return;
+                if (ev.key === 'ArrowDown') {
+                    ev.preventDefault();
+                    inputEl._highlightedIdx = Math.min(inputEl._highlightedIdx + 1, items.length - 1);
+                    items.forEach((it, i) => {
+                        it.classList.toggle('highlighted', i === inputEl._highlightedIdx);
+                        it.style.background = i === inputEl._highlightedIdx ? '#f0f7ff' : '';
+                    });
+                } else if (ev.key === 'ArrowUp') {
+                    ev.preventDefault();
+                    inputEl._highlightedIdx = Math.max(inputEl._highlightedIdx - 1, 0);
+                    items.forEach((it, i) => {
+                        it.classList.toggle('highlighted', i === inputEl._highlightedIdx);
+                        it.style.background = i === inputEl._highlightedIdx ? '#f0f7ff' : '';
+                    });
+                } else if ((ev.key === 'Enter' || ev.key === 'Tab') && inputEl._highlightedIdx >= 0) {
+                    // Tab accepts the highlighted suggestion too, instead of
+                    // leaving the tag input for the next field.
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    // Tags are auto-saved by applyTagSuggestion, no need to mark as modified
+                    applyTagSuggestion(container, inputEl, items[inputEl._highlightedIdx].textContent, noteId, dd);
+                } else if (ev.key === 'Escape') {
+                    dd.style.display = 'none';
+                }
+            });
+            inputEl.hasNavigationHandler = true;
+        }
+    });
+}
+
+/**
+ * Put the caret back in the tag input so the next tag can be typed straight
+ * away, without having to click the field again.
+ * The input is re-read from the container instead of being reused directly:
+ * the save that follows a tag change can re-render the tag editor, which would
+ * leave the original element detached (focusing it then does nothing).
+ * @param {HTMLElement} container - The editable tags container
+ * @param {HTMLInputElement} [fallbackInput] - Input to use if the container has none
+ */
+function focusTagInput(container, fallbackInput) {
+    const focusNow = () => {
+        const live = (container && container.querySelector('.tag-input')) || fallbackInput;
+        if (!live || !live.isConnected) return;
+
+        // Never steal focus back from somewhere the user moved to on purpose
+        // (the note body, the title, another field) between the two attempts.
+        const active = document.activeElement;
+        if (active && active !== live && active !== document.body && active !== document.documentElement
+            && !active.classList.contains('tag-input')) {
+            return;
+        }
+
+        if (active !== live) live.focus();
+        try {
+            live.setSelectionRange(live.value.length, live.value.length);
+        } catch (e) {
+            // Not all input types support selection ranges
+            console.debug('clickable-tags: live() failed:', e);
+        }
+    };
+
+    focusNow();
+    // Re-assert once the click / blur sequence is over, then once more after the
+    // save triggered by the change has had a chance to redraw the editor.
+    setTimeout(focusNow, 0);
+    setTimeout(focusNow, 120);
+}
+
+/**
+ * Add the tag picked from the suggestions dropdown and keep typing where it
+ * left off.
+ * @param {HTMLElement} container - The editable tags container
+ * @param {HTMLInputElement} inputEl - The tag input the suggestion was picked from
+ * @param {string} tag - The suggested tag to add
+ * @param {string} noteId - The ID of the note
+ * @param {HTMLElement|null} dd - The suggestions dropdown to hide, or null to
+ *                                  leave it to the caller
+ */
+function applyTagSuggestion(container, inputEl, tag, noteId, dd) {
+    // Clear the typed prefix first: a click on a suggestion can still blur the
+    // input in some browsers, and the blur handler would then commit that
+    // prefix as a second, unwanted tag alongside the suggestion.
+    if (inputEl) inputEl.value = '';
+    if (dd) dd.style.display = 'none';
+
+    if (!tagExistsInContainer(container, tag)) {
+        addTagElement(container, tag, noteId);
+    }
+    // Tags are auto-saved directly via updateTagsInput, no need to mark as modified
+    updateTagsInput(noteId, container);
+    focusTagInput(container, inputEl);
+}
+
+// Close suggestions when clicking outside
+document.addEventListener('click', function (e) {
+    document.querySelectorAll('.tag-suggestions').forEach(dd => {
+        if (!dd.contains(e.target)) dd.style.display = 'none';
+    });
+});
+
+// ============================================
+// Tag Element Manipulation
+// ============================================
+
+/**
+ * Resolve a tag's color to a hex value, mirroring resolveTagHex() in
+ * js/list_tags.js: window.TAG_COLORS maps a lowercased tag name to either a
+ * note palette id or a literal '#rrggbb'. Returns '' when the tag has no color.
+ * @param {string} tagName - The tag to look up
+ * @returns {string} A hex color, or '' when the tag is uncolored
+ */
+function resolveNoteTagHex(tagName) {
+    const map = window.TAG_COLORS;
+    if (!map || typeof map !== 'object') return '';
+
+    const value = map[String(tagName || '').trim().toLowerCase()];
+    if (typeof value !== 'string' || value === '') return '';
+    if (value.charAt(0) === '#') return value;
+
+    const palette = Array.isArray(window.NOTE_COLOR_PALETTE) ? window.NOTE_COLOR_PALETTE : [];
+    const entry = palette.find(color => color.id === value.toLowerCase());
+    return entry ? entry.hex : '';
+}
+
+/**
+ * Add a tag element to the container
+ * @param {HTMLElement} container - The container to add the tag to
+ * @param {string} tagText - The text of the tag
+ * @param {string} noteId - The ID of the note
+ */
+function addTagElement(container, tagText, noteId) {
+    const tagWrapper = document.createElement('span');
+    tagWrapper.className = 'clickable-tag-wrapper';
+
+    const tagElement = document.createElement('span');
+    tagElement.className = 'clickable-tag';
+    tagElement.textContent = tagText;
+    tagElement.setAttribute('data-tag', tagText);
+
+    const tagHex = resolveNoteTagHex(tagText);
+    if (tagHex) {
+        const dot = document.createElement('span');
+        dot.className = 'tag-color-dot';
+        dot.style.background = tagHex;
+        tagElement.insertBefore(dot, tagElement.firstChild);
+    }
+
+    tagElement.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        redirectToTag(tagText);
+    });
+
+    const deleteButton = document.createElement('span');
+    deleteButton.className = 'tag-delete-button';
+    deleteButton.innerHTML = '×';
+    deleteButton.title = 'Remove tag';
+    deleteButton.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        removeTagElement(tagWrapper, noteId);
+    });
+
+    tagWrapper.appendChild(tagElement);
+    tagWrapper.appendChild(deleteButton);
+
+    // Insert before the input field
+    const inputField = container.querySelector('.tag-input');
+    container.insertBefore(tagWrapper, inputField);
+}
+
+/**
+ * Remove a tag element
+ * @param {HTMLElement} tagWrapper - The wrapper element of the tag to remove
+ * @param {string} noteId - The ID of the note
+ */
+function removeTagElement(tagWrapper, noteId) {
+    const container = tagWrapper.closest('.editable-tags-container');
+    tagWrapper.remove();
+    updateTagsInput(noteId, container);
+}
+
+/**
+ * Check if a tag already exists in the container (case-insensitive)
+ * @param {HTMLElement} container - The container to check
+ * @param {string} tagText - The tag text to check for
+ * @returns {boolean} True if the tag exists
+ */
+function tagExistsInContainer(container, tagText) {
+    const existingTags = container.querySelectorAll('.clickable-tag');
+    return Array.from(existingTags).some(tag =>
+        (tag.getAttribute('data-tag') || tag.textContent).trim().toLowerCase() === tagText.trim().toLowerCase()
+    );
+}
+
+// ============================================
+// Tag Input Handling
+// ============================================
+
+/**
+ * Handle input in the tag input field
+ * @param {KeyboardEvent} e - The keyboard event
+ * @param {string} noteId - The ID of the note
+ * @param {HTMLElement} container - The container holding the tags
+ */
+function handleTagInput(e, noteId, container) {
+    if (e.key === ' ' || e.key === 'Enter' || e.key === ',') {
+        e.preventDefault(); // Prevents default behavior
+        e.stopPropagation(); // Prevents event propagation
+
+        const input = e.target;
+        let tagText = input.value.trim();
+
+        if (tagText && tagText !== '') {
+            // Check if there's a visible suggestions dropdown
+            const suggestionsDropdown = container.querySelector('.tag-suggestions');
+            if (suggestionsDropdown && suggestionsDropdown.style.display !== 'none') {
+                // For Enter key, check if any suggestion is highlighted
+                if (e.key === 'Enter') {
+                    // Check if there's a highlighted item
+                    const highlightedItem = suggestionsDropdown.querySelector('.tag-suggestion-item.highlighted');
+                    if (highlightedItem) {
+                        // Let the navigation handler handle the highlighted suggestion
+                        return false;
+                    }
+                    // No item highlighted, proceed to create the typed tag
+                }
+                // For space, comma, or Enter with no highlighted item, hide suggestions and allow creating the typed tag
+                suggestionsDropdown.style.display = 'none';
+            }
+
+            // Split by spaces to allow multiple tags at once
+            const tags = tagText.split(/\s+/).filter(tag => tag.trim() !== '');
+
+            tags.forEach(singleTag => {
+                const trimmedTag = singleTag.trim();
+                if (trimmedTag && !tagExistsInContainer(container, trimmedTag)) {
+                    addTagElement(container, trimmedTag, noteId);
+                }
+            });
+
+            input.value = '';
+            updateTagsInput(noteId, container);
+
+            // Keep focus on input to continue typing
+            focusTagInput(container, input);
+        }
+
+        return false;
+    } else if (e.key === 'Backspace' && e.target.value === '') {
+        // If backspace on empty input, remove last tag
+        const tagWrappers = container.querySelectorAll('.clickable-tag-wrapper');
+        if (tagWrappers.length > 0) {
+            const lastTag = tagWrappers[tagWrappers.length - 1];
+            removeTagElement(lastTag, noteId);
+        }
+    }
+}
+
+/**
+ * Handle blur on tag input - processes any remaining text
+ * @param {FocusEvent} e - The blur event
+ * @param {string} noteId - The ID of the note
+ * @param {HTMLElement} container - The container holding the tags
+ */
+function handleTagInputBlur(e, noteId, container) {
+    const input = e.target;
+    let tagText = input.value.trim();
+
+    if (tagText && tagText !== '') {
+        // Check if there's a visible suggestions dropdown
+        const suggestionsDropdown = container.querySelector('.tag-suggestions');
+        if (suggestionsDropdown && suggestionsDropdown.style.display !== 'none') {
+            // Hide suggestions and process the typed text
+            suggestionsDropdown.style.display = 'none';
+        }
+
+        // Split by spaces to allow multiple tags at once
+        const tags = tagText.split(/\s+/).filter(tag => tag.trim() !== '');
+
+        tags.forEach(singleTag => {
+            const trimmedTag = singleTag.trim();
+            if (trimmedTag && !tagExistsInContainer(container, trimmedTag)) {
+                addTagElement(container, trimmedTag, noteId);
+            }
+        });
+
+        input.value = '';
+        updateTagsInput(noteId, container);
+    }
+}
+
+// ============================================
+// Tag Display and Input Updates
+// ============================================
+
+/**
+ * Update the hidden tags input with current tags
+ * @param {string} noteId - The ID of the note
+ * @param {HTMLElement} container - The container holding the tags
+ */
+function updateTagsInput(noteId, container) {
+    const tagsInput = document.getElementById('tags' + noteId);
+    if (!tagsInput) return;
+
+    const tagElements = container.querySelectorAll('.clickable-tag');
+    // data-tag, not textContent: a colored tag also carries an empty dot span.
+    const tags = Array.from(tagElements).map(tag => tag.getAttribute('data-tag') || tag.textContent.trim());
+
+    tagsInput.value = tags.join(' ');
+
+    // A tag typed here is a tag that exists from now on: make it suggestible in
+    // the other notes right away, instead of only after the next page load.
+    rememberTagsForSuggestions(tags);
+
+    // Update the placeholder based on whether there are tags
+    const tagInput = container.querySelector('.tag-input');
+    if (tagInput) {
+        tagInput.placeholder = tags.length > 0
+            ? (window.t ? window.t('tags.add_single', null, 'Add tag...') : 'Add tag...')
+            : (window.t ? window.t('tags.add_multiple', null, 'Add tags...') : 'Add tags...');
+    }
+
+    // Trigger auto-save for this specific note (without changing global noteid)
+    triggerAutoSaveForNote(noteId);
+
+    // Trigger the input change event to notify any other listeners
+    const changeEvent = new Event('input', { bubbles: true });
+    tagsInput.dispatchEvent(changeEvent);
+}
+
+// ============================================
+// Auto-Save Integration
+// ============================================
+
+/**
+ * Trigger auto-save for a specific note
+ * @param {string} targetNoteId - The ID of the note to save
+ */
+function triggerAutoSaveForNote(targetNoteId) {
+    if (targetNoteId == 'search' || targetNoteId == -1 || targetNoteId === null || targetNoteId === undefined) return;
+
+
+    // Use dedicated function that doesn't depend on global noteid
+    updateNoteById(targetNoteId);
+}
+
+/**
+ * Update note by specific ID
+ * @param {string} noteId - The ID of the note to update
+ */
+function updateNoteById(noteId) {
+    if (noteId == 'search' || noteId == -1 || noteId === null || noteId === undefined) return;
+
+    // Get elements for this specific note
+    var entryElem = document.getElementById("entry" + noteId);
+    var titleInput = document.getElementById("inp" + noteId);
+    var tagsElem = document.getElementById("tags" + noteId);
+
+    var currentContent = entryElem
+        ? ((typeof window.getComparableNoteContent === 'function')
+            ? window.getComparableNoteContent(entryElem, noteId)
+            : entryElem.innerHTML)
+        : '';
+    var currentTitle = titleInput ? titleInput.value : '';
+    var currentTags = tagsElem ? tagsElem.value : '';
+
+
+    // Save to localStorage immediately
+    try {
+        if (entryElem) {
+            var draftKey = 'poznote_draft_' + noteId;
+            localStorage.setItem(draftKey, currentContent);
+
+            if (titleInput) {
+                localStorage.setItem('poznote_title_' + noteId, currentTitle);
+            }
+            if (tagsElem) {
+                localStorage.setItem('poznote_tags_' + noteId, currentTags);
+            }
+        }
+    } catch (err) {
+        // Silently ignore localStorage errors (quota exceeded, private browsing, etc.)
+        console.debug('clickable-tags: updateNoteById() failed:', err);
+    }
+
+    // Initialize lastSaved variables if this is the current note to prevent infinite loops
+    if (window.noteid == noteId) {
+        // Initialize the global lastSaved variables to prevent markNoteAsModified() infinite loops
+        if (typeof lastSavedContent === 'undefined' || lastSavedContent === null) {
+            lastSavedContent = currentContent;
+        }
+        if (typeof lastSavedTitle === 'undefined' || lastSavedTitle === null) {
+            lastSavedTitle = currentTitle;
+        }
+        if (typeof lastSavedTags === 'undefined' || lastSavedTags === null) {
+            lastSavedTags = currentTags;
+        }
+    }
+
+    // For tags modification, save immediately without visual indicator or delay
+    // Tags are saved instantly like titles, no red dot needed
+    saveNoteToServerById(noteId);
+}
+
+/**
+ * Save specific note to server by ID
+ * @param {string} noteId - The ID of the note to save
+ */
+function saveNoteToServerById(noteId) {
+
+    // Temporarily set global noteid for saveNoteToServer compatibility
+    var originalNoteid = window.noteid;
+    window.noteid = noteId;
+
+    try {
+        // Call the existing saveNoteToServer function
+        if (typeof saveNoteToServer === 'function') {
+            saveNoteToServer();
+        } else {
+            console.error('saveNoteToServer function not found');
+        }
+    } finally {
+        // Restore original noteid
+        window.noteid = originalNoteid;
+    }
+}
+
+// ============================================
+// Initialization and Event Listeners
+// ============================================
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', function () {
+    initializeClickableTags();
+});
+
+// Also initialize if DOM is already loaded
+if (document.readyState !== 'loading') {
+    initializeClickableTags();
+}
+
+// ============================================
+// Tag Search and Navigation
+// ============================================
+
+/**
+ * Get the current workspace from various sources
+ * @returns {string} The current workspace name
+ */
+function getCurrentWorkspace() {
+    // 1. Check URL parameters first
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const workspace = urlParams.get('workspace');
+        if (workspace) return workspace;
+    } catch (e) {
+        console.warn('Error reading URL params:', e);
+    }
+
+    // 2. Check global variables (set by PHP)
+    const workspaceVars = [
+        typeof pageWorkspace !== 'undefined' && pageWorkspace !== 'undefined' ? pageWorkspace : null,
+        typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : null,
+        typeof window.selectedWorkspace !== 'undefined' ? window.selectedWorkspace : null,
+        typeof window.pageWorkspace !== 'undefined' && window.pageWorkspace !== 'undefined' ? window.pageWorkspace : null
+    ];
+
+    for (const workspace of workspaceVars) {
+        if (workspace) return workspace;
+    }
+
+    // 3. Fallback: try workspace selector
+    const wsSelector = document.getElementById('workspaceSelector');
+    if (wsSelector && wsSelector.value) {
+        return wsSelector.value;
+    }
+
+    return '';
+}
+
+/**
+ * Redirect to notes with specific tag (toggles tag in search)
+ * @param {string} tag - The tag to search for
+ */
+function redirectToTag(tag) {
+    const currentWorkspace = getCurrentWorkspace();
+
+    // Get current search parameters
+    let urlParams = new URLSearchParams(window.location.search);
+    let currentTagsSearch = urlParams.get('tags_search') || '';
+
+    // Parse the current tags (space or comma separated)
+    let currentTags = [];
+    if (currentTagsSearch.trim()) {
+        currentTags = currentTagsSearch.split(/[\s,]+/).filter(t => t.trim() !== '');
+    }
+
+    // Check if the clicked tag is already in the search
+    const tagIndex = currentTags.findIndex(t => t.toLowerCase() === tag.toLowerCase());
+    let newTagsSearch = '';
+
+    if (tagIndex > -1) {
+        // Tag is already selected - remove it
+        currentTags.splice(tagIndex, 1);
+        newTagsSearch = currentTags.join(' ');
+    } else {
+        // Tag is not selected - add it
+        currentTags.push(tag);
+        newTagsSearch = currentTags.join(' ');
+    }
+
+    // Build URL with updated tags parameter while preserving date filters
+    const finalParams = new URLSearchParams();
+    if (currentWorkspace) {
+        finalParams.set('workspace', currentWorkspace);
+    }
+
+    const createdFrom = urlParams.get('created_from');
+    const createdTo = urlParams.get('created_to');
+    if (createdFrom) {
+        finalParams.set('created_from', createdFrom);
+    }
+    if (createdTo) {
+        finalParams.set('created_to', createdTo);
+    }
+
+    if (newTagsSearch.trim()) {
+        finalParams.set('tags_search', newTagsSearch);
+    }
+
+    const finalUrl = 'index.php' + (finalParams.toString() ? '?' + finalParams.toString() : '');
+
+    // Navigate to the URL
+    window.location.href = finalUrl;
+}
+
+// ============================================
+// Global Exports
+// ============================================
+
+// Make functions available globally for use by other scripts
+window.initializeClickableTags = initializeClickableTags;
+window.reinitializeClickableTagsAfterAjax = initializeClickableTags; // Alias for AJAX reinitialization
+window.refreshTagsCount = refreshTagsCount;
+window.highlightMatchingTags = highlightMatchingTags;
+window.redirectToTag = redirectToTag;
+window.convertTagsToEditable = convertTagsToEditable;
+window.triggerAutoSaveForNote = triggerAutoSaveForNote;
+
+// Listen for i18n loaded event to update tag input placeholders
+document.addEventListener('poznote:i18n:loaded', function () {
+    // Update all tag input placeholders with translations
+    document.querySelectorAll('.tag-input').forEach(function (input) {
+        const container = input.closest('.editable-tags-container');
+        if (container) {
+            const tagElements = container.querySelectorAll('.clickable-tag');
+            input.placeholder = tagElements.length > 0
+                ? (window.t ? window.t('tags.add_single', null, 'Add tag...') : 'Add tag...')
+                : (window.t ? window.t('tags.add_multiple', null, 'Add tags...') : 'Add tags...');
+        }
+    });
+});

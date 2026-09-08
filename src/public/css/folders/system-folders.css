@@ -1,0 +1,94 @@
+/**
+ * System Folders
+ *
+ * System folder container (hidden), system menu dropdown,
+ * and system folder icon-only display.
+ */
+
+/* Container pour les dossiers système - maintenant masqué (remplacé par page Home) */
+.system-folders-container {
+    display: none !important;
+}
+
+/* Conteneur du menu système avec menu déroulant */
+.system-menu-container {
+    position: relative;
+}
+
+/* Menu déroulant du système */
+.system-menu-dropdown {
+    position: fixed;
+    margin-top: 8px;
+    background: white;
+    border: 1px solid #d3d6db;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    max-width: 250px;
+    z-index: 10000;
+    overflow: visible;
+}
+
+/* Ellipsis icon */
+.system-folder .lucide-more-vertical.folder-icon {
+    font-size: 1em !important;
+    margin-right: 0 !important;
+    color: var(--pz-accent);
+}
+
+/* Dossiers système: affichage en icônes uniquement */
+.system-folder:not([data-folder="Favorites"]) .folder-toggle {
+    padding: 3px;
+    justify-content: center;
+    width: auto;
+    flex: 0 1 auto;
+    min-width: 0;
+    position: relative;
+    z-index: 2;
+}
+
+/* Cacher le nom des dossiers système */
+.system-folder:not([data-folder="Favorites"]) .folder-name {
+    display: none !important;
+}
+
+/* System folder icons */
+.system-folder:not([data-folder="Favorites"]) [class*="lucide-"].folder-icon {
+    font-size: 1em !important;
+    margin-right: 0 !important;
+    color: var(--pz-accent);
+}
+
+.system-folder[data-folder="Favorites"] [class*="lucide-"].folder-icon {
+    font-size: 1em !important;
+}
+
+/* Afficher le compteur à droite de l'icône - toujours visible */
+.system-folder:not([data-folder="Favorites"]) .folder-note-count {
+    display: inline-block !important;
+    opacity: 1 !important;
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+    color: #5b9bd5;
+    padding: 1px 4px;
+    font-size: 9px;
+    font-weight: 600;
+    min-width: 14px;
+    text-align: center;
+    line-height: 1.2;
+    margin-left: -2px;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+/* Effet hover sur les icônes système */
+.system-folder:not([data-folder="Favorites"]) .folder-toggle:hover {
+    background-color: transparent;
+}
+
+.system-folder:not([data-folder="Favorites"]) .folder-toggle:hover .folder-icon {
+    color: var(--pz-accent-hover);
+    transform: scale(1.15);
+}

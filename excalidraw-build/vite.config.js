@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   build: {
-    outDir: '../src/js/excalidraw-dist',
+    outDir: '../src/public/js/excalidraw-dist',
     lib: {
       entry: 'src/main.jsx',
       name: 'PoznoteExcalidraw',

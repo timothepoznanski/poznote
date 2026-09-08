@@ -1,0 +1,64 @@
+/**
+ * Toolbar Icon Colors
+ *
+ * Blue color states for toolbar buttons: attachments, favorites,
+ * share, markdown view/help/split.
+ */
+
+/* When attachments exist, make the paperclip icon blue */
+.btn-attachment.has-attachments i.lucide-paperclip,
+.btn-attachment.has-attachments .lucide-paperclip {
+    color: var(--pz-accent) !important;
+}
+
+/* Blue color for favorite star when marked as favorite */
+.toolbar-btn.btn-favorite.is-favorite i.lucide-star,
+.toolbar-btn.btn-favorite.is-favorite .lucide-star,
+.toolbar-btn.btn-publish.is-shared i.lucide-share-2,
+.toolbar-btn.btn-publish.is-shared .lucide-share-2,
+.toolbar-btn.btn-attachment.has-attachments i {
+    color: var(--pz-accent) !important;
+    filter: none !important;
+}
+
+/* Blue color for markdown view mode toggle button */
+.toolbar-btn.markdown-view-mode-btn i,
+.toolbar-btn.markdown-view-mode-btn [class*="lucide-"] {
+    color: var(--pz-accent) !important;
+    filter: none !important;
+}
+
+.toolbar-btn.markdown-view-mode-btn:hover i,
+.toolbar-btn.markdown-view-mode-btn:hover [class*="lucide-"] {
+    color: var(--pz-accent) !important;
+    filter: none !important;
+    transform: scale(1.18);
+}
+
+/* Markdown split view button - normal icon color (not blue) */
+.toolbar-btn.markdown-split-btn i,
+.toolbar-btn.markdown-split-btn [class*="lucide-"] {
+    /* Use default icon color */
+}
+
+.toolbar-btn.markdown-split-btn:hover i,
+.toolbar-btn.markdown-split-btn:hover [class*="lucide-"] {
+    transform: scale(1.18);
+}
+
+/* Add slash through icon when in split mode (active state) */
+.toolbar-btn.markdown-split-btn.active {
+    position: relative;
+}
+
+.toolbar-btn.markdown-split-btn.active::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 24px;
+    height: 2px;
+    background-color: #666;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    pointer-events: none;
+}

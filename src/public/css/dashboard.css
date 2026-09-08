@@ -1,0 +1,1952 @@
+/* ============================================
+   Notes board (dashboard.php)
+   ============================================ */
+
+body.dashboard-page {
+    display: flex;
+    align-items: flex-start;
+    background: var(--pz-surface);
+    min-height: 100vh;
+    padding-top: 0;
+}
+
+@keyframes dashboardHeartBlink {
+    0%, 100% {
+        opacity: 0.82;
+        transform: scale(1);
+    }
+
+    45% {
+        opacity: 1;
+        transform: scale(1.07);
+    }
+
+    70% {
+        opacity: 0.68;
+        transform: scale(0.97);
+    }
+}
+
+/* ---------- Left sidebar (tool buttons: home, search, git, settings) ---------- */
+
+.dashboard-container {
+    flex: 1;
+    /* Full available width: the card grid fits as many columns as the screen
+       allows (capped by the column-count setting) and centers itself. */
+    max-width: 100%;
+    padding-top: 0;
+    padding-bottom: 0;
+    min-width: 0;
+}
+
+/* ---------- Top bar ---------- */
+
+.dashboard-topbar {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    /* margin-bottom: 20px; */
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg-color, var(--pz-surface));
+    padding: 12px 0 8px;
+}
+
+.dashboard-topbar-filter {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 420px;
+    max-width: 90%;
+    margin: 20px auto 0;
+    animation: filterSlideIn 0.18s ease;
+}
+
+@keyframes filterSlideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.dashboard-topbar-filter.is-collapsed {
+    display: none;
+}
+
+.dashboard-filter-icon {
+    position: absolute;
+    left: 10px;
+    width: 20px;
+    height: 20px;
+    color: var(--pz-text-subtle);
+    pointer-events: none;
+}
+
+.dashboard-filter-input {
+    width: 100%;
+    padding: 7px 38px 7px 40px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #1f2937;
+    background: #ffffff;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-filter-input:focus {
+    outline: none;
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
+}
+
+.dashboard-filter-clear {
+    position: absolute;
+    right: 6px;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--pz-text-muted);
+    cursor: pointer;
+}
+
+.dashboard-filter-clear:hover {
+    background: var(--pz-surface-hover);
+}
+
+.dashboard-filter-clear .lucide {
+    width: 20px;
+    height: 20px;
+}
+
+.dashboard-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    flex-wrap: nowrap;
+    justify-content: center;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-bottom: 0;
+    padding: 0 4px;
+}
+
+.dashboard-topbar-actions::-webkit-scrollbar {
+    display: none;
+}
+
+#dashboardToggleFavorites.active .lucide-star {
+    color: var(--pz-warning);
+}
+
+.dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star {
+    color: var(--pz-warning);
+}
+
+/* ---------- Breadcrumb ---------- */
+
+/* Shares the card grid's capped width and auto margins so it starts on the
+   cards' left edge instead of hugging the full-width container. */
+.dashboard-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 10px 0 2px;
+    flex-wrap: wrap;
+    max-width: min(100%, calc(var(--dash-col-min, 190px) * var(--dash-col-max, 4)
+                  + var(--dash-col-gap, 14px) * (var(--dash-col-max, 4) - 1)));
+    margin-inline: auto;
+}
+
+.bc-home {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    color: var(--pz-accent);
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.bc-home:hover {
+    background: rgba(var(--pz-accent-rgb), 0.08);
+}
+
+.bc-home .lucide {
+    width: 24px;
+    height: 24px;
+}
+
+.bc-sep {
+    color: var(--pz-border-strong);
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.bc-item {
+    background: none;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--pz-accent);
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.bc-item:hover {
+    background: rgba(var(--pz-accent-rgb), 0.08);
+}
+
+.bc-current {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1f2937;
+    padding: 4px 8px;
+}
+
+/* ---------- Unified card grid ---------- */
+
+.dashboard-grid-container {
+    display: grid;
+    /* --dash-col-min is the card width (set per view-size-* variant) and
+       --dash-col-max the chosen maximum column count (default 4).
+       The count is capped by width, not by a fixed track count: auto-fit still
+       drops to fewer columns when the screen is too narrow, so cards keep
+       their width instead of being squeezed. minmax(0, …) keeps the floor at 0
+       because a percentage would resolve against the box being measured. */
+    grid-template-columns: repeat(auto-fit, minmax(0, var(--dash-col-min, 190px)));
+    /* Cards start at the left edge of the grid, so an incomplete last row lines
+       up under the first column instead of being centred on itself. The grid
+       box itself is shrink-wrapped and auto-margined, which centres the whole
+       block of columns on the page. */
+    justify-content: start;
+    /* max-width alone caps the box at N cards plus the N-1 gaps between them,
+       which is what limits the column count. width stays auto: auto-fit only
+       expands into space that is actually available, so shrink-wrapping the
+       box would collapse it to a single column. */
+    max-width: min(100%, calc(var(--dash-col-min, 190px) * var(--dash-col-max, 4)
+                  + var(--dash-col-gap, 14px) * (var(--dash-col-max, 4) - 1)));
+    grid-auto-rows: 132px;
+    gap: var(--dash-col-gap, 14px);
+    margin: 14px auto 0;
+}
+
+/* When pinned notes are shown in their own section, #dashboardGrid becomes a
+   plain block wrapper and the inner .dash-grid-section divs carry the grid.
+   The ID keeps this display override ahead of the view-size/layout variants.
+   The wrapper carries the column cap and is centred as one block, so the
+   pinned and Others grids share a left edge instead of each centring on its
+   own card count. */
+#dashboardGrid.dash-grid-sectioned {
+    display: block;
+    max-width: min(100%, calc(var(--dash-col-min, 190px) * var(--dash-col-max, 4)
+                  + var(--dash-col-gap, 14px) * (var(--dash-col-max, 4) - 1)));
+    margin-inline: auto;
+}
+
+/* Inside the wrapper the cap is already applied, so the sections fill it and
+   align left. Re-applying the calc here would measure 100% against a parent
+   whose width is still being resolved and collapse them to one column. */
+.dash-grid-sectioned .dashboard-grid-container {
+    margin-top: 0;
+    margin-inline: 0;
+    max-width: 100%;
+}
+
+/* Section titles (Pinned / Others) sit inside the centred wrapper, so plain
+   left alignment already puts them on the cards' left edge. */
+.dash-section-title {
+    margin: 26px 2px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--pz-text-muted);
+}
+
+:root[data-theme='dark'] .dash-section-title,
+body.dark-mode .dash-section-title {
+    color: #9ca3af;
+}
+
+/* ---------- View menu (card size + layout) ---------- */
+
+/* Row holding the View button and the filter bar, centered like the filter */
+.board-filter-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.board-filter-row .dashboard-topbar-filter {
+    margin: 0;
+    flex-shrink: 1;
+}
+
+.board-view-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.board-view-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 33px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    color: var(--pz-text-muted);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.board-view-btn:hover {
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
+}
+
+.board-view-btn .lucide {
+    width: 16px;
+    height: 16px;
+}
+
+/* The view toggle shows the current view: grid icon + size letter in grid
+   layout, list icon alone in list layout */
+.board-view-layout-toggle {
+    width: auto;
+    min-width: 36px;
+    padding: 0 9px;
+    gap: 4px;
+}
+
+.board-view-layout-toggle .lucide-layout-list {
+    display: none;
+}
+
+.board-view-controls.is-list .board-view-layout-toggle .lucide-layout-list {
+    display: inline-block;
+}
+
+.board-view-controls.is-list .board-view-layout-toggle .lucide-grid,
+.board-view-controls.is-list .board-view-layout-toggle .board-view-size-letter {
+    display: none;
+}
+
+/* Column count is a grid-only setting: hide it in list layout too */
+.board-view-controls.is-list .board-view-columns-btn {
+    display: none;
+}
+
+/* Phones keep the fixed 2-column layout, so the setting has nothing to act on */
+@media (max-width: 800px) {
+    .board-view-columns-btn {
+        display: none;
+    }
+}
+
+.board-view-columns-value {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.board-view-size-letter {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* ---------- View variants: card size ---------- */
+
+/* The size variables live on the container, not the grid, so the breadcrumb
+   (a sibling of the grid) can compute the same capped width. */
+.view-size-small {
+    --dash-col-min: 150px;
+    --dash-col-gap: 10px;
+}
+
+.view-size-small .dashboard-grid-container {
+    grid-auto-rows: 92px;
+}
+
+.view-size-small .board-card-excerpt {
+    max-height: calc(2 * 1.5em);
+}
+
+.view-size-small .dash-card-thumb {
+    width: 42px;
+    height: 42px;
+}
+
+/* Folder cards: shrink icon and paddings so the name stays visible in 92px */
+.view-size-small .dash-folder-card {
+    padding: 4px 10px 8px;
+}
+
+.view-size-small .dash-folder-card .dash-card-icon {
+    width: 32px;
+    height: 32px;
+}
+
+.view-size-small .dash-folder-card .dash-card-icon .lucide,
+.view-size-small .dash-folder-card .dash-card-icon [class^="lucide-"],
+.view-size-small .dash-folder-card .dash-card-icon [class*=" lucide-"] {
+    width: 20px;
+    height: 20px;
+}
+
+.view-size-small .dash-folder-card .dash-card-name {
+    -webkit-line-clamp: 1;
+}
+
+.view-size-small .dash-folder-card .dash-card-meta {
+    margin-top: 2px;
+}
+
+.view-size-large {
+    --dash-col-min: 250px;
+    --dash-col-gap: 16px;
+}
+
+.view-size-large .dashboard-grid-container {
+    grid-auto-rows: 210px;
+}
+
+.view-size-large .board-card-excerpt {
+    max-height: calc(7 * 1.5em);
+}
+
+.view-size-large .dash-card-thumb {
+    width: 104px;
+    height: 104px;
+}
+
+/* Wide: wider than a large card but at the medium height (the default
+   132px rows), so long titles and excerpt lines get room without the cards
+   growing taller. Everything else keeps the medium defaults. */
+.view-size-wide {
+    --dash-col-min: 320px;
+    --dash-col-gap: 16px;
+}
+
+.view-size-wide .dash-card-thumb {
+    width: 88px;
+    height: 88px;
+}
+
+/* ---------- View variants: list layout ---------- */
+
+/* List rows keep the width the board had before the column setting existed:
+   the container's old 1150px cap, centred. The column-count cap is dropped
+   here (on the sectioned wrapper too, whose id+class selector would keep it). */
+.view-layout-list .dashboard-grid-container,
+.view-layout-list #dashboardGrid.dash-grid-sectioned,
+.view-layout-list .dashboard-breadcrumb {
+    width: auto;
+    max-width: min(100%, 1150px);
+    margin-inline: auto;
+}
+
+.view-layout-list .dashboard-grid-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.view-layout-list .dash-note-card {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+}
+
+.view-layout-list .dash-card-link {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.view-layout-list .dash-card-note-title {
+    margin-bottom: 0;
+    flex-shrink: 0;
+    max-width: 40%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.view-layout-list .dash-card-body {
+    align-items: center;
+}
+
+.view-layout-list .board-card-excerpt {
+    max-height: 1.5em;
+}
+
+.view-layout-list .board-card-tasks {
+    max-height: 1.6em;
+}
+
+.view-layout-list .dash-card-thumb {
+    width: 34px;
+    height: 34px;
+}
+
+.view-layout-list .board-card-footer {
+    margin: 0 0 0 auto;
+    flex-shrink: 0;
+}
+
+/* In list layout the row is horizontal, so the pin sits inline at the start
+   instead of overlaying the top-right corner. */
+.view-layout-list .dash-card-pin {
+    position: static;
+    order: -1;
+    flex-shrink: 0;
+}
+
+.view-layout-list .dash-card-note-title {
+    padding-right: 0;
+}
+
+.view-layout-list .dash-folder-card {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 10px 14px;
+    text-align: left;
+}
+
+.view-layout-list .dash-folder-card .dash-card-icon {
+    width: 32px;
+    height: 32px;
+}
+
+.view-layout-list .dash-folder-card .dash-card-icon .lucide,
+.view-layout-list .dash-folder-card .dash-card-icon [class^="lucide-"],
+.view-layout-list .dash-folder-card .dash-card-icon [class*=" lucide-"] {
+    width: 20px;
+    height: 20px;
+}
+
+.view-layout-list .dash-card-name {
+    width: auto;
+    -webkit-line-clamp: 1;
+}
+
+.view-layout-list .dash-folder-card .dash-card-name {
+    margin: 0;
+}
+
+.view-layout-list .dash-folder-card .dash-card-meta {
+    margin: 0 0 0 auto;
+}
+
+/* ---------- Base card ---------- */
+
+.dash-card {
+    background: #ffffff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 14px;
+    position: relative;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+    overflow: hidden;
+    text-align: left;
+    cursor: pointer;
+}
+
+.dash-card:hover {
+    border-color: var(--pz-accent);
+    box-shadow: 0 3px 12px rgba(var(--pz-accent-rgb), 0.14);
+    transform: translateY(-2px);
+}
+
+/* ---------- Note color tint ----------
+   Cards carrying a note color get --note-color inline (see buildNoteCard in
+   js/dashboard-page.js). Everything else is derived from that single value with
+   color-mix(), so palette colors and per-note custom hex values behave alike.
+   Light mode mixes the hue into white; the dark rules below mix it into the
+   dark surface instead, which keeps text contrast intact in both themes. */
+
+.dash-card.has-note-color {
+    background: color-mix(in srgb, var(--note-color) 12%, #ffffff);
+    border-color: color-mix(in srgb, var(--note-color) 45%, #ffffff);
+}
+
+.dash-card.has-note-color:hover {
+    background: color-mix(in srgb, var(--note-color) 18%, #ffffff);
+    border-color: color-mix(in srgb, var(--note-color) 70%, #ffffff);
+    box-shadow: 0 3px 12px color-mix(in srgb, var(--note-color) 28%, transparent);
+}
+
+/* Tag chips sit on the tinted background, so lift them slightly */
+.dash-card.has-note-color .board-card-tag {
+    background: color-mix(in srgb, var(--note-color) 16%, #ffffff);
+}
+
+/* ---------- Note color filter (topbar) ---------- */
+
+.dashboard-color-filter-wrap {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+}
+
+/* Sits in .board-filter-row next to the view controls, so it matches
+   .board-view-btn rather than the topbar icon buttons. */
+.dashboard-color-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 33px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    color: var(--pz-text-muted);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.dashboard-color-filter-btn:hover {
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
+}
+
+.dashboard-color-filter-btn.active {
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
+    background: #eff6ff;
+}
+
+.dashboard-color-filter-btn .lucide {
+    width: 18px;
+    height: 18px;
+}
+
+:root[data-theme='dark'] .dashboard-color-filter-btn,
+body.dark-mode .dashboard-color-filter-btn {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text-muted);
+}
+
+:root[data-theme='dark'] .dashboard-color-filter-btn:hover,
+body.dark-mode .dashboard-color-filter-btn:hover,
+:root[data-theme='dark'] .dashboard-color-filter-btn.active,
+body.dark-mode .dashboard-color-filter-btn.active {
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
+    background: var(--dm-surface-hover);
+}
+
+/* Fixed rather than absolute: the topbar is an overflow-x:auto scroller, which
+   would clip an absolutely positioned dropdown. JS sets top/left on open. */
+.dashboard-color-filter-menu {
+    position: fixed;
+    z-index: 1200;
+    min-width: 180px;
+    /* Height is set by JS to the space left below the button, so a long
+       palette plus custom colors stays reachable instead of overflowing. */
+    max-height: 320px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 6px;
+    background: #ffffff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.dashboard-color-filter-menu[hidden] {
+    display: none;
+}
+
+.dashboard-color-filter-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    padding: 7px 9px;
+    border: none;
+    border-radius: 7px;
+    background: none;
+    font-size: 13px;
+    color: #1f2937;
+    text-align: left;
+    cursor: pointer;
+}
+
+.dashboard-color-filter-item:hover {
+    background: var(--pz-surface-hover);
+}
+
+.dashboard-color-filter-item.active {
+    background: #eff6ff;
+    font-weight: 600;
+}
+
+.note-color-swatch-empty {
+    background: repeating-linear-gradient(45deg, #e5e7eb 0 4px, #f9fafb 4px 8px);
+}
+
+:root[data-theme='dark'] .dashboard-color-filter-menu,
+body.dark-mode .dashboard-color-filter-menu {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme='dark'] .dashboard-color-filter-item,
+body.dark-mode .dashboard-color-filter-item {
+    color: var(--dm-text);
+}
+
+:root[data-theme='dark'] .dashboard-color-filter-item:hover,
+body.dark-mode .dashboard-color-filter-item:hover,
+:root[data-theme='dark'] .dashboard-color-filter-item.active,
+body.dark-mode .dashboard-color-filter-item.active {
+    background: var(--dm-surface-hover);
+}
+
+:root[data-theme='dark'] .note-color-swatch-empty,
+body.dark-mode .note-color-swatch-empty {
+    background: repeating-linear-gradient(45deg, #374151 0 4px, #1f2937 4px 8px);
+}
+
+/* ---------- Note color picker modal ---------- */
+
+.note-color-modal-subtitle {
+    margin: 4px 0 14px;
+    font-size: 13px;
+    color: var(--pz-text-muted);
+    word-break: break-word;
+}
+
+.note-color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.note-color-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 9px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 9px;
+    background: #ffffff;
+    cursor: pointer;
+    font-size: 13px;
+    text-align: left;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.note-color-option:hover {
+    border-color: var(--pz-text-subtle);
+}
+
+.note-color-option.selected {
+    border-color: var(--pz-accent);
+    background: #eff6ff;
+}
+
+.note-color-swatch {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.note-color-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #1f2937;
+}
+
+:root[data-theme='dark'] .note-color-modal-subtitle,
+body.dark-mode .note-color-modal-subtitle {
+    color: var(--dm-text-muted);
+}
+
+:root[data-theme='dark'] .note-color-option,
+body.dark-mode .note-color-option {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+:root[data-theme='dark'] .note-color-option.selected,
+body.dark-mode .note-color-option.selected {
+    border-color: var(--pz-accent);
+    background: var(--dm-surface-hover);
+}
+
+:root[data-theme='dark'] .note-color-name,
+body.dark-mode .note-color-name {
+    color: var(--dm-text);
+}
+
+/* Four footer buttons: widen the modal so they fit on one row (same
+   recipe as #userSettingsInfoModal in css/modals/base.css), stacking
+   them on small screens. */
+#noteColorModal .modal-content {
+    max-width: 560px;
+}
+
+#noteColorModal .modal-buttons {
+    flex-wrap: nowrap;
+}
+
+#noteColorModal .modal-buttons button {
+    white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+    #noteColorModal .modal-buttons {
+        flex-wrap: wrap;
+    }
+}
+
+/* First footer button: pushed left, quiet outlined style. The extra
+   .modal-buttons scope out-specifies the blue button:first-child rule
+   in css/modals/base.css. */
+.modal-buttons button.note-color-manage-btn,
+.modal-buttons button.dashboard-scope-manage-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: auto;
+    white-space: nowrap;
+    border: 1px solid var(--pz-border-strong);
+    background: transparent;
+    color: #374151;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.modal-buttons button.note-color-manage-btn:hover,
+.modal-buttons button.dashboard-scope-manage-btn:hover {
+    border-color: var(--pz-text-subtle);
+    background: #f9fafb;
+}
+
+.note-color-manage-btn .lucide,
+.dashboard-scope-manage-btn .lucide {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+:root[data-theme='dark'] .modal-buttons button.note-color-manage-btn,
+body.dark-mode .modal-buttons button.note-color-manage-btn,
+:root[data-theme='dark'] .modal-buttons button.dashboard-scope-manage-btn,
+body.dark-mode .modal-buttons button.dashboard-scope-manage-btn {
+    border-color: var(--dm-border);
+    background: transparent;
+    color: var(--dm-text);
+}
+
+:root[data-theme='dark'] .modal-buttons button.note-color-manage-btn:hover,
+body.dark-mode .modal-buttons button.note-color-manage-btn:hover,
+:root[data-theme='dark'] .modal-buttons button.dashboard-scope-manage-btn:hover,
+body.dark-mode .modal-buttons button.dashboard-scope-manage-btn:hover {
+    border-color: var(--dm-text-muted);
+    background: var(--dm-surface-hover);
+}
+
+/* ---------- Folder card ---------- */
+
+.dash-folder-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px 12px 14px;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.dash-folder-card .dash-card-name {
+    margin-top: -2px;
+}
+
+/* Count and, on multi-workspace boards, the workspace badge on one row */
+.dash-folder-card .dash-card-meta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    max-width: 100%;
+    min-width: 0;
+    margin-top: 6px;
+}
+
+.dash-card-ws {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    font-size: 11px;
+    color: var(--pz-text-muted);
+}
+
+.dash-card-ws .lucide {
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
+}
+
+/* The name is the part that gives way when the row is too narrow */
+.dash-card-ws .dash-ws-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dash-card-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+.dash-card-icon .lucide,
+.dash-card-icon [class^="lucide-"],
+.dash-card-icon [class*=" lucide-"] {
+    width: 26px;
+    height: 26px;
+    color: var(--pz-accent);
+}
+
+.dash-card-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1f2937;
+    line-height: 1.3;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    word-break: break-word;
+    width: 100%;
+}
+
+.dash-card-count {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--pz-text-muted);
+    background: var(--pz-surface-hover);
+    border-radius: 10px;
+    padding: 1px 8px;
+    white-space: nowrap;
+}
+
+/* ---------- Note card ---------- */
+
+.dash-note-card {
+    display: flex;
+    flex-direction: column;
+    padding: 14px 16px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.dash-card-link {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    text-decoration: none;
+    color: inherit;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.dash-card-note-title {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.35;
+    margin-bottom: 7px;
+    color: #1f2937;
+    word-break: break-word;
+    /* Room for the pin button, which overlays the card's top-right corner. */
+    padding-right: 22px;
+}
+
+/* ---------- Pin button ----------
+   Sits outside .dash-card-link (see buildNoteCard) so a click pins instead of
+   opening the note. Always on the card, so the affordance is visible without
+   hovering first; its colour still changes on hover and once pinned. */
+
+.dash-card-pin {
+    position: absolute;
+    top: 2px;
+    right: 5px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+/* Lucide icons are CSS masks, so the color comes from background-color. */
+.dash-card-pin i {
+    width: 14px;
+    height: 14px;
+    background-color: var(--pz-text-subtle);
+}
+
+.dash-card-pin:hover i,
+.dash-card.is-pinned .dash-card-pin i {
+    background-color: var(--pz-accent);
+}
+
+/* A pinned card reads as pinned even before the button is noticed. */
+.dash-card.is-pinned {
+    border-color: rgba(var(--pz-accent-rgb), 0.45);
+}
+
+/* ---------- Card drag-and-drop (manual board order) ----------
+   Note cards can be dragged among their siblings (initCardReorder in
+   js/dashboard-page.js); the position goes to entries.dashboard_order. The
+   card being dragged fades, and the drop target shows an accent bar on the
+   edge the card will land on: left or right in the grid, top or bottom in
+   the list layout. The bar is a pseudo-element inside the card, which already
+   clips its overflow and is positioned, so it needs no extra wrapper. */
+.dash-note-card.is-dragging {
+    opacity: 0.45;
+    transform: none;
+    box-shadow: none;
+}
+
+.dash-note-card.drop-before::after,
+.dash-note-card.drop-after::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    width: 3px;
+    border-radius: 2px;
+    background: var(--pz-accent);
+    z-index: 3;
+    pointer-events: none;
+}
+
+.dash-note-card.drop-before::after {
+    left: 0;
+}
+
+.dash-note-card.drop-after::after {
+    right: 0;
+}
+
+.view-layout-list .dash-note-card.drop-before::after,
+.view-layout-list .dash-note-card.drop-after::after {
+    top: auto;
+    bottom: auto;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    height: 3px;
+}
+
+.view-layout-list .dash-note-card.drop-before::after {
+    top: 0;
+}
+
+.view-layout-list .dash-note-card.drop-after::after {
+    bottom: 0;
+}
+
+.dash-note-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    margin-right: 6px;
+    vertical-align: -2px;
+}
+
+.dash-note-icon-emoji {
+    width: auto;
+    height: auto;
+    font-size: 15px;
+    vertical-align: -1px;
+}
+
+/* Reuse note content classes from existing styles */
+/* Optional thumbnail (first image of the note) next to the excerpt */
+.dash-card-body {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    min-width: 0;
+    flex: 1;
+    min-height: 0;
+}
+
+.dash-card-body .board-card-excerpt,
+.dash-card-body .board-card-tasks {
+    flex: 1;
+    min-width: 0;
+}
+
+.dash-card-thumb {
+    flex-shrink: 0;
+    width: 62px;
+    height: 62px;
+    /* Shrink with the available card space instead of getting chopped by
+       the card's overflow (which would swallow the bottom of the frame) */
+    max-height: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--pz-surface-hover);
+    position: relative;
+}
+
+/* Frame drawn over the image: a plain border gets swallowed by the image
+   edge on subpixel boundaries (the bottom side disappears) */
+.dash-card-thumb::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(17, 24, 39, 0.16);
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+.dash-card-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.board-card-excerpt {
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--pz-text-muted);
+    overflow: hidden;
+    /* Whole-line clipping; -webkit-line-clamp misplaces its ellipsis around
+       the forced breaks (<br>) used to keep the note's line structure */
+    max-height: calc(3 * 1.5em);
+    word-break: break-word;
+    flex: 1;
+    min-height: 0;
+}
+
+.board-card-tasks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: #4b5563;
+    overflow: hidden;
+    flex: 1;
+    min-height: 0;
+}
+
+.board-card-tasks li {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-bottom: 5px;
+    word-break: break-word;
+}
+
+.board-card-tasks li .lucide {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    opacity: 0.7;
+}
+
+.board-card-tasks li.done span {
+    text-decoration: line-through;
+    opacity: 0.55;
+}
+
+.board-card-footer {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 5px;
+    margin-top: 8px;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.board-card-footer:empty {
+    display: none;
+}
+
+.board-card-tag {
+    font-size: 10.5px;
+    font-weight: 500;
+    padding: 1px 8px;
+    border-radius: 9px;
+    color: #4b5563;
+    background: var(--pz-surface-hover);
+    white-space: nowrap;
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Per-tag color (--tag-color set inline from the tag_colors setting) */
+.board-card-tag-colored {
+    background: color-mix(in srgb, var(--tag-color) 16%, #ffffff);
+    color: color-mix(in srgb, var(--tag-color) 72%, #1f2937);
+}
+
+.board-card-date {
+    margin-left: auto;
+    font-size: 10.5px;
+    color: var(--pz-text-subtle);
+    white-space: nowrap;
+}
+
+/* ---------- Empty state ---------- */
+
+.dashboard-empty {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--pz-text-muted);
+}
+
+.dashboard-empty .lucide {
+    width: 42px;
+    height: 42px;
+    opacity: 0.5;
+    margin-bottom: 10px;
+}
+
+body.dashboard-page .notifications-empty i {
+    width: 54px;
+    height: 54px;
+}
+
+.dashboard-empty p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+/* ---------- Dark mode ---------- */
+
+:root[data-theme='dark'] body.dashboard-page,
+body.dark-mode.dashboard-page {
+    background: var(--dm-content-bg);
+}
+
+:root[data-theme='dark'] .dashboard-topbar,
+body.dark-mode .dashboard-topbar {
+    background: var(--dm-content-bg);
+}
+
+:root[data-theme='dark'] .dashboard-filter-input,
+body.dark-mode .dashboard-filter-input {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+:root[data-theme='dark'] .dashboard-filter-clear:hover,
+body.dark-mode .dashboard-filter-clear:hover {
+    background: var(--dm-surface-hover);
+}
+
+:root[data-theme='dark'] #dashboardToggleFavorites.active .lucide-star,
+body.dark-mode #dashboardToggleFavorites.active .lucide-star {
+    color: #ffc107;
+}
+
+:root[data-theme='dark'] .dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star,
+body.dark-mode .dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star {
+    color: #ffc107;
+}
+
+:root[data-theme='dark'] .bc-current,
+body.dark-mode .bc-current {
+    color: var(--dm-text);
+}
+
+:root[data-theme='dark'] .bc-sep,
+body.dark-mode .bc-sep {
+    color: var(--dm-border);
+}
+
+:root[data-theme='dark'] .dash-card,
+body.dark-mode .dash-card {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+:root[data-theme='dark'] .dash-card:hover,
+body.dark-mode .dash-card:hover {
+    border-color: var(--pz-accent);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* Note color tint, dark theme: the same hue mixed into the dark surface
+   instead of white, so colored cards stay dark enough to read on. */
+:root[data-theme='dark'] .dash-card.has-note-color,
+body.dark-mode .dash-card.has-note-color {
+    background: color-mix(in srgb, var(--note-color) 22%, var(--dm-surface));
+    border-color: color-mix(in srgb, var(--note-color) 55%, var(--dm-surface));
+}
+
+:root[data-theme='dark'] .dash-card.has-note-color:hover,
+body.dark-mode .dash-card.has-note-color:hover {
+    background: color-mix(in srgb, var(--note-color) 30%, var(--dm-surface));
+    border-color: color-mix(in srgb, var(--note-color) 75%, var(--dm-surface));
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.45);
+}
+
+:root[data-theme='dark'] .dash-card.has-note-color .board-card-tag,
+body.dark-mode .dash-card.has-note-color .board-card-tag {
+    background: color-mix(in srgb, var(--note-color) 26%, var(--dm-surface));
+    color: var(--dm-text);
+}
+
+:root[data-theme='dark'] .dash-card-name,
+body.dark-mode .dash-card-name {
+    color: var(--dm-text);
+}
+
+:root[data-theme='dark'] .dash-card-count,
+body.dark-mode .dash-card-count {
+    color: var(--dm-text-muted);
+    background: var(--dm-surface-hover);
+}
+
+:root[data-theme='dark'] .dash-card-note-title,
+body.dark-mode .dash-card-note-title {
+    color: var(--dm-text);
+}
+
+:root[data-theme='dark'] .dash-card-pin i,
+body.dark-mode .dash-card-pin i {
+    background-color: var(--dm-text-muted);
+}
+
+/* Restated after the muted rule above, which is specific enough to win otherwise. */
+:root[data-theme='dark'] .dash-card-pin:hover i,
+body.dark-mode .dash-card-pin:hover i,
+:root[data-theme='dark'] .dash-card.is-pinned .dash-card-pin i,
+body.dark-mode .dash-card.is-pinned .dash-card-pin i {
+    background-color: #4aa8d8;
+}
+
+:root[data-theme='dark'] .board-card-excerpt,
+body.dark-mode .board-card-excerpt,
+:root[data-theme='dark'] .board-card-tasks,
+body.dark-mode .board-card-tasks {
+    color: var(--dm-text-muted);
+}
+
+:root[data-theme='dark'] .dash-card-thumb,
+body.dark-mode .dash-card-thumb {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+:root[data-theme='dark'] .dash-card-thumb::after,
+body.dark-mode .dash-card-thumb::after {
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+:root[data-theme='dark'] .board-view-btn,
+body.dark-mode .board-view-btn {
+    background: var(--dm-surface, #262626);
+    border-color: var(--dm-border, var(--dm-border));
+    color: var(--dm-text-muted, #a0a0a0);
+}
+
+:root[data-theme='dark'] .board-view-btn:hover,
+body.dark-mode .board-view-btn:hover {
+    border-color: var(--dm-accent, var(--dm-accent));
+    color: var(--dm-accent, var(--dm-accent));
+}
+
+:root[data-theme='dark'] .board-card-tag,
+body.dark-mode .board-card-tag {
+    color: var(--dm-text-muted);
+    background: var(--dm-surface-hover);
+}
+
+:root[data-theme='dark'] .board-card-tag-colored,
+body.dark-mode .board-card-tag-colored {
+    background: color-mix(in srgb, var(--tag-color) 26%, var(--dm-surface));
+    color: color-mix(in srgb, var(--tag-color) 70%, #ffffff);
+}
+
+:root[data-theme='dark'] .board-card-date,
+body.dark-mode .board-card-date {
+    color: var(--dm-text-muted);
+    opacity: 0.7;
+}
+
+:root[data-theme='dark'] .dashboard-empty,
+body.dark-mode .dashboard-empty {
+    color: var(--dm-text-muted);
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 800px) {
+
+    .dashboard-topbar {
+        gap: 6px;
+    }
+
+    .dashboard-topbar-filter {
+        width: 100%;
+    }
+
+    .dashboard-topbar-actions {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 10px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 0 2px;
+    }
+
+    /* Mobile keeps its original 2-column stretched layout: the column-count
+       setting is desktop-only (its button is hidden below 800px), so every
+       desktop-side declaration it relies on is reset here. */
+    .dashboard-grid-container,
+    #dashboardGrid.dash-grid-sectioned,
+    .dashboard-breadcrumb {
+        width: auto;
+        max-width: 100%;
+        margin-inline: 0;
+    }
+
+    /* Phones show 2 stretched columns at S/M. Large cards keep their own
+       250px minimum, which leaves room for only one column on a phone: that
+       single-column L layout is what this breakpoint produced before the
+       column setting existed, and it is preserved below. */
+    .dashboard-grid-container {
+        grid-template-columns: repeat(2, 1fr);
+        justify-content: stretch;
+        grid-auto-rows: 116px;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    .view-size-large .dashboard-grid-container {
+        grid-template-columns: repeat(auto-fill, minmax(min(var(--dash-col-min, 250px), 100%), 1fr));
+        grid-auto-rows: 210px;
+    }
+
+    .dash-card-name {
+        font-size: 12px;
+    }
+
+    .dash-card-note-title {
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+
+    .board-card-excerpt {
+        -webkit-line-clamp: 2;
+        font-size: 11.5px;
+    }
+
+    .dash-card-icon {
+        width: 38px;
+        height: 38px;
+    }
+
+    .dash-card-icon .lucide,
+    .dash-card-icon [class^="lucide-"],
+    .dash-card-icon [class*=" lucide-"] {
+        width: 22px;
+        height: 22px;
+    }
+
+    .dash-folder-card {
+        gap: 4px;
+        padding: 10px 8px;
+    }
+
+    .dash-note-card {
+        padding: 10px 12px;
+    }
+
+}
+
+/* ============================================
+   Multi-workspace scope (dashboard.php ?scope=...)
+   ============================================ */
+
+/* One titled section per workspace at the root of a multi-workspace scope */
+.dash-group-title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--pz-text);
+}
+
+.dash-group-title > .lucide {
+    width: 16px;
+    height: 16px;
+    color: var(--pz-text-subtle);
+}
+
+.dash-group-tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 1px 8px;
+    border-radius: 9px;
+    color: #4b5563;
+    background: var(--pz-surface-hover);
+}
+
+.dash-group-count {
+    margin-left: auto;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--pz-text-muted);
+}
+
+.dash-group-empty {
+    grid-column: 1 / -1;
+    padding: 6px 2px 10px;
+    font-size: 13px;
+    font-style: italic;
+    color: var(--pz-text-subtle);
+}
+
+/* Workspace badge on note cards of a multi-workspace view */
+.board-card-ws {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.board-card-ws .lucide {
+    width: 10px;
+    height: 10px;
+}
+
+/* The name gives way inside the chip (a flex container cannot ellipsise a
+   bare text node) */
+.board-card-ws .dash-ws-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Color dot of a workspace (workspaces.php > Color), wherever its name shows:
+   card badges, group titles, the breadcrumb and the scope selector */
+.dash-ws-dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.dash-group-dot,
+.bc-workspace-dot,
+.dashboard-scope-dot {
+    width: 12px;
+    height: 12px;
+}
+
+:root[data-theme='dark'] .dash-ws-dot,
+body.dark-mode .dash-ws-dot {
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+/* Workspace crumb ahead of the folder path */
+.bc-workspace {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 6px;
+    font-size: 14px;
+    color: var(--pz-text-muted);
+}
+
+.bc-workspace .lucide {
+    width: 15px;
+    height: 15px;
+}
+/* Scope modal: reuses the picker list (.move-task-list / .move-task-item
+   from modals/base.css) with checkboxes, plus tag chips */
+.dashboard-scope-section-title {
+    margin: 22px 0 8px;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: var(--pz-text-muted);
+}
+
+.dashboard-scope-body > .dashboard-scope-section-title:first-child {
+    margin-top: 4px;
+}
+
+.dashboard-scope-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.dashboard-scope-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border: 1px solid var(--pz-border);
+    border-radius: 14px;
+    background: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    color: inherit;
+    cursor: pointer;
+    transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.dashboard-scope-tag:hover {
+    background: var(--pz-surface-hover);
+}
+
+.dashboard-scope-tag.is-active {
+    background: #e0f2fe;
+    border-color: #7dd3fc;
+}
+
+/* Only some of the tag's workspaces are checked */
+.dashboard-scope-tag.is-partial {
+    border-color: #7dd3fc;
+}
+
+.dashboard-scope-tag .lucide {
+    width: 13px;
+    height: 13px;
+}
+
+.dashboard-scope-tag-count {
+    font-size: 11px;
+    color: var(--pz-text-muted);
+}
+
+.dashboard-scope-empty {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--pz-text-muted);
+}
+
+.dashboard-scope-empty a {
+    color: var(--pz-accent);
+}
+
+.dashboard-scope-list {
+    max-height: min(48vh, 360px);
+    margin-top: 0;
+}
+
+/* .modal-buttons only carries margin-top: auto, which collapses to 0 here
+   (the modal content is not a flex column), so the row would touch the list */
+.dashboard-scope-modal .modal-buttons {
+    margin-top: 20px;
+}
+
+/* Rows are divs (a button cannot nest the arrow button), so they need the
+   border-box the picker's <button> rows get for free */
+.move-task-item.dashboard-scope-row {
+    box-sizing: border-box;
+    cursor: default;
+}
+
+.dashboard-scope-row-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+}
+
+.dashboard-scope-row-main .lucide {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: var(--pz-text-subtle);
+}
+
+.dashboard-scope-row input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    flex-shrink: 0;
+    accent-color: var(--pz-accent);
+}
+
+.dashboard-scope-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dashboard-scope-row small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dashboard-scope-row-all {
+    font-weight: 600;
+    border-bottom: 1px solid var(--pz-border);
+    border-radius: 4px 4px 0 0;
+    margin-bottom: 4px;
+}
+
+/* "Open only this workspace": shown while the row is hovered or focused */
+.dashboard-scope-open {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: none;
+    color: var(--pz-text-subtle);
+    cursor: pointer;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.12s ease, background 0.12s ease;
+}
+
+.dashboard-scope-row:hover .dashboard-scope-open,
+.dashboard-scope-row:focus-within .dashboard-scope-open {
+    opacity: 1;
+}
+
+@media (hover: none) {
+    .dashboard-scope-open {
+        opacity: 1;
+    }
+}
+
+.dashboard-scope-open:hover {
+    background: var(--pz-surface-hover);
+    color: var(--pz-accent);
+}
+
+/* Modified-since menu entries carry an icon instead of a swatch */
+.dashboard-modified-filter-item .lucide {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    color: var(--pz-text-subtle);
+}
+
+/* Tag filter: a checklist, so the menu stays open while tags are combined */
+.dashboard-tag-filter-menu {
+    min-width: 220px;
+    max-width: min(320px, calc(100vw - 16px));
+    overflow-x: hidden;
+}
+
+/* Rows are labels, so they need the border-box a <button> gets for free
+   (width: 100% plus padding would otherwise overflow sideways) */
+.dashboard-tag-filter-item {
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+/* The search hides rows through the hidden attribute, which the display:
+   flex of .dashboard-color-filter-item would otherwise override */
+.dashboard-tag-filter-item[hidden],
+.dashboard-tag-filter-empty[hidden] {
+    display: none;
+}
+
+/* Search box pinned at the top while the list scrolls; the negative margin
+   cancels the menu padding so it sits flush against the edge */
+.dashboard-tag-filter-search-wrap {
+    position: sticky;
+    top: -6px;
+    z-index: 1;
+    margin: -6px 0 4px;
+    padding: 6px 0;
+    background: #ffffff;
+}
+
+.dashboard-tag-filter-search {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 6px 9px;
+    border: 1px solid var(--pz-border);
+    border-radius: 6px;
+    background: #ffffff;
+    color: inherit;
+    font: inherit;
+    font-size: 13px;
+    outline: none;
+}
+
+.dashboard-tag-filter-search:focus {
+    border-color: var(--pz-accent);
+}
+
+:root[data-theme='dark'] .dashboard-tag-filter-search-wrap,
+body.dark-mode .dashboard-tag-filter-search-wrap {
+    background: var(--dm-surface);
+}
+
+:root[data-theme='dark'] .dashboard-tag-filter-search,
+body.dark-mode .dashboard-tag-filter-search {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+.dashboard-tag-filter-check {
+    width: 15px;
+    height: 15px;
+    margin: 0;
+    flex-shrink: 0;
+    accent-color: var(--pz-accent);
+}
+
+.dashboard-tag-filter-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.dashboard-tag-filter-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dashboard-tag-filter-count {
+    font-size: 11px;
+    color: var(--pz-text-subtle);
+    flex-shrink: 0;
+}
+
+.dashboard-tag-filter-empty {
+    padding: 7px 9px;
+    font-size: 13px;
+    color: var(--pz-text-subtle);
+}
+
+:root[data-theme='dark'] .dashboard-tag-filter-count,
+body.dark-mode .dashboard-tag-filter-count,
+:root[data-theme='dark'] .dashboard-tag-filter-empty,
+body.dark-mode .dashboard-tag-filter-empty {
+    color: #a8a8a8;
+}
+
+/* Dark mode */
+:root[data-theme='dark'] .dash-group-title,
+body.dark-mode .dash-group-title {
+    color: var(--dm-text);
+}
+
+:root[data-theme='dark'] .dash-group-tag,
+body.dark-mode .dash-group-tag {
+    color: #c9d1d9;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme='dark'] .dashboard-scope-section-title,
+body.dark-mode .dashboard-scope-section-title,
+:root[data-theme='dark'] .dashboard-scope-empty,
+body.dark-mode .dashboard-scope-empty {
+    color: #a8a8a8;
+}
+
+:root[data-theme='dark'] .dashboard-scope-tag,
+body.dark-mode .dashboard-scope-tag {
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+:root[data-theme='dark'] .dashboard-scope-tag:hover,
+body.dark-mode .dashboard-scope-tag:hover {
+    background: var(--dm-surface-hover);
+}
+
+:root[data-theme='dark'] .dashboard-scope-tag.is-active,
+body.dark-mode .dashboard-scope-tag.is-active {
+    background: var(--dm-active);
+    border-color: #4da3d0;
+}
+
+:root[data-theme='dark'] .dashboard-scope-tag.is-partial,
+body.dark-mode .dashboard-scope-tag.is-partial {
+    border-color: #4da3d0;
+}
+
+:root[data-theme='dark'] .dashboard-scope-row-all,
+body.dark-mode .dashboard-scope-row-all {
+    border-bottom-color: var(--dm-border);
+}
+
+:root[data-theme='dark'] .dashboard-scope-row-main .lucide,
+body.dark-mode .dashboard-scope-row-main .lucide,
+:root[data-theme='dark'] .dashboard-scope-open,
+body.dark-mode .dashboard-scope-open {
+    color: #a8a8a8;
+}
+
+:root[data-theme='dark'] .dashboard-scope-open:hover,
+body.dark-mode .dashboard-scope-open:hover {
+    background: var(--dm-surface-hover);
+    color: var(--dm-accent, #60a5fa);
+}

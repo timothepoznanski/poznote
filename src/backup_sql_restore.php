@@ -94,6 +94,7 @@ function poznoteExecuteBackupSql($dbPath, array $statements) {
                 $db->exec('ROLLBACK');
             } catch (Throwable $rollbackError) {
                 // The connection is closed below anyway
+                error_log('backup_sql_restore: poznoteExecuteBackupSql() failed: ' . $rollbackError->getMessage());
             }
             throw $e;
         }
@@ -105,6 +106,7 @@ function poznoteExecuteBackupSql($dbPath, array $statements) {
                 $db->close();
             } catch (Throwable $closeError) {
                 // Ignore, the error to report is $e
+                error_log('backup_sql_restore: poznoteExecuteBackupSql() failed: ' . $closeError->getMessage());
             }
         }
         return ['success' => false, 'error' => $e->getMessage()];
