@@ -10,12 +10,8 @@
     color: #bababa;
 }
 
-/* Hidden elements */
-.hidden {
-    display: none;
-}
-
-/* Utility: force hidden (used by JS to toggle visibility without inline styles) */
+/* Hidden elements: JS toggles this instead of writing inline styles, so it has
+   to beat whatever display the element's own rules give it. */
 .hidden {
     display: none !important;
 }

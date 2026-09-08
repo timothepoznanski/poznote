@@ -929,56 +929,6 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
 /* Lock icon for default workspace */
 .locked-icon { color: #777; margin-left: 8px; font-size: 0.9rem; }
 
-.btn {
-    display: inline-block;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: 400;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 6px;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-sizing: border-box;
-    line-height: 1.4;
-}
-
-.btn-primary {
-    background: var(--pz-accent);
-    color: white;
-}
-
-.btn-primary:hover {
-    background: var(--pz-accent-hover);
-}
-
-.btn-success {
-    background: var(--pz-success);
-    color: white;
-}
-
-.btn-success:hover {
-    background: #218838;
-}
-
-.btn:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-}
-
-.btn-secondary {
-    background: #6c757d;
-    color: white;
-    /* margin-right: 15px; */
-}
-
-.btn-secondary:hover {
-    background: #5a6268;
-    color: white;
-    text-decoration: none;
-}
-
 .form-group input[type="text"], 
 .form-group input[type="password"] {
     width: 100%;

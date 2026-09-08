@@ -53,36 +53,8 @@ body {
 .action-buttons {
     text-align: center;
     margin-top: 30px;
-}
-
-.btn {
-    padding: 12px 25px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    text-decoration: none;
-    font-weight: 400;
+}.btn {
     margin: 0 10px;
-}
-
-.btn-primary {
-    background: var(--pz-accent);
-    color: white;
-}
-
-.btn-primary:hover {
-    background: var(--pz-accent-hover);
-    text-decoration: none;
-}
-
-.btn-secondary {
-    background: #6c757d;
-    color: white;
-}
-
-.btn-secondary:hover {
-    background: #5a6268;
 }
 
 /* Responsive adjustments for mobile: stack label/value and make inputs full-width */

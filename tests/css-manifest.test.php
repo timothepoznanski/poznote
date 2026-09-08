@@ -49,6 +49,25 @@ test('no page links the same stylesheet twice', function () {
     assertSame([], $dupes, 'stylesheet listed twice for one page');
 });
 
+test('every page loads the whole dark layer, not a slice of it', function () {
+    // 19 of the 39 pages used to carry only part of it, which is how
+    // markdown_syntax.php ended up rendering the icon sidebar with no dark
+    // styling at all: it linked two of the ten files. A page either themes
+    // itself or it does not; there is no reason to pick a subset.
+    $partial = [];
+    $full = poznoteCssGroups()['@theme'];
+    foreach (array_keys(poznoteCssManifest()) as $page) {
+        $dark = array_values(array_filter(
+            poznoteCssResolve($page),
+            fn($f) => str_starts_with($f, 'css/dark-mode/')
+        ));
+        if ($dark !== $full) {
+            $partial[] = $page . ' (' . count($dark) . '/' . count($full) . ')';
+        }
+    }
+    assertSame([], $partial, 'pages carrying an incomplete dark layer');
+});
+
 test('a page using the dark layer declares the theme tokens first', function () {
     // dark-mode/*.css consume --dm-* from dark-mode/variables.css. Loading any
     // of them without it, or after it, leaves the dark theme unstyled.

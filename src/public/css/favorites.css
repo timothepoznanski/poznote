@@ -167,24 +167,6 @@ body.favorites-page {
     color: #666;
 }
 
-.btn {
-    display: inline-block;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: 400;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 6px;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.btn-secondary {
-    background: #6c757d;
-    color: white;
-}
-
 .loading-spinner {
     text-align: center;
     padding: 40px;

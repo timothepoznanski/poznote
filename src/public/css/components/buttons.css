@@ -1,0 +1,127 @@
+/**
+ * The button system.
+ *
+ * `.btn` used to be defined in thirteen page stylesheets, and fifteen pages
+ * loaded two of them, so the class resolved to eleven different things
+ * depending on which file came last. Three of those results were nobody's
+ * intent: they mixed a flex definition with an inline-block one and ended up
+ * carrying `gap` and `align-items` on `display: inline-block`, where both do
+ * nothing.
+ *
+ * This file is that base, loaded before the page stylesheets so a page can
+ * still override it deliberately. Two choices worth recording:
+ *
+ * - `inline-flex` with a `gap`, because 91 buttons in the app hold a Lucide
+ *   icon next to their label and the inline-block variants aligned them by
+ *   whitespace.
+ * - `border-radius: 4px`, the radius `.modal-buttons button` already uses in
+ *   modals/base.css, which nearly every page loads.
+ *
+ * Dark styling lives with the rest of the theme, in dark-mode/components.css.
+ */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-sizing: border-box;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    /* Buttons do not inherit the body font, and no reset sets one for them:
+       without this, every <button class="btn"> fell back to the browser's UI
+       font while the <a class="btn"> next to it used Inter. */
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.4;
+    text-decoration: none;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    opacity: 0.8;
+}
+
+.btn:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Lucide renders as a font: the icon inside a button must not inherit its weight. */
+.btn i {
+    font-weight: 300 !important;
+}
+
+.btn.disabled,
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed !important;
+    background: #ccc !important;
+    color: #666 !important;
+    pointer-events: none;
+}
+
+/* The label colour is !important because these buttons are often <a>
+   elements and page stylesheets set link colours with descendant selectors
+   that would otherwise win. It is held off disabled buttons on purpose: a
+   disabled one is greyed out by its context (modals/base.css paints it pale),
+   and forcing white there would leave an unreadable label. */
+.btn-primary {
+    background: var(--pz-accent);
+}
+
+.btn-primary:not(:disabled) {
+    color: #fff !important;
+}
+
+.btn-primary:hover {
+    background: var(--pz-accent-hover);
+}
+
+.btn-secondary {
+    background: #6c757d;
+}
+
+.btn-secondary:not(:disabled) {
+    color: #fff !important;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-danger {
+    background: var(--pz-danger);
+}
+
+.btn-danger:not(:disabled) {
+    color: #fff !important;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+/* Destructive actions stay visibly locked until their confirmation is met. */
+.btn-danger:disabled,
+.btn-danger:disabled:hover {
+    background: var(--pz-danger);
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.btn-success {
+    background: var(--pz-success);
+}
+
+.btn-success:not(:disabled) {
+    color: #fff !important;
+}
+
+.btn-success:hover {
+    background: #218838;
+}

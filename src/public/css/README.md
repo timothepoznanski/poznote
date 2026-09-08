@@ -8,6 +8,7 @@ themes work and which variables a custom stylesheet can rely on.
 
 | Path | What it styles |
 |---|---|
+| `components/` | shared component bases, loaded before the page stylesheets on every page (`@components` in the manifest). A page may add properties on top; it must not redefine what the base owns. |
 | `base.css`, `layout.css`, `utilities.css`, `variables.css` | index.php shell: fonts, columns, hide/show helpers |
 | `sidebar.css`, `icon-sidebar*.css`, `searchbars.css`, `menus.css`, `toolbar.css`, `tabs.css`, `outline.css` | left column, icon rail, menus, note toolbar, tab bar |
 | `notes/`, `folders/` | note rows and folder rows of the sidebar tree, note editor (`notes/noteentry.css`), folder/note action menus (`folders/actions-menu.css`) |
@@ -70,6 +71,25 @@ themes work and which variables a custom stylesheet can rely on.
   files, next to the light rules in the same file.
 - The black theme only swaps the `--dm-*` values (`dark-mode/variables.css`),
   it has no rules of its own. Keep it that way.
+- Every page loads the whole `@theme` group, never a slice of it. Nineteen of
+  them used to load part of it, which is how `markdown_syntax.php` ended up
+  rendering the icon sidebar with no dark styling at all.
+
+## Components
+
+`components/buttons.css` owns `.btn` and its `-primary` / `-secondary` /
+`-danger` / `-success` variants. Before it existed the class was defined in
+thirteen page stylesheets, fifteen pages loaded two of them, and `.btn`
+resolved to eleven different things depending on which file came last; three of
+those results carried `gap` and `align-items` on a `display: inline-block`,
+where neither does anything.
+
+The rule for anything in `components/`: **a page stylesheet may add properties
+the base does not set (a margin, a hover transform), never redefine the ones it
+owns.** If a page really needs a different button, that is a new class, not a
+second `.btn`.
+
+`tools/css-check.php` does not enforce this yet, so it is on review.
 
 ## Variables
 

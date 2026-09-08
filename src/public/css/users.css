@@ -64,71 +64,8 @@ html[data-theme='dark'] {
     margin-bottom: 5px;
 }
 
-/* Buttons */
-.btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 400;
-    transition: all 0.2s;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    text-decoration: none;
-    line-height: 1.4;
-    box-sizing: border-box;
-    outline: none;
-}
-
-.btn:hover {
-    opacity: 0.8;
-}
-
-.btn:focus {
-    outline: none;
-    box-shadow: none;
-}
-
 .btn i {
     font-weight: 300 !important;
-}
-
-.btn-primary {
-    background: var(--pz-accent);
-    color: white !important;
-}
-
-.btn-primary:hover {
-    background: var(--pz-accent-hover);
-}
-
-.btn-danger {
-    background: var(--pz-danger);
-    color: white !important;
-}
-
-.btn-danger:hover {
-    background: #c82333;
-}
-
-/* Delete stays visibly locked until the username is typed */
-.btn-danger:disabled,
-.btn-danger:disabled:hover {
-    background: var(--pz-danger);
-    opacity: 0.45;
-    cursor: not-allowed;
-}
-
-.btn-secondary {
-    background: #6c757d;
-    color: white !important;
-}
-
-.btn-secondary:hover {
-    background: #5a6268;
 }
 
 .btn-small {
@@ -147,15 +84,6 @@ html[data-theme='dark'] {
 
 .btn-cancel-admin:hover {
     background-color: #c82333 !important;
-}
-
-.btn.disabled,
-.btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed !important;
-    background: #ccc !important;
-    color: #666 !important;
-    pointer-events: none;
 }
 
 /* Table */

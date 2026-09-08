@@ -1,48 +1,8 @@
-/**
- * Shared Page - Buttons & Modal
- *
- * Button styles and modal dialog.
- */
 
-.btn {
-    display: inline-block;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: 400;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 6px;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
-}
 
 .btn-sm {
     padding: 6px 12px;
     font-size: 13px;
-}
-
-.btn-secondary {
-    background: #6c757d;
-    color: white;
-}
-
-.btn-secondary:hover {
-    background: #5a6268;
-    color: white;
-    text-decoration: none;
-}
-
-.btn-danger {
-    background: #e04b4b;
-    color: #fff;
-    border: none;
-}
-
-.btn-danger:hover {
-    background: #c43b3b;
 }
 
 /* Action button of a share made inaccessible: same amber eye-off as the
@@ -66,26 +26,6 @@
     color: #6c757d;
     cursor: not-allowed;
     opacity: 1;
-}
-
-.btn-primary {
-    background: var(--pz-accent);
-    color: white;
-    border: none;
-}
-
-.btn-primary:hover {
-    background: #006994;
-}
-
-.btn-success {
-    background: #2e7d32;
-    color: #fff;
-    border: none;
-}
-
-.btn-success:hover {
-    background: #1b5e20;
 }
 
 .modal-content {

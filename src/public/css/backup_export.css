@@ -45,41 +45,9 @@ body {
     color: var(--pz-text);
     border-bottom: 2px solid var(--pz-accent);
     padding-bottom: 10px;
-}
-
-/* Boutons */
-.btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
+}.btn {
     margin-right: 10px;
     margin-bottom: 10px;
-    font-size: 14px;
-}
-
-.btn-primary {
-    background-color: var(--pz-accent);
-    color: white;
-}
-
-.btn-primary:hover {
-    background-color: var(--pz-accent-hover);
-}
-
-.btn-secondary {
-    background-color: #6c757d;
-    color: white;
-}
-
-.btn-secondary:hover {
-    background-color: #5a6268;
-}
-
-.btn:hover {
-    opacity: 0.8;
 }
 
 /* Backup spinner styles */

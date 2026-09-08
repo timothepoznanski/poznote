@@ -246,39 +246,8 @@ body.git-sync-page {
     outline: none;
     border-color: #6366f1;
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-}
-
-/* Buttons */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    font-weight: 400;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-primary {
-    background-color: var(--pz-accent);
-    color: #fff;
-}
-
-.btn-primary:hover {
-    background-color: var(--pz-accent-hover);
+}.btn-primary:hover {
     transform: translateY(-1px);
-}
-
-.btn-secondary {
-    background: #6c757d;
-    color: white;
-}
-
-.btn-secondary:hover {
-    background: #dee2e6;
 }
 
 /* Dark Mode */
