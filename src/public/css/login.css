@@ -430,19 +430,19 @@ input[type="password"]::placeholder {
    Dark Mode (Login Page)
    ============================================ */
 
-html[data-theme='dark'] body {
+:where(html[data-theme='dark']) body {
     background-color: var(--dm-bg);
     color: var(--dm-text);
     --text-muted: #a0aec0;
 }
 
-html[data-theme='dark'] label,
+:where(html[data-theme='dark']) label,
 html[data-theme='dark'] .remember-me-label {
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] input[type="text"],
-html[data-theme='dark'] input[type="password"] {
+:where(html[data-theme='dark']) input[type="text"],
+:where(html[data-theme='dark']) input[type="password"] {
     background-color: var(--dm-surface);
     border-color: var(--dm-border);
 }

@@ -12,5 +12,12 @@
     "src/modals/folder_icon_modal.php": "the folder colour palette a user picks from: data, not chrome",
     "src/public/js/graph.js": "categorical palette for graph nodes: data, not chrome",
     "src/public/js/public-note.js": "theme config handed to mermaid, a third-party renderer"
-  }
+  },
+  "_comment_carrier": "Generic dark rules allowed to keep the carrier's weight. A generic rule names no class or id of its own, so written plainly it outweighs any page rule that does. Each entry says why it is allowed to stay.",
+  "carrier_weight_allow": {
+    "dark-mode/icons.css": [
+      "[class*=\"lucide-\"]"
+    ]
+  },
+  "_comment_carrier_icons": "dark-mode/icons.css keeps its weight for now, deliberately. Neutralising it restores the colour of 61 icons that page rules paint with --pz-accent and that render generic grey in dark. But --pz-accent is a FILL token and does not switch with the theme, so those icons then sit at contrast 2.78 on the dark ground, under the 3:1 WCAG minimum for a graphic. 87 rules colour an icon with --pz-accent; giving them an accent that switches is a design decision, not a cleanup."
 }

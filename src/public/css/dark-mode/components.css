@@ -22,7 +22,7 @@ html[data-theme='dark'] .tag-item {
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] h1 {
+:where(html[data-theme='dark']) h1 {
     color: var(--dm-text) !important;
 }
 
@@ -575,17 +575,17 @@ html[data-theme='dark'] .color-palette-popup {
    Tables
    ============================================ */
 
-html[data-theme='dark'] table {
+:where(html[data-theme='dark']) table {
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] table th {
+:where(html[data-theme='dark']) table th {
     background-color: var(--dm-surface);
     color: var(--dm-text);
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] table td {
+:where(html[data-theme='dark']) table td {
     color: var(--dm-text);
     border-color: var(--dm-border);
 }
@@ -624,16 +624,16 @@ html[data-theme='dark'] ::-webkit-scrollbar {
     height: 12px;
 }
 
-html[data-theme='dark'] ::-webkit-scrollbar-track {
+:where(html[data-theme='dark']) ::-webkit-scrollbar-track {
     background: var(--dm-bg);
 }
 
-html[data-theme='dark'] ::-webkit-scrollbar-thumb {
+:where(html[data-theme='dark']) ::-webkit-scrollbar-thumb {
     background: var(--dm-border);
     border-radius: 6px;
 }
 
-html[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
+:where(html[data-theme='dark']) ::-webkit-scrollbar-thumb:hover {
     background: var(--dm-surface-raised);
 }
 

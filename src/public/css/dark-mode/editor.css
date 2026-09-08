@@ -208,26 +208,26 @@ html[data-theme='dark'] .note-attachment-preview-caption a:focus {
    Text Selection & Highlighting
    ============================================ */
 
-html[data-theme='dark'] ::selection {
+:where(html[data-theme='dark']) ::selection {
     background-color: var(--dm-accent-soft);
     color: var(--pz-text-inverse);
 }
 
-html[data-theme='dark'] ::-moz-selection {
+:where(html[data-theme='dark']) ::-moz-selection {
     background-color: var(--dm-accent-soft);
     color: var(--pz-text-inverse);
 }
 
 /* Search highlights */
-html[data-theme='dark'] mark,
+:where(html[data-theme='dark']) mark,
 html[data-theme='dark'] .highlight {
     background-color: var(--dm-warning-soft);
     color: var(--dm-warning);
 }
 
 /* Highlighting inside code blocks (search/highlight marks, not syntax) */
-html[data-theme='dark'] pre mark[style*="background"],
-html[data-theme='dark'] code mark[style*="background"],
+:where(html[data-theme='dark']) pre mark[style*="background"],
+:where(html[data-theme='dark']) code mark[style*="background"],
 html[data-theme='dark'] .code-block mark[style*="background"] {
     background-color: var(--dm-warning-soft) !important;
     background-image: none !important;
@@ -235,7 +235,7 @@ html[data-theme='dark'] .code-block mark[style*="background"] {
 }
 
 /* Yellow highlighter tool */
-html[data-theme='dark'] [style*="background-color: rgb(255, 224, 102)"],
+:where(html[data-theme='dark']) [style*="background-color: rgb(255, 224, 102)"],
 html[data-theme='dark'] [style*="background-color:#ffe066"],
 html[data-theme='dark'] [style*="background-color: #ffe066"] {
     background-color: var(--dm-warning-soft) !important;
@@ -271,7 +271,7 @@ html[data-theme='dark'] .noteentry [style*="background-color: #dee2e6"] {
 }
 
 /* Horizontal rules */
-html[data-theme='dark'] hr {
+:where(html[data-theme='dark']) hr {
     border-color: var(--dm-border);
 }
 

@@ -248,8 +248,8 @@ pre.code-block:not([data-language]) {
     padding-top: 28px;
 }
 
-html[data-theme='dark'] pre[data-language]::before,
-html[data-theme='dark'] pre:has(code[data-language])::before,
+:where(html[data-theme='dark']) pre[data-language]::before,
+:where(html[data-theme='dark']) pre:has(code[data-language])::before,
 html[data-theme='dark'] pre.code-block:not([data-language])::before {
     color: var(--dm-text-bright);
     background: rgba(var(--pz-highlight-rgb), 0.12);

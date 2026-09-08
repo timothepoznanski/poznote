@@ -127,6 +127,15 @@ them and a background there breaks their native rendering.
 - no empty rule. A declaration block with nothing in it says nothing to anyone
   but the parser, and an empty `@keyframes` is how the first of those two bugs
   stayed hidden.
+- a generic dark rule may not outweigh its light twin. Page stylesheets load
+  after the light bases and before the dark layer, so at equal specificity a page
+  rule wins in light and loses in dark; and the carrier itself adds (0,1,1), so
+  `html[data-theme='dark'] a` is (0,2,1) against its light twin `a` at (0,0,1).
+  A dark rule that names no class or id of its own and paints a colour must wrap
+  its carrier in `:where()`, which weighs nothing. It still beats its light twin
+  by load order, exactly as in light, and it stops beating the page rules that
+  the light twin loses to. Exceptions live in `carrier_weight_allow` in the
+  baseline with a reason;
 - the same colour ratchet over the markup. The CSS one guards `src/public/css`
   and nothing else, so it read clean while 534 literals sat in the project's own
   PHP and JS: inline `style` attributes, `<style>` blocks in a page, colours

@@ -430,6 +430,78 @@ if ($markupBaseline !== null && $markup > $markupBaseline) {
     echo "colour literals in PHP/JS: $markup (baseline $markupBaseline) — lower the baseline to hold the gain\n";
 }
 
+// ---------------------------------------------------------------------------
+// A generic dark rule must not outweigh its light twin.
+//
+// Page stylesheets load AFTER the light bases and BEFORE the dark layer, so at
+// equal specificity a page rule wins in light and loses in dark. On top of that
+// the carrier itself adds (0,1,1): html[data-theme='dark'] a is (0,2,1) while
+// its light twin `a` is (0,0,1), two whole steps heavier. Anything the light
+// rule loses to, the dark one beats.
+//
+// That is not theory. The icon rail declares its own muted colour and got the
+// link accent in dark and not in light. The dashboard's dialog buttons stayed
+// transparent only because someone had spelled the carrier :root. A disabled
+// primary button took a page's grey label onto its accent fill.
+//
+// So: a dark rule that targets no class or id of its own and paints a colour
+// has to wrap its carrier in :where(), which weighs nothing. It still wins over
+// its light twin, by load order, exactly as in light. Rules that name a class
+// are not affected: they are meant to be specific.
+$carrier = "/^\s*(?<where>:where\()?html(?:\.theme-black)?\[data-theme='(?:dark|light)'\]\)?\s*/";
+$paints  = '/(^|[;{\s])(color|background|background-color|border[a-z-]*color|fill|stroke|opacity)\s*:/i';
+$allow = is_file($baselineFile)
+    ? (json_decode(file_get_contents($baselineFile), true)['carrier_weight_allow'] ?? [])
+    : [];
+foreach ($files as $file) {
+    $rel = str_starts_with($file, $root) ? 'src/public/css' . substr($file, strlen($root)) : $file;
+    $short = ltrim(str_replace('src/public/css', '', $rel), '/');
+    $css = preg_replace('!/\*.*?\*/!s', '', (string) file_get_contents($file));
+    if (!preg_match_all('/([^{}]+)\{([^{}]*)\}/', $css, $rules, PREG_SET_ORDER)) {
+        continue;
+    }
+    foreach ($rules as $r) {
+        $prelude = trim(preg_replace('/\s+/', ' ', $r[1]));
+        if ($prelude === '' || $prelude[0] === '@' || !preg_match($paints, $r[2])) {
+            continue;
+        }
+        foreach (explode(',', $prelude) as $sel) {
+            $sel = trim($sel);
+            if (!preg_match($carrier, $sel, $m)) {
+                continue;
+            }
+            if (($m['where'] ?? '') !== '') {
+                continue;                       // deja neutralise
+            }
+            $rest = trim(preg_replace($carrier, '', $sel));
+            if ($rest === '') {
+                continue;                       // le porteur lui-meme, pas une regle generique
+            }
+            // Specificite du reste. :where() ne pese rien; :not(), :is() et :has()
+            // pesent le contenu de leur argument, donc :has(body.tasks-page) rend
+            // une regle specifique et non generique.
+            $counted = preg_replace('/:where\([^()]*(?:\([^()]*\)[^()]*)*\)/', '', $rest);
+            $counted = preg_replace('/:(?:not|is|has)\(/', ' ', $counted);
+            // Nommer une classe ou un id, c'est viser quelque chose: pas generique.
+            if (preg_match('/[.#][\w-]/', $counted)) {
+                continue;
+            }
+            $weight = preg_match_all('/\[[^\]]+\]/', $counted)
+                    + preg_match_all('/(?<!:):(?!not|is|where|has|before|after|first-line|first-letter|placeholder|marker|selection|backdrop)[\w-]+/', $counted);
+            if ($weight > 1) {
+                continue;                       // deja assez specifique pour ne pas detourner
+            }
+            if (isset($allow[$short]) && in_array($rest, $allow[$short], true)) {
+                continue;
+            }
+            echo "$rel: \"$sel\" is a generic dark rule painting a colour. Wrap the carrier "
+               . "in :where() so it weighs what its light twin weighs, or add it to "
+               . "carrier_weight_allow in tools/css-check.baseline.json with a reason.\n";
+            $errors++;
+        }
+    }
+}
+
 if ($errors === 0) {
     echo count($files) . " stylesheet(s) balanced, $literals colour literal(s) in CSS, $markup in PHP/JS\n";
     exit(0);
