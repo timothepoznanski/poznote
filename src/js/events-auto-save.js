@@ -591,55 +591,6 @@ function emergencySave(noteId) {
 // ============================================================================
 
 /**
- * Restore note content from localStorage draft
- * @param {number|string} noteId - The note ID to restore
- * @param {string} content - Draft content
- * @param {string} title - Draft title
- * @param {string} tags - Draft tags
- */
-function restoreDraft(noteId, content, title, tags) {
-    const entryElem = document.getElementById('entry' + noteId);
-    const titleInput = document.getElementById('inp' + noteId);
-    const tagsInput = document.getElementById('tags' + noteId);
-
-    if (entryElem && content) {
-        const noteType = entryElem.getAttribute('data-note-type') || 'note';
-
-        if (noteType === 'note') {
-            // Fix drafts that stored escaped media tags
-            content = content
-                .replace(/&lt;audio\s+([^&]+)&gt;\s*&lt;\/audio&gt;/gi, '<audio $1></audio>')
-                .replace(/&lt;video\s+([^&]+)&gt;\s*&lt;\/video&gt;/gi, '<video $1></video>')
-                .replace(/&lt;iframe\s+([^&]+)&gt;\s*&lt;\/iframe&gt;/gi, '<iframe $1></iframe>');
-        }
-
-        entryElem.innerHTML = content;
-
-        if (typeof window.stripRuntimeHeadingAnchorsFromElement === 'function') {
-            window.stripRuntimeHeadingAnchorsFromElement(entryElem);
-        }
-
-        // Convert any restored <audio> elements to iframes for contenteditable
-        if (typeof window.convertNoteAudioToIframes === 'function') {
-            window.convertNoteAudioToIframes();
-        }
-
-        // Fix existing audio iframes to use audio_player.php
-        if (typeof window.fixAudioIframes === 'function') {
-            window.fixAudioIframes();
-        }
-    }
-
-    if (titleInput && title) {
-        titleInput.value = title;
-    }
-
-    if (tagsInput && tags) {
-        tagsInput.value = tags;
-    }
-}
-
-/**
  * Clear localStorage draft for a specific note
  * @param {number|string} noteId - The note ID to clear draft for
  */

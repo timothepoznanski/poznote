@@ -20,20 +20,6 @@ let notesWithClickableTags = new Set();
 // ============================================
 
 /**
- * Update the tags count in the sidebar
- * @param {number} delta - The amount to change the count by (can be positive or negative)
- */
-function updateTagsCount(delta) {
-    const countEl = document.getElementById('count-tags');
-    if (countEl) {
-        // System folders display count without parentheses, e.g. "5" not "(5)"
-        const currentCount = parseInt(countEl.textContent.trim(), 10) || 0;
-        const newCount = Math.max(0, currentCount + delta);
-        countEl.textContent = newCount.toString();
-    }
-}
-
-/**
  * Refresh the tags count from the server
  * Fetches the actual count of unique tags and updates the sidebar badge
  */
@@ -81,26 +67,6 @@ function initializeClickableTags() {
         const noteId = tagsInput.id.replace('tags', '');
         convertTagsToEditable(noteId);
     });
-}
-
-/**
- * Extract note ID from note container
- * @param {HTMLElement} container - The container element to search in
- * @returns {string|null} The note ID or null if not found
- */
-function extractNoteIdFromContainer(container) {
-    // Look for an element with an ID that contains the note ID
-    const titleInput = container.querySelector('input[id^="inp"]');
-    if (titleInput) {
-        return titleInput.id.replace('inp', '');
-    }
-
-    const tagsInput = container.querySelector('input[id^="tags"]');
-    if (tagsInput) {
-        return tagsInput.id.replace('tags', '');
-    }
-
-    return null;
 }
 
 /**
@@ -790,38 +756,6 @@ function handleTagInputBlur(e, noteId, container) {
 // ============================================
 // Tag Display and Input Updates
 // ============================================
-
-/**
- * Show a temporary error message for tag input
- * @param {HTMLInputElement} input - The input element to show error for
- * @param {string} message - The error message to display
- */
-function showTagError(input, message) {
-    // Remove existing error message
-    const existingError = input.parentNode.querySelector('.tag-error-message');
-    if (existingError) {
-        existingError.remove();
-    }
-
-    // Create error message element
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'tag-error-message';
-    errorDiv.textContent = message;
-    errorDiv.style.cssText = 'color: #dc3545; font-size: 12px; margin-top: 2px; position: absolute; z-index: 1000; background: white; padding: 2px 5px; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);';
-
-    // Insert after input
-    input.parentNode.insertBefore(errorDiv, input.nextSibling);
-
-    // Remove error after 3 seconds
-    setTimeout(() => {
-        if (errorDiv && errorDiv.parentNode) {
-            errorDiv.remove();
-        }
-    }, 3000);
-
-    // Clear the input
-    input.value = '';
-}
 
 /**
  * Update the hidden tags input with current tags

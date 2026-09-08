@@ -450,7 +450,6 @@ function showInputModal(title, placeholder, defaultValue, callback) {
     var titleElement = document.getElementById('inputModalTitle');
     var inputElement = document.getElementById('inputModalInput');
     var confirmBtn = document.getElementById('inputModalConfirmBtn');
-    var labelElem = document.getElementById('inputModalLabel');
 
     titleElement.textContent = title;
     inputElement.placeholder = placeholder || '';

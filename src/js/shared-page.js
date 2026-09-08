@@ -833,27 +833,6 @@
         .catch(function(error) { showShareToast(config.txtError + ': ' + error.message); });
     }
 
-    function updateNotePassword(noteId, password) {
-        return fetch('/api/v1/notes/' + noteId + '/share', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            credentials: 'same-origin',
-            body: JSON.stringify({ password: password })
-        })
-        .then(function(response) { return response.json(); })
-        .then(function(data) {
-            if (data.error) throw new Error(data.error);
-            var note = sharedNotes.find(function(n) { return n.note_id === noteId; });
-            if (note) {
-                note.hasPassword = data.hasPassword ? 1 : 0;
-                note.passwordValue = data.passwordValue || '';
-            }
-            mergeItems();
-            applyFilter();
-        })
-        .catch(function(error) { showShareToast(config.txtError + ': ' + error.message); });
-    }
-
     function updateNoteShareSettings(noteId, updates) {
         var payload = {};
         if (Object.prototype.hasOwnProperty.call(updates, 'custom_token') && updates.custom_token) {
@@ -949,21 +928,6 @@
         .catch(function(error) { showShareToast(config.txtError + ': ' + error.message); });
     }
 
-    function updateFolderPassword(folderId, password) {
-        return fetch('/api/v1/folders/' + folderId + '/share', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            credentials: 'same-origin',
-            body: JSON.stringify({ password: password })
-        })
-        .then(function(response) { return response.json(); })
-        .then(function(data) {
-            if (data.error) throw new Error(data.error);
-            window.location.reload();
-        })
-        .catch(function(error) { showShareToast(config.txtError + ': ' + error.message); });
-    }
-
     function updateFolderShareSettings(folderId, updates) {
         var payload = {};
         if (Object.prototype.hasOwnProperty.call(updates, 'custom_token') && updates.custom_token) {
@@ -1028,15 +992,6 @@
     }
 
     // ========== UI Helpers ==========
-
-    function checkEmpty() {
-        var emptyMessage = document.getElementById('emptyMessage');
-        var container = document.getElementById('sharedItemsContainer');
-        if (allItems.length === 0) {
-            if (container) container.innerHTML = '';
-            if (emptyMessage) emptyMessage.style.display = 'block';
-        }
-    }
 
     function buildNotePublicUrl(token) {
         return new URL(encodeURIComponent(token), window.location.origin + '/').href;

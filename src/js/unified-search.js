@@ -205,7 +205,6 @@ class SearchManager {
         const hasNotesSearchParam = urlParams.get('search') && urlParams.get('search').trim() !== '';
 
         // Check hidden field values: flags vs term-bearing inputs
-        const hasNotesFlag = elements.hiddenInputs.notesFlag?.value === '1';
         const hasTagsFlag = elements.hiddenInputs.tagsFlag?.value === '1';
 
         // If a recent user toggle was performed, avoid restoring from URL

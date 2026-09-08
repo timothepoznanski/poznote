@@ -27,22 +27,6 @@ function shouldReuseCurrentPwaWindow(targetUrl) {
     }
 }
 
-function openUrlWithPwaAwareness(targetUrl) {
-    if (!targetUrl) {
-        return;
-    }
-
-    if (shouldReuseCurrentPwaWindow(targetUrl)) {
-        window.location.href = targetUrl;
-        return;
-    }
-
-    var popup = window.open(targetUrl, '_blank', 'noopener');
-    if (!popup) {
-        window.location.href = targetUrl;
-    }
-}
-
 function bindPwaAwareLink(linkElement, targetUrl) {
     if (!linkElement || !targetUrl) {
         return;

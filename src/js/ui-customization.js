@@ -21,42 +21,6 @@
         'toolbar:btn-home': true
     };
 
-    var CUSTOMIZABLE_TOOLBAR_BUTTONS = {
-        'btn-bold': 'format',
-        'btn-italic': 'format',
-        'btn-underline': 'format',
-        'btn-strikethrough': 'format',
-        'btn-link': 'format',
-        'btn-color': 'format',
-        'btn-highlight': 'format',
-        'btn-list-ul': 'format',
-        'btn-list-ol': 'format',
-        'btn-task-list': 'format',
-        'btn-task-remove': 'format',
-        'btn-text-height': 'format',
-        'btn-code': 'format',
-        'btn-inline-code': 'format',
-        'btn-eraser': 'format',
-        'btn-search-replace': 'action',
-        'btn-checklist': 'action',
-        'btn-tasklist-actions': 'action',
-        'btn-favorite': 'action',
-        'btn-publish': 'action',
-        'btn-attachment': 'action',
-        'btn-reminder': 'action',
-        'btn-open-new-tab': 'action',
-        'btn-duplicate': 'action',
-        'btn-move': 'action',
-        'btn-create-linked-note': 'action',
-        'btn-download': 'action',
-        'btn-convert': 'action',
-        'btn-trash': 'action',
-        'btn-info': 'action',
-        'btn-note-width': 'action',
-        'btn-split-view': 'action',
-        'btn-audio': 'action'
-    };
-
     var CREATE_MENU_OPTION_SELECTORS = {
         'card:create-note-card': '.create-note-option[data-type="html"]',
         'card:create-markdown-note-card': '.create-note-option[data-type="markdown"]',
@@ -174,19 +138,6 @@
         }
 
         return isVisibleElement(item);
-    }
-
-    function getCustomizableToolbarClass(button) {
-        if (!button || !button.classList) return null;
-
-        for (var i = 0; i < button.classList.length; i++) {
-            var className = button.classList[i];
-            if (CUSTOMIZABLE_TOOLBAR_BUTTONS[className]) {
-                return className;
-            }
-        }
-
-        return null;
     }
 
     function syncToolbarFormattingVisibility() {

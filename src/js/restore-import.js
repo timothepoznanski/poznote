@@ -989,19 +989,6 @@ function toggleAdvancedImport() {
     }
 }
 
-// Database Import Functions
-function showImportConfirmation() {
-    const fileInput = document.getElementById('backup_file');
-    if (!fileInput.files.length) {
-        showCustomAlert(
-            tr('restore_import.alerts.no_sql_selected_title', 'No SQL File Selected'),
-            tr('restore_import.alerts.no_sql_selected_body', 'Please select a SQL file before proceeding with the database import.')
-        );
-        return;
-    }
-    document.getElementById('importConfirmModal').style.display = 'flex';
-}
-
 function hideImportConfirmation() {
     document.getElementById('importConfirmModal').style.display = 'none';
 }
@@ -1019,19 +1006,6 @@ function proceedWithImport() {
     }
 }
 
-// Notes Import Functions
-function showNotesImportConfirmation() {
-    const fileInput = document.getElementById('notes_file');
-    if (!fileInput.files.length) {
-        showCustomAlert(
-            tr('restore_import.alerts.no_zip_selected_title', 'No ZIP File Selected'),
-            tr('restore_import.alerts.no_zip_selected_notes', 'Please select a ZIP file containing HTML notes before proceeding with the import.')
-        );
-        return;
-    }
-    document.getElementById('notesImportConfirmModal').style.display = 'flex';
-}
-
 function hideNotesImportConfirmation() {
     document.getElementById('notesImportConfirmModal').style.display = 'none';
 }
@@ -1044,19 +1018,6 @@ function proceedWithNotesImport() {
     if (notesForm) {
         notesForm.submit();
     }
-}
-
-// Attachments Import Functions
-function showAttachmentsImportConfirmation() {
-    const fileInput = document.getElementById('attachments_file');
-    if (!fileInput.files.length) {
-        showCustomAlert(
-            tr('restore_import.alerts.no_zip_selected_title', 'No ZIP File Selected'),
-            tr('restore_import.alerts.no_zip_selected_attachments', 'Please select a ZIP file containing attachments before proceeding with the import.')
-        );
-        return;
-    }
-    document.getElementById('attachmentsImportConfirmModal').style.display = 'flex';
 }
 
 function hideAttachmentsImportConfirmation() {
@@ -1193,21 +1154,6 @@ function showIndividualNotesImportSpinner() {
     } catch (e) { /* ignore */ }
 }
 
-function hideIndividualNotesImportSpinner() {
-    try {
-        const spinner = document.getElementById('individualNotesImportSpinner');
-        const btn = document.getElementById('individualNotesImportBtn');
-        if (spinner) {
-            spinner.style.display = 'none';
-            spinner.setAttribute('aria-hidden', 'true');
-        }
-        if (btn) {
-            btn.disabled = false;
-            btn.setAttribute('aria-disabled', 'false');
-        }
-    } catch (e) { /* ignore */ }
-}
-
 // Direct Copy Restore Functions
 let directCopyRestorePendingForm = null;
 let directCopyRestoreSubmitting = false;
@@ -1280,37 +1226,6 @@ function proceedWithDirectCopyRestore() {
             form.submit();
         }, 0);
     }
-}
-
-// Restore spinner functions
-function showRestoreSpinner() {
-    try {
-        var spinner = document.getElementById('restoreSpinner');
-        var btn = document.getElementById('completeRestoreBtn');
-        if (spinner) {
-            spinner.style.display = 'inline-flex';
-            spinner.setAttribute('aria-hidden', 'false');
-        }
-        if (btn) {
-            btn.disabled = true;
-            btn.setAttribute('aria-disabled', 'true');
-        }
-    } catch (e) { /* ignore */ }
-}
-
-function hideRestoreSpinner() {
-    try {
-        var spinner = document.getElementById('restoreSpinner');
-        var btn = document.getElementById('completeRestoreBtn');
-        if (spinner) {
-            spinner.style.display = 'none';
-            spinner.setAttribute('aria-hidden', 'true');
-        }
-        if (btn) {
-            btn.disabled = false;
-            btn.setAttribute('aria-disabled', 'false');
-        }
-    } catch (e) { /* ignore */ }
 }
 
 // Load workspaces for individual notes import

@@ -92,10 +92,6 @@ function setupDragDropEvents() {
     });
 }
 
-function isPublicWorkspaceReadOnly() {
-    return !!(document.body && document.body.classList.contains('public-workspace-readonly'));
-}
-
 // True when the drag comes from outside the browser (OS files) rather than
 // from a note/folder being moved inside the app. Those drops are handled by
 // js/sidebar-file-import.js, so the folder handlers must ignore them.

@@ -4,57 +4,6 @@
  */
 
 // Global variables for folder hierarchy
-var folderHierarchyData = null;
-
-/**
- * Show dropdown menu for create button
- * @param {number} folderId - The parent folder ID
- * @param {string} folderName - The parent folder name
- * @param {Event} event - The click event
- */
-function showCreateDropdown(folderId, folderName, event) {
-    event.stopPropagation();
-
-    // Remove existing dropdown
-    var existing = document.getElementById('create-dropdown-menu');
-    if (existing) {
-        existing.remove();
-        return; // Toggle behavior
-    }
-
-    // Create dropdown menu
-    var dropdown = document.createElement('div');
-    dropdown.id = 'create-dropdown-menu';
-    dropdown.className = 'dropdown-menu';
-
-    var folderKey = 'folder_' + folderId;
-
-    var html = '';
-    html += '<div class="dropdown-item" onclick="showCreateNoteInFolderModal(' + folderId + ', \'' + escapeForJs(folderName) + '\'); closeCreateDropdown();">';
-    html += '<i class="lucide lucide-file"></i> Note';
-    html += '</div>';
-    // Allow subfolder creation for all folders
-    html += '<div class="dropdown-item" onclick="createSubfolder(\'' + folderKey + '\'); closeCreateDropdown();">';
-    html += '<i class="lucide lucide-folder"></i> Subfolder';
-    html += '</div>';
-
-    dropdown.innerHTML = html;
-
-    // Position the dropdown
-    var button = event.currentTarget;
-    var rect = button.getBoundingClientRect();
-    dropdown.style.position = 'absolute';
-    dropdown.style.top = (rect.bottom + window.scrollY) + 'px';
-    dropdown.style.left = (rect.left + window.scrollX) + 'px';
-    dropdown.style.zIndex = '10000';
-
-    document.body.appendChild(dropdown);
-
-    // Close dropdown when clicking outside
-    setTimeout(function () {
-        document.addEventListener('click', closeCreateDropdown);
-    }, 10);
-}
 
 /**
  * Close the create dropdown menu
@@ -65,14 +14,6 @@ function closeCreateDropdown() {
         dropdown.remove();
     }
     document.removeEventListener('click', closeCreateDropdown);
-}
-
-/**
- * Escape string for use in JavaScript
- */
-function escapeForJs(str) {
-    if (!str) return '';
-    return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
 }
 
 /**
@@ -176,33 +117,4 @@ function getFolderPath(folderId, callback) {
         .catch(function (error) {
             console.error('Error getting folder path:', error);
         });
-}
-
-/**
- * Display folder breadcrumb
- */
-function displayFolderBreadcrumb(folderId) {
-    getFolderPath(folderId, function (path, depth) {
-        var breadcrumbDiv = document.getElementById('folderBreadcrumb');
-        if (!breadcrumbDiv) return;
-
-        if (depth === 0) {
-            breadcrumbDiv.innerHTML = '';
-            breadcrumbDiv.style.display = 'none';
-            return;
-        }
-
-        var parts = path.split('/');
-        var html = '<i class="lucide lucide-folder-open"></i> ';
-
-        parts.forEach(function (part, index) {
-            if (index > 0) {
-                html += ' <i class="lucide lucide-chevron-right"></i> ';
-            }
-            html += '<span class="breadcrumb-item">' + escapeHtml(part) + '</span>';
-        });
-
-        breadcrumbDiv.innerHTML = html;
-        breadcrumbDiv.style.display = 'block';
-    });
 }

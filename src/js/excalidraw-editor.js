@@ -182,10 +182,6 @@
         updateSaveButtonsState();
     }
 
-    function getTheme() {
-        return normalizeTheme(getPoznoteTheme());
-    }
-
     function getPoznoteTheme() {
         try {
             var theme = normalizePoznoteTheme(window.__poznoteForcedTheme)

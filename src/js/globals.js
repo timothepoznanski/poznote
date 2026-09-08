@@ -5,7 +5,6 @@ var selectedFolder = null; // Nom du dossier (pour affichage uniquement)
 // Initialize from window.selectedWorkspace if available (set by PHP), otherwise empty string
 var selectedWorkspace = (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : '';
 var currentNoteFolder = null;
-var currentNoteFolderId = null; // ID du dossier de la note actuelle
 var currentNoteIdForAttachments = null;
 
 // Variables for moving notes to folders
@@ -13,24 +12,6 @@ var allFolders = [];
 
 // Map pour accès rapide folder ID -> folder data
 var folderMap = new Map();
-
-// Obtenir un dossier par son ID
-function getFolderById(id) {
-    return folderMap.get(parseInt(id));
-}
-
-// Mettre à jour le cache des dossiers
-function updateFolderCache(folders) {
-    folderMap.clear();
-    if (Array.isArray(folders)) {
-        folders.forEach(function (folder) {
-            if (folder && folder.id !== undefined) {
-                folderMap.set(parseInt(folder.id), folder);
-            }
-        });
-    }
-    allFolders = folders || [];
-}
 
 function getSelectedWorkspace() {
     // Return workspace from global variable (set by PHP from URL/database)

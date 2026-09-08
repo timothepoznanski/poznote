@@ -452,65 +452,6 @@ function getCurrentNoteId() {
     return null;
 }
 
-// Helper function to insert HTML at cursor position
-function insertHtmlAtCursor(html) {
-    let selection = window.getSelection();
-    let insertionSuccessful = false;
-
-    // If there's a current selection, use it
-    if (selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
-        const fragment = range.createContextualFragment(html);
-        range.deleteContents();
-        range.insertNode(fragment);
-        range.collapse(false);
-        selection.removeAllRanges();
-        selection.addRange(range);
-        insertionSuccessful = true;
-    } else {
-        // No selection, try to find the note content area and insert at the end
-        const noteContentElement = document.querySelector('.note-content[contenteditable="true"]') ||
-            document.querySelector('#note-content[contenteditable="true"]') ||
-            document.querySelector('[contenteditable="true"]');
-
-        if (noteContentElement) {
-            noteContentElement.focus();
-
-            // Create a range at the end of the content
-            const range = document.createRange();
-            range.selectNodeContents(noteContentElement);
-            range.collapse(false); // Move to end
-
-            // Insert the HTML
-            const fragment = range.createContextualFragment(html);
-            range.insertNode(fragment);
-            range.collapse(false);
-
-            // Update selection
-            selection = window.getSelection();
-            selection.removeAllRanges();
-            selection.addRange(range);
-
-            insertionSuccessful = true;
-        }
-    }
-
-    // If we still couldn't insert, show a notification
-    if (!insertionSuccessful) {
-        if (window.showNotificationPopup) {
-            showNotificationPopup(
-                excaTr('excalidraw.errors.insert_area_not_found', {}, 'Could not find note content area to insert diagram'),
-                'warning'
-            );
-        } else {
-            window.showError(
-                excaTr('excalidraw.errors.insert_area_not_found', {}, 'Could not find note content area to insert diagram'),
-                excaTr('excalidraw.titles.insertion_error', {}, 'Insertion Error')
-            );
-        }
-    }
-}
-
 // Download Excalidraw diagram as PNG image
 function downloadExcalidrawImage(noteId) {
     // Get the PNG file path for this note

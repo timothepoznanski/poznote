@@ -1116,14 +1116,6 @@
         return null;
     }
 
-    // The object the picker is currently editing, note or folder.
-    function currentColorTarget() {
-        if (colorTargetNoteId === null) return null;
-        return colorTargetType === 'folder'
-            ? findFolderById(colorTargetNoteId)
-            : findNoteById(colorTargetNoteId);
-    }
-
     function markSelectedSwatch() {
         var grid = document.getElementById('noteColorGrid');
         if (!grid) return;
