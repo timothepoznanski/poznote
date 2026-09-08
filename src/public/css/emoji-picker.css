@@ -96,10 +96,10 @@
 }
 
 .emoji-picker::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
+    background: var(--pz-scrollbar);
     border-radius: 10px;
 }
 
 .emoji-picker::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
+    background: var(--pz-scrollbar-hover);
 }

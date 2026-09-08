@@ -305,13 +305,13 @@ body.app-tab-reordering {
 
 [data-theme="dark"] .app-tab-close-all {
     background: var(--dm-content-bg, var(--dm-content-bg));
-    border-color: var(--dm-border, #334155);
+    border-color: var(--dm-border, var(--dm-border));
     color: var(--dm-text-muted);
     box-shadow: 9px 0 0 0 var(--dm-tabbar-bg);
 }
 
 [data-theme="dark"] .app-tab-close-all:hover {
-    background: var(--dm-surface-hover, #334155);
+    background: var(--dm-surface-hover, var(--dm-surface-hover));
     color: var(--dm-danger);
 }
 
@@ -338,7 +338,7 @@ body.app-tab-reordering {
 }
 
 [data-theme="dark"] .app-tab-context-item-danger:hover {
-    background-color: #3d2020;
+    background-color: var(--dm-content-bg);
 }
 
 [data-theme="dark"] .app-tab-context-separator {

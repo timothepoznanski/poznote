@@ -240,14 +240,14 @@ html[data-theme='dark'] .modal .modal-info-note {
 }
 
 .modal-buttons button.btn-cancel {
-    background-color: #6c757d;
+    background-color: var(--pz-neutral);
     color: var(--pz-text-inverse);
-    border: 1px solid #6c757d;
+    border: 1px solid var(--pz-neutral);
 }
 
 .modal-buttons button.btn-cancel:hover {
-    background-color: #5a6268;
-    border-color: #545b62;
+    background-color: var(--pz-neutral-hover);
+    border-color: var(--pz-neutral-hover);
 }
 
 .modal-buttons button.btn-success {
@@ -675,7 +675,7 @@ html[data-theme='dark'] .modal .modal-info-note {
 }
 
 .modal-footer .btn-secondary {
-    background: #6c757d;
+    background: var(--pz-neutral);
     color: var(--pz-text-inverse);
 }
 
@@ -705,7 +705,7 @@ html[data-theme='dark'] .modal .modal-info-note {
    ============================================ */
 
 .modal .btn-disabled {
-    background: #cccccc !important;
+    background: var(--pz-disabled) !important;
     color: var(--pz-text-muted) !important;
     border: none;
     padding: 8px 12px;
@@ -715,7 +715,7 @@ html[data-theme='dark'] .modal .modal-info-note {
 }
 
 .modal .btn-disabled:hover {
-    background: #cccccc !important;
+    background: var(--pz-disabled) !important;
     cursor: not-allowed !important;
 }
 

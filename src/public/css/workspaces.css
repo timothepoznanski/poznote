@@ -859,9 +859,9 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
 }
 
 .btn-background {
-    background-color: #6c757d;
+    background-color: var(--pz-neutral);
     color: var(--pz-text-inverse);
-    border-color: #6c757d;
+    border-color: var(--pz-neutral);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -869,8 +869,8 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
 }
 
 .btn-background:hover {
-    background-color: #5a6268;
-    border-color: #545b62;
+    background-color: var(--pz-neutral-hover);
+    border-color: var(--pz-neutral-hover);
 }
 
 @keyframes spin {

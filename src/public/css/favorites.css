@@ -213,7 +213,7 @@ body.favorites-page {
 }
 
 [data-theme="dark"] .btn-unfavorite {
-    background-color: #3b1d1d;
+    background-color: var(--dm-content-bg);
     border-color: var(--dm-danger-soft);
     color: var(--dm-danger);
 }

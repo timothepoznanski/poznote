@@ -494,7 +494,7 @@
 }
 
 #updateModal .btn-cancel {
-    background-color: #6c757d !important;
+    background-color: var(--pz-neutral) !important;
     color: var(--pz-text-inverse) !important;
     border: none !important;
     min-width: 120px;
@@ -504,7 +504,7 @@
 }
 
 #updateModal .btn-cancel:hover {
-    background-color: #5a6268 !important;
+    background-color: var(--pz-neutral-hover) !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3);
 }
@@ -653,14 +653,14 @@
    ============================================ */
 
 #deleteFolderModal .btn-cancel {
-    background-color: #6c757d !important;
+    background-color: var(--pz-neutral) !important;
     color: var(--pz-text-inverse) !important;
-    border: 1px solid #6c757d !important;
+    border: 1px solid var(--pz-neutral) !important;
 }
 
 #deleteFolderModal .btn-cancel:hover {
-    background-color: #5a6268 !important;
-    border-color: #545b62 !important;
+    background-color: var(--pz-neutral-hover) !important;
+    border-color: var(--pz-neutral-hover) !important;
 }
 
 #deleteFolderModal .btn-danger {
@@ -686,14 +686,14 @@
 }
 
 #deleteConfirmModal .btn-cancel {
-    background-color: #6c757d !important;
+    background-color: var(--pz-neutral) !important;
     color: var(--pz-text-inverse) !important;
-    border: 1px solid #6c757d !important;
+    border: 1px solid var(--pz-neutral) !important;
 }
 
 #deleteConfirmModal .btn-cancel:hover {
-    background-color: #5a6268 !important;
-    border-color: #545b62 !important;
+    background-color: var(--pz-neutral-hover) !important;
+    border-color: var(--pz-neutral-hover) !important;
 }
 
 #deleteConfirmModal .btn-danger {
@@ -719,14 +719,14 @@
 }
 
 #emptyTrashConfirmModal .btn-cancel {
-    background-color: #6c757d !important;
+    background-color: var(--pz-neutral) !important;
     color: var(--pz-text-inverse) !important;
-    border: 1px solid #6c757d !important;
+    border: 1px solid var(--pz-neutral) !important;
 }
 
 #emptyTrashConfirmModal .btn-cancel:hover {
-    background-color: #5a6268 !important;
-    border-color: #545b62 !important;
+    background-color: var(--pz-neutral-hover) !important;
+    border-color: var(--pz-neutral-hover) !important;
 }
 
 #emptyTrashConfirmModal .btn-danger {
@@ -762,14 +762,14 @@
 }
 
 #deleteAttachmentConfirmModal .btn-cancel {
-    background-color: #6c757d !important;
+    background-color: var(--pz-neutral) !important;
     color: var(--pz-text-inverse) !important;
-    border: 1px solid #6c757d !important;
+    border: 1px solid var(--pz-neutral) !important;
 }
 
 #deleteAttachmentConfirmModal .btn-cancel:hover {
-    background-color: #5a6268 !important;
-    border-color: #545b62 !important;
+    background-color: var(--pz-neutral-hover) !important;
+    border-color: var(--pz-neutral-hover) !important;
 }
 
 #restoreConfirmModal .btn-primary {

@@ -552,7 +552,7 @@ html[data-theme='dark'] .workspace-checkbox-item {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color: var(--pz-disabled);
     transition: .4s;
 }
 

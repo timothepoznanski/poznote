@@ -32,7 +32,7 @@
 }
 
 [data-theme="dark"] .error-message {
-    background-color: #3a1f1f;
+    background-color: var(--dm-content-bg);
     border-left-color: var(--dm-danger-hover);
     color: var(--dm-danger);
 }

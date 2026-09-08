@@ -506,12 +506,12 @@ body.public-note-page {
 }
 
 .public-task-edit-cancel {
-    background: #6c757d;
+    background: var(--pz-neutral);
     color: var(--pz-text-inverse);
 }
 
 .public-task-edit-cancel:hover {
-    background: #5a6268;
+    background: var(--pz-neutral-hover);
 }
 
 /* Important task styling for public view */
@@ -734,13 +734,13 @@ html[data-theme='dark'] .theme-toggle-btn:hover {
 }
 
 html[data-theme='dark'] .public-note audio {
-    background: #5f6368;
+    background: var(--dm-neutral);
     border-color: var(--dm-border-light);
 }
 
 html[data-theme='dark'] .public-note audio::-webkit-media-controls-enclosure,
 html[data-theme='dark'] .public-note audio::-webkit-media-controls-panel {
-    background: #5f6368;
+    background: var(--dm-neutral);
 }
 
 html[data-theme='dark'] .public-note .content pre {
@@ -911,11 +911,11 @@ html[data-theme='dark'] .public-note .content [style*="color:black"] {
 html[data-theme='dark'] .public-note-editor-markdown {
     background: var(--dm-surface, var(--dm-content-bg));
     color: var(--dm-text, var(--dm-text-bright));
-    border-color: var(--dm-border, #475569);
+    border-color: var(--dm-border, var(--dm-border-light));
 }
 
 html[data-theme='dark'] .public-note-editor-html {
-    border-color: var(--dm-border, #475569);
+    border-color: var(--dm-border, var(--dm-border-light));
 }
 
 html[data-theme='dark'] .public-edit-save-btn {

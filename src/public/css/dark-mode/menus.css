@@ -69,7 +69,7 @@ html[data-theme='dark'] .slash-date-picker-today-btn:hover {
 }
 
 html[data-theme='dark'] .slash-date-picker-remove-btn {
-    background: #3d1f1f;
+    background: var(--dm-content-bg);
     border-color: var(--dm-danger-hover);
     color: var(--dm-danger);
 }

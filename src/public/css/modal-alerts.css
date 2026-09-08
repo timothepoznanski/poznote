@@ -201,7 +201,7 @@ html[data-theme='dark'] .alert-modal,
 
 html[data-theme='dark'] .alert-modal-header,
 .dark-mode .alert-modal-header {
-    border-color: #4a5568;
+    border-color: var(--dm-border-light);
 }
 
 html[data-theme='dark'] .alert-modal-title,
@@ -365,7 +365,7 @@ html[data-theme='dark'] .progress-container,
 /* Dark mode spinner */
 html[data-theme='dark'] .spinner,
 .dark-mode .spinner {
-    border-color: #4a5568;
+    border-color: var(--dm-border-light);
     border-top-color: var(--pz-accent);
 }
 

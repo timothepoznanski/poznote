@@ -204,7 +204,7 @@ html[data-theme='dark'] .task-due-chip:hover {
 }
 
 html[data-theme='dark'] .task-due-chip.overdue {
-    background: #3d1f1f;
+    background: var(--dm-content-bg);
     border-color: var(--dm-danger-hover);
     color: var(--dm-danger);
 }
@@ -248,7 +248,7 @@ html[data-theme='dark'] .tasklist-progress-bar {
 /* Important task styling for dark mode */
 html[data-theme='dark'] .task-item.important {
     border-color: var(--dm-danger-hover);
-    background: #3d1f1f;
+    background: var(--dm-content-bg);
 }
 
 html[data-theme='dark'] .task-item.important .task-text {
@@ -364,13 +364,13 @@ html[data-theme='dark'] .btn-rename:hover {
 }
 
 html[data-theme='dark'] .btn-background {
-    background-color: #6c757d;
+    background-color: var(--dm-neutral);
     color: var(--pz-text-inverse);
-    border-color: #6c757d;
+    border-color: var(--dm-neutral);
 }
 
 html[data-theme='dark'] .btn-background:hover {
-    background-color: #5a6268;
+    background-color: var(--dm-neutral-hover);
     border-color: var(--dm-border-light);
 }
 
@@ -687,7 +687,7 @@ html[data-theme='dark'] .ai-chat-msg-assistant {
 }
 
 html[data-theme='dark'] .ai-chat-msg-error {
-    background: #3a1f22;
+    background: var(--dm-content-bg);
     color: var(--dm-danger);
     border-color: var(--dm-danger-soft);
 }
@@ -718,7 +718,7 @@ html[data-theme='dark'] .ai-chat-context {
 
 html[data-theme='dark'] .ai-chat-notice {
     color: var(--dm-warning-hover);
-    background: #322a15;
+    background: var(--dm-content-bg);
     border-color: var(--dm-warning-soft);
 }
 

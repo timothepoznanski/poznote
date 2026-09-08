@@ -952,7 +952,7 @@ html[data-theme="dark"]:has(body.tasks-page) {
 }
 
 [data-theme="dark"] .task-due-chip.overdue {
-    background-color: #3b1d1d;
+    background-color: var(--dm-content-bg);
     border-color: var(--dm-danger-soft);
     color: var(--dm-danger);
 }
@@ -1035,7 +1035,7 @@ html[data-theme="dark"]:has(body.tasks-page) {
 
 [data-theme="dark"] .tasks-cal-chip.overdue {
     border-left-color: var(--dm-danger-soft);
-    background: #3b1d1d;
+    background: var(--dm-content-bg);
 }
 
 [data-theme="dark"] .tasks-cal-modal-empty {

@@ -60,7 +60,7 @@
 .btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    background: #ccc;
+    background: var(--pz-disabled);
     color: var(--pz-text-muted);
 }
 
@@ -87,12 +87,12 @@
 }
 
 .btn-secondary {
-    background: #6c757d;
+    background: var(--pz-neutral);
     color: var(--pz-text-inverse);
 }
 
 .btn-secondary:hover {
-    background: #5a6268;
+    background: var(--pz-neutral-hover);
 }
 
 .btn-danger {

@@ -58,6 +58,13 @@
     /* Lucide icons are CSS masks painted with currentColor, so an icon's colour
        is just `color`. This is the grey the old filter chain produced. */
     --pz-icon: #808080;
+    /* Neutral controls. The secondary button's grey was written literally, even
+       inside components/buttons.css, so a palette could not reach it. */
+    --pz-neutral: #6c757d;         /* secondary button, neutral chip */
+    --pz-neutral-hover: #5a6268;
+    --pz-disabled: #cccccc;        /* the fill of a control that cannot be used */
+    --pz-scrollbar: #c1c1c1;
+    --pz-scrollbar-hover: #a8a8a8;
     /* White was written as #fff in 268 places, for two opposite jobs: the sheet
        a page is drawn on, and the label sitting on top of a filled control.
        They need separate names, because a theme that darkens the first must not
@@ -92,6 +99,11 @@
     /* Lucide icons are CSS masks painted with currentColor, so their colour is
        just `color`. These two are the greys the old `filter: invert(80%)` /
        `invert(90%)` produced, kept exactly so nothing moves. */
+    --dm-neutral: #5f6368;
+    --dm-neutral-hover: #6f757a;
+    --dm-disabled: #4a4a4a;
+    --dm-scrollbar: #4a4a4a;
+    --dm-scrollbar-hover: #5f6368;
     --dm-icon: #cccccc;
     --dm-icon-hover: #e6e6e6;
     /* The semantic families again, in the values a dark ground needs: a fill

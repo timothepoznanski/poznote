@@ -16,12 +16,12 @@ body.trash-page::-webkit-scrollbar {
 }
 
 body.trash-page::-webkit-scrollbar-thumb {
-    background-color: #c1c1c1 !important;
+    background-color: var(--pz-scrollbar) !important;
     border-radius: 8px !important;
 }
 
 body.trash-page::-webkit-scrollbar-thumb:hover {
-    background-color: #a8a8a8 !important;
+    background-color: var(--pz-scrollbar-hover) !important;
 }
 
 html {
@@ -42,12 +42,12 @@ body.trash-page html::-webkit-scrollbar {
 }
 
 body.trash-page html::-webkit-scrollbar-thumb {
-    background-color: #c1c1c1 !important;
+    background-color: var(--pz-scrollbar) !important;
     border-radius: 8px !important;
 }
 
 body.trash-page html::-webkit-scrollbar-thumb:hover {
-    background-color: #a8a8a8 !important;
+    background-color: var(--pz-scrollbar-hover) !important;
 }
 
 body.trash-page {

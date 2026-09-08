@@ -333,7 +333,7 @@
 /* Dark Mode support for Tags Modal */
 html[data-theme='dark'] .tags-modal-item {
     background: var(--dm-content-bg);
-    border-color: #334155;
+    border-color: var(--dm-border);
 }
 
 html[data-theme='dark'] .tags-modal-item-name {
@@ -347,6 +347,6 @@ html[data-theme='dark'] .tags-modal-item-name:focus {
 
 html[data-theme='dark'] #tagsModalInput {
     background: var(--dm-content-bg);
-    border-color: #334155;
+    border-color: var(--dm-border);
     color: var(--dm-text-bright);
 }

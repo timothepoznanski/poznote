@@ -553,15 +553,15 @@ html[data-theme='dark'] .nm-folder-option-selected {
 }
 
 :root[data-theme='dark'] .nm-folder-header:hover {
-    background: var(--folder-header-hover, #273549);
+    background: var(--folder-header-hover, var(--dm-surface));
 }
 
 :root[data-theme='dark'] .nm-folder-section {
-    border-color: var(--border-color, #334155);
+    border-color: var(--border-color, var(--dm-border));
 }
 
 :root[data-theme='dark'] .nm-notes-list {
-    border-top-color: var(--border-color, #334155);
+    border-top-color: var(--border-color, var(--dm-border));
 }
 
 :root[data-theme='dark'] .nm-note-row {
@@ -578,13 +578,13 @@ html[data-theme='dark'] .nm-folder-option-selected {
 
 :root[data-theme='dark'] .nm-bulk-bar {
     background: var(--bulk-bar-bg, var(--dm-content-bg));
-    border-color: var(--bulk-bar-border, #334155);
+    border-color: var(--bulk-bar-border, var(--dm-border));
 }
 
 :root[data-theme='dark'] #nmBulkBar .nm-bulk-btn {
     background: transparent;
     color: var(--dm-text-muted);
-    border-color: #475569;
+    border-color: var(--dm-border-light);
 }
 
 :root[data-theme='dark'] #nmBulkBar .nm-bulk-btn:hover {
@@ -596,7 +596,7 @@ html[data-theme='dark'] .nm-folder-option-selected {
 :root[data-theme='dark'] .nm-bulk-select {
     background: var(--action-bg, var(--dm-content-bg));
     color: var(--action-color, var(--dm-text-bright));
-    border-color: var(--action-border, #475569);
+    border-color: var(--action-border, var(--dm-border-light));
 }
 
 :root[data-theme='dark'] .nm-bulk-select option {

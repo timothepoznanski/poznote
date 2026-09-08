@@ -91,7 +91,7 @@ html[data-theme='dark'] .kanban-card-due {
 }
 
 html[data-theme='dark'] .kanban-card-due.overdue {
-    background: #3d1f1f;
+    background: var(--dm-content-bg);
     border-color: var(--dm-danger-hover);
     color: var(--dm-danger);
 }

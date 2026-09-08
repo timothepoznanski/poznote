@@ -25,7 +25,7 @@
 }
 
 .settings-container > a.btn-secondary {
-    background: #6c757d !important;
+    background: var(--pz-neutral) !important;
     color: var(--pz-text-inverse) !important;
     border: none !important;
 }
