@@ -70,7 +70,7 @@
 }
 
 .backlink-link:hover {
-    color: #005a8b !important;
+    color: var(--pz-accent-hover) !important;
     text-decoration: underline;
 }
 

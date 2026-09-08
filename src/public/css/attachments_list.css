@@ -56,7 +56,7 @@ body.attachments-page {
     border: 1px solid #dbeafe;
     border-radius: 6px;
     background: #eff6ff;
-    color: #1e40af;
+    color: var(--pz-accent-strong);
     font-size: 0.88rem;
     line-height: 1.45;
     box-sizing: border-box;

@@ -341,7 +341,7 @@
 }
 
 [data-theme="dark"] .folder-name-path {
-    color: #5daaff;
+    color: var(--dm-accent);
 }
 
 .folder-name-path i {

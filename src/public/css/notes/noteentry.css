@@ -376,7 +376,7 @@ textarea:focus {
 .note-attachment-preview-file-card:hover,
 .note-attachment-preview-file-card:focus {
     background: var(--pz-surface-hover);
-    color: #005a8b;
+    color: var(--pz-accent-hover);
     text-decoration: none;
 }
 
@@ -438,7 +438,7 @@ textarea:focus {
 
 .note-attachment-preview-caption a:hover,
 .note-attachment-preview-caption a:focus {
-    color: #005a8b;
+    color: var(--pz-accent-hover);
     text-decoration: underline;
 }
 

@@ -118,7 +118,7 @@ html[data-theme='dark'] .note-creation-loading-content {
 }
 
 .alert-modal-icon.info {
-    color: #2196f3;
+    color: var(--pz-link);
 }
 
 .alert-modal-icon.success {

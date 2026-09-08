@@ -10,7 +10,7 @@
 }
 
 [data-theme="dark"] .note-link {
-    color: #4d9eff;
+    color: var(--dm-accent);
 }
 
 [data-theme="dark"] .url-input {
@@ -126,7 +126,7 @@
 }
 
 [data-theme="dark"] .note-name {
-    color: #4d9eff;
+    color: var(--dm-accent);
 }
 
 [data-theme="dark"] .note-token {

@@ -361,7 +361,7 @@ html[data-theme='dark'] .move-task-item small {
 }
 
 html[data-theme='dark'] .move-task-item.move-task-create {
-    color: #60a5fa;
+    color: var(--dm-accent);
 }
 
 /* ============================================

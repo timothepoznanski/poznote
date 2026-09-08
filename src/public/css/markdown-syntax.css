@@ -172,7 +172,7 @@ html[data-theme='dark'] .syntax-card p {
 }
 
 html[data-theme='dark'] .syntax-card-category {
-    color: var(--dm-accent, #58a6ff);
+    color: var(--dm-accent, var(--dm-accent));
 }
 
 html[data-theme='dark'] .syntax-card pre {

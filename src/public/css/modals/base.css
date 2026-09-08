@@ -222,7 +222,7 @@ html[data-theme='dark'] .modal-buttons button.btn-primary:disabled:hover {
     padding: 10px 12px;
     border-radius: 8px;
     background: #eff6ff;
-    color: #1e40af;
+    color: var(--pz-accent-strong);
     font-size: 0.85rem;
     line-height: 1.45;
 }

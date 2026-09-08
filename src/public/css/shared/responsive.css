@@ -309,7 +309,7 @@
     }
 
     [data-theme="dark"] .note-name {
-        color: #5daaff;
+        color: var(--dm-accent);
     }
 
     [data-theme="dark"] .note-token {

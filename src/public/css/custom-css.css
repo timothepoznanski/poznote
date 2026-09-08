@@ -46,7 +46,7 @@
     border-radius: 8px;
     font-size: 0.95rem;
     font-weight: 500;
-    color: #0056b3;
+    color: var(--pz-accent-strong);
     word-break: break-all;
 }
 
@@ -97,6 +97,6 @@ html[data-theme='dark'] .no-css-text {
 html[data-theme='dark'] .custom-css-current-file {
     background: rgba(var(--pz-accent-rgb), 0.1);
     border-color: rgba(var(--pz-accent-rgb), 0.3);
-    color: #4db8ff;
+    color: var(--dm-accent);
 }
 

@@ -1885,5 +1885,5 @@ body.dashboard-page .notifications-empty i {
 
 :root[data-theme='dark'] .dashboard-scope-open:hover {
     background: var(--dm-surface-hover);
-    color: var(--dm-accent, #60a5fa);
+    color: var(--dm-accent, var(--dm-accent));
 }

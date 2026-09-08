@@ -269,7 +269,7 @@ html[data-theme='dark'] .task-item.important .task-text a:hover {
 /* Task order buttons */
 html[data-theme='dark'] .btn-task-order.active {
     background-color: rgba(var(--pz-accent-rgb), 0.2);
-    color: #4da6ff;
+    color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .btn-task-order:hover {

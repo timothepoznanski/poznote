@@ -77,8 +77,8 @@ html[data-theme='dark'] .folder-filter-banner-name i {
 
 html[data-theme='dark'] .folder-filter-banner-name i.folder-filter-banner-icon:hover,
 html[data-theme='dark'] .folder-filter-banner-name i.folder-filter-banner-icon:focus-visible {
-    color: var(--dm-accent, #4dabf7);
-    background-color: var(--dm-accent, #4dabf7);
+    color: var(--dm-accent, var(--dm-accent));
+    background-color: var(--dm-accent, var(--dm-accent));
 }
 
 html[data-theme='dark'] .search-date-field label {

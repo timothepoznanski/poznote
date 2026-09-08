@@ -402,12 +402,12 @@ html.theme-black[data-theme='dark'] .outline-nav-link {
 
 html[data-theme='dark'] .outline-nav-link:hover {
     background: var(--dm-sidebar-surface);
-    color: #4db8ff;
+    color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .outline-nav-link.active {
     background: var(--dm-active);
-    color: #4db8ff;
+    color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .outline-empty {
@@ -427,7 +427,7 @@ html[data-theme='dark'] .toggle-outline-btn {
 
 html[data-theme='dark'] .toggle-outline-btn:hover {
     background: var(--dm-surface-hover);
-    color: #4db8ff;
+    color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .toggle-outline-btn:disabled,

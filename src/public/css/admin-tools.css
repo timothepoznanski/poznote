@@ -114,7 +114,7 @@ html[data-theme='dark'] .btn-view-files {
 html[data-theme='dark'] .btn-view-files:hover {
     background: rgba(255,255,255,.1);
     border-color: #3b82f6;
-    color: #60a5fa;
+    color: var(--dm-accent);
 }
 
 /* Modal Styles */

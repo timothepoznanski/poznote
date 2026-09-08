@@ -68,7 +68,7 @@
 }
 
 .attachment-link:hover {
-    color: #005a8b !important;
+    color: var(--pz-accent-hover) !important;
     border-color: var(--pz-border-strong);
 }
 

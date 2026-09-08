@@ -80,7 +80,7 @@
 }
 
 .table-picker-insert-btn:hover {
-    background: #006399;
+    background: var(--pz-accent-hover);
 }
 
 .table-picker-insert-btn:active {

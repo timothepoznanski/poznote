@@ -51,7 +51,7 @@ html[data-theme='dark'] .slash-date-picker-day:hover {
 
 html[data-theme='dark'] .slash-date-picker-day.today {
     background: rgba(59, 130, 246, 0.25);
-    color: #60a5fa;
+    color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .slash-date-picker-day.selected,
@@ -61,7 +61,7 @@ html[data-theme='dark'] .slash-date-picker-day.selected:hover {
 }
 
 html[data-theme='dark'] .slash-date-picker-today-btn {
-    color: #60a5fa;
+    color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .slash-date-picker-today-btn:hover {

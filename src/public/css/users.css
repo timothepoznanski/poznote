@@ -587,7 +587,7 @@ html[data-theme='dark'] .users-table td {
 .account-access-own-label {
     display: none;
     background: var(--pz-accent-soft);
-    color: #0b5cad;
+    color: var(--pz-accent-strong);
 }
 
 .account-access-own .account-access-own-label {

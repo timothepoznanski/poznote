@@ -429,13 +429,13 @@ a.workspace-name-link:focus-visible {
 .workspace-share-link {
     display: inline-block;
     margin-top: 10px;
-    color: #0f5f93;
+    color: var(--pz-accent-hover);
     font-size: 13px;
     word-break: break-all;
 }
 
 .workspace-share-link:hover {
-    color: #084b75;
+    color: var(--pz-accent-hover);
 }
 
 .shared-edit-token-modal .shared-edit-token-modal-content {
@@ -497,7 +497,7 @@ a.workspace-name-link:focus-visible {
 .shared-edit-token-modal .workspace-share-modal-url {
     display: block;
     width: 100%;
-    color: #0f5f93;
+    color: var(--pz-accent-hover);
     font-size: 14px;
     line-height: normal;
     overflow: hidden;
@@ -531,7 +531,7 @@ a.workspace-name-link:focus-visible {
 }
 
 .shared-edit-token-modal a.workspace-share-modal-url:hover {
-    color: #084b75;
+    color: var(--pz-accent-hover);
     text-decoration: underline;
 }
 

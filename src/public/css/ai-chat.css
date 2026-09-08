@@ -382,7 +382,7 @@ a.ai-chat-header-btn {
 }
 
 .ai-chat-send-btn:hover {
-    background: #006699;
+    background: var(--pz-accent-hover);
 }
 
 .ai-chat-send-btn:disabled {
