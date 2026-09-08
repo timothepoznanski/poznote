@@ -239,13 +239,13 @@ a.note-internal-link:hover {
 }
 
 [data-theme="dark"] .note-reference-modal-header h3 {
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 [data-theme="dark"] .note-reference-search-input {
     background: var(--dm-surface, var(--dm-surface));
     border-color: var(--dm-border, var(--dm-border));
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 [data-theme="dark"] .note-reference-search-input:focus {
@@ -256,7 +256,7 @@ a.note-internal-link:hover {
 [data-theme="dark"] .note-reference-search input {
     background: var(--dm-surface, var(--dm-surface));
     border-color: var(--dm-border, var(--dm-border));
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 [data-theme="dark"] .note-reference-search input:focus {
@@ -278,19 +278,19 @@ a.note-internal-link:hover {
 }
 
 [data-theme="dark"] .note-reference-item-title {
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 [data-theme="dark"] .note-reference-heading {
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 [data-theme="dark"] .note-reference-icon {
-    color: #888;
+    color: var(--dm-text-subtle);
 }
 
 [data-theme="dark"] .note-reference-item-folder {
-    color: #888;
+    color: var(--dm-text-subtle);
 }
 
 [data-theme="dark"] a.note-internal-link {

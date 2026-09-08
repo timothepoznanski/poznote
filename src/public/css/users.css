@@ -237,7 +237,7 @@ html[data-theme='dark'] {
 }
 
 html[data-theme='dark'] .users-header-help {
-    color: #d6dde6;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .users-header-help:hover,
@@ -279,7 +279,7 @@ html[data-theme='dark'] .users-header-help:focus-visible {
 }
 
 html[data-theme='dark'] .users-table td {
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 /* User Info */
@@ -885,7 +885,7 @@ input:disabled+.slider {
 
     html[data-theme='dark'] .actions-center .btn-secondary {
         background: #3b3f45;
-        color: #f2f4f8 !important;
+        color: var(--dm-text-bright) !important;
     }
 
     html[data-theme='dark'] .actions-center .btn-secondary:hover {

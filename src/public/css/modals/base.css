@@ -209,7 +209,7 @@
 html[data-theme='dark'] .modal-buttons button.btn-primary:disabled,
 html[data-theme='dark'] .modal-buttons button.btn-primary:disabled:hover {
     background-color: rgba(255, 255, 255, 0.06) !important;
-    color: #6b7280 !important;
+    color: var(--dm-text-subtle) !important;
     border-color: rgba(255, 255, 255, 0.12) !important;
 }
 

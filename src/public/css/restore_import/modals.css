@@ -198,7 +198,7 @@ html[data-theme='dark'] .custom-alert-content {
 }
 
 html[data-theme='dark'] .import-confirm-modal .import-confirm-modal-content h3 {
-    color: #f2f5f8;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .import-confirm-modal .import-confirm-modal-content p,
@@ -217,7 +217,7 @@ html[data-theme='dark'] .direct-copy-restore-spinner {
 
 html[data-theme='dark'] .import-confirm-modal .import-confirm-modal-content .btn-cancel {
     background-color: #4c5057 !important;
-    color: #f4f6f8 !important;
+    color: var(--dm-text-bright) !important;
     border: 1px solid #4c5057 !important;
 }
 

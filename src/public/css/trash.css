@@ -646,7 +646,7 @@ html[data-theme='dark'] .trash-search-input,
 }
 
 [data-theme='dark'] .clear-filter-btn {
-    color: #888;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .trash-notecard {
@@ -656,7 +656,7 @@ html[data-theme='dark'] .trash-notecard {
 
 html[data-theme='dark'] .trash-innernote {
     /* background-color: var(--dm-surface) !important; */
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .css-title {
@@ -664,7 +664,7 @@ html[data-theme='dark'] .css-title {
 }
 
 html[data-theme='dark'] .trash-no-notes {
-    color: #a0a0a0;
+    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .trash-search-notice {
@@ -679,16 +679,16 @@ html[data-theme='dark'] .trash-search-notice {
 }
 
 html[data-theme='dark'] .lastupdated {
-    color: #888;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .noteentry {
-    color: #ccc;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .trash-page-count,
 html[data-theme='dark'] .trash-limit-notice {
-    color: #888;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .trash-notecard {
@@ -700,7 +700,7 @@ html[data-theme='dark'] .trash-note-header {
 }
 
 html[data-theme='dark'] .trash-action-btn .lucide {
-    color: #aaa;
+    color: var(--dm-text-muted);
     background-color: #aaa;
 }
 

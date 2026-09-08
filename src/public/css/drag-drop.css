@@ -256,7 +256,7 @@ html[data-theme='dark'] .root-drop-zone.drag-over {
 }
 
 html[data-theme='dark'] .drop-zone-content {
-    color: #ccc;
+    color: var(--dm-text-bright);
 }
 
 /* Note dragging styles - applies to ALL notes */

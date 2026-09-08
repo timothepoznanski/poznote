@@ -334,11 +334,11 @@ html[data-theme='dark'] .attachment-name {
 }
 
 html[data-theme='dark'] .attachment-meta {
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .attachment-size {
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 /* ============================================
@@ -367,7 +367,7 @@ html[data-theme='dark'] .backup-section label {
 html[data-theme='dark'] .backup-section .form-text,
 html[data-theme='dark'] .backup-section .text-muted,
 html[data-theme='dark'] .backup-section small {
-    color: #b0b0b0 !important;
+    color: var(--dm-text) !important;
 }
 
 html[data-theme='dark'] .backup-section select {
@@ -452,11 +452,11 @@ html[data-theme='dark'] .card-header h3 i.card-icon {
 }
 
 html[data-theme='dark'] .card-header h3 i.chevron {
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .card-header p {
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .card-content {
@@ -481,7 +481,7 @@ html[data-theme='dark'] .sub-card h4 {
 }
 
 html[data-theme='dark'] .sub-card h4 i.chevron {
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 /* ============================================
@@ -500,11 +500,11 @@ html[data-theme='dark'] .filter-input:focus {
 }
 
 html[data-theme='dark'] .filter-input::placeholder {
-    color: #777777;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .clear-filter-btn {
-    color: #777777;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .clear-filter-btn:hover {

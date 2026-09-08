@@ -279,34 +279,34 @@ body.app-tab-reordering {
 }
 
 [data-theme="dark"] .app-tab-title {
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 [data-theme="dark"] .app-tab.active .app-tab-title {
-    color: #f0f0f0;
+    color: var(--dm-text-bright);
 }
 
 [data-theme="dark"] .app-tab-close {
-    color: #888;
+    color: var(--dm-text-subtle);
 }
 
 [data-theme="dark"] .app-tab:hover .app-tab-title {
-    color: #d1d5db;
+    color: var(--dm-text-bright);
 }
 
 [data-theme="dark"] .app-tab.active .app-tab-close {
-    color: #bbb;
+    color: var(--dm-text);
 }
 
 [data-theme="dark"] .app-tab-close:hover {
     background: rgba(255, 255, 255, 0.1);
-    color: #e5e7eb;
+    color: var(--dm-text-bright);
 }
 
 [data-theme="dark"] .app-tab-close-all {
     background: var(--dm-content-bg, #1e293b);
     border-color: var(--dm-border, #334155);
-    color: #94a3b8;
+    color: var(--dm-text-muted);
     box-shadow: 9px 0 0 0 var(--dm-tabbar-bg);
 }
 
@@ -326,7 +326,7 @@ body.app-tab-reordering {
 }
 
 [data-theme="dark"] .app-tab-context-item {
-    color: #d1d5db;
+    color: var(--dm-text-bright);
 }
 
 [data-theme="dark"] .app-tab-context-item:hover {

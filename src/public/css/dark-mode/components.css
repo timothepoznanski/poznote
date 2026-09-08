@@ -60,7 +60,7 @@ html[data-theme='dark'] .clickable-tag:hover:visited {
 }
 
 html[data-theme='dark'] .tag-delete-button {
-    color: #808080;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .tag-delete-button:hover {
@@ -82,7 +82,7 @@ html[data-theme='dark'] .tag-input {
 }
 
 html[data-theme='dark'] .tag-input::placeholder {
-    color: #808080;
+    color: var(--dm-text-subtle);
 }
 
 /* Folder name badge */
@@ -100,7 +100,7 @@ html[data-theme='dark'] .folder-path-segment:hover {
 }
 
 html[data-theme='dark'] .folder-path-separator {
-    color: #64748b;
+    color: var(--dm-text-subtle);
 }
 
 /* Tag suggestions dropdown */
@@ -155,7 +155,7 @@ html[data-theme='dark'] .task-edit-textarea {
 }
 
 html[data-theme='dark'] .task-edit-hint {
-    color: #a8a8a8;
+    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .task-item:hover {
@@ -169,7 +169,7 @@ html[data-theme='dark'] .task-checkbox {
 html[data-theme='dark'] .task-delete-btn i,
 html[data-theme='dark'] .task-important-btn i,
 html[data-theme='dark'] .task-drag-handle i {
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .task-delete-btn:hover i {
@@ -185,7 +185,7 @@ html[data-theme='dark'] .task-important-btn.is-favorite i {
 }
 
 html[data-theme='dark'] .task-due-btn i {
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .task-due-btn:hover i {
@@ -195,7 +195,7 @@ html[data-theme='dark'] .task-due-btn:hover i {
 html[data-theme='dark'] .task-due-chip {
     background: var(--dm-surface);
     border-color: var(--dm-border);
-    color: #a8a8a8;
+    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .task-due-chip:hover {
@@ -210,7 +210,7 @@ html[data-theme='dark'] .task-due-chip.overdue {
 }
 
 html[data-theme='dark'] .task-menu-btn i {
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .task-menu-btn:hover i {
@@ -232,13 +232,13 @@ html[data-theme='dark'] .task-actions-menu-item:hover {
 }
 
 html[data-theme='dark'] .task-actions-menu-item i {
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 /* The :is() ID boost + !important outguns the `.noteentry *` --dm-text
    blanket from dark-mode/editor.css */
 html[data-theme='dark'] .tasklist-progress-label:is(#pz-specificity-boost, *) {
-    color: #a8a8a8 !important;
+    color: var(--dm-text-muted) !important;
 }
 
 html[data-theme='dark'] .tasklist-progress-bar {
@@ -291,7 +291,7 @@ html[data-theme='dark'] .form-group input {
 }
 
 html[data-theme='dark'] .form-group input::placeholder {
-    color: #888;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .form-group input:focus {
@@ -346,7 +346,7 @@ html[data-theme='dark'] .btn-rename {
 
 html[data-theme='dark'] .btn-rename:disabled {
     background-color: #4a4a4a;
-    color: #888;
+    color: var(--dm-text-subtle);
     border-color: var(--dm-border-light);
     opacity: 0.6;
 }
@@ -502,7 +502,7 @@ html[data-theme='dark'] #poznoteToast.notification-warning {
 html[data-theme='dark'] .emoji-hint {
     background: var(--dm-surface);
     border-left-color: #4a90e2;
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .emoji-hint kbd {
@@ -529,7 +529,7 @@ html[data-theme='dark'] .table-picker-input-section {
 }
 
 html[data-theme='dark'] .table-picker-input-field-label {
-    color: #c0c0c0;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .table-picker-input-field {
@@ -598,7 +598,7 @@ html[data-theme='dark'] .table-context-menu {
 }
 
 html[data-theme='dark'] .table-context-menu-item {
-    color: #e5e5e5 !important;
+    color: var(--dm-text-bright) !important;
 }
 
 html[data-theme='dark'] .table-context-menu-item[style*="color: #dc2626"] {
@@ -755,7 +755,7 @@ html[data-theme='dark'] .tasklist-embed-task:focus-within {
 }
 
 html[data-theme='dark'] .tasklist-embed-toggle {
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .tasklist-embed-toggle:hover {
@@ -766,7 +766,7 @@ html[data-theme='dark'] .tasklist-embed-toggle:hover {
    blanket from dark-mode/editor.css */
 html[data-theme='dark'] .tasklist-embed-count:is(#pz-specificity-boost, *),
 html[data-theme='dark'] .tasklist-embed-due:is(#pz-specificity-boost, *) {
-    color: #a8a8a8 !important;
+    color: var(--dm-text-muted) !important;
 }
 
 html[data-theme='dark'] .tasklist-embed-due.overdue:is(#pz-specificity-boost, *) {
@@ -774,12 +774,12 @@ html[data-theme='dark'] .tasklist-embed-due.overdue:is(#pz-specificity-boost, *)
 }
 
 html[data-theme='dark'] .tasklist-embed-task.completed .tasklist-embed-text:is(#pz-specificity-boost, *) {
-    color: #8a8a8a !important;
+    color: var(--dm-text-subtle) !important;
 }
 
 html[data-theme='dark'] .tasklist-embed-empty:is(#pz-specificity-boost, *),
 html[data-theme='dark'] .tasklist-embed-unavailable:is(#pz-specificity-boost, *) {
-    color: #8a8a8a !important;
+    color: var(--dm-text-subtle) !important;
 }
 
 /* Inline editing controls of the embedded task list. The `.noteentry *`
@@ -790,7 +790,7 @@ html[data-theme='dark'] .tasklist-embed-add-input:focus {
 }
 
 html[data-theme='dark'] .tasklist-embed-add-input::placeholder {
-    color: #8a8a8a;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .tasklist-embed-action i:is(#pz-specificity-boost, *),
@@ -801,7 +801,7 @@ html[data-theme='dark'] .tasklist-embed-add > i:is(#pz-specificity-boost, *) {
 
 html[data-theme='dark'] .tasklist-embed-action:is(#pz-specificity-boost, *),
 html[data-theme='dark'] .tasklist-embed-add:is(#pz-specificity-boost, *) {
-    color: #a8a8a8 !important;
+    color: var(--dm-text-muted) !important;
 }
 
 html[data-theme='dark'] .tasklist-embed-action-important.is-active:is(#pz-specificity-boost, *),

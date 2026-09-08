@@ -310,7 +310,7 @@ html[data-theme='dark'] .webhooks-section-hint {
 html[data-theme='dark'] .webhooks-field input {
     background: var(--input-bg, #2a2a2a);
     border-color: var(--border-color, #444);
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 html[data-theme='dark'] .webhooks-item-description {
     color: rgba(255, 255, 255, 0.62);
@@ -326,7 +326,7 @@ html[data-theme='dark'] .webhooks-actions-menu {
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
 }
 html[data-theme='dark'] .webhooks-actions-item {
-    color: var(--dm-text, #e0e0e0);
+    color: var(--dm-text, var(--dm-text-bright));
 }
 html[data-theme='dark'] .webhooks-actions-item:hover {
     background: rgba(255, 255, 255, 0.08);

@@ -173,13 +173,13 @@ div[onclick*="openExcalidrawNote"] {
 }
 
 [data-theme="dark"] .excalidraw-toolbar h3 {
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 [data-theme="dark"] .excalidraw-toolbar .toolbar-btn {
     background: var(--dm-surface, var(--dm-surface));
     border-color: var(--dm-border, var(--dm-border));
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 [data-theme="dark"] .excalidraw-toolbar .toolbar-btn:hover {

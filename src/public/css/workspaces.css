@@ -384,12 +384,12 @@ a.workspace-name-link:focus-visible {
 }
 
 :root[data-theme='dark'] .ws-tag-chip {
-    color: #c9d1d9;
+    color: var(--dm-text-bright);
     background: rgba(255, 255, 255, 0.08);
 }
 
 :root[data-theme='dark'] .ws-tags-help {
-    color: #9aa4b2;
+    color: var(--dm-text-muted);
 }
 
 .workspace-share-panel {
@@ -664,22 +664,22 @@ a.workspace-name-link:focus-visible {
 
 html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-modal-content {
     background: linear-gradient(180deg, #2a2d31 0%, #23262a 100%);
-    color: #eef2f7;
+    color: var(--dm-text-bright);
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 28px 64px rgba(0, 0, 0, 0.48);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-modal-content h3 {
-    color: #f5f7fa;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-modal-content p {
-    color: #c4ccd6;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-field-label,
 html[data-theme='dark'] .shared-edit-token-modal .indexable-label-text {
-    color: #eef2f7;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-url-row {
@@ -692,7 +692,7 @@ html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-url {
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-url.is-preview {
-    color: #d8dde5;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal a.workspace-share-modal-url:hover {
@@ -702,11 +702,11 @@ html[data-theme='dark'] .shared-edit-token-modal a.workspace-share-modal-url:hov
 html[data-theme='dark'] .shared-edit-token-modal .modal-password-input {
     background: #34383d;
     border-color: #5b636d;
-    color: #f5f7fa;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .modal-password-input::placeholder {
-    color: #aeb7c2;
+    color: var(--dm-text);
     opacity: 1;
 }
 
@@ -720,7 +720,7 @@ html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-password-tog
 html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-copy-btn {
     background: #454b52;
     border-color: #5b636d;
-    color: #f5f7fa;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-password-toggle:hover,
@@ -743,7 +743,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-container {
 html[data-theme='dark'] .shared-edit-token-modal .share-user-list-row,
 html[data-theme='dark'] .shared-edit-token-modal .share-user-list-name,
 html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message {
-    color: #d8dde5;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .share-user-list-row + .share-user-list-row {

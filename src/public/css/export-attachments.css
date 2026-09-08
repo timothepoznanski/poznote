@@ -47,9 +47,9 @@
 }
 
 [data-theme="dark"] .empty-state-description {
-    color: #aaa;
+    color: var(--dm-text-muted);
 }
 
 [data-theme="dark"] .summary-header .subtitle-text {
-    color: #999;
+    color: var(--dm-text-muted);
 }

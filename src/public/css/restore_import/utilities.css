@@ -84,5 +84,5 @@
 html[data-theme='dark'] .direct-copy-command {
     background-color: #1f2937;
     border-color: #4b5563;
-    color: #f3f4f6;
+    color: var(--dm-text-bright);
 }

@@ -389,11 +389,11 @@ html[data-theme='dark'] .outline-header {
 }
 
 html[data-theme='dark'] .outline-title {
-    color: #999;
+    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .outline-nav-link {
-    color: #ccc;
+    color: var(--dm-text-bright);
 }
 
 html.theme-black[data-theme='dark'] .outline-nav-link {
@@ -411,7 +411,7 @@ html[data-theme='dark'] .outline-nav-link.active {
 }
 
 html[data-theme='dark'] .outline-empty {
-    color: #666;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .outline-resize-handle {
@@ -422,7 +422,7 @@ html[data-theme='dark'] .outline-resize-handle {
 html[data-theme='dark'] .toggle-outline-btn {
     background: var(--dm-sidebar-surface);
     border-color: var(--dm-border);
-    color: #999;
+    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .toggle-outline-btn:hover {
@@ -434,13 +434,13 @@ html[data-theme='dark'] .toggle-outline-btn:disabled,
 html[data-theme='dark'] .toggle-outline-btn[aria-disabled="true"] {
     background: var(--dm-sidebar-surface);
     border-color: var(--dm-border);
-    color: #666;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .toggle-outline-btn:disabled:hover,
 html[data-theme='dark'] .toggle-outline-btn[aria-disabled="true"]:hover {
     background: var(--dm-sidebar-surface);
-    color: #666;
+    color: var(--dm-text-subtle);
 }
 
 .heading-anchor--floating {
@@ -506,5 +506,5 @@ html[data-theme='dark'] .toggle-outline-btn[aria-disabled="true"]:hover {
 
 html[data-theme='dark'] #heading-copy-toast {
     background: var(--dm-border-light);
-    color: #f0f0f0;
+    color: var(--dm-text-bright);
 }

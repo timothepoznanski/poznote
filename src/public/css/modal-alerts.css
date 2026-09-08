@@ -196,7 +196,7 @@ html[data-theme='dark'] .note-creation-loading-content {
 html[data-theme='dark'] .alert-modal,
 .dark-mode .alert-modal {
     background: #2d3748;
-    color: #e2e8f0;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .alert-modal-header,
@@ -206,12 +206,12 @@ html[data-theme='dark'] .alert-modal-header,
 
 html[data-theme='dark'] .alert-modal-title,
 .dark-mode .alert-modal-title {
-    color: #e2e8f0;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .alert-modal-body,
 .dark-mode .alert-modal-body {
-    color: #cbd5e0;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .alert-modal-button,
@@ -459,7 +459,7 @@ html[data-theme='dark'] .admin-contact-option {
     border-color: var(--dm-border, #374151);
 }
 html[data-theme='dark'] .admin-contact-option-desc {
-    color: #9ca3af;
+    color: var(--dm-text-muted);
 }
 html[data-theme='dark'] .admin-contact-email,
 html[data-theme='dark'] .admin-contact-copy {

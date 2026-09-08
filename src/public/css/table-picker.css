@@ -157,7 +157,7 @@ html[data-theme='dark'] .table-context-menu {
 }
 
 html[data-theme='dark'] .table-context-menu-item {
-    color: #e5e7eb;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .table-context-menu-item:hover {

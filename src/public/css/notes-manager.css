@@ -181,13 +181,13 @@ body.notes-manager-page {
 :root[data-theme='dark'] .nm-bulk-select {
     color-scheme: dark;
     background: var(--action-bg, #17304d);
-    color: var(--action-color, #eff6ff);
+    color: var(--action-color, var(--dm-text-bright));
     border-color: var(--action-border, #2d4f8e);
 }
 
 :root[data-theme='dark'] .nm-bulk-select option {
     background-color: var(--action-bg, #17304d);
-    color: var(--action-color, #eff6ff);
+    color: var(--action-color, var(--dm-text-bright));
 }
 
 .nm-modal-input {
@@ -232,7 +232,7 @@ body.notes-manager-page {
 }
 
 html[data-theme='dark'] .nm-filter-bar .clear-filter-btn {
-    color: #aaa;
+    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .nm-selected-count {
@@ -254,7 +254,7 @@ html[data-theme='dark'] .nm-folder-option:hover {
 
 html[data-theme='dark'] .nm-folder-option-selected {
     background: var(--selected-bg, rgba(148, 163, 184, 0.16));
-    color: var(--selected-color, #e5e7eb);
+    color: var(--selected-color, var(--dm-text-bright));
 }
 
 /* Content area */
@@ -583,30 +583,30 @@ html[data-theme='dark'] .nm-folder-option-selected {
 
 :root[data-theme='dark'] #nmBulkBar .nm-bulk-btn {
     background: transparent;
-    color: #94a3b8;
+    color: var(--dm-text-muted);
     border-color: #475569;
 }
 
 :root[data-theme='dark'] #nmBulkBar .nm-bulk-btn:hover {
     background: rgba(255, 255, 255, 0.05);
-    color: #cbd5e1;
+    color: var(--dm-text-bright);
     border-color: #64748b;
 }
 
 :root[data-theme='dark'] .nm-bulk-select {
     background: var(--action-bg, #1f2937);
-    color: var(--action-color, #e5e7eb);
+    color: var(--action-color, var(--dm-text-bright));
     border-color: var(--action-border, #475569);
 }
 
 :root[data-theme='dark'] .nm-bulk-select option {
     background-color: var(--action-bg, #1f2937);
-    color: var(--action-color, #e5e7eb);
+    color: var(--action-color, var(--dm-text-bright));
 }
 
 :root[data-theme='dark'] .nm-folder-option-selected {
     background: var(--selected-bg, rgba(148, 163, 184, 0.16));
-    color: var(--selected-color, #e5e7eb);
+    color: var(--selected-color, var(--dm-text-bright));
 }
 
 :root[data-theme='dark'] .nm-modal {

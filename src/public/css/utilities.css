@@ -161,5 +161,5 @@ body.center-note-content #right_col .notecard {
 
 html[data-theme='dark'] #note-width-toast {
     background: var(--dm-border-light);
-    color: #f0f0f0;
+    color: var(--dm-text-bright);
 }

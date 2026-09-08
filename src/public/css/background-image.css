@@ -122,11 +122,11 @@ html[data-theme='dark'] .background-preview-container {
 }
 
 html[data-theme='dark'] .background-preview .no-background-text {
-    color: #666;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .background-opacity-control label {
-    color: #ddd;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .background-opacity-control input[type="range"] {

@@ -169,7 +169,7 @@ html[data-theme="dark"] .hljs-symbol {
 html[data-theme="dark"] .hljs-code,
 html[data-theme="dark"] .hljs-comment,
 html[data-theme="dark"] .hljs-formula {
-    color: #8b949e;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme="dark"] .hljs-name,
@@ -208,7 +208,7 @@ html[data-theme="dark"] .hljs-addition {
 }
 
 html[data-theme="dark"] .hljs-deletion {
-    color: #ffdcd7;
+    color: var(--dm-text-bright);
     background-color: #67060c;
 }
 
@@ -251,7 +251,7 @@ pre.code-block:not([data-language]) {
 html[data-theme="dark"] pre[data-language]::before,
 html[data-theme="dark"] pre:has(code[data-language])::before,
 html[data-theme="dark"] pre.code-block:not([data-language])::before {
-    color: #c9d1d9;
+    color: var(--dm-text-bright);
     background: rgba(255, 255, 255, 0.12);
 }
 

@@ -85,13 +85,13 @@
 
 /* Dark mode support */
 html[data-theme='dark'] #customCssModal p {
-    color: #aaa;
+    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .no-css-text {
     background: rgba(255, 255, 255, 0.05);
     border-color: #444;
-    color: #888;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .custom-css-current-file {

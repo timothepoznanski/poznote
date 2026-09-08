@@ -937,7 +937,7 @@
 
 html[data-theme='dark'] .kanban-scroll-btn {
     background: #2a2a4a;
-    color: #e2e8f0;
+    color: var(--dm-text-bright);
     border-color: var(--border-color, #3a3a5a);
 }
 
@@ -952,7 +952,7 @@ html[data-theme='dark'] .kanban-inline-header {
 }
 
 html[data-theme='dark'] .kanban-inline-header .kanban-title {
-    color: #e2e8f0;
+    color: var(--dm-text-bright);
 }
 
 /* Responsive for inline view */

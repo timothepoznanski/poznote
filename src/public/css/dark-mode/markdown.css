@@ -47,7 +47,7 @@ html[data-theme='dark'] .markdown-preview pre {
 
 html[data-theme='dark'] .markdown-preview blockquote {
     border-left-color: var(--dm-border);
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 /* Tables */
@@ -87,12 +87,12 @@ html[data-theme='dark'] .markdown-preview hr {
 }
 
 html[data-theme='dark'] .markdown-preview del {
-    color: #808080;
+    color: var(--dm-text-subtle);
 }
 
 /* Placeholder for empty preview */
 html[data-theme='dark'] .markdown-preview-placeholder {
-    color: #666;
+    color: var(--dm-text-subtle);
 }
 
 /* Interactive markdown checkbox */
@@ -159,7 +159,7 @@ html[data-theme='dark'] .cm-tooltip-autocomplete ul li[aria-selected] {
 
 /* Checked task item text */
 html[data-theme='dark'] .markdown-preview li.task-list-item input[type="checkbox"]:checked+span {
-    color: #666;
+    color: var(--dm-text-subtle);
 }
 
 /* ============================================

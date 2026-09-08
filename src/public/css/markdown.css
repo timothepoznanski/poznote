@@ -91,7 +91,7 @@
 }
 
 html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::before {
-    color: #b9c4cf;
+    color: var(--dm-text);
 }
 
 .markdown-codemirror-host {
@@ -870,7 +870,7 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
 
 /* Dark mode adjustments for math */
 [data-theme='dark'] .katex {
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 /* Split view mode styles */

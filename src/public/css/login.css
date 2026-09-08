@@ -453,11 +453,11 @@ html[data-theme='dark'] input[type="password"] {
 }
 
 html[data-theme='dark'] .password-toggle {
-    color: #808080;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .password-toggle:hover {
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] input[type="text"]:focus,
@@ -468,7 +468,7 @@ html[data-theme='dark'] input[type="password"]:focus {
 
 html[data-theme='dark'] input[type="text"]::placeholder,
 html[data-theme='dark'] input[type="password"]::placeholder {
-    color: #808080;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .github-link a {
@@ -492,7 +492,7 @@ html[data-theme='dark'] .admin-warning code {
 
 html[data-theme='dark'] .account-select-intro,
 html[data-theme='dark'] .account-select-logout {
-    color: #a0aec0;
+    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .account-select-logout:hover {
@@ -522,13 +522,13 @@ html[data-theme='dark'] .oidc-divider::after {
 }
 
 html[data-theme='dark'] .oidc-divider span {
-    color: #a0aec0;
+    color: var(--dm-text-muted);
     background: var(--dm-bg);
 }
 
 html[data-theme='dark'] .oidc-other-account-button {
     background: transparent;
-    color: #e2e8f0;
+    color: var(--dm-text-bright);
     border-color: #4a5568;
 }
 

@@ -27,7 +27,7 @@ html[data-theme='dark'] .kanban-column-count {
 
 html[data-theme='dark'] .kanban-add-card-btn {
     background: transparent;
-    color: #9ca3af;
+    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .kanban-add-card-btn:hover {
@@ -99,11 +99,11 @@ html[data-theme='dark'] .kanban-task-preview-item {
 }
 
 html[data-theme='dark'] .kanban-task-preview-item.completed .kanban-task-preview-text {
-    color: #808080;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .kanban-card-meta {
-    color: #808080;
+    color: var(--dm-text-subtle);
 }
 
 /* Tags */
@@ -199,13 +199,13 @@ html[data-theme='dark'] .kanban-card-completed {
 }
 
 html[data-theme='dark'] .kanban-card-completed .kanban-card-title {
-    color: #808080;
+    color: var(--dm-text-subtle);
     text-decoration: line-through;
 }
 
 html[data-theme='dark'] .kanban-card-completed .kanban-card-snippet,
 html[data-theme='dark'] .kanban-card-completed .kanban-card-date {
-    color: #6b7280;
+    color: var(--dm-text-subtle);
 }
 
 /* ===== Completed section ===== */

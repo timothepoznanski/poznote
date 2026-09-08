@@ -87,7 +87,7 @@ body.tasks-page {
 }
 
 [data-theme="dark"] .tasks-progress-option {
-    color: #aaa;
+    color: var(--dm-text-muted);
 }
 
 /* Filter bar. On desktop the filter input sits on the same row, to the right
@@ -913,7 +913,7 @@ html[data-theme="dark"]:has(body.tasks-page) {
 }
 
 [data-theme="dark"] .tasks-note-toggle {
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 [data-theme="dark"] .tasks-note-toggle:hover {
@@ -944,7 +944,7 @@ html[data-theme="dark"]:has(body.tasks-page) {
 }
 
 [data-theme="dark"] .tasks-task-due-btn {
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 [data-theme="dark"] .tasks-task-due-btn:hover {
@@ -1011,7 +1011,7 @@ html[data-theme="dark"]:has(body.tasks-page) {
 }
 
 [data-theme="dark"] .tasks-cal-day.other-month .tasks-cal-day-num {
-    color: #4b5563;
+    color: var(--dm-text-subtle);
 }
 
 [data-theme="dark"] .tasks-cal-chip {

@@ -337,7 +337,7 @@ html[data-theme='dark'] .tags-modal-item {
 }
 
 html[data-theme='dark'] .tags-modal-item-name {
-    color: #e2e8f0;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .tags-modal-item-name:focus {
@@ -348,5 +348,5 @@ html[data-theme='dark'] .tags-modal-item-name:focus {
 html[data-theme='dark'] #tagsModalInput {
     background: #0f172a;
     border-color: #334155;
-    color: #f1f5f9;
+    color: var(--dm-text-bright);
 }

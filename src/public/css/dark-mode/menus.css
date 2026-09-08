@@ -31,7 +31,7 @@ html[data-theme='dark'] .slash-command-item[data-command-id='cancel'] .slash-com
 }
 
 html[data-theme='dark'] .slash-command-icon:not([style*="color"]) {
-    color: #9ca3af;
+    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .slash-date-picker {
@@ -97,7 +97,7 @@ html[data-theme='dark'] .slash-date-picker-time-btn {
 }
 
 html[data-theme='dark'] .slash-date-picker-time-btn i {
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .slash-time-cell {
@@ -155,7 +155,7 @@ html[data-theme='dark'] .image-menu-item:hover {
 }
 
 html[data-theme='dark'] .image-menu-item i {
-    color: #9ca3af;
+    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .image-submenu {
@@ -211,7 +211,7 @@ html[data-theme='dark'] .workspace-menu-item.current-workspace {
 }
 
 html[data-theme='dark'] .workspace-menu-item i {
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .workspace-menu-item .workspace-menu-dot {
@@ -237,7 +237,7 @@ html[data-theme='dark'] .workspace-menu-divider {
 html[data-theme='dark'] .folder-actions-toggle,
 html[data-theme='dark'] .note-actions-toggle,
 html[data-theme='dark'] .note-actions-item {
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .folder-actions-toggle:hover,
@@ -283,7 +283,7 @@ html[data-theme='dark'] .note-actions-menu-item:hover {
 
 html[data-theme='dark'] .folder-actions-menu-item i,
 html[data-theme='dark'] .note-actions-menu-item i {
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .folder-actions-menu-item:hover i,
@@ -345,7 +345,7 @@ html[data-theme='dark'] .export-option span {
 }
 
 html[data-theme='dark'] .export-option p {
-    color: #9ca3af;
+    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .export-option i {
@@ -439,7 +439,7 @@ html[data-theme='dark'] .create-menu-item:hover {
 }
 
 html[data-theme='dark'] .create-menu-item i {
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .create-menu-item:hover i {
@@ -452,5 +452,5 @@ html[data-theme='dark'] .create-menu .create-section:not(:first-child) {
 
 html[data-theme='dark'] .folder-actions-menu-item .actions-menu-shortcut,
 html[data-theme='dark'] .note-actions-menu-item .actions-menu-shortcut {
-    color: #8a8a8a;
+    color: var(--dm-text-subtle);
 }

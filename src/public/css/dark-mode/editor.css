@@ -109,7 +109,7 @@ html[data-theme='dark'] .noteentry code[class*="language-"] {
 html[data-theme='dark'] p.code-block-placeholder-before[data-ph]:empty:before,
 html[data-theme='dark'] p.code-block-placeholder-after[data-ph]:empty:before,
 html[data-theme='dark'] .excalidraw-placeholder[data-ph]:empty:before {
-    color: #888 !important;
+    color: var(--dm-text-subtle) !important;
     opacity: 0.6;
 }
 
@@ -125,7 +125,7 @@ html[data-theme='dark'] .noteentry pre .code-block-line-numbers-btn,
 html[data-theme='dark'] .code-block-actions-host > .code-block-line-numbers-btn {
     background: transparent !important;
     border: none !important;
-    color: #aaaaaa !important;
+    color: var(--dm-text-muted) !important;
     opacity: 0.55 !important;
 }
 
@@ -365,5 +365,5 @@ html[data-theme='dark'] .image-resize-handle:hover {
 /* Blockquotes */
 html[data-theme='dark'] .noteentry blockquote {
     border-left-color: var(--dm-border);
-    color: #b0b0b0;
+    color: var(--dm-text);
 }

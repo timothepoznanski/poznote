@@ -188,7 +188,7 @@
 
 /* Dark mode */
 :root[data-theme='dark'] .diary-month-title {
-    color: #e5e7eb;
+    color: var(--dm-text-bright);
     border-bottom-color: #374151;
 }
 
@@ -198,12 +198,12 @@
 
 :root[data-theme='dark'] .diary-today-tag {
     background: #0e6ba8;
-    color: #f3f4f6;
+    color: var(--dm-text-bright);
 }
 
 :root[data-theme='dark'] .diary-switch-btn {
     border-color: #374151;
-    color: #d1d5db;
+    color: var(--dm-text-bright);
 }
 
 :root[data-theme='dark'] .diary-switch-btn:hover {
@@ -214,7 +214,7 @@
 :root[data-theme='dark'] .diary-switch-btn.diary-switch-active {
     background: #0e6ba8;
     border-color: #0e6ba8;
-    color: #f3f4f6;
+    color: var(--dm-text-bright);
 }
 
 :root[data-theme='dark'] .diary-new-modal {
@@ -222,10 +222,10 @@
 }
 
 :root[data-theme='dark'] .diary-new-modal .modal-title {
-    color: #e5e7eb;
+    color: var(--dm-text-bright);
 }
 
 :root[data-theme='dark'] .diary-new-modal .diary-new-input {
     border-color: #374151;
-    color: #e5e7eb;
+    color: var(--dm-text-bright);
 }

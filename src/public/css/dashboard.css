@@ -274,7 +274,7 @@ body.dashboard-page {
 }
 
 :root[data-theme='dark'] .dash-section-title {
-    color: #9ca3af;
+    color: var(--dm-text-muted);
 }
 
 /* ---------- View menu (card size + layout) ---------- */
@@ -1353,7 +1353,7 @@ body.dashboard-page .notifications-empty i {
 :root[data-theme='dark'] .board-view-btn {
     background: var(--dm-surface, #262626);
     border-color: var(--dm-border, var(--dm-border));
-    color: var(--dm-text-muted, #a0a0a0);
+    color: var(--dm-text-muted, var(--dm-text-muted));
 }
 
 :root[data-theme='dark'] .board-view-btn:hover {
@@ -1838,7 +1838,7 @@ body.dashboard-page .notifications-empty i {
 
 :root[data-theme='dark'] .dashboard-tag-filter-count,
 :root[data-theme='dark'] .dashboard-tag-filter-empty {
-    color: #a8a8a8;
+    color: var(--dm-text-muted);
 }
 
 /* Dark mode */
@@ -1847,13 +1847,13 @@ body.dashboard-page .notifications-empty i {
 }
 
 :root[data-theme='dark'] .dash-group-tag {
-    color: #c9d1d9;
+    color: var(--dm-text-bright);
     background: rgba(255, 255, 255, 0.08);
 }
 
 :root[data-theme='dark'] .dashboard-scope-section-title,
 :root[data-theme='dark'] .dashboard-scope-empty {
-    color: #a8a8a8;
+    color: var(--dm-text-muted);
 }
 
 :root[data-theme='dark'] .dashboard-scope-tag {
@@ -1880,7 +1880,7 @@ body.dashboard-page .notifications-empty i {
 
 :root[data-theme='dark'] .dashboard-scope-row-main .lucide,
 :root[data-theme='dark'] .dashboard-scope-open {
-    color: #a8a8a8;
+    color: var(--dm-text-muted);
 }
 
 :root[data-theme='dark'] .dashboard-scope-open:hover {

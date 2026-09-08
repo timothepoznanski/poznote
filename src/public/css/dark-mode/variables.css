@@ -60,8 +60,14 @@
    ============================================ */
 
 :root[data-theme='dark'] {
+    /* Text scale. Contrast on --dm-content-bg is 11.6 / 8.2 / 5.9 / 4.3, the same
+       shape the black theme below already had. --dm-text-muted used to be
+       #c5c5c5, which is BRIGHTER than --dm-text: the muted level was louder than
+       the main one, so the hierarchy read backwards wherever both were used. */
+    --dm-text-bright: #e0e0e0;
     --dm-text: #bebebe;
-    --dm-text-muted: #c5c5c5;
+    --dm-text-muted: #a0a0a0;
+    --dm-text-subtle: #888888;
     --dm-bg: #252526;
     --dm-content-bg: #252526;
     --dm-sidebar-bg: #252526;
@@ -80,8 +86,12 @@
 }
 
 html.theme-black[data-theme='dark'] {
+    /* Same four steps, in the blue-grey the black theme uses. These two values
+       were already in the right order; bright and subtle extend them. */
+    --dm-text-bright: #e9ecf0;
     --dm-text: #c0c8d4;
     --dm-text-muted: #9ba6b5;
+    --dm-text-subtle: #818a96;
     --dm-bg: #0f1117;
     --dm-content-bg: #141821;
     --dm-sidebar-bg: #0b0d12;

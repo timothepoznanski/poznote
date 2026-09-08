@@ -258,22 +258,22 @@ html[data-theme='dark'] .git-sync-section {
 }
 
 html[data-theme='dark'] .git-sync-section h2 {
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .git-sync-description {
-    color: #aaa;
+    color: var(--dm-text-muted);
 }
 html[data-theme='dark'] .config-item {
     border-color: var(--dm-border);
 }
 
 html[data-theme='dark'] .config-label {
-    color: #bbb;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .config-value {
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .config-hint {
@@ -288,7 +288,7 @@ html[data-theme='dark'] .config-hint-error {
 }
 
 html[data-theme='dark'] .git-field-label {
-    color: #9ca3af;
+    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .git-field-input {
@@ -310,7 +310,7 @@ html[data-theme='dark'] .git-field-input[readonly]:focus {
 }
 
 html[data-theme='dark'] .git-field-input::placeholder {
-    color: #6b7280;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] select.git-field-input {
@@ -321,7 +321,7 @@ html[data-theme='dark'] select.git-field-input {
 }
 
 html[data-theme='dark'] .form-group label {
-    color: #bbb;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .form-group select {
@@ -336,7 +336,7 @@ html[data-theme='dark'] .form-group select:focus {
 
 html[data-theme='dark'] .btn-secondary {
     background: var(--dm-surface);
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .btn-secondary:hover {
@@ -351,17 +351,17 @@ html[data-theme='dark'] .debug-controls .btn[aria-pressed="true"] {
 html[data-theme='dark'] .debug-info {
     background: var(--dm-surface, var(--dm-content-bg));
     border-color: var(--dm-border, var(--dm-surface-hover));
-    color: var(--dm-text, #e0e0e0);
+    color: var(--dm-text, var(--dm-text-bright));
 }
 
 html.theme-black[data-theme='dark'] .debug-info {
     background: #141821;
     border-color: #2a3140;
-    color: #d8dee8;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .debug-info h4 {
-    color: var(--dm-text, #e0e0e0);
+    color: var(--dm-text, var(--dm-text-bright));
 }
 
 html[data-theme='dark'] .debug-info pre {
@@ -388,7 +388,7 @@ html[data-theme='dark'] .alert-warning {
 
 html[data-theme='dark'] .git-sync-footer-note {
     border-top-color: var(--dm-surface);
-    color: #999;
+    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .git-sync-footer-note strong {
@@ -402,7 +402,7 @@ html[data-theme='dark'] .badge-success {
 
 html[data-theme='dark'] .badge-disabled {
     background: var(--dm-surface);
-    color: #888;
+    color: var(--dm-text-subtle);
 }
 
 /* Responsive */
@@ -441,7 +441,7 @@ html[data-theme='dark'] .auto-sync-settings {
 }
 
 html[data-theme='dark'] .auto-sync-settings h4 {
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 .auto-sync-form {
@@ -477,7 +477,7 @@ html[data-theme='dark'] .form-check {
 }
 
 html[data-theme='dark'] .label-title {
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 .label-desc {
@@ -487,7 +487,7 @@ html[data-theme='dark'] .label-title {
 }
 
 html[data-theme='dark'] .label-desc {
-    color: #999;
+    color: var(--dm-text-muted);
 }
 
 /* Synced workspaces */
@@ -527,7 +527,7 @@ html[data-theme='dark'] .workspace-checkbox-list {
 }
 
 html[data-theme='dark'] .workspace-checkbox-item {
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 /* Switch Component */

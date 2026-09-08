@@ -112,7 +112,7 @@
 /* Dark mode */
 html[data-theme='dark'] .checklist-item-checked > .checklist-text,
 html[data-theme='dark'] .checklist-checkbox:checked+.checklist-text {
-    color: #666;
+    color: var(--dm-text-subtle);
 }
 
 /* Nested checklist indentation */

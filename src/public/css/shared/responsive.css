@@ -300,7 +300,7 @@
     }
 
     [data-theme="dark"] .indexable-label-text {
-        color: #e0e0e0;
+        color: var(--dm-text-bright);
     }
 
     [data-theme="dark"] .shared-note-item {
@@ -313,7 +313,7 @@
     }
 
     [data-theme="dark"] .note-token {
-        color: #b0b0b0;
+        color: var(--dm-text);
     }
 }
 

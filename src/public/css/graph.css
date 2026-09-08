@@ -314,7 +314,7 @@ html[data-theme="dark"] .graph-folder-select:focus {
 }
 
 html[data-theme="dark"] .graph-hint {
-    color: var(--dm-text-muted, #8a8a8a);
+    color: var(--dm-text-muted, var(--dm-text-subtle));
     opacity: 0.9;
 }
 

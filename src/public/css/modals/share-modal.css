@@ -107,7 +107,7 @@ html[data-theme='dark'] #shareModal .modal-content {
 }
 
 html[data-theme='dark'] #shareModal h3 {
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .toggle-slider {
@@ -161,7 +161,7 @@ html[data-theme='dark'] #folderShareModal .modal-content {
 }
 
 html[data-theme='dark'] #folderShareModal h3 {
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 /* ============================================
@@ -188,6 +188,6 @@ html[data-theme='dark'] #sharedViaFolderModal .modal-content {
 }
 
 html[data-theme='dark'] #sharedViaFolderModal h3 {
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 

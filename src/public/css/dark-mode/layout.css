@@ -43,7 +43,7 @@ html[data-theme='dark'] #search-bar-container.contains_forms_search {
 }
 
 html[data-theme='dark'] .searchbar-input::placeholder {
-    color: #808080;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .searchbar-icon {
@@ -51,7 +51,7 @@ html[data-theme='dark'] .searchbar-icon {
 }
 
 html[data-theme='dark'] .searchbar-date-toggle {
-    color: #808080;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .searchbar-date-toggle:hover,
@@ -97,7 +97,7 @@ html[data-theme='dark'] .search-date-input {
 
 /* Search options toggle button */
 html[data-theme='dark'] .searchbar-options-toggle {
-    color: #808080;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .searchbar-options-toggle:hover {
@@ -110,7 +110,7 @@ html[data-theme='dark'] .searchbar-options-toggle.active {
 
 /* Search type buttons */
 html[data-theme='dark'] .searchbar-type-btn {
-    color: #808080;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .searchbar-type-btn:hover {
@@ -203,11 +203,11 @@ html[data-theme='dark'] .folder-name {
 }
 
 html[data-theme='dark'] .folder-icon {
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .folder-note-count {
-    color: #999;
+    color: var(--dm-text-muted);
 }
 
 /* System folder note count - blue like in light mode */
@@ -266,11 +266,11 @@ html.theme-black[data-theme='dark'] .folder-name {
 
 /* Subheading and dates */
 html[data-theme='dark'] .note-subline {
-    color: #999;
+    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .lastupdated {
-    color: #999 !important;
+    color: var(--dm-text-muted) !important;
 }
 
 /* ============================================
@@ -290,7 +290,7 @@ html[data-theme='dark'] .resize-handle:hover {
 html[data-theme='dark'] .toggle-sidebar-btn {
     background: var(--dm-surface);
     border-color: var(--dm-border);
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .toggle-sidebar-btn:hover {
@@ -382,7 +382,7 @@ html[data-theme='dark'] .icon-sidebar-overflow-item-active {
 html[data-theme='dark'] #iconSidebarToggle {
     background: var(--dm-surface);
     border-color: var(--dm-border);
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] #iconSidebarToggle:hover {

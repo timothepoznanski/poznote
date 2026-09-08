@@ -66,7 +66,7 @@
 [data-theme="dark"] .shared-filter-tree-actions .btn {
     background: rgba(51, 65, 85, 0.38);
     border-color: rgba(148, 163, 184, 0.22);
-    color: #c8d0d8;
+    color: var(--dm-text-bright);
 }
 
 [data-theme="dark"] .shared-filter-tree-actions .btn:hover {
@@ -86,7 +86,7 @@
 }
 
 [data-theme="dark"] .shared-notes-header-cell {
-    color: #c8d0d8;
+    color: var(--dm-text-bright);
 }
 
 /* Soft action buttons: brighter icon hues so the tinted chips stay readable
@@ -122,7 +122,7 @@
 }
 
 [data-theme="dark"] .indexable-label-text {
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 [data-theme="dark"] .note-name {
@@ -130,7 +130,7 @@
 }
 
 [data-theme="dark"] .note-token {
-    color: #d6dde6;
+    color: var(--dm-text-bright);
 }
 
 [data-theme="dark"] .note-token-wrap {
@@ -138,7 +138,7 @@
 }
 
 [data-theme="dark"] .folder-badge {
-    color: #c6d0da;
+    color: var(--dm-text-bright);
     background-color: transparent;
 }
 
@@ -157,11 +157,11 @@
 }
 
 [data-theme="dark"] .note-actions-placeholder {
-    color: #b9c3cd;
+    color: var(--dm-text);
 }
 
 [data-theme="dark"] .shared-header-help {
-    color: #d6dde6;
+    color: var(--dm-text-bright);
 }
 
 [data-theme="dark"] .shared-header-help:hover,
@@ -190,7 +190,7 @@
 }
 
 [data-theme="dark"] .shared-type-icon:not([data-icon-color]) {
-    color: #888888;
+    color: var(--dm-text-subtle);
 }
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title h3,
@@ -199,18 +199,18 @@
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value label,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value span {
-    color: #f1f3f5;
+    color: var(--dm-text-bright);
 }
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title-link {
-    color: #f1f3f5;
+    color: var(--dm-text-bright);
     background: rgba(102, 179, 255, 0.1);
     border: 1px solid rgba(102, 179, 255, 0.14);
 }
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-url-preview:hover,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title-link:hover {
-    color: #f1f3f5;
+    color: var(--dm-text-bright);
 }
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-modal-content {
@@ -234,13 +234,13 @@
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .modal-password-input {
     background-color: var(--dm-surface-hover) !important;
     border-color: #707070 !important;
-    color: #f5f7fa !important;
+    color: var(--dm-text-bright) !important;
 }
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value input::placeholder,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value select::placeholder,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .modal-password-input::placeholder {
-    color: #b8bec7 !important;
+    color: var(--dm-text) !important;
     opacity: 1;
 }
 
@@ -257,7 +257,7 @@
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-password-toggle {
     background: #454545;
     border-color: #6f6f6f;
-    color: #f1f3f5;
+    color: var(--dm-text-bright);
 }
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-inline-renew:hover,
@@ -284,7 +284,7 @@
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .share-user-list-message,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .share-user-list-name {
-    color: #d8dde5;
+    color: var(--dm-text-bright);
 }
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .share-user-list-message.is-error {

@@ -156,7 +156,7 @@
 }
 
 [data-theme="dark"] .password-container input[type="password"]::placeholder {
-    color: #9ca3af;
+    color: var(--dm-text-muted);
 }
 
 [data-theme="dark"] .password-container .info {

@@ -102,7 +102,7 @@ body.settings-page {
 
 html[data-theme='light'] #changePasswordModal .change-password-description,
 body:not(.dark-mode) #changePasswordModal .change-password-description {
-    color: #5f6873;
+    color: var(--dm-text-subtle);
 }
 
 /* Status notice: says which password the "current password" field expects. */
@@ -252,7 +252,7 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
 html[data-theme='dark'] .settings-view-toggle {
     background: var(--dm-surface, #262626);
     border-color: var(--dm-border, var(--dm-border));
-    color: var(--dm-text-muted, #a0a0a0);
+    color: var(--dm-text-muted, var(--dm-text-muted));
 }
 
 html[data-theme='dark'] .settings-view-toggle:hover {
