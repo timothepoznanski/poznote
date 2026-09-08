@@ -116,7 +116,6 @@
     height: 16px;
     flex-shrink: 0;
     background-color: currentColor;
-    filter: none !important;
     transform: none !important;
 }
 
@@ -269,7 +268,6 @@
     width: 12px;
     height: 12px;
     background-color: currentColor;
-    filter: none !important;
     transition: transform 0.3s ease;
 }
 

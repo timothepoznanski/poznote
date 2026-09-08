@@ -46,6 +46,9 @@
     --pz-danger-soft: #f8d7da;
     --pz-success-soft: #d4edda;
     --pz-warning-soft: #fff3cd;
+    /* Lucide icons are CSS masks painted with currentColor, so an icon's colour
+       is just `color`. This is the grey the old filter chain produced. */
+    --pz-icon: #808080;
     /* White was written as #fff in 268 places, for two opposite jobs: the sheet
        a page is drawn on, and the label sitting on top of a filled control.
        They need separate names, because a theme that darkens the first must not
@@ -77,6 +80,11 @@
     /* A fill that has to sit above a hovered one: a chip, a raised control,
        a nested panel. 15 rules were painting it by hand. */
     --dm-surface-raised: #4a4a4a;
+    /* Lucide icons are CSS masks painted with currentColor, so their colour is
+       just `color`. These two are the greys the old `filter: invert(80%)` /
+       `invert(90%)` produced, kept exactly so nothing moves. */
+    --dm-icon: #cccccc;
+    --dm-icon-hover: #e6e6e6;
     --dm-border: #404040;
     --dm-border-light: #555555;
     --dm-accent: #4a9eff;
@@ -102,6 +110,8 @@ html.theme-black[data-theme='dark'] {
     --dm-surface: #171a21;
     --dm-surface-hover: #202532;
     --dm-surface-raised: #2d303d;
+    --dm-icon: #b9c2cf;
+    --dm-icon-hover: #dde3ec;
     --dm-border: #252b35;
     --dm-border-light: #394150;
     --dm-accent: #5f94f7;
