@@ -567,7 +567,7 @@ if ($isPublicWorkspaceReadonly) {
             $workspaceMenuEnabled = !$isPublicWorkspaceReadonly;
             ?>
             <div class="sidebar-title<?php echo $workspaceMenuEnabled ? '' : ' sidebar-title-static'; ?>"<?php echo $workspaceMenuEnabled ? ' role="button" tabindex="0" data-action="toggle-workspace-menu"' : ''; ?>>
-                <img src="favicon.ico" class="workspace-title-icon" alt="Poznote" aria-hidden="true">
+                <span class="poznote-logo workspace-title-icon" role="img" aria-label="Poznote"></span>
                 <span class="workspace-title-text"><?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?></span>
                 <?php if ($workspaceMenuEnabled): ?>
                 <i class="lucide lucide-caret-down workspace-dropdown-icon"></i>

@@ -35,6 +35,7 @@ function poznoteCssGroups(): array
         '@components' => [
             'css/components/buttons.css',
             'css/components/forms.css',
+            'css/components/logo.css',
         ],
 
         // The dialog stack, in cascade order.

@@ -202,7 +202,7 @@ if (isset($_GET['oidc_error'])) {
     <div class="login-container">
         <div class="login-header">
             <div class="logo">
-                <img src="favicon.ico" alt="<?php echo t_h('app.name', [], 'Poznote', $currentLang ?? 'en'); ?>" class="logo-favicon">
+                <span class="poznote-logo logo-favicon" role="img" aria-label="<?php echo t_h('app.name', [], 'Poznote', $currentLang ?? 'en'); ?>"></span>
             </div>
             <h1 class="login-title"><?php echo htmlspecialchars($login_display_name !== '' ? $login_display_name : 'Poznote'); ?></h1>
         </div>

@@ -23,6 +23,7 @@ $groups = [
         // its bundle has to list them itself. Buttons are not here: index.php has
         // no .btn element, only -btn suffixed classes of its own.
         'css/components/forms.css',
+        'css/components/logo.css',
         'css/utilities.css',
         'css/layout.css',
         'css/icon-sidebar.css',
