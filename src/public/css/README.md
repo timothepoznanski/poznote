@@ -126,6 +126,14 @@ them and a background there breaks their native rendering.
 - no empty rule. A declaration block with nothing in it says nothing to anyone
   but the parser, and an empty `@keyframes` is how the first of those two bugs
   stayed hidden.
+- the same colour ratchet over the markup. The CSS one guards `src/public/css`
+  and nothing else, so it read clean while 534 literals sat in the project's own
+  PHP and JS: inline `style` attributes, `<style>` blocks in a page, colours
+  handed to a script. A theme reaches none of them. Files that legitimately hold
+  colours are listed in `markup_exempt` in the baseline with a reason each: email
+  HTML (mail clients have no `var()`), standalone exports that render outside the
+  app, and colours that are data rather than chrome, like the brand colours of
+  programming languages or the folder palette a user picks from.
 
 ## Writing a palette
 

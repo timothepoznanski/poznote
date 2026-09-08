@@ -15,6 +15,8 @@ on:
     paths:
       - '**.php'
       - '**.css'
+      # css-check.php also counts the colours in PHP and JS.
+      - '**.js'
       - 'tools/css-check.baseline.json'
       - 'phpstan.neon'
       - 'phpstan-baseline.neon'
@@ -24,6 +26,8 @@ on:
     paths:
       - '**.php'
       - '**.css'
+      # css-check.php also counts the colours in PHP and JS.
+      - '**.js'
       - 'tools/css-check.baseline.json'
       - 'phpstan.neon'
       - 'phpstan-baseline.neon'

@@ -350,8 +350,88 @@ foreach ($emptyRules as $r) {
     $errors++;
 }
 
+// ---------------------------------------------------------------------------
+// The same ratchet, over the markup.
+//
+// The colour ratchet above guards src/public/css and nothing else, so it read
+// clean while 534 colour literals sat in the project's own PHP and JS: inline
+// style attributes, <style> blocks inside a page, colours handed to JS. A
+// theme cannot reach any of them, and a green number over a third of the
+// surface is worse than no number.
+//
+// Some of it is legitimate and is listed with a reason in the baseline file:
+// email HTML (no var() in mail clients), standalone exports that must render
+// outside the app, and colours that are DATA rather than chrome, like the
+// brand colours of programming languages or a user's folder-colour palette.
+$markupBaseline = is_file($baselineFile)
+    ? (json_decode(file_get_contents($baselineFile), true)['markup_literals'] ?? null)
+    : null;
+$exempt = is_file($baselineFile)
+    ? (json_decode(file_get_contents($baselineFile), true)['markup_exempt'] ?? [])
+    : [];
+
+$repo = dirname(__DIR__);
+$markup = 0;
+$markupPer = [];
+$vendorish = ['mermaid', 'swagger', 'katex', 'excalidraw', 'codemirror', '/lib/', '.min.js', 'highlight'];
+$srcDir = $repo . '/src';
+if (is_dir($srcDir)) {
+    $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($srcDir, FilesystemIterator::SKIP_DOTS));
+    foreach ($it as $f) {
+        if (!$f->isFile()) {
+            continue;
+        }
+        $path = str_replace('\\', '/', $f->getPathname());
+        $rel = substr($path, strlen($repo) + 1);
+        if (!preg_match('/\.(php|js)$/', $path)) {
+            continue;
+        }
+        if (str_contains($path, '/css/') || str_contains($path, '/vendor/')
+            || str_contains($path, '-dist') || str_contains($path, 'node_modules')) {
+            continue;
+        }
+        foreach ($vendorish as $v) {
+            if (str_contains(strtolower($path), $v)) {
+                continue 2;
+            }
+        }
+        if (isset($exempt[$rel])) {
+            continue;
+        }
+        $body = (string) file_get_contents($path);
+        if (!preg_match_all('/#[0-9a-fA-F]{3,8}\b|\brgba?\([^)]*\)/', $body, $mk)) {
+            continue;
+        }
+        $n = 0;
+        foreach ($mk[0] as $hit) {
+            if (!str_contains($hit, 'var(')) {
+                $n++;
+            }
+        }
+        if ($n > 0) {
+            $markup += $n;
+            $markupPer[$rel] = $n;
+        }
+    }
+}
+if ($markupBaseline !== null && $markup > $markupBaseline) {
+    arsort($markupPer);
+    $worst = array_slice($markupPer, 0, 3, true);
+    $shown = [];
+    foreach ($worst as $file => $n) {
+        $shown[] = "$file ($n)";
+    }
+    echo "colour literals in PHP/JS: $markup, up from $markupBaseline. Put the colour in a "
+       . "token and read it from CSS, or add the file to markup_exempt in "
+       . "tools/css-check.baseline.json WITH a reason. Biggest holders: "
+       . implode(', ', $shown) . "\n";
+    $errors++;
+} elseif ($markupBaseline !== null && $markup < $markupBaseline) {
+    echo "colour literals in PHP/JS: $markup (baseline $markupBaseline) — lower the baseline to hold the gain\n";
+}
+
 if ($errors === 0) {
-    echo count($files) . " stylesheet(s) balanced, $literals colour literal(s)\n";
+    echo count($files) . " stylesheet(s) balanced, $literals colour literal(s) in CSS, $markup in PHP/JS\n";
     exit(0);
 }
 exit(2);
