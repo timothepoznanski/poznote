@@ -6,7 +6,7 @@
  * responsible for gating on the AI configuration ($aiChatConfig from
  * poznoteResolveAiChatConfig()) and for loading css/ai-chat.css, js/ai-chat.js
  * and the two runtimes the latter relies on (js/globals.js for window.t,
- * js/markdown-handler.js for window.parseMarkdown).
+ * js/markdown-parser.js for window.parseMarkdown).
  */
 
 // The settings pages link back to the assistant (back_to_settings.php): tell

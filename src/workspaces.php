@@ -1059,7 +1059,11 @@ try {
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <script src="<?php echo poznoteAsset('js/modal-alerts.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/navigation.js'); ?>"></script>
-    <script src="js/workspaces.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/workspaces.js') ?: time(); ?>"></script>
+    <script src="js/workspaces-core.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/workspaces-core.js') ?: time(); ?>"></script>
+    <script src="js/workspaces-create.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/workspaces-create.js') ?: time(); ?>"></script>
+    <script src="js/workspaces-share.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/workspaces-share.js') ?: time(); ?>"></script>
+    <script src="js/workspaces-actions.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/workspaces-actions.js') ?: time(); ?>"></script>
+    <script src="js/workspaces-page.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/workspaces-page.js') ?: time(); ?>"></script>
     <script src="<?php echo poznoteAsset('js/workspace-background.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/modals-events.js'); ?>"></script>
     

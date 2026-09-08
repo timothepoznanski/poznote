@@ -69,7 +69,7 @@
     //
     // The three-dot button of each row opens #folderActionsModal, which holds
     // the same action items as the folder actions dropdown of index.php. The
-    // implementations are reused from js/utils.js, js/share.js and
+    // implementations are reused from the js/utils-*.js set, js/share.js and
     // js/folder-icon.js, all loaded by this page.
     const actionsModal = document.getElementById('folderActionsModal');
     const actionsMenu = document.getElementById('folder-actions-menu');

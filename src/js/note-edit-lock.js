@@ -183,7 +183,7 @@
     }
 
     // Tasklist notes replace the note body with the task UI and turn the entry
-    // itself non-editable (js/tasklist.js). The lock snapshot is taken from the
+    // itself non-editable (js/tasklist-render.js). The lock snapshot is taken from
     // server markup, before that happens, so restoring it verbatim would make
     // the entry editable again and every tap on a task button (three-dot menu,
     // star, move) would place a caret in the entry and pop the mobile keyboard.
@@ -267,10 +267,6 @@
         }
 
         return t('note_lock.banner', { user: getLockHolderName(lock) }, 'Read only: {{user}} is currently editing this note.');
-    }
-
-    function getLockCheckingMessage() {
-        return t('note_lock.checking', {}, 'Checking edit access...');
     }
 
     function getLockUnavailableMessage() {

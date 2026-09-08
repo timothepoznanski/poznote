@@ -525,7 +525,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
 
 <?php
 // Single shared dropdown for the per-folder three-dot toggles (position:fixed,
-// populated and placed by toggleFolderActionsMenu in js/utils.js). Kept
+// populated and placed by toggleFolderActionsMenu in js/utils-menus.js). Kept
 // outside the scrollable container so no ancestor can clip or transform it.
 echo renderFolderActionsMenu();
 // Same arrangement for the per-note three-dot toggles.

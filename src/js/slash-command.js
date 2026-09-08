@@ -1407,7 +1407,7 @@
 
     // Positioned calendar popup. The implementation lives in
     // js/date-picker-popup.js (window.showSlashDatePicker), shared with
-    // tasklist.js (per-task due dates) and the tasks page.
+    // tasklist-actions.js (per-task due dates) and the tasks page.
     function showSlashDatePicker(anchorRect, onPick, onDismiss, options) {
         if (typeof window.showSlashDatePicker === 'function') {
             window.showSlashDatePicker(anchorRect, onPick, onDismiss, options);

@@ -173,7 +173,7 @@
             toast.style.transform = 'translateY(0)';
 
             // Each toast has its own timer so multiple toasts can appear independently
-            var tId = setTimeout(function () {
+            setTimeout(function () {
                 toast.style.opacity = '0';
                 toast.style.transform = 'translateY(-6px)';
                 setTimeout(function () { try { container.removeChild(toast); } catch (e) {} }, 220);

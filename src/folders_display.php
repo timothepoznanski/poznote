@@ -436,14 +436,14 @@ function generateFolderActions($folderId, $folderName, $con, $workspace_filter, 
  * Render the single shared folder-actions dropdown menu.
  *
  * Emitted once per page (see notes_list.php). On open, the client
- * (toggleFolderActionsMenu in js/utils.js) copies the folder id/name onto
+ * (toggleFolderActionsMenu in js/utils-menus.js) copies the folder id/name onto
  * every action item, shows/hides the count-dependent and share-state items,
  * marks the active sort option and positions the menu next to the toggle.
  *
  * Items are grouped by what they act on (view, move, publish, name, delete)
  * with .folder-actions-menu-separator between groups. A separator left with
  * no visible item on one side is hidden on open by syncActionsMenuSeparators()
- * in js/utils.js, so an empty group (no notes in the folder, or items
+ * in js/utils-menus.js, so an empty group (no notes in the folder, or items
  * unchecked in UI customization) never leaves a stray rule behind.
  *
  * @return string HTML for the shared dropdown menu
@@ -646,7 +646,7 @@ function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderN
  *
  * Emitted once per page (see notes_list.php). Every item reuses an existing
  * note action already wired in js/index-events.js, so opening the note first
- * is no longer required; populateNoteActionsMenu (js/utils.js) copies the note
+ * is no longer required; populateNoteActionsMenu (js/utils-menus.js) copies the note
  * identity onto each item and drops the items a shortcut row cannot use.
  *
  * @param string $currentWorkspace Workspace being displayed, used to drop the
@@ -665,7 +665,7 @@ function renderNoteActionsMenu($currentWorkspace = '') {
     //
     // The groups below are separated by .note-actions-menu-separator; a
     // separator left with no visible item on one side is hidden on open by
-    // syncActionsMenuSeparators() in js/utils.js, so UI customization can
+    // syncActionsMenuSeparators() in js/utils-menus.js, so UI customization can
     // uncheck whole groups without leaving a stray rule behind.
 
     // --- Open, name and appearance in the tree ---

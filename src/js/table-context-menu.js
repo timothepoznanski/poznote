@@ -737,7 +737,7 @@
         return trimmed.split('|').map(c => c.trim());
     }
 
-    // Exposed so setupPreviewInteractivity (markdown-handler.js) can call it
+    // Exposed so setupPreviewInteractivity (markdown-actions.js) can call it
     window.showMdTableContextMenu = showMdTableContextMenu;
     window.hideMdTableContextMenu = hideMdTableContextMenu;
 

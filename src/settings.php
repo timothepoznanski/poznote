@@ -1336,7 +1336,16 @@ if ($canUseUserWebhooks) {
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
     <script src="<?php echo poznoteAsset('js/ui.js'); ?>"></script>
-    <script src="<?php echo poznoteAsset('js/utils.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/utils-note-create.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/utils-folders.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/utils-updates.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/utils-move-folder.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/utils-folder-tree.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/utils-move-note.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/utils-export-create.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/utils-menus.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/utils-note-rename.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/utils-kanban.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/font-size-settings.js'); ?>"></script>
     <script src="js/index-icon-scale-settings.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/index-icon-scale-settings.js') ?: time(); ?>"></script>
     <script src="<?php echo poznoteAsset('js/note-width-settings.js'); ?>"></script>

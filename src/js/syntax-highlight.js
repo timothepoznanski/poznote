@@ -197,7 +197,7 @@
             (preElement ? preElement.getAttribute('data-language') : '') || '').trim();
         if (dataLanguage) return false;
 
-        // Toolbar-inserted blocks (js/toolbar.js) carry the tag as a class:
+        // Toolbar-inserted blocks (js/toolbar-format.js) carry the tag as a class:
         // the CSS draws a "CODE" badge for pre.code-block:not([data-language]).
         if (preElement && preElement.classList.contains('code-block')) return false;
 

@@ -517,7 +517,7 @@ class TasksController
      * Restore the order the UI maintains: important-incomplete, then normal
      * incomplete, then completed. Order inside each group is preserved, so a
      * manual drag-and-drop arrangement survives untouched groups.
-     * Mirrors groupTasksByStatus() in js/tasklist.js.
+     * Mirrors groupTasksByStatus() in js/tasklist-core.js.
      */
     private function regroupTasks(array $tasks): array
     {

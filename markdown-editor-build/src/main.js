@@ -58,7 +58,7 @@ const searchHighlightField = StateField.define({
 })
 
 // Table rows are padded with spaces so their pipes line up in the raw source (see
-// formatMarkdownTableBlockLines in markdown-handler.js). That alignment is only
+// formatMarkdownTableBlockLines in markdown-lists-tables.js). That alignment is only
 // visible in a fixed-width font, so lines that look like table rows are tagged with
 // a class that markdown.css uses to switch them to a monospace font.
 const markdownTableLineDecoration = Decoration.line({ class: 'cm-md-table-line' })

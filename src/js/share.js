@@ -159,7 +159,7 @@ function refreshNotesListAfterFolderAction(folderIdToOpen, options) {
 
                     // The mini calendar lives inside #left_col: replacing the
                     // innerHTML destroyed its DOM and listeners, so rebuild it
-                    // (same as workspaces.js does after a workspace switch).
+                    // (same as workspaces-core.js does after a workspace switch).
                     if (window.MiniCalendar && document.getElementById('mini-calendar')) {
                         window.miniCalendar = new window.MiniCalendar();
                     }

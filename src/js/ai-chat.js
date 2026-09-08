@@ -202,7 +202,7 @@
     }
 
     // Render assistant markdown into a bubble, reusing the app's markdown
-    // parser (markdown-handler.js) with a sanitization pass on top.
+    // parser (markdown-parser.js) with a sanitization pass on top.
     function renderAssistantBubble(bubble, text) {
         if (typeof window.parseMarkdown !== 'function') {
             bubble.textContent = text;
@@ -545,7 +545,7 @@
     }
 
     /**
-     * Called by workspaces.js when the user switches workspace without a page
+     * Called by workspaces-core.js when the user switches workspace without a page
      * reload: park the current conversation under the workspace we are
      * leaving and show the one of the workspace we arrive in (if any). The
      * backend scopes every tool to the current workspace, so carrying the old

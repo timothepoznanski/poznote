@@ -672,7 +672,7 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
      note color palette (Settings > Note colors) plus a custom color. The dot
      marks the workspace's notes and folders on multi-workspace dashboard
      views (css/workspaces.css, handleWorkspaceColorButtonClick in
-     js/workspaces.js) -->
+     js/workspaces-actions.js) -->
 <div id="workspaceColorModal" class="modal initially-hidden">
     <div class="modal-content">
         <h3><?php echo t_h('workspaces.color.modal_title', [], 'Workspace color'); ?> <span id="workspaceColorSource"></span></h3>
@@ -716,7 +716,7 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
 
 <!-- Create dropdown, shared by the sidebar + button and the folder actions
      "Create here" entry. Styled and placed like the folder/note actions menus
-     (css/folders/actions-menu.css, adjustMenuPosition in js/utils.js): a
+     (css/folders/actions-menu.css, adjustMenuPosition in js/utils-menus.js): a
      single menu anchored to whatever opened it, not a modal.
      The .create-note-option class and the data-type values are what the UI
      Customization keys match on, so hiding an entry keeps working. -->

@@ -5352,7 +5352,7 @@ function sanitizeHtml($html) {
  * Replace fenced code blocks and single-backtick code spans with opaque
  * placeholders.
  *
- * Both Markdown renderers (markdown_parser.php and js/markdown-handler.js)
+ * Both Markdown renderers (markdown_parser.php and js/markdown-parser.js)
  * HTML-escape code, so markup quoted as a code sample can never execute and
  * must survive sanitizeMarkdownContent() verbatim (issue #1313). Only a
  * properly closed fence is masked: an unterminated one would otherwise

@@ -779,10 +779,19 @@ $currentLang = getUserLanguage();
 	<script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/modal-alerts.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/ui.js'); ?>"></script>
-	<script src="<?php echo poznoteAsset('js/utils.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/utils-note-create.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/utils-folders.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/utils-updates.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/utils-move-folder.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/utils-folder-tree.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/utils-move-note.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/utils-export-create.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/utils-menus.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/utils-note-rename.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/utils-kanban.js'); ?>"></script>
 	<!-- Folder action implementations reused from index.php: share modal, icon
 	     picker and the modal confirm-button delegation. Load order follows
-	     index_js.php (utils.js before share.js/folder-icon.js). -->
+	     index_js.php (the utils-*.js set before share.js/folder-icon.js). -->
 	<script src="<?php echo poznoteAsset('js/share.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/folder-icon.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/modals-events.js'); ?>"></script>

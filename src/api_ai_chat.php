@@ -638,7 +638,7 @@ function aiFindTaskIndex(array $tasks, $ref): ?int {
     return $found;
 }
 
-/** Important incomplete, then incomplete, then completed: the order the UI keeps (js/tasklist.js). */
+/** Important incomplete, then incomplete, then completed: the order the UI keeps (js/tasklist-core.js). */
 function aiRegroupTasks(array $tasks): array {
     $important = [];
     $normal = [];

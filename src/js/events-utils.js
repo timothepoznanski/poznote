@@ -28,26 +28,6 @@ function extractNoteIdFromEntry(entryElement) {
     return entryElement && entryElement.id ? entryElement.id.replace('entry', '') : null;
 }
 
-// Set the global noteid from the nearest .noteentry ancestor of a DOM element
-function setNoteIdFromNoteentry(element) {
-    var noteentry = element.closest('.noteentry');
-    if (noteentry) {
-        var id = extractNoteIdFromEntry(noteentry);
-        if (id) noteid = id;
-    }
-    return noteentry;
-}
-
-// Serialize checklists in a noteentry and trigger the auto-save pipeline
-function serializeAndMarkModified(noteentry) {
-    if (noteentry && typeof serializeChecklistsBeforeSave === 'function') {
-        serializeChecklistsBeforeSave(noteentry);
-    }
-    if (typeof window.markNoteAsModified === 'function') {
-        window.markNoteAsModified();
-    }
-}
-
 // Build audio_player.php URL from an API attachment URL
 // Returns the new URL or null if the src doesn't match the expected format
 function buildAudioPlayerUrl(src) {
@@ -163,7 +143,7 @@ function showSaveInProgressNotification(onCompleteCallback) {
     }, 100);
 
     // Fallback timeout
-    var fallbackTimeoutId = setTimeout(function () {
+    setTimeout(function () {
         clearInterval(checkInterval);
         showSavedAndDismiss();
     }, 3000);

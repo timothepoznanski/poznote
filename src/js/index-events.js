@@ -1144,7 +1144,7 @@
 
     /**
      * Open the create dropdown under the sidebar + button.
-     * The menu itself lives in modals.php and is driven by js/utils.js.
+     * The menu itself lives in modals.php and is driven by js/utils-export-create.js.
      */
     window.toggleCreateMenu = function () {
         closeSidebarMenu();

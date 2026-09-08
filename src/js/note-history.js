@@ -6,7 +6,7 @@
  * 
  * External Dependencies:
  * - window.noteid - current note ID
- * - loadNoteDirectly(url, noteId, event) - from note-loader-common.js
+ * - loadNoteDirectly(url, noteId, event) - from note-loader.js
  * - window.selectedWorkspace / getSelectedWorkspace() - workspace context
  */
 

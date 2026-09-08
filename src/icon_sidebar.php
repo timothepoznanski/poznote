@@ -255,7 +255,7 @@ if (function_exists('poznoteTidyIconSidebarDividers')) {
 // is on; the href is the no-JS fallback (settings.php auto-opens the same
 // modal on ?open=profile).
 // The update badge is admin-only, matching the Check for Updates card in
-// settings.php; js/utils.js reveals every .update-badge when a release is out.
+// settings.php; js/utils-updates.js reveals every .update-badge when a release is out.
 $iconSidebarBottomItems = [
     ['id' => 'iconSidebarProfileBtn', 'url' => $iconSidebarUrl('settings.php', ['open' => 'profile']) . '#my-profile-card', 'icon' => 'lucide-user', 'label' => t('profile.card', [], 'My Profile')],
     // Light/dark/black switch. It goes nowhere, so it renders as a button

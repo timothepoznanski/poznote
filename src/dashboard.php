@@ -900,10 +900,12 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 		<script src="<?php echo poznoteAsset('js/board-view-menu.js'); ?>"></script>
 		<?php if ($aiChatEnabled): ?>
 		<!-- AI chat panel: js/globals.js brings the i18n runtime (window.t) and
-		     getSelectedWorkspace(), js/markdown-handler.js the parser that renders
-		     the assistant's answers (window.parseMarkdown). -->
+		     getSelectedWorkspace(). The assistant's answers are rendered with
+		     window.parseMarkdown, so only the parser and the source helpers it
+		     builds on are needed here, not the whole markdown editor. -->
 		<script src="<?php echo poznoteAsset('js/globals.js'); ?>"></script>
-		<script src="<?php echo poznoteAsset('js/markdown-handler.js'); ?>"></script>
+		<script src="<?php echo poznoteAsset('js/markdown-source.js'); ?>"></script>
+		<script src="<?php echo poznoteAsset('js/markdown-parser.js'); ?>"></script>
 		<script src="<?php echo poznoteAsset('js/ai-chat.js'); ?>"></script>
 		<?php endif; ?>
     <script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>

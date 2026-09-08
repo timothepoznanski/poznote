@@ -559,7 +559,7 @@
         }
 
         // Implicit form submission is what mobile virtual keyboards trigger
-        // reliably (see tasklist.js); the keydown handler covers desktop
+        // reliably (see tasklist-edit-modal.js); the keydown handler covers desktop
         form.addEventListener('submit', function (e) {
             e.preventDefault();
             submitAdd();
@@ -578,7 +578,7 @@
         return form;
     }
 
-    // Rename through the shared "Edit task" modal of tasklist.js (multi-line
+    // Rename through the shared "Edit task" modal of tasklist-edit-modal.js (multi-line
     // text, Ctrl+Enter saves); the modal hands the new text back and the
     // widget persists it itself
     function openEmbedEditModal(embed, noteId, task, textEl) {

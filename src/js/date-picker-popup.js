@@ -1,5 +1,5 @@
 // Positioned calendar popup shared by the slash menu (slash-command.js),
-// tasklist due dates (tasklist.js) and the tasks page (tasks-page.js).
+// tasklist due dates (tasklist-actions.js) and the tasks page (tasks-page.js).
 //
 // The native <input type="date"> picker cannot be used here: the browser
 // decides where to open it and, at least on Chromium/Linux, showPicker()

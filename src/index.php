@@ -557,7 +557,7 @@ if ($isPublicWorkspaceReadonly) {
             <?php
             // The title opens the workspace dropdown even when a single
             // workspace exists: the menu also carries the "Edit workspaces" /
-            // "New workspace" entries (js/workspaces.js). Only the read-only
+            // "New workspace" entries (js/workspaces-core.js). Only the read-only
             // public view keeps a plain, non-clickable title.
             $workspaceMenuEnabled = !$isPublicWorkspaceReadonly;
             ?>

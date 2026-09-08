@@ -31,7 +31,8 @@
  * it, so an undone paste leaves nothing behind in the trash.
  *
  * The existing flows call record() once their request succeeded (see
- * js/events-drag-drop.js, js/utils.js, js/notes.js, js/inline-tree-edit.js),
+ * js/events-drag-drop.js, the js/utils-*.js set, js/notes.js,
+ * js/inline-tree-edit.js),
  * reading the "before" state through noteState() / folderState() first.
  */
 (function () {
@@ -888,7 +889,7 @@
     }
 
     /**
-     * Called by populateNoteActionsMenu / populateFolderActionsMenu (js/utils.js)
+     * Called by populateNoteActionsMenu / populateFolderActionsMenu (js/utils-menus.js)
      * each time a menu opens: the paste item only makes sense with something
      * on the clipboard, and the shortcut hints follow the platform.
      */

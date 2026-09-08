@@ -78,7 +78,7 @@
         });
     }
 
-    // Same grouping/order rules as toggleTask in tasklist.js: important
+    // Same grouping/order rules as toggleTask in tasklist-crud.js: important
     // incomplete first, normal incomplete, then completed (a newly completed
     // task goes to the start of the completed group in bottom-insert mode)
     function reorderTasksAfterToggle(tasks, toggledTask) {

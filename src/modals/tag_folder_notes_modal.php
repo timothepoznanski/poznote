@@ -1,5 +1,5 @@
 <!-- Tag all notes of a folder. Shared by index.php (via modals.php) and
-     list_folders.php; opened by showTagFolderNotesDialog() in js/utils.js.
+     list_folders.php; opened by showTagFolderNotesDialog() in js/utils-menus.js.
      The messages the script needs at runtime are carried as data attributes,
      so the page does not have to load the client-side i18n bundle. -->
 <div id="tagFolderNotesModal" class="modal"

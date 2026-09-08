@@ -150,11 +150,24 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
     <?php include 'modals.php'; ?>
     
     <script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
-    <script src="<?php echo poznoteAsset('js/workspaces.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/workspaces-core.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/workspaces-create.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/workspaces-share.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/workspaces-actions.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/workspaces-page.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/navigation.js'); ?>"></script>
     <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/ui.js?v=<?php echo $cache_v; ?>"></script>
-    <script src="<?php echo poznoteAsset('js/utils.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/utils-note-create.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/utils-folders.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/utils-updates.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/utils-move-folder.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/utils-folder-tree.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/utils-move-note.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/utils-export-create.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/utils-menus.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/utils-note-rename.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/utils-kanban.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/linked-note-selector.js'); ?>"></script>
     <script src="js/modals-events.js?v=<?php echo $cache_v; ?>"></script>
     <script>window.DEFAULT_NOTE_TITLES = <?php echo getDefaultNoteTitlesJson(); ?>;</script>

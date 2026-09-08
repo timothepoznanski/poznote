@@ -58,7 +58,7 @@
     /**
      * Re-point every rail link at another workspace.
      *
-     * index.php switches workspace without reloading (js/workspaces.js pushes
+     * index.php switches workspace without reloading (js/workspaces-core.js pushes
      * the new one into the URL and re-fetches only #left_col), and the rail
      * lives outside that column, so the hrefs icon_sidebar.php rendered would
      * otherwise keep carrying the workspace that was selected when the page

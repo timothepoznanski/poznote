@@ -238,23 +238,6 @@
             });
     }
 
-    function isValidCustomCssPath(path) {
-        var normalizedPath = (path || '').trim();
-        if (normalizedPath === '') {
-            return true;
-        }
-
-        if (/^[a-z][a-z0-9+.-]*:/i.test(normalizedPath) || normalizedPath.indexOf('\\') !== -1) {
-            return false;
-        }
-
-        if (normalizedPath.indexOf('..') !== -1 || normalizedPath.indexOf('/') !== -1) {
-            return false;
-        }
-
-        return /^[A-Za-z0-9._-]+\.css$/.test(normalizedPath);
-    }
-
     // Reload opener window if it's index.php
     function reloadOpener() {
         try {
@@ -4119,7 +4102,7 @@
     }
 
     // SortableJS is vendored but not loaded on the settings page; pull it in on
-    // first open, exactly as js/tasklist.js does. The up/down buttons are the
+    // first open, exactly as js/tasklist-order-drag.js does. The up/down buttons are the
     // fallback, so a failed load costs nothing but the dragging.
     function initIconSidebarOrderSortable() {
         var list = getIconSidebarOrderList();

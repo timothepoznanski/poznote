@@ -42,7 +42,7 @@
     /**
      * The language shown on the badge, or '' for an untagged block.
      * Both the PRE and the CODE carry data-language (see slash-command.js),
-     * except for toolbar-inserted blocks (js/toolbar.js) where the .code-block
+     * except for toolbar-inserted blocks (js/toolbar-format.js) where the .code-block
      * class alone makes the CSS draw a "CODE" badge.
      */
     function getBlockLanguage(block) {
@@ -76,7 +76,7 @@
      * A markdown block is rendered from a ``` fence, so retagging it means
      * rewriting that fence line in the source and re-rendering. The rendered
      * <pre> carries a data-line attribute pointing at its own fence line
-     * (js/markdown-handler.js), which is used to locate it in the source.
+     * (js/markdown-parser.js), which is used to locate it in the source.
      * ---------------------------------------------------------------- */
 
     function getMarkdownPreview(block) {
@@ -297,7 +297,7 @@
 
         if (!normalized) {
             // Plain block: no badge, no highlighting, no line numbers.
-            // .code-block (set by the toolbar button, js/toolbar.js) draws a
+            // .code-block (set by the toolbar button, js/toolbar-format.js) draws a
             // "CODE" badge on its own, so it has to go too or the tag would
             // survive its own removal.
             pre.removeAttribute('data-language');

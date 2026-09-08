@@ -136,7 +136,7 @@ function convertBase64ImagesToAttachments(noteEntry) {
     }
 }
 
-// Expose function globally for use in note-loader-common.js
+// Expose function globally for use in js/note-content-init.js
 window.convertBase64ImagesToAttachments = convertBase64ImagesToAttachments;
 
 /**

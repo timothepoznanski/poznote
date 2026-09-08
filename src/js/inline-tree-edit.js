@@ -6,7 +6,8 @@
  * commits a changed value. Creating a folder inserts a draft row at the place
  * the folder will live, so nothing has to be hunted down afterwards.
  *
- * Every entry point (newFolder/editFolderName/renameNote in js/utils.js,
+ * Every entry point (newFolder in js/utils-folders.js, editFolderName in
+ * js/utils-folder-tree.js, renameNote in js/utils-note-rename.js,
  * createSubfolder in js/folder-hierarchy.js) checks the boolean these
  * functions return and keeps its modal for the pages that have no tree,
  * namely create.php and list_folders.php.
