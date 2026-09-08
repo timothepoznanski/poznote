@@ -29,7 +29,7 @@ input[type="radio"] {
 }
 
 .css-title:focus {
-    border: none !important;
+    border: none;
     outline: none;
     box-shadow: none;
 }
@@ -50,5 +50,5 @@ hr {
     font-style: italic;
     font-weight: 400;
     margin-top: 7px;
-    color: rgb(51, 51, 51) !important;
+    color: rgb(51, 51, 51);
 }

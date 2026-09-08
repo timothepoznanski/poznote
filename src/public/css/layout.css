@@ -111,7 +111,7 @@ body {
 .sidebar-howto{
     background: transparent;
     border: none;
-    color: var(--pz-accent) !important;
+    color: var(--pz-accent);
     font-size: 1.3rem;
     cursor: pointer;
     padding: 6px;
@@ -125,7 +125,7 @@ body {
 .sidebar-plus {
     background: transparent;
     border: none;
-    color: var(--pz-text-muted) !important;
+    color: var(--pz-text-muted);
     font-size: 1.2rem;
     cursor: pointer;
     padding: 6px;
@@ -246,7 +246,7 @@ body {
     background-color: currentColor;
     -webkit-mask-size: 100% 100%;
     mask-size: 100% 100%;
-    filter: none !important;
+    filter: none;
 }
 
 /* Collapsed state */

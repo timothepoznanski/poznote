@@ -12,7 +12,7 @@
 pre.code-block,
 .noteentry pre {
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
-    background-color: var(--pz-surface) !important;
+    background-color: var(--pz-surface);
     /* border: 1px solid #e1e1e1; */
     border-radius: 4px;
     padding: 20px 20px;
@@ -34,7 +34,7 @@ pre.code-block,
     margin: 0 !important;
     padding: 30px 30px !important;
     /* border-radius: 6px; */
-    background: var(--pz-surface) !important;
+    background: var(--pz-surface);
     border: 1px solid var(--pz-border-light);
     overflow-x: auto;
     position: relative;
@@ -203,29 +203,29 @@ pre.code-block .code-block-delete-btn,
     width: 28px;
     height: 28px;
     padding: 0 !important;
-    background: transparent !important;
-    border: none !important;
-    color: var(--pz-text-subtle) !important;
-    opacity: 0.55 !important;
+    background: transparent;
+    border: none;
+    color: var(--pz-text-subtle);
+    opacity: 0.55;
 }
 
 .code-block-actions-host > .code-block-delete-btn {
-    color: var(--pz-danger) !important;
+    color: var(--pz-danger);
 }
 
 .code-block-actions-host > .code-block-copy-btn:hover,
 .code-block-actions-host > .code-block-delete-btn:hover,
 .code-block-actions-host > .code-block-line-numbers-btn:hover {
-    opacity: 1 !important;
+    opacity: 1;
 }
 
 .code-block-actions-host > .code-block-copy-btn:hover,
 .code-block-actions-host > .code-block-line-numbers-btn:hover {
-    color: var(--pz-text) !important;
+    color: var(--pz-text);
 }
 
 .code-block-actions-host > .code-block-delete-btn:hover {
-    color: var(--pz-danger) !important;
+    color: var(--pz-danger);
 }
 
 .code-block-actions-host > .code-block-copy-btn svg,
@@ -282,7 +282,7 @@ code {
 /* Code inside pre blocks should not have background */
 pre code,
 .noteentry pre code {
-    background-color: transparent !important;
+    background-color: transparent;
     padding: 0 !important;
     border-radius: 0 !important;
     font-size: inherit !important;
@@ -366,7 +366,7 @@ code *[style*="background"],
 .noteentry pre *[style*="background"],
 .noteentry code *[style*="background"],
 .noteentry .code-block *[style*="background"] {
-    background: linear-gradient(rgba(255, 255, 0, 0.4), rgba(255, 255, 0, 0.4)), var(--pz-surface-hover) !important;
+    background: linear-gradient(rgba(255, 255, 0, 0.4), rgba(255, 255, 0, 0.4)), var(--pz-surface-hover);
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
     font-size: inherit;
     /* inherit font size from parent */

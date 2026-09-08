@@ -19,15 +19,15 @@
 }
 
 .settings-container > a.btn-primary {
-    background: var(--pz-accent) !important;
-    color: var(--pz-text-inverse) !important;
-    border: none !important;
+    background: var(--pz-accent);
+    color: var(--pz-text-inverse);
+    border: none;
 }
 
 .settings-container > a.btn-secondary {
-    background: var(--pz-neutral) !important;
-    color: var(--pz-text-inverse) !important;
-    border: none !important;
+    background: var(--pz-neutral);
+    color: var(--pz-text-inverse);
+    border: none;
 }
 
 /* Alert messages */

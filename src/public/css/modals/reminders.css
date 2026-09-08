@@ -4,7 +4,7 @@
 
 /* ---- Reminder button in toolbar ---- */
 .btn-reminder.has-reminder {
-    color: var(--pz-accent) !important;
+    color: var(--pz-accent);
 }
 
 .btn-reminder.has-reminder i {
@@ -387,7 +387,7 @@
 }
 
 .notification-action-btn:hover {
-    opacity: 1 !important;
+    opacity: 1;
     background: var(--pz-surface-hover);
 }
 

@@ -69,6 +69,6 @@ html[data-theme='dark'] #new-note-loading-placeholder {
 }
 
 .links_arbo_left.selected-note {
-    background-color: transparent !important;
-    border-left: none !important;
+    background-color: transparent;
+    border-left: none;
 }

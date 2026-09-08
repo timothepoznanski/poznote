@@ -139,7 +139,7 @@
     height: 36px !important;
     min-width: 36px !important;
     padding: 0 !important;
-    border: none !important;
+    border: none;
     border-radius: 6px !important;
     font-size: 14px !important;
     flex: 0 0 auto !important;
@@ -184,18 +184,18 @@
 
 /* Ensure action icon buttons keep their background/color */
 .btn-icon.btn-view {
-    background: var(--pz-accent) !important;
-    color: var(--pz-text-inverse) !important;
+    background: var(--pz-accent);
+    color: var(--pz-text-inverse);
 }
 
 .btn-icon.btn-download {
-    background: var(--pz-success) !important;
-    color: var(--pz-text-inverse) !important;
+    background: var(--pz-success);
+    color: var(--pz-text-inverse);
 }
 
 .btn-icon.btn-delete {
-    background: var(--pz-danger) !important;
-    color: var(--pz-text-inverse) !important;
+    background: var(--pz-danger);
+    color: var(--pz-text-inverse);
 }
 
 /* Prevent modal global rules from making .btn-icon full width */

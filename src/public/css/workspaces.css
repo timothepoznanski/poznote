@@ -973,7 +973,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
         align-items: stretch !important;
         gap: 10px !important;
         padding: 15px 0 !important;
-        border-bottom: 1px solid var(--pz-border) !important;
+        border-bottom: 1px solid var(--pz-border);
     }
     
     .workspace-list .ws-col {
@@ -1082,18 +1082,18 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
     justify-content: center !important;
     width: 36px !important; /* Slightly larger on mobile for easier touch */
     height: 36px !important;
-    border: 1px solid var(--pz-border) !important;
+    border: 1px solid var(--pz-border);
     border-radius: 4px !important;
-    background: var(--pz-bg) !important;
-    color: var(--pz-text-muted) !important;
+    background: var(--pz-bg);
+    color: var(--pz-text-muted);
     cursor: pointer !important;
     transition: all 0.2s ease !important;
     margin-right: 8px !important; /* More spacing on mobile */
 }
 
 .btn-icon:hover {
-    background: var(--pz-surface) !important;
-    border-color: #bbb !important;
+    background: var(--pz-surface);
+    border-color: #bbb;
 }
 
 .btn-icon svg {
@@ -1102,13 +1102,13 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
 }
 
 .btn-download:hover {
-    color: var(--pz-success) !important;
-    border-color: var(--pz-success) !important;
+    color: var(--pz-success);
+    border-color: var(--pz-success);
 }
 
 .btn-delete:hover {
-    color: var(--pz-danger) !important;
-    border-color: var(--pz-danger) !important;
+    color: var(--pz-danger);
+    border-color: var(--pz-danger);
 }
 
 .workspace-list ul li {

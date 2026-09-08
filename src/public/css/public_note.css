@@ -258,7 +258,7 @@ body.public-note-page {
 
 .public-note .content pre {
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
-    background: var(--pz-surface) !important;
+    background: var(--pz-surface);
     padding: 30px !important;
     padding-bottom: 20px !important;
     border-radius: 4px;
@@ -281,11 +281,11 @@ body.public-note-page {
 }
 
 .public-note .content pre code {
-    background-color: transparent !important;
+    background-color: transparent;
     padding: 0 !important;
     color: inherit;
     border-radius: 0 !important;
-    border: none !important;
+    border: none;
     display: block;
     line-height: 1.4;
     white-space: inherit !important;
@@ -295,7 +295,7 @@ body.public-note-page {
 /* Remove Highlight.js background in public notes */
 .public-note .content pre code.hljs,
 .public-note .content pre .hljs {
-    background: transparent !important;
+    background: transparent;
 }
 
 /* Copy button for code blocks */
@@ -744,9 +744,9 @@ html[data-theme='dark'] .public-note audio::-webkit-media-controls-panel {
 }
 
 html[data-theme='dark'] .public-note .content pre {
-    background-color: var(--dm-code-bg) !important;
-    border-color: var(--dm-border) !important;
-    color: var(--dm-text-muted) !important;
+    background-color: var(--dm-code-bg);
+    border-color: var(--dm-border);
+    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .public-note .content code:not([class*="hljs"]):not([class*="language-"]) {
@@ -756,14 +756,14 @@ html[data-theme='dark'] .public-note .content code:not([class*="hljs"]):not([cla
 }
 
 html[data-theme='dark'] .public-note .content pre code:not([class*="hljs"]):not([class*="language-"]) {
-    background-color: transparent !important;
-    color: var(--dm-text-muted) !important;
-    border-color: transparent !important;
+    background-color: transparent;
+    color: var(--dm-text-muted);
+    border-color: transparent;
 }
 
 html[data-theme='dark'] .public-note .content pre code[class*="language-"],
 html[data-theme='dark'] .public-note .content code[class*="language-"] {
-    color: var(--dm-text-muted) !important;
+    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .public-note-attachments {
@@ -840,7 +840,7 @@ html[data-theme='dark'] .public-note .content [style*="color: #000"],
 html[data-theme='dark'] .public-note .content [style*="color:#000"],
 html[data-theme='dark'] .public-note .content [style*="color: black"],
 html[data-theme='dark'] .public-note .content [style*="color:black"] {
-    color: var(--dm-text) !important;
+    color: var(--dm-text);
 }
 
 /* ============================================================================

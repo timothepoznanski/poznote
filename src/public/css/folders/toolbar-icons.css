@@ -8,7 +8,7 @@
 /* When attachments exist, make the paperclip icon blue */
 .btn-attachment.has-attachments i.lucide-paperclip,
 .btn-attachment.has-attachments .lucide-paperclip {
-    color: var(--pz-accent) !important;
+    color: var(--pz-accent);
 }
 
 /* Blue color for favorite star when marked as favorite */
@@ -17,21 +17,21 @@
 .toolbar-btn.btn-publish.is-shared i.lucide-share-2,
 .toolbar-btn.btn-publish.is-shared .lucide-share-2,
 .toolbar-btn.btn-attachment.has-attachments i {
-    color: var(--pz-accent) !important;
-    filter: none !important;
+    color: var(--pz-accent);
+    filter: none;
 }
 
 /* Blue color for markdown view mode toggle button */
 .toolbar-btn.markdown-view-mode-btn i,
 .toolbar-btn.markdown-view-mode-btn [class*="lucide-"] {
-    color: var(--pz-accent) !important;
-    filter: none !important;
+    color: var(--pz-accent);
+    filter: none;
 }
 
 .toolbar-btn.markdown-view-mode-btn:hover i,
 .toolbar-btn.markdown-view-mode-btn:hover [class*="lucide-"] {
-    color: var(--pz-accent) !important;
-    filter: none !important;
+    color: var(--pz-accent);
+    filter: none;
     transform: scale(1.18);
 }
 

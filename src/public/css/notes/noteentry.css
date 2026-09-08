@@ -265,7 +265,7 @@ textarea:focus {
 }
 
 .noteentry .heading-anchor:hover {
-    opacity: 1 !important;
+    opacity: 1;
 }
 
 .noteentry .heading-anchor svg {

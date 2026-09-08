@@ -393,7 +393,7 @@ a.ai-chat-header-btn {
 /* icons.css applies a global gray filter to all lucide icons; without this
    exclusion the white send arrow renders gray on the blue button */
 #ai-chat-panel [class*="lucide-"] {
-    filter: none !important;
+    filter: none;
     color: inherit;
 }
 

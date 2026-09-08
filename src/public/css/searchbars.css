@@ -147,15 +147,15 @@
 }
 
 .searchbar-type-btn.active {
-    color: var(--pz-accent) !important;
+    color: var(--pz-accent);
 }
 
 .searchbar-type-btn.active i {
-    color: var(--pz-accent) !important;
+    color: var(--pz-accent);
 }
 
 .searchbar-type-btn.active i::before {
-    color: var(--pz-accent) !important;
+    color: var(--pz-accent);
 }
 
 .searchbar-type-btn i {
@@ -241,7 +241,7 @@
     right: 8px;
     top: 50%;
     transform: translateY(-50%);
-    background: none !important;
+    background: none;
     border: none;
     outline: none;
     cursor: pointer;

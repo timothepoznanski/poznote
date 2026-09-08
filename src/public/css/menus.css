@@ -233,8 +233,8 @@
 
 /* Make delete icon red in actions menu */
 .actions-menu-item .lucide-trash-2 {
-    color: var(--pz-danger) !important;
-    filter: none !important;
+    color: var(--pz-danger);
+    filter: none;
 }
 
 /* .actions-dropdown.mobile .actions-menu { min-width: 120px; padding: 6px 0; } */

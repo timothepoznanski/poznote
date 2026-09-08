@@ -21,37 +21,37 @@
 
 .folder-toggle.folder-dragging,
 .folder-header.folder-dragging {
-    opacity: 0.6 !important;
-    background-color: rgba(255, 152, 0, 0.08) !important;
-    border: 2px dashed rgba(255, 152, 0, 0.4) !important;
+    opacity: 0.6;
+    background-color: rgba(255, 152, 0, 0.08);
+    border: 2px dashed rgba(255, 152, 0, 0.4);
     transform: scale(0.98) !important;
     padding: 4px !important;
 }
 
 .folder-header.folder-source-drag {
-    background-color: rgba(255, 152, 0, 0.08) !important;
-    border: 2px solid rgba(255, 152, 0, 0.3) !important;
+    background-color: rgba(255, 152, 0, 0.08);
+    border: 2px solid rgba(255, 152, 0, 0.3);
     border-radius: 8px !important;
     padding: 4px !important;
     margin: 2px 0 !important;
-    box-shadow: 0 0 6px rgba(255, 152, 0, 0.2) !important;
+    box-shadow: 0 0 6px rgba(255, 152, 0, 0.2);
     transition: all 0.2s ease !important;
 }
 
 .folder-header.drag-over {
-    background-color: rgba(var(--pz-accent-rgb), 0.12) !important;
-    border: 2px dashed var(--pz-accent) !important;
+    background-color: rgba(var(--pz-accent-rgb), 0.12);
+    border: 2px dashed var(--pz-accent);
     border-radius: 8px !important;
-    box-shadow: 0 0 8px rgba(var(--pz-accent-rgb), 0.3) !important;
+    box-shadow: 0 0 8px rgba(var(--pz-accent-rgb), 0.3);
     padding: 4px !important;
     margin: 2px 0 !important;
     transition: all 0.2s ease !important;
 }
 
 .folder-header.folder-drop-target {
-    background-color: rgba(var(--pz-accent-rgb), 0.15) !important;
-    border: 2px dashed var(--pz-accent) !important;
-    box-shadow: 0 0 12px rgba(var(--pz-accent-rgb), 0.4) !important;
+    background-color: rgba(var(--pz-accent-rgb), 0.15);
+    border: 2px dashed var(--pz-accent);
+    box-shadow: 0 0 12px rgba(var(--pz-accent-rgb), 0.4);
     padding: 4px !important;
     margin: 2px 0 !important;
     transform: scale(1.02);
@@ -123,26 +123,26 @@ html[data-theme='dark'] .note-list-item.note-drop-after::after {
 
 /* Dark mode folder dragging */
 html[data-theme='dark'] .folder-header.folder-dragging {
-    background-color: rgba(255, 167, 38, 0.12) !important;
-    border-color: rgba(255, 167, 38, 0.5) !important;
+    background-color: rgba(255, 167, 38, 0.12);
+    border-color: rgba(255, 167, 38, 0.5);
 }
 
 html[data-theme='dark'] .folder-header.folder-source-drag {
-    background-color: rgba(255, 167, 38, 0.12) !important;
-    border: 2px solid rgba(255, 167, 38, 0.4) !important;
-    box-shadow: 0 0 6px rgba(255, 167, 38, 0.3) !important;
+    background-color: rgba(255, 167, 38, 0.12);
+    border: 2px solid rgba(255, 167, 38, 0.4);
+    box-shadow: 0 0 6px rgba(255, 167, 38, 0.3);
 }
 
 html[data-theme='dark'] .folder-header.drag-over {
-    background-color: rgba(74, 144, 226, 0.15) !important;
-    border: 2px dashed var(--dm-accent) !important;
-    box-shadow: 0 0 8px rgba(74, 144, 226, 0.4) !important;
+    background-color: rgba(74, 144, 226, 0.15);
+    border: 2px dashed var(--dm-accent);
+    box-shadow: 0 0 8px rgba(74, 144, 226, 0.4);
 }
 
 html[data-theme='dark'] .folder-header.folder-drop-target {
-    background-color: rgba(74, 144, 226, 0.2) !important;
-    border: 2px dashed var(--dm-accent) !important;
-    box-shadow: 0 0 12px rgba(74, 144, 226, 0.5) !important;
+    background-color: rgba(74, 144, 226, 0.2);
+    border: 2px dashed var(--dm-accent);
+    box-shadow: 0 0 12px rgba(74, 144, 226, 0.5);
 }
 
 html[data-theme='dark'] .folder-header.folder-drop-before>.folder-toggle::before,
@@ -220,10 +220,10 @@ html[data-theme='dark'] .folder-header.folder-drop-after>.folder-toggle::after {
 }
 
 .root-drop-zone.drag-over {
-    border-color: var(--pz-accent) !important;
-    background-color: var(--pz-accent-soft) !important;
+    border-color: var(--pz-accent);
+    background-color: var(--pz-accent-soft);
     transform: scale(1.02) !important;
-    box-shadow: 0 4px 12px rgba(var(--pz-accent-rgb), 0.3) !important;
+    box-shadow: 0 4px 12px rgba(var(--pz-accent-rgb), 0.3);
 }
 
 .drop-zone-content {
@@ -261,9 +261,9 @@ html[data-theme='dark'] .drop-zone-content {
 
 /* Note dragging styles - applies to ALL notes */
 .dragging {
-    opacity: 0.85 !important;
-    background-color: rgba(var(--pz-accent-rgb), 0.05) !important;
-    border-left: 2px solid rgba(var(--pz-accent-rgb), 0.3) !important;
+    opacity: 0.85;
+    background-color: rgba(var(--pz-accent-rgb), 0.05);
+    border-left: 2px solid rgba(var(--pz-accent-rgb), 0.3);
     transform: scale(0.98) !important;
     cursor: grabbing !important;
 }
@@ -272,10 +272,10 @@ html[data-theme='dark'] .drop-zone-content {
 a.links_arbo_left.dragging,
 .note-in-folder.dragging,
 .note-without-folder.dragging {
-    opacity: 0.85 !important;
-    background-color: rgba(var(--pz-accent-rgb), 0.05) !important;
-    border-left: 2px solid rgba(var(--pz-accent-rgb), 0.3) !important;
-    box-shadow: 0 2px 6px rgba(var(--pz-accent-rgb), 0.15) !important;
+    opacity: 0.85;
+    background-color: rgba(var(--pz-accent-rgb), 0.05);
+    border-left: 2px solid rgba(var(--pz-accent-rgb), 0.3);
+    box-shadow: 0 2px 6px rgba(var(--pz-accent-rgb), 0.15);
     transform: scale(0.98) !important;
     z-index: 1000 !important;
     position: relative !important;
@@ -377,10 +377,10 @@ a.links_arbo_left.dragging,
 
 /* The folder that will receive the imported notes */
 .folder-header.file-import-drop-target {
-    background-color: rgba(var(--pz-accent-rgb), 0.15) !important;
-    border: 2px dashed var(--pz-accent) !important;
+    background-color: rgba(var(--pz-accent-rgb), 0.15);
+    border: 2px dashed var(--pz-accent);
     border-radius: 8px !important;
-    box-shadow: 0 0 12px rgba(var(--pz-accent-rgb), 0.35) !important;
+    box-shadow: 0 0 12px rgba(var(--pz-accent-rgb), 0.35);
     padding: 4px !important;
     margin: 2px 0 !important;
     transition: all 0.2s ease !important;

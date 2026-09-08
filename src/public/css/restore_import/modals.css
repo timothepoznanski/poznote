@@ -216,14 +216,14 @@ html[data-theme='dark'] .direct-copy-restore-spinner {
 }
 
 html[data-theme='dark'] .import-confirm-modal .import-confirm-modal-content .btn-cancel {
-    background-color: var(--dm-surface-raised) !important;
-    color: var(--dm-text-bright) !important;
-    border: 1px solid var(--dm-border-light) !important;
+    background-color: var(--dm-surface-raised);
+    color: var(--dm-text-bright);
+    border: 1px solid var(--dm-border-light);
 }
 
 html[data-theme='dark'] .import-confirm-modal .import-confirm-modal-content .btn-cancel:hover {
-    background-color: var(--dm-neutral) !important;
-    border-color: var(--dm-border-light) !important;
+    background-color: var(--dm-neutral);
+    border-color: var(--dm-border-light);
 }
 
 html[data-theme='dark'] .import-confirm-modal .btn-confirm,

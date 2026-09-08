@@ -35,8 +35,8 @@ html[data-theme='dark'] .home-card-icon {
 
 /* Dark mode - debug info */
 html[data-theme='dark'] .debug-info {
-    background: var(--dm-sidebar-surface) !important;
-    border-color: var(--dm-border) !important;
+    background: var(--dm-sidebar-surface);
+    border-color: var(--dm-border);
     color: var(--dm-text);
 }
 

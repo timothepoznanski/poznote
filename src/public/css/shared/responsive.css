@@ -41,7 +41,7 @@
     html::-webkit-scrollbar {
         display: block !important;
         width: 6px !important;
-        background-color: var(--pz-surface-hover) !important;
+        background-color: var(--pz-surface-hover);
     }
 
     body {
@@ -59,7 +59,7 @@
     body::-webkit-scrollbar {
         display: block !important;
         width: 12px !important;
-        background-color: var(--pz-surface-hover) !important;
+        background-color: var(--pz-surface-hover);
     }
 
     body.shared-page {
@@ -76,7 +76,7 @@
     body.shared-page::-webkit-scrollbar {
         display: block !important;
         width: 12px !important;
-        background-color: var(--pz-surface-hover) !important;
+        background-color: var(--pz-surface-hover);
     }
 
     /* Fix pour iOS Safari */
@@ -296,7 +296,7 @@
     }
 
     [data-theme="dark"] body.shared-page {
-        background: var(--dm-bg) !important;
+        background: var(--dm-bg);
     }
 
     [data-theme="dark"] .indexable-label-text {

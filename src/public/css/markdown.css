@@ -22,17 +22,17 @@
     white-space: pre-wrap;
     word-wrap: break-word;
     background-color: transparent;
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
+    border: none;
+    outline: none;
+    box-shadow: none;
     /* Prevent parent container from scrolling when cursor moves */
     overflow-anchor: none;
 }
 
 .markdown-editor:focus {
-    outline: none !important;
-    border: none !important;
-    box-shadow: none !important;
+    outline: none;
+    border: none;
+    box-shadow: none;
 }
 
 /* Table rows are space-padded so their pipes line up (formatMarkdownTableBlockLines
@@ -169,79 +169,79 @@ html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::befor
 }
 
 .markdown-codemirror-host .poznote-cm-keyword {
-    color: var(--poznote-cm-keyword) !important;
+    color: var(--poznote-cm-keyword);
 }
 
 .markdown-codemirror-host .poznote-cm-atom {
-    color: var(--poznote-cm-atom) !important;
+    color: var(--poznote-cm-atom);
 }
 
 .markdown-codemirror-host .poznote-cm-string {
-    color: var(--poznote-cm-string) !important;
+    color: var(--poznote-cm-string);
 }
 
 .markdown-codemirror-host .poznote-cm-number {
-    color: var(--poznote-cm-number) !important;
+    color: var(--poznote-cm-number);
 }
 
 .markdown-codemirror-host .poznote-cm-comment {
-    color: var(--poznote-cm-comment) !important;
+    color: var(--poznote-cm-comment);
     font-style: italic !important;
 }
 
 .markdown-codemirror-host .poznote-cm-function {
-    color: var(--poznote-cm-function) !important;
+    color: var(--poznote-cm-function);
 }
 
 .markdown-codemirror-host .poznote-cm-variable {
-    color: var(--poznote-cm-variable) !important;
+    color: var(--poznote-cm-variable);
 }
 
 .markdown-codemirror-host .poznote-cm-type {
-    color: var(--poznote-cm-type) !important;
+    color: var(--poznote-cm-type);
 }
 
 .markdown-codemirror-host .poznote-cm-punctuation {
-    color: var(--poznote-cm-punctuation) !important;
+    color: var(--poznote-cm-punctuation);
 }
 
 .markdown-codemirror-host .poznote-cm-meta {
-    color: var(--poznote-cm-meta) !important;
+    color: var(--poznote-cm-meta);
 }
 
 .markdown-codemirror-host .poznote-cm-heading {
-    color: var(--poznote-cm-heading) !important;
+    color: var(--poznote-cm-heading);
     font-weight: 700 !important;
 }
 
 /* Per-level heading colors; each level falls back to the shared heading color
    unless a --poznote-cm-headingN variable is set (colored markdown setting). */
 .markdown-codemirror-host .poznote-cm-heading1 {
-    color: var(--poznote-cm-heading1, var(--poznote-cm-heading)) !important;
+    color: var(--poznote-cm-heading1, var(--poznote-cm-heading));
 }
 
 .markdown-codemirror-host .poznote-cm-heading2 {
-    color: var(--poznote-cm-heading2, var(--poznote-cm-heading)) !important;
+    color: var(--poznote-cm-heading2, var(--poznote-cm-heading));
 }
 
 .markdown-codemirror-host .poznote-cm-heading3 {
-    color: var(--poznote-cm-heading3, var(--poznote-cm-heading)) !important;
+    color: var(--poznote-cm-heading3, var(--poznote-cm-heading));
 }
 
 .markdown-codemirror-host .poznote-cm-heading4 {
-    color: var(--poznote-cm-heading4, var(--poznote-cm-heading)) !important;
+    color: var(--poznote-cm-heading4, var(--poznote-cm-heading));
 }
 
 .markdown-codemirror-host .poznote-cm-heading5 {
-    color: var(--poznote-cm-heading5, var(--poznote-cm-heading)) !important;
+    color: var(--poznote-cm-heading5, var(--poznote-cm-heading));
 }
 
 .markdown-codemirror-host .poznote-cm-heading6 {
-    color: var(--poznote-cm-heading6, var(--poznote-cm-heading)) !important;
+    color: var(--poznote-cm-heading6, var(--poznote-cm-heading));
 }
 
 .markdown-codemirror-host .poznote-cm-link {
-    color: var(--poznote-cm-link) !important;
+    color: var(--poznote-cm-link);
     text-decoration: underline !important;
 }
 
@@ -254,7 +254,7 @@ html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::befor
 }
 
 .markdown-codemirror-host .poznote-cm-monospace {
-    color: var(--poznote-cm-monospace) !important;
+    color: var(--poznote-cm-monospace);
 }
 
 .markdown-codemirror-host .poznote-cm-strikethrough {
@@ -262,8 +262,8 @@ html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::befor
 }
 
 .markdown-codemirror-host .poznote-cm-invalid {
-    background-color: var(--poznote-cm-invalid-bg) !important;
-    color: var(--poznote-cm-invalid) !important;
+    background-color: var(--poznote-cm-invalid-bg);
+    color: var(--poznote-cm-invalid);
 }
 
 .cm-tooltip {
@@ -365,7 +365,7 @@ body.slash-menu-cursor-hidden * {
 }
 
 .markdown-preview .heading-anchor:hover {
-    opacity: 1 !important;
+    opacity: 1;
 }
 
 .markdown-preview .heading-anchor svg {
@@ -413,15 +413,15 @@ body.slash-menu-cursor-hidden * {
 
 .noteentry pre.indented-pre,
 .markdown-preview pre.indented-pre {
-    background: none !important;
-    background-color: transparent !important;
-    border: none !important;
+    background: none;
+    background-color: transparent;
+    border: none;
     border-radius: 0 !important;
     padding: 0 !important;
     margin: 0 0 1em 0 !important;
     font-family: monospace !important;
     font-size: inherit !important;
-    color: inherit !important;
+    color: inherit;
     white-space: pre-wrap !important;
     width: auto !important;
     box-sizing: border-box !important;
@@ -430,10 +430,10 @@ body.slash-menu-cursor-hidden * {
 
 html[data-theme='dark'] .noteentry pre.indented-pre,
 html[data-theme='dark'] .markdown-preview pre.indented-pre {
-    background: none !important;
-    background-color: transparent !important;
-    border: none !important;
-    color: inherit !important;
+    background: none;
+    background-color: transparent;
+    border: none;
+    color: inherit;
 }
 
 .markdown-preview pre code {
@@ -665,29 +665,29 @@ body.markdown-colored .markdown-codemirror-host {
 }
 
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h1) {
-    color: var(--mdc-h1) !important;
+    color: var(--mdc-h1);
     border-bottom-color: color-mix(in srgb, var(--mdc-h1) 30%, transparent);
 }
 
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h2) {
-    color: var(--mdc-h2) !important;
+    color: var(--mdc-h2);
     border-bottom-color: color-mix(in srgb, var(--mdc-h2) 30%, transparent);
 }
 
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h3) {
-    color: var(--mdc-h3) !important;
+    color: var(--mdc-h3);
 }
 
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h4) {
-    color: var(--mdc-h4) !important;
+    color: var(--mdc-h4);
 }
 
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h5) {
-    color: var(--mdc-h5) !important;
+    color: var(--mdc-h5);
 }
 
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h6) {
-    color: var(--mdc-h6) !important;
+    color: var(--mdc-h6);
 }
 
 /* Code blocks: tint the block background with the chosen color (mixed into
@@ -696,12 +696,12 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h6) {
    `background: #F8FAFC !important` on pre.code-block in css/code-blocks.css,
    so indented and mermaid blocks must be excluded here explicitly. */
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, pre:not(.indented-pre):not(.mermaid)) {
-    background: color-mix(in srgb, var(--mdc-codeblock) 8%, var(--pz-surface-hover)) !important;
+    background: color-mix(in srgb, var(--mdc-codeblock) 8%, var(--pz-surface-hover));
 }
 
 body.markdown-colored .markdown-preview :not(pre) > :is(#poznote-md-colored-boost, code:not([class*="hljs"]):not([class*="language-"])) {
-    color: var(--mdc-code) !important;
-    background-color: color-mix(in srgb, var(--mdc-code) 9%, transparent) !important;
+    color: var(--mdc-code);
+    background-color: color-mix(in srgb, var(--mdc-code) 9%, transparent);
     border-radius: 3px;
 }
 
@@ -778,8 +778,8 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
 
 /* Indicateur visuel pour le drag & drop */
 .noteentry.drag-over {
-    border: 2px dashed var(--pz-accent) !important;
-    background-color: rgba(var(--pz-accent-rgb), 0.05) !important;
+    border: 2px dashed var(--pz-accent);
+    background-color: rgba(var(--pz-accent-rgb), 0.05);
     transition: all 0.2s ease;
 }
 
@@ -795,16 +795,16 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
 
 /* Supprimer complètement tous les cadres en mode édition markdown */
 .noteentry[data-note-type="markdown"] .markdown-editor:focus {
-    box-shadow: none !important;
-    border: none !important;
-    outline: none !important;
+    box-shadow: none;
+    border: none;
+    outline: none;
 }
 
 /* Supprimer aussi le cadre sur l'élément parent noteentry quand on édite du markdown */
 .noteentry[data-note-type="markdown"]:focus {
-    border: none !important;
-    border-bottom: none !important;
-    outline: none !important;
+    border: none;
+    border-bottom: none;
+    outline: none;
 }
 
 /* Placeholder for empty preview */
@@ -902,7 +902,7 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
     min-width: 0 !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    border-right: 1px solid var(--pz-border) !important;
+    border-right: 1px solid var(--pz-border);
     box-sizing: border-box !important;
     max-height: var(--markdown-split-pane-height, calc(100vh - 200px)) !important;
 }
@@ -989,12 +989,12 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
 /* Dark mode border for split view */
 [data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container,
 [data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview {
-    background: var(--dm-content-bg) !important;
+    background: var(--dm-content-bg);
 }
 
 [data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container,
 [data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor {
-    border-right-color: var(--dm-border) !important;
+    border-right-color: var(--dm-border);
 }
 
 body.markdown-split-card-view .noteentry.markdown-split-mode {
@@ -1009,9 +1009,9 @@ body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
     min-height: 0 !important;
     box-sizing: border-box !important;
     max-height: var(--markdown-split-pane-height, calc(100vh - 240px)) !important;
-    border: 1px solid var(--pz-border) !important;
+    border: 1px solid var(--pz-border);
     border-radius: 16px !important;
-    background: var(--pz-bg) !important;
+    background: var(--pz-bg);
 }
 
 body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor-container {
@@ -1026,7 +1026,7 @@ body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor {
     overflow-y: auto !important;
     overflow-x: hidden !important;
     padding: 18px 18px 18px !important;
-    border-right: none !important;
+    border-right: none;
     box-sizing: border-box !important;
     max-height: none !important;
 }
@@ -1052,8 +1052,8 @@ body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
 
 html[data-theme='dark'] body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor-container,
 html[data-theme='dark'] body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
-    border-color: var(--dm-border) !important;
-    background: var(--dm-content-bg) !important;
+    border-color: var(--dm-border);
+    background: var(--dm-content-bg);
 }
 
 /* Scrollbar styling for split view columns */

@@ -269,7 +269,7 @@ body.outline-collapsed .toggle-outline-btn:disabled {
     background-color: currentColor;
     -webkit-mask-size: 100% 100%;
     mask-size: 100% 100%;
-    filter: none !important;
+    filter: none;
 }
 
 /* Collapsed state */

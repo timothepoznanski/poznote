@@ -163,8 +163,8 @@
 }
 
 .app-tab-pin-icon .lucide-pin {
-    color: var(--pz-accent) !important;
-    filter: none !important;
+    color: var(--pz-accent);
+    filter: none;
 }
 
 /* ── Drag to reorder ── */

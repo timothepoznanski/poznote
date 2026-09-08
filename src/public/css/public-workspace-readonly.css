@@ -67,10 +67,10 @@ body.public-workspace-readonly .folder-wrapper .folder_name {
     position: static;
     width: auto;
     height: auto;
-    border: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    outline: none !important;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    outline: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -79,10 +79,10 @@ body.public-workspace-readonly .folder-wrapper .folder_name {
 .public-workspace-theme-toggle:hover,
 .public-workspace-theme-toggle:focus,
 .public-workspace-theme-toggle:focus-visible {
-    border: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    outline: none !important;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    outline: none;
 }
 
 .public-workspace-theme-toggle i,
@@ -98,6 +98,6 @@ html[data-theme='dark'] .public-workspace-theme-toggle {
 
 html[data-theme='dark'] .public-workspace-theme-toggle:hover,
 html[data-theme='dark'] .public-workspace-theme-toggle:focus-visible {
-    background: transparent !important;
+    background: transparent;
     color: var(--pz-text-inverse);
 }

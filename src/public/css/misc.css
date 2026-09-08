@@ -160,7 +160,7 @@ img {
 }
 
 html[data-theme='dark'] .create-note-subtitle {
-    color: var(--dm-text-muted) !important;
+    color: var(--dm-text-muted);
 }
 
 /* Image menu styles (similar to settings menu) */

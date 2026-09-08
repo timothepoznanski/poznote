@@ -14,16 +14,16 @@ body.shared-page {
 body.shared-page::-webkit-scrollbar {
     display: block !important;
     width: 8px !important;
-    background-color: var(--pz-surface-hover) !important;
+    background-color: var(--pz-surface-hover);
 }
 
 body.shared-page::-webkit-scrollbar-thumb {
-    background-color: var(--pz-scrollbar) !important;
+    background-color: var(--pz-scrollbar);
     border-radius: 8px !important;
 }
 
 body.shared-page::-webkit-scrollbar-thumb:hover {
-    background-color: var(--pz-scrollbar-hover) !important;
+    background-color: var(--pz-scrollbar-hover);
 }
 
 html {
@@ -39,16 +39,16 @@ body.shared-page html {
 body.shared-page html::-webkit-scrollbar {
     display: block !important;
     width: 8px !important;
-    background-color: var(--pz-surface-hover) !important;
+    background-color: var(--pz-surface-hover);
 }
 
 body.shared-page html::-webkit-scrollbar-thumb {
-    background-color: var(--pz-scrollbar) !important;
+    background-color: var(--pz-scrollbar);
     border-radius: 8px !important;
 }
 
 body.shared-page html::-webkit-scrollbar-thumb:hover {
-    background-color: var(--pz-scrollbar-hover) !important;
+    background-color: var(--pz-scrollbar-hover);
 }
 
 body.shared-page {

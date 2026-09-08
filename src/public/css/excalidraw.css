@@ -202,9 +202,9 @@ div[onclick*="openExcalidrawNote"] {
         left: 0 !important;
         right: 0 !important;
         z-index: 10000 !important; /* Cohérent avec la hiérarchie z-index */
-        background: var(--pz-bg) !important;
-        border-bottom: 1px solid var(--pz-border) !important;
-        box-shadow: 0 1px 3px rgba(var(--pz-shadow-rgb), 0.1) !important;
+        background: var(--pz-bg);
+        border-bottom: 1px solid var(--pz-border);
+        box-shadow: 0 1px 3px rgba(var(--pz-shadow-rgb), 0.1);
         height: 50px !important; /* Hauteur réduite sur mobile */
     }
     
@@ -265,8 +265,8 @@ div[onclick*="openExcalidrawNote"] {
     /* Dark mode adjustments for mobile */
     [data-theme="dark"] .excalidraw-toolbar,
     [data-theme="dark"] div[style*="justify-content: space-between"][style*="align-items: center"] {
-        background: var(--dm-bg, var(--dm-content-bg)) !important;
-        border-bottom-color: var(--dm-border, var(--dm-border)) !important;
+        background: var(--dm-bg, var(--dm-content-bg));
+        border-bottom-color: var(--dm-border, var(--dm-border));
     }
 
     /* The spacer only balances the desktop layout; it steals 100px here */
@@ -314,9 +314,9 @@ div[onclick*="openExcalidrawNote"] {
     left: 0 !important;
     right: 0 !important;
     z-index: 10000 !important; /* Keep high to stay above everything */
-    background: var(--pz-bg) !important;
-    border-bottom: 1px solid var(--border-color, var(--pz-border)) !important;
-    box-shadow: 0 1px 3px rgba(var(--pz-shadow-rgb), 0.1) !important;
+    background: var(--pz-bg);
+    border-bottom: 1px solid var(--border-color, var(--pz-border));
+    box-shadow: 0 1px 3px rgba(var(--pz-shadow-rgb), 0.1);
     box-sizing: border-box !important;
     height: var(--excalidraw-toolbar-height) !important;
     padding: 8px 20px !important; /* Reduced padding to fit new height */
@@ -374,7 +374,7 @@ body.excalidraw-editor-page .excalidraw.excalidraw-modal-container {
     width: 100vw !important;
     height: var(--excalidraw-viewport-height, 100vh) !important;
     overflow: visible !important;
-    background: transparent !important;
+    background: transparent;
     z-index: 10050 !important;
 }
 
@@ -432,9 +432,9 @@ body {
     
     /* Style for disabled Excalidraw buttons */
     .excalidraw-btn-mobile {
-        opacity: 0.6 !important;
+        opacity: 0.6;
         cursor: not-allowed !important;
-        background: var(--pz-neutral) !important;
+        background: var(--pz-neutral);
     }
 }
 
@@ -461,7 +461,7 @@ body.excalidraw-editor-page {
 
 body.excalidraw-editor-page #app,
 body.excalidraw-editor-page .excalidraw {
-    background: var(--excalidraw-note-background, var(--pz-bg)) !important;
+    background: var(--excalidraw-note-background, var(--pz-bg));
     color-scheme: light;
 }
 
@@ -472,28 +472,28 @@ body.excalidraw-editor-page.excalidraw-shell-dark .excalidraw {
 body.excalidraw-editor-page .excalidraw .excalidraw-canvas-container,
 body.excalidraw-editor-page .excalidraw .excalidraw-canvas-wrapper,
 body.excalidraw-editor-page .excalidraw .excalidraw__canvas-wrapper {
-    background: var(--excalidraw-note-background, var(--pz-bg)) !important;
+    background: var(--excalidraw-note-background, var(--pz-bg));
 }
 
 body.excalidraw-editor-page .excalidraw canvas[data-excalidraw-canvas],
 body.excalidraw-editor-page .excalidraw canvas.static {
-    background: var(--excalidraw-canvas-background, var(--pz-bg)) !important;
+    background: var(--excalidraw-canvas-background, var(--pz-bg));
 }
 
 body.excalidraw-editor-page .excalidraw canvas.interactive {
-    background: transparent !important;
+    background: transparent;
 }
 
 body.excalidraw-editor-page.excalidraw-shell-dark .excalidraw canvas {
-    filter: var(--theme-filter, invert(93%) hue-rotate(180deg)) !important;
+    filter: var(--theme-filter, invert(93%) hue-rotate(180deg));
 }
 
 body.excalidraw-editor-page.excalidraw-shell-light .excalidraw canvas {
-    filter: none !important;
+    filter: none;
 }
 
 body.excalidraw-editor-page .excalidraw .layer-ui__wrapper {
-    background: transparent !important;
+    background: transparent;
 }
 
 html[data-theme='dark'] body.excalidraw-editor-page,
@@ -572,15 +572,15 @@ html body.excalidraw-editor-page.excalidraw-shell-light .excalidraw {
 
 html[data-theme='dark'] body.excalidraw-editor-page .poznote-toolbar,
 body.excalidraw-editor-page.excalidraw-shell-dark .poznote-toolbar {
-    background: var(--dm-surface, var(--dm-surface)) !important;
-    border-bottom-color: var(--dm-border, var(--dm-border)) !important;
-    box-shadow: 0 1px 3px rgba(var(--pz-shadow-rgb), 0.35) !important;
+    background: var(--dm-surface, var(--dm-surface));
+    border-bottom-color: var(--dm-border, var(--dm-border));
+    box-shadow: 0 1px 3px rgba(var(--pz-shadow-rgb), 0.35);
 }
 
 html body.excalidraw-editor-page.excalidraw-shell-light .poznote-toolbar {
-    background: var(--pz-bg) !important;
-    border-bottom-color: var(--pz-border) !important;
-    box-shadow: 0 1px 3px rgba(var(--pz-shadow-rgb), 0.1) !important;
+    background: var(--pz-bg);
+    border-bottom-color: var(--pz-border);
+    box-shadow: 0 1px 3px rgba(var(--pz-shadow-rgb), 0.1);
 }
 
 .poznote-toolbar-buttons {
@@ -734,33 +734,33 @@ html body.excalidraw-editor-page.excalidraw-shell-light .excalidraw-loading {
 
 /* Button hover states - moved from inline styles for CSP compliance */
 .excalidraw-toolbar-btn:hover {
-    background: var(--pz-accent-strong) !important;
+    background: var(--pz-accent-strong);
 }
 
 .excalidraw-save-btn:hover {
-    background: var(--pz-success-hover) !important;
+    background: var(--pz-success-hover);
 }
 
 #cancelBtn:hover {
-    background: var(--pz-danger-hover) !important;
+    background: var(--pz-danger-hover);
 }
 
 #saveAndExitBtn:hover {
-    background: var(--pz-accent-hover) !important;
-    border-color: var(--pz-accent-hover) !important;
+    background: var(--pz-accent-hover);
+    border-color: var(--pz-accent-hover);
 }
 
 .excalidraw-toolbar-btn:disabled,
 .excalidraw-save-btn:disabled {
-    background: var(--pz-text-subtle) !important;
-    border-color: var(--pz-text-subtle) !important;
+    background: var(--pz-text-subtle);
+    border-color: var(--pz-text-subtle);
     cursor: not-allowed !important;
     opacity: 0.6;
 }
 
 .excalidraw-toolbar-btn:disabled:hover,
 .excalidraw-save-btn:disabled:hover {
-    background: var(--pz-text-subtle) !important;
+    background: var(--pz-text-subtle);
 }
 
 /* Inter font for Excalidraw */

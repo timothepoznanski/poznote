@@ -57,8 +57,8 @@
 
 /* Disabled & Danger in modals */
 .modal .btn-disabled {
-    background: var(--pz-disabled) !important;
-    color: var(--pz-text-muted) !important;
+    background: var(--pz-disabled);
+    color: var(--pz-text-muted);
     border: none;
     padding: 8px 12px;
     border-radius: 6px;
@@ -67,7 +67,7 @@
 }
 
 .modal .btn-disabled:hover {
-    background: var(--pz-disabled) !important;
+    background: var(--pz-disabled);
     cursor: not-allowed !important;
 }
 

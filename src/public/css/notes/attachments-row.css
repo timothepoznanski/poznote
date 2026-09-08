@@ -50,7 +50,7 @@
 
 /* Attachment Link (chip, matching the folder badge look) */
 .attachment-link {
-    color: var(--pz-accent) !important;
+    color: var(--pz-accent);
     text-decoration: none;
     font-size: 13px;
     line-height: 1.2;
@@ -68,12 +68,12 @@
 }
 
 .attachment-link:hover {
-    color: var(--pz-accent-hover) !important;
+    color: var(--pz-accent-hover);
     border-color: var(--pz-border-strong);
 }
 
 .attachment-link:visited {
-    color: var(--pz-accent) !important;
+    color: var(--pz-accent);
 }
 
 /* Paperclip icon button wrapper */

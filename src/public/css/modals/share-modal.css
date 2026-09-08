@@ -45,7 +45,7 @@
 }
 
 .toggle-switch input {
-    opacity: 0 !important;
+    opacity: 0;
     width: 0 !important;
     height: 0 !important;
     position: absolute;
@@ -76,7 +76,7 @@
 }
 
 input:checked+.toggle-slider {
-    background-color: var(--pz-success) !important;
+    background-color: var(--pz-success);
 }
 
 input:focus+.toggle-slider {
@@ -115,7 +115,7 @@ html[data-theme='dark'] .toggle-slider {
 }
 
 html[data-theme='dark'] input:checked+.toggle-slider {
-    background-color: var(--dm-success-hover) !important;
+    background-color: var(--dm-success-hover);
 }
 
 /* ============================================

@@ -235,7 +235,7 @@
 }
 
 .kanban-subfolder-toggle [class*="lucide-"] {
-    filter: none !important;
+    filter: none;
     transform: none !important;
 }
 
@@ -394,7 +394,7 @@
    the button/toggle currentColor, and must not scale on hover. */
 .kanban-card-complete-btn [class*="lucide-"],
 .kanban-completed-toggle [class*="lucide-"] {
-    filter: none !important;
+    filter: none;
     transform: none !important;
 }
 

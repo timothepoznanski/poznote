@@ -144,7 +144,7 @@
 }
 
 #foldersList .shared-folder-icon {
-    background: transparent !important;
+    background: transparent;
 }
 
 .note-name-container {
@@ -219,15 +219,15 @@
 
 .shared-password-icon.is-password-protected,
 .shared-restricted-icon.is-restricted {
-    filter: none !important;
-    color: var(--pz-danger) !important;
+    filter: none;
+    color: var(--pz-danger);
 }
 
 /* Disabled (inaccessible) share: the row stays listed, the badge and the
    struck-through token signal that the public link no longer resolves. */
 .shared-disabled-icon {
-    filter: none !important;
-    color: var(--pz-warning-hover) !important;
+    filter: none;
+    color: var(--pz-warning-hover);
 }
 
 .shared-note-item.is-share-disabled .note-token {
@@ -298,7 +298,7 @@
 
 .note-token.read-only {
     cursor: default;
-    background-color: transparent !important;
+    background-color: transparent;
     opacity: 0.7;
 }
 

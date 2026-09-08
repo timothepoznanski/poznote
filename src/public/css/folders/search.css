@@ -14,8 +14,8 @@
 .search-highlight,
 html[data-theme='dark'] .search-highlight,
 html[data-theme='dark'] .noteentry .search-highlight {
-    background-color: var(--dm-warning) !important;
-    color: #000000 !important; /* Force black text for readability on yellow */
+    background-color: var(--dm-warning);
+    color: #000000; /* Force black text for readability on yellow */
     font-weight: normal !important;
     font-family: inherit !important;
     font-style: normal !important;
@@ -34,19 +34,19 @@ html[data-theme='dark'] .noteentry .search-highlight {
 .search-highlight-active,
 html[data-theme='dark'] .search-highlight-active,
 html[data-theme='dark'] .noteentry .search-highlight-active {
-    background-color: var(--dm-warning-hover) !important; /* Bright orange */
-    color: #000000 !important;
+    background-color: var(--dm-warning-hover); /* Bright orange */
+    color: #000000;
     font-weight: bold !important;
-    box-shadow: 0 0 10px rgba(255, 157, 0, 0.8) !important;
+    box-shadow: 0 0 10px rgba(255, 157, 0, 0.8);
     z-index: 1000 !important;
-    border: 1px solid var(--dm-warning-hover) !important;
+    border: 1px solid var(--dm-warning-hover);
     border-radius: 4px;
 }
 
 /* Ensure text color inside tags follows the active highlight style */
 .search-highlight-active .clickable-tag,
 .search-highlight-active .tag-delete-button {
-    color: var(--pz-text) !important;
+    color: var(--pz-text);
 }
 
 @keyframes highlightPulse {
@@ -63,8 +63,8 @@ html[data-theme='dark'] .noteentry .search-highlight-active {
 .input-highlight-overlay,
 html[data-theme='dark'] .input-highlight-overlay,
 html[data-theme='dark'] .note-header .input-highlight-overlay {
-    background-color: var(--dm-warning) !important;
-    color: #000000 !important;
+    background-color: var(--dm-warning);
+    color: #000000;
     opacity: 0.7;
     border-radius: 2px;
     box-shadow: 0 1px 3px rgba(255, 255, 0, 0.3);
@@ -74,10 +74,10 @@ html[data-theme='dark'] .note-header .input-highlight-overlay {
 .input-highlight-overlay.search-highlight-active,
 html[data-theme='dark'] .input-highlight-overlay.search-highlight-active,
 html[data-theme='dark'] .note-header .input-highlight-overlay.search-highlight-active {
-    background-color: var(--dm-warning-hover) !important;
-    color: #000000 !important;
-    opacity: 0.9 !important;
+    background-color: var(--dm-warning-hover);
+    color: #000000;
+    opacity: 0.9;
     z-index: 10 !important;
-    box-shadow: 0 0 5px rgba(255, 157, 0, 0.7) !important;
+    box-shadow: 0 0 5px rgba(255, 157, 0, 0.7);
     border-radius: 4px;
 }

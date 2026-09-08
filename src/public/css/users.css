@@ -75,12 +75,12 @@ html[data-theme='dark'] {
 }
 
 .btn-cancel-admin {
-    background-color: var(--pz-danger) !important;
-    color: var(--pz-text-inverse) !important;
+    background-color: var(--pz-danger);
+    color: var(--pz-text-inverse);
 }
 
 .btn-cancel-admin:hover {
-    background-color: var(--pz-danger-hover) !important;
+    background-color: var(--pz-danger-hover);
 }
 
 /* Table */
@@ -882,7 +882,7 @@ input:disabled+.slider {
 
     html[data-theme='dark'] .actions-center .btn-secondary {
         background: var(--dm-surface-hover);
-        color: var(--dm-text-bright) !important;
+        color: var(--dm-text-bright);
     }
 
     html[data-theme='dark'] .actions-center .btn-secondary:hover {
@@ -891,7 +891,7 @@ input:disabled+.slider {
 
     html[data-theme='dark'] .actions-center .btn-danger {
         background: var(--dm-danger-hover);
-        color: var(--pz-text-inverse) !important;
+        color: var(--pz-text-inverse);
     }
 
     html[data-theme='dark'] .actions-center .btn-danger:hover {

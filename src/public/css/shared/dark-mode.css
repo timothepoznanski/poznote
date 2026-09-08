@@ -38,15 +38,15 @@
 }
 
 [data-theme="dark"] body.shared-page::-webkit-scrollbar {
-    background-color: var(--dm-surface) !important;
+    background-color: var(--dm-surface);
 }
 
 [data-theme="dark"] body.shared-page::-webkit-scrollbar-thumb {
-    background-color: var(--dm-border-light) !important;
+    background-color: var(--dm-border-light);
 }
 
 [data-theme="dark"] body.shared-page::-webkit-scrollbar-thumb:hover {
-    background-color: var(--dm-neutral) !important;
+    background-color: var(--dm-neutral);
 }
 
 [data-theme="dark"] .shared-note-item {
@@ -232,22 +232,22 @@
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value input,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value select,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .modal-password-input {
-    background-color: var(--dm-surface-hover) !important;
-    border-color: var(--dm-neutral-hover) !important;
-    color: var(--dm-text-bright) !important;
+    background-color: var(--dm-surface-hover);
+    border-color: var(--dm-neutral-hover);
+    color: var(--dm-text-bright);
 }
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value input::placeholder,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value select::placeholder,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .modal-password-input::placeholder {
-    color: var(--dm-text) !important;
+    color: var(--dm-text);
     opacity: 1;
 }
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value input:focus,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value select:focus,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .modal-password-input:focus {
-    border-color: var(--dm-accent-hover) !important;
+    border-color: var(--dm-accent-hover);
     box-shadow: 0 0 0 2px rgba(102, 179, 255, 0.18);
     outline: none;
 }
