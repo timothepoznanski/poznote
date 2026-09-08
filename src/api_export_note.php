@@ -270,7 +270,9 @@ function convertImageToBase64($imagePath) {
                     }
                 }
             }
-        } catch (Exception $e) {}
+        } catch (Exception $e) {
+            error_log('api_export_note: convertImageToBase64() failed: ' . $e->getMessage());
+        }
     }
     // Pattern for attachment links: api_attachments.php?action=download&note_id=X&attachment_id=Y
     elseif (stripos($imagePath, 'api_attachments.php') !== false) {
@@ -315,6 +317,7 @@ function convertImageToBase64($imagePath) {
                 }
             } catch (Exception $e) {
                 // Silent fail
+                error_log('api_export_note: convertImageToBase64() failed: ' . $e->getMessage());
             }
         }
     }
@@ -353,7 +356,9 @@ function convertImageToBase64($imagePath) {
                         }
                     }
                 }
-            } catch (Exception $e) {}
+            } catch (Exception $e) {
+                error_log('api_export_note: convertImageToBase64() failed: ' . $e->getMessage());
+            }
         }
     }
     

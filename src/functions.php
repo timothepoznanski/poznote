@@ -1375,6 +1375,7 @@ function getSetting($key, $default = null) {
                 }
             } catch (Exception $e) {
                 // Ignore errors, cache remains empty
+                error_log('functions: getSetting() failed: ' . $e->getMessage());
             }
         }
     }
@@ -2233,6 +2234,7 @@ function getUserTimezone() {
             return $cached;
         } catch (Exception $e) {
             // Fall back below if an old or manually edited setting is invalid.
+            error_log('functions: getUserTimezone() failed: ' . $e->getMessage());
         }
     }
     
@@ -2559,6 +2561,7 @@ function poznoteSumDbAttachmentBytes(): int {
         }
     } catch (Exception $e) {
         // Stats/quota input only: never break the caller
+        error_log('functions: poznoteSumDbAttachmentBytes() failed: ' . $e->getMessage());
     }
     return $total;
 }
@@ -2606,6 +2609,7 @@ function poznoteGetUserQuotaLimits(): array {
     } catch (Exception $e) {
         // Master database unavailable: fail open, quotas are an admin comfort
         // feature and must never take the app down.
+        error_log('functions: poznoteGetUserQuotaLimits() failed: ' . $e->getMessage());
     }
     return $limits;
 }
@@ -2684,6 +2688,7 @@ function poznoteGetActiveUserStorageUsageBytes(int $addBytes = 0): int {
             }
         } catch (Exception $e) {
             // Unreadable directory: count as 0
+            error_log('functions: poznoteGetActiveUserStorageUsageBytes() failed: ' . $e->getMessage());
         }
     }
 
@@ -2725,6 +2730,7 @@ function poznoteGetActiveUserS3UsageBytes(int $addBytes = 0): int {
         }
     } catch (Exception $e) {
         // Quota input only: never break the caller
+        error_log('functions: poznoteGetActiveUserS3UsageBytes() failed: ' . $e->getMessage());
     }
 
     $poznoteQuotaS3UsageCache += max(0, $addBytes);
@@ -3315,6 +3321,7 @@ function poznoteExpireAllSnapshotsOccasionally(PDO $con) {
         }
     } catch (Exception $e) {
         // Cleanup only: never break the page load
+        error_log('functions: poznoteExpireAllSnapshotsOccasionally() failed: ' . $e->getMessage());
     }
 }
 
@@ -3686,6 +3693,7 @@ function getFirstWorkspaceName() {
             }
         } catch (Exception $e) {
             // Continue to default
+            error_log('functions: getFirstWorkspaceName() failed: ' . $e->getMessage());
         }
     }
     return '';
@@ -3756,6 +3764,7 @@ function getWorkspaceFilter() {
             }
         } catch (Exception $e) {
             // If settings table doesn't exist or query fails, continue to default
+            error_log('functions: getWorkspaceFilter() failed: ' . $e->getMessage());
         }
     }
     
@@ -4124,6 +4133,7 @@ function poznoteRestoreReportProgress(string $stage, ?int $done = null, ?int $to
             $hook($stage, $done, $total);
         } catch (Throwable $e) {
             // observer only
+            error_log('functions: poznoteRestoreReportProgress() failed: ' . $e->getMessage());
         }
     }
 }
@@ -5767,7 +5777,9 @@ function poznoteGetWorkspaceTagsMap(PDO $con): array {
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $map[(string)$row['name']] = [];
             }
-        } catch (Exception $e2) {}
+        } catch (Exception $e2) {
+            error_log('functions: poznoteGetWorkspaceTagsMap() failed: ' . $e2->getMessage());
+        }
     }
     return $map;
 }
@@ -5790,6 +5802,7 @@ function poznoteGetWorkspaceColorsMap(PDO $con): array {
         }
     } catch (Exception $e) {
         // Column missing on a not-yet-migrated database: no colors
+        error_log('functions: poznoteGetWorkspaceColorsMap() failed: ' . $e->getMessage());
     }
     return $map;
 }

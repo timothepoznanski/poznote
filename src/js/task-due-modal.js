@@ -67,7 +67,9 @@
         // Never fight the modal's own controls
         if (active.closest && active.closest('#taskDueModal')) return;
 
-        try { active.blur(); } catch (e) { }
+        try { active.blur(); } catch (e) {
+            console.debug('task-due-modal: dismissMobileKeyboard() failed:', e);
+        }
     }
 
     function emailAvailable() {
@@ -205,7 +207,9 @@
         const onSave = state.onSave;
         Promise.resolve(onSave ? onSave(payload) : null)
             .then(function () { return reminderApiCall(payload); })
-            .catch(function () { })
+            .catch(function (e) {
+                console.debug('task-due-modal: applyAndClose() failed:', e);
+            })
             .then(function () { closeTaskDueModal(); });
     }
 

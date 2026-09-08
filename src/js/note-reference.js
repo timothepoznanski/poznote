@@ -165,7 +165,9 @@
                 savedEditableElement.focus(); 
                 // Return true if we managed to focus it
                 return true;
-            } catch (e) { }
+            } catch (e) {
+                console.debug('note-reference: restoreSelection() failed:', e);
+            }
         }
         return false;
     }
@@ -497,7 +499,9 @@
         input.focus();
         try {
             input.setSelectionRange(caretPos, caretPos);
-        } catch (e) { }
+        } catch (e) {
+            console.debug('note-reference: insertInputReference() failed:', e);
+        }
 
         resumeTaskEditBlurSaveIfNeeded();
     }
@@ -797,6 +801,7 @@
                 });
             } catch (e) {
                 // Network error: leave the link untouched
+                console.debug('note-reference: markDeadInternalLinks() failed:', e);
             }
         }));
     }

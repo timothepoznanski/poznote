@@ -50,7 +50,9 @@ function initializeCodeMirrorMarkdownEditor(editorDiv, markdownContent, readOnly
             if (typeof api.destroyEditor === 'function') {
                 api.destroyEditor(editorDiv);
             }
-        } catch (destroyError) { }
+        } catch (destroyError) {
+            console.debug('markdown-editor: initializeCodeMirrorMarkdownEditor() failed:', destroyError);
+        }
         editorDiv.removeAttribute('data-codemirror-enabled');
         editorDiv.classList.remove('markdown-codemirror-host');
         renderMarkdownEditorContent(editorDiv, markdownContent);
@@ -216,7 +218,9 @@ function getMarkdownSplitPaneBottomGap(noteEntry) {
         if (isFinite(parsedGap)) {
             bottomGap = parsedGap;
         }
-    } catch (e) {}
+    } catch (e) {
+        console.debug('markdown-editor: getMarkdownSplitPaneBottomGap() failed:', e);
+    }
 
     return bottomGap;
 }
@@ -268,7 +272,9 @@ function updateMarkdownSplitPaneHeight(noteEntryOrId) {
             if (window.getComputedStyle(pane).display === 'none') {
                 return;
             }
-        } catch (e) {}
+        } catch (e) {
+            console.debug('markdown-editor: updateMarkdownSplitPaneHeight() failed:', e);
+        }
 
         var rect = pane.getBoundingClientRect();
         if (rect.height > 0 || rect.top > 0) {

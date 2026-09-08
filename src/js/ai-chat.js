@@ -367,6 +367,7 @@
             }
         } catch (e) {
             // Storage full or unavailable — persistence is best-effort
+            console.debug('ai-chat: saveConversation() failed:', e);
         }
     }
 

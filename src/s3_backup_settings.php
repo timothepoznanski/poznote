@@ -693,7 +693,9 @@ $allBackupUsers = listAllUserProfiles();
                         credentials: 'same-origin',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                         body: body.toString()
-                    }).catch(function() {}).then(function() {
+                    }).catch(function (e) {
+                        console.debug('s3_backup_settings: finish() failed:', e);
+                    }).then(function() {
                         runInProgress = false;
                         refreshStatus();
                         refreshList();

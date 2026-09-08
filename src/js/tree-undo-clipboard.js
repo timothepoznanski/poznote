@@ -58,7 +58,9 @@
             if (typeof window.getSelectedWorkspace === 'function') {
                 return window.getSelectedWorkspace() || '';
             }
-        } catch (e) { }
+        } catch (e) {
+            console.debug('tree-undo-clipboard: currentWorkspace() failed:', e);
+        }
         return window.selectedWorkspace || '';
     }
 
@@ -249,13 +251,17 @@
     function reloadTree(removedNoteIds) {
         try {
             if (typeof window.persistFolderStatesFromDOM === 'function') window.persistFolderStatesFromDOM();
-        } catch (e) { }
+        } catch (e) {
+            console.debug('tree-undo-clipboard: reloadTree() failed:', e);
+        }
 
         var open = openNoteId();
         var openNoteGone = !!(open && (removedNoteIds || []).some(function (id) { return sameId(id, open); }));
         if (openNoteGone) {
             // Same landing as deleteNote(): the note pane has nothing to show
-            try { sessionStorage.removeItem('shouldScrollToNote'); } catch (e) { }
+            try { sessionStorage.removeItem('shouldScrollToNote'); } catch (e) {
+                console.debug('tree-undo-clipboard: reloadTree() failed:', e);
+            }
             window.location.href = 'index.php?workspace=' + encode(currentWorkspace());
         } else {
             window.location.reload();
@@ -264,7 +270,9 @@
 
     function rememberFolderOpen(folderId) {
         if (!folderId) return;
-        try { localStorage.setItem('folder_folder-' + String(folderId), 'open'); } catch (e) { }
+        try { localStorage.setItem('folder_folder-' + String(folderId), 'open'); } catch (e) {
+            console.debug('tree-undo-clipboard: rememberFolderOpen() failed:', e);
+        }
     }
 
     // ============================================
@@ -326,7 +334,9 @@
         return deleteFolderRequest(folderId, workspace).then(function (data) {
             var notes = (data.restore_snapshot && data.restore_snapshot.notes) || [];
             return sequence(notes, function (note) {
-                return permanentlyDeleteNote(note.id, workspace).catch(function () { });
+                return permanentlyDeleteNote(note.id, workspace).catch(function (e) {
+                    console.debug('tree-undo-clipboard: notes() failed:', e);
+                });
             }).then(function () {
                 return notes.map(function (note) { return note.id; });
             });
@@ -354,12 +364,16 @@
             var newId = data.id;
             return moveNote(newId, dest).then(function () {
                 if (dest.name) {
-                    return api('PATCH', '/api/v1/notes/' + encode(newId), { heading: dest.name }).catch(function () { });
+                    return api('PATCH', '/api/v1/notes/' + encode(newId), { heading: dest.name }).catch(function (e) {
+                        console.debug('tree-undo-clipboard: duplicateNoteInto() failed:', e);
+                    });
                 }
             }).then(function () {
                 return newId;
             }, function (error) {
-                return permanentlyDeleteNote(newId, sourceWorkspace).catch(function () { }).then(function () {
+                return permanentlyDeleteNote(newId, sourceWorkspace).catch(function (e) {
+                    console.debug('tree-undo-clipboard: duplicateNoteInto() failed:', e);
+                }).then(function () {
                     throw error;
                 });
             });
@@ -389,12 +403,16 @@
             }).then(function () {
                 if (dest.name) {
                     return api('PATCH', '/api/v1/folders/' + encode(newId), { name: dest.name, workspace: dest.workspace })
-                        .catch(function () { });
+                        .catch(function (e) {
+                            console.debug('tree-undo-clipboard: copyWorkspace() failed:', e);
+                        });
                 }
             }).then(function () {
                 return newId;
             }, function (error) {
-                return destroyFolderCopy(newId, copyWorkspace).catch(function () { }).then(function () {
+                return destroyFolderCopy(newId, copyWorkspace).catch(function (e) {
+                    console.debug('tree-undo-clipboard: copyWorkspace() failed:', e);
+                }).then(function () {
                     throw error;
                 });
             });
@@ -446,7 +464,9 @@
                 return sequence(ids, function (id) {
                     var request = api('POST', '/api/v1/notes/' + encode(id) + '/restore', { workspace: e.workspace });
                     // Shortcuts are best effort: the note itself must come back
-                    return sameId(id, e.noteId) ? request : request.catch(function () { });
+                    return sameId(id, e.noteId) ? request : request.catch(function (e) {
+                        console.debug('tree-undo-clipboard: renameNoteRequest() failed:', e);
+                    });
                 }).then(function () { return []; });
             },
             redo: function (e) {

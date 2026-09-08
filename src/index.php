@@ -269,7 +269,9 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
                     url.searchParams.set('workspace', <?php echo json_encode($workspaceResolvedInternally, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP); ?>);
                     history.replaceState(history.state, '', url);
                 }
-            } catch (_error) {}
+            } catch (_error) {
+                console.debug('index: failed:', _error);
+            }
         })();
     </script>
     <?php endif; ?>
@@ -298,6 +300,7 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
                 }
             } catch (_error) {
                 // Ignore localStorage access errors during early paint.
+                console.debug('index: failed:', _error);
             }
         })();
     </script>
@@ -460,7 +463,9 @@ if ($isPublicWorkspaceReadonly) {
             dialog.appendChild(content);
             modal.appendChild(dialog);
             document.body.appendChild(modal);
-        } catch (error) {}
+        } catch (error) {
+            console.debug('index: failed:', error);
+        }
     })();
     </script>
     <div id="save-indicator" class="save-indicator" style="display: none;">

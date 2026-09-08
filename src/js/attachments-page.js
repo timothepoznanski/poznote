@@ -249,6 +249,7 @@
                         try {
                             localStorage.setItem('poznote_needs_auto_push_' + noteId, 'true');
                         } catch (e) {
+                            console.debug('attachments-page: uploadAttachment() failed:', e);
                         }
                     }
                     
@@ -515,6 +516,7 @@
                         try {
                             localStorage.setItem('poznote_needs_auto_push_' + noteId, 'true');
                         } catch (e) {
+                            console.debug('attachments-page: deleteAttachment() failed:', e);
                         }
                     }
                     
@@ -586,7 +588,9 @@
                     a.setAttribute('href', 'index.php?' + params.join('&'));
                 }
             }
-        } catch (e) { }
+        } catch (e) {
+            console.debug('attachments-page: workspace() failed:', e);
+        }
     }
 
     // Initialize page

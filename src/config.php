@@ -202,6 +202,7 @@ function poznoteResolveCustomCssPath() {
         }
     } catch (Exception $e) {
         // Fall back to environment-based configuration when the master DB is unavailable.
+        error_log('config: poznoteResolveCustomCssPath() failed: ' . $e->getMessage());
     }
 
     return $fallbackPath;
@@ -237,6 +238,7 @@ function _oidc(string $dbKey, string $default = ''): string {
         }
     } catch (Exception $e) {
         // Return default when the master DB is unavailable.
+        error_log('config: _oidc() failed: ' . $e->getMessage());
     }
     return $default;
 }
@@ -250,6 +252,7 @@ function _oidcBool(string $dbKey, bool $default = false): bool {
         }
     } catch (Exception $e) {
         // Return default when the master DB is unavailable.
+        error_log('config: _oidcBool() failed: ' . $e->getMessage());
     }
     return $default;
 }
@@ -305,6 +308,7 @@ function poznoteResolveGlobalSetting(string $dbKey, string $envKey, $default = '
         }
     } catch (Exception $e) {
         // Fall back to environment-based configuration when the master DB is unavailable.
+        error_log('config: poznoteResolveGlobalSetting() failed: ' . $e->getMessage());
     }
     return _env($envKey, $default);
 }
@@ -329,6 +333,7 @@ function poznoteResolveTenantIsolationFeatures(): array {
         $raw = getGlobalSetting('tenant_isolation_features', null);
     } catch (Exception $e) {
         // Master DB unavailable: fall through to the environment.
+        error_log('config: poznoteResolveTenantIsolationFeatures() failed: ' . $e->getMessage());
     }
     if ($raw === null) {
         $envRaw = _env('POZNOTE_TENANT_ISOLATION_FEATURES', null);

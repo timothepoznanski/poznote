@@ -255,6 +255,7 @@
                 editor.dispatchEvent(new Event('input', { bubbles: true }));
             } catch (e) {
                 // Ignore input dispatch failures.
+                console.debug('markdown-formatting: replaceMarkdownRangeAndSelect() failed:', e);
             }
 
             didReplace = true;

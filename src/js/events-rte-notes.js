@@ -570,6 +570,7 @@ function removeEmptyCodeBlockLine(pre, range) {
         }
     } catch (err) {
         // Leave the block untouched when the DOM walk fails
+        console.debug('events-rte-notes: removeEmptyCodeBlockLine() failed:', err);
     }
 }
 
@@ -729,6 +730,7 @@ function handleMarkdownListEnter(e, selection) {
                 exitSel.addRange(exitRange);
             } catch (e) {
                 // Fall back to default cursor placement if the range fails
+                console.debug('events-rte-notes: handleMarkdownListEnter() failed:', e);
             }
         }
         triggerNoteSave();
@@ -779,6 +781,7 @@ function handleMarkdownListEnter(e, selection) {
             textSel.addRange(textRange);
         } catch (e) {
             // Fall back to default cursor placement if the range fails
+            console.debug('events-rte-notes: handleMarkdownListEnter() failed:', e);
         }
     }
 
@@ -909,6 +912,7 @@ function handleMarkdownListTab(e, selection) {
             textSel.addRange(textRange);
         } catch (err) {
             // Fall back to default cursor placement if the range fails
+            console.debug('events-rte-notes: handleMarkdownListTab() failed:', err);
         }
     }
 

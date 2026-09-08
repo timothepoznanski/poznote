@@ -184,6 +184,7 @@ function openTaskEditModal(taskId, noteId, currentText, lastFocusedElement, opti
             textarea.setSelectionRange(end, end);
         } catch (e) {
             // Some browsers do not support selection APIs on inactive controls.
+            console.debug('tasklist-edit-modal: openTaskEditModal() failed:', e);
         }
     });
 

@@ -87,6 +87,7 @@
                 }
             } catch (e) {
                 // ignore parsing errors
+                console.debug('background-settings: getCurrentWorkspace() failed:', e);
             }
         }
         

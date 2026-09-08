@@ -236,7 +236,9 @@ if (isset($_GET['oidc_error'])) {
                     break;
                 }
             }
-        } catch (Exception $e) {}
+        } catch (Exception $e) {
+            error_log('login: poznoteRenderLoginRedirectAndExit() failed: ' . $e->getMessage());
+        }
 
         if ($defaultAdminUsername): 
         ?>

@@ -359,7 +359,9 @@
         if (window.innerWidth < 768) {
             const active = document.activeElement;
             if (active && typeof active.blur === 'function') {
-                try { active.blur(); } catch (e) { }
+                try { active.blur(); } catch (e) {
+                    console.debug('date-picker-popup: handleEscape() failed:', e);
+                }
             }
         }
     }

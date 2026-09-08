@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     } catch (e) {
         // Ignore errors
+        console.debug('main: failed:', e);
     }
 
     // Initialize automatic update checking (once per day, for admin users only)
@@ -86,7 +87,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             }
         }
-    } catch (e) {}
+    } catch (e) {
+        console.debug('main: failed:', e);
+    }
 
     if (typeof window.updateToggleAllFoldersButton === 'function') {
         window.updateToggleAllFoldersButton();

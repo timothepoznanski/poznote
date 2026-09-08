@@ -540,7 +540,9 @@ class SystemController {
                     if (in_array('disabled', $snCols)) $snDisabledFilter = ' AND COALESCE(sn.disabled, 0) = 0';
                     $sfCols = array_column($ownerCon->query('PRAGMA table_info(shared_folders)')->fetchAll(PDO::FETCH_ASSOC), 'name');
                     if (in_array('disabled', $sfCols)) $sfDisabledFilter = ' AND COALESCE(sf.disabled, 0) = 0';
-                } catch (Exception $e) {}
+                } catch (Exception $e) {
+                    error_log('SystemController: listSharedWithMe() failed: ' . $e->getMessage());
+                }
 
                 // Check shared_notes
                 $stmt = $ownerCon->prepare(

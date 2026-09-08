@@ -2959,6 +2959,7 @@ class FoldersController {
             }
         } catch (Exception $e) {
             // fall through to the default
+            error_log('FoldersController: getGlobalNoteListSort() failed: ' . $e->getMessage());
         }
         return 'updated_desc';
     }

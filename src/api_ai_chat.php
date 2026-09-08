@@ -1936,6 +1936,7 @@ try {
         . 'Dates and times you pass to tools are in this timezone.';
 } catch (Exception $e) {
     // No timezone: the model will ask when it needs a date
+    error_log('api_ai_chat: aiExecuteTool() failed: ' . $e->getMessage());
 }
 
 // The chat is scoped to the workspace it was opened in. Resolve it once to an

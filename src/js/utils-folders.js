@@ -253,12 +253,14 @@ function executeDeleteFolderOperation(folderId, folderName) {
                             }
                         } catch (e) {
                             // ignore per-header errors
+                            console.debug('utils-folders: executeDeleteFolderOperation() failed:', e);
                         }
                     }
                     // Also remove any saved folder search/filter state for this folder name
 
                 } catch (e) {
                     // ignore any errors while trying to clean localStorage
+                    console.debug('utils-folders: executeDeleteFolderOperation() failed:', e);
                 }
 
                 // Reload to update UI
@@ -460,15 +462,21 @@ function deleteCurrentWorkspace() {
                                             foldersToRemove.push(df);
                                             var content = headers[i].querySelector('.folder-content');
                                             if (content && content.id) {
-                                                try { localStorage.removeItem('folder_' + content.id); } catch (e) { }
+                                                try { localStorage.removeItem('folder_' + content.id); } catch (e) {
+                                                    console.debug('utils-folders: deleteCurrentWorkspace() failed:', e);
+                                                }
                                             }
 
                                         }
-                                    } catch (e) { }
+                                    } catch (e) {
+                                        console.debug('utils-folders: deleteCurrentWorkspace() failed:', e);
+                                    }
                                 }
 
 
-                            } catch (e) { }
+                            } catch (e) {
+                                console.debug('utils-folders: deleteCurrentWorkspace() failed:', e);
+                            }
 
                             // Remove option from selector
                             for (var i = 0; i < sel.options.length; i++) {
@@ -485,7 +493,9 @@ function deleteCurrentWorkspace() {
                             try {
                                 var keysToDelete = [];
                                 try {
-                                    try { console.debug && console.debug('workspace delete: starting aggressive localStorage scan'); } catch (e) { }
+                                    try { console.debug && console.debug('workspace delete: starting aggressive localStorage scan'); } catch (e) {
+                                        console.debug('utils-folders: deleteCurrentWorkspace() failed:', e);
+                                    }
                                     for (var i = 0; i < localStorage.length; i++) {
                                         var key = localStorage.key(i);
                                         if (!key) continue;
@@ -493,14 +503,22 @@ function deleteCurrentWorkspace() {
                                             keysToDelete.push(key);
                                         }
                                     }
-                                    try { console.debug && console.debug('workspace delete: keys to delete', keysToDelete); } catch (e) { }
+                                    try { console.debug && console.debug('workspace delete: keys to delete', keysToDelete); } catch (e) {
+                                        console.debug('utils-folders: deleteCurrentWorkspace() failed:', e);
+                                    }
                                 } catch (e) { keysToDelete = []; }
 
                                 for (var k = 0; k < keysToDelete.length; k++) {
-                                    try { localStorage.removeItem(keysToDelete[k]); } catch (e) { }
+                                    try { localStorage.removeItem(keysToDelete[k]); } catch (e) {
+                                        console.debug('utils-folders: deleteCurrentWorkspace() failed:', e);
+                                    }
                                 }
-                                try { console.debug && console.debug('workspace delete: aggressive localStorage cleanup done'); } catch (e) { }
-                            } catch (e) { }
+                                try { console.debug && console.debug('workspace delete: aggressive localStorage cleanup done'); } catch (e) {
+                                    console.debug('utils-folders: deleteCurrentWorkspace() failed:', e);
+                                }
+                            } catch (e) {
+                                console.debug('utils-folders: deleteCurrentWorkspace() failed:', e);
+                            }
 
                             var url = new URL(window.location.href);
                             url.searchParams.set('workspace', newFirstWorkspace || sel.value);

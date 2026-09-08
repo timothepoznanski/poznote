@@ -40,6 +40,7 @@ function clearMenuPositioning(element) {
             element.style.removeProperty(prop);
         } catch (e) {
             // Ignore removal errors
+            console.debug('share: clearMenuPositioning() failed:', e);
         }
     });
     element.style.visibility = '';

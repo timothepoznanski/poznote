@@ -132,6 +132,7 @@ function convertTagsToEditable(noteId) {
             showTagSuggestions(tagInput, editableContainer, _tagSuggestionWorkspace(), noteId);
         } catch (err) {
             // Silently ignore autocomplete errors to not disrupt user experience
+            console.debug('clickable-tags: convertTagsToEditable() failed:', err);
         }
     });
     // Show suggestions on focus (and load the tag list, so the first character
@@ -150,6 +151,7 @@ function convertTagsToEditable(noteId) {
             prefetchAllTags(_tagSuggestionWorkspace());
         } catch (e) {
             // Prefetching is best-effort
+            console.debug('clickable-tags: convertTagsToEditable() failed:', e);
         }
     });
 
@@ -519,6 +521,7 @@ function focusTagInput(container, fallbackInput) {
             live.setSelectionRange(live.value.length, live.value.length);
         } catch (e) {
             // Not all input types support selection ranges
+            console.debug('clickable-tags: live() failed:', e);
         }
     };
 
@@ -844,6 +847,7 @@ function updateNoteById(noteId) {
         }
     } catch (err) {
         // Silently ignore localStorage errors (quota exceeded, private browsing, etc.)
+        console.debug('clickable-tags: updateNoteById() failed:', err);
     }
 
     // Initialize lastSaved variables if this is the current note to prevent infinite loops

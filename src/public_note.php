@@ -886,6 +886,7 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
                 }
             } catch (_error) {
                 // Ignore localStorage access errors during early paint.
+                console.debug('public_note: isDescendantOf() failed:', _error);
             }
         })();
     </script>

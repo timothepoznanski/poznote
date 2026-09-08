@@ -65,7 +65,9 @@ function clearTaskReminderIfAny(noteId, task) {
             credentials: 'same-origin',
             body: JSON.stringify({ task_id: String(task.id) })
         });
-    } catch (e) { }
+    } catch (e) {
+        console.debug('tasklist-crud: clearTaskReminderIfAny() failed:', e);
+    }
 }
 
 // Toggle task completion

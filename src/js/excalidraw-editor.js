@@ -514,6 +514,7 @@
                         localStorage.removeItem('poznote_tags_' + noteId);
                     } catch (err) {
                         // Ignore
+                        console.debug('excalidraw-editor: now() failed:', err);
                     }
                     
                     // Reset change tracking after save
@@ -583,6 +584,7 @@
                         localStorage.removeItem('poznote_tags_' + noteId);
                     } catch (err) {
                         // Ignore
+                        console.debug('excalidraw-editor: now() failed:', err);
                     }
                     
                     // After saving, redirect back to notes

@@ -188,6 +188,7 @@ class SearchManager {
             });
         } catch (err) {
             // ignore
+            console.debug('unified-search: failed:', err);
         }
     }
 
@@ -332,6 +333,7 @@ class SearchManager {
             });
         } catch (err) {
             // ignore
+            console.debug('unified-search: failed:', err);
         }
     }
 
@@ -346,6 +348,7 @@ class SearchManager {
             }
         } catch (err) {
             // ignore
+            console.debug('unified-search: failed:', err);
         }
     }
 
@@ -360,6 +363,7 @@ class SearchManager {
             }
         } catch (err) {
             // ignore
+            console.debug('unified-search: failed:', err);
         }
     }
 
@@ -779,9 +783,13 @@ class SearchManager {
             // duplicate execution. We also remove their entries from
             // this.eventHandlers so the global registry stays consistent.
             for (const [hk, fn] of elementHandlers.entries()) {
-                try { iconWrapper.removeEventListener('click', fn); } catch (e) { }
+                try { iconWrapper.removeEventListener('click', fn); } catch (e) {
+                    console.debug('unified-search: handler() failed:', e);
+                }
                 elementHandlers.delete(hk);
-                try { this.eventHandlers.delete(hk); } catch (e) { }
+                try { this.eventHandlers.delete(hk); } catch (e) {
+                    console.debug('unified-search: handler() failed:', e);
+                }
             }
         }
 
@@ -792,7 +800,9 @@ class SearchManager {
                     if (e._unifiedSearchHandled) return;
                     e._unifiedSearchHandled = true;
                 }
-            } catch (err) { }
+            } catch (err) {
+                console.debug('unified-search: handler() failed:', err);
+            }
             // Determine the actual view the click originated from. Use the
             // event target's closest container to figure out whether this
             // should be treated as a mobile or desktop toggle. This handles
@@ -814,6 +824,7 @@ class SearchManager {
                 }
             } catch (err) {
                 // ignore and fall back to provided isMobile
+                console.debug('unified-search: node() failed:', err);
             }
 
             e.preventDefault();
@@ -837,7 +848,9 @@ class SearchManager {
             // Persist the new type and update UI. Record a short-lived user
             // action so restore/reinit won't overwrite it. Use the effective
             // view (mobile/desktop) we just detected.
-            try { this._suppressUntil = Date.now() + 250; } catch (e) { }
+            try { this._suppressUntil = Date.now() + 250; } catch (e) {
+                console.debug('unified-search: node() failed:', e);
+            }
             this.setActiveSearchType(next, effectiveIsMobile);
 
             // Trigger behavior similar to clicking the pill
@@ -1274,9 +1287,11 @@ class SearchManager {
                     window.isSearchMode = Boolean(unified || search || tagsSearch || createdFrom || createdTo);
                 } catch (e) {
                     // ignore
+                    console.debug('unified-search: handler() failed:', e);
                 }
             } catch (err) {
                 // Ignore history errors
+                console.debug('unified-search: handler() failed:', err);
             }
 
             // Reinitialize components
@@ -1302,6 +1317,7 @@ class SearchManager {
                     this.updateInterface(true);
                 } catch (e) {
                     // ignore
+                    console.debug('unified-search: handler() failed:', e);
                 }
             }
 
@@ -1376,6 +1392,7 @@ class SearchManager {
                 }
             } catch (e) {
                 // ignore
+                console.debug('unified-search: pos() failed:', e);
             } finally {
                 this.focusAfterAjax = false;
                 this.focusCaretPos = null;
@@ -1442,6 +1459,7 @@ class SearchManager {
                     }
                 } catch (e) {
                     // ignore
+                    console.debug('unified-search: visibleTerm() failed:', e);
                 }
             }, 150);
 

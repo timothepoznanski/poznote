@@ -786,7 +786,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     copyBtn.textContent = copyDefaultLabel;
                     copyBtn.classList.remove('is-copied');
                 }, 1500);
-            }).catch(function () {});
+            }).catch(function (e) {
+                console.debug('oidc: writeToClipboard() failed:', e);
+            });
         });
     }
 

@@ -90,6 +90,7 @@
                 return true;
             } catch (e) {
                 // fallthrough to execCommand fallback
+                console.debug('copy-code-on-focus: copyText() failed:', e);
             }
         }
         // Fallback copy using a temporary textarea + execCommand('copy')
@@ -114,7 +115,9 @@
             } catch (e) {
                 ok = false;
             }
-            try { document.body.removeChild(ta); } catch (e) {}
+            try { document.body.removeChild(ta); } catch (e) {
+                console.debug('copy-code-on-focus: copyViaTextarea() failed:', e);
+            }
             return !!ok;
         } catch (e) {
             return false;
@@ -176,7 +179,9 @@
             setTimeout(function () {
                 toast.style.opacity = '0';
                 toast.style.transform = 'translateY(-6px)';
-                setTimeout(function () { try { container.removeChild(toast); } catch (e) {} }, 220);
+                setTimeout(function () { try { container.removeChild(toast); } catch (e) {
+                    console.debug('copy-code-on-focus: showToast() failed:', e);
+                } }, 220);
             }, duration);
 
             // toast shown (silent)
@@ -702,14 +707,18 @@
     // Initialize when DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function () { 
-            try { ensureToastContainer(); } catch(e){} 
+            try { ensureToastContainer(); } catch (e) {
+                console.debug('copy-code-on-focus: observeCodeBlocks() failed:', e);
+            } 
             addCopyButtonToCodeBlocks();
             updateCodeBlockOverflow();
             observeCodeBlocks();
             window.addEventListener('resize', updateCodeBlockOverflow);
         });
     } else {
-        try { ensureToastContainer(); } catch(e){}
+        try { ensureToastContainer(); } catch (e) {
+            console.debug('copy-code-on-focus: observeCodeBlocks() failed:', e);
+        }
         addCopyButtonToCodeBlocks();
         updateCodeBlockOverflow();
         observeCodeBlocks();

@@ -259,7 +259,9 @@ function openReminderModal(noteId, currentReminderAt) {
             setReminderRecurrenceValue(reminderInitialRecurrence);
             syncReminderPreviewFromInput();
         })
-        .catch(function() {});
+        .catch(function (e) {
+            console.debug('reminders: openReminderModal() failed:', e);
+        });
     }
 }
 

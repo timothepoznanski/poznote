@@ -44,8 +44,9 @@
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('pwa/sw.js', { updateViaCache: 'none' })
       .then((registration) => registration.update().then(() => registration))
-      .catch(() => {
-        // Ignore registration failures; the app remains usable without PWA features.
+      .catch((e) => {
+          // Ignore registration failures; the app remains usable without PWA features.
+          console.debug('pwa: failed:', e);
       });
   });
 })();

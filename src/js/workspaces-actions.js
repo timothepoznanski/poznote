@@ -38,7 +38,9 @@ function handleRenameButtonClick(e) {
             }
 
             // Disable button to prevent double clicks
-            try { document.getElementById('confirmRenameBtn').disabled = true; } catch (e) { }
+            try { document.getElementById('confirmRenameBtn').disabled = true; } catch (e) {
+                console.debug('workspaces-actions: handleRenameButtonClick() failed:', e);
+            }
 
             var params = new URLSearchParams({
                 action: 'rename',

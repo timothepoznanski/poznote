@@ -15,7 +15,9 @@
                     return value === '1' || value === 'true' || value === true;
                 }
             }
-        } catch (e) { }
+        } catch (e) {
+            console.debug('slash-command: isAltSlashModeEnabled() failed:', e);
+        }
         return false;
     }
 
@@ -190,7 +192,9 @@
         try {
             element.focus({ preventScroll: true });
         } catch (e) {
-            try { element.focus(); } catch (e2) { }
+            try { element.focus(); } catch (e2) {
+                console.debug('slash-command: focusEditableElement() failed:', e2);
+            }
         }
     }
 
@@ -203,7 +207,9 @@
             try {
                 active.blur();
                 return;
-            } catch (e) { }
+            } catch (e) {
+                console.debug('slash-command: closeMobileKeyboardForSlashMenu() failed:', e);
+            }
         }
 
         if (isMarkdownCodeMirrorEditor(element) && element.querySelector) {
@@ -212,12 +218,16 @@
                 try {
                     codeMirrorContent.blur();
                     return;
-                } catch (e) { }
+                } catch (e) {
+                    console.debug('slash-command: closeMobileKeyboardForSlashMenu() failed:', e);
+                }
             }
         }
 
         if (element && typeof element.blur === 'function') {
-            try { element.blur(); } catch (e) { }
+            try { element.blur(); } catch (e) {
+                console.debug('slash-command: closeMobileKeyboardForSlashMenu() failed:', e);
+            }
         }
     }
 
@@ -250,12 +260,16 @@
         if (selection && selection.rangeCount > 0) {
             try {
                 return selection.getRangeAt(0).cloneRange();
-            } catch (e) { }
+            } catch (e) {
+                console.debug('slash-command: getSavedDomRange() failed:', e);
+            }
         }
         if (window._slashCommandSavedRange && typeof window._slashCommandSavedRange.cloneRange === 'function') {
             try {
                 return window._slashCommandSavedRange.cloneRange();
-            } catch (e) { }
+            } catch (e) {
+                console.debug('slash-command: getSavedDomRange() failed:', e);
+            }
         }
         return null;
     }
@@ -308,7 +322,9 @@
                     selection.removeAllRanges();
                     selection.addRange(context.savedRange);
                 }
-            } catch (e) { }
+            } catch (e) {
+                console.debug('slash-command: insertMarkdownAtContext() failed:', e);
+            }
         }
 
         insertMarkdownAtCursor(insertText, caretDelta);
@@ -355,7 +371,9 @@
         // Ensure editor is actually in edit mode (visible)
         try {
             if (window.getComputedStyle(editor).display === 'none') return null;
-        } catch (e) { }
+        } catch (e) {
+            console.debug('slash-command: getCurrentMarkdownEditorFromSelection() failed:', e);
+        }
 
         return editor;
     }
@@ -392,7 +410,9 @@
             if (typeof window.normalizeContentEditableText === 'function') {
                 return window.normalizeContentEditableText(rootEl);
             }
-        } catch (e) { }
+        } catch (e) {
+            console.debug('slash-command: getMarkdownEditorText() failed:', e);
+        }
 
         // Fallback: innerText preserves visual newlines better than textContent
         return rootEl.innerText || rootEl.textContent || '';
@@ -462,7 +482,9 @@
             try {
                 range.selectNodeContents(rootEl);
                 range.collapse(false);
-            } catch (e2) { }
+            } catch (e2) {
+                console.debug('slash-command: setSelectionByOffsets() failed:', e2);
+            }
         }
 
         selection.removeAllRanges();
@@ -507,7 +529,9 @@
 
         try {
             rootEl.dispatchEvent(new Event('input', { bubbles: true }));
-        } catch (e) { }
+        } catch (e) {
+            console.debug('slash-command: replaceMarkdownRange() failed:', e);
+        }
     }
 
     // Insert Markdown text at cursor position
@@ -562,7 +586,9 @@
 
         try {
             editor.dispatchEvent(new Event('input', { bubbles: true }));
-        } catch (e) { }
+        } catch (e) {
+            console.debug('slash-command: insertMarkdownAtCursor() failed:', e);
+        }
     }
 
     // Wrap Markdown selection with a prefix and suffix
@@ -634,7 +660,9 @@
 
         try {
             editor.dispatchEvent(new Event('input', { bubbles: true }));
-        } catch (e) { }
+        } catch (e) {
+            console.debug('slash-command: wrapMarkdownSelection() failed:', e);
+        }
     }
 
     // Insert a prefix at the start of the current line in Markdown
@@ -1384,7 +1412,9 @@
                 try {
                     rect = api.getCoordsAtPos(editableElement, snapshot.end, 1)
                         || api.getCoordsAtPos(editableElement, snapshot.end, -1);
-                } catch (e) { }
+                } catch (e) {
+                    console.debug('slash-command: getCursorAnchorRect() failed:', e);
+                }
             }
         }
 
@@ -1394,7 +1424,9 @@
                 try {
                     const rects = range.getClientRects();
                     rect = (rects && rects.length > 0) ? rects[0] : range.getBoundingClientRect();
-                } catch (e) { }
+                } catch (e) {
+                    console.debug('slash-command: getCursorAnchorRect() failed:', e);
+                }
             }
         }
 
@@ -1428,7 +1460,9 @@
             if (sel && sel.rangeCount > 0 && context.editableElement.contains(sel.getRangeAt(0).commonAncestorContainer)) {
                 savedInsertionRange = sel.getRangeAt(0).cloneRange();
             }
-        } catch (e) { }
+        } catch (e) {
+            console.debug('slash-command: insertDate() failed:', e);
+        }
 
         const anchorRect = getCursorAnchorRect(context.editableElement, savedInsertionRange);
         showSlashDatePicker(anchorRect, function (date) {
@@ -1450,7 +1484,9 @@
                     sel.removeAllRanges();
                     sel.addRange(range);
                 }
-            } catch (e) { }
+            } catch (e) {
+                console.debug('slash-command: insertDate() failed:', e);
+            }
 
             // Format the date following the user's date/time format setting
             const formattedDate = (typeof window.poznoteFormatDateOnly === 'function')
@@ -1584,11 +1620,15 @@
             input.focus();
             try {
                 input.setSelectionRange(caretPos, caretPos);
-            } catch (e) { }
+            } catch (e) {
+                console.debug('slash-command: formattedDate() failed:', e);
+            }
             setTimeout(() => {
                 try {
                     input.setSelectionRange(caretPos, caretPos);
-                } catch (e) { }
+                } catch (e) {
+                    console.debug('slash-command: formattedDate() failed:', e);
+                }
             }, 0);
             resumeTaskEditBlurSave(input);
         }, function () {
@@ -1652,7 +1692,9 @@
             if (typeof window.initializeTaskListEmbeds === 'function') {
                 window.initializeTaskListEmbeds(editable);
             }
-        } catch (e) { }
+        } catch (e) {
+            console.debug('slash-command: insertTaskListEmbedHtml() failed:', e);
+        }
     }
 
     // Return title commands for the slash menu (specific to title field)
@@ -2332,7 +2374,9 @@
                                             selection.removeAllRanges();
                                             selection.addRange(insertionContext.savedRange);
                                             savedOffsets = getSelectionOffsetsWithin(editor);
-                                        } catch (e) { }
+                                        } catch (e) {
+                                            console.debug('slash-command: safeHeading() failed:', e);
+                                        }
                                     }
 
                                     if (!selectedText && savedOffsets && savedOffsets.end > savedOffsets.start) {
@@ -2405,7 +2449,9 @@
                                     if (editor && !dispatchedInput) {
                                         try {
                                             editor.dispatchEvent(new Event('input', { bubbles: true }));
-                                        } catch (e) { }
+                                        } catch (e) {
+                                            console.debug('slash-command: safeHeading() failed:', e);
+                                        }
                                     }
                                 });
                             }
@@ -2535,7 +2581,9 @@
             if (!editableElement.classList || !editableElement.classList.contains('markdown-editor')) return null;
             try {
                 if (window.getComputedStyle(editableElement).display === 'none') return null;
-            } catch (e) { }
+            } catch (e) {
+                console.debug('slash-command: getEditorContext() failed:', e);
+            }
         }
 
         return { noteType: noteType || 'note', noteEntry, editableElement };
@@ -2771,7 +2819,9 @@
             subSubmenuElement.removeEventListener('touchstart', handleTouchStart);
             subSubmenuElement.removeEventListener('touchmove', handleTouchMove);
             subSubmenuElement.removeEventListener('touchend', handleSubSubmenuTouchEnd);
-        } catch (e) { }
+        } catch (e) {
+            console.debug('slash-command: hideSubSubmenu() failed:', e);
+        }
 
         try {
             subSubmenuElement.remove();
@@ -2797,7 +2847,9 @@
             submenuElement.removeEventListener('touchmove', handleTouchMove);
             submenuElement.removeEventListener('touchend', handleSubmenuTouchEnd);
             submenuElement.removeEventListener('mouseover', handleSubmenuMouseOver);
-        } catch (e) { }
+        } catch (e) {
+            console.debug('slash-command: hideSubmenu() failed:', e);
+        }
 
         try {
             submenuElement.remove();
@@ -2825,7 +2877,9 @@
             slashMenuElement.removeEventListener('mousedown', handleMenuMouseDown);
             slashMenuElement.removeEventListener('click', handleMenuClick);
             slashMenuElement.removeEventListener('mouseover', handleMenuMouseOver);
-        } catch (e) { }
+        } catch (e) {
+            console.debug('slash-command: hideSlashMenu() failed:', e);
+        }
 
         try {
             slashMenuElement.remove();
@@ -3180,6 +3234,7 @@
                     sel.addRange(newRange);
                 } catch (e) {
                     // Fallback if node has an issue
+                    console.debug('slash-command: deleteSlashText() failed:', e);
                 }
             }
 
@@ -3280,7 +3335,9 @@
                         cursorRangeAfterDelete = sel.getRangeAt(0).cloneRange();
                     }
                 }
-            } catch (e) { }
+            } catch (e) {
+                console.debug('slash-command: cmd() failed:', e);
+            }
         }
 
         hideSlashMenu();
@@ -3292,7 +3349,9 @@
             try {
                 savedEditableElement.focus();
                 savedEditableElement.setSelectionRange(inputCursorPosition.start, inputCursorPosition.end);
-            } catch (e) { }
+            } catch (e) {
+                console.debug('slash-command: cmd() failed:', e);
+            }
         } else if (cursorRangeAfterDelete) {
             // Restore cursor for contenteditable
             try {
@@ -3302,7 +3361,9 @@
                 const sel = window.getSelection();
                 sel.removeAllRanges();
                 sel.addRange(cursorRangeAfterDelete);
-            } catch (e) { }
+            } catch (e) {
+                console.debug('slash-command: cmd() failed:', e);
+            }
         }
         // Also expose it globally so async modal callbacks (link, note-reference)
         // can use it as a reliable fallback for the cursor position.
@@ -3329,7 +3390,9 @@
                     } else if (savedNoteEntry) {
                         try {
                             savedNoteEntry.focus();
-                        } catch (e) { }
+                        } catch (e) {
+                            console.debug('slash-command: cmd() failed:', e);
+                        }
                     }
                 }
 

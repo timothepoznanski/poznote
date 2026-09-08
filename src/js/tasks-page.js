@@ -55,7 +55,9 @@
                     tasklistInsertOrder = data.value;
                 }
             })
-            .catch(function () { });
+            .catch(function (e) {
+                console.debug('tasks-page: refreshTasklistInsertOrder() failed:', e);
+            });
     }
 
     function escapeHtml(text) {
@@ -123,7 +125,9 @@
     function saveCollapsedNoteIds() {
         try {
             getPrefsStorage().setItem(COLLAPSED_KEY, JSON.stringify(Array.from(collapsedNoteIds)));
-        } catch (e) { }
+        } catch (e) {
+            console.debug('tasks-page: saveCollapsedNoteIds() failed:', e);
+        }
     }
 
     function loadViewMode() {
@@ -140,7 +144,9 @@
     function saveViewMode() {
         try {
             getPrefsStorage().setItem(VIEW_KEY, viewMode);
-        } catch (e) { }
+        } catch (e) {
+            console.debug('tasks-page: saveViewMode() failed:', e);
+        }
     }
 
     // "Display tasks in notes" toggle (checklists of regular notes), on by
@@ -160,7 +166,9 @@
     function saveShowNoteChecklists() {
         try {
             getPrefsStorage().setItem(SHOW_NOTE_CHECKLISTS_KEY, showNoteChecklists ? '1' : '0');
-        } catch (e) { }
+        } catch (e) {
+            console.debug('tasks-page: saveShowNoteChecklists() failed:', e);
+        }
     }
 
     // Groups currently taken into account (counts, progress, lists)
@@ -631,7 +639,9 @@
                 email_enabled: task.dueReminderEmail !== undefined ? !!task.dueReminderEmail : true,
                 recurrence: task.dueRecurrence || null
             })
-        }).catch(function () { });
+        }).catch(function (e) {
+            console.debug('tasks-page: rematerializeReminder() failed:', e);
+        });
     }
 
     function attachDropTarget(cell) {
@@ -660,7 +670,9 @@
                     rematerializeReminder(entry.note, entry.task);
                     render();
                 })
-                .catch(function () { });
+                .catch(function (e) {
+                    console.debug('tasks-page: attachDropTarget() failed:', e);
+                });
         });
     }
 
@@ -693,7 +705,9 @@
             try {
                 e.dataTransfer.setData('text/plain', task.text || '');
                 e.dataTransfer.effectAllowed = 'move';
-            } catch (err) { }
+            } catch (err) {
+                console.debug('tasks-page: renderCalendarChip() failed:', err);
+            }
         });
         chip.addEventListener('dragend', function () {
             dragEntry = null;
@@ -916,7 +930,9 @@
                     task.dueAt = value;
                     render();
                 })
-                .catch(function () { });
+                .catch(function (e) {
+                    console.debug('tasks-page: applyDueAt() failed:', e);
+                });
         };
 
         var pickerOptions = {
@@ -1120,7 +1136,9 @@
                         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                         credentials: 'same-origin',
                         body: JSON.stringify({ task_id: String(task.id) })
-                    }).catch(function () { });
+                    }).catch(function (e) {
+                        console.debug('tasks-page: toggleTask() failed:', e);
+                    });
                 }
                 render();
             })

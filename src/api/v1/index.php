@@ -92,6 +92,7 @@ if ($isPublicApiEndpoint) {
     } catch (Exception $e) {
         // Authentication failed, but that's ok for public attachments
         // Controller will check if note is publicly shared
+        error_log('index: failed: ' . $e->getMessage());
     }
 } elseif ($isAdminEndpoint || $isLookupEndpoint) {
     // Admin endpoints only need credential validation, not X-User-ID

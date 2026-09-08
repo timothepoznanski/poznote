@@ -1101,6 +1101,7 @@
             history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash);
         } catch (e) {
             // The bar simply stays closed
+            console.debug('search-replace: openSearchFromUrlParam() failed:', e);
         }
     }
 

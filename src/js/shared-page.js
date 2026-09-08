@@ -142,6 +142,7 @@
             window.localStorage.setItem(COLLAPSED_FOLDERS_STORAGE_KEY, JSON.stringify(Object.keys(collapsedFolderIds)));
         } catch (error) {
             // Ignore storage failures and keep the UI functional.
+            console.debug('shared-page: saveCollapsedFolderIds() failed:', error);
         }
     }
 
@@ -1185,7 +1186,9 @@
         setTimeout(function() {
             toast.style.opacity = '0';
             toast.style.transform = 'translateY(-6px)';
-            setTimeout(function() { try { toast.remove(); } catch(e) {} }, 220);
+            setTimeout(function() { try { toast.remove(); } catch (e) {
+                console.debug('shared-page: showCopyToast() failed:', e);
+            } }, 220);
         }, 1800);
     }
 

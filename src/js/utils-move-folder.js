@@ -86,7 +86,9 @@ function populateTargetFolderDropdown(excludeFolderId, excludeFolderName, select
                     select.value = String(preselectFolderId);
                     try {
                         updateMoveButton(select.value, true);
-                    } catch (e) { }
+                    } catch (e) {
+                        console.debug('utils-move-folder: populateTargetFolderDropdown() failed:', e);
+                    }
                 }
                 loadMoveNoteRecentFolders(excludeFolderId, selectId, workspace);
             }
@@ -116,6 +118,7 @@ function populateTargetFolderDropdown(excludeFolderId, excludeFolderName, select
         updateMoveButton(select.value || 'no-folder', true);
     } catch (e) {
         // ignore if updateMoveButton is not available in this context
+        console.debug('utils-move-folder: populateTargetFolderDropdown() failed:', e);
     }
 }
 
@@ -137,7 +140,9 @@ function getMoveFallbackWorkspace() {
         if (typeof getSelectedWorkspace === 'function') {
             return getSelectedWorkspace() || '';
         }
-    } catch (e) { }
+    } catch (e) {
+        console.debug('utils-move-folder: getMoveFallbackWorkspace() failed:', e);
+    }
 
     return (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace : '';
 }

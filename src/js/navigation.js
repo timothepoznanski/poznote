@@ -59,6 +59,7 @@ function getUrlNoteContext() {
         }
     } catch (e) {
         // Ignore malformed URLs and fall back to stored tabs.
+        console.debug('navigation: getUrlNoteContext() failed:', e);
     }
 
     return null;
@@ -91,6 +92,7 @@ function getStoredActiveTabContext(workspace) {
         }
     } catch (e) {
         // Storage may be unavailable in private mode.
+        console.debug('navigation: getStoredActiveTabContext() failed:', e);
     }
 
     return null;

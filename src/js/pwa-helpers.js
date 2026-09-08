@@ -79,6 +79,7 @@ function getPreferredPublicUrlProtocol() {
         }
     } catch (error) {
         // Ignore storage errors
+        console.debug('pwa-helpers: getPreferredPublicUrlProtocol() failed:', error);
     }
     return 'https';
 }
@@ -94,6 +95,7 @@ function setPreferredPublicUrlProtocol(protocol) {
         }
     } catch (error) {
         // Ignore storage errors
+        console.debug('pwa-helpers: setPreferredPublicUrlProtocol() failed:', error);
     }
 }
 

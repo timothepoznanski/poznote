@@ -789,7 +789,9 @@ function createBackup() {
                 var idx = collapsed.indexOf(key);
                 if (isCollapsed && idx === -1) collapsed.push(key);
                 if (!isCollapsed && idx !== -1) collapsed.splice(idx, 1);
-                try { store.setItem(STORAGE_KEY, JSON.stringify(collapsed)); } catch (e) {}
+                try { store.setItem(STORAGE_KEY, JSON.stringify(collapsed)); } catch (e) {
+                    console.debug('backup_export: apply() failed:', e);
+                }
             });
         });
     })();

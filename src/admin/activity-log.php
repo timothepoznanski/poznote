@@ -109,6 +109,7 @@ if ($requestedPageSize !== null && ctype_digit((string)$requestedPageSize)
         $sizeStmt->execute(['admin_activity_log_per_page', (string)$pageSize]);
     } catch (Exception $e) {
         // Non-fatal: the requested size still applies for this request.
+        error_log('activity-log: failed: ' . $e->getMessage());
     }
 } else {
     $storedPageSize = getSetting('admin_activity_log_per_page');

@@ -127,7 +127,9 @@ function handleMoveButtonClick(e) {
 
             // disable to prevent double clicks
             var confirmBtn = document.getElementById('confirmMoveBtn');
-            try { confirmBtn.disabled = true; } catch (e) { }
+            try { confirmBtn.disabled = true; } catch (e) {
+                console.debug('workspaces-page: handleMoveButtonClick() failed:', e);
+            }
 
             var params = new URLSearchParams({
                 action: 'move_notes',

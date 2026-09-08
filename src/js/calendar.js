@@ -54,6 +54,7 @@ class MiniCalendar {
             }
         } catch (error) {
             // Ignore URL parsing errors and continue with page state fallbacks.
+            console.debug('calendar: failed:', error);
         }
 
         if (typeof getSelectedWorkspace === 'function') {
@@ -80,6 +81,7 @@ class MiniCalendar {
                 }
             } catch (error) {
                 // Ignore malformed config and continue with DOM fallback.
+                console.debug('calendar: failed:', error);
             }
         }
 

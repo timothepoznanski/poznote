@@ -81,7 +81,9 @@ function toggleEmojiPicker() {
     try {
       const style = window.getComputedStyle(emojiBtn);
       if (style && (style.display === 'none' || style.visibility === 'hidden')) isVisible = false;
-    } catch (e) { }
+    } catch (e) {
+        console.debug('toolbar-emoji: toggleEmojiPicker() failed:', e);
+    }
 
     if (isVisible) {
       anchorRect = rect;
@@ -100,7 +102,9 @@ function toggleEmojiPicker() {
           if (rects && rects.length) anchorRect = rects[0];
         }
       }
-    } catch (e) { }
+    } catch (e) {
+        console.debug('toolbar-emoji: toggleEmojiPicker() failed:', e);
+    }
   }
 
   // Picker dimensions according to screen
@@ -155,7 +159,9 @@ function insertEmoji(emoji) {
       sel.removeAllRanges();
       sel.addRange(window.savedRanges.emoji);
     }
-  } catch (e) { }
+  } catch (e) {
+      console.debug('toolbar-emoji: insertEmoji() failed:', e);
+  }
 
   // Ensure focus is back on the editor before inserting.
   try {
@@ -172,7 +178,9 @@ function insertEmoji(emoji) {
         }
       }
     }
-  } catch (e) { }
+  } catch (e) {
+      console.debug('toolbar-emoji: focusTarget() failed:', e);
+  }
 
   // Handle input insertion (title and task fields)
   if (window.savedActiveInput) {

@@ -192,6 +192,7 @@ if (!isset($GLOBALS['poznoteIconSidebarGitOrderables'])) {
             }
         } catch (Throwable $e) {
             // Git misconfiguration must never take the rail down with it.
+            error_log('icon_sidebar: failed: ' . $e->getMessage());
         }
     }
     $GLOBALS['poznoteIconSidebarGitOrderables'] = $iconSidebarGitOrderables;
@@ -327,7 +328,9 @@ try {
     if (localStorage.getItem('iconSidebarCollapsed') === 'true') {
         document.body.classList.add('icon-sidebar-collapsed');
     }
-} catch (e) {}
+} catch (e) {
+    console.debug('icon_sidebar: failed:', e);
+}
 </script>
 <nav id="icon_sidebar">
     <div class="icon-sidebar-scroll">

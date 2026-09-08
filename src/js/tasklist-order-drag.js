@@ -563,7 +563,9 @@ function enableDragAndDrop(noteId) {
         script.onload = function() { initSortable(); };
         script.onerror = function() {
             // If local file fails, fall back to HTML5 implementation below
-            try { console.warn('tasklist: SortableJS local file failed, falling back to HTML5 DnD'); } catch(e){}
+            try { console.warn('tasklist: SortableJS local file failed, falling back to HTML5 DnD'); } catch (e) {
+                console.debug('tasklist-order-drag: initSortable() failed:', e);
+            }
             // continue to HTML5 fallback
             attachHTML5Handlers();
         };

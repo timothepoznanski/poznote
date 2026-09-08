@@ -10,7 +10,8 @@ function applyHtmlBlockStyle(style) {
   try {
     document.execCommand('styleWithCSS', false, false);
   } catch (e) {
-    // ignore
+      // ignore
+      console.debug('toolbar-editor-utils: applyHtmlBlockStyle() failed:', e);
   }
 
   // Strip heading-anchor links from the current block before formatBlock.
@@ -38,7 +39,8 @@ function applyHtmlBlockStyle(style) {
         return;
       }
     } catch (e) {
-      // Try the next formatBlock syntax
+        // Try the next formatBlock syntax
+        console.debug('toolbar-editor-utils: applyHtmlBlockStyle() failed:', e);
     }
   }
 }

@@ -444,6 +444,7 @@ function addRecentIcon(iconClass) {
         (window.__poznoteUserStorage || localStorage).setItem(RECENT_ICONS_KEY, JSON.stringify(recents.slice(0, RECENT_ICONS_MAX)));
     } catch (e) {
         // Storage unavailable: recents are a convenience only
+        console.debug('folder-icon: addRecentIcon() failed:', e);
     }
 }
 

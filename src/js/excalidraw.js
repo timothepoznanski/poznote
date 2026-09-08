@@ -8,6 +8,7 @@ function excaTr(key, vars, fallback) {
         }
     } catch (e) {
         // ignore
+        console.debug('excalidraw: excaTr() failed:', e);
     }
     let text = (fallback !== undefined && fallback !== null) ? String(fallback) : String(key);
     if (vars && typeof vars === 'object') {
@@ -353,6 +354,7 @@ function saveNoteAndWaitForCompletion() {
                         localStorage.removeItem('poznote_tags_' + noteid);
                     } catch (err) {
                         // Ignore errors
+                        console.debug('excalidraw: saveNoteAndWaitForCompletion() failed:', err);
                     }
 
                     if (checkCount >= maxChecks) {

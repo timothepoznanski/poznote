@@ -527,7 +527,9 @@ function initTextSelectionHandlers() {
                             isTitleOrTagField = true;
                             break;
                         }
-                    } catch (err) { }
+                    } catch (err) {
+                        console.debug('events-text-selection: isTitleOrTagElement() failed:', err);
+                    }
                     // Treat selection inside the note metadata subline as title-like (do not toggle toolbar)
                     if (currentElement.classList && currentElement.classList.contains('note-subline')) {
                         isTitleOrTagField = true;

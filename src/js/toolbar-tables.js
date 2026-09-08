@@ -604,7 +604,9 @@ window.insertTable = insertTable;
         selection.removeAllRanges();
         selection.addRange(nextRange);
       }
-    } catch (e) { }
+    } catch (e) {
+        console.debug('toolbar-tables: restoreMobileToolbarRange() failed:', e);
+    }
 
     restoreScrollState(scrollState);
     return nextRange;
@@ -656,7 +658,9 @@ window.insertTable = insertTable;
         } catch (e) {
           window.savedRanges.emoji = rangeToRestore;
         }
-      } catch (e) { }
+      } catch (e) {
+          console.debug('toolbar-tables: restoreMobileToolbarRange() failed:', e);
+      }
     }
 
     const target = toolbar.querySelector(targetSelector);

@@ -48,5 +48,6 @@
         applyTheme(getStoredTheme() || getServerTheme());
     } catch (e) {
         // Fallback silently
+        console.debug('public-note-theme-init: applyTheme() failed:', e);
     }
 })();

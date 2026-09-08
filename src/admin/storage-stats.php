@@ -46,6 +46,7 @@ function poznoteDirSize(string $dir): int {
         }
     } catch (Exception $e) {
         // Unreadable directory — treat as 0
+        error_log('storage-stats: poznoteDirSize() failed: ' . $e->getMessage());
     }
     return $total;
 }
@@ -113,6 +114,7 @@ function collectStorageStats(): array {
         }
     } catch (Exception $e) {
         // Profiles stay empty; rows render with an em dash for the name.
+        error_log('storage-stats: collectStorageStats() failed: ' . $e->getMessage());
     }
 
     // Real backup usage read from the backup bucket, in one ListObjects call
@@ -250,6 +252,7 @@ if (in_array($requestedSort, $allowedStorageSorts, true)) {
         $sortStmt->execute(['admin_storage_stats_sort', $storageSort]);
     } catch (Exception $e) {
         // Non-fatal: the requested sort still applies for this request.
+        error_log('storage-stats: collectStorageStats() failed: ' . $e->getMessage());
     }
 } else {
     $storedSort = getSetting('admin_storage_stats_sort');
@@ -291,6 +294,7 @@ if ($requestedPageSize !== null && ctype_digit((string)$requestedPageSize)
         $sizeStmt->execute(['admin_storage_stats_per_page', (string)$storagePageSize]);
     } catch (Exception $e) {
         // Non-fatal: the requested size still applies for this request.
+        error_log('storage-stats: collectStorageStats() failed: ' . $e->getMessage());
     }
 } else {
     $storedPageSize = getSetting('admin_storage_stats_per_page');
@@ -314,6 +318,7 @@ if ($requestedHideInactive !== null && in_array((string)$requestedHideInactive, 
         $hideStmt->execute(['admin_storage_stats_hide_inactive', $storageHideInactive ? '1' : '0']);
     } catch (Exception $e) {
         // Non-fatal: the requested state still applies for this request.
+        error_log('storage-stats: collectStorageStats() failed: ' . $e->getMessage());
     }
 } else {
     $storageHideInactive = getSetting('admin_storage_stats_hide_inactive') === '1';

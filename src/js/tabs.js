@@ -70,6 +70,7 @@
             }));
         } catch (e) {
             // Storage quota or private mode — silently ignore
+            console.debug('tabs: _saveToStorage() failed:', e);
         }
     }
 
@@ -79,7 +80,9 @@
             if (!raw) return null;
             var data = JSON.parse(raw);
             if (Array.isArray(data.tabs)) return data;
-        } catch (e) { }
+        } catch (e) {
+            console.debug('tabs: _loadFromStorage() failed:', e);
+        }
         return null;
     }
 
@@ -1102,7 +1105,9 @@
 
     function _cancelScrollRestoreWatch() {
         if (_scrollRestoreObserver) {
-            try { _scrollRestoreObserver.disconnect(); } catch (e) { }
+            try { _scrollRestoreObserver.disconnect(); } catch (e) {
+                console.debug('tabs: _cancelScrollRestoreWatch() failed:', e);
+            }
             _scrollRestoreObserver = null;
         }
         if (_scrollRestoreTimer) {
@@ -1378,7 +1383,9 @@
             // Set by external pages (e.g. the dashboard) to open the note as an
             // additional tab instead of replacing the active one.
             openAsNewTab = params.get('newtab') === '1';
-        } catch (e) { }
+        } catch (e) {
+            console.debug('tabs: _init() failed:', e);
+        }
 
         // Try to restore from localStorage
         var stored = _loadFromStorage();

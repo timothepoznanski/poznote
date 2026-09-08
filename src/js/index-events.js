@@ -988,6 +988,7 @@
             }
         } catch (e) {
             // ignore errors during initial folder state restoration
+            console.debug('index-events: restoreFolderStates() failed:', e);
         }
     }
 

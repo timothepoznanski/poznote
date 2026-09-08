@@ -96,7 +96,9 @@ function loadFoldersForMoveModal(currentFolderId, currentFolderName) {
     var ws = '';
     try {
         ws = (typeof getSelectedWorkspace === 'function') ? getSelectedWorkspace() : '';
-    } catch (e) { }
+    } catch (e) {
+        console.debug('utils-move-note: loadFoldersForMoveModal() failed:', e);
+    }
 
     fetch('/api/v1/folders?workspace=' + encodeURIComponent(ws || ''), {
         method: 'GET',
@@ -294,7 +296,9 @@ function moveNoteToFolder() {
                 if (data.share_delta && typeof updateSharedCount === 'function') {
                     updateSharedCount(data.share_delta);
                 }
-                try { closeModal('moveNoteFolderModal'); } catch (e) { }
+                try { closeModal('moveNoteFolderModal'); } catch (e) {
+                    console.debug('utils-move-note: moveNoteToFolder() failed:', e);
+                }
                 location.reload();
             } else {
                 var err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';

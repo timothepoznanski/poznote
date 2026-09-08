@@ -28,7 +28,8 @@ function getMarkdownEditorText(editor) {
       return window.normalizeContentEditableText(editor);
     }
   } catch (e) {
-    // Fall through to plain text extraction.
+      // Fall through to plain text extraction.
+      console.debug('toolbar-md-offsets: getMarkdownEditorText() failed:', e);
   }
 
   return editor.innerText || editor.textContent || '';
@@ -334,7 +335,8 @@ function replaceMarkdownRangeByOffsets(editor, start, end, replacement) {
   try {
     editor.dispatchEvent(new Event('input', { bubbles: true }));
   } catch (e) {
-    // Ignore input dispatch failures.
+      // Ignore input dispatch failures.
+      console.debug('toolbar-md-offsets: replaceMarkdownRangeByOffsets() failed:', e);
   }
 
   return true;

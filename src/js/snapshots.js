@@ -266,8 +266,9 @@
     window.createNoteSnapshot = function (noteId) {
         if (isSnapshotAccessBlocked() || !noteId || noteId === -1 || noteId === 'search') return;
 
-        rememberPendingSnapshotCreate(noteId, requestSnapshotCreate(noteId, false)).catch(function () {
+        rememberPendingSnapshotCreate(noteId, requestSnapshotCreate(noteId, false)).catch(function (e) {
             // Silently ignore - snapshots are best-effort
+            console.debug('snapshots: requestSnapshotCreate() failed:', e);
         });
     };
 
@@ -778,10 +779,14 @@
                 setTimeout(function () {
                     try {
                         container.removeChild(toast);
-                    } catch (e) {}
+                    } catch (e) {
+                        console.debug('snapshots: showSnapshotToast() failed:', e);
+                    }
                 }, 220);
             }, duration);
-        } catch (e) {}
+        } catch (e) {
+            console.debug('snapshots: showSnapshotToast() failed:', e);
+        }
     }
 
     function showSnapshotError(message) {
@@ -792,7 +797,9 @@
 
         try {
             window.alert(message);
-        } catch (e) {}
+        } catch (e) {
+            console.debug('snapshots: showSnapshotError() failed:', e);
+        }
     }
 
     function escapeHtml(str) {

@@ -10,7 +10,9 @@ document.addEventListener('DOMContentLoaded', function () {
             var a = document.getElementById('backToNotesLink');
             if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(workspace));
         }
-    } catch (e) { }
+    } catch (e) {
+        console.debug('backup-export-init: workspace() failed:', e);
+    }
 
     // Attach structured export button listener
     var structuredExportBtn = document.getElementById('structuredExportBtn');

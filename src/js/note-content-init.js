@@ -85,6 +85,7 @@ function reinitializeNoteContent(options) {
         }
     } catch (e) {
         // Silently continue if error
+        console.debug('note-content-init: reinitializeNoteContent() failed:', e);
     }
 
     // Re-initialize search highlighting if in search mode.
@@ -98,9 +99,13 @@ function reinitializeNoteContent(options) {
                         if (window.searchNavigation && window.searchNavigation.pendingAutoScroll && typeof scrollToFirstHighlight === 'function') {
                             scrollToFirstHighlight();
                         }
-                    } catch (e) { }
+                    } catch (e) {
+                        console.debug('note-content-init: reinitializeNoteContent() failed:', e);
+                    }
                 }, 60);
-            } catch (e) { }
+            } catch (e) {
+                console.debug('note-content-init: reinitializeNoteContent() failed:', e);
+            }
         } else if (typeof highlightSearchTerms === 'function') {
             setTimeout(function () {
                 highlightSearchTerms();
@@ -184,7 +189,9 @@ function reinitializeNoteContent(options) {
         if (typeof window.initializeTaskListEmbeds === 'function') {
             window.initializeTaskListEmbeds();
         }
-    } catch (e) { }
+    } catch (e) {
+        console.debug('note-content-init: reinitializeNoteContent() failed:', e);
+    }
 
     // If the loaded note(s) include any markdown entries, initialize them so the markdown content
     // is replaced with the interactive markdown editor/preview UI when notes are loaded via AJAX.
@@ -290,6 +297,7 @@ function reinitializeNoteContent(options) {
         }));
     } catch (e) {
         // Ignore event dispatch issues
+        console.debug('note-content-init: reinitializeNoteContent() failed:', e);
     }
 
     // Mark that note loading is complete

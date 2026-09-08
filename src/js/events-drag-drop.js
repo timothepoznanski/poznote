@@ -33,7 +33,9 @@ function setupDragDropEvents() {
                 // Add visual feedback to show the drop target
                 potential.classList.add('drag-over');
             }
-        } catch (err) { }
+        } catch (err) {
+            console.debug('events-drag-drop: setupDragDropEvents() failed:', err);
+        }
     });
 
     document.body.addEventListener('dragover', function (e) {
@@ -47,7 +49,9 @@ function setupDragDropEvents() {
                     e.dataTransfer.dropEffect = 'copy';
                 }
             }
-        } catch (err) { }
+        } catch (err) {
+            console.debug('events-drag-drop: setupDragDropEvents() failed:', err);
+        }
     });
 
     document.body.addEventListener('dragleave', function (e) {
@@ -60,7 +64,9 @@ function setupDragDropEvents() {
                     note.classList.remove('drag-over');
                 });
             }
-        } catch (err) { }
+        } catch (err) {
+            console.debug('events-drag-drop: setupDragDropEvents() failed:', err);
+        }
     });
 
     document.body.addEventListener('drop', function (e) {
@@ -88,6 +94,7 @@ function setupDragDropEvents() {
                 handleImageFilesAndInsert(dt.files, note, { x: e.clientX, y: e.clientY });
             }
         } catch (err) {
+            console.debug('events-drag-drop: setupDragDropEvents() failed:', err);
         }
     });
 }
@@ -426,6 +433,7 @@ function handleNoteDragStart(e) {
             e.dataTransfer.setDragImage(dragImage, 50, 20);
         } catch (err) {
             // Silently fail if browser doesn't support custom drag images
+            console.debug('events-drag-drop: handleNoteDragStart() failed:', err);
         }
 
         // Remove the drag image after a short delay
@@ -995,6 +1003,7 @@ function handleFolderDragStart(e) {
         e.dataTransfer.setDragImage(dragImage, 50, 20);
     } catch (err) {
         // Silently fail if browser doesn't support custom drag images
+        console.debug('events-drag-drop: handleFolderDragStart() failed:', err);
     }
 
     // Remove the drag image after a short delay
@@ -1114,7 +1123,9 @@ function openFolderHeaderForDrag(folderHeader) {
         content.style.display = 'block';
         try {
             localStorage.setItem('folder_' + content.id, 'open');
-        } catch (err) { }
+        } catch (err) {
+            console.debug('events-drag-drop: openFolderHeaderForDrag() failed:', err);
+        }
     }
 
     if (typeof updateToggleAllFoldersButton === 'function') {

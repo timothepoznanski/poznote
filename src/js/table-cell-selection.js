@@ -294,6 +294,7 @@
             sel.addRange(range);
         } catch (err) {
             // If the DOM shape prevents a clean range, leave the selection as-is
+            console.debug('table-cell-selection: isNativeSelectionOutsideTable() failed:', err);
         }
     }, true);
 

@@ -516,6 +516,7 @@ class GitSync {
             }
         } catch (Exception $e) {
             // Fall through to "all workspaces"
+            error_log('GitSync: getSyncedWorkspaces() failed: ' . $e->getMessage());
         }
         return $this->syncedWorkspacesCache;
     }
@@ -1406,7 +1407,9 @@ class GitSync {
 
                     $this->con->exec('COMMIT');
                 } catch (Exception $transEx) {
-                    try { $this->con->exec('ROLLBACK'); } catch (Exception $ignored) {}
+                    try { $this->con->exec('ROLLBACK'); } catch (Exception $ignored) {
+                        error_log('GitSync: pullNotes() failed: ' . $ignored->getMessage());
+                    }
                     $results['success']  = false;
                     $results['errors'][] = ['path' => 'db_upsert', 'error' => $transEx->getMessage()];
                     $results['debug'][]  = 'DB upsert transaction failed: ' . $transEx->getMessage();
@@ -1499,7 +1502,9 @@ class GitSync {
                     $this->con->exec('COMMIT');
                 }
             } catch (Exception $trashEx) {
-                try { $this->con->exec('ROLLBACK'); } catch (Exception $ignored) {}
+                try { $this->con->exec('ROLLBACK'); } catch (Exception $ignored) {
+                    error_log('GitSync: pullNotes() failed: ' . $ignored->getMessage());
+                }
                 $results['errors'][] = ['path' => 'trash_cleanup', 'error' => $trashEx->getMessage()];
                 $results['debug'][]  = 'Trash cleanup failed: ' . $trashEx->getMessage();
             }

@@ -68,6 +68,7 @@ function setAutoPushFlag(value) {
         }
     } catch (e) {
         // Ignore localStorage errors
+        console.debug('events-auto-save: setAutoPushFlag() failed:', e);
     }
 }
 

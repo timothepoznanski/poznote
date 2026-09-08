@@ -80,7 +80,9 @@ function highlightSearchTerms(forceReapply) {
     }
 
     if (isCombinedSearchActive() && typeof window.highlightMatchingTags === 'function') {
-        try { window.highlightMatchingTags(searchTerm); } catch (e) {}
+        try { window.highlightMatchingTags(searchTerm); } catch (e) {
+            console.debug('search-highlight: highlightSearchTerms() failed:', e);
+        }
     }
 
     updateHighlightsList();
@@ -113,7 +115,9 @@ function isNotesSearchActive() {
                 if (dt === 'notes' || mt === 'notes') return true;
             }
             if (window.searchManager.currentSearchType === 'notes') return true;
-        } catch (e) {}
+        } catch (e) {
+            console.debug('search-highlight: isNotesSearchActive() failed:', e);
+        }
     }
 
     return false;
@@ -249,7 +253,9 @@ function highlightInElement(element, searchWords) {
             node.parentNode.removeChild(node);
         } else if (node.nodeType === 1 && !node.classList.contains('search-highlight')) { // ELEMENT_NODE
             // Skip hidden containers (e.g. markdown editor in preview mode)
-            try { if (window.getComputedStyle(node).display === 'none') return; } catch (e) {}
+            try { if (window.getComputedStyle(node).display === 'none') return; } catch (e) {
+                console.debug('search-highlight: processTextNodes() failed:', e);
+            }
 
             Array.from(node.childNodes).forEach(processTextNodes);
         }
@@ -463,7 +469,9 @@ function updateHighlightsList() {
                 if (window.getComputedStyle(current).display === 'none') return false;
                 current = current.parentElement;
             }
-        } catch (e) {}
+        } catch (e) {
+            console.debug('search-highlight: updateHighlightsList() failed:', e);
+        }
         return true;
     });
 
@@ -560,7 +568,9 @@ function navigateToHighlight(index, smooth) {
                 });
             }
         } catch (e) {
-            try { target.scrollIntoView(behavior === 'smooth'); } catch (_) {}
+            try { target.scrollIntoView(behavior === 'smooth'); } catch (_) {
+                console.debug('search-highlight: behavior() failed:', _);
+            }
         }
     }, isMobile ? 250 : 50);
 

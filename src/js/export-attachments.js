@@ -18,5 +18,6 @@
         }
     } catch (e) {
         // Error reading workspace
+        console.debug('export-attachments: workspace() failed:', e);
     }
 })();

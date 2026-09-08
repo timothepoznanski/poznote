@@ -101,6 +101,7 @@
             localStorage.setItem('poznote-public-theme', theme);
         } catch (e) {
             // localStorage not available
+            console.debug('public-note: setTheme() failed:', e);
         }
 
         updateThemeIcon(theme);
@@ -194,7 +195,9 @@
                 else if (err.str) msg = err.str;
                 else if (err.message) msg = err.message;
             }
-        } catch (e) { }
+        } catch (e) {
+            console.debug('public-note: renderMermaidError() failed:', e);
+        }
 
         node.classList.remove('mermaid');
         node.innerHTML =
@@ -614,6 +617,7 @@
                 textarea.setSelectionRange(end, end);
             } catch (e) {
                 // Some browsers do not support selection APIs on inactive controls.
+                console.debug('public-note: enableInlineEdit() failed:', e);
             }
         });
     }

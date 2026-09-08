@@ -60,7 +60,9 @@ function initMermaid(retryCount) {
                 else if (err.str) msg = err.str;
                 else if (err.message) msg = err.message;
             }
-        } catch (e) { }
+        } catch (e) {
+            console.debug('markdown-parser: renderMermaidError() failed:', e);
+        }
 
         // Replace with readable error output using existing code block styling
         node.classList.remove('mermaid');
@@ -109,6 +111,7 @@ function initMermaid(retryCount) {
         }
     } catch (e0) {
         // Non-fatal: continue with normal Mermaid initialization
+        console.debug('markdown-parser: renderMermaidError() failed:', e0);
     }
 
     var theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default';
@@ -175,7 +178,9 @@ function initMermaid(retryCount) {
         // Mermaid will skip nodes marked as processed, so clear it when re-rendering.
         try {
             n.removeAttribute('data-processed');
-        } catch (eProcessed) { }
+        } catch (eProcessed) {
+            console.debug('markdown-parser: fallbackSource() failed:', eProcessed);
+        }
 
         n.textContent = _mdNormalizeMermaidSourceForRendering(existingSource);
         nodesToRender.push(n);
@@ -195,7 +200,9 @@ function initMermaid(retryCount) {
                     .then(function () {
                         // Ensure the node contains only the source text when (re)rendering
                         // and that it won't be skipped due to a stale processed flag.
-                        try { node.removeAttribute('data-processed'); } catch (eDp1) { }
+                        try { node.removeAttribute('data-processed'); } catch (eDp1) {
+                            console.debug('markdown-parser: fallbackSource() failed:', eDp1);
+                        }
                         node.textContent = renderSrc;
                         validNodes.push(node);
                     })
@@ -213,7 +220,9 @@ function initMermaid(retryCount) {
                     for (var k = 0; k < validNodes.length; k++) {
                         try {
                             validNodes[k].setAttribute('data-mermaid-render-theme', theme);
-                        } catch (eSetTheme1) { }
+                        } catch (eSetTheme1) {
+                            console.debug('markdown-parser: fallbackSource() failed:', eSetTheme1);
+                        }
                     }
                 });
             }).catch(function (e1) {
@@ -227,7 +236,9 @@ function initMermaid(retryCount) {
                 for (var k2 = 0; k2 < nodesToRender.length; k2++) {
                     try {
                         nodesToRender[k2].setAttribute('data-mermaid-render-theme', theme);
-                    } catch (eSetTheme2) { }
+                    } catch (eSetTheme2) {
+                        console.debug('markdown-parser: fallbackSource() failed:', eSetTheme2);
+                    }
                 }
             });
         }
@@ -249,7 +260,9 @@ function initMermaid(retryCount) {
             for (var k3 = 0; k3 < nodesToRender.length; k3++) {
                 try {
                     nodesToRender[k3].setAttribute('data-mermaid-render-theme', theme);
-                } catch (eSetTheme3) { }
+                } catch (eSetTheme3) {
+                    console.debug('markdown-parser: fallbackSource() failed:', eSetTheme3);
+                }
             }
         } catch (e2) {
             console.error('Mermaid initialization failed', e2);

@@ -888,6 +888,7 @@ function enrichFoldersWithParentId($folders, $con, $workspace_filter) {
         }
     } catch (Exception $e) {
         // On error, leave parent_id as null
+        error_log('folders_display: enrichFoldersWithParentId() failed: ' . $e->getMessage());
     }
     
     // Enrich folders with cached metadata

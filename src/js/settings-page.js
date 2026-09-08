@@ -189,8 +189,9 @@
                     cacheSettings(j.settings);
                 }
             })
-            .catch(function () {
+            .catch(function (e) {
                 // Badge refreshes will fall back to defaults if the batch request fails.
+                console.debug('settings-page: preloadSettings() failed:', e);
             });
 
         return settingsPreloadPromise;
@@ -246,6 +247,7 @@
             }
         } catch (e) {
             // Safely ignore cross-origin errors
+            console.debug('settings-page: reloadOpener() failed:', e);
         }
     }
 
@@ -256,6 +258,7 @@
             }
         } catch (e) {
             // Safely ignore reload issues
+            console.debug('settings-page: reloadCurrentSettingsPage() failed:', e);
         }
     }
 
@@ -347,6 +350,7 @@
                                 }
                             } catch (e) {
                                 // Safely ignore cross-origin errors
+                                console.debug('settings-page: shouldAddNoWrap() failed:', e);
                             }
                         }
 
@@ -777,7 +781,9 @@
 
         setSetting('note_color_palette', JSON.stringify(cleaned), function (success) {
             if (success) {
-                try { closeModal('noteColorPaletteModal'); } catch (e) { }
+                try { closeModal('noteColorPaletteModal'); } catch (e) {
+                    console.debug('settings-page: saveNoteColorPalette() failed:', e);
+                }
                 refreshNoteColorPaletteBadge();
             }
         });
@@ -1215,8 +1221,9 @@
                     : tr('git_sync.config.not_configured', {}, 'Not configured');
                 badge.className = 'setting-status ' + (configured ? 'enabled' : 'disabled');
             })
-            .catch(function () {
+            .catch(function (e) {
                 // Keep the server-rendered status if the refresh request fails.
+                console.debug('settings-page: refreshGitSyncCardBadge() failed:', e);
             });
     }
 
@@ -1503,7 +1510,9 @@
             }
             getSetting('markdown_colored_custom', function (customValue) {
                 var parsed = null;
-                try { parsed = JSON.parse(customValue || ''); } catch (e) { }
+                try { parsed = JSON.parse(customValue || ''); } catch (e) {
+                    console.debug('settings-page: openMarkdownColoredModal() failed:', e);
+                }
                 var inputs = document.querySelectorAll('#markdownColoredCustomRow input[data-mdc-element]');
                 inputs.forEach(function (input) {
                     var el = input.getAttribute('data-mdc-element');
@@ -1626,6 +1635,7 @@
                     }
                 } catch (err) {
                     // Use default href if URL parsing fails
+                    console.debug('settings-page: openDiaryDateFormatModal() failed:', err);
                 }
                 window.location = href;
             });
@@ -1832,7 +1842,9 @@
                         tmp.value = email;
                         document.body.appendChild(tmp);
                         tmp.select();
-                        try { document.execCommand('copy'); done(); } catch (err) {}
+                        try { document.execCommand('copy'); done(); } catch (err) {
+                            console.debug('settings-page: legacyCopy() failed:', err);
+                        }
                         tmp.remove();
                     };
                     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -2199,7 +2211,9 @@
                 if (!modal) return;
 
                 var onSaved = function () {
-                    try { closeModal('uiCustomizationModal'); } catch (e) { }
+                    try { closeModal('uiCustomizationModal'); } catch (e) {
+                        console.debug('settings-page: onSaved() failed:', e);
+                    }
                     refreshUiCustomizationBadge();
                     reloadOpener();
                     reloadCurrentSettingsPage();
@@ -2269,7 +2283,9 @@
                 if (!selected) selected = 'updated_desc';
                 setSetting('note_list_sort', selected, function (success) {
                     if (success) {
-                        try { closeModal('noteSortModal'); } catch (e) { }
+                        try { closeModal('noteSortModal'); } catch (e) {
+                            console.debug('settings-page: onError() failed:', e);
+                        }
                         reloadOpener();
                         refreshNoteSortBadge();
                     } else {
@@ -2296,7 +2312,9 @@
 
                 function finishMarkdownColored(success) {
                     if (success) {
-                        try { closeModal('markdownColoredModal'); } catch (e) { }
+                        try { closeModal('markdownColoredModal'); } catch (e) {
+                            console.debug('settings-page: finishMarkdownColored() failed:', e);
+                        }
                         reloadOpener();
                         refreshMarkdownColoredBadge();
                     } else {
@@ -2345,7 +2363,9 @@
                 }
                 setSetting('note_age_filter_days', selected, function (success) {
                     if (success) {
-                        try { closeModal('noteAgeFilterModal'); } catch (e) { }
+                        try { closeModal('noteAgeFilterModal'); } catch (e) {
+                            console.debug('settings-page: finishMarkdownColored() failed:', e);
+                        }
                         reloadOpener();
                         refreshNoteAgeFilterBadge();
                     } else {
@@ -2362,7 +2382,9 @@
                 var selected = String(getSnapshotsKeepCount(input ? input.value : ''));
                 setSetting('snapshots_keep_count', selected, function (success) {
                     if (success) {
-                        try { closeModal('snapshotsSettingsModal'); } catch (e) { }
+                        try { closeModal('snapshotsSettingsModal'); } catch (e) {
+                            console.debug('settings-page: finishMarkdownColored() failed:', e);
+                        }
                         refreshSnapshotsBadge();
                     } else {
                         alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
@@ -2383,7 +2405,9 @@
                 if (!selected) selected = 'en';
                 setSetting('language', selected, function (success) {
                     if (success) {
-                        try { closeModal('languageModal'); } catch (e) { }
+                        try { closeModal('languageModal'); } catch (e) {
+                            console.debug('settings-page: finishMarkdownColored() failed:', e);
+                        }
                         refreshLanguageBadge();
                         setTimeout(function () { window.location.reload(); }, 300);
                     } else {
@@ -2401,7 +2425,9 @@
                 var selectedTimezone = select ? select.value : 'Europe/Paris';
                 setSetting('timezone', selectedTimezone, function (success) {
                     if (success) {
-                        try { closeModal('timezoneModal'); } catch (e) { }
+                        try { closeModal('timezoneModal'); } catch (e) {
+                            console.debug('settings-page: finishMarkdownColored() failed:', e);
+                        }
                         refreshTimezoneBadge();
                         reloadOpener();
                     } else {
@@ -2436,7 +2462,9 @@
 
                 setSetting('date_time_format', selected, function (success) {
                     if (success) {
-                        try { closeModal('dateTimeFormatModal'); } catch (e) { }
+                        try { closeModal('dateTimeFormatModal'); } catch (e) {
+                            console.debug('settings-page: finishMarkdownColored() failed:', e);
+                        }
                         refreshDateTimeFormatBadge();
                         reloadOpener();
                     } else {
@@ -2472,7 +2500,9 @@
 
                 setSetting('diary_date_format', selected, function (success) {
                     if (success) {
-                        try { closeModal('diaryDateFormatModal'); } catch (e) { }
+                        try { closeModal('diaryDateFormatModal'); } catch (e) {
+                            console.debug('settings-page: finishMarkdownColored() failed:', e);
+                        }
                         refreshDiaryDateFormatBadge();
                         reloadOpener();
                     } else {
@@ -2492,7 +2522,9 @@
                 if (typeof window.__poznoteApplyMainFont === 'function') {
                     window.__poznoteApplyMainFont(selected);
                 }
-                try { closeModal('mainFontModal'); } catch (e) { }
+                try { closeModal('mainFontModal'); } catch (e) {
+                    console.debug('settings-page: selected() failed:', e);
+                }
                 refreshMainFontBadge();
                 reloadOpener();
             });
@@ -2508,7 +2540,9 @@
                 if (typeof window.__poznoteApplyEditorFont === 'function') {
                     window.__poznoteApplyEditorFont(selected);
                 }
-                try { closeModal('markdownFontModal'); } catch (e) { }
+                try { closeModal('markdownFontModal'); } catch (e) {
+                    console.debug('settings-page: selected() failed:', e);
+                }
                 refreshMarkdownFontBadge();
                 reloadOpener();
             });
@@ -2552,7 +2586,9 @@
             cancelCustomCssBtn.addEventListener('click', function () {
                 pendingCssFile = null;
                 pendingCssRemove = false;
-                try { closeModal('customCssModal'); } catch (e) { }
+                try { closeModal('customCssModal'); } catch (e) {
+                    console.debug('settings-page: selected() failed:', e);
+                }
             });
         }
 
@@ -2563,7 +2599,9 @@
                         .then(function (r) { return r.json(); })
                         .then(function (data) {
                             if (data.success) {
-                                try { closeModal('customCssModal'); } catch (e) { }
+                                try { closeModal('customCssModal'); } catch (e) {
+                                    console.debug('settings-page: selected() failed:', e);
+                                }
                                 refreshCustomCssBadge();
                                 reloadOpener();
                                 window.location.reload();
@@ -2585,7 +2623,9 @@
                         .then(function (data) {
                             if (data.success) {
                                 pendingCssFile = null;
-                                try { closeModal('customCssModal'); } catch (e) { }
+                                try { closeModal('customCssModal'); } catch (e) {
+                                    console.debug('settings-page: selected() failed:', e);
+                                }
                                 refreshCustomCssBadge();
                                 reloadOpener();
                                 window.location.reload();
@@ -2600,7 +2640,9 @@
                 }
 
                 // Nothing changed - just close
-                try { closeModal('customCssModal'); } catch (e) { }
+                try { closeModal('customCssModal'); } catch (e) {
+                    console.debug('settings-page: selected() failed:', e);
+                }
             });
         }
 
@@ -2621,7 +2663,9 @@
                 setSetting('import_max_individual_files', String(indVal), function (s1) {
                     setSetting('import_max_zip_files', String(zipVal), function (s2) {
                         if (s1 && s2) {
-                            try { closeModal('importLimitsModal'); } catch (e) { }
+                            try { closeModal('importLimitsModal'); } catch (e) {
+                                console.debug('settings-page: selected() failed:', e);
+                            }
                             refreshImportLimitsBadges();
                         } else {
                             alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
@@ -2668,7 +2712,9 @@
                         setSetting('user_max_storage_s3_mb', String(storageS3Val), function (s3ok) {
                             saveBackupsQuota(function (s4) {
                                 if (s1 && s2 && s3ok && s4) {
-                                    try { closeModal('userQuotasModal'); } catch (e) { }
+                                    try { closeModal('userQuotasModal'); } catch (e) {
+                                        console.debug('settings-page: saveBackupsQuota() failed:', e);
+                                    }
                                     refreshUserQuotasBadges();
                                 } else {
                                     alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
@@ -2705,7 +2751,9 @@
                     var legacyValue = features.indexOf('user_sharing') !== -1 ? '1' : '0';
                     setSetting('tenant_isolation', legacyValue, function () {
                         syncTenantIsolationHiddenKeys(features, function () {
-                            try { closeModal('tenantIsolationModal'); } catch (e) { }
+                            try { closeModal('tenantIsolationModal'); } catch (e) {
+                                console.debug('settings-page: saveBackupsQuota() failed:', e);
+                            }
                             refreshTenantIsolationBadge();
                             refreshUiCustomizationBadge();
                             reloadOpener();
@@ -4068,7 +4116,9 @@
 
         list.appendChild(row);
         syncIconSidebarOrderMoveButtons();
-        try { row.scrollIntoView({ block: 'nearest' }); } catch (e) { }
+        try { row.scrollIntoView({ block: 'nearest' }); } catch (e) {
+            console.debug('settings-page: addIconSidebarDividerRow() failed:', e);
+        }
     }
 
     // The first row cannot move up and the last cannot move down; disabling
@@ -4162,7 +4212,9 @@
                 return;
             }
 
-            try { closeModal('iconSidebarOrderModal'); } catch (e) { }
+            try { closeModal('iconSidebarOrderModal'); } catch (e) {
+                console.debug('settings-page: saveIconSidebarOrder() failed:', e);
+            }
             reloadOpener();
             reloadCurrentSettingsPage();
         });

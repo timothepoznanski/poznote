@@ -127,7 +127,8 @@ window.savedRanges = {};
         if (el.getAttribute('style') === '') el.removeAttribute('style');
       });
     } catch (e) {
-      // swallow
+        // swallow
+        console.debug('toolbar-popups: removeInlineColorInRange() failed:', e);
     }
   }
 
@@ -157,7 +158,8 @@ window.savedRanges = {};
       // Prefer CSS styling for foreColor
       document.execCommand('styleWithCSS', false, true);
     } catch (e) {
-      // ignore
+        // ignore
+        console.debug('toolbar-popups: applyColorToSelection() failed:', e);
     }
 
     if (color === 'none') {
@@ -165,7 +167,8 @@ window.savedRanges = {};
       try {
         document.execCommand('foreColor', false, 'inherit');
       } catch (e) {
-        // ignore
+          // ignore
+          console.debug('toolbar-popups: applyColorToSelection() failed:', e);
       }
       const sel = window.getSelection();
       if (sel.rangeCount > 0) {
@@ -314,27 +317,31 @@ window.savedRanges = {};
     try {
       document.execCommand('styleWithCSS', false, true);
     } catch (e) {
-      // ignore
+        // ignore
+        console.debug('toolbar-popups: applyHighlightToSelection() failed:', e);
     }
 
     if (color === 'none') {
       try {
         document.execCommand('hiliteColor', false, 'inherit');
       } catch (e) {
-        // ignore
+          // ignore
+          console.debug('toolbar-popups: applyHighlightToSelection() failed:', e);
       }
     } else {
       try {
         document.execCommand('hiliteColor', false, color);
       } catch (e) {
-        // ignore
+          // ignore
+          console.debug('toolbar-popups: applyHighlightToSelection() failed:', e);
       }
     }
 
     try {
       document.execCommand('styleWithCSS', false, false);
     } catch (e) {
-      // ignore
+        // ignore
+        console.debug('toolbar-popups: applyHighlightToSelection() failed:', e);
     }
   }
 
@@ -368,7 +375,7 @@ window.savedRanges = {};
       });
 
     } catch (err) {
-
+        console.debug('toolbar-popups: openColorPopup() failed:', err);
     }
   }
 

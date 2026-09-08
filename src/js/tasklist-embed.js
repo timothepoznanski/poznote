@@ -111,7 +111,9 @@
     function saveCollapsedListIds(ids) {
         try {
             getPrefsStorage().setItem(COLLAPSED_KEY, JSON.stringify(Array.from(ids)));
-        } catch (e) { }
+        } catch (e) {
+            console.debug('tasklist-embed: saveCollapsedListIds() failed:', e);
+        }
     }
 
     // ===== Task ordering (mirrors the tasklist note and the tasks page) =====
@@ -236,7 +238,9 @@
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
             credentials: 'same-origin',
             body: JSON.stringify({ task_id: String(taskId) })
-        }).catch(function () { });
+        }).catch(function (e) {
+            console.debug('tasklist-embed: cancelTaskReminder() failed:', e);
+        });
     }
 
     function canOpenDueModal() {
@@ -289,6 +293,7 @@
             renderWidget(embed, note, parseTasks(note.content));
         } catch (e) {
             // Network error: keep the fallback link untouched
+            console.debug('tasklist-embed: hydrateEmbed() failed:', e);
         }
     }
 
@@ -334,7 +339,9 @@
             input.focus();
             try {
                 input.setSelectionRange(state.selectionStart, state.selectionEnd);
-            } catch (e) { }
+            } catch (e) {
+                console.debug('tasklist-embed: restoreAddInputState() failed:', e);
+            }
         }
     }
 
@@ -884,7 +891,9 @@
         if (pickerState.onPicked) {
             try {
                 pickerState.onPicked(target);
-            } catch (e) { }
+            } catch (e) {
+                console.debug('tasklist-embed: confirmPickerChoice() failed:', e);
+            }
         }
     }
 

@@ -49,6 +49,7 @@ function getAppVersion() {
         }
     } catch (Exception $e) {
         // Git not available or no tags
+        error_log('version_helper: getAppVersion() failed: ' . $e->getMessage());
     }
 
     // Ultimate fallback

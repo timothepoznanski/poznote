@@ -179,7 +179,9 @@
                         fillProfileFields(data);
                     }
                 })
-                .catch(function () {});
+                .catch(function (e) {
+                    console.debug('profile: showProfileModal() failed:', e);
+                });
         }
 
         modal.style.display = 'flex';
@@ -369,7 +371,9 @@
                 if (parts[1]) el.appendChild(document.createTextNode(parts[1]));
                 el.style.display = '';
             })
-            .catch(function () {});
+            .catch(function (e) {
+                console.debug('profile: close() failed:', e);
+            });
 
         var confirmBtn = document.getElementById('clConfirmBtn');
         confirmBtn.addEventListener('click', function () {

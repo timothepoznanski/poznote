@@ -133,7 +133,9 @@
         .then(function (data) {
             if (data.success) updateCount(data.total_count || 0, data.unread_count || 0);
         })
-        .catch(function () {});
+        .catch(function (e) {
+            console.debug('notifications-modal: pollCount() failed:', e);
+        });
     }
 
     function openNotificationsModal() {
@@ -192,7 +194,9 @@
                 method: 'POST',
                 headers: { 'Accept': 'application/json' },
                 credentials: 'same-origin'
-            }).catch(function () {});
+            }).catch(function (e) {
+                console.debug('notifications-modal: openNotificationNote() failed:', e);
+            });
         }
 
         var workspace = document.body ? document.body.getAttribute('data-workspace') || '' : '';

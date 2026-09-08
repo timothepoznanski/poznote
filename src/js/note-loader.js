@@ -159,24 +159,36 @@ function applyHighlightsWithRetries() {
         // Delayed retries for combined mode
         setTimeout(function () {
             if (typeof highlightSearchTerms === 'function') {
-                try { highlightSearchTerms(); } catch (e) { }
+                try { highlightSearchTerms(); } catch (e) {
+                    console.debug('note-loader: searchTerm() failed:', e);
+                }
             }
             if (typeof window.highlightMatchingTags === 'function') {
-                try { window.highlightMatchingTags(searchTerm.trim()); } catch (e) { }
+                try { window.highlightMatchingTags(searchTerm.trim()); } catch (e) {
+                    console.debug('note-loader: searchTerm() failed:', e);
+                }
             }
             if (typeof updateAllOverlayPositions === 'function') {
-                try { updateAllOverlayPositions(); } catch (e) { }
+                try { updateAllOverlayPositions(); } catch (e) {
+                    console.debug('note-loader: searchTerm() failed:', e);
+                }
             }
         }, 100);
         setTimeout(function () {
             if (typeof highlightSearchTerms === 'function') {
-                try { highlightSearchTerms(); } catch (e) { }
+                try { highlightSearchTerms(); } catch (e) {
+                    console.debug('note-loader: searchTerm() failed:', e);
+                }
             }
             if (typeof window.highlightMatchingTags === 'function') {
-                try { window.highlightMatchingTags(searchTerm.trim()); } catch (e) { }
+                try { window.highlightMatchingTags(searchTerm.trim()); } catch (e) {
+                    console.debug('note-loader: searchTerm() failed:', e);
+                }
             }
             if (typeof updateAllOverlayPositions === 'function') {
-                try { updateAllOverlayPositions(); } catch (e) { }
+                try { updateAllOverlayPositions(); } catch (e) {
+                    console.debug('note-loader: searchTerm() failed:', e);
+                }
             }
             ensureActiveHighlightVisible();
         }, 250);
@@ -253,7 +265,9 @@ function applyHighlightsWithRetries() {
     setTimeout(function () {
         if (activeType === 'notes') {
             if (typeof highlightSearchTerms === 'function') {
-                try { highlightSearchTerms(); } catch (e) { }
+                try { highlightSearchTerms(); } catch (e) {
+                    console.debug('note-loader: visible() failed:', e);
+                }
             }
         } else if (activeType === 'tags') {
             if (typeof window.highlightMatchingTags === 'function') {
@@ -264,13 +278,17 @@ function applyHighlightsWithRetries() {
             }
         }
         if (typeof updateAllOverlayPositions === 'function') {
-            try { updateAllOverlayPositions(); } catch (e) { }
+            try { updateAllOverlayPositions(); } catch (e) {
+                console.debug('note-loader: term2() failed:', e);
+            }
         }
     }, 100);
     setTimeout(function () {
         if (activeType === 'notes') {
             if (typeof highlightSearchTerms === 'function') {
-                try { highlightSearchTerms(); } catch (e) { }
+                try { highlightSearchTerms(); } catch (e) {
+                    console.debug('note-loader: term2() failed:', e);
+                }
             }
         } else if (activeType === 'tags') {
             if (typeof window.highlightMatchingTags === 'function') {
@@ -281,7 +299,9 @@ function applyHighlightsWithRetries() {
             }
         }
         if (typeof updateAllOverlayPositions === 'function') {
-            try { updateAllOverlayPositions(); } catch (e) { }
+            try { updateAllOverlayPositions(); } catch (e) {
+                console.debug('note-loader: term3() failed:', e);
+            }
         }
         ensureActiveHighlightVisible();
     }, 300);

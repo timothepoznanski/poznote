@@ -675,7 +675,9 @@ function handleWorkspaceShareToggleClick(e) {
         if (!action || btn.disabled) return;
 
         if (action !== 'upsert_readonly_share') {
-            submitWorkspaceShareToggle(btn).catch(function () {});
+            submitWorkspaceShareToggle(btn).catch(function (e) {
+                console.debug('workspaces-share: handleWorkspaceShareToggleClick() failed:', e);
+            });
             return;
         }
 

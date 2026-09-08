@@ -202,6 +202,7 @@ function dashboardSaveScopeQuery(PDO $con, array $query): void {
         $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)')->execute(['dashboard_scope', $encoded]);
     } catch (Exception $e) {
         // Remembering the scope is a convenience: never fail the page over it
+        error_log('dashboard: dashboardSaveScopeQuery() failed: ' . $e->getMessage());
     }
 }
 
@@ -285,7 +286,9 @@ function dashboardGetTopbarCounts($con, string $pageWorkspace): array {
         $stmt = $con->prepare($query);
         $stmt->execute($params);
         $counts['notes'] = (int)$stmt->fetchColumn();
-    } catch (Exception $e) {}
+    } catch (Exception $e) {
+        error_log('dashboard: dashboardGetTopbarCounts() failed: ' . $e->getMessage());
+    }
 
     try {
         $query = "SELECT COUNT(*) FROM entries WHERE trash = 0 AND favorite = 1";
@@ -309,7 +312,9 @@ function dashboardGetTopbarCounts($con, string $pageWorkspace): array {
         $stmt = $con->prepare($query);
         $stmt->execute($params);
         $counts['favorites'] += (int)$stmt->fetchColumn();
-    } catch (Exception $e) {}
+    } catch (Exception $e) {
+        error_log('dashboard: dashboardGetTopbarCounts() failed: ' . $e->getMessage());
+    }
 
     try {
         $stmt = $con->prepare("
@@ -323,7 +328,9 @@ function dashboardGetTopbarCounts($con, string $pageWorkspace): array {
         $row = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
         $counts['notifications'] = (int)($row['total_count'] ?? 0);
         $counts['notifications_unread'] = (int)($row['unread_count'] ?? 0);
-    } catch (Exception $e) {}
+    } catch (Exception $e) {
+        error_log('dashboard: dashboardGetTopbarCounts() failed: ' . $e->getMessage());
+    }
 
     try {
         $query = "SELECT tags FROM entries WHERE trash = 0 AND tags IS NOT NULL AND tags != ''";
@@ -344,7 +351,9 @@ function dashboardGetTopbarCounts($con, string $pageWorkspace): array {
             }
         }
         $counts['tags'] = count($uniqueTags);
-    } catch (Exception $e) {}
+    } catch (Exception $e) {
+        error_log('dashboard: dashboardGetTopbarCounts() failed: ' . $e->getMessage());
+    }
 
     try {
         $query = "SELECT COUNT(*) FROM folders";
@@ -356,7 +365,9 @@ function dashboardGetTopbarCounts($con, string $pageWorkspace): array {
         $stmt = $con->prepare($query);
         $stmt->execute($params);
         $counts['folders'] = (int)$stmt->fetchColumn();
-    } catch (Exception $e) {}
+    } catch (Exception $e) {
+        error_log('dashboard: dashboardGetTopbarCounts() failed: ' . $e->getMessage());
+    }
 
     try {
         $query = "SELECT entry, attachments FROM entries WHERE trash = 0 AND attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
@@ -370,7 +381,9 @@ function dashboardGetTopbarCounts($con, string $pageWorkspace): array {
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $counts['attachments'] += poznoteCountDisplayableAttachments($row['attachments'] ?? '', $row['entry'] ?? '');
         }
-    } catch (Exception $e) {}
+    } catch (Exception $e) {
+        error_log('dashboard: dashboardGetTopbarCounts() failed: ' . $e->getMessage());
+    }
 
     try {
         $query = "SELECT COUNT(*) FROM entries WHERE trash = 1";
@@ -382,7 +395,9 @@ function dashboardGetTopbarCounts($con, string $pageWorkspace): array {
         $stmt = $con->prepare($query);
         $stmt->execute($params);
         $counts['trash'] = (int)$stmt->fetchColumn();
-    } catch (Exception $e) {}
+    } catch (Exception $e) {
+        error_log('dashboard: dashboardGetTopbarCounts() failed: ' . $e->getMessage());
+    }
 
     try {
         $workspaceClauseF = $pageWorkspace !== '' ? "WHERE f.workspace = ?" : "";
@@ -411,7 +426,9 @@ function dashboardGetTopbarCounts($con, string $pageWorkspace): array {
         $stmt = $con->prepare($query);
         $stmt->execute($params);
         $counts['shares'] += (int)$stmt->fetchColumn();
-    } catch (Exception $e) {}
+    } catch (Exception $e) {
+        error_log('dashboard: dashboardGetTopbarCounts() failed: ' . $e->getMessage());
+    }
 
     try {
         $workspaceClauseF = $pageWorkspace !== '' ? "WHERE f.workspace = ?" : "";
@@ -437,7 +454,9 @@ function dashboardGetTopbarCounts($con, string $pageWorkspace): array {
         $stmt = $con->prepare($query);
         $stmt->execute($params);
         $counts['shares'] += (int)$stmt->fetchColumn();
-    } catch (Exception $e) {}
+    } catch (Exception $e) {
+        error_log('dashboard: dashboardGetTopbarCounts() failed: ' . $e->getMessage());
+    }
 
     try {
         require_once __DIR__ . '/users/db_master.php';
@@ -467,10 +486,14 @@ function dashboardGetTopbarCounts($con, string $pageWorkspace): array {
                             $counts['shares']++;
                         }
                     }
-                } catch (Exception $e) {}
+                } catch (Exception $e) {
+                    error_log('dashboard: dashboardGetTopbarCounts() failed: ' . $e->getMessage());
+                }
             }
         }
-    } catch (Exception $e) {}
+    } catch (Exception $e) {
+        error_log('dashboard: dashboardGetTopbarCounts() failed: ' . $e->getMessage());
+    }
 
     return $counts;
 }
@@ -586,7 +609,9 @@ try {
     if (isset($con)) {
         $dashboardScope = dashboardResolveRememberedScope($con, $_GET, $pageWorkspace);
     }
-} catch (Exception $e) {}
+} catch (Exception $e) {
+    error_log('dashboard: dashboardBuildWorkspaceBoard() failed: ' . $e->getMessage());
+}
 $dashboardScopeIsMulti = $dashboardScope['mode'] !== 'single';
 if (!$dashboardScopeIsMulti) {
     $pageWorkspace = $dashboardScope['workspaces'][0] ?? $pageWorkspace;
@@ -702,6 +727,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 				}
 			} catch (_error) {
 				// Ignore localStorage access errors during early paint.
+				console.debug('dashboard: dashboardBuildWorkspaceBoard() failed:', _error);
 			}
 		})();
 	</script>

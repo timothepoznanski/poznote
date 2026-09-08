@@ -39,6 +39,7 @@ function applyPublicTheme(theme, save) {
             localStorage.setItem(PUBLIC_THEME_STORAGE_KEY, theme);
         } catch (e) {
             // localStorage not available
+            console.debug('public_folder: applyPublicTheme() failed:', e);
         }
     }
 
@@ -135,6 +136,7 @@ function loadPublicFolderCollapsedState() {
         });
     } catch (e) {
         // localStorage not available
+        console.debug('public_folder: loadPublicFolderCollapsedState() failed:', e);
     }
 }
 
@@ -152,6 +154,7 @@ function savePublicFolderCollapsedState() {
         localStorage.setItem(getPublicFolderCollapsedStorageKey(), JSON.stringify(collapsedFolderIds));
     } catch (e) {
         // localStorage not available
+        console.debug('public_folder: savePublicFolderCollapsedState() failed:', e);
     }
 }
 

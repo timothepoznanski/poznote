@@ -77,6 +77,7 @@ if (in_array($requestedSort, $allowedTrashSorts, true)) {
         $sortStmt->execute(['trash_sort', $trashSort]);
     } catch (Exception $e) {
         // Non-fatal: the requested sort still applies for this request.
+        error_log('trash: renderTasklistHtml() failed: ' . $e->getMessage());
     }
 }
 

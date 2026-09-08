@@ -9,7 +9,9 @@ window.loadPoznoteI18n = function() {
                 if (typeof window.applyI18nToDom === 'function') window.applyI18nToDom(document);
             }
         })
-        .catch(function() {});
+        .catch(function (e) {
+            console.debug('disaster-recovery: failed:', e);
+        });
 };
 window.loadPoznoteI18n();
 

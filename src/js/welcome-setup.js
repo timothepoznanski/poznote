@@ -58,7 +58,9 @@
         var config = {};
         try {
             config = JSON.parse(document.getElementById('poznote-config').textContent) || {};
-        } catch (e) { }
+        } catch (e) {
+            console.debug('welcome-setup: initialTheme() failed:', e);
+        }
         var currentFormat = String(config.dateTimeFormat || 'default');
         if (hasOption(dateFormatSelect, currentFormat)) {
             dateFormatSelect.value = currentFormat;
@@ -77,7 +79,9 @@
                 }
                 timezoneSelect.value = browserTz;
             }
-        } catch (e) { }
+        } catch (e) {
+            console.debug('welcome-setup: initialTheme() failed:', e);
+        }
 
         // Live theme preview while the wizard is open; only persisted on save.
         themeSelect.addEventListener('change', function () {
@@ -100,9 +104,13 @@
                 putSetting('language', languageSelect.value),
                 putSetting('timezone', timezoneSelect.value),
                 putSetting('date_time_format', dateFormatSelect.value)
-            ].map(function (p) { return p.catch(function () { }); });
+            ].map(function (p) { return p.catch(function (e) {
+                console.debug('welcome-setup: markDone() failed:', e);
+            }); });
             Promise.all(updates).then(function () {
-                return markDone(false).catch(function () { });
+                return markDone(false).catch(function (e) {
+                    console.debug('welcome-setup: markDone() failed:', e);
+                });
             }).then(function () {
                 // Reload so the chosen language and formats apply server-side.
                 window.location.reload();
@@ -124,7 +132,9 @@
         var tipLinks = modal.querySelectorAll('.welcome-setup-tip');
         for (var i = 0; i < tipLinks.length; i++) {
             tipLinks[i].addEventListener('click', function () {
-                try { markDone(true); } catch (e) { }
+                try { markDone(true); } catch (e) {
+                    console.debug('welcome-setup: close() failed:', e);
+                }
             });
         }
 

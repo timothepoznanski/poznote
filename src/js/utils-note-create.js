@@ -75,6 +75,7 @@ function getStoredActiveTabNoteId(workspaceName) {
         }
     } catch (error) {
         // Ignore storage errors and fall back to normal navigation.
+        console.debug('utils-note-create: getStoredActiveTabNoteId() failed:', error);
     }
 
     return null;
@@ -90,6 +91,7 @@ function storePendingCreatedNoteOpen(noteId, noteTitle, workspaceName, folderId)
         }));
     } catch (error) {
         // Ignore storage errors and fall back to normal navigation.
+        console.debug('utils-note-create: storePendingCreatedNoteOpen() failed:', error);
     }
 }
 
@@ -107,6 +109,7 @@ function consumePendingCreatedNoteOpen() {
             sessionStorage.removeItem(PENDING_CREATED_NOTE_OPEN_KEY);
         } catch (cleanupError) {
             // Ignore cleanup errors.
+            console.debug('utils-note-create: consumePendingCreatedNoteOpen() failed:', cleanupError);
         }
         return null;
     }
@@ -133,10 +136,12 @@ function rememberFolderStatesForCreatedNote(folderId) {
                 sessionStorage.setItem('poznote_create_open_folders', JSON.stringify(pendingCreateFolders));
             } catch (storageError) {
                 // Ignore storage errors and keep the creation flow moving.
+                console.debug('utils-note-create: rememberFolderStatesForCreatedNote() failed:', storageError);
             }
         }
     } catch (error) {
         // Ignore storage errors and keep the creation flow moving.
+        console.debug('utils-note-create: rememberFolderStatesForCreatedNote() failed:', error);
     }
 }
 
@@ -215,6 +220,7 @@ function setPendingNoteCreationLoading() {
         }
     } catch (error) {
         // Ignore storage errors; the modal still works until the current page unloads.
+        console.debug('utils-note-create: setPendingNoteCreationLoading() failed:', error);
     }
 }
 
@@ -225,6 +231,7 @@ function clearPendingNoteCreationLoading() {
         }
     } catch (error) {
         // Ignore storage errors.
+        console.debug('utils-note-create: clearPendingNoteCreationLoading() failed:', error);
     }
 }
 

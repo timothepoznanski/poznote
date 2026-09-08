@@ -34,6 +34,7 @@ function isPublicWorkspaceNavigationActive() {
             }
         } catch (e) {
             // Ignore malformed config and fall back to URL inspection.
+            console.debug('globals: isPublicWorkspaceNavigationActive() failed:', e);
         }
     }
 
@@ -134,8 +135,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!enabled) document.body.classList.add('emoji-hidden');
                 else document.body.classList.remove('emoji-hidden');
             })
-            .catch(function () { });
-    } catch (e) { }
+            .catch(function (e) {
+                console.debug('globals: canUsePoznoteSettingsApi() failed:', e);
+            });
+    } catch (e) {
+        console.debug('globals: canUsePoznoteSettingsApi() failed:', e);
+    }
 });
 
 // Centralized mobile detection: use CSS breakpoint (max-width: 800px)
@@ -205,6 +210,7 @@ function escapeHtml(text) {
             }
         } catch (e) {
             // ignore
+            console.debug('globals: getByPath() failed:', e);
         }
     };
 
@@ -215,10 +221,14 @@ function escapeHtml(text) {
                 if (j && j.success && j.strings) {
                     window.POZNOTE_I18N = { lang: j.lang || 'en', strings: j.strings };
                     window.applyI18nToDom(document);
-                    try { document.dispatchEvent(new CustomEvent('poznote:i18n:loaded', { detail: window.POZNOTE_I18N })); } catch (e) { }
+                    try { document.dispatchEvent(new CustomEvent('poznote:i18n:loaded', { detail: window.POZNOTE_I18N })); } catch (e) {
+                        console.debug('globals: getByPath() failed:', e);
+                    }
                 }
             })
-            .catch(function () { });
+            .catch(function (e) {
+                console.debug('globals: getByPath() failed:', e);
+            });
     };
 
     document.addEventListener('DOMContentLoaded', function () {

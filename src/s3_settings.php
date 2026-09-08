@@ -386,7 +386,9 @@ $s3Enabled = $s3Config['enabled'] === '1';
                         document.getElementById('s3-remote-status').title = data.remote.error;
                     }
                 })
-                .catch(function() {});
+                .catch(function (e) {
+                    console.debug('s3_settings: refreshStatus() failed:', e);
+                });
         }
         refreshStatus();
 

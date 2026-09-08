@@ -227,6 +227,7 @@ if ($isAdmin) {
         }
     } catch (Exception $e) {
         // Keep the page usable if the master database is temporarily unavailable.
+        error_log('settings: failed: ' . $e->getMessage());
     }
 }
 
@@ -298,6 +299,7 @@ if ($canUseUserWebhooks) {
                 }
             } catch (_error) {
                 // Ignore storage access errors during early paint.
+                console.debug('settings: failed:', _error);
             }
         })();
     </script>

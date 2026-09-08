@@ -101,6 +101,7 @@ function convertBase64ImagesToAttachments(noteEntry) {
             conversionPromises.push(promise);
         } catch (e) {
             // Silently continue if error processing image
+            console.debug('attachments: convertBase64ImagesToAttachments() failed:', e);
         }
     });
 
@@ -278,7 +279,8 @@ function loadAttachments(noteId) {
                 renderAttachmentPreviews(noteId, data.attachments, data.entry || '');
             }
         })
-        .catch(function () {
+        .catch(function (e) {
+            console.debug('attachments: loadAttachments() failed:', e);
         });
 }
 
@@ -580,7 +582,8 @@ function updateAttachmentCountInMenu(noteId) {
                 }
             }
         })
-        .catch(function () {
+        .catch(function (e) {
+            console.debug('attachments: updateAttachmentCountInMenu() failed:', e);
         });
 }
 
@@ -859,7 +862,8 @@ function refreshAttachmentPreviewsForNote(noteId) {
             var noteEntry = document.getElementById('entry' + noteId);
             renderAttachmentPreviews(noteId, data.attachments || [], data.entry || (noteEntry ? noteEntry.innerHTML : ''));
         })
-        .catch(function () {
+        .catch(function (e) {
+            console.debug('attachments: refreshAttachmentPreviewsForNote() failed:', e);
         });
 }
 
@@ -929,7 +933,9 @@ function caretRangeAtPoint(x, y) {
             range.collapse(true);
             return range;
         }
-    } catch (e) { }
+    } catch (e) {
+        console.debug('attachments: caretRangeAtPoint() failed:', e);
+    }
     return null;
 }
 
@@ -1227,7 +1233,9 @@ function replaceLoadingText(oldText, newText, dropTarget, textNodeHint) {
                     hintedRange.collapse(true);
                     hintedSelection.removeAllRanges();
                     hintedSelection.addRange(hintedRange);
-                } catch (e) { }
+                } catch (e) {
+                    console.debug('attachments: replaceLoadingText() failed:', e);
+                }
 
                 replaced = true;
             }
@@ -1264,7 +1272,9 @@ function replaceLoadingText(oldText, newText, dropTarget, textNodeHint) {
                         newRange.collapse(true);
                         sel.removeAllRanges();
                         sel.addRange(newRange);
-                    } catch (e) { }
+                    } catch (e) {
+                        console.debug('attachments: replaceLoadingText() failed:', e);
+                    }
 
                     break; // On remplace seulement la première occurrence
                 }
@@ -1498,7 +1508,9 @@ function insertHTMLAtSelection(html) {
                 if (container.nodeType === 3) container = container.parentNode;
                 _savedEditableElement = container.closest ? container.closest('[contenteditable="true"]') : null;
             }
-        } catch (e) {}
+        } catch (e) {
+            console.debug('attachments: insertHTMLAtSelection() failed:', e);
+        }
 
         _isMarkdown = !!(noteEntry.closest && noteEntry.closest('.innernote[data-markdown-note="true"]')) ||
                       !!(noteEntry.getAttribute('data-note-type') === 'markdown');
@@ -1583,7 +1595,9 @@ function insertHTMLAtSelection(html) {
                 var sel = window.getSelection();
                 sel.removeAllRanges();
                 sel.addRange(_savedRange);
-            } catch (e) {}
+            } catch (e) {
+                console.debug('attachments: insertAttachmentLink() failed:', e);
+            }
         }
 
         if (_isMarkdown) {

@@ -38,6 +38,7 @@
             localStorage.setItem(STORAGE_KEY, collapsed ? 'true' : 'false');
         } catch (error) {
             // Private browsing: the toggle still works for this page view.
+            console.debug('icon-sidebar-toggle: persistState() failed:', error);
         }
     }
 

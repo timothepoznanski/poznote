@@ -198,7 +198,8 @@ function insertSeparator() {
       return;
     }
   } catch (e) {
-    // execCommand failed, use manual approach
+      // execCommand failed, use manual approach
+      console.debug('toolbar-inline: insertSeparator() failed:', e);
   }
 
   // Fallback: manual insertion with undo support via modern API
@@ -296,7 +297,8 @@ document.addEventListener('keydown', function (e) {
           newSel.addRange(restoreRange);
         }
       } catch (err) {
-        // Silently fail if something goes wrong
+          // Silently fail if something goes wrong
+          console.debug('toolbar-inline: insertSeparator() failed:', err);
       }
     }, 0);
   }

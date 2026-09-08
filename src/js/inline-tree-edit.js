@@ -347,13 +347,16 @@
             sessionStorage.setItem(REVEAL_KEY, 'folder:' + folderId);
         } catch (e) {
             // Private browsing: the reveal is a nicety, the reload still happens.
+            console.debug('inline-tree-edit: rememberFolderReveal() failed:', e);
         }
     }
 
     function rememberNoteReveal(noteId) {
         try {
             sessionStorage.setItem(REVEAL_KEY, 'note:' + noteId);
-        } catch (e) { }
+        } catch (e) {
+            console.debug('inline-tree-edit: rememberNoteReveal() failed:', e);
+        }
     }
 
     function applyPendingReveal() {

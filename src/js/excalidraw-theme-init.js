@@ -9,7 +9,9 @@ window.__poznoteUserStorage = window.__poznoteUserStorage || (function () {
     try {
         var match = document.cookie.match(/(?:^|;\s*)poznote_uid=(\d+)/);
         if (match) uid = match[1];
-    } catch (e) {}
+    } catch (e) {
+        console.debug('excalidraw-theme-init: failed:', e);
+    }
 
     function scopedKey(key) {
         return uid ? key + '::u' + uid : key;
@@ -32,10 +34,14 @@ window.__poznoteUserStorage = window.__poznoteUserStorage || (function () {
             }
         },
         setItem: function (key, value) {
-            try { localStorage.setItem(scopedKey(key), value); } catch (e) {}
+            try { localStorage.setItem(scopedKey(key), value); } catch (e) {
+                console.debug('excalidraw-theme-init: scopedKey() failed:', e);
+            }
         },
         removeItem: function (key) {
-            try { localStorage.removeItem(scopedKey(key)); } catch (e) {}
+            try { localStorage.removeItem(scopedKey(key)); } catch (e) {
+                console.debug('excalidraw-theme-init: scopedKey() failed:', e);
+            }
         }
     };
 })();
@@ -108,5 +114,6 @@ window.__poznoteUserStorage = window.__poznoteUserStorage || (function () {
         });
     } catch (e) {
         // Fallback silently
+        console.debug('excalidraw-theme-init: applyBodyThemeClasses() failed:', e);
     }
 })();

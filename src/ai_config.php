@@ -184,6 +184,7 @@ function poznoteAiUserConfig(?PDO $con): array {
         $config['reasoning_effort'] = poznoteAiNormalizeReasoningEffort($rows[$keys['reasoning_effort']] ?? 'auto');
     } catch (Exception $e) {
         // A database without the settings table yet: no personal configuration
+        error_log('ai_config: poznoteAiUserConfig() failed: ' . $e->getMessage());
     }
     return $config;
 }

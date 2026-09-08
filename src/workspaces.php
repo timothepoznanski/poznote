@@ -126,6 +126,7 @@ if ($_POST) {
                 }
             } catch (Exception $e) {
                 // Settings table may not exist - ignore
+                error_log('workspaces: sanitizeWorkspaceShareAllowedUsers() failed: ' . $e->getMessage());
             }
 
             // Find another workspace to redirect to after deletion
@@ -178,6 +179,7 @@ if ($_POST) {
                 unregisterSharedLinksForFolders($con, $tokStmt->fetchAll(PDO::FETCH_COLUMN));
             } catch (Exception $e) {
                 // Non-fatal: don't block workspace deletion if share cleanup fails
+                error_log('workspaces: sanitizeWorkspaceShareAllowedUsers() failed: ' . $e->getMessage());
             }
 
             // Remove entries rows from DB
@@ -214,12 +216,14 @@ if ($_POST) {
                             }
                         } catch (Exception $e) {
                             // ignore DB check errors and continue
+                            error_log('workspaces: sanitizeWorkspaceShareAllowedUsers() failed: ' . $e->getMessage());
                         }
                     }
                 }
             } catch (Exception $e) {
                 // Non-fatal: don't block workspace deletion if cleanup fails
-        }
+                error_log('workspaces: sanitizeWorkspaceShareAllowedUsers() failed: ' . $e->getMessage());
+            }
 
             // Remove folders scoped to this workspace
             try {
@@ -227,6 +231,7 @@ if ($_POST) {
                 $delFolders->execute([$name]);
             } catch (Exception $e) {
                 // Table may not exist - ignore
+                error_log('workspaces: sanitizeWorkspaceShareAllowedUsers() failed: ' . $e->getMessage());
             }
 
             // Remove any settings namespaced for this workspace (key format: something::workspace)
@@ -235,6 +240,7 @@ if ($_POST) {
                 $delSettings->execute(['%::' . $name]);
             } catch (Exception $e) {
                 // non-fatal
+                error_log('workspaces: sanitizeWorkspaceShareAllowedUsers() failed: ' . $e->getMessage());
             }
 
             // Remove shared read-only workspace link if present
@@ -253,6 +259,7 @@ if ($_POST) {
                 $deleteShareStmt->execute([$name]);
             } catch (Exception $e) {
                 // Non-fatal: don't block workspace deletion if share cleanup fails
+                error_log('workspaces: sanitizeWorkspaceShareAllowedUsers() failed: ' . $e->getMessage());
             }
 
             // Delete workspace backgrounds folder
@@ -275,6 +282,7 @@ if ($_POST) {
                 }
             } catch (Exception $e) {
                 // Non-fatal: don't block workspace deletion if background cleanup fails
+                error_log('workspaces: sanitizeWorkspaceShareAllowedUsers() failed: ' . $e->getMessage());
             }
 
             // Update workspace settings if necessary
@@ -288,6 +296,7 @@ if ($_POST) {
                 }
             } catch (Exception $e) {
                 // If settings update fails, continue - it's not critical for workspace deletion
+                error_log('workspaces: sanitizeWorkspaceShareAllowedUsers() failed: ' . $e->getMessage());
             }
 
             // Finally remove workspace record
@@ -420,6 +429,7 @@ if ($_POST) {
                         $updateSettingsStmt->execute([$new_name, 'default_workspace', 'last_opened_workspace', $name]);
                     } catch (Exception $e) {
                         // Non-fatal
+                        error_log('workspaces: sanitizeWorkspaceShareAllowedUsers() failed: ' . $e->getMessage());
                     }
 
                     $con->commit();
@@ -789,6 +799,7 @@ try {
     }
 } catch (Exception $e) {
     // Sharing details remain usable even if the master user database is unavailable.
+    error_log('workspaces: buildWorkspaceShareRegistryKey() failed: ' . $e->getMessage());
 }
 
 // Count notes per workspace, excluding trashed notes.

@@ -89,6 +89,7 @@
             }));
         } catch (e) {
             // Ignore browsers without CustomEvent support.
+            console.debug('ui-customization: publishHiddenKeys() failed:', e);
         }
     }
 

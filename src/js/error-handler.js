@@ -44,6 +44,7 @@ try {
             sessionStorage.setItem('lastJSError', JSON.stringify(errorInfo));
         } catch (e) {
             // Ignore storage errors
+            console.debug('error-handler: failed:', e);
         }
     });
     
@@ -60,6 +61,7 @@ try {
             sessionStorage.setItem('lastPromiseError', JSON.stringify(errorInfo));
         } catch (e) {
             // Ignore storage errors
+            console.debug('error-handler: failed:', e);
         }
     });
 })();

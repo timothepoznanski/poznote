@@ -40,6 +40,7 @@ try {
     $notesTrash  = (int)$con->query("SELECT COUNT(*) FROM entries WHERE trash = 1")->fetchColumn();
 } catch (Exception $e) {
     // Leave counts at 0 on error.
+    error_log('storage-stats-user: poznoteStripUnit() failed: ' . $e->getMessage());
 }
 
 // S3 mode: split the attachments column like the admin page. Local is the
@@ -70,6 +71,7 @@ if ($s3ColumnVisible) {
         }
     } catch (Exception $e) {
         // Stats only: keep the zero/combined figures on error.
+        error_log('storage-stats-user: poznoteStripUnit() failed: ' . $e->getMessage());
     }
     // getStorageStats() adds every recorded size on top of the directory
     // size in S3 mode: strip that to get the on-disk figure.

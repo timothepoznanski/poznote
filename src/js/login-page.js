@@ -78,6 +78,7 @@
                     loginHint = localStorage.getItem('poznote_oidc_login_hint');
                 } catch (storageError) {
                     // localStorage unavailable - hint is best-effort only
+                    console.debug('login-page: dropAutofocus() failed:', storageError);
                 }
 
                 var startOidcLogin = function (options) {
@@ -156,6 +157,7 @@
             // Note: last_opened_workspace is now stored in database, no localStorage cleanup needed
         } catch (e) {
             // Ignore parse errors
+            console.debug('login-page: startOidcLogin() failed:', e);
         }
     });
 })();

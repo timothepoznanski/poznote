@@ -307,7 +307,9 @@ function initializeMarkdownNote(noteId) {
         setTimeout(function () {
             try {
                 window.highlightSearchTerms(true);
-            } catch (e) {}
+            } catch (e) {
+                console.debug('markdown-view-modes: text() failed:', e);
+            }
         }, 0);
     }
 

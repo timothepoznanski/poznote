@@ -17,5 +17,6 @@
         }
     } catch (e) {
         // localStorage unavailable or parse error - login hint is best-effort only
+        console.debug('oidc-login-hint: failed:', e);
     }
 })();

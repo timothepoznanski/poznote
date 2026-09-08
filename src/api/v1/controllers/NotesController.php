@@ -641,6 +641,7 @@ class NotesController {
                     }
                 } catch (Exception $e) {
                     // ignore
+                    error_log('NotesController: index() failed: ' . $e->getMessage());
                 }
             }
             
@@ -1148,6 +1149,7 @@ class NotesController {
                 $autoPushEnabled = $gitSync->isAutoPushEnabled();
             } catch (Exception $e) {
                 // Silently fail if GitSync is not available
+                error_log('NotesController: update() failed: ' . $e->getMessage());
             }
             
             // Validate workspace if changed

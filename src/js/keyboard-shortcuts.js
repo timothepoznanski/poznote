@@ -13,7 +13,9 @@
                 var value = window.getPoznoteInitialSetting(key);
                 return value === '1' || value === 'true' || value === true;
             }
-        } catch (e) { }
+        } catch (e) {
+            console.debug('keyboard-shortcuts: isShortcutSettingEnabled() failed:', e);
+        }
         return false;
     }
 

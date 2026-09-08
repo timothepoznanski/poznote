@@ -37,10 +37,14 @@ window.__poznoteUserStorage = window.__poznoteUserStorage || (function () {
             }
         },
         setItem: function (key, value) {
-            try { localStorage.setItem(scopedKey(key), value); } catch (e) {}
+            try { localStorage.setItem(scopedKey(key), value); } catch (e) {
+                console.debug('theme-init: scopedKey() failed:', e);
+            }
         },
         removeItem: function (key) {
-            try { localStorage.removeItem(scopedKey(key)); } catch (e) {}
+            try { localStorage.removeItem(scopedKey(key)); } catch (e) {
+                console.debug('theme-init: scopedKey() failed:', e);
+            }
         }
     };
 })();
@@ -65,7 +69,9 @@ window.__poznoteTabsStorageKey = function (workspace) {
                 localStorage.removeItem(key);
             }
         }
-    } catch (e) {}
+    } catch (e) {
+        console.debug('theme-init: purgeLegacyTabKeys() failed:', e);
+    }
 })();
 
 // Drop everything this browser holds for a user id, so deleting an account
@@ -81,7 +87,9 @@ window.__poznoteClearUserStorage = function (userId) {
                 localStorage.removeItem(key);
             }
         }
-    } catch (e) {}
+    } catch (e) {
+        console.debug('theme-init: purgeLegacyTabKeys() failed:', e);
+    }
 };
 
 // Theme initialization - runs synchronously in <head> to prevent FOUC
@@ -152,6 +160,7 @@ window.__poznoteClearUserStorage = function (userId) {
         }
     } catch (e) {
         // Fallback silently if localStorage unavailable
+        console.debug('theme-init: getSystemTheme() failed:', e);
     }
 })();
 
@@ -225,6 +234,7 @@ window.__poznoteClearUserStorage = function (userId) {
         applyMainFont(window.__poznoteUserStorage.getItem('main_font'));
     } catch (e) {
         // Fallback silently if localStorage unavailable
+        console.debug('theme-init: applyMainFont() failed:', e);
     }
 })();
 
@@ -281,5 +291,6 @@ window.__poznoteClearUserStorage = function (userId) {
         applyEditorFont(window.__poznoteUserStorage.getItem('markdown_font'));
     } catch (e) {
         // Fallback silently if localStorage unavailable
+        console.debug('theme-init: applyEditorFont() failed:', e);
     }
 })();

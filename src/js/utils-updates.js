@@ -97,6 +97,7 @@ function checkForUpdatesAutomatic() {
         })
         .catch(function (error) {
             // Silent failure - no user notification for automatic checks
+            console.debug('utils-updates: checkForUpdatesAutomatic() failed:', error);
         });
 }
 

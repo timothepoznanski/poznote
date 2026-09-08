@@ -349,6 +349,7 @@ if (in_array($requestedSort, $allowedUsersSorts, true)) {
         $sortStmt->execute(['admin_users_sort', $usersSort]);
     } catch (Exception $e) {
         // Non-fatal: the requested sort still applies for this request.
+        error_log('users: adminUsersSelfUrl() failed: ' . $e->getMessage());
     }
 } else {
     $storedSort = getSetting('admin_users_sort');
@@ -387,6 +388,7 @@ if ($requestedUsersPageSize !== null && ctype_digit((string)$requestedUsersPageS
         $sizeStmt->execute(['admin_users_per_page', (string)$usersPageSize]);
     } catch (Exception $e) {
         // Non-fatal: the requested size still applies for this request.
+        error_log('users: renderUsersSortHeader() failed: ' . $e->getMessage());
     }
 } else {
     $storedUsersPageSize = getSetting('admin_users_per_page');
@@ -409,6 +411,7 @@ if ($requestedStatus !== null && in_array((string)$requestedStatus, ['', 'all', 
         $statusStmt->execute(['admin_users_status_filter', $usersStatusFilter]);
     } catch (Exception $e) {
         // Non-fatal: the requested filter still applies for this request.
+        error_log('users: renderUsersSortHeader() failed: ' . $e->getMessage());
     }
 } else {
     $storedStatus = getSetting('admin_users_status_filter');
