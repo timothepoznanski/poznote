@@ -36,6 +36,7 @@ parameters:
     paths:
         - src
         - tools
+        - tests
 
     ignoreErrors:
         # $con is the shared SQLite handle created in db_connect.php and used by

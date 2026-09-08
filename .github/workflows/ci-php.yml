@@ -86,6 +86,15 @@ jobs:
                    | xargs -0 -n1 -P4 php -l > /dev/null'
           echo "✅ no syntax errors"
 
+      # Covers the pure functions in src/lib. It needs no database, no session
+      # and no config, which is only true because those modules were split out
+      # of functions.php, so it runs in the same bare image as the lint step.
+      # See tests/bootstrap.php for why there is no PHPUnit here.
+      - name: Unit tests
+        run: |
+          docker run --rm -v "$PWD":/app -w /app "$PHP_IMAGE" \
+            php tests/run.php
+
       - name: Download PHPStan
         run: |
           curl -fsSL -o phpstan.phar \

@@ -24,21 +24,6 @@ require_once __DIR__ . '/lib/note-titles.php';
 require_once __DIR__ . '/lib/checklists.php';
 require_once __DIR__ . '/lib/tasklists.php';
 
-/**
- * Trusted domains allowed for iframe embeds.
- * Used by both unescapeIframesInHtml() and the Markdown parser.
- */
-if (!defined('ALLOWED_IFRAME_DOMAINS')) {
-    define('ALLOWED_IFRAME_DOMAINS', [
-        'youtube.com',
-        'www.youtube.com',
-        'youtube-nocookie.com',
-        'www.youtube-nocookie.com',
-        'player.bilibili.com',
-        'www.bilibili.com',
-        'bilibili.com',
-    ]);
-}
 
 
 
