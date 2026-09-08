@@ -470,7 +470,7 @@
 
 #updateModal .backup-warning {
     background-color: var(--pz-warning-soft);
-    border: 1px solid #ffeaa7;
+    border: 1px solid var(--pz-warning-soft);
     border-radius: 8px;
     padding: 15px 20px;
     margin: 15px 0;
@@ -562,7 +562,7 @@
 }
 
 #confirmModal .btn-danger {
-    background-color: #e04b4b !important;
+    background-color: var(--pz-danger) !important;
     color: var(--pz-text-inverse) !important;
     border: none !important;
     padding: 8px 12px;
@@ -570,17 +570,17 @@
 }
 
 #confirmModal .btn-danger:hover {
-    background-color: #c43b3b !important;
+    background-color: var(--pz-danger-hover) !important;
 }
 
 #confirmModal #confirmButton.btn-danger {
-    background-color: #e04b4b !important;
+    background-color: var(--pz-danger) !important;
     color: var(--pz-text-inverse) !important;
     border: none !important;
 }
 
 #confirmModal #confirmButton.btn-danger:hover {
-    background-color: #c43b3b !important;
+    background-color: var(--pz-danger-hover) !important;
 }
 
 #confirmModal #confirmButton.btn-primary {
@@ -624,7 +624,7 @@
 }
 
 #confirmModal .modal-buttons .btn-cancel {
-    background-color: #e04b4b !important;
+    background-color: var(--pz-danger) !important;
     color: var(--pz-text-inverse) !important;
     border: none !important;
     min-width: 90px !important;
@@ -632,7 +632,7 @@
 }
 
 #confirmModal .modal-buttons .btn-cancel:hover {
-    background-color: #c43b3b !important;
+    background-color: var(--pz-danger-hover) !important;
 }
 
 @media (max-width: 420px) {
@@ -672,7 +672,7 @@
 }
 
 #deleteFolderModal .btn-danger:hover {
-    background-color: #c82333 !important;
+    background-color: var(--pz-danger-hover) !important;
 }
 
 /* ============================================
@@ -697,7 +697,7 @@
 }
 
 #deleteConfirmModal .btn-danger {
-    background-color: #e04b4b !important;
+    background-color: var(--pz-danger) !important;
     color: var(--pz-text-inverse) !important;
     border: none !important;
     padding: 8px 12px;
@@ -705,7 +705,7 @@
 }
 
 #deleteConfirmModal .btn-danger:hover {
-    background-color: #c43b3b !important;
+    background-color: var(--pz-danger-hover) !important;
 }
 
 /* ============================================
@@ -730,7 +730,7 @@
 }
 
 #emptyTrashConfirmModal .btn-danger {
-    background-color: #e04b4b !important;
+    background-color: var(--pz-danger) !important;
     color: var(--pz-text-inverse) !important;
     border: none !important;
     padding: 8px 12px;
@@ -738,7 +738,7 @@
 }
 
 #emptyTrashConfirmModal .btn-danger:hover {
-    background-color: #c43b3b !important;
+    background-color: var(--pz-danger-hover) !important;
 }
 
 /* ============================================
@@ -752,13 +752,13 @@
 }
 
 #restoreConfirmModal .btn-cancel {
-    background-color: #e04b4b !important;
+    background-color: var(--pz-danger) !important;
     color: var(--pz-text-inverse) !important;
     border: none !important;
 }
 
 #restoreConfirmModal .btn-cancel:hover {
-    background-color: #c43b3b !important;
+    background-color: var(--pz-danger-hover) !important;
 }
 
 #deleteAttachmentConfirmModal .btn-cancel {
@@ -804,7 +804,7 @@
 }
 
 #deleteModal .modal-buttons .btn-danger {
-    background: #e04b4b;
+    background: var(--pz-danger);
     color: var(--pz-text-inverse);
     border: none;
 }
@@ -980,18 +980,18 @@
 }
 
 .workspace-list .btn-danger {
-    background: #e04b4b;
+    background: var(--pz-danger);
     color: var(--pz-text-inverse);
     border: none;
 }
 
 .workspace-list .btn-danger:hover {
-    background: #c43b3b;
+    background: var(--pz-danger-hover);
 }
 
 .workspace-list .btn-rename {
     display: inline-flex;
-    background: #f0ad4e;
+    background: var(--pz-warning-hover);
     border: none;
 }
 
@@ -1248,7 +1248,7 @@
 
 .code-block-language-filter:focus {
     outline: none;
-    border-color: #0d6efd;
+    border-color: var(--pz-accent);
 }
 
 /* Inherit the modal text color so dark mode needs no override. */

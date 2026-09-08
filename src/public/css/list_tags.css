@@ -218,7 +218,7 @@ html[data-theme='dark'] .tag-color-filter-clear:hover {
 input[type="color"].tag-color-custom {
     appearance: none;
     -webkit-appearance: none;
-    background: conic-gradient(#ef4444, #eab308, #22c55e, #3b82f6, #a855f7, #ef4444);
+    background: conic-gradient(var(--pz-danger), var(--pz-warning-hover), var(--pz-success), var(--pz-accent), #a855f7, var(--pz-danger));
     overflow: hidden;
 }
 
@@ -279,7 +279,7 @@ html[data-theme='dark'] .tag-color-swatch.selected {
 }
 
 .tag-context-menu-item.danger {
-    color: #d9534f;
+    color: var(--pz-danger);
 }
 
 .tag-context-menu-item.danger:hover {
@@ -302,7 +302,7 @@ html[data-theme='dark'] .tag-context-menu-item:hover {
 }
 
 html[data-theme='dark'] .tag-context-menu-item.danger {
-    color: #e07070;
+    color: var(--dm-danger);
 }
 
 html[data-theme='dark'] .tag-context-menu-item.danger:hover {
@@ -333,7 +333,7 @@ html[data-theme='dark'] .tag-rename-input {
 }
 
 html[data-theme='dark'] .tag-rename-input:focus {
-    border-color: #5ab4e0;
+    border-color: var(--dm-accent-hover);
 }
 
 /* Mobile styles */

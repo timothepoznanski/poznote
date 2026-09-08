@@ -303,7 +303,7 @@
 .task-edit-error {
     display: none;
     margin: 0;
-    color: #d32f2f;
+    color: var(--pz-danger);
     font-size: 13px;
     line-height: 1.35;
 }
@@ -387,11 +387,11 @@
 }
 
 .task-delete-btn:hover i {
-    color: #d32f2f;
+    color: var(--pz-danger);
 }
 
 .task-important-btn:hover i {
-    color: #ffa000;
+    color: var(--pz-warning-hover);
 }
 
 .task-move-btn:hover i {
@@ -454,9 +454,9 @@
 }
 
 .task-due-chip.overdue {
-    border-color: #f1b8b8;
+    border-color: var(--pz-danger-soft);
     background: #fdf2f2;
-    color: #c62828;
+    color: var(--pz-danger-hover);
 }
 
 .task-item.completed .task-due-chip {
@@ -583,23 +583,23 @@
 
 /* Important task styling */
 .task-item.important {
-    border-color: #ffcccc;
+    border-color: var(--pz-danger-soft);
     background: var(--pz-surface);
 }
 
 .task-item.important .task-text {
-    color: #c62828;
+    color: var(--pz-danger-hover);
     /* red text for important tasks */
     font-weight: 600;
 }
 
 .task-item.important .task-text a {
-    color: #c62828;
+    color: var(--pz-danger-hover);
     font-weight: 600;
 }
 
 .task-item.important .task-text a:hover {
-    color: #8b0000;
+    color: var(--pz-danger-strong);
     text-decoration: underline;
 }
 
@@ -619,11 +619,11 @@
 /* Red star icon for important tasks */
 .task-item.important .task-icon-star,
 .task-item.important .lucide-star {
-    color: #ff0000 !important;
+    color: var(--pz-danger) !important;
 }
 
 .task-important-btn.is-favorite i {
-    color: #ff0000 !important;
+    color: var(--pz-danger) !important;
 }
 
 
@@ -658,7 +658,7 @@
    the known types override them below. */
 .callout {
     display: block;
-    border-left: 3px solid #0969da;
+    border-left: 3px solid var(--pz-accent);
     padding: 8px 0 8px 12px;
     margin: 12px 0;
 }
@@ -710,8 +710,8 @@
 
 .callout .callout-icon-svg,
 .callout .callout-title-text {
-    color: #0969da;
-    fill: #0969da;
+    color: var(--pz-accent);
+    fill: var(--pz-accent);
 }
 
 /* Foldable callouts (Obsidian "[!type]+" / "[!type]-" syntax) */
@@ -743,23 +743,23 @@ details.callout:not([open]) .callout-fold-icon {
 
 /* Callout colors - border, icon and title */
 .callout-note {
-    border-left-color: #0969da;
+    border-left-color: var(--pz-accent);
 }
 
 .callout-note .callout-icon-svg,
 .callout-note .callout-title-text {
-    color: #0969da;
-    fill: #0969da;
+    color: var(--pz-accent);
+    fill: var(--pz-accent);
 }
 
 .callout-tip {
-    border-left-color: #1a7f37;
+    border-left-color: var(--pz-success-hover);
 }
 
 .callout-tip .callout-icon-svg,
 .callout-tip .callout-title-text {
-    color: #1a7f37;
-    fill: #1a7f37;
+    color: var(--pz-success-hover);
+    fill: var(--pz-success-hover);
 }
 
 .callout-important {
@@ -773,23 +773,23 @@ details.callout:not([open]) .callout-fold-icon {
 }
 
 .callout-warning {
-    border-left-color: #9a6700;
+    border-left-color: var(--pz-warning-strong);
 }
 
 .callout-warning .callout-icon-svg,
 .callout-warning .callout-title-text {
-    color: #9a6700;
-    fill: #9a6700;
+    color: var(--pz-warning-strong);
+    fill: var(--pz-warning-strong);
 }
 
 .callout-caution {
-    border-left-color: #d1242f;
+    border-left-color: var(--pz-danger-hover);
 }
 
 .callout-caution .callout-icon-svg,
 .callout-caution .callout-title-text {
-    color: #d1242f;
-    fill: #d1242f;
+    color: var(--pz-danger-hover);
+    fill: var(--pz-danger-hover);
 }
 
 /* Toggle / Collapsible block styles */
@@ -1136,7 +1136,7 @@ html[data-theme='dark'] .toggle-block[open]>summary {
 
 .noteentry .tasklist-embed-action-important.is-active,
 .noteentry .tasklist-embed-action-important:hover {
-    color: #f39c12;
+    color: var(--pz-warning-hover);
 }
 
 .noteentry .tasklist-embed-action-due:hover {

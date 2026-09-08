@@ -83,7 +83,7 @@ html[data-theme='dark'] {
 }
 
 .btn-cancel-admin:hover {
-    background-color: #c82333 !important;
+    background-color: var(--pz-danger-hover) !important;
 }
 
 /* Table */
@@ -388,8 +388,8 @@ html[data-theme='dark'] .users-table td {
 
 .message-error {
     background: var(--pz-danger-soft);
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+    color: var(--pz-danger-strong);
+    border: 1px solid var(--pz-danger-soft);
 }
 
 /* Modals */
@@ -508,13 +508,13 @@ html[data-theme='dark'] .users-table td {
 }
 
 .password-feedback-error {
-    color: #721c24;
+    color: var(--pz-danger-strong);
     background: var(--pz-danger-soft);
-    border: 1px solid #f5c6cb;
+    border: 1px solid var(--pz-danger-soft);
 }
 
 .password-feedback-success {
-    color: #155724;
+    color: var(--pz-success-strong);
     background: var(--pz-success-soft);
     border: 1px solid #c3e6cb;
 }
@@ -581,7 +581,7 @@ html[data-theme='dark'] .users-table td {
 
 .account-access-state {
     background: var(--pz-danger-soft);
-    color: #721c24;
+    color: var(--pz-danger-strong);
 }
 
 .account-access-own-label {
@@ -601,12 +601,12 @@ html[data-theme='dark'] .users-table td {
 
 html[data-theme='dark'] .account-access-state {
     background: rgba(220, 53, 69, 0.18);
-    color: #ffb3bd;
+    color: var(--dm-danger);
 }
 
 html[data-theme='dark'] .account-access-own-label {
     background: rgba(74, 158, 255, 0.16);
-    color: #9cc7ff;
+    color: var(--dm-accent-hover);
 }
 
 .modal-title {
@@ -893,12 +893,12 @@ input:disabled+.slider {
     }
 
     html[data-theme='dark'] .actions-center .btn-danger {
-        background: #c93a4a;
+        background: var(--dm-danger-hover);
         color: var(--pz-text-inverse) !important;
     }
 
     html[data-theme='dark'] .actions-center .btn-danger:hover {
-        background: #d94a59;
+        background: var(--dm-danger-hover);
     }
 
     .modal-content {

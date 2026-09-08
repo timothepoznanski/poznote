@@ -62,7 +62,7 @@
 }
 
 .color-item:focus {
-    outline: 2px solid #4d90fe;
+    outline: 2px solid var(--pz-accent);
 }
 
 .color-swatch {

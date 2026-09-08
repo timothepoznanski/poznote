@@ -172,7 +172,7 @@ body.attachments-page {
 }
 
 .btn-download:hover {
-    background: #218838;
+    background: var(--pz-success-hover);
 }
 
 .loading-spinner {
@@ -202,9 +202,9 @@ body.attachments-page {
     text-align: center;
     padding: 20px;
     background-color: var(--pz-danger-soft);
-    color: #721c24;
+    color: var(--pz-danger-strong);
     border-radius: 6px;
-    border: 1px solid #f5c6cb;
+    border: 1px solid var(--pz-danger-soft);
 }
 
 /* Responsive */
@@ -255,9 +255,9 @@ body.attachments-page {
 }
 
 [data-theme="dark"] .attachments-inline-notice {
-    border-color: #1e3a8a;
-    background: #172554;
-    color: #bfdbfe;
+    border-color: var(--dm-accent-soft);
+    background: var(--dm-accent-soft);
+    color: var(--dm-accent-hover);
 }
 
 [data-theme="dark"] .filter-input {
@@ -273,14 +273,14 @@ body.attachments-page {
 }
 
 [data-theme="dark"] .filter-stats {
-    background-color: #1e3a52;
-    color: #b0d4ff;
+    background-color: var(--dm-accent-soft);
+    color: var(--dm-accent-hover);
 }
 
 [data-theme="dark"] .error-message {
     background-color: #3a1f1f;
-    border-color: #721c24;
-    color: #ffcccc;
+    border-color: var(--dm-danger-soft);
+    color: var(--dm-danger);
 }
 
 [data-theme="dark"] body.attachments-page::-webkit-scrollbar {

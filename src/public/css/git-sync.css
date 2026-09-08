@@ -55,8 +55,8 @@ body.git-sync-page {
 
 .alert-warning {
     background: var(--pz-warning-soft);
-    color: #856404;
-    border: 1px solid #ffeeba;
+    color: var(--pz-warning-strong);
+    border: 1px solid var(--pz-warning-soft);
 }
 
 .git-sync-footer-note {
@@ -70,7 +70,7 @@ body.git-sync-page {
 }
 
 .git-sync-footer-note strong {
-    color: #ef4444;
+    color: var(--pz-danger);
     font-weight: 600;
 }
 
@@ -98,7 +98,7 @@ body.git-sync-page {
 }
 
 .git-sync-section h2 i {
-    color: #6366f1;
+    color: var(--pz-accent);
     width: 24px;
 }
 
@@ -134,7 +134,7 @@ body.git-sync-page {
     padding: 12px;
     background: #f0f7ff;
     border-radius: 8px;
-    color: #1a56db;
+    color: var(--pz-accent-hover);
     font-size: 0.9rem;
     display: flex;
     align-items: flex-start;
@@ -153,7 +153,7 @@ body.git-sync-page {
 /* Same box, error palette: a required field that is not filled in yet */
 .config-hint-error {
     background: var(--pz-danger-soft);
-    color: #721c24;
+    color: var(--pz-danger-strong);
 }
 
 /* Badges */
@@ -167,7 +167,7 @@ body.git-sync-page {
 
 .badge-success {
     background: var(--pz-success-soft);
-    color: #155724;
+    color: var(--pz-success-strong);
 }
 
 .badge-disabled {
@@ -244,7 +244,7 @@ body.git-sync-page {
 
 .form-group select:focus {
     outline: none;
-    border-color: #6366f1;
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }.btn-primary:hover {
     transform: translateY(-1px);
@@ -278,13 +278,13 @@ html[data-theme='dark'] .config-value {
 
 html[data-theme='dark'] .config-hint {
     background: rgba(99, 102, 241, 0.1);
-    color: #a5b4fc;
+    color: var(--dm-accent-hover);
 }
 
 /* After the rule above, which it has to override */
 html[data-theme='dark'] .config-hint-error {
     background: rgba(220, 53, 69, 0.2);
-    color: #e57373;
+    color: var(--dm-danger);
 }
 
 html[data-theme='dark'] .git-field-label {
@@ -331,7 +331,7 @@ html[data-theme='dark'] .form-group select {
 }
 
 html[data-theme='dark'] .form-group select:focus {
-    border-color: #6366f1;
+    border-color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .btn-secondary {
@@ -370,19 +370,19 @@ html[data-theme='dark'] .debug-info pre {
 
 html[data-theme='dark'] .alert-success {
     background: rgba(40, 167, 69, 0.2);
-    color: #5cb85c;
+    color: var(--dm-success-hover);
     border-color: rgba(40, 167, 69, 0.3);
 }
 
 html[data-theme='dark'] .alert-error {
     background: rgba(220, 53, 69, 0.2);
-    color: #e57373;
+    color: var(--dm-danger);
     border-color: rgba(220, 53, 69, 0.3);
 }
 
 html[data-theme='dark'] .alert-warning {
     background: rgba(255, 193, 7, 0.2);
-    color: #ffca28;
+    color: var(--dm-warning);
     border-color: rgba(255, 193, 7, 0.3);
 }
 
@@ -392,12 +392,12 @@ html[data-theme='dark'] .git-sync-footer-note {
 }
 
 html[data-theme='dark'] .git-sync-footer-note strong {
-    color: #f1716d;
+    color: var(--dm-danger);
 }
 
 html[data-theme='dark'] .badge-success {
     background: rgba(40, 167, 69, 0.2);
-    color: #5cb85c;
+    color: var(--dm-success-hover);
 }
 
 html[data-theme='dark'] .badge-disabled {
@@ -568,11 +568,11 @@ html[data-theme='dark'] .workspace-checkbox-item {
 }
 
 input:checked+.slider {
-    background-color: #6366f1;
+    background-color: var(--pz-accent);
 }
 
 input:focus+.slider {
-    box-shadow: 0 0 1px #6366f1;
+    box-shadow: 0 0 1px var(--pz-accent);
 }
 
 input:checked+.slider:before {

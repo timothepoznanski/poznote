@@ -14,7 +14,7 @@
 .search-highlight,
 html[data-theme='dark'] .search-highlight,
 html[data-theme='dark'] .noteentry .search-highlight {
-    background-color: #ffff00 !important;
+    background-color: var(--dm-warning) !important;
     color: #000000 !important; /* Force black text for readability on yellow */
     font-weight: normal !important;
     font-family: inherit !important;
@@ -34,12 +34,12 @@ html[data-theme='dark'] .noteentry .search-highlight {
 .search-highlight-active,
 html[data-theme='dark'] .search-highlight-active,
 html[data-theme='dark'] .noteentry .search-highlight-active {
-    background-color: #ff9d00 !important; /* Bright orange */
+    background-color: var(--dm-warning-hover) !important; /* Bright orange */
     color: #000000 !important;
     font-weight: bold !important;
     box-shadow: 0 0 10px rgba(255, 157, 0, 0.8) !important;
     z-index: 1000 !important;
-    border: 1px solid #d35400 !important;
+    border: 1px solid var(--dm-warning-hover) !important;
     border-radius: 4px;
 }
 
@@ -63,7 +63,7 @@ html[data-theme='dark'] .noteentry .search-highlight-active {
 .input-highlight-overlay,
 html[data-theme='dark'] .input-highlight-overlay,
 html[data-theme='dark'] .note-header .input-highlight-overlay {
-    background-color: #ffff00 !important;
+    background-color: var(--dm-warning) !important;
     color: #000000 !important;
     opacity: 0.7;
     border-radius: 2px;
@@ -74,7 +74,7 @@ html[data-theme='dark'] .note-header .input-highlight-overlay {
 .input-highlight-overlay.search-highlight-active,
 html[data-theme='dark'] .input-highlight-overlay.search-highlight-active,
 html[data-theme='dark'] .note-header .input-highlight-overlay.search-highlight-active {
-    background-color: #ff9d00 !important;
+    background-color: var(--dm-warning-hover) !important;
     color: #000000 !important;
     opacity: 0.9 !important;
     z-index: 10 !important;

@@ -291,7 +291,7 @@
 }
 
 .searchbar-clear .clear-icon {
-    color: #d32f2f;
+    color: var(--pz-danger);
     font-size: 16px;
     font-weight: bold;
     line-height: 1;
@@ -345,8 +345,8 @@
 .folder-filter-banner-icon:hover,
 .folder-filter-banner-icon:focus-visible {
     /* Lucide icons are CSS masks: recolor needs background-color too */
-    color: #0d6efd;
-    background-color: #0d6efd;
+    color: var(--pz-accent);
+    background-color: var(--pz-accent);
 }
 
 .folder-filter-banner-clear {
@@ -362,7 +362,7 @@
 }
 
 .folder-filter-banner-clear .clear-icon {
-    color: #d32f2f;
+    color: var(--pz-danger);
     font-size: 14px;
     line-height: 1;
 }
@@ -440,12 +440,12 @@
 /* Search validation error styles */
 .search-validation-error {
     background-color: var(--pz-danger-soft);
-    color: #d32f2f;
+    color: var(--pz-danger);
     padding: 8px 12px;
     border-radius: 4px;
     font-size: 0.85em;
     margin: 8px 0 4px 0;
-    border-left: 3px solid #d32f2f;
+    border-left: 3px solid var(--pz-danger);
     animation: slideDown 0.3s ease-out;
 }
 

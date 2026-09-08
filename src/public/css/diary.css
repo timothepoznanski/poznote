@@ -169,7 +169,7 @@
 .diary-new-modal .diary-new-error {
     margin: 8px 0 0;
     font-size: 13px;
-    color: #dc2626;
+    color: var(--pz-danger);
 }
 
 /* Highlight today's card in the grid */
@@ -193,11 +193,11 @@
 }
 
 :root[data-theme='dark'] .diary-card-today {
-    border-color: #0e6ba8;
+    border-color: var(--dm-accent);
 }
 
 :root[data-theme='dark'] .diary-today-tag {
-    background: #0e6ba8;
+    background: var(--dm-accent);
     color: var(--dm-text-bright);
 }
 
@@ -207,13 +207,13 @@
 }
 
 :root[data-theme='dark'] .diary-switch-btn:hover {
-    border-color: #0e6ba8;
+    border-color: var(--dm-accent);
     color: var(--dm-accent);
 }
 
 :root[data-theme='dark'] .diary-switch-btn.diary-switch-active {
-    background: #0e6ba8;
-    border-color: #0e6ba8;
+    background: var(--dm-accent);
+    border-color: var(--dm-accent);
     color: var(--dm-text-bright);
 }
 

@@ -71,7 +71,7 @@
     top: 50%;
     left: 100%;
     transform: translateY(-50%);
-    color: #5b9bd5;
+    color: var(--pz-link);
     padding: 1px 4px;
     font-size: 9px;
     font-weight: 600;

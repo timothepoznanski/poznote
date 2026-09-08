@@ -236,7 +236,7 @@ html[data-theme='dark'] .modal-buttons button.btn-primary:disabled:hover {
 
 html[data-theme='dark'] .modal .modal-info-note {
     background: rgba(59, 130, 246, 0.14);
-    color: #93c5fd;
+    color: var(--dm-accent-hover);
 }
 
 .modal-buttons button.btn-cancel {
@@ -257,7 +257,7 @@ html[data-theme='dark'] .modal .modal-info-note {
 }
 
 .modal-buttons button.btn-success:hover {
-    background-color: #218838;
+    background-color: var(--pz-success-hover);
 }
 
 .modal-buttons button.btn-danger {
@@ -267,7 +267,7 @@ html[data-theme='dark'] .modal .modal-info-note {
 }
 
 .modal-buttons button.btn-danger:hover {
-    background-color: #c82333;
+    background-color: var(--pz-danger-hover);
 }
 
 /* ============================================
@@ -277,11 +277,11 @@ html[data-theme='dark'] .modal .modal-info-note {
 .modal-error-message {
     display: none;
     background-color: var(--pz-danger-soft);
-    color: #721c24;
+    color: var(--pz-danger-strong);
     padding: 10px;
     border-radius: 4px;
     margin-top: 10px;
-    border: 1px solid #f5c6cb;
+    border: 1px solid var(--pz-danger-soft);
 }
 
 /* ============================================
@@ -465,13 +465,13 @@ html[data-theme='dark'] .modal .modal-info-note {
     border: 1px solid var(--pz-border-strong);
     border-radius: 7px;
     background: none;
-    color: #b91c1c;
+    color: var(--pz-danger-hover);
     cursor: pointer;
 }
 
 .note-palette-remove:hover {
     background: #fef2f2;
-    border-color: #fca5a5;
+    border-color: var(--pz-danger-soft);
 }
 
 /* "Add color" is a secondary action inside the modal body, not a footer
@@ -593,7 +593,7 @@ html[data-theme='dark'] .modal .modal-info-note {
 
 :root[data-theme='dark'] .note-palette-remove:hover {
     background: var(--dm-surface-hover);
-    color: #fca5a5;
+    color: var(--dm-danger);
 }
 
 /* ============================================
@@ -645,7 +645,7 @@ html[data-theme='dark'] .modal .modal-info-note {
 /* "Create task list ..." row appended after the search results */
 .move-task-item.move-task-create {
     justify-content: flex-start;
-    color: #2563eb;
+    color: var(--pz-accent);
 }
 
 .move-task-item.move-task-create span {
@@ -695,8 +695,8 @@ html[data-theme='dark'] .modal .modal-info-note {
 }
 
 .modal-footer .btn-cancel:hover {
-    background-color: #c82333 !important;
-    border-color: #bd2130 !important;
+    background-color: var(--pz-danger-hover) !important;
+    border-color: var(--pz-danger-hover) !important;
     opacity: 1 !important;
 }
 
@@ -730,5 +730,5 @@ html[data-theme='dark'] .modal .modal-info-note {
 }
 
 .modal .btn-danger:hover {
-    background: #c82333;
+    background: var(--pz-danger-hover);
 }

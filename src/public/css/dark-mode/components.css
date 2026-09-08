@@ -48,7 +48,7 @@ html[data-theme='dark'] .clickable-tag {
 }
 
 html[data-theme='dark'] .clickable-tag:hover {
-    color: #6ab3ff;
+    color: var(--dm-accent-hover);
 }
 
 html[data-theme='dark'] .clickable-tag:visited {
@@ -56,7 +56,7 @@ html[data-theme='dark'] .clickable-tag:visited {
 }
 
 html[data-theme='dark'] .clickable-tag:hover:visited {
-    color: #6ab3ff;
+    color: var(--dm-accent-hover);
 }
 
 html[data-theme='dark'] .tag-delete-button {
@@ -64,15 +64,15 @@ html[data-theme='dark'] .tag-delete-button {
 }
 
 html[data-theme='dark'] .tag-delete-button:hover {
-    color: #ff6b6b;
+    color: var(--dm-danger);
 }
 
 html[data-theme='dark'] .clickable-tag-wrapper.tag-highlight {
-    background: #4a4a00;
+    background: var(--dm-warning-soft);
 }
 
 html[data-theme='dark'] .clickable-tag-wrapper.tag-highlight .clickable-tag {
-    color: #ffff99;
+    color: var(--dm-warning);
 }
 
 html[data-theme='dark'] .tag-input {
@@ -173,15 +173,15 @@ html[data-theme='dark'] .task-drag-handle i {
 }
 
 html[data-theme='dark'] .task-delete-btn:hover i {
-    color: #ff6b6b;
+    color: var(--dm-danger);
 }
 
 html[data-theme='dark'] .task-important-btn:hover i {
-    color: #ffc107;
+    color: var(--dm-warning);
 }
 
 html[data-theme='dark'] .task-important-btn.is-favorite i {
-    color: #ff6b6b !important;
+    color: var(--dm-danger) !important;
 }
 
 html[data-theme='dark'] .task-due-btn i {
@@ -189,7 +189,7 @@ html[data-theme='dark'] .task-due-btn i {
 }
 
 html[data-theme='dark'] .task-due-btn:hover i {
-    color: #4da3d0;
+    color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .task-due-chip {
@@ -199,14 +199,14 @@ html[data-theme='dark'] .task-due-chip {
 }
 
 html[data-theme='dark'] .task-due-chip:hover {
-    border-color: #4da3d0;
-    color: #4da3d0;
+    border-color: var(--dm-accent);
+    color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .task-due-chip.overdue {
     background: #3d1f1f;
-    border-color: #8b4545;
-    color: #ff6b6b;
+    border-color: var(--dm-danger-hover);
+    color: var(--dm-danger);
 }
 
 html[data-theme='dark'] .task-menu-btn i {
@@ -214,7 +214,7 @@ html[data-theme='dark'] .task-menu-btn i {
 }
 
 html[data-theme='dark'] .task-menu-btn:hover i {
-    color: #4da3d0;
+    color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .task-actions-menu {
@@ -247,22 +247,22 @@ html[data-theme='dark'] .tasklist-progress-bar {
 
 /* Important task styling for dark mode */
 html[data-theme='dark'] .task-item.important {
-    border-color: #8b4545;
+    border-color: var(--dm-danger-hover);
     background: #3d1f1f;
 }
 
 html[data-theme='dark'] .task-item.important .task-text {
-    color: #ff6b6b;
+    color: var(--dm-danger);
     font-weight: 600;
 }
 
 html[data-theme='dark'] .task-item.important .task-text a {
-    color: #ff6b6b;
+    color: var(--dm-danger);
     font-weight: 600;
 }
 
 html[data-theme='dark'] .task-item.important .task-text a:hover {
-    color: #ff8989;
+    color: var(--dm-danger);
     text-decoration: underline;
 }
 
@@ -345,9 +345,9 @@ html[data-theme='dark'] .btn-primary:hover {
 }
 
 html[data-theme='dark'] .btn-rename {
-    background-color: #ffc107;
+    background-color: var(--dm-warning);
     color: #212529;
-    border-color: #ffc107;
+    border-color: var(--dm-warning);
 }
 
 html[data-theme='dark'] .btn-rename:disabled {
@@ -359,8 +359,8 @@ html[data-theme='dark'] .btn-rename:disabled {
 
 html[data-theme='dark'] .btn-warning:hover,
 html[data-theme='dark'] .btn-rename:hover {
-    background-color: #e0a800;
-    border-color: #e0a800;
+    background-color: var(--dm-warning-hover);
+    border-color: var(--dm-warning-hover);
 }
 
 html[data-theme='dark'] .btn-background {
@@ -383,8 +383,8 @@ html[data-theme='dark'] .btn-delete-ws {
 
 html[data-theme='dark'] .btn-danger:hover,
 html[data-theme='dark'] .btn-delete-ws:hover {
-    background-color: #c82333;
-    border-color: #bd2130;
+    background-color: var(--dm-danger-hover);
+    border-color: var(--dm-danger-hover);
 }
 
 html[data-theme='dark'] .btn-success {
@@ -394,8 +394,8 @@ html[data-theme='dark'] .btn-success {
 }
 
 html[data-theme='dark'] .btn-success:hover {
-    background-color: #218838;
-    border-color: #218838;
+    background-color: var(--dm-success-hover);
+    border-color: var(--dm-success-hover);
 }
 
 html[data-theme='dark'] .btn-cancel {
@@ -421,7 +421,7 @@ html[data-theme='dark'] a:not(.btn) {
 }
 
 html[data-theme='dark'] a:not(.btn):hover {
-    color: #6ab3ff;
+    color: var(--dm-accent-hover);
 }
 
 html[data-theme='dark'] .back-link {
@@ -429,7 +429,7 @@ html[data-theme='dark'] .back-link {
 }
 
 html[data-theme='dark'] .back-link:hover {
-    color: #6ab3ff;
+    color: var(--dm-accent-hover);
 }
 
 /* ============================================
@@ -437,13 +437,13 @@ html[data-theme='dark'] .back-link:hover {
    ============================================ */
 
 html[data-theme='dark'] .setting-status.enabled {
-    background-color: #1a4d2e;
-    color: #7dd3a0;
+    background-color: var(--dm-success-soft);
+    color: var(--dm-success);
 }
 
 html[data-theme='dark'] .setting-status.disabled {
-    background-color: #4d1a1a;
-    color: #ff9999;
+    background-color: var(--dm-danger-soft);
+    color: var(--dm-danger);
 }
 
 /* ============================================
@@ -457,24 +457,24 @@ html[data-theme='dark'] .alert {
 }
 
 html[data-theme='dark'] .alert-success {
-    background-color: #1a4d2e;
-    color: #7dd3a0;
-    border-color: #2a6d4e;
+    background-color: var(--dm-success-soft);
+    color: var(--dm-success);
+    border-color: var(--dm-success-soft);
 }
 
 html[data-theme='dark'] .alert-danger,
 html[data-theme='dark'] .alert-error {
-    background-color: #4d1a1a;
-    color: #ff9999;
-    border-color: #6d2a2a;
+    background-color: var(--dm-danger-soft);
+    color: var(--dm-danger);
+    border-color: var(--dm-danger-soft);
 }
 
 /* Without this the generic .alert above wins and warnings read as a
    neutral grey panel, losing the caution signal entirely. */
 html[data-theme='dark'] .alert-warning {
-    background-color: #4d3d14;
-    color: #ffd479;
-    border-color: #6d5a2a;
+    background-color: var(--dm-warning-soft);
+    color: var(--dm-warning);
+    border-color: var(--dm-warning-soft);
 }
 
 html[data-theme='dark'] #poznoteToast {
@@ -484,14 +484,14 @@ html[data-theme='dark'] #poznoteToast {
 }
 
 html[data-theme='dark'] #poznoteToast.notification-success {
-    color: #4ade80;
-    border-color: #4ade80;
+    color: var(--dm-success);
+    border-color: var(--dm-success);
     box-shadow: 0 4px 16px rgba(74, 222, 128, 0.2);
 }
 
 html[data-theme='dark'] #poznoteToast.notification-error {
-    color: #f87171;
-    border-color: #f87171;
+    color: var(--dm-danger);
+    border-color: var(--dm-danger);
     box-shadow: 0 4px 16px rgba(248, 113, 113, 0.2);
 }
 
@@ -507,7 +507,7 @@ html[data-theme='dark'] #poznoteToast.notification-warning {
 
 html[data-theme='dark'] .emoji-hint {
     background: var(--dm-surface);
-    border-left-color: #4a90e2;
+    border-left-color: var(--dm-accent);
     color: var(--dm-text);
 }
 
@@ -545,7 +545,7 @@ html[data-theme='dark'] .table-picker-input-field {
 }
 
 html[data-theme='dark'] .table-picker-input-field:focus {
-    border-color: #64B5F6;
+    border-color: var(--dm-accent-hover);
     box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.15);
 }
 
@@ -554,11 +554,11 @@ html[data-theme='dark'] .table-picker-input-field:hover {
 }
 
 html[data-theme='dark'] .table-picker-insert-btn {
-    background: #1976D2;
+    background: var(--dm-accent);
 }
 
 html[data-theme='dark'] .table-picker-insert-btn:hover {
-    background: #1565C0;
+    background: var(--dm-accent);
 }
 
 /* Color palette popup */
@@ -608,7 +608,7 @@ html[data-theme='dark'] .table-context-menu-item {
 }
 
 html[data-theme='dark'] .table-context-menu-item[style*="color: #dc2626"] {
-    color: #f87171 !important;
+    color: var(--dm-danger) !important;
 }
 
 /* ============================================
@@ -688,8 +688,8 @@ html[data-theme='dark'] .ai-chat-msg-assistant {
 
 html[data-theme='dark'] .ai-chat-msg-error {
     background: #3a1f22;
-    color: #e8a0a8;
-    border-color: #5c2e33;
+    color: var(--dm-danger);
+    border-color: var(--dm-danger-soft);
 }
 
 html[data-theme='dark'] .ai-chat-md code,
@@ -717,9 +717,9 @@ html[data-theme='dark'] .ai-chat-context {
 }
 
 html[data-theme='dark'] .ai-chat-notice {
-    color: #d8b95c;
+    color: var(--dm-warning-hover);
     background: #322a15;
-    border-color: #55471f;
+    border-color: var(--dm-warning-soft);
 }
 
 html[data-theme='dark'] .ai-chat-inputbar {
@@ -765,7 +765,7 @@ html[data-theme='dark'] .tasklist-embed-toggle {
 }
 
 html[data-theme='dark'] .tasklist-embed-toggle:hover {
-    color: #4da3d0;
+    color: var(--dm-accent);
 }
 
 /* The :is() ID boost + !important outguns the `.noteentry *` --dm-text
@@ -776,7 +776,7 @@ html[data-theme='dark'] .tasklist-embed-due:is(#pz-specificity-boost, *) {
 }
 
 html[data-theme='dark'] .tasklist-embed-due.overdue:is(#pz-specificity-boost, *) {
-    color: #ff6b6b !important;
+    color: var(--dm-danger) !important;
 }
 
 html[data-theme='dark'] .tasklist-embed-task.completed .tasklist-embed-text:is(#pz-specificity-boost, *) {
@@ -812,18 +812,18 @@ html[data-theme='dark'] .tasklist-embed-add:is(#pz-specificity-boost, *) {
 
 html[data-theme='dark'] .tasklist-embed-action-important.is-active:is(#pz-specificity-boost, *),
 html[data-theme='dark'] .tasklist-embed-action-important:hover:is(#pz-specificity-boost, *) {
-    color: #f39c12 !important;
+    color: var(--dm-warning-hover) !important;
 }
 
 html[data-theme='dark'] .tasklist-embed-action-due:hover:is(#pz-specificity-boost, *),
 html[data-theme='dark'] button.tasklist-embed-due:hover:is(#pz-specificity-boost, *) {
-    color: #4da3d0 !important;
+    color: var(--dm-accent) !important;
 }
 
 html[data-theme='dark'] .tasklist-embed-action-delete:hover:is(#pz-specificity-boost, *) {
-    color: #ff6b6b !important;
+    color: var(--dm-danger) !important;
 }
 
 html[data-theme='dark'] .tasklist-embed-error:is(#pz-specificity-boost, *) {
-    color: #ff6b6b !important;
+    color: var(--dm-danger) !important;
 }

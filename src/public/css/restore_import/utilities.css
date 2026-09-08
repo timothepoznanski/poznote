@@ -21,13 +21,13 @@
 .alert-success {
     background-color: var(--pz-success-soft);
     border-color: var(--pz-success);
-    color: #155724;
+    color: var(--pz-success-strong);
 }
 
 .alert-danger {
     background-color: var(--pz-danger-soft);
     border-color: var(--pz-danger);
-    color: #721c24;
+    color: var(--pz-danger-strong);
 }
 
 .alert-info {
@@ -39,7 +39,7 @@
 .alert-warning {
     background-color: var(--pz-warning-soft);
     border-color: var(--pz-warning);
-    color: #856404;
+    color: var(--pz-warning-strong);
 }
 
 /* Section bottom spacer */

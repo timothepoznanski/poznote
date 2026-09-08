@@ -86,7 +86,7 @@
 }
 
 .home-card-red .home-card-icon i {
-    color: #f87171;
+    color: var(--pz-danger);
 }
 
 html[data-theme='dark'] .home-card-red .home-card-icon {
@@ -94,17 +94,17 @@ html[data-theme='dark'] .home-card-red .home-card-icon {
 }
 
 .home-card-red:hover {
-    border-color: #f87171;
+    border-color: var(--pz-danger);
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
 }
 
 /* Support card heart animation */
 @keyframes heartbeat {
-    0%, 100% { transform: scale(1); color: #f87171; }
-    15% { transform: scale(1.15); color: #ef4444; }
-    30% { transform: scale(1); color: #f87171; }
-    45% { transform: scale(1.12); color: #ef4444; }
-    60% { transform: scale(1); color: #f87171; }
+    0%, 100% { transform: scale(1); color: var(--pz-danger); }
+    15% { transform: scale(1.15); color: var(--pz-danger); }
+    30% { transform: scale(1); color: var(--pz-danger); }
+    45% { transform: scale(1.12); color: var(--pz-danger); }
+    60% { transform: scale(1); color: var(--pz-danger); }
 }
 
 #support-card .home-card-icon {
@@ -112,7 +112,7 @@ html[data-theme='dark'] .home-card-red .home-card-icon {
 }
 
 #support-card .home-card-icon i {
-    color: #f87171;
+    color: var(--pz-danger);
     animation: heartbeat 3.5s ease-in-out infinite;
 }
 

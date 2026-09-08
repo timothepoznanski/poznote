@@ -305,7 +305,7 @@ body.tasks-page {
 }
 
 [data-theme="dark"] .tasks-note-source-badge {
-    color: #5cb8ea;
+    color: var(--dm-accent-hover);
     background-color: rgba(92, 184, 234, 0.15);
 }
 
@@ -364,12 +364,12 @@ body.tasks-page {
 }
 
 .tasks-task-item.important .tasks-task-text {
-    color: #c62828;
+    color: var(--pz-danger-hover);
     font-weight: 600;
 }
 
 .tasks-task-star {
-    color: #ff0000;
+    color: var(--pz-danger);
     font-size: 14px;
     flex-shrink: 0;
 }
@@ -424,9 +424,9 @@ body.tasks-page {
 }
 
 .task-due-chip.overdue {
-    border-color: #f1b8b8;
+    border-color: var(--pz-danger-soft);
     background: #fdf2f2;
-    color: #c62828;
+    color: var(--pz-danger-hover);
 }
 
 .tasks-task-item.completed .task-due-chip {
@@ -634,17 +634,17 @@ body.tasks-page {
 }
 
 .tasks-cal-chip.important {
-    border-left-color: #c62828;
+    border-left-color: var(--pz-danger-hover);
     background: rgba(198, 40, 40, 0.08);
 }
 
 .tasks-cal-chip.important .tasks-cal-chip-text {
-    color: #c62828;
+    color: var(--pz-danger-hover);
     font-weight: 600;
 }
 
 .tasks-cal-chip.overdue {
-    border-left-color: #c62828;
+    border-left-color: var(--pz-danger-hover);
     background: #fdf2f2;
 }
 
@@ -732,7 +732,7 @@ body.tasks-page {
 
     .tasks-cal-chip.important,
     .tasks-cal-chip.overdue {
-        background: #c62828;
+        background: var(--pz-danger-hover);
     }
 
     .tasks-cal-chip.completed {
@@ -749,7 +749,7 @@ body.tasks-page {
 .error-message {
     text-align: center;
     margin-top: 50px;
-    color: #d32f2f;
+    color: var(--pz-danger);
 }
 
 .loading-spinner {
@@ -863,7 +863,7 @@ html[data-theme="dark"]:has(body.tasks-page) {
 }
 
 [data-theme="dark"] .note-name {
-    color: #0ea5e9;
+    color: var(--dm-accent);
 }
 
 /* One shade above the card background so the badge stays visible */
@@ -917,7 +917,7 @@ html[data-theme="dark"]:has(body.tasks-page) {
 }
 
 [data-theme="dark"] .tasks-note-toggle:hover {
-    color: #4da3d0;
+    color: var(--dm-accent);
 }
 
 [data-theme="dark"] .tasks-task-item {
@@ -929,7 +929,7 @@ html[data-theme="dark"]:has(body.tasks-page) {
 }
 
 [data-theme="dark"] .tasks-task-text a {
-    color: #4da3d0;
+    color: var(--dm-accent);
 }
 
 [data-theme="dark"] .task-due-chip {
@@ -939,8 +939,8 @@ html[data-theme="dark"]:has(body.tasks-page) {
 }
 
 [data-theme="dark"] .task-due-chip:hover {
-    border-color: #4da3d0;
-    color: #4da3d0;
+    border-color: var(--dm-accent);
+    color: var(--dm-accent);
 }
 
 [data-theme="dark"] .tasks-task-due-btn {
@@ -948,13 +948,13 @@ html[data-theme="dark"]:has(body.tasks-page) {
 }
 
 [data-theme="dark"] .tasks-task-due-btn:hover {
-    color: #4da3d0;
+    color: var(--dm-accent);
 }
 
 [data-theme="dark"] .task-due-chip.overdue {
     background-color: #3b1d1d;
-    border-color: #7f1d1d;
-    color: #fca5a5;
+    border-color: var(--dm-danger-soft);
+    color: var(--dm-danger);
 }
 
 [data-theme="dark"] .tasks-view-toggle {
@@ -978,8 +978,8 @@ html[data-theme="dark"]:has(body.tasks-page) {
 
 [data-theme="dark"] .tasks-cal-nav:hover,
 [data-theme="dark"] .tasks-cal-today-btn:hover {
-    border-color: #4da3d0;
-    color: #4da3d0;
+    border-color: var(--dm-accent);
+    color: var(--dm-accent);
 }
 
 /* Translucent white separators stay visible over both dark palettes */
@@ -1016,25 +1016,25 @@ html[data-theme="dark"]:has(body.tasks-page) {
 
 [data-theme="dark"] .tasks-cal-chip {
     background: rgba(14, 165, 233, 0.15);
-    border-left-color: #0ea5e9;
+    border-left-color: var(--dm-accent);
     color: var(--dm-text);
 }
 
 [data-theme="dark"] .tasks-cal-chip-time {
-    color: #4da3d0;
+    color: var(--dm-accent);
 }
 
 [data-theme="dark"] .tasks-cal-chip.important {
-    border-left-color: #7f1d1d;
+    border-left-color: var(--dm-danger-soft);
     background: rgba(198, 40, 40, 0.18);
 }
 
 [data-theme="dark"] .tasks-cal-chip.important .tasks-cal-chip-text {
-    color: #fca5a5;
+    color: var(--dm-danger);
 }
 
 [data-theme="dark"] .tasks-cal-chip.overdue {
-    border-left-color: #7f1d1d;
+    border-left-color: var(--dm-danger-soft);
     background: #3b1d1d;
 }
 
@@ -1050,12 +1050,12 @@ html[data-theme="dark"]:has(body.tasks-page) {
 /* Mobile bars again, with enough specificity to beat the dark chip rules */
 @media (max-width: 768px) {
     [data-theme="dark"] .tasks-cal-chip {
-        background: #0ea5e9;
+        background: var(--dm-accent);
     }
 
     [data-theme="dark"] .tasks-cal-chip.important,
     [data-theme="dark"] .tasks-cal-chip.overdue {
-        background: #dc2626;
+        background: var(--dm-danger-hover);
     }
 
     [data-theme="dark"] .tasks-cal-chip.completed {

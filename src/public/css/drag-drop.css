@@ -40,7 +40,7 @@
 
 .folder-header.drag-over {
     background-color: rgba(0, 123, 255, 0.12) !important;
-    border: 2px dashed #007bff !important;
+    border: 2px dashed var(--pz-accent) !important;
     border-radius: 8px !important;
     box-shadow: 0 0 8px rgba(0, 123, 255, 0.3) !important;
     padding: 4px !important;
@@ -50,7 +50,7 @@
 
 .folder-header.folder-drop-target {
     background-color: rgba(0, 123, 255, 0.15) !important;
-    border: 2px dashed #007bff !important;
+    border: 2px dashed var(--pz-accent) !important;
     box-shadow: 0 0 12px rgba(0, 123, 255, 0.4) !important;
     padding: 4px !important;
     margin: 2px 0 !important;
@@ -71,7 +71,7 @@
     left: 6px;
     right: 6px;
     height: 3px;
-    background: #007bff;
+    background: var(--pz-accent);
     border-radius: 999px;
     box-shadow: 0 0 8px rgba(0, 123, 255, 0.45);
     pointer-events: none;
@@ -100,7 +100,7 @@
     left: 6px;
     right: 6px;
     height: 3px;
-    background: #007bff;
+    background: var(--pz-accent);
     border-radius: 999px;
     box-shadow: 0 0 8px rgba(0, 123, 255, 0.45);
     pointer-events: none;
@@ -117,7 +117,7 @@
 
 html[data-theme='dark'] .note-list-item.note-drop-before::before,
 html[data-theme='dark'] .note-list-item.note-drop-after::after {
-    background: #4a90e2;
+    background: var(--dm-accent);
     box-shadow: 0 0 8px rgba(74, 144, 226, 0.55);
 }
 
@@ -135,19 +135,19 @@ html[data-theme='dark'] .folder-header.folder-source-drag {
 
 html[data-theme='dark'] .folder-header.drag-over {
     background-color: rgba(74, 144, 226, 0.15) !important;
-    border: 2px dashed #4a90e2 !important;
+    border: 2px dashed var(--dm-accent) !important;
     box-shadow: 0 0 8px rgba(74, 144, 226, 0.4) !important;
 }
 
 html[data-theme='dark'] .folder-header.folder-drop-target {
     background-color: rgba(74, 144, 226, 0.2) !important;
-    border: 2px dashed #4a90e2 !important;
+    border: 2px dashed var(--dm-accent) !important;
     box-shadow: 0 0 12px rgba(74, 144, 226, 0.5) !important;
 }
 
 html[data-theme='dark'] .folder-header.folder-drop-before>.folder-toggle::before,
 html[data-theme='dark'] .folder-header.folder-drop-after>.folder-toggle::after {
-    background: #4a90e2;
+    background: var(--dm-accent);
     box-shadow: 0 0 8px rgba(74, 144, 226, 0.55);
 }
 
@@ -220,7 +220,7 @@ html[data-theme='dark'] .folder-header.folder-drop-after>.folder-toggle::after {
 }
 
 .root-drop-zone.drag-over {
-    border-color: #007bff !important;
+    border-color: var(--pz-accent) !important;
     background-color: var(--pz-accent-soft) !important;
     transform: scale(1.02) !important;
     box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3) !important;
@@ -251,8 +251,8 @@ html[data-theme='dark'] .root-drop-zone {
 }
 
 html[data-theme='dark'] .root-drop-zone.drag-over {
-    background-color: #1a3a5a;
-    border-color: #4a90e2;
+    background-color: var(--dm-accent-soft);
+    border-color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .drop-zone-content {
@@ -378,7 +378,7 @@ a.links_arbo_left.dragging,
 /* The folder that will receive the imported notes */
 .folder-header.file-import-drop-target {
     background-color: rgba(0, 123, 255, 0.15) !important;
-    border: 2px dashed #007bff !important;
+    border: 2px dashed var(--pz-accent) !important;
     border-radius: 8px !important;
     box-shadow: 0 0 12px rgba(0, 123, 255, 0.35) !important;
     padding: 4px !important;
@@ -410,7 +410,7 @@ a.links_arbo_left.dragging,
     align-items: center;
     gap: 10px;
     padding: 18px 22px;
-    border: 2px dashed #007bff;
+    border: 2px dashed var(--pz-accent);
     border-radius: 12px;
     background: rgba(0, 123, 255, 0.06);
     max-width: 100%;
@@ -418,14 +418,14 @@ a.links_arbo_left.dragging,
 
 .sidebar-file-import-overlay-inner .lucide {
     font-size: 28px;
-    color: #007bff;
-    background-color: #007bff;
+    color: var(--pz-accent);
+    background-color: var(--pz-accent);
 }
 
 .sidebar-file-import-overlay-text {
     font-size: 14px;
     font-weight: 600;
-    color: #1c3d5a;
+    color: var(--pz-accent-strong);
     overflow-wrap: anywhere;
 }
 

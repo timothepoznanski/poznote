@@ -118,7 +118,7 @@
 /* Red color for cancel icon in mobile slash menu */
 .slash-command-icon.lucide-times-circle,
 .slash-command-item .slash-command-icon.lucide-times-circle {
-    color: #ef4444 !important;
+    color: var(--pz-danger) !important;
     font-weight: 400;
 }
 

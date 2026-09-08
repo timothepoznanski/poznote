@@ -69,7 +69,7 @@
 
 .kanban-column.drag-over {
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
-    border-color: #6366f1;
+    border-color: var(--pz-accent);
 }
 
 .kanban-column-header {
@@ -178,7 +178,7 @@
 .kanban-column-content.drag-over,
 .kanban-subfolder-content.drag-over {
     background: var(--pz-surface);
-    border: 2px dashed #6366f1;
+    border: 2px dashed var(--pz-accent);
     border-radius: 8px;
 }
 
@@ -196,7 +196,7 @@
 }
 
 .kanban-subfolder-section.drag-over {
-    border-color: #6366f1;
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
 }
 
@@ -375,8 +375,8 @@
 }
 
 .kanban-card-complete-btn:hover {
-    border-color: #16a34a;
-    color: #16a34a;
+    border-color: var(--pz-success);
+    color: var(--pz-success);
     background: #f0fdf4;
 }
 
@@ -405,8 +405,8 @@
 /* Completed cards keep the button visible as a status marker */
 .kanban-card-completed .kanban-card-complete-btn {
     opacity: 1;
-    border-color: #16a34a;
-    background: #16a34a;
+    border-color: var(--pz-success);
+    background: var(--pz-success);
     color: var(--pz-text-inverse);
 }
 
@@ -591,7 +591,7 @@
     width: 14px;
     height: 14px;
     margin: 2px 0 0;
-    accent-color: #6366f1;
+    accent-color: var(--pz-accent);
     cursor: pointer;
 }
 
@@ -672,8 +672,8 @@
 
 .kanban-card-due.overdue {
     background: #fdf2f2;
-    border-color: #f1b8b8;
-    color: #c62828;
+    border-color: var(--pz-danger-soft);
+    color: var(--pz-danger-hover);
 }
 
 .kanban-card-completed .kanban-card-due {

@@ -233,7 +233,7 @@
 
 /* Make delete icon red in actions menu */
 .actions-menu-item .lucide-trash-2 {
-    color: #ff0000 !important;
+    color: var(--pz-danger) !important;
     filter: none !important;
 }
 

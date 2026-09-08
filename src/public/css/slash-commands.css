@@ -66,7 +66,7 @@
 }
 
 .slash-command-item[data-command-id="cancel"] .slash-command-label {
-    color: #dc2626;
+    color: var(--pz-danger);
     font-weight: 600;
 }
 
@@ -168,7 +168,7 @@
 
 .slash-date-picker-day.today {
     background: rgba(11, 120, 230, 0.1);
-    color: #0b78e6;
+    color: var(--pz-accent);
     font-weight: 700;
 }
 
@@ -178,7 +178,7 @@
 
 .slash-date-picker-day.selected,
 .slash-date-picker-day.selected:hover {
-    background: #0b78e6;
+    background: var(--pz-accent);
     color: var(--pz-text-inverse);
     font-weight: 700;
 }
@@ -226,12 +226,12 @@
 }
 
 .slash-date-picker-time-btn:hover {
-    border-color: #0b78e6;
-    color: #0b78e6;
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
 }
 
 .slash-date-picker-time-btn:hover i {
-    color: #0b78e6;
+    color: var(--pz-accent);
 }
 
 /* Two-step time menu: hours grid, then minutes grid */
@@ -266,7 +266,7 @@
 
 .slash-time-cell.selected,
 .slash-time-cell.selected:hover {
-    background: #0b78e6;
+    background: var(--pz-accent);
     color: var(--pz-text-inverse);
     font-weight: 700;
 }
@@ -279,7 +279,7 @@
     font-size: 12px;
     font-weight: 600;
     color: var(--pz-text-inverse);
-    background: #0b78e6;
+    background: var(--pz-accent);
     padding: 4px 12px;
 }
 
@@ -308,13 +308,13 @@
 }
 
 .slash-date-picker-remove-btn {
-    border: 1px solid #f1b8b8;
+    border: 1px solid var(--pz-danger-soft);
     background: #fdf2f2;
-    color: #c62828;
+    color: var(--pz-danger-hover);
 }
 
 .slash-date-picker-remove-btn:hover {
-    border-color: #d32f2f;
+    border-color: var(--pz-danger);
     background: var(--pz-danger-soft);
 }
 
@@ -331,7 +331,7 @@
 
 .slash-date-picker-today-btn {
     font-size: 12px;
-    color: #0b78e6;
+    color: var(--pz-accent);
     padding: 4px 8px;
 }
 

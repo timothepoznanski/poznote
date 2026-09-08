@@ -33,8 +33,8 @@
 
 [data-theme="dark"] .error-message {
     background-color: #3a1f1f;
-    border-left-color: #dc3545;
-    color: #ffcccc;
+    border-left-color: var(--dm-danger-hover);
+    color: var(--dm-danger);
 }
 
 [data-theme="dark"] body.shared-page::-webkit-scrollbar {
@@ -72,7 +72,7 @@
 [data-theme="dark"] .shared-filter-tree-actions .btn:hover {
     background: rgba(77, 185, 235, 0.12);
     border-color: rgba(77, 185, 235, 0.24);
-    color: #a9e2ff;
+    color: var(--dm-accent-hover);
 }
 
 [data-theme="dark"] .shared-filter-tree-actions .btn:disabled {
@@ -93,11 +93,11 @@
    on a dark background; hover keeps the full-color treatment. */
 [data-theme="dark"] .note-actions .btn-success {
     background: rgba(74, 222, 128, 0.14);
-    color: #4ade80;
+    color: var(--dm-success);
 }
 
 [data-theme="dark"] .note-actions .btn-success:hover {
-    background: #2f9e44;
+    background: var(--dm-success-hover);
     color: var(--pz-text-inverse);
 }
 
@@ -107,17 +107,17 @@
 }
 
 [data-theme="dark"] .note-actions .btn-primary:hover {
-    background: #1d6fa5;
+    background: var(--dm-accent);
     color: var(--pz-text-inverse);
 }
 
 [data-theme="dark"] .note-actions .btn-danger {
     background: rgba(248, 113, 113, 0.14);
-    color: #f87171;
+    color: var(--dm-danger);
 }
 
 [data-theme="dark"] .note-actions .btn-danger:hover {
-    background: #dc2626;
+    background: var(--dm-danger-hover);
     color: var(--pz-text-inverse);
 }
 
@@ -144,7 +144,7 @@
 
 [data-theme="dark"] .shared-folder-toggle {
     background: rgba(77, 185, 235, 0.1);
-    color: #a9e2ff;
+    color: var(--dm-accent-hover);
 }
 
 [data-theme="dark"] .shared-folder-toggle:hover {
@@ -179,7 +179,7 @@
 
 [data-theme="dark"] .filter-type-btn:hover {
     border-color: var(--pz-accent);
-    color: #4db9eb;
+    color: var(--dm-accent-hover);
     background: rgba(var(--pz-accent-rgb), 0.18);
 }
 
@@ -247,7 +247,7 @@
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value input:focus,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value select:focus,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .modal-password-input:focus {
-    border-color: #66b3ff !important;
+    border-color: var(--dm-accent-hover) !important;
     box-shadow: 0 0 0 2px rgba(102, 179, 255, 0.18);
     outline: none;
 }
@@ -288,5 +288,5 @@
 }
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .share-user-list-message.is-error {
-    color: #ff9f9f;
+    color: var(--dm-danger);
 }

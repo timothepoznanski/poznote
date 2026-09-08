@@ -116,13 +116,13 @@
 }
 
 .import-confirm-modal-content .btn-cancel {
-    background-color: #e04b4b;
+    background-color: var(--pz-danger);
     color: var(--pz-text-inverse);
     border: none;
 }
 
 .import-confirm-modal-content .btn-cancel:hover {
-    background-color: #c43b3b;
+    background-color: var(--pz-danger-hover);
 }
 
 /* Custom Alert Message */
@@ -212,7 +212,7 @@ html[data-theme='dark'] .direct-copy-restore-processing {
 
 html[data-theme='dark'] .direct-copy-restore-spinner {
     border-color: rgba(255, 255, 255, 0.22);
-    border-top-color: #6bbcff;
+    border-top-color: var(--dm-accent-hover);
 }
 
 html[data-theme='dark'] .import-confirm-modal .import-confirm-modal-content .btn-cancel {
@@ -228,13 +228,13 @@ html[data-theme='dark'] .import-confirm-modal .import-confirm-modal-content .btn
 
 html[data-theme='dark'] .import-confirm-modal .btn-confirm,
 html[data-theme='dark'] .alert-ok-button {
-    background-color: #0e87cb;
+    background-color: var(--dm-accent);
     color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .import-confirm-modal .btn-confirm:hover,
 html[data-theme='dark'] .alert-ok-button:hover {
-    background-color: #0b74ae;
+    background-color: var(--dm-accent);
 }
 
 /* Responsive for modals */

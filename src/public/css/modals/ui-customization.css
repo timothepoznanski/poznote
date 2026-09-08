@@ -27,7 +27,7 @@
 /* "except administrators": the all-users modal does not apply to admins, which
    is easy to miss in the middle of the sentence. */
 .ui-custom-description-highlight {
-    color: #dc2626;
+    color: var(--pz-danger);
     font-weight: 600;
 }
 
@@ -93,7 +93,7 @@
     margin: 0;
     flex-shrink: 0;
     cursor: pointer;
-    accent-color: #3b82f6;
+    accent-color: var(--pz-accent);
 }
 
 .ui-custom-sections-scroll {
@@ -119,7 +119,7 @@
 }
 
 .ui-custom-filter-input:focus {
-    border-color: #3b82f6;
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);
 }
 
@@ -288,7 +288,7 @@
     margin: 0;
     flex-shrink: 0;
     cursor: pointer;
-    accent-color: #3b82f6;
+    accent-color: var(--pz-accent);
 }
 
 .ui-custom-item span {
@@ -316,7 +316,7 @@
 
 [data-theme="dark"] .ui-custom-description-highlight,
 .dark-mode .ui-custom-description-highlight {
-    color: #f87171;
+    color: var(--dm-danger);
 }
 
 [data-theme="dark"] .ui-custom-filter,

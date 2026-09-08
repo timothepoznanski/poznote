@@ -52,12 +52,12 @@
 
 .toolbar-btn:hover i.lucide-palette,
 .toolbar-btn:focus i.lucide-palette {
-    color: #ff2222 !important;
+    color: var(--pz-danger) !important;
 }
 
 .toolbar-btn:hover i.lucide-fill-drip,
 .toolbar-btn:focus i.lucide-fill-drip {
-    color: #ffe066 !important;
+    color: var(--pz-warning) !important;
 }
 
 /* Rotate animation */

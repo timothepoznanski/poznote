@@ -240,8 +240,8 @@ a.ai-chat-header-btn {
 .ai-chat-msg-error {
     align-self: stretch;
     background: #fdecea;
-    color: #b02a37;
-    border: 1px solid #f5c2c7;
+    color: var(--pz-danger-hover);
+    border: 1px solid var(--pz-danger-soft);
     font-size: 12.5px;
 }
 
@@ -426,9 +426,9 @@ a.ai-chat-header-btn {
     align-items: flex-start;
     gap: 6px;
     font-size: 12px;
-    color: #8a6d1a;
+    color: var(--pz-warning-strong);
     background: var(--pz-warning-soft);
-    border: 1px solid #f0e0b0;
+    border: 1px solid var(--pz-warning-soft);
     border-radius: 8px;
     padding: 6px 10px;
 }

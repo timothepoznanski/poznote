@@ -8,7 +8,7 @@
     position: absolute;
     top: -2px;
     right: -2px;
-    background: #ef4444;
+    background: var(--pz-danger);
     color: var(--pz-text-inverse);
     border-radius: 50%;
     width: 12px;
@@ -56,12 +56,12 @@ body.settings-page {
 
 .setting-status.enabled {
     background: var(--pz-success-soft);
-    color: #166534;
+    color: var(--pz-success-strong);
 }
 
 .setting-status.disabled {
     background: var(--pz-danger-soft);
-    color: #991b1b;
+    color: var(--pz-danger-strong);
 }
 
 .settings-current-user-badge {
@@ -383,7 +383,7 @@ html[data-theme='dark'] .settings-view-toggle:hover {
    pinned indicator, on the source card and on its clone alike. */
 
 :root[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
-    background-color: #4aa8d8;
+    background-color: var(--dm-accent);
 }
 
 /* Change Password card when a password change is impossible (SSO-only instance,

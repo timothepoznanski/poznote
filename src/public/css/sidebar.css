@@ -39,8 +39,8 @@
 /* Unread reminders: amber bell, mirroring .icon-sidebar-btn.has-notifications.
    Needs !important to beat the shared var(--pz-accent) below. */
 #sidebarNotificationsBtn.has-notifications .lucide-bell {
-    color: #f59e0b !important;
-    background-color: #f59e0b;
+    color: var(--pz-warning-hover) !important;
+    background-color: var(--pz-warning-hover);
 }
 
 .sidebar-folder-toggle,

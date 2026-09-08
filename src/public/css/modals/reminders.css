@@ -4,7 +4,7 @@
 
 /* ---- Reminder button in toolbar ---- */
 .btn-reminder.has-reminder {
-    color: #4a90d9 !important;
+    color: var(--pz-link) !important;
 }
 
 .btn-reminder.has-reminder i {
@@ -44,7 +44,7 @@
 
 .reminder-datetime-input:focus {
     outline: none;
-    border-color: #4a90d9;
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.15);
 }
 
@@ -80,7 +80,7 @@
 }
 
 .reminder-datetime-part:hover {
-    border-color: #4a90d9;
+    border-color: var(--pz-accent);
 }
 
 .reminder-datetime-part.initially-hidden {
@@ -111,7 +111,7 @@
 .reminder-repeat-label i {
     width: 16px;
     height: 16px;
-    color: #4a90d9;
+    color: var(--pz-link);
     flex-shrink: 0;
 }
 
@@ -150,7 +150,7 @@
 .reminder-repeat-unit:focus,
 .reminder-repeat-interval:focus {
     outline: none;
-    border-color: #4a90d9;
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.15);
 }
 
@@ -227,7 +227,7 @@
 .reminder-email-title i {
     width: 16px;
     height: 16px;
-    color: #4a90d9;
+    color: var(--pz-link);
     flex-shrink: 0;
 }
 
@@ -250,7 +250,7 @@
     background: rgba(74, 144, 217, 0.08);
     border-radius: 6px;
     font-size: 13px;
-    color: #4a90d9;
+    color: var(--pz-link);
     margin: 8px 0;
 }
 
@@ -341,7 +341,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #4a90d9;
+    color: var(--pz-link);
 }
 
 .notification-icon i {
@@ -414,7 +414,7 @@
 
 /* ---- Home page notification card ---- */
 #home-notifications-card.has-notifications .home-card-icon i {
-    color: #f59e0b;
+    color: var(--pz-warning-hover);
 }
 
 #notificationsModal .modal-content {
@@ -453,7 +453,7 @@
 
 #notificationsModal .notification-icon {
     flex-shrink: 0;
-    color: #4a90d9;
+    color: var(--pz-link);
 }
 
 #notificationsModal .notification-text {
@@ -492,6 +492,6 @@
 }
 
 #notificationsModal .notification-action-btn:hover {
-    color: #ef4444;
+    color: var(--pz-danger);
     background: rgba(239, 68, 68, 0.1);
 }

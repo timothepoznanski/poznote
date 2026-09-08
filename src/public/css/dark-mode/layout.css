@@ -57,7 +57,7 @@ html[data-theme='dark'] .searchbar-date-toggle {
 html[data-theme='dark'] .searchbar-date-toggle:hover,
 html[data-theme='dark'] .searchbar-date-toggle.active {
     background: transparent;
-    color: #5cb3e9;
+    color: var(--dm-accent-hover);
 }
 
 html[data-theme='dark'] .search-date-filter {
@@ -101,11 +101,11 @@ html[data-theme='dark'] .searchbar-options-toggle {
 }
 
 html[data-theme='dark'] .searchbar-options-toggle:hover {
-    color: #5cb3e9;
+    color: var(--dm-accent-hover);
 }
 
 html[data-theme='dark'] .searchbar-options-toggle.active {
-    color: #5cb3e9;
+    color: var(--dm-accent-hover);
 }
 
 /* Search type buttons */
@@ -114,29 +114,29 @@ html[data-theme='dark'] .searchbar-type-btn {
 }
 
 html[data-theme='dark'] .searchbar-type-btn:hover {
-    color: #5cb3e9;
+    color: var(--dm-accent-hover);
 }
 
 html[data-theme='dark'] .searchbar-type-btn:hover i {
-    color: #5cb3e9;
+    color: var(--dm-accent-hover);
 }
 
 html[data-theme='dark'] .searchbar-type-btn:hover i::before {
-    color: #5cb3e9;
+    color: var(--dm-accent-hover);
 }
 
 html[data-theme='dark'] .searchbar-type-btn.active {
-    color: #5cb3e9 !important;
+    color: var(--dm-accent-hover) !important;
 }
 
 html[data-theme='dark'] .searchbar-type-btn.active i,
 html[data-theme='dark'] .searchbar-type-btn.active i[class*="lucide-"] {
-    color: #5cb3e9 !important;
+    color: var(--dm-accent-hover) !important;
 }
 
 html[data-theme='dark'] .searchbar-type-btn.active i::before,
 html[data-theme='dark'] .searchbar-type-btn.active i[class*="lucide-"]::before {
-    color: #5cb3e9 !important;
+    color: var(--dm-accent-hover) !important;
 }
 
 /* Ensure filters don't desaturate search type icons */
@@ -212,7 +212,7 @@ html[data-theme='dark'] .folder-note-count {
 
 /* System folder note count - blue like in light mode */
 html[data-theme='dark'] .system-folder .folder-note-count {
-    color: #5b9bd5;
+    color: var(--dm-accent);
 }
 
 /* ============================================

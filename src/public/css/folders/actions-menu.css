@@ -227,7 +227,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .folder-actions-menu-item.shared,
 .note-actions-menu-item.danger,
 .note-actions-menu-item.shared {
-    color: #dc2626;
+    color: var(--pz-danger);
 }
 
 .folder-actions-menu-item.danger:hover,
@@ -241,7 +241,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .folder-actions-menu-item.shared i,
 .note-actions-menu-item.danger i,
 .note-actions-menu-item.shared i {
-    color: #dc2626;
+    color: var(--pz-danger);
 }
 
 /* Separator in menu */
@@ -268,12 +268,12 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 html[data-theme='dark'] .folder-actions-menu-item.active,
 html[data-theme='dark'] .note-actions-menu-item.active {
     background-color: rgba(var(--pz-accent-rgb), 0.2);
-    color: #38bdf8;
+    color: var(--dm-accent-hover);
 }
 
 html[data-theme='dark'] .folder-actions-menu-item.active i,
 html[data-theme='dark'] .note-actions-menu-item.active i {
-    color: #38bdf8;
+    color: var(--dm-accent-hover);
 }
 
 /* Folder action buttons */

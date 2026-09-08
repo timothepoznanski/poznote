@@ -200,7 +200,7 @@ html[data-theme='dark'] .action-btn:hover {
 }
 
 html[data-theme='dark'] .default-workspace-status {
-    color: #4ade80;
+    color: var(--dm-success);
 }
 
 html[data-theme='dark'] .workspace-list {
@@ -212,7 +212,7 @@ html[data-theme='dark'] .locked-icon {
 }
 
 html[data-theme='dark'] #defaultWorkspaceStatus {
-    color: #4ade80;
+    color: var(--dm-success);
 }
 
 html[data-theme='dark'] .workspace-item {
@@ -282,9 +282,9 @@ html[data-theme='dark'] .form-group label {
 }
 
 html[data-theme='dark'] .selected-filename {
-    background: #1a4a5e;
+    background: var(--dm-accent-soft);
     border-color: var(--dm-accent);
-    color: #a0d8ff;
+    color: var(--dm-accent-hover);
 }
 
 html[data-theme='dark'] .note-attachments-row {
@@ -298,7 +298,7 @@ html[data-theme='dark'] .attachment-link {
 }
 
 html[data-theme='dark'] .attachment-link:hover {
-    color: #6ab3ff;
+    color: var(--dm-accent-hover);
     border-color: var(--dm-border-light);
 }
 
@@ -317,8 +317,8 @@ html[data-theme='dark'] .loading-attachments {
 
 html[data-theme='dark'] .error-message {
     background: #44272a;
-    border-color: #6c3238;
-    color: #ff8e9a;
+    border-color: var(--dm-danger-soft);
+    color: var(--dm-danger);
 }
 
 html[data-theme='dark'] .attachment-card {
@@ -514,7 +514,7 @@ html[data-theme='dark'] .clear-filter-btn:hover {
 
 html[data-theme='dark'] .filter-stats {
     background-color: rgba(var(--pz-accent-rgb), 0.2);
-    color: #a0c4e0;
+    color: var(--dm-accent-hover);
 }
 
 /* ============================================
@@ -543,12 +543,12 @@ html[data-theme='dark'] .public-note .content pre code {
 
 /* Important task styling for public view in dark mode */
 html[data-theme='dark'] .public-note .content .task-item.important {
-    border-color: #8b4545;
+    border-color: var(--dm-danger-hover);
     background: #3d1f1f;
 }
 
 html[data-theme='dark'] .public-note .content .task-item.important .task-text {
-    color: #ff6b6b;
+    color: var(--dm-danger);
     font-weight: 600;
 }
 
@@ -578,12 +578,12 @@ html[data-theme='dark'] .folder-icon-item {
 
 html[data-theme='dark'] .folder-icon-item:hover {
     background: var(--dm-surface);
-    border-color: #6366f1;
+    border-color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .folder-icon-item.selected {
-    background: #1e1b4b;
-    border-color: #6366f1;
+    background: var(--dm-accent-soft);
+    border-color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .folder-icon-modal-content .modal-buttons .btn-secondary {
@@ -621,11 +621,11 @@ html[data-theme='dark'] .folder-color-swatch {
 }
 
 html[data-theme='dark'] .folder-color-option:hover .folder-color-swatch {
-    border-color: #6366f1;
+    border-color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .folder-color-option.selected .folder-color-swatch {
-    border-color: #6366f1;
+    border-color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .folder-color-default {

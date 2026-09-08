@@ -139,14 +139,14 @@
 
 /* Highlight for search results in note */
 .search-replace-highlight {
-    background-color: #ffeb3b;
+    background-color: var(--pz-warning);
     color: var(--pz-text);
     padding: 1px 0;
     border-radius: 2px;
 }
 
 .search-replace-highlight.active {
-    background-color: #ff9800;
+    background-color: var(--pz-warning-hover);
     color: var(--pz-text-inverse);
 }
 

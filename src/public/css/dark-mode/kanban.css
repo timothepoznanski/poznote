@@ -128,8 +128,8 @@ html[data-theme='dark'] .kanban-card-due {
 
 html[data-theme='dark'] .kanban-card-due.overdue {
     background: #3d1f1f;
-    border-color: #8b4545;
-    color: #ff6b6b;
+    border-color: var(--dm-danger-hover);
+    color: var(--dm-danger);
 }
 
 html[data-theme='dark'] .kanban-scroll-btn {
@@ -170,7 +170,7 @@ html[data-theme='dark'] .kanban-board::-webkit-scrollbar-thumb:hover {
 html[data-theme='dark'] .kanban-column-content.drag-over,
 html[data-theme='dark'] .kanban-subfolder-content.drag-over {
     background: var(--dm-surface);
-    border-color: #6366f1;
+    border-color: var(--dm-accent);
 }
 
 /* ===== Card completion button ===== */
@@ -182,13 +182,13 @@ html[data-theme='dark'] .kanban-card-complete-btn {
 
 html[data-theme='dark'] .kanban-card-complete-btn:hover {
     background: rgba(34, 197, 94, 0.15);
-    border-color: #22c55e;
-    color: #22c55e;
+    border-color: var(--dm-success-hover);
+    color: var(--dm-success-hover);
 }
 
 html[data-theme='dark'] .kanban-card-completed .kanban-card-complete-btn {
-    background: #16a34a;
-    border-color: #16a34a;
+    background: var(--dm-success-hover);
+    border-color: var(--dm-success-hover);
     color: var(--pz-text-inverse);
 }
 

@@ -140,7 +140,7 @@ html[data-theme='dark'] pre.code-block .code-block-delete-btn,
 html[data-theme='dark'] .noteentry pre .code-block-delete-btn,
 html[data-theme='dark'] .public-note .content pre .code-block-delete-btn,
 html[data-theme='dark'] .code-block-actions-host > .code-block-delete-btn {
-    color: #f87171 !important;
+    color: var(--dm-danger) !important;
 }
 
 html[data-theme='dark'] .code-block-copy-btn:hover,
@@ -161,14 +161,14 @@ html[data-theme='dark'] pre.code-block .code-block-delete-btn:hover,
 html[data-theme='dark'] .noteentry pre .code-block-delete-btn:hover,
 html[data-theme='dark'] .public-note .content pre .code-block-delete-btn:hover,
 html[data-theme='dark'] .code-block-actions-host > .code-block-delete-btn:hover {
-    color: #ff6b6b !important;
+    color: var(--dm-danger) !important;
 }
 
 html[data-theme='dark'] .code-block-copy-btn.copied,
 html[data-theme='dark'] pre.code-block .code-block-copy-btn.copied,
 html[data-theme='dark'] .noteentry pre .code-block-copy-btn.copied {
     background: transparent !important;
-    color: #28a745 !important;
+    color: var(--dm-success-hover) !important;
     border: none !important;
     opacity: 1 !important;
 }
@@ -178,7 +178,7 @@ html[data-theme='dark'] .noteentry pre .code-block-copy-btn.copied {
    ============================================ */
 
 html[data-theme='dark'] .noteentry a {
-    color: #64B5F6 !important;
+    color: var(--dm-accent-hover) !important;
 }
 
 /* Audio player */
@@ -232,37 +232,37 @@ html[data-theme='dark'] .note-attachment-preview-size {
    ============================================ */
 
 html[data-theme='dark'] ::selection {
-    background-color: #264f78;
+    background-color: var(--dm-accent-soft);
     color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] ::-moz-selection {
-    background-color: #264f78;
+    background-color: var(--dm-accent-soft);
     color: var(--pz-text-inverse);
 }
 
 /* Search highlights */
 html[data-theme='dark'] mark,
 html[data-theme='dark'] .highlight {
-    background-color: #4d4d00;
-    color: #ffff99;
+    background-color: var(--dm-warning-soft);
+    color: var(--dm-warning);
 }
 
 /* Highlighting inside code blocks (search/highlight marks, not syntax) */
 html[data-theme='dark'] pre mark[style*="background"],
 html[data-theme='dark'] code mark[style*="background"],
 html[data-theme='dark'] .code-block mark[style*="background"] {
-    background-color: #665500 !important;
+    background-color: var(--dm-warning-soft) !important;
     background-image: none !important;
-    color: #ffff99 !important;
+    color: var(--dm-warning) !important;
 }
 
 /* Yellow highlighter tool */
 html[data-theme='dark'] [style*="background-color: rgb(255, 224, 102)"],
 html[data-theme='dark'] [style*="background-color:#ffe066"],
 html[data-theme='dark'] [style*="background-color: #ffe066"] {
-    background-color: #665500 !important;
-    color: #ffff99 !important;
+    background-color: var(--dm-warning-soft) !important;
+    color: var(--dm-warning) !important;
 }
 
 /* Highlighter tool — other colors.
@@ -359,7 +359,7 @@ html[data-theme='dark'] .image-resize-handle {
 }
 
 html[data-theme='dark'] .image-resize-handle:hover {
-    background: #0099e6;
+    background: var(--dm-accent);
 }
 
 /* Blockquotes */

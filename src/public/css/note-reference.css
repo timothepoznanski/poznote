@@ -58,7 +58,7 @@
 }
 
 .modal-buttons .btn-cancel:hover {
-    background-color: #c82333;
+    background-color: var(--pz-danger-hover);
 }
 
 .note-reference-modal-content h3 {
@@ -294,7 +294,7 @@ a.note-internal-link:hover {
 }
 
 [data-theme="dark"] a.note-internal-link {
-    color: #64b5f6;
+    color: var(--dm-accent-hover);
 }
 
 [data-theme="dark"] a.note-internal-link:hover {

@@ -4,13 +4,13 @@
 .webhooks-page form { margin: 0; }
 .webhooks-page .alert-warning {
     background: var(--pz-warning-soft);
-    border: 1px solid #ffe69c;
-    color: #664d03;
+    border: 1px solid var(--pz-warning-soft);
+    color: var(--pz-warning-strong);
 }
 html[data-theme='dark'] .webhooks-page .alert-warning {
     background: rgba(255, 193, 7, 0.12);
     border-color: rgba(255, 193, 7, 0.35);
-    color: #ffd964;
+    color: var(--dm-warning);
 }
 .webhooks-section h2 {
     margin: 0 0 16px;
@@ -209,8 +209,8 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     letter-spacing: 0.04em;
     text-transform: uppercase;
 }
-.webhooks-state.is-enabled { color: #1f8f4e; }
-.webhooks-state.is-disabled { color: #b54747; }
+.webhooks-state.is-enabled { color: var(--pz-success-hover); }
+.webhooks-state.is-disabled { color: var(--pz-danger-hover); }
 .webhooks-item-actions {
     display: flex;
     justify-content: flex-end;
@@ -277,12 +277,12 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     flex: 0 0 auto;
     background-color: var(--pz-accent);
 }
-.webhooks-actions-item.is-danger { color: #c0392b; }
+.webhooks-actions-item.is-danger { color: var(--pz-danger-hover); }
 .webhooks-actions-item.is-danger:hover {
     background: rgba(192, 57, 43, 0.08);
-    color: #c0392b;
+    color: var(--pz-danger-hover);
 }
-.webhooks-actions-item.is-danger .lucide { background-color: #c0392b; }
+.webhooks-actions-item.is-danger .lucide { background-color: var(--pz-danger-hover); }
 
 /* Inline edit form, spans both columns under the row it belongs to */
 .webhooks-edit {
@@ -332,10 +332,10 @@ html[data-theme='dark'] .webhooks-actions-item:hover {
     background: rgba(255, 255, 255, 0.08);
 }
 html[data-theme='dark'] .webhooks-actions-item.is-danger {
-    color: #ff6b6b;
+    color: var(--dm-danger);
 }
 html[data-theme='dark'] .webhooks-actions-item.is-danger .lucide {
-    background-color: #ff6b6b;
+    background-color: var(--dm-danger);
 }
 html[data-theme='dark'] .webhooks-edit {
     border-top-color: rgba(255, 255, 255, 0.12);

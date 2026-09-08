@@ -153,11 +153,11 @@
 /* Today indicator */
 .mini-calendar-day-today {
     background: rgba(11, 120, 230, 0.1);
-    border: 1px solid #0b78e6;
+    border: 1px solid var(--pz-accent);
 }
 
 .mini-calendar-day-today .mini-calendar-day-number {
-    color: #0b78e6;
+    color: var(--pz-accent);
     font-weight: 700;
 }
 
@@ -174,12 +174,12 @@
     width: 2.5px;
     height: 2.5px;
     border-radius: 50%;
-    background: #0b78e6;
+    background: var(--pz-accent);
 }
 
 .mini-calendar-dot-more {
     font-size: 6px;
-    color: #0b78e6;
+    color: var(--pz-accent);
     font-weight: 600;
     line-height: 1;
 }
@@ -301,7 +301,7 @@
 
 .calendar-note-item:hover {
     background: var(--pz-surface-hover);
-    border-color: #0b78e6;
+    border-color: var(--pz-accent);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
@@ -365,7 +365,7 @@
 }
 
 .calendar-notes-modal .btn-close-red {
-    background: #dc2626;
+    background: var(--pz-danger);
     color: var(--pz-text-inverse);
     border: none;
     padding: 8px 20px;
@@ -377,5 +377,5 @@
 }
 
 .calendar-notes-modal .btn-close-red:hover {
-    background: #b91c1c;
+    background: var(--pz-danger-hover);
 }

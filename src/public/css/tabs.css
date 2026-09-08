@@ -135,7 +135,7 @@
 .app-tab-close-all:hover {
     background: var(--pz-surface-hover);
     border-color: var(--pz-border-strong);
-    color: #b91c1c;
+    color: var(--pz-danger-hover);
 }
 
 .app-tab-close-all .lucide {
@@ -237,11 +237,11 @@ body.app-tab-reordering {
 }
 
 .app-tab-context-item-danger {
-    color: #dc2626;
+    color: var(--pz-danger);
 }
 
 .app-tab-context-item-danger .app-tab-context-icon {
-    color: #dc2626;
+    color: var(--pz-danger);
     font-size: 1.1em;
 }
 
@@ -312,7 +312,7 @@ body.app-tab-reordering {
 
 [data-theme="dark"] .app-tab-close-all:hover {
     background: var(--dm-surface-hover, #334155);
-    color: #fca5a5;
+    color: var(--dm-danger);
 }
 
 [data-theme="dark"] .app-tab.app-tab-dragging {
@@ -334,7 +334,7 @@ body.app-tab-reordering {
 }
 
 [data-theme="dark"] .app-tab-context-item-danger {
-    color: #f87171;
+    color: var(--dm-danger);
 }
 
 [data-theme="dark"] .app-tab-context-item-danger:hover {

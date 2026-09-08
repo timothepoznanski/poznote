@@ -101,7 +101,7 @@
 }
 
 .btn-danger:hover {
-    background: #c82333;
+    background: var(--pz-danger-hover);
 }
 
 /* Destructive actions stay visibly locked until their confirmation is met. */
@@ -118,5 +118,5 @@
 }
 
 .btn-success:hover {
-    background: #218838;
+    background: var(--pz-success-hover);
 }

@@ -220,14 +220,14 @@
 .shared-password-icon.is-password-protected,
 .shared-restricted-icon.is-restricted {
     filter: none !important;
-    color: #ef4444 !important;
+    color: var(--pz-danger) !important;
 }
 
 /* Disabled (inaccessible) share: the row stays listed, the badge and the
    struck-through token signal that the public link no longer resolves. */
 .shared-disabled-icon {
     filter: none !important;
-    color: #f59e0b !important;
+    color: var(--pz-warning-hover) !important;
 }
 
 .shared-note-item.is-share-disabled .note-token {
@@ -505,11 +505,11 @@
 
     .note-actions .btn-success {
         background: rgba(46, 125, 50, 0.13);
-        color: #2e7d32;
+        color: var(--pz-success-hover);
     }
 
     .note-actions .btn-success:hover {
-        background: #2e7d32;
+        background: var(--pz-success-hover);
         color: var(--pz-text-inverse);
     }
 
@@ -525,11 +525,11 @@
 
     .note-actions .btn-danger {
         background: rgba(224, 75, 75, 0.13);
-        color: #e04b4b;
+        color: var(--pz-danger);
     }
 
     .note-actions .btn-danger:hover {
-        background: #e04b4b;
+        background: var(--pz-danger);
         color: var(--pz-text-inverse);
     }
 }

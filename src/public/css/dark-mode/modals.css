@@ -48,7 +48,7 @@ html[data-theme='dark'] .modal-buttons button:first-child {
 }
 
 html[data-theme='dark'] .modal-buttons button:first-child:hover {
-    background-color: #2a4a7f;
+    background-color: var(--dm-accent-soft);
 }
 
 /* The variants, scoped to the dialog, exactly as modals/base.css does it for the
@@ -78,8 +78,8 @@ html[data-theme='dark'] .modal-buttons button.btn-delete-ws {
 
 html[data-theme='dark'] .modal-buttons button.btn-danger:hover,
 html[data-theme='dark'] .modal-buttons button.btn-delete-ws:hover {
-    background-color: #c82333;
-    border-color: #bd2130;
+    background-color: var(--dm-danger-hover);
+    border-color: var(--dm-danger-hover);
 }
 
 html[data-theme='dark'] .modal-buttons button.btn-success {
@@ -89,8 +89,8 @@ html[data-theme='dark'] .modal-buttons button.btn-success {
 }
 
 html[data-theme='dark'] .modal-buttons button.btn-success:hover {
-    background-color: #218838;
-    border-color: #218838;
+    background-color: var(--dm-success-hover);
+    border-color: var(--dm-success-hover);
 }
 
 html[data-theme='dark'] .modal-buttons button.btn-cancel {
@@ -182,7 +182,7 @@ html[data-theme='dark'] :is(#taskDueModal, #taskDueModal) .reminder-repeat-inter
 
 html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-label i,
 html[data-theme='dark'] :is(#taskDueModal, #taskDueModal) .reminder-repeat-label i {
-    color: #7ab8ff;
+    color: var(--dm-accent-hover);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-email-option,
@@ -207,7 +207,7 @@ html[data-theme='dark'] #taskDueModal .reminder-email-title {
 
 html[data-theme='dark'] #reminderModal .reminder-email-title i,
 html[data-theme='dark'] #taskDueModal .reminder-email-title i {
-    color: #7ab8ff;
+    color: var(--dm-accent-hover);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-email-hint,
@@ -224,7 +224,7 @@ html[data-theme='dark'] #reminderModal .reminder-current-info,
 html[data-theme='dark'] #taskDueModal .reminder-current-info {
     background: rgba(74, 158, 255, 0.11);
     border: 1px solid rgba(74, 158, 255, 0.18);
-    color: #78b6ff;
+    color: var(--dm-accent-hover);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-modal-action,
@@ -247,22 +247,22 @@ html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-cancel:hover 
 
 html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-primary,
 html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-primary {
-    background: #0e87cb;
+    background: var(--dm-accent);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-primary:hover,
 html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-primary:hover {
-    background: #0b74ae;
+    background: var(--dm-accent);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-danger,
 html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-danger {
-    background: #df3b4c !important;
+    background: var(--dm-danger-hover) !important;
 }
 
 html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-danger:hover,
 html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-danger:hover {
-    background: #c93242 !important;
+    background: var(--dm-danger-hover) !important;
 }
 
 /* ============================================
@@ -299,7 +299,7 @@ html[data-theme='dark'] #notificationsModal .notification-item.unread:hover {
 
 html[data-theme='dark'] #notificationsModal .notification-icon {
     background: rgba(74, 158, 255, 0.14);
-    color: #7ab8ff;
+    color: var(--dm-accent-hover);
 }
 
 html[data-theme='dark'] #notificationsModal .notification-heading {
@@ -315,7 +315,7 @@ html[data-theme='dark'] #notificationsModal .notification-action-btn {
 }
 
 html[data-theme='dark'] #notificationsModal .notification-action-btn:hover {
-    color: #ff7b86;
+    color: var(--dm-danger);
     background: rgba(239, 68, 68, 0.14);
 }
 
@@ -413,14 +413,14 @@ html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-primary {
 }
 
 html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-primary:hover {
-    background-color: #2a4a7f;
+    background-color: var(--dm-accent-soft);
 }
 
 html[data-theme='dark'] #moveFolderFilesModal .modal-error-message,
 html[data-theme='dark'] #createWorkspaceModal .modal-error-message {
     background-color: rgba(255, 77, 77, 0.08);
-    color: #ff7b7b;
-    border: 1px solid #7a2e2e;
+    color: var(--dm-danger);
+    border: 1px solid var(--dm-danger-soft);
     border-radius: 4px;
     padding: 8px 10px;
 }
@@ -549,7 +549,7 @@ html[data-theme='dark'] #deleteModal .modal-content p {
    the dark panel, so a lighter red. #deleteAccountModal is the self-service
    twin built by js/delete-account.js on the settings page. */
 html[data-theme='dark'] :is(#deleteModal, #deleteAccountModal) .delete-warning-box .delete-warning {
-    color: #ff6b7a;
+    color: var(--dm-danger);
 }
 
 html[data-theme='dark'] #deleteModal input {
@@ -621,17 +621,17 @@ html[data-theme='dark'] #fontSizeModal .modal-footer .btn-primary {
 }
 
 html[data-theme='dark'] #fontSizeModal .modal-footer .btn-primary:hover {
-    background-color: #2a4a7f;
+    background-color: var(--dm-accent-soft);
 }
 
 html[data-theme='dark'] #fontSizeModal .modal-buttons .btn-primary {
-    background-color: #dc3545 !important;
+    background-color: var(--dm-danger-hover) !important;
     color: var(--pz-text-inverse) !important;
-    border-color: #dc3545 !important;
+    border-color: var(--dm-danger-hover) !important;
 }
 html[data-theme='dark'] #fontSizeModal .modal-buttons .btn-primary:hover {
-    background-color: #c82333 !important;
-    border-color: #bd2130 !important;
+    background-color: var(--dm-danger-hover) !important;
+    border-color: var(--dm-danger-hover) !important;
     opacity: 1;
 }
 
@@ -654,7 +654,7 @@ html[data-theme='dark'] .toggle-slider {
 }
 
 html[data-theme='dark'] input:checked+.toggle-slider {
-    background-color: #28a745 !important;
+    background-color: var(--dm-success-hover) !important;
 }
 
 /* Folder Share Modal */
@@ -712,9 +712,9 @@ html[data-theme='dark'] #deleteFolderModal .btn-cancel,
 html[data-theme='dark'] #deleteConfirmModal .btn-cancel,
 html[data-theme='dark'] #emptyTrashConfirmModal .btn-cancel,
 html[data-theme='dark'] #restoreConfirmModal .btn-cancel {
-    background-color: #e04b4b !important;
+    background-color: var(--dm-danger-hover) !important;
     color: var(--pz-text-inverse) !important;
-    border-color: #e04b4b !important;
+    border-color: var(--dm-danger-hover) !important;
 }
 
 html[data-theme='dark'] .import-confirm-modal-content .btn-cancel:hover,
@@ -723,8 +723,8 @@ html[data-theme='dark'] #deleteFolderModal .btn-cancel:hover,
 html[data-theme='dark'] #deleteConfirmModal .btn-cancel:hover,
 html[data-theme='dark'] #emptyTrashConfirmModal .btn-cancel:hover,
 html[data-theme='dark'] #restoreConfirmModal .btn-cancel:hover {
-    background-color: #c43b3b !important;
-    border-color: #c43b3b !important;
+    background-color: var(--dm-danger-hover) !important;
+    border-color: var(--dm-danger-hover) !important;
 }
 
 html[data-theme='dark'] #deleteFolderModal .btn-cancel {
@@ -800,7 +800,7 @@ html[data-theme='dark'] .snapshot-content-preview:empty::before {
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview a {
-    color: var(--dm-accent, #64B5F6) !important;
+    color: var(--dm-accent, var(--dm-accent-hover)) !important;
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview blockquote {
@@ -903,7 +903,7 @@ html[data-theme='dark'] #updateModal .modal-content p {
 
 html[data-theme='dark'] #updateModal .backup-warning {
     background-color: var(--dm-content-bg);
-    border-color: #5a4e1a;
+    border-color: var(--dm-warning-soft);
 }
 
 html[data-theme='dark'] #updateModal .backup-warning p {

@@ -115,7 +115,7 @@ html[data-theme='dark'] .toggle-slider {
 }
 
 html[data-theme='dark'] input:checked+.toggle-slider {
-    background-color: #28a745 !important;
+    background-color: var(--dm-success-hover) !important;
 }
 
 /* ============================================

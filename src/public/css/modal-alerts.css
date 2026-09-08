@@ -110,11 +110,11 @@ html[data-theme='dark'] .note-creation-loading-content {
 }
 
 .alert-modal-icon.warning {
-    color: #ff9800;
+    color: var(--pz-warning-hover);
 }
 
 .alert-modal-icon.error {
-    color: #f44336;
+    color: var(--pz-danger);
 }
 
 .alert-modal-icon.info {
@@ -122,7 +122,7 @@ html[data-theme='dark'] .note-creation-loading-content {
 }
 
 .alert-modal-icon.success {
-    color: #4caf50;
+    color: var(--pz-success);
 }
 
 .alert-modal-body {
@@ -174,12 +174,12 @@ html[data-theme='dark'] .note-creation-loading-content {
 }
 
 .alert-modal-button.secondary {
-    background: #e04b4b;
+    background: var(--pz-danger);
     color: var(--pz-text-inverse);
 }
 
 .alert-modal-button.secondary:hover {
-    background: #c43b3b;
+    background: var(--pz-danger-hover);
 }
 
 /* Destructive confirmation (confirmButtonClass: 'danger'): the confirm button
@@ -189,7 +189,7 @@ html[data-theme='dark'] .note-creation-loading-content {
 }
 
 .alert-modal-button.primary.danger:hover {
-    background: #b62b39;
+    background: var(--pz-danger-hover);
 }
 
 /* Dark mode support */
@@ -241,24 +241,24 @@ html[data-theme='dark'] .alert-modal-button.primary:hover,
    otherwise win over the light-mode danger shorthand. */
 html[data-theme='dark'] .alert-modal-button.primary.danger,
 .dark-mode .alert-modal-button.primary.danger {
-    background-color: #dc3545;
+    background-color: var(--dm-danger-hover);
     color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .alert-modal-button.primary.danger:hover,
 .dark-mode .alert-modal-button.primary.danger:hover {
-    background-color: #b62b39;
+    background-color: var(--dm-danger-hover);
 }
 
 html[data-theme='dark'] .alert-modal-button.secondary,
 .dark-mode .alert-modal-button.secondary {
-    background-color: #e04b4b;
+    background-color: var(--dm-danger-hover);
     color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .alert-modal-button.secondary:hover,
 .dark-mode .alert-modal-button.secondary:hover {
-    background-color: #c43b3b;
+    background-color: var(--dm-danger-hover);
 }
 
 html[data-theme='dark'] .alert-modal.snapshot-restore-confirm .alert-modal-button.primary,

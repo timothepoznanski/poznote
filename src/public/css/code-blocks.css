@@ -131,7 +131,7 @@ pre.code-block .code-block-line-numbers-btn,
 pre.code-block .code-block-delete-btn,
 .noteentry pre .code-block-delete-btn {
     right: 8px;
-    color: #f87171;
+    color: var(--pz-danger);
 }
 
 .code-block-copy-btn:hover,
@@ -165,7 +165,7 @@ pre.code-block .code-block-delete-btn,
 }
 
 .code-block-lang-btn:focus-visible {
-    outline: 2px solid #0d6efd;
+    outline: 2px solid var(--pz-accent);
     outline-offset: -2px;
 }
 
@@ -174,7 +174,7 @@ pre.code-block .code-block-delete-btn,
 }
 
 .code-block-delete-btn:hover {
-    color: #ef4444;
+    color: var(--pz-danger);
 }
 
 .code-block-copy-btn:active,
@@ -210,7 +210,7 @@ pre.code-block .code-block-delete-btn,
 }
 
 .code-block-actions-host > .code-block-delete-btn {
-    color: #f87171 !important;
+    color: var(--pz-danger) !important;
 }
 
 .code-block-actions-host > .code-block-copy-btn:hover,
@@ -225,7 +225,7 @@ pre.code-block .code-block-delete-btn,
 }
 
 .code-block-actions-host > .code-block-delete-btn:hover {
-    color: #ef4444 !important;
+    color: var(--pz-danger) !important;
 }
 
 .code-block-actions-host > .code-block-copy-btn svg,

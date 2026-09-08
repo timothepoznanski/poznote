@@ -218,7 +218,7 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #ef4444;
+    background: var(--pz-danger);
     display: block;
     pointer-events: none;
 }
@@ -233,7 +233,7 @@
 }
 
 .icon-sidebar-btn.has-notifications .lucide-bell {
-    color: #f59e0b;
+    color: var(--pz-warning-hover);
 }
 
 /* Collapse toggle: sits at the very bottom, just right of the rail's divider

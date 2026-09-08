@@ -75,10 +75,10 @@ html[data-theme='dark'] .dr-hero p {
     margin-top: 8px;
     padding: 8px 12px;
     background: rgba(59,130,246,.1);
-    border-left: 3px solid #3b82f6;
+    border-left: 3px solid var(--pz-accent);
     border-radius: 6px;
     font-size: 0.85rem;
-    color: #1d4ed8;
+    color: var(--pz-accent-hover);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -86,7 +86,7 @@ html[data-theme='dark'] .dr-hero p {
 
 html[data-theme='dark'] .deletion-notice {
     background: rgba(59,130,246,.15);
-    color: #93c5fd;
+    color: var(--dm-accent-hover);
 }
 
 .btn-view-files {
@@ -113,7 +113,7 @@ html[data-theme='dark'] .btn-view-files {
 
 html[data-theme='dark'] .btn-view-files:hover {
     background: rgba(255,255,255,.1);
-    border-color: #3b82f6;
+    border-color: var(--dm-accent);
     color: var(--dm-accent);
 }
 
@@ -261,20 +261,20 @@ html[data-theme='dark'] .btn-view-files:hover {
 }
 .status-clean { 
     background: var(--pz-success-soft); 
-    color: #166534; 
+    color: var(--pz-success-strong); 
 }
 .status-warning { 
     background: var(--pz-warning-soft); 
-    color: #854d0e; 
+    color: var(--pz-warning-strong); 
 }
 
 html[data-theme='dark'] .status-clean { 
     background: rgba(34,197,94,.15); 
-    color: #86efac; 
+    color: var(--dm-success); 
 }
 html[data-theme='dark'] .status-warning { 
     background: rgba(234,179,8,.15); 
-    color: #fde047; 
+    color: var(--dm-warning); 
 }
 
 /* ── Orphan Scanner Buttons ── */
@@ -389,15 +389,15 @@ html[data-theme='dark'] .status-warning {
    "used / limit" pair turns orange from 50% of the quota and red from 80%. */
 .quota-level-warn,
 .quota-level-warn .quota-inline {
-    color: #e8830c;
+    color: var(--pz-warning-hover);
 }
 .quota-level-danger,
 .quota-level-danger .quota-inline {
     color: var(--pz-danger);
 }
 html[data-theme='dark'] .quota-level-warn {
-    color: #fbbf24;
+    color: var(--dm-warning);
 }
 html[data-theme='dark'] .quota-level-danger {
-    color: #f87171;
+    color: var(--dm-danger);
 }

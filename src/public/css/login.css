@@ -132,7 +132,7 @@ input[type="password"] {
 input[type="text"]:focus,
 input[type="password"]:focus {
     outline: none;
-    border-color: #3182ce;
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
 }
 
@@ -211,7 +211,7 @@ input[type="password"]::placeholder {
 .login-button {
     width: 100%;
     padding: 0.875rem 1rem;
-    background: #3182ce;
+    background: var(--pz-accent);
     color: var(--pz-text-inverse);
     border: none;
     border-radius: 8px;
@@ -252,7 +252,7 @@ input[type="password"]::placeholder {
 }
 
 .login-button:hover {
-    background: #2c5282;
+    background: var(--pz-accent-strong);
 }
 
 .login-button:active {
@@ -305,7 +305,7 @@ input[type="password"]::placeholder {
 
 .account-option:hover,
 .account-option:focus {
-    border-color: #3182ce;
+    border-color: var(--pz-accent);
     background: var(--pz-surface);
     outline: none;
 }
@@ -325,7 +325,7 @@ input[type="password"]::placeholder {
     padding: 0.2rem 0.45rem;
     border-radius: 4px;
     background: #ebf8ff;
-    color: #2b6cb0;
+    color: var(--pz-accent);
     font-size: 0.75rem;
     font-weight: 600;
 }
@@ -340,12 +340,12 @@ input[type="password"]::placeholder {
 }
 
 .account-select-logout:hover {
-    color: #2c5282;
+    color: var(--pz-accent-strong);
     text-decoration: underline;
 }
 
 .error {
-    color: #e53e3e;
+    color: var(--pz-danger);
     margin-top: 0.5rem;
     font-size: 0.875rem;
     font-weight: 500;
@@ -354,8 +354,8 @@ input[type="password"]::placeholder {
 
 .admin-warning {
     background: var(--pz-surface);
-    border: 1px solid #feb2b2;
-    color: #c53030;
+    border: 1px solid var(--pz-danger-soft);
+    color: var(--pz-danger-hover);
     padding: 1rem;
     border-radius: 8px;
     margin-bottom: 1.5rem;
@@ -366,7 +366,7 @@ input[type="password"]::placeholder {
 
 .admin-warning code {
     background: var(--pz-danger-soft);
-    color: #c53030;
+    color: var(--pz-danger-hover);
     padding: 0.125rem 0.25rem;
     border-radius: 4px;
     font-weight: 600;
@@ -385,7 +385,7 @@ input[type="password"]::placeholder {
 }
 
 .info a {
-    color: #3182ce;
+    color: var(--pz-accent);
     text-decoration: none;
 }
 
@@ -408,7 +408,7 @@ input[type="password"]::placeholder {
 }
 
 .github-link a {
-    color: #3182ce;
+    color: var(--pz-accent);
     text-decoration: none;
     font-weight: 500;
     display: inline-flex;
@@ -418,7 +418,7 @@ input[type="password"]::placeholder {
 }
 
 .github-link a:hover {
-    color: #2c5282;
+    color: var(--pz-accent-strong);
     text-decoration: underline;
 }
 
@@ -481,8 +481,8 @@ html[data-theme='dark'] .github-link a:hover {
 
 html[data-theme='dark'] .admin-warning {
     background: rgba(197, 48, 48, 0.1);
-    border-color: #c53030;
-    color: #feb2b2;
+    border-color: var(--dm-danger-hover);
+    color: var(--dm-danger);
 }
 
 html[data-theme='dark'] .admin-warning code {
@@ -513,7 +513,7 @@ html[data-theme='dark'] .account-option:focus {
 
 html[data-theme='dark'] .account-option-badge {
     background: rgba(74, 158, 255, 0.16);
-    color: #9cc7ff;
+    color: var(--dm-accent-hover);
 }
 
 html[data-theme='dark'] .oidc-divider::before,

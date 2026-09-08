@@ -116,7 +116,7 @@
 }
 
 :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-danger:hover {
-    background-color: #c82333;
+    background-color: var(--pz-danger-hover);
 }
 
 /* Grey "Cancel", used by the logout confirmation. .btn-cancel is only styled

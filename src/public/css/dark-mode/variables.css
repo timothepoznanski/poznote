@@ -43,8 +43,17 @@
     /* The pale wash behind a status: an alert body, a badge, a flagged row.
        Each family mixed a Bootstrap-era pastel with a Tailwind-era one, in
        components that never appear side by side, so they are one intention. */
+    /* Every semantic colour has the same three steps, so a palette only has to
+       answer four questions per family: the fill, its hover, its pale wash, and
+       the deep shade used for text on that wash. */
+    --pz-danger-hover: #c82333;
+    --pz-danger-strong: #721c24;
     --pz-danger-soft: #f8d7da;
+    --pz-success-hover: #218838;
+    --pz-success-strong: #155724;
     --pz-success-soft: #d4edda;
+    --pz-warning-hover: #e0a800;
+    --pz-warning-strong: #856404;
     --pz-warning-soft: #fff3cd;
     /* Lucide icons are CSS masks painted with currentColor, so an icon's colour
        is just `color`. This is the grey the old filter chain produced. */
@@ -85,6 +94,20 @@
        `invert(90%)` produced, kept exactly so nothing moves. */
     --dm-icon: #cccccc;
     --dm-icon-hover: #e6e6e6;
+    /* The semantic families again, in the values a dark ground needs: a fill
+       bright enough to read, and a wash dark enough to sit on the page. The
+       black theme inherits these unless it overrides them. */
+    --dm-accent-hover: #6ab3ff;
+    --dm-accent-soft: #334155;
+    --dm-danger: #ff6b6b;
+    --dm-danger-hover: #ef4444;
+    --dm-danger-soft: #3d1f1f;
+    --dm-success: #4ade80;
+    --dm-success-hover: #22c55e;
+    --dm-success-soft: #1a4d2e;
+    --dm-warning: #ffc107;
+    --dm-warning-hover: #e0a800;
+    --dm-warning-soft: #665500;
     --dm-border: #404040;
     --dm-border-light: #555555;
     --dm-accent: #4a9eff;

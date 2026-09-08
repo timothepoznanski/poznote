@@ -155,12 +155,12 @@ body {
 
 /* A public workspace: the share icon stays tinted */
 .ws-icon-btn.is-shared {
-    color: #d97706;
+    color: var(--pz-warning-hover);
 }
 
 .ws-icon-btn.is-shared:hover,
 .ws-icon-btn.is-shared:focus-visible {
-    color: #b45309;
+    color: var(--pz-warning-strong);
 }
 
 .ws-icon-btn.ws-icon-btn-danger:hover,
@@ -190,12 +190,12 @@ body {
 }
 
 :root[data-theme='dark'] .ws-icon-btn.is-shared {
-    color: #fbbf24;
+    color: var(--dm-warning);
 }
 
 :root[data-theme='dark'] .ws-icon-btn.ws-icon-btn-danger:hover,
 :root[data-theme='dark'] .ws-icon-btn.ws-icon-btn-danger:focus-visible {
-    color: #ff6b6b;
+    color: var(--dm-danger);
     background: rgba(255, 107, 107, 0.12);
 }
 
@@ -363,7 +363,7 @@ a.workspace-name-link:focus-visible {
 }
 
 .ws-color-swatch-custom {
-    background: conic-gradient(#f87171, #fbbf24, #4ade80, #38bdf8, #a78bfa, #f87171);
+    background: conic-gradient(var(--pz-danger), var(--pz-warning), var(--pz-success), var(--pz-accent), #a78bfa, var(--pz-danger));
 }
 
 :root[data-theme='dark'] .ws-color-dot,
@@ -412,7 +412,7 @@ a.workspace-name-link:focus-visible {
 
 .workspace-share-badge.is-enabled {
     background: var(--pz-success-soft);
-    color: #166534;
+    color: var(--pz-success-strong);
 }
 
 .workspace-share-badge.is-disabled {
@@ -630,7 +630,7 @@ a.workspace-name-link:focus-visible {
 }
 
 .shared-edit-token-modal .share-user-list-message.is-error {
-    color: #b91c1c;
+    color: var(--pz-danger-hover);
 }
 
 .shared-edit-token-modal .share-user-list-row {
@@ -688,7 +688,7 @@ html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-url-row 
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-url {
-    color: #93c5fd;
+    color: var(--dm-accent-hover);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-url.is-preview {
@@ -696,7 +696,7 @@ html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-url.is-p
 }
 
 html[data-theme='dark'] .shared-edit-token-modal a.workspace-share-modal-url:hover {
-    color: #bfdbfe;
+    color: var(--dm-accent-hover);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .modal-password-input {
@@ -712,7 +712,7 @@ html[data-theme='dark'] .shared-edit-token-modal .modal-password-input::placehol
 
 html[data-theme='dark'] .shared-edit-token-modal .modal-password-input:focus {
     outline: none;
-    border-color: #66b3ff;
+    border-color: var(--dm-accent-hover);
     box-shadow: 0 0 0 2px rgba(102, 179, 255, 0.18);
 }
 
@@ -751,7 +751,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-row + .share-u
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-error {
-    color: #ff9f9f;
+    color: var(--dm-danger);
 }
 
 /* Boutons d'action */
@@ -854,8 +854,8 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
 }
 
 .btn-rename:hover {
-    background-color: #e0a800;
-    border-color: #d39e00;
+    background-color: var(--pz-warning-hover);
+    border-color: var(--pz-warning-hover);
 }
 
 .btn-background {
@@ -1149,7 +1149,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
 /* Default workspace status message */
 .default-workspace-status {
     margin-top: 8px;
-    color: #10b981;
+    color: var(--pz-success);
     display: none;
 }
 

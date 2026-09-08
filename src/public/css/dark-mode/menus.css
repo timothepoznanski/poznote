@@ -27,7 +27,7 @@ html[data-theme='dark'] .slash-command-label {
 }
 
 html[data-theme='dark'] .slash-command-item[data-command-id='cancel'] .slash-command-label {
-    color: #f87171 !important;
+    color: var(--dm-danger) !important;
 }
 
 html[data-theme='dark'] .slash-command-icon:not([style*="color"]) {
@@ -56,7 +56,7 @@ html[data-theme='dark'] .slash-date-picker-day.today {
 
 html[data-theme='dark'] .slash-date-picker-day.selected,
 html[data-theme='dark'] .slash-date-picker-day.selected:hover {
-    background: #2563eb;
+    background: var(--dm-accent);
     color: var(--pz-text-inverse);
 }
 
@@ -70,13 +70,13 @@ html[data-theme='dark'] .slash-date-picker-today-btn:hover {
 
 html[data-theme='dark'] .slash-date-picker-remove-btn {
     background: #3d1f1f;
-    border-color: #8b4545;
-    color: #ff6b6b;
+    border-color: var(--dm-danger-hover);
+    color: var(--dm-danger);
 }
 
 html[data-theme='dark'] .slash-date-picker-remove-btn:hover {
-    background: #4c1d1d;
-    border-color: #b91c1c;
+    background: var(--dm-danger-soft);
+    border-color: var(--dm-danger-hover);
 }
 
 html[data-theme='dark'] .slash-date-picker-remove-time-btn {
@@ -86,8 +86,8 @@ html[data-theme='dark'] .slash-date-picker-remove-time-btn {
 }
 
 html[data-theme='dark'] .slash-date-picker-remove-time-btn:hover {
-    border-color: #4da3d0;
-    color: #4da3d0;
+    border-color: var(--dm-accent);
+    color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .slash-date-picker-time-btn {
@@ -110,7 +110,7 @@ html[data-theme='dark'] .slash-time-cell:hover {
 
 html[data-theme='dark'] .slash-time-cell.selected,
 html[data-theme='dark'] .slash-time-cell.selected:hover {
-    background: #2563eb;
+    background: var(--dm-accent);
     color: var(--pz-text-inverse);
 }
 
@@ -119,12 +119,12 @@ html[data-theme='dark'] .slash-date-picker-actions-row {
 }
 
 html[data-theme='dark'] .slash-date-picker-apply-btn {
-    background: #2563eb;
+    background: var(--dm-accent);
     color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .slash-date-picker-apply-btn:hover {
-    background: #1d4ed8;
+    background: var(--dm-accent);
 }
 
 html[data-theme='dark'] .slash-command-back {
@@ -170,11 +170,11 @@ html[data-theme='dark'] .image-submenu-item {
 
 html[data-theme='dark'] .image-submenu-item:hover {
     background-color: var(--dm-surface);
-    color: #5cb3e9;
+    color: var(--dm-accent-hover);
 }
 
 html[data-theme='dark'] .image-menu-item[data-action='delete-image'] i {
-    color: #dc3545;
+    color: var(--dm-danger-hover);
 }
 
 html[data-theme='dark'] img.img-with-border {
@@ -254,7 +254,7 @@ html[data-theme='dark'] .note-actions-toggle:hover i,
 html[data-theme='dark'] .note-actions-toggle:hover [class*="lucide-"],
 html[data-theme='dark'] .note-actions-item:hover i,
 html[data-theme='dark'] .note-actions-item:hover [class*="lucide-"] {
-    color: #38bdf8;
+    color: var(--dm-accent-hover);
 }
 
 /* Group separators of both menus (light rule in css/folders/actions-menu.css):
@@ -293,7 +293,7 @@ html[data-theme='dark'] .note-actions-menu-item:hover i {
 
 html[data-theme='dark'] .folder-actions-menu-item.danger,
 html[data-theme='dark'] .note-actions-menu-item.danger {
-    color: #ff6b6b;
+    color: var(--dm-danger);
 }
 
 html[data-theme='dark'] .folder-actions-menu-item.danger:hover,
@@ -303,12 +303,12 @@ html[data-theme='dark'] .note-actions-menu-item.danger:hover {
 
 html[data-theme='dark'] .folder-actions-menu-item.danger i,
 html[data-theme='dark'] .note-actions-menu-item.danger i {
-    color: #ff6b6b;
+    color: var(--dm-danger);
 }
 
 html[data-theme='dark'] .folder-actions-menu-item.shared,
 html[data-theme='dark'] .note-actions-menu-item.shared {
-    color: #ff6b6b;
+    color: var(--dm-danger);
 }
 
 html[data-theme='dark'] .folder-actions-menu-item.shared:hover,
@@ -318,7 +318,7 @@ html[data-theme='dark'] .note-actions-menu-item.shared:hover {
 
 html[data-theme='dark'] .folder-actions-menu-item.shared i,
 html[data-theme='dark'] .note-actions-menu-item.shared i {
-    color: #ff6b6b;
+    color: var(--dm-danger);
 }
 
 html[data-theme='dark'] .folder-actions-menu-separator,

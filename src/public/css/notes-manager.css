@@ -180,13 +180,13 @@ body.notes-manager-page {
 
 :root[data-theme='dark'] .nm-bulk-select {
     color-scheme: dark;
-    background: var(--action-bg, #17304d);
+    background: var(--action-bg, var(--dm-accent-soft));
     color: var(--action-color, var(--dm-text-bright));
-    border-color: var(--action-border, #2d4f8e);
+    border-color: var(--action-border, var(--dm-accent-soft));
 }
 
 :root[data-theme='dark'] .nm-bulk-select option {
-    background-color: var(--action-bg, #17304d);
+    background-color: var(--action-bg, var(--dm-accent-soft));
     color: var(--action-color, var(--dm-text-bright));
 }
 
@@ -405,11 +405,11 @@ html[data-theme='dark'] .nm-folder-option-selected {
 }
 
 .nm-note-type-markdown {
-    color: #1d4ed8;
+    color: var(--pz-accent-hover);
 }
 
 .nm-note-type-tasklist {
-    color: #15803d;
+    color: var(--pz-success-hover);
 }
 
 .nm-note-type-excalidraw {
@@ -543,7 +543,7 @@ html[data-theme='dark'] .nm-folder-option-selected {
 .error-message {
     text-align: center;
     padding: 20px;
-    color: #dc2626;
+    color: var(--pz-danger);
     font-size: 14px;
 }
 

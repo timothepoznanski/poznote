@@ -118,7 +118,7 @@
 }
 
 .table-context-menu-item.danger {
-    color: #dc2626;
+    color: var(--pz-danger);
 }
 
 .table-context-menu-item.danger:hover {
@@ -165,7 +165,7 @@ html[data-theme='dark'] .table-context-menu-item:hover {
 }
 
 html[data-theme='dark'] .table-context-menu-item.danger {
-    color: #f87171;
+    color: var(--dm-danger);
 }
 
 html[data-theme='dark'] .table-context-menu-item.danger:hover {

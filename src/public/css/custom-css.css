@@ -42,7 +42,7 @@
     gap: 12px;
     padding: 12px 16px;
     background: #f0f7ff;
-    border: 1px solid #cce4ff;
+    border: 1px solid var(--pz-accent-soft);
     border-radius: 8px;
     font-size: 0.95rem;
     font-weight: 500;

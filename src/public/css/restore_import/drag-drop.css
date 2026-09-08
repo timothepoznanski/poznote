@@ -15,7 +15,7 @@
 
 .form-group.drag-over {
     background-color: var(--pz-accent-soft);
-    border: 2px dashed #2196F3 !important;
+    border: 2px dashed var(--pz-accent) !important;
 }
 
 .form-group.drag-over input[type="file"],

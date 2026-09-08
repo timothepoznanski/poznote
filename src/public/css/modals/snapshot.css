@@ -633,7 +633,7 @@
     }
 
     #snapshotModal .snapshot-modal-actions .btn-danger i.lucide {
-        color: #d11a2a !important;
+        color: var(--pz-danger-hover) !important;
     }
 
     #snapshotModal .snapshot-modal-actions .snapshot-take-btn i.lucide {

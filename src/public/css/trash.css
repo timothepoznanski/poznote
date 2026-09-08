@@ -298,18 +298,18 @@ body.trash-page {
 }
 
 .trash-restore-btn:hover .lucide {
-    color: #16a34a;
-    background-color: #16a34a;
+    color: var(--pz-success);
+    background-color: var(--pz-success);
 }
 
 .trash-delete-btn:hover {
     background: #fdecec;
-    border-color: #f5c6c6;
+    border-color: var(--pz-danger-soft);
 }
 
 .trash-delete-btn:hover .lucide {
-    color: #dc2626;
-    background-color: #dc2626;
+    color: var(--pz-danger);
+    background-color: var(--pz-danger);
 }
 
 /* Collapsed content preview with fade-out */
@@ -431,18 +431,18 @@ body.trash-page {
 }
 
 .searchtrash:focus {
-    border-bottom: 1px solid #32a1ce;
+    border-bottom: 1px solid var(--pz-accent);
 }
 
 /* Notice de recherche */
 .trash-search-notice {
     text-align: center;
     background: var(--pz-accent-soft);
-    border: 1px solid #bbdefb;
+    border: 1px solid var(--pz-accent-soft);
     border-radius: 6px;
     padding: 10px;
     margin: 15px 20px;
-    color: #1976d2;
+    color: var(--pz-accent);
     position: relative;
 }
 
@@ -454,7 +454,7 @@ body.trash-page {
 }
 
 .trash-clear-search:hover {
-    color: #d32f2f;
+    color: var(--pz-danger);
 }
 
 .lucide-x {
@@ -669,13 +669,13 @@ html[data-theme='dark'] .trash-no-notes {
 
 html[data-theme='dark'] .trash-search-notice {
     background-color: var(--dm-content-bg) !important;
-    border-color: #2c5282 !important;
-    color: #9cc6ef !important;
+    border-color: var(--dm-accent-soft) !important;
+    color: var(--dm-accent-hover) !important;
 }
 
 [data-theme='dark'] .trash-search-results {
-    background-color: #1e3a52;
-    color: #9cc6ef;
+    background-color: var(--dm-accent-soft);
+    color: var(--dm-accent-hover);
 }
 
 html[data-theme='dark'] .lastupdated {
@@ -710,8 +710,8 @@ html[data-theme='dark'] .trash-restore-btn:hover {
 }
 
 html[data-theme='dark'] .trash-restore-btn:hover .lucide {
-    color: #4ade80;
-    background-color: #4ade80;
+    color: var(--dm-success);
+    background-color: var(--dm-success);
 }
 
 html[data-theme='dark'] .trash-delete-btn:hover {
@@ -720,8 +720,8 @@ html[data-theme='dark'] .trash-delete-btn:hover {
 }
 
 html[data-theme='dark'] .trash-delete-btn:hover .lucide {
-    color: #f87171;
-    background-color: #f87171;
+    color: var(--dm-danger);
+    background-color: var(--dm-danger);
 }
 
 /* The card's inner surface is --dm-content-bg (see dark-mode/pages.css .trash-innernote) */

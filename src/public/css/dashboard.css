@@ -1271,11 +1271,11 @@ body.dashboard-page .notifications-empty i {
 }
 
 :root[data-theme='dark'] #dashboardToggleFavorites.active .lucide-star {
-    color: #ffc107;
+    color: var(--dm-warning);
 }
 
 :root[data-theme='dark'] .dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star {
-    color: #ffc107;
+    color: var(--dm-warning);
 }
 
 :root[data-theme='dark'] .bc-current {
@@ -1334,7 +1334,7 @@ body.dashboard-page .notifications-empty i {
 /* Restated after the muted rule above, which is specific enough to win otherwise. */
 :root[data-theme='dark'] .dash-card-pin:hover i,
 :root[data-theme='dark'] .dash-card.is-pinned .dash-card-pin i {
-    background-color: #4aa8d8;
+    background-color: var(--dm-accent);
 }
 
 :root[data-theme='dark'] .board-card-excerpt,
@@ -1609,12 +1609,12 @@ body.dashboard-page .notifications-empty i {
 
 .dashboard-scope-tag.is-active {
     background: var(--pz-accent-soft);
-    border-color: #7dd3fc;
+    border-color: var(--pz-accent);
 }
 
 /* Only some of the tag's workspaces are checked */
 .dashboard-scope-tag.is-partial {
-    border-color: #7dd3fc;
+    border-color: var(--pz-accent);
 }
 
 .dashboard-scope-tag .lucide {
@@ -1867,11 +1867,11 @@ body.dashboard-page .notifications-empty i {
 
 :root[data-theme='dark'] .dashboard-scope-tag.is-active {
     background: var(--dm-active);
-    border-color: #4da3d0;
+    border-color: var(--dm-accent);
 }
 
 :root[data-theme='dark'] .dashboard-scope-tag.is-partial {
-    border-color: #4da3d0;
+    border-color: var(--dm-accent);
 }
 
 :root[data-theme='dark'] .dashboard-scope-row-all {

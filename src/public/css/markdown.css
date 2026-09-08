@@ -499,7 +499,7 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
 }
 
 .markdown-preview a {
-    color: #007bff;
+    color: var(--pz-accent);
     text-decoration: none;
 }
 

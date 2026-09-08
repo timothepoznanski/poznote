@@ -62,8 +62,8 @@
 }
 
 .excalidraw-toolbar .btn-save:hover {
-    background: #218838;
-    border-color: #218838;
+    background: var(--pz-success-hover);
+    border-color: var(--pz-success-hover);
 }
 
 .excalidraw-editor {
@@ -160,7 +160,7 @@ div[onclick*="openExcalidrawNote"] {
     padding: 4px 10px;
     font-size: 12px;
     font-weight: 600;
-    background: #6366f1;
+    background: var(--pz-accent);
     color: var(--pz-text-inverse);
     border-radius: 4px;
     margin-bottom: 8px;
@@ -661,12 +661,12 @@ html body.excalidraw-editor-page.excalidraw-shell-light .poznote-toolbar-title {
 }
 
 .excalidraw-save-btn {
-    background: #238636;
-    border: 1px solid #238636;
+    background: var(--pz-success-hover);
+    border: 1px solid var(--pz-success-hover);
 }
 
 .excalidraw-save-btn:hover {
-    background: #2ea043;
+    background: var(--pz-success);
 }
 
 .excalidraw-save-btn:disabled {
@@ -690,12 +690,12 @@ html body.excalidraw-editor-page.excalidraw-shell-light .poznote-toolbar-title {
 }
 
 .excalidraw-btn-red {
-    background: #dc2626;
-    border: 1px solid #dc2626;
+    background: var(--pz-danger);
+    border: 1px solid var(--pz-danger);
 }
 
 .excalidraw-btn-red:hover {
-    background: #ef4444;
+    background: var(--pz-danger);
 }
 
 /* Excalidraw app container */
@@ -738,11 +738,11 @@ html body.excalidraw-editor-page.excalidraw-shell-light .excalidraw-loading {
 }
 
 .excalidraw-save-btn:hover {
-    background: #2d7b3e !important;
+    background: var(--pz-success-hover) !important;
 }
 
 #cancelBtn:hover {
-    background: #b91c1c !important;
+    background: var(--pz-danger-hover) !important;
 }
 
 #saveAndExitBtn:hover {

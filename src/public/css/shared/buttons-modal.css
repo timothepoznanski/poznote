@@ -9,7 +9,7 @@
    badge next to the share name, still opens the revoke modal. */
 .btn-share-disabled {
     background: rgba(245, 158, 11, 0.15);
-    color: #f59e0b;
+    color: var(--pz-warning-hover);
     border: none;
 }
 
@@ -271,7 +271,7 @@ body.shared-page .shared-edit-token-modal .share-user-list-message {
 }
 
 body.shared-page .shared-edit-token-modal .share-user-list-message.is-error {
-    color: #c43b3b;
+    color: var(--pz-danger-hover);
 }
 
 body.shared-page .shared-edit-token-modal .share-user-list-row {

@@ -21,7 +21,7 @@
 }
 
 .folder-icon-modal-content h3 i {
-    color: #6366f1;
+    color: var(--pz-accent);
 }
 
 /* Reduce space above the search bar */
@@ -47,7 +47,7 @@
 }
 
 .folder-icon-search-wrapper input:focus {
-    border-color: #6366f1;
+    border-color: var(--pz-accent);
 }
 
 /* Recently used icons row */
@@ -99,13 +99,13 @@
 
 .folder-icon-item:hover {
     background: var(--pz-surface-hover);
-    border-color: #6366f1;
+    border-color: var(--pz-accent);
     transform: scale(1.05);
 }
 
 .folder-icon-item.selected {
     background: #eef2ff;
-    border-color: #6366f1;
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
 }
 
@@ -136,7 +136,7 @@
 
 .folder-icon-modal-content .modal-buttons .btn-cancel {
     margin-left: auto;
-    background: #dc2626;
+    background: var(--pz-danger);
     color: var(--pz-text-inverse);
     border: none;
     padding: 10px 20px;
@@ -147,7 +147,7 @@
 }
 
 .folder-icon-modal-content .modal-buttons .btn-cancel:hover {
-    background: #b91c1c;
+    background: var(--pz-danger-hover);
 }
 
 /* Scrollbar styling for icon grid */
@@ -224,12 +224,12 @@
 }
 
 .folder-color-option:hover .folder-color-swatch {
-    border-color: #6366f1;
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 .folder-color-option.selected .folder-color-swatch {
-    border-color: #6366f1;
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }
 

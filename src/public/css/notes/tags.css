@@ -201,7 +201,7 @@
 }
 
 .tag-delete-button:hover {
-    color: #ef4444;
+    color: var(--pz-danger);
 }
 
 /* Tag Highlight state */
@@ -221,7 +221,7 @@
 .clickable-tag-wrapper.tag-highlight .tag-delete-button {
     background: rgba(0, 0, 0, 0.06);
     border-radius: 4px;
-    color: #7a3b00;
+    color: var(--pz-warning-strong);
 }
 
 /* Tag Input */
@@ -296,7 +296,7 @@
 
 .tags-modal-item-name:focus {
     background: rgba(59, 130, 246, 0.1);
-    box-shadow: 0 0 0 1px #3b82f6;
+    box-shadow: 0 0 0 1px var(--pz-accent);
 }
 
 .tags-modal-item-delete {
@@ -307,7 +307,7 @@
 }
 
 .tags-modal-item-delete:hover {
-    color: #ef4444;
+    color: var(--pz-danger);
 }
 
 .tags-modal-input-wrapper {
@@ -326,7 +326,7 @@
 }
 
 #tagsModalInput:focus {
-    border-color: #3b82f6;
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
 

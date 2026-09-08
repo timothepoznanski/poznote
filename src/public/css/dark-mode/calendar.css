@@ -120,10 +120,10 @@
 }
 
 :root[data-theme='dark'] .calendar-notes-modal .btn-close-red {
-    background: #ef4444;
+    background: var(--dm-danger-hover);
     color: var(--pz-text-inverse);
 }
 
 :root[data-theme='dark'] .calendar-notes-modal .btn-close-red:hover {
-    background: #dc2626;
+    background: var(--dm-danger-hover);
 }

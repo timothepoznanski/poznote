@@ -40,7 +40,7 @@
     padding: 20px;
     color: var(--pz-danger);
     background: var(--pz-danger-soft);
-    border: 1px solid #f5c6cb;
+    border: 1px solid var(--pz-danger-soft);
     border-radius: 4px;
     margin: 10px;
 }
@@ -168,7 +168,7 @@
 }
 
 .btn-download:hover {
-    background: #218838;
+    background: var(--pz-success-hover);
     transform: translateY(-1px);
 }
 
@@ -178,7 +178,7 @@
 }
 
 .btn-delete:hover {
-    background: #c82333;
+    background: var(--pz-danger-hover);
     transform: translateY(-1px);
 }
 
