@@ -34,6 +34,7 @@ function poznoteCssGroups(): array
         // can still override them on purpose.
         '@components' => [
             'css/components/buttons.css',
+            'css/components/forms.css',
         ],
 
         // The dialog stack, in cascade order.

@@ -3,7 +3,7 @@
 
 .webhooks-page form { margin: 0; }
 .webhooks-page .alert-warning {
-    background: #fff3cd;
+    background: var(--pz-warning-soft);
     border: 1px solid #ffe69c;
     color: #664d03;
 }

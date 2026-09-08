@@ -55,12 +55,12 @@ body.settings-page {
 }
 
 .setting-status.enabled {
-    background: #dcfce7;
+    background: var(--pz-success-soft);
     color: #166534;
 }
 
 .setting-status.disabled {
-    background: #fee2e2;
+    background: var(--pz-danger-soft);
     color: #991b1b;
 }
 

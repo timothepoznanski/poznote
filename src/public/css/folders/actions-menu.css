@@ -234,7 +234,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .folder-actions-menu-item.shared:hover,
 .note-actions-menu-item.danger:hover,
 .note-actions-menu-item.shared:hover {
-    background-color: #fee2e2;
+    background-color: var(--pz-danger-soft);
 }
 
 .folder-actions-menu-item.danger i,

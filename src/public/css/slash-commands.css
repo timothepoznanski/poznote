@@ -315,7 +315,7 @@
 
 .slash-date-picker-remove-btn:hover {
     border-color: #d32f2f;
-    background: #fbe4e4;
+    background: var(--pz-danger-soft);
 }
 
 .slash-date-picker-remove-time-btn {

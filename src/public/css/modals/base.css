@@ -276,7 +276,7 @@ html[data-theme='dark'] .modal .modal-info-note {
 
 .modal-error-message {
     display: none;
-    background-color: #f8d7da;
+    background-color: var(--pz-danger-soft);
     color: #721c24;
     padding: 10px;
     border-radius: 4px;
@@ -628,7 +628,7 @@ html[data-theme='dark'] .modal .modal-info-note {
 }
 
 .move-task-item.selected {
-    background: #e0f2fe;
+    background: var(--pz-accent-soft);
 }
 
 .move-task-item small {

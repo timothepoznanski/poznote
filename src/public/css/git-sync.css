@@ -54,7 +54,7 @@ body.git-sync-page {
 }
 
 .alert-warning {
-    background: #fff3cd;
+    background: var(--pz-warning-soft);
     color: #856404;
     border: 1px solid #ffeeba;
 }
@@ -152,7 +152,7 @@ body.git-sync-page {
 
 /* Same box, error palette: a required field that is not filled in yet */
 .config-hint-error {
-    background: #f8d7da;
+    background: var(--pz-danger-soft);
     color: #721c24;
 }
 
@@ -166,7 +166,7 @@ body.git-sync-page {
 }
 
 .badge-success {
-    background: #d4edda;
+    background: var(--pz-success-soft);
     color: #155724;
 }
 

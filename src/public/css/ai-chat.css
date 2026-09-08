@@ -427,7 +427,7 @@ a.ai-chat-header-btn {
     gap: 6px;
     font-size: 12px;
     color: #8a6d1a;
-    background: #fdf6e3;
+    background: var(--pz-warning-soft);
     border: 1px solid #f0e0b0;
     border-radius: 8px;
     padding: 6px 10px;

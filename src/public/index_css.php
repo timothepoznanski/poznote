@@ -19,6 +19,10 @@ $groups = [
         'css/lucide.css',
         'css/variables.css',
         'css/base.css',
+        // Shared component bases. index.php is not in the css_assets manifest, so
+        // its bundle has to list them itself. Buttons are not here: index.php has
+        // no .btn element, only -btn suffixed classes of its own.
+        'css/components/forms.css',
         'css/utilities.css',
         'css/layout.css',
         'css/icon-sidebar.css',

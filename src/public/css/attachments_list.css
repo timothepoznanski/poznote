@@ -201,7 +201,7 @@ body.attachments-page {
 .error-message {
     text-align: center;
     padding: 20px;
-    background-color: #f8d7da;
+    background-color: var(--pz-danger-soft);
     color: #721c24;
     border-radius: 6px;
     border: 1px solid #f5c6cb;

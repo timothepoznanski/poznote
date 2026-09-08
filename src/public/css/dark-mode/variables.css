@@ -40,6 +40,12 @@
     --pz-accent-soft: #e3f2fd;     /* active item background */
     --pz-success: #28a745;         /* success alerts, enabled states */
     --pz-warning: #ffc107;         /* warning alerts, badges */
+    /* The pale wash behind a status: an alert body, a badge, a flagged row.
+       Each family mixed a Bootstrap-era pastel with a Tailwind-era one, in
+       components that never appear side by side, so they are one intention. */
+    --pz-danger-soft: #f8d7da;
+    --pz-success-soft: #d4edda;
+    --pz-warning-soft: #fff3cd;
     /* White was written as #fff in 268 places, for two opposite jobs: the sheet
        a page is drawn on, and the label sitting on top of a filled control.
        They need separate names, because a theme that darkens the first must not

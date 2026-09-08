@@ -151,7 +151,7 @@ body.favorites-page {
 }
 
 .btn-unfavorite:hover {
-    background-color: #fee2e2;
+    background-color: var(--pz-danger-soft);
     border-color: #fca5a5;
     transform: translateY(-1px);
 }

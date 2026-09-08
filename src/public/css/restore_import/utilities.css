@@ -19,25 +19,25 @@
 }
 
 .alert-success {
-    background-color: #d4edda;
+    background-color: var(--pz-success-soft);
     border-color: var(--pz-success);
     color: #155724;
 }
 
 .alert-danger {
-    background-color: #f8d7da;
+    background-color: var(--pz-danger-soft);
     border-color: var(--pz-danger);
     color: #721c24;
 }
 
 .alert-info {
-    background-color: #d1ecf1;
+    background-color: var(--pz-accent-soft);
     border-color: #17a2b8;
     color: #0c5460;
 }
 
 .alert-warning {
-    background-color: #fff3cd;
+    background-color: var(--pz-warning-soft);
     border-color: var(--pz-warning);
     color: #856404;
 }

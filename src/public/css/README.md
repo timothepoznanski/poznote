@@ -89,7 +89,32 @@ the base does not set (a margin, a hover transform), never redefine the ones it
 owns.** If a page really needs a different button, that is a new class, not a
 second `.btn`.
 
+`components/forms.css` is the baseline for text inputs, textareas and selects.
+Without it they kept the browser's own white and pure black, which no token can
+reach: a palette could darken a page and leave its fields glowing. Checkboxes,
+radios, colour pickers and ranges are deliberately absent, the browser paints
+them and a background there breaks their native rendering.
+
 `tools/css-check.php` does not enforce this yet, so it is on review.
+
+## Writing a palette
+
+Everything a theme has to repaint is a token on `:root`, so a custom stylesheet
+(Settings > Custom CSS, injected last on every page) can be nothing but a list
+of overrides. Measured on eight pages: overriding the 24 tokens below leaves 0
+surfaces carrying an app colour.
+
+    --pz-bg --pz-surface --pz-surface-hover --pz-surface-sunken
+    --pz-text --pz-text-secondary --pz-text-muted --pz-text-subtle --pz-text-inverse
+    --pz-border-light --pz-border --pz-border-strong
+    --pz-accent --pz-accent-hover --pz-accent-rgb --pz-accent-strong --pz-accent-soft
+    --pz-link --pz-danger --pz-success --pz-warning
+    --pz-danger-soft --pz-success-soft --pz-warning-soft
+
+Two things are still out of reach and need rules of your own: the dark theme's
+own `--dm-*` values behave differently (see above), and about two dozen very
+pale washes sit between the neutral scale and the status scale and are still
+literal.
 
 ## Variables
 

@@ -411,7 +411,7 @@ a.workspace-name-link:focus-visible {
 }
 
 .workspace-share-badge.is-enabled {
-    background: #dff7e7;
+    background: var(--pz-success-soft);
     color: #166534;
 }
 

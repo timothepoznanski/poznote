@@ -440,7 +440,7 @@
 }
 
 #notificationsModal .notification-item.unread:hover {
-    background: #dbeafe;
+    background: var(--pz-accent-soft);
 }
 
 #notificationsModal .notification-content {

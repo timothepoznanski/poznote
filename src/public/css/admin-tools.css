@@ -260,11 +260,11 @@ html[data-theme='dark'] .btn-view-files:hover {
     display: inline-block;
 }
 .status-clean { 
-    background: #dcfce7; 
+    background: var(--pz-success-soft); 
     color: #166534; 
 }
 .status-warning { 
-    background: #fef9c3; 
+    background: var(--pz-warning-soft); 
     color: #854d0e; 
 }
 

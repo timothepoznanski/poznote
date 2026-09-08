@@ -1608,7 +1608,7 @@ body.dashboard-page .notifications-empty i {
 }
 
 .dashboard-scope-tag.is-active {
-    background: #e0f2fe;
+    background: var(--pz-accent-soft);
     border-color: #7dd3fc;
 }
 

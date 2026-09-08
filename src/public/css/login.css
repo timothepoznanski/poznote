@@ -365,7 +365,7 @@ input[type="password"]::placeholder {
 }
 
 .admin-warning code {
-    background: #fed7d7;
+    background: var(--pz-danger-soft);
     color: #c53030;
     padding: 0.125rem 0.25rem;
     border-radius: 4px;
