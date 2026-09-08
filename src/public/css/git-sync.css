@@ -2,7 +2,7 @@
 
 /* Remove gray background for git sync page */
 body.git-sync-page {
-    background: #fff;
+    background: var(--pz-bg);
 }
 
 .git-sync-container {
@@ -18,7 +18,7 @@ body.git-sync-page {
 
 .git-sync-header h1 {
     font-size: 1.8rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     margin-bottom: 10px;
     display: flex;
     align-items: center;
@@ -31,7 +31,7 @@ body.git-sync-page {
 }
 
 .git-sync-description {
-    color: #666;
+    color: var(--pz-text-muted);
     font-size: 0.95rem;
     max-width: 600px;
     margin: 0 auto;
@@ -46,7 +46,7 @@ body.git-sync-page {
 /* Alerts */
 .alert {
     padding: 12px 16px;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     margin: 20px 0;
     display: flex;
     align-items: center;
@@ -54,31 +54,31 @@ body.git-sync-page {
 }
 
 .alert-warning {
-    background: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeeba;
+    background: var(--pz-warning-soft);
+    color: var(--pz-warning-strong);
+    border: 1px solid var(--pz-warning-soft);
 }
 
 .git-sync-footer-note {
     margin: 20px auto 0px auto;
     padding: 0px 0px 15px;
     text-align: center;
-    color: #71717a;
+    color: var(--pz-text-muted);
     font-size: 0.9rem;
     line-height: 1.6;
     max-width: 700px;
 }
 
 .git-sync-footer-note strong {
-    color: #ef4444;
-    font-weight: 600;
+    color: var(--pz-danger);
+    font-weight: var(--pz-weight-semibold);
 }
 
 /* Sections */
 .git-sync-section {
-    background: #fff;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
+    background: var(--pz-bg);
+    border-radius: var(--pz-radius-xl);
+    border: 1px solid var(--pz-border);
     padding: 24px;
     margin: 20px 0;
 }
@@ -89,7 +89,7 @@ body.git-sync-page {
 
 .git-sync-section h2 {
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     margin: 0 0 20px;
     display: flex;
     align-items: center;
@@ -98,7 +98,7 @@ body.git-sync-page {
 }
 
 .git-sync-section h2 i {
-    color: #6366f1;
+    color: var(--pz-accent);
     width: 24px;
 }
 
@@ -113,7 +113,7 @@ body.git-sync-page {
     justify-content: space-between;
     align-items: center;
     padding: 10px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--pz-border-light);
 }
 
 .config-item:last-child {
@@ -121,8 +121,8 @@ body.git-sync-page {
 }
 
 .config-label {
-    font-weight: 500;
-    color: #555;
+    font-weight: var(--pz-weight-medium);
+    color: var(--pz-text-secondary);
 }
 
 .config-value {
@@ -133,8 +133,8 @@ body.git-sync-page {
     margin-top: 16px;
     padding: 12px;
     background: #f0f7ff;
-    border-radius: 8px;
-    color: #1a56db;
+    border-radius: var(--pz-radius-lg);
+    color: var(--pz-accent-hover);
     font-size: 0.9rem;
     display: flex;
     align-items: flex-start;
@@ -152,27 +152,27 @@ body.git-sync-page {
 
 /* Same box, error palette: a required field that is not filled in yet */
 .config-hint-error {
-    background: #f8d7da;
-    color: #721c24;
+    background: var(--pz-danger-soft);
+    color: var(--pz-danger-strong);
 }
 
 /* Badges */
 .badge {
     display: inline-block;
     padding: 4px 10px;
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
     font-size: 0.8rem;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
 }
 
 .badge-success {
-    background: #d4edda;
-    color: #155724;
+    background: var(--pz-success-soft);
+    color: var(--pz-success-strong);
 }
 
 .badge-disabled {
-    background: #e9ecef;
-    color: #6c757d;
+    background: var(--pz-surface-sunken);
+    color: var(--pz-text-muted);
 }
 
 /* Debug */
@@ -191,13 +191,13 @@ body.git-sync-page {
 
 .debug-controls .btn[aria-pressed="true"] {
     background: var(--pz-accent);
-    color: #fff;
+    color: var(--pz-text-inverse);
 }
 
 .debug-info {
     background: var(--pz-surface);
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm);
     padding: 15px;
     margin: 20px 0;
     max-height: 300px;
@@ -207,7 +207,7 @@ body.git-sync-page {
 .debug-info h4 {
     margin: 0 0 10px 0;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .debug-info pre {
@@ -228,219 +228,181 @@ body.git-sync-page {
 .form-group label {
     display: block;
     font-size: 0.85rem;
-    font-weight: 500;
+    font-weight: var(--pz-weight-semibold);
     margin-bottom: 6px;
-    color: #555;
+    color: var(--pz-text-secondary);
 }
 
 .form-group select {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
     font-size: 0.95rem;
-    background: #fff;
+    background: var(--pz-bg);
 }
 
 .form-group select:focus {
     outline: none;
-    border-color: #6366f1;
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-}
-
-/* Buttons */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    font-weight: 400;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-primary {
-    background-color: var(--pz-accent);
-    color: #fff;
-}
-
-.btn-primary:hover {
-    background-color: var(--pz-accent-hover);
+}.btn-primary:hover {
     transform: translateY(-1px);
 }
 
-.btn-secondary {
-    background: #6c757d;
-    color: white;
-}
-
-.btn-secondary:hover {
-    background: #dee2e6;
-}
-
 /* Dark Mode */
-body.dark-mode .git-sync-section {
+html[data-theme='dark'] .git-sync-section {
     background: var(--dm-bg);
     border: 1px solid var(--dm-border);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.3);
 }
 
-body.dark-mode .git-sync-section h2 {
-    color: #e0e0e0;
+html[data-theme='dark'] .git-sync-section h2 {
+    color: var(--dm-text-bright);
 }
 
-body.dark-mode .git-sync-description {
-    color: #aaa;
+html[data-theme='dark'] .git-sync-description {
+    color: var(--dm-text-muted);
 }
-body.dark-mode .config-item {
+html[data-theme='dark'] .config-item {
     border-color: var(--dm-border);
 }
 
-body.dark-mode .config-label {
-    color: #bbb;
+html[data-theme='dark'] .config-label {
+    color: var(--dm-text);
 }
 
-body.dark-mode .config-value {
-    color: #e0e0e0;
+html[data-theme='dark'] .config-value {
+    color: var(--dm-text-bright);
 }
 
-body.dark-mode .config-hint {
+html[data-theme='dark'] .config-hint {
     background: rgba(99, 102, 241, 0.1);
-    color: #a5b4fc;
+    color: var(--dm-accent-hover);
 }
 
 /* After the rule above, which it has to override */
-html[data-theme='dark'] .config-hint-error,
-body.dark-mode .config-hint-error {
+html[data-theme='dark'] .config-hint-error {
     background: rgba(220, 53, 69, 0.2);
-    color: #e57373;
+    color: var(--dm-danger);
 }
 
-body.dark-mode .git-field-label {
-    color: #9ca3af;
+html[data-theme='dark'] .git-field-label {
+    color: var(--dm-text-muted);
 }
 
-body.dark-mode .git-field-input {
+html[data-theme='dark'] .git-field-input {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-body.dark-mode .git-field-input:focus {
+html[data-theme='dark'] .git-field-input:focus {
     background: var(--dm-surface-hover);
     border-color: var(--pz-accent);
     box-shadow: none;
 }
 
-body.dark-mode .git-field-input[readonly]:focus {
+html[data-theme='dark'] .git-field-input[readonly]:focus {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     box-shadow: none;
 }
 
-body.dark-mode .git-field-input::placeholder {
-    color: #6b7280;
+html[data-theme='dark'] .git-field-input::placeholder {
+    color: var(--dm-text-subtle);
 }
 
-body.dark-mode select.git-field-input {
+html[data-theme='dark'] select.git-field-input {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
     background-size: 16px 16px;
 }
 
-body.dark-mode .form-group label {
-    color: #bbb;
+html[data-theme='dark'] .form-group label {
+    color: var(--dm-text);
 }
 
-body.dark-mode .form-group select {
+html[data-theme='dark'] .form-group select {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-body.dark-mode .form-group select:focus {
-    border-color: #6366f1;
+html[data-theme='dark'] .form-group select:focus {
+    border-color: var(--dm-accent);
 }
 
-body.dark-mode .btn-secondary {
-    background: #333;
-    color: #e0e0e0;
+html[data-theme='dark'] .btn-secondary {
+    background: var(--dm-surface);
+    color: var(--dm-text-bright);
 }
 
-body.dark-mode .btn-secondary:hover {
+html[data-theme='dark'] .btn-secondary:hover {
     background: var(--dm-border);
 }
 
-html[data-theme='dark'] .debug-controls .btn[aria-pressed="true"],
-body.dark-mode .debug-controls .btn[aria-pressed="true"] {
+html[data-theme='dark'] .debug-controls .btn[aria-pressed="true"] {
     background: var(--pz-accent);
-    color: #fff;
+    color: var(--pz-text-inverse);
 }
 
-html[data-theme='dark'] .debug-info,
-body.dark-mode .debug-info {
+html[data-theme='dark'] .debug-info {
     background: var(--dm-surface, var(--dm-content-bg));
     border-color: var(--dm-border, var(--dm-surface-hover));
-    color: var(--dm-text, #e0e0e0);
+    color: var(--dm-text, var(--dm-text-bright));
 }
 
 html.theme-black[data-theme='dark'] .debug-info {
-    background: #141821;
-    border-color: #2a3140;
-    color: #d8dee8;
+    background: var(--dm-content-bg);
+    border-color: var(--dm-border);
+    color: var(--dm-text-bright);
 }
 
-html[data-theme='dark'] .debug-info h4,
-body.dark-mode .debug-info h4 {
-    color: var(--dm-text, #e0e0e0);
+html[data-theme='dark'] .debug-info h4 {
+    color: var(--dm-text, var(--dm-text-bright));
 }
 
-html[data-theme='dark'] .debug-info pre,
-body.dark-mode .debug-info pre {
+html[data-theme='dark'] .debug-info pre {
     color: inherit;
 }
 
-body.dark-mode .alert-success {
+html[data-theme='dark'] .alert-success {
     background: rgba(40, 167, 69, 0.2);
-    color: #5cb85c;
+    color: var(--dm-success-hover);
     border-color: rgba(40, 167, 69, 0.3);
 }
 
-body.dark-mode .alert-error {
+html[data-theme='dark'] .alert-error {
     background: rgba(220, 53, 69, 0.2);
-    color: #e57373;
+    color: var(--dm-danger);
     border-color: rgba(220, 53, 69, 0.3);
 }
 
-body.dark-mode .alert-warning {
+html[data-theme='dark'] .alert-warning {
     background: rgba(255, 193, 7, 0.2);
-    color: #ffca28;
+    color: var(--dm-warning);
     border-color: rgba(255, 193, 7, 0.3);
 }
 
-body.dark-mode .git-sync-footer-note,
 html[data-theme='dark'] .git-sync-footer-note {
-    border-top-color: #333;
-    color: #999;
+    border-top-color: var(--dm-surface);
+    color: var(--dm-text-muted);
 }
 
-body.dark-mode .git-sync-footer-note strong,
 html[data-theme='dark'] .git-sync-footer-note strong {
-    color: #f1716d;
+    color: var(--dm-danger);
 }
 
-body.dark-mode .badge-success {
+html[data-theme='dark'] .badge-success {
     background: rgba(40, 167, 69, 0.2);
-    color: #5cb85c;
+    color: var(--dm-success-hover);
 }
 
-body.dark-mode .badge-disabled {
-    background: #333;
-    color: #888;
+html[data-theme='dark'] .badge-disabled {
+    background: var(--dm-surface);
+    color: var(--dm-text-subtle);
 }
 
 /* Responsive */
@@ -464,22 +426,22 @@ body.dark-mode .badge-disabled {
 .auto-sync-settings {
     margin-top: 24px;
     padding-top: 24px;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--pz-border);
 }
 
-body.dark-mode .auto-sync-settings {
-    border-top-color: #333;
+html[data-theme='dark'] .auto-sync-settings {
+    border-top-color: var(--dm-surface);
 }
 
 .auto-sync-settings h4 {
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     margin: 0 0 16px;
     color: var(--pz-text);
 }
 
-body.dark-mode .auto-sync-settings h4 {
-    color: #e0e0e0;
+html[data-theme='dark'] .auto-sync-settings h4 {
+    color: var(--dm-text-bright);
 }
 
 .auto-sync-form {
@@ -493,12 +455,12 @@ body.dark-mode .auto-sync-settings h4 {
     align-items: flex-start;
     gap: 16px;
     padding: 12px;
-    border-radius: 8px;
-    background: #f9fafb;
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-surface);
     transition: background 0.2s;
 }
 
-body.dark-mode .form-check {
+html[data-theme='dark'] .form-check {
     background: var(--dm-surface);
 }
 
@@ -509,23 +471,23 @@ body.dark-mode .form-check {
 }
 
 .label-title {
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     font-size: 0.95rem;
     color: var(--pz-text);
 }
 
-body.dark-mode .label-title {
-    color: #e0e0e0;
+html[data-theme='dark'] .label-title {
+    color: var(--dm-text-bright);
 }
 
 .label-desc {
     font-size: 0.85rem;
-    color: #666;
+    color: var(--pz-text-muted);
     line-height: 1.4;
 }
 
-body.dark-mode .label-desc {
-    color: #999;
+html[data-theme='dark'] .label-desc {
+    color: var(--dm-text-muted);
 }
 
 /* Synced workspaces */
@@ -543,15 +505,15 @@ body.dark-mode .label-desc {
     flex-wrap: wrap;
     gap: 8px 20px;
     padding: 12px;
-    border-radius: 8px;
-    background: #f9fafb;
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-surface);
 }
 
 .workspace-checkbox-list[hidden] {
     display: none;
 }
 
-body.dark-mode .workspace-checkbox-list {
+html[data-theme='dark'] .workspace-checkbox-list {
     background: var(--dm-surface);
 }
 
@@ -564,8 +526,8 @@ body.dark-mode .workspace-checkbox-list {
     cursor: pointer;
 }
 
-body.dark-mode .workspace-checkbox-item {
-    color: #e0e0e0;
+html[data-theme='dark'] .workspace-checkbox-item {
+    color: var(--dm-text-bright);
 }
 
 /* Switch Component */
@@ -590,7 +552,7 @@ body.dark-mode .workspace-checkbox-item {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color: var(--pz-disabled);
     transition: .4s;
 }
 
@@ -601,16 +563,16 @@ body.dark-mode .workspace-checkbox-item {
     width: 18px;
     left: 3px;
     bottom: 3px;
-    background-color: white;
+    background-color: var(--pz-bg);
     transition: .4s;
 }
 
 input:checked+.slider {
-    background-color: #6366f1;
+    background-color: var(--pz-accent);
 }
 
 input:focus+.slider {
-    box-shadow: 0 0 1px #6366f1;
+    box-shadow: 0 0 1px var(--pz-accent);
 }
 
 input:checked+.slider:before {
@@ -618,11 +580,11 @@ input:checked+.slider:before {
 }
 
 .slider.round {
-    border-radius: 24px;
+    border-radius: var(--pz-radius-2xl);
 }
 
 .slider.round:before {
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
 }
 
 /* Git Config Form */
@@ -642,8 +604,8 @@ input:checked+.slider:before {
 
 .git-field-label {
     font-size: 0.82rem;
-    font-weight: 600;
-    color: #4b5563;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.03em;
 }
@@ -651,10 +613,10 @@ input:checked+.slider:before {
 .git-field-input {
     padding: 10px 14px;
     border: 1px solid var(--pz-border-strong);
-    border-radius: 10px;
+    border-radius: var(--pz-radius-lg);
     font-size: 0.92rem;
-    background: #f9fafb;
-    color: #1f2937;
+    background: var(--pz-surface);
+    color: var(--pz-text);
     transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     width: 100%;
     box-sizing: border-box;
@@ -663,13 +625,13 @@ input:checked+.slider:before {
 .git-field-input:focus {
     outline: none;
     border-color: var(--pz-accent);
-    background: #fff;
+    background: var(--pz-bg);
     box-shadow: none;
 }
 
 .git-field-input[readonly]:focus {
     border-color: var(--pz-border-strong);
-    background: #f9fafb;
+    background: var(--pz-surface);
     box-shadow: none;
 }
 

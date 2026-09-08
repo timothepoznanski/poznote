@@ -108,7 +108,7 @@ try {
         
         if (!isset($_SESSION[$sessionKey]) || $_SESSION[$sessionKey] !== true) {
             $stylesheetHref = getVersionedPublicAppAssetHref('css/public_folder.css');
-            $variablesStylesheetHref = getVersionedPublicAppAssetHref('css/dark-mode/variables.css');
+            $variablesStylesheetHref = getVersionedPublicAppAssetHref('css/tokens.css');
             $themeInitHref = getVersionedPublicAppAssetHref('js/theme-init.js');
             ?>
             <!doctype html>
@@ -327,18 +327,7 @@ $noteBaseUrl = $protocol . '://' . $host;
     <?php endif; ?>
     <title><?php echo htmlspecialchars($folder['name']); ?></title>
     <script src="<?php echo htmlspecialchars(getVersionedPublicAppAssetHref('js/public-note-theme-init.js'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"></script>
-    <link rel="stylesheet" href="<?php echo htmlspecialchars(getVersionedPublicAppAssetHref('css/lucide.css'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
-    <link rel="stylesheet" href="<?php echo htmlspecialchars(getVersionedPublicAppAssetHref('css/dark-mode/variables.css'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('/css/dark-mode/layout.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('/css/dark-mode/menus.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('/css/dark-mode/editor.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('/css/dark-mode/modals.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('/css/dark-mode/components.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('/css/dark-mode/pages.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('/css/dark-mode/markdown.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('/css/dark-mode/kanban.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('/css/dark-mode/icons.css'); ?>">
-    <link rel="stylesheet" href="<?php echo htmlspecialchars(getVersionedPublicAppAssetHref('css/public_folder.css'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
+    <?php poznoteRenderStylesheets('public_folder', ['asset' => 'public']); ?>
 </head>
 <body class="public-folder-body" 
       data-share-token="<?php echo htmlspecialchars($token, ENT_QUOTES, 'UTF-8'); ?>"

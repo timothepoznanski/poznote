@@ -27,33 +27,6 @@ html.tags-page {
     overflow: auto;
 }
 
-/* Button styles matching trash.css */
-.btn {
-    display: inline-block;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: 400;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 6px;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
-}
-
-.btn-secondary {
-    background: #6c757d;
-    color: white;
-}
-
-.btn-secondary:hover {
-    background: #5a6268;
-    color: white;
-    text-decoration: none;
-}
-
 .tags-info {
     text-align: center;
     margin: 20px;
@@ -71,7 +44,7 @@ html.tags-page {
 .search-results {
     text-align: center;
     margin-top: 10px;
-    color: #666;
+    color: var(--pz-text-muted);
     font-size: 0.95em;
 }
 
@@ -83,14 +56,14 @@ html.tags-page {
 }
 
 .tag-item {
-    background: white;
+    background: var(--pz-bg);
     border: 2px solid var(--pz-border);
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
     padding: 15px;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(var(--pz-shadow-rgb), 0.1);
 }
 
 /* Classe pour masquer les tags lors du filtrage */
@@ -101,11 +74,11 @@ html.tags-page {
 .tag-item:hover {
     border-color: var(--pz-accent);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 8px rgba(var(--pz-shadow-rgb), 0.15);
 }
 
 .tag-name {
-    font-weight: normal;
+    font-weight: var(--pz-weight-normal);
     font-size: 1.1em;
     color: var(--pz-text);
     margin-bottom: 0;
@@ -114,7 +87,7 @@ html.tags-page {
 .tag-note-count {
     margin-left: 5px;
     font-size: 0.85em;
-    color: #888;
+    color: var(--pz-text-muted);
 }
 
 /* Colored dot shown on tags that have an assigned color */
@@ -122,7 +95,7 @@ html.tags-page {
     display: inline-block;
     width: 10px;
     height: 10px;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     margin-right: 7px;
     vertical-align: baseline;
     flex: 0 0 auto;
@@ -149,10 +122,10 @@ html.tags-page {
 .tag-color-filter-swatch {
     width: 22px;
     height: 22px;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     border: 2px solid transparent;
     background: var(--filter-color, transparent);
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(var(--pz-shadow-rgb), 0.12);
     cursor: pointer;
     padding: 0;
     transition: transform 0.15s, border-color 0.15s;
@@ -189,7 +162,7 @@ html.tags-page {
 .tag-color-filter-clear {
     background: none;
     border: none;
-    color: #64748b;
+    color: var(--pz-text-muted);
     font-size: 0.85rem;
     cursor: pointer;
     padding: 2px 6px;
@@ -197,22 +170,15 @@ html.tags-page {
 }
 
 .tag-color-filter-clear:hover {
-    color: #1e293b;
+    color: var(--pz-text);
 }
 
-html[data-theme='dark'] .tag-color-filter-swatch.active,
-body.dark-mode .tag-color-filter-swatch.active {
+html[data-theme='dark'] .tag-color-filter-swatch.active {
     border-color: #e2e8f0;
 }
 
-html[data-theme='dark'] .tag-color-filter-clear,
-body.dark-mode .tag-color-filter-clear {
-    color: #94a3b8;
-}
-
-html[data-theme='dark'] .tag-color-filter-clear:hover,
-body.dark-mode .tag-color-filter-clear:hover {
-    color: #e2e8f0;
+html[data-theme='dark'] .tag-color-filter-clear:hover {
+    color: var(--dm-text-bright);
 }
 
 /* Color picker grid inside the tag color modal */
@@ -227,9 +193,9 @@ body.dark-mode .tag-color-filter-clear:hover {
 .tag-color-swatch {
     width: 34px;
     height: 34px;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     border: 2px solid transparent;
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(var(--pz-shadow-rgb), 0.12);
     cursor: pointer;
     padding: 0;
     transition: transform 0.15s, border-color 0.15s;
@@ -248,7 +214,7 @@ body.dark-mode .tag-color-filter-clear:hover {
 input[type="color"].tag-color-custom {
     appearance: none;
     -webkit-appearance: none;
-    background: conic-gradient(#ef4444, #eab308, #22c55e, #3b82f6, #a855f7, #ef4444);
+    background: conic-gradient(var(--pz-danger), var(--pz-warning-hover), var(--pz-success), var(--pz-accent), #a855f7, var(--pz-danger));
     overflow: hidden;
 }
 
@@ -261,29 +227,28 @@ input[type="color"].tag-color-custom::-webkit-color-swatch {
     opacity: 0;
 }
 
-html[data-theme='dark'] .tag-color-swatch.selected,
-body.dark-mode .tag-color-swatch.selected {
+html[data-theme='dark'] .tag-color-swatch.selected {
     border-color: #ffffff;
 }
 
 .no-tags {
     text-align: center;
-    color: #666;
+    color: var(--pz-text-muted);
     font-size: 1.2em;
     margin-top: 50px;
     padding: 40px;
-    background: #f9f9f9;
-    border-radius: 12px;
+    background: var(--pz-surface);
+    border-radius: var(--pz-radius-xl);
 }
 
 /* Tag context menu */
 .tag-context-menu {
     position: fixed;
     z-index: 9999;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 4px 16px rgba(var(--pz-shadow-rgb), 0.15);
     padding: 4px 0;
     min-width: 150px;
     font-family: 'Inter', sans-serif;
@@ -306,11 +271,11 @@ body.dark-mode .tag-color-swatch.selected {
 }
 
 .tag-context-menu-item:hover {
-    background: #f0f0f0;
+    background: var(--pz-surface-hover);
 }
 
 .tag-context-menu-item.danger {
-    color: #d9534f;
+    color: var(--pz-danger);
 }
 
 .tag-context-menu-item.danger:hover {
@@ -318,39 +283,34 @@ body.dark-mode .tag-color-swatch.selected {
 }
 
 /* Dark mode */
-html[data-theme='dark'] .tag-context-menu,
-body.dark-mode .tag-context-menu {
-    background: #2a2a2a;
-    border-color: #444;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+html[data-theme='dark'] .tag-context-menu {
+    background: var(--dm-content-bg);
+    border-color: var(--dm-border);
+    box-shadow: 0 4px 16px rgba(var(--pz-shadow-rgb), 0.4);
 }
 
-html[data-theme='dark'] .tag-context-menu-item,
-body.dark-mode .tag-context-menu-item {
-    color: #e0e0e0;
+html[data-theme='dark'] .tag-context-menu-item {
+    color: var(--dm-text-bright);
 }
 
-html[data-theme='dark'] .tag-context-menu-item:hover,
-body.dark-mode .tag-context-menu-item:hover {
-    background: #383838;
+html[data-theme='dark'] .tag-context-menu-item:hover {
+    background: var(--dm-tab-active-bg);
 }
 
-html[data-theme='dark'] .tag-context-menu-item.danger,
-body.dark-mode .tag-context-menu-item.danger {
-    color: #e07070;
+html[data-theme='dark'] .tag-context-menu-item.danger {
+    color: var(--dm-danger);
 }
 
-html[data-theme='dark'] .tag-context-menu-item.danger:hover,
-body.dark-mode .tag-context-menu-item.danger:hover {
-    background: #3a2828;
+html[data-theme='dark'] .tag-context-menu-item.danger:hover {
+    background: var(--dm-content-bg);
 }
 
 /* Rename input inside the modal */
 .tag-rename-input {
     width: 100%;
     padding: 8px 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
+    border: 1px solid var(--pz-border-strong);
+    border-radius: var(--pz-radius);
     font-size: 14px;
     font-family: 'Inter', sans-serif;
     box-sizing: border-box;
@@ -362,16 +322,14 @@ body.dark-mode .tag-context-menu-item.danger:hover {
     border-color: var(--pz-accent);
 }
 
-html[data-theme='dark'] .tag-rename-input,
-body.dark-mode .tag-rename-input {
-    background: #333;
-    border-color: #555;
-    color: #e0e0e0;
+html[data-theme='dark'] .tag-rename-input {
+    background: var(--dm-surface);
+    border-color: var(--dm-border-light);
+    color: var(--dm-text-bright);
 }
 
-html[data-theme='dark'] .tag-rename-input:focus,
-body.dark-mode .tag-rename-input:focus {
-    border-color: #5ab4e0;
+html[data-theme='dark'] .tag-rename-input:focus {
+    border-color: var(--dm-accent-hover);
 }
 
 /* Mobile styles */

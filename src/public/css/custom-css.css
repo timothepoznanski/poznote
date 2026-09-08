@@ -3,7 +3,7 @@
 #customCssModal .modal-content {
     max-width: 500px;
     padding: 30px;
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
 }
 
 #customCssModal h3 {
@@ -13,7 +13,7 @@
 }
 
 #customCssModal p {
-    color: #666;
+    color: var(--pz-text-muted);
     font-size: 0.95rem;
     line-height: 1.5;
     margin-bottom: 25px;
@@ -27,12 +27,12 @@
 }
 
 .no-css-text {
-    color: #888;
+    color: var(--pz-text-muted);
     font-size: 0.9rem;
     padding: 15px;
-    background: rgba(0, 0, 0, 0.03);
-    border: 1px dashed #ccc;
-    border-radius: 8px;
+    background: rgba(var(--pz-shadow-rgb), 0.03);
+    border: 1px dashed var(--pz-border-strong);
+    border-radius: var(--pz-radius-lg);
     text-align: center;
 }
 
@@ -42,11 +42,11 @@
     gap: 12px;
     padding: 12px 16px;
     background: #f0f7ff;
-    border: 1px solid #cce4ff;
-    border-radius: 8px;
+    border: 1px solid var(--pz-accent-soft);
+    border-radius: var(--pz-radius-lg);
     font-size: 0.95rem;
-    font-weight: 500;
-    color: #0056b3;
+    font-weight: var(--pz-weight-medium);
+    color: var(--pz-accent-strong);
     word-break: break-all;
 }
 
@@ -67,16 +67,16 @@
     justify-content: center;
     gap: 8px;
     padding: 10px 16px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     border: none;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     cursor: pointer;
     transition: background-color 0.2s, opacity 0.2s;
 }
 
 #uploadCustomCssBtn {
     background-color: var(--pz-accent);
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 #uploadCustomCssBtn:hover {
@@ -84,22 +84,19 @@
 }
 
 /* Dark mode support */
-html[data-theme='dark'] #customCssModal p,
-body.dark-mode #customCssModal p {
-    color: #aaa;
+html[data-theme='dark'] #customCssModal p {
+    color: var(--dm-text-muted);
 }
 
-html[data-theme='dark'] .no-css-text,
-body.dark-mode .no-css-text {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: #444;
-    color: #888;
+html[data-theme='dark'] .no-css-text {
+    background: rgba(var(--pz-highlight-rgb), 0.05);
+    border-color: var(--dm-border);
+    color: var(--dm-text-subtle);
 }
 
-html[data-theme='dark'] .custom-css-current-file,
-body.dark-mode .custom-css-current-file {
+html[data-theme='dark'] .custom-css-current-file {
     background: rgba(var(--pz-accent-rgb), 0.1);
     border-color: rgba(var(--pz-accent-rgb), 0.3);
-    color: #4db8ff;
+    color: var(--dm-accent);
 }
 

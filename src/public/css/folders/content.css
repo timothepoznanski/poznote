@@ -53,10 +53,10 @@
 }
 
 .close {
-    color: #aaa;
+    color: var(--pz-text-subtle);
     float: right;
     font-size: 28px;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     line-height: 1;
     margin-top: -5px;
     cursor: pointer;
@@ -82,11 +82,11 @@
 }
 
 .folder-item:hover {
-    background-color: #f0f0f0;
+    background-color: var(--pz-surface-hover);
 }
 
 .folder-item i {
     margin-right: 8px;
-    color: #666;
+    color: var(--pz-text-muted);
     width: 12px;
 }

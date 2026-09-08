@@ -44,7 +44,6 @@ body.highlight-folder-tree .notes-list-scrollable-content:has(.folder-tree-activ
 }
 
 /* Dark backgrounds swallow faint text faster than light ones. */
-html[data-theme='dark'] body.highlight-folder-tree,
-body.dark-mode.highlight-folder-tree {
+html[data-theme='dark'] body.highlight-folder-tree {
     --folder-tree-dim-opacity: 0.45;
 }

@@ -39,8 +39,8 @@
 /* Unread reminders: amber bell, mirroring .icon-sidebar-btn.has-notifications.
    Needs !important to beat the shared var(--pz-accent) below. */
 #sidebarNotificationsBtn.has-notifications .lucide-bell {
-    color: #f59e0b !important;
-    background-color: #f59e0b;
+    color: var(--pz-warning-hover) !important;
+    background-color: var(--pz-warning-hover);
 }
 
 .sidebar-folder-toggle,
@@ -51,7 +51,7 @@
     font-size: 1.3rem;
     cursor: pointer;
     padding: 6px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -79,11 +79,11 @@
 .sidebar-plus {
     background: transparent;
     border: none;
-    color: #6c757d !important;
+    color: var(--pz-text-muted) !important;
     font-size: 1.2rem;
     cursor: pointer;
     padding: 4px 5px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     position: relative;
     min-width: 30px;
     min-height: 30px;
@@ -148,10 +148,10 @@
 .sidebar-plus [class*="lucide-"],
 .sidebar-plus .lucide-plus-circle {
     font-size: 1.1em !important;
-    color: #6c757d !important;
+    color: var(--pz-text-muted) !important;
 }
 
-/* .sidebar-plus:hover { background: rgba(0,0,0,0.04); color: var(--pz-accent-hover); } /* Display background button plus on hover */
+/* .sidebar-plus:hover { background: rgba(var(--pz-shadow-rgb), 0.04); color: var(--pz-accent-hover); } /* Display background button plus on hover */
 
 /* Make search bar full width of sidebar and align spacing with buttons */
 .searchbar-row {
@@ -169,7 +169,7 @@
 .folder-header {
     /* margin-top: 6px; */
     /* padding: 6px 4px; */
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
 }
 
 .folder-toggle {
@@ -180,15 +180,15 @@
 }
 
 .folder-name {
-    font-weight: 600;
-    color: #111827;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text);
     font-size: var(--sidebar-font-size, 13px);
 }
 
 .folder-note-count {
     color: var(--pz-text-muted);
     margin-left: 6px;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
 }
 
 .hide-folder-counts .folder-note-count {
@@ -222,7 +222,7 @@
 /* For keyboard-only users, provide a visible focus outline on the folder-toggle */
 .hide-folder-counts .folder-toggle:focus-within {
     outline: 2px solid rgba(59, 130, 246, 0.18);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
 }
 
 /* Folder content / notes styling */
@@ -237,8 +237,8 @@
 }
 
 .links_arbo_left .note-title {
-    font-weight: 500;
-    color: #1f2937;
+    font-weight: var(--pz-weight-medium);
+    color: var(--pz-text);
     font-size: var(--sidebar-font-size, 13px);
 }
 
@@ -299,5 +299,5 @@
 
 .links_arbo_left.selected-note .note-title {
     color: var(--pz-accent-strong);
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }

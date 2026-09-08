@@ -9,7 +9,6 @@
 
 $darkModeDir = __DIR__ . '/css/dark-mode/';
 $files = [
-    'variables.css',
     'layout.css',
     'menus.css',
     'editor.css',

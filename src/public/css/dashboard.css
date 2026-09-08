@@ -85,11 +85,11 @@ body.dashboard-page {
 .dashboard-filter-input {
     width: 100%;
     padding: 7px 38px 7px 40px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
     font-size: 13px;
-    color: #1f2937;
-    background: #ffffff;
+    color: var(--pz-text);
+    background: var(--pz-bg);
     box-sizing: border-box;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -109,7 +109,7 @@ body.dashboard-page {
     height: 30px;
     padding: 0;
     border: none;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     background: transparent;
     color: var(--pz-text-muted);
     cursor: pointer;
@@ -140,14 +140,6 @@ body.dashboard-page {
     display: none;
 }
 
-#dashboardToggleFavorites.active .lucide-star {
-    color: var(--pz-warning);
-}
-
-.dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star {
-    color: var(--pz-warning);
-}
-
 /* ---------- Breadcrumb ---------- */
 
 /* Shares the card grid's capped width and auto margins so it starts on the
@@ -170,7 +162,7 @@ body.dashboard-page {
     padding: 4px 8px;
     background: none;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     color: var(--pz-accent);
     cursor: pointer;
     transition: background 0.15s ease;
@@ -196,9 +188,9 @@ body.dashboard-page {
     background: none;
     border: none;
     padding: 4px 8px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-size: 13px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     color: var(--pz-accent);
     cursor: pointer;
     transition: background 0.15s ease;
@@ -210,8 +202,8 @@ body.dashboard-page {
 
 .bc-current {
     font-size: 13px;
-    font-weight: 600;
-    color: #1f2937;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text);
     padding: 4px 8px;
 }
 
@@ -269,13 +261,12 @@ body.dashboard-page {
 .dash-section-title {
     margin: 26px 2px 12px;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text-muted);
 }
 
-:root[data-theme='dark'] .dash-section-title,
-body.dark-mode .dash-section-title {
-    color: #9ca3af;
+html[data-theme='dark'] .dash-section-title {
+    color: var(--dm-text-muted);
 }
 
 /* ---------- View menu (card size + layout) ---------- */
@@ -307,9 +298,9 @@ body.dark-mode .dash-section-title {
     justify-content: center;
     width: 36px;
     height: 33px;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
     color: var(--pz-text-muted);
     cursor: pointer;
     flex-shrink: 0;
@@ -362,13 +353,13 @@ body.dark-mode .dash-section-title {
 
 .board-view-columns-value {
     font-size: 12px;
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
     line-height: 1;
 }
 
 .board-view-size-letter {
     font-size: 12px;
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
     line-height: 1;
 }
 
@@ -561,9 +552,9 @@ body.dark-mode .dash-section-title {
 /* ---------- Base card ---------- */
 
 .dash-card {
-    background: #ffffff;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 14px;
+    background: var(--pz-bg);
+    border: 1.5px solid var(--pz-border);
+    border-radius: var(--pz-radius-xl);
     position: relative;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
     overflow: hidden;
@@ -585,19 +576,19 @@ body.dark-mode .dash-section-title {
    dark surface instead, which keeps text contrast intact in both themes. */
 
 .dash-card.has-note-color {
-    background: color-mix(in srgb, var(--note-color) 12%, #ffffff);
-    border-color: color-mix(in srgb, var(--note-color) 45%, #ffffff);
+    background: color-mix(in srgb, var(--note-color) 12%, var(--pz-bg));
+    border-color: color-mix(in srgb, var(--note-color) 45%, var(--pz-bg));
 }
 
 .dash-card.has-note-color:hover {
-    background: color-mix(in srgb, var(--note-color) 18%, #ffffff);
-    border-color: color-mix(in srgb, var(--note-color) 70%, #ffffff);
+    background: color-mix(in srgb, var(--note-color) 18%, var(--pz-bg));
+    border-color: color-mix(in srgb, var(--note-color) 70%, var(--pz-bg));
     box-shadow: 0 3px 12px color-mix(in srgb, var(--note-color) 28%, transparent);
 }
 
 /* Tag chips sit on the tinted background, so lift them slightly */
 .dash-card.has-note-color .board-card-tag {
-    background: color-mix(in srgb, var(--note-color) 16%, #ffffff);
+    background: color-mix(in srgb, var(--note-color) 16%, var(--pz-bg));
 }
 
 /* ---------- Note color filter (topbar) ---------- */
@@ -616,9 +607,9 @@ body.dark-mode .dash-section-title {
     justify-content: center;
     width: 36px;
     height: 33px;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
     color: var(--pz-text-muted);
     cursor: pointer;
     flex-shrink: 0;
@@ -641,17 +632,14 @@ body.dark-mode .dash-section-title {
     height: 18px;
 }
 
-:root[data-theme='dark'] .dashboard-color-filter-btn,
-body.dark-mode .dashboard-color-filter-btn {
+html[data-theme='dark'] .dashboard-color-filter-btn {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text-muted);
 }
 
-:root[data-theme='dark'] .dashboard-color-filter-btn:hover,
-body.dark-mode .dashboard-color-filter-btn:hover,
-:root[data-theme='dark'] .dashboard-color-filter-btn.active,
-body.dark-mode .dashboard-color-filter-btn.active {
+html[data-theme='dark'] .dashboard-color-filter-btn:hover,
+html[data-theme='dark'] .dashboard-color-filter-btn.active {
     border-color: var(--pz-accent);
     color: var(--pz-accent);
     background: var(--dm-surface-hover);
@@ -669,10 +657,10 @@ body.dark-mode .dashboard-color-filter-btn.active {
     overflow-y: auto;
     overscroll-behavior: contain;
     padding: 6px;
-    background: #ffffff;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 10px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    background: var(--pz-bg);
+    border: 1.5px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 6px 20px rgba(var(--pz-shadow-rgb), 0.12);
 }
 
 .dashboard-color-filter-menu[hidden] {
@@ -686,10 +674,10 @@ body.dark-mode .dashboard-color-filter-btn.active {
     width: 100%;
     padding: 7px 9px;
     border: none;
-    border-radius: 7px;
+    border-radius: var(--pz-radius);
     background: none;
     font-size: 13px;
-    color: #1f2937;
+    color: var(--pz-text);
     text-align: left;
     cursor: pointer;
 }
@@ -700,35 +688,30 @@ body.dark-mode .dashboard-color-filter-btn.active {
 
 .dashboard-color-filter-item.active {
     background: #eff6ff;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .note-color-swatch-empty {
-    background: repeating-linear-gradient(45deg, #e5e7eb 0 4px, #f9fafb 4px 8px);
+    background: repeating-linear-gradient(45deg, var(--pz-surface-sunken) 0 4px, var(--pz-surface) 4px 8px);
 }
 
-:root[data-theme='dark'] .dashboard-color-filter-menu,
-body.dark-mode .dashboard-color-filter-menu {
+html[data-theme='dark'] .dashboard-color-filter-menu {
     background: var(--dm-surface);
     border-color: var(--dm-border);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 6px 20px rgba(var(--pz-shadow-rgb), 0.5);
 }
 
-:root[data-theme='dark'] .dashboard-color-filter-item,
-body.dark-mode .dashboard-color-filter-item {
+html[data-theme='dark'] .dashboard-color-filter-item {
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .dashboard-color-filter-item:hover,
-body.dark-mode .dashboard-color-filter-item:hover,
-:root[data-theme='dark'] .dashboard-color-filter-item.active,
-body.dark-mode .dashboard-color-filter-item.active {
+html[data-theme='dark'] .dashboard-color-filter-item:hover,
+html[data-theme='dark'] .dashboard-color-filter-item.active {
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] .note-color-swatch-empty,
-body.dark-mode .note-color-swatch-empty {
-    background: repeating-linear-gradient(45deg, #374151 0 4px, #1f2937 4px 8px);
+html[data-theme='dark'] .note-color-swatch-empty {
+    background: repeating-linear-gradient(45deg, var(--dm-surface-hover) 0 4px, var(--dm-content-bg) 4px 8px);
 }
 
 /* ---------- Note color picker modal ---------- */
@@ -752,9 +735,9 @@ body.dark-mode .note-color-swatch-empty {
     align-items: center;
     gap: 8px;
     padding: 7px 9px;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 9px;
-    background: #ffffff;
+    border: 1.5px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
     cursor: pointer;
     font-size: 13px;
     text-align: left;
@@ -773,37 +756,33 @@ body.dark-mode .note-color-swatch-empty {
 .note-color-swatch {
     width: 18px;
     height: 18px;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     flex-shrink: 0;
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(var(--pz-shadow-rgb), 0.12);
 }
 
 .note-color-name {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: #1f2937;
+    color: var(--pz-text);
 }
 
-:root[data-theme='dark'] .note-color-modal-subtitle,
-body.dark-mode .note-color-modal-subtitle {
+html[data-theme='dark'] .note-color-modal-subtitle {
     color: var(--dm-text-muted);
 }
 
-:root[data-theme='dark'] .note-color-option,
-body.dark-mode .note-color-option {
+html[data-theme='dark'] .note-color-option {
     background: var(--dm-surface);
     border-color: var(--dm-border);
 }
 
-:root[data-theme='dark'] .note-color-option.selected,
-body.dark-mode .note-color-option.selected {
+html[data-theme='dark'] .note-color-option.selected {
     border-color: var(--pz-accent);
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] .note-color-name,
-body.dark-mode .note-color-name {
+html[data-theme='dark'] .note-color-name {
     color: var(--dm-text);
 }
 
@@ -840,7 +819,7 @@ body.dark-mode .note-color-name {
     white-space: nowrap;
     border: 1px solid var(--pz-border-strong);
     background: transparent;
-    color: #374151;
+    color: var(--pz-text);
     cursor: pointer;
     transition: border-color 0.15s ease, background-color 0.15s ease;
 }
@@ -848,7 +827,7 @@ body.dark-mode .note-color-name {
 .modal-buttons button.note-color-manage-btn:hover,
 .modal-buttons button.dashboard-scope-manage-btn:hover {
     border-color: var(--pz-text-subtle);
-    background: #f9fafb;
+    background: var(--pz-surface);
 }
 
 .note-color-manage-btn .lucide,
@@ -858,19 +837,20 @@ body.dark-mode .note-color-name {
     flex-shrink: 0;
 }
 
-:root[data-theme='dark'] .modal-buttons button.note-color-manage-btn,
-body.dark-mode .modal-buttons button.note-color-manage-btn,
-:root[data-theme='dark'] .modal-buttons button.dashboard-scope-manage-btn,
-body.dark-mode .modal-buttons button.dashboard-scope-manage-btn {
+/* Scoped to the page on purpose. dark-mode/modals.css paints the first button
+   of any dialog with --dm-active at (0,3,2), and it loads AFTER this file while
+   modals/base.css loads before it, so at equal weight a page rule wins in light
+   and loses in dark. These are outline buttons in both themes; body.dashboard-page
+   is what says so rather than leaving it to load order. */
+html[data-theme='dark'] body.dashboard-page .modal-buttons button.note-color-manage-btn,
+html[data-theme='dark'] body.dashboard-page .modal-buttons button.dashboard-scope-manage-btn {
     border-color: var(--dm-border);
     background: transparent;
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .modal-buttons button.note-color-manage-btn:hover,
-body.dark-mode .modal-buttons button.note-color-manage-btn:hover,
-:root[data-theme='dark'] .modal-buttons button.dashboard-scope-manage-btn:hover,
-body.dark-mode .modal-buttons button.dashboard-scope-manage-btn:hover {
+html[data-theme='dark'] body.dashboard-page .modal-buttons button.note-color-manage-btn:hover,
+html[data-theme='dark'] body.dashboard-page .modal-buttons button.dashboard-scope-manage-btn:hover {
     border-color: var(--dm-text-muted);
     background: var(--dm-surface-hover);
 }
@@ -933,7 +913,7 @@ body.dark-mode .modal-buttons button.dashboard-scope-manage-btn:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 10px;
+    border-radius: var(--pz-radius-lg);
     flex-shrink: 0;
 }
 
@@ -947,8 +927,8 @@ body.dark-mode .modal-buttons button.dashboard-scope-manage-btn:hover {
 
 .dash-card-name {
     font-size: 13px;
-    font-weight: 600;
-    color: #1f2937;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text);
     line-height: 1.3;
     overflow: hidden;
     display: -webkit-box;
@@ -960,10 +940,10 @@ body.dark-mode .modal-buttons button.dashboard-scope-manage-btn:hover {
 
 .dash-card-count {
     font-size: 11px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text-muted);
     background: var(--pz-surface-hover);
-    border-radius: 10px;
+    border-radius: var(--pz-radius-lg);
     padding: 1px 8px;
     white-space: nowrap;
 }
@@ -990,11 +970,11 @@ body.dark-mode .modal-buttons button.dashboard-scope-manage-btn:hover {
 }
 
 .dash-card-note-title {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     font-size: 14px;
     line-height: 1.35;
     margin-bottom: 7px;
-    color: #1f2937;
+    color: var(--pz-text);
     word-break: break-word;
     /* Room for the pin button, which overlays the card's top-right corner. */
     padding-right: 22px;
@@ -1017,7 +997,7 @@ body.dark-mode .modal-buttons button.dashboard-scope-manage-btn:hover {
     height: 24px;
     padding: 0;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: transparent;
     cursor: pointer;
     transition: background-color 0.15s ease;
@@ -1060,7 +1040,7 @@ body.dark-mode .modal-buttons button.dashboard-scope-manage-btn:hover {
     top: 10px;
     bottom: 10px;
     width: 3px;
-    border-radius: 2px;
+    border-radius: var(--pz-radius-sm);
     background: var(--pz-accent);
     z-index: 3;
     pointer-events: none;
@@ -1131,7 +1111,7 @@ body.dark-mode .modal-buttons button.dashboard-scope-manage-btn:hover {
     /* Shrink with the available card space instead of getting chopped by
        the card's overflow (which would swallow the bottom of the frame) */
     max-height: 100%;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     overflow: hidden;
     background: var(--pz-surface-hover);
     position: relative;
@@ -1174,7 +1154,7 @@ body.dark-mode .modal-buttons button.dashboard-scope-manage-btn:hover {
     padding: 0;
     font-size: 12.5px;
     line-height: 1.45;
-    color: #4b5563;
+    color: var(--pz-text-secondary);
     overflow: hidden;
     flex: 1;
     min-height: 0;
@@ -1217,10 +1197,10 @@ body.dark-mode .modal-buttons button.dashboard-scope-manage-btn:hover {
 
 .board-card-tag {
     font-size: 10.5px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     padding: 1px 8px;
-    border-radius: 9px;
-    color: #4b5563;
+    border-radius: var(--pz-radius-lg);
+    color: var(--pz-text-secondary);
     background: var(--pz-surface-hover);
     white-space: nowrap;
     max-width: 110px;
@@ -1230,8 +1210,8 @@ body.dark-mode .modal-buttons button.dashboard-scope-manage-btn:hover {
 
 /* Per-tag color (--tag-color set inline from the tag_colors setting) */
 .board-card-tag-colored {
-    background: color-mix(in srgb, var(--tag-color) 16%, #ffffff);
-    color: color-mix(in srgb, var(--tag-color) 72%, #1f2937);
+    background: color-mix(in srgb, var(--tag-color) 16%, var(--pz-bg));
+    color: color-mix(in srgb, var(--tag-color) 72%, var(--pz-text));
 }
 
 .board-card-date {
@@ -1269,160 +1249,123 @@ body.dashboard-page .notifications-empty i {
 
 /* ---------- Dark mode ---------- */
 
-:root[data-theme='dark'] body.dashboard-page,
-body.dark-mode.dashboard-page {
+html[data-theme='dark'] body.dashboard-page {
     background: var(--dm-content-bg);
 }
 
-:root[data-theme='dark'] .dashboard-topbar,
-body.dark-mode .dashboard-topbar {
+html[data-theme='dark'] .dashboard-topbar {
     background: var(--dm-content-bg);
 }
 
-:root[data-theme='dark'] .dashboard-filter-input,
-body.dark-mode .dashboard-filter-input {
+html[data-theme='dark'] .dashboard-filter-input {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .dashboard-filter-clear:hover,
-body.dark-mode .dashboard-filter-clear:hover {
+html[data-theme='dark'] .dashboard-filter-clear:hover {
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] #dashboardToggleFavorites.active .lucide-star,
-body.dark-mode #dashboardToggleFavorites.active .lucide-star {
-    color: #ffc107;
-}
-
-:root[data-theme='dark'] .dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star,
-body.dark-mode .dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star {
-    color: #ffc107;
-}
-
-:root[data-theme='dark'] .bc-current,
-body.dark-mode .bc-current {
+html[data-theme='dark'] .bc-current {
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .bc-sep,
-body.dark-mode .bc-sep {
+html[data-theme='dark'] .bc-sep {
     color: var(--dm-border);
 }
 
-:root[data-theme='dark'] .dash-card,
-body.dark-mode .dash-card {
+html[data-theme='dark'] .dash-card {
     background: var(--dm-surface);
     border-color: var(--dm-border);
 }
 
-:root[data-theme='dark'] .dash-card:hover,
-body.dark-mode .dash-card:hover {
+html[data-theme='dark'] .dash-card:hover {
     border-color: var(--pz-accent);
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 3px 12px rgba(var(--pz-shadow-rgb), 0.35);
 }
 
 /* Note color tint, dark theme: the same hue mixed into the dark surface
    instead of white, so colored cards stay dark enough to read on. */
-:root[data-theme='dark'] .dash-card.has-note-color,
-body.dark-mode .dash-card.has-note-color {
+html[data-theme='dark'] .dash-card.has-note-color {
     background: color-mix(in srgb, var(--note-color) 22%, var(--dm-surface));
     border-color: color-mix(in srgb, var(--note-color) 55%, var(--dm-surface));
 }
 
-:root[data-theme='dark'] .dash-card.has-note-color:hover,
-body.dark-mode .dash-card.has-note-color:hover {
+html[data-theme='dark'] .dash-card.has-note-color:hover {
     background: color-mix(in srgb, var(--note-color) 30%, var(--dm-surface));
     border-color: color-mix(in srgb, var(--note-color) 75%, var(--dm-surface));
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 3px 12px rgba(var(--pz-shadow-rgb), 0.45);
 }
 
-:root[data-theme='dark'] .dash-card.has-note-color .board-card-tag,
-body.dark-mode .dash-card.has-note-color .board-card-tag {
+html[data-theme='dark'] .dash-card.has-note-color .board-card-tag {
     background: color-mix(in srgb, var(--note-color) 26%, var(--dm-surface));
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .dash-card-name,
-body.dark-mode .dash-card-name {
+html[data-theme='dark'] .dash-card-name {
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .dash-card-count,
-body.dark-mode .dash-card-count {
+html[data-theme='dark'] .dash-card-count {
     color: var(--dm-text-muted);
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] .dash-card-note-title,
-body.dark-mode .dash-card-note-title {
+html[data-theme='dark'] .dash-card-note-title {
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .dash-card-pin i,
-body.dark-mode .dash-card-pin i {
+html[data-theme='dark'] .dash-card-pin i {
     background-color: var(--dm-text-muted);
 }
 
 /* Restated after the muted rule above, which is specific enough to win otherwise. */
-:root[data-theme='dark'] .dash-card-pin:hover i,
-body.dark-mode .dash-card-pin:hover i,
-:root[data-theme='dark'] .dash-card.is-pinned .dash-card-pin i,
-body.dark-mode .dash-card.is-pinned .dash-card-pin i {
-    background-color: #4aa8d8;
+html[data-theme='dark'] .dash-card-pin:hover i,
+html[data-theme='dark'] .dash-card.is-pinned .dash-card-pin i {
+    background-color: var(--dm-accent);
 }
 
-:root[data-theme='dark'] .board-card-excerpt,
-body.dark-mode .board-card-excerpt,
-:root[data-theme='dark'] .board-card-tasks,
-body.dark-mode .board-card-tasks {
+html[data-theme='dark'] .board-card-excerpt,
+html[data-theme='dark'] .board-card-tasks {
     color: var(--dm-text-muted);
 }
 
-:root[data-theme='dark'] .dash-card-thumb,
-body.dark-mode .dash-card-thumb {
-    background: rgba(255, 255, 255, 0.06);
+html[data-theme='dark'] .dash-card-thumb {
+    background: rgba(var(--pz-highlight-rgb), 0.06);
 }
 
-:root[data-theme='dark'] .dash-card-thumb::after,
-body.dark-mode .dash-card-thumb::after {
-    border-color: rgba(255, 255, 255, 0.18);
+html[data-theme='dark'] .dash-card-thumb::after {
+    border-color: rgba(var(--pz-highlight-rgb), 0.18);
 }
 
-:root[data-theme='dark'] .board-view-btn,
-body.dark-mode .board-view-btn {
-    background: var(--dm-surface, #262626);
+html[data-theme='dark'] .board-view-btn {
+    background: var(--dm-surface, var(--dm-content-bg));
     border-color: var(--dm-border, var(--dm-border));
-    color: var(--dm-text-muted, #a0a0a0);
+    color: var(--dm-text-muted, var(--dm-text-muted));
 }
 
-:root[data-theme='dark'] .board-view-btn:hover,
-body.dark-mode .board-view-btn:hover {
+html[data-theme='dark'] .board-view-btn:hover {
     border-color: var(--dm-accent, var(--dm-accent));
     color: var(--dm-accent, var(--dm-accent));
 }
 
-:root[data-theme='dark'] .board-card-tag,
-body.dark-mode .board-card-tag {
+html[data-theme='dark'] .board-card-tag {
     color: var(--dm-text-muted);
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] .board-card-tag-colored,
-body.dark-mode .board-card-tag-colored {
+html[data-theme='dark'] .board-card-tag-colored {
     background: color-mix(in srgb, var(--tag-color) 26%, var(--dm-surface));
-    color: color-mix(in srgb, var(--tag-color) 70%, #ffffff);
+    color: color-mix(in srgb, var(--tag-color) 70%, var(--pz-text-inverse));
 }
 
-:root[data-theme='dark'] .board-card-date,
-body.dark-mode .board-card-date {
+html[data-theme='dark'] .board-card-date {
     color: var(--dm-text-muted);
     opacity: 0.7;
 }
 
-:root[data-theme='dark'] .dashboard-empty,
-body.dark-mode .dashboard-empty {
+html[data-theme='dark'] .dashboard-empty {
     color: var(--dm-text-muted);
 }
 
@@ -1536,17 +1479,17 @@ body.dark-mode .dashboard-empty {
 
 .dash-group-tag {
     font-size: 11px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     padding: 1px 8px;
-    border-radius: 9px;
-    color: #4b5563;
+    border-radius: var(--pz-radius-lg);
+    color: var(--pz-text-secondary);
     background: var(--pz-surface-hover);
 }
 
 .dash-group-count {
     margin-left: auto;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     color: var(--pz-text-muted);
 }
 
@@ -1585,9 +1528,9 @@ body.dark-mode .dashboard-empty {
     display: inline-block;
     width: 9px;
     height: 9px;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     flex-shrink: 0;
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(var(--pz-shadow-rgb), 0.12);
 }
 
 .dash-group-dot,
@@ -1597,9 +1540,8 @@ body.dark-mode .dashboard-empty {
     height: 12px;
 }
 
-:root[data-theme='dark'] .dash-ws-dot,
-body.dark-mode .dash-ws-dot {
-    border-color: rgba(255, 255, 255, 0.18);
+html[data-theme='dark'] .dash-ws-dot {
+    border-color: rgba(var(--pz-highlight-rgb), 0.18);
 }
 
 /* Workspace crumb ahead of the folder path */
@@ -1621,7 +1563,7 @@ body.dark-mode .dash-ws-dot {
 .dashboard-scope-section-title {
     margin: 22px 0 8px;
     font-size: 0.9em;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text-muted);
 }
 
@@ -1641,7 +1583,7 @@ body.dark-mode .dash-ws-dot {
     gap: 5px;
     padding: 4px 10px;
     border: 1px solid var(--pz-border);
-    border-radius: 14px;
+    border-radius: var(--pz-radius-xl);
     background: transparent;
     font-family: inherit;
     font-size: 13px;
@@ -1655,13 +1597,13 @@ body.dark-mode .dash-ws-dot {
 }
 
 .dashboard-scope-tag.is-active {
-    background: #e0f2fe;
-    border-color: #7dd3fc;
+    background: var(--pz-accent-soft);
+    border-color: var(--pz-accent);
 }
 
 /* Only some of the tag's workspaces are checked */
 .dashboard-scope-tag.is-partial {
-    border-color: #7dd3fc;
+    border-color: var(--pz-accent);
 }
 
 .dashboard-scope-tag .lucide {
@@ -1739,9 +1681,9 @@ body.dark-mode .dash-ws-dot {
 }
 
 .dashboard-scope-row-all {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     border-bottom: 1px solid var(--pz-border);
-    border-radius: 4px 4px 0 0;
+    border-radius: var(--pz-radius-sm) var(--pz-radius-sm) 0 0;
     margin-bottom: 4px;
 }
 
@@ -1754,7 +1696,7 @@ body.dark-mode .dash-ws-dot {
     height: 26px;
     padding: 0;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background: none;
     color: var(--pz-text-subtle);
     cursor: pointer;
@@ -1816,7 +1758,7 @@ body.dark-mode .dash-ws-dot {
     z-index: 1;
     margin: -6px 0 4px;
     padding: 6px 0;
-    background: #ffffff;
+    background: var(--pz-bg);
 }
 
 .dashboard-tag-filter-search {
@@ -1826,8 +1768,8 @@ body.dark-mode .dash-ws-dot {
     margin: 0;
     padding: 6px 9px;
     border: 1px solid var(--pz-border);
-    border-radius: 6px;
-    background: #ffffff;
+    border-radius: var(--pz-radius);
+    background: var(--pz-bg);
     color: inherit;
     font: inherit;
     font-size: 13px;
@@ -1838,13 +1780,11 @@ body.dark-mode .dash-ws-dot {
     border-color: var(--pz-accent);
 }
 
-:root[data-theme='dark'] .dashboard-tag-filter-search-wrap,
-body.dark-mode .dashboard-tag-filter-search-wrap {
+html[data-theme='dark'] .dashboard-tag-filter-search-wrap {
     background: var(--dm-surface);
 }
 
-:root[data-theme='dark'] .dashboard-tag-filter-search,
-body.dark-mode .dashboard-tag-filter-search {
+html[data-theme='dark'] .dashboard-tag-filter-search {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text);
@@ -1861,7 +1801,7 @@ body.dark-mode .dashboard-tag-filter-search {
 .dashboard-tag-filter-dot {
     width: 9px;
     height: 9px;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     flex-shrink: 0;
 }
 
@@ -1885,68 +1825,54 @@ body.dark-mode .dashboard-tag-filter-search {
     color: var(--pz-text-subtle);
 }
 
-:root[data-theme='dark'] .dashboard-tag-filter-count,
-body.dark-mode .dashboard-tag-filter-count,
-:root[data-theme='dark'] .dashboard-tag-filter-empty,
-body.dark-mode .dashboard-tag-filter-empty {
-    color: #a8a8a8;
+html[data-theme='dark'] .dashboard-tag-filter-count,
+html[data-theme='dark'] .dashboard-tag-filter-empty {
+    color: var(--dm-text-muted);
 }
 
 /* Dark mode */
-:root[data-theme='dark'] .dash-group-title,
-body.dark-mode .dash-group-title {
+html[data-theme='dark'] .dash-group-title {
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .dash-group-tag,
-body.dark-mode .dash-group-tag {
-    color: #c9d1d9;
-    background: rgba(255, 255, 255, 0.08);
+html[data-theme='dark'] .dash-group-tag {
+    color: var(--dm-text-bright);
+    background: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
-:root[data-theme='dark'] .dashboard-scope-section-title,
-body.dark-mode .dashboard-scope-section-title,
-:root[data-theme='dark'] .dashboard-scope-empty,
-body.dark-mode .dashboard-scope-empty {
-    color: #a8a8a8;
+html[data-theme='dark'] .dashboard-scope-section-title,
+html[data-theme='dark'] .dashboard-scope-empty {
+    color: var(--dm-text-muted);
 }
 
-:root[data-theme='dark'] .dashboard-scope-tag,
-body.dark-mode .dashboard-scope-tag {
+html[data-theme='dark'] .dashboard-scope-tag {
     color: var(--dm-text);
     border-color: var(--dm-border);
 }
 
-:root[data-theme='dark'] .dashboard-scope-tag:hover,
-body.dark-mode .dashboard-scope-tag:hover {
+html[data-theme='dark'] .dashboard-scope-tag:hover {
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] .dashboard-scope-tag.is-active,
-body.dark-mode .dashboard-scope-tag.is-active {
+html[data-theme='dark'] .dashboard-scope-tag.is-active {
     background: var(--dm-active);
-    border-color: #4da3d0;
+    border-color: var(--dm-accent);
 }
 
-:root[data-theme='dark'] .dashboard-scope-tag.is-partial,
-body.dark-mode .dashboard-scope-tag.is-partial {
-    border-color: #4da3d0;
+html[data-theme='dark'] .dashboard-scope-tag.is-partial {
+    border-color: var(--dm-accent);
 }
 
-:root[data-theme='dark'] .dashboard-scope-row-all,
-body.dark-mode .dashboard-scope-row-all {
+html[data-theme='dark'] .dashboard-scope-row-all {
     border-bottom-color: var(--dm-border);
 }
 
-:root[data-theme='dark'] .dashboard-scope-row-main .lucide,
-body.dark-mode .dashboard-scope-row-main .lucide,
-:root[data-theme='dark'] .dashboard-scope-open,
-body.dark-mode .dashboard-scope-open {
-    color: #a8a8a8;
+html[data-theme='dark'] .dashboard-scope-row-main .lucide,
+html[data-theme='dark'] .dashboard-scope-open {
+    color: var(--dm-text-muted);
 }
 
-:root[data-theme='dark'] .dashboard-scope-open:hover,
-body.dark-mode .dashboard-scope-open:hover {
+html[data-theme='dark'] .dashboard-scope-open:hover {
     background: var(--dm-surface-hover);
-    color: var(--dm-accent, #60a5fa);
+    color: var(--dm-accent, var(--dm-accent));
 }

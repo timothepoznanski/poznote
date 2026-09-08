@@ -156,24 +156,7 @@ $s3Enabled = $s3Config['enabled'] === '1';
     $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     ?>
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
-    <link rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/home/base.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/home/alerts.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/home/cards.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/home/buttons.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/home/dark-mode.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/home/responsive.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/settings.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/git-sync.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/attachments/usage-notice.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $cache_v; ?>">
+    <?php poznoteRenderStylesheets('s3_settings'); ?>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <style>
     .s3-status-grid { display: flex; gap: 24px; flex-wrap: wrap; margin: 10px 0; justify-content: center; }

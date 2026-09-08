@@ -64,23 +64,23 @@
     /* Hover/focus visual for attachment button (mobile) */
     .btn-attachment:hover,
     .btn-attachment:focus {
-        background: rgba(var(--pz-accent-rgb), 0.1) !important;
-        color: var(--pz-accent-hover) !important;
+        background: rgba(var(--pz-accent-rgb), 0.1);
+        color: var(--pz-accent-hover);
     }
 
     /* Attachment indicators (use app blue) */
     .btn-settings.has-attachments i,
     .btn-attachment.has-attachments i {
-        filter: none !important;
-        color: var(--pz-accent) !important;
+        filter: none;
+        color: var(--pz-accent);
     }
 
     .btn-settings.has-attachments:hover i,
     .btn-settings.has-attachments:focus i,
     .btn-attachment.has-attachments:hover i,
     .btn-attachment.has-attachments:focus i {
-        filter: none !important;
-        color: var(--pz-accent-hover) !important;
+        filter: none;
+        color: var(--pz-accent-hover);
     }
 }
 

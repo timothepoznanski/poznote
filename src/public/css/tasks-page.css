@@ -4,7 +4,7 @@ body.tasks-page {
     margin: 0;
     padding: 20px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background-color: var(--bg-color, #ffffff);
+    background-color: var(--bg-color, var(--pz-bg));
     color: var(--text-color, var(--pz-text));
 }
 
@@ -40,7 +40,7 @@ body.tasks-page {
 
 .tasks-progress-label {
     font-size: 13px;
-    color: #666;
+    color: var(--pz-text-muted);
     white-space: nowrap;
     order: 3;
     flex-shrink: 0;
@@ -48,8 +48,8 @@ body.tasks-page {
 
 .tasks-progress-bar {
     height: 8px;
-    border-radius: 4px;
-    background-color: #e9ecef;
+    border-radius: var(--pz-radius-sm);
+    background-color: var(--pz-surface-sunken);
     overflow: hidden;
     order: 2;
     flex: 1;
@@ -58,7 +58,7 @@ body.tasks-page {
 .tasks-progress-fill {
     height: 100%;
     width: 0;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background-color: var(--pz-accent);
     transition: width 0.3s ease;
 }
@@ -72,7 +72,7 @@ body.tasks-page {
     order: 4;
     flex-shrink: 0;
     font-size: 13px;
-    color: #666;
+    color: var(--pz-text-muted);
     white-space: nowrap;
     cursor: pointer;
     user-select: none;
@@ -86,8 +86,8 @@ body.tasks-page {
     accent-color: var(--pz-accent);
 }
 
-[data-theme="dark"] .tasks-progress-option {
-    color: #aaa;
+html[data-theme='dark'] .tasks-progress-option {
+    color: var(--dm-text-muted);
 }
 
 /* Filter bar. On desktop the filter input sits on the same row, to the right
@@ -110,7 +110,7 @@ body.tasks-page {
 .tasks-filter-chip {
     padding: 6px 14px;
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 16px;
+    border-radius: var(--pz-radius-2xl);
     background: transparent;
     color: var(--text-color, var(--pz-text));
     font-size: 13px;
@@ -126,7 +126,7 @@ body.tasks-page {
 .tasks-filter-chip.active {
     background-color: var(--pz-accent);
     border-color: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 .filter-input-wrapper {
@@ -143,10 +143,10 @@ body.tasks-page {
        both end up the same height on the shared row */
     padding: 6px 36px 6px 12px;
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     font-size: 13px;
     color: var(--text-color, var(--pz-text));
-    background-color: var(--input-bg, #ffffff);
+    background-color: var(--input-bg, var(--pz-bg));
     transition: all 0.2s ease;
     box-sizing: border-box;
 }
@@ -164,11 +164,11 @@ body.tasks-page {
     border: none;
     padding: 6px 8px;
     cursor: pointer;
-    color: #666;
+    color: var(--pz-text-muted);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
 }
 
 .clear-filter-btn:hover {
@@ -190,7 +190,7 @@ body.tasks-page {
     height: 29px;
     padding: 0;
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: transparent;
     color: var(--text-color, var(--pz-text));
     cursor: pointer;
@@ -209,8 +209,8 @@ body.tasks-page {
     margin: 0 auto 18px auto;
     padding: 12px 16px;
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 10px;
-    background-color: #fafafa;
+    border-radius: var(--pz-radius-lg);
+    background-color: var(--pz-surface);
 }
 
 .tasks-note-header {
@@ -240,9 +240,9 @@ body.tasks-page {
     height: 24px;
     padding: 0;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background: transparent;
-    color: #888;
+    color: var(--pz-text-muted);
     font-size: 16px;
     cursor: pointer;
     flex-shrink: 0;
@@ -265,7 +265,7 @@ body.tasks-page {
 }
 
 .note-name {
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     font-size: 16px;
     color: var(--pz-accent);
     text-decoration: none;
@@ -283,10 +283,10 @@ body.tasks-page {
     align-items: center;
     gap: 5px;
     font-size: 11px;
-    color: #666;
-    background-color: #f0f0f0;
+    color: var(--pz-text-muted);
+    background-color: var(--pz-surface-hover);
     padding: 2px 8px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
 }
 
 /* Groups built from the checklist items of a regular note (as opposed to a
@@ -299,20 +299,20 @@ body.tasks-page {
     color: var(--pz-accent);
     background-color: rgba(var(--pz-accent-rgb), 0.1);
     padding: 2px 8px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     white-space: nowrap;
     flex-shrink: 0;
 }
 
-[data-theme="dark"] .tasks-note-source-badge {
-    color: #5cb8ea;
+html[data-theme='dark'] .tasks-note-source-badge {
+    color: var(--dm-accent-hover);
     background-color: rgba(92, 184, 234, 0.15);
 }
 
 .tasks-note-count {
     margin-left: auto;
     font-size: 12px;
-    color: #888;
+    color: var(--pz-text-muted);
     white-space: nowrap;
 }
 
@@ -324,7 +324,7 @@ body.tasks-page {
     align-items: flex-start;
     gap: 10px;
     padding: 8px 4px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    border-bottom: 1px solid rgba(var(--pz-shadow-rgb), 0.04);
     cursor: pointer;
 }
 
@@ -359,17 +359,17 @@ body.tasks-page {
 }
 
 .tasks-task-item.completed .tasks-task-text {
-    color: #999;
+    color: var(--pz-text-subtle);
     text-decoration: line-through;
 }
 
 .tasks-task-item.important .tasks-task-text {
-    color: #c62828;
-    font-weight: 600;
+    color: var(--pz-danger-hover);
+    font-weight: var(--pz-weight-semibold);
 }
 
 .tasks-task-star {
-    color: #ff0000;
+    color: var(--pz-danger);
     font-size: 14px;
     flex-shrink: 0;
 }
@@ -381,9 +381,9 @@ body.tasks-page {
     justify-content: center;
     padding: 4px 8px;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background: transparent;
-    color: #999;
+    color: var(--pz-text-subtle);
     font-size: 14px;
     cursor: pointer;
     flex-shrink: 0;
@@ -402,10 +402,10 @@ body.tasks-page {
     align-items: center;
     gap: 4px;
     padding: 2px 8px;
-    border: 1px solid #d0d7de;
-    border-radius: 12px;
-    background: #f6f8fa;
-    color: #57606a;
+    border: 1px solid var(--pz-border-strong);
+    border-radius: var(--pz-radius-xl);
+    background: var(--pz-surface);
+    color: var(--pz-text-secondary);
     font-size: 12px;
     font-family: inherit;
     line-height: 1.4;
@@ -424,9 +424,9 @@ body.tasks-page {
 }
 
 .task-due-chip.overdue {
-    border-color: #f1b8b8;
+    border-color: var(--pz-danger-soft);
     background: #fdf2f2;
-    color: #c62828;
+    color: var(--pz-danger-hover);
 }
 
 .tasks-task-item.completed .task-due-chip {
@@ -438,7 +438,7 @@ body.tasks-page {
     display: flex;
     flex-shrink: 0;
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     overflow: hidden;
 }
 
@@ -462,7 +462,7 @@ body.tasks-page {
 
 .tasks-view-btn.active {
     background-color: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 /* Collapse/expand only makes sense for the note groups of the list view */
@@ -496,7 +496,7 @@ body.tasks-page {
     justify-content: center;
     height: 28px;
     border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: transparent;
     color: var(--text-color, var(--pz-text));
     cursor: pointer;
@@ -522,7 +522,7 @@ body.tasks-page {
 
 .tasks-cal-title {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     min-width: 160px;
     text-align: center;
 }
@@ -533,8 +533,8 @@ body.tasks-page {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 1px;
-    border: 1px solid #c6ccd2;
-    border-radius: 8px;
+    border: 1px solid var(--pz-border-strong);
+    border-radius: var(--pz-radius-lg);
     overflow: hidden;
     background: #c6ccd2;
 }
@@ -542,10 +542,10 @@ body.tasks-page {
 .tasks-cal-weekday {
     text-align: center;
     font-size: 11px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text-muted);
     padding: 6px 0;
-    background: var(--bg-color, #ffffff);
+    background: var(--bg-color, var(--pz-bg));
 }
 
 .tasks-cal-day {
@@ -555,7 +555,7 @@ body.tasks-page {
     min-height: 92px;
     min-width: 0;
     padding: 4px;
-    background: var(--bg-color, #ffffff);
+    background: var(--bg-color, var(--pz-bg));
     cursor: pointer;
     overflow: hidden;
 }
@@ -579,20 +579,20 @@ body.tasks-page {
     height: 22px;
     line-height: 22px;
     text-align: center;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     font-size: 12px;
-    color: #555;
+    color: var(--pz-text-secondary);
     flex-shrink: 0;
 }
 
 .tasks-cal-day.today .tasks-cal-day-num {
     background-color: var(--pz-accent);
-    color: #ffffff;
-    font-weight: 600;
+    color: var(--pz-text-inverse);
+    font-weight: var(--pz-weight-semibold);
 }
 
 .tasks-cal-day.other-month .tasks-cal-day-num {
-    color: #bbb;
+    color: var(--pz-text-subtle);
 }
 
 .tasks-cal-day.other-month .tasks-cal-chip {
@@ -608,7 +608,7 @@ body.tasks-page {
     padding: 2px 6px;
     border: none;
     border-left: 3px solid var(--pz-accent);
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background: rgba(var(--pz-accent-rgb), 0.1);
     color: var(--text-color, var(--pz-text));
     font-size: 11px;
@@ -621,7 +621,7 @@ body.tasks-page {
 }
 
 .tasks-cal-chip-time {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-accent);
     flex-shrink: 0;
 }
@@ -634,17 +634,17 @@ body.tasks-page {
 }
 
 .tasks-cal-chip.important {
-    border-left-color: #c62828;
+    border-left-color: var(--pz-danger-hover);
     background: rgba(198, 40, 40, 0.08);
 }
 
 .tasks-cal-chip.important .tasks-cal-chip-text {
-    color: #c62828;
-    font-weight: 600;
+    color: var(--pz-danger-hover);
+    font-weight: var(--pz-weight-semibold);
 }
 
 .tasks-cal-chip.overdue {
-    border-left-color: #c62828;
+    border-left-color: var(--pz-danger-hover);
     background: #fdf2f2;
 }
 
@@ -684,17 +684,17 @@ body.tasks-page {
 }
 
 .tasks-cal-modal-empty {
-    color: #666;
+    color: var(--pz-text-muted);
     font-size: 13px;
     margin: 0 0 10px 0;
 }
 
 .tasks-task-note-badge {
     font-size: 11px;
-    color: #666;
-    background-color: #f0f0f0;
+    color: var(--pz-text-muted);
+    background-color: var(--pz-surface-hover);
     padding: 2px 8px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     white-space: nowrap;
     max-width: 140px;
     overflow: hidden;
@@ -721,7 +721,7 @@ body.tasks-page {
         height: 5px;
         padding: 0;
         border-left: none;
-        border-radius: 2px;
+        border-radius: var(--pz-radius-sm);
         background: var(--pz-accent);
     }
 
@@ -732,7 +732,7 @@ body.tasks-page {
 
     .tasks-cal-chip.important,
     .tasks-cal-chip.overdue {
-        background: #c62828;
+        background: var(--pz-danger-hover);
     }
 
     .tasks-cal-chip.completed {
@@ -743,37 +743,19 @@ body.tasks-page {
 .empty-message {
     text-align: center;
     margin-top: 50px;
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 .error-message {
     text-align: center;
     margin-top: 50px;
-    color: #d32f2f;
-}
-
-.btn {
-    display: inline-block;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: 400;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 6px;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.btn-secondary {
-    background: #6c757d;
-    color: white;
+    color: var(--pz-danger);
 }
 
 .loading-spinner {
     text-align: center;
     padding: 40px;
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 /* Mobile: dated tasks show the due date on the first line, then the task
@@ -871,212 +853,212 @@ body.tasks-page {
 }
 
 /* Dark mode */
-html[data-theme="dark"]:has(body.tasks-page) {
+html[data-theme='dark']:has(body.tasks-page) {
     background-color: var(--dm-content-bg);
 }
 
-[data-theme="dark"] body.tasks-page {
+html[data-theme='dark'] body.tasks-page {
     background-color: var(--dm-content-bg);
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .note-name {
-    color: #0ea5e9;
+html[data-theme='dark'] .note-name {
+    color: var(--dm-accent);
 }
 
 /* One shade above the card background so the badge stays visible */
-[data-theme="dark"] .folder-badge {
+html[data-theme='dark'] .folder-badge {
     background-color: var(--dm-surface-hover);
     color: var(--dm-text-muted);
 }
 
-[data-theme="dark"] .filter-input {
+html[data-theme='dark'] .filter-input {
     background-color: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .tasks-filter-chip {
+html[data-theme='dark'] .tasks-filter-chip {
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .tasks-filter-chip.active {
+html[data-theme='dark'] .tasks-filter-chip.active {
     background-color: var(--pz-accent);
     border-color: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
-[data-theme="dark"] .tasks-collapse-btn {
+html[data-theme='dark'] .tasks-collapse-btn {
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .tasks-collapse-btn:hover {
+html[data-theme='dark'] .tasks-collapse-btn:hover {
     border-color: var(--pz-accent);
     color: var(--pz-accent);
 }
 
-[data-theme="dark"] .tasks-progress-bar {
+html[data-theme='dark'] .tasks-progress-bar {
     background-color: var(--dm-surface);
 }
 
-[data-theme="dark"] .tasks-note-group {
+html[data-theme='dark'] .tasks-note-group {
     border-color: var(--dm-border);
     background-color: var(--dm-surface);
 }
 
-[data-theme="dark"] .tasks-note-header {
+html[data-theme='dark'] .tasks-note-header {
     border-bottom-color: var(--dm-border);
 }
 
-[data-theme="dark"] .tasks-note-toggle {
-    color: #b0b0b0;
+html[data-theme='dark'] .tasks-note-toggle {
+    color: var(--dm-text);
 }
 
-[data-theme="dark"] .tasks-note-toggle:hover {
-    color: #4da3d0;
+html[data-theme='dark'] .tasks-note-toggle:hover {
+    color: var(--dm-accent);
 }
 
-[data-theme="dark"] .tasks-task-item {
-    border-bottom-color: rgba(255, 255, 255, 0.06);
+html[data-theme='dark'] .tasks-task-item {
+    border-bottom-color: rgba(var(--pz-highlight-rgb), 0.06);
 }
 
-[data-theme="dark"] .tasks-task-item.completed .tasks-task-text {
+html[data-theme='dark'] .tasks-task-item.completed .tasks-task-text {
     color: var(--dm-text-muted);
 }
 
-[data-theme="dark"] .tasks-task-text a {
-    color: #4da3d0;
+html[data-theme='dark'] .tasks-task-text a {
+    color: var(--dm-accent);
 }
 
-[data-theme="dark"] .task-due-chip {
+html[data-theme='dark'] .task-due-chip {
     background-color: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text-muted);
 }
 
-[data-theme="dark"] .task-due-chip:hover {
-    border-color: #4da3d0;
-    color: #4da3d0;
+html[data-theme='dark'] .task-due-chip:hover {
+    border-color: var(--dm-accent);
+    color: var(--dm-accent);
 }
 
-[data-theme="dark"] .tasks-task-due-btn {
-    color: #b0b0b0;
-}
-
-[data-theme="dark"] .tasks-task-due-btn:hover {
-    color: #4da3d0;
-}
-
-[data-theme="dark"] .task-due-chip.overdue {
-    background-color: #3b1d1d;
-    border-color: #7f1d1d;
-    color: #fca5a5;
-}
-
-[data-theme="dark"] .tasks-view-toggle {
-    border-color: var(--dm-border);
-}
-
-[data-theme="dark"] .tasks-view-btn {
+html[data-theme='dark'] .tasks-task-due-btn {
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .tasks-view-btn.active {
+html[data-theme='dark'] .tasks-task-due-btn:hover {
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .task-due-chip.overdue {
+    background-color: var(--dm-content-bg);
+    border-color: var(--dm-danger-soft);
+    color: var(--dm-danger);
+}
+
+html[data-theme='dark'] .tasks-view-toggle {
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .tasks-view-btn {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .tasks-view-btn.active {
     background-color: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
-[data-theme="dark"] .tasks-cal-nav,
-[data-theme="dark"] .tasks-cal-today-btn {
+html[data-theme='dark'] .tasks-cal-nav,
+html[data-theme='dark'] .tasks-cal-today-btn {
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .tasks-cal-nav:hover,
-[data-theme="dark"] .tasks-cal-today-btn:hover {
-    border-color: #4da3d0;
-    color: #4da3d0;
+html[data-theme='dark'] .tasks-cal-nav:hover,
+html[data-theme='dark'] .tasks-cal-today-btn:hover {
+    border-color: var(--dm-accent);
+    color: var(--dm-accent);
 }
 
 /* Translucent white separators stay visible over both dark palettes */
-[data-theme="dark"] .tasks-cal-grid {
-    border-color: rgba(255, 255, 255, 0.18);
-    background: rgba(255, 255, 255, 0.18);
+html[data-theme='dark'] .tasks-cal-grid {
+    border-color: rgba(var(--pz-highlight-rgb), 0.18);
+    background: rgba(var(--pz-highlight-rgb), 0.18);
 }
 
-[data-theme="dark"] .tasks-cal-weekday,
-[data-theme="dark"] .tasks-cal-day {
+html[data-theme='dark'] .tasks-cal-weekday,
+html[data-theme='dark'] .tasks-cal-day {
     background: var(--dm-content-bg);
 }
 
-[data-theme="dark"] .tasks-cal-weekday {
+html[data-theme='dark'] .tasks-cal-weekday {
     color: var(--dm-text-muted);
 }
 
-[data-theme="dark"] .tasks-cal-day:hover {
+html[data-theme='dark'] .tasks-cal-day:hover {
     background-color: rgba(14, 165, 233, 0.08);
 }
 
-[data-theme="dark"] .tasks-cal-day-num {
+html[data-theme='dark'] .tasks-cal-day-num {
     color: var(--dm-text-muted);
 }
 
-[data-theme="dark"] .tasks-cal-day.today .tasks-cal-day-num {
+html[data-theme='dark'] .tasks-cal-day.today .tasks-cal-day-num {
     background-color: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
-[data-theme="dark"] .tasks-cal-day.other-month .tasks-cal-day-num {
-    color: #4b5563;
+html[data-theme='dark'] .tasks-cal-day.other-month .tasks-cal-day-num {
+    color: var(--dm-text-subtle);
 }
 
-[data-theme="dark"] .tasks-cal-chip {
+html[data-theme='dark'] .tasks-cal-chip {
     background: rgba(14, 165, 233, 0.15);
-    border-left-color: #0ea5e9;
+    border-left-color: var(--dm-accent);
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .tasks-cal-chip-time {
-    color: #4da3d0;
+html[data-theme='dark'] .tasks-cal-chip-time {
+    color: var(--dm-accent);
 }
 
-[data-theme="dark"] .tasks-cal-chip.important {
-    border-left-color: #7f1d1d;
+html[data-theme='dark'] .tasks-cal-chip.important {
+    border-left-color: var(--dm-danger-soft);
     background: rgba(198, 40, 40, 0.18);
 }
 
-[data-theme="dark"] .tasks-cal-chip.important .tasks-cal-chip-text {
-    color: #fca5a5;
+html[data-theme='dark'] .tasks-cal-chip.important .tasks-cal-chip-text {
+    color: var(--dm-danger);
 }
 
-[data-theme="dark"] .tasks-cal-chip.overdue {
-    border-left-color: #7f1d1d;
-    background: #3b1d1d;
+html[data-theme='dark'] .tasks-cal-chip.overdue {
+    border-left-color: var(--dm-danger-soft);
+    background: var(--dm-content-bg);
 }
 
-[data-theme="dark"] .tasks-cal-modal-empty {
+html[data-theme='dark'] .tasks-cal-modal-empty {
     color: var(--dm-text-muted);
 }
 
-[data-theme="dark"] .tasks-task-note-badge {
+html[data-theme='dark'] .tasks-task-note-badge {
     background-color: var(--dm-surface);
     color: var(--dm-text-muted);
 }
 
 /* Mobile bars again, with enough specificity to beat the dark chip rules */
 @media (max-width: 768px) {
-    [data-theme="dark"] .tasks-cal-chip {
-        background: #0ea5e9;
+    html[data-theme='dark'] .tasks-cal-chip {
+        background: var(--dm-accent);
     }
 
-    [data-theme="dark"] .tasks-cal-chip.important,
-    [data-theme="dark"] .tasks-cal-chip.overdue {
-        background: #dc2626;
+    html[data-theme='dark'] .tasks-cal-chip.important,
+    html[data-theme='dark'] .tasks-cal-chip.overdue {
+        background: var(--dm-danger-hover);
     }
 
-    [data-theme="dark"] .tasks-cal-chip.completed {
+    html[data-theme='dark'] .tasks-cal-chip.completed {
         background: #4b5563;
     }
 }

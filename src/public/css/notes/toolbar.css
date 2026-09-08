@@ -6,24 +6,6 @@
  * and rotate keyframe animation.
  */
 
-/* Pulsation animation for modified save button */
-@keyframes pulse-save {
-    0% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.4);
-    }
-
-    50% {
-        transform: scale(1.05);
-        box-shadow: 0 0 0 4px rgba(229, 57, 53, 0.2);
-    }
-
-    100% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.0);
-    }
-}
-
 /* Pulse animation for update badge */
 @keyframes pulse {
     0% {
@@ -52,12 +34,12 @@
 
 .toolbar-btn:hover i.lucide-palette,
 .toolbar-btn:focus i.lucide-palette {
-    color: #ff2222 !important;
+    color: var(--pz-danger) !important;
 }
 
 .toolbar-btn:hover i.lucide-fill-drip,
 .toolbar-btn:focus i.lucide-fill-drip {
-    color: #ffe066 !important;
+    color: var(--pz-warning) !important;
 }
 
 /* Rotate animation */

@@ -10,10 +10,10 @@
     z-index: 9999;
     min-width: 180px;
     max-width: 260px;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 12px 30px rgba(var(--pz-shadow-rgb), 0.12);
     padding: 4px;
 }
 
@@ -22,7 +22,7 @@
     align-items: center;
     gap: 8px;
     padding: 5px 8px;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     cursor: pointer;
     user-select: none;
 }
@@ -41,7 +41,7 @@
 
 .emoji-autocomplete-name {
     font-size: 13px;
-    color: #374151;
+    color: var(--pz-text);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

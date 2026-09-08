@@ -7,15 +7,11 @@
 
 /* Placeholder color for tags input to match note title */
 .name_tags input::placeholder {
-    color: #bababa;
+    color: var(--pz-text-subtle);
 }
 
-/* Hidden elements */
-.hidden {
-    display: none;
-}
-
-/* Utility: force hidden (used by JS to toggle visibility without inline styles) */
+/* Hidden elements: JS toggles this instead of writing inline styles, so it has
+   to beat whatever display the element's own rules give it. */
 .hidden {
     display: none !important;
 }
@@ -142,10 +138,10 @@ body.center-note-content #right_col .notecard {
     left: 50%;
     transform: translateX(-50%) translateY(0.5rem);
     background: var(--pz-text);
-    color: #fff;
+    color: var(--pz-text-inverse);
     font-size: 0.82rem;
     padding: 0.4em 0.9em;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     pointer-events: none;
     z-index: 9999;
     opacity: 0;
@@ -163,8 +159,7 @@ body.center-note-content #right_col .notecard {
     transform: translateX(-50%) translateY(0.5rem);
 }
 
-body.dark-mode #note-width-toast,
 html[data-theme='dark'] #note-width-toast {
-    background: #555;
-    color: #f0f0f0;
+    background: var(--dm-border-light);
+    color: var(--dm-text-bright);
 }

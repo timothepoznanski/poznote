@@ -13,21 +13,21 @@
 .form-group label {
     display: block;
     margin-bottom: 5px;
-    font-weight: bold;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .form-group input[type="file"] {
     width: 100%;
     padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm);
 }
 
 /* Form label styles */
 .form-label {
     display: block;
     margin-bottom: 0.5rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text);
 }
 
@@ -35,9 +35,9 @@
 .form-file-input {
     width: 100%;
     padding: 0.5rem;
-    border: 2px dashed #d0d0d0;
-    border-radius: 8px;
-    background: #fafafa;
+    border: 2px dashed var(--pz-border-strong);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-surface);
     transition: all 0.3s ease;
     cursor: pointer;
 }
@@ -51,9 +51,9 @@
 .form-select-styled {
     width: 100%;
     padding: 0.5rem;
-    border: 1px solid #d0d0d0;
-    border-radius: 6px;
-    background: white;
+    border: 1px solid var(--pz-border-strong);
+    border-radius: var(--pz-radius);
+    background: var(--pz-bg);
     font-size: 15px;
     transition: border-color 0.2s;
 }
@@ -79,7 +79,7 @@
 
 .form-text-danger {
     color: var(--pz-danger);
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
 }
 
 .form-text-info {
@@ -88,7 +88,7 @@
 
 .form-text-muted-block {
     display: block;
-    color: #6c757d;
+    color: var(--pz-text-muted);
     margin-bottom: 0.5rem;
     line-height: 1.5;
 }
@@ -96,48 +96,9 @@
 /* Form group with spacing */
 .form-group-spaced {
     margin-bottom: 1.25rem;
-}
-
-/* Boutons */
-.btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+}.btn {
     margin-right: 0;
     margin-bottom: 0;
-    font-size: 14px;
-    font-weight: 400;
-    transition: all 0.2s;
-    line-height: 1.4;
-    box-sizing: border-box;
-}
-
-.btn:hover {
-    opacity: 0.8;
-}
-
-.btn-primary {
-    background-color: var(--pz-accent);
-    color: white;
-}
-
-.btn-primary:hover {
-    background-color: var(--pz-accent-hover);
-}
-
-.btn-secondary {
-    background-color: #6c757d;
-    color: white;
-}
-
-.btn-secondary:hover {
-    background-color: #5a6268;
 }
 
 /* Button with top margin */

@@ -22,17 +22,17 @@
     white-space: pre-wrap;
     word-wrap: break-word;
     background-color: transparent;
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
+    border: none;
+    outline: none;
+    box-shadow: none;
     /* Prevent parent container from scrolling when cursor moves */
     overflow-anchor: none;
 }
 
 .markdown-editor:focus {
-    outline: none !important;
-    border: none !important;
-    box-shadow: none !important;
+    outline: none;
+    border: none;
+    box-shadow: none;
 }
 
 /* Table rows are space-padded so their pipes line up (formatMarkdownTableBlockLines
@@ -53,7 +53,7 @@
 
 .markdown-editor:empty:before {
     content: attr(data-ph);
-    color: #999;
+    color: var(--pz-text-subtle);
 }
 
 .markdown-editor .markdown-excalidraw-placeholder {
@@ -62,7 +62,7 @@
     margin: 0;
     padding: 2px 10px 2px 0;
     min-height: calc(1.4em + 4px);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     overflow: hidden;
     user-select: none;
 }
@@ -77,7 +77,7 @@
     display: flex;
     align-items: center;
     line-height: 1.4;
-    color: #5f6b76;
+    color: var(--pz-text-muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -90,9 +90,8 @@
     vertical-align: top;
 }
 
-html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::before,
-body.dark-mode .markdown-editor .markdown-excalidraw-placeholder::before {
-    color: #b9c4cf;
+html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::before {
+    color: var(--dm-text);
 }
 
 .markdown-codemirror-host {
@@ -165,84 +164,84 @@ body.dark-mode .markdown-editor .markdown-excalidraw-placeholder::before {
 }
 
 .markdown-codemirror-host .cm-placeholder {
-    color: #999;
+    color: var(--pz-text-subtle);
     opacity: 1;
 }
 
 .markdown-codemirror-host .poznote-cm-keyword {
-    color: var(--poznote-cm-keyword) !important;
+    color: var(--poznote-cm-keyword);
 }
 
 .markdown-codemirror-host .poznote-cm-atom {
-    color: var(--poznote-cm-atom) !important;
+    color: var(--poznote-cm-atom);
 }
 
 .markdown-codemirror-host .poznote-cm-string {
-    color: var(--poznote-cm-string) !important;
+    color: var(--poznote-cm-string);
 }
 
 .markdown-codemirror-host .poznote-cm-number {
-    color: var(--poznote-cm-number) !important;
+    color: var(--poznote-cm-number);
 }
 
 .markdown-codemirror-host .poznote-cm-comment {
-    color: var(--poznote-cm-comment) !important;
+    color: var(--poznote-cm-comment);
     font-style: italic !important;
 }
 
 .markdown-codemirror-host .poznote-cm-function {
-    color: var(--poznote-cm-function) !important;
+    color: var(--poznote-cm-function);
 }
 
 .markdown-codemirror-host .poznote-cm-variable {
-    color: var(--poznote-cm-variable) !important;
+    color: var(--poznote-cm-variable);
 }
 
 .markdown-codemirror-host .poznote-cm-type {
-    color: var(--poznote-cm-type) !important;
+    color: var(--poznote-cm-type);
 }
 
 .markdown-codemirror-host .poznote-cm-punctuation {
-    color: var(--poznote-cm-punctuation) !important;
+    color: var(--poznote-cm-punctuation);
 }
 
 .markdown-codemirror-host .poznote-cm-meta {
-    color: var(--poznote-cm-meta) !important;
+    color: var(--poznote-cm-meta);
 }
 
 .markdown-codemirror-host .poznote-cm-heading {
-    color: var(--poznote-cm-heading) !important;
-    font-weight: 700 !important;
+    color: var(--poznote-cm-heading);
+    font-weight: var(--pz-weight-bold) !important;
 }
 
 /* Per-level heading colors; each level falls back to the shared heading color
    unless a --poznote-cm-headingN variable is set (colored markdown setting). */
 .markdown-codemirror-host .poznote-cm-heading1 {
-    color: var(--poznote-cm-heading1, var(--poznote-cm-heading)) !important;
+    color: var(--poznote-cm-heading1, var(--poznote-cm-heading));
 }
 
 .markdown-codemirror-host .poznote-cm-heading2 {
-    color: var(--poznote-cm-heading2, var(--poznote-cm-heading)) !important;
+    color: var(--poznote-cm-heading2, var(--poznote-cm-heading));
 }
 
 .markdown-codemirror-host .poznote-cm-heading3 {
-    color: var(--poznote-cm-heading3, var(--poznote-cm-heading)) !important;
+    color: var(--poznote-cm-heading3, var(--poznote-cm-heading));
 }
 
 .markdown-codemirror-host .poznote-cm-heading4 {
-    color: var(--poznote-cm-heading4, var(--poznote-cm-heading)) !important;
+    color: var(--poznote-cm-heading4, var(--poznote-cm-heading));
 }
 
 .markdown-codemirror-host .poznote-cm-heading5 {
-    color: var(--poznote-cm-heading5, var(--poznote-cm-heading)) !important;
+    color: var(--poznote-cm-heading5, var(--poznote-cm-heading));
 }
 
 .markdown-codemirror-host .poznote-cm-heading6 {
-    color: var(--poznote-cm-heading6, var(--poznote-cm-heading)) !important;
+    color: var(--poznote-cm-heading6, var(--poznote-cm-heading));
 }
 
 .markdown-codemirror-host .poznote-cm-link {
-    color: var(--poznote-cm-link) !important;
+    color: var(--poznote-cm-link);
     text-decoration: underline !important;
 }
 
@@ -251,11 +250,11 @@ body.dark-mode .markdown-editor .markdown-excalidraw-placeholder::before {
 }
 
 .markdown-codemirror-host .poznote-cm-strong {
-    font-weight: 700 !important;
+    font-weight: var(--pz-weight-bold) !important;
 }
 
 .markdown-codemirror-host .poznote-cm-monospace {
-    color: var(--poznote-cm-monospace) !important;
+    color: var(--poznote-cm-monospace);
 }
 
 .markdown-codemirror-host .poznote-cm-strikethrough {
@@ -263,13 +262,13 @@ body.dark-mode .markdown-editor .markdown-excalidraw-placeholder::before {
 }
 
 .markdown-codemirror-host .poznote-cm-invalid {
-    background-color: var(--poznote-cm-invalid-bg) !important;
-    color: var(--poznote-cm-invalid) !important;
+    background-color: var(--poznote-cm-invalid-bg);
+    color: var(--poznote-cm-invalid);
 }
 
 .cm-tooltip {
-    border: 1px solid #d9dee7;
-    border-radius: 8px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.15);
     overflow: hidden;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -281,7 +280,7 @@ body.dark-mode .markdown-editor .markdown-excalidraw-placeholder::before {
 
 .cm-tooltip-autocomplete ul li[aria-selected] {
     background: var(--pz-accent);
-    color: #fff;
+    color: var(--pz-text-inverse);
 }
 
 body.slash-menu-cursor-hidden,
@@ -292,7 +291,7 @@ body.slash-menu-cursor-hidden * {
 /* Markdown rendered content styles */
 .markdown-preview h1 {
     font-size: 2em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 0.67em 0;
     border-bottom: 2px solid var(--pz-border);
     padding-bottom: 0.3em;
@@ -300,7 +299,7 @@ body.slash-menu-cursor-hidden * {
 
 .markdown-preview h2 {
     font-size: 1.5em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 0.75em 0;
     border-bottom: 1px solid var(--pz-border);
     padding-bottom: 0.3em;
@@ -308,27 +307,27 @@ body.slash-menu-cursor-hidden * {
 
 .markdown-preview h3 {
     font-size: 1.25em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 0.83em 0;
 }
 
 .markdown-preview h4 {
     font-size: 1em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 1em 0;
 }
 
 .markdown-preview h5 {
     font-size: 0.875em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 1.33em 0;
 }
 
 .markdown-preview h6 {
     font-size: 0.75em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 1.67em 0;
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 /* Heading anchor links (GitHub-style) */
@@ -366,7 +365,7 @@ body.slash-menu-cursor-hidden * {
 }
 
 .markdown-preview .heading-anchor:hover {
-    opacity: 1 !important;
+    opacity: 1;
 }
 
 .markdown-preview .heading-anchor svg {
@@ -396,7 +395,7 @@ body.slash-menu-cursor-hidden * {
 }
 
 .markdown-preview code {
-    background-color: #f4f4f4;
+    background-color: var(--pz-surface-hover);
     padding: 2px 6px;
     /* border-radius: 3px; */
     font-family: 'Courier New', Courier, monospace;
@@ -405,24 +404,24 @@ body.slash-menu-cursor-hidden * {
 }
 
 .markdown-preview pre {
-    background-color: #f4f4f4;
+    background-color: var(--pz-surface-hover);
     padding: 12px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     overflow-x: auto;
     margin: 1em 0 !important;
 }
 
 .noteentry pre.indented-pre,
 .markdown-preview pre.indented-pre {
-    background: none !important;
-    background-color: transparent !important;
-    border: none !important;
-    border-radius: 0 !important;
+    background: none;
+    background-color: transparent;
+    border: none;
+    border-radius: 0!important;
     padding: 0 !important;
     margin: 0 0 1em 0 !important;
     font-family: monospace !important;
     font-size: inherit !important;
-    color: inherit !important;
+    color: inherit;
     white-space: pre-wrap !important;
     width: auto !important;
     box-sizing: border-box !important;
@@ -430,13 +429,11 @@ body.slash-menu-cursor-hidden * {
 }
 
 html[data-theme='dark'] .noteentry pre.indented-pre,
-html[data-theme='dark'] .markdown-preview pre.indented-pre,
-body.dark-mode .noteentry pre.indented-pre,
-body.dark-mode .markdown-preview pre.indented-pre {
-    background: none !important;
-    background-color: transparent !important;
-    border: none !important;
-    color: inherit !important;
+html[data-theme='dark'] .markdown-preview pre.indented-pre {
+    background: none;
+    background-color: transparent;
+    border: none;
+    color: inherit;
 }
 
 .markdown-preview pre code {
@@ -448,10 +445,10 @@ body.dark-mode .markdown-preview pre.indented-pre {
 
 .markdown-preview blockquote,
 .noteentry blockquote {
-    border-left: 4px solid #ddd;
+    border-left: 4px solid var(--pz-border);
     padding-left: 16px;
     margin: 1em 0;
-    color: #666;
+    color: var(--pz-text-muted);
     font-style: italic;
 }
 
@@ -502,7 +499,7 @@ body.dark-mode .markdown-preview pre.indented-pre {
 }
 
 .markdown-preview a {
-    color: #007bff;
+    color: var(--pz-accent);
     text-decoration: none;
 }
 
@@ -514,7 +511,7 @@ body.dark-mode .markdown-preview pre.indented-pre {
 .markdown-preview iframe {
     max-width: 100%;
     height: auto;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     margin: 0;
 }
 
@@ -525,10 +522,10 @@ body.dark-mode .markdown-preview pre.indented-pre {
 .markdown-preview video {
     max-width: 100%;
     height: auto;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     margin: 1em 0;
     background: #000;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.1);
 }
 
 .markdown-preview audio,
@@ -536,8 +533,8 @@ body.dark-mode .markdown-preview pre.indented-pre {
     max-width: 280px;
     display: block;
     margin: 8px 0;
-    border-radius: 8px;
-    background: #f1f3f4;
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-surface-hover);
 }
 
 @media screen and (max-width: 768px) {
@@ -556,7 +553,7 @@ body.dark-mode .markdown-preview pre.indented-pre {
     overflow: hidden;
     margin: 8px 0;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: transparent;
 }
 
@@ -568,7 +565,7 @@ body.dark-mode .markdown-preview pre.indented-pre {
     overflow: hidden;
     margin: 8px 0;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: transparent;
 }
 
@@ -589,7 +586,7 @@ body.dark-mode .markdown-preview pre.indented-pre {
 }
 
 .markdown-preview strong {
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
 }
 
 .markdown-preview em {
@@ -598,7 +595,7 @@ body.dark-mode .markdown-preview pre.indented-pre {
 
 .markdown-preview del {
     text-decoration: line-through;
-    color: #999;
+    color: var(--pz-text-subtle);
 }
 
 .noteentry table,
@@ -612,7 +609,7 @@ body.dark-mode .markdown-preview pre.indented-pre {
 .noteentry table td,
 .markdown-preview table th,
 .markdown-preview table td {
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     padding: 8px 12px;
     text-align: left;
     white-space: pre-line;
@@ -620,13 +617,13 @@ body.dark-mode .markdown-preview pre.indented-pre {
 
 .noteentry table th,
 .markdown-preview table th {
-    background-color: #f4f4f4;
-    font-weight: bold;
+    background-color: var(--pz-surface-hover);
+    font-weight: var(--pz-weight-bold);
 }
 
 .noteentry table tr:nth-child(even),
 .markdown-preview table tr:nth-child(even) {
-    background-color: #f9f9f9;
+    background-color: var(--pz-surface);
 }
 
 /* Colored markdown (the "Colored markdown" display setting).
@@ -668,29 +665,29 @@ body.markdown-colored .markdown-codemirror-host {
 }
 
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h1) {
-    color: var(--mdc-h1) !important;
+    color: var(--mdc-h1);
     border-bottom-color: color-mix(in srgb, var(--mdc-h1) 30%, transparent);
 }
 
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h2) {
-    color: var(--mdc-h2) !important;
+    color: var(--mdc-h2);
     border-bottom-color: color-mix(in srgb, var(--mdc-h2) 30%, transparent);
 }
 
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h3) {
-    color: var(--mdc-h3) !important;
+    color: var(--mdc-h3);
 }
 
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h4) {
-    color: var(--mdc-h4) !important;
+    color: var(--mdc-h4);
 }
 
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h5) {
-    color: var(--mdc-h5) !important;
+    color: var(--mdc-h5);
 }
 
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h6) {
-    color: var(--mdc-h6) !important;
+    color: var(--mdc-h6);
 }
 
 /* Code blocks: tint the block background with the chosen color (mixed into
@@ -699,13 +696,13 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h6) {
    `background: #F8FAFC !important` on pre.code-block in css/code-blocks.css,
    so indented and mermaid blocks must be excluded here explicitly. */
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, pre:not(.indented-pre):not(.mermaid)) {
-    background: color-mix(in srgb, var(--mdc-codeblock) 8%, #f4f4f4) !important;
+    background: color-mix(in srgb, var(--mdc-codeblock) 8%, var(--pz-surface-hover));
 }
 
 body.markdown-colored .markdown-preview :not(pre) > :is(#poznote-md-colored-boost, code:not([class*="hljs"]):not([class*="language-"])) {
-    color: var(--mdc-code) !important;
-    background-color: color-mix(in srgb, var(--mdc-code) 9%, transparent) !important;
-    border-radius: 3px;
+    color: var(--mdc-code);
+    background-color: color-mix(in srgb, var(--mdc-code) 9%, transparent);
+    border-radius: var(--pz-radius-sm);
 }
 
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, blockquote) {
@@ -766,7 +763,7 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
 /* Style for checked task items */
 .markdown-preview li.task-list-item input[type="checkbox"]:checked+span {
     text-decoration: line-through;
-    color: #888;
+    color: var(--pz-text-muted);
 }
 
 /* Click-to-navigate hint in split mode */
@@ -776,13 +773,13 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
 
 .noteentry.markdown-split-mode .markdown-preview [data-line]:not(.markdown-task-checkbox):not(summary):not(details):hover {
     background-color: rgba(var(--pz-accent-rgb), 0.05);
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
 }
 
 /* Indicateur visuel pour le drag & drop */
 .noteentry.drag-over {
-    border: 2px dashed var(--pz-accent) !important;
-    background-color: rgba(var(--pz-accent-rgb), 0.05) !important;
+    border: 2px dashed var(--pz-accent);
+    background-color: rgba(var(--pz-accent-rgb), 0.05);
     transition: all 0.2s ease;
 }
 
@@ -798,21 +795,21 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
 
 /* Supprimer complètement tous les cadres en mode édition markdown */
 .noteentry[data-note-type="markdown"] .markdown-editor:focus {
-    box-shadow: none !important;
-    border: none !important;
-    outline: none !important;
+    box-shadow: none;
+    border: none;
+    outline: none;
 }
 
 /* Supprimer aussi le cadre sur l'élément parent noteentry quand on édite du markdown */
 .noteentry[data-note-type="markdown"]:focus {
-    border: none !important;
-    border-bottom: none !important;
-    outline: none !important;
+    border: none;
+    border-bottom: none;
+    outline: none;
 }
 
 /* Placeholder for empty preview */
 .markdown-preview-placeholder {
-    color: #999;
+    color: var(--pz-text-subtle);
     padding: 0;
     text-align: left;
     opacity: 0.6;
@@ -824,19 +821,18 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
     justify-content: flex-start;
 }
 
-
 /* Mermaid diagrams */
 .mermaid {
     margin: 1em 0;
     text-align: center;
-    background-color: white;
+    background-color: var(--pz-bg);
     /* Ensure visibility in dark mode if mermaid doesn't handle it */
     padding: 10px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
 }
 
 /* Dark mode adjustment for mermaid container */
-[data-theme='dark'] .mermaid {
+html[data-theme='dark'] .mermaid {
     background-color: var(--dm-surface);
 }
 
@@ -872,8 +868,8 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
 }
 
 /* Dark mode adjustments for math */
-[data-theme='dark'] .katex {
-    color: #e0e0e0;
+html[data-theme='dark'] .katex {
+    color: var(--dm-text-bright);
 }
 
 /* Split view mode styles */
@@ -905,7 +901,7 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
     min-width: 0 !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    border-right: 1px solid var(--pz-border) !important;
+    border-right: 1px solid var(--pz-border);
     box-sizing: border-box !important;
     max-height: var(--markdown-split-pane-height, calc(100vh - 200px)) !important;
 }
@@ -990,14 +986,14 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
 }
 
 /* Dark mode border for split view */
-[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container,
-[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview {
-    background: var(--dm-content-bg) !important;
+html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container,
+html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview {
+    background: var(--dm-content-bg);
 }
 
-[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container,
-[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor {
-    border-right-color: var(--dm-border) !important;
+html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container,
+html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor {
+    border-right-color: var(--dm-border);
 }
 
 body.markdown-split-card-view .noteentry.markdown-split-mode {
@@ -1012,9 +1008,9 @@ body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
     min-height: 0 !important;
     box-sizing: border-box !important;
     max-height: var(--markdown-split-pane-height, calc(100vh - 240px)) !important;
-    border: 1px solid #d9dee7 !important;
-    border-radius: 16px !important;
-    background: #ffffff !important;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-2xl)!important;
+    background: var(--pz-bg);
 }
 
 body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor-container {
@@ -1029,7 +1025,7 @@ body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor {
     overflow-y: auto !important;
     overflow-x: hidden !important;
     padding: 18px 18px 18px !important;
-    border-right: none !important;
+    border-right: none;
     box-sizing: border-box !important;
     max-height: none !important;
 }
@@ -1054,11 +1050,8 @@ body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
 }
 
 html[data-theme='dark'] body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor-container,
-html[data-theme='dark'] body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview,
-body.dark-mode.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor-container,
-body.dark-mode.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
-    border-color: var(--dm-border) !important;
-    background: var(--dm-content-bg) !important;
+html[data-theme='dark'] body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
+    border-color: var(--dm-border);
 }
 
 /* Scrollbar styling for split view columns */
@@ -1088,21 +1081,21 @@ body.dark-mode.markdown-split-card-view .noteentry.markdown-split-mode .markdown
 }
 
 /* Dark mode scrollbar for split view */
-[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-track,
-[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-track,
-[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-track {
+html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-track,
+html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-track,
+html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-track {
     display: none;
 }
 
-[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-thumb,
-[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-thumb,
-[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-thumb {
+html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-thumb,
+html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-thumb,
+html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-thumb {
     display: none;
 }
 
-[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-thumb:hover,
-[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-thumb:hover,
-[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-thumb:hover {
+html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-thumb:hover,
+html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-thumb:hover,
+html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-thumb:hover {
     display: none;
 }
 
@@ -1113,8 +1106,8 @@ body.dark-mode.markdown-split-card-view .noteentry.markdown-split-mode .markdown
     scrollbar-width: none;
 }
 
-[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container,
-[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor,
-[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview {
+html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container,
+html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor,
+html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview {
     scrollbar-width: none;
 }

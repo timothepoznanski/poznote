@@ -17,11 +17,11 @@
     gap: 10px;
     margin: 0 0 12px 0;
     font-size: 1.3em;
-    color: #1f2937;
+    color: var(--pz-text);
 }
 
 .folder-icon-modal-content h3 i {
-    color: #6366f1;
+    color: var(--pz-accent);
 }
 
 /* Reduce space above the search bar */
@@ -38,8 +38,8 @@
 .folder-icon-search-wrapper input {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
     font-size: 14px;
     outline: none;
     transition: border-color 0.2s;
@@ -47,7 +47,7 @@
 }
 
 .folder-icon-search-wrapper input:focus {
-    border-color: #6366f1;
+    border-color: var(--pz-accent);
 }
 
 /* Recently used icons row */
@@ -72,9 +72,9 @@
     max-height: 200px;
     overflow-y: auto;
     padding: 10px;
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    background: var(--pz-surface);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
     margin-bottom: 20px;
 }
 
@@ -84,13 +84,13 @@
     justify-content: center;
     width: 40px;
     height: 40px;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
     cursor: pointer;
     transition: all 0.2s ease;
     font-size: 18px;
-    color: #374151;
+    color: var(--pz-text);
 }
 
 .folder-icon-item.hidden {
@@ -99,13 +99,13 @@
 
 .folder-icon-item:hover {
     background: var(--pz-surface-hover);
-    border-color: #6366f1;
+    border-color: var(--pz-accent);
     transform: scale(1.05);
 }
 
 .folder-icon-item.selected {
     background: #eef2ff;
-    border-color: #6366f1;
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
 }
 
@@ -120,11 +120,11 @@
 }
 
 .folder-icon-modal-content .modal-buttons .btn-secondary {
-    background: #e5e7eb;
-    color: #374151;
+    background: var(--pz-surface-sunken);
+    color: var(--pz-text);
     border: none;
     padding: 10px 20px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     font-size: 14px;
     transition: background 0.2s;
@@ -136,18 +136,18 @@
 
 .folder-icon-modal-content .modal-buttons .btn-cancel {
     margin-left: auto;
-    background: #dc2626;
-    color: white;
+    background: var(--pz-danger);
+    color: var(--pz-text-inverse);
     border: none;
     padding: 10px 20px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     font-size: 14px;
     transition: background 0.2s;
 }
 
 .folder-icon-modal-content .modal-buttons .btn-cancel:hover {
-    background: #b91c1c;
+    background: var(--pz-danger-hover);
 }
 
 /* Scrollbar styling for icon grid */
@@ -156,13 +156,13 @@
 }
 
 .folder-icon-grid::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
+    background: var(--pz-surface-hover);
+    border-radius: var(--pz-radius-sm);
 }
 
 .folder-icon-grid::-webkit-scrollbar-thumb {
     background: #cbd5e1;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
 }
 
 .folder-icon-grid::-webkit-scrollbar-thumb:hover {
@@ -181,9 +181,9 @@
     justify-content: center;
     gap: 8px;
     padding: 16px;
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    background: var(--pz-surface);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
 }
 
 .folder-color-option {
@@ -205,37 +205,37 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: white;
+    color: var(--pz-text-inverse);
     font-size: 18px;
-    font-weight: bold;
-    text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+    font-weight: var(--pz-weight-bold);
+    text-shadow: 0 0 3px rgba(var(--pz-shadow-rgb), 0.5);
 }
 
 .folder-color-option.selected .folder-color-default::after {
-    color: #374151;
+    color: var(--pz-text);
 }
 
 .folder-color-swatch {
     width: 100%;
     height: 100%;
-    border-radius: 6px;
-    border: 2px solid #e5e7eb;
+    border-radius: var(--pz-radius);
+    border: 2px solid var(--pz-border);
     transition: all 0.2s ease;
 }
 
 .folder-color-option:hover .folder-color-swatch {
-    border-color: #6366f1;
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 .folder-color-option.selected .folder-color-swatch {
-    border-color: #6366f1;
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }
 
 .folder-color-default {
-    background: linear-gradient(135deg, #e5e7eb 25%, transparent 25%, transparent 75%, #e5e7eb 75%, #e5e7eb),
-                linear-gradient(135deg, #e5e7eb 25%, #f9fafb 25%, #f9fafb 75%, #e5e7eb 75%, #e5e7eb);
+    background: linear-gradient(135deg, var(--pz-surface-sunken) 25%, transparent 25%, transparent 75%, var(--pz-surface-sunken) 75%, var(--pz-surface-sunken)),
+                linear-gradient(135deg, var(--pz-surface-sunken) 25%, var(--pz-surface) 25%, var(--pz-surface) 75%, var(--pz-surface-sunken) 75%, var(--pz-surface-sunken));
     background-size: 8px 8px;
     background-position: 0 0, 4px 4px;
 }

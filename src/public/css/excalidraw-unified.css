@@ -16,7 +16,7 @@
     -webkit-user-select: none;
     user-select: none;
     /* Prevent outline and focus indicators */
-    outline: none !important;
+    outline: none;
     /* Ensure container doesn't expand beyond content */
     overflow: hidden;
     line-height: 0;
@@ -35,7 +35,7 @@
     /* Re-enable pointer events for context menu */
     pointer-events: auto;
     /* Prevent any outline or focus indicators */
-    outline: none !important;
+    outline: none;
 }
 
 .excalidraw-image:not(.img-with-border):not(.img-with-border-no-padding) {
@@ -64,7 +64,7 @@
 }
 
 /* Mode sombre */
-[data-theme="dark"] .excalidraw-container {
+html[data-theme='dark'] .excalidraw-container {
     background-color: transparent;
     border-color: var(--dm-border);
 }

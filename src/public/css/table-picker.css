@@ -8,10 +8,10 @@
 /* Table picker styles */
 .table-picker-popup {
     position: fixed;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 8px 25px rgba(var(--pz-shadow-rgb), 0.15);
     z-index: 1000;
     padding: 20px;
     opacity: 0;
@@ -41,15 +41,15 @@
 
 .table-picker-input-field-label {
     font-size: 12px;
-    color: #555;
-    font-weight: 500;
+    color: var(--pz-text-secondary);
+    font-weight: var(--pz-weight-medium);
 }
 
 .table-picker-input-field {
     width: 50px;
     padding: 6px 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm);
     font-size: 13px;
     text-align: center;
     font-family: 'Inter', sans-serif;
@@ -69,18 +69,18 @@
 .table-picker-insert-btn {
     padding: 6px 14px;
     background: var(--pz-accent);
-    color: white;
+    color: var(--pz-text-inverse);
     border: none;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     font-size: 13px;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     cursor: pointer;
     transition: background-color 0.2s ease;
     font-family: 'Inter', sans-serif;
 }
 
 .table-picker-insert-btn:hover {
-    background: #006399;
+    background: var(--pz-accent-hover);
 }
 
 .table-picker-insert-btn:active {
@@ -91,10 +91,10 @@
 
 .table-context-menu {
     position: fixed;
-    background: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.15);
     padding: 4px 0;
     z-index: 10000;
     display: none;
@@ -109,7 +109,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #374151;
+    color: var(--pz-text);
     transition: background 0.15s;
 }
 
@@ -118,16 +118,16 @@
 }
 
 .table-context-menu-item.danger {
-    color: #dc2626;
+    color: var(--pz-danger);
 }
 
 .table-context-menu-item.danger:hover {
-    background: #fee2e2;
+    background: var(--pz-danger-soft);
 }
 
 .table-context-menu-separator {
     height: 1px;
-    background: #eee;
+    background: var(--pz-surface-sunken);
     margin: 4px 0;
 }
 
@@ -145,41 +145,29 @@
 }
 
 html[data-theme='dark'] .noteentry table td.pz-cell-selected,
-html[data-theme='dark'] .noteentry table th.pz-cell-selected,
-body.dark-mode .noteentry table td.pz-cell-selected,
-body.dark-mode .noteentry table th.pz-cell-selected {
+html[data-theme='dark'] .noteentry table th.pz-cell-selected {
     box-shadow: inset 0 0 0 9999px rgba(59, 130, 246, 0.3);
 }
 
 /* Dark mode */
-html[data-theme='dark'] .table-context-menu,
-body.dark-mode .table-context-menu {
-    background: #1f2937;
-    border-color: #374151;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+html[data-theme='dark'] .table-context-menu {
+    background: var(--dm-content-bg);
+    border-color: var(--dm-border);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.4);
 }
 
-html[data-theme='dark'] .table-context-menu-item,
-body.dark-mode .table-context-menu-item {
-    color: #e5e7eb;
+html[data-theme='dark'] .table-context-menu-item {
+    color: var(--dm-text-bright);
 }
 
-html[data-theme='dark'] .table-context-menu-item:hover,
-body.dark-mode .table-context-menu-item:hover {
-    background: #374151;
+html[data-theme='dark'] .table-context-menu-item.danger {
+    color: var(--dm-danger);
 }
 
-html[data-theme='dark'] .table-context-menu-item.danger,
-body.dark-mode .table-context-menu-item.danger {
-    color: #f87171;
-}
-
-html[data-theme='dark'] .table-context-menu-item.danger:hover,
-body.dark-mode .table-context-menu-item.danger:hover {
+html[data-theme='dark'] .table-context-menu-item.danger:hover {
     background: #3b1919;
 }
 
-html[data-theme='dark'] .table-context-menu-separator,
-body.dark-mode .table-context-menu-separator {
-    background: #374151;
+html[data-theme='dark'] .table-context-menu-separator {
+    background: var(--dm-surface-hover);
 }

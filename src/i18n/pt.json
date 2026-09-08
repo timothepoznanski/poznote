@@ -1808,6 +1808,7 @@
     },
     "errors": {
       "workspace_not_found": "Espaço de trabalho não encontrado",
+      "folder_not_found": "Pasta não encontrada",
       "note_quota_reached": "Limite de notas atingido: esta instância permite no máximo {{max}} notas para este usuário (lixeira incluída).",
       "storage_quota_reached": "Limite de armazenamento atingido: esta instância permite no máximo {{max}} MB de armazenamento para este usuário.",
       "linked_note_already_exists": "Já existe um atalho para esta nota",

@@ -15,9 +15,9 @@
 .restore-spinner-circle {
     width: 20px;
     height: 20px;
-    border: 3px solid rgba(0, 0, 0, 0.08);
+    border: 3px solid rgba(var(--pz-shadow-rgb), 0.08);
     border-top-color: var(--pz-accent);
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     animation: restore-spin 1s linear infinite;
 }
 

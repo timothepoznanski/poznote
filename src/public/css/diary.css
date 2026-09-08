@@ -6,8 +6,15 @@
    of spanning the full-width container. */
 .diary-month {
     margin: 22px auto 0;
-    max-width: min(100%, calc(var(--dash-col-min, 190px) * var(--dash-col-max, 4)
-                  + var(--dash-col-gap, 14px) * (var(--dash-col-max, 4) - 1)));
+    /* Same grid arithmetic as the dashboard, with the diary's own numbers. It
+       used to read --dash-col-* directly, but dashboard.css declares those on
+       .view-size-* and no diary element is inside one, so the values never
+       arrived and only the fallbacks were ever used. */
+    --diary-col-min: 190px;
+    --diary-col-max: 4;
+    --diary-col-gap: 14px;
+    max-width: min(100%, calc(var(--diary-col-min) * var(--diary-col-max)
+                  + var(--diary-col-gap) * (var(--diary-col-max) - 1)));
 }
 
 .diary-month:first-child {
@@ -36,11 +43,11 @@
 
 .diary-month-title {
     font-size: 15px;
-    font-weight: 700;
-    color: #1f2937;
+    font-weight: var(--pz-weight-bold);
+    color: var(--pz-text);
     margin: 0 0 2px;
     padding-bottom: 6px;
-    border-bottom: 1.5px solid #e5e7eb;
+    border-bottom: 1.5px solid var(--pz-border);
 }
 
 /* Header actions: same .btn style as admin/users.php, centered.
@@ -66,7 +73,7 @@
    (dark mode is covered by css/dark-mode/components.css) */
 .diary-page .btn-primary {
     background: var(--pz-accent);
-    color: white !important;
+    color: var(--pz-text-inverse);
 }
 
 .diary-page .btn-primary:hover {
@@ -88,11 +95,11 @@
     align-items: center;
     gap: 6px;
     padding: 5px 14px;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 999px;
+    border: 1.5px solid var(--pz-border);
+    border-radius: var(--pz-radius-pill);
     font-size: 13px;
-    font-weight: 600;
-    color: #374151;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text);
     text-decoration: none;
     white-space: nowrap;
 }
@@ -105,7 +112,7 @@
 .diary-switch-btn.diary-switch-active {
     background: var(--pz-accent);
     border-color: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 /* New-diary modal. The generic .modal-overlay/.modal-dialog styling is not
@@ -113,7 +120,7 @@
 .diary-new-modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.45);
+    background: rgba(var(--pz-shadow-rgb), 0.45);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -122,9 +129,9 @@
 }
 
 .diary-new-modal {
-    background: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    background: var(--pz-bg);
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 10px 30px rgba(var(--pz-shadow-rgb), 0.25);
     width: min(92vw, 380px);
     padding: 18px 20px;
 }
@@ -132,8 +139,8 @@
 .diary-new-modal .modal-title {
     margin: 0 0 14px;
     font-size: 16px;
-    font-weight: 700;
-    color: #1f2937;
+    font-weight: var(--pz-weight-bold);
+    color: var(--pz-text);
 }
 
 .diary-new-modal .modal-footer {
@@ -148,7 +155,7 @@
     box-sizing: border-box;
     padding: 8px 10px;
     border: 1.5px solid var(--pz-border-strong);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-size: 14px;
     background: transparent;
     color: inherit;
@@ -162,7 +169,7 @@
 .diary-new-modal .diary-new-error {
     margin: 8px 0 0;
     font-size: 13px;
-    color: #dc2626;
+    color: var(--pz-danger);
 }
 
 /* Highlight today's card in the grid */
@@ -172,7 +179,7 @@
 
 .diary-today-tag {
     background: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
 }
 
 .diary-empty .lucide {
@@ -180,54 +187,45 @@
 }
 
 /* Dark mode */
-:root[data-theme='dark'] .diary-month-title,
-body.dark-mode .diary-month-title {
-    color: #e5e7eb;
-    border-bottom-color: #374151;
+html[data-theme='dark'] .diary-month-title {
+    color: var(--dm-text-bright);
+    border-bottom-color: var(--dm-border);
 }
 
-:root[data-theme='dark'] .diary-card-today,
-body.dark-mode .diary-card-today {
-    border-color: #0e6ba8;
+html[data-theme='dark'] .diary-card-today {
+    border-color: var(--dm-accent);
 }
 
-:root[data-theme='dark'] .diary-today-tag,
-body.dark-mode .diary-today-tag {
-    background: #0e6ba8;
-    color: #f3f4f6;
+html[data-theme='dark'] .diary-today-tag {
+    background: var(--dm-accent);
+    color: var(--dm-text-bright);
 }
 
-:root[data-theme='dark'] .diary-switch-btn,
-body.dark-mode .diary-switch-btn {
-    border-color: #374151;
-    color: #d1d5db;
+html[data-theme='dark'] .diary-switch-btn {
+    border-color: var(--dm-border);
+    color: var(--dm-text-bright);
 }
 
-:root[data-theme='dark'] .diary-switch-btn:hover,
-body.dark-mode .diary-switch-btn:hover {
-    border-color: #0e6ba8;
-    color: #60a5fa;
+html[data-theme='dark'] .diary-switch-btn:hover {
+    border-color: var(--dm-accent);
+    color: var(--dm-accent);
 }
 
-:root[data-theme='dark'] .diary-switch-btn.diary-switch-active,
-body.dark-mode .diary-switch-btn.diary-switch-active {
-    background: #0e6ba8;
-    border-color: #0e6ba8;
-    color: #f3f4f6;
+html[data-theme='dark'] .diary-switch-btn.diary-switch-active {
+    background: var(--dm-accent);
+    border-color: var(--dm-accent);
+    color: var(--dm-text-bright);
 }
 
-:root[data-theme='dark'] .diary-new-modal,
-body.dark-mode .diary-new-modal {
-    background: #1f2937;
+html[data-theme='dark'] .diary-new-modal {
+    background: var(--dm-content-bg);
 }
 
-:root[data-theme='dark'] .diary-new-modal .modal-title,
-body.dark-mode .diary-new-modal .modal-title {
-    color: #e5e7eb;
+html[data-theme='dark'] .diary-new-modal .modal-title {
+    color: var(--dm-text-bright);
 }
 
-:root[data-theme='dark'] .diary-new-modal .diary-new-input,
-body.dark-mode .diary-new-modal .diary-new-input {
-    border-color: #374151;
-    color: #e5e7eb;
+html[data-theme='dark'] .diary-new-modal .diary-new-input {
+    border-color: var(--dm-border);
+    color: var(--dm-text-bright);
 }

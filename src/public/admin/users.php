@@ -591,23 +591,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     <title><?php echo getPageTitle(); ?></title>
     <meta name="color-scheme" content="dark light">
     <script src="../js/theme-init.js?v=<?php echo $v; ?>"></script>
-    <link rel="stylesheet" href="../css/lucide.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/settings.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/home/search.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/users.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/variables.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/layout.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/menus.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/editor.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/modals.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/components.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/pages.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/markdown.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/kanban.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/icons.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/icon-sidebar.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/icon-sidebar-page.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/icon-sidebar-mobile.css?v=<?php echo $v; ?>">
+    <?php poznoteRenderStylesheets('admin/users', ['prefix' => '../']); ?>
     <style>
         /* The 12-column table needs ~1740px, more than the shared 1400px
            admin cap: size the container to its content so wide screens

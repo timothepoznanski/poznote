@@ -540,24 +540,9 @@ foreach ($stats as $r) {
     <title><?php echo t_h('admin_tools.storage_stats.title', [], 'Storage statistics'); ?></title>
     <meta name="color-scheme" content="dark light">
     <script src="../js/theme-init.js?v=<?php echo $v; ?>"></script>
-    <link rel="stylesheet" href="../css/lucide.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/settings.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/home/search.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/users.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/variables.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/layout.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/menus.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/editor.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/modals.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/components.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/pages.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/icons.css?v=<?php echo $v; ?>">
+    <?php poznoteRenderStylesheets('admin/storage-stats', ['prefix' => '../']); ?>
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
-    <link rel="stylesheet" href="../css/admin-tools.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/icon-sidebar.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/icon-sidebar-page.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/icon-sidebar-mobile.css?v=<?php echo $v; ?>">
     <style>
     /* The table (10 columns in S3 mode, nowrap cells) is far wider than the
        default 700px admin column: let it use the whole window, keeping the

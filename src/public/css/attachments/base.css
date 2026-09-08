@@ -20,7 +20,7 @@
 
 html, body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-    color: rgb(55, 53, 47);
+    color: var(--pz-text);
 }
 
 body {
@@ -32,15 +32,15 @@ body {
     margin: 20px auto;
     padding: 20px;
     display: block;
-    background: white;
+    background: var(--pz-bg);
 }
 
 .settings-section {
     margin-bottom: 30px;
     padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    background: #f9f9f9;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    background: var(--pz-surface);
 }
 
 .settings-section h3 {

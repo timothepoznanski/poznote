@@ -14,6 +14,10 @@ on:
       - dev
     paths:
       - '**.php'
+      - '**.css'
+      # css-check.php also counts the colours in PHP and JS.
+      - '**.js'
+      - 'tools/css-check.baseline.json'
       - 'phpstan.neon'
       - 'phpstan-baseline.neon'
       - 'phpstan-bootstrap.php'
@@ -21,6 +25,10 @@ on:
   pull_request:
     paths:
       - '**.php'
+      - '**.css'
+      # css-check.php also counts the colours in PHP and JS.
+      - '**.js'
+      - 'tools/css-check.baseline.json'
       - 'phpstan.neon'
       - 'phpstan-baseline.neon'
       - 'phpstan-bootstrap.php'
@@ -90,10 +98,26 @@ jobs:
       # and no config, which is only true because those modules were split out
       # of functions.php, so it runs in the same bare image as the lint step.
       # See tests/bootstrap.php for why there is no PHPUnit here.
+      #
+      # The cross-account isolation suite lives in tests/integration and is NOT
+      # run here: it needs a live instance to create accounts on. Run it by
+      # hand against the dev container before a release, and after touching
+      # auth.php, the API router or a controller's WHERE clause. See
+      # tests/integration/README.md.
       - name: Unit tests
         run: |
           docker run --rm -v "$PWD":/app -w /app "$PHP_IMAGE" \
             php tests/run.php
+
+      # Brace balance, the one-carrier rule, and the colour ratchet. The
+      # stylesheets are concatenated at request time, so a single unclosed brace
+      # silently disables every rule after it in the bundle; and without the
+      # ratchet the hardcoded colours creep back, one pasted snippet at a time,
+      # until the app stops being themeable. See src/public/css/README.md.
+      - name: Stylesheets
+        run: |
+          docker run --rm -v "$PWD":/app -w /app "$PHP_IMAGE" \
+            php tools/css-check.php
 
       - name: Download PHPStan
         run: |

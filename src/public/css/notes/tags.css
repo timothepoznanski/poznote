@@ -21,26 +21,26 @@
     flex-shrink: 0;
     align-self: center;
     line-height: 1;
-    color: #6c757d;
+    color: var(--pz-text-muted);
     cursor: pointer;
 }
 
 /* Folder Name badge */
 .folder_name {
     font-size: 13px;
-    color: #37352F;
+    color: var(--pz-text);
     flex-shrink: 0;
     margin-right: 20px;
     padding: 4px 8px;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
+    border-radius: var(--pz-radius-xl);
+    border: 1px solid var(--pz-border-light);
     display: inline-block;
     line-height: 1.2;
     transition: all 0.2s ease;
 }
 
 .folder_name:hover {
-    border-color: #cbd5e1;
+    border-color: var(--pz-border-strong);
 }
 
 /* Folder breadcrumb (segmented path inside the folder badge) */
@@ -59,7 +59,7 @@
 
 .folder-path-separator {
     margin: 0 4px;
-    color: #94a3b8;
+    color: var(--pz-text-subtle);
 }
 
 .folder-wrapper {
@@ -84,7 +84,7 @@
     align-self: center;
     line-height: 1;
     cursor: pointer;
-    color: #6c757d;
+    color: var(--pz-text-muted);
 }
 
 .lucide-tag.icon_tag:hover {
@@ -96,11 +96,11 @@
     flex: 1;
     min-width: 0;
     overflow: visible;
-    color: rgb(55, 53, 47) !important;
+    color: var(--pz-text) !important;
 }
 
 .name_tags * {
-    color: rgb(55, 53, 47) !important;
+    color: var(--pz-text) !important;
 }
 
 .name_tags input:focus {
@@ -122,7 +122,7 @@
     align-items: center;
     min-height: 24px;
     border: 1px solid transparent;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     padding: 4px;
     transition: border-color 0.2s ease;
     overflow-x: auto;
@@ -142,14 +142,14 @@
 .clickable-tag-wrapper {
     display: inline-flex;
     align-items: center;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
+    border: 1px solid var(--pz-border-light);
+    border-radius: var(--pz-radius-xl);
     transition: all 0.2s ease;
     flex-shrink: 0;
 }
 
 .clickable-tag-wrapper:hover {
-    border-color: #cbd5e1;
+    border-color: var(--pz-border-strong);
 }
 
 .clickable-tag {
@@ -181,7 +181,7 @@
     display: inline-block;
     width: 8px;
     height: 8px;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     margin-right: 5px;
     vertical-align: middle;
     position: relative;
@@ -191,17 +191,17 @@
 
 /* Tag Delete Button */
 .tag-delete-button {
-    color: #94a3b8;
+    color: var(--pz-text-subtle);
     padding: 4px 6px 4px 2px;
     font-size: 14px;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     cursor: pointer;
     transition: color 0.2s ease;
     line-height: 1;
 }
 
 .tag-delete-button:hover {
-    color: #ef4444;
+    color: var(--pz-danger);
 }
 
 /* Tag Highlight state */
@@ -210,18 +210,18 @@
     align-items: center;
     gap: 6px;
     padding: 2px 6px;
-    border-radius: 8px;
-    background: #fff3b0;
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-warning-soft);
 }
 
 .clickable-tag-wrapper.tag-highlight .clickable-tag {
-    color: #2b2b2b;
+    color: var(--pz-text);
 }
 
 .clickable-tag-wrapper.tag-highlight .tag-delete-button {
-    background: rgba(0, 0, 0, 0.06);
-    border-radius: 4px;
-    color: #7a3b00;
+    background: rgba(var(--pz-shadow-rgb), 0.06);
+    border-radius: var(--pz-radius-sm);
+    color: var(--pz-warning-strong);
 }
 
 /* Tag Input */
@@ -232,7 +232,7 @@
     padding: 4px 8px;
     font-size: 13px;
     font-family: 'Inter', sans-serif;
-    color: #37352F;
+    color: var(--pz-text);
     min-width: 60px;
     max-width: 150px;
     flex-shrink: 0;
@@ -242,14 +242,14 @@
 }
 
 .tag-input::placeholder {
-    color: #bababa;
+    color: var(--pz-text-subtle);
     font-style: italic;
 }
 
 .tag-input:focus {
     outline: none;
     background: rgba(var(--pz-accent-rgb), 0.1);
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
 }
 
 /* Tags Modal List Styles */
@@ -267,9 +267,9 @@
     justify-content: space-between;
     align-items: center;
     padding: 8px 12px;
-    background: #f8fafc;
-    border-radius: 6px;
-    border: 1px solid #e2e8f0;
+    background: var(--pz-surface);
+    border-radius: var(--pz-radius);
+    border: 1px solid var(--pz-border-light);
 }
 
 /* Colored-tag dot in the manage-tags modal (see js/tags-modal.js). It is a
@@ -278,36 +278,36 @@
     display: inline-block;
     width: 8px;
     height: 8px;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     margin-right: 8px;
     flex: 0 0 auto;
 }
 
 .tags-modal-item-name {
     font-size: 14px;
-    color: #334155;
+    color: var(--pz-text);
     flex-grow: 1;
     margin-right: 10px;
     outline: none;
     padding: 2px 4px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     transition: background 0.2s;
 }
 
 .tags-modal-item-name:focus {
     background: rgba(59, 130, 246, 0.1);
-    box-shadow: 0 0 0 1px #3b82f6;
+    box-shadow: 0 0 0 1px var(--pz-accent);
 }
 
 .tags-modal-item-delete {
-    color: #94a3b8;
+    color: var(--pz-text-subtle);
     cursor: pointer;
     transition: color 0.2s;
     font-size: 16px;
 }
 
 .tags-modal-item-delete:hover {
-    color: #ef4444;
+    color: var(--pz-danger);
 }
 
 .tags-modal-input-wrapper {
@@ -317,8 +317,8 @@
 #tagsModalInput {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
+    border: 1px solid var(--pz-border-light);
+    border-radius: var(--pz-radius);
     font-size: 14px;
     outline: none;
     transition: border-color 0.2s;
@@ -326,27 +326,27 @@
 }
 
 #tagsModalInput:focus {
-    border-color: #3b82f6;
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
 
 /* Dark Mode support for Tags Modal */
 html[data-theme='dark'] .tags-modal-item {
-    background: #1e293b;
-    border-color: #334155;
+    background: var(--dm-content-bg);
+    border-color: var(--dm-border);
 }
 
 html[data-theme='dark'] .tags-modal-item-name {
-    color: #e2e8f0;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .tags-modal-item-name:focus {
-    background: rgba(74, 158, 255, 0.2);
+    background: rgba(var(--dm-accent-rgb), 0.2);
     box-shadow: 0 0 0 1px var(--dm-accent);
 }
 
 html[data-theme='dark'] #tagsModalInput {
-    background: #0f172a;
-    border-color: #334155;
-    color: #f1f5f9;
+    background: var(--dm-content-bg);
+    border-color: var(--dm-border);
+    color: var(--dm-text-bright);
 }

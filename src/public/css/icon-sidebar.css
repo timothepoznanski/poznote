@@ -18,7 +18,7 @@
     padding: 10px 5px;
     box-sizing: border-box;
     background: var(--pz-surface);
-    border-right: 1px solid #dee2e6;
+    border-right: 1px solid var(--pz-border);
     flex-shrink: 0;
     overflow: hidden;
 }
@@ -70,10 +70,10 @@
     overflow-y: auto;
     padding: 6px;
     box-sizing: border-box;
-    background: #fff;
+    background: var(--pz-bg);
     border: 1px solid var(--pz-border);
-    border-radius: 8px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 6px 20px rgba(var(--pz-shadow-rgb), 0.15);
 }
 
 #iconSidebarOverflowMenu.icon-sidebar-overflow-open {
@@ -88,13 +88,13 @@
     box-sizing: border-box;
     padding: 8px 10px;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: transparent;
     /* Same resting grey as .icon-sidebar-btn: the menu is the rail's own
        entries relabelled, so it must not read as a different palette. The icon
        is a mask tinted by currentColor, so this colours the label and the
        glyph together. */
-    color: #9aa1ab;
+    color: var(--pz-text-subtle);
     font-family: inherit;
     font-size: 14px;
     text-align: left;
@@ -116,7 +116,6 @@
     height: 16px;
     flex-shrink: 0;
     background-color: currentColor;
-    filter: none !important;
     transform: none !important;
 }
 
@@ -179,8 +178,8 @@
     padding: 0;
     margin: 0;
     border: none;
-    border-radius: 8px;
-    color: #9aa1ab;
+    border-radius: var(--pz-radius-lg);
+    color: var(--pz-text-subtle);
     background: transparent;
     text-decoration: none;
     cursor: pointer;
@@ -218,8 +217,8 @@
     right: 4px;
     width: 8px;
     height: 8px;
-    border-radius: 50%;
-    background: #ef4444;
+    border-radius: var(--pz-radius-circle);
+    background: var(--pz-danger);
     display: block;
     pointer-events: none;
 }
@@ -234,7 +233,7 @@
 }
 
 .icon-sidebar-btn.has-notifications .lucide-bell {
-    color: #f59e0b;
+    color: var(--pz-warning-hover);
 }
 
 /* Collapse toggle: sits at the very bottom, just right of the rail's divider
@@ -250,26 +249,25 @@
     width: 16px;
     height: 25px;
     padding: 0;
-    border: 1px solid #ccc;
-    border-radius: 0 4px 4px 0;
-    background: #fff;
-    color: #6c757d;
+    border: 1px solid var(--pz-border-strong);
+    border-radius: 0 var(--pz-radius-sm) var(--pz-radius-sm) 0;
+    background: var(--pz-bg);
+    color: var(--pz-text-muted);
     cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 4px rgba(var(--pz-shadow-rgb), 0.05);
     transition: left 0.3s ease, background 0.2s ease, color 0.2s ease;
 }
 
 #iconSidebarToggle:hover {
     background: var(--pz-surface);
     color: var(--pz-accent);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.1);
 }
 
 #iconSidebarToggle .lucide {
     width: 12px;
     height: 12px;
     background-color: currentColor;
-    filter: none !important;
     transition: transform 0.3s ease;
 }
 
@@ -305,12 +303,12 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     gap: 8px;
     padding: 8px 16px;
     border: 1px solid var(--pz-border-strong);
-    border-radius: 6px;
-    background: #fff;
-    color: #374151;
+    border-radius: var(--pz-radius);
+    background: var(--pz-bg);
+    color: var(--pz-text);
     font-family: inherit;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     text-decoration: none;
     cursor: pointer;
 }
@@ -318,7 +316,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
 .poznote-back-to-note-btn:hover,
 .poznote-back-btn:hover {
     background: var(--pz-surface-hover);
-    color: #111827;
+    color: var(--pz-text);
     text-decoration: none;
 }
 
@@ -363,8 +361,8 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     justify-content: center;
     gap: 10px;
     font-size: 24px;
-    font-weight: 600;
-    color: #374151;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text);
     margin: 0 0 20px 0;
 }
 
@@ -392,7 +390,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     margin: 0;
     padding: 4px 8px 4px 9px;
     border: 1px solid var(--pz-border);
-    border-radius: 999px;
+    border-radius: var(--pz-radius-pill);
     background: var(--pz-surface);
     /* A long workspace name must not push the page name off screen: cap it and
        let the ellipsis take over (the full name is readable in the menu). */
@@ -400,7 +398,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     max-width: 40vw;
     font: inherit;
     font-size: 13px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     line-height: 1.2;
     color: var(--pz-text);
     cursor: pointer;
@@ -476,13 +474,13 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     overflow-y: auto;
     padding: 6px;
     box-sizing: border-box;
-    background: #fff;
+    background: var(--pz-bg);
     border: 1px solid var(--pz-border);
-    border-radius: 8px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 6px 20px rgba(var(--pz-shadow-rgb), 0.15);
     /* Explicit: once moved, the menu no longer inherits from the title. */
     font-size: 14px;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     line-height: 1.35;
     text-align: left;
 }
@@ -496,8 +494,8 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     align-items: center;
     gap: 8px;
     padding: 7px 10px;
-    border-radius: 6px;
-    color: #374151;
+    border-radius: var(--pz-radius);
+    color: var(--pz-text);
     text-decoration: none;
     cursor: pointer;
 }
@@ -510,7 +508,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
 }
 
 .poznote-page-title-workspace-item-current {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 /* Action entries a page adds (dashboard.php's scope modal) are buttons. */
@@ -548,8 +546,8 @@ button.poznote-page-title-workspace-item {
     width: 9px;
     height: 9px;
     box-sizing: border-box;
-    border-radius: 50%;
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: var(--pz-radius-circle);
+    border: 1px solid rgba(var(--pz-shadow-rgb), 0.12);
     flex-shrink: 0;
 }
 
@@ -568,7 +566,7 @@ button.poznote-page-title-workspace-item {
 
 .poznote-page-title-workspace-item-manage .lucide,
 .poznote-page-title-workspace-item-action .lucide {
-    color: var(--pz-text-muted, #6b7280);
+    color: var(--pz-text-muted, var(--pz-text-muted));
 }
 
 .poznote-page-title-workspace-item-manage:hover .lucide,

@@ -27,8 +27,8 @@
     left: 0;
     right: 0;
     margin: 8px -16px -16px -16px;
-    background: #ffffff;
-    border-top: 1px solid #e6eef8;
+    background: var(--pz-bg);
+    border-top: 1px solid var(--pz-border-light);
     padding: 4px 8px 8px 8px;
     z-index: 10;
 }
@@ -61,9 +61,9 @@
 .mini-calendar-month-year {
     flex: 1;
     text-align: center;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     font-size: 12px;
-    color: #1f2937;
+    color: var(--pz-text);
 }
 
 .mini-calendar-nav,
@@ -71,10 +71,10 @@
 .mini-calendar-toggle {
     background: transparent;
     border: none;
-    color: #6c757d;
+    color: var(--pz-text-muted);
     cursor: pointer;
     padding: 2px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -107,7 +107,7 @@
 
 .mini-calendar-weekday {
     text-align: center;
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
     font-size: 9px;
     color: var(--pz-text-muted);
     padding: 0;
@@ -127,7 +127,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    border-radius: 2px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     transition: background-color 0.2s;
     position: relative;
@@ -136,7 +136,7 @@
 }
 
 .mini-calendar-day:not(.mini-calendar-day-empty):hover {
-    background: #f6fbff;
+    background: var(--pz-surface);
 }
 
 .mini-calendar-day-empty {
@@ -145,20 +145,20 @@
 
 .mini-calendar-day-number {
     font-size: 10px;
-    color: #1f2937;
-    font-weight: 500;
+    color: var(--pz-text);
+    font-weight: var(--pz-weight-medium);
     line-height: 1;
 }
 
 /* Today indicator */
 .mini-calendar-day-today {
     background: rgba(11, 120, 230, 0.1);
-    border: 1px solid #0b78e6;
+    border: 1px solid var(--pz-accent);
 }
 
 .mini-calendar-day-today .mini-calendar-day-number {
-    color: #0b78e6;
-    font-weight: 700;
+    color: var(--pz-accent);
+    font-weight: var(--pz-weight-bold);
 }
 
 /* Note dots indicator */
@@ -173,14 +173,14 @@
 .mini-calendar-dot {
     width: 2.5px;
     height: 2.5px;
-    border-radius: 50%;
-    background: #0b78e6;
+    border-radius: var(--pz-radius-circle);
+    background: var(--pz-accent);
 }
 
 .mini-calendar-dot-more {
     font-size: 6px;
-    color: #0b78e6;
-    font-weight: 600;
+    color: var(--pz-accent);
+    font-weight: var(--pz-weight-semibold);
     line-height: 1;
 }
 
@@ -190,8 +190,8 @@
 }
 
 .mini-calendar-day-has-notes .mini-calendar-day-number {
-    font-weight: 600;
-    color: #1f2937;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text);
 }
 
 /* Responsive adjustments for smaller screens */
@@ -240,7 +240,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(var(--pz-shadow-rgb), 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -249,9 +249,9 @@
 }
 
 .calendar-notes-modal {
-    background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    background: var(--pz-bg);
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 10px 40px rgba(var(--pz-shadow-rgb), 0.2);
     max-width: 500px;
     width: 100%;
     max-height: 80vh;
@@ -261,7 +261,7 @@
 
 .calendar-notes-modal .modal-header {
     padding: 20px 24px;
-    border-bottom: 1px solid #e6eef8;
+    border-bottom: 1px solid var(--pz-border-light);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -270,8 +270,8 @@
 .calendar-notes-modal .modal-title {
     margin: 0;
     font-size: 18px;
-    font-weight: 600;
-    color: #1f2937;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text);
 }
 
 
@@ -292,24 +292,24 @@
     align-items: center;
     justify-content: space-between;
     padding: 12px 16px;
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
+    background: var(--pz-surface);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .calendar-note-item:hover {
     background: var(--pz-surface-hover);
-    border-color: #0b78e6;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border-color: var(--pz-accent);
+    box-shadow: 0 2px 4px rgba(var(--pz-shadow-rgb), 0.05);
 }
 
 .calendar-note-title {
     flex: 1;
-    color: #1f2937;
+    color: var(--pz-text);
     font-size: 14px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -318,12 +318,12 @@
 
 .calendar-note-open-btn {
     background: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     border: none;
     padding: 6px 16px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     font-size: 13px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     cursor: pointer;
     transition: background-color 0.2s;
     flex-shrink: 0;
@@ -342,7 +342,7 @@
 
 .calendar-notes-modal .modal-footer {
     padding: 16px 24px;
-    border-top: 1px solid #e6eef8;
+    border-top: 1px solid var(--pz-border-light);
     display: flex;
     flex-direction: row !important;
     justify-content: flex-end;
@@ -350,12 +350,12 @@
 }
 .calendar-notes-modal .btn-open-all {
     background: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     border: none;
     padding: 8px 20px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius-sm);
     font-size: 14px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     cursor: pointer;
     transition: background-color 0.2s;
 }
@@ -365,17 +365,17 @@
 }
 
 .calendar-notes-modal .btn-close-red {
-    background: #dc2626;
-    color: #ffffff;
+    background: var(--pz-danger);
+    color: var(--pz-text-inverse);
     border: none;
     padding: 8px 20px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius-sm);
     font-size: 14px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     cursor: pointer;
     transition: background-color 0.2s;
 }
 
 .calendar-notes-modal .btn-close-red:hover {
-    background: #b91c1c;
+    background: var(--pz-danger-hover);
 }

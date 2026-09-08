@@ -11,9 +11,9 @@
 .attachment-upload {
     margin-bottom: 20px;
     padding: 15px;
-    border: 2px dashed #ddd;
-    border-radius: 5px;
-    background: #f9f9f9;
+    border: 2px dashed var(--pz-border);
+    border-radius: var(--pz-radius-sm);
+    background: var(--pz-surface);
 }
 
 .upload-button-container {
@@ -28,17 +28,17 @@
 .attachment-upload input[type="file"] {
     width: 100%;
     padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 3px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm);
     box-sizing: border-box;
 }
 
 .attachment-upload button {
     padding: 8px 16px;
     background: var(--pz-accent);
-    color: white;
+    color: var(--pz-text-inverse);
     border: none;
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
 }
 
@@ -57,10 +57,10 @@
     align-items: center;
     justify-content: space-between;
     padding: 10px;
-    border: 1px solid #eee;
-    border-radius: 3px;
+    border: 1px solid var(--pz-border-light);
+    border-radius: var(--pz-radius-sm);
     margin-bottom: 5px;
-    background: #f9f9f9;
+    background: var(--pz-surface);
 }
 
 .attachment-info {
@@ -69,7 +69,7 @@
 
 .attachment-size {
     font-size: 0.8em;
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 .attachment-info strong {
@@ -88,6 +88,6 @@
     padding: 4px 8px;
     font-size: 0.8em;
     border: none;
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
 }

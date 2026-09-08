@@ -13,15 +13,15 @@
     align-items: center;
     gap: 12px;
     position: relative;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-xl);
     padding: 12px 16px;
     text-decoration: none;
     color: inherit;
     transition: all 0.2s ease;
     cursor: pointer;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 3px rgba(var(--pz-shadow-rgb), 0.05);
 }
 
 .home-card:hover {
@@ -57,7 +57,7 @@
     margin-left: -9px;
     border: 2px solid rgba(var(--pz-accent-rgb), 0.22);
     border-top-color: var(--pz-accent);
-    border-radius: 999px;
+    border-radius: var(--pz-radius-pill);
     animation: lucide-spin 0.8s linear infinite;
 }
 
@@ -69,7 +69,7 @@
     align-items: center;
     justify-content: center;
     background: rgba(var(--pz-accent-rgb), 0.1);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     flex-shrink: 0;
     position: relative;
 }
@@ -80,46 +80,46 @@
     font-style: normal;
 }
 
-/* Red cards */
+/* Red cards. The wash is mixed from --pz-danger rather than written as
+   rgba(<channels>, a): one token to override instead of a colour and its
+   channels kept in sync by hand. */
 .home-card-red .home-card-icon {
-    background: rgba(239, 68, 68, 0.12);
+    background: color-mix(in srgb, var(--pz-danger) 12%, transparent);
 }
 
 .home-card-red .home-card-icon i {
-    color: #f87171;
+    color: var(--pz-danger);
 }
 
-html[data-theme='dark'] .home-card-red .home-card-icon,
-body.dark-mode .home-card-red .home-card-icon {
-    background: rgba(239, 68, 68, 0.22);
+html[data-theme='dark'] .home-card-red .home-card-icon {
+    background: color-mix(in srgb, var(--pz-danger) 22%, transparent);
 }
 
 .home-card-red:hover {
-    border-color: #f87171;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+    border-color: var(--pz-danger);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--pz-danger) 15%, transparent);
 }
 
 /* Support card heart animation */
 @keyframes heartbeat {
-    0%, 100% { transform: scale(1); color: #f87171; }
-    15% { transform: scale(1.15); color: #ef4444; }
-    30% { transform: scale(1); color: #f87171; }
-    45% { transform: scale(1.12); color: #ef4444; }
-    60% { transform: scale(1); color: #f87171; }
+    0%, 100% { transform: scale(1); color: var(--pz-danger); }
+    15% { transform: scale(1.15); color: var(--pz-danger); }
+    30% { transform: scale(1); color: var(--pz-danger); }
+    45% { transform: scale(1.12); color: var(--pz-danger); }
+    60% { transform: scale(1); color: var(--pz-danger); }
 }
 
 #support-card .home-card-icon {
-    background: rgba(239, 68, 68, 0.12);
+    background: color-mix(in srgb, var(--pz-danger) 12%, transparent);
 }
 
 #support-card .home-card-icon i {
-    color: #f87171;
+    color: var(--pz-danger);
     animation: heartbeat 3.5s ease-in-out infinite;
 }
 
-html[data-theme='dark'] #support-card .home-card-icon,
-body.dark-mode #support-card .home-card-icon {
-    background: rgba(239, 68, 68, 0.22);
+html[data-theme='dark'] #support-card .home-card-icon {
+    background: color-mix(in srgb, var(--pz-danger) 22%, transparent);
 }
 
 /* Card content */
@@ -134,8 +134,8 @@ body.dark-mode #support-card .home-card-icon {
    card, js/font-size-settings.js); it stays at 1 on the other pages. */
 .home-card-title {
     font-size: calc(16px * var(--settings-font-scale, 1));
-    font-weight: 400;
-    color: #1f2937;
+    font-weight: var(--pz-weight-normal);
+    color: var(--pz-text);
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -146,7 +146,7 @@ body.dark-mode #support-card .home-card-icon {
 .home-card-description {
     font-size: calc(11px * var(--settings-font-scale, 1));
     color: var(--pz-text-muted);
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     margin-top: 2px;
     display: block;
 }
@@ -182,16 +182,16 @@ body.dark-mode #support-card .home-card-icon {
     max-width: 240px;
     background: #1f2937;
     color: #f9fafb;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(var(--pz-highlight-rgb), 0.15);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-size: 0.95rem;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     line-height: 1.4;
     text-align: left;
     white-space: normal;
     padding: 8px 10px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.25);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;

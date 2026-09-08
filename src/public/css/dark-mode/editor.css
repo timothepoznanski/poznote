@@ -3,71 +3,59 @@
    ============================================ */
 
 /* Note card and inner note */
-html[data-theme='dark'] .notecard,
-body.dark-mode .notecard {
+html[data-theme='dark'] .notecard {
     background-color: var(--dm-content-bg);
 }
 
-html[data-theme='dark'] .innernote,
-body.dark-mode .innernote {
+html[data-theme='dark'] .innernote {
     background-color: var(--dm-content-bg);
     color: var(--dm-text);
 }
 
 /* Note header and toolbar - apply dark background immediately */
-html[data-theme='dark'] .note-header,
-body.dark-mode .note-header {
+html[data-theme='dark'] .note-header {
     background-color: var(--dm-content-bg) !important;
 }
 
-html[data-theme='dark'] .note-edit-toolbar,
-body.dark-mode .note-edit-toolbar {
-    background-color: var(--dm-content-bg) !important;
+html[data-theme='dark'] .note-edit-toolbar {
+    background-color: var(--dm-content-bg);
 }
 
-html[data-theme='dark'] .note-header-spacer,
-body.dark-mode .note-header-spacer {
-    background-color: var(--dm-content-bg) !important;
+html[data-theme='dark'] .note-header-spacer {
+    background-color: var(--dm-content-bg);
 }
 
 /* Note title */
-html[data-theme='dark'] .css-title,
-body.dark-mode .css-title {
+html[data-theme='dark'] .css-title {
     background-color: var(--dm-content-bg);
     color: var(--dm-text);
 }
 
 /* Note entry content */
-html[data-theme='dark'] .noteentry,
-body.dark-mode .noteentry {
+html[data-theme='dark'] .noteentry {
     background-color: var(--dm-content-bg);
     color: var(--dm-text) !important;
 }
 
-html[data-theme='dark'] .note-scroll-edge-btn,
-body.dark-mode .note-scroll-edge-btn {
+html[data-theme='dark'] .note-scroll-edge-btn {
     background: rgba(51, 51, 51, 0.96);
     border-color: var(--dm-border);
     color: var(--dm-accent);
-    box-shadow: 0 5px 14px rgba(0, 0, 0, 0.26);
+    box-shadow: 0 5px 14px rgba(var(--pz-shadow-rgb), 0.26);
 }
 
 html[data-theme='dark'] .note-scroll-edge-btn:hover,
-html[data-theme='dark'] .note-scroll-edge-btn:focus,
-body.dark-mode .note-scroll-edge-btn:hover,
-body.dark-mode .note-scroll-edge-btn:focus {
+html[data-theme='dark'] .note-scroll-edge-btn:focus {
     background: var(--dm-surface-hover);
 }
 
 /* Readable text colors: preserve inline color styles, links, and syntax highlighting */
-html[data-theme='dark'] .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.code-line):not(.search-highlight):not(.search-highlight-active):not([class^="md-"]):not([class*=" md-"]):not(.markdown-codemirror-host *),
-body.dark-mode .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.code-line):not(.search-highlight):not(.search-highlight-active):not([class^="md-"]):not([class*=" md-"]):not(.markdown-codemirror-host *) {
+html[data-theme='dark'] .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.code-line):not(.search-highlight):not(.search-highlight-active):not([class^="md-"]):not([class*=" md-"]):not(.markdown-codemirror-host *) {
     color: var(--dm-text) !important;
 }
 
 /* Note placeholder */
-html[data-theme='dark'] div[contentEditable=true]:empty:before,
-body.dark-mode div[contentEditable=true]:empty:before {
+html[data-theme='dark'] div[contentEditable=true]:empty:before {
     color: var(--dm-border-light);
 }
 
@@ -78,43 +66,34 @@ body.dark-mode div[contentEditable=true]:empty:before {
 /* Pre blocks and code-block class */
 html[data-theme='dark'] .noteentry pre,
 html[data-theme='dark'] .code-block,
-html[data-theme='dark'] pre.code-block,
-body.dark-mode .noteentry pre,
-body.dark-mode .code-block,
-body.dark-mode pre.code-block {
+html[data-theme='dark'] pre.code-block {
     background-color: var(--dm-code-bg) !important;
     border-color: var(--dm-border) !important;
     color: var(--dm-text-muted) !important;
 }
 
 /* Line-number gutter (code_block_line_numbers setting) */
-html[data-theme='dark'] .noteentry pre code.code-line-numbers .code-line::before,
-body.dark-mode .noteentry pre code.code-line-numbers .code-line::before {
+html[data-theme='dark'] .noteentry pre code.code-line-numbers .code-line::before {
     color: var(--dm-text-muted);
     opacity: 0.55;
 }
 
 /* Highlighter inside code blocks: preserve dark background with readable highlight */
 html[data-theme='dark'] .noteentry pre *[style*="background"],
-body.dark-mode .noteentry pre *[style*="background"],
 html[data-theme='dark'] .noteentry code *[style*="background"],
-body.dark-mode .noteentry code *[style*="background"],
-html[data-theme='dark'] .noteentry .code-block *[style*="background"],
-body.dark-mode .noteentry .code-block *[style*="background"] {
+html[data-theme='dark'] .noteentry .code-block *[style*="background"] {
     background: linear-gradient(rgba(255, 255, 0, 0.4), rgba(255, 255, 0, 0.4)), var(--dm-code-bg) !important;
     color: var(--dm-text) !important;
 }
 
 /* Inline code only (not inside pre blocks with syntax highlighting) */
-html[data-theme='dark'] .noteentry code:not([class*="hljs"]):not([class*="language-"]),
-body.dark-mode .noteentry code:not([class*="hljs"]):not([class*="language-"]) {
+html[data-theme='dark'] .noteentry code:not([class*="hljs"]):not([class*="language-"]) {
     background-color: var(--dm-surface) !important;
     color: var(--dm-text);
     border-color: var(--dm-border) !important;
 }
 
-html[data-theme='dark'] .noteentry pre code:not([class*="hljs"]):not([class*="language-"]),
-body.dark-mode .noteentry pre code:not([class*="hljs"]):not([class*="language-"]) {
+html[data-theme='dark'] .noteentry pre code:not([class*="hljs"]):not([class*="language-"]) {
     background-color: transparent !important;
     color: var(--dm-text-muted) !important;
     border-color: transparent !important;
@@ -122,20 +101,14 @@ body.dark-mode .noteentry pre code:not([class*="hljs"]):not([class*="language-"]
 
 /* Code blocks with language class - readable text before highlight.js processes */
 html[data-theme='dark'] .noteentry pre code[class*="language-"],
-html[data-theme='dark'] .noteentry code[class*="language-"],
-body.dark-mode .noteentry pre code[class*="language-"],
-body.dark-mode .noteentry code[class*="language-"] {
+html[data-theme='dark'] .noteentry code[class*="language-"] {
     color: var(--dm-text-muted) !important;
 }
 
 /* Code block and Excalidraw placeholders */
 html[data-theme='dark'] p.code-block-placeholder-before[data-ph]:empty:before,
 html[data-theme='dark'] p.code-block-placeholder-after[data-ph]:empty:before,
-html[data-theme='dark'] .excalidraw-placeholder[data-ph]:empty:before,
-body.dark-mode p.code-block-placeholder-before[data-ph]:empty:before,
-body.dark-mode p.code-block-placeholder-after[data-ph]:empty:before,
-body.dark-mode .excalidraw-placeholder[data-ph]:empty:before {
-    color: #888 !important;
+html[data-theme='dark'] .excalidraw-placeholder[data-ph]:empty:before {
     opacity: 0.6;
 }
 
@@ -148,28 +121,15 @@ html[data-theme='dark'] .code-block-actions-host > .code-block-copy-btn,
 html[data-theme='dark'] .code-block-actions-host > .code-block-delete-btn,
 html[data-theme='dark'] .code-block-line-numbers-btn,
 html[data-theme='dark'] .noteentry pre .code-block-line-numbers-btn,
-html[data-theme='dark'] .code-block-actions-host > .code-block-line-numbers-btn,
-body.dark-mode .code-block-copy-btn,
-body.dark-mode pre.code-block .code-block-copy-btn,
-body.dark-mode .noteentry pre .code-block-copy-btn,
-body.dark-mode .public-note .content pre .code-block-copy-btn,
-body.dark-mode .code-block-actions-host > .code-block-copy-btn,
-body.dark-mode .code-block-actions-host > .code-block-delete-btn,
-body.dark-mode .code-block-line-numbers-btn,
-body.dark-mode .noteentry pre .code-block-line-numbers-btn,
-body.dark-mode .code-block-actions-host > .code-block-line-numbers-btn {
+html[data-theme='dark'] .code-block-actions-host > .code-block-line-numbers-btn {
     background: transparent !important;
     border: none !important;
-    color: #aaaaaa !important;
     opacity: 0.55 !important;
 }
 
 html[data-theme='dark'] .code-block-copy-btn svg,
 html[data-theme='dark'] .code-block-delete-btn svg,
-html[data-theme='dark'] .code-block-line-numbers-btn svg,
-body.dark-mode .code-block-copy-btn svg,
-body.dark-mode .code-block-delete-btn svg,
-body.dark-mode .code-block-line-numbers-btn svg {
+html[data-theme='dark'] .code-block-line-numbers-btn svg {
     stroke: currentColor !important;
 }
 
@@ -177,13 +137,8 @@ html[data-theme='dark'] .code-block-delete-btn,
 html[data-theme='dark'] pre.code-block .code-block-delete-btn,
 html[data-theme='dark'] .noteentry pre .code-block-delete-btn,
 html[data-theme='dark'] .public-note .content pre .code-block-delete-btn,
-html[data-theme='dark'] .code-block-actions-host > .code-block-delete-btn,
-body.dark-mode .code-block-delete-btn,
-body.dark-mode pre.code-block .code-block-delete-btn,
-body.dark-mode .noteentry pre .code-block-delete-btn,
-body.dark-mode .public-note .content pre .code-block-delete-btn,
-body.dark-mode .code-block-actions-host > .code-block-delete-btn {
-    color: #f87171 !important;
+html[data-theme='dark'] .code-block-actions-host > .code-block-delete-btn {
+    color: var(--dm-danger) !important;
 }
 
 html[data-theme='dark'] .code-block-copy-btn:hover,
@@ -193,17 +148,9 @@ html[data-theme='dark'] .public-note .content pre .code-block-copy-btn:hover,
 html[data-theme='dark'] .code-block-actions-host > .code-block-copy-btn:hover,
 html[data-theme='dark'] .code-block-actions-host > .code-block-delete-btn:hover,
 html[data-theme='dark'] .code-block-line-numbers-btn:hover,
-html[data-theme='dark'] .code-block-actions-host > .code-block-line-numbers-btn:hover,
-body.dark-mode .code-block-copy-btn:hover,
-body.dark-mode pre.code-block .code-block-copy-btn:hover,
-body.dark-mode .noteentry pre .code-block-copy-btn:hover,
-body.dark-mode .public-note .content pre .code-block-copy-btn:hover,
-body.dark-mode .code-block-actions-host > .code-block-copy-btn:hover,
-body.dark-mode .code-block-actions-host > .code-block-delete-btn:hover,
-body.dark-mode .code-block-line-numbers-btn:hover,
-body.dark-mode .code-block-actions-host > .code-block-line-numbers-btn:hover {
+html[data-theme='dark'] .code-block-actions-host > .code-block-line-numbers-btn:hover {
     background: transparent !important;
-    color: #ffffff !important;
+    color: var(--pz-text-inverse) !important;
     opacity: 1 !important;
 }
 
@@ -211,23 +158,15 @@ html[data-theme='dark'] .code-block-delete-btn:hover,
 html[data-theme='dark'] pre.code-block .code-block-delete-btn:hover,
 html[data-theme='dark'] .noteentry pre .code-block-delete-btn:hover,
 html[data-theme='dark'] .public-note .content pre .code-block-delete-btn:hover,
-html[data-theme='dark'] .code-block-actions-host > .code-block-delete-btn:hover,
-body.dark-mode .code-block-delete-btn:hover,
-body.dark-mode pre.code-block .code-block-delete-btn:hover,
-body.dark-mode .noteentry pre .code-block-delete-btn:hover,
-body.dark-mode .public-note .content pre .code-block-delete-btn:hover,
-body.dark-mode .code-block-actions-host > .code-block-delete-btn:hover {
-    color: #ff6b6b !important;
+html[data-theme='dark'] .code-block-actions-host > .code-block-delete-btn:hover {
+    color: var(--dm-danger) !important;
 }
 
 html[data-theme='dark'] .code-block-copy-btn.copied,
 html[data-theme='dark'] pre.code-block .code-block-copy-btn.copied,
-html[data-theme='dark'] .noteentry pre .code-block-copy-btn.copied,
-body.dark-mode .code-block-copy-btn.copied,
-body.dark-mode pre.code-block .code-block-copy-btn.copied,
-body.dark-mode .noteentry pre .code-block-copy-btn.copied {
+html[data-theme='dark'] .noteentry pre .code-block-copy-btn.copied {
     background: transparent !important;
-    color: #28a745 !important;
+    color: var(--dm-success-hover) !important;
     border: none !important;
     opacity: 1 !important;
 }
@@ -236,118 +175,71 @@ body.dark-mode .noteentry pre .code-block-copy-btn.copied {
    Links in Notes
    ============================================ */
 
-html[data-theme='dark'] .noteentry a,
-body.dark-mode .noteentry a {
-    color: #64B5F6 !important;
+html[data-theme='dark'] .noteentry a {
+    color: var(--dm-accent-hover) !important;
 }
 
 /* Audio player */
 html[data-theme='dark'] .noteentry .note-audio-embed,
-html[data-theme='dark'] .noteentry audio,
-body.dark-mode .noteentry .note-audio-embed,
-body.dark-mode .noteentry audio {
+html[data-theme='dark'] .noteentry audio {
     background: var(--dm-surface);
 }
 
-html[data-theme='dark'] .note-attachment-preview,
-body.dark-mode .note-attachment-preview {
+html[data-theme='dark'] .note-attachment-preview {
     border-color: var(--dm-border);
     background: var(--dm-surface);
 }
 
-html[data-theme='dark'] .note-attachment-preview-media,
-html[data-theme='dark'] .note-attachment-preview-file-card,
-body.dark-mode .note-attachment-preview-media,
-body.dark-mode .note-attachment-preview-file-card {
-    background: var(--dm-sidebar-surface);
-}
-
-html[data-theme='dark'] .note-attachment-preview-file-card,
-body.dark-mode .note-attachment-preview-file-card {
-    color: var(--dm-text);
-}
-
 html[data-theme='dark'] .note-attachment-preview-file-card:hover,
-html[data-theme='dark'] .note-attachment-preview-file-card:focus,
-body.dark-mode .note-attachment-preview-file-card:hover,
-body.dark-mode .note-attachment-preview-file-card:focus {
-    background: var(--dm-surface-hover);
+html[data-theme='dark'] .note-attachment-preview-file-card:focus {
     color: var(--dm-accent);
 }
 
-html[data-theme='dark'] .note-attachment-preview-caption,
-body.dark-mode .note-attachment-preview-caption {
+html[data-theme='dark'] .note-attachment-preview-caption {
     border-top-color: var(--dm-border);
-    color: var(--dm-text-muted);
-}
-
-html[data-theme='dark'] .note-attachment-preview-caption a,
-body.dark-mode .note-attachment-preview-caption a {
-    color: var(--dm-text) !important;
 }
 
 html[data-theme='dark'] .note-attachment-preview-caption a:hover,
-html[data-theme='dark'] .note-attachment-preview-caption a:focus,
-body.dark-mode .note-attachment-preview-caption a:hover,
-body.dark-mode .note-attachment-preview-caption a:focus {
+html[data-theme='dark'] .note-attachment-preview-caption a:focus {
     color: var(--dm-accent) !important;
-}
-
-html[data-theme='dark'] .note-attachment-preview-file-card i,
-html[data-theme='dark'] .note-attachment-preview-caption i,
-html[data-theme='dark'] .note-attachment-preview-size,
-body.dark-mode .note-attachment-preview-file-card i,
-body.dark-mode .note-attachment-preview-caption i,
-body.dark-mode .note-attachment-preview-size {
-    color: var(--dm-text-muted);
 }
 
 /* ============================================
    Text Selection & Highlighting
    ============================================ */
 
-html[data-theme='dark'] ::selection,
-body.dark-mode ::selection {
-    background-color: #264f78;
-    color: #ffffff;
+:where(html[data-theme='dark']) ::selection {
+    background-color: var(--dm-accent-soft);
+    color: var(--pz-text-inverse);
 }
 
-html[data-theme='dark'] ::-moz-selection,
-body.dark-mode ::-moz-selection {
-    background-color: #264f78;
-    color: #ffffff;
+:where(html[data-theme='dark']) ::-moz-selection {
+    background-color: var(--dm-accent-soft);
+    color: var(--pz-text-inverse);
 }
 
 /* Search highlights */
-html[data-theme='dark'] mark,
-html[data-theme='dark'] .highlight,
-body.dark-mode mark,
-body.dark-mode .highlight {
-    background-color: #4d4d00;
-    color: #ffff99;
+:where(html[data-theme='dark']) mark,
+html[data-theme='dark'] .highlight {
+    background-color: var(--dm-warning-soft);
+    color: var(--dm-warning);
 }
 
 /* Highlighting inside code blocks (search/highlight marks, not syntax) */
-html[data-theme='dark'] pre mark[style*="background"],
-html[data-theme='dark'] code mark[style*="background"],
-html[data-theme='dark'] .code-block mark[style*="background"],
-body.dark-mode pre mark[style*="background"],
-body.dark-mode code mark[style*="background"],
-body.dark-mode .code-block mark[style*="background"] {
-    background-color: #665500 !important;
+:where(html[data-theme='dark']) pre mark[style*="background"],
+:where(html[data-theme='dark']) code mark[style*="background"],
+html[data-theme='dark'] .code-block mark[style*="background"] {
+    background-color: var(--dm-warning-soft) !important;
     background-image: none !important;
-    color: #ffff99 !important;
+    color: var(--dm-warning) !important;
 }
 
 /* Yellow highlighter tool */
-html[data-theme='dark'] [style*="background-color: rgb(255, 224, 102)"],
+:where(html[data-theme='dark']) [style*="background-color: rgb(255, 224, 102)"],
 html[data-theme='dark'] [style*="background-color:#ffe066"],
-html[data-theme='dark'] [style*="background-color: #ffe066"],
-body.dark-mode [style*="background-color: rgb(255, 224, 102)"],
-body.dark-mode [style*="background-color:#ffe066"],
-body.dark-mode [style*="background-color: #ffe066"] {
-    background-color: #665500 !important;
-    color: #ffff99 !important;
+html[data-theme='dark'] [style*="background-color: #ffe066"] {
+    background-color: var(--dm-warning-soft) !important;
+    color: var(--dm-warning) !important;
 }
 
 /* Highlighter tool — other colors.
@@ -374,34 +266,12 @@ html[data-theme='dark'] .noteentry [style*="background-color:#d0bfff"],
 html[data-theme='dark'] .noteentry [style*="background-color: #d0bfff"],
 html[data-theme='dark'] .noteentry [style*="background-color: rgb(222, 226, 230)"],
 html[data-theme='dark'] .noteentry [style*="background-color:#dee2e6"],
-html[data-theme='dark'] .noteentry [style*="background-color: #dee2e6"],
-body.dark-mode .noteentry [style*="background-color: rgb(255, 168, 168)"],
-body.dark-mode .noteentry [style*="background-color:#ffa8a8"],
-body.dark-mode .noteentry [style*="background-color: #ffa8a8"],
-body.dark-mode .noteentry [style*="background-color: rgb(178, 242, 187)"],
-body.dark-mode .noteentry [style*="background-color:#b2f2bb"],
-body.dark-mode .noteentry [style*="background-color: #b2f2bb"],
-body.dark-mode .noteentry [style*="background-color: rgb(165, 216, 255)"],
-body.dark-mode .noteentry [style*="background-color:#a5d8ff"],
-body.dark-mode .noteentry [style*="background-color: #a5d8ff"],
-body.dark-mode .noteentry [style*="background-color: rgb(255, 201, 222)"],
-body.dark-mode .noteentry [style*="background-color:#ffc9de"],
-body.dark-mode .noteentry [style*="background-color: #ffc9de"],
-body.dark-mode .noteentry [style*="background-color: rgb(255, 216, 168)"],
-body.dark-mode .noteentry [style*="background-color:#ffd8a8"],
-body.dark-mode .noteentry [style*="background-color: #ffd8a8"],
-body.dark-mode .noteentry [style*="background-color: rgb(208, 191, 255)"],
-body.dark-mode .noteentry [style*="background-color:#d0bfff"],
-body.dark-mode .noteentry [style*="background-color: #d0bfff"],
-body.dark-mode .noteentry [style*="background-color: rgb(222, 226, 230)"],
-body.dark-mode .noteentry [style*="background-color:#dee2e6"],
-body.dark-mode .noteentry [style*="background-color: #dee2e6"] {
-    color: #1a1a1a !important;
+html[data-theme='dark'] .noteentry [style*="background-color: #dee2e6"] {
+    color: var(--dm-content-bg) !important;
 }
 
 /* Horizontal rules */
-html[data-theme='dark'] hr,
-body.dark-mode hr {
+:where(html[data-theme='dark']) hr {
     border-color: var(--dm-border);
 }
 
@@ -409,15 +279,13 @@ body.dark-mode hr {
    Toolbar Buttons
    ============================================ */
 
-html[data-theme='dark'] .toolbar-btn,
-body.dark-mode .toolbar-btn {
+html[data-theme='dark'] .toolbar-btn {
     background-color: var(--dm-surface);
     color: var(--dm-text);
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .toolbar-btn:hover,
-body.dark-mode .toolbar-btn:hover {
+html[data-theme='dark'] .toolbar-btn:hover {
     background-color: var(--dm-surface-hover);
 }
 
@@ -426,63 +294,48 @@ body.dark-mode .toolbar-btn:hover {
    ============================================ */
 
 /* Color palette popup */
-html[data-theme='dark'] .color-palette-popup,
-body.dark-mode .color-palette-popup {
+html[data-theme='dark'] .color-palette-popup {
     background-color: var(--dm-surface);
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .color-palette-popup .color-grid,
-body.dark-mode .color-palette-popup .color-grid {
-    background: var(--dm-surface) !important;
+html[data-theme='dark'] .color-palette-popup .color-grid {
+    background: var(--dm-surface);
 }
 
 /* Outline swatches so dark ones (e.g. the black text color) stay visible
    against the dark popup background. */
-html[data-theme='dark'] .color-palette-popup .color-swatch,
-body.dark-mode .color-palette-popup .color-swatch {
-    border: 1px solid rgba(255, 255, 255, 0.35);
+html[data-theme='dark'] .color-palette-popup .color-swatch {
+    border: 1px solid rgba(var(--pz-highlight-rgb), 0.35);
 }
 
 /* Font size popup */
-html[data-theme='dark'] .font-size-popup,
-body.dark-mode .font-size-popup {
+html[data-theme='dark'] .font-size-popup {
     background-color: var(--dm-content-bg);
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .font-size-popup .font-size-item:hover,
-body.dark-mode .font-size-popup .font-size-item:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+html[data-theme='dark'] .font-size-popup .font-size-item:hover {
+    background-color: rgba(var(--pz-highlight-rgb), 0.1);
 }
 
-html[data-theme='dark'] .font-size-popup .size-label,
-body.dark-mode .font-size-popup .size-label {
-    color: var(--dm-text);
-}
-
-html[data-theme='dark'] .font-size-popup .size-preview,
-body.dark-mode .font-size-popup .size-preview {
+html[data-theme='dark'] .font-size-popup .size-preview {
     border-color: var(--dm-border);
-    color: var(--dm-text);
     background-color: var(--dm-content-bg);
 }
 
 /* Image resize handle */
-html[data-theme='dark'] .image-resize-handle,
-body.dark-mode .image-resize-handle {
+html[data-theme='dark'] .image-resize-handle {
     background: var(--pz-accent);
     border-color: var(--dm-surface);
 }
 
-html[data-theme='dark'] .image-resize-handle:hover,
-body.dark-mode .image-resize-handle:hover {
-    background: #0099e6;
+html[data-theme='dark'] .image-resize-handle:hover {
+    background: var(--dm-accent);
 }
 
 /* Blockquotes */
-html[data-theme='dark'] .noteentry blockquote,
-body.dark-mode .noteentry blockquote {
+html[data-theme='dark'] .noteentry blockquote {
     border-left-color: var(--dm-border);
-    color: #b0b0b0;
+    color: var(--dm-text);
 }

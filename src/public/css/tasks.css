@@ -5,11 +5,11 @@
 
 .task-drag-handle {
     cursor: grab;
-    color: #999;
+    color: var(--pz-text-subtle);
     font-size: 12px;
     margin-left: 4px;
     padding: 2px 4px;
-    border-radius: 2px;
+    border-radius: var(--pz-radius-sm);
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
@@ -35,22 +35,22 @@
 }
 
 .noteentry .tasklist-progress-label {
-    color: #666;
+    color: var(--pz-text-muted);
     text-align: left;
     margin-bottom: 6px;
 }
 
 .noteentry .tasklist-progress-bar {
     height: 8px;
-    border-radius: 4px;
-    background-color: #e9ecef;
+    border-radius: var(--pz-radius-sm);
+    background-color: var(--pz-surface-sunken);
     overflow: hidden;
 }
 
 .noteentry .tasklist-progress-fill {
     height: 100%;
     width: 0;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background-color: var(--pz-accent);
     transition: width 0.3s ease;
 }
@@ -75,11 +75,11 @@
 .task-input {
     width: 95%;
     padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm);
     font-size: 14px;
     font-family: inherit;
-    background: #fff;
+    background: var(--pz-bg);
     transition: border-color 0.2s ease;
 }
 
@@ -106,8 +106,8 @@
     padding: 6px 12px !important;
     margin-bottom: 8px;
     border: 1px solid var(--pz-border);
-    border-radius: 6px;
-    background: #fafafa;
+    border-radius: var(--pz-radius);
+    background: var(--pz-surface);
     transition: all 0.2s ease;
     user-select: none;
     -webkit-user-select: none;
@@ -117,12 +117,12 @@
 
 .task-drag-handle {
     cursor: grab;
-    color: #999;
+    color: var(--pz-text-subtle);
     font-size: 18px;
     margin-right: 2px;
     margin-left: 2px;
     padding: 2px 4px;
-    border-radius: 2px;
+    border-radius: var(--pz-radius-sm);
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
@@ -131,8 +131,8 @@
 }
 
 .task-drag-handle:hover {
-    color: #666;
-    background: rgba(0, 0, 0, 0.05);
+    color: var(--pz-text-muted);
+    background: rgba(var(--pz-shadow-rgb), 0.05);
 }
 
 .task-drag-handle:active {
@@ -140,8 +140,8 @@
 }
 
 .task-item:hover {
-    background: #f5f5f5;
-    border-color: #ccc;
+    background: var(--pz-surface-hover);
+    border-color: var(--pz-border-strong);
 }
 
 /* Drag & drop visual helpers */
@@ -153,34 +153,34 @@
 .task-item.dragging {
     opacity: 0.5;
     /* transform: rotate(3deg) scale(1.05); */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.15);
     z-index: 1000;
-    border: 4px solid var(--pz-accent) !important;
+    border: 4px solid var(--pz-accent);
 }
 
 /* Placeholder used for touch drag-and-drop */
 .task-item.placeholder {
-    border: 1px dashed #cbd5e0;
-    background: rgba(0, 0, 0, 0.02);
+    border: 1px dashed var(--pz-border-strong);
+    background: rgba(var(--pz-shadow-rgb), 0.02);
 }
 
 .task-item.completed {
-    background: #f0f8f0;
+    background: var(--pz-surface-hover);
     border-color: #c8e6c9;
     opacity: 0.8;
 }
 
 .task-item.completed .task-text {
     text-decoration: line-through;
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 .task-item.completed .task-text a {
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 .task-item.completed .task-text a:hover {
-    color: #444;
+    color: var(--pz-text);
     text-decoration: underline;
 }
 
@@ -228,10 +228,10 @@
     flex: 1;
     padding: 2px 4px;
     border: 1px solid var(--pz-accent);
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
     font-size: 14px;
     font-family: inherit;
-    background: #fff;
+    background: var(--pz-bg);
     outline: none;
 }
 
@@ -274,8 +274,8 @@
     min-height: 120px;
     flex: 0 1 auto;
     padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm);
     font-size: var(--note-font-size, 15px);
     font-family: inherit;
     line-height: 1.5;
@@ -295,7 +295,7 @@
 
 .task-edit-hint {
     margin: 0;
-    color: #6c757d;
+    color: var(--pz-text-muted);
     font-size: 12px;
     line-height: 1.35;
 }
@@ -303,7 +303,7 @@
 .task-edit-error {
     display: none;
     margin: 0;
-    color: #d32f2f;
+    color: var(--pz-danger);
     font-size: 13px;
     line-height: 1.35;
 }
@@ -340,7 +340,7 @@
     padding: 4px 8px;
     background: transparent;
     border: none;
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     font-size: 12px;
     opacity: 0.7;
@@ -354,7 +354,7 @@
     padding: 4px 8px;
     background: transparent;
     border: none;
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     font-size: 12px;
     opacity: 0.7;
@@ -380,18 +380,18 @@
 .task-important-btn i,
 .task-move-btn i,
 .task-drag-handle i {
-    color: #999;
+    color: var(--pz-text-subtle);
     font-family: "Font Awesome 5 Pro" !important;
     font-style: normal !important;
     display: inline-block;
 }
 
 .task-delete-btn:hover i {
-    color: #d32f2f;
+    color: var(--pz-danger);
 }
 
 .task-important-btn:hover i {
-    color: #ffa000;
+    color: var(--pz-warning-hover);
 }
 
 .task-move-btn:hover i {
@@ -402,7 +402,7 @@
     padding: 4px 8px;
     background: transparent;
     border: none;
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     font-size: 12px;
     opacity: 0.7;
@@ -414,7 +414,7 @@
 
 .task-due-btn i {
     font-size: 16px !important;
-    color: #999;
+    color: var(--pz-text-subtle);
     font-family: "Font Awesome 5 Pro" !important;
     font-style: normal !important;
     display: inline-block;
@@ -431,10 +431,10 @@
     gap: 4px;
     margin-left: 10px;
     padding: 2px 8px;
-    border: 1px solid #d0d7de;
-    border-radius: 12px;
-    background: #f6f8fa;
-    color: #57606a;
+    border: 1px solid var(--pz-border-strong);
+    border-radius: var(--pz-radius-xl);
+    background: var(--pz-surface);
+    color: var(--pz-text-secondary);
     font-size: 12px;
     line-height: 1.4;
     cursor: pointer;
@@ -454,9 +454,9 @@
 }
 
 .task-due-chip.overdue {
-    border-color: #f1b8b8;
+    border-color: var(--pz-danger-soft);
     background: #fdf2f2;
-    color: #c62828;
+    color: var(--pz-danger-hover);
 }
 
 .task-item.completed .task-due-chip {
@@ -477,7 +477,7 @@
     padding: 4px 8px;
     background: transparent;
     border: none;
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     font-size: 12px;
     opacity: 0.7;
@@ -488,7 +488,7 @@
 
 .task-menu-btn i {
     font-size: 16px !important;
-    color: #999;
+    color: var(--pz-text-subtle);
     font-family: "Font Awesome 5 Pro" !important;
     font-style: normal !important;
     display: inline-block;
@@ -503,10 +503,10 @@
     position: fixed;
     z-index: 9999;
     min-width: 210px;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 12px 30px rgba(var(--pz-shadow-rgb), 0.12);
     padding: 6px;
     display: flex;
     flex-direction: column;
@@ -519,11 +519,11 @@
     padding: 10px 12px;
     background: none;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     cursor: pointer;
     font-family: inherit;
     font-size: 14px;
-    color: #111827;
+    color: var(--pz-text);
     text-align: left;
 }
 
@@ -583,23 +583,23 @@
 
 /* Important task styling */
 .task-item.important {
-    border-color: #ffcccc;
-    background: #fff6f6;
+    border-color: var(--pz-danger-soft);
+    background: var(--pz-surface);
 }
 
 .task-item.important .task-text {
-    color: #c62828;
+    color: var(--pz-danger-hover);
     /* red text for important tasks */
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .task-item.important .task-text a {
-    color: #c62828;
-    font-weight: 600;
+    color: var(--pz-danger-hover);
+    font-weight: var(--pz-weight-semibold);
 }
 
 .task-item.important .task-text a:hover {
-    color: #8b0000;
+    color: var(--pz-danger-strong);
     text-decoration: underline;
 }
 
@@ -607,7 +607,7 @@
     padding: 4px 8px;
     background: transparent;
     border: none;
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     font-size: 12px;
     opacity: 0.8;
@@ -619,11 +619,11 @@
 /* Red star icon for important tasks */
 .task-item.important .task-icon-star,
 .task-item.important .lucide-star {
-    color: #ff0000 !important;
+    color: var(--pz-danger);
 }
 
 .task-important-btn.is-favorite i {
-    color: #ff0000 !important;
+    color: var(--pz-danger);
 }
 
 
@@ -658,13 +658,13 @@
    the known types override them below. */
 .callout {
     display: block;
-    border-left: 3px solid #0969da;
+    border-left: 3px solid var(--pz-accent);
     padding: 8px 0 8px 12px;
     margin: 12px 0;
 }
 
 .callout .callout-title {
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
     margin-bottom: 15px;
     display: flex;
     align-items: center;
@@ -704,14 +704,14 @@
 }
 
 .callout .callout-title-text {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     font-size: 14px;
 }
 
 .callout .callout-icon-svg,
 .callout .callout-title-text {
-    color: #0969da;
-    fill: #0969da;
+    color: var(--pz-accent);
+    fill: var(--pz-accent);
 }
 
 /* Foldable callouts (Obsidian "[!type]+" / "[!type]-" syntax) */
@@ -743,23 +743,23 @@ details.callout:not([open]) .callout-fold-icon {
 
 /* Callout colors - border, icon and title */
 .callout-note {
-    border-left-color: #0969da;
+    border-left-color: var(--pz-accent);
 }
 
 .callout-note .callout-icon-svg,
 .callout-note .callout-title-text {
-    color: #0969da;
-    fill: #0969da;
+    color: var(--pz-accent);
+    fill: var(--pz-accent);
 }
 
 .callout-tip {
-    border-left-color: #1a7f37;
+    border-left-color: var(--pz-success-hover);
 }
 
 .callout-tip .callout-icon-svg,
 .callout-tip .callout-title-text {
-    color: #1a7f37;
-    fill: #1a7f37;
+    color: var(--pz-success-hover);
+    fill: var(--pz-success-hover);
 }
 
 .callout-important {
@@ -773,23 +773,23 @@ details.callout:not([open]) .callout-fold-icon {
 }
 
 .callout-warning {
-    border-left-color: #9a6700;
+    border-left-color: var(--pz-warning-strong);
 }
 
 .callout-warning .callout-icon-svg,
 .callout-warning .callout-title-text {
-    color: #9a6700;
-    fill: #9a6700;
+    color: var(--pz-warning-strong);
+    fill: var(--pz-warning-strong);
 }
 
 .callout-caution {
-    border-left-color: #d1242f;
+    border-left-color: var(--pz-danger-hover);
 }
 
 .callout-caution .callout-icon-svg,
 .callout-caution .callout-title-text {
-    color: #d1242f;
-    fill: #d1242f;
+    color: var(--pz-danger-hover);
+    fill: var(--pz-danger-hover);
 }
 
 /* Toggle / Collapsible block styles */
@@ -801,7 +801,7 @@ details.callout:not([open]) .callout-fold-icon {
     /* padding-left: 10px; */
     /* padding-right: 10px; */
     /* border: 1px solid #e1e4e8; */
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
 }
 
 /* Ensure caret is visible at the bottom of the open block */
@@ -814,7 +814,7 @@ details.callout:not([open]) .callout-fold-icon {
     display: flex;
     align-items: center;
     padding: 10px 0px 0px 1px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     cursor: pointer;
     list-style: none;
     /* Hide default marker in Firefox */
@@ -887,7 +887,7 @@ details.callout:not([open]) .callout-fold-icon {
 /* Placeholder for empty toggle content */
 .toggle-block>.toggle-content[data-ph]:empty:before {
     content: attr(data-ph);
-    color: #999;
+    color: var(--pz-text-subtle);
     font-style: italic;
     opacity: 0.6;
 }
@@ -913,18 +913,18 @@ details.callout:not([open]) .callout-fold-icon {
 .toggle-before-placeholder:empty:before,
 .toggle-after-placeholder:empty:before {
     content: attr(data-ph);
-    color: #999;
+    color: var(--pz-text-subtle);
     font-style: italic;
     opacity: 0.6;
 }
 
 /* Dark mode adjustments */
-body.dark-mode .toggle-block {
-    border-color: #30363d;
+html[data-theme='dark'] .toggle-block {
+    border-color: var(--dm-border);
 }
 
-body.dark-mode .toggle-block[open]>summary {
-    border-bottom-color: #30363d;
+html[data-theme='dark'] .toggle-block[open]>summary {
+    border-bottom-color: var(--dm-border);
 }
 
 /* ============================================
@@ -944,7 +944,7 @@ body.dark-mode .toggle-block[open]>summary {
 
 .noteentry .tasklist-embed-widget {
     border: 1px solid var(--pz-border);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     padding: 12px 16px;
 }
 
@@ -969,9 +969,9 @@ body.dark-mode .toggle-block[open]>summary {
     height: 22px;
     padding: 0;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background: transparent;
-    color: #888;
+    color: var(--pz-text-muted);
     cursor: pointer;
     flex-shrink: 0;
 }
@@ -996,7 +996,7 @@ body.dark-mode .toggle-block[open]>summary {
 }
 
 .tasklist-embed-title {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: inherit;
     text-decoration: none;
     overflow: hidden;
@@ -1014,7 +1014,7 @@ body.dark-mode .toggle-block[open]>summary {
 
 .noteentry .tasklist-embed-count {
     margin-left: auto;
-    color: #666;
+    color: var(--pz-text-muted);
     flex-shrink: 0;
 }
 
@@ -1030,13 +1030,13 @@ body.dark-mode .toggle-block[open]>summary {
     align-items: flex-start;
     gap: 10px;
     padding: 4px 2px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     min-width: 0;
 }
 
 .noteentry .tasklist-embed-task:hover,
 .noteentry .tasklist-embed-task:focus-within {
-    background: rgba(0, 0, 0, 0.03);
+    background: rgba(var(--pz-shadow-rgb), 0.03);
 }
 
 .noteentry .tasklist-embed-checkbox {
@@ -1062,7 +1062,7 @@ body.dark-mode .toggle-block[open]>summary {
 
 .noteentry .tasklist-embed-task.completed .tasklist-embed-text {
     text-decoration: line-through;
-    color: #888;
+    color: var(--pz-text-muted);
 }
 
 /* Due date chip (a button opening the due-date modal) */
@@ -1078,7 +1078,7 @@ body.dark-mode .toggle-block[open]>summary {
     padding: 0;
     border: none;
     background: transparent;
-    color: #666;
+    color: var(--pz-text-muted);
     font-family: inherit;
     flex-shrink: 0;
     white-space: nowrap;
@@ -1113,9 +1113,9 @@ body.dark-mode .toggle-block[open]>summary {
     height: 22px;
     padding: 0;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background: transparent;
-    color: #999;
+    color: var(--pz-text-subtle);
     cursor: pointer;
     opacity: 0;
     transition: opacity 0.15s ease, color 0.15s ease;
@@ -1136,7 +1136,7 @@ body.dark-mode .toggle-block[open]>summary {
 
 .noteentry .tasklist-embed-action-important.is-active,
 .noteentry .tasklist-embed-action-important:hover {
-    color: #f39c12;
+    color: var(--pz-warning-hover);
 }
 
 .noteentry .tasklist-embed-action-due:hover {
@@ -1154,11 +1154,11 @@ body.dark-mode .toggle-block[open]>summary {
     gap: 10px;
     margin: 4px 0 0;
     padding: 4px 2px;
-    color: #999;
+    color: var(--pz-text-subtle);
 }
 
 .noteentry .tasklist-embed-add:focus-within {
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 /* Same footprint as the row checkboxes so the field lines up with the tasks */
@@ -1188,7 +1188,7 @@ body.dark-mode .toggle-block[open]>summary {
 }
 
 .noteentry .tasklist-embed-add-input::placeholder {
-    color: #999;
+    color: var(--pz-text-subtle);
     opacity: 1;
 }
 
@@ -1208,7 +1208,7 @@ body.dark-mode .toggle-block[open]>summary {
 
 .noteentry .tasklist-embed-empty,
 .noteentry .tasklist-embed-unavailable {
-    color: #888;
+    color: var(--pz-text-muted);
     font-style: italic;
     margin-top: 8px;
 }

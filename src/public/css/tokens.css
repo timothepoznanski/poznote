@@ -1,0 +1,268 @@
+/* ============================================
+   Design tokens
+   ============================================
+   This stylesheet is the one every page loads, so it is where the shared
+   tokens live: the colours, and the one layout value that is themeable.
+   Light values on :root, dark/black values in the --dm-* blocks below.
+
+   It used to be css/dark-mode/variables.css, which was wrong twice over: it
+   sat inside the dark layer while holding the LIGHT palette on :root, and a
+   second file was also called variables.css. Anyone going looking for the
+   palette did not find it. A custom stylesheet (Settings > Custom CSS) can
+   re-theme the app by overriding these on :root / html[data-theme='dark'].
+   Keep the names stable: they are part of the custom-CSS contract. */
+
+:root {
+    /* Corner radius. Twenty-seven different values were in use, fourteen of them
+       on buttons alone, so the same kind of control was rounded differently from
+       one page to the next. Six steps, and every value snapped to its nearest
+       one; nothing moved by more than 2px. */
+    --pz-radius-sm: 4px;      /* inputs, small controls, buttons */
+    --pz-radius: 6px;         /* default */
+    --pz-radius-lg: 8px;      /* cards, panels */
+    --pz-radius-xl: 12px;     /* dialogs */
+    --pz-radius-2xl: 16px;    /* the largest surfaces */
+    --pz-radius-pill: 999px;  /* chips and pills */
+    --pz-radius-circle: 50%;
+
+    /* Type weight. The stylesheets used eight spellings, 300 / 400 / 500 / 600 /
+       700 / normal / bold / inherit, for what the shipped font renders as two:
+       fonts.css declares Inter at 400 and 600 only, so 300 and 500 come out as
+       Regular and 700 as SemiBold. Naming the four steps keeps every rendering
+       exactly as it is while making the scale visible, and gives the day a
+       Medium and a Bold face ship somewhere to change.
+
+       Light is the exception: fonts.css now also declares Inter at 300, so this
+       step really does render lighter, but only on pages that link fonts.css
+       (the page stylesheets carrying their own @font-face copies still stop at
+       Regular and SemiBold, where 300 falls back to Regular). */
+    --pz-weight-light: 300;
+    --pz-weight-normal: 400;
+    --pz-weight-medium: 500;
+    --pz-weight-semibold: 600;
+    --pz-weight-bold: 700;
+
+    /* Layout. The resizable sidebar: js/resize-column.js overwrites this on
+       :root at runtime, this is the default it starts from. */
+    --left-col-width: 370px;
+
+    /* Brand blue: links, active states, primary buttons, focus rings. */
+    --pz-accent: #007db8;
+    --pz-accent-hover: #005a8a;
+    /* Same colour as RGB channels, for tints: rgba(var(--pz-accent-rgb), 0.1) */
+    --pz-accent-rgb: 0, 125, 184;
+    /* Hyperlinks. Kept as its own name because it shipped: a custom stylesheet
+       out there may already set --pz-link, and dropping the name would make
+       that override silently do nothing. It defaults to the accent now; the
+       value it used to carry, #2e8cfa, had contrast 3.36 on white and failed
+       WCAG AA for body text. Override it to colour links alone, or --pz-accent
+       to move both. */
+    --pz-link: var(--pz-accent);
+    /* The two ends of the greyscale, used with an alpha to darken or lighten
+       whatever is under them: shadows, scrims and pressed states take the
+       shadow channel, raised surfaces and hairlines on a dark ground take the
+       highlight channel. They are channels, not colours, so they compose:
+       rgba(var(--pz-shadow-rgb), 0.15). A theme that is not built on pure
+       black and white re-points these two and every elevation follows. */
+    --pz-shadow-rgb: 0, 0, 0;
+    --pz-highlight-rgb: 255, 255, 255;
+    /* Neutral palette of the light theme. Dark and black use --dm-* below. */
+    /* Text scale, four steps. Contrast on white is 12.6 / 7.6 / 4.8 / 2.5, and
+       the app used 62 different greys to express them. Pick by role, not by
+       taste, so a theme only has to redefine four values. */
+    --pz-text: #333333;            /* body text, headings */
+    --pz-text-secondary: #4b5563;  /* supporting text that still reads as content */
+    --pz-text-muted: #6b7280;      /* secondary text, icons */
+    --pz-text-subtle: #9ca3af;     /* placeholders, hints */
+    /* Border scale, three steps by lightness. 43 grey values were in use for
+       these three jobs. Anything darker, or tinted, is a border matching a
+       filled control and is not part of this scale. */
+    --pz-border-light: #eeeeee;    /* separators inside a surface */
+    --pz-border: #e0e0e0;          /* default borders */
+    --pz-border-strong: #d1d5db;   /* inputs, menus, cards */
+    /* Surface scale, four steps by lightness, from the page down to a well.
+       A pale TINT is a status or decorative fill and is deliberately not part of
+       this scale, so overriding these four repaints the chrome and leaves the
+       success greens and alert pinks alone. */
+    --pz-surface: #f8f9fa;         /* panels, cards, code backgrounds */
+    --pz-surface-hover: #f3f4f6;   /* hover rows and items */
+    --pz-surface-sunken: #e9ecef;  /* wells, inset areas, table headers */
+    --pz-danger: #dc3545;          /* destructive actions, errors */
+    --pz-accent-strong: #0b4da6;   /* selected note/folder title in the sidebar */
+    --pz-accent-soft: #e3f2fd;     /* active item background */
+    --pz-success: #28a745;         /* success alerts, enabled states */
+    --pz-warning: #ffc107;         /* warning alerts, badges */
+    /* The pale wash behind a status: an alert body, a badge, a flagged row.
+       Each family mixed a Bootstrap-era pastel with a Tailwind-era one, in
+       components that never appear side by side, so they are one intention. */
+    /* Every semantic colour has the same three steps, so a palette only has to
+       answer four questions per family: the fill, its hover, its pale wash, and
+       the deep shade used for text on that wash. */
+    --pz-danger-hover: #c82333;
+    --pz-danger-strong: #721c24;
+    --pz-danger-soft: #f8d7da;
+    --pz-success-hover: #218838;
+    --pz-success-strong: #155724;
+    --pz-success-soft: #d4edda;
+    --pz-warning-hover: #e0a800;
+    --pz-warning-strong: #856404;
+    --pz-warning-soft: #fff3cd;
+    /* Lucide icons are CSS masks painted with currentColor, so an icon's colour
+       is just `color`. This is the grey the old filter chain produced. */
+    --pz-icon: #808080;
+    /* Neutral controls. The secondary button's grey was written literally, even
+       inside components/buttons.css, so a palette could not reach it. */
+    --pz-neutral: #6c757d;         /* secondary button, neutral chip */
+    --pz-neutral-hover: #5a6268;
+    --pz-disabled: #cccccc;        /* the fill of a control that cannot be used */
+    --pz-scrollbar: #c1c1c1;
+    --pz-scrollbar-hover: #a8a8a8;
+    /* White was written as #fff in 268 places, for two opposite jobs: the sheet
+       a page is drawn on, and the label sitting on top of a filled control.
+       They need separate names, because a theme that darkens the first must not
+       darken the second. Both stay white here, so nothing changes until a custom
+       stylesheet overrides them. */
+    --pz-bg: #ffffff;              /* page, card, menu and modal background */
+    --pz-text-inverse: #ffffff;    /* label on an accent, dark or coloured ground */
+}
+
+/* ============================================
+   Dark Mode - CSS Custom Properties & Base
+   ============================================ */
+
+html[data-theme='dark'] {
+    /* Text scale. Contrast on --dm-content-bg is 11.6 / 8.2 / 5.9 / 4.3, the same
+       shape the black theme below already had. --dm-text-muted used to be
+       #c5c5c5, which is BRIGHTER than --dm-text: the muted level was louder than
+       the main one, so the hierarchy read backwards wherever both were used. */
+    --dm-text-bright: #e0e0e0;
+    --dm-text: #bebebe;
+    --dm-text-muted: #a0a0a0;
+    --dm-text-subtle: #888888;
+    --dm-bg: #252526;
+    --dm-content-bg: #252526;
+    --dm-sidebar-bg: #252526;
+    --dm-sidebar-surface: #333333;
+    --dm-surface: #333333;
+    --dm-surface-hover: #3a3a3a;
+    /* A fill that has to sit above a hovered one: a chip, a raised control,
+       a nested panel. 15 rules were painting it by hand. */
+    --dm-surface-raised: #4a4a4a;
+    /* Lucide icons are CSS masks painted with currentColor, so their colour is
+       just `color`. These two are the greys the old `filter: invert(80%)` /
+       `invert(90%)` produced, kept exactly so nothing moves. */
+    --dm-neutral: #5f6368;
+    --dm-neutral-hover: #6f757a;
+    --dm-disabled: #4a4a4a;
+    --dm-scrollbar: #4a4a4a;
+    --dm-scrollbar-hover: #5f6368;
+    --dm-icon: #cccccc;
+    --dm-icon-hover: #e6e6e6;
+    /* The semantic families again, in the values a dark ground needs: a fill
+       bright enough to read, and a wash dark enough to sit on the page. The
+       black theme inherits these unless it overrides them. */
+    --dm-accent-hover: #6ab3ff;
+    --dm-accent-soft: #334155;
+    --dm-danger: #ff6b6b;
+    --dm-danger-hover: #ef4444;
+    --dm-danger-soft: #3d1f1f;
+    --dm-success: #4ade80;
+    --dm-success-hover: #22c55e;
+    --dm-success-soft: #1a4d2e;
+    --dm-warning: #ffc107;
+    --dm-warning-hover: #e0a800;
+    --dm-warning-soft: #665500;
+
+    /* The light tokens, switched for this theme.
+
+       Until now a light rule that said color: var(--pz-text) rendered #333333 in
+       dark mode too, and the only thing saving it was a rule in dark-mode/ saying
+       the same thing again with --dm-text. That is why the dark layer holds 1,593
+       rules, 1,149 of which do nothing but restate a light rule in other colours.
+
+       With the token itself switching, a rule written once is correct in both
+       themes, and a component whose dark override was simply forgotten stops
+       rendering dark text on a dark ground.
+
+       Only the NEUTRALS switch. The accent and the status colours deliberately
+       do not: --dm-accent is bright because it has to read as text on a dark
+       ground, and using it as a fill would put white on #4a9eff at a contrast of
+       2.2. A fill and a label cannot be the same token; the dark layer already
+       states the fills it wants. */
+    --pz-bg: var(--dm-content-bg);
+    --pz-surface: var(--dm-surface);
+    --pz-surface-hover: var(--dm-surface-hover);
+    --pz-surface-sunken: var(--dm-surface-raised);
+    --pz-text: var(--dm-text);
+    --pz-text-secondary: var(--dm-text-muted);
+    --pz-text-muted: var(--dm-text-muted);
+    --pz-text-subtle: var(--dm-text-subtle);
+    --pz-border: var(--dm-border);
+    --pz-border-light: var(--dm-border);
+    --pz-border-strong: var(--dm-border-light);
+    --pz-icon: var(--dm-icon);
+    /* Neutral controls follow too. Their dark values existed but nothing
+       pointed at them, so a scrollbar or a disabled fill written once with
+       var(--pz-scrollbar) kept rendering the light grey in dark mode. */
+    --pz-disabled: var(--dm-disabled);
+    --pz-scrollbar: var(--dm-scrollbar);
+    --pz-scrollbar-hover: var(--dm-scrollbar-hover);
+    --dm-border: #404040;
+    --dm-border-light: #555555;
+    --dm-accent: #4a9eff;
+    --dm-accent-rgb: 74, 158, 255;   /* tints of the dark accent */
+    --dm-active: #1e3a5f;
+    --dm-code-bg: #262424;
+    --dm-tabbar-bg: #1e1e1e;
+    --dm-tab-bg: #252525;
+    --dm-tab-hover-bg: #2e2e2e;
+    --dm-tab-active-bg: #383838;
+}
+
+html.theme-black[data-theme='dark'] {
+    /* Same four steps, in the blue-grey the black theme uses. These two values
+       were already in the right order; bright and subtle extend them. */
+    --dm-text-bright: #e9ecf0;
+    --dm-text: #c0c8d4;
+    --dm-text-muted: #9ba6b5;
+    --dm-text-subtle: #818a96;
+    /* The neutral controls in this theme's own blue-grey. They were inherited
+       from the dark theme, whose greys are neutral, so a secondary button or a
+       scrollbar sat as a flat grey inside a blue-grey interface. Same lightness,
+       so nothing about the contrast changes. The status colours are NOT
+       overridden: a red is a red in both dark themes. */
+    --dm-neutral: #5f636a;
+    --dm-neutral-hover: #71747b;
+    --dm-disabled: #474a52;
+    --dm-scrollbar: #474a52;
+    --dm-scrollbar-hover: #5f636a;
+    --dm-bg: #0f1117;
+    --dm-content-bg: #141821;
+    --dm-sidebar-bg: #0b0d12;
+    --dm-sidebar-surface: #12151c;
+    --dm-surface: #171a21;
+    --dm-surface-hover: #202532;
+    --dm-surface-raised: #2d303d;
+    --dm-icon: #b9c2cf;
+    --dm-icon-hover: #dde3ec;
+    --dm-border: #252b35;
+    --dm-border-light: #394150;
+    --dm-accent: #5f94f7;
+    --dm-active: #15243a;
+    --dm-code-bg: #090b10;
+    --dm-tabbar-bg: var(--dm-sidebar-bg);
+    --dm-tab-bg: var(--dm-sidebar-surface);
+    --dm-tab-hover-bg: var(--dm-surface);
+    --dm-tab-active-bg: var(--dm-content-bg);
+}
+
+/* Apply dark background as early as possible */
+html[data-theme='dark'] {
+    background-color: var(--dm-content-bg);
+    color: var(--dm-text);
+}
+
+/* Prevent transition flash on initial load */
+html[data-theme='dark'] * {
+    transition: background-color 0.0s, color 0.0s, border-color 0.0s !important;
+}

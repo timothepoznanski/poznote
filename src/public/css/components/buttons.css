@@ -1,0 +1,122 @@
+/**
+ * The button system.
+ *
+ * `.btn` used to be defined in thirteen page stylesheets, and fifteen pages
+ * loaded two of them, so the class resolved to eleven different things
+ * depending on which file came last. Three of those results were nobody's
+ * intent: they mixed a flex definition with an inline-block one and ended up
+ * carrying `gap` and `align-items` on `display: inline-block`, where both do
+ * nothing.
+ *
+ * This file is that base, loaded before the page stylesheets so a page can
+ * still override it deliberately. Two choices worth recording:
+ *
+ * - `inline-flex` with a `gap`, because 91 buttons in the app hold a Lucide
+ *   icon next to their label and the inline-block variants aligned them by
+ *   whitespace.
+ * - `border-radius: 4px`, the radius `.modal-buttons button` already uses in
+ *   modals/base.css, which nearly every page loads.
+ *
+ * Dark styling lives with the rest of the theme, in dark-mode/components.css.
+ */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-sizing: border-box;
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--pz-radius-sm);
+    /* Buttons do not inherit the body font, and no reset sets one for them:
+       without this, every <button class="btn"> fell back to the browser's UI
+       font while the <a class="btn"> next to it used Inter. */
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: var(--pz-weight-normal);
+    line-height: 1.4;
+    text-decoration: none;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    opacity: 0.8;
+}
+
+.btn:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Lucide renders as a font: the icon inside a button must not inherit its weight. */
+.btn i {
+    font-weight: var(--pz-weight-normal) !important;
+}
+
+.btn.disabled,
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--pz-disabled);
+    color: var(--pz-text-muted);
+}
+
+/* An <a> cannot be disabled natively, so the class has to stop the click.
+   Native :disabled buttons already ignore clicks, and taking pointer events
+   from them would also suppress the title tooltip that explains why they are
+   inert (the shared page relies on that). */
+.btn.disabled {
+    pointer-events: none;
+}
+
+/* Plain weight on purpose. These colours have to lose to any rule that styles
+   a button in context: the tinted action buttons of the shared page
+   (.note-actions .btn-danger), a disabled dialog button
+   (.modal-buttons button.btn-primary:disabled), and so on. !important here
+   turned all of those into white-on-pale. */
+.btn-primary {
+    background: var(--pz-accent);
+    color: var(--pz-text-inverse);
+}
+
+.btn-primary:hover {
+    background: var(--pz-accent-hover);
+}
+
+.btn-secondary {
+    background: var(--pz-neutral);
+    color: var(--pz-text-inverse);
+}
+
+.btn-secondary:hover {
+    background: var(--pz-neutral-hover);
+}
+
+.btn-danger {
+    background: var(--pz-danger);
+    color: var(--pz-text-inverse);
+}
+
+.btn-danger:hover {
+    background: var(--pz-danger-hover);
+}
+
+/* Destructive actions stay visibly locked until their confirmation is met. */
+.btn-danger:disabled,
+.btn-danger:disabled:hover {
+    background: var(--pz-danger);
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.btn-success {
+    background: var(--pz-success);
+    color: var(--pz-text-inverse);
+}
+
+.btn-success:hover {
+    background: var(--pz-success-hover);
+}

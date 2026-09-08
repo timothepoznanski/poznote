@@ -15,20 +15,23 @@
 .toolbar-btn.btn-attachment.has-attachments i,
 .toolbar-btn.btn-reminder.has-reminder i {
     color: var(--pz-accent) !important;
-    filter: none !important;
 }
 
-/* Markdown split view button - normal icon color (not blue) */
-.toolbar-btn.markdown-split-btn i,
-.toolbar-btn.markdown-split-btn [class*="lucide-"] {
-    /* Use default icon color */
-}
+/* The markdown split-view button keeps the default icon colour: nothing to
+   declare, since no rule above tints it. */
 
-/* Apply default gray filter (lighter gray) to all icons not on hover */
-/* Exclude folder icons with custom colors from the filter */
-[class*="lucide-"]:not(.folder-icon[data-icon-color]):not(.note-icon[data-icon-color]):not(.shared-password-icon) {
-    filter: brightness(0) saturate(100%) invert(50%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(85%);
-    transition: transform 0.2s ease, filter 0.2s ease;
+/* The default icon colour.
+
+   This was a filter chain that forced a grey whatever colour the icon asked
+   for, so every icon with a colour of its own had to be excluded by hand:
+   :not(.folder-icon[data-icon-color]):not(.note-icon[data-icon-color]):not(.shared-password-icon).
+   Lucide icons are CSS masks painted with `background-color: currentColor`
+   (lucide.css), so `color` does the same job and lets an icon override it the
+   normal way. A coloured folder icon carries style="color: X !important" from
+   PHP and simply wins; nothing has to be carved out. */
+[class*="lucide-"] {
+    color: var(--pz-icon);
+    transition: transform 0.2s ease, color 0.2s ease;
 }
 
 /* Keep sidebar icons crisp (avoid thick-looking filter) */
@@ -36,14 +39,13 @@
 .sidebar-folder-toggle [class*="lucide-"],
 .sidebar-plus [class*="lucide-"],
 .icon-sidebar-btn [class*="lucide-"] {
-    filter: none !important;
     color: inherit;
     font-size: inherit;
 }
 
-[class*="lucide-"]:not(.folder-icon[data-icon-color]):not(.note-icon[data-icon-color]):not(.shared-password-icon):hover {
+[class*="lucide-"]:hover {
     transform: scale(1.18);
-    filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
+    color: var(--pz-accent);
 }
 
 /* The icon rail colours its icons via currentColor, not the global filter. The
@@ -53,7 +55,6 @@
 #iconSidebarOverflowMenu .icon-sidebar-overflow-item [class*="lucide-"],
 #iconSidebarOverflowMenu .icon-sidebar-overflow-item [class*="lucide-"]:hover {
     transform: none;
-    filter: none !important;
 }
 
 /* Ensure search type button icons are not recolored by the global fa filter */
@@ -72,13 +73,6 @@
     filter: none !important;
 }
 
-/* Exception: Remove filter for favorite/share/attachment (to show blue color) */
-.toolbar-btn.is-favorite .lucide-star,
-.toolbar-btn.is-shared .lucide-share-2,
-.toolbar-btn.has-attachments .lucide-paperclip {
-    filter: none !important;
-}
-
 .sidebar-plus {
     /* transform: scale(1.18); */
     filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
@@ -89,14 +83,12 @@
 .markdown-preview-btn [class*="lucide-"],
 .markdown-view-mode-btn i {
     color: var(--pz-accent) !important;
-    filter: none !important;
 }
 
 .markdown-edit-btn:hover [class*="lucide-"],
 .markdown-preview-btn:hover [class*="lucide-"],
 .markdown-view-mode-btn:hover i {
     color: var(--pz-accent) !important;
-    filter: none !important;
     transform: scale(1.18);
 }
 
@@ -117,8 +109,8 @@
 /* Red color for cancel icon in mobile slash menu */
 .slash-command-icon.lucide-times-circle,
 .slash-command-item .slash-command-icon.lucide-times-circle {
-    color: #ef4444 !important;
-    font-weight: 400;
+    color: var(--pz-danger) !important;
+    font-weight: var(--pz-weight-normal);
 }
 
 .lucide-plus {

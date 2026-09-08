@@ -23,13 +23,13 @@ input[type="radio"] {
     margin-bottom: 20px;
     margin-left: -3px;
     font-size: 24px;
-    font-weight: 600;
-    color: #37352F;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text);
     font-family: 'Inter', sans-serif;
 }
 
 .css-title:focus {
-    border: none !important;
+    border: none;
     outline: none;
     box-shadow: none;
 }
@@ -37,7 +37,7 @@ input[type="radio"] {
 /* Horizontal Rule */
 hr {
     margin: 0;
-    border-top: 1px solid #ccc;
+    border-top: 1px solid var(--pz-border-strong);
 }
 
 /* Last Updated Dates */
@@ -48,7 +48,7 @@ hr {
     font-size: 14px;
     font-family: 'Inter' !important;
     font-style: italic;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     margin-top: 7px;
-    color: rgb(51, 51, 51) !important;
+    color: rgb(51, 51, 51);
 }

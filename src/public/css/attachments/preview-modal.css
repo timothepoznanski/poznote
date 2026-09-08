@@ -13,7 +13,7 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(var(--pz-shadow-rgb), 0.8);
     cursor: pointer;
 }
 
@@ -29,9 +29,9 @@
     position: absolute;
     top: -40px;
     right: 0;
-    color: white;
+    color: var(--pz-text-inverse);
     font-size: 35px;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     cursor: pointer;
     z-index: 1001;
 }
@@ -43,22 +43,22 @@
 .image-preview-large {
     max-width: 100%;
     max-height: 80vh;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 4px 20px rgba(var(--pz-shadow-rgb), 0.5);
 }
 
 .image-preview-title {
-    color: white;
+    color: var(--pz-text-inverse);
     margin-top: 15px;
     font-size: 16px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
 }
 
 /* PDF preview modal */
 .pdf-preview-content {
     position: relative;
-    background: white;
-    border-radius: 8px;
+    background: var(--pz-bg);
+    border-radius: var(--pz-radius-lg);
     width: 90vw;
     max-width: 1200px;
     height: 90vh;
@@ -72,7 +72,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--pz-border-light);
     background: var(--pz-surface);
 }
 
@@ -90,7 +90,7 @@
     background: none;
     border: none;
     font-size: 24px;
-    color: #666;
+    color: var(--pz-text-muted);
     cursor: pointer;
     padding: 0;
     width: 30px;
@@ -98,18 +98,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     transition: all 0.2s ease;
 }
 
 .pdf-preview-close:hover {
-    background: #e9ecef;
+    background: var(--pz-surface-sunken);
     color: var(--pz-text);
 }
 
 .pdf-preview-actions {
     padding: 15px 20px;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--pz-border-light);
     background: var(--pz-surface);
     display: flex;
     gap: 10px;

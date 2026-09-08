@@ -14,8 +14,7 @@
     font-style: normal;
 }
 
-html[data-theme='dark'],
-body.dark-mode {
+html[data-theme='dark'] {
     --bg-color: var(--dm-bg);
     --bg-secondary: var(--dm-surface);
     --bg-hover: var(--dm-surface-hover);
@@ -65,72 +64,6 @@ body.dark-mode {
     margin-bottom: 5px;
 }
 
-/* Buttons */
-.btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 400;
-    transition: all 0.2s;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    text-decoration: none;
-    line-height: 1.4;
-    box-sizing: border-box;
-    outline: none;
-}
-
-.btn:hover {
-    opacity: 0.8;
-}
-
-.btn:focus {
-    outline: none;
-    box-shadow: none;
-}
-
-.btn i {
-    font-weight: 300 !important;
-}
-
-.btn-primary {
-    background: var(--pz-accent);
-    color: white !important;
-}
-
-.btn-primary:hover {
-    background: var(--pz-accent-hover);
-}
-
-.btn-danger {
-    background: var(--pz-danger);
-    color: white !important;
-}
-
-.btn-danger:hover {
-    background: #c82333;
-}
-
-/* Delete stays visibly locked until the username is typed */
-.btn-danger:disabled,
-.btn-danger:disabled:hover {
-    background: var(--pz-danger);
-    opacity: 0.45;
-    cursor: not-allowed;
-}
-
-.btn-secondary {
-    background: #6c757d;
-    color: white !important;
-}
-
-.btn-secondary:hover {
-    background: #5a6268;
-}
 
 .btn-small {
     padding: 6px 12px;
@@ -142,21 +75,12 @@ body.dark-mode {
 }
 
 .btn-cancel-admin {
-    background-color: var(--pz-danger) !important;
-    color: white !important;
+    background-color: var(--pz-danger);
+    color: var(--pz-text-inverse);
 }
 
 .btn-cancel-admin:hover {
-    background-color: #c82333 !important;
-}
-
-.btn.disabled,
-.btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed !important;
-    background: #ccc !important;
-    color: #666 !important;
-    pointer-events: none;
+    background-color: var(--pz-danger-hover);
 }
 
 /* Table */
@@ -173,14 +97,14 @@ body.dark-mode {
 .users-table td {
     padding: 15px;
     text-align: left;
-    border-bottom: 1px solid var(--border-color, #eee);
+    border-bottom: 1px solid var(--border-color, var(--pz-border-light));
     color: var(--text-color, var(--pz-text));
 }
 
 .users-table th {
     background: transparent;
-    font-weight: 600;
-    border-top: 2px solid var(--border-color, #eee);
+    font-weight: var(--pz-weight-semibold);
+    border-top: 2px solid var(--border-color, var(--pz-border-light));
     white-space: nowrap;
 }
 
@@ -217,7 +141,7 @@ body.dark-mode {
     align-items: center;
     gap: 7px;
     font-size: 14px;
-    color: var(--text-color, #4b5563);
+    color: var(--text-color, var(--pz-text-secondary));
     cursor: pointer;
     white-space: nowrap;
     user-select: none;
@@ -252,7 +176,7 @@ body.dark-mode {
 
 /* Bold the header of the column the table is currently sorted on. */
 .users-sort-link.users-sort-active {
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
 }
 
 .users-table-header-with-help {
@@ -268,7 +192,7 @@ body.dark-mode {
     justify-content: center;
     width: 16px;
     height: 16px;
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
     cursor: help;
 }
 
@@ -284,17 +208,17 @@ body.dark-mode {
     min-width: 300px;
     max-width: 380px;
     padding: 10px 12px;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: rgba(20, 20, 20, 0.94);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-size: 0.95rem;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     letter-spacing: normal;
     line-height: 1.45;
     text-transform: none;
     white-space: normal;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 8px 24px rgba(var(--pz-shadow-rgb), 0.18);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -309,25 +233,21 @@ body.dark-mode {
     visibility: visible;
 }
 
-html[data-theme='dark'] .users-header-help,
-body.dark-mode .users-header-help {
-    color: #d6dde6;
+html[data-theme='dark'] .users-header-help {
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .users-header-help:hover,
 html[data-theme='dark'] .users-header-help:focus,
-html[data-theme='dark'] .users-header-help:focus-visible,
-body.dark-mode .users-header-help:hover,
-body.dark-mode .users-header-help:focus,
-body.dark-mode .users-header-help:focus-visible {
-    color: #ffffff;
+html[data-theme='dark'] .users-header-help:focus-visible {
+    color: var(--pz-text-inverse);
 }
 
 .users-table td.user-id-cell {
     font-family: monospace;
     color: var(--text-color, var(--pz-text));
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .users-table td.user-created-cell {
@@ -344,7 +264,7 @@ body.dark-mode .users-header-help:focus-visible {
    .users-sort-active above). Declared after .user-id-cell so it still wins
    when the table is sorted on the ID column. */
 .users-table td.sorted-column-cell {
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
 }
 
 .users-table tbody tr {
@@ -352,11 +272,11 @@ body.dark-mode .users-header-help:focus-visible {
 }
 
 .users-table tr:hover {
-    background: var(--bg-hover, rgba(0, 0, 0, 0.02));
+    background: var(--bg-hover, rgba(var(--pz-shadow-rgb), 0.02));
 }
 
 html[data-theme='dark'] .users-table td {
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 /* User Info */
@@ -368,23 +288,23 @@ html[data-theme='dark'] .users-table td {
 }
 
 .user-name {
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
 }
 
 .user-username {
     color: var(--text-color, var(--pz-text));
     font-size: 0.95em;
     padding: 4px 8px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     display: inline-block;
     white-space: nowrap;
 }
 
 .user-email {
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
     font-size: 0.9em;
     padding: 4px 8px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     display: inline-block;
 }
 
@@ -393,17 +313,17 @@ html[data-theme='dark'] .users-table td {
 }
 
 .user-name-value {
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
     font-size: 0.9em;
 }
 
 .user-created-date {
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
     font-size: 0.9em;
 }
 
 .account-access-summary {
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
     font-size: 0.9em;
     line-height: 1.45;
     max-width: 260px;
@@ -416,19 +336,19 @@ html[data-theme='dark'] .users-table td {
 .badge {
     display: inline-block;
     padding: 4px 8px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     font-size: 11px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
 }
 
 .badge-active {
     background: var(--pz-success);
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .badge-inactive {
     background: var(--pz-danger);
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .clickable-badge {
@@ -459,14 +379,14 @@ html[data-theme='dark'] .users-table td {
 /* Messages */
 .message {
     padding: 15px;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     margin-bottom: 20px;
 }
 
 .message-error {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+    background: var(--pz-danger-soft);
+    color: var(--pz-danger-strong);
+    border: 1px solid var(--pz-danger-soft);
 }
 
 /* Modals */
@@ -477,7 +397,7 @@ html[data-theme='dark'] .users-table td {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(var(--pz-shadow-rgb), 0.5);
     z-index: 10000;
     align-items: center;
     justify-content: center;
@@ -488,8 +408,8 @@ html[data-theme='dark'] .users-table td {
 }
 
 .modal-content {
-    background: var(--bg-color, #fff);
-    border-radius: 12px;
+    background: var(--bg-color, var(--pz-bg));
+    border-radius: var(--pz-radius-xl);
     padding: 30px;
     max-width: 500px;
     width: 90%;
@@ -521,7 +441,7 @@ html[data-theme='dark'] .users-table td {
     display: block;
     margin-bottom: -6px;
     font-size: 0.9rem;
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
 }
 
 .profile-modal-help {
@@ -529,7 +449,7 @@ html[data-theme='dark'] .users-table td {
     margin-top: -2px;
     font-size: 0.78rem;
     line-height: 1.45;
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
 }
 
 .password-modal-content {
@@ -553,7 +473,7 @@ html[data-theme='dark'] .users-table td {
 
 .password-status-summary {
     margin: 0;
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
     font-size: 0.92rem;
     line-height: 1.45;
 }
@@ -567,7 +487,7 @@ html[data-theme='dark'] .users-table td {
 }
 
 .password-status-text {
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
     font-size: 0.85rem;
     text-align: left;
 }
@@ -578,21 +498,21 @@ html[data-theme='dark'] .users-table td {
 }
 
 .password-feedback {
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     padding: 10px 12px;
     margin-bottom: 12px;
     font-size: 0.95rem;
 }
 
 .password-feedback-error {
-    color: #721c24;
-    background: #f8d7da;
-    border: 1px solid #f5c6cb;
+    color: var(--pz-danger-strong);
+    background: var(--pz-danger-soft);
+    border: 1px solid var(--pz-danger-soft);
 }
 
 .password-feedback-success {
-    color: #155724;
-    background: #d4edda;
+    color: var(--pz-success-strong);
+    background: var(--pz-success-soft);
     border: 1px solid #c3e6cb;
 }
 
@@ -606,7 +526,7 @@ html[data-theme='dark'] .users-table td {
 }
 
 .account-access-help {
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
     font-size: 0.92rem;
     line-height: 1.5;
     margin: 14px 0 18px;
@@ -628,14 +548,14 @@ html[data-theme='dark'] .users-table td {
     align-items: center;
     gap: 10px;
     padding: 10px 12px;
-    border: 1px solid var(--border-color, #ddd);
-    border-radius: 6px;
+    border: 1px solid var(--border-color, var(--pz-border));
+    border-radius: var(--pz-radius);
     color: var(--text-color, var(--pz-text));
     cursor: pointer;
 }
 
 .account-access-option:hover {
-    background: var(--bg-hover, rgba(0, 0, 0, 0.02));
+    background: var(--bg-hover, rgba(var(--pz-shadow-rgb), 0.02));
 }
 
 .account-access-option input[type="checkbox"] {
@@ -650,21 +570,21 @@ html[data-theme='dark'] .users-table td {
 
 .account-access-state,
 .account-access-own-label {
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     padding: 2px 6px;
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .account-access-state {
-    background: #f8d7da;
-    color: #721c24;
+    background: var(--pz-danger-soft);
+    color: var(--pz-danger-strong);
 }
 
 .account-access-own-label {
     display: none;
-    background: #e7f1ff;
-    color: #0b5cad;
+    background: var(--pz-accent-soft);
+    color: var(--pz-accent-strong);
 }
 
 .account-access-own .account-access-own-label {
@@ -678,12 +598,12 @@ html[data-theme='dark'] .users-table td {
 
 html[data-theme='dark'] .account-access-state {
     background: rgba(220, 53, 69, 0.18);
-    color: #ffb3bd;
+    color: var(--dm-danger);
 }
 
 html[data-theme='dark'] .account-access-own-label {
-    background: rgba(74, 158, 255, 0.16);
-    color: #9cc7ff;
+    background: rgba(var(--dm-accent-rgb), 0.16);
+    color: var(--dm-accent-hover);
 }
 
 .modal-title {
@@ -704,7 +624,7 @@ html[data-theme='dark'] .account-access-own-label {
 .form-group label {
     display: block;
     margin-bottom: 8px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-semibold);
     color: var(--text-color, var(--pz-text));
 }
 
@@ -713,10 +633,10 @@ html[data-theme='dark'] .account-access-own-label {
 .form-group textarea {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid var(--border-color, #ddd);
-    border-radius: 8px;
+    border: 1px solid var(--border-color, var(--pz-border));
+    border-radius: var(--pz-radius-lg);
     font-size: 14px;
-    background: var(--bg-color, #fff);
+    background: var(--bg-color, var(--pz-bg));
     color: var(--text-color, var(--pz-text));
     box-sizing: border-box;
 }
@@ -785,7 +705,7 @@ html[data-theme='dark'] .account-access-own-label {
 
 .delete-warning {
     color: var(--pz-danger);
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     margin-top: 15px;
 }
 
@@ -801,7 +721,7 @@ html[data-theme='dark'] .account-access-own-label {
 .delete-confirm-group label {
     display: block;
     margin-bottom: 6px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-semibold);
 }
 
 /* Back Link */
@@ -839,9 +759,9 @@ html[data-theme='dark'] .account-access-own-label {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color: var(--pz-disabled);
     transition: .4s;
-    border-radius: 20px;
+    border-radius: var(--pz-radius-2xl);
 }
 
 .slider:before {
@@ -851,9 +771,9 @@ html[data-theme='dark'] .account-access-own-label {
     width: 14px;
     left: 3px;
     bottom: 3px;
-    background-color: white;
+    background-color: var(--pz-bg);
     transition: .4s;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
 }
 
 input:checked+.slider {
@@ -875,7 +795,7 @@ input:checked+.slider:before {
 }
 
 input:disabled+.slider {
-    background-color: #ccc;
+    background-color: var(--pz-disabled);
 }
 
 .btn-maintenance {
@@ -906,7 +826,7 @@ input:disabled+.slider {
         justify-content: center !important;
         text-align: center;
         box-sizing: border-box;
-        border-radius: 4px;
+        border-radius: var(--pz-radius-sm);
     }
 
     .admin-nav .btn {
@@ -943,9 +863,9 @@ input:disabled+.slider {
         max-width: 40px !important;
         height: 34px !important;
         padding: 0 !important;
-        border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        border-radius: var(--pz-radius-sm);
+        border: 1px solid rgba(var(--pz-highlight-rgb), 0.08);
+        box-shadow: inset 0 1px 0 rgba(var(--pz-highlight-rgb), 0.04);
     }
 
     .actions-center {
@@ -956,31 +876,26 @@ input:disabled+.slider {
         font-size: 15px;
     }
 
-    html[data-theme='dark'] .actions-center .btn,
-    body.dark-mode .actions-center .btn {
-        border-color: rgba(255, 255, 255, 0.06);
+    html[data-theme='dark'] .actions-center .btn {
+        border-color: rgba(var(--pz-highlight-rgb), 0.06);
     }
 
-    html[data-theme='dark'] .actions-center .btn-secondary,
-    body.dark-mode .actions-center .btn-secondary {
-        background: #3b3f45;
-        color: #f2f4f8 !important;
+    html[data-theme='dark'] .actions-center .btn-secondary {
+        background: var(--dm-surface-hover);
+        color: var(--dm-text-bright);
     }
 
-    html[data-theme='dark'] .actions-center .btn-secondary:hover,
-    body.dark-mode .actions-center .btn-secondary:hover {
-        background: #4a5058;
+    html[data-theme='dark'] .actions-center .btn-secondary:hover {
+        background: var(--dm-surface-raised);
     }
 
-    html[data-theme='dark'] .actions-center .btn-danger,
-    body.dark-mode .actions-center .btn-danger {
-        background: #c93a4a;
-        color: #fff !important;
+    html[data-theme='dark'] .actions-center .btn-danger {
+        background: var(--dm-danger-hover);
+        color: var(--pz-text-inverse);
     }
 
-    html[data-theme='dark'] .actions-center .btn-danger:hover,
-    body.dark-mode .actions-center .btn-danger:hover {
-        background: #d94a59;
+    html[data-theme='dark'] .actions-center .btn-danger:hover {
+        background: var(--dm-danger-hover);
     }
 
     .modal-content {
@@ -1036,7 +951,7 @@ input:disabled+.slider {
 
 .users-stat-badge {
     text-decoration: none;
-    color: white;
+    color: var(--pz-text-inverse);
     cursor: pointer;
     transition: opacity 0.2s, filter 0.2s, box-shadow 0.2s;
 }
@@ -1048,7 +963,7 @@ input:disabled+.slider {
 /* The badge whose filter is applied. The greyed-out sibling already carries
    most of the signal, so this only firms up the selected label. */
 .users-stat-badge.users-stat-selected {
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
 }
 
 /* The other status while a filter is applied: greyed out rather than hidden,

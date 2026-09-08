@@ -27,8 +27,8 @@
 /* "except administrators": the all-users modal does not apply to admins, which
    is easy to miss in the middle of the sentence. */
 .ui-custom-description-highlight {
-    color: #dc2626;
-    font-weight: 600;
+    color: var(--pz-danger);
+    font-weight: var(--pz-weight-semibold);
 }
 
 .ui-custom-filter {
@@ -56,7 +56,7 @@
     justify-content: center;
     flex-shrink: 0;
     padding: 10px;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     border: 1px solid rgba(128, 128, 128, 0.25);
     background: transparent;
     color: inherit;
@@ -93,7 +93,7 @@
     margin: 0;
     flex-shrink: 0;
     cursor: pointer;
-    accent-color: #3b82f6;
+    accent-color: var(--pz-accent);
 }
 
 .ui-custom-sections-scroll {
@@ -110,16 +110,16 @@
     width: 100%;
     box-sizing: border-box;
     border: 1px solid rgba(128, 128, 128, 0.25);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     padding: 10px 12px;
     font-size: 0.92em;
     outline: none;
-    background: #fff;
+    background: var(--pz-bg);
     transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .ui-custom-filter-input:focus {
-    border-color: #3b82f6;
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);
 }
 
@@ -127,7 +127,7 @@
     margin: 0 0 16px 0;
     padding: 14px 16px;
     border: 1px dashed rgba(128, 128, 128, 0.35);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     color: var(--pz-text-muted);
     font-size: 0.9em;
     text-align: center;
@@ -167,7 +167,7 @@
     align-items: center;
     gap: 8px;
     font-size: 0.95em;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     margin: 0 0 10px 0;
     padding-bottom: 6px;
     border-bottom: 1px solid rgba(128, 128, 128, 0.2);
@@ -230,9 +230,9 @@
 
 .ui-custom-toggle-all {
     font-size: 0.78em;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     padding: 2px 9px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     border: 1px solid rgba(128, 128, 128, 0.3);
     background: transparent;
     cursor: pointer;
@@ -254,7 +254,7 @@
     box-sizing: border-box;
     font-size: 0.92em;
     padding: 10px 14px;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     border: 1px solid rgba(128, 128, 128, 0.25);
     white-space: nowrap;
     opacity: 1;
@@ -271,7 +271,7 @@
     align-items: center;
     gap: 8px;
     padding: 5px 8px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     cursor: pointer;
     font-size: 0.88em;
     transition: background-color 0.15s;
@@ -288,7 +288,7 @@
     margin: 0;
     flex-shrink: 0;
     cursor: pointer;
-    accent-color: #3b82f6;
+    accent-color: var(--pz-accent);
 }
 
 .ui-custom-item span {
@@ -309,47 +309,47 @@
 }
 
 /* Dark mode */
-[data-theme="dark"] .ui-custom-description,
+html[data-theme='dark'] .ui-custom-description,
 .dark-mode .ui-custom-description {
-    color: #9ca3af;
+    color: var(--dm-text-muted);
 }
 
-[data-theme="dark"] .ui-custom-description-highlight,
+html[data-theme='dark'] .ui-custom-description-highlight,
 .dark-mode .ui-custom-description-highlight {
-    color: #f87171;
+    color: var(--dm-danger);
 }
 
-[data-theme="dark"] .ui-custom-filter,
+html[data-theme='dark'] .ui-custom-filter,
 .dark-mode .ui-custom-filter {
     background: transparent;
 }
 
-[data-theme="dark"] .ui-custom-filter-input,
+html[data-theme='dark'] .ui-custom-filter-input,
 .dark-mode .ui-custom-filter-input {
-    background: #111827;
-    border-color: rgba(255, 255, 255, 0.14);
-    color: #f3f4f6;
+    background: var(--dm-content-bg);
+    border-color: rgba(var(--pz-highlight-rgb), 0.14);
+    color: var(--dm-text-bright);
 }
 
-[data-theme="dark"] .ui-custom-filter-input::placeholder,
+html[data-theme='dark'] .ui-custom-filter-input::placeholder,
 .dark-mode .ui-custom-filter-input::placeholder {
-    color: #9ca3af;
+    color: var(--dm-text-muted);
 }
 
-[data-theme="dark"] .ui-custom-empty,
+html[data-theme='dark'] .ui-custom-empty,
 .dark-mode .ui-custom-empty {
-    border-color: rgba(255, 255, 255, 0.14);
-    color: #9ca3af;
+    border-color: rgba(var(--pz-highlight-rgb), 0.14);
+    color: var(--dm-text-muted);
 }
 
-[data-theme="dark"] .ui-custom-section-title,
+html[data-theme='dark'] .ui-custom-section-title,
 .dark-mode .ui-custom-section-title {
-    border-bottom-color: rgba(255, 255, 255, 0.1);
+    border-bottom-color: rgba(var(--pz-highlight-rgb), 0.1);
 }
 
-[data-theme="dark"] .ui-custom-item:hover,
+html[data-theme='dark'] .ui-custom-item:hover,
 .dark-mode .ui-custom-item:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
 /* Items hidden for everyone by the administrator (locked in user mode) */
@@ -402,7 +402,7 @@
     gap: 8px;
     padding: 0 8px 4px 8px;
     font-size: 0.72em;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     letter-spacing: 0.03em;
     text-transform: uppercase;
     color: var(--pz-text-muted);
@@ -439,9 +439,9 @@
     opacity: 0.4;
 }
 
-[data-theme="dark"] .ui-custom-columns,
+html[data-theme='dark'] .ui-custom-columns,
 .dark-mode .ui-custom-columns {
-    color: #9ca3af;
+    color: var(--dm-text-muted);
 }
 
 /* ============================================
@@ -489,7 +489,7 @@
     padding: 8px 10px;
     margin-bottom: 4px;
     border: 1px solid rgba(128, 128, 128, 0.25);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: rgba(128, 128, 128, 0.05);
     font-size: 0.92em;
     user-select: none;
@@ -503,7 +503,7 @@
 .icon-sidebar-order-handle {
     display: inline-flex;
     align-items: center;
-    color: #9aa1ab;
+    color: var(--pz-text-subtle);
     cursor: grab;
     flex-shrink: 0;
 }
@@ -520,7 +520,7 @@
     height: 16px;
     flex-shrink: 0;
     background-color: currentColor;
-    filter: none !important;
+    filter: none;
     transform: none !important;
 }
 
@@ -551,7 +551,7 @@
     height: 28px;
     padding: 0;
     border: 1px solid rgba(128, 128, 128, 0.25);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: transparent;
     color: inherit;
     cursor: pointer;
@@ -587,11 +587,11 @@
 .icon-sidebar-order-divider-label {
     flex: 0 0 auto;
     font-size: 0.85em;
-    color: #9aa1ab;
+    color: var(--pz-text-subtle);
 }
 
 .icon-sidebar-order-remove:hover:not(:disabled) {
-    color: #dc3545;
+    color: var(--pz-danger);
 }
 
 /* Under the list, styled like a quiet link rather than a third primary button
@@ -604,7 +604,7 @@
     margin-top: 8px;
     padding: 6px 8px;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: transparent;
     color: var(--pz-accent);
     font-family: inherit;
@@ -623,6 +623,6 @@
     width: 14px;
     height: 14px;
     background-color: currentColor;
-    filter: none !important;
+    filter: none;
     transform: none !important;
 }

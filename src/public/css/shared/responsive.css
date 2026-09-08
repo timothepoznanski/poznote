@@ -41,7 +41,7 @@
     html::-webkit-scrollbar {
         display: block !important;
         width: 6px !important;
-        background-color: #f1f1f1 !important;
+        background-color: var(--pz-surface-hover);
     }
 
     body {
@@ -59,7 +59,7 @@
     body::-webkit-scrollbar {
         display: block !important;
         width: 12px !important;
-        background-color: #f1f1f1 !important;
+        background-color: var(--pz-surface-hover);
     }
 
     body.shared-page {
@@ -76,7 +76,7 @@
     body.shared-page::-webkit-scrollbar {
         display: block !important;
         width: 12px !important;
-        background-color: #f1f1f1 !important;
+        background-color: var(--pz-surface-hover);
     }
 
     /* Fix pour iOS Safari */
@@ -147,9 +147,9 @@
         align-items: start;
         gap: 10px 12px;
         padding: 16px;
-        border-radius: 14px;
+        border-radius: var(--pz-radius-xl);
         margin-bottom: 12px;
-        background: var(--input-bg, #ffffff);
+        background: var(--input-bg, var(--pz-bg));
         box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
     }
 
@@ -204,7 +204,7 @@
     .shared-folder-toggle {
         width: 26px;
         height: 26px;
-        border-radius: 8px;
+        border-radius: var(--pz-radius-lg);
     }
 
     .folder-badge {
@@ -218,7 +218,7 @@
         width: 100%;
         min-width: 0;
         padding: 10px 12px;
-        border-radius: 10px;
+        border-radius: var(--pz-radius-lg);
         background: transparent;
         border: none;
     }
@@ -263,12 +263,12 @@
         text-align: right;
     }
 
-    [data-theme="dark"] .shared-note-item {
-        background: #2b2b2b;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+    html[data-theme='dark'] .shared-note-item {
+        background: var(--dm-content-bg);
+        box-shadow: 0 8px 20px rgba(var(--pz-shadow-rgb), 0.22);
     }
 
-    [data-theme="dark"] .note-token-wrap {
+    html[data-theme='dark'] .note-token-wrap {
         background: transparent;
         border-color: transparent;
     }
@@ -291,29 +291,29 @@
     }
 
     /* Dark mode on mobile */
-    [data-theme="dark"] .shared-header {
-        color: #ffffff;
+    html[data-theme='dark'] .shared-header {
+        color: var(--pz-text-inverse);
     }
 
-    [data-theme="dark"] body.shared-page {
-        background: var(--dm-bg) !important;
+    html[data-theme='dark'] body.shared-page {
+        background: var(--dm-bg);
     }
 
-    [data-theme="dark"] .indexable-label-text {
-        color: #e0e0e0;
+    html[data-theme='dark'] .indexable-label-text {
+        color: var(--dm-text-bright);
     }
 
-    [data-theme="dark"] .shared-note-item {
+    html[data-theme='dark'] .shared-note-item {
         border-color: var(--dm-border-light);
-        background-color: rgba(255, 255, 255, 0.05);
+        background-color: rgba(var(--pz-highlight-rgb), 0.05);
     }
 
-    [data-theme="dark"] .note-name {
-        color: #5daaff;
+    html[data-theme='dark'] .note-name {
+        color: var(--dm-accent);
     }
 
-    [data-theme="dark"] .note-token {
-        color: #b0b0b0;
+    html[data-theme='dark'] .note-token {
+        color: var(--dm-text);
     }
 }
 

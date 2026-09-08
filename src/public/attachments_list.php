@@ -13,28 +13,7 @@ $currentLang = getUserLanguage();
 	<title><?php echo getPageTitle(); ?></title>
 	<meta name="color-scheme" content="dark light">
 	<script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/lucide.css'); ?>"/>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/shared/base.css'); ?>"/>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/shared/notes-list.css'); ?>"/>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/shared/buttons-modal.css'); ?>"/>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/lucide.css'); ?>"/>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/shared/dark-mode.css'); ?>"/>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/shared/responsive.css'); ?>"/>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/attachments_list.css'); ?>"/>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/attachments/usage-notice.css'); ?>"/>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar.css'); ?>"/>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar-page.css'); ?>"/>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar-mobile.css'); ?>"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"/>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/layout.css'); ?>"/>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/menus.css'); ?>"/>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/editor.css'); ?>"/>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/modals.css'); ?>"/>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/components.css'); ?>"/>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/pages.css'); ?>"/>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/markdown.css'); ?>"/>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/kanban.css'); ?>"/>
-	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/icons.css'); ?>"/>
+	<?php poznoteRenderStylesheets('attachments_list'); ?>
 	<script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>

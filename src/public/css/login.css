@@ -24,7 +24,7 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background-color: #f8fafc;
+    background-color: var(--pz-surface);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -59,9 +59,9 @@ body {
 }
 
 .login-title {
-    color: #252526;
+    color: var(--pz-text);
     font-size: 1.875rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     margin: 0;
 }
 
@@ -75,8 +75,8 @@ body {
 label {
     display: block;
     margin-bottom: 0.5rem;
-    color: #4a5568;
-    font-weight: 500;
+    color: var(--pz-text-secondary);
+    font-weight: var(--pz-weight-semibold);
     font-size: 0.875rem;
 }
 
@@ -84,12 +84,12 @@ input[type="text"],
 input[type="password"] {
     width: 100%;
     padding: 0.875rem 1rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
+    border: 1px solid var(--pz-border-light);
+    border-radius: var(--pz-radius-lg);
     font-size: 1rem;
     font-family: inherit;
     transition: all 0.2s ease;
-    background: white;
+    background: var(--pz-bg);
 }
 
 .password-wrapper {
@@ -110,7 +110,7 @@ input[type="password"] {
     border: none;
     padding: 0.5rem;
     margin: 0;
-    color: #a0aec0;
+    color: var(--pz-text-subtle);
     cursor: pointer;
     transition: color 0.2s ease;
     display: flex;
@@ -122,7 +122,7 @@ input[type="password"] {
 
 .password-toggle:hover,
 .password-toggle:focus {
-    color: #4a5568;
+    color: var(--pz-text-secondary);
 }
 
 .password-toggle i {
@@ -132,13 +132,13 @@ input[type="password"] {
 input[type="text"]:focus,
 input[type="password"]:focus {
     outline: none;
-    border-color: #3182ce;
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
 }
 
 input[type="text"]::placeholder,
 input[type="password"]::placeholder {
-    color: #a0aec0;
+    color: var(--pz-text-subtle);
 }
 
 .remember-me-group {
@@ -149,8 +149,8 @@ input[type="password"]::placeholder {
     display: flex;
     align-items: center;
     cursor: pointer;
-    font-weight: 400;
-    color: #4a5568;
+    font-weight: var(--pz-weight-normal);
+    color: var(--pz-text-secondary);
     font-size: 0.875rem;
     margin-bottom: 0;
 }
@@ -200,10 +200,10 @@ input[type="password"]::placeholder {
 }
 
 .oidc-divider span {
-    color: #718096;
+    color: var(--pz-text-muted);
     font-size: 0.875rem;
-    font-weight: 500;
-    background: white;
+    font-weight: var(--pz-weight-medium);
+    background: var(--pz-bg);
     padding: 0 0.75rem;
     position: relative;
 }
@@ -211,12 +211,12 @@ input[type="password"]::placeholder {
 .login-button {
     width: 100%;
     padding: 0.875rem 1rem;
-    background: #3182ce;
-    color: white;
+    background: var(--pz-accent);
+    color: var(--pz-text-inverse);
     border: none;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     font-size: 1rem;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     cursor: pointer;
     transition: all 0.2s ease;
     margin-top: 0.5rem;
@@ -239,11 +239,11 @@ input[type="password"]::placeholder {
 .oidc-other-account-button.oidc-other-account-button {
     background: transparent;
     color: var(--pz-text);
-    border: 1px solid #cbd5e0;
+    border: 1px solid var(--pz-border-strong);
 }
 
 .oidc-other-account-button.oidc-other-account-button:hover {
-    background: rgba(0, 0, 0, 0.06);
+    background: rgba(var(--pz-shadow-rgb), 0.06);
     border-color: #a0aec0;
 }
 
@@ -252,7 +252,7 @@ input[type="password"]::placeholder {
 }
 
 .login-button:hover {
-    background: #2c5282;
+    background: var(--pz-accent-strong);
 }
 
 .login-button:active {
@@ -264,7 +264,7 @@ input[type="password"]::placeholder {
 }
 
 .account-select-intro {
-    color: #4a5568;
+    color: var(--pz-text-secondary);
     font-size: 0.95rem;
     line-height: 1.5;
     margin: 0 0 1rem;
@@ -293,10 +293,10 @@ input[type="password"]::placeholder {
     justify-content: space-between;
     gap: 0.75rem;
     padding: 0.875rem 1rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    background: #fff;
-    color: #252526;
+    border: 1px solid var(--pz-border-light);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+    color: var(--pz-text);
     font: inherit;
     cursor: pointer;
     text-align: left;
@@ -305,8 +305,8 @@ input[type="password"]::placeholder {
 
 .account-option:hover,
 .account-option:focus {
-    border-color: #3182ce;
-    background: #f7fafc;
+    border-color: var(--pz-accent);
+    background: var(--pz-surface);
     outline: none;
 }
 
@@ -317,47 +317,47 @@ input[type="password"]::placeholder {
 .account-option-name {
     min-width: 0;
     overflow-wrap: anywhere;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .account-option-badge {
     flex: 0 0 auto;
     padding: 0.2rem 0.45rem;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background: #ebf8ff;
-    color: #2b6cb0;
+    color: var(--pz-accent);
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .account-select-logout {
     display: block;
     margin-top: 1rem;
-    color: #4a5568;
+    color: var(--pz-text-secondary);
     font-size: 0.9rem;
     text-align: center;
     text-decoration: none;
 }
 
 .account-select-logout:hover {
-    color: #2c5282;
+    color: var(--pz-accent-strong);
     text-decoration: underline;
 }
 
 .error {
-    color: #e53e3e;
+    color: var(--pz-danger);
     margin-top: 0.5rem;
     font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     text-align: left;
 }
 
 .admin-warning {
-    background: #fff5f5;
-    border: 1px solid #feb2b2;
-    color: #c53030;
+    background: var(--pz-surface);
+    border: 1px solid var(--pz-danger-soft);
+    color: var(--pz-danger-hover);
     padding: 1rem;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     margin-bottom: 1.5rem;
     font-size: 0.875rem;
     text-align: left;
@@ -365,27 +365,27 @@ input[type="password"]::placeholder {
 }
 
 .admin-warning code {
-    background: #fed7d7;
-    color: #c53030;
+    background: var(--pz-danger-soft);
+    color: var(--pz-danger-hover);
     padding: 0.125rem 0.25rem;
-    border-radius: 4px;
-    font-weight: 600;
+    border-radius: var(--pz-radius-sm);
+    font-weight: var(--pz-weight-semibold);
 }
 
 .info {
     margin-top: 2rem;
     padding: 1rem;
-    background: #f7fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
+    background: var(--pz-surface);
+    border: 1px solid var(--pz-border-light);
+    border-radius: var(--pz-radius-lg);
     font-size: 0.875rem;
-    color: #4a5568;
+    color: var(--pz-text-secondary);
     line-height: 1.5;
     text-align: left;
 }
 
 .info a {
-    color: #3182ce;
+    color: var(--pz-accent);
     text-decoration: none;
 }
 
@@ -394,9 +394,9 @@ input[type="password"]::placeholder {
 }
 
 .info code {
-    background: #edf2f7;
+    background: var(--pz-surface-hover);
     padding: 0.125rem 0.25rem;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
     font-size: 0.8125rem;
 }
@@ -408,9 +408,9 @@ input[type="password"]::placeholder {
 }
 
 .github-link a {
-    color: #3182ce;
+    color: var(--pz-accent);
     text-decoration: none;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -418,7 +418,7 @@ input[type="password"]::placeholder {
 }
 
 .github-link a:hover {
-    color: #2c5282;
+    color: var(--pz-accent-strong);
     text-decoration: underline;
 }
 
@@ -430,45 +430,31 @@ input[type="password"]::placeholder {
    Dark Mode (Login Page)
    ============================================ */
 
-html[data-theme='dark'] body {
+:where(html[data-theme='dark']) body {
     background-color: var(--dm-bg);
     color: var(--dm-text);
     --text-muted: #a0aec0;
 }
 
-html[data-theme='dark'] .login-title {
-    color: var(--dm-text);
-}
-
-html[data-theme='dark'] label,
+:where(html[data-theme='dark']) label,
 html[data-theme='dark'] .remember-me-label {
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] input[type="text"],
-html[data-theme='dark'] input[type="password"] {
+:where(html[data-theme='dark']) input[type="text"],
+:where(html[data-theme='dark']) input[type="password"] {
     background-color: var(--dm-surface);
     border-color: var(--dm-border);
-    color: var(--dm-text);
-}
-
-html[data-theme='dark'] .password-toggle {
-    color: #808080;
 }
 
 html[data-theme='dark'] .password-toggle:hover {
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] input[type="text"]:focus,
 html[data-theme='dark'] input[type="password"]:focus {
     border-color: var(--dm-accent);
     box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.18);
-}
-
-html[data-theme='dark'] input[type="text"]::placeholder,
-html[data-theme='dark'] input[type="password"]::placeholder {
-    color: #808080;
 }
 
 html[data-theme='dark'] .github-link a {
@@ -481,18 +467,13 @@ html[data-theme='dark'] .github-link a:hover {
 
 html[data-theme='dark'] .admin-warning {
     background: rgba(197, 48, 48, 0.1);
-    border-color: #c53030;
-    color: #feb2b2;
+    border-color: var(--dm-danger-hover);
+    color: var(--dm-danger);
 }
 
 html[data-theme='dark'] .admin-warning code {
     background: rgba(254, 215, 215, 0.2);
-    color: #fff;
-}
-
-html[data-theme='dark'] .account-select-intro,
-html[data-theme='dark'] .account-select-logout {
-    color: #a0aec0;
+    color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .account-select-logout:hover {
@@ -502,7 +483,6 @@ html[data-theme='dark'] .account-select-logout:hover {
 html[data-theme='dark'] .account-option {
     background: var(--dm-surface);
     border-color: var(--dm-border);
-    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .account-option:hover,
@@ -512,8 +492,8 @@ html[data-theme='dark'] .account-option:focus {
 }
 
 html[data-theme='dark'] .account-option-badge {
-    background: rgba(74, 158, 255, 0.16);
-    color: #9cc7ff;
+    background: rgba(var(--dm-accent-rgb), 0.16);
+    color: var(--dm-accent-hover);
 }
 
 html[data-theme='dark'] .oidc-divider::before,
@@ -522,18 +502,17 @@ html[data-theme='dark'] .oidc-divider::after {
 }
 
 html[data-theme='dark'] .oidc-divider span {
-    color: #a0aec0;
     background: var(--dm-bg);
 }
 
 html[data-theme='dark'] .oidc-other-account-button {
     background: transparent;
-    color: #e2e8f0;
-    border-color: #4a5568;
+    color: var(--dm-text-bright);
+    border-color: var(--dm-border-light);
 }
 
 html[data-theme='dark'] .oidc-other-account-button:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(var(--pz-highlight-rgb), 0.06);
 }
 
 /* Responsive Design */

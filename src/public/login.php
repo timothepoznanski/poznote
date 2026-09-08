@@ -194,18 +194,7 @@ if (isset($_GET['oidc_error'])) {
     <link rel="apple-touch-icon" href="pwa/poznote.png">
     <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <script src="pwa/pwa.js" defer></script>
-    <link rel="stylesheet" href="css/lucide.css?v=<?php echo $loginAssetV; ?>">
-    <link rel="stylesheet" href="css/login.css?v=<?php echo $loginAssetV; ?>">
-    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>">
-    <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $loginAssetV; ?>">
-    <link rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $loginAssetV; ?>">
-    <link rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo $loginAssetV; ?>">
-    <link rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $loginAssetV; ?>">
-    <link rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $loginAssetV; ?>">
-    <link rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $loginAssetV; ?>">
-    <link rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $loginAssetV; ?>">
-    <link rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $loginAssetV; ?>">
-    <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $loginAssetV; ?>">
+    <?php poznoteRenderStylesheets('login'); ?>
     <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 </head>
@@ -213,7 +202,7 @@ if (isset($_GET['oidc_error'])) {
     <div class="login-container">
         <div class="login-header">
             <div class="logo">
-                <img src="favicon.ico" alt="<?php echo t_h('app.name', [], 'Poznote', $currentLang ?? 'en'); ?>" class="logo-favicon">
+                <span class="poznote-logo logo-favicon" role="img" aria-label="<?php echo t_h('app.name', [], 'Poznote', $currentLang ?? 'en'); ?>"></span>
             </div>
             <h1 class="login-title"><?php echo htmlspecialchars($login_display_name !== '' ? $login_display_name : 'Poznote'); ?></h1>
         </div>

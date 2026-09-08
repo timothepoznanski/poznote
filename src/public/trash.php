@@ -94,33 +94,7 @@ $trashOrderBy = $trashSort === 'created'
     <title><?php echo getPageTitle(); ?></title>
     <meta name="color-scheme" content="dark light">
     <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/lucide.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/base.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/specific-modals.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/attachments.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/share-modal.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/alerts-utilities.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/responsive.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/trash.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/notes/noteentry.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/checklists.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/tasks.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/markdown.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/code-blocks.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/syntax-highlight.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/layout.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/menus.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/editor.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/modals.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/components.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/pages.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/markdown.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/kanban.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/icons.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar-page.css'); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar-mobile.css'); ?>"/>
+    <?php poznoteRenderStylesheets('trash'); ?>
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>

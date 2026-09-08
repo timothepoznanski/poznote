@@ -15,22 +15,22 @@
 }
 
 .folder-name {
-    font-weight: 600;
-    color: rgb(55, 53, 47);
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text);
     font-size: var(--sidebar-font-size, 13px);
 }
 
 .folder-note-count {
     font-size: 12px;
     color: var(--pz-text-muted);
-    font-weight: 300;
+    font-weight: var(--pz-weight-normal);
     margin-left: 8px;
     flex: 0 0 auto;
 }
 
 .folder-icon[data-action='open-kanban-view']:hover {
     transform: scale(1.15);
-    color: #ef4444 !important;
+    color: var(--pz-danger);
 }
 
 .folder-icon {

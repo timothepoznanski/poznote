@@ -14,10 +14,10 @@
     z-index: 9999;
     width: 280px;
     overflow: visible;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 12px 30px rgba(var(--pz-shadow-rgb), 0.12);
     padding: 6px;
     opacity: 0;
     transform: translateY(6px);
@@ -36,7 +36,7 @@
     align-items: center;
     gap: 10px;
     padding: 8px 10px;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     cursor: pointer;
     user-select: none;
     position: relative;
@@ -61,13 +61,13 @@
 
 .slash-command-label {
     font-size: 14px;
-    color: #111827;
+    color: var(--pz-text);
     flex: 1;
 }
 
 .slash-command-item[data-command-id="cancel"] .slash-command-label {
-    color: #dc2626;
-    font-weight: 600;
+    color: var(--pz-danger);
+    font-weight: var(--pz-weight-semibold);
 }
 
 .slash-command-submenu-indicator {
@@ -100,10 +100,10 @@
        from inside dialogs like the reminder modal */
     z-index: 10001;
     width: 252px;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 12px 30px rgba(var(--pz-shadow-rgb), 0.12);
     padding: 10px;
     user-select: none;
 }
@@ -117,8 +117,8 @@
 
 .slash-date-picker-title {
     font-size: 13px;
-    font-weight: 600;
-    color: #111827;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text);
 }
 
 .slash-date-picker-nav,
@@ -127,7 +127,7 @@
     border: none;
     background: none;
     cursor: pointer;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-family: inherit;
 }
 
@@ -158,7 +158,7 @@
 
 .slash-date-picker-day {
     font-size: 13px;
-    color: #111827;
+    color: var(--pz-text);
     padding: 4px 0;
 }
 
@@ -168,8 +168,8 @@
 
 .slash-date-picker-day.today {
     background: rgba(11, 120, 230, 0.1);
-    color: #0b78e6;
-    font-weight: 700;
+    color: var(--pz-accent);
+    font-weight: var(--pz-weight-bold);
 }
 
 .slash-date-picker-day.today:hover {
@@ -178,9 +178,9 @@
 
 .slash-date-picker-day.selected,
 .slash-date-picker-day.selected:hover {
-    background: #0b78e6;
-    color: #ffffff;
-    font-weight: 700;
+    background: var(--pz-accent);
+    color: var(--pz-text-inverse);
+    font-weight: var(--pz-weight-bold);
 }
 
 .slash-date-picker-footer {
@@ -211,12 +211,12 @@
     align-items: center;
     gap: 4px;
     padding: 2px 8px;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
     font-family: inherit;
     font-size: 12px;
-    color: #111827;
-    background: #ffffff;
+    color: var(--pz-text);
+    background: var(--pz-bg);
     cursor: pointer;
 }
 
@@ -226,12 +226,12 @@
 }
 
 .slash-date-picker-time-btn:hover {
-    border-color: #0b78e6;
-    color: #0b78e6;
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
 }
 
 .slash-date-picker-time-btn:hover i {
-    color: #0b78e6;
+    color: var(--pz-accent);
 }
 
 /* Two-step time menu: hours grid, then minutes grid */
@@ -253,10 +253,10 @@
     border: none;
     background: none;
     cursor: pointer;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-family: inherit;
     font-size: 13px;
-    color: #111827;
+    color: var(--pz-text);
     padding: 6px 0;
 }
 
@@ -266,25 +266,25 @@
 
 .slash-time-cell.selected,
 .slash-time-cell.selected:hover {
-    background: #0b78e6;
-    color: #ffffff;
-    font-weight: 700;
+    background: var(--pz-accent);
+    color: var(--pz-text-inverse);
+    font-weight: var(--pz-weight-bold);
 }
 
 .slash-date-picker-apply-btn {
     border: none;
     cursor: pointer;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-family: inherit;
     font-size: 12px;
-    font-weight: 600;
-    color: #ffffff;
-    background: #0b78e6;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text-inverse);
+    background: var(--pz-accent);
     padding: 4px 12px;
 }
 
 .slash-date-picker-apply-btn:hover {
-    background: #0961bd;
+    background: var(--pz-accent);
 }
 
 /* Pill buttons matching the task due-date chip look */
@@ -294,7 +294,7 @@
     align-items: center;
     gap: 4px;
     padding: 2px 8px;
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
     font-family: inherit;
     font-size: 12px;
     line-height: 1.4;
@@ -308,20 +308,20 @@
 }
 
 .slash-date-picker-remove-btn {
-    border: 1px solid #f1b8b8;
+    border: 1px solid var(--pz-danger-soft);
     background: #fdf2f2;
-    color: #c62828;
+    color: var(--pz-danger-hover);
 }
 
 .slash-date-picker-remove-btn:hover {
-    border-color: #d32f2f;
-    background: #fbe4e4;
+    border-color: var(--pz-danger);
+    background: var(--pz-danger-soft);
 }
 
 .slash-date-picker-remove-time-btn {
-    border: 1px solid #d0d7de;
-    background: #f6f8fa;
-    color: #57606a;
+    border: 1px solid var(--pz-border-strong);
+    background: var(--pz-surface);
+    color: var(--pz-text-secondary);
 }
 
 .slash-date-picker-remove-time-btn:hover {
@@ -331,7 +331,7 @@
 
 .slash-date-picker-today-btn {
     font-size: 12px;
-    color: #0b78e6;
+    color: var(--pz-accent);
     padding: 4px 8px;
 }
 

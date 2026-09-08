@@ -394,15 +394,7 @@ $examples = [
     <title><?php echo t_h('markdown_syntax.page_title', [], 'Markdown syntax'); ?> - Poznote</title>
     <meta name="color-scheme" content="dark light">
     <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/lucide.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/info.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/home/buttons.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/markdown-syntax.css'); ?>">
-    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/pages.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar-page.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar-mobile.css'); ?>">
+    <?php poznoteRenderStylesheets('markdown_syntax'); ?>
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 </head>
 <body class="has-icon-sidebar">

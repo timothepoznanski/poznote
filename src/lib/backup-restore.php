@@ -503,6 +503,28 @@ function restoreEntriesFromDir($sourceDir) {
     if (!$entriesPath || !is_dir($entriesPath)) {
         return ['success' => false, 'error' => 'Cannot find entries directory'];
     }
+
+    // A restored archive is untrusted input, so every note file is sanitized
+    // before it lands in the entries directory the note page reads from
+    // (GHSA-xjh4-q36h-mcvv). The policy depends on the note type, which the
+    // file extension alone does not give: a task list is JSON stored in a
+    // .html file. The SQL dump has already been restored at this point, so the
+    // types are read back from it; a note with no row falls back to the strict
+    // HTML treatment.
+    require_once __DIR__ . '/html-sanitize.php';
+    $noteTypes = [];
+    try {
+        $typeCon = new PDO('sqlite:' . poznoteGetActiveDatabasePath());
+        $typeCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        foreach ($typeCon->query('SELECT id, type FROM entries') as $row) {
+            $noteTypes[(string) $row['id']] = $row['type'];
+        }
+        $typeCon = null;
+    } catch (Throwable $e) {
+        // No readable database means no type hints, not a failed restore:
+        // every file then takes the strict path below.
+        error_log('backup-restore: could not read note types for sanitization: ' . $e->getMessage());
+    }
     
     $files = new RecursiveIteratorIterator(
         new RecursiveDirectoryIterator($sourceDir),
@@ -560,18 +582,19 @@ function restoreEntriesFromDir($sourceDir) {
                         );
                     }
                     
+                    $noteType = $noteTypes[(string) $noteId]
+                        ?? (($extension === 'md') ? 'markdown' : 'note');
+                    $content = poznoteSanitizeImportedNoteContent($content, $noteType);
+
                     $targetFile = $entriesPath . '/' . basename($relativePath);
                     if (file_put_contents($targetFile, $content) !== false) {
                         chmod($targetFile, 0644);
                         $importedCount++;
                     }
                 } else {
-                    // If reading fails, just copy the file as-is
-                    $targetFile = $entriesPath . '/' . basename($relativePath);
-                    if (copy($filePath, $targetFile)) {
-                        chmod($targetFile, 0644);
-                        $importedCount++;
-                    }
+                    // Unreadable here means unreadable for the sanitizer too, so
+                    // the file is skipped rather than copied through unchecked.
+                    error_log('backup-restore: skipped unreadable note file ' . $relativePath);
                 }
             }
         }

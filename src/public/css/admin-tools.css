@@ -15,20 +15,19 @@
 .dr-hero h1 {
     margin: 0 0 8px;
     font-size: 1.6rem;
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
 }
 .dr-hero p {
     margin: 0;
-    color: var(--text-secondary, #666);
+    color: var(--pz-text-muted);
     font-size: 0.95rem;
     max-width: 520px;
     margin: 0 auto;
     line-height: 1.6;
 }
 
-html[data-theme='dark'] .dr-hero p,
-body.dark-mode .dr-hero p {
-    color: rgba(255, 255, 255, 0.82);
+html[data-theme='dark'] .dr-hero p {
+    color: rgba(var(--pz-highlight-rgb), 0.82);
 }
 
 /* ── Status chips ── */
@@ -37,9 +36,9 @@ body.dark-mode .dr-hero p {
     align-items: center;
     gap: 4px;
     padding: 3px 10px;
-    border-radius: 999px;
+    border-radius: var(--pz-radius-pill);
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 /* ── Orphan Scanner ── */
@@ -47,10 +46,10 @@ body.dark-mode .dr-hero p {
     width: 100%; 
     border-collapse: collapse; 
     margin-top: 20px; 
-    color: var(--text-primary); 
-    background: var(--bg-color, #fff);
-    border: 1.5px solid var(--border-color, #e5e7eb);
-    border-radius: 12px;
+    color: var(--pz-text); 
+    background: var(--bg-color, var(--pz-bg));
+    border: 1.5px solid var(--border-color, var(--pz-border));
+    border-radius: var(--pz-radius-xl);
     overflow: hidden;
 }
 .results-table th, 
@@ -60,12 +59,12 @@ body.dark-mode .dr-hero p {
     text-align: left; 
 }
 .results-table th { 
-    background: var(--bg-secondary, #f9f9f9);
+    background: var(--bg-secondary, var(--pz-surface));
     font-size: 0.7rem;
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--text-muted, #888);
+    color: var(--text-muted, var(--pz-text-muted));
 }
 .results-table tr:last-child td { border-bottom: none; }
 
@@ -76,10 +75,10 @@ body.dark-mode .dr-hero p {
     margin-top: 8px;
     padding: 8px 12px;
     background: rgba(59,130,246,.1);
-    border-left: 3px solid #3b82f6;
-    border-radius: 6px;
+    border-left: 3px solid var(--pz-accent);
+    border-radius: var(--pz-radius);
     font-size: 0.85rem;
-    color: #1d4ed8;
+    color: var(--pz-accent-hover);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -87,35 +86,35 @@ body.dark-mode .dr-hero p {
 
 html[data-theme='dark'] .deletion-notice {
     background: rgba(59,130,246,.15);
-    color: #93c5fd;
+    color: var(--dm-accent-hover);
 }
 
 .btn-view-files {
-    background: var(--bg-secondary, #f5f5f5);
-    border: 1px solid var(--border-color, #ddd);
+    background: var(--bg-secondary, var(--pz-surface-hover));
+    border: 1px solid var(--border-color, var(--pz-border));
     padding: 6px 14px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius-sm);
     font-size: 0.85rem;
     cursor: pointer;
-    color: var(--text-primary);
+    color: var(--pz-text);
     transition: all 0.2s;
 }
 
 .btn-view-files:hover {
-    background: var(--hover-bg, #e8e8e8);
+    background: var(--pz-surface-sunken);
     border-color: var(--pz-accent);
     color: var(--pz-accent);
 }
 
 html[data-theme='dark'] .btn-view-files {
-    background: rgba(255,255,255,.05);
-    border-color: rgba(255,255,255,.1);
+    background: rgba(var(--pz-highlight-rgb), .05);
+    border-color: rgba(var(--pz-highlight-rgb), .1);
 }
 
 html[data-theme='dark'] .btn-view-files:hover {
-    background: rgba(255,255,255,.1);
-    border-color: #3b82f6;
-    color: #60a5fa;
+    background: rgba(var(--pz-highlight-rgb), .1);
+    border-color: var(--dm-accent);
+    color: var(--dm-accent);
 }
 
 /* Modal Styles */
@@ -137,19 +136,19 @@ html[data-theme='dark'] .btn-view-files:hover {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(var(--pz-shadow-rgb), 0.5);
 }
 
 .orphan-modal-content {
     position: relative;
-    background: var(--bg-color, #fff);
-    border-radius: 12px;
+    background: var(--bg-color, var(--pz-bg));
+    border-radius: var(--pz-radius-xl);
     max-width: 600px;
     width: 90%;
     max-height: 80vh;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 60px rgba(var(--pz-shadow-rgb), 0.3);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
@@ -158,14 +157,14 @@ html[data-theme='dark'] .btn-view-files:hover {
     align-items: center;
     justify-content: space-between;
     padding: 20px 24px;
-    border-bottom: 1px solid var(--border-color, #e5e7eb);
+    border-bottom: 1px solid var(--border-color, var(--pz-border));
 }
 
 .orphan-modal-header h3 {
     margin: 0;
     font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-primary);
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text);
 }
 
 .orphan-modal-close {
@@ -173,7 +172,7 @@ html[data-theme='dark'] .btn-view-files:hover {
     border: none;
     font-size: 28px;
     line-height: 1;
-    color: var(--text-muted, #999);
+    color: var(--text-muted, var(--pz-text-subtle));
     cursor: pointer;
     padding: 0;
     width: 32px;
@@ -181,14 +180,14 @@ html[data-theme='dark'] .btn-view-files:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     transition: all 0.2s;
     font-family: inherit;
 }
 
 .orphan-modal-close:hover {
-    background: var(--hover-bg, #f5f5f5);
-    color: var(--text-primary);
+    background: var(--pz-surface-hover);
+    color: var(--pz-text);
 }
 
 .orphan-modal-body {
@@ -205,7 +204,7 @@ html[data-theme='dark'] .btn-view-files:hover {
 
 .orphan-files-ul li {
     padding: 10px 12px;
-    border-bottom: 1px solid var(--border-color, #f0f0f0);
+    border-bottom: 1px solid var(--border-color, var(--pz-border-light));
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace;
     font-size: 0.85rem;
     word-break: break-all;
@@ -216,12 +215,12 @@ html[data-theme='dark'] .btn-view-files:hover {
 }
 
 .orphan-files-ul li .file-path {
-    color: var(--text-muted, #999);
+    color: var(--text-muted, var(--pz-text-subtle));
     font-size: 0.8rem;
 }
 
 .orphan-files-ul li strong {
-    color: var(--text-primary);
+    color: var(--pz-text);
 }
 
 @media (max-width: 640px) {
@@ -255,27 +254,27 @@ html[data-theme='dark'] .btn-view-files:hover {
 
 .status-badge { 
     padding: 4px 10px; 
-    border-radius: 999px; 
+    border-radius: var(--pz-radius-pill); 
     font-size: 0.75rem; 
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     display: inline-block;
 }
 .status-clean { 
-    background: #dcfce7; 
-    color: #166534; 
+    background: var(--pz-success-soft); 
+    color: var(--pz-success-strong); 
 }
 .status-warning { 
-    background: #fef9c3; 
-    color: #854d0e; 
+    background: var(--pz-warning-soft); 
+    color: var(--pz-warning-strong); 
 }
 
 html[data-theme='dark'] .status-clean { 
     background: rgba(34,197,94,.15); 
-    color: #86efac; 
+    color: var(--dm-success); 
 }
 html[data-theme='dark'] .status-warning { 
     background: rgba(234,179,8,.15); 
-    color: #fde047; 
+    color: var(--dm-warning); 
 }
 
 /* ── Orphan Scanner Buttons ── */
@@ -338,7 +337,7 @@ html[data-theme='dark'] .status-warning {
     
     .results-table {
         font-size: 0.8rem;
-        border-radius: 8px;
+        border-radius: var(--pz-radius-lg);
     }
     
     .results-table th,
@@ -390,17 +389,15 @@ html[data-theme='dark'] .status-warning {
    "used / limit" pair turns orange from 50% of the quota and red from 80%. */
 .quota-level-warn,
 .quota-level-warn .quota-inline {
-    color: #e8830c;
+    color: var(--pz-warning-hover);
 }
 .quota-level-danger,
 .quota-level-danger .quota-inline {
     color: var(--pz-danger);
 }
-html[data-theme='dark'] .quota-level-warn,
-body.dark-mode .quota-level-warn {
-    color: #fbbf24;
+html[data-theme='dark'] .quota-level-warn {
+    color: var(--dm-warning);
 }
-html[data-theme='dark'] .quota-level-danger,
-body.dark-mode .quota-level-danger {
-    color: #f87171;
+html[data-theme='dark'] .quota-level-danger {
+    color: var(--dm-danger);
 }

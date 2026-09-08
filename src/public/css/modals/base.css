@@ -39,7 +39,7 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(var(--pz-shadow-rgb), 0.4);
     display: none;
     align-items: flex-start;
     justify-content: center;
@@ -53,15 +53,15 @@
    ============================================ */
 
 .modal-content {
-    background-color: #fefefe;
+    background-color: var(--pz-bg);
     padding: 28px;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     width: 90%;
     max-width: var(--modal-max-width);
     margin: 0 auto;
     font-family: 'Inter', sans-serif;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 20px rgba(var(--pz-shadow-rgb), 0.3);
     box-sizing: border-box;
     overflow-x: hidden;
     z-index: 10000 !important;
@@ -70,9 +70,9 @@
 .modal-content h3 {
     margin-top: 0;
     margin-bottom: 15px;
-    color: rgb(55, 53, 47);
+    color: var(--pz-text);
     font-size: 18px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 /* ============================================
@@ -83,8 +83,8 @@
 .modal-content select {
     padding: 8px 12px;
     margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm);
     font-size: 14px;
     font-family: 'Inter', sans-serif;
     box-sizing: border-box;
@@ -100,7 +100,7 @@
 .modal .form-group label {
     display: block;
     margin-bottom: 6px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 /* Ensure controls inside modals never exceed the modal width */
@@ -129,7 +129,7 @@
 .modal-buttons button {
     padding: 8px 14px;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     font-size: 14px;
     font-family: 'Inter', sans-serif;
@@ -140,7 +140,7 @@
 
 .modal-buttons button:first-child {
     background-color: var(--pz-accent);
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .modal-buttons button:first-child:hover {
@@ -150,11 +150,11 @@
 .modal-buttons button:last-child {
     background-color: var(--pz-surface);
     color: var(--pz-text);
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
 }
 
 .modal-buttons button:last-child:hover {
-    background-color: #e9ecef;
+    background-color: var(--pz-surface-sunken);
 }
 
 /* Account-settings info modal holds three buttons: keep them on a single
@@ -184,7 +184,7 @@
 /* Explicit button classes (take precedence over first/last child rules) */
 .modal-buttons button.btn-primary {
     background-color: var(--pz-accent);
-    color: white;
+    color: var(--pz-text-inverse);
     border: none;
 }
 
@@ -197,9 +197,9 @@
    disabled button, so the flat colour has to be re-asserted here. */
 .modal-buttons button.btn-primary:disabled,
 .modal-buttons button.btn-primary:disabled:hover {
-    background-color: #eceff3;
-    color: #9aa5b1;
-    border: 1px solid #dfe3e8;
+    background-color: var(--pz-surface-sunken);
+    color: var(--pz-text-subtle);
+    border: 1px solid var(--pz-border);
     cursor: not-allowed;
     opacity: 1;
 }
@@ -207,12 +207,10 @@
 /* dark-mode/components.css sets .btn-primary colours with !important, so the
    disabled state has to re-assert them the same way to win. */
 html[data-theme='dark'] .modal-buttons button.btn-primary:disabled,
-html[data-theme='dark'] .modal-buttons button.btn-primary:disabled:hover,
-body.dark-mode .modal-buttons button.btn-primary:disabled,
-body.dark-mode .modal-buttons button.btn-primary:disabled:hover {
-    background-color: rgba(255, 255, 255, 0.06) !important;
-    color: #6b7280 !important;
-    border-color: rgba(255, 255, 255, 0.12) !important;
+html[data-theme='dark'] .modal-buttons button.btn-primary:disabled:hover {
+    background-color: rgba(var(--pz-highlight-rgb), 0.06) !important;
+    color: var(--dm-text-subtle) !important;
+    border-color: rgba(var(--pz-highlight-rgb), 0.12) !important;
 }
 
 /* Info box explaining why a disabled action in this modal is unavailable. */
@@ -222,9 +220,9 @@ body.dark-mode .modal-buttons button.btn-primary:disabled:hover {
     gap: 10px;
     margin: 12px 0 10px 0;
     padding: 10px 12px;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: #eff6ff;
-    color: #1e40af;
+    color: var(--pz-accent-strong);
     font-size: 0.85rem;
     line-height: 1.45;
 }
@@ -236,41 +234,40 @@ body.dark-mode .modal-buttons button.btn-primary:disabled:hover {
     margin-top: 2px;
 }
 
-html[data-theme='dark'] .modal .modal-info-note,
-body.dark-mode .modal .modal-info-note {
+html[data-theme='dark'] .modal .modal-info-note {
     background: rgba(59, 130, 246, 0.14);
-    color: #93c5fd;
+    color: var(--dm-accent-hover);
 }
 
 .modal-buttons button.btn-cancel {
-    background-color: #6c757d;
-    color: white;
-    border: 1px solid #6c757d;
+    background-color: var(--pz-neutral);
+    color: var(--pz-text-inverse);
+    border: 1px solid var(--pz-neutral);
 }
 
 .modal-buttons button.btn-cancel:hover {
-    background-color: #5a6268;
-    border-color: #545b62;
+    background-color: var(--pz-neutral-hover);
+    border-color: var(--pz-neutral-hover);
 }
 
 .modal-buttons button.btn-success {
     background-color: var(--pz-success);
-    color: white;
+    color: var(--pz-text-inverse);
     border: none;
 }
 
 .modal-buttons button.btn-success:hover {
-    background-color: #218838;
+    background-color: var(--pz-success-hover);
 }
 
 .modal-buttons button.btn-danger {
     background-color: var(--pz-danger);
-    color: white;
+    color: var(--pz-text-inverse);
     border: none;
 }
 
 .modal-buttons button.btn-danger:hover {
-    background-color: #c82333;
+    background-color: var(--pz-danger-hover);
 }
 
 /* ============================================
@@ -279,12 +276,12 @@ body.dark-mode .modal .modal-info-note {
 
 .modal-error-message {
     display: none;
-    background-color: #f8d7da;
-    color: #721c24;
+    background-color: var(--pz-danger-soft);
+    color: var(--pz-danger-strong);
     padding: 10px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     margin-top: 10px;
-    border: 1px solid #f5c6cb;
+    border: 1px solid var(--pz-danger-soft);
 }
 
 /* ============================================
@@ -333,8 +330,8 @@ body.dark-mode .modal .modal-info-note {
 .date-format-tokens dt code {
     font-family: 'Courier New', monospace;
     font-size: 12px;
-    background: rgba(0, 0, 0, 0.06);
-    border-radius: 3px;
+    background: rgba(var(--pz-shadow-rgb), 0.06);
+    border-radius: var(--pz-radius-sm);
     padding: 1px 5px;
     white-space: nowrap;
 }
@@ -375,8 +372,8 @@ body.dark-mode .modal .modal-info-note {
     height: 26px;
     padding: 0 !important;
     margin: 0 !important;
-    border: 1px solid #d7dee5;
-    border-radius: 6px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
     background: none;
     cursor: pointer;
 }
@@ -387,12 +384,12 @@ body.dark-mode .modal .modal-info-note {
 
 .mdc-custom-row input[type="color"]::-webkit-color-swatch {
     border: none;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
 }
 
 .mdc-custom-row input[type="color"]::-moz-color-swatch {
     border: none;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
 }
 
 /* ============================================
@@ -425,7 +422,7 @@ body.dark-mode .modal .modal-info-note {
     padding: 0;
     margin: 0;
     border: 1px solid var(--pz-border-strong);
-    border-radius: 7px;
+    border-radius: var(--pz-radius);
     background: none;
     cursor: pointer;
     overflow: hidden;
@@ -439,12 +436,12 @@ body.dark-mode .modal .modal-info-note {
 
 .modal-content .note-palette-row input.note-palette-color::-webkit-color-swatch {
     border: none;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
 }
 
 .modal-content .note-palette-row input.note-palette-color::-moz-color-swatch {
     border: none;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
 }
 
 .modal-content .note-palette-row input.note-palette-name {
@@ -454,7 +451,7 @@ body.dark-mode .modal .modal-info-note {
     padding: 0 10px;
     margin: 0;
     border: 1px solid var(--pz-border-strong);
-    border-radius: 7px;
+    border-radius: var(--pz-radius);
     font-size: 14px;
 }
 
@@ -466,15 +463,15 @@ body.dark-mode .modal .modal-info-note {
     align-items: center;
     justify-content: center;
     border: 1px solid var(--pz-border-strong);
-    border-radius: 7px;
+    border-radius: var(--pz-radius);
     background: none;
-    color: #b91c1c;
+    color: var(--pz-danger-hover);
     cursor: pointer;
 }
 
 .note-palette-remove:hover {
     background: #fef2f2;
-    border-color: #fca5a5;
+    border-color: var(--pz-danger-soft);
 }
 
 /* "Add color" is a secondary action inside the modal body, not a footer
@@ -488,10 +485,10 @@ body.dark-mode .modal .modal-info-note {
     gap: 6px;
     margin: 4px 0 6px;
     padding: 7px 12px;
-    border: 1px dashed #cbd5e1;
-    border-radius: 7px;
+    border: 1px dashed var(--pz-border-strong);
+    border-radius: var(--pz-radius);
     background: transparent;
-    color: #4b5563 !important;
+    color: var(--pz-text-secondary) !important;
     font-size: 13px;
     cursor: pointer;
     transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
@@ -514,7 +511,7 @@ body.dark-mode .modal .modal-info-note {
 #noteColorPaletteModal .modal-buttons {
     margin-top: 14px;
     padding-top: 14px;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--pz-border);
 }
 
 /* Four footer buttons: widen the modal so they fit on one row, stacking
@@ -547,67 +544,56 @@ body.dark-mode .modal .modal-info-note {
     margin-right: auto;
     border: 1px solid var(--pz-border-strong);
     background: transparent;
-    color: #374151;
+    color: var(--pz-text);
     cursor: pointer;
     transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .modal-buttons button.note-palette-back:hover {
     border-color: var(--pz-text-subtle);
-    background: #f9fafb;
+    background: var(--pz-surface);
 }
 
-:root[data-theme='dark'] #noteColorPaletteModal .modal-buttons button.note-palette-back,
-body.dark-mode #noteColorPaletteModal .modal-buttons button.note-palette-back {
+html[data-theme='dark'] #noteColorPaletteModal .modal-buttons button.note-palette-back {
     border-color: var(--dm-border);
     background: transparent;
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] #noteColorPaletteModal .modal-buttons button.note-palette-back:hover,
-body.dark-mode #noteColorPaletteModal .modal-buttons button.note-palette-back:hover {
+html[data-theme='dark'] #noteColorPaletteModal .modal-buttons button.note-palette-back:hover {
     border-color: var(--dm-text-muted);
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] #noteColorPaletteModal .modal-buttons,
-body.dark-mode #noteColorPaletteModal .modal-buttons {
+html[data-theme='dark'] #noteColorPaletteModal .modal-buttons {
     border-top-color: var(--dm-border);
 }
 
-:root[data-theme='dark'] .modal-content .note-palette-add,
-body.dark-mode .modal-content .note-palette-add,
-:root[data-theme='dark'] .modal-content button.note-palette-add,
-body.dark-mode .modal-content button.note-palette-add {
+html[data-theme='dark'] .modal-content .note-palette-add,
+html[data-theme='dark'] .modal-content button.note-palette-add {
     border-color: var(--dm-border);
     background: transparent;
     color: var(--dm-text-muted) !important;
 }
 
-:root[data-theme='dark'] .modal-content .note-palette-add:hover,
-body.dark-mode .modal-content .note-palette-add:hover,
-:root[data-theme='dark'] .modal-content button.note-palette-add:hover,
-body.dark-mode .modal-content button.note-palette-add:hover {
+html[data-theme='dark'] .modal-content .note-palette-add:hover,
+html[data-theme='dark'] .modal-content button.note-palette-add:hover {
     border-color: var(--pz-accent);
     color: var(--pz-accent) !important;
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] .note-palette-row input.note-palette-name,
-body.dark-mode .note-palette-row input.note-palette-name,
-:root[data-theme='dark'] .note-palette-row input.note-palette-color,
-body.dark-mode .note-palette-row input.note-palette-color,
-:root[data-theme='dark'] .note-palette-remove,
-body.dark-mode .note-palette-remove {
+html[data-theme='dark'] .note-palette-row input.note-palette-name,
+html[data-theme='dark'] .note-palette-row input.note-palette-color,
+html[data-theme='dark'] .note-palette-remove {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .note-palette-remove:hover,
-body.dark-mode .note-palette-remove:hover {
+html[data-theme='dark'] .note-palette-remove:hover {
     background: var(--dm-surface-hover);
-    color: #fca5a5;
+    color: var(--dm-danger);
 }
 
 /* ============================================
@@ -617,8 +603,8 @@ body.dark-mode .note-palette-remove:hover {
 .move-task-list {
     max-height: 260px;
     overflow: auto;
-    border: 1px solid #eee;
-    border-radius: 6px;
+    border: 1px solid var(--pz-border-light);
+    border-radius: var(--pz-radius);
     padding: 6px;
     margin-top: 6px;
 }
@@ -630,7 +616,7 @@ body.dark-mode .note-palette-remove:hover {
     border: none;
     background: transparent;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -642,7 +628,7 @@ body.dark-mode .note-palette-remove:hover {
 }
 
 .move-task-item.selected {
-    background: #e0f2fe;
+    background: var(--pz-accent-soft);
 }
 
 .move-task-item small {
@@ -659,7 +645,7 @@ body.dark-mode .note-palette-remove:hover {
 /* "Create task list ..." row appended after the search results */
 .move-task-item.move-task-create {
     justify-content: flex-start;
-    color: #2563eb;
+    color: var(--pz-accent);
 }
 
 .move-task-item.move-task-create span {
@@ -680,7 +666,7 @@ body.dark-mode .note-palette-remove:hover {
 .modal-footer .btn {
     padding: 8px 16px;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     margin-left: 10px;
     display: inline-flex;
@@ -689,13 +675,13 @@ body.dark-mode .note-palette-remove:hover {
 }
 
 .modal-footer .btn-secondary {
-    background: #6c757d;
-    color: white;
+    background: var(--pz-neutral);
+    color: var(--pz-text-inverse);
 }
 
 .modal-footer .btn-primary {
     background: var(--pz-accent);
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .modal-footer .btn:hover {
@@ -704,13 +690,13 @@ body.dark-mode .note-palette-remove:hover {
 
 .modal-footer .btn-cancel {
     background-color: var(--pz-danger) !important;
-    color: white !important;
+    color: var(--pz-text-inverse) !important;
     border: 1px solid var(--pz-danger) !important;
 }
 
 .modal-footer .btn-cancel:hover {
-    background-color: #c82333 !important;
-    border-color: #bd2130 !important;
+    background-color: var(--pz-danger-hover) !important;
+    border-color: var(--pz-danger-hover) !important;
     opacity: 1 !important;
 }
 
@@ -719,30 +705,26 @@ body.dark-mode .note-palette-remove:hover {
    ============================================ */
 
 .modal .btn-disabled {
-    background: #cccccc !important;
-    color: #888888 !important;
+    background: var(--pz-disabled) !important;
+    color: var(--pz-text-muted) !important;
     border: none;
     padding: 8px 12px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius-sm);
     cursor: not-allowed !important;
     opacity: 0.6;
 }
 
 .modal .btn-disabled:hover {
-    background: #cccccc !important;
+    background: var(--pz-disabled) !important;
     cursor: not-allowed !important;
 }
 
+/* Only the two values that differ from components/buttons.css. The fill, the
+   label colour, border: none, cursor and the hover were restating the base;
+   opacity: 1 was worse than redundant, at equal specificity and a later load
+   it beat .btn-danger:disabled, so a disabled Delete in a dialog rendered as
+   a live button with a pointer cursor. */
 .modal .btn-danger {
-    background: #e04b4b !important;
-    color: #fff !important;
-    border: none;
     padding: 8px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    opacity: 1;
-}
-
-.modal .btn-danger:hover {
-    background: #c43b3b !important;
+    border-radius: var(--pz-radius-sm);
 }

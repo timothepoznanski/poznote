@@ -17,14 +17,14 @@
 #inputModal .modal-body label {
     display: block;
     margin-bottom: 6px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 #inputModal .modal-body input {
     width: 100%;
     padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm);
     font-size: 14px;
     box-sizing: border-box;
 }
@@ -85,7 +85,8 @@
 
 .font-size-controls label {
     margin: 0;
-    font-weight: normal;
+    /* normal on purpose: these sit inside a dialog that bolds its labels. */
+    font-weight: var(--pz-weight-normal);
     font-size: 15px;
     flex: 1;
 }
@@ -96,8 +97,8 @@
     padding: 6px 10px;
     margin: 0;
     font-size: 14px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm);
     text-align: center;
 }
 
@@ -131,7 +132,7 @@
 
 .note-width-unit {
     font-size: 1.2rem;
-    color: #6b7280;
+    color: var(--pz-text-muted);
 }
 
 .note-width-input-container input {
@@ -144,18 +145,18 @@
 
 .btn-full-width-footer {
     background-color: var(--pz-surface-hover) !important;
-    color: #4b5563 !important;
+    color: var(--pz-text-secondary) !important;
     border: 1px solid var(--pz-border-strong) !important;
 }
 
 .btn-full-width-footer:hover {
-    background-color: #e5e7eb !important;
-    color: #111827 !important;
+    background-color: var(--pz-surface-sunken) !important;
+    color: var(--pz-text) !important;
 }
 
 .btn-full-width-footer.active {
     background-color: var(--pz-accent) !important;
-    color: white !important;
+    color: var(--pz-text-inverse) !important;
     border-color: var(--pz-accent) !important;
 }
 
@@ -189,9 +190,9 @@
 #moveFolderFilesModal select#moveFolderFilesTargetSelect {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    background: #fff;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    background: var(--pz-bg);
     margin: 10px 0 12px 0;
     font-size: 14px;
     box-sizing: border-box;
@@ -237,7 +238,7 @@
 #moveNoteFolderModal .form-group label {
     display: block;
     margin-bottom: 6px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text);
 }
 
@@ -262,12 +263,12 @@
     color: var(--pz-accent);
     cursor: pointer;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     white-space: nowrap;
 }
 
 #moveNoteFolderModal .move-note-inline-create-toggle:hover {
-    color: #005f8c;
+    color: var(--pz-accent-hover);
     text-decoration: underline;
 }
 
@@ -291,14 +292,14 @@
     flex: 0 0 auto;
     padding: 8px 14px;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     cursor: pointer;
     font-size: 13px;
 }
 
 #moveNoteFolderModal .move-note-inline-create button.btn-primary {
     background-color: var(--pz-accent);
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 #moveNoteFolderModal .move-note-inline-create button.btn-primary:hover {
@@ -308,11 +309,11 @@
 #moveNoteFolderModal .move-note-inline-create button.btn-cancel {
     background-color: var(--pz-surface);
     color: var(--pz-text);
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
 }
 
 #moveNoteFolderModal .move-note-inline-create button.btn-cancel:hover {
-    background-color: #e9ecef;
+    background-color: var(--pz-surface-sunken);
 }
 
 #moveNoteFolderModal .move-note-recent-folders {
@@ -324,9 +325,9 @@
     align-items: center;
     gap: 6px;
     margin-bottom: 8px;
-    color: #555;
+    color: var(--pz-text-secondary);
     font-size: 13px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 #moveNoteFolderModal .move-note-recent-list {
@@ -342,10 +343,10 @@
     max-width: 100%;
     min-height: 34px;
     padding: 6px 10px;
-    border: 1px solid #d7dde3;
-    border-radius: 8px;
-    background: #f7f9fb;
-    color: #263238;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-surface);
+    color: var(--pz-text);
     cursor: pointer;
     font-size: 13px;
     line-height: 1.2;
@@ -355,7 +356,7 @@
 #moveNoteFolderModal .move-note-recent-folder.is-selected {
     border-color: var(--pz-accent);
     background: #e8f4fa;
-    color: #005f8c;
+    color: var(--pz-accent-hover);
 }
 
 #moveNoteFolderModal .move-note-recent-folder span {
@@ -372,60 +373,6 @@
 /* Move Task Modal */
 #moveTaskModal .modal-buttons {
     margin-top: 12px;
-}
-
-/* ============================================
-   Note Info Modal (#noteInfoModal)
-   ============================================ */
-
-#noteInfoModal .modal-content {
-    max-width: 420px;
-    text-align: left;
-}
-
-#noteInfoModal .modal-content h3 {
-    color: var(--pz-accent);
-    margin-bottom: 20px;
-    border-bottom: 2px solid var(--pz-accent);
-    padding-bottom: 10px;
-}
-
-#noteInfoModal .modal-content h3 i {
-    margin-right: 8px;
-}
-
-#noteInfoModal .info-row {
-    display: flex;
-    align-items: center;
-    margin: 15px 0;
-    padding: 8px;
-    background-color: var(--pz-surface);
-    border-radius: 4px;
-    border-left: 3px solid var(--pz-accent);
-}
-
-#noteInfoModal .info-row strong {
-    min-width: 180px;
-    color: var(--pz-text);
-    font-weight: 600;
-}
-
-#noteInfoModal .info-row strong i {
-    margin-right: 6px;
-    color: var(--pz-accent);
-    width: 16px;
-    text-align: center;
-}
-
-#noteInfoModal .info-value {
-    color: #555;
-    font-family: monospace;
-    background-color: #fff;
-    padding: 4px 8px;
-    border-radius: 3px;
-    border: 1px solid #ddd;
-    flex: 1;
-    margin-left: 10px;
 }
 
 /* ============================================
@@ -447,12 +394,12 @@
 #updateModal .modal-content p {
     margin: 15px 0;
     line-height: 1.6;
-    color: #555;
+    color: var(--pz-text-secondary);
 }
 
 #updateModal .version-info {
     background-color: var(--pz-surface);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     padding: 15px 20px;
     margin: 20px 0;
 }
@@ -465,13 +412,13 @@
 
 #updateModal .version-info strong {
     color: var(--pz-accent);
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 #updateModal .backup-warning {
-    background-color: #fff3cd;
-    border: 1px solid #ffeaa7;
-    border-radius: 8px;
+    background-color: var(--pz-warning-soft);
+    border: 1px solid var(--pz-warning-soft);
+    border-radius: var(--pz-radius-lg);
     padding: 15px 20px;
     margin: 15px 0;
 }
@@ -483,7 +430,7 @@
 
 #updateModal .backup-warning strong {
     color: var(--pz-danger);
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 #updateModal .modal-buttons {
@@ -494,24 +441,24 @@
 }
 
 #updateModal .btn-cancel {
-    background-color: #6c757d !important;
-    color: white !important;
+    background-color: var(--pz-neutral) !important;
+    color: var(--pz-text-inverse) !important;
     border: none !important;
     min-width: 120px;
     padding: 10px 24px !important;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(var(--pz-shadow-rgb), 0.1);
 }
 
 #updateModal .btn-cancel:hover {
-    background-color: #5a6268 !important;
+    background-color: var(--pz-neutral-hover) !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3);
 }
 
 #updateModal .btn-cancel:active {
     transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(var(--pz-shadow-rgb), 0.1);
 }
 
 /* Update Check Modal */
@@ -528,7 +475,7 @@
 #updateCheckModal .modal-content p {
     margin: 15px 0;
     line-height: 1.5;
-    color: #555;
+    color: var(--pz-text-secondary);
 }
 
 /* ============================================
@@ -547,50 +494,50 @@
 
 #confirmModal .modal-content p {
     line-height: 1.5;
-    color: #555;
+    color: var(--pz-text-secondary);
     font-size: 16px;
 }
 
 #confirmModal .btn-secondary {
     background-color: var(--pz-accent) !important;
-    color: white !important;
+    color: var(--pz-text-inverse) !important;
     border: none !important;
 }
 
 #confirmModal .btn-secondary:hover {
-    background-color: #0056b3 !important;
+    background-color: var(--pz-accent-strong) !important;
 }
 
 #confirmModal .btn-danger {
-    background-color: #e04b4b !important;
-    color: #fff !important;
+    background-color: var(--pz-danger) !important;
+    color: var(--pz-text-inverse) !important;
     border: none !important;
     padding: 8px 12px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius-sm);
 }
 
 #confirmModal .btn-danger:hover {
-    background-color: #c43b3b !important;
+    background-color: var(--pz-danger-hover) !important;
 }
 
 #confirmModal #confirmButton.btn-danger {
-    background-color: #e04b4b !important;
-    color: #fff !important;
+    background-color: var(--pz-danger) !important;
+    color: var(--pz-text-inverse) !important;
     border: none !important;
 }
 
 #confirmModal #confirmButton.btn-danger:hover {
-    background-color: #c43b3b !important;
+    background-color: var(--pz-danger-hover) !important;
 }
 
 #confirmModal #confirmButton.btn-primary {
     background-color: var(--pz-accent) !important;
-    color: #fff !important;
+    color: var(--pz-text-inverse) !important;
     border: none !important;
 }
 
 #confirmModal #confirmButton.btn-primary:hover {
-    background-color: #0056b3 !important;
+    background-color: var(--pz-accent-strong) !important;
 }
 
 #confirmModal .modal-buttons {
@@ -624,15 +571,15 @@
 }
 
 #confirmModal .modal-buttons .btn-cancel {
-    background-color: #e04b4b !important;
-    color: #fff !important;
+    background-color: var(--pz-danger) !important;
+    color: var(--pz-text-inverse) !important;
     border: none !important;
     min-width: 90px !important;
     flex: 0 0 110px !important;
 }
 
 #confirmModal .modal-buttons .btn-cancel:hover {
-    background-color: #c43b3b !important;
+    background-color: var(--pz-danger-hover) !important;
 }
 
 @media (max-width: 420px) {
@@ -653,26 +600,26 @@
    ============================================ */
 
 #deleteFolderModal .btn-cancel {
-    background-color: #6c757d !important;
-    color: #fff !important;
-    border: 1px solid #6c757d !important;
+    background-color: var(--pz-neutral) !important;
+    color: var(--pz-text-inverse) !important;
+    border: 1px solid var(--pz-neutral) !important;
 }
 
 #deleteFolderModal .btn-cancel:hover {
-    background-color: #5a6268 !important;
-    border-color: #545b62 !important;
+    background-color: var(--pz-neutral-hover) !important;
+    border-color: var(--pz-neutral-hover) !important;
 }
 
 #deleteFolderModal .btn-danger {
     background-color: var(--pz-danger) !important;
-    color: #fff !important;
+    color: var(--pz-text-inverse) !important;
     border: none !important;
     padding: 8px 12px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius-sm);
 }
 
 #deleteFolderModal .btn-danger:hover {
-    background-color: #c82333 !important;
+    background-color: var(--pz-danger-hover) !important;
 }
 
 /* ============================================
@@ -686,26 +633,26 @@
 }
 
 #deleteConfirmModal .btn-cancel {
-    background-color: #6c757d !important;
-    color: #fff !important;
-    border: 1px solid #6c757d !important;
+    background-color: var(--pz-neutral) !important;
+    color: var(--pz-text-inverse) !important;
+    border: 1px solid var(--pz-neutral) !important;
 }
 
 #deleteConfirmModal .btn-cancel:hover {
-    background-color: #5a6268 !important;
-    border-color: #545b62 !important;
+    background-color: var(--pz-neutral-hover) !important;
+    border-color: var(--pz-neutral-hover) !important;
 }
 
 #deleteConfirmModal .btn-danger {
-    background-color: #e04b4b !important;
-    color: #fff !important;
+    background-color: var(--pz-danger) !important;
+    color: var(--pz-text-inverse) !important;
     border: none !important;
     padding: 8px 12px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius-sm);
 }
 
 #deleteConfirmModal .btn-danger:hover {
-    background-color: #c43b3b !important;
+    background-color: var(--pz-danger-hover) !important;
 }
 
 /* ============================================
@@ -719,26 +666,26 @@
 }
 
 #emptyTrashConfirmModal .btn-cancel {
-    background-color: #6c757d !important;
-    color: #fff !important;
-    border: 1px solid #6c757d !important;
+    background-color: var(--pz-neutral) !important;
+    color: var(--pz-text-inverse) !important;
+    border: 1px solid var(--pz-neutral) !important;
 }
 
 #emptyTrashConfirmModal .btn-cancel:hover {
-    background-color: #5a6268 !important;
-    border-color: #545b62 !important;
+    background-color: var(--pz-neutral-hover) !important;
+    border-color: var(--pz-neutral-hover) !important;
 }
 
 #emptyTrashConfirmModal .btn-danger {
-    background-color: #e04b4b !important;
-    color: #fff !important;
+    background-color: var(--pz-danger) !important;
+    color: var(--pz-text-inverse) !important;
     border: none !important;
     padding: 8px 12px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius-sm);
 }
 
 #emptyTrashConfirmModal .btn-danger:hover {
-    background-color: #c43b3b !important;
+    background-color: var(--pz-danger-hover) !important;
 }
 
 /* ============================================
@@ -752,34 +699,34 @@
 }
 
 #restoreConfirmModal .btn-cancel {
-    background-color: #e04b4b !important;
-    color: #fff !important;
+    background-color: var(--pz-danger) !important;
+    color: var(--pz-text-inverse) !important;
     border: none !important;
 }
 
 #restoreConfirmModal .btn-cancel:hover {
-    background-color: #c43b3b !important;
+    background-color: var(--pz-danger-hover) !important;
 }
 
 #deleteAttachmentConfirmModal .btn-cancel {
-    background-color: #6c757d !important;
-    color: #fff !important;
-    border: 1px solid #6c757d !important;
+    background-color: var(--pz-neutral) !important;
+    color: var(--pz-text-inverse) !important;
+    border: 1px solid var(--pz-neutral) !important;
 }
 
 #deleteAttachmentConfirmModal .btn-cancel:hover {
-    background-color: #5a6268 !important;
-    border-color: #545b62 !important;
+    background-color: var(--pz-neutral-hover) !important;
+    border-color: var(--pz-neutral-hover) !important;
 }
 
 #restoreConfirmModal .btn-primary {
     background-color: var(--pz-accent) !important;
-    color: white !important;
+    color: var(--pz-text-inverse) !important;
     border: none !important;
 }
 
 #restoreConfirmModal .btn-primary:hover {
-    background-color: #0056b3 !important;
+    background-color: var(--pz-accent-strong) !important;
 }
 
 /* ============================================
@@ -800,12 +747,12 @@
     width: 150px;
     height: 40px;
     box-sizing: border-box;
-    border-radius: 6px;
+    border-radius: var(--pz-radius-sm);
 }
 
 #deleteModal .modal-buttons .btn-danger {
-    background: #e04b4b;
-    color: #fff;
+    background: var(--pz-danger);
+    color: var(--pz-text-inverse);
     border: none;
 }
 
@@ -813,7 +760,7 @@
 #deleteModal .modal-buttons .btn-secondary {
     background: var(--pz-surface);
     color: var(--pz-text);
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
 }
 
 #deleteModal .modal-content>div>button {
@@ -822,17 +769,14 @@
     width: 150px;
     height: 40px;
     box-sizing: border-box;
-    border-radius: 6px;
+    border-radius: var(--pz-radius-sm);
 }
 
-#deleteModal .modal-content>div>button.btn-danger {
-    border: none;
-}
-
-#deleteModal .modal-content>div>button:disabled {
-    cursor: not-allowed;
-    opacity: 0.95;
-}
+/* Both buttons in this dialog carry .btn, so components/buttons.css already
+   gives them border: none and the disabled treatment. The opacity: 0.95 that
+   used to live here was an ID-weight rule, so it beat the base's "a locked
+   destructive action fades to 0.45" and left the button looking live; it only
+   read as disabled because workspaces.css was greying it with !important. */
 
 /* ============================================
    Rename Modal (#renameModal)
@@ -847,19 +791,19 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(var(--pz-shadow-rgb), 0.5);
     align-items: center;
     justify-content: center;
 }
 
 #renameModal .modal-content,
 .rename-modal-content {
-    background-color: white;
+    background-color: var(--pz-bg);
     padding: 20px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     width: 90%;
     max-width: 400px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 20px rgba(var(--pz-shadow-rgb), 0.3);
 }
 
 #renameModal .modal-buttons,
@@ -878,13 +822,13 @@
     width: 150px;
     height: 40px;
     box-sizing: border-box;
-    border-radius: 6px;
+    border-radius: var(--pz-radius-sm);
 }
 
 #renameModal .modal-buttons .btn-primary,
 #moveNotesModal .modal-buttons .btn-primary {
     background-color: var(--pz-accent);
-    color: white;
+    color: var(--pz-text-inverse);
     border: none;
 }
 
@@ -894,7 +838,7 @@
 #moveNotesModal .modal-buttons .btn-cancel {
     background: var(--pz-surface);
     color: var(--pz-text);
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
 }
 
 #renameModal .modal-content>div>button,
@@ -904,7 +848,7 @@
     width: 150px;
     height: 40px;
     box-sizing: border-box;
-    border-radius: 6px;
+    border-radius: var(--pz-radius-sm);
 }
 
 #renameModal .modal-content>div>button.btn-primary,
@@ -924,30 +868,30 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5) !important;
+    background-color: rgba(var(--pz-shadow-rgb), 0.5) !important;
     align-items: center;
     justify-content: center;
 }
 
 #moveNotesModal .modal-content {
-    background-color: white;
+    background-color: var(--pz-bg);
     padding: 20px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     width: 90%;
     max-width: 420px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 20px rgba(var(--pz-shadow-rgb), 0.3);
 }
 
 #moveNotesModal select {
     width: 100%;
     padding: 8px 12px;
     font-size: 14px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm);
     box-sizing: border-box;
     margin-bottom: 12px;
-    background-color: #fff;
-    color: #222;
+    background-color: var(--pz-bg);
+    color: var(--pz-text);
 }
 
 /* ============================================
@@ -957,9 +901,9 @@
 .workspace-select {
     width: 100%;
     padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background: white;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm);
+    background: var(--pz-bg);
     font-size: 14px;
     margin-bottom: 16px;
     margin-top: 16px;
@@ -980,18 +924,18 @@
 }
 
 .workspace-list .btn-danger {
-    background: #e04b4b;
-    color: #fff;
+    background: var(--pz-danger);
+    color: var(--pz-text-inverse);
     border: none;
 }
 
 .workspace-list .btn-danger:hover {
-    background: #c43b3b;
+    background: var(--pz-danger-hover);
 }
 
 .workspace-list .btn-rename {
     display: inline-flex;
-    background: #f0ad4e;
+    background: var(--pz-warning-hover);
     border: none;
 }
 
@@ -1039,7 +983,7 @@
 }
 
 .tenant-isolation-feature-title {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 /* Inherit the modal text color so dark mode needs no override. */
@@ -1067,7 +1011,7 @@
     padding: 8px 12px;
     background: transparent;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     font: inherit;
     color: inherit;
     text-align: left;
@@ -1080,7 +1024,7 @@
 
 .code-block-language-item.selected {
     background: rgba(13, 110, 253, 0.12);
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 /* ============================================================
@@ -1129,7 +1073,7 @@
     overflow-y: auto;
     padding: 10px 12px;
     border: 2px dashed rgba(127, 127, 127, 0.45);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: transparent;
     color: inherit;
     font-size: 14px;
@@ -1168,7 +1112,7 @@
     display: block;
     margin-bottom: 4px;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     opacity: 0.75;
 }
 
@@ -1178,7 +1122,7 @@
     max-height: 38vh;
     padding: 10px 12px;
     border: 1px solid rgba(127, 127, 127, 0.35);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: transparent;
     color: inherit;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -1210,7 +1154,7 @@
     overflow-y: auto;
     padding: 10px 12px;
     border: 1px solid rgba(127, 127, 127, 0.35);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: transparent;
     color: inherit;
     font-size: 14px;
@@ -1239,7 +1183,7 @@
     padding: 8px 12px;
     margin-bottom: 8px;
     border: 1px solid rgba(127, 127, 127, 0.4);
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background: transparent;
     font: inherit;
     color: inherit;
@@ -1248,7 +1192,7 @@
 
 .code-block-language-filter:focus {
     outline: none;
-    border-color: #0d6efd;
+    border-color: var(--pz-accent);
 }
 
 /* Inherit the modal text color so dark mode needs no override. */

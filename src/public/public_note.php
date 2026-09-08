@@ -475,7 +475,7 @@ try {
 
         if (!$allAuthenticated) {
             $passwordStylesheetHref = getVersionedPublicAppAssetHref('css/public_folder.css');
-            $passwordVariablesStylesheetHref = getVersionedPublicAppAssetHref('css/dark-mode/variables.css');
+            $passwordVariablesStylesheetHref = getVersionedPublicAppAssetHref('css/tokens.css');
             $passwordThemeInitHref = getVersionedPublicAppAssetHref('js/theme-init.js');
             ?>
             <!doctype html>
@@ -890,28 +890,10 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
             }
         })();
     </script>
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/lucide.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/variables.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/layout.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/menus.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/editor.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/modals.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/components.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/pages.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/markdown.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/kanban.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/icons.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/notes/attachments-row.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/public_note.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/outline.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/modal-alerts.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/tasks.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/markdown.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('css/syntax-highlight.css'); ?>">
-    <link rel="stylesheet" href="<?php echo poznoteAsset('js/katex/katex.min.css'); ?>">
+    <?php poznoteRenderStylesheets('public_note', ['asset' => 'public']); ?>
     <script src="<?php echo poznoteAsset('js/mermaid/mermaid.min.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/katex/katex.min.js'); ?>"></script>
-    <!-- katex/auto-render.min.js removed: its renderMathInElement was overwritten by js/math-renderer.js below -->
+    <!-- No KaTeX auto-render: renderMathInElement comes from js/math-renderer.js, which renders the .math-block/.math-inline spans the parser emits -->
     <script src="<?php echo poznoteAsset('js/highlight/highlight.min.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/highlight/powershell.min.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/syntax-highlight.js'); ?>"></script>

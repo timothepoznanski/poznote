@@ -6,8 +6,8 @@
 
 .background-preview-container {
     margin: 20px auto !important;
-    border: 2px dashed #ddd;
-    border-radius: 8px;
+    border: 2px dashed var(--pz-border);
+    border-radius: var(--pz-radius-lg);
     overflow: hidden;
     max-width: 100% !important;
     width: 400px;
@@ -28,7 +28,7 @@
 }
 
 .background-preview .no-background-text {
-    color: #999;
+    color: var(--pz-text-subtle);
     font-size: 14px;
     position: relative;
     z-index: 1;
@@ -50,11 +50,11 @@
 
 #uploadBackgroundBtn {
     border: none;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     padding: 10px 20px;
     background-color: var(--pz-accent);
-    color: white;
-    font-weight: 400;
+    color: var(--pz-text-inverse);
+    font-weight: var(--pz-weight-normal);
     cursor: pointer;
     transition: background-color 0.2s;
     display: flex;
@@ -68,7 +68,7 @@
 
 #removeBackgroundBtn {
     border: none;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
 }
 
 .background-opacity-control {
@@ -77,7 +77,7 @@
 
 .background-opacity-control label {
     display: block;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     margin-bottom: 10px;
     color: var(--pz-text);
 }
@@ -85,8 +85,8 @@
 .background-opacity-control input[type="range"] {
     width: 100%;
     height: 6px;
-    border-radius: 3px;
-    background: #ddd;
+    border-radius: var(--pz-radius-sm);
+    background: var(--pz-surface-sunken);
     outline: none;
     -webkit-appearance: none;
 }
@@ -96,7 +96,7 @@
     appearance: none;
     width: 20px;
     height: 20px;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     background: var(--pz-accent);
     cursor: pointer;
 }
@@ -104,36 +104,32 @@
 .background-opacity-control input[type="range"]::-moz-range-thumb {
     width: 20px;
     height: 20px;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     background: var(--pz-accent);
     cursor: pointer;
     border: none;
 }
 
 #backgroundOpacityValue {
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
     color: var(--pz-accent);
 }
 
 /* Dark mode support */
-html[data-theme='dark'] .background-preview-container,
-body.dark-mode .background-preview-container {
-    border-color: #444;
-    background-color: #2a2a2a;
+html[data-theme='dark'] .background-preview-container {
+    border-color: var(--dm-border);
+    background-color: var(--dm-content-bg);
 }
 
-html[data-theme='dark'] .background-preview .no-background-text,
-body.dark-mode .background-preview .no-background-text {
-    color: #666;
+html[data-theme='dark'] .background-preview .no-background-text {
+    color: var(--dm-text-subtle);
 }
 
-html[data-theme='dark'] .background-opacity-control label,
-body.dark-mode .background-opacity-control label {
-    color: #ddd;
+html[data-theme='dark'] .background-opacity-control label {
+    color: var(--dm-text-bright);
 }
 
-html[data-theme='dark'] .background-opacity-control input[type="range"],
-body.dark-mode .background-opacity-control input[type="range"] {
-    background: #444;
+html[data-theme='dark'] .background-opacity-control input[type="range"] {
+    background: var(--dm-surface-raised);
 }
 

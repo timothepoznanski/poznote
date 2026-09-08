@@ -19,11 +19,11 @@
 .note-reference-search-input {
     width: 100%;
     padding: 12px 16px;
-    border: 1px solid var(--border-color, #ddd);
-    border-radius: 8px;
+    border: 1px solid var(--border-color, var(--pz-border));
+    border-radius: var(--pz-radius-lg);
     font-size: 15px;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--input-bg, #fff);
+    background: var(--input-bg, var(--pz-bg));
     color: var(--text-color, var(--pz-text));
     transition: border-color 0.2s, box-shadow 0.2s;
     box-sizing: border-box;
@@ -31,7 +31,7 @@
 
 .note-reference-search-input:focus {
     outline: none;
-    border-color: var(--primary-color, #2196F3);
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
 }
 
@@ -48,17 +48,17 @@
 
 .modal-buttons .btn-cancel {
     background-color: var(--pz-danger);
-    color: white;
+    color: var(--pz-text-inverse);
     border: none;
     padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 500;
+    border-radius: var(--pz-radius-sm);
+    font-weight: var(--pz-weight-medium);
     cursor: pointer;
     transition: background-color 0.2s;
 }
 
 .modal-buttons .btn-cancel:hover {
-    background-color: #c82333;
+    background-color: var(--pz-danger-hover);
 }
 
 .note-reference-modal-content h3 {
@@ -69,12 +69,12 @@
 }
 
 .note-reference-modal-content h3 i {
-    color: var(--primary-color, #2196F3);
+    color: var(--pz-accent);
 }
 
 .note-reference-description {
     margin: 0 0 12px;
-    color: var(--text-muted, #666);
+    color: var(--text-muted, var(--pz-text-muted));
     font-size: 14px;
     line-height: 1.5;
 }
@@ -92,11 +92,11 @@
 .note-reference-search input {
     width: 100%;
     padding: 12px 16px;
-    border: 1px solid var(--border-color, #ddd);
-    border-radius: 8px;
+    border: 1px solid var(--border-color, var(--pz-border));
+    border-radius: var(--pz-radius-lg);
     font-size: 15px;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--input-bg, #fff);
+    background: var(--input-bg, var(--pz-bg));
     color: var(--text-color, var(--pz-text));
     transition: border-color 0.2s, box-shadow 0.2s;
     box-sizing: border-box;
@@ -104,15 +104,15 @@
 
 .note-reference-search input:focus {
     outline: none;
-    border-color: var(--primary-color, #2196F3);
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
 }
 
 /* Recent label */
 .note-reference-recent-label {
     font-size: 12px;
-    font-weight: 600;
-    color: var(--text-muted, #666);
+    font-weight: var(--pz-weight-semibold);
+    color: var(--text-muted, var(--pz-text-muted));
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 8px;
@@ -123,16 +123,16 @@
 .note-reference-list {
     max-height: 400px;
     overflow-y: auto;
-    border-radius: 8px;
-    border: 1px solid var(--border-color, #eee);
-    background-color: var(--input-bg, #fff);
+    border-radius: var(--pz-radius-lg);
+    border: 1px solid var(--border-color, var(--pz-border-light));
+    background-color: var(--input-bg, var(--pz-bg));
 }
 
 .note-reference-loading,
 .note-reference-empty {
     padding: 24px;
     text-align: center;
-    color: var(--text-muted, #999);
+    color: var(--text-muted, var(--pz-text-subtle));
     font-size: 14px;
 }
 
@@ -148,7 +148,7 @@
     padding: 14px 16px;
     cursor: pointer;
     transition: all 0.15s ease;
-    border-bottom: 1px solid var(--border-color, #eee);
+    border-bottom: 1px solid var(--border-color, var(--pz-border-light));
 }
 
 .note-reference-item:last-child {
@@ -156,13 +156,13 @@
 }
 
 .note-reference-item:hover {
-    background-color: var(--hover-bg, rgba(33, 150, 243, 0.08));
+    background-color: rgba(var(--pz-accent-rgb), 0.08);
     padding-left: 20px;
 }
 
 .note-reference-icon {
     flex-shrink: 0;
-    color: var(--primary-color, #2196F3);
+    color: var(--pz-accent);
     font-size: 18px;
     display: flex;
     align-items: center;
@@ -172,7 +172,7 @@
 .note-reference-heading {
     flex: 1;
     font-size: 15px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     color: var(--text-color, var(--pz-text));
     overflow: hidden;
     text-overflow: ellipsis;
@@ -189,7 +189,7 @@
 
 .note-reference-item-title {
     font-size: 14px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     color: var(--text-color, var(--pz-text));
     overflow: hidden;
     text-overflow: ellipsis;
@@ -197,7 +197,7 @@
 
 .note-reference-item-folder {
     font-size: 12px;
-    color: var(--text-muted, #888);
+    color: var(--text-muted, var(--pz-text-muted));
     display: flex;
     align-items: center;
     gap: 4px;
@@ -210,10 +210,10 @@
 /* Internal note links in content */
 a.note-internal-link,
 span.note-internal-link {
-    color: var(--primary-color, #2196F3);
+    color: var(--pz-accent);
     text-decoration: none;
     padding: 0 2px;
-    border-radius: 2px;
+    border-radius: var(--pz-radius-sm);
     transition: color 0.2s;
     cursor: pointer;
 }
@@ -224,7 +224,7 @@ a.note-internal-link:hover {
 
 /* Broken/not found link (span or dead anchor) — clickable to create the missing note */
 .note-internal-link.note-link-broken {
-    color: var(--error-color, var(--pz-danger));
+    color: var(--pz-danger);
     text-decoration: line-through;
     cursor: pointer;
 }
@@ -234,74 +234,74 @@ a.note-internal-link:hover {
 }
 
 /* Dark mode adjustments */
-[data-theme="dark"] .note-reference-modal-content {
+html[data-theme='dark'] .note-reference-modal-content {
     background-color: var(--dm-content-bg, var(--dm-content-bg));
 }
 
-[data-theme="dark"] .note-reference-modal-header h3 {
-    color: var(--dark-text-color, #e0e0e0);
+html[data-theme='dark'] .note-reference-modal-header h3 {
+    color: var(--dm-text-bright);
 }
 
-[data-theme="dark"] .note-reference-search-input {
+html[data-theme='dark'] .note-reference-search-input {
     background: var(--dm-surface, var(--dm-surface));
     border-color: var(--dm-border, var(--dm-border));
-    color: var(--dark-text-color, #e0e0e0);
+    color: var(--dm-text-bright);
 }
 
-[data-theme="dark"] .note-reference-search-input:focus {
-    border-color: var(--primary-color, #2196F3);
+html[data-theme='dark'] .note-reference-search-input:focus {
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
 }
 
-[data-theme="dark"] .note-reference-search input {
+html[data-theme='dark'] .note-reference-search input {
     background: var(--dm-surface, var(--dm-surface));
     border-color: var(--dm-border, var(--dm-border));
-    color: var(--dark-text-color, #e0e0e0);
+    color: var(--dm-text-bright);
 }
 
-[data-theme="dark"] .note-reference-search input:focus {
-    border-color: var(--primary-color, #2196F3);
+html[data-theme='dark'] .note-reference-search input:focus {
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
 }
 
-[data-theme="dark"] .note-reference-list {
-    border-color: var(--dark-border-color, #444);
-    background-color: var(--dark-input-bg, #333);
+html[data-theme='dark'] .note-reference-list {
+    border-color: var(--dm-border);
+    background-color: var(--dm-surface);
 }
 
-[data-theme="dark"] .note-reference-item {
-    border-bottom-color: var(--dark-border-color, #444);
+html[data-theme='dark'] .note-reference-item {
+    border-bottom-color: var(--dm-border);
 }
 
-[data-theme="dark"] .note-reference-item:hover {
+html[data-theme='dark'] .note-reference-item:hover {
     background-color: rgba(33, 150, 243, 0.15);
 }
 
-[data-theme="dark"] .note-reference-item-title {
-    color: var(--dark-text-color, #e0e0e0);
+html[data-theme='dark'] .note-reference-item-title {
+    color: var(--dm-text-bright);
 }
 
-[data-theme="dark"] .note-reference-heading {
-    color: var(--dark-text-color, #e0e0e0);
+html[data-theme='dark'] .note-reference-heading {
+    color: var(--dm-text-bright);
 }
 
-[data-theme="dark"] .note-reference-icon {
-    color: var(--dark-text-muted, #888);
+html[data-theme='dark'] .note-reference-icon {
+    color: var(--dm-text-subtle);
 }
 
-[data-theme="dark"] .note-reference-item-folder {
-    color: var(--dark-text-muted, #888);
+html[data-theme='dark'] .note-reference-item-folder {
+    color: var(--dm-text-subtle);
 }
 
-[data-theme="dark"] a.note-internal-link {
-    color: #64b5f6;
+html[data-theme='dark'] a.note-internal-link {
+    color: var(--dm-accent-hover);
 }
 
-[data-theme="dark"] a.note-internal-link:hover {
+html[data-theme='dark'] a.note-internal-link:hover {
     text-decoration: underline;
 }
 
-[data-theme="dark"] .note-internal-link.note-link-broken {
+html[data-theme='dark'] .note-internal-link.note-link-broken {
     color: #f48fb1;
 }
 

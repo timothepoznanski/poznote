@@ -10,7 +10,6 @@
     --shared-column-gap: 48px;
     --shared-divider-padding: 14px;
     --shared-name-width: 220px;
-    --shared-folder-width: 190px;
     --shared-token-width: 210px;
     --shared-actions-width: 228px;
     max-width: var(--shared-content-max-width, 980px);
@@ -27,10 +26,10 @@
 
 .shared-notes-header-cell {
     font-size: 12px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: var(--text-muted, #666666);
+    color: var(--text-muted, var(--pz-text-muted));
     text-align: center;
 }
 
@@ -60,7 +59,7 @@
     justify-content: center;
     width: 16px;
     height: 16px;
-    color: var(--text-muted, #666666);
+    color: var(--text-muted, var(--pz-text-muted));
     cursor: help;
 }
 
@@ -76,17 +75,17 @@
     min-width: 260px;
     max-width: 320px;
     padding: 10px 12px;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: rgba(20, 20, 20, 0.94);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-size: 0.95rem;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     letter-spacing: normal;
     line-height: 1.45;
     text-transform: none;
     white-space: normal;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 8px 24px rgba(var(--pz-shadow-rgb), 0.18);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -144,7 +143,7 @@
 }
 
 #foldersList .shared-folder-icon {
-    background: transparent !important;
+    background: transparent;
 }
 
 .note-name-container {
@@ -167,9 +166,9 @@
     height: 22px;
     padding: 0;
     border: none;
-    border-radius: 7px;
+    border-radius: var(--pz-radius);
     background: rgba(var(--pz-accent-rgb), 0.08);
-    color: var(--link-color, #007bff);
+    color: var(--pz-accent);
     cursor: pointer;
     transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
 }
@@ -179,7 +178,7 @@
 }
 
 .shared-folder-toggle:focus-visible {
-    outline: 2px solid rgba(0, 123, 255, 0.45);
+    outline: 2px solid rgba(var(--pz-accent-rgb), 0.45);
     outline-offset: 2px;
 }
 
@@ -203,9 +202,9 @@
 }
 
 .note-name {
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     font-size: 13px;
-    color: var(--link-color, #007bff);
+    color: var(--pz-accent);
     text-decoration: none;
     min-width: 0;
     overflow: hidden;
@@ -219,15 +218,15 @@
 
 .shared-password-icon.is-password-protected,
 .shared-restricted-icon.is-restricted {
-    filter: none !important;
-    color: #ef4444 !important;
+    filter: none;
+    color: var(--pz-danger);
 }
 
 /* Disabled (inaccessible) share: the row stays listed, the badge and the
    struck-through token signal that the public link no longer resolves. */
 .shared-disabled-icon {
-    filter: none !important;
-    color: #f59e0b !important;
+    filter: none;
+    color: var(--pz-warning-hover);
 }
 
 .shared-note-item.is-share-disabled .note-token {
@@ -240,7 +239,7 @@
     align-items: center;
     gap: 5px;
     font-size: 13px;
-    color: #6c757d;
+    color: var(--pz-text-muted);
     background-color: transparent;
     padding: 0;
     margin-right: 5px;
@@ -281,13 +280,13 @@
     min-width: 0;
     font-family: monospace;
     font-size: 13px;
-    color: var(--text-muted, #666666);
+    color: var(--text-muted, var(--pz-text-muted));
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     cursor: text;
     padding: 0;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     background: transparent;
     transition: color 0.2s;
 }
@@ -298,7 +297,7 @@
 
 .note-token.read-only {
     cursor: default;
-    background-color: transparent !important;
+    background-color: transparent;
     opacity: 0.7;
 }
 
@@ -317,14 +316,14 @@
     background-color: transparent;
 }
 
-[data-theme="dark"] .shared-via-parent {
+html[data-theme='dark'] .shared-via-parent {
     border-left-color: transparent;
     background-color: transparent;
 }
 
 .folder-name-path {
-    font-weight: 500;
-    color: var(--link-color, #007bff);
+    font-weight: var(--pz-weight-medium);
+    color: var(--pz-accent);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -337,11 +336,11 @@
 }
 
 .shared-folder-row[data-collapsible="1"] .folder-name-path {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
-[data-theme="dark"] .folder-name-path {
-    color: #5daaff;
+html[data-theme='dark'] .folder-name-path {
+    color: var(--dm-accent);
 }
 
 .folder-name-path i {
@@ -383,7 +382,7 @@
 .note-actions-placeholder {
     font-size: 12px;
     font-style: italic;
-    color: var(--text-muted, #666666);
+    color: var(--text-muted, var(--pz-text-muted));
     text-align: center;
     white-space: nowrap;
 }
@@ -391,12 +390,12 @@
 .empty-message {
     text-align: center;
     padding: 60px 20px;
-    color: var(--text-muted, #666666);
+    color: var(--text-muted, var(--pz-text-muted));
 }
 
 .empty-message i {
     font-size: 48px;
-    color: var(--text-muted, #cccccc);
+    color: var(--text-muted, var(--pz-text-subtle));
     margin-bottom: 16px;
 }
 
@@ -500,36 +499,36 @@
     /* Soft action buttons: tinted background with a colored icon, full color
        on hover. Much lighter than a saturated chip on every row. */
     .note-actions .btn {
-        border-radius: 8px;
+        border-radius: var(--pz-radius-sm);
     }
 
     .note-actions .btn-success {
         background: rgba(46, 125, 50, 0.13);
-        color: #2e7d32;
+        color: var(--pz-success-hover);
     }
 
     .note-actions .btn-success:hover {
-        background: #2e7d32;
-        color: #ffffff;
+        background: var(--pz-success-hover);
+        color: var(--pz-text-inverse);
     }
 
     .note-actions .btn-primary {
         background: rgba(var(--pz-accent-rgb), 0.13);
-        color: var(--pz-accent, #007db8);
+        color: var(--pz-accent, var(--pz-accent));
     }
 
     .note-actions .btn-primary:hover {
-        background: var(--pz-accent, #007db8);
-        color: #ffffff;
+        background: var(--pz-accent, var(--pz-accent));
+        color: var(--pz-text-inverse);
     }
 
     .note-actions .btn-danger {
         background: rgba(224, 75, 75, 0.13);
-        color: #e04b4b;
+        color: var(--pz-danger);
     }
 
     .note-actions .btn-danger:hover {
-        background: #e04b4b;
-        color: #ffffff;
+        background: var(--pz-danger);
+        color: var(--pz-text-inverse);
     }
 }

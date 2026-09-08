@@ -5,7 +5,7 @@
 
 /* Summary page header subtitle */
 .summary-header .subtitle-text {
-    color: #6c757d;
+    color: var(--pz-text-muted);
     margin: 10px 0 0 0;
     font-size: 14px;
 }
@@ -18,7 +18,7 @@
 /* Empty state icon */
 .empty-state-icon {
     font-size: 48px;
-    color: #6c757d;
+    color: var(--pz-text-muted);
     margin-bottom: 20px;
 }
 
@@ -31,7 +31,7 @@
 
 /* Empty state description */
 .empty-state-description {
-    color: #666;
+    color: var(--pz-text-muted);
     line-height: 1.6;
     margin-bottom: 20px;
     font-size: 16px;
@@ -42,14 +42,14 @@
 }
 
 /* Dark mode support */
-[data-theme="dark"] .empty-state-title {
-    color: #fff;
+html[data-theme='dark'] .empty-state-title {
+    color: var(--pz-text-inverse);
 }
 
-[data-theme="dark"] .empty-state-description {
-    color: #aaa;
+html[data-theme='dark'] .empty-state-description {
+    color: var(--dm-text-muted);
 }
 
-[data-theme="dark"] .summary-header .subtitle-text {
-    color: #999;
+html[data-theme='dark'] .summary-header .subtitle-text {
+    color: var(--dm-text-muted);
 }

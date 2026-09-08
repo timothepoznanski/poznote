@@ -53,11 +53,11 @@ body.public-note-page {
 .public-note h1 {
     margin-top: 0;
     font-size: 1.4rem;
-    color: #0f172a;
+    color: var(--pz-text);
 }
 
 .public-note .meta {
-    color: #666;
+    color: var(--pz-text-muted);
     font-size: 0.9em;
     margin-bottom: 12px;
 }
@@ -115,15 +115,15 @@ body.public-note-page {
 }
 
 .public-note img.img-with-border {
-    border: 1px solid #ddd;
-    border-radius: 6px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
     padding: 6px;
-    background: #fff;
+    background: var(--pz-bg);
     box-sizing: border-box;
 }
 
 .public-note img.img-with-border-no-padding {
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     border-radius: 0;
     padding: 0 !important;
     vertical-align: middle;
@@ -133,8 +133,8 @@ body.public-note-page {
 .public-note video {
     max-width: 100%;
     height: auto;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.1);
     background: #000;
     margin: 10px 0;
 }
@@ -147,23 +147,23 @@ body.public-note-page {
     overflow: hidden;
     margin: 8px 0;
     padding: 0;
-    border: 1px solid #d0d7de;
+    border: 1px solid var(--pz-border-strong);
     box-sizing: border-box;
-    border-radius: 999px;
-    background: #ffffff;
+    border-radius: var(--pz-radius-pill);
+    background: var(--pz-bg);
 }
 
 .public-note audio::-webkit-media-controls-enclosure,
 .public-note audio::-webkit-media-controls-panel {
     border-radius: inherit;
-    background: #ffffff;
+    background: var(--pz-bg);
 }
 
 .public-note .note-audio-embed {
     max-width: 280px;
     display: block;
-    border-radius: 8px;
-    background: #f1f3f4;
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-surface-hover);
     margin: 8px 0;
 }
 
@@ -180,7 +180,7 @@ body.public-note-page {
     height: auto !important;
     aspect-ratio: 16 / 9;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     margin: 10px 0;
 }
 
@@ -198,7 +198,7 @@ body.public-note-page {
     overflow: hidden;
     margin: 8px 0;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: transparent;
 }
 
@@ -210,7 +210,7 @@ body.public-note-page {
     overflow: hidden;
     margin: 8px 0;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: transparent;
 }
 
@@ -234,7 +234,7 @@ body.public-note-page {
 
 :where(.public-note .content) table td,
 :where(.public-note .content) table th {
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     padding: 8px;
     min-width: 50px;
     text-align: left;
@@ -242,8 +242,8 @@ body.public-note-page {
 }
 
 :where(.public-note .content) table th {
-    background-color: #f5f5f5;
-    font-weight: 600;
+    background-color: var(--pz-surface-hover);
+    font-weight: var(--pz-weight-semibold);
 }
 
 /* Code block styles for public notes */
@@ -253,19 +253,19 @@ body.public-note-page {
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
     font-size: 0.9em;
     color: var(--pz-text);
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
 }
 
 .public-note .content pre {
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
-    background: #F8FAFC !important;
+    background: var(--pz-surface);
     padding: 30px !important;
     padding-bottom: 20px !important;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     overflow-x: auto;
     margin: 0.75em 0;
     position: relative;
-    border: 1px solid #e9ecef;
+    border: 1px solid var(--pz-border-light);
     white-space: pre-wrap !important;
     word-wrap: break-word !important;
     overflow-wrap: break-word !important;
@@ -281,11 +281,11 @@ body.public-note-page {
 }
 
 .public-note .content pre code {
-    background-color: transparent !important;
+    background-color: transparent;
     padding: 0 !important;
     color: inherit;
-    border-radius: 0 !important;
-    border: none !important;
+    border-radius: 0!important;
+    border: none;
     display: block;
     line-height: 1.4;
     white-space: inherit !important;
@@ -295,7 +295,7 @@ body.public-note-page {
 /* Remove Highlight.js background in public notes */
 .public-note .content pre code.hljs,
 .public-note .content pre .hljs {
-    background: transparent !important;
+    background: transparent;
 }
 
 /* Copy button for code blocks */
@@ -305,14 +305,14 @@ body.public-note-page {
     top: 8px;
     right: 8px;
     padding: 6px 10px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    background: rgba(var(--pz-highlight-rgb), 0.9);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     opacity: 1;
     transition: background-color 0.2s;
     font-size: 12px;
-    color: #555;
+    color: var(--pz-text-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -322,12 +322,12 @@ body.public-note-page {
 .public-note .content .code-block-copy-btn {
     background: transparent;
     border: none;
-    color: #8a8f98;
+    color: var(--pz-text-subtle);
 }
 
 .public-note .content .code-block-copy-btn:hover,
 .code-block-copy-btn:hover {
-    background-color: #fff;
+    background-color: var(--pz-bg);
     color: var(--pz-text);
 }
 
@@ -338,9 +338,9 @@ body.public-note-page {
 
 .public-note .content .code-block-copy-btn.copied,
 .code-block-copy-btn.copied {
-    background-color: #4caf50;
-    color: white;
-    border-color: #4caf50;
+    background-color: var(--pz-success);
+    color: var(--pz-text-inverse);
+    border-color: var(--pz-success);
 }
 
 .public-note .content .code-block-copy-btn.copied {
@@ -360,10 +360,10 @@ body.public-note-page {
 
 /* Blockquote styles */
 .public-note .content blockquote {
-    border-left: 4px solid #ddd;
+    border-left: 4px solid var(--pz-border);
     padding-left: 16px;
     margin: 1em 0;
-    color: #666;
+    color: var(--pz-text-muted);
     font-style: italic;
 }
 
@@ -409,7 +409,7 @@ body.public-note-page {
 /* Style for checked task items */
 .public-note .content li.task-list-item input[type="checkbox"]:checked+span {
     text-decoration: line-through;
-    color: #888;
+    color: var(--pz-text-muted);
 }
 
 /* Tasklist note styles (JSON-based tasklists) */
@@ -421,7 +421,7 @@ body.public-note-page {
 
 .public-note .content .task-item.completed .task-text {
     text-decoration: line-through;
-    color: #888;
+    color: var(--pz-text-muted);
 }
 
 /* Task actions (edit/delete buttons) */
@@ -441,7 +441,7 @@ body.public-note-page {
 .task-action-btn {
     background: transparent;
     border: none;
-    color: #999;
+    color: var(--pz-text-subtle);
     cursor: pointer;
     font-size: 14px;
     padding: 2px 5px;
@@ -449,7 +449,7 @@ body.public-note-page {
 }
 
 .task-action-btn:hover {
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 .public-task-delete-btn {
@@ -498,7 +498,7 @@ body.public-note-page {
     margin: 0 0 8px 0;
     color: var(--text-color, var(--pz-text));
     font-size: 18px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .public-task-edit-footer {
@@ -506,23 +506,23 @@ body.public-note-page {
 }
 
 .public-task-edit-cancel {
-    background: #6c757d;
-    color: #fff;
+    background: var(--pz-neutral);
+    color: var(--pz-text-inverse);
 }
 
 .public-task-edit-cancel:hover {
-    background: #5a6268;
+    background: var(--pz-neutral-hover);
 }
 
 /* Important task styling for public view */
 .public-note .content .task-item.important {
-    border-color: #ffcccc;
-    background: #fff6f6;
+    border-color: var(--pz-danger-soft);
+    background: var(--pz-surface);
 }
 
 .public-note .content .task-item.important .task-text {
-    color: #c62828;
-    font-weight: 600;
+    color: var(--pz-danger-hover);
+    font-weight: var(--pz-weight-semibold);
 }
 
 /* Horizontal rule */
@@ -534,7 +534,7 @@ body.public-note-page {
 
 /* Text formatting */
 .public-note .content strong {
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
 }
 
 .public-note .content em {
@@ -543,12 +543,12 @@ body.public-note-page {
 
 .public-note .content del {
     text-decoration: line-through;
-    color: #999;
+    color: var(--pz-text-subtle);
 }
 
 /* Links */
 .public-note .content a {
-    color: #007bff;
+    color: var(--pz-accent);
     text-decoration: none;
 }
 
@@ -565,7 +565,7 @@ body.public-note-page {
 /* Headings in content */
 .public-note .content h1 {
     font-size: 2em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 0.67em 0;
     border-bottom: 2px solid var(--pz-border);
     padding-bottom: 0.3em;
@@ -573,7 +573,7 @@ body.public-note-page {
 
 .public-note .content h2 {
     font-size: 1.5em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 0.75em 0;
     border-bottom: 1px solid var(--pz-border);
     padding-bottom: 0.3em;
@@ -581,27 +581,27 @@ body.public-note-page {
 
 .public-note .content h3 {
     font-size: 1.25em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 0.83em 0;
 }
 
 .public-note .content h4 {
     font-size: 1em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 1em 0;
 }
 
 .public-note .content h5 {
     font-size: 0.875em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 1.33em 0;
 }
 
 .public-note .content h6 {
     font-size: 0.75em;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 1.67em 0;
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 .public-note .content .heading-anchor {
@@ -661,7 +661,7 @@ body.public-note-page {
 .public-note-attachments {
     margin-bottom: 24px;
     padding-bottom: 18px;
-    border-bottom: 1px solid #d8dee4;
+    border-bottom: 1px solid var(--pz-border);
 }
 
 .public-note-attachments h2 {
@@ -669,9 +669,9 @@ body.public-note-page {
     align-items: center;
     gap: 8px;
     margin: 0 0 12px;
-    color: #0f172a;
+    color: var(--pz-text);
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 /* Theme toggle button */
@@ -701,8 +701,8 @@ body.public-note-page {
 
 .theme-toggle-btn {
     background: transparent;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
     padding: 8px 12px;
     cursor: pointer;
     font-size: 18px;
@@ -714,7 +714,7 @@ body.public-note-page {
 }
 
 .theme-toggle-btn:hover {
-    background: #f5f5f5;
+    background: var(--pz-surface-hover);
     border-color: #999;
 }
 
@@ -724,29 +724,28 @@ body.public-note-page {
 
 /* Dark mode styles for theme toggle */
 html[data-theme='dark'] .theme-toggle-btn {
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
     border-color: var(--dm-border);
 }
 
 html[data-theme='dark'] .theme-toggle-btn:hover {
-    background: var(--dm-surface-hover);
     border-color: var(--dm-border-light);
 }
 
 html[data-theme='dark'] .public-note audio {
-    background: #5f6368;
-    border-color: #4b5563;
+    background: var(--dm-neutral);
+    border-color: var(--dm-border-light);
 }
 
 html[data-theme='dark'] .public-note audio::-webkit-media-controls-enclosure,
 html[data-theme='dark'] .public-note audio::-webkit-media-controls-panel {
-    background: #5f6368;
+    background: var(--dm-neutral);
 }
 
 html[data-theme='dark'] .public-note .content pre {
-    background-color: var(--dm-code-bg) !important;
-    border-color: var(--dm-border) !important;
-    color: var(--dm-text-muted) !important;
+    background-color: var(--dm-code-bg);
+    border-color: var(--dm-border);
+    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .public-note .content code:not([class*="hljs"]):not([class*="language-"]) {
@@ -756,14 +755,14 @@ html[data-theme='dark'] .public-note .content code:not([class*="hljs"]):not([cla
 }
 
 html[data-theme='dark'] .public-note .content pre code:not([class*="hljs"]):not([class*="language-"]) {
-    background-color: transparent !important;
-    color: var(--dm-text-muted) !important;
-    border-color: transparent !important;
+    background-color: transparent;
+    color: var(--dm-text-muted);
+    border-color: transparent;
 }
 
 html[data-theme='dark'] .public-note .content pre code[class*="language-"],
 html[data-theme='dark'] .public-note .content code[class*="language-"] {
-    color: var(--dm-text-muted) !important;
+    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .public-note-attachments {
@@ -771,18 +770,18 @@ html[data-theme='dark'] .public-note-attachments {
 }
 
 html[data-theme='dark'] .public-note-attachments h2 {
-    color: #e5e7eb;
+    color: var(--dm-text-bright);
 }
 
 /* Dark mode styles for important tasks */
 html[data-theme='dark'] .public-note .content .task-item.important {
-    border-color: #5a2a2a;
-    background: #2d1a1a;
+    border-color: var(--dm-danger-soft);
+    background: var(--dm-content-bg);
 }
 
 html[data-theme='dark'] .public-note .content .task-item.important .task-text {
-    color: #ff6b6b;
-    font-weight: 600;
+    color: var(--dm-danger);
+    font-weight: var(--pz-weight-semibold);
 }
 
 html[data-theme='dark'] .public-task-edit-title {
@@ -790,12 +789,12 @@ html[data-theme='dark'] .public-task-edit-title {
 }
 
 html[data-theme='dark'] .public-task-edit-cancel {
-    background: #4c5057;
-    color: #f4f6f8;
+    background: var(--dm-surface-raised);
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .public-task-edit-cancel:hover {
-    background: #595e67;
+    background: var(--dm-neutral);
 }
 
 /* Dark mode styles for tables */
@@ -811,7 +810,7 @@ html[data-theme='dark'] .public-task-edit-cancel:hover {
 :where(html[data-theme='dark']) :where(.public-note .content) table th {
     border-color: var(--dm-border);
     background: var(--dm-content-bg);
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 :where(html[data-theme='dark']) :where(.public-note .content) table th {
@@ -819,12 +818,12 @@ html[data-theme='dark'] .public-task-edit-cancel:hover {
 }
 
 html[data-theme='dark'] .public-note .content .heading-anchor {
-    color: #e5e7eb;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .public-note .content blockquote {
     border-left-color: var(--dm-border);
-    color: #b0b0b0;
+    color: var(--dm-text);
 }
 
 /* Text pasted from external editors carries near-black inline colors (e.g.
@@ -840,7 +839,7 @@ html[data-theme='dark'] .public-note .content [style*="color: #000"],
 html[data-theme='dark'] .public-note .content [style*="color:#000"],
 html[data-theme='dark'] .public-note .content [style*="color: black"],
 html[data-theme='dark'] .public-note .content [style*="color:black"] {
-    color: var(--dm-text) !important;
+    color: var(--dm-text);
 }
 
 /* ============================================================================
@@ -868,9 +867,9 @@ html[data-theme='dark'] .public-note .content [style*="color:black"] {
 .public-note-editor-markdown {
     min-height: 60vh;
     padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    background: #fff;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    background: var(--pz-bg);
     color: var(--pz-text);
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 14px;
@@ -886,8 +885,8 @@ html[data-theme='dark'] .public-note .content [style*="color:black"] {
 .public-note-editor-html {
     min-height: 40vh;
     padding: 12px;
-    border: 1px dashed #ccc;
-    border-radius: 6px;
+    border: 1px dashed var(--pz-border-strong);
+    border-radius: var(--pz-radius);
 }
 
 .public-note-editor-html:focus {
@@ -896,11 +895,11 @@ html[data-theme='dark'] .public-note .content [style*="color:black"] {
 }
 
 .public-edit-save-btn {
-    color: #16a34a;
+    color: var(--pz-success);
 }
 
 .public-edit-cancel-btn {
-    color: #dc2626;
+    color: var(--pz-danger);
 }
 
 .public-edit-save-btn.is-saving {
@@ -909,19 +908,19 @@ html[data-theme='dark'] .public-note .content [style*="color:black"] {
 }
 
 html[data-theme='dark'] .public-note-editor-markdown {
-    background: var(--dm-surface, #1e293b);
-    color: var(--dm-text, #e0e0e0);
-    border-color: var(--dm-border, #475569);
+    background: var(--dm-surface, var(--dm-content-bg));
+    color: var(--dm-text, var(--dm-text-bright));
+    border-color: var(--dm-border, var(--dm-border-light));
 }
 
 html[data-theme='dark'] .public-note-editor-html {
-    border-color: var(--dm-border, #475569);
+    border-color: var(--dm-border, var(--dm-border-light));
 }
 
 html[data-theme='dark'] .public-edit-save-btn {
-    color: #4ade80;
+    color: var(--dm-success);
 }
 
 html[data-theme='dark'] .public-edit-cancel-btn {
-    color: #f87171;
+    color: var(--dm-danger);
 }

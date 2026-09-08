@@ -18,7 +18,7 @@ body {
     display: flex;
     align-items: center;
     padding: 15px 30px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--pz-border-light);
 }
 
 .info-row:last-child {
@@ -26,63 +26,35 @@ body {
 }
 
 .info-label {
-    font-weight: 600;
-    color: #495057;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text-secondary);
     flex: 0 0 210px;
     margin-right: 32px;
 }
 
 .info-value {
     flex: 1;
-    color: #212529;
+    color: var(--pz-text);
     display: flex;
     align-items: center;
 }
 
 .favorite-yes {
     color: var(--pz-warning);
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .favorite-no {
     /* Use the same color as regular info values to match surrounding text */
     color: inherit;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
 }
 
 .action-buttons {
     text-align: center;
     margin-top: 30px;
-}
-
-.btn {
-    padding: 12px 25px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    text-decoration: none;
-    font-weight: 400;
+}.btn {
     margin: 0 10px;
-}
-
-.btn-primary {
-    background: var(--pz-accent);
-    color: white;
-}
-
-.btn-primary:hover {
-    background: var(--pz-accent-hover);
-    text-decoration: none;
-}
-
-.btn-secondary {
-    background: #6c757d;
-    color: white;
-}
-
-.btn-secondary:hover {
-    background: #5a6268;
 }
 
 /* Responsive adjustments for mobile: stack label/value and make inputs full-width */

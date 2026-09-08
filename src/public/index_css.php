@@ -17,8 +17,16 @@
 $groups = [
     'core' => [
         'css/lucide.css',
-        'css/variables.css',
+        'css/tokens.css',
         'css/base.css',
+        // Shared component bases. index.php is not in the css_assets manifest, so
+        // its bundle has to list them itself. Buttons belong here too: the shared
+        // modals in src/modals.php give this page 8 .btn elements and 66 bare
+        // modifiers (.btn-primary and friends used without .btn), and without the
+        // base those fell back to whatever a page stylesheet happened to say.
+        'css/components/buttons.css',
+        'css/components/forms.css',
+        'css/components/logo.css',
         'css/utilities.css',
         'css/layout.css',
         'css/icon-sidebar.css',

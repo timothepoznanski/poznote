@@ -5,11 +5,9 @@
  * and sidebar link transitions.
  */
 
-/* Note Loading State - no transition */
-.note-loading-state {}
-
-/* Smooth fade out for outgoing content - no transition */
-.note-fade-out {}
+/* .note-loading-state and .note-fade-out carry no style on purpose: the note
+   swap is deliberately instant. They used to be declared empty, which said the
+   same thing to no one but the parser. */
 
 #new-note-loading-placeholder {
     flex: 1;
@@ -17,12 +15,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #4b5563;
-}
-
-html[data-theme='dark'] #new-note-loading-placeholder,
-body.dark-mode #new-note-loading-placeholder {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-secondary);
 }
 
 /* Spin animation */
@@ -35,6 +28,7 @@ body.dark-mode #new-note-loading-placeholder {
     0% {
         -webkit-transform: rotate(0deg);
     }
+
     100% {
         -webkit-transform: rotate(359deg);
     }
@@ -44,6 +38,7 @@ body.dark-mode #new-note-loading-placeholder {
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
     }
@@ -52,13 +47,14 @@ body.dark-mode #new-note-loading-placeholder {
 /* Highlight flash when a folder is revealed from the note header breadcrumb */
 .folder-header.folder-reveal-highlight > .folder-toggle {
     animation: folderRevealFlash 1.6s ease-out;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
 }
 
 @keyframes folderRevealFlash {
     0%, 50% {
         background-color: rgba(var(--pz-accent-rgb), 0.18);
     }
+
     100% {
         background-color: transparent;
     }
@@ -70,6 +66,6 @@ body.dark-mode #new-note-loading-placeholder {
 }
 
 .links_arbo_left.selected-note {
-    background-color: transparent !important;
-    border-left: none !important;
+    background-color: transparent;
+    border-left: none;
 }

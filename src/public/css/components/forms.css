@@ -1,0 +1,48 @@
+/**
+ * The baseline for form controls.
+ *
+ * Poznote styled its fields page by page: 46 rules across the stylesheets, and
+ * every control nobody thought about kept the browser's own colours. Measured
+ * on eight pages: 190 text controls, 144 of them rendering the user agent's
+ * pure black on the user agent's white. Those two colours are unreachable from
+ * a stylesheet that only sets tokens, which is why a custom theme could darken
+ * a page and leave its inputs glowing white (the note title bar, for one).
+ *
+ * This file gives them a token to answer to. It is loaded before the page
+ * stylesheets, so every existing per-page rule still wins.
+ *
+ * Checkboxes, radios, colour pickers, ranges and file inputs are deliberately
+ * absent: they are painted by the browser and a background here breaks their
+ * native rendering.
+ */
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="url"],
+input[type="tel"],
+input[type="number"],
+input[type="search"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="week"],
+input:not([type]),
+textarea,
+select {
+    background-color: var(--pz-bg);
+    color: var(--pz-text);
+}
+
+/* The user agent greys a disabled field with its own #efefef, which no token can
+   reach. --pz-surface-sunken is the same value to the eye and follows the theme. */
+input:disabled,
+textarea:disabled,
+select:disabled {
+    background-color: var(--pz-surface-sunken);
+}
+
+::placeholder {
+    color: var(--pz-text-subtle);
+}

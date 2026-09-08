@@ -7,16 +7,16 @@
 
 /* Card Container */
 .card-container {
-    background: #fff;
+    background: var(--pz-bg);
     border: 1px solid var(--pz-border);
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-radius: var(--pz-radius-xl);
+    box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.08);
     transition: all 0.3s ease;
     overflow: hidden;
 }
 
 .card-container:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 16px rgba(var(--pz-shadow-rgb), 0.12);
     border-color: var(--pz-accent);
     transform: translateY(-2px);
 }
@@ -24,7 +24,7 @@
 /* Card Header */
 .card-header {
     padding: 20px 24px;
-    background: linear-gradient(135deg, var(--pz-surface) 0%, #ffffff 100%);
+    background: linear-gradient(135deg, var(--pz-surface) 0%, var(--pz-bg) 100%);
     border-bottom: 1px solid var(--pz-border);
     cursor: pointer;
     user-select: none;
@@ -32,14 +32,14 @@
 }
 
 .card-header:hover {
-    background: linear-gradient(135deg, #f0f4f8 0%, var(--pz-surface) 100%);
+    background: linear-gradient(135deg, var(--pz-surface-hover) 0%, var(--pz-surface) 100%);
 }
 
 .card-header h3 {
     margin: 0;
-    color: #252526;
+    color: var(--pz-text);
     font-size: 18px;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     display: flex;
     align-items: center;
     gap: 12px;
@@ -53,7 +53,7 @@
 .card-header h3 i.chevron {
     margin-left: auto;
     font-size: 16px;
-    color: #666;
+    color: var(--pz-text-muted);
     transition: transform 0.3s ease;
 }
 
@@ -63,14 +63,14 @@
 
 .card-header p {
     margin: 8px 0 0 32px;
-    color: #666;
+    color: var(--pz-text-muted);
     font-size: 14px;
     line-height: 1.5;
 }
 
 /* Card Content */
 .card-content {
-    background: #ffffff;
+    background: var(--pz-bg);
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.4s ease-out, padding 0.3s ease;
@@ -96,8 +96,8 @@
 /* Sub-cards (for nested sections) */
 .sub-card {
     background: var(--pz-surface);
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
+    border: 1px solid var(--pz-border-light);
+    border-radius: var(--pz-radius-lg);
     margin-bottom: 16px;
     overflow: hidden;
 }
@@ -114,14 +114,14 @@
 }
 
 .sub-card-header:hover {
-    background: #eef2f5;
+    background: var(--pz-surface-hover);
 }
 
 .sub-card h4 {
     margin: 0;
     color: var(--pz-text);
     font-size: 16px;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -130,7 +130,7 @@
 .sub-card h4 i.chevron {
     margin-left: auto;
     font-size: 14px;
-    color: #666;
+    color: var(--pz-text-muted);
     transition: transform 0.3s ease;
 }
 
@@ -157,7 +157,3 @@
     margin-top: 12px;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}

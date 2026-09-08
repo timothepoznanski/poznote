@@ -10,13 +10,13 @@
 /* ContentEditable Placeholder */
 div[contentEditable=true]:empty:before {
     content: attr(data-ph);
-    color: #bababa;
+    color: var(--pz-text-subtle);
 }
 
 /* Placeholder lines around embedded Excalidraw diagrams */
 .excalidraw-placeholder:empty:before {
     content: attr(data-ph);
-    color: #999;
+    color: var(--pz-text-subtle);
     font-style: italic;
     opacity: 0.6;
 }
@@ -31,7 +31,7 @@ div[contentEditable=true]:empty:before {
 p.code-block-placeholder-before[data-ph]:empty:before,
 p.code-block-placeholder-after[data-ph]:empty:before {
     content: attr(data-ph);
-    color: #999;
+    color: var(--pz-text-subtle);
     font-style: italic;
     opacity: 0.6;
 }
@@ -41,8 +41,8 @@ p.code-block-placeholder-after[data-ph]:empty:before {
     margin-left: 1%;
     margin-right: 1%;
     margin-bottom: 20px;
-    background: white;
-    border-radius: 5px;
+    background: var(--pz-bg);
+    border-radius: var(--pz-radius-sm);
     font-family: 'Inter', sans-serif;
 }
 
@@ -91,9 +91,9 @@ p.code-block-placeholder-after[data-ph]:empty:before {
         width: 32px;
         height: 32px;
         padding: 0;
-        border: 1px solid rgba(0, 0, 0, 0.12);
-        border-radius: 7px;
-        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid rgba(var(--pz-shadow-rgb), 0.12);
+        border-radius: var(--pz-radius);
+        background: rgba(var(--pz-highlight-rgb), 0.96);
         color: var(--pz-accent);
         box-shadow: 0 5px 14px rgba(15, 23, 42, 0.14);
         cursor: pointer;
@@ -133,7 +133,7 @@ textarea {
     padding: 0;
     padding-top: 30px;
     width: 100%;
-    border: 0 none white;
+    border: 0 none var(--pz-bg);
     overflow: hidden;
     outline: none;
     resize: none;
@@ -149,7 +149,7 @@ textarea:focus {
 .noteentry {
     padding: 0;
     width: 100%;
-    border: 0 none white;
+    border: 0 none var(--pz-bg);
     overflow-wrap: break-word;
     outline: none;
     resize: none;
@@ -180,37 +180,37 @@ textarea:focus {
 /* Heading styles - higher specificity to override font-size */
 .noteentry h1 {
     font-size: 2em !important;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 0.67em 0;
 }
 
 .noteentry h2 {
     font-size: 1.5em !important;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 0.83em 0;
 }
 
 .noteentry h3 {
     font-size: 1.17em !important;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 1em 0;
 }
 
 .noteentry h4 {
     font-size: 1em !important;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 1.33em 0;
 }
 
 .noteentry h5 {
     font-size: 0.83em !important;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 1.67em 0;
 }
 
 .noteentry h6 {
     font-size: 0.67em !important;
-    font-weight: bold;
+    font-weight: var(--pz-weight-bold);
     margin: 2.33em 0;
 }
 
@@ -265,7 +265,7 @@ textarea:focus {
 }
 
 .noteentry .heading-anchor:hover {
-    opacity: 1 !important;
+    opacity: 1;
 }
 
 .noteentry .heading-anchor svg {
@@ -298,8 +298,8 @@ textarea:focus {
 .noteentry .note-video-embed {
     max-width: 100%;
     height: auto;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.1);
     background: #000;
     display: block;
     margin: 10px 0;
@@ -314,8 +314,8 @@ textarea:focus {
     overflow: hidden;
     margin: 8px 0;
     border: none;
-    border-radius: 8px;
-    background: #f1f3f4;
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-surface-hover);
 }
 
 .note-attachment-previews {
@@ -330,9 +330,9 @@ textarea:focus {
     min-width: 0;
     margin: 0;
     overflow: hidden;
-    border: 1px solid #d8dee4;
-    border-radius: 8px;
-    background: #ffffff;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
 }
 
 .note-attachment-preview-media {
@@ -342,14 +342,14 @@ textarea:focus {
     width: 100%;
     aspect-ratio: 4 / 3;
     overflow: hidden;
-    background: #f6f8fa;
+    background: var(--pz-surface);
 }
 
 .note-attachment-preview-frame {
     display: block;
     height: auto;
     border: 0;
-    background: #ffffff;
+    background: var(--pz-bg);
     pointer-events: none;
 }
 
@@ -358,7 +358,7 @@ textarea:focus {
     height: 56px;
     aspect-ratio: auto;
     border: 0;
-    background: #f1f3f4;
+    background: var(--pz-surface-hover);
 }
 
 .note-attachment-preview-file-card {
@@ -368,22 +368,22 @@ textarea:focus {
     height: 100%;
     min-height: 132px;
     padding: 12px;
-    background: #f8fafc;
-    color: #1f2937;
+    background: var(--pz-surface);
+    color: var(--pz-text);
     text-decoration: none;
 }
 
 .note-attachment-preview-file-card:hover,
 .note-attachment-preview-file-card:focus {
-    background: #eef6fb;
-    color: #005a8b;
+    background: var(--pz-surface-hover);
+    color: var(--pz-accent-hover);
     text-decoration: none;
 }
 
 .note-attachment-preview-file-card i,
 .note-attachment-preview-caption i {
     flex: 0 0 auto;
-    color: #64748b;
+    color: var(--pz-text-muted);
 }
 
 .note-attachment-preview-file-card i {
@@ -401,7 +401,7 @@ textarea:focus {
     min-width: 0;
     overflow-wrap: anywhere;
     font-size: 0.86rem;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     line-height: 1.25;
 }
 
@@ -412,8 +412,8 @@ textarea:focus {
     row-gap: 2px;
     min-height: 42px;
     padding: 7px 8px;
-    border-top: 1px solid #d8dee4;
-    color: #64748b;
+    border-top: 1px solid var(--pz-border);
+    color: var(--pz-text-muted);
     font-size: 0.78rem;
     line-height: 1.2;
 }
@@ -427,7 +427,7 @@ textarea:focus {
 .note-attachment-preview-caption a {
     min-width: 0;
     overflow: hidden;
-    color: #0f172a;
+    color: var(--pz-text);
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
@@ -438,13 +438,13 @@ textarea:focus {
 
 .note-attachment-preview-caption a:hover,
 .note-attachment-preview-caption a:focus {
-    color: #005a8b;
+    color: var(--pz-accent-hover);
     text-decoration: underline;
 }
 
 .note-attachment-preview-size {
     flex: 0 0 auto;
-    color: #64748b;
+    color: var(--pz-text-muted);
     font-size: 0.72rem;
 }
 

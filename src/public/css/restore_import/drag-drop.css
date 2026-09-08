@@ -9,13 +9,13 @@
     position: relative;
     border: 2px solid transparent;
     padding: 10px;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     transition: all 0.3s ease;
 }
 
 .form-group.drag-over {
     background-color: var(--pz-accent-soft);
-    border: 2px dashed #2196F3 !important;
+    border: 2px dashed var(--pz-accent);
 }
 
 .form-group.drag-over input[type="file"],
@@ -35,18 +35,18 @@
     align-items: center;
     justify-content: center;
     background: rgba(227, 242, 253, 0.95);
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     pointer-events: none;
     z-index: 10;
 }
 
 .drop-overlay-text {
     font-size: 1.2em;
-    font-weight: 600;
-    color: #2196F3;
-    background: rgba(255, 255, 255, 0.95);
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-accent);
+    background: rgba(var(--pz-highlight-rgb), 0.95);
     padding: 20px 30px;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
     white-space: nowrap;
 }

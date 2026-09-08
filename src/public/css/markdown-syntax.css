@@ -8,7 +8,7 @@
 
 .markdown-syntax-intro {
     margin: 0 0 18px;
-    color: #495057;
+    color: var(--pz-text-secondary);
     line-height: 1.65;
     max-width: 72ch;
 }
@@ -30,18 +30,18 @@
 .markdown-syntax-filter-icon {
     position: absolute;
     left: 12px;
-    color: var(--placeholder-color, #94a3b8);
+    color: var(--pz-text-subtle);
     pointer-events: none;
 }
 
 .markdown-syntax-filter-bar .filter-input {
     width: 100%;
     padding: 11px 42px 11px 38px;
-    border: 1px solid #d7dee5;
-    border-radius: 10px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
     font-size: 14px;
     color: var(--text-color, var(--pz-text));
-    background: var(--input-bg, #ffffff);
+    background: var(--input-bg, var(--pz-bg));
     transition: border-color 0.2s, box-shadow 0.2s;
     box-sizing: border-box;
 }
@@ -61,14 +61,14 @@
     background: none;
     border: none;
     padding: 4px 6px;
-    border-radius: 6px;
-    color: #667085;
+    border-radius: var(--pz-radius);
+    color: var(--pz-text-muted);
     cursor: pointer;
 }
 
 .markdown-syntax-filter-bar .clear-filter-btn:hover {
-    background: #eef2f6;
-    color: #1f2937;
+    background: var(--pz-surface-hover);
+    color: var(--pz-text);
 }
 
 .markdown-syntax-filter-bar .filter-stats {
@@ -84,9 +84,9 @@
 }
 
 .syntax-card {
-    border: 1px solid #e9eef3;
-    border-radius: 10px;
-    background: #fff;
+    border: 1px solid var(--pz-border-light);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
     padding: 18px;
     box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
@@ -95,7 +95,7 @@
     margin: 0 0 10px;
     color: var(--pz-accent);
     font-size: 12px;
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
     letter-spacing: 0.08em;
     text-transform: uppercase;
 }
@@ -108,17 +108,17 @@
 
 .syntax-card p {
     margin: 0 0 12px;
-    color: #495057;
+    color: var(--pz-text-secondary);
     line-height: 1.55;
 }
 
 .syntax-card pre {
     margin: 0;
     overflow-x: auto;
-    border: 1px solid #f0f0f0;
-    border-radius: 4px;
+    border: 1px solid var(--pz-border-light);
+    border-radius: var(--pz-radius-sm);
     background: var(--pz-surface);
-    color: #212529;
+    color: var(--pz-text);
     padding: 12px;
     font-size: 13px;
     line-height: 1.55;
@@ -132,10 +132,10 @@
 .markdown-syntax-empty {
     margin: 0;
     padding: 16px 18px;
-    border: 1px dashed #d7dee5;
-    border-radius: 10px;
-    background: #f8fafc;
-    color: #52606d;
+    border: 1px dashed var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-surface);
+    color: var(--pz-text-secondary);
     line-height: 1.6;
 }
 
@@ -154,42 +154,35 @@
     }
 }
 
-html[data-theme='dark'] .markdown-syntax-intro,
-body.dark-mode .markdown-syntax-intro {
-    color: var(--dm-text-muted, #8b949e);
+html[data-theme='dark'] .markdown-syntax-intro {
+    color: var(--dm-text-muted, var(--dm-text-subtle));
 }
 
-html[data-theme='dark'] .syntax-card h2,
-body.dark-mode .syntax-card h2 {
-    color: var(--dm-text, #e6edf3);
+html[data-theme='dark'] .syntax-card h2 {
+    color: var(--dm-text, var(--dm-text-bright));
 }
 
-html[data-theme='dark'] .syntax-card,
-body.dark-mode .syntax-card {
-    border-color: var(--dm-border, #30363d);
-    background: var(--dm-surface, #161b22);
+html[data-theme='dark'] .syntax-card {
+    border-color: var(--dm-border, var(--dm-border));
+    background: var(--dm-surface, var(--dm-content-bg));
 }
 
-html[data-theme='dark'] .syntax-card p,
-body.dark-mode .syntax-card p {
-    color: var(--dm-text-muted, #8b949e);
+html[data-theme='dark'] .syntax-card p {
+    color: var(--dm-text-muted, var(--dm-text-subtle));
 }
 
-html[data-theme='dark'] .syntax-card-category,
-body.dark-mode .syntax-card-category {
-    color: var(--dm-accent, #58a6ff);
+html[data-theme='dark'] .syntax-card-category {
+    color: var(--dm-accent, var(--dm-accent));
 }
 
-html[data-theme='dark'] .syntax-card pre,
-body.dark-mode .syntax-card pre {
-    border-color: var(--dm-border, #30363d);
-    background: var(--dm-bg, #0d1117);
-    color: var(--dm-text, #e6edf3);
+html[data-theme='dark'] .syntax-card pre {
+    border-color: var(--dm-border, var(--dm-border));
+    background: var(--dm-bg, var(--dm-content-bg));
+    color: var(--dm-text, var(--dm-text-bright));
 }
 
-html[data-theme='dark'] .markdown-syntax-empty,
-body.dark-mode .markdown-syntax-empty {
-    border-color: var(--dm-border, #30363d);
-    background: var(--dm-surface, #161b22);
-    color: var(--dm-text-muted, #8b949e);
+html[data-theme='dark'] .markdown-syntax-empty {
+    border-color: var(--dm-border, var(--dm-border));
+    background: var(--dm-surface, var(--dm-content-bg));
+    color: var(--dm-text-muted, var(--dm-text-subtle));
 }

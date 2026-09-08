@@ -239,25 +239,9 @@ if ($backupsColumnVisible) {
     <title><?php echo t_h('admin_tools.storage_stats.title', [], 'Storage statistics'); ?></title>
     <meta name="color-scheme" content="dark light">
     <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
-    <link rel="stylesheet" href="css/lucide.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/fonts.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/settings.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/users.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $v; ?>">
+    <?php poznoteRenderStylesheets('storage-stats-user'); ?>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
-    <link rel="stylesheet" href="css/admin-tools.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/attachments/usage-notice.css?v=<?php echo $v; ?>">
     <style>
     /* Help icon on the local attachments figure when S3 storage is on.
        No vertical-align override: lucide.css's -0.125em keeps the icon on

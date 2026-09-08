@@ -45,7 +45,7 @@
 }
 
 .toggle-switch input {
-    opacity: 0 !important;
+    opacity: 0;
     width: 0 !important;
     height: 0 !important;
     position: absolute;
@@ -58,9 +58,9 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color: var(--pz-disabled);
     transition: all 0.3s ease;
-    border-radius: 24px;
+    border-radius: var(--pz-radius-2xl);
 }
 
 .toggle-slider:before {
@@ -70,13 +70,13 @@
     width: 18px;
     left: 3px;
     bottom: 3px;
-    background-color: white;
+    background-color: var(--pz-bg);
     transition: all 0.3s ease;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
 }
 
 input:checked+.toggle-slider {
-    background-color: var(--pz-success) !important;
+    background-color: var(--pz-success);
 }
 
 input:focus+.toggle-slider {
@@ -90,13 +90,13 @@ input:checked+.toggle-slider:before {
 /* Button Variants */
 #shareModal .btn-cancel {
     background: var(--pz-danger);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     border: none;
 }
 
 #shareModal .btn-create-share {
     background: var(--pz-success);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     border: none;
 }
 
@@ -107,15 +107,15 @@ html[data-theme='dark'] #shareModal .modal-content {
 }
 
 html[data-theme='dark'] #shareModal h3 {
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .toggle-slider {
-    background-color: #555;
+    background-color: var(--dm-border-light);
 }
 
 html[data-theme='dark'] input:checked+.toggle-slider {
-    background-color: #28a745 !important;
+    background-color: var(--dm-success-hover);
 }
 
 /* ============================================
@@ -144,13 +144,13 @@ html[data-theme='dark'] input:checked+.toggle-slider {
 /* Button Variants */
 #folderShareModal .btn-cancel {
     background: var(--pz-danger);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     border: none;
 }
 
 #folderShareModal .btn-primary {
     background: var(--pz-accent);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     border: none;
 }
 
@@ -161,7 +161,7 @@ html[data-theme='dark'] #folderShareModal .modal-content {
 }
 
 html[data-theme='dark'] #folderShareModal h3 {
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
 /* ============================================
@@ -178,7 +178,7 @@ html[data-theme='dark'] #folderShareModal h3 {
 
 #sharedViaFolderModal .btn-view-shares {
     background: var(--pz-success);
-    color: #ffffff;
+    color: var(--pz-text-inverse);
     border: none;
 }
 
@@ -188,6 +188,6 @@ html[data-theme='dark'] #sharedViaFolderModal .modal-content {
 }
 
 html[data-theme='dark'] #sharedViaFolderModal h3 {
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 

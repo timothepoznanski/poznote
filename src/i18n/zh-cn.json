@@ -1802,6 +1802,7 @@
     },
     "errors": {
       "workspace_not_found": "未找到工作区",
+      "folder_not_found": "未找到文件夹",
       "note_quota_reached": "已达到笔记数量上限：此实例允许该用户最多 {{max}} 条笔记（包含回收站）。",
       "storage_quota_reached": "已达到存储上限：此实例允许该用户最多 {{max}} MB 存储空间。",
       "linked_note_already_exists": "此笔记已存在快捷方式",

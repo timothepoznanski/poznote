@@ -12,9 +12,9 @@
 pre.code-block,
 .noteentry pre {
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
-    background-color: #f8f8f8 !important;
+    background-color: var(--pz-surface);
     /* border: 1px solid #e1e1e1; */
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     padding: 20px 20px;
     margin: 0;
     color: var(--pz-text);
@@ -34,8 +34,8 @@ pre.code-block,
     margin: 0 !important;
     padding: 30px 30px !important;
     /* border-radius: 6px; */
-    background: #F8FAFC !important;
-    border: 1px solid #e9ecef;
+    background: var(--pz-surface);
+    border: 1px solid var(--pz-border-light);
     overflow-x: auto;
     position: relative;
     width: 100%;
@@ -80,7 +80,7 @@ pre.code-block::-webkit-scrollbar-thumb:horizontal:active,
     top: 0;
     width: var(--code-line-number-digits, 2ch);
     text-align: right;
-    color: #9aa3af;
+    color: var(--pz-text-subtle);
     user-select: none;
     -webkit-user-select: none;
 }
@@ -101,7 +101,7 @@ pre.code-block .code-block-line-numbers-btn,
     height: 28px;
     background: transparent;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -111,7 +111,7 @@ pre.code-block .code-block-line-numbers-btn,
     z-index: 10;
     padding: 0;
     font-size: 14px;
-    color: #586069;
+    color: var(--pz-text-secondary);
 }
 
 .code-block-copy-btn,
@@ -131,7 +131,7 @@ pre.code-block .code-block-line-numbers-btn,
 pre.code-block .code-block-delete-btn,
 .noteentry pre .code-block-delete-btn {
     right: 8px;
-    color: #f87171;
+    color: var(--pz-danger);
 }
 
 .code-block-copy-btn:hover,
@@ -154,27 +154,27 @@ pre.code-block .code-block-delete-btn,
     margin: 0;
     background: transparent;
     border: none;
-    border-radius: 0 0 4px 0;
+    border-radius: 0 0 var(--pz-radius-sm) 0;
     box-sizing: content-box;
     cursor: pointer;
     z-index: 11;
 }
 
 .code-block-lang-btn:hover {
-    background: rgba(0, 0, 0, 0.06);
+    background: rgba(var(--pz-shadow-rgb), 0.06);
 }
 
 .code-block-lang-btn:focus-visible {
-    outline: 2px solid #0d6efd;
+    outline: 2px solid var(--pz-accent);
     outline-offset: -2px;
 }
 
 .code-block-copy-btn:hover {
-    color: #24292e;
+    color: var(--pz-text);
 }
 
 .code-block-delete-btn:hover {
-    color: #ef4444;
+    color: var(--pz-danger);
 }
 
 .code-block-copy-btn:active,
@@ -203,29 +203,29 @@ pre.code-block .code-block-delete-btn,
     width: 28px;
     height: 28px;
     padding: 0 !important;
-    background: transparent !important;
-    border: none !important;
-    color: #8a8f98 !important;
-    opacity: 0.55 !important;
+    background: transparent;
+    border: none;
+    color: var(--pz-text-subtle);
+    opacity: 0.55;
 }
 
 .code-block-actions-host > .code-block-delete-btn {
-    color: #f87171 !important;
+    color: var(--pz-danger);
 }
 
 .code-block-actions-host > .code-block-copy-btn:hover,
 .code-block-actions-host > .code-block-delete-btn:hover,
 .code-block-actions-host > .code-block-line-numbers-btn:hover {
-    opacity: 1 !important;
+    opacity: 1;
 }
 
 .code-block-actions-host > .code-block-copy-btn:hover,
 .code-block-actions-host > .code-block-line-numbers-btn:hover {
-    color: #24292e !important;
+    color: var(--pz-text);
 }
 
 .code-block-actions-host > .code-block-delete-btn:hover {
-    color: #ef4444 !important;
+    color: var(--pz-danger);
 }
 
 .code-block-actions-host > .code-block-copy-btn svg,
@@ -272,9 +272,9 @@ pre.code-block,
 /* Code inline */
 code {
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
-    background-color: #f4f4f4;
+    background-color: var(--pz-surface-hover);
     padding: 2px 4px;
-    border-radius: 3px;
+    border-radius: var(--pz-radius-sm);
     color: var(--pz-text);
     font-size: var(--code-block-font-size, 15px) !important;
 }
@@ -282,9 +282,9 @@ code {
 /* Code inside pre blocks should not have background */
 pre code,
 .noteentry pre code {
-    background-color: transparent !important;
+    background-color: transparent;
     padding: 0 !important;
-    border-radius: 0 !important;
+    border-radius: 0!important;
     font-size: inherit !important;
 }
 
@@ -366,7 +366,7 @@ code *[style*="background"],
 .noteentry pre *[style*="background"],
 .noteentry code *[style*="background"],
 .noteentry .code-block *[style*="background"] {
-    background: linear-gradient(rgba(255, 255, 0, 0.4), rgba(255, 255, 0, 0.4)), #f4f4f4 !important;
+    background: linear-gradient(rgba(255, 255, 0, 0.4), rgba(255, 255, 0, 0.4)), var(--pz-surface-hover);
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
     font-size: inherit;
     /* inherit font size from parent */
@@ -446,7 +446,7 @@ code *[style*="color"],
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
     font-size: var(--code-block-font-size, 15px) !important;
     font-style: normal !important;
-    font-weight: normal !important;
+    font-weight: var(--pz-weight-normal) !important;
     white-space: pre-wrap !important;
     word-wrap: break-word !important;
     overflow-wrap: break-word !important;
@@ -504,24 +504,24 @@ pre.code-block::-webkit-scrollbar-track,
 .noteentry pre::-webkit-scrollbar-thumb,
 pre.code-block::-webkit-scrollbar-thumb,
 .code-block::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.15);
-    border-radius: 2px;
+    background: rgba(var(--pz-shadow-rgb), 0.15);
+    border-radius: var(--pz-radius-sm);
 }
 
 .noteentry pre::-webkit-scrollbar-thumb:hover,
 pre.code-block::-webkit-scrollbar-thumb:hover,
 .code-block::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.30);
+    background: rgba(var(--pz-shadow-rgb), 0.30);
 }
 
 html[data-theme='dark'] .noteentry pre::-webkit-scrollbar-thumb,
 html[data-theme='dark'] pre.code-block::-webkit-scrollbar-thumb,
 html[data-theme='dark'] .code-block::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(var(--pz-highlight-rgb), 0.2);
 }
 
 html[data-theme='dark'] .noteentry pre::-webkit-scrollbar-thumb:hover,
 html[data-theme='dark'] pre.code-block::-webkit-scrollbar-thumb:hover,
 html[data-theme='dark'] .code-block::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.35);
+    background: rgba(var(--pz-highlight-rgb), 0.35);
 }

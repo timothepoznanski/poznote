@@ -18,8 +18,8 @@
 
 /* Color palette popup (desktop) - same appearance as mobile palette */
 .color-palette-popup {
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
-    border-radius: 6px;
+    box-shadow: 0 6px 18px rgba(var(--pz-shadow-rgb), 0.12);
+    border-radius: var(--pz-radius);
     background: transparent;
     padding: 6px 8px;
     z-index: 9999;
@@ -29,10 +29,10 @@
 }
 
 .color-palette-popup {
-    background: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.12);
-    border-radius: 6px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    background: var(--pz-bg);
+    border: 1px solid rgba(var(--pz-shadow-rgb), 0.12);
+    border-radius: var(--pz-radius);
+    box-shadow: 0 6px 18px rgba(var(--pz-shadow-rgb), 0.12);
     box-sizing: border-box;
     max-width: calc(100vw - 16px);
     padding: 8px;
@@ -57,19 +57,19 @@
     border: none;
     background: transparent;
     padding: 6px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
 }
 
 .color-item:focus {
-    outline: 2px solid #4d90fe;
+    outline: 2px solid var(--pz-accent);
 }
 
 .color-swatch {
     display: inline-block;
     width: 20px;
     height: 20px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
 }
 
 .color-palette-popup.show {
@@ -85,15 +85,15 @@
     justify-content: center;
     max-width: 100%;
     padding: 8px 12px;
-    background: rgba(255, 255, 255, 0.98);
-    border-radius: 10px;
+    background: rgba(var(--pz-highlight-rgb), 0.98);
+    border-radius: var(--pz-radius-lg);
     box-sizing: border-box;
 }
 
 .color-item {
     width: 28px;
     height: 16px;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     border: none;
     cursor: pointer;
     padding: 0;
@@ -112,9 +112,9 @@
     position: absolute;
     top: calc(100% + 8px);
     right: 0;
-    background: #ffffff;
-    border: 1px solid #e6e6e6;
-    border-radius: 8px;
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
     box-shadow: 0 8px 20px rgba(20, 20, 20, 0.12);
     padding: 8px;
     z-index: 1002;
@@ -139,13 +139,13 @@
     justify-content: space-between;
     gap: 12px;
     padding: 8px 10px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     cursor: pointer;
     transition: background-color 0.12s ease, color 0.12s ease;
 }
 
 .font-size-popup .font-size-item:hover {
-    background-color: #f6fbff;
+    background-color: var(--pz-surface);
 }
 
 .font-size-popup .size-label {
@@ -160,30 +160,30 @@
     min-width: 36px;
     min-height: 28px;
     padding: 4px 8px;
-    border-radius: 4px;
-    border: 1px solid #eee;
-    color: #222;
-    background: #fafafa;
+    border-radius: var(--pz-radius-sm);
+    border: 1px solid var(--pz-border-light);
+    color: var(--pz-text);
+    background: var(--pz-surface);
 }
 
 .font-size-popup .style-normal {
     font-size: 0.95rem;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
 }
 
 .font-size-popup .style-h1 {
     font-size: 1.45rem;
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
 }
 
 .font-size-popup .style-h2 {
     font-size: 1.2rem;
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
 }
 
 .font-size-popup .style-h3 {
     font-size: 1.05rem;
-    font-weight: 700;
+    font-weight: var(--pz-weight-bold);
 }
 
 .btn-attachment.has-attachments i {
@@ -228,7 +228,7 @@
 
 /* Only apply header background if no workspace background image is set */
 body:not(.has-background-image) .note-header {
-    background: #fff;
+    background: var(--pz-bg);
 }
 
 .note-edit-toolbar {
@@ -253,7 +253,7 @@ body:not(.has-background-image) .note-header {
 
 .note-header>#lastupdated {
     font-size: 0.95em;
-    color: #888;
+    color: var(--pz-text-muted);
 }
 
 /* Toolbar Buttons */
@@ -261,7 +261,7 @@ body:not(.has-background-image) .note-header {
 .toolbar-btn {
     background: transparent !important;
     border: none !important;
-    border-radius: 5px;
+    border-radius: var(--pz-radius-sm);
     padding: 6px 8px;
     font-size: 1.4em;
     cursor: pointer;
@@ -319,7 +319,7 @@ body:not(.has-background-image) .note-header {
 .note-header-spacer {
     width: 100%;
     height: 15px;
-    background: #fff;
+    background: var(--pz-bg);
 }
 
 a.links_arbo_left,
@@ -334,13 +334,13 @@ a.links_arbo_left:active {
     text-overflow: ellipsis;
     vertical-align: top;
     text-decoration: none;
-    color: rgb(55, 53, 47);
+    color: var(--pz-text);
     padding: 3px 6px 3px 0px;
     /* Réduction du padding vertical (6px → 3px) */
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     font-size: 14px;
     line-height: 1.2;
-    font-weight: normal;
+    font-weight: var(--pz-weight-normal);
     box-sizing: border-box;
 }
 

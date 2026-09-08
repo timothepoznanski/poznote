@@ -19,10 +19,10 @@
 .system-menu-dropdown {
     position: fixed;
     margin-top: 8px;
-    background: white;
-    border: 1px solid #d3d6db;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border-strong);
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.15);
     min-width: 200px;
     max-width: 250px;
     z-index: 10000;
@@ -66,15 +66,15 @@
 /* Afficher le compteur à droite de l'icône - toujours visible */
 .system-folder:not([data-folder="Favorites"]) .folder-note-count {
     display: inline-block !important;
-    opacity: 1 !important;
+    opacity: 1;
     position: absolute;
     top: 50%;
     left: 100%;
     transform: translateY(-50%);
-    color: #5b9bd5;
+    color: var(--pz-accent);
     padding: 1px 4px;
     font-size: 9px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     min-width: 14px;
     text-align: center;
     line-height: 1.2;

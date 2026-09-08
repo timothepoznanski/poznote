@@ -1,0 +1,23 @@
+{
+  "_comment": "Colour literals left in src/public/css, outside the palette file itself: hex, the white/black keywords, and functional colours (rgba, hsl, oklch...) whose arguments name no variable. The check in tools/css-check.php fails when this number grows. Lower it whenever a change removes some.",
+  "colour_literals": 389,
+  "_comment_markup": "Colour literals in the project's own PHP and JS: inline style attributes, <style> blocks, colours handed to scripts. A theme cannot reach any of them. Third-party bundles are skipped. Files listed in markup_exempt are not counted and each one says why.",
+  "markup_literals": 534,
+  "markup_exempt": {
+    "src/ReminderEmailService.php": "email HTML: mail clients do not support var()",
+    "src/public/api_download_note.php": "standalone export, has to render outside the app",
+    "src/public/api_export_note.php": "standalone export, has to render outside the app",
+    "src/public/api_export_attachments.php": "standalone export, has to render outside the app",
+    "src/public/js/slash-command.js": "brand colours of programming languages: data, not chrome",
+    "src/modals/folder_icon_modal.php": "the folder colour palette a user picks from: data, not chrome",
+    "src/public/js/graph.js": "categorical palette for graph nodes: data, not chrome",
+    "src/public/js/public-note.js": "theme config handed to mermaid, a third-party renderer"
+  },
+  "_comment_carrier": "Generic dark rules allowed to keep the carrier's weight. A generic rule names no class or id of its own, so written plainly it outweighs any page rule that does. Each entry says why it is allowed to stay.",
+  "carrier_weight_allow": {
+    "dark-mode/icons.css": [
+      "[class*=\"lucide-\"]"
+    ]
+  },
+  "_comment_carrier_icons": "dark-mode/icons.css keeps its weight for now, deliberately. Neutralising it restores the colour of 61 icons that page rules paint with --pz-accent and that render generic grey in dark. But --pz-accent is a FILL token and does not switch with the theme, so those icons then sit at contrast 2.78 on the dark ground, under the 3:1 WCAG minimum for a graphic. 87 rules colour an icon with --pz-accent; giving them an accent that switches is a design decision, not a cleanup."
+}

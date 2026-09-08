@@ -22,9 +22,9 @@
 .sidebar-folder-toggle:hover,
 .sidebar-folder-toggle:active,
 .sidebar-folder-toggle:focus {
-    background: transparent !important;
-    box-shadow: none !important;
-    outline: none !important;
+    background: transparent;
+    box-shadow: none;
+    outline: none;
 }
 
 /* Forcing the folder toggle and star visible on touch now lives with the rules
@@ -33,7 +33,7 @@
    that UI customization generates when the user switches either control off. */
 
 .folder-toggle .folder-actions i {
-    opacity: 1 !important;
+    opacity: 1;
     pointer-events: auto !important;
 }
 
@@ -42,20 +42,20 @@
 .folder-header.selected,
 .folder-header:active,
 .folder-header:focus {
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    outline: none;
 }
 
 /* Force remove any possible folder selection styles */
 .folder-toggle.selected,
 .folder-toggle:active,
 .folder-toggle:focus {
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    outline: none;
 }
 
 /* Remove all selection highlights on mobile for notes */
@@ -63,11 +63,11 @@
 .links_arbo_left:hover,
 .links_arbo_left:active,
 .links_arbo_left:focus {
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    outline: none;
+    -webkit-tap-highlight-color: rgba(var(--pz-shadow-rgb), 0) !important;
     touch-action: manipulation !important;
 }
 
@@ -268,7 +268,7 @@ body.mobile-formatting-toolbar-active .color-palette-popup .color-swatch {
 
 body.mobile-formatting-toolbar-active.has-background-image #right_col .note-header,
 body.mobile-keyboard-open.has-background-image #right_col .note-header {
-    background: rgba(255, 255, 255, 0.96);
+    background: rgba(var(--pz-highlight-rgb), 0.96);
 }
 
 .save-indicator {
@@ -297,7 +297,7 @@ body.mobile-keyboard-open.has-background-image #right_col .note-header {
 #left_col::-webkit-scrollbar {
     display: none !important;
     width: 0 !important;
-    background: transparent !important;
+    background: transparent;
 }
 
 #left_col::-webkit-scrollbar-track {
@@ -316,7 +316,7 @@ pre code.hljs::-webkit-scrollbar,
 .hljs::-webkit-scrollbar {
     height: 0 !important;
     width: 0 !important;
-    background: transparent !important;
+    background: transparent;
 }
 
 pre,
@@ -375,7 +375,7 @@ pre code.hljs,
     margin-left: 6px !important;
     margin-right: 4px !important;
     display: inline-block !important;
-    opacity: 1 !important;
+    opacity: 1;
     pointer-events: auto !important;
     /* .hide-folder-counts parks the count at translateY(-2px) and only restores
        it on hover/focus-within. Touch devices never hover, so without this the
@@ -516,12 +516,12 @@ body.mobile-formatting-toolbar-active #right_col .note-edit-toolbar .mobile-home
 
 /* Back button in slash submenu (mobile) */
 .slash-command-back {
-    font-weight: 500;
-    background-color: #f9fafb !important;
+    font-weight: var(--pz-weight-medium);
+    background-color: var(--pz-surface);
 }
 
 .slash-command-back:hover {
-    background-color: var(--pz-surface-hover) !important;
+    background-color: var(--pz-surface-hover);
 }
 
 /* Responsive tables in note view (mobile)

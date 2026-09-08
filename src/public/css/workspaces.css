@@ -14,7 +14,7 @@
 
 html, body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-    color: rgb(55, 53, 47);
+    color: var(--pz-text);
 }
 
 body {
@@ -26,17 +26,17 @@ body {
     max-width: 1000px;
     margin: 20px auto;
     padding: 20px;
-    background: white;
-    border-radius: 8px;
-    /* box-shadow: 0 2px 10px rgba(0,0,0,0.1); */
+    background: var(--pz-bg);
+    border-radius: var(--pz-radius-lg);
+    /* box-shadow: 0 2px 10px rgba(var(--pz-shadow-rgb), 0.1); */
 }
 
 /* Sections de paramètres */
 .settings-section {
     margin-bottom: 30px;
     padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
 }
 
 .settings-section h3 {
@@ -54,7 +54,7 @@ body {
 .form-group label {
     display: block;
     margin-bottom: 5px;
-    font-weight: bold;
+    font-weight: var(--pz-weight-semibold);
 }
 
 /* The inputs and the button share one row; the tags hint sits under the whole
@@ -87,15 +87,15 @@ body {
     display: flex;
     align-items: center;
     padding: 15px;
-    border: 1px solid #dee2e6;
-    border-radius: 6px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
     margin-bottom: 10px;
-    background-color: white;
+    background-color: var(--pz-bg);
     transition: box-shadow 0.2s;
 }
 
 .workspace-item:hover {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(var(--pz-shadow-rgb), 0.1);
 }
 
 /* Colonnes de la liste des workspaces */
@@ -133,7 +133,7 @@ body {
     height: 36px;
     padding: 0;
     border: 1px solid transparent;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: transparent;
     color: var(--pz-accent);
     cursor: pointer;
@@ -155,12 +155,12 @@ body {
 
 /* A public workspace: the share icon stays tinted */
 .ws-icon-btn.is-shared {
-    color: #d97706;
+    color: var(--pz-warning-hover);
 }
 
 .ws-icon-btn.is-shared:hover,
 .ws-icon-btn.is-shared:focus-visible {
-    color: #b45309;
+    color: var(--pz-warning-strong);
 }
 
 .ws-icon-btn.ws-icon-btn-danger:hover,
@@ -178,30 +178,24 @@ body {
     color: var(--pz-text-muted);
 }
 
-:root[data-theme='dark'] .ws-icon-btn,
-body.dark-mode .ws-icon-btn {
+html[data-theme='dark'] .ws-icon-btn {
     color: var(--pz-accent);
 }
 
-:root[data-theme='dark'] .ws-icon-btn:hover,
-body.dark-mode .ws-icon-btn:hover,
-:root[data-theme='dark'] .ws-icon-btn:focus-visible,
-body.dark-mode .ws-icon-btn:focus-visible {
+html[data-theme='dark'] .ws-icon-btn:hover,
+html[data-theme='dark'] .ws-icon-btn:focus-visible {
     background: var(--dm-surface-hover);
     border-color: var(--dm-border);
     color: var(--pz-accent);
 }
 
-:root[data-theme='dark'] .ws-icon-btn.is-shared,
-body.dark-mode .ws-icon-btn.is-shared {
-    color: #fbbf24;
+html[data-theme='dark'] .ws-icon-btn.is-shared {
+    color: var(--dm-warning);
 }
 
-:root[data-theme='dark'] .ws-icon-btn.ws-icon-btn-danger:hover,
-body.dark-mode .ws-icon-btn.ws-icon-btn-danger:hover,
-:root[data-theme='dark'] .ws-icon-btn.ws-icon-btn-danger:focus-visible,
-body.dark-mode .ws-icon-btn.ws-icon-btn-danger:focus-visible {
-    color: #ff6b6b;
+html[data-theme='dark'] .ws-icon-btn.ws-icon-btn-danger:hover,
+html[data-theme='dark'] .ws-icon-btn.ws-icon-btn-danger:focus-visible {
+    color: var(--dm-danger);
     background: rgba(255, 107, 107, 0.12);
 }
 
@@ -232,7 +226,7 @@ body.dark-mode .ws-icon-btn.ws-icon-btn-danger:focus-visible {
 
 .workspace-info-list dt {
     color: var(--pz-text-muted);
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .workspace-info-list dd {
@@ -258,7 +252,7 @@ body.dark-mode .ws-icon-btn.ws-icon-btn-danger:focus-visible {
 }
 
 .workspace-name-item {
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     color: var(--pz-text);
     font-size: 16px;
 }
@@ -267,7 +261,7 @@ body.dark-mode .ws-icon-btn.ws-icon-btn-danger:focus-visible {
 a.workspace-name-link {
     text-decoration: none;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     transition: color 0.15s ease;
 }
 
@@ -280,10 +274,10 @@ a.workspace-name-link:focus-visible {
 
 .workspace-count {
     font-size: 12px;
-    color: #666;
-    background-color: #e9ecef;
+    color: var(--pz-text-muted);
+    background-color: var(--pz-surface-sunken);
     padding: 2px 8px;
-    border-radius: 12px;
+    border-radius: var(--pz-radius-xl);
     margin-left: 8px;
 }
 
@@ -300,9 +294,9 @@ a.workspace-name-link:focus-visible {
     align-items: center;
     gap: 4px;
     font-size: 12px;
-    color: #4b5563;
-    background: #eef2f7;
-    border-radius: 12px;
+    color: var(--pz-text-secondary);
+    background: var(--pz-surface-hover);
+    border-radius: var(--pz-radius-xl);
     padding: 2px 9px;
 }
 
@@ -316,9 +310,9 @@ a.workspace-name-link:focus-visible {
 .ws-color-dot {
     width: 10px;
     height: 10px;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     flex-shrink: 0;
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(var(--pz-shadow-rgb), 0.12);
 }
 
 .ws-color-grid {
@@ -337,7 +331,7 @@ a.workspace-name-link:focus-visible {
     height: 34px;
     padding: 0;
     border: 2px solid transparent;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     background: none;
     cursor: pointer;
     transition: border-color 0.15s ease, transform 0.15s ease;
@@ -354,8 +348,8 @@ a.workspace-name-link:focus-visible {
 .ws-color-swatch {
     width: 24px;
     height: 24px;
-    border-radius: 50%;
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: var(--pz-radius-circle);
+    border: 1px solid rgba(var(--pz-shadow-rgb), 0.12);
 }
 
 /* The native input covers the swatch, invisible, so a click opens the picker */
@@ -369,21 +363,19 @@ a.workspace-name-link:focus-visible {
 }
 
 .ws-color-swatch-custom {
-    background: conic-gradient(#f87171, #fbbf24, #4ade80, #38bdf8, #a78bfa, #f87171);
+    background: conic-gradient(var(--pz-danger), var(--pz-warning), var(--pz-success), var(--pz-accent), #a78bfa, var(--pz-danger));
 }
 
-:root[data-theme='dark'] .ws-color-dot,
-body.dark-mode .ws-color-dot,
-:root[data-theme='dark'] .ws-color-swatch,
-body.dark-mode .ws-color-swatch {
-    border-color: rgba(255, 255, 255, 0.18);
+html[data-theme='dark'] .ws-color-dot,
+html[data-theme='dark'] .ws-color-swatch {
+    border-color: rgba(var(--pz-highlight-rgb), 0.18);
 }
 
 .ws-tags-help {
     display: block;
     margin-top: 8px;
     font-size: 12px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
 }
 
 /* Tags modal: Poznote button row (right-aligned), spaced from the list */
@@ -391,23 +383,21 @@ body.dark-mode .ws-color-swatch {
     margin-top: 20px;
 }
 
-:root[data-theme='dark'] .ws-tag-chip,
-body.dark-mode .ws-tag-chip {
-    color: #c9d1d9;
-    background: rgba(255, 255, 255, 0.08);
+html[data-theme='dark'] .ws-tag-chip {
+    color: var(--dm-text-bright);
+    background: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
-:root[data-theme='dark'] .ws-tags-help,
-body.dark-mode .ws-tags-help {
-    color: #9aa4b2;
+html[data-theme='dark'] .ws-tags-help {
+    color: var(--dm-text-muted);
 }
 
 .workspace-share-panel {
     margin-top: 12px;
     padding: 12px;
-    border: 1px solid #d8e3ea;
-    border-radius: 8px;
-    background: #f7fafc;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-surface);
     width: 100%;
 }
 
@@ -415,37 +405,37 @@ body.dark-mode .ws-tags-help {
     display: inline-flex;
     align-items: center;
     padding: 3px 10px;
-    border-radius: 999px;
+    border-radius: var(--pz-radius-pill);
     font-size: 12px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
 }
 
 .workspace-share-badge.is-enabled {
-    background: #dff7e7;
-    color: #166534;
+    background: var(--pz-success-soft);
+    color: var(--pz-success-strong);
 }
 
 .workspace-share-badge.is-disabled {
-    background: #eceff1;
-    color: #475569;
+    background: var(--pz-surface-sunken);
+    color: var(--pz-text-secondary);
 }
 
 .workspace-share-help {
     margin: 8px 0 0;
-    color: #64748b;
+    color: var(--pz-text-muted);
     font-size: 13px;
 }
 
 .workspace-share-link {
     display: inline-block;
     margin-top: 10px;
-    color: #0f5f93;
+    color: var(--pz-accent-hover);
     font-size: 13px;
     word-break: break-all;
 }
 
 .workspace-share-link:hover {
-    color: #084b75;
+    color: var(--pz-accent-hover);
 }
 
 .shared-edit-token-modal .shared-edit-token-modal-content {
@@ -462,7 +452,7 @@ body.dark-mode .ws-tags-help {
 
 .shared-edit-token-modal .shared-edit-token-modal-content p {
     margin: 0 0 16px;
-    color: #4b5563;
+    color: var(--pz-text-secondary);
     line-height: 1.5;
 }
 
@@ -475,8 +465,8 @@ body.dark-mode .ws-tags-help {
 }
 
 .shared-edit-token-modal .shared-edit-token-field-label {
-    font-weight: 600;
-    color: #374151;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text);
 }
 
 .shared-edit-token-modal .workspace-share-modal-url-row {
@@ -507,14 +497,14 @@ body.dark-mode .ws-tags-help {
 .shared-edit-token-modal .workspace-share-modal-url {
     display: block;
     width: 100%;
-    color: #0f5f93;
+    color: var(--pz-accent-hover);
     font-size: 14px;
     line-height: normal;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     text-decoration: none;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
     margin: 0;
     padding: 0;
 }
@@ -522,7 +512,7 @@ body.dark-mode .ws-tags-help {
 .shared-edit-token-modal .workspace-share-modal-copy-btn {
     background: var(--pz-surface-hover);
     border: 1px solid var(--pz-border-strong);
-    color: #374151;
+    color: var(--pz-text);
     flex-shrink: 0;
     align-self: center;
     width: 40px;
@@ -530,18 +520,18 @@ body.dark-mode .ws-tags-help {
     max-width: 40px;
     height: 40px;
     min-height: 40px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .shared-edit-token-modal .workspace-share-modal-url.is-preview {
-    color: #374151;
+    color: var(--pz-text);
 }
 
 .shared-edit-token-modal a.workspace-share-modal-url:hover {
-    color: #084b75;
+    color: var(--pz-accent-hover);
     text-decoration: underline;
 }
 
@@ -557,7 +547,7 @@ body.dark-mode .ws-tags-help {
     height: 40px;
     padding: 8px 10px;
     border: 1px solid var(--pz-border-strong);
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-size: 14px;
     margin: 0;
     width: 100%;
@@ -580,15 +570,15 @@ body.dark-mode .ws-tags-help {
     align-self: stretch;
     background: var(--pz-surface-hover);
     border: 1px solid var(--pz-border-strong);
-    color: #374151;
-    border-radius: 6px;
+    color: var(--pz-text);
+    border-radius: var(--pz-radius);
 }
 
 .shared-edit-token-modal .shared-edit-token-password-toggle:hover:not(:disabled),
 .shared-edit-token-modal .workspace-share-modal-copy-btn:hover:not(:disabled) {
-    background: #e5e7eb;
+    background: var(--pz-surface-sunken);
     border-color: var(--pz-text-subtle);
-    color: #111827;
+    color: var(--pz-text);
 }
 
 .shared-edit-token-modal .workspace-share-modal-copy-btn {
@@ -611,9 +601,9 @@ body.dark-mode .ws-tags-help {
 .shared-edit-token-modal .share-indexable-wrap,
 .shared-edit-token-modal .share-restrict-users-wrap {
     padding: 12px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    background: #f9fafb;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-surface);
 }
 
 .shared-edit-token-modal .share-indexable-label {
@@ -621,16 +611,16 @@ body.dark-mode .ws-tags-help {
 }
 
 .shared-edit-token-modal .indexable-label-text {
-    color: #374151;
+    color: var(--pz-text);
 }
 
 .shared-edit-token-modal .share-user-list-container {
     margin-top: 10px;
     max-height: 180px;
     overflow-y: auto;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    background: #fff;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    background: var(--pz-bg);
 }
 
 .shared-edit-token-modal .share-user-list-message {
@@ -640,7 +630,7 @@ body.dark-mode .ws-tags-help {
 }
 
 .shared-edit-token-modal .share-user-list-message.is-error {
-    color: #b91c1c;
+    color: var(--pz-danger-hover);
 }
 
 .shared-edit-token-modal .share-user-list-row {
@@ -648,7 +638,7 @@ body.dark-mode .ws-tags-help {
     align-items: center;
     gap: 8px;
     padding: 9px 10px;
-    color: #374151;
+    color: var(--pz-text);
 }
 
 .shared-edit-token-modal .share-user-list-row + .share-user-list-row {
@@ -672,130 +662,106 @@ body.dark-mode .ws-tags-help {
     white-space: nowrap;
 }
 
-html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-modal-content,
-body.dark-mode .shared-edit-token-modal .shared-edit-token-modal-content {
-    background: linear-gradient(180deg, #2a2d31 0%, #23262a 100%);
-    color: #eef2f7;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 28px 64px rgba(0, 0, 0, 0.48);
+html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-modal-content {
+    background: linear-gradient(180deg, var(--dm-surface) 0%, var(--dm-content-bg) 100%);
+    color: var(--dm-text-bright);
+    border: 1px solid rgba(var(--pz-highlight-rgb), 0.08);
+    box-shadow: 0 28px 64px rgba(var(--pz-shadow-rgb), 0.48);
 }
 
-html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-modal-content h3,
-body.dark-mode .shared-edit-token-modal .shared-edit-token-modal-content h3 {
-    color: #f5f7fa;
+html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-modal-content h3 {
+    color: var(--dm-text-bright);
 }
 
-html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-modal-content p,
-body.dark-mode .shared-edit-token-modal .shared-edit-token-modal-content p {
-    color: #c4ccd6;
+html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-modal-content p {
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-field-label,
-html[data-theme='dark'] .shared-edit-token-modal .indexable-label-text,
-body.dark-mode .shared-edit-token-modal .shared-edit-token-field-label,
-body.dark-mode .shared-edit-token-modal .indexable-label-text {
-    color: #eef2f7;
+html[data-theme='dark'] .shared-edit-token-modal .indexable-label-text {
+    color: var(--dm-text-bright);
 }
 
-html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-url-row,
-body.dark-mode .shared-edit-token-modal .workspace-share-modal-url-row {
+html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-url-row {
     background: transparent;
     border-color: transparent;
 }
 
-html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-url,
-body.dark-mode .shared-edit-token-modal .workspace-share-modal-url {
-    color: #93c5fd;
+html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-url {
+    color: var(--dm-accent-hover);
 }
 
-html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-url.is-preview,
-body.dark-mode .shared-edit-token-modal .workspace-share-modal-url.is-preview {
-    color: #d8dde5;
+html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-url.is-preview {
+    color: var(--dm-text-bright);
 }
 
-html[data-theme='dark'] .shared-edit-token-modal a.workspace-share-modal-url:hover,
-body.dark-mode .shared-edit-token-modal .workspace-share-modal-url:hover {
-    color: #bfdbfe;
+html[data-theme='dark'] .shared-edit-token-modal a.workspace-share-modal-url:hover {
+    color: var(--dm-accent-hover);
 }
 
-html[data-theme='dark'] .shared-edit-token-modal .modal-password-input,
-body.dark-mode .shared-edit-token-modal .modal-password-input {
-    background: #34383d;
-    border-color: #5b636d;
-    color: #f5f7fa;
+html[data-theme='dark'] .shared-edit-token-modal .modal-password-input {
+    background: var(--dm-surface-hover);
+    border-color: var(--dm-neutral);
+    color: var(--dm-text-bright);
 }
 
-html[data-theme='dark'] .shared-edit-token-modal .modal-password-input::placeholder,
-body.dark-mode .shared-edit-token-modal .modal-password-input::placeholder {
-    color: #aeb7c2;
+html[data-theme='dark'] .shared-edit-token-modal .modal-password-input::placeholder {
+    color: var(--dm-text);
     opacity: 1;
 }
 
-html[data-theme='dark'] .shared-edit-token-modal .modal-password-input:focus,
-body.dark-mode .shared-edit-token-modal .modal-password-input:focus {
+html[data-theme='dark'] .shared-edit-token-modal .modal-password-input:focus {
     outline: none;
-    border-color: #66b3ff;
+    border-color: var(--dm-accent-hover);
     box-shadow: 0 0 0 2px rgba(102, 179, 255, 0.18);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-password-toggle,
-html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-copy-btn,
-body.dark-mode .shared-edit-token-modal .shared-edit-token-password-toggle,
-body.dark-mode .shared-edit-token-modal .workspace-share-modal-copy-btn {
-    background: #454b52;
-    border-color: #5b636d;
-    color: #f5f7fa;
+html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-copy-btn {
+    background: var(--dm-surface-raised);
+    border-color: var(--dm-neutral);
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-password-toggle:hover,
-html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-copy-btn:hover,
-body.dark-mode .shared-edit-token-modal .shared-edit-token-password-toggle:hover,
-body.dark-mode .shared-edit-token-modal .workspace-share-modal-copy-btn:hover {
-    background: #535b64;
-    color: #ffffff;
+html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-copy-btn:hover {
+    background: var(--dm-neutral);
+    color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .share-indexable-wrap,
-html[data-theme='dark'] .shared-edit-token-modal .share-restrict-users-wrap,
-body.dark-mode .shared-edit-token-modal .share-indexable-wrap,
-body.dark-mode .shared-edit-token-modal .share-restrict-users-wrap {
-    background: rgba(255, 255, 255, 0.03);
-    border-color: rgba(255, 255, 255, 0.08);
+html[data-theme='dark'] .shared-edit-token-modal .share-restrict-users-wrap {
+    background: rgba(var(--pz-highlight-rgb), 0.03);
+    border-color: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
-html[data-theme='dark'] .shared-edit-token-modal .share-user-list-container,
-body.dark-mode .shared-edit-token-modal .share-user-list-container {
-    background: #2d3136;
-    border-color: rgba(255, 255, 255, 0.08);
+html[data-theme='dark'] .shared-edit-token-modal .share-user-list-container {
+    background: var(--dm-surface);
+    border-color: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .share-user-list-row,
 html[data-theme='dark'] .shared-edit-token-modal .share-user-list-name,
-html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message,
-body.dark-mode .shared-edit-token-modal .share-user-list-row,
-body.dark-mode .shared-edit-token-modal .share-user-list-name,
-body.dark-mode .shared-edit-token-modal .share-user-list-message {
-    color: #d8dde5;
+html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message {
+    color: var(--dm-text-bright);
 }
 
-html[data-theme='dark'] .shared-edit-token-modal .share-user-list-row + .share-user-list-row,
-body.dark-mode .shared-edit-token-modal .share-user-list-row + .share-user-list-row {
-    border-top-color: rgba(255, 255, 255, 0.08);
+html[data-theme='dark'] .shared-edit-token-modal .share-user-list-row + .share-user-list-row {
+    border-top-color: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
-html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-error,
-body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
-    color: #ff9f9f;
+html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-error {
+    color: var(--dm-danger);
 }
 
 /* Boutons d'action */
 .action-btn {
     padding: 6px 12px;
     font-size: 12px;
-    border-radius: 3px;
-    border: 1px solid #dee2e6;
-    background-color: white;
-    color: #ffffff;
+    border-radius: var(--pz-radius-sm);
+    border: 1px solid var(--pz-border);
+    background-color: var(--pz-bg);
+    color: var(--pz-text-inverse);
     cursor: pointer;
     transition: all 0.2s;
     margin-left: 0;
@@ -852,7 +818,7 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        border-radius: 6px;
+        border-radius: var(--pz-radius);
         background: var(--pz-surface-hover);
         border: 1px solid var(--pz-border-strong);
         align-self: center;
@@ -880,7 +846,7 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
 
 .btn-rename {
     background-color: var(--pz-warning);
-    color: white;
+    color: var(--pz-text-inverse);
     border-color: var(--pz-warning);
     display: inline-flex;
     align-items: center;
@@ -888,14 +854,14 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
 }
 
 .btn-rename:hover {
-    background-color: #e0a800;
-    border-color: #d39e00;
+    background-color: var(--pz-warning-hover);
+    border-color: var(--pz-warning-hover);
 }
 
 .btn-background {
-    background-color: #6c757d;
-    color: white;
-    border-color: #6c757d;
+    background-color: var(--pz-neutral);
+    color: var(--pz-text-inverse);
+    border-color: var(--pz-neutral);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -903,8 +869,8 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
 }
 
 .btn-background:hover {
-    background-color: #5a6268;
-    border-color: #545b62;
+    background-color: var(--pz-neutral-hover);
+    border-color: var(--pz-neutral-hover);
 }
 
 @keyframes spin {
@@ -919,10 +885,10 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
     justify-content: center;
     width: 32px;
     height: 32px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background: white;
-    color: #666;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm);
+    background: var(--pz-bg);
+    color: var(--pz-text-muted);
     cursor: pointer;
     transition: all 0.2s ease;
     margin-right: 5px;
@@ -950,75 +916,20 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
 
 .workspace-list .action-btn:active { transform: translateY(1px); }
 
-/* Disabled / grayed buttons */
-.btn[disabled], .btn.disabled {
-    background: #e9ecef !important;
-    color: #6c757d !important;
-    border-color: #ddd !important;
-    cursor: not-allowed;
-    box-shadow: none !important;
-    opacity: 0.95;
-}
+/* The disabled look belongs to components/buttons.css. This file used to
+   restate it on a bare .btn, which reached the five pages it loads on and
+   overrode the base's deliberate "a locked destructive action stays red"
+   rule; border-color and box-shadow were no-ops, the base sets neither. */
 
 /* Lock icon for default workspace */
-.locked-icon { color: #777; margin-left: 8px; font-size: 0.9rem; }
-
-.btn {
-    display: inline-block;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: 400;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 6px;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-sizing: border-box;
-    line-height: 1.4;
-}
-
-.btn-primary {
-    background: var(--pz-accent);
-    color: white;
-}
-
-.btn-primary:hover {
-    background: var(--pz-accent-hover);
-}
-
-.btn-success {
-    background: var(--pz-success);
-    color: white;
-}
-
-.btn-success:hover {
-    background: #218838;
-}
-
-.btn:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-}
-
-.btn-secondary {
-    background: #6c757d;
-    color: white;
-    /* margin-right: 15px; */
-}
-
-.btn-secondary:hover {
-    background: #5a6268;
-    color: white;
-    text-decoration: none;
-}
+.locked-icon { color: var(--pz-text-muted); margin-left: 8px; font-size: 0.9rem; }
 
 .form-group input[type="text"], 
 .form-group input[type="password"] {
     width: 100%;
     padding: 10px 40px 10px 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm);
     font-size: 14px;
     box-sizing: border-box;
 }
@@ -1062,7 +973,7 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
         align-items: stretch !important;
         gap: 10px !important;
         padding: 15px 0 !important;
-        border-bottom: 1px solid var(--pz-border) !important;
+        border-bottom: 1px solid var(--pz-border);
     }
     
     .workspace-list .ws-col {
@@ -1091,7 +1002,7 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
         margin-bottom: 0 !important;
         padding: 12px !important;
         font-size: 15px !important;
-        font-weight: 500 !important;
+        font-weight: var(--pz-weight-medium) !important;
         min-height: 44px !important;
         display: flex !important;
         align-items: center !important;
@@ -1171,18 +1082,18 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
     justify-content: center !important;
     width: 36px !important; /* Slightly larger on mobile for easier touch */
     height: 36px !important;
-    border: 1px solid #ddd !important;
-    border-radius: 4px !important;
-    background: white !important;
-    color: #666 !important;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm)!important;
+    background: var(--pz-bg);
+    color: var(--pz-text-muted);
     cursor: pointer !important;
     transition: all 0.2s ease !important;
     margin-right: 8px !important; /* More spacing on mobile */
 }
 
 .btn-icon:hover {
-    background: var(--pz-surface) !important;
-    border-color: #bbb !important;
+    background: var(--pz-surface);
+    border-color: #bbb;
 }
 
 .btn-icon svg {
@@ -1191,13 +1102,13 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
 }
 
 .btn-download:hover {
-    color: var(--pz-success) !important;
-    border-color: var(--pz-success) !important;
+    color: var(--pz-success);
+    border-color: var(--pz-success);
 }
 
 .btn-delete:hover {
-    color: var(--pz-danger) !important;
-    border-color: var(--pz-danger) !important;
+    color: var(--pz-danger);
+    border-color: var(--pz-danger);
 }
 
 .workspace-list ul li {
@@ -1205,7 +1116,7 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
     grid-auto-rows: auto;
     gap: 8px;
     padding: 10px 6px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--pz-border-light);
 }
 
 /* ===========================================
@@ -1233,7 +1144,7 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
 /* Default workspace status message */
 .default-workspace-status {
     margin-top: 8px;
-    color: #10b981;
+    color: var(--pz-success);
     display: none;
 }
 

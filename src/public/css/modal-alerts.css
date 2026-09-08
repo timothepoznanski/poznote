@@ -18,8 +18,8 @@
     align-items: center;
     justify-content: center;
     border: 1px solid rgba(229, 231, 235, 0.85);
-    border-radius: 8px;
-    background: #ffffff;
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
     box-shadow: 0 18px 40px rgba(15, 23, 42, 0.22);
 }
 
@@ -28,9 +28,9 @@
     flex-direction: column;
     align-items: center;
     gap: 12px;
-    color: #4b5563;
+    color: var(--pz-text-secondary);
     font-size: 13px;
-    font-weight: 500;
+    font-weight: var(--pz-weight-medium);
 }
 
 .note-creation-loading-content i {
@@ -39,21 +39,14 @@
     line-height: 1;
 }
 
-html[data-theme='dark'] .note-creation-loading-modal,
-body.dark-mode .note-creation-loading-modal {
-    background: rgba(0, 0, 0, 0.46);
+html[data-theme='dark'] .note-creation-loading-modal {
+    background: rgba(var(--pz-shadow-rgb), 0.46);
 }
 
-html[data-theme='dark'] .note-creation-loading-dialog,
-body.dark-mode .note-creation-loading-dialog {
+html[data-theme='dark'] .note-creation-loading-dialog {
     background: var(--dm-surface);
     border-color: var(--dm-border);
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.42);
-}
-
-html[data-theme='dark'] .note-creation-loading-content,
-body.dark-mode .note-creation-loading-content {
-    color: var(--dm-text-muted);
+    box-shadow: 0 18px 40px rgba(var(--pz-shadow-rgb), 0.42);
 }
 
 .alert-modal-overlay {
@@ -62,7 +55,7 @@ body.dark-mode .note-creation-loading-content {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(var(--pz-shadow-rgb), 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -78,9 +71,9 @@ body.dark-mode .note-creation-loading-content {
 }
 
 .alert-modal {
-    background: var(--bg-color, #fff);
-    border-radius: 8px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    background: var(--bg-color, var(--pz-bg));
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 10px 30px rgba(var(--pz-shadow-rgb), 0.3);
     max-width: 400px;
     width: 90%;
     max-height: 80vh;
@@ -101,7 +94,7 @@ body.dark-mode .note-creation-loading-content {
 .alert-modal-title {
     margin: 0 0 16px 0;
     font-size: 18px;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     color: var(--text-color, var(--pz-text));
     display: flex;
     align-items: center;
@@ -113,24 +106,24 @@ body.dark-mode .note-creation-loading-content {
 }
 
 .alert-modal-icon.warning {
-    color: #ff9800;
+    color: var(--pz-warning-hover);
 }
 
 .alert-modal-icon.error {
-    color: #f44336;
+    color: var(--pz-danger);
 }
 
 .alert-modal-icon.info {
-    color: #2196f3;
+    color: var(--pz-accent);
 }
 
 .alert-modal-icon.success {
-    color: #4caf50;
+    color: var(--pz-success);
 }
 
 .alert-modal-body {
     padding: 20px;
-    color: var(--text-color, #666);
+    color: var(--text-color, var(--pz-text-muted));
     line-height: 1.5;
 }
 
@@ -144,10 +137,10 @@ body.dark-mode .note-creation-loading-content {
 .alert-modal-button {
     padding: 10px 20px;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
     cursor: pointer;
     font-size: 14px;
-    font-weight: 400;
+    font-weight: var(--pz-weight-normal);
     transition: all 0.2s ease;
     min-width: 80px;
 }
@@ -158,12 +151,12 @@ body.dark-mode .note-creation-loading-content {
 }
 
 .alert-modal-button.primary {
-    background: var(--primary-color, var(--pz-accent));
-    color: white;
+    background: var(--pz-accent);
+    color: var(--pz-text-inverse);
 }
 
 .alert-modal-button.primary:hover {
-    background: var(--primary-color-dark, var(--pz-accent-hover));
+    background: var(--pz-accent-hover);
 }
 
 .alert-modal.snapshot-restore-confirm .alert-modal-button.primary,
@@ -177,12 +170,12 @@ body.dark-mode .note-creation-loading-content {
 }
 
 .alert-modal-button.secondary {
-    background: #e04b4b;
-    color: white;
+    background: var(--pz-danger);
+    color: var(--pz-text-inverse);
 }
 
 .alert-modal-button.secondary:hover {
-    background: #c43b3b;
+    background: var(--pz-danger-hover);
 }
 
 /* Destructive confirmation (confirmButtonClass: 'danger'): the confirm button
@@ -192,29 +185,29 @@ body.dark-mode .note-creation-loading-content {
 }
 
 .alert-modal-button.primary.danger:hover {
-    background: #b62b39;
+    background: var(--pz-danger-hover);
 }
 
 /* Dark mode support */
 html[data-theme='dark'] .alert-modal,
 .dark-mode .alert-modal {
-    background: var(--bg-color-dark, #2d3748);
-    color: var(--text-color-dark, #e2e8f0);
+    background: var(--dm-surface);
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .alert-modal-header,
 .dark-mode .alert-modal-header {
-    border-color: var(--border-color-dark, #4a5568);
+    border-color: var(--dm-border-light);
 }
 
 html[data-theme='dark'] .alert-modal-title,
 .dark-mode .alert-modal-title {
-    color: var(--text-color-dark, #e2e8f0);
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .alert-modal-body,
 .dark-mode .alert-modal-body {
-    color: var(--text-color-dark, #cbd5e0);
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .alert-modal-button,
@@ -231,37 +224,37 @@ html[data-theme='dark'] .alert-modal-button:hover,
 
 html[data-theme='dark'] .alert-modal-button.primary,
 .dark-mode .alert-modal-button.primary {
-    background-color: var(--primary-color, var(--pz-accent));
-    color: white;
+    background-color: var(--pz-accent);
+    color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .alert-modal-button.primary:hover,
 .dark-mode .alert-modal-button.primary:hover {
-    background-color: var(--primary-color-dark, var(--pz-accent-hover));
+    background-color: var(--pz-accent-hover);
 }
 
 /* Placed after the .primary rule above, which sets background-color and would
    otherwise win over the light-mode danger shorthand. */
 html[data-theme='dark'] .alert-modal-button.primary.danger,
 .dark-mode .alert-modal-button.primary.danger {
-    background-color: #dc3545;
-    color: #fff;
+    background-color: var(--dm-danger-hover);
+    color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .alert-modal-button.primary.danger:hover,
 .dark-mode .alert-modal-button.primary.danger:hover {
-    background-color: #b62b39;
+    background-color: var(--dm-danger-hover);
 }
 
 html[data-theme='dark'] .alert-modal-button.secondary,
 .dark-mode .alert-modal-button.secondary {
-    background-color: #e04b4b;
-    color: #fff;
+    background-color: var(--dm-danger-hover);
+    color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .alert-modal-button.secondary:hover,
 .dark-mode .alert-modal-button.secondary:hover {
-    background-color: #c43b3b;
+    background-color: var(--dm-danger-hover);
 }
 
 html[data-theme='dark'] .alert-modal.snapshot-restore-confirm .alert-modal-button.primary,
@@ -304,13 +297,6 @@ html[data-theme='dark'] .alert-modal-button.primary.snapshot-restore-confirm-but
     /* Prevent interaction with background */
 }
 
-/* Base animation for indeterminate progress bars */
-@keyframes indeterminate-progress {
-    0% { left: -30%; width: 30%; }
-    50% { left: 40%; width: 60%; }
-    100% { left: 100%; width: 30%; }
-}
-
 /* Progress Bar Modal */
 .progress-modal {
     text-align: center;
@@ -320,7 +306,7 @@ html[data-theme='dark'] .alert-modal-button.primary.snapshot-restore-confirm-but
     width: 100%;
     height: 12px;
     background: var(--border-color, var(--pz-border));
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     overflow: hidden;
     margin: 15px 0;
     position: relative;
@@ -328,7 +314,7 @@ html[data-theme='dark'] .alert-modal-button.primary.snapshot-restore-confirm-but
 
 .progress-bar-inner {
     height: 100%;
-    background: var(--primary-color, var(--pz-accent));
+    background: var(--pz-accent);
     width: 0%;
     position: absolute;
     left: 0;
@@ -337,7 +323,7 @@ html[data-theme='dark'] .alert-modal-button.primary.snapshot-restore-confirm-but
 
 html[data-theme='dark'] .progress-container,
 .dark-mode .progress-container {
-    background: var(--border-color-dark, #4a5568);
+    background: #4a5568;
 }
 
 .spinner-icon {
@@ -350,8 +336,8 @@ html[data-theme='dark'] .progress-container,
     width: 20px;
     height: 20px;
     border: 2px solid var(--border-color, var(--pz-border));
-    border-top: 2px solid var(--primary-color, var(--pz-accent));
-    border-radius: 50%;
+    border-top: 2px solid var(--pz-accent);
+    border-radius: var(--pz-radius-circle);
     animation: spin 1s linear infinite;
 }
 
@@ -368,8 +354,8 @@ html[data-theme='dark'] .progress-container,
 /* Dark mode spinner */
 html[data-theme='dark'] .spinner,
 .dark-mode .spinner {
-    border-color: var(--border-color-dark, #4a5568);
-    border-top-color: var(--primary-color, var(--pz-accent));
+    border-color: var(--dm-border-light);
+    border-top-color: var(--pz-accent);
 }
 
 /* Admin contact modal (SaaS mode): two routing options, GitHub for general
@@ -381,15 +367,17 @@ html[data-theme='dark'] .spinner,
     text-align: left;
     white-space: normal;
 }
+
 .admin-contact-option {
     display: flex;
     gap: 12px;
     align-items: flex-start;
     padding: 14px;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    background: #f9fafb;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-surface);
 }
+
 .admin-contact-option > .lucide {
     flex: none;
     margin-top: 3px;
@@ -397,32 +385,38 @@ html[data-theme='dark'] .spinner,
     color: var(--pz-accent);
     background-color: var(--pz-accent);
 }
+
 .admin-contact-option-title {
     display: block;
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     margin-bottom: 3px;
 }
+
 .admin-contact-option-desc {
     display: block;
     color: var(--pz-text-muted);
     font-size: 0.92rem;
     line-height: 1.45;
 }
+
 .admin-contact-option a {
     display: inline-flex;
     align-items: center;
     gap: 5px;
     margin-top: 8px;
     color: var(--pz-accent);
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     text-decoration: none;
 }
+
 .admin-contact-option a:hover {
     text-decoration: underline;
 }
+
 .admin-contact-option a .lucide {
     font-size: 0.85em;
 }
+
 .admin-contact-email-row {
     display: flex;
     align-items: center;
@@ -430,46 +424,43 @@ html[data-theme='dark'] .spinner,
     margin-top: 8px;
     flex-wrap: wrap;
 }
+
 .admin-contact-email {
-    font-weight: 600;
+    font-weight: var(--pz-weight-semibold);
     padding: 4px 10px;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    background: #fff;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    background: var(--pz-bg);
 }
+
 .admin-contact-copy {
     display: inline-flex;
     align-items: center;
     gap: 5px;
     padding: 4px 10px;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    background: #fff;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    background: var(--pz-bg);
     cursor: pointer;
     font: inherit;
     font-size: 0.85rem;
     color: inherit;
 }
+
 .admin-contact-copy:hover {
     border-color: var(--pz-accent);
     color: var(--pz-accent);
 }
+
 .admin-contact-copy .lucide {
     font-size: 0.9em;
 }
-html[data-theme='dark'] .admin-contact-option,
-body.dark-mode .admin-contact-option {
-    background: var(--dm-surface, #1f2937);
-    border-color: var(--dm-border, #374151);
-}
-html[data-theme='dark'] .admin-contact-option-desc,
-body.dark-mode .admin-contact-option-desc {
-    color: #9ca3af;
-}
-html[data-theme='dark'] .admin-contact-email,
-html[data-theme='dark'] .admin-contact-copy,
-body.dark-mode .admin-contact-email,
-body.dark-mode .admin-contact-copy {
+
+html[data-theme='dark'] .admin-contact-option {
+    background: var(--dm-surface, var(--dm-content-bg));
+    border-color: var(--dm-border, var(--dm-border));
+}html[data-theme='dark'] .admin-contact-email,
+html[data-theme='dark'] .admin-contact-copy {
     background: transparent;
-    border-color: var(--dm-border, #374151);
+    border-color: var(--dm-border, var(--dm-border));
 }

@@ -195,24 +195,7 @@ foreach ($eventHelpDefaults as $eventName => $default) {
     <title><?php echo t_h('webhooks_admin.title', [], 'Webhooks'); ?> - Poznote</title>
     <meta name="color-scheme" content="dark light">
     <script src="../js/theme-init.js?v=<?php echo $v; ?>"></script>
-    <link rel="stylesheet" href="../css/lucide.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/settings.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/users.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/workspaces.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/modals/alerts-utilities.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/modal-alerts.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/variables.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/layout.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/menus.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/modals.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/components.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/pages.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/icons.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/workspaces-inline.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/webhooks.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/icon-sidebar.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/icon-sidebar-page.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/icon-sidebar-mobile.css?v=<?php echo $v; ?>">
+    <?php poznoteRenderStylesheets('admin/webhooks', ['prefix' => '../']); ?>
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
 </head>

@@ -333,7 +333,7 @@ function renderPublicStatusPage($currentLang, array $options = []) {
     http_response_code($options['status'] ?? 403);
 
     $statusStylesheetHref = getVersionedPublicAppAssetHref('css/public_folder.css');
-    $statusVariablesStylesheetHref = getVersionedPublicAppAssetHref('css/dark-mode/variables.css');
+    $statusVariablesStylesheetHref = getVersionedPublicAppAssetHref('css/tokens.css');
     $themeInitHref = getVersionedPublicAppAssetHref('js/theme-init.js');
     $title = $options['title'] ?? t_h('common.error', [], 'Error', $currentLang);
     $message = $options['message'] ?? '';

@@ -2,6 +2,9 @@
 
 # Script to rebuild the CodeMirror Markdown editor bundle
 # Usage: ./tools/rebuild-markdown-editor.sh
+#
+# After a rebuild that changes the @codemirror packages, update the matching
+# entry in vendor.json (updated, verified).
 
 set -e
 

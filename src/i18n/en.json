@@ -1377,6 +1377,7 @@
     },
     "errors": {
       "workspace_not_found": "Workspace not found",
+      "folder_not_found": "Folder not found",
       "note_quota_reached": "Note limit reached: this instance allows at most {{max}} notes for this user (trash included).",
       "storage_quota_reached": "Storage limit reached: this instance allows at most {{max}} MB of storage for this user.",
       "linked_note_already_exists": "A shortcut already exists for this note",

@@ -22,15 +22,13 @@
     text-decoration: underline;
 }
 
-html[data-theme='dark'] .attachment-usage-notice,
-body.dark-mode .attachment-usage-notice {
-    color: #f87171;
+html[data-theme='dark'] .attachment-usage-notice {
+    color: var(--dm-danger);
 }
 
-html[data-theme='dark'] .attachment-usage-notice .lucide-alert-triangle,
-body.dark-mode .attachment-usage-notice .lucide-alert-triangle {
-    color: #f87171;
-    background-color: #f87171;
+html[data-theme='dark'] .attachment-usage-notice .lucide-alert-triangle {
+    color: var(--dm-danger);
+    background-color: var(--dm-danger);
 }
 
 /* Directly under a page title (attachments_list.php), the notice is centred

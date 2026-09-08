@@ -40,9 +40,9 @@
     font-size: 15px !important;
     margin-top: 15px !important;
     padding: 12px !important;
-    border-radius: 8px !important;
-    background-color: #f8d7da !important;
-    border: 1px solid #f5c6cb !important;
+    border-radius: var(--pz-radius-lg)!important;
+    background-color: var(--pz-danger-soft) !important;
+    border: 1px solid var(--pz-danger-soft) !important;
     display: none !important;
     box-sizing: border-box !important;
 }

@@ -12,16 +12,16 @@ body.trash-page::-webkit-scrollbar {
     display: block !important;
     /* Override global rule that hides scrollbars */
     width: 8px !important;
-    background-color: #f1f1f1 !important;
+    background-color: var(--pz-surface-hover);
 }
 
 body.trash-page::-webkit-scrollbar-thumb {
-    background-color: #c1c1c1 !important;
-    border-radius: 8px !important;
+    background-color: var(--pz-scrollbar);
+    border-radius: var(--pz-radius-lg)!important;
 }
 
 body.trash-page::-webkit-scrollbar-thumb:hover {
-    background-color: #a8a8a8 !important;
+    background-color: var(--pz-scrollbar-hover);
 }
 
 html {
@@ -38,16 +38,16 @@ body.trash-page html {
 body.trash-page html::-webkit-scrollbar {
     display: block !important;
     width: 8px !important;
-    background-color: #f1f1f1 !important;
+    background-color: var(--pz-surface-hover);
 }
 
 body.trash-page html::-webkit-scrollbar-thumb {
-    background-color: #c1c1c1 !important;
-    border-radius: 8px !important;
+    background-color: var(--pz-scrollbar);
+    border-radius: var(--pz-radius-lg)!important;
 }
 
 body.trash-page html::-webkit-scrollbar-thumb:hover {
-    background-color: #a8a8a8 !important;
+    background-color: var(--pz-scrollbar-hover);
 }
 
 body.trash-page {
@@ -75,7 +75,7 @@ body.trash-page {
 
 .trash-page-count {
     font-size: 13px;
-    color: #888;
+    color: var(--pz-text-muted);
     text-align: center;
     width: 100%;
     margin-top: 10px;
@@ -83,12 +83,12 @@ body.trash-page {
 
 .trash-search-results {
     font-size: 13px;
-    color: #666;
+    color: var(--pz-text-muted);
     white-space: nowrap;
     padding: 6px 12px;
     background-color: #f0f7ff;
-    border-radius: 6px;
-    font-weight: 500;
+    border-radius: var(--pz-radius);
+    font-weight: var(--pz-weight-medium);
     margin-left: 10px;
 }
 
@@ -120,11 +120,11 @@ body.trash-page {
 .trash-search-input {
     width: 100%;
     padding: 10px 40px 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
     font-size: 14px;
     color: var(--pz-text);
-    background-color: #f8f8f8;
+    background-color: var(--pz-surface);
     transition: all 0.2s ease;
     box-sizing: border-box;
 }
@@ -142,29 +142,29 @@ body.trash-page {
     border: none;
     padding: 6px 8px;
     cursor: pointer;
-    color: #666;
+    color: var(--pz-text-muted);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 4px;
+    border-radius: var(--pz-radius-sm);
 }
 
 .trash-search-input::placeholder {
-    color: #999 !important;
+    color: var(--pz-text-subtle);
     opacity: 1;
 }
 
 .trash-search-input::-webkit-input-placeholder {
-    color: #999 !important;
+    color: var(--pz-text-subtle);
 }
 
 .trash-search-input::-moz-placeholder {
-    color: #999 !important;
+    color: var(--pz-text-subtle);
     opacity: 1;
 }
 
 .trash-search-input:-ms-input-placeholder {
-    color: #999 !important;
+    color: var(--pz-text-subtle);
 }
 
 /* Sort toggle: two links styled as one segmented control, sitting next to the
@@ -173,17 +173,17 @@ body.trash-page {
     display: inline-flex;
     flex: 0 0 auto;
     padding: 3px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #f8f8f8;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background-color: var(--pz-surface);
 }
 
 .trash-sort-option {
     padding: 7px 14px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     font-size: 13px;
     line-height: 1.2;
-    color: #666;
+    color: var(--pz-text-muted);
     text-decoration: none;
     white-space: nowrap;
     transition: all 0.2s ease;
@@ -194,10 +194,10 @@ body.trash-page {
 }
 
 .trash-sort-option.is-active {
-    background-color: #fff;
+    background-color: var(--pz-bg);
     color: var(--pz-accent);
-    font-weight: 600;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    font-weight: var(--pz-weight-semibold);
+    box-shadow: 0 1px 2px rgba(var(--pz-shadow-rgb), 0.08);
 }
 
 .trash-buttons-container {
@@ -208,47 +208,6 @@ body.trash-page {
     margin-bottom: 30px;
 }
 
-.btn {
-    display: inline-block;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: 400;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 6px;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
-}
-
-.btn-secondary {
-    background: #6c757d;
-    color: white;
-}
-
-.btn-secondary:hover {
-    background: #5a6268;
-    color: white;
-    text-decoration: none;
-}
-
-.btn-danger {
-    background: #e04b4b;
-    color: #fff;
-    border: none;
-}
-
-.btn-danger:hover {
-    background: #c43b3b;
-}
-
-.btn:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-}
-
 .trash-content {
     padding: 20px;
     max-width: 1200px;
@@ -257,17 +216,17 @@ body.trash-page {
 
 .trash-notecard {
     position: relative;
-    border: 1px solid #ddd;
+    border: 1px solid var(--pz-border);
     margin-bottom: 15px;
-    border-radius: 10px;
-    background: white;
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
     font-family: 'Inter', sans-serif;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 3px rgba(var(--pz-shadow-rgb), 0.04);
     transition: box-shadow 0.15s ease;
 }
 
 .trash-notecard:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.08);
 }
 
 .trash-innernote {
@@ -284,7 +243,7 @@ body.trash-page {
     justify-content: space-between;
     gap: 16px;
     padding-bottom: 12px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--pz-border-light);
     margin-bottom: 12px;
 }
 
@@ -300,7 +259,7 @@ body.trash-page {
 
 .trash-note-header .lastupdated {
     font-size: 12.5px;
-    color: #888;
+    color: var(--pz-text-muted);
 }
 
 .trash-action-icons {
@@ -319,7 +278,7 @@ body.trash-page {
     height: 34px;
     padding: 0;
     border: 1px solid transparent;
-    border-radius: 8px;
+    border-radius: var(--pz-radius-lg);
     background: transparent;
     cursor: pointer;
     transition: background-color 0.15s ease, border-color 0.15s ease;
@@ -328,7 +287,7 @@ body.trash-page {
 .trash-action-btn .lucide {
     width: 17px;
     height: 17px;
-    color: #666;
+    color: var(--pz-text-muted);
     background-color: #666;
     pointer-events: none;
 }
@@ -339,18 +298,18 @@ body.trash-page {
 }
 
 .trash-restore-btn:hover .lucide {
-    color: #16a34a;
-    background-color: #16a34a;
+    color: var(--pz-success);
+    background-color: var(--pz-success);
 }
 
 .trash-delete-btn:hover {
     background: #fdecec;
-    border-color: #f5c6c6;
+    border-color: var(--pz-danger-soft);
 }
 
 .trash-delete-btn:hover .lucide {
-    color: #dc2626;
-    background-color: #dc2626;
+    color: var(--pz-danger);
+    background-color: var(--pz-danger);
 }
 
 /* Collapsed content preview with fade-out */
@@ -370,7 +329,7 @@ body.trash-page {
     right: 0;
     bottom: 0;
     height: 60px;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff);
+    background: linear-gradient(to bottom, rgba(var(--pz-highlight-rgb), 0), var(--pz-bg));
     pointer-events: none;
 }
 
@@ -385,7 +344,7 @@ body.trash-page {
     margin-top: 6px;
     padding: 5px 14px;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     background: transparent;
     color: var(--pz-accent);
     font-size: 12.5px;
@@ -428,7 +387,7 @@ body.trash-page {
 /* Empty state */
 .trash-no-notes {
     text-align: center;
-    color: #666;
+    color: var(--pz-text-muted);
     margin-top: 60px;
     font-size: 1.05em;
     padding-bottom: 100px;
@@ -440,7 +399,7 @@ body.trash-page {
     justify-content: center;
     width: 72px;
     height: 72px;
-    border-radius: 50%;
+    border-radius: var(--pz-radius-circle);
     background: var(--pz-surface-hover);
     margin-bottom: 16px;
 }
@@ -453,49 +412,49 @@ body.trash-page {
 }
 
 .trash-no-notes-text {
-    color: #666;
+    color: var(--pz-text-muted);
 }
 
 .trash-limit-notice {
     text-align: center;
     font-size: 13px;
-    color: #888;
+    color: var(--pz-text-muted);
     margin: 10px 0 30px 0;
 }
 
 .searchtrash::-webkit-input-placeholder {
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .searchtrash:-ms-input-placeholder {
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .searchtrash:focus {
-    border-bottom: 1px solid #32a1ce;
+    border-bottom: 1px solid var(--pz-accent);
 }
 
 /* Notice de recherche */
 .trash-search-notice {
     text-align: center;
     background: var(--pz-accent-soft);
-    border: 1px solid #bbdefb;
-    border-radius: 6px;
+    border: 1px solid var(--pz-accent-soft);
+    border-radius: var(--pz-radius);
     padding: 10px;
     margin: 15px 20px;
-    color: #1976d2;
+    color: var(--pz-accent);
     position: relative;
 }
 
 .trash-clear-search {
     cursor: pointer;
     margin-left: 10px;
-    color: #666;
+    color: var(--pz-text-muted);
     transition: color 0.2s;
 }
 
 .trash-clear-search:hover {
-    color: #d32f2f;
+    color: var(--pz-danger);
 }
 
 .lucide-x {
@@ -532,7 +491,7 @@ body.trash-page {
         display: block !important;
         /* Override global rule */
         width: 6px !important;
-        background-color: #f1f1f1 !important;
+        background-color: var(--pz-surface-hover);
     }
 
     body {
@@ -553,7 +512,7 @@ body.trash-page {
         display: block !important;
         /* Override global rule */
         width: 12px !important;
-        background-color: #f1f1f1 !important;
+        background-color: var(--pz-surface-hover);
     }
 
     body.trash-page {
@@ -563,7 +522,7 @@ body.trash-page {
         min-height: 100vh !important;
         position: static !important;
         padding: 10px;
-        background: #f5f5f5 !important;
+        background: var(--pz-surface-hover);
         scrollbar-width: auto !important;
         /* Override global rule */
         -ms-overflow-style: scrollbar !important;
@@ -574,7 +533,7 @@ body.trash-page {
         display: block !important;
         /* Override global rule */
         width: 12px !important;
-        background-color: #f1f1f1 !important;
+        background-color: var(--pz-surface-hover);
     }
 
     /* Fix pour iOS Safari */
@@ -625,8 +584,8 @@ body.trash-page {
 
     .trash-notecard {
         margin-bottom: 20px;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-radius: var(--pz-radius-xl);
+        box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.1);
     }
 
     .trash-innernote {
@@ -673,139 +632,116 @@ body.trash-page {
 
 /* Dark Mode Support for Trash Page */
 html[data-theme='dark'] body.trash-page,
-[data-theme='dark'] body.trash-page,
-body.dark-mode.trash-page {
-    background-color: var(--dm-content-bg) !important;
-    background: var(--dm-content-bg) !important;
+html[data-theme='dark'] body.trash-page {
+    background-color: var(--dm-content-bg);
+    background: var(--dm-content-bg);
     color: var(--dm-text);
 }
 
 html[data-theme='dark'] .trash-search-input,
-[data-theme='dark'] .trash-search-input,
-body.dark-mode .trash-search-input {
-    background-color: var(--dm-surface) !important;
-    color: var(--dm-text) !important;
-    border-color: var(--dm-border) !important;
+html[data-theme='dark'] .trash-search-input {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+    border-color: var(--dm-border);
 }
 
-[data-theme='dark'] .clear-filter-btn {
-    color: #888;
+html[data-theme='dark'] .clear-filter-btn {
+    color: var(--dm-text-subtle);
 }
 
-html[data-theme='dark'] .trash-notecard,
-body.dark-mode .trash-notecard {
-    background-color: var(--dm-surface) !important;
-    border-color: var(--dm-border) !important;
+html[data-theme='dark'] .trash-notecard {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .trash-innernote,
-body.dark-mode .trash-innernote {
+html[data-theme='dark'] .trash-innernote {
     /* background-color: var(--dm-surface) !important; */
-    color: #e0e0e0;
+    color: var(--dm-text-bright);
 }
 
-html[data-theme='dark'] .css-title,
-body.dark-mode .css-title {
+html[data-theme='dark'] .css-title {
     color: var(--dm-accent);
 }
 
-html[data-theme='dark'] .trash-no-notes,
-body.dark-mode .trash-no-notes {
-    color: #a0a0a0;
+html[data-theme='dark'] .trash-no-notes {
+    color: var(--dm-text-muted);
 }
 
-html[data-theme='dark'] .trash-search-notice,
-body.dark-mode .trash-search-notice {
-    background-color: #1a2a3a !important;
-    border-color: #2c5282 !important;
-    color: #9cc6ef !important;
+html[data-theme='dark'] .trash-search-notice {
+    background-color: var(--dm-content-bg);
+    border-color: var(--dm-accent-soft);
+    color: var(--dm-accent-hover);
 }
 
-[data-theme='dark'] .trash-search-results {
-    background-color: #1e3a52;
-    color: #9cc6ef;
+html[data-theme='dark'] .trash-search-results {
+    background-color: var(--dm-accent-soft);
+    color: var(--dm-accent-hover);
 }
 
-html[data-theme='dark'] .lastupdated,
-body.dark-mode .lastupdated {
-    color: #888;
+html[data-theme='dark'] .lastupdated {
+    color: var(--dm-text-subtle);
 }
 
-html[data-theme='dark'] .noteentry,
-body.dark-mode .noteentry {
-    color: #ccc;
+html[data-theme='dark'] .noteentry {
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .trash-page-count,
-html[data-theme='dark'] .trash-limit-notice,
-body.dark-mode .trash-page-count,
-body.dark-mode .trash-limit-notice {
-    color: #888;
+html[data-theme='dark'] .trash-limit-notice {
+    color: var(--dm-text-subtle);
 }
 
-html[data-theme='dark'] .trash-notecard,
-body.dark-mode .trash-notecard {
+html[data-theme='dark'] .trash-notecard {
     box-shadow: none;
 }
 
-html[data-theme='dark'] .trash-note-header,
-body.dark-mode .trash-note-header {
+html[data-theme='dark'] .trash-note-header {
     border-bottom-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .trash-action-btn .lucide,
-body.dark-mode .trash-action-btn .lucide {
-    color: #aaa;
-    background-color: #aaa;
+html[data-theme='dark'] .trash-action-btn .lucide {
+    color: var(--dm-text-muted);
+    background-color: var(--dm-text-muted);
 }
 
-html[data-theme='dark'] .trash-restore-btn:hover,
-body.dark-mode .trash-restore-btn:hover {
+html[data-theme='dark'] .trash-restore-btn:hover {
     background: rgba(34, 197, 94, 0.12);
     border-color: rgba(34, 197, 94, 0.3);
 }
 
-html[data-theme='dark'] .trash-restore-btn:hover .lucide,
-body.dark-mode .trash-restore-btn:hover .lucide {
-    color: #4ade80;
-    background-color: #4ade80;
+html[data-theme='dark'] .trash-restore-btn:hover .lucide {
+    color: var(--dm-success);
+    background-color: var(--dm-success);
 }
 
-html[data-theme='dark'] .trash-delete-btn:hover,
-body.dark-mode .trash-delete-btn:hover {
+html[data-theme='dark'] .trash-delete-btn:hover {
     background: rgba(220, 38, 38, 0.12);
     border-color: rgba(220, 38, 38, 0.3);
 }
 
-html[data-theme='dark'] .trash-delete-btn:hover .lucide,
-body.dark-mode .trash-delete-btn:hover .lucide {
-    color: #f87171;
-    background-color: #f87171;
+html[data-theme='dark'] .trash-delete-btn:hover .lucide {
+    color: var(--dm-danger);
+    background-color: var(--dm-danger);
 }
 
 /* The card's inner surface is --dm-content-bg (see dark-mode/pages.css .trash-innernote) */
-html[data-theme='dark'] .trash-preview-fade,
-body.dark-mode .trash-preview-fade {
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0), var(--dm-content-bg));
+html[data-theme='dark'] .trash-preview-fade {
+    background: linear-gradient(to bottom, rgba(var(--pz-shadow-rgb), 0), var(--dm-content-bg));
 }
 
-html[data-theme='dark'] .trash-expand-btn:hover,
-body.dark-mode .trash-expand-btn:hover {
-    background: rgba(74, 158, 255, 0.1);
+html[data-theme='dark'] .trash-expand-btn:hover {
+    background: rgba(var(--dm-accent-rgb), 0.1);
 }
 
-html[data-theme='dark'] .trash-expand-btn,
-body.dark-mode .trash-expand-btn {
+html[data-theme='dark'] .trash-expand-btn {
     color: var(--dm-accent);
 }
 
-html[data-theme='dark'] .trash-expand-btn .lucide,
-body.dark-mode .trash-expand-btn .lucide {
+html[data-theme='dark'] .trash-expand-btn .lucide {
     color: var(--dm-accent);
     background-color: var(--dm-accent);
 }
 
-html[data-theme='dark'] .trash-no-notes-icon,
-body.dark-mode .trash-no-notes-icon {
+html[data-theme='dark'] .trash-no-notes-icon {
     background: var(--dm-surface);
 }

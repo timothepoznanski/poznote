@@ -33,30 +33,9 @@ $pageWorkspace = trim(getWorkspaceFilter());
     <title><?php echo getPageTitle(); ?></title>
     <meta name="color-scheme" content="dark light">
     <script src="../js/theme-init.js?v=<?php echo $v; ?>"></script>
-    <link rel="stylesheet" href="../css/lucide.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/settings.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/users.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/restore_import/base.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/restore_import/cards.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/restore_import/forms-buttons.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/restore_import/modals.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/restore_import/utilities.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/modals/base.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/modals/alerts-utilities.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/variables.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/layout.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/menus.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/editor.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/modals.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/components.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/pages.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/icons.css?v=<?php echo $v; ?>">
+    <?php poznoteRenderStylesheets('admin/disaster-recovery', ['prefix' => '../']); ?>
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
-    <link rel="stylesheet" href="../css/admin-tools.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/icon-sidebar.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/icon-sidebar-page.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/icon-sidebar-mobile.css?v=<?php echo $v; ?>">
     <script src="../js/globals.js?v=<?php echo $v; ?>"></script>
 </head>
 <body class="has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">

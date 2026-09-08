@@ -67,8 +67,8 @@ body {
 
 .sidebar-title {
     font-size: 1.25rem;
-    font-weight: 700;
-    color: #1f2937;
+    font-weight: var(--pz-weight-bold);
+    color: var(--pz-text);
     /* dark */
     display: flex;
     align-items: center;
@@ -78,7 +78,7 @@ body {
 .workspace-dropdown-icon {
     margin-left: 1px;
     font-size: 0.9rem;
-    color: #6c757d;
+    color: var(--pz-text-muted);
     pointer-events: none;
     transition: transform 0.2s ease;
     position: relative;
@@ -111,11 +111,11 @@ body {
 .sidebar-howto{
     background: transparent;
     border: none;
-    color: var(--pz-accent) !important;
+    color: var(--pz-accent);
     font-size: 1.3rem;
     cursor: pointer;
     padding: 6px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -125,11 +125,11 @@ body {
 .sidebar-plus {
     background: transparent;
     border: none;
-    color: #6c757d !important;
+    color: var(--pz-text-muted);
     font-size: 1.2rem;
     cursor: pointer;
     padding: 6px;
-    border-radius: 6px;
+    border-radius: var(--pz-radius);
 }
 
 /* Hover and focus states for sidebar buttons */
@@ -152,7 +152,7 @@ body {
     height: 100vh;
     display: flex;
     flex-direction: column;
-    background-color: #FFFFFF;
+    background-color: var(--pz-bg);
     overflow: hidden;
 }
 
@@ -180,7 +180,7 @@ body {
     cursor: col-resize;
     position: relative;
     flex-shrink: 0;
-    border-right: 1px solid #dee2e6;
+    border-right: 1px solid var(--pz-border);
 }
 
 /* Extend hover area for easier button access */
@@ -203,19 +203,19 @@ body {
     left: 0;
     width: 16px;
     height: 25px;
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 0 4px 4px 0;
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border-strong);
+    border-radius: 0 var(--pz-radius-sm) var(--pz-radius-sm) 0;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #6c757d;
+    color: var(--pz-text-muted);
     font-size: 0.875rem;
     padding: 0;
     transition: all 0.2s ease;
     z-index: 10;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 4px rgba(var(--pz-shadow-rgb), 0.05);
     opacity: 1;
     pointer-events: auto;
 }
@@ -229,7 +229,7 @@ body {
 .toggle-sidebar-btn:hover {
     background: var(--pz-surface);
     color: var(--pz-accent);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.1);
 }
 
 .toggle-sidebar-btn i {
@@ -246,7 +246,7 @@ body {
     background-color: currentColor;
     -webkit-mask-size: 100% 100%;
     mask-size: 100% 100%;
-    filter: none !important;
+    filter: none;
 }
 
 /* Collapsed state */
@@ -269,7 +269,7 @@ body.sidebar-collapsed .resize-handle {
    side, rail toggle first. See #iconSidebarToggle in css/icon-sidebar.css. */
 body.sidebar-collapsed .toggle-sidebar-btn {
     left: 20px;
-    border-radius: 0 4px 4px 0;
+    border-radius: 0 var(--pz-radius-sm) var(--pz-radius-sm) 0;
     opacity: 1;
     pointer-events: auto;
     z-index: 12;

@@ -25,7 +25,7 @@
 
 .folder-option.selected {
     background-color: var(--pz-accent);
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .folder-option.selected:hover {
@@ -35,10 +35,10 @@
 .folder-option i {
     margin-right: 10px;
     width: 16px;
-    color: #666;
+    color: var(--pz-text-muted);
     flex-shrink: 0;
 }
 
 .folder-option.selected i {
-    color: white;
+    color: var(--pz-text-inverse);
 }

@@ -441,13 +441,20 @@ paths:
                   example: 12
                 folder:
                   type: string
-                  description: Target folder name (alternative to folder_id)
+                  description: >
+                    Target folder path (alternative to folder_id). Missing
+                    segments are created. 'folder_name' is accepted as an
+                    older spelling of the same parameter.
                 type:
                   type: string
                   enum: [note, markdown, tasklist]
                   default: note
                 tags:
-                  type: string
+                  oneOf:
+                    - type: string
+                    - type: array
+                      items:
+                        type: string
                   example: "tag1,tag2"
       responses:
         '201':
@@ -623,11 +630,21 @@ paths:
                 content:
                   type: string
                 tags:
-                  type: string
+                  oneOf:
+                    - type: string
+                    - type: array
+                      items:
+                        type: string
                 folder_id:
                   type: integer
                   nullable: true
                   description: ID of the folder (optional)
+                folder:
+                  type: string
+                  description: >
+                    Target folder path (alternative to folder_id). Missing
+                    segments are created, an empty string moves the note to
+                    the workspace root, and folder_id wins when both are sent.
                 if_version:
                   type: string
                   description: >
@@ -1248,6 +1265,8 @@ paths:
       responses:
         '200':
           description: Lock refreshed
+        '404':
+          description: Note not found
         '409':
           description: Note is locked by another session
 
@@ -1274,6 +1293,8 @@ paths:
       responses:
         '200':
           description: Lock released (or was not held)
+        '404':
+          description: Note not found
 
   # ==================
   # Snapshots Endpoints
@@ -1879,7 +1900,9 @@ paths:
             type: integer
       responses:
         '200':
-          description: Reminder removed (also returned when the note does not exist)
+          description: Reminder removed
+        '404':
+          description: Note not found or in trash
           content:
             application/json:
               schema:
@@ -2038,6 +2061,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        '404':
+          description: Note not found or in trash
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /reminders:
     get:
@@ -2150,8 +2179,7 @@ paths:
       summary: Mark a notification as read
       description: >
         Clears the unread flag, which lowers unread_count but leaves the
-        notification in the list. Use dismiss to remove it. This endpoint does
-        not check that the notification exists.
+        notification in the list. Use dismiss to remove it.
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
         - name: id
@@ -2176,6 +2204,12 @@ paths:
                     example: 12
         '400':
           description: Invalid notification ID (not numeric)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Notification not found
           content:
             application/json:
               schema:
@@ -2222,6 +2256,12 @@ paths:
                     example: "2026-08-17 07:00:00"
         '400':
           description: Invalid notification ID (not numeric)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Notification not found
           content:
             application/json:
               schema:
@@ -2833,6 +2873,8 @@ paths:
       responses:
         '200':
           description: Folder emptied
+        '404':
+          description: Folder not found
 
   /folders/{id}/icon:
     put:
@@ -2857,6 +2899,8 @@ paths:
       responses:
         '200':
           description: Icon updated
+        '404':
+          description: Folder not found
 
   /folders/{id}/pinned:
     put:
@@ -2986,6 +3030,8 @@ paths:
       responses:
         '200':
           description: Note count
+        '404':
+          description: Folder not found
 
   /folders/{id}/path:
     get:
@@ -3001,6 +3047,8 @@ paths:
       responses:
         '200':
           description: Folder path
+        '404':
+          description: Folder not found
 
   # ==================
   # Trash Endpoints
@@ -3184,6 +3232,8 @@ paths:
       responses:
         '200':
           description: Tag renamed
+        '404':
+          description: No note carries this tag
     delete:
       tags: [Tags]
       summary: Delete a tag from all notes
@@ -3202,6 +3252,8 @@ paths:
       responses:
         '200':
           description: Tag deleted
+        '404':
+          description: No note carries this tag
 
   # ==================
   # Settings Endpoints
