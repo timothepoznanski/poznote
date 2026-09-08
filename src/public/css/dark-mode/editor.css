@@ -18,11 +18,11 @@ html[data-theme='dark'] .note-header {
 }
 
 html[data-theme='dark'] .note-edit-toolbar {
-    background-color: var(--dm-content-bg) !important;
+    background-color: var(--dm-content-bg);
 }
 
 html[data-theme='dark'] .note-header-spacer {
-    background-color: var(--dm-content-bg) !important;
+    background-color: var(--dm-content-bg);
 }
 
 /* Note title */
@@ -323,7 +323,7 @@ html[data-theme='dark'] .color-palette-popup {
 }
 
 html[data-theme='dark'] .color-palette-popup .color-grid {
-    background: var(--dm-surface) !important;
+    background: var(--dm-surface);
 }
 
 /* Outline swatches so dark ones (e.g. the black text color) stay visible

@@ -106,7 +106,7 @@ html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview [data-l
 }
 
 html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor {
-    background-color: transparent !important;
+    background-color: transparent;
     color: var(--dm-text);
 }
 

@@ -27,11 +27,11 @@ html[data-theme='dark'] h1 {
 }
 
 html[data-theme='dark'] .tags-info {
-    color: var(--dm-text) !important;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .tag-name {
-    color: var(--dm-text) !important;
+    color: var(--dm-text);
 }
 
 /* Editable tags */
@@ -327,6 +327,13 @@ html[data-theme='dark'] .btn-secondary:hover {
     background-color: var(--dm-surface-hover);
 }
 
+/* The !important is load-bearing and must stay until the dark modal rules are
+   restructured: html[data-theme='dark'] .modal-buttons button is (0,2,2) and
+   beats this (0,2,1), so without it every primary button inside a dialog falls
+   back to the neutral surface. The cost is that it also flattens the rules that
+   style a button in context, such as the tinted row actions of the shares page.
+   Fixing that means giving the variants their own specificity, not deleting
+   this. See src/public/css/README.md. */
 html[data-theme='dark'] .btn-primary {
     background-color: var(--pz-accent) !important;
     color: var(--pz-text-inverse) !important;
@@ -359,7 +366,7 @@ html[data-theme='dark'] .btn-rename:hover {
 
 html[data-theme='dark'] .btn-background {
     background-color: #6c757d !important;
-    color: var(--pz-text-inverse) !important;
+    color: var(--pz-text-inverse);
     border-color: #6c757d !important;
 }
 
@@ -370,9 +377,9 @@ html[data-theme='dark'] .btn-background:hover {
 
 html[data-theme='dark'] .btn-danger,
 html[data-theme='dark'] .btn-delete-ws {
-    background-color: #dc3545 !important;
+    background-color: var(--pz-danger) !important;
     color: var(--pz-text-inverse) !important;
-    border-color: #dc3545 !important;
+    border-color: var(--pz-danger) !important;
 }
 
 html[data-theme='dark'] .btn-danger:hover,
@@ -382,9 +389,9 @@ html[data-theme='dark'] .btn-delete-ws:hover {
 }
 
 html[data-theme='dark'] .btn-success {
-    background-color: #28a745 !important;
+    background-color: var(--pz-success) !important;
     color: var(--pz-text-inverse) !important;
-    border-color: #28a745 !important;
+    border-color: var(--pz-success) !important;
 }
 
 html[data-theme='dark'] .btn-success:hover {
