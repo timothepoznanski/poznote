@@ -825,14 +825,11 @@
     border-radius: 6px;
 }
 
-#deleteModal .modal-content>div>button.btn-danger {
-    border: none;
-}
-
-#deleteModal .modal-content>div>button:disabled {
-    cursor: not-allowed;
-    opacity: 0.95;
-}
+/* Both buttons in this dialog carry .btn, so components/buttons.css already
+   gives them border: none and the disabled treatment. The opacity: 0.95 that
+   used to live here was an ID-weight rule, so it beat the base's "a locked
+   destructive action fades to 0.45" and left the button looking live; it only
+   read as disabled because workspaces.css was greying it with !important. */
 
 /* ============================================
    Rename Modal (#renameModal)

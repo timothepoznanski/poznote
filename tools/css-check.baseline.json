@@ -1,4 +1,4 @@
 {
-  "_comment": "Colour literals left in src/public/css, outside the palette file itself. The check in tools/css-check.php fails when this number grows. Lower it whenever a change removes some.",
-  "colour_literals": 164
+  "_comment": "Colour literals left in src/public/css, outside the palette file itself: hex, the white/black keywords, and functional colours (rgba, hsl, oklch...) whose arguments name no variable. The check in tools/css-check.php fails when this number grows. Lower it whenever a change removes some.",
+  "colour_literals": 397
 }

@@ -115,3 +115,44 @@ test('rendered links are versioned and honour the subdirectory prefix', function
 test('an unknown page key resolves to nothing rather than half a page', function () {
     assertSame([], poznoteCssResolve('does-not-exist'));
 });
+
+// A page that styles .btn without loading components/buttons.css gets the
+// browser's default button: index.php shipped ten of them across seven
+// dialogs, grey with black text, because its bundle deliberately left the
+// base out on the belief that the page had no .btn element. It has eight,
+// plus 66 bare modifiers, all from the shared dialogs in src/modals.php.
+test('every page that styles a button also loads the button base', function () use ($docroot) {
+    $stylesButton = function (array $files) use ($docroot): array {
+        $hits = [];
+        foreach ($files as $file) {
+            $css = @file_get_contents($docroot . $file);
+            if ($css !== false && preg_match('/(^|[\s,{}])\.btn(-[a-z]+)?[\s,:.\[{]/m', $css)) {
+                $hits[] = $file;
+            }
+        }
+        return $hits;
+    };
+    $wrong = [];
+    foreach (array_keys(poznoteCssManifest()) as $page) {
+        $files = poznoteCssResolve($page);
+        if (in_array('css/components/buttons.css', $files, true)) {
+            continue;
+        }
+        foreach ($stylesButton($files) as $file) {
+            $wrong[] = "$page -> $file";
+        }
+    }
+    // index.php is not in the manifest; its bundles are listed in index_css.php.
+    // Read that file rather than requiring it: it is an endpoint and would
+    // print a concatenated stylesheet into the test output.
+    $source = (string) file_get_contents(dirname(__DIR__) . '/src/public/index_css.php');
+    preg_match_all("/'(css\/[^']+\.css)'/", $source, $m);
+    $flat = $m[1];
+    assertTrue($flat !== [], 'index_css.php lists no stylesheet');
+    if (!in_array('css/components/buttons.css', $flat, true)) {
+        foreach ($stylesButton($flat) as $file) {
+            $wrong[] = "index.php -> $file";
+        }
+    }
+    assertSame([], $wrong, 'button rules loaded without components/buttons.css');
+});

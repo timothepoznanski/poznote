@@ -64,9 +64,6 @@ html[data-theme='dark'] {
     margin-bottom: 5px;
 }
 
-.btn i {
-    font-weight: 300 !important;
-}
 
 .btn-small {
     padding: 6px 12px;

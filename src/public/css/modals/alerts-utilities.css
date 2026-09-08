@@ -71,18 +71,14 @@
     cursor: not-allowed !important;
 }
 
+/* Only the two values that differ from components/buttons.css. The fill, the
+   label colour, border: none, cursor and the hover were restating the base;
+   opacity: 1 was worse than redundant, at equal specificity and a later load
+   it beat .btn-danger:disabled, so a disabled Delete in a dialog rendered as
+   a live button with a pointer cursor. */
 .modal .btn-danger {
-    background: var(--pz-danger);
-    color: var(--pz-text-inverse);
-    border: none;
     padding: 8px 12px;
     border-radius: 6px;
-    cursor: pointer;
-    opacity: 1;
-}
-
-.modal .btn-danger:hover {
-    background: var(--pz-danger-hover);
 }
 
 /* ============================================

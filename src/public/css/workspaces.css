@@ -916,15 +916,10 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
 
 .workspace-list .action-btn:active { transform: translateY(1px); }
 
-/* Disabled / grayed buttons */
-.btn[disabled], .btn.disabled {
-    background: var(--pz-surface-sunken) !important;
-    color: var(--pz-text-muted) !important;
-    border-color: var(--pz-border) !important;
-    cursor: not-allowed;
-    box-shadow: none !important;
-    opacity: 0.95;
-}
+/* The disabled look belongs to components/buttons.css. This file used to
+   restate it on a bare .btn, which reached the five pages it loads on and
+   overrode the base's deliberate "a locked destructive action stays red"
+   rule; border-color and box-shadow were no-ops, the base sets neither. */
 
 /* Lock icon for default workspace */
 .locked-icon { color: var(--pz-text-muted); margin-left: 8px; font-size: 0.9rem; }
