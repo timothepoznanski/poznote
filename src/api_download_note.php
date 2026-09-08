@@ -388,7 +388,7 @@ function cleanHtmlContent($content) {
  * @param string $tags Comma-separated tag list
  * @return string Complete HTML document with styling
  */
-function generateStyledHtml($content, $title, $tags = '') {
+function generateDownloadStyledHtml($content, $title, $tags = '') {
     // Clean the content
     $cleanContent = cleanHtmlContent($content);
     
@@ -458,10 +458,10 @@ switch ($noteType) {
             $tasksContent .= '</div>' . "\n";
             $tasksContent .= '</div>' . "\n";
             
-            $content = generateStyledHtml($tasksContent, $title, $tags);
+            $content = generateDownloadStyledHtml($tasksContent, $title, $tags);
         } else {
             // Invalid JSON - show raw content in preformatted block
-            $content = generateStyledHtml(
+            $content = generateDownloadStyledHtml(
                 '<pre>' . htmlspecialchars($content, ENT_QUOTES, 'UTF-8') . '</pre>', 
                 $title, 
                 $tags
@@ -478,7 +478,7 @@ switch ($noteType) {
     case 'markdown':
     default:
         // Regular HTML or Markdown notes - wrap with styled HTML
-        $content = generateStyledHtml($content, $title, $tags);
+        $content = generateDownloadStyledHtml($content, $title, $tags);
         break;
 }
 

@@ -77,3 +77,6 @@ clear_all_except_poznote.sh
 
 # Poznote MCP specific
 src/poznote_mcp/__pycache__/
+
+# PHPStan binary, downloaded on demand (CI and local runs)
+phpstan.phar

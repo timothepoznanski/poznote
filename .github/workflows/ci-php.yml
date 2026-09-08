@@ -1,0 +1,98 @@
+name: CI - PHP
+
+# The PHP sources had no CI coverage at all: only Docker packaging changes were
+# checked. This workflow runs the two cheap gates that catch the failures that
+# actually take the app down - syntax errors, and calls to functions/constants
+# that do not exist.
+#
+# Both steps run inside the same PHP image as production (see Dockerfile) so a
+# construct that parses on the runner's PHP but not on 8.4 cannot slip through.
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - '**.php'
+      - 'phpstan.neon'
+      - 'phpstan-baseline.neon'
+      - 'phpstan-bootstrap.php'
+      - '.github/workflows/ci-php.yml'
+  pull_request:
+    paths:
+      - '**.php'
+      - 'phpstan.neon'
+      - 'phpstan-baseline.neon'
+      - 'phpstan-bootstrap.php'
+      - '.github/workflows/ci-php.yml'
+
+# ==========================================================================
+# PINNED VERSIONS - READ THIS BEFORE CHANGING ANY VALUE BELOW
+# ==========================================================================
+#
+# Everything here is pinned on purpose. PHPStan is not a stable target: each
+# release adds rules and refines inference, so an unpinned run would report
+# errors that were not there yesterday and turn every open PR red at once,
+# with a diff that explains nothing. The pin is what makes
+# phpstan-baseline.neon meaningful.
+#
+# --- Upgrading PHPSTAN_VERSION -------------------------------------------
+# The three things below move together. Doing only part of it breaks CI.
+#
+#   1. Set PHPSTAN_VERSION to the new release.
+#   2. Recompute PHPSTAN_SHA256, otherwise the checksum step fails:
+#        curl -fsSL -o /tmp/phpstan.phar \
+#          https://github.com/phpstan/phpstan/releases/download/<VERSION>/phpstan.phar
+#        sha256sum /tmp/phpstan.phar
+#   3. Regenerate the baseline from the repo root, or new rules will fail
+#      the build on pre-existing code:
+#        php /tmp/phpstan.phar analyse --generate-baseline
+#   4. Commit ci-php.yml and phpstan-baseline.neon in the SAME commit.
+#
+# Check what the new baseline gained before committing it: a jump of a few
+# entries is normal, a jump of hundreds means a rule needs silencing in
+# phpstan.neon rather than freezing.
+#
+# --- Upgrading PHP_IMAGE --------------------------------------------------
+# This must track the PHP major used in production. When the Dockerfile's
+# `FROM php:X.Y-fpm-alpine...` moves, three places change together:
+#
+#   1. PHP_IMAGE here            -> php:X.Y-cli
+#   2. phpstan.neon              -> phpVersion: X0Y00  (8.4 is 80400)
+#   3. phpstan-baseline.neon     -> regenerate, a new PHP version changes
+#                                   which deprecations PHPStan reports
+#
+# Analysing against a different version than production is worse than not
+# analysing at all, because it reports problems that do not exist and hides
+# the ones that do.
+# ==========================================================================
+env:
+  PHP_IMAGE: php:8.4-cli
+  PHPSTAN_VERSION: 2.2.13
+  PHPSTAN_SHA256: a3293d850a9966fbef43e39d04f2b081b8eec35839126c43a54684f21b10ad69
+
+jobs:
+  php:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Lint every PHP file
+        run: |
+          docker run --rm -v "$PWD":/app -w /app "$PHP_IMAGE" \
+            sh -c 'find . -path ./.git -prune -o -name "*.php" -print0 \
+                   | xargs -0 -n1 -P4 php -l > /dev/null'
+          echo "✅ no syntax errors"
+
+      - name: Download PHPStan
+        run: |
+          curl -fsSL -o phpstan.phar \
+            "https://github.com/phpstan/phpstan/releases/download/${PHPSTAN_VERSION}/phpstan.phar"
+          echo "${PHPSTAN_SHA256}  phpstan.phar" | sha256sum -c -
+
+      - name: Static analysis
+        run: |
+          docker run --rm -v "$PWD":/app -w /app "$PHP_IMAGE" \
+            php phpstan.phar analyse --no-progress --memory-limit=2G
