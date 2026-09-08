@@ -674,73 +674,6 @@ body.public-note-page {
     font-weight: 600;
 }
 
-.public-note-attachments-list {
-    display: grid;
-    gap: 8px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-.public-note-attachment-link {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-height: 42px;
-    padding: 9px 12px;
-    border: 1px solid #d8dee4;
-    border-radius: 6px;
-    background: #ffffff;
-    color: #0f172a;
-    text-decoration: none;
-    transition: border-color 0.15s, background-color 0.15s, color 0.15s;
-}
-
-.public-note-attachment-link:hover,
-.public-note-attachment-link:focus {
-    border-color: var(--pz-accent);
-    background: #f7fbfd;
-    color: #005a8b;
-    text-decoration: none;
-}
-
-.public-note-attachment-link i {
-    flex: 0 0 auto;
-    color: #64748b;
-}
-
-.public-note-attachment-name {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.public-note-attachment-size {
-    flex: 0 0 auto;
-    margin-left: auto;
-    color: #64748b;
-    font-size: 0.85rem;
-}
-
-@media screen and (max-width: 520px) {
-    .public-note-attachment-link {
-        align-items: flex-start;
-        flex-wrap: wrap;
-    }
-
-    .public-note-attachment-name {
-        flex: 1 1 calc(100% - 28px);
-        white-space: normal;
-        overflow-wrap: anywhere;
-    }
-
-    .public-note-attachment-size {
-        flex-basis: 100%;
-        margin-left: 28px;
-    }
-}
-
 /* Theme toggle button */
 .public-note-header {
     display: flex;
@@ -839,24 +772,6 @@ html[data-theme='dark'] .public-note-attachments {
 
 html[data-theme='dark'] .public-note-attachments h2 {
     color: #e5e7eb;
-}
-
-html[data-theme='dark'] .public-note-attachment-link {
-    border-color: var(--dm-border);
-    background: var(--dm-surface);
-    color: #e5e7eb;
-}
-
-html[data-theme='dark'] .public-note-attachment-link:hover,
-html[data-theme='dark'] .public-note-attachment-link:focus {
-    border-color: #38bdf8;
-    background: var(--dm-surface-hover);
-    color: #bae6fd;
-}
-
-html[data-theme='dark'] .public-note-attachment-link i,
-html[data-theme='dark'] .public-note-attachment-size {
-    color: #9ca3af;
 }
 
 /* Dark mode styles for important tasks */

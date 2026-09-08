@@ -396,18 +396,6 @@ body.dark-mode .btn-secondary:hover {
     background-color: var(--dm-surface-hover);
 }
 
-html[data-theme='dark'] .btn-shared,
-body.dark-mode .btn-shared {
-    background-color: var(--dm-accent);
-    color: #ffffff;
-    border-color: var(--dm-accent);
-}
-
-html[data-theme='dark'] .btn-shared:hover,
-body.dark-mode .btn-shared:hover {
-    background-color: #3182ce;
-}
-
 html[data-theme='dark'] .btn-primary,
 body.dark-mode .btn-primary {
     background-color: var(--pz-accent) !important;
@@ -419,26 +407,6 @@ html[data-theme='dark'] .btn-primary:hover,
 body.dark-mode .btn-primary:hover {
     background-color: var(--pz-accent-hover) !important;
     border-color: var(--pz-accent-hover) !important;
-}
-
-html[data-theme='dark'] .btn-warning,
-body.dark-mode .btn-warning {
-    background-color: #ffc107 !important;
-    color: #212529 !important;
-    border-color: #ffc107 !important;
-}
-
-html[data-theme='dark'] .btn-orange,
-body.dark-mode .btn-orange {
-    background-color: #e67e22 !important;
-    color: #ffffff !important;
-    border-color: #e67e22 !important;
-}
-
-html[data-theme='dark'] .btn-orange:hover,
-body.dark-mode .btn-orange:hover {
-    background-color: #d35400 !important;
-    border-color: #d35400 !important;
 }
 
 html[data-theme='dark'] .btn-rename,
@@ -627,11 +595,6 @@ body.dark-mode #poznoteToast.notification-warning {
    Emoji Picker
    ============================================ */
 
-html[data-theme='dark'] .emoji-picker-popup,
-body.dark-mode .emoji-picker-popup {
-    border-color: var(--dm-border);
-}
-
 html[data-theme='dark'] .emoji-hint,
 body.dark-mode .emoji-hint {
     background: var(--dm-surface);
@@ -644,11 +607,6 @@ body.dark-mode .emoji-hint kbd {
     background: var(--dm-bg);
     border-color: var(--dm-border);
     color: var(--dm-text);
-}
-
-html[data-theme='dark'] .emoji-picker-popup .emoji-item:hover,
-body.dark-mode .emoji-picker-popup .emoji-item:hover {
-    background-color: var(--dm-surface);
 }
 
 /* ============================================
@@ -666,36 +624,9 @@ body.dark-mode .table-picker-header {
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .table-picker-cell,
-body.dark-mode .table-picker-cell {
-    background-color: var(--dm-bg);
-    border-color: var(--dm-border);
-}
-
-html[data-theme='dark'] .table-picker-cell:hover,
-body.dark-mode .table-picker-cell:hover {
-    border-color: #64B5F6;
-}
-
-html[data-theme='dark'] .table-picker-cell.highlighted,
-body.dark-mode .table-picker-cell.highlighted {
-    background-color: var(--dm-active);
-    border-color: #64B5F6;
-}
-
-html[data-theme='dark'] .table-picker-label,
-body.dark-mode .table-picker-label {
-    color: #b0b0b0;
-}
-
 html[data-theme='dark'] .table-picker-input-section,
 body.dark-mode .table-picker-input-section {
     border-top-color: var(--dm-border);
-}
-
-html[data-theme='dark'] .table-picker-input-label,
-body.dark-mode .table-picker-input-label {
-    color: #b0b0b0;
 }
 
 html[data-theme='dark'] .table-picker-input-field-label,
@@ -820,13 +751,6 @@ body.dark-mode ::-webkit-scrollbar-thumb:hover {
 /* ============================================
    Info Box
    ============================================ */
-
-html[data-theme='dark'] .info-box,
-body.dark-mode .info-box {
-    background-color: #1a3a52;
-    border-color: var(--dm-accent);
-    color: #b0d4f1;
-}
 
 /* ============================================
    AI Chat Panel
@@ -1015,7 +939,6 @@ html[data-theme='dark'] .tasklist-embed-unavailable:is(#pz-specificity-boost, *)
 body.dark-mode .tasklist-embed-unavailable:is(#pz-specificity-boost, *) {
     color: #8a8a8a !important;
 }
-
 
 /* Inline editing controls of the embedded task list. The `.noteentry *`
    --dm-text blanket also hits the buttons, so their colors need the :is()

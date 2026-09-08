@@ -65,16 +65,6 @@ body.dark-mode {
     margin-bottom: 5px;
 }
 
-.admin-title {
-    font-size: 1.8rem;
-    color: var(--text-color, var(--pz-text));
-}
-
-.admin-subtitle {
-    color: var(--text-muted, #666);
-    margin-top: 5px;
-}
-
 /* Buttons */
 .btn {
     padding: 10px 20px;
@@ -149,10 +139,6 @@ body.dark-mode {
 
 .btn-margin-right {
     margin-right: 10px;
-}
-
-.btn-margin-top {
-    margin-top: 10px;
 }
 
 .btn-cancel-admin {
@@ -435,11 +421,6 @@ html[data-theme='dark'] .users-table td {
     font-weight: 500;
 }
 
-.badge-admin {
-    background: var(--pz-warning);
-    color: var(--pz-text);
-}
-
 .badge-active {
     background: var(--pz-success);
     color: white;
@@ -480,12 +461,6 @@ html[data-theme='dark'] .users-table td {
     padding: 15px;
     border-radius: 8px;
     margin-bottom: 20px;
-}
-
-.message-success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
 }
 
 .message-error {
@@ -589,13 +564,6 @@ html[data-theme='dark'] .users-table td {
     align-items: center;
     gap: 12px;
     margin-bottom: 14px;
-}
-
-.password-section-label {
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--text-muted, #666);
-    margin-bottom: 6px;
 }
 
 .password-status-text {
@@ -896,11 +864,6 @@ input:checked+.slider:before {
     transform: translateX(16px);
 }
 
-/* Admin specific toggle color */
-input.admin-toggle:checked+.slider {
-    background-color: var(--pz-warning);
-}
-
 /* Disabled toggle styling */
 .toggle-switch.disabled {
     opacity: 0.6;
@@ -913,32 +876,6 @@ input.admin-toggle:checked+.slider {
 
 input:disabled+.slider {
     background-color: #ccc;
-}
-
-input.admin-toggle:disabled:checked+.slider {
-    background-color: var(--pz-warning);
-}
-
-/* Maintenance Section */
-.maintenance-section {
-    border-top: 1px solid var(--border-color);
-    padding-bottom: 10px;
-    margin-top: 40px;
-    margin-bottom: 80px;
-    /* Space below the section */
-}
-
-.maintenance-title {
-    font-size: 1.4rem;
-}
-
-.maintenance-subtitle {
-    margin-bottom: 10px;
-    font-weight: bold;
-}
-
-.maintenance-description {
-    max-width: 800px;
 }
 
 .btn-maintenance {
@@ -961,10 +898,6 @@ input.admin-toggle:disabled:checked+.slider {
         flex-direction: column;
         align-items: flex-start;
         gap: 15px;
-    }
-
-    .admin-title {
-        font-size: 1.5rem;
     }
 
     .btn:not(.admin-nav .btn) {
@@ -1050,10 +983,6 @@ input.admin-toggle:disabled:checked+.slider {
         background: #d94a59;
     }
 
-    .users-table td.hide-on-mobile {
-        display: none !important;
-    }
-
     .modal-content {
         padding: 20px 25px 20px 20px;
         width: calc(100% - 40px);
@@ -1091,9 +1020,6 @@ input.admin-toggle:disabled:checked+.slider {
         /* padding-bottom: 100px; */
     }
 
-    .maintenance-title {
-        font-size: 1.2rem;
-    }
 }
 
 /* Instance-wide enabled/disabled tallies, sitting to the right of the filter

@@ -142,17 +142,6 @@
     color: var(--pz-accent);
 }
 
-.workspace-menu-username {
-    cursor: default;
-    font-weight: 400;
-    color: var(--text-color, var(--pz-text));
-    border-bottom: none;
-}
-
-.workspace-menu-username:hover {
-    background-color: transparent;
-}
-
 .workspace-menu-divider {
     height: 1px;
     background-color: var(--pz-border);
@@ -249,8 +238,3 @@
 }
 
 /* .actions-dropdown.mobile .actions-menu { min-width: 120px; padding: 6px 0; } */
-
-.icon_trash {
-    color: var(--pz-accent);
-}
-

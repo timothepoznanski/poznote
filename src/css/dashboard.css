@@ -10,24 +10,6 @@ body.dashboard-page {
     padding-top: 0;
 }
 
-.dashboard-sidebar-sep {
-    width: 60%;
-    border: none;
-    border-top: 1px solid #e5e7eb;
-    margin: 6px 0;
-    flex-shrink: 0;
-}
-
-.dashboard-sidebar-kofi .lucide-heart {
-    color: #e63946;
-    animation: dashboardHeartBlink 2.4s ease-in-out infinite;
-    transform-origin: center;
-}
-
-.dashboard-sidebar-kofi:hover .lucide-heart {
-    color: #e63946 !important;
-}
-
 @keyframes dashboardHeartBlink {
     0%, 100% {
         opacity: 0.82;
@@ -45,87 +27,7 @@ body.dashboard-page {
     }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .dashboard-sidebar-kofi .lucide-heart {
-        animation: none;
-        opacity: 1;
-        transform: none;
-    }
-}
-
-:root[data-theme='dark'] .dashboard-sidebar-sep,
-body.dark-mode .dashboard-sidebar-sep {
-    border-color: var(--dm-border);
-}
-
 /* ---------- Left sidebar (tool buttons: home, search, git, settings) ---------- */
-
-.dashboard-sidebar {
-    position: sticky;
-    top: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    padding: 16px 6px;
-    min-height: 100vh;
-    width: 58px;
-    flex-shrink: 0;
-}
-
-.dashboard-sidebar .dashboard-topbar-btn {
-    width: 48px;
-    height: 48px;
-    padding: 0;
-}
-
-.dashboard-sidebar-context {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    width: 100%;
-    margin-bottom: 4px;
-}
-
-.dashboard-sidebar-context-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    width: 48px;
-    min-height: 42px;
-    color: #4b5563;
-    text-align: center;
-}
-
-.dashboard-sidebar-context-link {
-    text-decoration: none;
-    transition: color 0.15s ease, transform 0.15s ease;
-}
-
-.dashboard-sidebar-context-link:hover,
-.dashboard-sidebar-context-link:focus-visible {
-    color: var(--pz-accent);
-    transform: translateY(-1px);
-}
-
-.dashboard-sidebar-context-item .lucide {
-    width: 15px;
-    height: 15px;
-    flex-shrink: 0;
-}
-
-.dashboard-sidebar-context-item span {
-    max-width: 46px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 12px;
-    font-weight: 400;
-    line-height: 1.1;
-}
 
 .dashboard-container {
     flex: 1;
@@ -238,194 +140,12 @@ body.dark-mode .dashboard-sidebar-sep {
     display: none;
 }
 
-.dashboard-topbar-btn {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    width: 46px;
-    height: 50px;
-    padding: 0 0 14px;
-    margin: 0;
-    border: none;
-    border-radius: 8px;
-    color: var(--pz-text-muted);
-    background: transparent;
-    text-decoration: none;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: inherit;
-    appearance: none;
-    -webkit-appearance: none;
-    transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
-}
-
-.dashboard-topbar-actions .dashboard-topbar-btn {
-    width: 50px;
-    height: 50px;
-    padding: 4px 4px 14px;
-}
-
-.dashboard-topbar-btn:hover {
-    color: var(--pz-accent);
-    background: rgba(var(--pz-accent-rgb), 0.08);
-    border-radius: 8px;
-    transform: translateY(-2px);
-}
-
-.dashboard-topbar-btn.active .lucide {
-    color: var(--pz-accent);
-}
-
 #dashboardToggleFavorites.active .lucide-star {
     color: var(--pz-warning);
 }
 
-.dashboard-notifications-btn.has-notifications .lucide-bell {
-    color: #f59e0b;
-}
-
-.dashboard-topbar-count {
-    position: absolute;
-    bottom: 2px;
-    left: 0;
-    right: 0;
-    text-align: center;
-    padding: 0;
-    color: var(--pz-accent);
-    font-size: 13px;
-    font-weight: 400;
-    /* 1.2 leaves room for descenders (p, y); overflow:hidden clips them at 1 */
-    line-height: 1.2;
-    font-variant-numeric: tabular-nums;
-    pointer-events: none;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.dashboard-notifications-btn.has-notifications .dashboard-topbar-count {
-    color: #f59e0b;
-}
-
-.dashboard-topbar-btn .lucide {
-    width: 21px;
-    height: 21px;
-}
-
-/* Per-icon accent colours — matching home.php card palette */
-.dashboard-topbar-btn .lucide-sticky-note,
-.dashboard-topbar-btn .lucide-tags,
-.dashboard-topbar-btn .lucide-folder-open,
-.dashboard-topbar-btn .lucide-share-2,
-.dashboard-topbar-btn .lucide-paperclip,
-.dashboard-topbar-btn .lucide-bell,
-.dashboard-topbar-btn .lucide-upload,
-.dashboard-topbar-btn .lucide-download {
-    color: var(--pz-accent);
-}
-
-.dashboard-topbar-btn .lucide-star,
-.dashboard-topbar-btn .lucide-trash-2 {
-    color: var(--pz-accent);
-}
-
-.dashboard-topbar-btn .lucide-search {
-    color: #10b981;
-}
-
-.dashboard-topbar-actions .dashboard-topbar-btn .lucide {
-    color: var(--pz-text-muted);
-}
-
 .dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star {
     color: var(--pz-warning);
-}
-
-.dashboard-topbar-actions .dashboard-notifications-btn.has-notifications .lucide-bell {
-    color: #f59e0b;
-}
-
-/* ---------- Git sync feedback/debug ---------- */
-
-.dashboard-sync-debug {
-    margin-top: 10px;
-}
-
-.dashboard-debug-controls {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-}
-
-.dashboard-debug-controls [hidden],
-.dashboard-debug-info[hidden] {
-    display: none !important;
-}
-
-.dashboard-debug-btn {
-    font-size: 12px;
-    padding: 6px 12px;
-}
-
-.dashboard-debug-btn[aria-pressed="true"] {
-    background: var(--pz-accent);
-    color: #fff;
-}
-
-.dashboard-debug-info {
-    background: var(--pz-surface);
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    padding: 15px;
-    max-height: 250px;
-    overflow-y: auto;
-}
-
-.dashboard-debug-info h4 {
-    margin: 0 0 10px 0;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.dashboard-debug-info pre {
-    margin: 0;
-    font-size: 11px;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    font-family: monospace;
-    text-align: left;
-}
-
-:root[data-theme='dark'] .dashboard-debug-btn[aria-pressed="true"],
-body.dark-mode .dashboard-debug-btn[aria-pressed="true"] {
-    background: var(--pz-accent);
-    color: #fff;
-}
-
-:root[data-theme='dark'] .dashboard-debug-info,
-body.dark-mode .dashboard-debug-info {
-    background: var(--dm-surface, var(--dm-content-bg));
-    border-color: var(--dm-border, var(--dm-surface-hover));
-    color: var(--dm-text, #e0e0e0);
-}
-
-:root.theme-black[data-theme='dark'] .dashboard-debug-info {
-    background: #141821;
-    border-color: #2a3140;
-    color: #d8dee8;
-}
-
-:root[data-theme='dark'] .dashboard-debug-info h4,
-body.dark-mode .dashboard-debug-info h4 {
-    color: var(--dm-text, #e0e0e0);
-}
-
-:root[data-theme='dark'] .dashboard-debug-info pre,
-body.dark-mode .dashboard-debug-info pre {
-    color: inherit;
 }
 
 /* ---------- Breadcrumb ---------- */
@@ -1559,16 +1279,6 @@ body.dark-mode .dashboard-topbar {
     background: var(--dm-content-bg);
 }
 
-:root[data-theme='dark'] .dashboard-sidebar,
-body.dark-mode .dashboard-sidebar {
-    background: var(--dm-content-bg);
-}
-
-:root[data-theme='dark'] .dashboard-sidebar-context-item,
-body.dark-mode .dashboard-sidebar-context-item {
-    color: var(--dm-text-muted);
-}
-
 :root[data-theme='dark'] .dashboard-filter-input,
 body.dark-mode .dashboard-filter-input {
     background: var(--dm-surface);
@@ -1581,87 +1291,14 @@ body.dark-mode .dashboard-filter-clear:hover {
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] .dashboard-topbar-btn,
-body.dark-mode .dashboard-topbar-btn {
-    background: transparent;
-    border-color: transparent;
-    color: var(--dm-text-muted);
-}
-
-:root[data-theme='dark'] .dashboard-topbar-btn:hover,
-body.dark-mode .dashboard-topbar-btn:hover {
-    color: var(--pz-accent);
-    background: rgba(var(--pz-accent-rgb), 0.12);
-    transform: translateY(-2px);
-}
-
-:root[data-theme='dark'] .dashboard-topbar-btn.active .lucide,
-body.dark-mode .dashboard-topbar-btn.active .lucide {
-    color: var(--pz-accent);
-}
-
 :root[data-theme='dark'] #dashboardToggleFavorites.active .lucide-star,
 body.dark-mode #dashboardToggleFavorites.active .lucide-star {
     color: #ffc107;
 }
 
-:root[data-theme='dark'] .dashboard-topbar-btn .lucide-sticky-note,
-:root[data-theme='dark'] .dashboard-topbar-btn .lucide-tags,
-:root[data-theme='dark'] .dashboard-topbar-btn .lucide-folder-open,
-:root[data-theme='dark'] .dashboard-topbar-btn .lucide-share-2,
-:root[data-theme='dark'] .dashboard-topbar-btn .lucide-paperclip,
-:root[data-theme='dark'] .dashboard-topbar-btn .lucide-bell,
-:root[data-theme='dark'] .dashboard-topbar-btn .lucide-upload,
-:root[data-theme='dark'] .dashboard-topbar-btn .lucide-download,
-body.dark-mode .dashboard-topbar-btn .lucide-sticky-note,
-body.dark-mode .dashboard-topbar-btn .lucide-tags,
-body.dark-mode .dashboard-topbar-btn .lucide-folder-open,
-body.dark-mode .dashboard-topbar-btn .lucide-share-2,
-body.dark-mode .dashboard-topbar-btn .lucide-paperclip,
-body.dark-mode .dashboard-topbar-btn .lucide-bell,
-body.dark-mode .dashboard-topbar-btn .lucide-upload,
-body.dark-mode .dashboard-topbar-btn .lucide-download {
-    color: var(--pz-accent);
-}
-
-:root[data-theme='dark'] .dashboard-notifications-btn.has-notifications .lucide-bell,
-body.dark-mode .dashboard-notifications-btn.has-notifications .lucide-bell {
-    color: #f59e0b;
-}
-
-:root[data-theme='dark'] .dashboard-notifications-btn.has-notifications .dashboard-topbar-count,
-body.dark-mode .dashboard-notifications-btn.has-notifications .dashboard-topbar-count {
-    color: #f59e0b;
-}
-
-:root[data-theme='dark'] .dashboard-topbar-btn .lucide-star,
-:root[data-theme='dark'] .dashboard-topbar-btn .lucide-trash-2,
-body.dark-mode .dashboard-topbar-btn .lucide-star,
-body.dark-mode .dashboard-topbar-btn .lucide-trash-2 {
-    color: var(--pz-accent);
-}
-
-.dashboard-topbar-actions .dashboard-topbar-btn .lucide-search,
-:root[data-theme='dark'] .dashboard-topbar-btn .lucide-search,
-body.dark-mode .dashboard-topbar-btn .lucide-search,
-:root[data-theme='dark'] .dashboard-topbar-actions .dashboard-topbar-btn .lucide-search,
-body.dark-mode .dashboard-topbar-actions .dashboard-topbar-btn .lucide-search {
-    color: #10b981;
-}
-
-:root[data-theme='dark'] .dashboard-topbar-actions .dashboard-topbar-btn .lucide:not(.lucide-search),
-body.dark-mode .dashboard-topbar-actions .dashboard-topbar-btn .lucide:not(.lucide-search) {
-    color: var(--dm-text-muted);
-}
-
 :root[data-theme='dark'] .dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star,
 body.dark-mode .dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star {
     color: #ffc107;
-}
-
-:root[data-theme='dark'] .dashboard-topbar-actions .dashboard-notifications-btn.has-notifications .lucide-bell,
-body.dark-mode .dashboard-topbar-actions .dashboard-notifications-btn.has-notifications .lucide-bell {
-    color: #f59e0b;
 }
 
 :root[data-theme='dark'] .bc-current,
@@ -1766,7 +1403,6 @@ body.dark-mode .board-view-btn:hover {
     color: var(--dm-accent, var(--dm-accent));
 }
 
-
 :root[data-theme='dark'] .board-card-tag,
 body.dark-mode .board-card-tag {
     color: var(--dm-text-muted);
@@ -1790,39 +1426,9 @@ body.dark-mode .dashboard-empty {
     color: var(--dm-text-muted);
 }
 
-/* ---------- Mobile back link (hidden on desktop) ---------- */
-
-.dashboard-mobile-back {
-    display: none;
-    text-decoration: none;
-    color: var(--pz-text-muted);
-    cursor: pointer;
-}
-
-.dashboard-mobile-back:hover {
-    color: var(--pz-accent);
-}
-
-.dashboard-mobile-back:hover .lucide {
-    color: var(--pz-accent);
-}
-
-:root[data-theme='dark'] .dashboard-mobile-back:hover,
-body.dark-mode .dashboard-mobile-back:hover {
-    color: var(--dm-accent, #60a5fa);
-}
-
-:root[data-theme='dark'] .dashboard-mobile-back:hover .lucide,
-body.dark-mode .dashboard-mobile-back:hover .lucide {
-    color: var(--dm-accent, #60a5fa);
-}
-
 /* ---------- Responsive ---------- */
 
 @media (max-width: 800px) {
-    .dashboard-mobile-back {
-        display: flex;
-    }
 
     .dashboard-topbar {
         gap: 6px;
@@ -1830,37 +1436,6 @@ body.dark-mode .dashboard-mobile-back:hover .lucide {
 
     .dashboard-topbar-filter {
         width: 100%;
-    }
-
-    .dashboard-sidebar {
-        width: 50px;
-        padding: 10px 3px;
-        gap: 2px;
-    }
-
-    .dashboard-sidebar .dashboard-topbar-btn {
-        width: 44px;
-        height: 44px;
-    }
-
-    .dashboard-sidebar-context-item {
-        width: 44px;
-        min-height: 38px;
-    }
-
-    .dashboard-sidebar-context-item .lucide {
-        width: 14px;
-        height: 14px;
-    }
-
-    .dashboard-sidebar-context-item span {
-        max-width: 42px;
-        font-size: 11px;
-    }
-
-    .dashboard-sidebar .dashboard-topbar-btn .lucide {
-        width: 20px;
-        height: 20px;
     }
 
     .dashboard-topbar-actions {
@@ -1872,27 +1447,6 @@ body.dark-mode .dashboard-mobile-back:hover .lucide {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         padding: 0 2px;
-    }
-
-    .dashboard-topbar-actions .dashboard-topbar-btn {
-        flex: 0 0 auto;
-    }
-
-    .dashboard-topbar-actions .dashboard-topbar-btn {
-        border: none;
-        width: 44px;
-        height: 44px;
-        padding: 2px 2px 12px;
-    }
-
-    .dashboard-topbar-btn .lucide {
-        width: 20px;
-        height: 20px;
-    }
-
-    .dashboard-topbar-count {
-        font-size: 11px;
-        bottom: 3px;
     }
 
     /* Mobile keeps its original 2-column stretched layout: the column-count
@@ -1959,31 +1513,6 @@ body.dark-mode .dashboard-mobile-back:hover .lucide {
     }
 
 }
-
-/* Version badge — always bottom-left */
-.dashboard-version-badge {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    position: fixed;
-    bottom: 12px;
-    left: 12px;
-    z-index: 100;
-    font-size: 13px;
-    color: var(--pz-text-muted);
-    padding: 6px 10px;
-}
-
-:root[data-theme='dark'] .dashboard-version-badge,
-body.dark-mode .dashboard-version-badge {
-    color: var(--dm-text-muted, #9ca3af);
-}
-
-:root[data-theme='dark'] .dashboard-mobile-back:hover,
-body.dark-mode .dashboard-mobile-back:hover {
-    color: var(--dm-accent, #60a5fa);
-}
-
 
 /* ============================================
    Multi-workspace scope (dashboard.php ?scope=...)

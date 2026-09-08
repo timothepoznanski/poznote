@@ -176,103 +176,6 @@
     font-size: 17px;
 }
 
-.snapshot-help-btn {
-    position: static;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    border: 1px solid transparent;
-    border-radius: 6px;
-    background: transparent;
-    color: #667085;
-    cursor: help;
-    flex: 0 0 auto;
-}
-
-.snapshot-help-btn:hover,
-.snapshot-help-btn:focus-visible {
-    background: rgba(0, 0, 0, 0.06);
-    color: #344054;
-    outline: none;
-}
-
-.snapshot-help-btn .lucide {
-    width: 18px;
-    height: 18px;
-}
-
-.snapshot-help-btn::before,
-.snapshot-help-btn::after {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(-2px);
-    transition: opacity 0.15s ease, transform 0.15s ease;
-    z-index: 30;
-}
-
-.snapshot-help-btn::before {
-    content: '';
-    left: calc(100% - 20px);
-    top: calc(100% + 2px);
-    border: 6px solid transparent;
-    border-bottom-color: #111827;
-}
-
-.snapshot-help-btn::after {
-    content: attr(data-tooltip);
-    left: 0;
-    top: calc(100% + 14px);
-    width: max-content;
-    max-width: min(420px, calc(100vw - 64px));
-    padding: 10px 12px;
-    border-radius: 8px;
-    background: #111827;
-    color: #ffffff;
-    box-shadow: 0 10px 26px rgba(16, 24, 40, 0.22);
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 1.45;
-    text-align: left;
-    white-space: pre-line;
-}
-
-.snapshot-help-btn:hover::before,
-.snapshot-help-btn:hover::after,
-.snapshot-help-btn:focus-visible::before,
-.snapshot-help-btn:focus-visible::after {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.snapshot-close-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 6px;
-    border-radius: 6px;
-    color: inherit;
-    opacity: 0.5;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.15s, background-color 0.15s;
-}
-
-.snapshot-close-btn:hover {
-    opacity: 1;
-    background-color: rgba(0, 0, 0, 0.06);
-}
-
-.snapshot-close-btn .lucide {
-    width: 18px;
-    height: 18px;
-}
-
 /* ---- Loading / Empty States ---- */
 .snapshot-state {
     display: flex;
@@ -476,16 +379,6 @@
 #snapshotModal.snapshot-modal-dark .snapshot-date-list-header,
 #snapshotModal.snapshot-modal-dark .snapshot-meta-item {
     color: rgba(218, 226, 237, 0.82) !important;
-}
-
-#snapshotModal.snapshot-modal-dark .snapshot-help-btn {
-    color: rgba(218, 226, 237, 0.82);
-}
-
-#snapshotModal.snapshot-modal-dark .snapshot-help-btn:hover,
-#snapshotModal.snapshot-modal-dark .snapshot-help-btn:focus-visible {
-    background: rgba(255, 255, 255, 0.1);
-    color: #f2f5f8;
 }
 
 #snapshotModal.snapshot-modal-dark .snapshot-meta-title {

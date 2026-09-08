@@ -9,32 +9,6 @@
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .shared-info {
-    background-color: #1e3a52;
-    color: #e0e0e0;
-}
-
-[data-theme="dark"] .shared-notes-table {
-    background-color: var(--dm-surface);
-}
-
-[data-theme="dark"] .shared-notes-table thead {
-    background-color: var(--dm-surface);
-}
-
-[data-theme="dark"] .shared-notes-table th {
-    color: var(--dm-text);
-    border-bottom-color: var(--dm-border);
-}
-
-[data-theme="dark"] .shared-notes-table td {
-    border-bottom-color: var(--dm-border);
-}
-
-[data-theme="dark"] .shared-notes-table tbody tr:hover {
-    background-color: var(--dm-surface-hover);
-}
-
 [data-theme="dark"] .note-link {
     color: #4d9eff;
 }
@@ -73,10 +47,6 @@
 
 [data-theme="dark"] body.shared-page::-webkit-scrollbar-thumb:hover {
     background-color: #666666 !important;
-}
-
-[data-theme="dark"] .indexable-toggle-label {
-    color: var(--dm-text);
 }
 
 [data-theme="dark"] .shared-note-item {
@@ -167,19 +137,6 @@
     border-color: transparent;
 }
 
-[data-theme="dark"] .note-token-wrap.is-editable {
-    border-color: transparent;
-}
-
-[data-theme="dark"] .note-token-wrap.is-editable:hover {
-    border-color: transparent;
-}
-
-[data-theme="dark"] .note-token-wrap.is-editable:focus-within {
-    border-color: transparent;
-    box-shadow: none;
-}
-
 [data-theme="dark"] .folder-badge {
     color: #c6d0da;
     background-color: transparent;
@@ -213,18 +170,6 @@
     color: #ffffff;
 }
 
-[data-theme="dark"] .task-permissions-option {
-    color: #f1f3f5;
-}
-
-[data-theme="dark"] .task-permissions-option span {
-    color: #f1f3f5;
-}
-
-[data-theme="dark"] .task-permissions-option input[type="radio"] {
-    accent-color: #4d9eff;
-}
-
 /* Type filter buttons - dark mode */
 [data-theme="dark"] .filter-type-btn {
     background: var(--dm-surface);
@@ -255,10 +200,6 @@
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value label,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value span {
     color: #f1f3f5;
-}
-
-[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-url-preview {
-    color: #66b3ff;
 }
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title-link {

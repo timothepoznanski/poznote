@@ -345,34 +345,12 @@ textarea:focus {
     background: #f6f8fa;
 }
 
-.note-attachment-preview-image .note-attachment-preview-media {
-    min-height: 0;
-}
-
-.note-attachment-preview-image img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    max-height: none;
-    object-fit: cover;
-    background: #ffffff;
-}
-
 .note-attachment-preview-frame {
     display: block;
     height: auto;
     border: 0;
     background: #ffffff;
     pointer-events: none;
-}
-
-.note-attachment-preview-video video {
-    display: block;
-    width: 100%;
-    height: 100%;
-    max-height: none;
-    object-fit: cover;
-    background: #000000;
 }
 
 .note-attachment-preview-audio-frame {

@@ -3,12 +3,6 @@
    Upload, display, and manage file attachments
    ============================================ */
 
-.attachment-modal .modal-content {
-    margin: 5% auto !important;
-    display: flex;
-    flex-direction: column;
-}
-
 #attachmentModal .modal-content {
     margin: 5% auto !important;
 }
@@ -22,10 +16,6 @@
     background: #f9f9f9;
 }
 
-.file-input-container {
-    margin-bottom: 5px;
-}
-
 .upload-button-container {
     text-align: center;
     display: none;
@@ -33,19 +23,6 @@
 
 .upload-button-container.show {
     display: block;
-}
-
-.attachment-help {
-    margin-top: 10px;
-    padding: 8px;
-    background: #e7f3ff;
-    border: 1px solid #bee5eb;
-    border-radius: 3px;
-    font-size: 0.9em;
-}
-
-.attachment-help small {
-    color: #0c5460;
 }
 
 .attachment-upload input[type="file"] {
@@ -90,11 +67,6 @@
     flex: 1;
 }
 
-.attachment-filename {
-    font-weight: bold;
-    color: var(--pz-text);
-}
-
 .attachment-size {
     font-size: 0.8em;
     color: #666;
@@ -118,22 +90,4 @@
     border: none;
     border-radius: 3px;
     cursor: pointer;
-}
-
-.attachment-download {
-    background: var(--pz-success);
-    color: white;
-}
-
-.attachment-download:hover {
-    background: #218838;
-}
-
-.attachment-delete {
-    background: var(--pz-danger);
-    color: white;
-}
-
-.attachment-delete:hover {
-    background: #c82333;
 }

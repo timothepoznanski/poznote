@@ -68,15 +68,6 @@
     text-decoration: none;
 }
 
-.folders-list {
-    max-height: 200px;
-    overflow-y: auto;
-    border: 1px solid var(--pz-border);
-    border-radius: 4px;
-    background-color: #fafafa;
-    margin-top: 8px;
-}
-
 .folder-item {
     padding: 8px 12px;
     border-bottom: 1px solid var(--pz-border);

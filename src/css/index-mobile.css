@@ -13,12 +13,6 @@
     display: block !important;
 }
 
-/* Hide mobile elements on desktop */
-
-.mobile-nav-button {
-    display: none !important;
-}
-
 /* Mobile browsers can keep :hover after a tap. Keep the folder expand button neutral. */
 .sidebar-folder-toggle {
     -webkit-tap-highlight-color: transparent !important;
@@ -448,11 +442,6 @@ a.links_arbo_left::-webkit-scrollbar,
     padding: 10px 0;
 }
 
-/* Hide Excalidraw button on mobile */
-.btn-excalidraw {
-    display: none !important;
-}
-
 /* Hide open in new tab button on mobile (it's in the overflow menu) */
 .btn-open-new-tab {
     display: none !important;
@@ -523,13 +512,6 @@ body.mobile-formatting-toolbar-active #right_col .note-edit-toolbar .mobile-home
 
 .slash-command-menu .slash-command-icon {
     font-size: 16px;
-}
-
-/* Mobile action separator in slash menu */
-.slash-command-separator {
-    height: 1px;
-    background: #e5e7eb;
-    margin: 6px 0;
 }
 
 /* Back button in slash submenu (mobile) */

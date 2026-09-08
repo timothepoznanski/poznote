@@ -6,12 +6,6 @@
  * and rotate keyframe animation.
  */
 
-/* Save Button Animation */
-.toolbar-btn.save-modified {
-    background: transparent !important;
-    border: none !important;
-}
-
 /* Pulsation animation for modified save button */
 @keyframes pulse-save {
     0% {
@@ -43,16 +37,6 @@
     100% {
         transform: scale(1);
     }
-}
-
-/* Save icon - red when modified */
-.toolbar-btn.save-modified i.lucide-save {
-    color: #ff0000 !important;
-}
-
-.toolbar-btn.save-modified:hover i.lucide-save,
-.toolbar-btn.save-modified:focus i.lucide-save {
-    color: #ff0000 !important;
 }
 
 /* Save icon - inherit color when not modified */

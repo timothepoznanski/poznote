@@ -75,12 +75,6 @@ body {
     gap: 8px;
 }
 
-.workspace-burger-icon {
-    font-size: 1.1rem;
-    color: #6c757d;
-    pointer-events: none;
-}
-
 .workspace-dropdown-icon {
     margin-left: 1px;
     font-size: 0.9rem;

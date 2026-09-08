@@ -26,17 +26,6 @@
     border: 1px solid #f5c6cb;
 }
 
-.error-content {
-    text-align: center;
-    padding: 20px;
-    color: #d32f2f;
-}
-
-.error-content i {
-    font-size: 2em;
-    margin-bottom: 10px;
-}
-
 /* ============================================
    Modal Footer Buttons
    ============================================ */
@@ -130,28 +119,8 @@
    Margin Utilities
    ============================================ */
 
-.mt-8 {
-    margin-top: 8px;
-}
-
-.mt-10 {
-    margin-top: 10px;
-}
-
 .mt-12 {
     margin-top: 12px;
-}
-
-.mt-16 {
-    margin-top: 16px;
-}
-
-.mb-10 {
-    margin-bottom: 10px;
-}
-
-.mb-15 {
-    margin-bottom: 15px;
 }
 
 /* ============================================
@@ -210,10 +179,6 @@
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 14px;
-}
-
-.default-font-size-info {
-    display: block;
 }
 
 .backup-warning-text {

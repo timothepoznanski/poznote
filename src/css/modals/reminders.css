@@ -296,45 +296,6 @@
     font-weight: 600;
 }
 
-/* ---- Notifications Badge ---- */
-.sidebar-notifications {
-    position: relative;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 4px 6px;
-    border-radius: 6px;
-    color: inherit;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.sidebar-notifications:hover {
-    background: var(--hover-bg, rgba(0, 0, 0, 0.05));
-}
-
-.notifications-badge {
-    position: absolute;
-    top: 0;
-    right: 0;
-    min-width: 16px;
-    height: 16px;
-    padding: 0 4px;
-    background: #e74c3c;
-    color: #fff;
-    font-size: 10px;
-    font-weight: 700;
-    line-height: 16px;
-    text-align: center;
-    border-radius: 10px;
-    transform: translate(25%, -25%);
-}
-
-.notifications-badge-hidden {
-    display: none;
-}
-
 /* ---- Notification Items ---- */
 .notification-item {
     display: flex;
@@ -454,32 +415,6 @@
 /* ---- Home page notification card ---- */
 #home-notifications-card.has-notifications .home-card-icon i {
     color: #f59e0b;
-}
-
-.home-notifications-dot {
-    position: absolute;
-    top: -3px;
-    right: -3px;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #f59e0b;
-    display: none;
-    pointer-events: none;
-    z-index: 1;
-}
-
-#home-notifications-card.has-notifications .home-notifications-dot {
-    display: block;
-}
-
-#home-notifications-card.has-notifications .home-card-count {
-    color: #f59e0b;
-    font-weight: 700;
-}
-
-.home-card-icon-notifications i {
-    color: var(--pz-text-muted);
 }
 
 #notificationsModal .modal-content {

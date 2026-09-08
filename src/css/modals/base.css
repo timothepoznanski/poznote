@@ -287,13 +287,6 @@ body.dark-mode .modal .modal-info-note {
     border: 1px solid #f5c6cb;
 }
 
-.default-info {
-    font-size: 12px;
-    color: var(--pz-danger);
-    margin-top: 5px;
-    font-style: italic;
-}
-
 /* ============================================
    Radio Buttons
    ============================================ */

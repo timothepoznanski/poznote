@@ -5,16 +5,6 @@
  * and button styles.
  */
 
-/* Boîte d'information */
-.info-box {
-    background: var(--pz-accent-soft);
-    border: 1px solid #1976d2;
-    border-radius: 4px;
-    padding: 12px;
-    margin: 15px 0;
-    font-size: 14px;
-}
-
 /* Groupes de formulaires */
 .form-group {
     margin-bottom: 15px;

@@ -26,14 +26,6 @@
     border-top: 1px solid var(--pz-border);
 }
 
-.table-picker-input-label {
-    font-size: 12px;
-    color: #666;
-    margin-bottom: 10px;
-    text-align: center;
-    font-weight: 500;
-}
-
 .table-picker-input-container {
     display: flex;
     align-items: center;

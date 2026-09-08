@@ -19,19 +19,6 @@
     z-index: 10;
 }
 
-.excalidraw-toolbar .toolbar-left,
-.excalidraw-toolbar .toolbar-center,
-.excalidraw-toolbar .toolbar-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.excalidraw-toolbar .toolbar-center {
-    flex: 1;
-    justify-content: center;
-}
-
 .excalidraw-toolbar h3 {
     margin: 0;
     font-size: 18px;

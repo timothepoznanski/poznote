@@ -105,8 +105,3 @@ body.dark-mode .home-search-clear:hover {
     color: var(--dm-text);
     background: rgba(255, 255, 255, 0.08);
 }
-
-html[data-theme='dark'] .home-info-line,
-body.dark-mode .home-info-line {
-    color: var(--dm-text);
-}

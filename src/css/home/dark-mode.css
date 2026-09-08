@@ -12,23 +12,6 @@ body.dark-mode .home-page {
     background: var(--dm-content-bg);
 }
 
-html[data-theme='dark'] .home-header,
-body.dark-mode .home-header {
-    color: var(--dm-text);
-    border-bottom-color: var(--dm-border);
-}
-
-html[data-theme='dark'] .home-workspace-name,
-body.dark-mode .home-workspace-name {
-    color: var(--dm-text);
-}
-
-html[data-theme='dark'] .home-notes-count,
-body.dark-mode .home-notes-count {
-    color: var(--dm-text-muted);
-    background: var(--dm-surface);
-}
-
 /* Dark mode - cards */
 html[data-theme='dark'] .home-card,
 body.dark-mode .home-card {
@@ -46,11 +29,6 @@ body.dark-mode .home-card-title {
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .home-card-count,
-body.dark-mode .home-card-count {
-    color: var(--dm-text-muted);
-}
-
 html[data-theme='dark'] .home-card-description,
 body.dark-mode .home-card-description {
     color: var(--dm-text-muted);
@@ -59,22 +37,6 @@ body.dark-mode .home-card-description {
 html[data-theme='dark'] .home-card-icon,
 body.dark-mode .home-card-icon {
     background: rgba(var(--pz-accent-rgb), 0.2);
-}
-
-/* Dark mode - special card icons */
-html[data-theme='dark'] .home-card-icon-shared,
-body.dark-mode .home-card-icon-shared {
-    background: rgba(var(--pz-accent-rgb), 0.2);
-}
-
-html[data-theme='dark'] .home-card-icon-favorites,
-body.dark-mode .home-card-icon-favorites {
-    background: rgba(255, 193, 7, 0.2);
-}
-
-html[data-theme='dark'] .home-card-icon-trash,
-body.dark-mode .home-card-icon-trash {
-    background: rgba(255, 152, 0, 0.2);
 }
 
 /* Dark mode - debug info */

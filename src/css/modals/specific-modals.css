@@ -83,72 +83,11 @@
     gap: 15px;
 }
 
-.font-size-section h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 18px;
-    color: var(--pz-text);
-}
-
 .font-size-controls label {
     margin: 0;
     font-weight: normal;
     font-size: 15px;
     flex: 1;
-}
-
-/* Help icon + tooltip used in settings modals */
-.field-help {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    cursor: help;
-    flex-shrink: 0;
-}
-
-.field-help .lucide {
-    width: 14px;
-    height: 14px;
-    opacity: 0.45;
-    transition: opacity 0.15s ease;
-}
-
-.field-help:hover .lucide,
-.field-help:focus .lucide,
-.field-help:focus-visible .lucide {
-    opacity: 0.75;
-}
-
-.field-help-tooltip {
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 0;
-    transform: none;
-    min-width: 220px;
-    max-width: 300px;
-    padding: 8px 11px;
-    border-radius: 6px;
-    background: rgba(20, 20, 20, 0.93);
-    color: #fff;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    font-size: 0.95rem;
-    font-weight: 400;
-    line-height: 1.5;
-    white-space: normal;
-    text-align: left;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity 0.15s ease, visibility 0.15s ease;
-    z-index: 200;
-}
-
-.field-help:hover .field-help-tooltip,
-.field-help:focus .field-help-tooltip,
-.field-help:focus-visible .field-help-tooltip {
-    opacity: 1;
-    visibility: visible;
 }
 
 .font-size-controls input {
@@ -160,20 +99,6 @@
     border: 1px solid #ddd;
     border-radius: 4px;
     text-align: center;
-}
-
-.font-size-preview {
-    border: 1px solid #ddd;
-    padding: 20px;
-    margin-top: 10px;
-    background-color: white;
-    border-radius: 4px;
-}
-
-.font-size-preview p {
-    margin: 0;
-    padding: 0;
-    line-height: 1.5;
 }
 
 /* Vertical rhythm: the title keeps its default top margin but not the
@@ -561,34 +486,6 @@
     font-weight: 600;
 }
 
-#updateModal .update-buttons-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid rgba(224, 224, 224, 0.9);
-}
-
-#updateModal .update-instructions-buttons {
-    display: none;
-    gap: 12px;
-    justify-content: center;
-    flex-wrap: wrap;
-    align-items: stretch;
-}
-
-@media (max-width: 500px) {
-    #updateModal .update-instructions-buttons {
-        flex-direction: column;
-    }
-
-    #updateModal .btn-update {
-        width: 100%;
-        min-width: auto;
-    }
-}
-
 #updateModal .modal-buttons {
     justify-content: center;
     border-top: none;
@@ -613,30 +510,6 @@
 }
 
 #updateModal .btn-cancel:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-#updateModal .btn-update {
-    background-color: var(--pz-accent) !important;
-    color: white !important;
-    border: none !important;
-    padding: 12px 20px !important;
-    font-size: 14px !important;
-    font-weight: 500 !important;
-    min-width: 200px;
-    white-space: nowrap;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-#updateModal .btn-update:hover {
-    background-color: #0056b3 !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(var(--pz-accent-rgb), 0.4);
-}
-
-#updateModal .btn-update:active {
     transform: translateY(0);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -989,30 +862,6 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-.rename-modal-content h3 {
-    margin-top: 0;
-    color: var(--pz-text);
-}
-
-.rename-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.rename-form input {
-    padding: 8px 12px;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-.rename-buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-}
-
 #renameModal .modal-buttons,
 #moveNotesModal .modal-buttons {
     display: flex;
@@ -1125,14 +974,6 @@
 /* ============================================
    Workspace List & Delete Forms
    ============================================ */
-
-.delete-form {
-    margin: 0;
-}
-
-.delete-form .btn {
-    margin: 0;
-}
 
 .workspace-list ul li>.ws-col .action-btn {
     margin: 0;

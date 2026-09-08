@@ -73,14 +73,6 @@ body.trash-page {
     /* Extra space to ensure scrolling */
 }
 
-.trash-header {
-    text-align: center;
-    font-weight: 500;
-    color: var(--pz-text);
-    margin-top: 40px;
-    margin-bottom: 20px;
-}
-
 .trash-page-count {
     font-size: 13px;
     color: #888;
@@ -471,16 +463,6 @@ body.trash-page {
     margin: 10px 0 30px 0;
 }
 
-.trash-close-search {
-    cursor: pointer;
-    font-weight: 700;
-    margin-left: 10px;
-}
-
-.trash-close-search:hover {
-    color: var(--pz-accent);
-}
-
 .searchtrash::-webkit-input-placeholder {
     color: white;
 }
@@ -604,12 +586,6 @@ body.trash-page {
         padding-bottom: 20px !important;
     }
 
-    .trash-header {
-        font-size: 1.8em;
-        margin-top: 20px;
-        margin-bottom: 15px;
-    }
-
     .trash-filter-bar {
         justify-content: center;
         margin-bottom: 20px;
@@ -642,7 +618,6 @@ body.trash-page {
         font-size: 13px;
         white-space: nowrap;
     }
-
 
     .trash-content {
         padding: 10px;

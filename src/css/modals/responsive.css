@@ -47,16 +47,6 @@
     box-sizing: border-box !important;
 }
 
-/* Attachment modal sizing */
-.attachment-modal .modal-content {
-    width: 90% !important;
-    max-width: 400px !important;
-    margin: 6% auto 0 auto !important;
-    max-height: 80vh !important;
-    overflow-y: auto !important;
-    box-sizing: border-box !important;
-}
-
 .attachment-upload {
     flex-direction: column !important;
     gap: 12px !important;
@@ -166,19 +156,6 @@
     .link-modal-footer {
         flex-direction: column-reverse !important;
         gap: 10px !important;
-    }
-
-    /* Link modal mobile */
-    .link-modal-content {
-        padding: 12px !important;
-    }
-
-    .link-modal-header h3 {
-        font-size: 1rem !important;
-    }
-
-    .link-modal-btn {
-        width: 100% !important;
     }
 
     /* Move notes modal positioning */

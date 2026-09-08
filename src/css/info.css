@@ -9,31 +9,6 @@ body {
     margin: 0 auto;
 }
 
-/* Button container styles similar to list_tags.css */
-.info-buttons-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 20px;
-    position: relative;
-}
-
-.titre-info {
-    text-align: center;
-    /* margin-bottom: 20px; */
-    color: var(--pz-text);
-    font-size: 24px;
-}
-
-.info-buttons-back-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 20px;
-}
-
 .info-content {
     /* Removed background, border-radius, and border */
     overflow: hidden;
@@ -132,15 +107,6 @@ body {
         gap: 8px;
     }
 
-    /* Hide the "Notes" button on mobile */
-    .info-buttons-container .btn[title="Notes"] {
-        display: none !important;
-    }
-
-    /* Center the header when button is hidden */
-    .info-buttons-container {
-        justify-content: center;
-    }
 }
 
 /* ===========================================

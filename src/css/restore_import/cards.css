@@ -127,11 +127,6 @@
     gap: 8px;
 }
 
-.sub-card h4 i.sub-card-icon {
-    color: var(--pz-accent);
-    font-size: 16px;
-}
-
 .sub-card h4 i.chevron {
     margin-left: auto;
     font-size: 14px;
@@ -160,31 +155,6 @@
 
 .sub-card-content > *:first-child {
     margin-top: 12px;
-}
-
-/* Legacy accordion support (kept for JavaScript compatibility) */
-.backup-section.child-section h3 {
-    font-weight: 400;
-}
-
-.accordion-header {
-    cursor: pointer;
-    user-select: none;
-    display: flex;
-    align-items: center;
-    transition: color 0.2s;
-}
-
-.accordion-header:hover {
-    color: var(--pz-accent);
-}
-
-.accordion-icon {
-    display: none;
-}
-
-.accordion-content {
-    animation: fadeIn 0.3s ease-out;
 }
 
 @keyframes fadeIn {

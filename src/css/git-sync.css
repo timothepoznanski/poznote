@@ -175,33 +175,6 @@ body.git-sync-page {
     color: #6c757d;
 }
 
-.badge-warning {
-    background: #fff3cd;
-    color: #856404;
-}
-
-.badge-info {
-    background: #e7f1ff;
-    color: #1a56db;
-}
-
-.not-configured {
-    color: #999;
-    font-style: italic;
-}
-
-.repo-link {
-    color: #1a56db;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.repo-link:hover {
-    text-decoration: underline;
-}
-
 /* Debug */
 .debug-controls {
     margin: 20px 0;
@@ -244,53 +217,6 @@ body.git-sync-page {
     word-wrap: break-word;
     font-family: monospace;
     text-align: left;
-}
-
-/* Sync Actions Grid */
-.sync-actions-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    /* margin-bottom: 20px; */
-}
-
-.sync-action-card {
-    background: transparent;
-    border-radius: 10px;
-    padding: 24px;
-    text-align: center;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    background: #ffffff;
-}
-
-.sync-action-icon {
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 16px;
-}
-
-.sync-action-icon i {
-    font-size: 1.5rem;
-    color: #fff;
-}
-
-.sync-action-card h3 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin: 0 0 8px;
-    color: var(--pz-text);
-}
-
-.sync-action-card p {
-    font-size: 0.9rem;
-    color: #666;
-    margin: 0 0 16px;
 }
 
 /* Forms */
@@ -353,92 +279,6 @@ body.git-sync-page {
 
 .btn-secondary:hover {
     background: #dee2e6;
-}
-
-/* Last Sync Info */
-.last-sync-info {
-    background: #f9fafb;
-    border-radius: 8px;
-    padding: 16px;
-}
-
-.last-sync-info p {
-    margin: 8px 0;
-    font-size: 0.95rem;
-}
-
-.last-sync-info p:first-child {
-    margin-top: 0;
-}
-
-.last-sync-info p:last-child {
-    margin-bottom: 0;
-}
-
-/* Not Configured Section */
-.not-configured-section {
-    text-align: center;
-    padding: 40px 24px;
-}
-
-.not-configured-icon {
-    font-size: 4rem;
-    color: #ddd;
-    margin-bottom: 20px;
-}
-
-.not-configured-section h2 {
-    justify-content: center;
-    font-size: 1.3rem;
-}
-
-.not-configured-section p {
-    color: #666;
-    max-width: 500px;
-    margin: 0 auto 24px;
-}
-
-.setup-instructions {
-    text-align: left;
-    background: #f9fafb;
-    border-radius: 10px;
-    padding: 24px;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.setup-instructions h3 {
-    font-size: 1rem;
-    font-weight: 600;
-    margin: 0 0 16px;
-    color: var(--pz-text);
-}
-
-.setup-instructions ol {
-    margin: 0 0 20px;
-    padding-left: 20px;
-}
-
-.setup-instructions li {
-    margin: 10px 0;
-    color: #555;
-    line-height: 1.5;
-}
-
-.code-example {
-    background: #252526;
-    border-radius: 8px;
-    padding: 16px;
-    overflow-x: auto;
-}
-
-.code-example pre {
-    margin: 0;
-    color: #d4d4d4;
-    font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
-    font-size: 0.85rem;
-    white-space: pre-wrap;
-    word-break: break-all;
 }
 
 /* Dark Mode */
@@ -512,18 +352,6 @@ body.dark-mode select.git-field-input {
     background-size: 16px 16px;
 }
 
-body.dark-mode .sync-action-card {
-    background: transparent;
-}
-
-body.dark-mode .sync-action-card h3 {
-    color: #e0e0e0;
-}
-
-body.dark-mode .sync-action-card p {
-    color: #999;
-}
-
 body.dark-mode .form-group label {
     color: #bbb;
 }
@@ -576,30 +404,6 @@ body.dark-mode .debug-info pre {
     color: inherit;
 }
 
-body.dark-mode .last-sync-info {
-    background: #252525;
-}
-
-body.dark-mode .setup-instructions {
-    background: #252525;
-}
-
-body.dark-mode .setup-instructions h3 {
-    color: #e0e0e0;
-}
-
-body.dark-mode .setup-instructions li {
-    color: #bbb;
-}
-
-body.dark-mode .not-configured-icon {
-    color: #444;
-}
-
-body.dark-mode .not-configured-section p {
-    color: #999;
-}
-
 body.dark-mode .alert-success {
     background: rgba(40, 167, 69, 0.2);
     color: #5cb85c;
@@ -639,20 +443,6 @@ body.dark-mode .badge-disabled {
     color: #888;
 }
 
-body.dark-mode .badge-warning {
-    background: rgba(255, 193, 7, 0.2);
-    color: #ffc107;
-}
-
-body.dark-mode .badge-info {
-    background: rgba(99, 102, 241, 0.2);
-    color: #a5b4fc;
-}
-
-body.dark-mode .repo-link {
-    color: #a5b4fc;
-}
-
 /* Responsive */
 @media (max-width: 600px) {
     .git-sync-header h1 {
@@ -661,10 +451,6 @@ body.dark-mode .repo-link {
 
     .git-sync-section {
         padding: 16px;
-    }
-
-    .sync-actions-grid {
-        grid-template-columns: 1fr;
     }
 
     .config-item {

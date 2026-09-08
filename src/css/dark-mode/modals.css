@@ -656,14 +656,6 @@ body.dark-mode #noteWidthModal .modal-body p {
     color: #c8c8c8;
 }
 
-html[data-theme='dark'] #fontSizeModal .font-size-section,
-html[data-theme='dark'] #noteWidthModal .font-size-section,
-body.dark-mode #fontSizeModal .font-size-section,
-body.dark-mode #noteWidthModal .font-size-section {
-    background-color: #1f1f1f;
-    border-color: var(--dm-surface-hover);
-}
-
 html[data-theme='dark'] #fontSizeModal .font-size-controls label,
 html[data-theme='dark'] #noteWidthModal .font-size-controls label,
 body.dark-mode #fontSizeModal .font-size-controls label,
@@ -710,19 +702,6 @@ body.dark-mode #noteWidthModal .font-size-controls input::placeholder {
 html[data-theme='dark'] #noteWidthModal .note-width-unit,
 body.dark-mode #noteWidthModal .note-width-unit {
     color: #9ca3af;
-}
-
-html[data-theme='dark'] #fontSizeModal .default-info,
-html[data-theme='dark'] #noteWidthModal .default-info,
-body.dark-mode #fontSizeModal .default-info,
-body.dark-mode #noteWidthModal .default-info {
-    color: #ffa6a6;
-}
-
-html[data-theme='dark'] #fontSizeModal .font-size-preview,
-body.dark-mode #fontSizeModal .font-size-preview {
-    background-color: var(--dm-surface);
-    border-color: var(--dm-surface-hover);
 }
 
 html[data-theme='dark'] #fontSizeModal .modal-footer .btn-primary,
@@ -902,24 +881,6 @@ body.dark-mode #snapshotModal .snapshot-modal-header h3 {
 html[data-theme='dark'] #snapshotModal .snapshot-modal-description,
 body.dark-mode #snapshotModal .snapshot-modal-description {
     color: rgba(218, 226, 237, 0.82);
-}
-
-html[data-theme='dark'] #snapshotModal .snapshot-help-btn,
-body.dark-mode #snapshotModal .snapshot-help-btn {
-    color: var(--dm-text-muted, #b5beca);
-}
-
-html[data-theme='dark'] #snapshotModal .snapshot-help-btn:hover,
-html[data-theme='dark'] #snapshotModal .snapshot-help-btn:focus-visible,
-body.dark-mode #snapshotModal .snapshot-help-btn:hover,
-body.dark-mode #snapshotModal .snapshot-help-btn:focus-visible {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: var(--dm-text, #f2f5f8);
-}
-
-html[data-theme='dark'] .snapshot-close-btn:hover,
-body.dark-mode .snapshot-close-btn:hover {
-    background-color: rgba(255, 255, 255, 0.1);
 }
 
 html[data-theme='dark'] .snapshot-meta,

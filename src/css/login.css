@@ -67,7 +67,6 @@ body {
 
 /* Make the login display name visually consistent with other modal/section headings */
 
-
 .form-group {
     margin-bottom: 1.5rem;
     text-align: left;
@@ -402,37 +401,6 @@ input[type="password"]::placeholder {
     font-size: 0.8125rem;
 }
 
-.login-note {
-    margin-top: 2rem;
-    padding: 1rem;
-    background: #f7fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 0.875rem;
-    color: #4a5568;
-    line-height: 1.5;
-    text-align: center;
-}
-
-.login-note p {
-    margin: 0 0 0.75rem 0;
-}
-
-.login-note p:last-child {
-    margin-bottom: 0;
-}
-
-.login-note code {
-    background: #edf2f7;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
-    font-size: 0.8125rem;
-    color: var(--pz-text);
-    display: inline-block;
-    margin: 0.5rem 0;
-}
-
 .github-link {
     margin-top: 1rem !important;
     padding-top: 0.75rem;
@@ -596,15 +564,6 @@ html[data-theme='dark'] .oidc-other-account-button:hover {
         font-size: 0.8125rem;
     }
 
-    .login-note {
-        font-size: 0.8125rem;
-        margin-top: 1.5rem;
-        padding: 0.875rem;
-    }
-
-    .login-note code {
-        font-size: 0.75rem;
-    }
 }
 
 /* ===========================================
@@ -616,4 +575,3 @@ html[data-theme='dark'] .oidc-other-account-button:hover {
     margin-top: 0.75rem;
     text-align: center;
 }
-

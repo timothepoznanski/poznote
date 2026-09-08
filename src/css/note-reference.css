@@ -12,28 +12,6 @@
     flex: 1;
 }
 
-.note-reference-modal-close {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-muted, #666);
-    transition: all 0.2s;
-    border-radius: 50%;
-}
-
-.note-reference-modal-close:hover {
-    color: var(--text-color, var(--pz-text));
-    background-color: var(--hover-bg, rgba(0, 0, 0, 0.05));
-}
-
-.note-reference-modal-close i {
-    font-size: 20px;
-}
-
 .note-reference-search-container {
     margin-bottom: 12px;
 }
@@ -229,8 +207,6 @@
     font-size: 10px;
 }
 
-
-
 /* Internal note links in content */
 a.note-internal-link,
 span.note-internal-link {
@@ -257,24 +233,12 @@ a.note-internal-link:hover {
     text-decoration: underline line-through;
 }
 
-.toolbar-btn.btn-note-reference i {
-    font-size: 14px;
-}
-
 /* Dark mode adjustments */
 [data-theme="dark"] .note-reference-modal-content {
     background-color: var(--dm-content-bg, var(--dm-content-bg));
 }
 
 [data-theme="dark"] .note-reference-modal-header h3 {
-    color: var(--dark-text-color, #e0e0e0);
-}
-
-[data-theme="dark"] .note-reference-modal-close {
-    color: var(--dark-text-muted, #888);
-}
-
-[data-theme="dark"] .note-reference-modal-close:hover {
     color: var(--dark-text-color, #e0e0e0);
 }
 

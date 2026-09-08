@@ -37,11 +37,6 @@ body.graph-page {
     background: transparent;
 }
 
-.graph-actions {
-    display: flex;
-    gap: 8px;
-}
-
 .graph-search-wrapper {
     flex: 0 1 340px;
     min-width: 180px;
@@ -387,12 +382,4 @@ html[data-theme="dark"] .graph-tooltip-meta {
         display: none;
     }
 
-    .graph-actions {
-        justify-content: center;
-    }
-
-    .graph-actions .btn {
-        padding: 6px 10px;
-        font-size: 13px;
-    }
 }

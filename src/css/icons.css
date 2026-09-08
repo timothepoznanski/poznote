@@ -72,11 +72,6 @@
     filter: none !important;
 }
 
-/* Exception: Remove filter for save button when modified (to show red color) */
-.toolbar-btn.save-modified .lucide-save {
-    filter: none !important;
-}
-
 /* Exception: Remove filter for favorite/share/attachment (to show blue color) */
 .toolbar-btn.is-favorite .lucide-star,
 .toolbar-btn.is-shared .lucide-share-2,

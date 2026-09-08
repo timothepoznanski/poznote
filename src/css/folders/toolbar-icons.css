@@ -35,20 +35,6 @@
     transform: scale(1.18);
 }
 
-/* Blue color for markdown help button */
-.toolbar-btn.markdown-help-btn i,
-.toolbar-btn.markdown-help-btn [class*="lucide-"] {
-    color: var(--pz-accent) !important;
-    filter: none !important;
-}
-
-.toolbar-btn.markdown-help-btn:hover i,
-.toolbar-btn.markdown-help-btn:hover [class*="lucide-"] {
-    color: var(--pz-accent) !important;
-    filter: none !important;
-    transform: scale(1.18);
-}
-
 /* Markdown split view button - normal icon color (not blue) */
 .toolbar-btn.markdown-split-btn i,
 .toolbar-btn.markdown-split-btn [class*="lucide-"] {

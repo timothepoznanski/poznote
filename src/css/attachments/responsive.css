@@ -61,37 +61,6 @@
         margin-bottom: 5px !important;
     }
 
-    /* When text selection mode shows formatting buttons */
-    .show-format-buttons .btn-bold,
-    .show-format-buttons .btn-italic,
-    .show-format-buttons .btn-underline,
-    .show-format-buttons .btn-strikethrough,
-    .show-format-buttons .btn-link,
-    .show-format-buttons .btn-unlink,
-    .show-format-buttons .btn-color,
-    .show-format-buttons .btn-highlight,
-    .show-format-buttons .btn-list-ul,
-    .show-format-buttons .btn-list-ol,
-    .show-format-buttons .btn-text-height,
-    .show-format-buttons .btn-code,
-    .show-format-buttons .btn-inline-code,
-    .show-format-buttons .btn-eraser {
-        display: flex !important;
-    }
-
-    /* Hide action buttons when formatting buttons are shown */
-    .show-format-buttons .btn-separator,
-    .show-format-buttons .btn-emoji,
-    .show-format-buttons .btn-save,
-    .show-format-buttons .btn-favorite,
-    .show-format-buttons .btn-folder,
-    .show-format-buttons .btn-attachment,
-    .show-format-buttons .btn-download,
-    .show-format-buttons .btn-info,
-    .show-format-buttons .btn-trash {
-        display: none !important;
-    }
-
     /* Hover/focus visual for attachment button (mobile) */
     .btn-attachment:hover,
     .btn-attachment:focus {

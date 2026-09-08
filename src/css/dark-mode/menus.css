@@ -159,11 +159,6 @@ body.dark-mode .slash-date-picker-apply-btn:hover {
     background: #1d4ed8;
 }
 
-html[data-theme='dark'] .slash-command-separator,
-body.dark-mode .slash-command-separator {
-    background: var(--dm-border);
-}
-
 html[data-theme='dark'] .slash-command-back,
 body.dark-mode .slash-command-back {
     background-color: transparent !important;
@@ -513,11 +508,6 @@ body.dark-mode .dropdown-item i {
 html[data-theme='dark'] .dropdown-item:hover i,
 body.dark-mode .dropdown-item:hover i {
     color: var(--dm-accent);
-}
-
-html[data-theme='dark'] .dropdown-divider,
-body.dark-mode .dropdown-divider {
-    background-color: var(--dm-border);
 }
 
 /* ============================================

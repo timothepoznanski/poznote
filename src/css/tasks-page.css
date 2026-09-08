@@ -14,13 +14,6 @@ body.tasks-page {
     padding: 20px;
 }
 
-.tasks-buttons-container {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
 /* Progress section. On desktop the title, progress bar and label share one
    row (the header wrapper is flattened with display: contents); the mobile
    media query restores the stacked layout. */
@@ -828,10 +821,6 @@ body.tasks-page {
         padding: 5px;
     }
 
-    .tasks-buttons-container {
-        margin-bottom: 20px;
-    }
-
     .tasks-note-group {
         padding: 10px 12px;
         margin-bottom: 12px;
@@ -872,11 +861,6 @@ body.tasks-page {
 
     .tasks-progress-option {
         margin-top: 10px;
-    }
-
-    .tasks-buttons-container {
-        flex-direction: row;
-        gap: 10px;
     }
 
     .btn {

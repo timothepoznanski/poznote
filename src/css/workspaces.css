@@ -110,12 +110,6 @@ body {
     min-width: 200px;
 }
 
-.ws-col-background {
-    flex: 0 0 auto;
-    justify-content: center;
-    min-width: 50px;
-}
-
 /* Row actions: one icon per action (share, rename, tags, background, move
    notes, delete). The delegated click handlers read the button from
    event.target, hence the pointer-events on the icons. */
@@ -417,19 +411,6 @@ body.dark-mode .ws-tags-help {
     width: 100%;
 }
 
-.workspace-share-heading {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.workspace-share-title {
-    font-weight: 600;
-    color: #1f2937;
-}
-
 .workspace-share-badge {
     display: inline-flex;
     align-items: center;
@@ -453,13 +434,6 @@ body.dark-mode .ws-tags-help {
     margin: 8px 0 0;
     color: #64748b;
     font-size: 13px;
-}
-
-.workspace-share-controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 10px;
 }
 
 .workspace-share-link {
@@ -933,80 +907,9 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
     border-color: #545b62;
 }
 
-.btn-delete-ws {
-    background-color: var(--pz-danger);
-    color: white;
-    border-color: var(--pz-danger);
-}
-
-.btn-delete-ws:hover {
-    background-color: #c82333;
-    border-color: #bd2130;
-}
-
-
-/* Indicateur de chargement */
-.loading-workspaces {
-    text-align: center;
-    color: #666;
-    font-style: italic;
-    padding: 40px;
-}
-
-.loading-workspaces i {
-    animation: spin 1s linear infinite;
-    margin-right: 8px;
-    font-size: 18px;
-}
-
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-}
-
-/* Message vide */
-.empty-workspaces {
-    text-align: center;
-    color: #666;
-    font-style: italic;
-    padding: 40px;
-    background-color: var(--pz-surface);
-    border-radius: 6px;
-    border: 1px solid #dee2e6;
-}
-
-/* Statistiques des workspaces */
-.workspace-stats {
-    background-color: var(--pz-surface);
-    padding: 15px;
-    border-radius: 6px;
-    margin-bottom: 20px;
-    border: 1px solid #dee2e6;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
-    margin-top: 10px;
-}
-
-.stat-item {
-    text-align: center;
-}
-
-.stat-number {
-    font-size: 24px;
-    font-weight: bold;
-    color: var(--pz-accent);
-    display: block;
-}
-
-.stat-label {
-    font-size: 12px;
-    color: #666;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
 /* Icon styles for attachments page */
@@ -1057,9 +960,6 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
     opacity: 0.95;
 }
 
-/* Ensure delete column has consistent spacing */
-.ws-col-delete { justify-content: center; }
-
 /* Lock icon for default workspace */
 .locked-icon { color: #777; margin-left: 8px; font-size: 0.9rem; }
 
@@ -1094,24 +994,6 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
 
 .btn-success:hover {
     background: #218838;
-}
-
-.btn-warning {
-    background: var(--pz-warning);
-    /* color: #212529; */
-}
-
-.btn-warning:hover {
-    background: #e0a800;
-}
-
-.btn-orange {
-    background: #e67e22;
-    color: white;
-}
-
-.btn-orange:hover {
-    background: #d35400;
 }
 
 .btn:disabled {
@@ -1220,15 +1102,6 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
         padding: 12px !important;
     }
 
-    .workspace-share-controls {
-        flex-direction: column !important;
-    }
-    
-    /* Ensure delete form takes full width */
-    .workspace-list .delete-form {
-        width: 100% !important;
-    }
-    
     /* Form styling for mobile */
     .ws-create-row {
         flex-direction: column;

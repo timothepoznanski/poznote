@@ -82,13 +82,6 @@ body.settings-page {
     height: 14px;
 }
 
-/* Heart Blink Animation */
-.heart-blink {
-    color: #ef4444;
-    font-size: 0.85em;
-    animation: heartbeat 1.5s ease-in-out infinite;
-}
-
 @keyframes heartbeat {
     0% { opacity: 1; transform: scale(1); }
     25% { opacity: 0.6; transform: scale(0.9); }
@@ -120,43 +113,6 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     border-left: 3px solid transparent;
     font-size: 0.9rem;
     line-height: 1.45;
-}
-
-#changePasswordModal .change-password-status-custom {
-    border-left-color: #2e9e5b;
-    background: rgba(46, 158, 91, 0.14);
-    color: rgba(255, 255, 255, 0.86);
-}
-
-/* Still on the shared default: worth acting on, so flag it. */
-#changePasswordModal .change-password-status-default {
-    border-left-color: #d99100;
-    background: rgba(217, 145, 0, 0.16);
-    color: rgba(255, 255, 255, 0.86);
-}
-
-#changePasswordModal .change-password-status-sso {
-    border-left-color: #4a9eff;
-    background: rgba(74, 158, 255, 0.14);
-    color: rgba(255, 255, 255, 0.86);
-}
-
-html[data-theme='light'] #changePasswordModal .change-password-status-custom,
-body:not(.dark-mode) #changePasswordModal .change-password-status-custom {
-    background: rgba(46, 158, 91, 0.1);
-    color: #1f6b3d;
-}
-
-html[data-theme='light'] #changePasswordModal .change-password-status-default,
-body:not(.dark-mode) #changePasswordModal .change-password-status-default {
-    background: rgba(217, 145, 0, 0.12);
-    color: #8a5d00;
-}
-
-html[data-theme='light'] #changePasswordModal .change-password-status-sso,
-body:not(.dark-mode) #changePasswordModal .change-password-status-sso {
-    background: rgba(74, 158, 255, 0.1);
-    color: #1f5fa8;
 }
 
 /* Settings Category Titles */

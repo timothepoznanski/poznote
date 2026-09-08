@@ -150,11 +150,6 @@ body.dark-mode .settings-card h3 {
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .settings-card-icon,
-body.dark-mode .settings-card-icon {
-    color: var(--dm-accent);
-}
-
 html[data-theme='dark'] .settings-section,
 body.dark-mode .settings-section {
     background-color: var(--dm-surface);
@@ -181,12 +176,6 @@ body.dark-mode .settings-section .btn:enabled {
    Info Page
    ============================================ */
 
-html[data-theme='dark'] .info-container,
-body.dark-mode .info-container {
-    background-color: var(--dm-content-bg);
-    color: var(--dm-text);
-}
-
 html[data-theme='dark'] .info-label,
 body.dark-mode .info-label {
     background-color: var(--dm-content-bg);
@@ -197,11 +186,6 @@ html[data-theme='dark'] .info-value,
 body.dark-mode .info-value {
     background-color: var(--dm-content-bg);
     color: var(--dm-text);
-}
-
-html[data-theme='dark'] .info-card,
-body.dark-mode .info-card {
-    border-color: var(--dm-border);
 }
 
 html[data-theme='dark'] .info-row,
@@ -294,12 +278,6 @@ body.dark-mode .workspace-item:hover {
 
 html[data-theme='dark'] .trash-container,
 body.dark-mode .trash-container {
-    background-color: var(--dm-content-bg);
-    color: var(--dm-text);
-}
-
-html[data-theme='dark'] .trash-header,
-body.dark-mode .trash-header {
     background-color: var(--dm-content-bg);
     color: var(--dm-text);
 }
@@ -441,21 +419,6 @@ html[data-theme='dark'] .backup-container,
 body.dark-mode .backup-container {
     background-color: var(--dm-content-bg);
     color: var(--dm-text);
-}
-
-html[data-theme='dark'] .accordion-header,
-body.dark-mode .accordion-header {
-    color: var(--dm-text);
-}
-
-html[data-theme='dark'] .accordion-header:hover,
-body.dark-mode .accordion-header:hover {
-    color: var(--dm-accent);
-}
-
-html[data-theme='dark'] .accordion-icon,
-body.dark-mode .accordion-icon {
-    color: #b0b0b0;
 }
 
 html[data-theme='dark'] .backup-section,
@@ -616,11 +579,6 @@ body.dark-mode .sub-card h4 {
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .sub-card h4 i.sub-card-icon,
-body.dark-mode .sub-card h4 i.sub-card-icon {
-    color: var(--dm-accent);
-}
-
 html[data-theme='dark'] .sub-card h4 i.chevron,
 body.dark-mode .sub-card h4 i.chevron {
     color: #b0b0b0;
@@ -715,11 +673,6 @@ body.dark-mode .folder-icon-modal-content h3 {
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .folder-icon-description,
-body.dark-mode .folder-icon-description {
-    color: #b0b0b0;
-}
-
 html[data-theme='dark'] .folder-icon-grid,
 body.dark-mode .folder-icon-grid {
     background: var(--dm-bg);
@@ -780,11 +733,6 @@ body.dark-mode .folder-icon-grid::-webkit-scrollbar-thumb:hover {
 /* ============================================
    Folder Color Picker
    ============================================ */
-
-html[data-theme='dark'] .folder-color-label,
-body.dark-mode .folder-color-label {
-    color: var(--dm-text);
-}
 
 html[data-theme='dark'] .folder-color-picker,
 body.dark-mode .folder-color-picker {

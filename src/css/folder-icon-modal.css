@@ -24,12 +24,6 @@
     color: #6366f1;
 }
 
-.folder-icon-description {
-    margin: 0 0 20px 0;
-    color: var(--pz-text-muted);
-    font-size: 14px;
-}
-
 /* Reduce space above the search bar */
 .folder-icon-modal-content {
     padding-top: 14px;
@@ -179,14 +173,6 @@
 .folder-color-section {
     margin-top: 20px;
     margin-bottom: 20px;
-}
-
-.folder-color-label {
-    display: block;
-    font-weight: 600;
-    font-size: 14px;
-    color: #374151;
-    margin-bottom: 12px;
 }
 
 .folder-color-picker {

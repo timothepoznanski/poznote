@@ -84,10 +84,6 @@
     flex-wrap: wrap;
 }
 
-.btn-text-mobile-only {
-    display: none;
-}
-
 @media (max-width: 600px) {
     .workspaces-nav {
         gap: 12px;

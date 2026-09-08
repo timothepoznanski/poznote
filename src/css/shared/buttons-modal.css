@@ -35,17 +35,6 @@
     text-decoration: none;
 }
 
-.btn-shared {
-    background: rgb(0, 125, 184);
-    color: white;
-}
-
-.btn-shared:hover {
-    background: rgb(0, 105, 154);
-    color: white;
-    text-decoration: none;
-}
-
 .btn-danger {
     background: #e04b4b;
     color: #fff;

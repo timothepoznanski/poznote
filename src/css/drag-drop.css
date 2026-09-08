@@ -210,19 +210,6 @@ body.dark-mode .folder-header.folder-drop-after>.folder-toggle::after {
     min-height: 60px !important;
 }
 
-.root-drop-zone.active-drop-zone {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    background-color: var(--pz-accent-soft) !important;
-    border: 3px dashed #007bff !important;
-    color: #007bff !important;
-    font-weight: bold !important;
-    padding: 20px !important;
-    margin: 10px !important;
-    z-index: 9999 !important;
-}
-
 .root-drop-zone[style*="display: block"] {
     display: block !important;
     animation: dropZoneShow 0.3s ease;

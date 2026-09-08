@@ -49,28 +49,6 @@ body.attachments-page {
     color: var(--text-color, var(--pz-text));
 }
 
-.attachments-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-.attachments-header {
-    font-size: 28px;
-    font-weight: 600;
-    margin-bottom: 10px;
-    color: var(--text-color, var(--pz-text));
-    opacity: 1;
-}
-
-.attachments-buttons-container {
-    display: flex;
-    justify-content: flex-start;
-    gap: 20px;
-    margin-top: 20px;
-    margin-bottom: 30px;
-}
-
 .attachments-inline-notice {
     max-width: 900px;
     margin: -8px auto 20px auto;
@@ -130,29 +108,6 @@ body.attachments-page {
     font-weight: 500;
 }
 
-.attachments-content {
-    margin-top: 20px;
-}
-
-/* Attachments Notes List */
-.attachments-notes-list {
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-.attachment-note-item {
-    margin-bottom: 20px;
-    padding: 16px;
-    border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: 8px;
-    background-color: var(--card-bg, #ffffff);
-    transition: box-shadow 0.2s ease;
-}
-
-.attachment-note-item:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
 .note-header {
     display: flex;
     justify-content: space-between;
@@ -171,14 +126,6 @@ body.attachments-page {
     text-overflow: ellipsis;
     white-space: nowrap;
     flex: 1;
-}
-
-.attachment-count {
-    font-size: 14px;
-    color: var(--text-muted, #666666);
-    display: flex;
-    align-items: center;
-    gap: 6px;
 }
 
 /* Attachments List */
@@ -208,15 +155,6 @@ body.attachments-page {
     width: 20px;
     text-align: center;
     flex-shrink: 0;
-}
-
-.attachment-filename {
-    flex: 1;
-    font-size: 14px;
-    color: var(--text-color, var(--pz-text));
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 .attachment-size {
@@ -276,22 +214,6 @@ body.attachments-page {
         padding: 10px;
     }
 
-    .attachments-container {
-        padding: 10px;
-        padding-bottom: 20px;
-    }
-
-    .attachments-header {
-        font-size: 1.8em;
-        margin-top: 20px;
-        margin-bottom: 15px;
-    }
-
-    .attachments-buttons-container {
-        justify-content: center;
-        margin: 15px 10px;
-    }
-
     .attachments-filter-bar {
         flex-wrap: wrap;
     }
@@ -303,11 +225,6 @@ body.attachments-page {
     .attachment-item {
         flex-wrap: wrap;
         gap: 8px;
-    }
-
-    .attachment-filename {
-        flex-basis: 100%;
-        order: 2;
     }
 
     .attachment-size {
@@ -323,15 +240,6 @@ body.attachments-page {
 [data-theme="dark"] body.attachments-page {
     background-color: var(--dm-content-bg);
     color: var(--dm-text);
-}
-
-[data-theme="dark"] .attachments-header {
-    color: #ffffff;
-}
-
-[data-theme="dark"] .attachment-note-item {
-    background-color: var(--dm-surface);
-    border-color: var(--dm-border);
 }
 
 [data-theme="dark"] .note-header {
@@ -464,13 +372,6 @@ body.attachments-page {
     text-decoration: underline;
 }
 
-.attachment-count {
-    color: var(--text-muted, #666);
-    font-size: 13px;
-    margin-left: 8px;
-    font-weight: normal;
-}
-
 .attachments-list-container {
     max-width: 900px;
     margin: 0 auto;
@@ -521,4 +422,3 @@ body.attachments-page {
 .toggle-label {
     font-weight: 500;
 }
-

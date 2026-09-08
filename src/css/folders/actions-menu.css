@@ -162,28 +162,6 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     color: var(--pz-accent);
 }
 
-/* Kanban icon style */
-.folder-kanban-icon {
-    padding: 2px 4px;
-    cursor: pointer;
-    color: var(--pz-text-muted);
-    border-radius: 4px;
-    transition: all 0.15s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.folder-kanban-icon:hover {
-    background: rgba(107, 114, 128, 0.1);
-    color: var(--pz-accent-strong);
-}
-
-.folder-kanban-icon i,
-.folder-kanban-icon [class*="lucide-"] {
-    font-size: 0.75em !important;
-}
-
 /* Dropdown menu shared by folder actions (.folder-actions-menu), note actions
    (.note-actions-menu) and the create menu (.create-menu): one look, three JS
    hooks. Each is a single shared menu placed by adjustMenuPosition() in
@@ -274,17 +252,6 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     margin: 4px 0;
 }
 
-.folder-actions-menu-header,
-.note-actions-menu-header {
-    padding: 6px 16px;
-    font-size: 0.75em;
-    text-transform: uppercase;
-    color: var(--pz-text-subtle);
-    font-weight: 600;
-    pointer-events: none;
-    letter-spacing: 0.05em;
-}
-
 .folder-actions-menu-item.active,
 .note-actions-menu-item.active {
     background-color: var(--pz-accent-soft);
@@ -313,11 +280,6 @@ body.dark-mode .note-actions-menu-item.active i {
     color: #38bdf8;
 }
 
-/* Visibility of sort checkmark */
-.folder-actions-menu-item .sort-check {
-    display: none;
-}
-
 /* Folder action buttons */
 .folder-edit-btn,
 .folder-delete-btn,
@@ -327,11 +289,6 @@ body.dark-mode .note-actions-menu-item.active i {
     margin-left: 8px;
     cursor: pointer;
     border-radius: 4px;
-}
-
-/* Hide edit button for system folders to prevent renaming */
-.default-folder .folder-edit-btn {
-    display: none !important;
 }
 
 /* Hide "Open all notes" action on mobile (viewport ≤ 800px) */

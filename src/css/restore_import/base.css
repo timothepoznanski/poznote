@@ -37,14 +37,6 @@ body {
     border-radius: 8px;
 }
 
-/* Navigation buttons container */
-.navigation-buttons {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 40px;
-}
-
 /* Sections de sauvegarde - Modern Cards */
 .backup-section {
     padding: 0;

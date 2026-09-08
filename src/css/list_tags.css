@@ -27,28 +27,6 @@ html.tags-page {
     overflow: auto;
 }
 
-/* Button styles reused from trash.css to match appearance */
-.tags-buttons-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    margin: 20px 30px;
-    position: relative;
-}
-
-.tags-header {
-    font-size: 1.8em;
-    color: var(--pz-text);
-    font-weight: 500;
-    margin: 0;
-}
-
-.tags-actions {
-    display: flex;
-    gap: 10px;
-}
-
 /* Button styles matching trash.css */
 .btn {
     display: inline-block;
@@ -399,33 +377,9 @@ body.dark-mode .tag-rename-input:focus {
 /* Mobile styles */
 @media (max-width: 800px) {
 
-    /* Adjust search input width for mobile */
-    .tags-search-input {
-        width: 90%;
-    }
-
     /* Adjust container padding for mobile */
     .tags-container {
         padding: 15px;
-    }
-
-    /* Adjust button container for mobile */
-    .tags-buttons-container {
-        flex-direction: column;
-        margin: 15px 10px 20px 10px;
-        gap: 15px;
-        text-align: center;
-    }
-
-    /* Adjust header for mobile */
-    .tags-header {
-        font-size: 1.5em;
-        width: 100%;
-    }
-
-    .tags-actions {
-        width: 100%;
-        justify-content: center;
     }
 
     /* Adjust grid for mobile */

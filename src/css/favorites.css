@@ -14,22 +14,6 @@ body.favorites-page {
     padding: 20px;
 }
 
-.favorites-header {
-    font-size: 28px;
-    font-weight: 600;
-    margin-bottom: 25px;
-    color: var(--text-color, var(--pz-text));
-    text-align: center;
-}
-
-.favorites-buttons-container {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 20px;
-    margin-bottom: 30px;
-}
-
 /* Filter Bar */
 .favorites-filter-bar {
     max-width: 900px;
@@ -213,14 +197,6 @@ body.favorites-page {
 
 /* Mobile responsive */
 @media (max-width: 600px) {
-    .favorites-header {
-        font-size: 22px;
-    }
-
-    .favorites-buttons-container {
-        flex-direction: row;
-        gap: 10px;
-    }
 
     .btn {
         padding: 8px 12px;

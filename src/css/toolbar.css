@@ -107,22 +107,6 @@
 
 /* baseline removed - simplified palette */
 
-/* caret removed - popup has no arrow */
-
-.toolbar-vertical-menu {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
-    min-width: 200px;
-    padding: 8px 0;
-    margin-top: 5px;
-}
-
 /* Text style popup (used by toolbar.js -> changeFontSize) */
 .font-size-popup {
     position: absolute;
@@ -200,24 +184,6 @@
 .font-size-popup .style-h3 {
     font-size: 1.05rem;
     font-weight: 700;
-}
-
-.btn-settings {
-    position: relative;
-}
-
-.btn-settings.active {
-    background: rgba(var(--pz-accent-rgb), 0.1) !important;
-    color: var(--pz-accent) !important;
-}
-
-/* Attachment indicators (use app blue instead of green) */
-.btn-settings.has-attachments {
-    color: var(--pz-accent) !important;
-}
-
-.btn-settings.has-attachments:hover {
-    color: var(--pz-accent-hover) !important;
 }
 
 .btn-attachment.has-attachments i {
@@ -388,33 +354,6 @@ a.links_arbo_left .note-title {
 
 a.links_arbo_left.selected-note {
     background-color: transparent;
-}
-
-/* MENU RIGHT - Note action icons (download, info, save) */
-.icon_download {
-    color: var(--pz-accent);
-    font-size: 17px;
-}
-
-.note-icons-desktop {
-    padding: 4px 11px;
-    font-size: 17px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 25px;
-    cursor: pointer;
-    margin: 0 0 0 auto;
-}
-
-.icon_info {
-    color: var(--pz-accent);
-    font-size: 1.1em;
-}
-
-.icon_save {
-    color: var(--pz-accent);
-    font-size: 1.1em;
 }
 
 /* Desktop styles for toolbar menu (3 dots menu) */

@@ -250,12 +250,6 @@ body.dark-mode.markdown-colored .markdown-preview :is(#poznote-md-colored-boost,
    Markdown Toolbar Icons
    ============================================ */
 
-/* Keep active toolbar icons with their original colors */
-html[data-theme='dark'] .toolbar-btn.save-modified .lucide-save,
-body.dark-mode .toolbar-btn.save-modified .lucide-save {
-    filter: none !important;
-}
-
 html[data-theme='dark'] .toolbar-btn.is-favorite i,
 html[data-theme='dark'] .toolbar-btn.is-shared i,
 html[data-theme='dark'] .toolbar-btn.has-attachments i,
@@ -309,24 +303,6 @@ body.dark-mode .markdown-view-mode-btn:hover i {
 /* Split view button - normal color */
 html[data-theme='dark'] .markdown-split-btn:hover i,
 body.dark-mode .markdown-split-btn:hover i {
-    transform: scale(1.18);
-}
-
-/* Markdown help button */
-html[data-theme='dark'] .toolbar-btn.markdown-help-btn i,
-html[data-theme='dark'] .toolbar-btn.markdown-help-btn [class*="lucide-"],
-body.dark-mode .toolbar-btn.markdown-help-btn i,
-body.dark-mode .toolbar-btn.markdown-help-btn [class*="lucide-"] {
-    color: var(--pz-accent) !important;
-    filter: none !important;
-}
-
-html[data-theme='dark'] .toolbar-btn.markdown-help-btn:hover i,
-html[data-theme='dark'] .toolbar-btn.markdown-help-btn:hover [class*="lucide-"],
-body.dark-mode .toolbar-btn.markdown-help-btn:hover i,
-body.dark-mode .toolbar-btn.markdown-help-btn:hover [class*="lucide-"] {
-    color: var(--pz-accent) !important;
-    filter: none !important;
     transform: scale(1.18);
 }
 

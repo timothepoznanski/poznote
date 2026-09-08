@@ -89,19 +89,6 @@
         padding-bottom: 20px !important;
     }
 
-    .shared-buttons-container {
-        justify-content: center;
-        margin: 0 10px 15px 10px;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    .shared-buttons-container .btn {
-        flex: 1 1 auto;
-        min-width: 120px;
-        margin: 0;
-    }
-
     .shared-content {
         padding: 10px;
     }
@@ -220,11 +207,6 @@
         border-radius: 8px;
     }
 
-    .note-folder-container {
-        grid-area: folder;
-        min-height: 0;
-    }
-
     .folder-badge {
         font-size: 14px;
         line-height: 1.4;
@@ -247,11 +229,6 @@
         line-height: 1.45;
         white-space: normal;
         overflow-wrap: anywhere;
-    }
-
-    .note-token-edit-button {
-        width: 28px;
-        height: 28px;
     }
 
     .note-actions {
