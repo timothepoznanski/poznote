@@ -26,8 +26,7 @@
     line-height: 1.6;
 }
 
-html[data-theme='dark'] .dr-hero p,
-body.dark-mode .dr-hero p {
+html[data-theme='dark'] .dr-hero p {
     color: rgba(255, 255, 255, 0.82);
 }
 
@@ -396,11 +395,9 @@ html[data-theme='dark'] .status-warning {
 .quota-level-danger .quota-inline {
     color: var(--pz-danger);
 }
-html[data-theme='dark'] .quota-level-warn,
-body.dark-mode .quota-level-warn {
+html[data-theme='dark'] .quota-level-warn {
     color: #fbbf24;
 }
-html[data-theme='dark'] .quota-level-danger,
-body.dark-mode .quota-level-danger {
+html[data-theme='dark'] .quota-level-danger {
     color: #f87171;
 }

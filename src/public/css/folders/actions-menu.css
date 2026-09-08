@@ -266,17 +266,13 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 
 /* Dark mode adjustments */
 html[data-theme='dark'] .folder-actions-menu-item.active,
-html[data-theme='dark'] .note-actions-menu-item.active,
-body.dark-mode .folder-actions-menu-item.active,
-body.dark-mode .note-actions-menu-item.active {
+html[data-theme='dark'] .note-actions-menu-item.active {
     background-color: rgba(var(--pz-accent-rgb), 0.2);
     color: #38bdf8;
 }
 
 html[data-theme='dark'] .folder-actions-menu-item.active i,
-html[data-theme='dark'] .note-actions-menu-item.active i,
-body.dark-mode .folder-actions-menu-item.active i,
-body.dark-mode .note-actions-menu-item.active i {
+html[data-theme='dark'] .note-actions-menu-item.active i {
     color: #38bdf8;
 }
 

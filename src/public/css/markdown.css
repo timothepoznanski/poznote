@@ -90,8 +90,7 @@
     vertical-align: top;
 }
 
-html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::before,
-body.dark-mode .markdown-editor .markdown-excalidraw-placeholder::before {
+html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::before {
     color: #b9c4cf;
 }
 
@@ -430,9 +429,7 @@ body.slash-menu-cursor-hidden * {
 }
 
 html[data-theme='dark'] .noteentry pre.indented-pre,
-html[data-theme='dark'] .markdown-preview pre.indented-pre,
-body.dark-mode .noteentry pre.indented-pre,
-body.dark-mode .markdown-preview pre.indented-pre {
+html[data-theme='dark'] .markdown-preview pre.indented-pre {
     background: none !important;
     background-color: transparent !important;
     border: none !important;
@@ -1054,9 +1051,7 @@ body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
 }
 
 html[data-theme='dark'] body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor-container,
-html[data-theme='dark'] body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview,
-body.dark-mode.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor-container,
-body.dark-mode.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
+html[data-theme='dark'] body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
     border-color: var(--dm-border) !important;
     background: var(--dm-content-bg) !important;
 }

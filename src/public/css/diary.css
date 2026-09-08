@@ -180,54 +180,45 @@
 }
 
 /* Dark mode */
-:root[data-theme='dark'] .diary-month-title,
-body.dark-mode .diary-month-title {
+:root[data-theme='dark'] .diary-month-title {
     color: #e5e7eb;
     border-bottom-color: #374151;
 }
 
-:root[data-theme='dark'] .diary-card-today,
-body.dark-mode .diary-card-today {
+:root[data-theme='dark'] .diary-card-today {
     border-color: #0e6ba8;
 }
 
-:root[data-theme='dark'] .diary-today-tag,
-body.dark-mode .diary-today-tag {
+:root[data-theme='dark'] .diary-today-tag {
     background: #0e6ba8;
     color: #f3f4f6;
 }
 
-:root[data-theme='dark'] .diary-switch-btn,
-body.dark-mode .diary-switch-btn {
+:root[data-theme='dark'] .diary-switch-btn {
     border-color: #374151;
     color: #d1d5db;
 }
 
-:root[data-theme='dark'] .diary-switch-btn:hover,
-body.dark-mode .diary-switch-btn:hover {
+:root[data-theme='dark'] .diary-switch-btn:hover {
     border-color: #0e6ba8;
     color: #60a5fa;
 }
 
-:root[data-theme='dark'] .diary-switch-btn.diary-switch-active,
-body.dark-mode .diary-switch-btn.diary-switch-active {
+:root[data-theme='dark'] .diary-switch-btn.diary-switch-active {
     background: #0e6ba8;
     border-color: #0e6ba8;
     color: #f3f4f6;
 }
 
-:root[data-theme='dark'] .diary-new-modal,
-body.dark-mode .diary-new-modal {
+:root[data-theme='dark'] .diary-new-modal {
     background: #1f2937;
 }
 
-:root[data-theme='dark'] .diary-new-modal .modal-title,
-body.dark-mode .diary-new-modal .modal-title {
+:root[data-theme='dark'] .diary-new-modal .modal-title {
     color: #e5e7eb;
 }
 
-:root[data-theme='dark'] .diary-new-modal .diary-new-input,
-body.dark-mode .diary-new-modal .diary-new-input {
+:root[data-theme='dark'] .diary-new-modal .diary-new-input {
     border-color: #374151;
     color: #e5e7eb;
 }

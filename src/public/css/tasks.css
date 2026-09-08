@@ -919,11 +919,11 @@ details.callout:not([open]) .callout-fold-icon {
 }
 
 /* Dark mode adjustments */
-body.dark-mode .toggle-block {
+html[data-theme='dark'] .toggle-block {
     border-color: #30363d;
 }
 
-body.dark-mode .toggle-block[open]>summary {
+html[data-theme='dark'] .toggle-block[open]>summary {
     border-bottom-color: #30363d;
 }
 

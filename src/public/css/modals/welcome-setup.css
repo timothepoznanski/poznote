@@ -134,32 +134,27 @@
     }
 }
 
-/* ---- Dark / black mode (body.dark-mode is set for both) ---- */
+/* ---- Dark / black mode (data-theme='dark' covers both) ---- */
 
-:root[data-theme='dark'] .welcome-setup-subtitle,
-body.dark-mode .welcome-setup-subtitle {
+:root[data-theme='dark'] .welcome-setup-subtitle {
     color: var(--dm-text-muted);
 }
 
-:root[data-theme='dark'] .welcome-setup-field label,
-body.dark-mode .welcome-setup-field label {
+:root[data-theme='dark'] .welcome-setup-field label {
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .welcome-setup-tip,
-body.dark-mode .welcome-setup-tip {
+:root[data-theme='dark'] .welcome-setup-tip {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .welcome-setup-tip:hover,
-body.dark-mode .welcome-setup-tip:hover {
+:root[data-theme='dark'] .welcome-setup-tip:hover {
     background: var(--dm-surface-hover);
     border-color: var(--pz-accent);
 }
 
-:root[data-theme='dark'] .welcome-setup-tip .welcome-setup-tip-arrow,
-body.dark-mode .welcome-setup-tip .welcome-setup-tip-arrow {
+:root[data-theme='dark'] .welcome-setup-tip .welcome-setup-tip-arrow {
     color: var(--dm-text-muted);
 }

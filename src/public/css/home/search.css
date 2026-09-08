@@ -87,21 +87,18 @@
 }
 
 /* Dark mode - search */
-html[data-theme='dark'] .home-search-input,
-body.dark-mode .home-search-input {
+html[data-theme='dark'] .home-search-input {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .home-search-input:focus,
-body.dark-mode .home-search-input:focus {
+html[data-theme='dark'] .home-search-input:focus {
     border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.2);
 }
 
-html[data-theme='dark'] .home-search-clear:hover,
-body.dark-mode .home-search-clear:hover {
+html[data-theme='dark'] .home-search-clear:hover {
     color: var(--dm-text);
     background: rgba(255, 255, 255, 0.08);
 }

@@ -22,13 +22,11 @@
     text-decoration: underline;
 }
 
-html[data-theme='dark'] .attachment-usage-notice,
-body.dark-mode .attachment-usage-notice {
+html[data-theme='dark'] .attachment-usage-notice {
     color: #f87171;
 }
 
-html[data-theme='dark'] .attachment-usage-notice .lucide-alert-triangle,
-body.dark-mode .attachment-usage-notice .lucide-alert-triangle {
+html[data-theme='dark'] .attachment-usage-notice .lucide-alert-triangle {
     color: #f87171;
     background-color: #f87171;
 }

@@ -33,8 +33,7 @@
    Dark Mode - CSS Custom Properties & Base
    ============================================ */
 
-:root[data-theme='dark'],
-body.dark-mode {
+:root[data-theme='dark'] {
     --dm-text: #bebebe;
     --dm-text-muted: #c5c5c5;
     --dm-bg: #252526;
@@ -54,8 +53,7 @@ body.dark-mode {
     --dm-tab-active-bg: #383838;
 }
 
-html.theme-black[data-theme='dark'],
-body.black-mode {
+html.theme-black[data-theme='dark'] {
     --dm-text: #c0c8d4;
     --dm-text-muted: #9ba6b5;
     --dm-bg: #0f1117;
@@ -76,14 +74,12 @@ body.black-mode {
 }
 
 /* Apply dark background as early as possible */
-html[data-theme='dark'],
-body.dark-mode {
+html[data-theme='dark'] {
     background-color: var(--dm-content-bg);
     color: var(--dm-text);
 }
 
 /* Prevent transition flash on initial load */
-html[data-theme='dark'] *,
-body.dark-mode * {
+html[data-theme='dark'] * {
     transition: background-color 0.0s, color 0.0s, border-color 0.0s !important;
 }

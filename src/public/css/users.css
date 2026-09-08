@@ -14,8 +14,7 @@
     font-style: normal;
 }
 
-html[data-theme='dark'],
-body.dark-mode {
+html[data-theme='dark'] {
     --bg-color: var(--dm-bg);
     --bg-secondary: var(--dm-surface);
     --bg-hover: var(--dm-surface-hover);
@@ -309,17 +308,13 @@ body.dark-mode {
     visibility: visible;
 }
 
-html[data-theme='dark'] .users-header-help,
-body.dark-mode .users-header-help {
+html[data-theme='dark'] .users-header-help {
     color: #d6dde6;
 }
 
 html[data-theme='dark'] .users-header-help:hover,
 html[data-theme='dark'] .users-header-help:focus,
-html[data-theme='dark'] .users-header-help:focus-visible,
-body.dark-mode .users-header-help:hover,
-body.dark-mode .users-header-help:focus,
-body.dark-mode .users-header-help:focus-visible {
+html[data-theme='dark'] .users-header-help:focus-visible {
     color: #ffffff;
 }
 
@@ -956,30 +951,25 @@ input:disabled+.slider {
         font-size: 15px;
     }
 
-    html[data-theme='dark'] .actions-center .btn,
-    body.dark-mode .actions-center .btn {
+    html[data-theme='dark'] .actions-center .btn {
         border-color: rgba(255, 255, 255, 0.06);
     }
 
-    html[data-theme='dark'] .actions-center .btn-secondary,
-    body.dark-mode .actions-center .btn-secondary {
+    html[data-theme='dark'] .actions-center .btn-secondary {
         background: #3b3f45;
         color: #f2f4f8 !important;
     }
 
-    html[data-theme='dark'] .actions-center .btn-secondary:hover,
-    body.dark-mode .actions-center .btn-secondary:hover {
+    html[data-theme='dark'] .actions-center .btn-secondary:hover {
         background: #4a5058;
     }
 
-    html[data-theme='dark'] .actions-center .btn-danger,
-    body.dark-mode .actions-center .btn-danger {
+    html[data-theme='dark'] .actions-center .btn-danger {
         background: #c93a4a;
         color: #fff !important;
     }
 
-    html[data-theme='dark'] .actions-center .btn-danger:hover,
-    body.dark-mode .actions-center .btn-danger:hover {
+    html[data-theme='dark'] .actions-center .btn-danger:hover {
         background: #d94a59;
     }
 

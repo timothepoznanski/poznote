@@ -38,12 +38,17 @@ themes work and which variables a custom stylesheet can rely on.
 
 ## Themes
 
-- `js/theme-init.js` runs synchronously in `<head>` and sets
-  `html[data-theme='dark'|'light']` (plus `html.theme-black` for the black
-  variant) before first paint; `js/theme-manager.js` later also adds
-  `body.dark-mode` / `body.black-mode`. Dark rules are written against both
-  carriers (`html[data-theme='dark'] X, body.dark-mode X`); `data-theme` is the
-  one that is always present.
+- **One carrier: `data-theme` on `<html>`.** `js/theme-init.js` (and
+  `js/excalidraw-theme-init.js` on the drawing page) runs synchronously in
+  `<head>` and sets `html[data-theme='dark'|'light']`, plus `html.theme-black`
+  for the black variant, before first paint. Write dark rules as
+  `html[data-theme='dark'] X` and black ones as
+  `html.theme-black[data-theme='dark'] X`, nothing else.
+- `js/theme-manager.js` also adds `body.dark-mode` / `body.black-mode` at
+  `DOMContentLoaded`. **Never style against those classes.** They arrive after
+  first paint, so they cover strictly less than the attribute at equal
+  specificity; they are kept only so an admin's custom stylesheet written
+  against them keeps working.
 - Light values are the defaults in each component file. Dark overrides live in
   `dark-mode/*.css` (index order: variables, layout, menus, editor, modals,
   components, pages, markdown, kanban, icons, calendar) or, for page-specific

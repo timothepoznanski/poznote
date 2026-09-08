@@ -3,33 +3,27 @@
    ============================================ */
 
 /* Main containers */
-html[data-theme='dark'] #left_col,
-body.dark-mode #left_col {
+html[data-theme='dark'] #left_col {
     background-color: var(--dm-bg);
     color: var(--dm-text);
 }
 
 html[data-theme='dark'] #right_col,
-html[data-theme='dark'] #right_pane,
-body.dark-mode #right_col,
-body.dark-mode #right_pane {
+html[data-theme='dark'] #right_pane {
     background-color: var(--dm-content-bg);
     color: var(--dm-text);
 }
 
 /* Sidebar header */
-html[data-theme='dark'] .sidebar-title,
-body.dark-mode .sidebar-title {
+html[data-theme='dark'] .sidebar-title {
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .workspace-title-text,
-body.dark-mode .workspace-title-text {
+html[data-theme='dark'] .workspace-title-text {
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .workspace-dropdown-icon,
-body.dark-mode .workspace-dropdown-icon {
+html[data-theme='dark'] .workspace-dropdown-icon {
     color: var(--dm-text-muted);
 }
 
@@ -37,150 +31,119 @@ body.dark-mode .workspace-dropdown-icon {
    Search Bar
    ============================================ */
 
-html[data-theme='dark'] .searchbar-input,
-body.dark-mode .searchbar-input {
+html[data-theme='dark'] .searchbar-input {
     background-color: var(--dm-sidebar-surface);
     color: var(--dm-text);
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] #search-bar-container.contains_forms_search,
-body.dark-mode #search-bar-container.contains_forms_search {
+html[data-theme='dark'] #search-bar-container.contains_forms_search {
     background-color: var(--dm-sidebar-bg);
     border-bottom-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .searchbar-input::placeholder,
-body.dark-mode .searchbar-input::placeholder {
+html[data-theme='dark'] .searchbar-input::placeholder {
     color: #808080;
 }
 
-html[data-theme='dark'] .searchbar-icon,
-body.dark-mode .searchbar-icon {
+html[data-theme='dark'] .searchbar-icon {
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .searchbar-date-toggle,
-body.dark-mode .searchbar-date-toggle {
+html[data-theme='dark'] .searchbar-date-toggle {
     color: #808080;
 }
 
 html[data-theme='dark'] .searchbar-date-toggle:hover,
-html[data-theme='dark'] .searchbar-date-toggle.active,
-body.dark-mode .searchbar-date-toggle:hover,
-body.dark-mode .searchbar-date-toggle.active {
+html[data-theme='dark'] .searchbar-date-toggle.active {
     background: transparent;
     color: #5cb3e9;
 }
 
-html[data-theme='dark'] .search-date-filter,
-body.dark-mode .search-date-filter {
+html[data-theme='dark'] .search-date-filter {
     background: var(--dm-surface);
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .folder-filter-banner,
-body.dark-mode .folder-filter-banner {
+html[data-theme='dark'] .folder-filter-banner {
     border-color: var(--dm-border);
     color: var(--dm-text-muted);
 }
 
-html[data-theme='dark'] .folder-filter-banner-name i,
-body.dark-mode .folder-filter-banner-name i {
+html[data-theme='dark'] .folder-filter-banner-name i {
     color: var(--dm-text-muted);
     background-color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .folder-filter-banner-name i.folder-filter-banner-icon:hover,
-html[data-theme='dark'] .folder-filter-banner-name i.folder-filter-banner-icon:focus-visible,
-body.dark-mode .folder-filter-banner-name i.folder-filter-banner-icon:hover,
-body.dark-mode .folder-filter-banner-name i.folder-filter-banner-icon:focus-visible {
+html[data-theme='dark'] .folder-filter-banner-name i.folder-filter-banner-icon:focus-visible {
     color: var(--dm-accent, #4dabf7);
     background-color: var(--dm-accent, #4dabf7);
 }
 
-html[data-theme='dark'] .search-date-field label,
-body.dark-mode .search-date-field label {
+html[data-theme='dark'] .search-date-field label {
     color: var(--dm-text-muted);
 }
 
-html[data-theme='dark'] .search-date-field label i,
-body.dark-mode .search-date-field label i {
+html[data-theme='dark'] .search-date-field label i {
     color: var(--dm-text-muted);
 }
 
-html[data-theme='dark'] .search-date-input,
-body.dark-mode .search-date-input {
+html[data-theme='dark'] .search-date-input {
     background: var(--dm-bg);
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
 /* Search options toggle button */
-html[data-theme='dark'] .searchbar-options-toggle,
-body.dark-mode .searchbar-options-toggle {
+html[data-theme='dark'] .searchbar-options-toggle {
     color: #808080;
 }
 
-html[data-theme='dark'] .searchbar-options-toggle:hover,
-body.dark-mode .searchbar-options-toggle:hover {
+html[data-theme='dark'] .searchbar-options-toggle:hover {
     color: #5cb3e9;
 }
 
-html[data-theme='dark'] .searchbar-options-toggle.active,
-body.dark-mode .searchbar-options-toggle.active {
+html[data-theme='dark'] .searchbar-options-toggle.active {
     color: #5cb3e9;
 }
 
 /* Search type buttons */
-html[data-theme='dark'] .searchbar-type-btn,
-body.dark-mode .searchbar-type-btn {
+html[data-theme='dark'] .searchbar-type-btn {
     color: #808080;
 }
 
-html[data-theme='dark'] .searchbar-type-btn:hover,
-body.dark-mode .searchbar-type-btn:hover {
+html[data-theme='dark'] .searchbar-type-btn:hover {
     color: #5cb3e9;
 }
 
-html[data-theme='dark'] .searchbar-type-btn:hover i,
-body.dark-mode .searchbar-type-btn:hover i {
+html[data-theme='dark'] .searchbar-type-btn:hover i {
     color: #5cb3e9;
 }
 
-html[data-theme='dark'] .searchbar-type-btn:hover i::before,
-body.dark-mode .searchbar-type-btn:hover i::before {
+html[data-theme='dark'] .searchbar-type-btn:hover i::before {
     color: #5cb3e9;
 }
 
-html[data-theme='dark'] .searchbar-type-btn.active,
-body.dark-mode .searchbar-type-btn.active {
+html[data-theme='dark'] .searchbar-type-btn.active {
     color: #5cb3e9 !important;
 }
 
 html[data-theme='dark'] .searchbar-type-btn.active i,
-body.dark-mode .searchbar-type-btn.active i,
-html[data-theme='dark'] .searchbar-type-btn.active i[class*="lucide-"],
-body.dark-mode .searchbar-type-btn.active i[class*="lucide-"] {
+html[data-theme='dark'] .searchbar-type-btn.active i[class*="lucide-"] {
     color: #5cb3e9 !important;
 }
 
 html[data-theme='dark'] .searchbar-type-btn.active i::before,
-body.dark-mode .searchbar-type-btn.active i::before,
-html[data-theme='dark'] .searchbar-type-btn.active i[class*="lucide-"]::before,
-body.dark-mode .searchbar-type-btn.active i[class*="lucide-"]::before {
+html[data-theme='dark'] .searchbar-type-btn.active i[class*="lucide-"]::before {
     color: #5cb3e9 !important;
 }
 
 /* Ensure filters don't desaturate search type icons */
 html[data-theme='dark'] .searchbar-type-btn i,
-body.dark-mode .searchbar-type-btn i,
 html[data-theme='dark'] .searchbar-type-btn i::before,
-body.dark-mode .searchbar-type-btn i::before,
 html[data-theme='dark'] .searchbar-type-btn.active i,
-body.dark-mode .searchbar-type-btn.active i,
-html[data-theme='dark'] .searchbar-type-btn.active i::before,
-body.dark-mode .searchbar-type-btn.active i::before {
+html[data-theme='dark'] .searchbar-type-btn.active i::before {
     filter: none !important;
 }
 
@@ -189,27 +152,23 @@ body.dark-mode .searchbar-type-btn.active i::before {
    ============================================ */
 
 /* System folders container - hidden (replaced by Home page) */
-html[data-theme='dark'] .system-folders-container,
-body.dark-mode .system-folders-container {
+html[data-theme='dark'] .system-folders-container {
     display: none !important;
 }
 
 /* System menu dropdown */
-html[data-theme='dark'] .system-menu-dropdown,
-body.dark-mode .system-menu-dropdown {
+html[data-theme='dark'] .system-menu-dropdown {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 /* Favorites */
-html[data-theme='dark'] #folder-favorites,
-body.dark-mode #folder-favorites {
+html[data-theme='dark'] #folder-favorites {
     border-bottom-color: var(--dm-border);
 }
 
-html[data-theme='dark'] #folder-favorites .note-title::before,
-body.dark-mode #folder-favorites .note-title::before {
+html[data-theme='dark'] #folder-favorites .note-title::before {
     color: var(--dm-text);
 }
 
@@ -217,51 +176,42 @@ body.dark-mode #folder-favorites .note-title::before {
    Folders
    ============================================ */
 
-html[data-theme='dark'] .favorites-separator,
-body.dark-mode .favorites-separator {
+html[data-theme='dark'] .favorites-separator {
     border-bottom-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .folder-header,
-body.dark-mode .folder-header {
+html[data-theme='dark'] .folder-header {
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .folder-header h2,
-body.dark-mode .folder-header h2 {
+html[data-theme='dark'] .folder-header h2 {
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .folder-toggle,
-body.dark-mode .folder-toggle {
+html[data-theme='dark'] .folder-toggle {
     color: var(--dm-text);
 }
 
 /* Dark counterpart of the light grey row hover in drag-drop.css: the light
    rgba(55,53,47,.08) overlay is invisible on a dark ground. */
-html[data-theme='dark'] .folder-toggle:hover,
-body.dark-mode .folder-toggle:hover {
+html[data-theme='dark'] .folder-toggle:hover {
     background-color: rgba(255, 255, 255, 0.06);
 }
 
-html[data-theme='dark'] .folder-name,
-body.dark-mode .folder-name {
+html[data-theme='dark'] .folder-name {
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .folder-icon,
-body.dark-mode .folder-icon {
+html[data-theme='dark'] .folder-icon {
     color: #b0b0b0;
 }
 
-html[data-theme='dark'] .folder-note-count,
-body.dark-mode .folder-note-count {
+html[data-theme='dark'] .folder-note-count {
     color: #999;
 }
 
 /* System folder note count - blue like in light mode */
-html[data-theme='dark'] .system-folder .folder-note-count,
-body.dark-mode .system-folder .folder-note-count {
+html[data-theme='dark'] .system-folder .folder-note-count {
     color: #5b9bd5;
 }
 
@@ -269,67 +219,57 @@ body.dark-mode .system-folder .folder-note-count {
    Notes List
    ============================================ */
 
-html[data-theme='dark'] .links_arbo_left,
-body.dark-mode .links_arbo_left {
+html[data-theme='dark'] .links_arbo_left {
     background-color: transparent !important;
     color: var(--dm-text);
 }
 
 html[data-theme='dark'] .links_arbo_left:hover,
-html[data-theme='dark'] .links_arbo_left.selected-note,
-body.dark-mode .links_arbo_left:hover {
+html[data-theme='dark'] .links_arbo_left.selected-note {
     background-color: var(--dm-sidebar-surface) !important;
 }
 
 html[data-theme='dark'] .links_arbo_left:hover .note-title,
-html[data-theme='dark'] .links_arbo_left.selected-note .note-title,
-body.dark-mode .links_arbo_left:hover .note-title {
+html[data-theme='dark'] .links_arbo_left.selected-note .note-title {
     color: var(--dm-accent) !important;
 }
 
-body.dark-mode .links_arbo_left.selected-note {
+html[data-theme='dark'] .links_arbo_left.selected-note {
     background-color: var(--dm-sidebar-surface) !important;
 }
 
-body.dark-mode .links_arbo_left.selected-note .note-title {
+html[data-theme='dark'] .links_arbo_left.selected-note .note-title {
     color: var(--dm-accent) !important;
 }
 
-html[data-theme='dark'] .links_arbo_left.active,
-body.dark-mode .links_arbo_left.active {
+html[data-theme='dark'] .links_arbo_left.active {
     background-color: var(--dm-active);
     border-left: 3px solid var(--dm-accent);
 }
 
-html[data-theme='dark'] .note-title,
-body.dark-mode .note-title {
+html[data-theme='dark'] .note-title {
     color: var(--dm-text);
 }
 
 /* Black theme - sidebar note and folder name colors */
-html.theme-black[data-theme='dark'] .note-title,
-body.black-mode .note-title {
+html.theme-black[data-theme='dark'] .note-title {
     color: #66778f;
 }
 
-html.theme-black[data-theme='dark'] .links_arbo_left,
-body.black-mode .links_arbo_left {
+html.theme-black[data-theme='dark'] .links_arbo_left {
     color: #66778f;
 }
 
-html.theme-black[data-theme='dark'] .folder-name,
-body.black-mode .folder-name {
+html.theme-black[data-theme='dark'] .folder-name {
     color: #66778f;
 }
 
 /* Subheading and dates */
-html[data-theme='dark'] .note-subline,
-body.dark-mode .note-subline {
+html[data-theme='dark'] .note-subline {
     color: #999;
 }
 
-html[data-theme='dark'] .lastupdated,
-body.dark-mode .lastupdated {
+html[data-theme='dark'] .lastupdated {
     color: #999 !important;
 }
 
@@ -339,25 +279,21 @@ body.dark-mode .lastupdated {
 
 /* The handle is zero-width (see css/layout.css), so only its border shows;
    a background-color here would never paint. */
-html[data-theme='dark'] .resize-handle,
-body.dark-mode .resize-handle {
+html[data-theme='dark'] .resize-handle {
     border-right: 1px solid var(--dm-border);
 }
 
-html[data-theme='dark'] .resize-handle:hover,
-body.dark-mode .resize-handle:hover {
+html[data-theme='dark'] .resize-handle:hover {
     border-right: 1px solid var(--dm-border-light);
 }
 
-html[data-theme='dark'] .toggle-sidebar-btn,
-body.dark-mode .toggle-sidebar-btn {
+html[data-theme='dark'] .toggle-sidebar-btn {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     color: #b0b0b0;
 }
 
-html[data-theme='dark'] .toggle-sidebar-btn:hover,
-body.dark-mode .toggle-sidebar-btn:hover {
+html[data-theme='dark'] .toggle-sidebar-btn:hover {
     background: var(--dm-surface-hover);
     color: var(--dm-accent);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -367,41 +303,32 @@ body.dark-mode .toggle-sidebar-btn:hover {
    Icon Sidebar (index.php)
    ============================================ */
 
-html[data-theme='dark'] #icon_sidebar,
-body.dark-mode #icon_sidebar {
+html[data-theme='dark'] #icon_sidebar {
     background-color: var(--dm-bg);
     border-right: 1px solid var(--dm-border);
 }
 
-html[data-theme='dark'] .icon-sidebar-bottom,
-body.dark-mode .icon-sidebar-bottom {
+html[data-theme='dark'] .icon-sidebar-bottom {
     border-top-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .icon-sidebar-divider,
-body.dark-mode .icon-sidebar-divider {
+html[data-theme='dark'] .icon-sidebar-divider {
     background: var(--dm-border);
 }
 
-html[data-theme='dark'] .icon-sidebar-btn,
-body.dark-mode .icon-sidebar-btn {
+html[data-theme='dark'] .icon-sidebar-btn {
     color: var(--dm-text-muted);
     opacity: 0.4;
 }
 
 html[data-theme='dark'] .icon-sidebar-btn:hover,
 html[data-theme='dark'] .icon-sidebar-btn:focus-visible,
-html[data-theme='dark'] .icon-sidebar-btn.has-notifications,
-body.dark-mode .icon-sidebar-btn:hover,
-body.dark-mode .icon-sidebar-btn:focus-visible,
-body.dark-mode .icon-sidebar-btn.has-notifications {
+html[data-theme='dark'] .icon-sidebar-btn.has-notifications {
     opacity: 1;
 }
 
 html[data-theme='dark'] .icon-sidebar-btn:hover,
-html[data-theme='dark'] .icon-sidebar-btn:focus-visible,
-body.dark-mode .icon-sidebar-btn:hover,
-body.dark-mode .icon-sidebar-btn:focus-visible {
+html[data-theme='dark'] .icon-sidebar-btn:focus-visible {
     color: var(--dm-accent);
     background: var(--dm-surface-hover);
 }
@@ -410,23 +337,19 @@ body.dark-mode .icon-sidebar-btn:focus-visible {
    the selected icon gets a brighter tint and full opacity to stand out from
    the merely-hovered state above. */
 html[data-theme='dark'] .icon-sidebar-btn-active,
-html[data-theme='dark'] .icon-sidebar-btn-active:hover,
-body.dark-mode .icon-sidebar-btn-active,
-body.dark-mode .icon-sidebar-btn-active:hover {
+html[data-theme='dark'] .icon-sidebar-btn-active:hover {
     color: var(--dm-accent);
     background: rgba(var(--pz-accent-rgb), 0.30);
     opacity: 1;
 }
 
-html[data-theme='dark'] .icon-sidebar-btn-active .lucide,
-body.dark-mode .icon-sidebar-btn-active .lucide {
+html[data-theme='dark'] .icon-sidebar-btn-active .lucide {
     background-color: var(--dm-accent);
 }
 
 /* Overflow menu: a floating popup rather than part of the rail, so it takes the
    surface colours instead of the sidebar's. */
-html[data-theme='dark'] #iconSidebarOverflowMenu,
-body.dark-mode #iconSidebarOverflowMenu {
+html[data-theme='dark'] #iconSidebarOverflowMenu {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
@@ -434,44 +357,35 @@ body.dark-mode #iconSidebarOverflowMenu {
 
 /* Same resting treatment as .icon-sidebar-btn above, dimmed opacity included:
    the menu lists the rail's own entries and must not read brighter than them. */
-html[data-theme='dark'] .icon-sidebar-overflow-item,
-body.dark-mode .icon-sidebar-overflow-item {
+html[data-theme='dark'] .icon-sidebar-overflow-item {
     color: var(--dm-text-muted);
     opacity: 0.4;
 }
 
 html[data-theme='dark'] .icon-sidebar-overflow-item:hover,
 html[data-theme='dark'] .icon-sidebar-overflow-item:focus-visible,
-html[data-theme='dark'] .icon-sidebar-overflow-item-active,
-body.dark-mode .icon-sidebar-overflow-item:hover,
-body.dark-mode .icon-sidebar-overflow-item:focus-visible,
-body.dark-mode .icon-sidebar-overflow-item-active {
+html[data-theme='dark'] .icon-sidebar-overflow-item-active {
     opacity: 1;
 }
 
 html[data-theme='dark'] .icon-sidebar-overflow-item:hover,
-html[data-theme='dark'] .icon-sidebar-overflow-item:focus-visible,
-body.dark-mode .icon-sidebar-overflow-item:hover,
-body.dark-mode .icon-sidebar-overflow-item:focus-visible {
+html[data-theme='dark'] .icon-sidebar-overflow-item:focus-visible {
     background: var(--dm-surface-hover);
     color: var(--dm-accent);
 }
 
-html[data-theme='dark'] .icon-sidebar-overflow-item-active,
-body.dark-mode .icon-sidebar-overflow-item-active {
+html[data-theme='dark'] .icon-sidebar-overflow-item-active {
     background: rgba(var(--pz-accent-rgb), 0.30);
     color: var(--dm-accent);
 }
 
-html[data-theme='dark'] #iconSidebarToggle,
-body.dark-mode #iconSidebarToggle {
+html[data-theme='dark'] #iconSidebarToggle {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     color: #b0b0b0;
 }
 
-html[data-theme='dark'] #iconSidebarToggle:hover,
-body.dark-mode #iconSidebarToggle:hover {
+html[data-theme='dark'] #iconSidebarToggle:hover {
     background: var(--dm-surface-hover);
     color: var(--dm-accent);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);

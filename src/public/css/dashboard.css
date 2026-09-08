@@ -273,8 +273,7 @@ body.dashboard-page {
     color: var(--pz-text-muted);
 }
 
-:root[data-theme='dark'] .dash-section-title,
-body.dark-mode .dash-section-title {
+:root[data-theme='dark'] .dash-section-title {
     color: #9ca3af;
 }
 
@@ -641,17 +640,14 @@ body.dark-mode .dash-section-title {
     height: 18px;
 }
 
-:root[data-theme='dark'] .dashboard-color-filter-btn,
-body.dark-mode .dashboard-color-filter-btn {
+:root[data-theme='dark'] .dashboard-color-filter-btn {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text-muted);
 }
 
 :root[data-theme='dark'] .dashboard-color-filter-btn:hover,
-body.dark-mode .dashboard-color-filter-btn:hover,
-:root[data-theme='dark'] .dashboard-color-filter-btn.active,
-body.dark-mode .dashboard-color-filter-btn.active {
+:root[data-theme='dark'] .dashboard-color-filter-btn.active {
     border-color: var(--pz-accent);
     color: var(--pz-accent);
     background: var(--dm-surface-hover);
@@ -707,27 +703,22 @@ body.dark-mode .dashboard-color-filter-btn.active {
     background: repeating-linear-gradient(45deg, #e5e7eb 0 4px, #f9fafb 4px 8px);
 }
 
-:root[data-theme='dark'] .dashboard-color-filter-menu,
-body.dark-mode .dashboard-color-filter-menu {
+:root[data-theme='dark'] .dashboard-color-filter-menu {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
 }
 
-:root[data-theme='dark'] .dashboard-color-filter-item,
-body.dark-mode .dashboard-color-filter-item {
+:root[data-theme='dark'] .dashboard-color-filter-item {
     color: var(--dm-text);
 }
 
 :root[data-theme='dark'] .dashboard-color-filter-item:hover,
-body.dark-mode .dashboard-color-filter-item:hover,
-:root[data-theme='dark'] .dashboard-color-filter-item.active,
-body.dark-mode .dashboard-color-filter-item.active {
+:root[data-theme='dark'] .dashboard-color-filter-item.active {
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] .note-color-swatch-empty,
-body.dark-mode .note-color-swatch-empty {
+:root[data-theme='dark'] .note-color-swatch-empty {
     background: repeating-linear-gradient(45deg, #374151 0 4px, #1f2937 4px 8px);
 }
 
@@ -785,25 +776,21 @@ body.dark-mode .note-color-swatch-empty {
     color: #1f2937;
 }
 
-:root[data-theme='dark'] .note-color-modal-subtitle,
-body.dark-mode .note-color-modal-subtitle {
+:root[data-theme='dark'] .note-color-modal-subtitle {
     color: var(--dm-text-muted);
 }
 
-:root[data-theme='dark'] .note-color-option,
-body.dark-mode .note-color-option {
+:root[data-theme='dark'] .note-color-option {
     background: var(--dm-surface);
     border-color: var(--dm-border);
 }
 
-:root[data-theme='dark'] .note-color-option.selected,
-body.dark-mode .note-color-option.selected {
+:root[data-theme='dark'] .note-color-option.selected {
     border-color: var(--pz-accent);
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] .note-color-name,
-body.dark-mode .note-color-name {
+:root[data-theme='dark'] .note-color-name {
     color: var(--dm-text);
 }
 
@@ -859,18 +846,14 @@ body.dark-mode .note-color-name {
 }
 
 :root[data-theme='dark'] .modal-buttons button.note-color-manage-btn,
-body.dark-mode .modal-buttons button.note-color-manage-btn,
-:root[data-theme='dark'] .modal-buttons button.dashboard-scope-manage-btn,
-body.dark-mode .modal-buttons button.dashboard-scope-manage-btn {
+:root[data-theme='dark'] .modal-buttons button.dashboard-scope-manage-btn {
     border-color: var(--dm-border);
     background: transparent;
     color: var(--dm-text);
 }
 
 :root[data-theme='dark'] .modal-buttons button.note-color-manage-btn:hover,
-body.dark-mode .modal-buttons button.note-color-manage-btn:hover,
-:root[data-theme='dark'] .modal-buttons button.dashboard-scope-manage-btn:hover,
-body.dark-mode .modal-buttons button.dashboard-scope-manage-btn:hover {
+:root[data-theme='dark'] .modal-buttons button.dashboard-scope-manage-btn:hover {
     border-color: var(--dm-text-muted);
     background: var(--dm-surface-hover);
 }
@@ -1269,160 +1252,131 @@ body.dashboard-page .notifications-empty i {
 
 /* ---------- Dark mode ---------- */
 
-:root[data-theme='dark'] body.dashboard-page,
-body.dark-mode.dashboard-page {
+:root[data-theme='dark'] body.dashboard-page {
     background: var(--dm-content-bg);
 }
 
-:root[data-theme='dark'] .dashboard-topbar,
-body.dark-mode .dashboard-topbar {
+:root[data-theme='dark'] .dashboard-topbar {
     background: var(--dm-content-bg);
 }
 
-:root[data-theme='dark'] .dashboard-filter-input,
-body.dark-mode .dashboard-filter-input {
+:root[data-theme='dark'] .dashboard-filter-input {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .dashboard-filter-clear:hover,
-body.dark-mode .dashboard-filter-clear:hover {
+:root[data-theme='dark'] .dashboard-filter-clear:hover {
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] #dashboardToggleFavorites.active .lucide-star,
-body.dark-mode #dashboardToggleFavorites.active .lucide-star {
+:root[data-theme='dark'] #dashboardToggleFavorites.active .lucide-star {
     color: #ffc107;
 }
 
-:root[data-theme='dark'] .dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star,
-body.dark-mode .dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star {
+:root[data-theme='dark'] .dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star {
     color: #ffc107;
 }
 
-:root[data-theme='dark'] .bc-current,
-body.dark-mode .bc-current {
+:root[data-theme='dark'] .bc-current {
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .bc-sep,
-body.dark-mode .bc-sep {
+:root[data-theme='dark'] .bc-sep {
     color: var(--dm-border);
 }
 
-:root[data-theme='dark'] .dash-card,
-body.dark-mode .dash-card {
+:root[data-theme='dark'] .dash-card {
     background: var(--dm-surface);
     border-color: var(--dm-border);
 }
 
-:root[data-theme='dark'] .dash-card:hover,
-body.dark-mode .dash-card:hover {
+:root[data-theme='dark'] .dash-card:hover {
     border-color: var(--pz-accent);
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
 }
 
 /* Note color tint, dark theme: the same hue mixed into the dark surface
    instead of white, so colored cards stay dark enough to read on. */
-:root[data-theme='dark'] .dash-card.has-note-color,
-body.dark-mode .dash-card.has-note-color {
+:root[data-theme='dark'] .dash-card.has-note-color {
     background: color-mix(in srgb, var(--note-color) 22%, var(--dm-surface));
     border-color: color-mix(in srgb, var(--note-color) 55%, var(--dm-surface));
 }
 
-:root[data-theme='dark'] .dash-card.has-note-color:hover,
-body.dark-mode .dash-card.has-note-color:hover {
+:root[data-theme='dark'] .dash-card.has-note-color:hover {
     background: color-mix(in srgb, var(--note-color) 30%, var(--dm-surface));
     border-color: color-mix(in srgb, var(--note-color) 75%, var(--dm-surface));
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.45);
 }
 
-:root[data-theme='dark'] .dash-card.has-note-color .board-card-tag,
-body.dark-mode .dash-card.has-note-color .board-card-tag {
+:root[data-theme='dark'] .dash-card.has-note-color .board-card-tag {
     background: color-mix(in srgb, var(--note-color) 26%, var(--dm-surface));
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .dash-card-name,
-body.dark-mode .dash-card-name {
+:root[data-theme='dark'] .dash-card-name {
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .dash-card-count,
-body.dark-mode .dash-card-count {
+:root[data-theme='dark'] .dash-card-count {
     color: var(--dm-text-muted);
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] .dash-card-note-title,
-body.dark-mode .dash-card-note-title {
+:root[data-theme='dark'] .dash-card-note-title {
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .dash-card-pin i,
-body.dark-mode .dash-card-pin i {
+:root[data-theme='dark'] .dash-card-pin i {
     background-color: var(--dm-text-muted);
 }
 
 /* Restated after the muted rule above, which is specific enough to win otherwise. */
 :root[data-theme='dark'] .dash-card-pin:hover i,
-body.dark-mode .dash-card-pin:hover i,
-:root[data-theme='dark'] .dash-card.is-pinned .dash-card-pin i,
-body.dark-mode .dash-card.is-pinned .dash-card-pin i {
+:root[data-theme='dark'] .dash-card.is-pinned .dash-card-pin i {
     background-color: #4aa8d8;
 }
 
 :root[data-theme='dark'] .board-card-excerpt,
-body.dark-mode .board-card-excerpt,
-:root[data-theme='dark'] .board-card-tasks,
-body.dark-mode .board-card-tasks {
+:root[data-theme='dark'] .board-card-tasks {
     color: var(--dm-text-muted);
 }
 
-:root[data-theme='dark'] .dash-card-thumb,
-body.dark-mode .dash-card-thumb {
+:root[data-theme='dark'] .dash-card-thumb {
     background: rgba(255, 255, 255, 0.06);
 }
 
-:root[data-theme='dark'] .dash-card-thumb::after,
-body.dark-mode .dash-card-thumb::after {
+:root[data-theme='dark'] .dash-card-thumb::after {
     border-color: rgba(255, 255, 255, 0.18);
 }
 
-:root[data-theme='dark'] .board-view-btn,
-body.dark-mode .board-view-btn {
+:root[data-theme='dark'] .board-view-btn {
     background: var(--dm-surface, #262626);
     border-color: var(--dm-border, var(--dm-border));
     color: var(--dm-text-muted, #a0a0a0);
 }
 
-:root[data-theme='dark'] .board-view-btn:hover,
-body.dark-mode .board-view-btn:hover {
+:root[data-theme='dark'] .board-view-btn:hover {
     border-color: var(--dm-accent, var(--dm-accent));
     color: var(--dm-accent, var(--dm-accent));
 }
 
-:root[data-theme='dark'] .board-card-tag,
-body.dark-mode .board-card-tag {
+:root[data-theme='dark'] .board-card-tag {
     color: var(--dm-text-muted);
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] .board-card-tag-colored,
-body.dark-mode .board-card-tag-colored {
+:root[data-theme='dark'] .board-card-tag-colored {
     background: color-mix(in srgb, var(--tag-color) 26%, var(--dm-surface));
     color: color-mix(in srgb, var(--tag-color) 70%, #ffffff);
 }
 
-:root[data-theme='dark'] .board-card-date,
-body.dark-mode .board-card-date {
+:root[data-theme='dark'] .board-card-date {
     color: var(--dm-text-muted);
     opacity: 0.7;
 }
 
-:root[data-theme='dark'] .dashboard-empty,
-body.dark-mode .dashboard-empty {
+:root[data-theme='dark'] .dashboard-empty {
     color: var(--dm-text-muted);
 }
 
@@ -1597,8 +1551,7 @@ body.dark-mode .dashboard-empty {
     height: 12px;
 }
 
-:root[data-theme='dark'] .dash-ws-dot,
-body.dark-mode .dash-ws-dot {
+:root[data-theme='dark'] .dash-ws-dot {
     border-color: rgba(255, 255, 255, 0.18);
 }
 
@@ -1838,13 +1791,11 @@ body.dark-mode .dash-ws-dot {
     border-color: var(--pz-accent);
 }
 
-:root[data-theme='dark'] .dashboard-tag-filter-search-wrap,
-body.dark-mode .dashboard-tag-filter-search-wrap {
+:root[data-theme='dark'] .dashboard-tag-filter-search-wrap {
     background: var(--dm-surface);
 }
 
-:root[data-theme='dark'] .dashboard-tag-filter-search,
-body.dark-mode .dashboard-tag-filter-search {
+:root[data-theme='dark'] .dashboard-tag-filter-search {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text);
@@ -1886,67 +1837,53 @@ body.dark-mode .dashboard-tag-filter-search {
 }
 
 :root[data-theme='dark'] .dashboard-tag-filter-count,
-body.dark-mode .dashboard-tag-filter-count,
-:root[data-theme='dark'] .dashboard-tag-filter-empty,
-body.dark-mode .dashboard-tag-filter-empty {
+:root[data-theme='dark'] .dashboard-tag-filter-empty {
     color: #a8a8a8;
 }
 
 /* Dark mode */
-:root[data-theme='dark'] .dash-group-title,
-body.dark-mode .dash-group-title {
+:root[data-theme='dark'] .dash-group-title {
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .dash-group-tag,
-body.dark-mode .dash-group-tag {
+:root[data-theme='dark'] .dash-group-tag {
     color: #c9d1d9;
     background: rgba(255, 255, 255, 0.08);
 }
 
 :root[data-theme='dark'] .dashboard-scope-section-title,
-body.dark-mode .dashboard-scope-section-title,
-:root[data-theme='dark'] .dashboard-scope-empty,
-body.dark-mode .dashboard-scope-empty {
+:root[data-theme='dark'] .dashboard-scope-empty {
     color: #a8a8a8;
 }
 
-:root[data-theme='dark'] .dashboard-scope-tag,
-body.dark-mode .dashboard-scope-tag {
+:root[data-theme='dark'] .dashboard-scope-tag {
     color: var(--dm-text);
     border-color: var(--dm-border);
 }
 
-:root[data-theme='dark'] .dashboard-scope-tag:hover,
-body.dark-mode .dashboard-scope-tag:hover {
+:root[data-theme='dark'] .dashboard-scope-tag:hover {
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] .dashboard-scope-tag.is-active,
-body.dark-mode .dashboard-scope-tag.is-active {
+:root[data-theme='dark'] .dashboard-scope-tag.is-active {
     background: var(--dm-active);
     border-color: #4da3d0;
 }
 
-:root[data-theme='dark'] .dashboard-scope-tag.is-partial,
-body.dark-mode .dashboard-scope-tag.is-partial {
+:root[data-theme='dark'] .dashboard-scope-tag.is-partial {
     border-color: #4da3d0;
 }
 
-:root[data-theme='dark'] .dashboard-scope-row-all,
-body.dark-mode .dashboard-scope-row-all {
+:root[data-theme='dark'] .dashboard-scope-row-all {
     border-bottom-color: var(--dm-border);
 }
 
 :root[data-theme='dark'] .dashboard-scope-row-main .lucide,
-body.dark-mode .dashboard-scope-row-main .lucide,
-:root[data-theme='dark'] .dashboard-scope-open,
-body.dark-mode .dashboard-scope-open {
+:root[data-theme='dark'] .dashboard-scope-open {
     color: #a8a8a8;
 }
 
-:root[data-theme='dark'] .dashboard-scope-open:hover,
-body.dark-mode .dashboard-scope-open:hover {
+:root[data-theme='dark'] .dashboard-scope-open:hover {
     background: var(--dm-surface-hover);
     color: var(--dm-accent, #60a5fa);
 }

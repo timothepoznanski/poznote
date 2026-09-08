@@ -159,8 +159,7 @@ img {
     display: inline;
 }
 
-html[data-theme='dark'] .create-note-subtitle,
-body.dark-mode .create-note-subtitle {
+html[data-theme='dark'] .create-note-subtitle {
     color: var(--text-muted-dark, #999999) !important;
 }
 

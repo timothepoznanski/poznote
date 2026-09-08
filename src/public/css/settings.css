@@ -249,15 +249,13 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     display: inline-block;
 }
 
-html[data-theme='dark'] .settings-view-toggle,
-body.dark-mode .settings-view-toggle {
+html[data-theme='dark'] .settings-view-toggle {
     background: var(--dm-surface, #262626);
     border-color: var(--dm-border, var(--dm-border));
     color: var(--dm-text-muted, #a0a0a0);
 }
 
-html[data-theme='dark'] .settings-view-toggle:hover,
-body.dark-mode .settings-view-toggle:hover {
+html[data-theme='dark'] .settings-view-toggle:hover {
     border-color: var(--dm-accent, var(--dm-accent));
     color: var(--dm-accent, var(--dm-accent));
 }
@@ -384,8 +382,7 @@ body.dark-mode .settings-view-toggle:hover {
 /* A pinned card keeps the plain card border: the blue pin icon is the only
    pinned indicator, on the source card and on its clone alike. */
 
-:root[data-theme='dark'] .home-card.is-pinned .settings-card-pin i,
-body.dark-mode .home-card.is-pinned .settings-card-pin i {
+:root[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
     background-color: #4aa8d8;
 }
 
@@ -731,52 +728,43 @@ body.dark-mode .home-card.is-pinned .settings-card-pin i {
 
     /* ----- Dark mode ----- */
 
-    html[data-theme='dark'] .home-container.settings-with-nav .home-grid:not([hidden]),
-    body.dark-mode .home-container.settings-with-nav .home-grid:not([hidden]) {
+    html[data-theme='dark'] .home-container.settings-with-nav .home-grid:not([hidden]) {
         background: var(--dm-surface);
         border-color: var(--dm-border);
     }
 
-    html[data-theme='dark'] .home-container.settings-with-nav .home-card::before,
-    body.dark-mode .home-container.settings-with-nav .home-card::before {
+    html[data-theme='dark'] .home-container.settings-with-nav .home-card::before {
         background: var(--dm-surface-hover);
     }
 
-    html[data-theme='dark'] .home-container.settings-with-nav .home-card + .home-card::after,
-    body.dark-mode .home-container.settings-with-nav .home-card + .home-card::after {
+    html[data-theme='dark'] .home-container.settings-with-nav .home-card + .home-card::after {
         background: var(--dm-border);
     }
 
-    html[data-theme='dark'] .settings-nav-item,
-    body.dark-mode .settings-nav-item {
+    html[data-theme='dark'] .settings-nav-item {
         color: var(--dm-text);
     }
 
-    html[data-theme='dark'] .settings-nav-item:hover,
-    body.dark-mode .settings-nav-item:hover {
+    html[data-theme='dark'] .settings-nav-item:hover {
         background: var(--dm-surface-hover);
         color: var(--dm-text);
     }
 
-    html[data-theme='dark'] .settings-nav-item.is-active,
-    body.dark-mode .settings-nav-item.is-active {
+    html[data-theme='dark'] .settings-nav-item.is-active {
         background: rgba(74, 158, 255, 0.16);
         color: var(--dm-accent);
     }
 
-    html[data-theme='dark'] .home-container.settings-with-nav .settings-toggle-card .setting-status,
-    body.dark-mode .home-container.settings-with-nav .settings-toggle-card .setting-status {
+    html[data-theme='dark'] .home-container.settings-with-nav .settings-toggle-card .setting-status {
         background: #555555;
         color: transparent;
     }
 
-    html[data-theme='dark'] .home-container.settings-with-nav .settings-toggle-card .setting-status::after,
-    body.dark-mode .home-container.settings-with-nav .settings-toggle-card .setting-status::after {
+    html[data-theme='dark'] .home-container.settings-with-nav .settings-toggle-card .setting-status::after {
         background: #e5e7eb;
     }
 
-    html[data-theme='dark'] .home-container.settings-with-nav .settings-toggle-card .setting-status.enabled,
-    body.dark-mode .home-container.settings-with-nav .settings-toggle-card .setting-status.enabled {
+    html[data-theme='dark'] .home-container.settings-with-nav .settings-toggle-card .setting-status.enabled {
         background: var(--dm-accent);
     }
 }

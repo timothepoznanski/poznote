@@ -154,41 +154,34 @@
     }
 }
 
-html[data-theme='dark'] .markdown-syntax-intro,
-body.dark-mode .markdown-syntax-intro {
+html[data-theme='dark'] .markdown-syntax-intro {
     color: var(--dm-text-muted, #8b949e);
 }
 
-html[data-theme='dark'] .syntax-card h2,
-body.dark-mode .syntax-card h2 {
+html[data-theme='dark'] .syntax-card h2 {
     color: var(--dm-text, #e6edf3);
 }
 
-html[data-theme='dark'] .syntax-card,
-body.dark-mode .syntax-card {
+html[data-theme='dark'] .syntax-card {
     border-color: var(--dm-border, #30363d);
     background: var(--dm-surface, #161b22);
 }
 
-html[data-theme='dark'] .syntax-card p,
-body.dark-mode .syntax-card p {
+html[data-theme='dark'] .syntax-card p {
     color: var(--dm-text-muted, #8b949e);
 }
 
-html[data-theme='dark'] .syntax-card-category,
-body.dark-mode .syntax-card-category {
+html[data-theme='dark'] .syntax-card-category {
     color: var(--dm-accent, #58a6ff);
 }
 
-html[data-theme='dark'] .syntax-card pre,
-body.dark-mode .syntax-card pre {
+html[data-theme='dark'] .syntax-card pre {
     border-color: var(--dm-border, #30363d);
     background: var(--dm-bg, #0d1117);
     color: var(--dm-text, #e6edf3);
 }
 
-html[data-theme='dark'] .markdown-syntax-empty,
-body.dark-mode .markdown-syntax-empty {
+html[data-theme='dark'] .markdown-syntax-empty {
     border-color: var(--dm-border, #30363d);
     background: var(--dm-surface, #161b22);
     color: var(--dm-text-muted, #8b949e);

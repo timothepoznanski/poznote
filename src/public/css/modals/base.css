@@ -207,9 +207,7 @@
 /* dark-mode/components.css sets .btn-primary colours with !important, so the
    disabled state has to re-assert them the same way to win. */
 html[data-theme='dark'] .modal-buttons button.btn-primary:disabled,
-html[data-theme='dark'] .modal-buttons button.btn-primary:disabled:hover,
-body.dark-mode .modal-buttons button.btn-primary:disabled,
-body.dark-mode .modal-buttons button.btn-primary:disabled:hover {
+html[data-theme='dark'] .modal-buttons button.btn-primary:disabled:hover {
     background-color: rgba(255, 255, 255, 0.06) !important;
     color: #6b7280 !important;
     border-color: rgba(255, 255, 255, 0.12) !important;
@@ -236,8 +234,7 @@ body.dark-mode .modal-buttons button.btn-primary:disabled:hover {
     margin-top: 2px;
 }
 
-html[data-theme='dark'] .modal .modal-info-note,
-body.dark-mode .modal .modal-info-note {
+html[data-theme='dark'] .modal .modal-info-note {
     background: rgba(59, 130, 246, 0.14);
     color: #93c5fd;
 }
@@ -557,55 +554,44 @@ body.dark-mode .modal .modal-info-note {
     background: #f9fafb;
 }
 
-:root[data-theme='dark'] #noteColorPaletteModal .modal-buttons button.note-palette-back,
-body.dark-mode #noteColorPaletteModal .modal-buttons button.note-palette-back {
+:root[data-theme='dark'] #noteColorPaletteModal .modal-buttons button.note-palette-back {
     border-color: var(--dm-border);
     background: transparent;
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] #noteColorPaletteModal .modal-buttons button.note-palette-back:hover,
-body.dark-mode #noteColorPaletteModal .modal-buttons button.note-palette-back:hover {
+:root[data-theme='dark'] #noteColorPaletteModal .modal-buttons button.note-palette-back:hover {
     border-color: var(--dm-text-muted);
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] #noteColorPaletteModal .modal-buttons,
-body.dark-mode #noteColorPaletteModal .modal-buttons {
+:root[data-theme='dark'] #noteColorPaletteModal .modal-buttons {
     border-top-color: var(--dm-border);
 }
 
 :root[data-theme='dark'] .modal-content .note-palette-add,
-body.dark-mode .modal-content .note-palette-add,
-:root[data-theme='dark'] .modal-content button.note-palette-add,
-body.dark-mode .modal-content button.note-palette-add {
+:root[data-theme='dark'] .modal-content button.note-palette-add {
     border-color: var(--dm-border);
     background: transparent;
     color: var(--dm-text-muted) !important;
 }
 
 :root[data-theme='dark'] .modal-content .note-palette-add:hover,
-body.dark-mode .modal-content .note-palette-add:hover,
-:root[data-theme='dark'] .modal-content button.note-palette-add:hover,
-body.dark-mode .modal-content button.note-palette-add:hover {
+:root[data-theme='dark'] .modal-content button.note-palette-add:hover {
     border-color: var(--pz-accent);
     color: var(--pz-accent) !important;
     background: var(--dm-surface-hover);
 }
 
 :root[data-theme='dark'] .note-palette-row input.note-palette-name,
-body.dark-mode .note-palette-row input.note-palette-name,
 :root[data-theme='dark'] .note-palette-row input.note-palette-color,
-body.dark-mode .note-palette-row input.note-palette-color,
-:root[data-theme='dark'] .note-palette-remove,
-body.dark-mode .note-palette-remove {
+:root[data-theme='dark'] .note-palette-remove {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .note-palette-remove:hover,
-body.dark-mode .note-palette-remove:hover {
+:root[data-theme='dark'] .note-palette-remove:hover {
     background: var(--dm-surface-hover);
     color: #fca5a5;
 }

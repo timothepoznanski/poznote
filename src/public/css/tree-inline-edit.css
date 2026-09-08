@@ -77,15 +77,13 @@ a.links_arbo_left .note-title.tree-inline-editing,
 }
 
 /* Dark and black themes */
-:root[data-theme='dark'] .tree-inline-input,
-body.dark-mode .tree-inline-input {
+:root[data-theme='dark'] .tree-inline-input {
     background: var(--dm-surface);
     color: var(--dm-text);
     border-color: var(--dm-accent);
     box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2);
 }
 
-:root[data-theme='dark'] .tree-inline-input::placeholder,
-body.dark-mode .tree-inline-input::placeholder {
+:root[data-theme='dark'] .tree-inline-input::placeholder {
     color: var(--dm-text-muted);
 }

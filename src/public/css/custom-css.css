@@ -84,20 +84,17 @@
 }
 
 /* Dark mode support */
-html[data-theme='dark'] #customCssModal p,
-body.dark-mode #customCssModal p {
+html[data-theme='dark'] #customCssModal p {
     color: #aaa;
 }
 
-html[data-theme='dark'] .no-css-text,
-body.dark-mode .no-css-text {
+html[data-theme='dark'] .no-css-text {
     background: rgba(255, 255, 255, 0.05);
     border-color: #444;
     color: #888;
 }
 
-html[data-theme='dark'] .custom-css-current-file,
-body.dark-mode .custom-css-current-file {
+html[data-theme='dark'] .custom-css-current-file {
     background: rgba(var(--pz-accent-rgb), 0.1);
     border-color: rgba(var(--pz-accent-rgb), 0.3);
     color: #4db8ff;

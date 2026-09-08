@@ -935,23 +935,23 @@
     right: 8px;
 }
 
-body.dark-mode .kanban-scroll-btn {
+html[data-theme='dark'] .kanban-scroll-btn {
     background: var(--bg-tertiary, #2a2a4a);
     color: var(--text-primary, #e2e8f0);
     border-color: var(--border-color, #3a3a5a);
 }
 
 /* Dark mode support for inline view */
-body.dark-mode .kanban-inline-view {
+html[data-theme='dark'] .kanban-inline-view {
     background: transparent;
 }
 
-body.dark-mode .kanban-inline-header {
+html[data-theme='dark'] .kanban-inline-header {
     background: transparent;
     border-bottom-color: var(--border-color, rgb(46, 46, 46));
 }
 
-body.dark-mode .kanban-inline-header .kanban-title {
+html[data-theme='dark'] .kanban-inline-header .kanban-title {
     color: var(--text-primary, #e2e8f0);
 }
 

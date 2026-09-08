@@ -163,7 +163,6 @@ body.center-note-content #right_col .notecard {
     transform: translateX(-50%) translateY(0.5rem);
 }
 
-body.dark-mode #note-width-toast,
 html[data-theme='dark'] #note-width-toast {
     background: #555;
     color: #f0f0f0;

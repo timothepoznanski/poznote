@@ -8,143 +8,117 @@
    Tags
    ============================================ */
 
-html[data-theme='dark'] .name_tags,
-body.dark-mode .name_tags {
+html[data-theme='dark'] .name_tags {
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .name_tags *,
-body.dark-mode .name_tags * {
+html[data-theme='dark'] .name_tags * {
     color: var(--dm-text) !important;
 }
 
-html[data-theme='dark'] .tag-item,
-body.dark-mode .tag-item {
+html[data-theme='dark'] .tag-item {
     background-color: var(--dm-surface);
     color: var(--dm-text);
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] h1,
-body.dark-mode h1 {
+html[data-theme='dark'] h1 {
     color: var(--dm-text) !important;
 }
 
-html[data-theme='dark'] .tags-info,
-body.dark-mode .tags-info {
+html[data-theme='dark'] .tags-info {
     color: var(--dm-text) !important;
 }
 
-html[data-theme='dark'] .tag-name,
-body.dark-mode .tag-name {
+html[data-theme='dark'] .tag-name {
     color: var(--dm-text) !important;
 }
 
 /* Editable tags */
-html[data-theme='dark'] .clickable-tag-wrapper,
-body.dark-mode .clickable-tag-wrapper {
+html[data-theme='dark'] .clickable-tag-wrapper {
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .clickable-tag-wrapper:hover,
-body.dark-mode .clickable-tag-wrapper:hover {
+html[data-theme='dark'] .clickable-tag-wrapper:hover {
     border-color: var(--dm-border-light);
 }
 
-html[data-theme='dark'] .clickable-tag,
-body.dark-mode .clickable-tag {
+html[data-theme='dark'] .clickable-tag {
     color: var(--dm-accent);
 }
 
-html[data-theme='dark'] .clickable-tag:hover,
-body.dark-mode .clickable-tag:hover {
+html[data-theme='dark'] .clickable-tag:hover {
     color: #6ab3ff;
 }
 
-html[data-theme='dark'] .clickable-tag:visited,
-body.dark-mode .clickable-tag:visited {
+html[data-theme='dark'] .clickable-tag:visited {
     color: var(--dm-accent);
 }
 
-html[data-theme='dark'] .clickable-tag:hover:visited,
-body.dark-mode .clickable-tag:hover:visited {
+html[data-theme='dark'] .clickable-tag:hover:visited {
     color: #6ab3ff;
 }
 
-html[data-theme='dark'] .tag-delete-button,
-body.dark-mode .tag-delete-button {
+html[data-theme='dark'] .tag-delete-button {
     color: #808080;
 }
 
-html[data-theme='dark'] .tag-delete-button:hover,
-body.dark-mode .tag-delete-button:hover {
+html[data-theme='dark'] .tag-delete-button:hover {
     color: #ff6b6b;
 }
 
-html[data-theme='dark'] .clickable-tag-wrapper.tag-highlight,
-body.dark-mode .clickable-tag-wrapper.tag-highlight {
+html[data-theme='dark'] .clickable-tag-wrapper.tag-highlight {
     background: #4a4a00;
 }
 
-html[data-theme='dark'] .clickable-tag-wrapper.tag-highlight .clickable-tag,
-body.dark-mode .clickable-tag-wrapper.tag-highlight .clickable-tag {
+html[data-theme='dark'] .clickable-tag-wrapper.tag-highlight .clickable-tag {
     color: #ffff99;
 }
 
-html[data-theme='dark'] .tag-input,
-body.dark-mode .tag-input {
+html[data-theme='dark'] .tag-input {
     background: transparent;
     color: var(--dm-text);
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .tag-input::placeholder,
-body.dark-mode .tag-input::placeholder {
+html[data-theme='dark'] .tag-input::placeholder {
     color: #808080;
 }
 
 /* Folder name badge */
-html[data-theme='dark'] .folder_name,
-body.dark-mode .folder_name {
+html[data-theme='dark'] .folder_name {
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .folder_name:hover,
-body.dark-mode .folder_name:hover {
+html[data-theme='dark'] .folder_name:hover {
     border-color: var(--dm-border-light);
 }
 
-html[data-theme='dark'] .folder-path-segment:hover,
-body.dark-mode .folder-path-segment:hover {
+html[data-theme='dark'] .folder-path-segment:hover {
     color: var(--dm-accent);
 }
 
-html[data-theme='dark'] .folder-path-separator,
-body.dark-mode .folder-path-separator {
+html[data-theme='dark'] .folder-path-separator {
     color: #64748b;
 }
 
 /* Tag suggestions dropdown */
-html[data-theme='dark'] .tag-suggestions,
-body.dark-mode .tag-suggestions {
+html[data-theme='dark'] .tag-suggestions {
     background-color: var(--dm-surface) !important;
     border-color: var(--dm-border) !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
 }
 
-html[data-theme='dark'] .tag-suggestion-item,
-body.dark-mode .tag-suggestion-item {
+html[data-theme='dark'] .tag-suggestion-item {
     color: var(--dm-text) !important;
 }
 
-html[data-theme='dark'] .tag-suggestion-item:hover,
-body.dark-mode .tag-suggestion-item:hover {
+html[data-theme='dark'] .tag-suggestion-item:hover {
     background-color: var(--dm-surface) !important;
 }
 
-html[data-theme='dark'] .tag-suggestion-item.highlighted,
-body.dark-mode .tag-suggestion-item.highlighted {
+html[data-theme='dark'] .tag-suggestion-item.highlighted {
     background-color: var(--pz-accent) !important;
     color: #ffffff !important;
 }
@@ -153,190 +127,156 @@ body.dark-mode .tag-suggestion-item.highlighted {
    Task List Items
    ============================================ */
 
-html[data-theme='dark'] .task-item,
-body.dark-mode .task-item {
+html[data-theme='dark'] .task-item {
     background-color: var(--dm-surface);
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .task-text,
-body.dark-mode .task-text {
+html[data-theme='dark'] .task-text {
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .task-input,
-body.dark-mode .task-input {
+html[data-theme='dark'] .task-input {
     background-color: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .task-edit-input,
-body.dark-mode .task-edit-input {
+html[data-theme='dark'] .task-edit-input {
     background-color: var(--dm-surface);
     border-color: var(--pz-accent);
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .task-edit-textarea,
-body.dark-mode .task-edit-textarea {
+html[data-theme='dark'] .task-edit-textarea {
     background-color: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .task-edit-hint,
-body.dark-mode .task-edit-hint {
+html[data-theme='dark'] .task-edit-hint {
     color: #a8a8a8;
 }
 
-html[data-theme='dark'] .task-item:hover,
-body.dark-mode .task-item:hover {
+html[data-theme='dark'] .task-item:hover {
     background-color: var(--dm-surface);
 }
 
-html[data-theme='dark'] .task-checkbox,
-body.dark-mode .task-checkbox {
+html[data-theme='dark'] .task-checkbox {
     border-color: var(--dm-border);
 }
 
 html[data-theme='dark'] .task-delete-btn i,
 html[data-theme='dark'] .task-important-btn i,
-html[data-theme='dark'] .task-drag-handle i,
-body.dark-mode .task-delete-btn i,
-body.dark-mode .task-important-btn i,
-body.dark-mode .task-drag-handle i {
+html[data-theme='dark'] .task-drag-handle i {
     color: #b0b0b0;
 }
 
-html[data-theme='dark'] .task-delete-btn:hover i,
-body.dark-mode .task-delete-btn:hover i {
+html[data-theme='dark'] .task-delete-btn:hover i {
     color: #ff6b6b;
 }
 
-html[data-theme='dark'] .task-important-btn:hover i,
-body.dark-mode .task-important-btn:hover i {
+html[data-theme='dark'] .task-important-btn:hover i {
     color: #ffc107;
 }
 
-html[data-theme='dark'] .task-important-btn.is-favorite i,
-body.dark-mode .task-important-btn.is-favorite i {
+html[data-theme='dark'] .task-important-btn.is-favorite i {
     color: #ff6b6b !important;
 }
 
-html[data-theme='dark'] .task-due-btn i,
-body.dark-mode .task-due-btn i {
+html[data-theme='dark'] .task-due-btn i {
     color: #b0b0b0;
 }
 
-html[data-theme='dark'] .task-due-btn:hover i,
-body.dark-mode .task-due-btn:hover i {
+html[data-theme='dark'] .task-due-btn:hover i {
     color: #4da3d0;
 }
 
-html[data-theme='dark'] .task-due-chip,
-body.dark-mode .task-due-chip {
+html[data-theme='dark'] .task-due-chip {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     color: #a8a8a8;
 }
 
-html[data-theme='dark'] .task-due-chip:hover,
-body.dark-mode .task-due-chip:hover {
+html[data-theme='dark'] .task-due-chip:hover {
     border-color: #4da3d0;
     color: #4da3d0;
 }
 
-html[data-theme='dark'] .task-due-chip.overdue,
-body.dark-mode .task-due-chip.overdue {
+html[data-theme='dark'] .task-due-chip.overdue {
     background: #3d1f1f;
     border-color: #8b4545;
     color: #ff6b6b;
 }
 
-html[data-theme='dark'] .task-menu-btn i,
-body.dark-mode .task-menu-btn i {
+html[data-theme='dark'] .task-menu-btn i {
     color: #b0b0b0;
 }
 
-html[data-theme='dark'] .task-menu-btn:hover i,
-body.dark-mode .task-menu-btn:hover i {
+html[data-theme='dark'] .task-menu-btn:hover i {
     color: #4da3d0;
 }
 
-html[data-theme='dark'] .task-actions-menu,
-body.dark-mode .task-actions-menu {
+html[data-theme='dark'] .task-actions-menu {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
 }
 
-html[data-theme='dark'] .task-actions-menu-item,
-body.dark-mode .task-actions-menu-item {
+html[data-theme='dark'] .task-actions-menu-item {
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .task-actions-menu-item:hover,
-body.dark-mode .task-actions-menu-item:hover {
+html[data-theme='dark'] .task-actions-menu-item:hover {
     background: rgba(255, 255, 255, 0.08);
 }
 
-html[data-theme='dark'] .task-actions-menu-item i,
-body.dark-mode .task-actions-menu-item i {
+html[data-theme='dark'] .task-actions-menu-item i {
     color: #b0b0b0;
 }
 
 /* The :is() ID boost + !important outguns the `.noteentry *` --dm-text
    blanket from dark-mode/editor.css */
-html[data-theme='dark'] .tasklist-progress-label:is(#pz-specificity-boost, *),
-body.dark-mode .tasklist-progress-label:is(#pz-specificity-boost, *) {
+html[data-theme='dark'] .tasklist-progress-label:is(#pz-specificity-boost, *) {
     color: #a8a8a8 !important;
 }
 
-html[data-theme='dark'] .tasklist-progress-bar,
-body.dark-mode .tasklist-progress-bar {
+html[data-theme='dark'] .tasklist-progress-bar {
     background-color: var(--dm-surface);
 }
 
 /* Important task styling for dark mode */
-html[data-theme='dark'] .task-item.important,
-body.dark-mode .task-item.important {
+html[data-theme='dark'] .task-item.important {
     border-color: #8b4545;
     background: #3d1f1f;
 }
 
-html[data-theme='dark'] .task-item.important .task-text,
-body.dark-mode .task-item.important .task-text {
+html[data-theme='dark'] .task-item.important .task-text {
     color: #ff6b6b;
     font-weight: 600;
 }
 
-html[data-theme='dark'] .task-item.important .task-text a,
-body.dark-mode .task-item.important .task-text a {
+html[data-theme='dark'] .task-item.important .task-text a {
     color: #ff6b6b;
     font-weight: 600;
 }
 
-html[data-theme='dark'] .task-item.important .task-text a:hover,
-body.dark-mode .task-item.important .task-text a:hover {
+html[data-theme='dark'] .task-item.important .task-text a:hover {
     color: #ff8989;
     text-decoration: underline;
 }
 
 /* Task order buttons */
-html[data-theme='dark'] .btn-task-order.active,
-body.dark-mode .btn-task-order.active {
+html[data-theme='dark'] .btn-task-order.active {
     background-color: rgba(var(--pz-accent-rgb), 0.2);
     color: #4da6ff;
 }
 
-html[data-theme='dark'] .btn-task-order:hover,
-body.dark-mode .btn-task-order:hover {
+html[data-theme='dark'] .btn-task-order:hover {
     background-color: rgba(var(--pz-accent-rgb), 0.1);
 }
 
-html[data-theme='dark'] .btn-task-order.active:hover,
-body.dark-mode .btn-task-order.active:hover {
+html[data-theme='dark'] .btn-task-order.active:hover {
     background-color: rgba(var(--pz-accent-rgb), 0.25);
 }
 
@@ -344,34 +284,29 @@ body.dark-mode .btn-task-order.active:hover {
    Form Groups
    ============================================ */
 
-html[data-theme='dark'] .form-group input,
-body.dark-mode .form-group input {
+html[data-theme='dark'] .form-group input {
     background-color: var(--dm-surface);
     color: var(--dm-text);
     border-color: #555;
 }
 
-html[data-theme='dark'] .form-group input::placeholder,
-body.dark-mode .form-group input::placeholder {
+html[data-theme='dark'] .form-group input::placeholder {
     color: #888;
 }
 
-html[data-theme='dark'] .form-group input:focus,
-body.dark-mode .form-group input:focus {
+html[data-theme='dark'] .form-group input:focus {
     background-color: var(--dm-surface-hover);
     border-color: var(--dm-accent);
     outline: none;
 }
 
-html[data-theme='dark'] .form-group select,
-body.dark-mode .form-group select {
+html[data-theme='dark'] .form-group select {
     background-color: var(--dm-border);
     color: var(--dm-text);
     border-color: #555;
 }
 
-html[data-theme='dark'] .form-group select option,
-body.dark-mode .form-group select option {
+html[data-theme='dark'] .form-group select option {
     background-color: var(--dm-border);
     color: var(--dm-text);
 }
@@ -381,43 +316,35 @@ body.dark-mode .form-group select option {
    ============================================ */
 
 html[data-theme='dark'] .btn,
-html[data-theme='dark'] .btn-secondary,
-body.dark-mode .btn,
-body.dark-mode .btn-secondary {
+html[data-theme='dark'] .btn-secondary {
     background-color: var(--dm-surface);
     color: var(--dm-text);
     border-color: var(--dm-border);
 }
 
 html[data-theme='dark'] .btn:hover,
-html[data-theme='dark'] .btn-secondary:hover,
-body.dark-mode .btn:hover,
-body.dark-mode .btn-secondary:hover {
+html[data-theme='dark'] .btn-secondary:hover {
     background-color: var(--dm-surface-hover);
 }
 
-html[data-theme='dark'] .btn-primary,
-body.dark-mode .btn-primary {
+html[data-theme='dark'] .btn-primary {
     background-color: var(--pz-accent) !important;
     color: #ffffff !important;
     border-color: var(--pz-accent) !important;
 }
 
-html[data-theme='dark'] .btn-primary:hover,
-body.dark-mode .btn-primary:hover {
+html[data-theme='dark'] .btn-primary:hover {
     background-color: var(--pz-accent-hover) !important;
     border-color: var(--pz-accent-hover) !important;
 }
 
-html[data-theme='dark'] .btn-rename,
-body.dark-mode .btn-rename {
+html[data-theme='dark'] .btn-rename {
     background-color: #ffc107 !important;
     color: #212529 !important;
     border-color: #ffc107 !important;
 }
 
-html[data-theme='dark'] .btn-rename:disabled,
-body.dark-mode .btn-rename:disabled {
+html[data-theme='dark'] .btn-rename:disabled {
     background-color: #4a4a4a;
     color: #888;
     border-color: #555;
@@ -425,65 +352,53 @@ body.dark-mode .btn-rename:disabled {
 }
 
 html[data-theme='dark'] .btn-warning:hover,
-html[data-theme='dark'] .btn-rename:hover,
-body.dark-mode .btn-warning:hover,
-body.dark-mode .btn-rename:hover {
+html[data-theme='dark'] .btn-rename:hover {
     background-color: #e0a800 !important;
     border-color: #e0a800 !important;
 }
 
-html[data-theme='dark'] .btn-background,
-body.dark-mode .btn-background {
+html[data-theme='dark'] .btn-background {
     background-color: #6c757d !important;
     color: white !important;
     border-color: #6c757d !important;
 }
 
-html[data-theme='dark'] .btn-background:hover,
-body.dark-mode .btn-background:hover {
+html[data-theme='dark'] .btn-background:hover {
     background-color: #5a6268 !important;
     border-color: #545b62 !important;
 }
 
 html[data-theme='dark'] .btn-danger,
-html[data-theme='dark'] .btn-delete-ws,
-body.dark-mode .btn-danger,
-body.dark-mode .btn-delete-ws {
+html[data-theme='dark'] .btn-delete-ws {
     background-color: #dc3545 !important;
     color: #ffffff !important;
     border-color: #dc3545 !important;
 }
 
 html[data-theme='dark'] .btn-danger:hover,
-html[data-theme='dark'] .btn-delete-ws:hover,
-body.dark-mode .btn-danger:hover,
-body.dark-mode .btn-delete-ws:hover {
+html[data-theme='dark'] .btn-delete-ws:hover {
     background-color: #c82333 !important;
     border-color: #bd2130 !important;
 }
 
-html[data-theme='dark'] .btn-success,
-body.dark-mode .btn-success {
+html[data-theme='dark'] .btn-success {
     background-color: #28a745 !important;
     color: white !important;
     border-color: #28a745 !important;
 }
 
-html[data-theme='dark'] .btn-success:hover,
-body.dark-mode .btn-success:hover {
+html[data-theme='dark'] .btn-success:hover {
     background-color: #218838 !important;
     border-color: #218838 !important;
 }
 
-html[data-theme='dark'] .btn-cancel,
-body.dark-mode .btn-cancel {
+html[data-theme='dark'] .btn-cancel {
     background-color: var(--dm-border);
     color: var(--dm-text);
     border-color: #555;
 }
 
-html[data-theme='dark'] .btn-cancel:hover,
-body.dark-mode .btn-cancel:hover {
+html[data-theme='dark'] .btn-cancel:hover {
     background-color: #4a4a4a;
 }
 
@@ -491,23 +406,19 @@ body.dark-mode .btn-cancel:hover {
    Links
    ============================================ */
 
-html[data-theme='dark'] a,
-body.dark-mode a {
+html[data-theme='dark'] a {
     color: var(--dm-accent);
 }
 
-html[data-theme='dark'] a:hover,
-body.dark-mode a:hover {
+html[data-theme='dark'] a:hover {
     color: #6ab3ff;
 }
 
-html[data-theme='dark'] .back-link,
-body.dark-mode .back-link {
+html[data-theme='dark'] .back-link {
     color: var(--dm-accent);
 }
 
-html[data-theme='dark'] .back-link:hover,
-body.dark-mode .back-link:hover {
+html[data-theme='dark'] .back-link:hover {
     color: #6ab3ff;
 }
 
@@ -515,14 +426,12 @@ body.dark-mode .back-link:hover {
    Badges
    ============================================ */
 
-html[data-theme='dark'] .setting-status.enabled,
-body.dark-mode .setting-status.enabled {
+html[data-theme='dark'] .setting-status.enabled {
     background-color: #1a4d2e;
     color: #7dd3a0;
 }
 
-html[data-theme='dark'] .setting-status.disabled,
-body.dark-mode .setting-status.disabled {
+html[data-theme='dark'] .setting-status.disabled {
     background-color: #4d1a1a;
     color: #ff9999;
 }
@@ -531,24 +440,20 @@ body.dark-mode .setting-status.disabled {
    Alerts & Notifications
    ============================================ */
 
-html[data-theme='dark'] .alert,
-body.dark-mode .alert {
+html[data-theme='dark'] .alert {
     background-color: var(--dm-surface);
     color: var(--dm-text);
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .alert-success,
-body.dark-mode .alert-success {
+html[data-theme='dark'] .alert-success {
     background-color: #1a4d2e;
     color: #7dd3a0;
     border-color: #2a6d4e;
 }
 
 html[data-theme='dark'] .alert-danger,
-html[data-theme='dark'] .alert-error,
-body.dark-mode .alert-danger,
-body.dark-mode .alert-error {
+html[data-theme='dark'] .alert-error {
     background-color: #4d1a1a;
     color: #ff9999;
     border-color: #6d2a2a;
@@ -556,36 +461,31 @@ body.dark-mode .alert-error {
 
 /* Without this the generic .alert above wins and warnings read as a
    neutral grey panel, losing the caution signal entirely. */
-html[data-theme='dark'] .alert-warning,
-body.dark-mode .alert-warning {
+html[data-theme='dark'] .alert-warning {
     background-color: #4d3d14;
     color: #ffd479;
     border-color: #6d5a2a;
 }
 
-html[data-theme='dark'] #poznoteToast,
-body.dark-mode #poznoteToast {
+html[data-theme='dark'] #poznoteToast {
     background-color: var(--dm-surface);
     color: var(--dm-text);
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] #poznoteToast.notification-success,
-body.dark-mode #poznoteToast.notification-success {
+html[data-theme='dark'] #poznoteToast.notification-success {
     color: #4ade80;
     border-color: #4ade80;
     box-shadow: 0 4px 16px rgba(74, 222, 128, 0.2);
 }
 
-html[data-theme='dark'] #poznoteToast.notification-error,
-body.dark-mode #poznoteToast.notification-error {
+html[data-theme='dark'] #poznoteToast.notification-error {
     color: #f87171;
     border-color: #f87171;
     box-shadow: 0 4px 16px rgba(248, 113, 113, 0.2);
 }
 
-html[data-theme='dark'] #poznoteToast.notification-warning,
-body.dark-mode #poznoteToast.notification-warning {
+html[data-theme='dark'] #poznoteToast.notification-warning {
     color: var(--dm-accent);
     border-color: var(--dm-accent);
     box-shadow: 0 4px 16px rgba(74, 158, 255, 0.2);
@@ -595,15 +495,13 @@ body.dark-mode #poznoteToast.notification-warning {
    Emoji Picker
    ============================================ */
 
-html[data-theme='dark'] .emoji-hint,
-body.dark-mode .emoji-hint {
+html[data-theme='dark'] .emoji-hint {
     background: var(--dm-surface);
     border-left-color: #4a90e2;
     color: #b0b0b0;
 }
 
-html[data-theme='dark'] .emoji-hint kbd,
-body.dark-mode .emoji-hint kbd {
+html[data-theme='dark'] .emoji-hint kbd {
     background: var(--dm-bg);
     border-color: var(--dm-border);
     color: var(--dm-text);
@@ -613,58 +511,48 @@ body.dark-mode .emoji-hint kbd {
    Table Picker
    ============================================ */
 
-html[data-theme='dark'] .table-picker-popup,
-body.dark-mode .table-picker-popup {
+html[data-theme='dark'] .table-picker-popup {
     background-color: var(--dm-surface);
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .table-picker-header,
-body.dark-mode .table-picker-header {
+html[data-theme='dark'] .table-picker-header {
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .table-picker-input-section,
-body.dark-mode .table-picker-input-section {
+html[data-theme='dark'] .table-picker-input-section {
     border-top-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .table-picker-input-field-label,
-body.dark-mode .table-picker-input-field-label {
+html[data-theme='dark'] .table-picker-input-field-label {
     color: #c0c0c0;
 }
 
-html[data-theme='dark'] .table-picker-input-field,
-body.dark-mode .table-picker-input-field {
+html[data-theme='dark'] .table-picker-input-field {
     background-color: var(--dm-bg);
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .table-picker-input-field:focus,
-body.dark-mode .table-picker-input-field:focus {
+html[data-theme='dark'] .table-picker-input-field:focus {
     border-color: #64B5F6;
     box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.15);
 }
 
-html[data-theme='dark'] .table-picker-input-field:hover,
-body.dark-mode .table-picker-input-field:hover {
+html[data-theme='dark'] .table-picker-input-field:hover {
     border-color: #555;
 }
 
-html[data-theme='dark'] .table-picker-insert-btn,
-body.dark-mode .table-picker-insert-btn {
+html[data-theme='dark'] .table-picker-insert-btn {
     background: #1976D2;
 }
 
-html[data-theme='dark'] .table-picker-insert-btn:hover,
-body.dark-mode .table-picker-insert-btn:hover {
+html[data-theme='dark'] .table-picker-insert-btn:hover {
     background: #1565C0;
 }
 
 /* Color palette popup */
-html[data-theme='dark'] .color-palette-popup,
-body.dark-mode .color-palette-popup {
+html[data-theme='dark'] .color-palette-popup {
     background-color: var(--dm-surface);
     border-color: var(--dm-border);
 }
@@ -673,52 +561,43 @@ body.dark-mode .color-palette-popup {
    Tables
    ============================================ */
 
-html[data-theme='dark'] table,
-body.dark-mode table {
+html[data-theme='dark'] table {
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] table th,
-body.dark-mode table th {
+html[data-theme='dark'] table th {
     background-color: var(--dm-surface);
     color: var(--dm-text);
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] table td,
-body.dark-mode table td {
+html[data-theme='dark'] table td {
     color: var(--dm-text);
     border-color: var(--dm-border);
 }
 
 /* Inserted tables */
 html[data-theme='dark'] .noteentry table.inserted-table td,
-html[data-theme='dark'] .noteentry table.inserted-table th,
-body.dark-mode .noteentry table.inserted-table td,
-body.dark-mode .noteentry table.inserted-table th {
+html[data-theme='dark'] .noteentry table.inserted-table th {
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .noteentry table.inserted-table th,
-body.dark-mode .noteentry table.inserted-table th {
+html[data-theme='dark'] .noteentry table.inserted-table th {
     background-color: var(--dm-surface);
 }
 
 /* Table context menu */
-html[data-theme='dark'] .table-context-menu,
-body.dark-mode .table-context-menu {
+html[data-theme='dark'] .table-context-menu {
     background: var(--dm-surface) !important;
     border-color: #444 !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
 }
 
-html[data-theme='dark'] .table-context-menu-item,
-body.dark-mode .table-context-menu-item {
+html[data-theme='dark'] .table-context-menu-item {
     color: #e5e5e5 !important;
 }
 
-html[data-theme='dark'] .table-context-menu-item[style*="color: #dc2626"],
-body.dark-mode .table-context-menu-item[style*="color: #dc2626"] {
+html[data-theme='dark'] .table-context-menu-item[style*="color: #dc2626"] {
     color: #f87171 !important;
 }
 
@@ -726,25 +605,21 @@ body.dark-mode .table-context-menu-item[style*="color: #dc2626"] {
    Scrollbar (WebKit)
    ============================================ */
 
-html[data-theme='dark'] ::-webkit-scrollbar,
-body.dark-mode ::-webkit-scrollbar {
+html[data-theme='dark'] ::-webkit-scrollbar {
     width: 12px;
     height: 12px;
 }
 
-html[data-theme='dark'] ::-webkit-scrollbar-track,
-body.dark-mode ::-webkit-scrollbar-track {
+html[data-theme='dark'] ::-webkit-scrollbar-track {
     background: var(--dm-bg);
 }
 
-html[data-theme='dark'] ::-webkit-scrollbar-thumb,
-body.dark-mode ::-webkit-scrollbar-thumb {
+html[data-theme='dark'] ::-webkit-scrollbar-thumb {
     background: var(--dm-border);
     border-radius: 6px;
 }
 
-html[data-theme='dark'] ::-webkit-scrollbar-thumb:hover,
-body.dark-mode ::-webkit-scrollbar-thumb:hover {
+html[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
     background: #4a4a4a;
 }
 
@@ -756,134 +631,108 @@ body.dark-mode ::-webkit-scrollbar-thumb:hover {
    AI Chat Panel
    ============================================ */
 
-html[data-theme='dark'] #ai-chat-panel,
-body.dark-mode #ai-chat-panel {
+html[data-theme='dark'] #ai-chat-panel {
     background: var(--dm-bg);
 }
 
-html[data-theme='dark'] .ai-chat-resize-handle,
-body.dark-mode .ai-chat-resize-handle {
+html[data-theme='dark'] .ai-chat-resize-handle {
     border-left-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .ai-chat-resize-handle:hover,
-body.dark-mode .ai-chat-resize-handle:hover {
+html[data-theme='dark'] .ai-chat-resize-handle:hover {
     border-left-color: var(--dm-border);
 }
 
-html[data-theme='dark'] #ai-chat-panel.ai-chat-resizing .ai-chat-resize-handle,
-body.dark-mode #ai-chat-panel.ai-chat-resizing .ai-chat-resize-handle {
+html[data-theme='dark'] #ai-chat-panel.ai-chat-resizing .ai-chat-resize-handle {
     border-left-color: var(--dm-accent);
 }
 
-html[data-theme='dark'] .ai-chat-title,
-body.dark-mode .ai-chat-title {
+html[data-theme='dark'] .ai-chat-title {
     color: var(--dm-text-muted);
 }
 
-html[data-theme='dark'] .ai-chat-header-btn,
-body.dark-mode .ai-chat-header-btn {
+html[data-theme='dark'] .ai-chat-header-btn {
     color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .ai-chat-header-btn:hover,
-html[data-theme='dark'] .ai-chat-header-btn:focus,
-body.dark-mode .ai-chat-header-btn:hover,
-body.dark-mode .ai-chat-header-btn:focus {
+html[data-theme='dark'] .ai-chat-header-btn:focus {
     background: var(--dm-surface-hover);
     color: var(--dm-accent);
 }
 
-html[data-theme='dark'] .ai-chat-empty,
-body.dark-mode .ai-chat-empty {
+html[data-theme='dark'] .ai-chat-empty {
     color: var(--dm-text-muted);
 }
 
-html[data-theme='dark'] .ai-chat-msg-user,
-body.dark-mode .ai-chat-msg-user {
+html[data-theme='dark'] .ai-chat-msg-user {
     background: var(--dm-active);
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .ai-chat-msg-assistant,
-body.dark-mode .ai-chat-msg-assistant {
+html[data-theme='dark'] .ai-chat-msg-assistant {
     background: var(--dm-surface);
     color: var(--dm-text);
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .ai-chat-msg-error,
-body.dark-mode .ai-chat-msg-error {
+html[data-theme='dark'] .ai-chat-msg-error {
     background: #3a1f22;
     color: #e8a0a8;
     border-color: #5c2e33;
 }
 
 html[data-theme='dark'] .ai-chat-md code,
-html[data-theme='dark'] .ai-chat-md pre,
-body.dark-mode .ai-chat-md code,
-body.dark-mode .ai-chat-md pre {
+html[data-theme='dark'] .ai-chat-md pre {
     background: rgba(255, 255, 255, 0.08);
 }
 
-html[data-theme='dark'] .ai-chat-md blockquote,
-body.dark-mode .ai-chat-md blockquote {
+html[data-theme='dark'] .ai-chat-md blockquote {
     border-left-color: var(--dm-border);
     color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .ai-chat-md th,
-html[data-theme='dark'] .ai-chat-md td,
-body.dark-mode .ai-chat-md th,
-body.dark-mode .ai-chat-md td {
+html[data-theme='dark'] .ai-chat-md td {
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .ai-chat-md a,
-body.dark-mode .ai-chat-md a {
+html[data-theme='dark'] .ai-chat-md a {
     color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .ai-chat-tool,
-html[data-theme='dark'] .ai-chat-context,
-body.dark-mode .ai-chat-tool,
-body.dark-mode .ai-chat-context {
+html[data-theme='dark'] .ai-chat-context {
     color: var(--dm-text-muted);
 }
 
-html[data-theme='dark'] .ai-chat-notice,
-body.dark-mode .ai-chat-notice {
+html[data-theme='dark'] .ai-chat-notice {
     color: #d8b95c;
     background: #322a15;
     border-color: #55471f;
 }
 
-html[data-theme='dark'] .ai-chat-inputbar,
-body.dark-mode .ai-chat-inputbar {
+html[data-theme='dark'] .ai-chat-inputbar {
     background: var(--dm-bg);
     border-top-color: var(--dm-border);
 }
 
-html[data-theme='dark'] #ai-chat-input,
-body.dark-mode #ai-chat-input {
+html[data-theme='dark'] #ai-chat-input {
     background: var(--dm-surface);
     color: var(--dm-text);
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] #ai-chat-input:focus,
-body.dark-mode #ai-chat-input:focus {
+html[data-theme='dark'] #ai-chat-input:focus {
     border-color: var(--dm-accent);
 }
 
-html[data-theme='dark'] .ai-chat-send-btn,
-body.dark-mode .ai-chat-send-btn {
+html[data-theme='dark'] .ai-chat-send-btn {
     background: var(--dm-accent);
     color: #ffffff;
 }
 
-html[data-theme='dark'] .ai-chat-send-btn:disabled,
-body.dark-mode .ai-chat-send-btn:disabled {
+html[data-theme='dark'] .ai-chat-send-btn:disabled {
     background: var(--dm-surface-hover);
     color: var(--dm-text-muted);
 }
@@ -892,103 +741,79 @@ body.dark-mode .ai-chat-send-btn:disabled {
    Embedded task list in a regular note (tasklist-embed.js)
    ============================================ */
 
-html[data-theme='dark'] .tasklist-embed-widget,
-body.dark-mode .tasklist-embed-widget {
+html[data-theme='dark'] .tasklist-embed-widget {
     border-color: var(--dm-border);
 }
 
 html[data-theme='dark'] .tasklist-embed-task:hover,
-body.dark-mode .tasklist-embed-task:hover,
-html[data-theme='dark'] .tasklist-embed-task:focus-within,
-body.dark-mode .tasklist-embed-task:focus-within {
+html[data-theme='dark'] .tasklist-embed-task:focus-within {
     background: rgba(255, 255, 255, 0.05);
 }
 
-html[data-theme='dark'] .tasklist-embed-toggle,
-body.dark-mode .tasklist-embed-toggle {
+html[data-theme='dark'] .tasklist-embed-toggle {
     color: #b0b0b0;
 }
 
-html[data-theme='dark'] .tasklist-embed-toggle:hover,
-body.dark-mode .tasklist-embed-toggle:hover {
+html[data-theme='dark'] .tasklist-embed-toggle:hover {
     color: #4da3d0;
 }
 
 /* The :is() ID boost + !important outguns the `.noteentry *` --dm-text
    blanket from dark-mode/editor.css */
 html[data-theme='dark'] .tasklist-embed-count:is(#pz-specificity-boost, *),
-body.dark-mode .tasklist-embed-count:is(#pz-specificity-boost, *),
-html[data-theme='dark'] .tasklist-embed-due:is(#pz-specificity-boost, *),
-body.dark-mode .tasklist-embed-due:is(#pz-specificity-boost, *) {
+html[data-theme='dark'] .tasklist-embed-due:is(#pz-specificity-boost, *) {
     color: #a8a8a8 !important;
 }
 
-html[data-theme='dark'] .tasklist-embed-due.overdue:is(#pz-specificity-boost, *),
-body.dark-mode .tasklist-embed-due.overdue:is(#pz-specificity-boost, *) {
+html[data-theme='dark'] .tasklist-embed-due.overdue:is(#pz-specificity-boost, *) {
     color: #ff6b6b !important;
 }
 
-html[data-theme='dark'] .tasklist-embed-task.completed .tasklist-embed-text:is(#pz-specificity-boost, *),
-body.dark-mode .tasklist-embed-task.completed .tasklist-embed-text:is(#pz-specificity-boost, *) {
+html[data-theme='dark'] .tasklist-embed-task.completed .tasklist-embed-text:is(#pz-specificity-boost, *) {
     color: #8a8a8a !important;
 }
 
 html[data-theme='dark'] .tasklist-embed-empty:is(#pz-specificity-boost, *),
-body.dark-mode .tasklist-embed-empty:is(#pz-specificity-boost, *),
-html[data-theme='dark'] .tasklist-embed-unavailable:is(#pz-specificity-boost, *),
-body.dark-mode .tasklist-embed-unavailable:is(#pz-specificity-boost, *) {
+html[data-theme='dark'] .tasklist-embed-unavailable:is(#pz-specificity-boost, *) {
     color: #8a8a8a !important;
 }
 
 /* Inline editing controls of the embedded task list. The `.noteentry *`
    --dm-text blanket also hits the buttons, so their colors need the :is()
    ID boost + !important; the icons simply inherit from their control. */
-html[data-theme='dark'] .tasklist-embed-add-input:focus,
-body.dark-mode .tasklist-embed-add-input:focus {
+html[data-theme='dark'] .tasklist-embed-add-input:focus {
     border-bottom-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .tasklist-embed-add-input::placeholder,
-body.dark-mode .tasklist-embed-add-input::placeholder {
+html[data-theme='dark'] .tasklist-embed-add-input::placeholder {
     color: #8a8a8a;
 }
 
 html[data-theme='dark'] .tasklist-embed-action i:is(#pz-specificity-boost, *),
-body.dark-mode .tasklist-embed-action i:is(#pz-specificity-boost, *),
 html[data-theme='dark'] .tasklist-embed-due i:is(#pz-specificity-boost, *),
-body.dark-mode .tasklist-embed-due i:is(#pz-specificity-boost, *),
-html[data-theme='dark'] .tasklist-embed-add > i:is(#pz-specificity-boost, *),
-body.dark-mode .tasklist-embed-add > i:is(#pz-specificity-boost, *) {
+html[data-theme='dark'] .tasklist-embed-add > i:is(#pz-specificity-boost, *) {
     color: inherit !important;
 }
 
 html[data-theme='dark'] .tasklist-embed-action:is(#pz-specificity-boost, *),
-body.dark-mode .tasklist-embed-action:is(#pz-specificity-boost, *),
-html[data-theme='dark'] .tasklist-embed-add:is(#pz-specificity-boost, *),
-body.dark-mode .tasklist-embed-add:is(#pz-specificity-boost, *) {
+html[data-theme='dark'] .tasklist-embed-add:is(#pz-specificity-boost, *) {
     color: #a8a8a8 !important;
 }
 
 html[data-theme='dark'] .tasklist-embed-action-important.is-active:is(#pz-specificity-boost, *),
-body.dark-mode .tasklist-embed-action-important.is-active:is(#pz-specificity-boost, *),
-html[data-theme='dark'] .tasklist-embed-action-important:hover:is(#pz-specificity-boost, *),
-body.dark-mode .tasklist-embed-action-important:hover:is(#pz-specificity-boost, *) {
+html[data-theme='dark'] .tasklist-embed-action-important:hover:is(#pz-specificity-boost, *) {
     color: #f39c12 !important;
 }
 
 html[data-theme='dark'] .tasklist-embed-action-due:hover:is(#pz-specificity-boost, *),
-body.dark-mode .tasklist-embed-action-due:hover:is(#pz-specificity-boost, *),
-html[data-theme='dark'] button.tasklist-embed-due:hover:is(#pz-specificity-boost, *),
-body.dark-mode button.tasklist-embed-due:hover:is(#pz-specificity-boost, *) {
+html[data-theme='dark'] button.tasklist-embed-due:hover:is(#pz-specificity-boost, *) {
     color: #4da3d0 !important;
 }
 
-html[data-theme='dark'] .tasklist-embed-action-delete:hover:is(#pz-specificity-boost, *),
-body.dark-mode .tasklist-embed-action-delete:hover:is(#pz-specificity-boost, *) {
+html[data-theme='dark'] .tasklist-embed-action-delete:hover:is(#pz-specificity-boost, *) {
     color: #ff6b6b !important;
 }
 
-html[data-theme='dark'] .tasklist-embed-error:is(#pz-specificity-boost, *),
-body.dark-mode .tasklist-embed-error:is(#pz-specificity-boost, *) {
+html[data-theme='dark'] .tasklist-embed-error:is(#pz-specificity-boost, *) {
     color: #ff6b6b !important;
 }

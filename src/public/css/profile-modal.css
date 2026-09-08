@@ -132,41 +132,34 @@
 
 /* Dark mode. Every host page loads css/dark-mode/variables.css, so the tokens
    are always defined; both theme hooks are needed, as elsewhere. */
-html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal),
-body.dark-mode :is(#editProfileModal, #confirmLogoutModal) {
+html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) {
     background-color: rgba(0, 0, 0, 0.8);
 }
 
-html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) .modal-content,
-body.dark-mode :is(#editProfileModal, #confirmLogoutModal) .modal-content {
+html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) .modal-content {
     background-color: var(--dm-content-bg);
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) .modal-content h3,
-body.dark-mode :is(#editProfileModal, #confirmLogoutModal) .modal-content h3 {
+html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) .modal-content h3 {
     color: var(--dm-accent);
 }
 
-html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) .text-small-muted,
-body.dark-mode :is(#editProfileModal, #confirmLogoutModal) .text-small-muted {
+html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) .text-small-muted {
     color: var(--dm-text-muted);
 }
 
-html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) input,
-body.dark-mode :is(#editProfileModal, #confirmLogoutModal) input {
+html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) input {
     background-color: var(--dm-surface);
     color: var(--dm-text);
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-cancel,
-body.dark-mode :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-cancel {
+html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-cancel {
     background-color: var(--dm-surface);
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-cancel:hover,
-body.dark-mode :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-cancel:hover {
+html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-cancel:hover {
     background-color: var(--dm-border);
 }

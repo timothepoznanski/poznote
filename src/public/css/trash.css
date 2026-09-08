@@ -673,16 +673,14 @@ body.trash-page {
 
 /* Dark Mode Support for Trash Page */
 html[data-theme='dark'] body.trash-page,
-[data-theme='dark'] body.trash-page,
-body.dark-mode.trash-page {
+[data-theme='dark'] body.trash-page {
     background-color: var(--dm-content-bg) !important;
     background: var(--dm-content-bg) !important;
     color: var(--dm-text);
 }
 
 html[data-theme='dark'] .trash-search-input,
-[data-theme='dark'] .trash-search-input,
-body.dark-mode .trash-search-input {
+[data-theme='dark'] .trash-search-input {
     background-color: var(--dm-surface) !important;
     color: var(--dm-text) !important;
     border-color: var(--dm-border) !important;
@@ -692,30 +690,25 @@ body.dark-mode .trash-search-input {
     color: #888;
 }
 
-html[data-theme='dark'] .trash-notecard,
-body.dark-mode .trash-notecard {
+html[data-theme='dark'] .trash-notecard {
     background-color: var(--dm-surface) !important;
     border-color: var(--dm-border) !important;
 }
 
-html[data-theme='dark'] .trash-innernote,
-body.dark-mode .trash-innernote {
+html[data-theme='dark'] .trash-innernote {
     /* background-color: var(--dm-surface) !important; */
     color: #e0e0e0;
 }
 
-html[data-theme='dark'] .css-title,
-body.dark-mode .css-title {
+html[data-theme='dark'] .css-title {
     color: var(--dm-accent);
 }
 
-html[data-theme='dark'] .trash-no-notes,
-body.dark-mode .trash-no-notes {
+html[data-theme='dark'] .trash-no-notes {
     color: #a0a0a0;
 }
 
-html[data-theme='dark'] .trash-search-notice,
-body.dark-mode .trash-search-notice {
+html[data-theme='dark'] .trash-search-notice {
     background-color: #1a2a3a !important;
     border-color: #2c5282 !important;
     color: #9cc6ef !important;
@@ -726,86 +719,70 @@ body.dark-mode .trash-search-notice {
     color: #9cc6ef;
 }
 
-html[data-theme='dark'] .lastupdated,
-body.dark-mode .lastupdated {
+html[data-theme='dark'] .lastupdated {
     color: #888;
 }
 
-html[data-theme='dark'] .noteentry,
-body.dark-mode .noteentry {
+html[data-theme='dark'] .noteentry {
     color: #ccc;
 }
 
 html[data-theme='dark'] .trash-page-count,
-html[data-theme='dark'] .trash-limit-notice,
-body.dark-mode .trash-page-count,
-body.dark-mode .trash-limit-notice {
+html[data-theme='dark'] .trash-limit-notice {
     color: #888;
 }
 
-html[data-theme='dark'] .trash-notecard,
-body.dark-mode .trash-notecard {
+html[data-theme='dark'] .trash-notecard {
     box-shadow: none;
 }
 
-html[data-theme='dark'] .trash-note-header,
-body.dark-mode .trash-note-header {
+html[data-theme='dark'] .trash-note-header {
     border-bottom-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .trash-action-btn .lucide,
-body.dark-mode .trash-action-btn .lucide {
+html[data-theme='dark'] .trash-action-btn .lucide {
     color: #aaa;
     background-color: #aaa;
 }
 
-html[data-theme='dark'] .trash-restore-btn:hover,
-body.dark-mode .trash-restore-btn:hover {
+html[data-theme='dark'] .trash-restore-btn:hover {
     background: rgba(34, 197, 94, 0.12);
     border-color: rgba(34, 197, 94, 0.3);
 }
 
-html[data-theme='dark'] .trash-restore-btn:hover .lucide,
-body.dark-mode .trash-restore-btn:hover .lucide {
+html[data-theme='dark'] .trash-restore-btn:hover .lucide {
     color: #4ade80;
     background-color: #4ade80;
 }
 
-html[data-theme='dark'] .trash-delete-btn:hover,
-body.dark-mode .trash-delete-btn:hover {
+html[data-theme='dark'] .trash-delete-btn:hover {
     background: rgba(220, 38, 38, 0.12);
     border-color: rgba(220, 38, 38, 0.3);
 }
 
-html[data-theme='dark'] .trash-delete-btn:hover .lucide,
-body.dark-mode .trash-delete-btn:hover .lucide {
+html[data-theme='dark'] .trash-delete-btn:hover .lucide {
     color: #f87171;
     background-color: #f87171;
 }
 
 /* The card's inner surface is --dm-content-bg (see dark-mode/pages.css .trash-innernote) */
-html[data-theme='dark'] .trash-preview-fade,
-body.dark-mode .trash-preview-fade {
+html[data-theme='dark'] .trash-preview-fade {
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0), var(--dm-content-bg));
 }
 
-html[data-theme='dark'] .trash-expand-btn:hover,
-body.dark-mode .trash-expand-btn:hover {
+html[data-theme='dark'] .trash-expand-btn:hover {
     background: rgba(74, 158, 255, 0.1);
 }
 
-html[data-theme='dark'] .trash-expand-btn,
-body.dark-mode .trash-expand-btn {
+html[data-theme='dark'] .trash-expand-btn {
     color: var(--dm-accent);
 }
 
-html[data-theme='dark'] .trash-expand-btn .lucide,
-body.dark-mode .trash-expand-btn .lucide {
+html[data-theme='dark'] .trash-expand-btn .lucide {
     color: var(--dm-accent);
     background-color: var(--dm-accent);
 }
 
-html[data-theme='dark'] .trash-no-notes-icon,
-body.dark-mode .trash-no-notes-icon {
+html[data-theme='dark'] .trash-no-notes-icon {
     background: var(--dm-surface);
 }

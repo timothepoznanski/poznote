@@ -200,18 +200,15 @@ html.tags-page {
     color: #1e293b;
 }
 
-html[data-theme='dark'] .tag-color-filter-swatch.active,
-body.dark-mode .tag-color-filter-swatch.active {
+html[data-theme='dark'] .tag-color-filter-swatch.active {
     border-color: #e2e8f0;
 }
 
-html[data-theme='dark'] .tag-color-filter-clear,
-body.dark-mode .tag-color-filter-clear {
+html[data-theme='dark'] .tag-color-filter-clear {
     color: #94a3b8;
 }
 
-html[data-theme='dark'] .tag-color-filter-clear:hover,
-body.dark-mode .tag-color-filter-clear:hover {
+html[data-theme='dark'] .tag-color-filter-clear:hover {
     color: #e2e8f0;
 }
 
@@ -261,8 +258,7 @@ input[type="color"].tag-color-custom::-webkit-color-swatch {
     opacity: 0;
 }
 
-html[data-theme='dark'] .tag-color-swatch.selected,
-body.dark-mode .tag-color-swatch.selected {
+html[data-theme='dark'] .tag-color-swatch.selected {
     border-color: #ffffff;
 }
 
@@ -318,30 +314,25 @@ body.dark-mode .tag-color-swatch.selected {
 }
 
 /* Dark mode */
-html[data-theme='dark'] .tag-context-menu,
-body.dark-mode .tag-context-menu {
+html[data-theme='dark'] .tag-context-menu {
     background: #2a2a2a;
     border-color: #444;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
-html[data-theme='dark'] .tag-context-menu-item,
-body.dark-mode .tag-context-menu-item {
+html[data-theme='dark'] .tag-context-menu-item {
     color: #e0e0e0;
 }
 
-html[data-theme='dark'] .tag-context-menu-item:hover,
-body.dark-mode .tag-context-menu-item:hover {
+html[data-theme='dark'] .tag-context-menu-item:hover {
     background: #383838;
 }
 
-html[data-theme='dark'] .tag-context-menu-item.danger,
-body.dark-mode .tag-context-menu-item.danger {
+html[data-theme='dark'] .tag-context-menu-item.danger {
     color: #e07070;
 }
 
-html[data-theme='dark'] .tag-context-menu-item.danger:hover,
-body.dark-mode .tag-context-menu-item.danger:hover {
+html[data-theme='dark'] .tag-context-menu-item.danger:hover {
     background: #3a2828;
 }
 
@@ -362,15 +353,13 @@ body.dark-mode .tag-context-menu-item.danger:hover {
     border-color: var(--pz-accent);
 }
 
-html[data-theme='dark'] .tag-rename-input,
-body.dark-mode .tag-rename-input {
+html[data-theme='dark'] .tag-rename-input {
     background: #333;
     border-color: #555;
     color: #e0e0e0;
 }
 
-html[data-theme='dark'] .tag-rename-input:focus,
-body.dark-mode .tag-rename-input:focus {
+html[data-theme='dark'] .tag-rename-input:focus {
     border-color: #5ab4e0;
 }
 

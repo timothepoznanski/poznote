@@ -116,24 +116,20 @@
 }
 
 /* Dark mode support */
-html[data-theme='dark'] .background-preview-container,
-body.dark-mode .background-preview-container {
+html[data-theme='dark'] .background-preview-container {
     border-color: #444;
     background-color: #2a2a2a;
 }
 
-html[data-theme='dark'] .background-preview .no-background-text,
-body.dark-mode .background-preview .no-background-text {
+html[data-theme='dark'] .background-preview .no-background-text {
     color: #666;
 }
 
-html[data-theme='dark'] .background-opacity-control label,
-body.dark-mode .background-opacity-control label {
+html[data-theme='dark'] .background-opacity-control label {
     color: #ddd;
 }
 
-html[data-theme='dark'] .background-opacity-control input[type="range"],
-body.dark-mode .background-opacity-control input[type="range"] {
+html[data-theme='dark'] .background-opacity-control input[type="range"] {
     background: #444;
 }
 

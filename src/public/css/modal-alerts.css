@@ -39,20 +39,17 @@
     line-height: 1;
 }
 
-html[data-theme='dark'] .note-creation-loading-modal,
-body.dark-mode .note-creation-loading-modal {
+html[data-theme='dark'] .note-creation-loading-modal {
     background: rgba(0, 0, 0, 0.46);
 }
 
-html[data-theme='dark'] .note-creation-loading-dialog,
-body.dark-mode .note-creation-loading-dialog {
+html[data-theme='dark'] .note-creation-loading-dialog {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     box-shadow: 0 18px 40px rgba(0, 0, 0, 0.42);
 }
 
-html[data-theme='dark'] .note-creation-loading-content,
-body.dark-mode .note-creation-loading-content {
+html[data-theme='dark'] .note-creation-loading-content {
     color: var(--dm-text-muted);
 }
 
@@ -457,19 +454,15 @@ html[data-theme='dark'] .spinner,
 .admin-contact-copy .lucide {
     font-size: 0.9em;
 }
-html[data-theme='dark'] .admin-contact-option,
-body.dark-mode .admin-contact-option {
+html[data-theme='dark'] .admin-contact-option {
     background: var(--dm-surface, #1f2937);
     border-color: var(--dm-border, #374151);
 }
-html[data-theme='dark'] .admin-contact-option-desc,
-body.dark-mode .admin-contact-option-desc {
+html[data-theme='dark'] .admin-contact-option-desc {
     color: #9ca3af;
 }
 html[data-theme='dark'] .admin-contact-email,
-html[data-theme='dark'] .admin-contact-copy,
-body.dark-mode .admin-contact-email,
-body.dark-mode .admin-contact-copy {
+html[data-theme='dark'] .admin-contact-copy {
     background: transparent;
     border-color: var(--dm-border, #374151);
 }

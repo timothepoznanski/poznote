@@ -89,8 +89,7 @@
     color: #f87171;
 }
 
-html[data-theme='dark'] .home-card-red .home-card-icon,
-body.dark-mode .home-card-red .home-card-icon {
+html[data-theme='dark'] .home-card-red .home-card-icon {
     background: rgba(239, 68, 68, 0.22);
 }
 
@@ -117,8 +116,7 @@ body.dark-mode .home-card-red .home-card-icon {
     animation: heartbeat 3.5s ease-in-out infinite;
 }
 
-html[data-theme='dark'] #support-card .home-card-icon,
-body.dark-mode #support-card .home-card-icon {
+html[data-theme='dark'] #support-card .home-card-icon {
     background: rgba(239, 68, 68, 0.22);
 }
 
