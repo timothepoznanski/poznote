@@ -99,17 +99,44 @@ them and a background there breaks their native rendering.
 
 ## Writing a palette
 
-Everything a theme has to repaint is a token on `:root`, so a custom stylesheet
-(Settings > Custom CSS, injected last on every page) can be nothing but a list
-of overrides. Measured on eight pages: overriding the 24 tokens below leaves 0
-surfaces carrying an app colour.
+Everything a theme has to repaint is a token, so a custom stylesheet (Settings >
+Custom CSS, injected last on every page) can be nothing but a list of overrides.
+Two blocks, the shape a Catppuccin-style theme already has: light values on
+`:root`, dark values on `:root[data-theme='dark']`, and the black variant on
+`html.theme-black[data-theme='dark']` if you want a third.
 
-    --pz-bg --pz-surface --pz-surface-hover --pz-surface-sunken
-    --pz-text --pz-text-secondary --pz-text-muted --pz-text-subtle --pz-text-inverse
-    --pz-border-light --pz-border --pz-border-strong
-    --pz-accent --pz-accent-hover --pz-accent-rgb --pz-accent-strong --pz-accent-soft
-    --pz-link --pz-danger --pz-success --pz-warning
-    --pz-danger-soft --pz-success-soft --pz-warning-soft
+Light, on `:root`:
+
+    surfaces   --pz-bg --pz-surface --pz-surface-hover --pz-surface-sunken
+    text       --pz-text --pz-text-secondary --pz-text-muted --pz-text-subtle
+               --pz-text-inverse
+    borders    --pz-border-light --pz-border --pz-border-strong
+    accent     --pz-accent --pz-accent-hover --pz-accent-strong --pz-accent-soft
+               --pz-accent-rgb --pz-link
+    status     --pz-danger --pz-danger-hover --pz-danger-strong --pz-danger-soft
+               --pz-success --pz-success-hover --pz-success-strong --pz-success-soft
+               --pz-warning --pz-warning-hover --pz-warning-strong --pz-warning-soft
+    icons      --pz-icon
+
+Dark, the same shape under `--dm-`:
+
+    surfaces   --dm-content-bg --dm-bg --dm-sidebar-bg --dm-sidebar-surface
+               --dm-surface --dm-surface-hover --dm-surface-raised --dm-code-bg
+    text       --dm-text-bright --dm-text --dm-text-muted --dm-text-subtle
+    borders    --dm-border --dm-border-light
+    accent     --dm-accent --dm-accent-hover --dm-accent-soft --dm-active
+    status     --dm-danger --dm-danger-hover --dm-danger-soft
+               --dm-success --dm-success-hover --dm-success-soft
+               --dm-warning --dm-warning-hover --dm-warning-soft
+    icons      --dm-icon --dm-icon-hover
+    tabs       --dm-tabbar-bg --dm-tab-bg --dm-tab-hover-bg --dm-tab-active-bg
+
+Every semantic family has the same four steps, so there are only four questions
+per family: the fill, its hover, the deep shade for text on the wash, and the
+wash itself.
+
+Measured on eight pages: overriding the surface, text, border and accent tokens
+leaves 0 surfaces carrying a colour of the app's own.
 
 ### How the dark layer is ordered
 
