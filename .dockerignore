@@ -27,6 +27,7 @@ poznote-url-saver
 tools
 
 # Static analysis tooling - never part of the runtime image
+.oxlintrc.json
 phpstan.neon
 phpstan-baseline.neon
 phpstan-bootstrap.php
