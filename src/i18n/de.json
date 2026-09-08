@@ -1809,6 +1809,7 @@
     },
     "errors": {
       "workspace_not_found": "Arbeitsbereich nicht gefunden",
+      "folder_not_found": "Ordner nicht gefunden",
       "note_quota_reached": "Notizlimit erreicht: Diese Instanz erlaubt höchstens {{max}} Notizen für diesen Benutzer (inklusive Papierkorb).",
       "storage_quota_reached": "Speicherlimit erreicht: Diese Instanz erlaubt höchstens {{max}} MB Speicher für diesen Benutzer.",
       "linked_note_already_exists": "Für diese Notiz existiert bereits eine Verknüpfung",

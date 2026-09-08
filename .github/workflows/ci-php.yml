@@ -98,6 +98,12 @@ jobs:
       # and no config, which is only true because those modules were split out
       # of functions.php, so it runs in the same bare image as the lint step.
       # See tests/bootstrap.php for why there is no PHPUnit here.
+      #
+      # The cross-account isolation suite lives in tests/integration and is NOT
+      # run here: it needs a live instance to create accounts on. Run it by
+      # hand against the dev container before a release, and after touching
+      # auth.php, the API router or a controller's WHERE clause. See
+      # tests/integration/README.md.
       - name: Unit tests
         run: |
           docker run --rm -v "$PWD":/app -w /app "$PHP_IMAGE" \

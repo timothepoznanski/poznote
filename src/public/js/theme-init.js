@@ -222,7 +222,12 @@ window.__poznoteClearUserStorage = function (userId) {
         var style = document.createElement('style');
         style.id = 'main-font-override';
         style.textContent =
-            "@font-face { font-family: 'Inter'; src: " + localSrc(def.regular) + "; font-weight: 400; font-style: normal; } " +
+            // The regular face answers 300 as well as 400: css/fonts.css bundles a
+            // real Inter Light, and without this range a page asking for 300
+            // would keep drawing that Light while its neighbours switch to the
+            // chosen font. System stacks have no Light to offer, so the chosen
+            // font's regular stands in and the page stays one family.
+            "@font-face { font-family: 'Inter'; src: " + localSrc(def.regular) + "; font-weight: 300 400; font-style: normal; } " +
             "@font-face { font-family: 'Inter'; src: " + localSrc(def.semibold) + "; font-weight: 600; font-style: normal; }";
         document.documentElement.appendChild(style);
     }

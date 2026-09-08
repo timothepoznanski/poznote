@@ -521,6 +521,24 @@ foreach ($files as $file) {
     }
     $rel = str_starts_with($file, $root) ? 'src/public/css' . substr($file, strlen($root)) : $file;
     $css = preg_replace('!/\*.*?\*/!s', '', (string) file_get_contents($file));
+
+    // @font-face is the one place the scale must NOT be used: var() resolves in
+    // property values on elements, never in at-rule descriptors, so a token
+    // there does not fall back to its value, it voids the descriptor and the
+    // face claims the default 400. Two faces at 400 and the last one declared
+    // answers every request, which rendered the whole app in SemiBold once.
+    // So: reject var() inside the block, and hide the block from the scale
+    // check below, which would otherwise demand exactly what breaks it.
+    $css = preg_replace_callback('/@font-face\s*\{[^}]*\}/i', function ($m) use ($rel, &$errors) {
+        if (preg_match('/font-weight\s*:\s*var\(/i', $m[0])) {
+            echo "$rel: font-weight: var() in @font-face. Descriptors do not "
+               . "resolve var(): write the number, the face silently claims 400 "
+               . "otherwise. See the comment in css/fonts.css.\n";
+            $errors++;
+        }
+        return '';
+    }, $css);
+
     foreach ($scales as $prop => $rx) {
         if (!preg_match_all($rx, $css, $hits)) {
             continue;

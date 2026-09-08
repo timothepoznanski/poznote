@@ -644,6 +644,13 @@ function importSingleNoteFile($con, $content, $fileName, $fileExtension, $worksp
     $content = $meta['content'];
     $frontMatterData = $meta['frontMatterData'];
 
+    // An imported file is attacker-controlled content that the owner's own
+    // session renders as markup, so it gets the same treatment as anything
+    // saved through the editor (GHSA-xjh4-q36h-mcvv). Done after the metadata
+    // pass, which reads the title out of the front matter, and before both the
+    // insert and the file write so neither copy keeps the raw payload.
+    $content = poznoteSanitizeImportedNoteContent($content, $noteType);
+
     // Override folder from front matter if present
     if ($frontMatterData && isset($frontMatterData['folder']) && !empty($frontMatterData['folder'])) {
         $frontMatterFolder = $frontMatterData['folder'];
@@ -906,6 +913,13 @@ function importNotesZip($uploadedFile) {
             }
         }
         
+        // Sanitize after the title extraction above, which reads the <title>
+        // tag the sanitizer strips, and before both the file write and the
+        // database row: an archive from an untrusted source must not be able
+        // to plant markup that the owner's session executes
+        // (GHSA-xjh4-q36h-mcvv).
+        $content = poznoteSanitizeImportedNoteContent($content, $noteType);
+
         // Write file to entries directory
         $targetFile = $entriesPath . '/' . $baseFilename;
         if (file_put_contents($targetFile, $content) === false) {
@@ -973,6 +987,16 @@ function importNotesZip($uploadedFile) {
     return ['success' => true, 'message' => $message];
 }
 
+/**
+ * True for the bookkeeping entries at the root of an attachments export
+ * (the metadata manifest and the index page), which must never be stored
+ * as attachments when that archive is imported back.
+ */
+function poznoteIsAttachmentsArchiveManifest(string $zipEntryName): bool {
+    $path = str_replace('\\', '/', $zipEntryName);
+    return in_array($path, ['poznote_attachments_metadata.json', 'index.html'], true);
+}
+
 function importAttachmentsZip($uploadedFile) {
     // Check file type
     if (!preg_match('/\.zip$/i', $uploadedFile['name'])) {
@@ -1010,7 +1034,7 @@ function importAttachmentsZip($uploadedFile) {
     $attachmentsBytesEstimate = 0;
     for ($i = 0; $i < $zip->numFiles; $i++) {
         $stat = $zip->statIndex($i);
-        if (substr($stat['name'], -1) === '/') {
+        if (substr($stat['name'], -1) === '/' || poznoteIsAttachmentsArchiveManifest($stat['name'])) {
             continue;
         }
         $attachmentsBytesEstimate += max(0, (int)($stat['size'] ?? 0));
@@ -1038,7 +1062,15 @@ function importAttachmentsZip($uploadedFile) {
         if (substr($filename, -1) === '/') {
             continue;
         }
-        
+
+        // The archive our own export produces carries a manifest and a
+        // browsable index beside the files. They describe the archive, they
+        // are not attachments, and importing them dropped two stray files
+        // into the attachments directory and counted them as imported.
+        if (poznoteIsAttachmentsArchiveManifest($filename)) {
+            continue;
+        }
+
         // Extract file content
         $content = $zip->getFromIndex($i);
         if ($content === false) {

@@ -1810,6 +1810,7 @@
     },
     "errors": {
       "workspace_not_found": "Espacio de trabajo no encontrado",
+      "folder_not_found": "Carpeta no encontrada",
       "note_quota_reached": "Límite de notas alcanzado: esta instancia permite como máximo {{max}} notas para este usuario (papelera incluida).",
       "storage_quota_reached": "Límite de almacenamiento alcanzado: esta instancia permite como máximo {{max}} MB de almacenamiento para este usuario.",
       "linked_note_already_exists": "Ya existe un atajo para esta nota",

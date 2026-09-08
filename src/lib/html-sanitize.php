@@ -240,7 +240,7 @@ function sanitizeHtml($html) {
     
     // Allowed attributes per tag
     $allowedAttrs = [
-        'a' => ['href', 'title', 'target', 'rel'],
+        'a' => ['href', 'title', 'target', 'rel', 'download'],
         'img' => ['src', 'alt', 'title', 'width', 'height', 'data-is-excalidraw', 'data-excalidraw-note-id'],
         'td' => ['colspan', 'rowspan'],
         'th' => ['colspan', 'rowspan', 'scope'],
@@ -567,4 +567,59 @@ function sanitizeMarkdownContent($markdown) {
     $markdown = preg_replace('/(href|src)\s*=\s*(["\'])\s*vbscript:/i', '$1=$2', $markdown);
 
     return restoreMarkdownCodeSegments($markdown, $codeSegments);
+}
+
+/**
+ * True when a stored note body is a structured JSON payload (a task list),
+ * not markup.
+ *
+ * Task lists keep their JSON in the same `entry` column and `.html` file as
+ * every other note, and no renderer ever emits it as HTML. Running it through
+ * the HTML sanitizer would corrupt it, so the import paths hand it through
+ * untouched, but only for a note the metadata already declares as a task
+ * list: a plain note whose body happens to parse as JSON is still printed as
+ * markup.
+ */
+function poznoteContentIsStructuredJson(string $content): bool {
+    $trimmed = trim($content);
+    if ($trimmed === '' || ($trimmed[0] !== '[' && $trimmed[0] !== '{')) {
+        return false;
+    }
+    $decoded = json_decode($trimmed, true);
+    return json_last_error() === JSON_ERROR_NONE && is_array($decoded);
+}
+
+/**
+ * Sanitize note content that arrives from outside the app: a file or ZIP
+ * import, a Git pull, a restored backup.
+ *
+ * The editor's own save path has always run a note through
+ * sanitizeHtml()/sanitizeMarkdownContent() before storing it, but the import
+ * paths stored what they were given. An imported note could therefore carry
+ * an inline handler or a <script> tag that the owner's own page executed on
+ * the next load, with no click, because the default screen opens the most
+ * recently updated note (GHSA-xjh4-q36h-mcvv). This applies the same policy
+ * the API applies, keyed by note type, so imported and edited notes are held
+ * to one rule.
+ *
+ * @param string|null $content   Note body as it came from the archive/remote
+ * @param string|null $noteType  'note', 'markdown', 'tasklist' or 'excalidraw';
+ *                               null when the caller cannot tell, which is
+ *                               treated as HTML (the strict case)
+ */
+function poznoteSanitizeImportedNoteContent($content, ?string $noteType) {
+    $content = (string) $content;
+    if (trim($content) === '') {
+        return $content;
+    }
+
+    if ($noteType === 'markdown') {
+        return sanitizeMarkdownContent($content);
+    }
+
+    if ($noteType === 'tasklist' && poznoteContentIsStructuredJson($content)) {
+        return $content;
+    }
+
+    return sanitizeHtml($content);
 }

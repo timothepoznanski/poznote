@@ -9,6 +9,9 @@ Each name is fetched from unpkg (lucide-static, pinned to the same version as
 the existing bundle) and emitted as a .lucide-<name> block in the same format
 as the rest of the file. After appending blocks, add the names to FOLDER_ICONS
 in src/js/folder-icon.js and (optionally) icon_names.* in src/i18n/*.json.
+
+LUCIDE_VERSION below must stay in sync with the lucide-static entry in
+vendor.json, which records what the committed bundle was generated from.
 """
 
 import argparse

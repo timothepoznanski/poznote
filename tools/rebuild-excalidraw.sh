@@ -2,6 +2,9 @@
 
 # Script to rebuild the Excalidraw bundle
 # Usage: ./rebuild-excalidraw.sh
+#
+# After a rebuild that changes @excalidraw/excalidraw or its dependencies,
+# update the matching entry in vendor.json (version, updated, verified).
 
 echo "Rebuilding Excalidraw bundle..."
 

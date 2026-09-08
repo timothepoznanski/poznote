@@ -1605,8 +1605,38 @@ class FoldersController {
     /**
      * POST /api/v1/folders/{id}/empty - Empty folder (move notes to trash)
      */
+    /**
+     * Answers 400 or 404 and returns false unless the folder is in this
+     * account's database.
+     *
+     * Every route that takes a folder id needs this. An UPDATE that matches no
+     * row reports success just like one that changed something, so without the
+     * check a caller passing an id it does not own gets the same answer as the
+     * owner - which is both a lie and, on a shared instance, a hint that the
+     * request was understood.
+     */
+    private function requireFolder(int $folderId): bool {
+        if ($folderId <= 0) {
+            $this->sendError('Invalid folder ID', 400);
+            return false;
+        }
+
+        $stmt = $this->db->prepare("SELECT id FROM folders WHERE id = ?");
+        $stmt->execute([$folderId]);
+        if (!$stmt->fetchColumn()) {
+            $this->sendError('Folder not found', 404);
+            return false;
+        }
+
+        return true;
+    }
+
     public function empty(string $id): void {
         $folderId = (int)$id;
+        if (!$this->requireFolder($folderId)) {
+            return;
+        }
+
         $data = $this->getInputData();
         $workspace = isset($data['workspace']) ? trim((string)$data['workspace']) : null;
         
@@ -1628,14 +1658,13 @@ class FoldersController {
      */
     public function updateIcon(string $id): void {
         $folderId = (int)$id;
+        if (!$this->requireFolder($folderId)) {
+            return;
+        }
+
         $data = $this->getInputData();
         $icon = trim($data['icon'] ?? '');
         $iconColor = trim($data['icon_color'] ?? '');
-
-        if ($folderId <= 0) {
-            $this->sendError('Invalid folder ID', 400);
-            return;
-        }
 
         $iconValue = $this->normalizeFolderIcon($icon);
         $iconColorValue = $iconColor === '' ? null : $iconColor;
@@ -1676,10 +1705,7 @@ class FoldersController {
             return;
         }
 
-        $existsStmt = $this->db->prepare("SELECT id FROM folders WHERE id = ?");
-        $existsStmt->execute([$folderId]);
-        if (!$existsStmt->fetchColumn()) {
-            $this->sendError('Folder not found', 404);
+        if (!$this->requireFolder($folderId)) {
             return;
         }
 
@@ -1727,10 +1753,7 @@ class FoldersController {
             return;
         }
 
-        $existsStmt = $this->db->prepare("SELECT id FROM folders WHERE id = ?");
-        $existsStmt->execute([$folderId]);
-        if (!$existsStmt->fetchColumn()) {
-            $this->sendError('Folder not found', 404);
+        if (!$this->requireFolder($folderId)) {
             return;
         }
 
@@ -1777,10 +1800,7 @@ class FoldersController {
             return;
         }
 
-        $existsStmt = $this->db->prepare("SELECT id FROM folders WHERE id = ?");
-        $existsStmt->execute([$folderId]);
-        if (!$existsStmt->fetchColumn()) {
-            $this->sendError('Folder not found', 404);
+        if (!$this->requireFolder($folderId)) {
             return;
         }
 
@@ -1802,6 +1822,10 @@ class FoldersController {
      */
     public function noteCount(string $id): void {
         $folderId = (int)$id;
+        if (!$this->requireFolder($folderId)) {
+            return;
+        }
+
         $workspace = isset($_GET['workspace']) ? trim((string)$_GET['workspace']) : null;
         
         $totalCount = $this->countNotesRecursive($folderId, $workspace);
@@ -1829,6 +1853,10 @@ class FoldersController {
      */
     public function path(string $id): void {
         $folderId = (int)$id;
+        if (!$this->requireFolder($folderId)) {
+            return;
+        }
+
         $workspace = isset($_GET['workspace']) ? trim((string)$_GET['workspace']) : null;
         
         // Build path

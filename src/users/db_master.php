@@ -8,16 +8,34 @@
  * - User selects their profile on login
  */
 
+// Include utility functions (createDirectoryWithPermissions, etc.) BEFORE
+// config: config.php reads global settings while it is still loading, which
+// re-enters this file, and getMasterConnection() must find its helpers
+// already declared.
+require_once __DIR__ . '/../functions.php';
+
 // Ensure config is loaded
 if (!defined('SQLITE_DATABASE')) {
     require_once __DIR__ . '/../config.php';
 }
 
-// Include utility functions (createDirectoryWithPermissions, etc.)
-require_once __DIR__ . '/../functions.php';
+/**
+ * Path of the master database, usually at the root of the data directory.
+ *
+ * Resolved by a function rather than only by the constant below because a
+ * script that requires this file before config.php sends config.php through
+ * its own global-setting reads, and those re-enter getMasterConnection()
+ * before the define() at the end of this block has run.
+ */
+function masterDatabasePath(): string {
+    if (defined('MASTER_DATABASE')) {
+        return MASTER_DATABASE;
+    }
+    return $_ENV['POZNOTE_MASTER_DATABASE'] ?? dirname(SQLITE_DATABASE, 2) . '/master.db';
+}
 
 // Master database path - usually located at the root of the data directory
-define('MASTER_DATABASE', $_ENV['POZNOTE_MASTER_DATABASE'] ?? dirname(SQLITE_DATABASE, 2) . '/master.db');
+define('MASTER_DATABASE', masterDatabasePath());
 
 /**
  * Get connection to master database
@@ -30,7 +48,7 @@ function getMasterConnection(): PDO {
     }
     
     try {
-        $dbPath = MASTER_DATABASE;
+        $dbPath = masterDatabasePath();
         $dbDir = dirname($dbPath);
         createDirectoryWithPermissions($dbDir);
         

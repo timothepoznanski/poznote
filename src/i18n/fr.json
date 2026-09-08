@@ -1895,6 +1895,7 @@
     },
     "errors": {
       "workspace_not_found": "Espace de travail introuvable",
+      "folder_not_found": "Dossier introuvable",
       "note_quota_reached": "Limite de notes atteinte : cette instance autorise au maximum {{max}} notes pour cet utilisateur (corbeille incluse).",
       "storage_quota_reached": "Limite de stockage atteinte : cette instance autorise au maximum {{max}} Mo de stockage pour cet utilisateur.",
       "linked_note_already_exists": "Un raccourci existe déjà pour cette note",

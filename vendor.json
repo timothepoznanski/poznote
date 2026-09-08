@@ -1,0 +1,305 @@
+{
+  "_about": [
+    "Manifest of the third-party code vendored into this repository: libraries whose files are",
+    "committed here instead of being installed from a package manager at build time.",
+    "It exists so that a question like 'are we affected by this mermaid CVE' can be answered by",
+    "reading one file, and so that refreshing a library does not require guessing where it came from.",
+    "",
+    "Every file listed with a non-null URL was verified byte for byte against that URL on the",
+    "date in 'verified': the vendored files are the pristine upstream artifacts, with no local patch.",
+    "To re-check one file: curl -sL <url> | sha256sum, and compare with the sha256 recorded here.",
+    "",
+    "When you update a library: replace the files, then update version, urls, sha256, 'updated' and",
+    "'verified' in the matching entry. When you vendor a new one, add an entry. A file under a path",
+    "listed here that is not described by an entry is a bug in this manifest."
+  ],
+  "_fields": {
+    "id": "Package name upstream (npm name where one exists), so advisories can be matched mechanically.",
+    "version": "Exact vendored version. 'built' entries take it from the build directory's lockfile instead.",
+    "license": "SPDX identifier of the upstream license.",
+    "homepage": "Project home, for advisories and release notes.",
+    "files": "Paths in this repository, with the upstream URL each file was downloaded from and its sha256.",
+    "vendored": "Date the library first entered the repository (first commit touching it).",
+    "updated": "Date the vendored files last changed, whether an upgrade or a file added or removed.",
+    "verified": "Date the recorded sha256 values were last confirmed against upstream.",
+    "loaded_by": "Where the asset is pulled into a page, so unused copies are easy to spot.",
+    "files_removed": "Files of the upstream distribution deliberately not kept, to delete again after a version bump.",
+    "build": "For libraries compiled here rather than downloaded: the build directory holding package.json and package-lock.json, which are the authoritative version record."
+  },
+  "generated": "2026-09-09",
+  "libraries": [
+    {
+      "id": "mermaid",
+      "version": "11.12.2",
+      "license": "MIT",
+      "homepage": "https://github.com/mermaid-js/mermaid",
+      "files": [
+        {
+          "path": "src/public/js/mermaid/mermaid.min.js",
+          "url": "https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.2/mermaid.min.js",
+          "sha256": "d0830a6c05546e9edb8fe20a8f545f3e0dc7c4c3134d584bad9c13a99d7a71e0"
+        }
+      ],
+      "vendored": "2025-12-13",
+      "updated": "2025-12-13",
+      "verified": "2026-09-09",
+      "loaded_by": [
+        "src/public/js/lazy-libs.js (on demand, when a note contains a diagram)",
+        "src/public/public_note.php"
+      ],
+      "notes": "Browser build exposing window.mermaid. The cdnjs artifact is the esbuild IIFE bundle, not the ESM dist/mermaid.min.js published on npm, so refresh it from the same cdnjs path."
+    },
+    {
+      "id": "katex",
+      "version": "0.16.9",
+      "license": "MIT",
+      "homepage": "https://github.com/KaTeX/KaTeX",
+      "files": [
+        {
+          "path": "src/public/js/katex/katex.min.js",
+          "url": "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js",
+          "sha256": "dc84b296ec3e884de093158f760fd9d45b6c7abe58b5381557f4e138f46a58ae"
+        },
+        {
+          "path": "src/public/js/katex/katex.min.css",
+          "url": "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css",
+          "sha256": "505d5f829022bb7b4f24dfee0aa1141cd7bba67afe411d1240335f820960b5c3"
+        },
+        {
+          "path": "src/public/js/katex/fonts/",
+          "url": "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/",
+          "sha256": null,
+          "note": "20 woff2 files required by katex.min.css. Refresh them together with the CSS."
+        }
+      ],
+      "vendored": "2025-12-27",
+      "updated": "2025-12-27",
+      "verified": "2026-09-09",
+      "loaded_by": [
+        "src/public/js/lazy-libs.js (on demand, when a note contains math)",
+        "src/public/public_note.php",
+        "src/css_assets.php (katex.min.css)"
+      ],
+      "notes": "Only the parts Poznote loads are vendored. dist/contrib/auto-render.min.js is deliberately not kept: src/public/js/math-renderer.js provides renderMathInElement itself, over the .math-block and .math-inline spans the markdown parser emits, so the upstream auto-render would only be overwritten. Do not restore it on a version bump."
+    },
+    {
+      "id": "highlight.js",
+      "version": "11.9.0",
+      "license": "BSD-3-Clause",
+      "homepage": "https://github.com/highlightjs/highlight.js",
+      "files": [
+        {
+          "path": "src/public/js/highlight/highlight.min.js",
+          "url": "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js",
+          "sha256": "837a6fa5b0c736b52bbde2b2b6190f305da3fc9ed41681db5321507057b5c846"
+        },
+        {
+          "path": "src/public/js/highlight/powershell.min.js",
+          "url": "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/powershell.min.js",
+          "sha256": "9812f1ea7bf1e4da7dcb4408cb46f3b5be3aa5bb46a01406b4092a9828a51275"
+        }
+      ],
+      "vendored": "2026-01-30",
+      "updated": "2026-02-03",
+      "verified": "2026-09-09",
+      "loaded_by": [
+        "src/public/index.php",
+        "src/public/public_note.php"
+      ],
+      "notes": "Common-languages bundle plus the separate PowerShell grammar, which the common bundle does not include. Both files must stay on the same version."
+    },
+    {
+      "id": "sortablejs",
+      "version": "1.15.0",
+      "license": "MIT",
+      "homepage": "https://github.com/SortableJS/Sortable",
+      "files": [
+        {
+          "path": "src/public/js/Sortable.min.js",
+          "url": "https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js",
+          "sha256": "8a9889aecc2f011e15031fed87eeb35ac75e62655a7b4889ba247ee8ea872474"
+        }
+      ],
+      "vendored": "2025-10-24",
+      "updated": "2025-10-24",
+      "verified": "2026-09-09",
+      "loaded_by": [
+        "src/public/js/tasklist-order-drag.js (injected on demand)",
+        "src/public/js/settings-page.js (injected on demand)"
+      ],
+      "notes": "Vendored to remove a CDN dependency at runtime."
+    },
+    {
+      "id": "lucide-static",
+      "version": "0.575.0",
+      "license": "ISC",
+      "homepage": "https://lucide.dev",
+      "files": [
+        {
+          "path": "src/public/css/lucide.css",
+          "url": "https://unpkg.com/lucide-static@0.575.0/icons/<name>.svg",
+          "sha256": "39cefd291f2fd6bc97fd12dab491c82dc6ebdeec64f81a3eced1296598bd15a6"
+        }
+      ],
+      "vendored": "2026-02-22",
+      "updated": "2026-09-03",
+      "verified": "2026-09-09",
+      "loaded_by": [
+        "src/css_assets.php (linked by every page)"
+      ],
+      "notes": "Generated, not downloaded: tools/generate-lucide-icons.py fetches individual SVGs from unpkg and emits one CSS mask rule per icon, with the upstream version kept in each embedded @license comment. LUCIDE_VERSION in that script must match the version here. The file is appended to over time, so its sha256 changes whenever an icon is added without any upstream version change. src/public/css/lucide-icons-map.json is a Poznote alias table, not upstream content."
+    },
+    {
+      "id": "inter",
+      "version": "4.001",
+      "license": "OFL-1.1",
+      "homepage": "https://github.com/rsms/inter",
+      "files": [
+        {
+          "path": "src/public/webfonts/Inter/static/Inter_24pt-Regular.ttf",
+          "url": null,
+          "sha256": "d2a4911506ea4e124a47ca044e5e79f671ddf8f1a55f1ab9a56c58d088124b63"
+        },
+        {
+          "path": "src/public/webfonts/Inter/static/Inter_24pt-SemiBold.ttf",
+          "url": null,
+          "sha256": "10238d4c2f85914e3899177426840bde80b078a612903066cf5c9afd17dbf023"
+        },
+        {
+          "path": "src/public/webfonts/Inter/OFL.txt",
+          "url": null,
+          "sha256": null
+        }
+      ],
+      "vendored": "2025-08-01",
+      "updated": "2025-08-01",
+      "verified": "2026-09-09",
+      "loaded_by": [
+        "src/public/css/fonts.css"
+      ],
+      "notes": "Static TTF subset of the Google Fonts distribution (https://fonts.google.com/specimen/Inter), hence the Inter_24pt file naming. That download has no stable per-file URL, so the sha256 values here were not checked against upstream; the version comes from the font name table, not from a package manifest. Fonts carry no executable code, so they matter for licensing rather than for advisories."
+    },
+    {
+      "id": "swagger-ui-dist",
+      "version": "5.10.0",
+      "license": "Apache-2.0",
+      "homepage": "https://github.com/swagger-api/swagger-ui",
+      "files": [
+        {
+          "path": "src/public/api-docs/swagger-ui/swagger-ui-bundle.js",
+          "url": "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.10.0/swagger-ui-bundle.js",
+          "sha256": "8b4e7416c674312c26de654cbfb221a5f09d2bdd1129a5cf4bf126896c6ff2f7"
+        },
+        {
+          "path": "src/public/api-docs/swagger-ui/swagger-ui-bundle.js.map",
+          "url": "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.10.0/swagger-ui-bundle.js.map",
+          "sha256": "41772e27f456246240cec58a294720da1b0cbc722be98d26514e2517a36ed458"
+        },
+        {
+          "path": "src/public/api-docs/swagger-ui/swagger-ui-standalone-preset.js",
+          "url": "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.10.0/swagger-ui-standalone-preset.js",
+          "sha256": "206a095575bb311c9e64eb0a71e59578f01285f5692619d884384e429f988b7f"
+        },
+        {
+          "path": "src/public/api-docs/swagger-ui/swagger-ui-standalone-preset.js.map",
+          "url": "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.10.0/swagger-ui-standalone-preset.js.map",
+          "sha256": "2a537505caa166090e7cffbbc0074e7266b241214277a3c34a3d59bd22194254"
+        },
+        {
+          "path": "src/public/api-docs/swagger-ui/swagger-ui.css",
+          "url": "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.10.0/swagger-ui.css",
+          "sha256": "22036661a013a98eb3e80b83ea1bf3f573743b278073de20b136be94af246b56"
+        },
+        {
+          "path": "src/public/api-docs/swagger-ui/swagger-ui.css.map",
+          "url": "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.10.0/swagger-ui.css.map",
+          "sha256": "2d43b613b11e5a223c54f6c8720813c114db9c2dd0fd372355a5063c95313aba"
+        },
+        {
+          "path": "src/public/api-docs/swagger-ui/oauth2-redirect.html",
+          "url": "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.10.0/oauth2-redirect.html",
+          "sha256": "397fd30a2499cd2c5f3411ade0ca7fbd786d5011639ca78a06824d580b83c122"
+        }
+      ],
+      "files_removed": [
+        "index.html",
+        "index.css",
+        "swagger-initializer.js",
+        "favicon-16x16.png",
+        "favicon-32x32.png",
+        "swagger-ui.js",
+        "swagger-ui.js.map",
+        "swagger-ui-es-bundle.js",
+        "swagger-ui-es-bundle.js.map",
+        "swagger-ui-es-bundle-core.js",
+        "swagger-ui-es-bundle-core.js.map"
+      ],
+      "vendored": "2025-10-15",
+      "updated": "2026-09-09",
+      "verified": "2026-09-09",
+      "loaded_by": [
+        "src/public/api-docs/index.php"
+      ],
+      "notes": "Only the part of the distribution Poznote serves is vendored, so this directory is a subset: the files kept are unmodified, but do not expect it to match the upstream package file for file. api-docs/index.php requires authentication and loads swagger-ui.css, swagger-ui-bundle.js and swagger-ui-standalone-preset.js with its own initialisation, so after a version bump, delete everything in files_removed again. Why each group went: the distribution ships its own demo page pointing at the upstream petstore spec, and static files in the docroot are served without going through index.php, so that page was reachable unauthenticated (index.html, its index.css and its two favicons, swagger-initializer.js); swagger-ui.js and the two ES bundles are alternative packagings for bundlers that nothing here loads, so they and their source maps were dead weight, about 6 MB. The three source maps that remain belong to the files actually served, which each declare a sourceMappingURL: removing them would leave devtools requesting a missing file. oauth2-redirect.html is kept because swagger-ui-bundle.js refers to it as the default OAuth2 redirect."
+    },
+    {
+      "id": "@excalidraw/excalidraw",
+      "version": "0.17.6",
+      "license": "MIT",
+      "homepage": "https://github.com/excalidraw/excalidraw",
+      "files": [
+        {
+          "path": "src/public/js/excalidraw-dist/excalidraw-bundle.iife.js",
+          "url": null,
+          "sha256": "598097c6a2b6b59f0975a70d28b8883c9ad806e2739f94faa2254991d4e4e825"
+        },
+        {
+          "path": "src/public/js/excalidraw-dist/excalidraw-assets/",
+          "url": null,
+          "sha256": null,
+          "note": "Copied verbatim from node_modules/@excalidraw/excalidraw/dist/excalidraw-assets: fonts, locales and the lazy-loaded vendor chunk."
+        }
+      ],
+      "build": {
+        "dir": "excalidraw-build",
+        "script": "tools/rebuild-excalidraw.sh",
+        "manifest": "excalidraw-build/package.json",
+        "lockfile": "excalidraw-build/package-lock.json"
+      },
+      "vendored": "2025-10-25",
+      "updated": "2026-08-04",
+      "verified": "2026-09-09",
+      "loaded_by": [
+        "src/public/excalidraw_editor.php"
+      ],
+      "notes": "Built here, not downloaded: the committed bundle also contains React 18.3.1, react-dom and lodash. Run 'npm audit' in excalidraw-build for advisories covering the whole dependency tree; package-lock.json is the authoritative version record."
+    },
+    {
+      "id": "codemirror",
+      "version": "6 (see lockfile)",
+      "license": "MIT",
+      "homepage": "https://codemirror.net",
+      "files": [
+        {
+          "path": "src/public/js/codemirror-dist/markdown-codemirror.iife.js",
+          "url": null,
+          "sha256": "9d9ce7687c37e20073d0fdf80e31f2b182456d50ef98b5ab0b5faea446465dc0"
+        }
+      ],
+      "build": {
+        "dir": "markdown-editor-build",
+        "script": "tools/rebuild-markdown-editor.sh",
+        "manifest": "markdown-editor-build/package.json",
+        "lockfile": "markdown-editor-build/package-lock.json"
+      },
+      "vendored": "2026-06-20",
+      "updated": "2026-09-03",
+      "verified": "2026-09-09",
+      "loaded_by": [
+        "src/public/index.php",
+        "src/public/js/markdown-editor.js (bridge)"
+      ],
+      "notes": "Built here from about twenty @codemirror packages, so there is no single version number: package-lock.json is the authoritative record and 'npm audit' in markdown-editor-build is the advisory check."
+    }
+  ]
+}

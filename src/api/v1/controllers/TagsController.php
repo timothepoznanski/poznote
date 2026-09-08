@@ -67,6 +67,40 @@ class TagsController {
      * Rename a tag across all notes (optionally scoped to a workspace)
      * Body: { "new_name": "...", "workspace": "..." (optional) }
      */
+    /**
+     * A tag exists only as long as a note carries it, so "no note carries it"
+     * is what not-found means here. Without the check both routes answer
+     * `{"success": true, "updated": 0}` for a tag that was never in this
+     * account, which reads as a rename or a deletion that happened.
+     *
+     * The LIKE narrows the scan; the exact comparison is what decides, since
+     * LIKE '%todo%' also matches a note tagged "todolist".
+     */
+    private function tagExists(string $tag, ?string $workspace): bool {
+        $where = "trash = 0 AND tags LIKE ?";
+        $params = ['%' . $tag . '%'];
+        if (!empty($workspace)) {
+            $where .= " AND workspace = ?";
+            $params[] = $workspace;
+        }
+
+        $stmt = $this->con->prepare("SELECT tags FROM entries WHERE $where");
+        $stmt->execute($params);
+
+        foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $tags) {
+            if (in_array($tag, array_map('trim', explode(',', (string)$tags)), true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function sendTagNotFound(string $tag): void {
+        http_response_code(404);
+        echo json_encode(['success' => false, 'message' => 'Tag not found: ' . $tag]);
+    }
+
     public function rename(string $tag): void {
         $tag = urldecode($tag);
         $input = json_decode(file_get_contents('php://input'), true);
@@ -81,6 +115,11 @@ class TagsController {
         // Spaces → underscores to match the existing tag normalisation convention
         $newName = str_replace(' ', '_', $newName);
         $workspace = $input['workspace'] ?? null;
+
+        if (!$this->tagExists($tag, $workspace)) {
+            $this->sendTagNotFound($tag);
+            return;
+        }
 
         if ($newName === $tag) {
             echo json_encode(['success' => true, 'updated' => 0]);
@@ -136,6 +175,11 @@ class TagsController {
     public function delete(string $tag): void {
         $tag = urldecode($tag);
         $workspace = $_GET['workspace'] ?? null;
+
+        if (!$this->tagExists($tag, $workspace)) {
+            $this->sendTagNotFound($tag);
+            return;
+        }
 
         try {
             $where = "trash = 0 AND tags LIKE ?";

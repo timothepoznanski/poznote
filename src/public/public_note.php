@@ -893,7 +893,7 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
     <?php poznoteRenderStylesheets('public_note', ['asset' => 'public']); ?>
     <script src="<?php echo poznoteAsset('js/mermaid/mermaid.min.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/katex/katex.min.js'); ?>"></script>
-    <!-- katex/auto-render.min.js removed: its renderMathInElement was overwritten by js/math-renderer.js below -->
+    <!-- No KaTeX auto-render: renderMathInElement comes from js/math-renderer.js, which renders the .math-block/.math-inline spans the parser emits -->
     <script src="<?php echo poznoteAsset('js/highlight/highlight.min.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/highlight/powershell.min.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/syntax-highlight.js'); ?>"></script>

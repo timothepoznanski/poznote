@@ -1410,8 +1410,20 @@ class GitSync {
                         continue;
                     }
 
+                    // A remote repository is not a trusted source: it can be
+                    // shared, or simply someone else's. Hold a pulled note to the
+                    // same policy the editor applies on save, before it reaches
+                    // the entries directory the note page reads from
+                    // (GHSA-xjh4-q36h-mcvv).
+                    require_once __DIR__ . '/lib/html-sanitize.php';
+                    // Same type derivation as the INSERT below, so the policy
+                    // applied here always matches the type the row ends up with.
+                    $pulledType = $metadata[(string) $noteId]['type']
+                        ?? ((strtolower(pathinfo($filename, PATHINFO_EXTENSION)) === 'md') ? 'markdown' : 'note');
+                    $safeContent = poznoteSanitizeImportedNoteContent($raw['content'], $pulledType);
+
                     // Write to disk immediately
-                    file_put_contents($localEntryFile, $raw['content']);
+                    file_put_contents($localEntryFile, $safeContent);
                     $downloadedNotes[] = ['noteId' => $noteId, 'filename' => $filename, 'filePath' => $localEntryFile];
                 }
             } catch (Exception $e) {

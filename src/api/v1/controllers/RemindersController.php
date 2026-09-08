@@ -218,6 +218,9 @@ class RemindersController {
         }
         
         $noteId = (int)$id;
+        if (!$this->requireNote($noteId)) {
+            return;
+        }
         
         try {
             // Clear reminder on the note
@@ -335,6 +338,10 @@ class RemindersController {
         }
 
         $noteId = (int)$id;
+        if (!$this->requireNote($noteId)) {
+            return;
+        }
+
         $input = json_decode(file_get_contents('php://input'), true);
         $taskId = '';
         if (is_array($input) && isset($input['task_id']) && is_scalar($input['task_id'])) {
@@ -406,9 +413,41 @@ class RemindersController {
      * POST /api/v1/reminders/{id}/read
      * Mark a notification as read
      */
+    /**
+     * Answers 404 and returns false when the note is not in this account's
+     * database, so a route addressing a note it does not own cannot come back
+     * saying the work was done.
+     */
+    private function requireNote(int $noteId): bool {
+        $stmt = $this->con->prepare("SELECT id FROM entries WHERE id = ? AND trash = 0");
+        $stmt->execute([$noteId]);
+        if (!$stmt->fetchColumn()) {
+            $this->sendError(404, 'Note not found');
+            return false;
+        }
+
+        return true;
+    }
+
+    /** Same, for the notification rows the /reminders/{id} routes address. */
+    private function requireNotification(int $notificationId): bool {
+        $stmt = $this->con->prepare("SELECT id FROM notifications WHERE id = ?");
+        $stmt->execute([$notificationId]);
+        if (!$stmt->fetchColumn()) {
+            $this->sendError(404, 'Notification not found');
+            return false;
+        }
+
+        return true;
+    }
+
     public function markRead(string $id): void {
         if (!is_numeric($id)) {
             $this->sendError(400, 'Invalid notification ID');
+            return;
+        }
+
+        if (!$this->requireNotification((int)$id)) {
             return;
         }
         
@@ -429,6 +468,10 @@ class RemindersController {
     public function dismiss(string $id): void {
         if (!is_numeric($id)) {
             $this->sendError(400, 'Invalid notification ID');
+            return;
+        }
+
+        if (!$this->requireNotification((int)$id)) {
             return;
         }
         

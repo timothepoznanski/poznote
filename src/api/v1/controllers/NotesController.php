@@ -445,6 +445,15 @@ class NotesController {
             return;
         }
 
+        // The lock table lives in master.db, keyed by (user, note), so nothing
+        // in refreshNoteEditLock() would notice a note id this account does
+        // not own: it would happily create a lock row for a note that is not
+        // there. acquireLock() checks the same thing before taking a lock.
+        if (!$this->noteExistsForEditing($noteId)) {
+            $this->sendError(404, 'Note not found');
+            return;
+        }
+
         $editorSessionId = $this->getEditorSessionId($input);
         if ($editorSessionId === '') {
             $this->sendError(400, 'Missing editor session');
@@ -478,6 +487,11 @@ class NotesController {
         $input = $this->decodeOptionalJsonBody();
         if ($input === null) {
             $this->sendError(400, 'Invalid JSON in request body');
+            return;
+        }
+
+        if (!$this->noteExistsForEditing($noteId)) {
+            $this->sendError(404, 'Note not found');
             return;
         }
 
@@ -863,9 +877,9 @@ class NotesController {
      * Body (JSON):
      *   - heading: Note title (optional, defaults to "New note")
      *   - content: Note content (HTML or Markdown)
-     *   - tags: Comma-separated tags
-     *   - folder_name: Folder name
-     *   - folder_id: Folder ID (alternative to folder_name)
+     *   - tags: Comma-separated tags, or an array of tags
+     *   - folder: Folder path ('folder_name' is accepted as an older spelling)
+     *   - folder_id: Folder ID (alternative to folder)
      *   - workspace: Workspace name
      *   - type: Note type (note, markdown, excalidraw)
      *   - created_date: Optional YYYY-MM-DD date to backdate the note to
@@ -881,8 +895,14 @@ class NotesController {
         }
         
         $originalHeading = isset($input['heading']) ? trim($input['heading']) : '';
-        $tags = isset($input['tags']) ? trim($input['tags']) : '';
-        $folder = isset($input['folder_name']) ? trim($input['folder_name']) : null;
+        // Tags arrive either comma-separated or as an array, the way
+        // PUT /notes/{id}/tags takes them; sanitizeTags() accepts both, so it
+        // is called here instead of trim(), which fatals on an array.
+        $tags = isset($input['tags']) ? $this->sanitizeTags($input['tags']) : '';
+        // 'folder' is what the API documentation names this parameter,
+        // 'folder_name' is the older spelling; both mean the target folder path.
+        $folderInput = $input['folder'] ?? $input['folder_name'] ?? null;
+        $folder = is_string($folderInput) ? trim($folderInput) : null;
         
         // Handle workspace - use provided value or fallback to first workspace
         $workspace = isset($input['workspace']) && trim($input['workspace']) !== '' 
@@ -910,11 +930,6 @@ class NotesController {
                     $this->sendError(404, t('api.errors.workspace_not_found', [], 'Workspace not found'));
                     return;
                 }
-            }
-            
-            // Validate and clean tags
-            if (!empty($tags)) {
-                $tags = $this->sanitizeTags($tags);
             }
             
             // Get folder_id if folder name is provided
@@ -1070,8 +1085,11 @@ class NotesController {
      * Body (JSON):
      *   - heading: Note title
      *   - content: Note content
-     *   - tags: Comma-separated tags
+     *   - tags: Comma-separated tags, or an array of tags
      *   - folder_id: Folder ID
+     *   - folder: Folder path, alternative to folder_id ('folder_name' is
+     *     accepted as an older spelling); an empty string moves the note to
+     *     the workspace root
      *   - workspace: Workspace name
      *   - git_push: If true, push note to Git after saving
      */
@@ -1134,7 +1152,7 @@ class NotesController {
             // Prepare update data (only update provided fields)
             $heading = isset($input['heading']) ? trim($input['heading']) : $note['heading'];
             $entry = $input['content'] ?? $input['entry'] ?? null;
-            $tags = isset($input['tags']) ? trim($input['tags']) : null;
+            $tags = isset($input['tags']) ? $this->sanitizeTags($input['tags']) : null;
             $folder_id = isset($input['folder_id']) ? (int)$input['folder_id'] : (int)$note['folder_id'];
             if ($folder_id === 0) $folder_id = null;
             $workspace = isset($input['workspace']) ? trim($input['workspace']) : $note['workspace'];
@@ -1175,12 +1193,32 @@ class NotesController {
                     $folder = null;
                 }
             }
-            
-            // Validate tags
-            if ($tags !== null && !empty($tags)) {
-                $tags = $this->sanitizeTags($tags);
-            }
 
+            // A folder name moves the note just as folder_id does, the way
+            // create() accepts one: the path is resolved (and its missing
+            // segments created) against the target workspace. Ignored when the
+            // same request already pinned a folder_id, and an empty string
+            // means the workspace root.
+            $folderNameInput = $input['folder'] ?? $input['folder_name'] ?? null;
+            $folderNameApplied = false;
+            if (!isset($input['folder_id']) && is_string($folderNameInput)) {
+                $folderNameInput = trim($folderNameInput);
+                $folderNameApplied = true;
+                if ($folderNameInput === '') {
+                    $folder_id = null;
+                    $folder = null;
+                } else {
+                    $resolvedId = resolveFolderPathToId($workspace, $folderNameInput, true, $this->con);
+                    if (!$resolvedId) {
+                        $this->sendError(404, t('api.errors.folder_not_found', [], 'Folder not found'));
+                        return;
+                    }
+                    $folder_id = (int)$resolvedId;
+                    $segments = explode('/', $folderNameInput);
+                    $folder = end($segments);
+                }
+            }
+            
             // Diary entries follow their date title: renaming one to another
             // date (in any supported diary date format) moves it into the
             // matching Diary/YYYY/MM folder (created on demand) of the diary it
@@ -1190,6 +1228,7 @@ class NotesController {
             $currentFolderId = $note['folder_id'] !== null ? (int)$note['folder_id'] : null;
             $headingDate = $heading !== $note['heading'] ? parseDiaryEntryTitle($heading) : null;
             if ($headingDate !== null
+                && !$folderNameApplied
                 && (!isset($input['folder_id']) || $folder_id === $currentFolderId)
                 && $currentFolderId !== null
                 && ($noteDiaryRoot = findDiaryRootForFolder($this->con, $note['workspace'], $currentFolderId)) !== null) {
