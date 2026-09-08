@@ -18,12 +18,14 @@ $folderId = isset($input['folder_id']) ? (int)$input['folder_id'] : null;
 $sortType = $input['sort_type'] ?? null;
 
 if (!$folderId || !$sortType) {
+    http_response_code(400);
     echo json_encode(['success' => false, 'error' => 'Missing folder_id or sort_type']);
     exit;
 }
 
 $allowedSorts = ['alphabet', 'created', 'modified', 'manual'];
 if (!in_array($sortType, $allowedSorts)) {
+    http_response_code(400);
     echo json_encode(['success' => false, 'error' => 'Invalid sort type']);
     exit;
 }
@@ -33,6 +35,7 @@ try {
     $stmt = $con->prepare("SELECT id FROM folders WHERE id = ?");
     $stmt->execute([$folderId]);
     if (!$stmt->fetch()) {
+        http_response_code(404);
         echo json_encode(['success' => false, 'error' => 'Folder not found']);
         exit;
     }

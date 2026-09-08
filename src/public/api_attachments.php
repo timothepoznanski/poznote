@@ -29,6 +29,7 @@ $attachments_dir = getAttachmentsPath();
 // Create directory if needed
 if (!createDirectoryWithPermissions($attachments_dir)) {
     error_log("Failed to create attachments directory: $attachments_dir");
+    http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Failed to create attachments directory']);
     exit;
 }
@@ -58,6 +59,7 @@ switch ($action) {
         break;
     default:
         if ($action !== 'download') {
+            http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'Invalid action']);
         }
         break;
@@ -166,18 +168,21 @@ function handleUpload() {
     
     if (empty($note_id)) {
         error_log("Upload failed: Note ID is required");
+        http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Note ID is required']);
         return;
     }
     
     if (!isset($_FILES['file'])) {
         error_log("Upload failed: No file uploaded");
+        http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'No file uploaded']);
         return;
     }
 
     $note = resolveAttachmentNote($note_id, $workspace);
     if (!$note) {
+        http_response_code(404);
         echo json_encode(['success' => false, 'message' => 'Note not found']);
         return;
     }
@@ -190,31 +195,38 @@ function handleUpload() {
             break;
         case UPLOAD_ERR_NO_FILE:
             error_log("Upload failed: No file sent");
+            http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'No file sent']);
             return;
         case UPLOAD_ERR_INI_SIZE:
         case UPLOAD_ERR_FORM_SIZE:
             error_log("Upload failed: File too large");
+            http_response_code(413);
             echo json_encode(['success' => false, 'message' => 'File too large']);
             return;
         case UPLOAD_ERR_PARTIAL:
             error_log("Upload failed: File upload was interrupted");
+            http_response_code(500);
             echo json_encode(['success' => false, 'message' => 'File upload was interrupted']);
             return;
         case UPLOAD_ERR_NO_TMP_DIR:
             error_log("Upload failed: No temporary directory");
+            http_response_code(500);
             echo json_encode(['success' => false, 'message' => 'Server configuration error']);
             return;
         case UPLOAD_ERR_CANT_WRITE:
             error_log("Upload failed: Failed to write file to disk");
+            http_response_code(500);
             echo json_encode(['success' => false, 'message' => 'Failed to write file to disk']);
             return;
         case UPLOAD_ERR_EXTENSION:
             error_log("Upload failed: File upload stopped by extension");
+            http_response_code(500);
             echo json_encode(['success' => false, 'message' => 'File upload stopped by extension']);
             return;
         default:
             error_log("Upload failed: Unknown upload error: " . $file['error']);
+            http_response_code(500);
             echo json_encode(['success' => false, 'message' => 'Unknown upload error']);
             return;
     }
@@ -226,6 +238,7 @@ function handleUpload() {
     // Check if source file exists and is readable
     if (!is_uploaded_file($file['tmp_name'])) {
         error_log("Upload failed: Invalid uploaded file: " . $file['tmp_name']);
+        http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Invalid uploaded file']);
         return;
     }
@@ -233,6 +246,7 @@ function handleUpload() {
     // Check file size
     if ($file_size > 200 * 1024 * 1024) { // 200MB limit
         error_log("Upload failed: File too large: $file_size bytes");
+        http_response_code(413);
         echo json_encode(['success' => false, 'message' => 'File too large (max 200MB)']);
         return;
     }
@@ -240,12 +254,14 @@ function handleUpload() {
     $validation = poznoteValidateAttachmentFile($original_name, $file['tmp_name']);
     if (!$validation['success']) {
         error_log("Upload failed: " . $validation['error'] . ": " . $original_name);
+        http_response_code(400);
         echo json_encode(['success' => false, 'message' => $validation['error']]);
         return;
     }
 
     $quotaError = poznoteCheckAttachmentStorageQuota((int)$file_size);
     if ($quotaError !== null) {
+        http_response_code(413);
         echo json_encode(['success' => false, 'message' => $quotaError]);
         return;
     }
@@ -259,6 +275,7 @@ function handleUpload() {
     // Re-check if destination directory is writable (local storage only)
     if (!poznoteAttachmentsAreRemote() && !is_writable($attachments_dir)) {
         error_log("Upload failed: Attachments directory is not writable: $attachments_dir");
+        http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'Attachments directory is not writable']);
         return;
     }
@@ -295,10 +312,12 @@ function handleUpload() {
         } else {
             poznoteDeleteAttachmentFile($unique_filename); // Clean up file if database update fails
             error_log("Attachment database update failed");
+            http_response_code(500);
             echo json_encode(['success' => false, 'message' => 'Database update failed']);
         }
     } else {
         error_log("Attachment file move failed");
+        http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'Failed to save file']);
     }
 }
@@ -308,6 +327,7 @@ function handleList() {
     $workspace = $_GET['workspace'] ?? null;
     
     if (empty($note_id)) {
+        http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Note ID is required']);
         return;
     }
@@ -317,6 +337,7 @@ function handleList() {
         $attachments = decodeAttachmentList($note['attachments'] ?? '');
         echo json_encode(['success' => true, 'attachments' => $attachments]);
     } else {
+        http_response_code(404);
         echo json_encode(['success' => false, 'message' => 'Note not found']);
     }
 }
@@ -329,6 +350,7 @@ function handleDelete() {
     $workspace = $_POST['workspace'] ?? null;
     
     if (empty($note_id) || empty($attachment_id)) {
+        http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Note ID and Attachment ID are required']);
         return;
     }
@@ -362,12 +384,15 @@ function handleDelete() {
             if ($success) {
                 echo json_encode(['success' => true, 'message' => 'Attachment deleted successfully']);
             } else {
+                http_response_code(500);
                 echo json_encode(['success' => false, 'message' => 'Database update failed']);
             }
         } else {
+            http_response_code(404);
             echo json_encode(['success' => false, 'message' => 'Attachment not found']);
         }
     } else {
+        http_response_code(404);
         echo json_encode(['success' => false, 'message' => 'Note not found']);
     }
 }

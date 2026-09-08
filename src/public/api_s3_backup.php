@@ -161,6 +161,7 @@ switch ($action) {
             $client = S3BackupService::makeClient($config);
             echo json_encode($client->testConnection());
         } catch (Exception $e) {
+            http_response_code(500);
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
         break;
@@ -195,6 +196,7 @@ switch ($action) {
             $client = S3BackupService::makeClient();
             $backups = S3BackupService::listBackups($client);
         } catch (Exception $e) {
+            http_response_code(500);
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
             break;
         }
@@ -265,6 +267,7 @@ switch ($action) {
             S3BackupService::makeClient()->deleteObject($key);
             echo json_encode(['success' => true]);
         } catch (Exception $e) {
+            http_response_code(500);
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
         break;
@@ -313,6 +316,7 @@ switch ($action) {
                 'backups' => $backups,
             ]);
         } catch (Exception $e) {
+            http_response_code(500);
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
         break;
@@ -383,6 +387,7 @@ switch ($action) {
             S3BackupService::makeClient()->deleteObject($key);
             echo json_encode(['success' => true]);
         } catch (Exception $e) {
+            http_response_code(500);
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
         break;

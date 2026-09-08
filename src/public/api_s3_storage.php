@@ -86,6 +86,7 @@ switch ($action) {
             $result = $client->testConnection();
             echo json_encode($result);
         } catch (Exception $e) {
+            http_response_code(500);
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
         break;
@@ -129,6 +130,7 @@ switch ($action) {
         try {
             $client = s3ClientFromSavedConfig();
         } catch (Exception $e) {
+            http_response_code(500);
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
             break;
         }
@@ -180,6 +182,7 @@ switch ($action) {
         try {
             $client = s3ClientFromSavedConfig();
         } catch (Exception $e) {
+            http_response_code(500);
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
             break;
         }
@@ -188,6 +191,7 @@ switch ($action) {
         try {
             $objects = $client->listObjects('attachments/');
         } catch (Exception $e) {
+            http_response_code(500);
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
             break;
         }

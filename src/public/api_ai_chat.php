@@ -145,6 +145,7 @@ if ($action === 'test') {
 
     header('Content-Type: application/json');
     if ($body === false) {
+        http_response_code(502);
         echo json_encode(['success' => false, 'error' => $err]);
         exit;
     }
@@ -158,6 +159,7 @@ if ($action === 'test') {
         } elseif (isset($decoded['error']) && is_string($decoded['error'])) {
             $detail .= ': ' . $decoded['error'];
         }
+        http_response_code(502);
         echo json_encode(['success' => false, 'error' => $detail]);
         exit;
     }
