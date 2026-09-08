@@ -237,61 +237,61 @@ body.attachments-page {
 }
 
 /* Dark mode adjustments */
-[data-theme="dark"] body.attachments-page {
+html[data-theme='dark'] body.attachments-page {
     background-color: var(--dm-content-bg);
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .note-header {
+html[data-theme='dark'] .note-header {
     border-bottom-color: var(--dm-border);
 }
 
-[data-theme="dark"] .attachment-item {
+html[data-theme='dark'] .attachment-item {
     background-color: var(--dm-surface);
 }
 
-[data-theme="dark"] .attachment-item:hover {
+html[data-theme='dark'] .attachment-item:hover {
     background-color: var(--dm-surface-hover);
 }
 
-[data-theme="dark"] .attachments-inline-notice {
+html[data-theme='dark'] .attachments-inline-notice {
     border-color: var(--dm-accent-soft);
     background: var(--dm-accent-soft);
     color: var(--dm-accent-hover);
 }
 
-[data-theme="dark"] .filter-input {
+html[data-theme='dark'] .filter-input {
     background-color: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .file-type-filter {
+html[data-theme='dark'] .file-type-filter {
     background-color: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .filter-stats {
+html[data-theme='dark'] .filter-stats {
     background-color: var(--dm-accent-soft);
     color: var(--dm-accent-hover);
 }
 
-[data-theme="dark"] .error-message {
+html[data-theme='dark'] .error-message {
     background-color: var(--dm-content-bg);
     border-color: var(--dm-danger-soft);
     color: var(--dm-danger);
 }
 
-[data-theme="dark"] body.attachments-page::-webkit-scrollbar {
+html[data-theme='dark'] body.attachments-page::-webkit-scrollbar {
     background-color: var(--dm-surface);
 }
 
-[data-theme="dark"] body.attachments-page::-webkit-scrollbar-thumb {
+html[data-theme='dark'] body.attachments-page::-webkit-scrollbar-thumb {
     background-color: var(--dm-border-light);
 }
 
-[data-theme="dark"] body.attachments-page::-webkit-scrollbar-thumb:hover {
+html[data-theme='dark'] body.attachments-page::-webkit-scrollbar-thumb:hover {
     background-color: var(--dm-neutral);
 }
 
@@ -352,7 +352,7 @@ body.attachments-page {
     display: block;
 }
 
-[data-theme="dark"] .attachment-image-preview img {
+html[data-theme='dark'] .attachment-image-preview img {
     background: var(--dm-code-bg);
 }
 

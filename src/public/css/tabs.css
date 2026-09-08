@@ -257,91 +257,91 @@ body.app-tab-reordering {
 
 /* ── Dark mode ── */
 
-[data-theme="dark"] #app-tab-bar {
+html[data-theme='dark'] #app-tab-bar {
     background: var(--dm-tabbar-bg);
     border-color: var(--dm-border);
 }
 
-[data-theme="dark"] .app-tab {
+html[data-theme='dark'] .app-tab {
     background: var(--dm-tab-bg);
     border-color: var(--dm-border);
 }
 
-[data-theme="dark"] .app-tab:hover {
+html[data-theme='dark'] .app-tab:hover {
     background: var(--dm-tab-hover-bg);
 }
 
 /* Active tab: blue top accent + noticeably lighter bg + bright text */
-[data-theme="dark"] .app-tab.active {
+html[data-theme='dark'] .app-tab.active {
     background: var(--dm-tab-active-bg);
     border-color: var(--dm-border-light);
     border-top: 2px solid var(--pz-accent);
 }
 
-[data-theme="dark"] .app-tab-title {
+html[data-theme='dark'] .app-tab-title {
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .app-tab.active .app-tab-title {
+html[data-theme='dark'] .app-tab.active .app-tab-title {
     color: var(--dm-text-bright);
 }
 
-[data-theme="dark"] .app-tab-close {
+html[data-theme='dark'] .app-tab-close {
     color: var(--dm-text-subtle);
 }
 
-[data-theme="dark"] .app-tab:hover .app-tab-title {
+html[data-theme='dark'] .app-tab:hover .app-tab-title {
     color: var(--dm-text-bright);
 }
 
-[data-theme="dark"] .app-tab.active .app-tab-close {
+html[data-theme='dark'] .app-tab.active .app-tab-close {
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .app-tab-close:hover {
+html[data-theme='dark'] .app-tab-close:hover {
     background: rgba(var(--pz-highlight-rgb), 0.1);
     color: var(--dm-text-bright);
 }
 
-[data-theme="dark"] .app-tab-close-all {
+html[data-theme='dark'] .app-tab-close-all {
     background: var(--dm-content-bg, var(--dm-content-bg));
     border-color: var(--dm-border, var(--dm-border));
     color: var(--dm-text-muted);
     box-shadow: 9px 0 0 0 var(--dm-tabbar-bg);
 }
 
-[data-theme="dark"] .app-tab-close-all:hover {
+html[data-theme='dark'] .app-tab-close-all:hover {
     background: var(--dm-surface-hover, var(--dm-surface-hover));
     color: var(--dm-danger);
 }
 
-[data-theme="dark"] .app-tab.app-tab-dragging {
+html[data-theme='dark'] .app-tab.app-tab-dragging {
     box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.5);
 }
 
-[data-theme="dark"] .app-tab-context-menu {
+html[data-theme='dark'] .app-tab-context-menu {
     background: var(--dm-content-bg);
     border-color: var(--dm-surface-hover);
     box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.4);
 }
 
-[data-theme="dark"] .app-tab-context-item {
+html[data-theme='dark'] .app-tab-context-item {
     color: var(--dm-text-bright);
 }
 
-[data-theme="dark"] .app-tab-context-item:hover {
+html[data-theme='dark'] .app-tab-context-item:hover {
     background-color: var(--dm-tab-active-bg);
 }
 
-[data-theme="dark"] .app-tab-context-item-danger {
+html[data-theme='dark'] .app-tab-context-item-danger {
     color: var(--dm-danger);
 }
 
-[data-theme="dark"] .app-tab-context-item-danger:hover {
+html[data-theme='dark'] .app-tab-context-item-danger:hover {
     background-color: var(--dm-content-bg);
 }
 
-[data-theme="dark"] .app-tab-context-separator {
+html[data-theme='dark'] .app-tab-context-separator {
     background: var(--dm-surface-hover);
 }
 

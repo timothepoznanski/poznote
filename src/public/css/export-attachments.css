@@ -42,14 +42,14 @@
 }
 
 /* Dark mode support */
-[data-theme="dark"] .empty-state-title {
+html[data-theme='dark'] .empty-state-title {
     color: var(--pz-text-inverse);
 }
 
-[data-theme="dark"] .empty-state-description {
+html[data-theme='dark'] .empty-state-description {
     color: var(--dm-text-muted);
 }
 
-[data-theme="dark"] .summary-header .subtitle-text {
+html[data-theme='dark'] .summary-header .subtitle-text {
     color: var(--dm-text-muted);
 }

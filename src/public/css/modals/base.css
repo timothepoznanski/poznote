@@ -554,44 +554,44 @@ html[data-theme='dark'] .modal .modal-info-note {
     background: var(--pz-surface);
 }
 
-:root[data-theme='dark'] #noteColorPaletteModal .modal-buttons button.note-palette-back {
+html[data-theme='dark'] #noteColorPaletteModal .modal-buttons button.note-palette-back {
     border-color: var(--dm-border);
     background: transparent;
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] #noteColorPaletteModal .modal-buttons button.note-palette-back:hover {
+html[data-theme='dark'] #noteColorPaletteModal .modal-buttons button.note-palette-back:hover {
     border-color: var(--dm-text-muted);
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] #noteColorPaletteModal .modal-buttons {
+html[data-theme='dark'] #noteColorPaletteModal .modal-buttons {
     border-top-color: var(--dm-border);
 }
 
-:root[data-theme='dark'] .modal-content .note-palette-add,
-:root[data-theme='dark'] .modal-content button.note-palette-add {
+html[data-theme='dark'] .modal-content .note-palette-add,
+html[data-theme='dark'] .modal-content button.note-palette-add {
     border-color: var(--dm-border);
     background: transparent;
     color: var(--dm-text-muted) !important;
 }
 
-:root[data-theme='dark'] .modal-content .note-palette-add:hover,
-:root[data-theme='dark'] .modal-content button.note-palette-add:hover {
+html[data-theme='dark'] .modal-content .note-palette-add:hover,
+html[data-theme='dark'] .modal-content button.note-palette-add:hover {
     border-color: var(--pz-accent);
     color: var(--pz-accent) !important;
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] .note-palette-row input.note-palette-name,
-:root[data-theme='dark'] .note-palette-row input.note-palette-color,
-:root[data-theme='dark'] .note-palette-remove {
+html[data-theme='dark'] .note-palette-row input.note-palette-name,
+html[data-theme='dark'] .note-palette-row input.note-palette-color,
+html[data-theme='dark'] .note-palette-remove {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .note-palette-remove:hover {
+html[data-theme='dark'] .note-palette-remove:hover {
     background: var(--dm-surface-hover);
     color: var(--dm-danger);
 }

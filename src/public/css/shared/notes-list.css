@@ -316,7 +316,7 @@
     background-color: transparent;
 }
 
-[data-theme="dark"] .shared-via-parent {
+html[data-theme='dark'] .shared-via-parent {
     border-left-color: transparent;
     background-color: transparent;
 }
@@ -339,7 +339,7 @@
     font-weight: 600;
 }
 
-[data-theme="dark"] .folder-name-path {
+html[data-theme='dark'] .folder-name-path {
     color: var(--dm-accent);
 }
 

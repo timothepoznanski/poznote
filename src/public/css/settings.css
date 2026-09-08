@@ -376,7 +376,7 @@ html[data-theme='dark'] .settings-view-toggle:hover {
 /* A pinned card keeps the plain card border: the blue pin icon is the only
    pinned indicator, on the source card and on its clone alike. */
 
-:root[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
+html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
     background-color: var(--dm-accent);
 }
 

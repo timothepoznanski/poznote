@@ -187,45 +187,45 @@
 }
 
 /* Dark mode */
-:root[data-theme='dark'] .diary-month-title {
+html[data-theme='dark'] .diary-month-title {
     color: var(--dm-text-bright);
     border-bottom-color: var(--dm-border);
 }
 
-:root[data-theme='dark'] .diary-card-today {
+html[data-theme='dark'] .diary-card-today {
     border-color: var(--dm-accent);
 }
 
-:root[data-theme='dark'] .diary-today-tag {
+html[data-theme='dark'] .diary-today-tag {
     background: var(--dm-accent);
     color: var(--dm-text-bright);
 }
 
-:root[data-theme='dark'] .diary-switch-btn {
+html[data-theme='dark'] .diary-switch-btn {
     border-color: var(--dm-border);
     color: var(--dm-text-bright);
 }
 
-:root[data-theme='dark'] .diary-switch-btn:hover {
+html[data-theme='dark'] .diary-switch-btn:hover {
     border-color: var(--dm-accent);
     color: var(--dm-accent);
 }
 
-:root[data-theme='dark'] .diary-switch-btn.diary-switch-active {
+html[data-theme='dark'] .diary-switch-btn.diary-switch-active {
     background: var(--dm-accent);
     border-color: var(--dm-accent);
     color: var(--dm-text-bright);
 }
 
-:root[data-theme='dark'] .diary-new-modal {
+html[data-theme='dark'] .diary-new-modal {
     background: var(--dm-content-bg);
 }
 
-:root[data-theme='dark'] .diary-new-modal .modal-title {
+html[data-theme='dark'] .diary-new-modal .modal-title {
     color: var(--dm-text-bright);
 }
 
-:root[data-theme='dark'] .diary-new-modal .diary-new-input {
+html[data-theme='dark'] .diary-new-modal .diary-new-input {
     border-color: var(--dm-border);
     color: var(--dm-text-bright);
 }

@@ -86,7 +86,7 @@ body.tasks-page {
     accent-color: var(--pz-accent);
 }
 
-[data-theme="dark"] .tasks-progress-option {
+html[data-theme='dark'] .tasks-progress-option {
     color: var(--dm-text-muted);
 }
 
@@ -304,7 +304,7 @@ body.tasks-page {
     flex-shrink: 0;
 }
 
-[data-theme="dark"] .tasks-note-source-badge {
+html[data-theme='dark'] .tasks-note-source-badge {
     color: var(--dm-accent-hover);
     background-color: rgba(92, 184, 234, 0.15);
 }
@@ -853,212 +853,212 @@ body.tasks-page {
 }
 
 /* Dark mode */
-html[data-theme="dark"]:has(body.tasks-page) {
+html[data-theme='dark']:has(body.tasks-page) {
     background-color: var(--dm-content-bg);
 }
 
-[data-theme="dark"] body.tasks-page {
+html[data-theme='dark'] body.tasks-page {
     background-color: var(--dm-content-bg);
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .note-name {
+html[data-theme='dark'] .note-name {
     color: var(--dm-accent);
 }
 
 /* One shade above the card background so the badge stays visible */
-[data-theme="dark"] .folder-badge {
+html[data-theme='dark'] .folder-badge {
     background-color: var(--dm-surface-hover);
     color: var(--dm-text-muted);
 }
 
-[data-theme="dark"] .filter-input {
+html[data-theme='dark'] .filter-input {
     background-color: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .tasks-filter-chip {
+html[data-theme='dark'] .tasks-filter-chip {
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .tasks-filter-chip.active {
+html[data-theme='dark'] .tasks-filter-chip.active {
     background-color: var(--pz-accent);
     border-color: var(--pz-accent);
     color: var(--pz-text-inverse);
 }
 
-[data-theme="dark"] .tasks-collapse-btn {
+html[data-theme='dark'] .tasks-collapse-btn {
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .tasks-collapse-btn:hover {
+html[data-theme='dark'] .tasks-collapse-btn:hover {
     border-color: var(--pz-accent);
     color: var(--pz-accent);
 }
 
-[data-theme="dark"] .tasks-progress-bar {
+html[data-theme='dark'] .tasks-progress-bar {
     background-color: var(--dm-surface);
 }
 
-[data-theme="dark"] .tasks-note-group {
+html[data-theme='dark'] .tasks-note-group {
     border-color: var(--dm-border);
     background-color: var(--dm-surface);
 }
 
-[data-theme="dark"] .tasks-note-header {
+html[data-theme='dark'] .tasks-note-header {
     border-bottom-color: var(--dm-border);
 }
 
-[data-theme="dark"] .tasks-note-toggle {
+html[data-theme='dark'] .tasks-note-toggle {
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .tasks-note-toggle:hover {
+html[data-theme='dark'] .tasks-note-toggle:hover {
     color: var(--dm-accent);
 }
 
-[data-theme="dark"] .tasks-task-item {
+html[data-theme='dark'] .tasks-task-item {
     border-bottom-color: rgba(var(--pz-highlight-rgb), 0.06);
 }
 
-[data-theme="dark"] .tasks-task-item.completed .tasks-task-text {
+html[data-theme='dark'] .tasks-task-item.completed .tasks-task-text {
     color: var(--dm-text-muted);
 }
 
-[data-theme="dark"] .tasks-task-text a {
+html[data-theme='dark'] .tasks-task-text a {
     color: var(--dm-accent);
 }
 
-[data-theme="dark"] .task-due-chip {
+html[data-theme='dark'] .task-due-chip {
     background-color: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text-muted);
 }
 
-[data-theme="dark"] .task-due-chip:hover {
+html[data-theme='dark'] .task-due-chip:hover {
     border-color: var(--dm-accent);
     color: var(--dm-accent);
 }
 
-[data-theme="dark"] .tasks-task-due-btn {
+html[data-theme='dark'] .tasks-task-due-btn {
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .tasks-task-due-btn:hover {
+html[data-theme='dark'] .tasks-task-due-btn:hover {
     color: var(--dm-accent);
 }
 
-[data-theme="dark"] .task-due-chip.overdue {
+html[data-theme='dark'] .task-due-chip.overdue {
     background-color: var(--dm-content-bg);
     border-color: var(--dm-danger-soft);
     color: var(--dm-danger);
 }
 
-[data-theme="dark"] .tasks-view-toggle {
+html[data-theme='dark'] .tasks-view-toggle {
     border-color: var(--dm-border);
 }
 
-[data-theme="dark"] .tasks-view-btn {
+html[data-theme='dark'] .tasks-view-btn {
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .tasks-view-btn.active {
+html[data-theme='dark'] .tasks-view-btn.active {
     background-color: var(--pz-accent);
     color: var(--pz-text-inverse);
 }
 
-[data-theme="dark"] .tasks-cal-nav,
-[data-theme="dark"] .tasks-cal-today-btn {
+html[data-theme='dark'] .tasks-cal-nav,
+html[data-theme='dark'] .tasks-cal-today-btn {
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .tasks-cal-nav:hover,
-[data-theme="dark"] .tasks-cal-today-btn:hover {
+html[data-theme='dark'] .tasks-cal-nav:hover,
+html[data-theme='dark'] .tasks-cal-today-btn:hover {
     border-color: var(--dm-accent);
     color: var(--dm-accent);
 }
 
 /* Translucent white separators stay visible over both dark palettes */
-[data-theme="dark"] .tasks-cal-grid {
+html[data-theme='dark'] .tasks-cal-grid {
     border-color: rgba(var(--pz-highlight-rgb), 0.18);
     background: rgba(var(--pz-highlight-rgb), 0.18);
 }
 
-[data-theme="dark"] .tasks-cal-weekday,
-[data-theme="dark"] .tasks-cal-day {
+html[data-theme='dark'] .tasks-cal-weekday,
+html[data-theme='dark'] .tasks-cal-day {
     background: var(--dm-content-bg);
 }
 
-[data-theme="dark"] .tasks-cal-weekday {
+html[data-theme='dark'] .tasks-cal-weekday {
     color: var(--dm-text-muted);
 }
 
-[data-theme="dark"] .tasks-cal-day:hover {
+html[data-theme='dark'] .tasks-cal-day:hover {
     background-color: rgba(14, 165, 233, 0.08);
 }
 
-[data-theme="dark"] .tasks-cal-day-num {
+html[data-theme='dark'] .tasks-cal-day-num {
     color: var(--dm-text-muted);
 }
 
-[data-theme="dark"] .tasks-cal-day.today .tasks-cal-day-num {
+html[data-theme='dark'] .tasks-cal-day.today .tasks-cal-day-num {
     background-color: var(--pz-accent);
     color: var(--pz-text-inverse);
 }
 
-[data-theme="dark"] .tasks-cal-day.other-month .tasks-cal-day-num {
+html[data-theme='dark'] .tasks-cal-day.other-month .tasks-cal-day-num {
     color: var(--dm-text-subtle);
 }
 
-[data-theme="dark"] .tasks-cal-chip {
+html[data-theme='dark'] .tasks-cal-chip {
     background: rgba(14, 165, 233, 0.15);
     border-left-color: var(--dm-accent);
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .tasks-cal-chip-time {
+html[data-theme='dark'] .tasks-cal-chip-time {
     color: var(--dm-accent);
 }
 
-[data-theme="dark"] .tasks-cal-chip.important {
+html[data-theme='dark'] .tasks-cal-chip.important {
     border-left-color: var(--dm-danger-soft);
     background: rgba(198, 40, 40, 0.18);
 }
 
-[data-theme="dark"] .tasks-cal-chip.important .tasks-cal-chip-text {
+html[data-theme='dark'] .tasks-cal-chip.important .tasks-cal-chip-text {
     color: var(--dm-danger);
 }
 
-[data-theme="dark"] .tasks-cal-chip.overdue {
+html[data-theme='dark'] .tasks-cal-chip.overdue {
     border-left-color: var(--dm-danger-soft);
     background: var(--dm-content-bg);
 }
 
-[data-theme="dark"] .tasks-cal-modal-empty {
+html[data-theme='dark'] .tasks-cal-modal-empty {
     color: var(--dm-text-muted);
 }
 
-[data-theme="dark"] .tasks-task-note-badge {
+html[data-theme='dark'] .tasks-task-note-badge {
     background-color: var(--dm-surface);
     color: var(--dm-text-muted);
 }
 
 /* Mobile bars again, with enough specificity to beat the dark chip rules */
 @media (max-width: 768px) {
-    [data-theme="dark"] .tasks-cal-chip {
+    html[data-theme='dark'] .tasks-cal-chip {
         background: var(--dm-accent);
     }
 
-    [data-theme="dark"] .tasks-cal-chip.important,
-    [data-theme="dark"] .tasks-cal-chip.overdue {
+    html[data-theme='dark'] .tasks-cal-chip.important,
+    html[data-theme='dark'] .tasks-cal-chip.overdue {
         background: var(--dm-danger-hover);
     }
 
-    [data-theme="dark"] .tasks-cal-chip.completed {
+    html[data-theme='dark'] .tasks-cal-chip.completed {
         background: #4b5563;
     }
 }

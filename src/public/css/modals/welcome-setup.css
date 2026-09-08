@@ -136,25 +136,25 @@
 
 /* ---- Dark / black mode (data-theme='dark' covers both) ---- */
 
-:root[data-theme='dark'] .welcome-setup-subtitle {
+html[data-theme='dark'] .welcome-setup-subtitle {
     color: var(--dm-text-muted);
 }
 
-:root[data-theme='dark'] .welcome-setup-field label {
+html[data-theme='dark'] .welcome-setup-field label {
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .welcome-setup-tip {
+html[data-theme='dark'] .welcome-setup-tip {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .welcome-setup-tip:hover {
+html[data-theme='dark'] .welcome-setup-tip:hover {
     background: var(--dm-surface-hover);
     border-color: var(--pz-accent);
 }
 
-:root[data-theme='dark'] .welcome-setup-tip .welcome-setup-tip-arrow {
+html[data-theme='dark'] .welcome-setup-tip .welcome-setup-tip-arrow {
     color: var(--dm-text-muted);
 }

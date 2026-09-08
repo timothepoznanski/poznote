@@ -178,14 +178,14 @@ body.notes-manager-page {
     color: var(--pz-text);
 }
 
-:root[data-theme='dark'] .nm-bulk-select {
+html[data-theme='dark'] .nm-bulk-select {
     color-scheme: dark;
     background: var(--action-bg, var(--dm-accent-soft));
     color: var(--action-color, var(--dm-text-bright));
     border-color: var(--action-border, var(--dm-accent-soft));
 }
 
-:root[data-theme='dark'] .nm-bulk-select option {
+html[data-theme='dark'] .nm-bulk-select option {
     background-color: var(--action-bg, var(--dm-accent-soft));
     color: var(--action-color, var(--dm-text-bright));
 }
@@ -208,7 +208,7 @@ body.notes-manager-page {
 }
 
 /* ── Dark Mode Overrides ────────────────────────────────────────────── */
-:root[data-theme='dark'] {
+html[data-theme='dark'] {
     --bg-color: var(--dm-bg, var(--dm-content-bg));
     --text-color: var(--dm-text, #e3e3e3);
     --border-color: var(--dm-border, var(--dm-border));
@@ -540,68 +540,68 @@ html[data-theme='dark'] .nm-folder-option-selected {
 }
 
 /* ── Dark mode overrides ─────────────────────────────────────────────── */
-:root[data-theme='dark'] .nm-folder-header {
+html[data-theme='dark'] .nm-folder-header {
     background: var(--folder-header-bg, var(--dm-content-bg));
 }
 
-:root[data-theme='dark'] .nm-folder-header:hover {
+html[data-theme='dark'] .nm-folder-header:hover {
     background: var(--folder-header-hover, var(--dm-surface));
 }
 
-:root[data-theme='dark'] .nm-folder-section {
+html[data-theme='dark'] .nm-folder-section {
     border-color: var(--border-color, var(--dm-border));
 }
 
-:root[data-theme='dark'] .nm-notes-list {
+html[data-theme='dark'] .nm-notes-list {
     border-top-color: var(--border-color, var(--dm-border));
 }
 
-:root[data-theme='dark'] .nm-note-row {
+html[data-theme='dark'] .nm-note-row {
     border-bottom-color: var(--border-color-light, var(--dm-border));
 }
 
-:root[data-theme='dark'] .nm-note-row:hover {
+html[data-theme='dark'] .nm-note-row:hover {
     background: var(--row-hover-bg, var(--dm-content-bg));
 }
 
-:root[data-theme='dark'] .nm-note-row:has(.nm-note-checkbox:checked) {
+html[data-theme='dark'] .nm-note-row:has(.nm-note-checkbox:checked) {
     background: var(--row-selected-bg, rgba(148, 163, 184, 0.12));
 }
 
-:root[data-theme='dark'] .nm-bulk-bar {
+html[data-theme='dark'] .nm-bulk-bar {
     background: var(--bulk-bar-bg, var(--dm-content-bg));
     border-color: var(--bulk-bar-border, var(--dm-border));
 }
 
-:root[data-theme='dark'] #nmBulkBar .nm-bulk-btn {
+html[data-theme='dark'] #nmBulkBar .nm-bulk-btn {
     background: transparent;
     color: var(--dm-text-muted);
     border-color: var(--dm-border-light);
 }
 
-:root[data-theme='dark'] #nmBulkBar .nm-bulk-btn:hover {
+html[data-theme='dark'] #nmBulkBar .nm-bulk-btn:hover {
     background: rgba(var(--pz-highlight-rgb), 0.05);
     color: var(--dm-text-bright);
     border-color: #64748b;
 }
 
-:root[data-theme='dark'] .nm-bulk-select {
+html[data-theme='dark'] .nm-bulk-select {
     background: var(--action-bg, var(--dm-content-bg));
     color: var(--action-color, var(--dm-text-bright));
     border-color: var(--action-border, var(--dm-border-light));
 }
 
-:root[data-theme='dark'] .nm-bulk-select option {
+html[data-theme='dark'] .nm-bulk-select option {
     background-color: var(--action-bg, var(--dm-content-bg));
     color: var(--action-color, var(--dm-text-bright));
 }
 
-:root[data-theme='dark'] .nm-folder-option-selected {
+html[data-theme='dark'] .nm-folder-option-selected {
     background: var(--selected-bg, rgba(148, 163, 184, 0.16));
     color: var(--selected-color, var(--dm-text-bright));
 }
 
-:root[data-theme='dark'] .nm-modal {
+html[data-theme='dark'] .nm-modal {
     background: var(--dm-content-bg);
 }
 

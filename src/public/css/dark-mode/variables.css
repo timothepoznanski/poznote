@@ -85,7 +85,7 @@
    Dark Mode - CSS Custom Properties & Base
    ============================================ */
 
-:root[data-theme='dark'] {
+html[data-theme='dark'] {
     /* Text scale. Contrast on --dm-content-bg is 11.6 / 8.2 / 5.9 / 4.3, the same
        shape the black theme below already had. --dm-text-muted used to be
        #c5c5c5, which is BRIGHTER than --dm-text: the muted level was louder than

@@ -138,7 +138,7 @@
     text-align: left;
 }
 
-[data-theme="dark"] .password-page-body {
+html[data-theme='dark'] .password-page-body {
     --password-bg: var(--dm-bg, var(--dm-content-bg));
     --password-card-bg: var(--dm-surface, var(--dm-surface));
     --password-border: var(--dm-border, var(--dm-border));
@@ -149,21 +149,21 @@
     --password-shadow: none;
 }
 
-[data-theme="dark"] .password-container input[type="password"] {
+html[data-theme='dark'] .password-container input[type="password"] {
     background: var(--dm-bg, var(--dm-content-bg));
     border-color: var(--dm-border, var(--dm-border));
     color: var(--dm-text, var(--dm-text));
 }
 
-[data-theme="dark"] .password-container input[type="password"]::placeholder {
+html[data-theme='dark'] .password-container input[type="password"]::placeholder {
     color: var(--dm-text-muted);
 }
 
-[data-theme="dark"] .password-container .info {
+html[data-theme='dark'] .password-container .info {
     background: var(--dm-bg, var(--dm-content-bg));
 }
 
-[data-theme="dark"] .password-container .error {
+html[data-theme='dark'] .password-container .error {
     background: rgba(220, 53, 69, 0.12);
     color: var(--dm-danger);
 }
@@ -289,7 +289,7 @@
     }
 }
 
-[data-theme="dark"] .status-page-body {
+html[data-theme='dark'] .status-page-body {
     --status-bg: var(--dm-bg, var(--dm-content-bg));
     --status-card-bg: var(--dm-surface, var(--dm-surface));
     --status-card-border: var(--dm-border, var(--dm-border));
@@ -299,8 +299,8 @@
     --status-shadow: none;
 }
 
-[data-theme="dark"] .status-card-hint,
-[data-theme="dark"] .status-card-action.secondary {
+html[data-theme='dark'] .status-card-hint,
+html[data-theme='dark'] .status-card-action.secondary {
     background: var(--dm-bg, var(--dm-content-bg));
 }
 
@@ -319,8 +319,8 @@ body.view-kanban .public-folder-body {
     max-width: 1400px;
 }
 
-[data-theme="dark"] .public-folder-body,
-[data-theme="dark"].public-folder-html {
+html[data-theme='dark'] .public-folder-body,
+html[data-theme='dark'].public-folder-html {
     --bg-color: var(--dm-bg, var(--dm-content-bg));
     --text-color: var(--dm-text, var(--dm-text));
     --link-color: #6db3f2;
@@ -331,8 +331,8 @@ body.view-kanban .public-folder-body {
     --hover-bg: rgba(var(--pz-highlight-rgb), 0.06);
 }
 
-[data-theme="light"] .public-folder-body,
-[data-theme="light"].public-folder-html {
+html[data-theme='light'] .public-folder-body,
+html[data-theme='light'].public-folder-html {
     --bg-color: #ffffff;
     --text-color: #333;
     --link-color: rgb(49, 130, 206);
@@ -609,8 +609,8 @@ body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.i
     background: var(--toggle-bg-hover, var(--pz-border));
 }
 
-[data-theme="dark"] .theme-toggle, 
-[data-theme="dark"] .view-toggle {
+html[data-theme='dark'] .theme-toggle, 
+html[data-theme='dark'] .view-toggle {
     --toggle-bg: #333;
     --toggle-bg-hover: #444;
 }
@@ -634,7 +634,7 @@ body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.i
     max-height: 80vh;
 }
 
-[data-theme="dark"] .kanban-col {
+html[data-theme='dark'] .kanban-col {
     --kanban-col-bg: #2d2d2d;
 }
 
@@ -662,7 +662,7 @@ body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.i
     border-radius: 10px;
 }
 
-[data-theme="dark"] .kanban-col-count {
+html[data-theme='dark'] .kanban-col-count {
     --badge-bg: #444;
 }
 
@@ -684,7 +684,7 @@ body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.i
     transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
-[data-theme="dark"] .kanban-public-card {
+html[data-theme='dark'] .kanban-public-card {
     --card-bg: #383838;
 }
 
@@ -796,7 +796,7 @@ body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.i
 }
 
 /* Dark mode support */
-[data-theme="dark"] {
+html[data-theme='dark'] {
     --note-bg: var(--dm-surface, var(--dm-surface));
     --text-color: var(--dm-text, var(--dm-text));
     --text-muted: var(--dm-text-muted, var(--dm-text-muted));
@@ -807,7 +807,7 @@ body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.i
     --tag-bg: var(--dm-surface, var(--dm-surface));
 }
 
-[data-theme="light"] {
+html[data-theme='light'] {
     --note-bg: #ffffff;
     --text-color: #333;
     --text-muted: #666;

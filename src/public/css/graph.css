@@ -1,6 +1,6 @@
 /**
  * Graph view — full-page force-directed visualization of note links.
- * Light styles by default, dark overrides via html[data-theme="dark"]
+ * Light styles by default, dark overrides via html[data-theme='dark']
  * (kept here rather than in the css/dark-mode bundle).
  */
 
@@ -285,87 +285,87 @@ body.graph-page {
 
 /* Dark mode ------------------------------------------------------------- */
 
-html[data-theme="dark"] body.graph-page {
+html[data-theme='dark'] body.graph-page {
     background: var(--dm-bg, var(--dm-content-bg));
 }
 
-html[data-theme="dark"] .graph-toolbar {
+html[data-theme='dark'] .graph-toolbar {
     background: transparent;
 }
 
-html[data-theme="dark"] .graph-search-input {
+html[data-theme='dark'] .graph-search-input {
     background: var(--dm-content-bg, var(--dm-content-bg));
     border-color: var(--dm-border, var(--dm-border));
     color: var(--dm-text, var(--dm-text));
 }
 
-html[data-theme="dark"] .graph-search-input:focus {
+html[data-theme='dark'] .graph-search-input:focus {
     border-color: var(--dm-accent, var(--dm-accent));
 }
 
-html[data-theme="dark"] .graph-folder-select {
+html[data-theme='dark'] .graph-folder-select {
     background: var(--dm-content-bg, var(--dm-content-bg));
     border-color: var(--dm-border, var(--dm-border));
     color: var(--dm-text-muted, var(--dm-text-muted));
 }
 
-html[data-theme="dark"] .graph-folder-select:focus {
+html[data-theme='dark'] .graph-folder-select:focus {
     border-color: var(--dm-accent, var(--dm-accent));
 }
 
-html[data-theme="dark"] .graph-hint {
+html[data-theme='dark'] .graph-hint {
     color: var(--dm-text-muted, var(--dm-text-subtle));
     opacity: 0.9;
 }
 
-html[data-theme="dark"] .graph-orphans-toggle,
-html[data-theme="dark"] .graph-stats,
-html[data-theme="dark"] .graph-loading,
-html[data-theme="dark"] .graph-empty {
+html[data-theme='dark'] .graph-orphans-toggle,
+html[data-theme='dark'] .graph-stats,
+html[data-theme='dark'] .graph-loading,
+html[data-theme='dark'] .graph-empty {
     color: var(--dm-text-muted, var(--dm-text-muted));
 }
 
-html[data-theme="dark"] .graph-reset-btn {
+html[data-theme='dark'] .graph-reset-btn {
     background: var(--dm-content-bg, var(--dm-content-bg));
     border-color: var(--dm-border, var(--dm-border));
     color: var(--dm-text-muted, var(--dm-text-muted));
 }
 
-html[data-theme="dark"] .graph-reset-btn:hover {
+html[data-theme='dark'] .graph-reset-btn:hover {
     background: var(--dm-surface, var(--dm-surface));
 }
 
-html[data-theme="dark"] .graph-edge {
+html[data-theme='dark'] .graph-edge {
     stroke: var(--dm-surface-raised);
 }
 
-html[data-theme="dark"] .graph-edge.hl {
+html[data-theme='dark'] .graph-edge.hl {
     stroke: #7d8590;
 }
 
-html[data-theme="dark"] .graph-node circle {
+html[data-theme='dark'] .graph-node circle {
     stroke: var(--dm-bg, var(--dm-content-bg));
 }
 
-html[data-theme="dark"] .graph-label {
+html[data-theme='dark'] .graph-label {
     fill: var(--dm-text-muted, var(--dm-text-muted));
 }
 
-html[data-theme="dark"] .graph-node.search-hit circle {
+html[data-theme='dark'] .graph-node.search-hit circle {
     stroke: var(--dm-accent, var(--dm-accent));
 }
 
-html[data-theme="dark"] .graph-tooltip {
+html[data-theme='dark'] .graph-tooltip {
     background: var(--dm-surface, var(--dm-surface));
     border-color: var(--dm-border, var(--dm-border));
     box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.4);
 }
 
-html[data-theme="dark"] .graph-tooltip-title {
+html[data-theme='dark'] .graph-tooltip-title {
     color: var(--dm-text, var(--dm-text));
 }
 
-html[data-theme="dark"] .graph-tooltip-meta {
+html[data-theme='dark'] .graph-tooltip-meta {
     color: var(--dm-text-muted, var(--dm-text-muted));
 }
 

@@ -263,12 +263,12 @@
         text-align: right;
     }
 
-    [data-theme="dark"] .shared-note-item {
+    html[data-theme='dark'] .shared-note-item {
         background: var(--dm-content-bg);
         box-shadow: 0 8px 20px rgba(var(--pz-shadow-rgb), 0.22);
     }
 
-    [data-theme="dark"] .note-token-wrap {
+    html[data-theme='dark'] .note-token-wrap {
         background: transparent;
         border-color: transparent;
     }
@@ -291,28 +291,28 @@
     }
 
     /* Dark mode on mobile */
-    [data-theme="dark"] .shared-header {
+    html[data-theme='dark'] .shared-header {
         color: var(--pz-text-inverse);
     }
 
-    [data-theme="dark"] body.shared-page {
+    html[data-theme='dark'] body.shared-page {
         background: var(--dm-bg);
     }
 
-    [data-theme="dark"] .indexable-label-text {
+    html[data-theme='dark'] .indexable-label-text {
         color: var(--dm-text-bright);
     }
 
-    [data-theme="dark"] .shared-note-item {
+    html[data-theme='dark'] .shared-note-item {
         border-color: var(--dm-border-light);
         background-color: rgba(var(--pz-highlight-rgb), 0.05);
     }
 
-    [data-theme="dark"] .note-name {
+    html[data-theme='dark'] .note-name {
         color: var(--dm-accent);
     }
 
-    [data-theme="dark"] .note-token {
+    html[data-theme='dark'] .note-token {
         color: var(--dm-text);
     }
 }

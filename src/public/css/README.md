@@ -99,7 +99,13 @@ them and a background there breaks their native rendering.
 
 - brace and comment balance, because the stylesheets are concatenated at request
   time and one unclosed brace silently kills every rule after it in the bundle;
-- no `body.dark-mode` / `body.black-mode` selector, so the theme keeps one carrier;
+- one carrier, and one spelling of it. `html[data-theme='dark']`, with single
+  quotes, plus `html.theme-black[data-theme='dark']`. No `body.dark-mode`, and
+  not the two other spellings that were in use: `:root[data-theme='dark']` is
+  (0,2,0) because `:root` is a pseudo-class, a bare `[data-theme='dark']` is
+  (0,1,0), and the canonical form is (0,1,1). They are not interchangeable, and
+  thirteen targets used to be styled through more than one of them, so which
+  rule won was settled by a spelling nobody had chosen;
 - a colour ratchet. `tools/css-check.baseline.json` holds the number of colour
   literals left outside the palette file, and the check fails when a change adds
   any. Counted: hex, the `white` / `black` keywords, and any functional colour

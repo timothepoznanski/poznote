@@ -120,94 +120,94 @@ code.hljs {
 }
 
 /* Dark theme - Applied when data-theme="dark" is set on html element */
-html[data-theme="dark"] .hljs {
+html[data-theme='dark'] .hljs {
     color: var(--dm-text-muted);
     background: var(--dm-content-bg);
 }
 
-html[data-theme="dark"] .hljs-doctag,
-html[data-theme="dark"] .hljs-keyword,
-html[data-theme="dark"] .hljs-meta .hljs-keyword,
-html[data-theme="dark"] .hljs-template-tag,
-html[data-theme="dark"] .hljs-template-variable,
-html[data-theme="dark"] .hljs-type,
-html[data-theme="dark"] .hljs-variable.language_ {
+html[data-theme='dark'] .hljs-doctag,
+html[data-theme='dark'] .hljs-keyword,
+html[data-theme='dark'] .hljs-meta .hljs-keyword,
+html[data-theme='dark'] .hljs-template-tag,
+html[data-theme='dark'] .hljs-template-variable,
+html[data-theme='dark'] .hljs-type,
+html[data-theme='dark'] .hljs-variable.language_ {
     color: var(--dm-danger);
 }
 
-html[data-theme="dark"] .hljs-title,
-html[data-theme="dark"] .hljs-title.class_,
-html[data-theme="dark"] .hljs-title.class_.inherited__,
-html[data-theme="dark"] .hljs-title.function_ {
+html[data-theme='dark'] .hljs-title,
+html[data-theme='dark'] .hljs-title.class_,
+html[data-theme='dark'] .hljs-title.class_.inherited__,
+html[data-theme='dark'] .hljs-title.function_ {
     color: #d2a8ff;
 }
 
-html[data-theme="dark"] .hljs-attr,
-html[data-theme="dark"] .hljs-attribute,
-html[data-theme="dark"] .hljs-literal,
-html[data-theme="dark"] .hljs-meta,
-html[data-theme="dark"] .hljs-number,
-html[data-theme="dark"] .hljs-operator,
-html[data-theme="dark"] .hljs-selector-attr,
-html[data-theme="dark"] .hljs-selector-class,
-html[data-theme="dark"] .hljs-selector-id,
-html[data-theme="dark"] .hljs-variable {
+html[data-theme='dark'] .hljs-attr,
+html[data-theme='dark'] .hljs-attribute,
+html[data-theme='dark'] .hljs-literal,
+html[data-theme='dark'] .hljs-meta,
+html[data-theme='dark'] .hljs-number,
+html[data-theme='dark'] .hljs-operator,
+html[data-theme='dark'] .hljs-selector-attr,
+html[data-theme='dark'] .hljs-selector-class,
+html[data-theme='dark'] .hljs-selector-id,
+html[data-theme='dark'] .hljs-variable {
     color: var(--dm-accent-hover);
 }
 
-html[data-theme="dark"] .hljs-meta .hljs-string,
-html[data-theme="dark"] .hljs-regexp,
-html[data-theme="dark"] .hljs-string {
+html[data-theme='dark'] .hljs-meta .hljs-string,
+html[data-theme='dark'] .hljs-regexp,
+html[data-theme='dark'] .hljs-string {
     color: var(--dm-accent-hover);
 }
 
-html[data-theme="dark"] .hljs-built_in,
-html[data-theme="dark"] .hljs-symbol {
+html[data-theme='dark'] .hljs-built_in,
+html[data-theme='dark'] .hljs-symbol {
     color: var(--dm-warning-hover);
 }
 
-html[data-theme="dark"] .hljs-code,
-html[data-theme="dark"] .hljs-comment,
-html[data-theme="dark"] .hljs-formula {
+html[data-theme='dark'] .hljs-code,
+html[data-theme='dark'] .hljs-comment,
+html[data-theme='dark'] .hljs-formula {
     color: var(--dm-text-subtle);
 }
 
-html[data-theme="dark"] .hljs-name,
-html[data-theme="dark"] .hljs-quote,
-html[data-theme="dark"] .hljs-selector-pseudo,
-html[data-theme="dark"] .hljs-selector-tag {
+html[data-theme='dark'] .hljs-name,
+html[data-theme='dark'] .hljs-quote,
+html[data-theme='dark'] .hljs-selector-pseudo,
+html[data-theme='dark'] .hljs-selector-tag {
     color: var(--dm-success);
 }
 
-html[data-theme="dark"] .hljs-subst {
+html[data-theme='dark'] .hljs-subst {
     color: var(--dm-text-muted);
 }
 
-html[data-theme="dark"] .hljs-section {
+html[data-theme='dark'] .hljs-section {
     color: var(--dm-accent);
     font-weight: 700;
 }
 
-html[data-theme="dark"] .hljs-bullet {
+html[data-theme='dark'] .hljs-bullet {
     color: var(--dm-warning);
 }
 
-html[data-theme="dark"] .hljs-emphasis {
+html[data-theme='dark'] .hljs-emphasis {
     color: var(--dm-text-muted);
     font-style: italic;
 }
 
-html[data-theme="dark"] .hljs-strong {
+html[data-theme='dark'] .hljs-strong {
     color: var(--dm-text-muted);
     font-weight: 700;
 }
 
-html[data-theme="dark"] .hljs-addition {
+html[data-theme='dark'] .hljs-addition {
     color: var(--dm-success);
     background-color: var(--dm-success-soft);
 }
 
-html[data-theme="dark"] .hljs-deletion {
+html[data-theme='dark'] .hljs-deletion {
     color: var(--dm-text-bright);
     background-color: var(--dm-danger-soft);
 }
@@ -248,9 +248,9 @@ pre.code-block:not([data-language]) {
     padding-top: 28px;
 }
 
-html[data-theme="dark"] pre[data-language]::before,
-html[data-theme="dark"] pre:has(code[data-language])::before,
-html[data-theme="dark"] pre.code-block:not([data-language])::before {
+html[data-theme='dark'] pre[data-language]::before,
+html[data-theme='dark'] pre:has(code[data-language])::before,
+html[data-theme='dark'] pre.code-block:not([data-language])::before {
     color: var(--dm-text-bright);
     background: rgba(var(--pz-highlight-rgb), 0.12);
 }

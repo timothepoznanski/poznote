@@ -64,7 +64,7 @@
 }
 
 /* Mode sombre */
-[data-theme="dark"] .excalidraw-container {
+html[data-theme='dark'] .excalidraw-container {
     background-color: transparent;
     border-color: var(--dm-border);
 }

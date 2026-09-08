@@ -265,7 +265,7 @@ body.dashboard-page {
     color: var(--pz-text-muted);
 }
 
-:root[data-theme='dark'] .dash-section-title {
+html[data-theme='dark'] .dash-section-title {
     color: var(--dm-text-muted);
 }
 
@@ -632,14 +632,14 @@ body.dashboard-page {
     height: 18px;
 }
 
-:root[data-theme='dark'] .dashboard-color-filter-btn {
+html[data-theme='dark'] .dashboard-color-filter-btn {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text-muted);
 }
 
-:root[data-theme='dark'] .dashboard-color-filter-btn:hover,
-:root[data-theme='dark'] .dashboard-color-filter-btn.active {
+html[data-theme='dark'] .dashboard-color-filter-btn:hover,
+html[data-theme='dark'] .dashboard-color-filter-btn.active {
     border-color: var(--pz-accent);
     color: var(--pz-accent);
     background: var(--dm-surface-hover);
@@ -695,22 +695,22 @@ body.dashboard-page {
     background: repeating-linear-gradient(45deg, var(--pz-surface-sunken) 0 4px, var(--pz-surface) 4px 8px);
 }
 
-:root[data-theme='dark'] .dashboard-color-filter-menu {
+html[data-theme='dark'] .dashboard-color-filter-menu {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     box-shadow: 0 6px 20px rgba(var(--pz-shadow-rgb), 0.5);
 }
 
-:root[data-theme='dark'] .dashboard-color-filter-item {
+html[data-theme='dark'] .dashboard-color-filter-item {
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .dashboard-color-filter-item:hover,
-:root[data-theme='dark'] .dashboard-color-filter-item.active {
+html[data-theme='dark'] .dashboard-color-filter-item:hover,
+html[data-theme='dark'] .dashboard-color-filter-item.active {
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] .note-color-swatch-empty {
+html[data-theme='dark'] .note-color-swatch-empty {
     background: repeating-linear-gradient(45deg, var(--dm-surface-hover) 0 4px, var(--dm-content-bg) 4px 8px);
 }
 
@@ -768,21 +768,21 @@ body.dashboard-page {
     color: var(--pz-text);
 }
 
-:root[data-theme='dark'] .note-color-modal-subtitle {
+html[data-theme='dark'] .note-color-modal-subtitle {
     color: var(--dm-text-muted);
 }
 
-:root[data-theme='dark'] .note-color-option {
+html[data-theme='dark'] .note-color-option {
     background: var(--dm-surface);
     border-color: var(--dm-border);
 }
 
-:root[data-theme='dark'] .note-color-option.selected {
+html[data-theme='dark'] .note-color-option.selected {
     border-color: var(--pz-accent);
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] .note-color-name {
+html[data-theme='dark'] .note-color-name {
     color: var(--dm-text);
 }
 
@@ -837,15 +837,20 @@ body.dashboard-page {
     flex-shrink: 0;
 }
 
-:root[data-theme='dark'] .modal-buttons button.note-color-manage-btn,
-:root[data-theme='dark'] .modal-buttons button.dashboard-scope-manage-btn {
+/* Scoped to the page on purpose. dark-mode/modals.css paints the first button
+   of any dialog with --dm-active at (0,3,2), and it loads AFTER this file while
+   modals/base.css loads before it, so at equal weight a page rule wins in light
+   and loses in dark. These are outline buttons in both themes; body.dashboard-page
+   is what says so rather than leaving it to load order. */
+html[data-theme='dark'] body.dashboard-page .modal-buttons button.note-color-manage-btn,
+html[data-theme='dark'] body.dashboard-page .modal-buttons button.dashboard-scope-manage-btn {
     border-color: var(--dm-border);
     background: transparent;
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .modal-buttons button.note-color-manage-btn:hover,
-:root[data-theme='dark'] .modal-buttons button.dashboard-scope-manage-btn:hover {
+html[data-theme='dark'] body.dashboard-page .modal-buttons button.note-color-manage-btn:hover,
+html[data-theme='dark'] body.dashboard-page .modal-buttons button.dashboard-scope-manage-btn:hover {
     border-color: var(--dm-text-muted);
     background: var(--dm-surface-hover);
 }
@@ -1244,123 +1249,123 @@ body.dashboard-page .notifications-empty i {
 
 /* ---------- Dark mode ---------- */
 
-:root[data-theme='dark'] body.dashboard-page {
+html[data-theme='dark'] body.dashboard-page {
     background: var(--dm-content-bg);
 }
 
-:root[data-theme='dark'] .dashboard-topbar {
+html[data-theme='dark'] .dashboard-topbar {
     background: var(--dm-content-bg);
 }
 
-:root[data-theme='dark'] .dashboard-filter-input {
+html[data-theme='dark'] .dashboard-filter-input {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .dashboard-filter-clear:hover {
+html[data-theme='dark'] .dashboard-filter-clear:hover {
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] .bc-current {
+html[data-theme='dark'] .bc-current {
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .bc-sep {
+html[data-theme='dark'] .bc-sep {
     color: var(--dm-border);
 }
 
-:root[data-theme='dark'] .dash-card {
+html[data-theme='dark'] .dash-card {
     background: var(--dm-surface);
     border-color: var(--dm-border);
 }
 
-:root[data-theme='dark'] .dash-card:hover {
+html[data-theme='dark'] .dash-card:hover {
     border-color: var(--pz-accent);
     box-shadow: 0 3px 12px rgba(var(--pz-shadow-rgb), 0.35);
 }
 
 /* Note color tint, dark theme: the same hue mixed into the dark surface
    instead of white, so colored cards stay dark enough to read on. */
-:root[data-theme='dark'] .dash-card.has-note-color {
+html[data-theme='dark'] .dash-card.has-note-color {
     background: color-mix(in srgb, var(--note-color) 22%, var(--dm-surface));
     border-color: color-mix(in srgb, var(--note-color) 55%, var(--dm-surface));
 }
 
-:root[data-theme='dark'] .dash-card.has-note-color:hover {
+html[data-theme='dark'] .dash-card.has-note-color:hover {
     background: color-mix(in srgb, var(--note-color) 30%, var(--dm-surface));
     border-color: color-mix(in srgb, var(--note-color) 75%, var(--dm-surface));
     box-shadow: 0 3px 12px rgba(var(--pz-shadow-rgb), 0.45);
 }
 
-:root[data-theme='dark'] .dash-card.has-note-color .board-card-tag {
+html[data-theme='dark'] .dash-card.has-note-color .board-card-tag {
     background: color-mix(in srgb, var(--note-color) 26%, var(--dm-surface));
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .dash-card-name {
+html[data-theme='dark'] .dash-card-name {
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .dash-card-count {
+html[data-theme='dark'] .dash-card-count {
     color: var(--dm-text-muted);
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] .dash-card-note-title {
+html[data-theme='dark'] .dash-card-note-title {
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .dash-card-pin i {
+html[data-theme='dark'] .dash-card-pin i {
     background-color: var(--dm-text-muted);
 }
 
 /* Restated after the muted rule above, which is specific enough to win otherwise. */
-:root[data-theme='dark'] .dash-card-pin:hover i,
-:root[data-theme='dark'] .dash-card.is-pinned .dash-card-pin i {
+html[data-theme='dark'] .dash-card-pin:hover i,
+html[data-theme='dark'] .dash-card.is-pinned .dash-card-pin i {
     background-color: var(--dm-accent);
 }
 
-:root[data-theme='dark'] .board-card-excerpt,
-:root[data-theme='dark'] .board-card-tasks {
+html[data-theme='dark'] .board-card-excerpt,
+html[data-theme='dark'] .board-card-tasks {
     color: var(--dm-text-muted);
 }
 
-:root[data-theme='dark'] .dash-card-thumb {
+html[data-theme='dark'] .dash-card-thumb {
     background: rgba(var(--pz-highlight-rgb), 0.06);
 }
 
-:root[data-theme='dark'] .dash-card-thumb::after {
+html[data-theme='dark'] .dash-card-thumb::after {
     border-color: rgba(var(--pz-highlight-rgb), 0.18);
 }
 
-:root[data-theme='dark'] .board-view-btn {
+html[data-theme='dark'] .board-view-btn {
     background: var(--dm-surface, var(--dm-content-bg));
     border-color: var(--dm-border, var(--dm-border));
     color: var(--dm-text-muted, var(--dm-text-muted));
 }
 
-:root[data-theme='dark'] .board-view-btn:hover {
+html[data-theme='dark'] .board-view-btn:hover {
     border-color: var(--dm-accent, var(--dm-accent));
     color: var(--dm-accent, var(--dm-accent));
 }
 
-:root[data-theme='dark'] .board-card-tag {
+html[data-theme='dark'] .board-card-tag {
     color: var(--dm-text-muted);
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] .board-card-tag-colored {
+html[data-theme='dark'] .board-card-tag-colored {
     background: color-mix(in srgb, var(--tag-color) 26%, var(--dm-surface));
     color: color-mix(in srgb, var(--tag-color) 70%, var(--pz-text-inverse));
 }
 
-:root[data-theme='dark'] .board-card-date {
+html[data-theme='dark'] .board-card-date {
     color: var(--dm-text-muted);
     opacity: 0.7;
 }
 
-:root[data-theme='dark'] .dashboard-empty {
+html[data-theme='dark'] .dashboard-empty {
     color: var(--dm-text-muted);
 }
 
@@ -1535,7 +1540,7 @@ body.dashboard-page .notifications-empty i {
     height: 12px;
 }
 
-:root[data-theme='dark'] .dash-ws-dot {
+html[data-theme='dark'] .dash-ws-dot {
     border-color: rgba(var(--pz-highlight-rgb), 0.18);
 }
 
@@ -1775,11 +1780,11 @@ body.dashboard-page .notifications-empty i {
     border-color: var(--pz-accent);
 }
 
-:root[data-theme='dark'] .dashboard-tag-filter-search-wrap {
+html[data-theme='dark'] .dashboard-tag-filter-search-wrap {
     background: var(--dm-surface);
 }
 
-:root[data-theme='dark'] .dashboard-tag-filter-search {
+html[data-theme='dark'] .dashboard-tag-filter-search {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text);
@@ -1820,54 +1825,54 @@ body.dashboard-page .notifications-empty i {
     color: var(--pz-text-subtle);
 }
 
-:root[data-theme='dark'] .dashboard-tag-filter-count,
-:root[data-theme='dark'] .dashboard-tag-filter-empty {
+html[data-theme='dark'] .dashboard-tag-filter-count,
+html[data-theme='dark'] .dashboard-tag-filter-empty {
     color: var(--dm-text-muted);
 }
 
 /* Dark mode */
-:root[data-theme='dark'] .dash-group-title {
+html[data-theme='dark'] .dash-group-title {
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .dash-group-tag {
+html[data-theme='dark'] .dash-group-tag {
     color: var(--dm-text-bright);
     background: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
-:root[data-theme='dark'] .dashboard-scope-section-title,
-:root[data-theme='dark'] .dashboard-scope-empty {
+html[data-theme='dark'] .dashboard-scope-section-title,
+html[data-theme='dark'] .dashboard-scope-empty {
     color: var(--dm-text-muted);
 }
 
-:root[data-theme='dark'] .dashboard-scope-tag {
+html[data-theme='dark'] .dashboard-scope-tag {
     color: var(--dm-text);
     border-color: var(--dm-border);
 }
 
-:root[data-theme='dark'] .dashboard-scope-tag:hover {
+html[data-theme='dark'] .dashboard-scope-tag:hover {
     background: var(--dm-surface-hover);
 }
 
-:root[data-theme='dark'] .dashboard-scope-tag.is-active {
+html[data-theme='dark'] .dashboard-scope-tag.is-active {
     background: var(--dm-active);
     border-color: var(--dm-accent);
 }
 
-:root[data-theme='dark'] .dashboard-scope-tag.is-partial {
+html[data-theme='dark'] .dashboard-scope-tag.is-partial {
     border-color: var(--dm-accent);
 }
 
-:root[data-theme='dark'] .dashboard-scope-row-all {
+html[data-theme='dark'] .dashboard-scope-row-all {
     border-bottom-color: var(--dm-border);
 }
 
-:root[data-theme='dark'] .dashboard-scope-row-main .lucide,
-:root[data-theme='dark'] .dashboard-scope-open {
+html[data-theme='dark'] .dashboard-scope-row-main .lucide,
+html[data-theme='dark'] .dashboard-scope-open {
     color: var(--dm-text-muted);
 }
 
-:root[data-theme='dark'] .dashboard-scope-open:hover {
+html[data-theme='dark'] .dashboard-scope-open:hover {
     background: var(--dm-surface-hover);
     color: var(--dm-accent, var(--dm-accent));
 }

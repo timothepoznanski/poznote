@@ -187,38 +187,38 @@ body.favorites-page {
 }
 
 /* Dark mode */
-[data-theme="dark"] body.favorites-page {
+html[data-theme='dark'] body.favorites-page {
     background-color: var(--dm-content-bg);
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .note-name {
+html[data-theme='dark'] .note-name {
     color: var(--dm-accent);
 }
 
-[data-theme="dark"] .folder-badge {
+html[data-theme='dark'] .folder-badge {
     background-color: var(--dm-surface);
     color: var(--dm-text-muted);
 }
 
-[data-theme="dark"] .filter-input {
+html[data-theme='dark'] .filter-input {
     background-color: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
-[data-theme="dark"] .filter-stats {
+html[data-theme='dark'] .filter-stats {
     background-color: var(--dm-accent-soft);
     color: var(--dm-accent-hover);
 }
 
-[data-theme="dark"] .btn-unfavorite {
+html[data-theme='dark'] .btn-unfavorite {
     background-color: var(--dm-content-bg);
     border-color: var(--dm-danger-soft);
     color: var(--dm-danger);
 }
 
-[data-theme="dark"] .btn-unfavorite:hover {
+html[data-theme='dark'] .btn-unfavorite:hover {
     background-color: var(--dm-danger-soft);
     border-color: var(--dm-danger-hover);
 }

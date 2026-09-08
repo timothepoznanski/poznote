@@ -632,20 +632,20 @@ body.trash-page {
 
 /* Dark Mode Support for Trash Page */
 html[data-theme='dark'] body.trash-page,
-[data-theme='dark'] body.trash-page {
+html[data-theme='dark'] body.trash-page {
     background-color: var(--dm-content-bg);
     background: var(--dm-content-bg);
     color: var(--dm-text);
 }
 
 html[data-theme='dark'] .trash-search-input,
-[data-theme='dark'] .trash-search-input {
+html[data-theme='dark'] .trash-search-input {
     background-color: var(--dm-surface);
     color: var(--dm-text);
     border-color: var(--dm-border);
 }
 
-[data-theme='dark'] .clear-filter-btn {
+html[data-theme='dark'] .clear-filter-btn {
     color: var(--dm-text-subtle);
 }
 
@@ -673,7 +673,7 @@ html[data-theme='dark'] .trash-search-notice {
     color: var(--dm-accent-hover);
 }
 
-[data-theme='dark'] .trash-search-results {
+html[data-theme='dark'] .trash-search-results {
     background-color: var(--dm-accent-soft);
     color: var(--dm-accent-hover);
 }

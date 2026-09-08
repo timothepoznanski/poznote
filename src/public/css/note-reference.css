@@ -234,74 +234,74 @@ a.note-internal-link:hover {
 }
 
 /* Dark mode adjustments */
-[data-theme="dark"] .note-reference-modal-content {
+html[data-theme='dark'] .note-reference-modal-content {
     background-color: var(--dm-content-bg, var(--dm-content-bg));
 }
 
-[data-theme="dark"] .note-reference-modal-header h3 {
+html[data-theme='dark'] .note-reference-modal-header h3 {
     color: var(--dm-text-bright);
 }
 
-[data-theme="dark"] .note-reference-search-input {
+html[data-theme='dark'] .note-reference-search-input {
     background: var(--dm-surface, var(--dm-surface));
     border-color: var(--dm-border, var(--dm-border));
     color: var(--dm-text-bright);
 }
 
-[data-theme="dark"] .note-reference-search-input:focus {
+html[data-theme='dark'] .note-reference-search-input:focus {
     border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
 }
 
-[data-theme="dark"] .note-reference-search input {
+html[data-theme='dark'] .note-reference-search input {
     background: var(--dm-surface, var(--dm-surface));
     border-color: var(--dm-border, var(--dm-border));
     color: var(--dm-text-bright);
 }
 
-[data-theme="dark"] .note-reference-search input:focus {
+html[data-theme='dark'] .note-reference-search input:focus {
     border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
 }
 
-[data-theme="dark"] .note-reference-list {
+html[data-theme='dark'] .note-reference-list {
     border-color: var(--dm-border);
     background-color: var(--dm-surface);
 }
 
-[data-theme="dark"] .note-reference-item {
+html[data-theme='dark'] .note-reference-item {
     border-bottom-color: var(--dm-border);
 }
 
-[data-theme="dark"] .note-reference-item:hover {
+html[data-theme='dark'] .note-reference-item:hover {
     background-color: rgba(33, 150, 243, 0.15);
 }
 
-[data-theme="dark"] .note-reference-item-title {
+html[data-theme='dark'] .note-reference-item-title {
     color: var(--dm-text-bright);
 }
 
-[data-theme="dark"] .note-reference-heading {
+html[data-theme='dark'] .note-reference-heading {
     color: var(--dm-text-bright);
 }
 
-[data-theme="dark"] .note-reference-icon {
+html[data-theme='dark'] .note-reference-icon {
     color: var(--dm-text-subtle);
 }
 
-[data-theme="dark"] .note-reference-item-folder {
+html[data-theme='dark'] .note-reference-item-folder {
     color: var(--dm-text-subtle);
 }
 
-[data-theme="dark"] a.note-internal-link {
+html[data-theme='dark'] a.note-internal-link {
     color: var(--dm-accent-hover);
 }
 
-[data-theme="dark"] a.note-internal-link:hover {
+html[data-theme='dark'] a.note-internal-link:hover {
     text-decoration: underline;
 }
 
-[data-theme="dark"] .note-internal-link.note-link-broken {
+html[data-theme='dark'] .note-internal-link.note-link-broken {
     color: #f48fb1;
 }
 

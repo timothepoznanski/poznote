@@ -99,6 +99,31 @@ foreach ($files as $file) {
                  (str_contains($text, 'black-mode') ? 'black' : 'dark') . "-mode\n";
             $errors++;
         }
+        // One carrier means one SPELLING of it. The three that were in use are
+        // not interchangeable: :root[data-theme] is (0,2,0) because :root is a
+        // pseudo-class, html[data-theme] is (0,1,1), and a bare [data-theme] is
+        // (0,1,0). Thirteen targets were styled through more than one of them,
+        // so which rule won was decided by a spelling nobody chose on purpose.
+        if (preg_match_all('/(?<![\w.#\]-])(:root|\[data-theme=)|\[data-theme="[^"]*"\]/', $text, $mm, PREG_OFFSET_CAPTURE)) {
+            foreach ($mm[0] as $hit) {
+                [$found, $at] = $hit;
+                if (!str_contains($text, 'data-theme')) {
+                    continue;
+                }
+                if ($found === ':root' && !preg_match('/:root\s*\{/', $text)) {
+                    echo "$name:" . ($n + 1) . ": write html[data-theme='dark'], not :root[data-theme=...]"
+                       . " (:root is a pseudo-class, so it outweighs html)\n";
+                    $errors++;
+                } elseif ($found === '[data-theme=' && ($at === 0 || !preg_match('/[\w.#\]-]$/', substr($text, 0, $at)))) {
+                    echo "$name:" . ($n + 1) . ": write html[data-theme='dark'], not a bare [data-theme=...]"
+                       . " (a bare attribute selector weighs less than html[...])\n";
+                    $errors++;
+                } elseif (str_starts_with($found, '[data-theme="')) {
+                    echo "$name:" . ($n + 1) . ": quote the theme attribute with ' like everywhere else\n";
+                    $errors++;
+                }
+            }
+        }
     }
 }
 
