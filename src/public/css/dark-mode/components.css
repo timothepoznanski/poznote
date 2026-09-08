@@ -107,7 +107,7 @@ html[data-theme='dark'] .folder-path-separator {
 html[data-theme='dark'] .tag-suggestions {
     background-color: var(--dm-surface) !important;
     border-color: var(--dm-border) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.4) !important;
 }
 
 html[data-theme='dark'] .tag-suggestion-item {
@@ -220,7 +220,7 @@ html[data-theme='dark'] .task-menu-btn:hover i {
 html[data-theme='dark'] .task-actions-menu {
     background: var(--dm-surface);
     border-color: var(--dm-border);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 12px 30px rgba(var(--pz-shadow-rgb), 0.5);
 }
 
 html[data-theme='dark'] .task-actions-menu-item {
@@ -228,7 +228,7 @@ html[data-theme='dark'] .task-actions-menu-item {
 }
 
 html[data-theme='dark'] .task-actions-menu-item:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
 html[data-theme='dark'] .task-actions-menu-item i {
@@ -498,7 +498,7 @@ html[data-theme='dark'] #poznoteToast.notification-error {
 html[data-theme='dark'] #poznoteToast.notification-warning {
     color: var(--dm-accent);
     border-color: var(--dm-accent);
-    box-shadow: 0 4px 16px rgba(74, 158, 255, 0.2);
+    box-shadow: 0 4px 16px rgba(var(--dm-accent-rgb), 0.2);
 }
 
 /* ============================================
@@ -600,7 +600,7 @@ html[data-theme='dark'] .noteentry table.inserted-table th {
 html[data-theme='dark'] .table-context-menu {
     background: var(--dm-surface) !important;
     border-color: var(--dm-border) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.4) !important;
 }
 
 html[data-theme='dark'] .table-context-menu-item {
@@ -694,7 +694,7 @@ html[data-theme='dark'] .ai-chat-msg-error {
 
 html[data-theme='dark'] .ai-chat-md code,
 html[data-theme='dark'] .ai-chat-md pre {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
 html[data-theme='dark'] .ai-chat-md blockquote {
@@ -757,7 +757,7 @@ html[data-theme='dark'] .tasklist-embed-widget {
 
 html[data-theme='dark'] .tasklist-embed-task:hover,
 html[data-theme='dark'] .tasklist-embed-task:focus-within {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(var(--pz-highlight-rgb), 0.05);
 }
 
 html[data-theme='dark'] .tasklist-embed-toggle {

@@ -73,7 +73,7 @@
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
     border-radius: 8px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 20px rgba(var(--pz-shadow-rgb), 0.15);
 }
 
 #iconSidebarOverflowMenu.icon-sidebar-overflow-open {
@@ -254,14 +254,14 @@
     background: var(--pz-bg);
     color: var(--pz-text-muted);
     cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 4px rgba(var(--pz-shadow-rgb), 0.05);
     transition: left 0.3s ease, background 0.2s ease, color 0.2s ease;
 }
 
 #iconSidebarToggle:hover {
     background: var(--pz-surface);
     color: var(--pz-accent);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.1);
 }
 
 #iconSidebarToggle .lucide {
@@ -477,7 +477,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
     border-radius: 8px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 20px rgba(var(--pz-shadow-rgb), 0.15);
     /* Explicit: once moved, the menu no longer inherits from the title. */
     font-size: 14px;
     font-weight: 400;
@@ -547,7 +547,7 @@ button.poznote-page-title-workspace-item {
     height: 9px;
     box-sizing: border-box;
     border-radius: 50%;
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(var(--pz-shadow-rgb), 0.12);
     flex-shrink: 0;
 }
 

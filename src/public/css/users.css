@@ -221,7 +221,7 @@ html[data-theme='dark'] {
     line-height: 1.45;
     text-transform: none;
     white-space: normal;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 8px 24px rgba(var(--pz-shadow-rgb), 0.18);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -275,7 +275,7 @@ html[data-theme='dark'] .users-header-help:focus-visible {
 }
 
 .users-table tr:hover {
-    background: var(--bg-hover, rgba(0, 0, 0, 0.02));
+    background: var(--bg-hover, rgba(var(--pz-shadow-rgb), 0.02));
 }
 
 html[data-theme='dark'] .users-table td {
@@ -400,7 +400,7 @@ html[data-theme='dark'] .users-table td {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(var(--pz-shadow-rgb), 0.5);
     z-index: 10000;
     align-items: center;
     justify-content: center;
@@ -558,7 +558,7 @@ html[data-theme='dark'] .users-table td {
 }
 
 .account-access-option:hover {
-    background: var(--bg-hover, rgba(0, 0, 0, 0.02));
+    background: var(--bg-hover, rgba(var(--pz-shadow-rgb), 0.02));
 }
 
 .account-access-option input[type="checkbox"] {
@@ -605,7 +605,7 @@ html[data-theme='dark'] .account-access-state {
 }
 
 html[data-theme='dark'] .account-access-own-label {
-    background: rgba(74, 158, 255, 0.16);
+    background: rgba(var(--dm-accent-rgb), 0.16);
     color: var(--dm-accent-hover);
 }
 
@@ -867,8 +867,8 @@ input:disabled+.slider {
         height: 34px !important;
         padding: 0 !important;
         border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(var(--pz-highlight-rgb), 0.08);
+        box-shadow: inset 0 1px 0 rgba(var(--pz-highlight-rgb), 0.04);
     }
 
     .actions-center {
@@ -880,7 +880,7 @@ input:disabled+.slider {
     }
 
     html[data-theme='dark'] .actions-center .btn {
-        border-color: rgba(255, 255, 255, 0.06);
+        border-color: rgba(var(--pz-highlight-rgb), 0.06);
     }
 
     html[data-theme='dark'] .actions-center .btn-secondary {

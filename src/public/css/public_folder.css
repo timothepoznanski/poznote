@@ -24,7 +24,7 @@
     --password-muted: #666666;
     --password-accent: #3182ce;
     --password-accent-hover: #2563eb;
-    --password-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+    --password-shadow: 0 6px 24px rgba(var(--pz-shadow-rgb), 0.08);
     font-family: 'Inter', sans-serif;
     display: flex;
     align-items: center;
@@ -184,7 +184,7 @@
     --status-muted: #666666;
     --status-accent: #3182ce;
     --status-accent-strong: #3182ce;
-    --status-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+    --status-shadow: 0 6px 24px rgba(var(--pz-shadow-rgb), 0.08);
     font-family: 'Inter', sans-serif;
     min-height: 100vh;
     margin: 0;
@@ -330,7 +330,7 @@ body.view-kanban .public-folder-body {
     --sidebar-bg: var(--dm-sidebar-bg, var(--dm-content-bg));
     --panel-bg: var(--dm-surface, var(--dm-surface));
     --muted-color: var(--dm-text-muted, var(--dm-text-muted));
-    --hover-bg: rgba(255, 255, 255, 0.06);
+    --hover-bg: rgba(var(--pz-highlight-rgb), 0.06);
 }
 
 [data-theme="light"] .public-folder-body,
@@ -342,7 +342,7 @@ body.view-kanban .public-folder-body {
     --sidebar-bg: #f7f8fa;
     --panel-bg: #ffffff;
     --muted-color: #6b7280;
-    --hover-bg: rgba(0, 0, 0, 0.04);
+    --hover-bg: rgba(var(--pz-shadow-rgb), 0.04);
 }
 
 .public-folder-body h1 {
@@ -399,7 +399,7 @@ body.view-kanban .public-folder-body {
 .filter-input:focus {
     outline: none;
     border-color: var(--link-color, var(--pz-accent));
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
 }
 
 .filter-input::placeholder {
@@ -431,7 +431,7 @@ body.view-kanban .public-folder-body {
     color: var(--muted-color, var(--pz-text-muted));
     white-space: nowrap;
     padding: 4px 10px;
-    background-color: rgba(0, 123, 255, 0.08);
+    background-color: rgba(var(--pz-accent-rgb), 0.08);
     border-radius: 6px;
     align-self: flex-start;
     font-weight: 500;
@@ -692,7 +692,7 @@ body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.i
 
 .kanban-public-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(var(--pz-shadow-rgb), 0.1);
 }
 
 .kanban-card-title {
@@ -724,7 +724,7 @@ body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.i
 }
 
 .note-item:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.1);
 }
 
 .note-item h2 {

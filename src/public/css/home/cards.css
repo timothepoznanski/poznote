@@ -21,7 +21,7 @@
     color: inherit;
     transition: all 0.2s ease;
     cursor: pointer;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 3px rgba(var(--pz-shadow-rgb), 0.05);
 }
 
 .home-card:hover {
@@ -180,7 +180,7 @@ html[data-theme='dark'] #support-card .home-card-icon {
     max-width: 240px;
     background: #1f2937;
     color: #f9fafb;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(var(--pz-highlight-rgb), 0.15);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-size: 0.95rem;
     font-weight: 400;
@@ -189,7 +189,7 @@ html[data-theme='dark'] #support-card .home-card-icon {
     white-space: normal;
     padding: 8px 10px;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.25);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;

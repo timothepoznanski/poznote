@@ -96,7 +96,7 @@
 }
 
 .snapshot-date-btn:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(var(--pz-shadow-rgb), 0.05);
 }
 
 .snapshot-date-btn.active {
@@ -364,8 +364,8 @@
 /* ---- Local dark mode fallback ---- */
 #snapshotModal.snapshot-modal-dark .snapshot-modal-content {
     background: linear-gradient(180deg, #262a31 0%, #1f2329 100%);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.38);
+    border: 1px solid rgba(var(--pz-highlight-rgb), 0.06);
+    box-shadow: 0 18px 44px rgba(var(--pz-shadow-rgb), 0.38);
 }
 
 #snapshotModal.snapshot-modal-dark .snapshot-modal-header h3 {
@@ -386,7 +386,7 @@
 }
 
 #snapshotModal.snapshot-modal-dark .snapshot-date-list {
-    border-right-color: rgba(255, 255, 255, 0.14);
+    border-right-color: rgba(var(--pz-highlight-rgb), 0.14);
 }
 
 #snapshotModal.snapshot-modal-dark .snapshot-date-btn {
@@ -394,7 +394,7 @@
 }
 
 #snapshotModal.snapshot-modal-dark .snapshot-date-btn:not(.active):hover {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
 #snapshotModal.snapshot-modal-dark .snapshot-date-secondary {
@@ -402,10 +402,10 @@
 }
 
 #snapshotModal.snapshot-modal-dark .snapshot-content-preview {
-    border-color: rgba(255, 255, 255, 0.14);
+    border-color: rgba(var(--pz-highlight-rgb), 0.14);
     background: #11161d !important;
     color: #e6edf3 !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    box-shadow: inset 0 1px 0 rgba(var(--pz-highlight-rgb), 0.03);
 }
 
 #snapshotModal.snapshot-modal-dark .snapshot-content-preview > *:not(img):not(svg):not(canvas):not(video),
@@ -430,8 +430,8 @@
 
 #snapshotModal.snapshot-modal-dark .snapshot-content-preview pre {
     background-color: #161d27 !important;
-    border: 1px solid rgba(255, 255, 255, 0.18) !important;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(var(--pz-highlight-rgb), 0.18) !important;
+    box-shadow: 0 0 0 1px rgba(var(--pz-highlight-rgb), 0.04), inset 0 1px 0 rgba(var(--pz-highlight-rgb), 0.03);
 }
 
 #snapshotModal.snapshot-modal-dark .snapshot-content-preview pre code.hljs,

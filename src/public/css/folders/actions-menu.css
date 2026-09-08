@@ -174,7 +174,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     background: var(--pz-bg);
     border: 1px solid var(--pz-border-strong);
     border-radius: 6px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 6px -1px rgba(var(--pz-shadow-rgb), 0.1), 0 2px 4px -1px rgba(var(--pz-shadow-rgb), 0.06);
     min-width: 190px;
     padding: 4px 0;
     z-index: 10000;

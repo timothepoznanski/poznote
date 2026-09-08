@@ -192,7 +192,7 @@ a.ai-chat-header-btn {
 }
 
 .ai-chat-md code {
-    background: rgba(0, 0, 0, 0.06);
+    background: rgba(var(--pz-shadow-rgb), 0.06);
     border-radius: 4px;
     padding: 1px 4px;
     font-size: 0.9em;
@@ -200,7 +200,7 @@ a.ai-chat-header-btn {
 }
 
 .ai-chat-md pre {
-    background: rgba(0, 0, 0, 0.06);
+    background: rgba(var(--pz-shadow-rgb), 0.06);
     border-radius: 6px;
     padding: 8px 10px;
     overflow-x: auto;
@@ -454,7 +454,7 @@ a.ai-chat-header-btn {
         right: 0;
         width: 100%;
         z-index: 1200;
-        box-shadow: -4px 0 16px rgba(0, 0, 0, 0.08);
+        box-shadow: -4px 0 16px rgba(var(--pz-shadow-rgb), 0.08);
         transform: translateX(100%);
         transition: transform 0.25s ease;
     }

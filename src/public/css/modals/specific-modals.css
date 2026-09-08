@@ -500,7 +500,7 @@
     min-width: 120px;
     padding: 10px 24px !important;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(var(--pz-shadow-rgb), 0.1);
 }
 
 #updateModal .btn-cancel:hover {
@@ -511,7 +511,7 @@
 
 #updateModal .btn-cancel:active {
     transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(var(--pz-shadow-rgb), 0.1);
 }
 
 /* Update Check Modal */
@@ -847,7 +847,7 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(var(--pz-shadow-rgb), 0.5);
     align-items: center;
     justify-content: center;
 }
@@ -859,7 +859,7 @@
     border-radius: 6px;
     width: 90%;
     max-width: 400px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 20px rgba(var(--pz-shadow-rgb), 0.3);
 }
 
 #renameModal .modal-buttons,
@@ -924,7 +924,7 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5) !important;
+    background-color: rgba(var(--pz-shadow-rgb), 0.5) !important;
     align-items: center;
     justify-content: center;
 }
@@ -935,7 +935,7 @@
     border-radius: 6px;
     width: 90%;
     max-width: 420px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 20px rgba(var(--pz-shadow-rgb), 0.3);
 }
 
 #moveNotesModal select {

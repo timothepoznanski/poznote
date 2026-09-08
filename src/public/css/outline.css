@@ -213,7 +213,7 @@
     padding: 0;
     transition: all 0.2s ease;
     z-index: 10;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 4px rgba(var(--pz-shadow-rgb), 0.05);
     opacity: 1;
     pointer-events: auto;
 }
@@ -233,7 +233,7 @@ body:not(.outline-collapsed) .toggle-outline-btn {
 .toggle-outline-btn:hover {
     background: var(--pz-surface);
     color: var(--pz-accent);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.1);
 }
 
 .toggle-outline-btn:disabled,
@@ -337,7 +337,7 @@ body.outline-collapsed .toggle-outline-btn i {
         right: 0;
         top: 0;
         z-index: 2147483003;
-        box-shadow: -4px 0 8px rgba(0, 0, 0, 0.2);
+        box-shadow: -4px 0 8px rgba(var(--pz-shadow-rgb), 0.2);
         width: 80% !important;
         max-width: 320px !important;
         padding: 0px 16px 16px 16px;
@@ -356,7 +356,7 @@ body.outline-collapsed .toggle-outline-btn i {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(var(--pz-shadow-rgb), 0.4);
     z-index: 2147483002;
     opacity: 0;
     pointer-events: none;

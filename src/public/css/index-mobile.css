@@ -67,7 +67,7 @@
     border: none !important;
     box-shadow: none !important;
     outline: none !important;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;
+    -webkit-tap-highlight-color: rgba(var(--pz-shadow-rgb), 0) !important;
     touch-action: manipulation !important;
 }
 
@@ -268,7 +268,7 @@ body.mobile-formatting-toolbar-active .color-palette-popup .color-swatch {
 
 body.mobile-formatting-toolbar-active.has-background-image #right_col .note-header,
 body.mobile-keyboard-open.has-background-image #right_col .note-header {
-    background: rgba(255, 255, 255, 0.96);
+    background: rgba(var(--pz-highlight-rgb), 0.96);
 }
 
 .save-indicator {

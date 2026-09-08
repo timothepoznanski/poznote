@@ -5,7 +5,7 @@
     /* background: var(--pz-surface); */
     /* border-bottom: 1px solid var(--border-color, var(--pz-border)); */
     padding: 8px 12px;
-    /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); */
+    /* box-shadow: 0 2px 4px rgba(var(--pz-shadow-rgb), 0.05); */
     position: relative;
     z-index: 9;
     /* Keep the bar about as wide as the centered toolbar instead of

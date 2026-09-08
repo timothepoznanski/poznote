@@ -16,7 +16,7 @@
 
 .folder-name {
     font-weight: 600;
-    color: rgb(55, 53, 47);
+    color: var(--pz-text);
     font-size: var(--sidebar-font-size, 13px);
 }
 

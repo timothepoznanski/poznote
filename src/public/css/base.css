@@ -23,7 +23,7 @@
 html,
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-    color: rgb(55, 53, 47);
+    color: var(--pz-text);
     overflow-x: hidden;
 }
 
@@ -45,7 +45,7 @@ form {
 /* LINKS */
 
 a {
-    color: var(--pz-link);
+    color: var(--pz-accent);
     text-decoration: none;
 }
 

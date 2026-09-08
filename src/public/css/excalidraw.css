@@ -15,7 +15,7 @@
     padding: 12px 20px;
     background: var(--pz-bg);
     border-bottom: 1px solid var(--border-color, var(--pz-border));
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 3px rgba(var(--pz-shadow-rgb), 0.05);
     z-index: 10;
 }
 
@@ -132,7 +132,7 @@ div[onclick*="openExcalidrawNote"] {
 
 .excalidraw-preview-overlay {
     position: relative;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(var(--pz-shadow-rgb), 0.8);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -141,7 +141,7 @@ div[onclick*="openExcalidrawNote"] {
 }
 
 .excalidraw-preview-container:hover .excalidraw-preview-overlay {
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(var(--pz-shadow-rgb), 0.9);
 }
 
 .excalidraw-preview-overlay {
@@ -150,7 +150,7 @@ div[onclick*="openExcalidrawNote"] {
 }
 
 .excalidraw-preview-container:hover .excalidraw-preview-overlay {
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(var(--pz-shadow-rgb), 0.9);
 }
 
 .excalidraw-badge {
@@ -204,7 +204,7 @@ div[onclick*="openExcalidrawNote"] {
         z-index: 10000 !important; /* Cohérent avec la hiérarchie z-index */
         background: var(--pz-bg) !important;
         border-bottom: 1px solid var(--pz-border) !important;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+        box-shadow: 0 1px 3px rgba(var(--pz-shadow-rgb), 0.1) !important;
         height: 50px !important; /* Hauteur réduite sur mobile */
     }
     
@@ -316,7 +316,7 @@ div[onclick*="openExcalidrawNote"] {
     z-index: 10000 !important; /* Keep high to stay above everything */
     background: var(--pz-bg) !important;
     border-bottom: 1px solid var(--border-color, var(--pz-border)) !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 1px 3px rgba(var(--pz-shadow-rgb), 0.1) !important;
     box-sizing: border-box !important;
     height: var(--excalidraw-toolbar-height) !important;
     padding: 8px 20px !important; /* Reduced padding to fit new height */
@@ -565,7 +565,7 @@ html body.excalidraw-editor-page.excalidraw-shell-light .excalidraw {
     padding: 8px 20px;
     background: var(--pz-bg);
     border-bottom: 1px solid var(--pz-border);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(var(--pz-shadow-rgb), 0.1);
     position: relative;
     z-index: 5000;
 }
@@ -574,13 +574,13 @@ html[data-theme='dark'] body.excalidraw-editor-page .poznote-toolbar,
 body.excalidraw-editor-page.excalidraw-shell-dark .poznote-toolbar {
     background: var(--dm-surface, var(--dm-surface)) !important;
     border-bottom-color: var(--dm-border, var(--dm-border)) !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35) !important;
+    box-shadow: 0 1px 3px rgba(var(--pz-shadow-rgb), 0.35) !important;
 }
 
 html body.excalidraw-editor-page.excalidraw-shell-light .poznote-toolbar {
     background: var(--pz-bg) !important;
     border-bottom-color: var(--pz-border) !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 1px 3px rgba(var(--pz-shadow-rgb), 0.1) !important;
 }
 
 .poznote-toolbar-buttons {

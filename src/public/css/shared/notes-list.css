@@ -86,7 +86,7 @@
     line-height: 1.45;
     text-transform: none;
     white-space: normal;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 8px 24px rgba(var(--pz-shadow-rgb), 0.18);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -179,7 +179,7 @@
 }
 
 .shared-folder-toggle:focus-visible {
-    outline: 2px solid rgba(0, 123, 255, 0.45);
+    outline: 2px solid rgba(var(--pz-accent-rgb), 0.45);
     outline-offset: 2px;
 }
 

@@ -134,7 +134,7 @@ body.public-note-page {
     max-width: 100%;
     height: auto;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.1);
     background: #000;
     margin: 10px 0;
 }
@@ -305,7 +305,7 @@ body.public-note-page {
     top: 8px;
     right: 8px;
     padding: 6px 10px;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(var(--pz-highlight-rgb), 0.9);
     border: 1px solid var(--pz-border);
     border-radius: 4px;
     cursor: pointer;

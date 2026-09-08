@@ -43,8 +43,8 @@
 .drop-overlay-text {
     font-size: 1.2em;
     font-weight: 600;
-    color: var(--pz-link);
-    background: rgba(255, 255, 255, 0.95);
+    color: var(--pz-accent);
+    background: rgba(var(--pz-highlight-rgb), 0.95);
     padding: 20px 30px;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);

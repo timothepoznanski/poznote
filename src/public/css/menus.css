@@ -17,7 +17,7 @@
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.15);
     min-width: 200px;
     z-index: 1000;
     overflow: hidden;
@@ -73,7 +73,7 @@
     background-color: var(--pz-bg);
     /* border: 1px solid #ddd; */
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.15);
     /* The sidebar can be resized down to 200px and clips horizontally
        (#left_col has overflow-x: hidden), so the menu never grows past the
        title row it is centred on: a long workspace name or a long
@@ -126,7 +126,7 @@
     margin: 0 11px 0 3px;
     border-radius: 50%;
     flex-shrink: 0;
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(var(--pz-shadow-rgb), 0.12);
 }
 
 /* min-width: 0 defeats the flex item's automatic min-content floor, without
@@ -193,7 +193,7 @@
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.15);
     z-index: 9999;
     min-width: 140px;
     padding: 8px 0;

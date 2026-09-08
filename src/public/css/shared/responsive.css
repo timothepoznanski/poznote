@@ -265,7 +265,7 @@
 
     [data-theme="dark"] .shared-note-item {
         background: var(--dm-content-bg);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+        box-shadow: 0 8px 20px rgba(var(--pz-shadow-rgb), 0.22);
     }
 
     [data-theme="dark"] .note-token-wrap {
@@ -305,7 +305,7 @@
 
     [data-theme="dark"] .shared-note-item {
         border-color: var(--dm-border-light);
-        background-color: rgba(255, 255, 255, 0.05);
+        background-color: rgba(var(--pz-highlight-rgb), 0.05);
     }
 
     [data-theme="dark"] .note-name {

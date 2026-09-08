@@ -215,7 +215,7 @@ body {
     padding: 0;
     transition: all 0.2s ease;
     z-index: 10;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 4px rgba(var(--pz-shadow-rgb), 0.05);
     opacity: 1;
     pointer-events: auto;
 }
@@ -229,7 +229,7 @@ body {
 .toggle-sidebar-btn:hover {
     background: var(--pz-surface);
     color: var(--pz-accent);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.1);
 }
 
 .toggle-sidebar-btn i {

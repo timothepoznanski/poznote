@@ -588,7 +588,7 @@ html[data-theme='dark'] .nm-folder-option-selected {
 }
 
 :root[data-theme='dark'] #nmBulkBar .nm-bulk-btn:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(var(--pz-highlight-rgb), 0.05);
     color: var(--dm-text-bright);
     border-color: #64748b;
 }

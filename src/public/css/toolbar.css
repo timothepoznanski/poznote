@@ -18,7 +18,7 @@
 
 /* Color palette popup (desktop) - same appearance as mobile palette */
 .color-palette-popup {
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 6px 18px rgba(var(--pz-shadow-rgb), 0.12);
     border-radius: 6px;
     background: transparent;
     padding: 6px 8px;
@@ -30,9 +30,9 @@
 
 .color-palette-popup {
     background: var(--pz-bg);
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(var(--pz-shadow-rgb), 0.12);
     border-radius: 6px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 6px 18px rgba(var(--pz-shadow-rgb), 0.12);
     box-sizing: border-box;
     max-width: calc(100vw - 16px);
     padding: 8px;
@@ -85,7 +85,7 @@
     justify-content: center;
     max-width: 100%;
     padding: 8px 12px;
-    background: rgba(255, 255, 255, 0.98);
+    background: rgba(var(--pz-highlight-rgb), 0.98);
     border-radius: 10px;
     box-sizing: border-box;
 }
@@ -334,7 +334,7 @@ a.links_arbo_left:active {
     text-overflow: ellipsis;
     vertical-align: top;
     text-decoration: none;
-    color: rgb(55, 53, 47);
+    color: var(--pz-text);
     padding: 3px 6px 3px 0px;
     /* Réduction du padding vertical (6px → 3px) */
     border-radius: 8px;

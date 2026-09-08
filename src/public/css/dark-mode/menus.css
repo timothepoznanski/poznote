@@ -13,7 +13,7 @@ html[data-theme='dark'] .slash-command-menu {
 
 html[data-theme='dark'] .slash-command-item:hover,
 html[data-theme='dark'] .slash-command-item.selected {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
 html[data-theme='dark'] .slash-command-item[data-command-id='cancel']:hover,
@@ -46,7 +46,7 @@ html[data-theme='dark'] .slash-date-picker-day {
 
 html[data-theme='dark'] .slash-date-picker-nav:hover,
 html[data-theme='dark'] .slash-date-picker-day:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
 html[data-theme='dark'] .slash-date-picker-day.today {
@@ -105,7 +105,7 @@ html[data-theme='dark'] .slash-time-cell {
 }
 
 html[data-theme='dark'] .slash-time-cell:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
 html[data-theme='dark'] .slash-time-cell.selected,
@@ -132,7 +132,7 @@ html[data-theme='dark'] .slash-command-back {
 }
 
 html[data-theme='dark'] .slash-command-back:hover {
-    background-color: rgba(255, 255, 255, 0.08) !important;
+    background-color: rgba(var(--pz-highlight-rgb), 0.08) !important;
 }
 
 /* ============================================
@@ -150,7 +150,7 @@ html[data-theme='dark'] .image-menu-item {
 }
 
 html[data-theme='dark'] .image-menu-item:hover {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(var(--pz-highlight-rgb), 0.08);
     color: var(--dm-text);
 }
 
@@ -193,7 +193,7 @@ html[data-theme='dark'] img.img-with-border-no-padding {
 html[data-theme='dark'] .workspace-menu {
     background-color: var(--dm-surface);
     border-color: var(--dm-border);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.5);
 }
 
 html[data-theme='dark'] .workspace-menu-item {
@@ -215,7 +215,7 @@ html[data-theme='dark'] .workspace-menu-item i {
 }
 
 html[data-theme='dark'] .workspace-menu-item .workspace-menu-dot {
-    border-color: rgba(255, 255, 255, 0.18);
+    border-color: rgba(var(--pz-highlight-rgb), 0.18);
 }
 
 html[data-theme='dark'] .workspace-menu-item:hover i {
@@ -244,7 +244,7 @@ html[data-theme='dark'] .folder-actions-toggle:hover,
 html[data-theme='dark'] .note-actions-toggle:hover,
 html[data-theme='dark'] .note-actions-toggle.open,
 html[data-theme='dark'] .note-actions-item:hover {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(var(--pz-highlight-rgb), 0.12);
     color: var(--dm-text);
 }
 
@@ -268,7 +268,7 @@ html[data-theme='dark'] .folder-actions-menu,
 html[data-theme='dark'] .note-actions-menu {
     background: var(--dm-surface);
     border: 1px solid var(--dm-border);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 8px 24px rgba(var(--pz-shadow-rgb), 0.35);
 }
 
 html[data-theme='dark'] .folder-actions-menu-item,
@@ -356,7 +356,7 @@ html[data-theme='dark'] .export-option i {
 html[data-theme='dark'] .note-edit-toolbar .mobile-toolbar-menu {
     background: var(--dm-content-bg);
     border: 1px solid var(--dm-border);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 8px 24px rgba(var(--pz-shadow-rgb), 0.35);
 }
 
 html[data-theme='dark'] .note-edit-toolbar .dropdown-menu {
@@ -384,7 +384,7 @@ html[data-theme='dark'] .note-edit-toolbar .mobile-toolbar-item i {
 html[data-theme='dark'] .dropdown-menu {
     background-color: var(--dm-bg);
     border-color: var(--dm-border);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 16px rgba(var(--pz-shadow-rgb), 0.5);
 }
 
 html[data-theme='dark'] .dropdown-item {
@@ -414,7 +414,7 @@ html[data-theme='dark'] .emoji-autocomplete-menu {
 
 html[data-theme='dark'] .emoji-autocomplete-item:hover,
 html[data-theme='dark'] .emoji-autocomplete-item.selected {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
 html[data-theme='dark'] .emoji-autocomplete-name {
@@ -427,7 +427,7 @@ html[data-theme='dark'] .emoji-autocomplete-name {
 html[data-theme='dark'] .create-menu {
     background: var(--dm-surface);
     border: 1px solid var(--dm-border);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 8px 24px rgba(var(--pz-shadow-rgb), 0.35);
 }
 
 html[data-theme='dark'] .create-menu-item {

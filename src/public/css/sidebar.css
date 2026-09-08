@@ -151,7 +151,7 @@
     color: var(--pz-text-muted) !important;
 }
 
-/* .sidebar-plus:hover { background: rgba(0,0,0,0.04); color: var(--pz-accent-hover); } /* Display background button plus on hover */
+/* .sidebar-plus:hover { background: rgba(var(--pz-shadow-rgb), 0.04); color: var(--pz-accent-hover); } /* Display background button plus on hover */
 
 /* Make search bar full width of sidebar and align spacing with buttons */
 .searchbar-row {

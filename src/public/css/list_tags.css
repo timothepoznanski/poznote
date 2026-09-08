@@ -63,7 +63,7 @@ html.tags-page {
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(var(--pz-shadow-rgb), 0.1);
 }
 
 /* Classe pour masquer les tags lors du filtrage */
@@ -74,7 +74,7 @@ html.tags-page {
 .tag-item:hover {
     border-color: var(--pz-accent);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 8px rgba(var(--pz-shadow-rgb), 0.15);
 }
 
 .tag-name {
@@ -125,7 +125,7 @@ html.tags-page {
     border-radius: 50%;
     border: 2px solid transparent;
     background: var(--filter-color, transparent);
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(var(--pz-shadow-rgb), 0.12);
     cursor: pointer;
     padding: 0;
     transition: transform 0.15s, border-color 0.15s;
@@ -199,7 +199,7 @@ html[data-theme='dark'] .tag-color-filter-clear:hover {
     height: 34px;
     border-radius: 50%;
     border: 2px solid transparent;
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(var(--pz-shadow-rgb), 0.12);
     cursor: pointer;
     padding: 0;
     transition: transform 0.15s, border-color 0.15s;
@@ -252,7 +252,7 @@ html[data-theme='dark'] .tag-color-swatch.selected {
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
     border-radius: 8px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 16px rgba(var(--pz-shadow-rgb), 0.15);
     padding: 4px 0;
     min-width: 150px;
     font-family: 'Inter', sans-serif;
@@ -290,7 +290,7 @@ html[data-theme='dark'] .tag-color-swatch.selected {
 html[data-theme='dark'] .tag-context-menu {
     background: var(--dm-content-bg);
     border-color: var(--dm-border);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 16px rgba(var(--pz-shadow-rgb), 0.4);
 }
 
 html[data-theme='dark'] .tag-context-menu-item {

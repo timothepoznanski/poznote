@@ -161,7 +161,7 @@ pre.code-block .code-block-delete-btn,
 }
 
 .code-block-lang-btn:hover {
-    background: rgba(0, 0, 0, 0.06);
+    background: rgba(var(--pz-shadow-rgb), 0.06);
 }
 
 .code-block-lang-btn:focus-visible {
@@ -504,24 +504,24 @@ pre.code-block::-webkit-scrollbar-track,
 .noteentry pre::-webkit-scrollbar-thumb,
 pre.code-block::-webkit-scrollbar-thumb,
 .code-block::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.15);
+    background: rgba(var(--pz-shadow-rgb), 0.15);
     border-radius: 2px;
 }
 
 .noteentry pre::-webkit-scrollbar-thumb:hover,
 pre.code-block::-webkit-scrollbar-thumb:hover,
 .code-block::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.30);
+    background: rgba(var(--pz-shadow-rgb), 0.30);
 }
 
 html[data-theme='dark'] .noteentry pre::-webkit-scrollbar-thumb,
 html[data-theme='dark'] pre.code-block::-webkit-scrollbar-thumb,
 html[data-theme='dark'] .code-block::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(var(--pz-highlight-rgb), 0.2);
 }
 
 html[data-theme='dark'] .noteentry pre::-webkit-scrollbar-thumb:hover,
 html[data-theme='dark'] pre.code-block::-webkit-scrollbar-thumb:hover,
 html[data-theme='dark'] .code-block::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.35);
+    background: rgba(var(--pz-highlight-rgb), 0.35);
 }

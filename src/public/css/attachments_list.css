@@ -90,7 +90,7 @@ body.attachments-page {
 .file-type-filter:focus {
     outline: none;
     border-color: var(--pz-accent);
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
 }
 
 .thumbnails-toggle {

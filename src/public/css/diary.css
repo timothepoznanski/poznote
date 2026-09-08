@@ -120,7 +120,7 @@
 .diary-new-modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.45);
+    background: rgba(var(--pz-shadow-rgb), 0.45);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -131,7 +131,7 @@
 .diary-new-modal {
     background: var(--pz-bg);
     border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 10px 30px rgba(var(--pz-shadow-rgb), 0.25);
     width: min(92vw, 380px);
     padding: 18px 20px;
 }

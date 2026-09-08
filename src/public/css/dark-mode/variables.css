@@ -13,6 +13,14 @@
     --pz-accent-hover: #005a8a;
     /* Same colour as RGB channels, for tints: rgba(var(--pz-accent-rgb), 0.1) */
     --pz-accent-rgb: 0, 125, 184;
+    /* The two ends of the greyscale, used with an alpha to darken or lighten
+       whatever is under them: shadows, scrims and pressed states take the
+       shadow channel, raised surfaces and hairlines on a dark ground take the
+       highlight channel. They are channels, not colours, so they compose:
+       rgba(var(--pz-shadow-rgb), 0.15). A theme that is not built on pure
+       black and white re-points these two and every elevation follows. */
+    --pz-shadow-rgb: 0, 0, 0;
+    --pz-highlight-rgb: 255, 255, 255;
     /* Neutral palette of the light theme. Dark and black use --dm-* below. */
     /* Text scale, four steps. Contrast on white is 12.6 / 7.6 / 4.8 / 2.5, and
        the app used 62 different greys to express them. Pick by role, not by
@@ -35,7 +43,6 @@
     --pz-surface-hover: #f3f4f6;   /* hover rows and items */
     --pz-surface-sunken: #e9ecef;  /* wells, inset areas, table headers */
     --pz-danger: #dc3545;          /* destructive actions, errors */
-    --pz-link: #2e8cfa;            /* hyperlinks in notes */
     --pz-accent-strong: #0b4da6;   /* selected note/folder title in the sidebar */
     --pz-accent-soft: #e3f2fd;     /* active item background */
     --pz-success: #28a745;         /* success alerts, enabled states */
@@ -152,6 +159,7 @@
     --dm-border: #404040;
     --dm-border-light: #555555;
     --dm-accent: #4a9eff;
+    --dm-accent-rgb: 74, 158, 255;   /* tints of the dark accent */
     --dm-active: #1e3a5f;
     --dm-code-bg: #262424;
     --dm-tabbar-bg: #1e1e1e;

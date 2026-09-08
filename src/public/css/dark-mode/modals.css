@@ -4,7 +4,7 @@
 
 /* Modal overlay */
 html[data-theme='dark'] .modal {
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(var(--pz-shadow-rgb), 0.8);
 }
 
 /* Modal content base */
@@ -110,8 +110,8 @@ html[data-theme='dark'] .modal-buttons button.btn-cancel:hover {
 html[data-theme='dark'] #reminderModal .modal-content,
 html[data-theme='dark'] #taskDueModal .modal-content {
     background: linear-gradient(180deg, var(--dm-content-bg) 0%, var(--dm-content-bg) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.38);
+    border: 1px solid rgba(var(--pz-highlight-rgb), 0.06);
+    box-shadow: 0 18px 44px rgba(var(--pz-shadow-rgb), 0.38);
 }
 
 html[data-theme='dark'] #reminderModal .modal-content h3,
@@ -124,14 +124,14 @@ html[data-theme='dark'] #taskDueModal .reminder-datetime-input {
     background: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text-bright);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    box-shadow: inset 0 1px 0 rgba(var(--pz-highlight-rgb), 0.03);
     color-scheme: dark;
 }
 
 html[data-theme='dark'] #reminderModal .reminder-datetime-input:focus,
 html[data-theme='dark'] #taskDueModal .reminder-datetime-input:focus {
     border-color: var(--dm-accent);
-    box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.18);
+    box-shadow: 0 0 0 3px rgba(var(--dm-accent-rgb), 0.18);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-datetime-input::-webkit-calendar-picker-indicator,
@@ -166,7 +166,7 @@ html[data-theme='dark'] :is(#taskDueModal, #taskDueModal) .reminder-repeat-inter
     background: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text-bright);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    box-shadow: inset 0 1px 0 rgba(var(--pz-highlight-rgb), 0.03);
     color-scheme: dark;
 }
 
@@ -177,7 +177,7 @@ html[data-theme='dark'] :is(#taskDueModal, #taskDueModal) .reminder-repeat-unit:
 html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-interval:focus,
 html[data-theme='dark'] :is(#taskDueModal, #taskDueModal) .reminder-repeat-interval:focus {
     border-color: var(--dm-accent);
-    box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.18);
+    box-shadow: 0 0 0 3px rgba(var(--dm-accent-rgb), 0.18);
 }
 
 html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-label i,
@@ -188,7 +188,7 @@ html[data-theme='dark'] :is(#taskDueModal, #taskDueModal) .reminder-repeat-label
 html[data-theme='dark'] #reminderModal .reminder-email-option,
 html[data-theme='dark'] #taskDueModal .reminder-email-option {
     background: var(--dm-surface);
-    border-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(var(--pz-highlight-rgb), 0.08);
     color: var(--dm-text-bright);
 }
 
@@ -197,7 +197,7 @@ html[data-theme='dark'] #taskDueModal .reminder-email-option:hover,
 html[data-theme='dark'] #reminderModal .reminder-email-option:focus-within,
 html[data-theme='dark'] #taskDueModal .reminder-email-option:focus-within {
     background: var(--dm-surface);
-    border-color: rgba(74, 158, 255, 0.24);
+    border-color: rgba(var(--dm-accent-rgb), 0.24);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-email-title,
@@ -222,8 +222,8 @@ html[data-theme='dark'] #taskDueModal .reminder-repeat-hint {
 
 html[data-theme='dark'] #reminderModal .reminder-current-info,
 html[data-theme='dark'] #taskDueModal .reminder-current-info {
-    background: rgba(74, 158, 255, 0.11);
-    border: 1px solid rgba(74, 158, 255, 0.18);
+    background: rgba(var(--dm-accent-rgb), 0.11);
+    border: 1px solid rgba(var(--dm-accent-rgb), 0.18);
     color: var(--dm-accent-hover);
 }
 
@@ -271,8 +271,8 @@ html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-danger:hover 
 
 html[data-theme='dark'] #notificationsModal .modal-content {
     background: linear-gradient(180deg, var(--dm-content-bg) 0%, var(--dm-content-bg) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.38);
+    border: 1px solid rgba(var(--pz-highlight-rgb), 0.06);
+    box-shadow: 0 18px 44px rgba(var(--pz-shadow-rgb), 0.38);
 }
 
 html[data-theme='dark'] #notificationsModal .modal-content h3 {
@@ -281,7 +281,7 @@ html[data-theme='dark'] #notificationsModal .modal-content h3 {
 
 html[data-theme='dark'] #notificationsModal .notification-item {
     background: var(--dm-surface);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(var(--pz-highlight-rgb), 0.06);
 }
 
 html[data-theme='dark'] #notificationsModal .notification-item:hover {
@@ -289,16 +289,16 @@ html[data-theme='dark'] #notificationsModal .notification-item:hover {
 }
 
 html[data-theme='dark'] #notificationsModal .notification-item.unread {
-    background: rgba(74, 158, 255, 0.14);
-    border-color: rgba(74, 158, 255, 0.22);
+    background: rgba(var(--dm-accent-rgb), 0.14);
+    border-color: rgba(var(--dm-accent-rgb), 0.22);
 }
 
 html[data-theme='dark'] #notificationsModal .notification-item.unread:hover {
-    background: rgba(74, 158, 255, 0.2);
+    background: rgba(var(--dm-accent-rgb), 0.2);
 }
 
 html[data-theme='dark'] #notificationsModal .notification-icon {
-    background: rgba(74, 158, 255, 0.14);
+    background: rgba(var(--dm-accent-rgb), 0.14);
     color: var(--dm-accent-hover);
 }
 
@@ -377,7 +377,7 @@ html[data-theme='dark'] #moveFolderFilesModal select#moveFolderFilesTargetSelect
 html[data-theme='dark'] #moveFolderFilesModal select#moveFolderFilesTargetSelect:focus {
     outline: none;
     border-color: var(--dm-accent);
-    box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.25);
+    box-shadow: 0 0 0 2px rgba(var(--dm-accent-rgb), 0.25);
 }
 
 html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-cancel {
@@ -435,7 +435,7 @@ html[data-theme='dark'] #moveNotesModal select {
 html[data-theme='dark'] #moveNotesModal select:focus {
     outline: none;
     border-color: var(--dm-accent);
-    box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.25);
+    box-shadow: 0 0 0 2px rgba(var(--dm-accent-rgb), 0.25);
 }
 
 /* ============================================
@@ -465,7 +465,7 @@ html[data-theme='dark'] #moveNoteFolderModal .move-note-inline-create button.btn
 }
 
 html[data-theme='dark'] #moveNoteFolderModal .move-note-inline-create button.btn-cancel:hover {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
 html[data-theme='dark'] #moveNoteFolderModal .move-note-recent-folder {
@@ -476,7 +476,7 @@ html[data-theme='dark'] #moveNoteFolderModal .move-note-recent-folder {
 
 html[data-theme='dark'] #moveNoteFolderModal .move-note-recent-folder:hover,
 html[data-theme='dark'] #moveNoteFolderModal .move-note-recent-folder.is-selected {
-    background: rgba(74, 158, 255, 0.16);
+    background: rgba(var(--dm-accent-rgb), 0.16);
     border-color: var(--dm-accent);
     color: var(--dm-text-bright);
 }
@@ -507,7 +507,7 @@ html[data-theme='dark'] #renameModal input {
 html[data-theme='dark'] #renameModal input:focus {
     outline: none;
     border-color: var(--dm-accent);
-    box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.25);
+    box-shadow: 0 0 0 2px rgba(var(--dm-accent-rgb), 0.25);
 }
 
 /* ============================================
@@ -545,7 +545,7 @@ html[data-theme='dark'] #deleteModal input {
 html[data-theme='dark'] #deleteModal input:focus {
     outline: none;
     border-color: var(--dm-accent);
-    box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.25);
+    box-shadow: 0 0 0 2px rgba(var(--dm-accent-rgb), 0.25);
 }
 
 /* ============================================
@@ -725,8 +725,8 @@ html[data-theme='dark'] #deleteFolderModal .btn-cancel:hover {
 /* Snapshot Modal Dark Mode */
 html[data-theme='dark'] #snapshotModal .snapshot-modal-content {
     background: linear-gradient(180deg, var(--dm-content-bg) 0%, var(--dm-content-bg) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.38);
+    border: 1px solid rgba(var(--pz-highlight-rgb), 0.06);
+    box-shadow: 0 18px 44px rgba(var(--pz-shadow-rgb), 0.38);
 }
 
 html[data-theme='dark'] .snapshot-modal-header {
@@ -753,7 +753,7 @@ html[data-theme='dark'] #snapshotModal .snapshot-content-preview {
     border-color: var(--dm-border);
     background: var(--dm-content-bg) !important;
     color: var(--dm-text, var(--dm-text-bright)) !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+    box-shadow: inset 0 1px 0 rgba(var(--pz-highlight-rgb), 0.02);
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview h1,
@@ -841,7 +841,7 @@ html[data-theme='dark'] #snapshotModal .snapshot-date-secondary {
 }
 
 html[data-theme='dark'] .snapshot-date-btn:hover {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-state-title {
@@ -896,6 +896,6 @@ html[data-theme='dark'] .date-format-tokens {
 }
 
 html[data-theme='dark'] .date-format-tokens dt code {
-    background: rgba(255, 255, 255, 0.1) !important;
+    background: rgba(var(--pz-highlight-rgb), 0.1) !important;
     color: var(--dm-text) !important;
 }

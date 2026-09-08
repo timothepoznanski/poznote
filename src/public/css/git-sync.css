@@ -254,7 +254,7 @@ body.git-sync-page {
 html[data-theme='dark'] .git-sync-section {
     background: var(--dm-bg);
     border: 1px solid var(--dm-border);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.3);
 }
 
 html[data-theme='dark'] .git-sync-section h2 {

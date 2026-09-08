@@ -96,11 +96,11 @@
     flex: 1;
     min-width: 0;
     overflow: visible;
-    color: rgb(55, 53, 47) !important;
+    color: var(--pz-text) !important;
 }
 
 .name_tags * {
-    color: rgb(55, 53, 47) !important;
+    color: var(--pz-text) !important;
 }
 
 .name_tags input:focus {
@@ -219,7 +219,7 @@
 }
 
 .clickable-tag-wrapper.tag-highlight .tag-delete-button {
-    background: rgba(0, 0, 0, 0.06);
+    background: rgba(var(--pz-shadow-rgb), 0.06);
     border-radius: 4px;
     color: var(--pz-warning-strong);
 }
@@ -341,7 +341,7 @@ html[data-theme='dark'] .tags-modal-item-name {
 }
 
 html[data-theme='dark'] .tags-modal-item-name:focus {
-    background: rgba(74, 158, 255, 0.2);
+    background: rgba(var(--dm-accent-rgb), 0.2);
     box-shadow: 0 0 0 1px var(--dm-accent);
 }
 

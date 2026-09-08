@@ -17,7 +17,7 @@
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
     border-radius: 10px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 12px 30px rgba(var(--pz-shadow-rgb), 0.12);
     padding: 6px;
     opacity: 0;
     transform: translateY(6px);
@@ -103,7 +103,7 @@
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
     border-radius: 10px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 12px 30px rgba(var(--pz-shadow-rgb), 0.12);
     padding: 10px;
     user-select: none;
 }

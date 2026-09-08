@@ -22,7 +22,7 @@
     height: 56px;
     border-radius: 14px;
     margin-bottom: 12px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 2px 10px rgba(var(--pz-shadow-rgb), 0.12);
 }
 
 .welcome-setup-hero h3 {

@@ -324,7 +324,7 @@ body.tasks-page {
     align-items: flex-start;
     gap: 10px;
     padding: 8px 4px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    border-bottom: 1px solid rgba(var(--pz-shadow-rgb), 0.04);
     cursor: pointer;
 }
 
@@ -921,7 +921,7 @@ html[data-theme="dark"]:has(body.tasks-page) {
 }
 
 [data-theme="dark"] .tasks-task-item {
-    border-bottom-color: rgba(255, 255, 255, 0.06);
+    border-bottom-color: rgba(var(--pz-highlight-rgb), 0.06);
 }
 
 [data-theme="dark"] .tasks-task-item.completed .tasks-task-text {
@@ -984,8 +984,8 @@ html[data-theme="dark"]:has(body.tasks-page) {
 
 /* Translucent white separators stay visible over both dark palettes */
 [data-theme="dark"] .tasks-cal-grid {
-    border-color: rgba(255, 255, 255, 0.18);
-    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(var(--pz-highlight-rgb), 0.18);
+    background: rgba(var(--pz-highlight-rgb), 0.18);
 }
 
 [data-theme="dark"] .tasks-cal-weekday,

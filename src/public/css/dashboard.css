@@ -668,7 +668,7 @@ body.dashboard-page {
     background: var(--pz-bg);
     border: 1.5px solid var(--pz-border);
     border-radius: 10px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 6px 20px rgba(var(--pz-shadow-rgb), 0.12);
 }
 
 .dashboard-color-filter-menu[hidden] {
@@ -706,7 +706,7 @@ body.dashboard-page {
 :root[data-theme='dark'] .dashboard-color-filter-menu {
     background: var(--dm-surface);
     border-color: var(--dm-border);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 6px 20px rgba(var(--pz-shadow-rgb), 0.5);
 }
 
 :root[data-theme='dark'] .dashboard-color-filter-item {
@@ -766,7 +766,7 @@ body.dashboard-page {
     height: 18px;
     border-radius: 50%;
     flex-shrink: 0;
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(var(--pz-shadow-rgb), 0.12);
 }
 
 .note-color-name {
@@ -1293,7 +1293,7 @@ body.dashboard-page .notifications-empty i {
 
 :root[data-theme='dark'] .dash-card:hover {
     border-color: var(--pz-accent);
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 3px 12px rgba(var(--pz-shadow-rgb), 0.35);
 }
 
 /* Note color tint, dark theme: the same hue mixed into the dark surface
@@ -1306,7 +1306,7 @@ body.dashboard-page .notifications-empty i {
 :root[data-theme='dark'] .dash-card.has-note-color:hover {
     background: color-mix(in srgb, var(--note-color) 30%, var(--dm-surface));
     border-color: color-mix(in srgb, var(--note-color) 75%, var(--dm-surface));
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 3px 12px rgba(var(--pz-shadow-rgb), 0.45);
 }
 
 :root[data-theme='dark'] .dash-card.has-note-color .board-card-tag {
@@ -1343,11 +1343,11 @@ body.dashboard-page .notifications-empty i {
 }
 
 :root[data-theme='dark'] .dash-card-thumb {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(var(--pz-highlight-rgb), 0.06);
 }
 
 :root[data-theme='dark'] .dash-card-thumb::after {
-    border-color: rgba(255, 255, 255, 0.18);
+    border-color: rgba(var(--pz-highlight-rgb), 0.18);
 }
 
 :root[data-theme='dark'] .board-view-btn {
@@ -1541,7 +1541,7 @@ body.dashboard-page .notifications-empty i {
     height: 9px;
     border-radius: 50%;
     flex-shrink: 0;
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(var(--pz-shadow-rgb), 0.12);
 }
 
 .dash-group-dot,
@@ -1552,7 +1552,7 @@ body.dashboard-page .notifications-empty i {
 }
 
 :root[data-theme='dark'] .dash-ws-dot {
-    border-color: rgba(255, 255, 255, 0.18);
+    border-color: rgba(var(--pz-highlight-rgb), 0.18);
 }
 
 /* Workspace crumb ahead of the folder path */
@@ -1848,7 +1848,7 @@ body.dashboard-page .notifications-empty i {
 
 :root[data-theme='dark'] .dash-group-tag {
     color: var(--dm-text-bright);
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
 :root[data-theme='dark'] .dashboard-scope-section-title,

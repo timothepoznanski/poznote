@@ -240,7 +240,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(var(--pz-shadow-rgb), 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -251,7 +251,7 @@
 .calendar-notes-modal {
     background: var(--pz-bg);
     border-radius: 8px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 40px rgba(var(--pz-shadow-rgb), 0.2);
     max-width: 500px;
     width: 100%;
     max-height: 80vh;
@@ -302,7 +302,7 @@
 .calendar-note-item:hover {
     background: var(--pz-surface-hover);
     border-color: var(--pz-accent);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 4px rgba(var(--pz-shadow-rgb), 0.05);
 }
 
 .calendar-note-title {

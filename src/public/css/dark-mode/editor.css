@@ -41,7 +41,7 @@ html[data-theme='dark'] .note-scroll-edge-btn {
     background: rgba(51, 51, 51, 0.96);
     border-color: var(--dm-border);
     color: var(--dm-accent);
-    box-shadow: 0 5px 14px rgba(0, 0, 0, 0.26);
+    box-shadow: 0 5px 14px rgba(var(--pz-shadow-rgb), 0.26);
 }
 
 html[data-theme='dark'] .note-scroll-edge-btn:hover,
@@ -314,7 +314,7 @@ html[data-theme='dark'] .color-palette-popup .color-grid {
 /* Outline swatches so dark ones (e.g. the black text color) stay visible
    against the dark popup background. */
 html[data-theme='dark'] .color-palette-popup .color-swatch {
-    border: 1px solid rgba(255, 255, 255, 0.35);
+    border: 1px solid rgba(var(--pz-highlight-rgb), 0.35);
 }
 
 /* Font size popup */
@@ -324,7 +324,7 @@ html[data-theme='dark'] .font-size-popup {
 }
 
 html[data-theme='dark'] .font-size-popup .font-size-item:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(var(--pz-highlight-rgb), 0.1);
 }
 
 html[data-theme='dark'] .font-size-popup .size-preview {

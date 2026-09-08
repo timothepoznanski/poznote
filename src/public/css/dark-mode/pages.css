@@ -46,7 +46,7 @@ html[data-theme='dark'] .poznote-page-title-workspace-static:hover {
 html[data-theme='dark'] .poznote-page-title-workspace-menu {
     background: var(--dm-surface);
     border-color: var(--dm-border);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 6px 20px rgba(var(--pz-shadow-rgb), 0.5);
 }
 
 html[data-theme='dark'] .poznote-page-title-workspace-item {
@@ -69,7 +69,7 @@ html[data-theme='dark'] .poznote-page-title-workspace-item-action .lucide {
 }
 
 html[data-theme='dark'] .poznote-page-title-workspace-dot {
-    border-color: rgba(255, 255, 255, 0.18);
+    border-color: rgba(var(--pz-highlight-rgb), 0.18);
 }
 
 html[data-theme='dark'] .poznote-page-title-workspace-dot-none {
@@ -222,7 +222,7 @@ html[data-theme='dark'] .workspace-item {
 
 html[data-theme='dark'] .workspace-item:hover {
     background-color: var(--dm-surface);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.4);
 }
 
 /* ============================================
@@ -384,7 +384,7 @@ html[data-theme='dark'] .form-select-styled {
 
 html[data-theme='dark'] .form-select-styled:focus {
     border-color: var(--dm-accent);
-    box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.2);
+    box-shadow: 0 0 0 3px rgba(var(--dm-accent-rgb), 0.2);
 }
 
 html[data-theme='dark'] .form-file-input {
@@ -426,11 +426,11 @@ html[data-theme='dark'] .backup-section input[type="file"]::file-selector-button
 html[data-theme='dark'] .card-container {
     background-color: var(--dm-content-bg);
     border-color: var(--dm-border);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.3);
 }
 
 html[data-theme='dark'] .card-container:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 16px rgba(var(--pz-shadow-rgb), 0.4);
     border-color: var(--pz-accent);
 }
 

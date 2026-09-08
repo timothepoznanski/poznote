@@ -20,7 +20,7 @@
 :root[data-theme='dark'] .mini-calendar-nav:hover,
 :root[data-theme='dark'] .mini-calendar-today:hover,
 :root[data-theme='dark'] .mini-calendar-toggle:hover {
-    background: rgba(74, 158, 255, 0.15);
+    background: rgba(var(--dm-accent-rgb), 0.15);
     color: var(--dm-accent, var(--dm-accent));
 }
 
@@ -29,7 +29,7 @@
 }
 
 :root[data-theme='dark'] .mini-calendar-day:not(.mini-calendar-day-empty):hover {
-    background: rgba(74, 158, 255, 0.1);
+    background: rgba(var(--dm-accent-rgb), 0.1);
 }
 
 :root[data-theme='dark'] .mini-calendar-day-number {
@@ -38,7 +38,7 @@
 
 /* Today indicator in dark mode */
 :root[data-theme='dark'] .mini-calendar-day-today {
-    background: rgba(74, 158, 255, 0.2);
+    background: rgba(var(--dm-accent-rgb), 0.2);
     border: 1px solid var(--dm-accent, var(--dm-accent));
 }
 
@@ -58,7 +58,7 @@
 
 /* Days with notes in dark mode */
 :root[data-theme='dark'] .mini-calendar-day-has-notes:hover {
-    background: rgba(74, 158, 255, 0.15);
+    background: rgba(var(--dm-accent-rgb), 0.15);
 }
 
 :root[data-theme='dark'] .mini-calendar-day-has-notes .mini-calendar-day-number {
@@ -84,12 +84,12 @@
 }
 
 :root[data-theme='dark'] .calendar-note-item {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(var(--pz-highlight-rgb), 0.05);
     border-color: var(--dm-border, var(--dm-border));
 }
 
 :root[data-theme='dark'] .calendar-note-item:hover {
-    background: rgba(74, 158, 255, 0.1);
+    background: rgba(var(--dm-accent-rgb), 0.1);
     border-color: var(--dm-accent, var(--dm-accent));
 }
 

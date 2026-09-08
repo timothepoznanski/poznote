@@ -93,7 +93,7 @@ html[data-theme='dark'] .markdown-preview .markdown-task-checkbox {
 
 /* Click-to-navigate hover in split mode */
 html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview [data-line]:not(.markdown-task-checkbox):not(summary):not(details):hover {
-    background-color: rgba(74, 158, 255, 0.1);
+    background-color: rgba(var(--dm-accent-rgb), 0.1);
 }
 
 html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor {
@@ -125,12 +125,12 @@ html[data-theme='dark'] .markdown-codemirror-host .cm-editor {
 }
 
 html[data-theme='dark'] .markdown-codemirror-host .cm-activeLine {
-    background: rgba(74, 158, 255, 0.12);
+    background: rgba(var(--dm-accent-rgb), 0.12);
 }
 
 html[data-theme='dark'] .markdown-codemirror-host .cm-selectionBackground,
 html[data-theme='dark'] .markdown-codemirror-host .cm-focused .cm-selectionBackground {
-    background: rgba(74, 158, 255, 0.28);
+    background: rgba(var(--dm-accent-rgb), 0.28);
 }
 
 html[data-theme='dark'] .markdown-codemirror-host .cm-placeholder {

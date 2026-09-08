@@ -231,7 +231,7 @@ body.graph-page {
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
     border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.12);
     font-size: 13px;
     pointer-events: none;
     z-index: 10;
@@ -358,7 +358,7 @@ html[data-theme="dark"] .graph-node.search-hit circle {
 html[data-theme="dark"] .graph-tooltip {
     background: var(--dm-surface, var(--dm-surface));
     border-color: var(--dm-border, var(--dm-border));
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.4);
 }
 
 html[data-theme="dark"] .graph-tooltip-title {

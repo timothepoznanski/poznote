@@ -327,7 +327,7 @@
 [data-theme="dark"] .ui-custom-filter-input,
 .dark-mode .ui-custom-filter-input {
     background: var(--dm-content-bg);
-    border-color: rgba(255, 255, 255, 0.14);
+    border-color: rgba(var(--pz-highlight-rgb), 0.14);
     color: var(--dm-text-bright);
 }
 
@@ -338,18 +338,18 @@
 
 [data-theme="dark"] .ui-custom-empty,
 .dark-mode .ui-custom-empty {
-    border-color: rgba(255, 255, 255, 0.14);
+    border-color: rgba(var(--pz-highlight-rgb), 0.14);
     color: var(--dm-text-muted);
 }
 
 [data-theme="dark"] .ui-custom-section-title,
 .dark-mode .ui-custom-section-title {
-    border-bottom-color: rgba(255, 255, 255, 0.1);
+    border-bottom-color: rgba(var(--pz-highlight-rgb), 0.1);
 }
 
 [data-theme="dark"] .ui-custom-item:hover,
 .dark-mode .ui-custom-item:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
 /* Items hidden for everyone by the administrator (locked in user mode) */

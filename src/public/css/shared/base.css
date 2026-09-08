@@ -163,7 +163,7 @@ body.shared-page {
     white-space: nowrap;
     border: 1px solid rgba(148, 163, 184, 0.34);
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.76);
+    background: rgba(var(--pz-highlight-rgb), 0.76);
     color: var(--text-muted, var(--pz-text-muted));
     box-shadow: none;
 }
@@ -182,7 +182,7 @@ body.shared-page {
 }
 
 .shared-filter-tree-actions .btn:focus-visible {
-    outline: 2px solid rgba(0, 123, 255, 0.22);
+    outline: 2px solid rgba(var(--pz-accent-rgb), 0.22);
     outline-offset: 2px;
 }
 
@@ -199,7 +199,7 @@ body.shared-page {
     .shared-filter-tree-actions .btn:not(:disabled):active,
     .shared-filter-tree-actions .btn:not(:disabled):focus {
         border-color: rgba(148, 163, 184, 0.34);
-        background: rgba(255, 255, 255, 0.76);
+        background: rgba(var(--pz-highlight-rgb), 0.76);
         color: var(--text-muted, var(--pz-text-muted));
         box-shadow: none;
         outline: none;
@@ -228,7 +228,7 @@ body.shared-page {
 .filter-input:focus {
     outline: none;
     border-color: var(--pz-accent);
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
 }
 
 .filter-input::placeholder {

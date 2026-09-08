@@ -223,7 +223,7 @@ pre.code-block:not([data-language])::before {
     padding: 2px 8px;
     font-size: 0.75em;
     color: var(--pz-text-muted);
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(var(--pz-shadow-rgb), 0.05);
     border-bottom-right-radius: 4px;
     text-transform: uppercase;
     font-weight: 500;
@@ -252,7 +252,7 @@ html[data-theme="dark"] pre[data-language]::before,
 html[data-theme="dark"] pre:has(code[data-language])::before,
 html[data-theme="dark"] pre.code-block:not([data-language])::before {
     color: var(--dm-text-bright);
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(var(--pz-highlight-rgb), 0.12);
 }
 
 /* Style code blocks with language class */

@@ -4,7 +4,7 @@
 
 /* ---- Reminder button in toolbar ---- */
 .btn-reminder.has-reminder {
-    color: var(--pz-link) !important;
+    color: var(--pz-accent) !important;
 }
 
 .btn-reminder.has-reminder i {
@@ -111,7 +111,7 @@
 .reminder-repeat-label i {
     width: 16px;
     height: 16px;
-    color: var(--pz-link);
+    color: var(--pz-accent);
     flex-shrink: 0;
 }
 
@@ -227,7 +227,7 @@
 .reminder-email-title i {
     width: 16px;
     height: 16px;
-    color: var(--pz-link);
+    color: var(--pz-accent);
     flex-shrink: 0;
 }
 
@@ -250,7 +250,7 @@
     background: rgba(74, 144, 217, 0.08);
     border-radius: 6px;
     font-size: 13px;
-    color: var(--pz-link);
+    color: var(--pz-accent);
     margin: 8px 0;
 }
 
@@ -341,7 +341,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--pz-link);
+    color: var(--pz-accent);
 }
 
 .notification-icon i {
@@ -453,7 +453,7 @@
 
 #notificationsModal .notification-icon {
     flex-shrink: 0;
-    color: var(--pz-link);
+    color: var(--pz-accent);
 }
 
 #notificationsModal .notification-text {

@@ -3,7 +3,7 @@
 html[data-theme='dark'] .kanban-column {
     background: var(--dm-bg);
     border-color: var(--dm-border);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 6px -1px rgba(var(--pz-shadow-rgb), 0.4);
 }
 
 html[data-theme='dark'] .kanban-column-header {
@@ -57,13 +57,13 @@ html[data-theme='dark'] .kanban-sort-toggle:hover {
 html[data-theme='dark'] .kanban-card {
     background: var(--dm-surface);
     border-color: var(--dm-border);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 1px 3px rgba(var(--pz-shadow-rgb), 0.4);
 }
 
 html[data-theme='dark'] .kanban-card:hover {
     border-color: var(--dm-neutral);
     background: var(--dm-surface);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 6px -1px rgba(var(--pz-shadow-rgb), 0.5);
 }
 
 html[data-theme='dark'] .kanban-card-meta {
@@ -180,7 +180,7 @@ html[data-theme='dark'] .kanban-subfolder-section {
 }
 
 html[data-theme='dark'] .kanban-subfolder-toggle:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(var(--pz-highlight-rgb), 0.06);
 }
 
 html[data-theme='dark'] .kanban-subfolder-count {

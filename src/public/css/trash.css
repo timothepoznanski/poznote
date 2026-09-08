@@ -197,7 +197,7 @@ body.trash-page {
     background-color: var(--pz-bg);
     color: var(--pz-accent);
     font-weight: 600;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 2px rgba(var(--pz-shadow-rgb), 0.08);
 }
 
 .trash-buttons-container {
@@ -221,12 +221,12 @@ body.trash-page {
     border-radius: 10px;
     background: var(--pz-bg);
     font-family: 'Inter', sans-serif;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 3px rgba(var(--pz-shadow-rgb), 0.04);
     transition: box-shadow 0.15s ease;
 }
 
 .trash-notecard:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.08);
 }
 
 .trash-innernote {
@@ -329,7 +329,7 @@ body.trash-page {
     right: 0;
     bottom: 0;
     height: 60px;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), var(--pz-bg));
+    background: linear-gradient(to bottom, rgba(var(--pz-highlight-rgb), 0), var(--pz-bg));
     pointer-events: none;
 }
 
@@ -585,7 +585,7 @@ body.trash-page {
     .trash-notecard {
         margin-bottom: 20px;
         border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.1);
     }
 
     .trash-innernote {
@@ -726,11 +726,11 @@ html[data-theme='dark'] .trash-delete-btn:hover .lucide {
 
 /* The card's inner surface is --dm-content-bg (see dark-mode/pages.css .trash-innernote) */
 html[data-theme='dark'] .trash-preview-fade {
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0), var(--dm-content-bg));
+    background: linear-gradient(to bottom, rgba(var(--pz-shadow-rgb), 0), var(--dm-content-bg));
 }
 
 html[data-theme='dark'] .trash-expand-btn:hover {
-    background: rgba(74, 158, 255, 0.1);
+    background: rgba(var(--dm-accent-rgb), 0.1);
 }
 
 html[data-theme='dark'] .trash-expand-btn {

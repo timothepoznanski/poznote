@@ -208,7 +208,7 @@
     color: var(--pz-text-inverse);
     font-size: 18px;
     font-weight: bold;
-    text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 0 3px rgba(var(--pz-shadow-rgb), 0.5);
 }
 
 .folder-color-option.selected .folder-color-default::after {

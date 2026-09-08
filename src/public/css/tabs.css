@@ -96,7 +96,7 @@
 }
 
 .app-tab-close:hover {
-    background: rgba(0, 0, 0, 0.08);
+    background: rgba(var(--pz-shadow-rgb), 0.08);
     color: var(--pz-text);
 }
 
@@ -194,7 +194,7 @@ body.app-tab-reordering {
     transition: none !important;
     z-index: 2;
     opacity: 0.9;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 4px 10px rgba(var(--pz-shadow-rgb), 0.18);
     /* Let the tab under the cursor keep its hover state instead of the
        floating copy stealing it. */
     pointer-events: none;
@@ -207,7 +207,7 @@ body.app-tab-reordering {
     background: var(--pz-bg);
     border: 1px solid var(--pz-border-strong);
     border-radius: 8px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 15px -3px rgba(var(--pz-shadow-rgb), 0.1), 0 4px 6px -2px rgba(var(--pz-shadow-rgb), 0.05);
     min-width: 160px;
     padding: 4px 0;
     z-index: 99999;
@@ -299,7 +299,7 @@ body.app-tab-reordering {
 }
 
 [data-theme="dark"] .app-tab-close:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(var(--pz-highlight-rgb), 0.1);
     color: var(--dm-text-bright);
 }
 
@@ -316,13 +316,13 @@ body.app-tab-reordering {
 }
 
 [data-theme="dark"] .app-tab.app-tab-dragging {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.5);
 }
 
 [data-theme="dark"] .app-tab-context-menu {
     background: var(--dm-content-bg);
     border-color: var(--dm-surface-hover);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.4);
 }
 
 [data-theme="dark"] .app-tab-context-item {

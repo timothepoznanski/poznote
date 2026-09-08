@@ -81,7 +81,7 @@ a.links_arbo_left .note-title.tree-inline-editing,
     background: var(--dm-surface);
     color: var(--dm-text);
     border-color: var(--dm-accent);
-    box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2);
+    box-shadow: 0 0 0 2px rgba(var(--dm-accent-rgb), 0.2);
 }
 
 :root[data-theme='dark'] .tree-inline-input::placeholder {

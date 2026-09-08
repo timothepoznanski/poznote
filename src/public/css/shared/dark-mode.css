@@ -82,7 +82,7 @@
 }
 
 [data-theme="dark"] .shared-notes-header {
-    border-bottom-color: rgba(255, 255, 255, 0.12);
+    border-bottom-color: rgba(var(--pz-highlight-rgb), 0.12);
 }
 
 [data-theme="dark"] .shared-notes-header-cell {
@@ -102,7 +102,7 @@
 }
 
 [data-theme="dark"] .note-actions .btn-primary {
-    background: rgba(74, 158, 255, 0.14);
+    background: rgba(var(--dm-accent-rgb), 0.14);
     color: var(--dm-accent);
 }
 
@@ -215,18 +215,18 @@
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-modal-content {
     background: linear-gradient(180deg, var(--dm-content-bg) 0%, var(--dm-content-bg) 100%);
-    border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 28px 64px rgba(0, 0, 0, 0.48);
+    border-color: rgba(var(--pz-highlight-rgb), 0.08);
+    box-shadow: 0 28px 64px rgba(var(--pz-shadow-rgb), 0.48);
 }
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title {
     background: linear-gradient(180deg, rgba(102, 179, 255, 0.12), rgba(102, 179, 255, 0.02));
-    border-bottom-color: rgba(255, 255, 255, 0.08);
+    border-bottom-color: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-modal-actions {
-    border-top-color: rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.02);
+    border-top-color: rgba(var(--pz-highlight-rgb), 0.08);
+    background: rgba(var(--pz-highlight-rgb), 0.02);
 }
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value input,
@@ -270,16 +270,16 @@
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .share-protocol-wrap,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .share-indexable-wrap,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .share-restrict-users-wrap {
-    border-top-color: rgba(255, 255, 255, 0.08);
+    border-top-color: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .share-user-list-container {
-    background: rgba(255, 255, 255, 0.03);
-    border-color: rgba(255, 255, 255, 0.08);
+    background: rgba(var(--pz-highlight-rgb), 0.03);
+    border-color: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .share-user-list-row + .share-user-list-row {
-    border-top-color: rgba(255, 255, 255, 0.08);
+    border-top-color: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .share-user-list-message,
