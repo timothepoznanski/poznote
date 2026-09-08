@@ -102,8 +102,54 @@ foreach ($files as $file) {
     }
 }
 
+// ---------------------------------------------------------------------------
+// Colour ratchet.
+//
+// The stylesheets went from 3,178 hardcoded colours to a couple of hundred, and
+// what is left is deliberate: a video letterbox that must stay black, the text
+// on a yellow search highlight, a handful of one-off component shades. Without
+// a floor the count creeps straight back up, one pasted snippet at a time, and
+// the app stops being themeable again. This fails when a change ADDS colours.
+//
+// Raising the baseline is allowed but has to be a decision: put the new number
+// in tools/css-check.baseline.json and say in the commit message why the colour
+// could not be a token.
+$baselineFile = __DIR__ . '/css-check.baseline.json';
+$baseline = is_file($baselineFile)
+    ? (json_decode(file_get_contents($baselineFile), true)['colour_literals'] ?? null)
+    : null;
+
+$literals = 0;
+$inComponents = [];
+foreach ($files as $file) {
+    if (str_ends_with($file, 'dark-mode/variables.css')) {
+        continue;                       // the palette itself, where colours belong
+    }
+    $css = preg_replace('!/\*.*?\*/!s', '', (string) file_get_contents($file));
+    $css = preg_replace('/^\s*--[\w-]+\s*:[^;]*;/m', '', $css);   // token definitions
+    $n = preg_match_all('/#[0-9a-fA-F]{3,8}\b|(?<![\w-])(?:white|black)(?![\w-])/', $css);
+    $literals += $n;
+    if ($n > 0 && str_contains($file, '/components/')) {
+        $inComponents[] = ($n) . ' in ' . basename($file);
+    }
+}
+
+// A shared component base has no excuse: it is the layer a palette most needs
+// to reach, so it must be entirely made of tokens.
+if ($inComponents) {
+    echo "css/components/ must contain no colour literal: " . implode(', ', $inComponents) . "\n";
+    $errors++;
+}
+if ($baseline !== null && $literals > $baseline) {
+    echo "colour literals: $literals, up from $baseline. Use a token, or raise the "
+       . "baseline in tools/css-check.baseline.json and say why in the commit.\n";
+    $errors++;
+} elseif ($baseline !== null && $literals < $baseline) {
+    echo "colour literals: $literals (baseline $baseline) — lower the baseline to hold the gain\n";
+}
+
 if ($errors === 0) {
-    echo count($files) . " stylesheet(s) balanced\n";
+    echo count($files) . " stylesheet(s) balanced, $literals colour literal(s)\n";
     exit(0);
 }
 exit(2);

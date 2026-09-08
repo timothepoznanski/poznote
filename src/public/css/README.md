@@ -95,7 +95,19 @@ reach: a palette could darken a page and leave its fields glowing. Checkboxes,
 radios, colour pickers and ranges are deliberately absent, the browser paints
 them and a background there breaks their native rendering.
 
-`tools/css-check.php` does not enforce this yet, so it is on review.
+`tools/css-check.php` runs in CI and holds three lines:
+
+- brace and comment balance, because the stylesheets are concatenated at request
+  time and one unclosed brace silently kills every rule after it in the bundle;
+- no `body.dark-mode` / `body.black-mode` selector, so the theme keeps one carrier;
+- a colour ratchet. `tools/css-check.baseline.json` holds the number of colour
+  literals left outside the palette file, and the check fails when a change adds
+  any. Raising it is allowed but has to be a decision, written in the commit.
+  `css/components/` is stricter still: a shared base must be entirely tokens,
+  since it is the layer a palette most needs to reach.
+
+What it does not check is that a page rule only ADDS to a component base. That
+one is still on review.
 
 ## Writing a palette
 
