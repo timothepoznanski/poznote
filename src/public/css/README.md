@@ -8,8 +8,9 @@ themes work and which variables a custom stylesheet can rely on.
 
 | Path | What it styles |
 |---|---|
+| `tokens.css` | every design token: the colour palette for the three themes, and `--left-col-width`. The one stylesheet every page loads, and the file a theme overrides. |
 | `components/` | shared component bases, loaded before the page stylesheets on every page (`@components` in the manifest). A page may add properties on top; it must not redefine what the base owns. |
-| `base.css`, `layout.css`, `utilities.css`, `variables.css` | index.php shell: fonts, columns, hide/show helpers |
+| `base.css`, `layout.css`, `utilities.css` | index.php shell: fonts, columns, hide/show helpers |
 | `sidebar.css`, `icon-sidebar*.css`, `searchbars.css`, `menus.css`, `toolbar.css`, `tabs.css`, `outline.css` | left column, icon rail, menus, note toolbar, tab bar |
 | `notes/`, `folders/` | note rows and folder rows of the sidebar tree, note editor (`notes/noteentry.css`), folder/note action menus (`folders/actions-menu.css`) |
 | `modals/`, `modal-alerts.css` | dialogs shared by index.php and the standalone pages |
@@ -66,7 +67,7 @@ themes work and which variables a custom stylesheet can rely on.
   specificity; they are kept only so an admin's custom stylesheet written
   against them keeps working.
 - Light values are the defaults in each component file. Dark overrides live in
-  `dark-mode/*.css` (index order: variables, layout, menus, editor, modals,
+  `dark-mode/*.css` (index order: layout, menus, editor, modals,
   components, pages, markdown, kanban, icons, calendar) or, for page-specific
   files, next to the light rules in the same file.
 - The black theme only swaps the `--dm-*` values (`tokens.css`),
