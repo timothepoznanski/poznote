@@ -397,7 +397,7 @@ html[data-theme='dark'] .outline-nav-link {
 }
 
 html.theme-black[data-theme='dark'] .outline-nav-link {
-    color: #66778f;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .outline-nav-link:hover {

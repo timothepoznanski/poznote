@@ -167,6 +167,16 @@ html.theme-black[data-theme='dark'] {
     --dm-text: #c0c8d4;
     --dm-text-muted: #9ba6b5;
     --dm-text-subtle: #818a96;
+    /* The neutral controls in this theme's own blue-grey. They were inherited
+       from the dark theme, whose greys are neutral, so a secondary button or a
+       scrollbar sat as a flat grey inside a blue-grey interface. Same lightness,
+       so nothing about the contrast changes. The status colours are NOT
+       overridden: a red is a red in both dark themes. */
+    --dm-neutral: #5f636a;
+    --dm-neutral-hover: #71747b;
+    --dm-disabled: #474a52;
+    --dm-scrollbar: #474a52;
+    --dm-scrollbar-hover: #5f636a;
     --dm-bg: #0f1117;
     --dm-content-bg: #141821;
     --dm-sidebar-bg: #0b0d12;

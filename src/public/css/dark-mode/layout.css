@@ -205,15 +205,15 @@ html[data-theme='dark'] .note-title {
 
 /* Black theme - sidebar note and folder name colors */
 html.theme-black[data-theme='dark'] .note-title {
-    color: #66778f;
+    color: var(--dm-text-subtle);
 }
 
 html.theme-black[data-theme='dark'] .links_arbo_left {
-    color: #66778f;
+    color: var(--dm-text-subtle);
 }
 
 html.theme-black[data-theme='dark'] .folder-name {
-    color: #66778f;
+    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .lastupdated {
