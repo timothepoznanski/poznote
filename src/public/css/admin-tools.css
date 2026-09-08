@@ -19,7 +19,7 @@
 }
 .dr-hero p {
     margin: 0;
-    color: var(--text-secondary, #666);
+    color: #666;
     font-size: 0.95rem;
     max-width: 520px;
     margin: 0 auto;
@@ -46,7 +46,7 @@ html[data-theme='dark'] .dr-hero p {
     width: 100%; 
     border-collapse: collapse; 
     margin-top: 20px; 
-    color: var(--text-primary); 
+    color: var(--pz-text); 
     background: var(--bg-color, #fff);
     border: 1.5px solid var(--border-color, #e5e7eb);
     border-radius: 12px;
@@ -96,7 +96,7 @@ html[data-theme='dark'] .deletion-notice {
     border-radius: 6px;
     font-size: 0.85rem;
     cursor: pointer;
-    color: var(--text-primary);
+    color: var(--pz-text);
     transition: all 0.2s;
 }
 
@@ -164,7 +164,7 @@ html[data-theme='dark'] .btn-view-files:hover {
     margin: 0;
     font-size: 1.1rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--pz-text);
 }
 
 .orphan-modal-close {
@@ -187,7 +187,7 @@ html[data-theme='dark'] .btn-view-files:hover {
 
 .orphan-modal-close:hover {
     background: var(--hover-bg, #f5f5f5);
-    color: var(--text-primary);
+    color: var(--pz-text);
 }
 
 .orphan-modal-body {
@@ -220,7 +220,7 @@ html[data-theme='dark'] .btn-view-files:hover {
 }
 
 .orphan-files-ul li strong {
-    color: var(--text-primary);
+    color: var(--pz-text);
 }
 
 @media (max-width: 640px) {

@@ -29,7 +29,7 @@
 }
 
 .modal-content {
-    background-color: var(--modal-bg, #ffffff);
+    background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     max-width: 500px;
@@ -313,7 +313,7 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-modal-actions {
     margin-bottom: -20px;
     padding: 14px 20px 20px;
     border-top: 1px solid var(--border-color, #dee2e6);
-    background: var(--modal-bg, #ffffff);
+    background: #ffffff;
 }
 
 body.shared-page .shared-edit-token-modal .shared-edit-token-modal-actions > .btn {

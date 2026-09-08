@@ -27,7 +27,7 @@ body.notes-manager-page {
 .nm-filter-icon {
     position: absolute;
     left: 10px;
-    color: var(--placeholder-color, #94a3b8);
+    color: #94a3b8;
     pointer-events: none;
 }
 
@@ -610,7 +610,7 @@ html[data-theme='dark'] .nm-folder-option-selected {
 }
 
 :root[data-theme='dark'] .nm-modal {
-    background: var(--modal-bg, #1e293b);
+    background: #1e293b;
 }
 
 /* ── Responsive ───────────────────────────────────────────────────────── */

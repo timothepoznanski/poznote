@@ -306,7 +306,7 @@ body.app-tab-reordering {
 [data-theme="dark"] .app-tab-close-all {
     background: var(--dm-content-bg, #1e293b);
     border-color: var(--dm-border, #334155);
-    color: var(--dm-text-secondary, #94a3b8);
+    color: #94a3b8;
     box-shadow: 9px 0 0 0 var(--dm-tabbar-bg);
 }
 

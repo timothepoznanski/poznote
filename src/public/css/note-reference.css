@@ -224,7 +224,7 @@ a.note-internal-link:hover {
 
 /* Broken/not found link (span or dead anchor) — clickable to create the missing note */
 .note-internal-link.note-link-broken {
-    color: var(--error-color, var(--pz-danger));
+    color: var(--pz-danger);
     text-decoration: line-through;
     cursor: pointer;
 }
@@ -239,13 +239,13 @@ a.note-internal-link:hover {
 }
 
 [data-theme="dark"] .note-reference-modal-header h3 {
-    color: var(--dark-text-color, #e0e0e0);
+    color: #e0e0e0;
 }
 
 [data-theme="dark"] .note-reference-search-input {
     background: var(--dm-surface, var(--dm-surface));
     border-color: var(--dm-border, var(--dm-border));
-    color: var(--dark-text-color, #e0e0e0);
+    color: #e0e0e0;
 }
 
 [data-theme="dark"] .note-reference-search-input:focus {
@@ -256,7 +256,7 @@ a.note-internal-link:hover {
 [data-theme="dark"] .note-reference-search input {
     background: var(--dm-surface, var(--dm-surface));
     border-color: var(--dm-border, var(--dm-border));
-    color: var(--dark-text-color, #e0e0e0);
+    color: #e0e0e0;
 }
 
 [data-theme="dark"] .note-reference-search input:focus {
@@ -265,12 +265,12 @@ a.note-internal-link:hover {
 }
 
 [data-theme="dark"] .note-reference-list {
-    border-color: var(--dark-border-color, #444);
-    background-color: var(--dark-input-bg, #333);
+    border-color: #444;
+    background-color: var(--dm-surface);
 }
 
 [data-theme="dark"] .note-reference-item {
-    border-bottom-color: var(--dark-border-color, #444);
+    border-bottom-color: #444;
 }
 
 [data-theme="dark"] .note-reference-item:hover {
@@ -278,19 +278,19 @@ a.note-internal-link:hover {
 }
 
 [data-theme="dark"] .note-reference-item-title {
-    color: var(--dark-text-color, #e0e0e0);
+    color: #e0e0e0;
 }
 
 [data-theme="dark"] .note-reference-heading {
-    color: var(--dark-text-color, #e0e0e0);
+    color: #e0e0e0;
 }
 
 [data-theme="dark"] .note-reference-icon {
-    color: var(--dark-text-muted, #888);
+    color: #888;
 }
 
 [data-theme="dark"] .note-reference-item-folder {
-    color: var(--dark-text-muted, #888);
+    color: #888;
 }
 
 [data-theme="dark"] a.note-internal-link {

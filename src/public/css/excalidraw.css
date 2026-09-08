@@ -13,7 +13,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 12px 20px;
-    background: var(--bg-primary, #ffffff);
+    background: #ffffff;
     border-bottom: 1px solid var(--border-color, var(--pz-border));
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     z-index: 10;
@@ -23,7 +23,7 @@
     margin: 0;
     font-size: 18px;
     font-weight: 600;
-    color: var(--text-primary, #252526);
+    color: #252526;
 }
 
 .excalidraw-toolbar .toolbar-btn {
@@ -36,14 +36,14 @@
     border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 6px;
     background: var(--bg-secondary, #f5f5f5);
-    color: var(--text-primary, #252526);
+    color: #252526;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .excalidraw-toolbar .toolbar-btn:hover {
     background: var(--bg-hover, #e8e8e8);
-    border-color: var(--border-hover, #d0d0d0);
+    border-color: #d0d0d0;
 }
 
 .excalidraw-toolbar .toolbar-btn:active {
@@ -173,13 +173,13 @@ div[onclick*="openExcalidrawNote"] {
 }
 
 [data-theme="dark"] .excalidraw-toolbar h3 {
-    color: var(--text-primary, #e0e0e0);
+    color: #e0e0e0;
 }
 
 [data-theme="dark"] .excalidraw-toolbar .toolbar-btn {
     background: var(--dm-surface, var(--dm-surface));
     border-color: var(--dm-border, var(--dm-border));
-    color: var(--text-primary, #e0e0e0);
+    color: #e0e0e0;
 }
 
 [data-theme="dark"] .excalidraw-toolbar .toolbar-btn:hover {
@@ -314,7 +314,7 @@ div[onclick*="openExcalidrawNote"] {
     left: 0 !important;
     right: 0 !important;
     z-index: 10000 !important; /* Keep high to stay above everything */
-    background: var(--bg-primary, #ffffff) !important;
+    background: #ffffff !important;
     border-bottom: 1px solid var(--border-color, var(--pz-border)) !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
     box-sizing: border-box !important;

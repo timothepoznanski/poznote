@@ -30,7 +30,7 @@
 .markdown-syntax-filter-icon {
     position: absolute;
     left: 12px;
-    color: var(--placeholder-color, #94a3b8);
+    color: #94a3b8;
     pointer-events: none;
 }
 

@@ -4,7 +4,7 @@
 
 /* ---- Reminder button in toolbar ---- */
 .btn-reminder.has-reminder {
-    color: var(--accent-color, #4a90d9) !important;
+    color: #4a90d9 !important;
 }
 
 .btn-reminder.has-reminder i {
@@ -44,7 +44,7 @@
 
 .reminder-datetime-input:focus {
     outline: none;
-    border-color: var(--accent-color, #4a90d9);
+    border-color: #4a90d9;
     box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.15);
 }
 
@@ -80,7 +80,7 @@
 }
 
 .reminder-datetime-part:hover {
-    border-color: var(--accent-color, #4a90d9);
+    border-color: #4a90d9;
 }
 
 .reminder-datetime-part.initially-hidden {
@@ -111,7 +111,7 @@
 .reminder-repeat-label i {
     width: 16px;
     height: 16px;
-    color: var(--accent-color, #4a90d9);
+    color: #4a90d9;
     flex-shrink: 0;
 }
 
@@ -150,7 +150,7 @@
 .reminder-repeat-unit:focus,
 .reminder-repeat-interval:focus {
     outline: none;
-    border-color: var(--accent-color, #4a90d9);
+    border-color: #4a90d9;
     box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.15);
 }
 
@@ -162,7 +162,7 @@
 .reminder-repeat-hint {
     font-size: 11.5px;
     line-height: 1.4;
-    color: var(--text-secondary, #777);
+    color: #777;
     margin-top: -6px;
 }
 
@@ -227,12 +227,12 @@
 .reminder-email-title i {
     width: 16px;
     height: 16px;
-    color: var(--accent-color, #4a90d9);
+    color: #4a90d9;
     flex-shrink: 0;
 }
 
 .reminder-email-hint {
-    color: var(--text-secondary, #777);
+    color: #777;
     font-size: 12px;
     line-height: 1.35;
     overflow-wrap: anywhere;
@@ -250,7 +250,7 @@
     background: rgba(74, 144, 217, 0.08);
     border-radius: 6px;
     font-size: 13px;
-    color: var(--accent-color, #4a90d9);
+    color: #4a90d9;
     margin: 8px 0;
 }
 
@@ -341,7 +341,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--accent-color, #4a90d9);
+    color: #4a90d9;
 }
 
 .notification-icon i {
@@ -436,11 +436,11 @@
 }
 
 #notificationsModal .notification-item.unread {
-    background: var(--unread-bg, #eff6ff);
+    background: #eff6ff;
 }
 
 #notificationsModal .notification-item.unread:hover {
-    background: var(--unread-hover-bg, #dbeafe);
+    background: #dbeafe;
 }
 
 #notificationsModal .notification-content {
@@ -453,7 +453,7 @@
 
 #notificationsModal .notification-icon {
     flex-shrink: 0;
-    color: var(--accent-color, #4a90d9);
+    color: #4a90d9;
 }
 
 #notificationsModal .notification-text {

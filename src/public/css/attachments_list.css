@@ -103,7 +103,7 @@ body.attachments-page {
     color: var(--text-muted, #666666);
     white-space: nowrap;
     padding: 6px 12px;
-    background-color: var(--info-bg-light, #f0f7ff);
+    background-color: #f0f7ff;
     border-radius: 6px;
     font-weight: 500;
 }
@@ -140,18 +140,18 @@ body.attachments-page {
     align-items: center;
     gap: 12px;
     padding: 10px 12px;
-    background-color: var(--attachment-bg, var(--pz-surface));
+    background-color: var(--pz-surface);
     border-radius: 6px;
     transition: background-color 0.2s ease;
 }
 
 .attachment-item:hover {
-    background-color: var(--attachment-hover-bg, #e9ecef);
+    background-color: #e9ecef;
 }
 
 .attachment-item i {
     font-size: 18px;
-    color: var(--icon-color, #6c757d);
+    color: #6c757d;
     width: 20px;
     text-align: center;
     flex-shrink: 0;

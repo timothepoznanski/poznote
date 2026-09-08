@@ -24,7 +24,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     margin: 0 0 16px;
     font-size: 0.92rem;
     line-height: 1.45;
-    color: var(--text-secondary, #666);
+    color: #666;
 }
 .webhooks-field { margin-bottom: 16px; }
 .webhooks-field label {
@@ -36,7 +36,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
 .webhooks-hint {
     display: block;
     font-size: 0.82rem;
-    color: var(--text-secondary, #888);
+    color: #888;
     margin-top: 4px;
     line-height: 1.4;
 }
@@ -48,7 +48,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     border: 1px solid #ddd;
     border-radius: 4px;
     background: #fff;
-    color: var(--text-primary, var(--pz-text));
+    color: var(--pz-text);
     box-sizing: border-box;
 }
 .webhooks-events {
@@ -172,7 +172,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
 .webhooks-item-description {
     font-size: 0.88rem;
     line-height: 1.4;
-    color: var(--text-secondary, #666);
+    color: #666;
     overflow-wrap: anywhere;
 }
 /* Events as their own wrapping row of pills: the previous single-line code
@@ -190,14 +190,14 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     border-radius: 5px;
     background: rgba(0, 124, 186, 0.08);
     border: 1px solid rgba(0, 124, 186, 0.18);
-    color: var(--text-secondary, #4a5568);
+    color: #4a5568;
     font-size: 0.76rem;
     line-height: 1.5;
     overflow-wrap: anywhere;
 }
 .webhooks-item-meta {
     font-size: 0.82rem;
-    color: var(--text-secondary, #888);
+    color: #888;
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
@@ -264,7 +264,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     text-align: left;
     font-family: inherit;
     font-size: 0.88rem;
-    color: var(--text-primary, var(--pz-text));
+    color: var(--pz-text);
     cursor: pointer;
 }
 .webhooks-actions-item:hover {
@@ -310,7 +310,7 @@ html[data-theme='dark'] .webhooks-section-hint {
 html[data-theme='dark'] .webhooks-field input {
     background: var(--input-bg, #2a2a2a);
     border-color: var(--border-color, #444);
-    color: var(--text-primary, #e0e0e0);
+    color: #e0e0e0;
 }
 html[data-theme='dark'] .webhooks-item-description {
     color: rgba(255, 255, 255, 0.62);

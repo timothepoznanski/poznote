@@ -261,7 +261,7 @@ body.shared-page {
     color: var(--text-muted, #666666);
     white-space: nowrap;
     padding: 6px 12px;
-    background-color: var(--info-bg-light, #f0f7ff);
+    background-color: #f0f7ff;
     border-radius: 6px;
     font-weight: 500;
 }
