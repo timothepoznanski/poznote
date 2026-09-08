@@ -69,7 +69,7 @@ themes work and which variables a custom stylesheet can rely on.
   `dark-mode/*.css` (index order: variables, layout, menus, editor, modals,
   components, pages, markdown, kanban, icons, calendar) or, for page-specific
   files, next to the light rules in the same file.
-- The black theme only swaps the `--dm-*` values (`dark-mode/variables.css`),
+- The black theme only swaps the `--dm-*` values (`tokens.css`),
   it has no rules of its own. Keep it that way.
 - Every page loads the whole `@theme` group, never a slice of it. Nineteen of
   them used to load part of it, which is how `markdown_syntax.php` ended up
@@ -200,7 +200,7 @@ literal.
 
 ## Variables
 
-Defined in `dark-mode/variables.css`, the one stylesheet every page loads.
+Defined in `tokens.css`, the one stylesheet every page loads.
 
 Light (on `:root`):
 

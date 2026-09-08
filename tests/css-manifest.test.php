@@ -34,7 +34,7 @@ test('every group referenced by a page is defined', function () {
 
 test('no page links the same stylesheet twice', function () {
     // Six pages linked lucide.css twice and settings.php also linked
-    // dark-mode/variables.css twice. poznoteCssResolve() drops the repeat, but
+    // tokens.css twice. poznoteCssResolve() drops the repeat, but
     // a duplicate in the manifest is still a mistake worth catching.
     $dupes = [];
     foreach (poznoteCssManifest() as $page => $items) {
@@ -55,7 +55,12 @@ test('every page loads the whole dark layer, not a slice of it', function () {
     // styling at all: it linked two of the ten files. A page either themes
     // itself or it does not; there is no reason to pick a subset.
     $partial = [];
-    $full = poznoteCssGroups()['@theme'];
+    // css/tokens.css also lives in @theme but not under css/dark-mode/: it holds
+    // the light palette too, and every page needs it whether it themes or not.
+    $full = array_values(array_filter(
+        poznoteCssGroups()['@theme'],
+        fn($f) => str_starts_with($f, 'css/dark-mode/')
+    ));
     foreach (array_keys(poznoteCssManifest()) as $page) {
         $dark = array_values(array_filter(
             poznoteCssResolve($page),
@@ -68,23 +73,35 @@ test('every page loads the whole dark layer, not a slice of it', function () {
     assertSame([], $partial, 'pages carrying an incomplete dark layer');
 });
 
-test('a page using the dark layer declares the theme tokens first', function () {
-    // dark-mode/*.css consume --dm-* from dark-mode/variables.css. Loading any
-    // of them without it, or after it, leaves the dark theme unstyled.
+test('a page using the dark layer also loads the tokens it reads', function () {
+    // dark-mode/*.css consume --dm-* from css/tokens.css. Order does not matter,
+    // custom properties resolve at computed-value time wherever they are
+    // declared, but a page that loads the dark layer without the tokens gets a
+    // dark theme made of unresolved var() and renders unstyled.
     $wrong = [];
     foreach (array_keys(poznoteCssManifest()) as $page) {
-        $dark = array_values(array_filter(
-            poznoteCssResolve($page),
-            fn($f) => str_starts_with($f, 'css/dark-mode/')
-        ));
-        if (!$dark) {
-            continue;
-        }
-        if ($dark[0] !== 'css/dark-mode/variables.css') {
-            $wrong[] = "$page (first is {$dark[0]})";
+        $files = poznoteCssResolve($page);
+        $usesDark = (bool) array_filter($files, fn($f) => str_starts_with($f, 'css/dark-mode/'));
+        if ($usesDark && !in_array('css/tokens.css', $files, true)) {
+            $wrong[] = $page;
         }
     }
-    assertSame([], $wrong, 'dark layer loaded before its tokens');
+    assertSame([], $wrong, 'dark layer loaded without css/tokens.css');
+});
+
+test('the tokens are declared exactly once per page', function () {
+    // The file was called dark-mode/variables.css and lived inside the dark
+    // layer while holding the LIGHT palette on :root. Two files were named
+    // variables.css, one of them a single layout value. Whoever went looking
+    // for the palette did not find it there; #1261 is partly that.
+    $wrong = [];
+    foreach (array_keys(poznoteCssManifest()) as $page) {
+        $n = count(array_keys(poznoteCssResolve($page), 'css/tokens.css', true));
+        if ($n !== 1) {
+            $wrong[] = "$page ($n)";
+        }
+    }
+    assertSame([], $wrong, 'pages not loading the tokens exactly once');
 });
 
 test('every page key matches an entry point that renders it', function () use ($docroot) {

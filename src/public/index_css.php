@@ -17,7 +17,7 @@
 $groups = [
     'core' => [
         'css/lucide.css',
-        'css/variables.css',
+        'css/tokens.css',
         'css/base.css',
         // Shared component bases. index.php is not in the css_assets manifest, so
         // its bundle has to list them itself. Buttons belong here too: the shared

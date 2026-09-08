@@ -151,7 +151,7 @@ $baseline = is_file($baselineFile)
 $literals = 0;
 $inComponents = [];
 foreach ($files as $file) {
-    if (str_ends_with($file, 'dark-mode/variables.css')) {
+    if (str_ends_with($file, '/tokens.css')) {
         continue;                       // the palette itself, where colours belong
     }
     $css = preg_replace('!/\*.*?\*/!s', '', (string) file_get_contents($file));

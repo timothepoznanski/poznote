@@ -953,7 +953,7 @@ function denyPublicWorkspaceAccessResponse(string $message, int $code = 403): vo
         $v = @file_get_contents(__DIR__ . '/version.txt') ?: time();
         $themeAssetVersion = max(
             (int) (@filemtime(__DIR__ . '/public/js/theme-init.js') ?: 0),
-            (int) (@filemtime(__DIR__ . '/public/css/dark-mode/variables.css') ?: 0),
+            (int) (@filemtime(__DIR__ . '/public/css/tokens.css') ?: 0),
             (int) (@filemtime(__DIR__ . '/public/css/public_folder.css') ?: 0)
         );
         $v = urlencode(trim($v) . ($themeAssetVersion > 0 ? '-' . $themeAssetVersion : ''));
@@ -970,7 +970,7 @@ function denyPublicWorkspaceAccessResponse(string $message, int $code = 403): vo
             <title><?php echo htmlspecialchars($title); ?></title>
             <meta name="color-scheme" content="dark light">
             <script src="<?php echo $prefix; ?>js/theme-init.js?v=<?php echo $v; ?>"></script>
-            <link rel="stylesheet" href="<?php echo $prefix; ?>css/dark-mode/variables.css?v=<?php echo $v; ?>">
+            <link rel="stylesheet" href="<?php echo $prefix; ?>css/tokens.css?v=<?php echo $v; ?>">
             <link rel="stylesheet" href="<?php echo $prefix; ?>css/public_folder.css?v=<?php echo $v; ?>">
             <link rel="stylesheet" href="<?php echo $prefix; ?>css/lucide.css?v=<?php echo $v; ?>">
             <style>

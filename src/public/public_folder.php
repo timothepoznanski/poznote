@@ -108,7 +108,7 @@ try {
         
         if (!isset($_SESSION[$sessionKey]) || $_SESSION[$sessionKey] !== true) {
             $stylesheetHref = getVersionedPublicAppAssetHref('css/public_folder.css');
-            $variablesStylesheetHref = getVersionedPublicAppAssetHref('css/dark-mode/variables.css');
+            $variablesStylesheetHref = getVersionedPublicAppAssetHref('css/tokens.css');
             $themeInitHref = getVersionedPublicAppAssetHref('js/theme-init.js');
             ?>
             <!doctype html>

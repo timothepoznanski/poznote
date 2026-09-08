@@ -40,7 +40,7 @@ function poznoteGetThemeAssetVersion() {
         'js/emoji-autocomplete.js',
         'js/graph.js',
         'css/graph.css',
-        'css/dark-mode/variables.css',
+        'css/tokens.css',
         'css/dark-mode/layout.css',
         'css/dark-mode/menus.css',
         'css/dark-mode/editor.css',

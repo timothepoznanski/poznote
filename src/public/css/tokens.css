@@ -1,13 +1,22 @@
 /* ============================================
-   Theme tokens
+   Design tokens
    ============================================
    This stylesheet is the one every page loads, so it is where the shared
-   colour tokens live. Light values on :root, dark/black values in the
-   --dm-* blocks below. A custom stylesheet (Settings > Custom CSS) can
+   tokens live: the colours, and the one layout value that is themeable.
+   Light values on :root, dark/black values in the --dm-* blocks below.
+
+   It used to be css/dark-mode/variables.css, which was wrong twice over: it
+   sat inside the dark layer while holding the LIGHT palette on :root, and a
+   second file was also called variables.css. Anyone going looking for the
+   palette did not find it. A custom stylesheet (Settings > Custom CSS) can
    re-theme the app by overriding these on :root / html[data-theme='dark'].
    Keep the names stable: they are part of the custom-CSS contract. */
 
 :root {
+    /* Layout. The resizable sidebar: js/resize-column.js overwrites this on
+       :root at runtime, this is the default it starts from. */
+    --left-col-width: 370px;
+
     /* Brand blue: links, active states, primary buttons, focus rings. */
     --pz-accent: #007db8;
     --pz-accent-hover: #005a8a;

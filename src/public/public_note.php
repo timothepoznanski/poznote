@@ -475,7 +475,7 @@ try {
 
         if (!$allAuthenticated) {
             $passwordStylesheetHref = getVersionedPublicAppAssetHref('css/public_folder.css');
-            $passwordVariablesStylesheetHref = getVersionedPublicAppAssetHref('css/dark-mode/variables.css');
+            $passwordVariablesStylesheetHref = getVersionedPublicAppAssetHref('css/tokens.css');
             $passwordThemeInitHref = getVersionedPublicAppAssetHref('js/theme-init.js');
             ?>
             <!doctype html>

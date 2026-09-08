@@ -54,7 +54,7 @@ if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
             <title><?php echo t_h('settings_password.title', [], 'Settings Protected', $currentLang); ?></title>
             <meta name="color-scheme" content="dark light">
             <script src="js/theme-init.js?v=<?php echo $spCacheV; ?>"></script>
-            <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $spCacheV; ?>">
+            <link rel="stylesheet" href="css/tokens.css?v=<?php echo $spCacheV; ?>">
             <link rel="stylesheet" href="css/public_folder.css?v=<?php echo $spCacheV; ?>">
         </head>
         <body class="password-page-body">

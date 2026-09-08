@@ -6,7 +6,7 @@
  * through four different cache-busting schemes. Adding one shared stylesheet
  * meant editing 40 <head> blocks, and nothing checked that a page still loaded
  * what it needed, so the lists drifted apart unnoticed: settings.php linked
- * lucide.css and dark-mode/variables.css twice, five other pages linked
+ * lucide.css and tokens.css twice, five other pages linked
  * lucide.css twice, and several pages carry only part of the dark layer.
  *
  * A page now names itself and the manifest says what that means:
@@ -47,10 +47,10 @@ function poznoteCssGroups(): array
             'css/modals/alerts-utilities.css',
             'css/modals/responsive.css',
         ],
-        // The dark/black layer. dark-mode/variables.css declares the tokens the other
+        // The dark/black layer. tokens.css declares the tokens the other
         // files consume, so it always comes first.
         '@theme' => [
-            'css/dark-mode/variables.css',
+            'css/tokens.css',
             'css/dark-mode/layout.css',
             'css/dark-mode/menus.css',
             'css/dark-mode/editor.css',
