@@ -411,7 +411,7 @@ function poznoteGetCustomCssHref() {
     }
 
     // Fall back to the css/ directory bundled in the image (development / legacy).
-    $absoluteFilePath = __DIR__ . '/public/css' . $filename;
+    $absoluteFilePath = __DIR__ . '/public/css/' . $filename;
     if (!is_file($absoluteFilePath)) {
         return '';
     }

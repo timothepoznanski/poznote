@@ -28,7 +28,7 @@ $workspaceSegment = getWorkspaceBackgroundSegment($workspace);
 $responseWorkspace = $workspace !== '' ? $workspace : 'default';
 
 // Create user backgrounds directory with workspace subdirectory if it doesn't exist
-$user_dir = __DIR__ . '/../data/users' . $user_id;
+$user_dir = __DIR__ . '/../data/users/' . $user_id;
 $backgrounds_dir = $user_dir . '/backgrounds';
 $workspace_backgrounds_dir = $backgrounds_dir . '/' . $workspaceSegment;
 
