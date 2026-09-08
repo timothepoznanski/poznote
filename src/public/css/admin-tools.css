@@ -101,7 +101,7 @@ html[data-theme='dark'] .deletion-notice {
 }
 
 .btn-view-files:hover {
-    background: var(--hover-bg, var(--pz-surface-sunken));
+    background: var(--pz-surface-sunken);
     border-color: var(--pz-accent);
     color: var(--pz-accent);
 }
@@ -186,7 +186,7 @@ html[data-theme='dark'] .btn-view-files:hover {
 }
 
 .orphan-modal-close:hover {
-    background: var(--hover-bg, var(--pz-surface-hover));
+    background: var(--pz-surface-hover);
     color: var(--pz-text);
 }
 

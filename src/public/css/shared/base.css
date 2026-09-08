@@ -227,7 +227,7 @@ body.shared-page {
 
 .filter-input:focus {
     outline: none;
-    border-color: var(--primary-color, #007bff);
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
@@ -251,7 +251,7 @@ body.shared-page {
 }
 
 .clear-filter-btn:hover {
-    background-color: var(--hover-bg, var(--pz-surface-hover));
+    background-color: var(--pz-surface-hover);
     color: var(--text-color, var(--pz-text));
 }
 

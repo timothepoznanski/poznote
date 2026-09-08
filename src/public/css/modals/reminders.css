@@ -197,7 +197,7 @@
 .reminder-email-option {
     border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 8px;
-    background: var(--card-bg, var(--pz-surface));
+    background: var(--pz-surface);
     padding: 10px 12px;
 }
 
@@ -313,7 +313,7 @@
 }
 
 .notification-item:hover {
-    background: var(--hover-bg, rgba(0, 0, 0, 0.04));
+    background: var(--pz-surface-hover);
 }
 
 .notification-item.unread {
@@ -388,7 +388,7 @@
 
 .notification-action-btn:hover {
     opacity: 1 !important;
-    background: var(--hover-bg, rgba(0, 0, 0, 0.08));
+    background: var(--pz-surface-hover);
 }
 
 /* ---- Empty State ---- */
@@ -432,7 +432,7 @@
 }
 
 #notificationsModal .notification-item:hover {
-    background: var(--hover-bg, var(--pz-surface-hover));
+    background: var(--pz-surface-hover);
 }
 
 #notificationsModal .notification-item.unread {

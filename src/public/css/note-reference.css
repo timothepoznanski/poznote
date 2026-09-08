@@ -31,7 +31,7 @@
 
 .note-reference-search-input:focus {
     outline: none;
-    border-color: var(--primary-color, #2196F3);
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
 }
 
@@ -69,7 +69,7 @@
 }
 
 .note-reference-modal-content h3 i {
-    color: var(--primary-color, #2196F3);
+    color: var(--pz-accent);
 }
 
 .note-reference-description {
@@ -104,7 +104,7 @@
 
 .note-reference-search input:focus {
     outline: none;
-    border-color: var(--primary-color, #2196F3);
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
 }
 
@@ -156,13 +156,13 @@
 }
 
 .note-reference-item:hover {
-    background-color: var(--hover-bg, rgba(33, 150, 243, 0.08));
+    background-color: rgba(var(--pz-accent-rgb), 0.08);
     padding-left: 20px;
 }
 
 .note-reference-icon {
     flex-shrink: 0;
-    color: var(--primary-color, #2196F3);
+    color: var(--pz-accent);
     font-size: 18px;
     display: flex;
     align-items: center;
@@ -210,7 +210,7 @@
 /* Internal note links in content */
 a.note-internal-link,
 span.note-internal-link {
-    color: var(--primary-color, #2196F3);
+    color: var(--pz-accent);
     text-decoration: none;
     padding: 0 2px;
     border-radius: 2px;
@@ -249,7 +249,7 @@ a.note-internal-link:hover {
 }
 
 [data-theme="dark"] .note-reference-search-input:focus {
-    border-color: var(--primary-color, #2196F3);
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
 }
 
@@ -260,7 +260,7 @@ a.note-internal-link:hover {
 }
 
 [data-theme="dark"] .note-reference-search input:focus {
-    border-color: var(--primary-color, #2196F3);
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
 }
 

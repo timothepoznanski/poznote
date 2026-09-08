@@ -169,7 +169,7 @@
     border: none;
     border-radius: 7px;
     background: rgba(var(--pz-accent-rgb), 0.08);
-    color: var(--link-color, #007bff);
+    color: var(--pz-accent);
     cursor: pointer;
     transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
 }
@@ -205,7 +205,7 @@
 .note-name {
     font-weight: 500;
     font-size: 13px;
-    color: var(--link-color, #007bff);
+    color: var(--pz-accent);
     text-decoration: none;
     min-width: 0;
     overflow: hidden;
@@ -324,7 +324,7 @@
 
 .folder-name-path {
     font-weight: 500;
-    color: var(--link-color, #007bff);
+    color: var(--pz-accent);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

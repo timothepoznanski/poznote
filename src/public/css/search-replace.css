@@ -61,7 +61,7 @@
 
 .search-replace-input:focus {
     outline: none;
-    border-color: var(--primary-color, #2196F3);
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
 }
 
@@ -163,7 +163,7 @@
 }
 
 [data-theme="dark"] .search-replace-input:focus {
-    border-color: var(--primary-color, #2196F3);
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
 }
 

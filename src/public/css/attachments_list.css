@@ -89,7 +89,7 @@ body.attachments-page {
 
 .file-type-filter:focus {
     outline: none;
-    border-color: var(--primary-color, #007bff);
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
@@ -120,7 +120,7 @@ body.attachments-page {
 .note-name {
     font-weight: 500;
     font-size: 16px;
-    color: var(--link-color, #007bff);
+    color: var(--pz-accent);
     text-decoration: none;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -308,7 +308,7 @@ body.attachments-page {
 .attachment-note-name {
     display: block;
     font-weight: 500;
-    color: var(--link-color, #007bff);
+    color: var(--pz-accent);
     text-decoration: none;
     margin-bottom: 8px;
 }
@@ -368,7 +368,7 @@ body.attachments-page {
 }
 
 .attachment-file-link:hover {
-    color: var(--link-color, #007bff);
+    color: var(--pz-accent);
     text-decoration: underline;
 }
 

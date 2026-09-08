@@ -6,8 +6,15 @@
    of spanning the full-width container. */
 .diary-month {
     margin: 22px auto 0;
-    max-width: min(100%, calc(var(--dash-col-min, 190px) * var(--dash-col-max, 4)
-                  + var(--dash-col-gap, 14px) * (var(--dash-col-max, 4) - 1)));
+    /* Same grid arithmetic as the dashboard, with the diary's own numbers. It
+       used to read --dash-col-* directly, but dashboard.css declares those on
+       .view-size-* and no diary element is inside one, so the values never
+       arrived and only the fallbacks were ever used. */
+    --diary-col-min: 190px;
+    --diary-col-max: 4;
+    --diary-col-gap: 14px;
+    max-width: min(100%, calc(var(--diary-col-min) * var(--diary-col-max)
+                  + var(--diary-col-gap) * (var(--diary-col-max) - 1)));
 }
 
 .diary-month:first-child {

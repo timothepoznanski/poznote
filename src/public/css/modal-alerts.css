@@ -155,7 +155,7 @@ html[data-theme='dark'] .note-creation-loading-content {
 }
 
 .alert-modal-button.primary {
-    background: var(--primary-color, var(--pz-accent));
+    background: var(--pz-accent);
     color: var(--pz-text-inverse);
 }
 
@@ -228,7 +228,7 @@ html[data-theme='dark'] .alert-modal-button:hover,
 
 html[data-theme='dark'] .alert-modal-button.primary,
 .dark-mode .alert-modal-button.primary {
-    background-color: var(--primary-color, var(--pz-accent));
+    background-color: var(--pz-accent);
     color: var(--pz-text-inverse);
 }
 
@@ -325,7 +325,7 @@ html[data-theme='dark'] .alert-modal-button.primary.snapshot-restore-confirm-but
 
 .progress-bar-inner {
     height: 100%;
-    background: var(--primary-color, var(--pz-accent));
+    background: var(--pz-accent);
     width: 0%;
     position: absolute;
     left: 0;
@@ -347,7 +347,7 @@ html[data-theme='dark'] .progress-container,
     width: 20px;
     height: 20px;
     border: 2px solid var(--border-color, var(--pz-border));
-    border-top: 2px solid var(--primary-color, var(--pz-accent));
+    border-top: 2px solid var(--pz-accent);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -366,7 +366,7 @@ html[data-theme='dark'] .progress-container,
 html[data-theme='dark'] .spinner,
 .dark-mode .spinner {
     border-color: #4a5568;
-    border-top-color: var(--primary-color, var(--pz-accent));
+    border-top-color: var(--pz-accent);
 }
 
 /* Admin contact modal (SaaS mode): two routing options, GitHub for general
