@@ -80,9 +80,11 @@
     font-style: normal;
 }
 
-/* Red cards */
+/* Red cards. The wash is mixed from --pz-danger rather than written as
+   rgba(<channels>, a): one token to override instead of a colour and its
+   channels kept in sync by hand. */
 .home-card-red .home-card-icon {
-    background: rgba(239, 68, 68, 0.12);
+    background: color-mix(in srgb, var(--pz-danger) 12%, transparent);
 }
 
 .home-card-red .home-card-icon i {
@@ -90,12 +92,12 @@
 }
 
 html[data-theme='dark'] .home-card-red .home-card-icon {
-    background: rgba(239, 68, 68, 0.22);
+    background: color-mix(in srgb, var(--pz-danger) 22%, transparent);
 }
 
 .home-card-red:hover {
     border-color: var(--pz-danger);
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--pz-danger) 15%, transparent);
 }
 
 /* Support card heart animation */
@@ -108,7 +110,7 @@ html[data-theme='dark'] .home-card-red .home-card-icon {
 }
 
 #support-card .home-card-icon {
-    background: rgba(239, 68, 68, 0.12);
+    background: color-mix(in srgb, var(--pz-danger) 12%, transparent);
 }
 
 #support-card .home-card-icon i {
@@ -117,7 +119,7 @@ html[data-theme='dark'] .home-card-red .home-card-icon {
 }
 
 html[data-theme='dark'] #support-card .home-card-icon {
-    background: rgba(239, 68, 68, 0.22);
+    background: color-mix(in srgb, var(--pz-danger) 22%, transparent);
 }
 
 /* Card content */

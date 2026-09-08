@@ -133,11 +133,16 @@ html[data-theme='dark'] .settings-section h3 {
     border-bottom-color: var(--dm-accent);
 }
 
-html[data-theme='dark'] .settings-section .btn {
+/* The neutral buttons of a settings section only. At (0,3,1) this used to beat
+   html[data-theme='dark'] .btn-primary at (0,2,1), so a filled button got this
+   grey label on its accent fill: contrast 2.44, below WCAG AA, on the Create
+   and Save buttons of the workspaces and settings pages. A filled variant
+   carries its own label colour. */
+html[data-theme='dark'] .settings-section .btn:not(.btn-primary):not(.btn-danger):not(.btn-success) {
     color: var(--dm-border);
 }
 
-html[data-theme='dark'] .settings-section .btn:enabled {
+html[data-theme='dark'] .settings-section .btn:enabled:not(.btn-primary):not(.btn-danger):not(.btn-success) {
     color: var(--dm-text);
 }
 
