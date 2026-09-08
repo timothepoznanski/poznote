@@ -22,7 +22,14 @@ function checkForUpdates() {
     fetch('api/v1/system/updates')
         .then(function (response) {
             if (!response.ok) {
-                throw new Error('HTTP Error: ' + response.status);
+                // Prefer the message the server sent over a bare status code:
+                // the API answers 4xx with {"error": "..."} and that text is what
+                // the user needs to see.
+                return response.json()
+                    .catch(function () { return {}; })
+                    .then(function (data) {
+                        throw new Error(data.error || data.message || ('HTTP Error: ' + response.status));
+                    });
             }
             return response.json();
         })
@@ -80,7 +87,14 @@ function checkForUpdatesAutomatic() {
     fetch('api/v1/system/updates')
         .then(function (response) {
             if (!response.ok) {
-                throw new Error('HTTP Error: ' + response.status);
+                // Prefer the message the server sent over a bare status code:
+                // the API answers 4xx with {"error": "..."} and that text is what
+                // the user needs to see.
+                return response.json()
+                    .catch(function () { return {}; })
+                    .then(function (data) {
+                        throw new Error(data.error || data.message || ('HTTP Error: ' + response.status));
+                    });
             }
             return response.json();
         })
@@ -144,7 +158,14 @@ function showUpdateInstructions(hasUpdate = false, checkFailed = false) {
         fetch('api/v1/system/updates')
             .then(function (response) {
                 if (!response.ok) {
-                    throw new Error('HTTP Error: ' + response.status);
+                    // Prefer the message the server sent over a bare status code:
+                    // the API answers 4xx with {"error": "..."} and that text is what
+                    // the user needs to see.
+                    return response.json()
+                        .catch(function () { return {}; })
+                        .then(function (data) {
+                            throw new Error(data.error || data.message || ('HTTP Error: ' + response.status));
+                        });
                 }
                 return response.json();
             })

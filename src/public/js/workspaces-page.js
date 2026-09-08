@@ -147,7 +147,14 @@ function handleMoveButtonClick(e) {
             })
                 .then(function (resp) {
                     if (!resp.ok) {
-                        throw new Error('HTTP error ' + resp.status);
+                        // Prefer the message the server sent over a bare status code:
+                        // the API answers 4xx with {"error": "..."} and that text is what
+                        // the user needs to see.
+                        return resp.json()
+                            .catch(function () { return {}; })
+                            .then(function (data) {
+                                throw new Error(data.error || data.message || ('HTTP error ' + resp.status));
+                            });
                     }
                     return resp.json();
                 })

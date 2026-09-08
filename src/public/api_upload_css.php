@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../auth.php';
+require_once __DIR__ . '/../lib/api-response.php';
 requireAdmin();
 
 require_once __DIR__ . '/../functions.php';
@@ -10,7 +11,7 @@ header('Content-Type: application/json');
 $css_dir = __DIR__ . '/../data/css';
 
 if (!createDirectoryWithPermissions($css_dir)) {
-    echo json_encode(['success' => false, 'error' => 'Failed to create css directory']);
+    apiFail('Failed to create css directory', 500);
     exit;
 }
 
@@ -34,13 +35,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['css_file'])) {
     $file = $_FILES['css_file'];
 
     if ($file['error'] !== UPLOAD_ERR_OK) {
-        echo json_encode(['success' => false, 'error' => 'Upload failed with error code: ' . $file['error']]);
+        apiFail('Upload failed with error code: ' . $file['error'], 400);
         exit;
     }
 
     $max_size = 1 * 1024 * 1024; // 1 MB
     if ($file['size'] > $max_size) {
-        echo json_encode(['success' => false, 'error' => 'File too large. Maximum size is 1 MB.']);
+        apiFail('File too large. Maximum size is 1 MB.', 413);
         exit;
     }
 
@@ -51,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['css_file'])) {
 
     $allowed_mimes = ['text/css', 'text/plain', 'application/octet-stream'];
     if (!in_array($mime, $allowed_mimes, true)) {
-        echo json_encode(['success' => false, 'error' => 'Invalid file type. Only CSS files are allowed.']);
+        apiFail('Invalid file type. Only CSS files are allowed.', 400);
         exit;
     }
 
@@ -76,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['css_file'])) {
     }
 
     if (!move_uploaded_file($file['tmp_name'], $destination)) {
-        echo json_encode(['success' => false, 'error' => 'Failed to save file']);
+        apiFail('Failed to save file', 500);
         exit;
     }
 
@@ -102,4 +103,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     exit;
 }
 
-echo json_encode(['success' => false, 'error' => 'Invalid request']);
+apiFail('Invalid request', 400);

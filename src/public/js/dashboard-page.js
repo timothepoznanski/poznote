@@ -1051,7 +1051,14 @@
             credentials: 'same-origin',
             body: JSON.stringify({ pinned: nextPinned })
         }).then(function (response) {
-            if (!response.ok) throw new Error('pin update failed');
+            if (!response.ok) {
+                // Prefer the message the server sent over a bare status code.
+                return response.json()
+                    .catch(function () { return {}; })
+                    .then(function (data) {
+                        throw new Error(data.error || data.message || 'pin update failed');
+                    });
+            }
             return response.json();
         }).then(function (data) {
             note.pinned = data && typeof data.pinned === 'boolean' ? data.pinned : nextPinned;
@@ -1079,7 +1086,14 @@
             credentials: 'same-origin',
             body: JSON.stringify({ pinned: nextPinned })
         }).then(function (response) {
-            if (!response.ok) throw new Error('pin update failed');
+            if (!response.ok) {
+                // Prefer the message the server sent over a bare status code.
+                return response.json()
+                    .catch(function () { return {}; })
+                    .then(function (data) {
+                        throw new Error(data.error || data.message || 'pin update failed');
+                    });
+            }
             return response.json();
         }).then(function (data) {
             folder.pinned = data && typeof data.pinned === 'boolean' ? data.pinned : nextPinned;
@@ -1198,7 +1212,14 @@
             credentials: 'same-origin',
             body: JSON.stringify({ color: value })
         }).then(function (response) {
-            if (!response.ok) throw new Error('color update failed');
+            if (!response.ok) {
+                // Prefer the message the server sent over a bare status code.
+                return response.json()
+                    .catch(function () { return {}; })
+                    .then(function (data) {
+                        throw new Error(data.error || data.message || 'color update failed');
+                    });
+            }
             return response.json();
         }).then(function (data) {
             var target = isFolder ? findFolderById(targetId) : findNoteById(targetId);
@@ -1737,7 +1758,14 @@
 
         fetch('api/v1/workspaces', { credentials: 'same-origin' })
             .then(function (r) {
-                if (!r.ok) throw new Error('HTTP ' + r.status);
+                if (!r.ok) {
+                    // Prefer the message the server sent over a bare status code.
+                    return r.json()
+                        .catch(function () { return {}; })
+                        .then(function (data) {
+                            throw new Error(data.error || data.message || 'HTTP ' + r.status);
+                        });
+                }
                 return r.json();
             })
             .then(function (data) {

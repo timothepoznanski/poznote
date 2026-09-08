@@ -298,7 +298,14 @@ function executeMoveAllFiles() {
     })
         .then(function (response) {
             if (!response.ok) {
-                throw new Error('HTTP error! status: ' + response.status);
+                // Prefer the message the server sent over a bare status code:
+                // the API answers 4xx with {"error": "..."} and that text is what
+                // the user needs to see.
+                return response.json()
+                    .catch(function () { return {}; })
+                    .then(function (data) {
+                        throw new Error(data.error || data.message || ('HTTP error! status: ' + response.status));
+                    });
             }
 
             // Check if response is actually JSON

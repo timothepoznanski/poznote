@@ -270,7 +270,16 @@ function loadAttachments(noteId) {
         credentials: 'same-origin'
     })
         .then(function (response) {
-            if (!response.ok) throw new Error('Failed to load attachments');
+            if (!response.ok) {
+                // Prefer the message the server sent over a bare status code:
+                // the API answers 4xx with {"error": "..."} and that text is what
+                // the user needs to see.
+                return response.json()
+                    .catch(function () { return {}; })
+                    .then(function (data) {
+                        throw new Error(data.error || data.message || 'Failed to load attachments');
+                    });
+            }
             return response.json();
         })
         .then(function (data) {
@@ -347,7 +356,16 @@ function deleteAttachment(attachmentId, noteId) {
         credentials: 'same-origin'
     })
         .then(function (response) {
-            if (!response.ok) throw new Error('Failed to delete attachment');
+            if (!response.ok) {
+                // Prefer the message the server sent over a bare status code:
+                // the API answers 4xx with {"error": "..."} and that text is what
+                // the user needs to see.
+                return response.json()
+                    .catch(function () { return {}; })
+                    .then(function (data) {
+                        throw new Error(data.error || data.message || 'Failed to delete attachment');
+                    });
+            }
             return response.json();
         })
         .then(function (data) {
@@ -410,7 +428,14 @@ function updateAttachmentCountInMenu(noteId) {
         credentials: 'same-origin'
     })
         .then(function (response) {
-            if (!response.ok) throw new Error('Failed to update attachment count');
+            if (!response.ok) {
+                // Prefer the message the server sent over a bare status code.
+                return response.json()
+                    .catch(function () { return {}; })
+                    .then(function (data) {
+                        throw new Error(data.error || data.message || 'Failed to update attachment count');
+                    });
+            }
             return response.json();
         })
         .then(function (data) {
@@ -772,7 +797,14 @@ function resolveAttachmentPreviewSetting(callback) {
         credentials: 'same-origin'
     })
         .then(function (response) {
-            if (!response.ok) throw new Error('Failed to load setting');
+            if (!response.ok) {
+                // Prefer the message the server sent over a bare status code.
+                return response.json()
+                    .catch(function () { return {}; })
+                    .then(function (data) {
+                        throw new Error(data.error || data.message || 'Failed to load setting');
+                    });
+            }
             return response.json();
         })
         .then(function (data) {
@@ -854,7 +886,16 @@ function refreshAttachmentPreviewsForNote(noteId) {
         credentials: 'same-origin'
     })
         .then(function (response) {
-            if (!response.ok) throw new Error('Failed to load attachments');
+            if (!response.ok) {
+                // Prefer the message the server sent over a bare status code:
+                // the API answers 4xx with {"error": "..."} and that text is what
+                // the user needs to see.
+                return response.json()
+                    .catch(function () { return {}; })
+                    .then(function (data) {
+                        throw new Error(data.error || data.message || 'Failed to load attachments');
+                    });
+            }
             return response.json();
         })
         .then(function (data) {
@@ -992,7 +1033,14 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry, dropPoint) {
             body: formData
         })
             .then(function (response) {
-                if (!response.ok) throw new Error('Failed to upload attachment');
+                if (!response.ok) {
+                    // Prefer the message the server sent over a bare status code.
+                    return response.json()
+                        .catch(function () { return {}; })
+                        .then(function (data) {
+                            throw new Error(data.error || data.message || 'Failed to upload attachment');
+                        });
+                }
                 return response.json();
             })
             .then(function (data) {
@@ -1085,7 +1133,14 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry, dropPoint) {
         body: formData
     })
         .then(function (response) {
-            if (!response.ok) throw new Error('Failed to upload attachment');
+            if (!response.ok) {
+                // Prefer the message the server sent over a bare status code.
+                return response.json()
+                    .catch(function () { return {}; })
+                    .then(function (data) {
+                        throw new Error(data.error || data.message || 'Failed to upload attachment');
+                    });
+            }
             return response.json();
         })
         .then(function (data) {
@@ -1347,7 +1402,14 @@ function handleHTMLImageInsert(file, dropTarget, dropPoint) {
         body: formData
     })
         .then(function (response) {
-            if (!response.ok) throw new Error('Failed to upload attachment');
+            if (!response.ok) {
+                // Prefer the message the server sent over a bare status code.
+                return response.json()
+                    .catch(function () { return {}; })
+                    .then(function (data) {
+                        throw new Error(data.error || data.message || 'Failed to upload attachment');
+                    });
+            }
             return response.json();
         })
         .then(function (data) {

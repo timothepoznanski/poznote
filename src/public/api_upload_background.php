@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../auth.php';
+require_once __DIR__ . '/../lib/api-response.php';
 requireAuth();
 
 require_once __DIR__ . '/../functions.php';
@@ -33,17 +34,17 @@ $backgrounds_dir = $user_dir . '/backgrounds';
 $workspace_backgrounds_dir = $backgrounds_dir . '/' . $workspaceSegment;
 
 if (!createDirectoryWithPermissions($user_dir)) {
-    echo json_encode(['success' => false, 'error' => 'Failed to prepare background storage']);
+    apiFail('Failed to prepare background storage', 500);
     exit;
 }
 
 if (!createDirectoryWithPermissions($backgrounds_dir)) {
-    echo json_encode(['success' => false, 'error' => 'Failed to prepare background storage']);
+    apiFail('Failed to prepare background storage', 500);
     exit;
 }
 
 if (!createDirectoryWithPermissions($workspace_backgrounds_dir)) {
-    echo json_encode(['success' => false, 'error' => 'Failed to prepare background storage']);
+    apiFail('Failed to prepare background storage', 500);
     exit;
 }
 
@@ -61,17 +62,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['background'])) {
     $max_size = 5 * 1024 * 1024; // 5MB
     
     if ($file['size'] > $max_size) {
-        echo json_encode(['success' => false, 'error' => 'File too large. Maximum size is 5MB.']);
+        apiFail('File too large. Maximum size is 5MB.', 413);
         exit;
     }
     
     if ($file['error'] !== UPLOAD_ERR_OK) {
-        echo json_encode(['success' => false, 'error' => 'Upload failed with error code: ' . $file['error']]);
+        apiFail('Upload failed with error code: ' . $file['error'], 400);
         exit;
     }
 
     if (!is_uploaded_file($file['tmp_name'])) {
-        echo json_encode(['success' => false, 'error' => 'Invalid uploaded file.']);
+        apiFail('Invalid uploaded file.', 400);
         exit;
     }
 
@@ -82,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['background'])) {
     }
 
     if (!is_string($mimeType) || !isset($allowedTypes[$mimeType])) {
-        echo json_encode(['success' => false, 'error' => 'Invalid file type. Only JPG, PNG, GIF, and WebP are allowed.']);
+        apiFail('Invalid file type. Only JPG, PNG, GIF, and WebP are allowed.', 400);
         exit;
     }
     
@@ -100,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['background'])) {
         $url = '/data/users/' . $user_id . '/backgrounds/' . rawurlencode($workspaceSegment) . '/' . $filename . '?v=' . time();
         echo json_encode(['success' => true, 'url' => $url, 'workspace' => $responseWorkspace]);
     } else {
-        echo json_encode(['success' => false, 'error' => 'Failed to save file']);
+        apiFail('Failed to save file', 500);
     }
     exit;
 }
@@ -128,4 +129,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     exit;
 }
 
-echo json_encode(['success' => false, 'error' => 'Invalid request method']);
+apiFail('Invalid request method', 400);

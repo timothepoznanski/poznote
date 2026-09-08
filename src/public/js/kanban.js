@@ -549,9 +549,13 @@
                                 credentials: 'same-origin'
                             });
 
-                            if (!response.ok) throw new Error('HTTP error: ' + response.status);
+                            // Read the body first: the API answers 4xx with a JSON error and that
 
-                            const data = await response.json();
+                            // message is more useful than the status code alone.
+
+                            const data = await response.json().catch(function () { return {}; });
+
+                            if (!response.ok) throw new Error(data.error || data.message || 'HTTP error: ' + response.status);
                             if (data.success) {
                                 // Reload to show the new column
                                 // If inside index.php, we might want a partial refresh, 
@@ -601,9 +605,13 @@
                 credentials: 'same-origin'
             });
 
-            if (!response.ok) throw new Error('HTTP error: ' + response.status);
+            // Read the body first: the API answers 4xx with a JSON error and that
 
-            const data = await response.json();
+            // message is more useful than the status code alone.
+
+            const data = await response.json().catch(function () { return {}; });
+
+            if (!response.ok) throw new Error(data.error || data.message || 'HTTP error: ' + response.status);
             return data.success === true;
         } catch (error) {
             console.error('Kanban API error:', error);
@@ -1127,9 +1135,13 @@
                 credentials: 'same-origin'
             });
 
-            if (!noteResponse.ok) throw new Error('HTTP error: ' + noteResponse.status);
+            // Read the body first: the API answers 4xx with a JSON error and that
 
-            const noteData = await noteResponse.json();
+            // message is more useful than the status code alone.
+
+            const noteData = await noteResponse.json().catch(function () { return {}; });
+
+            if (!noteResponse.ok) throw new Error(noteData.error || noteData.message || 'HTTP error: ' + noteResponse.status);
             if (!noteData || !noteData.success || !noteData.note || noteData.note.type !== 'tasklist') {
                 throw new Error('Invalid tasklist note response');
             }

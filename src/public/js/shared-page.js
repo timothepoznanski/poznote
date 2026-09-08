@@ -763,7 +763,14 @@
 
         fetch('api/v1/shared?' + params.toString())
             .then(function(response) {
-                if (!response.ok) throw new Error('HTTP error! status: ' + response.status);
+                if (!response.ok) {
+                    // Prefer the message the server sent over a bare status code.
+                    return response.json()
+                        .catch(function () { return {}; })
+                        .then(function (data) {
+                            throw new Error(data.error || data.message || 'HTTP error! status: ' + response.status);
+                        });
+                }
                 return response.json();
             })
             .then(function(data) {
@@ -773,7 +780,14 @@
                 return fetch('api/v1/shared/with-me');
             })
             .then(function(response) {
-                if (!response.ok) throw new Error('HTTP error! status: ' + response.status);
+                if (!response.ok) {
+                    // Prefer the message the server sent over a bare status code.
+                    return response.json()
+                        .catch(function () { return {}; })
+                        .then(function (data) {
+                            throw new Error(data.error || data.message || 'HTTP error! status: ' + response.status);
+                        });
+                }
                 return response.json();
             })
             .then(function(data) {

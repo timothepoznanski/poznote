@@ -117,7 +117,7 @@ if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessA
     }
 }
 
-require_once dirname(__DIR__, 3) . '/api/v1/ApiResponse.php';
+require_once dirname(__DIR__, 3) . '/lib/api-response.php';
 
 // Include controllers
 require_once __DIR__ . '/../../../api/v1/controllers/NotesController.php';

@@ -127,7 +127,14 @@ function saveNoteWidth(redirect = false) {
         body: JSON.stringify({ value: width })
     })
         .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
+            if (!response.ok) {
+                // Prefer the message the server sent over a bare status code.
+                return response.json()
+                    .catch(function () { return {}; })
+                    .then(function (data) {
+                        throw new Error(data.error || data.message || 'Network response was not ok');
+                    });
+            }
             return response.json();
         })
         .then(data => {
