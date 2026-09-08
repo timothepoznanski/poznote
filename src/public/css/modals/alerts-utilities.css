@@ -72,8 +72,8 @@
 }
 
 .modal .btn-danger {
-    background: #e04b4b !important;
-    color: var(--pz-text-inverse) !important;
+    background: var(--pz-danger);
+    color: var(--pz-text-inverse);
     border: none;
     padding: 8px 12px;
     border-radius: 6px;
@@ -82,7 +82,7 @@
 }
 
 .modal .btn-danger:hover {
-    background: #c43b3b !important;
+    background: #c82333;
 }
 
 /* ============================================

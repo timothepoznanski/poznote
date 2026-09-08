@@ -111,22 +111,22 @@ surfaces carrying an app colour.
     --pz-link --pz-danger --pz-success --pz-warning
     --pz-danger-soft --pz-success-soft --pz-warning-soft
 
-### Why the dark layer still leans on !important
+### How the dark layer is ordered
 
-192 declarations in `dark-mode/` carry `!important`, and most of them are
-load-bearing rather than lazy. The cause is an ordering mistake in the layer
-itself: the generic rules are MORE specific than the variant rules that are
-supposed to refine them. `html[data-theme='dark'] .modal-buttons button` is
-(0,2,2); `html[data-theme='dark'] .btn-primary` is (0,2,1). Without `!important`
-the generic one wins and every primary button inside a dialog turns neutral
-grey, which is exactly what happens if you remove it (verified by diffing the
-computed styles of 24,486 elements across nine pages and three themes).
+Write a dark rule the way the light layer does it: the generic first, the
+variant scoped to the same context after it. The layer used to have this
+backwards. `html[data-theme='dark'] .modal-buttons button` is (0,2,2) and
+`html[data-theme='dark'] .btn-primary` is (0,2,1), so the generic rule beat the
+variant and the only way out was `!important` on the variant, which then
+flattened every rule that styles a button IN context: the tinted row actions of
+the shares page, the `.danger` item of a table menu, the scoped buttons of the
+admin user list. `dark-mode/modals.css` now carries
+`html[data-theme='dark'] .modal-buttons button.btn-primary` and friends, at
+(0,3,2), and the variants in `components.css` are plain weight again.
 
-The consequence is the one a theme author feels: those rules also flatten every
-rule that styles a button IN CONTEXT, such as the tinted row actions of the
-shares page, which is why they look solid in dark and washed in light. The fix
-is to give the variants their own specificity, not to delete the `!important`.
-That is a restructuring of the dark modal and button rules and has not been done.
+If you find yourself reaching for `!important` in `dark-mode/`, check first
+whether a generic rule in the same layer is simply more specific than the
+variant you are writing. That is usually what is happening.
 
 Two things are still out of reach and need rules of your own: the dark theme's
 own `--dm-*` values behave differently (see above), and about two dozen very

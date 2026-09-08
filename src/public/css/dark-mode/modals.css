@@ -51,6 +51,58 @@ html[data-theme='dark'] .modal-buttons button:first-child:hover {
     background-color: #2a4a7f;
 }
 
+/* The variants, scoped to the dialog, exactly as modals/base.css does it for the
+   light theme. The generic rules above are (0,2,2) and (0,3,2); the plain
+   variant rules in dark-mode/components.css are (0,2,1), so without these a
+   primary button inside a dialog fell back to the neutral surface and the only
+   way to stop it was !important, which then flattened every rule that styles a
+   button in context. These are (0,3,2) and (0,4,2), one step above what they
+   have to beat and one step below anything a page scopes for itself. */
+html[data-theme='dark'] .modal-buttons button.btn-primary {
+    background-color: var(--pz-accent);
+    color: var(--pz-text-inverse);
+    border-color: var(--pz-accent);
+}
+
+html[data-theme='dark'] .modal-buttons button.btn-primary:hover {
+    background-color: var(--pz-accent-hover);
+    border-color: var(--pz-accent-hover);
+}
+
+html[data-theme='dark'] .modal-buttons button.btn-danger,
+html[data-theme='dark'] .modal-buttons button.btn-delete-ws {
+    background-color: var(--pz-danger);
+    color: var(--pz-text-inverse);
+    border-color: var(--pz-danger);
+}
+
+html[data-theme='dark'] .modal-buttons button.btn-danger:hover,
+html[data-theme='dark'] .modal-buttons button.btn-delete-ws:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+html[data-theme='dark'] .modal-buttons button.btn-success {
+    background-color: var(--pz-success);
+    color: var(--pz-text-inverse);
+    border-color: var(--pz-success);
+}
+
+html[data-theme='dark'] .modal-buttons button.btn-success:hover {
+    background-color: #218838;
+    border-color: #218838;
+}
+
+html[data-theme='dark'] .modal-buttons button.btn-cancel {
+    background-color: var(--dm-border);
+    color: var(--dm-text);
+    border-color: var(--dm-border-light);
+}
+
+html[data-theme='dark'] .modal-buttons button.btn-cancel:hover {
+    background-color: #4a4a4a;
+}
+
 /* ============================================
    Reminder Modal
    ============================================ */

@@ -327,28 +327,27 @@ html[data-theme='dark'] .btn-secondary:hover {
     background-color: var(--dm-surface-hover);
 }
 
-/* The !important is load-bearing and must stay until the dark modal rules are
-   restructured: html[data-theme='dark'] .modal-buttons button is (0,2,2) and
-   beats this (0,2,1), so without it every primary button inside a dialog falls
-   back to the neutral surface. The cost is that it also flattens the rules that
-   style a button in context, such as the tinted row actions of the shares page.
-   Fixing that means giving the variants their own specificity, not deleting
-   this. See src/public/css/README.md. */
+/* Plain weight. These used to be, because dark-mode/modals.css styles
+   every button in a dialog at a higher specificity than this rule and would
+   otherwise win. That is now handled where it belongs, by variants scoped to the
+   dialog in modals.css, so a page can once again style a button in context: the
+   tinted row actions of the shares page, the .danger item of a table menu, the
+   .actions-center buttons of the admin user list. */
 html[data-theme='dark'] .btn-primary {
-    background-color: var(--pz-accent) !important;
-    color: var(--pz-text-inverse) !important;
-    border-color: var(--pz-accent) !important;
+    background-color: var(--pz-accent);
+    color: var(--pz-text-inverse);
+    border-color: var(--pz-accent);
 }
 
 html[data-theme='dark'] .btn-primary:hover {
-    background-color: var(--pz-accent-hover) !important;
-    border-color: var(--pz-accent-hover) !important;
+    background-color: var(--pz-accent-hover);
+    border-color: var(--pz-accent-hover);
 }
 
 html[data-theme='dark'] .btn-rename {
-    background-color: #ffc107 !important;
-    color: #212529 !important;
-    border-color: #ffc107 !important;
+    background-color: #ffc107;
+    color: #212529;
+    border-color: #ffc107;
 }
 
 html[data-theme='dark'] .btn-rename:disabled {
@@ -360,43 +359,43 @@ html[data-theme='dark'] .btn-rename:disabled {
 
 html[data-theme='dark'] .btn-warning:hover,
 html[data-theme='dark'] .btn-rename:hover {
-    background-color: #e0a800 !important;
-    border-color: #e0a800 !important;
+    background-color: #e0a800;
+    border-color: #e0a800;
 }
 
 html[data-theme='dark'] .btn-background {
-    background-color: #6c757d !important;
+    background-color: #6c757d;
     color: var(--pz-text-inverse);
-    border-color: #6c757d !important;
+    border-color: #6c757d;
 }
 
 html[data-theme='dark'] .btn-background:hover {
-    background-color: #5a6268 !important;
-    border-color: #545b62 !important;
+    background-color: #5a6268;
+    border-color: #545b62;
 }
 
 html[data-theme='dark'] .btn-danger,
 html[data-theme='dark'] .btn-delete-ws {
-    background-color: var(--pz-danger) !important;
-    color: var(--pz-text-inverse) !important;
-    border-color: var(--pz-danger) !important;
+    background-color: var(--pz-danger);
+    color: var(--pz-text-inverse);
+    border-color: var(--pz-danger);
 }
 
 html[data-theme='dark'] .btn-danger:hover,
 html[data-theme='dark'] .btn-delete-ws:hover {
-    background-color: #c82333 !important;
-    border-color: #bd2130 !important;
+    background-color: #c82333;
+    border-color: #bd2130;
 }
 
 html[data-theme='dark'] .btn-success {
-    background-color: var(--pz-success) !important;
-    color: var(--pz-text-inverse) !important;
-    border-color: var(--pz-success) !important;
+    background-color: var(--pz-success);
+    color: var(--pz-text-inverse);
+    border-color: var(--pz-success);
 }
 
 html[data-theme='dark'] .btn-success:hover {
-    background-color: #218838 !important;
-    border-color: #218838 !important;
+    background-color: #218838;
+    border-color: #218838;
 }
 
 html[data-theme='dark'] .btn-cancel {
