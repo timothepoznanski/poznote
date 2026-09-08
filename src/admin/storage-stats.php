@@ -51,13 +51,6 @@ function poznoteDirSize(string $dir): int {
 }
 
 /**
- * Format a byte count as MB with two decimals.
- */
-function poznoteFormatMb(int $bytes): string {
-    return number_format($bytes / (1024 * 1024), 2);
-}
-
-/**
  * Glue a trailing unit like "(MB)" to the preceding word so it never wraps
  * onto its own line. Expects an already HTML-safe string from t_h().
  */

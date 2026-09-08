@@ -503,6 +503,17 @@ function poznoteFormatAttachmentSize($bytes) {
     return rtrim(rtrim(number_format($size, $precision, '.', ''), '0'), '.') . ' ' . $units[$index];
 }
 
+/**
+ * Raw megabyte figure for the storage statistics pages, e.g. "12.40".
+ *
+ * Deliberately unitless: the storage tables render the "MB" header once per
+ * column. Use poznoteFormatAttachmentSize() above when the unit has to travel
+ * with the number.
+ */
+function poznoteFormatMb(int $bytes): string {
+    return number_format($bytes / (1024 * 1024), 2);
+}
+
 function poznoteBuildAttachmentUrl($noteId, $attachmentId, $workspace = '', $forceDownload = false) {
     $query = [];
     $workspace = trim((string)$workspace);

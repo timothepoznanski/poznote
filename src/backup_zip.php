@@ -16,6 +16,11 @@ require_once __DIR__ . '/functions.php';
 require_once __DIR__ . '/users/db_master.php';
 require_once __DIR__ . '/users/UserDataManager.php';
 require_once __DIR__ . '/storage/AttachmentStorage.php';
+// Shared HTML post-processing for exports and backups. These used to be
+// duplicated here behind function_exists() guards, which let the two copies
+// drift apart unnoticed (the export one had stopped stripping the code block
+// language badge).
+require_once __DIR__ . '/export_helpers.php';
 
 if (!function_exists('generateSQLDumpForConnection')) {
 function generateSQLDumpForConnection($con) {
@@ -63,75 +68,6 @@ function generateSQLDumpForConnection($con) {
     }
 
     return $sql;
-}
-}
-
-if (!function_exists('removeCopyButtonsFromHtml')) {
-/**
- * Remove code block copy buttons from HTML export
- */
-function removeCopyButtonsFromHtml($html) {
-    if ($html === '' || $html === null) {
-        return $html;
-    }
-
-    $dom = new DOMDocument();
-    libxml_use_internal_errors(true);
-    $dom->loadHTML('<?xml encoding="utf-8" ?>' . $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-    libxml_clear_errors();
-
-    $xpath = new DOMXPath($dom);
-    // Code block UI affordances (copy / delete / language badge / line numbers)
-    $actionButtons = $xpath->query("//*[contains(@class, 'code-block-copy-btn') or contains(@class, 'code-block-delete-btn') or contains(@class, 'code-block-lang-btn') or contains(@class, 'code-block-line-numbers-btn')]");
-    foreach ($actionButtons as $button) {
-        $button->parentNode->removeChild($button);
-    }
-
-    // Strip the xml processing instruction added above for UTF-8 handling
-    return preg_replace('/^<\?xml[^>]*\?>\s*/', '', $dom->saveHTML());
-}
-}
-
-if (!function_exists('addDownloadAttributesToAttachmentLinks')) {
-/**
- * Add a download attribute to <a> tags pointing at exported attachment files so
- * browsers save the file instead of navigating to it when the export is opened locally.
- * $downloadNames maps the exported basename (attachment id + extension) to the
- * original filename used as the suggested download name.
- */
-function addDownloadAttributesToAttachmentLinks($html, $downloadNames) {
-    if ($html === '' || $html === null) {
-        return $html;
-    }
-
-    return preg_replace_callback(
-        '#<a\b[^>]*href=("|\')(?:\.\./)*attachments/([^"\'?\#]+)(?:[?\#][^"\']*)?\1[^>]*>#i',
-        function ($matches) use ($downloadNames) {
-            $tag = $matches[0];
-
-            // Keep the click-to-view behavior of image preview wrappers; their
-            // caption link is the download entry point
-            if (stripos($tag, 'note-attachment-preview-media') !== false) {
-                return $tag;
-            }
-
-            // Skip tags that already carry a download attribute (compare with
-            // quoted values blanked out so title="Download ..." does not match)
-            $tagWithoutValues = preg_replace('/"[^"]*"|\'[^\']*\'/', '""', $tag);
-            if (preg_match('/\sdownload\b/i', $tagWithoutValues)) {
-                return $tag;
-            }
-
-            $basename = $matches[2];
-            $downloadAttr = ' download';
-            if (isset($downloadNames[$basename]) && $downloadNames[$basename] !== '') {
-                $downloadAttr = ' download="' . htmlspecialchars($downloadNames[$basename], ENT_QUOTES, 'UTF-8') . '"';
-            }
-
-            return '<a' . $downloadAttr . substr($tag, 2);
-        },
-        $html
-    );
 }
 }
 

@@ -22,13 +22,6 @@ $currentLang   = getUserLanguage();
 $pageWorkspace = trim(getWorkspaceFilter());
 
 /**
- * Format a byte count as MB with two decimals.
- */
-function poznoteFormatMb(int $bytes): string {
-    return number_format($bytes / (1024 * 1024), 2);
-}
-
-/**
  * Drop a trailing unit like "(MB)" from a table header label: the cards
  * carry the unit inside the figure itself. Expects an HTML-safe string.
  */
