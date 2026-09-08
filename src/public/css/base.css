@@ -8,14 +8,14 @@
 @font-face {
     font-family: 'Inter';
     src: url('../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
-    font-weight: var(--pz-weight-normal);
+    font-weight: 400;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Inter';
     src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
-    font-weight: var(--pz-weight-semibold);
+    font-weight: 600;
     font-style: normal;
 }
 
@@ -45,7 +45,7 @@ form {
 /* LINKS */
 
 a {
-    color: var(--pz-accent);
+    color: var(--pz-link);
     text-decoration: none;
 }
 

@@ -30,7 +30,13 @@
        fonts.css declares Inter at 400 and 600 only, so 300 and 500 come out as
        Regular and 700 as SemiBold. Naming the four steps keeps every rendering
        exactly as it is while making the scale visible, and gives the day a
-       Medium and a Bold face ship somewhere to change. */
+       Medium and a Bold face ship somewhere to change.
+
+       Light is the exception: fonts.css now also declares Inter at 300, so this
+       step really does render lighter, but only on pages that link fonts.css
+       (the page stylesheets carrying their own @font-face copies still stop at
+       Regular and SemiBold, where 300 falls back to Regular). */
+    --pz-weight-light: 300;
     --pz-weight-normal: 400;
     --pz-weight-medium: 500;
     --pz-weight-semibold: 600;
@@ -45,6 +51,13 @@
     --pz-accent-hover: #005a8a;
     /* Same colour as RGB channels, for tints: rgba(var(--pz-accent-rgb), 0.1) */
     --pz-accent-rgb: 0, 125, 184;
+    /* Hyperlinks. Kept as its own name because it shipped: a custom stylesheet
+       out there may already set --pz-link, and dropping the name would make
+       that override silently do nothing. It defaults to the accent now; the
+       value it used to carry, #2e8cfa, had contrast 3.36 on white and failed
+       WCAG AA for body text. Override it to colour links alone, or --pz-accent
+       to move both. */
+    --pz-link: var(--pz-accent);
     /* The two ends of the greyscale, used with an alpha to darken or lighten
        whatever is under them: shadows, scrims and pressed states take the
        shadow channel, raised surfaces and hairlines on a dark ground take the

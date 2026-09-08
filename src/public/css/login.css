@@ -1,7 +1,7 @@
 @font-face {
     font-family: 'Inter';
     font-style: normal;
-    font-weight: var(--pz-weight-normal);
+    font-weight: 400;
     font-display: swap;
     src: url('../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
 }
@@ -9,7 +9,7 @@
 @font-face {
     font-family: 'Inter';
     font-style: normal;
-    font-weight: var(--pz-weight-semibold);
+    font-weight: 600;
     font-display: swap;
     src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
 }

@@ -7,12 +7,30 @@
  * font, instead of pasting another @font-face copy (a dozen page stylesheets
  * historically carry their own; new pages should use this one).
  *
- * Only these two weights ship; browsers synthesise the rest.
+ * Only these three weights ship; browsers pick the nearest for the rest, so a
+ * 500 still renders as Regular. Light is here and not in the page stylesheets
+ * that declare their own faces: only pages linking this file get it.
+ *
+ * The weights below are written out and not taken from the --pz-weight-* scale
+ * on purpose: var() resolves in property values on elements, never in at-rule
+ * descriptors. A var() here does not fall back to the token's value, it makes
+ * the descriptor invalid, and the face then claims the default weight of 400.
+ * Two faces both claiming 400 means the last one declared answers every
+ * request, which is how the whole app once rendered in SemiBold.
+ * tools/css-check.php guards this.
  */
 @font-face {
     font-family: 'Inter';
+    src: url('../webfonts/Inter/static/Inter_24pt-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Inter';
     src: url('../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
-    font-weight: var(--pz-weight-normal);
+    font-weight: 400;
     font-style: normal;
     font-display: swap;
 }
@@ -20,7 +38,7 @@
 @font-face {
     font-family: 'Inter';
     src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
-    font-weight: var(--pz-weight-semibold);
+    font-weight: 600;
     font-style: normal;
     font-display: swap;
 }
