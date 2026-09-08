@@ -140,14 +140,6 @@ body.dashboard-page {
     display: none;
 }
 
-#dashboardToggleFavorites.active .lucide-star {
-    color: var(--pz-warning);
-}
-
-.dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star {
-    color: var(--pz-warning);
-}
-
 /* ---------- Breadcrumb ---------- */
 
 /* Shares the card grid's capped width and auto margins so it starts on the
@@ -1268,14 +1260,6 @@ body.dashboard-page .notifications-empty i {
 
 :root[data-theme='dark'] .dashboard-filter-clear:hover {
     background: var(--dm-surface-hover);
-}
-
-:root[data-theme='dark'] #dashboardToggleFavorites.active .lucide-star {
-    color: var(--dm-warning);
-}
-
-:root[data-theme='dark'] .dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star {
-    color: var(--dm-warning);
 }
 
 :root[data-theme='dark'] .bc-current {

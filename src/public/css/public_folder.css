@@ -183,7 +183,6 @@
     --status-text: var(--pz-text);
     --status-muted: #666666;
     --status-accent: #3182ce;
-    --status-accent-strong: #3182ce;
     --status-shadow: 0 6px 24px rgba(var(--pz-shadow-rgb), 0.08);
     font-family: 'Inter', sans-serif;
     min-height: 100vh;
@@ -297,7 +296,6 @@
     --status-text: var(--dm-text, var(--dm-text));
     --status-muted: var(--dm-text-muted, var(--dm-text-muted));
     --status-accent: #6db3f2;
-    --status-accent-strong: #6db3f2;
     --status-shadow: none;
 }
 
@@ -804,7 +802,6 @@ body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.i
     --text-muted: var(--dm-text-muted, var(--dm-text-muted));
     --border-color: var(--dm-border, var(--dm-border));
     --primary-color: var(--dm-accent);
-    --primary-hover: #3a8eef;
     --button-bg: var(--dm-surface, var(--dm-surface));
     --button-hover-bg: var(--dm-surface-hover, var(--dm-surface-hover));
     --tag-bg: var(--dm-surface, var(--dm-surface));
@@ -816,7 +813,6 @@ body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.i
     --text-muted: #666;
     --border-color: #ddd;
     --primary-color: #007bff;
-    --primary-hover: #0056b3;
     --button-bg: #f5f5f5;
     --button-hover-bg: #e0e0e0;
     --tag-bg: #f0f0f0;

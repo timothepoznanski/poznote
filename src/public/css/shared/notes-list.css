@@ -10,7 +10,6 @@
     --shared-column-gap: 48px;
     --shared-divider-padding: 14px;
     --shared-name-width: 220px;
-    --shared-folder-width: 190px;
     --shared-token-width: 210px;
     --shared-actions-width: 228px;
     max-width: var(--shared-content-max-width, 980px);

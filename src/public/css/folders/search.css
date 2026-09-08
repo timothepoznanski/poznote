@@ -49,16 +49,6 @@ html[data-theme='dark'] .noteentry .search-highlight-active {
     color: var(--pz-text);
 }
 
-@keyframes highlightPulse {
-    0%,
-    100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.8;
-    }
-}
-
 /* Input highlight overlay for precise word highlighting in input elements */
 .input-highlight-overlay,
 html[data-theme='dark'] .input-highlight-overlay,

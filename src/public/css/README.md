@@ -95,19 +95,31 @@ reach: a palette could darken a page and leave its fields glowing. Checkboxes,
 radios, colour pickers and ranges are deliberately absent, the browser paints
 them and a background there breaks their native rendering.
 
-`tools/css-check.php` runs in CI and holds three lines:
+`tools/css-check.php` runs in CI and holds six lines:
 
 - brace and comment balance, because the stylesheets are concatenated at request
   time and one unclosed brace silently kills every rule after it in the bundle;
 - no `body.dark-mode` / `body.black-mode` selector, so the theme keeps one carrier;
 - a colour ratchet. `tools/css-check.baseline.json` holds the number of colour
   literals left outside the palette file, and the check fails when a change adds
-  any. Raising it is allowed but has to be a decision, written in the commit.
+  any. Counted: hex, the `white` / `black` keywords, and any functional colour
+  (`rgba()`, `hsl()`, `oklch()`...) whose arguments name no variable. Raising the
+  baseline is allowed but has to be a decision, written in the commit.
   `css/components/` is stricter still: a shared base must be entirely tokens,
-  since it is the layer a palette most needs to reach.
-
-What it does not check is that a page rule only ADDS to a component base. That
-one is still on review.
+  since it is the layer a palette most needs to reach;
+- the component-base rule below, enforced: outside `css/components/`, a
+  stylesheet may not redefine a property the base owns **on the base's own
+  selector**. Restyling in context (`.shares-page .btn-success`) stays legal, and
+  so does `@media`, because a viewport is a context;
+- no two `@keyframes` of the same name with different bodies. The name is one
+  global namespace and the last definition loaded wins, silently: an emptied
+  `slideDown` killed the search bar's opening animation, and a `heartbeat`
+  declared-but-unused in `settings.css` replaced the real one on seven pages.
+  Same-named blocks that agree are fine (`from`/`to` and `0%`/`100%` compare
+  equal);
+- no empty rule. A declaration block with nothing in it says nothing to anyone
+  but the parser, and an empty `@keyframes` is how the first of those two bugs
+  stayed hidden.
 
 ## Writing a palette
 

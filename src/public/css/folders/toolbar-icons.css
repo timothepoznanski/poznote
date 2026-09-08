@@ -35,11 +35,8 @@
     transform: scale(1.18);
 }
 
-/* Markdown split view button - normal icon color (not blue) */
-.toolbar-btn.markdown-split-btn i,
-.toolbar-btn.markdown-split-btn [class*="lucide-"] {
-    /* Use default icon color */
-}
+/* The markdown split-view button keeps the default icon colour: nothing to
+   declare, since no rule above tints it. */
 
 .toolbar-btn.markdown-split-btn:hover i,
 .toolbar-btn.markdown-split-btn:hover [class*="lucide-"] {

@@ -297,15 +297,6 @@ html[data-theme='dark'] .alert-modal-button.primary.snapshot-restore-confirm-but
     /* Prevent interaction with background */
 }
 
-/* Base animation for indeterminate progress bars */
-@keyframes indeterminate-progress {
-    0% { left: -30%; width: 30%; }
-
-    50% { left: 40%; width: 60%; }
-
-    100% { left: 100%; width: 30%; }
-}
-
 /* Progress Bar Modal */
 .progress-modal {
     text-align: center;

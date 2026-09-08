@@ -17,9 +17,6 @@
     animation: slideDown 0.2s ease-out;
 }
 
-@keyframes slideDown {
-}
-
 /* Controls row (search + navigation buttons) */
 .search-replace-controls {
     display: flex;

@@ -84,18 +84,6 @@ body.settings-page {
     height: 14px;
 }
 
-@keyframes heartbeat {
-    0% { opacity: 1; transform: scale(1); }
-
-    25% { opacity: 0.6; transform: scale(0.9); }
-
-    50% { opacity: 1; transform: scale(1); }
-
-    75% { opacity: 0.6; transform: scale(0.9); }
-
-    100% { opacity: 1; transform: scale(1); }
-}
-
 /* Settings Card Clickable Cursor - helper if needed, though home-card handles it */
 .settings-card-clickable {
     cursor: pointer;

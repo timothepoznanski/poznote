@@ -5,11 +5,9 @@
  * and sidebar link transitions.
  */
 
-/* Note Loading State - no transition */
-.note-loading-state {}
-
-/* Smooth fade out for outgoing content - no transition */
-.note-fade-out {}
+/* .note-loading-state and .note-fade-out carry no style on purpose: the note
+   swap is deliberately instant. They used to be declared empty, which said the
+   same thing to no one but the parser. */
 
 #new-note-loading-placeholder {
     flex: 1;

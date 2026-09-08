@@ -156,6 +156,12 @@
     --pz-border-light: var(--dm-border);
     --pz-border-strong: var(--dm-border-light);
     --pz-icon: var(--dm-icon);
+    /* Neutral controls follow too. Their dark values existed but nothing
+       pointed at them, so a scrollbar or a disabled fill written once with
+       var(--pz-scrollbar) kept rendering the light grey in dark mode. */
+    --pz-disabled: var(--dm-disabled);
+    --pz-scrollbar: var(--dm-scrollbar);
+    --pz-scrollbar-hover: var(--dm-scrollbar-hover);
     --dm-border: #404040;
     --dm-border-light: #555555;
     --dm-accent: #4a9eff;

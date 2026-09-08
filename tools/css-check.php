@@ -260,6 +260,71 @@ foreach ($pageRules as [$file, $line, $sel, $props]) {
     $errors++;
 }
 
+// ---------------------------------------------------------------------------
+// @keyframes names are one global namespace, and the last definition wins.
+//
+// Two animations found by this check had been silently replaced: a de-dup pass
+// emptied @keyframes slideDown in search-replace.css and left the reference in
+// place, so the search bar's opening animation did nothing; and settings.css
+// declared a heartbeat it never used which, loading later, overrode the real
+// beating heart on the Support card across seven pages. Nothing rendered an
+// error either time. Same-named blocks are fine as long as they AGREE.
+//
+// Empty rules go with it: a declaration block with nothing in it says nothing
+// to anyone but the parser, and an empty @keyframes is how the first bug hid.
+$frames = [];       // name => [ [file, normalised body] ]
+$emptyRules = [];
+foreach ($files as $file) {
+    $css = preg_replace('!/\*.*?\*/!s', '', (string) file_get_contents($file));
+    $name = str_starts_with($file, $root) ? 'src/public/css' . substr($file, strlen($root)) : $file;
+    $len = strlen($css);
+    for ($i = 0; $i < $len; $i++) {
+        if ($css[$i] !== '@' || !preg_match('/\G@(-\w+-)?keyframes\s+([\w-]+)\s*\{/', $css, $m, 0, $i)) {
+            continue;
+        }
+        $start = $i + strlen($m[0]);
+        $depth = 1;
+        $j = $start;
+        while ($j < $len && $depth > 0) {
+            if ($css[$j] === '{') {
+                $depth++;
+            } elseif ($css[$j] === '}') {
+                $depth--;
+            }
+            $j++;
+        }
+        $body = substr($css, $start, $j - $start - 1);
+        // from/to and 0%/100% are the same keyframe: compare meaning, not text.
+        $body = strtolower(preg_replace('/\s+/', '', $body));
+        $body = str_replace(['from{', 'to{'], ['0%{', '100%{'], $body);
+        $frames[($m[1] ?? '') . $m[2]][] = [$name, $body];
+        $i = $j - 1;
+    }
+    // Une regle vide: un prelude qui n'est pas une at-rule, suivi de {}
+    if (preg_match_all('/(^|[};])\s*([^{};@]+?)\s*\{\s*\}/', $css, $e, PREG_SET_ORDER)) {
+        foreach ($e as $x) {
+            $emptyRules[] = "$name: " . trim(preg_replace('/\s+/', ' ', $x[2]));
+        }
+    }
+}
+foreach ($frames as $kfName => $defs) {
+    if (count($defs) < 2) {
+        continue;
+    }
+    $bodies = array_unique(array_column($defs, 1));
+    if (count($bodies) === 1) {
+        continue;                    // duplique mais d'accord avec lui-meme
+    }
+    echo "@keyframes $kfName is defined " . count($defs) . " times with different bodies; "
+       . "the last one loaded silently replaces the others: "
+       . implode(', ', array_map(fn($d) => $d[0] . ($d[1] === '' ? ' (empty)' : ''), $defs)) . "\n";
+    $errors++;
+}
+foreach ($emptyRules as $r) {
+    echo "$r: empty rule, delete it or say what it is for in a comment\n";
+    $errors++;
+}
+
 if ($errors === 0) {
     echo count($files) . " stylesheet(s) balanced, $literals colour literal(s)\n";
     exit(0);

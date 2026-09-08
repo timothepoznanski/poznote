@@ -17,11 +17,8 @@
     color: var(--pz-accent) !important;
 }
 
-/* Markdown split view button - normal icon color (not blue) */
-.toolbar-btn.markdown-split-btn i,
-.toolbar-btn.markdown-split-btn [class*="lucide-"] {
-    /* Use default icon color */
-}
+/* The markdown split-view button keeps the default icon colour: nothing to
+   declare, since no rule above tints it. */
 
 /* The default icon colour.
 
@@ -74,12 +71,6 @@
 .slash-command-item i[style*="color:"],
 .slash-command-submenu i[style*="color:"] {
     filter: none !important;
-}
-
-/* Exception: Remove filter for favorite/share/attachment (to show blue color) */
-.toolbar-btn.is-favorite .lucide-star,
-.toolbar-btn.is-shared .lucide-share-2,
-.toolbar-btn.has-attachments .lucide-paperclip {
 }
 
 .sidebar-plus {

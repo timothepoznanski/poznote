@@ -412,11 +412,6 @@
     font-size: 14px;
 }
 
-/* ---- Home page notification card ---- */
-#home-notifications-card.has-notifications .home-card-icon i {
-    color: var(--pz-warning-hover);
-}
-
 #notificationsModal .modal-content {
     position: relative;
 }

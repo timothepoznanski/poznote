@@ -226,7 +226,6 @@ body.notes-manager-page {
     --selected-bg: rgba(148, 163, 184, 0.16);
     --selected-color: #e5e7eb;
     --badge-bg: #3730a3;
-    --badge-color: #e0e7ff;
     --badge-bg-subtle: var(--dm-border);
     --muted-color: #888888;
 }
