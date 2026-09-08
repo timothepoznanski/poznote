@@ -348,16 +348,8 @@ html[data-theme='dark'] .move-task-item {
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .move-task-item:hover {
-    background: var(--dm-surface-hover);
-}
-
 html[data-theme='dark'] .move-task-item.selected {
     background: var(--dm-active);
-}
-
-html[data-theme='dark'] .move-task-item small {
-    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .move-task-item.move-task-create {
@@ -386,14 +378,6 @@ html[data-theme='dark'] #moveFolderFilesModal select#moveFolderFilesTargetSelect
     outline: none;
     border-color: var(--dm-accent);
     box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.25);
-}
-
-html[data-theme='dark'] #moveFolderFilesModal .modal-info-message {
-    color: var(--dm-text-muted);
-}
-
-html[data-theme='dark'] #moveFolderFilesModal .modal-info-message i {
-    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-cancel {
@@ -757,11 +741,6 @@ html[data-theme='dark'] #snapshotModal .snapshot-modal-description {
     color: rgba(218, 226, 237, 0.82);
 }
 
-html[data-theme='dark'] .snapshot-meta {
-    background: transparent;
-    border-bottom: none;
-}
-
 html[data-theme='dark'] .snapshot-meta-item {
     color: rgba(232, 238, 247, 0.86);
 }
@@ -793,10 +772,6 @@ html[data-theme='dark'] #snapshotModal .snapshot-content-preview section,
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview article {
     color: inherit !important;
     background: transparent !important;
-}
-
-html[data-theme='dark'] .snapshot-content-preview:empty::before {
-    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview a {
@@ -867,15 +842,6 @@ html[data-theme='dark'] #snapshotModal .snapshot-date-secondary {
 
 html[data-theme='dark'] .snapshot-date-btn:hover {
     background-color: rgba(255, 255, 255, 0.08);
-}
-
-html[data-theme='dark'] .snapshot-date-btn.active {
-    background-color: var(--pz-accent);
-    color: var(--pz-text-inverse);
-}
-
-html[data-theme='dark'] #snapshotModal .snapshot-date-btn [class*="lucide-"] {
-    filter: none !important;
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-state-title {

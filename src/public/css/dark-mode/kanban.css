@@ -1,10 +1,4 @@
-/* ============================================
-   Dark Mode - Kanban View
-   ============================================ */
 
-html[data-theme='dark'] .kanban-title {
-    color: var(--dm-text);
-}
 
 html[data-theme='dark'] .kanban-column {
     background: var(--dm-bg);
@@ -16,28 +10,14 @@ html[data-theme='dark'] .kanban-column-header {
     border-bottom-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .kanban-column-title {
-    color: var(--dm-text);
-}
-
 html[data-theme='dark'] .kanban-column-count {
     background: var(--dm-surface);
-    color: var(--dm-text-muted);
-}
-
-html[data-theme='dark'] .kanban-add-card-btn {
-    background: transparent;
     color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .kanban-add-card-btn:hover {
     background: rgba(var(--pz-accent-rgb), 0.2);
     color: var(--pz-text-inverse);
-}
-
-html[data-theme='dark'] .kanban-add-card-btn:focus {
-    outline: 2px solid var(--pz-accent);
-    outline-offset: 2px;
 }
 
 html[data-theme='dark'] .kanban-add-column-btn {
@@ -84,22 +64,6 @@ html[data-theme='dark'] .kanban-card:hover {
     border-color: #666666;
     background: var(--dm-surface);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-}
-
-html[data-theme='dark'] .kanban-card-title {
-    color: var(--dm-text);
-}
-
-html[data-theme='dark'] .kanban-card-snippet {
-    color: var(--dm-text-muted);
-}
-
-html[data-theme='dark'] .kanban-task-preview-item {
-    color: var(--dm-text-muted);
-}
-
-html[data-theme='dark'] .kanban-task-preview-item.completed .kanban-task-preview-text {
-    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .kanban-card-meta {
@@ -198,24 +162,10 @@ html[data-theme='dark'] .kanban-card-completed {
     border-color: var(--dm-border);
 }
 
-html[data-theme='dark'] .kanban-card-completed .kanban-card-title {
-    color: var(--dm-text-subtle);
-    text-decoration: line-through;
-}
-
-html[data-theme='dark'] .kanban-card-completed .kanban-card-snippet,
-html[data-theme='dark'] .kanban-card-completed .kanban-card-date {
-    color: var(--dm-text-subtle);
-}
-
 /* ===== Completed section ===== */
 html[data-theme='dark'] .kanban-completed-toggle {
     border-top-color: var(--dm-border);
     color: var(--dm-text-muted);
-}
-
-html[data-theme='dark'] .kanban-completed-toggle:hover {
-    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .kanban-completed-count {
@@ -227,10 +177,6 @@ html[data-theme='dark'] .kanban-completed-count {
 html[data-theme='dark'] .kanban-subfolder-section {
     background: var(--dm-surface);
     border-color: var(--dm-border);
-}
-
-html[data-theme='dark'] .kanban-subfolder-toggle {
-    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .kanban-subfolder-toggle:hover {

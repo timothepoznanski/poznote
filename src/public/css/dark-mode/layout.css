@@ -14,17 +14,8 @@ html[data-theme='dark'] #right_pane {
     color: var(--dm-text);
 }
 
-/* Sidebar header */
-html[data-theme='dark'] .sidebar-title {
-    color: var(--dm-text);
-}
-
 html[data-theme='dark'] .workspace-title-text {
     color: var(--dm-text);
-}
-
-html[data-theme='dark'] .workspace-dropdown-icon {
-    color: var(--dm-text-muted);
 }
 
 /* ============================================
@@ -48,10 +39,6 @@ html[data-theme='dark'] .searchbar-input::placeholder {
 
 html[data-theme='dark'] .searchbar-icon {
     color: var(--dm-text);
-}
-
-html[data-theme='dark'] .searchbar-date-toggle {
-    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .searchbar-date-toggle:hover,
@@ -81,10 +68,6 @@ html[data-theme='dark'] .folder-filter-banner-name i.folder-filter-banner-icon:f
     background-color: var(--dm-accent, var(--dm-accent));
 }
 
-html[data-theme='dark'] .search-date-field label {
-    color: var(--dm-text-muted);
-}
-
 html[data-theme='dark'] .search-date-field label i {
     color: var(--dm-text-muted);
 }
@@ -95,22 +78,12 @@ html[data-theme='dark'] .search-date-input {
     color: var(--dm-text);
 }
 
-/* Search options toggle button */
-html[data-theme='dark'] .searchbar-options-toggle {
-    color: var(--dm-text-subtle);
-}
-
 html[data-theme='dark'] .searchbar-options-toggle:hover {
     color: var(--dm-accent-hover);
 }
 
 html[data-theme='dark'] .searchbar-options-toggle.active {
     color: var(--dm-accent-hover);
-}
-
-/* Search type buttons */
-html[data-theme='dark'] .searchbar-type-btn {
-    color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .searchbar-type-btn:hover {
@@ -137,23 +110,6 @@ html[data-theme='dark'] .searchbar-type-btn.active i[class*="lucide-"] {
 html[data-theme='dark'] .searchbar-type-btn.active i::before,
 html[data-theme='dark'] .searchbar-type-btn.active i[class*="lucide-"]::before {
     color: var(--dm-accent-hover) !important;
-}
-
-/* Ensure filters don't desaturate search type icons */
-html[data-theme='dark'] .searchbar-type-btn i,
-html[data-theme='dark'] .searchbar-type-btn i::before,
-html[data-theme='dark'] .searchbar-type-btn.active i,
-html[data-theme='dark'] .searchbar-type-btn.active i::before {
-    filter: none !important;
-}
-
-/* ============================================
-   System Folders & Favorites
-   ============================================ */
-
-/* System folders container - hidden (replaced by Home page) */
-html[data-theme='dark'] .system-folders-container {
-    display: none !important;
 }
 
 /* System menu dropdown */
@@ -204,10 +160,6 @@ html[data-theme='dark'] .folder-name {
 
 html[data-theme='dark'] .folder-icon {
     color: var(--dm-text);
-}
-
-html[data-theme='dark'] .folder-note-count {
-    color: var(--dm-text-muted);
 }
 
 /* System folder note count - blue like in light mode */
@@ -264,11 +216,6 @@ html.theme-black[data-theme='dark'] .folder-name {
     color: #66778f;
 }
 
-/* Subheading and dates */
-html[data-theme='dark'] .note-subline {
-    color: var(--dm-text-muted);
-}
-
 html[data-theme='dark'] .lastupdated {
     color: var(--dm-text-muted) !important;
 }
@@ -310,10 +257,6 @@ html[data-theme='dark'] #icon_sidebar {
 
 html[data-theme='dark'] .icon-sidebar-bottom {
     border-top-color: var(--dm-border);
-}
-
-html[data-theme='dark'] .icon-sidebar-divider {
-    background: var(--dm-border);
 }
 
 html[data-theme='dark'] .icon-sidebar-btn {
