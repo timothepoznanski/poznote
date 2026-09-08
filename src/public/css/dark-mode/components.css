@@ -412,15 +412,19 @@ html[data-theme='dark'] .btn-cancel:hover {
    Links
    ============================================ */
 
-/* Buttons are excluded: an <a class="btn"> is a button, and letting the generic
-   link colour reach it is what used to force components/buttons.css to defend
-   its label colour with !important, which in turn overrode every contextual
-   button style (the tinted action buttons of the shared page, for one). */
-html[data-theme='dark'] a:not(.btn) {
+/* The carrier is wrapped in :where() so this weighs (0,0,1), exactly what the
+   light `a` rule in base.css weighs. Written plainly it was (0,2,1), two steps
+   above its light counterpart, so the two themes did not resolve the same way:
+   any element that is a LINK but not a hyperlink lost its own colour in dark
+   and kept it in light. The icon rail was the visible case, 135 of its entries
+   painted accent-blue over the muted grey they ask for, which also swallowed
+   the highlight on the current page. .btn no longer needs excluding either:
+   at (0,0,1) every component that states a colour already outranks this. */
+:where(html[data-theme='dark']) a {
     color: var(--dm-accent);
 }
 
-html[data-theme='dark'] a:not(.btn):hover {
+:where(html[data-theme='dark']) a:hover {
     color: var(--dm-accent-hover);
 }
 
