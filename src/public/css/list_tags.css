@@ -56,7 +56,7 @@ html.tags-page {
 }
 
 .tag-item {
-    background: white;
+    background: var(--pz-bg);
     border: 2px solid var(--pz-border);
     border-radius: 12px;
     padding: 15px;
@@ -241,7 +241,7 @@ html[data-theme='dark'] .tag-color-swatch.selected {
     font-size: 1.2em;
     margin-top: 50px;
     padding: 40px;
-    background: #f9f9f9;
+    background: var(--pz-surface);
     border-radius: 12px;
 }
 
@@ -275,7 +275,7 @@ html[data-theme='dark'] .tag-color-swatch.selected {
 }
 
 .tag-context-menu-item:hover {
-    background: #f0f0f0;
+    background: var(--pz-surface-hover);
 }
 
 .tag-context-menu-item.danger {

@@ -163,7 +163,7 @@ body.public-note-page {
     max-width: 280px;
     display: block;
     border-radius: 8px;
-    background: #f1f3f4;
+    background: var(--pz-surface-hover);
     margin: 8px 0;
 }
 
@@ -242,7 +242,7 @@ body.public-note-page {
 }
 
 :where(.public-note .content) table th {
-    background-color: #f5f5f5;
+    background-color: var(--pz-surface-hover);
     font-weight: 600;
 }
 
@@ -258,7 +258,7 @@ body.public-note-page {
 
 .public-note .content pre {
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
-    background: #F8FAFC !important;
+    background: var(--pz-surface) !important;
     padding: 30px !important;
     padding-bottom: 20px !important;
     border-radius: 4px;
@@ -339,7 +339,7 @@ body.public-note-page {
 .public-note .content .code-block-copy-btn.copied,
 .code-block-copy-btn.copied {
     background-color: #4caf50;
-    color: white;
+    color: var(--pz-text-inverse);
     border-color: #4caf50;
 }
 
@@ -517,7 +517,7 @@ body.public-note-page {
 /* Important task styling for public view */
 .public-note .content .task-item.important {
     border-color: #ffcccc;
-    background: #fff6f6;
+    background: var(--pz-surface);
 }
 
 .public-note .content .task-item.important .task-text {
@@ -714,7 +714,7 @@ body.public-note-page {
 }
 
 .theme-toggle-btn:hover {
-    background: #f5f5f5;
+    background: var(--pz-surface-hover);
     border-color: #999;
 }
 

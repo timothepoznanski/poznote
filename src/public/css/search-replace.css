@@ -103,12 +103,12 @@
 }
 
 .search-replace-btn:hover {
-    background: #f0f0f0;
+    background: var(--pz-surface-hover);
     border-color: #bbb;
 }
 
 .search-replace-btn:active {
-    background: #e8e8e8;
+    background: var(--pz-surface-sunken);
 }
 
 .search-replace-btn:disabled {
@@ -133,7 +133,7 @@
 }
 
 .search-replace-close-btn:hover {
-    background: #f0f0f0;
+    background: var(--pz-surface-hover);
     color: var(--text-color, var(--pz-text));
 }
 

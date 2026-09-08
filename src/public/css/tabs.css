@@ -57,7 +57,7 @@
 }
 
 .app-tab:hover {
-    background: #e9ecef;
+    background: var(--pz-surface-sunken);
 }
 
 .app-tab.active {
@@ -251,7 +251,7 @@ body.app-tab-reordering {
 
 .app-tab-context-separator {
     height: 1px;
-    background: #e5e7eb;
+    background: var(--pz-surface-sunken);
     margin: 4px 0;
 }
 

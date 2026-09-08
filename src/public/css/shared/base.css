@@ -14,7 +14,7 @@ body.shared-page {
 body.shared-page::-webkit-scrollbar {
     display: block !important;
     width: 8px !important;
-    background-color: #f1f1f1 !important;
+    background-color: var(--pz-surface-hover) !important;
 }
 
 body.shared-page::-webkit-scrollbar-thumb {
@@ -39,7 +39,7 @@ body.shared-page html {
 body.shared-page html::-webkit-scrollbar {
     display: block !important;
     width: 8px !important;
-    background-color: #f1f1f1 !important;
+    background-color: var(--pz-surface-hover) !important;
 }
 
 body.shared-page html::-webkit-scrollbar-thumb {
@@ -251,7 +251,7 @@ body.shared-page {
 }
 
 .clear-filter-btn:hover {
-    background-color: var(--hover-bg, #f0f0f0);
+    background-color: var(--hover-bg, var(--pz-surface-hover));
     color: var(--text-color, var(--pz-text));
 }
 

@@ -79,7 +79,7 @@ html[data-theme='dark'] {
 
 .btn-cancel-admin {
     background-color: var(--pz-danger) !important;
-    color: white !important;
+    color: var(--pz-text-inverse) !important;
 }
 
 .btn-cancel-admin:hover {
@@ -346,12 +346,12 @@ html[data-theme='dark'] .users-table td {
 
 .badge-active {
     background: var(--pz-success);
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .badge-inactive {
     background: var(--pz-danger);
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .clickable-badge {
@@ -774,7 +774,7 @@ html[data-theme='dark'] .account-access-own-label {
     width: 14px;
     left: 3px;
     bottom: 3px;
-    background-color: white;
+    background-color: var(--pz-bg);
     transition: .4s;
     border-radius: 50%;
 }
@@ -954,7 +954,7 @@ input:disabled+.slider {
 
 .users-stat-badge {
     text-decoration: none;
-    color: white;
+    color: var(--pz-text-inverse);
     cursor: pointer;
     transition: opacity 0.2s, filter 0.2s, box-shadow 0.2s;
 }

@@ -37,7 +37,7 @@
     box-sizing: border-box;
     border: none;
     border-radius: 8px;
-    background-color: #fefefe;
+    background-color: var(--pz-bg);
     color: rgb(55, 53, 47);
     font-family: 'Inter', sans-serif;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -122,12 +122,12 @@
 /* Grey "Cancel", used by the logout confirmation. .btn-cancel is only styled
    inside .modal-buttons by the shared sheets, which half the host pages skip. */
 :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-cancel {
-    background-color: #e9ecef;
+    background-color: var(--pz-surface-sunken);
     color: rgb(55, 53, 47);
 }
 
 :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-cancel:hover {
-    background-color: #dde1e5;
+    background-color: var(--pz-surface-sunken);
 }
 
 /* Dark mode. Every host page loads css/dark-mode/variables.css, so the tokens

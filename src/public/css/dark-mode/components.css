@@ -359,7 +359,7 @@ html[data-theme='dark'] .btn-rename:hover {
 
 html[data-theme='dark'] .btn-background {
     background-color: #6c757d !important;
-    color: white !important;
+    color: var(--pz-text-inverse) !important;
     border-color: #6c757d !important;
 }
 
@@ -383,7 +383,7 @@ html[data-theme='dark'] .btn-delete-ws:hover {
 
 html[data-theme='dark'] .btn-success {
     background-color: #28a745 !important;
-    color: white !important;
+    color: var(--pz-text-inverse) !important;
     border-color: #28a745 !important;
 }
 

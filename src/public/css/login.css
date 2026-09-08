@@ -24,7 +24,7 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background-color: #f8fafc;
+    background-color: var(--pz-surface);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -89,7 +89,7 @@ input[type="password"] {
     font-size: 1rem;
     font-family: inherit;
     transition: all 0.2s ease;
-    background: white;
+    background: var(--pz-bg);
 }
 
 .password-wrapper {
@@ -203,7 +203,7 @@ input[type="password"]::placeholder {
     color: var(--pz-text-muted);
     font-size: 0.875rem;
     font-weight: 500;
-    background: white;
+    background: var(--pz-bg);
     padding: 0 0.75rem;
     position: relative;
 }
@@ -212,7 +212,7 @@ input[type="password"]::placeholder {
     width: 100%;
     padding: 0.875rem 1rem;
     background: #3182ce;
-    color: white;
+    color: var(--pz-text-inverse);
     border: none;
     border-radius: 8px;
     font-size: 1rem;
@@ -306,7 +306,7 @@ input[type="password"]::placeholder {
 .account-option:hover,
 .account-option:focus {
     border-color: #3182ce;
-    background: #f7fafc;
+    background: var(--pz-surface);
     outline: none;
 }
 
@@ -353,7 +353,7 @@ input[type="password"]::placeholder {
 }
 
 .admin-warning {
-    background: #fff5f5;
+    background: var(--pz-surface);
     border: 1px solid #feb2b2;
     color: #c53030;
     padding: 1rem;
@@ -375,7 +375,7 @@ input[type="password"]::placeholder {
 .info {
     margin-top: 2rem;
     padding: 1rem;
-    background: #f7fafc;
+    background: var(--pz-surface);
     border: 1px solid var(--pz-border-light);
     border-radius: 8px;
     font-size: 0.875rem;
@@ -394,7 +394,7 @@ input[type="password"]::placeholder {
 }
 
 .info code {
-    background: #edf2f7;
+    background: var(--pz-surface-hover);
     padding: 0.125rem 0.25rem;
     border-radius: 4px;
     font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;

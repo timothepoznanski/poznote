@@ -82,7 +82,7 @@
 }
 
 .folder-item:hover {
-    background-color: #f0f0f0;
+    background-color: var(--pz-surface-hover);
 }
 
 .folder-item i {

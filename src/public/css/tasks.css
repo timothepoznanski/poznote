@@ -43,7 +43,7 @@
 .noteentry .tasklist-progress-bar {
     height: 8px;
     border-radius: 4px;
-    background-color: #e9ecef;
+    background-color: var(--pz-surface-sunken);
     overflow: hidden;
 }
 
@@ -107,7 +107,7 @@
     margin-bottom: 8px;
     border: 1px solid var(--pz-border);
     border-radius: 6px;
-    background: #fafafa;
+    background: var(--pz-surface);
     transition: all 0.2s ease;
     user-select: none;
     -webkit-user-select: none;
@@ -140,7 +140,7 @@
 }
 
 .task-item:hover {
-    background: #f5f5f5;
+    background: var(--pz-surface-hover);
     border-color: var(--pz-border-strong);
 }
 
@@ -165,7 +165,7 @@
 }
 
 .task-item.completed {
-    background: #f0f8f0;
+    background: var(--pz-surface-hover);
     border-color: #c8e6c9;
     opacity: 0.8;
 }
@@ -433,7 +433,7 @@
     padding: 2px 8px;
     border: 1px solid var(--pz-border-strong);
     border-radius: 12px;
-    background: #f6f8fa;
+    background: var(--pz-surface);
     color: var(--pz-text-secondary);
     font-size: 12px;
     line-height: 1.4;
@@ -584,7 +584,7 @@
 /* Important task styling */
 .task-item.important {
     border-color: #ffcccc;
-    background: #fff6f6;
+    background: var(--pz-surface);
 }
 
 .task-item.important .task-text {

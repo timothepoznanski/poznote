@@ -517,7 +517,7 @@ body.mobile-formatting-toolbar-active #right_col .note-edit-toolbar .mobile-home
 /* Back button in slash submenu (mobile) */
 .slash-command-back {
     font-weight: 500;
-    background-color: #f9fafb !important;
+    background-color: var(--pz-surface) !important;
 }
 
 .slash-command-back:hover {

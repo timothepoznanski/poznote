@@ -53,7 +53,7 @@
    ============================================ */
 
 .modal-content {
-    background-color: #fefefe;
+    background-color: var(--pz-bg);
     padding: 28px;
     border: none;
     border-radius: 8px;
@@ -140,7 +140,7 @@
 
 .modal-buttons button:first-child {
     background-color: var(--pz-accent);
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .modal-buttons button:first-child:hover {
@@ -154,7 +154,7 @@
 }
 
 .modal-buttons button:last-child:hover {
-    background-color: #e9ecef;
+    background-color: var(--pz-surface-sunken);
 }
 
 /* Account-settings info modal holds three buttons: keep them on a single
@@ -184,7 +184,7 @@
 /* Explicit button classes (take precedence over first/last child rules) */
 .modal-buttons button.btn-primary {
     background-color: var(--pz-accent);
-    color: white;
+    color: var(--pz-text-inverse);
     border: none;
 }
 
@@ -197,7 +197,7 @@
    disabled button, so the flat colour has to be re-asserted here. */
 .modal-buttons button.btn-primary:disabled,
 .modal-buttons button.btn-primary:disabled:hover {
-    background-color: #eceff3;
+    background-color: var(--pz-surface-sunken);
     color: var(--pz-text-subtle);
     border: 1px solid var(--pz-border);
     cursor: not-allowed;
@@ -241,7 +241,7 @@ html[data-theme='dark'] .modal .modal-info-note {
 
 .modal-buttons button.btn-cancel {
     background-color: #6c757d;
-    color: white;
+    color: var(--pz-text-inverse);
     border: 1px solid #6c757d;
 }
 
@@ -252,7 +252,7 @@ html[data-theme='dark'] .modal .modal-info-note {
 
 .modal-buttons button.btn-success {
     background-color: var(--pz-success);
-    color: white;
+    color: var(--pz-text-inverse);
     border: none;
 }
 
@@ -262,7 +262,7 @@ html[data-theme='dark'] .modal .modal-info-note {
 
 .modal-buttons button.btn-danger {
     background-color: var(--pz-danger);
-    color: white;
+    color: var(--pz-text-inverse);
     border: none;
 }
 
@@ -551,7 +551,7 @@ html[data-theme='dark'] .modal .modal-info-note {
 
 .modal-buttons button.note-palette-back:hover {
     border-color: var(--pz-text-subtle);
-    background: #f9fafb;
+    background: var(--pz-surface);
 }
 
 :root[data-theme='dark'] #noteColorPaletteModal .modal-buttons button.note-palette-back {
@@ -676,12 +676,12 @@ html[data-theme='dark'] .modal .modal-info-note {
 
 .modal-footer .btn-secondary {
     background: #6c757d;
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .modal-footer .btn-primary {
     background: var(--pz-accent);
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .modal-footer .btn:hover {
@@ -690,7 +690,7 @@ html[data-theme='dark'] .modal .modal-info-note {
 
 .modal-footer .btn-cancel {
     background-color: var(--pz-danger) !important;
-    color: white !important;
+    color: var(--pz-text-inverse) !important;
     border: 1px solid var(--pz-danger) !important;
 }
 

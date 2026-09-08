@@ -69,7 +69,7 @@ img {
     width: 28px;
     height: 28px;
     background: var(--pz-accent);
-    border: 2px solid white;
+    border: 2px solid var(--pz-bg);
     border-radius: 4px 0 4px 0;
     cursor: nwse-resize;
     touch-action: none;
@@ -79,7 +79,7 @@ img {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     z-index: 100;
     transition: all 0.2s ease;
-    color: white;
+    color: var(--pz-text-inverse);
     font-size: 20px;
     font-weight: bold;
     line-height: 1;
@@ -92,7 +92,7 @@ img {
 }
 
 .image-resize-handle i {
-    color: white;
+    color: var(--pz-text-inverse);
     font-size: 10px;
     pointer-events: none;
 }
@@ -166,7 +166,7 @@ html[data-theme='dark'] .create-note-subtitle {
 /* Image menu styles (similar to settings menu) */
 .image-menu {
     position: absolute;
-    background: white;
+    background: var(--pz-bg);
     border: 1px solid var(--pz-border);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -215,7 +215,7 @@ html[data-theme='dark'] .create-note-subtitle {
 
 .image-submenu {
     position: fixed;
-    background: white;
+    background: var(--pz-bg);
     border: 1px solid var(--pz-border);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -286,7 +286,7 @@ img.img-with-border-no-padding {
 }
 
 .export-option:hover {
-    background-color: #f9fafb;
+    background-color: var(--pz-surface);
     border-color: var(--pz-accent);
 }
 
@@ -332,7 +332,7 @@ img.img-with-border-no-padding {
     top: 20px;
     right: 20px;
     background: var(--pz-accent);
-    color: white;
+    color: var(--pz-text-inverse);
     padding: 15px 20px;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);

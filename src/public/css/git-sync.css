@@ -171,7 +171,7 @@ body.git-sync-page {
 }
 
 .badge-disabled {
-    background: #e9ecef;
+    background: var(--pz-surface-sunken);
     color: var(--pz-text-muted);
 }
 
@@ -456,7 +456,7 @@ html[data-theme='dark'] .auto-sync-settings h4 {
     gap: 16px;
     padding: 12px;
     border-radius: 8px;
-    background: #f9fafb;
+    background: var(--pz-surface);
     transition: background 0.2s;
 }
 
@@ -506,7 +506,7 @@ html[data-theme='dark'] .label-desc {
     gap: 8px 20px;
     padding: 12px;
     border-radius: 8px;
-    background: #f9fafb;
+    background: var(--pz-surface);
 }
 
 .workspace-checkbox-list[hidden] {
@@ -563,7 +563,7 @@ html[data-theme='dark'] .workspace-checkbox-item {
     width: 18px;
     left: 3px;
     bottom: 3px;
-    background-color: white;
+    background-color: var(--pz-bg);
     transition: .4s;
 }
 
@@ -615,7 +615,7 @@ input:checked+.slider:before {
     border: 1px solid var(--pz-border-strong);
     border-radius: 10px;
     font-size: 0.92rem;
-    background: #f9fafb;
+    background: var(--pz-surface);
     color: var(--pz-text);
     transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     width: 100%;
@@ -631,7 +631,7 @@ input:checked+.slider:before {
 
 .git-field-input[readonly]:focus {
     border-color: var(--pz-border-strong);
-    background: #f9fafb;
+    background: var(--pz-surface);
     box-shadow: none;
 }
 

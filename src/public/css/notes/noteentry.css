@@ -41,7 +41,7 @@ p.code-block-placeholder-after[data-ph]:empty:before {
     margin-left: 1%;
     margin-right: 1%;
     margin-bottom: 20px;
-    background: white;
+    background: var(--pz-bg);
     border-radius: 5px;
     font-family: 'Inter', sans-serif;
 }
@@ -133,7 +133,7 @@ textarea {
     padding: 0;
     padding-top: 30px;
     width: 100%;
-    border: 0 none white;
+    border: 0 none var(--pz-bg);
     overflow: hidden;
     outline: none;
     resize: none;
@@ -149,7 +149,7 @@ textarea:focus {
 .noteentry {
     padding: 0;
     width: 100%;
-    border: 0 none white;
+    border: 0 none var(--pz-bg);
     overflow-wrap: break-word;
     outline: none;
     resize: none;
@@ -315,7 +315,7 @@ textarea:focus {
     margin: 8px 0;
     border: none;
     border-radius: 8px;
-    background: #f1f3f4;
+    background: var(--pz-surface-hover);
 }
 
 .note-attachment-previews {
@@ -342,7 +342,7 @@ textarea:focus {
     width: 100%;
     aspect-ratio: 4 / 3;
     overflow: hidden;
-    background: #f6f8fa;
+    background: var(--pz-surface);
 }
 
 .note-attachment-preview-frame {
@@ -358,7 +358,7 @@ textarea:focus {
     height: 56px;
     aspect-ratio: auto;
     border: 0;
-    background: #f1f3f4;
+    background: var(--pz-surface-hover);
 }
 
 .note-attachment-preview-file-card {
@@ -368,14 +368,14 @@ textarea:focus {
     height: 100%;
     min-height: 132px;
     padding: 12px;
-    background: #f8fafc;
+    background: var(--pz-surface);
     color: var(--pz-text);
     text-decoration: none;
 }
 
 .note-attachment-preview-file-card:hover,
 .note-attachment-preview-file-card:focus {
-    background: #eef6fb;
+    background: var(--pz-surface-hover);
     color: #005a8b;
     text-decoration: none;
 }

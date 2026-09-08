@@ -72,7 +72,7 @@
     max-height: 200px;
     overflow-y: auto;
     padding: 10px;
-    background: #f9fafb;
+    background: var(--pz-surface);
     border: 1px solid var(--pz-border);
     border-radius: 8px;
     margin-bottom: 20px;
@@ -84,7 +84,7 @@
     justify-content: center;
     width: 40px;
     height: 40px;
-    background: white;
+    background: var(--pz-bg);
     border: 1px solid var(--pz-border);
     border-radius: 6px;
     cursor: pointer;
@@ -120,7 +120,7 @@
 }
 
 .folder-icon-modal-content .modal-buttons .btn-secondary {
-    background: #e5e7eb;
+    background: var(--pz-surface-sunken);
     color: var(--pz-text);
     border: none;
     padding: 10px 20px;
@@ -137,7 +137,7 @@
 .folder-icon-modal-content .modal-buttons .btn-cancel {
     margin-left: auto;
     background: #dc2626;
-    color: white;
+    color: var(--pz-text-inverse);
     border: none;
     padding: 10px 20px;
     border-radius: 6px;
@@ -156,7 +156,7 @@
 }
 
 .folder-icon-grid::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: var(--pz-surface-hover);
     border-radius: 4px;
 }
 
@@ -181,7 +181,7 @@
     justify-content: center;
     gap: 8px;
     padding: 16px;
-    background: #f9fafb;
+    background: var(--pz-surface);
     border: 1px solid var(--pz-border);
     border-radius: 8px;
 }
@@ -205,7 +205,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: white;
+    color: var(--pz-text-inverse);
     font-size: 18px;
     font-weight: bold;
     text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
@@ -234,8 +234,8 @@
 }
 
 .folder-color-default {
-    background: linear-gradient(135deg, #e5e7eb 25%, transparent 25%, transparent 75%, #e5e7eb 75%, #e5e7eb),
-                linear-gradient(135deg, #e5e7eb 25%, #f9fafb 25%, #f9fafb 75%, #e5e7eb 75%, #e5e7eb);
+    background: linear-gradient(135deg, var(--pz-surface-sunken) 25%, transparent 25%, transparent 75%, var(--pz-surface-sunken) 75%, var(--pz-surface-sunken)),
+                linear-gradient(135deg, var(--pz-surface-sunken) 25%, var(--pz-surface) 25%, var(--pz-surface) 75%, var(--pz-surface-sunken) 75%, var(--pz-surface-sunken));
     background-size: 8px 8px;
     background-position: 0 0, 4px 4px;
 }

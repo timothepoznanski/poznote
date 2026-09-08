@@ -70,7 +70,7 @@
     width: 18px;
     left: 3px;
     bottom: 3px;
-    background-color: white;
+    background-color: var(--pz-bg);
     transition: all 0.3s ease;
     border-radius: 50%;
 }

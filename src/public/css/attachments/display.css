@@ -6,7 +6,7 @@
 
 /* Attachments display */
 .attachments-display {
-    background: white;
+    background: var(--pz-bg);
     border-radius: 4px;
     border: 1px solid var(--pz-border-light);
 }
@@ -74,7 +74,7 @@
 }
 
 .attachment-icon i {
-    color: white;
+    color: var(--pz-text-inverse);
     font-size: 18px;
 }
 
@@ -154,7 +154,7 @@
 
 .btn-view {
     background: var(--pz-accent);
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .btn-view:hover {
@@ -164,7 +164,7 @@
 
 .btn-download {
     background: var(--pz-success);
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .btn-download:hover {
@@ -174,7 +174,7 @@
 
 .btn-delete {
     background: var(--pz-danger);
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .btn-delete:hover {

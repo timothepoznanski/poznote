@@ -12,7 +12,7 @@
 pre.code-block,
 .noteentry pre {
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
-    background-color: #f8f8f8 !important;
+    background-color: var(--pz-surface) !important;
     /* border: 1px solid #e1e1e1; */
     border-radius: 4px;
     padding: 20px 20px;
@@ -34,7 +34,7 @@ pre.code-block,
     margin: 0 !important;
     padding: 30px 30px !important;
     /* border-radius: 6px; */
-    background: #F8FAFC !important;
+    background: var(--pz-surface) !important;
     border: 1px solid var(--pz-border-light);
     overflow-x: auto;
     position: relative;
@@ -272,7 +272,7 @@ pre.code-block,
 /* Code inline */
 code {
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
-    background-color: #f4f4f4;
+    background-color: var(--pz-surface-hover);
     padding: 2px 4px;
     border-radius: 3px;
     color: var(--pz-text);
@@ -366,7 +366,7 @@ code *[style*="background"],
 .noteentry pre *[style*="background"],
 .noteentry code *[style*="background"],
 .noteentry .code-block *[style*="background"] {
-    background: linear-gradient(rgba(255, 255, 0, 0.4), rgba(255, 255, 0, 0.4)), #f4f4f4 !important;
+    background: linear-gradient(rgba(255, 255, 0, 0.4), rgba(255, 255, 0, 0.4)), var(--pz-surface-hover) !important;
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
     font-size: inherit;
     /* inherit font size from parent */

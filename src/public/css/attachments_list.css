@@ -9,7 +9,7 @@ body.attachments-page {
 body.attachments-page::-webkit-scrollbar {
     display: block !important;
     width: 8px !important;
-    background-color: #f1f1f1 !important;
+    background-color: var(--pz-surface-hover) !important;
 }
 
 body.attachments-page::-webkit-scrollbar-thumb {
@@ -29,7 +29,7 @@ body.attachments-page html {
 body.attachments-page html::-webkit-scrollbar {
     display: block !important;
     width: 8px !important;
-    background-color: #f1f1f1 !important;
+    background-color: var(--pz-surface-hover) !important;
 }
 
 body.attachments-page html::-webkit-scrollbar-thumb {
@@ -146,7 +146,7 @@ body.attachments-page {
 }
 
 .attachment-item:hover {
-    background-color: #e9ecef;
+    background-color: var(--pz-surface-sunken);
 }
 
 .attachment-item i {
@@ -166,7 +166,7 @@ body.attachments-page {
 
 .btn-download {
     background: var(--pz-success);
-    color: white;
+    color: var(--pz-text-inverse);
     min-width: 36px;
     flex-shrink: 0;
 }

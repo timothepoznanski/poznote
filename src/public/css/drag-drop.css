@@ -193,7 +193,7 @@ html[data-theme='dark'] .folder-header.folder-drop-after>.folder-toggle::after {
     margin: 10px 5px;
     border: 2px dashed var(--pz-border);
     border-radius: 8px;
-    background-color: #f9f9f9;
+    background-color: var(--pz-surface);
     text-align: center;
     transition: all 0.3s ease;
     /* Force visibility */

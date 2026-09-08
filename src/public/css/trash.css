@@ -12,7 +12,7 @@ body.trash-page::-webkit-scrollbar {
     display: block !important;
     /* Override global rule that hides scrollbars */
     width: 8px !important;
-    background-color: #f1f1f1 !important;
+    background-color: var(--pz-surface-hover) !important;
 }
 
 body.trash-page::-webkit-scrollbar-thumb {
@@ -38,7 +38,7 @@ body.trash-page html {
 body.trash-page html::-webkit-scrollbar {
     display: block !important;
     width: 8px !important;
-    background-color: #f1f1f1 !important;
+    background-color: var(--pz-surface-hover) !important;
 }
 
 body.trash-page html::-webkit-scrollbar-thumb {
@@ -124,7 +124,7 @@ body.trash-page {
     border-radius: 8px;
     font-size: 14px;
     color: var(--pz-text);
-    background-color: #f8f8f8;
+    background-color: var(--pz-surface);
     transition: all 0.2s ease;
     box-sizing: border-box;
 }
@@ -175,7 +175,7 @@ body.trash-page {
     padding: 3px;
     border: 1px solid var(--pz-border);
     border-radius: 8px;
-    background-color: #f8f8f8;
+    background-color: var(--pz-surface);
 }
 
 .trash-sort-option {
@@ -219,7 +219,7 @@ body.trash-page {
     border: 1px solid var(--pz-border);
     margin-bottom: 15px;
     border-radius: 10px;
-    background: white;
+    background: var(--pz-bg);
     font-family: 'Inter', sans-serif;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     transition: box-shadow 0.15s ease;
@@ -423,11 +423,11 @@ body.trash-page {
 }
 
 .searchtrash::-webkit-input-placeholder {
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .searchtrash:-ms-input-placeholder {
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .searchtrash:focus {
@@ -491,7 +491,7 @@ body.trash-page {
         display: block !important;
         /* Override global rule */
         width: 6px !important;
-        background-color: #f1f1f1 !important;
+        background-color: var(--pz-surface-hover) !important;
     }
 
     body {
@@ -512,7 +512,7 @@ body.trash-page {
         display: block !important;
         /* Override global rule */
         width: 12px !important;
-        background-color: #f1f1f1 !important;
+        background-color: var(--pz-surface-hover) !important;
     }
 
     body.trash-page {
@@ -522,7 +522,7 @@ body.trash-page {
         min-height: 100vh !important;
         position: static !important;
         padding: 10px;
-        background: #f5f5f5 !important;
+        background: var(--pz-surface-hover) !important;
         scrollbar-width: auto !important;
         /* Override global rule */
         -ms-overflow-style: scrollbar !important;
@@ -533,7 +533,7 @@ body.trash-page {
         display: block !important;
         /* Override global rule */
         width: 12px !important;
-        background-color: #f1f1f1 !important;
+        background-color: var(--pz-surface-hover) !important;
     }
 
     /* Fix pour iOS Safari */

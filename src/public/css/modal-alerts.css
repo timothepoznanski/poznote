@@ -156,7 +156,7 @@ html[data-theme='dark'] .note-creation-loading-content {
 
 .alert-modal-button.primary {
     background: var(--primary-color, var(--pz-accent));
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .alert-modal-button.primary:hover {
@@ -175,7 +175,7 @@ html[data-theme='dark'] .note-creation-loading-content {
 
 .alert-modal-button.secondary {
     background: #e04b4b;
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .alert-modal-button.secondary:hover {
@@ -229,7 +229,7 @@ html[data-theme='dark'] .alert-modal-button:hover,
 html[data-theme='dark'] .alert-modal-button.primary,
 .dark-mode .alert-modal-button.primary {
     background-color: var(--primary-color, var(--pz-accent));
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .alert-modal-button.primary:hover,
@@ -385,7 +385,7 @@ html[data-theme='dark'] .spinner,
     padding: 14px;
     border: 1px solid var(--pz-border);
     border-radius: 10px;
-    background: #f9fafb;
+    background: var(--pz-surface);
 }
 .admin-contact-option > .lucide {
     flex: none;

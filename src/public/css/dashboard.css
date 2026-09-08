@@ -700,7 +700,7 @@ body.dashboard-page {
 }
 
 .note-color-swatch-empty {
-    background: repeating-linear-gradient(45deg, #e5e7eb 0 4px, #f9fafb 4px 8px);
+    background: repeating-linear-gradient(45deg, var(--pz-surface-sunken) 0 4px, var(--pz-surface) 4px 8px);
 }
 
 :root[data-theme='dark'] .dashboard-color-filter-menu {
@@ -835,7 +835,7 @@ body.dashboard-page {
 .modal-buttons button.note-color-manage-btn:hover,
 .modal-buttons button.dashboard-scope-manage-btn:hover {
     border-color: var(--pz-text-subtle);
-    background: #f9fafb;
+    background: var(--pz-surface);
 }
 
 .note-color-manage-btn .lucide,

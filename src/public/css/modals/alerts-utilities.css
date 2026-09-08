@@ -43,12 +43,12 @@
 
 .modal-footer .btn-secondary {
     background: #6c757d;
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .modal-footer .btn-primary {
     background: var(--pz-accent);
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .modal-footer .btn:hover {

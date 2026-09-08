@@ -37,7 +37,7 @@
     padding: 0.5rem;
     border: 2px dashed var(--pz-border-strong);
     border-radius: 8px;
-    background: #fafafa;
+    background: var(--pz-surface);
     transition: all 0.3s ease;
     cursor: pointer;
 }
@@ -53,7 +53,7 @@
     padding: 0.5rem;
     border: 1px solid var(--pz-border-strong);
     border-radius: 6px;
-    background: white;
+    background: var(--pz-bg);
     font-size: 15px;
     transition: border-color 0.2s;
 }

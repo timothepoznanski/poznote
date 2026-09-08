@@ -296,7 +296,7 @@
     margin: 0;
     border: 1px solid var(--pz-border);
     border-radius: 8px;
-    background: #fcfcfc;
+    background: var(--pz-bg);
     color: var(--pz-text);
     font-size: var(--note-font-size, 15px);
     line-height: normal;
@@ -341,7 +341,7 @@
     padding: 18px 20px;
     border: 1px solid var(--pz-border);
     border-radius: 8px;
-    background: #f8fafc;
+    background: var(--pz-surface);
     overflow-x: auto;
     box-sizing: border-box;
 }
@@ -534,7 +534,7 @@
 .snapshot-restore-btn {
     background-color: var(--pz-accent) !important;
     border-color: var(--pz-accent) !important;
-    color: white !important;
+    color: var(--pz-text-inverse) !important;
 }
 
 .snapshot-restore-btn:hover {

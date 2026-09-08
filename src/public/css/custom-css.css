@@ -76,7 +76,7 @@
 
 #uploadCustomCssBtn {
     background-color: var(--pz-accent);
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 #uploadCustomCssBtn:hover {

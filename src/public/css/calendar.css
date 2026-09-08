@@ -136,7 +136,7 @@
 }
 
 .mini-calendar-day:not(.mini-calendar-day-empty):hover {
-    background: #f6fbff;
+    background: var(--pz-surface);
 }
 
 .mini-calendar-day-empty {
@@ -292,7 +292,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 12px 16px;
-    background: #f9fafb;
+    background: var(--pz-surface);
     border: 1px solid var(--pz-border);
     border-radius: 6px;
     cursor: pointer;

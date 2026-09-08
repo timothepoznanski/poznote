@@ -33,7 +33,7 @@ body {
     max-width: 1000px;
     margin: 20px auto;
     padding: 20px;
-    background: white;
+    background: var(--pz-bg);
     border-radius: 8px;
 }
 

@@ -21,7 +21,7 @@
 }
 
 .import-confirm-modal-content {
-    background-color: #fefefe;
+    background-color: var(--pz-bg);
     margin: 0;
     padding: 20px;
     border: none;
@@ -98,7 +98,7 @@
 
 .btn-confirm {
     background-color: var(--pz-accent);
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .btn-confirm:hover {
@@ -112,7 +112,7 @@
 }
 
 .import-confirm-modal-content .btn-cancel:hover {
-    background-color: #e9ecef;
+    background-color: var(--pz-surface-sunken);
 }
 
 .import-confirm-modal-content .btn-cancel {
@@ -140,7 +140,7 @@
 }
 
 .custom-alert-content {
-    background-color: #fefefe;
+    background-color: var(--pz-bg);
     margin: 0 auto;
     padding: 20px;
     border: none;
@@ -177,7 +177,7 @@
     font-family: 'Inter', sans-serif;
     transition: background-color 0.2s;
     background-color: var(--pz-accent);
-    color: white;
+    color: var(--pz-text-inverse);
 }
 
 .alert-ok-button:hover {

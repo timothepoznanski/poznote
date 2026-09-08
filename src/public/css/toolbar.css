@@ -145,7 +145,7 @@
 }
 
 .font-size-popup .font-size-item:hover {
-    background-color: #f6fbff;
+    background-color: var(--pz-surface);
 }
 
 .font-size-popup .size-label {
@@ -163,7 +163,7 @@
     border-radius: 4px;
     border: 1px solid var(--pz-border-light);
     color: var(--pz-text);
-    background: #fafafa;
+    background: var(--pz-surface);
 }
 
 .font-size-popup .style-normal {

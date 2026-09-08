@@ -29,7 +29,7 @@
     position: absolute;
     top: -40px;
     right: 0;
-    color: white;
+    color: var(--pz-text-inverse);
     font-size: 35px;
     font-weight: bold;
     cursor: pointer;
@@ -48,7 +48,7 @@
 }
 
 .image-preview-title {
-    color: white;
+    color: var(--pz-text-inverse);
     margin-top: 15px;
     font-size: 16px;
     font-weight: 500;
@@ -57,7 +57,7 @@
 /* PDF preview modal */
 .pdf-preview-content {
     position: relative;
-    background: white;
+    background: var(--pz-bg);
     border-radius: 8px;
     width: 90vw;
     max-width: 1200px;
@@ -103,7 +103,7 @@
 }
 
 .pdf-preview-close:hover {
-    background: #e9ecef;
+    background: var(--pz-surface-sunken);
     color: var(--pz-text);
 }
 

@@ -268,7 +268,7 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     cursor: pointer;
 }
 .webhooks-actions-item:hover {
-    background: #f2f6f9;
+    background: var(--pz-surface-hover);
     color: var(--pz-accent);
 }
 .webhooks-actions-item .lucide {

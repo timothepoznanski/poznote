@@ -32,7 +32,7 @@ body {
     margin: 20px auto;
     padding: 20px;
     display: block;
-    background: white;
+    background: var(--pz-bg);
 }
 
 .settings-section {
@@ -40,7 +40,7 @@ body {
     padding: 20px;
     border: 1px solid var(--pz-border);
     border-radius: 6px;
-    background: #f9f9f9;
+    background: var(--pz-surface);
 }
 
 .settings-section h3 {

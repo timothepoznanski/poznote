@@ -120,7 +120,7 @@ body.favorites-page {
     gap: 5px;
     font-size: 11px;
     color: var(--pz-text-muted);
-    background-color: #f0f0f0;
+    background-color: var(--pz-surface-hover);
     padding: 2px 8px;
     border-radius: 4px;
 }
@@ -140,7 +140,7 @@ body.favorites-page {
     justify-content: center;
     width: 38px;
     height: 38px;
-    background-color: #fff5f5;
+    background-color: var(--pz-surface);
     border: 1px solid #fecaca;
     border-radius: 8px;
     color: #dc2626;

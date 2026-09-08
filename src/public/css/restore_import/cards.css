@@ -32,7 +32,7 @@
 }
 
 .card-header:hover {
-    background: linear-gradient(135deg, #f0f4f8 0%, var(--pz-surface) 100%);
+    background: linear-gradient(135deg, var(--pz-surface-hover) 0%, var(--pz-surface) 100%);
 }
 
 .card-header h3 {
@@ -114,7 +114,7 @@
 }
 
 .sub-card-header:hover {
-    background: #eef2f5;
+    background: var(--pz-surface-hover);
 }
 
 .sub-card h4 {

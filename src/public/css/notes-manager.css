@@ -106,7 +106,7 @@ body.notes-manager-page {
     max-width: 900px;
     margin: 0 auto 16px;
     padding: 12px 14px;
-    background: var(--bulk-bar-bg, #f8fafc);
+    background: var(--bulk-bar-bg, var(--pz-surface));
     border: 1px solid var(--bulk-bar-border, var(--pz-border));
     border-radius: 10px;
     transition: opacity 0.2s, transform 0.2s;
@@ -144,7 +144,7 @@ body.notes-manager-page {
 }
 
 #nmBulkBar .nm-bulk-btn:hover {
-    background: #f1f5f9;
+    background: var(--pz-surface-hover);
     color: var(--pz-text-secondary);
     border-color: #94a3b8;
 }
@@ -276,14 +276,14 @@ html[data-theme='dark'] .nm-folder-option-selected {
     align-items: center;
     gap: 8px;
     padding: 10px 14px;
-    background: var(--folder-header-bg, #f8fafc);
+    background: var(--folder-header-bg, var(--pz-surface));
     cursor: pointer;
     user-select: none;
     transition: background 0.15s;
 }
 
 .nm-folder-header:hover {
-    background: var(--folder-header-hover, #f1f5f9);
+    background: var(--folder-header-hover, var(--pz-surface-hover));
 }
 
 .nm-folder-chevron {
@@ -329,7 +329,7 @@ html[data-theme='dark'] .nm-folder-option-selected {
     font-weight: 500;
     padding: 1px 8px;
     border-radius: 10px;
-    background: var(--badge-bg-subtle, #e5e7eb);
+    background: var(--badge-bg-subtle, var(--pz-surface-sunken));
     color: var(--muted-color, var(--pz-text-muted));
 }
 
@@ -352,11 +352,11 @@ html[data-theme='dark'] .nm-folder-option-selected {
 }
 
 .nm-note-row:hover {
-    background: var(--row-hover-bg, #f9fafb);
+    background: var(--row-hover-bg, var(--pz-surface));
 }
 
 .nm-note-row:has(.nm-note-checkbox:checked) {
-    background: var(--row-selected-bg, #f1f5f9);
+    background: var(--row-selected-bg, var(--pz-surface-hover));
 }
 
 .nm-note-checkbox {
@@ -431,7 +431,7 @@ html[data-theme='dark'] .nm-folder-option-selected {
     font-weight: 500;
     padding: 1px 7px;
     border-radius: 10px;
-    background: var(--badge-bg-subtle, #e5e7eb);
+    background: var(--badge-bg-subtle, var(--pz-surface-sunken));
     color: var(--muted-color, var(--pz-text-muted));
     white-space: nowrap;
     overflow: hidden;
@@ -517,7 +517,7 @@ html[data-theme='dark'] .nm-folder-option-selected {
 }
 
 .nm-folder-option-selected {
-    background: var(--selected-bg, #eef2f6);
+    background: var(--selected-bg, var(--pz-surface-hover));
     color: var(--selected-color, var(--pz-text));
     font-weight: 500;
 }

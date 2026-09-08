@@ -395,7 +395,7 @@ body.slash-menu-cursor-hidden * {
 }
 
 .markdown-preview code {
-    background-color: #f4f4f4;
+    background-color: var(--pz-surface-hover);
     padding: 2px 6px;
     /* border-radius: 3px; */
     font-family: 'Courier New', Courier, monospace;
@@ -404,7 +404,7 @@ body.slash-menu-cursor-hidden * {
 }
 
 .markdown-preview pre {
-    background-color: #f4f4f4;
+    background-color: var(--pz-surface-hover);
     padding: 12px;
     border-radius: 4px;
     overflow-x: auto;
@@ -534,7 +534,7 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
     display: block;
     margin: 8px 0;
     border-radius: 8px;
-    background: #f1f3f4;
+    background: var(--pz-surface-hover);
 }
 
 @media screen and (max-width: 768px) {
@@ -617,13 +617,13 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
 
 .noteentry table th,
 .markdown-preview table th {
-    background-color: #f4f4f4;
+    background-color: var(--pz-surface-hover);
     font-weight: bold;
 }
 
 .noteentry table tr:nth-child(even),
 .markdown-preview table tr:nth-child(even) {
-    background-color: #f9f9f9;
+    background-color: var(--pz-surface);
 }
 
 /* Colored markdown (the "Colored markdown" display setting).
@@ -696,7 +696,7 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h6) {
    `background: #F8FAFC !important` on pre.code-block in css/code-blocks.css,
    so indented and mermaid blocks must be excluded here explicitly. */
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, pre:not(.indented-pre):not(.mermaid)) {
-    background: color-mix(in srgb, var(--mdc-codeblock) 8%, #f4f4f4) !important;
+    background: color-mix(in srgb, var(--mdc-codeblock) 8%, var(--pz-surface-hover)) !important;
 }
 
 body.markdown-colored .markdown-preview :not(pre) > :is(#poznote-md-colored-boost, code:not([class*="hljs"]):not([class*="language-"])) {
@@ -826,7 +826,7 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
 .mermaid {
     margin: 1em 0;
     text-align: center;
-    background-color: white;
+    background-color: var(--pz-bg);
     /* Ensure visibility in dark mode if mermaid doesn't handle it */
     padding: 10px;
     border-radius: 4px;

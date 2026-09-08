@@ -29,7 +29,7 @@ code.hljs {
 /* Light theme (default) */
 .hljs {
     color: var(--pz-text);
-    background: #f6f8fa;
+    background: var(--pz-surface);
 }
 
 .hljs-doctag,

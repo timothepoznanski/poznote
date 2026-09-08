@@ -83,7 +83,7 @@
     min-height: 40px;
     padding: 0 16px;
     background: var(--password-accent);
-    color: white;
+    color: var(--pz-text-inverse);
     border: none;
     border-radius: 6px;
     font-size: 14px;
@@ -128,7 +128,7 @@
 
 .password-container .info {
     color: var(--password-muted);
-    background: #f7f8fa;
+    background: var(--pz-surface);
     border-left: 3px solid var(--password-accent);
     border-radius: 6px;
     padding: 12px 14px;
@@ -228,7 +228,7 @@
     padding: 12px 14px;
     border-left: 3px solid var(--status-accent);
     border-radius: 6px;
-    background: #f7f8fa;
+    background: var(--pz-surface);
     color: var(--status-muted);
     line-height: 1.55;
     white-space: pre-line;
@@ -268,7 +268,7 @@
 }
 
 .status-card-action.secondary:hover {
-    background: #f7f8fa;
+    background: var(--pz-surface);
 }
 
 @media (max-width: 640px) {
@@ -422,7 +422,7 @@ body.view-kanban .public-folder-body {
 }
 
 .clear-filter-btn:hover {
-    background-color: var(--hover-bg, #f0f0f0);
+    background-color: var(--hover-bg, var(--pz-surface-hover));
     color: var(--text-color, var(--pz-text));
 }
 
@@ -455,7 +455,7 @@ body.view-kanban .public-folder-body {
 }
 
 .public-folder-toggle-all:hover {
-    background: var(--hover-bg, #f0f0f0);
+    background: var(--hover-bg, var(--pz-surface-hover));
 }
 
 .public-folder-toggle-all:focus:not(:focus-visible) {
@@ -595,7 +595,7 @@ body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.i
 }
 
 .theme-toggle, .view-toggle {
-    background: var(--toggle-bg, #eee);
+    background: var(--toggle-bg, var(--pz-surface-sunken));
     border: 1px solid var(--border-color, var(--pz-border));
     padding: 10px 15px;
     border-radius: 6px;
@@ -629,7 +629,7 @@ body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.i
 
 .kanban-col {
     flex: 0 0 280px;
-    background: var(--kanban-col-bg, #f1f3f5);
+    background: var(--kanban-col-bg, var(--pz-surface-hover));
     border-radius: 8px;
     display: flex;
     flex-direction: column;
@@ -659,7 +659,7 @@ body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.i
 .kanban-col-count {
     font-size: 0.75rem;
     color: var(--muted-color);
-    background: var(--badge-bg, #ddd);
+    background: var(--badge-bg, var(--pz-surface-sunken));
     padding: 2px 6px;
     border-radius: 10px;
 }

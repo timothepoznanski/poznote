@@ -66,7 +66,7 @@
    (dark mode is covered by css/dark-mode/components.css) */
 .diary-page .btn-primary {
     background: var(--pz-accent);
-    color: white !important;
+    color: var(--pz-text-inverse) !important;
 }
 
 .diary-page .btn-primary:hover {

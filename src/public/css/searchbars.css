@@ -47,7 +47,7 @@
 }
 
 .searchbar-input:disabled {
-    background-color: #f5f5f5;
+    background-color: var(--pz-surface-hover);
     color: var(--pz-text-subtle);
     cursor: not-allowed;
 }
@@ -377,7 +377,7 @@
     padding: 8px;
     border: 1px solid var(--pz-border-strong);
     border-radius: 8px;
-    background: #f8fafc;
+    background: var(--pz-surface);
     box-sizing: border-box;
 }
 

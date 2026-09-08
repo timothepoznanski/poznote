@@ -97,7 +97,7 @@
     padding: 10px 12px;
     border: 1px solid var(--pz-border);
     border-radius: 8px;
-    background: #f8fafc;
+    background: var(--pz-surface);
     color: var(--pz-text);
     text-decoration: none;
     font-size: 13px;

@@ -59,7 +59,7 @@ html[data-theme='dark'] .dr-hero p {
     text-align: left; 
 }
 .results-table th { 
-    background: var(--bg-secondary, #f9f9f9);
+    background: var(--bg-secondary, var(--pz-surface));
     font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -90,7 +90,7 @@ html[data-theme='dark'] .deletion-notice {
 }
 
 .btn-view-files {
-    background: var(--bg-secondary, #f5f5f5);
+    background: var(--bg-secondary, var(--pz-surface-hover));
     border: 1px solid var(--border-color, var(--pz-border));
     padding: 6px 14px;
     border-radius: 6px;
@@ -101,7 +101,7 @@ html[data-theme='dark'] .deletion-notice {
 }
 
 .btn-view-files:hover {
-    background: var(--hover-bg, #e8e8e8);
+    background: var(--hover-bg, var(--pz-surface-sunken));
     border-color: var(--pz-accent);
     color: var(--pz-accent);
 }
@@ -186,7 +186,7 @@ html[data-theme='dark'] .btn-view-files:hover {
 }
 
 .orphan-modal-close:hover {
-    background: var(--hover-bg, #f5f5f5);
+    background: var(--hover-bg, var(--pz-surface-hover));
     color: var(--pz-text);
 }
 

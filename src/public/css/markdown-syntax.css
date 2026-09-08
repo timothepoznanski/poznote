@@ -67,7 +67,7 @@
 }
 
 .markdown-syntax-filter-bar .clear-filter-btn:hover {
-    background: #eef2f6;
+    background: var(--pz-surface-hover);
     color: var(--pz-text);
 }
 
@@ -134,7 +134,7 @@
     padding: 16px 18px;
     border: 1px dashed var(--pz-border);
     border-radius: 10px;
-    background: #f8fafc;
+    background: var(--pz-surface);
     color: var(--pz-text-secondary);
     line-height: 1.6;
 }

@@ -267,7 +267,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 8px 12px;
-    background: #f8fafc;
+    background: var(--pz-surface);
     border-radius: 6px;
     border: 1px solid var(--pz-border-light);
 }

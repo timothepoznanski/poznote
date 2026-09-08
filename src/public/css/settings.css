@@ -9,7 +9,7 @@
     top: -2px;
     right: -2px;
     background: #ef4444;
-    color: white;
+    color: var(--pz-text-inverse);
     border-radius: 50%;
     width: 12px;
     height: 12px;
@@ -72,7 +72,7 @@ body.settings-page {
     font-weight: 500;
     padding: 3px 10px;
     border-radius: 999px;
-    background: #eef2f7;
+    background: var(--pz-surface-hover);
     color: var(--pz-text-secondary);
 }
 
@@ -617,7 +617,7 @@ html[data-theme='dark'] .settings-view-toggle:hover {
         left: 16px;
         right: 16px;
         height: 1px;
-        background: #eef0f3;
+        background: var(--pz-surface-sunken);
         pointer-events: none;
     }
 

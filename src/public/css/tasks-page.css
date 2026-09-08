@@ -49,7 +49,7 @@ body.tasks-page {
 .tasks-progress-bar {
     height: 8px;
     border-radius: 4px;
-    background-color: #e9ecef;
+    background-color: var(--pz-surface-sunken);
     overflow: hidden;
     order: 2;
     flex: 1;
@@ -210,7 +210,7 @@ body.tasks-page {
     padding: 12px 16px;
     border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 10px;
-    background-color: #fafafa;
+    background-color: var(--pz-surface);
 }
 
 .tasks-note-header {
@@ -284,7 +284,7 @@ body.tasks-page {
     gap: 5px;
     font-size: 11px;
     color: var(--pz-text-muted);
-    background-color: #f0f0f0;
+    background-color: var(--pz-surface-hover);
     padding: 2px 8px;
     border-radius: 4px;
 }
@@ -404,7 +404,7 @@ body.tasks-page {
     padding: 2px 8px;
     border: 1px solid var(--pz-border-strong);
     border-radius: 12px;
-    background: #f6f8fa;
+    background: var(--pz-surface);
     color: var(--pz-text-secondary);
     font-size: 12px;
     font-family: inherit;
@@ -692,7 +692,7 @@ body.tasks-page {
 .tasks-task-note-badge {
     font-size: 11px;
     color: var(--pz-text-muted);
-    background-color: #f0f0f0;
+    background-color: var(--pz-surface-hover);
     padding: 2px 8px;
     border-radius: 4px;
     white-space: nowrap;

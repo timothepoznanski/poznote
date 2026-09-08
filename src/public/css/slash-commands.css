@@ -320,7 +320,7 @@
 
 .slash-date-picker-remove-time-btn {
     border: 1px solid var(--pz-border-strong);
-    background: #f6f8fa;
+    background: var(--pz-surface);
     color: var(--pz-text-secondary);
 }
 

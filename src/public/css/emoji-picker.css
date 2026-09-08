@@ -9,7 +9,7 @@
 
 .emoji-picker {
     position: fixed;
-    background: white;
+    background: var(--pz-bg);
     border: 1px solid var(--pz-border);
     /* border-radius: 12px; */
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
@@ -35,7 +35,7 @@
 .emoji-hint kbd {
     display: inline-block;
     padding: 2px 6px;
-    background: white;
+    background: var(--pz-bg);
     border: 1px solid var(--pz-border-strong);
     border-radius: 3px;
     font-family: monospace;
@@ -91,7 +91,7 @@
 }
 
 .emoji-picker::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: var(--pz-surface-hover);
     border-radius: 10px;
 }
 

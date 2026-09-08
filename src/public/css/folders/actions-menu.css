@@ -171,7 +171,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .note-actions-menu,
 .create-menu {
     position: fixed;
-    background: white;
+    background: var(--pz-bg);
     border: 1px solid var(--pz-border-strong);
     border-radius: 6px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -248,7 +248,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .folder-actions-menu-separator,
 .note-actions-menu-separator {
     height: 1px;
-    background: #e5e7eb;
+    background: var(--pz-surface-sunken);
     margin: 4px 0;
 }
 

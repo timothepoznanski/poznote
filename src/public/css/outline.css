@@ -240,7 +240,7 @@ body:not(.outline-collapsed) .toggle-outline-btn {
 .toggle-outline-btn[aria-disabled="true"],
 html.outline-collapsed .toggle-outline-btn:disabled,
 body.outline-collapsed .toggle-outline-btn:disabled {
-    background: #f1f3f5;
+    background: var(--pz-surface-hover);
     color: var(--pz-text-subtle);
     border-color: var(--pz-border);
     box-shadow: none;
@@ -250,7 +250,7 @@ body.outline-collapsed .toggle-outline-btn:disabled {
 
 .toggle-outline-btn:disabled:hover,
 .toggle-outline-btn[aria-disabled="true"]:hover {
-    background: #f1f3f5;
+    background: var(--pz-surface-hover);
     color: var(--pz-text-subtle);
     box-shadow: none;
 }

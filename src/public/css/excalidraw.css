@@ -35,14 +35,14 @@
     font-weight: 400;
     border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 6px;
-    background: var(--bg-secondary, #f5f5f5);
+    background: var(--bg-secondary, var(--pz-surface-hover));
     color: var(--pz-text);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .excalidraw-toolbar .toolbar-btn:hover {
-    background: var(--bg-hover, #e8e8e8);
+    background: var(--bg-hover, var(--pz-surface-sunken));
     border-color: var(--pz-border-strong);
 }
 
