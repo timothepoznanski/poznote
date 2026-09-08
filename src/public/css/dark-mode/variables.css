@@ -108,6 +108,35 @@
     --dm-warning: #ffc107;
     --dm-warning-hover: #e0a800;
     --dm-warning-soft: #665500;
+
+    /* The light tokens, switched for this theme.
+
+       Until now a light rule that said color: var(--pz-text) rendered #333333 in
+       dark mode too, and the only thing saving it was a rule in dark-mode/ saying
+       the same thing again with --dm-text. That is why the dark layer holds 1,593
+       rules, 1,149 of which do nothing but restate a light rule in other colours.
+
+       With the token itself switching, a rule written once is correct in both
+       themes, and a component whose dark override was simply forgotten stops
+       rendering dark text on a dark ground.
+
+       Only the NEUTRALS switch. The accent and the status colours deliberately
+       do not: --dm-accent is bright because it has to read as text on a dark
+       ground, and using it as a fill would put white on #4a9eff at a contrast of
+       2.2. A fill and a label cannot be the same token; the dark layer already
+       states the fills it wants. */
+    --pz-bg: var(--dm-content-bg);
+    --pz-surface: var(--dm-surface);
+    --pz-surface-hover: var(--dm-surface-hover);
+    --pz-surface-sunken: var(--dm-surface-raised);
+    --pz-text: var(--dm-text);
+    --pz-text-secondary: var(--dm-text-muted);
+    --pz-text-muted: var(--dm-text-muted);
+    --pz-text-subtle: var(--dm-text-subtle);
+    --pz-border: var(--dm-border);
+    --pz-border-light: var(--dm-border);
+    --pz-border-strong: var(--dm-border-light);
+    --pz-icon: var(--dm-icon);
     --dm-border: #404040;
     --dm-border-light: #555555;
     --dm-accent: #4a9eff;
