@@ -701,7 +701,7 @@ html[data-theme='dark'] .shared-edit-token-modal a.workspace-share-modal-url:hov
 
 html[data-theme='dark'] .shared-edit-token-modal .modal-password-input {
     background: var(--dm-surface-hover);
-    border-color: #5b636d;
+    border-color: var(--dm-neutral);
     color: var(--dm-text-bright);
 }
 
@@ -719,13 +719,13 @@ html[data-theme='dark'] .shared-edit-token-modal .modal-password-input:focus {
 html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-password-toggle,
 html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-copy-btn {
     background: var(--dm-surface-raised);
-    border-color: #5b636d;
+    border-color: var(--dm-neutral);
     color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-password-toggle:hover,
 html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-copy-btn:hover {
-    background: #535b64;
+    background: var(--dm-neutral);
     color: var(--pz-text-inverse);
 }
 

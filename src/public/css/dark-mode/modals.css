@@ -241,7 +241,7 @@ html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-cancel {
 
 html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-cancel:hover,
 html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-cancel:hover {
-    background: #595e67;
+    background: var(--dm-neutral);
     border-color: var(--dm-border-light);
 }
 
@@ -331,7 +331,7 @@ html[data-theme='dark'] #notificationsModal .modal-buttons .btn-cancel {
 }
 
 html[data-theme='dark'] #notificationsModal .modal-buttons .btn-cancel:hover {
-    background: #595e67;
+    background: var(--dm-neutral);
     border-color: var(--dm-border-light);
 }
 

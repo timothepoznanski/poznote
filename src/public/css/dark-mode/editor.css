@@ -275,7 +275,7 @@ html[data-theme='dark'] .noteentry [style*="background-color: #d0bfff"],
 html[data-theme='dark'] .noteentry [style*="background-color: rgb(222, 226, 230)"],
 html[data-theme='dark'] .noteentry [style*="background-color:#dee2e6"],
 html[data-theme='dark'] .noteentry [style*="background-color: #dee2e6"] {
-    color: #1a1a1a !important;
+    color: var(--dm-content-bg) !important;
 }
 
 /* Horizontal rules */

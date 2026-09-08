@@ -346,7 +346,7 @@ html[data-theme='dark'] .btn-primary:hover {
 
 html[data-theme='dark'] .btn-rename {
     background-color: var(--dm-warning);
-    color: #212529;
+    color: var(--dm-content-bg);
     border-color: var(--dm-warning);
 }
 

@@ -592,7 +592,7 @@ html[data-theme='dark'] .folder-icon-modal-content .modal-buttons .btn-secondary
 }
 
 html[data-theme='dark'] .folder-icon-modal-content .modal-buttons .btn-secondary:hover {
-    background: #6b7280;
+    background: var(--dm-neutral-hover);
 }
 
 html[data-theme='dark'] .folder-icon-grid::-webkit-scrollbar-track {
@@ -604,7 +604,7 @@ html[data-theme='dark'] .folder-icon-grid::-webkit-scrollbar-thumb {
 }
 
 html[data-theme='dark'] .folder-icon-grid::-webkit-scrollbar-thumb:hover {
-    background: #6b7280;
+    background: var(--dm-neutral-hover);
 }
 
 /* ============================================

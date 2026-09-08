@@ -221,5 +221,5 @@ html[data-theme='dark'] .markdown-view-mode-btn:hover i {
 
 /* Slash through icon when active (in split mode) */
 html[data-theme='dark'] .toolbar-btn.markdown-split-btn.active::after {
-    background-color: #999;
+    background-color: var(--dm-text-muted);
 }

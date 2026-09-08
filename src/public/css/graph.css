@@ -336,7 +336,7 @@ html[data-theme="dark"] .graph-reset-btn:hover {
 }
 
 html[data-theme="dark"] .graph-edge {
-    stroke: #4a4f56;
+    stroke: var(--dm-surface-raised);
 }
 
 html[data-theme="dark"] .graph-edge.hl {

@@ -701,7 +701,7 @@ html[data-theme='dark'] .trash-note-header {
 
 html[data-theme='dark'] .trash-action-btn .lucide {
     color: var(--dm-text-muted);
-    background-color: #aaa;
+    background-color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .trash-restore-btn:hover {

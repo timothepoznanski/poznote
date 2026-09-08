@@ -795,7 +795,7 @@ html[data-theme='dark'] .public-task-edit-cancel {
 }
 
 html[data-theme='dark'] .public-task-edit-cancel:hover {
-    background: #595e67;
+    background: var(--dm-neutral);
 }
 
 /* Dark mode styles for tables */
