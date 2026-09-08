@@ -5,6 +5,7 @@ requireAuth();
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../functions.php';
+require_once __DIR__ . '/../version_helper.php';
 require_once __DIR__ . '/../users/db_master.php';
 
 // Get note ID from URL parameter
@@ -146,9 +147,11 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
     // Every asset below is versioned: the PWA service worker serves cached CSS
     // when the network fails, so an unversioned URL can pin a stale stylesheet
     // with no way to force-refresh from inside the installed app.
-    $v = @file_get_contents('version.txt');
-    if ($v === false) $v = time();
-    $v = urlencode(poznoteBuildAssetCacheVersion(trim($v)));
+    // getAppVersion() reads version.txt through an absolute path. Reading it
+    // relatively broke when the entry points moved into src/public/: the file
+    // stayed one level up, so this fell back to time() and changed the asset
+    // URL on every single page load.
+    $v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     ?>
     <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <link rel="stylesheet" href="css/lucide.css?v=<?php echo $v; ?>">

@@ -137,10 +137,11 @@ try {
 
 $isEmpty = empty($diaryNotes);
 
-$rawVersion = @file_get_contents('version.txt');
-if ($rawVersion === false) $rawVersion = '0.0.0';
-$rawVersion = trim($rawVersion);
-$cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
+// getAppVersion() reads version.txt through an absolute path. Reading it
+// relatively broke when the entry points moved into src/public/: the file
+// stayed one level up, so this fell back to time() and changed the asset
+// URL on every single page load.
+$cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">

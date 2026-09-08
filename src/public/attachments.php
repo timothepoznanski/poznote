@@ -4,6 +4,7 @@ requireAuth();
 
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../functions.php';
+require_once __DIR__ . '/../version_helper.php';
 require_once __DIR__ . '/../db_connect.php';
 
 // GitHub Sync Logic
@@ -46,9 +47,11 @@ if (!$note) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
     <?php 
-    $v = @file_get_contents('version.txt');
-    if ($v === false) $v = time();
-    $v = urlencode(poznoteBuildAssetCacheVersion(trim($v)));
+    // getAppVersion() reads version.txt through an absolute path. Reading it
+    // relatively broke when the entry points moved into src/public/: the file
+    // stayed one level up, so this fell back to time() and changed the asset
+    // URL on every single page load.
+    $v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     ?>
     <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
     <link rel="stylesheet" href="css/lucide.css?v=<?php echo $v; ?>">

@@ -833,9 +833,11 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
     <?php 
-    $cache_v = @file_get_contents('version.txt');
-    if ($cache_v === false) $cache_v = time();
-    $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
+    // getAppVersion() reads version.txt through an absolute path. Reading it
+    // relatively broke when the entry points moved into src/public/: the file
+    // stayed one level up, so this fell back to time() and changed the asset
+    // URL on every single page load.
+    $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     ?>
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>

@@ -41,9 +41,7 @@ if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
     }
 
     if (empty($_SESSION['settings_password_authenticated'])) {
-        $spCacheV = @file_get_contents('version.txt');
-        if ($spCacheV === false) { $spCacheV = time(); }
-        $spCacheV = urlencode(poznoteBuildAssetCacheVersion(trim($spCacheV)));
+        $spCacheV = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
         $spBackHref = $note_id
             ? 'index.php?note=' . intval($note_id)
             : 'index.php?workspace=' . urlencode($pageWorkspace);
@@ -80,13 +78,12 @@ if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
 }
 
 // Get cache version for assets
-$cache_v = @file_get_contents('version.txt');
-if ($cache_v === false) {
-    $cache_v = time();
-}
-$cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
+// Absolute path via getAppVersion(): version.txt lives one level above the
+// docroot, so reading it relatively fell back to time() and changed the asset
+// URL on every page load.
+$cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 
-$app_version_display = trim(@file_get_contents('version.txt') ?: 'Unknown');
+$app_version_display = getAppVersion();
 $app_version_display = htmlspecialchars($app_version_display, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
 $settingsPageConfig = [

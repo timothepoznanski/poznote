@@ -65,7 +65,11 @@ function poznoteGetThemeAssetVersion() {
 
     $version = 0;
     foreach ($paths as $relativePath) {
-        $absolutePath = __DIR__ . '/' . $relativePath;
+        // These are docroot-relative: the assets live in src/public/, config.php
+        // does not. Resolving them against __DIR__ alone found nothing after the
+        // docroot split, so this returned '' and editing a theme stylesheet no
+        // longer busted the cache.
+        $absolutePath = __DIR__ . '/public/' . $relativePath;
         if (is_file($absolutePath)) {
             $version = max($version, (int) filemtime($absolutePath));
         }
@@ -127,7 +131,10 @@ function poznoteAsset($path) {
     // Keep the caller's leading slash (some pages are served from a nested URL
     // and rely on root-relative asset paths) but strip it to find the file.
     $relativePath = ltrim($path, '/');
-    $absolutePath = __DIR__ . '/' . $relativePath;
+    // Docroot-relative, and the docroot is src/public/ while this file is not in
+    // it: resolving against __DIR__ alone silently found nothing, so every asset
+    // lost its per-file mtime and only carried the app version.
+    $absolutePath = __DIR__ . '/public/' . $relativePath;
 
     // Loaded on demand: config.php is included by pages that do not all pull in
     // version_helper.php themselves, and the helper must not depend on that.

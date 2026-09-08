@@ -14,6 +14,7 @@ requireAdmin();
 
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../functions.php';
+require_once __DIR__ . '/../version_helper.php';
 requireSettingsPassword();
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../users/db_master.php';
@@ -100,9 +101,11 @@ $aiLocalHost = aiChatLocalDefaultHost();
     <title><?php echo t_h('ai_settings.title', [], 'AI Assistant'); ?> - <?php echo getPageTitle(); ?></title>
     <meta name="color-scheme" content="dark light">
     <?php
-    $cache_v = @file_get_contents('version.txt');
-    if ($cache_v === false) $cache_v = time();
-    $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
+    // getAppVersion() reads version.txt through an absolute path. Reading it
+    // relatively broke when the entry points moved into src/public/: the file
+    // stayed one level up, so this fell back to time() and changed the asset
+    // URL on every single page load.
+    $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     ?>
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
     <link rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>">
