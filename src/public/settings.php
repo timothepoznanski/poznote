@@ -291,7 +291,15 @@ if ($canUseUserWebhooks) {
             try {
                 var store = window.__poznoteUserStorage || window.localStorage;
                 var size = parseInt(store.getItem('settings_font_size'), 10);
-                if (size >= 10 && size <= 32 && size !== 15) {
+                if (!(size >= 10 && size <= 32)) {
+                    // No stored size: phones start at 13px, desktops at the
+                    // 15px reference (same default as font-size-settings.js).
+                    var mobile = window.matchMedia
+                        ? window.matchMedia('(max-width: 800px)').matches
+                        : window.innerWidth <= 800;
+                    size = mobile ? 13 : 15;
+                }
+                if (size !== 15) {
                     document.documentElement.style.setProperty('--settings-font-scale', String(Math.round((size / 15) * 1000) / 1000));
                 }
             } catch (_error) {

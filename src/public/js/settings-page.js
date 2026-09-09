@@ -416,12 +416,22 @@
         });
     }
 
+    // The settings page default is viewport dependent (13px on phones); the
+    // literal mirrors js/font-size-settings.js for the rare load order where
+    // that file has not defined its helper yet.
+    function settingsFontSizeFallback() {
+        if (typeof window.settingsFontSizeDefault === 'function') {
+            return window.settingsFontSizeDefault();
+        }
+        return (typeof isMobileDevice === 'function' && isMobileDevice()) ? '13' : '15';
+    }
+
     function refreshFontSizeBadge() {
         var fontBadges = [
             { id: 'font-size-badge', key: 'note_font_size', default: '15', i18nKey: 'display.badges.note_font_size', fallback: '' },
             { id: 'sidebar-font-size-badge', key: 'sidebar_font_size', default: '13', i18nKey: 'display.badges.sidebar_font_size', fallback: '' },
             { id: 'code-block-font-size-badge', key: 'code_block_font_size', default: '15', i18nKey: 'display.badges.code_block_font_size', fallback: '' },
-            { id: 'settings-font-size-badge', key: 'settings_font_size', default: '15', i18nKey: 'display.badges.settings_font_size', fallback: '' }
+            { id: 'settings-font-size-badge', key: 'settings_font_size', default: settingsFontSizeFallback(), i18nKey: 'display.badges.settings_font_size', fallback: '' }
         ];
 
         fontBadges.forEach(function (config) {
@@ -3142,6 +3152,9 @@
             sectionLabelRefreshers.push(function () {
                 applySectionState(title.classList.contains('section-collapsed'));
             });
+            if (alwaysExpandedSections.indexOf(sectionKey) === -1) {
+                collapsibleSections.push({ title: title, apply: applySectionState });
+            }
 
             // The button's click bubbles up here, so one listener covers both.
             // The desktop layout shows one section at a time: nothing to
