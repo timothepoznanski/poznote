@@ -1406,7 +1406,16 @@
     }
   },
   "theme": {
-    "toggle": "Toggle theme"
+    "toggle": "Toggle theme",
+    "names": {
+      "light": "Light",
+      "dark": "Dark",
+      "black": "Black",
+      "lavender": "Lavender",
+      "sepia": "Sepia",
+      "terminal": "Terminal"
+    },
+    "choose": "Choose a theme"
   },
   "table": {
     "context_menu": {

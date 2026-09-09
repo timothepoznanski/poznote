@@ -1831,7 +1831,16 @@
     }
   },
   "theme": {
-    "toggle": "切换主题"
+    "toggle": "切换主题",
+    "names": {
+      "light": "浅色",
+      "dark": "深色",
+      "black": "纯黑",
+      "lavender": "薰衣草",
+      "sepia": "棕褐",
+      "terminal": "终端"
+    },
+    "choose": "选择主题"
   },
   "table": {
     "context_menu": {

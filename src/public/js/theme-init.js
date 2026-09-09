@@ -95,24 +95,24 @@ window.__poznoteClearUserStorage = function (userId) {
 // Theme initialization - runs synchronously in <head> to prevent FOUC
 (function () {
     try {
-        var palettes = {
-            dark: {
-                contentBg: '#252526',
-                sidebarBg: '#252526',
-                text: '#e0e0e0'
-            },
-            black: {
-                contentBg: '#141821',
-                sidebarBg: '#0b0d12',
-                text: '#d8dee8'
-            }
+        // Every theme, with just enough of each palette to paint the page
+        // before the stylesheets land. `mode` goes in data-theme, `variant` is
+        // the class carrying the palette. The same list lives in
+        // js/theme-manager.js and css/tokens.css: add a theme in all three.
+        var THEMES = {
+            light:    { mode: 'light', contentBg: '#ffffff', sidebarBg: '#ffffff', text: '#333333' },
+            dark:     { mode: 'dark',  contentBg: '#252526', sidebarBg: '#252526', text: '#e0e0e0' },
+            black:    { mode: 'dark',  contentBg: '#141821', sidebarBg: '#0b0d12', text: '#d8dee8', variant: 'theme-black' },
+            lavender: { mode: 'light', contentBg: '#f3e3ff', sidebarBg: '#e7cdfb', text: '#1a0033', variant: 'theme-lavender' },
+            sepia:    { mode: 'light', contentBg: '#f6ecd8', sidebarBg: '#efe0c4', text: '#3b2c1a', variant: 'theme-sepia' },
+            terminal: { mode: 'dark',  contentBg: '#041008', sidebarBg: '#000000', text: '#4ee87a', variant: 'theme-terminal' }
         };
+
+        var VARIANT_CLASSES = ['theme-black', 'theme-lavender', 'theme-sepia', 'theme-terminal'];
 
         function normalizeTheme(value) {
             value = String(value || '').toLowerCase();
-            return value === 'black' || value === 'dark' || value === 'light' || value === 'system'
-                ? value
-                : null;
+            return value === 'system' || THEMES[value] ? value : null;
         }
 
         function getSystemTheme() {
@@ -124,19 +124,30 @@ window.__poznoteClearUserStorage = function (userId) {
         if (t === 'system') {
             t = getSystemTheme();
         }
-        var isDark = t === 'dark' || t === 'black';
-        var effectiveTheme = isDark ? 'dark' : 'light';
-        var palette = t === 'black' ? palettes.black : palettes.dark;
+        var palette = THEMES[t] || THEMES.light;
+        var effectiveTheme = palette.mode;
+        var isDark = effectiveTheme === 'dark';
         var r = document.documentElement;
         r.setAttribute('data-theme', effectiveTheme);
         r.style.colorScheme = effectiveTheme;
-        r.style.backgroundColor = isDark ? palette.contentBg : '#ffffff';
+        // Painted inline so the page is not white for a frame. theme-manager.js
+        // removes it once the stylesheets are in, so a theme can own the canvas.
+        r.style.backgroundColor = palette.contentBg;
+
+        // One variant class at a time, in both modes: the named themes are
+        // variants of light or dark, exactly as theme-black always was.
+        for (var vi = 0; vi < VARIANT_CLASSES.length; vi++) {
+            if (VARIANT_CLASSES[vi] === palette.variant) {
+                r.classList.add(VARIANT_CLASSES[vi]);
+            } else {
+                r.classList.remove(VARIANT_CLASSES[vi]);
+            }
+        }
 
         // Add theme class for pages that need it (settings, display)
         if (isDark) {
             r.classList.add('theme-dark');
             r.classList.remove('theme-light');
-            r.classList.toggle('theme-black', t === 'black');
 
             // Inject critical CSS to prevent white flash on all key elements
             var style = document.createElement('style');
@@ -156,7 +167,6 @@ window.__poznoteClearUserStorage = function (userId) {
         } else {
             r.classList.add('theme-light');
             r.classList.remove('theme-dark');
-            r.classList.remove('theme-black');
         }
     } catch (e) {
         // Fallback silently if localStorage unavailable

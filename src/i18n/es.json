@@ -1834,7 +1834,16 @@
     }
   },
   "theme": {
-    "toggle": "Cambiar de tema"
+    "toggle": "Cambiar de tema",
+    "names": {
+      "light": "Claro",
+      "dark": "Oscuro",
+      "black": "Negro",
+      "lavender": "Lavanda",
+      "sepia": "Sepia",
+      "terminal": "Terminal"
+    },
+    "choose": "Elegir un tema"
   },
   "table": {
     "context_menu": {
