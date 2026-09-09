@@ -916,7 +916,7 @@ try {
                                 $workspaceReadonlyEnabled = $readonlyToken !== '';
                                 $ws_display = htmlspecialchars($ws);
                             ?>
-                            <li>
+                            <li class="ws-row">
                                 <?php
                                     $cnt = isset($workspace_counts[$ws]) ? (int)$workspace_counts[$ws] : 0;
                                     $folderCount = isset($workspace_folder_counts[$ws]) ? (int)$workspace_folder_counts[$ws] : 0;
@@ -954,6 +954,8 @@ try {
                                     $backgroundLabel = t_h('workspaces.actions.background', [], 'Background', $currentLang);
                                     $moveLabel = t_h('workspaces.actions.move_notes', [], 'Move notes', $currentLang);
                                     $deleteLabel = t_h('common.delete', [], 'Delete', $currentLang);
+                                    $infoLabel = t_h('common.information', [], 'Information');
+                                    $actionsMenuLabel = t_h('workspaces.actions.menu', [], 'Workspace actions', $currentLang);
                                 ?>
                                 <div class="ws-col ws-col-actions">
                                     <div class="ws-icon-actions">
@@ -969,26 +971,26 @@ try {
                                                 data-allowed-users="<?php echo htmlspecialchars(json_encode($workspaceRow['readonly_allowed_users'] ?? [], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP), ENT_QUOTES, 'UTF-8'); ?>"
                                                 data-action="upsert_readonly_share"
                                                 title="<?php echo $shareLabel; ?>" aria-label="<?php echo $shareLabel; ?>">
-                                            <i class="lucide lucide-share-2"></i>
+                                            <i class="lucide lucide-share-2"></i><span class="ws-icon-btn-text"><?php echo $shareLabel; ?></span>
                                         </button>
                                         <button type="button" class="ws-icon-btn workspace-rename-action" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo $renameLabel; ?>" aria-label="<?php echo $renameLabel; ?>">
-                                            <i class="lucide lucide-pencil"></i>
+                                            <i class="lucide lucide-pencil"></i><span class="ws-icon-btn-text"><?php echo $renameLabel; ?></span>
                                         </button>
                                         <button type="button" class="ws-icon-btn workspace-tags-action" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" data-tags="<?php echo htmlspecialchars(implode(', ', $workspaceRow['tags'] ?? []), ENT_QUOTES, 'UTF-8'); ?>" title="<?php echo $tagsLabel; ?>" aria-label="<?php echo $tagsLabel; ?>">
-                                            <i class="lucide lucide-tag"></i>
+                                            <i class="lucide lucide-tag"></i><span class="ws-icon-btn-text"><?php echo $tagsLabel; ?></span>
                                         </button>
                                         <button type="button" class="ws-icon-btn workspace-color-action" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" data-color="<?php echo htmlspecialchars($workspaceRow['color'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" title="<?php echo $colorLabel; ?>" aria-label="<?php echo $colorLabel; ?>">
-                                            <i class="lucide lucide-palette"></i>
+                                            <i class="lucide lucide-palette"></i><span class="ws-icon-btn-text"><?php echo $colorLabel; ?></span>
                                         </button>
                                         <button type="button" class="ws-icon-btn workspace-background-action" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo $backgroundLabel; ?>" aria-label="<?php echo $backgroundLabel; ?>">
-                                            <i class="lucide lucide-image"></i>
+                                            <i class="lucide lucide-image"></i><span class="ws-icon-btn-text"><?php echo $backgroundLabel; ?></span>
                                         </button>
                                         <button type="button" class="ws-icon-btn btn-move" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo $moveLabel; ?>" aria-label="<?php echo $moveLabel; ?>" <?php echo ($cnt === 0 || count($workspaces) <= 1) ? 'disabled' : ''; ?>>
-                                            <i class="lucide lucide-folder-output"></i>
+                                            <i class="lucide lucide-folder-output"></i><span class="ws-icon-btn-text"><?php echo $moveLabel; ?></span>
                                         </button>
                                         <?php if (count($workspaces) > 1): ?>
                                             <button type="button" class="ws-icon-btn ws-icon-btn-danger btn-delete" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo $deleteLabel; ?>" aria-label="<?php echo $deleteLabel; ?>">
-                                                <i class="lucide lucide-trash-2"></i>
+                                                <i class="lucide lucide-trash-2"></i><span class="ws-icon-btn-text"><?php echo $deleteLabel; ?></span>
                                             </button>
                                         <?php endif; ?>
                                         <button type="button" class="ws-icon-btn workspace-info-action"
@@ -998,10 +1000,16 @@ try {
                                                 data-tags="<?php echo htmlspecialchars(json_encode($wsTags, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP), ENT_QUOTES, 'UTF-8'); ?>"
                                                 data-shared="<?php echo $workspaceReadonlyEnabled ? '1' : '0'; ?>"
                                                 data-shared-with="<?php echo htmlspecialchars(json_encode($sharedWith, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP), ENT_QUOTES, 'UTF-8'); ?>"
-                                                title="<?php echo t_h('common.information', [], 'Information'); ?>" aria-label="<?php echo t_h('common.information', [], 'Information'); ?>">
-                                            <i class="lucide lucide-info"></i>
+                                                title="<?php echo $infoLabel; ?>" aria-label="<?php echo $infoLabel; ?>">
+                                            <i class="lucide lucide-info"></i><span class="ws-icon-btn-text"><?php echo $infoLabel; ?></span>
                                         </button>
                                     </div>
+                                    <!-- Narrow screens: layoutWorkspaceRowActions() moves the buttons
+                                         that no longer fit on the line into this menu. -->
+                                    <button type="button" class="ws-actions-toggle" aria-haspopup="true" aria-expanded="false" title="<?php echo $actionsMenuLabel; ?>" aria-label="<?php echo $actionsMenuLabel; ?>">
+                                        <i class="lucide lucide-more-vertical"></i>
+                                    </button>
+                                    <div class="ws-actions-menu"></div>
                                 </div>
                             </li>
                         <?php endforeach; ?>

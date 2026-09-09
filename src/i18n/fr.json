@@ -600,7 +600,8 @@
     },
     "actions": {
       "select": "Sélectionner",
-      "move_notes": "Déplacer les notes"
+      "move_notes": "Déplacer les notes",
+      "menu": "Actions du workspace"
     },
     "count": {
       "notes_0": "0 notes",

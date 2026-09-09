@@ -341,6 +341,9 @@
       "saved": "Color updated",
       "save_error": "Could not update the color",
       "invalid": "Invalid color"
+    },
+    "actions": {
+      "menu": "Workspace actions"
     }
   },
   "display": {

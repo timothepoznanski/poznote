@@ -46,12 +46,15 @@ function updateWorkspaceShareToggleButton(button, isShared, shareState) {
 
     button.setAttribute('data-action', 'upsert_readonly_share');
     button.setAttribute('data-shared', isShared ? '1' : '0');
-    // Icon button: the state shows through its tooltip and the is-shared tint
+    // Icon button: the state shows through its tooltip and the is-shared tint,
+    // plus the label the mobile actions menu prints next to the icon
     var shareLabel = isShared
         ? getWorkspaceShareText('workspace-share-edit-btn', 'Edit share')
         : getWorkspaceShareText('workspace-share-enable-btn', 'Share');
     button.title = shareLabel;
     button.setAttribute('aria-label', shareLabel);
+    var shareLabelEl = button.querySelector('.ws-icon-btn-text');
+    if (shareLabelEl) shareLabelEl.textContent = shareLabel;
     button.classList.toggle('is-shared', isShared);
 
     if (shareState && Object.prototype.hasOwnProperty.call(shareState, 'url')) {

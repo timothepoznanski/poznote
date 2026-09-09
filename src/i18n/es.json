@@ -589,7 +589,8 @@
     },
     "actions": {
       "select": "Seleccionar",
-      "move_notes": "Mover notas"
+      "move_notes": "Mover notas",
+      "menu": "Acciones del espacio de trabajo"
     },
     "count": {
       "notes_0": "0 notas",

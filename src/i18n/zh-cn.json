@@ -590,7 +590,8 @@
     },
     "actions": {
       "select": "选择",
-      "move_notes": "移动笔记"
+      "move_notes": "移动笔记",
+      "menu": "工作区操作"
     },
     "count": {
       "notes_0": "0 篇笔记",

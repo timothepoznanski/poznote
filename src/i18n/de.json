@@ -588,7 +588,8 @@
     },
     "actions": {
       "select": "Auswählen",
-      "move_notes": "Notizen verschieben"
+      "move_notes": "Notizen verschieben",
+      "menu": "Workspace-Aktionen"
     },
     "count": {
       "notes_0": "0 Notizen",
