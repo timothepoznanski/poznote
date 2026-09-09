@@ -1223,7 +1223,6 @@
       "panel_title": "Personalizar esta página",
       "panel_button": "Personalizar la interfaz",
       "panel_hint": "Solo se muestran los elementos de esta página. Los cambios se aplican de inmediato y se guardan automáticamente.",
-      "panel_admin_note": "Este panel solo cambia tu propia interfaz; la columna «Usuarios» está en los ajustes.",
       "panel_all_options": "Todas las opciones",
       "panel_saving": "Guardando…",
       "panel_saved": "Guardado",

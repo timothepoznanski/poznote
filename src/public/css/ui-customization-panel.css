@@ -167,8 +167,13 @@ body:has(#ai-chat-panel.ai-chat-open) #edgeAiChatBtn {
     padding: 0 16px 12px;
 }
 
-.ui-custom-panel-hint {
+/* Secondary text: read once, then stays out of the way. The id outweighs the
+   dark-mode .ui-custom-description rule in modals/ui-customization.css. */
+#uiCustomizationPanel .ui-custom-panel-hint {
     margin: 0 0 10px;
+    font-size: 0.78em;
+    line-height: 1.45;
+    color: var(--pz-text-subtle);
 }
 
 .ui-custom-panel-filter {

@@ -1222,7 +1222,6 @@
       "panel_title": "Diese Seite anpassen",
       "panel_button": "Oberfläche anpassen",
       "panel_hint": "Nur die Elemente dieser Seite werden aufgeführt. Änderungen gelten sofort und werden automatisch gespeichert.",
-      "panel_admin_note": "Dieses Panel ändert nur Ihre eigene Oberfläche; die Spalte „Benutzer“ finden Sie in den Einstellungen.",
       "panel_all_options": "Alle Optionen",
       "panel_saving": "Wird gespeichert…",
       "panel_saved": "Gespeichert",

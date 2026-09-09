@@ -1223,7 +1223,6 @@
       "panel_title": "自定义此页面",
       "panel_button": "自定义界面",
       "panel_hint": "仅列出此页面的元素。更改会立即生效并自动保存。",
-      "panel_admin_note": "此面板仅更改您自己的界面；“用户”列位于设置中。",
       "panel_all_options": "所有选项",
       "panel_saving": "正在保存…",
       "panel_saved": "已保存",

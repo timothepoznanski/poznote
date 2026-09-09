@@ -1248,7 +1248,6 @@
       "panel_title": "Personnaliser cette page",
       "panel_button": "Personnaliser l'interface",
       "panel_hint": "Seuls les éléments de cette page sont listés. Les changements s'appliquent immédiatement et sont enregistrés automatiquement.",
-      "panel_admin_note": "Ce panneau ne modifie que votre propre interface ; la colonne « Utilisateurs » se trouve dans les paramètres.",
       "panel_all_options": "Toutes les options",
       "panel_saving": "Enregistrement…",
       "panel_saved": "Enregistré",

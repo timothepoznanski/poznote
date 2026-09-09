@@ -711,7 +711,6 @@
       "panel_title": "Customize this page",
       "panel_button": "Customize the interface",
       "panel_hint": "Only the elements of this page are listed. Changes apply immediately and are saved automatically.",
-      "panel_admin_note": "This panel only changes your own interface; the \"Users\" column is in the settings.",
       "panel_all_options": "All options",
       "panel_saving": "Saving…",
       "panel_saved": "Saved",
