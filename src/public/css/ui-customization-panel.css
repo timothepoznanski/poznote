@@ -3,11 +3,27 @@
    laid out like #ai-chat-panel (css/ai-chat.css). The checklist inside reuses
    the .ui-custom-* rules of css/modals/ui-customization.css. */
 
+/* Size of the floating edge buttons, shared with the note's scroll-to-edge
+   arrows (.note-scroll-edge-btn, css/notes/noteentry.css) so the column reads
+   as one. Bigger on a phone, where they are tapped with a thumb. */
+:root {
+    --pz-edge-btn-size: 32px;
+    --pz-edge-icon-size: 15px;
+    --pz-edge-btn-gap: 6px;
+}
+
+@media (max-width: 800px) {
+    :root {
+        --pz-edge-btn-size: 36px;
+        --pz-edge-icon-size: 17px;
+    }
+}
+
 /* Floating stack at the bottom-right of the page (ui_customization_panel.php):
    the AI assistant toggle above this panel's toggle. Shifted left of the
    columns docked there (--pz-docked-*, css/notes/noteentry.css) and, on the
-   notes page, raised above the note's scroll-to-edge arrows, which use the
-   same 32px look (.note-scroll-edge-btn) so the four read as one column. */
+   notes page, raised above the note's scroll-to-edge arrows so the four read
+   as one column. */
 .pz-edge-stack {
     position: fixed;
     right: calc(10px + var(--pz-docked-outline, 0px) + var(--pz-docked-ai-chat, 0px) + var(--pz-docked-ui-custom, 0px));
@@ -15,13 +31,13 @@
     z-index: 30;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: var(--pz-edge-btn-gap);
     pointer-events: none;
 }
 
 .pz-edge-btn {
-    width: 32px;
-    height: 32px;
+    width: var(--pz-edge-btn-size);
+    height: var(--pz-edge-btn-size);
     padding: 0;
     border: 1px solid rgba(var(--pz-shadow-rgb), 0.12);
     border-radius: var(--pz-radius);
@@ -56,7 +72,7 @@
 }
 
 .pz-edge-btn [class*="lucide-"] {
-    font-size: 15px;
+    font-size: var(--pz-edge-icon-size);
     filter: none;
     color: inherit;
 }
@@ -70,14 +86,26 @@ body:has(#ai-chat-panel.ai-chat-open) #edgeAiChatBtn {
     display: none;
 }
 
-/* One arrow showing: 32px + gap; both: 70px + gap */
+/* Raised over the arrows below it: one arrow showing is a button plus a gap,
+   both is twice that. On mobile the arrows show only with the note on screen
+   (body.note-open, css/notes/noteentry.css), so the lift follows that. */
 @media (min-width: 801px) {
     body:has(.note-scroll-edge-btn:not([hidden])) .pz-edge-stack {
-        bottom: 48px;
+        bottom: calc(10px + var(--pz-edge-btn-size) + var(--pz-edge-btn-gap));
     }
 
     body:has(.note-scroll-top-btn:not([hidden])):has(.note-scroll-bottom-btn:not([hidden])) .pz-edge-stack {
-        bottom: 86px;
+        bottom: calc(10px + 2 * (var(--pz-edge-btn-size) + var(--pz-edge-btn-gap)));
+    }
+}
+
+@media (max-width: 800px) {
+    body.note-open:has(.note-scroll-edge-btn:not([hidden])) .pz-edge-stack {
+        bottom: calc(10px + var(--pz-edge-btn-size) + var(--pz-edge-btn-gap));
+    }
+
+    body.note-open:has(.note-scroll-top-btn:not([hidden])):has(.note-scroll-bottom-btn:not([hidden])) .pz-edge-stack {
+        bottom: calc(10px + 2 * (var(--pz-edge-btn-size) + var(--pz-edge-btn-gap)));
     }
 }
 
@@ -228,22 +256,12 @@ body:has(#ai-chat-panel.ai-chat-open) #edgeAiChatBtn {
     }
 }
 
-/* Phones: smaller buttons, and the panel slides over the page like the AI
-   chat panel (css/ai-chat.css) instead of docking */
+/* Phones: the buttons take the touch size set at the top of this file, and
+   the panel slides over the page like the AI chat panel (css/ai-chat.css)
+   instead of docking */
 @media (max-width: 800px) {
     .pz-edge-stack {
         right: 10px;
-        bottom: 10px;
-        gap: 5px;
-    }
-
-    .pz-edge-btn {
-        width: 26px;
-        height: 26px;
-    }
-
-    .pz-edge-btn [class*="lucide-"] {
-        font-size: 13px;
     }
 
     #uiCustomizationPanel,
