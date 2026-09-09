@@ -121,10 +121,8 @@ body.center-note-content #right_col .notecard {
     /* The markdown split view keeps the full column, and so does everything
        around it (title, tags, attachments): halving an already narrowed note
        would leave two unusable panes, and the surroundings have to match the
-       full-width panes below them. The width setting is carried by the panes
-       themselves, which inset their own content to --note-width (see
-       css/markdown.css), so the editor and the preview each get the
-       configured share of their own half. */
+       full-width panes below them. The width setting therefore does not apply
+       while the split is open, in either pane. */
     #right_col .innernote:has(.noteentry.markdown-split-mode) > :not(.note-header):not(.note-scroll-edge-controls) {
         max-width: none;
     }
