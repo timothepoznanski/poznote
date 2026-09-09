@@ -11,6 +11,8 @@
 if (!function_exists('createDirectoryWithPermissions')) {
     require_once __DIR__ . '/functions.php';
 }
+// What a rendered note shows, for the search_clean_entry SQLite function below
+require_once __DIR__ . '/lib/search-text.php';
 
 // Determine database path based on authenticated user
 $dbPath = SQLITE_DATABASE; // Default path (fallback)
@@ -146,9 +148,10 @@ try {
         }
         
         if ($type === 'markdown') {
-            // Remove code block markers with language tags (e.g., ```bash)
-            // This prevents language badges from showing up in search results
-            $content = preg_replace('/^```[a-zA-Z0-9+#*-]+\s*$/m', '```', $content);
+            // Match only what the preview shows: link addresses, image paths,
+            // reference definitions, comments and fence language tags live in
+            // the source alone (lib/search-text.php)
+            $content = poznoteMarkdownVisibleText($content);
         } else {
             // HTML Note: Remove individual code block language tags from class and data-language attributes
             // This prevents searching for "shell" or "java" matching the language tag but not the content
