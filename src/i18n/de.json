@@ -1833,7 +1833,16 @@
     }
   },
   "theme": {
-    "toggle": "Design wechseln"
+    "toggle": "Design wechseln",
+    "names": {
+      "light": "Hell",
+      "dark": "Dunkel",
+      "black": "Schwarz",
+      "lavender": "Lavendel",
+      "sepia": "Sepia",
+      "terminal": "Terminal"
+    },
+    "choose": "Theme wählen"
   },
   "table": {
     "context_menu": {

@@ -10,31 +10,37 @@
     // localStorage keys on pages loaded without theme-init.js.
     var themeStore = window.__poznoteUserStorage || window.localStorage;
 
-    var palettes = {
-        dark: {
-            contentBg: '#252526',
-            sidebarBg: '#252526',
-            text: '#e0e0e0'
-        },
-        black: {
-            contentBg: '#141821',
-            sidebarBg: '#0b0d12',
-            text: '#d8dee8'
-        }
-    };
+    // Every theme the picker offers. `mode` is what goes in data-theme, so the
+    // whole stylesheet keeps working unchanged; `variant`, when set, is the
+    // class on <html> that carries the palette, mirroring theme-black. The
+    // same list lives in js/theme-init.js and in css/tokens.css: a new theme
+    // has to be added in all three.
+    var THEMES = [
+        { id: 'light',    mode: 'light', icon: 'lucide-sun' },
+        { id: 'dark',     mode: 'dark',  icon: 'lucide-moon' },
+        { id: 'black',    mode: 'dark',  icon: 'lucide-moon-star', variant: 'theme-black' },
+        { id: 'lavender', mode: 'light', icon: 'lucide-sparkles',  variant: 'theme-lavender' },
+        { id: 'sepia',    mode: 'light', icon: 'lucide-book-open', variant: 'theme-sepia' },
+        { id: 'terminal', mode: 'dark',  icon: 'lucide-terminal',  variant: 'theme-terminal' }
+    ];
 
-    // The three themes the Theme card in settings.php offers, in the order the
-    // toggle buttons walk through them. 'system' is not a theme of its own: it
-    // resolves to whichever of light/dark the OS is on, so the cycle starts
-    // from what is actually displayed.
+    var THEME_VARIANT_CLASSES = THEMES
+        .map(function (t) { return t.variant; })
+        .filter(Boolean);
+
+    // The three the toggle used to walk through, kept for window.toggleTheme:
+    // public_folder.php and the keyboard path still cycle rather than pick.
     var THEME_CYCLE = ['light', 'dark', 'black'];
 
-    // Each toggle button shows the theme its next click applies.
-    var THEME_ICONS = {
-        light: 'lucide-sun',
-        dark: 'lucide-moon',
-        black: 'lucide-moon-star'
-    };
+    var THEME_ICONS = {};
+    THEMES.forEach(function (t) { THEME_ICONS[t.id] = t.icon; });
+
+    function getThemeDef(theme) {
+        for (var i = 0; i < THEMES.length; i++) {
+            if (THEMES[i].id === theme) return THEMES[i];
+        }
+        return null;
+    }
 
     function getNextTheme(theme) {
         // An unknown value lands on 'light', the first entry of the cycle.
@@ -43,17 +49,12 @@
 
     function normalizeThemeMode(theme) {
         theme = String(theme || '').toLowerCase();
-        return theme === 'black' || theme === 'dark' || theme === 'light' || theme === 'system'
-            ? theme
-            : null;
+        return theme === 'system' || getThemeDef(theme) ? theme : null;
     }
 
     function getEffectiveTheme(theme) {
-        return theme === 'black' || theme === 'dark' ? 'dark' : 'light';
-    }
-
-    function getPalette(theme) {
-        return theme === 'black' ? palettes.black : palettes.dark;
+        var def = getThemeDef(theme);
+        return def ? def.mode : 'light';
     }
 
     function getForcedTheme() {
@@ -121,12 +122,10 @@
         }
 
         var effectiveTheme = getEffectiveTheme(selectedTheme);
-        var palette = getPalette(selectedTheme);
 
         // Set data-theme on <html> for early CSS
         root.setAttribute('data-theme', effectiveTheme);
         root.style.colorScheme = effectiveTheme;
-        root.style.backgroundColor = effectiveTheme === 'dark' ? palette.contentBg : '#ffffff';
 
         // Update theme-dark/theme-light classes for consistency with theme-init.js
         if (effectiveTheme === 'dark') {
@@ -136,7 +135,12 @@
             root.classList.add('theme-light');
             root.classList.remove('theme-dark');
         }
-        root.classList.toggle('theme-black', selectedTheme === 'black');
+
+        // One variant class at a time: the named themes are variants of a mode.
+        var variant = (getThemeDef(selectedTheme) || {}).variant;
+        THEME_VARIANT_CLASSES.forEach(function (cls) {
+            root.classList.toggle(cls, cls === variant);
+        });
 
         // Remove critical CSS from theme-init.js if it exists, as it contains !important rules
         // that will interfere with dynamic theme switching
@@ -180,14 +184,12 @@
         applyTheme(getNextTheme(selectedTheme), true);
     }
 
-    // Point the toggle buttons at the theme the next click applies, from the
-    // SELECTED mode (light, dark, black or system).
+    // Show the theme currently in use. It used to show the one the NEXT click
+    // would apply, which made sense while the button cycled; it opens a picker
+    // now, so the icon reports state instead of predicting an action.
     function updateThemeUI(mode) {
-        // Toggle buttons show the theme a click would switch to. Taken from the
-        // selected mode rather than the effective one, which collapses black
-        // into dark and would leave two of the three steps on the same icon.
         var appliedTheme = mode === 'system' ? getSystemTheme() : mode;
-        var toggleIconClass = 'lucide ' + THEME_ICONS[getNextTheme(appliedTheme)];
+        var toggleIconClass = 'lucide ' + (THEME_ICONS[appliedTheme] || THEME_ICONS.light);
         var toggles = document.querySelectorAll('[data-theme-toggle]');
         for (var i = 0; i < toggles.length; i++) {
             var toggleIcon = toggles[i].querySelector('i');
@@ -215,16 +217,140 @@
     window.getCurrentThemeMode = getCurrentThemeMode;
     window.applyTheme = applyTheme;
 
+    // ---------------------------------------------------------------------
+    // The picker.
+    //
+    // The rail button used to cycle light -> dark -> black, which stopped
+    // scaling at three themes. It opens this menu instead. The markup and the
+    // classes are the rail's overflow menu, so the two read the same and share
+    // its stylesheet; it is built here rather than in icon_sidebar.php because
+    // the button also exists on pages that do not render the rail.
+    var MENU_ID = 'themePickerMenu';
+    var MENU_OPEN_CLASS = 'icon-sidebar-overflow-open';
+
+    function label(theme) {
+        var fallbacks = {
+            light: 'Light', dark: 'Dark', black: 'Black',
+            lavender: 'Lavender', sepia: 'Sepia', terminal: 'Terminal'
+        };
+        return window.t
+            ? window.t('theme.names.' + theme, null, fallbacks[theme])
+            : fallbacks[theme];
+    }
+
+    function getMenu() {
+        var menu = document.getElementById(MENU_ID);
+        if (menu) return menu;
+
+        menu = document.createElement('div');
+        menu.id = MENU_ID;
+        menu.setAttribute('role', 'menu');
+        document.body.appendChild(menu);
+        return menu;
+    }
+
+    function closeMenu() {
+        var menu = document.getElementById(MENU_ID);
+        if (menu) menu.classList.remove(MENU_OPEN_CLASS);
+        var toggles = document.querySelectorAll('[data-theme-toggle]');
+        for (var i = 0; i < toggles.length; i++) {
+            toggles[i].setAttribute('aria-expanded', 'false');
+        }
+    }
+
+    function isMenuOpen() {
+        var menu = document.getElementById(MENU_ID);
+        return !!menu && menu.classList.contains(MENU_OPEN_CLASS);
+    }
+
+    function positionMenu(menu, button) {
+        // position: fixed, like the overflow menu: the rail scrolls and clips,
+        // so an absolutely positioned menu would be cut off.
+        var box = button.getBoundingClientRect();
+        var size = menu.getBoundingClientRect();
+        var gap = 8;
+        var left = box.right + gap;
+        if (left + size.width > window.innerWidth - gap) {
+            left = Math.max(gap, box.left - size.width - gap);
+        }
+        var top = Math.min(
+            Math.max(gap, box.top + (box.height / 2) - (size.height / 2)),
+            window.innerHeight - size.height - gap
+        );
+        menu.style.left = Math.round(left) + 'px';
+        menu.style.top = Math.round(Math.max(gap, top)) + 'px';
+    }
+
+    function openMenu(button) {
+        var menu = getMenu();
+        // On 'system' nothing in the list matches, which would leave the menu
+        // with no mark at all. Show the theme actually on screen instead.
+        var mode = getCurrentThemeMode();
+        var current = mode === 'system' ? getSystemTheme() : mode;
+
+        menu.innerHTML = '';
+        THEMES.forEach(function (def) {
+            var item = document.createElement('button');
+            item.type = 'button';
+            item.className = 'icon-sidebar-overflow-item';
+            item.setAttribute('role', 'menuitemradio');
+            item.setAttribute('data-theme-choice', def.id);
+            item.setAttribute('aria-checked', current === def.id ? 'true' : 'false');
+            if (current === def.id) {
+                item.classList.add('icon-sidebar-overflow-item-active');
+            }
+
+            var icon = document.createElement('i');
+            icon.className = 'lucide ' + def.icon;
+            item.appendChild(icon);
+
+            var text = document.createElement('span');
+            text.textContent = label(def.id);
+            item.appendChild(text);
+
+            menu.appendChild(item);
+        });
+
+        menu.classList.add(MENU_OPEN_CLASS);
+        button.setAttribute('aria-expanded', 'true');
+        positionMenu(menu, button);
+    }
+
     document.addEventListener('click', function (event) {
         var target = event.target;
         if (!target || typeof target.closest !== 'function') return;
 
-        var themeToggle = target.closest('[data-theme-toggle]');
-        if (!themeToggle) return;
+        var choice = target.closest('[data-theme-choice]');
+        if (choice) {
+            event.preventDefault();
+            applyTheme(choice.getAttribute('data-theme-choice'), true);
+            closeMenu();
+            return;
+        }
 
-        event.preventDefault();
-        toggleTheme();
+        var themeToggle = target.closest('[data-theme-toggle]');
+        if (themeToggle) {
+            event.preventDefault();
+            if (isMenuOpen()) {
+                closeMenu();
+            } else {
+                openMenu(themeToggle);
+            }
+            return;
+        }
+
+        if (isMenuOpen() && !target.closest('#' + MENU_ID)) {
+            closeMenu();
+        }
     });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && isMenuOpen()) {
+            closeMenu();
+        }
+    });
+
+    window.addEventListener('resize', closeMenu);
 
     // Initialize theme when DOM is ready
     if (document.readyState === 'loading') {

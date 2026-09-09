@@ -219,6 +219,182 @@ html[data-theme='dark'] {
     --dm-tab-active-bg: #383838;
 }
 
+/* ============================================
+   Named themes
+   ============================================
+   Each one is a variant of a mode, exactly like theme-black above: the mode
+   stays in data-theme so every rule in the app keeps working unchanged, and
+   the class carries the palette. A light variant overrides the --pz-* scales,
+   a dark one the --dm-*. js/theme-manager.js and js/theme-init.js hold the
+   same list; adding a theme means adding it in all three. */
+
+/* --- Lavender: a light theme with a neon streak -------------------------- */
+html.theme-lavender {
+    --pz-bg: #f3e3ff;
+    --pz-surface: #e7cdfb;
+    --pz-surface-hover: #d9b3f5;
+    --pz-surface-sunken: #d9b3f5;
+
+    --pz-text: #1a0033;
+    --pz-text-secondary: #43206b;
+    --pz-text-muted: #5c3a85;
+    --pz-text-subtle: #6b4d90;
+    --pz-text-inverse: #ffffff;
+
+    --pz-border-light: #d9b3f5;
+    --pz-border: #c98ae8;
+    --pz-border-strong: #b026ff;
+
+    --pz-accent: #7a00d4;
+    --pz-accent-hover: #c2007a;
+    --pz-accent-strong: #4a0080;
+    --pz-accent-soft: #f3d9ff;
+    --pz-accent-rgb: 122, 0, 212;
+    --pz-link: #7a00d4;
+
+    --pz-danger: #c4002a;
+    --pz-danger-hover: #8f001e;
+    --pz-danger-strong: #6b0016;
+    --pz-danger-soft: #ffd9e2;
+    --pz-success: #1d9e00;
+    --pz-success-hover: #157400;
+    --pz-success-strong: #0d4a00;
+    --pz-success-soft: #d8ffd0;
+    --pz-warning: #a38f00;
+    --pz-warning-hover: #7d6d00;
+    --pz-warning-strong: #544a00;
+    --pz-warning-soft: #fff8cc;
+
+    --pz-icon: #c2007a;
+    --pz-neutral: #6b3fa0;
+    --pz-neutral-hover: #52307a;
+    --pz-disabled: #d9b3f5;
+    --pz-scrollbar: #c98ae8;
+    --pz-scrollbar-hover: #b026ff;
+    --pz-shadow-rgb: 122, 0, 212;
+}
+
+/* --- Sepia: warm paper, for reading -------------------------------------- */
+html.theme-sepia {
+    --pz-bg: #f6ecd8;
+    --pz-surface: #efe0c4;
+    --pz-surface-hover: #e6d2ad;
+    --pz-surface-sunken: #e6d2ad;
+
+    --pz-text: #3b2c1a;
+    --pz-text-secondary: #56412a;
+    --pz-text-muted: #6d573c;
+    --pz-text-subtle: #7a6449;
+    --pz-text-inverse: #f6ecd8;
+
+    --pz-border-light: #e6d2ad;
+    --pz-border: #d4bd94;
+    --pz-border-strong: #b99e72;
+
+    --pz-accent: #8a4b12;
+    --pz-accent-hover: #6d3a0c;
+    --pz-accent-strong: #4d2807;
+    --pz-accent-soft: #f2dcc0;
+    --pz-accent-rgb: 138, 75, 18;
+    --pz-link: #8a4b12;
+
+    --pz-danger: #96271b;
+    --pz-danger-hover: #741c12;
+    --pz-danger-strong: #52130c;
+    --pz-danger-soft: #f6d9d2;
+    --pz-success: #4a6a1f;
+    --pz-success-hover: #384f17;
+    --pz-success-strong: #26350f;
+    --pz-success-soft: #e3edcd;
+    --pz-warning: #8a6a12;
+    --pz-warning-hover: #6d540c;
+    --pz-warning-strong: #4d3a07;
+    --pz-warning-soft: #f6e8c2;
+
+    --pz-icon: #7a6449;
+    --pz-neutral: #6d573c;
+    --pz-neutral-hover: #56412a;
+    --pz-disabled: #e6d2ad;
+    --pz-scrollbar: #d4bd94;
+    --pz-scrollbar-hover: #b99e72;
+    --pz-shadow-rgb: 59, 44, 26;
+}
+
+/* --- Terminal: green phosphor on a dark tube ----------------------------- */
+html.theme-terminal[data-theme='dark'] {
+    --dm-bg: #000000;
+    --dm-content-bg: #041008;
+    --dm-sidebar-bg: #000000;
+    --dm-sidebar-surface: #0a1f10;
+    --dm-surface: #0a1f10;
+    --dm-surface-hover: #10301a;
+    --dm-surface-raised: #164226;
+    --dm-code-bg: #000000;
+    --dm-active: #10301a;
+
+    --dm-text-bright: #b6ffc8;
+    --dm-text: #4ee87a;
+    --dm-text-muted: #37c561;
+    --dm-text-subtle: #279449;
+
+    --dm-border: #16512a;
+    --dm-border-light: #1f7a3a;
+
+    --dm-accent: #4ee87a;
+    --dm-accent-rgb: 78, 232, 122;
+    --dm-accent-hover: #b6ffc8;
+    --dm-accent-soft: #0a2a14;
+
+    --dm-danger: #ff5f56;
+    --dm-danger-hover: #ff8a84;
+    --dm-danger-soft: #2e0a08;
+    --dm-success: #4ee87a;
+    --dm-success-hover: #b6ffc8;
+    --dm-success-soft: #0a2a14;
+    --dm-warning: #ffbd2e;
+    --dm-warning-hover: #ffd473;
+    --dm-warning-soft: #2e2205;
+
+    --dm-icon: #2fae54;
+    --dm-icon-hover: #4ee87a;
+    --dm-neutral: #16512a;
+    --dm-neutral-hover: #1f7a3a;
+    --dm-disabled: #10301a;
+    --dm-scrollbar: #16512a;
+    --dm-scrollbar-hover: #1f7a3a;
+
+    --dm-tabbar-bg: #000000;
+    --dm-tab-bg: #041008;
+    --dm-tab-hover-bg: #0a1f10;
+    --dm-tab-active-bg: #10301a;
+
+    /* Fills keep their own label colour: the phosphor green is a text colour,
+       so anything filled with it takes the tube's black back. */
+    --pz-accent: #2fae54;
+    --pz-accent-hover: #4ee87a;
+    --pz-accent-strong: #b6ffc8;
+    --pz-accent-soft: #0a2a14;
+    --pz-accent-rgb: 47, 174, 84;
+    --pz-text-inverse: #041008;
+    --pz-danger: #e04c3f;
+    --pz-danger-hover: #ff5f56;
+    --pz-danger-strong: #ff8a84;
+    --pz-danger-soft: #2e0a08;
+    --pz-success: #2fae54;
+    --pz-success-hover: #4ee87a;
+    --pz-success-strong: #b6ffc8;
+    --pz-success-soft: #0a2a14;
+    --pz-warning: #a37516;
+    --pz-warning-hover: #ffbd2e;
+    --pz-warning-strong: #ffd473;
+    --pz-warning-soft: #2e2205;
+    --pz-neutral: #16512a;
+    --pz-neutral-hover: #1f7a3a;
+    --pz-icon: #2fae54;
+    --pz-shadow-rgb: 0, 0, 0;
+    --pz-highlight-rgb: 78, 232, 122;
+}
+
 html.theme-black[data-theme='dark'] {
     /* Same four steps, in the blue-grey the black theme uses. These two values
        were already in the right order; bright and subtle extend them. */

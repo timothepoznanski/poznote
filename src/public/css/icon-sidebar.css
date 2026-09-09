@@ -61,7 +61,12 @@
 /* Popup listing the entries currently out of view. Fixed rather than absolute:
    #icon_sidebar is overflow:hidden, so an absolutely positioned menu would be
    clipped by the rail. js/icon-sidebar-toggle.js sets top/left. */
-#iconSidebarOverflowMenu {
+/* The rail's overflow menu and the theme picker are the same object with two
+   contents, so they share one set of rules. Both are position: fixed and
+   placed by JS: the rail scrolls and clips, an absolutely positioned menu
+   would be cut off. */
+#iconSidebarOverflowMenu,
+#themePickerMenu {
     display: none;
     position: fixed;
     z-index: 10000;
@@ -76,7 +81,8 @@
     box-shadow: 0 6px 20px rgba(var(--pz-shadow-rgb), 0.15);
 }
 
-#iconSidebarOverflowMenu.icon-sidebar-overflow-open {
+#iconSidebarOverflowMenu.icon-sidebar-overflow-open,
+#themePickerMenu.icon-sidebar-overflow-open {
     display: block;
 }
 

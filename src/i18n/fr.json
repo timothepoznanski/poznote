@@ -1924,7 +1924,16 @@
     }
   },
   "theme": {
-    "toggle": "Changer de thème"
+    "toggle": "Changer de thème",
+    "names": {
+      "light": "Clair",
+      "dark": "Sombre",
+      "black": "Noir",
+      "lavender": "Lavande",
+      "sepia": "Sépia",
+      "terminal": "Terminal"
+    },
+    "choose": "Choisir un thème"
   },
   "table": {
     "context_menu": {

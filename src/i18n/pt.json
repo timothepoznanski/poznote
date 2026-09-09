@@ -1837,7 +1837,16 @@
     }
   },
   "theme": {
-    "toggle": "Alternar tema"
+    "toggle": "Alternar tema",
+    "names": {
+      "light": "Claro",
+      "dark": "Escuro",
+      "black": "Preto",
+      "lavender": "Lavanda",
+      "sepia": "Sépia",
+      "terminal": "Terminal"
+    },
+    "choose": "Escolher um tema"
   },
   "table": {
     "context_menu": {

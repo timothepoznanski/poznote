@@ -174,7 +174,7 @@ function renderFolderListRow($folderId, $folder, $depth, $workspace, $sharedFold
 	echo '<div class="shared-folder-icon" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: transparent !important; border-radius: 8px; flex: 0 0 auto;">';
 	echo '<i class="' . $folder_icon . '" ' . $icon_style . '></i>';
 	echo '</div>';
-	echo '<span class="folder-name-text" style="font-weight: 500; font-size: 16px; color: var(--text-color, var(--dm-text, #333333));">' . $folder_name . ' <span style="font-size: 14px; color: var(--text-muted, var(--dm-text-muted, #6c757d)); font-weight: 400;">(' . $note_count . ')</span></span>';
+	echo '<span class="folder-name-text" style="font-weight: 500; font-size: 16px; color: var(--pz-text);">' . $folder_name . ' <span style="font-size: 14px; color: var(--pz-text-muted); font-weight: 400;">(' . $note_count . ')</span></span>';
 	echo '</div>';
 
 	// Folder identity, carried by every action button of the row
