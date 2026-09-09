@@ -495,7 +495,7 @@
       "support": "Soutenez le développement de Poznote par un don.",
       "s3_storage": "Stocker les pièces jointes des notes dans un stockage objet compatible S3 au lieu du disque local.",
       "s3_backup": "Envoie des archives de sauvegarde complètes vers un bucket compatible S3, manuellement ou selon une planification.",
-      "highlight_current_folder_tree": "Estomper les notes et les dossiers situés en dehors de la hiérarchie de dossiers dans laquelle vous travaillez.",
+      "highlight_current_folder_tree": "Estomper, autant que vous le souhaitez, les notes et les dossiers situés en dehors de la hiérarchie de dossiers dans laquelle vous travaillez.",
       "snapshots": "Choisir combien de snapshots automatiques quotidiens sont conservés par note."
     },
     "title": "Paramètres",
@@ -1492,6 +1492,16 @@
         "alphabetical": "Alphabétique",
         "manual": "Manuel (glisser-déposer)"
       }
+    },
+    "folder_tree_highlight": {
+      "title": "Mettre en avant le dossier courant",
+      "description": "Les notes et les dossiers situés en dehors de la hiérarchie dans laquelle vous travaillez sont estompés. Choisissez l'intensité de l'estompage :",
+      "dim_strength": "Estompage",
+      "turn_off": "Désactiver",
+      "preview_current_folder": "Dossier courant",
+      "preview_current_note": "Une note sur laquelle vous travaillez",
+      "preview_other_folder": "Un autre dossier",
+      "preview_other_note": "Une note ailleurs"
     },
     "markdown_colored": {
       "title": "Markdown coloré",

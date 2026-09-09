@@ -402,6 +402,14 @@ function poznoteSaasAdminContactEmail(): string {
 
 
 
+// "Highlight current folder tree": how much the rows outside the active
+// hierarchy fade, in percent. The user picks a value on the settings slider;
+// index.php turns it into --folder-tree-dim-opacity (css/folders/tree-highlight.css).
+const POZNOTE_FOLDER_TREE_DIM_DEFAULT = 35;
+const POZNOTE_FOLDER_TREE_DIM_MIN = 10;
+const POZNOTE_FOLDER_TREE_DIM_MAX = 90;
+const POZNOTE_FOLDER_TREE_DIM_STEP = 5;
+
 const POZNOTE_SNAPSHOTS_DEFAULT_COUNT = 3;
 const POZNOTE_SNAPSHOTS_MIN_COUNT = 1;
 const POZNOTE_SNAPSHOTS_MAX_COUNT = 30;

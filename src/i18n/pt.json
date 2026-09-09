@@ -482,7 +482,7 @@
       "support": "Apoie o desenvolvimento do Poznote com uma doação.",
       "s3_storage": "Armazenar os anexos das notas em um armazenamento de objetos compatível com S3 em vez do disco local.",
       "s3_backup": "Envia arquivos de backup completos para um bucket compatível com S3, manualmente ou conforme um agendamento.",
-      "highlight_current_folder_tree": "Esbater as notas e pastas que estão fora da hierarquia de pastas em que está a trabalhar.",
+      "highlight_current_folder_tree": "Esbater, tanto quanto quiser, as notas e pastas que estão fora da hierarquia de pastas em que está a trabalhar.",
       "snapshots": "Escolher quantos instantâneos automáticos diários são guardados por nota."
     },
     "title": "Configurações",
@@ -1457,6 +1457,16 @@
         "alphabetical": "Alfabética",
         "manual": "Manual (arrastar e soltar)"
       }
+    },
+    "folder_tree_highlight": {
+      "title": "Realçar a árvore de pastas atual",
+      "description": "As notas e pastas fora da hierarquia em que está a trabalhar são esbatidas. Escolha a intensidade:",
+      "dim_strength": "Esbatimento",
+      "turn_off": "Desativar",
+      "preview_current_folder": "Pasta atual",
+      "preview_current_note": "Uma nota em que está a trabalhar",
+      "preview_other_folder": "Outra pasta",
+      "preview_other_note": "Uma nota noutro sítio"
     },
     "markdown_colored": {
       "title": "Markdown colorido",

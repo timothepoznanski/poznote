@@ -483,7 +483,7 @@
       "support": "Unterstützen Sie die Entwicklung von Poznote mit einer Spende.",
       "s3_storage": "Notiz-Anhänge in einem S3-kompatiblen Objektspeicher statt auf der lokalen Festplatte speichern.",
       "s3_backup": "Lädt vollständige Sicherungsarchive in einen S3-kompatiblen Bucket hoch, manuell oder nach Zeitplan.",
-      "highlight_current_folder_tree": "Notizen und Ordner außerhalb der Ordnerhierarchie, in der Sie arbeiten, abschwächen.",
+      "highlight_current_folder_tree": "Notizen und Ordner außerhalb der Ordnerhierarchie, in der Sie arbeiten, so stark abschwächen, wie Sie möchten.",
       "snapshots": "Festlegen, wie viele automatische tägliche Schnappschüsse pro Notiz behalten werden."
     },
     "title": "Einstellungen",
@@ -1458,6 +1458,16 @@
         "alphabetical": "Alphabetisch",
         "manual": "Manuell (Drag & Drop)"
       }
+    },
+    "folder_tree_highlight": {
+      "title": "Aktuellen Ordnerbaum hervorheben",
+      "description": "Notizen und Ordner außerhalb der Hierarchie, in der Sie arbeiten, werden abgeschwächt. Wählen Sie, wie stark:",
+      "dim_strength": "Abschwächung",
+      "turn_off": "Ausschalten",
+      "preview_current_folder": "Aktueller Ordner",
+      "preview_current_note": "Eine Notiz, an der Sie arbeiten",
+      "preview_other_folder": "Ein anderer Ordner",
+      "preview_other_note": "Eine Notiz an anderer Stelle"
     },
     "markdown_colored": {
       "title": "Farbiges Markdown",

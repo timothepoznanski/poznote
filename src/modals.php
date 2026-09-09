@@ -942,6 +942,33 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
+<!-- Highlight current folder tree: how far the rest of the notes list fades -->
+<div id="folderTreeHighlightModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.folder_tree_highlight.title', [], 'Highlight current folder tree'); ?></h3>
+        <div class="modal-body">
+            <p><?php echo t_h('modals.folder_tree_highlight.description', [], 'Notes and folders outside the hierarchy you are working in fade out. Choose how far they fade:'); ?></p>
+            <div class="folder-tree-dim-control">
+                <label for="folderTreeDimInput"><?php echo t_h('modals.folder_tree_highlight.dim_strength', [], 'Dimming'); ?>: <span id="folderTreeDimValue"><?php echo POZNOTE_FOLDER_TREE_DIM_DEFAULT; ?></span>%</label>
+                <input type="range" id="folderTreeDimInput" min="<?php echo POZNOTE_FOLDER_TREE_DIM_MIN; ?>" max="<?php echo POZNOTE_FOLDER_TREE_DIM_MAX; ?>" step="<?php echo POZNOTE_FOLDER_TREE_DIM_STEP; ?>" value="<?php echo POZNOTE_FOLDER_TREE_DIM_DEFAULT; ?>">
+            </div>
+            <!-- Stand-in for the notes list: the settings page has no tree of
+                 its own, so the slider needs something to preview on. -->
+            <div class="folder-tree-dim-preview" id="folderTreeDimPreview" aria-hidden="true">
+                <div class="ftd-row"><i class="lucide lucide-folder-open"></i><span><?php echo t_h('modals.folder_tree_highlight.preview_current_folder', [], 'Current folder'); ?></span></div>
+                <div class="ftd-row ftd-note"><i class="lucide lucide-file-text"></i><span><?php echo t_h('modals.folder_tree_highlight.preview_current_note', [], 'A note you are working on'); ?></span></div>
+                <div class="ftd-row ftd-dimmed"><i class="lucide lucide-folder"></i><span><?php echo t_h('modals.folder_tree_highlight.preview_other_folder', [], 'Another folder'); ?></span></div>
+                <div class="ftd-row ftd-note ftd-dimmed"><i class="lucide lucide-file-text"></i><span><?php echo t_h('modals.folder_tree_highlight.preview_other_note', [], 'A note somewhere else'); ?></span></div>
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="folderTreeHighlightModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-secondary" id="disableFolderTreeHighlightBtn"><?php echo t_h('modals.folder_tree_highlight.turn_off', [], 'Turn off'); ?></button>
+            <button type="button" class="btn-primary" id="saveFolderTreeHighlightBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Colored markdown modal -->
 <div id="markdownColoredModal" class="modal">
     <div class="modal-content">

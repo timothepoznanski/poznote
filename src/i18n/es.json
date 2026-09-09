@@ -484,7 +484,7 @@
       "support": "Apoya el desarrollo de Poznote con una donación.",
       "s3_storage": "Almacenar los adjuntos de las notas en un almacenamiento de objetos compatible con S3 en lugar del disco local.",
       "s3_backup": "Sube archivos de copia de seguridad completos a un bucket compatible con S3, manualmente o según una programación.",
-      "highlight_current_folder_tree": "Atenuar las notas y carpetas que están fuera de la jerarquía de carpetas en la que trabajas.",
+      "highlight_current_folder_tree": "Atenuar, tanto como quieras, las notas y carpetas que están fuera de la jerarquía de carpetas en la que trabajas.",
       "snapshots": "Elegir cuántas instantáneas automáticas diarias se conservan por nota."
     },
     "title": "Configuración",
@@ -1459,6 +1459,16 @@
         "alphabetical": "Alfabético",
         "manual": "Manual (arrastrar y soltar)"
       }
+    },
+    "folder_tree_highlight": {
+      "title": "Resaltar el árbol de carpetas actual",
+      "description": "Las notas y carpetas fuera de la jerarquía en la que trabajas se atenúan. Elige cuánto:",
+      "dim_strength": "Atenuación",
+      "turn_off": "Desactivar",
+      "preview_current_folder": "Carpeta actual",
+      "preview_current_note": "Una nota en la que trabajas",
+      "preview_other_folder": "Otra carpeta",
+      "preview_other_note": "Una nota en otro lugar"
     },
     "markdown_colored": {
       "title": "Markdown a color",

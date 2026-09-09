@@ -728,3 +728,63 @@ html[data-theme='dark'] .note-palette-remove:hover {
     padding: 8px 12px;
     border-radius: var(--pz-radius-sm);
 }
+
+/* ============================================
+   Highlight current folder tree (folderTreeHighlightModal)
+   ============================================ */
+
+.folder-tree-dim-control {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 16px 0 12px;
+    font-size: 14px;
+}
+
+/* css/modals/responsive.css pads every modal input by 12px (iOS zoom guard),
+   which on a range input pushes the thumb away from the track ends. */
+.modal-content .folder-tree-dim-control input[type="range"] {
+    width: 100%;
+    margin: 0;
+    padding: 0 !important;
+    accent-color: var(--pz-accent);
+}
+
+/* The settings page has no notes list, so the slider previews on this. The
+   bottom margin is what keeps it off the buttons, which .modal-buttons pins to
+   the bottom of the dialog with margin-top: auto. */
+.folder-tree-dim-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 24px;
+    padding: 10px 12px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    background: var(--pz-bg);
+    font-size: 14px;
+    user-select: none;
+}
+
+.folder-tree-dim-preview .ftd-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 0;
+    color: var(--pz-text);
+}
+
+.folder-tree-dim-preview .ftd-row.ftd-note {
+    padding-left: 20px;
+    color: var(--pz-text-secondary);
+}
+
+.folder-tree-dim-preview .ftd-row.ftd-dimmed {
+    opacity: var(--folder-tree-dim-opacity, 0.65);
+}
+
+.folder-tree-dim-preview .lucide {
+    color: var(--pz-icon);
+    background-color: var(--pz-icon);
+    flex: none;
+}

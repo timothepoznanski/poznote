@@ -198,7 +198,7 @@
       "support": "Support the development of Poznote with a donation.",
       "s3_storage": "Store note attachments in an S3-compatible object storage instead of the local disk.",
       "s3_backup": "Upload complete backup archives to an S3-compatible bucket, manually or on a schedule.",
-      "highlight_current_folder_tree": "Dim the notes and folders that sit outside the folder hierarchy you are working in.",
+      "highlight_current_folder_tree": "Dim the notes and folders that sit outside the folder hierarchy you are working in, as much or as little as you like.",
       "snapshots": "Choose how many automatic daily snapshots are kept per note."
     },
     "title": "Settings",
@@ -997,6 +997,16 @@
         "alphabetical": "Alphabetical",
         "manual": "Manual (drag and drop)"
       }
+    },
+    "folder_tree_highlight": {
+      "title": "Highlight current folder tree",
+      "description": "Notes and folders outside the hierarchy you are working in fade out. Choose how far they fade:",
+      "dim_strength": "Dimming",
+      "turn_off": "Turn off",
+      "preview_current_folder": "Current folder",
+      "preview_current_note": "A note you are working on",
+      "preview_other_folder": "Another folder",
+      "preview_other_note": "A note somewhere else"
     },
     "markdown_colored": {
       "title": "Colored markdown",

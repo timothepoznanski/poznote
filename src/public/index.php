@@ -194,11 +194,12 @@ $settings = [
     'backlinks_at_bottom' => '0',
     'default_image_border_no_padding' => '0',
     'spellcheck_html_notes' => '0',
-    'highlight_current_folder_tree' => '0'
+    'highlight_current_folder_tree' => '0',
+    'folder_tree_dim_level' => ''
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -358,8 +359,16 @@ if (poznoteSettingEnabled($settings['code_block_line_numbers'], false)) {
 }
 // Dims the notes list outside the folder hierarchy being worked in
 // (css/folders/tree-highlight.css)
+$folder_tree_dim_style = '';
 if (poznoteSettingEnabled($settings['highlight_current_folder_tree'], false)) {
     $extra_body_classes .= ' highlight-folder-tree';
+    // How much the rest of the list fades, as a percentage picked on the
+    // slider in the settings modal. Out of range or never set falls back to
+    // the stylesheet default.
+    $folder_tree_dim_level = (int)$settings['folder_tree_dim_level'];
+    if ($folder_tree_dim_level >= POZNOTE_FOLDER_TREE_DIM_MIN && $folder_tree_dim_level <= POZNOTE_FOLDER_TREE_DIM_MAX) {
+        $folder_tree_dim_style = '--folder-tree-dim-opacity: ' . number_format((100 - $folder_tree_dim_level) / 100, 2, '.', '') . '; ';
+    }
 }
 if (poznoteSettingEnabled($settings['markdown_split_card_view'], true)) {
     $extra_body_classes .= ' markdown-split-card-view';
@@ -418,12 +427,14 @@ if ($pref && isset($allowed_sorts[$pref])) {
 
 // Set body classes
 $body_classes = trim($extra_body_classes);
+// Per-user CSS variables that cannot live in a stylesheet
+$body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
 if ($isPublicWorkspaceReadonly) {
     $body_classes = trim($body_classes . ' public-workspace-readonly');
 }
 ?>
 
-<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?><?php echo $markdown_colored_style ? ' style="' . htmlspecialchars($markdown_colored_style, ENT_QUOTES) . '"' : ''; ?> data-workspace="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
+<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?><?php echo $body_inline_style ? ' style="' . htmlspecialchars($body_inline_style, ENT_QUOTES) . '"' : ''; ?> data-workspace="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
     <script>
     (function () {
         try {
