@@ -145,6 +145,7 @@
       "language": "Change the language of the interface.",
       "main_font": "Choose the font used throughout the application.",
       "markdown_font": "Choose the font used in the markdown editor.",
+      "markdown_default_view_mode": "Choose whether markdown notes open in preview, edit or split mode. A note you switch to another mode keeps it until you close the tab.",
       "font_size": "Adjust the font size of notes, sidebar, code blocks and the settings page.",
       "index_icon_scale": "Adjust the size of the icons in the note list.",
       "timezone": "Set the timezone used to display dates and times.",
@@ -212,6 +213,7 @@
       "actions": "Actions",
       "admin_tools": "Admin Tools",
       "display": "Display",
+      "markdown": "Markdown",
       "behavior": "Behavior",
       "about": "About",
       "documentation": "About"
@@ -357,6 +359,7 @@
     "cards": {
       "main_font": "App font",
       "markdown_font": "Markdown editor font",
+      "markdown_default_view_mode": "Default view mode",
       "login_display": "Login page title",
       "note_font_size": "Font size",
       "note_sort_order": "Note sorting",
@@ -1109,6 +1112,18 @@
         "ss": "seconds (09)",
         "A": "AM/PM"
       }
+    },
+    "markdown_default_view_mode": {
+      "title": "Default view mode",
+      "description": "Choose how markdown notes open:",
+      "options": {
+        "preview": "Preview",
+        "edit": "Edit",
+        "split": "Split (editor and preview side by side)",
+        "split_short": "Split",
+        "last": "Last used mode"
+      },
+      "hint": "A note you switch to another mode keeps that mode until you close the tab. New notes always open in split mode."
     },
     "diary_date_format": {
       "title": "Diary entry date format",

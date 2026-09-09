@@ -432,6 +432,7 @@
       "language": "更改界面语言。",
       "main_font": "选择整个应用使用的字体。",
       "markdown_font": "选择 Markdown 编辑器使用的字体。",
+      "markdown_default_view_mode": "选择 Markdown 笔记以预览、编辑还是分栏模式打开。切换到其他模式的笔记会保持该模式，直到关闭标签页。",
       "font_size": "调整笔记、侧边栏、代码块和设置页面的字体大小。",
       "index_icon_scale": "调整笔记列表中图标的大小。",
       "timezone": "设置用于显示日期和时间的时区。",
@@ -499,6 +500,7 @@
       "actions": "操作",
       "admin_tools": "管理工具",
       "display": "显示",
+      "markdown": "Markdown",
       "behavior": "行为",
       "about": "关于",
       "documentation": "关于"
@@ -720,6 +722,7 @@
     "cards": {
       "main_font": "应用字体",
       "markdown_font": "Markdown 编辑器字体",
+      "markdown_default_view_mode": "默认打开模式",
       "login_display": "登录页面标题",
       "note_font_size": "字体大小",
       "note_sort_order": "笔记排序规则",
@@ -1565,6 +1568,18 @@
         "ss": "秒 (09)",
         "A": "上午/下午"
       }
+    },
+    "markdown_default_view_mode": {
+      "title": "默认打开模式",
+      "description": "选择 Markdown 笔记的打开方式：",
+      "options": {
+        "preview": "预览",
+        "edit": "编辑",
+        "split": "分栏（编辑器与预览并排）",
+        "split_short": "分栏",
+        "last": "上次使用的模式"
+      },
+      "hint": "切换到其他模式的笔记会保持该模式，直到关闭标签页。新笔记始终以分栏模式打开。"
     },
     "diary_date_format": {
       "title": "日记条目日期格式",

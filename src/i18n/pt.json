@@ -429,6 +429,7 @@
       "language": "Altere o idioma da interface.",
       "main_font": "Escolha a fonte usada em todo o aplicativo.",
       "markdown_font": "Escolha a fonte usada no editor markdown.",
+      "markdown_default_view_mode": "Escolha se as notas markdown abrem em pré-visualização, edição ou vista dividida. Uma nota que você mudar para outro modo o mantém até fechar a aba.",
       "font_size": "Ajuste o tamanho da fonte das notas, da barra lateral, dos blocos de código e da página de configurações.",
       "index_icon_scale": "Ajuste o tamanho dos ícones na lista de notas.",
       "timezone": "Defina o fuso horário usado para exibir datas e horas.",
@@ -496,6 +497,7 @@
       "actions": "Ações",
       "admin_tools": "Ferramentas de administração",
       "display": "Tela",
+      "markdown": "Markdown",
       "behavior": "Comportamento",
       "about": "Sobre",
       "documentation": "Sobre"
@@ -717,6 +719,7 @@
     "cards": {
       "main_font": "Fonte do aplicativo",
       "markdown_font": "Fonte do editor markdown",
+      "markdown_default_view_mode": "Modo de abertura",
       "login_display": "Título da Página de Login",
       "note_font_size": "Tamanho da Fonte",
       "note_sort_order": "Ordem de classificação das notas",
@@ -1569,6 +1572,18 @@
         "ss": "segundos (09)",
         "A": "AM/PM"
       }
+    },
+    "markdown_default_view_mode": {
+      "title": "Modo de abertura",
+      "description": "Escolha como as notas markdown abrem:",
+      "options": {
+        "preview": "Pré-visualização",
+        "edit": "Edição",
+        "split": "Vista dividida (editor e pré-visualização lado a lado)",
+        "split_short": "Vista dividida",
+        "last": "Último modo usado"
+      },
+      "hint": "Uma nota que você mudar para outro modo o mantém até fechar a aba. Notas novas sempre abrem em vista dividida."
     },
     "diary_date_format": {
       "title": "Formato de data das entradas do diário",

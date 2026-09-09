@@ -1295,6 +1295,27 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
+<!-- Markdown default view mode modal -->
+<div id="markdownDefaultViewModeModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.markdown_default_view_mode.title', [], 'Default view mode'); ?></h3>
+        <div class="modal-body">
+            <p><?php echo t_h('modals.markdown_default_view_mode.description', [], 'Choose how markdown notes open:'); ?></p>
+            <div class="radio-options">
+                <label><input type="radio" name="markdownDefaultViewMode" value="preview"> <?php echo t_h('modals.markdown_default_view_mode.options.preview', [], 'Preview'); ?></label>
+                <label><input type="radio" name="markdownDefaultViewMode" value="edit"> <?php echo t_h('modals.markdown_default_view_mode.options.edit', [], 'Edit'); ?></label>
+                <label><input type="radio" name="markdownDefaultViewMode" value="split"> <?php echo t_h('modals.markdown_default_view_mode.options.split', [], 'Split (editor and preview side by side)'); ?></label>
+                <label><input type="radio" name="markdownDefaultViewMode" value="last"> <?php echo t_h('modals.markdown_default_view_mode.options.last', [], 'Last used mode'); ?></label>
+            </div>
+            <p class="modal-hint"><?php echo t_h('modals.markdown_default_view_mode.hint', [], 'A note you switch to another mode keeps that mode until you close the tab. New notes always open in split mode.'); ?></p>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="markdownDefaultViewModeModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveMarkdownDefaultViewModeModalBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Diary entry date format modal -->
 <div id="diaryDateFormatModal" class="modal">
     <div class="modal-content">

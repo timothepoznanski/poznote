@@ -501,6 +501,18 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
     margin-bottom: 24px;
 }
 
+/* Markdown default view mode modal: the hint under the radios is the last
+   thing in the body, so it carries the gap to the buttons instead of
+   .radio-options. */
+#markdownDefaultViewModeModal .radio-options {
+    margin-bottom: 12px;
+}
+#markdownDefaultViewModeModal .modal-hint {
+    margin: 0 0 24px;
+    font-size: 13px;
+    opacity: 0.8;
+}
+
 /* ==========================================================================
    Desktop layout: section list on the left, rows on the right
    settings.php only (.settings-with-nav on the container). settings-page.js

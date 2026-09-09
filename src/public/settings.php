@@ -582,18 +582,6 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
-            <!-- Markdown Editor Font -->
-            <div class="home-card" id="markdown-font-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_font', [], 'Choose the font used in the markdown editor.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-file-code"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_font', [], 'Markdown editor font'); ?></span>
-                    <span id="markdown-font-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                </div>
-            </div>
-
             <!-- Font Size -->
             <div class="home-card" id="font-size-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.font_size', [], 'Adjust the font size of notes, sidebar, code blocks and the settings page.'); ?>"><i class="lucide lucide-help-circle"></i></span>
@@ -669,36 +657,6 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
-            <!-- Markdown Split Card View -->
-            <div class="home-card" id="markdown-split-card-view-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_split_card_view', [], 'Display markdown notes in a framed split view with editor and preview.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-columns-2"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_split_card_view', [], 'Framed markdown'); ?></span>
-                    <span id="markdown-split-card-view-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
-                </div>
-            </div>
-
-            <!-- Colored Markdown -->
-            <div class="home-card" id="markdown-colored-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_colored', [], 'Color markdown notes: pick a color for each heading level, inline code, code block background, quotes, table headers and separators.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-palette"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_colored', [], 'Colored markdown'); ?></span>
-                    <span id="markdown-colored-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
-                </div>
-            </div>
-
-            <!-- Code Block Line Numbers -->
-            <div class="home-card" id="code-line-numbers-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.code_line_numbers', [], 'Show line numbers in code blocks in the markdown preview.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-list-ordered"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.code_block_line_numbers', [], 'Code block line numbers'); ?></span>
-                    <span id="code-line-numbers-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
-                </div>
-            </div>
-
             <!-- Attachment Previews in Notes -->
             <div class="home-card" id="attachment-previews-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.attachment_previews', [], 'Show previews of attachments inside notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
@@ -739,6 +697,64 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.icon_sidebar_order', [], 'Icon sidebar order'); ?></span>
                     <span id="icon-sidebar-order-badge" class="setting-status enabled"><?php echo t_h('display.badges.icon_sidebar_order_configure', [], 'Configure'); ?></span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- MARKDOWN CATEGORY -->
+        <h2 class="settings-category-title" id="markdown"><?php echo t_h('settings.categories.markdown', [], 'Markdown'); ?></h2>
+        <div class="home-grid" id="settings-markdown-section-grid">
+
+            <!-- Default View Mode (preview / edit / split / last used) -->
+            <div class="home-card" id="markdown-default-view-mode-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_default_view_mode', [], 'Choose whether markdown notes open in preview, edit or split mode. A note you switch to another mode keeps it until you close the tab.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-book-open"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_default_view_mode', [], 'Default view mode'); ?></span>
+                    <span id="markdown-default-view-mode-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+            <!-- Markdown Editor Font -->
+            <div class="home-card" id="markdown-font-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_font', [], 'Choose the font used in the markdown editor.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-file-code"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_font', [], 'Markdown editor font'); ?></span>
+                    <span id="markdown-font-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+            <!-- Markdown Split Card View -->
+            <div class="home-card" id="markdown-split-card-view-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_split_card_view', [], 'Display markdown notes in a framed split view with editor and preview.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-columns-2"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_split_card_view', [], 'Framed markdown'); ?></span>
+                    <span id="markdown-split-card-view-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Colored Markdown -->
+            <div class="home-card" id="markdown-colored-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_colored', [], 'Color markdown notes: pick a color for each heading level, inline code, code block background, quotes, table headers and separators.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-palette"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_colored', [], 'Colored markdown'); ?></span>
+                    <span id="markdown-colored-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Code Block Line Numbers -->
+            <div class="home-card" id="code-line-numbers-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.code_line_numbers', [], 'Show line numbers in code blocks in the markdown preview.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-list-ordered"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.code_block_line_numbers', [], 'Code block line numbers'); ?></span>
+                    <span id="code-line-numbers-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
 

@@ -442,6 +442,7 @@
       "language": "Changez la langue de l'interface.",
       "main_font": "Choisissez la police utilisée dans toute l'application.",
       "markdown_font": "Choisissez la police utilisée dans l'éditeur markdown.",
+      "markdown_default_view_mode": "Choisir si les notes markdown s'ouvrent en aperçu, en édition ou en vue partagée. Une note passée dans un autre mode le garde jusqu'à la fermeture de l'onglet.",
       "font_size": "Ajustez la taille de police des notes, de la barre latérale, des blocs de code et de la page des paramètres.",
       "index_icon_scale": "Ajustez la taille des icônes dans la liste des notes.",
       "timezone": "Définissez le fuseau horaire utilisé pour afficher les dates et heures.",
@@ -509,6 +510,7 @@
       "actions": "Actions",
       "admin_tools": "Outils d'administration",
       "display": "Affichage",
+      "markdown": "Markdown",
       "behavior": "Comportement",
       "about": "À propos",
       "documentation": "À propos"
@@ -732,6 +734,7 @@
     "cards": {
       "main_font": "Police de l'application",
       "markdown_font": "Police de l'éditeur markdown",
+      "markdown_default_view_mode": "Mode d'ouverture",
       "login_display": "Titre page de connexion",
       "note_font_size": "Taille de police",
       "note_sort_order": "Tri des notes",
@@ -1604,6 +1607,18 @@
         "ss": "secondes (09)",
         "A": "AM/PM"
       }
+    },
+    "markdown_default_view_mode": {
+      "title": "Mode d'ouverture",
+      "description": "Choisir comment s'ouvrent les notes markdown :",
+      "options": {
+        "preview": "Aperçu",
+        "edit": "Édition",
+        "split": "Vue partagée (éditeur et aperçu côte à côte)",
+        "split_short": "Vue partagée",
+        "last": "Dernier mode utilisé"
+      },
+      "hint": "Une note passée dans un autre mode le garde jusqu'à la fermeture de l'onglet. Les nouvelles notes s'ouvrent toujours en vue partagée."
     },
     "diary_date_format": {
       "title": "Format de date des entrées de journal",

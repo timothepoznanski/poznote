@@ -431,6 +431,7 @@
       "language": "Cambia el idioma de la interfaz.",
       "main_font": "Elige la fuente utilizada en toda la aplicación.",
       "markdown_font": "Elige la fuente utilizada en el editor markdown.",
+      "markdown_default_view_mode": "Elige si las notas markdown se abren en vista previa, edición o vista dividida. Una nota que cambies a otro modo lo conserva hasta cerrar la pestaña.",
       "font_size": "Ajusta el tamaño de fuente de las notas, la barra lateral, los bloques de código y la página de configuración.",
       "index_icon_scale": "Ajusta el tamaño de los iconos en la lista de notas.",
       "timezone": "Define la zona horaria utilizada para mostrar fechas y horas.",
@@ -498,6 +499,7 @@
       "actions": "Acciones",
       "admin_tools": "Herramientas de administración",
       "display": "Pantalla",
+      "markdown": "Markdown",
       "behavior": "Comportamiento",
       "about": "Acerca de",
       "documentation": "Acerca de"
@@ -720,6 +722,7 @@
     "cards": {
       "main_font": "Fuente de la aplicación",
       "markdown_font": "Fuente del editor markdown",
+      "markdown_default_view_mode": "Modo de apertura",
       "login_display": "Título de página de inicio de sesión",
       "note_font_size": "Tamaño de fuente",
       "note_sort_order": "Orden de clasificación de notas",
@@ -1571,6 +1574,18 @@
         "ss": "segundos (09)",
         "A": "AM/PM"
       }
+    },
+    "markdown_default_view_mode": {
+      "title": "Modo de apertura",
+      "description": "Elige cómo se abren las notas markdown:",
+      "options": {
+        "preview": "Vista previa",
+        "edit": "Edición",
+        "split": "Vista dividida (editor y vista previa lado a lado)",
+        "split_short": "Vista dividida",
+        "last": "Último modo usado"
+      },
+      "hint": "Una nota que cambies a otro modo lo conserva hasta cerrar la pestaña. Las notas nuevas siempre se abren en vista dividida."
     },
     "diary_date_format": {
       "title": "Formato de fecha de las entradas del diario",
