@@ -4235,7 +4235,7 @@
         if (typeof Sortable === 'undefined') {
             if (!document.querySelector('script[data-sortable-local]')) {
                 var script = document.createElement('script');
-                script.src = 'js/Sortable.min.js';
+                script.src = (window.poznoteAssetUrl ? window.poznoteAssetUrl('js/Sortable.min.js') : 'js/Sortable.min.js');
                 script.async = true;
                 script.setAttribute('data-sortable-local', '1');
                 script.onload = initIconSidebarOrderSortable;
