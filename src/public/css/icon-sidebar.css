@@ -30,7 +30,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
+    /* 4px, not 2px, so the button pitch is 44 and lands on a 4px grid. At 2px
+       it was 42, which is 2 mod 4: on a display scaled by a quarter the
+       separators below then fell on different subpixel offsets and rendered at
+       visibly different weights from one another. Measured at 100 / 125 / 150 /
+       175 / 200%: identical at every one with a 44px pitch and a 2px rule. */
+    gap: 4px;
     width: 100%;
     flex: 1 1 auto;
     min-height: 0;
@@ -142,7 +147,7 @@
     align-self: stretch;
     margin: 8px 4px 0;
     padding: 6px 0 0;
-    border-top: 1px solid var(--pz-border);
+    border-top: 2px solid var(--pz-border);
 }
 
 /* Tighter than the navigation entries above: five account actions at the
@@ -156,10 +161,15 @@
    line as the account group's divider below. js/icon-sidebar-toggle.js sets
    [hidden] on the ones left with no visible entry on one side once UI
    Customization or the git scope has hidden buttons. */
+/* 2px, not the 1px hairline this used to be. A 1px line lands on a whole device
+   pixel at some heights and straddles two at others as soon as the display is
+   scaled by a fraction, so the rail's separators rendered at visibly different
+   weights from one another at 125% and 150%. 2px is even at those ratios. The
+   group divider and the account group's border below have to match. */
 .icon-sidebar-divider {
     flex-shrink: 0;
     align-self: stretch;
-    height: 1px;
+    height: 2px;
     margin: 3px 4px;
     background: var(--pz-border);
 }
