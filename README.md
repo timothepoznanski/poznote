@@ -646,8 +646,58 @@ Notes:
 - Click **Remove** to delete the file and disable the custom stylesheet.
 - Poznote appends a cache-busting `v=` parameter automatically.
 - The stylesheet is injected near the end of `<head>`, so it can override the default application styles.
-- The brand colour and the dark/black palette are CSS variables, so a theme is a few lines: override `--pz-accent`, `--pz-accent-hover`, `--pz-accent-rgb` on `:root` and the `--dm-*` variables on `html[data-theme='dark']`. The list lives in `src/public/css/tokens.css`, with an example in `src/public/css/README.md`.
 - Only administrators can upload or remove the custom CSS file.
+
+**Before writing any CSS**, check whether a built-in theme already does what you want: the theme button at the bottom of the icon rail offers Light, Dark, Black, Lavender, Sepia and Terminal.
+
+### Examples
+
+Colours, spacing, radii and font weights are design tokens, so most changes are a short list of variable overrides rather than a fight with selectors. The full list is in `src/public/css/tokens.css`.
+
+**Change the accent colour**
+
+```css
+:root {
+    --pz-accent: #d6336c;
+    --pz-accent-hover: #a61e4d;
+    --pz-accent-rgb: 214, 51, 108;   /* same colour, channels only, used for tints */
+}
+html[data-theme='dark'] {
+    --dm-accent: #f783ac;            /* lighter, because it sits on a dark ground */
+}
+```
+
+Two tokens rather than one because a *fill* and a *label* cannot be the same colour: `--pz-accent` fills buttons, `--dm-accent` is the accent as text in dark mode.
+
+**Recolour the note toolbar icons**
+
+```css
+.note-edit-toolbar .toolbar-btn i,
+.note-edit-toolbar .toolbar-btn [class*="lucide-"],
+.note-edit-toolbar .toolbar-btn:hover i,
+.note-edit-toolbar .toolbar-btn:hover [class*="lucide-"] {
+    color: #e5322d !important;
+}
+```
+
+Icons are CSS masks painted with `background-color: currentColor`, so `color` is all you need. `!important` is needed here because a few of those icons already carry a colour of their own (the star when a note is a favourite, the share icon when it is published, the paperclip when it has attachments).
+
+**Warm up the whole interface**
+
+```css
+:root {
+    --pz-bg: #f6ecd8;          /* page and note background */
+    --pz-surface: #efe0c4;     /* panels, cards, menus */
+    --pz-text: #3b2c1a;
+    --pz-border: #d4bd94;
+}
+```
+
+**Write a full theme**
+
+Override the tokens on `:root` for light and on `:root[data-theme='dark']` for dark, and nothing else. `src/public/css/README.md` documents every token and shows a complete example; the built-in Lavender, Sepia and Terminal themes in `src/public/css/tokens.css` are the same thing, written the same way.
+
+One thing a theme cannot reach yet: a handful of icons that a page rule colours explicitly render in the generic icon grey in dark mode.
 
 </details>
 
