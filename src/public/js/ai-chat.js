@@ -434,6 +434,12 @@
             updateWorkspaceIndicator();
             updateContextIndicator();
         }
+        // On phones the panel is a full screen overlay: let the Back button
+        // close it (js/panel-back.js).
+        if (window.PoznotePanelBack) {
+            if (open) window.PoznotePanelBack.opened();
+            else window.PoznotePanelBack.closed();
+        }
     }
 
     function toggle() {
@@ -732,6 +738,13 @@
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && isScopeModalOpen()) closeScopeModal();
         });
+
+        if (window.PoznotePanelBack) {
+            window.PoznotePanelBack.register({
+                isOpen: isOpen,
+                close: function () { setOpen(false); }
+            });
+        }
 
         restoreConversation();
 
