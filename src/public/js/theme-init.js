@@ -49,6 +49,52 @@ window.__poznoteUserStorage = window.__poznoteUserStorage || (function () {
     };
 })();
 
+// The theme is a per-user display preference like the others, but the pages
+// that need it first are pre-auth: logout clears the poznote_uid cookie, so
+// login.php has no user to read the scoped key for and used to fall back to
+// 'system' whatever theme the account had chosen. Every write therefore also
+// lands on an unscoped device key, which the pre-auth pages read back. Only a
+// theme name travels that way, so nothing about the account leaks to the next
+// person using the browser.
+window.__poznoteThemeStorage = window.__poznoteThemeStorage || (function () {
+    var KEY = 'poznote-theme';
+    var DEVICE_KEY = 'poznote-theme-device';
+
+    return {
+        get: function () {
+            if (window.__poznoteUserId) {
+                var scoped = window.__poznoteUserStorage.getItem(KEY);
+                // Backfill: a browser that chose its theme before the mirror
+                // existed would otherwise keep a pre-auth page on 'system'
+                // until the user picked a theme again.
+                if (scoped) {
+                    try {
+                        if (localStorage.getItem(DEVICE_KEY) !== scoped) {
+                            localStorage.setItem(DEVICE_KEY, scoped);
+                        }
+                    } catch (e) {
+                        console.debug('theme-init: device theme mirror failed:', e);
+                    }
+                }
+                return scoped;
+            }
+            try {
+                // The legacy shared key is the fallback for browsers that last
+                // set a theme before the preferences were scoped per user.
+                return localStorage.getItem(DEVICE_KEY) || localStorage.getItem(KEY);
+            } catch (e) {
+                return null;
+            }
+        },
+        set: function (value) {
+            window.__poznoteUserStorage.setItem(KEY, value);
+            try { localStorage.setItem(DEVICE_KEY, value); } catch (e) {
+                console.debug('theme-init: device theme mirror failed:', e);
+            }
+        }
+    };
+})();
+
 // Open tabs are stored per user and per workspace. Unlike the display
 // preferences above there is no migration from the legacy shared key: adopting
 // the tabs of whoever used the browser before is exactly the leak this scoping
@@ -120,7 +166,7 @@ window.__poznoteClearUserStorage = function (userId) {
         }
 
         var forcedTheme = window.__poznoteForcedTheme;
-        var t = normalizeTheme(forcedTheme) || normalizeTheme(window.__poznoteUserStorage.getItem('poznote-theme')) || 'system';
+        var t = normalizeTheme(forcedTheme) || normalizeTheme(window.__poznoteThemeStorage.get()) || 'system';
         if (t === 'system') {
             t = getSystemTheme();
         }

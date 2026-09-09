@@ -6,9 +6,19 @@
 (function () {
     'use strict';
 
-    // Per-user storage (defined in theme-init.js); falls back to the shared
-    // localStorage keys on pages loaded without theme-init.js.
-    var themeStore = window.__poznoteUserStorage || window.localStorage;
+    // Per-user storage with a device-wide mirror (defined in theme-init.js), so
+    // the pre-auth pages can read the theme back without a user id; falls back
+    // to the shared localStorage key on pages loaded without theme-init.js.
+    var themeStore = window.__poznoteThemeStorage || {
+        get: function () {
+            try { return localStorage.getItem('poznote-theme'); } catch (e) { return null; }
+        },
+        set: function (value) {
+            try { localStorage.setItem('poznote-theme', value); } catch (e) {
+                console.debug('theme-manager: theme could not be stored:', e);
+            }
+        }
+    };
 
     // Every theme the picker offers. `mode` is what goes in data-theme, so the
     // whole stylesheet keeps working unchanged; `variant`, when set, is the
@@ -70,13 +80,13 @@
             return;
         }
 
-        var savedTheme = normalizeThemeMode(themeStore.getItem('poznote-theme')) || 'system';
+        var savedTheme = normalizeThemeMode(themeStore.get()) || 'system';
 
         if (savedTheme === 'system') {
             // Listen for system theme changes
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
                 // Only re-apply if no manual preference is set
-                var currentMode = normalizeThemeMode(themeStore.getItem('poznote-theme')) || 'system';
+                var currentMode = normalizeThemeMode(themeStore.get()) || 'system';
                 if (currentMode === 'system') {
                     applyTheme('system', false);
                 }
@@ -115,10 +125,10 @@
             if (save !== false) {
                 // Store 'system' explicitly instead of removing the key, so an
                 // absent user-scoped key keeps meaning "not migrated yet".
-                themeStore.setItem('poznote-theme', 'system');
+                themeStore.set('system');
             }
         } else if (save !== false) {
-            themeStore.setItem('poznote-theme', theme);
+            themeStore.set(theme);
         }
 
         var effectiveTheme = getEffectiveTheme(selectedTheme);
@@ -204,7 +214,7 @@
         var forcedTheme = getForcedTheme();
         if (forcedTheme) return forcedTheme;
 
-        return normalizeThemeMode(themeStore.getItem('poznote-theme')) || 'system';
+        return normalizeThemeMode(themeStore.get()) || 'system';
     }
 
     // Make functions globally available
