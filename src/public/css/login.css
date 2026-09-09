@@ -209,7 +209,9 @@ input[type="password"]::placeholder {
     padding: 0.875rem 1rem;
     background: var(--pz-accent);
     color: var(--pz-text-inverse);
-    border: none;
+    /* Transparent rather than none, so the outlined variants below keep the
+       same height as the filled ones. */
+    border: 1px solid transparent;
     border-radius: var(--pz-radius-lg);
     font-size: 1rem;
     font-weight: var(--pz-weight-normal);
@@ -501,14 +503,18 @@ html[data-theme='dark'] .oidc-divider span {
 }
 
 /* The base rule fills the button with --pz-text and labels it --pz-text-inverse.
-   Both flip in dark mode, so the light fill would carry a white label. */
+   Both flip in dark mode, which would put a near-white slab right under the
+   accent button. A raised surface keeps the SSO button one visual step below
+   the primary action and stays in the theme's own palette. */
 html[data-theme='dark'] .oidc-button {
-    background: var(--dm-text-bright);
-    color: var(--dm-bg);
+    background: var(--dm-surface-raised);
+    color: var(--dm-text-bright);
+    border-color: var(--dm-border-light);
 }
 
 html[data-theme='dark'] .oidc-button:hover {
-    background: var(--dm-text);
+    background: color-mix(in srgb, var(--dm-surface-raised) 85%, var(--dm-text-bright));
+    border-color: var(--dm-text-subtle);
 }
 
 html[data-theme='dark'] .oidc-other-account-button {
