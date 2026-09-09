@@ -2370,6 +2370,139 @@ class NotesController {
     }
     
     /**
+     * Folder or workspace names that mark their notes as templates. English
+     * always works; the other names are the word "templates" in the shipped
+     * languages, so a French user can keep a "Modèles" folder.
+     */
+    private const TEMPLATE_CONTAINER_NAMES = [
+        'templates', 'template',
+        'modèles', 'modèle', 'modeles', 'modele',
+        'vorlagen', 'vorlage',
+        'plantillas', 'plantilla',
+        'modelos', 'modelo',
+        'шаблоны', 'шаблон',
+        '模板',
+    ];
+
+    private static function isTemplateContainerName(string $name): bool {
+        $normalized = mb_strtolower(trim($name), 'UTF-8');
+        return $normalized !== '' && in_array($normalized, self::TEMPLATE_CONTAINER_NAMES, true);
+    }
+
+    /**
+     * GET /api/v1/notes/templates
+     * List the notes the "/template" slash command can insert
+     *
+     * A note carries no template flag: a template is an ordinary note kept
+     * either in a folder named "Templates" (any depth below it counts, so
+     * templates can be sorted into sub-folders) in the given workspace, or
+     * anywhere in a workspace named "Templates", which offers it from every
+     * workspace. Only HTML and Markdown notes qualify: the command pastes
+     * note content at the caret, and a task list or a diagram has nothing to
+     * paste. The content itself comes from GET /notes/{id}.
+     *
+     * Query params:
+     *   - workspace: Workspace whose "Templates" folders are considered
+     *                (defaults to every workspace)
+     */
+    public function listTemplates(): void {
+        $workspace = trim((string)($_GET['workspace'] ?? ''));
+
+        try {
+            // Template folders: every folder named "Templates", plus everything below it
+            $folderSql = "SELECT id, name, parent_id FROM folders";
+            $folderParams = [];
+            if ($workspace !== '') {
+                $folderSql .= " WHERE workspace = ?";
+                $folderParams[] = $workspace;
+            }
+            $stmt = $this->con->prepare($folderSql);
+            $stmt->execute($folderParams);
+
+            $childrenByParent = [];
+            $queue = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $folderId = (int)$row['id'];
+                $parentId = $row['parent_id'] !== null ? (int)$row['parent_id'] : 0;
+                $childrenByParent[$parentId][] = $folderId;
+                if (self::isTemplateContainerName((string)$row['name'])) {
+                    $queue[] = $folderId;
+                }
+            }
+
+            $templateFolderIds = [];
+            while ($queue) {
+                $folderId = array_shift($queue);
+                if (isset($templateFolderIds[$folderId])) {
+                    continue;
+                }
+                $templateFolderIds[$folderId] = true;
+                foreach ($childrenByParent[$folderId] ?? [] as $childId) {
+                    $queue[] = $childId;
+                }
+            }
+            $templateFolderIds = array_keys($templateFolderIds);
+
+            // Template workspaces: every workspace named "Templates"
+            $templateWorkspaces = [];
+            $wsStmt = $this->con->query("SELECT name FROM workspaces");
+            while ($wsStmt && ($name = $wsStmt->fetchColumn()) !== false) {
+                if (self::isTemplateContainerName((string)$name)) {
+                    $templateWorkspaces[] = (string)$name;
+                }
+            }
+
+            if (!$templateFolderIds && !$templateWorkspaces) {
+                $this->sendSuccess(['notes' => [], 'count' => 0]);
+                return;
+            }
+
+            $conditions = [];
+            $params = [];
+            if ($templateFolderIds) {
+                $conditions[] = "folder_id IN (" . implode(',', array_fill(0, count($templateFolderIds), '?')) . ")";
+                $params = array_merge($params, $templateFolderIds);
+            }
+            if ($templateWorkspaces) {
+                $conditions[] = "workspace IN (" . implode(',', array_fill(0, count($templateWorkspaces), '?')) . ")";
+                $params = array_merge($params, $templateWorkspaces);
+            }
+
+            $sql = "SELECT id, heading, type, workspace, folder_id, icon, icon_color
+                    FROM entries
+                    WHERE trash = 0
+                    AND (type IS NULL OR type = '' OR type IN ('note', 'markdown'))
+                    AND (" . implode(' OR ', $conditions) . ")";
+            $this->appendPublicWorkspaceAgeFilter($sql, $params);
+            $sql .= " ORDER BY heading COLLATE NOCASE, id";
+
+            $stmt = $this->con->prepare($sql);
+            $stmt->execute($params);
+
+            $notes = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $notes[] = [
+                    'id' => (int)$row['id'],
+                    'heading' => (string)($row['heading'] ?? ''),
+                    'type' => ($row['type'] === 'markdown') ? 'markdown' : 'note',
+                    'workspace' => $row['workspace'] ?? null,
+                    'folder_id' => $row['folder_id'] !== null ? (int)$row['folder_id'] : null,
+                    'icon' => $this->normalizeNoteIcon($row['icon'] ?? null) ?? self::DEFAULT_NOTE_ICON,
+                    'icon_color' => $row['icon_color'] ?? null
+                ];
+            }
+
+            $this->sendSuccess([
+                'notes' => $notes,
+                'count' => count($notes)
+            ]);
+        } catch (Exception $e) {
+            error_log('NotesController: listTemplates() failed: ' . $e->getMessage());
+            $this->sendError(500, 'Database error occurred');
+        }
+    }
+
+    /**
      * POST /api/v1/notes/{id}/convert
      * Convert note between markdown and HTML
      */

@@ -913,6 +913,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 		     getSelectedWorkspace(). The assistant's answers are rendered with
 		     window.parseMarkdown, so only the parser and the source helpers it
 		     builds on are needed here, not the whole markdown editor. -->
+		<script src="<?php echo poznoteAsset('js/panel-back.js'); ?>"></script>
 		<script src="<?php echo poznoteAsset('js/globals.js'); ?>"></script>
 		<script src="<?php echo poznoteAsset('js/markdown-source.js'); ?>"></script>
 		<script src="<?php echo poznoteAsset('js/markdown-parser.js'); ?>"></script>

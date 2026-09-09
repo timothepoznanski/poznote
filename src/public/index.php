@@ -195,11 +195,12 @@ $settings = [
     'default_image_border_no_padding' => '0',
     'spellcheck_html_notes' => '0',
     'highlight_current_folder_tree' => '0',
-    'folder_tree_dim_level' => ''
+    'folder_tree_dim_level' => '',
+    'markdown_default_view_mode' => 'preview'
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level', 'markdown_default_view_mode')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -373,6 +374,13 @@ if (poznoteSettingEnabled($settings['highlight_current_folder_tree'], false)) {
 if (poznoteSettingEnabled($settings['markdown_split_card_view'], true)) {
     $extra_body_classes .= ' markdown-split-card-view';
 }
+// Mode markdown notes with content open in (js/markdown-view-modes.js reads
+// it from <body data-markdown-default-mode>). 'last' follows the mode last
+// used on any note, which is how every note opened before this setting.
+$markdown_default_view_mode = trim((string)$settings['markdown_default_view_mode']);
+if (!in_array($markdown_default_view_mode, ['preview', 'edit', 'split', 'last'], true)) {
+    $markdown_default_view_mode = 'preview';
+}
 // Colored markdown ('0' = off, 'custom' = per-element colors chosen by the user)
 $markdown_colored_theme = trim((string)$settings['markdown_colored']);
 $markdown_colored_style = '';
@@ -434,7 +442,7 @@ if ($isPublicWorkspaceReadonly) {
 }
 ?>
 
-<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?><?php echo $body_inline_style ? ' style="' . htmlspecialchars($body_inline_style, ENT_QUOTES) . '"' : ''; ?> data-workspace="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
+<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?><?php echo $body_inline_style ? ' style="' . htmlspecialchars($body_inline_style, ENT_QUOTES) . '"' : ''; ?> data-workspace="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>" data-markdown-default-mode="<?php echo htmlspecialchars($markdown_default_view_mode, ENT_QUOTES); ?>">
     <script>
     (function () {
         try {

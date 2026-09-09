@@ -19,7 +19,6 @@
  * header link opens (settings.php?open=ui-customization).
  */
 $uiCustomizationPanelPage = isset($uiCustomizationPanelPage) ? (string)$uiCustomizationPanelPage : 'notes';
-$uiCustomizationPanelIsAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
 $uiCustomizationPanelTitle = t_h('modals.ui_customization.panel_title', [], 'Customize this page');
 // The including page resolves $aiChatEnabled before including the AI chat
 // panel; the stack repeats its toggle so the assistant is one tap away.
@@ -63,7 +62,7 @@ $uiCustomizationPanelAiLabel = t_h('ai_chat.toolbar_button', [], 'AI assistant')
             </button>
         </div>
         <div class="ui-custom-panel-body">
-            <p class="ui-custom-description ui-custom-panel-hint"><?php echo t_h('modals.ui_customization.panel_hint', [], 'Only the elements of this page are listed. Changes apply immediately and are saved automatically.'); ?><?php if ($uiCustomizationPanelIsAdmin): ?> <?php echo t_h('modals.ui_customization.panel_admin_note', [], 'This panel only changes your own interface; the "Users" column is in the settings.'); ?><?php endif; ?></p>
+            <p class="ui-custom-description ui-custom-panel-hint"><?php echo t_h('modals.ui_customization.panel_hint', [], 'Only the elements of this page are listed. Changes apply immediately and are saved automatically.'); ?></p>
             <div class="ui-custom-filter ui-custom-panel-filter">
                 <input type="search" id="uiCustomizationPanelFilter" class="ui-custom-filter-input"
                     placeholder="<?php echo t_h('modals.ui_customization.filter_placeholder', [], 'Filter items...'); ?>" autocomplete="off">

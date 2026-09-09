@@ -430,6 +430,7 @@
       "language": "Ändern Sie die Sprache der Oberfläche.",
       "main_font": "Wählen Sie die Schriftart für die gesamte Anwendung.",
       "markdown_font": "Wählen Sie die Schriftart für den Markdown-Editor.",
+      "markdown_default_view_mode": "Festlegen, ob Markdown-Notizen in der Vorschau, im Bearbeitungsmodus oder geteilt geöffnet werden. Eine Notiz, die in einen anderen Modus geschaltet wird, behält ihn bis zum Schließen des Tabs.",
       "font_size": "Passen Sie die Schriftgröße von Notizen, Seitenleiste, Codeblöcken und der Einstellungsseite an.",
       "index_icon_scale": "Passen Sie die Größe der Symbole in der Notizenliste an.",
       "timezone": "Legen Sie die Zeitzone für die Anzeige von Datum und Uhrzeit fest.",
@@ -480,6 +481,8 @@
       "github": "Öffnen Sie den Quellcode von Poznote auf GitHub.",
       "api_rest": "Zeigen Sie Informationen zur REST-API von Poznote an.",
       "website": "Öffnen Sie die offizielle Poznote-Website.",
+      "tips": "Entdecken Sie Tipps und Tricks, um das Beste aus Poznote herauszuholen.",
+      "discord": "Der Poznote-Community auf Discord beitreten.",
       "support": "Unterstützen Sie die Entwicklung von Poznote mit einer Spende.",
       "s3_storage": "Notiz-Anhänge in einem S3-kompatiblen Objektspeicher statt auf der lokalen Festplatte speichern.",
       "s3_backup": "Lädt vollständige Sicherungsarchive in einen S3-kompatiblen Bucket hoch, manuell oder nach Zeitplan.",
@@ -496,6 +499,7 @@
       "actions": "Aktionen",
       "admin_tools": "Admin-Werkzeuge",
       "display": "Anzeige",
+      "markdown": "Markdown",
       "behavior": "Verhalten",
       "about": "Über",
       "documentation": "Über"
@@ -531,6 +535,8 @@
       "documentation": "Documentation GitHub",
       "news": "Poznote-Blog",
       "website": "Poznote-Website",
+      "tips": "Tipps",
+      "discord": "Discord",
       "github_star": "Auf GitHub einen Stern vergeben",
       "guestbook": "Poznote Gästebuch",
       "support": "Poznote unterstützen",
@@ -717,6 +723,7 @@
     "cards": {
       "main_font": "App-Schriftart",
       "markdown_font": "Markdown-Editor-Schriftart",
+      "markdown_default_view_mode": "Standardansicht",
       "login_display": "Login-Seiten-Titel",
       "note_font_size": "Schriftgröße",
       "note_sort_order": "Notizen-Sortierreihenfolge",
@@ -1222,7 +1229,6 @@
       "panel_title": "Diese Seite anpassen",
       "panel_button": "Oberfläche anpassen",
       "panel_hint": "Nur die Elemente dieser Seite werden aufgeführt. Änderungen gelten sofort und werden automatisch gespeichert.",
-      "panel_admin_note": "Dieses Panel ändert nur Ihre eigene Oberfläche; die Spalte „Benutzer“ finden Sie in den Einstellungen.",
       "panel_all_options": "Alle Optionen",
       "panel_saving": "Wird gespeichert…",
       "panel_saved": "Gespeichert",
@@ -1570,6 +1576,18 @@
         "A": "AM/PM"
       }
     },
+    "markdown_default_view_mode": {
+      "title": "Standardansicht",
+      "description": "Festlegen, wie Markdown-Notizen geöffnet werden:",
+      "options": {
+        "preview": "Vorschau",
+        "edit": "Bearbeiten",
+        "split": "Geteilt (Editor und Vorschau nebeneinander)",
+        "split_short": "Geteilt",
+        "last": "Zuletzt verwendeter Modus"
+      },
+      "hint": "Eine Notiz, die in einen anderen Modus geschaltet wird, behält ihn bis zum Schließen des Tabs. Neue Notizen öffnen sich immer geteilt."
+    },
     "diary_date_format": {
       "title": "Datumsformat der Tagebucheinträge",
       "description": "Wählen Sie das Datumsformat für die Titel neuer Tagebucheinträge:",
@@ -1821,7 +1839,11 @@
     "audio_invalid_file": "Bitte wählen Sie eine Audiodatei aus.",
     "audio_upload_failed": "Upload fehlgeschlagen: {{error}}",
     "date": "Datum",
-    "tasklist_embed": "Aufgabenliste"
+    "tasklist_embed": "Aufgabenliste",
+    "template": "Vorlage",
+    "template_none": "Noch keine Vorlagen",
+    "template_none_hint": "Lege Notizen in einen Ordner namens „Vorlagen“ oder „Templates“",
+    "template_insert_failed": "Die Vorlage konnte nicht eingefügt werden"
   },
   "api": {
     "settings": {

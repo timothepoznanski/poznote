@@ -429,6 +429,7 @@
       "language": "Altere o idioma da interface.",
       "main_font": "Escolha a fonte usada em todo o aplicativo.",
       "markdown_font": "Escolha a fonte usada no editor markdown.",
+      "markdown_default_view_mode": "Escolha se as notas markdown abrem em pré-visualização, edição ou vista dividida. Uma nota que você mudar para outro modo o mantém até fechar a aba.",
       "font_size": "Ajuste o tamanho da fonte das notas, da barra lateral, dos blocos de código e da página de configurações.",
       "index_icon_scale": "Ajuste o tamanho dos ícones na lista de notas.",
       "timezone": "Defina o fuso horário usado para exibir datas e horas.",
@@ -479,6 +480,8 @@
       "github": "Abra o código-fonte do Poznote no GitHub.",
       "api_rest": "Mostre informações sobre a API REST do Poznote.",
       "website": "Abra o site oficial do Poznote.",
+      "tips": "Descubra dicas e truques para aproveitar ao máximo o Poznote.",
+      "discord": "Junte-se à comunidade Poznote no Discord.",
       "support": "Apoie o desenvolvimento do Poznote com uma doação.",
       "s3_storage": "Armazenar os anexos das notas em um armazenamento de objetos compatível com S3 em vez do disco local.",
       "s3_backup": "Envia arquivos de backup completos para um bucket compatível com S3, manualmente ou conforme um agendamento.",
@@ -495,6 +498,7 @@
       "actions": "Ações",
       "admin_tools": "Ferramentas de administração",
       "display": "Tela",
+      "markdown": "Markdown",
       "behavior": "Comportamento",
       "about": "Sobre",
       "documentation": "Sobre"
@@ -530,6 +534,8 @@
       "documentation": "Documentation GitHub",
       "news": "Blog do Poznote",
       "website": "Site do Poznote",
+      "tips": "Dicas",
+      "discord": "Discord",
       "github_star": "Dar uma estrela no GitHub",
       "guestbook": "Livro de visitas do Poznote",
       "support": "Apoiar Poznote",
@@ -715,6 +721,7 @@
     "cards": {
       "main_font": "Fonte do aplicativo",
       "markdown_font": "Fonte do editor markdown",
+      "markdown_default_view_mode": "Modo de abertura",
       "login_display": "Título da Página de Login",
       "note_font_size": "Tamanho da Fonte",
       "note_sort_order": "Ordem de classificação das notas",
@@ -1221,7 +1228,6 @@
       "panel_title": "Personalizar esta página",
       "panel_button": "Personalizar a interface",
       "panel_hint": "Apenas os elementos desta página são listados. As alterações aplicam-se imediatamente e são guardadas automaticamente.",
-      "panel_admin_note": "Este painel só altera a sua própria interface; a coluna «Utilizadores» está nas definições.",
       "panel_all_options": "Todas as opções",
       "panel_saving": "A guardar…",
       "panel_saved": "Guardado",
@@ -1569,6 +1575,18 @@
         "A": "AM/PM"
       }
     },
+    "markdown_default_view_mode": {
+      "title": "Modo de abertura",
+      "description": "Escolha como as notas markdown abrem:",
+      "options": {
+        "preview": "Pré-visualização",
+        "edit": "Edição",
+        "split": "Vista dividida (editor e pré-visualização lado a lado)",
+        "split_short": "Vista dividida",
+        "last": "Último modo usado"
+      },
+      "hint": "Uma nota que você mudar para outro modo o mantém até fechar a aba. Notas novas sempre abrem em vista dividida."
+    },
     "diary_date_format": {
       "title": "Formato de data das entradas do diário",
       "description": "Escolha o formato de data usado para intitular as novas entradas do diário:",
@@ -1820,7 +1838,11 @@
     "audio_invalid_file": "Por favor, selecione um ficheiro de audio.",
     "audio_upload_failed": "Erro ao enviar: {{error}}",
     "date": "Data",
-    "tasklist_embed": "Lista de tarefas"
+    "tasklist_embed": "Lista de tarefas",
+    "template": "Modelo",
+    "template_none": "Ainda não há modelos",
+    "template_none_hint": "Coloque notas numa pasta chamada \"Modelos\" ou \"Templates\"",
+    "template_insert_failed": "Não foi possível inserir o modelo"
   },
   "api": {
     "settings": {

@@ -98,6 +98,7 @@
             'folder_tree_dim_level',
             'notes_without_folders_after_folders',
             'markdown_split_card_view',
+            'markdown_default_view_mode',
             'markdown_colored',
             'markdown_colored_custom',
             'code_block_word_wrap',
@@ -1073,6 +1074,59 @@
             default:
                 return tr('modals.date_time_format.options.default', {}, 'YYYY-MM-DD HH:mm');
         }
+    }
+
+    function getMarkdownDefaultViewModeLabel(mode) {
+        switch (mode) {
+            case 'edit':
+                return tr('modals.markdown_default_view_mode.options.edit', {}, 'Edit');
+            case 'split':
+                return tr('modals.markdown_default_view_mode.options.split_short', {}, 'Split');
+            case 'last':
+                return tr('modals.markdown_default_view_mode.options.last', {}, 'Last used mode');
+            default:
+                return tr('modals.markdown_default_view_mode.options.preview', {}, 'Preview');
+        }
+    }
+
+    function normalizeMarkdownDefaultViewMode(value) {
+        return ['preview', 'edit', 'split', 'last'].indexOf(value) !== -1 ? value : 'preview';
+    }
+
+    function refreshMarkdownDefaultViewModeBadge() {
+        getSetting('markdown_default_view_mode', function (value) {
+            var badge = document.getElementById('markdown-default-view-mode-badge');
+            if (!badge) return;
+
+            var mode = normalizeMarkdownDefaultViewMode(value);
+            badge.textContent = getMarkdownDefaultViewModeLabel(mode);
+            badge.className = 'setting-status enabled';
+
+            var card = document.getElementById('markdown-default-view-mode-card');
+            if (card) {
+                var icon = card.querySelector('.home-card-icon i');
+                if (icon) {
+                    icon.classList.toggle('lucide-book-open', mode === 'preview');
+                    icon.classList.toggle('lucide-pencil', mode === 'edit');
+                    icon.classList.toggle('lucide-columns-2', mode === 'split');
+                    icon.classList.toggle('lucide-history', mode === 'last');
+                }
+            }
+        });
+    }
+
+    function openMarkdownDefaultViewModeModal() {
+        var modal = document.getElementById('markdownDefaultViewModeModal');
+        if (!modal) return;
+
+        getSetting('markdown_default_view_mode', function (value) {
+            var currentValue = normalizeMarkdownDefaultViewMode(value);
+            var radios = document.getElementsByName('markdownDefaultViewMode');
+            for (var i = 0; i < radios.length; i++) {
+                radios[i].checked = (radios[i].value === currentValue);
+            }
+            modal.style.display = 'flex';
+        });
     }
 
     function refreshDateTimeFormatBadge() {
@@ -2146,6 +2200,11 @@
             dateTimeFormatCard.addEventListener('click', openDateTimeFormatModal);
         }
 
+        var markdownDefaultViewModeCard = document.getElementById('markdown-default-view-mode-card');
+        if (markdownDefaultViewModeCard) {
+            markdownDefaultViewModeCard.addEventListener('click', openMarkdownDefaultViewModeModal);
+        }
+
         var diaryDateFormatCard = document.getElementById('diary-date-format-card');
         if (diaryDateFormatCard) {
             diaryDateFormatCard.addEventListener('click', openDiaryDateFormatModal);
@@ -2582,6 +2641,30 @@
         }
 
         // Save date and time format modal button
+        var saveMarkdownDefaultViewModeBtn = document.getElementById('saveMarkdownDefaultViewModeModalBtn');
+        if (saveMarkdownDefaultViewModeBtn) {
+            saveMarkdownDefaultViewModeBtn.addEventListener('click', function () {
+                var radios = document.getElementsByName('markdownDefaultViewMode');
+                var selected = 'preview';
+                for (var i = 0; i < radios.length; i++) {
+                    if (radios[i].checked) { selected = radios[i].value; break; }
+                }
+                selected = normalizeMarkdownDefaultViewMode(selected);
+
+                setSetting('markdown_default_view_mode', selected, function (success) {
+                    if (success) {
+                        try { closeModal('markdownDefaultViewModeModal'); } catch (e) {
+                            console.debug('settings-page: closeModal(markdownDefaultViewModeModal) failed:', e);
+                        }
+                        refreshMarkdownDefaultViewModeBadge();
+                        reloadOpener();
+                    } else {
+                        alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                    }
+                });
+            });
+        }
+
         var saveDateTimeFormatBtn = document.getElementById('saveDateTimeFormatModalBtn');
         if (saveDateTimeFormatBtn) {
             saveDateTimeFormatBtn.addEventListener('click', function () {
@@ -2924,6 +3007,7 @@
             refreshToolbarModeBadge();
             refreshTimezoneBadge();
             refreshDateTimeFormatBadge();
+            refreshMarkdownDefaultViewModeBadge();
             refreshNoteWidthBadge();
             refreshIndexIconScaleBadge();
             refreshCustomCssBadge();
@@ -3386,6 +3470,7 @@
                 'settings-pinned-section-grid': 'lucide-pin',
                 'settings-actions-section-grid': 'lucide-zap',
                 'settings-display-section-grid': 'lucide-monitor',
+                'settings-markdown-section-grid': 'lucide-file-code',
                 'settings-behavior-section-grid': 'lucide-settings-2',
                 'admin-tools-grid': 'lucide-wrench',
                 'settings-documentation-section-grid': 'lucide-info'
@@ -3533,6 +3618,7 @@
             refreshDiaryDateFormatBadge();
             refreshToolbarModeBadge();
             refreshDateTimeFormatBadge();
+            refreshMarkdownDefaultViewModeBadge();
             refreshInstallAppBadge();
             refreshCustomCssBadge();
         });
@@ -4472,6 +4558,7 @@
     window.openNoteAgeFilterModal = openNoteAgeFilterModal;
     window.showTimezonePrompt = showTimezonePrompt;
     window.openDateTimeFormatModal = openDateTimeFormatModal;
+    window.openMarkdownDefaultViewModeModal = openMarkdownDefaultViewModeModal;
     window.openDiaryDateFormatModal = openDiaryDateFormatModal;
     window.refreshLanguageBadge = refreshLanguageBadge;
     window.refreshLoginDisplayBadge = refreshLoginDisplayBadge;
@@ -4484,6 +4571,7 @@
     window.refreshToolbarModeBadge = refreshToolbarModeBadge;
     window.refreshTimezoneBadge = refreshTimezoneBadge;
     window.refreshDateTimeFormatBadge = refreshDateTimeFormatBadge;
+    window.refreshMarkdownDefaultViewModeBadge = refreshMarkdownDefaultViewModeBadge;
     window.refreshNoteWidthBadge = refreshNoteWidthBadge;
     window.refreshCustomCssBadge = refreshCustomCssBadge;
     window.getSetting = getSetting;

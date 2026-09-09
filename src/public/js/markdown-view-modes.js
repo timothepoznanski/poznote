@@ -53,6 +53,71 @@ function prioritizeInitialMarkdownPreviewImages(previewDiv) {
     }
 }
 
+// Per-note view mode memory for the current browser session, plus the global
+// "last used" mode. A note switched to edit mode comes back in edit mode when
+// reopened in the same tab, while other notes still open in the user's default
+// (markdown_default_view_mode setting, rendered by index.php as
+// data-markdown-default-mode on <body>). sessionStorage is deliberate: the
+// memory ends with the tab, so it never turns into a sticky preference.
+var _MD_VIEW_MODES = ['preview', 'edit', 'split'];
+var _MD_LAST_MODE_KEY = 'poznote-markdown-view-mode';
+var _MD_SESSION_MODES_KEY = 'poznote-markdown-note-modes';
+
+function _mdGetDefaultViewMode() {
+    var setting = '';
+    try {
+        setting = (document.body && document.body.getAttribute('data-markdown-default-mode')) || '';
+    } catch (e) {
+        setting = '';
+    }
+    if (setting === 'last') {
+        var last = null;
+        try {
+            last = localStorage.getItem(_MD_LAST_MODE_KEY);
+        } catch (e) {
+            console.warn('Could not read view mode from localStorage:', e);
+        }
+        return _MD_VIEW_MODES.indexOf(last) !== -1 ? last : 'preview';
+    }
+    return _MD_VIEW_MODES.indexOf(setting) !== -1 ? setting : 'preview';
+}
+
+function _mdReadSessionModes() {
+    try {
+        var raw = sessionStorage.getItem(_MD_SESSION_MODES_KEY);
+        var parsed = raw ? JSON.parse(raw) : null;
+        return (parsed && typeof parsed === 'object') ? parsed : {};
+    } catch (e) {
+        return {};
+    }
+}
+
+function _mdGetNoteSessionMode(noteId) {
+    if (!noteId) return null;
+    var mode = _mdReadSessionModes()[String(noteId)];
+    return _MD_VIEW_MODES.indexOf(mode) !== -1 ? mode : null;
+}
+
+function _mdSetNoteSessionMode(noteId, mode) {
+    if (!noteId || _MD_VIEW_MODES.indexOf(mode) === -1) return;
+    try {
+        var modes = _mdReadSessionModes();
+        modes[String(noteId)] = mode;
+        sessionStorage.setItem(_MD_SESSION_MODES_KEY, JSON.stringify(modes));
+    } catch (e) {
+        console.warn('Could not save view mode to sessionStorage:', e);
+    }
+}
+
+function _mdRememberViewMode(noteId, mode) {
+    _mdSetNoteSessionMode(noteId, mode);
+    try {
+        localStorage.setItem(_MD_LAST_MODE_KEY, mode);
+    } catch (e) {
+        console.warn('Could not save view mode to localStorage:', e);
+    }
+}
+
 /**
  * Initialize markdown note functionality
  */
@@ -131,13 +196,10 @@ function initializeMarkdownNote(noteId) {
         noteEntry.setAttribute('data-markdown-content', markdownContent);
     }
 
-    // Try to restore saved view mode (global for all notes)
-    var savedMode = null;
-    try {
-        savedMode = localStorage.getItem('poznote-markdown-view-mode');
-    } catch (e) {
-        console.warn('Could not read view mode from localStorage:', e);
-    }
+    // Mode to open this note in: the mode it was switched to earlier in this
+    // browser session first, then the user's default (markdown_default_view_mode
+    // setting; its 'last' value follows the mode last used on any note).
+    var savedMode = _mdGetNoteSessionMode(noteId) || _mdGetDefaultViewMode();
 
     // Determine initial mode: edit or preview
     var isEmpty = markdownContent.trim() === '';
@@ -183,9 +245,13 @@ function initializeMarkdownNote(noteId) {
         // New notes on desktop: start in split mode
         startInSplitMode = true;
         startInEditMode = false;
+        // Remembered so the note comes back in split mode within this session,
+        // even though the default for notes with content is preview.
+        _mdSetNoteSessionMode(noteId, 'split');
     } else if (isEmpty) {
         // New notes on mobile: start in edit mode
         startInEditMode = true;
+        _mdSetNoteSessionMode(noteId, 'edit');
     } else if (savedMode && savedMode === 'split' && !isMobileViewportCheck) {
         startInSplitMode = true;
         startInEditMode = false;
@@ -520,12 +586,7 @@ function switchToEditMode(noteId) {
     // Update view mode button
     updateViewModeButton(noteId, 'edit');
 
-    // Save mode to localStorage
-    try {
-        localStorage.setItem('poznote-markdown-view-mode', 'edit');
-    } catch (e) {
-        console.warn('Could not save view mode to localStorage:', e);
-    }
+    _mdRememberViewMode(noteId, 'edit');
 
     // Refresh outline panel if available
     if (window.outlinePanel && window.outlinePanel.refresh) {
@@ -618,12 +679,7 @@ function switchToPreviewMode(noteId) {
     // Update view mode button
     updateViewModeButton(noteId, 'preview');
 
-    // Save mode to localStorage
-    try {
-        localStorage.setItem('poznote-markdown-view-mode', 'preview');
-    } catch (e) {
-        console.warn('Could not save view mode to localStorage:', e);
-    }
+    _mdRememberViewMode(noteId, 'preview');
 
     // Only mark as edited and trigger save if content has changed
     if (previousContent !== markdownContent) {
@@ -876,12 +932,7 @@ function switchToSplitMode(noteId) {
     // Update view mode button
     updateViewModeButton(noteId, 'split');
 
-    // Save mode to localStorage
-    try {
-        localStorage.setItem('poznote-markdown-view-mode', 'split');
-    } catch (e) {
-        console.warn('Could not save view mode to localStorage:', e);
-    }
+    _mdRememberViewMode(noteId, 'split');
 
     // Setup live preview update on input
     setupSplitModePreviewUpdate(noteId);

@@ -342,6 +342,11 @@ $router->get('/notes/with-attachments', function($params) use ($notesController)
     $notesController->listWithAttachments();
 });
 
+// Notes the "/template" slash command can insert (must come before /notes/{id})
+$router->get('/notes/templates', function($params) use ($notesController) {
+    $notesController->listTemplates();
+});
+
 // List all notes
 $router->get('/notes', function($params) use ($notesController) {
     $notesController->index();

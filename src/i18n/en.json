@@ -145,6 +145,7 @@
       "language": "Change the language of the interface.",
       "main_font": "Choose the font used throughout the application.",
       "markdown_font": "Choose the font used in the markdown editor.",
+      "markdown_default_view_mode": "Choose whether markdown notes open in preview, edit or split mode. A note you switch to another mode keeps it until you close the tab.",
       "font_size": "Adjust the font size of notes, sidebar, code blocks and the settings page.",
       "index_icon_scale": "Adjust the size of the icons in the note list.",
       "timezone": "Set the timezone used to display dates and times.",
@@ -195,6 +196,8 @@
       "github": "Open the Poznote source code on GitHub.",
       "api_rest": "Show information about the Poznote REST API.",
       "website": "Open the official Poznote website.",
+      "tips": "Discover tips and tricks to get the most out of Poznote.",
+      "discord": "Join the Poznote community on Discord.",
       "support": "Support the development of Poznote with a donation.",
       "s3_storage": "Store note attachments in an S3-compatible object storage instead of the local disk.",
       "s3_backup": "Upload complete backup archives to an S3-compatible bucket, manually or on a schedule.",
@@ -211,6 +214,7 @@
       "actions": "Actions",
       "admin_tools": "Admin Tools",
       "display": "Display",
+      "markdown": "Markdown",
       "behavior": "Behavior",
       "about": "About",
       "documentation": "About"
@@ -228,6 +232,8 @@
       "documentation": "Documentation GitHub",
       "news": "Poznote Blog",
       "website": "Poznote Website",
+      "tips": "Tips",
+      "discord": "Discord",
       "github_star": "Star on GitHub",
       "guestbook": "Poznote Guestbook",
       "support": "Support Poznote",
@@ -355,6 +361,7 @@
     "cards": {
       "main_font": "App font",
       "markdown_font": "Markdown editor font",
+      "markdown_default_view_mode": "Default view mode",
       "login_display": "Login page title",
       "note_font_size": "Font size",
       "note_sort_order": "Note sorting",
@@ -711,7 +718,6 @@
       "panel_title": "Customize this page",
       "panel_button": "Customize the interface",
       "panel_hint": "Only the elements of this page are listed. Changes apply immediately and are saved automatically.",
-      "panel_admin_note": "This panel only changes your own interface; the \"Users\" column is in the settings.",
       "panel_all_options": "All options",
       "panel_saving": "Saving…",
       "panel_saved": "Saved",
@@ -1109,6 +1115,18 @@
         "A": "AM/PM"
       }
     },
+    "markdown_default_view_mode": {
+      "title": "Default view mode",
+      "description": "Choose how markdown notes open:",
+      "options": {
+        "preview": "Preview",
+        "edit": "Edit",
+        "split": "Split (editor and preview side by side)",
+        "split_short": "Split",
+        "last": "Last used mode"
+      },
+      "hint": "A note you switch to another mode keeps that mode until you close the tab. New notes always open in split mode."
+    },
     "diary_date_format": {
       "title": "Diary entry date format",
       "description": "Choose the date format used to title new diary entries:",
@@ -1392,7 +1410,11 @@
     "audio_invalid_file": "Please select an audio file.",
     "audio_upload_failed": "Upload failed: {{error}}",
     "date": "Date",
-    "tasklist_embed": "Task list"
+    "tasklist_embed": "Task list",
+    "template": "Template",
+    "template_none": "No templates yet",
+    "template_none_hint": "Put notes in a folder named \"Templates\"",
+    "template_insert_failed": "Could not insert the template"
   },
   "api": {
     "settings": {

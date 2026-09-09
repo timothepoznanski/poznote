@@ -570,6 +570,26 @@ paths:
         '200':
           description: List of notes that have attachments
 
+  /notes/templates:
+    get:
+      tags: [Notes]
+      summary: List notes usable as templates
+      description: |
+        Notes the "/template" slash command can insert: HTML and Markdown notes
+        kept in a folder named "Templates" (sub-folders included) or in a
+        workspace named "Templates". The name is matched case-insensitively,
+        in English or in the interface language.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: workspace
+          in: query
+          description: Only consider the "Templates" folders of this workspace
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of template notes (id, heading, type, workspace, folder_id, icon, icon_color)
+
   /notes/{id}:
     get:
       tags: [Notes]
@@ -1155,22 +1175,6 @@ paths:
           description: Invalid color value
         '404':
           description: Note not found
-
-  /notes/{id}/create-template:
-    post:
-      tags: [Notes]
-      summary: Create a template from a note
-      description: Copies the note into the "Templates" folder of its workspace (created if missing)
-      parameters:
-        - $ref: '#/components/parameters/UserIdHeader'
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '201':
-          description: Template created
 
   /notes/{id}/convert:
     post:

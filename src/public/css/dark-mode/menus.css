@@ -21,6 +21,15 @@ html[data-theme='dark'] .slash-command-item[data-command-id='cancel'].selected {
     background: rgba(248, 113, 113, 0.16);
 }
 
+html[data-theme='dark'] .slash-command-item.slash-command-disabled:hover,
+html[data-theme='dark'] .slash-command-item.slash-command-disabled.selected {
+    background: transparent;
+}
+
+html[data-theme='dark'] .slash-command-hint {
+    color: var(--dm-text-muted);
+}
+
 html[data-theme='dark'] .slash-command-item .slash-command-label,
 html[data-theme='dark'] .slash-command-label {
     color: var(--pz-text-inverse) !important;

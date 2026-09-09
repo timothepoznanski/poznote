@@ -90,6 +90,23 @@
     font-size: 13px;
 }
 
+/* Informational rows, like "No templates yet" in the Template submenu */
+.slash-command-item.slash-command-disabled {
+    cursor: default;
+}
+
+.slash-command-item.slash-command-disabled:hover,
+.slash-command-item.slash-command-disabled.selected {
+    background: transparent;
+}
+
+.slash-command-hint {
+    display: block;
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--pz-text-muted);
+}
+
 /* ============================================
    Date Picker Popup (/date command)
    ============================================ */

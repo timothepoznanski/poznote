@@ -432,6 +432,7 @@
       "language": "更改界面语言。",
       "main_font": "选择整个应用使用的字体。",
       "markdown_font": "选择 Markdown 编辑器使用的字体。",
+      "markdown_default_view_mode": "选择 Markdown 笔记以预览、编辑还是分栏模式打开。切换到其他模式的笔记会保持该模式，直到关闭标签页。",
       "font_size": "调整笔记、侧边栏、代码块和设置页面的字体大小。",
       "index_icon_scale": "调整笔记列表中图标的大小。",
       "timezone": "设置用于显示日期和时间的时区。",
@@ -482,6 +483,8 @@
       "github": "在 GitHub 上打开 Poznote 源代码。",
       "api_rest": "显示 Poznote REST API 的相关信息。",
       "website": "打开 Poznote 官方网站。",
+      "tips": "探索技巧与窍门，充分发挥 Poznote 的潜力。",
+      "discord": "加入 Poznote 的 Discord 社区。",
       "support": "通过捐赠支持 Poznote 的开发。",
       "s3_storage": "将笔记附件存储在 S3 兼容的对象存储中,而不是本地磁盘。",
       "s3_backup": "将完整备份归档上传到 S3 兼容的存储桶,可手动或按计划执行。",
@@ -498,6 +501,7 @@
       "actions": "操作",
       "admin_tools": "管理工具",
       "display": "显示",
+      "markdown": "Markdown",
       "behavior": "行为",
       "about": "关于",
       "documentation": "关于"
@@ -534,6 +538,8 @@
       "documentation": "Documentation GitHub",
       "news": "Poznote 博客",
       "website": "Poznote 网站",
+      "tips": "技巧",
+      "discord": "Discord",
       "github_star": "在 GitHub 上加星",
       "guestbook": "Poznote 留言板",
       "custom_css": "自定义 CSS 文件",
@@ -718,6 +724,7 @@
     "cards": {
       "main_font": "应用字体",
       "markdown_font": "Markdown 编辑器字体",
+      "markdown_default_view_mode": "默认打开模式",
       "login_display": "登录页面标题",
       "note_font_size": "字体大小",
       "note_sort_order": "笔记排序规则",
@@ -1223,7 +1230,6 @@
       "panel_title": "自定义此页面",
       "panel_button": "自定义界面",
       "panel_hint": "仅列出此页面的元素。更改会立即生效并自动保存。",
-      "panel_admin_note": "此面板仅更改您自己的界面；“用户”列位于设置中。",
       "panel_all_options": "所有选项",
       "panel_saving": "正在保存…",
       "panel_saved": "已保存",
@@ -1565,6 +1571,18 @@
         "A": "上午/下午"
       }
     },
+    "markdown_default_view_mode": {
+      "title": "默认打开模式",
+      "description": "选择 Markdown 笔记的打开方式：",
+      "options": {
+        "preview": "预览",
+        "edit": "编辑",
+        "split": "分栏（编辑器与预览并排）",
+        "split_short": "分栏",
+        "last": "上次使用的模式"
+      },
+      "hint": "切换到其他模式的笔记会保持该模式，直到关闭标签页。新笔记始终以分栏模式打开。"
+    },
     "diary_date_format": {
       "title": "日记条目日期格式",
       "description": "选择用于命名新日记条目的日期格式：",
@@ -1814,7 +1832,11 @@
     "audio_invalid_file": "请选择音频文件。",
     "audio_upload_failed": "上传失败：{{error}}",
     "date": "日期",
-    "tasklist_embed": "任务列表"
+    "tasklist_embed": "任务列表",
+    "template": "模板",
+    "template_none": "暂无模板",
+    "template_none_hint": "将笔记放入名为“模板”或“Templates”的文件夹",
+    "template_insert_failed": "无法插入模板"
   },
   "api": {
     "settings": {

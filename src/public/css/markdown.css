@@ -630,10 +630,14 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
    One --mdc-* variable per element; the user's colors are inlined on <body>
    by index.php, so they apply identically in light and dark mode (the values
    below are only fallbacks, dark fallbacks in css/dark-mode/markdown.css).
-   The unmatched #id inside :is() boosts specificity above the blanket
+   The colour declarations need BOTH the !important and the unmatched #id
+   inside :is(): they fight the blanket
    `.noteentry * { color: var(--dm-text) !important }` rule in
-   css/dark-mode/editor.css and above the dark-mode preview defaults, so one
-   set of rules serves both themes. */
+   css/dark-mode/editor.css, which is important and very specific (nine :not()
+   arguments). Dropping either one leaves headings and inline code plain in the
+   dark and black themes only (issue #1347); with both, one set of rules serves
+   every theme. Declarations the blanket does not touch (border and background
+   colours) stay at ordinary weight. */
 body.markdown-colored {
     --mdc-h1: var(--pz-accent);
     --mdc-h2: #1a7f37;
@@ -665,29 +669,29 @@ body.markdown-colored .markdown-codemirror-host {
 }
 
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h1) {
-    color: var(--mdc-h1);
+    color: var(--mdc-h1) !important;
     border-bottom-color: color-mix(in srgb, var(--mdc-h1) 30%, transparent);
 }
 
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h2) {
-    color: var(--mdc-h2);
+    color: var(--mdc-h2) !important;
     border-bottom-color: color-mix(in srgb, var(--mdc-h2) 30%, transparent);
 }
 
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h3) {
-    color: var(--mdc-h3);
+    color: var(--mdc-h3) !important;
 }
 
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h4) {
-    color: var(--mdc-h4);
+    color: var(--mdc-h4) !important;
 }
 
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h5) {
-    color: var(--mdc-h5);
+    color: var(--mdc-h5) !important;
 }
 
 body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h6) {
-    color: var(--mdc-h6);
+    color: var(--mdc-h6) !important;
 }
 
 /* Code blocks: tint the block background with the chosen color (mixed into
@@ -700,7 +704,7 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, pre:not(.
 }
 
 body.markdown-colored .markdown-preview :not(pre) > :is(#poznote-md-colored-boost, code:not([class*="hljs"]):not([class*="language-"])) {
-    color: var(--mdc-code);
+    color: var(--mdc-code) !important;
     background-color: color-mix(in srgb, var(--mdc-code) 9%, transparent);
     border-radius: var(--pz-radius-sm);
 }

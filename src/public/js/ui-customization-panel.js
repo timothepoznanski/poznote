@@ -259,6 +259,12 @@
             setStatus('');
             load();
         }
+        // On phones the panel covers the page: let the Back button close it
+        // (js/panel-back.js).
+        if (window.PoznotePanelBack) {
+            if (open) window.PoznotePanelBack.opened();
+            else window.PoznotePanelBack.closed();
+        }
     }
 
     function init() {
@@ -269,6 +275,13 @@
         pruneForPage(panel.getAttribute('data-ui-page') || 'notes');
         initSections();
         if ('inert' in panel) panel.inert = true;
+
+        if (window.PoznotePanelBack) {
+            window.PoznotePanelBack.register({
+                isOpen: isOpen,
+                close: function () { setOpen(false); }
+            });
+        }
 
         document.addEventListener('click', function (e) {
             if (e.target.closest('[data-action="toggle-ui-customization-panel"]')) {

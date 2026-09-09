@@ -212,6 +212,14 @@ class SettingsController {
             return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
         }
 
+        if ($key === 'markdown_default_view_mode') {
+            $normalized = trim((string) $value);
+            if (!in_array($normalized, ['preview', 'edit', 'split', 'last'], true)) {
+                throw new InvalidArgumentException('invalid markdown default view mode', 400);
+            }
+            return $normalized;
+        }
+
         if ($key === 'slash_menu_require_alt') {
             return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
         }

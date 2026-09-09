@@ -89,6 +89,7 @@
     let savedNoteEntry = null;
     let savedEditableElement = null;
     let activeCommands = null;
+    let activeCommandsBuilder = null;  // rebuilds activeCommands, for a menu already open when the template list arrives
     let codeMirrorSlashEditor = null;
     let codeMirrorSlashFrom = -1;
     let codeMirrorSlashTo = -1;
@@ -1746,6 +1747,226 @@
         ]);
     }
 
+    // -------------------------------------------------------------------
+    // Templates (/template)
+    // -------------------------------------------------------------------
+    //
+    // A template is an ordinary note kept in a folder named "Templates" or in
+    // a workspace named "Templates" (GET /api/v1/notes/templates decides). The
+    // menu is built synchronously when "/" is typed, so the list lives in a
+    // cache refreshed in the background: once at startup, then every time the
+    // menu opens. That refresh serves the next opening, and re-renders the
+    // current one if the list changed meanwhile.
+
+    let templateCache = { workspace: null, items: [] };
+    let templateFetchPromise = null;
+
+    function getTemplateWorkspace() {
+        try {
+            if (typeof window.getSelectedWorkspace === 'function') {
+                return String(window.getSelectedWorkspace() || '');
+            }
+            if (typeof window.selectedWorkspace === 'string') {
+                return window.selectedWorkspace;
+            }
+        } catch (e) {
+            console.debug('slash-command: getTemplateWorkspace() failed:', e);
+        }
+        return '';
+    }
+
+    function refreshTemplateCache() {
+        if (templateFetchPromise) return templateFetchPromise;
+
+        const workspace = getTemplateWorkspace();
+        const url = '/api/v1/notes/templates' + (workspace ? '?workspace=' + encodeURIComponent(workspace) : '');
+
+        templateFetchPromise = fetch(url, { credentials: 'same-origin' })
+            .then(response => (response.ok ? response.json() : null))
+            .then(data => {
+                const items = (data && data.success && Array.isArray(data.notes)) ? data.notes : [];
+                const changed = workspace !== templateCache.workspace
+                    || JSON.stringify(items) !== JSON.stringify(templateCache.items);
+                templateCache = { workspace, items };
+                if (changed) rebuildOpenMenuCommands();
+            })
+            .catch(e => {
+                console.debug('slash-command: refreshTemplateCache() failed:', e);
+            })
+            .then(() => {
+                templateFetchPromise = null;
+            });
+
+        return templateFetchPromise;
+    }
+
+    // Re-render the main menu with fresh commands. Left alone while a submenu
+    // is open: replacing the list under the user's pointer would close it.
+    function rebuildOpenMenuCommands() {
+        if (!slashMenuElement || submenuElement || typeof activeCommandsBuilder !== 'function') return;
+        activeCommands = activeCommandsBuilder();
+        updateMenuContent();
+    }
+
+    function getTemplateSlashCommand() {
+        const t = window.t || ((key, params, fallback) => fallback);
+        const currentNoteId = savedNoteEntry && savedNoteEntry.getAttribute
+            ? String(savedNoteEntry.getAttribute('data-note-id') || '')
+            : '';
+
+        // A template cannot be pasted into itself
+        const items = templateCache.items
+            .filter(note => String(note.id) !== currentNoteId)
+            .map(note => ({
+                id: 'template-' + note.id,
+                icon: note.icon || 'lucide-file-text',
+                iconColor: note.icon_color || null,
+                label: note.heading || t('note_reference.untitled', null, 'Untitled'),
+                action: function () { insertTemplate(note); }
+            }));
+
+        if (!items.length) {
+            items.push({
+                id: 'template-none',
+                icon: 'lucide-info',
+                label: t('slash_menu.template_none', null, 'No templates yet'),
+                hint: t('slash_menu.template_none_hint', null, 'Put notes in a folder named "Templates"'),
+                disabled: true
+            });
+        }
+
+        return {
+            id: 'template',
+            icon: 'lucide-stamp',
+            label: t('slash_menu.template', null, 'Template'),
+            aliases: ['template', 'tpl', 'snippet'],
+            submenu: items
+        };
+    }
+
+    function convertTemplateContent(content, sourceType, targetType) {
+        if (sourceType === targetType || content.trim() === '') {
+            return Promise.resolve(content);
+        }
+
+        // Both converters are the ones used for whole-note conversion, so a
+        // template pasted across note types looks like a converted note would.
+        const toMarkdown = targetType === 'markdown';
+        return fetch(toMarkdown ? '/api/v1/convert-html' : '/api/v1/convert-markdown', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(toMarkdown ? { html: content } : { markdown: content })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (!data || data.success === false) {
+                    throw new Error((data && data.error) || 'Conversion failed');
+                }
+                return String((toMarkdown ? data.markdown : data.html) || '');
+            });
+    }
+
+    // Insert HTML at the caret the slash menu was opened from
+    function insertHtmlAtContext(context, html) {
+        const editable = context && context.editableElement;
+        if (!editable) return;
+
+        focusEditableElement(editable);
+
+        try {
+            const selection = window.getSelection();
+            const savedRange = context.savedRange;
+            if (selection) {
+                let range = (savedRange && editable.contains(savedRange.commonAncestorContainer)) ? savedRange : null;
+                if (!range) {
+                    // No caret left in this note: append rather than drop the content
+                    range = document.createRange();
+                    range.selectNodeContents(editable);
+                    range.collapse(false);
+                }
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+        } catch (e) {
+            console.debug('slash-command: insertHtmlAtContext() failed:', e);
+        }
+
+        // execCommand keeps the insertion in the undo stack and fires the input
+        // event the autosave listens to, like a paste does
+        let inserted = false;
+        try {
+            inserted = document.execCommand('insertHTML', false, html);
+        } catch (e) {
+            inserted = false;
+        }
+
+        if (!inserted) {
+            const selection = window.getSelection();
+            const container = document.createElement('div');
+            container.innerHTML = html;
+            const fragment = document.createDocumentFragment();
+            let lastNode = null;
+            while (container.firstChild) {
+                lastNode = fragment.appendChild(container.firstChild);
+            }
+            if (selection && selection.rangeCount) {
+                const range = selection.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode(fragment);
+                if (lastNode) {
+                    const after = document.createRange();
+                    after.setStartAfter(lastNode);
+                    after.collapse(true);
+                    selection.removeAllRanges();
+                    selection.addRange(after);
+                }
+            } else {
+                editable.appendChild(fragment);
+            }
+            editable.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        if (typeof window.markNoteAsModified === 'function') {
+            window.markNoteAsModified();
+        }
+    }
+
+    // Paste a template note's content at the caret. The caret is captured now
+    // because the content arrives asynchronously, after the menu is gone.
+    function insertTemplate(note) {
+        const context = getEditorContext();
+        if (!context || !note) return;
+
+        const targetType = context.noteType === 'markdown' ? 'markdown' : 'note';
+        const insertionContext = captureEditorInsertionContext();
+        const t = window.t || ((key, params, fallback) => fallback);
+
+        fetch('/api/v1/notes/' + encodeURIComponent(note.id), { credentials: 'same-origin' })
+            .then(response => response.json())
+            .then(data => {
+                if (!data || !data.success || !data.note) {
+                    throw new Error((data && data.error) || 'Template not found');
+                }
+                const sourceType = data.note.type === 'markdown' ? 'markdown' : 'note';
+                return convertTemplateContent(String(data.note.content || ''), sourceType, targetType);
+            })
+            .then(content => {
+                if (content === '') return;
+                if (targetType === 'markdown') {
+                    insertMarkdownAtContext(insertionContext, content, 0);
+                } else {
+                    insertHtmlAtContext(insertionContext, content);
+                }
+            })
+            .catch(error => {
+                console.error('slash-command: insertTemplate() failed:', error);
+                if (typeof showNotificationPopup === 'function') {
+                    showNotificationPopup(t('slash_menu.template_insert_failed', null, 'Could not insert the template'), 'error');
+                }
+            });
+    }
+
     // Return slash commands common between HTML and Markdown modes
     function getCommonSlashCommands() {
         var t = window.t || (function (key, params, fallback) { return fallback; });
@@ -2172,6 +2393,7 @@
                     }
                 ]
             },
+            getTemplateSlashCommand(),
             common.cancel
         ]);
     }
@@ -2526,6 +2748,7 @@
                     }
                 ]
             },
+            getTemplateSlashCommand(),
             common.cancel
         ]);
     }
@@ -2727,10 +2950,12 @@
                 const submenuIndicator = hasSubmenu ? '<i class="lucide lucide-chevron-right slash-command-submenu-indicator"></i>' : '';
                 const iconStyle = item.iconColor ? ' style="margin-right: 8px; width: 16px; display: inline-block; text-align: center; color: ' + item.iconColor + ';"' : ' style="margin-right: 8px; width: 16px; display: inline-block; text-align: center;"';
                 const iconHtml = item.icon ? '<i class="slash-command-icon ' + item.icon + '"' + iconStyle + '></i>' : '';
+                const disabledClass = item.disabled ? ' slash-command-disabled' : '';
+                const hintHtml = item.hint ? '<span class="slash-command-hint">' + escapeHtml(item.hint) + '</span>' : '';
                 return (
-                    '<div class="slash-command-item' + selectedClass + '" data-submenu-id="' + item.id + '" data-has-sub-submenu="' + hasSubmenu + '">' +
+                    '<div class="slash-command-item' + selectedClass + disabledClass + '" data-submenu-id="' + item.id + '" data-has-sub-submenu="' + hasSubmenu + '">' +
                     iconHtml +
-                    '<span class="slash-command-label">' + escapeHtml(item.label) + '</span>' +
+                    '<span class="slash-command-label">' + escapeHtml(item.label) + hintHtml + '</span>' +
                     submenuIndicator +
                     '</div>'
                 );
@@ -2910,6 +3135,7 @@
         const isTaskInput = isTaskInputElement(input);
         const ctx = { noteType: isTaskInput ? 'tasklist' : 'title', noteEntry: savedNoteEntry, editableElement: input };
 
+        activeCommandsBuilder = null;
         activeCommands = isTaskInput ? getTaskSlashCommands() : getTitleSlashCommands();
         filterText = '';
         selectedIndex = 0;
@@ -3852,7 +4078,9 @@
         savedEditableElement = editor;
         savedNoteEntry = editor.closest && editor.closest('.noteentry');
 
-        activeCommands = getMarkdownSlashCommands();
+        activeCommandsBuilder = getMarkdownSlashCommands;
+        activeCommands = activeCommandsBuilder();
+        refreshTemplateCache();
         filterText = '';
         selectedIndex = 0;
         filteredCommands = getFilteredCommands('');
@@ -3946,7 +4174,9 @@
             return;
         }
 
-        activeCommands = ctx.noteType === 'markdown' ? getMarkdownSlashCommands() : getSlashCommands();
+        activeCommandsBuilder = ctx.noteType === 'markdown' ? getMarkdownSlashCommands : getSlashCommands;
+        activeCommands = activeCommandsBuilder();
+        refreshTemplateCache();
 
         filterText = '';
         selectedIndex = 0;
@@ -4114,6 +4344,11 @@
     // Initialize slash menu system (event listeners)
     function init() {
         document.addEventListener('input', handleInput, true);
+
+        // Warm the template list so the first "/" already shows it
+        if (document.querySelector('.noteentry')) {
+            setTimeout(refreshTemplateCache, 1500);
+        }
         document.addEventListener('keydown', handleAltSlashShortcut, true);
         document.addEventListener('keydown', handleKeydown, true);
         document.addEventListener('mousedown', handleClickOutside, true);
