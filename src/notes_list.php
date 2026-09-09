@@ -56,7 +56,7 @@ if ($using_unified_search) {
     $search_in_notes_value = (!empty($search) || $preserve_notes) ? '1' : '';
     $search_in_tags_value = (!empty($tags_search) || $preserve_tags) ? '1' : '';
 }
-if ($search_combined) {
+if (!empty($search_combined)) {
     $search_in_notes_value = '1';
     $search_in_tags_value = '1';
 }
