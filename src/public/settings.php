@@ -1280,6 +1280,17 @@ if ($canUseUserWebhooks) {
                 </div>
             </a>
 
+            <!-- Discord community -->
+            <a href="https://discord.gg/AWhWWSEkJ" target="_blank" rel="noopener noreferrer" class="home-card" id="discord-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.discord', [], 'Join the Poznote community on Discord.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide pz-icon-discord"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.discord', [], 'Discord'); ?></span>
+                </div>
+            </a>
+
             <!-- Support -->
             <a href="https://ko-fi.com/timothepoznanski" target="_blank" rel="noopener noreferrer" class="home-card" id="support-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.support', [], 'Support the development of Poznote with a donation.'); ?>"><i class="lucide lucide-help-circle"></i></span>

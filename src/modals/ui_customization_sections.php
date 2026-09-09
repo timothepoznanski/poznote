@@ -101,6 +101,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:admin-contact-card" checked><span><?php echo t_h('settings.cards.admin_contact', [], 'Help'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:github-card" checked><span><?php echo t_h('settings.cards.documentation', [], 'Documentation GitHub'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:website-card" checked><span><?php echo t_h('settings.cards.website', [], 'Poznote Website'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:discord-card" checked><span><?php echo t_h('settings.cards.discord', [], 'Discord'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:support-card" checked><span><?php echo t_h('settings.cards.support', [], 'Support Poznote'); ?></span></label>
 </div>
 </div>
