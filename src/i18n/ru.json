@@ -201,7 +201,9 @@
     },
     "title": "Настройки",
     "collapse_section": "Свернуть раздел",
+    "collapse_all_sections": "Свернуть все",
     "expand_section": "Развернуть раздел",
+    "expand_all_sections": "Развернуть все",
     "categories": {
       "pinned": "Закреплённые",
       "actions": "Действия",

@@ -485,7 +485,9 @@
     },
     "title": "Configurações",
     "collapse_section": "Recolher a seção",
+    "collapse_all_sections": "Recolher tudo",
     "expand_section": "Expandir a seção",
+    "expand_all_sections": "Expandir tudo",
     "categories": {
       "pinned": "Fixados",
       "actions": "Ações",

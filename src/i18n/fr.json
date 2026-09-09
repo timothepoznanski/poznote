@@ -498,7 +498,9 @@
     },
     "title": "Paramètres",
     "collapse_section": "Réduire la section",
+    "collapse_all_sections": "Tout replier",
     "expand_section": "Développer la section",
+    "expand_all_sections": "Tout déplier",
     "categories": {
       "pinned": "Épinglés",
       "actions": "Actions",

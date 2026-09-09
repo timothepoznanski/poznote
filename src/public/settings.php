@@ -333,6 +333,14 @@ if ($canUseUserWebhooks) {
                     <i class="lucide lucide-x"></i>
                 </button>
             </div>
+            <!-- Collapse/expand every section at once. Only useful in the
+                 stacked mobile layout: the desktop nav shows one section at a
+                 time, so css/settings.css hides this button there. -->
+            <button type="button" id="settingsCollapseAll" class="settings-collapse-all"
+                data-label-collapse="<?php echo t_h('settings.collapse_all_sections', [], 'Collapse all'); ?>"
+                data-label-expand="<?php echo t_h('settings.expand_all_sections', [], 'Expand all'); ?>">
+                <i class="lucide lucide-chevron-down"></i>
+            </button>
         </div>
 
         <!-- Desktop layout (css/settings.css, .settings-with-nav): the section

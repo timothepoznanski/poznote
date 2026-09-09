@@ -487,7 +487,9 @@
     },
     "title": "Configuración",
     "collapse_section": "Contraer la sección",
+    "collapse_all_sections": "Contraer todo",
     "expand_section": "Expandir la sección",
+    "expand_all_sections": "Expandir todo",
     "categories": {
       "pinned": "Fijados",
       "actions": "Acciones",

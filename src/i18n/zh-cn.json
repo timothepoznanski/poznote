@@ -488,7 +488,9 @@
     },
     "title": "设置",
     "collapse_section": "折叠此部分",
+    "collapse_all_sections": "全部折叠",
     "expand_section": "展开此部分",
+    "expand_all_sections": "全部展开",
     "categories": {
       "pinned": "已固定",
       "actions": "操作",

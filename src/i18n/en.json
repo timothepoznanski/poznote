@@ -201,7 +201,9 @@
     },
     "title": "Settings",
     "collapse_section": "Collapse section",
+    "collapse_all_sections": "Collapse all",
     "expand_section": "Expand section",
+    "expand_all_sections": "Expand all",
     "categories": {
       "pinned": "Pinned",
       "actions": "Actions",

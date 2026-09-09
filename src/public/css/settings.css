@@ -258,6 +258,50 @@ html[data-theme='dark'] .settings-view-toggle:hover {
     color: var(--dm-accent, var(--dm-accent));
 }
 
+/* Collapse/expand all sections, at the right end of the filter row. Same
+   look as the view toggle above; the chevron mirrors the section chevrons,
+   pointing right once everything is collapsed. */
+.settings-collapse-all {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    padding: 0;
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    color: var(--pz-text-muted);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.settings-collapse-all:hover {
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
+}
+
+.settings-collapse-all .lucide {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.15s ease;
+}
+
+.settings-collapse-all.is-collapsed .lucide {
+    transform: rotate(-90deg);
+}
+
+html[data-theme='dark'] .settings-collapse-all {
+    background: var(--dm-surface, var(--dm-content-bg));
+    border-color: var(--dm-border);
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .settings-collapse-all:hover {
+    border-color: var(--dm-accent);
+    color: var(--dm-accent);
+}
+
 /* ---------- List layout: cards become compact full-width rows ---------- */
 
 /* On desktop the rows don't need the full grid width: halve the container */
@@ -467,8 +511,10 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
         max-width: 900px;
     }
 
-    /* Rows are the only layout here: the grid/list toggle stays mobile-only */
-    .settings-with-nav .settings-view-toggle {
+    /* Rows are the only layout here, and one section shows at a time: the
+       grid/list toggle and the collapse-all button stay mobile-only */
+    .settings-with-nav .settings-view-toggle,
+    .settings-with-nav .settings-collapse-all {
         display: none;
     }
 

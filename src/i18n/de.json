@@ -486,7 +486,9 @@
     },
     "title": "Einstellungen",
     "collapse_section": "Bereich einklappen",
+    "collapse_all_sections": "Alle einklappen",
     "expand_section": "Bereich ausklappen",
+    "expand_all_sections": "Alle ausklappen",
     "categories": {
       "pinned": "Angepinnt",
       "actions": "Aktionen",

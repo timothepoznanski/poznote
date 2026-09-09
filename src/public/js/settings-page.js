@@ -3075,6 +3075,28 @@
 
         var sectionLabelRefreshers = [];
 
+        // Collapse/expand-all button in the filter row: it mirrors the state
+        // of the sections, collapsing everything while at least one is open
+        // and reopening them once they are all closed. The always-expanded
+        // sections (Pinned) are left out of both the count and the action.
+        var collapseAllBtn = document.getElementById('settingsCollapseAll');
+        var collapsibleSections = [];
+
+        var updateCollapseAllBtn = function () {
+            if (!collapseAllBtn) return;
+            var allCollapsed = collapsibleSections.length > 0
+                && collapsibleSections.every(function (section) {
+                    return section.title.classList.contains('section-collapsed');
+                });
+            collapseAllBtn.classList.toggle('is-collapsed', allCollapsed);
+            var label = allCollapsed
+                ? (collapseAllBtn.getAttribute('data-label-expand') || 'Expand all')
+                : (collapseAllBtn.getAttribute('data-label-collapse') || 'Collapse all');
+            collapseAllBtn.setAttribute('aria-expanded', allCollapsed ? 'false' : 'true');
+            collapseAllBtn.setAttribute('aria-label', label);
+            collapseAllBtn.title = label;
+        };
+
         // Rebuilt from the DOM on every toggle so the stored list stays in sync
         // even when several sections change at once.
         var persistSectionStates = function () {
@@ -3128,6 +3150,7 @@
                 if (isSettingsNavLayout()) return;
                 applySectionState(!title.classList.contains('section-collapsed'));
                 persistSectionStates();
+                updateCollapseAllBtn();
             });
         });
 
@@ -3158,6 +3181,20 @@
             // ?open=about deliberately stays in the URL: icon_sidebar.php reads
             // it to highlight About instead of Settings, so stripping it would
             // move the highlight back to Settings on the next reload.
+        }
+
+        if (collapseAllBtn) {
+            collapseAllBtn.addEventListener('click', function () {
+                var collapse = !collapsibleSections.every(function (section) {
+                    return section.title.classList.contains('section-collapsed');
+                });
+                collapsibleSections.forEach(function (section) {
+                    section.apply(collapse);
+                });
+                persistSectionStates();
+                updateCollapseAllBtn();
+            });
+            updateCollapseAllBtn();
         }
 
         // Card/list layout toggle next to the filter bar (same pattern as the
