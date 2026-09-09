@@ -705,7 +705,15 @@
       "folder_actions_toggle": "Menu button (⋮) on folders",
       "note_actions_toggle": "Menu button (⋮) on notes",
       "note_actions_hint": "Items of the ⋮ menu on each note in the sidebar. Unchecking them all hides the menu button.",
-      "theme_toggle": "Theme toggle"
+      "theme_toggle": "Theme toggle",
+      "panel_title": "Customize this page",
+      "panel_button": "Customize the interface",
+      "panel_hint": "Only the elements of this page are listed. Changes apply immediately and are saved automatically.",
+      "panel_admin_note": "This panel only changes your own interface; the \"Users\" column is in the settings.",
+      "panel_all_options": "All options",
+      "panel_saving": "Saving…",
+      "panel_saved": "Saved",
+      "panel_save_error": "Could not save, try again."
     },
     "icon_sidebar_order": {
       "title": "Icon sidebar order",

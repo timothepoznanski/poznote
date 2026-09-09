@@ -34,9 +34,12 @@ function poznoteGetNonHideableUiKeys() {
 function poznoteNormalizeHiddenUiKey($key) {
     static $renamed = [
         'toolbar:btn-share' => 'toolbar:btn-publish',
-        // Notifications and AI chat moved from the icon rail to the sidebar header.
+        // Notifications moved from the icon rail to the sidebar header.
         'card:iconSidebarNotificationsBtn' => 'card:sidebarNotificationsBtn',
-        'card:iconSidebarAiChatBtn' => 'card:sidebarAiChatBtn',
+        // The AI assistant button left the icon rail for the floating stack
+        // at the bottom-right of the page (ui_customization_panel.php).
+        'card:iconSidebarAiChatBtn' => 'card:edgeAiChatBtn',
+        'card:sidebarAiChatBtn' => 'card:edgeAiChatBtn',
         // The workspace menu's single "Workspaces" entry became "Edit
         // workspaces" once "New workspace" got its own entry.
         'wsmenu:goto-workspaces' => 'wsmenu:edit-workspaces',

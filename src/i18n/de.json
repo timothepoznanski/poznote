@@ -1216,7 +1216,15 @@
       "folder_actions_toggle": "Menüschaltfläche (⋮) bei Ordnern",
       "note_actions_toggle": "Menüschaltfläche (⋮) bei Notizen",
       "note_actions_hint": "Einträge des ⋮-Menüs jeder Notiz in der Seitenleiste. Werden alle abgewählt, verschwindet die Menüschaltfläche.",
-      "theme_toggle": "Design-Umschalter"
+      "theme_toggle": "Design-Umschalter",
+      "panel_title": "Diese Seite anpassen",
+      "panel_button": "Oberfläche anpassen",
+      "panel_hint": "Nur die Elemente dieser Seite werden aufgeführt. Änderungen gelten sofort und werden automatisch gespeichert.",
+      "panel_admin_note": "Dieses Panel ändert nur Ihre eigene Oberfläche; die Spalte „Benutzer“ finden Sie in den Einstellungen.",
+      "panel_all_options": "Alle Optionen",
+      "panel_saving": "Wird gespeichert…",
+      "panel_saved": "Gespeichert",
+      "panel_save_error": "Speichern nicht möglich, bitte erneut versuchen."
     },
     "icon_sidebar_order": {
       "title": "Reihenfolge der Icon-Seitenleiste",

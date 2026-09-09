@@ -1979,6 +1979,17 @@
             snapshotsCard.addEventListener('click', openSnapshotsSettingsModal);
         }
 
+        // Deep link from the contextual panel's "All options" button
+        // (ui_customization_panel.php): settings.php?open=ui-customization
+        if (new URLSearchParams(window.location.search || '').get('open') === 'ui-customization') {
+            showUiCustomizationModal();
+            if (window.history && typeof window.history.replaceState === 'function') {
+                var cleanUiCustomizationUrl = new URL(window.location.href);
+                cleanUiCustomizationUrl.searchParams.delete('open');
+                window.history.replaceState({}, '', cleanUiCustomizationUrl.toString());
+            }
+        }
+
         // Deep link from the note's Snapshots modal: settings.php?open=snapshots
         if (new URLSearchParams(window.location.search || '').get('open') === 'snapshots') {
             openSnapshotsSettingsModal();
@@ -3495,7 +3506,10 @@
     // working. See poznoteNormalizeHiddenUiKey() in functions.php.
     var RENAMED_UI_KEYS = {
         'toolbar:btn-share': 'toolbar:btn-publish',
-        'wsmenu:goto-workspaces': 'wsmenu:edit-workspaces'
+        'wsmenu:goto-workspaces': 'wsmenu:edit-workspaces',
+        'card:iconSidebarNotificationsBtn': 'card:sidebarNotificationsBtn',
+        'card:iconSidebarAiChatBtn': 'card:edgeAiChatBtn',
+        'card:sidebarAiChatBtn': 'card:edgeAiChatBtn'
     };
 
     function normalizeHiddenUiKey(key) {
@@ -3825,7 +3839,9 @@
             toggleBtn.innerHTML = '<i class="lucide lucide-chevron-down"></i>';
             title.appendChild(toggleBtn);
 
-            setUiCustomizationSectionCollapsed(section, false);
+            // Folded by default: ten sections of checkboxes are a wall of
+            // text when they all start open (discussion 1298).
+            setUiCustomizationSectionCollapsed(section, true);
         });
 
         updateCollapseAllBtn(modal);
@@ -3849,10 +3865,16 @@
             var title = e.target.closest('.ui-custom-section-title');
             if (!title) return;
 
-            var section = title.closest('.ui-custom-section');
-            if (!section) return;
+            var clicked = title.closest('.ui-custom-section');
+            if (!clicked) return;
 
-            setUiCustomizationSectionCollapsed(section, !isUiCustomizationSectionCollapsed(section));
+            // Accordion: opening a section folds the others, so one section
+            // of checkboxes is on screen at a time. Collapse all / Expand all
+            // above still opens everything at once.
+            var expand = isUiCustomizationSectionCollapsed(clicked);
+            modal.querySelectorAll('.ui-custom-section').forEach(function (section) {
+                setUiCustomizationSectionCollapsed(section, section !== clicked || !expand);
+            });
             updateCollapseAllBtn(modal);
         });
     }
@@ -4012,9 +4034,11 @@
                 hiddenOnlyToggle.checked = false;
             }
 
-            // Every section opens again on each visit, like the filter
+            // Every section starts folded on each visit, like the filter
+            // is reset: the accordion in initSectionCollapseButtons() opens
+            // them one at a time.
             modal.querySelectorAll('.ui-custom-section').forEach(function (section) {
-                setUiCustomizationSectionCollapsed(section, false);
+                setUiCustomizationSectionCollapsed(section, true);
             });
             updateCollapseAllBtn(modal);
 

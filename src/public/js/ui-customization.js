@@ -46,9 +46,12 @@
     // working. See poznoteNormalizeHiddenUiKey() in functions.php.
     var RENAMED_UI_KEYS = {
         'toolbar:btn-share': 'toolbar:btn-publish',
-        // Notifications and AI chat moved from the icon rail to the sidebar header.
+        // Notifications moved from the icon rail to the sidebar header.
         'card:iconSidebarNotificationsBtn': 'card:sidebarNotificationsBtn',
-        'card:iconSidebarAiChatBtn': 'card:sidebarAiChatBtn',
+        // The AI assistant button left the icon rail for the floating stack
+        // at the bottom-right of the page (ui_customization_panel.php).
+        'card:iconSidebarAiChatBtn': 'card:edgeAiChatBtn',
+        'card:sidebarAiChatBtn': 'card:edgeAiChatBtn',
         // The workspace menu's single "Workspaces" entry became "Edit
         // workspaces" once "New workspace" got its own entry.
         'wsmenu:goto-workspaces': 'wsmenu:edit-workspaces'
@@ -68,6 +71,25 @@
             });
     }
 
+    // Keys the administrator hides for every user (empty for administrators),
+    // applied on top of the user's own set. Emitted by
+    // poznoteRenderUiCustomizationBootstrap() next to the merged list.
+    function getEnforcedGlobalKeys() {
+        var keys = window.__POZNOTE_GLOBAL_HIDDEN_UI_ELEMENTS__;
+        return Array.isArray(keys) ? keys : [];
+    }
+
+    function mergeEnforcedGlobalKeys(userHidden) {
+        var seen = Object.create(null);
+        var merged = [];
+        getEnforcedGlobalKeys().concat(Array.isArray(userHidden) ? userHidden : []).forEach(function (key) {
+            if (typeof key !== 'string' || seen[key]) return;
+            seen[key] = true;
+            merged.push(key);
+        });
+        return merged;
+    }
+
     function publishHiddenKeys(hidden) {
         var hiddenKeyMap = Object.create(null);
 
@@ -80,7 +102,13 @@
             hiddenKeyMap: hiddenKeyMap,
             isHidden: function (key) {
                 return !!hiddenKeyMap[key];
-            }
+            },
+            // Re-apply the user's own set without a reload (contextual panel,
+            // js/ui-customization-panel.js); the enforced keys are merged in.
+            apply: function (userHidden) {
+                applyHiddenKeys(mergeEnforcedGlobalKeys(userHidden));
+            },
+            normalizeKeys: sanitizeHiddenKeys
         };
 
         try {
@@ -319,103 +347,103 @@
         });
     }
 
-    function applyHiddenElements() {
-        function applyHiddenKeys(hidden) {
-            hidden = sanitizeHiddenKeys(hidden);
-            publishHiddenKeys(hidden);
+    function applyHiddenKeys(hidden) {
+        hidden = sanitizeHiddenKeys(hidden);
+        publishHiddenKeys(hidden);
 
-            var rules = [];
+        var rules = [];
 
-            hidden.forEach(function (key) {
-                var parts = key.split(':');
-                if (parts.length !== 2) return;
+        hidden.forEach(function (key) {
+            var parts = key.split(':');
+            if (parts.length !== 2) return;
 
-                var type = parts[0];
-                var id = parts[1];
+            var type = parts[0];
+            var id = parts[1];
 
-                if (type === 'card') {
-                    if (id === 'ui-customization-card') return;
-                    rules.push('#' + id + ' { display: none !important; }');
+            if (type === 'card') {
+                if (id === 'ui-customization-card') return;
+                rules.push('#' + id + ' { display: none !important; }');
 
-                    if (CREATE_MENU_OPTION_SELECTORS[key]) {
-                        rules.push('#create-menu ' + CREATE_MENU_OPTION_SELECTORS[key] + ' { display: none !important; }');
-                    }
-                } else if (type === 'toolbar') {
-                    rules.push('.note-edit-toolbar .' + id + ', .note-edit-toolbar .' + id + ':not(.hide-on-selection) { display: none !important; }');
-                    rules.push('.mobile-toolbar-menu [data-selector=".' + id + '"] { display: none !important; }');
-                    if (id === 'btn-markdown-syntax') {
-                        rules.push('.mobile-toolbar-menu [data-action="open-markdown-syntax"] { display: none !important; }');
-                    } else if (id === 'btn-snapshot') {
-                        rules.push('.mobile-toolbar-menu [data-action="show-snapshot"] { display: none !important; }');
-                    } else if (id === 'btn-split-view') {
-                        rules.push('.note-edit-toolbar .markdown-split-btn, .note-edit-toolbar .markdown-split-btn:not(.hide-on-selection) { display: none !important; }');
-                    } else if (id === 'btn-search-replace') {
-                        // The selection formatting toolbar has its own copy of the button
-                        rules.push('.note-edit-toolbar .btn-search-replace-format, .note-edit-toolbar .btn-search-replace-format.show-on-selection { display: none !important; }');
-                    } else if (id === 'btn-tasklist-actions') {
-                        rules.push('.tasklist-actions-dropdown { display: none !important; }');
-                    } else if (id === 'btn-audio') {
-                        rules.push('.mobile-toolbar-menu [data-action="insert-audio-file"] { display: none !important; }');
-                    } else if (id === 'btn-clear-completed') {
-                        rules.push('.mobile-toolbar-menu [data-action="clear-completed-tasks"] { display: none !important; }');
-                    } else if (id === 'btn-uncheck-all') {
-                        rules.push('.mobile-toolbar-menu [data-action="uncheck-all-tasks"] { display: none !important; }');
-                    } else if (id === 'btn-print') {
-                        rules.push('.mobile-toolbar-menu [data-action="print-note"] { display: none !important; }');
-                    }
-                } else if (type === 'wsmenu') {
-                    rules.push('.workspace-menu-item[data-action="' + id + '"] { display: none !important; }');
-                } else if (type === 'folder') {
-                    rules.push('.folder-actions-menu-item[data-action="' + id + '"] { display: none !important; }');
-                    if (id === 'toggle-sort-submenu') {
-                        rules.push('.sort-submenu { display: none !important; }');
-                    }
-                } else if (type === 'note') {
-                    // Scoped to the menu: the same data-action values are used by
-                    // the note toolbar and by the note icons in the tree, which
-                    // this setting must not touch. !important also beats the
-                    // inline display populateNoteActionsMenu() sets on the
-                    // share/favorite state variants.
-                    rules.push('.note-actions-menu-item[data-action="' + id + '"] { display: none !important; }');
-                } else if (type === 'panel') {
-                    if (id === 'mini-calendar') {
-                        rules.push('.mini-calendar-container { display: none !important; }');
-                    } else if (id === 'folder-actions-toggle') {
-                        rules.push('.folder-actions-toggle { display: none !important; }');
-                    } else if (id === 'note-actions-toggle') {
-                        rules.push('.note-actions-toggle { display: none !important; }');
-                    } else if (id === 'note-created-date') {
-                        rules.push('.note-subline { display: none !important; }');
-                    } else if (id === 'note-icons') {
-                        rules.push('.note-icon { display: none !important; }');
-                    } else if (id === 'folder-note-count') {
-                        rules.push('.folder-note-count { display: none !important; }');
-                    } else if (id === 'outline-panel') {
-                        rules.push('#outline-panel { display: none !important; }');
-                        rules.push('#outlineResizeHandle { display: none !important; }');
-                        rules.push('#outlineMobileBackdrop { display: none !important; }');
-                    } else if (id === 'tasklist-progress') {
-                        rules.push('.tasklist-progress { display: none !important; }');
-                    }
+                if (CREATE_MENU_OPTION_SELECTORS[key]) {
+                    rules.push('#create-menu ' + CREATE_MENU_OPTION_SELECTORS[key] + ' { display: none !important; }');
                 }
-            });
-
-            var existingStyle = document.getElementById('ui-customization-styles');
-            if (rules.length > 0) {
-                if (!existingStyle) {
-                    existingStyle = document.createElement('style');
-                    existingStyle.setAttribute('id', 'ui-customization-styles');
-                    document.head.appendChild(existingStyle);
+            } else if (type === 'toolbar') {
+                rules.push('.note-edit-toolbar .' + id + ', .note-edit-toolbar .' + id + ':not(.hide-on-selection) { display: none !important; }');
+                rules.push('.mobile-toolbar-menu [data-selector=".' + id + '"] { display: none !important; }');
+                if (id === 'btn-markdown-syntax') {
+                    rules.push('.mobile-toolbar-menu [data-action="open-markdown-syntax"] { display: none !important; }');
+                } else if (id === 'btn-snapshot') {
+                    rules.push('.mobile-toolbar-menu [data-action="show-snapshot"] { display: none !important; }');
+                } else if (id === 'btn-split-view') {
+                    rules.push('.note-edit-toolbar .markdown-split-btn, .note-edit-toolbar .markdown-split-btn:not(.hide-on-selection) { display: none !important; }');
+                } else if (id === 'btn-search-replace') {
+                    // The selection formatting toolbar has its own copy of the button
+                    rules.push('.note-edit-toolbar .btn-search-replace-format, .note-edit-toolbar .btn-search-replace-format.show-on-selection { display: none !important; }');
+                } else if (id === 'btn-tasklist-actions') {
+                    rules.push('.tasklist-actions-dropdown { display: none !important; }');
+                } else if (id === 'btn-audio') {
+                    rules.push('.mobile-toolbar-menu [data-action="insert-audio-file"] { display: none !important; }');
+                } else if (id === 'btn-clear-completed') {
+                    rules.push('.mobile-toolbar-menu [data-action="clear-completed-tasks"] { display: none !important; }');
+                } else if (id === 'btn-uncheck-all') {
+                    rules.push('.mobile-toolbar-menu [data-action="uncheck-all-tasks"] { display: none !important; }');
+                } else if (id === 'btn-print') {
+                    rules.push('.mobile-toolbar-menu [data-action="print-note"] { display: none !important; }');
                 }
-                existingStyle.textContent = rules.join('\n');
-            } else if (existingStyle && existingStyle.parentNode) {
-                existingStyle.parentNode.removeChild(existingStyle);
+            } else if (type === 'wsmenu') {
+                rules.push('.workspace-menu-item[data-action="' + id + '"] { display: none !important; }');
+            } else if (type === 'folder') {
+                rules.push('.folder-actions-menu-item[data-action="' + id + '"] { display: none !important; }');
+                if (id === 'toggle-sort-submenu') {
+                    rules.push('.sort-submenu { display: none !important; }');
+                }
+            } else if (type === 'note') {
+                // Scoped to the menu: the same data-action values are used by
+                // the note toolbar and by the note icons in the tree, which
+                // this setting must not touch. !important also beats the
+                // inline display populateNoteActionsMenu() sets on the
+                // share/favorite state variants.
+                rules.push('.note-actions-menu-item[data-action="' + id + '"] { display: none !important; }');
+            } else if (type === 'panel') {
+                if (id === 'mini-calendar') {
+                    rules.push('.mini-calendar-container { display: none !important; }');
+                } else if (id === 'folder-actions-toggle') {
+                    rules.push('.folder-actions-toggle { display: none !important; }');
+                } else if (id === 'note-actions-toggle') {
+                    rules.push('.note-actions-toggle { display: none !important; }');
+                } else if (id === 'note-created-date') {
+                    rules.push('.note-subline { display: none !important; }');
+                } else if (id === 'note-icons') {
+                    rules.push('.note-icon { display: none !important; }');
+                } else if (id === 'folder-note-count') {
+                    rules.push('.folder-note-count { display: none !important; }');
+                } else if (id === 'outline-panel') {
+                    rules.push('#outline-panel { display: none !important; }');
+                    rules.push('#outlineResizeHandle { display: none !important; }');
+                    rules.push('#outlineMobileBackdrop { display: none !important; }');
+                } else if (id === 'tasklist-progress') {
+                    rules.push('.tasklist-progress { display: none !important; }');
+                }
             }
+        });
 
-            scheduleVisibilitySync();
-            startObserver();
+        var existingStyle = document.getElementById('ui-customization-styles');
+        if (rules.length > 0) {
+            if (!existingStyle) {
+                existingStyle = document.createElement('style');
+                existingStyle.setAttribute('id', 'ui-customization-styles');
+                document.head.appendChild(existingStyle);
+            }
+            existingStyle.textContent = rules.join('\n');
+        } else if (existingStyle && existingStyle.parentNode) {
+            existingStyle.parentNode.removeChild(existingStyle);
         }
 
+        scheduleVisibilitySync();
+        startObserver();
+    }
+
+    function applyHiddenElements() {
         var initialHiddenKeys = getInitialHiddenKeys();
         if (initialHiddenKeys !== null) {
             applyHiddenKeys(initialHiddenKeys);

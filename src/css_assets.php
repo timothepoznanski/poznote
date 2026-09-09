@@ -256,6 +256,8 @@ function poznoteCssManifest(): array
             'css/favorites.css',
             'css/home/alerts.css',
             'css/dashboard.css',
+            'css/modals/ui-customization.css',
+            'css/ui-customization-panel.css',
             '@theme',
             '@icon-sidebar',
         ],

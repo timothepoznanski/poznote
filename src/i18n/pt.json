@@ -1215,7 +1215,15 @@
       "folder_actions_toggle": "Botão de menu (⋮) nas pastas",
       "note_actions_toggle": "Botão de menu (⋮) nas notas",
       "note_actions_hint": "Itens do menu ⋮ de cada nota na barra lateral. Desmarcar todos oculta o botão do menu.",
-      "theme_toggle": "Botão de tema"
+      "theme_toggle": "Botão de tema",
+      "panel_title": "Personalizar esta página",
+      "panel_button": "Personalizar a interface",
+      "panel_hint": "Apenas os elementos desta página são listados. As alterações aplicam-se imediatamente e são guardadas automaticamente.",
+      "panel_admin_note": "Este painel só altera a sua própria interface; a coluna «Utilizadores» está nas definições.",
+      "panel_all_options": "Todas as opções",
+      "panel_saving": "A guardar…",
+      "panel_saved": "Guardado",
+      "panel_save_error": "Não foi possível guardar, tente novamente."
     },
     "icon_sidebar_order": {
       "title": "Ordem da barra de ícones",

@@ -522,12 +522,9 @@ if ($isPublicWorkspaceReadonly) {
     // below are appended here because their handlers only exist on this page.
     $iconSidebarWorkspace = ($workspace_filter !== '' && $workspace_filter !== '__last_opened__') ? $workspace_filter : '';
     // Notifications live in the sidebar header instead (next to the create
-    // button). The AI assistant keeps its id from that period so the
-    // UI Customization preferences saved against it stay valid.
+    // button), and the AI assistant toggle in the floating stack at the
+    // bottom-right of the page (ui_customization_panel.php).
     $iconSidebarExtraItems = [];
-    if ($aiChatEnabled) {
-        $iconSidebarExtraItems[] = ['id' => 'sidebarAiChatBtn', 'after' => 'iconSidebarDashboardBtn', 'action' => 'toggle-ai-chat', 'icon' => 'lucide-bot', 'label' => t('ai_chat.toolbar_button', [], 'AI assistant')];
-    }
     if ($showGitSync) {
         $iconSidebarExtraItems[] = ['id' => 'iconSidebarGitPushBtn', 'gitAction' => 'push', 'icon' => 'lucide-upload', 'label' => 'Push', 'hidden' => !$currentWorkspaceSynced];
         $iconSidebarExtraItems[] = ['id' => 'iconSidebarGitPullBtn', 'gitAction' => 'pull', 'icon' => 'lucide-download', 'label' => 'Pull', 'hidden' => !$currentWorkspaceSynced];
@@ -729,6 +726,15 @@ if ($isPublicWorkspaceReadonly) {
 
     <?php if ($aiChatEnabled): ?>
     <?php include __DIR__ . '/../ai_chat_panel.php'; ?>
+    <?php endif; ?>
+
+    <?php if (!$isPublicWorkspaceReadonly): ?>
+    <?php
+    // Contextual UI Customization: floating button + docked column listing
+    // the hideable elements of this page (see ui_customization_panel.php)
+    $uiCustomizationPanelPage = 'notes';
+    include __DIR__ . '/../ui_customization_panel.php';
+    ?>
     <?php endif; ?>
 
     <!-- Data for initialization (used by index-events.js) -->
