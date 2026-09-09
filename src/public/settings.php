@@ -1296,6 +1296,17 @@ if ($canUseUserWebhooks) {
                 </div>
             </a>
 
+            <!-- Tips -->
+            <a href="https://poznote.com/tips.html" target="_blank" rel="noopener noreferrer" class="home-card" id="tips-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.tips', [], 'Discover tips and tricks to get the most out of Poznote.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-lightbulb"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.tips', [], 'Tips'); ?></span>
+                </div>
+            </a>
+
             <!-- Discord community -->
             <a href="https://discord.gg/AWhWWSEkJ" target="_blank" rel="noopener noreferrer" class="home-card" id="discord-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.discord', [], 'Join the Poznote community on Discord.'); ?>"><i class="lucide lucide-help-circle"></i></span>
