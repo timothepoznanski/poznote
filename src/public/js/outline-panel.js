@@ -1121,11 +1121,7 @@ function scrollToHeading(heading) {
                 markdownPreview.scrollTop = Math.max(0, offset);
 
                 // Highlight the heading in preview
-                heading.element.style.transition = 'background-color 0.3s ease';
-                heading.element.style.backgroundColor = 'rgba(0, 125, 184, 0.1)';
-                setTimeout(() => {
-                    heading.element.style.backgroundColor = '';
-                }, 1000);
+                highlightOutlineTarget(heading.element);
             }
             return;
         }
@@ -1277,13 +1273,37 @@ function waitForOutlineScrollToSettle(readScrollTop, callback) {
     requestAnimationFrame(tick);
 }
 
+// How long the flash behind the heading an outline link scrolled to stays,
+// in step with the animation in css/outline.css.
+const OUTLINE_TARGET_FLASH_MS = 1300;
+
 function highlightOutlineTarget(element) {
-    // Briefly highlight the element
-    element.style.transition = 'background-color 0.3s ease';
-    element.style.backgroundColor = 'rgba(0, 125, 184, 0.1)';
-    setTimeout(() => {
-        element.style.backgroundColor = '';
-    }, 1000);
+    if (!element || typeof element.getBoundingClientRect !== 'function') return;
+
+    // An overlay above the page, never a background written on the heading:
+    // in a rich-text note the heading is part of the editable content the
+    // autosave serialises, and a flash set on it was saved with the note.
+    const flash = document.createElement('div');
+    flash.className = 'outline-target-flash';
+    flash.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(flash);
+
+    const deadline = Date.now() + OUTLINE_TARGET_FLASH_MS;
+    const follow = () => {
+        if (Date.now() > deadline || !element.isConnected) {
+            flash.remove();
+            return;
+        }
+        // Re-read every frame: the smooth scroll that brings the heading
+        // into view is still running when the flash starts.
+        const rect = element.getBoundingClientRect();
+        flash.style.top = rect.top + 'px';
+        flash.style.left = rect.left + 'px';
+        flash.style.width = rect.width + 'px';
+        flash.style.height = rect.height + 'px';
+        requestAnimationFrame(follow);
+    };
+    follow();
 }
 
 /**

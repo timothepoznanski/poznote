@@ -504,6 +504,13 @@ function emergencySave(noteId) {
         // <div><br></div>, and injected &nbsp; used to accumulate across
         // save/reload cycles (also cleans up notes polluted by older versions)
         ent = ent.replace(/(?:&nbsp;|\u00A0)*<br\s*[\/]?>/gi, "<br>");
+        // Until 6.81.4 the outline flashed the heading a link scrolled to by
+        // writing a background on the heading itself, and never removed the
+        // transition, so any save made meanwhile kept them. The flash is an
+        // overlay now; this strips what those saves left in the note.
+        ent = ent
+            .replace(/\s*(?:transition:\s*background-color 0\.3s ease(?: 0s)?|background-color:\s*rgba\(0,\s*125,\s*184,\s*0\.1\))\s*;?/gi, '')
+            .replace(/\s+style=""/g, '');
     }
 
     const tags = tagsElem ? tagsElem.value : '';
