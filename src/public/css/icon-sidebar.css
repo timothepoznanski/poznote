@@ -147,7 +147,7 @@
     align-self: stretch;
     margin: 8px 4px 0;
     padding: 6px 0 0;
-    border-top: 2px solid var(--pz-border);
+    border-top: 1px solid var(--pz-border);
 }
 
 /* Tighter than the navigation entries above: five account actions at the
@@ -161,16 +161,17 @@
    line as the account group's divider below. js/icon-sidebar-toggle.js sets
    [hidden] on the ones left with no visible entry on one side once UI
    Customization or the git scope has hidden buttons. */
-/* 2px, not the 1px hairline this used to be. A 1px line lands on a whole device
-   pixel at some heights and straddles two at others as soon as the display is
-   scaled by a fraction, so the rail's separators rendered at visibly different
-   weights from one another at 125% and 150%. 2px is even at those ratios. The
-   group divider and the account group's border below have to match. */
+/* A 1px line lands on a whole device pixel at some heights and straddles two at
+   others once the display is scaled by a fraction, and a straddled line reads
+   as thicker. What keeps the rail's separators matching each other is not their
+   height but the 4px grid: the block below is 3 + 1 + 4 = 8px, so a divider
+   does not shift the subpixel offset of what follows it. Keep the total at a
+   multiple of 4 if you ever change the height. */
 .icon-sidebar-divider {
     flex-shrink: 0;
     align-self: stretch;
-    height: 2px;
-    margin: 3px 4px;
+    height: 1px;
+    margin: 3px 4px 4px;
     background: var(--pz-border);
 }
 
