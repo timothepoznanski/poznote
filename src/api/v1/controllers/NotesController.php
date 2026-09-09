@@ -1331,6 +1331,13 @@ class NotesController {
                     }
                 }
 
+                // An AI assistant writing through the MCP server may drop
+                // most of a note in one call: keep the previous version as
+                // a snapshot first. The web editor never takes this path.
+                if (isApiServiceTokenRequest()) {
+                    poznoteCreateSafetySnapshot($this->con, $noteId, 'mcp');
+                }
+
                 $write_result = file_put_contents($filename, $contentToSave);
                 if ($write_result === false) {
                     $this->sendError(500, 'Failed to write file');

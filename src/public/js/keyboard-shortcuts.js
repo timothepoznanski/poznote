@@ -1,6 +1,7 @@
 /**
  * Global keyboard shortcuts
  * - Ctrl+S / Cmd+S: save the current note (setting: ctrl_s_save_enabled)
+ * - Ctrl+Alt+S / Cmd+Alt+S: take a snapshot of the current note (always on)
  * - Alt+ArrowUp / Alt+ArrowDown: switch between notes in the current folder (setting: note_nav_shortcuts_enabled)
  */
 
@@ -101,6 +102,18 @@
 
     function handleShortcutKeydown(e) {
         if (e.defaultPrevented) return;
+
+        // Ctrl+Alt+S / Cmd+Alt+S takes a snapshot of the current note. Keyed on
+        // e.key so a layout where AltGr+S types a letter (Polish "ś") is left
+        // alone; on a Mac, Option+S reports "ß", hence the physical key check.
+        if ((e.ctrlKey || e.metaKey) && e.altKey && !e.shiftKey && e.key
+            && (e.key.toLowerCase() === 's' || (e.metaKey && e.code === 'KeyS'))) {
+            if (typeof window.takeSnapshotShortcut !== 'function') return;
+            if (window.takeSnapshotShortcut()) {
+                e.preventDefault();
+            }
+            return;
+        }
 
         // Ctrl+S / Cmd+S saves the current note (Ctrl+Shift+S stays strikethrough)
         if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && e.key && e.key.toLowerCase() === 's') {

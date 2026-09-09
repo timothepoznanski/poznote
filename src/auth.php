@@ -1439,6 +1439,19 @@ function hasApiAuthCredentials(): bool {
     return getApiBearerToken() !== null || getApiBasicCredentials() !== null;
 }
 
+/**
+ * True when the current request was authenticated with the internal MCP
+ * service token (data/.mcp_token), i.e. it comes from the MCP server acting
+ * for an AI assistant. Used to take a safety snapshot before such a client
+ * rewrites a note.
+ */
+function isApiServiceTokenRequest(): bool {
+    if (getApiBearerToken() === null) {
+        return false;
+    }
+    return (($_SESSION['login_user']['_api_auth_method'] ?? '') === 'service_token');
+}
+
 function isApiJwtBearerToken(string $token): bool {
     return substr_count($token, '.') === 2;
 }

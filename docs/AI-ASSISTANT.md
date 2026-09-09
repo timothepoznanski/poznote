@@ -27,6 +27,8 @@ When the assistant edits or creates a note, the open note and the sidebar refres
 
 The assistant reads and writes note content as Markdown. Rich-text (HTML) notes are converted on the fly in both directions, with the same converter as the **Convert note** action, so a rewrite keeps headings, lists, links, tables and images; rich formatting such as colors or fonts is not kept. A note too long for the assistant to read in full is refused for rewriting rather than truncated.
 
+Before the assistant changes the content of a note (rewrite, checkbox, task), Poznote takes a snapshot of the current version, labeled "Before AI edit" in the note's **Snapshots** menu. If the result is not what you wanted, restore that snapshot. The snapshot is skipped when the latest one already holds the same content, a single answer that touches the same note several times takes only one, and the 20 most recent of them are kept per note.
+
 The assistant is **scoped to the current workspace**: it only sees, searches and edits the notes of the workspace you opened the chat in, and new notes are created there. To ask about another workspace, switch to it first. On a dashboard showing several workspaces, the first click on the button says which workspace the assistant will act on and asks whether to continue.
 
 The conversation is kept while your browser tab stays open (it survives page reloads) and can be wiped at any time with the trash button in the panel header.

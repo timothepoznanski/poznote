@@ -406,6 +406,8 @@ const POZNOTE_SNAPSHOTS_DEFAULT_COUNT = 3;
 const POZNOTE_SNAPSHOTS_MIN_COUNT = 1;
 const POZNOTE_SNAPSHOTS_MAX_COUNT = 30;
 const POZNOTE_SNAPSHOTS_MAX_AGE_DAYS = 30;
+// Snapshots taken before an AI assistant / MCP edit kept per note (newest first)
+const POZNOTE_SNAPSHOTS_SAFETY_MAX_COUNT = 20;
 
 
 

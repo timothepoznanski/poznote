@@ -7,7 +7,9 @@
  * and users can also add more snapshots manually during the same day.
  * Keeps up to getSnapshotsKeepCount() automatic snapshots per note (3 by
  * default, user setting snapshots_keep_count); manual snapshots are not
- * limited. Every snapshot expires after POZNOTE_SNAPSHOTS_MAX_AGE_DAYS.
+ * limited. A manual snapshot is also taken, tagged with its origin, right
+ * before the AI assistant or the MCP server rewrites a note (see
+ * createSafetySnapshot). Every snapshot expires after POZNOTE_SNAPSHOTS_MAX_AGE_DAYS.
  * Attachments and images removed from a note stay on disk while a snapshot
  * references them (see poznotePruneSnapshotOnlyAttachments), so an older
  * state can be restored.
@@ -35,7 +37,9 @@ class SnapshotsController {
     /**
      * Expire snapshots older than POZNOTE_SNAPSHOTS_MAX_AGE_DAYS, then purge
      * automatic (daily) snapshots beyond the newest $maxSnapshots for a given
-     * note. Manual snapshots only expire and do not count toward the limit.
+     * note, and safety snapshots (taken before an AI or MCP edit) beyond the
+     * newest POZNOTE_SNAPSHOTS_SAFETY_MAX_COUNT. User-made manual snapshots
+     * only expire and do not count toward either limit.
      */
     private function purgeOldSnapshots(string $noteSnapshotDir): void {
         poznoteExpireNoteSnapshots($this->con, (int) basename($noteSnapshotDir));
@@ -48,6 +52,7 @@ class SnapshotsController {
         if ($files === false) return;
 
         $snapshots = [];
+        $safetySnapshots = [];
 
         foreach ($files as $file) {
             if ($file === '.' || $file === '..') continue;
@@ -65,21 +70,40 @@ class SnapshotsController {
             $paths = $this->getSnapshotPaths($noteSnapshotDir, $parsed['key'], $parsed['extension']);
             $meta = $this->readSnapshotMeta($paths['meta']);
 
-            if ((bool) ($meta['manual'] ?? $parsed['manual'])) {
-                continue;
-            }
-
-            $snapshots[] = [
+            $record = [
                 'key' => $parsed['key'],
                 'snapshot_file' => $snapshotFile,
                 'meta_file' => $paths['meta'],
                 'created_at_raw' => (string) ($meta['created_at'] ?? ''),
                 'date' => $parsed['date']
             ];
+
+            if ((bool) ($meta['manual'] ?? $parsed['manual'])) {
+                if (in_array((string) ($meta['origin'] ?? ''), ['ai', 'mcp'], true)) {
+                    $safetySnapshots[] = $record;
+                }
+                continue;
+            }
+
+            $snapshots[] = $record;
         }
 
-        if (count($snapshots) <= $this->maxSnapshots) {
+        $removed = $this->deleteBeyondNewest($snapshots, $this->maxSnapshots)
+            + $this->deleteBeyondNewest($safetySnapshots, POZNOTE_SNAPSHOTS_SAFETY_MAX_COUNT);
+        if ($removed === 0) {
             return;
+        }
+
+        poznotePruneSnapshotOnlyAttachments($this->con, (int) basename($noteSnapshotDir));
+    }
+
+    /**
+     * Delete every snapshot of the list but the $keep newest ones. Returns
+     * the number of snapshots removed.
+     */
+    private function deleteBeyondNewest(array $snapshots, int $keep): int {
+        if (count($snapshots) <= $keep) {
+            return 0;
         }
 
         usort($snapshots, function (array $a, array $b): int {
@@ -101,12 +125,14 @@ class SnapshotsController {
             return strcmp((string) ($b['key'] ?? ''), (string) ($a['key'] ?? ''));
         });
 
-        foreach (array_slice($snapshots, $this->maxSnapshots) as $snapshot) {
+        $removed = 0;
+        foreach (array_slice($snapshots, $keep) as $snapshot) {
             @unlink((string) $snapshot['snapshot_file']);
             @unlink((string) $snapshot['meta_file']);
+            $removed++;
         }
 
-        poznotePruneSnapshotOnlyAttachments($this->con, (int) basename($noteSnapshotDir));
+        return $removed;
     }
 
     /**
@@ -407,6 +433,7 @@ class SnapshotsController {
                 'heading' => $meta['heading'] ?? '',
                 'type' => $meta['type'] ?? 'note',
                 'manual' => (bool) ($meta['manual'] ?? $parsed['manual']),
+                'origin' => (string) ($meta['origin'] ?? ''),
                 'created_at_raw' => (string) ($meta['created_at'] ?? ''),
                 'created_at' => $this->formatSnapshotCreatedAt((string) ($meta['created_at'] ?? '')),
                 'snapshot_file' => $paths['snapshot'],
@@ -542,7 +569,7 @@ class SnapshotsController {
     /**
      * Create a snapshot for a note and return an API-compatible result.
      */
-    public function createSnapshotForNote(int $noteId, bool $manual = false): array {
+    public function createSnapshotForNote(int $noteId, bool $manual = false, ?string $origin = null): array {
         if ($noteId <= 0) {
             return [
                 'success' => false,
@@ -624,6 +651,11 @@ class SnapshotsController {
                 'manual' => $manual,
                 'created_at' => gmdate('Y-m-d H:i:s')
             ];
+            if ($origin !== null && $origin !== '') {
+                // Who asked for this manual snapshot: 'ai' (built-in assistant)
+                // or 'mcp' (MCP server), taken right before they change the note
+                $meta['origin'] = $origin;
+            }
             
             // Write snapshot file
             if (file_put_contents($snapshotPaths['snapshot'], $content) === false) {
@@ -663,6 +695,65 @@ class SnapshotsController {
      */
     public function ensureAutomaticSnapshot(int $noteId): array {
         return $this->createSnapshotForNote($noteId, false);
+    }
+
+    /**
+     * Take a manual snapshot tagged with its origin ('ai' or 'mcp') right
+     * before an automated writer replaces the content of a note, so the
+     * previous version stays one click away in the Snapshots modal. At most
+     * POZNOTE_SNAPSHOTS_SAFETY_MAX_COUNT of them are kept per note.
+     * Skipped when the note is still empty, and when the newest snapshot
+     * already holds the current content (the note was opened today and not
+     * edited since, or the writer edits the same note repeatedly): nothing
+     * would be gained by a duplicate.
+     */
+    public function createSafetySnapshot(int $noteId, string $origin): array {
+        if ($noteId <= 0) {
+            return [
+                'success' => false,
+                'status' => 400,
+                'error' => t('snapshot.api.invalid_note_id', [], 'Invalid note ID')
+            ];
+        }
+
+        try {
+            $stmt = $this->con->prepare("SELECT id, heading, type, entry, created FROM entries WHERE id = ? AND trash = 0");
+            $stmt->execute([$noteId]);
+            $note = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$note) {
+                return [
+                    'success' => false,
+                    'status' => 404,
+                    'error' => t('snapshot.api.note_not_found', [], 'Note not found')
+                ];
+            }
+
+            $noteType = $note['type'] ?? 'note';
+            $expectedExtension = ($noteType === 'markdown') ? 'md' : 'html';
+            $noteSnapshotDir = $this->getSnapshotsPath() . '/' . $noteId;
+            $currentContent = $this->getCurrentNoteContent($note);
+            if ($this->isSnapshotContentEmpty($currentContent, $noteType)) {
+                // Nothing to protect (a note the assistant is filling in)
+                return ['success' => true, 'skipped' => true, 'reason' => 'empty'];
+            }
+
+            $existing = $this->collectSnapshots($noteSnapshotDir, $expectedExtension);
+            if ($existing !== []) {
+                $newestContent = @file_get_contents($existing[0]['snapshot_file']);
+                if (is_string($newestContent) && $newestContent === $currentContent) {
+                    return [
+                        'success' => true,
+                        'skipped' => true,
+                        'reason' => 'unchanged',
+                        'snapshot_key' => $existing[0]['key']
+                    ];
+                }
+            }
+        } catch (Exception $e) {
+            error_log('Snapshot safety check error: ' . $e->getMessage());
+        }
+
+        return $this->createSnapshotForNote($noteId, true, $origin);
     }
 
     /**
@@ -723,6 +814,7 @@ class SnapshotsController {
                     'heading' => $snapshot['heading'],
                     'type' => $snapshot['type'],
                     'manual' => $snapshot['manual'],
+                    'origin' => $snapshot['origin'],
                     'created_at' => $snapshot['created_at']
                 ];
             }, $snapshots);
@@ -821,6 +913,7 @@ class SnapshotsController {
                     'heading' => $meta['heading'] ?? ($snapshotRecord['heading'] ?? ''),
                     'type' => $meta['type'] ?? ($snapshotRecord['type'] ?? $noteType),
                     'manual' => (bool) ($meta['manual'] ?? ($snapshotRecord['manual'] ?? false)),
+                    'origin' => (string) ($meta['origin'] ?? ($snapshotRecord['origin'] ?? '')),
                     'content' => $content,
                     'created_at' => $this->formatSnapshotCreatedAt((string) ($meta['created_at'] ?? ''))
                 ]

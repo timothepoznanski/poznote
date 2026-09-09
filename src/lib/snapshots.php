@@ -234,6 +234,41 @@ function poznoteExpireAllSnapshotsOccasionally(PDO $con) {
     }
 }
 
+/**
+ * Take a snapshot of a note right before an automated writer (the AI
+ * assistant, the MCP server) replaces its content, so hours of edits are
+ * never one bad rewrite away from being lost. Best-effort: a failure is
+ * logged and never blocks the write. One snapshot per note per request,
+ * whatever the number of tool calls that touch it. Returns true when a
+ * snapshot was actually written.
+ */
+function poznoteCreateSafetySnapshot(PDO $con, $noteId, string $origin): bool {
+    static $done = [];
+
+    $noteId = (int) $noteId;
+    if ($noteId <= 0) {
+        return false;
+    }
+    if (isset($done[$noteId])) {
+        return false;
+    }
+    $done[$noteId] = true;
+
+    try {
+        require_once __DIR__ . '/../api/v1/controllers/SnapshotsController.php';
+        $controller = new SnapshotsController($con);
+        $result = $controller->createSafetySnapshot($noteId, $origin);
+        if (empty($result['success'])) {
+            error_log('Safety snapshot (' . $origin . ') failed for note ' . $noteId . ': ' . ($result['error'] ?? 'unknown error'));
+            return false;
+        }
+        return !empty($result['created']);
+    } catch (Throwable $e) {
+        error_log('Safety snapshot (' . $origin . ') failed for note ' . $noteId . ': ' . $e->getMessage());
+        return false;
+    }
+}
+
 function deleteNoteSnapshots($noteId) {
     $noteId = (int) $noteId;
     if ($noteId <= 0) {
