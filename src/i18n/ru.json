@@ -201,7 +201,9 @@
     },
     "title": "Настройки",
     "collapse_section": "Свернуть раздел",
+    "collapse_all_sections": "Свернуть все",
     "expand_section": "Развернуть раздел",
+    "expand_all_sections": "Развернуть все",
     "categories": {
       "pinned": "Закреплённые",
       "actions": "Действия",
@@ -341,6 +343,9 @@
       "saved": "Цвет обновлён",
       "save_error": "Не удалось обновить цвет",
       "invalid": "Недопустимый цвет"
+    },
+    "actions": {
+      "menu": "Действия рабочего пространства"
     }
   },
   "display": {
@@ -2258,7 +2263,6 @@
     "placeholder_combined": "Поиск по заметкам и тегам...",
     "search_in_notes": "Искать в заметках",
     "search_in_tags": "Искать по тегам",
-    "toggle_options": "Переключить параметры поиска",
     "toggle_date_filter": "Показать/скрыть фильтр даты",
     "created_from": "Создано с",
     "created_to": "Создано до",

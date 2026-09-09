@@ -416,12 +416,22 @@
         });
     }
 
+    // The settings page default is viewport dependent (13px on phones); the
+    // literal mirrors js/font-size-settings.js for the rare load order where
+    // that file has not defined its helper yet.
+    function settingsFontSizeFallback() {
+        if (typeof window.settingsFontSizeDefault === 'function') {
+            return window.settingsFontSizeDefault();
+        }
+        return (typeof isMobileDevice === 'function' && isMobileDevice()) ? '13' : '15';
+    }
+
     function refreshFontSizeBadge() {
         var fontBadges = [
             { id: 'font-size-badge', key: 'note_font_size', default: '15', i18nKey: 'display.badges.note_font_size', fallback: '' },
             { id: 'sidebar-font-size-badge', key: 'sidebar_font_size', default: '13', i18nKey: 'display.badges.sidebar_font_size', fallback: '' },
             { id: 'code-block-font-size-badge', key: 'code_block_font_size', default: '15', i18nKey: 'display.badges.code_block_font_size', fallback: '' },
-            { id: 'settings-font-size-badge', key: 'settings_font_size', default: '15', i18nKey: 'display.badges.settings_font_size', fallback: '' }
+            { id: 'settings-font-size-badge', key: 'settings_font_size', default: settingsFontSizeFallback(), i18nKey: 'display.badges.settings_font_size', fallback: '' }
         ];
 
         fontBadges.forEach(function (config) {
@@ -3075,6 +3085,28 @@
 
         var sectionLabelRefreshers = [];
 
+        // Collapse/expand-all button in the filter row: it mirrors the state
+        // of the sections, collapsing everything while at least one is open
+        // and reopening them once they are all closed. The always-expanded
+        // sections (Pinned) are left out of both the count and the action.
+        var collapseAllBtn = document.getElementById('settingsCollapseAll');
+        var collapsibleSections = [];
+
+        var updateCollapseAllBtn = function () {
+            if (!collapseAllBtn) return;
+            var allCollapsed = collapsibleSections.length > 0
+                && collapsibleSections.every(function (section) {
+                    return section.title.classList.contains('section-collapsed');
+                });
+            collapseAllBtn.classList.toggle('is-collapsed', allCollapsed);
+            var label = allCollapsed
+                ? (collapseAllBtn.getAttribute('data-label-expand') || 'Expand all')
+                : (collapseAllBtn.getAttribute('data-label-collapse') || 'Collapse all');
+            collapseAllBtn.setAttribute('aria-expanded', allCollapsed ? 'false' : 'true');
+            collapseAllBtn.setAttribute('aria-label', label);
+            collapseAllBtn.title = label;
+        };
+
         // Rebuilt from the DOM on every toggle so the stored list stays in sync
         // even when several sections change at once.
         var persistSectionStates = function () {
@@ -3120,6 +3152,9 @@
             sectionLabelRefreshers.push(function () {
                 applySectionState(title.classList.contains('section-collapsed'));
             });
+            if (alwaysExpandedSections.indexOf(sectionKey) === -1) {
+                collapsibleSections.push({ title: title, apply: applySectionState });
+            }
 
             // The button's click bubbles up here, so one listener covers both.
             // The desktop layout shows one section at a time: nothing to
@@ -3128,6 +3163,7 @@
                 if (isSettingsNavLayout()) return;
                 applySectionState(!title.classList.contains('section-collapsed'));
                 persistSectionStates();
+                updateCollapseAllBtn();
             });
         });
 
@@ -3158,6 +3194,20 @@
             // ?open=about deliberately stays in the URL: icon_sidebar.php reads
             // it to highlight About instead of Settings, so stripping it would
             // move the highlight back to Settings on the next reload.
+        }
+
+        if (collapseAllBtn) {
+            collapseAllBtn.addEventListener('click', function () {
+                var collapse = !collapsibleSections.every(function (section) {
+                    return section.title.classList.contains('section-collapsed');
+                });
+                collapsibleSections.forEach(function (section) {
+                    section.apply(collapse);
+                });
+                persistSectionStates();
+                updateCollapseAllBtn();
+            });
+            updateCollapseAllBtn();
         }
 
         // Card/list layout toggle next to the filter bar (same pattern as the

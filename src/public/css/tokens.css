@@ -124,6 +124,12 @@
        stylesheet overrides them. */
     --pz-bg: #ffffff;              /* page, card, menu and modal background */
     --pz-text-inverse: #ffffff;    /* label on an accent, dark or coloured ground */
+    /* Search matches: the highlighter yellow, and the orange of the current one.
+       Their own names, because the warning family is a text colour in several
+       themes and unreadable as a fill behind black text. */
+    --pz-mark: #ffff00;
+    --pz-mark-active: #ff9d00;
+    --pz-mark-active-border: #d35400;
 }
 
 /* ============================================
@@ -172,6 +178,9 @@ html[data-theme='dark'] {
     --dm-warning: #ffc107;
     --dm-warning-hover: #e0a800;
     --dm-warning-soft: #665500;
+    --pz-mark: var(--dm-warning);
+    --pz-mark-active: var(--dm-warning-hover);
+    --pz-mark-active-border: var(--dm-warning-hover);
 
     /* The light tokens, switched for this theme.
 

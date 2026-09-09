@@ -498,7 +498,9 @@
     },
     "title": "Paramètres",
     "collapse_section": "Réduire la section",
+    "collapse_all_sections": "Tout replier",
     "expand_section": "Développer la section",
+    "expand_all_sections": "Tout déplier",
     "categories": {
       "pinned": "Épinglés",
       "actions": "Actions",
@@ -600,7 +602,8 @@
     },
     "actions": {
       "select": "Sélectionner",
-      "move_notes": "Déplacer les notes"
+      "move_notes": "Déplacer les notes",
+      "menu": "Actions du workspace"
     },
     "count": {
       "notes_0": "0 notes",
@@ -823,7 +826,6 @@
     "placeholder_combined": "Rechercher dans les notes et les tags...",
     "search_in_notes": "Rechercher dans les notes",
     "search_in_tags": "Rechercher dans les tags",
-    "toggle_options": "Afficher/masquer les options de recherche",
     "toggle_date_filter": "Afficher/masquer le filtre de date",
     "created_from": "Créée à partir du",
     "created_to": "Créée jusqu'au",

@@ -110,13 +110,13 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
 }
 
 /* Settings Category Titles */
-/* Light, not normal: the section titles and the left nav are the page's own
-   furniture, and they read as labels rather than as a heading above the cards
-   when they sit a step below the card titles. css/fonts.css, which this page
-   links, is what makes 300 a real face and not a fallback to Regular. */
+/* Semibold: the section titles head the cards below them, so they sit a step
+   above the card titles (regular) instead of a step below. css/fonts.css,
+   which this page links, is what makes 600 a real face and not a synthesised
+   bold; there is no 500 face, so medium would render as Regular. */
 .settings-category-title {
     font-size: calc(1.1rem * var(--settings-font-scale, 1));
-    font-weight: var(--pz-weight-light);
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text);
     margin: 1.5rem 0 0.75rem 0;
     padding-bottom: 0.5rem;
@@ -258,6 +258,50 @@ html[data-theme='dark'] .settings-view-toggle:hover {
     color: var(--dm-accent, var(--dm-accent));
 }
 
+/* Collapse/expand all sections, at the right end of the filter row. Same
+   look as the view toggle above; the chevron mirrors the section chevrons,
+   pointing right once everything is collapsed. */
+.settings-collapse-all {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    padding: 0;
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    color: var(--pz-text-muted);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.settings-collapse-all:hover {
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
+}
+
+.settings-collapse-all .lucide {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.15s ease;
+}
+
+.settings-collapse-all.is-collapsed .lucide {
+    transform: rotate(-90deg);
+}
+
+html[data-theme='dark'] .settings-collapse-all {
+    background: var(--dm-surface, var(--dm-content-bg));
+    border-color: var(--dm-border);
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .settings-collapse-all:hover {
+    border-color: var(--dm-accent);
+    color: var(--dm-accent);
+}
+
 /* ---------- List layout: cards become compact full-width rows ---------- */
 
 /* On desktop the rows don't need the full grid width: halve the container */
@@ -322,11 +366,25 @@ html[data-theme='dark'] .settings-view-toggle:hover {
     flex-shrink: 0;
 }
 
-/* List view rows are compact: no help icon and no pin button at all (pinning
-   is done from the grid view) */
-.view-list .setting-help,
-.view-list .settings-card-pin {
+/* List view rows are compact: no help icon. The pin stays, since the list is
+   the mobile default and pinning would otherwise need a switch back to the
+   grid; it sits in the flow at the end of the row rather than in the
+   bottom-right corner, which the compact row has no space for. */
+.view-list .setting-help {
     display: none;
+}
+
+.view-list .settings-card-pin {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: 4px;
+    /* Comfortable tap target on touch without widening the row */
+    padding: 4px;
 }
 
 /* ---------- Pin button ----------
@@ -334,7 +392,7 @@ html[data-theme='dark'] .settings-view-toggle:hover {
    (same size, same muted grey, always visible); a pinned card shows it in
    blue instead (same pattern as the dashboard pin).
    Absolutely positioned, so it reserves no space: bottom-right corner in grid
-   view, hidden in list view, in the flow at the end of the row in the desktop
+   view; in the flow at the end of the row in list view and in the desktop
    layout. */
 
 /* The empty pinned section is hidden through the `hidden` attribute, but the
@@ -467,8 +525,10 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
         max-width: 900px;
     }
 
-    /* Rows are the only layout here: the grid/list toggle stays mobile-only */
-    .settings-with-nav .settings-view-toggle {
+    /* Rows are the only layout here, and one section shows at a time: the
+       grid/list toggle and the collapse-all button stay mobile-only */
+    .settings-with-nav .settings-view-toggle,
+    .settings-with-nav .settings-collapse-all {
         display: none;
     }
 
@@ -507,7 +567,7 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
         color: var(--pz-text-secondary);
         font: inherit;
         font-size: calc(14px * var(--settings-font-scale, 1));
-        font-weight: var(--pz-weight-light);
+        font-weight: var(--pz-weight-normal);
         line-height: 1.3;
         text-align: left;
         cursor: pointer;
@@ -524,8 +584,8 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
         color: var(--pz-text);
     }
 
-    /* Colour and background carry the active state; the weight stays normal
-       so the list reads as one text, not a bold row among light ones. */
+    /* Colour and background carry the active state; the weight stays the same
+       so the list reads as one text, not a bold row among regular ones. */
     .settings-nav-item.is-active {
         background: rgba(var(--pz-accent-rgb), 0.1);
         color: var(--pz-accent);

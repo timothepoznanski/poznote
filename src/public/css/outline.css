@@ -496,3 +496,25 @@ html[data-theme='dark'] #heading-copy-toast {
     background: var(--dm-border-light);
     color: var(--dm-text-bright);
 }
+
+/* The flash behind the heading an outline link scrolled to. A fixed overlay
+   that js/outline-panel.js keeps on the heading's box while it lasts, above
+   the page rather than a background on the heading itself: in a rich-text
+   note the heading is editable content, and anything written into it is what
+   the autosave serialises. */
+.outline-target-flash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 20;
+    pointer-events: none;
+    border-radius: var(--pz-radius-sm);
+    background: rgba(var(--pz-accent-rgb), 0.12);
+    animation: outline-target-flash 1.3s ease forwards;
+}
+
+@keyframes outline-target-flash {
+    0% { opacity: 0; }
+    20%, 75% { opacity: 1; }
+    100% { opacity: 0; }
+}

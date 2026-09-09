@@ -486,7 +486,9 @@
     },
     "title": "Einstellungen",
     "collapse_section": "Bereich einklappen",
+    "collapse_all_sections": "Alle einklappen",
     "expand_section": "Bereich ausklappen",
+    "expand_all_sections": "Alle ausklappen",
     "categories": {
       "pinned": "Angepinnt",
       "actions": "Aktionen",
@@ -588,7 +590,8 @@
     },
     "actions": {
       "select": "Auswählen",
-      "move_notes": "Notizen verschieben"
+      "move_notes": "Notizen verschieben",
+      "menu": "Workspace-Aktionen"
     },
     "count": {
       "notes_0": "0 Notizen",
@@ -804,7 +807,6 @@
     "placeholder_combined": "In Notizen und Tags suchen...",
     "search_in_notes": "In Notizen suchen",
     "search_in_tags": "In Tags suchen",
-    "toggle_options": "Suchoptionen ein-/ausblenden",
     "toggle_date_filter": "Datumsfilter ein-/ausblenden",
     "created_from": "Erstellt ab",
     "created_to": "Erstellt bis",

@@ -201,7 +201,9 @@
     },
     "title": "Settings",
     "collapse_section": "Collapse section",
+    "collapse_all_sections": "Collapse all",
     "expand_section": "Expand section",
+    "expand_all_sections": "Expand all",
     "categories": {
       "pinned": "Pinned",
       "actions": "Actions",
@@ -341,6 +343,9 @@
       "saved": "Color updated",
       "save_error": "Could not update the color",
       "invalid": "Invalid color"
+    },
+    "actions": {
+      "menu": "Workspace actions"
     }
   },
   "display": {
@@ -2316,7 +2321,6 @@
     "placeholder_combined": "Search in notes and tags...",
     "search_in_notes": "Search in notes",
     "search_in_tags": "Search in tags",
-    "toggle_options": "Toggle search options",
     "toggle_date_filter": "Toggle date filter",
     "created_from": "Created from",
     "created_to": "Created to",

@@ -114,7 +114,8 @@
     /* Both offsets keep the same 8px gap on the right: `right` applies while the
        bar scrolls and the button is stuck, `margin-right` while the tabs still
        fit. The solid box-shadow below is not a visual shadow: it paints that
-       gap opaque so a tab scrolling past cannot show through it. */
+       gap opaque so a tab scrolling past cannot show through it, so it has to
+       carry the bar's own background and not a hardcoded white. */
     right: 8px;
     margin-right: 8px;
     flex-shrink: 0;
@@ -123,7 +124,7 @@
     border: 1px solid var(--pz-border);
     border-radius: var(--pz-radius);
     background: var(--pz-bg);
-    box-shadow: 9px 0 0 0 #fff;
+    box-shadow: 9px 0 0 0 var(--pz-bg);
     color: var(--pz-text-muted);
     font-family: inherit;
     font-size: 0.75rem;

@@ -125,6 +125,20 @@ body {
     gap: 4px;
 }
 
+/* Narrow screens only: the actions that no longer fit on the row move behind
+   this kebab, at the right of the workspace name (or of its tags when it has
+   some). On desktop every action fits, so neither is ever shown. */
+.ws-actions-toggle,
+.ws-actions-menu {
+    display: none;
+}
+
+/* Action labels: invisible next to the icons on the row, printed next to the
+   icon once the button has been moved into the overflow menu. */
+.ws-icon-btn-text {
+    display: none;
+}
+
 .ws-icon-btn {
     display: inline-flex;
     align-items: center;
@@ -968,32 +982,177 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
         margin-bottom: 30px !important;
     }
     
+    /* The row stays on one line: the name (and its tags) on the left, as many
+       action icons as fit on the right. layoutWorkspaceRowActions() moves the
+       ones that no longer fit into the kebab menu at the end of the strip. */
     .workspace-list ul li {
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 10px !important;
+        flex-direction: row !important;
+        gap: 8px !important;
         padding: 15px 0 !important;
         border-bottom: 1px solid var(--pz-border);
     }
-    
-    .workspace-list .ws-col {
-        width: 100% !important;
-        flex-basis: auto !important;
+
+    /* Beats the align-items: flex-start !important that workspaces-inline.css,
+       loaded after this file, puts on the same selector. */
+    .workspace-list ul li.ws-row {
+        align-items: center !important;
+    }
+
+    .workspace-list .ws-col-name {
+        flex: 1 1 auto !important;
+        width: auto !important;
+        /* The floor the overflow measurement works against: the icons have
+           stopped fitting as soon as they push the name column past this.
+           layoutWorkspaceRowActions() replaces the fallback with the width the
+           name and its tags actually need, so a short name leaves room for more
+           icons on the line. */
+        min-width: var(--ws-name-reserve, 140px) !important;
+    }
+
+    .workspace-list .workspace-name-item,
+    .workspace-list .ws-tag-chip {
+        overflow-wrap: anywhere;
+    }
+
+    .workspace-list .ws-tags-row {
+        min-width: 0;
     }
 
     .workspace-list .ws-col-actions {
+        position: relative;
+        flex: 0 0 auto !important;
+        width: auto !important;
         flex-basis: auto !important;
-        justify-content: flex-start;
-    }
-
-    .workspace-list .ws-icon-actions {
-        flex-wrap: wrap;
-        gap: 6px;
+        justify-content: flex-end;
+        gap: 4px;
     }
 
     .workspace-list .ws-icon-btn {
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
+    }
+
+    /* The kebab only appears once something has actually been moved into it. */
+    .workspace-list .ws-col-actions.has-overflow .ws-actions-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        border: 1px solid transparent;
+        border-radius: var(--pz-radius);
+        background: transparent;
+        color: var(--pz-text-secondary);
+        cursor: pointer;
+    }
+
+    .workspace-list .ws-actions-toggle .lucide {
+        width: 18px;
+        height: 18px;
+        pointer-events: none;
+    }
+
+    .workspace-list .ws-col-actions.is-open .ws-actions-toggle {
+        background: var(--pz-surface-hover);
+        border-color: var(--pz-border);
+        color: var(--pz-accent);
+    }
+
+    /* The overflow menu: absolute inside .ws-col-actions, so it hangs under the
+       kebab and stays inside the horizontally clipped settings container. */
+    .workspace-list .ws-actions-menu {
+        display: none;
+        position: absolute;
+        top: calc(100% + 2px);
+        right: 0;
+        z-index: 50;
+        flex-direction: column;
+        align-items: stretch;
+        min-width: 190px;
+        padding: 4px 0;
+        background: var(--pz-bg);
+        border: 1px solid var(--pz-border-strong);
+        border-radius: var(--pz-radius);
+        box-shadow: 0 4px 6px -1px rgba(var(--pz-shadow-rgb), 0.1), 0 2px 4px -1px rgba(var(--pz-shadow-rgb), 0.06);
+    }
+
+    .workspace-list .ws-col-actions.is-open .ws-actions-menu {
+        display: flex;
+    }
+
+    /* Same buttons, moved: inside the menu they render as labelled rows. */
+    .workspace-list .ws-actions-menu .ws-icon-btn {
+        width: 100%;
+        height: auto;
+        justify-content: flex-start;
+        gap: 10px;
+        padding: 10px 14px;
+        border: 0;
+        border-radius: 0;
+        color: var(--pz-text);
+        font-size: 15px;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    .workspace-list .ws-actions-menu .ws-icon-btn[disabled] {
+        color: var(--pz-text-muted);
+    }
+
+    .workspace-list .ws-actions-menu .ws-icon-btn .lucide {
+        flex: 0 0 auto;
+        color: var(--pz-text-muted);
+    }
+
+    .workspace-list .ws-actions-menu .ws-icon-btn:hover,
+    .workspace-list .ws-actions-menu .ws-icon-btn:focus-visible {
+        border-color: transparent;
+        color: var(--pz-text);
+    }
+
+    .workspace-list .ws-actions-menu .ws-icon-btn.is-shared .lucide {
+        color: var(--pz-warning-hover);
+    }
+
+    .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger,
+    .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger .lucide,
+    .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger:hover,
+    .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger:focus-visible {
+        color: var(--pz-danger);
+    }
+
+    .workspace-list .ws-actions-menu .ws-icon-btn-text {
+        display: inline;
+    }
+
+    html[data-theme='dark'] .workspace-list .ws-actions-menu {
+        background: var(--dm-bg);
+        border-color: var(--dm-border);
+    }
+
+    html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn {
+        color: var(--dm-text);
+    }
+
+    html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn .lucide {
+        color: var(--dm-text-muted);
+    }
+
+    html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn:hover,
+    html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn:focus-visible {
+        color: var(--dm-text);
+    }
+
+    html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn.is-shared .lucide {
+        color: var(--dm-warning);
+    }
+
+    html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger,
+    html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger .lucide,
+    html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger:hover,
+    html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger:focus-visible {
+        color: var(--dm-danger);
     }
     
     .workspace-list .btn {

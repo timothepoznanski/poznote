@@ -390,8 +390,22 @@
         // and index.php appends its own extras, so re-measure on both.
         document.addEventListener('poznote-ui-customization-updated', syncLayout);
 
+        // Showing or hiding the button resizes the scroll area, and a resize
+        // made from inside a ResizeObserver callback is what the browser
+        // reports as "ResizeObserver loop completed with undelivered
+        // notifications". Deferring the sync to the next frame keeps that
+        // write out of the callback; the measurement itself is unchanged.
+        var overflowSyncFrame = null;
+        function scheduleOverflowSync() {
+            if (overflowSyncFrame !== null) return;
+            overflowSyncFrame = window.requestAnimationFrame(function () {
+                overflowSyncFrame = null;
+                syncOverflowButton();
+            });
+        }
+
         if (typeof ResizeObserver === 'function') {
-            new ResizeObserver(syncOverflowButton).observe(scrollArea);
+            new ResizeObserver(scheduleOverflowSync).observe(scrollArea);
         }
         if (typeof MutationObserver === 'function') {
             new MutationObserver(syncLayout).observe(scrollArea, {

@@ -12,9 +12,21 @@ const fontSizeStore = window.__poznoteUserStorage || window.localStorage;
 // settings.php applies the same factor inline before the first paint.
 const SETTINGS_FONT_SIZE_BASE = 15;
 
+// 15px card text is oversized on a phone, so an install that never touched the
+// Font size card starts at 13px below the mobile breakpoint (the same one used
+// by css/settings.css). Saving a value stores it for every layout.
+const SETTINGS_FONT_SIZE_MOBILE_DEFAULT = 13;
+
+function settingsFontSizeDefault() {
+    const mobile = window.matchMedia
+        ? window.matchMedia('(max-width: 800px)').matches
+        : window.innerWidth <= 800;
+    return String(mobile ? SETTINGS_FONT_SIZE_MOBILE_DEFAULT : SETTINGS_FONT_SIZE_BASE);
+}
+
 function settingsFontScale(size) {
     const parsed = parseInt(size, 10);
-    const safe = (parsed >= 10 && parsed <= 32) ? parsed : SETTINGS_FONT_SIZE_BASE;
+    const safe = (parsed >= 10 && parsed <= 32) ? parsed : parseInt(settingsFontSizeDefault(), 10);
     return String(Math.round((safe / SETTINGS_FONT_SIZE_BASE) * 1000) / 1000);
 }
 
@@ -124,7 +136,7 @@ function loadCurrentFontSizes() {
     }
 
     // Load settings page font size from localStorage
-    const settingsFontSize = fontSizeStore.getItem('settings_font_size') || String(SETTINGS_FONT_SIZE_BASE);
+    const settingsFontSize = fontSizeStore.getItem('settings_font_size') || settingsFontSizeDefault();
     const settingsFontSizeInput = document.getElementById('settingsFontSizeInput');
     if (settingsFontSizeInput) {
         settingsFontSizeInput.value = settingsFontSize;
@@ -203,7 +215,7 @@ function applyFontSizeToNotes() {
     const codeBlockFontSize = fontSizeStore.getItem('code_block_font_size') || '15';
     document.documentElement.style.setProperty('--code-block-font-size', codeBlockFontSize + 'px');
 
-    const settingsFontSize = fontSizeStore.getItem('settings_font_size') || String(SETTINGS_FONT_SIZE_BASE);
+    const settingsFontSize = fontSizeStore.getItem('settings_font_size') || settingsFontSizeDefault();
     document.documentElement.style.setProperty('--settings-font-scale', settingsFontScale(settingsFontSize));
 }
 
@@ -214,6 +226,9 @@ function applyStoredFontSize() {
 
 // Add the function to the window object so it can be called from HTML
 window.showNoteFontSizePrompt = showNoteFontSizePrompt;
+
+// js/settings-page.js reads it for the Font size card badge.
+window.settingsFontSizeDefault = settingsFontSizeDefault;
 
 // Function to initialize all font size settings elements and events
 function initFontSizeSettings() {

@@ -487,7 +487,9 @@
     },
     "title": "Configuración",
     "collapse_section": "Contraer la sección",
+    "collapse_all_sections": "Contraer todo",
     "expand_section": "Expandir la sección",
+    "expand_all_sections": "Expandir todo",
     "categories": {
       "pinned": "Fijados",
       "actions": "Acciones",
@@ -589,7 +591,8 @@
     },
     "actions": {
       "select": "Seleccionar",
-      "move_notes": "Mover notas"
+      "move_notes": "Mover notas",
+      "menu": "Acciones del espacio de trabajo"
     },
     "count": {
       "notes_0": "0 notas",
@@ -805,7 +808,6 @@
     "placeholder_combined": "Buscar en notas y etiquetas...",
     "search_in_notes": "Buscar en notas",
     "search_in_tags": "Buscar en etiquetas",
-    "toggle_options": "Mostrar/ocultar opciones de búsqueda",
     "toggle_date_filter": "Mostrar/ocultar filtro de fecha",
     "created_from": "Creada desde",
     "created_to": "Creada hasta",
