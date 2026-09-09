@@ -145,6 +145,16 @@
             criticalStyle.remove();
         }
 
+        // Same reason, and it was missed: theme-init.js also paints the page
+        // canvas inline on <html> to avoid a flash before the stylesheets land.
+        // An inline style beats every rule, so leaving it there pins the canvas
+        // to that hardcoded value for good, and a custom
+        // stylesheet can repaint every panel and still show the old colour
+        // behind them (light was pinned to opaque white).
+        // By the time this runs the stylesheets are in, so drop it
+        // and let html { background-color: var(--pz-bg) } take over.
+        root.style.removeProperty('background-color');
+
         // Manage body class for compatibility
         if (document.body) {
             if (effectiveTheme === 'dark') {

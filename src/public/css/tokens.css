@@ -256,6 +256,15 @@ html.theme-black[data-theme='dark'] {
     --dm-tab-active-bg: var(--dm-content-bg);
 }
 
+/* The page canvas. The dark rule below existed on its own for a long time,
+   which left the light theme's outermost ground on the browser's default
+   white: no token reached it, so a custom stylesheet could repaint every
+   panel and still show white behind them. --pz-bg is #ffffff by default, so
+   this renders exactly as the UA default did and only adds the hook. */
+html {
+    background-color: var(--pz-bg);
+}
+
 /* Apply dark background as early as possible */
 html[data-theme='dark'] {
     background-color: var(--dm-content-bg);
