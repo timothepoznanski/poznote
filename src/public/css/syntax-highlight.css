@@ -16,6 +16,10 @@ pre code.hljs {
     display: block;
     overflow: visible;
     padding: 0 !important;
+    /* The <pre> is the surface that paints the block (code-blocks.css,
+       dark-mode/editor.css). A second fill on the <code> only covers the
+       content box, so the pre's padding shows through as a frame around it. */
+    background: transparent;
 }
 
 pre code.hljs.has-x-overflow {
@@ -123,6 +127,14 @@ code.hljs {
 html[data-theme='dark'] .hljs {
     color: var(--dm-text-muted);
     background: var(--dm-content-bg);
+}
+
+/* This rule (0,2,1) outranks the transparent `pre code` rules the editor and
+   the markdown preview rely on (0,1,2), so inside a <pre> the <code> painted
+   --dm-content-bg over the pre's --dm-code-bg: a visible frame in the black
+   theme, a faint one in dark and terminal. */
+html[data-theme='dark'] pre code.hljs {
+    background: transparent;
 }
 
 html[data-theme='dark'] .hljs-doctag,
