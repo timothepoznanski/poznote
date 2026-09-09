@@ -14,10 +14,6 @@
     src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
 }
 
-:root {
-    --text-muted: #4a5568;
-}
-
 * {
     box-sizing: border-box;
 }
@@ -133,7 +129,7 @@ input[type="text"]:focus,
 input[type="password"]:focus {
     outline: none;
     border-color: var(--pz-accent);
-    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.12);
 }
 
 input[type="text"]::placeholder,
@@ -188,7 +184,7 @@ input[type="password"]::placeholder {
     top: 50%;
     width: 42%;
     height: 1px;
-    background: #e2e8f0;
+    background: var(--pz-border-light);
 }
 
 .oidc-divider::before {
@@ -231,7 +227,7 @@ input[type="password"]::placeholder {
 }
 
 .oidc-button:hover {
-    background: #252526;
+    background: color-mix(in srgb, var(--pz-text) 85%, rgb(var(--pz-shadow-rgb)));
 }
 
 /* Secondary variant shown when a previous SSO account is remembered.
@@ -244,7 +240,7 @@ input[type="password"]::placeholder {
 
 .oidc-other-account-button.oidc-other-account-button:hover {
     background: rgba(var(--pz-shadow-rgb), 0.06);
-    border-color: #a0aec0;
+    border-color: var(--pz-text-subtle);
 }
 
 .oidc-other-account-button[hidden] {
@@ -324,7 +320,7 @@ input[type="password"]::placeholder {
     flex: 0 0 auto;
     padding: 0.2rem 0.45rem;
     border-radius: var(--pz-radius-sm);
-    background: #ebf8ff;
+    background: var(--pz-accent-soft);
     color: var(--pz-accent);
     font-size: 0.75rem;
     font-weight: var(--pz-weight-semibold);
@@ -433,7 +429,6 @@ input[type="password"]::placeholder {
 :where(html[data-theme='dark']) body {
     background-color: var(--dm-bg);
     color: var(--dm-text);
-    --text-muted: #a0aec0;
 }
 
 :where(html[data-theme='dark']) label,
@@ -454,7 +449,7 @@ html[data-theme='dark'] .password-toggle:hover {
 html[data-theme='dark'] input[type="text"]:focus,
 html[data-theme='dark'] input[type="password"]:focus {
     border-color: var(--dm-accent);
-    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.18);
+    box-shadow: 0 0 0 3px rgba(var(--dm-accent-rgb), 0.18);
 }
 
 html[data-theme='dark'] .github-link a {
@@ -498,7 +493,7 @@ html[data-theme='dark'] .account-option-badge {
 
 html[data-theme='dark'] .oidc-divider::before,
 html[data-theme='dark'] .oidc-divider::after {
-    background: #4a5568;
+    background: var(--dm-border-light);
 }
 
 html[data-theme='dark'] .oidc-divider span {
