@@ -1304,7 +1304,7 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
 <div id="welcomeSetupModal" class="modal">
     <div class="modal-content welcome-setup-content">
         <div class="welcome-setup-hero">
-            <img src="pwa/poznote.png" alt="Poznote" class="welcome-setup-logo">
+            <span class="poznote-logo welcome-setup-logo" role="img" aria-label="Poznote"></span>
             <h3><?php echo t_h('modals.welcome_setup.title', [], 'Welcome to Poznote!'); ?></h3>
             <p class="welcome-setup-subtitle"><?php echo t_h('modals.welcome_setup.subtitle', [], 'Let\'s set up a few preferences to get you started. You can change them at any time.'); ?></p>
         </div>
@@ -1722,7 +1722,7 @@ $iconSidebarOrderDividerRow = static function (): string {
                 <?php
                 // The kept count links to its setting: the number is injected
                 // after escaping so the surrounding translated text stays safe.
-                $snapshotModalDescription = t_h('snapshot.modal.description', ['count' => '%%COUNT%%', 'days' => POZNOTE_SNAPSHOTS_MAX_AGE_DAYS], "Created automatically on first open each day, the last {{count}} are kept. \"Take snapshot now\" adds a manual snapshot. Every snapshot expires after {{days}} days.");
+                $snapshotModalDescription = t_h('snapshot.modal.description', ['count' => '%%COUNT%%', 'days' => POZNOTE_SNAPSHOTS_MAX_AGE_DAYS], "Created automatically on first open each day, the last {{count}} are kept. \"Take snapshot now\" or Ctrl + Alt + S adds a manual snapshot, and one is taken before the AI assistant or the MCP server changes a note. Every snapshot expires after {{days}} days.");
                 $snapshotKeepCountLink = '<a href="settings.php?open=snapshots#snapshots-card" class="snapshot-keep-count-link" onclick="return openSnapshotsKeepCountSettings(event)" title="' . t_h('snapshot.modal.keep_count_link_title', [], 'Change how many automatic snapshots are kept') . '">' . getSnapshotsKeepCount() . '</a>';
                 ?>
                 <p class="snapshot-modal-description"><?php echo str_replace('%%COUNT%%', $snapshotKeepCountLink, $snapshotModalDescription); ?></p>

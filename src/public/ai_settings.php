@@ -110,6 +110,7 @@ $aiLocalHost = aiChatLocalDefaultHost();
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
     <?php poznoteRenderStylesheets('ai_settings'); ?>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <style>
     /* Per-user AI access list */
     /* Instances can have many profiles: keep the list from burying the

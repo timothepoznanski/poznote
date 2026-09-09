@@ -128,6 +128,7 @@ function runScanner(bool $doDelete): array {
     <script src="../js/theme-init.js?v=<?php echo $v; ?>"></script>
     <?php poznoteRenderStylesheets('admin/orphan-scanner', ['prefix' => '../']); ?>
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
 </head>
 <body class="has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">

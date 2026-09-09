@@ -35,6 +35,7 @@ $pageWorkspace = trim(getWorkspaceFilter());
     <script src="../js/theme-init.js?v=<?php echo $v; ?>"></script>
     <?php poznoteRenderStylesheets('admin/disaster-recovery', ['prefix' => '../']); ?>
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <script src="../js/globals.js?v=<?php echo $v; ?>"></script>
 </head>

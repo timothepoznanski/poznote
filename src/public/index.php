@@ -256,6 +256,7 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <meta name="apple-mobile-web-app-title" content="Poznote">
     <link rel="manifest" href="pwa/manifest.webmanifest?v=<?php echo $v; ?>" crossorigin="use-credentials">
     <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="pwa/poznote.png?v=<?php echo $v; ?>">
     <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
     <?php if ($workspaceResolvedInternally !== null): ?>

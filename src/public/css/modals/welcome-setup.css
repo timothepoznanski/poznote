@@ -17,12 +17,12 @@
     padding: 4px 0 18px;
 }
 
+/* The mark is the .poznote-logo mask (css/components/logo.css), painted
+   with --pz-accent, so it follows the theme like the rest of the modal. */
 .welcome-setup-logo {
     width: 56px;
     height: 56px;
-    border-radius: var(--pz-radius-xl);
     margin-bottom: 12px;
-    box-shadow: 0 2px 10px rgba(var(--pz-shadow-rgb), 0.12);
 }
 
 .welcome-setup-hero h3 {

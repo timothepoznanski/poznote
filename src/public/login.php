@@ -196,6 +196,7 @@ if (isset($_GET['oidc_error'])) {
     <script src="pwa/pwa.js" defer></script>
     <?php poznoteRenderStylesheets('login'); ?>
     <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 </head>
 <body>

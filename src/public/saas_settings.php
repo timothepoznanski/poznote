@@ -68,6 +68,7 @@ $configuredCommunityUrl = trim((string)getGlobalSetting('saas_community_url', ''
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
     <?php poznoteRenderStylesheets('saas_settings'); ?>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <style>
     /* No grey strip behind the toggle rows on this page, in either theme. */
     .form-check,

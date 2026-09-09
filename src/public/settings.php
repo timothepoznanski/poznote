@@ -281,6 +281,7 @@ if ($canUseUserWebhooks) {
     <meta name="color-scheme" content="dark light">
     <link rel="manifest" href="pwa/manifest.webmanifest?v=<?php echo $cache_v; ?>">
     <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="pwa/poznote.png?v=<?php echo $cache_v; ?>">
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
     <script>

@@ -110,6 +110,7 @@ $allBackupUsers = listAllUserProfiles();
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
     <?php poznoteRenderStylesheets('s3_backup_settings'); ?>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <style>
     /* The page keeps its usual 900px reading width, but widens just enough for
        the backup table to show every row on one line (JS measures the table's
