@@ -19,7 +19,7 @@
         { id: 'light',    mode: 'light', icon: 'lucide-sun' },
         { id: 'dark',     mode: 'dark',  icon: 'lucide-moon' },
         { id: 'black',    mode: 'dark',  icon: 'lucide-moon-star', variant: 'theme-black' },
-        { id: 'lavender', mode: 'light', icon: 'lucide-sparkles',  variant: 'theme-lavender' },
+        { id: 'lavender', mode: 'light', icon: 'lucide-flower-2', variant: 'theme-lavender' },
         { id: 'sepia',    mode: 'light', icon: 'lucide-book-open', variant: 'theme-sepia' },
         { id: 'terminal', mode: 'dark',  icon: 'lucide-terminal',  variant: 'theme-terminal' }
     ];
