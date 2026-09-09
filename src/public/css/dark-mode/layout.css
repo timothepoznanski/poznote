@@ -78,38 +78,20 @@ html[data-theme='dark'] .search-date-input {
     color: var(--dm-text);
 }
 
-html[data-theme='dark'] .searchbar-options-toggle:hover {
+/* Two flat states, no hover feedback (see searchbars.css). dark-mode/icons.css
+   paints and scales every lucide icon on hover, so the icon's :hover is restated
+   here with a more specific selector. */
+html[data-theme='dark'] .searchbar-type-btn i[class*="lucide-"],
+html[data-theme='dark'] .searchbar-type-btn i[class*="lucide-"]:hover {
+    color: var(--dm-icon);
+    transform: none;
+}
+
+html[data-theme='dark'] .searchbar-type-btn.active,
+html[data-theme='dark'] .searchbar-type-btn.active:hover,
+html[data-theme='dark'] .searchbar-type-btn.active i[class*="lucide-"],
+html[data-theme='dark'] .searchbar-type-btn.active i[class*="lucide-"]:hover {
     color: var(--dm-accent-hover);
-}
-
-html[data-theme='dark'] .searchbar-options-toggle.active {
-    color: var(--dm-accent-hover);
-}
-
-html[data-theme='dark'] .searchbar-type-btn:hover {
-    color: var(--dm-accent-hover);
-}
-
-html[data-theme='dark'] .searchbar-type-btn:hover i {
-    color: var(--dm-accent-hover);
-}
-
-html[data-theme='dark'] .searchbar-type-btn:hover i::before {
-    color: var(--dm-accent-hover);
-}
-
-html[data-theme='dark'] .searchbar-type-btn.active {
-    color: var(--dm-accent-hover) !important;
-}
-
-html[data-theme='dark'] .searchbar-type-btn.active i,
-html[data-theme='dark'] .searchbar-type-btn.active i[class*="lucide-"] {
-    color: var(--dm-accent-hover) !important;
-}
-
-html[data-theme='dark'] .searchbar-type-btn.active i::before,
-html[data-theme='dark'] .searchbar-type-btn.active i[class*="lucide-"]::before {
-    color: var(--dm-accent-hover) !important;
 }
 
 /* System menu dropdown */

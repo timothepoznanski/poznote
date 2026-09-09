@@ -52,24 +52,28 @@ function initializeWorkspaces() {
     }
 }
 
-// Helper function to get current search type for workspace navigation
-function getCurrentSearchType() {
-    var currentSearchType = 'notes'; // default
-    if (window.searchManager) {
-        // Try to get active search type from desktop first, then mobile
-        var desktopActiveType = window.searchManager.getActiveSearchType(false);
-        var mobileActiveType = window.searchManager.getActiveSearchType(true);
+// Helper function to get the selected search scopes for workspace navigation
+function getCurrentSearchTypes() {
+    if (window.searchManager && typeof window.searchManager.getActiveSearchTypes === 'function') {
+        // Try the desktop searchbar first, then the mobile one
+        var desktopTypes = window.searchManager.getActiveSearchTypes(false);
+        if (desktopTypes && desktopTypes.length) return desktopTypes;
 
-        // Use non-default type if available
-        if (desktopActiveType !== 'notes') {
-            currentSearchType = desktopActiveType;
-        } else if (mobileActiveType !== 'notes') {
-            currentSearchType = mobileActiveType;
-        } else {
-            currentSearchType = desktopActiveType; // fallback to desktop
-        }
+        var mobileTypes = window.searchManager.getActiveSearchTypes(true);
+        if (mobileTypes && mobileTypes.length) return mobileTypes;
     }
-    return currentSearchType;
+    return ['notes']; // default
+}
+
+// Carry the selected search scopes over to a workspace navigation URL
+function applySearchTypesToUrl(url) {
+    var types = getCurrentSearchTypes();
+
+    url.searchParams.delete('preserve_notes');
+    url.searchParams.delete('preserve_tags');
+
+    if (types.indexOf('notes') !== -1) url.searchParams.set('preserve_notes', '1');
+    if (types.indexOf('tags') !== -1) url.searchParams.set('preserve_tags', '1');
 }
 
 function onWorkspaceChange() {
@@ -91,18 +95,7 @@ function onWorkspaceChange() {
 
     // Reload the page with the new workspace
     var url = new URL(window.location.href);
-    var currentSearchType = getCurrentSearchType();
-
-    // Clear existing preserve parameters
-    url.searchParams.delete('preserve_notes');
-    url.searchParams.delete('preserve_tags');
-
-    // Set appropriate preserve parameter based on current search type
-    if (currentSearchType === 'tags') {
-        url.searchParams.set('preserve_tags', '1');
-    } else {
-        url.searchParams.set('preserve_notes', '1');
-    }
+    applySearchTypesToUrl(url);
 
     url.searchParams.set('workspace', val);
     window.location.href = url.toString();

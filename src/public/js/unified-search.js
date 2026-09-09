@@ -1,8 +1,15 @@
 
+// Persisted search scope: 'notes', 'tags' or 'both'
+const SEARCH_SCOPE_STORAGE_KEY = 'poznote_search_scope';
+// Key used before the scope icons became independent toggles
+const LEGACY_COMBINED_SCOPE_KEY = 'poznote_combined_search_mode';
+
 class SearchManager {
     constructor() {
         this.searchTypes = ['notes', 'tags'];
         this.isMobile = false;
+        // Selected scopes; never empty, so a search always covers something
+        this.activeSearchTypes = ['notes'];
         this.currentSearchType = 'notes';
         this.lastSearchTerm = '';
         this.lastDateFilterKey = '';
@@ -55,8 +62,6 @@ class SearchManager {
                 createdTo: document.getElementById(`created-to${suffix}`)
             },
             dateToggle: document.getElementById(`search-date-toggle${suffix}`),
-            optionsToggle: document.getElementById(`search-options-toggle${suffix}`),
-            typeIconsContainer: document.getElementById(`searchbar-type-icons${suffix}`),
             container: document.querySelector(isMobile ? '.unified-search-container.mobile' : '.unified-search-container')
         };
     }
@@ -92,13 +97,12 @@ class SearchManager {
             this.showSystemFoldersContainer();
         }
 
-        // Restore state from URL parameters or defaults
-        if (!this.suppressURLRestore) {
-            this.restoreSearchStateFromURL(isMobile);
+        // Restore the scope from URL parameters, storage or defaults
+        if (this.suppressURLRestore) {
+            this.setActiveSearchTypes(this.activeSearchTypes, isMobile);
+        } else {
+            this.restoreSearchScope(isMobile);
         }
-
-        // Initialize combined mode state from hidden input
-        this.restoreCombinedModeState(isMobile);
 
         // Initialize last search term from current input value
         if (elements.searchInput && elements.searchInput.value) {
@@ -110,63 +114,67 @@ class SearchManager {
     }
 
     /**
-     * Restore combined mode state from URL, localStorage, or hidden input
+     * Read the scope saved by a previous session, falling back to the legacy key
      */
-    restoreCombinedModeState(isMobile) {
-        const elements = this.getElements(isMobile);
-        if (!elements.typeIconsContainer || !elements.optionsToggle) return;
+    readStoredSearchTypes() {
+        try {
+            const stored = localStorage.getItem(SEARCH_SCOPE_STORAGE_KEY);
+            if (stored === 'notes') return ['notes'];
+            if (stored === 'tags') return ['tags'];
+            if (stored === 'both') return ['notes', 'tags'];
 
-        // Check if combined mode is enabled - first from URL, then localStorage, then from hidden input
-        let isCombined = false;
+            // Legacy key: '0' meant a single scope was picked, anything else meant both
+            if (localStorage.getItem(LEGACY_COMBINED_SCOPE_KEY) === '0') return ['notes'];
+        } catch (e) {
+            console.debug('unified-search: reading the stored scope failed:', e);
+        }
 
-        // Check URL parameters first (highest priority - preserves state during navigation)
+        // Default: search notes and tags at once
+        return ['notes', 'tags'];
+    }
+
+    /**
+     * Persist the scope so it survives reloads
+     */
+    storeSearchTypes(types) {
+        try {
+            localStorage.setItem(SEARCH_SCOPE_STORAGE_KEY, types.length > 1 ? 'both' : (types[0] || 'notes'));
+        } catch (e) {
+            console.debug('unified-search: storing the scope failed:', e);
+        }
+    }
+
+    /**
+     * Work out the scope from the URL, then storage, then the default
+     */
+    resolveSearchTypesFromContext() {
         const urlParams = new URLSearchParams(window.location.search);
-        const urlCombined = urlParams.get('search_combined');
+        const types = [];
 
-        if (urlCombined === '1') {
-            isCombined = true;
-        } else if (urlCombined === '0') {
-            // URL param explicitly set to '0'
-            isCombined = false;
-        } else {
-            // No URL param or other value, try localStorage
-            try {
-                const savedState = localStorage.getItem('poznote_combined_search_mode');
-                if (savedState === '0') {
-                    // User explicitly disabled combined mode
-                    isCombined = false;
-                } else if (savedState === '1') {
-                    isCombined = true;
-                } else {
-                    // No saved state - default to combined mode (hidden icons)
-                    isCombined = true;
-                }
-            } catch (e) {
-                // localStorage not available - default to combined mode
-                isCombined = true;
-            }
+        // Flags pushed into the URL by a previous search are the most precise signal
+        if (urlParams.get('search_in_notes') === '1') types.push('notes');
+        if (urlParams.get('search_in_tags') === '1') types.push('tags');
+        if (types.length) return types;
+
+        if (urlParams.get('search_combined') === '1') return ['notes', 'tags'];
+
+        if ((urlParams.get('search') || '').trim() || urlParams.get('preserve_notes') === '1') types.push('notes');
+        if ((urlParams.get('tags_search') || '').trim() || urlParams.get('preserve_tags') === '1') types.push('tags');
+        if (types.length) return types;
+
+        return this.readStoredSearchTypes();
+    }
+
+    /**
+     * Restore the scope, unless the user just toggled an icon
+     */
+    restoreSearchScope(isMobile) {
+        if (this._suppressUntil && Date.now() < this._suppressUntil) {
+            this.setActiveSearchTypes(this.activeSearchTypes, isMobile);
+            return;
         }
 
-        if (isCombined) {
-            // Hide icons and update toggle state
-            elements.typeIconsContainer.classList.add('hidden');
-            elements.optionsToggle.classList.remove('active');
-            elements.searchInput?.classList.add('search-combined-mode');
-            // Update hidden input to match
-            if (elements.hiddenInputs.combinedMode) {
-                elements.hiddenInputs.combinedMode.value = '1';
-            }
-            this.updatePlaceholderForCombinedMode(isMobile);
-        } else {
-            // Show icons - this is the default state
-            elements.typeIconsContainer.classList.remove('hidden');
-            elements.optionsToggle.classList.add('active');
-            elements.searchInput?.classList.remove('search-combined-mode');
-            // Update hidden input to match
-            if (elements.hiddenInputs.combinedMode) {
-                elements.hiddenInputs.combinedMode.value = '';
-            }
-        }
+        this.setActiveSearchTypes(this.resolveSearchTypesFromContext(), isMobile);
     }
 
     /**
@@ -193,80 +201,45 @@ class SearchManager {
     }
 
     /**
-     * Restore search state from URL parameters
+     * Set the active scopes and update the UI.
+     * An empty selection is not allowed: notes is used as the fallback.
      */
-    restoreSearchStateFromURL(isMobile) {
-        const urlParams = new URLSearchParams(window.location.search);
+    setActiveSearchTypes(types, isMobile) {
         const elements = this.getElements(isMobile);
 
-        // Check URL preferences and explicit search params
-        const preserveNotes = urlParams.get('preserve_notes') === '1';
-        const preserveTags = urlParams.get('preserve_tags') === '1';
-        const hasTagsSearchParam = urlParams.get('tags_search') && urlParams.get('tags_search').trim() !== '';
-        const hasNotesSearchParam = urlParams.get('search') && urlParams.get('search').trim() !== '';
+        const next = this.searchTypes.filter(type => Array.isArray(types) && types.includes(type));
+        if (next.length === 0) next.push('notes');
 
-        // Check hidden field values: flags vs term-bearing inputs
-        const hasTagsFlag = elements.hiddenInputs.tagsFlag?.value === '1';
-
-        // If a recent user toggle was performed, avoid restoring from URL
-        if (this._suppressUntil && Date.now() < this._suppressUntil) return;
-
-        // Determine active search type
-        // Prefer explicit URL params (tags_search / search) if present
-        if (hasTagsSearchParam || preserveTags || hasTagsFlag) {
-            this.setActiveSearchType('tags', isMobile);
-        } else if (hasNotesSearchParam || preserveNotes) {
-            this.setActiveSearchType('notes', isMobile);
-        } else {
-            // Default to notes
-            this.setActiveSearchType('notes', isMobile);
-        }
-    }
-
-    /**
-     * Set active search type and update UI
-     */
-    setActiveSearchType(searchType, isMobile) {
-        if (!this.searchTypes.includes(searchType)) return;
-        // start tracing removed; keep behavior unchanged
-
-        const elements = this.getElements(isMobile);
-
-        // If leaving a previous search type, clear highlights of that type
-        const prev = this.currentSearchType;
-        if (prev === 'notes' && searchType !== 'notes' && typeof clearSearchHighlights === 'function') {
+        // Clear the highlights of the scopes we are leaving
+        const previous = this.activeSearchTypes || [];
+        if (previous.includes('notes') && !next.includes('notes') && typeof clearSearchHighlights === 'function') {
             try { clearSearchHighlights(); } catch (e) { /* ignore */ }
         }
-        if (prev === 'tags' && searchType !== 'tags' && typeof window.highlightMatchingTags === 'function') {
+        if (previous.includes('tags') && !next.includes('tags') && typeof window.highlightMatchingTags === 'function') {
             try { window.highlightMatchingTags(''); } catch (e) { /* ignore */ }
         }
 
-        // Clear all active states
         this.searchTypes.forEach(type => {
             const button = elements.buttons[type];
-            if (button) {
-                button.classList.remove('active');
-            }
+            if (!button) return;
+            const isActive = next.includes(type);
+            button.classList.toggle('active', isActive);
+            button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
         });
 
-        // Set active state
-        const activeButton = elements.buttons[searchType];
-        if (activeButton) {
-            activeButton.classList.add('active');
-        }
         // Persist state even if buttons are absent
-        this.currentSearchType = searchType;
+        this.activeSearchTypes = next;
+        this.currentSearchType = next[0];
         // Expose last active search type globally for other modules (used by applyHighlightsWithRetries)
-        try { window._lastActiveSearchType = searchType; } catch (e) { /* ignore */ }
+        try { window._lastActiveSearchType = this.currentSearchType; } catch (e) { /* ignore */ }
         // update UI
         this.updateInterface(isMobile);
 
-        // If switching into 'notes' search, (re-)apply highlights now that state is set
-        if (searchType === 'notes' && typeof highlightSearchTerms === 'function') {
+        // (Re-)apply the highlights of the scopes that are now active
+        if (next.includes('notes') && typeof highlightSearchTerms === 'function') {
             try { highlightSearchTerms(); } catch (e) { /* ignore */ }
         }
-        // If switching into 'tags' search, attempt to highlight matching tag UI elements
-        if (searchType === 'tags' && typeof window.highlightMatchingTags === 'function') {
+        if (next.includes('tags') && typeof window.highlightMatchingTags === 'function') {
             try {
                 // Prefer hidden term if present, else visible input
                 var hiddenTerm = elements.hiddenInputs.tagsTerm?.value || '';
@@ -276,6 +249,14 @@ class SearchManager {
                 window.highlightMatchingTags(term);
             } catch (e) { /* ignore */ }
         }
+    }
+
+    /**
+     * Restrict the search to a single scope
+     */
+    setActiveSearchType(searchType, isMobile) {
+        if (!this.searchTypes.includes(searchType)) return;
+        this.setActiveSearchTypes([searchType], isMobile);
     }
 
     /**
@@ -372,17 +353,19 @@ class SearchManager {
      */
     updatePlaceholder(isMobile) {
         const elements = this.getElements(isMobile);
-        const activeType = this.getActiveSearchType(isMobile);
+        if (!elements.searchInput) return;
 
         const placeholders = {
             notes: (window.t ? window.t('search.placeholder_notes', null, 'Search for one or more words (use "quotes" for exact phrases)...') : 'Search for one or more words (use "quotes" for exact phrases)...'),
-            tags: (window.t ? window.t('search.placeholder_tags', null, 'Search for one or more tags...') : 'Search for one or more tags...')
+            tags: (window.t ? window.t('search.placeholder_tags', null, 'Search for one or more tags...') : 'Search for one or more tags...'),
+            both: (window.t ? window.t('search.placeholder_combined', null, 'Search in notes and tags...') : 'Search in notes and tags...')
         };
 
-        if (elements.searchInput) {
-            elements.searchInput.placeholder = placeholders[activeType] || placeholders.notes;
-            elements.searchInput.disabled = false;
-        }
+        const activeTypes = this.getActiveSearchTypes(isMobile);
+        const key = activeTypes.length > 1 ? 'both' : (activeTypes[0] || 'notes');
+
+        elements.searchInput.placeholder = placeholders[key] || placeholders.notes;
+        elements.searchInput.disabled = false;
     }
 
     /**
@@ -411,21 +394,29 @@ class SearchManager {
     }
 
     /**
-     * Get currently active search type
+     * Get the currently active scopes
      */
-    getActiveSearchType(isMobile) {
+    getActiveSearchTypes(isMobile) {
         const elements = this.getElements(isMobile);
         // Prefer DOM state if buttons are present
-        for (const type of this.searchTypes) {
-            if (elements.buttons[type]?.classList.contains('active')) {
-                // keep internal sync
-                this.currentSearchType = type;
-                return type;
-            }
+        const types = this.searchTypes.filter(type => elements.buttons[type]?.classList.contains('active'));
+
+        if (types.length > 0) {
+            // keep internal sync
+            this.activeSearchTypes = types;
+            this.currentSearchType = types[0];
+            return types;
         }
 
-        // Fallback to internal state (useful when pills were removed)
-        return this.currentSearchType || 'notes'; // Default
+        // Fallback to internal state (useful when the icons are absent)
+        return (this.activeSearchTypes && this.activeSearchTypes.length) ? this.activeSearchTypes : ['notes'];
+    }
+
+    /**
+     * Get the primary active search type, i.e. the first selected scope
+     */
+    getActiveSearchType(isMobile) {
+        return this.getActiveSearchTypes(isMobile)[0] || 'notes';
     }
 
     /**
@@ -433,109 +424,39 @@ class SearchManager {
      */
     updateHiddenInputs(isMobile) {
         const elements = this.getElements(isMobile);
-        const activeType = this.getActiveSearchType(isMobile);
+        const activeTypes = this.getActiveSearchTypes(isMobile);
         const searchValue = elements.searchInput?.value.trim() || '';
 
+        const notesActive = activeTypes.includes('notes');
+        const tagsActive = activeTypes.includes('tags');
+
         // Update term-bearing hidden inputs (so AJAX receives the actual search term)
-        // In combined mode, set BOTH term inputs; otherwise only set the active type's term.
-        const isCombinedMode = this.isCombinedModeActive(isMobile);
+        // for each selected scope only.
         if (elements.hiddenInputs.notesTerm) {
-            elements.hiddenInputs.notesTerm.value = (isCombinedMode || activeType === 'notes') ? searchValue : '';
+            elements.hiddenInputs.notesTerm.value = notesActive ? searchValue : '';
         }
         if (elements.hiddenInputs.tagsTerm) {
-            elements.hiddenInputs.tagsTerm.value = (isCombinedMode || activeType === 'tags') ? searchValue : '';
+            elements.hiddenInputs.tagsTerm.value = tagsActive ? searchValue : '';
         }
 
-        // Update flag inputs (search-in-*) to reflect active type
-        // In combined mode, both flags should be set
+        // Update flag inputs (search-in-*) to reflect the selected scopes
         if (elements.hiddenInputs.notesFlag) {
-            elements.hiddenInputs.notesFlag.value = (isCombinedMode || activeType === 'notes') ? '1' : '';
+            elements.hiddenInputs.notesFlag.value = notesActive ? '1' : '';
         }
         if (elements.hiddenInputs.tagsFlag) {
-            elements.hiddenInputs.tagsFlag.value = (isCombinedMode || activeType === 'tags') ? '1' : '';
+            elements.hiddenInputs.tagsFlag.value = tagsActive ? '1' : '';
         }
+        // Both scopes at once is what the backend calls combined mode
         if (elements.hiddenInputs.combinedMode) {
-            elements.hiddenInputs.combinedMode.value = isCombinedMode ? '1' : '';
+            elements.hiddenInputs.combinedMode.value = (notesActive && tagsActive) ? '1' : '';
         }
     }
 
     /**
-     * Check if combined search mode is active
+     * Check whether both scopes are selected, which the backend calls combined mode
      */
     isCombinedModeActive(isMobile) {
-        const elements = this.getElements(isMobile);
-
-        // Check the hidden input value first (most reliable)
-        if (elements.hiddenInputs.combinedMode?.value === '1') {
-            return true;
-        }
-
-        // Fallback: check if type icons container is hidden
-        if (elements.typeIconsContainer?.classList.contains('hidden')) {
-            return true;
-        }
-
-        // Also check via CSS class on container
-        const container = elements.container;
-        if (container) {
-            const iconsDiv = container.querySelector('.searchbar-type-icons');
-            if (iconsDiv?.classList.contains('hidden')) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Toggle combined search mode
-     */
-    toggleCombinedMode(isMobile) {
-        const elements = this.getElements(isMobile);
-        if (!elements.typeIconsContainer || !elements.optionsToggle) return;
-
-        const isHidden = elements.typeIconsContainer.classList.contains('hidden');
-
-        if (isHidden) {
-            // Show icons - switch to single mode
-            elements.typeIconsContainer.classList.remove('hidden');
-            elements.optionsToggle.classList.add('active');
-            elements.searchInput?.classList.remove('search-combined-mode');
-            // Update combined mode hidden input immediately
-            if (elements.hiddenInputs.combinedMode) {
-                elements.hiddenInputs.combinedMode.value = '';
-            }
-            // Save state to localStorage
-            try { localStorage.setItem('poznote_combined_search_mode', '0'); } catch (e) { /* ignore */ }
-        } else {
-            // Hide icons - switch to combined mode
-            elements.typeIconsContainer.classList.add('hidden');
-            elements.optionsToggle.classList.remove('active');
-            elements.searchInput?.classList.add('search-combined-mode');
-            // Update combined mode hidden input immediately
-            if (elements.hiddenInputs.combinedMode) {
-                elements.hiddenInputs.combinedMode.value = '1';
-            }
-            // Save state to localStorage
-            try { localStorage.setItem('poznote_combined_search_mode', '1'); } catch (e) { /* ignore */ }
-        }
-
-        // Update hidden inputs and placeholder
-        this.updateHiddenInputs(isMobile);
-        this.updatePlaceholderForCombinedMode(isMobile);
-
-        // If there's a search term, perform search immediately
-        if (elements.searchInput?.value.trim()) {
-            const searchValue = elements.searchInput.value.trim();
-            const activeType = this.getActiveSearchType(isMobile);
-
-            if (!this.validateSearchTerms(searchValue, activeType, isMobile)) {
-                elements.searchInput?.focus();
-                return;
-            }
-
-            this.performAjaxSearch(elements.form, isMobile);
-        }
+        return this.getActiveSearchTypes(isMobile).length === this.searchTypes.length;
     }
 
     /**
@@ -559,23 +480,6 @@ class SearchManager {
     }
 
     /**
-     * Update placeholder for combined mode
-     */
-    updatePlaceholderForCombinedMode(isMobile) {
-        const elements = this.getElements(isMobile);
-        if (!elements.searchInput) return;
-
-        const isCombinedMode = this.isCombinedModeActive(isMobile);
-
-        if (isCombinedMode) {
-            const placeholder = window.t ? window.t('search.placeholder_combined', null, 'Search in notes and tags...') : 'Search in notes and tags...';
-            elements.searchInput.placeholder = placeholder;
-        } else {
-            this.updatePlaceholder(isMobile);
-        }
-    }
-
-    /**
      * Setup event listeners
      */
     setupEventListeners() {
@@ -587,35 +491,10 @@ class SearchManager {
         this.setupIconListeners(true);
         this.setupInputListeners(false);
         this.setupInputListeners(true);
-        this.setupOptionsToggleListeners(false);
-        this.setupOptionsToggleListeners(true);
         this.setupDateToggleListeners(false);
         this.setupDateToggleListeners(true);
         this.setupDateFilterListeners(false);
         this.setupDateFilterListeners(true);
-    }
-
-    /**
-     * Setup options toggle listeners
-     */
-    setupOptionsToggleListeners(isMobile) {
-        const elements = this.getElements(isMobile);
-        if (!elements.optionsToggle) return;
-
-        const handlerKey = `options-toggle-${isMobile ? 'mobile' : 'desktop'}`;
-        const existingHandler = this.eventHandlers.get(handlerKey);
-        if (existingHandler) {
-            elements.optionsToggle.removeEventListener('click', existingHandler);
-        }
-
-        const handler = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.toggleCombinedMode(isMobile);
-        };
-
-        this.eventHandlers.set(handlerKey, handler);
-        elements.optionsToggle.addEventListener('click', handler);
     }
 
     /**
@@ -931,24 +810,36 @@ class SearchManager {
     handleButtonClick(searchType, isMobile) {
         const elements = this.getElements(isMobile);
         const button = elements.buttons[searchType];
+        if (!button) return;
 
-        if (!button || button.classList.contains('active')) {
-            return; // Already active, do nothing
+        const activeTypes = this.getActiveSearchTypes(isMobile);
+        const wasActive = activeTypes.includes(searchType);
+
+        let next = wasActive
+            ? activeTypes.filter(type => type !== searchType)
+            : this.searchTypes.filter(type => activeTypes.includes(type) || type === searchType);
+
+        // The selection can never be emptied: deselecting the last scope switches to the other one
+        if (next.length === 0) {
+            next = this.searchTypes.filter(type => type !== searchType);
         }
 
-        // Clear search highlights when switching search types
+        // Clear search highlights when the scope changes
         if (typeof clearSearchHighlights === 'function') {
             clearSearchHighlights();
         }
 
-        this.setActiveSearchType(searchType, isMobile);
+        // Record a short-lived user action so restore/reinit won't overwrite it
+        try { this._suppressUntil = Date.now() + 250; } catch (e) { /* ignore */ }
+        this.setActiveSearchTypes(next, isMobile);
+        this.storeSearchTypes(next);
 
         // Handle search if there's content
         if (elements.searchInput?.value.trim()) {
             const searchValue = elements.searchInput.value.trim();
 
-            // Validate search terms before auto-searching (use the NEW searchType, not the current one)
-            if (!this.validateSearchTerms(searchValue, searchType, isMobile)) {
+            // Validate search terms before auto-searching (use the NEW scope, not the previous one)
+            if (!this.validateSearchTerms(searchValue, this.getActiveSearchType(isMobile), isMobile)) {
                 // Validation failed, don't proceed with search
                 elements.searchInput?.focus();
                 return;
@@ -1094,32 +985,13 @@ class SearchManager {
      * Validate search state
      */
     validateSearchState(isMobile) {
-        // In combined mode, search state is always valid
-        if (this.isCombinedModeActive(isMobile)) {
+        // Notes, tags or both are all valid; only an empty selection is not
+        if (this.getActiveSearchTypes(isMobile).length > 0) {
             return true;
         }
 
-        const elements = this.getElements(isMobile);
-        // If explicit buttons exist in the DOM (older UI with pills), use them
-        const buttonsExist = Object.values(elements.buttons).some(b => b !== null && b !== undefined);
-        if (buttonsExist) {
-            const activeTypes = this.searchTypes.filter(type => elements.buttons[type]?.classList.contains('active'));
-            if (activeTypes.length !== 1) {
-                // Reset to notes as default
-                this.setActiveSearchType('notes', isMobile);
-                return false;
-            }
-            return true;
-        }
-
-        // When buttons/pills have been removed, rely on internal state (currentSearchType)
-        const activeType = this.getActiveSearchType(isMobile);
-        if (this.searchTypes.includes(activeType)) {
-            return true;
-        }
-
-        // As a last resort, reset to notes
-        this.setActiveSearchType('notes', isMobile);
+        // Should not happen, but reset to notes rather than search nothing
+        this.setActiveSearchTypes(['notes'], isMobile);
         return false;
     }
 
@@ -1472,45 +1344,10 @@ class SearchManager {
      * Save current search state
      */
     saveCurrentSearchState() {
-        // Try to capture explicit button state; if buttons/pills were removed,
-        // fall back to internal currentSearchType so the choice survives AJAX.
-        const desktopElements = this.getElements(false);
-        const mobileElements = this.getElements(true);
-
-        const desktopButtonsExist = Object.values(desktopElements.buttons).some(b => b !== null && b !== undefined);
-        const mobileButtonsExist = Object.values(mobileElements.buttons).some(b => b !== null && b !== undefined);
-
-        const desktopState = {
-            notes: false,
-            tags: false,
-            combinedMode: this.isCombinedModeActive(false)
-        };
-        const mobileState = {
-            notes: false,
-            tags: false,
-            combinedMode: this.isCombinedModeActive(true)
-        };
-
-        if (desktopButtonsExist) {
-            desktopState.notes = desktopElements.buttons.notes?.classList.contains('active') || false;
-            desktopState.tags = desktopElements.buttons.tags?.classList.contains('active') || false;
-        } else {
-            // Fallback to internal state
-            const t = this.currentSearchType || 'notes';
-            desktopState[t] = true;
-        }
-
-        if (mobileButtonsExist) {
-            mobileState.notes = mobileElements.buttons.notes?.classList.contains('active') || false;
-            mobileState.tags = mobileElements.buttons.tags?.classList.contains('active') || false;
-        } else {
-            const t = this.currentSearchType || 'notes';
-            mobileState[t] = true;
-        }
-
+        // Capture the selected scopes of each view so they survive the AJAX DOM swap
         return {
-            desktop: desktopState,
-            mobile: mobileState
+            desktop: this.getActiveSearchTypes(false),
+            mobile: this.getActiveSearchTypes(true)
         };
     }
 
@@ -1521,47 +1358,10 @@ class SearchManager {
         if (!state) return;
         if (this._suppressUntil && Date.now() < this._suppressUntil) return;
 
-        // Restore desktop state immediately to avoid intermediate UI reset
-        if (state.desktop.notes) this.setActiveSearchType('notes', false);
-        else if (state.desktop.tags) this.setActiveSearchType('tags', false);
-
-        // Restore combined mode for desktop
-        this.restoreCombinedModeFromState(state.desktop, false);
-
-        // Restore mobile state immediately
-        if (state.mobile.notes) this.setActiveSearchType('notes', true);
-        else if (state.mobile.tags) this.setActiveSearchType('tags', true);
-
-        // Restore combined mode for mobile
-        this.restoreCombinedModeFromState(state.mobile, true);
+        this.setActiveSearchTypes(state.desktop, false);
+        this.setActiveSearchTypes(state.mobile, true);
 
         this.ensureAtLeastOneButtonActive();
-    }
-
-    /**
-     * Restore combined mode from saved state
-     */
-    restoreCombinedModeFromState(state, isMobile) {
-        if (!state) return;
-        const elements = this.getElements(isMobile);
-        if (!elements.typeIconsContainer || !elements.optionsToggle) return;
-
-        if (state.combinedMode) {
-            elements.typeIconsContainer.classList.add('hidden');
-            elements.optionsToggle.classList.remove('active');
-            elements.searchInput?.classList.add('search-combined-mode');
-            if (elements.hiddenInputs.combinedMode) {
-                elements.hiddenInputs.combinedMode.value = '1';
-            }
-        } else {
-            elements.typeIconsContainer.classList.remove('hidden');
-            elements.optionsToggle.classList.add('active');
-            elements.searchInput?.classList.remove('search-combined-mode');
-            if (elements.hiddenInputs.combinedMode) {
-                elements.hiddenInputs.combinedMode.value = '';
-            }
-        }
-        this.updatePlaceholderForCombinedMode(isMobile);
     }
 
     /**
@@ -1570,33 +1370,19 @@ class SearchManager {
     ensureAtLeastOneButtonActive() {
         [false, true].forEach(isMobile => {
             const elements = this.getElements(isMobile);
+            const buttonsExist = Object.values(elements.buttons).some(b => b !== null && b !== undefined);
+            if (!buttonsExist) return;
+
             const hasActive = this.searchTypes.some(type =>
                 elements.buttons[type]?.classList.contains('active')
             );
+            if (hasActive) return;
 
-            // If there are explicit buttons in the DOM, ensure one is active.
-            // If buttons/pills were removed, respect the internal currentSearchType
-            const buttonsExist = Object.values(elements.buttons).some(b => b !== null && b !== undefined);
-            if (buttonsExist) {
-                if (!hasActive) {
-                    // Respect a recent user toggle: don't force state while suppression is active
-                    if (this._suppressUntil && Date.now() < this._suppressUntil) return;
-                    // Prefer the internal currentSearchType if possible so we don't
-                    // overwrite a recent user action when buttons exist but no
-                    // button is currently marked active (e.g. after AJAX DOM swaps).
-                    const preferred = this.currentSearchType || 'notes';
-                    if (elements.buttons[preferred]) {
-                        this.setActiveSearchType(preferred, isMobile);
-                    } else {
-                        // Fallback to notes if preferred button isn't present
-                        this.setActiveSearchType('notes', isMobile);
-                    }
-                }
-            } else {
-                // No buttons: apply internal state (avoid forcing 'notes')
-                const t = this.currentSearchType || 'notes';
-                this.setActiveSearchType(t, isMobile);
-            }
+            // Respect a recent user toggle: don't force state while suppression is active
+            if (this._suppressUntil && Date.now() < this._suppressUntil) return;
+
+            // Reapply the internal selection, which is never empty
+            this.setActiveSearchTypes(this.activeSearchTypes, isMobile);
         });
     }
 
@@ -1636,35 +1422,14 @@ class SearchManager {
             newParams.set('note', currentNote);
         }
 
-        // Preserve the currently active search type
+        // Preserve every selected scope
         // Try to detect if we're in mobile mode first
         const mobileContainer = document.querySelector('.unified-search-container.mobile');
-        const isMobile = mobileContainer && mobileContainer.offsetParent !== null;
+        const isMobile = Boolean(mobileContainer && mobileContainer.offsetParent !== null);
 
-        let activeSearchType = this.getActiveSearchType(isMobile);
-
-        // If we couldn't determine the type from the current view, try the other view
-        if (activeSearchType === 'notes' && !isMobile) {
-            // Check if mobile view has an active type different from notes
-            const mobileActiveType = this.getActiveSearchType(true);
-            if (mobileActiveType !== 'notes') {
-                activeSearchType = mobileActiveType;
-            }
-        } else if (activeSearchType === 'notes' && isMobile) {
-            // Check if desktop view has an active type different from notes
-            const desktopActiveType = this.getActiveSearchType(false);
-            if (desktopActiveType !== 'notes') {
-                activeSearchType = desktopActiveType;
-            }
-        }
-
-        // Set the appropriate preserve parameter based on active search type
-        if (activeSearchType === 'tags') {
-            newParams.set('preserve_tags', '1');
-        } else {
-            // Default to notes or explicitly preserve notes
-            newParams.set('preserve_notes', '1');
-        }
+        const activeTypes = this.getActiveSearchTypes(isMobile);
+        if (activeTypes.includes('notes')) newParams.set('preserve_notes', '1');
+        if (activeTypes.includes('tags')) newParams.set('preserve_tags', '1');
 
         const newUrl = 'index.php' + (newParams.toString() ? '?' + newParams.toString() : '');
         window.location.href = newUrl;

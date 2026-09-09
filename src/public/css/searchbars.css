@@ -21,7 +21,7 @@
 }
 
 .searchbar-input {
-    padding: 10px 12px 10px 83px;
+    padding: 10px 12px 10px 64px;
     border-radius: var(--pz-radius-lg);
     border: 1px solid var(--pz-border-strong);
     background: var(--pz-bg);
@@ -71,54 +71,15 @@
     align-items: center;
 }
 
-/* Search options toggle button (3 dots) */
-.searchbar-options-toggle {
-    position: absolute;
-    left: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: transparent;
-    border: none;
-    padding: 6px 6px;
-    cursor: pointer;
-    color: var(--pz-text-subtle);
-    font-size: 14px;
-    transition: color 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 3;
-}
-
-.searchbar-options-toggle:hover {
-    color: var(--pz-accent);
-}
-
-.searchbar-options-toggle.active {
-    color: var(--pz-accent);
-}
-
-/* Search type toggle buttons */
+/* Search scope toggles: notes, tags, or both, but never neither */
 .searchbar-type-icons {
     position: absolute;
-    left: 30px;
+    left: 10px;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
     gap: 0px;
     z-index: 2;
-    transition: opacity 0.2s ease, visibility 0.2s ease;
-}
-
-.searchbar-type-icons.hidden {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-}
-
-/* When search icons are hidden, adjust input padding */
-.searchbar-input.search-combined-mode {
-    padding-left: 32px !important;
 }
 
 .searchbar-type-btn {
@@ -134,28 +95,27 @@
     justify-content: center;
 }
 
-.searchbar-type-btn:hover {
+/* Two flat states: accent when selected, subtle grey otherwise. Hovering changes
+   nothing, so the pointer resting on an icon you just toggled never disguises
+   its new state. The <i> is named explicitly, and its :hover restated, because
+   icons.css paints every lucide icon accent and scales it on hover, and that
+   rule outranks the plain `color: inherit` below. */
+.searchbar-type-btn:hover,
+.searchbar-type-btn i[class*="lucide-"],
+.searchbar-type-btn i[class*="lucide-"]:hover {
+    color: var(--pz-text-subtle);
+}
+
+.searchbar-type-btn.active,
+.searchbar-type-btn.active:hover,
+.searchbar-type-btn.active i[class*="lucide-"],
+.searchbar-type-btn.active i[class*="lucide-"]:hover {
     color: var(--pz-accent);
 }
 
-.searchbar-type-btn:hover i {
-    color: var(--pz-accent);
-}
-
-.searchbar-type-btn:hover i::before {
-    color: var(--pz-accent);
-}
-
-.searchbar-type-btn.active {
-    color: var(--pz-accent);
-}
-
-.searchbar-type-btn.active i {
-    color: var(--pz-accent);
-}
-
-.searchbar-type-btn.active i::before {
-    color: var(--pz-accent);
+.searchbar-type-btn i[class*="lucide-"],
+.searchbar-type-btn i[class*="lucide-"]:hover {
+    transform: none;
 }
 
 .searchbar-type-btn i {

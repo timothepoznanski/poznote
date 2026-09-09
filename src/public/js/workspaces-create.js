@@ -159,18 +159,7 @@ function switchToWorkspace(workspaceName) {
 
     var url = new URL(window.location.href);
     url.searchParams.delete('note');
-    var currentSearchType = getCurrentSearchType();
-
-    // Clear existing preserve parameters
-    url.searchParams.delete('preserve_notes');
-    url.searchParams.delete('preserve_tags');
-
-    // Set appropriate preserve parameter based on current search type
-    if (currentSearchType === 'tags') {
-        url.searchParams.set('preserve_tags', '1');
-    } else {
-        url.searchParams.set('preserve_notes', '1');
-    }
+    applySearchTypesToUrl(url);
 
     url.searchParams.set('workspace', workspaceName);
 

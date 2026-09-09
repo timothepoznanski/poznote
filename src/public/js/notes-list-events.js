@@ -177,68 +177,6 @@
 
     window.toggleSearchBar = toggleSearchBar;
 
-    /**
-     * Handle search type toggle between notes and tags
-     * @param {Event} event - The click event
-     */
-    function handleSearchTypeToggle(event) {
-        var button = event.target.closest('.searchbar-type-btn');
-        if (!button) return;
-
-        var searchType = button.getAttribute('data-search-type');
-        if (!searchType) return;
-
-        // Use SearchManager if available (handles both button state and search execution)
-        if (window.searchManager && typeof window.searchManager.handleButtonClick === 'function') {
-            window.searchManager.handleButtonClick(searchType, false);
-            return;
-        }
-
-        // Fallback: manual update if SearchManager not available
-        updateSearchTypeUI(button, searchType);
-    }
-
-    /**
-     * Update search type UI manually (fallback when SearchManager not available)
-     * @param {HTMLElement} activeButton - The button that was clicked
-     * @param {string} searchType - Either 'notes' or 'tags'
-     */
-    function updateSearchTypeUI(activeButton, searchType) {
-        // Update button states
-        var allButtons = document.querySelectorAll('.searchbar-type-btn');
-        allButtons.forEach(function (btn) {
-            btn.classList.remove('active');
-        });
-        activeButton.classList.add('active');
-
-        // Update hidden fields and placeholder
-        var searchInNotes = document.getElementById('search-in-notes');
-        var searchInTags = document.getElementById('search-in-tags');
-        var searchInput = document.getElementById('unified-search');
-
-        if (searchType === 'notes') {
-            if (searchInNotes) searchInNotes.value = '1';
-            if (searchInTags) searchInTags.value = '';
-            if (searchInput) {
-                searchInput.placeholder = window.t
-                    ? window.t('search.placeholder_notes', null, 'Search for one or more words...')
-                    : 'Search for one or more words...';
-            }
-        } else if (searchType === 'tags') {
-            if (searchInNotes) searchInNotes.value = '';
-            if (searchInTags) searchInTags.value = '1';
-            if (searchInput) {
-                searchInput.placeholder = window.t
-                    ? window.t('search.placeholder_tags', null, 'Search for one or more tags...')
-                    : 'Search for one or more tags...';
-            }
-        }
-
-        if (searchInput) {
-            searchInput.focus();
-        }
-    }
-
     // =====================================================
     // EVENT HANDLERS
     // =====================================================
@@ -806,38 +744,13 @@
             searchContainer.style.display = (searchBarVisible === 'false') ? 'none' : 'block';
         }
 
-        // Initialize search type button states
-        initializeSearchTypeButtons();
+        // The searchbar scope icons (notes / tags) are wired by SearchManager
 
         // Clean up the old favorites section collapsed state
         restoreFavoritesState();
 
         // Attach event listeners
         attachEventListeners();
-    }
-
-    /**
-     * Initialize search type buttons (notes/tags) state
-     */
-    function initializeSearchTypeButtons() {
-        var searchInNotes = document.getElementById('search-in-notes');
-        var searchInTags = document.getElementById('search-in-tags');
-        var notesBtn = document.querySelector('.searchbar-type-notes');
-        var tagsBtn = document.querySelector('.searchbar-type-tags');
-
-        if (searchInTags && searchInTags.value === '1') {
-            if (notesBtn) notesBtn.classList.remove('active');
-            if (tagsBtn) tagsBtn.classList.add('active');
-        } else {
-            if (notesBtn) notesBtn.classList.add('active');
-            if (tagsBtn) tagsBtn.classList.remove('active');
-        }
-
-        // Attach click handlers to type buttons
-        var typeButtons = document.querySelectorAll('.searchbar-type-btn');
-        typeButtons.forEach(function (btn) {
-            btn.addEventListener('click', handleSearchTypeToggle);
-        });
     }
 
     /**

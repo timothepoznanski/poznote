@@ -47,6 +47,27 @@ try {
 $selected_linked_note_id = isset($_GET['select_linked_note']) ? intval($_GET['select_linked_note']) : 0;
 $has_created_date_filter = !empty($created_from) || !empty($created_to);
 
+// Search scope: the two searchbar icons toggle independently, so a search can
+// cover notes, tags, or both, but never neither.
+if ($using_unified_search) {
+    $search_in_notes_value = (isset($_POST['search_in_notes']) && $_POST['search_in_notes'] === '1') ? '1' : '';
+    $search_in_tags_value = (isset($_POST['search_in_tags']) && $_POST['search_in_tags'] === '1') ? '1' : '';
+} else {
+    $search_in_notes_value = (!empty($search) || $preserve_notes) ? '1' : '';
+    $search_in_tags_value = (!empty($tags_search) || $preserve_tags) ? '1' : '';
+}
+if ($search_combined) {
+    $search_in_notes_value = '1';
+    $search_in_tags_value = '1';
+}
+// Nothing selected yet: fall back to the default scope, notes and tags at once
+if ($search_in_notes_value !== '1' && $search_in_tags_value !== '1') {
+    $search_in_notes_value = '1';
+    $search_in_tags_value = '1';
+}
+// Both scopes at once is what the backend calls combined mode
+$search_combined_value = ($search_in_notes_value === '1' && $search_in_tags_value === '1') ? '1' : '';
+
 ?>
 
 <!-- Notes list display -->
@@ -55,14 +76,11 @@ $has_created_date_filter = !empty($created_from) || !empty($created_to);
     <form id="unified-search-form" action="index.php" method="POST">
         <div class="unified-search-container">
             <div class="searchbar-row searchbar-icon-row">
-                <button type="button" id="search-options-toggle" class="searchbar-options-toggle" title="<?php echo t_h('search.toggle_options', [], 'Toggle search options'); ?>">
-                    <i class="lucide lucide-more-vertical"></i>
-                </button>
-                <div class="searchbar-type-icons<?php echo !isset($search_combined) || $search_combined !== false ? ' hidden' : ''; ?>" id="searchbar-type-icons">
-                    <button type="button" id="search-notes-btn" class="searchbar-type-btn searchbar-type-notes active" data-search-type="notes" title="<?php echo t_h('search.search_in_notes', [], 'Search in notes'); ?>">
+                <div class="searchbar-type-icons" id="searchbar-type-icons">
+                    <button type="button" id="search-notes-btn" class="searchbar-type-btn searchbar-type-notes<?php echo $search_in_notes_value === '1' ? ' active' : ''; ?>" data-search-type="notes" aria-pressed="<?php echo $search_in_notes_value === '1' ? 'true' : 'false'; ?>" title="<?php echo t_h('search.search_in_notes', [], 'Search in notes'); ?>">
                         <i class="lucide lucide-file-alt"></i>
                     </button>
-                    <button type="button" id="search-tags-btn" class="searchbar-type-btn searchbar-type-tags" data-search-type="tags" title="<?php echo t_h('search.search_in_tags', [], 'Search in tags'); ?>">
+                    <button type="button" id="search-tags-btn" class="searchbar-type-btn searchbar-type-tags<?php echo $search_in_tags_value === '1' ? ' active' : ''; ?>" data-search-type="tags" aria-pressed="<?php echo $search_in_tags_value === '1' ? 'true' : 'false'; ?>" title="<?php echo t_h('search.search_in_tags', [], 'Search in tags'); ?>">
                         <i class="lucide lucide-tag"></i>
                     </button>
                 </div>
@@ -95,9 +113,9 @@ $has_created_date_filter = !empty($created_from) || !empty($created_to);
             <input type="hidden" id="search-notes-hidden" name="search" value="<?php echo htmlspecialchars($search ?? '', ENT_QUOTES); ?>">
             <input type="hidden" id="search-tags-hidden" name="tags_search" value="<?php echo htmlspecialchars($tags_search ?? '', ENT_QUOTES); ?>">
             <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
-            <input type="hidden" id="search-in-notes" name="search_in_notes" value="<?php echo ($using_unified_search && !empty($_POST['search_in_notes']) && $_POST['search_in_notes'] === '1') || (!$using_unified_search && (!empty($search) || $preserve_notes)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search) && !$preserve_tags) ? '1' : ''); ?>">
-            <input type="hidden" id="search-in-tags" name="search_in_tags" value="<?php echo ($using_unified_search && !empty($_POST['search_in_tags']) && $_POST['search_in_tags'] === '1') || (!$using_unified_search && (!empty($tags_search) || $preserve_tags)) ? '1' : ''; ?>">
-            <input type="hidden" id="search-combined-mode" name="search_combined" value="<?php echo $search_combined ? '1' : ''; ?>">
+            <input type="hidden" id="search-in-notes" name="search_in_notes" value="<?php echo $search_in_notes_value; ?>">
+            <input type="hidden" id="search-in-tags" name="search_in_tags" value="<?php echo $search_in_tags_value; ?>">
+            <input type="hidden" id="search-combined-mode" name="search_combined" value="<?php echo $search_combined_value; ?>">
         </div>
     </form>
 </div>
