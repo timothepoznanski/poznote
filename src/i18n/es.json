@@ -1838,7 +1838,11 @@
     "audio_invalid_file": "Por favor, seleccione un archivo de audio.",
     "audio_upload_failed": "Error al subir: {{error}}",
     "date": "Fecha",
-    "tasklist_embed": "Lista de tareas"
+    "tasklist_embed": "Lista de tareas",
+    "template": "Plantilla",
+    "template_none": "Aún no hay plantillas",
+    "template_none_hint": "Coloca notas en una carpeta llamada «Plantillas» o «Templates»",
+    "template_insert_failed": "No se pudo insertar la plantilla"
   },
   "api": {
     "settings": {

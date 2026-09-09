@@ -1408,7 +1408,11 @@
     "audio_invalid_file": "Please select an audio file.",
     "audio_upload_failed": "Upload failed: {{error}}",
     "date": "Date",
-    "tasklist_embed": "Task list"
+    "tasklist_embed": "Task list",
+    "template": "Template",
+    "template_none": "No templates yet",
+    "template_none_hint": "Put notes in a folder named \"Templates\"",
+    "template_insert_failed": "Could not insert the template"
   },
   "api": {
     "settings": {

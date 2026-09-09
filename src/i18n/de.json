@@ -1837,7 +1837,11 @@
     "audio_invalid_file": "Bitte wählen Sie eine Audiodatei aus.",
     "audio_upload_failed": "Upload fehlgeschlagen: {{error}}",
     "date": "Datum",
-    "tasklist_embed": "Aufgabenliste"
+    "tasklist_embed": "Aufgabenliste",
+    "template": "Vorlage",
+    "template_none": "Noch keine Vorlagen",
+    "template_none_hint": "Lege Notizen in einen Ordner namens „Vorlagen“ oder „Templates“",
+    "template_insert_failed": "Die Vorlage konnte nicht eingefügt werden"
   },
   "api": {
     "settings": {

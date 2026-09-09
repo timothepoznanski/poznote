@@ -1836,7 +1836,11 @@
     "audio_invalid_file": "Por favor, selecione um ficheiro de audio.",
     "audio_upload_failed": "Erro ao enviar: {{error}}",
     "date": "Data",
-    "tasklist_embed": "Lista de tarefas"
+    "tasklist_embed": "Lista de tarefas",
+    "template": "Modelo",
+    "template_none": "Ainda não há modelos",
+    "template_none_hint": "Coloque notas numa pasta chamada \"Modelos\" ou \"Templates\"",
+    "template_insert_failed": "Não foi possível inserir o modelo"
   },
   "api": {
     "settings": {

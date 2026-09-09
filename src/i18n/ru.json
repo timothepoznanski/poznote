@@ -1357,7 +1357,11 @@
     "audio_invalid_file": "Пожалуйста, выберите аудиофайл.",
     "audio_upload_failed": "Ошибка загрузки: {{error}}",
     "date": "Дата",
-    "tasklist_embed": "Список задач"
+    "tasklist_embed": "Список задач",
+    "template": "Шаблон",
+    "template_none": "Шаблонов пока нет",
+    "template_none_hint": "Поместите заметки в папку с именем «Шаблоны» или «Templates»",
+    "template_insert_failed": "Не удалось вставить шаблон"
   },
   "api": {
     "settings": {

@@ -200,6 +200,43 @@ curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/with-attachments
 ```
 
+### List Templates
+
+```
+GET /notes/templates
+```
+
+List the notes the `/template` slash command can insert. A template is an ordinary HTML or Markdown note kept in a folder named `Templates` (sub-folders included) or in a workspace named `Templates`. The folder or workspace name is matched case-insensitively, in English or in the language of the interface (`Modèles`, `Vorlagen`, `Plantillas`, `Modelos`, `Шаблоны`, `模板`).
+
+**Query Parameters:**
+- `workspace` (optional): Only look at the `Templates` folders of this workspace. Notes of a `Templates` workspace are always included.
+
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  "http://YOUR_SERVER/api/v1/notes/templates?workspace=Poznote"
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "notes": [
+    {
+      "id": 12,
+      "heading": "Meeting notes",
+      "type": "note",
+      "workspace": "Poznote",
+      "folder_id": 3,
+      "icon": "lucide-file-text",
+      "icon_color": null
+    }
+  ],
+  "count": 1
+}
+```
+
+Fetch the content of a template with `GET /notes/{id}`.
+
 ### Get Note
 
 ```
@@ -395,19 +432,6 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"folder_id": 12, "workspace": "Poznote"}' \
   http://YOUR_SERVER/api/v1/notes/123/duplicate
-```
-
-### Create Template from Note
-
-```
-POST /notes/{id}/create-template
-```
-
-Create a reusable template from an existing note.
-
-```bash
-curl -X POST -u 'username:password' -H "X-User-ID: 1" \
-  http://YOUR_SERVER/api/v1/notes/123/create-template
 ```
 
 ### Convert Note Type
@@ -3194,6 +3218,7 @@ curl http://YOUR_SERVER/api_health.php
 |--------|----------|-------------|
 | `GET` | `/notes` | List notes |
 | `GET` | `/notes/with-attachments` | List notes with attachments |
+| `GET` | `/notes/templates` | List notes usable as templates |
 | `GET` | `/notes/resolve` | Resolve note by reference |
 | `GET` | `/notes/search` | Search notes |
 | `GET` | `/notes/{id}` | Get note |
@@ -3202,7 +3227,6 @@ curl http://YOUR_SERVER/api_health.php
 | `DELETE` | `/notes/{id}` | Delete note |
 | `POST` | `/notes/{id}/restore` | Restore from trash |
 | `POST` | `/notes/{id}/duplicate` | Duplicate note |
-| `POST` | `/notes/{id}/create-template` | Create template |
 | `POST` | `/notes/{id}/convert` | Convert type |
 | `POST` | `/notes/{id}/beacon` | Emergency save |
 | `PUT` | `/notes/{id}/tags` | Update tags |

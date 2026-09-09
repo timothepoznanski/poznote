@@ -87,6 +87,7 @@ function routeTable(): array
         'GET /notes/resolve' => [OWNED, 'query' => ['reference' => '{marker}']],
         'GET /notes/search' => [SCOPED, 'query' => ['q' => '{marker}']],
         'GET /notes/with-attachments' => [SCOPED],
+        'GET /notes/templates' => [SCOPED],
         'GET /changes' => [SCOPED],
         'GET /graph' => [SCOPED],
         'POST /convert-html' => [SCOPED, 'body' => ['content' => '# heading']],
@@ -599,7 +600,7 @@ function checkPathTraversal(IsolationContext $ctx): void
 function checkWorkspaceScoping(IsolationContext $ctx): void
 {
     $workspace = $ctx->fixtures['workspace'];
-    $routes = ['/notes', '/folders', '/folders/counts', '/tags', '/trash', '/graph', '/tasks', '/reminders', '/notes/search'];
+    $routes = ['/notes', '/notes/templates', '/folders', '/folders/counts', '/tags', '/trash', '/graph', '/tasks', '/reminders', '/notes/search'];
 
     foreach ($routes as $path) {
         test("workspace scoping: GET $path?workspace=<owner's>", function () use ($ctx, $path, $workspace) {
