@@ -62,29 +62,32 @@ p.code-block-placeholder-after[data-ph]:empty:before {
 }
 
 @media (min-width: 801px) {
+    /* Each column docked on the right of the note (outline, AI chat, UI
+       customization panel) declares its width in one of these on <html> or
+       <body>; the fixed controls add them up instead of listing every
+       combination. css/ui-customization-panel.css reads them too. */
+    html:not(.outline-collapsed) {
+        --pz-docked-outline: var(--outline-width, 280px);
+    }
+
+    html.ai-chat-open,
+    body:has(#ai-chat-panel.ai-chat-open) {
+        --pz-docked-ai-chat: var(--ai-chat-width, 380px);
+    }
+
+    body.ui-custom-panel-open {
+        --pz-docked-ui-custom: var(--ui-custom-panel-width, 360px);
+    }
+
     .note-scroll-edge-controls {
         position: fixed;
-        right: 10px;
+        right: calc(10px + var(--pz-docked-outline, 0px) + var(--pz-docked-ai-chat, 0px) + var(--pz-docked-ui-custom, 0px));
         bottom: 10px;
         z-index: 30;
         display: flex;
         flex-direction: column;
         gap: 6px;
         pointer-events: none;
-    }
-
-    html:not(.outline-collapsed) .note-scroll-edge-controls {
-        right: calc(var(--outline-width, 280px) + 10px);
-    }
-
-    html.ai-chat-open .note-scroll-edge-controls,
-    body:has(#ai-chat-panel.ai-chat-open) .note-scroll-edge-controls {
-        right: calc(var(--ai-chat-width, 380px) + 10px);
-    }
-
-    html.ai-chat-open:not(.outline-collapsed) .note-scroll-edge-controls,
-    body:has(#ai-chat-panel.ai-chat-open):not(.outline-collapsed) .note-scroll-edge-controls {
-        right: calc(var(--outline-width, 280px) + var(--ai-chat-width, 380px) + 10px);
     }
 
     .note-scroll-edge-btn {

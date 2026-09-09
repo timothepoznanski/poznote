@@ -12,10 +12,6 @@ require_once 'oidc.php';
 require_once __DIR__ . '/../version_helper.php';
 require_once __DIR__ . '/../users/db_master.php';
 
-// Cache-busting version for the login page assets; without it browsers keep
-// stale copies of login.css / login-page.js across releases
-$loginAssetV = rawurlencode(getAppVersion());
-
 // Set security headers for login page
 header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; form-action 'self';");
 header("X-Content-Type-Options: nosniff");
@@ -81,7 +77,7 @@ function poznoteRenderLoginRedirectAndExit(?string $redirectAfter, string $curre
 
     echo '<!DOCTYPE html><html><head>';
     echo '<script type="application/json" id="workspace-redirect-data">' . json_encode($redirectConfig) . '</script>';
-    echo '<script src="js/workspace-redirect.js?v=' . rawurlencode(getAppVersion()) . '"></script>';
+    echo '<script src="' . poznoteAsset('js/workspace-redirect.js') . '"></script>';
     echo '</head><body>' . t_h('login.redirecting', [], 'Redirecting...', $currentLang) . '</body></html>';
     exit;
 }
@@ -190,12 +186,13 @@ if (isset($_GET['oidc_error'])) {
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Poznote">
     <meta name="color-scheme" content="dark light">
-    <link rel="manifest" href="pwa/manifest.webmanifest">
+    <link rel="manifest" href="<?php echo poznoteAsset('pwa/manifest.webmanifest'); ?>">
     <link rel="apple-touch-icon" href="pwa/poznote.png">
     <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
-    <script src="pwa/pwa.js" defer></script>
+    <script src="<?php echo poznoteAsset('pwa/pwa.js'); ?>" defer></script>
     <?php poznoteRenderStylesheets('login'); ?>
     <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 </head>
 <body>
@@ -333,6 +330,6 @@ if (isset($_GET['oidc_error'])) {
     ];
     ?>
     <script type="application/json" id="login-config"><?php echo json_encode($loginConfig); ?></script>
-    <script src="js/login-page.js?v=<?php echo $loginAssetV; ?>"></script>
+    <script src="<?php echo poznoteAsset('js/login-page.js'); ?>"></script>
 </body>
 </html>

@@ -718,12 +718,9 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     data-ai-workspace="<?php echo htmlspecialchars($aiPanelWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
       data-scope="<?php echo htmlspecialchars($dashboardScope['key'], ENT_QUOTES, 'UTF-8'); ?>">
     <?php
-    // Same entry, same id and same place as on index.php, so the UI
-    // Customization preference saved against it applies here too.
+    // The AI assistant toggle lives in the floating stack at the bottom-right
+    // of the page (ui_customization_panel.php), like on index.php.
     $iconSidebarExtraItems = [];
-    if ($aiChatEnabled) {
-        $iconSidebarExtraItems[] = ['id' => 'sidebarAiChatBtn', 'after' => 'iconSidebarDashboardBtn', 'action' => 'toggle-ai-chat', 'icon' => 'lucide-bot', 'label' => t('ai_chat.toolbar_button', [], 'AI assistant')];
-    }
     include __DIR__ . '/../icon_sidebar.php';
     ?>
 
@@ -813,6 +810,13 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	</div>
 	<?php endif; ?>
 	<?php endif; ?>
+
+	<?php
+	// Contextual UI Customization: floating button + docked column listing the
+	// hideable elements of this page (see ui_customization_panel.php)
+	$uiCustomizationPanelPage = 'dashboard';
+	include __DIR__ . '/../ui_customization_panel.php';
+	?>
 
 
 		<div id="workspaceSwitcherModal" class="modal">
@@ -915,5 +919,8 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 		<script src="<?php echo poznoteAsset('js/ai-chat.js'); ?>"></script>
 		<?php endif; ?>
     <script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
+    <!-- Contextual UI Customization panel (see ui_customization_panel.php) -->
+    <script src="<?php echo poznoteAsset('js/ui-customization.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/ui-customization-panel.js'); ?>"></script>
 </body>
 </html>

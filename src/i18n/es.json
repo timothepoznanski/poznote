@@ -84,12 +84,14 @@
     "menu_item": "Instantáneas",
     "modal": {
       "title": "Instantáneas",
-      "description": "Creadas automáticamente al abrir por primera vez cada día, se conservan las últimas {{count}}. «Tomar instantánea ahora» añade una instantánea manual. Toda instantánea caduca a los {{days}} días.",
+      "description": "Creadas automáticamente al abrir por primera vez cada día, se conservan las últimas {{count}}. «Tomar instantánea ahora» o Ctrl + Alt + S añade una instantánea manual, y se toma una antes de cada cambio hecho por el asistente de IA o el servidor MCP. Toda instantánea caduca a los {{days}} días.",
       "loading": "Cargando instantánea...",
       "history": "Historial",
       "markdown_preview": "Vista previa",
       "markdown_source": "Vista source",
       "today": "Hoy",
+      "origin_ai": "Antes del cambio de la IA",
+      "origin_mcp": "Antes del cambio por MCP",
       "empty_title": "No hay instantánea disponible",
       "empty_hint": "No hay instantáneas por el momento, pero puedes crear una manualmente ahora mismo.",
       "new_note_empty_title": "Aún no hay instantáneas",
@@ -482,7 +484,7 @@
       "support": "Apoya el desarrollo de Poznote con una donación.",
       "s3_storage": "Almacenar los adjuntos de las notas en un almacenamiento de objetos compatible con S3 en lugar del disco local.",
       "s3_backup": "Sube archivos de copia de seguridad completos a un bucket compatible con S3, manualmente o según una programación.",
-      "highlight_current_folder_tree": "Atenuar las notas y carpetas que están fuera de la jerarquía de carpetas en la que trabajas.",
+      "highlight_current_folder_tree": "Atenuar, tanto como quieras, las notas y carpetas que están fuera de la jerarquía de carpetas en la que trabajas.",
       "snapshots": "Elegir cuántas instantáneas automáticas diarias se conservan por nota."
     },
     "title": "Configuración",
@@ -1217,7 +1219,15 @@
       "folder_actions_toggle": "Botón de menú (⋮) en las carpetas",
       "note_actions_toggle": "Botón de menú (⋮) en las notas",
       "note_actions_hint": "Elementos del menú ⋮ de cada nota en la barra lateral. Si se desmarcan todos, se oculta el botón del menú.",
-      "theme_toggle": "Botón de tema"
+      "theme_toggle": "Botón de tema",
+      "panel_title": "Personalizar esta página",
+      "panel_button": "Personalizar la interfaz",
+      "panel_hint": "Solo se muestran los elementos de esta página. Los cambios se aplican de inmediato y se guardan automáticamente.",
+      "panel_admin_note": "Este panel solo cambia tu propia interfaz; la columna «Usuarios» está en los ajustes.",
+      "panel_all_options": "Todas las opciones",
+      "panel_saving": "Guardando…",
+      "panel_saved": "Guardado",
+      "panel_save_error": "No se pudo guardar, inténtalo de nuevo."
     },
     "icon_sidebar_order": {
       "title": "Orden de la barra de iconos",
@@ -1449,6 +1459,16 @@
         "alphabetical": "Alfabético",
         "manual": "Manual (arrastrar y soltar)"
       }
+    },
+    "folder_tree_highlight": {
+      "title": "Resaltar el árbol de carpetas actual",
+      "description": "Las notas y carpetas fuera de la jerarquía en la que trabajas se atenúan. Elige cuánto:",
+      "dim_strength": "Atenuación",
+      "turn_off": "Desactivar",
+      "preview_current_folder": "Carpeta actual",
+      "preview_current_note": "Una nota en la que trabajas",
+      "preview_other_folder": "Otra carpeta",
+      "preview_other_note": "Una nota en otro lugar"
     },
     "markdown_colored": {
       "title": "Markdown a color",

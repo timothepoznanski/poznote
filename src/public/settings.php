@@ -111,6 +111,7 @@ $settingsPageUserKeys = [
     'hide_folder_counts',
     'hide_folder_actions',
     'highlight_current_folder_tree',
+    'folder_tree_dim_level',
     'notes_without_folders_after_folders',
     'markdown_split_card_view',
     'markdown_colored',
@@ -281,6 +282,7 @@ if ($canUseUserWebhooks) {
     <meta name="color-scheme" content="dark light">
     <link rel="manifest" href="pwa/manifest.webmanifest?v=<?php echo $cache_v; ?>">
     <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="pwa/poznote.png?v=<?php echo $cache_v; ?>">
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
     <script>
@@ -636,11 +638,11 @@ if ($canUseUserWebhooks) {
 
             <!-- Highlight Current Folder Tree -->
             <div class="home-card" id="folder-tree-highlight-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.highlight_current_folder_tree', [], 'Dim the notes and folders that sit outside the folder hierarchy you are working in.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.highlight_current_folder_tree', [], 'Dim the notes and folders that sit outside the folder hierarchy you are working in, as much or as little as you like.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-folder-tree"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.highlight_current_folder_tree', [], 'Highlight current folder tree'); ?></span>
-                    <span id="folder-tree-highlight-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                    <span id="folder-tree-highlight-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                 </div>
             </div>
 

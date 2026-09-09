@@ -557,7 +557,7 @@ function enableDragAndDrop(noteId) {
     const existingScript = document.querySelector('script[data-sortable-local]');
     if (!existingScript) {
         const script = document.createElement('script');
-        script.src = 'js/Sortable.min.js';
+        script.src = (window.poznoteAssetUrl ? window.poznoteAssetUrl('js/Sortable.min.js') : 'js/Sortable.min.js');
         script.async = true;
         script.setAttribute('data-sortable-local', '1');
         script.onload = function() { initSortable(); };

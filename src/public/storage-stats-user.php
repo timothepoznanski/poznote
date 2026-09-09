@@ -241,6 +241,7 @@ if ($backupsColumnVisible) {
     <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
     <?php poznoteRenderStylesheets('storage-stats-user'); ?>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <style>
     /* Help icon on the local attachments figure when S3 storage is on.

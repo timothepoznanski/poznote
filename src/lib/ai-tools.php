@@ -500,6 +500,7 @@ function aiPersistTasks(PDO $con, int $noteId, array $tasks, $actorUserId): ?str
     $existingBytes = is_file($filename) ? (int)filesize($filename) : 0;
     $quotaError = poznoteCheckStorageQuota(strlen($content) - $existingBytes);
     if ($quotaError !== null) return json_encode(['error' => $quotaError]);
+    poznoteCreateSafetySnapshot($con, $noteId, 'ai');
     createDirectoryWithPermissions(dirname($filename));
     if (file_put_contents($filename, $content) === false) return json_encode(['error' => 'Failed to write note file']);
     $con->prepare('UPDATE entries SET entry = ?, updated = ?, updated_by_user_id = ? WHERE id = ?')
@@ -808,13 +809,19 @@ function aiToolUpdateNoteContent($con, array $args, $chatWorkspace, $actorUserId
             $content = aiRestoreInlineImages($content, $stored);
         }
     }
+    // The previous version stays one click away in the Snapshots modal
+    $snapshotTaken = poznoteCreateSafetySnapshot($con, $noteId, 'ai');
     createDirectoryWithPermissions(dirname($filename));
     if (file_put_contents($filename, $content) === false) {
         return json_encode(['error' => 'Failed to write note file']);
     }
     $con->prepare('UPDATE entries SET entry = ?, updated = ?, updated_by_user_id = ? WHERE id = ?')
         ->execute([$content, gmdate('Y-m-d H:i:s'), $actorUserId, $noteId]);
-    return json_encode(['ok' => true, 'note_id' => $noteId, 'title' => $note['heading']], JSON_UNESCAPED_UNICODE);
+    $result = ['ok' => true, 'note_id' => $noteId, 'title' => $note['heading']];
+    if ($snapshotTaken) {
+        $result['previous_version'] = 'saved as a snapshot before this change (Snapshots menu of the note)';
+    }
+    return json_encode($result, JSON_UNESCAPED_UNICODE);
 }
 
 /** Tool `create_note`. */
@@ -1403,6 +1410,7 @@ function aiToolSetChecklistItem($con, array $args, $chatWorkspace, $actorUserId)
     if ($newContent === null) {
         return json_encode(['error' => 'Could not locate the checkbox in the note']);
     }
+    poznoteCreateSafetySnapshot($con, $noteId, 'ai');
     createDirectoryWithPermissions(dirname($filename));
     if (file_put_contents($filename, $newContent) === false) {
         return json_encode(['error' => 'Failed to write note file']);

@@ -803,6 +803,8 @@ curl -u 'username:password' -H "X-User-ID: 1" \
 
 Snapshots preserve daily versions of a note's content. One automatic snapshot is taken per day; the most recent automatic snapshots are kept per note, 3 by default (user setting `snapshots_keep_count`, 1 to 30, also available from Settings > Snapshots). Manual snapshots can be added on demand without limit and do not count toward that number. Every snapshot, automatic or manual, expires 30 days after it was taken.
 
+A manual snapshot is also taken automatically right before the built-in AI assistant or the MCP server (requests authenticated with the MCP service token) changes the content or tasks of a note, unless the note is empty or the newest snapshot already holds the same content; the 20 most recent of them are kept per note. Such snapshots carry an `origin` field in the list and get responses, `"ai"` or `"mcp"`; user-made snapshots have an empty `origin`.
+
 An attachment or image deleted from a note is kept on disk (hidden from the note) as long as a snapshot still references it, so restoring that snapshot brings it back. The file is removed for good once no snapshot references it any more (the last one expired or was purged), or when the note is permanently deleted.
 
 ### Create Snapshot

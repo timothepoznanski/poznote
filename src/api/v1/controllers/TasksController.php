@@ -623,6 +623,9 @@ class TasksController
         }
 
         createDirectoryWithPermissions(dirname($filename));
+        if (isApiServiceTokenRequest()) {
+            poznoteCreateSafetySnapshot($this->con, $noteId, 'mcp');
+        }
         file_put_contents($filename, $content);
 
         $stmt = $this->con->prepare("UPDATE entries SET entry = ?, updated = datetime('now') WHERE id = ?");

@@ -1,6 +1,18 @@
 <?php
 require_once __DIR__ . '/../../auth.php';
 requireAuth();
+
+// Swagger UI is vendored next to this page, so it cannot go through
+// poznoteAsset(): that helper resolves paths against the docroot, and these
+// hrefs must stay relative to /api-docs/. Same idea though, key the URL on the
+// file's own mtime so an update is picked up instead of served from the
+// browser cache for another year.
+$swaggerAsset = static function (string $file): string {
+    $absolutePath = __DIR__ . '/' . $file;
+    $mtime = is_file($absolutePath) ? @filemtime($absolutePath) : false;
+    $href = $mtime !== false ? $file . '?v=' . rawurlencode((string) $mtime) : $file;
+    return htmlspecialchars($href, ENT_QUOTES, 'UTF-8');
+};
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -8,7 +20,7 @@ requireAuth();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poznote API Documentation</title>
-    <link rel="stylesheet" href="swagger-ui/swagger-ui.css">
+    <link rel="stylesheet" href="<?php echo $swaggerAsset('swagger-ui/swagger-ui.css'); ?>">
     <style>
         body {
             margin: 0;
@@ -40,12 +52,12 @@ requireAuth();
 </head>
 <body>
     <div id="swagger-ui"></div>
-    <script src="swagger-ui/swagger-ui-bundle.js"></script>
-    <script src="swagger-ui/swagger-ui-standalone-preset.js"></script>
+    <script src="<?php echo $swaggerAsset('swagger-ui/swagger-ui-bundle.js'); ?>"></script>
+    <script src="<?php echo $swaggerAsset('swagger-ui/swagger-ui-standalone-preset.js'); ?>"></script>
     <script>
         window.onload = function() {
             SwaggerUIBundle({
-                url: "openapi.yaml?v=<?php echo time(); ?>",
+                url: "<?php echo $swaggerAsset('openapi.yaml'); ?>",
                 dom_id: '#swagger-ui',
                 deepLinking: true,
                 presets: [

@@ -378,6 +378,16 @@
                 var createdParts = String(snap.created_at).trim().split(' ');
                 secondaryLabel = createdParts[createdParts.length - 1] || '';
             }
+            // Safety snapshots taken before an automated rewrite say so
+            var originLabel = '';
+            if (snap.origin === 'ai') {
+                originLabel = tr('snapshot.modal.origin_ai', 'Before AI edit');
+            } else if (snap.origin === 'mcp') {
+                originLabel = tr('snapshot.modal.origin_mcp', 'Before MCP edit');
+            }
+            if (originLabel) {
+                secondaryLabel = secondaryLabel ? secondaryLabel + ' \u00b7 ' + originLabel : originLabel;
+            }
 
             btn.innerHTML = '<i class="lucide lucide-calendar"></i>' +
                 '<span class="snapshot-date-labels">' +
@@ -566,6 +576,63 @@
         } else if (confirm(tr('snapshot.confirm.take_now_message', 'Create an additional snapshot with the current note content? Existing snapshots for today will be kept.'))) {
             executeTakeSnapshot();
         }
+    };
+
+    /**
+     * Wait until the autosave of the current note has gone through, so a
+     * snapshot taken right after reflects what the user sees. Resolves
+     * anyway after a few seconds: the snapshot is best-effort.
+     */
+    function waitForNoteSaved(noteId) {
+        return new Promise(function (resolve) {
+            var deadline = Date.now() + 5000;
+            (function check() {
+                var pending = typeof window.hasUnsavedChanges === 'function' && window.hasUnsavedChanges(noteId);
+                if (!pending || Date.now() > deadline) {
+                    resolve();
+                    return;
+                }
+                setTimeout(check, 100);
+            })();
+        });
+    }
+
+    /**
+     * Take a manual snapshot of the open note without any confirmation
+     * (Ctrl + Alt + S). Saves pending edits first so the snapshot holds
+     * the content on screen, then shows a toast.
+     */
+    window.takeSnapshotShortcut = function () {
+        if (isSnapshotAccessBlocked()) return false;
+
+        var noteId = window.noteid;
+        if (!noteId || noteId === -1 || noteId === 'search') return false;
+
+        var save = Promise.resolve();
+        if (typeof window.hasUnsavedChanges === 'function' && window.hasUnsavedChanges(noteId)
+            && typeof window.saveNoteImmediately === 'function') {
+            window.saveNoteImmediately();
+            save = waitForNoteSaved(noteId);
+        }
+
+        save.then(function () {
+            return rememberPendingSnapshotCreate(noteId, requestSnapshotCreate(noteId, true));
+        }).then(function (data) {
+            if (!data || !data.success) {
+                showSnapshotError((data && data.error) || tr('snapshot.errors.create_failed', 'Failed to take snapshot'));
+                return;
+            }
+            showSnapshotToast(tr('snapshot.messages.created_now', 'Snapshot added'));
+            // Refresh the list if the modal happens to be open on this note
+            var modal = document.getElementById('snapshotModal');
+            if (modal && modal.style.display !== 'none' && String(modal.dataset.noteId) === String(noteId)) {
+                showSnapshotModal(noteId);
+            }
+        }).catch(function () {
+            showSnapshotError(tr('snapshot.errors.create_failed', 'Failed to take snapshot'));
+        });
+
+        return true;
     };
 
     /**

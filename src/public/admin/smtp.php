@@ -242,6 +242,7 @@ $notifyCandidates = listNewUserNotificationCandidates();
     <script src="../js/theme-init.js?v=<?php echo $v; ?>"></script>
     <?php poznoteRenderStylesheets('admin/smtp', ['prefix' => '../']); ?>
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <style>
         .smtp-page form { margin: 0; }

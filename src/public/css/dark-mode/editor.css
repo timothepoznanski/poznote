@@ -37,15 +37,28 @@ html[data-theme='dark'] .noteentry {
     color: var(--dm-text) !important;
 }
 
-html[data-theme='dark'] .note-scroll-edge-btn {
+html[data-theme='dark'] .note-scroll-edge-btn,
+html[data-theme='dark'] .pz-edge-btn {
     background: rgba(51, 51, 51, 0.96);
     border-color: var(--dm-border);
     color: var(--dm-accent);
     box-shadow: 0 5px 14px rgba(var(--pz-shadow-rgb), 0.26);
 }
 
+/* The floating stack buttons only take the accent on hover */
+html[data-theme='dark'] .pz-edge-btn {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .pz-edge-btn:hover,
+html[data-theme='dark'] .pz-edge-btn:focus {
+    color: var(--dm-accent);
+}
+
 html[data-theme='dark'] .note-scroll-edge-btn:hover,
-html[data-theme='dark'] .note-scroll-edge-btn:focus {
+html[data-theme='dark'] .note-scroll-edge-btn:focus,
+html[data-theme='dark'] .pz-edge-btn:hover,
+html[data-theme='dark'] .pz-edge-btn:focus {
     background: var(--dm-surface-hover);
 }
 

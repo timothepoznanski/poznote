@@ -2,23 +2,27 @@
  * Current Folder Tree Highlight
  *
  * With the "Highlight current folder tree" setting on, the notes list dims
- * everything outside the hierarchy being worked in. notes_list.php marks the
- * active folder .folder-tree-active and each of its ancestors
- * .folder-tree-branch; js/folder-tree-highlight.js moves those marks as the
- * user opens other notes and folders.
+ * everything outside the hierarchy being worked in. How far it dims is up to
+ * the user: the settings modal writes folder_tree_dim_level and index.php
+ * turns it into --folder-tree-dim-opacity on <body>. The value below is only
+ * the fallback for a user who never touched the slider.
+ *
+ * notes_list.php marks the active folder .folder-tree-active and each of its
+ * ancestors .folder-tree-branch; js/folder-tree-highlight.js moves those marks
+ * as the user opens other notes and folders.
  *
  * The :has() gate keeps the dimming off whenever no folder is active (no note
  * selected yet, or a note that lives outside any folder).
  */
 
 body.highlight-folder-tree {
-    --folder-tree-dim-opacity: 0.38;
+    --folder-tree-dim-opacity: 0.65;
 }
 
 body.highlight-folder-tree .notes-list-scrollable-content:has(.folder-tree-active) .folder-toggle,
 body.highlight-folder-tree .notes-list-scrollable-content:has(.folder-tree-active) .note-list-item,
 body.highlight-folder-tree .notes-list-scrollable-content:has(.folder-tree-active) .favorites-separator {
-    opacity: var(--folder-tree-dim-opacity, 0.38);
+    opacity: var(--folder-tree-dim-opacity, 0.65);
     transition: opacity 0.15s ease;
 }
 
@@ -41,9 +45,4 @@ body.highlight-folder-tree .notes-list-scrollable-content:has(.folder-tree-activ
 body.highlight-folder-tree .notes-list-scrollable-content:has(.folder-tree-active) .folder-toggle:hover,
 body.highlight-folder-tree .notes-list-scrollable-content:has(.folder-tree-active) .note-list-item:hover {
     opacity: 1;
-}
-
-/* Dark backgrounds swallow faint text faster than light ones. */
-html[data-theme='dark'] body.highlight-folder-tree {
-    --folder-tree-dim-opacity: 0.45;
 }

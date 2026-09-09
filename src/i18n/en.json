@@ -63,12 +63,14 @@
     "menu_item": "Snapshots",
     "modal": {
       "title": "Snapshots",
-      "description": "Created automatically on first open each day, the last {{count}} are kept. \"Take snapshot now\" adds a manual snapshot. Every snapshot expires after {{days}} days.",
+      "description": "Created automatically on first open each day, the last {{count}} are kept. \"Take snapshot now\" or Ctrl + Alt + S adds a manual snapshot, and one is taken before the AI assistant or the MCP server changes a note. Every snapshot expires after {{days}} days.",
       "loading": "Loading snapshot...",
       "history": "History",
       "markdown_preview": "Preview",
       "markdown_source": "Source view",
       "today": "Today",
+      "origin_ai": "Before AI edit",
+      "origin_mcp": "Before MCP edit",
       "empty_title": "No snapshot available",
       "empty_hint": "No snapshot for now, but you can create one manually right away.",
       "new_note_empty_title": "No snapshot yet",
@@ -196,7 +198,7 @@
       "support": "Support the development of Poznote with a donation.",
       "s3_storage": "Store note attachments in an S3-compatible object storage instead of the local disk.",
       "s3_backup": "Upload complete backup archives to an S3-compatible bucket, manually or on a schedule.",
-      "highlight_current_folder_tree": "Dim the notes and folders that sit outside the folder hierarchy you are working in.",
+      "highlight_current_folder_tree": "Dim the notes and folders that sit outside the folder hierarchy you are working in, as much or as little as you like.",
       "snapshots": "Choose how many automatic daily snapshots are kept per note."
     },
     "title": "Settings",
@@ -705,7 +707,15 @@
       "folder_actions_toggle": "Menu button (⋮) on folders",
       "note_actions_toggle": "Menu button (⋮) on notes",
       "note_actions_hint": "Items of the ⋮ menu on each note in the sidebar. Unchecking them all hides the menu button.",
-      "theme_toggle": "Theme toggle"
+      "theme_toggle": "Theme toggle",
+      "panel_title": "Customize this page",
+      "panel_button": "Customize the interface",
+      "panel_hint": "Only the elements of this page are listed. Changes apply immediately and are saved automatically.",
+      "panel_admin_note": "This panel only changes your own interface; the \"Users\" column is in the settings.",
+      "panel_all_options": "All options",
+      "panel_saving": "Saving…",
+      "panel_saved": "Saved",
+      "panel_save_error": "Could not save, try again."
     },
     "icon_sidebar_order": {
       "title": "Icon sidebar order",
@@ -987,6 +997,16 @@
         "alphabetical": "Alphabetical",
         "manual": "Manual (drag and drop)"
       }
+    },
+    "folder_tree_highlight": {
+      "title": "Highlight current folder tree",
+      "description": "Notes and folders outside the hierarchy you are working in fade out. Choose how far they fade:",
+      "dim_strength": "Dimming",
+      "turn_off": "Turn off",
+      "preview_current_folder": "Current folder",
+      "preview_current_note": "A note you are working on",
+      "preview_other_folder": "Another folder",
+      "preview_other_note": "A note somewhere else"
     },
     "markdown_colored": {
       "title": "Colored markdown",

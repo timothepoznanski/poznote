@@ -194,11 +194,12 @@ $settings = [
     'backlinks_at_bottom' => '0',
     'default_image_border_no_padding' => '0',
     'spellcheck_html_notes' => '0',
-    'highlight_current_folder_tree' => '0'
+    'highlight_current_folder_tree' => '0',
+    'folder_tree_dim_level' => ''
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -256,6 +257,7 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <meta name="apple-mobile-web-app-title" content="Poznote">
     <link rel="manifest" href="pwa/manifest.webmanifest?v=<?php echo $v; ?>" crossorigin="use-credentials">
     <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="pwa/poznote.png?v=<?php echo $v; ?>">
     <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
     <?php if ($workspaceResolvedInternally !== null): ?>
@@ -357,8 +359,16 @@ if (poznoteSettingEnabled($settings['code_block_line_numbers'], false)) {
 }
 // Dims the notes list outside the folder hierarchy being worked in
 // (css/folders/tree-highlight.css)
+$folder_tree_dim_style = '';
 if (poznoteSettingEnabled($settings['highlight_current_folder_tree'], false)) {
     $extra_body_classes .= ' highlight-folder-tree';
+    // How much the rest of the list fades, as a percentage picked on the
+    // slider in the settings modal. Out of range or never set falls back to
+    // the stylesheet default.
+    $folder_tree_dim_level = (int)$settings['folder_tree_dim_level'];
+    if ($folder_tree_dim_level >= POZNOTE_FOLDER_TREE_DIM_MIN && $folder_tree_dim_level <= POZNOTE_FOLDER_TREE_DIM_MAX) {
+        $folder_tree_dim_style = '--folder-tree-dim-opacity: ' . number_format((100 - $folder_tree_dim_level) / 100, 2, '.', '') . '; ';
+    }
 }
 if (poznoteSettingEnabled($settings['markdown_split_card_view'], true)) {
     $extra_body_classes .= ' markdown-split-card-view';
@@ -417,12 +427,14 @@ if ($pref && isset($allowed_sorts[$pref])) {
 
 // Set body classes
 $body_classes = trim($extra_body_classes);
+// Per-user CSS variables that cannot live in a stylesheet
+$body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
 if ($isPublicWorkspaceReadonly) {
     $body_classes = trim($body_classes . ' public-workspace-readonly');
 }
 ?>
 
-<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?><?php echo $markdown_colored_style ? ' style="' . htmlspecialchars($markdown_colored_style, ENT_QUOTES) . '"' : ''; ?> data-workspace="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
+<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?><?php echo $body_inline_style ? ' style="' . htmlspecialchars($body_inline_style, ENT_QUOTES) . '"' : ''; ?> data-workspace="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
     <script>
     (function () {
         try {
@@ -522,12 +534,9 @@ if ($isPublicWorkspaceReadonly) {
     // below are appended here because their handlers only exist on this page.
     $iconSidebarWorkspace = ($workspace_filter !== '' && $workspace_filter !== '__last_opened__') ? $workspace_filter : '';
     // Notifications live in the sidebar header instead (next to the create
-    // button). The AI assistant keeps its id from that period so the
-    // UI Customization preferences saved against it stay valid.
+    // button), and the AI assistant toggle in the floating stack at the
+    // bottom-right of the page (ui_customization_panel.php).
     $iconSidebarExtraItems = [];
-    if ($aiChatEnabled) {
-        $iconSidebarExtraItems[] = ['id' => 'sidebarAiChatBtn', 'after' => 'iconSidebarDashboardBtn', 'action' => 'toggle-ai-chat', 'icon' => 'lucide-bot', 'label' => t('ai_chat.toolbar_button', [], 'AI assistant')];
-    }
     if ($showGitSync) {
         $iconSidebarExtraItems[] = ['id' => 'iconSidebarGitPushBtn', 'gitAction' => 'push', 'icon' => 'lucide-upload', 'label' => 'Push', 'hidden' => !$currentWorkspaceSynced];
         $iconSidebarExtraItems[] = ['id' => 'iconSidebarGitPullBtn', 'gitAction' => 'pull', 'icon' => 'lucide-download', 'label' => 'Pull', 'hidden' => !$currentWorkspaceSynced];
@@ -729,6 +738,15 @@ if ($isPublicWorkspaceReadonly) {
 
     <?php if ($aiChatEnabled): ?>
     <?php include __DIR__ . '/../ai_chat_panel.php'; ?>
+    <?php endif; ?>
+
+    <?php if (!$isPublicWorkspaceReadonly): ?>
+    <?php
+    // Contextual UI Customization: floating button + docked column listing
+    // the hideable elements of this page (see ui_customization_panel.php)
+    $uiCustomizationPanelPage = 'notes';
+    include __DIR__ . '/../ui_customization_panel.php';
+    ?>
     <?php endif; ?>
 
     <!-- Data for initialization (used by index-events.js) -->

@@ -1,3 +1,29 @@
+// Cache-busting for assets injected from JavaScript.
+// Scripts appended at runtime bypass poznoteAsset(), so their URL never changes
+// and a browser keeps serving the copy it cached under the previous release
+// (issue 1345). Reuse the ?v= of the script that carried this file: PHP
+// already busts that one, so it changes on every update.
+(function () {
+    var carrier = document.currentScript;
+    var version = '';
+    try {
+        if (carrier && carrier.src) {
+            version = new URL(carrier.src, window.location.href).searchParams.get('v') || '';
+        }
+    } catch (e) {
+        version = '';
+    }
+
+    // Returns `path` with the current asset version appended. Leaves a path that
+    // already carries a query string alone, and degrades to the bare path when
+    // the version could not be read.
+    window.poznoteAssetUrl = function (path) {
+        path = String(path);
+        if (!version || path.indexOf('?') !== -1) return path;
+        return path + '?v=' + encodeURIComponent(version);
+    };
+})();
+
 // Variables globales de l'application
 var noteid = -1;
 var selectedFolderId = null; // ID du dossier sélectionné

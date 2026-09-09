@@ -345,7 +345,7 @@ $aiTools = [
         'type' => 'function',
         'function' => [
             'name' => 'update_note_content',
-            'description' => "Replace the full content of a markdown or rich-text (HTML) note. This is how you apply any change the user asks for on a note (rewrite, refactor, reformat, improve, translate, fix, add or remove parts): call it instead of writing the new version in the chat. Read the note with get_note first, then send the complete new content (not a diff) written in Markdown whatever the note's format: rich-text notes are converted from Markdown automatically. Never use it without a request from the user in this conversation.",
+            'description' => "Replace the full content of a markdown or rich-text (HTML) note. This is how you apply any change the user asks for on a note (rewrite, refactor, reformat, improve, translate, fix, add or remove parts): call it instead of writing the new version in the chat. Read the note with get_note first, then send the complete new content (not a diff) written in Markdown whatever the note's format: rich-text notes are converted from Markdown automatically. Poznote saves a snapshot of the previous content right before the change, so the user can restore it from the note's Snapshots menu. Never use it without a request from the user in this conversation.",
             'parameters' => [
                 'type' => 'object',
                 'properties' => [
@@ -653,6 +653,9 @@ $system = 'You are the AI assistant built into Poznote, a personal note-taking a
     . 'including rich-text (HTML) notes, and update_note_content and create_note expect '
     . "Markdown, which Poznote converts back to the note's own format. Write headings, "
     . 'lists, emphasis, links and tables in Markdown syntax and never emit HTML tags. '
+    . 'A snapshot of the previous content is saved automatically before you change a note, so '
+    . 'if the user regrets a change, tell them it can be restored from the Snapshots menu of the '
+    . 'note. '
     . 'After a modification, state briefly and precisely what changed, without repeating the '
     . 'new content: the user sees it in the note. '
     . 'Cite the titles of the notes you used. Be concise. '

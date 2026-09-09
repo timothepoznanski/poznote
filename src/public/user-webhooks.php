@@ -178,6 +178,7 @@ foreach ($eventHelpDefaults as $eventName => $default) {
     <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
     <?php poznoteRenderStylesheets('user-webhooks'); ?>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
 </head>
 <body class="has-icon-sidebar" data-workspace="<?php echo user_webhooks_h($pageWorkspace); ?>">

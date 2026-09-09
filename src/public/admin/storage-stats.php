@@ -542,6 +542,7 @@ foreach ($stats as $r) {
     <script src="../js/theme-init.js?v=<?php echo $v; ?>"></script>
     <?php poznoteRenderStylesheets('admin/storage-stats', ['prefix' => '../']); ?>
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <style>
     /* The table (10 columns in S3 mode, nowrap cells) is far wider than the

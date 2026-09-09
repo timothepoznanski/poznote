@@ -84,12 +84,14 @@
     "menu_item": "快照",
     "modal": {
       "title": "快照",
-      "description": "每天首次打开时自动创建，保留最近 {{count}} 个。「立即创建快照」会添加一个手动快照。所有快照在 {{days}} 天后过期。",
+      "description": "每天首次打开时自动创建，保留最近 {{count}} 个。「立即创建快照」或 Ctrl + Alt + S 会添加一个手动快照，AI 助手或 MCP 服务器修改笔记前也会自动创建一个。所有快照在 {{days}} 天后过期。",
       "loading": "正在加载快照...",
       "history": "历史记录",
       "markdown_preview": "预览",
       "markdown_source": "源码视图",
       "today": "今天",
+      "origin_ai": "AI 修改前",
+      "origin_mcp": "MCP 修改前",
       "empty_title": "没有可用快照",
       "empty_hint": "目前还没有快照，但你现在可以手动创建一个。",
       "new_note_empty_title": "还没有快照",
@@ -483,7 +485,7 @@
       "support": "通过捐赠支持 Poznote 的开发。",
       "s3_storage": "将笔记附件存储在 S3 兼容的对象存储中,而不是本地磁盘。",
       "s3_backup": "将完整备份归档上传到 S3 兼容的存储桶,可手动或按计划执行。",
-      "highlight_current_folder_tree": "淡化当前所在文件夹层级之外的笔记和文件夹。",
+      "highlight_current_folder_tree": "按你喜欢的程度淡化当前所在文件夹层级之外的笔记和文件夹。",
       "snapshots": "选择每条笔记保留多少个每日自动快照。"
     },
     "title": "设置",
@@ -1217,7 +1219,15 @@
       "folder_actions_toggle": "文件夹上的菜单按钮（⋮）",
       "note_actions_toggle": "笔记上的菜单按钮（⋮）",
       "note_actions_hint": "侧边栏中每条笔记的 ⋮ 菜单项。全部取消勾选将隐藏菜单按钮。",
-      "theme_toggle": "主题切换"
+      "theme_toggle": "主题切换",
+      "panel_title": "自定义此页面",
+      "panel_button": "自定义界面",
+      "panel_hint": "仅列出此页面的元素。更改会立即生效并自动保存。",
+      "panel_admin_note": "此面板仅更改您自己的界面；“用户”列位于设置中。",
+      "panel_all_options": "所有选项",
+      "panel_saving": "正在保存…",
+      "panel_saved": "已保存",
+      "panel_save_error": "无法保存，请重试。"
     },
     "icon_sidebar_order": {
       "title": "图标侧边栏顺序",
@@ -1443,6 +1453,16 @@
         "alphabetical": "字母顺序",
         "manual": "手动（拖放）"
       }
+    },
+    "folder_tree_highlight": {
+      "title": "突出显示当前文件夹树",
+      "description": "当前所在层级之外的笔记和文件夹会被淡化。请选择淡化程度：",
+      "dim_strength": "淡化程度",
+      "turn_off": "关闭",
+      "preview_current_folder": "当前文件夹",
+      "preview_current_note": "正在编辑的笔记",
+      "preview_other_folder": "其他文件夹",
+      "preview_other_note": "其他位置的笔记"
     },
     "markdown_colored": {
       "title": "彩色 Markdown",

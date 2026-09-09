@@ -245,6 +245,14 @@ class SettingsController {
             return (string) $intVal;
         }
 
+        if ($key === 'folder_tree_dim_level') {
+            $intVal = (int) $value;
+            if ($intVal < POZNOTE_FOLDER_TREE_DIM_MIN || $intVal > POZNOTE_FOLDER_TREE_DIM_MAX) {
+                throw new InvalidArgumentException('value must be between ' . POZNOTE_FOLDER_TREE_DIM_MIN . ' and ' . POZNOTE_FOLDER_TREE_DIM_MAX, 400);
+            }
+            return (string) $intVal;
+        }
+
         if ($key === 'note_age_filter_days') {
             $intVal = (int) $value;
             if ($intVal < 0 || $intVal > 36500) {

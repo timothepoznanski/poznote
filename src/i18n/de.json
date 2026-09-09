@@ -83,12 +83,14 @@
     "menu_item": "Schnappschüsse",
     "modal": {
       "title": "Schnappschüsse",
-      "description": "Automatisch beim ersten Öffnen jeden Tag erstellt, die letzten {{count}} werden behalten. „Jetzt Schnappschuss erstellen“ fügt einen manuellen Schnappschuss hinzu. Jeder Schnappschuss läuft nach {{days}} Tagen ab.",
+      "description": "Automatisch beim ersten Öffnen jeden Tag erstellt, die letzten {{count}} werden behalten. „Jetzt Schnappschuss erstellen“ oder Strg + Alt + S fügt einen manuellen Schnappschuss hinzu, und vor jeder Änderung durch den KI-Assistenten oder den MCP-Server wird einer erstellt. Jeder Schnappschuss läuft nach {{days}} Tagen ab.",
       "loading": "Schnappschuss wird geladen...",
       "history": "Verlauf",
       "markdown_preview": "Vorschau",
       "markdown_source": "Quellansicht",
       "today": "Heute",
+      "origin_ai": "Vor KI-Änderung",
+      "origin_mcp": "Vor MCP-Änderung",
       "empty_title": "Kein Schnappschuss verfügbar",
       "empty_hint": "Im Moment gibt es keinen Schnappschuss, aber du kannst jetzt manuell einen erstellen.",
       "new_note_empty_title": "Noch kein Schnappschuss",
@@ -481,7 +483,7 @@
       "support": "Unterstützen Sie die Entwicklung von Poznote mit einer Spende.",
       "s3_storage": "Notiz-Anhänge in einem S3-kompatiblen Objektspeicher statt auf der lokalen Festplatte speichern.",
       "s3_backup": "Lädt vollständige Sicherungsarchive in einen S3-kompatiblen Bucket hoch, manuell oder nach Zeitplan.",
-      "highlight_current_folder_tree": "Notizen und Ordner außerhalb der Ordnerhierarchie, in der Sie arbeiten, abschwächen.",
+      "highlight_current_folder_tree": "Notizen und Ordner außerhalb der Ordnerhierarchie, in der Sie arbeiten, so stark abschwächen, wie Sie möchten.",
       "snapshots": "Festlegen, wie viele automatische tägliche Schnappschüsse pro Notiz behalten werden."
     },
     "title": "Einstellungen",
@@ -1216,7 +1218,15 @@
       "folder_actions_toggle": "Menüschaltfläche (⋮) bei Ordnern",
       "note_actions_toggle": "Menüschaltfläche (⋮) bei Notizen",
       "note_actions_hint": "Einträge des ⋮-Menüs jeder Notiz in der Seitenleiste. Werden alle abgewählt, verschwindet die Menüschaltfläche.",
-      "theme_toggle": "Design-Umschalter"
+      "theme_toggle": "Design-Umschalter",
+      "panel_title": "Diese Seite anpassen",
+      "panel_button": "Oberfläche anpassen",
+      "panel_hint": "Nur die Elemente dieser Seite werden aufgeführt. Änderungen gelten sofort und werden automatisch gespeichert.",
+      "panel_admin_note": "Dieses Panel ändert nur Ihre eigene Oberfläche; die Spalte „Benutzer“ finden Sie in den Einstellungen.",
+      "panel_all_options": "Alle Optionen",
+      "panel_saving": "Wird gespeichert…",
+      "panel_saved": "Gespeichert",
+      "panel_save_error": "Speichern nicht möglich, bitte erneut versuchen."
     },
     "icon_sidebar_order": {
       "title": "Reihenfolge der Icon-Seitenleiste",
@@ -1448,6 +1458,16 @@
         "alphabetical": "Alphabetisch",
         "manual": "Manuell (Drag & Drop)"
       }
+    },
+    "folder_tree_highlight": {
+      "title": "Aktuellen Ordnerbaum hervorheben",
+      "description": "Notizen und Ordner außerhalb der Hierarchie, in der Sie arbeiten, werden abgeschwächt. Wählen Sie, wie stark:",
+      "dim_strength": "Abschwächung",
+      "turn_off": "Ausschalten",
+      "preview_current_folder": "Aktueller Ordner",
+      "preview_current_note": "Eine Notiz, an der Sie arbeiten",
+      "preview_other_folder": "Ein anderer Ordner",
+      "preview_other_note": "Eine Notiz an anderer Stelle"
     },
     "markdown_colored": {
       "title": "Farbiges Markdown",

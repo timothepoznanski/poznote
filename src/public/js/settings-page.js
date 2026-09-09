@@ -95,6 +95,7 @@
             'hide_folder_counts',
             'hide_folder_actions',
             'highlight_current_folder_tree',
+            'folder_tree_dim_level',
             'notes_without_folders_after_folders',
             'markdown_split_card_view',
             'markdown_colored',
@@ -1534,6 +1535,106 @@
         });
     }
 
+    // Highlight current folder tree: the card opens a modal where the dim
+    // strength is a slider, and 'Turn off' is how the feature is disabled.
+    // Kept in sync with POZNOTE_FOLDER_TREE_DIM_* in functions.php.
+    var FOLDER_TREE_DIM_DEFAULT = 35;
+    var FOLDER_TREE_DIM_MIN = 10;
+    var FOLDER_TREE_DIM_MAX = 90;
+
+    function folderTreeDimLevel(value) {
+        var level = parseInt(value, 10);
+        if (isNaN(level) || level < FOLDER_TREE_DIM_MIN || level > FOLDER_TREE_DIM_MAX) {
+            return FOLDER_TREE_DIM_DEFAULT;
+        }
+        return level;
+    }
+
+    function updateFolderTreeDimPreview(level) {
+        var valueLabel = document.getElementById('folderTreeDimValue');
+        if (valueLabel) valueLabel.textContent = String(level);
+
+        var preview = document.getElementById('folderTreeDimPreview');
+        if (preview) {
+            preview.style.setProperty('--folder-tree-dim-opacity', String((100 - level) / 100));
+        }
+    }
+
+    function refreshFolderTreeHighlightBadge() {
+        var txt = getTranslations();
+        getSetting('highlight_current_folder_tree', function (value) {
+            var badge = document.getElementById('folder-tree-highlight-status');
+            if (!badge) return;
+
+            var enabled = isSettingEnabled(value, false, false);
+            if (!enabled) {
+                badge.textContent = txt.disabled;
+                badge.className = 'setting-status disabled';
+                return;
+            }
+
+            getSetting('folder_tree_dim_level', function (level) {
+                badge.textContent = folderTreeDimLevel(level) + '%';
+                badge.className = 'setting-status enabled';
+            });
+        });
+    }
+
+    function openFolderTreeHighlightModal() {
+        var modal = document.getElementById('folderTreeHighlightModal');
+        if (!modal) return;
+
+        getSetting('folder_tree_dim_level', function (value) {
+            var level = folderTreeDimLevel(value);
+            var slider = document.getElementById('folderTreeDimInput');
+            if (slider) slider.value = String(level);
+            updateFolderTreeDimPreview(level);
+            modal.style.display = 'flex';
+        });
+    }
+
+    // Saving turns the feature on: the slider is the only way to reach it, and
+    // a user who dragged it meant to see the result.
+    function saveFolderTreeHighlight() {
+        var slider = document.getElementById('folderTreeDimInput');
+        var level = folderTreeDimLevel(slider ? slider.value : null);
+
+        setSetting('folder_tree_dim_level', String(level), function (levelSaved) {
+            if (!levelSaved) {
+                alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                return;
+            }
+
+            setSetting('highlight_current_folder_tree', '1', function (enabledSaved) {
+                if (!enabledSaved) {
+                    alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                    return;
+                }
+
+                try { closeModal('folderTreeHighlightModal'); } catch (e) {
+                    console.debug('settings-page: saveFolderTreeHighlight() failed:', e);
+                }
+                refreshFolderTreeHighlightBadge();
+                reloadOpener();
+            });
+        });
+    }
+
+    function disableFolderTreeHighlight() {
+        setSetting('highlight_current_folder_tree', '0', function (success) {
+            if (!success) {
+                alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                return;
+            }
+
+            try { closeModal('folderTreeHighlightModal'); } catch (e) {
+                console.debug('settings-page: disableFolderTreeHighlight() failed:', e);
+            }
+            refreshFolderTreeHighlightBadge();
+            reloadOpener();
+        });
+    }
+
     function openNoteAgeFilterModal() {
         var modal = document.getElementById('noteAgeFilterModal');
         if (!modal) return;
@@ -1938,7 +2039,6 @@
         // (panel:note-created-date, panel:note-icons, panel:folder-note-count).
         setupToggleCard('type-note-icons-card', 'type-note-icons-status', 'type_based_note_icons', false, true);
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
-        setupToggleCard('folder-tree-highlight-card', 'folder-tree-highlight-status', 'highlight_current_folder_tree', false, false);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
         setupToggleCard('markdown-split-card-view-card', 'markdown-split-card-view-status', 'markdown_split_card_view', false, true);
         refreshMarkdownColoredBadge();
@@ -1977,6 +2077,17 @@
         var snapshotsCard = document.getElementById('snapshots-card');
         if (snapshotsCard) {
             snapshotsCard.addEventListener('click', openSnapshotsSettingsModal);
+        }
+
+        // Deep link from the contextual panel's "All options" button
+        // (ui_customization_panel.php): settings.php?open=ui-customization
+        if (new URLSearchParams(window.location.search || '').get('open') === 'ui-customization') {
+            showUiCustomizationModal();
+            if (window.history && typeof window.history.replaceState === 'function') {
+                var cleanUiCustomizationUrl = new URL(window.location.href);
+                cleanUiCustomizationUrl.searchParams.delete('open');
+                window.history.replaceState({}, '', cleanUiCustomizationUrl.toString());
+            }
         }
 
         // Deep link from the note's Snapshots modal: settings.php?open=snapshots
@@ -2273,6 +2384,29 @@
         var fontSizeCard = document.getElementById('font-size-card');
         if (fontSizeCard && typeof window.showNoteFontSizePrompt === 'function') {
             fontSizeCard.addEventListener('click', window.showNoteFontSizePrompt);
+        }
+
+        // Highlight current folder tree card - dim strength lives in a modal
+        var folderTreeHighlightCard = document.getElementById('folder-tree-highlight-card');
+        if (folderTreeHighlightCard) {
+            folderTreeHighlightCard.addEventListener('click', openFolderTreeHighlightModal);
+        }
+
+        var folderTreeDimInput = document.getElementById('folderTreeDimInput');
+        if (folderTreeDimInput) {
+            folderTreeDimInput.addEventListener('input', function () {
+                updateFolderTreeDimPreview(folderTreeDimLevel(folderTreeDimInput.value));
+            });
+        }
+
+        var saveFolderTreeHighlightBtn = document.getElementById('saveFolderTreeHighlightBtn');
+        if (saveFolderTreeHighlightBtn) {
+            saveFolderTreeHighlightBtn.addEventListener('click', saveFolderTreeHighlight);
+        }
+
+        var disableFolderTreeHighlightBtn = document.getElementById('disableFolderTreeHighlightBtn');
+        if (disableFolderTreeHighlightBtn) {
+            disableFolderTreeHighlightBtn.addEventListener('click', disableFolderTreeHighlight);
         }
 
         // Index icon scale card - delegates to index-icon-scale-settings.js
@@ -2797,6 +2931,7 @@
             refreshUserQuotasBadges();
             refreshGitSyncEnabledBadge();
             refreshTenantIsolationBadge();
+            refreshFolderTreeHighlightBadge();
             refreshUiCustomizationBadge();
         });
 
@@ -3495,7 +3630,10 @@
     // working. See poznoteNormalizeHiddenUiKey() in functions.php.
     var RENAMED_UI_KEYS = {
         'toolbar:btn-share': 'toolbar:btn-publish',
-        'wsmenu:goto-workspaces': 'wsmenu:edit-workspaces'
+        'wsmenu:goto-workspaces': 'wsmenu:edit-workspaces',
+        'card:iconSidebarNotificationsBtn': 'card:sidebarNotificationsBtn',
+        'card:iconSidebarAiChatBtn': 'card:edgeAiChatBtn',
+        'card:sidebarAiChatBtn': 'card:edgeAiChatBtn'
     };
 
     function normalizeHiddenUiKey(key) {
@@ -3825,7 +3963,9 @@
             toggleBtn.innerHTML = '<i class="lucide lucide-chevron-down"></i>';
             title.appendChild(toggleBtn);
 
-            setUiCustomizationSectionCollapsed(section, false);
+            // Folded by default: ten sections of checkboxes are a wall of
+            // text when they all start open (discussion 1298).
+            setUiCustomizationSectionCollapsed(section, true);
         });
 
         updateCollapseAllBtn(modal);
@@ -3849,10 +3989,16 @@
             var title = e.target.closest('.ui-custom-section-title');
             if (!title) return;
 
-            var section = title.closest('.ui-custom-section');
-            if (!section) return;
+            var clicked = title.closest('.ui-custom-section');
+            if (!clicked) return;
 
-            setUiCustomizationSectionCollapsed(section, !isUiCustomizationSectionCollapsed(section));
+            // Accordion: opening a section folds the others, so one section
+            // of checkboxes is on screen at a time. Collapse all / Expand all
+            // above still opens everything at once.
+            var expand = isUiCustomizationSectionCollapsed(clicked);
+            modal.querySelectorAll('.ui-custom-section').forEach(function (section) {
+                setUiCustomizationSectionCollapsed(section, section !== clicked || !expand);
+            });
             updateCollapseAllBtn(modal);
         });
     }
@@ -4012,9 +4158,11 @@
                 hiddenOnlyToggle.checked = false;
             }
 
-            // Every section opens again on each visit, like the filter
+            // Every section starts folded on each visit, like the filter
+            // is reset: the accordion in initSectionCollapseButtons() opens
+            // them one at a time.
             modal.querySelectorAll('.ui-custom-section').forEach(function (section) {
-                setUiCustomizationSectionCollapsed(section, false);
+                setUiCustomizationSectionCollapsed(section, true);
             });
             updateCollapseAllBtn(modal);
 
@@ -4211,7 +4359,7 @@
         if (typeof Sortable === 'undefined') {
             if (!document.querySelector('script[data-sortable-local]')) {
                 var script = document.createElement('script');
-                script.src = 'js/Sortable.min.js';
+                script.src = (window.poznoteAssetUrl ? window.poznoteAssetUrl('js/Sortable.min.js') : 'js/Sortable.min.js');
                 script.async = true;
                 script.setAttribute('data-sortable-local', '1');
                 script.onload = initIconSidebarOrderSortable;

@@ -82,12 +82,14 @@
     "menu_item": "Instantâneos",
     "modal": {
       "title": "Instantâneos",
-      "description": "Criados automaticamente na primeira abertura de cada dia, os últimos {{count}} são guardados. \"Criar instantâneo agora\" adiciona um instantâneo manual. Todos os instantâneos expiram ao fim de {{days}} dias.",
+      "description": "Criados automaticamente na primeira abertura de cada dia, os últimos {{count}} são guardados. \"Criar instantâneo agora\" ou Ctrl + Alt + S adiciona um instantâneo manual, e é criado um antes de cada alteração feita pelo assistente de IA ou pelo servidor MCP. Todos os instantâneos expiram ao fim de {{days}} dias.",
       "loading": "Carregando instantâneo...",
       "history": "Histórico",
       "markdown_preview": "Pré-visualização",
       "markdown_source": "Vista source",
       "today": "Hoje",
+      "origin_ai": "Antes da alteração pela IA",
+      "origin_mcp": "Antes da alteração por MCP",
       "empty_title": "Nenhum instantâneo disponível",
       "empty_hint": "Nenhum instantâneo por enquanto, mas você pode criar um manualmente agora mesmo.",
       "new_note_empty_title": "Ainda não há instantâneos",
@@ -480,7 +482,7 @@
       "support": "Apoie o desenvolvimento do Poznote com uma doação.",
       "s3_storage": "Armazenar os anexos das notas em um armazenamento de objetos compatível com S3 em vez do disco local.",
       "s3_backup": "Envia arquivos de backup completos para um bucket compatível com S3, manualmente ou conforme um agendamento.",
-      "highlight_current_folder_tree": "Esbater as notas e pastas que estão fora da hierarquia de pastas em que está a trabalhar.",
+      "highlight_current_folder_tree": "Esbater, tanto quanto quiser, as notas e pastas que estão fora da hierarquia de pastas em que está a trabalhar.",
       "snapshots": "Escolher quantos instantâneos automáticos diários são guardados por nota."
     },
     "title": "Configurações",
@@ -1215,7 +1217,15 @@
       "folder_actions_toggle": "Botão de menu (⋮) nas pastas",
       "note_actions_toggle": "Botão de menu (⋮) nas notas",
       "note_actions_hint": "Itens do menu ⋮ de cada nota na barra lateral. Desmarcar todos oculta o botão do menu.",
-      "theme_toggle": "Botão de tema"
+      "theme_toggle": "Botão de tema",
+      "panel_title": "Personalizar esta página",
+      "panel_button": "Personalizar a interface",
+      "panel_hint": "Apenas os elementos desta página são listados. As alterações aplicam-se imediatamente e são guardadas automaticamente.",
+      "panel_admin_note": "Este painel só altera a sua própria interface; a coluna «Utilizadores» está nas definições.",
+      "panel_all_options": "Todas as opções",
+      "panel_saving": "A guardar…",
+      "panel_saved": "Guardado",
+      "panel_save_error": "Não foi possível guardar, tente novamente."
     },
     "icon_sidebar_order": {
       "title": "Ordem da barra de ícones",
@@ -1447,6 +1457,16 @@
         "alphabetical": "Alfabética",
         "manual": "Manual (arrastar e soltar)"
       }
+    },
+    "folder_tree_highlight": {
+      "title": "Realçar a árvore de pastas atual",
+      "description": "As notas e pastas fora da hierarquia em que está a trabalhar são esbatidas. Escolha a intensidade:",
+      "dim_strength": "Esbatimento",
+      "turn_off": "Desativar",
+      "preview_current_folder": "Pasta atual",
+      "preview_current_note": "Uma nota em que está a trabalhar",
+      "preview_other_folder": "Outra pasta",
+      "preview_other_note": "Uma nota noutro sítio"
     },
     "markdown_colored": {
       "title": "Markdown colorido",
