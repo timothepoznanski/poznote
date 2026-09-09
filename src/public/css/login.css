@@ -505,6 +505,17 @@ html[data-theme='dark'] .oidc-divider span {
     background: var(--dm-bg);
 }
 
+/* The base rule fills the button with --pz-text and labels it --pz-text-inverse.
+   Both flip in dark mode, so the light fill would carry a white label. */
+html[data-theme='dark'] .oidc-button {
+    background: var(--dm-text-bright);
+    color: var(--dm-bg);
+}
+
+html[data-theme='dark'] .oidc-button:hover {
+    background: var(--dm-text);
+}
+
 html[data-theme='dark'] .oidc-other-account-button {
     background: transparent;
     color: var(--dm-text-bright);
