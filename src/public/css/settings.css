@@ -366,11 +366,25 @@ html[data-theme='dark'] .settings-collapse-all:hover {
     flex-shrink: 0;
 }
 
-/* List view rows are compact: no help icon and no pin button at all (pinning
-   is done from the grid view) */
-.view-list .setting-help,
-.view-list .settings-card-pin {
+/* List view rows are compact: no help icon. The pin stays, since the list is
+   the mobile default and pinning would otherwise need a switch back to the
+   grid; it sits in the flow at the end of the row rather than in the
+   bottom-right corner, which the compact row has no space for. */
+.view-list .setting-help {
     display: none;
+}
+
+.view-list .settings-card-pin {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: 4px;
+    /* Comfortable tap target on touch without widening the row */
+    padding: 4px;
 }
 
 /* ---------- Pin button ----------
@@ -378,7 +392,7 @@ html[data-theme='dark'] .settings-collapse-all:hover {
    (same size, same muted grey, always visible); a pinned card shows it in
    blue instead (same pattern as the dashboard pin).
    Absolutely positioned, so it reserves no space: bottom-right corner in grid
-   view, hidden in list view, in the flow at the end of the row in the desktop
+   view; in the flow at the end of the row in list view and in the desktop
    layout. */
 
 /* The empty pinned section is hidden through the `hidden` attribute, but the
