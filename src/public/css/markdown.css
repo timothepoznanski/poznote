@@ -892,6 +892,12 @@ html[data-theme='dark'] .katex {
     overflow: hidden !important;
 }
 
+/* Split mode splits the note column between the editor and the preview, so the
+   per-note width toggle has nothing left to widen: hide it while split is on. */
+.innernote:has(.noteentry.markdown-split-mode) .btn-note-width {
+    display: none !important;
+}
+
 /* Tab bar now lives outside #right_col — split-mode header needs no override */
 
 .noteentry.markdown-split-mode .markdown-editor-container,
