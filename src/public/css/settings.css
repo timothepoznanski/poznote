@@ -110,13 +110,13 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
 }
 
 /* Settings Category Titles */
-/* Light, not normal: the section titles and the left nav are the page's own
-   furniture, and they read as labels rather than as a heading above the cards
-   when they sit a step below the card titles. css/fonts.css, which this page
-   links, is what makes 300 a real face and not a fallback to Regular. */
+/* Semibold: the section titles head the cards below them, so they sit a step
+   above the card titles (regular) instead of a step below. css/fonts.css,
+   which this page links, is what makes 600 a real face and not a synthesised
+   bold; there is no 500 face, so medium would render as Regular. */
 .settings-category-title {
     font-size: calc(1.1rem * var(--settings-font-scale, 1));
-    font-weight: var(--pz-weight-light);
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text);
     margin: 1.5rem 0 0.75rem 0;
     padding-bottom: 0.5rem;
@@ -567,7 +567,7 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
         color: var(--pz-text-secondary);
         font: inherit;
         font-size: calc(14px * var(--settings-font-scale, 1));
-        font-weight: var(--pz-weight-light);
+        font-weight: var(--pz-weight-normal);
         line-height: 1.3;
         text-align: left;
         cursor: pointer;
@@ -584,8 +584,8 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
         color: var(--pz-text);
     }
 
-    /* Colour and background carry the active state; the weight stays normal
-       so the list reads as one text, not a bold row among light ones. */
+    /* Colour and background carry the active state; the weight stays the same
+       so the list reads as one text, not a bold row among regular ones. */
     .settings-nav-item.is-active {
         background: rgba(var(--pz-accent-rgb), 0.1);
         color: var(--pz-accent);
