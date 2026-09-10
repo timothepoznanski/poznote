@@ -1457,24 +1457,407 @@
 
     // ========== Modal Functions ==========
 
+    // The custom CSS modal lists every theme stored in data/css/ and applies the
+    // selected one on save. An upload is staged the same way, so the file only
+    // reaches the server when the admin confirms.
     var pendingCssFile = null;
-    var pendingCssRemove = false;
+    var pendingCssFileName = '';
+    var customCssThemes = [];
+    var customCssSelected = '';
+    var customCssActive = '';
+    // The theme list modal works on rows rather than on the saved entries: the
+    // order of the rows IS the order the rail's button walks, so a row keeps its
+    // place whether it is ticked or not.
+    var customCssBuiltinThemes = [];
+    var customCssThemeIcon = 'lucide-palette';
+    var themeListRows = [];
+    var themeListSaved = '';
+    var customCssThemeSaved = [];
 
-    function updateCustomCssModalState(filename) {
+    // Mirrors the sanitisation api_upload_css.php applies, so the staged row
+    // shows the name the file will actually be stored under.
+    function customCssStoredName(name) {
+        var base = String(name || '').replace(/\.[^.]*$/, '');
+        base = base.replace(/[^A-Za-z0-9._-]/g, '_').substring(0, 60);
+        return (base !== '' ? base : 'custom') + '.css';
+    }
+
+    function customCssFormatSize(bytes) {
+        var size = parseInt(bytes, 10);
+        if (isNaN(size) || size < 0) return '';
+        if (size < 1024) return size + ' B';
+        return Math.round(size / 1024) + ' KB';
+    }
+
+    function buildCustomCssRow(options) {
+        // The row is a div and not a label: a delete button nested in a label
+        // would also toggle the radio it wraps.
+        var row = document.createElement('div');
+        row.className = 'custom-css-theme';
+        if (options.selected) row.classList.add('selected');
+
+        var main = document.createElement('label');
+        main.className = 'custom-css-theme-main';
+
+        var radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'customCssTheme';
+        radio.value = options.value;
+        radio.checked = !!options.selected;
+        radio.addEventListener('change', function () {
+            customCssSelected = options.value;
+            renderCustomCssThemes();
+        });
+        main.appendChild(radio);
+
+        var body = document.createElement('span');
+        body.className = 'custom-css-theme-body';
+
+        var name = document.createElement('span');
+        name.className = 'custom-css-theme-name';
+        name.textContent = options.label;
+        body.appendChild(name);
+
+        if (options.meta) {
+            var meta = document.createElement('span');
+            meta.className = 'custom-css-theme-meta';
+            meta.textContent = options.meta;
+            body.appendChild(meta);
+        }
+        main.appendChild(body);
+        row.appendChild(main);
+
+        if (options.deletable) {
+            var del = document.createElement('button');
+            del.type = 'button';
+            del.className = 'custom-css-theme-delete';
+            del.title = tr('common.delete', {}, 'Delete');
+            del.setAttribute('aria-label', tr('common.delete', {}, 'Delete'));
+            del.innerHTML = '<i class="lucide lucide-trash-2"></i>';
+            del.addEventListener('click', function () {
+                deleteCustomCssTheme(options.value);
+            });
+            row.appendChild(del);
+        }
+
+        return row;
+    }
+
+    function renderCustomCssThemes() {
+        var list = document.getElementById('customCssThemeList');
         var noFile = document.getElementById('customCssNoFile');
-        var currentFile = document.getElementById('customCssCurrentFile');
-        var fileNameEl = document.getElementById('customCssFileName');
-        var removeBtn = document.getElementById('removeCustomCssBtn');
-        if (filename) {
-            if (noFile) noFile.style.display = 'none';
-            if (currentFile) currentFile.style.display = 'flex';
-            if (fileNameEl) fileNameEl.textContent = filename;
-            if (removeBtn) removeBtn.style.display = 'inline-block';
-        } else {
-            if (noFile) noFile.style.display = 'block';
-            if (currentFile) currentFile.style.display = 'none';
-            if (fileNameEl) fileNameEl.textContent = '';
-            if (removeBtn) removeBtn.style.display = 'none';
+        if (!list) return;
+
+        list.innerHTML = '';
+
+        if (noFile) {
+            noFile.style.display = (customCssThemes.length === 0 && !pendingCssFile) ? 'block' : 'none';
+        }
+
+        list.appendChild(buildCustomCssRow({
+            value: '',
+            label: tr('modals.custom_css.none', {}, 'No custom CSS'),
+            selected: customCssSelected === '',
+            deletable: false
+        }));
+
+        customCssThemes.forEach(function (theme) {
+            var meta = customCssFormatSize(theme.size);
+            if (theme.filename === customCssActive) {
+                meta = meta ? meta + ' - ' + tr('modals.custom_css.active', {}, 'Applied') : tr('modals.custom_css.active', {}, 'Applied');
+            }
+            list.appendChild(buildCustomCssRow({
+                value: theme.filename,
+                label: theme.filename,
+                meta: meta,
+                selected: customCssSelected === theme.filename,
+                deletable: true
+            }));
+        });
+
+        if (pendingCssFile) {
+            var known = customCssThemes.some(function (theme) { return theme.filename === pendingCssFileName; });
+            list.appendChild(buildCustomCssRow({
+                value: pendingCssFileName,
+                label: pendingCssFileName,
+                meta: known
+                    ? tr('modals.custom_css.pending_replace', {}, 'Replaced on save')
+                    : tr('modals.custom_css.pending_upload', {}, 'Uploaded on save'),
+                selected: customCssSelected === pendingCssFileName,
+                deletable: false
+            }));
+        }
+    }
+
+    // Everything the modal shows comes from one payload, so a save that answers
+    // with the new state refreshes both lists without a second request.
+    function readCustomCssState(data) {
+        customCssThemes = Array.isArray(data.themes) ? data.themes : [];
+        customCssActive = data.active || '';
+        customCssBuiltinThemes = Array.isArray(data.builtin_themes) ? data.builtin_themes : [];
+        customCssThemeIcon = data.custom_theme_icon || 'lucide-palette';
+        var list = data.theme_list && Array.isArray(data.theme_list.entries) ? data.theme_list.entries : [];
+        customCssThemeSaved = list.map(function (entry) {
+            return { id: entry.id, mode: entry.mode === 'dark' ? 'dark' : 'light' };
+        });
+        themeListSaved = JSON.stringify(themeListEntriesOf(buildThemeListRows()));
+    }
+
+    function customCssThemeIdFor(filename) {
+        return 'custom:' + filename;
+    }
+
+    function findSavedThemeEntry(id) {
+        for (var i = 0; i < customCssThemeSaved.length; i++) {
+            if (customCssThemeSaved[i].id === id) return customCssThemeSaved[i];
+        }
+        return null;
+    }
+
+    function themeChoiceLabel(id) {
+        return tr('theme.names.' + id, {}, id.charAt(0).toUpperCase() + id.slice(1));
+    }
+
+    /**
+     * One row per theme this instance has: what the admin kept first, in the
+     * order it was saved, then everything left over. Rebuilding it this way is
+     * what makes a reordering survive a reopen, and what puts a freshly
+     * uploaded stylesheet at the end rather than in the middle.
+     */
+    function buildThemeListRows() {
+        var known = {};
+        var rows = [];
+
+        var rowFor = function (id) {
+            if (known[id]) return null;
+            var saved = findSavedThemeEntry(id);
+            var file = id.indexOf('custom:') === 0 ? id.slice('custom:'.length) : '';
+            var builtin = null;
+            for (var i = 0; i < customCssBuiltinThemes.length; i++) {
+                if (customCssBuiltinThemes[i].id === id) { builtin = customCssBuiltinThemes[i]; break; }
+            }
+            if (!file && !builtin) return null;
+            known[id] = true;
+            return {
+                id: id,
+                custom: !!file,
+                icon: builtin ? builtin.icon : customCssThemeIcon,
+                label: builtin ? themeChoiceLabel(id) : file.replace(/\.css$/i, ''),
+                checked: !!saved,
+                mode: saved && saved.mode === 'dark' ? 'dark' : 'light'
+            };
+        };
+
+        var push = function (id) {
+            var row = rowFor(id);
+            if (row) rows.push(row);
+        };
+
+        customCssThemeSaved.forEach(function (entry) { push(entry.id); });
+        customCssBuiltinThemes.forEach(function (def) { push(def.id); });
+        storedCssFileNames().forEach(function (filename) { push(customCssThemeIdFor(filename)); });
+
+        return rows;
+    }
+
+    /** The stored stylesheets, plus the one staged for upload. */
+    function storedCssFileNames() {
+        var files = customCssThemes.map(function (theme) { return theme.filename; });
+        if (pendingCssFile && files.indexOf(pendingCssFileName) === -1) {
+            files.push(pendingCssFileName);
+        }
+        return files;
+    }
+
+    /** What gets saved: the ticked rows, in the order they are shown. */
+    function themeListEntriesOf(rows) {
+        var entries = [];
+        rows.forEach(function (row) {
+            if (!row.checked) return;
+            var entry = { id: row.id };
+            if (row.custom) entry.mode = row.mode;
+            entries.push(entry);
+        });
+        return entries;
+    }
+
+    function moveThemeListRow(index, delta) {
+        var target = index + delta;
+        if (target < 0 || target >= themeListRows.length) return;
+        var row = themeListRows[index];
+        themeListRows[index] = themeListRows[target];
+        themeListRows[target] = row;
+        renderThemeListChoices();
+    }
+
+    function buildThemeChoiceRow(row, index) {
+        var el = document.createElement('div');
+        el.className = 'custom-css-theme-choice';
+        el.setAttribute('data-theme-id', row.id);
+        if (row.checked) el.classList.add('selected');
+
+        var main = document.createElement('label');
+        main.className = 'custom-css-theme-choice-main';
+
+        var checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = row.checked;
+        checkbox.addEventListener('change', function () {
+            row.checked = checkbox.checked;
+            el.classList.toggle('selected', row.checked);
+        });
+        main.appendChild(checkbox);
+
+        var icon = document.createElement('i');
+        icon.className = 'lucide ' + row.icon;
+        main.appendChild(icon);
+
+        var name = document.createElement('span');
+        name.className = 'custom-css-theme-choice-name';
+        name.textContent = row.label;
+        main.appendChild(name);
+        el.appendChild(main);
+
+        if (row.custom) {
+            // A stylesheet paints over one of the two modes, and which one it
+            // was written for cannot be read from the file: the admin says it.
+            var select = document.createElement('select');
+            select.className = 'custom-css-theme-choice-mode';
+            select.title = tr('modals.theme_list.mode_help', {}, 'Is this stylesheet written for the light mode or the dark mode?');
+            [['light', themeChoiceLabel('light')], ['dark', themeChoiceLabel('dark')]].forEach(function (pair) {
+                var option = document.createElement('option');
+                option.value = pair[0];
+                option.textContent = pair[1];
+                select.appendChild(option);
+            });
+            select.value = row.mode;
+            select.addEventListener('change', function () {
+                row.mode = select.value === 'dark' ? 'dark' : 'light';
+            });
+            el.appendChild(select);
+        }
+
+        var order = document.createElement('span');
+        order.className = 'custom-css-theme-order';
+        [['up', -1, 'lucide-chevron-up'], ['down', 1, 'lucide-chevron-down']].forEach(function (spec) {
+            var button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'custom-css-theme-order-btn';
+            button.title = spec[0] === 'up'
+                ? tr('modals.theme_list.move_up', {}, 'Move up')
+                : tr('modals.theme_list.move_down', {}, 'Move down');
+            button.setAttribute('aria-label', button.title);
+            button.innerHTML = '<i class="lucide ' + spec[2] + '"></i>';
+            button.disabled = spec[1] < 0 ? index === 0 : index === themeListRows.length - 1;
+            button.addEventListener('click', function () { moveThemeListRow(index, spec[1]); });
+            order.appendChild(button);
+        });
+        el.appendChild(order);
+
+        return el;
+    }
+
+    function renderThemeListChoices() {
+        var box = document.getElementById('themeListChoices');
+        if (!box) return;
+
+        box.innerHTML = '';
+        themeListRows.forEach(function (row, index) {
+            box.appendChild(buildThemeChoiceRow(row, index));
+        });
+    }
+
+    function showThemeListModal() {
+        var modal = document.getElementById('themeListModal');
+        if (!modal) return;
+
+        loadCustomCssThemes(function () {
+            themeListRows = buildThemeListRows();
+            renderThemeListChoices();
+            modal.style.display = 'flex';
+        });
+    }
+
+    // js/theme-manager.js calls this when the rail's button has a single theme
+    // to offer, so the click opens the list instead of doing nothing.
+    window.poznoteOpenThemeListModal = function () {
+        if (!window.__poznoteThemeListEditable) return;
+        showThemeListModal();
+    };
+
+    function refreshThemeListBadge() {
+        var badge = document.getElementById('theme-list-badge');
+        if (!badge) return;
+
+        fetch('api_upload_css.php', { method: 'GET', credentials: 'same-origin' })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                var count = data.theme_list && Array.isArray(data.theme_list.entries)
+                    ? data.theme_list.entries.length
+                    : 0;
+                badge.textContent = count === 1
+                    ? tr('modals.theme_list.badge_one', {}, '1 theme')
+                    : tr('modals.theme_list.badge_other', { count: count }, count + ' themes');
+                badge.className = 'setting-status enabled';
+            })
+            .catch(function () {
+                badge.textContent = tr('common.error', {}, 'Error');
+                badge.className = 'setting-status disabled';
+            });
+    }
+
+    function loadCustomCssThemes(callback) {
+        fetch('api_upload_css.php', { method: 'GET', credentials: 'same-origin' })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                readCustomCssState(data);
+                if (typeof callback === 'function') callback(true);
+            })
+            .catch(function () {
+                customCssThemes = [];
+                customCssActive = '';
+                customCssThemeSaved = [];
+                themeListSaved = '';
+                if (typeof callback === 'function') callback(false);
+            });
+    }
+
+    function deleteCustomCssTheme(filename) {
+        var message = tr('modals.custom_css.delete_confirm', { name: filename },
+            'Delete ' + filename + '? The file is removed from your data volume.');
+        var run = function () {
+            fetch('api_upload_css.php?filename=' + encodeURIComponent(filename), {
+                method: 'DELETE',
+                credentials: 'same-origin'
+            })
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    if (!data.success) {
+                        alert(data.error || tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                        return;
+                    }
+                    var wasApplied = filename === customCssActive;
+                    readCustomCssState(data);
+                    if (customCssSelected === filename) customCssSelected = customCssActive;
+                    if (pendingCssFile && pendingCssFileName === filename) {
+                        // The staged upload no longer replaces anything, it is still staged.
+                        customCssSelected = pendingCssFileName;
+                    }
+                    renderCustomCssThemes();
+                    refreshCustomCssBadge();
+                    refreshThemeListBadge();
+                    if (wasApplied) reloadOpener();
+                })
+                .catch(function () {
+                    alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                });
+        };
+
+        if (window.modalAlert && typeof window.modalAlert.confirm === 'function') {
+            window.modalAlert.confirm(message, tr('modals.custom_css.title', {}, 'Custom CSS'))
+                .then(function (confirmed) { if (confirmed) run(); });
+        } else if (window.confirm(message)) {
+            run();
         }
     }
 
@@ -1483,18 +1866,15 @@
         if (!modal) return;
 
         pendingCssFile = null;
-        pendingCssRemove = false;
+        pendingCssFileName = '';
+        var fileInput = document.getElementById('customCssFileInput');
+        if (fileInput) fileInput.value = '';
 
-        fetch('api_upload_css.php', { method: 'GET', credentials: 'same-origin' })
-            .then(function (r) { return r.json(); })
-            .then(function (data) {
-                updateCustomCssModalState(data.exists ? data.filename : null);
-                modal.style.display = 'flex';
-            })
-            .catch(function () {
-                updateCustomCssModalState(null);
-                modal.style.display = 'flex';
-            });
+        loadCustomCssThemes(function () {
+            customCssSelected = customCssActive;
+            renderCustomCssThemes();
+            modal.style.display = 'flex';
+        });
     }
 
     function showLanguageModal() {
@@ -2811,9 +3191,17 @@
         // ---- Custom CSS upload modal ----
         var uploadCustomCssBtn = document.getElementById('uploadCustomCssBtn');
         var customCssFileInput = document.getElementById('customCssFileInput');
-        var removeCustomCssBtn = document.getElementById('removeCustomCssBtn');
         var cancelCustomCssBtn = document.getElementById('cancelCustomCssBtn');
         var saveCustomCssBtn = document.getElementById('saveCustomCssBtn');
+
+        function closeCustomCssModal() {
+            pendingCssFile = null;
+            pendingCssFileName = '';
+            if (customCssFileInput) customCssFileInput.value = '';
+            try { closeModal('customCssModal'); } catch (e) {
+                console.debug('settings-page: closeModal() failed:', e);
+            }
+        }
 
         if (uploadCustomCssBtn && customCssFileInput) {
             uploadCustomCssBtn.addEventListener('click', function () {
@@ -2828,81 +3216,139 @@
                     return;
                 }
                 pendingCssFile = file;
-                pendingCssRemove = false;
-                updateCustomCssModalState(file.name);
-            });
-        }
-
-        if (removeCustomCssBtn) {
-            removeCustomCssBtn.addEventListener('click', function () {
-                pendingCssFile = null;
-                pendingCssRemove = true;
-                updateCustomCssModalState(null);
-                if (customCssFileInput) customCssFileInput.value = '';
+                pendingCssFileName = customCssStoredName(file.name);
+                customCssSelected = pendingCssFileName;
+                renderCustomCssThemes();
             });
         }
 
         if (cancelCustomCssBtn) {
-            cancelCustomCssBtn.addEventListener('click', function () {
-                pendingCssFile = null;
-                pendingCssRemove = false;
-                try { closeModal('customCssModal'); } catch (e) {
-                    console.debug('settings-page: selected() failed:', e);
+            cancelCustomCssBtn.addEventListener('click', closeCustomCssModal);
+        }
+
+        var postCustomCss = function (body) {
+            return fetch('api_upload_css.php', { method: 'POST', credentials: 'same-origin', body: body })
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    if (!data || !data.success) {
+                        throw new Error((data && data.error) || '');
+                    }
+                    return data;
+                });
+        };
+
+        var customCssSaveFailed = function (error) {
+            alert((error && error.message) || tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+        };
+
+        if (saveCustomCssBtn) {
+            saveCustomCssBtn.addEventListener('click', function () {
+                var uploadNeeded = !!pendingCssFile;
+                var selectionChanged = customCssSelected !== customCssActive;
+
+                if (!uploadNeeded && !selectionChanged) {
+                    // Nothing changed - just close
+                    closeCustomCssModal();
+                    return;
+                }
+
+                // The file has to be on the server before it can be applied, so
+                // the upload comes first and the selection reports the result.
+                var chain = Promise.resolve();
+
+                if (uploadNeeded) {
+                    chain = chain.then(function () {
+                        var formData = new FormData();
+                        formData.append('css_file', pendingCssFile);
+                        // The radio selection decides what is applied, not the upload.
+                        formData.append('activate', '0');
+                        return postCustomCss(formData).then(function (data) {
+                            pendingCssFile = null;
+                            return data;
+                        });
+                    });
+                }
+
+                chain.then(function () {
+                    var body = new FormData();
+                    body.append('action', 'select');
+                    body.append('filename', customCssSelected);
+                    return postCustomCss(body);
+                }).then(function () {
+                    closeCustomCssModal();
+                    refreshCustomCssBadge();
+                    refreshThemeListBadge();
+                    reloadOpener();
+                    window.location.reload();
+                }).catch(customCssSaveFailed);
+            });
+        }
+
+        // The Custom CSS modal names the theme list in a sentence, and that name
+        // opens it: leaving this modal for the other one, like Cancel does.
+        var openThemeListFromCss = document.getElementById('openThemeListFromCss');
+        if (openThemeListFromCss) {
+            openThemeListFromCss.addEventListener('click', function () {
+                closeCustomCssModal();
+                showThemeListModal();
+            });
+        }
+
+        // ---- Theme list modal ----
+        var themeListCard = document.getElementById('theme-list-card');
+        if (themeListCard) {
+            themeListCard.addEventListener('click', showThemeListModal);
+        }
+
+        // Deep link from the rail's theme button when the list holds a single
+        // theme, so clicking it leads somewhere: settings.php?open=theme-list
+        if (new URLSearchParams(window.location.search || '').get('open') === 'theme-list') {
+            showThemeListModal();
+            if (window.history && typeof window.history.replaceState === 'function') {
+                var cleanThemeListUrl = new URL(window.location.href);
+                cleanThemeListUrl.searchParams.delete('open');
+                window.history.replaceState({}, '', cleanThemeListUrl.toString());
+            }
+        }
+
+        var cancelThemeListBtn = document.getElementById('cancelThemeListBtn');
+        if (cancelThemeListBtn) {
+            cancelThemeListBtn.addEventListener('click', function () {
+                try { closeModal('themeListModal'); } catch (e) {
+                    console.debug('settings-page: closeModal() failed:', e);
                 }
             });
         }
 
-        if (saveCustomCssBtn) {
-            saveCustomCssBtn.addEventListener('click', function () {
-                if (pendingCssRemove) {
-                    fetch('api_upload_css.php', { method: 'DELETE', credentials: 'same-origin' })
-                        .then(function (r) { return r.json(); })
-                        .then(function (data) {
-                            if (data.success) {
-                                try { closeModal('customCssModal'); } catch (e) {
-                                    console.debug('settings-page: selected() failed:', e);
-                                }
-                                refreshCustomCssBadge();
-                                reloadOpener();
-                                window.location.reload();
-                            } else {
-                                alert(data.error || tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
-                            }
-                        })
-                        .catch(function () {
-                            alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
-                        });
+        var saveThemeListBtn = document.getElementById('saveThemeListBtn');
+        if (saveThemeListBtn) {
+            saveThemeListBtn.addEventListener('click', function () {
+                var entries = themeListEntriesOf(themeListRows);
+
+                if (entries.length === 0) {
+                    alert(tr('modals.theme_list.empty', {}, 'Keep at least one theme in the list.'));
                     return;
                 }
 
-                if (pendingCssFile) {
-                    var formData = new FormData();
-                    formData.append('css_file', pendingCssFile);
-                    fetch('api_upload_css.php', { method: 'POST', credentials: 'same-origin', body: formData })
-                        .then(function (r) { return r.json(); })
-                        .then(function (data) {
-                            if (data.success) {
-                                pendingCssFile = null;
-                                try { closeModal('customCssModal'); } catch (e) {
-                                    console.debug('settings-page: selected() failed:', e);
-                                }
-                                refreshCustomCssBadge();
-                                reloadOpener();
-                                window.location.reload();
-                            } else {
-                                alert(data.error || tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
-                            }
-                        })
-                        .catch(function () {
-                            alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
-                        });
+                if (JSON.stringify(entries) === themeListSaved) {
+                    // Nothing changed - just close
+                    try { closeModal('themeListModal'); } catch (e) {
+                        console.debug('settings-page: closeModal() failed:', e);
+                    }
                     return;
                 }
 
-                // Nothing changed - just close
-                try { closeModal('customCssModal'); } catch (e) {
-                    console.debug('settings-page: selected() failed:', e);
-                }
+                var body = new FormData();
+                body.append('action', 'theme_list');
+                body.append('entries', JSON.stringify(entries));
+                postCustomCss(body).then(function () {
+                    try { closeModal('themeListModal'); } catch (e) {
+                        console.debug('settings-page: closeModal() failed:', e);
+                    }
+                    refreshThemeListBadge();
+                    reloadOpener();
+                    window.location.reload();
+                }).catch(customCssSaveFailed);
             });
         }
 
@@ -3044,6 +3490,7 @@
             refreshNoteWidthBadge();
             refreshIndexIconScaleBadge();
             refreshCustomCssBadge();
+            refreshThemeListBadge();
             refreshImportLimitsBadges();
             refreshUserQuotasBadges();
             refreshGitSyncEnabledBadge();

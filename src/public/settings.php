@@ -1208,6 +1208,18 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
+            <!-- Theme list: what the rail's theme button walks through -->
+            <div class="home-card" id="theme-list-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.theme_list', [], 'Choose which themes the theme button offers, and in which order.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-sun-moon"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.theme_list', [], 'Theme list'); ?></span>
+                    <span id="theme-list-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
             <!-- Disaster Recovery -->
             <div class="home-card settings-card-clickable" id="disaster-recovery-card" data-href="admin/disaster-recovery.php">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.disaster_recovery', [], 'Restore the instance from a backup in case of data loss.'); ?>"><i class="lucide lucide-help-circle"></i></span>

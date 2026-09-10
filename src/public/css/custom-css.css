@@ -36,23 +36,82 @@
     text-align: center;
 }
 
-.custom-css-current-file {
+.custom-css-theme-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.custom-css-theme {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid var(--pz-border-strong);
+    border-radius: var(--pz-radius-lg);
+}
+
+.custom-css-theme-main {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 16px;
-    background: #f0f7ff;
-    border: 1px solid var(--pz-accent-soft);
-    border-radius: var(--pz-radius-lg);
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+}
+
+.custom-css-theme:hover {
+    background: var(--pz-surface-hover);
+}
+
+.custom-css-theme.selected {
+    border-color: var(--pz-accent);
+    background: rgba(var(--pz-accent-rgb), 0.08);
+}
+
+.custom-css-theme input[type='radio'] {
+    flex-shrink: 0;
+    margin: 0;
+    accent-color: var(--pz-accent);
+}
+
+.custom-css-theme-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+
+.custom-css-theme-name {
     font-size: 0.95rem;
     font-weight: var(--pz-weight-medium);
-    color: var(--pz-accent-strong);
     word-break: break-all;
 }
 
-.custom-css-current-file i {
-    font-size: 1.1rem;
+.custom-css-theme-meta {
+    font-size: 0.8rem;
+    color: var(--pz-text-muted);
+}
+
+.custom-css-theme-delete {
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    background: none;
+    border: none;
+    border-radius: var(--pz-radius);
+    color: var(--pz-text-muted);
+    cursor: pointer;
+}
+
+.custom-css-theme-delete:hover {
+    color: var(--pz-danger);
+    background: var(--pz-surface-hover);
 }
 
 .custom-css-actions {
@@ -94,9 +153,173 @@ html[data-theme='dark'] .no-css-text {
     color: var(--dm-text-subtle);
 }
 
-html[data-theme='dark'] .custom-css-current-file {
-    background: rgba(var(--pz-accent-rgb), 0.1);
-    border-color: rgba(var(--pz-accent-rgb), 0.3);
-    color: var(--dm-accent);
+html[data-theme='dark'] .custom-css-theme.selected {
+    border-color: rgba(var(--dm-accent-rgb), 0.5);
+    background: rgba(var(--dm-accent-rgb), 0.12);
 }
 
+html[data-theme='dark'] .custom-css-theme input[type='radio'] {
+    accent-color: var(--dm-accent);
+}
+
+
+/* The modal has two blocks: the stored stylesheets, then the theme list the
+   rail's button walks through. */
+.custom-css-block-head {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.custom-css-block-title {
+    font-size: 0.95rem;
+    color: var(--pz-text);
+}
+
+.custom-css-block-help {
+    font-size: 0.82rem;
+    line-height: 1.4;
+    color: var(--pz-text-muted);
+}
+
+/* A name inside a sentence that opens another modal: a button, so it is
+   reachable by keyboard, drawn as the link it reads as. */
+.custom-css-inline-link {
+    padding: 0;
+    font: inherit;
+    color: var(--pz-link);
+    background: none;
+    border: none;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.custom-css-inline-link:hover {
+    color: var(--pz-accent-hover);
+}
+
+.custom-css-theme-choices {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.custom-css-theme-choice {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    /* A row carrying a mode select would otherwise stand taller than the rest */
+    min-height: 42px;
+    box-sizing: border-box;
+    padding: 6px 12px;
+    border: 1px solid var(--pz-border-strong);
+    border-radius: var(--pz-radius-lg);
+}
+
+.custom-css-theme-choice.selected {
+    border-color: var(--pz-accent);
+    background: rgba(var(--pz-accent-rgb), 0.08);
+}
+
+.custom-css-theme-choice-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+}
+
+.custom-css-theme-choice-main input[type='checkbox'] {
+    flex-shrink: 0;
+    margin: 0;
+    accent-color: var(--pz-accent);
+}
+
+.custom-css-theme-choice-main i {
+    flex-shrink: 0;
+    font-size: 1.05rem;
+    color: var(--pz-icon);
+}
+
+.custom-css-theme-choice-name {
+    font-size: 0.9rem;
+    word-break: break-all;
+}
+
+/* Compact sizing must out-rank the global iOS-zoom rule
+   (.modal-content select { font-size:16px/padding:12px !important } in
+   modals/responsive.css) and the vertical margins base.css gives every select
+   in a modal. Without that, 12px of padding inside a 28px box leaves no room
+   for the text and the control renders empty. */
+#themeListModal .custom-css-theme-choice-mode {
+    flex-shrink: 0;
+    height: 28px;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 2px 6px !important;
+    font-size: 13px !important;
+    color: var(--pz-text);
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border-strong);
+    border-radius: var(--pz-radius-sm);
+}
+
+/* Touch devices keep 16px to avoid iOS focus zoom */
+@media (pointer: coarse) {
+    #themeListModal .custom-css-theme-choice-mode {
+        height: auto;
+        padding: 8px 10px !important;
+        font-size: 16px !important;
+    }
+}
+
+.custom-css-theme-order {
+    display: flex;
+    flex-shrink: 0;
+    gap: 2px;
+}
+
+.custom-css-theme-order-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    background: none;
+    border: none;
+    border-radius: var(--pz-radius-sm);
+    color: var(--pz-icon);
+    cursor: pointer;
+}
+
+.custom-css-theme-order-btn:hover:not(:disabled) {
+    background: var(--pz-surface-hover);
+    color: var(--pz-accent);
+}
+
+.custom-css-theme-order-btn:disabled {
+    color: var(--pz-disabled);
+    cursor: default;
+}
+
+#themeListModal .modal-content {
+    max-width: 520px;
+}
+
+/* .modal-buttons only has margin-top: auto, so a block that ends the modal has
+   to keep its own distance from the buttons. The custom CSS modal gets it from
+   .custom-css-upload-controls; this list is the last thing in its own modal. */
+#themeListChoices {
+    margin: 20px 0 24px;
+}
+
+html[data-theme='dark'] .custom-css-theme-choice.selected {
+    border-color: rgba(var(--dm-accent-rgb), 0.5);
+    background: rgba(var(--dm-accent-rgb), 0.12);
+}
+
+html[data-theme='dark'] .custom-css-theme-choice-main input[type='checkbox'] {
+    accent-color: var(--dm-accent);
+}

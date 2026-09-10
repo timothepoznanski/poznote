@@ -675,20 +675,37 @@ Configure it in **Settings > Appearance > UI Customization**.
 <summary><strong>Custom CSS Overrides</strong></summary>
 <br>
 
-If you want to adjust fonts, spacing, or other visual details beyond the built-in options, you can upload an extra stylesheet that is applied to every HTML page for all users.
+If you want to adjust fonts, spacing, or other visual details beyond the built-in options, you can upload extra stylesheets that are applied to every HTML page for all users.
 
-Configure it in **Settings > Appearance > Custom CSS**.
+Configure them in **Settings > Appearance > Custom CSS**.
 
 Notes:
 
 - Click **Upload CSS file** to select a `.css` file from your computer.
-- The file is uploaded and stored in `data/css/` (your Docker volume), so it survives image updates.
-- Click **Remove** to delete the file and disable the custom stylesheet.
+- Every uploaded file is kept, so you can store several themes and switch between them without uploading again.
+- The modal lists what is stored: pick the one to apply to every user, or **No custom CSS** to go back to the built-in appearance, then click **Save**.
+- Uploading a file that has the name of a stored one replaces that theme.
+- The files are stored in `data/css/` (your Docker volume), so they survive image updates.
+- Click the bin icon next to a theme to delete that file from your volume.
 - Poznote appends a cache-busting `v=` parameter automatically.
 - The stylesheet is injected near the end of `<head>`, so it can override the default application styles.
-- Only administrators can upload or remove the custom CSS file.
+- Only administrators can upload, apply or delete a custom CSS file.
 
-**Before writing any CSS**, check whether a built-in theme already does what you want: the theme button at the bottom of the icon rail offers Light, Dark, Black, Lavender, Sepia and Terminal.
+### The theme list
+
+**Settings > Theme list** says what the theme button at the bottom of the icon rail walks through: one theme per click, in the order shown.
+
+- Tick the built-in themes you want to keep, and leave out the ones nobody uses.
+- Tick a stored CSS file to offer it as a theme of its own. It gets a palette icon and the name of the file.
+- Use the arrows to set the order the button walks through.
+- A custom theme paints over a light or a dark base, which the file cannot say on its own: choose it next to the file. That is what `data-theme` is set to, so a stylesheet written for the dark mode needs **Dark** here.
+- The list is a global setting, so everyone walks through the same themes; which one is applied stays each user's own choice.
+- Whoever is on a theme you take out of the list gets the first theme of the list right away.
+- Picking a custom theme loads that file for that user only, in place of the stylesheet applied instance-wide.
+- Deleting a CSS file removes it from the list too.
+- With a single theme in the list there is nothing to walk to, so the button opens this list for an administrator, and does nothing for everyone else.
+
+**Before writing any CSS**, check whether a built-in theme already does what you want: the theme button at the bottom of the icon rail walks through Light, Dark, Black, Lavender, Sepia and Terminal.
 
 ### Examples
 

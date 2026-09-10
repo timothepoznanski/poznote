@@ -2557,7 +2557,8 @@ curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
 
 **Global settings (admin only):**
 - `login_display_name`
-- `custom_css_path` *(read-only via this API — use `POST /api_upload_css.php` to upload a file or `DELETE /api_upload_css.php` to remove it)*
+- `custom_css_path` *(read-only via this API. Use `POST /api_upload_css.php` to upload a file, `POST /api_upload_css.php` with `action=select&filename=<name>` to apply a stored one, `GET` to list them, and `DELETE /api_upload_css.php?filename=<name>` to remove one)*
+- `theme_list` *(read-only via this API. Use `POST /api_upload_css.php` with `action=theme_list&entries=<json>` to set what the theme button walks through, in order, for example `[{"id":"light"},{"id":"custom:catppuccin.css","mode":"dark"}]`)*
 - `git_sync_enabled`
 - `import_max_individual_files`
 - `import_max_zip_files`
