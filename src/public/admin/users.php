@@ -1483,16 +1483,23 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                 <div id="pw_status" class="password-status-text"></div>
             </div>
 
+            <!-- Typed twice, like the user's own change-password modal: an
+                 admin setting a password for someone else never gets to find
+                 out it was mistyped. -->
             <div class="form-group password-form-group">
                 <input type="password" id="pw_new_password" placeholder="<?php echo t_h('multiuser.admin.new_password', [], 'New password'); ?>" autocomplete="new-password">
+                <input type="password" id="pw_confirm_password" placeholder="<?php echo t_h('password.modal.confirm', [], 'Confirm new password'); ?>" autocomplete="new-password">
             </div>
 
             <div id="pw_error" class="password-feedback password-feedback-error" style="display: none;"></div>
             <div id="pw_success" class="password-feedback password-feedback-success" style="display: none;"></div>
 
+            <!-- Reset to default is not part of the save/cancel pair: it takes
+                 its own row above them (css/users.css), so its long label never
+                 squeezes the two buttons that end the dialog. -->
             <div class="form-actions password-modal-actions">
-                <button type="button" class="btn btn-danger" onclick="closeModal('passwordModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
                 <button type="button" class="btn btn-secondary" id="pw_reset_btn" onclick="resetPasswordToDefault()"><?php echo t_h('multiuser.admin.password_management.reset_to_default', [], 'Reset to default'); ?></button>
+                <button type="button" class="btn btn-danger" onclick="closeModal('passwordModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
                 <button type="button" class="btn btn-primary" id="pw_save_btn" onclick="setNewPassword()"><?php echo t_h('common.save', [], 'Save'); ?></button>
             </div>
         </div>
@@ -1646,6 +1653,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
             document.getElementById('pw_user_id').value = userId;
             document.getElementById('pw_title_user').textContent = username;
             document.getElementById('pw_new_password').value = '';
+            document.getElementById('pw_confirm_password').value = '';
             document.getElementById('pw_error').style.display = 'none';
             document.getElementById('pw_success').style.display = 'none';
             document.getElementById('passwordModal').classList.add('active');
@@ -1655,6 +1663,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
         function setNewPassword() {
             var userId = document.getElementById('pw_user_id').value;
             var newPw = document.getElementById('pw_new_password').value;
+            var confirmPw = document.getElementById('pw_confirm_password').value;
             var errorEl = document.getElementById('pw_error');
             var successEl = document.getElementById('pw_success');
 
@@ -1663,6 +1672,12 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 
             if (!newPw || newPw.length < 4) {
                 errorEl.textContent = <?php echo json_encode(t('password.errors.too_short', [], 'Password must be at least 4 characters')); ?>;
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            if (newPw !== confirmPw) {
+                errorEl.textContent = <?php echo json_encode(t('password.errors.mismatch', [], 'New passwords do not match')); ?>;
                 errorEl.style.display = 'block';
                 return;
             }

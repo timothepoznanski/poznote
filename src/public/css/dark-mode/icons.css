@@ -38,6 +38,12 @@ html[data-theme='dark'] .sidebar-folder-toggle [class*="lucide-"] {
     color: inherit;
 }
 
+/* Default-credential alert (settings.php): the shield carries the alert's own
+   colour, red or amber, and reads as a stray grey glyph without this. */
+html[data-theme='dark'] .settings-default-credentials [class*="lucide-"] {
+    color: inherit;
+}
+
 /* Icon rail: colours come from currentColor, never the global filter. The
    overflow menu clones the rail's icons, so it needs the same exemption. */
 html[data-theme='dark'] .icon-sidebar-btn [class*="lucide-"],

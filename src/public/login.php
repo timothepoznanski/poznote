@@ -11,6 +11,7 @@ require_once __DIR__ . '/../functions.php';
 require_once 'oidc.php';
 require_once __DIR__ . '/../version_helper.php';
 require_once __DIR__ . '/../users/db_master.php';
+require_once __DIR__ . '/../lib/default-credentials.php';
 
 // Set security headers for login page
 header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; form-action 'self';");
@@ -212,19 +213,14 @@ if (isset($_GET['oidc_error'])) {
         ?>
 
         <?php 
-        // Display warning if default 'admin_change_me' user exists
-        $defaultAdminUsername = null;
-        try {
-            $profiles = getAllUserProfiles();
-            foreach ($profiles as $profile) {
-                if ($profile['username'] === 'admin_change_me') {
-                    $defaultAdminUsername = $profile['username'];
-                    break;
-                }
-            }
-        } catch (Exception $e) {
-            error_log('login: poznoteRenderLoginRedirectAndExit() failed: ' . $e->getMessage());
-        }
+        // Sign-in hint for a fresh install, spelling out both shipped defaults.
+        // It is only shown while both are still untouched: this page is public,
+        // so a hint that names a live username and password has to stop being
+        // shown the moment either one stops being true. Once one is changed the
+        // owner knows their own credentials, and lib/default-credentials.php
+        // takes over inside the app to keep asking for the other one.
+        $defaultAdminProfile = poznoteFindPristineDefaultProfile();
+        $defaultAdminUsername = $defaultAdminProfile['username'] ?? null;
 
         if ($defaultAdminUsername): 
         ?>

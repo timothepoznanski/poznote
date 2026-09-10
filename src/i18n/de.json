@@ -577,6 +577,13 @@
       "s3_storage": "S3-Anhänge",
       "s3_backup": "S3-Sicherungen"
     },
+    "default_credentials": {
+      "both": "Dieses Konto verwendet noch den mitgelieferten Benutzernamen und das mitgelieferte Passwort. Jeder, der diese Instanz erreichen kann, kann sich anmelden.",
+      "password": "Dieses Konto verwendet noch das mitgelieferte Passwort. Jeder, der diese Instanz erreichen kann, kann sich anmelden.",
+      "username": "Dieses Konto verwendet noch den mitgelieferten Benutzernamen.",
+      "change_password": "Passwort ändern",
+      "change_username": "Benutzernamen ändern"
+    },
     "welcome_setup": {
       "relaunch": "Erneut öffnen",
       "restart_failed": "Der Startassistent konnte nicht erneut geöffnet werden. Bitte versuchen Sie es erneut."

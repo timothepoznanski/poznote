@@ -240,6 +240,21 @@
     display: none;
 }
 
+/* Default username or password still in place (icon_sidebar.php). Opposite
+   corner from the update dot and amber rather than red, so an instance showing
+   both says two things instead of looking like one dot that moved. */
+.icon-sidebar-btn .attention-badge {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 8px;
+    height: 8px;
+    border-radius: var(--pz-radius-circle);
+    background: var(--pz-warning-hover);
+    display: block;
+    pointer-events: none;
+}
+
 .icon-sidebar-btn .lucide {
     width: 16px;
     height: 16px;

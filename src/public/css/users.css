@@ -493,6 +493,9 @@ html[data-theme='dark'] .users-table td {
 }
 
 .password-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     margin-top: 22px;
     margin-bottom: 34px;
 }
@@ -519,6 +522,31 @@ html[data-theme='dark'] .users-table td {
 .password-modal-content .form-actions .btn {
     padding: 8px 14px;
     min-width: 0;
+}
+
+/* Reset to default is a different kind of action from the pair that closes the
+   dialog, and its label is a sentence in most languages. Own row above them,
+   so no translation can wrap it into a two-line block wedged between Cancel
+   and Save. */
+.password-modal-actions {
+    flex-wrap: wrap;
+}
+
+.password-modal-actions #pw_reset_btn {
+    flex: 1 1 100%;
+    order: -1;
+    margin-bottom: 4px;
+    /* Outlined rather than filled: sitting full width right under the fields,
+       a solid button would read as the primary action of the dialog, which it
+       is not. */
+    background: transparent;
+    color: var(--pz-text-secondary);
+    border: 1px solid var(--pz-border);
+}
+
+.password-modal-actions #pw_reset_btn:hover {
+    background: var(--pz-surface);
+    color: var(--pz-text);
 }
 
 .account-access-modal-content {

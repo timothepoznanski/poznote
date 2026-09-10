@@ -579,6 +579,13 @@
       "s3_storage": "S3 附件",
       "s3_backup": "S3 备份"
     },
+    "default_credentials": {
+      "both": "此账户仍在使用默认的用户名和密码。任何能访问此实例的人都可以登录。",
+      "password": "此账户仍在使用默认密码。任何能访问此实例的人都可以登录。",
+      "username": "此账户仍在使用默认用户名。",
+      "change_password": "修改密码",
+      "change_username": "修改用户名"
+    },
     "welcome_setup": {
       "relaunch": "重新查看",
       "restart_failed": "无法重新打开启动向导。请重试。"

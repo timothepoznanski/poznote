@@ -11,6 +11,8 @@ services:
       SQLITE_DATABASE: /var/www/html/data/database/poznote.db
       # Simultaneous PHP requests (image default 10, see docker/php-fpm/www.conf)
       POZNOTE_PHP_FPM_MAX_CHILDREN: ${POZNOTE_PHP_FPM_MAX_CHILDREN:-}
+      # PHP memory limit per request, in MB (image default 512, see docker/php/php.ini)
+      POZNOTE_PHP_MEMORY_LIMIT: ${POZNOTE_PHP_MEMORY_LIMIT:-}
     ports:
       - "${HTTP_WEB_PORT}:80"
     volumes:

@@ -215,6 +215,18 @@ $settingsChangePasswordDisabledHelp = $settingsChangePasswordDisabledReason === 
     ? t_h('settings.card_help.change_password_sso_only', [], 'This instance uses SSO only, so a local password would never be accepted at sign-in. Password changes are disabled.')
     : t_h('settings.card_help.change_password_no_local', [], 'Your account signs in through your identity provider and has no local password, so there is no current password to confirm a change with. An administrator can set one for you from Admin Tools > Users.');
 
+// Shipped defaults still in place on this account. The login page names both
+// values, so it stops as soon as either one is changed (it is public and would
+// otherwise be handing out live credentials, or lying about them); the reminder
+// to finish the job belongs here instead, behind authentication.
+require_once __DIR__ . '/../lib/default-credentials.php';
+$settingsDefaultCredentials = poznoteDefaultCredentialState((int)(getAuthenticatedUserId() ?? 0));
+// poznoteDefaultCredentialState() already drops the password half when no one
+// could sign in with it, which is the same ground the greyed-out card covers.
+$settingsDefaultPasswordInUse = $settingsDefaultCredentials['password'];
+$settingsDefaultUsernameInUse = $settingsDefaultCredentials['username'];
+$settingsHasDefaultCredential = $settingsDefaultPasswordInUse || $settingsDefaultUsernameInUse;
+
 if ($isAdmin) {
     try {
         require_once __DIR__ . '/../users/db_master.php';
@@ -376,6 +388,36 @@ if ($canUseUserWebhooks) {
         <div class="settings-layout">
         <nav id="settings-nav" class="settings-nav" aria-label="<?php echo t_h('settings.title', [], 'Settings'); ?>"></nav>
         <div class="settings-content">
+
+        <?php if ($settingsHasDefaultCredential): ?>
+        <!-- DEFAULT CREDENTIALS: sits above the sections, not inside one, so it
+             stays visible whichever section the desktop nav has open. Not
+             dismissible: it goes away by changing the credential it names. -->
+        <div class="alert <?php echo $settingsDefaultPasswordInUse ? 'alert-error' : 'alert-warning'; ?> settings-default-credentials" role="status" id="default-credentials-alert"
+             data-password-default="<?php echo $settingsDefaultPasswordInUse ? '1' : '0'; ?>"
+             data-username-default="<?php echo $settingsDefaultUsernameInUse ? '1' : '0'; ?>">
+            <i class="lucide lucide-shield"></i>
+            <div class="settings-default-credentials-body">
+                <span class="settings-default-credentials-text"><?php
+                    if ($settingsDefaultPasswordInUse && $settingsDefaultUsernameInUse) {
+                        echo t_h('settings.default_credentials.both', [], 'This account still uses the username and the password it shipped with. Anyone who can reach this instance can sign in to it.');
+                    } elseif ($settingsDefaultPasswordInUse) {
+                        echo t_h('settings.default_credentials.password', [], 'This account still uses the password it shipped with. Anyone who can reach this instance can sign in to it.');
+                    } else {
+                        echo t_h('settings.default_credentials.username', [], 'This account still uses the username it shipped with.');
+                    }
+                ?></span>
+                <span class="settings-default-credentials-actions">
+                    <?php if ($settingsDefaultPasswordInUse): ?>
+                    <a class="btn btn-primary" id="default-credentials-password-btn" href="settings.php?open=change-password#change-password-card"><?php echo t_h('settings.default_credentials.change_password', [], 'Change password'); ?></a>
+                    <?php endif; ?>
+                    <?php if ($settingsDefaultUsernameInUse): ?>
+                    <button type="button" class="btn btn-secondary" id="default-credentials-username-btn"><?php echo t_h('settings.default_credentials.change_username', [], 'Change username'); ?></button>
+                    <?php endif; ?>
+                </span>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <!-- PINNED CARDS (filled by settings-page.js from the per-user pin list) -->
         <h2 class="settings-category-title" id="settings-pinned-section-title" hidden><?php echo t_h('settings.categories.pinned', [], 'Pinned'); ?></h2>
