@@ -1452,6 +1452,16 @@ function isApiServiceTokenRequest(): bool {
     return (($_SESSION['login_user']['_api_auth_method'] ?? '') === 'service_token');
 }
 
+/**
+ * True when the current API request authenticated with an app password
+ * (src/lib/app-passwords.php). Account management refuses such requests:
+ * a credential issued for one client must not be able to change the account
+ * password, delete the account, or mint further credentials.
+ */
+function isApiAppPasswordRequest(): bool {
+    return (($_SESSION['login_user']['_api_auth_method'] ?? '') === 'app_password');
+}
+
 function isApiJwtBearerToken(string $token): bool {
     return substr_count($token, '.') === 2;
 }
@@ -1613,7 +1623,13 @@ function authenticateApiBasicAuth(bool $requireAdmin = false): array {
         exit;
     }
     
-    if ($basicAuthDisabled) {
+    // "Disable Basic auth" is about account passwords: an SSO-only instance
+    // does not want them anywhere near the API. App passwords are the
+    // credential that exists precisely for that instance, so they go through.
+    // The shape check is all that is decided here; the secret itself is
+    // verified below like any other.
+    require_once __DIR__ . '/lib/app-passwords.php';
+    if ($basicAuthDisabled && !isAppPasswordSecret((string)$basicCredentials['password'])) {
         $msg = api_t('auth.api.basic_auth_disabled', [], 'Basic authentication is disabled');
         header('HTTP/1.1 403 Forbidden');
         header('Content-Type: application/json');
@@ -1634,17 +1650,25 @@ function authenticateApiBasicAuth(bool $requireAdmin = false): array {
         exit;
     }
 
-    $authUser = ctype_digit($loginIdentifier)
-        ? getUserProfileById((int)$loginIdentifier)
-        : getUserProfileByUsername($loginIdentifier);
-
-    $credentialsValid = $authUser && $authUser['active'] && verifyUserPassword((int)($authUser['id'] ?? 0), $basicCredentials['password']);
+    $authUser = resolveApiBasicAuthUser($basicCredentials);
+    $credentialsValid = $authUser !== null;
 
     // Same response for bad credentials and insufficient role (no role disclosure),
     // but only genuine credential failures count towards the rate limit.
     if (!$credentialsValid || ($requireAdmin && !(bool)$authUser['is_admin'])) {
         if (!$credentialsValid) {
             recordFailedLoginAttempt((string)$loginIdentifier);
+        }
+        // A valid app password on an admin route is the one case that gets
+        // told why: its holder already has the secret, so nothing is disclosed,
+        // and "invalid credentials" would send them checking a value that is
+        // fine. Admin routes are out of scope for app passwords by design.
+        if ($credentialsValid && ($authUser['_api_auth_method'] ?? '') === 'app_password') {
+            $msg = api_t('auth.api.app_password_admin_forbidden', [], 'App passwords cannot access administrator endpoints');
+            header('HTTP/1.1 403 Forbidden');
+            header('Content-Type: application/json');
+            echo json_encode(['error' => $msg]);
+            exit;
         }
         $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
         header('HTTP/1.1 401 Unauthorized');
@@ -1653,9 +1677,57 @@ function authenticateApiBasicAuth(bool $requireAdmin = false): array {
         exit;
     }
 
-    $authUser['_api_auth_method'] = 'basic';
     clearLoginRateLimit((string)$loginIdentifier);
 
+    return $authUser;
+}
+
+/**
+ * Resolves Basic credentials to the profile they authenticate, or null.
+ *
+ * Two credentials are accepted in the password slot: the account password,
+ * checked by verifyUserPassword(), and an app password
+ * (src/lib/app-passwords.php), told apart by its shape. An app password
+ * authenticates the profile with the admin flag stripped and its method
+ * recorded, and that is what every later restriction keys off: the admin
+ * gate above, isCurrentUserAdmin() in the controllers, and the rule in
+ * requireApiAuth() that a non-admin credential only reaches its own profile.
+ *
+ * Shared with the attachment download path, which checks Basic credentials
+ * by hand because a publicly shared attachment must stay reachable with none.
+ */
+function resolveApiBasicAuthUser(array $basicCredentials): ?array {
+    require_once __DIR__ . '/users/db_master.php';
+    require_once __DIR__ . '/lib/app-passwords.php';
+
+    $loginIdentifier = (string)($basicCredentials['username'] ?? '');
+    $password = (string)($basicCredentials['password'] ?? '');
+
+    $authUser = ctype_digit($loginIdentifier)
+        ? getUserProfileById((int)$loginIdentifier)
+        : getUserProfileByUsername($loginIdentifier);
+    if (!$authUser || !$authUser['active']) {
+        return null;
+    }
+    $userId = (int)($authUser['id'] ?? 0);
+
+    if (isAppPasswordSecret($password)) {
+        require_once __DIR__ . '/users/app_passwords.php';
+        $appPassword = verifyUserAppPassword($userId, $password);
+        if ($appPassword === null) {
+            return null;
+        }
+        $authUser['is_admin'] = 0;
+        $authUser['_api_auth_method'] = 'app_password';
+        $authUser['_app_password_id'] = (int)$appPassword['id'];
+        $authUser['_app_password_label'] = (string)$appPassword['label'];
+        return $authUser;
+    }
+
+    if (!verifyUserPassword($userId, $password)) {
+        return null;
+    }
+    $authUser['_api_auth_method'] = 'basic';
     return $authUser;
 }
 
@@ -1679,9 +1751,10 @@ function requireApiAuth() {
     $isAdminCreds = (bool)$authUser['is_admin'];
     
     // For Basic Auth, require X-User-ID header to specify which user profile to use
-    // This is needed because with multi-user, each user has their own data
+    // This is needed because with multi-user, each user has their own data.
+    // A credential bound to one profile (OIDC JWT, app password) implies it.
     $userId = $_SERVER['HTTP_X_USER_ID'] ?? null;
-    if ($userId === null && ($authUser['_api_auth_method'] ?? '') === 'oidc_jwt') {
+    if ($userId === null && in_array($authUser['_api_auth_method'] ?? '', ['oidc_jwt', 'app_password'], true)) {
         $userId = (string)$authUser['id'];
     }
     

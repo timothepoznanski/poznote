@@ -46,6 +46,12 @@ curl -u 'username:password' http://YOUR_SERVER/api/v1/notes
 
 Use the current password of the profile you authenticate with. Default local passwords are `admin` for administrators and `user` for standard users until they are changed in the Poznote UI.
 
+**App passwords.** Instead of the account password, a user can create an *app password* in `Settings > App passwords` and hand it to one client (the browser extension, the Android app, a script, an MCP server). It is sent exactly like the account password, with the account's username, over Basic auth. What makes it different is what it is not accepted for: it never opens a browser session, never reaches `/api/v1/admin/*`, cannot change the password, delete the account or manage app passwords, and is bound to its own profile, so `X-User-ID` is optional and may only name that profile. On an SSO-only instance (OIDC with *Disable HTTP Basic Auth for API* enabled) it is the only credential the API accepts over Basic auth. Each one can be given an expiry and revoked at any time.
+
+```bash
+curl -u 'username:pzn_2f7c…' http://YOUR_SERVER/api/v1/notes
+```
+
 OIDC Bearer JWT authentication is available when OIDC is enabled. Poznote validates the token signature with the provider JWKS, checks issuer, expiration, and audience, then maps the token claims to a Poznote profile using the same OIDC linking rules as interactive login (`sub`, then `preferred_username`, then `email`). Group and user allowlists, disabled profiles, and auto-create settings are also enforced.
 
 ```bash
@@ -63,14 +69,14 @@ By default, the accepted JWT `aud` claim is the configured OIDC Client ID. If yo
 |-------|-------------|---------|
 | **No auth** | No credentials needed | `GET /api/v1/users/profiles`, `GET /api_health.php`, Public tasks |
 | **User auth** | Valid credentials, no `X-User-ID` needed | `/api/v1/users/me`, `/api/v1/system/*`, `/api/v1/shared/*` |
-| **Data auth** | Valid credentials; `X-User-ID` required for Basic/service token, optional for OIDC JWT own profile | All user data endpoints (notes, folders, tags, etc.) |
+| **Data auth** | Valid credentials; `X-User-ID` required for Basic/service token, optional for OIDC JWT and app passwords (own profile) | All user data endpoints (notes, folders, tags, etc.) |
 | **Admin auth** | Admin credentials, no `X-User-ID` needed | `/api/v1/admin/*`, `/api/v1/users/lookup/*` |
 
 ---
 
 ## Multi-User Mode
 
-Poznote supports multiple user profiles, each with their own isolated data. For API calls that access **user data** (notes, folders, workspaces, tags, attachments, backups, settings, etc.), Basic Auth and internal service-token requests must include the `X-User-ID` header. OIDC Bearer JWT requests use the token-linked profile by default and only need `X-User-ID` when an admin token targets another profile.
+Poznote supports multiple user profiles, each with their own isolated data. For API calls that access **user data** (notes, folders, workspaces, tags, attachments, backups, settings, etc.), Basic Auth with an account password and internal service-token requests must include the `X-User-ID` header. OIDC Bearer JWT requests use the token-linked profile by default and only need `X-User-ID` when an admin token targets another profile. App passwords always act on the profile they belong to.
 
 Account-access grants configured in the web admin UI only apply to interactive browser sessions after login account selection. They do not allow non-admin API credentials to use `X-User-ID` for another profile. API access to another user's data requires administrator credentials or the internal service token.
 
@@ -82,7 +88,7 @@ curl -u 'username:password' -H "X-User-ID: 1" \
 **Endpoints that do NOT require the `X-User-ID` header:**
 - **Admin endpoints**: `/api/v1/admin/*`
 - **Public endpoints**: `/api/v1/users/profiles`
-- **User profile endpoints**: `/api/v1/users/me`, `/api/v1/users/me/password`, `/api/v1/users/me/password-status`
+- **User profile endpoints**: `/api/v1/users/me`, `/api/v1/users/me/password`, `/api/v1/users/me/password-status`, `/api/v1/users/me/app-passwords`
 - **System endpoints**: `/api/v1/system/*` (version, updates, i18n)
 - **Shared endpoints**: `/api/v1/shared`, `/api/v1/shared/with-me`
 
@@ -347,6 +353,7 @@ Update an existing note by ID. Only include fields you want to modify.
 | `workspace` | string | Move to workspace |
 | `git_push` | boolean | Trigger Git sync after update |
 | `if_version` | string | Optimistic concurrency token (see below) |
+| `state_hash` | string | Fingerprint of the editor state being saved, used by the web editor's draft recovery. `GET /notes/{id}` returns it as `state_hash` until the note is written again by anyone, `null` otherwise. Other API clients can leave it out. |
 
 ```bash
 curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
@@ -2550,7 +2557,8 @@ curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
 
 **Global settings (admin only):**
 - `login_display_name`
-- `custom_css_path` *(read-only via this API — use `POST /api_upload_css.php` to upload a file or `DELETE /api_upload_css.php` to remove it)*
+- `custom_css_path` *(read-only via this API. Use `POST /api_upload_css.php` to upload a file, `POST /api_upload_css.php` with `action=select&filename=<name>` to apply a stored one, `GET` to list them, and `DELETE /api_upload_css.php?filename=<name>` to remove one)*
+- `theme_list` *(read-only via this API. Use `POST /api_upload_css.php` with `action=theme_list&entries=<json>` to set what the theme button walks through, in order, for example `[{"id":"light"},{"id":"custom:catppuccin.css","mode":"dark"}]`)*
 - `git_sync_enabled`
 - `import_max_individual_files`
 - `import_max_zip_files`
@@ -2827,6 +2835,91 @@ Check whether the current user has a custom password or is using the `.env` fall
 ```bash
 curl -u 'username:password' \
   http://YOUR_SERVER/api/v1/users/me/password-status
+```
+
+### List App Passwords
+
+```
+GET /users/me/app-passwords
+```
+
+List the current user's app passwords (see [Authentication](#authentication)). The secrets themselves are never returned, only a short `hint` (the prefix and the first four characters) to match a row against the value pasted in a client. Dates are in the user's timezone and format. Not available to requests authenticated with an app password.
+
+```bash
+curl -u 'username:password' \
+  http://YOUR_SERVER/api/v1/users/me/app-passwords
+```
+
+**Response:**
+```json
+{
+  "app_passwords": [
+    {
+      "id": 3,
+      "label": "Chrome extension",
+      "hint": "pzn_2f7c",
+      "created_at": "2026-09-10 14:02",
+      "last_used_at": "2026-09-10 15:31",
+      "expires_at": null,
+      "expired": false
+    }
+  ],
+  "count": 1,
+  "active_count": 1,
+  "limit": 25
+}
+```
+
+### Create App Password
+
+```
+POST /users/me/app-passwords
+```
+
+Create an app password. The clear-text `secret` is in this response and nowhere else afterwards. A profile can hold at most 25 app passwords. Not available to requests authenticated with an app password.
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `label` | string | Yes | A name for the client that will use it (max. 60 characters) |
+| `expires_in_days` | integer | No | Lifetime in days (1 to 3650). Omit for no expiry |
+
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"label": "Chrome extension", "expires_in_days": 90}' \
+  http://YOUR_SERVER/api/v1/users/me/app-passwords
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "app_password": {
+    "id": 3,
+    "label": "Chrome extension",
+    "hint": "pzn_2f7c",
+    "created_at": "2026-09-10 14:02",
+    "last_used_at": null,
+    "expires_at": "2026-12-09 14:02",
+    "expired": false
+  },
+  "secret": "pzn_2f7c…"
+}
+```
+
+### Revoke App Password
+
+```
+DELETE /users/me/app-passwords/{id}
+```
+
+Revoke an app password. A client still holding the secret is refused from the next request on. Not available to requests authenticated with an app password.
+
+```bash
+curl -X DELETE -u 'username:password' \
+  http://YOUR_SERVER/api/v1/users/me/app-passwords/3
 ```
 
 ### Delete My Account
@@ -3399,6 +3492,9 @@ curl http://YOUR_SERVER/api_health.php
 | `PATCH` | `/users/me` | Update own profile |
 | `POST` | `/users/me/password` | Change password |
 | `GET` | `/users/me/password-status` | Password status |
+| `GET` | `/users/me/app-passwords` | List app passwords |
+| `POST` | `/users/me/app-passwords` | Create app password |
+| `DELETE` | `/users/me/app-passwords/{id}` | Revoke app password |
 | `DELETE` | `/users/me` | Delete own account |
 | `GET` | `/users/lookup/{username}` | Lookup by name |
 

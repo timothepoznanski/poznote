@@ -169,6 +169,19 @@ try {
     $settingsPageConfig['passwordStatus'] = null;
 }
 
+// App passwords card: seed the badge so the page does not fetch the list
+// just to say how many there are.
+try {
+    require_once __DIR__ . '/../users/app_passwords.php';
+    $settingsPageAppPasswordsUserId = (int)(getCurrentUserId() ?? 0);
+    $settingsPageConfig['appPasswords'] = [
+        'active_count' => $settingsPageAppPasswordsUserId > 0 ? countActiveUserAppPasswords($settingsPageAppPasswordsUserId) : 0,
+    ];
+} catch (Exception $e) {
+    $settingsPageConfig['appPasswords'] = ['active_count' => 0];
+}
+$settingsAppPasswordsActive = (int)($settingsPageConfig['appPasswords']['active_count'] ?? 0);
+
 // Whether a local password is of any use to this user. Unusable in two cases:
 // the instance is SSO-only, so no password would ever be accepted at login;
 // or this profile was provisioned without a credential, so there is no current
@@ -223,6 +236,9 @@ if ($isAdmin) {
         foreach ($settingsPageGlobalKeys as $settingsPageKey) {
             $settingsPageConfig['settings'][$settingsPageKey] = getGlobalSetting($settingsPageKey, '');
         }
+        // Resolved rather than read raw, so the badge tells the truth on an
+        // instance configured through the environment variable.
+        $settingsPageConfig['settings']['allow_executable_attachments'] = poznoteExecutableAttachmentsAllowed() ? '1' : '0';
     } catch (Exception $e) {
         // Keep the page usable if the master database is temporarily unavailable.
         error_log('settings: failed: ' . $e->getMessage());
@@ -404,6 +420,26 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.change_password', [], 'Change Password'); ?></span>
                     <span id="password-status-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+            <!-- App passwords: revocable API credentials for clients that cannot sign in through SSO -->
+            <div class="home-card" id="app-passwords-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.app_passwords', [], 'Create passwords for apps and extensions that connect through the API, such as the browser extension. They work even when you sign in through SSO, cannot open the web interface or change your account, and can be revoked at any time.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-plug"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.app_passwords', [], 'App passwords'); ?></span>
+                    <span id="app-passwords-status-badge" class="setting-status <?php echo $settingsAppPasswordsActive > 0 ? 'enabled' : 'disabled'; ?>"><?php
+                        if ($settingsAppPasswordsActive === 1) {
+                            echo t_h('app_passwords.status.count_one', [], '1 active');
+                        } elseif ($settingsAppPasswordsActive > 1) {
+                            echo t_h('app_passwords.status.count_other', ['count' => $settingsAppPasswordsActive], '{{count}} active');
+                        } else {
+                            echo t_h('app_passwords.status.none', [], 'None');
+                        }
+                    ?></span>
                 </div>
             </div>
 
@@ -708,7 +744,7 @@ if ($canUseUserWebhooks) {
 
             <!-- Default View Mode (preview / edit / split / last used) -->
             <div class="home-card" id="markdown-default-view-mode-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_default_view_mode', [], 'Choose whether markdown notes open in preview, edit or split mode. A note you switch to another mode keeps it until you close the tab.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_default_view_mode', [], 'Choose whether markdown notes open in preview, edit or split mode.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-book-open"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.markdown_default_view_mode', [], 'Default view mode'); ?></span>
@@ -1099,6 +1135,18 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
+            <!-- Script and executable attachments (instance-wide) -->
+            <div class="home-card" id="executable-attachments-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.allow_executable_attachments', [], 'Allow scripts and executables (.sh, .ps1, .bat, .exe, .py, ...) to be attached to notes, for every account on this instance. Poznote never runs them, it only stores and serves them. File types a web server could execute, such as .php, stay blocked.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-file-code"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.allow_executable_attachments', [], 'Script and executable attachments'); ?></span>
+                    <span id="executable-attachments-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
             <!-- Tenant isolation (SaaS mode) -->
             <div class="home-card" id="tenant-isolation-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.tenant_isolation', [], 'SaaS mode: choose which capabilities are blocked for non-admin users, such as discovering the other accounts of the instance or registering personal webhooks. Leave everything unchecked for a family or team instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
@@ -1160,6 +1208,18 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
+            <!-- Theme list: what the rail's theme button walks through -->
+            <div class="home-card" id="theme-list-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.theme_list', [], 'Choose which themes the theme button offers, and in which order.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-sun-moon"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.theme_list', [], 'Theme list'); ?></span>
+                    <span id="theme-list-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
             <!-- Disaster Recovery -->
             <div class="home-card settings-card-clickable" id="disaster-recovery-card" data-href="admin/disaster-recovery.php">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.disaster_recovery', [], 'Restore the instance from a backup in case of data loss.'); ?>"><i class="lucide lucide-help-circle"></i></span>
@@ -1209,7 +1269,7 @@ if ($canUseUserWebhooks) {
 
         <!-- ABOUT CATEGORY (grid id kept as -documentation- so saved collapse
              state and pinned cards survive the rename) -->
-        <h2 class="settings-category-title" id="settings-documentation-section-title"><?php echo t_h('settings.categories.documentation', [], 'About'); ?></h2>
+        <h2 class="settings-category-title" id="settings-documentation-section-title"><?php echo t_h('settings.categories.documentation', [], 'About'); ?><span class="update-badge update-badge-inline update-badge-hidden"></span></h2>
         <div class="home-grid" id="settings-documentation-section-grid">
 
             <!-- Version: the former "Check for Updates" card of the Actions
@@ -1385,6 +1445,7 @@ if ($canUseUserWebhooks) {
     <script src="js/settings-page.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/settings-page.js') ?: time(); ?>"></script>
     <script src="js/ui-customization.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/change-password.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/change-password.js') ?: time(); ?>"></script>
+    <script src="js/app-passwords.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/app-passwords.js') ?: time(); ?>"></script>
     <!-- js/profile.js (My Profile card and modal) is loaded by icon_sidebar.php,
          which every page carrying the rail includes. -->
     <script src="js/delete-account.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/delete-account.js') ?: time(); ?>"></script>

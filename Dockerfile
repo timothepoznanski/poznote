@@ -120,6 +120,10 @@ RUN sed -i 's/listen 80;/listen 8080;/' /etc/nginx/http.d/default.conf \
 RUN mkdir -p /var/log/supervisor /run/nginx \
     && chown -R poznote:poznote /var/log /var/lib/nginx /run
 
+# init.sh rewrites pm.max_children in the pool config when
+# POZNOTE_PHP_FPM_MAX_CHILDREN is set; as "poznote" it needs to own the file.
+RUN chown poznote:poznote /usr/local/etc/php-fpm.d/www.conf
+
 # Copy application source, owned by the unprivileged user
 COPY --chown=poznote:poznote ./src /var/www/html
 

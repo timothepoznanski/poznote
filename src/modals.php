@@ -194,39 +194,63 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
-<!-- Custom CSS Path Modal -->
+<!-- Custom CSS Modal: the stylesheets stored in data/css/ -->
 <div id="customCssModal" class="modal">
     <div class="modal-content">
         <h3><?php echo t_h('modals.custom_css.title', [], 'Custom CSS'); ?></h3>
-        <p><?php echo t_h('modals.custom_css.description', [], 'Upload a CSS file to customise Poznote\'s appearance. The file is stored in your data volume and applied to all users.'); ?></p>
+        <p><?php echo t_h('modals.custom_css.description', [], 'Upload CSS files to customise Poznote\'s appearance. They are stored in your data volume, and the one you select is applied to all users.'); ?></p>
 
         <div class="custom-css-upload-controls">
             <input type="file" id="customCssFileInput" accept=".css,text/css" style="display:none">
-            
-            <div id="customCssNoFile" class="no-css-text">
-                <?php echo t_h('modals.custom_css.no_file', [], 'No custom CSS loaded'); ?>
+
+            <div id="customCssNoFile" class="no-css-text" style="display:none">
+                <?php echo t_h('modals.custom_css.no_file', [], 'No CSS file stored yet'); ?>
             </div>
 
-            <div id="customCssCurrentFile" class="custom-css-current-file" style="display:none">
-                <i class="lucide lucide-file-code"></i>
-                <span id="customCssFileName"></span>
-            </div>
+            <div id="customCssThemeList" class="custom-css-theme-list"></div>
 
             <div class="custom-css-actions">
                 <button type="button" class="btn-secondary" id="uploadCustomCssBtn">
                     <i class="lucide lucide-upload"></i>
                     <?php echo t_h('modals.custom_css.upload', [], 'Upload CSS file'); ?>
                 </button>
-                <button type="button" class="btn-danger" id="removeCustomCssBtn" style="display:none">
-                    <i class="lucide lucide-trash-2"></i>
-                    <?php echo t_h('common.delete', [], 'Delete'); ?>
-                </button>
+            </div>
+
+            <div class="custom-css-block-help">
+                <?php
+                // The sentence names the theme list, and that name opens it. The
+                // marker travels through the escaping untouched, so the button is
+                // the only HTML in a string a translator wrote.
+                $customCssThemeListLink = '<button type="button" class="custom-css-inline-link" id="openThemeListFromCss">'
+                    . t_h('modals.custom_css.theme_list_link_label', [], 'theme list')
+                    . '</button>';
+                echo str_replace(
+                    '{{link}}',
+                    $customCssThemeListLink,
+                    t_h('modals.custom_css.theme_list_link', [], 'A CSS file can also be offered as a theme: add it to the {{link}}.')
+                );
+                ?>
             </div>
         </div>
 
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" id="cancelCustomCssBtn"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" id="saveCustomCssBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
+<!-- Theme List Modal: what the rail's theme button walks through, in order -->
+<div id="themeListModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.theme_list.title', [], 'Theme list'); ?></h3>
+        <p><?php echo t_h('modals.theme_list.description', [], 'Each click on the theme button of the icon sidebar switches to the next theme in this list. Tick the ones to offer, order them with the arrows, and tick a CSS file to offer it as a theme too.'); ?></p>
+
+        <div id="themeListChoices" class="custom-css-theme-choices"></div>
+
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" id="cancelThemeListBtn"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveThemeListBtn"><?php echo t_h('common.save'); ?></button>
         </div>
     </div>
 </div>
@@ -1307,7 +1331,7 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
                 <label><input type="radio" name="markdownDefaultViewMode" value="split"> <?php echo t_h('modals.markdown_default_view_mode.options.split', [], 'Split (editor and preview side by side)'); ?></label>
                 <label><input type="radio" name="markdownDefaultViewMode" value="last"> <?php echo t_h('modals.markdown_default_view_mode.options.last', [], 'Last used mode'); ?></label>
             </div>
-            <p class="modal-hint"><?php echo t_h('modals.markdown_default_view_mode.hint', [], 'A note you switch to another mode keeps that mode until you close the tab. New notes always open in split mode.'); ?></p>
+            <p class="modal-hint"><?php echo t_h('modals.markdown_default_view_mode.hint', [], 'A note you switch to another mode opens again in the default mode next time. New notes always open in split mode.'); ?></p>
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="markdownDefaultViewModeModal"><?php echo t_h('common.cancel'); ?></button>

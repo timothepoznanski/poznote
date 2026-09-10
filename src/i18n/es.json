@@ -38,7 +38,7 @@
       "oidc_button": "Continuar con {{provider}}",
       "documentation": "Documentación de Poznote",
       "redirecting": "Redirigiendo...",
-      "admin_warning": "Inicie sesión con el nombre de usuario <code>{{username}}</code> y la contraseña actual de esta cuenta. Luego podrá cambiar el nombre de esta cuenta en la configuración para mayor seguridad.",
+      "admin_warning": "Al iniciar sesión, cambie su contraseña de inmediato en la configuración. También podrá cambiar su nombre de usuario.",
       "errors": {
         "invalid_credentials": "Usuario o contraseña incorrectos."
       }
@@ -348,7 +348,13 @@
       "loading_error": "Error al cargar adjuntos",
       "upload_failed_generic": "Subida fallida. Por favor intenta de nuevo.",
       "upload_failed_connection": "Subida fallida. Por favor verifica tu conexión.",
-      "link_copy_failed": "Error al copiar el enlace"
+      "link_copy_failed": "Error al copiar el enlace",
+      "blocked_extension_unlockable": "Los archivos {{ext}} están bloqueados de forma predeterminada. Puedes permitirlos en Configuración > Herramientas de administración > Adjuntos de scripts y ejecutables.",
+      "blocked_extension_locked": "Los archivos {{ext}} pueden ser ejecutados por un servidor web y nunca se pueden adjuntar.",
+      "blocked_mime_unlockable": "Este archivo se detecta como {{mime}} y está bloqueado de forma predeterminada. Puedes permitir scripts y ejecutables en Configuración > Herramientas de administración > Adjuntos de scripts y ejecutables.",
+      "blocked_mime_locked": "Este archivo se detecta como {{mime}}, que un servidor web puede ejecutar, por lo que nunca se puede adjuntar.",
+      "blocked_extension_unlockable_user": "Los archivos {{ext}} están bloqueados en esta instancia. Un administrador puede permitirlos en Configuración > Herramientas de administración > Adjuntos de scripts y ejecutables.",
+      "blocked_mime_unlockable_user": "Este archivo se detecta como {{mime}} y está bloqueado en esta instancia. Un administrador puede permitir scripts y ejecutables en Configuración > Herramientas de administración > Adjuntos de scripts y ejecutables."
     },
     "messages": {
       "upload_success": "¡Archivo subido exitosamente!",
@@ -419,6 +425,7 @@
       "password_note_no_local": "Tu contraseña la gestiona tu proveedor de identidad.",
       "change_password_sso_only": "Esta instancia solo usa SSO, por lo que nunca se aceptaría una contraseña local al iniciar sesión. Los cambios de contraseña están desactivados.",
       "change_password_no_local": "Tu cuenta inicia sesión mediante tu proveedor de identidad y no tiene contraseña local, por lo que no hay contraseña actual con la que confirmar un cambio. Un administrador puede establecer una desde Herramientas de administración > Usuarios.",
+      "app_passwords": "Crea contraseñas para aplicaciones y extensiones que se conectan a través de la API, como la extensión del navegador. Funcionan aunque inicies sesión con SSO, no permiten abrir la interfaz web ni modificar tu cuenta, y se pueden revocar en cualquier momento.",
       "git_sync": "Respalda tus notas en un repositorio Git y consulta el historial de sincronización.",
       "extension": "Instala la extensión del navegador para guardar páginas web en Poznote.",
       "install_app": "Instala Poznote como aplicación en tu dispositivo (PWA).",
@@ -431,7 +438,7 @@
       "language": "Cambia el idioma de la interfaz.",
       "main_font": "Elige la fuente utilizada en toda la aplicación.",
       "markdown_font": "Elige la fuente utilizada en el editor markdown.",
-      "markdown_default_view_mode": "Elige si las notas markdown se abren en vista previa, edición o vista dividida. Una nota que cambies a otro modo lo conserva hasta cerrar la pestaña.",
+      "markdown_default_view_mode": "Elige si las notas markdown se abren en vista previa, edición o vista dividida.",
       "font_size": "Ajusta el tamaño de fuente de las notas, la barra lateral, los bloques de código y la página de configuración.",
       "index_icon_scale": "Ajusta el tamaño de los iconos en la lista de notas.",
       "timezone": "Define la zona horaria utilizada para mostrar fechas y horas.",
@@ -454,6 +461,7 @@
       "code_line_numbers": "Muestra los números de línea en los bloques de código de la vista previa de markdown.",
       "attachment_previews": "Muestra vistas previas de los adjuntos dentro de las notas.",
       "attachments_at_bottom": "Muestra la sección de adjuntos en la parte inferior de las notas en lugar de arriba.",
+      "allow_executable_attachments": "Permite adjuntar scripts y ejecutables (.sh, .ps1, .bat, .exe, .py, ...), para todas las cuentas de esta instancia. Poznote nunca los ejecuta, solo los almacena y los sirve. Los tipos que un servidor web podría ejecutar, como .php, siguen bloqueados.",
       "backlinks_at_bottom": "Muestra la sección de retroenlaces en la parte inferior de las notas en lugar de arriba.",
       "default_image_border": "Muestra por defecto las imágenes de las notas con borde y sin relleno.",
       "spellcheck_html_notes": "Activa el corrector ortográfico del navegador en las notas HTML.",
@@ -473,6 +481,7 @@
       "import_limits": "Define el número máximo de archivos permitidos por importación.",
       "user_quotas": "Limita el número de notas y el almacenamiento disponible por usuario.",
       "custom_css": "Aplica tu propio CSS para personalizar la apariencia de Poznote.",
+      "theme_list": "Elige qué temas ofrece el botón de tema, y en qué orden.",
       "ui_customization_admin": "Oculta los elementos de la interfaz que no utilizas, para ti o para todos los usuarios de esta instancia.",
       "disaster_recovery": "Restaura la instancia desde una copia de seguridad en caso de pérdida de datos.",
       "orphan_scanner": "Encuentra y limpia archivos adjuntos que ya no pertenecen a ninguna nota.",
@@ -543,6 +552,7 @@
       "support": "Apoyar Poznote",
       "buy_me_a_coffee": "Invítame a un café",
       "custom_css": "Archivo CSS personalizado",
+      "theme_list": "Lista de temas",
       "install_extension": "Instalar extensión",
       "install_app": "Instalar aplicación",
       "release_notes": "Notas de la versión",
@@ -552,11 +562,13 @@
       "storage_stats_user": "Estadísticas de almacenamiento del usuario",
       "user_management": "Gestión de usuarios",
       "change_password": "Cambiar contraseña",
+      "app_passwords": "Contraseñas de aplicación",
       "delete_account": "Eliminar cuenta",
       "import_limits": "Límites de importación",
       "user_quotas": "Cuotas de usuario",
       "welcome_setup": "Asistente de inicio",
       "git_sync_toggle": "Sincronización Git",
+      "allow_executable_attachments": "Adjuntos de scripts y ejecutables",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Correo",
       "webhooks": "Webhooks de administrador",
@@ -832,7 +844,16 @@
     "confirm_navigation": "⚠️ Cambios no guardados\n\nTienes cambios no guardados que se perderán.\n¿Guardar antes de navegar?",
     "notification": {
       "saving": "Guardando cambios...",
-      "saved": "¡Guardado!"
+      "saved": "¡Guardado!",
+      "not_saved_yet": "Tus últimos cambios aún no se han podido guardar. Se conservan en este dispositivo y Poznote sigue intentándolo."
+    },
+    "draft": {
+      "found_conflict": "Esta nota tiene cambios sin guardar de tu última visita, pero también se modificó en otro lugar desde entonces. La versión que no conserves queda en el historial de la nota.",
+      "found_error": "Esta nota tiene cambios sin guardar de tu última visita. Aún no se han podido guardar.",
+      "restore": "Conservar mis cambios sin guardar",
+      "discard": "Conservar la versión actual",
+      "restored": "Tus últimos cambios se han recuperado y guardado.",
+      "restore_failed": "No se han podido guardar tus cambios. Comprueba tu conexión e inténtalo de nuevo."
     }
   },
   "tasklist": {
@@ -1058,7 +1079,8 @@
       "create_linked_note": "Crear atajo",
       "open_in_new_tab": "Abrir en nueva pestaña",
       "split_view": "Alternar vista dividida",
-      "search_replace": "Buscar y reemplazar"
+      "search_replace": "Buscar y reemplazar",
+      "save_now": "Guardar ahora"
     },
     "link": {
       "add_title": "Agregar enlace",
@@ -1153,12 +1175,29 @@
     },
     "custom_css": {
       "title": "CSS personalizado",
-      "description": "Sube un archivo CSS para personalizar la apariencia de Poznote. El archivo se almacena en tu volumen de datos y se aplica a todos los usuarios.",
-      "no_file": "No se ha cargado ningún CSS personalizado",
+      "description": "Sube archivos CSS para personalizar la apariencia de Poznote. Se guardan en tu volumen de datos y el que selecciones se aplica a todos los usuarios.",
+      "theme_list_link": "Un archivo CSS también puede ofrecerse como tema: añádelo a la {{link}}.",
+      "theme_list_link_label": "lista de temas",
+      "no_file": "Todavía no hay ningún archivo CSS guardado",
+      "none": "Sin CSS personalizado",
+      "active": "Aplicado",
+      "pending_upload": "Se subirá al guardar",
+      "pending_replace": "Se reemplazará al guardar",
+      "delete_confirm": "¿Eliminar {{name}}? El archivo se borra de tu volumen de datos.",
       "upload": "Subir archivo CSS",
       "validation": "Por favor, selecciona un archivo CSS.",
       "placeholder": "custom.css",
       "hint": "Usuarios de Docker: coloca el archivo en la carpeta de volumen data/css/ (p. ej. data/css/custom.css). De lo contrario, se carga desde css/custom.css dentro de la imagen."
+    },
+    "theme_list": {
+      "title": "Lista de temas",
+      "description": "Cada clic en el botón de tema de la barra de iconos pasa al siguiente tema de esta lista. Marca los que quieras ofrecer, ordénalos con las flechas y marca un archivo CSS para ofrecerlo también como tema.",
+      "mode_help": "¿Esta hoja de estilos está escrita para el modo claro o el modo oscuro?",
+      "move_up": "Subir",
+      "move_down": "Bajar",
+      "empty": "Deja al menos un tema en la lista.",
+      "badge_one": "1 tema",
+      "badge_other": "{{count}} temas"
     },
     "import_limits": {
       "title": "Límites de importación",
@@ -1587,7 +1626,7 @@
         "split_short": "Vista dividida",
         "last": "Último modo usado"
       },
-      "hint": "Una nota que cambies a otro modo lo conserva hasta cerrar la pestaña. Las notas nuevas siempre se abren en vista dividida."
+      "hint": "Una nota que cambies a otro modo se vuelve a abrir en el modo predeterminado. Las notas nuevas siempre se abren en vista dividida."
     },
     "diary_date_format": {
       "title": "Formato de fecha de las entradas del diario",
@@ -1768,7 +1807,7 @@
   },
   "update": {
     "new_available": "🎉 ¡Nueva actualización disponible!",
-    "new_version_available": "Para actualizar, sigue las instrucciones en GitHub <a href=\"https://github.com/timothepoznanski/poznote#update-application\" target=\"_blank\">aquí</a>",
+    "new_version_available": "Si gestionas esta instalación tú mismo, sigue las instrucciones en GitHub <a href=\"https://github.com/timothepoznanski/poznote#update-application\" target=\"_blank\">aquí</a> para actualizar. Si no, tu proveedor de alojamiento debe realizar la actualización.",
     "description": "Tus datos serán preservados durante la actualización.",
     "up_to_date": "✅ Poznote está actualizado",
     "error_loading_version": "Error al cargar versión",
@@ -2103,7 +2142,7 @@
     "redirecting": "Redirigiendo...",
     "show_password": "Mostrar contraseña",
     "hide_password": "Ocultar contraseña",
-    "admin_warning": "Inicie sesión con el nombre de usuario <code>{{username}}</code> y la contraseña actual de esta cuenta. Luego podrá cambiar el nombre de esta cuenta en la configuración para mayor seguridad.",
+    "admin_warning": "Al iniciar sesión, cambie su contraseña de inmediato en la configuración. También podrá cambiar su nombre de usuario.",
     "fields": {
       "username": "Nombre de usuario",
       "username_or_email": "Nombre de usuario o correo electrónico",
@@ -2152,7 +2191,7 @@
       "default_reason": "bloqueado por la política de seguridad de adjuntos",
       "original_filename": "original",
       "note": "nota",
-      "recovery_hint": "Estos archivos quedaron en el ZIP de origen y no se restauraron como adjuntos activos por motivos de seguridad. Puedes recuperarlos manualmente desde el ZIP. Una reimportación directa seguirá bloqueada mientras el archivo conserve un tipo prohibido; guárdalo dentro de un archivo permitido como .zip, o conviértelo/renómbralo a un tipo permitido solo si confías en el archivo.",
+      "recovery_hint": "Estos archivos quedaron en el ZIP de origen y no se restauraron como adjuntos activos por motivos de seguridad. Puedes recuperarlos manualmente desde el ZIP. Una reimportación directa seguirá bloqueada mientras el archivo conserve un tipo prohibido; guárdalo dentro de un archivo permitido como .zip, o conviértelo/renómbralo a un tipo permitido solo si confías en el archivo. Si son scripts o ejecutables en los que confías, un administrador puede activar Configuración > Herramientas de administración > Adjuntos de scripts y ejecutables, y después vuelve a importar.",
       "reasons": {
         "invalid_filename": "Nombre de archivo adjunto inválido",
         "hidden_filename": "No se permiten nombres de archivos adjuntos ocultos",
@@ -3389,6 +3428,8 @@
       "account_deleted": "Cuenta eliminada",
       "access_granted": "Acceso a la cuenta concedido",
       "access_revoked": "Acceso a la cuenta revocado",
+      "app_password_created": "Contraseña de aplicación creada",
+      "app_password_revoked": "Contraseña de aplicación revocada",
       "workspace_created": "Espacio de trabajo creado",
       "workspace_deleted": "Espacio de trabajo eliminado",
       "workspace_shared": "Espacio de trabajo compartido",
@@ -3419,7 +3460,8 @@
       "accounts": "cuentas: {{accounts}}",
       "empty_value": "vacío",
       "s3_objects_deleted": "{{count}} objetos S3 eliminados",
-      "s3_cleanup_failed": "falló la limpieza de S3"
+      "s3_cleanup_failed": "falló la limpieza de S3",
+      "expires_at": "caduca el {{date}}"
     },
     "destinations": {
       "download": "descarga",
@@ -3527,6 +3569,44 @@
     },
     "success": "Contraseña cambiada con éxito."
   },
+  "app_passwords": {
+    "status": {
+      "none": "Ninguna",
+      "count_one": "1 activa",
+      "count_other": "{{count}} activas"
+    },
+    "modal": {
+      "title": "Contraseñas de aplicación",
+      "description": "Una contraseña de aplicación permite a una aplicación o extensión usar la API con tu nombre de usuario, en lugar de la contraseña de tu cuenta, incluso si inicias sesión con SSO. No permite abrir la interfaz web, acceder a la administración ni modificar tu cuenta, y puedes revocarla en cualquier momento.",
+      "label_placeholder": "Nombre, p. ej. Extensión de Chrome",
+      "expiry_label": "Caducidad",
+      "expiry_never": "No caduca",
+      "expiry_30": "30 días",
+      "expiry_90": "90 días",
+      "expiry_365": "1 año",
+      "create": "Crear",
+      "close": "Cerrar",
+      "empty": "Todavía no hay ninguna contraseña de aplicación.",
+      "secret_title": "Contraseña de aplicación «{{label}}»",
+      "secret_notice": "Cópiala ahora: no se volverá a mostrar.",
+      "usage_hint": "En la aplicación, introduce tu nombre de usuario y este valor como contraseña.",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "created": "Creada el {{date}}",
+      "last_used": "Último uso el {{date}}",
+      "never_used": "Nunca usada",
+      "expires": "Caduca el {{date}}",
+      "expired": "Caducada",
+      "revoke": "Revocar",
+      "confirm_revoke": "Confirmar"
+    },
+    "errors": {
+      "label_required": "Pon un nombre a la contraseña de aplicación.",
+      "limit_reached": "Límite alcanzado: revoca una contraseña de aplicación antes de crear otra.",
+      "load_failed": "No se pudieron cargar tus contraseñas de aplicación.",
+      "generic": "Algo salió mal. Inténtalo de nuevo."
+    }
+  },
   "delete_account": {
     "modal": {
       "title": "Eliminar cuenta",
@@ -3602,7 +3682,7 @@
       "sso_only_admin_password": "Puede poner esta instancia en modo solo SSO estableciendo POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true en el archivo .env.",
       "sso_only_admin_password_warning": "Antes de activarlo, asegúrese de que al menos una cuenta de administrador tenga una contraseña explícita (Ajustes > Usuarios).",
       "sso_only_admin_password_recovery": "Si el proveedor de identidad deja de estar disponible, la recuperación consiste en volver a poner la opción en false e iniciar sesión con esa contraseña.",
-      "disable_basic_auth": "Si está activado, las solicitudes API con HTTP Basic Auth se rechazarán (403)"
+      "disable_basic_auth": "Si está activado, las peticiones a la API autenticadas con una contraseña de cuenta mediante HTTP Basic Auth se rechazan (403). Las contraseñas de aplicación creadas por los usuarios en sus ajustes siguen funcionando."
     },
     "actions": {
       "copy_all": "Copiar todo",

@@ -2,6 +2,7 @@
 // Which stylesheets each page loads. Kept next to the asset helpers below
 // because poznoteRenderStylesheets() builds its hrefs with poznoteAsset().
 require_once __DIR__ . '/css_assets.php';
+require_once __DIR__ . '/theme_catalog.php';
 
 // ============================================================
 // HELPER: Read environment variable safely
@@ -437,14 +438,58 @@ function poznoteGetCustomCssHref() {
 
 /**
  * Render the extra stylesheet link tag.
+ *
+ * There is exactly one such element per page, and it is the only place a custom
+ * stylesheet is applied: the global one is its default href, and a user who
+ * picked a custom theme in the rail gets that theme's file instead. The script
+ * that follows it does the swap while the head is still parsing, so the default
+ * sheet never flashes before the chosen one.
+ *
+ * The element is rendered even with no global stylesheet, as long as the theme
+ * list offers one: the browser needs something to point at.
  */
 function poznoteRenderCustomCssLinkTag() {
     $href = poznoteGetCustomCssHref();
-    if ($href === '') {
+    if ($href === '' && !poznoteThemeListHasCustom()) {
         return '';
     }
 
-    return '<link rel="stylesheet" href="' . htmlspecialchars($href, ENT_QUOTES, 'UTF-8') . '" data-poznote-custom-css="1">';
+    $attributes = ' id="poznote-custom-css" data-poznote-custom-css="1"';
+    if ($href !== '') {
+        $escaped = htmlspecialchars($href, ENT_QUOTES, 'UTF-8');
+        $attributes .= ' href="' . $escaped . '" data-poznote-default-href="' . $escaped . '"';
+    }
+
+    return '<link rel="stylesheet"' . $attributes . '>'
+        . '<script>window.__poznoteApplyCustomTheme&&window.__poznoteApplyCustomTheme();</script>';
+}
+
+/**
+ * Hand the curated theme list to the browser, as early in the head as possible.
+ *
+ * js/theme-init.js reads it before the first paint to know what a stored theme
+ * id means, so this has to come before that script rather than at the end of
+ * the head like the stylesheet link. Nothing is emitted while no admin has
+ * curated anything: the six built-in themes are what the client assumes.
+ */
+function poznoteRenderThemeListScript() {
+    if (!poznoteThemeListIsConfigured()) {
+        return '';
+    }
+
+    $json = json_encode(poznoteThemeListForClient(), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+    if ($json === false) {
+        return '';
+    }
+
+    // A list with a single theme leaves the button nothing to walk to, so it
+    // opens the list instead. Only an admin may edit it; the path to
+    // settings.php is worked out in the browser, from the rail's own link,
+    // because a page in a subdirectory reaches it relatively.
+    $editable = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
+
+    return '<script>window.__poznoteThemeList=' . $json . ';'
+        . 'window.__poznoteThemeListEditable=' . ($editable ? 'true' : 'false') . ';</script>';
 }
 
 /**
@@ -471,18 +516,32 @@ function poznoteIsHtmlResponseBuffer($buffer) {
 }
 
 /**
- * Inject the extra stylesheet before </head> on HTML pages.
+ * Inject the theme list after <head> and the extra stylesheet before </head>.
+ *
+ * Both are appended by hand rather than added to the CSS manifest because they
+ * are not part of what a page declares: any HTML response gets them, including
+ * the pages that write their own head.
  */
 function poznoteInjectCustomCssIntoHtml($buffer) {
-    if (!defined('CUSTOM_CSS_PATH') || CUSTOM_CSS_PATH === '') {
+    if (!poznoteIsHtmlResponseBuffer($buffer)) {
         return $buffer;
     }
 
-    if (!poznoteIsHtmlResponseBuffer($buffer) || stripos($buffer, '</head>') === false) {
-        return $buffer;
+    $themeScript = poznoteRenderThemeListScript();
+    if ($themeScript !== '' && strpos($buffer, 'window.__poznoteThemeList') === false) {
+        // A callback, not a replacement string: the JSON carries characters
+        // preg_replace would read as backreferences.
+        $buffer = preg_replace_callback(
+            '/<head\b[^>]*>/i',
+            function ($matches) use ($themeScript) {
+                return $matches[0] . "\n" . $themeScript;
+            },
+            $buffer,
+            1
+        );
     }
 
-    if (strpos($buffer, 'data-poznote-custom-css="1"') !== false) {
+    if (stripos($buffer, '</head>') === false || strpos($buffer, 'data-poznote-custom-css="1"') !== false) {
         return $buffer;
     }
 
@@ -491,14 +550,23 @@ function poznoteInjectCustomCssIntoHtml($buffer) {
         return $buffer;
     }
 
-    return preg_replace('/<\/head>/i', $linkTag . "\n</head>", $buffer, 1);
+    return preg_replace_callback(
+        '/<\/head>/i',
+        function ($matches) use ($linkTag) {
+            return $linkTag . "\n" . $matches[0];
+        },
+        $buffer,
+        1
+    );
 }
 
 if (
     PHP_SAPI !== 'cli'
-    && defined('CUSTOM_CSS_PATH')
-    && CUSTOM_CSS_PATH !== ''
     && !defined('POZNOTE_CUSTOM_CSS_BUFFER_STARTED')
+    && (
+        (defined('CUSTOM_CSS_PATH') && CUSTOM_CSS_PATH !== '')
+        || poznoteThemeListIsConfigured()
+    )
 ) {
     define('POZNOTE_CUSTOM_CSS_BUFFER_STARTED', true);
     ob_start('poznoteInjectCustomCssIntoHtml');

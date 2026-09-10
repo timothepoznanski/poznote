@@ -832,22 +832,10 @@ function updateNoteById(noteId) {
     var currentTags = tagsElem ? tagsElem.value : '';
 
 
-    // Save to localStorage immediately
-    try {
-        if (entryElem) {
-            var draftKey = 'poznote_draft_' + noteId;
-            localStorage.setItem(draftKey, currentContent);
-
-            if (titleInput) {
-                localStorage.setItem('poznote_title_' + noteId, currentTitle);
-            }
-            if (tagsElem) {
-                localStorage.setItem('poznote_tags_' + noteId, currentTags);
-            }
-        }
-    } catch (err) {
-        // Silently ignore localStorage errors (quota exceeded, private browsing, etc.)
-        console.debug('clickable-tags: updateNoteById() failed:', err);
+    // Save to localStorage immediately, through the autosave's draft store
+    // so the draft carries the meta entry its recovery relies on
+    if (entryElem && typeof window.writeNoteDraft === 'function') {
+        window.writeNoteDraft(noteId, currentContent, titleInput ? currentTitle : null, tagsElem ? currentTags : null);
     }
 
     // Initialize lastSaved variables if this is the current note to prevent infinite loops

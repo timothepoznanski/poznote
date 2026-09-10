@@ -898,39 +898,15 @@ function parseMarkdown($text) {
             }
 
             $previousResult = count($result) > 0 ? $result[count($result) - 1] : '';
-            $isPreviousCodeBlockElement = preg_match('/^<pre\b|^<div class="mermaid"\b/', $previousResult) === 1;
             $isPreviousTaskEmbed = preg_match('/^<div class="tasklist-embed"/', $previousResult) === 1;
             $isNextTaskEmbed = ($i + 1 < count($lines)) && preg_match('/^\s*\x00PTASKEMBED\d+\x00\s*$/', $lines[$i + 1]) === 1;
-            
-            // Check if the next non-empty line is a block element (code block, header, list, etc.)
-            // If so, don't add blank line placeholders as block elements have their own spacing
-            $nextNonEmptyIndex = $i + 1;
-            $isNextBlockElement = false;
-            if ($nextNonEmptyIndex < count($lines)) {
-                $nextLine = $lines[$nextNonEmptyIndex];
-                // Check for various block-level elements
-                $isNextBlockElement = (
-                    preg_match('/\x00CODEBLOCK\d+\x00/', $nextLine) ||  // Code block
-                    preg_match('/^\s*\x00PEXCALIDRAW\d+\x00\s*$/', $nextLine) || // Excalidraw block
-                    preg_match('/^\s*\x00PTASKEMBED\d+\x00\s*$/', $nextLine) || // Task-list embed
-                    preg_match('/\x00MATHBLOCK\d+\x00/', $nextLine) ||  // Math block
-                    preg_match('/^\x00PTAG\d+\x00/', $nextLine) ||      // HTML tags
-                    preg_match('/^#{1,6}\s+/', $nextLine) ||            // Headers
-                    preg_match('/^(\*{3,}|-{3,}|_{3,})$/', $nextLine) || // Horizontal rules
-                    preg_match('/^&gt;\s/', $nextLine) ||               // Blockquotes
-                    preg_match('/^\s*[\*\-\+]\s+\[([ xX])\]\s+/', $nextLine) || // Task lists
-                    preg_match('/^\s*[\*\-\+]\s+/', $nextLine) ||       // Unordered lists
-                    preg_match('/^\s*\d+(?:\.\d+)*\.\s+/', $nextLine) || // Ordered lists
-                    isMarkdownTableStart($nextLine, isset($lines[$nextNonEmptyIndex + 1]) ? $lines[$nextNonEmptyIndex + 1] : '') // Tables
-                );
-            }
-            
-            // Preserve blank lines based on context:
-            // - Before block elements or after code blocks: keep (count - 1) blank lines
-            // - Between regular text blocks: keep all blank lines
-            $placeholdersToAdd = ($isNextBlockElement || $isPreviousCodeBlockElement)
-                ? max($blankLineCount - 1, 0)
-                : $blankLineCount;
+
+            // The first blank line is the block separator itself: the paragraph,
+            // heading, list, ... on either side already carries the margin that
+            // renders it, so emitting a placeholder for it would double the gap.
+            // Only the extra blank lines an author typed on purpose become
+            // placeholders.
+            $placeholdersToAdd = max($blankLineCount - 1, 0);
             // The task-embed protection adds a synthetic newline on each side
             // of the marker; swallow it plus the single authored blank line so
             // the widget sits flush against the surrounding text (no spacer

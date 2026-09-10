@@ -50,10 +50,27 @@ window.__poznoteUserStorage = window.__poznoteUserStorage || (function () {
     'use strict';
 
     function normalizeThemeMode(theme) {
+        // A theme built from an uploaded stylesheet is unknown here: the editor
+        // has no palette for it, but it says which mode it paints over, and
+        // that is what decides the canvas colour.
+        var custom = customThemeMode(theme);
+        if (custom) return custom;
+
         theme = String(theme || '').toLowerCase();
         return theme === 'black' || theme === 'dark' || theme === 'light' || theme === 'system'
             ? theme
             : null;
+    }
+
+    function customThemeMode(theme) {
+        var list = window.__poznoteThemeList;
+        if (!list || !list.length || !theme) return null;
+        for (var i = 0; i < list.length; i++) {
+            if (list[i] && list[i].id === theme && list[i].file) {
+                return list[i].mode === 'dark' ? 'dark' : 'light';
+            }
+        }
+        return null;
     }
 
     function getSystemTheme() {

@@ -358,7 +358,13 @@
       "loading_error": "Erreur lors du chargement des pièces jointes",
       "upload_failed_generic": "Échec du téléchargement. Veuillez réessayer.",
       "upload_failed_connection": "Échec du téléchargement. Veuillez vérifier votre connexion.",
-      "link_copy_failed": "Impossible de copier le lien"
+      "link_copy_failed": "Impossible de copier le lien",
+      "blocked_extension_unlockable": "Les fichiers {{ext}} sont bloqués par défaut. Vous pouvez les autoriser dans Paramètres > Outils d'administration > Pièces jointes scripts et exécutables.",
+      "blocked_extension_locked": "Les fichiers {{ext}} peuvent être exécutés par un serveur web et ne peuvent jamais être joints.",
+      "blocked_mime_unlockable": "Ce fichier est détecté comme {{mime}} et bloqué par défaut. Vous pouvez autoriser les scripts et exécutables dans Paramètres > Outils d'administration > Pièces jointes scripts et exécutables.",
+      "blocked_mime_locked": "Ce fichier est détecté comme {{mime}}, qu'un serveur web peut exécuter : il ne peut jamais être joint.",
+      "blocked_extension_unlockable_user": "Les fichiers {{ext}} sont bloqués sur cette instance. Un administrateur peut les autoriser dans Paramètres > Outils d'administration > Pièces jointes scripts et exécutables.",
+      "blocked_mime_unlockable_user": "Ce fichier est détecté comme {{mime}} et bloqué sur cette instance. Un administrateur peut autoriser les scripts et exécutables dans Paramètres > Outils d'administration > Pièces jointes scripts et exécutables."
     },
     "messages": {
       "upload_success": "Fichier téléchargé avec succès !",
@@ -430,6 +436,7 @@
       "password_note_no_local": "Votre mot de passe est géré par votre fournisseur d'identité.",
       "change_password_sso_only": "Cette instance utilise uniquement le SSO, donc un mot de passe local ne serait jamais accepté à la connexion. Les changements de mot de passe sont désactivés.",
       "change_password_no_local": "Votre compte se connecte via votre fournisseur d'identité et n'a pas de mot de passe local, il n'y a donc aucun mot de passe actuel pour confirmer un changement. Un administrateur peut vous en définir un depuis Outils d'administration > Utilisateurs.",
+      "app_passwords": "Créez des mots de passe pour les applications et extensions qui se connectent via l'API, comme l'extension de navigateur. Ils fonctionnent même si vous vous connectez via SSO, ne permettent ni d'ouvrir l'interface web ni de modifier votre compte, et peuvent être révoqués à tout moment.",
       "git_sync": "Sauvegardez vos notes dans un dépôt Git et consultez l'historique de synchronisation.",
       "extension": "Installez l'extension de navigateur pour enregistrer des pages web dans Poznote.",
       "install_app": "Installez Poznote comme application sur votre appareil (PWA).",
@@ -442,7 +449,7 @@
       "language": "Changez la langue de l'interface.",
       "main_font": "Choisissez la police utilisée dans toute l'application.",
       "markdown_font": "Choisissez la police utilisée dans l'éditeur markdown.",
-      "markdown_default_view_mode": "Choisir si les notes markdown s'ouvrent en aperçu, en édition ou en vue partagée. Une note passée dans un autre mode le garde jusqu'à la fermeture de l'onglet.",
+      "markdown_default_view_mode": "Choisir si les notes markdown s'ouvrent en aperçu, en édition ou en vue partagée.",
       "font_size": "Ajustez la taille de police des notes, de la barre latérale, des blocs de code et de la page des paramètres.",
       "index_icon_scale": "Ajustez la taille des icônes dans la liste des notes.",
       "timezone": "Définissez le fuseau horaire utilisé pour afficher les dates et heures.",
@@ -465,6 +472,7 @@
       "code_line_numbers": "Affichez les numéros de ligne dans les blocs de code de l'aperçu markdown.",
       "attachment_previews": "Affichez un aperçu des pièces jointes dans les notes.",
       "attachments_at_bottom": "Affichez la section des pièces jointes en bas des notes plutôt qu'en haut.",
+      "allow_executable_attachments": "Autorise les scripts et exécutables (.sh, .ps1, .bat, .exe, .py, ...) en pièce jointe, pour tous les comptes de cette instance. Poznote ne les exécute jamais, il ne fait que les stocker et les servir. Les types qu'un serveur web pourrait exécuter, comme .php, restent bloqués.",
       "backlinks_at_bottom": "Affichez la section des rétroliens en bas des notes plutôt qu'en haut.",
       "default_image_border": "Affichez par défaut les images des notes avec une bordure et sans marge intérieure.",
       "spellcheck_html_notes": "Activez le correcteur orthographique du navigateur dans les notes HTML.",
@@ -484,6 +492,7 @@
       "import_limits": "Définissez le nombre maximal de fichiers autorisés par import.",
       "user_quotas": "Limitez le nombre de notes et le stockage disponibles par utilisateur.",
       "custom_css": "Appliquez votre propre CSS pour personnaliser l'apparence de Poznote.",
+      "theme_list": "Choisissez les thèmes proposés par le bouton thème, et dans quel ordre.",
       "ui_customization_admin": "Masquez les éléments de l'interface que vous n'utilisez pas, pour vous-même ou pour tous les utilisateurs de cette instance.",
       "disaster_recovery": "Restaurez l'instance depuis une sauvegarde en cas de perte de données.",
       "orphan_scanner": "Trouvez et nettoyez les fichiers de pièces jointes qui n'appartiennent plus à aucune note.",
@@ -557,17 +566,20 @@
       "install_extension": "Installer l'extension",
       "install_app": "Installer l'application",
       "custom_css": "Chemin CSS personnalisé",
+      "theme_list": "Liste des thèmes",
       "release_notes": "Notes de version",
       "orphan_scanner": "Scanner de pièces jointes orphelines",
       "storage_stats": "Statistiques de stockage admin",
       "activity_log": "Journal d'activité",
       "storage_stats_user": "Statistiques de stockage utilisateur",
       "change_password": "Changer le mot de passe",
+      "app_passwords": "Mots de passe d'application",
       "delete_account": "Supprimer le compte",
       "import_limits": "Limites d'import",
       "user_quotas": "Quotas utilisateurs",
       "welcome_setup": "Assistant de démarrage",
       "git_sync_toggle": "Synchronisation Git",
+      "allow_executable_attachments": "Pièces jointes scripts et exécutables",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Email",
       "webhooks": "Webhooks admin",
@@ -850,7 +862,16 @@
     "confirm_navigation": "⚠️ Modifications non enregistrées\n\nVous avez des modifications non enregistrées qui seront perdues.\nEnregistrer avant de quitter la page ?",
     "notification": {
       "saving": "Enregistrement des modifications…",
-      "saved": "Enregistré !"
+      "saved": "Enregistré !",
+      "not_saved_yet": "Vos dernières modifications n'ont pas encore pu être enregistrées. Elles sont conservées sur cet appareil et Poznote réessaie."
+    },
+    "draft": {
+      "found_conflict": "Cette note contient des modifications non enregistrées de votre dernière visite, mais elle a aussi été modifiée ailleurs depuis. La version que vous ne gardez pas reste dans l'historique de la note.",
+      "found_error": "Cette note contient des modifications non enregistrées de votre dernière visite. Elles n'ont pas encore pu être enregistrées.",
+      "restore": "Garder mes modifications non enregistrées",
+      "discard": "Garder la version actuelle",
+      "restored": "Vos dernières modifications ont été récupérées et enregistrées.",
+      "restore_failed": "Vos modifications n'ont pas pu être enregistrées. Vérifiez votre connexion et réessayez."
     }
   },
   "tasklist": {
@@ -1068,7 +1089,8 @@
       "create_linked_note": "Créer un raccourci",
       "open_in_new_tab": "Ouvrir dans un nouvel onglet",
       "split_view": "Activer/désactiver la vue divisée",
-      "search_replace": "Rechercher et remplacer"
+      "search_replace": "Rechercher et remplacer",
+      "save_now": "Enregistrer maintenant"
     },
     "link": {
       "add_title": "Ajouter un lien",
@@ -1178,12 +1200,29 @@
     },
     "custom_css": {
       "title": "CSS personnalisé",
-      "description": "Téléversez un fichier CSS pour personnaliser l'apparence de Poznote. Le fichier est stocké dans votre volume de données et appliqué à tous les utilisateurs.",
-      "no_file": "Aucun CSS personnalisé chargé",
+      "description": "Importez des fichiers CSS pour personnaliser l'apparence de Poznote. Ils sont stockés dans votre volume de données, et celui que vous sélectionnez est appliqué à tous les utilisateurs.",
+      "theme_list_link": "Un fichier CSS peut aussi être proposé comme thème : ajoutez-le à la {{link}}.",
+      "theme_list_link_label": "liste des thèmes",
+      "no_file": "Aucun fichier CSS enregistré",
+      "none": "Aucun CSS personnalisé",
+      "active": "Appliqué",
+      "pending_upload": "Importé à l'enregistrement",
+      "pending_replace": "Remplacé à l'enregistrement",
+      "delete_confirm": "Supprimer {{name}} ? Le fichier est retiré de votre volume de données.",
       "upload": "Téléverser un fichier CSS",
       "validation": "Veuillez sélectionner un fichier CSS.",
       "placeholder": "custom.css",
       "hint": "Utilisateurs Docker : placez le fichier dans votre volume data/css/ (ex. data/css/custom.css). Sinon, il est chargé depuis css/custom.css dans l'image."
+    },
+    "theme_list": {
+      "title": "Liste des thèmes",
+      "description": "Chaque clic sur le bouton thème de la barre d'icônes passe au thème suivant de cette liste. Cochez ceux à proposer, ordonnez-les avec les flèches, et cochez un fichier CSS pour le proposer aussi comme thème.",
+      "mode_help": "Cette feuille de style est-elle écrite pour le mode clair ou le mode sombre ?",
+      "move_up": "Monter",
+      "move_down": "Descendre",
+      "empty": "Gardez au moins un thème dans la liste.",
+      "badge_one": "1 thème",
+      "badge_other": "{{count}} thèmes"
     },
     "import_limits": {
       "title": "Limites d'import",
@@ -1620,7 +1659,7 @@
         "split_short": "Vue partagée",
         "last": "Dernier mode utilisé"
       },
-      "hint": "Une note passée dans un autre mode le garde jusqu'à la fermeture de l'onglet. Les nouvelles notes s'ouvrent toujours en vue partagée."
+      "hint": "Une note passée dans un autre mode se rouvre ensuite dans le mode par défaut. Les nouvelles notes s'ouvrent toujours en vue partagée."
     },
     "diary_date_format": {
       "title": "Format de date des entrées de journal",
@@ -1844,7 +1883,7 @@
   },
   "update": {
     "new_available": "🎉 Nouvelle mise à jour disponible !",
-    "new_version_available": "Pour mettre à jour, suivez les instructions sur GitHub <a href=\"https://github.com/timothepoznanski/poznote#update-application\" target=\"_blank\">ici</a>",
+    "new_version_available": "Si vous gérez vous-même cette installation, suivez les instructions sur GitHub <a href=\"https://github.com/timothepoznanski/poznote#update-application\" target=\"_blank\">ici</a> pour mettre à jour. Sinon, c'est à votre hébergeur d'effectuer la mise à jour.",
     "description": "Vos données seront préservées pendant la mise à jour.",
     "up_to_date": "✅ Poznote est à jour",
     "error_loading_version": "Erreur lors du chargement de la version",
@@ -2193,7 +2232,7 @@
     "redirecting": "Redirection...",
     "show_password": "Afficher le mot de passe",
     "hide_password": "Masquer le mot de passe",
-    "admin_warning": "Veuillez vous connecter avec le pseudo <code>{{username}}</code> et le mot de passe actuel de ce compte. Vous pourrez ensuite renommer ce compte dans les réglages pour plus de sécurité.",
+    "admin_warning": "À l'ouverture, veuillez changer votre mot de passe immédiatement dans les paramètres. Vous pourrez également changer votre login.",
     "fields": {
       "username": "Nom d’utilisateur",
       "username_or_email": "Pseudo ou Email",
@@ -2242,7 +2281,7 @@
       "default_reason": "bloqué par la politique de sécurité des pièces jointes",
       "original_filename": "original",
       "note": "note",
-      "recovery_hint": "Ces fichiers sont restés dans le ZIP source et n'ont pas été restaurés comme pièces jointes actives pour des raisons de sécurité. Vous pouvez les récupérer manuellement depuis le ZIP. Un réimport direct restera bloqué tant que le fichier garde un type interdit ; placez-le dans une archive autorisée comme .zip, ou convertissez/renommez-le vers un type autorisé uniquement si vous faites confiance au fichier.",
+      "recovery_hint": "Ces fichiers sont restés dans le ZIP source et n'ont pas été restaurés comme pièces jointes actives pour des raisons de sécurité. Vous pouvez les récupérer manuellement depuis le ZIP. Un réimport direct restera bloqué tant que le fichier garde un type interdit ; placez-le dans une archive autorisée comme .zip, ou convertissez/renommez-le vers un type autorisé uniquement si vous faites confiance au fichier. S'il s'agit de scripts ou d'exécutables auxquels vous faites confiance, un administrateur peut activer Paramètres > Outils d'administration > Pièces jointes scripts et exécutables, puis relancez l'import.",
       "reasons": {
         "invalid_filename": "Nom de pièce jointe invalide",
         "hidden_filename": "Les noms de pièces jointes masqués ne sont pas autorisés",
@@ -3614,6 +3653,8 @@
       "account_deleted": "Compte supprimé",
       "access_granted": "Accès au compte accordé",
       "access_revoked": "Accès au compte révoqué",
+      "app_password_created": "Mot de passe d'application créé",
+      "app_password_revoked": "Mot de passe d'application révoqué",
       "workspace_created": "Espace de travail créé",
       "workspace_deleted": "Espace de travail supprimé",
       "workspace_shared": "Espace de travail partagé",
@@ -3644,7 +3685,8 @@
       "accounts": "comptes : {{accounts}}",
       "empty_value": "vide",
       "s3_objects_deleted": "{{count}} objets S3 supprimés",
-      "s3_cleanup_failed": "échec du nettoyage S3"
+      "s3_cleanup_failed": "échec du nettoyage S3",
+      "expires_at": "expire le {{date}}"
     },
     "destinations": {
       "download": "téléchargement",
@@ -3752,6 +3794,44 @@
     },
     "success": "Mot de passe modifié avec succès."
   },
+  "app_passwords": {
+    "status": {
+      "none": "Aucun",
+      "count_one": "1 actif",
+      "count_other": "{{count}} actifs"
+    },
+    "modal": {
+      "title": "Mots de passe d'application",
+      "description": "Un mot de passe d'application permet à une application ou une extension d'utiliser l'API avec votre nom d'utilisateur, à la place du mot de passe de votre compte, même si vous vous connectez via SSO. Il ne permet ni d'ouvrir l'interface web, ni d'accéder à l'administration, ni de modifier votre compte, et vous pouvez le révoquer à tout moment.",
+      "label_placeholder": "Nom, par ex. Extension Chrome",
+      "expiry_label": "Expiration",
+      "expiry_never": "N'expire jamais",
+      "expiry_30": "30 jours",
+      "expiry_90": "90 jours",
+      "expiry_365": "1 an",
+      "create": "Créer",
+      "close": "Fermer",
+      "empty": "Aucun mot de passe d'application pour le moment.",
+      "secret_title": "Mot de passe d'application « {{label}} »",
+      "secret_notice": "Copiez-le maintenant : il ne sera plus affiché.",
+      "usage_hint": "Dans l'application, saisissez votre nom d'utilisateur et cette valeur comme mot de passe.",
+      "copy": "Copier",
+      "copied": "Copié",
+      "created": "Créé le {{date}}",
+      "last_used": "Dernière utilisation le {{date}}",
+      "never_used": "Jamais utilisé",
+      "expires": "Expire le {{date}}",
+      "expired": "Expiré",
+      "revoke": "Révoquer",
+      "confirm_revoke": "Confirmer"
+    },
+    "errors": {
+      "label_required": "Donnez un nom au mot de passe d'application.",
+      "limit_reached": "Limite atteinte : révoquez un mot de passe d'application avant d'en créer un autre.",
+      "load_failed": "Impossible de charger vos mots de passe d'application.",
+      "generic": "Une erreur est survenue. Réessayez."
+    }
+  },
   "delete_account": {
     "modal": {
       "title": "Supprimer le compte",
@@ -3827,7 +3907,7 @@
       "sso_only_admin_password": "Vous pouvez passer cette instance en SSO uniquement en définissant POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true dans le fichier .env.",
       "sso_only_admin_password_warning": "Avant de l'activer, assurez-vous qu'au moins un compte administrateur possède un mot de passe explicite (Réglages > Utilisateurs).",
       "sso_only_admin_password_recovery": "Si le fournisseur d'identité devient indisponible, la récupération consiste à repasser l'option à false puis à se connecter avec ce mot de passe.",
-      "disable_basic_auth": "Lorsqu'activé, les requêtes API avec HTTP Basic Auth seront rejetées (403)"
+      "disable_basic_auth": "Si activé, les requêtes API authentifiées avec un mot de passe de compte via HTTP Basic Auth sont rejetées (403). Les mots de passe d'application créés par les utilisateurs dans leurs paramètres continuent de fonctionner."
     },
     "actions": {
       "copy_all": "Tout copier",

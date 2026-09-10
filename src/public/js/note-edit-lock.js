@@ -451,6 +451,9 @@
         var noteCard = document.getElementById('note' + noteId);
         var titleInput = document.getElementById('inp' + noteId);
         var entry = document.getElementById('entry' + noteId);
+        // The class is the trace of a locked, checking or unavailable state:
+        // its presence tells a real transition from a heartbeat's refresh
+        var wasLocked = !!(noteCard && noteCard.classList.contains('note-edit-locked'));
 
         noteStates[noteId] = {
             editable: true,
@@ -487,6 +490,12 @@
             if (typeof window.refreshCodeBlockLanguageButtons === 'function') {
                 window.refreshCodeBlockLanguageButtons(entry);
             }
+        }
+
+        // The note just became editable: the draft recovery of
+        // js/events-auto-save.js listens for this.
+        if (wasLocked) {
+            document.dispatchEvent(new CustomEvent('noteEditUnlocked', { detail: { noteId: noteId } }));
         }
     }
 
@@ -721,6 +730,14 @@
     window.isNoteEditingLocked = function (noteId) {
         noteId = normalizeNoteId(noteId || activeNoteId);
         return !!(noteId && noteStates[noteId] && noteStates[noteId].editable === false);
+    };
+    // Whether the lock request made when the note was loaded has been
+    // answered (acquired, refused or unavailable): the draft recovery in
+    // js/events-auto-save.js waits for this before writing to the note.
+    window.isNoteEditLockSettled = function (noteId) {
+        noteId = normalizeNoteId(noteId || activeNoteId);
+        var state = noteId ? noteStates[noteId] : null;
+        return !!(state && !state.checking);
     };
     window.handleNoteEditLockConflict = function (noteId, lock, message, reason) {
         handleLockConflict(noteId, lock, message, reason || 'lost');

@@ -27,6 +27,19 @@
     display: none !important;
 }
 
+/* The About entry, in the desktop section list and on the collapsed section
+   header below 801px: no icon box to sit on, so the dot follows the label
+   instead of floating over it. */
+.update-badge-inline {
+    position: static;
+    width: 8px;
+    height: 8px;
+    margin-left: 6px;
+    flex-shrink: 0;
+    align-self: center;
+    animation: none;
+}
+
 @keyframes pulse {
     0% { transform: scale(1); }
 
@@ -107,6 +120,165 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     border-left: 3px solid transparent;
     font-size: 0.9rem;
     line-height: 1.45;
+}
+
+/* App passwords modal (js/app-passwords.js): a create row, the secret shown
+   once, then one row per credential. Only --pz-* tokens, which tokens.css
+   re-maps for the dark themes, so no dark block is needed here. */
+#appPasswordsModal .modal-content {
+    max-width: 600px;
+}
+
+#appPasswordsModal .app-passwords-description {
+    color: var(--pz-text-muted);
+    line-height: 1.45;
+    margin: 0 0 14px 0;
+}
+
+#appPasswordsModal .app-passwords-create {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+/* modals/base.css gives every modal input and select margin-top: 10px and
+   margin-bottom: 15px. In a flex row those margins are part of the item's
+   outer box, so the fields end up sitting 2.5px off the button and the row
+   carries 25px of vertical space it does not need. The row spaces itself. */
+#appPasswordsModal .app-passwords-create input[type="text"],
+#appPasswordsModal .app-passwords-create select {
+    margin: 0;
+}
+
+#appPasswordsModal .app-passwords-create input[type="text"] {
+    flex: 1 1 200px;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+#appPasswordsModal .app-passwords-create select {
+    flex: 0 1 auto;
+}
+
+/* Vertical padding matched to the fields (8px + 1px border) so the three
+   controls in the row read as one line. The button must not shrink: the
+   input is the flexible one. */
+#appPasswordsModal .app-passwords-create .btn {
+    flex: 0 0 auto;
+    padding: 9px 16px;
+}
+
+#appPasswordsModal .app-passwords-error {
+    color: var(--pz-danger);
+    margin: 0 0 10px 0;
+    font-size: 0.9rem;
+}
+
+#appPasswordsModal .app-password-secret {
+    margin: 0 0 14px 0;
+    padding: 10px 12px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    background-color: var(--pz-surface);
+}
+
+#appPasswordsModal .app-password-secret-title {
+    margin-bottom: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#appPasswordsModal .app-password-secret-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* The secret is 44 characters and has to stay on one line to be selectable
+   as one unit; it scrolls inside its own box rather than widening the modal. */
+#appPasswordsModal .app-password-secret-value {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 6px 8px;
+    border-radius: var(--pz-radius);
+    background-color: var(--pz-surface-sunken);
+    font-family: monospace;
+    font-size: 0.95rem;
+    user-select: all;
+}
+
+#appPasswordsModal .app-password-copy {
+    flex: 0 0 auto;
+    padding: 6px 14px;
+}
+
+#appPasswordsModal .app-password-secret-notice,
+#appPasswordsModal .app-password-secret-usage {
+    margin: 8px 0 0 0;
+    font-size: 0.9rem;
+    color: var(--pz-text-muted);
+    line-height: 1.45;
+}
+
+#appPasswordsModal .app-password-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--pz-border);
+    max-height: 40vh;
+    overflow-y: auto;
+}
+
+#appPasswordsModal .app-password-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--pz-border);
+}
+
+#appPasswordsModal .app-password-row.is-expired .app-password-label {
+    color: var(--pz-text-muted);
+    text-decoration: line-through;
+}
+
+#appPasswordsModal .app-password-main {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+#appPasswordsModal .app-password-label {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#appPasswordsModal .app-password-meta {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--pz-text-muted);
+    line-height: 1.4;
+}
+
+#appPasswordsModal .app-password-expired {
+    color: var(--pz-danger);
+}
+
+#appPasswordsModal .app-password-revoke {
+    flex: 0 0 auto;
+    padding: 4px 10px;
+    font-size: 0.85rem;
+}
+
+#appPasswordsModal .app-passwords-empty {
+    padding: 12px 0;
+    color: var(--pz-text-muted);
 }
 
 /* Settings Category Titles */
@@ -615,6 +787,12 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
     .home-container.settings-with-nav:not(.settings-filtering) .settings-category-title:not(.settings-section-active),
     .home-container.settings-with-nav:not(.settings-filtering) .home-grid:not(.settings-section-active) {
         display: none;
+    }
+
+    /* The section list carries the update dot here, and the title of the
+       section already open does not need to repeat it. */
+    .settings-with-nav .settings-category-title .update-badge {
+        display: none !important;
     }
 
     /* One section at a time, so the titles neither collapse nor look

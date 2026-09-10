@@ -156,21 +156,106 @@ window.__poznoteClearUserStorage = function (userId) {
 
         var VARIANT_CLASSES = ['theme-black', 'theme-lavender', 'theme-sepia', 'theme-terminal'];
 
-        function normalizeTheme(value) {
-            value = String(value || '').toLowerCase();
-            return value === 'system' || THEMES[value] ? value : null;
+        // A stylesheet uploaded in Settings > Custom CSS can be offered as a
+        // theme of its own. Those entries only exist in the list the server
+        // injects at the top of the head (window.__poznoteThemeList), so an id
+        // like 'custom:catppuccin.css' is only a theme while the admin keeps it
+        // in the list: an unknown one falls back to 'system' like any other
+        // stale value.
+        function findCustomTheme(value) {
+            var list = window.__poznoteThemeList;
+            if (!list || !list.length) return null;
+            for (var i = 0; i < list.length; i++) {
+                if (list[i] && list[i].id === value && list[i].file) return list[i];
+            }
+            return null;
+        }
+
+        function themeList() {
+            var list = window.__poznoteThemeList;
+            return list && list.length ? list : [];
+        }
+
+        function findListed(value) {
+            var list = themeList();
+            for (var i = 0; i < list.length; i++) {
+                if (list[i] && list[i].id === value) return list[i];
+            }
+            return null;
         }
 
         function getSystemTheme() {
             return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
         }
 
-        var forcedTheme = window.__poznoteForcedTheme;
-        var t = normalizeTheme(forcedTheme) || normalizeTheme(window.__poznoteThemeStorage.get()) || 'system';
-        if (t === 'system') {
-            t = getSystemTheme();
+        // 'system' means light or dark. When the admin left neither in the
+        // list, the first theme of the same mode stands in, then the first one.
+        function resolveSystemTheme() {
+            var system = getSystemTheme();
+            var list = themeList();
+            if (!list.length || findListed(system)) return system;
+            for (var i = 0; i < list.length; i++) {
+                if (list[i] && list[i].mode === system) return list[i].id;
+            }
+            return list[0].id;
         }
-        var palette = THEMES[t] || THEMES.light;
+
+        // The theme a stored value means today. When the admin curated the
+        // list, only what is in it counts: a theme taken out of it resolves to
+        // the first one offered, so the page follows the list right away
+        // instead of keeping a theme nobody can pick any more.
+        function resolveStoredTheme(value) {
+            value = String(value || '');
+            var lower = value.toLowerCase();
+            if (value === '' || lower === 'system') return resolveSystemTheme();
+
+            var list = themeList();
+            if (!list.length) return THEMES[lower] ? lower : resolveSystemTheme();
+            if (findListed(value)) return value;
+            if (findListed(lower)) return lower;
+            return list[0].id;
+        }
+
+        // A page that forces a theme is a public one: it names a built-in
+        // theme, and the curated list has no say there.
+        function forcedTheme() {
+            var value = String(window.__poznoteForcedTheme || '').toLowerCase();
+            return value !== 'system' && THEMES[value] ? value : null;
+        }
+
+        window.__poznoteResolveThemeId = resolveStoredTheme;
+
+        // The theme on screen right now, custom ids included: what the page is
+        // painted with before theme-manager.js is even loaded.
+        function currentThemeId() {
+            return forcedTheme() || resolveStoredTheme(window.__poznoteThemeStorage.get());
+        }
+
+        window.__poznoteCurrentThemeId = currentThemeId;
+
+        // Point the single custom stylesheet link (injected by config.php right
+        // before </head>) at the theme in use: the file of a custom theme, or
+        // the instance-wide stylesheet an admin applied to everyone. Called
+        // from the head while it is still parsing, and again by
+        // theme-manager.js on every theme change.
+        window.__poznoteApplyCustomTheme = function (themeId) {
+            var link = document.getElementById('poznote-custom-css');
+            if (!link) return;
+
+            var custom = findCustomTheme(themeId || currentThemeId());
+            var href = custom ? custom.href : (link.getAttribute('data-poznote-default-href') || '');
+            if (href) {
+                if (link.getAttribute('href') !== href) link.setAttribute('href', href);
+            } else if (link.hasAttribute('href')) {
+                link.removeAttribute('href');
+            }
+        };
+
+        var t = currentThemeId();
+        var customTheme = findCustomTheme(t);
+        // A custom stylesheet brings its own colours, so the flash-prevention
+        // palette is the plain light or dark one it sits on.
+        var palette = customTheme ? THEMES[customTheme.mode === 'dark' ? 'dark' : 'light'] : (THEMES[t] || THEMES.light);
         var effectiveTheme = palette.mode;
         var isDark = effectiveTheme === 'dark';
         var r = document.documentElement;
@@ -182,8 +267,9 @@ window.__poznoteClearUserStorage = function (userId) {
 
         // One variant class at a time, in both modes: the named themes are
         // variants of light or dark, exactly as theme-black always was.
+        var activeVariant = customTheme ? '' : palette.variant;
         for (var vi = 0; vi < VARIANT_CLASSES.length; vi++) {
-            if (VARIANT_CLASSES[vi] === palette.variant) {
+            if (VARIANT_CLASSES[vi] === activeVariant) {
                 r.classList.add(VARIANT_CLASSES[vi]);
             } else {
                 r.classList.remove(VARIANT_CLASSES[vi]);

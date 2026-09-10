@@ -104,11 +104,17 @@
     background: var(--pz-danger-hover);
 }
 
-/* Destructive actions stay visibly locked until their confirmation is met. */
+/* Destructive actions stay visibly locked until their confirmation is met.
+   Fading the whole element (opacity) faded the label with it, and white on a
+   45% red left the button name unreadable. The muted state is a danger tint
+   with the strong danger colour as the label instead, so the button still
+   reads as locked and destructive while its text stays legible in every
+   theme. */
 .btn-danger:disabled,
 .btn-danger:disabled:hover {
-    background: var(--pz-danger);
-    opacity: 0.45;
+    background: var(--pz-danger-soft);
+    color: var(--pz-danger-strong);
+    opacity: 1;
     cursor: not-allowed;
 }
 

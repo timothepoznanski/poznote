@@ -520,78 +520,98 @@ function poznoteDeleteAttachmentFile($filename): void {
     }
 }
 
-function poznoteBlockedAttachmentExtensions(): array {
+/**
+ * Attachment types are refused at two different levels.
+ *
+ * SERVER level: the file could be executed by a web server that ends up
+ * serving the data volume. Poznote's own nginx keeps data/ out of the docroot
+ * and denies it explicitly, but self-hosted setups put all sorts of things in
+ * front of the volume, so these stay refused unconditionally.
+ *
+ * EXECUTABLE level: the file can only run on the machine of whoever downloads
+ * it, which on a personal instance is the owner themselves. Storing .ps1,
+ * .sh or .exe files next to the notes that document them is a legitimate use
+ * (discussion 1355), so this level is refused by default and is lifted for the
+ * whole instance by an administrator, through the allow_executable_attachments
+ * global setting. Instance-wide on purpose: on a shared instance the files
+ * become downloadable by everyone the notes are shared with, so the decision
+ * belongs to whoever runs the server, not to each account.
+ */
+const POZNOTE_ATTACHMENT_BLOCK_SERVER = 'server';
+const POZNOTE_ATTACHMENT_BLOCK_EXECUTABLE = 'executable';
+
+/** Extensions a web server may execute. Never uploadable. */
+function poznoteServerExecutableAttachmentExtensions(): array {
     return [
         'asp' => true,
         'aspx' => true,
-        'bat' => true,
-        'bash' => true,
         'cgi' => true,
+        'fcgi' => true,
+        'jsp' => true,
+        'jspx' => true,
+        'phar' => true,
+        'pht' => true,
+        'phtml' => true,
+        'shtml' => true,
+    ];
+}
+
+/** Extensions that only run on the downloader's machine. Unlockable. */
+function poznoteExecutableAttachmentExtensions(): array {
+    return [
+        'bash' => true,
+        'bat' => true,
         'cmd' => true,
         'com' => true,
         'dll' => true,
         'dylib' => true,
         'exe' => true,
-        'fcgi' => true,
         'fish' => true,
         'jar' => true,
-        'jsp' => true,
-        'jspx' => true,
         'ksh' => true,
-        'pht' => true,
-        'phtml' => true,
-        'phar' => true,
         'pl' => true,
         'ps1' => true,
         'psm1' => true,
         'py' => true,
         'rb' => true,
-        'shtml' => true,
         'sh' => true,
         'so' => true,
         'zsh' => true,
     ];
 }
 
-function poznoteAttachmentExtensionIsBlocked(string $extension): bool {
-    $extension = strtolower(ltrim($extension, '.'));
-    if ($extension === '') {
-        return false;
-    }
-
-    if (preg_match('/^php[0-9]*$/', $extension)) {
-        return true;
-    }
-
-    $blockedExtensions = poznoteBlockedAttachmentExtensions();
-    return isset($blockedExtensions[$extension]);
-}
-
-function poznoteBlockedAttachmentMimeTypes(): array {
+/** MIME types a web server may execute. Never uploadable. */
+function poznoteServerExecutableAttachmentMimeTypes(): array {
     return [
-        'application/java-archive' => true,
         'application/php' => true,
-        'application/vnd.microsoft.portable-executable' => true,
         'application/x-cgi' => true,
-        'application/x-dosexec' => true,
-        'application/x-executable' => true,
         'application/x-httpd-cgi' => true,
         'application/x-httpd-php' => true,
+        'application/x-php' => true,
+        'text/x-cgi' => true,
+        'text/x-php' => true,
+    ];
+}
+
+/** MIME types that only run on the downloader's machine. Unlockable. */
+function poznoteExecutableAttachmentMimeTypes(): array {
+    return [
+        'application/java-archive' => true,
+        'application/vnd.microsoft.portable-executable' => true,
+        'application/x-dosexec' => true,
+        'application/x-executable' => true,
         'application/x-java-archive' => true,
         'application/x-mach-binary' => true,
         'application/x-ms-dos-executable' => true,
         'application/x-msdownload' => true,
         'application/x-perl' => true,
-        'application/x-php' => true,
         'application/x-python' => true,
         'application/x-python-code' => true,
         'application/x-ruby' => true,
         'application/x-sh' => true,
         'application/x-sharedlib' => true,
         'application/x-shellscript' => true,
-        'text/x-cgi' => true,
         'text/x-perl' => true,
-        'text/x-php' => true,
         'text/x-python' => true,
         'text/x-ruby' => true,
         'text/x-script.python' => true,
@@ -600,15 +620,92 @@ function poznoteBlockedAttachmentMimeTypes(): array {
     ];
 }
 
-function poznoteAttachmentMimeTypeIsBlocked(?string $mimeType): bool {
-    if (!is_string($mimeType) || trim($mimeType) === '') {
+/**
+ * Whether this instance accepts script and executable attachments.
+ *
+ * Read through config.php's resolver, so the admin toggle in the master
+ * database wins and POZNOTE_ALLOW_EXECUTABLE_ATTACHMENTS still configures an
+ * instance that has never opened the settings page. Defaults to no, including
+ * when neither layer is available (CLI workers, unit tests), so the permissive
+ * path is never the accidental one.
+ */
+function poznoteExecutableAttachmentsAllowed(): bool {
+    if (function_exists('poznoteResolveGlobalSetting')) {
+        $value = poznoteResolveGlobalSetting('allow_executable_attachments', 'POZNOTE_ALLOW_EXECUTABLE_ATTACHMENTS', '0');
+    } elseif (function_exists('getGlobalSetting')) {
+        $value = getGlobalSetting('allow_executable_attachments', '0');
+    } else {
         return false;
     }
 
-    $mimeType = strtolower(trim(explode(';', $mimeType, 2)[0]));
-    $blockedMimeTypes = poznoteBlockedAttachmentMimeTypes();
+    return filter_var($value, FILTER_VALIDATE_BOOL);
+}
 
-    return isset($blockedMimeTypes[$mimeType]);
+/** Block level of an extension, or null when it is not restricted at all. */
+function poznoteAttachmentExtensionBlockLevel(string $extension): ?string {
+    $extension = strtolower(ltrim($extension, '.'));
+    if ($extension === '') {
+        return null;
+    }
+
+    if (preg_match('/^php[0-9]*$/', $extension)) {
+        return POZNOTE_ATTACHMENT_BLOCK_SERVER;
+    }
+
+    if (isset(poznoteServerExecutableAttachmentExtensions()[$extension])) {
+        return POZNOTE_ATTACHMENT_BLOCK_SERVER;
+    }
+
+    if (isset(poznoteExecutableAttachmentExtensions()[$extension])) {
+        return POZNOTE_ATTACHMENT_BLOCK_EXECUTABLE;
+    }
+
+    return null;
+}
+
+/** Block level of a MIME type, or null when it is not restricted at all. */
+function poznoteAttachmentMimeTypeBlockLevel(?string $mimeType): ?string {
+    if (!is_string($mimeType) || trim($mimeType) === '') {
+        return null;
+    }
+
+    $mimeType = strtolower(trim(explode(';', $mimeType, 2)[0]));
+
+    if (isset(poznoteServerExecutableAttachmentMimeTypes()[$mimeType])) {
+        return POZNOTE_ATTACHMENT_BLOCK_SERVER;
+    }
+
+    if (isset(poznoteExecutableAttachmentMimeTypes()[$mimeType])) {
+        return POZNOTE_ATTACHMENT_BLOCK_EXECUTABLE;
+    }
+
+    return null;
+}
+
+/**
+ * Whether a block level refuses the file for this account right now.
+ * $executablesAllowed defaults to the account setting; pass it explicitly to
+ * decide against a known state instead of reading the database.
+ */
+function poznoteAttachmentBlockLevelApplies(?string $blockLevel, ?bool $executablesAllowed = null): bool {
+    if ($blockLevel === null) {
+        return false;
+    }
+    if ($blockLevel === POZNOTE_ATTACHMENT_BLOCK_SERVER) {
+        return true;
+    }
+    if ($executablesAllowed === null) {
+        $executablesAllowed = poznoteExecutableAttachmentsAllowed();
+    }
+    return !$executablesAllowed;
+}
+
+function poznoteAttachmentExtensionIsBlocked(string $extension, ?bool $executablesAllowed = null): bool {
+    return poznoteAttachmentBlockLevelApplies(poznoteAttachmentExtensionBlockLevel($extension), $executablesAllowed);
+}
+
+function poznoteAttachmentMimeTypeIsBlocked(?string $mimeType, ?bool $executablesAllowed = null): bool {
+    return poznoteAttachmentBlockLevelApplies(poznoteAttachmentMimeTypeBlockLevel($mimeType), $executablesAllowed);
 }
 
 function poznoteNormalizeAttachmentFilename(string $filename): string {
@@ -639,10 +736,18 @@ function poznoteValidateAttachmentFilename(string $filename): array {
         return ['success' => false, 'error' => 'Attachment filename is too long'];
     }
 
+    // Every dotted segment is tested, not just the last one: "report.exe.txt"
+    // is still an executable to a Windows shell that hides known extensions.
     $segments = explode('.', $baseFilename);
     foreach (array_slice($segments, 1) as $extensionSegment) {
-        if (poznoteAttachmentExtensionIsBlocked($extensionSegment)) {
-            return ['success' => false, 'error' => 'Attachment file type is not allowed'];
+        $blockLevel = poznoteAttachmentExtensionBlockLevel($extensionSegment);
+        if (poznoteAttachmentBlockLevelApplies($blockLevel)) {
+            return [
+                'success' => false,
+                'error' => 'Attachment file type is not allowed',
+                'block_level' => $blockLevel,
+                'blocked_extension' => strtolower(ltrim($extensionSegment, '.')),
+            ];
         }
     }
 
@@ -679,8 +784,14 @@ function poznoteValidateAttachmentFile(string $filename, ?string $filePath = nul
     }
 
     $mimeType = poznoteDetectAttachmentMimeType($filePath, $content);
-    if (poznoteAttachmentMimeTypeIsBlocked($mimeType)) {
-        return ['success' => false, 'error' => 'Attachment MIME type is not allowed'];
+    $mimeBlockLevel = poznoteAttachmentMimeTypeBlockLevel($mimeType);
+    if (poznoteAttachmentBlockLevelApplies($mimeBlockLevel)) {
+        return [
+            'success' => false,
+            'error' => 'Attachment MIME type is not allowed',
+            'block_level' => $mimeBlockLevel,
+            'blocked_mime' => strtolower(trim(explode(';', (string) $mimeType, 2)[0])),
+        ];
     }
 
     return [
@@ -688,6 +799,50 @@ function poznoteValidateAttachmentFile(string $filename, ?string $filePath = nul
         'filename' => $filenameValidation['filename'],
         'mime_type' => $mimeType ?: 'application/octet-stream',
     ];
+}
+
+/**
+ * User-facing message for a failed attachment validation.
+ *
+ * A refusal an administrator can lift names the setting, and says who can
+ * reach it: the toggle is instance-wide, so a regular account is told to ask
+ * rather than sent hunting through its own settings. A refusal that can never
+ * be lifted says why instead.
+ */
+function poznoteAttachmentValidationMessage(array $validation): string {
+    $error = (string) ($validation['error'] ?? '');
+    $blockLevel = $validation['block_level'] ?? null;
+    $unlockable = ($blockLevel === POZNOTE_ATTACHMENT_BLOCK_EXECUTABLE);
+    $isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
+
+    $blockedExtension = (string) ($validation['blocked_extension'] ?? '');
+    if ($blockedExtension !== '') {
+        $extension = '.' . $blockedExtension;
+        if (!$unlockable) {
+            return t('attachments.errors.blocked_extension_locked', ['ext' => $extension],
+                $extension . ' files can be executed by a web server and can never be attached.');
+        }
+        return $isAdmin
+            ? t('attachments.errors.blocked_extension_unlockable', ['ext' => $extension],
+                $extension . ' files are blocked by default. You can allow them in Settings > Admin Tools > Script and executable attachments.')
+            : t('attachments.errors.blocked_extension_unlockable_user', ['ext' => $extension],
+                $extension . ' files are blocked on this instance. An administrator can allow them in Settings > Admin Tools > Script and executable attachments.');
+    }
+
+    $blockedMime = (string) ($validation['blocked_mime'] ?? '');
+    if ($blockedMime !== '') {
+        if (!$unlockable) {
+            return t('attachments.errors.blocked_mime_locked', ['mime' => $blockedMime],
+                'This file is detected as ' . $blockedMime . ', which a web server can execute, so it can never be attached.');
+        }
+        return $isAdmin
+            ? t('attachments.errors.blocked_mime_unlockable', ['mime' => $blockedMime],
+                'This file is detected as ' . $blockedMime . ' and is blocked by default. You can allow scripts and executables in Settings > Admin Tools > Script and executable attachments.')
+            : t('attachments.errors.blocked_mime_unlockable_user', ['mime' => $blockedMime],
+                'This file is detected as ' . $blockedMime . ' and is blocked on this instance. An administrator can allow scripts and executables in Settings > Admin Tools > Script and executable attachments.');
+    }
+
+    return poznoteAttachmentValidationErrorForDisplay($error);
 }
 
 function poznoteAttachmentValidationErrorForDisplay(string $error): string {

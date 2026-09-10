@@ -624,6 +624,9 @@
             if (typeof window.clearDraft === 'function') {
                 window.clearDraft(noteId);
             }
+            if (typeof window.setNoteSaveButtonState === 'function') {
+                window.setNoteSaveButtonState(noteId, false);
+            }
         } catch (e) { /* ignore */ }
         if (document.title.indexOf('🔴') === 0) {
             document.title = document.title.replace(/^🔴\s*/, '');
@@ -640,7 +643,8 @@
             noteId: noteId,
             main: rightCol ? rightCol.scrollTop : 0,
             cm: cmScroller ? cmScroller.scrollTop : 0,
-            notice: !!showNotice
+            // true for the standard "refreshed" notice, or the text to show
+            notice: (typeof showNotice === 'string' && showNotice) ? showNotice : !!showNotice
         };
         delete outOfSync[noteId];
         dropCachedNote(noteId);
@@ -672,7 +676,7 @@
         if (!card) {
             return null;
         }
-        var existing = card.querySelector('.note-external-change-banner');
+        var existing = card.querySelector('.note-external-change-banner:not(.is-draft-recovery)');
         if (existing && existing.parentNode) {
             existing.parentNode.removeChild(existing);
         }
@@ -681,7 +685,7 @@
 
     function removeBanner(noteId) {
         var card = document.getElementById('note' + noteId);
-        var banner = card ? card.querySelector('.note-external-change-banner') : null;
+        var banner = card ? card.querySelector('.note-external-change-banner:not(.is-draft-recovery)') : null;
         if (banner && banner.parentNode) {
             banner.parentNode.removeChild(banner);
         }
@@ -725,7 +729,7 @@
 
         var unsaved = hasUnsavedChanges(noteId);
         var signature = kind + '|' + (unsaved ? 'unsaved' : 'clean');
-        var existing = card.querySelector('.note-external-change-banner');
+        var existing = card.querySelector('.note-external-change-banner:not(.is-draft-recovery)');
         if (existing && existing.dataset.bannerSignature === signature) {
             // Same message already on screen (a save retried and was refused
             // again): keep the node so it does not blink while typing.
@@ -795,16 +799,24 @@
         insertBanner(card, banner);
     }
 
-    function showRefreshedNotice(noteId) {
+    // keepBanners: leave the change banners in place (a notice that is not
+    // about a refresh), only a previous notice is replaced
+    function showRefreshedNotice(noteId, text, keepBanners) {
         ensureStyles();
-        var card = getBannerAnchor(noteId);
+        var card = keepBanners ? document.getElementById('note' + noteId) : getBannerAnchor(noteId);
         if (!card) {
             return;
+        }
+        if (keepBanners) {
+            var previous = card.querySelector('.note-external-change-banner.is-notice');
+            if (previous && previous.parentNode) {
+                previous.parentNode.removeChild(previous);
+            }
         }
         var notice = document.createElement('div');
         notice.className = 'note-external-change-banner is-notice';
         notice.setAttribute('role', 'status');
-        notice.textContent = t('live_refresh.note_refreshed', {}, 'Refreshed with changes made outside this tab.');
+        notice.textContent = text || t('live_refresh.note_refreshed', {}, 'Refreshed with changes made outside this tab.');
         insertBanner(card, notice);
         window.setTimeout(function () {
             notice.style.opacity = '0';
@@ -846,7 +858,7 @@
                 }
             });
             if (restore.notice) {
-                showRefreshedNotice(loadedId);
+                showRefreshedNotice(loadedId, typeof restore.notice === 'string' ? restore.notice : null);
             }
         }
         // Adopt the freshly loaded note's token as soon as possible
@@ -940,5 +952,105 @@
         outOfSync[noteId] = true;
         ensureStyles();
         showBanner(noteId, 'changed', serverContentVersion || null);
+    };
+
+    // ------------------------------------------------------------------
+    // Draft recovery (js/events-auto-save.js)
+    // ------------------------------------------------------------------
+
+    function removeDraftBanner(noteId) {
+        var card = document.getElementById('note' + noteId);
+        var banner = card ? card.querySelector('.note-external-change-banner.is-draft-recovery') : null;
+        if (banner && banner.parentNode) {
+            banner.parentNode.removeChild(banner);
+        }
+    }
+
+    /**
+     * Shown when a draft left by a previous session cannot be saved
+     * silently: the note was modified since (kind "conflict") or the
+     * automatic save failed (kind "error"). Keeping the draft writes it over
+     * the current version. onRestore returns a promise resolving to false
+     * when the save failed (the banner stays), onDiscard drops the draft.
+     */
+    function showDraftRecoveryBanner(noteId, opts) {
+        ensureStyles();
+        noteId = normalizeNoteId(noteId);
+        var card = document.getElementById('note' + noteId);
+        if (!card) {
+            return false;
+        }
+        removeDraftBanner(noteId);
+        opts = opts || {};
+
+        var banner = document.createElement('div');
+        banner.className = 'note-external-change-banner is-draft-recovery';
+        banner.setAttribute('role', 'status');
+
+        var text = document.createElement('span');
+        text.textContent = opts.kind === 'error'
+            ? t('autosave.draft.found_error', {}, 'This note has unsaved changes from your last visit. They could not be saved yet.')
+            : t('autosave.draft.found_conflict', {}, 'This note has unsaved changes from your last visit, but it was also changed elsewhere since. The version you do not keep stays in the note history.');
+        banner.appendChild(text);
+
+        var actions = document.createElement('span');
+        actions.className = 'note-external-change-actions';
+
+        var restoreButton = document.createElement('button');
+        restoreButton.type = 'button';
+        restoreButton.textContent = t('autosave.draft.restore', {}, 'Keep my unsaved changes');
+        var discardButton = document.createElement('button');
+        discardButton.type = 'button';
+        discardButton.textContent = t('autosave.draft.discard', {}, 'Keep the current version');
+
+        restoreButton.addEventListener('click', function () {
+            restoreButton.disabled = true;
+            discardButton.disabled = true;
+            Promise.resolve(opts.onRestore ? opts.onRestore() : true).then(function (done) {
+                if (done === false) {
+                    restoreButton.disabled = false;
+                    discardButton.disabled = false;
+                    return;
+                }
+                removeDraftBanner(noteId);
+            }, function () {
+                restoreButton.disabled = false;
+                discardButton.disabled = false;
+            });
+        });
+        discardButton.addEventListener('click', function () {
+            if (opts.onDiscard) {
+                opts.onDiscard();
+            }
+            removeDraftBanner(noteId);
+        });
+
+        actions.appendChild(restoreButton);
+        actions.appendChild(discardButton);
+        banner.appendChild(actions);
+        insertBanner(card, banner);
+        return true;
+    }
+
+    window.liveRefreshShowDraftBanner = showDraftRecoveryBanner;
+
+    // A short notice above the note (js/events-auto-save.js: a save that
+    // could not reach the server), leaving any change banner in place
+    window.liveRefreshShowNotice = function (noteId, text) {
+        noteId = normalizeNoteId(noteId);
+        if (noteId) {
+            showRefreshedNotice(noteId, text, true);
+        }
+    };
+
+    // Reload the note on screen from the server (scroll kept), showing
+    // noticeText above it once loaded. Returns false when no reload could be
+    // started (another load in progress).
+    window.liveRefreshReloadNote = function (noteId, noticeText) {
+        noteId = normalizeNoteId(noteId);
+        if (!noteId) {
+            return false;
+        }
+        return reloadNote(noteId, noticeText || false);
     };
 })();

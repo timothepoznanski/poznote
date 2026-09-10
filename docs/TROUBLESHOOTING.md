@@ -129,3 +129,25 @@ Alternatively, install Poznote in a directory outside of `/root`, such as `/opt/
 3. If you can log in as an administrator but not as a standard user, check if the profile is marked as **active** in the User Management panel.
 
 </details>
+
+<a id="the-app-stops-answering-under-load"></a>
+<details>
+<summary><strong>The app stops answering under load (autosave errors, "server reached pm.max_children")</strong></summary>
+<br>
+
+PHP requests are served by a fixed pool of php-fpm workers, 10 by default. Short requests (autosave, polls, page loads) never fill it. Long ones do: an AI chat answer being streamed, an S3 call, a git sync, a large upload. Once every worker is busy, every other request waits, the browser shows a network error on save, and the container log reads:
+
+```
+WARNING: [pool www] server reached pm.max_children setting (10), consider raising it
+```
+
+Raise the pool on a busy instance (several users, AI chat, S3 or git sync in use) with the `POZNOTE_PHP_FPM_MAX_CHILDREN` variable in `.env`, then recreate the container (a restart does not reload environment variables):
+
+```bash
+POZNOTE_PHP_FPM_MAX_CHILDREN=20
+docker compose up -d --force-recreate webserver
+```
+
+Each busy worker costs about 25-30 MB of memory, and idle workers are few whatever the value, so 20 is safe on a host with 1 GB and 10 fits a 512 MB host. The value is applied by the container's init script on every start; an invalid value is reported in the log and the image default kept.
+
+</details>

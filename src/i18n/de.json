@@ -38,7 +38,7 @@
       "oidc_button": "Mit {{provider}} fortfahren",
       "documentation": "Poznote Dokumentation",
       "redirecting": "Weiterleitung...",
-      "admin_warning": "Bitte melden Sie sich mit dem Benutzernamen <code>{{username}}</code> und dem aktuellen Passwort dieses Kontos an. Sie können dieses Konto dann in den Einstellungen für mehr Sicherheit umbenennen.",
+      "admin_warning": "Bitte ändern Sie nach der Anmeldung sofort Ihr Passwort in den Einstellungen. Dort können Sie auch Ihren Benutzernamen ändern.",
       "errors": {
         "invalid_credentials": "Benutzername oder Passwort ist falsch."
       }
@@ -347,7 +347,13 @@
       "loading_error": "Fehler beim Laden der Anhänge",
       "upload_failed_generic": "Hochladen fehlgeschlagen. Bitte versuchen Sie es erneut.",
       "upload_failed_connection": "Hochladen fehlgeschlagen. Bitte überprüfen Sie Ihre Verbindung.",
-      "link_copy_failed": "Link konnte nicht kopiert werden"
+      "link_copy_failed": "Link konnte nicht kopiert werden",
+      "blocked_extension_unlockable": "{{ext}}-Dateien sind standardmäßig blockiert. Sie können sie unter Einstellungen > Administrationswerkzeuge > Skript- und Programmanhänge erlauben.",
+      "blocked_extension_locked": "{{ext}}-Dateien können von einem Webserver ausgeführt werden und lassen sich nie anhängen.",
+      "blocked_mime_unlockable": "Diese Datei wird als {{mime}} erkannt und ist standardmäßig blockiert. Sie können Skripte und ausführbare Dateien unter Einstellungen > Administrationswerkzeuge > Skript- und Programmanhänge erlauben.",
+      "blocked_mime_locked": "Diese Datei wird als {{mime}} erkannt, was ein Webserver ausführen kann, deshalb lässt sie sich nie anhängen.",
+      "blocked_extension_unlockable_user": "{{ext}}-Dateien sind auf dieser Instanz blockiert. Ein Administrator kann sie unter Einstellungen > Administrationswerkzeuge > Skript- und Programmanhänge erlauben.",
+      "blocked_mime_unlockable_user": "Diese Datei wird als {{mime}} erkannt und ist auf dieser Instanz blockiert. Ein Administrator kann Skripte und ausführbare Dateien unter Einstellungen > Administrationswerkzeuge > Skript- und Programmanhänge erlauben."
     },
     "messages": {
       "upload_success": "Datei erfolgreich hochgeladen!",
@@ -418,6 +424,7 @@
       "password_note_no_local": "Ihr Passwort wird von Ihrem Identitaetsanbieter verwaltet.",
       "change_password_sso_only": "Diese Instanz verwendet ausschliesslich SSO, daher wuerde ein lokales Passwort bei der Anmeldung nie akzeptiert. Passwortaenderungen sind deaktiviert.",
       "change_password_no_local": "Ihr Konto meldet sich ueber Ihren Identitaetsanbieter an und hat kein lokales Passwort, daher gibt es kein aktuelles Passwort zur Bestaetigung einer Aenderung. Ein Administrator kann eines fuer Sie unter Admin-Tools > Benutzer festlegen.",
+      "app_passwords": "Erstellen Sie Passwörter für Apps und Erweiterungen, die sich über die API verbinden, etwa die Browser-Erweiterung. Sie funktionieren auch bei Anmeldung über SSO, können weder die Weboberfläche öffnen noch Ihr Konto ändern und lassen sich jederzeit widerrufen.",
       "git_sync": "Sichern Sie Ihre Notizen in einem Git-Repository und sehen Sie den Synchronisationsverlauf.",
       "extension": "Installieren Sie die Browser-Erweiterung, um Webseiten in Poznote zu speichern.",
       "install_app": "Installieren Sie Poznote als Anwendung auf Ihrem Gerät (PWA).",
@@ -430,7 +437,7 @@
       "language": "Ändern Sie die Sprache der Oberfläche.",
       "main_font": "Wählen Sie die Schriftart für die gesamte Anwendung.",
       "markdown_font": "Wählen Sie die Schriftart für den Markdown-Editor.",
-      "markdown_default_view_mode": "Festlegen, ob Markdown-Notizen in der Vorschau, im Bearbeitungsmodus oder geteilt geöffnet werden. Eine Notiz, die in einen anderen Modus geschaltet wird, behält ihn bis zum Schließen des Tabs.",
+      "markdown_default_view_mode": "Festlegen, ob Markdown-Notizen in der Vorschau, im Bearbeitungsmodus oder geteilt geöffnet werden.",
       "font_size": "Passen Sie die Schriftgröße von Notizen, Seitenleiste, Codeblöcken und der Einstellungsseite an.",
       "index_icon_scale": "Passen Sie die Größe der Symbole in der Notizenliste an.",
       "timezone": "Legen Sie die Zeitzone für die Anzeige von Datum und Uhrzeit fest.",
@@ -453,6 +460,7 @@
       "code_line_numbers": "Zeilennummern in Codeblöcken in der Markdown-Vorschau anzeigen.",
       "attachment_previews": "Zeigen Sie Vorschauen von Anhängen in Notizen an.",
       "attachments_at_bottom": "Zeigen Sie den Anhangsbereich unten statt oben in Notizen an.",
+      "allow_executable_attachments": "Erlaubt Skripte und ausführbare Dateien (.sh, .ps1, .bat, .exe, .py, ...) als Anhang, für alle Konten dieser Instanz. Poznote führt sie nie aus, es speichert und liefert sie nur aus. Dateitypen, die ein Webserver ausführen könnte, etwa .php, bleiben blockiert.",
       "backlinks_at_bottom": "Zeigen Sie den Backlink-Bereich unten statt oben in Notizen an.",
       "default_image_border": "Zeigen Sie Bilder in Notizen standardmäßig mit Rahmen und ohne Innenabstand an.",
       "spellcheck_html_notes": "Aktivieren Sie die Rechtschreibprüfung des Browsers in HTML-Notizen.",
@@ -472,6 +480,7 @@
       "import_limits": "Legen Sie die maximale Anzahl von Dateien pro Import fest.",
       "user_quotas": "Begrenzen Sie die Anzahl der Notizen und den Speicherplatz pro Benutzer.",
       "custom_css": "Wenden Sie eigenes CSS an, um das Aussehen von Poznote anzupassen.",
+      "theme_list": "Legen Sie fest, welche Themes die Theme-Schaltfläche anbietet und in welcher Reihenfolge.",
       "ui_customization_admin": "Blenden Sie Oberflächenelemente aus, die Sie nicht verwenden, für sich selbst oder für alle Benutzer dieser Instanz.",
       "disaster_recovery": "Stellen Sie die Instanz nach einem Datenverlust aus einer Sicherung wieder her.",
       "orphan_scanner": "Finden und bereinigen Sie Anhangsdateien, die zu keiner Notiz mehr gehören.",
@@ -542,6 +551,7 @@
       "support": "Poznote unterstützen",
       "buy_me_a_coffee": "Spendiere mir einen Kaffee",
       "custom_css": "Benutzerdefinierte CSS-Datei",
+      "theme_list": "Theme-Liste",
       "install_extension": "Erweiterung installieren",
       "install_app": "App installieren",
       "release_notes": "Versionshinweise",
@@ -551,11 +561,13 @@
       "storage_stats_user": "Benutzer-Speicherstatistik",
       "user_management": "Benutzerverwaltung",
       "change_password": "Passwort ändern",
+      "app_passwords": "App-Passwörter",
       "delete_account": "Konto löschen",
       "import_limits": "Importlimits",
       "user_quotas": "Benutzerkontingente",
       "welcome_setup": "Startassistent",
       "git_sync_toggle": "Git-Synchronisierung",
+      "allow_executable_attachments": "Skript- und Programmanhänge",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / E-Mail",
       "webhooks": "Admin-Webhooks",
@@ -831,7 +843,16 @@
     "confirm_navigation": "⚠️ Ungespeicherte Änderungen\n\nSie haben ungespeicherte Änderungen, die verloren gehen.\nVor dem Navigieren speichern?",
     "notification": {
       "saving": "Änderungen werden gespeichert...",
-      "saved": "Gespeichert!"
+      "saved": "Gespeichert!",
+      "not_saved_yet": "Ihre letzten Änderungen konnten noch nicht gespeichert werden. Sie bleiben auf diesem Gerät erhalten und Poznote versucht es weiter."
+    },
+    "draft": {
+      "found_conflict": "Diese Notiz enthält ungespeicherte Änderungen von Ihrem letzten Besuch, wurde seitdem aber auch woanders geändert. Die Version, die Sie nicht behalten, bleibt im Verlauf der Notiz.",
+      "found_error": "Diese Notiz enthält ungespeicherte Änderungen von Ihrem letzten Besuch. Sie konnten noch nicht gespeichert werden.",
+      "restore": "Meine ungespeicherten Änderungen behalten",
+      "discard": "Aktuelle Version behalten",
+      "restored": "Ihre letzten Änderungen wurden wiederhergestellt und gespeichert.",
+      "restore_failed": "Ihre Änderungen konnten nicht gespeichert werden. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut."
     }
   },
   "tasklist": {
@@ -1057,7 +1078,8 @@
       "create_linked_note": "Verknüpfung erstellen",
       "open_in_new_tab": "In neuem Tab öffnen",
       "split_view": "Geteilte Ansicht umschalten",
-      "search_replace": "Suchen und ersetzen"
+      "search_replace": "Suchen und ersetzen",
+      "save_now": "Jetzt speichern"
     },
     "link": {
       "add_title": "Link hinzufügen",
@@ -1152,12 +1174,29 @@
     },
     "custom_css": {
       "title": "Benutzerdefiniertes CSS",
-      "description": "Laden Sie eine CSS-Datei hoch, um das Erscheinungsbild von Poznote anzupassen. Die Datei wird in Ihrem Daten-Volume gespeichert und für alle Benutzer angewendet.",
-      "no_file": "Kein benutzerdefiniertes CSS geladen",
+      "description": "Laden Sie CSS-Dateien hoch, um das Aussehen von Poznote anzupassen. Sie werden in Ihrem Daten-Volume gespeichert, und die ausgewählte Datei gilt für alle Benutzer.",
+      "theme_list_link": "Eine CSS-Datei kann auch als Theme angeboten werden: Fügen Sie sie der {{link}} hinzu.",
+      "theme_list_link_label": "Theme-Liste",
+      "no_file": "Noch keine CSS-Datei gespeichert",
+      "none": "Kein eigenes CSS",
+      "active": "Angewendet",
+      "pending_upload": "Wird beim Speichern hochgeladen",
+      "pending_replace": "Wird beim Speichern ersetzt",
+      "delete_confirm": "{{name}} löschen? Die Datei wird aus Ihrem Daten-Volume entfernt.",
       "upload": "CSS-Datei hochladen",
       "validation": "Bitte wählen Sie eine CSS-Datei aus.",
       "placeholder": "custom.css",
       "hint": "Docker-Nutzer: Legen Sie die Datei im Volume-Ordner data/css/ ab (z. B. data/css/custom.css). Andernfalls wird sie aus css/custom.css im Image geladen."
+    },
+    "theme_list": {
+      "title": "Theme-Liste",
+      "description": "Jeder Klick auf die Theme-Schaltfläche der Icon-Seitenleiste wechselt zum nächsten Theme dieser Liste. Haken Sie die an, die angeboten werden sollen, ordnen Sie sie mit den Pfeilen, und haken Sie eine CSS-Datei an, um sie ebenfalls als Theme anzubieten.",
+      "mode_help": "Ist dieses Stylesheet für den hellen oder den dunklen Modus geschrieben?",
+      "move_up": "Nach oben",
+      "move_down": "Nach unten",
+      "empty": "Behalten Sie mindestens ein Theme in der Liste.",
+      "badge_one": "1 Theme",
+      "badge_other": "{{count}} Themes"
     },
     "import_limits": {
       "title": "Importlimits",
@@ -1586,7 +1625,7 @@
         "split_short": "Geteilt",
         "last": "Zuletzt verwendeter Modus"
       },
-      "hint": "Eine Notiz, die in einen anderen Modus geschaltet wird, behält ihn bis zum Schließen des Tabs. Neue Notizen öffnen sich immer geteilt."
+      "hint": "Eine Notiz, die in einen anderen Modus geschaltet wird, öffnet sich beim nächsten Mal wieder im Standardmodus. Neue Notizen öffnen sich immer geteilt."
     },
     "diary_date_format": {
       "title": "Datumsformat der Tagebucheinträge",
@@ -1767,7 +1806,7 @@
   },
   "update": {
     "new_available": "🎉 Neues Update verfügbar!",
-    "new_version_available": "Zum Aktualisieren folgen Sie der Anleitung auf GitHub <a href=\"https://github.com/timothepoznanski/poznote#update-application\" target=\"_blank\">hier</a>",
+    "new_version_available": "Wenn Sie diese Installation selbst verwalten, folgen Sie der Anleitung auf GitHub <a href=\"https://github.com/timothepoznanski/poznote#update-application\" target=\"_blank\">hier</a>, um zu aktualisieren. Andernfalls muss Ihr Hosting-Anbieter die Aktualisierung durchführen.",
     "description": "Ihre Daten werden während des Updates erhalten bleiben.",
     "up_to_date": "✅ Poznote ist auf dem neuesten Stand",
     "error_loading_version": "Fehler beim Laden der Version",
@@ -2102,7 +2141,7 @@
     "redirecting": "Weiterleitung...",
     "show_password": "Passwort anzeigen",
     "hide_password": "Passwort ausblenden",
-    "admin_warning": "Bitte melden Sie sich mit dem Benutzernamen <code>{{username}}</code> und dem aktuellen Passwort dieses Kontos an und benennen Sie dieses Konto in den Einstellungen für mehr Sicherheit um.",
+    "admin_warning": "Bitte ändern Sie nach der Anmeldung sofort Ihr Passwort in den Einstellungen. Dort können Sie auch Ihren Benutzernamen ändern.",
     "fields": {
       "username": "Benutzername",
       "username_or_email": "Benutzername oder E-Mail",
@@ -2151,7 +2190,7 @@
       "default_reason": "durch die Sicherheitsrichtlinie für Anhänge blockiert",
       "original_filename": "Original",
       "note": "Notiz",
-      "recovery_hint": "Diese Dateien sind im Quell-ZIP geblieben und wurden aus Sicherheitsgründen nicht als aktive Anhänge wiederhergestellt. Sie können sie manuell aus dem ZIP wiederherstellen. Ein direkter Re-Import wird weiterhin blockiert, solange die Datei einen verbotenen Typ behält; speichern Sie sie in einem erlaubten Archiv wie .zip oder konvertieren/benennen Sie sie nur in einen erlaubten Typ um, wenn Sie der Datei vertrauen.",
+      "recovery_hint": "Diese Dateien sind im Quell-ZIP geblieben und wurden aus Sicherheitsgründen nicht als aktive Anhänge wiederhergestellt. Sie können sie manuell aus dem ZIP wiederherstellen. Ein direkter Re-Import wird weiterhin blockiert, solange die Datei einen verbotenen Typ behält; speichern Sie sie in einem erlaubten Archiv wie .zip oder konvertieren/benennen Sie sie nur in einen erlaubten Typ um, wenn Sie der Datei vertrauen. Wenn es sich um Skripte oder Programme handelt, denen Sie vertrauen, kann ein Administrator Einstellungen > Administrationswerkzeuge > Skript- und Programmanhänge aktivieren; importieren Sie danach erneut.",
       "reasons": {
         "invalid_filename": "Ungültiger Anhangsdateiname",
         "hidden_filename": "Versteckte Anhangsdateinamen sind nicht erlaubt",
@@ -3389,6 +3428,8 @@
       "account_deleted": "Konto gelöscht",
       "access_granted": "Kontozugriff gewährt",
       "access_revoked": "Kontozugriff entzogen",
+      "app_password_created": "App-Passwort erstellt",
+      "app_password_revoked": "App-Passwort widerrufen",
       "workspace_created": "Arbeitsbereich erstellt",
       "workspace_deleted": "Arbeitsbereich gelöscht",
       "workspace_shared": "Arbeitsbereich geteilt",
@@ -3419,7 +3460,8 @@
       "accounts": "Konten: {{accounts}}",
       "empty_value": "leer",
       "s3_objects_deleted": "{{count}} S3-Objekte gelöscht",
-      "s3_cleanup_failed": "S3-Bereinigung fehlgeschlagen"
+      "s3_cleanup_failed": "S3-Bereinigung fehlgeschlagen",
+      "expires_at": "läuft ab am {{date}}"
     },
     "destinations": {
       "download": "Download",
@@ -3527,6 +3569,44 @@
     },
     "success": "Passwort erfolgreich geändert."
   },
+  "app_passwords": {
+    "status": {
+      "none": "Keine",
+      "count_one": "1 aktiv",
+      "count_other": "{{count}} aktiv"
+    },
+    "modal": {
+      "title": "App-Passwörter",
+      "description": "Mit einem App-Passwort kann eine App oder Erweiterung die API mit Ihrem Benutzernamen anstelle Ihres Kontopassworts nutzen, auch wenn Sie sich über SSO anmelden. Es kann weder die Weboberfläche öffnen noch auf die Verwaltung zugreifen oder Ihr Konto ändern, und Sie können es jederzeit widerrufen.",
+      "label_placeholder": "Name, z. B. Chrome-Erweiterung",
+      "expiry_label": "Ablauf",
+      "expiry_never": "Läuft nie ab",
+      "expiry_30": "30 Tage",
+      "expiry_90": "90 Tage",
+      "expiry_365": "1 Jahr",
+      "create": "Erstellen",
+      "close": "Schließen",
+      "empty": "Noch kein App-Passwort.",
+      "secret_title": "App-Passwort „{{label}}“",
+      "secret_notice": "Jetzt kopieren: es wird nicht noch einmal angezeigt.",
+      "usage_hint": "Geben Sie in der App Ihren Benutzernamen und diesen Wert als Passwort ein.",
+      "copy": "Kopieren",
+      "copied": "Kopiert",
+      "created": "Erstellt am {{date}}",
+      "last_used": "Zuletzt verwendet am {{date}}",
+      "never_used": "Nie verwendet",
+      "expires": "Läuft ab am {{date}}",
+      "expired": "Abgelaufen",
+      "revoke": "Widerrufen",
+      "confirm_revoke": "Bestätigen"
+    },
+    "errors": {
+      "label_required": "Geben Sie dem App-Passwort einen Namen.",
+      "limit_reached": "Limit erreicht: Widerrufen Sie ein App-Passwort, bevor Sie ein neues erstellen.",
+      "load_failed": "Ihre App-Passwörter konnten nicht geladen werden.",
+      "generic": "Etwas ist schiefgelaufen. Versuchen Sie es erneut."
+    }
+  },
   "delete_account": {
     "modal": {
       "title": "Konto löschen",
@@ -3602,7 +3682,7 @@
       "sso_only_admin_password": "Sie können diese Instanz auf reines SSO umstellen, indem Sie POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true in der .env-Datei setzen.",
       "sso_only_admin_password_warning": "Stellen Sie vorher sicher, dass mindestens ein Administratorkonto ein explizites Passwort hat (Einstellungen > Benutzer).",
       "sso_only_admin_password_recovery": "Wird der Identitätsanbieter unerreichbar, besteht die Wiederherstellung darin, die Option wieder auf false zu setzen und sich mit diesem Passwort anzumelden.",
-      "disable_basic_auth": "Wenn aktiviert, werden API-Anfragen mit HTTP Basic Auth abgelehnt (403)"
+      "disable_basic_auth": "Wenn aktiviert, werden API-Anfragen, die mit einem Kontopasswort über HTTP Basic Auth authentifiziert sind, abgelehnt (403). Von Benutzern in ihren Einstellungen erstellte App-Passwörter funktionieren weiterhin."
     },
     "actions": {
       "copy_all": "Alle kopieren",

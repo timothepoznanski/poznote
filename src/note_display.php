@@ -230,6 +230,13 @@
                         ? t_h('index.toolbar.favorite_remove', [], 'Remove from favorites')
                         : t_h('index.toolbar.favorite_add', [], 'Add to favorites');
 
+                    // Manual save, same path as Ctrl+S. The icon turns blue from the
+                    // first unsaved change until the server confirmed the save
+                    // (class is-saving, js/events-auto-save.js).
+                    if (!$isPublicWorkspaceReadonly) {
+                        echo '<button type="button" class="toolbar-btn btn-save note-action-btn" title="'.t_h('editor.toolbar.save_now', [], 'Save now').'" data-action="save-note" data-note-id="'.$row['id'].'"><i class="lucide lucide-save"></i></button>';
+                    }
+
                     if (!$isPublicWorkspaceReadonly) {
                         echo '<button type="button" class="toolbar-btn btn-favorite note-action-btn'.$favorite_class.'" title="'.$favorite_title.'" data-action="toggle-favorite" data-note-id="'.$row['id'].'"><i class="lucide lucide-star"></i></button>';
                     }

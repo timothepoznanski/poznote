@@ -138,7 +138,7 @@ function showUpdateInstructions(hasUpdate = false, checkFailed = false) {
         } else if (hasUpdate) {
             if (titleEl) titleEl.textContent = window.t ? window.t('update.new_available', null, 'New update available') : 'New update available';
             if (messageEl) {
-                messageEl.innerHTML = window.t ? window.t('update.new_version_available', null, 'To update, follow the instructions on GitHub <a href="https://github.com/timothepoznanski/poznote#update-application" target="_blank">here</a>.') : 'To update, follow the instructions on GitHub <a href="https://github.com/timothepoznanski/poznote#update-application" target="_blank">here</a>.';
+                messageEl.innerHTML = window.t ? window.t('update.new_version_available', null, 'If you manage this installation yourself, follow the instructions on GitHub <a href="https://github.com/timothepoznanski/poznote#update-application" target="_blank">here</a> to update. Otherwise, your hosting provider has to perform the update.') : 'If you manage this installation yourself, follow the instructions on GitHub <a href="https://github.com/timothepoznanski/poznote#update-application" target="_blank">here</a> to update. Otherwise, your hosting provider has to perform the update.';
                 messageEl.style.display = '';
             }
         } else {

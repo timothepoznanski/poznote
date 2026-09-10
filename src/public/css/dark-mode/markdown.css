@@ -191,7 +191,8 @@ html[data-theme='dark'] body.markdown-colored .markdown-preview :is(#poznote-md-
 
 html[data-theme='dark'] .toolbar-btn.is-favorite i,
 html[data-theme='dark'] .toolbar-btn.is-shared i,
-html[data-theme='dark'] .toolbar-btn.has-attachments i {
+html[data-theme='dark'] .toolbar-btn.has-attachments i,
+html[data-theme='dark'] .toolbar-btn.btn-save.is-saving i {
     color: var(--pz-accent) !important;
     filter: none !important;
 }

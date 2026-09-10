@@ -348,7 +348,13 @@
       "loading_error": "加载附件时出错",
       "upload_failed_generic": "上传失败。请稍后重试。",
       "upload_failed_connection": "上传失败。请检查您的网络连接。",
-      "link_copy_failed": "复制链接失败"
+      "link_copy_failed": "复制链接失败",
+      "blocked_extension_unlockable": "{{ext}} 文件默认被阻止。您可以在“设置 > 管理工具 > 脚本和可执行文件附件”中允许它们。",
+      "blocked_extension_locked": "{{ext}} 文件可能被 Web 服务器执行，因此永远无法作为附件上传。",
+      "blocked_mime_unlockable": "该文件被识别为 {{mime}}，默认被阻止。您可以在“设置 > 管理工具 > 脚本和可执行文件附件”中允许脚本和可执行文件。",
+      "blocked_mime_locked": "该文件被识别为 {{mime}}，Web 服务器可能执行此类型，因此永远无法作为附件上传。",
+      "blocked_extension_unlockable_user": "{{ext}} 文件在本实例上被阻止。管理员可以在“设置 > 管理工具 > 脚本和可执行文件附件”中允许它们。",
+      "blocked_mime_unlockable_user": "该文件被识别为 {{mime}}，在本实例上被阻止。管理员可以在“设置 > 管理工具 > 脚本和可执行文件附件”中允许脚本和可执行文件。"
     },
     "messages": {
       "upload_success": "文件上传成功！",
@@ -420,6 +426,7 @@
       "password_note_no_local": "您的密码由您的身份提供商管理。",
       "change_password_sso_only": "此实例仅使用 SSO，因此登录时永远不会接受本地密码。密码修改已禁用。",
       "change_password_no_local": "您的账户通过身份提供商登录且没有本地密码，因此没有当前密码可用于确认更改。管理员可以在管理工具 > 用户中为您设置一个。",
+      "app_passwords": "为通过 API 连接的应用和扩展（例如浏览器扩展）创建密码。即使您通过 SSO 登录，它们也能使用；它们无法打开网页界面或更改您的账户，并且可以随时撤销。",
       "git_sync": "将笔记备份到 Git 仓库并查看同步历史。",
       "extension": "安装浏览器扩展，将网页保存到 Poznote。",
       "install_app": "将 Poznote 作为应用安装到您的设备（PWA）。",
@@ -432,7 +439,7 @@
       "language": "更改界面语言。",
       "main_font": "选择整个应用使用的字体。",
       "markdown_font": "选择 Markdown 编辑器使用的字体。",
-      "markdown_default_view_mode": "选择 Markdown 笔记以预览、编辑还是分栏模式打开。切换到其他模式的笔记会保持该模式，直到关闭标签页。",
+      "markdown_default_view_mode": "选择 Markdown 笔记以预览、编辑还是分栏模式打开。",
       "font_size": "调整笔记、侧边栏、代码块和设置页面的字体大小。",
       "index_icon_scale": "调整笔记列表中图标的大小。",
       "timezone": "设置用于显示日期和时间的时区。",
@@ -455,6 +462,7 @@
       "code_line_numbers": "在 markdown 预览的代码块中显示行号。",
       "attachment_previews": "在笔记中显示附件预览。",
       "attachments_at_bottom": "将附件区域显示在笔记底部而不是顶部。",
+      "allow_executable_attachments": "允许本实例的所有账户将脚本和可执行文件（.sh、.ps1、.bat、.exe、.py 等）添加为附件。Poznote 从不运行它们，只负责存储和下载。Web 服务器可能执行的类型（如 .php）仍然被阻止。",
       "backlinks_at_bottom": "将反向链接区域显示在笔记底部而不是顶部。",
       "default_image_border": "默认以带边框且无内边距的方式显示笔记中的图片。",
       "spellcheck_html_notes": "在 HTML 笔记中启用浏览器拼写检查。",
@@ -474,6 +482,7 @@
       "import_limits": "设置每次导入允许的最大文件数量。",
       "user_quotas": "限制每个用户的笔记数量和可用存储空间。",
       "custom_css": "应用您自己的 CSS 来自定义 Poznote 的外观。",
+      "theme_list": "选择主题按钮提供哪些主题，以及它们的顺序。",
       "ui_customization_admin": "隐藏您不使用的界面元素，为您自己或为此实例的所有用户。",
       "disaster_recovery": "在数据丢失时从备份恢复实例。",
       "orphan_scanner": "查找并清理不再属于任何笔记的附件文件。",
@@ -543,6 +552,7 @@
       "github_star": "在 GitHub 上加星",
       "guestbook": "Poznote 留言板",
       "custom_css": "自定义 CSS 文件",
+      "theme_list": "主题列表",
       "support": "支持 Poznote",
       "buy_me_a_coffee": "请我喝杯咖啡",
       "install_extension": "安装扩展",
@@ -553,11 +563,13 @@
       "activity_log": "活动日志",
       "storage_stats_user": "用户存储统计",
       "change_password": "修改密码",
+      "app_passwords": "应用密码",
       "delete_account": "删除账户",
       "import_limits": "导入限制",
       "user_quotas": "用户配额",
       "welcome_setup": "启动向导",
       "git_sync_toggle": "Git 同步",
+      "allow_executable_attachments": "脚本和可执行文件附件",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / 邮件",
       "webhooks": "管理员 Webhook",
@@ -832,7 +844,16 @@
     "confirm_navigation": "⚠️ 未保存的更改\n\n您有未保存的更改，这些更改将会丢失。\n要在离开前保存吗？",
     "notification": {
       "saving": "正在保存更改...",
-      "saved": "已保存！"
+      "saved": "已保存！",
+      "not_saved_yet": "您最近的更改暂时无法保存。它们已保留在此设备上，Poznote 会继续尝试。"
+    },
+    "draft": {
+      "found_conflict": "此笔记有您上次访问时未保存的更改，但此后它也在其他地方被修改过。您不保留的版本会留在笔记历史中。",
+      "found_error": "此笔记有您上次访问时未保存的更改。它们暂时无法保存。",
+      "restore": "保留我未保存的更改",
+      "discard": "保留当前版本",
+      "restored": "您最近的更改已恢复并保存。",
+      "restore_failed": "无法保存您的更改。请检查网络连接后重试。"
     }
   },
   "tasklist": {
@@ -1058,7 +1079,8 @@
       "search_replace": "查找替换",
       "split_view": "切换分屏视图",
       "switch_to_edit": "切换到编辑模式",
-      "switch_to_preview": "切换到预览模式"
+      "switch_to_preview": "切换到预览模式",
+      "save_now": "立即保存"
     },
     "link": {
       "add_title": "添加链接",
@@ -1153,12 +1175,29 @@
     },
     "custom_css": {
       "title": "自定义 CSS",
-      "description": "上传 CSS 文件以自定义 Poznote 的外观。该文件存储在您的数据卷中，并应用于所有用户。",
-      "no_file": "未加载自定义 CSS",
+      "description": "上传 CSS 文件以自定义 Poznote 的外观。文件保存在你的数据卷中，所选的那个会应用于所有用户。",
+      "theme_list_link": "CSS 文件也可以作为主题提供：把它加入{{link}}。",
+      "theme_list_link_label": "主题列表",
+      "no_file": "尚未保存任何 CSS 文件",
+      "none": "不使用自定义 CSS",
+      "active": "已应用",
+      "pending_upload": "保存时上传",
+      "pending_replace": "保存时替换",
+      "delete_confirm": "删除 {{name}}？该文件将从你的数据卷中移除。",
       "upload": "上传 CSS 文件",
       "validation": "请选择一个 CSS 文件。",
       "placeholder": "custom.css",
       "hint": "Docker 用户：请将文件放入数据卷 data/css/ 文件夹中（例如 data/css/custom.css）。否则将从镜像内的 css/custom.css 加载。"
+    },
+    "theme_list": {
+      "title": "主题列表",
+      "description": "每次点击图标侧边栏的主题按钮，都会切换到此列表中的下一个主题。勾选要提供的主题，用箭头调整顺序，勾选某个 CSS 文件即可把它也作为主题提供。",
+      "mode_help": "这个样式表是为浅色模式还是深色模式编写的？",
+      "move_up": "上移",
+      "move_down": "下移",
+      "empty": "列表中至少保留一个主题。",
+      "badge_one": "1 个主题",
+      "badge_other": "{{count}} 个主题"
     },
     "import_limits": {
       "title": "导入限制",
@@ -1581,7 +1620,7 @@
         "split_short": "分栏",
         "last": "上次使用的模式"
       },
-      "hint": "切换到其他模式的笔记会保持该模式，直到关闭标签页。新笔记始终以分栏模式打开。"
+      "hint": "切换到其他模式的笔记，下次打开时会恢复为默认模式。新笔记始终以分栏模式打开。"
     },
     "diary_date_format": {
       "title": "日记条目日期格式",
@@ -1760,7 +1799,7 @@
   },
   "update": {
     "new_available": "🎉 有新版本可用！",
-    "new_version_available": "如需更新，请查看 GitHub 上的说明 <a href=\"https://github.com/timothepoznanski/poznote#update-application\" target=\"_blank\">此处</a>",
+    "new_version_available": "如果这个实例由您自己管理，请按 GitHub 上的说明<a href=\"https://github.com/timothepoznanski/poznote#update-application\" target=\"_blank\">此处</a>进行更新。否则需要等待您的托管服务商完成更新。",
     "description": "您的数据在更新过程中将被保留。",
     "up_to_date": "✅ Poznote 已是最新版本",
     "error_loading_version": "加载版本信息出错",
@@ -2104,7 +2143,7 @@
     "redirecting": "正在重定向...",
     "show_password": "显示密码",
     "hide_password": "隐藏密码",
-    "admin_warning": "请使用用户名 <code>{{username}}</code> 和此帐户的当前密码登录，然后可在设置中重命名此帐户以提高安全性。",
+    "admin_warning": "登录后请立即在设置中修改密码，您也可以在那里修改用户名。",
     "fields": {
       "username": "用户名",
       "username_or_email": "用户名或邮箱",
@@ -2153,7 +2192,7 @@
       "default_reason": "被附件安全策略阻止",
       "original_filename": "原始文件名",
       "note": "笔记",
-      "recovery_hint": "这些文件仍保留在源 ZIP 中，出于安全原因未作为活动附件还原。您可以从 ZIP 中手动恢复它们。只要文件仍保持被禁止的类型，直接重新导入仍会被阻止；请将其放入允许的归档文件（如 .zip）中，或仅在信任该文件时将其转换/重命名为允许的类型。",
+      "recovery_hint": "这些文件仍保留在源 ZIP 中，出于安全原因未作为活动附件还原。您可以从 ZIP 中手动恢复它们。只要文件仍保持被禁止的类型，直接重新导入仍会被阻止；请将其放入允许的归档文件（如 .zip）中，或仅在信任该文件时将其转换/重命名为允许的类型。 如果这些是您信任的脚本或可执行文件，管理员可以启用“设置 > 管理工具 > 脚本和可执行文件附件”，然后重新导入。",
       "reasons": {
         "invalid_filename": "附件文件名无效",
         "hidden_filename": "不允许隐藏的附件文件名",
@@ -3513,6 +3552,8 @@
       "account_deleted": "账户已删除",
       "access_granted": "已授予账户访问权限",
       "access_revoked": "已撤销账户访问权限",
+      "app_password_created": "已创建应用密码",
+      "app_password_revoked": "已撤销应用密码",
       "workspace_created": "工作区已创建",
       "workspace_deleted": "工作区已删除",
       "workspace_shared": "工作区已共享",
@@ -3543,7 +3584,8 @@
       "accounts": "账户：{{accounts}}",
       "empty_value": "空",
       "s3_objects_deleted": "已删除 {{count}} 个 S3 对象",
-      "s3_cleanup_failed": "S3 清理失败"
+      "s3_cleanup_failed": "S3 清理失败",
+      "expires_at": "过期于 {{date}}"
     },
     "destinations": {
       "download": "下载",
@@ -3648,6 +3690,44 @@
     },
     "success": "密码修改成功。"
   },
+  "app_passwords": {
+    "status": {
+      "none": "无",
+      "count_one": "1 个有效",
+      "count_other": "{{count}} 个有效"
+    },
+    "modal": {
+      "title": "应用密码",
+      "description": "应用密码允许应用或扩展使用您的用户名和该密码（而非账户密码）访问 API，即使您通过 SSO 登录也可以。它无法打开网页界面、访问管理功能或更改您的账户，并且您可以随时撤销。",
+      "label_placeholder": "名称，例如 Chrome 扩展",
+      "expiry_label": "有效期",
+      "expiry_never": "永不过期",
+      "expiry_30": "30 天",
+      "expiry_90": "90 天",
+      "expiry_365": "1 年",
+      "create": "创建",
+      "close": "关闭",
+      "empty": "尚无应用密码。",
+      "secret_title": "应用密码“{{label}}”",
+      "secret_notice": "请立即复制：它不会再次显示。",
+      "usage_hint": "在应用中，输入您的用户名，并将此值作为密码。",
+      "copy": "复制",
+      "copied": "已复制",
+      "created": "创建于 {{date}}",
+      "last_used": "最后使用于 {{date}}",
+      "never_used": "从未使用",
+      "expires": "过期于 {{date}}",
+      "expired": "已过期",
+      "revoke": "撤销",
+      "confirm_revoke": "确认"
+    },
+    "errors": {
+      "label_required": "请为应用密码命名。",
+      "limit_reached": "已达上限：请先撤销一个应用密码，再创建新的。",
+      "load_failed": "无法加载您的应用密码。",
+      "generic": "出现错误，请重试。"
+    }
+  },
   "delete_account": {
     "modal": {
       "title": "删除账户",
@@ -3723,7 +3803,7 @@
       "sso_only_admin_password": "您可以在 .env 文件中设置 POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true，使该实例仅允许 SSO 登录。",
       "sso_only_admin_password_warning": "启用前请确保至少有一个管理员账户已设置明确的密码（设置 > 用户）。",
       "sso_only_admin_password_recovery": "如果身份提供商不可用，恢复方式是将该选项改回 false，然后使用该密码登录。",
-      "disable_basic_auth": "启用后，带有 HTTP Basic Auth 的 API 请求将被拒绝（403）"
+      "disable_basic_auth": "启用后，通过 HTTP Basic Auth 使用账户密码认证的 API 请求将被拒绝（403）。用户在设置中创建的应用密码仍可继续使用。"
     },
     "actions": {
       "copy_all": "复制全部",

@@ -13,7 +13,8 @@
 .toolbar-btn.btn-publish.is-shared i.lucide-share-2,
 .toolbar-btn.btn-publish.is-shared .lucide-share-2,
 .toolbar-btn.btn-attachment.has-attachments i,
-.toolbar-btn.btn-reminder.has-reminder i {
+.toolbar-btn.btn-reminder.has-reminder i,
+.toolbar-btn.btn-save.is-saving i {
     color: var(--pz-accent) !important;
 }
 

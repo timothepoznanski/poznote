@@ -16,19 +16,12 @@ function persistMarkdownImageSourceChange(noteEntry, editorDiv, previewDiv, note
     }
     window.noteid = noteId;
 
-    try {
-        localStorage.setItem('poznote_draft_' + noteId, newContent);
-
+    // Through the autosave's draft store, so the draft carries the meta
+    // entry its recovery relies on (js/events-auto-save.js)
+    if (typeof window.writeNoteDraft === 'function') {
         var titleInput = document.getElementById('inp' + noteId);
         var tagsElem = document.getElementById('tags' + noteId);
-        if (titleInput) {
-            localStorage.setItem('poznote_title_' + noteId, titleInput.value);
-        }
-        if (tagsElem) {
-            localStorage.setItem('poznote_tags_' + noteId, tagsElem.value);
-        }
-    } catch (e) {
-        console.warn('Could not persist markdown image change draft:', e);
+        window.writeNoteDraft(noteId, newContent, titleInput ? titleInput.value : null, tagsElem ? tagsElem.value : null);
     }
 
     if (previewDiv) {

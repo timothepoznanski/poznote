@@ -197,6 +197,9 @@ function routeTable(): array
         'GET /users/me' => [SCOPED],
         'PATCH /users/me' => [SCOPED, 'body' => []],
         'GET /users/me/password-status' => [SCOPED],
+        'GET /users/me/app-passwords' => [SCOPED],
+        'POST /users/me/app-passwords' => [SCOPED, 'body' => ['label' => 'replay probe']],
+        'DELETE /users/me/app-passwords/{id}' => [OWNED, 'target' => ['id' => 'app_password']],
         'POST /users/me/password' => [EXCLUDED, 'reason' => 'would change B\'s password mid-run'],
         'DELETE /users/me' => [EXCLUDED, 'reason' => 'would delete B mid-run; carries no identifier to replay'],
         // A directory of usernames, on purpose: the share dialogs need it, and
@@ -594,6 +597,74 @@ function checkPathTraversal(IsolationContext $ctx): void
 }
 
 /**
+ * An app password (src/lib/app-passwords.php) is a credential deliberately
+ * weaker than the account password. Each limit is a promise made to the user
+ * who pastes one into an extension, so each is checked here: it reaches the
+ * owner's own data and nothing else, cannot be used as an admin, cannot
+ * manage the account, and stops working the moment it is revoked.
+ */
+function checkAppPasswords(IsolationContext $ctx): void
+{
+    $owner = $ctx->owner;
+    $created = $owner->api->post('/users/me/app-passwords', ['json' => ['label' => 'isolation client']]);
+    $secret = (string)($created->json['secret'] ?? '');
+    $id = (int)($created->json['app_password']['id'] ?? 0);
+
+    test('app password: the owner can create one', function () use ($created, $secret, $id) {
+        assertStatusIn([201], $created, 'POST /users/me/app-passwords');
+        if ($secret === '' || $id <= 0) {
+            fail('no secret or id in ' . $created->summary());
+        }
+    });
+    if ($secret === '' || $id <= 0) {
+        return;
+    }
+
+    // Owner's username, app password, no X-User-ID: the profile is implied.
+    $client = new ApiClient($ctx->baseUrl, $owner->username, $secret, null);
+
+    test('app password: reaches the owner\'s own notes', function () use ($client, $ctx) {
+        $response = $client->get('/notes/search', ['query' => ['q' => $ctx->fixtures['marker']]]);
+        assertStatusIn([200], $response, 'GET /notes/search');
+        if (!$response->mentions($ctx->fixtures['marker'])) {
+            fail('the owner\'s own note is missing from a search made with their app password: ' . $response->summary());
+        }
+    });
+
+    test('app password: is refused on admin routes', function () use ($client) {
+        assertStatusIn([401, 403], $client->get('/admin/users'), 'GET /admin/users');
+        assertStatusIn([401, 403], $client->get('/admin/stats'), 'GET /admin/stats');
+    });
+
+    test('app password: cannot name another profile', function () use ($client, $ctx) {
+        $response = $client->withUserId($ctx->stranger->id)->get('/notes');
+        assertStatusIn([401, 403], $response, 'GET /notes as another profile');
+    });
+
+    test('app password: cannot manage the account', function () use ($client) {
+        assertStatusIn([403], $client->get('/users/me/app-passwords'), 'GET /users/me/app-passwords');
+        assertStatusIn([403], $client->post('/users/me/app-passwords', ['json' => ['label' => 'minted']]), 'POST /users/me/app-passwords');
+        assertStatusIn([403], $client->post('/users/me/password', ['json' => [
+            'current_password' => 'x', 'new_password' => 'hijacked', 'confirm_password' => 'hijacked']]), 'POST /users/me/password');
+        assertStatusIn([403], $client->request('PATCH', '/users/me', ['json' => ['first_name' => 'Mallory']]), 'PATCH /users/me');
+        // No confirm_username on purpose: were the guard missing, the
+        // confirmation check would still refuse, so the owner survives a
+        // regression here and the 403 (not 400) is what proves the guard.
+        assertStatusIn([403], $client->request('DELETE', '/users/me'), 'DELETE /users/me');
+    });
+
+    test('app password: is bound to its username', function () use ($ctx, $secret) {
+        $wrongAccount = new ApiClient($ctx->baseUrl, $ctx->stranger->username, $secret, null);
+        assertStatusIn([401], $wrongAccount->get('/notes'), 'owner\'s secret with the stranger\'s username');
+    });
+
+    test('app password: stops working once revoked', function () use ($owner, $client, $id) {
+        assertStatusIn([200], $owner->api->request('DELETE', "/users/me/app-passwords/$id"), 'revoke');
+        assertStatusIn([401], $client->get('/notes'), 'GET /notes after revocation');
+    });
+}
+
+/**
  * Workspace names travel in query strings rather than paths, so they get their
  * own pass: naming the owner's workspace must not widen what the stranger sees.
  */
@@ -813,5 +884,6 @@ function runIsolationTests(IsolationContext $ctx): void
     checkShareTokens($ctx);
     checkWorkspaceScoping($ctx);
     checkPathTraversal($ctx);
+    checkAppPasswords($ctx);
     checkDetectors($ctx);
 }

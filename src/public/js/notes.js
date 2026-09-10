@@ -215,6 +215,10 @@ function _recoverOwnEditLock(noteId, editorSessionId) {
 /**
  * Save the current note to server
  * This function is called by the auto-save mechanism
+ *
+ * options.onSaved is called once the server confirmed the save (and never
+ * when nothing was sent: no note, locked, empty title), so a manual save
+ * can confirm to the user without guessing.
  */
 function saveNoteToServer(options) {
     options = options || {};
@@ -303,7 +307,12 @@ function saveNoteToServer(options) {
 
     var editorSessionId = _getEditorSessionIdForSave();
 
+    // The exact state being sent becomes the draft, and its fingerprint
+    // travels with the request (js/events-auto-save.js, DRAFT STORAGE)
+    var stateHash = (typeof window.snapshotNoteStateForSave === 'function') ? window.snapshotNoteStateForSave(noteid) : null;
+
     var updates = {
+        state_hash: stateHash,
         heading: headi,
         content: ent,
         tags: tags,
@@ -338,6 +347,7 @@ function saveNoteToServer(options) {
             }).then(function (data) {
                 return {
                     ok: response.ok,
+                    status: response.status,
                     data: data || {}
                 };
             });
@@ -350,6 +360,9 @@ function saveNoteToServer(options) {
                 }
                 var responseTitle = (data.note && data.note.heading) ? data.note.heading : headi;
                 handleSaveResponse(JSON.stringify({ date: new Date().toLocaleDateString(), title: responseTitle, original_title: headi }));
+                if (typeof options.onSaved === 'function') {
+                    options.onSaved();
+                }
 
                 // Mark note as needing auto-push since it was successfully saved (if auto-push enabled)
                 if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
@@ -398,7 +411,7 @@ function saveNoteToServer(options) {
                     if (!options.retriedVersion && currentVersion
                         && typeof window.liveRefreshShouldRetryVersionConflict === 'function'
                         && window.liveRefreshShouldRetryVersionConflict(noteid)) {
-                        saveNoteToServer({ retriedVersion: true, retryVersion: currentVersion });
+                        saveNoteToServer({ retriedVersion: true, retryVersion: currentVersion, onSaved: options.onSaved });
                         return;
                     }
                     // Real conflict: keep the local edits unsaved and let the
@@ -413,7 +426,7 @@ function saveNoteToServer(options) {
                 if (!options.retriedEditLock && _canRecoverOwnEditLock(data.lock)) {
                     _recoverOwnEditLock(noteid, editorSessionId).then(function (recovered) {
                         if (recovered) {
-                            saveNoteToServer({ retriedEditLock: true });
+                            saveNoteToServer({ retriedEditLock: true, onSaved: options.onSaved });
                             return;
                         }
 
@@ -434,6 +447,14 @@ function saveNoteToServer(options) {
                     return;
                 }
 
+                // No answer from the app itself (proxy 502/504, server busy):
+                // transient, handled like a network failure below
+                if (!data.error && !data.message && typeof window.noteSaveFailed === 'function') {
+                    console.warn('[Poznote Auto-Save] Save failed with HTTP', result.status);
+                    window.noteSaveFailed(noteid);
+                    return;
+                }
+
                 // Show user-visible error notification
                 if (typeof showNotificationPopup === 'function') {
                     showNotificationPopup(data.error || data.message || 'Error saving note', 'error');
@@ -442,7 +463,10 @@ function saveNoteToServer(options) {
         })
         .catch(function (error) {
             console.error('[Poznote Auto-Save] Network error:', error.message);
-            if (typeof showNotificationPopup === 'function') {
+            // Kept on this device and retried, no alarming dialog
+            if (typeof window.noteSaveFailed === 'function') {
+                window.noteSaveFailed(noteid);
+            } else if (typeof showNotificationPopup === 'function') {
                 showNotificationPopup('Network error: ' + error.message, 'error');
             }
         });
@@ -524,6 +548,11 @@ function _updateUIAfterSave(timeText, titleChanged) {
     // Clear draft from localStorage
     if (typeof window.clearDraft === 'function') {
         window.clearDraft(noteid);
+    }
+    if (typeof window.noteSaveSucceeded === 'function') {
+        window.noteSaveSucceeded(noteid);
+    } else if (typeof window.setNoteSaveButtonState === 'function') {
+        window.setNoteSaveButtonState(noteid, false);
     }
 
     // Mark note as saved (remove from pending refresh list)

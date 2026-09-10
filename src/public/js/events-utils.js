@@ -277,31 +277,3 @@ function serializeChecklists(entryElement) {
         });
     });
 }
-
-// Reinitialize auto-save state after loading fresh note content from server
-// This function is called from external code when a new note is loaded
-function reinitializeAutoSaveState() {
-    // Get current note ID from the DOM
-    var currentNoteId = null;
-    var entryElem = document.querySelector('[id^="entry"]:not([id*="search"])');
-    if (entryElem) {
-        currentNoteId = extractNoteIdFromEntry(entryElem);
-    }
-
-    if (currentNoteId && currentNoteId !== 'search' && currentNoteId !== '-1') {
-        // Update global noteid
-        if (typeof window !== 'undefined') {
-            window.noteid = currentNoteId;
-        }
-
-        // Delegate to the auto-save module if available
-        if (typeof window.reinitializeAutoSaveState === 'function') {
-            window.reinitializeAutoSaveState(currentNoteId, entryElem);
-        }
-
-        // Clear any stale draft for this note since we just loaded fresh content
-        if (typeof window.clearDraft === 'function') {
-            window.clearDraft(currentNoteId);
-        }
-    }
-}

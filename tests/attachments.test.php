@@ -10,6 +10,52 @@ test('executable extensions are refused', function () {
     }
 });
 
+test('server-executable types are separated from merely executable ones', function () {
+    foreach (['php', 'php7', 'phtml', 'phar', 'cgi', 'jsp', 'shtml'] as $ext) {
+        assertSame(POZNOTE_ATTACHMENT_BLOCK_SERVER, poznoteAttachmentExtensionBlockLevel($ext), "extension {$ext}");
+    }
+    foreach (['sh', 'ps1', 'bat', 'exe', 'py', 'jar'] as $ext) {
+        assertSame(POZNOTE_ATTACHMENT_BLOCK_EXECUTABLE, poznoteAttachmentExtensionBlockLevel($ext), "extension {$ext}");
+    }
+    assertSame(null, poznoteAttachmentExtensionBlockLevel('png'));
+
+    assertSame(POZNOTE_ATTACHMENT_BLOCK_SERVER, poznoteAttachmentMimeTypeBlockLevel('text/x-php'));
+    assertSame(POZNOTE_ATTACHMENT_BLOCK_EXECUTABLE, poznoteAttachmentMimeTypeBlockLevel('text/x-shellscript'));
+    assertSame(null, poznoteAttachmentMimeTypeBlockLevel('image/png'));
+});
+
+test('the setting lifts the executable block but never the server one', function () {
+    // The suite has no database, so the decision is exercised against an
+    // explicit state rather than through the settings table.
+    assertFalse(poznoteAttachmentExtensionIsBlocked('ps1', true), 'ps1 must be allowed once unblocked');
+    assertFalse(poznoteAttachmentMimeTypeIsBlocked('text/x-shellscript', true), 'shell scripts must be allowed once unblocked');
+    assertTrue(poznoteAttachmentExtensionIsBlocked('ps1', false), 'ps1 must be refused while blocked');
+
+    assertTrue(poznoteAttachmentExtensionIsBlocked('php', true), 'php can never be unblocked');
+    assertTrue(poznoteAttachmentMimeTypeIsBlocked('application/x-httpd-php', true), 'php content can never be unblocked');
+
+    assertFalse(poznoteAttachmentBlockLevelApplies(null, false), 'an unrestricted type is never refused');
+});
+
+test('executables stay blocked when no settings layer is available', function () {
+    // CLI workers and this suite load the lib on its own: the missing setting
+    // must read as blocked, never as allowed.
+    assertTrue(poznoteAttachmentExtensionIsBlocked('exe'), 'default must be blocked');
+    assertFalse(poznoteValidateAttachmentFilename('deploy.ps1')['success']);
+});
+
+test('a blocked filename reports what was refused and whether it can be lifted', function () {
+    $executable = poznoteValidateAttachmentFilename('deploy.ps1');
+    assertFalse($executable['success']);
+    assertSame('ps1', $executable['blocked_extension']);
+    assertSame(POZNOTE_ATTACHMENT_BLOCK_EXECUTABLE, $executable['block_level']);
+
+    $server = poznoteValidateAttachmentFilename('shell.php');
+    assertFalse($server['success']);
+    assertSame('php', $server['blocked_extension']);
+    assertSame(POZNOTE_ATTACHMENT_BLOCK_SERVER, $server['block_level']);
+});
+
 test('ordinary document extensions are accepted', function () {
     foreach (['png', 'pdf', 'md', 'txt', 'jpg'] as $ext) {
         assertFalse(poznoteAttachmentExtensionIsBlocked($ext), "extension {$ext}");

@@ -35,6 +35,20 @@ class UsersController {
         }
         return null;
     }
+
+    /**
+     * Account management needs the account's own credentials. An app password
+     * is scoped to reading and writing notes: it must not be able to change
+     * the password, delete the account, or create and revoke app passwords,
+     * otherwise one leaked client token would hand over the whole account.
+     */
+    private function requireFullCredentials() {
+        if (function_exists('isApiAppPasswordRequest') && isApiAppPasswordRequest()) {
+            http_response_code(403);
+            return ['error' => 'This action is not available with an app password'];
+        }
+        return null;
+    }
     
     /**
      * GET /api/v1/users/me - Get current authenticated user's profile
@@ -73,6 +87,7 @@ class UsersController {
      */
     public function updateMe() {
         if ($err = $this->requireActiveAccountOwner()) return $err;
+        if ($err = $this->requireFullCredentials()) return $err;
 
         require_once dirname(__DIR__, 3) . '/users/db_master.php';
 
@@ -532,6 +547,7 @@ class UsersController {
      */
     public function changePassword() {
         if ($err = $this->requireActiveAccountOwner()) return $err;
+        if ($err = $this->requireFullCredentials()) return $err;
 
         require_once dirname(__DIR__, 3) . '/users/db_master.php';
         
@@ -600,6 +616,7 @@ class UsersController {
      */
     public function deleteMe() {
         if ($err = $this->requireActiveAccountOwner()) return $err;
+        if ($err = $this->requireFullCredentials()) return $err;
 
         require_once dirname(__DIR__, 3) . '/users/db_master.php';
 
@@ -976,5 +993,154 @@ class UsersController {
             'id' => (int)$user['id'],
             'username' => $user['username']
         ];
+    }
+
+    // ==================================================================
+    // App passwords (see src/lib/app-passwords.php for what they are)
+    // ==================================================================
+
+    /** Dates for the list, in the user's timezone and format like password_changed_at. */
+    private function formatAppPasswordRow(array $row) {
+        foreach (['created_at', 'last_used_at', 'expires_at'] as $field) {
+            if (array_key_exists($field, $row)) {
+                $row[$field] = $this->formatPasswordChangedAt($row[$field]);
+            }
+        }
+        return $row;
+    }
+
+    /**
+     * GET /api/v1/users/me/app-passwords - List the current user's app passwords
+     * The secrets are never returned; each row carries a short hint instead.
+     */
+    public function listAppPasswords() {
+        if ($err = $this->requireActiveAccountOwner()) return $err;
+        if ($err = $this->requireFullCredentials()) return $err;
+
+        require_once dirname(__DIR__, 3) . '/users/app_passwords.php';
+
+        $userId = (int)getCurrentUserId();
+        if ($userId <= 0) {
+            http_response_code(401);
+            return ['error' => 'Not authenticated'];
+        }
+
+        $rows = listUserAppPasswords($userId);
+        $active = 0;
+        foreach ($rows as $row) {
+            if (empty($row['expired'])) {
+                $active++;
+            }
+        }
+
+        return [
+            'app_passwords' => array_map([$this, 'formatAppPasswordRow'], $rows),
+            'count' => count($rows),
+            'active_count' => $active,
+            'limit' => APP_PASSWORD_MAX_PER_USER,
+        ];
+    }
+
+    /**
+     * POST /api/v1/users/me/app-passwords - Create an app password
+     * Body: { label: string, expires_in_days?: int }
+     * The clear-text secret is in this response and nowhere else afterwards.
+     */
+    public function createAppPassword() {
+        if ($err = $this->requireActiveAccountOwner()) return $err;
+        if ($err = $this->requireFullCredentials()) return $err;
+
+        require_once dirname(__DIR__, 3) . '/users/app_passwords.php';
+        require_once dirname(__DIR__, 3) . '/ActivityLog.php';
+
+        $userId = (int)getCurrentUserId();
+        if ($userId <= 0) {
+            http_response_code(401);
+            return ['error' => 'Not authenticated'];
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($data)) {
+            $data = [];
+        }
+
+        $label = normalizeAppPasswordLabel($data['label'] ?? null);
+        if ($label === null) {
+            http_response_code(400);
+            return ['error' => 'A label is required'];
+        }
+
+        $expiresAt = appPasswordExpiryFromDays($data['expires_in_days'] ?? null);
+        if ($expiresAt === false) {
+            http_response_code(400);
+            return ['error' => 'expires_in_days must be a whole number of days between 1 and ' . APP_PASSWORD_MAX_EXPIRY_DAYS];
+        }
+
+        if (countUserAppPasswords($userId) >= APP_PASSWORD_MAX_PER_USER) {
+            http_response_code(409);
+            return ['error' => 'App password limit reached: revoke one before creating another'];
+        }
+
+        $created = createUserAppPassword($userId, $label, $expiresAt);
+        if ($created === null) {
+            http_response_code(500);
+            return ['error' => 'Failed to create the app password'];
+        }
+
+        // The label is the only detail worth keeping. The row id is not an
+        // "app_password_id" key on purpose: activityStripSecrets() drops any
+        // key containing "password", which would leave the entry empty.
+        logActivity(ACTIVITY_APP_PASSWORD_CREATED, [
+            'label' => $label,
+            'credential_id' => $created['id'],
+            'expires_at' => $expiresAt,
+        ], 'api');
+
+        http_response_code(201);
+        return [
+            'success' => true,
+            'app_password' => $this->formatAppPasswordRow([
+                'id' => $created['id'],
+                'label' => $created['label'],
+                'hint' => $created['hint'],
+                'created_at' => $created['created_at'],
+                'last_used_at' => null,
+                'expires_at' => $created['expires_at'],
+                'expired' => false,
+            ]),
+            'secret' => $created['secret'],
+        ];
+    }
+
+    /**
+     * DELETE /api/v1/users/me/app-passwords/{id} - Revoke an app password
+     * A client still holding the secret is refused from the next request on.
+     */
+    public function revokeAppPassword($id) {
+        if ($err = $this->requireActiveAccountOwner()) return $err;
+        if ($err = $this->requireFullCredentials()) return $err;
+
+        require_once dirname(__DIR__, 3) . '/users/app_passwords.php';
+        require_once dirname(__DIR__, 3) . '/ActivityLog.php';
+
+        $userId = (int)getCurrentUserId();
+        if ($userId <= 0) {
+            http_response_code(401);
+            return ['error' => 'Not authenticated'];
+        }
+
+        $id = (int)$id;
+        $row = getUserAppPassword($userId, $id);
+        if ($row === null || !revokeUserAppPassword($userId, $id)) {
+            http_response_code(404);
+            return ['error' => 'App password not found'];
+        }
+
+        logActivity(ACTIVITY_APP_PASSWORD_REVOKED, [
+            'label' => $row['label'],
+            'credential_id' => $id,
+        ], 'api');
+
+        return ['success' => true];
     }
 }

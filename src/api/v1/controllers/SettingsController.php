@@ -16,7 +16,9 @@ class SettingsController {
         'hidden_ui_elements_global',
         'login_display_name',
         'custom_css_path',
+        'theme_list',
         'git_sync_enabled',
+        'allow_executable_attachments',
         'tenant_isolation',
         'tenant_isolation_features',
         'tenant_isolation_applied_ui_keys',
@@ -91,6 +93,13 @@ class SettingsController {
     }
 
     private function normalizeSettingValue(string $key, $value): string {
+        if ($key === 'theme_list') {
+            // The list is written from the Custom CSS modal, which validates
+            // every entry against the themes this instance has. Writing it here
+            // would take a raw string on trust, so this API only reads it.
+            throw new InvalidArgumentException('theme_list is read-only, use api_upload_css.php', 400);
+        }
+
         if ($key === 'custom_css_path') {
             $normalized = poznoteNormalizeCustomCssPath($value);
             if ($normalized === '' && trim((string) $value) !== '') {
@@ -225,6 +234,10 @@ class SettingsController {
         }
 
         if ($key === 'note_nav_shortcuts_enabled' || $key === 'ctrl_s_save_enabled') {
+            return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
+        }
+
+        if ($key === 'allow_executable_attachments') {
             return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
         }
 

@@ -1,6 +1,6 @@
 {
   "_comment": "Colour literals left in src/public/css, outside the palette file itself: hex, the white/black keywords, and functional colours (rgba, hsl, oklch...) whose arguments name no variable. The check in tools/css-check.php fails when this number grows. Lower it whenever a change removes some.",
-  "colour_literals": 381,
+  "colour_literals": 380,
   "_comment_markup": "Colour literals in the project's own PHP and JS: inline style attributes, <style> blocks, colours handed to scripts. A theme cannot reach any of them. Third-party bundles are skipped. Files listed in markup_exempt are not counted and each one says why.",
   "markup_literals": 516,
   "markup_exempt": {

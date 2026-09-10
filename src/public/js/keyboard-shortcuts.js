@@ -100,6 +100,9 @@
         }, 1500);
     }
 
+    // Also shown by the toolbar's save button (js/index-events.js)
+    window.showSavedToast = showSavedToast;
+
     function handleShortcutKeydown(e) {
         if (e.defaultPrevented) return;
 
@@ -120,8 +123,8 @@
             if (!isShortcutSettingEnabled('ctrl_s_save_enabled')) return;
             e.preventDefault();
             if (typeof window.saveNoteImmediately === 'function') {
-                window.saveNoteImmediately();
-                showSavedToast();
+                // The toast only once the server confirmed the save
+                window.saveNoteImmediately({ onSaved: showSavedToast });
             }
             return;
         }

@@ -245,6 +245,8 @@ function activityActionIcon(string $action): string {
         case ACTIVITY_WORKSPACE_UNSHARED: return 'lucide-share-2';
         case ACTIVITY_ACCESS_GRANTED:     return 'lucide-key';
         case ACTIVITY_ACCESS_REVOKED:     return 'lucide-key';
+        case ACTIVITY_APP_PASSWORD_CREATED: return 'lucide-plug';
+        case ACTIVITY_APP_PASSWORD_REVOKED: return 'lucide-plug';
         case ACTIVITY_PROFILE_UPDATED:    return 'lucide-pencil';
         case ACTIVITY_QUOTA_UPDATED:      return 'lucide-gauge';
         case ACTIVITY_ACCOUNT_ACTIVATED:  return 'lucide-unlock';
@@ -277,6 +279,8 @@ function activityActionTone(string $action): string {
         // spotting in a scan; their opposites are routine.
         case ACTIVITY_ADMIN_GRANTED:
         case ACTIVITY_ACCOUNT_DEACTIVATED:
+        // A new credential is a new way in; its revocation is routine.
+        case ACTIVITY_APP_PASSWORD_CREATED:
             return 'act-warn';
         case ACTIVITY_LOGIN:
         case ACTIVITY_LOGOUT:
@@ -386,6 +390,14 @@ function activityDetailsText(string $action, ?string $json): string {
         case ACTIVITY_ACCESS_REVOKED:
             $accounts = is_array($d['accounts'] ?? null) ? $d['accounts'] : [];
             return t('activity_log.details.accounts', ['accounts' => implode(', ', $accounts)], 'accounts: {{accounts}}');
+
+        case ACTIVITY_APP_PASSWORD_CREATED:
+        case ACTIVITY_APP_PASSWORD_REVOKED:
+            $parts = ['"' . ($d['label'] ?? '?') . '"'];
+            if (!empty($d['expires_at'])) {
+                $parts[] = t('activity_log.details.expires_at', ['date' => $d['expires_at']], 'expires {{date}}');
+            }
+            return implode(' · ', $parts);
 
         case ACTIVITY_PROFILE_UPDATED:
         case ACTIVITY_QUOTA_UPDATED:

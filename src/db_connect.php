@@ -183,7 +183,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 37; // 37: workspaces.color (dot on multi-workspace dashboard views)
+    $CURRENT_SCHEMA_VERSION = 38; // 38: entries.client_state_hash/_version (draft recovery, issue 1349)
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -752,6 +752,28 @@ try {
             $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_folder_dashboard_order ON entries(workspace, folder_id, dashboard_order)');
         } catch (Exception $e) {
             error_log('Could not add dashboard_order column to entries: ' . $e->getMessage());
+        }
+
+        // Ensure the client state columns exist: the fingerprint of the editor
+        // state the web client last saved (content, title and tags as the
+        // browser saw them) and the version token that save produced. The
+        // draft recovery (js/events-auto-save.js) compares the fingerprint
+        // with a draft left in the browser to know whether that draft reached
+        // the server, without comparing content the server may have rewritten
+        // (sanitizer, base64 images turned into attachments). It only counts
+        // while the note's version still matches, so no other writer of a
+        // note needs to know about these columns.
+        try {
+            $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
+            $existingColumns = array_column($cols, 'name');
+            if (!in_array('client_state_hash', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN client_state_hash TEXT");
+            }
+            if (!in_array('client_state_version', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN client_state_version TEXT");
+            }
+        } catch (Exception $e) {
+            error_log('Could not add client state columns to entries: ' . $e->getMessage());
         }
 
         // === DATA DIRECTORIES ===

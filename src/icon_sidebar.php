@@ -259,9 +259,9 @@ if (function_exists('poznoteTidyIconSidebarDividers')) {
 // settings.php; js/utils-updates.js reveals every .update-badge when a release is out.
 $iconSidebarBottomItems = [
     ['id' => 'iconSidebarProfileBtn', 'url' => $iconSidebarUrl('settings.php', ['open' => 'profile']) . '#my-profile-card', 'icon' => 'lucide-user', 'label' => t('profile.card', [], 'My Profile')],
-    // Light/dark/black switch. It goes nowhere, so it renders as a button
-    // rather than a link; js/theme-manager.js picks it up through
-    // data-theme-toggle and keeps the icon on the theme the next click applies.
+    // Theme switch. It goes nowhere, so it renders as a button rather than a
+    // link; js/theme-manager.js picks it up through data-theme-toggle, steps to
+    // the next theme of the list on each click and shows the one in use.
     ['id' => 'iconSidebarThemeToggleBtn', 'themeToggle' => true, 'icon' => 'lucide-moon', 'label' => t('theme.toggle', [], 'Toggle theme')],
     // ?open=about lands on settings.php with the About section expanded and
     // every other section collapsed (js/settings-page.js). It is settings.php

@@ -136,7 +136,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         // but the statements a Poznote backup is made of. Checked before the
         // wipe: a refused dump must leave the existing data untouched.
         require_once __DIR__ . '/../backup_sql_restore.php';
-        $parsedDump = poznoteParseBackupSql((string)file_get_contents($sqlFile));
+        $parsedDump = poznoteValidateBackupSqlFile($sqlFile);
         if (!$parsedDump['success']) {
             deleteDirectory($tempExtractDir);
             $tempExtractDir = null;
@@ -146,7 +146,6 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
                 'message' => ''
             ];
         }
-        $dumpStatements = $parsedDump['statements'];
         unset($parsedDump);
 
         // A backup made with the lighter-zip option references attachments in
@@ -296,8 +295,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         
         // Restore database (the SQL file was validated before the wipe)
         poznoteRestoreReportProgress('database');
-        $dbResult = restoreDatabaseFromFile($sqlFile, $dumpStatements);
-        unset($dumpStatements);
+        $dbResult = restoreDatabaseFromFile($sqlFile, true);
         if ($dbResult['success']) {
             $dbLabel = basename(poznoteGetActiveDatabasePath());
             $dbSummary = '';
@@ -434,24 +432,25 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
  * anything else (ATTACH, PRAGMA, triggers...) is refused. See
  * backup_sql_restore.php.
  *
+ * The dump is read as a stream, one statement at a time: the dump of a large
+ * account weighs as much as its notes and must not be loaded whole.
+ *
  * @param string $sqlFile Path of the dump
- * @param array|null $statements Statements already validated by
- *        poznoteParseBackupSql(), to avoid parsing the file twice
+ * @param bool $alreadyValidated true when the caller already ran
+ *        poznoteValidateBackupSqlFile() on this file (restoreCompleteBackup
+ *        does, before wiping anything), to save one pass over it. The
+ *        statements are checked again as they are executed either way.
  */
-function restoreDatabaseFromFile($sqlFile, $statements = null) {
+function restoreDatabaseFromFile($sqlFile, $alreadyValidated = false) {
     require_once __DIR__ . '/../backup_sql_restore.php';
 
-    if ($statements === null) {
-        $content = file_get_contents($sqlFile);
-        if (!$content) {
-            return ['success' => false, 'error' => 'Cannot read SQL file'];
-        }
-        $parsed = poznoteParseBackupSql($content);
-        unset($content);
+    // Nothing must be wiped before the whole dump is known to be a Poznote
+    // one, so an unchecked file gets its own pass first
+    if (!$alreadyValidated) {
+        $parsed = poznoteValidateBackupSqlFile($sqlFile);
         if (!$parsed['success']) {
             return ['success' => false, 'error' => 'Invalid SQL dump: ' . $parsed['error']];
         }
-        $statements = $parsed['statements'];
     }
 
     // Use the active database path from db_connect.php or determine it for the current user
@@ -483,7 +482,7 @@ function restoreDatabaseFromFile($sqlFile, $statements = null) {
         }
     }
     
-    $executed = poznoteExecuteBackupSql($dbPath, $statements);
+    $executed = poznoteExecuteBackupSqlFile($dbPath, $sqlFile);
     if (!$executed['success']) {
         return ['success' => false, 'error' => $executed['error']];
     }

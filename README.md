@@ -57,6 +57,7 @@ https://discord.gg/AWhWWSEkJ
 - [Change Settings](#change-settings)
 - [Update application](#update-application)
 - [Authentication](#authentication)
+- [App Passwords](#app-passwords)
 - [Note types](#note-types)
 - [Snapshots](#snapshots)
 - [Personalization](#personalization)
@@ -359,6 +360,7 @@ Use the `.env` file for:
 - `POZNOTE_OIDC_CLIENT_SECRET`
 - `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN`
 - Optional runtime overrides such as `POZNOTE_MCP_PORT` and `POZNOTE_DEBUG`
+- `POZNOTE_PHP_FPM_MAX_CHILDREN` to change the number of simultaneous PHP requests (default 10) on a busy instance, see the [Troubleshooting Guide](docs/TROUBLESHOOTING.md#the-app-stops-answering-under-load)
 
 Use the UI for:
 
@@ -426,7 +428,7 @@ Your data is preserved in the `./data` directory and will not be affected by the
 
 ## Authentication
 
-Poznote supports multiple authentication methods including local accounts and external identity providers.
+Poznote supports multiple authentication methods including local accounts and external identity providers. Apps and extensions that talk to the REST API use **app passwords**, a separate credential described below.
 
 <details>
 <summary><strong>Local Accounts Authentication</strong></summary>
@@ -478,6 +480,7 @@ Poznote supports OpenID Connect (authorization code + PKCE) for single sign-on i
 5. If auto-create users is enabled and no profile matches, Poznote creates one automatically. Such a profile has **no password at all**: it never went through the initial-credential handover an admin does when creating an account, so it does not answer to the default password. Sign-in goes through the provider, or an admin sets an explicit password from **Settings > Admin Tools > Users**.
 6. If `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true`, the username/password form is hidden and the login page becomes SSO-only.
 7. REST API clients can authenticate with `Authorization: Bearer <OIDC JWT>` when OIDC is enabled; Poznote validates the provider JWKS, issuer, expiration, audience, and configured access controls.
+8. Clients that cannot perform an OIDC flow at all (browser extension, mobile app, scripts) use an [app password](#app-passwords) instead, which each user creates from their own settings.
 
 #### Configuration
 
@@ -509,6 +512,40 @@ From the OIDC admin page, configure:
 - **Auto-create users:** enabled
 
 If auto-provisioning is enabled, Poznote generates a username from the OIDC claims (`preferred_username`, `nickname`, email local part, `name`, then `sub`) and stores the OIDC subject on the created profile.
+
+</details>
+
+<a id="app-passwords"></a>
+<details>
+<summary><strong>App Passwords (for apps, extensions and scripts)</strong></summary>
+<br>
+
+Apps cannot sign in through an identity provider the way a browser can. An **app password** is a separate credential you create for one client and can revoke at any time, so you never have to hand out your account password.
+
+Create one from **Settings > App passwords**: give it a name (the client that will use it), optionally an expiry, and copy the generated secret. It is shown once and never again.
+
+Then, in the client, enter **your usual username** and **the app password** where it asks for a password. Nothing else changes: it travels as ordinary HTTP Basic Auth, so every existing client works as-is.
+
+```bash
+curl -u 'username:pzn_2f7c…' https://YOUR_SERVER/api/v1/notes
+```
+
+#### What an app password can and cannot do
+
+|  | |
+|---|---|
+| ✅ Read and write the notes, folders, tags and attachments of **its own profile** | ❌ Open the web interface: it is refused at the login form |
+| ✅ Work when the instance is SSO-only, including with *Disable HTTP Basic Auth for API* enabled | ❌ Reach any `/api/v1/admin/*` endpoint, even when the account is an administrator |
+| ✅ Be given an expiry date, and be revoked at any moment | ❌ Change your password, edit or delete your account, or create further app passwords |
+| ✅ Omit the `X-User-ID` header: it is bound to the profile that created it | ❌ Act on another profile, even for an administrator |
+
+Because of those limits, a leaked app password exposes the notes of one account and nothing more, and you close the hole by revoking the row.
+
+The list in **Settings > App passwords** shows, for each one, the first characters of the secret (to tell them apart), when it was created, and when it was last used, which is what makes an unused credential easy to spot and remove. Each account can hold up to 25.
+
+> **On an SSO-only instance,** an app password is the only credential the API accepts over Basic Auth. Accounts created automatically by OIDC have no account password at all, so this is how their owners connect the browser extension, a phone, or a script.
+
+Full reference, including the endpoints that manage them: [REST API documentation](docs/API-REST.md#authentication).
 
 </details>
 
@@ -638,20 +675,37 @@ Configure it in **Settings > Appearance > UI Customization**.
 <summary><strong>Custom CSS Overrides</strong></summary>
 <br>
 
-If you want to adjust fonts, spacing, or other visual details beyond the built-in options, you can upload an extra stylesheet that is applied to every HTML page for all users.
+If you want to adjust fonts, spacing, or other visual details beyond the built-in options, you can upload extra stylesheets that are applied to every HTML page for all users.
 
-Configure it in **Settings > Appearance > Custom CSS**.
+Configure them in **Settings > Appearance > Custom CSS**.
 
 Notes:
 
 - Click **Upload CSS file** to select a `.css` file from your computer.
-- The file is uploaded and stored in `data/css/` (your Docker volume), so it survives image updates.
-- Click **Remove** to delete the file and disable the custom stylesheet.
+- Every uploaded file is kept, so you can store several themes and switch between them without uploading again.
+- The modal lists what is stored: pick the one to apply to every user, or **No custom CSS** to go back to the built-in appearance, then click **Save**.
+- Uploading a file that has the name of a stored one replaces that theme.
+- The files are stored in `data/css/` (your Docker volume), so they survive image updates.
+- Click the bin icon next to a theme to delete that file from your volume.
 - Poznote appends a cache-busting `v=` parameter automatically.
 - The stylesheet is injected near the end of `<head>`, so it can override the default application styles.
-- Only administrators can upload or remove the custom CSS file.
+- Only administrators can upload, apply or delete a custom CSS file.
 
-**Before writing any CSS**, check whether a built-in theme already does what you want: the theme button at the bottom of the icon rail offers Light, Dark, Black, Lavender, Sepia and Terminal.
+### The theme list
+
+**Settings > Theme list** says what the theme button at the bottom of the icon rail walks through: one theme per click, in the order shown.
+
+- Tick the built-in themes you want to keep, and leave out the ones nobody uses.
+- Tick a stored CSS file to offer it as a theme of its own. It gets a palette icon and the name of the file.
+- Use the arrows to set the order the button walks through.
+- A custom theme paints over a light or a dark base, which the file cannot say on its own: choose it next to the file. That is what `data-theme` is set to, so a stylesheet written for the dark mode needs **Dark** here.
+- The list is a global setting, so everyone walks through the same themes; which one is applied stays each user's own choice.
+- Whoever is on a theme you take out of the list gets the first theme of the list right away.
+- Picking a custom theme loads that file for that user only, in place of the stylesheet applied instance-wide.
+- Deleting a CSS file removes it from the list too.
+- With a single theme in the list there is nothing to walk to, so the button opens this list for an administrator, and does nothing for everyone else.
+
+**Before writing any CSS**, check whether a built-in theme already does what you want: the theme button at the bottom of the icon rail walks through Light, Dark, Black, Lavender, Sepia and Terminal.
 
 ### Examples
 
@@ -1175,6 +1229,20 @@ The **Poznote URL Saver** is a browser extension that allows you to quickly save
 
 Install the extension directly from the Chrome Web Store → [Install extension](https://chromewebstore.google.com/detail/bmjclfamahegmgillaghhmnbkjebipbh?utm_source=item-share-cb)
 
+#### Connecting it to your instance
+
+1. In Poznote, open **Settings > App passwords**, create one named after the extension, and copy the secret it shows. It is displayed once.
+2. Open the extension, then fill in:
+   - **App URL:** the address of your instance, e.g. `https://notes.example.com/`
+   - **Username:** your Poznote username
+   - **Password:** the app password you just copied
+   - **Workspace**, and optionally a **Folder**, where saved pages should land
+3. Save. The extension resolves your profile by itself and is ready to use.
+
+Your account password works here too, but an app password is the better credential for an extension: it reaches the API only, never the web interface or your account settings, it is limited to your own profile, and revoking it in Poznote cuts the extension off without changing anything else. See [App Passwords](#app-passwords) for the full list of limits.
+
+> **If your instance is SSO-only,** an app password is the only way to connect the extension: the sign-in form the extension needs does not exist for your account. Create one from **Settings > App passwords** exactly as above.
+
 ## Share to Poznote on Android
 
 On Android, Poznote appears in the system **Share** menu once the PWA is installed. Share a page from Chrome (or a link/text from any app), pick Poznote, and a new note is created with the page title and a clickable link — no extension needed.
@@ -1198,6 +1266,10 @@ For the complete API reference with all endpoints, parameters, and curl examples
 # List all notes for user ID 1
 curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes
+
+# Same, with an app password created in Settings > App passwords
+# (works on SSO-only instances; X-User-ID is implied)
+curl -u 'username:pzn_2f7c…' http://YOUR_SERVER/api/v1/notes
 
 # Create a note
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \

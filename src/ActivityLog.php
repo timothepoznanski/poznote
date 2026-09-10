@@ -45,6 +45,8 @@ const ACTIVITY_ADMIN_GRANTED      = 'admin.granted';
 const ACTIVITY_ADMIN_REVOKED      = 'admin.revoked';
 const ACTIVITY_LOGIN              = 'user.login';
 const ACTIVITY_LOGOUT             = 'user.logout';
+const ACTIVITY_APP_PASSWORD_CREATED = 'app_password.created';
+const ACTIVITY_APP_PASSWORD_REVOKED = 'app_password.revoked';
 
 /**
  * Every action the log can hold, in the order the admin filter lists them.
@@ -64,6 +66,8 @@ function activityLogActions(): array {
         ACTIVITY_ACCOUNT_DELETED,
         ACTIVITY_ACCESS_GRANTED,
         ACTIVITY_ACCESS_REVOKED,
+        ACTIVITY_APP_PASSWORD_CREATED,
+        ACTIVITY_APP_PASSWORD_REVOKED,
         ACTIVITY_WORKSPACE_CREATED,
         ACTIVITY_WORKSPACE_DELETED,
         ACTIVITY_WORKSPACE_SHARED,

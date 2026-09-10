@@ -450,6 +450,15 @@
         return !!(block && block.closest('.noteentry'));
     }
 
+    // The gutter itself is drawn by applyCodeLineNumbers() in
+    // js/syntax-highlight.js and styled by css/code-blocks.css, and both only
+    // match inside .noteentry. On a page that loads this script without one,
+    // such as public_note.php, the toggle would write data-line-numbers and
+    // change nothing on screen, so it is not offered there.
+    function canToggleLineNumbers(block) {
+        return !!(block && block.closest('.noteentry'));
+    }
+
     // Add copy button to code blocks
     function addCopyButtonToCodeBlocks() {
         // Find all code blocks
@@ -463,6 +472,7 @@
 
             var actionHost = ensureCodeBlockActionHost(block);
             var allowDelete = canDeleteCodeBlock(block);
+            var allowLineNumbers = canToggleLineNumbers(block);
             
             // Check if button already exists
             var existingBtn = findActionButton(block, actionHost, 'code-block-copy-btn');
@@ -501,32 +511,38 @@
             }
 
             // Line-numbers toggle, sitting left of the copy button
-            if (existingLineBtn) {
-                lineBtn = existingLineBtn;
-                var newLineBtn = lineBtn.cloneNode(false);
-                lineBtn.parentNode.replaceChild(newLineBtn, lineBtn);
-                lineBtn = newLineBtn;
-            } else {
-                lineBtn = document.createElement('button');
-                lineBtn.className = 'code-block-line-numbers-btn';
-                lineBtn.setAttribute('type', 'button');
-                lineBtn.setAttribute('contenteditable', 'false');
-            }
-            setLineNumbersButtonState(lineBtn, areLineNumbersVisible(block));
-
-            if (lineBtn.parentNode !== actionHost) {
-                if (lineBtn.parentNode) {
-                    lineBtn.parentNode.removeChild(lineBtn);
+            if (!allowLineNumbers) {
+                if (existingLineBtn && existingLineBtn.parentNode) {
+                    existingLineBtn.parentNode.removeChild(existingLineBtn);
                 }
-                actionHost.appendChild(lineBtn);
-            }
-
-            lineBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                toggleLineNumbers(block);
+            } else {
+                if (existingLineBtn) {
+                    lineBtn = existingLineBtn;
+                    var newLineBtn = lineBtn.cloneNode(false);
+                    lineBtn.parentNode.replaceChild(newLineBtn, lineBtn);
+                    lineBtn = newLineBtn;
+                } else {
+                    lineBtn = document.createElement('button');
+                    lineBtn.className = 'code-block-line-numbers-btn';
+                    lineBtn.setAttribute('type', 'button');
+                    lineBtn.setAttribute('contenteditable', 'false');
+                }
                 setLineNumbersButtonState(lineBtn, areLineNumbersVisible(block));
-            });
+
+                if (lineBtn.parentNode !== actionHost) {
+                    if (lineBtn.parentNode) {
+                        lineBtn.parentNode.removeChild(lineBtn);
+                    }
+                    actionHost.appendChild(lineBtn);
+                }
+
+                lineBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleLineNumbers(block);
+                    setLineNumbersButtonState(lineBtn, areLineNumbersVisible(block));
+                });
+            }
 
             if (!allowDelete) {
                 if (existingDelBtn && existingDelBtn.parentNode) {

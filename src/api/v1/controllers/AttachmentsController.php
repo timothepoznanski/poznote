@@ -274,7 +274,7 @@ class AttachmentsController {
         $validation = poznoteValidateAttachmentFile($original_name, $file['tmp_name']);
         if (!$validation['success']) {
             http_response_code(400);
-            echo json_encode(['success' => false, 'message' => $validation['error']]);
+            echo json_encode(['success' => false, 'message' => poznoteAttachmentValidationMessage($validation)]);
             return;
         }
 
@@ -404,17 +404,10 @@ class AttachmentsController {
             }
 
             if (!$isAuthenticated) {
+                // Account password or app password, same rule as the API gate.
                 $basicCredentials = getApiBasicCredentials();
-                if ($basicCredentials !== null) {
-                    require_once __DIR__ . '/../../../users/db_master.php';
-                    $loginIdentifier = $basicCredentials['username'];
-                    $authUser = ctype_digit($loginIdentifier)
-                        ? getUserProfileById((int) $loginIdentifier)
-                        : getUserProfileByUsername($loginIdentifier);
-
-                    if ($authUser && $authUser['active'] && verifyUserPassword((int)$authUser['id'], $basicCredentials['password'])) {
-                        $isAuthenticated = true;
-                    }
+                if ($basicCredentials !== null && resolveApiBasicAuthUser($basicCredentials) !== null) {
+                    $isAuthenticated = true;
                 }
             }
 

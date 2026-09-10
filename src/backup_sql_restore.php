@@ -8,7 +8,15 @@
  * master user database, or a brand new file under the web root) and escalate
  * to administrator or execute code on the server (GHSA-rmm5-6582-qcmc).
  *
- * The dump Poznote writes (generateSQLDumpForConnection in backup_zip.php)
+ * The dump of a large account weighs as much as its notes, so it is never
+ * held in memory as a whole: poznoteBackupSqlStreamStatements() reads the
+ * file in chunks and hands out one statement at a time. The restore makes two
+ * passes over it, one to check every statement before anything is wiped
+ * (poznoteValidateBackupSqlFile) and one to execute them
+ * (poznoteExecuteBackupSqlFile), which is also why the second pass checks
+ * again: the statement that runs is always one that was just checked.
+ *
+ * The dump Poznote writes (generateSQLDumpToStream in backup_zip.php)
  * only ever contains three kinds of statements: DROP TABLE, CREATE TABLE and
  * INSERT ... VALUES with literal values. The restore therefore parses the
  * file into statements, accepts nothing but those shapes (plus CREATE INDEX
@@ -18,10 +26,23 @@
  */
 
 /**
- * Parse a backup dump into the list of statements to execute.
+ * Why one statement was refused, with a short preview of it.
+ */
+function poznoteBackupSqlRejection($index, $reason, $statement) {
+    $preview = preg_replace('/\s+/', ' ', substr($statement, 0, 80));
+    if (strlen($statement) > 80) {
+        $preview .= '...';
+    }
+    return 'statement ' . $index . ' is not allowed in a Poznote backup: ' . $reason . ' ("' . $preview . '")';
+}
+
+/**
+ * Parse a backup dump held in a string into the list of statements to
+ * execute. Nothing is executed here.
  *
- * Nothing is executed here: the caller can validate a dump before touching
- * the existing database.
+ * Keeps the whole dump AND every statement in memory, so it is meant for
+ * small dumps and for tests; the restore streams the file instead, see
+ * poznoteValidateBackupSqlFile() and poznoteExecuteBackupSqlFile().
  *
  * @param string $sql Content of database/poznote_backup.sql
  * @return array ['success' => bool, 'statements' => string[], 'error' => string]
@@ -40,14 +61,10 @@ function poznoteParseBackupSql($sql) {
             continue;
         }
         if ($check !== true) {
-            $preview = preg_replace('/\s+/', ' ', substr($statement, 0, 80));
-            if (strlen($statement) > 80) {
-                $preview .= '...';
-            }
             return [
                 'success' => false,
                 'statements' => [],
-                'error' => 'statement ' . $index . ' is not allowed in a Poznote backup: ' . $check . ' ("' . $preview . '")'
+                'error' => poznoteBackupSqlRejection($index, $check, $statement)
             ];
         }
         $statements[] = $statement;
@@ -61,6 +78,97 @@ function poznoteParseBackupSql($sql) {
 }
 
 /**
+ * Check every statement of a dump FILE without executing anything and
+ * without ever holding more than one statement in memory.
+ *
+ * Called before the restore wipes anything: a dump carrying a statement a
+ * Poznote backup cannot contain must leave the existing data untouched.
+ *
+ * @param string $sqlFile Path of database/poznote_backup.sql
+ * @return array ['success' => bool, 'error' => string, 'count' => int]
+ */
+function poznoteValidateBackupSqlFile($sqlFile) {
+    $handle = @fopen($sqlFile, 'rb');
+    if ($handle === false) {
+        return ['success' => false, 'error' => 'the SQL dump cannot be read', 'count' => 0];
+    }
+
+    $seen = 0;
+    $count = 0;
+    try {
+        foreach (poznoteBackupSqlStreamStatements($handle) as $statement) {
+            $seen++;
+            $check = poznoteBackupSqlValidateStatement($statement);
+            if ($check === 'skip') {
+                continue;
+            }
+            if ($check !== true) {
+                return [
+                    'success' => false,
+                    'error' => poznoteBackupSqlRejection($seen, $check, $statement),
+                    'count' => 0
+                ];
+            }
+            $count++;
+        }
+    } finally {
+        fclose($handle);
+    }
+
+    if ($seen === 0) {
+        return ['success' => false, 'error' => 'the SQL dump is empty', 'count' => 0];
+    }
+    if ($count === 0) {
+        return ['success' => false, 'error' => 'the SQL dump contains no statement', 'count' => 0];
+    }
+
+    return ['success' => true, 'error' => '', 'count' => $count];
+}
+
+/**
+ * Execute a dump FILE into a (fresh) SQLite database, one statement at a
+ * time, without holding the dump in memory.
+ *
+ * Each statement is checked again on its way in. The file was already
+ * validated as a whole before the wipe, but re-checking here is what
+ * guarantees that what reaches the database is what passed the grammar
+ * check, whatever happened to the file in between.
+ *
+ * @param string $dbPath Path of the SQLite database to write
+ * @param string $sqlFile Path of database/poznote_backup.sql
+ * @return array ['success' => bool, 'error' => string]
+ */
+function poznoteExecuteBackupSqlFile($dbPath, $sqlFile) {
+    $handle = @fopen($sqlFile, 'rb');
+    if ($handle === false) {
+        return ['success' => false, 'error' => 'Cannot read SQL file'];
+    }
+
+    try {
+        return poznoteExecuteBackupSql($dbPath, poznoteBackupSqlStreamStatements($handle), true);
+    } finally {
+        fclose($handle);
+    }
+}
+
+/**
+ * Run one statement through the grammar check on its way to the database.
+ *
+ * @return bool true to execute it, false to skip it
+ * @throws RuntimeException when the statement is not one a dump can contain
+ */
+function poznoteAssertBackupSqlStatement($statement, $index) {
+    $check = poznoteBackupSqlValidateStatement($statement);
+    if ($check === true) {
+        return true;
+    }
+    if ($check === 'skip') {
+        return false;
+    }
+    throw new RuntimeException(poznoteBackupSqlRejection($index, $check, $statement));
+}
+
+/**
  * Execute pre-validated backup statements into a (fresh) SQLite database.
  *
  * Every statement runs inside one transaction on a connection guarded by an
@@ -68,12 +176,15 @@ function poznoteParseBackupSql($sql) {
  * attach another database, change pragmas or load an extension.
  *
  * @param string $dbPath Path of the SQLite database to write
- * @param string[] $statements Statements returned by poznoteParseBackupSql()
+ * @param iterable $statements Statements from poznoteParseBackupSql(), or the
+ *        generator of poznoteBackupSqlStreamStatements()
+ * @param bool $validateEach check each statement on its way in, for a
+ *        generator reading a file that was validated in an earlier pass
  * @return array ['success' => bool, 'error' => string]
  */
-function poznoteExecuteBackupSql($dbPath, array $statements) {
+function poznoteExecuteBackupSql($dbPath, $statements, $validateEach = false) {
     if (!class_exists('SQLite3')) {
-        return poznoteExecuteBackupSqlWithPdo($dbPath, $statements);
+        return poznoteExecuteBackupSqlWithPdo($dbPath, $statements, $validateEach);
     }
 
     $db = null;
@@ -85,7 +196,12 @@ function poznoteExecuteBackupSql($dbPath, array $statements) {
 
         $db->exec('BEGIN');
         try {
+            $index = 0;
             foreach ($statements as $statement) {
+                $index++;
+                if ($validateEach && !poznoteAssertBackupSqlStatement($statement, $index)) {
+                    continue;
+                }
                 $db->exec($statement);
             }
             $db->exec('COMMIT');
@@ -159,14 +275,19 @@ function poznoteBackupSqlAuthorizer($action, $arg1 = null, $arg2 = null, $dbName
  * removed everything but DROP/CREATE TABLE, CREATE INDEX and literal INSERTs,
  * so running the statements one by one through PDO is safe.
  */
-function poznoteExecuteBackupSqlWithPdo($dbPath, array $statements) {
+function poznoteExecuteBackupSqlWithPdo($dbPath, $statements, $validateEach = false) {
     try {
         $con = new PDO('sqlite:' . $dbPath);
         $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $con->exec('PRAGMA busy_timeout = 5000');
         $con->beginTransaction();
         try {
+            $index = 0;
             foreach ($statements as $statement) {
+                $index++;
+                if ($validateEach && !poznoteAssertBackupSqlStatement($statement, $index)) {
+                    continue;
+                }
                 $con->exec($statement);
             }
             $con->commit();
@@ -182,116 +303,197 @@ function poznoteExecuteBackupSqlWithPdo($dbPath, array $statements) {
 }
 
 /**
- * Split SQL text into statements, honouring string literals, quoted
- * identifiers and comments (a ';' inside a note's HTML must not split).
- * Comments are dropped. Returned statements are trimmed and non-empty.
+ * Yield the statements of a dump read from a stream, one at a time.
  *
- * @return string[]
+ * Splitting honours string literals, quoted identifiers and comments (a ';'
+ * inside a note's HTML must not split). Comments are dropped. Yielded
+ * statements are trimmed and non-empty.
+ *
+ * The stream is read in chunks, so what is in memory is the statement being
+ * assembled, never the dump: an INSERT carries one note, while the dump of a
+ * large account carries all of them. The remaining bound is the largest
+ * single statement, about five times its size while it is being checked
+ * (measured: 84 MB for a 16 MB note), so a 300 KB note costs a megabyte or
+ * two and the size of the account no longer enters into it, which is the
+ * whole point. A statement is only ever cut where the scanner is certain
+ * of the character's meaning, which is why the scanners below ask for more
+ * data instead of guessing at the end of a chunk.
+ *
+ * @param resource $handle Stream open for reading, at the position to start from
+ * @param int $chunkSize Bytes read at a time
+ * @return Generator<string>
  */
-function poznoteBackupSqlSplitStatements($sql) {
-    $statements = [];
-    $current = '';
-    $length = strlen($sql);
+function poznoteBackupSqlStreamStatements($handle, $chunkSize = 262144) {
+    $chunkSize = max(1, (int)$chunkSize);
+    $buf = '';
+    $len = 0;
     $pos = 0;
+    $current = '';
+    $eof = false;
 
-    while ($pos < $length) {
+    // Append the next chunk. Never moves what the buffer already holds, so
+    // the offsets the scanners below carry stay valid across a refill.
+    $refill = function () use (&$buf, &$len, &$eof, $handle, $chunkSize) {
+        if ($eof) {
+            return false;
+        }
+        $chunk = fread($handle, $chunkSize);
+        if ($chunk === false || $chunk === '') {
+            $eof = true;
+            return false;
+        }
+        $buf .= $chunk;
+        $len = strlen($buf);
+        return true;
+    };
+
+    while (true) {
+        // Drop what has been consumed, once it is worth a copy. Only correct
+        // here, between two constructs: nothing holds an offset into the
+        // buffer at this point.
+        if ($pos >= $chunkSize) {
+            $buf = substr($buf, $pos);
+            $len = strlen($buf);
+            $pos = 0;
+        }
+        if ($pos >= $len && !$refill()) {
+            break;
+        }
+
         // Jump to the next character that can change the parsing state
-        $chunkLength = strcspn($sql, "'\"`[;-/", $pos);
-        if ($chunkLength > 0) {
-            $current .= substr($sql, $pos, $chunkLength);
-            $pos += $chunkLength;
-            if ($pos >= $length) {
-                break;
+        $span = strcspn($buf, "'\"`[;-/", $pos);
+        if ($span > 0) {
+            $current .= substr($buf, $pos, $span);
+            $pos += $span;
+            continue;
+        }
+
+        $char = $buf[$pos];
+
+        if ($char === ';') {
+            $trimmed = trim($current);
+            // Released before yielding: the consumer's own work (tokenizing)
+            // must not run with two copies of the statement alive
+            $current = '';
+            if ($trimmed !== '') {
+                yield $trimmed;
             }
+            $pos++;
+            continue;
         }
 
-        $char = $sql[$pos];
-        switch ($char) {
-            case ';':
-                $trimmed = trim($current);
-                if ($trimmed !== '') {
-                    $statements[] = $trimmed;
-                }
-                $current = '';
-                $pos++;
-                break;
-
-            case "'":
-                // String literal, '' is an escaped quote
-                $end = $pos + 1;
-                while (true) {
-                    $quote = strpos($sql, "'", $end);
-                    if ($quote === false) {
-                        $end = $length;
-                        break;
-                    }
-                    if ($quote + 1 < $length && $sql[$quote + 1] === "'") {
+        if ($char === "'" || $char === '"' || $char === '`' || $char === '[') {
+            // String literal or quoted identifier. Doubling the quote escapes
+            // it, except inside [...] which has no escape.
+            $closing = ($char === '[') ? ']' : $char;
+            $doubles = ($char !== '[');
+            $end = $pos + 1;
+            while (true) {
+                $quote = strpos($buf, $closing, $end);
+                // A closing quote as the last byte read is undecided: the next
+                // chunk may start with a second one, which would escape it.
+                if ($quote !== false && (!$doubles || $quote + 1 < $len || $eof)) {
+                    if ($doubles && $quote + 1 < $len && $buf[$quote + 1] === $closing) {
                         $end = $quote + 2;
                         continue;
                     }
                     $end = $quote + 1;
                     break;
                 }
-                $current .= substr($sql, $pos, $end - $pos);
-                $pos = $end;
-                break;
-
-            case '"':
-            case '`':
-            case '[':
-                $closing = ($char === '[') ? ']' : $char;
-                $end = $pos + 1;
-                while (true) {
-                    $quote = strpos($sql, $closing, $end);
-                    if ($quote === false) {
-                        $end = $length;
-                        break;
-                    }
-                    if ($char !== '[' && $quote + 1 < $length && $sql[$quote + 1] === $closing) {
-                        $end = $quote + 2;
-                        continue;
-                    }
-                    $end = $quote + 1;
+                if ($quote === false) {
+                    $end = $len; // everything read so far is inside the literal
+                }
+                if (!$refill()) {
+                    $end = $len; // unterminated: the rest of the dump belongs to it
                     break;
                 }
-                $current .= substr($sql, $pos, $end - $pos);
-                $pos = $end;
-                break;
-
-            case '-':
-                if ($pos + 1 < $length && $sql[$pos + 1] === '-') {
-                    // Line comment: drop it
-                    $newline = strpos($sql, "\n", $pos);
-                    $pos = ($newline === false) ? $length : $newline + 1;
-                    $current .= ' ';
-                } else {
-                    $current .= $char;
-                    $pos++;
-                }
-                break;
-
-            case '/':
-                if ($pos + 1 < $length && $sql[$pos + 1] === '*') {
-                    // Block comment: drop it
-                    $close = strpos($sql, '*/', $pos + 2);
-                    $pos = ($close === false) ? $length : $close + 2;
-                    $current .= ' ';
-                } else {
-                    $current .= $char;
-                    $pos++;
-                }
-                break;
-
-            default:
-                $current .= $char;
-                $pos++;
-                break;
+            }
+            $current .= substr($buf, $pos, $end - $pos);
+            $pos = $end;
+            continue;
         }
+
+        // '-' and '/' only start a comment when followed by the right
+        // character, which may be the first byte of the next chunk
+        if ($pos + 1 >= $len && !$refill()) {
+            $current .= $char;
+            $pos++;
+            continue;
+        }
+        $next = $buf[$pos + 1];
+
+        if ($char === '-' && $next === '-') {
+            // Line comment: drop it
+            $from = $pos;
+            while (true) {
+                $newline = strpos($buf, "\n", $from);
+                if ($newline !== false) {
+                    $pos = $newline + 1;
+                    break;
+                }
+                $from = $len;
+                if (!$refill()) {
+                    $pos = $len;
+                    break;
+                }
+            }
+            $current .= ' ';
+            continue;
+        }
+
+        if ($char === '/' && $next === '*') {
+            // Block comment: drop it
+            $from = $pos + 2;
+            while (true) {
+                $close = strpos($buf, '*/', $from);
+                if ($close !== false) {
+                    $pos = $close + 2;
+                    break;
+                }
+                // A '*' as the last byte read could still open the '*/'
+                $from = max($from, $len - 1);
+                if (!$refill()) {
+                    $pos = $len;
+                    break;
+                }
+            }
+            $current .= ' ';
+            continue;
+        }
+
+        $current .= $char;
+        $pos++;
     }
 
     $trimmed = trim($current);
     if ($trimmed !== '') {
-        $statements[] = $trimmed;
+        yield $trimmed;
+    }
+}
+
+/**
+ * Split SQL text held in a string into statements. Same rules as
+ * poznoteBackupSqlStreamStatements(), which does the work.
+ *
+ * @return string[]
+ */
+function poznoteBackupSqlSplitStatements($sql) {
+    // php://temp spills to disk past a couple of megabytes, so splitting a
+    // large dump this way costs disk rather than a second copy in memory
+    $handle = fopen('php://temp', 'r+b');
+    if ($handle === false) {
+        return [];
+    }
+    fwrite($handle, (string)$sql);
+    rewind($handle);
+
+    $statements = [];
+    try {
+        foreach (poznoteBackupSqlStreamStatements($handle) as $statement) {
+            $statements[] = $statement;
+        }
+    } finally {
+        fclose($handle);
     }
 
     return $statements;
