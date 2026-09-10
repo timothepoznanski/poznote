@@ -3566,6 +3566,25 @@
                 applyActiveSection();
             };
 
+            // The Version card lives in the About section, so its update badge
+            // is out of sight while another section is shown: the About entry
+            // carries one too, to say which section to open. It mirrors the
+            // card badge because the nav is built after utils-updates.js may
+            // already have revealed the badges, and js/utils-updates.js
+            // reveals or hides every .update-badge on later checks.
+            var buildNavBadge = function () {
+                var cardBadge = document.querySelector('#check-updates-card .update-badge');
+                if (!cardBadge) return null;
+                var badge = document.createElement('span');
+                badge.className = 'update-badge update-badge-inline';
+                if (cardBadge.classList.contains('update-badge-hidden')) {
+                    badge.classList.add('update-badge-hidden');
+                } else {
+                    badge.style.display = 'inline-block';
+                }
+                return badge;
+            };
+
             var buildNavItem = function (key, labelText) {
                 var item = document.createElement('button');
                 item.type = 'button';
@@ -3578,6 +3597,10 @@
                 label.textContent = labelText;
                 item.appendChild(icon);
                 item.appendChild(label);
+                if (key === 'settings-documentation-section-grid') {
+                    var navBadge = buildNavBadge();
+                    if (navBadge) item.appendChild(navBadge);
+                }
                 item.addEventListener('click', function () {
                     // Picking a section replaces the filter: its rows are
                     // what was asked for.

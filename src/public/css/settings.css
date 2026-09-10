@@ -27,6 +27,19 @@
     display: none !important;
 }
 
+/* The About entry, in the desktop section list and on the collapsed section
+   header below 801px: no icon box to sit on, so the dot follows the label
+   instead of floating over it. */
+.update-badge-inline {
+    position: static;
+    width: 8px;
+    height: 8px;
+    margin-left: 6px;
+    flex-shrink: 0;
+    align-self: center;
+    animation: none;
+}
+
 @keyframes pulse {
     0% { transform: scale(1); }
 
@@ -615,6 +628,12 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
     .home-container.settings-with-nav:not(.settings-filtering) .settings-category-title:not(.settings-section-active),
     .home-container.settings-with-nav:not(.settings-filtering) .home-grid:not(.settings-section-active) {
         display: none;
+    }
+
+    /* The section list carries the update dot here, and the title of the
+       section already open does not need to repeat it. */
+    .settings-with-nav .settings-category-title .update-badge {
+        display: none !important;
     }
 
     /* One section at a time, so the titles neither collapse nor look

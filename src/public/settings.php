@@ -1224,7 +1224,7 @@ if ($canUseUserWebhooks) {
 
         <!-- ABOUT CATEGORY (grid id kept as -documentation- so saved collapse
              state and pinned cards survive the rename) -->
-        <h2 class="settings-category-title" id="settings-documentation-section-title"><?php echo t_h('settings.categories.documentation', [], 'About'); ?></h2>
+        <h2 class="settings-category-title" id="settings-documentation-section-title"><?php echo t_h('settings.categories.documentation', [], 'About'); ?><span class="update-badge update-badge-inline update-badge-hidden"></span></h2>
         <div class="home-grid" id="settings-documentation-section-grid">
 
             <!-- Version: the former "Check for Updates" card of the Actions
