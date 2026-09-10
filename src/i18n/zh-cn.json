@@ -2413,7 +2413,12 @@
       "workspaces_body": "您的备份已恢复。要打开哪个工作区？",
       "workspaces_close": "关闭",
       "stage_downloading": "正在从存储桶获取存档...",
-      "queued_uploaded": "上传完成，恢复即将开始..."
+      "queued_uploaded": "上传完成，恢复即将开始...",
+      "cancel_upload": "取消此次上传",
+      "foreign_upload": "另一个标签页或窗口中已有上传正在进行（已发送 {{done}}/{{total}} 个分片）。",
+      "upload_interrupted": "上一次上传在完成 {{total}} 个分片中的 {{done}} 个后被中断，未恢复任何内容。您可以重新开始恢复。",
+      "upload_cancelled": "待处理的上传已取消。您可以重新开始恢复。",
+      "worker_lost": "恢复在完成前已停止。请检查服务器日志，然后重新开始。"
     },
     "chunked_import": {
       "queued": "导入即将开始...",
@@ -2424,7 +2429,9 @@
       "stage_notes": "正在导入笔记...（{{done}}/{{total}}）",
       "stage_notes_simple": "正在导入笔记...",
       "done": "导入成功完成。",
-      "error": "导入失败：{{error}}"
+      "error": "导入失败：{{error}}",
+      "upload_interrupted": "上一次上传在完成 {{total}} 个分片中的 {{done}} 个后被中断，未导入任何内容。您可以重新开始导入。",
+      "worker_lost": "导入在完成前已停止。请检查服务器日志，然后重新开始。"
     }
   },
   "markdown_guide": {

@@ -2415,7 +2415,12 @@
       "workspaces_body": "A sua cópia de segurança foi restaurada. Que espaço de trabalho quer abrir?",
       "workspaces_close": "Fechar",
       "stage_downloading": "A obter o arquivo do bucket...",
-      "queued_uploaded": "Envio concluído, a iniciar o restauro..."
+      "queued_uploaded": "Envio concluído, a iniciar o restauro...",
+      "cancel_upload": "Cancelar este envio",
+      "foreign_upload": "Já existe um envio em curso noutro separador ou janela ({{done}}/{{total}} fragmentos enviados).",
+      "upload_interrupted": "O envio anterior foi interrompido após {{done}} de {{total}} fragmentos, nada foi restaurado. Pode iniciar a restauração novamente.",
+      "upload_cancelled": "O envio pendente foi cancelado. Pode iniciar a restauração novamente.",
+      "worker_lost": "A restauração parou antes de terminar. Consulte os registos do servidor e inicie-a novamente."
     },
     "chunked_import": {
       "queued": "A iniciar a importação...",
@@ -2426,7 +2431,9 @@
       "stage_notes": "A importar as notas... ({{done}}/{{total}})",
       "stage_notes_simple": "A importar as notas...",
       "done": "Importação concluída com sucesso.",
-      "error": "A importação falhou: {{error}}"
+      "error": "A importação falhou: {{error}}",
+      "upload_interrupted": "O envio anterior foi interrompido após {{done}} de {{total}} fragmentos, nada foi importado. Pode iniciar a importação novamente.",
+      "worker_lost": "A importação parou antes de terminar. Consulte os registos do servidor e inicie-a novamente."
     }
   },
   "markdown_guide": {

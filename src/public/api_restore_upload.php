@@ -107,6 +107,26 @@ function restoreUploadFail(int $code, string $error): void {
 }
 
 /**
+ * Public job state plus the liveness flag the page needs to tell a live
+ * transfer from an abandoned one: an 'uploading' job is only progressing
+ * while some page keeps posting slices, and that page may be gone (closed
+ * tab, dropped connection). Without this the page would show a progress bar
+ * that never moves again.
+ */
+function restoreUploadState(int $userId, array $job): array {
+    $state = poznoteJobPublicState($job);
+    $status = (string)($job['status'] ?? '');
+    if ($status === 'uploading') {
+        $state['stale'] = poznoteJobIsUploadStale($userId, $job);
+    } elseif ($status === 'queued' || $status === 'running') {
+        $state['stale'] = poznoteJobIsWorkerStale($userId, $job);
+    } else {
+        $state['stale'] = false;
+    }
+    return $state;
+}
+
+/**
  * The user's active restore-family job (complete restore OR notes import),
  * whatever type the caller wants to start: both flows rewrite the account's
  * data, so they must never run concurrently, even across types. Stale jobs
@@ -137,14 +157,27 @@ function restoreFamilyActiveJob(int $userId): ?array {
     return null;
 }
 
-/** 409 with a message naming what is already running. */
-function restoreFamilyRefuseBusy(array $active): void {
+/**
+ * 409 naming what is already running, with that job's state attached: the
+ * page adopts it and shows its progress bar instead of a dead end, the same
+ * way a reloaded page picks a running job back up.
+ */
+function restoreFamilyRefuseBusy(int $userId, array $active): void {
     if (($active['status'] ?? '') === 'uploading') {
-        restoreUploadFail(409, 'An upload for this account is already in progress in another tab or window. Finish or cancel it before starting a new one.');
+        $error = 'An upload for this account is already in progress in another tab or window. Finish or cancel it before starting a new one.';
+    } elseif (($active['type'] ?? '') === POZNOTE_JOB_TYPE_NOTES_IMPORT) {
+        $error = 'An import is already running for this account. Wait for it to finish before starting a new one.';
+    } else {
+        $error = 'A restore is already running for this account. Wait for it to finish before starting a new one.';
     }
-    restoreUploadFail(409, ($active['type'] ?? '') === POZNOTE_JOB_TYPE_NOTES_IMPORT
-        ? 'An import is already running for this account. Wait for it to finish before starting a new one.'
-        : 'A restore is already running for this account. Wait for it to finish before starting a new one.');
+    http_response_code(409);
+    echo json_encode([
+        'success' => false,
+        'error' => $error,
+        'busy' => true,
+        'job' => restoreUploadState($userId, $active),
+    ]);
+    exit;
 }
 
 switch ($action) {
@@ -153,7 +186,7 @@ switch ($action) {
 
         $active = restoreFamilyActiveJob($currentUserId);
         if ($active !== null) {
-            restoreFamilyRefuseBusy($active);
+            restoreFamilyRefuseBusy($currentUserId, $active);
         }
 
         $filename = (string)($_POST['filename'] ?? '');
@@ -275,7 +308,7 @@ switch ($action) {
         $job = poznoteJobUpdate($currentUserId, (string)$job['id'], ['status' => 'queued']);
         poznoteJobSpawnRunner($currentUserId, (string)$job['id']);
 
-        echo json_encode(['success' => true, 'job' => poznoteJobPublicState($job)]);
+        echo json_encode(['success' => true, 'job' => restoreUploadState($currentUserId, $job)]);
         exit;
     }
 
@@ -309,7 +342,7 @@ switch ($action) {
         poznoteJobCleanup($currentUserId);
         $active = restoreFamilyActiveJob($currentUserId);
         if ($active !== null) {
-            restoreFamilyRefuseBusy($active);
+            restoreFamilyRefuseBusy($currentUserId, $active);
         }
 
         try {
@@ -322,19 +355,22 @@ switch ($action) {
             restoreUploadFail(500, $e->getMessage());
         }
 
-        echo json_encode(['success' => true, 'job' => poznoteJobPublicState($job)]);
+        echo json_encode(['success' => true, 'job' => restoreUploadState($currentUserId, $job)]);
         exit;
     }
 
     case 'status': {
         $job = restoreUploadJob($currentUserId);
-        if ($job === null) {
+        if ($job === null && ($_GET['upload_id'] ?? $_POST['upload_id'] ?? '') === '') {
             // No id given: report the newest job of the requested type, so a
             // reloaded page can pick a running restore or import back up.
+            // An id that no longer exists (the job was cancelled or cleaned
+            // up) reports nothing instead, or the poller would latch onto an
+            // unrelated older job and replay its outcome.
             $jobs = poznoteJobList($currentUserId, $requestedJobType);
             $job = $jobs[0] ?? null;
         }
-        echo json_encode(['success' => true, 'job' => $job !== null ? poznoteJobPublicState($job) : null]);
+        echo json_encode(['success' => true, 'job' => $job !== null ? restoreUploadState($currentUserId, $job) : null]);
         exit;
     }
 

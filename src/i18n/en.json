@@ -2091,7 +2091,12 @@
       "workspaces_body": "Your backup has been restored. Which workspace do you want to open?",
       "workspaces_close": "Close",
       "stage_downloading": "Fetching the archive from the bucket...",
-      "queued_uploaded": "Upload complete, restore starting..."
+      "queued_uploaded": "Upload complete, restore starting...",
+      "cancel_upload": "Cancel this upload",
+      "foreign_upload": "An upload is already in progress in another tab or window ({{done}}/{{total}} slices sent).",
+      "upload_interrupted": "The previous upload was interrupted after {{done}} of {{total}} slices, so nothing was restored. You can start the restore again.",
+      "upload_cancelled": "The pending upload was cancelled. You can start the restore again.",
+      "worker_lost": "The restore stopped before it finished. Check the server logs, then start it again."
     },
     "chunked_import": {
       "queued": "Import starting...",
@@ -2102,7 +2107,9 @@
       "stage_notes": "Importing the notes... ({{done}}/{{total}})",
       "stage_notes_simple": "Importing the notes...",
       "done": "Import completed successfully.",
-      "error": "The import failed: {{error}}"
+      "error": "The import failed: {{error}}",
+      "upload_interrupted": "The previous upload was interrupted after {{done}} of {{total}} slices, so nothing was imported. You can start the import again.",
+      "worker_lost": "The import stopped before it finished. Check the server logs, then start it again."
     }
   },
   "markdown_guide": {

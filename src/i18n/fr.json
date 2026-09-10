@@ -2502,7 +2502,12 @@
       "workspaces_body": "Votre sauvegarde a été restaurée. Quel espace de travail voulez-vous ouvrir ?",
       "workspaces_close": "Fermer",
       "stage_downloading": "Récupération de l'archive depuis le bucket...",
-      "queued_uploaded": "Envoi terminé, démarrage de la restauration..."
+      "queued_uploaded": "Envoi terminé, démarrage de la restauration...",
+      "cancel_upload": "Annuler cet envoi",
+      "foreign_upload": "Un envoi est déjà en cours dans un autre onglet ou une autre fenêtre ({{done}}/{{total}} tranches envoyées).",
+      "upload_interrupted": "L'envoi précédent a été interrompu après {{done}} tranches sur {{total}}, rien n'a été restauré. Vous pouvez relancer la restauration.",
+      "upload_cancelled": "L'envoi en attente a été annulé. Vous pouvez relancer la restauration.",
+      "worker_lost": "La restauration s'est arrêtée avant la fin. Consultez les journaux du serveur, puis relancez-la."
     },
     "chunked_import": {
       "queued": "Démarrage de l'import...",
@@ -2513,7 +2518,9 @@
       "stage_notes": "Import des notes... ({{done}}/{{total}})",
       "stage_notes_simple": "Import des notes...",
       "done": "Import terminé avec succès.",
-      "error": "L'import a échoué : {{error}}"
+      "error": "L'import a échoué : {{error}}",
+      "upload_interrupted": "L'envoi précédent a été interrompu après {{done}} tranches sur {{total}}, rien n'a été importé. Vous pouvez relancer l'import.",
+      "worker_lost": "L'import s'est arrêté avant la fin. Consultez les journaux du serveur, puis relancez-le."
     }
   },
   "markdown_guide": {
