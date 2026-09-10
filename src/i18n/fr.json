@@ -436,6 +436,7 @@
       "password_note_no_local": "Votre mot de passe est géré par votre fournisseur d'identité.",
       "change_password_sso_only": "Cette instance utilise uniquement le SSO, donc un mot de passe local ne serait jamais accepté à la connexion. Les changements de mot de passe sont désactivés.",
       "change_password_no_local": "Votre compte se connecte via votre fournisseur d'identité et n'a pas de mot de passe local, il n'y a donc aucun mot de passe actuel pour confirmer un changement. Un administrateur peut vous en définir un depuis Outils d'administration > Utilisateurs.",
+      "app_passwords": "Créez des mots de passe pour les applications et extensions qui se connectent via l'API, comme l'extension de navigateur. Ils fonctionnent même si vous vous connectez via SSO, ne permettent ni d'ouvrir l'interface web ni de modifier votre compte, et peuvent être révoqués à tout moment.",
       "git_sync": "Sauvegardez vos notes dans un dépôt Git et consultez l'historique de synchronisation.",
       "extension": "Installez l'extension de navigateur pour enregistrer des pages web dans Poznote.",
       "install_app": "Installez Poznote comme application sur votre appareil (PWA).",
@@ -570,6 +571,7 @@
       "activity_log": "Journal d'activité",
       "storage_stats_user": "Statistiques de stockage utilisateur",
       "change_password": "Changer le mot de passe",
+      "app_passwords": "Mots de passe d'application",
       "delete_account": "Supprimer le compte",
       "import_limits": "Limites d'import",
       "user_quotas": "Quotas utilisateurs",
@@ -3632,6 +3634,8 @@
       "account_deleted": "Compte supprimé",
       "access_granted": "Accès au compte accordé",
       "access_revoked": "Accès au compte révoqué",
+      "app_password_created": "Mot de passe d'application créé",
+      "app_password_revoked": "Mot de passe d'application révoqué",
       "workspace_created": "Espace de travail créé",
       "workspace_deleted": "Espace de travail supprimé",
       "workspace_shared": "Espace de travail partagé",
@@ -3662,7 +3666,8 @@
       "accounts": "comptes : {{accounts}}",
       "empty_value": "vide",
       "s3_objects_deleted": "{{count}} objets S3 supprimés",
-      "s3_cleanup_failed": "échec du nettoyage S3"
+      "s3_cleanup_failed": "échec du nettoyage S3",
+      "expires_at": "expire le {{date}}"
     },
     "destinations": {
       "download": "téléchargement",
@@ -3770,6 +3775,44 @@
     },
     "success": "Mot de passe modifié avec succès."
   },
+  "app_passwords": {
+    "status": {
+      "none": "Aucun",
+      "count_one": "1 actif",
+      "count_other": "{{count}} actifs"
+    },
+    "modal": {
+      "title": "Mots de passe d'application",
+      "description": "Un mot de passe d'application permet à une application ou une extension d'utiliser l'API avec votre nom d'utilisateur, à la place du mot de passe de votre compte, même si vous vous connectez via SSO. Il ne permet ni d'ouvrir l'interface web, ni d'accéder à l'administration, ni de modifier votre compte, et vous pouvez le révoquer à tout moment.",
+      "label_placeholder": "Nom, par ex. Extension Chrome",
+      "expiry_label": "Expiration",
+      "expiry_never": "N'expire jamais",
+      "expiry_30": "30 jours",
+      "expiry_90": "90 jours",
+      "expiry_365": "1 an",
+      "create": "Créer",
+      "close": "Fermer",
+      "empty": "Aucun mot de passe d'application pour le moment.",
+      "secret_title": "Mot de passe d'application « {{label}} »",
+      "secret_notice": "Copiez-le maintenant : il ne sera plus affiché.",
+      "usage_hint": "Dans l'application, saisissez votre nom d'utilisateur et cette valeur comme mot de passe.",
+      "copy": "Copier",
+      "copied": "Copié",
+      "created": "Créé le {{date}}",
+      "last_used": "Dernière utilisation le {{date}}",
+      "never_used": "Jamais utilisé",
+      "expires": "Expire le {{date}}",
+      "expired": "Expiré",
+      "revoke": "Révoquer",
+      "confirm_revoke": "Confirmer"
+    },
+    "errors": {
+      "label_required": "Donnez un nom au mot de passe d'application.",
+      "limit_reached": "Limite atteinte : révoquez un mot de passe d'application avant d'en créer un autre.",
+      "load_failed": "Impossible de charger vos mots de passe d'application.",
+      "generic": "Une erreur est survenue. Réessayez."
+    }
+  },
   "delete_account": {
     "modal": {
       "title": "Supprimer le compte",
@@ -3845,7 +3888,7 @@
       "sso_only_admin_password": "Vous pouvez passer cette instance en SSO uniquement en définissant POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true dans le fichier .env.",
       "sso_only_admin_password_warning": "Avant de l'activer, assurez-vous qu'au moins un compte administrateur possède un mot de passe explicite (Réglages > Utilisateurs).",
       "sso_only_admin_password_recovery": "Si le fournisseur d'identité devient indisponible, la récupération consiste à repasser l'option à false puis à se connecter avec ce mot de passe.",
-      "disable_basic_auth": "Lorsqu'activé, les requêtes API avec HTTP Basic Auth seront rejetées (403)"
+      "disable_basic_auth": "Si activé, les requêtes API authentifiées avec un mot de passe de compte via HTTP Basic Auth sont rejetées (403). Les mots de passe d'application créés par les utilisateurs dans leurs paramètres continuent de fonctionner."
     },
     "actions": {
       "copy_all": "Tout copier",

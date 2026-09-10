@@ -425,6 +425,7 @@
       "password_note_no_local": "Tu contraseña la gestiona tu proveedor de identidad.",
       "change_password_sso_only": "Esta instancia solo usa SSO, por lo que nunca se aceptaría una contraseña local al iniciar sesión. Los cambios de contraseña están desactivados.",
       "change_password_no_local": "Tu cuenta inicia sesión mediante tu proveedor de identidad y no tiene contraseña local, por lo que no hay contraseña actual con la que confirmar un cambio. Un administrador puede establecer una desde Herramientas de administración > Usuarios.",
+      "app_passwords": "Crea contraseñas para aplicaciones y extensiones que se conectan a través de la API, como la extensión del navegador. Funcionan aunque inicies sesión con SSO, no permiten abrir la interfaz web ni modificar tu cuenta, y se pueden revocar en cualquier momento.",
       "git_sync": "Respalda tus notas en un repositorio Git y consulta el historial de sincronización.",
       "extension": "Instala la extensión del navegador para guardar páginas web en Poznote.",
       "install_app": "Instala Poznote como aplicación en tu dispositivo (PWA).",
@@ -559,6 +560,7 @@
       "storage_stats_user": "Estadísticas de almacenamiento del usuario",
       "user_management": "Gestión de usuarios",
       "change_password": "Cambiar contraseña",
+      "app_passwords": "Contraseñas de aplicación",
       "delete_account": "Eliminar cuenta",
       "import_limits": "Límites de importación",
       "user_quotas": "Cuotas de usuario",
@@ -3407,6 +3409,8 @@
       "account_deleted": "Cuenta eliminada",
       "access_granted": "Acceso a la cuenta concedido",
       "access_revoked": "Acceso a la cuenta revocado",
+      "app_password_created": "Contraseña de aplicación creada",
+      "app_password_revoked": "Contraseña de aplicación revocada",
       "workspace_created": "Espacio de trabajo creado",
       "workspace_deleted": "Espacio de trabajo eliminado",
       "workspace_shared": "Espacio de trabajo compartido",
@@ -3437,7 +3441,8 @@
       "accounts": "cuentas: {{accounts}}",
       "empty_value": "vacío",
       "s3_objects_deleted": "{{count}} objetos S3 eliminados",
-      "s3_cleanup_failed": "falló la limpieza de S3"
+      "s3_cleanup_failed": "falló la limpieza de S3",
+      "expires_at": "caduca el {{date}}"
     },
     "destinations": {
       "download": "descarga",
@@ -3545,6 +3550,44 @@
     },
     "success": "Contraseña cambiada con éxito."
   },
+  "app_passwords": {
+    "status": {
+      "none": "Ninguna",
+      "count_one": "1 activa",
+      "count_other": "{{count}} activas"
+    },
+    "modal": {
+      "title": "Contraseñas de aplicación",
+      "description": "Una contraseña de aplicación permite a una aplicación o extensión usar la API con tu nombre de usuario, en lugar de la contraseña de tu cuenta, incluso si inicias sesión con SSO. No permite abrir la interfaz web, acceder a la administración ni modificar tu cuenta, y puedes revocarla en cualquier momento.",
+      "label_placeholder": "Nombre, p. ej. Extensión de Chrome",
+      "expiry_label": "Caducidad",
+      "expiry_never": "No caduca",
+      "expiry_30": "30 días",
+      "expiry_90": "90 días",
+      "expiry_365": "1 año",
+      "create": "Crear",
+      "close": "Cerrar",
+      "empty": "Todavía no hay ninguna contraseña de aplicación.",
+      "secret_title": "Contraseña de aplicación «{{label}}»",
+      "secret_notice": "Cópiala ahora: no se volverá a mostrar.",
+      "usage_hint": "En la aplicación, introduce tu nombre de usuario y este valor como contraseña.",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "created": "Creada el {{date}}",
+      "last_used": "Último uso el {{date}}",
+      "never_used": "Nunca usada",
+      "expires": "Caduca el {{date}}",
+      "expired": "Caducada",
+      "revoke": "Revocar",
+      "confirm_revoke": "Confirmar"
+    },
+    "errors": {
+      "label_required": "Pon un nombre a la contraseña de aplicación.",
+      "limit_reached": "Límite alcanzado: revoca una contraseña de aplicación antes de crear otra.",
+      "load_failed": "No se pudieron cargar tus contraseñas de aplicación.",
+      "generic": "Algo salió mal. Inténtalo de nuevo."
+    }
+  },
   "delete_account": {
     "modal": {
       "title": "Eliminar cuenta",
@@ -3620,7 +3663,7 @@
       "sso_only_admin_password": "Puede poner esta instancia en modo solo SSO estableciendo POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true en el archivo .env.",
       "sso_only_admin_password_warning": "Antes de activarlo, asegúrese de que al menos una cuenta de administrador tenga una contraseña explícita (Ajustes > Usuarios).",
       "sso_only_admin_password_recovery": "Si el proveedor de identidad deja de estar disponible, la recuperación consiste en volver a poner la opción en false e iniciar sesión con esa contraseña.",
-      "disable_basic_auth": "Si está activado, las solicitudes API con HTTP Basic Auth se rechazarán (403)"
+      "disable_basic_auth": "Si está activado, las peticiones a la API autenticadas con una contraseña de cuenta mediante HTTP Basic Auth se rechazan (403). Las contraseñas de aplicación creadas por los usuarios en sus ajustes siguen funcionando."
     },
     "actions": {
       "copy_all": "Copiar todo",

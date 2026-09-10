@@ -423,6 +423,7 @@
       "password_note_no_local": "Sua senha e gerenciada pelo seu provedor de identidade.",
       "change_password_sso_only": "Esta instancia usa apenas SSO, portanto uma senha local nunca seria aceita no login. As alteracoes de senha estao desativadas.",
       "change_password_no_local": "Sua conta faz login pelo seu provedor de identidade e nao tem senha local, portanto nao ha senha atual para confirmar uma alteracao. Um administrador pode definir uma em Ferramentas de administracao > Usuarios.",
+      "app_passwords": "Crie senhas para aplicativos e extensões que se conectam pela API, como a extensão do navegador. Elas funcionam mesmo quando você entra por SSO, não permitem abrir a interface web nem alterar sua conta, e podem ser revogadas a qualquer momento.",
       "git_sync": "Faça backup das suas notas em um repositório Git e veja o histórico de sincronização.",
       "extension": "Instale a extensão do navegador para salvar páginas web no Poznote.",
       "install_app": "Instale o Poznote como aplicativo no seu dispositivo (PWA).",
@@ -557,6 +558,7 @@
       "storage_stats_user": "Estatísticas de armazenamento do usuário",
       "user_management": "Gestão de utilizadores",
       "change_password": "Mudar palavra-passe",
+      "app_passwords": "Senhas de aplicativo",
       "delete_account": "Eliminar conta",
       "import_limits": "Limites de importação",
       "user_quotas": "Cotas de usuário",
@@ -3410,6 +3412,8 @@
       "account_deleted": "Conta eliminada",
       "access_granted": "Acesso à conta concedido",
       "access_revoked": "Acesso à conta revogado",
+      "app_password_created": "Senha de aplicativo criada",
+      "app_password_revoked": "Senha de aplicativo revogada",
       "workspace_created": "Área de trabalho criada",
       "workspace_deleted": "Área de trabalho eliminada",
       "workspace_shared": "Área de trabalho partilhada",
@@ -3440,7 +3444,8 @@
       "accounts": "contas: {{accounts}}",
       "empty_value": "vazio",
       "s3_objects_deleted": "{{count}} objetos S3 eliminados",
-      "s3_cleanup_failed": "falha na limpeza do S3"
+      "s3_cleanup_failed": "falha na limpeza do S3",
+      "expires_at": "expira em {{date}}"
     },
     "destinations": {
       "download": "transferência",
@@ -3548,6 +3553,44 @@
     },
     "success": "Palavra-passe alterada com sucesso."
   },
+  "app_passwords": {
+    "status": {
+      "none": "Nenhuma",
+      "count_one": "1 ativa",
+      "count_other": "{{count}} ativas"
+    },
+    "modal": {
+      "title": "Senhas de aplicativo",
+      "description": "Uma senha de aplicativo permite que um aplicativo ou extensão use a API com seu nome de usuário, no lugar da senha da sua conta, mesmo quando você entra por SSO. Ela não permite abrir a interface web, acessar a administração nem alterar sua conta, e você pode revogá-la a qualquer momento.",
+      "label_placeholder": "Nome, ex.: Extensão do Chrome",
+      "expiry_label": "Validade",
+      "expiry_never": "Nunca expira",
+      "expiry_30": "30 dias",
+      "expiry_90": "90 dias",
+      "expiry_365": "1 ano",
+      "create": "Criar",
+      "close": "Fechar",
+      "empty": "Nenhuma senha de aplicativo ainda.",
+      "secret_title": "Senha de aplicativo \"{{label}}\"",
+      "secret_notice": "Copie agora: ela não será exibida novamente.",
+      "usage_hint": "No aplicativo, informe seu nome de usuário e este valor como senha.",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "created": "Criada em {{date}}",
+      "last_used": "Último uso em {{date}}",
+      "never_used": "Nunca usada",
+      "expires": "Expira em {{date}}",
+      "expired": "Expirada",
+      "revoke": "Revogar",
+      "confirm_revoke": "Confirmar"
+    },
+    "errors": {
+      "label_required": "Dê um nome à senha de aplicativo.",
+      "limit_reached": "Limite atingido: revogue uma senha de aplicativo antes de criar outra.",
+      "load_failed": "Não foi possível carregar suas senhas de aplicativo.",
+      "generic": "Algo deu errado. Tente novamente."
+    }
+  },
   "delete_account": {
     "modal": {
       "title": "Eliminar conta",
@@ -3623,7 +3666,7 @@
       "sso_only_admin_password": "Pode colocar esta instância em modo apenas SSO definindo POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true no ficheiro .env.",
       "sso_only_admin_password_warning": "Antes de o ativar, certifique-se de que pelo menos uma conta de administrador tem uma palavra-passe explícita (Definições > Utilizadores).",
       "sso_only_admin_password_recovery": "Se o fornecedor de identidade ficar indisponível, a recuperação consiste em voltar a colocar a opção em false e iniciar sessão com essa palavra-passe.",
-      "disable_basic_auth": "Quando ativado, os pedidos API com HTTP Basic Auth serão rejeitados (403)"
+      "disable_basic_auth": "Quando ativado, as requisições à API autenticadas com uma senha de conta via HTTP Basic Auth são rejeitadas (403). As senhas de aplicativo criadas pelos usuários em suas configurações continuam funcionando."
     },
     "actions": {
       "copy_all": "Copiar tudo",

@@ -963,6 +963,20 @@ $router->delete('/users/me', function($params) use ($usersController) {
     echo json_encode($usersController->deleteMe());
 });
 
+// App passwords: per-client API credentials that work where the account
+// password does not (SSO-only instances), see src/lib/app-passwords.php
+$router->get('/users/me/app-passwords', function($params) use ($usersController) {
+    echo json_encode($usersController->listAppPasswords());
+});
+
+$router->post('/users/me/app-passwords', function($params) use ($usersController) {
+    echo json_encode($usersController->createAppPassword());
+});
+
+$router->delete('/users/me/app-passwords/{id}', function($params) use ($usersController) {
+    echo json_encode($usersController->revokeAppPassword($params['id']));
+});
+
 // Get user ID by username (admin only, used by backup scripts)
 $router->get('/users/lookup/{username}', function($params) use ($usersController) {
     echo json_encode($usersController->lookup($params['username']));

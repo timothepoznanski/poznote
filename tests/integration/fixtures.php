@@ -142,6 +142,14 @@ final class Fixtures
             'json' => ['value' => 'Georgia'],
         ]), [200], 'write setting');
 
+        // An app password, so DELETE /users/me/app-passwords/{id} has a real
+        // target. The marker in its label is what the leak check looks for
+        // when the stranger lists their own.
+        $appPassword = $this->expect($api->post('/users/me/app-passwords', [
+            'json' => ['label' => 'app-' . $marker],
+        ]), [201], 'create app password');
+        $appPasswordId = (string)($appPassword->json['app_password']['id'] ?? '');
+
         // A trashed note, so DELETE /trash/{id} has a real target.
         $trashed = $this->expect($api->post('/notes', ['json' => [
             'heading' => 'trash-' . $marker,
@@ -183,6 +191,7 @@ final class Fixtures
             'folder_share_token' => self::tokenFromUrl((string)($folderShare->json['url'] ?? '')),
             'snapshot' => (string)($snapshot->json['snapshot_key'] ?? ''),
             'setting' => 'note_font_family',
+            'app_password' => $appPasswordId,
         ];
     }
 
@@ -190,7 +199,15 @@ final class Fixtures
     public function cleanup(): void
     {
         foreach (array_reverse($this->created) as $id) {
-            $this->admin->request('DELETE', "/admin/users/$id");
+            $response = $this->admin->request('DELETE', "/admin/users/$id");
+            // Say so rather than leave a throwaway account behind unnoticed.
+            // The usual cause is the login rate limiter: the suite fires
+            // deliberately wrong credentials, and the per-IP backstop can
+            // reach its hard block before the cleanup runs.
+            if ($response->status !== 200) {
+                fwrite(STDERR, "cleanup: could not delete account #$id -> " . $response->summary()
+                    . "\n  remove it by hand: docker exec <webserver> php -r 'require \"/var/www/html/users/db_master.php\"; deleteUserProfile($id, true);'\n");
+            }
         }
         $this->created = [];
     }

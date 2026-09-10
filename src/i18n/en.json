@@ -133,6 +133,7 @@
       "password_note_no_local": "Your password is managed by your identity provider.",
       "change_password_sso_only": "This instance uses SSO only, so a local password would never be accepted at sign-in. Password changes are disabled.",
       "change_password_no_local": "Your account signs in through your identity provider and has no local password, so there is no current password to confirm a change with. An administrator can set one for you from Admin Tools > Users.",
+      "app_passwords": "Create passwords for apps and extensions that connect through the API, such as the browser extension. They work even when you sign in through SSO, cannot open the web interface or change your account, and can be revoked at any time.",
       "git_sync": "Back up your notes to a Git repository and view the synchronization history.",
       "extension": "Install the browser extension to save web pages into Poznote.",
       "install_app": "Install Poznote as an application on your device (PWA).",
@@ -248,6 +249,7 @@
       "activity_log": "Activity log",
       "storage_stats_user": "User Storage statistics",
       "change_password": "Change Password",
+      "app_passwords": "App passwords",
       "delete_account": "Delete Account",
       "import_limits": "Import Limits",
       "user_quotas": "User quotas",
@@ -3005,6 +3007,8 @@
       "account_deleted": "Account deleted",
       "access_granted": "Account access granted",
       "access_revoked": "Account access revoked",
+      "app_password_created": "App password created",
+      "app_password_revoked": "App password revoked",
       "workspace_created": "Workspace created",
       "workspace_deleted": "Workspace deleted",
       "workspace_shared": "Workspace shared",
@@ -3035,7 +3039,8 @@
       "accounts": "accounts: {{accounts}}",
       "empty_value": "empty",
       "s3_objects_deleted": "{{count}} S3 objects deleted",
-      "s3_cleanup_failed": "S3 cleanup failed"
+      "s3_cleanup_failed": "S3 cleanup failed",
+      "expires_at": "expires {{date}}"
     },
     "destinations": {
       "download": "download",
@@ -3258,6 +3263,44 @@
     },
     "success": "Password changed successfully."
   },
+  "app_passwords": {
+    "status": {
+      "none": "None",
+      "count_one": "1 active",
+      "count_other": "{{count}} active"
+    },
+    "modal": {
+      "title": "App passwords",
+      "description": "An app password lets an app or extension use the API with your username, in place of your account password, even when you sign in through SSO. It cannot open the web interface, reach administration or change your account, and you can revoke it at any time.",
+      "label_placeholder": "Name, e.g. Chrome extension",
+      "expiry_label": "Expiration",
+      "expiry_never": "Never expires",
+      "expiry_30": "30 days",
+      "expiry_90": "90 days",
+      "expiry_365": "1 year",
+      "create": "Create",
+      "close": "Close",
+      "empty": "No app password yet.",
+      "secret_title": "App password \"{{label}}\"",
+      "secret_notice": "Copy it now: it will not be shown again.",
+      "usage_hint": "In the app, enter your username and this value as the password.",
+      "copy": "Copy",
+      "copied": "Copied",
+      "created": "Created {{date}}",
+      "last_used": "Last used {{date}}",
+      "never_used": "Never used",
+      "expires": "Expires {{date}}",
+      "expired": "Expired",
+      "revoke": "Revoke",
+      "confirm_revoke": "Confirm"
+    },
+    "errors": {
+      "label_required": "Give the app password a name.",
+      "limit_reached": "Limit reached: revoke an app password before creating another.",
+      "load_failed": "Could not load your app passwords.",
+      "generic": "Something went wrong. Try again."
+    }
+  },
   "delete_account": {
     "modal": {
       "title": "Delete Account",
@@ -3333,7 +3376,7 @@
       "sso_only_admin_password": "You can make this instance SSO-only by setting POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true in the .env file.",
       "sso_only_admin_password_warning": "Before enabling it, make sure at least one admin account has an explicit password set (Settings > Users).",
       "sso_only_admin_password_recovery": "If the identity provider becomes unavailable, recovery means switching the flag back to false and signing in with that password.",
-      "disable_basic_auth": "When enabled, API requests with HTTP Basic Auth will be rejected (403)"
+      "disable_basic_auth": "When enabled, API requests authenticated with an account password over HTTP Basic Auth are rejected (403). App passwords created by users in their settings keep working."
     },
     "actions": {
       "copy_all": "Copy all",

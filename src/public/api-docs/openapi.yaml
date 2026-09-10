@@ -56,7 +56,7 @@ components:
       # nosemgrep: yaml.openapi.security.use-of-basic-authentication.use-of-basic-authentication
       type: http
       scheme: basic
-      description: HTTP Basic Auth with global username/password. Include X-User-ID header for data endpoints.
+      description: HTTP Basic Auth with the profile's username and either its account password (include X-User-ID for data endpoints) or an app password created in Settings > App passwords (X-User-ID implied; API only, no admin routes, no account management, works on SSO-only instances).
     BearerAuth:
       type: http
       scheme: bearer
@@ -74,9 +74,33 @@ components:
       required: true
       schema:
         type: integer
-      description: User profile ID to access. Required for Basic Auth and internal service-token data requests. OIDC Bearer JWT requests default to the token-linked profile when omitted. Account-access grants from the web UI do not allow non-admin API credentials to target another profile; use admin credentials or the internal service token for cross-profile API access. Use GET /users/profiles to list available profiles.
+      description: User profile ID to access. Required for account-password Basic Auth and internal service-token data requests. OIDC Bearer JWT and app-password requests default to their own profile when omitted. Account-access grants from the web UI do not allow non-admin API credentials to target another profile; use admin credentials or the internal service token for cross-profile API access. Use GET /users/profiles to list available profiles.
 
   schemas:
+    AppPassword:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 3
+        label:
+          type: string
+          example: "Chrome extension"
+        hint:
+          type: string
+          description: Prefix and first four characters of the secret
+          example: "pzn_2f7c"
+        created_at:
+          type: string
+          nullable: true
+        last_used_at:
+          type: string
+          nullable: true
+        expires_at:
+          type: string
+          nullable: true
+        expired:
+          type: boolean
     Note:
       type: object
       properties:
@@ -4041,6 +4065,104 @@ paths:
       responses:
         '200':
           description: Password status
+
+  /users/me/app-passwords:
+    get:
+      tags: [Users]
+      summary: List current user's app passwords
+      description: |
+        App passwords are API credentials a user hands to one client (browser extension,
+        phone, script) in place of the account password. They are sent like the account
+        password over Basic auth, work on SSO-only instances, never open a browser session,
+        never reach admin routes, cannot manage the account, and act only on their own profile.
+        The secrets are never returned, only a short hint. Does NOT require X-User-ID header.
+        Not available to requests authenticated with an app password.
+      responses:
+        '200':
+          description: App passwords of the current user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  app_passwords:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AppPassword'
+                  count:
+                    type: integer
+                  active_count:
+                    type: integer
+                  limit:
+                    type: integer
+                    example: 25
+        '403':
+          description: Requested with an app password
+    post:
+      tags: [Users]
+      summary: Create an app password
+      description: |
+        The clear-text secret is in this response and nowhere else afterwards.
+        Does NOT require X-User-ID header. Not available to requests authenticated with an app password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [label]
+              properties:
+                label:
+                  type: string
+                  maxLength: 60
+                  example: "Chrome extension"
+                expires_in_days:
+                  type: integer
+                  minimum: 1
+                  maximum: 3650
+                  description: Lifetime in days; omit for no expiry
+      responses:
+        '201':
+          description: App password created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  app_password:
+                    $ref: '#/components/schemas/AppPassword'
+                  secret:
+                    type: string
+                    example: "pzn_2f7c4e1a9b0d5c6e7f8091a2b3c4d5e6f7a8b9c0d1"
+        '400':
+          description: Missing label or invalid expiry
+        '403':
+          description: Requested with an app password
+        '409':
+          description: App password limit reached
+
+  /users/me/app-passwords/{id}:
+    delete:
+      tags: [Users]
+      summary: Revoke an app password
+      description: |
+        A client still holding the secret is refused from the next request on.
+        Does NOT require X-User-ID header. Not available to requests authenticated with an app password.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: App password revoked
+        '403':
+          description: Requested with an app password
+        '404':
+          description: No such app password on this profile
 
   /users/lookup/{username}:
     get:

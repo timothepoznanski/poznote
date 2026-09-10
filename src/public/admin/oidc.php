@@ -617,7 +617,7 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
                             <input type="checkbox" id="oidc_disable_basic_auth" name="oidc_disable_basic_auth" value="1" <?php echo $settings['oidc_disable_basic_auth'] ? 'checked' : ''; ?>>
                             <label for="oidc_disable_basic_auth"><?php echo t_h('oidc_admin.fields.disable_basic_auth', [], 'Disable HTTP Basic Auth for API'); ?></label>
                         </div>
-                        <span class="oidc-hint"><?php echo t_h('oidc_admin.hints.disable_basic_auth', [], 'When enabled, API requests with HTTP Basic Auth will be rejected (403)'); ?></span>
+                        <span class="oidc-hint"><?php echo t_h('oidc_admin.hints.disable_basic_auth', [], 'When enabled, API requests authenticated with an account password over HTTP Basic Auth are rejected (403). App passwords created by users in their settings keep working.'); ?></span>
                     </div>
                 </div>
             </div>

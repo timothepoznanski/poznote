@@ -38,6 +38,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:my-profile-card" checked><span><?php echo t_h('profile.card', [], 'My Profile'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:welcome-setup-card" checked><span><?php echo t_h('settings.cards.welcome_setup', [], 'Startup guide'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:change-password-card" checked><span><?php echo t_h('settings.cards.change_password', [], 'Change Password'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:app-passwords-card" checked><span><?php echo t_h('settings.cards.app_passwords', [], 'App passwords'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:delete-account-card" checked><span><?php echo t_h('settings.cards.delete_account', [], 'Delete Account'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:git-sync-card" checked><span><?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:backup-export-card" checked><span><?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?></span></label>

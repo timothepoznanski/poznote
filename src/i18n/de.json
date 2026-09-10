@@ -424,6 +424,7 @@
       "password_note_no_local": "Ihr Passwort wird von Ihrem Identitaetsanbieter verwaltet.",
       "change_password_sso_only": "Diese Instanz verwendet ausschliesslich SSO, daher wuerde ein lokales Passwort bei der Anmeldung nie akzeptiert. Passwortaenderungen sind deaktiviert.",
       "change_password_no_local": "Ihr Konto meldet sich ueber Ihren Identitaetsanbieter an und hat kein lokales Passwort, daher gibt es kein aktuelles Passwort zur Bestaetigung einer Aenderung. Ein Administrator kann eines fuer Sie unter Admin-Tools > Benutzer festlegen.",
+      "app_passwords": "Erstellen Sie Passwörter für Apps und Erweiterungen, die sich über die API verbinden, etwa die Browser-Erweiterung. Sie funktionieren auch bei Anmeldung über SSO, können weder die Weboberfläche öffnen noch Ihr Konto ändern und lassen sich jederzeit widerrufen.",
       "git_sync": "Sichern Sie Ihre Notizen in einem Git-Repository und sehen Sie den Synchronisationsverlauf.",
       "extension": "Installieren Sie die Browser-Erweiterung, um Webseiten in Poznote zu speichern.",
       "install_app": "Installieren Sie Poznote als Anwendung auf Ihrem Gerät (PWA).",
@@ -558,6 +559,7 @@
       "storage_stats_user": "Benutzer-Speicherstatistik",
       "user_management": "Benutzerverwaltung",
       "change_password": "Passwort ändern",
+      "app_passwords": "App-Passwörter",
       "delete_account": "Konto löschen",
       "import_limits": "Importlimits",
       "user_quotas": "Benutzerkontingente",
@@ -3407,6 +3409,8 @@
       "account_deleted": "Konto gelöscht",
       "access_granted": "Kontozugriff gewährt",
       "access_revoked": "Kontozugriff entzogen",
+      "app_password_created": "App-Passwort erstellt",
+      "app_password_revoked": "App-Passwort widerrufen",
       "workspace_created": "Arbeitsbereich erstellt",
       "workspace_deleted": "Arbeitsbereich gelöscht",
       "workspace_shared": "Arbeitsbereich geteilt",
@@ -3437,7 +3441,8 @@
       "accounts": "Konten: {{accounts}}",
       "empty_value": "leer",
       "s3_objects_deleted": "{{count}} S3-Objekte gelöscht",
-      "s3_cleanup_failed": "S3-Bereinigung fehlgeschlagen"
+      "s3_cleanup_failed": "S3-Bereinigung fehlgeschlagen",
+      "expires_at": "läuft ab am {{date}}"
     },
     "destinations": {
       "download": "Download",
@@ -3545,6 +3550,44 @@
     },
     "success": "Passwort erfolgreich geändert."
   },
+  "app_passwords": {
+    "status": {
+      "none": "Keine",
+      "count_one": "1 aktiv",
+      "count_other": "{{count}} aktiv"
+    },
+    "modal": {
+      "title": "App-Passwörter",
+      "description": "Mit einem App-Passwort kann eine App oder Erweiterung die API mit Ihrem Benutzernamen anstelle Ihres Kontopassworts nutzen, auch wenn Sie sich über SSO anmelden. Es kann weder die Weboberfläche öffnen noch auf die Verwaltung zugreifen oder Ihr Konto ändern, und Sie können es jederzeit widerrufen.",
+      "label_placeholder": "Name, z. B. Chrome-Erweiterung",
+      "expiry_label": "Ablauf",
+      "expiry_never": "Läuft nie ab",
+      "expiry_30": "30 Tage",
+      "expiry_90": "90 Tage",
+      "expiry_365": "1 Jahr",
+      "create": "Erstellen",
+      "close": "Schließen",
+      "empty": "Noch kein App-Passwort.",
+      "secret_title": "App-Passwort „{{label}}“",
+      "secret_notice": "Jetzt kopieren: es wird nicht noch einmal angezeigt.",
+      "usage_hint": "Geben Sie in der App Ihren Benutzernamen und diesen Wert als Passwort ein.",
+      "copy": "Kopieren",
+      "copied": "Kopiert",
+      "created": "Erstellt am {{date}}",
+      "last_used": "Zuletzt verwendet am {{date}}",
+      "never_used": "Nie verwendet",
+      "expires": "Läuft ab am {{date}}",
+      "expired": "Abgelaufen",
+      "revoke": "Widerrufen",
+      "confirm_revoke": "Bestätigen"
+    },
+    "errors": {
+      "label_required": "Geben Sie dem App-Passwort einen Namen.",
+      "limit_reached": "Limit erreicht: Widerrufen Sie ein App-Passwort, bevor Sie ein neues erstellen.",
+      "load_failed": "Ihre App-Passwörter konnten nicht geladen werden.",
+      "generic": "Etwas ist schiefgelaufen. Versuchen Sie es erneut."
+    }
+  },
   "delete_account": {
     "modal": {
       "title": "Konto löschen",
@@ -3620,7 +3663,7 @@
       "sso_only_admin_password": "Sie können diese Instanz auf reines SSO umstellen, indem Sie POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true in der .env-Datei setzen.",
       "sso_only_admin_password_warning": "Stellen Sie vorher sicher, dass mindestens ein Administratorkonto ein explizites Passwort hat (Einstellungen > Benutzer).",
       "sso_only_admin_password_recovery": "Wird der Identitätsanbieter unerreichbar, besteht die Wiederherstellung darin, die Option wieder auf false zu setzen und sich mit diesem Passwort anzumelden.",
-      "disable_basic_auth": "Wenn aktiviert, werden API-Anfragen mit HTTP Basic Auth abgelehnt (403)"
+      "disable_basic_auth": "Wenn aktiviert, werden API-Anfragen, die mit einem Kontopasswort über HTTP Basic Auth authentifiziert sind, abgelehnt (403). Von Benutzern in ihren Einstellungen erstellte App-Passwörter funktionieren weiterhin."
     },
     "actions": {
       "copy_all": "Alle kopieren",

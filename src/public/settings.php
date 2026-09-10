@@ -169,6 +169,19 @@ try {
     $settingsPageConfig['passwordStatus'] = null;
 }
 
+// App passwords card: seed the badge so the page does not fetch the list
+// just to say how many there are.
+try {
+    require_once __DIR__ . '/../users/app_passwords.php';
+    $settingsPageAppPasswordsUserId = (int)(getCurrentUserId() ?? 0);
+    $settingsPageConfig['appPasswords'] = [
+        'active_count' => $settingsPageAppPasswordsUserId > 0 ? countActiveUserAppPasswords($settingsPageAppPasswordsUserId) : 0,
+    ];
+} catch (Exception $e) {
+    $settingsPageConfig['appPasswords'] = ['active_count' => 0];
+}
+$settingsAppPasswordsActive = (int)($settingsPageConfig['appPasswords']['active_count'] ?? 0);
+
 // Whether a local password is of any use to this user. Unusable in two cases:
 // the instance is SSO-only, so no password would ever be accepted at login;
 // or this profile was provisioned without a credential, so there is no current
@@ -407,6 +420,26 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.change_password', [], 'Change Password'); ?></span>
                     <span id="password-status-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+            <!-- App passwords: revocable API credentials for clients that cannot sign in through SSO -->
+            <div class="home-card" id="app-passwords-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.app_passwords', [], 'Create passwords for apps and extensions that connect through the API, such as the browser extension. They work even when you sign in through SSO, cannot open the web interface or change your account, and can be revoked at any time.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-plug"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.app_passwords', [], 'App passwords'); ?></span>
+                    <span id="app-passwords-status-badge" class="setting-status <?php echo $settingsAppPasswordsActive > 0 ? 'enabled' : 'disabled'; ?>"><?php
+                        if ($settingsAppPasswordsActive === 1) {
+                            echo t_h('app_passwords.status.count_one', [], '1 active');
+                        } elseif ($settingsAppPasswordsActive > 1) {
+                            echo t_h('app_passwords.status.count_other', ['count' => $settingsAppPasswordsActive], '{{count}} active');
+                        } else {
+                            echo t_h('app_passwords.status.none', [], 'None');
+                        }
+                    ?></span>
                 </div>
             </div>
 
@@ -1400,6 +1433,7 @@ if ($canUseUserWebhooks) {
     <script src="js/settings-page.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/settings-page.js') ?: time(); ?>"></script>
     <script src="js/ui-customization.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/change-password.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/change-password.js') ?: time(); ?>"></script>
+    <script src="js/app-passwords.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/app-passwords.js') ?: time(); ?>"></script>
     <!-- js/profile.js (My Profile card and modal) is loaded by icon_sidebar.php,
          which every page carrying the rail includes. -->
     <script src="js/delete-account.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/delete-account.js') ?: time(); ?>"></script>
