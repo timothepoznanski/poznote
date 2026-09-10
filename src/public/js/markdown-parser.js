@@ -1608,36 +1608,15 @@ function parseMarkdown(text) {
             }
 
             let previousResult = result.length > 0 ? result[result.length - 1] : '';
-            let isPreviousCodeBlockElement = /^<pre\b/.test(previousResult) || /^<div class="mermaid"\b/.test(previousResult);
             let isPreviousTaskEmbed = /^<div class="tasklist-embed"/.test(previousResult);
             let isNextTaskEmbed = (i + 1 < lines.length) && /^\s*\x00PTASKEMBED\d+\x00\s*$/.test(lines[i + 1]);
 
-            // Avoid adding a full blank placeholder right before block elements,
-            // because those already contribute their own top spacing.
-            let nextNonEmptyIndex = i + 1;
-            let isNextBlockElement = false;
-            if (nextNonEmptyIndex < lines.length) {
-                let nextLine = lines[nextNonEmptyIndex];
-                isNextBlockElement = (
-                    /^\s*```/.test(nextLine) ||                      // Code block fence
-                    /^(    |\t)/.test(nextLine) ||                   // Indented code block
-                    /^\s*\x00PEXCALIDRAW\d+\x00\s*$/.test(nextLine) || // Excalidraw block placeholder
-                    /^\s*\x00PTASKEMBED\d+\x00\s*$/.test(nextLine) || // Task-list embed placeholder
-                    /\x00MATHBLOCK\d+\x00/.test(nextLine) ||        // Math block placeholder
-                    /^\x00PTAG\d+\x00/.test(nextLine) ||            // Protected HTML tags
-                    /^#{1,6}\s+/.test(nextLine) ||                   // Headers
-                    /^(\*{3,}|-{3,}|_{3,})$/.test(nextLine.trim()) || // Horizontal rules
-                    /^(&gt;|>)\s/.test(nextLine) ||                  // Blockquotes
-                    /^\s*[\*\-\+]\s+\[([ xX])\]\s+/.test(nextLine) || // Task lists
-                    /^\s*[\*\-\+]\s+/.test(nextLine) ||          // Unordered lists
-                    /^\s*\d+(?:\.\d+)*\.\s+/.test(nextLine) ||    // Ordered lists
-                    isMarkdownTableStart(nextLine, lines[nextNonEmptyIndex + 1] || '') // Tables
-                );
-            }
-
-            // Block elements already contribute their own spacing; regular text keeps
-            // authored blank lines visible unless the previous block was a code block.
-            let placeholdersToAdd = (isNextBlockElement || isPreviousCodeBlockElement) ? Math.max(blankLineCount - 1, 0) : blankLineCount;
+            // The first blank line is the block separator itself: the paragraph,
+            // heading, list, ... on either side already carries the margin that
+            // renders it, so emitting a placeholder for it would double the gap.
+            // Only the extra blank lines an author typed on purpose become
+            // placeholders.
+            let placeholdersToAdd = Math.max(blankLineCount - 1, 0);
             // The task-embed protection adds a synthetic newline on each side
             // of the marker; swallow it plus the single authored blank line so
             // the widget sits flush against the surrounding text (no spacer

@@ -653,6 +653,22 @@ body.public-note-page {
     line-height: 1.2;
 }
 
+/* Markdown notes: a blank source line is a block separator, not content, so
+   the parser stops emitting a placeholder for it and paragraphs carry the gap
+   themselves (same spacing as .markdown-preview). Rich-text notes keep the
+   flush paragraphs of the editor above. */
+.public-note .content.public-note-markdown p {
+    margin: 0 0 1em 0;
+}
+
+.public-note .content.public-note-markdown p.blank-line {
+    margin: 0;
+}
+
+.public-note .content.public-note-markdown p:last-child {
+    margin-bottom: 0;
+}
+
 .public-note-attachments-row {
     margin-top: 0;
     margin-bottom: 14px;
