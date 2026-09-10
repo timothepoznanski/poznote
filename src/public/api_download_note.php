@@ -492,6 +492,8 @@ header('Content-Length: ' . strlen($content));
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: 0');
 
-// Output content and exit
+// Unbuffered: the file must reach the browser as the exporter built it, and
+// a large note must not be copied into memory a second time.
+poznoteEndOutputBuffers();
 echo $content;
 exit;

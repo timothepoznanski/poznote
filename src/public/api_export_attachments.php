@@ -221,6 +221,6 @@ header('Content-Length: ' . filesize($zipFileName));
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: 0');
 
-readfile($zipFileName);
+poznoteSendFile($zipFileName);
 unlink($zipFileName);
 ?>

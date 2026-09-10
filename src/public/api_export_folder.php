@@ -6,6 +6,7 @@ require_once __DIR__ . '/../functions.php';
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../export_helpers.php';
+require_once __DIR__ . '/../lib/export-staging.php';
 
 // Start output buffering to prevent any unwanted output
 ob_start();
@@ -45,6 +46,12 @@ if ($result !== TRUE) {
     ob_end_clean();
     die('Cannot create ZIP file. Error code: ' . $result);
 }
+
+// Note bodies are rewritten before archiving (front matter, attachment paths,
+// copy buttons) and used to be handed to ZipArchive::addFromString(), which
+// keeps every one of them in memory until close(). They are staged on disk
+// instead, so the peak is one note rather than the whole export.
+$stagingDir = poznoteExportOpenStagingDir('poznote_export_folder');
 
 // Build folder tree
 $folderTree = buildFolderTree($con, $workspace);
@@ -152,7 +159,7 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             }
         }
         
-        $zip->addFromString($noteFileName, $content);
+        poznoteExportAddRewrittenFile($zip, $stagingDir, $noteFileName, $content);
         
         // Collect attachments for this note
         if (isset($noteAttachments[$noteId])) {
@@ -225,6 +232,6 @@ header('Content-Length: ' . filesize($zipFileName));
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: 0');
 
-readfile($zipFileName);
+poznoteSendFile($zipFileName);
 unlink($zipFileName);
 ?>

@@ -192,7 +192,8 @@ class BackupController {
         header('Cache-Control: no-cache, must-revalidate');
         header('Pragma: no-cache');
         
-        readfile($filePath);
+        // Unbuffered: the archive must not be copied into memory on its way out.
+        poznoteSendFile($filePath);
         exit;
     }
     

@@ -150,8 +150,9 @@ switch ($action) {
         header('Cache-Control: no-cache, must-revalidate');
         header('Expires: 0');
         // The file is kept after the download: an interrupted transfer can be
-        // retried until the job is discarded or expires.
-        readfile($file);
+        // retried until the job is discarded or expires. Sent unbuffered: a
+        // 900 MB archive must not be copied into memory on its way out.
+        poznoteSendFile($file);
         exit;
     }
 
