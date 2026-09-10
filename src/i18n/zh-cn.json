@@ -1778,7 +1778,7 @@
   },
   "update": {
     "new_available": "🎉 有新版本可用！",
-    "new_version_available": "如需更新，请查看 GitHub 上的说明 <a href=\"https://github.com/timothepoznanski/poznote#update-application\" target=\"_blank\">此处</a>",
+    "new_version_available": "如果这个实例由您自己管理，请按 GitHub 上的说明<a href=\"https://github.com/timothepoznanski/poznote#update-application\" target=\"_blank\">此处</a>进行更新。否则需要等待您的托管服务商完成更新。",
     "description": "您的数据在更新过程中将被保留。",
     "up_to_date": "✅ Poznote 已是最新版本",
     "error_loading_version": "加载版本信息出错",

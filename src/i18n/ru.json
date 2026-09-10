@@ -1295,7 +1295,7 @@
   },
   "update": {
     "new_available": "🎉 Доступно новое обновление!",
-    "new_version_available": "Для обновления следуйте инструкциям на GitHub <a href=\"https://github.com/timothepoznanski/poznote#update-application\" target=\"_blank\">здесь</a>",
+    "new_version_available": "Если вы сами управляете этой установкой, следуйте инструкциям на GitHub <a href=\"https://github.com/timothepoznanski/poznote#update-application\" target=\"_blank\">здесь</a>, чтобы обновиться. Иначе обновление должен выполнить ваш хостинг-провайдер.",
     "description": "Ваши данные будут сохранены во время обновления.",
     "up_to_date": "✅ Poznote обновлен",
     "error_loading_version": "Ошибка загрузки версии",
