@@ -97,8 +97,11 @@
 
 /* Effective width for the open note, resolved once so every consumer reads a
    single value (the note body below, and the markdown split panes in
-   css/markdown.css). Order matters: the per-note toolbar override is last and
-   therefore beats the global setting from settings.php. */
+   css/markdown.css). The per-note toolbar override comes last and must beat
+   the global setting from settings.php, so it carries the same `body` prefix:
+   source order only decides between rules of equal specificity, and without
+   it the global rule's extra type selector would win and the toolbar toggle
+   would do nothing while "center note content" is on. */
 #right_col .notecard {
     --note-width: 100%;
 }
@@ -107,7 +110,7 @@ body.center-note-content #right_col .notecard {
     --note-width: var(--note-max-width, 800px);
 }
 
-#right_col .notecard[data-content-width] {
+body #right_col .notecard[data-content-width] {
     --note-width: var(--note-content-width, 100%);
 }
 
