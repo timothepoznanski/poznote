@@ -429,7 +429,7 @@
       "language": "Altere o idioma da interface.",
       "main_font": "Escolha a fonte usada em todo o aplicativo.",
       "markdown_font": "Escolha a fonte usada no editor markdown.",
-      "markdown_default_view_mode": "Escolha se as notas markdown abrem em pré-visualização, edição ou vista dividida. Uma nota que você mudar para outro modo o mantém até fechar a aba.",
+      "markdown_default_view_mode": "Escolha se as notas markdown abrem em pré-visualização, edição ou vista dividida.",
       "font_size": "Ajuste o tamanho da fonte das notas, da barra lateral, dos blocos de código e da página de configurações.",
       "index_icon_scale": "Ajuste o tamanho dos ícones na lista de notas.",
       "timezone": "Defina o fuso horário usado para exibir datas e horas.",
@@ -1585,7 +1585,7 @@
         "split_short": "Vista dividida",
         "last": "Último modo usado"
       },
-      "hint": "Uma nota que você mudar para outro modo o mantém até fechar a aba. Notas novas sempre abrem em vista dividida."
+      "hint": "Uma nota que você mudar para outro modo abre novamente no modo padrão. Notas novas sempre abrem em vista dividida."
     },
     "diary_date_format": {
       "title": "Formato de data das entradas do diário",

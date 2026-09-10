@@ -708,7 +708,7 @@ if ($canUseUserWebhooks) {
 
             <!-- Default View Mode (preview / edit / split / last used) -->
             <div class="home-card" id="markdown-default-view-mode-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_default_view_mode', [], 'Choose whether markdown notes open in preview, edit or split mode. A note you switch to another mode keeps it until you close the tab.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_default_view_mode', [], 'Choose whether markdown notes open in preview, edit or split mode.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-book-open"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.markdown_default_view_mode', [], 'Default view mode'); ?></span>

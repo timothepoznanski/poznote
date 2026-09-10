@@ -1307,7 +1307,7 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
                 <label><input type="radio" name="markdownDefaultViewMode" value="split"> <?php echo t_h('modals.markdown_default_view_mode.options.split', [], 'Split (editor and preview side by side)'); ?></label>
                 <label><input type="radio" name="markdownDefaultViewMode" value="last"> <?php echo t_h('modals.markdown_default_view_mode.options.last', [], 'Last used mode'); ?></label>
             </div>
-            <p class="modal-hint"><?php echo t_h('modals.markdown_default_view_mode.hint', [], 'A note you switch to another mode keeps that mode until you close the tab. New notes always open in split mode.'); ?></p>
+            <p class="modal-hint"><?php echo t_h('modals.markdown_default_view_mode.hint', [], 'A note you switch to another mode opens again in the default mode next time. New notes always open in split mode.'); ?></p>
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="markdownDefaultViewModeModal"><?php echo t_h('common.cancel'); ?></button>

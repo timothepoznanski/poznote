@@ -442,7 +442,7 @@
       "language": "Changez la langue de l'interface.",
       "main_font": "Choisissez la police utilisée dans toute l'application.",
       "markdown_font": "Choisissez la police utilisée dans l'éditeur markdown.",
-      "markdown_default_view_mode": "Choisir si les notes markdown s'ouvrent en aperçu, en édition ou en vue partagée. Une note passée dans un autre mode le garde jusqu'à la fermeture de l'onglet.",
+      "markdown_default_view_mode": "Choisir si les notes markdown s'ouvrent en aperçu, en édition ou en vue partagée.",
       "font_size": "Ajustez la taille de police des notes, de la barre latérale, des blocs de code et de la page des paramètres.",
       "index_icon_scale": "Ajustez la taille des icônes dans la liste des notes.",
       "timezone": "Définissez le fuseau horaire utilisé pour afficher les dates et heures.",
@@ -1620,7 +1620,7 @@
         "split_short": "Vue partagée",
         "last": "Dernier mode utilisé"
       },
-      "hint": "Une note passée dans un autre mode le garde jusqu'à la fermeture de l'onglet. Les nouvelles notes s'ouvrent toujours en vue partagée."
+      "hint": "Une note passée dans un autre mode se rouvre ensuite dans le mode par défaut. Les nouvelles notes s'ouvrent toujours en vue partagée."
     },
     "diary_date_format": {
       "title": "Format de date des entrées de journal",
