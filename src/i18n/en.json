@@ -168,6 +168,7 @@
       "code_line_numbers": "Show line numbers in code blocks in the markdown preview.",
       "attachment_previews": "Show previews of attachments inside notes.",
       "attachments_at_bottom": "Show the attachments section at the bottom of notes instead of the top.",
+      "allow_executable_attachments": "Allow scripts and executables (.sh, .ps1, .bat, .exe, .py, ...) to be attached to notes, for every account on this instance. Poznote never runs them, it only stores and serves them. File types a web server could execute, such as .php, stay blocked.",
       "backlinks_at_bottom": "Show the backlinks section at the bottom of notes instead of the top.",
       "default_image_border": "Display images in notes with a border and no padding by default.",
       "spellcheck_html_notes": "Enable the browser spell checker in HTML notes.",
@@ -252,6 +253,7 @@
       "user_quotas": "User quotas",
       "welcome_setup": "Startup guide",
       "git_sync_toggle": "Git Sync",
+      "allow_executable_attachments": "Script and executable attachments",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Email",
       "webhooks": "Admin Webhooks",
@@ -542,7 +544,13 @@
       "loading_error": "Error loading attachments",
       "upload_failed_generic": "Upload failed. Please try again.",
       "upload_failed_connection": "Upload failed. Please check your connection.",
-      "link_copy_failed": "Failed to copy link"
+      "link_copy_failed": "Failed to copy link",
+      "blocked_extension_unlockable": "{{ext}} files are blocked by default. You can allow them in Settings > Admin Tools > Script and executable attachments.",
+      "blocked_extension_locked": "{{ext}} files can be executed by a web server and can never be attached.",
+      "blocked_mime_unlockable": "This file is detected as {{mime}} and is blocked by default. You can allow scripts and executables in Settings > Admin Tools > Script and executable attachments.",
+      "blocked_mime_locked": "This file is detected as {{mime}}, which a web server can execute, so it can never be attached.",
+      "blocked_extension_unlockable_user": "{{ext}} files are blocked on this instance. An administrator can allow them in Settings > Admin Tools > Script and executable attachments.",
+      "blocked_mime_unlockable_user": "This file is detected as {{mime}} and is blocked on this instance. An administrator can allow scripts and executables in Settings > Admin Tools > Script and executable attachments."
     },
     "messages": {
       "upload_success": "File uploaded successfully!",
@@ -1840,7 +1848,7 @@
       "default_reason": "blocked by attachment security policy",
       "original_filename": "original",
       "note": "note",
-      "recovery_hint": "These files were left in the source ZIP and were not restored as active attachments for security reasons. You can recover them manually from the ZIP. A direct re-import will still be blocked while the file keeps a forbidden type; store it inside an allowed archive such as .zip, or convert/rename it to an allowed type only if you trust the file.",
+      "recovery_hint": "These files were left in the source ZIP and were not restored as active attachments for security reasons. You can recover them manually from the ZIP. A direct re-import will still be blocked while the file keeps a forbidden type; store it inside an allowed archive such as .zip, or convert/rename it to an allowed type only if you trust the file. If these are scripts or executables you trust, an administrator can enable Settings > Admin Tools > Script and executable attachments, then import again.",
       "reasons": {
         "invalid_filename": "Invalid attachment filename",
         "hidden_filename": "Hidden attachment filenames are not allowed",

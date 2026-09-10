@@ -17,6 +17,7 @@ class SettingsController {
         'login_display_name',
         'custom_css_path',
         'git_sync_enabled',
+        'allow_executable_attachments',
         'tenant_isolation',
         'tenant_isolation_features',
         'tenant_isolation_applied_ui_keys',
@@ -225,6 +226,10 @@ class SettingsController {
         }
 
         if ($key === 'note_nav_shortcuts_enabled' || $key === 'ctrl_s_save_enabled') {
+            return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
+        }
+
+        if ($key === 'allow_executable_attachments') {
             return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
         }
 

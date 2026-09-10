@@ -274,7 +274,7 @@ class AttachmentsController {
         $validation = poznoteValidateAttachmentFile($original_name, $file['tmp_name']);
         if (!$validation['success']) {
             http_response_code(400);
-            echo json_encode(['success' => false, 'message' => $validation['error']]);
+            echo json_encode(['success' => false, 'message' => poznoteAttachmentValidationMessage($validation)]);
             return;
         }
 

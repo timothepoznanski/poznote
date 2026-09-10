@@ -358,7 +358,13 @@
       "loading_error": "Erreur lors du chargement des pièces jointes",
       "upload_failed_generic": "Échec du téléchargement. Veuillez réessayer.",
       "upload_failed_connection": "Échec du téléchargement. Veuillez vérifier votre connexion.",
-      "link_copy_failed": "Impossible de copier le lien"
+      "link_copy_failed": "Impossible de copier le lien",
+      "blocked_extension_unlockable": "Les fichiers {{ext}} sont bloqués par défaut. Vous pouvez les autoriser dans Paramètres > Outils d'administration > Pièces jointes scripts et exécutables.",
+      "blocked_extension_locked": "Les fichiers {{ext}} peuvent être exécutés par un serveur web et ne peuvent jamais être joints.",
+      "blocked_mime_unlockable": "Ce fichier est détecté comme {{mime}} et bloqué par défaut. Vous pouvez autoriser les scripts et exécutables dans Paramètres > Outils d'administration > Pièces jointes scripts et exécutables.",
+      "blocked_mime_locked": "Ce fichier est détecté comme {{mime}}, qu'un serveur web peut exécuter : il ne peut jamais être joint.",
+      "blocked_extension_unlockable_user": "Les fichiers {{ext}} sont bloqués sur cette instance. Un administrateur peut les autoriser dans Paramètres > Outils d'administration > Pièces jointes scripts et exécutables.",
+      "blocked_mime_unlockable_user": "Ce fichier est détecté comme {{mime}} et bloqué sur cette instance. Un administrateur peut autoriser les scripts et exécutables dans Paramètres > Outils d'administration > Pièces jointes scripts et exécutables."
     },
     "messages": {
       "upload_success": "Fichier téléchargé avec succès !",
@@ -465,6 +471,7 @@
       "code_line_numbers": "Affichez les numéros de ligne dans les blocs de code de l'aperçu markdown.",
       "attachment_previews": "Affichez un aperçu des pièces jointes dans les notes.",
       "attachments_at_bottom": "Affichez la section des pièces jointes en bas des notes plutôt qu'en haut.",
+      "allow_executable_attachments": "Autorise les scripts et exécutables (.sh, .ps1, .bat, .exe, .py, ...) en pièce jointe, pour tous les comptes de cette instance. Poznote ne les exécute jamais, il ne fait que les stocker et les servir. Les types qu'un serveur web pourrait exécuter, comme .php, restent bloqués.",
       "backlinks_at_bottom": "Affichez la section des rétroliens en bas des notes plutôt qu'en haut.",
       "default_image_border": "Affichez par défaut les images des notes avec une bordure et sans marge intérieure.",
       "spellcheck_html_notes": "Activez le correcteur orthographique du navigateur dans les notes HTML.",
@@ -568,6 +575,7 @@
       "user_quotas": "Quotas utilisateurs",
       "welcome_setup": "Assistant de démarrage",
       "git_sync_toggle": "Synchronisation Git",
+      "allow_executable_attachments": "Pièces jointes scripts et exécutables",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Email",
       "webhooks": "Webhooks admin",
@@ -2242,7 +2250,7 @@
       "default_reason": "bloqué par la politique de sécurité des pièces jointes",
       "original_filename": "original",
       "note": "note",
-      "recovery_hint": "Ces fichiers sont restés dans le ZIP source et n'ont pas été restaurés comme pièces jointes actives pour des raisons de sécurité. Vous pouvez les récupérer manuellement depuis le ZIP. Un réimport direct restera bloqué tant que le fichier garde un type interdit ; placez-le dans une archive autorisée comme .zip, ou convertissez/renommez-le vers un type autorisé uniquement si vous faites confiance au fichier.",
+      "recovery_hint": "Ces fichiers sont restés dans le ZIP source et n'ont pas été restaurés comme pièces jointes actives pour des raisons de sécurité. Vous pouvez les récupérer manuellement depuis le ZIP. Un réimport direct restera bloqué tant que le fichier garde un type interdit ; placez-le dans une archive autorisée comme .zip, ou convertissez/renommez-le vers un type autorisé uniquement si vous faites confiance au fichier. S'il s'agit de scripts ou d'exécutables auxquels vous faites confiance, un administrateur peut activer Paramètres > Outils d'administration > Pièces jointes scripts et exécutables, puis relancez l'import.",
       "reasons": {
         "invalid_filename": "Nom de pièce jointe invalide",
         "hidden_filename": "Les noms de pièces jointes masqués ne sont pas autorisés",

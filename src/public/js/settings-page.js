@@ -144,6 +144,9 @@
         if (document.getElementById('git-sync-enabled-card')) {
             keys.push('git_sync_enabled');
         }
+        if (document.getElementById('executable-attachments-card')) {
+            keys.push('allow_executable_attachments');
+        }
         if (document.getElementById('tenant-isolation-card')) {
             keys.push('tenant_isolation', 'tenant_isolation_features', 'tenant_isolation_applied_ui_keys');
         }
@@ -1228,6 +1231,20 @@
         });
     }
 
+    function refreshExecutableAttachmentsBadge() {
+        var badge = document.getElementById('executable-attachments-status');
+        if (!badge) return;
+
+        var txt = getTranslations();
+        getSetting('allow_executable_attachments', function (value) {
+            var enabled = value === '1' || value === 'true';
+            badge.textContent = enabled ? txt.enabled : txt.disabled;
+            badge.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled');
+            var card = document.getElementById('executable-attachments-card');
+            if (card) card.setAttribute('aria-checked', enabled ? 'true' : 'false');
+        });
+    }
+
     // Blocked tenant isolation features, with the legacy fallback: instances
     // configured before the feature list existed only had the on/off
     // tenant_isolation flag, which meant user_sharing.
@@ -2250,6 +2267,22 @@
                         refreshGitSyncEnabledBadge();
                         refreshGitSyncCardBadge();
                         reloadOpener();
+                    });
+                });
+            });
+        }
+
+        // Script and executable attachments: instance-wide, so it is written
+        // to the master database like the other admin toggles.
+        var executableAttachmentsCard = document.getElementById('executable-attachments-card');
+        if (executableAttachmentsCard) {
+            markToggleCard(executableAttachmentsCard);
+            refreshExecutableAttachmentsBadge();
+            executableAttachmentsCard.addEventListener('click', function () {
+                getSetting('allow_executable_attachments', function (currentValue) {
+                    var currently = currentValue === '1' || currentValue === 'true';
+                    setSetting('allow_executable_attachments', currently ? '0' : '1', function () {
+                        refreshExecutableAttachmentsBadge();
                     });
                 });
             });

@@ -90,6 +90,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:s3-storage-card" checked><span><?php echo t_h('settings.cards.s3_storage', [], 'S3 Attachments'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:s3-backup-card" checked><span><?php echo t_h('settings.cards.s3_backup', [], 'S3 Backups'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:git-sync-enabled-card" checked><span><?php echo t_h('settings.cards.git_sync_toggle', [], 'Git Sync'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:executable-attachments-card" checked><span><?php echo t_h('settings.cards.allow_executable_attachments', [], 'Script and executable attachments'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:tenant-isolation-card" checked><span><?php echo t_h('settings.cards.tenant_isolation', [], 'Tenant isolation'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:import-limits-card" checked><span><?php echo t_h('settings.cards.import_limits', [], 'Import Limits'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:user-quotas-card" checked><span><?php echo t_h('settings.cards.user_quotas', [], 'User quotas'); ?></span></label>
@@ -131,6 +132,7 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-search-replace" checked><span><?php echo t_h('editor.toolbar.search_replace', [], 'Search and Replace'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-checklist" checked><span><?php echo t_h('editor.toolbar.insert_checklist', [], 'Checklist'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-tasklist-actions" checked><span><?php echo t_h('tasklist.actions', [], 'Task list actions'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-save" checked><span><?php echo t_h('editor.toolbar.save_now', [], 'Save now'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-favorite" checked><span><?php echo t_h('index.toolbar.favorite_add', [], 'Favorite'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-publish" checked><span><?php echo t_h('index.toolbar.share_note', [], 'Share'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-attachment" checked><span><?php echo t_h('modals.attachment.title', [], 'Attachments'); ?></span></label>

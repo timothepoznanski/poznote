@@ -348,7 +348,13 @@
       "loading_error": "Error al cargar adjuntos",
       "upload_failed_generic": "Subida fallida. Por favor intenta de nuevo.",
       "upload_failed_connection": "Subida fallida. Por favor verifica tu conexión.",
-      "link_copy_failed": "Error al copiar el enlace"
+      "link_copy_failed": "Error al copiar el enlace",
+      "blocked_extension_unlockable": "Los archivos {{ext}} están bloqueados de forma predeterminada. Puedes permitirlos en Configuración > Herramientas de administración > Adjuntos de scripts y ejecutables.",
+      "blocked_extension_locked": "Los archivos {{ext}} pueden ser ejecutados por un servidor web y nunca se pueden adjuntar.",
+      "blocked_mime_unlockable": "Este archivo se detecta como {{mime}} y está bloqueado de forma predeterminada. Puedes permitir scripts y ejecutables en Configuración > Herramientas de administración > Adjuntos de scripts y ejecutables.",
+      "blocked_mime_locked": "Este archivo se detecta como {{mime}}, que un servidor web puede ejecutar, por lo que nunca se puede adjuntar.",
+      "blocked_extension_unlockable_user": "Los archivos {{ext}} están bloqueados en esta instancia. Un administrador puede permitirlos en Configuración > Herramientas de administración > Adjuntos de scripts y ejecutables.",
+      "blocked_mime_unlockable_user": "Este archivo se detecta como {{mime}} y está bloqueado en esta instancia. Un administrador puede permitir scripts y ejecutables en Configuración > Herramientas de administración > Adjuntos de scripts y ejecutables."
     },
     "messages": {
       "upload_success": "¡Archivo subido exitosamente!",
@@ -454,6 +460,7 @@
       "code_line_numbers": "Muestra los números de línea en los bloques de código de la vista previa de markdown.",
       "attachment_previews": "Muestra vistas previas de los adjuntos dentro de las notas.",
       "attachments_at_bottom": "Muestra la sección de adjuntos en la parte inferior de las notas en lugar de arriba.",
+      "allow_executable_attachments": "Permite adjuntar scripts y ejecutables (.sh, .ps1, .bat, .exe, .py, ...), para todas las cuentas de esta instancia. Poznote nunca los ejecuta, solo los almacena y los sirve. Los tipos que un servidor web podría ejecutar, como .php, siguen bloqueados.",
       "backlinks_at_bottom": "Muestra la sección de retroenlaces en la parte inferior de las notas en lugar de arriba.",
       "default_image_border": "Muestra por defecto las imágenes de las notas con borde y sin relleno.",
       "spellcheck_html_notes": "Activa el corrector ortográfico del navegador en las notas HTML.",
@@ -557,6 +564,7 @@
       "user_quotas": "Cuotas de usuario",
       "welcome_setup": "Asistente de inicio",
       "git_sync_toggle": "Sincronización Git",
+      "allow_executable_attachments": "Adjuntos de scripts y ejecutables",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Correo",
       "webhooks": "Webhooks de administrador",
@@ -2152,7 +2160,7 @@
       "default_reason": "bloqueado por la política de seguridad de adjuntos",
       "original_filename": "original",
       "note": "nota",
-      "recovery_hint": "Estos archivos quedaron en el ZIP de origen y no se restauraron como adjuntos activos por motivos de seguridad. Puedes recuperarlos manualmente desde el ZIP. Una reimportación directa seguirá bloqueada mientras el archivo conserve un tipo prohibido; guárdalo dentro de un archivo permitido como .zip, o conviértelo/renómbralo a un tipo permitido solo si confías en el archivo.",
+      "recovery_hint": "Estos archivos quedaron en el ZIP de origen y no se restauraron como adjuntos activos por motivos de seguridad. Puedes recuperarlos manualmente desde el ZIP. Una reimportación directa seguirá bloqueada mientras el archivo conserve un tipo prohibido; guárdalo dentro de un archivo permitido como .zip, o conviértelo/renómbralo a un tipo permitido solo si confías en el archivo. Si son scripts o ejecutables en los que confías, un administrador puede activar Configuración > Herramientas de administración > Adjuntos de scripts y ejecutables, y después vuelve a importar.",
       "reasons": {
         "invalid_filename": "Nombre de archivo adjunto inválido",
         "hidden_filename": "No se permiten nombres de archivos adjuntos ocultos",

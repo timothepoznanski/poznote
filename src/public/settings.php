@@ -223,6 +223,9 @@ if ($isAdmin) {
         foreach ($settingsPageGlobalKeys as $settingsPageKey) {
             $settingsPageConfig['settings'][$settingsPageKey] = getGlobalSetting($settingsPageKey, '');
         }
+        // Resolved rather than read raw, so the badge tells the truth on an
+        // instance configured through the environment variable.
+        $settingsPageConfig['settings']['allow_executable_attachments'] = poznoteExecutableAttachmentsAllowed() ? '1' : '0';
     } catch (Exception $e) {
         // Keep the page usable if the master database is temporarily unavailable.
         error_log('settings: failed: ' . $e->getMessage());
@@ -1096,6 +1099,18 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.git_sync_toggle', [], 'Git Sync'); ?></span>
                     <span id="git-sync-enabled-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+            <!-- Script and executable attachments (instance-wide) -->
+            <div class="home-card" id="executable-attachments-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.allow_executable_attachments', [], 'Allow scripts and executables (.sh, .ps1, .bat, .exe, .py, ...) to be attached to notes, for every account on this instance. Poznote never runs them, it only stores and serves them. File types a web server could execute, such as .php, stay blocked.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-file-code"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.allow_executable_attachments', [], 'Script and executable attachments'); ?></span>
+                    <span id="executable-attachments-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                 </div>
             </div>
 

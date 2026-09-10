@@ -255,7 +255,7 @@ function handleUpload() {
     if (!$validation['success']) {
         error_log("Upload failed: " . $validation['error'] . ": " . $original_name);
         http_response_code(400);
-        echo json_encode(['success' => false, 'message' => $validation['error']]);
+        echo json_encode(['success' => false, 'message' => poznoteAttachmentValidationMessage($validation)]);
         return;
     }
 

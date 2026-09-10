@@ -347,7 +347,13 @@
       "loading_error": "Fehler beim Laden der Anhänge",
       "upload_failed_generic": "Hochladen fehlgeschlagen. Bitte versuchen Sie es erneut.",
       "upload_failed_connection": "Hochladen fehlgeschlagen. Bitte überprüfen Sie Ihre Verbindung.",
-      "link_copy_failed": "Link konnte nicht kopiert werden"
+      "link_copy_failed": "Link konnte nicht kopiert werden",
+      "blocked_extension_unlockable": "{{ext}}-Dateien sind standardmäßig blockiert. Sie können sie unter Einstellungen > Administrationswerkzeuge > Skript- und Programmanhänge erlauben.",
+      "blocked_extension_locked": "{{ext}}-Dateien können von einem Webserver ausgeführt werden und lassen sich nie anhängen.",
+      "blocked_mime_unlockable": "Diese Datei wird als {{mime}} erkannt und ist standardmäßig blockiert. Sie können Skripte und ausführbare Dateien unter Einstellungen > Administrationswerkzeuge > Skript- und Programmanhänge erlauben.",
+      "blocked_mime_locked": "Diese Datei wird als {{mime}} erkannt, was ein Webserver ausführen kann, deshalb lässt sie sich nie anhängen.",
+      "blocked_extension_unlockable_user": "{{ext}}-Dateien sind auf dieser Instanz blockiert. Ein Administrator kann sie unter Einstellungen > Administrationswerkzeuge > Skript- und Programmanhänge erlauben.",
+      "blocked_mime_unlockable_user": "Diese Datei wird als {{mime}} erkannt und ist auf dieser Instanz blockiert. Ein Administrator kann Skripte und ausführbare Dateien unter Einstellungen > Administrationswerkzeuge > Skript- und Programmanhänge erlauben."
     },
     "messages": {
       "upload_success": "Datei erfolgreich hochgeladen!",
@@ -453,6 +459,7 @@
       "code_line_numbers": "Zeilennummern in Codeblöcken in der Markdown-Vorschau anzeigen.",
       "attachment_previews": "Zeigen Sie Vorschauen von Anhängen in Notizen an.",
       "attachments_at_bottom": "Zeigen Sie den Anhangsbereich unten statt oben in Notizen an.",
+      "allow_executable_attachments": "Erlaubt Skripte und ausführbare Dateien (.sh, .ps1, .bat, .exe, .py, ...) als Anhang, für alle Konten dieser Instanz. Poznote führt sie nie aus, es speichert und liefert sie nur aus. Dateitypen, die ein Webserver ausführen könnte, etwa .php, bleiben blockiert.",
       "backlinks_at_bottom": "Zeigen Sie den Backlink-Bereich unten statt oben in Notizen an.",
       "default_image_border": "Zeigen Sie Bilder in Notizen standardmäßig mit Rahmen und ohne Innenabstand an.",
       "spellcheck_html_notes": "Aktivieren Sie die Rechtschreibprüfung des Browsers in HTML-Notizen.",
@@ -556,6 +563,7 @@
       "user_quotas": "Benutzerkontingente",
       "welcome_setup": "Startassistent",
       "git_sync_toggle": "Git-Synchronisierung",
+      "allow_executable_attachments": "Skript- und Programmanhänge",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / E-Mail",
       "webhooks": "Admin-Webhooks",
@@ -2151,7 +2159,7 @@
       "default_reason": "durch die Sicherheitsrichtlinie für Anhänge blockiert",
       "original_filename": "Original",
       "note": "Notiz",
-      "recovery_hint": "Diese Dateien sind im Quell-ZIP geblieben und wurden aus Sicherheitsgründen nicht als aktive Anhänge wiederhergestellt. Sie können sie manuell aus dem ZIP wiederherstellen. Ein direkter Re-Import wird weiterhin blockiert, solange die Datei einen verbotenen Typ behält; speichern Sie sie in einem erlaubten Archiv wie .zip oder konvertieren/benennen Sie sie nur in einen erlaubten Typ um, wenn Sie der Datei vertrauen.",
+      "recovery_hint": "Diese Dateien sind im Quell-ZIP geblieben und wurden aus Sicherheitsgründen nicht als aktive Anhänge wiederhergestellt. Sie können sie manuell aus dem ZIP wiederherstellen. Ein direkter Re-Import wird weiterhin blockiert, solange die Datei einen verbotenen Typ behält; speichern Sie sie in einem erlaubten Archiv wie .zip oder konvertieren/benennen Sie sie nur in einen erlaubten Typ um, wenn Sie der Datei vertrauen. Wenn es sich um Skripte oder Programme handelt, denen Sie vertrauen, kann ein Administrator Einstellungen > Administrationswerkzeuge > Skript- und Programmanhänge aktivieren; importieren Sie danach erneut.",
       "reasons": {
         "invalid_filename": "Ungültiger Anhangsdateiname",
         "hidden_filename": "Versteckte Anhangsdateinamen sind nicht erlaubt",
