@@ -839,7 +839,16 @@
     "confirm_navigation": "⚠️ Ungespeicherte Änderungen\n\nSie haben ungespeicherte Änderungen, die verloren gehen.\nVor dem Navigieren speichern?",
     "notification": {
       "saving": "Änderungen werden gespeichert...",
-      "saved": "Gespeichert!"
+      "saved": "Gespeichert!",
+      "not_saved_yet": "Ihre letzten Änderungen konnten noch nicht gespeichert werden. Sie bleiben auf diesem Gerät erhalten und Poznote versucht es weiter."
+    },
+    "draft": {
+      "found_conflict": "Diese Notiz enthält ungespeicherte Änderungen von Ihrem letzten Besuch, wurde seitdem aber auch woanders geändert. Die Version, die Sie nicht behalten, bleibt im Verlauf der Notiz.",
+      "found_error": "Diese Notiz enthält ungespeicherte Änderungen von Ihrem letzten Besuch. Sie konnten noch nicht gespeichert werden.",
+      "restore": "Meine ungespeicherten Änderungen behalten",
+      "discard": "Aktuelle Version behalten",
+      "restored": "Ihre letzten Änderungen wurden wiederhergestellt und gespeichert.",
+      "restore_failed": "Ihre Änderungen konnten nicht gespeichert werden. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut."
     }
   },
   "tasklist": {
@@ -1065,7 +1074,8 @@
       "create_linked_note": "Verknüpfung erstellen",
       "open_in_new_tab": "In neuem Tab öffnen",
       "split_view": "Geteilte Ansicht umschalten",
-      "search_replace": "Suchen und ersetzen"
+      "search_replace": "Suchen und ersetzen",
+      "save_now": "Jetzt speichern"
     },
     "link": {
       "add_title": "Link hinzufügen",

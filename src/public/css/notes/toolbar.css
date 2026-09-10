@@ -21,9 +21,9 @@
     }
 }
 
-/* Save icon - inherit color when not modified */
-.toolbar-btn:not(.save-modified) i.lucide-save {
-    color: inherit;
+/* Save icon: grey at rest, accent while a save is pending (icons.css) */
+.toolbar-btn.btn-save i.lucide-save {
+    transition: color 0.2s;
 }
 
 /* Palette & fill-drip icons - inherit by default, colored on hover */

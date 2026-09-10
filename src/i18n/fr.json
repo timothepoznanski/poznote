@@ -858,7 +858,16 @@
     "confirm_navigation": "⚠️ Modifications non enregistrées\n\nVous avez des modifications non enregistrées qui seront perdues.\nEnregistrer avant de quitter la page ?",
     "notification": {
       "saving": "Enregistrement des modifications…",
-      "saved": "Enregistré !"
+      "saved": "Enregistré !",
+      "not_saved_yet": "Vos dernières modifications n'ont pas encore pu être enregistrées. Elles sont conservées sur cet appareil et Poznote réessaie."
+    },
+    "draft": {
+      "found_conflict": "Cette note contient des modifications non enregistrées de votre dernière visite, mais elle a aussi été modifiée ailleurs depuis. La version que vous ne gardez pas reste dans l'historique de la note.",
+      "found_error": "Cette note contient des modifications non enregistrées de votre dernière visite. Elles n'ont pas encore pu être enregistrées.",
+      "restore": "Garder mes modifications non enregistrées",
+      "discard": "Garder la version actuelle",
+      "restored": "Vos dernières modifications ont été récupérées et enregistrées.",
+      "restore_failed": "Vos modifications n'ont pas pu être enregistrées. Vérifiez votre connexion et réessayez."
     }
   },
   "tasklist": {
@@ -1076,7 +1085,8 @@
       "create_linked_note": "Créer un raccourci",
       "open_in_new_tab": "Ouvrir dans un nouvel onglet",
       "split_view": "Activer/désactiver la vue divisée",
-      "search_replace": "Rechercher et remplacer"
+      "search_replace": "Rechercher et remplacer",
+      "save_now": "Enregistrer maintenant"
     },
     "link": {
       "add_title": "Ajouter un lien",

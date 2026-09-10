@@ -840,7 +840,16 @@
     "confirm_navigation": "⚠️ Cambios no guardados\n\nTienes cambios no guardados que se perderán.\n¿Guardar antes de navegar?",
     "notification": {
       "saving": "Guardando cambios...",
-      "saved": "¡Guardado!"
+      "saved": "¡Guardado!",
+      "not_saved_yet": "Tus últimos cambios aún no se han podido guardar. Se conservan en este dispositivo y Poznote sigue intentándolo."
+    },
+    "draft": {
+      "found_conflict": "Esta nota tiene cambios sin guardar de tu última visita, pero también se modificó en otro lugar desde entonces. La versión que no conserves queda en el historial de la nota.",
+      "found_error": "Esta nota tiene cambios sin guardar de tu última visita. Aún no se han podido guardar.",
+      "restore": "Conservar mis cambios sin guardar",
+      "discard": "Conservar la versión actual",
+      "restored": "Tus últimos cambios se han recuperado y guardado.",
+      "restore_failed": "No se han podido guardar tus cambios. Comprueba tu conexión e inténtalo de nuevo."
     }
   },
   "tasklist": {
@@ -1066,7 +1075,8 @@
       "create_linked_note": "Crear atajo",
       "open_in_new_tab": "Abrir en nueva pestaña",
       "split_view": "Alternar vista dividida",
-      "search_replace": "Buscar y reemplazar"
+      "search_replace": "Buscar y reemplazar",
+      "save_now": "Guardar ahora"
     },
     "link": {
       "add_title": "Agregar enlace",

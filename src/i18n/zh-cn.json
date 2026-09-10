@@ -840,7 +840,16 @@
     "confirm_navigation": "⚠️ 未保存的更改\n\n您有未保存的更改，这些更改将会丢失。\n要在离开前保存吗？",
     "notification": {
       "saving": "正在保存更改...",
-      "saved": "已保存！"
+      "saved": "已保存！",
+      "not_saved_yet": "您最近的更改暂时无法保存。它们已保留在此设备上，Poznote 会继续尝试。"
+    },
+    "draft": {
+      "found_conflict": "此笔记有您上次访问时未保存的更改，但此后它也在其他地方被修改过。您不保留的版本会留在笔记历史中。",
+      "found_error": "此笔记有您上次访问时未保存的更改。它们暂时无法保存。",
+      "restore": "保留我未保存的更改",
+      "discard": "保留当前版本",
+      "restored": "您最近的更改已恢复并保存。",
+      "restore_failed": "无法保存您的更改。请检查网络连接后重试。"
     }
   },
   "tasklist": {
@@ -1066,7 +1075,8 @@
       "search_replace": "查找替换",
       "split_view": "切换分屏视图",
       "switch_to_edit": "切换到编辑模式",
-      "switch_to_preview": "切换到预览模式"
+      "switch_to_preview": "切换到预览模式",
+      "save_now": "立即保存"
     },
     "link": {
       "add_title": "添加链接",

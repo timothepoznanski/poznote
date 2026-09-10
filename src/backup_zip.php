@@ -22,12 +22,47 @@ require_once __DIR__ . '/storage/AttachmentStorage.php';
 // language badge).
 require_once __DIR__ . '/export_helpers.php';
 
-if (!function_exists('generateSQLDumpForConnection')) {
-function generateSQLDumpForConnection($con) {
+if (!function_exists('generateSQLDumpToStream')) {
+/**
+ * Write every byte of $data to $stream, looping over short writes (a full
+ * disk can accept part of a buffer and report success for that part only).
+ */
+function poznoteExportWriteAll($stream, string $data): bool {
+    $length = strlen($data);
+    $offset = 0;
+    while ($offset < $length) {
+        $written = fwrite($stream, $offset === 0 ? $data : substr($data, $offset));
+        if ($written === false || $written === 0) {
+            return false;
+        }
+        $offset += $written;
+    }
+    return true;
+}
+
+/**
+ * Write the SQL dump of a user database to an open stream, one statement at
+ * a time.
+ *
+ * The dump used to be assembled as one PHP string and handed to
+ * ZipArchive::addFromString(), which copies it again and keeps the copy
+ * until close(). entries.entry carries the full body of every note, trash
+ * included, so on a large account the dump alone weighed as much as the
+ * notes, and the build peaked at about three times the size of the notes:
+ * enough to exhaust memory_limit, or to get the whole container killed on
+ * a 512 MB host. Streaming keeps the peak at one row.
+ *
+ * The statement format is what backup_sql_restore.php's whitelist parser
+ * expects; keep the two in sync.
+ */
+function generateSQLDumpToStream($con, $stream): bool {
     $sql = "-- " . t('backup_export.dump.title') . "\n";
     $userTimezone = getUserTimezone();
     $dt = new DateTime('now', new DateTimeZone($userTimezone));
     $sql .= "-- " . t('backup_export.dump.generated_on', ['date' => $dt->format('Y-m-d H:i:s')]) . "\n\n";
+    if (!poznoteExportWriteAll($stream, $sql)) {
+        return false;
+    }
 
     // Get all table names
     $tables = $con->query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
@@ -43,16 +78,22 @@ function generateSQLDumpForConnection($con) {
         $createStmt = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($createStmt && $createStmt['sql']) {
             // Add DROP TABLE to ensure clean restoration
-            $sql .= "DROP TABLE IF EXISTS \"{$table}\";\n";
-            $sql .= $createStmt['sql'] . ";\n\n";
+            if (!poznoteExportWriteAll($stream, "DROP TABLE IF EXISTS \"{$table}\";\n" . $createStmt['sql'] . ";\n\n")) {
+                return false;
+            }
         }
 
-        // Get all data using prepared statement
+        // Rows are fetched one at a time; the column list is the same for
+        // every row of a SELECT *, so it is rendered once per table.
         $stmt = $con->prepare("SELECT * FROM \"{$table}\"");
         $stmt->execute();
-        $data = $stmt;
-        while ($row = $data->fetch(PDO::FETCH_ASSOC)) {
-            $columns = array_keys($row);
+        $columnList = null;
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            if ($columnList === null) {
+                $columnList = implode(', ', array_map(function($col) {
+                    return "\"{$col}\"";
+                }, array_keys($row)));
+            }
             $values = array_map(function($value) use ($con) {
                 if ($value === null) {
                     return 'NULL';
@@ -60,14 +101,61 @@ function generateSQLDumpForConnection($con) {
                 return $con->quote($value);
             }, array_values($row));
 
-            $sql .= "INSERT INTO \"{$table}\" (" . implode(', ', array_map(function($col) {
-                return "\"{$col}\"";
-            }, $columns)) . ") VALUES (" . implode(', ', $values) . ");\n";
+            $line = "INSERT INTO \"{$table}\" (" . $columnList . ") VALUES (" . implode(', ', $values) . ");\n";
+            if (!poznoteExportWriteAll($stream, $line)) {
+                return false;
+            }
         }
-        $sql .= "\n";
+        if (!poznoteExportWriteAll($stream, "\n")) {
+            return false;
+        }
     }
 
-    return $sql;
+    return true;
+}
+
+/**
+ * Write a rewritten file for the archive into the build's staging directory
+ * and return its path, or null if it could not be written in full.
+ */
+function poznoteExportStageFile(string $stagingDir, string $relativePath, string $content): ?string {
+    $path = $stagingDir . '/' . $relativePath;
+    $dir = dirname($path);
+    if (!is_dir($dir) && !@mkdir($dir, 0700, true) && !is_dir($dir)) {
+        return null;
+    }
+    $stream = @fopen($path, 'wb');
+    if ($stream === false) {
+        return null;
+    }
+    $ok = poznoteExportWriteAll($stream, $content);
+    fclose($stream);
+    if (!$ok) {
+        @unlink($path);
+        return null;
+    }
+    return $path;
+}
+
+/**
+ * Remove a build's staging directory (SQL dump, rewritten note bodies).
+ */
+function poznoteExportRemoveStaging(?string $dir): void {
+    if ($dir === null || $dir === '' || !is_dir($dir)) {
+        return;
+    }
+    $items = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::CHILD_FIRST
+    );
+    foreach ($items as $item) {
+        if ($item->isDir()) {
+            @rmdir($item->getPathname());
+        } else {
+            @unlink($item->getPathname());
+        }
+    }
+    @rmdir($dir);
 }
 }
 
@@ -153,6 +241,22 @@ function buildUserBackupZip($userId, $skipS3Attachments = false) {
         return ['success' => false, 'zip_path' => null, 'filename' => null, 'error' => t('backup_export.errors.cannot_create_zip')];
     }
 
+    // Everything the archive needs that is not already a file on disk (the
+    // SQL dump, note bodies rewritten for offline viewing) is written here
+    // and added with addFile(): ZipArchive then streams it at close() time
+    // instead of holding it in memory, so the build's memory use no longer
+    // grows with the size of the account.
+    $stagingDir = $tempDir . '/poznote_export_' . $userId . '_' . bin2hex(random_bytes(6));
+    $fail = function (string $error) use ($zip, $zipFileName, $stagingDir) {
+        $zip->close();
+        @unlink($zipFileName);
+        poznoteExportRemoveStaging($stagingDir);
+        return ['success' => false, 'zip_path' => null, 'filename' => null, 'error' => $error];
+    };
+    if (!@mkdir($stagingDir, 0700, true) && !is_dir($stagingDir)) {
+        return $fail(t('backup_export.errors.cannot_create_zip'));
+    }
+
     // Add SQL dump from user's database
     $userDbPath = $userDataManager->getUserDatabasePath();
     if (file_exists($userDbPath)) {
@@ -161,18 +265,19 @@ function buildUserBackupZip($userId, $skipS3Attachments = false) {
         $tempCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $tempCon->exec('PRAGMA busy_timeout = 5000');
 
-        $sqlContent = generateSQLDumpForConnection($tempCon);
-        if ($sqlContent) {
-            $zip->addFromString('database/poznote_backup.sql', $sqlContent);
+        $dumpPath = $stagingDir . '/poznote_backup.sql';
+        $dumpStream = @fopen($dumpPath, 'wb');
+        $dumpOk = $dumpStream !== false && generateSQLDumpToStream($tempCon, $dumpStream);
+        if ($dumpStream !== false) {
+            fclose($dumpStream);
+        }
+        if ($dumpOk && filesize($dumpPath) > 0) {
+            $zip->addFile($dumpPath, 'database/poznote_backup.sql');
         } else {
-            $zip->close();
-            unlink($zipFileName);
-            return ['success' => false, 'zip_path' => null, 'filename' => null, 'error' => t('backup_export.errors.failed_to_create_db_backup')];
+            return $fail(t('backup_export.errors.failed_to_create_db_backup'));
         }
     } else {
-        $zip->close();
-        unlink($zipFileName);
-        return ['success' => false, 'zip_path' => null, 'filename' => null, 'error' => 'User database not found'];
+        return $fail('User database not found');
     }
 
     // Add all note entries (HTML and Markdown) from user's data
@@ -225,11 +330,12 @@ function buildUserBackupZip($userId, $skipS3Attachments = false) {
 
                 // Include both HTML and Markdown files
                 if ($extension === 'html' || $extension === 'md') {
-                    $content = file_get_contents($filePath);
-                    if ($content !== false) {
+                    $original = file_get_contents($filePath);
+                    if ($original !== false) {
                         // Get note ID from filename (e.g., "123.html" -> "123")
                         $noteId = (int) pathinfo($relativePath, PATHINFO_FILENAME);
                         $noteType = $noteTypeMap[$noteId] ?? 'note';
+                        $content = $original;
 
                         if ($extension === 'html' && $noteType !== 'tasklist') {
                             // Remove copy buttons from HTML
@@ -247,7 +353,20 @@ function buildUserBackupZip($userId, $skipS3Attachments = false) {
                             }
                         }
 
-                        $zip->addFromString('entries/' . $relativePath, $content);
+                        // The note is read again from disk when the archive
+                        // is written, so only a body that was actually
+                        // rewritten needs a staged copy; nothing is kept in
+                        // memory past this iteration either way.
+                        if ($content === $original) {
+                            $zip->addFile($filePath, 'entries/' . $relativePath);
+                        } else {
+                            $staged = poznoteExportStageFile($stagingDir, 'entries/' . $relativePath, $content);
+                            if ($staged === null) {
+                                return $fail(t('backup_export.errors.failed_to_create_backup_file'));
+                            }
+                            $zip->addFile($staged, 'entries/' . $relativePath);
+                        }
+                        unset($content, $original);
                     } else {
                         $zip->addFile($filePath, 'entries/' . $relativePath);
                     }
@@ -436,16 +555,9 @@ function buildUserBackupZip($userId, $skipS3Attachments = false) {
         // were skipped: we cannot tell what is missing. Refuse rather than
         // hand back an archive that looks complete and is not.
         if (AttachmentStorage::remoteFailedThisRequest()) {
-            $zip->close();
-            @unlink($zipFileName);
             AttachmentStorage::resetRequestBucketState();
-            return [
-                'success' => false,
-                'zip_path' => null,
-                'filename' => null,
-                'error' => t('backup_export.errors.s3_unreachable', [],
-                    'The S3 bucket could not be read while building the archive, so some attachments would be missing from it. Nothing was saved. Check the bucket and try again.'),
-            ];
+            return $fail(t('backup_export.errors.s3_unreachable', [],
+                'The S3 bucket could not be read while building the archive, so some attachments would be missing from it. Nothing was saved. Check the bucket and try again.'));
         }
     }
 
@@ -480,9 +592,11 @@ function buildUserBackupZip($userId, $skipS3Attachments = false) {
 
     $zip->close();
 
-    // The bucket downloads were only needed until close() read them into the
-    // archive; dropping them now keeps long worker runs from accumulating
-    // every user's attachments in the temp dir until the process exits.
+    // The staged files and the bucket downloads were only needed until
+    // close() read them into the archive; dropping them now keeps long
+    // worker runs from accumulating every user's files in the temp dir
+    // until the process exits.
+    poznoteExportRemoveStaging($stagingDir);
     AttachmentStorage::resetRequestBucketState();
 
     if (!file_exists($zipFileName) || filesize($zipFileName) <= 0) {

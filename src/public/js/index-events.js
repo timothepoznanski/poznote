@@ -599,6 +599,17 @@
             // Note actions with noteId
             // (toggle-ai-chat / ai-chat-clear are handled in ai-chat.js so the
             // panel also works on pages without index-events.js)
+            case 'save-note':
+                // Same as Ctrl+S: save now, the toast once the server confirmed.
+                // After a full page load the current note id is only set when
+                // the note gets focused: the button names it itself.
+                if (typeof window.saveNoteImmediately === 'function') {
+                    if (noteId) {
+                        window.noteid = noteId;
+                    }
+                    window.saveNoteImmediately({ onSaved: window.showSavedToast });
+                }
+                break;
             case 'toggle-favorite':
                 if (noteId && typeof toggleFavorite === 'function') {
                     toggleFavorite(noteId);

@@ -359,6 +359,7 @@ Use the `.env` file for:
 - `POZNOTE_OIDC_CLIENT_SECRET`
 - `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN`
 - Optional runtime overrides such as `POZNOTE_MCP_PORT` and `POZNOTE_DEBUG`
+- `POZNOTE_PHP_FPM_MAX_CHILDREN` to change the number of simultaneous PHP requests (default 10) on a busy instance, see the [Troubleshooting Guide](docs/TROUBLESHOOTING.md#the-app-stops-answering-under-load)
 
 Use the UI for:
 

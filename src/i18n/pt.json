@@ -837,7 +837,16 @@
     "confirm_navigation": "⚠️ Alterações Não Salvas\n\nVocê tem alterações não salvas que serão perdidas.\nSalvar antes de navegar?",
     "notification": {
       "saving": "Salvando alterações...",
-      "saved": "Salvo!"
+      "saved": "Salvo!",
+      "not_saved_yet": "Suas últimas alterações ainda não puderam ser salvas. Elas ficam guardadas neste dispositivo e o Poznote continua tentando."
+    },
+    "draft": {
+      "found_conflict": "Esta nota tem alterações não salvas da sua última visita, mas também foi modificada em outro lugar desde então. A versão que você não mantiver fica no histórico da nota.",
+      "found_error": "Esta nota tem alterações não salvas da sua última visita. Elas ainda não puderam ser salvas.",
+      "restore": "Manter minhas alterações não salvas",
+      "discard": "Manter a versão atual",
+      "restored": "Suas últimas alterações foram recuperadas e salvas.",
+      "restore_failed": "Suas alterações não puderam ser salvas. Verifique sua conexão e tente novamente."
     }
   },
   "tasklist": {
@@ -1064,7 +1073,8 @@
       "create_linked_note": "Criar atalho",
       "open_in_new_tab": "Abrir em nova aba",
       "split_view": "Alternar vista dividida",
-      "search_replace": "Pesquisar e substituir"
+      "search_replace": "Pesquisar e substituir",
+      "save_now": "Salvar agora"
     },
     "link": {
       "add_title": "Adicionar Link",

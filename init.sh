@@ -30,6 +30,46 @@ if [ "$CURRENT_UID" != "0" ]; then
     fi
 fi
 
+# php-fpm worker count. The image default (docker/php-fpm/www.conf) suits
+# most instances; a busy one (several users, AI chat, S3, git sync) can raise
+# it with POZNOTE_PHP_FPM_MAX_CHILDREN, each busy worker costing about
+# 25-30 MB. The start/spare settings are kept consistent with it, php-fpm
+# refuses to start otherwise. Applied on every start, so the value follows
+# the environment of the container.
+FPM_POOL="/usr/local/etc/php-fpm.d/www.conf"
+if [ -n "${POZNOTE_PHP_FPM_MAX_CHILDREN:-}" ]; then
+    FPM_MAX="$POZNOTE_PHP_FPM_MAX_CHILDREN"
+    case "$FPM_MAX" in
+        *[!0-9]*|'')
+            echo "WARNING: POZNOTE_PHP_FPM_MAX_CHILDREN='$FPM_MAX' is not a whole number, keeping the image default." >&2
+            ;;
+        *)
+            if [ "$FPM_MAX" -lt 1 ] || [ "$FPM_MAX" -gt 1000 ]; then
+                echo "WARNING: POZNOTE_PHP_FPM_MAX_CHILDREN=$FPM_MAX is outside 1-1000, keeping the image default." >&2
+            elif [ ! -w "$FPM_POOL" ]; then
+                echo "WARNING: $FPM_POOL is not writable, POZNOTE_PHP_FPM_MAX_CHILDREN not applied." >&2
+            else
+                FPM_START=2
+                FPM_MAX_SPARE=3
+                if [ "$FPM_MAX" -lt 2 ]; then FPM_START="$FPM_MAX"; fi
+                if [ "$FPM_MAX" -lt 3 ]; then FPM_MAX_SPARE="$FPM_MAX"; fi
+                # Rewritten through /tmp rather than sed -i: in the rootless
+                # image the file is ours but its directory stays root's, and
+                # sed -i needs to create a temporary file next to it.
+                FPM_TMP="$(mktemp)"
+                sed \
+                    -e "s/^pm\.max_children = .*/pm.max_children = $FPM_MAX/" \
+                    -e "s/^pm\.start_servers = .*/pm.start_servers = $FPM_START/" \
+                    -e "s/^pm\.max_spare_servers = .*/pm.max_spare_servers = $FPM_MAX_SPARE/" \
+                    "$FPM_POOL" > "$FPM_TMP" \
+                    && cat "$FPM_TMP" > "$FPM_POOL"
+                rm -f "$FPM_TMP"
+                echo "php-fpm: pm.max_children = $FPM_MAX (POZNOTE_PHP_FPM_MAX_CHILDREN)"
+            fi
+            ;;
+    esac
+fi
+
 # Ensure data directory exists with correct permissions
 mkdir -p "$DATA_DIR"
 

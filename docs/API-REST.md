@@ -347,6 +347,7 @@ Update an existing note by ID. Only include fields you want to modify.
 | `workspace` | string | Move to workspace |
 | `git_push` | boolean | Trigger Git sync after update |
 | `if_version` | string | Optimistic concurrency token (see below) |
+| `state_hash` | string | Fingerprint of the editor state being saved, used by the web editor's draft recovery. `GET /notes/{id}` returns it as `state_hash` until the note is written again by anyone, `null` otherwise. Other API clients can leave it out. |
 
 ```bash
 curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \

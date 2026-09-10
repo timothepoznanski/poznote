@@ -760,13 +760,13 @@ class NotesController {
             if ($id !== null && is_numeric($id)) {
                 $noteId = (int)$id;
                 if ($useWorkspaceFilter) {
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
                     $params = [$noteId, $workspace];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
                 } else {
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, entry FROM entries WHERE id = ? AND trash = 0";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE id = ? AND trash = 0";
                     $params = [$noteId];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $stmt = $this->con->prepare($sql);
@@ -784,13 +784,13 @@ class NotesController {
                 
                 if (is_numeric($reference)) {
                     $refId = (int)$reference;
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
                     $params = [$refId, $workspace];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
                 } else {
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, entry FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ?";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ?";
                     $params = ['%' . $reference . '%', $workspace];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $sql .= " ORDER BY updated DESC LIMIT 1";
@@ -861,6 +861,10 @@ class NotesController {
                     'content_width' => isset($row['content_width']) ? (int)$row['content_width'] : null,
                     'display_order' => (int)($row['display_order'] ?? 0),
                     'dashboard_order' => (int)($row['dashboard_order'] ?? 0),
+                    // Fingerprint of the editor state the web client last saved,
+                    // only while the note has not changed since (db_connect.php)
+                    'state_hash' => (!empty($row['client_state_hash']) && hash_equals((string)($row['client_state_version'] ?? ''), $version))
+                        ? $row['client_state_hash'] : null,
                     'content' => $content
                 ]
             ], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
@@ -1375,6 +1379,24 @@ class NotesController {
             
             $updateFields[] = "workspace = ?";
             $updateParams[] = $workspace;
+
+            // New version token so the caller can chain conditional writes
+            // without re-reading the note. Content is reloaded through the
+            // same path show() uses, keeping both tokens consistent.
+            $newContent = $this->loadNoteContentForVersion($noteId, $noteType, $entry !== null ? $entrycontent : ($note['entry'] ?? null));
+            $newVersion = $this->computeNoteVersion($now_utc, $heading, $newContent);
+
+            // Fingerprint of the editor state the web client is saving, kept
+            // with the version this write produces: a later visit can tell
+            // whether a draft left in the browser is this very state (see the
+            // client_state_hash migration in db_connect.php). Other writers
+            // change the version, which retires it, so they need not know.
+            $stateHash = (isset($input['state_hash']) && is_string($input['state_hash']) && preg_match('/^[0-9a-f-]{1,80}$/', $input['state_hash']))
+                ? $input['state_hash'] : null;
+            $updateFields[] = "client_state_hash = ?";
+            $updateParams[] = $stateHash;
+            $updateFields[] = "client_state_version = ?";
+            $updateParams[] = $stateHash !== null ? $newVersion : null;
             
             $updateParams[] = $noteId;
             
@@ -1398,11 +1420,6 @@ class NotesController {
                     }
                 }
                 
-                // New version token so the caller can chain conditional writes
-                // without re-reading the note. Content is reloaded through the
-                // same path show() uses, keeping both tokens consistent.
-                $newContent = $this->loadNoteContentForVersion($noteId, $noteType, $entry !== null ? $entrycontent : ($note['entry'] ?? null));
-                $newVersion = $this->computeNoteVersion($now_utc, $heading, $newContent);
                 header('ETag: "' . $newVersion . '"');
 
                 // Prepare response

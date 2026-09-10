@@ -1658,7 +1658,8 @@
       "open_in_new_tab": "Open in new tab",
       "create_linked_note": "Create shortcut",
       "search_replace": "Search and replace",
-      "split_view": "Toggle split view"
+      "split_view": "Toggle split view",
+      "save_now": "Save now"
     },
     "link": {
       "add_title": "Add link",
@@ -3798,7 +3799,16 @@
   "autosave": {
     "notification": {
       "saving": "Saving changes...",
-      "saved": "Saved!"
+      "saved": "Saved!",
+      "not_saved_yet": "Your latest changes could not be saved yet. They are kept on this device and Poznote keeps trying."
+    },
+    "draft": {
+      "found_conflict": "This note has unsaved changes from your last visit, but it was also changed elsewhere since. The version you do not keep stays in the note history.",
+      "found_error": "This note has unsaved changes from your last visit. They could not be saved yet.",
+      "restore": "Keep my unsaved changes",
+      "discard": "Keep the current version",
+      "restored": "Your latest changes were recovered and saved.",
+      "restore_failed": "Your changes could not be saved. Check your connection and try again."
     }
   },
   "tasks_page": {
