@@ -333,6 +333,14 @@ class AttachmentStorage {
      * migrated files without a network round-trip.
      */
     public function stream(string $filename): bool {
+        // Unbuffered, whichever side the bytes come from: config.php's
+        // injection buffer (or a page-level ob_start()) would copy the whole
+        // file into memory first, and readfile() is one single write that no
+        // chunk size can split (see poznoteSendFile() in config.php, not used
+        // here so this class stays free of the application bootstrap).
+        while (ob_get_level() > 0 && @ob_end_clean()) {
+        }
+
         $localPath = $this->localDir() . '/' . basename($filename);
         if (file_exists($localPath) && is_readable($localPath)) {
             readfile($localPath);

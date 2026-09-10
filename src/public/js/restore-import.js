@@ -168,6 +168,14 @@ function handleRestoreImportClick(e) {
             hideCustomAlert();
             break;
 
+        // Pending upload cancellation (either flow)
+        case 'cancel-pending-restore-upload':
+            cancelPendingRestoreUpload();
+            break;
+        case 'cancel-pending-notes-import-upload':
+            cancelPendingNotesImportUpload();
+            break;
+
         // Post-restore workspace chooser
         case 'hide-restore-workspaces-modal':
             hideRestoreWorkspacesModal();
@@ -328,7 +336,15 @@ function proceedWithCompleteRestore() {
 // restore outside any HTTP request, so no proxy or browser timeout can
 // interrupt it; this page polls the job status and shows the outcome.
 
-const chunkedRestore = { pollTimer: null, uploading: false };
+// pendingFile: the archive the user picked while another upload still held
+// the slot, started as soon as that one is cancelled.
+const chunkedRestore = {
+    pollTimer: null,
+    uploading: false,
+    pendingFile: null,
+    foreignJob: null,
+    lastBeatAt: 0
+};
 
 function chunkedRestoreConfig() {
     return window.__restoreImportConfig || {};
@@ -348,6 +364,7 @@ function chunkedRestoreEls() {
         progress: document.getElementById('chunkedRestoreProgress'),
         bar: document.getElementById('chunkedRestoreBar'),
         statusText: document.getElementById('chunkedRestoreStatusText'),
+        cancel: document.getElementById('chunkedRestoreCancelBtn'),
         error: document.getElementById('chunkedRestoreError'),
         success: document.getElementById('chunkedRestoreSuccess'),
         button: document.getElementById('completeRestoreBtn')
@@ -368,8 +385,27 @@ function chunkedRestoreShowProgress(percent, text) {
         const circle = els.progress.querySelector('.restore-spinner-circle');
         if (circle) circle.style.display = '';
     }
+    // Only an upload this page is not driving offers a cancel button; every
+    // other state hides it again.
+    if (els.cancel) els.cancel.classList.add('initially-hidden');
     if (els.bar) els.bar.style.width = Math.max(0, Math.min(100, percent)) + '%';
     if (els.statusText) els.statusText.textContent = text;
+}
+
+/**
+ * An upload registered for this account that this page is not sending: it
+ * belongs to another tab, or to a page that has since been closed. Its
+ * progress is shown like any other stage, plus a way out for the user who
+ * has no idea which tab it was.
+ */
+function chunkedRestoreShowForeignUpload(job) {
+    chunkedRestore.foreignJob = job;
+    chunkedRestoreShowProgress(restoreFamilyUploadPercent(job), restoreFamilyUploadLabel(job));
+    const els = chunkedRestoreEls();
+    if (els.cancel) {
+        els.cancel.classList.remove('initially-hidden');
+        els.cancel.disabled = false;
+    }
 }
 
 /** Completion state: full bar, no spinner, summary below, chooser on top. */
@@ -380,6 +416,7 @@ function chunkedRestoreShowDone(summary) {
         const circle = els.progress.querySelector('.restore-spinner-circle');
         if (circle) circle.style.display = 'none';
     }
+    if (els.cancel) els.cancel.classList.add('initially-hidden');
     if (els.bar) els.bar.style.width = '100%';
     if (els.statusText) els.statusText.textContent = chunkedRestoreText('done', 'Restore completed successfully.');
     if (els.error) els.error.classList.add('initially-hidden');
@@ -393,6 +430,7 @@ function chunkedRestoreShowDone(summary) {
 function chunkedRestoreShowResult(ok, text) {
     const els = chunkedRestoreEls();
     if (els.progress) els.progress.classList.add('initially-hidden');
+    if (els.cancel) els.cancel.classList.add('initially-hidden');
     const box = ok ? els.success : els.error;
     const other = ok ? els.error : els.success;
     if (other) other.classList.add('initially-hidden');
@@ -413,17 +451,171 @@ window.addEventListener('beforeunload', function (e) {
     }
 });
 
-/** POST FormData to the restore upload endpoint, expecting JSON back. */
+// Leaving for real ends the transfer, whatever the warning above got as an
+// answer. Dropping the beat here is what lets the next visit say the upload
+// was interrupted instead of showing a bar that will never move again.
+window.addEventListener('pagehide', function () {
+    if (chunkedRestore.uploading) restoreUploadBeatClear();
+});
+
+/**
+ * POST FormData to the restore upload endpoint, expecting JSON back. The
+ * whole response body rides on the rejection too: a refusal can carry the
+ * job that caused it (409 busy), and the caller shows that job rather than
+ * a dead end.
+ */
 function chunkedRestoreFetch(body) {
     return fetch('api_restore_upload.php', { method: 'POST', credentials: 'same-origin', body: body })
         .then(async function (r) {
             let data = null;
             try { data = await r.json(); } catch (e) { /* proxy error page */ }
             if (!data || !data.success) {
-                throw new Error((data && data.error) || ('HTTP ' + r.status));
+                const err = new Error((data && data.error) || ('HTTP ' + r.status));
+                err.data = data;
+                throw err;
             }
             return data;
         });
+}
+
+// ========================================
+// Shared restore-family job helpers
+// ========================================
+// The complete restore and the notes import cannot run at the same time
+// (both rewrite the account's data), so either one may be refused because of
+// the other, and either may still be running when the page is reloaded.
+// These helpers route a job to the card that owns it, whichever flow asked.
+
+function restoreFamilyJobIsImport(job) {
+    return !!job && job.type === 'notes_import';
+}
+
+// ---- Who is still sending? ----------------------------------------------
+// The slices only ever travel from the tab that holds the file, so no server
+// state can tell a transfer still running in another tab from one whose tab
+// was closed: the server only sees that no slice arrived lately, and waits
+// three minutes before calling it abandoned. The sending tab therefore leaves
+// a heartbeat in this browser's storage and drops it on the way out, so a
+// page coming back knows at once whether anyone is still pushing bytes.
+// One key for both flows: only one restore-family upload may run at a time.
+
+const RESTORE_UPLOAD_BEAT_KEY = 'poznote-restore-upload-beat';
+// Only a crash lets a beat expire (leaving the page clears it), so the window
+// can be wide enough to cover a transfer stalled on a bad connection.
+const RESTORE_UPLOAD_BEAT_MAX_AGE_MS = 120000;
+
+function restoreUploadBeatStore() {
+    return window.__poznoteUserStorage || window.localStorage;
+}
+
+/** Claim, or renew, this tab's ownership of the upload for `jobId`. */
+function restoreUploadBeat(jobId) {
+    try {
+        restoreUploadBeatStore().setItem(RESTORE_UPLOAD_BEAT_KEY, JSON.stringify({ id: jobId, ts: Date.now() }));
+    } catch (e) { /* storage refused: the server's own window still applies */ }
+}
+
+/**
+ * Renew at most every couple of seconds: this runs on transfer progress
+ * events, which fire far too often to write storage each time.
+ */
+function restoreUploadBeatTick(jobId) {
+    const now = Date.now();
+    if (now - (chunkedRestore.lastBeatAt || 0) < 2000) return;
+    chunkedRestore.lastBeatAt = now;
+    restoreUploadBeat(jobId);
+}
+
+function restoreUploadBeatClear() {
+    try {
+        restoreUploadBeatStore().removeItem(RESTORE_UPLOAD_BEAT_KEY);
+    } catch (e) { /* nothing to clear */ }
+}
+
+/**
+ * True while a tab of this browser is still sending slices for this job. No
+ * beat is the ordinary case after a page was closed mid-transfer; it can also
+ * mean the upload runs on another device, which is why nothing is discarded
+ * without the user asking for it.
+ */
+function restoreUploadIsBeating(jobId) {
+    let beat = null;
+    try {
+        beat = JSON.parse(restoreUploadBeatStore().getItem(RESTORE_UPLOAD_BEAT_KEY) || 'null');
+    } catch (e) { /* unreadable or absent */ }
+    return !!beat && beat.id === jobId && (Date.now() - beat.ts) < RESTORE_UPLOAD_BEAT_MAX_AGE_MS;
+}
+
+/** An upload the server still holds that nobody is feeding any more. */
+function restoreFamilyUploadIsAbandoned(job) {
+    return !!job && job.status === 'uploading' && (job.stale || !restoreUploadIsBeating(job.id));
+}
+
+/** The job a 409 refusal named, or null when the failure was something else. */
+function restoreFamilyBusyJob(err) {
+    const data = err && err.data;
+    return (data && data.busy && data.job) ? data.job : null;
+}
+
+/**
+ * True while a job can still change on its own, so following it is worth a
+ * poll. An upload nobody feeds any more and a job whose worker died are both
+ * final: the server treats them as abandoned and lets the next attempt take
+ * their slot.
+ */
+function restoreFamilyJobIsLive(job) {
+    if (!job) return false;
+    if (job.status === 'uploading') return !restoreFamilyUploadIsAbandoned(job);
+    return (job.status === 'queued' || job.status === 'running') && !job.stale;
+}
+
+/** Show a job (and follow it) in whichever card owns its flow. */
+function restoreFamilyRenderJob(job) {
+    if (restoreFamilyJobIsImport(job)) {
+        notesImportOpenCard();
+        notesImportSetBusy(true);
+        notesImportRenderJob(job);
+        if (restoreFamilyJobIsLive(job)) notesImportPoll(job.id);
+    } else {
+        chunkedRestoreOpenCards();
+        chunkedRestoreSetBusy(true);
+        chunkedRestoreRenderJob(job);
+        if (restoreFamilyJobIsLive(job)) chunkedRestorePoll(job.id);
+    }
+}
+
+/**
+ * Bar position of an upload this page is not driving: the slice count is the
+ * only progress the server can report, since the bytes travel from the tab
+ * that holds the file.
+ */
+function restoreFamilyUploadPercent(job) {
+    const total = job.total_chunks || 0;
+    const done = job.received_chunks || 0;
+    return total > 0 ? Math.min(1, done / total) * CHUNKED_RESTORE_UPLOAD_SPAN : 0;
+}
+
+function restoreFamilyUploadLabel(job) {
+    return chunkedRestoreText(
+        'foreign_upload',
+        'An upload is already in progress in another tab or window ({{done}}/{{total}} slices sent).',
+        { done: job.received_chunks || 0, total: job.total_chunks || 0 }
+    );
+}
+
+/** How far the abandoned transfer had got, for the message that reports it. */
+function restoreFamilyUploadCounts(job) {
+    return { done: job.received_chunks || 0, total: job.total_chunks || 0 };
+}
+
+/** Drop an unfinished upload (any flow), so a new one may start at once. */
+function restoreFamilyAbortJob(job) {
+    const body = new FormData();
+    body.append('action', 'abort');
+    body.append('csrf_token', chunkedRestoreConfig().csrfToken || '');
+    if (restoreFamilyJobIsImport(job)) body.append('job_type', 'notes_import');
+    body.append('upload_id', job.id);
+    return chunkedRestoreFetch(body).catch(function () { /* already gone */ });
 }
 
 /** Upload one slice with fine-grained progress events. */
@@ -557,6 +749,7 @@ async function chunkedUploadFile(file, opts) {
     const uploadId = initData.upload_id;
 
     chunkedRestore.uploading = true;
+    restoreUploadBeat(uploadId);
     try {
         let sent = 0;
         for (let i = 0; i < totalChunks; i++) {
@@ -572,6 +765,10 @@ async function chunkedUploadFile(file, opts) {
                     fd.append('chunk_index', String(i));
                     fd.append('chunk', blob, 'chunk');
                     await chunkedRestoreSendChunk(fd, function (loaded) {
+                        // Transfer progress keeps firing even in a background
+                        // tab, where timers are throttled to once a minute, so
+                        // this is the reliable place to renew the beat.
+                        restoreUploadBeatTick(uploadId);
                         opts.renderProgress(sent + loaded, file.size);
                     });
                     break;
@@ -586,6 +783,7 @@ async function chunkedUploadFile(file, opts) {
                 }
             }
             sent += blob.size;
+            restoreUploadBeat(uploadId);
             opts.renderProgress(sent, file.size);
         }
 
@@ -598,6 +796,7 @@ async function chunkedUploadFile(file, opts) {
         return finData.job;
     } finally {
         chunkedRestore.uploading = false;
+        restoreUploadBeatClear();
     }
 }
 
@@ -630,8 +829,37 @@ function chunkedRestoreRenderJob(job) {
         chunkedRestoreStopPolling();
         return;
     }
+    if (job.status === 'uploading') {
+        if (!restoreFamilyUploadIsAbandoned(job)) {
+            // A tab of this browser is still sending: follow its slice count,
+            // it may well be about to finish.
+            chunkedRestoreShowForeignUpload(job);
+            return;
+        }
+        // Nobody is pushing bytes any more: the page that held the file is
+        // gone and this upload can never complete. Say where it stopped and
+        // hand the card back; starting again clears the leftover.
+        chunkedRestoreStopPolling();
+        chunkedRestoreShowResult(false, chunkedRestoreText(
+            'upload_interrupted',
+            'The previous upload was interrupted after {{done}} of {{total}} slices, so nothing was restored. You can start the restore again.',
+            restoreFamilyUploadCounts(job)
+        ));
+        return;
+    }
     if (job.status === 'queued' || job.status === 'running') {
-        chunkedRestoreShowProgress(chunkedRestoreJobPercent(job), chunkedRestoreStageLabel(job));
+        if (!job.stale) {
+            chunkedRestoreShowProgress(chunkedRestoreJobPercent(job), chunkedRestoreStageLabel(job));
+            return;
+        }
+        // The worker has not touched the job for half an hour: it was killed
+        // (container restart, out of memory). Nothing will move again, so
+        // report it rather than spin on a frozen bar.
+        chunkedRestoreStopPolling();
+        chunkedRestoreShowResult(false, chunkedRestoreText(
+            'worker_lost',
+            'The restore stopped before it finished. Check the server logs, then start it again.'
+        ));
         return;
     }
     chunkedRestoreStopPolling();
@@ -695,7 +923,7 @@ function chunkedRestorePoll(uploadId) {
     poll();
 }
 
-async function startChunkedRestore(file) {
+async function startChunkedRestore(file, retried) {
     chunkedRestoreSetBusy(true);
     chunkedRestoreRenderUpload(0, file.size);
     try {
@@ -703,8 +931,58 @@ async function startChunkedRestore(file) {
         chunkedRestoreRenderJob(job);
         chunkedRestorePoll(job.id);
     } catch (e) {
+        const busy = restoreFamilyBusyJob(e);
+        if (busy) {
+            // An upload nobody feeds any more holds the slot on paper only.
+            // Clear it and go, rather than making the user sit out the
+            // server's abandon window for a tab they already closed.
+            if (!retried && restoreFamilyUploadIsAbandoned(busy)) {
+                await restoreFamilyAbortJob(busy);
+                return startChunkedRestore(file, true);
+            }
+            // Something really is running: show it instead of refusing,
+            // exactly like a reloaded page does. A live upload keeps the
+            // chosen file aside, so cancelling it starts this restore
+            // straight away. Only when that upload belongs to this card,
+            // though: its cancel button is the one that would start the file.
+            if (busy.status === 'uploading' && !restoreFamilyJobIsImport(busy)) {
+                chunkedRestore.pendingFile = file;
+            }
+            restoreFamilyRenderJob(busy);
+            if (restoreFamilyJobIsImport(busy)) {
+                chunkedRestoreShowResult(false, e.message);
+            }
+            return;
+        }
         chunkedRestoreShowResult(false, chunkedRestoreText('uploadError', 'The upload failed: {{error}}', { error: e.message }));
     }
+}
+
+/**
+ * Drop the pending upload shown in the restore card. When the user got here
+ * by trying to start a restore of their own, that restore starts as soon as
+ * the slot is free.
+ */
+function cancelPendingRestoreUpload() {
+    const job = chunkedRestore.foreignJob;
+    if (!job) return;
+    const els = chunkedRestoreEls();
+    if (els.cancel) els.cancel.disabled = true;
+    chunkedRestoreStopPolling();
+    chunkedRestore.foreignJob = null;
+    restoreFamilyAbortJob(job)
+        .then(function () {
+            const file = chunkedRestore.pendingFile;
+            chunkedRestore.pendingFile = null;
+            if (file) {
+                startChunkedRestore(file);
+                return;
+            }
+            chunkedRestoreShowResult(false, chunkedRestoreText(
+                'upload_cancelled',
+                'The pending upload was cancelled. You can start the restore again.'
+            ));
+        });
 }
 
 // The restore controls live inside two collapsible cards that are closed by
@@ -726,7 +1004,7 @@ function chunkedRestoreOpenCards(extraIds) {
  * bucket and restoring it is exactly as slow, so it cannot live inside an
  * HTTP request either.
  */
-function startS3Restore(s3Key) {
+function startS3Restore(s3Key, retried) {
     chunkedRestoreOpenCards(['s3RestoreContent']);
     chunkedRestoreSetBusy(true);
     chunkedRestoreShowProgress(2, chunkedRestoreText('queued', 'Restore starting...'));
@@ -742,6 +1020,17 @@ function startS3Restore(s3Key) {
             chunkedRestorePoll(data.job.id);
         })
         .catch(function (e) {
+            const busy = restoreFamilyBusyJob(e);
+            if (busy) {
+                if (!retried && restoreFamilyUploadIsAbandoned(busy)) {
+                    return restoreFamilyAbortJob(busy).then(function () {
+                        return startS3Restore(s3Key, true);
+                    });
+                }
+                restoreFamilyRenderJob(busy);
+                if (restoreFamilyJobIsImport(busy)) chunkedRestoreShowResult(false, e.message);
+                return;
+            }
             chunkedRestoreShowResult(false, chunkedRestoreText('error', 'The restore failed: {{error}}', { error: e.message }));
         });
 }
@@ -751,11 +1040,15 @@ function chunkedRestoreResume() {
         .then(function (r) { return r.json(); })
         .then(function (data) {
             if (!data.success || !data.job) return;
-            if (data.job.status === 'queued' || data.job.status === 'running') {
+            const status = data.job.status;
+            // 'uploading' included: an upload left behind by a closed tab
+            // would otherwise be invisible here and refuse the next restore
+            // with an error about a tab the user cannot find.
+            if (status === 'queued' || status === 'running' || status === 'uploading') {
                 chunkedRestoreOpenCards();
                 chunkedRestoreSetBusy(true);
                 chunkedRestoreRenderJob(data.job);
-                chunkedRestorePoll(data.job.id);
+                if (restoreFamilyJobIsLive(data.job)) chunkedRestorePoll(data.job.id);
             }
             // A finished or failed run from an earlier visit is not
             // resurfaced: its outcome was shown when it happened.
@@ -772,17 +1065,27 @@ function chunkedRestoreResume() {
 // the import outside any HTTP request. This page polls the job status and
 // renders it into the individual-notes card's own progress bar.
 
-const notesImportJob = { pollTimer: null };
+const notesImportJob = { pollTimer: null, pendingUpload: null, foreignJob: null };
 
 function notesImportEls() {
     return {
         progress: document.getElementById('notesImportProgress'),
         bar: document.getElementById('notesImportBar'),
         statusText: document.getElementById('notesImportStatusText'),
+        cancel: document.getElementById('notesImportCancelBtn'),
         error: document.getElementById('notesImportError'),
         success: document.getElementById('notesImportSuccess'),
         button: document.getElementById('individualNotesImportBtn')
     };
+}
+
+/** The import card is closed by default; a resumed or adopted job needs it open. */
+function notesImportOpenCard() {
+    const content = document.getElementById('individualNotesContent');
+    if (content) content.classList.add('open');
+    const header = document.querySelector('[data-target="individualNotesContent"]');
+    const chevron = header ? header.querySelector('.chevron') : null;
+    if (chevron) chevron.classList.add('open');
 }
 
 // The upload takes the bar's first span (like the restore), then the
@@ -809,8 +1112,20 @@ function notesImportShowProgress(percent, text) {
         const circle = els.progress.querySelector('.restore-spinner-circle');
         if (circle) circle.style.display = '';
     }
+    if (els.cancel) els.cancel.classList.add('initially-hidden');
     if (els.bar) els.bar.style.width = Math.max(0, Math.min(100, percent)) + '%';
     if (els.statusText) els.statusText.textContent = text;
+}
+
+/** An upload this page is not sending (another tab, or a closed one). */
+function notesImportShowForeignUpload(job) {
+    notesImportJob.foreignJob = job;
+    notesImportShowProgress(restoreFamilyUploadPercent(job), restoreFamilyUploadLabel(job));
+    const els = notesImportEls();
+    if (els.cancel) {
+        els.cancel.classList.remove('initially-hidden');
+        els.cancel.disabled = false;
+    }
 }
 
 /** Completion state: full bar, no spinner, import summary below. */
@@ -821,6 +1136,7 @@ function notesImportShowDone(summary) {
         const circle = els.progress.querySelector('.restore-spinner-circle');
         if (circle) circle.style.display = 'none';
     }
+    if (els.cancel) els.cancel.classList.add('initially-hidden');
     if (els.bar) els.bar.style.width = '100%';
     if (els.statusText) els.statusText.textContent = chunkedRestoreText('import_done', 'Import completed successfully.');
     if (els.error) els.error.classList.add('initially-hidden');
@@ -834,6 +1150,7 @@ function notesImportShowDone(summary) {
 function notesImportShowError(text) {
     const els = notesImportEls();
     if (els.progress) els.progress.classList.add('initially-hidden');
+    if (els.cancel) els.cancel.classList.add('initially-hidden');
     if (els.success) els.success.classList.add('initially-hidden');
     if (els.error) {
         els.error.textContent = text;
@@ -903,8 +1220,29 @@ function notesImportRenderJob(job) {
         notesImportStopPolling();
         return;
     }
+    if (job.status === 'uploading') {
+        if (!restoreFamilyUploadIsAbandoned(job)) {
+            notesImportShowForeignUpload(job);
+            return;
+        }
+        notesImportStopPolling();
+        notesImportShowError(chunkedRestoreText(
+            'import_upload_interrupted',
+            'The previous upload was interrupted after {{done}} of {{total}} slices, so nothing was imported. You can start the import again.',
+            restoreFamilyUploadCounts(job)
+        ));
+        return;
+    }
     if (job.status === 'queued' || job.status === 'running') {
-        notesImportShowProgress(notesImportJobPercent(job), notesImportStageLabel(job));
+        if (!job.stale) {
+            notesImportShowProgress(notesImportJobPercent(job), notesImportStageLabel(job));
+            return;
+        }
+        notesImportStopPolling();
+        notesImportShowError(chunkedRestoreText(
+            'import_worker_lost',
+            'The import stopped before it finished. Check the server logs, then start it again.'
+        ));
         return;
     }
     notesImportStopPolling();
@@ -929,7 +1267,7 @@ function notesImportPoll(uploadId) {
     poll();
 }
 
-async function startChunkedNotesImport(file, workspace, folder) {
+async function startChunkedNotesImport(file, workspace, folder, retried) {
     notesImportSetBusy(true);
     notesImportRenderUpload(0, file.size);
     try {
@@ -950,8 +1288,46 @@ async function startChunkedNotesImport(file, workspace, folder) {
         notesImportRenderJob(job);
         notesImportPoll(job.id);
     } catch (e) {
+        const busy = restoreFamilyBusyJob(e);
+        if (busy) {
+            if (!retried && restoreFamilyUploadIsAbandoned(busy)) {
+                await restoreFamilyAbortJob(busy);
+                return startChunkedNotesImport(file, workspace, folder, true);
+            }
+            if (busy.status === 'uploading' && restoreFamilyJobIsImport(busy)) {
+                notesImportJob.pendingUpload = { file: file, workspace: workspace, folder: folder };
+            }
+            restoreFamilyRenderJob(busy);
+            if (!restoreFamilyJobIsImport(busy)) {
+                notesImportShowError(e.message);
+            }
+            return;
+        }
         notesImportShowError(chunkedRestoreText('uploadError', 'The upload failed: {{error}}', { error: e.message }));
     }
+}
+
+/** Drop the pending upload shown in the import card, then start the user's own. */
+function cancelPendingNotesImportUpload() {
+    const job = notesImportJob.foreignJob;
+    if (!job) return;
+    const els = notesImportEls();
+    if (els.cancel) els.cancel.disabled = true;
+    notesImportStopPolling();
+    notesImportJob.foreignJob = null;
+    restoreFamilyAbortJob(job)
+        .then(function () {
+            const pending = notesImportJob.pendingUpload;
+            notesImportJob.pendingUpload = null;
+            if (pending) {
+                startChunkedNotesImport(pending.file, pending.workspace, pending.folder);
+                return;
+            }
+            notesImportShowError(chunkedRestoreText(
+                'upload_cancelled',
+                'The pending upload was cancelled. You can start the restore again.'
+            ));
+        });
 }
 
 // An import launched earlier (or from another tab) may still be running on
@@ -962,12 +1338,12 @@ function notesImportResume() {
         .then(function (r) { return r.json(); })
         .then(function (data) {
             if (!data.success || !data.job) return;
-            if (data.job.status === 'queued' || data.job.status === 'running') {
-                const content = document.getElementById('individualNotesContent');
-                if (content) content.classList.add('open');
+            const status = data.job.status;
+            if (status === 'queued' || status === 'running' || status === 'uploading') {
+                notesImportOpenCard();
                 notesImportSetBusy(true);
                 notesImportRenderJob(data.job);
-                notesImportPoll(data.job.id);
+                if (restoreFamilyJobIsLive(data.job)) notesImportPoll(data.job.id);
             }
             // A finished or failed run from an earlier visit is not
             // resurfaced: its outcome was shown when it happened.

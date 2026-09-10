@@ -6,6 +6,7 @@ require_once __DIR__ . '/../functions.php';
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../export_helpers.php';
+require_once __DIR__ . '/../lib/export-staging.php';
 
 // Start output buffering to prevent any unwanted output
 ob_start();
@@ -23,6 +24,12 @@ if ($result !== TRUE) {
     ob_end_clean();
     die('Cannot create ZIP file. Error code: ' . $result);
 }
+
+// Note bodies are rewritten before archiving (front matter, attachment paths,
+// copy buttons) and used to be handed to ZipArchive::addFromString(), which
+// keeps every one of them in memory until close(). They are staged on disk
+// instead, so the peak is one note rather than the whole export.
+$stagingDir = poznoteExportOpenStagingDir('poznote_export_entries');
 
 $fileCount = 0;
 
@@ -98,7 +105,7 @@ foreach ($files as $name => $file) {
                     if ($metadata) {
                         $content = file_get_contents($filePath);
                         $frontMatterContent = addFrontMatterToMarkdown($content, $metadata, $con);
-                        $zip->addFromString($relativePath, $frontMatterContent);
+                        poznoteExportAddRewrittenFile($zip, $stagingDir, $relativePath, $frontMatterContent);
                         $fileCount++;
                     } else {
                         // No metadata found, add file as-is
@@ -121,7 +128,7 @@ foreach ($files as $name => $file) {
                         if ($noteType !== 'tasklist') {
                             $content = removeCopyButtonsFromHtml($content);
                         }
-                        $zip->addFromString($relativePath, $content);
+                        poznoteExportAddRewrittenFile($zip, $stagingDir, $relativePath, $content);
                     } else {
                         $zip->addFile($filePath, $relativePath);
                     }
@@ -154,6 +161,6 @@ header('Content-Length: ' . filesize($zipFileName));
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: 0');
 
-readfile($zipFileName);
+poznoteSendFile($zipFileName);
 unlink($zipFileName);
 ?>

@@ -131,6 +131,8 @@ function s3BackupStreamArchive(string $key): void {
         header('Content-Disposition: attachment; filename="' . basename($key) . '"');
         header('Content-Length: ' . $head['size']);
         header('Cache-Control: no-cache, must-revalidate');
+        // Unbuffered: the archive must not be copied into memory on its way out.
+        poznoteEndOutputBuffers();
         $client->streamObject($key);
     } catch (Exception $e) {
         if (!headers_sent()) {

@@ -480,6 +480,12 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
                     <span class="restore-spinner-circle" aria-hidden="true"></span>
                     <span id="chunkedRestoreStatusText"></span>
                 </div>
+                <!-- Only shown for an upload this page is not sending (another
+                     tab, or one that was closed mid-transfer): the user has no
+                     other way to free the slot before it times out. -->
+                <button type="button" id="chunkedRestoreCancelBtn" class="chunked-restore-cancel initially-hidden" data-action="cancel-pending-restore-upload">
+                    <?php echo t_h('restore_import.chunked.cancel_upload'); ?>
+                </button>
             </div>
             <div id="chunkedRestoreError" class="alert alert-danger chunked-restore-result initially-hidden"></div>
             <div id="chunkedRestoreSuccess" class="alert alert-success chunked-restore-result initially-hidden"></div>
@@ -568,6 +574,9 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
                     <span class="restore-spinner-circle" aria-hidden="true"></span>
                     <span id="notesImportStatusText"></span>
                 </div>
+                <button type="button" id="notesImportCancelBtn" class="chunked-restore-cancel initially-hidden" data-action="cancel-pending-notes-import-upload">
+                    <?php echo t_h('restore_import.chunked.cancel_upload'); ?>
+                </button>
             </div>
             <div id="notesImportError" class="alert alert-danger chunked-restore-result initially-hidden"></div>
             <div id="notesImportSuccess" class="alert alert-success chunked-restore-result initially-hidden"></div>
@@ -747,16 +756,26 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
         display: flex; flex-direction: column; gap: 8px;
         margin: 16px 0; max-height: 40vh; overflow-y: auto;
     }
-    .restore-workspace-open-btn {
+    /* Outlined button shared by the workspace chooser and the cancel
+       control under the progress bar: same borders and accent hover, only
+       the metrics differ. */
+    .restore-workspace-open-btn,
+    .chunked-restore-cancel {
         display: block; width: 100%; padding: 10px 14px; text-align: left;
         border: 1px solid rgba(128, 128, 128, 0.35); border-radius: 6px;
         background: transparent; color: inherit; font: inherit;
         font-weight: 600; cursor: pointer;
     }
-    .restore-workspace-open-btn:hover {
+    .restore-workspace-open-btn:hover,
+    .chunked-restore-cancel:hover:not(:disabled) {
         border-color: var(--pz-accent, #007cba);
         color: var(--pz-accent, #007cba);
     }
+    .chunked-restore-cancel {
+        width: auto; margin-top: 12px; padding: 6px 12px;
+        font-size: 13px; font-weight: normal;
+    }
+    .chunked-restore-cancel:disabled { opacity: 0.6; cursor: default; }
     </style>
     <!-- Configuration for JavaScript -->
     <script type="application/json" id="restore-import-config"><?php
@@ -782,6 +801,12 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
                 'error' => t('restore_import.chunked.error', [], 'The restore failed: {{error}}'),
                 'uploadError' => t('restore_import.chunked.upload_error', [], 'The upload failed: {{error}}'),
                 'chunkRetry' => t('restore_import.chunked.chunk_retry', [], 'A slice failed to upload, retrying...'),
+                'foreign_upload' => t('restore_import.chunked.foreign_upload', [], 'An upload is already in progress in another tab or window ({{done}}/{{total}} slices sent).'),
+                'upload_interrupted' => t('restore_import.chunked.upload_interrupted', [], 'The previous upload was interrupted after {{done}} of {{total}} slices, so nothing was restored. You can start the restore again.'),
+                'upload_cancelled' => t('restore_import.chunked.upload_cancelled', [], 'The pending upload was cancelled. You can start the restore again.'),
+                'worker_lost' => t('restore_import.chunked.worker_lost', [], 'The restore stopped before it finished. Check the server logs, then start it again.'),
+                'import_worker_lost' => t('restore_import.chunked_import.worker_lost', [], 'The import stopped before it finished. Check the server logs, then start it again.'),
+                'import_upload_interrupted' => t('restore_import.chunked_import.upload_interrupted', [], 'The previous upload was interrupted after {{done}} of {{total}} slices, so nothing was imported. You can start the import again.'),
                 'import_queued' => t('restore_import.chunked_import.queued', [], 'Import starting...'),
                 'import_queued_uploaded' => t('restore_import.chunked_import.queued_uploaded', [], 'Upload complete, import starting...'),
                 'import_stage_preparing' => t('restore_import.chunked_import.stage_preparing', [], 'Reading the archive...'),

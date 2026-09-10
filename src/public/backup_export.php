@@ -101,7 +101,8 @@ function createCompleteBackup($userId = null, $skipS3Attachments = false) {
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: 0');
 
-    readfile($zipFileName);
+    // Unbuffered: the archive must not be copied into memory on its way out.
+    poznoteSendFile($zipFileName);
     unlink($zipFileName);
     exit;
 }

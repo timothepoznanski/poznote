@@ -229,7 +229,7 @@ if (isset($_GET['oidc_error'])) {
         if ($defaultAdminUsername): 
         ?>
         <div class="admin-warning">
-            <?php echo t('login.admin_warning', ['username' => $defaultAdminUsername], 'Once logged in, please change your password immediately in the settings. You can also change your username there.', $currentLang ?? 'en'); ?>
+            <?php echo t('login.admin_warning', ['username' => $defaultAdminUsername], 'Please log in with the username <code>' . htmlspecialchars($defaultAdminUsername) . '</code> and the password <code>admin</code>. Once logged in, change your password immediately in the settings. You can also change your username.', $currentLang ?? 'en'); ?>
         </div>
         <?php endif; ?>
         

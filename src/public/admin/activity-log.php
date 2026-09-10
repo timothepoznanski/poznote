@@ -162,6 +162,10 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     header('Content-Disposition: attachment; filename="' . $filename . '"');
     header('Cache-Control: no-store');
 
+    // Unbuffered: a long log is written row by row and must not pile up in
+    // memory first.
+    poznoteEndOutputBuffers();
+
     $out = fopen('php://output', 'w');
     // UTF-8 BOM: without it Excel reads accented names and details as mojibake.
     fwrite($out, "\xEF\xBB\xBF");

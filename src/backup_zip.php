@@ -21,24 +21,11 @@ require_once __DIR__ . '/storage/AttachmentStorage.php';
 // drift apart unnoticed (the export one had stopped stripping the code block
 // language badge).
 require_once __DIR__ . '/export_helpers.php';
+// The staging helpers below are shared with the per-folder and per-workspace
+// ZIP exports, which had the same in-memory problem this file solved.
+require_once __DIR__ . '/lib/export-staging.php';
 
 if (!function_exists('generateSQLDumpToStream')) {
-/**
- * Write every byte of $data to $stream, looping over short writes (a full
- * disk can accept part of a buffer and report success for that part only).
- */
-function poznoteExportWriteAll($stream, string $data): bool {
-    $length = strlen($data);
-    $offset = 0;
-    while ($offset < $length) {
-        $written = fwrite($stream, $offset === 0 ? $data : substr($data, $offset));
-        if ($written === false || $written === 0) {
-            return false;
-        }
-        $offset += $written;
-    }
-    return true;
-}
 
 /**
  * Write the SQL dump of a user database to an open stream, one statement at
@@ -114,49 +101,6 @@ function generateSQLDumpToStream($con, $stream): bool {
     return true;
 }
 
-/**
- * Write a rewritten file for the archive into the build's staging directory
- * and return its path, or null if it could not be written in full.
- */
-function poznoteExportStageFile(string $stagingDir, string $relativePath, string $content): ?string {
-    $path = $stagingDir . '/' . $relativePath;
-    $dir = dirname($path);
-    if (!is_dir($dir) && !@mkdir($dir, 0700, true) && !is_dir($dir)) {
-        return null;
-    }
-    $stream = @fopen($path, 'wb');
-    if ($stream === false) {
-        return null;
-    }
-    $ok = poznoteExportWriteAll($stream, $content);
-    fclose($stream);
-    if (!$ok) {
-        @unlink($path);
-        return null;
-    }
-    return $path;
-}
-
-/**
- * Remove a build's staging directory (SQL dump, rewritten note bodies).
- */
-function poznoteExportRemoveStaging(?string $dir): void {
-    if ($dir === null || $dir === '' || !is_dir($dir)) {
-        return;
-    }
-    $items = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
-        RecursiveIteratorIterator::CHILD_FIRST
-    );
-    foreach ($items as $item) {
-        if ($item->isDir()) {
-            @rmdir($item->getPathname());
-        } else {
-            @unlink($item->getPathname());
-        }
-    }
-    @rmdir($dir);
-}
 }
 
 /**

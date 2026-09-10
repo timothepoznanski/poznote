@@ -890,6 +890,9 @@ function exportAsHtml($htmlContent, $title, $disposition = 'attachment') {
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');
     
+    // Unbuffered: the file must reach the browser as the exporter built it,
+    // and a large note must not be copied into memory a second time.
+    poznoteEndOutputBuffers();
     echo $htmlContent;
     exit;
 }
@@ -999,7 +1002,7 @@ function exportAsHtmlZip($htmlContent, $note, $con) {
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');
     
-    readfile($tempZipFile);
+    poznoteSendFile($tempZipFile);
     @unlink($tempZipFile);
     exit;
 }
@@ -1077,6 +1080,9 @@ function exportAsMarkdown($content, $note, $con) {
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');
     
+    // Unbuffered: the file must reach the browser as the exporter built it,
+    // and a large note must not be copied into memory a second time.
+    poznoteEndOutputBuffers();
     echo $markdownContent;
     exit;
 }
@@ -1224,7 +1230,7 @@ function exportAsMarkdownZip($content, $note, $con) {
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');
     
-    readfile($tempZipFile);
+    poznoteSendFile($tempZipFile);
     @unlink($tempZipFile);
     exit;
 }
@@ -1240,6 +1246,9 @@ function exportAsJson($rawJson, $title) {
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: 0');
 
+    // Unbuffered: the file must reach the browser as the exporter built it,
+    // and a large note must not be copied into memory a second time.
+    poznoteEndOutputBuffers();
     echo $rawJson;
     exit;
 }

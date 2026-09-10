@@ -521,13 +521,11 @@ function poznoteIsHtmlResponseBuffer($buffer) {
  * Both are appended by hand rather than added to the CSS manifest because they
  * are not part of what a page declares: any HTML response gets them, including
  * the pages that write their own head.
+ *
+ * The two snippets are parameters so the rewrite can be exercised without a
+ * configured instance (tests/output-injection.test.php).
  */
-function poznoteInjectCustomCssIntoHtml($buffer) {
-    if (!poznoteIsHtmlResponseBuffer($buffer)) {
-        return $buffer;
-    }
-
-    $themeScript = poznoteRenderThemeListScript();
+function poznoteInjectIntoHtmlHead(string $buffer, string $themeScript, string $linkTag): string {
     if ($themeScript !== '' && strpos($buffer, 'window.__poznoteThemeList') === false) {
         // A callback, not a replacement string: the JSON carries characters
         // preg_replace would read as backreferences.
@@ -541,12 +539,8 @@ function poznoteInjectCustomCssIntoHtml($buffer) {
         );
     }
 
-    if (stripos($buffer, '</head>') === false || strpos($buffer, 'data-poznote-custom-css="1"') !== false) {
-        return $buffer;
-    }
-
-    $linkTag = poznoteRenderCustomCssLinkTag();
-    if ($linkTag === '') {
+    if ($linkTag === '' || stripos($buffer, '</head>') === false
+        || strpos($buffer, 'data-poznote-custom-css="1"') !== false) {
         return $buffer;
     }
 
@@ -560,6 +554,95 @@ function poznoteInjectCustomCssIntoHtml($buffer) {
     );
 }
 
+/**
+ * Whether the response being written is a file handed to the browser rather
+ * than a page rendered by it.
+ *
+ * A note exported as HTML is a document the user keeps, so it must come out
+ * exactly as the exporter built it. Without this check it was served with
+ * Content-Type text/html and got the theme script and the stylesheet link
+ * written into it like any page.
+ *
+ * The header list is a parameter so this can be checked without a request.
+ */
+function poznoteResponseIsFileDownload(array $headers): bool {
+    foreach ($headers as $header) {
+        if (stripos($header, 'Content-Disposition:') === 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Whether a chunk handed to the output handler can hold the document head:
+ * only the first chunk of an HTML response that is a page can.
+ *
+ * The handler runs once per POZNOTE_OUTPUT_CHUNK_BYTES of output rather than
+ * once per response, so a later chunk of a large page never carries the real
+ * head; a "<head>" found there could only come from note content.
+ */
+function poznoteOutputChunkCanCarryHead(string $buffer, int $phase): bool {
+    return ($phase & PHP_OUTPUT_HANDLER_START) !== 0
+        && !poznoteResponseIsFileDownload(headers_list())
+        && poznoteIsHtmlResponseBuffer($buffer);
+}
+
+/**
+ * The output handler installed below. The default phase is what PHP passes
+ * when the handler sees the whole response at once.
+ */
+function poznoteInjectCustomCssIntoHtml($buffer, $phase = PHP_OUTPUT_HANDLER_START | PHP_OUTPUT_HANDLER_FINAL) {
+    if (!poznoteOutputChunkCanCarryHead((string)$buffer, (int)$phase)) {
+        return $buffer;
+    }
+
+    return poznoteInjectIntoHtmlHead((string)$buffer, poznoteRenderThemeListScript(), poznoteRenderCustomCssLinkTag());
+}
+
+/**
+ * Close every output buffer so what follows goes straight to the client.
+ *
+ * For responses that stream a body: the injection buffer below and any
+ * page-level ob_start() would otherwise copy the body into memory first.
+ * Whatever the buffers held is dropped, which is what a download wants (a
+ * stray byte ahead of the archive would corrupt it).
+ */
+function poznoteEndOutputBuffers(): void {
+    // A buffer that refuses to go (zlib.output_compression's, for one) would
+    // otherwise keep the loop spinning.
+    while (ob_get_level() > 0 && @ob_end_clean()) {
+    }
+}
+
+/**
+ * Send a file from disk to the client, unbuffered.
+ *
+ * readfile() maps the whole file and hands it to the output layer in a single
+ * write, so no chunk size keeps a buffered request from holding all of it:
+ * a 900 MB backup died on memory_limit before its first byte went out.
+ * Closing the buffers first is the only thing that makes it stream.
+ *
+ * @return int|false what readfile() returns
+ */
+function poznoteSendFile(string $path) {
+    poznoteEndOutputBuffers();
+    return readfile($path);
+}
+
+/**
+ * How much output the injection buffer may hold before it is handed to the
+ * handler and flushed. Without a chunk size PHP keeps the entire response in
+ * memory until the script ends, which matters for bodies written in small
+ * pieces: an S3 object echoed as it arrives, a CSV written row by row, a very
+ * large note page. HTML pages are far smaller than this, so they still reach
+ * the handler in one piece; a larger one is handled through its first chunk,
+ * which is where its head is. A file sent with readfile() is one single
+ * write and goes through poznoteSendFile() instead.
+ */
+define('POZNOTE_OUTPUT_CHUNK_BYTES', 4 * 1024 * 1024);
+
 if (
     PHP_SAPI !== 'cli'
     && !defined('POZNOTE_CUSTOM_CSS_BUFFER_STARTED')
@@ -569,5 +652,5 @@ if (
     )
 ) {
     define('POZNOTE_CUSTOM_CSS_BUFFER_STARTED', true);
-    ob_start('poznoteInjectCustomCssIntoHtml');
+    ob_start('poznoteInjectCustomCssIntoHtml', POZNOTE_OUTPUT_CHUNK_BYTES);
 }
