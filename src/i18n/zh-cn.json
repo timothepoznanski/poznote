@@ -2143,7 +2143,7 @@
     "redirecting": "正在重定向...",
     "show_password": "显示密码",
     "hide_password": "隐藏密码",
-    "admin_warning": "登录后请立即在设置中修改密码，您也可以在那里修改用户名。",
+    "admin_warning": "请使用用户名 <code>{{username}}</code> 和密码 <code>admin</code> 登录。登录后请立即在设置中修改密码，您也可以修改用户名。",
     "fields": {
       "username": "用户名",
       "username_or_email": "用户名或邮箱",

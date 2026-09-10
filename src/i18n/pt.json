@@ -38,7 +38,7 @@
       "oidc_button": "Continuar com {{provider}}",
       "documentation": "Documentação do Poznote",
       "redirecting": "Redirecionando...",
-      "admin_warning": "Ao iniciar sessão, altere sua senha imediatamente nas configurações. Você também poderá alterar seu nome de usuário.",
+      "admin_warning": "Inicie sessão com o nome de usuário <code>{{username}}</code> e a senha <code>admin</code>. Em seguida, altere sua senha imediatamente nas configurações. Você também pode alterar seu nome de usuário.",
       "errors": {
         "invalid_credentials": "Usuário ou senha incorretos."
       }
@@ -2145,7 +2145,7 @@
     "redirecting": "Redirecionando...",
     "show_password": "Mostrar senha",
     "hide_password": "Ocultar senha",
-    "admin_warning": "Ao iniciar sessão, altere sua senha imediatamente nas configurações. Você também poderá alterar seu nome de usuário.",
+    "admin_warning": "Inicie sessão com o nome de usuário <code>{{username}}</code> e a senha <code>admin</code>. Em seguida, altere sua senha imediatamente nas configurações. Você também pode alterar seu nome de usuário.",
     "fields": {
       "username": "Nome de usuário",
       "username_or_email": "Nome de usuário ou e-mail",

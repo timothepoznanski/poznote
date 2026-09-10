@@ -2232,7 +2232,7 @@
     "redirecting": "Redirection...",
     "show_password": "Afficher le mot de passe",
     "hide_password": "Masquer le mot de passe",
-    "admin_warning": "À l'ouverture, veuillez changer votre mot de passe immédiatement dans les paramètres. Vous pourrez également changer votre login.",
+    "admin_warning": "Veuillez vous connecter avec le login <code>{{username}}</code> et le mot de passe <code>admin</code>. À l'ouverture, changez immédiatement votre mot de passe dans les paramètres. Vous pourrez également changer votre login.",
     "fields": {
       "username": "Nom d’utilisateur",
       "username_or_email": "Pseudo ou Email",
