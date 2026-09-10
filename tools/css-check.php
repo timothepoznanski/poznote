@@ -19,7 +19,9 @@ if ($root === false) {
     fwrite(STDERR, "css-check: stylesheet directory not found (expected src/public/css)\n");
     exit(2);
 }
-$files = array_slice($argv, 1);
+// $argv only exists under register_argc_argv, which the CLI SAPI always sets
+// but PHPStan cannot assume: no arguments means "check everything" anyway.
+$files = array_slice($argv ?? [], 1);
 if (!$files) {
     $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS));
     foreach ($it as $f) {

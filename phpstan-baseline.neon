@@ -147,7 +147,7 @@ parameters:
 		-
 			message: '#^Variable \$preserve_tags might not be defined\.$#'
 			identifier: variable.undefined
-			count: 6
+			count: 5
 			path: src/notes_list.php
 
 		-
@@ -171,7 +171,7 @@ parameters:
 		-
 			message: '#^Variable \$using_unified_search might not be defined\.$#'
 			identifier: variable.undefined
-			count: 5
+			count: 1
 			path: src/notes_list.php
 
 		-
