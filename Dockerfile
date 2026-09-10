@@ -121,8 +121,9 @@ RUN mkdir -p /var/log/supervisor /run/nginx \
     && chown -R poznote:poznote /var/log /var/lib/nginx /run
 
 # init.sh rewrites pm.max_children in the pool config when
-# POZNOTE_PHP_FPM_MAX_CHILDREN is set; as "poznote" it needs to own the file.
-RUN chown poznote:poznote /usr/local/etc/php-fpm.d/www.conf
+# POZNOTE_PHP_FPM_MAX_CHILDREN is set, and memory_limit in php.ini when
+# POZNOTE_PHP_MEMORY_LIMIT is set; as "poznote" it needs to own both files.
+RUN chown poznote:poznote /usr/local/etc/php-fpm.d/www.conf /usr/local/etc/php/php.ini
 
 # Copy application source, owned by the unprivileged user
 COPY --chown=poznote:poznote ./src /var/www/html

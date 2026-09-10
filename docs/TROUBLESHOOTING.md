@@ -151,3 +151,27 @@ docker compose up -d --force-recreate webserver
 Each busy worker costs about 25-30 MB of memory, and idle workers are few whatever the value, so 20 is safe on a host with 1 GB and 10 fits a 512 MB host. The value is applied by the container's init script on every start; an invalid value is reported in the log and the image default kept.
 
 </details>
+
+<a id="a-request-runs-out-of-memory"></a>
+<details>
+<summary><strong>A request fails with "Allowed memory size exhausted"</strong></summary>
+<br>
+
+Each PHP request may use up to 512 MB by default. That is a ceiling, not a reservation (an idle worker weighs about 25 MB), and its job is to make a runaway request fail with a readable line in the PHP log instead of taking the host down:
+
+```
+PHP Fatal error:  Allowed memory size of 536870912 bytes exhausted (tried to allocate ...) in ...
+```
+
+Backups, restores, exports and downloads stream to disk and need a few MB whatever the size of the account, so this should only happen with a single note of tens of MB. A backup or a download that hits it is a bug, please report it with the log line.
+
+To raise the limit, set `POZNOTE_PHP_MEMORY_LIMIT` in `.env` (a whole number of MB), then recreate the container (a restart does not reload environment variables):
+
+```bash
+POZNOTE_PHP_MEMORY_LIMIT=1024
+docker compose up -d --force-recreate webserver
+```
+
+Never set it above the memory of the host: a request that goes past what the machine has is killed by the kernel without any message, and can take the whole container with it. On a 512 MB host, keep the default. The value is applied by the container's init script on every start; an invalid value is reported in the log and the image default kept.
+
+</details>

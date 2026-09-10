@@ -70,6 +70,38 @@ if [ -n "${POZNOTE_PHP_FPM_MAX_CHILDREN:-}" ]; then
     esac
 fi
 
+# PHP memory limit per request. The image default (docker/php/php.ini, 512M)
+# is a ceiling for one request, not a reservation: it is what makes a runaway
+# request fail with a readable error instead of taking the host down. Backups,
+# restores, exports and downloads stream and need a few MB whatever the size
+# of the account, so the only reason to raise it is a single note of tens of
+# MB. Never above the memory of the host: the kernel would kill the container
+# instead. A whole number of MB, applied on every start.
+PHP_INI="/usr/local/etc/php/php.ini"
+if [ -n "${POZNOTE_PHP_MEMORY_LIMIT:-}" ]; then
+    MEM_LIMIT="$POZNOTE_PHP_MEMORY_LIMIT"
+    case "$MEM_LIMIT" in
+        *[!0-9]*|'')
+            echo "WARNING: POZNOTE_PHP_MEMORY_LIMIT='$MEM_LIMIT' is not a whole number of MB, keeping the image default." >&2
+            ;;
+        *)
+            if [ "$MEM_LIMIT" -lt 128 ] || [ "$MEM_LIMIT" -gt 65536 ]; then
+                echo "WARNING: POZNOTE_PHP_MEMORY_LIMIT=$MEM_LIMIT is outside 128-65536 (MB), keeping the image default." >&2
+            elif [ ! -w "$PHP_INI" ]; then
+                echo "WARNING: $PHP_INI is not writable, POZNOTE_PHP_MEMORY_LIMIT not applied." >&2
+            else
+                # Same detour through /tmp as above: in the rootless image the
+                # file is ours but its directory is not.
+                INI_TMP="$(mktemp)"
+                sed -e "s/^memory_limit = .*/memory_limit = ${MEM_LIMIT}M/" "$PHP_INI" > "$INI_TMP" \
+                    && cat "$INI_TMP" > "$PHP_INI"
+                rm -f "$INI_TMP"
+                echo "php: memory_limit = ${MEM_LIMIT}M (POZNOTE_PHP_MEMORY_LIMIT)"
+            fi
+            ;;
+    esac
+fi
+
 # Ensure data directory exists with correct permissions
 mkdir -p "$DATA_DIR"
 
