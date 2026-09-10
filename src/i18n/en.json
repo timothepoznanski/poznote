@@ -267,6 +267,13 @@
       "s3_storage": "S3 Attachments",
       "s3_backup": "S3 Backups"
     },
+    "default_credentials": {
+      "both": "This account still uses the username and the password it shipped with. Anyone who can reach this instance can sign in to it.",
+      "password": "This account still uses the password it shipped with. Anyone who can reach this instance can sign in to it.",
+      "username": "This account still uses the username it shipped with.",
+      "change_password": "Change Password",
+      "change_username": "Change username"
+    },
     "welcome_setup": {
       "relaunch": "Review",
       "restart_failed": "The startup guide could not be relaunched. Please try again."

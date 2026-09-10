@@ -406,6 +406,14 @@
             });
         }
 
+        // Default-credentials alert (settings.php): the username half of it
+        // is fixed in this same modal, so open it straight away rather than
+        // sending the reader off to find the card.
+        var defaultCredentialsBtn = document.getElementById('default-credentials-username-btn');
+        if (defaultCredentialsBtn) {
+            defaultCredentialsBtn.addEventListener('click', showProfileModal);
+        }
+
         // Icon rail Logout: confirm first. The href stays the no-JS fallback.
         var logoutBtn = document.getElementById('iconSidebarLogoutBtn');
         if (logoutBtn) {

@@ -589,6 +589,13 @@
       "s3_storage": "Pièces jointes S3",
       "s3_backup": "Sauvegardes S3"
     },
+    "default_credentials": {
+      "both": "Ce compte utilise encore le login et le mot de passe livrés par défaut. N'importe qui pouvant joindre cette instance peut s'y connecter.",
+      "password": "Ce compte utilise encore le mot de passe livré par défaut. N'importe qui pouvant joindre cette instance peut s'y connecter.",
+      "username": "Ce compte utilise encore le login livré par défaut.",
+      "change_password": "Changer le mot de passe",
+      "change_username": "Changer le login"
+    },
     "welcome_setup": {
       "relaunch": "Revoir",
       "restart_failed": "Impossible de relancer l’assistant de démarrage. Veuillez réessayer."

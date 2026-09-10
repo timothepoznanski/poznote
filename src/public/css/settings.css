@@ -1035,3 +1035,51 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
   background-color: currentColor;
   background-image: none;
 }
+
+/* Default-credential alert: above the section list, so it is on screen whatever
+   section is open. .alert (css/home/alerts.css) carries the colours; only the
+   row layout is specific here. */
+.settings-default-credentials {
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.settings-default-credentials .lucide {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.settings-default-credentials-body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+    line-height: 1.5;
+}
+
+.settings-default-credentials-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* The buttons sit on a tinted alert, so they keep their own colours and only
+   shrink to match the surrounding text. */
+.settings-default-credentials-actions .btn {
+    padding: 6px 12px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+/* The username is the lesser of the two problems, so its button is an outline
+   in the alert's own colour rather than a second filled block competing with
+   the password one. */
+.settings-default-credentials-actions .btn-secondary {
+    background: transparent;
+    color: inherit;
+    border: 1px solid currentColor;
+}
+
+.settings-default-credentials-actions .btn-secondary:hover {
+    background: var(--pz-surface);
+}

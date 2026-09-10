@@ -5086,4 +5086,52 @@
     };
     window.showCustomCssModal = showCustomCssModal;
 
+    // ========== Default-credential alert ==========
+
+    // Called by the modules that fix one half of the problem, so the alert at
+    // the top of the page settles without a reload. The username modal reloads
+    // the whole page anyway (the name is in server-rendered strings), so in
+    // practice this is the password path.
+    window.poznoteResolveDefaultCredential = function (half) {
+        if (half !== 'password' && half !== 'username') return;
+
+        var alertEl = document.getElementById('default-credentials-alert');
+        if (!alertEl) return;
+
+        alertEl.setAttribute('data-' + half + '-default', '0');
+        var passwordLeft = alertEl.getAttribute('data-password-default') === '1';
+        var usernameLeft = alertEl.getAttribute('data-username-default') === '1';
+
+        // Nothing left to warn about: the rail dot goes with it, otherwise it
+        // would point at a page with no alert on it.
+        if (!passwordLeft && !usernameLeft) {
+            alertEl.remove();
+            var railDot = document.querySelector('#iconSidebarSettingsBtn .attention-badge');
+            if (railDot) railDot.remove();
+            return;
+        }
+
+        // One half left, so the "both" wording is never the answer here. The
+        // password is the security half and sets the tone; with only the
+        // username left the alert steps down to a warning.
+        alertEl.classList.toggle('alert-error', passwordLeft);
+        alertEl.classList.toggle('alert-warning', !passwordLeft);
+
+        var text = alertEl.querySelector('.settings-default-credentials-text');
+        if (text) {
+            text.textContent = passwordLeft
+                ? tr('settings.default_credentials.password', {}, 'This account still uses the password it shipped with. Anyone who can reach this instance can sign in to it.')
+                : tr('settings.default_credentials.username', {}, 'This account still uses the username it shipped with.');
+        }
+
+        if (!passwordLeft) {
+            var passwordBtn = document.getElementById('default-credentials-password-btn');
+            if (passwordBtn) passwordBtn.remove();
+        }
+        if (!usernameLeft) {
+            var usernameBtn = document.getElementById('default-credentials-username-btn');
+            if (usernameBtn) usernameBtn.remove();
+        }
+    };
+
 })();

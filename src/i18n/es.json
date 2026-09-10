@@ -578,6 +578,13 @@
       "s3_storage": "Adjuntos S3",
       "s3_backup": "Copias de seguridad S3"
     },
+    "default_credentials": {
+      "both": "Esta cuenta sigue usando el nombre de usuario y la contraseña predeterminados. Cualquiera que pueda acceder a esta instancia puede iniciar sesión.",
+      "password": "Esta cuenta sigue usando la contraseña predeterminada. Cualquiera que pueda acceder a esta instancia puede iniciar sesión.",
+      "username": "Esta cuenta sigue usando el nombre de usuario predeterminado.",
+      "change_password": "Cambiar contraseña",
+      "change_username": "Cambiar nombre de usuario"
+    },
     "welcome_setup": {
       "relaunch": "Revisar",
       "restart_failed": "No se ha podido volver a iniciar el asistente de inicio. Inténtalo de nuevo."

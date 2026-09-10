@@ -576,6 +576,13 @@
       "s3_storage": "Anexos S3",
       "s3_backup": "Backups S3"
     },
+    "default_credentials": {
+      "both": "Esta conta ainda usa o nome de usuário e a palavra-passe de origem. Qualquer pessoa que consiga aceder a esta instância pode entrar.",
+      "password": "Esta conta ainda usa a palavra-passe de origem. Qualquer pessoa que consiga aceder a esta instância pode entrar.",
+      "username": "Esta conta ainda usa o nome de usuário de origem.",
+      "change_password": "Mudar palavra-passe",
+      "change_username": "Mudar nome de usuário"
+    },
     "welcome_setup": {
       "relaunch": "Rever",
       "restart_failed": "Não foi possível reabrir o assistente de início. Tente novamente."

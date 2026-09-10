@@ -257,6 +257,18 @@ if (function_exists('poznoteTidyIconSidebarDividers')) {
 // modal on ?open=profile).
 // The update badge is admin-only, matching the Check for Updates card in
 // settings.php; js/utils-updates.js reveals every .update-badge when a release is out.
+// A profile still on a shipped default username or password gets a second dot
+// on Settings, where the alert at the top of the page says which one it is. It
+// is deliberately not a .update-badge: js/utils-updates.js shows and hides
+// every element of that class on each release check, and would take this one
+// with it.
+require_once __DIR__ . '/lib/default-credentials.php';
+// The signed-in person's own credentials, not the active account's: the two
+// differ while someone is looking at an account shared with them, and a dot
+// about a borrowed account would point at a Settings page that refuses it.
+$iconSidebarDefaultCredential = function_exists('getAuthenticatedUserId')
+    && poznoteHasDefaultCredential((int)(getAuthenticatedUserId() ?? 0));
+
 $iconSidebarBottomItems = [
     ['id' => 'iconSidebarProfileBtn', 'url' => $iconSidebarUrl('settings.php', ['open' => 'profile']) . '#my-profile-card', 'icon' => 'lucide-user', 'label' => t('profile.card', [], 'My Profile')],
     // Theme switch. It goes nowhere, so it renders as a button rather than a
@@ -268,7 +280,7 @@ $iconSidebarBottomItems = [
     // with a query flag rather than a page of its own, so the two entries below
     // split the active state by that flag: About
     // lights up on ?open=about, Settings on every other settings.php visit.
-    ['id' => 'iconSidebarSettingsBtn', 'url' => $iconSidebarUrl('settings.php'), 'icon' => 'lucide-settings', 'label' => t('sidebar.settings', [], 'Settings'), 'activeFlag' => $iconSidebarCurrentPage === 'settings.php' && !$iconSidebarIsAboutView, 'updateBadge' => function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()],
+    ['id' => 'iconSidebarSettingsBtn', 'url' => $iconSidebarUrl('settings.php'), 'icon' => 'lucide-settings', 'label' => t('sidebar.settings', [], 'Settings'), 'activeFlag' => $iconSidebarCurrentPage === 'settings.php' && !$iconSidebarIsAboutView, 'updateBadge' => function_exists('isCurrentUserAdmin') && isCurrentUserAdmin(), 'attentionBadge' => $iconSidebarDefaultCredential],
     ['id' => 'iconSidebarAboutBtn', 'url' => $iconSidebarUrl('settings.php', ['open' => 'about']), 'icon' => 'lucide-info-circle', 'label' => t('settings.categories.documentation', [], 'About'), 'activeFlag' => $iconSidebarIsAboutView],
     ['id' => 'iconSidebarLogoutBtn', 'url' => $iconSidebarBasePath . 'logout.php', 'icon' => 'lucide-log-out', 'label' => t('workspace_menu.logout', [], 'Logout')],
 ];
@@ -370,6 +382,9 @@ try {
         <?php if (!empty($iconSidebarItem['updateBadge'])): ?>
         <span class="update-badge update-badge-hidden"></span>
         <?php endif; ?>
+        <?php if (!empty($iconSidebarItem['attentionBadge'])): ?>
+        <span class="attention-badge"></span>
+        <?php endif; ?>
     </a>
     <?php endif; ?>
     <?php endforeach; ?>
@@ -405,6 +420,9 @@ try {
         <i class="lucide <?php echo $iconSidebarIcon; ?>"></i>
         <?php if (!empty($iconSidebarItem['updateBadge'])): ?>
         <span class="update-badge update-badge-hidden"></span>
+        <?php endif; ?>
+        <?php if (!empty($iconSidebarItem['attentionBadge'])): ?>
+        <span class="attention-badge"></span>
         <?php endif; ?>
     </a>
     <?php endif; ?>

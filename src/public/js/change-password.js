@@ -288,6 +288,12 @@
                     var modal = document.getElementById('changePasswordModal');
                     if (modal) modal.style.display = 'none';
                     refreshPasswordStatusBadge({ forceFetch: true });
+                    // The default-credential alert at the top of settings.php
+                    // was about this exact password: settle it here rather than
+                    // leaving it up until the next page load.
+                    if (typeof window.poznoteResolveDefaultCredential === 'function') {
+                        window.poznoteResolveDefaultCredential('password');
+                    }
                 } else {
                     var msg = result.data.error || tr('common.error', {}, 'Error');
                     // Translate known error messages
