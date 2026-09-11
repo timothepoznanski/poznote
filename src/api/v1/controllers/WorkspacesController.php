@@ -40,12 +40,15 @@ class WorkspacesController {
                 $rows = [];
 
                 if (is_string($publicWorkspaceName) && $publicWorkspaceName !== '') {
-                    $stmt = $this->con->prepare('SELECT name, created, tags, color FROM workspaces WHERE name = ? ORDER BY name');
+                    $stmt = $this->con->prepare('SELECT name, created, tags, color FROM workspaces WHERE name = ?');
                     $stmt->execute([$publicWorkspaceName]);
                     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 }
             } else {
-                $stmt = $this->con->query("SELECT name, created, tags, color FROM workspaces ORDER BY name");
+                // The order the user arranged on workspaces.php: the sidebar
+                // workspace menu and every other consumer of this endpoint
+                // shows the list as it comes back.
+                $stmt = $this->con->query('SELECT name, created, tags, color FROM workspaces ORDER BY ' . poznoteWorkspaceOrderBy($this->con));
                 $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
             }
 

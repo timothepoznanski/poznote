@@ -670,6 +670,7 @@
       "source_target_must_differ": "源工作区和目标工作区必须不同"
     },
     "messages": {
+      "creating": "正在创建工作区...",
       "created": "工作区已创建",
       "deleted_all": "工作区已删除，所有关联的笔记、文件夹和附件已被移除",
       "renamed": "笔记和标签中的工作区已重命名",
@@ -731,6 +732,11 @@
       "saved": "颜色已更新",
       "save_error": "无法更新颜色",
       "invalid": "无效的颜色"
+    },
+    "order": {
+      "handle": "拖动以重新排序",
+      "saved": "工作区顺序已更新",
+      "save_error": "无法更新工作区顺序"
     }
   },
   "display": {

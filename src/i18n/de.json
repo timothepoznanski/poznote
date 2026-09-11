@@ -668,6 +668,7 @@
       "source_target_must_differ": "Quell- und Ziel-Arbeitsbereiche müssen sich unterscheiden"
     },
     "messages": {
+      "creating": "Arbeitsbereich wird erstellt...",
       "created": "Arbeitsbereich erstellt",
       "deleted_all": "Arbeitsbereich gelöscht und alle zugehörigen Notizen, Ordner und Anhänge entfernt",
       "renamed": "Arbeitsbereich in allen Notizen und Labels umbenannt",
@@ -730,6 +731,11 @@
       "saved": "Farbe aktualisiert",
       "save_error": "Die Farbe konnte nicht aktualisiert werden",
       "invalid": "Ungültige Farbe"
+    },
+    "order": {
+      "handle": "Zum Umsortieren ziehen",
+      "saved": "Reihenfolge der Arbeitsbereiche aktualisiert",
+      "save_error": "Die Reihenfolge der Arbeitsbereiche konnte nicht aktualisiert werden"
     }
   },
   "display": {

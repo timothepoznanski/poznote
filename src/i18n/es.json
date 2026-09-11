@@ -669,6 +669,7 @@
       "source_target_must_differ": "Los espacios de trabajo de origen y destino deben ser diferentes"
     },
     "messages": {
+      "creating": "Creando espacio de trabajo...",
       "created": "Espacio de trabajo creado",
       "deleted_all": "Espacio de trabajo eliminado y todas las notas, carpetas y adjuntos asociados eliminados",
       "renamed": "Espacio de trabajo renombrado en notas y etiquetas",
@@ -731,6 +732,11 @@
       "saved": "Color actualizado",
       "save_error": "No se pudo actualizar el color",
       "invalid": "Color no válido"
+    },
+    "order": {
+      "handle": "Arrastrar para reordenar",
+      "saved": "Orden de los espacios de trabajo actualizado",
+      "save_error": "No se pudo actualizar el orden de los espacios de trabajo"
     }
   },
   "display": {

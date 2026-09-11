@@ -681,6 +681,7 @@
       "source_target_must_differ": "Les espaces de travail source et destination doivent être différents"
     },
     "messages": {
+      "creating": "Espace de travail en cours de création...",
       "created": "Espace de travail créé",
       "deleted_all": "Espace de travail supprimé et toutes les notes, dossiers et pièces jointes associées ont été supprimés",
       "renamed": "Espace de travail renommé pour les notes et libellés",
@@ -743,6 +744,11 @@
       "saved": "Couleur mise à jour",
       "save_error": "Impossible de mettre à jour la couleur",
       "invalid": "Couleur invalide"
+    },
+    "order": {
+      "handle": "Glisser pour réordonner",
+      "saved": "Ordre des espaces de travail mis à jour",
+      "save_error": "Impossible de mettre à jour l'ordre des espaces de travail"
     }
   },
   "display": {

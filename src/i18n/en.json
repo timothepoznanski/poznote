@@ -362,6 +362,14 @@
     },
     "actions": {
       "menu": "Workspace actions"
+    },
+    "order": {
+      "handle": "Drag to reorder",
+      "saved": "Workspace order updated",
+      "save_error": "Could not update the workspace order"
+    },
+    "messages": {
+      "creating": "Creating workspace..."
     }
   },
   "display": {

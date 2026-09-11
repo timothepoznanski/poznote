@@ -369,6 +369,46 @@ if ($_POST) {
                 echo json_encode(['success' => true, 'message' => $message, 'name' => $name, 'color' => $color]);
                 exit;
             }
+        } elseif (isset($_POST['action']) && $_POST['action'] === 'reorder') {
+            // Save the order the rows were arranged in with the up/down arrows.
+            // The whole list is rewritten on every move, so the positions stay
+            // 1..n whichever arrow was clicked. A workspace missing from the
+            // list (created in another tab meanwhile) keeps its own value: at
+            // 0 it sorts alphabetically after the arranged ones.
+            $names = $_POST['names'] ?? [];
+            if (!is_array($names)) {
+                $names = [$names];
+            }
+            $names = array_values(array_filter(array_map(function ($value) {
+                return trim((string)$value);
+            }, $names), function ($value) {
+                return $value !== '';
+            }));
+
+            if (empty($names)) {
+                throw new Exception(t('workspaces.errors.name_required', [], 'Workspace name required', $currentLang));
+            }
+
+            $upd = $con->prepare('UPDATE workspaces SET display_order = ? WHERE name = ?');
+            $con->beginTransaction();
+            try {
+                $position = 0;
+                foreach ($names as $orderedName) {
+                    $position++;
+                    $upd->execute([$position, $orderedName]);
+                }
+                $con->commit();
+            } catch (Exception $e) {
+                $con->rollBack();
+                throw $e;
+            }
+
+            $message = t('workspaces.order.saved', [], 'Workspace order updated', $currentLang);
+            if (!empty($isAjax)) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true, 'message' => $message, 'names' => $names]);
+                exit;
+            }
         } elseif (isset($_POST['action']) && $_POST['action'] === 'rename') {
             $name = trim($_POST['name'] ?? '');
             $new_name = trim($_POST['new_name'] ?? '');
@@ -769,7 +809,7 @@ if (!function_exists('buildWorkspaceShareRegistryKey')) {
 // Read existing workspaces and share state
 $workspaces = [];
 $workspaceRows = [];
-$stmt = $con->query('SELECT w.name, w.tags, w.color, sw.token AS readonly_token, sw.password AS readonly_password, sw.password_encrypted AS readonly_password_encrypted, sw.login_required AS readonly_login_required, sw.allowed_users AS readonly_allowed_users FROM workspaces w LEFT JOIN shared_workspaces sw ON sw.workspace_name = w.name ORDER BY w.name');
+$stmt = $con->query('SELECT w.name, w.tags, w.color, sw.token AS readonly_token, sw.password AS readonly_password, sw.password_encrypted AS readonly_password_encrypted, sw.login_required AS readonly_login_required, sw.allowed_users AS readonly_allowed_users FROM workspaces w LEFT JOIN shared_workspaces sw ON sw.workspace_name = w.name ORDER BY ' . poznoteWorkspaceOrderBy($con, 'w'));
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $workspaceName = $row['name'];
     $readonlyToken = $row['readonly_token'] ?? '';
@@ -908,6 +948,12 @@ try {
                 <?php if (empty($workspaces)): ?>
                     <div><?php echo t_h('workspaces.sections.existing.empty', [], 'No workspaces defined.', $currentLang); ?></div>
                 <?php else: ?>
+                    <?php
+                        // Dragging only means something with another row to
+                        // drag past, so a single workspace gets no handle.
+                        $showWorkspaceOrder = count($workspaceRows) > 1;
+                        $dragHandleLabel = t_h('workspaces.order.handle', [], 'Drag to reorder', $currentLang);
+                    ?>
                     <ul>
                         <?php foreach ($workspaceRows as $workspaceRow): ?>
                                 <?php
@@ -916,7 +962,17 @@ try {
                                 $workspaceReadonlyEnabled = $readonlyToken !== '';
                                 $ws_display = htmlspecialchars($ws);
                             ?>
-                            <li class="ws-row">
+                            <li class="ws-row" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
+                                <?php if ($showWorkspaceOrder): ?>
+                                <div class="ws-col ws-col-order">
+                                    <!-- A button rather than a plain span: the
+                                         handle is also the keyboard way in, with
+                                         the up and down arrow keys. -->
+                                    <button type="button" class="ws-drag-handle" title="<?php echo $dragHandleLabel; ?>" aria-label="<?php echo $dragHandleLabel; ?>">
+                                        <i class="lucide lucide-grip-vertical"></i>
+                                    </button>
+                                </div>
+                                <?php endif; ?>
                                 <?php
                                     $cnt = isset($workspace_counts[$ws]) ? (int)$workspace_counts[$ws] : 0;
                                     $folderCount = isset($workspace_folder_counts[$ws]) ? (int)$workspace_folder_counts[$ws] : 0;
