@@ -395,16 +395,9 @@
             card.addEventListener('click', showProfileModal);
         }
 
-        // Icon rail entry (icon_sidebar.php): open the modal over the current
-        // page. Its href to settings.php?open=profile is only a fallback for
-        // when this script never runs, so the click is cancelled here.
-        var railBtn = document.getElementById('iconSidebarProfileBtn');
-        if (railBtn) {
-            railBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-                showProfileModal();
-            });
-        }
+        // The icon rail entry (icon_sidebar.php) is a plain link to
+        // settings.php?open=account: it opens the My Account section rather
+        // than this modal, which the card above opens once there.
 
         // Default-credentials alert (settings.php): the username half of it
         // is fixed in this same modal, so open it straight away rather than
@@ -423,9 +416,9 @@
             });
         }
 
-        // No card guard: ?open=profile is also the rail's no-JS fallback, and
-        // the card can be hidden through UI Customization, but the modal must
-        // open either way.
+        // No card guard: ?open=profile comes from the user-settings modal
+        // (modals.php), and the card can be hidden through UI Customization,
+        // but the modal must open either way.
         if (shouldAutoOpenProfileModal()) {
             if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
             clearAutoOpenProfileModalParam();
