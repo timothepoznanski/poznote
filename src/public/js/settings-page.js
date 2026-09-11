@@ -3915,6 +3915,7 @@
             var navStore = window.__poznoteUserStorage || window.localStorage;
             var NAV_ICONS = {
                 'settings-pinned-section-grid': 'lucide-pin',
+                'settings-account-section-grid': 'lucide-user',
                 'settings-actions-section-grid': 'lucide-zap',
                 'settings-display-section-grid': 'lucide-monitor',
                 'settings-markdown-section-grid': 'lucide-file-code',

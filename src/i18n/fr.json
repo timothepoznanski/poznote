@@ -516,6 +516,7 @@
     "expand_all_sections": "Tout déplier",
     "categories": {
       "pinned": "Épinglés",
+      "account": "Mon compte",
       "actions": "Actions",
       "admin_tools": "Outils d'administration",
       "display": "Affichage",

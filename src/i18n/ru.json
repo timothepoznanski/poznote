@@ -213,6 +213,7 @@
     "expand_all_sections": "Развернуть все",
     "categories": {
       "pinned": "Закреплённые",
+      "account": "Мой аккаунт",
       "actions": "Действия",
       "admin_tools": "Инструменты администратора",
       "display": "Отображение",

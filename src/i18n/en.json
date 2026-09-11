@@ -213,6 +213,7 @@
     "expand_all_sections": "Expand all",
     "categories": {
       "pinned": "Pinned",
+      "account": "My Account",
       "actions": "Actions",
       "admin_tools": "Admin Tools",
       "display": "Display",

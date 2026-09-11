@@ -295,6 +295,10 @@
         syncSectionVisibility('home-actions-section-title', 'home-actions-section-grid');
     }
 
+    function syncSettingsAccountSection() {
+        syncSectionVisibility('settings-account-section-title', 'settings-account-section-grid');
+    }
+
     function syncSettingsActionsSection() {
         syncSectionVisibility('settings-actions-section-title', 'settings-actions-section-grid');
     }
@@ -327,6 +331,7 @@
             syncNoteActionToggles();
             syncHomeDashboardSection();
             syncHomeActionsSection();
+            syncSettingsAccountSection();
             syncSettingsActionsSection();
             syncSettingsDisplaySection();
             syncSettingsBehaviorSection();

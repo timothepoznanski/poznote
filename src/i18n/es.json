@@ -505,6 +505,7 @@
     "expand_all_sections": "Expandir todo",
     "categories": {
       "pinned": "Fijados",
+      "account": "Mi cuenta",
       "actions": "Acciones",
       "admin_tools": "Herramientas de administración",
       "display": "Pantalla",

@@ -504,6 +504,7 @@
     "expand_all_sections": "Alle ausklappen",
     "categories": {
       "pinned": "Angepinnt",
+      "account": "Mein Konto",
       "actions": "Aktionen",
       "admin_tools": "Admin-Werkzeuge",
       "display": "Anzeige",
