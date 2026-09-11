@@ -821,9 +821,9 @@ try {
                 file_put_contents($welcomeFile, $welcomeContent);
                 setFilePermissions($welcomeFile, 0644);
 
-                // Arm the first-run welcome wizard: index.php shows it while
-                // this key is 'pending'; js/welcome-setup.js flips it to
-                // 'done' once the user finishes or skips it.
+                // Arm the first-run startup guide: index.php sends a plain
+                // page load to welcome.php while this key is 'pending', and
+                // the guide flips it to 'done' once it is finished or skipped.
                 $con->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('welcome_setup', 'pending')");
             }
             // Legacy migration: ensure folder_id is populated and entry snippets exist.

@@ -57,6 +57,20 @@ if ($isRightColFragment) {
 
 require_once __DIR__ . '/../db_connect.php';
 
+// First run of an account: hand the visitor over to the startup guide before
+// building anything. The key is seeded 'pending' when the account database is
+// created and welcome.php flips it to 'done', so this fires exactly once.
+// Only a plain page load is diverted: a note-pane fragment or a POST would
+// lose its payload to the redirect, and a public-workspace visitor owns no
+// settings to walk through.
+if (!$isRightColFragment
+    && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET'
+    && getSetting('welcome_setup', '') === 'pending'
+    && !(function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive())) {
+    header('Location: welcome.php');
+    exit;
+}
+
 // No scheduler: old snapshots (and the attachments only they keep) are
 // expired for this user once a day, from here.
 poznoteExpireAllSnapshotsOccasionally($con);
@@ -530,10 +544,6 @@ if ($isPublicWorkspaceReadonly) {
     <?php endif; ?>
 
     <?php
-    // First-run welcome wizard: the key is seeded 'pending' when the account
-    // database is created; js/welcome-setup.js flips it to 'done' once the
-    // user finishes or skips the wizard.
-    $showWelcomeSetupModal = !$isPublicWorkspaceReadonly && getSetting('welcome_setup', '') === 'pending';
     if (!$isRightColFragment) {
         include __DIR__ . '/../modals.php';
     }

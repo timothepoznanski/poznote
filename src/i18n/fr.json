@@ -430,7 +430,6 @@
       "tenant_isolation": "Mode SaaS : choisissez les fonctionnalités bloquées pour les utilisateurs non administrateurs, comme la découverte des autres comptes de l'instance ou l'enregistrement de webhooks personnels. Laissez tout décoché pour une instance familiale ou d'équipe.",
       "workspaces": "Organisez vos notes dans des espaces de travail séparés, chacun avec ses dossiers et ses notes.",
       "my_profile": "Consultez et modifiez les informations de votre profil.",
-      "welcome_setup": "Revoyez l’assistant de démarrage et mettez à jour vos préférences de base.",
       "change_password": "Changez le mot de passe utilisé pour vous connecter.",
       "password_note_sso_only": "La connexion par mot de passe est désactivée sur cette instance.",
       "password_note_no_local": "Votre mot de passe est géré par votre fournisseur d'identité.",
@@ -577,7 +576,6 @@
       "delete_account": "Supprimer le compte",
       "import_limits": "Limites d'import",
       "user_quotas": "Quotas utilisateurs",
-      "welcome_setup": "Assistant de démarrage",
       "git_sync_toggle": "Synchronisation Git",
       "allow_executable_attachments": "Pièces jointes scripts et exécutables",
       "oidc_config": "OIDC / SSO",
@@ -595,10 +593,6 @@
       "username": "Ce compte utilise encore le login livré par défaut.",
       "change_password": "Changer le mot de passe",
       "change_username": "Changer le login"
-    },
-    "welcome_setup": {
-      "relaunch": "Revoir",
-      "restart_failed": "Impossible de relancer l’assistant de démarrage. Veuillez réessayer."
     },
     "install_app": {
       "launching": "L’installation va se lancer. Veuillez patienter...",
@@ -1599,24 +1593,6 @@
         "custom_label": "Personnalisé",
         "days": "jours"
       }
-    },
-    "welcome_setup": {
-      "title": "Bienvenue sur Poznote !",
-      "subtitle": "Configurons quelques préférences pour bien démarrer. Vous pourrez les modifier à tout moment.",
-      "language_label": "Langue",
-      "theme_label": "Thème",
-      "theme_options": {
-        "system": "Comme le système",
-        "light": "Clair",
-        "dark": "Sombre",
-        "black": "Noir"
-      },
-      "date_format_label": "Format date et heure",
-      "timezone_label": "Fuseau horaire",
-      "settings_tip": "Bien d'autres options (polices, sauvegardes, IA et plus encore) vous attendent dans les paramètres de Poznote.",
-      "dashboard_tip": "Le tableau de bord vous offre une vue d'ensemble de vos notes et de votre compte.",
-      "skip": "Passer",
-      "start": "C'est parti !"
     },
     "timezone": {
       "title": "Fuseau horaire",
@@ -4549,6 +4525,43 @@
     "errors": {
       "duplicate_title": "Une note portant le même titre est déjà archivée dans ce dossier.",
       "archive_prefix": "Erreur lors de l'archivage de la note : {{error}}"
+    }
+  },
+  "welcome_page": {
+    "page_title": "Bienvenue",
+    "title": "Bienvenue dans Poznote",
+    "lead": "Content de vous compter parmi nous. Prenez une minute pour régler Poznote à votre goût.",
+    "language_modal": {
+      "title": "Choisissez votre langue"
+    },
+    "preferences": {
+      "language": "Langue",
+      "theme": "Thème",
+      "theme_system": "Comme mon système",
+      "date_format": "Format de date et d’heure",
+      "timezone": "Fuseau horaire"
+    },
+    "account": {
+      "title": "Votre compte",
+      "hint": "Le nom d’utilisateur et le mot de passe avec lesquels vous vous connecterez.",
+      "username": "Nom d’utilisateur",
+      "username_hint": "Lettres, chiffres, points, tirets bas et tirets.",
+      "username_default_hint": "Ce compte répond encore au nom d’utilisateur livré avec l’installation. Choisissez le vôtre.",
+      "current_password": "Mot de passe actuel",
+      "new_password": "Nouveau mot de passe",
+      "confirm_password": "Confirmer le mot de passe",
+      "password_default_hint": "Ce compte utilise encore le mot de passe livré avec l’installation ({{password}}). Choisissez le vôtre maintenant.",
+      "password_unavailable": "Vous vous connectez via votre fournisseur d’identité, il n’y a donc pas de mot de passe à définir ici."
+    },
+    "footnote": "Tout cela, et bien d’autres choses, se règle ensuite dans les Paramètres.",
+    "start": "Commencer avec Poznote",
+    "saving": "Enregistrement...",
+    "errors": {
+      "generic": "Une erreur est survenue. Veuillez réessayer.",
+      "username_required": "Un nom d’utilisateur est nécessaire.",
+      "password_incomplete": "Remplissez tous les champs de mot de passe, ou laissez-les tous vides.",
+      "password_mismatch": "Les deux nouveaux mots de passe ne correspondent pas.",
+      "password_too_short": "Le mot de passe doit contenir au moins 4 caractères."
     }
   }
 }

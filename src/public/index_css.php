@@ -80,7 +80,6 @@ $groups = [
         'css/modals/responsive.css',
         'css/modals/snapshot.css',
         'css/modals/reminders.css',
-        'css/modals/welcome-setup.css',
         'css/tasks.css',
         'css/markdown.css',
         'css/excalidraw.css',

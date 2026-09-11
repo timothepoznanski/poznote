@@ -418,7 +418,6 @@
       "tenant_isolation": "SaaS-Modus: Wählen Sie, welche Funktionen für Benutzer ohne Administratorrechte blockiert werden, etwa das Entdecken der anderen Konten der Instanz oder das Registrieren persönlicher Webhooks. Für Familien- oder Teaminstanzen alles abgewählt lassen.",
       "workspaces": "Organisieren Sie Ihre Notizen in getrennten Arbeitsbereichen mit eigenen Ordnern und Notizen.",
       "my_profile": "Profilinformationen ansehen und bearbeiten.",
-      "welcome_setup": "Startassistenten erneut öffnen und grundlegende Einstellungen aktualisieren.",
       "change_password": "Ändern Sie das Passwort für die Anmeldung.",
       "password_note_sso_only": "Die Passwort-Anmeldung ist auf dieser Instanz deaktiviert.",
       "password_note_no_local": "Ihr Passwort wird von Ihrem Identitaetsanbieter verwaltet.",
@@ -565,7 +564,6 @@
       "delete_account": "Konto löschen",
       "import_limits": "Importlimits",
       "user_quotas": "Benutzerkontingente",
-      "welcome_setup": "Startassistent",
       "git_sync_toggle": "Git-Synchronisierung",
       "allow_executable_attachments": "Skript- und Programmanhänge",
       "oidc_config": "OIDC / SSO",
@@ -583,10 +581,6 @@
       "username": "Dieses Konto verwendet noch den mitgelieferten Benutzernamen.",
       "change_password": "Passwort ändern",
       "change_username": "Benutzernamen ändern"
-    },
-    "welcome_setup": {
-      "relaunch": "Erneut öffnen",
-      "restart_failed": "Der Startassistent konnte nicht erneut geöffnet werden. Bitte versuchen Sie es erneut."
     },
     "install_app": {
       "launching": "Die Installation wird gestartet. Bitte warten Sie...",
@@ -1565,24 +1559,6 @@
         "custom_label": "Benutzerdefiniert",
         "days": "Tage"
       }
-    },
-    "welcome_setup": {
-      "title": "Willkommen bei Poznote!",
-      "subtitle": "Legen wir ein paar Einstellungen für den Start fest. Sie können sie jederzeit ändern.",
-      "language_label": "Sprache",
-      "theme_label": "Thema",
-      "theme_options": {
-        "system": "Wie das System",
-        "light": "Hell",
-        "dark": "Dunkel",
-        "black": "Schwarz"
-      },
-      "date_format_label": "Datums- und Uhrzeitformat",
-      "timezone_label": "Zeitzone",
-      "settings_tip": "Viele weitere Optionen (Schriftarten, Backups, KI und mehr) warten in den Poznote-Einstellungen auf Sie.",
-      "dashboard_tip": "Das Dashboard gibt Ihnen einen Überblick über Ihre Notizen und Ihr Konto.",
-      "skip": "Überspringen",
-      "start": "Los geht's"
     },
     "timezone": {
       "title": "Zeitzone",
@@ -4299,6 +4275,43 @@
     "errors": {
       "duplicate_title": "In diesem Ordner ist bereits eine Notiz mit demselben Titel archiviert.",
       "archive_prefix": "Fehler beim Archivieren der Notiz: {{error}}"
+    }
+  },
+  "welcome_page": {
+    "page_title": "Willkommen",
+    "title": "Willkommen bei Poznote",
+    "lead": "Schön, dass Sie da sind. Nehmen Sie sich eine Minute, um Poznote einzurichten.",
+    "language_modal": {
+      "title": "Wählen Sie Ihre Sprache"
+    },
+    "preferences": {
+      "language": "Sprache",
+      "theme": "Design",
+      "theme_system": "Wie mein System",
+      "date_format": "Datums- und Zeitformat",
+      "timezone": "Zeitzone"
+    },
+    "account": {
+      "title": "Ihr Konto",
+      "hint": "Der Benutzername und das Passwort, mit denen Sie sich anmelden.",
+      "username": "Benutzername",
+      "username_hint": "Buchstaben, Ziffern, Punkte, Unterstriche und Bindestriche.",
+      "username_default_hint": "Dieses Konto nutzt noch den mitgelieferten Benutzernamen. Wählen Sie Ihren eigenen.",
+      "current_password": "Aktuelles Passwort",
+      "new_password": "Neues Passwort",
+      "confirm_password": "Passwort bestätigen",
+      "password_default_hint": "Dieses Konto nutzt noch das mitgelieferte Passwort ({{password}}). Wählen Sie jetzt Ihr eigenes.",
+      "password_unavailable": "Sie melden sich über Ihren Identitätsanbieter an, daher gibt es hier kein Passwort festzulegen."
+    },
+    "footnote": "All das und noch viel mehr lässt sich später in den Einstellungen ändern.",
+    "start": "Mit Poznote loslegen",
+    "saving": "Wird gespeichert...",
+    "errors": {
+      "generic": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+      "username_required": "Ein Benutzername ist erforderlich.",
+      "password_incomplete": "Füllen Sie alle Passwortfelder aus oder lassen Sie sie alle leer.",
+      "password_mismatch": "Die beiden neuen Passwörter stimmen nicht überein.",
+      "password_too_short": "Das Passwort muss mindestens 4 Zeichen lang sein."
     }
   }
 }

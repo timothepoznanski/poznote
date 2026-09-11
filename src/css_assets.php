@@ -538,6 +538,13 @@ function poznoteCssManifest(): array
             'css/webhooks.css',
             '@icon-sidebar',
         ],
+        'welcome' => [
+            'css/fonts.css',
+            'css/lucide.css',
+            '@components',
+            'css/welcome.css',
+            '@theme',
+        ],
         'workspaces' => [
             'css/lucide.css',
             '@components',
