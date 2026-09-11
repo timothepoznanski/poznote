@@ -599,7 +599,7 @@ class TasksController
         $blockingLock = getBlockingNoteEditLock(
             (int) (getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0)),
             $noteId,
-            (int) (getAuthenticatedUserId() ?? getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0))
+            getNoteEditLockActorUserId()
         );
         if ($blockingLock !== null) {
             $this->sendError(423, 'This note is currently being edited by ' . describeNoteEditLockHolder($blockingLock));

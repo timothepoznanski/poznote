@@ -37,7 +37,7 @@ The MCP server acts as a bridge between AI assistants and your Poznote instance.
 2. MCP server calls Poznote REST API
 3. Results are returned to the AI assistant
 
-A Poznote tab open in the browser picks up the changes made through MCP within a few seconds: the sidebar tree and the open note refresh in place (or show a reload banner when the note has unsaved edits).
+A Poznote tab open in the browser picks up the changes made through MCP within a few seconds: the sidebar tree and the open note refresh in place (or show a reload banner when the note has unsaved edits). A note that is simply open in the browser does not block MCP writes; only a note being edited by another user of the same account, or by a visitor on a public share link, answers with an HTTP 423 error.
 
 ## Features
 

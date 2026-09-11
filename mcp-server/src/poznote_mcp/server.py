@@ -582,6 +582,9 @@ def update_note(
             version; the result then includes the current content and version so
             you can merge and retry. Recommended whenever you rewrite content
             you read earlier.
+            A note merely open in the user's browser does not block the
+            update (the tab refreshes itself); an HTTP 423 error means another
+            user is editing the note right now, so wait before retrying.
         reminder_at: Due date/reminder for the note as an ISO datetime
             (e.g. '2026-09-01T09:00:00+02:00'), the same reminder the bell icon
             sets in the UI. Include an offset, or it is read as UTC. Pass

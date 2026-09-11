@@ -380,6 +380,10 @@ curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123
 ```
 
+**Edit locks:**
+
+The web editor takes the note's edit lock as soon as the note is opened (see [Note Locks](#note-locks)). A write without an `editor_session_id` (the MCP server, a script using your credentials) is not blocked by your own lock: the open tab picks the change up within a few seconds, and its autosave sends `if_version`, so it cannot overwrite yours. The write is rejected with `423 Locked` only while another user of the account, or a visitor on a public share link, is editing the note; the response names the holder in `error` and carries the lock details in `lock`.
+
 ### Delete Note
 
 ```
@@ -714,7 +718,7 @@ Emergency save via `sendBeacon` API. Accepts FormData instead of JSON. Used inte
 
 ## Note Locks
 
-Exclusive edit locks prevent two editors from modifying the same note simultaneously. All lock endpoints identify the editor with an `editor_session_id`, sent either in the JSON body, as an `editor_session_id` form field, or via the `X-Editor-Session-ID` header. When the note is already locked by another session, lock endpoints respond with `409 Conflict` and the current lock details.
+Exclusive edit locks prevent two editors from modifying the same note simultaneously. All lock endpoints identify the editor with an `editor_session_id`, sent either in the JSON body, as an `editor_session_id` form field, or via the `X-Editor-Session-ID` header. When the note is already locked by another user, lock endpoints respond with `423 Locked` and the current lock details. A user's own sessions never block each other: opening the note in a second tab takes the lock over.
 
 ### Acquire Lock
 
