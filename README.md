@@ -240,6 +240,24 @@ See the cloud hosting options at [poznote.com/hosting.html](https://poznote.com/
 
 </details>
 
+<a id="proxmox"></a>
+<details>
+<summary><strong>🗄️ Proxmox VE</strong></summary><br>
+
+On a Proxmox VE host, the Proxmox VE Community Scripts project installs Poznote in its own container with a single command, no Docker involved: it creates an unprivileged Debian 13 LXC (1 vCPU, 512 MB of RAM and a 4 GB disk by default) and serves Poznote from nginx and PHP inside it.
+
+Run this from the Proxmox host shell:
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/ct/poznote.sh)"
+```
+
+Poznote then answers at `http://<container-ip>:8040`, with the same default credentials as any other install. To update it later, run `update` in the container console.
+
+This script is written and maintained by the community, not by Poznote. See the [Poznote script page](https://community-scripts.org/scripts/poznote) for its options and notes.
+
+</details>
+
 <a id="kubernetes"></a>
 <details>
 <summary><strong>☸️ Kubernetes with Helm</strong></summary>
