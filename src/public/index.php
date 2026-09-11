@@ -43,6 +43,18 @@ requireAuth();
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../version_helper.php';
 
+// A sidebar click needs the note pane only. js/note-loader.js asks for it
+// with this header; the page is then built as usual, but everything outside
+// #right_col goes into a buffer that is dropped, and the two heaviest parts
+// of the rest (the notes tree, the modals) are not rendered at all. Without
+// the header the full page is served, unchanged.
+$isRightColFragment = (($_SERVER['HTTP_X_POZNOTE_FRAGMENT'] ?? '') === 'right_col');
+$rightColFragmentBufferLevel = 0;
+if ($isRightColFragment) {
+    ob_start('poznoteDiscardOutput');
+    $rightColFragmentBufferLevel = ob_get_level();
+}
+
 require_once __DIR__ . '/../db_connect.php';
 
 // No scheduler: old snapshots (and the attachments only they keep) are
@@ -522,7 +534,9 @@ if ($isPublicWorkspaceReadonly) {
     // database is created; js/welcome-setup.js flips it to 'done' once the
     // user finishes or skips the wizard.
     $showWelcomeSetupModal = !$isPublicWorkspaceReadonly && getSetting('welcome_setup', '') === 'pending';
-    include __DIR__ . '/../modals.php';
+    if (!$isRightColFragment) {
+        include __DIR__ . '/../modals.php';
+    }
     ?>
 
     <?php
@@ -653,43 +667,47 @@ if ($isPublicWorkspaceReadonly) {
     ?></script>
                     
     <?php
-        // Execute query for left column
-        $stmt_left = $con->prepare($query_left_secure);
-        $stmt_left->execute($sql_params);
-        
-        // Group notes by folder for hierarchical display (now uses folder_id)
-        $organized = organizeNotesByFolder($stmt_left, $con, $workspace_filter, $note_list_sort_type);
-        $folders = $organized['folders'];
-        $uncategorized_notes = $organized['uncategorized_notes'];
-        
-        // Handle favorites (including uncategorized notes)
-        $folders = handleFavorites($folders, $uncategorized_notes);
-        
-        // Track folders with search results for favorites
-        $folders_with_results = [];
-        if($is_search_mode) {
-            foreach($folders as $folderId => $folderData) {
-                if (!empty($folderData['notes'])) {
-                    $folders_with_results[$folderData['name']] = true;
+        // The notes tree (left column). A fragment request skips it: the rows,
+        // their grouping and the markup are the bulk of the page.
+        if (!$isRightColFragment) {
+            // Execute query for left column
+            $stmt_left = $con->prepare($query_left_secure);
+            $stmt_left->execute($sql_params);
+
+            // Group notes by folder for hierarchical display (now uses folder_id)
+            $organized = organizeNotesByFolder($stmt_left, $con, $workspace_filter, $note_list_sort_type);
+            $folders = $organized['folders'];
+            $uncategorized_notes = $organized['uncategorized_notes'];
+
+            // Handle favorites (including uncategorized notes)
+            $folders = handleFavorites($folders, $uncategorized_notes);
+
+            // Track folders with search results for favorites
+            $folders_with_results = [];
+            if($is_search_mode) {
+                foreach($folders as $folderId => $folderData) {
+                    if (!empty($folderData['notes'])) {
+                        $folders_with_results[$folderData['name']] = true;
+                    }
                 }
+                $folders_with_results = updateFavoritesSearchResults($folders_with_results, $folders);
             }
-            $folders_with_results = updateFavoritesSearchResults($folders_with_results, $folders);
+
+            // Add empty folders from folders table
+            $folders = addEmptyFolders($con, $folders, $workspace_filter);
+
+            // Ensure Favorites folder always exists (even if empty)
+            $folders = ensureFavoritesFolder($folders);
+
+            // Sort folders
+            $folders = sortFolders($folders);
+
+            // Get total notes count for folder opening logic
+            $total_notes = getTotalNotesCount($con, $workspace_filter);
+
+            // Notes list left column
+            include __DIR__ . '/../notes_list.php';
         }
-        
-        // Add empty folders from folders table
-        $folders = addEmptyFolders($con, $folders, $workspace_filter);
-        
-        // Ensure Favorites folder always exists (even if empty)
-        $folders = ensureFavoritesFolder($folders);
-        
-        // Sort folders
-        $folders = sortFolders($folders);
-        
-        // Get total notes count for folder opening logic
-        $total_notes = getTotalNotesCount($con, $workspace_filter);
-        
-        // Notes list left column
-        include __DIR__ . '/../notes_list.php';                 
     ?>
 
     </div>
@@ -704,6 +722,14 @@ if ($isPublicWorkspaceReadonly) {
 
     <!-- RIGHT COLUMN -->
     <div id="right_pane">
+    <?php if ($isRightColFragment): ?>
+    <?php
+        // From here to the end of #right_col the output is the fragment itself:
+        // drop what the page rendered so far and let the pane through.
+        while (ob_get_level() >= $rightColFragmentBufferLevel && @ob_end_clean()) {
+        }
+    ?>
+    <?php endif; ?>
     <div id="right_col">
             
         <?php
@@ -712,6 +738,13 @@ if ($isPublicWorkspaceReadonly) {
             include __DIR__ . '/../note_display.php';
         ?>
     </div>
+    <?php if ($isRightColFragment): ?>
+    <?php
+        // The rest of the page goes back into the discard handler, which
+        // returns nothing when PHP flushes it at the end of the request.
+        ob_start('poznoteDiscardOutput');
+    ?>
+    <?php endif; ?>
     </div><!-- #right_pane -->
 
     <!-- OUTLINE MOBILE BACKDROP -->

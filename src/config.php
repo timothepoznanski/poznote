@@ -602,6 +602,18 @@ function poznoteInjectCustomCssIntoHtml($buffer, $phase = PHP_OUTPUT_HANDLER_STA
 }
 
 /**
+ * Output handler that drops whatever it is given.
+ *
+ * index.php wraps everything outside #right_col in it when js/note-loader.js
+ * asks for the note pane alone (X-Poznote-Fragment: right_col). A handler
+ * rather than an ob_end_clean() at the end of the page, so that an exit() on
+ * the way cannot flush the parts a fragment must not carry.
+ */
+function poznoteDiscardOutput($buffer) {
+    return '';
+}
+
+/**
  * Close every output buffer so what follows goes straight to the client.
  *
  * For responses that stream a body: the injection buffer below and any

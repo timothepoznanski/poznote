@@ -38,6 +38,17 @@
      */
     var _pendingTabSwitch = null;
 
+    /** Note id of the load loadNoteDirectly() has in flight, null once it landed. */
+    var _loadingNoteId = null;
+
+    /**
+     * The tab a sidebar navigation has just repurposed, with a copy of what it
+     * held before. The second click of a double-click on that note (open in a
+     * new tab) uses it to give the previous content its tab back.
+     * @type {{tabId: string, tab: Object, at: number}|null}
+     */
+    var _lastReplacedTab = null;
+
     /** Scroll positions keyed by tab ID — kept in memory only, not persisted. */
     var _scrollPositions = {};
 
@@ -988,6 +999,53 @@
     }
 
     /**
+     * Second click of a double-click on a sidebar note whose first click has
+     * already landed: the active tab was repurposed for it, so the previous
+     * content gets its own tab back, in place, and the note stays where it is.
+     * @returns {boolean} whether that was the case
+     */
+    function _reopenTabReplacedBySidebarClick(noteId) {
+        var replaced = _lastReplacedTab;
+        if (!replaced || replaced.tabId !== activeTabId) return false;
+        // Only the click that started this gesture qualifies: anything older
+        // is a plain double-click on the note already open, a no-op
+        if (Date.now() - replaced.at > 1000) return false;
+        var active = _findTabById(activeTabId);
+        if (!active || !_isNoteTab(active) || active.noteId !== noteId) return false;
+
+        var restored = Object.assign({}, replaced.tab, { id: _generateId() });
+        tabs.splice(_indexById(activeTabId), 0, restored);
+        // The scroll saved when the click navigated away belongs to the restored content
+        if (_scrollPositions[activeTabId]) {
+            _scrollPositions[restored.id] = _scrollPositions[activeTabId];
+            delete _scrollPositions[activeTabId];
+        }
+        _lastReplacedTab = null;
+        _saveToStorage();
+        render();
+        return true;
+    }
+
+    /**
+     * Second click of a double-click whose first click is still loading the
+     * note into the active tab: that load lands in a new tab instead, with no
+     * second request.
+     * @returns {boolean} whether that was the case
+     */
+    function _adoptSidebarLoadAsNewTab(noteId, title) {
+        if (!window.isLoadingNote || _loadingNoteId !== noteId) return false;
+        if (_pendingTabSwitch !== null || isNoteOpen(noteId)) return false;
+
+        var newTab = { id: _generateId(), type: 'note', noteId: noteId, title: title || _getDefaultTitle() };
+        tabs.push(newTab);
+        activeTabId = newTab.id;
+        _pendingTabSwitch = newTab.id;
+        _saveToStorage();
+        render();
+        return true;
+    }
+
+    /**
      * Called when "open in new tab" is clicked (from note toolbar or sidebar menu).
      * Creates a new tab for the given note and makes it active.
      * If the note is not currently displayed, loads it via AJAX.
@@ -996,6 +1054,14 @@
         options = options || {};
         // Internal tabs are always enabled (except on mobile where this won't be called)
         noteId = String(noteId);
+
+        // From the sidebar, a double-click's first click has already navigated
+        // the active tab to the note (or is doing so): sort out the tabs
+        // rather than open the note a second time.
+        if (options.afterSidebarClick && _areTabsEnabled()) {
+            if (_reopenTabReplacedBySidebarClick(noteId)) return;
+            if (_adoptSidebarLoadAsNewTab(noteId, title)) return;
+        }
 
         // Check if tab already exists for this note
         var existingTab = null;
@@ -1273,12 +1339,31 @@
     }
 
     /**
+     * Hook called from loadNoteDirectly when a request leaves.
+     * @param {string|number} noteId
+     */
+    function _onNoteLoadStarted(noteId) {
+        _loadingNoteId = String(noteId);
+        // A pending tab switch belongs to the load it was set for. A different
+        // note leaving now means that load was dropped for this one, and the
+        // switch must not be applied to what lands.
+        if (_pendingTabSwitch !== null) {
+            var pending = _findTabById(_pendingTabSwitch);
+            if (!pending || !_isNoteTab(pending) || pending.noteId !== _loadingNoteId) {
+                _pendingTabSwitch = null;
+            }
+        }
+    }
+
+    /**
      * Hook called from loadNoteCommon immediately after innerHTML replacement.
      * Decides whether to update the active tab's note (regular navigation)
      * or just confirm the tab switch (tab click).
      * @param {string|number} noteId
      */
     function _onNoteLoaded(noteId) {
+        _loadingNoteId = null;
+        _lastReplacedTab = null;
         if (!_areTabsEnabled()) return;
         noteId = String(noteId);
 
@@ -1326,7 +1411,9 @@
                 tabs.push(newTab);
                 activeTabId = newTab.id;
             } else if (tab) {
-                // Update the active tab to the new note
+                // Update the active tab to the new note, remembering what it held
+                // in case this click turns out to be the first of a double-click
+                _lastReplacedTab = { tabId: tab.id, tab: Object.assign({}, tab), at: Date.now() };
                 tab.type = 'note';
                 tab.noteId = noteId;
                 delete tab.folderId;
@@ -1748,6 +1835,7 @@
         isInitialized: isInitialized,
         render: render,
         updateUI: updateOpenInNewTabButtons, // Expose for external calls
+        _onNoteLoadStarted: _onNoteLoadStarted,
         _onNoteLoaded: _onNoteLoaded,
         _saveScrollPosition: _saveScrollPosition,
         _restoreScrollForNote: _restoreScrollForNote,
