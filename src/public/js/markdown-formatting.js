@@ -975,8 +975,20 @@
         document.execCommand('insertHTML', false, styledText);
     }
 
+    function isMarkdownSelectionWrapped(prefix, suffix) {
+        var context = getCurrentMarkdownEditContext();
+        var editor = context.editor;
+        var offsets = context.offsets;
+        if (!editor || !offsets || offsets.start === offsets.end) return false;
+        var fullText = getMarkdownEditorValue(editor);
+        var before = fullText.slice(Math.max(0, offsets.start - prefix.length), offsets.start);
+        var after = fullText.slice(offsets.end, offsets.end + suffix.length);
+        return before === prefix && after === suffix;
+    }
+
     // Export functions
     window.isInMarkdownEditor = isInMarkdownEditor;
+    window.isMarkdownSelectionWrapped = isMarkdownSelectionWrapped;
     window.applyMarkdownBold = applyMarkdownBold;
     window.applyMarkdownItalic = applyMarkdownItalic;
     window.applyMarkdownStrikethrough = applyMarkdownStrikethrough;

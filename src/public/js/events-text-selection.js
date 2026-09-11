@@ -467,6 +467,44 @@ function initTextSelectionHandlers() {
         });
     }
 
+    function updateFormatActiveStates(editableElement) {
+        var isMarkdown = editableElement && (
+            editableElement.classList.contains('markdown-editor') ||
+            editableElement.classList.contains('cm-content') ||
+            (editableElement.closest && editableElement.closest('.markdown-editor'))
+        );
+
+        var formats = [
+            { selector: '.btn-bold',          md: ['**', '**'],    rte: 'bold'          },
+            { selector: '.btn-italic',        md: ['*',  '*' ],    rte: 'italic'        },
+            { selector: '.btn-underline',     md: ['<u>', '</u>'], rte: 'underline'     },
+            { selector: '.btn-strikethrough', md: ['~~', '~~'],    rte: 'strikeThrough' },
+        ];
+
+        formats.forEach(function (fmt) {
+            var btn = document.querySelector(fmt.selector + '.show-on-selection');
+            if (!btn) return;
+
+            var isActive = false;
+            if (isMarkdown && typeof window.isMarkdownSelectionWrapped === 'function') {
+                isActive = window.isMarkdownSelectionWrapped(fmt.md[0], fmt.md[1]);
+                // Single * also matches inside **: treat italic as active only when not bold
+                if (fmt.md[0] === '*' && isActive) {
+                    isActive = !window.isMarkdownSelectionWrapped('**', '**');
+                }
+            } else {
+                try { isActive = document.queryCommandState(fmt.rte); } catch (e) { /* ignore */ }
+            }
+
+            btn.classList.toggle('is-format-active', isActive);
+        });
+    }
+
+    function clearFormatActiveStates() {
+        document.querySelectorAll('.btn-bold, .btn-italic, .btn-underline, .btn-strikethrough')
+            .forEach(function (btn) { btn.classList.remove('is-format-active'); });
+    }
+
     function handleSelectionChange() {
         clearTimeout(selectionTimeout);
         selectionTimeout = setTimeout(function () {
@@ -591,6 +629,7 @@ function initTextSelectionHandlers() {
                     for (var i = 0; i < noteActionButtons.length; i++) {
                         noteActionButtons[i].classList.add('hide-on-selection');
                     }
+                    updateFormatActiveStates(editableElement);
                     setMobileFormattingToolbarActive(true);
                 } else {
                     // Text selected but not in an editable area: hide everything
@@ -600,6 +639,7 @@ function initTextSelectionHandlers() {
                     for (var i = 0; i < noteActionButtons.length; i++) {
                         noteActionButtons[i].classList.add('hide-on-selection');
                     }
+                    clearFormatActiveStates();
                     setMobileFormattingToolbarActive(false);
                 }
             } else {
@@ -610,6 +650,7 @@ function initTextSelectionHandlers() {
                 for (var i = 0; i < noteActionButtons.length; i++) {
                     noteActionButtons[i].classList.remove('hide-on-selection');
                 }
+                clearFormatActiveStates();
                 setMobileFormattingToolbarActive(false);
             }
 
