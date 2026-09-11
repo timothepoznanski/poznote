@@ -6,6 +6,52 @@
  */
 
 /**
+ * ORDER BY clause listing workspaces the way the user arranged them with the
+ * arrows on workspaces.php: the placed ones first (display_order 1..n), then
+ * whatever is still at 0, alphabetically. Same convention as folders and
+ * notes, so an account that never touched the arrows keeps the plain
+ * alphabetical list it has always had.
+ *
+ * workspaces.display_order arrives with a migration, so a database that has
+ * not run it yet falls back to the alphabetical order instead of breaking
+ * every workspace list.
+ *
+ * @param PDO|null $pdo   Connection to inspect; defaults to the global one.
+ * @param string   $alias Table alias to prefix the columns with, when the
+ *                        query joins (workspaces.php: 'w').
+ * @return string The clause, without the ORDER BY keyword.
+ */
+function poznoteWorkspaceOrderBy($pdo = null, string $alias = ''): string {
+    static $hasColumn = [];
+
+    if ($pdo === null) {
+        global $con;
+        $pdo = $con;
+    }
+
+    $key = $pdo instanceof PDO ? spl_object_id($pdo) : 0;
+    if (!isset($hasColumn[$key])) {
+        $hasColumn[$key] = false;
+        if ($pdo instanceof PDO) {
+            try {
+                $cols = $pdo->query('PRAGMA table_info(workspaces)')->fetchAll(PDO::FETCH_ASSOC);
+                $hasColumn[$key] = in_array('display_order', array_column($cols, 'name'), true);
+            } catch (Exception $e) {
+                error_log('functions: poznoteWorkspaceOrderBy() failed: ' . $e->getMessage());
+            }
+        }
+    }
+
+    $prefix = $alias !== '' ? $alias . '.' : '';
+    if (!$hasColumn[$key]) {
+        return $prefix . 'name COLLATE NOCASE';
+    }
+
+    return 'CASE WHEN ' . $prefix . 'display_order > 0 THEN 0 ELSE 1 END, '
+        . $prefix . 'display_order, ' . $prefix . 'name COLLATE NOCASE';
+}
+
+/**
  * Get the first available workspace name from the database
  * Used as fallback when no specific workspace is selected
  * 
@@ -19,7 +65,7 @@ function getFirstWorkspaceName() {
     global $con;
     if (isset($con)) {
         try {
-            $stmt = $con->query("SELECT name FROM workspaces ORDER BY name LIMIT 1");
+            $stmt = $con->query('SELECT name FROM workspaces ORDER BY ' . poznoteWorkspaceOrderBy($con) . ' LIMIT 1');
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($row && !empty($row['name'])) {
                 return $row['name'];
@@ -188,7 +234,7 @@ function poznoteRenderPageTitleWorkspace($workspace = null, array $options = [])
     $names = [];
     if (isset($con)) {
         try {
-            $stmt = $con->query('SELECT name FROM workspaces ORDER BY name COLLATE NOCASE');
+            $stmt = $con->query('SELECT name FROM workspaces ORDER BY ' . poznoteWorkspaceOrderBy($con));
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $name = (string)$row['name'];
                 if ($name !== '') {
@@ -334,14 +380,14 @@ function poznoteSerializeWorkspaceTags(array $tags): string {
 function poznoteGetWorkspaceTagsMap(PDO $con): array {
     $map = [];
     try {
-        $stmt = $con->query('SELECT name, tags FROM workspaces ORDER BY name COLLATE NOCASE');
+        $stmt = $con->query('SELECT name, tags FROM workspaces ORDER BY ' . poznoteWorkspaceOrderBy($con));
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $map[(string)$row['name']] = poznoteParseWorkspaceTags($row['tags'] ?? '');
         }
     } catch (Exception $e) {
         // Column missing on a not-yet-migrated database: no tags
         try {
-            $stmt = $con->query('SELECT name FROM workspaces ORDER BY name COLLATE NOCASE');
+            $stmt = $con->query('SELECT name FROM workspaces ORDER BY ' . poznoteWorkspaceOrderBy($con));
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $map[(string)$row['name']] = [];
             }

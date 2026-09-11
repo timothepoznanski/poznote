@@ -886,3 +886,29 @@ html[data-theme='dark'] .date-format-tokens dt code {
     background: rgba(var(--pz-highlight-rgb), 0.1) !important;
     color: var(--dm-text) !important;
 }
+
+/* ============================================
+   Change Password Modal
+   ============================================
+   The default dark theme keeps the status colours of the light scale (only the
+   neutrals are remapped in tokens.css), so the three notice fills of
+   css/settings.css need their dark counterparts here. The named dark themes
+   remap both scales and would be right either way. */
+
+html[data-theme='dark'] #changePasswordModal .change-password-status-custom {
+    background: var(--dm-success-soft);
+    color: var(--dm-success);
+    border-left-color: var(--dm-success);
+}
+
+html[data-theme='dark'] #changePasswordModal .change-password-status-default {
+    background: var(--dm-warning-soft);
+    color: var(--dm-warning);
+    border-left-color: var(--dm-warning);
+}
+
+html[data-theme='dark'] #changePasswordModal .change-password-status-sso {
+    background: var(--dm-accent-soft);
+    color: var(--dm-accent);
+    border-left-color: var(--dm-accent);
+}

@@ -1117,10 +1117,11 @@ function updateTitleInElement(linkElement, newTitle) {
 // ============================================================
 
 /**
- * Open a note in a new browser tab
+ * Open a note in a new in-app tab (a real browser tab without the tab manager)
  * @param {string|number} noteId - The note ID to open
+ * @param {Object} [options] - Passed to tabManager.openInNewTab (afterSidebarClick, insertAfterActive...)
  */
-function openNoteInNewTab(noteId) {
+function openNoteInNewTab(noteId, options) {
     if (!noteId) {
         console.error('No note ID provided');
         return;
@@ -1147,7 +1148,7 @@ function openNoteInNewTab(noteId) {
                 title = noteTitleEl.textContent.trim();
             }
         }
-        window.tabManager.openInNewTab(noteId, title);
+        window.tabManager.openInNewTab(noteId, title, options);
         return;
     }
 

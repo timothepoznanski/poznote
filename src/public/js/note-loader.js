@@ -320,6 +320,21 @@ function findNoteLinkById(noteId) {
     return null;
 }
 
+// The request loading a note right now, so that a newer navigation can drop
+// it instead of being ignored while it is in flight.
+var activeNoteLoadXhr = null;
+
+function abortActiveNoteLoad() {
+    var xhr = activeNoteLoadXhr;
+    if (!xhr) return false;
+    activeNoteLoadXhr = null;
+    xhr.poznoteAborted = true;
+    // abort() fires the final readystatechange synchronously, which clears
+    // the loading flag through onLoadingComplete before this returns.
+    xhr.abort();
+    return true;
+}
+
 /**
  * Common note loading logic shared by loadNoteDirectly and loadNoteViaAjax.
  * Handles XHR request, response parsing, content update, and error handling.
@@ -380,11 +395,21 @@ function loadNoteCommon(url, noteId, options) {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', finalUrl, true);
     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    // Ask index.php for #right_col alone: the rest of the page (the whole
+    // notes tree, the modals) was fetched, parsed and thrown away on every
+    // click. A server without the fragment path ignores the header and the
+    // full page still parses the same way below.
+    xhr.setRequestHeader('X-Poznote-Fragment', 'right_col');
+    activeNoteLoadXhr = xhr;
 
     xhr.onreadystatechange = function () {
         try {
             if (xhr.readyState === 4) {
+                if (activeNoteLoadXhr === xhr) activeNoteLoadXhr = null;
                 clearLoading();
+
+                // Dropped for a newer navigation: nothing to show, nothing failed
+                if (xhr.poznoteAborted) return;
 
                 if (xhr.status === 200) {
                     try {
@@ -559,15 +584,23 @@ window.loadNoteDirectly = function (url, noteId, event, clickedElement, extraOpt
             }
         }
 
-        // Prevent multiple simultaneous loads
+        // A load still in flight is dropped in favour of this one (the click
+        // used to be ignored instead). abort() clears the flag synchronously,
+        // so a flag still set afterwards means nothing could be dropped.
         if (window.isLoadingNote) {
-            return false;
+            abortActiveNoteLoad();
+            if (window.isLoadingNote) {
+                return false;
+            }
         }
         window.isLoadingNote = true;
 
         // Save scroll position of the current tab before navigating away
         if (window.tabManager && typeof window.tabManager._saveScrollPosition === 'function') {
             window.tabManager._saveScrollPosition();
+        }
+        if (window.tabManager && typeof window.tabManager._onNoteLoadStarted === 'function') {
+            window.tabManager._onNoteLoadStarted(noteId);
         }
 
         // Find the clicked link to update selection

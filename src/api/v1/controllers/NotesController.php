@@ -35,11 +35,16 @@ class NotesController {
     }
 
     private function getNoteLockHolderUserId(): int {
-        return (int) (getAuthenticatedUserId() ?? getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0));
+        return getNoteEditLockActorUserId();
     }
 
+    /**
+     * Who the write is recorded as (updated_by, webhooks): always the
+     * authenticated user, unlike the lock identity above which follows the
+     * profile an MCP service-token request acts for.
+     */
     private function getActorUserId(): int {
-        return $this->getNoteLockHolderUserId();
+        return (int) (getAuthenticatedUserId() ?? getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0));
     }
 
     /**
@@ -210,12 +215,24 @@ class NotesController {
         }
 
         if ($editorSessionId === '') {
-            $lock = getNoteEditLock($targetUserId, $noteId);
-            if (!$lock) {
+            // A client without an editor session (the MCP server, an API
+            // script) never holds the lock itself. The same rule as the other
+            // one-shot writers (tasks, AI chat, trash): only a lock held by
+            // another user or a public visitor blocks the write. The user's
+            // own lock does not, the app takes it as soon as a note is opened,
+            // viewing included (issue 1366), and the open tab protects itself:
+            // its autosave sends if_version and js/live-refresh.js reloads the
+            // note or shows the banner.
+            $blockingLock = getBlockingNoteEditLock($targetUserId, $noteId, $holderUserId);
+            if ($blockingLock === null) {
                 return true;
             }
 
-            $this->sendLockConflict('This note is currently locked for editing', $lock, $editorSessionId);
+            $this->sendLockConflict(
+                'This note is currently being edited by ' . describeNoteEditLockHolder($blockingLock),
+                $blockingLock,
+                $editorSessionId
+            );
             return false;
         }
 

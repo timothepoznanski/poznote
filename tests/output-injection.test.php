@@ -189,3 +189,14 @@ test('every endpoint that sends a file closes the output buffers first', functio
     assertTrue($seen >= 12, 'download endpoints found: ' . $seen);
     assertSame([], $offenders, 'endpoints sending a file through the output buffers');
 });
+
+test('a note pane fragment carries no head and comes back byte for byte', function () use ($injectedScript, $injectedLink) {
+    // index.php answers a sidebar click (X-Poznote-Fragment: right_col) with
+    // #right_col alone; the handler must not write the head snippets into it.
+    $fragment = '<div id="right_col"><div class="noteentry">hello</div></div>';
+    assertSame($fragment, poznoteInjectIntoHtmlHead($fragment, $injectedScript, $injectedLink));
+});
+
+test('the handler wrapping the rest of the page for a fragment returns nothing', function () {
+    assertSame('', poznoteDiscardOutput('<!DOCTYPE html><html><head></head><body>the tree</body></html>'));
+});

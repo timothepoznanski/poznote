@@ -59,7 +59,9 @@ function handleCreateWorkspace(event) {
             if (createBtn) createBtn.disabled = false;
 
             if (json && json.success) {
-                showAjaxAlert(wsTr('workspaces.messages.created', {}, 'Workspace created'), 'success');
+                // The row only appears once the page has reloaded, just below,
+                // so the banner says the creation is under way rather than done.
+                showAjaxAlert(wsTr('workspaces.messages.creating', {}, 'Creating workspace...'), 'success');
 
                 // Clear inputs
                 nameInput.value = '';
@@ -479,6 +481,7 @@ function initializeWorkspacesPage() {
     document.addEventListener('click', handleRenameButtonClick);
     document.addEventListener('click', handleWorkspaceTagsButtonClick);
     document.addEventListener('click', handleWorkspaceColorButtonClick);
+    document.addEventListener('keydown', handleWorkspaceOrderKeydown);
     document.addEventListener('click', handleSelectButtonClick);
     document.addEventListener('click', handleDeleteButtonClick);
     document.addEventListener('click', handleMoveButtonClick);
@@ -521,6 +524,9 @@ function initializeWorkspacesPage() {
     if (document.fonts && document.fonts.ready && typeof document.fonts.ready.then === 'function') {
         document.fonts.ready.then(scheduleWorkspaceRowActionsLayout).catch(function () {});
     }
+
+    // Dragging the rows by their handle to reorder the workspaces
+    initWorkspaceOrderSortable();
 
     // Initialize default workspace dropdown
     loadDefaultWorkspaceSetting();

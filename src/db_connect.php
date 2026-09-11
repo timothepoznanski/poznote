@@ -183,7 +183,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 38; // 38: entries.client_state_hash/_version (draft recovery, issue 1349)
+    $CURRENT_SCHEMA_VERSION = 39; // 39: workspaces.display_order (manual workspace order)
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -266,7 +266,8 @@ try {
         $con->exec('CREATE TABLE IF NOT EXISTS workspaces (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT UNIQUE NOT NULL,
-            created DATETIME DEFAULT CURRENT_TIMESTAMP
+            created DATETIME DEFAULT CURRENT_TIMESTAMP,
+            display_order INTEGER DEFAULT 0
         )');
 
         // Insert default workspace only if no workspaces exist
@@ -665,6 +666,22 @@ try {
             error_log('Could not add workspaces.color column: ' . $e->getMessage());
         }
 
+        // Workspace order: the position the workspace takes in every list that
+        // shows them (workspaces.php, the sidebar menu, the page title chip).
+        // 0 means "left where it was": those keep sorting alphabetically, after
+        // the ones the user arranged on workspaces.php, so an account that
+        // never touches the arrows sees the order it has always had, and a
+        // workspace created later lands at the end rather than in the middle.
+        try {
+            $cols = $con->query("PRAGMA table_info(workspaces)")->fetchAll(PDO::FETCH_ASSOC);
+            $existingColumns = array_column($cols, 'name');
+            if (!in_array('display_order', $existingColumns)) {
+                $con->exec("ALTER TABLE workspaces ADD COLUMN display_order INTEGER DEFAULT 0");
+            }
+        } catch (Exception $e) {
+            error_log('Could not add workspaces.display_order column: ' . $e->getMessage());
+        }
+
         // Ensure linked_note_id column exists (may be missing from restored backups)
         try {
             $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
@@ -821,9 +838,9 @@ try {
                 file_put_contents($welcomeFile, $welcomeContent);
                 setFilePermissions($welcomeFile, 0644);
 
-                // Arm the first-run welcome wizard: index.php shows it while
-                // this key is 'pending'; js/welcome-setup.js flips it to
-                // 'done' once the user finishes or skips it.
+                // Arm the first-run startup guide: index.php sends a plain
+                // page load to welcome.php while this key is 'pending', and
+                // the guide flips it to 'done' once it is finished or skipped.
                 $con->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('welcome_setup', 'pending')");
             }
             // Legacy migration: ensure folder_id is populated and entry snippets exist.

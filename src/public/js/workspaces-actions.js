@@ -504,3 +504,143 @@ function handleDeleteButtonClick(e) {
         };
     }
 }
+
+// ========== ROW ORDER ==========
+// The rows of workspaces.php are dragged by their handle, then the whole list
+// is saved as one order (reorder POST): the positions stay 1..n whatever was
+// moved, and every list that shows workspaces (the sidebar menu, the page
+// title chip, the dashboard selectors) follows it.
+
+var workspaceOrderSaveTimer = null;
+
+// SortableJS is vendored but not loaded by workspaces.php; pull it in on first
+// use, as js/settings-page.js does for the rail order. The arrow keys below are
+// the fallback, so a failed load costs nothing but the dragging.
+function initWorkspaceOrderSortable() {
+    var list = document.querySelector('.workspace-list ul');
+    if (!list || list.dataset.sortable === '1') return;
+    if (!list.querySelector('.ws-drag-handle')) return;
+
+    if (typeof Sortable === 'undefined') {
+        if (!document.querySelector('script[data-sortable-local]')) {
+            var script = document.createElement('script');
+            script.src = (window.poznoteAssetUrl ? window.poznoteAssetUrl('js/Sortable.min.js') : 'js/Sortable.min.js');
+            script.async = true;
+            script.setAttribute('data-sortable-local', '1');
+            script.onload = initWorkspaceOrderSortable;
+            document.head.appendChild(script);
+        }
+        return;
+    }
+
+    new Sortable(list, {
+        animation: 150,
+        handle: '.ws-drag-handle',
+        draggable: '.ws-row',
+        onStart: function (evt) { evt.item.classList.add('ws-row-dragging'); },
+        onEnd: function (evt) {
+            evt.item.classList.remove('ws-row-dragging');
+            if (evt.oldIndex === evt.newIndex) return;
+            scheduleWorkspaceOrderSave(list);
+        }
+    });
+
+    list.dataset.sortable = '1';
+}
+
+// Keyboard equivalent of the drag: the handle is a button, so it takes focus,
+// and the arrow keys move its row one place at a time.
+function handleWorkspaceOrderKeydown(event) {
+    if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
+
+    var handle = (event.target && event.target.closest) ? event.target.closest('.ws-drag-handle') : null;
+    if (!handle) return;
+
+    var row = handle.closest('.ws-row');
+    var list = row ? row.parentElement : null;
+    if (!row || !list) return;
+
+    var goingUp = event.key === 'ArrowUp';
+    var sibling = goingUp ? row.previousElementSibling : row.nextElementSibling;
+    if (!sibling) return;
+
+    event.preventDefault();
+
+    if (goingUp) {
+        list.insertBefore(row, sibling);
+    } else {
+        list.insertBefore(sibling, row);
+    }
+
+    // The row moved out from under the caret; the handle keeps the focus.
+    handle.focus();
+    scheduleWorkspaceOrderSave(list);
+}
+
+// A run of moves (an arrow key held down, a drag right after another) is one
+// save, and the last order wins: sending one request per move could persist
+// them out of order.
+function scheduleWorkspaceOrderSave(list) {
+    if (workspaceOrderSaveTimer) clearTimeout(workspaceOrderSaveTimer);
+    workspaceOrderSaveTimer = setTimeout(function () {
+        workspaceOrderSaveTimer = null;
+        saveWorkspaceOrder(list);
+    }, 500);
+}
+
+function saveWorkspaceOrder(list) {
+    var params = new URLSearchParams();
+    params.append('action', 'reorder');
+
+    Array.prototype.forEach.call(list.querySelectorAll('.ws-row'), function (row) {
+        var name = row.getAttribute('data-ws');
+        if (name) params.append('names[]', name);
+    });
+
+    fetch('workspaces.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        },
+        body: params.toString()
+    })
+        .then(function (resp) { return resp.json(); })
+        .then(function (json) {
+            if (json && json.success) {
+                // No success banner: the row moving is the feedback, and an
+                // alert on every click would flash at each step of a move.
+                syncDefaultWorkspaceSelectOrder(json.names || []);
+            } else {
+                showAjaxAlert(wsTr('workspaces.order.save_error', {}, 'Could not update the workspace order'), 'danger');
+            }
+        })
+        .catch(function () {
+            showAjaxAlert(wsTr('workspaces.order.save_error', {}, 'Could not update the workspace order'), 'danger');
+        });
+}
+
+// The "Default Workspace" select lists the same workspaces, so it follows the
+// new order without waiting for a reload. The options are moved rather than
+// rebuilt, which leaves the current choice (saved or not) alone, and the
+// "Last workspace opened" entry where it belongs, at the top.
+function syncDefaultWorkspaceSelectOrder(names) {
+    if (!names.length) return;
+
+    document.body.setAttribute('data-workspaces', JSON.stringify(names));
+
+    var select = document.getElementById('defaultWorkspaceSelect');
+    if (!select) return;
+
+    // A null prototype: a workspace may legitimately be called "constructor"
+    // or "__proto__".
+    var options = Object.create(null);
+    Array.prototype.forEach.call(select.options, function (option) {
+        options[option.value] = option;
+    });
+
+    names.forEach(function (name) {
+        if (options[name]) select.appendChild(options[name]);
+    });
+}

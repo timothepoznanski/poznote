@@ -423,9 +423,11 @@ if ($canUseUserWebhooks) {
         <h2 class="settings-category-title" id="settings-pinned-section-title" hidden><?php echo t_h('settings.categories.pinned', [], 'Pinned'); ?></h2>
         <div class="home-grid" id="settings-pinned-section-grid" hidden></div>
 
-        <!-- ACTIONS CATEGORY -->
-        <h2 class="settings-category-title" id="settings-actions-section-title"><?php echo t_h('settings.categories.actions'); ?></h2>
-        <div class="home-grid" id="settings-actions-section-grid">
+        <!-- MY ACCOUNT CATEGORY: identity and access for the signed-in
+             user (profile, password, API credentials, storage, deletion).
+             Kept apart from Actions, which holds app-wide tools. -->
+        <h2 class="settings-category-title" id="settings-account-section-title"><?php echo t_h('settings.categories.account', [], 'My Account'); ?></h2>
+        <div class="home-grid" id="settings-account-section-grid">
 
             <!-- My Profile (username, first/last name) -->
             <div class="home-card" id="my-profile-card">
@@ -436,18 +438,6 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('profile.card', [], 'My Profile'); ?></span>
                     <span id="profile-username-badge" class="setting-status enabled"><?php echo htmlspecialchars((string)($currentUser['username'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></span>
-                </div>
-            </div>
-
-            <!-- Welcome setup wizard -->
-            <div class="home-card settings-card-clickable" id="welcome-setup-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.welcome_setup', [], 'Review the startup guide and update your basic preferences.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-sparkles"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.welcome_setup', [], 'Startup guide'); ?></span>
-                    <span class="setting-status enabled"><?php echo t_h('settings.welcome_setup.relaunch', [], 'Review'); ?></span>
                 </div>
             </div>
 
@@ -484,6 +474,36 @@ if ($canUseUserWebhooks) {
                     ?></span>
                 </div>
             </div>
+
+            <!-- Storage Statistics (own account) -->
+            <div class="home-card settings-card-clickable" id="storage-stats-user-card" data-href="storage-stats-user.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.storage_stats_user', [], 'See how much storage your notes and attachments use.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-pie-chart"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.storage_stats_user', [], 'User Storage statistics'); ?></span>
+                </div>
+            </div>
+
+            <?php if (getCurrentUserId() !== 1): // user ID 1 is the permanent super-admin and can never be deleted ?>
+            <!-- Delete Account -->
+            <div class="home-card home-card-red" id="delete-account-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.delete_account', [], 'Permanently delete your account and all its data.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-trash-2"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.delete_account', [], 'Delete Account'); ?></span>
+                </div>
+            </div>
+            <?php endif; ?>
+
+        </div>
+
+        <!-- ACTIONS CATEGORY -->
+        <h2 class="settings-category-title" id="settings-actions-section-title"><?php echo t_h('settings.categories.actions'); ?></h2>
+        <div class="home-grid" id="settings-actions-section-grid">
 
             <!-- Git Sync (available to all users) -->
             <div class="home-card settings-card-clickable" id="git-sync-card" data-href="git_sync.php">
@@ -603,30 +623,6 @@ if ($canUseUserWebhooks) {
                     <span class="home-card-title"><?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?></span>
                 </div>
             </a>
-
-            <!-- Storage Statistics (own account) -->
-            <div class="home-card settings-card-clickable" id="storage-stats-user-card" data-href="storage-stats-user.php">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.storage_stats_user', [], 'See how much storage your notes and attachments use.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-pie-chart"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.storage_stats_user', [], 'User Storage statistics'); ?></span>
-                </div>
-            </div>
-
-            <?php if (getCurrentUserId() !== 1): // user ID 1 is the permanent super-admin and can never be deleted ?>
-            <!-- Delete Account -->
-            <div class="home-card home-card-red" id="delete-account-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.delete_account', [], 'Permanently delete your account and all its data.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-trash-2"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.delete_account', [], 'Delete Account'); ?></span>
-                </div>
-            </div>
-            <?php endif; ?>
 
         </div>
 

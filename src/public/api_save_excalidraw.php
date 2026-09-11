@@ -27,7 +27,7 @@ function excalidrawAssertNoteNotLockedByOther(int $note_id): void {
     $blockingLock = getBlockingNoteEditLock(
         (int)(getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0)),
         $note_id,
-        (int)(getAuthenticatedUserId() ?? getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0))
+        getNoteEditLockActorUserId()
     );
     if ($blockingLock !== null) {
         http_response_code(423);

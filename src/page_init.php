@@ -27,7 +27,7 @@ function initializeWorkspacesAndLabels($con) {
         $workspaces = [];
         try {
             // Try to read workspaces from the DB if the table exists
-            $stmt_ws = $con->query("SELECT name FROM workspaces ORDER BY name");
+            $stmt_ws = $con->query('SELECT name FROM workspaces ORDER BY ' . poznoteWorkspaceOrderBy($con));
             while ($r = $stmt_ws->fetch(PDO::FETCH_ASSOC)) {
                 $workspaces[] = $r['name'];
             }

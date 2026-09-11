@@ -417,7 +417,6 @@
       "tenant_isolation": "Modo SaaS: escolha quais funcionalidades são bloqueadas para os utilizadores não administradores, como descobrir as outras contas da instância ou registar webhooks pessoais. Deixe tudo desmarcado numa instância familiar ou de equipa.",
       "workspaces": "Organize suas notas em espaços de trabalho separados, cada um com suas pastas e notas.",
       "my_profile": "Veja e edite as informações do seu perfil.",
-      "welcome_setup": "Reveja o assistente de início e atualize as suas preferências básicas.",
       "change_password": "Altere a senha usada para entrar.",
       "password_note_sso_only": "O login com senha esta desativado nesta instancia.",
       "password_note_no_local": "Sua senha e gerenciada pelo seu provedor de identidade.",
@@ -504,6 +503,7 @@
     "expand_all_sections": "Expandir tudo",
     "categories": {
       "pinned": "Fixados",
+      "account": "Minha conta",
       "actions": "Ações",
       "admin_tools": "Ferramentas de administração",
       "display": "Tela",
@@ -564,7 +564,6 @@
       "delete_account": "Eliminar conta",
       "import_limits": "Limites de importação",
       "user_quotas": "Cotas de usuário",
-      "welcome_setup": "Assistente de início",
       "git_sync_toggle": "Sincronização Git",
       "allow_executable_attachments": "Anexos de scripts e executáveis",
       "oidc_config": "OIDC / SSO",
@@ -582,10 +581,6 @@
       "username": "Esta conta ainda usa o nome de usuário de origem.",
       "change_password": "Mudar palavra-passe",
       "change_username": "Mudar nome de usuário"
-    },
-    "welcome_setup": {
-      "relaunch": "Rever",
-      "restart_failed": "Não foi possível reabrir o assistente de início. Tente novamente."
     },
     "install_app": {
       "launching": "A instalação vai começar. Por favor, aguarde...",
@@ -672,6 +667,7 @@
       "source_target_must_differ": "Os espaços de trabalho de origem e destino devem ser diferentes"
     },
     "messages": {
+      "creating": "Criando espaço de trabalho...",
       "created": "Espaço de trabalho criado",
       "deleted_all": "Espaço de trabalho excluído e todas as notas, pastas e anexos associados removidos",
       "renamed": "Espaço de trabalho renomeado em todas as notas e etiquetas",
@@ -733,6 +729,11 @@
       "saved": "Cor atualizada",
       "save_error": "Não foi possível atualizar a cor",
       "invalid": "Cor inválida"
+    },
+    "order": {
+      "handle": "Arraste para reordenar",
+      "saved": "Ordem dos espaços de trabalho atualizada",
+      "save_error": "Não foi possível atualizar a ordem dos espaços de trabalho"
     }
   },
   "display": {
@@ -1564,24 +1565,6 @@
         "custom_label": "Personalizado",
         "days": "dias"
       }
-    },
-    "welcome_setup": {
-      "title": "Bem-vindo ao Poznote!",
-      "subtitle": "Vamos definir algumas preferências para começar. Você pode alterá-las a qualquer momento.",
-      "language_label": "Idioma",
-      "theme_label": "Tema",
-      "theme_options": {
-        "system": "Como o sistema",
-        "light": "Claro",
-        "dark": "Escuro",
-        "black": "Preto"
-      },
-      "date_format_label": "Formato de data e hora",
-      "timezone_label": "Fuso Horário",
-      "settings_tip": "Muitas outras opções (fontes, backups, IA e mais) esperam por você nas configurações do Poznote.",
-      "dashboard_tip": "O painel oferece uma visão geral das suas notas e da sua conta.",
-      "skip": "Pular",
-      "start": "Começar"
     },
     "timezone": {
       "title": "Fuso Horário",
@@ -4302,6 +4285,43 @@
     "errors": {
       "duplicate_title": "Já existe uma nota arquivada com o mesmo título nesta pasta.",
       "archive_prefix": "Erro ao arquivar a nota: {{error}}"
+    }
+  },
+  "welcome_page": {
+    "page_title": "Bem-vindo",
+    "title": "Bem-vindo ao Poznote",
+    "lead": "Que bom ter você aqui. Reserve um minuto para deixar o Poznote do seu jeito.",
+    "language_modal": {
+      "title": "Escolha o seu idioma"
+    },
+    "preferences": {
+      "language": "Idioma",
+      "theme": "Tema",
+      "theme_system": "Igual ao meu sistema",
+      "date_format": "Formato de data e hora",
+      "timezone": "Fuso horário"
+    },
+    "account": {
+      "title": "A sua conta",
+      "hint": "O nome de usuario e a palavra-passe com os quais vai entrar.",
+      "username": "Nome de usuario",
+      "username_hint": "Letras, dígitos, pontos, sublinhados e hífens.",
+      "username_default_hint": "Esta conta ainda usa o nome de usuario com que foi instalada. Escolha o seu.",
+      "current_password": "Palavra-passe atual",
+      "new_password": "Nova palavra-passe",
+      "confirm_password": "Confirmar palavra-passe",
+      "password_default_hint": "Esta conta ainda usa a palavra-passe com que foi instalada ({{password}}). Escolha agora a sua.",
+      "password_unavailable": "Você entra através do seu fornecedor de identidade, por isso não há palavra-passe a definir aqui."
+    },
+    "footnote": "Tudo isto, e muito mais, pode ser alterado depois nas Configurações.",
+    "start": "Começar a usar o Poznote",
+    "saving": "Salvando...",
+    "errors": {
+      "generic": "Algo correu mal. Tente novamente.",
+      "username_required": "É necessário um nome de usuario.",
+      "password_incomplete": "Preencha todos os campos de palavra-passe, ou deixe-os todos vazios.",
+      "password_mismatch": "As duas novas palavras-passe não coincidem.",
+      "password_too_short": "A palavra-passe deve ter pelo menos 4 caracteres."
     }
   }
 }

@@ -122,6 +122,30 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     line-height: 1.45;
 }
 
+/* The kind is appended to the class by js/change-password.js
+   ('change-password-status-' + kind), so no selector here is spelled out
+   anywhere in the markup: keep the three rules even when a search for the
+   literal class name comes up empty. Without them the notice loses its fill
+   and reads as one more paragraph. */
+#changePasswordModal .change-password-status-custom {
+    background: var(--pz-success-soft);
+    color: var(--pz-success-strong);
+    border-left-color: var(--pz-success);
+}
+
+/* Still on the shared default: worth acting on, so flag it. */
+#changePasswordModal .change-password-status-default {
+    background: var(--pz-warning-soft);
+    color: var(--pz-warning-strong);
+    border-left-color: var(--pz-warning);
+}
+
+#changePasswordModal .change-password-status-sso {
+    background: var(--pz-accent-soft);
+    color: var(--pz-accent-strong);
+    border-left-color: var(--pz-accent);
+}
+
 /* App passwords modal (js/app-passwords.js): a create row, the secret shown
    once, then one row per credential. Only --pz-* tokens, which tokens.css
    re-maps for the dark themes, so no dark block is needed here. */

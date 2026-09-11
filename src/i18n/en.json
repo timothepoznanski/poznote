@@ -127,7 +127,6 @@
       "tenant_isolation": "SaaS mode: choose which capabilities are blocked for non-admin users, such as discovering the other accounts of the instance or registering personal webhooks. Leave everything unchecked for a family or team instance.",
       "workspaces": "Organize your notes into separate workspaces, each with its own folders and notes.",
       "my_profile": "View and edit your profile information.",
-      "welcome_setup": "Review the startup guide and update your basic preferences.",
       "change_password": "Change the password used to sign in.",
       "password_note_sso_only": "Password sign-in is disabled on this instance.",
       "password_note_no_local": "Your password is managed by your identity provider.",
@@ -214,6 +213,7 @@
     "expand_all_sections": "Expand all",
     "categories": {
       "pinned": "Pinned",
+      "account": "My Account",
       "actions": "Actions",
       "admin_tools": "Admin Tools",
       "display": "Display",
@@ -255,7 +255,6 @@
       "delete_account": "Delete Account",
       "import_limits": "Import Limits",
       "user_quotas": "User quotas",
-      "welcome_setup": "Startup guide",
       "git_sync_toggle": "Git Sync",
       "allow_executable_attachments": "Script and executable attachments",
       "oidc_config": "OIDC / SSO",
@@ -273,10 +272,6 @@
       "username": "This account still uses the username it shipped with.",
       "change_password": "Change Password",
       "change_username": "Change username"
-    },
-    "welcome_setup": {
-      "relaunch": "Review",
-      "restart_failed": "The startup guide could not be relaunched. Please try again."
     },
     "install_app": {
       "launching": "The installation will start. Please wait...",
@@ -367,6 +362,14 @@
     },
     "actions": {
       "menu": "Workspace actions"
+    },
+    "order": {
+      "handle": "Drag to reorder",
+      "saved": "Workspace order updated",
+      "save_error": "Could not update the workspace order"
+    },
+    "messages": {
+      "creating": "Creating workspace..."
     }
   },
   "display": {
@@ -1094,24 +1097,6 @@
         "custom_label": "Custom",
         "days": "days"
       }
-    },
-    "welcome_setup": {
-      "title": "Welcome to Poznote!",
-      "subtitle": "Let's set up a few preferences to get you started. You can change them at any time.",
-      "language_label": "Language",
-      "theme_label": "Theme",
-      "theme_options": {
-        "system": "Same as system",
-        "light": "Light",
-        "dark": "Dark",
-        "black": "Black"
-      },
-      "date_format_label": "Date & time format",
-      "timezone_label": "Timezone",
-      "settings_tip": "Many more options (fonts, backups, AI and more) are waiting for you in the Poznote settings.",
-      "dashboard_tip": "The dashboard gives you an overview of your notes and your account.",
-      "skip": "Skip",
-      "start": "Get started"
     },
     "timezone": {
       "title": "Timezone",
@@ -4081,6 +4066,43 @@
     "errors": {
       "duplicate_title": "A note with the same title is already archived in this folder.",
       "archive_prefix": "Error archiving the note: {{error}}"
+    }
+  },
+  "welcome_page": {
+    "page_title": "Welcome",
+    "title": "Welcome to Poznote",
+    "lead": "Happy to have you here. Take a minute to make Poznote yours.",
+    "language_modal": {
+      "title": "Choose your language"
+    },
+    "preferences": {
+      "language": "Language",
+      "theme": "Theme",
+      "theme_system": "Same as my system",
+      "date_format": "Date and time format",
+      "timezone": "Timezone"
+    },
+    "account": {
+      "title": "Your account",
+      "hint": "The username and password you will sign in with.",
+      "username": "Username",
+      "username_hint": "Letters, digits, dots, underscores and dashes.",
+      "username_default_hint": "This account still answers to the username it was installed with. Pick your own.",
+      "current_password": "Current password",
+      "new_password": "New password",
+      "confirm_password": "Confirm password",
+      "password_default_hint": "This account still uses the password it was installed with ({{password}}). Choose your own now.",
+      "password_unavailable": "You sign in through your identity provider, so there is no password to set here."
+    },
+    "footnote": "All of this, and a lot more, can be changed later in Settings.",
+    "start": "Start using Poznote",
+    "saving": "Saving...",
+    "errors": {
+      "generic": "Something went wrong. Please try again.",
+      "username_required": "A username is required.",
+      "password_incomplete": "Fill in every password box, or leave them all empty.",
+      "password_mismatch": "The two new passwords do not match.",
+      "password_too_short": "The password must be at least 4 characters."
     }
   }
 }

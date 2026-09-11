@@ -110,6 +110,73 @@ body {
     min-width: 200px;
 }
 
+/* Every column of a row centres on the same line. The name box is about 20px
+   tall, the drag handle 24px and the action buttons 36px, so top-aligning them
+   (the align-items: flex-start !important of workspaces-inline.css, loaded
+   after this file) left the handle 2px and the action icons 8px below the
+   name. The extra class beats that !important, the way the narrow layout
+   already did further down. */
+.workspace-list ul li.ws-row {
+    align-items: center !important;
+}
+
+/* Row order: the handle each row is dragged by (js/workspaces-actions.js
+   drives SortableJS). It sits before the name, and is left out entirely when
+   the account has a single workspace (nothing to drag past). */
+.ws-col-order {
+    flex: 0 0 auto;
+    margin-right: 2px;
+}
+
+.ws-drag-handle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--pz-radius);
+    background: transparent;
+    color: var(--pz-text-subtle);
+    cursor: grab;
+    touch-action: none;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.ws-drag-handle:active {
+    cursor: grabbing;
+}
+
+.ws-drag-handle .lucide {
+    width: 16px;
+    height: 16px;
+    pointer-events: none;
+}
+
+.ws-drag-handle:hover,
+.ws-drag-handle:focus-visible {
+    background: var(--pz-surface-hover);
+    border-color: var(--pz-border);
+    color: var(--pz-accent);
+}
+
+/* The row being dragged, faded while its placeholder travels the list. */
+.ws-row.ws-row-dragging {
+    opacity: 0.5;
+}
+
+html[data-theme='dark'] .ws-drag-handle {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .ws-drag-handle:hover,
+html[data-theme='dark'] .ws-drag-handle:focus-visible {
+    background: var(--dm-surface-hover);
+    border-color: var(--dm-border);
+    color: var(--pz-accent);
+}
+
 /* Row actions: one icon per action (share, rename, tags, background, move
    notes, delete). The delegated click handlers read the button from
    event.target, hence the pointer-events on the icons. */
@@ -990,12 +1057,6 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
         gap: 8px !important;
         padding: 15px 0 !important;
         border-bottom: 1px solid var(--pz-border);
-    }
-
-    /* Beats the align-items: flex-start !important that workspaces-inline.css,
-       loaded after this file, puts on the same selector. */
-    .workspace-list ul li.ws-row {
-        align-items: center !important;
     }
 
     .workspace-list .ws-col-name {

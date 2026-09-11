@@ -1,0 +1,390 @@
+/**
+ * The first-run startup guide (src/public/welcome.php).
+ *
+ * A page of its own, not a dialog: it is the very first screen of a new
+ * account, so it owns the whole viewport instead of floating over a notes
+ * list the user has not seen yet.
+ *
+ * Everything here is written against the --pz-* tokens. The neutrals among
+ * them are remapped for the dark themes in css/tokens.css, so the page follows
+ * every theme without a dark layer of its own. The accent and the status
+ * colours deliberately do NOT switch (a dark fill and a dark label cannot be
+ * the same colour), so those go through the local tokens below, which the one
+ * dark rule of this file repoints.
+ */
+
+body.welcome-page {
+    /* Named first so the 'Inter' @font-face swap done by js/theme-init.js for
+       the App font setting reaches this page, as it does on the settings page
+       and unlike the shared system stacks. css/fonts.css provides the face. */
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
+    margin: 0;
+    padding-block: 40px;
+    padding-inline: 16px;
+    min-height: 100vh;
+    --welcome-accent: var(--pz-accent);
+    --welcome-danger: var(--pz-danger-strong);
+    --welcome-danger-bg: var(--pz-danger-soft);
+}
+
+/* The colours that stay put across themes, pointed at their dark values here.
+   One rule instead of a dark layer, because everything else on this page is a
+   neutral and css/tokens.css already switches those. */
+html[data-theme='dark'] body.welcome-page {
+    --welcome-accent: var(--dm-accent);
+    --welcome-danger: var(--dm-danger);
+    --welcome-danger-bg: var(--dm-danger-soft);
+}
+
+.welcome-shell {
+    max-width: 620px;
+    margin: 0 auto;
+}
+
+/* ---- Language popup ----
+
+   The guide starts here: the language decides what every word after it says.
+   The overlay is painted by the markup, not by a script, so there is no moment
+   where the page shows through in a language nobody chose; welcome-page.js
+   removes it once a language is picked, together with the scroll lock. */
+
+.welcome-lang-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(var(--pz-shadow-rgb), 0.55);
+}
+
+.welcome-page-locked {
+    overflow: hidden;
+}
+
+.welcome-lang-dialog {
+    width: 100%;
+    max-width: 480px;
+    box-sizing: border-box;
+    padding: 26px 24px 24px;
+    border-radius: var(--pz-radius-xl);
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border);
+    text-align: center;
+}
+
+.welcome-lang-title {
+    margin: 0 0 20px;
+    font-size: 19px;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text);
+}
+
+/* Three per row, and a last row that is not full centres itself. Flex rather
+   than a grid because the count is whatever the app ships: seven languages
+   leave one on its own, and the grid answers to that either with an orphan in
+   the left corner or, if told to span, with a button three times the size of
+   the others. Centring is the only arrangement that reads as deliberate for
+   any count. */
+.welcome-lang-choices {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.welcome-lang-choice {
+    /* Three columns and their two gaps. flex-grow stays 0: a lone button on
+       the last row must keep the width of the others, not take the row. */
+    flex: 0 1 calc((100% - 20px) / 3);
+    min-width: 118px;
+    padding: 12px 10px;
+    border: 1px solid var(--pz-border-strong);
+    border-radius: var(--pz-radius);
+    background: var(--pz-bg);
+    color: var(--pz-text);
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 1.3;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.welcome-lang-choice:hover {
+    border-color: var(--welcome-accent);
+    background: var(--pz-surface-hover);
+}
+
+/* A ring, not a fill. The script focuses the current language on load, and a
+   filled button next to an accent border read as "already chosen and locked"
+   rather than "start here". */
+.welcome-lang-choice:focus-visible {
+    outline: 2px solid var(--welcome-accent);
+    outline-offset: 2px;
+}
+
+/* The language the account is already in. It is a suggestion, not a selection:
+   the popup closes on a click, whichever one it is. */
+.welcome-lang-choice-current {
+    border-color: var(--welcome-accent);
+    font-weight: var(--pz-weight-semibold);
+}
+
+
+/* ---- Hero ---- */
+
+.welcome-hero {
+    text-align: center;
+    padding-bottom: 32px;
+}
+
+.welcome-title {
+    margin: 0 0 10px;
+    font-size: 30px;
+    font-weight: var(--pz-weight-semibold);
+    line-height: 1.2;
+    color: var(--pz-text);
+}
+
+.welcome-lead {
+    margin: 0 auto;
+    max-width: 430px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--pz-text-secondary);
+}
+
+/* ---- Sections ---- */
+
+.welcome-card {
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.welcome-card-title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 0 0 4px;
+    font-size: 16px;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text);
+}
+
+.welcome-card-title .lucide {
+    flex: 0 0 auto;
+    width: 17px;
+    height: 17px;
+}
+
+.welcome-card-hint {
+    margin: 0 0 16px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--pz-text-muted);
+}
+
+/* The one thing on this card that is not neutral information: the account
+   still answers to a password anyone can look up. It carries the danger
+   colour, as the same condition does in the settings page alert, so it does
+   not read as a second subtitle under the one above it. */
+.welcome-password-warning {
+    margin: 0 0 16px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--welcome-danger);
+}
+
+.welcome-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 16px;
+}
+
+.welcome-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+/* A field that keeps its own row whatever the grid does (the username sits
+   above the three password boxes, which are a row of their own). */
+.welcome-field-wide {
+    grid-column: 1 / -1;
+}
+
+.welcome-field label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text);
+}
+
+.welcome-field label .lucide {
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+}
+
+.welcome-field input,
+.welcome-field select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px 10px;
+    border: 1px solid var(--pz-border-strong);
+    border-radius: var(--pz-radius-sm);
+    font-family: inherit;
+    /* 16px is what stops iOS from zooming the page on focus. */
+    font-size: 16px;
+    background-color: var(--pz-bg);
+    color: var(--pz-text);
+}
+
+.welcome-field input:focus,
+.welcome-field select:focus {
+    outline: none;
+    border-color: var(--welcome-accent);
+}
+
+.welcome-field-hint {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--pz-text-muted);
+}
+
+.welcome-passwords {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px 16px;
+}
+
+/* Two boxes instead of three: an account still on the password it was
+   installed with is not asked for it (see welcome.php). */
+.welcome-passwords-pair {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+/* ---- Feedback ---- */
+
+.welcome-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 16px;
+    padding: 10px 12px;
+    border: 1px solid var(--welcome-danger);
+    border-radius: var(--pz-radius);
+    background: var(--welcome-danger-bg);
+    color: var(--welcome-danger);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* The author `display` above outranks the user agent's [hidden] rule, so the
+   box has to hide itself. js/welcome-page.js toggles el.hidden. */
+.welcome-error[hidden] {
+    display: none;
+}
+
+.welcome-error .lucide {
+    flex: 0 0 auto;
+    width: 15px;
+    height: 15px;
+    margin-top: 1px;
+}
+
+/* ---- Icon colours ----
+
+   dark-mode/icons.css paints every Lucide glyph with the icon grey and grows
+   it on hover, through html[data-theme='dark'] [class*="lucide-"], which
+   outweighs any plain class selector. These glyphs are decoration next to a
+   label, not controls: they keep their colour and they stay still. The
+   :is(#id, *) boost is the house way of outweighing that carrier, and it is
+   written once here rather than repeated on each rule above. */
+.welcome-card-title .lucide:is(#pz-welcome-boost, *),
+.welcome-field label .lucide:is(#pz-welcome-boost, *),
+.welcome-footnote .lucide:is(#pz-welcome-boost, *) {
+    color: var(--welcome-accent);
+}
+
+.welcome-error .lucide:is(#pz-welcome-boost, *) {
+    color: inherit;
+}
+
+.welcome-card-title .lucide:hover:is(#pz-welcome-boost, *),
+.welcome-field label .lucide:hover:is(#pz-welcome-boost, *),
+.welcome-footnote .lucide:hover:is(#pz-welcome-boost, *),
+.welcome-error .lucide:hover:is(#pz-welcome-boost, *) {
+    transform: none;
+}
+
+/* ---- Footer ---- */
+
+.welcome-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.welcome-actions .btn {
+    padding: 11px 22px;
+    font-size: 15px;
+}
+
+/* Sits above the button, not under it, and reads as a statement rather than
+   small print: it is the answer to "where is everything else?". */
+.welcome-footnote {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding: 13px 15px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+    color: var(--pz-text-secondary);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.welcome-footnote .lucide {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+}
+
+/* ---- Narrow screens ---- */
+
+@media (max-width: 560px) {
+    body.welcome-page {
+        padding-block: 24px;
+    }
+
+    .welcome-lang-title {
+        font-size: 17px;
+    }
+
+    .welcome-title {
+        font-size: 25px;
+    }
+
+    .welcome-grid,
+    .welcome-passwords {
+        grid-template-columns: 1fr;
+    }
+
+    .welcome-actions .btn {
+        flex: 1 1 auto;
+    }
+}

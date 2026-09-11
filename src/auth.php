@@ -1453,6 +1453,31 @@ function isApiServiceTokenRequest(): bool {
 }
 
 /**
+ * Whose editing the current request counts as, for the note edit lock.
+ *
+ * A note open in the app is locked by the logged-in user, and that same
+ * user's other tools never block on it (their other tabs, the AI chat, an
+ * API script with their credentials). Normally that identity is the
+ * authenticated user, so an admin working inside another profile still
+ * keeps their own: that profile's open tab does block them.
+ *
+ * The MCP service token has no user of its own (it is authenticated as the
+ * default admin profile) and acts for the profile named by X-User-ID, so
+ * for the lock it is that profile: the note open in their browser and the
+ * assistant writing through MCP are the same person (issue 1366).
+ */
+function getNoteEditLockActorUserId(): int {
+    if (isApiServiceTokenRequest()) {
+        $targetUserId = (int) (getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0));
+        if ($targetUserId > 0) {
+            return $targetUserId;
+        }
+    }
+
+    return (int) (getAuthenticatedUserId() ?? getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0));
+}
+
+/**
  * True when the current API request authenticated with an app password
  * (src/lib/app-passwords.php). Account management refuses such requests:
  * a credential issued for one client must not be able to change the account

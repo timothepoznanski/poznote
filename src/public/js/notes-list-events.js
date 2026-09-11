@@ -9,12 +9,9 @@
     'use strict';
 
     // =====================================================
-    // DOUBLE-CLICK DETECTION
+    // STATE
     // =====================================================
 
-    var clickTimer = null;
-    var lastClickedElement = null;
-    var DOUBLE_CLICK_DELAY = 200; // milliseconds
     var suppressNextEditorTitleIconClick = false;
 
     // =====================================================
@@ -559,39 +556,25 @@
 
             case 'load-note':
                 event.preventDefault(); // Always prevent default navigation
-                
+
+                // Second click of a double-click: the first one already loaded
+                // the note, handleNotesListDblClick takes over from here (open
+                // in a new tab). A programmatic click() has detail 0 and loads
+                // like a first click.
+                if (event.detail > 1) {
+                    break;
+                }
+
                 var noteLink = actionElement.getAttribute('href');
                 var noteId = actionElement.getAttribute('data-note-db-id');
-                
+
                 if (!noteLink || !noteId || typeof window.loadNoteDirectly !== 'function') {
                     break;
                 }
-                
-                // Check if this is a double-click (same element clicked within delay)
-                if (clickTimer !== null && lastClickedElement === actionElement) {
-                    // Double-click detected - open in new tab
-                    clearTimeout(clickTimer);
-                    clickTimer = null;
-                    lastClickedElement = null;
 
-                    if (shouldReuseTabForLinkedPair(actionElement)) {
-                        window.loadNoteDirectly(noteLink, noteId, event, actionElement);
-                    } else if (typeof openNoteInNewTab === 'function') {
-                        openNoteInNewTab(noteId);
-                    }
-                } else {
-                    // First click - start timer to load note
-                    if (clickTimer !== null) {
-                        clearTimeout(clickTimer);
-                    }
-                    
-                    lastClickedElement = actionElement;
-                    clickTimer = setTimeout(function() {
-                        clickTimer = null;
-                        lastClickedElement = null;
-                        window.loadNoteDirectly(noteLink, noteId, event, actionElement);
-                    }, DOUBLE_CLICK_DELAY);
-                }
+                // Loaded on the first click. A 200 ms timer used to sit here to
+                // tell a double-click apart, paid on every navigation.
+                window.loadNoteDirectly(noteLink, noteId, event, actionElement);
                 break;
 
             case 'open-kanban-view':
@@ -631,9 +614,16 @@
 
             var noteLink = actionElement.getAttribute('href');
             if (noteId && noteLink && shouldReuseTabForLinkedPair(actionElement) && typeof window.loadNoteDirectly === 'function') {
-                window.loadNoteDirectly(noteLink, noteId, event, actionElement);
+                // The first click of this double-click already put the note in
+                // the current tab, or is still doing so
+                if (!document.getElementById('inp' + noteId) && !window.isLoadingNote) {
+                    window.loadNoteDirectly(noteLink, noteId, event, actionElement);
+                }
             } else if (noteId && typeof openNoteInNewTab === 'function') {
-                openNoteInNewTab(noteId);
+                // The first click landed the note in the active tab (or is
+                // loading it there): the tab manager sorts out which tab keeps
+                // what, see tabs.js openInNewTab
+                openNoteInNewTab(noteId, { afterSidebarClick: true });
             }
         }
     }

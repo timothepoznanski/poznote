@@ -420,7 +420,6 @@
       "tenant_isolation": "SaaS 模式：选择对非管理员用户屏蔽哪些功能，例如发现实例中的其他账户或注册个人 webhook。家庭或团队实例请保持全部不勾选。",
       "workspaces": "将笔记整理到独立的工作区，每个工作区有自己的文件夹和笔记。",
       "my_profile": "查看和编辑您的个人资料信息。",
-      "welcome_setup": "重新查看启动向导并更新基本偏好设置。",
       "change_password": "更改用于登录的密码。",
       "password_note_sso_only": "此实例已禁用密码登录。",
       "password_note_no_local": "您的密码由您的身份提供商管理。",
@@ -507,6 +506,7 @@
     "expand_all_sections": "全部展开",
     "categories": {
       "pinned": "已固定",
+      "account": "我的账户",
       "actions": "操作",
       "admin_tools": "管理工具",
       "display": "显示",
@@ -567,7 +567,6 @@
       "delete_account": "删除账户",
       "import_limits": "导入限制",
       "user_quotas": "用户配额",
-      "welcome_setup": "启动向导",
       "git_sync_toggle": "Git 同步",
       "allow_executable_attachments": "脚本和可执行文件附件",
       "oidc_config": "OIDC / SSO",
@@ -585,10 +584,6 @@
       "username": "此账户仍在使用默认用户名。",
       "change_password": "修改密码",
       "change_username": "修改用户名"
-    },
-    "welcome_setup": {
-      "relaunch": "重新查看",
-      "restart_failed": "无法重新打开启动向导。请重试。"
     },
     "install_app": {
       "launching": "安装即将开始，请稍候...",
@@ -675,6 +670,7 @@
       "source_target_must_differ": "源工作区和目标工作区必须不同"
     },
     "messages": {
+      "creating": "正在创建工作区...",
       "created": "工作区已创建",
       "deleted_all": "工作区已删除，所有关联的笔记、文件夹和附件已被移除",
       "renamed": "笔记和标签中的工作区已重命名",
@@ -736,6 +732,11 @@
       "saved": "颜色已更新",
       "save_error": "无法更新颜色",
       "invalid": "无效的颜色"
+    },
+    "order": {
+      "handle": "拖动以重新排序",
+      "saved": "工作区顺序已更新",
+      "save_error": "无法更新工作区顺序"
     }
   },
   "display": {
@@ -1560,24 +1561,6 @@
         "custom_label": "自定义",
         "days": "天"
       }
-    },
-    "welcome_setup": {
-      "title": "欢迎使用 Poznote！",
-      "subtitle": "让我们先设置几个偏好，帮助您快速上手。您随时可以更改这些设置。",
-      "language_label": "语言",
-      "theme_label": "主题",
-      "theme_options": {
-        "system": "跟随系统",
-        "light": "浅色",
-        "dark": "深色",
-        "black": "纯黑"
-      },
-      "date_format_label": "日期和时间格式",
-      "timezone_label": "时区",
-      "settings_tip": "更多选项（字体、备份、AI 等）等您在 Poznote 设置中探索。",
-      "dashboard_tip": "仪表盘可让您总览笔记和账户。",
-      "skip": "跳过",
-      "start": "开始使用"
     },
     "timezone": {
       "title": "时区",
@@ -4420,6 +4403,43 @@
     "errors": {
       "duplicate_title": "该文件夹中已归档同名笔记。",
       "archive_prefix": "归档笔记时出错：{{error}}"
+    }
+  },
+  "welcome_page": {
+    "page_title": "欢迎",
+    "title": "欢迎使用 Poznote",
+    "lead": "很高兴见到你。花一分钟把 Poznote 调成你喜欢的样子。",
+    "language_modal": {
+      "title": "选择你的语言"
+    },
+    "preferences": {
+      "language": "语言",
+      "theme": "主题",
+      "theme_system": "跟随系统",
+      "date_format": "日期和时间格式",
+      "timezone": "时区"
+    },
+    "account": {
+      "title": "你的账户",
+      "hint": "你今后用来登录的用户名和密码。",
+      "username": "用户名",
+      "username_hint": "字母、数字、点、下划线和连字符。",
+      "username_default_hint": "此账户仍在使用安装时自带的用户名，换成你自己的吧。",
+      "current_password": "当前密码",
+      "new_password": "新密码",
+      "confirm_password": "确认密码",
+      "password_default_hint": "此账户仍在使用安装时自带的密码（{{password}}）。现在设置你自己的密码吧。",
+      "password_unavailable": "你通过身份提供商登录，因此这里无需设置密码。"
+    },
+    "footnote": "以上这些，以及更多选项，之后都可以在设置中修改。",
+    "start": "开始使用 Poznote",
+    "saving": "正在保存...",
+    "errors": {
+      "generic": "出了点问题，请重试。",
+      "username_required": "需要填写用户名。",
+      "password_incomplete": "请填写所有密码框，或者全部留空。",
+      "password_mismatch": "两次输入的新密码不一致。",
+      "password_too_short": "密码至少需要 4 个字符。"
     }
   }
 }

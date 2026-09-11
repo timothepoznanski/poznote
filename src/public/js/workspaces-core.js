@@ -180,10 +180,8 @@ function displayWorkspaceMenu(menu, workspaces, username, actingAs) {
         currentWorkspace = workspaces[0].name;
     }
 
-    // Sort workspaces alphabetically
-    workspaces.sort(function (a, b) {
-        return a.name.localeCompare(b.name);
-    });
+    // The API already returns them in the order set on workspaces.php (the
+    // arrows on each row), so the list is shown as it comes.
 
     knownWorkspaceNames = workspaces.map(function (w) { return w.name; });
 
