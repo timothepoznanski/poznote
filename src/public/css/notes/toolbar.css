@@ -2,8 +2,7 @@
  * Notes - Toolbar Icons & Animations
  *
  * Styles for the save button animation (pulse effect),
- * save icon color states, palette/fill-drip icon colors,
- * and rotate keyframe animation.
+ * save icon color states, and rotate keyframe animation.
  */
 
 /* Pulse animation for update badge */
@@ -26,21 +25,12 @@
     transition: color 0.2s;
 }
 
-/* Palette & fill-drip icons - inherit by default, colored on hover */
-.toolbar-btn i.lucide-palette,
-.toolbar-btn i.lucide-fill-drip {
-    color: inherit !important;
-}
-
-.toolbar-btn:hover i.lucide-palette,
-.toolbar-btn:focus i.lucide-palette {
-    color: var(--pz-danger) !important;
-}
-
-.toolbar-btn:hover i.lucide-fill-drip,
-.toolbar-btn:focus i.lucide-fill-drip {
-    color: var(--pz-warning) !important;
-}
+/* The text-color palette icon used to be forced to `color: inherit`, which on a
+   <button> resolves to the UA's buttontext (black in light mode) or to the dark
+   theme's --dm-text, never to the --pz-icon grey every other toolbar icon uses.
+   It stood out as the one black icon in the row of formatting buttons that the
+   selection reveals, and it was also the only one turning red on hover. It now
+   simply follows icons.css like its neighbours. */
 
 /* Rotate animation */
 @keyframes rotate {
