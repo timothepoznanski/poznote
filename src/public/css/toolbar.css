@@ -294,6 +294,16 @@ body:not(.has-background-image) .note-header {
     display: inline-flex;
 }
 
+.toolbar-btn.is-format-active {
+    background-color: var(--pz-accent-soft) !important;
+    color: var(--pz-accent) !important;
+}
+
+html[data-theme='dark'] .toolbar-btn.is-format-active {
+    background-color: var(--dm-accent-soft) !important;
+    color: var(--dm-accent) !important;
+}
+
 /* Note action buttons: visible by default, hidden during selection */
 .note-action-btn {
     display: inline-flex;
