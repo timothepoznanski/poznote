@@ -80,7 +80,7 @@ function getKnownNoteColorNames() {
     foreach (getDefaultNoteColorNames() as $id => $englishName) {
         $known[$id] = [mb_strtolower($englishName)];
     }
-    foreach (glob(__DIR__ . '/i18n/*.json') ?: [] as $file) {
+    foreach (glob(__DIR__ . '/../i18n/*.json') ?: [] as $file) {
         $dict = loadI18nDictionary(basename($file, '.json'));
         foreach (array_keys($known) as $id) {
             $translated = i18nGet($dict, 'note_color.names.' . $id);

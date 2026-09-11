@@ -14,7 +14,7 @@ function getDefaultNoteTitles(): array {
 
     if ($titles === null) {
         $titles = [];
-        foreach (glob(__DIR__ . '/i18n/*.json') ?: [] as $file) {
+        foreach (glob(__DIR__ . '/../i18n/*.json') ?: [] as $file) {
             $lang = basename($file, '.json');
             $dict = loadI18nDictionary($lang);
             $title = i18nGet($dict, 'index.note.new_note');
