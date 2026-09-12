@@ -43,10 +43,10 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 
 ### Tools (actions)
 - `get_note` — Get a specific note by ID with full content
-- `list_notes` — List all notes from a workspace
+- `list_notes` — List the notes of a workspace, one page at a time (`limit`/`offset`, with the workspace's real `total` in the result)
 - `search_notes` — Search notes by text query, with optional creation date range
-- `create_note` — Create a new note, optionally with a due date/reminder (⚠️ if no workspace is specified in the prompt, the note is created in the user's default workspace; always specify the target workspace)
-- `update_note` — Update an existing note, and/or set its due date/reminder
+- `create_note` — Create a new note, optionally from a template and/or with a due date/reminder
+- `update_note` — Update an existing note, move it, and/or set its due date/reminder
 - `delete_note` — Delete a note by ID
 - `get_reminder` — Get the reminder currently set on a note
 - `set_reminder` — Set or replace a note's reminder, with an optional repeat interval
@@ -56,16 +56,20 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 - `update_task` — Update one task (text, due date, reminder, important flag)
 - `complete_task` — Mark a task as done, or reopen it
 - `delete_task` — Delete one task from a tasklist note
-- `create_folder` — Create a new folder
-- `list_folders` — List all folders from a workspace
+- `create_folder` — Create a folder, by name or by path (`folder_path="Projects/2026/Q3"` makes the whole chain in one call), or a diary root with `is_diary=true`
+- `list_folders` — List all folders from a workspace, with their paths and diary flags
 - `list_workspaces` — List all available workspaces
 - `list_tags` — List all unique tags used in notes
+- `list_templates` — List the template notes `create_note`'s `from_template_id` can start from
 - `get_trash` — List all notes currently in the trash
 - `empty_trash` — Permanently delete all notes in the trash
 - `restore_note` — Restore a note from the trash
 - `duplicate_note` — Create a duplicate of an existing note
 - `toggle_favorite` — Toggle the favorite status of a note
 - `list_attachments` — List all attachments for a specific note
+- `add_attachment` — Attach a file to a note from its base64 content (image, log, PDF, …)
+- `move_note` — Move a note to another workspace and/or folder, keeping its id
+- `move_folder` — Move a folder (with its subfolders and notes) under another parent and/or into another workspace
 - `move_note_to_folder` — Move a note to a specific folder
 - `remove_note_from_folder` — Remove a note from its current folder (moves it to root)
 - `share_note` — Enable public sharing for a note and get the public URL
@@ -90,9 +94,21 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 - `get_app_setting` — Get the value of a specific application setting
 - `update_app_setting` — Update the value of a specific application setting
 
+**Which workspace a write goes to.** Always name the `workspace` on `create_note` and `create_folder`: it is the only way to be sure. When one is omitted, the server resolves it in a fixed order and never guesses: the `mcp_default_workspace` setting when it names a workspace that exists, then the account's only workspace when it has just one. With several workspaces and no setting, the call is refused and the answer lists them, rather than landing the note in whichever workspace happens to sort first (which used to move on its own, for instance the first time archiving a note created "Archives"). Set the default with `update_app_setting("mcp_default_workspace", "<name>")`.
+
+**Attachments.** `add_attachment(note_id, filename, content_base64)` stores a file on a note exactly as a drag-and-drop in the web UI does, so a generated chart or a log file can be attached without a human in the loop; a `data:` URI is accepted as the content. Poznote's own rules still apply, so an executable type and a full storage quota come back as a refusal carrying the reason. The bytes travel base64-encoded inside the tool call, so the tool caps an upload at 25 MB and points at the web UI for anything larger.
+
+**Moving things.** `move_note` and `move_folder` move, they do not copy: ids, content, history and the links pointing at a note all survive. On `update_note`, `workspace` says where to *look the note up*; the argument that moves it is `target_workspace`. A note that changes workspace without being given a folder of the destination lands at that workspace's root, since its old folder belongs to the workspace it left. A folder takes its subfolders and every note inside them along.
+
+**Folders.** Every tool that takes a folder takes the same thing: a name, or a slash-separated path. `create_note(folder="Diary/2026/08")` creates the missing levels on the way down; `create_folder(folder_path=…)` does the same for a folder; `list_notes(folder_id=…)` scopes a listing to one folder server-side, so its `total` counts that folder alone. A bare name reaches an existing folder at any depth when only one folder of the workspace carries it, rather than creating a second one at the root; when several do, the call is refused and lists them, so pass the full path or the id.
+
+**Diaries.** A diary is not just a folder named Diary: it is a root folder carrying the `is_diary` flag, and the "New diary entry" button of the UI files its dated notes into the flagged root. Create one with `create_folder(folder_name="Journal", is_diary=true)`, and `list_folders` tells you which folders are diaries. Passing a name that a root folder already carries turns that folder into a diary and keeps its notes. Diary entries themselves are ordinary notes: file them with `create_note(folder="Journal/2026/09")`.
+
+**Templates.** A template is an ordinary note kept in a folder named `Templates` (any depth below it counts) or anywhere in a workspace of that name; the word is recognised in every shipped language, so a `Modèles` folder works too. `list_templates` returns them with their ids, and `create_note(from_template_id=…)` starts a new note from one, taking the template's own format unless you pass a `note_type`. Passing `content` as well appends it after the template body.
+
 **Reminders and tasks.** `reminder_at` (on `create_note`/`update_note` and `set_reminder`) is an ISO datetime such as `2026-09-01T09:00:00+02:00`; include an offset, or the time is read as UTC. Task due dates (`due_at`) are different: they are local wall-clock values, `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM` with no offset, resolved through the user's configured timezone, and a date without a time reminds at 09:00. Repeat intervals use `<count><unit>` with unit `i`/`h`/`d`/`w`/`m`/`y`, for example `30i`, `1d` or `2w`.
 
-The task tools operate on one task at a time, so there is no need to read and rewrite a tasklist's whole content array: call `list_tasks` to get task IDs, then `add_task`, `update_task`, `complete_task` or `delete_task`. Notifications stay in sync automatically, and completing or deleting a task retires its pending reminder.
+The task tools address one task at a time: call `list_tasks` to get task IDs, then `add_task`, `update_task`, `complete_task` or `delete_task`. Each call carries only that task, so a client never reads a tasklist and sends a whole new array back, and two callers editing different tasks cannot overwrite each other. Poznote stores a note's tasks as a single JSON array, which the server rewrites on every call, so the work one call does still grows with the length of the list. Notifications stay in sync automatically, and completing or deleting a task retires its pending reminder.
 
 Most tools accept an optional `user_id` argument to target a specific user profile. When provided, the MCP server sends the `X-User-ID` header for that request, allowing you to create or read notes across different profiles without changing the global MCP environment. The exceptions are the system-level tools `get_system_info`, `list_backups`, `create_backup` and `delete_backup`, which do not take `user_id`. To change the default profile used when no `user_id` is passed, see [Default user profile](#default-user-profile).
 
@@ -241,7 +257,7 @@ If you must route the MCP server through a network, protect it with:
 
 The MCP server connects to the Poznote REST API with an internal Bearer token stored in `data/.mcp_token`. Poznote creates this token automatically and the Docker Compose setup mounts `./data` read-only into the MCP container so the token never needs to live in `.env`.
 
-Because that token identifies the MCP server, Poznote takes a snapshot of a note right before a request carrying it changes the note's content or tasks (`update_note`, `add_task`, `update_task`, `complete_task`, `delete_task`). It shows as "Before MCP edit" in the note's Snapshots menu, so an AI rewrite that dropped content can be restored in one click. No snapshot is taken when the latest one already holds the same content, and the 20 most recent of them are kept per note.
+Because that token identifies the MCP server, Poznote takes a snapshot of a note right before a request carrying it changes the note's content or tasks (`update_note`, `add_task`, `update_task`, `complete_task`, `delete_task`). It shows as "Before MCP edit" in the note's Snapshots menu, so an AI rewrite that dropped content can be restored in one click. No snapshot is taken when the latest one already holds the same content, and the 20 most recent of them are kept per note, a number to raise in **Settings → Snapshots** (up to 200) when the MCP server does enough editing to roll through 20 in an afternoon.
 
 ---
 

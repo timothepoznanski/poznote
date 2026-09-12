@@ -27,6 +27,8 @@ def _fake_client():
     client = MagicMock()
     client.create_note.return_value = {"id": 100, "heading": "Tasks"}
     client.update_note.return_value = {"id": 100, "heading": "Tasks"}
+    # One workspace: create_note/create_folder resolve it without being told (#1373)
+    client.list_workspaces.return_value = [{"name": "Poznote"}]
     return client
 
 

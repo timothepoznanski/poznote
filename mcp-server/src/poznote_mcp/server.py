@@ -27,12 +27,15 @@ Inbound authentication:
 
 import argparse
 import atexit
+import base64
+import binascii
 import hmac
 import json
 import logging
 import os
 import socket
 import sys
+import time
 from typing import Optional, Union
 
 import httpx
@@ -143,6 +146,15 @@ def _assert_port_available(host: str, port: int) -> None:
     if last_error is not None:
         raise last_error
 
+# Largest page GET /notes serves in one call; list_notes refuses more so the
+# caller gets a clear error instead of the API's 400.
+MAX_NOTES_PAGE_SIZE = 1000
+
+# Largest attachment add_attachment accepts. Poznote itself allows 200 MB, but
+# the bytes reach this tool base64-encoded inside a JSON tool call, which is a
+# bad way to carry a film; refuse early and say so instead of timing out.
+MAX_ATTACHMENT_BYTES = 25 * 1024 * 1024
+
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8045
 AUTH_TOKEN_ENV = "POZNOTE_MCP_AUTH_TOKEN"
@@ -248,6 +260,79 @@ def _get_client_or_error() -> tuple[PoznoteClient | None, str | None]:
     return client, None
 
 
+# The workspace a write lands in when the caller names none. Resolved per
+# profile and remembered briefly, since it costs two API calls (issue #1373).
+DEFAULT_WORKSPACE_SETTING = "mcp_default_workspace"
+_DEFAULT_WORKSPACE_TTL = 60.0
+_default_workspace_cache: dict[str, tuple[float, str]] = {}
+
+
+def _forget_default_workspace() -> None:
+    """Drop the cache after this server changed the set of workspaces."""
+    _default_workspace_cache.clear()
+
+
+def _resolve_workspace(client, workspace: Optional[str], user_id: Optional[int]) -> tuple[Optional[str], Optional[str]]:
+    """The workspace a write goes to, or a JSON error explaining why it cannot.
+
+    Omitting the workspace used to fall through to the API's "first workspace",
+    which is whichever one sorts first: creating a workspace, or archiving a
+    note (which makes "Archives"), silently moved where later notes landed.
+    A default has to be either stable or absent, so:
+
+      1. the workspace the caller named, when it named one;
+      2. the mcp_default_workspace setting, when it names a real workspace;
+      3. the only workspace there is, which cannot be ambiguous;
+      4. otherwise no guess at all: the caller is told to name one.
+    """
+    if workspace is not None and str(workspace).strip():
+        return str(workspace).strip(), None
+
+    cache_key = str(user_id if user_id is not None else "")
+    cached = _default_workspace_cache.get(cache_key)
+    if cached and (time.monotonic() - cached[0]) < _DEFAULT_WORKSPACE_TTL:
+        return cached[1], None
+
+    try:
+        names = [w.get("name") for w in client.list_workspaces(user_id=user_id) if w.get("name")]
+    except Exception as exc:
+        return None, _api_error_json(exc)
+
+    configured = ""
+    try:
+        setting = client.get_setting(DEFAULT_WORKSPACE_SETTING, user_id=user_id)
+        configured = str((setting or {}).get("value") or "").strip()
+    except Exception:
+        # The setting is a convenience, not a requirement: a server that
+        # cannot read it still resolves a single-workspace account.
+        configured = ""
+
+    resolved = None
+    if configured and configured in names:
+        resolved = configured
+    elif len(names) == 1:
+        resolved = names[0]
+
+    if resolved is None:
+        return None, json.dumps(
+            {
+                "error": "No workspace given, and no stable default to fall back on.",
+                "hint": (
+                    "Pass workspace explicitly, or set the "
+                    f"{DEFAULT_WORKSPACE_SETTING} setting (update_app_setting) to the "
+                    "workspace MCP writes should go to."
+                ),
+                "workspaces": names,
+                "configured_default": configured or None,
+            },
+            indent=2,
+            ensure_ascii=False,
+        )
+
+    _default_workspace_cache[cache_key] = (time.monotonic(), resolved)
+    return resolved, None
+
+
 def _api_error_json(exc: Exception) -> str:
     """Convert an HTTP/network exception into a clean JSON error for the AI."""
     if isinstance(exc, httpx.ConnectError):
@@ -318,29 +403,57 @@ def get_note(id: int, workspace: Optional[str] = None, user_id: Optional[int] = 
 
 
 @mcp.tool()
-def list_notes(workspace: Optional[str] = None, limit: int = 50, user_id: Optional[int] = None) -> str:
-    """List all notes from a specific workspace
-    
+def list_notes(
+    workspace: Optional[str] = None,
+    limit: int = 50,
+    offset: int = 0,
+    folder_id: Optional[int] = None,
+    folder: Optional[str] = None,
+    user_id: Optional[int] = None,
+) -> str:
+    """List the notes of a workspace or a folder, one page at a time
+
+    The result carries "total", the number of notes matching the filters, next
+    to "count", the size of this page: when "has_more" is true, call again with
+    offset raised by the page size to get the rest. A page is never silently
+    truncated.
+
     Args:
         workspace: Workspace name (optional)
-        limit: Maximum number of results (default: 50)
+        limit: Page size, 1-1000 (default: 50)
+        offset: Number of notes to skip before this page (default: 0)
+        folder_id: Only notes in this folder (see list_folders). Scoped by the
+            server, so paging still counts only that folder's notes.
+        folder: Name of the folder to scope to, when its id is not at hand.
+            A name is not unique across a workspace; prefer folder_id.
         user_id: User profile ID to access (optional, overrides default)
     """
     client, err = _get_client_or_error()
     if err:
         return err
+
+    page_size = int(limit) if limit else MAX_NOTES_PAGE_SIZE
+    if page_size < 1 or page_size > MAX_NOTES_PAGE_SIZE:
+        return json.dumps(
+            {"error": f"limit must be between 1 and {MAX_NOTES_PAGE_SIZE}"}, ensure_ascii=False
+        )
+    start = max(0, int(offset or 0))
+
     try:
-        notes = client.list_notes(workspace=workspace, user_id=user_id)
+        page = client.list_notes(
+            workspace=workspace,
+            user_id=user_id,
+            limit=page_size,
+            offset=start,
+            folder_id=folder_id,
+            folder=folder,
+        )
     except Exception as exc:
         return _api_error_json(exc)
     
-    # Limit results if specified
-    if limit and len(notes) > limit:
-        notes = notes[:limit]
-    
     # Format for AI consumption
     formatted = []
-    for note in notes:
+    for note in page["notes"]:
         formatted.append({
             "id": note.get("id"),
             "title": note.get("heading", "Untitled"),
@@ -352,10 +465,20 @@ def list_notes(workspace: Optional[str] = None, limit: int = 50, user_id: Option
     
     result = {
         "count": len(formatted),
+        "total": page["total"],
+        "offset": start,
+        "limit": page_size,
+        "has_more": page["has_more"],
         "notes": formatted,
     }
+    if page["has_more"]:
+        result["next_offset"] = start + len(formatted)
     if workspace is not None:
         result["workspace"] = workspace
+    if folder_id is not None:
+        result["folder_id"] = folder_id
+    if folder is not None:
+        result["folder"] = folder
 
     return json.dumps(result, indent=2, ensure_ascii=False)
 
@@ -401,6 +524,50 @@ def search_notes(query: str, workspace: Optional[str] = None, limit: int = 10, c
         "count": len(formatted),
         "results": formatted,
     }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def list_templates(workspace: Optional[str] = None, user_id: Optional[int] = None) -> str:
+    """List the template notes available to create_note's from_template_id
+
+    A template is an ordinary note kept in a folder named "Templates" (any
+    depth below it counts) or anywhere in a workspace of that name; the word
+    also works in the other shipped languages, so a "Modeles" folder counts
+    too. Read one with get_note, or pass its id to create_note as
+    from_template_id.
+
+    Args:
+        workspace: Only consider the "Templates" folders of this workspace.
+            Omit to list the templates of every workspace.
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        templates = client.list_templates(workspace=workspace, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    formatted = [
+        {
+            "id": t.get("id"),
+            "title": t.get("heading", "Untitled"),
+            "note_type": t.get("type"),
+            "workspace": t.get("workspace"),
+            "folder_id": t.get("folder_id"),
+        }
+        for t in templates
+    ]
+
+    result = {
+        "count": len(formatted),
+        "templates": formatted,
+    }
+    if workspace is not None:
+        result["workspace"] = workspace
+
+    return json.dumps(result, indent=2, ensure_ascii=False)
 
 
 def _normalize_content(content, note_type=None):
@@ -464,11 +631,12 @@ def _reminder_result(client, note_id: int, reminder_at, recurrence, message, ema
 @mcp.tool()
 def create_note(
     title: str,
-    content: Union[str, list],
+    content: Optional[Union[str, list]] = None,
     workspace: Optional[str] = None,
     tags: Optional[str] = None,
     folder: Optional[str] = None,
     note_type: str = "note",
+    from_template_id: Optional[int] = None,
     user_id: Optional[int] = None,
     reminder_at: Optional[str] = None,
     reminder_recurrence: Optional[str] = None,
@@ -481,10 +649,23 @@ def create_note(
         title: Title of the new note
         content: Content of the note. Always a plain string (HTML or Markdown).
             For task lists, pass the JSON array serialized as a string.
-        workspace: Workspace name (optional)
+            Optional only when from_template_id is given, which then supplies
+            the content; passing both appends this content to the template.
+        workspace: Workspace to create it in. Omit it only when you mean the
+            account's default: the mcp_default_workspace setting, or the only
+            workspace there is. With several workspaces and no setting, the
+            call is refused rather than guessing, and lists them for you.
         tags: Comma-separated tags (e.g., 'ai, docs, important')
-        folder: Folder name to place the note in
+        folder: Folder to place the note in, as a name or a path
+            ('Diary/2026/08'). Missing levels of a path are created. A bare
+            name matches an existing folder at any depth when only one folder
+            of the workspace carries it; when several do, the call is refused
+            and lists them, so pass the full path or use move_note_to_folder.
         note_type: Note type/format. Supported: 'note' (HTML, default), 'markdown', 'tasklist'.
+            Ignored when from_template_id is given without a note_type of your
+            own: the template's own format is used.
+        from_template_id: ID of a template note (see list_templates) whose
+            content the new note starts from.
         user_id: User profile ID to access (optional, overrides default)
         reminder_at: Due date/reminder for the note as an ISO datetime
             (e.g. '2026-09-01T09:00:00+02:00'). Sets the same reminder the bell
@@ -498,6 +679,29 @@ def create_note(
     client, err = _get_client_or_error()
     if err:
         return err
+
+    # A template supplies the content, and its own format unless the caller
+    # asked for one. Reading it here rather than server-side keeps create_note
+    # a single tool call for the agent while the REST API stays unchanged.
+    template_note_type = None
+    if from_template_id is not None:
+        try:
+            template = client.get_note(int(from_template_id), workspace=None, user_id=user_id)
+        except Exception as exc:
+            return _api_error_json(exc)
+        if template is None:
+            return json.dumps(
+                {"error": f"Template note {from_template_id} not found"}, ensure_ascii=False
+            )
+        template_body = template.get("content", "") or ""
+        template_note_type = template.get("type")
+        content = template_body if content is None else template_body + str(content)
+
+    if content is None:
+        return json.dumps(
+            {"error": "content is required (or pass from_template_id to take it from a template)"},
+            ensure_ascii=False,
+        )
 
     # Normalize note_type for convenience (allow 'html' as an alias of 'note')
     # If note_type is missing/empty, default to HTML (note).
@@ -516,7 +720,17 @@ def create_note(
                 ensure_ascii=False,
             )
 
+    # 'note' is this tool's default, so it cannot be told apart from a caller
+    # who asked for HTML; a template's own format wins over it, which keeps a
+    # Markdown template from being pasted into a rich-text note.
+    if template_note_type in {"note", "markdown"} and note_type == "note":
+        note_type = template_note_type
+
     content = _normalize_content(content, note_type)
+
+    workspace, err = _resolve_workspace(client, workspace, user_id)
+    if err:
+        return err
 
     try:
         result = client.create_note(
@@ -560,6 +774,9 @@ def update_note(
     content: Optional[Union[str, list]] = None,
     title: Optional[str] = None,
     tags: Optional[str] = None,
+    target_workspace: Optional[str] = None,
+    folder: Optional[str] = None,
+    folder_id: Optional[int] = None,
     user_id: Optional[int] = None,
     if_version: Optional[str] = None,
     reminder_at: Optional[str] = None,
@@ -576,6 +793,17 @@ def update_note(
             For task lists, pass the JSON array serialized as a string.
         title: New title for the note
         tags: New tags (comma-separated)
+        target_workspace: Move the note to this workspace, keeping its id and
+            its history. Note that `workspace` above only says where to look
+            the note up; it never moves it. Without a folder of the target
+            workspace, the note lands at that workspace's root.
+        folder: Move the note into this folder, as a name or a path
+            ('Diary/2026/08', missing levels created). An empty string moves it
+            to the root of its workspace. Resolved against target_workspace
+            when the note also moves.
+        folder_id: Move the note into this folder by id (see list_folders).
+            Wins over folder, and must be a folder of the workspace the note
+            ends up in.
         user_id: User profile ID to access (optional, overrides default)
         if_version: Version token from get_note. When set, the write is rejected
             with a version_conflict result if the note changed since that
@@ -602,7 +830,9 @@ def update_note(
     if err:
         return err
 
-    has_note_fields = any(v is not None for v in (content, title, tags))
+    has_note_fields = any(
+        v is not None for v in (content, title, tags, target_workspace, folder, folder_id)
+    )
     result = None
 
     if has_note_fields:
@@ -615,6 +845,9 @@ def update_note(
                 workspace=workspace,
                 user_id=user_id,
                 if_version=if_version,
+                target_workspace=target_workspace,
+                folder=folder,
+                folder_id=folder_id,
             )
         except Exception as exc:
             return _api_error_json(exc)
@@ -636,7 +869,10 @@ def update_note(
 
     if not has_note_fields and reminder_at is None:
         return json.dumps(
-            {"error": "Nothing to update. Provide content, title, tags or reminder_at."},
+            {
+                "error": "Nothing to update. Provide content, title, tags, "
+                         "target_workspace, folder, folder_id or reminder_at."
+            },
             ensure_ascii=False,
         )
 
@@ -843,7 +1079,12 @@ def add_task(
     reminder_email: Optional[bool] = None,
     user_id: Optional[int] = None,
 ) -> str:
-    """Add a single task to a tasklist note, without rewriting the whole list
+    """Add a single task to a tasklist note
+
+    You send only the new task: there is no need to read the list first and
+    send it back, so a concurrent edit cannot be overwritten. (The note stores
+    its tasks as one JSON array, which the server rewrites for you, so the
+    cost of a call still grows with the length of the list.)
 
     Args:
         note_id: ID of the tasklist note
@@ -1013,39 +1254,92 @@ def delete_task(note_id: int, task_id: str, user_id: Optional[int] = None) -> st
 
 @mcp.tool()
 def create_folder(
-    folder_name: str,
+    folder_name: Optional[str] = None,
     workspace: Optional[str] = None,
     parent_folder_id: Optional[int] = None,
+    folder_path: Optional[str] = None,
+    create_parents: bool = True,
+    is_diary: bool = False,
     user_id: Optional[int] = None,
 ) -> str:
-    """Create a new folder in Poznote
-    
+    """Create a folder, by name or by path, optionally as a diary
+
+    Pass folder_path to create a whole chain in one call:
+    create_folder(folder_path="Projects/2026/Q3") makes the missing levels on
+    the way down, the same way create_note's folder argument does.
+
     Args:
-        folder_name: Name of the new folder
-        workspace: Workspace name (optional)
+        folder_name: Name of the new folder (a single level; use folder_path
+            for a nested one)
+        workspace: Workspace to create it in. Omit it only when you mean the
+            account's default: the mcp_default_workspace setting, or the only
+            workspace there is. With several workspaces and no setting, the
+            call is refused rather than guessing, and lists them for you.
         parent_folder_id: ID of the parent folder (optional, creates folder at root if not specified)
+        folder_path: Slash-separated path of the folder to create, e.g.
+            'Projects/2026/Q3'. Takes precedence over folder_name.
+        create_parents: With folder_path, create the missing parent levels
+            (default). Set false to fail instead when a level is missing.
+        is_diary: Create the folder as a diary root, the thing the "New diary
+            entry" button of the UI files its dated notes into. A diary is
+            always at the root of its workspace, so this cannot be combined
+            with a parent folder or a nested path. When a root folder of that
+            name already exists, it becomes the diary and keeps its notes.
         user_id: User profile ID to access (optional, overrides default)
     """
-    if not folder_name:
-        return json.dumps({"error": "folder_name is required"}, ensure_ascii=False)
+    target = (folder_path or "").strip() or (folder_name or "").strip()
+    if not target:
+        return json.dumps({"error": "folder_name or folder_path is required"}, ensure_ascii=False)
+
+    if is_diary:
+        if "/" in target:
+            return json.dumps(
+                {"error": "A diary is a root folder: pass its name, not a path.", "folder": target},
+                ensure_ascii=False,
+            )
+        if parent_folder_id is not None:
+            return json.dumps(
+                {"error": "A diary is a root folder: it cannot have a parent folder."},
+                ensure_ascii=False,
+            )
+        # The by-name route is the one that turns an existing root folder of
+        # that name into a diary instead of refusing it.
+        folder_name, folder_path = target, None
+    elif "/" in target:
+        # A name carrying a slash is a path, whichever argument it arrived in.
+        folder_path, folder_name = target, None
     
     client, err = _get_client_or_error()
     if err:
         return err
+
+    workspace, err = _resolve_workspace(client, workspace, user_id)
+    if err:
+        return err
+
     try:
         result = client.create_folder(
             folder_name=folder_name,
             parent_folder_id=parent_folder_id,
             workspace=workspace,
             user_id=user_id,
+            folder_path=folder_path,
+            create_parents=create_parents,
+            is_diary=is_diary,
         )
     except Exception as exc:
         return _api_error_json(exc)
+
+    if result and result.get("error"):
+        return json.dumps(
+            {k: v for k, v in result.items() if v is not None}, indent=2, ensure_ascii=False
+        )
     
     if result:
+        kind = "Diary" if is_diary else "Folder"
         return json.dumps({
             "success": True,
-            "message": f"Folder '{folder_name}' created successfully",
+            "message": f"{kind} '{target}' created successfully",
             "folder": result,
         }, indent=2, ensure_ascii=False)
     else:
@@ -1055,7 +1349,10 @@ def create_folder(
 @mcp.tool()
 def list_folders(workspace: Optional[str] = None, user_id: Optional[int] = None) -> str:
     """List all folders from a specific workspace
-    
+
+    Each folder carries its full path and is_diary, which marks the diary
+    roots the "New diary entry" button files dated notes into.
+
     Args:
         workspace: Workspace name (optional)
         user_id: User profile ID to access (optional, overrides default)
@@ -1250,6 +1547,226 @@ def move_note_to_folder(note_id: int, folder_id: int, user_id: Optional[int] = N
     except Exception as exc:
         return _api_error_json(exc)
     return json.dumps({"success": success, "message": f"Note {note_id} moved to folder {folder_id}" if success else "Failed to move note"}, ensure_ascii=False)
+
+
+@mcp.tool()
+def add_attachment(
+    note_id: int,
+    filename: str,
+    content_base64: str,
+    mime_type: Optional[str] = None,
+    workspace: Optional[str] = None,
+    user_id: Optional[int] = None,
+) -> str:
+    """Attach a file to a note, from its base64 content
+
+    Use it to hand a note a chart, a screenshot, a log file or any document
+    the note should carry. The file is stored the way a drag-and-drop in the
+    web UI stores it, and list_attachments then shows it.
+
+    Poznote refuses executable file types, and the account's storage quota
+    applies, so the answer can be a refusal carrying the reason.
+
+    Args:
+        note_id: ID of the note the file is attached to
+        filename: Name the file is stored and shown under, extension included
+            ('chart.png', 'run-2026-09-12.log'). The extension decides how
+            Poznote treats the file.
+        content_base64: The file's bytes, base64-encoded. Standard base64,
+            with or without padding and line breaks; a data: URI prefix is
+            accepted and stripped.
+        mime_type: Content type of the file ('image/png'). Optional: Poznote
+            detects it from the bytes and the extension anyway.
+        workspace: Workspace of the note (optional)
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    if not filename or not str(filename).strip():
+        return json.dumps({"error": "filename is required"}, ensure_ascii=False)
+
+    raw = (content_base64 or "").strip()
+    if not raw:
+        return json.dumps({"error": "content_base64 is required"}, ensure_ascii=False)
+
+    # Agents often paste the whole data: URI they were handed.
+    if raw.startswith("data:"):
+        header, _, payload = raw.partition(",")
+        if not payload:
+            return json.dumps({"error": "content_base64 is not a valid data: URI"}, ensure_ascii=False)
+        raw = payload
+        if mime_type is None and header.startswith("data:"):
+            declared = header[5:].split(";", 1)[0].strip()
+            if declared:
+                mime_type = declared
+
+    try:
+        content = base64.b64decode(raw, validate=False)
+    except (binascii.Error, ValueError) as exc:
+        return json.dumps(
+            {"error": "content_base64 is not valid base64", "detail": str(exc)}, ensure_ascii=False
+        )
+
+    if not content:
+        return json.dumps({"error": "content_base64 decodes to an empty file"}, ensure_ascii=False)
+
+    if len(content) > MAX_ATTACHMENT_BYTES:
+        return json.dumps(
+            {
+                "error": "Attachment too large for a tool call",
+                "size": len(content),
+                "max_size": MAX_ATTACHMENT_BYTES,
+                "hint": "Upload large files through the web UI.",
+            },
+            ensure_ascii=False,
+        )
+
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        result = client.add_attachment(
+            note_id=note_id,
+            filename=str(filename).strip(),
+            content=content,
+            mime_type=mime_type,
+            workspace=workspace,
+            user_id=user_id,
+        )
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    if not result.get("success"):
+        return json.dumps(
+            {"success": False, "error": result.get("error", "Failed to attach the file")},
+            indent=2,
+            ensure_ascii=False,
+        )
+
+    return json.dumps({
+        "success": True,
+        "message": f"'{filename}' attached to note {note_id}",
+        "note_id": note_id,
+        "attachment_id": result.get("attachment_id"),
+        "filename": result.get("filename", filename),
+        "size": len(content),
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def move_note(
+    note_id: int,
+    target_workspace: Optional[str] = None,
+    folder: Optional[str] = None,
+    folder_id: Optional[int] = None,
+    workspace: Optional[str] = None,
+    user_id: Optional[int] = None,
+) -> str:
+    """Move a note to another workspace and/or folder, keeping its id
+
+    The note keeps its id, its content, its history and every link pointing at
+    it: this is a move, not a copy-and-delete.
+
+    Args:
+        note_id: ID of the note to move
+        target_workspace: Workspace to move the note to. Without a folder, the
+            note lands at that workspace's root.
+        folder: Folder to move the note into, as a name or a path
+            ('Diary/2026/08'; missing levels are created). An empty string
+            means the root of the workspace. Resolved against target_workspace
+            when both are given.
+        folder_id: Folder to move the note into, by id (see list_folders).
+            Wins over folder, and must be a folder of the workspace the note
+            ends up in.
+        workspace: Workspace to look the note up in (optional). This one never
+            moves the note; target_workspace does.
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    if target_workspace is None and folder is None and folder_id is None:
+        return json.dumps(
+            {"error": "Nothing to move to. Provide target_workspace, folder or folder_id."},
+            ensure_ascii=False,
+        )
+
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        result = client.update_note(
+            note_id=note_id,
+            workspace=workspace,
+            user_id=user_id,
+            target_workspace=target_workspace,
+            folder=folder,
+            folder_id=folder_id,
+        )
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    if not result:
+        return json.dumps({"error": f"Note {note_id} not found or move failed"}, ensure_ascii=False)
+
+    destination = target_workspace or (result.get("workspace") if isinstance(result, dict) else None)
+    return json.dumps({
+        "success": True,
+        "message": f"Note {note_id} moved" + (f" to workspace '{destination}'" if destination else ""),
+        "note": result,
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def move_folder(
+    folder_id: int,
+    target_workspace: Optional[str] = None,
+    new_parent_folder_id: Optional[int] = None,
+    new_parent_folder: Optional[str] = None,
+    user_id: Optional[int] = None,
+) -> str:
+    """Move a folder under another parent and/or into another workspace
+
+    Its subfolders and every note inside them move with it, keeping their ids.
+    Pass neither parent argument to put the folder at the root of its
+    destination.
+
+    Args:
+        folder_id: ID of the folder to move
+        target_workspace: Workspace to move the folder to (optional; it stays
+            in its own workspace when omitted)
+        new_parent_folder_id: ID of the folder it becomes a child of. Must be
+            in the destination workspace.
+        new_parent_folder: Path of that parent folder, when its id is not at
+            hand. The folder must already exist.
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    if target_workspace is None and new_parent_folder_id is None and new_parent_folder is None:
+        return json.dumps(
+            {"error": "Nothing to move to. Provide target_workspace, new_parent_folder_id or new_parent_folder."},
+            ensure_ascii=False,
+        )
+
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        result = client.move_folder(
+            folder_id,
+            target_workspace=target_workspace,
+            new_parent_folder_id=new_parent_folder_id,
+            new_parent_folder=new_parent_folder,
+            user_id=user_id,
+        )
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    if result and result.get("error"):
+        return json.dumps({"success": False, "error": result["error"]}, ensure_ascii=False)
+
+    if not result:
+        return json.dumps({"error": f"Folder {folder_id} not found or move failed"}, ensure_ascii=False)
+
+    return json.dumps({
+        "success": True,
+        "message": f"Folder {folder_id} moved to '{result.get('path', '')}'".rstrip(" '"),
+        "folder": result,
+    }, indent=2, ensure_ascii=False)
 
 
 @mcp.tool()
@@ -1598,6 +2115,8 @@ def create_workspace(name: str, user_id: Optional[int] = None) -> str:
         result = client.create_workspace(name, user_id=user_id)
     except Exception as exc:
         return _api_error_json(exc)
+    # The set of workspaces changed, so a remembered default may be stale.
+    _forget_default_workspace()
     if result:
         return json.dumps({"success": True, "message": f"Workspace '{name}' created", "workspace": result}, indent=2, ensure_ascii=False)
     else:
@@ -1623,6 +2142,8 @@ def rename_workspace(current_name: str, new_name: str, user_id: Optional[int] = 
         result = client.rename_workspace(current_name, new_name, user_id=user_id)
     except Exception as exc:
         return _api_error_json(exc)
+    # The set of workspaces changed, so a remembered default may be stale.
+    _forget_default_workspace()
     if result:
         return json.dumps({"success": True, "message": f"Workspace renamed from '{current_name}' to '{new_name}'", "workspace": result}, indent=2, ensure_ascii=False)
     else:
@@ -1644,6 +2165,8 @@ def delete_workspace(name: str, user_id: Optional[int] = None) -> str:
         success = client.delete_workspace(name, user_id=user_id)
     except Exception as exc:
         return _api_error_json(exc)
+    # The set of workspaces changed, so a remembered default may be stale.
+    _forget_default_workspace()
     if success:
         return json.dumps({"success": True, "message": f"Workspace '{name}' deleted"}, indent=2, ensure_ascii=False)
     else:

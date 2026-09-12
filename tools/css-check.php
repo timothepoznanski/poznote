@@ -365,6 +365,128 @@ foreach ($emptyRules as $r) {
 // email HTML (no var() in mail clients), standalone exports that must render
 // outside the app, and colours that are DATA rather than chrome, like the
 // brand colours of programming languages or a user's folder-colour palette.
+/**
+ * Colour literals in one of the project's own PHP or JS files.
+ *
+ * Comments come out first. An issue reference such as #1370 and an HTML entity
+ * such as &#039; both read as a hex colour to a plain scan, and a colour named
+ * in a comment paints nothing, so neither belongs in the number the ratchet
+ * guards: counting them means the next comment that cites an issue fails the
+ * build for a colour nobody wrote.
+ */
+function markupColourCount(string $path, string $body): int
+{
+    $code = str_ends_with($path, '.js')
+        ? markupStripJsComments($body)
+        : markupStripPhpComments($body);
+    if (!preg_match_all('/#[0-9a-fA-F]{3,8}\b|\brgba?\([^)]*\)/', $code, $mk, PREG_OFFSET_CAPTURE)) {
+        return 0;
+    }
+    $n = 0;
+    foreach ($mk[0] as $hit) {
+        if (str_contains($hit[0], 'var(')) {
+            continue;
+        }
+        if ($hit[1] > 0 && $code[$hit[1] - 1] === '&') {
+            continue; // &#039;, &#8230;: an HTML entity, not a colour
+        }
+        $n++;
+    }
+    return $n;
+}
+
+/** PHP is tokenised, so a # comment and a colour in a string never blur. */
+function markupStripPhpComments(string $body): string
+{
+    $out = '';
+    foreach (token_get_all($body) as $token) {
+        if (is_array($token)) {
+            if ($token[0] !== T_COMMENT && $token[0] !== T_DOC_COMMENT) {
+                $out .= $token[1];
+            }
+            continue;
+        }
+        $out .= $token;
+    }
+    return $out;
+}
+
+/**
+ * JavaScript is scanned by hand, like the CSS above. Strings and regex
+ * literals are copied whole: a slash inside .replace(/\//g, ...) must not
+ * open a comment and swallow the rest of the line.
+ */
+function markupStripJsComments(string $body): string
+{
+    $out = '';
+    $len = strlen($body);
+    $prev = '';  // last significant character, to tell a regex from a division
+    for ($i = 0; $i < $len; $i++) {
+        $c = $body[$i];
+        if ($c === '/' && $i + 1 < $len && $body[$i + 1] === '/') {
+            while ($i < $len && $body[$i] !== "\n") {
+                $i++;
+            }
+            $out .= "\n";
+            continue;
+        }
+        if ($c === '/' && $i + 1 < $len && $body[$i + 1] === '*') {
+            $end = strpos($body, '*/', $i + 2);
+            $i = $end === false ? $len : $end + 1;
+            $out .= ' ';
+            continue;
+        }
+        if ($c === '"' || $c === "'" || $c === '`') {
+            $out .= $c;
+            for ($i++; $i < $len; $i++) {
+                $d = $body[$i];
+                $out .= $d;
+                if ($d === '\\') {
+                    $i++;
+                    if ($i < $len) {
+                        $out .= $body[$i];
+                    }
+                    continue;
+                }
+                if ($d === $c || ($d === "\n" && $c !== '`')) {
+                    break;
+                }
+            }
+            $prev = $c;
+            continue;
+        }
+        if ($c === '/' && $prev !== '' && str_contains('(,=:[!&|?{};+-*%~^', $prev)) {
+            $out .= $c;
+            $class = false;  // inside [...], where an unescaped / is literal
+            for ($i++; $i < $len; $i++) {
+                $d = $body[$i];
+                $out .= $d;
+                if ($d === '\\') {
+                    $i++;
+                    if ($i < $len) {
+                        $out .= $body[$i];
+                    }
+                    continue;
+                }
+                if ($d === '[') {
+                    $class = true;
+                } elseif ($d === ']') {
+                    $class = false;
+                } elseif ($d === "\n" || ($d === '/' && !$class)) {
+                    break;  // a newline means it was a division after all
+                }
+            }
+            $prev = '/';
+            continue;
+        }
+        $out .= $c;
+        if (trim($c) !== '') {
+            $prev = $c;
+        }
+    }
+    return $out;
+}
+
 $markupBaseline = is_file($baselineFile)
     ? (json_decode(file_get_contents($baselineFile), true)['markup_literals'] ?? null)
     : null;
@@ -400,16 +522,7 @@ if (is_dir($srcDir)) {
         if (isset($exempt[$rel])) {
             continue;
         }
-        $body = (string) file_get_contents($path);
-        if (!preg_match_all('/#[0-9a-fA-F]{3,8}\b|\brgba?\([^)]*\)/', $body, $mk)) {
-            continue;
-        }
-        $n = 0;
-        foreach ($mk[0] as $hit) {
-            if (!str_contains($hit, 'var(')) {
-                $n++;
-            }
-        }
+        $n = markupColourCount($path, (string) file_get_contents($path));
         if ($n > 0) {
             $markup += $n;
             $markupPer[$rel] = $n;

@@ -414,8 +414,12 @@ const POZNOTE_SNAPSHOTS_DEFAULT_COUNT = 3;
 const POZNOTE_SNAPSHOTS_MIN_COUNT = 1;
 const POZNOTE_SNAPSHOTS_MAX_COUNT = 30;
 const POZNOTE_SNAPSHOTS_MAX_AGE_DAYS = 30;
-// Snapshots taken before an AI assistant / MCP edit kept per note (newest first)
-const POZNOTE_SNAPSHOTS_SAFETY_MAX_COUNT = 20;
+// Snapshots taken before an AI assistant / MCP edit kept per note (newest
+// first). The default of the snapshots_safety_keep_count setting: an instance
+// whose MCP server does a lot of editing rolls through 20 in an afternoon.
+const POZNOTE_SNAPSHOTS_SAFETY_DEFAULT_COUNT = 20;
+const POZNOTE_SNAPSHOTS_SAFETY_MIN_COUNT = 1;
+const POZNOTE_SNAPSHOTS_SAFETY_MAX_COUNT = 200;
 
 
 

@@ -204,7 +204,8 @@
       "s3_storage": "Store note attachments in an S3-compatible object storage instead of the local disk.",
       "s3_backup": "Upload complete backup archives to an S3-compatible bucket, manually or on a schedule.",
       "highlight_current_folder_tree": "Dim the notes and folders that sit outside the folder hierarchy you are working in, as much or as little as you like.",
-      "snapshots": "Choose how many automatic daily snapshots are kept per note."
+      "snapshots": "Choose how many automatic daily snapshots and how many safety snapshots (before an AI or MCP edit) are kept per note.",
+      "stt": "Configure the speech-to-text server used to dictate notes and transcribe audio attachments."
     },
     "title": "Settings",
     "collapse_section": "Collapse section",
@@ -264,7 +265,8 @@
       "saas": "SaaS mode",
       "admin_contact": "Help",
       "s3_storage": "S3 Attachments",
-      "s3_backup": "S3 Backups"
+      "s3_backup": "S3 Backups",
+      "stt": "Transcription"
     },
     "default_credentials": {
       "both": "This account still uses the username and the password it shipped with. Anyone who can reach this instance can sign in to it.",
@@ -1195,10 +1197,13 @@
     "snapshots": {
       "title": "Snapshots",
       "description": "Number of automatic snapshots kept per note (one is taken per day when the note is first opened). Manual snapshots taken with \"Take snapshot now\" are not counted. Every snapshot expires after {{days}} days:",
+      "safety_description": "Number of safety snapshots kept per note. One is taken right before the AI assistant or the MCP server rewrites a note, and shows as \"Before AI edit\" or \"Before MCP edit\":",
       "options": {
-        "unit": "automatic snapshots"
+        "unit": "automatic snapshots",
+        "safety_unit": "safety snapshots"
       },
       "badge": "{{count}} automatic per note",
+      "badge_with_safety": "{{count}} automatic, {{safety}} safety per note",
       "warning_title": "Snapshots only store the note text. Attachments are never copied.",
       "warning": "Attachments and images are kept on disk even after you remove them from a note, as long as one of its snapshots still contains them. They are only freed when the last snapshot containing them expires (after {{days}} days at most) or when the note is permanently deleted."
     }
@@ -1435,7 +1440,8 @@
     "template": "Template",
     "template_none": "No templates yet",
     "template_none_hint": "Put notes in a folder named \"Templates\"",
-    "template_insert_failed": "Could not insert the template"
+    "template_insert_failed": "Could not insert the template",
+    "dictate": "Dictate"
   },
   "api": {
     "settings": {
@@ -3827,6 +3833,71 @@
     "scope_modal_title": "One workspace at a time",
     "scope_modal_text": "The assistant cannot act on several workspaces at once. Here it will only search, read and change the notes of the workspace \"{{workspace}}\".",
     "scope_modal_continue": "Continue"
+  },
+  "stt_settings": {
+    "title": "Transcription",
+    "config_title": "Configuration",
+    "description": "Connect Poznote to a speech-to-text server so voice can be turned into note text. Any server speaking the OpenAI audio API works, including self-hosted Whisper servers, and the audio never leaves the machine that runs it.",
+    "enable_label": "Enable transcription",
+    "enable_description": "Adds a Dictate entry to the slash menu of every note, and a Transcribe action on audio attachments.",
+    "users_label": "Users allowed to use the transcription server configured by the administrator",
+    "users_description": "Only the selected users can dictate and transcribe with the configuration on this page. New users have no access until you add them here.",
+    "users_filter_placeholder": "Filter users",
+    "provider_label": "Transcription server",
+    "url_description": "Base URL of a server exposing POST /v1/audio/transcriptions. For a container running on the Docker host, use http://host.docker.internal:8000",
+    "api_key_description": "Leave empty for a local server that asks for none. Required for OpenAI.",
+    "model_description": "A Whisper model such as Systran/faster-whisper-small. Check access above to list what the server offers. whisper.cpp serves the single model it was started with and ignores this, but a value is still required.",
+    "model_none_found": "This server lists no model. Type the model name into the field below if you know it, or check the server documentation.",
+    "language_label": "Spoken language",
+    "language_description": "Two-letter code such as en, fr or de. Leave empty to let the server detect the language, which is what Whisper does well; set it when you always dictate in the same one and short sentences get mistaken for another.",
+    "user_keys_label": "Allow personal transcription servers",
+    "user_keys_description": "Every user gets a Transcription card in their own settings, where they can enter their own server and API key. When a user does so, their audio goes to that server rather than the one on this page, whether or not that user appears in the list above.",
+    "footer_note": "Recordings are uploaded to Poznote and forwarded to the transcription server from there, not from the browser. Poznote keeps no copy: the audio is discarded once the text comes back, unless the user chooses to attach the recording to the note.",
+    "messages": {
+      "saved": "Configuration saved successfully.",
+      "save_error": "Failed to save configuration."
+    }
+  },
+  "stt_settings_user": {
+    "title": "My transcription server",
+    "card": "My transcription server",
+    "card_help": "Send your dictation to your own speech-to-text server.",
+    "description": "Send your recordings to your own speech-to-text server, with your own API key. Your configuration replaces the one set by the administrator.",
+    "disabled_notice": "Your administrator has not allowed personal transcription servers on this instance.",
+    "using_instance": "Transcription currently goes through the server set by the administrator. Enable your own configuration below to use yours instead.",
+    "enable_label": "Use my own server",
+    "enable_description": "Dictation and attachment transcription use the server and API key below instead of the instance ones.",
+    "messages": {
+      "incomplete": "Enter a server URL and a model before enabling your own transcription server."
+    }
+  },
+  "stt": {
+    "modal": {
+      "title": "Dictate",
+      "recording_hint": "Speak, then stop the recording to have it transcribed.",
+      "stop": "Stop and transcribe",
+      "transcribing": "Transcribing...",
+      "transcribing_file": "Transcribing {{file}}...",
+      "review_label": "Transcription",
+      "keep_audio": "Also attach the recording to this note",
+      "insert": "Insert"
+    },
+    "attachment": {
+      "transcribe": "Transcribe"
+    },
+    "errors": {
+      "unsupported": "This browser cannot record audio.",
+      "insecure_context": "The microphone needs HTTPS. Open Poznote over https, or through localhost.",
+      "permission_denied": "Poznote was not allowed to use the microphone.",
+      "no_microphone": "No microphone was found.",
+      "microphone_failed": "The microphone could not be opened.",
+      "empty_recording": "Nothing was recorded.",
+      "max_duration": "Maximum recording length reached, transcribing what was recorded.",
+      "nothing_heard": "The server heard nothing in this recording.",
+      "no_note": "Open a note first: there is nowhere to put the text.",
+      "failed": "Transcription failed: {{error}}",
+      "attach_failed": "The text was inserted, but the recording could not be attached: {{error}}"
+    }
   },
   "diary": {
     "title": "Diary",

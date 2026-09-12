@@ -114,14 +114,15 @@ jobs:
         run: |
           VERSION="${{ steps.check_version.outputs.version }}"
 
-          # Only build ARM for stable versions (not beta versions). Each
-          # platform builds natively on a matching runner (no QEMU).
-          if [[ "$VERSION" == *"-beta"* ]]; then
+          # Betas build for both architectures so the floating 'latest-and-beta'
+          # tag works on ARM hosts too; throwaway '-test' versions stay AMD64
+          # only. Each platform builds natively on a matching runner (no QEMU).
+          if [[ "$VERSION" == *"-test"* ]]; then
             matrix='{"include":[{"platform":"linux/amd64","runner":"ubuntu-latest"}]}'
-            echo "🧪 Beta version detected - building only for AMD64 (no ARM)"
+            echo "🧪 Test version detected - building only for AMD64 (no ARM)"
           else
             matrix='{"include":[{"platform":"linux/amd64","runner":"ubuntu-latest"},{"platform":"linux/arm64","runner":"ubuntu-24.04-arm"}]}'
-            echo "📦 Stable/test version - building for AMD64 and ARM64"
+            echo "📦 Stable/beta version - building for AMD64 and ARM64"
           fi
 
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
@@ -272,20 +273,30 @@ jobs:
               # Add major.minor version tag (e.g., poznote:4.1)
               TAGS="$TAGS"$'\n'"ghcr.io/${{ github.repository_owner }}/poznote:$MAJOR.$MINOR"
 
-              echo "📦 Stable version detected - will tag as: $VERSION, $MAJOR, $MAJOR.$MINOR, latest"
+              echo "📦 Stable version detected - will tag as: $VERSION, $MAJOR, $MAJOR.$MINOR, latest, latest-and-beta"
             else
               echo "⚠️  Version doesn't match semver pattern, skipping major/minor tags"
             fi
 
             # Add latest tag
             TAGS="$TAGS"$'\n'"ghcr.io/${{ github.repository_owner }}/poznote:latest"
+
+            # Beta testers track the newest code, so a stable release moves
+            # 'latest-and-beta' forward too (a stable is always newer than the
+            # beta that preceded it)
+            TAGS="$TAGS"$'\n'"ghcr.io/${{ github.repository_owner }}/poznote:latest-and-beta"
+          elif [[ "$VERSION" == *"-beta"* ]]; then
+            # Floating tag for beta testers: always points at the newest beta
+            TAGS="$TAGS"$'\n'"ghcr.io/${{ github.repository_owner }}/poznote:latest-and-beta"
+            echo "🧪 Beta version detected - will tag as: $VERSION, latest-and-beta (no 'latest' or major/minor versions)"
           else
-            echo "🧪 Pre-release version detected (test/beta) - will NOT tag as 'latest' or major/minor versions"
+            echo "🧪 Pre-release version detected (test) - will NOT tag as 'latest' or major/minor versions"
           fi
 
           # Rootless variant tags, derived from the same list: 'latest' becomes
           # 'rootless', every other tag gets a '-rootless' suffix
-          # (e.g. poznote:6.30.5-rootless, poznote:6-rootless, poznote:rootless)
+          # (e.g. poznote:6.30.5-rootless, poznote:6-rootless, poznote:rootless,
+          # poznote:latest-and-beta-rootless)
           ROOTLESS_TAGS=$(echo "$TAGS" | sed -E 's/:latest$/:rootless/; t; s/$/-rootless/')
 
           echo "tags<<EOF" >> $GITHUB_OUTPUT
@@ -315,15 +326,23 @@ jobs:
               # Add major.minor version tag (e.g., poznote-mcp:4.1)
               TAGS="$TAGS"$'\n'"ghcr.io/${{ github.repository_owner }}/poznote-mcp:$MAJOR.$MINOR"
 
-              echo "📦 Stable version detected - will tag MCP as: $VERSION, $MAJOR, $MAJOR.$MINOR, latest"
+              echo "📦 Stable version detected - will tag MCP as: $VERSION, $MAJOR, $MAJOR.$MINOR, latest, latest-and-beta"
             else
               echo "⚠️  Version doesn't match semver pattern, skipping major/minor tags"
             fi
 
             # Add latest tag
             TAGS="$TAGS"$'\n'"ghcr.io/${{ github.repository_owner }}/poznote-mcp:latest"
+
+            # A stable release also moves 'latest-and-beta' forward, so beta
+            # testers stay on the newest code
+            TAGS="$TAGS"$'\n'"ghcr.io/${{ github.repository_owner }}/poznote-mcp:latest-and-beta"
+          elif [[ "$VERSION" == *"-beta"* ]]; then
+            # Floating tag for beta testers: always points at the newest beta
+            TAGS="$TAGS"$'\n'"ghcr.io/${{ github.repository_owner }}/poznote-mcp:latest-and-beta"
+            echo "🧪 Beta version detected - will tag MCP as: $VERSION, latest-and-beta"
           else
-            echo "🧪 Pre-release version detected (test/beta) - will NOT tag MCP with major/minor or 'latest'"
+            echo "🧪 Pre-release version detected (test) - will NOT tag MCP with major/minor or 'latest'"
           fi
 
           echo "tags<<EOF" >> $GITHUB_OUTPUT
@@ -433,13 +452,13 @@ jobs:
           echo "$all_versions_debug" | head -20  # Show first 20 for debugging
 
           # Get all package versions (excluding untagged versions and the
-          # floating 'latest'/'rootless' tags, which always point at the
-          # current release and must never be deleted)
+          # floating 'latest'/'rootless'/'latest-and-beta' tags, which always point
+          # at the current release or beta and must never be deleted)
           versions=$(gh api \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "/user/packages/container/${PACKAGE_NAME}/versions" \
-            --jq '[.[] | select(.metadata.container.tags | length > 0) | select(.metadata.container.tags | index("latest") == null and index("rootless") == null)] | sort_by(.created_at) | reverse | .[].id' \
+            --jq '[.[] | select(.metadata.container.tags | length > 0) | select(.metadata.container.tags | index("latest") == null and index("rootless") == null and index("latest-and-beta") == null and index("latest-and-beta-rootless") == null)] | sort_by(.created_at) | reverse | .[].id' \
             2>/dev/null || echo "")
 
           if [ -z "$versions" ]; then
@@ -521,12 +540,15 @@ jobs:
           KEEP_COUNT=20  # single variant, so 20 versions = ~20 releases
           PACKAGE_NAME="poznote-mcp"
 
-          # Get all package versions (excluding 'latest' tag and untagged versions)
+          # Get all package versions (excluding untagged versions and the
+          # floating 'latest'/'latest-and-beta' tags). index() is used rather than
+          # '.tags[] != "latest"', which emits an entry per non-matching tag and
+          # so keeps multi-tagged versions in the deletion list.
           versions=$(gh api \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "/user/packages/container/${PACKAGE_NAME}/versions" \
-            --jq '[.[] | select(.metadata.container.tags | length > 0) | select(.metadata.container.tags[] != "latest")] | sort_by(.created_at) | reverse | .[].id' \
+            --jq '[.[] | select(.metadata.container.tags | length > 0) | select(.metadata.container.tags | index("latest") == null and index("latest-and-beta") == null)] | sort_by(.created_at) | reverse | .[].id' \
             2>/dev/null || echo "")
 
           if [ -z "$versions" ]; then

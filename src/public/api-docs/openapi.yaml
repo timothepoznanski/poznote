@@ -368,7 +368,11 @@ paths:
     get:
       tags: [Notes]
       summary: List notes
-      description: Get list of notes with optional filters
+      description: >
+        Get list of notes with optional filters. The response carries total,
+        the number of notes matching the filters, next to count, the size of
+        the page returned, so a truncated page is never mistaken for a
+        complete one. Page through a large workspace with limit and offset.
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
         - name: workspace
@@ -420,6 +424,19 @@ paths:
           schema:
             type: boolean
           description: Include folder information
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+          description: Maximum number of notes to return. Omit to return them all.
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+          description: Number of notes to skip, for paging through a limit
       responses:
         '200':
           description: List of notes
@@ -434,6 +451,26 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Note'
+                  count:
+                    type: integer
+                    description: Number of notes in this page
+                  total:
+                    type: integer
+                    description: Number of notes matching the filters, ignoring limit/offset
+                  offset:
+                    type: integer
+                  limit:
+                    type: integer
+                    nullable: true
+                  has_more:
+                    type: boolean
+                    description: True when notes remain after this page
+        '400':
+          description: Invalid limit, offset or date filter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     post:
       tags: [Notes]
       summary: Create a new note
@@ -467,8 +504,12 @@ paths:
                   type: string
                   description: >
                     Target folder path (alternative to folder_id). Missing
-                    segments are created. 'folder_name' is accepted as an
-                    older spelling of the same parameter.
+                    segments are created. A name with no slash matches an
+                    existing folder at any depth when exactly one folder of the
+                    workspace carries it; when several do, the request is
+                    refused with 409 ambiguous_folder_name and the candidates.
+                    'folder_name' is accepted as an older spelling of the same
+                    parameter.
                 type:
                   type: string
                   enum: [note, markdown, tasklist]
@@ -679,16 +720,30 @@ paths:
                     - type: array
                       items:
                         type: string
+                workspace:
+                  type: string
+                  description: >
+                    Moves the note to this workspace, keeping its id and its
+                    history. The note lands at the root of the destination
+                    unless the same request also names a folder of it, since
+                    its current folder belongs to the workspace it leaves.
+                    (The workspace query parameter is only a lookup filter.)
                 folder_id:
                   type: integer
                   nullable: true
-                  description: ID of the folder (optional)
+                  description: >
+                    ID of the folder (optional). When the request also changes
+                    the workspace, it must be a folder of the destination.
                 folder:
                   type: string
                   description: >
                     Target folder path (alternative to folder_id). Missing
                     segments are created, an empty string moves the note to
                     the workspace root, and folder_id wins when both are sent.
+                    A name with no slash matches an existing folder at any
+                    depth when exactly one folder of the workspace carries it;
+                    when several do, the request is refused with 409
+                    ambiguous_folder_name and the candidates.
                 if_version:
                   type: string
                   description: >
@@ -1567,9 +1622,12 @@ paths:
       tags: [Tasks]
       summary: Add a task to a note
       description: >
-        Appends one task to a task list note, without rewriting the note's
-        whole content array. When reminder is true, the matching notification
-        is scheduled from due_at automatically.
+        Appends one task to a task list note. The request carries only the new
+        task, so a client never has to read the list and send it back, and a
+        concurrent edit cannot be lost. The note itself stores its tasks as a
+        single JSON array, which the server rewrites, so the work done per call
+        grows with the length of the list. When reminder is true, the matching
+        notification is scheduled from due_at automatically.
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
         - name: id
@@ -2646,10 +2704,17 @@ paths:
           description: Return as nested tree structure
       responses:
         '200':
-          description: List of folders
+          description: >
+            List of folders. Each carries its full path and is_diary, which marks
+            the diary roots of the workspace.
     post:
       tags: [Folders]
       summary: Create a new folder
+      description: >
+        Creates one folder from folder_name (optionally under parent_folder_id),
+        or a whole chain from folder_path such as "Projects/2026/Q3". With a
+        path, create_parents decides whether the missing levels on the way down
+        are created or the call fails.
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
       requestBody:
@@ -2657,18 +2722,40 @@ paths:
           application/json:
             schema:
               type: object
-              required: [name, workspace]
               properties:
-                name:
+                folder_name:
                   type: string
+                  description: Name of a single folder to create. 'name' is accepted as an older spelling.
+                folder_path:
+                  type: string
+                  description: Slash-separated path to create, e.g. "Projects/2026/Q3". Takes precedence over folder_name.
+                  example: "Projects/2026/Q3"
+                create_parents:
+                  type: boolean
+                  description: With folder_path, create the missing parent levels instead of failing
+                  default: false
+                is_diary:
+                  type: boolean
+                  description: >
+                    Create the folder as a diary root, the folder the "New diary entry"
+                    button files its dated notes into. A diary is always at the root of
+                    its workspace, so this cannot be combined with a parent folder or a
+                    nested path. When a root folder of that name already exists, it is
+                    turned into a diary (200, converted true) instead of conflicting.
+                  default: false
                 workspace:
                   type: string
-                parent_id:
+                parent_folder_id:
                   type: integer
                   nullable: true
+                  description: Parent of a folder created by name. 'parent_id' is accepted as an older spelling.
       responses:
         '201':
           description: Folder created
+        '404':
+          description: Workspace or parent folder not found (with folder_path, the missing segment is named)
+        '409':
+          description: A folder of that name already exists in that place
 
   /folders/counts:
     get:

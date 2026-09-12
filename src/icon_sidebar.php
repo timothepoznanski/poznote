@@ -78,6 +78,9 @@ $iconSidebarCurrentPage = $iconSidebarBasePath === '' ? basename($iconSidebarScr
 // param once it has applied the section state, so it also flips the highlight
 // over to the About button to keep the rail matching the cleaned URL.
 $iconSidebarIsAboutView = $iconSidebarCurrentPage === 'settings.php' && (($_GET['open'] ?? '') === 'about');
+// Same idea for My Profile: settings.php?open=account opens the My Account
+// section on its own, so the rail highlights Profile rather than Settings.
+$iconSidebarIsAccountView = $iconSidebarCurrentPage === 'settings.php' && (($_GET['open'] ?? '') === 'account');
 
 // Four groups, top to bottom: the entry points into the app (Home, Dashboard,
 // Graph), the views that hold the content itself (Notes, Tasks, Folders,
@@ -251,10 +254,8 @@ if (function_exists('poznoteTidyIconSidebarDividers')) {
 
 // Account actions, in their own group pinned to the bottom of the rail: only
 // the navigation entries above scroll, this group always stays visible.
-// Profile and Logout have no 'page' so they never highlight. js/profile.js,
-// loaded below, opens the My Profile modal in place on whatever page the rail
-// is on; the href is the no-JS fallback (settings.php auto-opens the same
-// modal on ?open=profile).
+// Logout has no 'page' so it never highlights; Profile splits the settings.php
+// highlight by its ?open flag, the way About does.
 // The update badge is admin-only, matching the Check for Updates card in
 // settings.php; js/utils-updates.js reveals every .update-badge when a release is out.
 // A profile still on a shipped default username or password gets a second dot
@@ -270,17 +271,21 @@ $iconSidebarDefaultCredential = function_exists('getAuthenticatedUserId')
     && poznoteHasDefaultCredential((int)(getAuthenticatedUserId() ?? 0));
 
 $iconSidebarBottomItems = [
-    ['id' => 'iconSidebarProfileBtn', 'url' => $iconSidebarUrl('settings.php', ['open' => 'profile']) . '#my-profile-card', 'icon' => 'lucide-user', 'label' => t('profile.card', [], 'My Profile')],
+    // ?open=account lands on settings.php with the My Account section open and
+    // every other section closed (js/settings-page.js), where the My Profile
+    // card opens the profile modal.
+    ['id' => 'iconSidebarProfileBtn', 'url' => $iconSidebarUrl('settings.php', ['open' => 'account']), 'icon' => 'lucide-user', 'label' => t('profile.card', [], 'My Profile'), 'activeFlag' => $iconSidebarIsAccountView],
     // Theme switch. It goes nowhere, so it renders as a button rather than a
     // link; js/theme-manager.js picks it up through data-theme-toggle, steps to
     // the next theme of the list on each click and shows the one in use.
     ['id' => 'iconSidebarThemeToggleBtn', 'themeToggle' => true, 'icon' => 'lucide-moon', 'label' => t('theme.toggle', [], 'Toggle theme')],
     // ?open=about lands on settings.php with the About section expanded and
     // every other section collapsed (js/settings-page.js). It is settings.php
-    // with a query flag rather than a page of its own, so the two entries below
-    // split the active state by that flag: About
-    // lights up on ?open=about, Settings on every other settings.php visit.
-    ['id' => 'iconSidebarSettingsBtn', 'url' => $iconSidebarUrl('settings.php'), 'icon' => 'lucide-settings', 'label' => t('sidebar.settings', [], 'Settings'), 'activeFlag' => $iconSidebarCurrentPage === 'settings.php' && !$iconSidebarIsAboutView, 'updateBadge' => function_exists('isCurrentUserAdmin') && isCurrentUserAdmin(), 'attentionBadge' => $iconSidebarDefaultCredential],
+    // with a query flag rather than a page of its own, so the settings.php
+    // entries of this group split the active state by that flag: About lights
+    // up on ?open=about, My Profile on ?open=account, Settings on every other
+    // settings.php visit.
+    ['id' => 'iconSidebarSettingsBtn', 'url' => $iconSidebarUrl('settings.php'), 'icon' => 'lucide-settings', 'label' => t('sidebar.settings', [], 'Settings'), 'activeFlag' => $iconSidebarCurrentPage === 'settings.php' && !$iconSidebarIsAboutView && !$iconSidebarIsAccountView, 'updateBadge' => function_exists('isCurrentUserAdmin') && isCurrentUserAdmin(), 'attentionBadge' => $iconSidebarDefaultCredential],
     ['id' => 'iconSidebarAboutBtn', 'url' => $iconSidebarUrl('settings.php', ['open' => 'about']), 'icon' => 'lucide-info-circle', 'label' => t('settings.categories.documentation', [], 'About'), 'activeFlag' => $iconSidebarIsAboutView],
     ['id' => 'iconSidebarLogoutBtn', 'url' => $iconSidebarBasePath . 'logout.php', 'icon' => 'lucide-log-out', 'label' => t('workspace_menu.logout', [], 'Logout')],
 ];
@@ -401,7 +406,7 @@ try {
     $iconSidebarLabel = htmlspecialchars($iconSidebarItem['label'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $iconSidebarIcon = htmlspecialchars($iconSidebarItem['icon'], ENT_QUOTES, 'UTF-8');
     // 'activeFlag' covers the entries that share a page and split the highlight
-    // by query string (Settings vs About); the rest match on 'page'.
+    // by query string (Settings vs About vs My Profile); the rest match on 'page'.
     $iconSidebarIsCurrent = isset($iconSidebarItem['activeFlag'])
         ? (bool)$iconSidebarItem['activeFlag']
         : (isset($iconSidebarItem['page']) && $iconSidebarItem['page'] === $iconSidebarCurrentPage);

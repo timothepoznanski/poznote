@@ -256,6 +256,31 @@ body:has(#ai-chat-panel.ai-chat-open) #edgeAiChatBtn {
     }
 }
 
+/* settings.php is a plain document-flow page (no flex body to dock into): the
+   column is pinned to the right edge and the page is inset by its width while
+   it is open, so the cards reflow instead of being covered. Below the modal
+   stack (z-index 9999, css/modals/base.css): the checklist also opens as a
+   modal from the UI Customization card. */
+@media (min-width: 801px) {
+    body.settings-page #uiCustomizationPanel {
+        position: fixed;
+        top: 0;
+        right: 0;
+        z-index: 40;
+        box-shadow: -4px 0 16px rgba(var(--pz-shadow-rgb), 0.08);
+    }
+
+    /* The rail inset (margin-left, css/icon-sidebar-page.css) carries its own
+       transition; both margins move here. */
+    body.settings-page.has-icon-sidebar {
+        transition: margin-left 0.3s ease, margin-right 0.25s ease;
+    }
+
+    body.settings-page.ui-custom-panel-open {
+        margin-right: var(--ui-custom-panel-width, 360px);
+    }
+}
+
 /* Phones: the buttons take the touch size set at the top of this file, and
    the panel slides over the page like the AI chat panel (css/ai-chat.css)
    instead of docking */

@@ -1,0 +1,114 @@
+/*
+ * Dictation modal (src/modals.php #dictateModal, js/speech-to-text.js).
+ *
+ * Three panels share the dialog and only one is visible at a time, so the box
+ * needs a floor: without it the dialog jumps between the recording panel and
+ * the review textarea on every state change.
+ */
+
+.dictate-modal-content {
+    max-width: 520px;
+    width: 100%;
+}
+
+.dictate-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 132px;
+    justify-content: center;
+    padding: 4px 0 8px;
+}
+
+.dictate-panel[hidden] { display: none; }
+
+/* Input level, so a muted or unplugged microphone shows before a long
+   recording comes back as an empty transcript. */
+.dictate-level {
+    height: 8px;
+    border-radius: var(--pz-radius-sm);
+    background: var(--pz-surface-sunken);
+    overflow: hidden;
+}
+
+.dictate-level-bar {
+    display: block;
+    height: 100%;
+    width: 0;
+    border-radius: var(--pz-radius-sm);
+    background: var(--pz-accent);
+    transition: width 80ms linear;
+}
+
+.dictate-timer {
+    font-size: 2rem;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    color: var(--pz-text);
+    line-height: 1.1;
+}
+
+.dictate-hint {
+    margin: 0;
+    text-align: center;
+    color: var(--pz-text-muted);
+    font-size: 0.9rem;
+}
+
+/* The spinner is the same lucide icon the rest of the app uses for waiting,
+   turned by hand because it is an <i>, not an animated glyph. */
+.dictate-hint .lucide-loader {
+    animation: dictate-spin 1s linear infinite;
+    margin-right: 6px;
+}
+
+@keyframes dictate-spin {
+    to { transform: rotate(360deg); }
+}
+
+.dictate-review-label {
+    font-size: 0.9rem;
+    color: var(--pz-text-muted);
+}
+
+#dictateText {
+    width: 100%;
+    box-sizing: border-box;
+    resize: vertical;
+    padding: 10px;
+    border: 1px solid var(--pz-border-strong);
+    border-radius: var(--pz-radius);
+    background: var(--pz-bg);
+    color: var(--pz-text);
+    font: inherit;
+    line-height: 1.5;
+}
+
+.dictate-keep {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--pz-text-secondary);
+    cursor: pointer;
+}
+
+.dictate-keep[hidden] { display: none; }
+
+.dictate-keep input[type="checkbox"] {
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+.dictate-error {
+    margin: 0 0 4px;
+    color: var(--pz-danger);
+    font-size: 0.9rem;
+}
+
+.dictate-error[hidden] { display: none; }
+
+@media (max-width: 600px) {
+    .dictate-timer { font-size: 1.6rem; }
+    .dictate-panel { min-height: 112px; }
+}

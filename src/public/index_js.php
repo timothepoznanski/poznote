@@ -148,6 +148,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/ui-customization-panel.js',
         'js/paste-markdown-modal.js',
         'js/insert-markdown-modal.js',
+        'js/speech-to-text.js',
     ],
     ];
 }

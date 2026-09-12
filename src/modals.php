@@ -1076,6 +1076,10 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
             <div class="radio-options">
                 <label><input type="number" id="snapshotsKeepCountInput" min="<?php echo POZNOTE_SNAPSHOTS_MIN_COUNT; ?>" max="<?php echo POZNOTE_SNAPSHOTS_MAX_COUNT; ?>" step="1" value="<?php echo POZNOTE_SNAPSHOTS_DEFAULT_COUNT; ?>" style="width:80px; margin:0; padding:4px 8px;"> <?php echo t_h('modals.snapshots.options.unit', [], 'automatic snapshots'); ?></label>
             </div>
+            <p><?php echo t_h('modals.snapshots.safety_description', [], 'Number of safety snapshots kept per note. One is taken right before the AI assistant or the MCP server rewrites a note, and shows as "Before AI edit" or "Before MCP edit":'); ?></p>
+            <div class="radio-options">
+                <label><input type="number" id="snapshotsSafetyKeepCountInput" min="<?php echo POZNOTE_SNAPSHOTS_SAFETY_MIN_COUNT; ?>" max="<?php echo POZNOTE_SNAPSHOTS_SAFETY_MAX_COUNT; ?>" step="1" value="<?php echo POZNOTE_SNAPSHOTS_SAFETY_DEFAULT_COUNT; ?>" style="width:80px; margin:0; padding:4px 8px;"> <?php echo t_h('modals.snapshots.options.safety_unit', [], 'safety snapshots'); ?></label>
+            </div>
             <div class="delete-warning-box">
                 <p class="delete-warning"><?php echo t_h('modals.snapshots.warning_title', [], 'Snapshots only store the note text. Attachments are never copied.'); ?></p>
                 <p class="delete-warning-recovery"><?php echo t_h('modals.snapshots.warning', ['days' => POZNOTE_SNAPSHOTS_MAX_AGE_DAYS], 'Attachments and images are kept on disk even after you remove them from a note, as long as one of its snapshots still contains them. They are only freed when the last snapshot containing them expires (after {{days}} days at most) or when the note is permanently deleted.'); ?></p>
@@ -1250,6 +1254,46 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="diaryDateFormatModal"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" id="saveDiaryDateFormatModalBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
+<!--
+  Dictation modal (js/speech-to-text.js). Three panels in one dialog, shown one
+  at a time: recording, then the wait while the server transcribes, then the
+  text to review before it lands in the note. Reviewing rather than inserting
+  straight away is deliberate: a transcript is a guess, and this is also where
+  the recording can be kept as an attachment.
+-->
+<div id="dictateModal" class="modal">
+    <div class="modal-content dictate-modal-content">
+        <h3><i class="lucide lucide-mic"></i> <?php echo t_h('stt.modal.title', [], 'Dictate'); ?></h3>
+
+        <div class="dictate-panel" id="dictateRecordPanel">
+            <div class="dictate-level" id="dictateLevel" aria-hidden="true"><span class="dictate-level-bar" id="dictateLevelBar"></span></div>
+            <div class="dictate-timer" id="dictateTimer">0:00</div>
+            <p class="dictate-hint" id="dictateHint"><?php echo t_h('stt.modal.recording_hint', [], 'Speak, then stop the recording to have it transcribed.'); ?></p>
+        </div>
+
+        <div class="dictate-panel" id="dictateWorkPanel" hidden>
+            <p class="dictate-hint"><i class="lucide lucide-loader"></i> <span id="dictateWorkLabel"><?php echo t_h('stt.modal.transcribing', [], 'Transcribing...'); ?></span></p>
+        </div>
+
+        <div class="dictate-panel" id="dictateReviewPanel" hidden>
+            <label class="dictate-review-label" for="dictateText"><?php echo t_h('stt.modal.review_label', [], 'Transcription'); ?></label>
+            <textarea id="dictateText" rows="7" spellcheck="true"></textarea>
+            <label class="dictate-keep" id="dictateKeepRow">
+                <input type="checkbox" id="dictateKeepAudio">
+                <span><?php echo t_h('stt.modal.keep_audio', [], 'Also attach the recording to this note'); ?></span>
+            </label>
+        </div>
+
+        <p class="dictate-error" id="dictateError" hidden></p>
+
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" id="dictateCancelBtn"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="dictateStopBtn"><i class="lucide lucide-square"></i> <?php echo t_h('stt.modal.stop', [], 'Stop and transcribe'); ?></button>
+            <button type="button" class="btn-primary" id="dictateInsertBtn" hidden><?php echo t_h('stt.modal.insert', [], 'Insert'); ?></button>
         </div>
     </div>
 </div>

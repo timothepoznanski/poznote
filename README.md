@@ -72,6 +72,7 @@ https://discord.gg/AWhWWSEkJ
 - [Offline View](#offline-view)
 - [Multiple Instances](#multiple-instances)
 - [AI Assistant](#ai-assistant)
+- [Transcription (speech to text)](#transcription-speech-to-text)
 - [MCP Server](#mcp-server)
 - [Chrome Extension](#chrome-extension)
 - [Share to Poznote on Android](#share-to-poznote-on-android)
@@ -642,7 +643,7 @@ Snapshots keep earlier versions of a note's content so you can go back to a prev
 
 *   **Automatic:** a snapshot is taken the first time a note is opened each day. The 3 most recent automatic snapshots are kept per note; this number can be changed under **Settings > Behavior > Snapshots**.
 *   **Manual:** "Take snapshot now" adds a snapshot at any time, and so does **Ctrl + Alt + S** (Cmd + Alt + S on Mac) while a note is open. Manual snapshots are unlimited and do not count toward that number.
-*   **Before an AI edit:** a snapshot is taken automatically right before the [AI assistant](#ai-assistant) or the [MCP server](#mcp-server) changes the content of a note, so a rewrite that goes wrong is one click away from being undone. These snapshots are labeled "Before AI edit" or "Before MCP edit" in the history, are skipped when the latest snapshot already holds the same content, and the 20 most recent ones are kept per note.
+*   **Before an AI edit:** a snapshot is taken automatically right before the [AI assistant](#ai-assistant) or the [MCP server](#mcp-server) changes the content of a note, so a rewrite that goes wrong is one click away from being undone. These snapshots are labeled "Before AI edit" or "Before MCP edit" in the history, are skipped when the latest snapshot already holds the same content, and the 20 most recent ones are kept per note, a number you can change in **Settings → Snapshots** (1 to 200) if your instance edits a lot of notes through AI or MCP.
 *   **Expiry:** every snapshot, automatic or manual, is deleted 30 days after it was taken. A snapshot can also be deleted by hand from the Snapshots modal.
 *   **Attachments and images:** snapshots only store the note text. Attachments are never copied, so a file referenced by several snapshots exists once on disk. A file removed from a note stays on disk, hidden from the note, as long as a snapshot still contains it, so restoring that snapshot brings it back. It is deleted for good once the last snapshot containing it expires or is deleted, or when the note is permanently deleted. Keeping more snapshots therefore never duplicates files. It only keeps removed files around for longer, 30 days at most.
 
@@ -1237,6 +1238,21 @@ The administrator can also allow personal API keys. Each user then gets a **My A
 For the full configuration guide, covering providers, choosing a model, and how to connect a local Ollama/LM Studio server from the Poznote container (finding the right URL, `OLLAMA_HOST`, Docker networking), see the [AI Assistant documentation](docs/AI-ASSISTANT.md).
 
 The AI server is called from the Poznote server, never from your browser. With a local Ollama instance, your notes and conversations never leave your machine. To let an external AI assistant (VS Code Copilot, Claude CLI...) manage your notes instead, see the [MCP Server](#mcp-server) below.
+
+## Transcription (speech to text)
+
+Poznote can turn voice into note text through a speech-to-text server you run yourself. It embeds no speech model: it talks to any server exposing the OpenAI audio API (`POST /v1/audio/transcriptions`), which every self-hostable Whisper distribution speaks, [Speaches](https://github.com/speaches-ai/speaches), [whisper.cpp](https://github.com/ggml-org/whisper.cpp) and [LocalAI](https://localai.io) among them. Point it at a container on your own machine and the audio never leaves it.
+
+Once configured, two things appear:
+
+- **Dictate**, in the slash menu of every note. Type `/` and pick **Dictate**, speak, stop, and the transcript comes back in a box where you can correct it before it goes into the note, at the cursor, in rich-text and Markdown notes alike. A checkbox offers to keep the recording as an attachment; unticked, which is the default, the audio is discarded once the text comes back.
+- **Transcribe**, on audio attachments. Any `mp3`, `wav`, `ogg`, `m4a` or `flac` file attached to a note gets a microphone button in the attachments dialog, which is what you want for a voice memo recorded on your phone and dropped into Poznote.
+
+To enable it, go to **Settings → Admin Tools → Transcription** (administrator only), pick a server, use **Check access and list models**, and tick the users allowed to use it. Access is granted profile by profile, and the administrator can also allow personal servers, which gives every user a **My transcription server** card in their own settings.
+
+For the full guide, covering the three server options with ready-to-run Docker commands, choosing a model, spoken language, and why the microphone needs HTTPS, see the [Transcription documentation](docs/TRANSCRIPTION.md).
+
+Recordings are uploaded to Poznote and forwarded to the transcription server from there, never from your browser. Poznote keeps no copy of the audio unless you ask it to attach the recording.
 
 ## MCP Server
 

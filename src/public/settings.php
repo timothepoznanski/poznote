@@ -126,6 +126,7 @@ $settingsPageUserKeys = [
     'note_list_sort',
     'note_age_filter_days',
     'snapshots_keep_count',
+    'snapshots_safety_keep_count',
     'tasklist_insert_order',
     'diary_default_note_type',
     'diary_date_format',
@@ -570,6 +571,35 @@ if ($canUseUserWebhooks) {
                         if ($aiUserActiveCard) {
                             echo t_h('common.enabled', [], 'Enabled');
                         } elseif ($aiUserKeysAllowedCard && !$aiUserHasConfigCard) {
+                            echo t_h('git_sync.config.not_configured', [], 'Not configured');
+                        } else {
+                            echo t_h('common.disabled', [], 'Disabled');
+                        }
+                        ?>
+                    </span>
+                </div>
+            </div>
+
+            <!-- My transcription server (personal speech-to-text server) -->
+            <div class="home-card settings-card-clickable" id="stt-user-card" data-href="stt_settings_user.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('stt_settings_user.card_help', [], 'Send your dictation to your own speech-to-text server.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-mic"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('stt_settings_user.card', [], 'My transcription server'); ?></span>
+                    <?php
+                    require_once __DIR__ . '/../stt_config.php';
+                    $sttUserKeysAllowedCard = poznoteSttUserKeysAllowed();
+                    $sttUserConfigCard = poznoteSttUserConfig($con);
+                    $sttUserHasConfigCard = $sttUserConfigCard['url'] !== '' && $sttUserConfigCard['model'] !== '';
+                    $sttUserActiveCard = $sttUserKeysAllowedCard && poznoteSttConfigUsable($sttUserConfigCard);
+                    ?>
+                    <span class="setting-status <?php echo $sttUserActiveCard ? 'enabled' : 'disabled'; ?>">
+                        <?php
+                        if ($sttUserActiveCard) {
+                            echo t_h('common.enabled', [], 'Enabled');
+                        } elseif ($sttUserKeysAllowedCard && !$sttUserHasConfigCard) {
                             echo t_h('git_sync.config.not_configured', [], 'Not configured');
                         } else {
                             echo t_h('common.disabled', [], 'Disabled');
@@ -1110,6 +1140,37 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
+            <!-- Transcription (instance-wide speech-to-text server) -->
+            <div class="home-card settings-card-clickable" id="stt-card" data-href="stt_settings.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.stt', [], 'Configure the speech-to-text server used to dictate notes and transcribe audio attachments.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-mic"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.stt', [], 'Transcription'); ?></span>
+                    <?php
+                    require_once __DIR__ . '/../stt_config.php';
+                    // Three states, like the AI Assistant card above: switched on
+                    // with no server or no model is not "disabled", it is waiting
+                    // for the rest of its configuration.
+                    $sttInstanceCard = poznoteSttInstanceConfig();
+                    $sttInstanceCompleteCard = $sttInstanceCard['url'] !== '' && $sttInstanceCard['model'] !== '';
+                    $sttEnabledCard = $sttInstanceCard['enabled'] && $sttInstanceCompleteCard;
+                    ?>
+                    <span class="setting-status <?php echo $sttEnabledCard ? 'enabled' : 'disabled'; ?>">
+                        <?php
+                        if ($sttEnabledCard) {
+                            echo t_h('common.enabled', [], 'Enabled');
+                        } elseif (!$sttInstanceCompleteCard) {
+                            echo t_h('git_sync.config.not_configured', [], 'Not configured');
+                        } else {
+                            echo t_h('common.disabled', [], 'Disabled');
+                        }
+                        ?>
+                    </span>
+                </div>
+            </div>
+
             <!-- SaaS mode display elements (instance-wide configuration) -->
             <div class="home-card settings-card-clickable" id="saas-card" data-href="saas_settings.php">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.saas', [], 'Display elements meant for instances offered as a hosted service (SaaS). All hidden by default.'); ?>"><i class="lucide lucide-help-circle"></i></span>
@@ -1447,6 +1508,15 @@ if ($canUseUserWebhooks) {
     </div>
     <?php endif; ?>
 
+    <?php
+    // Contextual UI Customization: floating button at the bottom-right + docked
+    // column listing the hideable elements of this page (the settings cards and
+    // the icon rail), see ui_customization_panel.php. The card above opens the
+    // same checklist in a modal, with the instance-wide column for admins.
+    $uiCustomizationPanelPage = 'settings';
+    include __DIR__ . '/../ui_customization_panel.php';
+    ?>
+
     <?php include __DIR__ . '/../modals.php'; ?>
     <script type="application/json" id="page-config-data"><?php
         echo json_encode($settingsPageConfig, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
@@ -1482,6 +1552,10 @@ if ($canUseUserWebhooks) {
     </script>
     <script src="js/settings-page.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/settings-page.js') ?: time(); ?>"></script>
     <script src="js/ui-customization.js?v=<?php echo $cache_v; ?>"></script>
+    <!-- Contextual UI Customization panel (see ui_customization_panel.php);
+         js/panel-back.js lets the device Back button close it on a phone. -->
+    <script src="<?php echo poznoteAsset('js/panel-back.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/ui-customization-panel.js'); ?>"></script>
     <script src="js/change-password.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/change-password.js') ?: time(); ?>"></script>
     <script src="js/app-passwords.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/app-passwords.js') ?: time(); ?>"></script>
     <!-- js/profile.js (My Profile card and modal) is loaded by icon_sidebar.php,

@@ -26,6 +26,22 @@
     var settingsCache = Object.create(null);
     var settingsPreloadPromise = null;
 
+    // Rail deep links: settings.php?open=<key> lands on the page with that
+    // section on its own. Both layouts read it, the stacked one collapsing
+    // every other section and the desktop nav selecting the matching entry.
+    var SECTION_DEEP_LINKS = {
+        about: 'settings-documentation-section-grid',
+        account: 'settings-account-section-grid'
+    };
+
+    // The section a ?open= deep link names, or null when the param is absent
+    // or names something else (js/profile.js owns ?open=profile, and several
+    // cards use their own ?open= values to open a modal).
+    function deepLinkSectionGridId() {
+        var open = new URLSearchParams(window.location.search || '').get('open') || '';
+        return SECTION_DEEP_LINKS[open] || null;
+    }
+
     // Get language label from code
     function getLanguageLabel(code) {
         switch (code) {
@@ -111,6 +127,7 @@
             'note_list_sort',
             'note_age_filter_days',
             'snapshots_keep_count',
+            'snapshots_safety_keep_count',
             'tasklist_insert_order',
             'diary_default_note_type',
             'diary_date_format',
@@ -838,10 +855,19 @@
 
     var SNAPSHOTS_DEFAULT_COUNT = 3;
     var SNAPSHOTS_MAX_COUNT = 30;
+    // Safety snapshots (before an AI or MCP edit) have their own, wider range:
+    // an instance whose MCP server edits a lot rolls through 20 in an afternoon.
+    var SNAPSHOTS_SAFETY_DEFAULT_COUNT = 20;
+    var SNAPSHOTS_SAFETY_MAX_COUNT = 200;
 
     function getSnapshotsKeepCount(value) {
         var count = parseInt(value, 10);
         return (count >= 1 && count <= SNAPSHOTS_MAX_COUNT) ? count : SNAPSHOTS_DEFAULT_COUNT;
+    }
+
+    function getSafetySnapshotsKeepCount(value) {
+        var count = parseInt(value, 10);
+        return (count >= 1 && count <= SNAPSHOTS_SAFETY_MAX_COUNT) ? count : SNAPSHOTS_SAFETY_DEFAULT_COUNT;
     }
 
     function refreshSnapshotsBadge() {
@@ -850,8 +876,15 @@
             if (!badge) return;
 
             var count = getSnapshotsKeepCount(value);
-            badge.textContent = tr('modals.snapshots.badge', { count: count }, count + ' automatic per note');
-            badge.className = 'setting-status enabled';
+            getSetting('snapshots_safety_keep_count', function (safetyValue) {
+                var safety = getSafetySnapshotsKeepCount(safetyValue);
+                badge.textContent = tr(
+                    'modals.snapshots.badge_with_safety',
+                    { count: count, safety: safety },
+                    count + ' automatic, ' + safety + ' safety per note'
+                );
+                badge.className = 'setting-status enabled';
+            });
         });
     }
 
@@ -861,7 +894,11 @@
         getSetting('snapshots_keep_count', function (value) {
             var input = document.getElementById('snapshotsKeepCountInput');
             if (input) input.value = String(getSnapshotsKeepCount(value));
-            modal.style.display = 'flex';
+            getSetting('snapshots_safety_keep_count', function (safetyValue) {
+                var safetyInput = document.getElementById('snapshotsSafetyKeepCountInput');
+                if (safetyInput) safetyInput.value = String(getSafetySnapshotsKeepCount(safetyValue));
+                modal.style.display = 'flex';
+            });
         });
     }
 
@@ -2963,15 +3000,23 @@
             saveSnapshotsBtn.addEventListener('click', function () {
                 var input = document.getElementById('snapshotsKeepCountInput');
                 var selected = String(getSnapshotsKeepCount(input ? input.value : ''));
+                var safetyInput = document.getElementById('snapshotsSafetyKeepCountInput');
+                var safetySelected = String(getSafetySnapshotsKeepCount(safetyInput ? safetyInput.value : ''));
                 setSetting('snapshots_keep_count', selected, function (success) {
-                    if (success) {
+                    if (!success) {
+                        alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                        return;
+                    }
+                    setSetting('snapshots_safety_keep_count', safetySelected, function (safetySuccess) {
+                        if (!safetySuccess) {
+                            alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                            return;
+                        }
                         try { closeModal('snapshotsSettingsModal'); } catch (e) {
-                            console.debug('settings-page: finishMarkdownColored() failed:', e);
+                            console.debug('settings-page: closeModal(snapshotsSettingsModal) failed:', e);
                         }
                         refreshSnapshotsBadge();
-                    } else {
-                        alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
-                    }
+                    });
                 });
             });
         }
@@ -3837,29 +3882,30 @@
             sectionLabelRefreshers.forEach(function (refresh) { refresh(); });
         });
 
-        // Deep link from the rail's About button: settings.php?open=about shows
-        // the About section on its own, instead of the default view where only
-        // "Pinned" is expanded.
-        if (new URLSearchParams(window.location.search || '').get('open') === 'about') {
-            var aboutGrid = document.getElementById('settings-documentation-section-grid');
+        // Deep link from the rail's About and My Profile buttons:
+        // settings.php?open=about / ?open=account shows that section on its
+        // own, instead of the default view where only "Pinned" is expanded.
+        var deepLinkGrid = document.getElementById(deepLinkSectionGridId() || '');
+        if (deepLinkGrid) {
             document.querySelectorAll('.settings-category-title').forEach(function (title) {
                 var grid = title.nextElementSibling;
                 if (!grid || !grid.classList.contains('home-grid')) return;
                 // The pinned section is hidden when empty; leave it as it is.
                 if (title.hidden) return;
-                var isAbout = grid === aboutGrid;
-                title.classList.toggle('section-collapsed', !isAbout);
-                grid.classList.toggle('section-collapsed', !isAbout);
+                var isTarget = grid === deepLinkGrid;
+                title.classList.toggle('section-collapsed', !isTarget);
+                grid.classList.toggle('section-collapsed', !isTarget);
                 var btn = title.querySelector('.settings-section-toggle');
-                if (btn) btn.setAttribute('aria-expanded', isAbout ? 'true' : 'false');
+                if (btn) btn.setAttribute('aria-expanded', isTarget ? 'true' : 'false');
             });
-            var aboutTitle = document.getElementById('settings-documentation-section-title');
-            if (aboutTitle && typeof aboutTitle.scrollIntoView === 'function') {
-                aboutTitle.scrollIntoView({ block: 'start' });
+            var deepLinkTitle = deepLinkGrid.previousElementSibling;
+            if (deepLinkTitle && typeof deepLinkTitle.scrollIntoView === 'function') {
+                deepLinkTitle.scrollIntoView({ block: 'start' });
             }
-            // ?open=about deliberately stays in the URL: icon_sidebar.php reads
-            // it to highlight About instead of Settings, so stripping it would
-            // move the highlight back to Settings on the next reload.
+            // ?open= deliberately stays in the URL: icon_sidebar.php reads it
+            // to highlight About or My Profile instead of Settings, so
+            // stripping it would move the highlight back to Settings on the
+            // next reload.
         }
 
         if (collapseAllBtn) {
@@ -4039,13 +4085,10 @@
                 navSections.push({ key: key, title: title, grid: grid, item: item });
             });
 
-            // Initial section: the rail's About deep link, then a #hash naming
-            // a section (title or grid id), then the saved choice, then the
-            // first listed section.
-            var initialKey = null;
-            if (new URLSearchParams(window.location.search || '').get('open') === 'about') {
-                initialKey = 'settings-documentation-section-grid';
-            }
+            // Initial section: the rail's About / My Profile deep link, then a
+            // #hash naming a section (title or grid id), then the saved
+            // choice, then the first listed section.
+            var initialKey = deepLinkSectionGridId();
             if (!initialKey && window.location.hash) {
                 var hashId = decodeURIComponent(window.location.hash.slice(1));
                 navSections.forEach(function (section) {

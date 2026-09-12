@@ -494,7 +494,7 @@
       "s3_storage": "Armazenar os anexos das notas em um armazenamento de objetos compatível com S3 em vez do disco local.",
       "s3_backup": "Envia arquivos de backup completos para um bucket compatível com S3, manualmente ou conforme um agendamento.",
       "highlight_current_folder_tree": "Esbater, tanto quanto quiser, as notas e pastas que estão fora da hierarquia de pastas em que está a trabalhar.",
-      "snapshots": "Escolher quantos instantâneos automáticos diários são guardados por nota."
+      "snapshots": "Escolha quantos instantâneos automáticos diários e quantos instantâneos de segurança (antes de uma edição por IA ou MCP) são guardados por nota."
     },
     "title": "Configurações",
     "collapse_section": "Recolher a seção",
@@ -1674,10 +1674,13 @@
     "snapshots": {
       "title": "Instantâneos",
       "description": "Número de instantâneos automáticos guardados por nota (um é criado por dia na primeira abertura da nota). Os instantâneos manuais criados com \"Criar instantâneo agora\" não contam. Todos os instantâneos expiram ao fim de {{days}} dias:",
+      "safety_description": "Número de instantâneos de segurança guardados por nota. É criado um mesmo antes de o assistente de IA ou o servidor MCP reescrever uma nota, e aparece como \"Antes da edição por IA\" ou \"Antes da edição por MCP\":",
       "options": {
-        "unit": "instantâneos automáticos"
+        "unit": "instantâneos automáticos",
+        "safety_unit": "instantâneos de segurança"
       },
       "badge": "{{count}} automáticos por nota",
+      "badge_with_safety": "{{count}} automáticos, {{safety}} de segurança por nota",
       "warning_title": "Os instantâneos guardam apenas o texto da nota. Os anexos nunca são copiados.",
       "warning": "Os anexos e as imagens são mantidos no disco mesmo depois de removidos de uma nota, enquanto um dos seus instantâneos ainda os contiver. Só são libertados quando o último instantâneo que os contém expira (no máximo ao fim de {{days}} dias) ou quando a nota é eliminada definitivamente."
     }

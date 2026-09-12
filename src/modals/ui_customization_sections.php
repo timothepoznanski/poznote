@@ -7,14 +7,15 @@
  *
  * Rendered twice: inside #uiCustomizationModal (modals.php, opened from the
  * settings page, where administrators also get the Users column) and inside
- * the contextual panel (ui_customization_panel.php) on the notes page and
- * the dashboard.
+ * the contextual panel (ui_customization_panel.php) on the notes page, the
+ * dashboard and the settings page.
  *
  * data-ui-pages names the pages an element can be seen on ('notes' for
- * index.php, 'dashboard' for dashboard.php, space separated); the panel only
- * lists the sections of the page it is opened on. Set on the section, an item
- * may override it (an empty value means "no live page": the item is only
- * offered in the modal). Sections without it never show in the panel.
+ * index.php, 'dashboard' for dashboard.php, 'settings' for settings.php,
+ * space separated); the panel only lists the sections of the page it is
+ * opened on. Set on the section, an item may override it (an empty value
+ * means "no live page": the item is only offered in the modal). Sections
+ * without it never show in the panel.
  */
 ?>
 <!-- Create Cards Section -->
@@ -32,7 +33,7 @@
 </div>
 
 <!-- Settings Cards Section -->
-<div class="ui-custom-section" data-ui-pages="">
+<div class="ui-custom-section" data-ui-pages="settings">
 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.settings_cards', [], 'Settings Cards'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
 <div class="ui-custom-items">
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:my-profile-card" checked><span><?php echo t_h('profile.card', [], 'My Profile'); ?></span></label>
@@ -86,6 +87,8 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:user-webhooks-card" checked><span><?php echo t_h('webhooks_user.card', [], 'User Webhooks'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:ai-assistant-card" checked><span><?php echo t_h('settings.cards.ai_assistant', [], 'AI Assistant'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:ai-assistant-user-card" checked><span><?php echo t_h('ai_settings_user.card', [], 'My AI Assistant'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:stt-card" checked><span><?php echo t_h('settings.cards.stt', [], 'Transcription'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:stt-user-card" checked><span><?php echo t_h('stt_settings_user.card', [], 'My transcription server'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:saas-card" checked><span><?php echo t_h('settings.cards.saas', [], 'SaaS mode'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:s3-storage-card" checked><span><?php echo t_h('settings.cards.s3_storage', [], 'S3 Attachments'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:s3-backup-card" checked><span><?php echo t_h('settings.cards.s3_backup', [], 'S3 Backups'); ?></span></label>
@@ -219,8 +222,8 @@
 </div>
 </div>
 
-<!-- Notes Page Icon Sidebar Section -->
-<div class="ui-custom-section" data-ui-pages="notes dashboard">
+<!-- Icon Sidebar Section -->
+<div class="ui-custom-section" data-ui-pages="notes dashboard settings">
 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.icon_sidebar', [], 'Icon sidebar'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
 <div class="ui-custom-items">
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarDashboardBtn" checked><span><?php echo t_h('common.back_to_home', [], 'Dashboard'); ?></span></label>

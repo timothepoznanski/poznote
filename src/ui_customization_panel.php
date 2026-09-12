@@ -8,9 +8,9 @@
  * option is seen where it happens instead of from the settings page.
  *
  * The including page sets $uiCustomizationPanelPage ('notes' for index.php,
- * 'dashboard' for dashboard.php): js/ui-customization-panel.js keeps the
- * sections of modals/ui_customization_sections.php whose data-ui-pages lists
- * it. It needs js/ui-customization.js (the runtime that applies the keys) and
+ * 'dashboard' for dashboard.php, 'settings' for settings.php):
+ * js/ui-customization-panel.js keeps the sections of
+ * modals/ui_customization_sections.php whose data-ui-pages lists it. It needs js/ui-customization.js (the runtime that applies the keys) and
  * css/ui-customization-panel.css plus css/modals/ui-customization.css for the
  * checklist itself.
  *
