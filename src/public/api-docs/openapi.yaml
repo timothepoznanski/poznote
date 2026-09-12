@@ -1567,9 +1567,12 @@ paths:
       tags: [Tasks]
       summary: Add a task to a note
       description: >
-        Appends one task to a task list note, without rewriting the note's
-        whole content array. When reminder is true, the matching notification
-        is scheduled from due_at automatically.
+        Appends one task to a task list note. The request carries only the new
+        task, so a client never has to read the list and send it back, and a
+        concurrent edit cannot be lost. The note itself stores its tasks as a
+        single JSON array, which the server rewrites, so the work done per call
+        grows with the length of the list. When reminder is true, the matching
+        notification is scheduled from due_at automatically.
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
         - name: id

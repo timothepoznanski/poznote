@@ -83,6 +83,7 @@ function initializeMasterDatabase(PDO $con): void {
             is_admin INTEGER DEFAULT 0,
             notify_new_user INTEGER DEFAULT 0,
             ai_chat_enabled INTEGER DEFAULT 0,
+            stt_enabled INTEGER DEFAULT 0,
             language TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -137,6 +138,13 @@ function initializeMasterDatabase(PDO $con): void {
         // individually; new profiles start without access.
         if (!in_array('ai_chat_enabled', $existingColumns)) {
             $con->exec("ALTER TABLE users ADD COLUMN ai_chat_enabled INTEGER DEFAULT 0");
+        }
+
+        // Per-user access to the transcription server, same shape and same
+        // reasoning as ai_chat_enabled above: the server is instance-wide,
+        // access to it is granted profile by profile.
+        if (!in_array('stt_enabled', $existingColumns)) {
+            $con->exec("ALTER TABLE users ADD COLUMN stt_enabled INTEGER DEFAULT 0");
         }
 
         // Interface language, mirrored from the per-user settings table on every
@@ -1117,7 +1125,7 @@ function updateUserProfile(int $id, array $data): array {
             return ['success' => false, 'error' => 'User profile not found'];
         }
         
-        $allowedFields = ['username', 'email', 'email_verified', 'first_name', 'last_name', 'active', 'is_admin', 'notify_new_user', 'ai_chat_enabled', 'oidc_subject', 'quota_max_notes', 'quota_max_storage_mb', 'quota_max_storage_s3_mb', 'quota_max_backups_s3_mb'];
+        $allowedFields = ['username', 'email', 'email_verified', 'first_name', 'last_name', 'active', 'is_admin', 'notify_new_user', 'ai_chat_enabled', 'stt_enabled', 'oidc_subject', 'quota_max_notes', 'quota_max_storage_mb', 'quota_max_storage_s3_mb', 'quota_max_backups_s3_mb'];
         $updates = [];
         $params = [];
 
@@ -1185,7 +1193,7 @@ function updateUserProfile(int $id, array $data): array {
 
         foreach ($data as $key => $value) {
             if (in_array($key, $allowedFields)) {
-                if ($key === 'active' || $key === 'is_admin' || $key === 'notify_new_user' || $key === 'ai_chat_enabled') {
+                if ($key === 'active' || $key === 'is_admin' || $key === 'notify_new_user' || $key === 'ai_chat_enabled' || $key === 'stt_enabled') {
                     $value = (int)(bool)$value;
                 }
                 $updates[] = "$key = ?";
@@ -1222,9 +1230,14 @@ function updateUserProfile(int $id, array $data): array {
         }
 
         // A deactivated profile keeps no AI grant: reactivating it should not
-        // silently restore access the admin granted long ago.
+        // silently restore access the admin granted long ago. Transcription
+        // access is granted the same way and is dropped for the same reason.
         if ($newActive !== 1 && !array_key_exists('ai_chat_enabled', $data)) {
             $updates[] = "ai_chat_enabled = 0";
+        }
+
+        if ($newActive !== 1 && !array_key_exists('stt_enabled', $data)) {
+            $updates[] = "stt_enabled = 0";
         }
 
         $updates[] = "updated_at = CURRENT_TIMESTAMP";
@@ -1882,6 +1895,82 @@ function isAiChatAllowedForUser(?int $userId): bool {
     try {
         $con = getMasterConnection();
         $stmt = $con->prepare("SELECT ai_chat_enabled FROM users WHERE id = ? AND active = 1");
+        $stmt->execute([$userId]);
+        $value = $stmt->fetchColumn();
+        return $value !== false && (int)$value === 1;
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+/**
+ * List the active profiles that can be granted access to the transcription
+ * server, with their current opt-in state. Same list as the AI assistant one,
+ * reading the other column.
+ */
+function listSttCandidates(): array {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->query("
+            SELECT id, username, email, first_name, last_name, is_admin, stt_enabled
+            FROM users
+            WHERE active = 1
+            ORDER BY username
+        ");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+/**
+ * Replace the set of users allowed to use the instance transcription server.
+ * Ids that are not eligible profiles are ignored rather than rejected.
+ */
+function setSttUsers(array $userIds): bool {
+    try {
+        $con = getMasterConnection();
+
+        $eligible = [];
+        foreach (listSttCandidates() as $candidate) {
+            $eligible[(int)$candidate['id']] = true;
+        }
+
+        $selected = [];
+        foreach ($userIds as $userId) {
+            $userId = (int)$userId;
+            if (isset($eligible[$userId])) {
+                $selected[$userId] = true;
+            }
+        }
+
+        $con->beginTransaction();
+        $con->exec("UPDATE users SET stt_enabled = 0 WHERE stt_enabled = 1");
+        if (!empty($selected)) {
+            $stmt = $con->prepare("UPDATE users SET stt_enabled = 1 WHERE id = ?");
+            foreach (array_keys($selected) as $userId) {
+                $stmt->execute([$userId]);
+            }
+        }
+        $con->commit();
+        return true;
+    } catch (Exception $e) {
+        if (isset($con) && $con instanceof PDO && $con->inTransaction()) {
+            $con->rollBack();
+        }
+        error_log('Failed to save transcription access list: ' . $e->getMessage());
+        return false;
+    }
+}
+
+/** Whether this profile may use the instance transcription configuration. */
+function isSttAllowedForUser(?int $userId): bool {
+    if ($userId === null || $userId <= 0) {
+        return false;
+    }
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("SELECT stt_enabled FROM users WHERE id = ? AND active = 1");
         $stmt->execute([$userId]);
         $value = $stmt->fetchColumn();
         return $value !== false && (int)$value === 1;

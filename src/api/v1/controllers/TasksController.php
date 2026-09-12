@@ -4,7 +4,10 @@
  *
  * Aggregates the tasks of every tasklist note in a workspace for the
  * global tasks page (tasks.php), and exposes per-task CRUD so API/MCP
- * clients can manage a single task without rewriting the whole note.
+ * clients can address a single task: they send that task alone instead of
+ * reading the note and sending a whole new list back, which is what makes
+ * concurrent edits safe. The note itself is still rewritten server-side on
+ * every call, so the cost of one is proportional to the size of the list.
  *
  * Task content is stored as a JSON array in the note body. The on-disk
  * entry file is the source of truth; the database `entry` column is only

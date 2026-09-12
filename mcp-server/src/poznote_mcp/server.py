@@ -843,7 +843,12 @@ def add_task(
     reminder_email: Optional[bool] = None,
     user_id: Optional[int] = None,
 ) -> str:
-    """Add a single task to a tasklist note, without rewriting the whole list
+    """Add a single task to a tasklist note
+
+    You send only the new task: there is no need to read the list first and
+    send it back, so a concurrent edit cannot be overwritten. (The note stores
+    its tasks as one JSON array, which the server rewrites for you, so the
+    cost of a call still grows with the length of the list.)
 
     Args:
         note_id: ID of the tasklist note
