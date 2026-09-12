@@ -403,6 +403,50 @@ def search_notes(query: str, workspace: Optional[str] = None, limit: int = 10, c
     }, indent=2, ensure_ascii=False)
 
 
+@mcp.tool()
+def list_templates(workspace: Optional[str] = None, user_id: Optional[int] = None) -> str:
+    """List the template notes available to create_note's from_template_id
+
+    A template is an ordinary note kept in a folder named "Templates" (any
+    depth below it counts) or anywhere in a workspace of that name; the word
+    also works in the other shipped languages, so a "Modeles" folder counts
+    too. Read one with get_note, or pass its id to create_note as
+    from_template_id.
+
+    Args:
+        workspace: Only consider the "Templates" folders of this workspace.
+            Omit to list the templates of every workspace.
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        templates = client.list_templates(workspace=workspace, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    formatted = [
+        {
+            "id": t.get("id"),
+            "title": t.get("heading", "Untitled"),
+            "note_type": t.get("type"),
+            "workspace": t.get("workspace"),
+            "folder_id": t.get("folder_id"),
+        }
+        for t in templates
+    ]
+
+    result = {
+        "count": len(formatted),
+        "templates": formatted,
+    }
+    if workspace is not None:
+        result["workspace"] = workspace
+
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
 def _normalize_content(content, note_type=None):
     """Normalize note content into the string the backend API expects.
 
@@ -464,11 +508,12 @@ def _reminder_result(client, note_id: int, reminder_at, recurrence, message, ema
 @mcp.tool()
 def create_note(
     title: str,
-    content: Union[str, list],
+    content: Optional[Union[str, list]] = None,
     workspace: Optional[str] = None,
     tags: Optional[str] = None,
     folder: Optional[str] = None,
     note_type: str = "note",
+    from_template_id: Optional[int] = None,
     user_id: Optional[int] = None,
     reminder_at: Optional[str] = None,
     reminder_recurrence: Optional[str] = None,
@@ -481,10 +526,16 @@ def create_note(
         title: Title of the new note
         content: Content of the note. Always a plain string (HTML or Markdown).
             For task lists, pass the JSON array serialized as a string.
+            Optional only when from_template_id is given, which then supplies
+            the content; passing both appends this content to the template.
         workspace: Workspace name (optional)
         tags: Comma-separated tags (e.g., 'ai, docs, important')
         folder: Folder name to place the note in
         note_type: Note type/format. Supported: 'note' (HTML, default), 'markdown', 'tasklist'.
+            Ignored when from_template_id is given without a note_type of your
+            own: the template's own format is used.
+        from_template_id: ID of a template note (see list_templates) whose
+            content the new note starts from.
         user_id: User profile ID to access (optional, overrides default)
         reminder_at: Due date/reminder for the note as an ISO datetime
             (e.g. '2026-09-01T09:00:00+02:00'). Sets the same reminder the bell
@@ -498,6 +549,29 @@ def create_note(
     client, err = _get_client_or_error()
     if err:
         return err
+
+    # A template supplies the content, and its own format unless the caller
+    # asked for one. Reading it here rather than server-side keeps create_note
+    # a single tool call for the agent while the REST API stays unchanged.
+    template_note_type = None
+    if from_template_id is not None:
+        try:
+            template = client.get_note(int(from_template_id), workspace=None, user_id=user_id)
+        except Exception as exc:
+            return _api_error_json(exc)
+        if template is None:
+            return json.dumps(
+                {"error": f"Template note {from_template_id} not found"}, ensure_ascii=False
+            )
+        template_body = template.get("content", "") or ""
+        template_note_type = template.get("type")
+        content = template_body if content is None else template_body + str(content)
+
+    if content is None:
+        return json.dumps(
+            {"error": "content is required (or pass from_template_id to take it from a template)"},
+            ensure_ascii=False,
+        )
 
     # Normalize note_type for convenience (allow 'html' as an alias of 'note')
     # If note_type is missing/empty, default to HTML (note).
@@ -515,6 +589,12 @@ def create_note(
                 },
                 ensure_ascii=False,
             )
+
+    # 'note' is this tool's default, so it cannot be told apart from a caller
+    # who asked for HTML; a template's own format wins over it, which keeps a
+    # Markdown template from being pasted into a rich-text note.
+    if template_note_type in {"note", "markdown"} and note_type == "note":
+        note_type = template_note_type
 
     content = _normalize_content(content, note_type)
 

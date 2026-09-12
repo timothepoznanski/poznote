@@ -164,6 +164,23 @@ class PoznoteClient:
             return data.get("results", [])
         return []
     
+    def list_templates(self, workspace: str | None = None, user_id: str | int | None = None) -> list[dict]:
+        """List the notes the "/template" command can insert
+
+        A template is an ordinary note kept in a folder named "Templates"
+        (at any depth below it) or in a workspace of that name.
+        """
+        params = {}
+        self._set_workspace(params, workspace)
+
+        response = self.client.get("/notes/templates", params=params, headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+
+        if data.get("success"):
+            return data.get("notes", [])
+        return []
+
     def create_note(
         self,
         title: str,

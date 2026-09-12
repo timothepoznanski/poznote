@@ -45,7 +45,7 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 - `get_note` — Get a specific note by ID with full content
 - `list_notes` — List all notes from a workspace
 - `search_notes` — Search notes by text query, with optional creation date range
-- `create_note` — Create a new note, optionally with a due date/reminder (⚠️ if no workspace is specified in the prompt, the note is created in the user's default workspace; always specify the target workspace)
+- `create_note` — Create a new note, optionally from a template and/or with a due date/reminder (⚠️ if no workspace is specified in the prompt, the note is created in the user's default workspace; always specify the target workspace)
 - `update_note` — Update an existing note, and/or set its due date/reminder
 - `delete_note` — Delete a note by ID
 - `get_reminder` — Get the reminder currently set on a note
@@ -60,6 +60,7 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 - `list_folders` — List all folders from a workspace
 - `list_workspaces` — List all available workspaces
 - `list_tags` — List all unique tags used in notes
+- `list_templates` — List the template notes `create_note`'s `from_template_id` can start from
 - `get_trash` — List all notes currently in the trash
 - `empty_trash` — Permanently delete all notes in the trash
 - `restore_note` — Restore a note from the trash
@@ -89,6 +90,8 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 - `delete_backup` — Delete a specific backup file
 - `get_app_setting` — Get the value of a specific application setting
 - `update_app_setting` — Update the value of a specific application setting
+
+**Templates.** A template is an ordinary note kept in a folder named `Templates` (any depth below it counts) or anywhere in a workspace of that name; the word is recognised in every shipped language, so a `Modèles` folder works too. `list_templates` returns them with their ids, and `create_note(from_template_id=…)` starts a new note from one, taking the template's own format unless you pass a `note_type`. Passing `content` as well appends it after the template body.
 
 **Reminders and tasks.** `reminder_at` (on `create_note`/`update_note` and `set_reminder`) is an ISO datetime such as `2026-09-01T09:00:00+02:00`; include an offset, or the time is read as UTC. Task due dates (`due_at`) are different: they are local wall-clock values, `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM` with no offset, resolved through the user's configured timezone, and a date without a time reminds at 09:00. Repeat intervals use `<count><unit>` with unit `i`/`h`/`d`/`w`/`m`/`y`, for example `30i`, `1d` or `2w`.
 
