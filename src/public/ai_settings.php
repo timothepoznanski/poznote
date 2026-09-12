@@ -111,6 +111,32 @@ $aiLocalHost = aiChatLocalDefaultHost();
     <?php poznoteRenderStylesheets('ai_settings'); ?>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <style>
+    /* Per-user AI access list */
+    /* Instances can have many profiles: keep the list from burying the
+       provider/model fields below it */
+    .ai-user-list {
+        display: flex; flex-direction: column; gap: 2px; margin-top: 8px;
+        max-height: 260px; overflow-y: auto;
+        border: 1px solid #dfe3e8; border-radius: 6px; padding: 6px 10px;
+    }
+    html[data-theme='dark'] .ai-user-list,
+    body.dark-mode .ai-user-list { border-color: var(--dm-border, #404040); }
+    .ai-user-filter { margin-top: 8px; }
+    .ai-user { display: flex; align-items: center; gap: 10px; padding: 6px 4px; cursor: pointer; }
+    .ai-user[hidden] { display: none; }
+    .ai-user-empty { padding: 8px 4px; font-size: 0.9rem; opacity: 0.7; }
+    .ai-user input[type="checkbox"] { flex: 0 0 auto; margin: 0; }
+    /* Name and username stay on a single line, the username giving way first
+       when the row is too narrow */
+    .ai-user-copy { display: flex; align-items: baseline; gap: 6px; line-height: 1.3; min-width: 0; }
+    .ai-user-name { font-weight: 500; white-space: nowrap; }
+    .ai-user-meta {
+        font-size: 0.85rem; opacity: 0.7;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .ai-user-meta::before { content: '\00b7'; margin-right: 6px; }
+    </style>
 </head>
 <body class="home-page git-sync-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php $iconSidebarWorkspace = $pageWorkspace; include __DIR__ . '/../icon_sidebar.php'; ?>
