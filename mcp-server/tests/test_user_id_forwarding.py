@@ -22,7 +22,9 @@ def test_headers_for_user_overrides_default_user_and_preserves_auth():
         assert headers["X-User-ID"] == "2"
         assert headers["Authorization"] == "Bearer secret-token"
         assert headers["Accept"] == "application/json"
-        assert headers["Content-Type"] == "application/json"
+        # Content-Type is httpx's to set per request: json= and the multipart
+        # of an attachment upload need different ones (see add_attachment).
+        assert "Content-Type" not in headers
     finally:
         client.close()
 

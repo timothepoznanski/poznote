@@ -67,6 +67,7 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 - `duplicate_note` — Create a duplicate of an existing note
 - `toggle_favorite` — Toggle the favorite status of a note
 - `list_attachments` — List all attachments for a specific note
+- `add_attachment` — Attach a file to a note from its base64 content (image, log, PDF, …)
 - `move_note` — Move a note to another workspace and/or folder, keeping its id
 - `move_folder` — Move a folder (with its subfolders and notes) under another parent and/or into another workspace
 - `move_note_to_folder` — Move a note to a specific folder
@@ -92,6 +93,8 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 - `delete_backup` — Delete a specific backup file
 - `get_app_setting` — Get the value of a specific application setting
 - `update_app_setting` — Update the value of a specific application setting
+
+**Attachments.** `add_attachment(note_id, filename, content_base64)` stores a file on a note exactly as a drag-and-drop in the web UI does, so a generated chart or a log file can be attached without a human in the loop; a `data:` URI is accepted as the content. Poznote's own rules still apply, so an executable type and a full storage quota come back as a refusal carrying the reason. The bytes travel base64-encoded inside the tool call, so the tool caps an upload at 25 MB and points at the web UI for anything larger.
 
 **Moving things.** `move_note` and `move_folder` move, they do not copy: ids, content, history and the links pointing at a note all survive. On `update_note`, `workspace` says where to *look the note up*; the argument that moves it is `target_workspace`. A note that changes workspace without being given a folder of the destination lands at that workspace's root, since its old folder belongs to the workspace it left. A folder takes its subfolders and every note inside them along.
 

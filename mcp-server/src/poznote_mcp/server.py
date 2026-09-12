@@ -27,6 +27,8 @@ Inbound authentication:
 
 import argparse
 import atexit
+import base64
+import binascii
 import hmac
 import json
 import logging
@@ -146,6 +148,11 @@ def _assert_port_available(host: str, port: int) -> None:
 # Largest page GET /notes serves in one call; list_notes refuses more so the
 # caller gets a clear error instead of the API's 400.
 MAX_NOTES_PAGE_SIZE = 1000
+
+# Largest attachment add_attachment accepts. Poznote itself allows 200 MB, but
+# the bytes reach this tool base64-encoded inside a JSON tool call, which is a
+# bad way to carry a film; refuse early and say so instead of timing out.
+MAX_ATTACHMENT_BYTES = 25 * 1024 * 1024
 
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8045
@@ -1451,6 +1458,108 @@ def move_note_to_folder(note_id: int, folder_id: int, user_id: Optional[int] = N
     except Exception as exc:
         return _api_error_json(exc)
     return json.dumps({"success": success, "message": f"Note {note_id} moved to folder {folder_id}" if success else "Failed to move note"}, ensure_ascii=False)
+
+
+@mcp.tool()
+def add_attachment(
+    note_id: int,
+    filename: str,
+    content_base64: str,
+    mime_type: Optional[str] = None,
+    workspace: Optional[str] = None,
+    user_id: Optional[int] = None,
+) -> str:
+    """Attach a file to a note, from its base64 content
+
+    Use it to hand a note a chart, a screenshot, a log file or any document
+    the note should carry. The file is stored the way a drag-and-drop in the
+    web UI stores it, and list_attachments then shows it.
+
+    Poznote refuses executable file types, and the account's storage quota
+    applies, so the answer can be a refusal carrying the reason.
+
+    Args:
+        note_id: ID of the note the file is attached to
+        filename: Name the file is stored and shown under, extension included
+            ('chart.png', 'run-2026-09-12.log'). The extension decides how
+            Poznote treats the file.
+        content_base64: The file's bytes, base64-encoded. Standard base64,
+            with or without padding and line breaks; a data: URI prefix is
+            accepted and stripped.
+        mime_type: Content type of the file ('image/png'). Optional: Poznote
+            detects it from the bytes and the extension anyway.
+        workspace: Workspace of the note (optional)
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    if not filename or not str(filename).strip():
+        return json.dumps({"error": "filename is required"}, ensure_ascii=False)
+
+    raw = (content_base64 or "").strip()
+    if not raw:
+        return json.dumps({"error": "content_base64 is required"}, ensure_ascii=False)
+
+    # Agents often paste the whole data: URI they were handed.
+    if raw.startswith("data:"):
+        header, _, payload = raw.partition(",")
+        if not payload:
+            return json.dumps({"error": "content_base64 is not a valid data: URI"}, ensure_ascii=False)
+        raw = payload
+        if mime_type is None and header.startswith("data:"):
+            declared = header[5:].split(";", 1)[0].strip()
+            if declared:
+                mime_type = declared
+
+    try:
+        content = base64.b64decode(raw, validate=False)
+    except (binascii.Error, ValueError) as exc:
+        return json.dumps(
+            {"error": "content_base64 is not valid base64", "detail": str(exc)}, ensure_ascii=False
+        )
+
+    if not content:
+        return json.dumps({"error": "content_base64 decodes to an empty file"}, ensure_ascii=False)
+
+    if len(content) > MAX_ATTACHMENT_BYTES:
+        return json.dumps(
+            {
+                "error": "Attachment too large for a tool call",
+                "size": len(content),
+                "max_size": MAX_ATTACHMENT_BYTES,
+                "hint": "Upload large files through the web UI.",
+            },
+            ensure_ascii=False,
+        )
+
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        result = client.add_attachment(
+            note_id=note_id,
+            filename=str(filename).strip(),
+            content=content,
+            mime_type=mime_type,
+            workspace=workspace,
+            user_id=user_id,
+        )
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    if not result.get("success"):
+        return json.dumps(
+            {"success": False, "error": result.get("error", "Failed to attach the file")},
+            indent=2,
+            ensure_ascii=False,
+        )
+
+    return json.dumps({
+        "success": True,
+        "message": f"'{filename}' attached to note {note_id}",
+        "note_id": note_id,
+        "attachment_id": result.get("attachment_id"),
+        "filename": result.get("filename", filename),
+        "size": len(content),
+    }, indent=2, ensure_ascii=False)
 
 
 @mcp.tool()
