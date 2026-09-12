@@ -35,6 +35,7 @@ import logging
 import os
 import socket
 import sys
+import time
 from typing import Optional, Union
 
 import httpx
@@ -257,6 +258,79 @@ def _get_client_or_error() -> tuple[PoznoteClient | None, str | None]:
         )
 
     return client, None
+
+
+# The workspace a write lands in when the caller names none. Resolved per
+# profile and remembered briefly, since it costs two API calls (issue #1373).
+DEFAULT_WORKSPACE_SETTING = "mcp_default_workspace"
+_DEFAULT_WORKSPACE_TTL = 60.0
+_default_workspace_cache: dict[str, tuple[float, str]] = {}
+
+
+def _forget_default_workspace() -> None:
+    """Drop the cache after this server changed the set of workspaces."""
+    _default_workspace_cache.clear()
+
+
+def _resolve_workspace(client, workspace: Optional[str], user_id: Optional[int]) -> tuple[Optional[str], Optional[str]]:
+    """The workspace a write goes to, or a JSON error explaining why it cannot.
+
+    Omitting the workspace used to fall through to the API's "first workspace",
+    which is whichever one sorts first: creating a workspace, or archiving a
+    note (which makes "Archives"), silently moved where later notes landed.
+    A default has to be either stable or absent, so:
+
+      1. the workspace the caller named, when it named one;
+      2. the mcp_default_workspace setting, when it names a real workspace;
+      3. the only workspace there is, which cannot be ambiguous;
+      4. otherwise no guess at all: the caller is told to name one.
+    """
+    if workspace is not None and str(workspace).strip():
+        return str(workspace).strip(), None
+
+    cache_key = str(user_id if user_id is not None else "")
+    cached = _default_workspace_cache.get(cache_key)
+    if cached and (time.monotonic() - cached[0]) < _DEFAULT_WORKSPACE_TTL:
+        return cached[1], None
+
+    try:
+        names = [w.get("name") for w in client.list_workspaces(user_id=user_id) if w.get("name")]
+    except Exception as exc:
+        return None, _api_error_json(exc)
+
+    configured = ""
+    try:
+        setting = client.get_setting(DEFAULT_WORKSPACE_SETTING, user_id=user_id)
+        configured = str((setting or {}).get("value") or "").strip()
+    except Exception:
+        # The setting is a convenience, not a requirement: a server that
+        # cannot read it still resolves a single-workspace account.
+        configured = ""
+
+    resolved = None
+    if configured and configured in names:
+        resolved = configured
+    elif len(names) == 1:
+        resolved = names[0]
+
+    if resolved is None:
+        return None, json.dumps(
+            {
+                "error": "No workspace given, and no stable default to fall back on.",
+                "hint": (
+                    "Pass workspace explicitly, or set the "
+                    f"{DEFAULT_WORKSPACE_SETTING} setting (update_app_setting) to the "
+                    "workspace MCP writes should go to."
+                ),
+                "workspaces": names,
+                "configured_default": configured or None,
+            },
+            indent=2,
+            ensure_ascii=False,
+        )
+
+    _default_workspace_cache[cache_key] = (time.monotonic(), resolved)
+    return resolved, None
 
 
 def _api_error_json(exc: Exception) -> str:
@@ -577,7 +651,10 @@ def create_note(
             For task lists, pass the JSON array serialized as a string.
             Optional only when from_template_id is given, which then supplies
             the content; passing both appends this content to the template.
-        workspace: Workspace name (optional)
+        workspace: Workspace to create it in. Omit it only when you mean the
+            account's default: the mcp_default_workspace setting, or the only
+            workspace there is. With several workspaces and no setting, the
+            call is refused rather than guessing, and lists them for you.
         tags: Comma-separated tags (e.g., 'ai, docs, important')
         folder: Folder to place the note in, as a name or a path
             ('Diary/2026/08'). Missing levels of a path are created. A bare
@@ -650,6 +727,10 @@ def create_note(
         note_type = template_note_type
 
     content = _normalize_content(content, note_type)
+
+    workspace, err = _resolve_workspace(client, workspace, user_id)
+    if err:
+        return err
 
     try:
         result = client.create_note(
@@ -1190,7 +1271,10 @@ def create_folder(
     Args:
         folder_name: Name of the new folder (a single level; use folder_path
             for a nested one)
-        workspace: Workspace name (optional)
+        workspace: Workspace to create it in. Omit it only when you mean the
+            account's default: the mcp_default_workspace setting, or the only
+            workspace there is. With several workspaces and no setting, the
+            call is refused rather than guessing, and lists them for you.
         parent_folder_id: ID of the parent folder (optional, creates folder at root if not specified)
         folder_path: Slash-separated path of the folder to create, e.g.
             'Projects/2026/Q3'. Takes precedence over folder_name.
@@ -1228,6 +1312,11 @@ def create_folder(
     client, err = _get_client_or_error()
     if err:
         return err
+
+    workspace, err = _resolve_workspace(client, workspace, user_id)
+    if err:
+        return err
+
     try:
         result = client.create_folder(
             folder_name=folder_name,
@@ -2026,6 +2115,8 @@ def create_workspace(name: str, user_id: Optional[int] = None) -> str:
         result = client.create_workspace(name, user_id=user_id)
     except Exception as exc:
         return _api_error_json(exc)
+    # The set of workspaces changed, so a remembered default may be stale.
+    _forget_default_workspace()
     if result:
         return json.dumps({"success": True, "message": f"Workspace '{name}' created", "workspace": result}, indent=2, ensure_ascii=False)
     else:
@@ -2051,6 +2142,8 @@ def rename_workspace(current_name: str, new_name: str, user_id: Optional[int] = 
         result = client.rename_workspace(current_name, new_name, user_id=user_id)
     except Exception as exc:
         return _api_error_json(exc)
+    # The set of workspaces changed, so a remembered default may be stale.
+    _forget_default_workspace()
     if result:
         return json.dumps({"success": True, "message": f"Workspace renamed from '{current_name}' to '{new_name}'", "workspace": result}, indent=2, ensure_ascii=False)
     else:
@@ -2072,6 +2165,8 @@ def delete_workspace(name: str, user_id: Optional[int] = None) -> str:
         success = client.delete_workspace(name, user_id=user_id)
     except Exception as exc:
         return _api_error_json(exc)
+    # The set of workspaces changed, so a remembered default may be stale.
+    _forget_default_workspace()
     if success:
         return json.dumps({"success": True, "message": f"Workspace '{name}' deleted"}, indent=2, ensure_ascii=False)
     else:

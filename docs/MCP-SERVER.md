@@ -45,7 +45,7 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 - `get_note` — Get a specific note by ID with full content
 - `list_notes` — List the notes of a workspace, one page at a time (`limit`/`offset`, with the workspace's real `total` in the result)
 - `search_notes` — Search notes by text query, with optional creation date range
-- `create_note` — Create a new note, optionally from a template and/or with a due date/reminder (⚠️ if no workspace is specified in the prompt, the note is created in the user's default workspace; always specify the target workspace)
+- `create_note` — Create a new note, optionally from a template and/or with a due date/reminder
 - `update_note` — Update an existing note, move it, and/or set its due date/reminder
 - `delete_note` — Delete a note by ID
 - `get_reminder` — Get the reminder currently set on a note
@@ -93,6 +93,8 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 - `delete_backup` — Delete a specific backup file
 - `get_app_setting` — Get the value of a specific application setting
 - `update_app_setting` — Update the value of a specific application setting
+
+**Which workspace a write goes to.** Always name the `workspace` on `create_note` and `create_folder`: it is the only way to be sure. When one is omitted, the server resolves it in a fixed order and never guesses: the `mcp_default_workspace` setting when it names a workspace that exists, then the account's only workspace when it has just one. With several workspaces and no setting, the call is refused and the answer lists them, rather than landing the note in whichever workspace happens to sort first (which used to move on its own, for instance the first time archiving a note created "Archives"). Set the default with `update_app_setting("mcp_default_workspace", "<name>")`.
 
 **Attachments.** `add_attachment(note_id, filename, content_base64)` stores a file on a note exactly as a drag-and-drop in the web UI does, so a generated chart or a log file can be attached without a human in the loop; a `data:` URI is accepted as the content. Poznote's own rules still apply, so an executable type and a full storage quota come back as a refusal carrying the reason. The bytes travel base64-encoded inside the tool call, so the tool caps an upload at 25 MB and points at the web UI for anything larger.
 

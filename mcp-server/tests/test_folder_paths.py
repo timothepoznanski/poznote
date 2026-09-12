@@ -108,6 +108,7 @@ def test_create_folder_needs_a_name_or_a_path():
 def test_create_folder_surfaces_the_conflict_instead_of_a_bare_failure():
     client = MagicMock()
     client.create_folder.return_value = {"error": "Folder already exists", "folder": {"id": 4}, "missing_segment": None}
+    client.list_workspaces.return_value = [{"name": "Poznote"}]
 
     with patch.object(server, "_get_client_or_error", return_value=(client, None)):
         payload = json.loads(server.create_folder(folder_path="Projects/2026/Q3"))
