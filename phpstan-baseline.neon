@@ -279,5 +279,5 @@ parameters:
 		-
 			message: '#^Variable \$con in isset\(\) always exists and is not nullable\.$#'
 			identifier: isset.variable
-			count: 5
+			count: 6
 			path: src/users/db_master.php

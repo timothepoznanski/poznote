@@ -268,6 +268,7 @@ if ($noteId <= 0 || $attachmentId === '') {
     sttJsonError(400, 'Note id and attachment id are required');
 }
 
+$row = null;
 try {
     $stmt = $con->prepare('SELECT attachments, linked_note_id FROM entries WHERE id = ?');
     $stmt->execute([$noteId]);
