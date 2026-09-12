@@ -42,18 +42,39 @@
         return map;
     }
 
+    // Pages whose hideable elements are all rendered server side under the id
+    // the key names, so an absent element means the page does not offer it to
+    // this user: the settings page leaves out the administrator cards and the
+    // cards of the features that are switched off, and the icon rail its
+    // conditional buttons. Elsewhere a key may name an element built later
+    // (menu entries, toolbar buttons), which must stay listed.
+    var PRUNE_MISSING_PAGES = { settings: true };
+
     // Keeps only the sections and items whose data-ui-pages names this page
     // (see modals/ui_customization_sections.php).
     function pruneForPage(page) {
+        var pruneMissing = !!PRUNE_MISSING_PAGES[page];
+
         function pagesOf(element, fallback) {
             var attr = element.getAttribute('data-ui-pages');
             return attr === null ? fallback : attr.split(/\s+/).filter(Boolean);
         }
 
+        // A hidden card is still in the DOM (the runtime only sets
+        // display: none on it), so unchecking one never drops it from the
+        // list.
+        function isOnPage(item) {
+            if (!pruneMissing) return true;
+            var checkbox = item.querySelector('[data-ui-key]');
+            var key = checkbox ? checkbox.getAttribute('data-ui-key') : '';
+            if (key.indexOf('card:') !== 0) return true;
+            return !!document.getElementById(key.slice('card:'.length));
+        }
+
         panel.querySelectorAll('.ui-custom-section').forEach(function (section) {
             var sectionPages = pagesOf(section, []);
             section.querySelectorAll('.ui-custom-item').forEach(function (item) {
-                if (pagesOf(item, sectionPages).indexOf(page) === -1) {
+                if (pagesOf(item, sectionPages).indexOf(page) === -1 || !isOnPage(item)) {
                     item.parentNode.removeChild(item);
                 }
             });

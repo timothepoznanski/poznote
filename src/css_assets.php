@@ -468,6 +468,7 @@ function poznoteCssManifest(): array
             'css/settings.css',
             '@modals',
             'css/modals/ui-customization.css',
+            'css/ui-customization-panel.css',
             'css/background-image.css',
             'css/custom-css.css',
             '@theme',

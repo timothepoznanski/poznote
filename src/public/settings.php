@@ -1447,6 +1447,15 @@ if ($canUseUserWebhooks) {
     </div>
     <?php endif; ?>
 
+    <?php
+    // Contextual UI Customization: floating button at the bottom-right + docked
+    // column listing the hideable elements of this page (the settings cards and
+    // the icon rail), see ui_customization_panel.php. The card above opens the
+    // same checklist in a modal, with the instance-wide column for admins.
+    $uiCustomizationPanelPage = 'settings';
+    include __DIR__ . '/../ui_customization_panel.php';
+    ?>
+
     <?php include __DIR__ . '/../modals.php'; ?>
     <script type="application/json" id="page-config-data"><?php
         echo json_encode($settingsPageConfig, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
@@ -1482,6 +1491,10 @@ if ($canUseUserWebhooks) {
     </script>
     <script src="js/settings-page.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/settings-page.js') ?: time(); ?>"></script>
     <script src="js/ui-customization.js?v=<?php echo $cache_v; ?>"></script>
+    <!-- Contextual UI Customization panel (see ui_customization_panel.php);
+         js/panel-back.js lets the device Back button close it on a phone. -->
+    <script src="<?php echo poznoteAsset('js/panel-back.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/ui-customization-panel.js'); ?>"></script>
     <script src="js/change-password.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/change-password.js') ?: time(); ?>"></script>
     <script src="js/app-passwords.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/app-passwords.js') ?: time(); ?>"></script>
     <!-- js/profile.js (My Profile card and modal) is loaded by icon_sidebar.php,
