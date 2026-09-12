@@ -362,7 +362,11 @@ class FoldersController {
             return;
         }
         
-        $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, color, display_order, created FROM folders WHERE workspace = ?');
+        // Flag the legacy name-matched diary root before reading the column,
+        // so a journal that predates is_diary is reported as the diary it is.
+        getDiaryRoots($this->db, $workspace);
+
+        $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, color, display_order, is_diary, created FROM folders WHERE workspace = ?');
         $stmt->execute([$workspace]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -378,6 +382,7 @@ class FoldersController {
                 'color' => $r['color'] ?? null,
                 'color_hex' => !empty($r['color']) ? (resolveNoteColorHex($r['color']) ?: null) : null,
                 'display_order' => (int)($r['display_order'] ?? 0),
+                'is_diary' => (int)($r['is_diary'] ?? 0) === 1,
                 'created' => $r['created'] ?? null,
             ];
         }
@@ -394,6 +399,7 @@ class FoldersController {
                     'color' => $f['color'],
                     'color_hex' => $f['color_hex'],
                     'display_order' => $f['display_order'],
+                    'is_diary' => $f['is_diary'],
                     'path' => $this->computeFolderPath($id, $foldersById),
                 ];
             }
@@ -418,6 +424,7 @@ class FoldersController {
                     'color' => $f['color'],
                     'color_hex' => $f['color_hex'],
                     'display_order' => $f['display_order'],
+                    'is_diary' => $f['is_diary'],
                     'path' => $this->computeFolderPath($id, $foldersById),
                 ];
             }
@@ -508,6 +515,11 @@ class FoldersController {
         $parentFolderId = $data['parent_folder_id'] ?? $data['parent_id'] ?? null;
         if ($parentFolderId !== null) $parentFolderId = (int)$parentFolderId;
         $parentFolderKey = isset($data['parent_folder_key']) ? trim((string)$data['parent_folder_key']) : null;
+        // A diary is a root folder flagged is_diary: the "New diary entry"
+        // button files its notes into the flagged root, so a folder merely
+        // named "Diary" is not one and the UI builds a second tree next to it
+        // (issue #1371). Creating one over the API needs the flag, not a name.
+        $isDiary = isset($data['is_diary']) ? filter_var($data['is_diary'], FILTER_VALIDATE_BOOLEAN) : false;
         
         // Validate workspace
         if (!$this->validateWorkspace($workspace)) {
@@ -528,6 +540,11 @@ class FoldersController {
             
             if (empty($segments)) {
                 $this->sendError('Invalid folder_path', 400);
+                return;
+            }
+
+            if ($isDiary && count($segments) > 1) {
+                $this->sendError('A diary is a root folder: is_diary needs a single-segment folder_path', 400);
                 return;
             }
             
@@ -573,8 +590,8 @@ class FoldersController {
                     return;
                 }
                 
-                $insertStmt = $this->db->prepare("INSERT INTO folders (name, workspace, parent_id, created) VALUES (?, ?, ?, datetime('now'))");
-                $ok = $insertStmt->execute([$seg, $workspace, $parentId]);
+                $insertStmt = $this->db->prepare("INSERT INTO folders (name, workspace, parent_id, is_diary, created) VALUES (?, ?, ?, ?, datetime('now'))");
+                $ok = $insertStmt->execute([$seg, $workspace, $parentId, ($isDiary && $isLast) ? 1 : 0]);
                 if (!$ok) {
                     $this->sendError('Failed to insert folder', 500);
                     return;
@@ -609,6 +626,7 @@ class FoldersController {
                     'name' => $finalName,
                     'workspace' => $workspace,
                     'parent_id' => $finalParentId,
+                    'is_diary' => $isDiary,
                     'path' => $folderPath
                 ],
                 'folder_id' => $finalFolderId,
@@ -622,6 +640,11 @@ class FoldersController {
         $err = $this->validateFolderSegment($folderName);
         if ($err !== null) {
             $this->sendError($err, 400);
+            return;
+        }
+
+        if ($isDiary && ($parentFolderId !== null || ($parentFolder !== null && $parentFolder !== '') || $parentFolderKey !== null)) {
+            $this->sendError('A diary is a root folder: is_diary cannot be combined with a parent folder', 400);
             return;
         }
         
@@ -671,13 +694,41 @@ class FoldersController {
         }
         
         if ((int)$checkStmt->fetchColumn() > 0) {
+            // A root folder of that name already exists. Turning it into a
+            // diary is what the diary UI does, and the folder's notes stay in
+            // place; anything else is still a conflict.
+            if ($isDiary) {
+                $existing = $this->db->prepare('SELECT id, is_diary FROM folders WHERE name = ? AND workspace = ? AND parent_id IS NULL');
+                $existing->execute([$folderName, $workspace]);
+                $row = $existing->fetch(PDO::FETCH_ASSOC);
+                if ($row && (int)$row['is_diary'] !== 1) {
+                    $this->db->prepare('UPDATE folders SET is_diary = 1 WHERE id = ?')->execute([(int)$row['id']]);
+                    $this->sendJson([
+                        'success' => true,
+                        'message' => 'Existing folder turned into a diary',
+                        'converted' => true,
+                        'folder' => [
+                            'id' => (int)$row['id'],
+                            'name' => $folderName,
+                            'workspace' => $workspace,
+                            'parent_id' => null,
+                            'is_diary' => true,
+                        ],
+                        'folder_id' => (int)$row['id'],
+                        'folder_name' => $folderName,
+                        'parent_id' => null
+                    ], 200);
+                    return;
+                }
+            }
+
             $this->sendJson(['success' => false, 'error' => 'Folder already exists in this location'], 409);
             return;
         }
         
         // Create folder
-        $stmt = $this->db->prepare("INSERT INTO folders (name, workspace, parent_id, created) VALUES (?, ?, ?, datetime('now'))");
-        $result = $stmt->execute([$folderName, $workspace, $parentId]);
+        $stmt = $this->db->prepare("INSERT INTO folders (name, workspace, parent_id, is_diary, created) VALUES (?, ?, ?, ?, datetime('now'))");
+        $result = $stmt->execute([$folderName, $workspace, $parentId, $isDiary ? 1 : 0]);
         
         if (!$result) {
             $this->sendError('Failed to insert folder', 500);
@@ -694,6 +745,7 @@ class FoldersController {
                 'name' => $folderName,
                 'workspace' => $workspace,
                 'parent_id' => $parentId,
+                'is_diary' => $isDiary,
             ],
             'folder_id' => $folderId,
             'folder_name' => $folderName,

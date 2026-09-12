@@ -56,8 +56,8 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 - `update_task` — Update one task (text, due date, reminder, important flag)
 - `complete_task` — Mark a task as done, or reopen it
 - `delete_task` — Delete one task from a tasklist note
-- `create_folder` — Create a folder, by name or by path (`folder_path="Projects/2026/Q3"` makes the whole chain in one call)
-- `list_folders` — List all folders from a workspace
+- `create_folder` — Create a folder, by name or by path (`folder_path="Projects/2026/Q3"` makes the whole chain in one call), or a diary root with `is_diary=true`
+- `list_folders` — List all folders from a workspace, with their paths and diary flags
 - `list_workspaces` — List all available workspaces
 - `list_tags` — List all unique tags used in notes
 - `list_templates` — List the template notes `create_note`'s `from_template_id` can start from
@@ -92,6 +92,8 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 - `update_app_setting` — Update the value of a specific application setting
 
 **Folders.** Every tool that takes a folder takes the same thing: a name, or a slash-separated path. `create_note(folder="Diary/2026/08")` creates the missing levels on the way down; `create_folder(folder_path=…)` does the same for a folder; `list_notes(folder_id=…)` scopes a listing to one folder server-side, so its `total` counts that folder alone. A bare name reaches an existing folder at any depth when only one folder of the workspace carries it, rather than creating a second one at the root; when several do, the call is refused and lists them, so pass the full path or the id.
+
+**Diaries.** A diary is not just a folder named Diary: it is a root folder carrying the `is_diary` flag, and the "New diary entry" button of the UI files its dated notes into the flagged root. Create one with `create_folder(folder_name="Journal", is_diary=true)`, and `list_folders` tells you which folders are diaries. Passing a name that a root folder already carries turns that folder into a diary and keeps its notes. Diary entries themselves are ordinary notes: file them with `create_note(folder="Journal/2026/09")`.
 
 **Templates.** A template is an ordinary note kept in a folder named `Templates` (any depth below it counts) or anywhere in a workspace of that name; the word is recognised in every shipped language, so a `Modèles` folder works too. `list_templates` returns them with their ids, and `create_note(from_template_id=…)` starts a new note from one, taking the template's own format unless you pass a `note_type`. Passing `content` as well appends it after the template body.
 

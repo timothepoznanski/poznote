@@ -2694,7 +2694,9 @@ paths:
           description: Return as nested tree structure
       responses:
         '200':
-          description: List of folders
+          description: >
+            List of folders. Each carries its full path and is_diary, which marks
+            the diary roots of the workspace.
     post:
       tags: [Folders]
       summary: Create a new folder
@@ -2721,6 +2723,15 @@ paths:
                 create_parents:
                   type: boolean
                   description: With folder_path, create the missing parent levels instead of failing
+                  default: false
+                is_diary:
+                  type: boolean
+                  description: >
+                    Create the folder as a diary root, the folder the "New diary entry"
+                    button files its dated notes into. A diary is always at the root of
+                    its workspace, so this cannot be combined with a parent folder or a
+                    nested path. When a root folder of that name already exists, it is
+                    turned into a diary (200, converted true) instead of conflicting.
                   default: false
                 workspace:
                   type: string

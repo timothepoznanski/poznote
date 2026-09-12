@@ -337,18 +337,23 @@ class PoznoteClient:
         user_id: str | int | None = None,
         folder_path: str | None = None,
         create_parents: bool = False,
+        is_diary: bool = False,
     ) -> dict | None:
         """
         Create a new folder, by name or by path
 
         With folder_path ("Projects/2026/Q3"), the whole chain is created in
-        one call when create_parents is set.
+        one call when create_parents is set. With is_diary, the folder is
+        created as a diary root (a root folder only).
 
         Returns the created folder with its ID, or a dict carrying "error"
         when the API refused (an existing folder answers 409).
         """
         payload: dict = {}
         self._set_workspace(payload, workspace)
+
+        if is_diary:
+            payload["is_diary"] = True
 
         if folder_path:
             payload["folder_path"] = folder_path

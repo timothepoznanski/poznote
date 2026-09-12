@@ -1149,9 +1149,10 @@ def create_folder(
     parent_folder_id: Optional[int] = None,
     folder_path: Optional[str] = None,
     create_parents: bool = True,
+    is_diary: bool = False,
     user_id: Optional[int] = None,
 ) -> str:
-    """Create a folder, by name or by path
+    """Create a folder, by name or by path, optionally as a diary
 
     Pass folder_path to create a whole chain in one call:
     create_folder(folder_path="Projects/2026/Q3") makes the missing levels on
@@ -1166,14 +1167,33 @@ def create_folder(
             'Projects/2026/Q3'. Takes precedence over folder_name.
         create_parents: With folder_path, create the missing parent levels
             (default). Set false to fail instead when a level is missing.
+        is_diary: Create the folder as a diary root, the thing the "New diary
+            entry" button of the UI files its dated notes into. A diary is
+            always at the root of its workspace, so this cannot be combined
+            with a parent folder or a nested path. When a root folder of that
+            name already exists, it becomes the diary and keeps its notes.
         user_id: User profile ID to access (optional, overrides default)
     """
     target = (folder_path or "").strip() or (folder_name or "").strip()
     if not target:
         return json.dumps({"error": "folder_name or folder_path is required"}, ensure_ascii=False)
 
-    # A name carrying a slash is a path, whichever argument it arrived in.
-    if "/" in target:
+    if is_diary:
+        if "/" in target:
+            return json.dumps(
+                {"error": "A diary is a root folder: pass its name, not a path.", "folder": target},
+                ensure_ascii=False,
+            )
+        if parent_folder_id is not None:
+            return json.dumps(
+                {"error": "A diary is a root folder: it cannot have a parent folder."},
+                ensure_ascii=False,
+            )
+        # The by-name route is the one that turns an existing root folder of
+        # that name into a diary instead of refusing it.
+        folder_name, folder_path = target, None
+    elif "/" in target:
+        # A name carrying a slash is a path, whichever argument it arrived in.
         folder_path, folder_name = target, None
     
     client, err = _get_client_or_error()
@@ -1187,6 +1207,7 @@ def create_folder(
             user_id=user_id,
             folder_path=folder_path,
             create_parents=create_parents,
+            is_diary=is_diary,
         )
     except Exception as exc:
         return _api_error_json(exc)
@@ -1197,9 +1218,10 @@ def create_folder(
         )
     
     if result:
+        kind = "Diary" if is_diary else "Folder"
         return json.dumps({
             "success": True,
-            "message": f"Folder '{target}' created successfully",
+            "message": f"{kind} '{target}' created successfully",
             "folder": result,
         }, indent=2, ensure_ascii=False)
     else:
@@ -1209,7 +1231,10 @@ def create_folder(
 @mcp.tool()
 def list_folders(workspace: Optional[str] = None, user_id: Optional[int] = None) -> str:
     """List all folders from a specific workspace
-    
+
+    Each folder carries its full path and is_diary, which marks the diary
+    roots the "New diary entry" button files dated notes into.
+
     Args:
         workspace: Workspace name (optional)
         user_id: User profile ID to access (optional, overrides default)
