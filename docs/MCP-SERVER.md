@@ -43,7 +43,7 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 
 ### Tools (actions)
 - `get_note` — Get a specific note by ID with full content
-- `list_notes` — List all notes from a workspace
+- `list_notes` — List the notes of a workspace, one page at a time (`limit`/`offset`, with the workspace's real `total` in the result)
 - `search_notes` — Search notes by text query, with optional creation date range
 - `create_note` — Create a new note, optionally from a template and/or with a due date/reminder (⚠️ if no workspace is specified in the prompt, the note is created in the user's default workspace; always specify the target workspace)
 - `update_note` — Update an existing note, and/or set its due date/reminder

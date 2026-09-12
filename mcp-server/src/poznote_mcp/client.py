@@ -97,22 +97,51 @@ class PoznoteClient:
         if workspace:
             target["workspace"] = workspace
     
-    def list_notes(self, workspace: str | None = None, user_id: str | int | None = None) -> list[dict]:
+    def list_notes(
+        self,
+        workspace: str | None = None,
+        user_id: str | int | None = None,
+        limit: int | None = None,
+        offset: int | None = None,
+        folder_id: int | None = None,
+        folder: str | None = None,
+    ) -> dict:
         """
-        List all notes
-        
-        Returns list of notes with: id, heading, tags, folder, workspace, updated, created
+        List notes, one page at a time
+
+        Returns the API payload: 'notes' (id, heading, tags, folder,
+        workspace, updated, created), plus 'total', the number of notes
+        matching the filters, and 'has_more'. The server pages the query, so
+        'total' is the real count even when a page was asked for.
         """
-        params = {}
+        params: dict = {}
         self._set_workspace(params, workspace)
+        if limit is not None:
+            params["limit"] = limit
+        if offset:
+            params["offset"] = offset
+        if folder_id is not None:
+            params["folder_id"] = folder_id
+        if folder:
+            params["folder"] = folder
         
         response = self.client.get("/notes", params=params, headers=self._headers_for_user(user_id))
         response.raise_for_status()
         data = response.json()
         
         if data.get("success"):
-            return data.get("notes", [])
-        return []
+            notes = data.get("notes", [])
+            return {
+                "notes": notes,
+                # Older Poznote servers answer without these fields; falling
+                # back to the page size keeps the caller working, it just
+                # cannot detect truncation there.
+                "total": int(data.get("total", len(notes))),
+                "offset": int(data.get("offset", offset or 0)),
+                "limit": data.get("limit", limit),
+                "has_more": bool(data.get("has_more", False)),
+            }
+        return {"notes": [], "total": 0, "offset": offset or 0, "limit": limit, "has_more": False}
     
     def get_note(self, note_id: int, workspace: str | None = None, user_id: str | int | None = None) -> dict | None:
         """

@@ -143,6 +143,10 @@ def _assert_port_available(host: str, port: int) -> None:
     if last_error is not None:
         raise last_error
 
+# Largest page GET /notes serves in one call; list_notes refuses more so the
+# caller gets a clear error instead of the API's 400.
+MAX_NOTES_PAGE_SIZE = 1000
+
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8045
 AUTH_TOKEN_ENV = "POZNOTE_MCP_AUTH_TOKEN"
@@ -318,29 +322,44 @@ def get_note(id: int, workspace: Optional[str] = None, user_id: Optional[int] = 
 
 
 @mcp.tool()
-def list_notes(workspace: Optional[str] = None, limit: int = 50, user_id: Optional[int] = None) -> str:
-    """List all notes from a specific workspace
-    
+def list_notes(
+    workspace: Optional[str] = None,
+    limit: int = 50,
+    offset: int = 0,
+    user_id: Optional[int] = None,
+) -> str:
+    """List the notes of a workspace, one page at a time
+
+    The result carries "total", the number of notes the workspace actually
+    holds, next to "count", the size of this page: when "has_more" is true,
+    call again with offset raised by the page size to get the rest. A page
+    is never silently truncated.
+
     Args:
         workspace: Workspace name (optional)
-        limit: Maximum number of results (default: 50)
+        limit: Page size, 1-1000 (default: 50)
+        offset: Number of notes to skip before this page (default: 0)
         user_id: User profile ID to access (optional, overrides default)
     """
     client, err = _get_client_or_error()
     if err:
         return err
+
+    page_size = int(limit) if limit else MAX_NOTES_PAGE_SIZE
+    if page_size < 1 or page_size > MAX_NOTES_PAGE_SIZE:
+        return json.dumps(
+            {"error": f"limit must be between 1 and {MAX_NOTES_PAGE_SIZE}"}, ensure_ascii=False
+        )
+    start = max(0, int(offset or 0))
+
     try:
-        notes = client.list_notes(workspace=workspace, user_id=user_id)
+        page = client.list_notes(workspace=workspace, user_id=user_id, limit=page_size, offset=start)
     except Exception as exc:
         return _api_error_json(exc)
     
-    # Limit results if specified
-    if limit and len(notes) > limit:
-        notes = notes[:limit]
-    
     # Format for AI consumption
     formatted = []
-    for note in notes:
+    for note in page["notes"]:
         formatted.append({
             "id": note.get("id"),
             "title": note.get("heading", "Untitled"),
@@ -352,8 +371,14 @@ def list_notes(workspace: Optional[str] = None, limit: int = 50, user_id: Option
     
     result = {
         "count": len(formatted),
+        "total": page["total"],
+        "offset": start,
+        "limit": page_size,
+        "has_more": page["has_more"],
         "notes": formatted,
     }
+    if page["has_more"]:
+        result["next_offset"] = start + len(formatted)
     if workspace is not None:
         result["workspace"] = workspace
 

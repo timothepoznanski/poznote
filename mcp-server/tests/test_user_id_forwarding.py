@@ -148,7 +148,8 @@ def test_tool_handlers_forward_user_id(mock_gcoe, tool_name, call_kwargs, client
     import poznote_mcp.server as srv
 
     client = MagicMock()
-    client.list_notes.return_value = []
+    # list_notes returns a page, not a bare list, since #1370
+    client.list_notes.return_value = {"notes": [], "total": 0, "offset": 0, "limit": 50, "has_more": False}
     client.create_note.return_value = {"id": 1}
     client.create_folder.return_value = {"id": 1}
     mock_gcoe.return_value = (client, None)

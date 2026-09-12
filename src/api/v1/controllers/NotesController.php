@@ -11,6 +11,8 @@ require_once __DIR__ . '/../../../users/db_master.php';
 class NotesController {
     private PDO $con;
     private const DEFAULT_NOTE_ICON = 'lucide-file-text';
+    /** Largest page GET /notes will return in one call */
+    private const MAX_NOTES_PAGE_SIZE = 1000;
 
     public function __construct(PDO $con) {
         $this->con = $con;
@@ -542,6 +544,12 @@ class NotesController {
      *   - search: Search query to filter notes by heading or content
      *   - created_from: Filter notes created on or after this date (YYYY-MM-DD)
      *   - created_to: Filter notes created on or before this date (YYYY-MM-DD)
+     *   - limit: Maximum number of notes to return (1-1000, default: all)
+     *   - offset: Number of notes to skip, for paging through a limit
+     *
+     * The response always carries 'total', the number of notes the filters
+     * match, next to 'count', the size of the page returned: a caller can
+     * tell a full workspace from a truncated page (see issue #1370).
      */
     public function index(): void {
         $workspace = $_GET['workspace'] ?? null;
@@ -555,8 +563,28 @@ class NotesController {
         $createdToRaw = trim((string)($_GET['created_to'] ?? ''));
         $createdFrom = normalizeDateOnlyFilter($createdFromRaw);
         $createdTo = normalizeDateOnlyFilter($createdToRaw);
+        $limitRaw = trim((string)($_GET['limit'] ?? ''));
+        $offsetRaw = trim((string)($_GET['offset'] ?? ''));
         
         try {
+            $limit = null;
+            if ($limitRaw !== '') {
+                if (!ctype_digit($limitRaw) || (int)$limitRaw < 1 || (int)$limitRaw > self::MAX_NOTES_PAGE_SIZE) {
+                    $this->sendError(400, 'limit must be an integer between 1 and ' . self::MAX_NOTES_PAGE_SIZE);
+                    return;
+                }
+                $limit = (int)$limitRaw;
+            }
+
+            $offset = 0;
+            if ($offsetRaw !== '') {
+                if (!ctype_digit($offsetRaw)) {
+                    $this->sendError(400, 'offset must be a non-negative integer');
+                    return;
+                }
+                $offset = (int)$offsetRaw;
+            }
+
             if ($createdFromRaw !== '' && $createdFrom === '') {
                 $this->sendError(400, 'created_from must use YYYY-MM-DD format');
                 return;
@@ -588,33 +616,34 @@ class NotesController {
                 return;
             }
             
-            // Build query for notes
-            $sql = "SELECT id, heading, type, tags, folder, folder_id, workspace, updated, created, favorite, icon, icon_color, color, content_width, display_order, dashboard_order FROM entries WHERE trash = 0";
+            // Build query for notes. The filters live in $where on their own,
+            // so the COUNT(*) below matches the page exactly.
+            $where = " WHERE trash = 0";
             $params = [];
             
             if ($workspace) {
-                $sql .= " AND workspace = ?";
+                $where .= " AND workspace = ?";
                 $params[] = $workspace;
             }
             
             if ($folder) {
-                $sql .= " AND folder = ?";
+                $where .= " AND folder = ?";
                 $params[] = $folder;
             }
             
             if ($folderId) {
-                $sql .= " AND folder_id = ?";
+                $where .= " AND folder_id = ?";
                 $params[] = $folderId;
             }
 
             if ($favorite !== null) {
-                $sql .= " AND favorite = ?";
+                $where .= " AND favorite = ?";
                 $params[] = $favorite;
             }
             
             // Add search filter if provided
             if ($search !== null && $search !== '') {
-                $sql .= " AND (remove_accents(heading) LIKE remove_accents(?) 
+                $where .= " AND (remove_accents(heading) LIKE remove_accents(?) 
                          OR remove_accents(search_clean_entry(entry, type)) LIKE remove_accents(?))";
                 $params[] = '%' . $search . '%';
                 $params[] = '%' . $search . '%';
@@ -622,17 +651,19 @@ class NotesController {
 
             $createdFromUtc = dateOnlyFilterToUtcBoundary($createdFrom, false);
             if ($createdFromUtc !== null) {
-                $sql .= " AND created >= ?";
+                $where .= " AND created >= ?";
                 $params[] = $createdFromUtc;
             }
 
             $createdToUtc = dateOnlyFilterToUtcBoundary($createdTo, true);
             if ($createdToUtc !== null) {
-                $sql .= " AND created <= ?";
+                $where .= " AND created <= ?";
                 $params[] = $createdToUtc;
             }
 
-            $this->appendPublicWorkspaceAgeFilter($sql, $params);
+            $this->appendPublicWorkspaceAgeFilter($where, $params);
+
+            $sql = "SELECT id, heading, type, tags, folder, folder_id, workspace, updated, created, favorite, icon, icon_color, color, content_width, display_order, dashboard_order FROM entries" . $where;
             
             // Handle sorting
             $notes_without_folders_after = false;
@@ -676,8 +707,25 @@ class NotesController {
                 }
             }
             
+            // How many notes the filters match, whatever the page asked for.
+            // Counting before paging is what lets a caller tell "this is the
+            // whole workspace" from "there is more after this page".
+            $countStmt = $this->con->prepare("SELECT COUNT(*) FROM entries" . $where);
+            $countStmt->execute($params);
+            $total = (int)$countStmt->fetchColumn();
+
             $sql .= " ORDER BY " . $order_by;
-            
+
+            if ($limit !== null) {
+                $sql .= " LIMIT ? OFFSET ?";
+                $params[] = $limit;
+                $params[] = $offset;
+            } elseif ($offset > 0) {
+                // SQLite needs a LIMIT before an OFFSET; -1 means "no limit".
+                $sql .= " LIMIT -1 OFFSET ?";
+                $params[] = $offset;
+            }
+
             $stmt = $this->con->prepare($sql);
             $stmt->execute($params);
             
@@ -690,7 +738,14 @@ class NotesController {
                 $notes[] = $row;
             }
             
-            $this->sendSuccess(['notes' => $notes]);
+            $this->sendSuccess([
+                'notes' => $notes,
+                'count' => count($notes),
+                'total' => $total,
+                'offset' => $offset,
+                'limit' => $limit,
+                'has_more' => ($offset + count($notes)) < $total,
+            ]);
             
         } catch (Exception $e) {
             $this->sendError(500, 'Database error occurred');

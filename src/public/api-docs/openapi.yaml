@@ -368,7 +368,11 @@ paths:
     get:
       tags: [Notes]
       summary: List notes
-      description: Get list of notes with optional filters
+      description: >
+        Get list of notes with optional filters. The response carries total,
+        the number of notes matching the filters, next to count, the size of
+        the page returned, so a truncated page is never mistaken for a
+        complete one. Page through a large workspace with limit and offset.
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
         - name: workspace
@@ -420,6 +424,19 @@ paths:
           schema:
             type: boolean
           description: Include folder information
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+          description: Maximum number of notes to return. Omit to return them all.
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+          description: Number of notes to skip, for paging through a limit
       responses:
         '200':
           description: List of notes
@@ -434,6 +451,26 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Note'
+                  count:
+                    type: integer
+                    description: Number of notes in this page
+                  total:
+                    type: integer
+                    description: Number of notes matching the filters, ignoring limit/offset
+                  offset:
+                    type: integer
+                  limit:
+                    type: integer
+                    nullable: true
+                  has_more:
+                    type: boolean
+                    description: True when notes remain after this page
+        '400':
+          description: Invalid limit, offset or date filter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     post:
       tags: [Notes]
       summary: Create a new note
