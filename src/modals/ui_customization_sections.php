@@ -87,6 +87,8 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:user-webhooks-card" checked><span><?php echo t_h('webhooks_user.card', [], 'User Webhooks'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:ai-assistant-card" checked><span><?php echo t_h('settings.cards.ai_assistant', [], 'AI Assistant'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:ai-assistant-user-card" checked><span><?php echo t_h('ai_settings_user.card', [], 'My AI Assistant'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:stt-card" checked><span><?php echo t_h('settings.cards.stt', [], 'Transcription'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:stt-user-card" checked><span><?php echo t_h('stt_settings_user.card', [], 'My transcription server'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:saas-card" checked><span><?php echo t_h('settings.cards.saas', [], 'SaaS mode'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:s3-storage-card" checked><span><?php echo t_h('settings.cards.s3_storage', [], 'S3 Attachments'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:s3-backup-card" checked><span><?php echo t_h('settings.cards.s3_backup', [], 'S3 Backups'); ?></span></label>

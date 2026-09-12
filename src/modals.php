@@ -1258,6 +1258,46 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
+<!--
+  Dictation modal (js/speech-to-text.js). Three panels in one dialog, shown one
+  at a time: recording, then the wait while the server transcribes, then the
+  text to review before it lands in the note. Reviewing rather than inserting
+  straight away is deliberate: a transcript is a guess, and this is also where
+  the recording can be kept as an attachment.
+-->
+<div id="dictateModal" class="modal">
+    <div class="modal-content dictate-modal-content">
+        <h3><i class="lucide lucide-mic"></i> <?php echo t_h('stt.modal.title', [], 'Dictate'); ?></h3>
+
+        <div class="dictate-panel" id="dictateRecordPanel">
+            <div class="dictate-level" id="dictateLevel" aria-hidden="true"><span class="dictate-level-bar" id="dictateLevelBar"></span></div>
+            <div class="dictate-timer" id="dictateTimer">0:00</div>
+            <p class="dictate-hint" id="dictateHint"><?php echo t_h('stt.modal.recording_hint', [], 'Speak, then stop the recording to have it transcribed.'); ?></p>
+        </div>
+
+        <div class="dictate-panel" id="dictateWorkPanel" hidden>
+            <p class="dictate-hint"><i class="lucide lucide-loader"></i> <span id="dictateWorkLabel"><?php echo t_h('stt.modal.transcribing', [], 'Transcribing...'); ?></span></p>
+        </div>
+
+        <div class="dictate-panel" id="dictateReviewPanel" hidden>
+            <label class="dictate-review-label" for="dictateText"><?php echo t_h('stt.modal.review_label', [], 'Transcription'); ?></label>
+            <textarea id="dictateText" rows="7" spellcheck="true"></textarea>
+            <label class="dictate-keep" id="dictateKeepRow">
+                <input type="checkbox" id="dictateKeepAudio">
+                <span><?php echo t_h('stt.modal.keep_audio', [], 'Also attach the recording to this note'); ?></span>
+            </label>
+        </div>
+
+        <p class="dictate-error" id="dictateError" hidden></p>
+
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" id="dictateCancelBtn"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="dictateStopBtn"><i class="lucide lucide-square"></i> <?php echo t_h('stt.modal.stop', [], 'Stop and transcribe'); ?></button>
+            <button type="button" class="btn-primary" id="dictateInsertBtn" hidden><?php echo t_h('stt.modal.insert', [], 'Insert'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Note Reference Modal -->
 <div id="attachmentPickerModal" class="modal">
     <div class="modal-content note-reference-modal-content">

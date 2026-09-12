@@ -580,6 +580,35 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
+            <!-- My transcription server (personal speech-to-text server) -->
+            <div class="home-card settings-card-clickable" id="stt-user-card" data-href="stt_settings_user.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('stt_settings_user.card_help', [], 'Send your dictation to your own speech-to-text server.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-mic"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('stt_settings_user.card', [], 'My transcription server'); ?></span>
+                    <?php
+                    require_once __DIR__ . '/../stt_config.php';
+                    $sttUserKeysAllowedCard = poznoteSttUserKeysAllowed();
+                    $sttUserConfigCard = poznoteSttUserConfig($con);
+                    $sttUserHasConfigCard = $sttUserConfigCard['url'] !== '' && $sttUserConfigCard['model'] !== '';
+                    $sttUserActiveCard = $sttUserKeysAllowedCard && poznoteSttConfigUsable($sttUserConfigCard);
+                    ?>
+                    <span class="setting-status <?php echo $sttUserActiveCard ? 'enabled' : 'disabled'; ?>">
+                        <?php
+                        if ($sttUserActiveCard) {
+                            echo t_h('common.enabled', [], 'Enabled');
+                        } elseif ($sttUserKeysAllowedCard && !$sttUserHasConfigCard) {
+                            echo t_h('git_sync.config.not_configured', [], 'Not configured');
+                        } else {
+                            echo t_h('common.disabled', [], 'Disabled');
+                        }
+                        ?>
+                    </span>
+                </div>
+            </div>
+
             <!-- Browser Extension -->
             <a href="https://chromewebstore.google.com/detail/poznote-url-saver/bmjclfamahegmgillaghhmnbkjebipbh" target="_blank" rel="noopener noreferrer" class="home-card" id="extension-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.extension', [], 'Install the browser extension to save web pages into Poznote.'); ?>"><i class="lucide lucide-help-circle"></i></span>
@@ -1102,6 +1131,37 @@ if ($canUseUserWebhooks) {
                         if ($aiChatEnabledCard) {
                             echo t_h('common.enabled', [], 'Enabled');
                         } elseif (!$aiInstanceCompleteCard) {
+                            echo t_h('git_sync.config.not_configured', [], 'Not configured');
+                        } else {
+                            echo t_h('common.disabled', [], 'Disabled');
+                        }
+                        ?>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Transcription (instance-wide speech-to-text server) -->
+            <div class="home-card settings-card-clickable" id="stt-card" data-href="stt_settings.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.stt', [], 'Configure the speech-to-text server used to dictate notes and transcribe audio attachments.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-mic"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.stt', [], 'Transcription'); ?></span>
+                    <?php
+                    require_once __DIR__ . '/../stt_config.php';
+                    // Three states, like the AI Assistant card above: switched on
+                    // with no server or no model is not "disabled", it is waiting
+                    // for the rest of its configuration.
+                    $sttInstanceCard = poznoteSttInstanceConfig();
+                    $sttInstanceCompleteCard = $sttInstanceCard['url'] !== '' && $sttInstanceCard['model'] !== '';
+                    $sttEnabledCard = $sttInstanceCard['enabled'] && $sttInstanceCompleteCard;
+                    ?>
+                    <span class="setting-status <?php echo $sttEnabledCard ? 'enabled' : 'disabled'; ?>">
+                        <?php
+                        if ($sttEnabledCard) {
+                            echo t_h('common.enabled', [], 'Enabled');
+                        } elseif (!$sttInstanceCompleteCard) {
                             echo t_h('git_sync.config.not_configured', [], 'Not configured');
                         } else {
                             echo t_h('common.disabled', [], 'Disabled');

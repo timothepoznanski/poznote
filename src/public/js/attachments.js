@@ -305,6 +305,10 @@ function displayAttachments(attachments) {
     var html = '';
     var titleView = tr('attachments.actions.view', {}, 'View');
     var titleDelete = tr('attachments.actions.delete', {}, 'Delete');
+    var titleTranscribe = tr('stt.attachment.transcribe', {}, 'Transcribe');
+    // Only when a transcription server is configured for this user; the
+    // endpoint checks the same thing again (see api_transcribe.php).
+    var canTranscribe = !!(window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.speechToText);
     for (var i = 0; i < attachments.length; i++) {
         var attachment = attachments[i];
         var fileSize = formatFileSize(attachment.file_size);
@@ -312,9 +316,9 @@ function displayAttachments(attachments) {
             ? window.poznoteFormatDateTime(attachment.uploaded_at, { defaultDateOnly: true })
             : new Date(attachment.uploaded_at).toLocaleDateString();
 
-        html += '<div class="attachment-item">';
-        html += '<div class="attachment-info">';
         var safeFilename = attachment.original_filename.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        html += '<div class="attachment-item" data-attachment-id="' + attachment.id + '" data-filename="' + safeFilename + '">';
+        html += '<div class="attachment-info">';
         html += '<strong>' + safeFilename + '</strong><br>';
         html += '<small>' + fileSize + ' - ' + uploadDate + '</small>';
         html += '</div>';
@@ -322,6 +326,11 @@ function displayAttachments(attachments) {
         html += '<button onclick="downloadAttachment(\'' + attachment.id + '\')" title="' + titleView + '">';
         html += '<i class="lucide lucide-eye"></i>';
         html += '</button>';
+        if (canTranscribe && isAudioAttachment(attachment)) {
+            html += '<button onclick="transcribeAttachmentFromList(\'' + attachment.id + '\')" title="' + titleTranscribe + '">';
+            html += '<i class="lucide lucide-mic"></i>';
+            html += '</button>';
+        }
         html += '<button onclick="deleteAttachment(\'' + attachment.id + '\')" title="' + titleDelete + '" class="delete-btn">';
         html += '<i class="lucide lucide-trash-2"></i>';
         html += '</button>';
@@ -330,6 +339,42 @@ function displayAttachments(attachments) {
     }
 
     container.innerHTML = html;
+}
+
+/**
+ * An attachment a speech-to-text server can be asked to read. Mirrors
+ * poznoteAttachmentPreviewKind() server-side: the recorded type when there is
+ * one, the extension otherwise, because files uploaded long ago often carry
+ * neither a type nor a useful one.
+ */
+function isAudioAttachment(attachment) {
+    var type = String(attachment.file_type || attachment.mime_type || attachment.type || '').toLowerCase();
+    if (type.indexOf('audio/') === 0) return true;
+    var name = String(attachment.original_filename || attachment.filename || '').toLowerCase();
+    return /\.(mp3|wav|ogg|m4a|flac)$/.test(name);
+}
+
+/**
+ * Transcribe one of the note's audio attachments. The modal that opens is the
+ * dictation one (js/speech-to-text.js), which is also where the text is
+ * reviewed before it goes into the note.
+ */
+function transcribeAttachmentFromList(attachmentId, noteId) {
+    var noteIdToUse = noteId || currentNoteIdForAttachments;
+    if (!noteIdToUse) {
+        showNotificationPopup(tr('attachments.errors.no_note_selected', {}, 'No note selected'), 'error');
+        return;
+    }
+    if (typeof window.transcribeAttachment !== 'function') return;
+
+    var row = document.querySelector('.attachment-item[data-attachment-id="' + attachmentId + '"]');
+    var filename = row ? (row.getAttribute('data-filename') || '') : '';
+
+    // The attachments dialog would sit on top of the transcription one
+    if (typeof window.closeModal === 'function') {
+        window.closeModal('attachmentModal');
+    }
+    window.transcribeAttachment(noteIdToUse, attachmentId, filename);
 }
 
 function downloadAttachment(attachmentId, noteId) {

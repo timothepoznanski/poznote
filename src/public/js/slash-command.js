@@ -1527,6 +1527,13 @@
         });
     }
 
+    // Dictation needs a transcription server; index.php says whether this user
+    // has one (see poznoteResolveSttConfig()). Read at menu-open time rather
+    // than at load, so it holds whatever the page was served with.
+    function isSpeechToTextAvailable() {
+        return !!(window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.speechToText);
+    }
+
     function isSlashCommandHidden(commandId) {
         var config = window.PoznoteUiCustomization;
         return !!(config && config.hiddenKeyMap && config.hiddenKeyMap['slash:' + commandId]);
@@ -2019,6 +2026,22 @@
                 label: t('slash_menu.take_photo', null, 'Take a photo'),
                 action: function () { insertImage(true); }
             },
+            // Only offered when a transcription server is configured for this
+            // user; filterSlashCommands() drops a null entry.
+            dictate: isSpeechToTextAvailable() ? {
+                id: 'dictate',
+                icon: 'lucide lucide-mic',
+                label: t('slash_menu.dictate', null, 'Dictate'),
+                aliases: ['dictate', 'voice', 'speech', 'record', 'transcribe'],
+                action: function () {
+                    if (typeof window.openDictationModal === 'function') {
+                        // The menu is still closing and the caret still moving;
+                        // the modal reads both, so let them settle first, the
+                        // way the emoji picker does.
+                        setTimeout(function () { window.openDictationModal(); }, 10);
+                    }
+                }
+            } : null,
             cancel: {
                 id: 'cancel',
                 icon: 'lucide-times-circle',
@@ -2229,6 +2252,7 @@
                     }
                 ]
             },
+            common.dictate,
             {
                 id: 'link-menu',
                 icon: 'lucide-link',
@@ -2564,6 +2588,7 @@
                     }
                 ]
             },
+            common.dictate,
             {
                 id: 'link-menu',
                 icon: 'lucide-link',

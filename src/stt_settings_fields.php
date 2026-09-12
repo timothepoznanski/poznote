@@ -51,13 +51,18 @@
 
                     <div class="git-field-group">
                         <label class="git-field-label" for="stt_model"><?php echo t_h('ai_settings.model_label', [], 'Model'); ?></label>
-                        <select name="stt_model" id="stt_model" class="git-field-input" <?php echo $sttConfig['model'] === '' ? 'hidden' : ''; ?>>
-                            <?php if ($sttConfig['model'] !== ''): ?>
-                            <option value="<?php echo htmlspecialchars($sttConfig['model']); ?>" selected><?php echo htmlspecialchars($sttConfig['model']); ?></option>
-                            <?php endif; ?>
-                        </select>
-                        <p class="config-hint config-hint-error" id="stt-model-empty-msg" <?php echo $sttConfig['model'] === '' ? '' : 'hidden'; ?>><?php echo t_h('ai_settings.model_empty_hint', ['button' => t('ai_settings.test', [], 'Check access and list models')], 'Click "{{button}}" above, then select one.'); ?></p>
-                        <span class="label-desc"><?php echo t_h('stt_settings.model_description', [], 'A Whisper model such as Systran/faster-whisper-small. whisper.cpp serves the single model it was started with and ignores this, but a value is still required.'); ?></span>
+                        <?php
+                        // A free text field with a datalist rather than the AI page's
+                        // select: whisper.cpp answers /v1/models with nothing at all,
+                        // and a select would then leave no way to name the model. The
+                        // test fills the list when the server does offer one.
+                        ?>
+                        <input type="text" name="stt_model" id="stt_model" class="git-field-input"
+                               value="<?php echo htmlspecialchars($sttConfig['model']); ?>"
+                               list="stt-model-options" autocomplete="off"
+                               placeholder="Systran/faster-whisper-small">
+                        <datalist id="stt-model-options"></datalist>
+                        <span class="label-desc"><?php echo t_h('stt_settings.model_description', [], 'A Whisper model such as Systran/faster-whisper-small. Check access above to list what the server offers. whisper.cpp serves the single model it was started with and ignores this, but a value is still required.'); ?></span>
                     </div>
 
                     <div class="git-field-group">
