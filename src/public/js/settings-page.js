@@ -127,6 +127,7 @@
             'note_list_sort',
             'note_age_filter_days',
             'snapshots_keep_count',
+            'snapshots_safety_keep_count',
             'tasklist_insert_order',
             'diary_default_note_type',
             'diary_date_format',
@@ -854,10 +855,19 @@
 
     var SNAPSHOTS_DEFAULT_COUNT = 3;
     var SNAPSHOTS_MAX_COUNT = 30;
+    // Safety snapshots (before an AI or MCP edit) have their own, wider range:
+    // an instance whose MCP server edits a lot rolls through 20 in an afternoon.
+    var SNAPSHOTS_SAFETY_DEFAULT_COUNT = 20;
+    var SNAPSHOTS_SAFETY_MAX_COUNT = 200;
 
     function getSnapshotsKeepCount(value) {
         var count = parseInt(value, 10);
         return (count >= 1 && count <= SNAPSHOTS_MAX_COUNT) ? count : SNAPSHOTS_DEFAULT_COUNT;
+    }
+
+    function getSafetySnapshotsKeepCount(value) {
+        var count = parseInt(value, 10);
+        return (count >= 1 && count <= SNAPSHOTS_SAFETY_MAX_COUNT) ? count : SNAPSHOTS_SAFETY_DEFAULT_COUNT;
     }
 
     function refreshSnapshotsBadge() {
@@ -866,8 +876,15 @@
             if (!badge) return;
 
             var count = getSnapshotsKeepCount(value);
-            badge.textContent = tr('modals.snapshots.badge', { count: count }, count + ' automatic per note');
-            badge.className = 'setting-status enabled';
+            getSetting('snapshots_safety_keep_count', function (safetyValue) {
+                var safety = getSafetySnapshotsKeepCount(safetyValue);
+                badge.textContent = tr(
+                    'modals.snapshots.badge_with_safety',
+                    { count: count, safety: safety },
+                    count + ' automatic, ' + safety + ' safety per note'
+                );
+                badge.className = 'setting-status enabled';
+            });
         });
     }
 
@@ -877,7 +894,11 @@
         getSetting('snapshots_keep_count', function (value) {
             var input = document.getElementById('snapshotsKeepCountInput');
             if (input) input.value = String(getSnapshotsKeepCount(value));
-            modal.style.display = 'flex';
+            getSetting('snapshots_safety_keep_count', function (safetyValue) {
+                var safetyInput = document.getElementById('snapshotsSafetyKeepCountInput');
+                if (safetyInput) safetyInput.value = String(getSafetySnapshotsKeepCount(safetyValue));
+                modal.style.display = 'flex';
+            });
         });
     }
 
@@ -2979,15 +3000,23 @@
             saveSnapshotsBtn.addEventListener('click', function () {
                 var input = document.getElementById('snapshotsKeepCountInput');
                 var selected = String(getSnapshotsKeepCount(input ? input.value : ''));
+                var safetyInput = document.getElementById('snapshotsSafetyKeepCountInput');
+                var safetySelected = String(getSafetySnapshotsKeepCount(safetyInput ? safetyInput.value : ''));
                 setSetting('snapshots_keep_count', selected, function (success) {
-                    if (success) {
+                    if (!success) {
+                        alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                        return;
+                    }
+                    setSetting('snapshots_safety_keep_count', safetySelected, function (safetySuccess) {
+                        if (!safetySuccess) {
+                            alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                            return;
+                        }
                         try { closeModal('snapshotsSettingsModal'); } catch (e) {
-                            console.debug('settings-page: finishMarkdownColored() failed:', e);
+                            console.debug('settings-page: closeModal(snapshotsSettingsModal) failed:', e);
                         }
                         refreshSnapshotsBadge();
-                    } else {
-                        alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
-                    }
+                    });
                 });
             });
         }

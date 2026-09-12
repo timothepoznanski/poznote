@@ -126,6 +126,7 @@ $settingsPageUserKeys = [
     'note_list_sort',
     'note_age_filter_days',
     'snapshots_keep_count',
+    'snapshots_safety_keep_count',
     'tasklist_insert_order',
     'diary_default_note_type',
     'diary_date_format',

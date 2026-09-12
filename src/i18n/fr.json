@@ -507,7 +507,7 @@
       "s3_storage": "Stocker les pièces jointes des notes dans un stockage objet compatible S3 au lieu du disque local.",
       "s3_backup": "Envoie des archives de sauvegarde complètes vers un bucket compatible S3, manuellement ou selon une planification.",
       "highlight_current_folder_tree": "Estomper, autant que vous le souhaitez, les notes et les dossiers situés en dehors de la hiérarchie de dossiers dans laquelle vous travaillez.",
-      "snapshots": "Choisir combien de snapshots automatiques quotidiens sont conservés par note."
+      "snapshots": "Choisissez combien de snapshots automatiques quotidiens et combien de snapshots de sécurité (avant une modification IA ou MCP) sont conservés par note."
     },
     "title": "Paramètres",
     "collapse_section": "Réduire la section",
@@ -1709,10 +1709,13 @@
     "snapshots": {
       "title": "Snapshots",
       "description": "Nombre de snapshots automatiques conservés par note (un est pris chaque jour à la première ouverture de la note). Les snapshots manuels pris avec « Prendre un snapshot maintenant » ne sont pas comptés. Tout snapshot expire au bout de {{days}} jours :",
+      "safety_description": "Nombre de snapshots de sécurité conservés par note. Un est pris juste avant que l'assistant IA ou le serveur MCP ne réécrive une note, et apparaît sous « Avant modification IA » ou « Avant modification MCP » :",
       "options": {
-        "unit": "snapshots automatiques"
+        "unit": "snapshots automatiques",
+        "safety_unit": "snapshots de sécurité"
       },
       "badge": "{{count}} automatiques par note",
+      "badge_with_safety": "{{count}} automatiques, {{safety}} de sécurité par note",
       "warning_title": "Les snapshots ne stockent que le texte de la note. Les pièces jointes ne sont jamais copiées.",
       "warning": "Les pièces jointes et les images sont conservées sur le disque même après leur suppression de la note, tant qu'un de ses snapshots les contient encore. Elles ne sont libérées que lorsque le dernier snapshot qui les contient expire (au plus tard après {{days}} jours) ou lorsque la note est définitivement supprimée."
     }

@@ -8,16 +8,48 @@
  */
 
 /**
+ * A stored snapshot count, or the default when it is out of range.
+ *
+ * A setting can hold anything a hand-written API call put there. Falling back
+ * to the default matters more here than anywhere else: a count read as 0 would
+ * mean "purge every snapshot", which is the opposite of what the feature is
+ * for.
+ */
+function poznoteClampSnapshotsKeepCount($value, int $min, int $max, int $default): int {
+    $count = (int) $value;
+    if ($count < $min || $count > $max) {
+        return $default;
+    }
+
+    return $count;
+}
+
+/**
  * How many automatic (daily) snapshots are kept per note (user setting,
  * default 3). Manual snapshots are not limited.
  */
 function getSnapshotsKeepCount() {
-    $count = (int) getSetting('snapshots_keep_count', POZNOTE_SNAPSHOTS_DEFAULT_COUNT);
-    if ($count < POZNOTE_SNAPSHOTS_MIN_COUNT || $count > POZNOTE_SNAPSHOTS_MAX_COUNT) {
-        return POZNOTE_SNAPSHOTS_DEFAULT_COUNT;
-    }
+    return poznoteClampSnapshotsKeepCount(
+        getSetting('snapshots_keep_count', POZNOTE_SNAPSHOTS_DEFAULT_COUNT),
+        POZNOTE_SNAPSHOTS_MIN_COUNT,
+        POZNOTE_SNAPSHOTS_MAX_COUNT,
+        POZNOTE_SNAPSHOTS_DEFAULT_COUNT
+    );
+}
 
-    return $count;
+/**
+ * How many safety snapshots (taken before an AI assistant or the MCP server
+ * rewrites a note) are kept per note. User setting, default 20: an instance
+ * doing many MCP edits rolls through that in an afternoon, and one doing none
+ * has no reason to keep 20 copies of every note (issue #1365).
+ */
+function getSafetySnapshotsKeepCount() {
+    return poznoteClampSnapshotsKeepCount(
+        getSetting('snapshots_safety_keep_count', POZNOTE_SNAPSHOTS_SAFETY_DEFAULT_COUNT),
+        POZNOTE_SNAPSHOTS_SAFETY_MIN_COUNT,
+        POZNOTE_SNAPSHOTS_SAFETY_MAX_COUNT,
+        POZNOTE_SNAPSHOTS_SAFETY_DEFAULT_COUNT
+    );
 }
 
 function getNoteSnapshotsDir($noteId) {

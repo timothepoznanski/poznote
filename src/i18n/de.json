@@ -495,7 +495,7 @@
       "s3_storage": "Notiz-Anhänge in einem S3-kompatiblen Objektspeicher statt auf der lokalen Festplatte speichern.",
       "s3_backup": "Lädt vollständige Sicherungsarchive in einen S3-kompatiblen Bucket hoch, manuell oder nach Zeitplan.",
       "highlight_current_folder_tree": "Notizen und Ordner außerhalb der Ordnerhierarchie, in der Sie arbeiten, so stark abschwächen, wie Sie möchten.",
-      "snapshots": "Festlegen, wie viele automatische tägliche Schnappschüsse pro Notiz behalten werden."
+      "snapshots": "Wählen Sie, wie viele automatische tägliche Schnappschüsse und wie viele Sicherheits-Schnappschüsse (vor einer KI- oder MCP-Änderung) pro Notiz aufbewahrt werden."
     },
     "title": "Einstellungen",
     "collapse_section": "Bereich einklappen",
@@ -1675,10 +1675,13 @@
     "snapshots": {
       "title": "Schnappschüsse",
       "description": "Anzahl der automatischen Schnappschüsse pro Notiz (einer wird täglich beim ersten Öffnen der Notiz erstellt). Manuelle Schnappschüsse über „Jetzt Schnappschuss erstellen“ zählen nicht mit. Jeder Schnappschuss läuft nach {{days}} Tagen ab:",
+      "safety_description": "Anzahl der Sicherheits-Schnappschüsse pro Notiz. Einer wird unmittelbar erstellt, bevor der KI-Assistent oder der MCP-Server eine Notiz überschreibt, und erscheint als „Vor KI-Änderung“ oder „Vor MCP-Änderung“:",
       "options": {
-        "unit": "automatische Schnappschüsse"
+        "unit": "automatische Schnappschüsse",
+        "safety_unit": "Sicherheits-Schnappschüsse"
       },
       "badge": "{{count}} automatische pro Notiz",
+      "badge_with_safety": "{{count}} automatische, {{safety}} Sicherheits- pro Notiz",
       "warning_title": "Schnappschüsse speichern nur den Text der Notiz. Anhänge werden nie kopiert.",
       "warning": "Anhänge und Bilder bleiben auch nach dem Entfernen aus einer Notiz auf der Festplatte, solange einer ihrer Schnappschüsse sie noch enthält. Sie werden erst freigegeben, wenn der letzte Schnappschuss, der sie enthält, abläuft (spätestens nach {{days}} Tagen) oder die Notiz endgültig gelöscht wird."
     }

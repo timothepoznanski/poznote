@@ -9,7 +9,8 @@
  * default, user setting snapshots_keep_count); manual snapshots are not
  * limited. A manual snapshot is also taken, tagged with its origin, right
  * before the AI assistant or the MCP server rewrites a note (see
- * createSafetySnapshot). Every snapshot expires after POZNOTE_SNAPSHOTS_MAX_AGE_DAYS.
+ * createSafetySnapshot); getSafetySnapshotsKeepCount() of those are kept per
+ * note (user setting snapshots_safety_keep_count, 20 by default). Every snapshot expires after POZNOTE_SNAPSHOTS_MAX_AGE_DAYS.
  * Attachments and images removed from a note stay on disk while a snapshot
  * references them (see poznotePruneSnapshotOnlyAttachments), so an older
  * state can be restored.
@@ -18,10 +19,12 @@
 class SnapshotsController {
     private PDO $con;
     private int $maxSnapshots;
+    private int $maxSafetySnapshots;
 
     public function __construct(PDO $con) {
         $this->con = $con;
         $this->maxSnapshots = getSnapshotsKeepCount();
+        $this->maxSafetySnapshots = getSafetySnapshotsKeepCount();
     }
     
     /**
@@ -38,8 +41,8 @@ class SnapshotsController {
      * Expire snapshots older than POZNOTE_SNAPSHOTS_MAX_AGE_DAYS, then purge
      * automatic (daily) snapshots beyond the newest $maxSnapshots for a given
      * note, and safety snapshots (taken before an AI or MCP edit) beyond the
-     * newest POZNOTE_SNAPSHOTS_SAFETY_MAX_COUNT. User-made manual snapshots
-     * only expire and do not count toward either limit.
+     * newest $maxSafetySnapshots. User-made manual snapshots only expire and
+     * do not count toward either limit.
      */
     private function purgeOldSnapshots(string $noteSnapshotDir): void {
         poznoteExpireNoteSnapshots($this->con, (int) basename($noteSnapshotDir));
@@ -89,7 +92,7 @@ class SnapshotsController {
         }
 
         $removed = $this->deleteBeyondNewest($snapshots, $this->maxSnapshots)
-            + $this->deleteBeyondNewest($safetySnapshots, POZNOTE_SNAPSHOTS_SAFETY_MAX_COUNT);
+            + $this->deleteBeyondNewest($safetySnapshots, $this->maxSafetySnapshots);
         if ($removed === 0) {
             return;
         }
@@ -701,7 +704,8 @@ class SnapshotsController {
      * Take a manual snapshot tagged with its origin ('ai' or 'mcp') right
      * before an automated writer replaces the content of a note, so the
      * previous version stays one click away in the Snapshots modal. At most
-     * POZNOTE_SNAPSHOTS_SAFETY_MAX_COUNT of them are kept per note.
+     * getSafetySnapshotsKeepCount() of them are kept per note (the
+     * snapshots_safety_keep_count setting, 20 by default).
      * Skipped when the note is still empty, and when the newest snapshot
      * already holds the current content (the note was opened today and not
      * edited since, or the writer edits the same note repeatedly): nothing

@@ -1076,6 +1076,10 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
             <div class="radio-options">
                 <label><input type="number" id="snapshotsKeepCountInput" min="<?php echo POZNOTE_SNAPSHOTS_MIN_COUNT; ?>" max="<?php echo POZNOTE_SNAPSHOTS_MAX_COUNT; ?>" step="1" value="<?php echo POZNOTE_SNAPSHOTS_DEFAULT_COUNT; ?>" style="width:80px; margin:0; padding:4px 8px;"> <?php echo t_h('modals.snapshots.options.unit', [], 'automatic snapshots'); ?></label>
             </div>
+            <p><?php echo t_h('modals.snapshots.safety_description', [], 'Number of safety snapshots kept per note. One is taken right before the AI assistant or the MCP server rewrites a note, and shows as "Before AI edit" or "Before MCP edit":'); ?></p>
+            <div class="radio-options">
+                <label><input type="number" id="snapshotsSafetyKeepCountInput" min="<?php echo POZNOTE_SNAPSHOTS_SAFETY_MIN_COUNT; ?>" max="<?php echo POZNOTE_SNAPSHOTS_SAFETY_MAX_COUNT; ?>" step="1" value="<?php echo POZNOTE_SNAPSHOTS_SAFETY_DEFAULT_COUNT; ?>" style="width:80px; margin:0; padding:4px 8px;"> <?php echo t_h('modals.snapshots.options.safety_unit', [], 'safety snapshots'); ?></label>
+            </div>
             <div class="delete-warning-box">
                 <p class="delete-warning"><?php echo t_h('modals.snapshots.warning_title', [], 'Snapshots only store the note text. Attachments are never copied.'); ?></p>
                 <p class="delete-warning-recovery"><?php echo t_h('modals.snapshots.warning', ['days' => POZNOTE_SNAPSHOTS_MAX_AGE_DAYS], 'Attachments and images are kept on disk even after you remove them from a note, as long as one of its snapshots still contains them. They are only freed when the last snapshot containing them expires (after {{days}} days at most) or when the note is permanently deleted.'); ?></p>

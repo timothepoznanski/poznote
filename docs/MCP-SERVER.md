@@ -257,7 +257,7 @@ If you must route the MCP server through a network, protect it with:
 
 The MCP server connects to the Poznote REST API with an internal Bearer token stored in `data/.mcp_token`. Poznote creates this token automatically and the Docker Compose setup mounts `./data` read-only into the MCP container so the token never needs to live in `.env`.
 
-Because that token identifies the MCP server, Poznote takes a snapshot of a note right before a request carrying it changes the note's content or tasks (`update_note`, `add_task`, `update_task`, `complete_task`, `delete_task`). It shows as "Before MCP edit" in the note's Snapshots menu, so an AI rewrite that dropped content can be restored in one click. No snapshot is taken when the latest one already holds the same content, and the 20 most recent of them are kept per note.
+Because that token identifies the MCP server, Poznote takes a snapshot of a note right before a request carrying it changes the note's content or tasks (`update_note`, `add_task`, `update_task`, `complete_task`, `delete_task`). It shows as "Before MCP edit" in the note's Snapshots menu, so an AI rewrite that dropped content can be restored in one click. No snapshot is taken when the latest one already holds the same content, and the 20 most recent of them are kept per note, a number to raise in **Settings → Snapshots** (up to 200) when the MCP server does enough editing to roll through 20 in an afternoon.
 
 ---
 
