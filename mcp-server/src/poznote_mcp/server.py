@@ -686,6 +686,9 @@ def update_note(
     content: Optional[Union[str, list]] = None,
     title: Optional[str] = None,
     tags: Optional[str] = None,
+    target_workspace: Optional[str] = None,
+    folder: Optional[str] = None,
+    folder_id: Optional[int] = None,
     user_id: Optional[int] = None,
     if_version: Optional[str] = None,
     reminder_at: Optional[str] = None,
@@ -702,6 +705,17 @@ def update_note(
             For task lists, pass the JSON array serialized as a string.
         title: New title for the note
         tags: New tags (comma-separated)
+        target_workspace: Move the note to this workspace, keeping its id and
+            its history. Note that `workspace` above only says where to look
+            the note up; it never moves it. Without a folder of the target
+            workspace, the note lands at that workspace's root.
+        folder: Move the note into this folder, as a name or a path
+            ('Diary/2026/08', missing levels created). An empty string moves it
+            to the root of its workspace. Resolved against target_workspace
+            when the note also moves.
+        folder_id: Move the note into this folder by id (see list_folders).
+            Wins over folder, and must be a folder of the workspace the note
+            ends up in.
         user_id: User profile ID to access (optional, overrides default)
         if_version: Version token from get_note. When set, the write is rejected
             with a version_conflict result if the note changed since that
@@ -728,7 +742,9 @@ def update_note(
     if err:
         return err
 
-    has_note_fields = any(v is not None for v in (content, title, tags))
+    has_note_fields = any(
+        v is not None for v in (content, title, tags, target_workspace, folder, folder_id)
+    )
     result = None
 
     if has_note_fields:
@@ -741,6 +757,9 @@ def update_note(
                 workspace=workspace,
                 user_id=user_id,
                 if_version=if_version,
+                target_workspace=target_workspace,
+                folder=folder,
+                folder_id=folder_id,
             )
         except Exception as exc:
             return _api_error_json(exc)
@@ -762,7 +781,10 @@ def update_note(
 
     if not has_note_fields and reminder_at is None:
         return json.dumps(
-            {"error": "Nothing to update. Provide content, title, tags or reminder_at."},
+            {
+                "error": "Nothing to update. Provide content, title, tags, "
+                         "target_workspace, folder, folder_id or reminder_at."
+            },
             ensure_ascii=False,
         )
 
@@ -1429,6 +1451,124 @@ def move_note_to_folder(note_id: int, folder_id: int, user_id: Optional[int] = N
     except Exception as exc:
         return _api_error_json(exc)
     return json.dumps({"success": success, "message": f"Note {note_id} moved to folder {folder_id}" if success else "Failed to move note"}, ensure_ascii=False)
+
+
+@mcp.tool()
+def move_note(
+    note_id: int,
+    target_workspace: Optional[str] = None,
+    folder: Optional[str] = None,
+    folder_id: Optional[int] = None,
+    workspace: Optional[str] = None,
+    user_id: Optional[int] = None,
+) -> str:
+    """Move a note to another workspace and/or folder, keeping its id
+
+    The note keeps its id, its content, its history and every link pointing at
+    it: this is a move, not a copy-and-delete.
+
+    Args:
+        note_id: ID of the note to move
+        target_workspace: Workspace to move the note to. Without a folder, the
+            note lands at that workspace's root.
+        folder: Folder to move the note into, as a name or a path
+            ('Diary/2026/08'; missing levels are created). An empty string
+            means the root of the workspace. Resolved against target_workspace
+            when both are given.
+        folder_id: Folder to move the note into, by id (see list_folders).
+            Wins over folder, and must be a folder of the workspace the note
+            ends up in.
+        workspace: Workspace to look the note up in (optional). This one never
+            moves the note; target_workspace does.
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    if target_workspace is None and folder is None and folder_id is None:
+        return json.dumps(
+            {"error": "Nothing to move to. Provide target_workspace, folder or folder_id."},
+            ensure_ascii=False,
+        )
+
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        result = client.update_note(
+            note_id=note_id,
+            workspace=workspace,
+            user_id=user_id,
+            target_workspace=target_workspace,
+            folder=folder,
+            folder_id=folder_id,
+        )
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    if not result:
+        return json.dumps({"error": f"Note {note_id} not found or move failed"}, ensure_ascii=False)
+
+    destination = target_workspace or (result.get("workspace") if isinstance(result, dict) else None)
+    return json.dumps({
+        "success": True,
+        "message": f"Note {note_id} moved" + (f" to workspace '{destination}'" if destination else ""),
+        "note": result,
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def move_folder(
+    folder_id: int,
+    target_workspace: Optional[str] = None,
+    new_parent_folder_id: Optional[int] = None,
+    new_parent_folder: Optional[str] = None,
+    user_id: Optional[int] = None,
+) -> str:
+    """Move a folder under another parent and/or into another workspace
+
+    Its subfolders and every note inside them move with it, keeping their ids.
+    Pass neither parent argument to put the folder at the root of its
+    destination.
+
+    Args:
+        folder_id: ID of the folder to move
+        target_workspace: Workspace to move the folder to (optional; it stays
+            in its own workspace when omitted)
+        new_parent_folder_id: ID of the folder it becomes a child of. Must be
+            in the destination workspace.
+        new_parent_folder: Path of that parent folder, when its id is not at
+            hand. The folder must already exist.
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    if target_workspace is None and new_parent_folder_id is None and new_parent_folder is None:
+        return json.dumps(
+            {"error": "Nothing to move to. Provide target_workspace, new_parent_folder_id or new_parent_folder."},
+            ensure_ascii=False,
+        )
+
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        result = client.move_folder(
+            folder_id,
+            target_workspace=target_workspace,
+            new_parent_folder_id=new_parent_folder_id,
+            new_parent_folder=new_parent_folder,
+            user_id=user_id,
+        )
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    if result and result.get("error"):
+        return json.dumps({"success": False, "error": result["error"]}, ensure_ascii=False)
+
+    if not result:
+        return json.dumps({"error": f"Folder {folder_id} not found or move failed"}, ensure_ascii=False)
+
+    return json.dumps({
+        "success": True,
+        "message": f"Folder {folder_id} moved to '{result.get('path', '')}'".rstrip(" '"),
+        "folder": result,
+    }, indent=2, ensure_ascii=False)
 
 
 @mcp.tool()

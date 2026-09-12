@@ -255,9 +255,16 @@ class PoznoteClient:
         workspace: str | None = None,
         user_id: str | int | None = None,
         if_version: str | None = None,
+        target_workspace: str | None = None,
+        folder: str | None = None,
+        folder_id: int | None = None,
     ) -> dict | None:
         """
-        Update an existing note
+        Update an existing note, and/or move it
+
+        ``workspace`` only scopes the lookup; ``target_workspace`` is the one
+        that moves the note. ``folder`` (a name or a path) and ``folder_id``
+        move it inside a workspace, and an empty ``folder`` means its root.
 
         Returns the updated note. When if_version is given and the note changed
         since that version, returns the API's conflict payload (success False,
@@ -271,6 +278,12 @@ class PoznoteClient:
             payload["heading"] = title
         if tags is not None:
             payload["tags"] = tags
+        if target_workspace is not None:
+            payload["workspace"] = target_workspace
+        if folder is not None:
+            payload["folder"] = folder
+        if folder_id is not None:
+            payload["folder_id"] = folder_id
 
         if not payload:
             return None
@@ -624,6 +637,40 @@ class PoznoteClient:
         )
         if response.status_code == 404:
             return None
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return data.get("folder")
+        return None
+
+    def move_folder(
+        self,
+        folder_id: int,
+        target_workspace: str | None = None,
+        new_parent_folder_id: int | None = None,
+        new_parent_folder: str | None = None,
+        user_id: str | int | None = None,
+    ) -> dict | None:
+        """Move a folder under another parent and/or into another workspace
+
+        The folder takes its subfolders and every note in them along.
+        """
+        payload: dict = {}
+        if target_workspace:
+            payload["target_workspace"] = target_workspace
+        if new_parent_folder_id is not None:
+            payload["new_parent_folder_id"] = new_parent_folder_id
+        if new_parent_folder is not None:
+            payload["new_parent_folder"] = new_parent_folder
+
+        response = self.client.post(
+            f"/folders/{folder_id}/move",
+            json=payload,
+            headers=self._headers_for_user(user_id),
+        )
+        if response.status_code in (400, 404, 409):
+            data = response.json()
+            return {"error": data.get("error") or "Folder could not be moved"}
         response.raise_for_status()
         data = response.json()
         if data.get("success"):

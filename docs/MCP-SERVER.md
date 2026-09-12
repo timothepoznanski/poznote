@@ -46,7 +46,7 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 - `list_notes` — List the notes of a workspace, one page at a time (`limit`/`offset`, with the workspace's real `total` in the result)
 - `search_notes` — Search notes by text query, with optional creation date range
 - `create_note` — Create a new note, optionally from a template and/or with a due date/reminder (⚠️ if no workspace is specified in the prompt, the note is created in the user's default workspace; always specify the target workspace)
-- `update_note` — Update an existing note, and/or set its due date/reminder
+- `update_note` — Update an existing note, move it, and/or set its due date/reminder
 - `delete_note` — Delete a note by ID
 - `get_reminder` — Get the reminder currently set on a note
 - `set_reminder` — Set or replace a note's reminder, with an optional repeat interval
@@ -67,6 +67,8 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 - `duplicate_note` — Create a duplicate of an existing note
 - `toggle_favorite` — Toggle the favorite status of a note
 - `list_attachments` — List all attachments for a specific note
+- `move_note` — Move a note to another workspace and/or folder, keeping its id
+- `move_folder` — Move a folder (with its subfolders and notes) under another parent and/or into another workspace
 - `move_note_to_folder` — Move a note to a specific folder
 - `remove_note_from_folder` — Remove a note from its current folder (moves it to root)
 - `share_note` — Enable public sharing for a note and get the public URL
@@ -90,6 +92,8 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 - `delete_backup` — Delete a specific backup file
 - `get_app_setting` — Get the value of a specific application setting
 - `update_app_setting` — Update the value of a specific application setting
+
+**Moving things.** `move_note` and `move_folder` move, they do not copy: ids, content, history and the links pointing at a note all survive. On `update_note`, `workspace` says where to *look the note up*; the argument that moves it is `target_workspace`. A note that changes workspace without being given a folder of the destination lands at that workspace's root, since its old folder belongs to the workspace it left. A folder takes its subfolders and every note inside them along.
 
 **Folders.** Every tool that takes a folder takes the same thing: a name, or a slash-separated path. `create_note(folder="Diary/2026/08")` creates the missing levels on the way down; `create_folder(folder_path=…)` does the same for a folder; `list_notes(folder_id=…)` scopes a listing to one folder server-side, so its `total` counts that folder alone. A bare name reaches an existing folder at any depth when only one folder of the workspace carries it, rather than creating a second one at the root; when several do, the call is refused and lists them, so pass the full path or the id.
 

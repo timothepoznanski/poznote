@@ -720,10 +720,20 @@ paths:
                     - type: array
                       items:
                         type: string
+                workspace:
+                  type: string
+                  description: >
+                    Moves the note to this workspace, keeping its id and its
+                    history. The note lands at the root of the destination
+                    unless the same request also names a folder of it, since
+                    its current folder belongs to the workspace it leaves.
+                    (The workspace query parameter is only a lookup filter.)
                 folder_id:
                   type: integer
                   nullable: true
-                  description: ID of the folder (optional)
+                  description: >
+                    ID of the folder (optional). When the request also changes
+                    the workspace, it must be a folder of the destination.
                 folder:
                   type: string
                   description: >

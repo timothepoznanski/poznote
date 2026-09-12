@@ -1300,6 +1300,28 @@ class NotesController {
                     $folder = end($segments);
                 }
             }
+
+            // Moving a note to another workspace. Its folder belongs to the
+            // workspace it is leaving, so carrying folder_id over would leave
+            // the note pointing into the old tree and invisible in both
+            // (issue #1368). A folder named in the same request was already
+            // resolved against the target workspace above; otherwise the note
+            // lands at the root of the workspace it moves to.
+            if ($workspace !== $note['workspace']) {
+                if (isset($input['folder_id']) && $folder_id !== null) {
+                    $fwStmt = $this->con->prepare('SELECT name FROM folders WHERE id = ? AND workspace = ?');
+                    $fwStmt->execute([$folder_id, $workspace]);
+                    $targetFolder = $fwStmt->fetch(PDO::FETCH_ASSOC);
+                    if (!$targetFolder) {
+                        $this->sendError(400, 'folder_id must be a folder of the target workspace');
+                        return;
+                    }
+                    $folder = $targetFolder['name'];
+                } elseif (!$folderNameApplied) {
+                    $folder_id = null;
+                    $folder = null;
+                }
+            }
             
             // Diary entries follow their date title: renaming one to another
             // date (in any supported diary date format) moves it into the
