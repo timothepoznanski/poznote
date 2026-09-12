@@ -504,8 +504,12 @@ paths:
                   type: string
                   description: >
                     Target folder path (alternative to folder_id). Missing
-                    segments are created. 'folder_name' is accepted as an
-                    older spelling of the same parameter.
+                    segments are created. A name with no slash matches an
+                    existing folder at any depth when exactly one folder of the
+                    workspace carries it; when several do, the request is
+                    refused with 409 ambiguous_folder_name and the candidates.
+                    'folder_name' is accepted as an older spelling of the same
+                    parameter.
                 type:
                   type: string
                   enum: [note, markdown, tasklist]
@@ -726,6 +730,10 @@ paths:
                     Target folder path (alternative to folder_id). Missing
                     segments are created, an empty string moves the note to
                     the workspace root, and folder_id wins when both are sent.
+                    A name with no slash matches an existing folder at any
+                    depth when exactly one folder of the workspace carries it;
+                    when several do, the request is refused with 409
+                    ambiguous_folder_name and the candidates.
                 if_version:
                   type: string
                   description: >
@@ -2690,6 +2698,11 @@ paths:
     post:
       tags: [Folders]
       summary: Create a new folder
+      description: >
+        Creates one folder from folder_name (optionally under parent_folder_id),
+        or a whole chain from folder_path such as "Projects/2026/Q3". With a
+        path, create_parents decides whether the missing levels on the way down
+        are created or the call fails.
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
       requestBody:
@@ -2697,18 +2710,31 @@ paths:
           application/json:
             schema:
               type: object
-              required: [name, workspace]
               properties:
-                name:
+                folder_name:
                   type: string
+                  description: Name of a single folder to create. 'name' is accepted as an older spelling.
+                folder_path:
+                  type: string
+                  description: Slash-separated path to create, e.g. "Projects/2026/Q3". Takes precedence over folder_name.
+                  example: "Projects/2026/Q3"
+                create_parents:
+                  type: boolean
+                  description: With folder_path, create the missing parent levels instead of failing
+                  default: false
                 workspace:
                   type: string
-                parent_id:
+                parent_folder_id:
                   type: integer
                   nullable: true
+                  description: Parent of a folder created by name. 'parent_id' is accepted as an older spelling.
       responses:
         '201':
           description: Folder created
+        '404':
+          description: Workspace or parent folder not found (with folder_path, the missing segment is named)
+        '409':
+          description: A folder of that name already exists in that place
 
   /folders/counts:
     get:

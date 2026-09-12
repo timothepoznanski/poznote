@@ -331,30 +331,56 @@ class PoznoteClient:
     
     def create_folder(
         self,
-        folder_name: str,
+        folder_name: str | None = None,
         parent_folder_id: int | None = None,
         workspace: str | None = None,
         user_id: str | int | None = None,
+        folder_path: str | None = None,
+        create_parents: bool = False,
     ) -> dict | None:
         """
-        Create a new folder
-        
-        Returns the created folder with its ID
+        Create a new folder, by name or by path
+
+        With folder_path ("Projects/2026/Q3"), the whole chain is created in
+        one call when create_parents is set.
+
+        Returns the created folder with its ID, or a dict carrying "error"
+        when the API refused (an existing folder answers 409).
         """
-        payload = {
-            "folder_name": folder_name,
-        }
+        payload: dict = {}
         self._set_workspace(payload, workspace)
+
+        if folder_path:
+            payload["folder_path"] = folder_path
+            if create_parents:
+                payload["create_parents"] = True
+        else:
+            payload["folder_name"] = folder_name
         
         if parent_folder_id is not None:
             payload["parent_folder_id"] = parent_folder_id
         
         response = self.client.post("/folders", json=payload, headers=self._headers_for_user(user_id))
+
+        # A conflict (the folder is already there) or a missing parent carries
+        # the reason in the body; raising would throw it away.
+        if response.status_code in (404, 409):
+            data = response.json()
+            return {
+                "error": data.get("error") or "Folder could not be created",
+                "folder": data.get("folder"),
+                "missing_segment": data.get("missing_segment"),
+            }
+
         response.raise_for_status()
         data = response.json()
         
         if data.get("success"):
-            return data.get("folder")
+            folder = data.get("folder")
+            if folder is not None and data.get("created_parents"):
+                folder = dict(folder)
+                folder["created_parents"] = data.get("created_parents")
+            return folder
         return None
 
     def list_folders(self, workspace: str | None = None, user_id: str | int | None = None) -> list[dict]:

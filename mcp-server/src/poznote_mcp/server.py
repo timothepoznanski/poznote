@@ -326,19 +326,25 @@ def list_notes(
     workspace: Optional[str] = None,
     limit: int = 50,
     offset: int = 0,
+    folder_id: Optional[int] = None,
+    folder: Optional[str] = None,
     user_id: Optional[int] = None,
 ) -> str:
-    """List the notes of a workspace, one page at a time
+    """List the notes of a workspace or a folder, one page at a time
 
-    The result carries "total", the number of notes the workspace actually
-    holds, next to "count", the size of this page: when "has_more" is true,
-    call again with offset raised by the page size to get the rest. A page
-    is never silently truncated.
+    The result carries "total", the number of notes matching the filters, next
+    to "count", the size of this page: when "has_more" is true, call again with
+    offset raised by the page size to get the rest. A page is never silently
+    truncated.
 
     Args:
         workspace: Workspace name (optional)
         limit: Page size, 1-1000 (default: 50)
         offset: Number of notes to skip before this page (default: 0)
+        folder_id: Only notes in this folder (see list_folders). Scoped by the
+            server, so paging still counts only that folder's notes.
+        folder: Name of the folder to scope to, when its id is not at hand.
+            A name is not unique across a workspace; prefer folder_id.
         user_id: User profile ID to access (optional, overrides default)
     """
     client, err = _get_client_or_error()
@@ -353,7 +359,14 @@ def list_notes(
     start = max(0, int(offset or 0))
 
     try:
-        page = client.list_notes(workspace=workspace, user_id=user_id, limit=page_size, offset=start)
+        page = client.list_notes(
+            workspace=workspace,
+            user_id=user_id,
+            limit=page_size,
+            offset=start,
+            folder_id=folder_id,
+            folder=folder,
+        )
     except Exception as exc:
         return _api_error_json(exc)
     
@@ -381,6 +394,10 @@ def list_notes(
         result["next_offset"] = start + len(formatted)
     if workspace is not None:
         result["workspace"] = workspace
+    if folder_id is not None:
+        result["folder_id"] = folder_id
+    if folder is not None:
+        result["folder"] = folder
 
     return json.dumps(result, indent=2, ensure_ascii=False)
 
@@ -555,7 +572,11 @@ def create_note(
             the content; passing both appends this content to the template.
         workspace: Workspace name (optional)
         tags: Comma-separated tags (e.g., 'ai, docs, important')
-        folder: Folder name to place the note in
+        folder: Folder to place the note in, as a name or a path
+            ('Diary/2026/08'). Missing levels of a path are created. A bare
+            name matches an existing folder at any depth when only one folder
+            of the workspace carries it; when several do, the call is refused
+            and lists them, so pass the full path or use move_note_to_folder.
         note_type: Note type/format. Supported: 'note' (HTML, default), 'markdown', 'tasklist'.
             Ignored when from_template_id is given without a note_type of your
             own: the template's own format is used.
@@ -1123,21 +1144,37 @@ def delete_task(note_id: int, task_id: str, user_id: Optional[int] = None) -> st
 
 @mcp.tool()
 def create_folder(
-    folder_name: str,
+    folder_name: Optional[str] = None,
     workspace: Optional[str] = None,
     parent_folder_id: Optional[int] = None,
+    folder_path: Optional[str] = None,
+    create_parents: bool = True,
     user_id: Optional[int] = None,
 ) -> str:
-    """Create a new folder in Poznote
-    
+    """Create a folder, by name or by path
+
+    Pass folder_path to create a whole chain in one call:
+    create_folder(folder_path="Projects/2026/Q3") makes the missing levels on
+    the way down, the same way create_note's folder argument does.
+
     Args:
-        folder_name: Name of the new folder
+        folder_name: Name of the new folder (a single level; use folder_path
+            for a nested one)
         workspace: Workspace name (optional)
         parent_folder_id: ID of the parent folder (optional, creates folder at root if not specified)
+        folder_path: Slash-separated path of the folder to create, e.g.
+            'Projects/2026/Q3'. Takes precedence over folder_name.
+        create_parents: With folder_path, create the missing parent levels
+            (default). Set false to fail instead when a level is missing.
         user_id: User profile ID to access (optional, overrides default)
     """
-    if not folder_name:
-        return json.dumps({"error": "folder_name is required"}, ensure_ascii=False)
+    target = (folder_path or "").strip() or (folder_name or "").strip()
+    if not target:
+        return json.dumps({"error": "folder_name or folder_path is required"}, ensure_ascii=False)
+
+    # A name carrying a slash is a path, whichever argument it arrived in.
+    if "/" in target:
+        folder_path, folder_name = target, None
     
     client, err = _get_client_or_error()
     if err:
@@ -1148,14 +1185,21 @@ def create_folder(
             parent_folder_id=parent_folder_id,
             workspace=workspace,
             user_id=user_id,
+            folder_path=folder_path,
+            create_parents=create_parents,
         )
     except Exception as exc:
         return _api_error_json(exc)
+
+    if result and result.get("error"):
+        return json.dumps(
+            {k: v for k, v in result.items() if v is not None}, indent=2, ensure_ascii=False
+        )
     
     if result:
         return json.dumps({
             "success": True,
-            "message": f"Folder '{folder_name}' created successfully",
+            "message": f"Folder '{target}' created successfully",
             "folder": result,
         }, indent=2, ensure_ascii=False)
     else:

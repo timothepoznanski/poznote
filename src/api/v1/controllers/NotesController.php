@@ -1013,6 +1013,9 @@ class NotesController {
             if ($folder_id === 0) $folder_id = null;
             
             if ($folder && !$folder_id) {
+                if ($this->refuseAmbiguousFolderName($workspace, $folder)) {
+                    return;
+                }
                 // Robust path resolution and automatic creation of missing subfolders
                 $resolvedId = resolveFolderPathToId($workspace, $folder, true, $this->con);
                 if ($resolvedId) {
@@ -1284,6 +1287,9 @@ class NotesController {
                     $folder_id = null;
                     $folder = null;
                 } else {
+                    if ($this->refuseAmbiguousFolderName($workspace, $folderNameInput)) {
+                        return;
+                    }
                     $resolvedId = resolveFolderPathToId($workspace, $folderNameInput, true, $this->con);
                     if (!$resolvedId) {
                         $this->sendError(404, t('api.errors.folder_not_found', [], 'Folder not found'));
@@ -3074,6 +3080,44 @@ class NotesController {
     /**
      * Send an error response
      */
+    /**
+     * Refuse a bare folder name several folders of the workspace answer to.
+     *
+     * "08" is not an address when the workspace holds Diary/2026/08 and
+     * Archive/2025/08: resolving it either way is a guess, and creating a
+     * third one at the root (what this used to do) is the worst of the three.
+     * Returns true when the request was answered and the caller must stop.
+     */
+    private function refuseAmbiguousFolderName(string $workspace, string $folderPath): bool {
+        if (strpos($folderPath, '/') !== false) {
+            return false;
+        }
+
+        $matches = poznoteFindFoldersNamed($workspace, $folderPath, $this->con);
+        if (count($matches) < 2) {
+            return false;
+        }
+
+        foreach ($matches as $match) {
+            if ($match['parent_id'] === null) {
+                // A root folder of that name wins, as it always has.
+                return false;
+            }
+        }
+
+        http_response_code(409);
+        echo json_encode([
+            'success' => false,
+            'error' => 'Several folders are named "' . $folderPath . '" in this workspace. Pass the full path, or folder_id.',
+            'code' => 'ambiguous_folder_name',
+            'candidates' => array_map(
+                fn(array $m) => ['id' => $m['id'], 'path' => $m['path']],
+                $matches
+            ),
+        ], JSON_UNESCAPED_UNICODE);
+        return true;
+    }
+
     private function sendError(int $code, string $message): void {
         // Delegates to lib/api-response.php. Note that FoldersController and
         // TrashController declare the arguments the other way round; the

@@ -56,7 +56,7 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 - `update_task` — Update one task (text, due date, reminder, important flag)
 - `complete_task` — Mark a task as done, or reopen it
 - `delete_task` — Delete one task from a tasklist note
-- `create_folder` — Create a new folder
+- `create_folder` — Create a folder, by name or by path (`folder_path="Projects/2026/Q3"` makes the whole chain in one call)
 - `list_folders` — List all folders from a workspace
 - `list_workspaces` — List all available workspaces
 - `list_tags` — List all unique tags used in notes
@@ -90,6 +90,8 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 - `delete_backup` — Delete a specific backup file
 - `get_app_setting` — Get the value of a specific application setting
 - `update_app_setting` — Update the value of a specific application setting
+
+**Folders.** Every tool that takes a folder takes the same thing: a name, or a slash-separated path. `create_note(folder="Diary/2026/08")` creates the missing levels on the way down; `create_folder(folder_path=…)` does the same for a folder; `list_notes(folder_id=…)` scopes a listing to one folder server-side, so its `total` counts that folder alone. A bare name reaches an existing folder at any depth when only one folder of the workspace carries it, rather than creating a second one at the root; when several do, the call is refused and lists them, so pass the full path or the id.
 
 **Templates.** A template is an ordinary note kept in a folder named `Templates` (any depth below it counts) or anywhere in a workspace of that name; the word is recognised in every shipped language, so a `Modèles` folder works too. `list_templates` returns them with their ids, and `create_note(from_template_id=…)` starts a new note from one, taking the template's own format unless you pass a `note_type`. Passing `content` as well appends it after the template body.
 

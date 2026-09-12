@@ -533,6 +533,7 @@ class FoldersController {
             
             $parentId = null;
             $finalFolderId = null;
+            $finalParentId = null;
             $finalName = null;
             $createdParents = [];
             $finalWasCreated = false;
@@ -585,6 +586,9 @@ class FoldersController {
                 }
                 if ($isLast) {
                     $finalWasCreated = true;
+                    // The folder the leaf hangs from, captured before $parentId
+                    // becomes the leaf itself for the next iteration.
+                    $finalParentId = $parentId;
                 }
                 
                 $parentId = $newId;
@@ -604,7 +608,7 @@ class FoldersController {
                     'id' => $finalFolderId,
                     'name' => $finalName,
                     'workspace' => $workspace,
-                    'parent_id' => $parentId !== $finalFolderId ? $parentId : null,
+                    'parent_id' => $finalParentId,
                     'path' => $folderPath
                 ],
                 'folder_id' => $finalFolderId,
