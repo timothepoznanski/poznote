@@ -69,7 +69,7 @@ https://discord.gg/AWhWWSEkJ
 - [Modifier les paramètres](#modifier-les-paramètres)
 - [Mettre à jour l'application](#mettre-à-jour-lapplication)
 - [Authentification](#authentification)
-- [Mots de passe d'application](#app-passwords)
+- [Mots de passe d'application](#mots-de-passe-dapplication)
 - [Types de notes](#types-de-notes)
 - [Snapshots](#snapshots)
 - [Personnalisation](#personnalisation)
@@ -384,7 +384,9 @@ Renommez le compte administrateur par défaut et changez le mot de passe par dé
 
 La plupart des réglages du quotidien se modifient depuis l'interface de Poznote. Réservez le fichier `.env` aux valeurs de déploiement et d'exécution lues au démarrage des conteneurs.
 
-Utilisez le fichier `.env` pour :
+<details>
+<summary><strong>Utilisez le fichier <code>.env</code> pour</strong></summary>
+<br>
 
 - `HTTP_WEB_PORT`
 - `POZNOTE_OIDC_CLIENT_ID`
@@ -396,10 +398,16 @@ Utilisez le fichier `.env` pour :
 - `POZNOTE_SETTINGS_PASSWORD` pour demander un mot de passe supplémentaire avant l'ouverture de la page Paramètres, vide par défaut
 - `POZNOTE_MCP_AUTH_TOKEN` pour exiger un jeton bearer des clients MCP, voir [Serveur MCP](#serveur-mcp)
 
-Utilisez l'interface pour :
+</details>
+
+<details>
+<summary><strong>Utilisez l'interface pour</strong></summary>
+<br>
 
 - Les réglages d'administration et globaux, comme la configuration du fournisseur OIDC, l'activation de la synchronisation Git, les limites d'import et le téléversement de CSS personnalisé
 - Les réglages propres à chaque utilisateur ou profil, comme les mots de passe des comptes locaux, le thème, les tailles de police, le tri des notes, l'arrière-plan des espaces de travail et les éléments d'interface masqués
+
+</details>
 
 
 ### Modifier les paramètres système (`.env`)
@@ -462,7 +470,7 @@ Vos données sont conservées dans le répertoire `./data` et ne sont pas affect
 
 ## Authentification
 
-Poznote prend en charge plusieurs méthodes d'authentification, dont les comptes locaux et les fournisseurs d'identité externes. Les applications et extensions qui dialoguent avec l'API REST utilisent des **mots de passe d'application**, un identifiant distinct décrit plus bas.
+Poznote prend en charge plusieurs méthodes d'authentification, dont les comptes locaux et les fournisseurs d'identité externes. Les applications et extensions qui dialoguent avec l'API REST utilisent des [mots de passe d'application](#mots-de-passe-dapplication), un identifiant distinct décrit dans la section suivante.
 
 <details>
 <summary><strong>Authentification par comptes locaux</strong></summary>
@@ -514,7 +522,7 @@ Poznote prend en charge OpenID Connect (authorization code + PKCE) pour l'authen
 5. Si la création automatique des utilisateurs est activée et qu'aucun profil ne correspond, Poznote en crée un automatiquement. Un tel profil n'a **aucun mot de passe** : il n'est jamais passé par la remise des identifiants initiaux qu'effectue un administrateur lorsqu'il crée un compte, il ne répond donc pas au mot de passe par défaut. La connexion passe par le fournisseur, ou bien un administrateur définit un mot de passe explicite depuis **Paramètres > Outils d'administration > Gestion des utilisateurs**.
 6. Si `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true`, le formulaire nom d'utilisateur/mot de passe est masqué et la page de connexion passe en SSO uniquement.
 7. Quand OIDC est activé, les clients de l'API REST peuvent s'authentifier avec `Authorization: Bearer <OIDC JWT>` ; Poznote vérifie le JWKS du fournisseur, l'émetteur, l'expiration, l'audience et les contrôles d'accès configurés.
-8. Les clients incapables de suivre un flux OIDC (extension de navigateur, application mobile, scripts) utilisent à la place un [mot de passe d'application](#app-passwords), que chaque utilisateur crée depuis ses propres paramètres.
+8. Les clients incapables de suivre un flux OIDC (extension de navigateur, application mobile, scripts) utilisent à la place un [mot de passe d'application](#mots-de-passe-dapplication), que chaque utilisateur crée depuis ses propres paramètres.
 
 #### Configuration
 
@@ -549,39 +557,19 @@ Si la création automatique est activée, Poznote génère un nom d'utilisateur 
 
 </details>
 
-<a id="app-passwords"></a>
-<details>
-<summary><strong>Mots de passe d'application (pour les applications, extensions et scripts)</strong></summary>
-<br>
+## Mots de passe d'application
 
-Les applications ne peuvent pas se connecter via un fournisseur d'identité comme le fait un navigateur. Un **mot de passe d'application** est un identifiant distinct que vous créez pour un client donné et que vous pouvez révoquer à tout moment : vous n'avez jamais à communiquer le mot de passe de votre compte.
+Les applications ne peuvent pas se connecter via un fournisseur d'identité comme le fait un navigateur. Un **mot de passe d'application** est un identifiant distinct que vous créez pour un client donné (l'extension de navigateur, un téléphone, un script) et que vous pouvez révoquer à tout moment : vous n'avez jamais à communiquer le mot de passe de votre compte.
 
-Créez-en un depuis **Paramètres > Mots de passe d'application** : donnez-lui un nom (celui du client qui l'utilisera), éventuellement une date d'expiration, puis copiez le secret généré. Il n'est affiché qu'une seule fois.
-
-Ensuite, dans le client, saisissez **votre nom d'utilisateur habituel** et **le mot de passe d'application** là où un mot de passe est demandé. Rien d'autre ne change : il transite en authentification HTTP Basic ordinaire, donc tous les clients existants fonctionnent tels quels.
+Créez-en un depuis **Paramètres > Mots de passe d'application** : donnez-lui un nom, éventuellement une date d'expiration, puis copiez le secret généré. Il n'est affiché qu'une seule fois. Ensuite, dans le client, saisissez votre nom d'utilisateur habituel et le mot de passe d'application là où un mot de passe est demandé. Il transite en authentification HTTP Basic ordinaire, donc tous les clients existants fonctionnent tels quels :
 
 ```bash
 curl -u 'username:pzn_2f7c…' https://YOUR_SERVER/api/v1/notes
 ```
 
-#### Ce qu'un mot de passe d'application peut faire ou non
+Un mot de passe d'application n'atteint que l'API REST, et uniquement pour son propre profil : il ne peut ni ouvrir l'interface web, ni appeler un endpoint d'administration, ni changer votre mot de passe ou gérer votre compte, même si le compte est administrateur. Un mot de passe divulgué n'expose donc que les notes d'un seul compte, rien de plus, et il suffit de le révoquer pour refermer la brèche. Sur une instance en SSO uniquement, où les comptes créés par OIDC n'ont aucun mot de passe, c'est le seul identifiant accepté par l'API en authentification Basic.
 
-|  | |
-|---|---|
-| ✅ Lire et modifier les notes, dossiers, tags et pièces jointes de **son propre profil** | ❌ Ouvrir l'interface web : il est refusé par le formulaire de connexion |
-| ✅ Fonctionner quand l'instance est en SSO uniquement, y compris avec *Désactiver l'authentification HTTP Basic pour l'API* activé | ❌ Atteindre un endpoint `/api/v1/admin/*`, même si le compte est administrateur |
-| ✅ Recevoir une date d'expiration et être révoqué à tout moment | ❌ Changer votre mot de passe, modifier ou supprimer votre compte, ou créer d'autres mots de passe d'application |
-| ✅ Se passer de l'en-tête `X-User-ID` : il est lié au profil qui l'a créé | ❌ Agir sur un autre profil, même pour un administrateur |
-
-Grâce à ces limites, un mot de passe d'application divulgué n'expose que les notes d'un seul compte, rien de plus, et il suffit de révoquer la ligne correspondante pour refermer la brèche.
-
-La liste de **Paramètres > Mots de passe d'application** indique pour chacun les premiers caractères du secret (pour les distinguer), sa date de création et sa date de dernière utilisation, ce qui permet de repérer et de supprimer facilement un identifiant inutilisé. Chaque compte peut en avoir jusqu'à 25.
-
-> **Sur une instance en SSO uniquement,** un mot de passe d'application est le seul identifiant accepté par l'API en authentification Basic. Les comptes créés automatiquement par OIDC n'ont aucun mot de passe de compte : c'est donc ainsi que leurs propriétaires connectent l'extension de navigateur, un téléphone ou un script.
-
-Référence complète, y compris les endpoints qui permettent de les gérer : [documentation de l'API REST](docs/API-REST.md#authentication).
-
-</details>
+La liste complète des limites et les endpoints qui permettent de gérer les mots de passe d'application se trouvent dans la [documentation de l'API REST](docs/API-REST.md#authentication).
 
 ## Types de notes
 
@@ -654,11 +642,17 @@ Poznote prend en charge deux formats de notes principaux, chacun adapté à une 
 
 Les snapshots conservent les versions précédentes du contenu d'une note pour que vous puissiez revenir à un état antérieur depuis le menu **Snapshots** de la note.
 
+<details>
+<summary><strong>Fonctionnement des snapshots</strong></summary>
+<br>
+
 *   **Automatiques :** un snapshot est pris la première fois qu'une note est ouverte chaque jour. Les 3 snapshots automatiques les plus récents sont conservés par note ; ce nombre se modifie dans **Paramètres > Comportement > Snapshots**.
 *   **Manuels :** « Prendre un snapshot maintenant » ajoute un snapshot à tout moment, tout comme **Ctrl + Alt + S** (Cmd + Alt + S sur Mac) lorsqu'une note est ouverte. Les snapshots manuels sont illimités et ne sont pas comptés dans ce nombre.
 *   **Avant une modification par l'IA :** un snapshot est pris automatiquement juste avant que l'[assistant IA](#assistant-ia) ou le [serveur MCP](#serveur-mcp) ne modifie le contenu d'une note : une réécriture qui tourne mal s'annule donc en un clic. Ces snapshots portent la mention « Avant modification par l'IA » ou « Avant modification MCP » dans l'historique, ne sont pas pris lorsque le dernier snapshot contient déjà le même contenu, et les 20 plus récents sont conservés par note, un nombre que vous pouvez modifier dans **Paramètres → Snapshots** (de 1 à 200) si votre instance modifie beaucoup de notes via l'IA ou MCP.
 *   **Expiration :** chaque snapshot, automatique ou manuel, est supprimé 30 jours après avoir été pris. Un snapshot peut aussi être supprimé à la main depuis la fenêtre Snapshots.
 *   **Pièces jointes et images :** les snapshots ne stockent que le texte de la note. Les pièces jointes ne sont jamais copiées : un fichier référencé par plusieurs snapshots n'existe qu'une fois sur le disque. Un fichier retiré d'une note reste sur le disque, masqué dans la note, tant qu'un snapshot le contient encore, si bien que restaurer ce snapshot le fait revenir. Il est supprimé définitivement dès que le dernier snapshot qui le contient expire ou est supprimé, ou lorsque la note est supprimée définitivement. Conserver davantage de snapshots ne duplique donc jamais de fichiers. Cela garde seulement les fichiers retirés plus longtemps, 30 jours au maximum.
+
+</details>
 
 ## Personnalisation
 
@@ -816,19 +810,15 @@ Une chose reste pour l'instant hors de portée d'un thème : quelques icônes qu
 
 > À ne pas confondre avec la fonctionnalité [Instances multiples](#instances-multiples).
 
-Poznote repose sur une architecture multi-utilisateur avec des espaces de données isolés pour chaque profil, tout en permettant une collaboration maîtrisée sur la même instance.
+Poznote est multi-utilisateur : chaque profil a ses propres notes, espaces de travail, tags, dossiers, pièces jointes et paramètres, et se connecte avec son propre nom d'utilisateur ou adresse e-mail et son mot de passe.
 
-- **Isolation des données** : chaque profil a ses propres notes, espaces de travail, tags, dossiers, pièces jointes et paramètres utilisateur.
-- **Authentification par profil** : les utilisateurs se connectent avec leur propre nom d'utilisateur ou adresse e-mail et leur mot de passe. Tant qu'un mot de passe n'a pas été changé dans l'interface, les valeurs par défaut intégrées s'appliquent (`admin` pour les administrateurs, `user` pour les utilisateurs standard).
-- **Gestion des utilisateurs** : les administrateurs peuvent créer, désactiver et gérer les profils depuis **Paramètres > Outils d'administration > Gestion des utilisateurs**.
-- **Accès délégué aux comptes** : les administrateurs peuvent donner à un utilisateur l'accès au compte d'un autre utilisateur. Quand un utilisateur peut ouvrir plusieurs comptes, Poznote lui demande après la connexion quel compte utiliser et indique clairement lorsque la session agit **en tant que** autre utilisateur.
-- **Garde-fous propriétaire/administrateur** : ouvrir le compte d'un autre utilisateur n'en transfère pas la propriété. Les actions sensibles, comme le changement de mot de passe, la sauvegarde et la restauration, la configuration de la synchronisation Git et les réglages d'administration globaux, restent réservées au propriétaire ou à l'administrateur concerné.
-- **Partage** : les notes, les dossiers et des espaces de travail entiers peuvent être partagés avec d'autres utilisateurs de la même instance, ou publiquement via des liens dédiés. Un partage est en lecture seule par défaut et peut être rendu modifiable : modification du texte pour une note, modification des notes pour un dossier, et trois niveaux pour une liste de tâches (lecture seule, cocher ou décocher uniquement, modification complète).
-- **Verrouillage à éditeur unique** : quand plusieurs utilisateurs ont accès à la même note, Poznote n'autorise qu'un seul éditeur actif à la fois. Les autres utilisateurs peuvent toujours ouvrir la note en lecture seule, voir qui détient le verrou, et prendre la main sur l'édition en rouvrant la note une fois le verrou libéré ou expiré.
-- **Isolation des comptes (mode SaaS)** : les administrateurs peuvent bloquer certaines fonctionnalités pour les utilisateurs non administrateurs, comme la découverte des autres comptes de l'instance et le partage avec eux, ou l'enregistrement de webhooks personnels. Les administrateurs ne sont jamais concernés. Laissez tout décoché pour une instance familiale ou d'équipe.
+- **Gestion des utilisateurs** : les administrateurs créent, désactivent et gèrent les profils depuis **Paramètres > Outils d'administration > Gestion des utilisateurs**, et peuvent donner à un utilisateur l'accès au compte d'un autre utilisateur sans en transférer la propriété.
+- **Partage** : les notes, les dossiers et des espaces de travail entiers peuvent être partagés avec d'autres utilisateurs de l'instance, en lecture seule ou en modification, ou publiquement via des liens dédiés. Quand plusieurs utilisateurs ont accès à la même note, un seul la modifie à la fois et les autres voient qui détient le verrou.
+- **Isolation des comptes (mode SaaS)** : les administrateurs peuvent empêcher les utilisateurs non administrateurs de découvrir les autres comptes de l'instance, de partager avec eux ou d'enregistrer des webhooks personnels. Laissez tout décoché pour une instance familiale ou d'équipe.
 
-
-### Architecture et structure
+<details>
+<summary><strong>Organisation des données sur le disque</strong></summary>
+<br>
 
 Poznote utilise une base de données maîtresse (`data/master.db`) pour les données de coordination partagées, et des bases de données et fichiers séparés par utilisateur pour le contenu réel des notes.
 
@@ -848,38 +838,19 @@ data/
     └── ...
 ```
 
+</details>
+
 ## Journal d'activité
 
-Poznote conserve un historique des opérations sensibles effectuées sur l'instance, pour que les administrateurs puissent voir ce qui s'est passé, quand et par qui. Il est accessible depuis **Paramètres > Outils d'administration > Journal d'activité** et réservé aux administrateurs.
+Poznote conserve un historique des opérations sensibles effectuées sur l'instance, pour que les administrateurs puissent voir ce qui s'est passé, quand et par qui : connexions et déconnexions, modifications de comptes et de quotas, création et partage d'espaces de travail, sauvegardes et restaurations, vidage de la corbeille et suppressions définitives, mots de passe d'application. Il est accessible depuis **Paramètres > Outils d'administration > Journal d'activité**, réservé aux administrateurs, et l'icône d'aide en haut de la page liste toutes les opérations enregistrées.
 
-Chaque entrée enregistre la date et l'heure, le compte concerné, l'action et un court résumé, comme le nom de l'espace de travail supprimé ou le nombre de notes retirées. Survolez l'icône d'aide en haut de la page pour obtenir la liste complète des opérations enregistrées, qui couvre :
-
-- **Sessions** : connexions et déconnexions.
-- **Comptes** : modifications de profil (nom d'utilisateur, e-mail, nom), modifications de quota, activation et désactivation, rôle administrateur accordé ou retiré, suppression de compte, et accès délégué aux comptes accordé ou retiré.
-- **Espaces de travail** : création, suppression, partage et fin de partage.
-- **Données** : création et restauration de sauvegardes, vidage de la corbeille et suppression définitive de notes.
-- **Mots de passe d'application** : création et révocation.
-
-L'activité courante est volontairement laissée de côté : écrire une note ou la mettre à la corbeille n'est pas enregistré, pas plus que les appels API authentifiés à chaque requête, qui transformeraient sinon le journal en simple relevé de trafic.
-
-Le journal enregistre qu'une opération a eu lieu, pas les données qu'elle a touchées. **Le contenu des notes n'y est jamais écrit**, pas plus que les tags, les dossiers ou les pièces jointes. Une entrée de suppression identifie la note par son titre et son espace de travail pour que l'événement soit reconnaissable, rien de plus.
-
-> **Aucun mot de passe n'est jamais écrit dans le journal**, sous quelque forme que ce soit. Lorsqu'un mot de passe entre en jeu, par exemple sur un espace de travail partagé protégé, seul le fait qu'un mot de passe est défini est enregistré.
-
-Les entrées sont conservées 90 jours par défaut. La durée de rétention peut être réglée sur 30, 90 ou 365 jours, ou rendue illimitée, et le journal peut être vidé manuellement depuis la même page.
+Le journal enregistre qu'une opération a eu lieu, pas les données qu'elle a touchées : le contenu des notes et les mots de passe n'y sont jamais écrits, et l'activité courante, comme écrire une note ou la mettre à la corbeille, est laissée de côté. Les entrées sont conservées 90 jours par défaut (30, 90, 365 jours ou illimité), et le journal peut être vidé depuis la même page.
 
 ## Webhooks
 
-Poznote peut prévenir des services externes lorsque quelque chose se produit sur l'instance, en envoyant des webhooks sortants (requêtes HTTP POST avec un payload JSON) vers les endpoints que vous enregistrez. Il est ainsi facile de brancher Poznote sur des outils d'automatisation comme n8n, Zapier ou vos propres scripts. Poznote se contente d'émettre les webhooks : ce qu'en fait l'endpoint destinataire (envoyer un e-mail, déclencher un workflow, ...) ne dépend que de vous.
+Poznote peut prévenir des services externes lorsque quelque chose se produit sur l'instance, en envoyant des webhooks sortants (requêtes HTTP POST avec un payload JSON) vers les endpoints que vous enregistrez, ce qui permet de le brancher sur des outils d'automatisation comme n8n, Zapier ou vos propres scripts. Les administrateurs enregistrent les événements de l'instance (comptes, quotas, inscriptions) dans **Paramètres > Outils d'administration > Webhooks admin**, et chaque utilisateur peut enregistrer des endpoints pour ses propres notes et rappels dans **Paramètres > Webhooks utilisateur**.
 
-Il existe deux niveaux de webhooks :
-
-- **Webhooks admin** (**Paramètres > Outils d'administration > Webhooks admin**, administrateurs uniquement) : événements de l'instance comme `user.created`, `user.updated`, `user.activated`, `user.deactivated`, `user.deleted`, `settings.language_changed`, `signup.cap_reached`, `quota.notes_reached` et `quota.storage_reached`.
-- **Webhooks utilisateur** (**Paramètres > Webhooks utilisateur**) : chaque compte peut enregistrer ses propres endpoints pour les événements concernant son propre contenu : `note.created`, `note.shared` et les événements de rappel. Ces événements ne sont jamais livrés qu'aux endpoints enregistrés par le compte qui les a produits, jamais à ceux d'un autre utilisateur.
-
-Les livraisons sont des requêtes POST JSON signées en HMAC-SHA256 lorsque le webhook a un secret (même principe que les webhooks GitHub). Le contenu des notes n'est jamais envoyé, les payloads ne transportent que des métadonnées, et les événements de rappel existent en trois variantes pour que vous choisissiez la quantité de données qui quitte l'instance.
-
-Pour la référence complète, qui couvre chaque événement, les champs exacts du payload (`data.user`, `data.note`, ...), la vérification de signature avec des exemples de code, les garanties de livraison et la configuration de l'URL de l'instance pour les liens directs vers les notes, consultez la **[documentation des webhooks](docs/WEBHOOKS.fr.md)**.
+Les livraisons sont signées en HMAC-SHA256 lorsque le webhook a un secret, et le contenu des notes n'est jamais envoyé. Chaque événement, les champs du payload, la vérification de signature et les garanties de livraison sont décrits dans la **[documentation des webhooks](docs/WEBHOOKS.fr.md)**.
 
 ## Synchronisation Git
 
@@ -1240,19 +1211,11 @@ Server: my-server.com
 
 ## Assistant IA
 
-Poznote intègre un chat IA qui se connecte à n'importe quel serveur compatible OpenAI, à une instance locale [Ollama](https://ollama.com) ou [LM Studio](https://lmstudio.ai), ou à un fournisseur cloud comme [Anthropic (Claude)](https://www.anthropic.com) ou OpenAI. Une fois configuré, un bouton **Assistant IA** apparaît dans la barre d'icônes de gauche, sur la page des notes et sur le tableau de bord, et ouvre le panneau de chat directement sur place.
+Poznote intègre un chat IA qui se connecte à une instance locale [Ollama](https://ollama.com) ou [LM Studio](https://lmstudio.ai), à un fournisseur cloud comme [Anthropic (Claude)](https://www.anthropic.com) ou OpenAI, ou à n'importe quel serveur compatible OpenAI. Il recherche et lit vos notes pour répondre à vos questions et, quand vous le lui demandez, les crée, les réécrit et les organise, dans l'espace de travail où vous avez ouvert le chat.
 
-L'assistant est global, dans l'esprit de MCP : il dispose d'outils pour **rechercher et lire vos notes**, et s'en sert de lui-même pour répondre à vos questions, comme « que disent mes notes à propos de X ? », des synthèses sur plusieurs notes, ou retrouver cette note dont vous vous souvenez à moitié. Quand vous le lui demandez explicitement, il peut aussi **créer, renommer et réécrire des notes**, **les organiser** (tags, dossiers, favoris, rappels, tâches et cases à cocher) et **déplacer des notes et des dossiers vers la corbeille** (sans jamais les supprimer définitivement). Les réponses sont diffusées en continu et affichées en Markdown.
+Un administrateur l'active depuis **Paramètres → Outils d'administration → Assistant IA**, et chaque profil dispose alors d'un bouton **Assistant IA** dans la barre d'icônes de gauche. Le serveur d'IA est appelé depuis le serveur Poznote, jamais depuis votre navigateur : avec une instance Ollama locale, vos notes ne quittent jamais votre machine.
 
-L'assistant est **limité à l'espace de travail courant** : il ne voit, ne recherche et ne modifie que les notes de l'espace de travail dans lequel vous avez ouvert le chat, et c'est là que les nouvelles notes sont créées. Pour poser une question sur un autre espace de travail, basculez d'abord sur celui-ci.
-
-Pour l'activer, allez dans **Paramètres → Outils d'administration → Assistant IA** (administrateur uniquement), choisissez un fournisseur et utilisez **Vérifier l'accès et lister les modèles** pour vérifier le serveur et choisir un modèle parmi ceux qu'il propose. La configuration s'applique à toute l'instance : une fois le chat activé par l'administrateur, tous les profils utilisateur y ont accès.
-
-L'administrateur peut aussi autoriser les clés API personnelles. Chaque utilisateur dispose alors d'une carte **Mon assistant IA** dans ses propres paramètres, pour faire pointer le chat vers son propre serveur, son propre fournisseur et sa propre clé au lieu de ceux de l'instance.
-
-Pour le guide de configuration complet, qui couvre les fournisseurs, le choix d'un modèle et la connexion d'un serveur Ollama/LM Studio local depuis le conteneur Poznote (trouver la bonne URL, `OLLAMA_HOST`, réseau Docker), consultez la [documentation de l'assistant IA](docs/AI-ASSISTANT.fr.md).
-
-Le serveur d'IA est appelé depuis le serveur Poznote, jamais depuis votre navigateur. Avec une instance Ollama locale, vos notes et vos conversations ne quittent jamais votre machine. Pour confier plutôt la gestion de vos notes à un assistant IA externe (VS Code Copilot, Claude CLI...), consultez le [Serveur MCP](#serveur-mcp) ci-dessous.
+Ce que l'assistant sait faire, le choix d'un fournisseur et d'un modèle, les clés API personnelles et la connexion d'un serveur local depuis le conteneur Poznote sont décrits dans la [documentation de l'assistant IA](docs/AI-ASSISTANT.fr.md). Pour confier plutôt la gestion de vos notes à un assistant IA externe (VS Code Copilot, Claude CLI...), consultez le [Serveur MCP](#serveur-mcp) ci-dessous.
 
 ## Transcription (reconnaissance vocale)
 
@@ -1264,54 +1227,20 @@ La mise en place d'un serveur, le choix d'un modèle et tout le reste sont décr
 
 ## Serveur MCP
 
-Poznote intègre un serveur Model Context Protocol (MCP) qui permet à des assistants IA comme GitHub Copilot d'interagir avec vos notes en langage naturel. Par exemple :
+Poznote intègre un serveur Model Context Protocol (MCP) qui permet à des assistants IA comme GitHub Copilot ou Claude CLI d'interagir avec vos notes en langage naturel. Par exemple :
 
 - « Crée une nouvelle note intitulée 'Meeting Notes' avec le contenu... »
 - « Recherche les notes qui parlent de 'Docker' »
 - « Liste toutes les notes de mon espace de travail Poznote »
 - « Mets à jour la note 42 avec de nouvelles informations »
 
-<p align="center">
-  <img src="docs/mcp-poznote.gif" alt="Poznote MCP Server demo" width="100%">
-</p>
-
-Pour les instructions d'installation et d'utilisation, consultez la [documentation du serveur MCP](docs/MCP-SERVER.fr.md).
-
-Le serveur MCP utilise des réglages par défaut (port `8045`, débogage désactivé). Pour les surcharger :
-
-```bash
-POZNOTE_MCP_PORT=9000 POZNOTE_DEBUG=true docker compose up -d --force-recreate mcp-server
-```
-
-Il s'agit de surcharges au niveau du conteneur et de l'exécution, pas de réglages de l'interface Poznote. Vous pouvez les passer en ligne de commande comme ci-dessus ou les placer dans `.env` avant de recréer le conteneur `mcp-server`.
-
-Le serveur MCP ne reconnaît que les valeurs exactes en minuscules `true` et `false` pour `POZNOTE_DEBUG`, et se rabat sur `false` pour toute autre valeur (le serveur web est plus tolérant et accepte aussi `1`, `on` ou `yes`). Après avoir modifié les réglages, recréez le conteneur ; un simple redémarrage ne recharge pas les variables d'environnement.
-
-**Sécurité :** le port MCP n'est publié que sur `127.0.0.1` : par défaut, rien en dehors de votre machine ne peut donc l'atteindre. Si vous l'exposez davantage (reverse proxy, réseau local ou installation sans Docker), définissez `POZNOTE_MCP_AUTH_TOKEN` dans `.env` et le serveur exigera un en-tête `Authorization: Bearer <token>` de chaque client. Hors Docker, `poznote-mcp serve` écoute par défaut sur `127.0.0.1`. Plus de détails dans la [section Sécurité](docs/MCP-SERVER.fr.md#sécurité) de la documentation MCP.
+Le serveur MCP est fourni avec le `docker-compose.yml` officiel et n'est publié que sur `127.0.0.1` : par défaut, rien en dehors de votre machine ne peut l'atteindre. L'installation, la configuration des clients, les surcharges de port et de débogage, et la protection par `POZNOTE_MCP_AUTH_TOKEN` lorsque vous l'exposez davantage sont décrites dans la [documentation du serveur MCP](docs/MCP-SERVER.fr.md).
 
 ## Extension Chrome
 
-**Poznote URL Saver** est une extension de navigateur qui vous permet d'enregistrer rapidement, en un seul clic, l'URL ou même une capture pleine page de la page courante dans votre instance Poznote.
+**Poznote URL Saver** est une extension de navigateur qui enregistre en un seul clic l'URL, ou même une capture pleine page, de la page courante dans votre instance Poznote. Installez-la depuis le Chrome Web Store : [Installer l'extension](https://chromewebstore.google.com/detail/bmjclfamahegmgillaghhmnbkjebipbh?utm_source=item-share-cb)
 
-<p align="center">
-  <img src="images/chrome-extension.png" alt="Poznote Chrome Extension" width="50%">
-</p>
-
-Installez l'extension directement depuis le Chrome Web Store → [Installer l'extension](https://chromewebstore.google.com/detail/bmjclfamahegmgillaghhmnbkjebipbh?utm_source=item-share-cb)
-
-#### Connecter l'extension à votre instance
-
-1. Dans Poznote, ouvrez **Paramètres > Mots de passe d'application**, créez-en un portant le nom de l'extension et copiez le secret affiché. Il n'est affiché qu'une seule fois.
-2. Ouvrez l'extension, puis renseignez :
-   - **App URL :** l'adresse de votre instance, par exemple `https://notes.example.com/`
-   - **Username :** votre nom d'utilisateur Poznote
-   - **Password :** le mot de passe d'application que vous venez de copier
-   - **Workspace**, et éventuellement **Folder** : l'espace de travail et le dossier où les pages enregistrées doivent arriver
-3. Enregistrez. L'extension retrouve votre profil toute seule et elle est prête à l'emploi.
-
-Le mot de passe de votre compte fonctionne aussi ici, mais un mot de passe d'application est un meilleur choix pour une extension : il n'atteint que l'API, jamais l'interface web ni les paramètres de votre compte, il est limité à votre propre profil, et le révoquer dans Poznote coupe l'accès de l'extension sans rien changer d'autre. Consultez [Mots de passe d'application](#app-passwords) pour la liste complète des limites.
-
-> **Si votre instance est en SSO uniquement,** un mot de passe d'application est le seul moyen de connecter l'extension : le formulaire de connexion dont l'extension a besoin n'existe pas pour votre compte. Créez-en un depuis **Paramètres > Mots de passe d'application** exactement comme ci-dessus.
+L'extension se connecte à votre instance avec votre nom d'utilisateur et un [mot de passe d'application](#mots-de-passe-dapplication). Les étapes de configuration sont dans la [documentation de l'extension Chrome](docs/CHROME-EXTENSION.fr.md).
 
 ## Partager vers Poznote sur Android
 

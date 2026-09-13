@@ -61,6 +61,10 @@ Utilisez ensuite **Vérifier l'accès et lister les modèles**, qui vérifie que
 
 La configuration s'applique à toute l'instance : une fois activé par l'administrateur, chaque profil utilisateur a accès au chat.
 
+### Clés API personnelles
+
+La même page propose l'option **Autoriser les clés API personnelles**. Quand elle est activée, chaque utilisateur dispose d'une carte **Mon assistant IA** dans ses propres paramètres, pour faire pointer le chat vers son propre serveur, son propre fournisseur et sa propre clé API au lieu de ceux configurés pour l'instance.
+
 ## Choisir un modèle
 
 Choisissez un modèle qui prend en charge l'**appel d'outils** (aussi appelé « function calling »), par exemple `qwen3`, `llama3.1` ou `mistral`. C'est l'appel d'outils qui permet à l'assistant de parcourir vos notes : avec un modèle qui ne le prend pas en charge, le chat fonctionne toujours (un avertissement vous le signale) mais ne peut pas accéder à vos notes de lui-même.

@@ -19,6 +19,10 @@ Dieser Server unterstützt **ausschließlich den HTTP-Transport** (MCP Streamabl
 > [!TIP]
 > Sie suchen einen Chat mit einem lokalen Modell (z. B. Ollama) direkt in Poznote? Dafür brauchen Sie den MCP-Server nicht, verwenden Sie stattdessen den integrierten [KI-Assistenten](AI-ASSISTANT.de.md) (**Einstellungen → Admin-Werkzeuge → KI-Assistent**). Der MCP-Server dient dazu, *externe* MCP-fähige Assistenten mit Ihren Notizen zu verbinden; Ollama allein ist eine Laufzeitumgebung für Modelle, kein MCP-Client, und kann sich nicht direkt mit ihm verbinden.
 
+<p align="center">
+  <img src="mcp-poznote.gif" alt="Poznote MCP Server demo" width="100%">
+</p>
+
 ## Schnellstart
 
 Wählen Sie Ihren bevorzugten KI-Assistenten:
@@ -180,7 +184,7 @@ Dieses Token ist unabhängig von `data/.mcp_token`: Jenes verwendet der MCP-Serv
 
 #### Debug-Modus
 
-Setzen Sie `POZNOTE_DEBUG=true` im Startbefehl, um die Log-Stufe von `INFO` auf `DEBUG` umzustellen. Für den normalen Betrieb setzen Sie den Wert wieder auf `false`. Nur die exakten Kleinschreibungswerte `true` und `false` werden erkannt. Jeder andere Wert wird als `false` behandelt, und in die MCP-Logs wird eine Warnung geschrieben. Jede an die Poznote-API gesendete HTTP-Anfrage, jeder vom KI-Assistenten empfangene Tool-Aufruf und jede Antwort werden ausführlich in die Container-Logs geschrieben. Nutzen Sie den Modus, um Verbindungs- oder Authentifizierungsprobleme zu diagnostizieren:
+Setzen Sie `POZNOTE_DEBUG=true` im Startbefehl, um die Log-Stufe von `INFO` auf `DEBUG` umzustellen. Für den normalen Betrieb setzen Sie den Wert wieder auf `false`. Nur die exakten Kleinschreibungswerte `true` und `false` werden erkannt. Jeder andere Wert wird als `false` behandelt, und in die MCP-Logs wird eine Warnung geschrieben. Der Webserver ist toleranter und akzeptiert auch `1`, `on` oder `yes`. Jede an die Poznote-API gesendete HTTP-Anfrage, jeder vom KI-Assistenten empfangene Tool-Aufruf und jede Antwort werden ausführlich in die Container-Logs geschrieben. Nutzen Sie den Modus, um Verbindungs- oder Authentifizierungsprobleme zu diagnostizieren:
 
 ```bash
 docker compose logs -f mcp-server

@@ -384,7 +384,9 @@ Rename the default administrator account and change the default password after t
 
 Most day-to-day settings are changed from the Poznote interface. Use the `.env` file only for deployment/runtime values that are read when containers start.
 
-Use the `.env` file for:
+<details>
+<summary><strong>Use the <code>.env</code> file for</strong></summary>
+<br>
 
 - `HTTP_WEB_PORT`
 - `POZNOTE_OIDC_CLIENT_ID`
@@ -396,10 +398,16 @@ Use the `.env` file for:
 - `POZNOTE_SETTINGS_PASSWORD` to ask for an extra password before the Settings page opens, left empty by default
 - `POZNOTE_MCP_AUTH_TOKEN` to require a bearer token from MCP clients, see [MCP Server](#mcp-server)
 
-Use the UI for:
+</details>
+
+<details>
+<summary><strong>Use the UI for</strong></summary>
+<br>
 
 - Admin/global settings such as OIDC provider settings, Git Sync enablement, import limits, and custom CSS upload
 - User/profile settings such as local account passwords, theme, font sizes, note sorting, workspace background, and hidden UI elements
+
+</details>
 
 
 ### Modify System Settings (`.env`)
@@ -462,7 +470,7 @@ Your data is preserved in the `./data` directory and will not be affected by the
 
 ## Authentication
 
-Poznote supports multiple authentication methods including local accounts and external identity providers. Apps and extensions that talk to the REST API use **app passwords**, a separate credential described below.
+Poznote supports multiple authentication methods including local accounts and external identity providers. Apps and extensions that talk to the REST API use [app passwords](#app-passwords), a separate credential described in the next section.
 
 <details>
 <summary><strong>Local Accounts Authentication</strong></summary>
@@ -549,39 +557,19 @@ If auto-provisioning is enabled, Poznote generates a username from the OIDC clai
 
 </details>
 
-<a id="app-passwords"></a>
-<details>
-<summary><strong>App Passwords (for apps, extensions and scripts)</strong></summary>
-<br>
+## App Passwords
 
-Apps cannot sign in through an identity provider the way a browser can. An **app password** is a separate credential you create for one client and can revoke at any time, so you never have to hand out your account password.
+Apps cannot sign in through an identity provider the way a browser can. An **app password** is a separate credential you create for one client (the browser extension, a phone, a script) and can revoke at any time, so you never have to hand out your account password.
 
-Create one from **Settings > App passwords**: give it a name (the client that will use it), optionally an expiry, and copy the generated secret. It is shown once and never again.
-
-Then, in the client, enter **your usual username** and **the app password** where it asks for a password. Nothing else changes: it travels as ordinary HTTP Basic Auth, so every existing client works as-is.
+Create one from **Settings > App passwords**: give it a name, optionally an expiry, and copy the generated secret. It is shown once and never again. Then, in the client, enter your usual username and the app password where it asks for a password. It travels as ordinary HTTP Basic Auth, so every existing client works as-is:
 
 ```bash
 curl -u 'username:pzn_2f7c…' https://YOUR_SERVER/api/v1/notes
 ```
 
-#### What an app password can and cannot do
+An app password only reaches the REST API, and only for its own profile: it cannot open the web interface, call an admin endpoint, change your password or manage your account, even when the account is an administrator. A leaked one therefore exposes the notes of one account and nothing more, and revoking it closes the hole. On an SSO-only instance, where accounts created by OIDC have no password at all, it is the only credential the API accepts over Basic Auth.
 
-|  | |
-|---|---|
-| ✅ Read and write the notes, folders, tags and attachments of **its own profile** | ❌ Open the web interface: it is refused at the login form |
-| ✅ Work when the instance is SSO-only, including with *Disable HTTP Basic Auth for API* enabled | ❌ Reach any `/api/v1/admin/*` endpoint, even when the account is an administrator |
-| ✅ Be given an expiry date, and be revoked at any moment | ❌ Change your password, edit or delete your account, or create further app passwords |
-| ✅ Omit the `X-User-ID` header: it is bound to the profile that created it | ❌ Act on another profile, even for an administrator |
-
-Because of those limits, a leaked app password exposes the notes of one account and nothing more, and you close the hole by revoking the row.
-
-The list in **Settings > App passwords** shows, for each one, the first characters of the secret (to tell them apart), when it was created, and when it was last used, which is what makes an unused credential easy to spot and remove. Each account can hold up to 25.
-
-> **On an SSO-only instance,** an app password is the only credential the API accepts over Basic Auth. Accounts created automatically by OIDC have no account password at all, so this is how their owners connect the browser extension, a phone, or a script.
-
-Full reference, including the endpoints that manage them: [REST API documentation](docs/API-REST.md#authentication).
-
-</details>
+The full list of limits and the endpoints that manage app passwords are in the [REST API documentation](docs/API-REST.md#authentication).
 
 ## Note types
 
@@ -654,11 +642,17 @@ Poznote supports two primary note formats, each tailored for different workflows
 
 Snapshots keep earlier versions of a note's content so you can go back to a previous state from the note's **Snapshots** menu.
 
+<details>
+<summary><strong>How snapshots work</strong></summary>
+<br>
+
 *   **Automatic:** a snapshot is taken the first time a note is opened each day. The 3 most recent automatic snapshots are kept per note; this number can be changed under **Settings > Behavior > Snapshots**.
 *   **Manual:** "Take snapshot now" adds a snapshot at any time, and so does **Ctrl + Alt + S** (Cmd + Alt + S on Mac) while a note is open. Manual snapshots are unlimited and do not count toward that number.
 *   **Before an AI edit:** a snapshot is taken automatically right before the [AI assistant](#ai-assistant) or the [MCP server](#mcp-server) changes the content of a note, so a rewrite that goes wrong is one click away from being undone. These snapshots are labeled "Before AI edit" or "Before MCP edit" in the history, are skipped when the latest snapshot already holds the same content, and the 20 most recent ones are kept per note, a number you can change in **Settings → Snapshots** (1 to 200) if your instance edits a lot of notes through AI or MCP.
 *   **Expiry:** every snapshot, automatic or manual, is deleted 30 days after it was taken. A snapshot can also be deleted by hand from the Snapshots modal.
 *   **Attachments and images:** snapshots only store the note text. Attachments are never copied, so a file referenced by several snapshots exists once on disk. A file removed from a note stays on disk, hidden from the note, as long as a snapshot still contains it, so restoring that snapshot brings it back. It is deleted for good once the last snapshot containing it expires or is deleted, or when the note is permanently deleted. Keeping more snapshots therefore never duplicates files. It only keeps removed files around for longer, 30 days at most.
+
+</details>
 
 ## Personalization
 
@@ -816,19 +810,15 @@ One thing a theme cannot reach yet: a handful of icons that a page rule colours 
 
 > Not to be confused with the [Multiple Instances](#multiple-instances) feature.
 
-Poznote features a multi-user architecture with isolated data spaces for each profile while still allowing controlled collaboration on the same instance.
+Poznote is multi-user: each profile has its own notes, workspaces, tags, folders, attachments and settings, and signs in with its own username or email address and password.
 
-- **Data isolation**: Each profile has its own notes, workspaces, tags, folders, attachments, and user settings.
-- **Per-profile authentication**: Users sign in with their own username or email address and password. Until a password is changed in the UI, built-in defaults are used (`admin` for administrators, `user` for standard users).
-- **User management**: Administrators can create, disable, and manage profiles from **Settings > Admin Tools > User Management**.
-- **Delegated account access**: Administrators can grant one user access to another user's account. When a user can open multiple accounts, Poznote asks which account to use after login and clearly indicates when the session is **acting as** another user.
-- **Owner/admin safeguards**: Opening another user's account does not transfer ownership. Sensitive actions such as password changes, backup/restore, Git Sync configuration, and global admin settings remain restricted to the appropriate owner or administrator.
-- **Sharing**: Notes, folders, and entire workspaces can be shared with other users of the same instance, or publicly through dedicated links. A share is read-only by default and can be made editable: text editing for a note, note editing for a folder, and three levels for a task list (read only, check or uncheck only, full edit).
-- **Single-editor locking**: When several users can access the same note, Poznote allows only one active editor at a time. Other users can still open the note in read-only mode, see who currently holds the lock, and take over editing after reopening the note once the lock is released or expires.
-- **Tenant isolation (SaaS mode)**: Administrators can block selected capabilities for non-admin users, such as discovering the other accounts of the instance and sharing with them, or registering personal webhooks. Administrators are never affected. Leave everything unchecked for a family or team instance.
+- **User management**: administrators create, disable and manage profiles from **Settings > Admin Tools > User Management**, and can give a user access to another user's account without transferring its ownership.
+- **Sharing**: notes, folders and entire workspaces can be shared with other users of the instance, read-only or editable, or publicly through dedicated links. When several users can access the same note, only one edits it at a time and the others see who holds the lock.
+- **Tenant isolation (SaaS mode)**: administrators can stop non-admin users from discovering the other accounts of the instance, sharing with them, or registering personal webhooks. Leave everything unchecked for a family or team instance.
 
-
-### Architecture & Structure
+<details>
+<summary><strong>Data layout on disk</strong></summary>
+<br>
 
 Poznote uses a master database (`data/master.db`) for shared coordination data, and separate per-user databases and files for actual note content.
 
@@ -848,38 +838,19 @@ data/
     └── ...
 ```
 
+</details>
+
 ## Activity Log
 
-Poznote keeps a history of the sensitive operations performed on the instance, so administrators can see what happened, when, and by whom. It is available from **Settings > Admin Tools > Activity log** and is restricted to administrators.
+Poznote keeps a history of the sensitive operations performed on the instance, so administrators can see what happened, when, and by whom: logins and logouts, account and quota changes, workspace creation and sharing, backups and restores, trash emptying and permanent deletions, app passwords. It is available from **Settings > Admin Tools > Activity log**, restricted to administrators, and the help icon at the top of the page lists every recorded operation.
 
-Each entry records the date and time, the account concerned, the action, and a short summary such as the name of the deleted workspace or the number of notes removed. Hover the help icon at the top of the page for the full list of recorded operations, which covers:
-
-- **Sessions**: logins and logouts.
-- **Accounts**: profile changes (username, email, name), quota changes, activation and deactivation, admin role granted or revoked, account deletion, and delegated account access granted or revoked.
-- **Workspaces**: creation, deletion, sharing and unsharing.
-- **Data**: backup creation and restore, trash emptying, and permanent note deletion.
-- **App passwords**: creation and revocation.
-
-Routine activity is deliberately left out: writing or moving a note to the trash is not recorded, and neither are API calls authenticated on each request, which would otherwise turn the log into a traffic dump.
-
-The log records that an operation happened, not the data it touched. **Note content is never written to it**, and neither are tags, folders, or attachments. A deletion entry identifies the note by its title and workspace so the event can be recognised, nothing more.
-
-> **No password is ever written to the log**, in any form. Where a password is relevant, for example on a protected shared workspace, only the fact that one is set is recorded.
-
-Entries are kept for 90 days by default. The retention period can be changed to 30, 90 or 365 days, or set to unlimited, and the log can be cleared manually from the same page.
+The log records that an operation happened, not the data it touched: note content and passwords are never written to it, and routine activity such as writing a note or moving it to the trash is left out. Entries are kept for 90 days by default (30, 90, 365 days or unlimited), and the log can be cleared from the same page.
 
 ## Webhooks
 
-Poznote can notify external services when something happens on the instance, by sending outgoing webhooks (HTTP POST requests with a JSON payload) to the endpoints you register. This makes it easy to plug Poznote into automation tools such as n8n, Zapier, or your own scripts. Poznote only emits webhooks: what the receiving endpoint does with them (send an email, trigger a workflow, ...) is up to you.
+Poznote can notify external services when something happens on the instance, by sending outgoing webhooks (HTTP POST requests with a JSON payload) to the endpoints you register, so it plugs into automation tools such as n8n, Zapier, or your own scripts. Administrators register instance events (accounts, quotas, signups) under **Settings > Admin Tools > Admin Webhooks**, and every user can register endpoints for their own notes and reminders under **Settings > User Webhooks**.
 
-There are two levels of webhooks:
-
-- **Admin Webhooks** (**Settings > Admin Tools > Admin Webhooks**, administrators only): instance events such as `user.created`, `user.updated`, `user.activated`, `user.deactivated`, `user.deleted`, `settings.language_changed`, `signup.cap_reached`, `quota.notes_reached`, and `quota.storage_reached`.
-- **User Webhooks** (**Settings > User Webhooks**): each account can register its own endpoints for events about its own content: `note.created`, `note.shared`, and reminder events. These events are only ever delivered to the endpoints registered by the account that produced them, never to another user's.
-
-Deliveries are JSON POST requests signed with HMAC-SHA256 when the webhook has a secret (same scheme as GitHub webhooks). Note content is never sent, payloads carry only metadata, and reminder events come in three variants so you choose how much data leaves the instance.
-
-For the complete reference, covering every event, the exact payload fields (`data.user`, `data.note`, ...), signature verification with code examples, delivery guarantees, and the Instance URL configuration for direct note links, see the **[Webhooks documentation](docs/WEBHOOKS.md)**.
+Deliveries are signed with HMAC-SHA256 when the webhook has a secret, and note content is never sent. Every event, the payload fields, signature verification and delivery guarantees are covered in the **[Webhooks documentation](docs/WEBHOOKS.md)**.
 
 ## Git Synchronization
 
@@ -1240,19 +1211,11 @@ Server: my-server.com
 
 ## AI Assistant
 
-Poznote includes an integrated AI chat that connects to any OpenAI-compatible server, a local [Ollama](https://ollama.com) or [LM Studio](https://lmstudio.ai) instance, or a cloud provider like [Anthropic (Claude)](https://www.anthropic.com) or OpenAI. Once configured, an **AI assistant** button appears in the left icon rail, on the notes page and on the dashboard, and opens the chat panel right there.
+Poznote includes an integrated AI chat that connects to a local [Ollama](https://ollama.com) or [LM Studio](https://lmstudio.ai) instance, a cloud provider like [Anthropic (Claude)](https://www.anthropic.com) or OpenAI, or any OpenAI-compatible server. It searches and reads your notes to answer questions and, when you ask for it, creates, rewrites and organizes them, within the workspace you opened the chat in.
 
-The assistant is global, MCP-style: it has tools to **search and read your notes**, and uses them on its own to answer questions, like "what do my notes say about X?", cross-note summaries, finding that note you half remember. When you explicitly ask for it, it can also **create, rename and rewrite notes**, **organize them** (tags, folders, favorites, reminders, tasks and checkboxes) and **move notes and folders to the trash** (never delete them for good). Answers are streamed and rendered as Markdown.
+An administrator enables it from **Settings → Admin Tools → AI Assistant**, and every profile then gets an **AI assistant** button in the left icon rail. The AI server is called from the Poznote server, never from your browser, so with a local Ollama instance your notes never leave your machine.
 
-The assistant is **scoped to the current workspace**: it only sees, searches and edits the notes of the workspace you opened the chat in, and new notes are created there. To ask about another workspace, switch to it first.
-
-To enable it, go to **Settings → Admin Tools → AI Assistant** (administrator only), pick a provider and use **Check access and list models** to verify the server and choose a model from the ones it offers. The configuration applies to the whole instance: once enabled by the administrator, every user profile gets the chat.
-
-The administrator can also allow personal API keys. Each user then gets a **My AI Assistant** card in their own settings, to point the chat at their own server, provider and key instead of the instance ones.
-
-For the full configuration guide, covering providers, choosing a model, and how to connect a local Ollama/LM Studio server from the Poznote container (finding the right URL, `OLLAMA_HOST`, Docker networking), see the [AI Assistant documentation](docs/AI-ASSISTANT.md).
-
-The AI server is called from the Poznote server, never from your browser. With a local Ollama instance, your notes and conversations never leave your machine. To let an external AI assistant (VS Code Copilot, Claude CLI...) manage your notes instead, see the [MCP Server](#mcp-server) below.
+What the assistant can do, choosing a provider and a model, personal API keys, and connecting a local server from the Poznote container are covered in the [AI Assistant documentation](docs/AI-ASSISTANT.md). To let an external AI assistant (VS Code Copilot, Claude CLI...) manage your notes instead, see the [MCP Server](#mcp-server) below.
 
 ## Transcription (speech to text)
 
@@ -1264,54 +1227,20 @@ Setting up a server, choosing a model, and everything else is in the [Transcript
 
 ## MCP Server
 
-Poznote includes a Model Context Protocol (MCP) server that enables AI assistants like GitHub Copilot to interact with your notes using natural language. For example:
+Poznote includes a Model Context Protocol (MCP) server that enables AI assistants like GitHub Copilot or Claude CLI to interact with your notes using natural language. For example:
 
 - "Create a new note titled 'Meeting Notes' with the content..."
 - "Search for notes about 'Docker'"
 - "List all notes in my Poznote workspace"
 - "Update note 42 with new information"
 
-<p align="center">
-  <img src="docs/mcp-poznote.gif" alt="Poznote MCP Server demo" width="100%">
-</p>
-
-For setup and usage instructions, see the [MCP Server documentation](docs/MCP-SERVER.md).
-
-The MCP server uses default settings (port `8045`, debug off). To override:
-
-```bash
-POZNOTE_MCP_PORT=9000 POZNOTE_DEBUG=true docker compose up -d --force-recreate mcp-server
-```
-
-These are container/runtime overrides, not Poznote UI settings. You can pass them inline as shown above or place them in `.env` before recreating the `mcp-server` container.
-
-The MCP server only recognizes the exact lowercase values `true` and `false` for `POZNOTE_DEBUG`, and falls back to `false` for anything else (the web server is more tolerant and also accepts `1`, `on` or `yes`). After changing settings, recreate the container; a simple restart does not reload environment variables.
-
-**Security:** the MCP port is published on `127.0.0.1` only, so by default nothing outside your machine can reach it. If you expose it further (reverse proxy, LAN, or a non-Docker install), set `POZNOTE_MCP_AUTH_TOKEN` in `.env` and the server will require an `Authorization: Bearer <token>` header from every client. When run outside Docker, `poznote-mcp serve` binds to `127.0.0.1` by default. Details in the [Security section](docs/MCP-SERVER.md#security) of the MCP documentation.
+The MCP server ships with the official `docker-compose.yml` and is published on `127.0.0.1` only, so nothing outside your machine can reach it by default. Setup, client configuration, port and debug overrides, and how to protect it with `POZNOTE_MCP_AUTH_TOKEN` when you expose it further are covered in the [MCP Server documentation](docs/MCP-SERVER.md).
 
 ## Chrome Extension
 
-The **Poznote URL Saver** is a browser extension that allows you to quickly save the URL or even a full-page screenshot of the current page to your Poznote instance with a single click.
+The **Poznote URL Saver** is a browser extension that saves the URL, or even a full-page screenshot, of the current page to your Poznote instance with a single click. Install it from the Chrome Web Store: [Install extension](https://chromewebstore.google.com/detail/bmjclfamahegmgillaghhmnbkjebipbh?utm_source=item-share-cb)
 
-<p align="center">
-  <img src="images/chrome-extension.png" alt="Poznote Chrome Extension" width="50%">
-</p>
-
-Install the extension directly from the Chrome Web Store → [Install extension](https://chromewebstore.google.com/detail/bmjclfamahegmgillaghhmnbkjebipbh?utm_source=item-share-cb)
-
-#### Connecting it to your instance
-
-1. In Poznote, open **Settings > App passwords**, create one named after the extension, and copy the secret it shows. It is displayed once.
-2. Open the extension, then fill in:
-   - **App URL:** the address of your instance, e.g. `https://notes.example.com/`
-   - **Username:** your Poznote username
-   - **Password:** the app password you just copied
-   - **Workspace**, and optionally a **Folder**, where saved pages should land
-3. Save. The extension resolves your profile by itself and is ready to use.
-
-Your account password works here too, but an app password is the better credential for an extension: it reaches the API only, never the web interface or your account settings, it is limited to your own profile, and revoking it in Poznote cuts the extension off without changing anything else. See [App Passwords](#app-passwords) for the full list of limits.
-
-> **If your instance is SSO-only,** an app password is the only way to connect the extension: the sign-in form the extension needs does not exist for your account. Create one from **Settings > App passwords** exactly as above.
+The extension connects to your instance with your username and an [app password](#app-passwords). The setup steps are in the [Chrome Extension documentation](docs/CHROME-EXTENSION.md).
 
 ## Share to Poznote on Android
 

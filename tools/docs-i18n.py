@@ -38,6 +38,7 @@ ROOT = Path(__file__).resolve().parent.parent
 PAGES = [
     "README.md",
     "docs/AI-ASSISTANT.md",
+    "docs/CHROME-EXTENSION.md",
     "docs/CLAUDE-CLI.md",
     "docs/MCP-SERVER.md",
     "docs/TRANSCRIPTION.md",

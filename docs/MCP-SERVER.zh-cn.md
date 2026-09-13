@@ -19,6 +19,10 @@
 > [!TIP]
 > 想直接在 Poznote 中与本地模型（例如 Ollama）聊天？这并不需要 MCP 服务器，请改用内置的 [AI 助手](AI-ASSISTANT.zh-cn.md)（**设置 → 管理工具 → AI 助手**）。MCP 服务器用于将支持 MCP 的*外部*助手连接到您的笔记；Ollama 本身只是模型运行时，不是 MCP 客户端，无法直接连接到 MCP 服务器。
 
+<p align="center">
+  <img src="mcp-poznote.gif" alt="Poznote MCP Server demo" width="100%">
+</p>
+
 ## 快速开始
 
 选择您喜欢的 AI 助手：
@@ -180,7 +184,7 @@ docker compose up -d --force-recreate mcp-server
 
 #### 调试模式
 
-在启动命令中设置 `POZNOTE_DEBUG=true`，可将日志级别从 `INFO` 切换为 `DEBUG`。正常使用时请改回 `false`。只识别完全小写的 `true` 和 `false`。其他任何值都会被视为 `false`，并在 MCP 日志中写入警告。发送到 Poznote API 的每个 HTTP 请求、从 AI 助手收到的每个工具调用以及每个响应，都会详细写入容器日志。可用它来诊断连接或身份验证问题：
+在启动命令中设置 `POZNOTE_DEBUG=true`，可将日志级别从 `INFO` 切换为 `DEBUG`。正常使用时请改回 `false`。只识别完全小写的 `true` 和 `false`。其他任何值都会被视为 `false`，并在 MCP 日志中写入警告。Web 服务器的容忍度更高，还接受 `1`、`on` 或 `yes`。发送到 Poznote API 的每个 HTTP 请求、从 AI 助手收到的每个工具调用以及每个响应，都会详细写入容器日志。可用它来诊断连接或身份验证问题：
 
 ```bash
 docker compose logs -f mcp-server
