@@ -4539,9 +4539,6 @@
     "delete_title": "Tagebuch löschen",
     "delete_confirm": "Tagebuch „{{name}}“ löschen? Seine Ordner werden entfernt und alle Einträge in den Papierkorb verschoben.",
     "delete_error": "Das Tagebuch konnte nicht gelöscht werden.",
-    "journal_trash": "In den Papierkorb",
-    "journal_trash_confirm": "„{{title}}“ in den Papierkorb verschieben?",
-    "journal_trash_error": "Dieser Eintrag konnte nicht in den Papierkorb verschoben werden.",
     "rename_title": "Tagebuch umbenennen",
     "rename_error": "Das Tagebuch konnte nicht umbenannt werden."
   },

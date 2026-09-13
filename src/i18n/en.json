@@ -4188,9 +4188,6 @@
     "delete_title": "Delete diary",
     "delete_confirm": "Delete the diary \"{{name}}\"? Its folders are removed and all its entries are moved to the trash.",
     "delete_error": "Could not delete the diary.",
-    "journal_trash": "Move to trash",
-    "journal_trash_confirm": "Move \"{{title}}\" to the trash?",
-    "journal_trash_error": "Could not move this entry to the trash.",
     "rename_title": "Rename diary",
     "rename_error": "Could not rename the diary."
   },

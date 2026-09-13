@@ -2049,7 +2049,7 @@
     "list": "Liste",
     "bullet_list": "Liste à puces",
     "numbered_list": "Liste numérotée",
-    "checklist": "Liste de tâches",
+    "checklist": "Cases à cocher",
     "done": "Fait",
     "image": "Image",
     "take_photo": "Prendre une photo",
@@ -4644,9 +4644,6 @@
     "delete_title": "Supprimer le journal",
     "delete_confirm": "Supprimer le journal « {{name}} » ? Ses dossiers sont supprimés et toutes ses notes sont placées dans la corbeille.",
     "delete_error": "Impossible de supprimer le journal.",
-    "journal_trash": "Mettre à la corbeille",
-    "journal_trash_confirm": "Mettre « {{title}} » à la corbeille ?",
-    "journal_trash_error": "Impossible de mettre cette note à la corbeille.",
     "rename_title": "Renommer le journal",
     "rename_error": "Impossible de renommer le journal."
   },

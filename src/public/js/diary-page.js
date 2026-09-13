@@ -195,7 +195,6 @@
         var isToday = data.todayNoteId && note.id === data.todayNoteId;
         var title = note.dated ? longDateLabel(note.entryDate) : note.heading;
         var subtitle = note.dated ? '' : '<span class="diary-journal-subtitle">' + esc(longDateLabel(note.entryDate)) + '</span>';
-        var trashLabel = txt.journalTrash || 'Move to trash';
         var editable = journalNoteIsEditable(note);
         var editLabel = txt.journalEdit || 'Edit here';
 
@@ -205,11 +204,15 @@
 
         return '<article class="diary-journal-entry' + (isToday ? ' is-today' : '') + '" data-note-id="' + note.id + '">' +
             '<header class="diary-journal-header">' +
-                '<h2 class="diary-journal-title">' +
-                    '<a href="' + esc(note.url) + '">' + buildNoteIcon(note, 'diary-journal-icon') + esc(title) + '</a>' +
-                '</h2>' +
-                (isToday ? '<span class="board-card-tag diary-today-tag">' + esc(txt.today || 'Today') + '</span>' : '') +
-                subtitle +
+                // Title, today tag and date share one shrinkable group: a long
+                // title is cut with an ellipsis, the pencil stays on its row
+                '<div class="diary-journal-heading">' +
+                    '<h2 class="diary-journal-title">' +
+                        '<a href="' + esc(note.url) + '" title="' + esc(title) + '">' + buildNoteIcon(note, 'diary-journal-icon') + esc(title) + '</a>' +
+                    '</h2>' +
+                    (isToday ? '<span class="board-card-tag diary-today-tag">' + esc(txt.today || 'Today') + '</span>' : '') +
+                    subtitle +
+                '</div>' +
                 '<span class="diary-journal-save-status" aria-live="polite"></span>' +
                 // The pencil edits in place (the title opens the note); a
                 // tasklist or a shortcut has no inline editor and no pencil
@@ -218,16 +221,13 @@
                         '<i class="lucide lucide-pencil"></i>' +
                       '</button>'
                     : '') +
-                '<button type="button" class="diary-journal-delete" title="' + esc(trashLabel) + '" aria-label="' + esc(trashLabel) + '">' +
-                    '<i class="lucide lucide-trash-2"></i>' +
-                '</button>' +
             '</header>' +
+            (tags ? '<div class="board-card-footer diary-journal-tags">' + tags + '</div>' : '') +
             // Markdown paragraphs carry their own gap, rich-text ones are flush
             // as in the editor (same split as public_note.css).
             '<div class="diary-journal-body' + (note.type === 'markdown' ? ' diary-journal-markdown' : '') + ' is-loading">' +
                 buildJournalExcerpt(note) +
             '</div>' +
-            (tags ? '<div class="board-card-footer diary-journal-tags">' + tags + '</div>' : '') +
         '</article>';
     }
 
@@ -1355,87 +1355,6 @@
         window.addEventListener('resize', closeDiaryContextMenu);
     }
 
-    // --- Move a journal entry to the trash ---
-    //
-    // Same request as the note menu's delete (not permanent, restorable from
-    // the trash). The entry leaves the column in place, so the reader keeps
-    // their position instead of the journal being rebuilt from the top.
-
-    function removeNoteFromList(list, noteId) {
-        for (var i = 0; i < list.length; i++) {
-            if (list[i].id === noteId) {
-                list.splice(i, 1);
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    function trashJournalEntry(btn) {
-        var entry = btn.closest('.diary-journal-entry');
-        if (!entry) return;
-        var noteId = parseInt(entry.getAttribute('data-note-id'), 10);
-        if (journalEdits[noteId]) finishJournalEdit(journalEdits[noteId]);
-        var titleEl = entry.querySelector('.diary-journal-title');
-        var title = titleEl ? titleEl.textContent.trim() : '';
-        var message = (txt.journalTrashConfirm || 'Move "{{title}}" to the trash?').replace('{{title}}', title);
-
-        var confirmed = window.modalAlert && typeof window.modalAlert.confirm === 'function'
-            ? window.modalAlert.confirm(message, txt.journalTrash || 'Move to trash', {
-                alertType: 'warning',
-                confirmText: txt.journalTrash || 'Move to trash',
-                cancelText: txt.cancel || 'Cancel',
-                cancelButtonClass: 'diary-confirm-cancel',
-                confirmButtonClass: 'danger'
-            })
-            : Promise.resolve(window.confirm(message));
-
-        confirmed.then(function (ok) {
-            if (!ok) return;
-            btn.disabled = true;
-            var url = 'api/v1/notes/' + encodeURIComponent(noteId) + '?permanent=false';
-            if (data.workspace) url += '&workspace=' + encodeURIComponent(data.workspace);
-            fetch(url, { method: 'DELETE', credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                .then(function (response) {
-                    // 423 carries the name of whoever is editing the note
-                    return response.json().catch(function () { return {}; }).then(function (result) {
-                        if (!response.ok || !result.success) {
-                            throw new Error(result.error || result.message || ('HTTP ' + response.status));
-                        }
-                    });
-                })
-                .then(function () {
-                    removeNoteFromList(notes, noteId);
-                    delete journalBodies[noteId];
-                    // The day has no entry any more: the button creates one again
-                    if (noteId === data.todayNoteId) {
-                        data.todayNoteId = null;
-                        var todayBtn = document.getElementById('diaryTodayBtn');
-                        var todayLabel = todayBtn && todayBtn.querySelector('.diary-today-label');
-                        var todayIcon = todayBtn && todayBtn.querySelector('.lucide');
-                        if (todayLabel) todayLabel.textContent = txt.todayCreate || "Create today's entry";
-                        if (todayIcon) todayIcon.className = 'lucide lucide-calendar-plus';
-                    }
-
-                    if (notes.length === 0) {
-                        // Last entry gone: the server renders the empty diary's invitation
-                        window.location.reload();
-                        return;
-                    }
-                    var index = removeNoteFromList(journalNotes, noteId);
-                    if (index !== -1 && index < journalShown) journalShown--;
-                    entry.remove();
-                    renderOutline();
-                    fillJournalViewport();
-                    scheduleOutlineActive();
-                })
-                .catch(function (err) {
-                    btn.disabled = false;
-                    showError((txt.journalTrashError || 'Could not move this entry to the trash.') + ' ' + err.message);
-                });
-        });
-    }
-
     // --- Delete a diary ---
     //
     // A diary is a root folder, so deleting one is the folder delete of the
@@ -1504,15 +1423,6 @@
                 saveViewMode(viewMode);
                 applyViewMode();
                 render();
-            });
-        }
-
-        var diaryContent = document.getElementById('diaryContent');
-        if (diaryContent) {
-            // Delegated: entries are appended as the reader scrolls
-            diaryContent.addEventListener('click', function (e) {
-                var btn = e.target.closest('.diary-journal-delete');
-                if (btn) trashJournalEntry(btn);
             });
         }
 

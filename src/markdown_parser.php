@@ -1048,7 +1048,9 @@ function parseMarkdown($text) {
             continue;
         }
         
-        $taskListLinePattern = '/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/';
+        // The text after the checkbox is optional: "- [ ]" on its own is an empty
+        // checkbox, not a bullet whose text is "[ ]" (issue #1386).
+        $taskListLinePattern = '/^(\s*)[\*\-\+]\s+\[([ xX])\](?:\s+(.*))?$/';
 
         // Helper: Parse nested lists (supports task lists, ordered, and unordered)
         $parseNestedList = function($startIndex, $isTaskList = false) use (&$lines, $applyInlineStyles, &$parseNestedList, $taskListLinePattern) {
@@ -1152,7 +1154,7 @@ function parseMarkdown($text) {
                 }
                 
                 $indent = strlen($matches[1]);
-                $content = $matches[3];
+                $content = $matches[3] ?? '';
                 
                 // First item: establish base indentation and marker type
                 if ($baseIndent === null) {

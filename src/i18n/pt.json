@@ -4540,9 +4540,6 @@
     "delete_title": "Excluir diário",
     "delete_confirm": "Excluir o diário \"{{name}}\"? Suas pastas são removidas e todas as entradas vão para a lixeira.",
     "delete_error": "Não foi possível excluir o diário.",
-    "journal_trash": "Mover para a lixeira",
-    "journal_trash_confirm": "Mover \"{{title}}\" para a lixeira?",
-    "journal_trash_error": "Não foi possível mover esta entrada para a lixeira.",
     "rename_title": "Renomear diário",
     "rename_error": "Não foi possível renomear o diário."
   },

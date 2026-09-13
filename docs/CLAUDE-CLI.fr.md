@@ -55,9 +55,10 @@ claude mcp add --transport http poznote http://127.0.0.1:8045/mcp \
   --header "Authorization: Bearer YOUR_TOKEN"
 ```
 
-La configuration sera enregistrée à l'un de ces emplacements :
-- **Au niveau du projet :** `/your/project/.claude.json` (lorsque la commande est lancée depuis un projet)
-- **Au niveau de l'utilisateur :** `~/.claude.json` (configuration globale)
+L'emplacement de la configuration dépend de l'option `--scope` :
+- **Local (par défaut) :** `~/.claude.json`, disponible uniquement dans le dossier où la commande a été lancée
+- **Utilisateur (`--scope user`) :** `~/.claude.json`, disponible dans tous vos projets
+- **Projet (`--scope project`) :** `.mcp.json` à la racine du projet, destiné à être versionné et partagé avec votre équipe
 
 ### 3. Vérifier la configuration
 
