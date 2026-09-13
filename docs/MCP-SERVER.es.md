@@ -19,6 +19,10 @@ Este servidor admite **únicamente el transporte HTTP** (MCP Streamable HTTP).
 > [!TIP]
 > ¿Buscas un chat con un modelo local (por ejemplo Ollama) directamente dentro de Poznote? Para eso no necesitas el servidor MCP: usa en su lugar el [Asistente IA](AI-ASSISTANT.es.md) integrado (**Configuración → Herramientas de administración → Asistente IA**). El servidor MCP sirve para conectar a tus notas asistentes *externos* compatibles con MCP; Ollama por sí solo es un entorno de ejecución de modelos, no un cliente MCP, y no puede conectarse a él directamente.
 
+<p align="center">
+  <img src="mcp-poznote.gif" alt="Poznote MCP Server demo" width="100%">
+</p>
+
 ## Inicio rápido
 
 Elige tu asistente de IA preferido:
@@ -180,7 +184,7 @@ Este token es distinto de `data/.mcp_token`: aquel lo usa el servidor MCP para c
 
 #### Modo de depuración
 
-Define `POZNOTE_DEBUG=true` en el comando de arranque para cambiar el nivel de log de `INFO` a `DEBUG`. Vuelve a ponerlo en `false` para el uso normal. Solo se reconocen los valores exactos en minúsculas `true` y `false`. Cualquier otro valor se trata como `false` y se escribe una advertencia en los logs de MCP. Cada petición HTTP enviada a la API de Poznote, cada llamada a herramienta recibida del asistente de IA y cada respuesta se escriben en detalle en los logs del contenedor. Úsalo para diagnosticar problemas de conexión o de autenticación:
+Define `POZNOTE_DEBUG=true` en el comando de arranque para cambiar el nivel de log de `INFO` a `DEBUG`. Vuelve a ponerlo en `false` para el uso normal. Solo se reconocen los valores exactos en minúsculas `true` y `false`. Cualquier otro valor se trata como `false` y se escribe una advertencia en los logs de MCP. El servidor web es más tolerante y también acepta `1`, `on` o `yes`. Cada petición HTTP enviada a la API de Poznote, cada llamada a herramienta recibida del asistente de IA y cada respuesta se escriben en detalle en los logs del contenedor. Úsalo para diagnosticar problemas de conexión o de autenticación:
 
 ```bash
 docker compose logs -f mcp-server

@@ -61,6 +61,10 @@ Verwenden Sie anschließend **Zugang prüfen und Modelle auflisten**: Damit wird
 
 Die Konfiguration gilt für die gesamte Instanz: Sobald der Administrator den Assistenten aktiviert hat, erhält jedes Benutzerprofil den Chat.
 
+### Persönliche API-Schlüssel
+
+Dieselbe Seite bietet die Option **Persönliche API-Schlüssel erlauben**. Ist sie aktiviert, erhält jeder Benutzer in seinen eigenen Einstellungen eine Karte **Mein KI-Assistent**, um den Chat statt auf die für die Instanz konfigurierten Werte auf seinen eigenen Server, Anbieter und API-Schlüssel zu richten.
+
 ## Modell auswählen
 
 Wählen Sie ein Modell, das **Tool Calling** unterstützt (auch „Function Calling“ genannt), z. B. `qwen3`, `llama3.1` oder `mistral`. Tool Calling ermöglicht es dem Assistenten, Ihre Notizen zu durchsuchen: Mit einem Modell ohne diese Fähigkeit funktioniert der Chat zwar weiterhin (ein Hinweis weist Sie darauf hin), kann aber nicht selbstständig auf Ihre Notizen zugreifen.

@@ -69,7 +69,7 @@ https://discord.gg/AWhWWSEkJ
 - [Einstellungen ändern](#einstellungen-ändern)
 - [Anwendung aktualisieren](#anwendung-aktualisieren)
 - [Authentifizierung](#authentifizierung)
-- [App-Passwörter](#app-passwords)
+- [App-Passwörter](#app-passwörter)
 - [Notiztypen](#notiztypen)
 - [Schnappschüsse](#schnappschüsse)
 - [Personalisierung](#personalisierung)
@@ -384,7 +384,9 @@ Benennen Sie das Standard-Administratorkonto um und ändern Sie das Standardpass
 
 Die meisten alltäglichen Einstellungen ändern Sie in der Poznote-Oberfläche. Die Datei `.env` ist nur für Bereitstellungs- und Laufzeitwerte gedacht, die beim Start der Container gelesen werden.
 
-Verwenden Sie die Datei `.env` für:
+<details>
+<summary><strong>Verwenden Sie die Datei <code>.env</code> für</strong></summary>
+<br>
 
 - `HTTP_WEB_PORT`
 - `POZNOTE_OIDC_CLIENT_ID`
@@ -396,10 +398,16 @@ Verwenden Sie die Datei `.env` für:
 - `POZNOTE_SETTINGS_PASSWORD`, um vor dem Öffnen der Einstellungsseite ein zusätzliches Passwort abzufragen, standardmäßig leer
 - `POZNOTE_MCP_AUTH_TOKEN`, um von MCP-Clients ein Bearer-Token zu verlangen, siehe [MCP-Server](#mcp-server)
 
-Verwenden Sie die Oberfläche für:
+</details>
+
+<details>
+<summary><strong>Verwenden Sie die Oberfläche für</strong></summary>
+<br>
 
 - Administrative und globale Einstellungen wie OIDC-Anbietereinstellungen, Aktivierung der Git-Synchronisierung, Importlimits und das Hochladen von benutzerdefiniertem CSS
 - Benutzer- und Profileinstellungen wie Passwörter lokaler Konten, Design, Schriftgrößen, Sortierung der Notizen, Hintergrund des Arbeitsbereichs und ausgeblendete Oberflächenelemente
+
+</details>
 
 
 ### Systemeinstellungen ändern (`.env`)
@@ -462,7 +470,7 @@ Ihre Daten bleiben im Verzeichnis `./data` erhalten und sind von der Aktualisier
 
 ## Authentifizierung
 
-Poznote unterstützt mehrere Authentifizierungsmethoden, darunter lokale Konten und externe Identitätsanbieter. Apps und Erweiterungen, die mit der REST-API kommunizieren, verwenden **App-Passwörter**, eine eigene Art von Zugangsdaten, die weiter unten beschrieben wird.
+Poznote unterstützt mehrere Authentifizierungsmethoden, darunter lokale Konten und externe Identitätsanbieter. Apps und Erweiterungen, die mit der REST-API kommunizieren, verwenden [App-Passwörter](#app-passwörter), eine eigene Art von Zugangsdaten, die im nächsten Abschnitt beschrieben wird.
 
 <details>
 <summary><strong>Authentifizierung mit lokalen Konten</strong></summary>
@@ -514,7 +522,7 @@ Poznote unterstützt OpenID Connect (Authorization Code + PKCE) für Single Sign
 5. Ist das automatische Anlegen von Benutzern aktiviert und passt kein Profil, legt Poznote automatisch eines an. Ein solches Profil hat **überhaupt kein Passwort**: Es hat nie die Übergabe der initialen Zugangsdaten durchlaufen, die ein Administrator beim Anlegen eines Kontos vornimmt, und reagiert daher nicht auf das Standardpasswort. Die Anmeldung erfolgt über den Anbieter, oder ein Administrator legt unter **Einstellungen > Admin-Werkzeuge > Benutzerverwaltung** ein ausdrückliches Passwort fest.
 6. Mit `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true` wird das Formular für Benutzername und Passwort ausgeblendet, und die Anmeldeseite erlaubt nur noch SSO.
 7. Bei aktiviertem OIDC können sich REST-API-Clients mit `Authorization: Bearer <OIDC JWT>` authentifizieren. Poznote prüft dabei die JWKS des Anbieters, den Aussteller, das Ablaufdatum, die Audience und die konfigurierten Zugriffsbeschränkungen.
-8. Clients, die überhaupt keinen OIDC-Flow durchlaufen können (Browsererweiterung, mobile App, Skripte), verwenden stattdessen ein [App-Passwort](#app-passwords), das jeder Benutzer in seinen eigenen Einstellungen erstellt.
+8. Clients, die überhaupt keinen OIDC-Flow durchlaufen können (Browsererweiterung, mobile App, Skripte), verwenden stattdessen ein [App-Passwort](#app-passwörter), das jeder Benutzer in seinen eigenen Einstellungen erstellt.
 
 #### Konfiguration
 
@@ -549,39 +557,19 @@ Ist das automatische Anlegen aktiviert, erzeugt Poznote einen Benutzernamen aus 
 
 </details>
 
-<a id="app-passwords"></a>
-<details>
-<summary><strong>App-Passwörter (für Apps, Erweiterungen und Skripte)</strong></summary>
-<br>
+## App-Passwörter
 
-Apps können sich nicht wie ein Browser über einen Identitätsanbieter anmelden. Ein **App-Passwort** ist eine eigene Zugangsinformation, die Sie für genau einen Client erstellen und jederzeit widerrufen können, sodass Sie nie Ihr Kontopasswort herausgeben müssen.
+Apps können sich nicht wie ein Browser über einen Identitätsanbieter anmelden. Ein **App-Passwort** ist eine eigene Zugangsinformation, die Sie für genau einen Client erstellen (die Browsererweiterung, ein Smartphone, ein Skript) und jederzeit widerrufen können, sodass Sie nie Ihr Kontopasswort herausgeben müssen.
 
-Erstellen Sie eines unter **Einstellungen > App-Passwörter**: Geben Sie ihm einen Namen (den des Clients, der es verwenden wird), optional ein Ablaufdatum, und kopieren Sie das erzeugte Geheimnis. Es wird nur ein einziges Mal angezeigt.
-
-Geben Sie dann im Client **Ihren üblichen Benutzernamen** und dort, wo ein Passwort verlangt wird, **das App-Passwort** ein. Sonst ändert sich nichts: Es wird als gewöhnliche HTTP Basic Auth übertragen, sodass jeder vorhandene Client unverändert funktioniert.
+Erstellen Sie eines unter **Einstellungen > App-Passwörter**: Geben Sie ihm einen Namen, optional ein Ablaufdatum, und kopieren Sie das erzeugte Geheimnis. Es wird nur ein einziges Mal angezeigt. Geben Sie dann im Client Ihren üblichen Benutzernamen und dort, wo ein Passwort verlangt wird, das App-Passwort ein. Es wird als gewöhnliche HTTP Basic Auth übertragen, sodass jeder vorhandene Client unverändert funktioniert:
 
 ```bash
 curl -u 'username:pzn_2f7c…' https://YOUR_SERVER/api/v1/notes
 ```
 
-#### Was ein App-Passwort kann und was nicht
+Ein App-Passwort erreicht nur die REST-API, und nur für sein eigenes Profil: Es kann weder die Weboberfläche öffnen noch einen Admin-Endpunkt aufrufen, Ihr Passwort ändern oder Ihr Konto verwalten, selbst wenn das Konto Administrator ist. Ein kompromittiertes App-Passwort legt daher die Notizen eines einzigen Kontos offen und nichts weiter, und mit dem Widerruf ist die Lücke geschlossen. Auf einer Nur-SSO-Instanz, auf der per OIDC angelegte Konten gar kein Passwort haben, ist es die einzige Zugangsinformation, die die API über Basic Auth akzeptiert.
 
-|  | |
-|---|---|
-| ✅ Notizen, Ordner, Tags und Anhänge **seines eigenen Profils** lesen und schreiben | ❌ Die Weboberfläche öffnen: Es wird im Anmeldeformular abgewiesen |
-| ✅ Auf einer Nur-SSO-Instanz funktionieren, auch wenn *HTTP Basic Auth für die API deaktivieren* aktiviert ist | ❌ Einen Endpunkt unter `/api/v1/admin/*` erreichen, selbst wenn das Konto Administrator ist |
-| ✅ Mit einem Ablaufdatum versehen und jederzeit widerrufen werden | ❌ Ihr Passwort ändern, Ihr Konto bearbeiten oder löschen oder weitere App-Passwörter erstellen |
-| ✅ Ohne den Header `X-User-ID` auskommen: Es ist an das Profil gebunden, das es erstellt hat | ❌ Im Namen eines anderen Profils handeln, auch nicht für einen Administrator |
-
-Wegen dieser Einschränkungen legt ein kompromittiertes App-Passwort die Notizen eines einzigen Kontos offen und nichts weiter, und Sie schließen die Lücke, indem Sie den Eintrag widerrufen.
-
-Die Liste unter **Einstellungen > App-Passwörter** zeigt für jedes App-Passwort die ersten Zeichen des Geheimnisses (um sie zu unterscheiden), das Erstellungsdatum und den Zeitpunkt der letzten Verwendung. So lassen sich ungenutzte Zugangsdaten leicht erkennen und entfernen. Jedes Konto kann bis zu 25 davon haben.
-
-> **Auf einer Nur-SSO-Instanz** ist ein App-Passwort die einzige Zugangsinformation, die die API über Basic Auth akzeptiert. Automatisch per OIDC angelegte Konten haben überhaupt kein Kontopasswort, daher verbinden ihre Inhaber auf diesem Weg die Browsererweiterung, ein Smartphone oder ein Skript.
-
-Vollständige Referenz, einschließlich der Endpunkte zu ihrer Verwaltung: [REST-API-Dokumentation](docs/API-REST.md#authentication).
-
-</details>
+Die vollständige Liste der Einschränkungen und die Endpunkte zur Verwaltung der App-Passwörter finden Sie in der [REST-API-Dokumentation](docs/API-REST.md#authentication).
 
 ## Notiztypen
 
@@ -654,11 +642,17 @@ Poznote unterstützt zwei Hauptformate für Notizen, die jeweils auf unterschied
 
 Schnappschüsse bewahren frühere Versionen des Inhalts einer Notiz auf, sodass Sie über das Menü **Schnappschüsse** der Notiz zu einem früheren Stand zurückkehren können.
 
+<details>
+<summary><strong>So funktionieren Schnappschüsse</strong></summary>
+<br>
+
 *   **Automatisch:** Beim ersten Öffnen einer Notiz an einem Tag wird ein Schnappschuss erstellt. Pro Notiz werden die 3 neuesten automatischen Schnappschüsse aufbewahrt; diese Anzahl lässt sich unter **Einstellungen > Verhalten > Schnappschüsse** ändern.
 *   **Manuell:** „Jetzt Schnappschuss erstellen“ fügt jederzeit einen Schnappschuss hinzu, ebenso **Strg + Alt + S** (Cmd + Alt + S auf dem Mac) bei geöffneter Notiz. Manuelle Schnappschüsse sind unbegrenzt und zählen nicht zu dieser Anzahl.
 *   **Vor einer KI-Änderung:** Unmittelbar bevor der [KI-Assistent](#ki-assistent) oder der [MCP-Server](#mcp-server) den Inhalt einer Notiz ändert, wird automatisch ein Schnappschuss erstellt, sodass sich eine misslungene Umformulierung mit einem Klick rückgängig machen lässt. Diese Schnappschüsse sind im Verlauf mit „Vor KI-Änderung“ oder „Vor MCP-Änderung“ gekennzeichnet und werden übersprungen, wenn der letzte Schnappschuss bereits denselben Inhalt enthält. Pro Notiz werden die 20 neuesten aufbewahrt, eine Anzahl, die Sie unter **Einstellungen → Schnappschüsse** ändern können (1 bis 200), falls auf Ihrer Instanz viele Notizen über KI oder MCP bearbeitet werden.
 *   **Ablauf:** Jeder Schnappschuss, ob automatisch oder manuell, wird 30 Tage nach seiner Erstellung gelöscht. Ein Schnappschuss kann auch von Hand im Dialog „Schnappschüsse“ gelöscht werden.
 *   **Anhänge und Bilder:** Schnappschüsse speichern nur den Text der Notiz. Anhänge werden nie kopiert, sodass eine Datei, auf die mehrere Schnappschüsse verweisen, nur einmal auf der Festplatte existiert. Eine aus einer Notiz entfernte Datei bleibt, für die Notiz unsichtbar, auf der Festplatte, solange noch ein Schnappschuss sie enthält, sodass sie beim Wiederherstellen dieses Schnappschusses zurückkehrt. Endgültig gelöscht wird sie, sobald der letzte Schnappschuss, der sie enthält, abläuft oder gelöscht wird, oder wenn die Notiz endgültig gelöscht wird. Mehr Schnappschüsse aufzubewahren dupliziert also nie Dateien. Entfernte Dateien bleiben lediglich länger erhalten, höchstens 30 Tage.
+
+</details>
 
 ## Personalisierung
 
@@ -816,19 +810,15 @@ Eines kann ein Design noch nicht erreichen: Einige wenige Symbole, die eine Seit
 
 > Nicht zu verwechseln mit der Funktion [Mehrere Instanzen](#mehrere-instanzen).
 
-Poznote verfügt über eine Mehrbenutzerarchitektur mit getrennten Datenbereichen für jedes Profil und erlaubt dennoch eine kontrollierte Zusammenarbeit auf derselben Instanz.
+Poznote ist mehrbenutzerfähig: Jedes Profil hat eigene Notizen, Arbeitsbereiche, Tags, Ordner, Anhänge und Einstellungen und meldet sich mit seinem eigenen Benutzernamen oder seiner E-Mail-Adresse und seinem Passwort an.
 
-- **Datentrennung**: Jedes Profil hat eigene Notizen, Arbeitsbereiche, Tags, Ordner, Anhänge und Benutzereinstellungen.
-- **Authentifizierung pro Profil**: Benutzer melden sich mit ihrem eigenen Benutzernamen oder ihrer E-Mail-Adresse und ihrem Passwort an. Bis ein Passwort in der Oberfläche geändert wird, gelten die eingebauten Standardwerte (`admin` für Administratoren, `user` für Standardbenutzer).
-- **Benutzerverwaltung**: Administratoren können Profile unter **Einstellungen > Admin-Werkzeuge > Benutzerverwaltung** anlegen, deaktivieren und verwalten.
-- **Delegierter Kontozugriff**: Administratoren können einem Benutzer Zugriff auf das Konto eines anderen Benutzers gewähren. Kann ein Benutzer mehrere Konten öffnen, fragt Poznote nach der Anmeldung, welches Konto verwendet werden soll, und zeigt deutlich an, wenn die Sitzung **im Namen** eines anderen Benutzers handelt.
-- **Schutz für Eigentümer und Administratoren**: Das Öffnen des Kontos eines anderen Benutzers überträgt keine Eigentümerschaft. Sensible Aktionen wie Passwortänderungen, Sicherung/Wiederherstellung, Konfiguration der Git-Synchronisierung und globale Administratoreinstellungen bleiben dem jeweiligen Eigentümer oder Administrator vorbehalten.
-- **Teilen**: Notizen, Ordner und ganze Arbeitsbereiche können mit anderen Benutzern derselben Instanz oder öffentlich über eigene Links geteilt werden. Eine Freigabe ist standardmäßig schreibgeschützt und kann bearbeitbar gemacht werden: Textbearbeitung bei einer Notiz, Bearbeitung der Notizen bei einem Ordner und drei Stufen bei einer Aufgabenliste (nur lesen, nur abhaken oder Haken entfernen, vollständige Bearbeitung).
-- **Sperre für einen einzigen Bearbeiter**: Können mehrere Benutzer auf dieselbe Notiz zugreifen, erlaubt Poznote jeweils nur einen aktiven Bearbeiter. Andere Benutzer können die Notiz weiterhin schreibgeschützt öffnen, sehen, wer gerade die Sperre hält, und die Bearbeitung übernehmen, indem sie die Notiz erneut öffnen, sobald die Sperre freigegeben wurde oder abgelaufen ist.
-- **Mandantentrennung (SaaS-Modus)**: Administratoren können ausgewählte Funktionen für Benutzer ohne Administratorrechte sperren, etwa das Auffinden der anderen Konten der Instanz und das Teilen mit ihnen oder das Registrieren persönlicher Webhooks. Administratoren sind davon nie betroffen. Für eine Familien- oder Team-Instanz lassen Sie alles deaktiviert.
+- **Benutzerverwaltung**: Administratoren legen Profile unter **Einstellungen > Admin-Werkzeuge > Benutzerverwaltung** an, deaktivieren und verwalten sie, und können einem Benutzer Zugriff auf das Konto eines anderen Benutzers gewähren, ohne dessen Eigentümerschaft zu übertragen.
+- **Teilen**: Notizen, Ordner und ganze Arbeitsbereiche können mit anderen Benutzern der Instanz geteilt werden, schreibgeschützt oder bearbeitbar, oder öffentlich über eigene Links. Können mehrere Benutzer auf dieselbe Notiz zugreifen, bearbeitet sie jeweils nur einer, und die anderen sehen, wer die Sperre hält.
+- **Mandantentrennung (SaaS-Modus)**: Administratoren können Benutzern ohne Administratorrechte das Auffinden der anderen Konten der Instanz, das Teilen mit ihnen oder das Registrieren persönlicher Webhooks untersagen. Für eine Familien- oder Team-Instanz lassen Sie alles deaktiviert.
 
-
-### Architektur und Struktur
+<details>
+<summary><strong>Datenablage auf der Festplatte</strong></summary>
+<br>
 
 Poznote verwendet eine Master-Datenbank (`data/master.db`) für gemeinsame Koordinationsdaten sowie separate Datenbanken und Dateien pro Benutzer für die eigentlichen Notizinhalte.
 
@@ -848,38 +838,19 @@ data/
     └── ...
 ```
 
+</details>
+
 ## Aktivitätsprotokoll
 
-Poznote führt einen Verlauf der sensiblen Vorgänge auf der Instanz, sodass Administratoren sehen können, was wann und durch wen geschehen ist. Das Protokoll ist unter **Einstellungen > Admin-Werkzeuge > Aktivitätsprotokoll** verfügbar und Administratoren vorbehalten.
+Poznote führt einen Verlauf der sensiblen Vorgänge auf der Instanz, sodass Administratoren sehen können, was wann und durch wen geschehen ist: An- und Abmeldungen, Konto- und Kontingentänderungen, Erstellen und Teilen von Arbeitsbereichen, Sicherungen und Wiederherstellungen, Leeren des Papierkorbs und endgültige Löschungen, App-Passwörter. Das Protokoll ist unter **Einstellungen > Admin-Werkzeuge > Aktivitätsprotokoll** verfügbar, Administratoren vorbehalten, und das Hilfesymbol oben auf der Seite listet alle protokollierten Vorgänge auf.
 
-Jeder Eintrag enthält Datum und Uhrzeit, das betroffene Konto, die Aktion und eine kurze Zusammenfassung, etwa den Namen des gelöschten Arbeitsbereichs oder die Anzahl der entfernten Notizen. Fahren Sie mit der Maus über das Hilfesymbol oben auf der Seite, um die vollständige Liste der protokollierten Vorgänge zu sehen. Sie umfasst:
-
-- **Sitzungen**: An- und Abmeldungen.
-- **Konten**: Profiländerungen (Benutzername, E-Mail-Adresse, Name), Kontingentänderungen, Aktivierung und Deaktivierung, gewährte oder entzogene Administratorrolle, Kontolöschung sowie gewährter oder entzogener delegierter Kontozugriff.
-- **Arbeitsbereiche**: Erstellen, Löschen, Teilen und Aufheben der Freigabe.
-- **Daten**: Erstellen und Wiederherstellen von Sicherungen, Leeren des Papierkorbs und endgültiges Löschen von Notizen.
-- **App-Passwörter**: Erstellen und Widerrufen.
-
-Routinetätigkeiten werden bewusst nicht erfasst: Das Schreiben einer Notiz oder das Verschieben in den Papierkorb wird nicht protokolliert, ebenso wenig API-Aufrufe, die bei jeder Anfrage authentifiziert werden. Andernfalls würde das Protokoll zu einem Mitschnitt des gesamten Datenverkehrs.
-
-Das Protokoll hält fest, dass ein Vorgang stattgefunden hat, nicht die Daten, die er betraf. **Notizinhalte werden nie hineingeschrieben**, ebenso wenig Tags, Ordner oder Anhänge. Ein Löscheintrag identifiziert die Notiz über ihren Titel und Arbeitsbereich, damit sich das Ereignis zuordnen lässt, mehr nicht.
-
-> **Es wird nie ein Passwort protokolliert**, in keiner Form. Wo ein Passwort eine Rolle spielt, etwa bei einem geschützten geteilten Arbeitsbereich, wird nur festgehalten, dass eines gesetzt ist.
-
-Einträge werden standardmäßig 90 Tage lang aufbewahrt. Die Aufbewahrungsdauer lässt sich auf 30, 90 oder 365 Tage ändern oder unbegrenzt setzen, und das Protokoll kann auf derselben Seite manuell geleert werden.
+Das Protokoll hält fest, dass ein Vorgang stattgefunden hat, nicht die Daten, die er betraf: Notizinhalte und Passwörter werden nie hineingeschrieben, und Routinetätigkeiten wie das Schreiben einer Notiz oder das Verschieben in den Papierkorb werden nicht erfasst. Einträge werden standardmäßig 90 Tage lang aufbewahrt (30, 90, 365 Tage oder unbegrenzt), und das Protokoll kann auf derselben Seite geleert werden.
 
 ## Webhooks
 
-Poznote kann externe Dienste benachrichtigen, wenn auf der Instanz etwas geschieht, indem es ausgehende Webhooks (HTTP-POST-Anfragen mit JSON-Nutzdaten) an die von Ihnen registrierten Endpunkte sendet. So lässt sich Poznote leicht an Automatisierungswerkzeuge wie n8n, Zapier oder eigene Skripte anbinden. Poznote sendet ausschließlich Webhooks: Was der empfangende Endpunkt damit macht (eine E-Mail senden, einen Workflow auslösen, ...), liegt bei Ihnen.
+Poznote kann externe Dienste benachrichtigen, wenn auf der Instanz etwas geschieht, indem es ausgehende Webhooks (HTTP-POST-Anfragen mit JSON-Nutzdaten) an die von Ihnen registrierten Endpunkte sendet. So lässt sich Poznote an Automatisierungswerkzeuge wie n8n, Zapier oder eigene Skripte anbinden. Administratoren registrieren Instanzereignisse (Konten, Kontingente, Registrierungen) unter **Einstellungen > Admin-Werkzeuge > Admin-Webhooks**, und jeder Benutzer kann unter **Einstellungen > Benutzer-Webhooks** Endpunkte für seine eigenen Notizen und Erinnerungen registrieren.
 
-Es gibt zwei Ebenen von Webhooks:
-
-- **Admin-Webhooks** (**Einstellungen > Admin-Werkzeuge > Admin-Webhooks**, nur Administratoren): Instanzereignisse wie `user.created`, `user.updated`, `user.activated`, `user.deactivated`, `user.deleted`, `settings.language_changed`, `signup.cap_reached`, `quota.notes_reached` und `quota.storage_reached`.
-- **Benutzer-Webhooks** (**Einstellungen > Benutzer-Webhooks**): Jedes Konto kann eigene Endpunkte für Ereignisse zu seinen eigenen Inhalten registrieren: `note.created`, `note.shared` und Erinnerungsereignisse. Diese Ereignisse werden ausschließlich an die Endpunkte des Kontos zugestellt, das sie ausgelöst hat, nie an die eines anderen Benutzers.
-
-Zustellungen sind JSON-POST-Anfragen, die mit HMAC-SHA256 signiert werden, wenn der Webhook ein Geheimnis hat (dasselbe Verfahren wie bei GitHub-Webhooks). Notizinhalte werden nie gesendet, die Nutzdaten enthalten nur Metadaten, und Erinnerungsereignisse gibt es in drei Varianten, sodass Sie selbst bestimmen, wie viele Daten die Instanz verlassen.
-
-Die vollständige Referenz mit allen Ereignissen, den genauen Feldern der Nutzdaten (`data.user`, `data.note`, ...), der Signaturprüfung mit Codebeispielen, den Zustellungsgarantien und der Konfiguration der Instanz-URL für direkte Links zu Notizen finden Sie in der **[Webhooks-Dokumentation](docs/WEBHOOKS.de.md)**.
+Zustellungen werden mit HMAC-SHA256 signiert, wenn der Webhook ein Geheimnis hat, und Notizinhalte werden nie gesendet. Alle Ereignisse, die Felder der Nutzdaten, die Signaturprüfung und die Zustellungsgarantien sind in der **[Webhooks-Dokumentation](docs/WEBHOOKS.de.md)** beschrieben.
 
 ## Git-Synchronisierung
 
@@ -1240,19 +1211,11 @@ Server: my-server.com
 
 ## KI-Assistent
 
-Poznote enthält einen integrierten KI-Chat, der sich mit jedem OpenAI-kompatiblen Server verbindet, einer lokalen [Ollama](https://ollama.com)- oder [LM Studio](https://lmstudio.ai)-Instanz oder einem Cloud-Anbieter wie [Anthropic (Claude)](https://www.anthropic.com) oder OpenAI. Nach der Konfiguration erscheint in der linken Symbolleiste, auf der Notizseite und im Dashboard eine Schaltfläche **KI-Assistent**, die das Chat-Panel direkt dort öffnet.
+Poznote enthält einen integrierten KI-Chat, der sich mit einer lokalen [Ollama](https://ollama.com)- oder [LM Studio](https://lmstudio.ai)-Instanz, einem Cloud-Anbieter wie [Anthropic (Claude)](https://www.anthropic.com) oder OpenAI oder jedem OpenAI-kompatiblen Server verbindet. Er durchsucht und liest Ihre Notizen, um Fragen zu beantworten, und erstellt, überarbeitet und organisiert sie auf Wunsch, innerhalb des Arbeitsbereichs, in dem Sie den Chat geöffnet haben.
 
-Der Assistent arbeitet global, im Stil von MCP: Er verfügt über Werkzeuge, um **Ihre Notizen zu durchsuchen und zu lesen**, und setzt sie selbstständig ein, um Fragen zu beantworten, etwa „Was steht in meinen Notizen über X?“, notizübergreifende Zusammenfassungen oder die Suche nach der Notiz, an die Sie sich nur noch halb erinnern. Wenn Sie ihn ausdrücklich darum bitten, kann er außerdem **Notizen erstellen, umbenennen und neu schreiben**, **sie organisieren** (Tags, Ordner, Favoriten, Erinnerungen, Aufgaben und Kontrollkästchen) und **Notizen und Ordner in den Papierkorb verschieben** (er löscht sie nie endgültig). Die Antworten werden gestreamt und als Markdown dargestellt.
+Ein Administrator aktiviert ihn unter **Einstellungen → Admin-Werkzeuge → KI-Assistent**, danach erhält jedes Profil eine Schaltfläche **KI-Assistent** in der linken Symbolleiste. Der KI-Server wird vom Poznote-Server aus aufgerufen, nie aus Ihrem Browser, sodass Ihre Notizen mit einer lokalen Ollama-Instanz nie Ihren Rechner verlassen.
 
-Der Assistent ist **auf den aktuellen Arbeitsbereich beschränkt**: Er sieht, durchsucht und bearbeitet nur die Notizen des Arbeitsbereichs, in dem Sie den Chat geöffnet haben, und neue Notizen werden dort angelegt. Um nach einem anderen Arbeitsbereich zu fragen, wechseln Sie zuerst dorthin.
-
-Zum Aktivieren öffnen Sie **Einstellungen → Admin-Werkzeuge → KI-Assistent** (nur Administratoren), wählen einen Anbieter und prüfen mit **Zugang prüfen und Modelle auflisten** den Server, um dann eines der angebotenen Modelle auszuwählen. Die Konfiguration gilt für die gesamte Instanz: Sobald der Administrator sie aktiviert hat, erhält jedes Benutzerprofil den Chat.
-
-Der Administrator kann außerdem persönliche API-Schlüssel erlauben. Jeder Benutzer erhält dann in seinen eigenen Einstellungen eine Karte **Mein KI-Assistent**, um den Chat statt auf die Vorgaben der Instanz auf seinen eigenen Server, Anbieter und Schlüssel zu richten.
-
-Die vollständige Konfigurationsanleitung mit Anbietern, der Wahl eines Modells und der Anbindung eines lokalen Ollama- oder LM-Studio-Servers aus dem Poznote-Container heraus (die richtige URL finden, `OLLAMA_HOST`, Docker-Netzwerk) finden Sie in der [Dokumentation zum KI-Assistenten](docs/AI-ASSISTANT.de.md).
-
-Der KI-Server wird vom Poznote-Server aus aufgerufen, nie aus Ihrem Browser. Mit einer lokalen Ollama-Instanz verlassen Ihre Notizen und Unterhaltungen nie Ihren Rechner. Wenn stattdessen ein externer KI-Assistent (VS Code Copilot, Claude CLI...) Ihre Notizen verwalten soll, lesen Sie weiter unten den Abschnitt [MCP-Server](#mcp-server).
+Was der Assistent kann, die Wahl eines Anbieters und eines Modells, persönliche API-Schlüssel und die Anbindung eines lokalen Servers aus dem Poznote-Container heraus sind in der [Dokumentation zum KI-Assistenten](docs/AI-ASSISTANT.de.md) beschrieben. Wenn stattdessen ein externer KI-Assistent (VS Code Copilot, Claude CLI...) Ihre Notizen verwalten soll, lesen Sie weiter unten den Abschnitt [MCP-Server](#mcp-server).
 
 ## Transkription (Sprache zu Text)
 
@@ -1264,54 +1227,20 @@ Die Einrichtung eines Servers, die Wahl eines Modells und alles Weitere sind in 
 
 ## MCP-Server
 
-Poznote enthält einen Model-Context-Protocol-Server (MCP), über den KI-Assistenten wie GitHub Copilot in natürlicher Sprache mit Ihren Notizen arbeiten können. Zum Beispiel:
+Poznote enthält einen Model-Context-Protocol-Server (MCP), über den KI-Assistenten wie GitHub Copilot oder Claude CLI in natürlicher Sprache mit Ihren Notizen arbeiten können. Zum Beispiel:
 
 - „Erstelle eine neue Notiz mit dem Titel 'Meeting Notes' und dem Inhalt ...“
 - „Suche nach Notizen über 'Docker'“
 - „Liste alle Notizen in meinem Poznote-Arbeitsbereich auf“
 - „Aktualisiere Notiz 42 mit neuen Informationen“
 
-<p align="center">
-  <img src="docs/mcp-poznote.gif" alt="Poznote MCP Server demo" width="100%">
-</p>
-
-Anleitungen zu Einrichtung und Verwendung finden Sie in der [Dokumentation zum MCP-Server](docs/MCP-SERVER.de.md).
-
-Der MCP-Server verwendet Standardeinstellungen (Port `8045`, Debug aus). Zum Überschreiben:
-
-```bash
-POZNOTE_MCP_PORT=9000 POZNOTE_DEBUG=true docker compose up -d --force-recreate mcp-server
-```
-
-Dies sind Überschreibungen für Container und Laufzeit, keine Einstellungen der Poznote-Oberfläche. Sie können sie wie oben gezeigt direkt im Befehl übergeben oder vor dem Neuerstellen des Containers `mcp-server` in `.env` eintragen.
-
-Der MCP-Server erkennt für `POZNOTE_DEBUG` nur die exakten kleingeschriebenen Werte `true` und `false` und fällt bei allem anderen auf `false` zurück (der Webserver ist toleranter und akzeptiert auch `1`, `on` oder `yes`). Erstellen Sie den Container nach einer Änderung der Einstellungen neu; ein einfacher Neustart lädt die Umgebungsvariablen nicht neu.
-
-**Sicherheit:** Der MCP-Port wird nur auf `127.0.0.1` veröffentlicht, sodass ihn standardmäßig nichts außerhalb Ihres Rechners erreichen kann. Wenn Sie ihn weiter freigeben (Reverse Proxy, LAN oder Installation ohne Docker), setzen Sie `POZNOTE_MCP_AUTH_TOKEN` in `.env`, und der Server verlangt dann von jedem Client einen Header `Authorization: Bearer <token>`. Außerhalb von Docker bindet sich `poznote-mcp serve` standardmäßig an `127.0.0.1`. Details finden Sie im [Abschnitt Sicherheit](docs/MCP-SERVER.de.md#sicherheit) der MCP-Dokumentation.
+Der MCP-Server ist Teil der offiziellen `docker-compose.yml` und wird nur auf `127.0.0.1` veröffentlicht, sodass ihn standardmäßig nichts außerhalb Ihres Rechners erreichen kann. Einrichtung, Client-Konfiguration, Überschreibungen für Port und Debug sowie der Schutz mit `POZNOTE_MCP_AUTH_TOKEN`, wenn Sie ihn weiter freigeben, sind in der [Dokumentation zum MCP-Server](docs/MCP-SERVER.de.md) beschrieben.
 
 ## Chrome-Erweiterung
 
-Der **Poznote URL Saver** ist eine Browsererweiterung, mit der Sie die URL oder sogar einen ganzseitigen Screenshot der aktuellen Seite mit einem einzigen Klick in Ihrer Poznote-Instanz speichern können.
+Der **Poznote URL Saver** ist eine Browsererweiterung, die die URL oder sogar einen ganzseitigen Screenshot der aktuellen Seite mit einem einzigen Klick in Ihrer Poznote-Instanz speichert. Installieren Sie sie aus dem Chrome Web Store: [Erweiterung installieren](https://chromewebstore.google.com/detail/bmjclfamahegmgillaghhmnbkjebipbh?utm_source=item-share-cb)
 
-<p align="center">
-  <img src="images/chrome-extension.png" alt="Poznote Chrome Extension" width="50%">
-</p>
-
-Installieren Sie die Erweiterung direkt aus dem Chrome Web Store → [Erweiterung installieren](https://chromewebstore.google.com/detail/bmjclfamahegmgillaghhmnbkjebipbh?utm_source=item-share-cb)
-
-#### Mit Ihrer Instanz verbinden
-
-1. Öffnen Sie in Poznote **Einstellungen > App-Passwörter**, erstellen Sie eines, das Sie nach der Erweiterung benennen, und kopieren Sie das angezeigte Geheimnis. Es wird nur ein einziges Mal angezeigt.
-2. Öffnen Sie die Erweiterung und füllen Sie aus:
-   - **App URL:** die Adresse Ihrer Instanz, z. B. `https://notes.example.com/`
-   - **Username:** Ihr Poznote-Benutzername
-   - **Password:** das soeben kopierte App-Passwort
-   - **Workspace** und optional **Folder**: wo gespeicherte Seiten abgelegt werden sollen
-3. Speichern Sie. Die Erweiterung ermittelt Ihr Profil selbst und ist einsatzbereit.
-
-Ihr Kontopasswort funktioniert hier ebenfalls, doch für eine Erweiterung ist ein App-Passwort die bessere Wahl: Es erreicht nur die API, nie die Weboberfläche oder Ihre Kontoeinstellungen, es ist auf Ihr eigenes Profil beschränkt, und wenn Sie es in Poznote widerrufen, ist die Erweiterung getrennt, ohne dass sich sonst etwas ändert. Die vollständige Liste der Einschränkungen finden Sie unter [App-Passwörter](#app-passwords).
-
-> **Wenn Ihre Instanz nur SSO erlaubt,** ist ein App-Passwort die einzige Möglichkeit, die Erweiterung zu verbinden: Das Anmeldeformular, das die Erweiterung benötigt, existiert für Ihr Konto nicht. Erstellen Sie eines unter **Einstellungen > App-Passwörter**, genau wie oben beschrieben.
+Die Erweiterung verbindet sich mit Ihrer Instanz über Ihren Benutzernamen und ein [App-Passwort](#app-passwörter). Die Einrichtungsschritte finden Sie in der [Dokumentation zur Chrome-Erweiterung](docs/CHROME-EXTENSION.de.md).
 
 ## Unter Android an Poznote teilen
 

@@ -19,6 +19,10 @@ This server supports **HTTP transport only** (MCP Streamable HTTP).
 > [!TIP]
 > Looking for a chat with a local model (e.g. Ollama) directly inside Poznote? You don't need the MCP server for that — use the built-in [AI Assistant](AI-ASSISTANT.md) instead (**Settings → Admin Tools → AI Assistant**). The MCP server is for connecting *external* MCP-capable assistants to your notes; Ollama alone is a model runtime, not an MCP client, and cannot connect to it directly.
 
+<p align="center">
+  <img src="mcp-poznote.gif" alt="Poznote MCP Server demo" width="100%">
+</p>
+
 ## Quick Start
 
 Choose your preferred AI assistant:
@@ -180,7 +184,7 @@ This token is separate from `data/.mcp_token`: that one is used by the MCP serve
 
 #### Debug mode
 
-Set `POZNOTE_DEBUG=true` in the startup command to switch the log level from `INFO` to `DEBUG`. Set it back to `false` for normal use. Only the exact lowercase values `true` and `false` are recognized. Any other value is treated as `false` and a warning is written to the MCP logs. Every HTTP request sent to the Poznote API, every tool call received from the AI assistant, and every response are written in detail to the container logs. Use it to diagnose connection or authentication issues:
+Set `POZNOTE_DEBUG=true` in the startup command to switch the log level from `INFO` to `DEBUG`. Set it back to `false` for normal use. Only the exact lowercase values `true` and `false` are recognized. Any other value is treated as `false` and a warning is written to the MCP logs. The web server is more tolerant and also accepts `1`, `on` or `yes`. Every HTTP request sent to the Poznote API, every tool call received from the AI assistant, and every response are written in detail to the container logs. Use it to diagnose connection or authentication issues:
 
 ```bash
 docker compose logs -f mcp-server

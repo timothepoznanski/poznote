@@ -61,6 +61,10 @@ Then use **Check access and list models**, which verifies the server is reachabl
 
 The configuration applies to the whole instance: once enabled by the administrator, every user profile gets the chat.
 
+### Personal API keys
+
+The same page has an **Allow personal API keys** option. When it is enabled, each user gets a **My AI Assistant** card in their own settings, to point the chat at their own server, provider and API key instead of the ones configured for the instance.
+
 ## Choosing a model
 
 Pick a model that supports **tool calling** (also called "function calling"), e.g. `qwen3`, `llama3.1` or `mistral`. Tool calling is what lets the assistant browse your notes: with a model that lacks it, the chat still works (a notice tells you so) but cannot access your notes on its own.

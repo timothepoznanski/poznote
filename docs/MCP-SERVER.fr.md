@@ -19,6 +19,10 @@ Ce serveur prend en charge **uniquement le transport HTTP** (MCP Streamable HTTP
 > [!TIP]
 > Vous cherchez un chat avec un modèle local (par exemple Ollama) directement dans Poznote ? Vous n'avez pas besoin du serveur MCP pour cela : utilisez plutôt l'[Assistant IA](AI-ASSISTANT.fr.md) intégré (**Paramètres → Outils d'administration → Assistant IA**). Le serveur MCP sert à connecter à vos notes des assistants *externes* compatibles MCP ; Ollama seul est un environnement d'exécution de modèles, pas un client MCP, et ne peut pas s'y connecter directement.
 
+<p align="center">
+  <img src="mcp-poznote.gif" alt="Poznote MCP Server demo" width="100%">
+</p>
+
 ## Démarrage rapide
 
 Choisissez votre assistant IA :
@@ -180,7 +184,7 @@ Ce jeton est distinct de `data/.mcp_token` : celui-là sert au serveur MCP pour 
 
 #### Mode débogage
 
-Définissez `POZNOTE_DEBUG=true` dans la commande de démarrage pour faire passer le niveau de log de `INFO` à `DEBUG`. Remettez-le à `false` pour un usage normal. Seules les valeurs exactes en minuscules `true` et `false` sont reconnues. Toute autre valeur est traitée comme `false` et un avertissement est écrit dans les logs MCP. Chaque requête HTTP envoyée à l'API Poznote, chaque appel d'outil reçu de l'assistant IA et chaque réponse sont écrits en détail dans les logs du conteneur. Utilisez-le pour diagnostiquer des problèmes de connexion ou d'authentification :
+Définissez `POZNOTE_DEBUG=true` dans la commande de démarrage pour faire passer le niveau de log de `INFO` à `DEBUG`. Remettez-le à `false` pour un usage normal. Seules les valeurs exactes en minuscules `true` et `false` sont reconnues. Toute autre valeur est traitée comme `false` et un avertissement est écrit dans les logs MCP. Le serveur web est plus tolérant et accepte aussi `1`, `on` ou `yes`. Chaque requête HTTP envoyée à l'API Poznote, chaque appel d'outil reçu de l'assistant IA et chaque réponse sont écrits en détail dans les logs du conteneur. Utilisez-le pour diagnostiquer des problèmes de connexion ou d'authentification :
 
 ```bash
 docker compose logs -f mcp-server

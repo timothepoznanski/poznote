@@ -61,6 +61,10 @@ Después usa **Comprobar el acceso y listar los modelos**, que verifica que el s
 
 La configuración se aplica a toda la instancia: una vez activada por el administrador, todos los perfiles de usuario tienen el chat.
 
+### Claves de API personales
+
+La misma página ofrece la opción **Permitir claves API personales**. Cuando está activada, cada usuario tiene una tarjeta **Mi asistente de IA** en su propia configuración, para dirigir el chat a su propio servidor, proveedor y clave de API en lugar de los configurados para la instancia.
+
 ## Elegir un modelo
 
 Elige un modelo compatible con **llamadas a herramientas** (también llamadas "function calling"), por ejemplo `qwen3`, `llama3.1` o `mistral`. Las llamadas a herramientas son lo que permite al asistente recorrer tus notas: con un modelo que no las admite, el chat sigue funcionando (un aviso te lo indica) pero no puede acceder a tus notas por su cuenta.

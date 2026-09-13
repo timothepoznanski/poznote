@@ -19,6 +19,10 @@ Este servidor suporta **somente o transporte HTTP** (MCP Streamable HTTP).
 > [!TIP]
 > Procura um chat com um modelo local (por exemplo o Ollama) diretamente dentro do Poznote? Para isso você não precisa do servidor MCP: use o [Assistente IA](AI-ASSISTANT.pt.md) integrado (**Configurações → Ferramentas de administração → Assistente IA**). O servidor MCP serve para conectar assistentes *externos* compatíveis com MCP às suas notas; o Ollama sozinho é um runtime de modelos, não um cliente MCP, e não consegue se conectar a ele diretamente.
 
+<p align="center">
+  <img src="mcp-poznote.gif" alt="Poznote MCP Server demo" width="100%">
+</p>
+
 ## Início rápido
 
 Escolha o seu assistente de IA preferido:
@@ -180,7 +184,7 @@ Esse token é diferente de `data/.mcp_token`: aquele é usado pelo servidor MCP 
 
 #### Modo de depuração
 
-Defina `POZNOTE_DEBUG=true` no comando de inicialização para mudar o nível de log de `INFO` para `DEBUG`. Volte para `false` no uso normal. Apenas os valores exatos em minúsculas `true` e `false` são reconhecidos. Qualquer outro valor é tratado como `false`, e um aviso é gravado nos logs do MCP. Cada requisição HTTP enviada à API do Poznote, cada chamada de ferramenta recebida do assistente de IA e cada resposta são registradas em detalhe nos logs do contêiner. Use esse modo para diagnosticar problemas de conexão ou de autenticação:
+Defina `POZNOTE_DEBUG=true` no comando de inicialização para mudar o nível de log de `INFO` para `DEBUG`. Volte para `false` no uso normal. Apenas os valores exatos em minúsculas `true` e `false` são reconhecidos. Qualquer outro valor é tratado como `false`, e um aviso é gravado nos logs do MCP. O servidor web é mais tolerante e também aceita `1`, `on` ou `yes`. Cada requisição HTTP enviada à API do Poznote, cada chamada de ferramenta recebida do assistente de IA e cada resposta são registradas em detalhe nos logs do contêiner. Use esse modo para diagnosticar problemas de conexão ou de autenticação:
 
 ```bash
 docker compose logs -f mcp-server

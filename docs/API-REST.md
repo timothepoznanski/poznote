@@ -52,6 +52,17 @@ Use the current password of the profile you authenticate with. Default local pas
 curl -u 'username:pzn_2f7c…' http://YOUR_SERVER/api/v1/notes
 ```
 
+What an app password can and cannot do:
+
+|  | |
+|---|---|
+| ✅ Read and write the notes, folders, tags and attachments of **its own profile** | ❌ Open the web interface: it is refused at the login form |
+| ✅ Work when the instance is SSO-only, including with *Disable HTTP Basic Auth for API* enabled | ❌ Reach any `/api/v1/admin/*` endpoint, even when the account is an administrator |
+| ✅ Be given an expiry date, and be revoked at any moment | ❌ Change your password, edit or delete your account, or create further app passwords |
+| ✅ Omit the `X-User-ID` header: it is bound to the profile that created it | ❌ Act on another profile, even for an administrator |
+
+The list in `Settings > App passwords` shows, for each one, the first characters of the secret (to tell them apart), when it was created, and when it was last used, which makes an unused credential easy to spot and remove. Each account can hold up to 25.
+
 OIDC Bearer JWT authentication is available when OIDC is enabled. Poznote validates the token signature with the provider JWKS, checks issuer, expiration, and audience, then maps the token claims to a Poznote profile using the same OIDC linking rules as interactive login (`sub`, then `preferred_username`, then `email`). Group and user allowlists, disabled profiles, and auto-create settings are also enforced.
 
 ```bash
