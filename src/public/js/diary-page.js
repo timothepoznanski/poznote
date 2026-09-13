@@ -195,8 +195,9 @@
         var isToday = data.todayNoteId && note.id === data.todayNoteId;
         var title = note.dated ? longDateLabel(note.entryDate) : note.heading;
         var subtitle = note.dated ? '' : '<span class="diary-journal-subtitle">' + esc(longDateLabel(note.entryDate)) + '</span>';
-        var openLabel = txt.journalOpen || 'Open the note';
         var trashLabel = txt.journalTrash || 'Move to trash';
+        var editable = journalNoteIsEditable(note);
+        var editLabel = txt.journalEdit || 'Edit here';
 
         var tags = (note.tags || []).map(function (tag) {
             return '<span class="board-card-tag">' + esc(tag) + '</span>';
@@ -209,9 +210,14 @@
                 '</h2>' +
                 (isToday ? '<span class="board-card-tag diary-today-tag">' + esc(txt.today || 'Today') + '</span>' : '') +
                 subtitle +
-                '<a class="diary-journal-open" href="' + esc(note.url) + '" title="' + esc(openLabel) + '" aria-label="' + esc(openLabel) + '">' +
-                    '<i class="lucide lucide-pencil"></i>' +
-                '</a>' +
+                '<span class="diary-journal-save-status" aria-live="polite"></span>' +
+                // The pencil edits in place (the title opens the note); a
+                // tasklist or a shortcut has no inline editor and no pencil
+                (editable
+                    ? '<button type="button" class="diary-journal-edit" title="' + esc(editLabel) + '" aria-label="' + esc(editLabel) + '">' +
+                        '<i class="lucide lucide-pencil"></i>' +
+                      '</button>'
+                    : '') +
                 '<button type="button" class="diary-journal-delete" title="' + esc(trashLabel) + '" aria-label="' + esc(trashLabel) + '">' +
                     '<i class="lucide lucide-trash-2"></i>' +
                 '</button>' +
@@ -246,7 +252,7 @@
         var entry = document.querySelector('.diary-journal-entry[data-note-id="' + noteId + '"]');
         if (!entry) return;
         var body = entry.querySelector('.diary-journal-body');
-        if (!body || !body.classList.contains('is-loading')) return;
+        if (!body || !body.classList.contains('is-loading') || body.classList.contains('is-editing')) return;
 
         if (journalFailed[noteId]) {
             body.classList.remove('is-loading');
@@ -279,6 +285,11 @@
         chunk.forEach(function (note) { fillJournalBody(note.id); });
         if (missing.length === 0) return;
         missing.forEach(function (id) { journalPending[id] = true; });
+        // A body saved in place while this request is out is fetched again
+        // by invalidateJournalBody(): this response must not overwrite it
+        var generation = {};
+        missing.forEach(function (id) { generation[id] = journalBodyGen[id] || 0; });
+        var isCurrent = function (id) { return (journalBodyGen[id] || 0) === generation[id]; };
 
         var url = 'api/v1/diary/entries.php?ids=' + missing.join(',') +
             '&workspace=' + encodeURIComponent(data.workspace || '');
@@ -290,6 +301,7 @@
             .then(function (result) {
                 var entries = (result && result.entries) || {};
                 missing.forEach(function (id) {
+                    if (!isCurrent(id)) return;
                     delete journalPending[id];
                     if (Object.prototype.hasOwnProperty.call(entries, id)) {
                         journalBodies[id] = String(entries[id] || '');
@@ -301,6 +313,7 @@
             })
             .catch(function () {
                 missing.forEach(function (id) {
+                    if (!isCurrent(id)) return;
                     delete journalPending[id];
                     journalFailed[id] = true;
                     fillJournalBody(id);
@@ -331,6 +344,7 @@
     }
 
     function renderJournal(container, visibleNotes) {
+        finishAllJournalEdits(null);
         if (journalObserver) {
             journalObserver.disconnect();
             journalObserver = null;
@@ -360,6 +374,378 @@
         } else {
             while (appendJournalChunk()) { /* no observer: show everything */ }
         }
+    }
+
+    // --- Journal inline editing ---
+    //
+    // An entry is edited where it is read: its pencil, or a click in its
+    // body, swaps the rendered body for an editor on the note's source (a
+    // textarea for markdown, a rich-text area for HTML notes), and the note
+    // is saved through PATCH api/v1/notes/{id} as the writer types. The
+    // journal takes no edit lock, like the other one-shot writers (issue
+    // 1366): every save carries if_version, so a note changed elsewhere in
+    // the meantime is never overwritten. Leaving the editor (Done, Escape, a
+    // click outside the entry) saves what is pending and renders the body
+    // again from the server. Tasklists and shortcuts open in the editor.
+
+    var JOURNAL_SAVE_DELAY_MS = 1200;
+    var journalEdits = {};    // note id -> edit state while its editor is open
+    var journalBodyGen = {};  // note id -> bumped when a cached body is retired
+
+    function journalNoteIsEditable(note) {
+        return !!note && (note.type === 'note' || note.type === 'markdown');
+    }
+
+    function findJournalNote(noteId) {
+        for (var i = 0; i < notes.length; i++) {
+            if (notes[i].id === noteId) return notes[i];
+        }
+        return null;
+    }
+
+    function journalEditList() {
+        return Object.keys(journalEdits).map(function (id) { return journalEdits[id]; });
+    }
+
+    function journalHasUnsavedEdit() {
+        return journalEditList().some(function (state) { return state.dirty || state.saving; });
+    }
+
+    function setJournalSaveStatus(entry, kind, text) {
+        var status = entry.querySelector('.diary-journal-save-status');
+        if (!status) return;
+        status.textContent = text || '';
+        status.classList.toggle('is-error', kind === 'error');
+        status.classList.toggle('is-saving', kind === 'saving');
+    }
+
+    function setJournalEditButton(entry, editing) {
+        var btn = entry.querySelector('.diary-journal-edit');
+        if (!btn) return;
+        var label = editing ? (txt.journalEditDone || 'Done editing') : (txt.journalEdit || 'Edit here');
+        btn.title = label;
+        btn.setAttribute('aria-label', label);
+        var icon = btn.querySelector('.lucide');
+        if (icon) icon.className = 'lucide ' + (editing ? 'lucide-check' : 'lucide-pencil');
+    }
+
+    // The cached body is stale once the note was saved: drop it and, when the
+    // entry is on screen, fetch it again. The generation guards a fetch that
+    // was already in flight for the old content.
+    function invalidateJournalBody(note) {
+        journalBodyGen[note.id] = (journalBodyGen[note.id] || 0) + 1;
+        delete journalBodies[note.id];
+        delete journalFailed[note.id];
+        delete journalPending[note.id];
+        var entry = entryElement(note.id);
+        if (!entry) return;
+        var body = entry.querySelector('.diary-journal-body');
+        if (!body || body.classList.contains('is-editing')) return;
+        body.classList.add('is-loading');
+        body.innerHTML = buildJournalExcerpt(note);
+        loadJournalBodies([note]);
+    }
+
+    // The filter and the board's cards read the excerpt: keep them current
+    // without waiting for a page reload.
+    function updateJournalNoteExcerpt(note, content, type) {
+        var text;
+        if (type === 'markdown') {
+            text = String(content || '');
+        } else {
+            var holder = document.createElement('div');
+            holder.innerHTML = String(content || '');
+            text = holder.textContent || '';
+        }
+        text = text.replace(/\s+/g, ' ').trim();
+        note.text = text.length > 300 ? text.slice(0, 300) : text;
+        note.search = normalizeSearchText(note.heading + ' ' + (note.tags || []).join(' ') + ' ' + text);
+    }
+
+    function journalEditorContent(state) {
+        return state.type === 'markdown' ? state.editor.value : state.editor.innerHTML;
+    }
+
+    function autosizeJournalEditor(editor) {
+        if (editor.tagName !== 'TEXTAREA') return;
+        editor.style.height = 'auto';
+        editor.style.height = (editor.scrollHeight + 2) + 'px';
+    }
+
+    function placeJournalCaret(state) {
+        var editor = state.editor;
+        // Writing continues at the end, unless the end is off screen: then the
+        // page must not jump, and the caret starts at the top.
+        var atEnd = editor.getBoundingClientRect().bottom <= window.innerHeight;
+        try {
+            editor.focus({ preventScroll: true });
+        } catch (e) {
+            editor.focus();
+        }
+        if (state.type === 'markdown') {
+            var pos = atEnd ? editor.value.length : 0;
+            editor.setSelectionRange(pos, pos);
+            return;
+        }
+        var selection = window.getSelection ? window.getSelection() : null;
+        if (!selection) return;
+        var range = document.createRange();
+        range.selectNodeContents(editor);
+        range.collapse(!atEnd);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+
+    function scheduleJournalSave(state) {
+        state.dirty = true;
+        if (state.conflict) return;
+        setJournalSaveStatus(state.entry, '', '');
+        clearTimeout(state.saveTimer);
+        state.saveTimer = setTimeout(function () { saveJournalEdit(state); }, JOURNAL_SAVE_DELAY_MS);
+    }
+
+    // Resolves to true once the editor's content is on the server. A failed
+    // save leaves the state dirty, so the next keystroke (or Done) retries;
+    // a version conflict stops the saving for good, the writer is told.
+    function saveJournalEdit(state) {
+        clearTimeout(state.saveTimer);
+        state.saveTimer = null;
+        if (state.conflict) return Promise.resolve(false);
+        if (state.saving) {
+            state.saveAgain = true;
+            return state.saving;
+        }
+        if (!state.dirty) return Promise.resolve(true);
+
+        var content = journalEditorContent(state);
+        state.dirty = false;
+        setJournalSaveStatus(state.entry, 'saving', txt.journalSaving || 'Saving...');
+
+        state.saving = fetch('api/v1/notes/' + encodeURIComponent(state.noteId), {
+            method: 'PATCH',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ content: content, if_version: state.version })
+        })
+            .then(function (response) {
+                return response.json().catch(function () { return {}; }).then(function (result) {
+                    if (response.status === 409) {
+                        state.conflict = true;
+                        throw new Error(result.error || 'version_conflict');
+                    }
+                    if (!response.ok || !result.note) {
+                        throw new Error(result.error || result.message || ('HTTP ' + response.status));
+                    }
+                    if (result.note.version) state.version = result.note.version;
+                    updateJournalNoteExcerpt(state.note, content, state.type);
+                    setJournalSaveStatus(state.entry, 'saved', txt.journalSaved || 'Saved');
+                    return true;
+                });
+            })
+            .catch(function (err) {
+                state.dirty = true;
+                if (state.conflict) {
+                    setJournalSaveStatus(state.entry, 'error', txt.journalConflict ||
+                        'This entry was changed elsewhere. Your latest changes here were not saved: reload the page to see the current version.');
+                } else {
+                    setJournalSaveStatus(state.entry, 'error', (txt.journalSaveError || 'Could not save this entry.') + ' ' + err.message);
+                }
+                return false;
+            })
+            .then(function (ok) {
+                state.saving = null;
+                if (state.saveAgain) {
+                    state.saveAgain = false;
+                    if (state.dirty) return saveJournalEdit(state);
+                }
+                return ok;
+            });
+        return state.saving;
+    }
+
+    function openJournalEditor(entry, note, fresh) {
+        var body = entry.querySelector('.diary-journal-body');
+        if (!body) return;
+        var type = fresh.type === 'markdown' ? 'markdown' : 'note';
+        var placeholder = txt.journalEditPlaceholder || 'Write here...';
+        var editor;
+        if (type === 'markdown') {
+            editor = document.createElement('textarea');
+            editor.className = 'diary-journal-editor diary-journal-editor-markdown';
+            editor.value = String(fresh.content || '');
+            editor.placeholder = placeholder;
+        } else {
+            editor = document.createElement('div');
+            editor.className = 'diary-journal-editor diary-journal-editor-richtext';
+            editor.contentEditable = 'true';
+            editor.innerHTML = String(fresh.content || '');
+            editor.setAttribute('data-placeholder', placeholder);
+        }
+
+        var state = {
+            noteId: note.id,
+            note: note,
+            entry: entry,
+            editor: editor,
+            type: type,
+            version: fresh.version || '',
+            dirty: false,
+            saving: null,
+            saveAgain: false,
+            saveTimer: null,
+            conflict: false
+        };
+        journalEdits[note.id] = state;
+
+        body.classList.remove('is-loading');
+        body.classList.add('is-editing');
+        body.innerHTML = '';
+        body.appendChild(editor);
+        entry.classList.add('is-editing');
+        setJournalEditButton(entry, true);
+        setJournalSaveStatus(entry, '', '');
+
+        editor.addEventListener('input', function () {
+            autosizeJournalEditor(editor);
+            scheduleJournalSave(state);
+        });
+        editor.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                finishJournalEdit(state);
+                return;
+            }
+            if ((e.ctrlKey || e.metaKey) && !e.altKey && (e.key === 's' || e.key === 'S')) {
+                e.preventDefault();
+                saveJournalEdit(state);
+                return;
+            }
+            // Two spaces indent a markdown list item; the focus stays put
+            if (e.key === 'Tab' && !e.shiftKey && type === 'markdown') {
+                e.preventDefault();
+                var start = editor.selectionStart;
+                var end = editor.selectionEnd;
+                editor.value = editor.value.slice(0, start) + '  ' + editor.value.slice(end);
+                editor.setSelectionRange(start + 2, start + 2);
+                autosizeJournalEditor(editor);
+                scheduleJournalSave(state);
+            }
+        });
+
+        autosizeJournalEditor(editor);
+        placeJournalCaret(state);
+    }
+
+    function startJournalEdit(entry) {
+        if (!entry) return;
+        var noteId = parseInt(entry.getAttribute('data-note-id'), 10);
+        var note = findJournalNote(noteId);
+        if (!journalNoteIsEditable(note) || journalEdits[noteId] || entry.classList.contains('is-edit-loading')) return;
+
+        // One entry at a time: the others are saved and rendered again
+        journalEditList().forEach(function (state) { finishJournalEdit(state); });
+
+        entry.classList.add('is-edit-loading');
+        // The source is read afresh: the rendered body may be minutes old,
+        // and the version token must be the one the save is checked against.
+        var url = 'api/v1/notes/' + encodeURIComponent(noteId);
+        if (data.workspace) url += '?workspace=' + encodeURIComponent(data.workspace);
+        fetch(url, { credentials: 'same-origin', headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function (response) {
+                return response.json().catch(function () { return {}; }).then(function (result) {
+                    if (!response.ok || !result.note) {
+                        throw new Error(result.error || result.message || ('HTTP ' + response.status));
+                    }
+                    return result.note;
+                });
+            })
+            .then(function (fresh) {
+                entry.classList.remove('is-edit-loading');
+                if (!entry.isConnected || journalEdits[noteId]) return;
+                openJournalEditor(entry, note, fresh);
+            })
+            .catch(function (err) {
+                entry.classList.remove('is-edit-loading');
+                if (!entry.isConnected) return;
+                setJournalSaveStatus(entry, 'error', (txt.journalLoadError || 'Could not load this entry.') + ' ' + err.message);
+            });
+    }
+
+    // Save what is pending, then show the rendered body again. When the
+    // save fails the editor stays open with the error, so nothing written
+    // is lost; typing again or pressing Done retries.
+    function finishJournalEdit(state) {
+        if (!state || journalEdits[state.noteId] !== state) return Promise.resolve(false);
+        clearTimeout(state.saveTimer);
+        state.saveTimer = null;
+
+        var pending = state.dirty && !state.conflict ? saveJournalEdit(state) : (state.saving || Promise.resolve(true));
+        return pending.then(function (ok) {
+            if (journalEdits[state.noteId] !== state) return false;
+            if (!ok && !state.conflict && state.entry.isConnected) return false;
+            delete journalEdits[state.noteId];
+
+            var entry = state.entry;
+            if (entry.isConnected) {
+                entry.classList.remove('is-editing');
+                setJournalEditButton(entry, false);
+                setJournalSaveStatus(entry, '', '');
+                var body = entry.querySelector('.diary-journal-body');
+                if (body) body.classList.remove('is-editing');
+            }
+            invalidateJournalBody(state.note);
+            return true;
+        });
+    }
+
+    function finishAllJournalEdits(except) {
+        journalEditList().forEach(function (state) {
+            if (state.entry !== except) finishJournalEdit(state);
+        });
+    }
+
+    function initJournalEditing() {
+        var diaryContent = document.getElementById('diaryContent');
+        if (diaryContent) {
+            diaryContent.addEventListener('click', function (e) {
+                var editBtn = e.target.closest('.diary-journal-edit');
+                if (editBtn) {
+                    var entry = editBtn.closest('.diary-journal-entry');
+                    var noteId = entry ? parseInt(entry.getAttribute('data-note-id'), 10) : 0;
+                    if (journalEdits[noteId]) {
+                        finishJournalEdit(journalEdits[noteId]);
+                    } else {
+                        startJournalEdit(entry);
+                    }
+                    return;
+                }
+                // A click in the text starts editing, but not one on a link or
+                // a control, nor the release of a text selection
+                var body = e.target.closest('.diary-journal-body');
+                if (!body || body.classList.contains('is-editing')) return;
+                if (e.target.closest('a, input, button, select, textarea, audio, video, iframe, img, details, summary, label')) return;
+                var selection = window.getSelection ? window.getSelection() : null;
+                if (selection && !selection.isCollapsed) return;
+                startJournalEdit(body.closest('.diary-journal-entry'));
+            });
+        }
+
+        // A click anywhere else leaves the editor
+        document.addEventListener('mousedown', function (e) {
+            if (!Object.keys(journalEdits).length) return;
+            var entry = e.target.closest ? e.target.closest('.diary-journal-entry') : null;
+            finishAllJournalEdits(entry);
+        });
+
+        window.addEventListener('beforeunload', function (e) {
+            if (!journalHasUnsavedEdit()) return;
+            e.preventDefault();
+            e.returnValue = '';
+        });
     }
 
     // --- Journal dates panel ---
@@ -699,6 +1085,7 @@
             renderJournal(container, visibleNotes);
             return;
         }
+        finishAllJournalEdits(null);
         if (journalObserver) {
             journalObserver.disconnect();
             journalObserver = null;
@@ -988,6 +1375,7 @@
         var entry = btn.closest('.diary-journal-entry');
         if (!entry) return;
         var noteId = parseInt(entry.getAttribute('data-note-id'), 10);
+        if (journalEdits[noteId]) finishJournalEdit(journalEdits[noteId]);
         var titleEl = entry.querySelector('.diary-journal-title');
         var title = titleEl ? titleEl.textContent.trim() : '';
         var message = (txt.journalTrashConfirm || 'Move "{{title}}" to the trash?').replace('{{title}}', title);
@@ -1128,6 +1516,7 @@
             });
         }
 
+        initJournalEditing();
         initDiaryContextMenu();
 
         document.querySelectorAll('.diary-switch-delete').forEach(function (btn) {
