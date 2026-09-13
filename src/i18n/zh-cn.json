@@ -4639,9 +4639,6 @@
     "delete_title": "删除日记",
     "delete_confirm": "删除日记“{{name}}”？其文件夹将被删除，所有日记条目将移到回收站。",
     "delete_error": "无法删除日记。",
-    "journal_trash": "移到回收站",
-    "journal_trash_confirm": "将“{{title}}”移到回收站？",
-    "journal_trash_error": "无法将这篇日记移到回收站。",
     "rename_title": "重命名日记",
     "rename_error": "无法重命名日记。"
   },

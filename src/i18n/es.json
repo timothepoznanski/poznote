@@ -4540,9 +4540,6 @@
     "delete_title": "Eliminar diario",
     "delete_confirm": "¿Eliminar el diario «{{name}}»? Sus carpetas se eliminan y todas sus entradas se mueven a la papelera.",
     "delete_error": "No se pudo eliminar el diario.",
-    "journal_trash": "Mover a la papelera",
-    "journal_trash_confirm": "¿Mover «{{title}}» a la papelera?",
-    "journal_trash_error": "No se pudo mover esta entrada a la papelera.",
     "rename_title": "Renombrar diario",
     "rename_error": "No se pudo renombrar el diario."
   },

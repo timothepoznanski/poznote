@@ -392,13 +392,24 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
     padding-bottom: 48px;
 }
 
-.diary-journal-entry {
-    padding: 22px 0 26px;
-    border-bottom: 1.5px solid var(--pz-border);
+.diary-journal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
 }
 
-.diary-journal-entry:first-child {
-    padding-top: 8px;
+/* Each entry sits in its own frame, same border and radius as the board cards */
+.diary-journal-entry {
+    padding: 20px 24px 22px;
+    border: 1.5px solid var(--pz-border);
+    border-radius: var(--pz-radius-xl);
+    background: var(--pz-bg);
+}
+
+@media (max-width: 600px) {
+    .diary-journal-entry {
+        padding: 16px 14px 18px;
+    }
 }
 
 .diary-journal-header {
@@ -409,18 +420,36 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
     margin-bottom: 12px;
 }
 
+/* A zero basis never pushes the status or the pencil to a new row: the group
+   takes what they leave and the title gives way first. */
+.diary-journal-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1 1 0;
+    min-width: 0;
+}
+
 .diary-journal-title {
+    flex: 0 1 auto;
+    min-width: 0;
     margin: 0;
     font-size: 19px;
     font-weight: var(--pz-weight-bold);
     color: var(--pz-text);
-    min-width: 0;
-    overflow-wrap: anywhere;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .diary-journal-title a {
     color: inherit;
     text-decoration: none;
+}
+
+.diary-journal-heading > :not(.diary-journal-title) {
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .diary-journal-title a:hover {
@@ -440,25 +469,25 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
 }
 
 /* Save status of an entry edited in place, then the pencil (edit in place,
-   the title opens the note), pushed to the end of the header row: the status
-   takes the free space, or the first action when the status is empty. */
+   the title opens the note), at the end of the header row since the heading
+   group takes the free space. */
 .diary-journal-save-status {
-    margin-left: auto;
     font-size: 12px;
     color: var(--pz-text-muted);
-    overflow-wrap: anywhere;
+    white-space: nowrap;
 }
 
 .diary-journal-save-status:empty {
     display: none;
 }
 
-.diary-journal-save-status:empty + :is(.diary-journal-edit, .diary-journal-delete) {
-    margin-left: auto;
-}
-
+/* An error can be a sentence: it gets its own row under the title */
 .diary-journal-save-status.is-error {
     color: var(--pz-danger);
+    order: 1;
+    flex-basis: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
 .diary-journal-edit {
@@ -492,45 +521,9 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
     color: var(--pz-accent);
 }
 
-/* Right of the pencil, red at rest as the destructive action */
-.diary-journal-delete {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    margin-left: -6px;
-    padding: 0;
-    border: none;
-    border-radius: var(--pz-radius);
-    background: transparent;
-    color: var(--pz-danger);
-    cursor: pointer;
-}
-
-.diary-journal-delete .lucide {
-    width: 15px;
-    height: 15px;
-}
-
-.diary-journal-delete:hover,
-.diary-journal-delete:focus-visible {
-    color: var(--pz-danger-hover);
-    background: var(--pz-surface-hover);
-}
-
-.diary-journal-delete:disabled {
-    opacity: 0.5;
-    cursor: default;
-}
-
-/* The icon painters colour icons themselves: this one follows its button */
-.diary-journal-delete [class*="lucide-"] {
-    color: inherit;
-}
-
 .diary-journal-tags {
-    margin-top: 14px;
+    flex-wrap: wrap;
+    margin: -4px 0 12px;
 }
 
 /* ---------- Journal entry body ----------
@@ -853,14 +846,9 @@ html[data-theme='dark'] .diary-journal-toggle.active [class*="lucide-"] {
     color: var(--dm-accent);
 }
 
-html[data-theme='dark'] .diary-journal-delete [class*="lucide-"],
-html[data-theme='dark'] .diary-journal-delete:hover [class*="lucide-"] {
-    color: var(--pz-danger);
-}
-
-html[data-theme='dark'] .diary-journal-delete:hover,
-html[data-theme='dark'] .diary-journal-delete:focus-visible {
-    background: var(--dm-surface-hover);
+html[data-theme='dark'] .diary-journal-entry {
+    border-color: var(--dm-border);
+    background: var(--dm-surface);
 }
 
 html[data-theme='dark'] .diary-journal-title {
