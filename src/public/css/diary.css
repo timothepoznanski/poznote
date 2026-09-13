@@ -439,27 +439,57 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
     color: var(--pz-text-muted);
 }
 
-/* Pushed to the end of the header row */
-.diary-journal-open {
+/* Save status of an entry edited in place, then the pencil (edit in place,
+   the title opens the note), pushed to the end of the header row: the status
+   takes the free space, or the first action when the status is empty. */
+.diary-journal-save-status {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--pz-text-muted);
+    overflow-wrap: anywhere;
+}
+
+.diary-journal-save-status:empty {
+    display: none;
+}
+
+.diary-journal-save-status:empty + :is(.diary-journal-edit, .diary-journal-delete) {
+    margin-left: auto;
+}
+
+.diary-journal-save-status.is-error {
+    color: var(--pz-danger);
+}
+
+.diary-journal-edit {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     width: 30px;
     height: 30px;
-    margin-left: auto;
+    padding: 0;
+    border: none;
     border-radius: var(--pz-radius);
+    background: transparent;
     color: var(--pz-text-muted);
+    cursor: pointer;
 }
 
-.diary-journal-open .lucide {
+.diary-journal-edit .lucide {
     width: 15px;
     height: 15px;
 }
 
-.diary-journal-open:hover,
-.diary-journal-open:focus-visible {
+.diary-journal-edit:hover,
+.diary-journal-edit:focus-visible {
     color: var(--pz-accent);
     background: var(--pz-surface-hover);
+}
+
+/* The pencil shows a check while its entry is being edited */
+.diary-journal-entry.is-editing .diary-journal-edit,
+.diary-journal-entry.is-editing .diary-journal-edit [class*="lucide-"] {
+    color: var(--pz-accent);
 }
 
 /* Right of the pencil, red at rest as the destructive action */
@@ -687,6 +717,51 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
     color: var(--pz-danger);
 }
 
+/* ---------- Journal inline editing ----------
+   The entry's body becomes its editor (js/diary-page.js): a textarea on the
+   markdown source, sized to its content, or a rich-text area holding the
+   note's HTML, which keeps the reading styles above. */
+
+.diary-journal-editor {
+    display: block;
+    width: 100%;
+    min-height: 3em;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 10px 12px;
+    border: 1px solid var(--pz-accent);
+    border-radius: var(--pz-radius);
+    background: var(--pz-surface);
+    color: var(--pz-text);
+    font: inherit;
+    line-height: inherit;
+    outline: none;
+}
+
+.diary-journal-editor-markdown {
+    resize: none;
+    overflow: hidden;
+    white-space: pre-wrap;
+}
+
+.diary-journal-editor-richtext:empty::before {
+    content: attr(data-placeholder);
+    color: var(--pz-text-muted);
+    pointer-events: none;
+}
+
+.diary-journal-editor-richtext > :first-child {
+    margin-top: 0;
+}
+
+.diary-journal-editor-richtext > :last-child {
+    margin-bottom: 0;
+}
+
+.diary-journal-entry.is-edit-loading .diary-journal-body {
+    opacity: 0.6;
+}
+
 /* Dark mode */
 html[data-theme='dark'] .diary-month-title {
     color: var(--dm-text-bright);
@@ -792,7 +867,18 @@ html[data-theme='dark'] .diary-journal-title {
     color: var(--dm-text-bright);
 }
 
-html[data-theme='dark'] .diary-journal-open:hover [class*="lucide-"],
-html[data-theme='dark'] .diary-journal-open:focus-visible [class*="lucide-"] {
+html[data-theme='dark'] .diary-journal-edit:hover [class*="lucide-"],
+html[data-theme='dark'] .diary-journal-edit:focus-visible [class*="lucide-"],
+html[data-theme='dark'] .diary-journal-entry.is-editing .diary-journal-edit [class*="lucide-"] {
     color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .diary-journal-editor {
+    border-color: var(--dm-accent);
+    background: var(--dm-surface);
+    color: var(--dm-text-bright);
+}
+
+html[data-theme='dark'] .diary-journal-editor-richtext:empty::before {
+    color: var(--dm-text-muted);
 }

@@ -4,7 +4,8 @@
  * (Diary/YYYY/MM) as cards grouped by month, newest first, with a one-click
  * "Today's entry" button that opens (or creates) the note titled with
  * today's date. The journal toggle swaps the board for one reading column of
- * full entries (js/diary-page.js, bodies from api/v1/diary/entries.php).
+ * full entries (js/diary-page.js, bodies from api/v1/diary/entries.php),
+ * each editable in place through the notes API.
  */
 require_once __DIR__ . '/../page_bootstrap.php';
 
@@ -284,7 +285,13 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 			renameLabel: <?php echo json_encode(t('common.rename', [], 'Rename')); ?>,
 			renameDiaryTitle: <?php echo json_encode(t('diary.rename_title', [], 'Rename diary')); ?>,
 			renameDiaryError: <?php echo json_encode(t('diary.rename_error', [], 'Could not rename the diary.')); ?>,
-			journalOpen: <?php echo json_encode(t('diary.journal_open', [], 'Open the note')); ?>,
+			journalEdit: <?php echo json_encode(t('diary.journal_edit', [], 'Edit here')); ?>,
+			journalEditDone: <?php echo json_encode(t('diary.journal_edit_done', [], 'Done editing')); ?>,
+			journalEditPlaceholder: <?php echo json_encode(t('diary.journal_edit_placeholder', [], 'Write here...')); ?>,
+			journalSaving: <?php echo json_encode(t('diary.journal_saving', [], 'Saving...')); ?>,
+			journalSaved: <?php echo json_encode(t('diary.journal_saved', [], 'Saved')); ?>,
+			journalSaveError: <?php echo json_encode(t('diary.journal_save_error', [], 'Could not save this entry.')); ?>,
+			journalConflict: <?php echo json_encode(t('diary.journal_conflict', [], 'This entry was changed elsewhere. Your latest changes here were not saved: reload the page to see the current version.')); ?>,
 			journalTrash: <?php echo json_encode(t('diary.journal_trash', [], 'Move to trash')); ?>,
 			journalTrashConfirm: <?php echo json_encode(t('diary.journal_trash_confirm', [], 'Move "{{title}}" to the trash?')); ?>,
 			journalTrashError: <?php echo json_encode(t('diary.journal_trash_error', [], 'Could not move this entry to the trash.')); ?>,

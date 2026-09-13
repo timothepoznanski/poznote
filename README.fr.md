@@ -634,7 +634,7 @@ Poznote prend en charge deux formats de notes principaux, chacun adapté à une 
 *   **Usage :** écrivez une note par jour, façon journal intime, depuis un tableau Journal dédié.
 *   **Fonctionnement :** le bouton « Créer la note du jour » crée la note du jour (il devient « Aller à la note du jour » une fois la note créée), avec la date du jour pour titre, et la range automatiquement dans une arborescence de dossiers `Diary/YYYY/MM`.
 *   **Vue tableau :** les entrées s'affichent sous forme de cartes regroupées par mois, les plus récentes en premier, avec un filtre pour retrouver rapidement les entrées passées.
-*   **Vue en fil continu :** le bouton en forme de parchemin, à côté des réglages d'affichage, passe à une seule colonne de lecture : chaque entrée avec son contenu complet, les plus récentes en premier, chargées au fil du défilement. Le filtre s'y applique aussi.
+*   **Vue en fil continu :** le bouton en forme de parchemin, à côté des réglages d'affichage, passe à une seule colonne de lecture : chaque entrée avec son contenu complet, les plus récentes en premier, chargées au fil du défilement. Le filtre s'y applique aussi. Cliquez sur une entrée, ou sur son crayon, pour la modifier sur place : les changements sont enregistrés au fil de la frappe.
 *   **Format :** les nouvelles entrées sont créées en notes HTML ou Markdown, selon le réglage « Format des entrées de journal » dans **Paramètres > Comportement**.
 </details>
 

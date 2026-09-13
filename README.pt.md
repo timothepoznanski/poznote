@@ -634,7 +634,7 @@ O Poznote oferece dois formatos principais de nota, cada um pensado para um flux
 *   **Uso:** escreva uma nota por dia, no estilo de um diário, a partir de um quadro Diário dedicado.
 *   **Fluxo de trabalho:** o botão "Criar a entrada de hoje" cria a nota do dia (ele passa a se chamar "Ir para a entrada de hoje" quando a nota já existe), com a data atual como título e armazenada automaticamente em uma estrutura de pastas `Diary/YYYY/MM`.
 *   **Visualização em quadro:** as entradas são exibidas como cartões agrupados por mês, das mais recentes para as mais antigas, com um filtro para encontrar rapidamente entradas anteriores.
-*   **Vista contínua:** o botão em forma de pergaminho, ao lado dos controles de visualização, muda para uma única coluna de leitura: cada entrada com seu conteúdo completo, das mais recentes para as mais antigas, carregadas conforme você rola a página. O filtro também funciona ali.
+*   **Vista contínua:** o botão em forma de pergaminho, ao lado dos controles de visualização, muda para uma única coluna de leitura: cada entrada com seu conteúdo completo, das mais recentes para as mais antigas, carregadas conforme você rola a página. O filtro também funciona ali. Clique em uma entrada, ou em seu lápis, para editá-la ali mesmo; as alterações são salvas enquanto você digita.
 *   **Formato:** novas entradas são criadas como notas HTML ou Markdown, conforme a configuração "Formato das entradas do diário" em **Configurações > Comportamento**.
 </details>
 
