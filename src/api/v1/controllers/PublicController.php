@@ -87,8 +87,10 @@ class PublicController {
             if (isset($input['text'])) {
                 $newText = $this->normalizePublicTaskText((string)$input['text'], $type);
                 // Match the prefix (indent + marker + checkbox)
-                if (preg_match('/^(\s*[\*\-\+]\s+\[[ xX]\]\s+)(.*)$/', $line, $matches)) {
-                    $lines[$lineIndex] = $matches[1] . $newText;
+                // The text is optional (an empty "- [ ]" renders as a checkbox too),
+                // so the separating space is added back when the line had none.
+                if (preg_match('/^(\s*[\*\-\+]\s+\[[ xX]\])(?:(\s+)(.*))?$/', $line, $matches)) {
+                    $lines[$lineIndex] = $matches[1] . ($matches[2] ?? ' ') . $newText;
                 } else {
                     // Fallback: if it's not a standard checkbox line, we might not want to edit it this way
                     $this->sendError(400, 'Target line is not a valid markdown checkbox');

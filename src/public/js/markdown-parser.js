@@ -641,7 +641,9 @@ function _mdParseCalloutHeader(firstLine) {
     return null;
 }
 
-var _MD_TASK_LIST_LINE_REGEX = /^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/;
+// The text after the checkbox is optional: "- [ ]" on its own is an empty
+// checkbox, not a bullet whose text is "[ ]" (issue #1386).
+var _MD_TASK_LIST_LINE_REGEX = /^(\s*)[\*\-\+]\s+\[([ xX])\](?:\s+(.*))?$/;
 
 /*
  * Renders one (possibly nested) markdown list starting at `startIndex`, and
@@ -768,7 +770,7 @@ function _mdParseNestedList(startIndex, isTaskList, ctx) {
         }
 
         let indent = listMatch[1].length;
-        let content = isTaskList ? listMatch[3] : listMatch[3];
+        let content = listMatch[3] || '';
 
         // If this is the first item, set the base indentation and marker type
         if (baseIndent === null) {
