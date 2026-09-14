@@ -175,7 +175,14 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:media" checked><span><?php echo t_h('slash_menu.media', [], 'Media'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:toggle" checked><span><?php echo t_h('slash_menu.toggle', [], 'Toggle'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:emoji" checked><span><?php echo t_h('slash_menu.emoji', [], 'Emoji'); ?></span></label>
-    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:date" checked><span><?php echo t_h('slash_menu.date', [], 'Date'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:date" checked><span><?php echo t_h('slash_menu.date_section', [], 'Calendar and time'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:now" checked><span><?php echo t_h('slash_menu.date_section', [], 'Calendar and time') . ' › ' . t_h('slash_menu.now', [], 'Now'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:relative-date" checked><span><?php echo t_h('slash_menu.date_section', [], 'Calendar and time') . ' › ' . t_h('slash_menu.relative_date', [], 'Relative'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:weekday" checked><span><?php echo t_h('slash_menu.date_section', [], 'Calendar and time') . ' › ' . t_h('slash_menu.weekday', [], 'Day of the week'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:insert-date" checked><span><?php echo t_h('slash_menu.date_section', [], 'Calendar and time') . ' › ' . t_h('slash_menu.date', [], 'Date'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:insert-time" checked><span><?php echo t_h('slash_menu.date_section', [], 'Calendar and time') . ' › ' . t_h('slash_menu.time', [], 'Time'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:insert-datetime" checked><span><?php echo t_h('slash_menu.date_section', [], 'Calendar and time') . ' › ' . t_h('slash_menu.date_time', [], 'Date and time'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:journal-link" checked><span><?php echo t_h('slash_menu.date_section', [], 'Calendar and time') . ' › ' . t_h('slash_menu.journal_link', [], 'Link to diary entry'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:excalidraw" checked><span>Excalidraw</span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:table" checked><span><?php echo t_h('slash_menu.table', [], 'Table'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:separator" checked><span><?php echo t_h('slash_menu.separator', [], 'Separator'); ?></span></label>

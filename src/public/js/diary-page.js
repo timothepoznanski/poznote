@@ -1135,32 +1135,51 @@
             openNote(data.todayNoteId);
             return;
         }
+        createEntry({ heading: data.todayTitle, folder_name: data.folderPath }, btn);
+    }
 
-        btn.disabled = true;
+    // fields: heading + folder_name (+ created_date for another day)
+    function createEntry(fields, btn) {
+        if (btn) btn.disabled = true;
         fetch('api/v1/notes', {
             method: 'POST',
             credentials: 'same-origin',
             headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-            body: JSON.stringify({
-                heading: data.todayTitle,
-                folder_name: data.folderPath,
+            body: JSON.stringify(Object.assign({
                 workspace: data.workspace,
                 type: data.noteType === 'markdown' ? 'markdown' : 'note'
-            })
+            }, fields))
         })
             .then(function (response) { return response.json(); })
             .then(function (result) {
                 if (result.success && result.note) {
                     openNote(result.note.id);
                 } else {
-                    btn.disabled = false;
+                    if (btn) btn.disabled = false;
                     showError(result.error || result.message || txt.createError || 'Could not create the diary entry.');
                 }
             })
             .catch(function (err) {
-                btn.disabled = false;
+                if (btn) btn.disabled = false;
                 showError((txt.createError || 'Could not create the diary entry.') + ' ' + err.message);
             });
+    }
+
+    // diary.php?date= for a day without an entry (a diary link opened outside
+    // the editor): create it, then open it. The param is stripped first so
+    // going back to this page does not create it again.
+    function openRequestedDate() {
+        if (!data.openDate) return;
+        try {
+            var pageUrl = new URL(window.location.href);
+            pageUrl.searchParams.delete('date');
+            window.history.replaceState(null, '', pageUrl.toString());
+        } catch (e) { /* URL API unavailable */ }
+        createEntry({
+            heading: data.openDate.title,
+            folder_name: data.openDate.folder,
+            created_date: data.openDate.iso
+        }, null);
     }
 
     // --- New diary ---
@@ -1430,6 +1449,7 @@
 
         initJournalEditing();
         initDiaryContextMenu();
+        openRequestedDate();
 
         document.querySelectorAll('.diary-switch-delete').forEach(function (btn) {
             btn.addEventListener('click', function () { deleteDiary(btn); });
