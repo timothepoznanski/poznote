@@ -1189,17 +1189,18 @@
     // show under the input.
     function openDiaryNameModal(opts) {
         var overlay = document.createElement('div');
-        overlay.className = 'modal-overlay diary-new-modal-overlay';
+        // Same markup as js/modal-alerts.js, so it matches the app's other dialogs
+        overlay.className = 'alert-modal-overlay show';
         overlay.innerHTML =
-            '<div class="modal-dialog diary-new-modal">' +
-                '<div class="modal-header"><h3 class="modal-title">' + esc(opts.title) + '</h3></div>' +
-                '<div class="modal-body">' +
+            '<div class="alert-modal diary-new-modal">' +
+                '<div class="alert-modal-header"><h3 class="alert-modal-title">' + esc(opts.title) + '</h3></div>' +
+                '<div class="alert-modal-body">' +
                     '<input type="text" class="diary-new-input" maxlength="255" placeholder="' + esc(txt.newDiaryPlaceholder || 'Diary name') + '" autocomplete="off">' +
                     '<p class="diary-new-error initially-hidden"></p>' +
                 '</div>' +
-                '<div class="modal-footer">' +
-                    '<button type="button" class="btn btn-secondary" data-action="close-modal">' + esc(txt.cancel || 'Cancel') + '</button>' +
-                    '<button type="button" class="btn btn-primary" data-action="submit-diary-name">' + esc(opts.confirmText) + '</button>' +
+                '<div class="alert-modal-footer">' +
+                    '<button type="button" class="alert-modal-button secondary" data-action="close-modal">' + esc(txt.cancel || 'Cancel') + '</button>' +
+                    '<button type="button" class="alert-modal-button primary" data-action="submit-diary-name">' + esc(opts.confirmText) + '</button>' +
                 '</div>' +
             '</div>';
         document.body.appendChild(overlay);

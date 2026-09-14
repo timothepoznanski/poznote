@@ -87,7 +87,12 @@
     justify-content: center;
     align-items: center;
     gap: 8px;
-    padding: 4px 0;
+    /* 16px above (4px from .diary-actions) and 16px below, the filter row stays put */
+    padding: 12px 0 0;
+}
+
+.diary-switcher + .board-filter-row {
+    margin-top: 16px;
 }
 
 /* The pill holds the switch link and the diary's delete button */
@@ -170,48 +175,17 @@
     color: var(--pz-text-inverse);
 }
 
-/* New-diary modal. The generic .modal-overlay/.modal-dialog styling is not
-   loaded on this page, so the modal is fully styled here. */
-.diary-new-modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(var(--pz-shadow-rgb), 0.45);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10000;
-    padding: 16px;
-}
-
-.diary-new-modal {
-    background: var(--pz-bg);
-    border-radius: var(--pz-radius-lg);
-    box-shadow: 0 10px 30px rgba(var(--pz-shadow-rgb), 0.25);
-    width: min(92vw, 380px);
-    padding: 18px 20px;
-}
-
-.diary-new-modal .modal-title {
-    margin: 0 0 14px;
-    font-size: 16px;
-    font-weight: var(--pz-weight-bold);
-    color: var(--pz-text);
-}
-
-.diary-new-modal .modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    margin-top: 16px;
-}
-
+/* New-diary / rename modal. The frame, title and buttons come from
+   css/modal-alerts.css (.alert-modal); only the input is styled here, like
+   the name inputs of the app's modals (css/modals/base.css). */
 .diary-new-modal .diary-new-input {
     width: 100%;
     box-sizing: border-box;
-    padding: 8px 10px;
-    border: 1.5px solid var(--pz-border-strong);
-    border-radius: var(--pz-radius);
+    padding: 8px 12px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm);
     font-size: 14px;
+    font-family: inherit;
     background: transparent;
     color: inherit;
 }
@@ -867,14 +841,6 @@ html[data-theme='dark'] .diary-switch-active .diary-switch-delete:hover {
 html[data-theme='dark'] .diary-switch-btn.diary-switch-active {
     background: var(--dm-accent);
     border-color: var(--dm-accent);
-    color: var(--dm-text-bright);
-}
-
-html[data-theme='dark'] .diary-new-modal {
-    background: var(--dm-content-bg);
-}
-
-html[data-theme='dark'] .diary-new-modal .modal-title {
     color: var(--dm-text-bright);
 }
 
