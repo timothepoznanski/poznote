@@ -29,6 +29,24 @@ if ($selectedDiary === null && !empty($diaryRoots)) {
     $selectedDiary = $diaryRoots[0];
 }
 
+// ?date=YYYY-MM-DD (the slash menu's "Link to diary entry"): go to that day's
+// entry. When it does not exist yet, the board loads and diary-page.js creates
+// it (DIARY_DATA.openDate), so a plain GET never writes. Inside the editor
+// these links are intercepted and handled without this round trip
+// (openDiaryEntryForDate() in js/utils-export-create.js).
+$openDate = null;
+if (isset($_GET['date']) && preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', (string)$_GET['date'], $dateParts)
+    && checkdate((int)$dateParts[2], (int)$dateParts[3], (int)$dateParts[1])) {
+    $existingEntryId = ($selectedDiary !== null && isset($con))
+        ? findDiaryEntryIdForDate($con, $diaryWorkspace, (string)$_GET['date'], $selectedDiary['id'])
+        : null;
+    if ($existingEntryId !== null) {
+        header('Location: index.php?note=' . $existingEntryId . '&newtab=1&workspace=' . urlencode($diaryWorkspace));
+        exit;
+    }
+    $openDate = (string)$_GET['date'];
+}
+
 $diaryRootName = $selectedDiary !== null
     ? $selectedDiary['name']
     : getDiaryRootFolderName(isset($con) ? $con : null, $diaryWorkspace);
@@ -275,6 +293,11 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
 		todayNoteId: <?php echo json_encode($todayNoteId); ?>,
 		todayTitle: <?php echo json_encode($todayTitle); ?>,
 		todayIso: <?php echo json_encode($todayIso); ?>,
+		openDate: <?php echo json_encode($openDate !== null ? [
+			'iso'    => $openDate,
+			'title'  => formatDiaryEntryTitle($openDate),
+			'folder' => $diaryRootName . '/' . substr($openDate, 0, 4) . '/' . substr($openDate, 5, 2),
+		] : null, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP); ?>,
 		folderPath: <?php echo json_encode($diaryFolderPath); ?>,
 		workspace: <?php echo json_encode($diaryWorkspace); ?>,
 		noteType: <?php echo json_encode(getDiaryDefaultNoteType()); ?>,

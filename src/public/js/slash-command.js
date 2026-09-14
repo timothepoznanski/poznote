@@ -1447,8 +1447,120 @@
         }
     }
 
-    // Insert a date (opens date picker)
-    function insertDate() {
+    // -------------------------------------------------------------------
+    // Date section
+    // -------------------------------------------------------------------
+    //
+    // Every entry describes what to insert as a request:
+    //   { mode: 'date' }      calendar, inserts the picked day
+    //   { mode: 'time' }      hour then minutes menu, inserts the time
+    //   { mode: 'datetime' }  calendar + time, confirmed with Apply
+    //   { mode: 'fixed', date }  no popup (today, tomorrow, a weekday...)
+    //   { mode: 'journal' }   calendar, inserts a link to that day's diary
+    //                         entry (diary.php?date=, which opens or creates it)
+    // resolveSlashDateRequest() turns a request into { text, href? } and each
+    // editor kind (HTML, Markdown, plain input) inserts that result its own way.
+
+    function formatSlashDate(date) {
+        return (typeof window.poznoteFormatDateOnly === 'function')
+            ? window.poznoteFormatDateOnly(date)
+            : date.toLocaleDateString();
+    }
+
+    function formatSlashTime(date) {
+        return (typeof window.poznoteFormatTimeOnly === 'function')
+            ? window.poznoteFormatTimeOnly(date)
+            : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function formatSlashDateTime(date) {
+        return (typeof window.poznoteFormatDateTime === 'function')
+            ? window.poznoteFormatDateTime(date)
+            : date.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
+    }
+
+    function slashIsoDay(date) {
+        return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+    }
+
+    function slashDayOffset(days) {
+        const now = new Date();
+        return new Date(now.getFullYear(), now.getMonth(), now.getDate() + days);
+    }
+
+    // Same day N months away, clamped to the end of shorter months
+    // (31 January + 1 month = 28/29 February, not early March)
+    function slashMonthOffset(months) {
+        const now = new Date();
+        const target = new Date(now.getFullYear(), now.getMonth() + months, 1);
+        const lastDay = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
+        return new Date(target.getFullYear(), target.getMonth(), Math.min(now.getDate(), lastDay));
+    }
+
+    // Link to the diary entry of a day. The title comes from the diary
+    // lookup, so it follows the configured diary date format.
+    function resolveJournalLink(date) {
+        const workspace = window.selectedWorkspace || '';
+        const iso = slashIsoDay(date);
+        const href = 'diary.php?date=' + iso + (workspace ? '&workspace=' + encodeURIComponent(workspace) : '');
+        const fallback = { text: formatSlashDate(date), href: href };
+        return fetch('api/v1/calendar/diary-entry.php?date=' + iso + (workspace ? '&workspace=' + encodeURIComponent(workspace) : ''), { credentials: 'same-origin' })
+            .then(function (response) { return response.json(); })
+            .then(function (diary) {
+                return (diary && diary.title) ? { text: String(diary.title), href: href } : fallback;
+            })
+            .catch(function () { return fallback; });
+    }
+
+    // Shows the popup the request needs (if any), then calls onResult with
+    // { text, href? }. onDismiss runs when the popup is closed without a pick.
+    function resolveSlashDateRequest(anchorRect, request, onResult, onDismiss) {
+        const mode = request.mode;
+        if (mode === 'fixed') {
+            onResult({ text: formatSlashDate(request.date) });
+            return;
+        }
+        if (mode === 'now-time' || mode === 'now-datetime') {
+            // Read the clock on click, not when the menu was built
+            const clock = new Date();
+            onResult({ text: mode === 'now-time' ? formatSlashTime(clock) : formatSlashDateTime(clock) });
+            return;
+        }
+
+        // Time menus start on the current time to the minute
+        const now = new Date();
+        const pad2 = function (v) { return String(v).padStart(2, '0'); };
+        const nowTime = pad2(now.getHours()) + ':' + pad2(now.getMinutes());
+        let options;
+        if (mode === 'time') {
+            options = { timeOnly: true, initialTime: nowTime };
+        } else if (mode === 'datetime') {
+            options = { withTime: true, initialTime: nowTime };
+        }
+
+        showSlashDatePicker(anchorRect, function (date, time) {
+            if (mode === 'journal') {
+                resolveJournalLink(date).then(onResult);
+                return;
+            }
+            if (mode === 'date') {
+                onResult({ text: formatSlashDate(date) });
+                return;
+            }
+            if (!/^\d{2}:\d{2}$/.test(time || '')) return;
+            const base = date || new Date();
+            const stamp = new Date(base.getFullYear(), base.getMonth(), base.getDate(),
+                parseInt(time.substring(0, 2), 10), parseInt(time.substring(3, 5), 10));
+            onResult({ text: mode === 'time' ? formatSlashTime(stamp) : formatSlashDateTime(stamp) });
+        }, onDismiss, options);
+    }
+
+    function escapeSlashHtml(value) {
+        return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Insert a date section result in an HTML editor
+    function insertDate(request) {
         // Find current editor context to restore later
         const context = getEditorContext();
         if (!context) return;
@@ -1466,7 +1578,7 @@
         }
 
         const anchorRect = getCursorAnchorRect(context.editableElement, savedInsertionRange);
-        showSlashDatePicker(anchorRect, function (date) {
+        resolveSlashDateRequest(anchorRect, request, function (result) {
             // Focus the editor back before inserting
             focusEditableElement(context.editableElement);
 
@@ -1489,19 +1601,25 @@
                 console.debug('slash-command: insertDate() failed:', e);
             }
 
-            // Format the date following the user's date/time format setting
-            const formattedDate = (typeof window.poznoteFormatDateOnly === 'function')
-                ? window.poznoteFormatDateOnly(date)
-                : date.toLocaleDateString();
+            const html = result.href
+                ? '<a href="' + escapeSlashHtml(result.href) + '">' + escapeSlashHtml(result.text) + '</a>&nbsp;'
+                : escapeSlashHtml(result.text);
             if (typeof window.insertHTMLAtSelection === 'function') {
-                window.insertHTMLAtSelection(formattedDate);
+                window.insertHTMLAtSelection(html);
             } else {
                 // Fallback for HTML notes
                 const selection = window.getSelection();
                 if (selection && selection.rangeCount) {
                     const range = selection.getRangeAt(0);
                     range.deleteContents();
-                    range.insertNode(document.createTextNode(formattedDate));
+                    if (result.href) {
+                        const link = document.createElement('a');
+                        link.href = result.href;
+                        link.textContent = result.text;
+                        range.insertNode(link);
+                    } else {
+                        range.insertNode(document.createTextNode(result.text));
+                    }
                 }
             }
 
@@ -1513,18 +1631,106 @@
         });
     }
 
-    // Insert a date in a Markdown editor
-    function insertDateMarkdown() {
+    // Insert a date section result in a Markdown editor
+    function insertDateMarkdown(request) {
         const context = getEditorContext();
         if (!context) return;
 
         const insertionContext = captureEditorInsertionContext();
         const anchorRect = getCursorAnchorRect(context.editableElement, insertionContext.savedRange);
-        showSlashDatePicker(anchorRect, function (date) {
-            insertMarkdownAtContext(insertionContext, (typeof window.poznoteFormatDateOnly === 'function')
-                ? window.poznoteFormatDateOnly(date)
-                : date.toLocaleDateString(), 0);
+        resolveSlashDateRequest(anchorRect, request, function (result) {
+            const text = result.href
+                ? '[' + result.text.replace(/([\[\]\\])/g, '\\$1') + '](' + result.href + ')'
+                : result.text;
+            insertMarkdownAtContext(insertionContext, text, 0);
         });
+    }
+
+    // The Date section. It keeps the 'date' id so the existing "slash:date"
+    // customization hides all of it. insert(request) inserts in the current
+    // editor; withJournalLink adds the diary link entry (notes only, a plain
+    // input cannot hold a link).
+    function buildDateSection(t, insert, withJournalLink) {
+        const lang = document.documentElement.lang || undefined;
+        const englishWeekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+        // Next occurrence of each weekday after today, Monday first
+        const weekdays = englishWeekdays.map(function (english, index) {
+            const today = slashDayOffset(0);
+            const targetDow = (index + 1) % 7; // getDay(): Sunday = 0
+            const delta = ((targetDow - today.getDay() + 7) % 7) || 7;
+            const date = slashDayOffset(delta);
+            let name;
+            try {
+                name = date.toLocaleDateString(lang, { weekday: 'long' });
+            } catch (e) {
+                name = date.toLocaleDateString(undefined, { weekday: 'long' });
+            }
+            return {
+                id: 'weekday-' + english,
+                label: name.charAt(0).toUpperCase() + name.slice(1),
+                aliases: [english],
+                action: function () { insert({ mode: 'fixed', date: date }); }
+            };
+        });
+
+        const relative = function (id, date, label) {
+            return {
+                id: id,
+                label: label,
+                aliases: [id.replace(/-/g, ' ')],
+                action: function () { insert({ mode: 'fixed', date: date }); }
+            };
+        };
+
+        // Future first, then past, nearest first
+        const relativeDates = [
+            relative('tomorrow', slashDayOffset(1), t('slash_menu.tomorrow', null, 'Tomorrow')),
+            relative('day-after-tomorrow', slashDayOffset(2), t('slash_menu.day_after_tomorrow', null, 'Day after tomorrow')),
+            relative('next-week', slashDayOffset(7), t('slash_menu.next_week', null, 'Next week')),
+            relative('next-month', slashMonthOffset(1), t('slash_menu.next_month', null, 'Next month')),
+            relative('next-year', slashMonthOffset(12), t('slash_menu.next_year', null, 'Next year')),
+            relative('yesterday', slashDayOffset(-1), t('slash_menu.yesterday', null, 'Yesterday')),
+            relative('day-before-yesterday', slashDayOffset(-2), t('slash_menu.day_before_yesterday', null, 'Day before yesterday')),
+            relative('last-week', slashDayOffset(-7), t('slash_menu.last_week', null, 'Last week')),
+            relative('last-month', slashMonthOffset(-1), t('slash_menu.last_month', null, 'Last month')),
+            relative('last-year', slashMonthOffset(-12), t('slash_menu.last_year', null, 'Last year'))
+        ];
+
+        // The Now submenu entries show the value they insert as their label
+        // (today, the current time, both), so one click or Enter inserts it;
+        // their names stay searchable through the aliases
+        const now = new Date();
+        const todayLabel = t('slash_menu.today', null, 'Today');
+        const nowTimeLabel = t('slash_menu.now_time', null, 'Current time');
+        const nowDateTimeLabel = t('slash_menu.now_datetime', null, 'Current date and time');
+
+        const nowEntries = [
+            { id: 'today', icon: 'lucide-sun', label: formatSlashDate(now), aliases: ['today', todayLabel], action: function () { insert({ mode: 'fixed', date: slashDayOffset(0) }); } },
+            { id: 'now-time', icon: 'lucide-clock', label: formatSlashTime(now), aliases: ['now', 'time', nowTimeLabel], action: function () { insert({ mode: 'now-time' }); } },
+            { id: 'now-datetime', icon: 'lucide-alarm-clock', label: formatSlashDateTime(now), aliases: ['now', nowDateTimeLabel], action: function () { insert({ mode: 'now-datetime' }); } }
+        ];
+
+        const items = [
+            { id: 'now', icon: 'lucide-clock', label: t('slash_menu.now', null, 'Now'), submenu: nowEntries },
+            { id: 'relative-date', icon: 'lucide-history', label: t('slash_menu.relative_date', null, 'Relative'), submenu: relativeDates },
+            { id: 'weekday', icon: 'lucide-calendar', label: t('slash_menu.weekday', null, 'Day of the week'), submenu: weekdays },
+            { id: 'insert-date', icon: 'lucide-calendar-alt', label: t('slash_menu.date', null, 'Date'), action: function () { insert({ mode: 'date' }); } },
+            { id: 'insert-time', icon: 'lucide-watch', label: t('slash_menu.time', null, 'Time'), aliases: ['time'], action: function () { insert({ mode: 'time' }); } },
+            { id: 'insert-datetime', icon: 'lucide-calendar-plus', label: t('slash_menu.date_time', null, 'Date and time'), action: function () { insert({ mode: 'datetime' }); } }
+        ];
+        if (withJournalLink) {
+            items.push({ id: 'journal-link', icon: 'lucide-book-open', label: t('slash_menu.journal_link', null, 'Link to diary entry'), aliases: ['diary', 'journal'], action: function () { insert({ mode: 'journal' }); } });
+        }
+
+        // Not labelled "Date": the search flattens every entry of a section
+        // whose name matches, so typing /date would list the whole section
+        return {
+            id: 'date',
+            icon: 'lucide-calendar-alt',
+            label: t('slash_menu.date_section', null, 'Calendar and time'),
+            submenu: items
+        };
     }
 
     // Dictation needs a transcription server; index.php says whether this user
@@ -1599,7 +1805,7 @@
         }
     }
 
-    function openDateForInput(input) {
+    function openDateForInput(input, request) {
         if (!input || input.tagName !== 'INPUT') return;
 
         pauseTaskEditBlurSave(input);
@@ -1608,10 +1814,8 @@
         const insertionEnd = (typeof input.selectionEnd === 'number') ? input.selectionEnd : insertionStart;
 
         const inputRect = input.getBoundingClientRect();
-        showSlashDatePicker(isUsableAnchorRect(inputRect) ? inputRect : null, function (date) {
-            const formattedDate = ((typeof window.poznoteFormatDateOnly === 'function')
-                ? window.poznoteFormatDateOnly(date)
-                : date.toLocaleDateString()) + ' ';
+        resolveSlashDateRequest(isUsableAnchorRect(inputRect) ? inputRect : null, request, function (result) {
+            const formattedDate = result.text + ' ';
             const text = input.value;
 
             const safeStart = Math.max(0, Math.min(insertionStart, text.length));
@@ -1629,13 +1833,13 @@
             try {
                 input.setSelectionRange(caretPos, caretPos);
             } catch (e) {
-                console.debug('slash-command: formattedDate() failed:', e);
+                console.debug('slash-command: openDateForInput() failed:', e);
             }
             setTimeout(() => {
                 try {
                     input.setSelectionRange(caretPos, caretPos);
                 } catch (e) {
-                    console.debug('slash-command: formattedDate() failed:', e);
+                    console.debug('slash-command: openDateForInput() failed:', e);
                 }
             }, 0);
             resumeTaskEditBlurSave(input);
@@ -1717,14 +1921,9 @@
                     openEmojiForInput(savedEditableElement);
                 }
             },
-            {
-                id: 'date',
-                icon: 'lucide-calendar-alt',
-                label: t('slash_menu.date', null, 'Date'),
-                action: function () {
-                    openDateForInput(savedEditableElement);
-                }
-            }
+            buildDateSection(t, function (request) {
+                openDateForInput(savedEditableElement, request);
+            }, false)
         ]);
     }
 
@@ -1741,14 +1940,9 @@
                     openEmojiForInput(savedEditableElement);
                 }
             },
-            {
-                id: 'date',
-                icon: 'lucide-calendar-alt',
-                label: t('slash_menu.date', null, 'Date'),
-                action: function () {
-                    openDateForInput(savedEditableElement);
-                }
-            },
+            buildDateSection(t, function (request) {
+                openDateForInput(savedEditableElement, request);
+            }, false),
             common.noteReference,
             common.cancel
         ]);
@@ -2234,14 +2428,6 @@
                             insertToggle();
                         }
                     },
-                    {
-                        id: 'date',
-                        icon: 'lucide-calendar-alt',
-                        label: t('slash_menu.date', null, 'Date'),
-                        action: function () {
-                            insertDate();
-                        }
-                    },
                     common.dictate,
                     common.excalidraw,
                     common.emoji,
@@ -2267,6 +2453,7 @@
                     }
                 ]
             },
+            buildDateSection(t, insertDate, true),
             {
                 id: 'link-menu',
                 icon: 'lucide-link',
@@ -2575,14 +2762,6 @@
                             insertMarkdownAtCursor('\n\n<details class="toggle-block" open>\n<summary class="toggle-header">Toggle</summary>\n\n...\n\n</details>\n\n', -17);
                         }
                     },
-                    {
-                        id: 'date',
-                        icon: 'lucide-calendar-alt',
-                        label: t('slash_menu.date', null, 'Date'),
-                        action: function () {
-                            insertDateMarkdown();
-                        }
-                    },
                     common.dictate,
                     common.excalidraw,
                     common.emoji,
@@ -2604,6 +2783,7 @@
                     }
                 ]
             },
+            buildDateSection(t, insertDateMarkdown, true),
             {
                 id: 'link-menu',
                 icon: 'lucide-link',

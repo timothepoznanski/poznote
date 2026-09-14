@@ -57,6 +57,8 @@
             : '';
         let timeMenuMode = null; // null | 'hours' | 'minutes'
         let timeMenuHour = null;
+        // Highlighted minute on the minutes step (moved with the arrow keys)
+        let timeMenuMinute = null;
 
         // Time-only mode: open straight on the hour menu; picking the minutes
         // returns the time and closes (no calendar involved)
@@ -88,6 +90,34 @@
             return timeStr;
         }
 
+        function selectedHour() {
+            return selectedTime !== '' ? parseInt(selectedTime.substring(0, 2), 10) : null;
+        }
+
+        // 5-minute steps, plus the selected minute when it falls between two
+        // steps (a menu seeded with the current time)
+        function minuteSteps() {
+            const steps = [];
+            for (let m = 0; m < 60; m += 5) steps.push(m);
+            if (selectedHour() === timeMenuHour) {
+                const selectedMinute = parseInt(selectedTime.substring(3, 5), 10);
+                if (steps.indexOf(selectedMinute) === -1) {
+                    steps.push(selectedMinute);
+                    steps.sort(function (a, b) { return a - b; });
+                }
+            }
+            return steps;
+        }
+
+        // Go to the minutes step of an hour, highlighting the selected minute
+        // when the selection is in that hour, :00 otherwise
+        function showMinutesOf(hour) {
+            timeMenuHour = hour;
+            timeMenuMode = 'minutes';
+            timeMenuMinute = selectedHour() === hour ? parseInt(selectedTime.substring(3, 5), 10) : 0;
+            render();
+        }
+
         function renderTimeMenu() {
             const title = timeMenuMode === 'minutes'
                 ? pad2(timeMenuHour) + ':--'
@@ -101,17 +131,18 @@
 
             if (timeMenuMode === 'hours') {
                 html += '<div class="slash-time-grid hours">';
+                const highlightedHour = timeMenuHour !== null ? timeMenuHour : selectedHour();
                 for (let h = 0; h < 24; h++) {
-                    const isSelected = selectedTime !== '' && parseInt(selectedTime.substring(0, 2), 10) === h;
+                    const isSelected = highlightedHour === h;
                     html += '<button type="button" class="slash-time-cell' + (isSelected ? ' selected' : '') + '" data-hour="' + h + '">' + pad2(h) + '</button>';
                 }
                 html += '</div>';
             } else {
                 html += '<div class="slash-time-grid minutes">';
-                for (let m = 0; m < 60; m += 5) {
-                    const isSelected = selectedTime === pad2(timeMenuHour) + ':' + pad2(m);
+                minuteSteps().forEach(function (m) {
+                    const isSelected = m === timeMenuMinute;
                     html += '<button type="button" class="slash-time-cell' + (isSelected ? ' selected' : '') + '" data-minute="' + m + '">' + pad2(timeMenuHour) + ':' + pad2(m) + '</button>';
-                }
+                });
                 html += '</div>';
             }
 
@@ -184,7 +215,23 @@
         }
 
         let picked = false;
+        // The pointer is hidden (and hover highlights muted) while the popup is
+        // driven from the keyboard, so a resting mouse neither covers the grid
+        // nor shows a second highlight. A real mouse move brings it back; the
+        // arrow keys and Enter hide it again.
+        function setMouseHidden(hidden) {
+            document.documentElement.classList.toggle('slash-date-picker-mouse-hidden', hidden);
+        }
+
+        function handleMouseMove(e) {
+            // Chromium fires mousemove without movement when the content under
+            // a resting pointer is re-rendered: only a real move counts
+            if (e.movementX || e.movementY) setMouseHidden(false);
+        }
+
         function cleanup() {
+            setMouseHidden(false);
+            document.removeEventListener('mousemove', handleMouseMove, true);
             document.removeEventListener('mousedown', handleOutsideMouseDown, true);
             document.removeEventListener('keydown', handleEscape, true);
             if (picker.parentNode) picker.parentNode.removeChild(picker);
@@ -226,11 +273,93 @@
             if (!picker.contains(e.target)) cleanup();
         }
 
+        // Enter walks through the popup's steps, then confirms what it shows:
+        // the selected day (or today) and the highlighted time.
+        //   date only:      calendar -> insert
+        //   time only:      hours -> minutes -> insert
+        //   date and time:  calendar -> hours -> minutes -> insert
+        function confirmWithEnter() {
+            if (timeMenuMode === 'hours') {
+                const hour = timeMenuHour !== null ? timeMenuHour : selectedHour();
+                showMinutesOf(hour !== null ? hour : new Date().getHours());
+                return;
+            }
+            if (timeMenuMode === null && options && options.withTime) {
+                if (!selectedDayStr) {
+                    selectedDayStr = dayString(today.getFullYear(), today.getMonth(), today.getDate());
+                }
+                timeMenuMode = 'hours';
+                timeMenuHour = selectedTime !== '' ? parseInt(selectedTime.substring(0, 2), 10) : null;
+                render();
+                return;
+            }
+            if (timeMenuMode === 'minutes') {
+                selectedTime = pad2(timeMenuHour) + ':' + pad2(timeMenuMinute !== null ? timeMenuMinute : 0);
+            }
+            if (timeOnly) {
+                picked = true;
+                cleanup();
+                onPick(null, selectedTime);
+                return;
+            }
+            applySelection();
+        }
+
+        // Arrow keys move the highlight in the current grid: days (7 columns,
+        // the view follows across months), hours (6 columns, wrapping) or
+        // minutes (4 columns). The first press only highlights the starting
+        // point (today, the selected hour) when nothing is highlighted yet.
+        const ARROW_STEPS = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+
+        function moveWithArrow(key) {
+            const step = ARROW_STEPS[key];
+            if (timeMenuMode === 'hours') {
+                if (timeMenuHour === null) {
+                    const hour = selectedHour();
+                    timeMenuHour = hour !== null ? hour : new Date().getHours();
+                } else {
+                    timeMenuHour = (timeMenuHour + step[0] + step[1] * 6 + 24) % 24;
+                }
+            } else if (timeMenuMode === 'minutes') {
+                const steps = minuteSteps();
+                const index = steps.indexOf(timeMenuMinute);
+                const next = index === -1 ? 0 : Math.max(0, Math.min(steps.length - 1, index + step[0] + step[1] * 4));
+                timeMenuMinute = steps[next];
+            } else {
+                let day;
+                if (selectedDayStr) {
+                    day = new Date(
+                        parseInt(selectedDayStr.substring(0, 4), 10),
+                        parseInt(selectedDayStr.substring(5, 7), 10) - 1,
+                        parseInt(selectedDayStr.substring(8, 10), 10) + step[0] + step[1] * 7
+                    );
+                } else {
+                    day = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                }
+                selectedDayStr = dayString(day.getFullYear(), day.getMonth(), day.getDate());
+                viewYear = day.getFullYear();
+                viewMonth = day.getMonth();
+            }
+            render();
+        }
+
         function handleEscape(e) {
+            if (ARROW_STEPS[e.key] && !e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+                e.preventDefault();
+                e.stopPropagation();
+                setMouseHidden(true);
+                moveWithArrow(e.key);
+                return;
+            }
             if (e.key === 'Escape') {
                 e.preventDefault();
                 e.stopPropagation();
                 cleanup();
+            } else if (e.key === 'Enter' && !e.isComposing) {
+                e.preventDefault();
+                e.stopPropagation();
+                setMouseHidden(true);
+                confirmWithEnter();
             }
         }
 
@@ -304,9 +433,7 @@
             }
             const hourBtn = e.target.closest('[data-hour]');
             if (hourBtn) {
-                timeMenuHour = parseInt(hourBtn.getAttribute('data-hour'), 10);
-                timeMenuMode = 'minutes';
-                render();
+                showMinutesOf(parseInt(hourBtn.getAttribute('data-hour'), 10));
                 return;
             }
             const minuteBtn = e.target.closest('[data-minute]');
@@ -351,6 +478,8 @@
 
         document.addEventListener('mousedown', handleOutsideMouseDown, true);
         document.addEventListener('keydown', handleEscape, true);
+        document.addEventListener('mousemove', handleMouseMove, true);
+        setMouseHidden(true);
 
         slashDatePickerCleanup = cleanup;
 

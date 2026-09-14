@@ -152,6 +152,24 @@ function setupAttachmentEvents() {
  * @param {string} href - The link URL
  */
 function handleInternalNoteLink(href) {
+    // Diary links (slash menu "Link to diary entry"): open that day's entry,
+    // creating it on first click. diary.php?date= does the same server side
+    // for links opened outside the editor (new browser tab, public pages).
+    var diaryMatch = /(?:^|\/)diary\.php\?(?:[^#]*&)?date=(\d{4}-\d{2}-\d{2})/.exec(href);
+    if (diaryMatch && typeof window.openDiaryEntryForDate === 'function') {
+        var diaryWorkspaceMatch = href.match(/[?&]workspace=([^&#]+)/);
+        var diaryWorkspace = diaryWorkspaceMatch
+            ? decodeURIComponent(diaryWorkspaceMatch[1])
+            : (window.selectedWorkspace || '');
+        window.openDiaryEntryForDate(diaryMatch[1], diaryWorkspace, function (noteId, workspace, created) {
+            if (created && typeof window.refreshNotesListAfterFolderAction === 'function') {
+                try { window.refreshNotesListAfterFolderAction(); } catch (e) { /* list refresh is cosmetic */ }
+            }
+            handleInternalNoteLink('index.php?note=' + noteId + '&workspace=' + encodeURIComponent(workspace || diaryWorkspace));
+        });
+        return true;
+    }
+
     var noteMatch = href.match(/[?&]note=(\d+)/);
     var workspaceMatch = href.match(/[?&]workspace=([^&]+)/);
 

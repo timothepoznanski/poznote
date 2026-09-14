@@ -251,6 +251,20 @@
     color: var(--pz-accent);
 }
 
+/* Pointer hidden while the date/time popup is driven from the keyboard
+   (js/date-picker-popup.js); hover highlights are muted so a resting mouse
+   does not show a second highlight next to the keyboard one */
+html.slash-date-picker-mouse-hidden,
+html.slash-date-picker-mouse-hidden * {
+    cursor: none !important;
+}
+
+html.slash-date-picker-mouse-hidden .slash-date-picker .slash-date-picker-nav:hover,
+html.slash-date-picker-mouse-hidden .slash-date-picker .slash-date-picker-day:not(.selected):not(.today):hover,
+html.slash-date-picker-mouse-hidden .slash-date-picker .slash-time-cell:not(.selected):hover {
+    background: transparent;
+}
+
 /* Two-step time menu: hours grid, then minutes grid */
 .slash-time-grid {
     display: grid;

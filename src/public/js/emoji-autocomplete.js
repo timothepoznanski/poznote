@@ -26,7 +26,7 @@
         ['😜', 'stuck_out_tongue_winking_eye'], ['🤪', 'zany_face'], ['🤔', 'thinking'],
         ['🤨', 'raised_eyebrow'], ['😐', 'neutral_face'], ['😑', 'expressionless'],
         ['🙄', 'roll_eyes'], ['😏', 'smirk'], ['😒', 'unamused'], ['😬', 'grimacing'], ['🤥', 'lying_face'],
-        ['😌', 'relieved'], ['😴', 'sleeping'], ['😷', 'mask'], ['🤯', 'exploding_head mind_blown'],
+        ['😌', 'relieved'], ['😴', 'sleeping'], ['🫩', 'face_with_bags_under_eyes tired'], ['😷', 'mask'], ['🤯', 'exploding_head mind_blown'],
         ['🥳', 'partying_face'], ['😎', 'sunglasses'], ['🤓', 'nerd_face'], ['😕', 'confused'],
         ['😟', 'worried'], ['🙁', 'slightly_frowning_face'], ['😮', 'open_mouth'],
         ['😲', 'astonished'], ['😳', 'flushed'], ['🥺', 'pleading_face'], ['😢', 'cry'],

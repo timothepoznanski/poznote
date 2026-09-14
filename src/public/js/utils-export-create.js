@@ -383,25 +383,38 @@ function createNoteOfType(noteType, globalFnNames) {
  * Open today's diary entry, creating it first when it does not exist yet.
  * Goes straight to the note: routing through diary.php?today=1 made the diary
  * board render for a moment before the note replaced it.
- * api/v1/calendar/diary-entry.php supplies the target folder, workspace, the
- * configured note type (see the diary_default_note_type setting) and the entry
- * title in the configured diary date format (diary_date_format).
  */
 function createDiaryEntryForToday() {
-    var diaryWs = window.selectedWorkspace || '';
     // Local date, so the entry matches the user's today rather than UTC's.
     var now = new Date();
     var today = now.getFullYear() + '-' +
         String(now.getMonth() + 1).padStart(2, '0') + '-' +
         String(now.getDate()).padStart(2, '0');
+    openDiaryEntryForDate(today, window.selectedWorkspace || '');
+}
 
-    var lookupUrl = 'api/v1/calendar/diary-entry.php?date=' + encodeURIComponent(today) +
+/**
+ * Open the diary entry of a day (YYYY-MM-DD), creating it first when it does
+ * not exist yet. api/v1/calendar/diary-entry.php supplies the target folder,
+ * workspace, the configured note type (see the diary_default_note_type
+ * setting) and the entry title in the configured diary date format
+ * (diary_date_format).
+ *
+ * openEntry(noteId, workspace, created) opens the note; by default the page
+ * navigates to it. Diary links in notes (the slash menu's "Link to diary
+ * entry", diary.php?date=) pass their own to open it in a tab instead.
+ */
+function openDiaryEntryForDate(date, workspace, openEntry) {
+    var diaryWs = workspace || '';
+    var lookupUrl = 'api/v1/calendar/diary-entry.php?date=' + encodeURIComponent(date) +
         (diaryWs ? '&workspace=' + encodeURIComponent(diaryWs) : '');
 
-    function openEntry(noteId, workspace) {
-        var url = 'index.php?note=' + encodeURIComponent(noteId) + '&newtab=1';
-        if (workspace) url += '&workspace=' + encodeURIComponent(workspace);
-        window.location.href = url;
+    if (typeof openEntry !== 'function') {
+        openEntry = function (noteId, ws) {
+            var url = 'index.php?note=' + encodeURIComponent(noteId) + '&newtab=1';
+            if (ws) url += '&workspace=' + encodeURIComponent(ws);
+            window.location.href = url;
+        };
     }
 
     function fail(error) {
@@ -423,7 +436,7 @@ function createDiaryEntryForToday() {
             if (diary && diary.error) throw new Error(diary.error);
 
             if (diary.exists && diary.id) {
-                openEntry(diary.id, diary.workspace || diaryWs);
+                openEntry(diary.id, diary.workspace || diaryWs, false);
                 return null;
             }
 
@@ -434,17 +447,17 @@ function createDiaryEntryForToday() {
                 body: JSON.stringify({
                     // The title follows the configured diary date format;
                     // created_date stays YYYY-MM-DD, as the API expects.
-                    heading: diary.title || today,
+                    heading: diary.title || date,
                     folder_name: diary.folder,
                     workspace: diary.workspace,
                     type: diary.noteType === 'markdown' ? 'markdown' : 'note',
-                    created_date: today
+                    created_date: date
                 })
             })
                 .then(function (response) { return response.json(); })
                 .then(function (result) {
                     if (result.success && result.note) {
-                        openEntry(result.note.id, result.note.workspace || diary.workspace);
+                        openEntry(result.note.id, result.note.workspace || diary.workspace, true);
                     } else {
                         fail(result.error || result.message || '');
                     }
@@ -452,6 +465,8 @@ function createDiaryEntryForToday() {
         })
         .catch(function (error) { fail(error.message); });
 }
+
+window.openDiaryEntryForDate = openDiaryEntryForDate;
 
 function createHtmlNote() {
     createNoteOfType('note', ['newnote', 'createNewNote']);
