@@ -1,6 +1,76 @@
 (function () {
     'use strict';
 
+    // Day and month names per app language: mirror of getDateNameLocales() in
+    // lib/datetime.php (tests/date-names.test.php keeps them equal). Kept as
+    // strict JSON between the markers so the test can read it.
+    var DATE_NAMES = /* date-names:start */
+    {
+        "en": {
+            "layout": "{wd}, {month} {d}, {y}",
+            "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+            "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+            "short": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        },
+        "fr": {
+            "layout": "{wd} {d} {month} {y}",
+            "days": ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
+            "months": ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"],
+            "short": ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."]
+        },
+        "de": {
+            "layout": "{wd}, {d}. {month} {y}",
+            "days": ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"],
+            "months": ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
+            "short": ["Jan.", "Feb.", "März", "Apr.", "Mai", "Juni", "Juli", "Aug.", "Sept.", "Okt.", "Nov.", "Dez."]
+        },
+        "es": {
+            "layout": "{wd}, {d} de {month} de {y}",
+            "days": ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
+            "months": ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
+            "short": ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sept", "oct", "nov", "dic"]
+        },
+        "pt": {
+            "layout": "{wd}, {d} de {month} de {y}",
+            "days": ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"],
+            "months": ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"],
+            "short": ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
+        },
+        "ru": {
+            "layout": "{wd}, {d} {month} {y} г.",
+            "days": ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"],
+            "months": ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"],
+            "short": ["янв.", "февр.", "мар.", "апр.", "мая", "июн.", "июл.", "авг.", "сент.", "окт.", "нояб.", "дек."]
+        },
+        "zh-cn": {
+            "layout": "{y}年{m}月{d}日{wd}",
+            "days": ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"],
+            "months": ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+            "short": ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"]
+        }
+    }
+    /* date-names:end */;
+
+    function getDateNames() {
+        var config = window.POZNOTE_CONFIG || {};
+        var lang = String(document.documentElement.lang || config.language || config.lang || 'en').toLowerCase();
+        return DATE_NAMES[lang] || DATE_NAMES[lang.split('-')[0]] || DATE_NAMES.en;
+    }
+
+    function formatLongDate(date) {
+        var names = getDateNames();
+        var parts = {
+            '{wd}': names.days[date.getDay()],
+            '{month}': names.months[date.getMonth()],
+            '{m}': String(date.getMonth() + 1),
+            '{d}': String(date.getDate()),
+            '{y}': String(date.getFullYear())
+        };
+        return names.layout.replace(/\{wd\}|\{month\}|\{m\}|\{d\}|\{y\}/g, function (token) {
+            return parts[token];
+        });
+    }
+
     function normalizeFormat(value) {
         if (typeof value === 'string' && value.indexOf('custom:') === 0 && value.slice(7).trim() !== '') {
             return 'custom:' + value.slice(7).trim();
@@ -11,7 +81,8 @@
             ymd_hi: true,
             ymd_his: true,
             dmy_hi: true,
-            mdy_hia: true
+            mdy_hia: true,
+            long: true
         };
         return allowed[value] ? value : 'default';
     }
@@ -58,11 +129,16 @@
 
     function formatCustomPattern(date, pattern) {
         var hours12Number = (date.getHours() % 12) || 12;
+        var names = getDateNames();
         var values = {
             YYYY: String(date.getFullYear()),
             YY: String(date.getFullYear()).slice(-2),
+            MMMM: names.months[date.getMonth()],
+            MMM: names.short[date.getMonth()],
             MM: pad(date.getMonth() + 1),
+            dddd: names.days[date.getDay()],
             DD: pad(date.getDate()),
+            D: String(date.getDate()),
             HH: pad(date.getHours()),
             hh: pad(hours12Number),
             h: String(hours12Number),
@@ -73,7 +149,7 @@
             a: date.getHours() >= 12 ? 'pm' : 'am'
         };
 
-        return normalizeCustomPattern(pattern).replace(/YYYY|YY|MM|DD|HH|hh|h|mm|ss|SS|A|a/g, function (token) {
+        return normalizeCustomPattern(pattern).replace(/YYYY|YY|MMMM|MMM|MM|dddd|DD|D|HH|hh|h|mm|ss|SS|A|a/g, function (token) {
             return values[token];
         });
     }
@@ -103,6 +179,9 @@
         if (format === 'ymd_his') {
             return year + '-' + month + '-' + day + ' ' + hours24 + ':' + minutes + ':' + seconds;
         }
+        if (format === 'long') {
+            return formatLongDate(date) + ' ' + hours24 + ':' + minutes;
+        }
         if (format === 'dmy_hi') {
             return day + '/' + month + '/' + year + ' ' + hours24 + ':' + minutes;
         }
@@ -121,7 +200,7 @@
         var timeSegments = [];
 
         segments.forEach(function (segment) {
-            if (/YYYY|YY|MM|DD/.test(segment)) {
+            if (/YYYY|YY|MMM|MM|dddd|D/.test(segment)) {
                 dateSegments.push(segment);
             } else if (/HH|hh|h|mm|ss|SS|A|a/.test(segment)) {
                 timeSegments.push(segment);
@@ -153,6 +232,9 @@
 
         if (format === 'dmy_hi') {
             return day + '/' + month + '/' + year;
+        }
+        if (format === 'long') {
+            return formatLongDate(date);
         }
         if (format === 'mdy_hia') {
             return month + '/' + day + '/' + year;

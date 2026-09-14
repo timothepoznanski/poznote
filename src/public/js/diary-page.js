@@ -193,7 +193,9 @@
 
     function buildJournalEntry(note) {
         var isToday = data.todayNoteId && note.id === data.todayNoteId;
-        var title = note.dated ? longDateLabel(note.entryDate) : note.heading;
+        // The title as written, so a dated one follows the diary date format
+        // setting; only an undated title gets the day spelled out beside it
+        var title = note.heading;
         var subtitle = note.dated ? '' : '<span class="diary-journal-subtitle">' + esc(longDateLabel(note.entryDate)) + '</span>';
         var editable = journalNoteIsEditable(note);
         var editLabel = txt.journalEdit || 'Edit here';

@@ -108,7 +108,6 @@ $settingsPageUserKeys = [
     'show_note_icons',
     'type_based_note_icons',
     'note_color_palette',
-    'hide_folder_counts',
     'hide_folder_actions',
     'highlight_current_folder_tree',
     'folder_tree_dim_level',

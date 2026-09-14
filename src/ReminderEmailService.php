@@ -492,7 +492,11 @@ class ReminderEmailService {
         try {
             $date = new DateTime($utcDatetime, new DateTimeZone('UTC'));
             $date->setTimezone($tz);
-            return $date->format($format);
+            $formatted = $date->format($format);
+            // Month and weekday names in the recipient's language
+            return function_exists('applyDateNameTokens')
+                ? applyDateNameTokens($formatted, $date, $this->normalizeLanguage($settings['language'] ?? 'en'))
+                : $formatted;
         } catch (Throwable $e) {
             return $utcDatetime;
         }
@@ -505,6 +509,7 @@ class ReminderEmailService {
             'ymd_his' => 'Y-m-d H:i:s',
             'dmy_hi' => 'd/m/Y H:i',
             'mdy_hia' => 'm/d/Y h:i A',
+            'long' => (defined('DATE_NAME_LONG_DATE') ? DATE_NAME_LONG_DATE : 'l, F j, Y') . ' H:i',
         ];
 
         if (strpos($format, 'custom:') === 0 && function_exists('customDateTimePatternToPhpFormat')) {

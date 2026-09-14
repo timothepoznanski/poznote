@@ -61,8 +61,7 @@ function diaryBuildNoteData(array $note, string $pageWorkspace): array {
         // title is a date in a supported format (so renaming an entry re-dates
         // it), otherwise its creation date.
         'entryDate' => $titleDate ?? $created,
-        // The journal view shows a dated title as a spelled-out day, any other
-        // title as it is.
+        // The journal view spells the day out beside an undated title only.
         'dated'     => $titleDate !== null,
         // newtab=1 tells tabs.js to open the note as a new internal tab (see js/tabs.js).
         'url'       => 'index.php?note=' . $noteId . '&newtab=1' . ($pageWorkspace !== '' ? '&workspace=' . urlencode($pageWorkspace) : ''),
@@ -136,6 +135,17 @@ $isEmpty = empty($diaryNotes);
 // stayed one level up, so this fell back to time() and changed the asset
 // URL on every single page load.
 $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
+
+// The "Colored markdown" setting reaches the journal view the way it reaches
+// the note preview: body.markdown-colored plus the --mdc-* colours inlined on
+// <body> (lib/markdown-colored.php, painted by css/diary.css).
+$bodyClasses = 'favorites-page dashboard-page diary-page has-icon-sidebar';
+$bodyStyle = '';
+$markdownColoredTheme = getSetting('markdown_colored', '0');
+if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
+    $bodyClasses .= ' markdown-colored';
+    $bodyStyle = poznoteMarkdownColoredStyle($markdownColoredTheme, getSetting('markdown_colored_custom', ''));
+}
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
@@ -151,7 +161,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
-<body class="favorites-page dashboard-page diary-page has-icon-sidebar"
+<body class="<?php echo htmlspecialchars($bodyClasses, ENT_QUOTES, 'UTF-8'); ?>"<?php echo $bodyStyle !== '' ? ' style="' . htmlspecialchars($bodyStyle, ENT_QUOTES, 'UTF-8') . '"' : ''; ?>
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
 	<script>
 	// Journal mode and the dates panel's state before the first paint, so the

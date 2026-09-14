@@ -697,6 +697,59 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
     font-weight: var(--pz-weight-semibold);
 }
 
+/* ---------- Colored markdown in the journal ----------
+   body.markdown-colored and the --mdc-* colours inlined on <body> come from
+   lib/markdown-colored.php (diary.php, as index.php). Same tints as the note
+   preview in css/markdown.css and, like there, markdown entries only; the
+   dark fallbacks of the tokens live in css/dark-mode/markdown.css. */
+
+body.markdown-colored .diary-journal-markdown h1 {
+    color: var(--mdc-h1);
+}
+
+body.markdown-colored .diary-journal-markdown h2 {
+    color: var(--mdc-h2);
+}
+
+body.markdown-colored .diary-journal-markdown h3 {
+    color: var(--mdc-h3);
+}
+
+body.markdown-colored .diary-journal-markdown h4 {
+    color: var(--mdc-h4);
+}
+
+body.markdown-colored .diary-journal-markdown h5 {
+    color: var(--mdc-h5);
+}
+
+body.markdown-colored .diary-journal-markdown h6 {
+    color: var(--mdc-h6);
+}
+
+body.markdown-colored .diary-journal-markdown pre {
+    background: color-mix(in srgb, var(--mdc-codeblock) 8%, var(--pz-surface));
+}
+
+body.markdown-colored .diary-journal-markdown :not(pre) > code {
+    color: var(--mdc-code);
+    background: color-mix(in srgb, var(--mdc-code) 9%, transparent);
+}
+
+body.markdown-colored .diary-journal-markdown blockquote {
+    border-left-color: var(--mdc-quote);
+    background: color-mix(in srgb, var(--mdc-quote) 6%, transparent);
+    padding: 4px 8px 4px 14px;
+}
+
+body.markdown-colored .diary-journal-markdown th {
+    background: color-mix(in srgb, var(--mdc-table) 9%, transparent);
+}
+
+body.markdown-colored .diary-journal-markdown hr {
+    border-top-color: color-mix(in srgb, var(--mdc-hr) 35%, transparent);
+}
+
 .diary-journal-empty,
 .diary-journal-error {
     margin: 0;

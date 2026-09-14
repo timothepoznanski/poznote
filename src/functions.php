@@ -10,6 +10,7 @@ require_once __DIR__ . '/lib/html-sanitize.php';
 require_once __DIR__ . '/lib/attachments.php';
 require_once __DIR__ . '/lib/backup-restore.php';
 require_once __DIR__ . '/lib/diary.php';
+require_once __DIR__ . '/lib/markdown-colored.php';
 require_once __DIR__ . '/lib/datetime.php';
 require_once __DIR__ . '/lib/note-colors.php';
 require_once __DIR__ . '/lib/quotas.php';

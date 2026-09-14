@@ -107,7 +107,7 @@ foreach (poznoteSupportedLanguages() as $welcomeLanguageCode) {
 
 $welcomeTimezone = (string)getSetting('timezone', 'UTC');
 $welcomeDateFormat = (string)getSetting('date_time_format', 'default');
-$welcomeDateFormats = ['default', 'ymd_his', 'dmy_hi', 'mdy_hia'];
+$welcomeDateFormats = ['default', 'ymd_his', 'dmy_hi', 'mdy_hia', 'long'];
 
 // The themes this instance offers, in the order the rail button walks them,
 // so the guide never proposes a theme the admin removed from the list.

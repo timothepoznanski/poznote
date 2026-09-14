@@ -300,7 +300,7 @@ class SettingsController {
 
         if ($key === 'date_time_format') {
             $normalized = trim((string) $value);
-            $allowedFormats = ['default', 'ymd_hi', 'ymd_his', 'dmy_hi', 'mdy_hia'];
+            $allowedFormats = ['default', 'ymd_hi', 'ymd_his', 'dmy_hi', 'mdy_hia', 'long'];
             if (strpos($normalized, 'custom:') === 0) {
                 $customPattern = trim(substr($normalized, 7));
                 if ($customPattern === '' || strlen($customPattern) > 80) {
@@ -320,7 +320,7 @@ class SettingsController {
         if ($key === 'diary_date_format') {
             $normalized = trim((string) $value);
             // Keys of getDiaryDateFormats() in functions.php
-            $allowedFormats = ['ymd', 'dmy_slash', 'mdy_slash', 'dmy_dot', 'ymd_slash'];
+            $allowedFormats = ['ymd', 'dmy_slash', 'mdy_slash', 'dmy_dot', 'ymd_slash', 'long'];
             if (strpos($normalized, 'custom:') === 0) {
                 require_once __DIR__ . '/../../../functions.php';
                 $customPattern = trim(substr($normalized, 7));

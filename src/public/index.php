@@ -207,7 +207,6 @@ $settings = [
     'show_note_created' => false,
     'show_note_icons' => '1',
     'hide_folder_actions' => null,
-    'hide_folder_counts' => null,
     'note_list_sort' => 'updated_desc',
     'notes_without_folders_after_folders' => '1',
     'code_block_word_wrap' => '1',
@@ -226,7 +225,7 @@ $settings = [
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level', 'markdown_default_view_mode')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level', 'markdown_default_view_mode')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -374,9 +373,6 @@ if ($show_note_created_setting) {
 if (poznoteSettingEnabled($settings['hide_folder_actions'], true)) {
     $extra_body_classes .= ' folder-actions-always-visible';
 }
-if (!poznoteSettingEnabled($settings['hide_folder_counts'], true)) {
-    $extra_body_classes .= ' hide-folder-counts';
-}
 if ($center_note_content_enabled) {
     $extra_body_classes .= ' center-note-content';
 }
@@ -409,31 +405,13 @@ $markdown_default_view_mode = trim((string)$settings['markdown_default_view_mode
 if (!in_array($markdown_default_view_mode, ['preview', 'edit', 'split', 'last'], true)) {
     $markdown_default_view_mode = 'preview';
 }
-// Colored markdown ('0' = off, 'custom' = per-element colors chosen by the user)
-$markdown_colored_theme = trim((string)$settings['markdown_colored']);
+// Colored markdown ('0' = off, 'custom' = per-element colors chosen by the
+// user): body class + --mdc-* colours, lib/markdown-colored.php (diary.php
+// builds its <body> the same way for the journal view)
 $markdown_colored_style = '';
-if ($markdown_colored_theme !== '' && $markdown_colored_theme !== '0' && $markdown_colored_theme !== 'false') {
+if (poznoteMarkdownColoredEnabled($settings['markdown_colored'])) {
     $extra_body_classes .= ' markdown-colored';
-    $customColors = json_decode((string)$settings['markdown_colored_custom'], true);
-    if (is_array($customColors)) {
-        // Legacy values stored a single 'heading' color and no code block background
-        $mdcLegacyHeading = (string)($customColors['heading'] ?? '');
-        foreach (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] as $mdcLevel) {
-            if (!isset($customColors[$mdcLevel]) && $mdcLegacyHeading !== '') {
-                $customColors[$mdcLevel] = $mdcLegacyHeading;
-            }
-        }
-        if (!isset($customColors['codeblock']) && isset($customColors['code'])) {
-            $customColors['codeblock'] = $customColors['code'];
-        }
-        foreach (['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'code', 'codeblock', 'quote', 'table', 'hr'] as $mdcElement) {
-            $mdcColor = (string)($customColors[$mdcElement] ?? '');
-            if (preg_match('/^#[0-9a-fA-F]{6}$/', $mdcColor)) {
-                $markdown_colored_style .= '--mdc-' . $mdcElement . ': ' . $mdcColor . '; ';
-            }
-        }
-        $markdown_colored_style = trim($markdown_colored_style);
-    }
+    $markdown_colored_style = poznoteMarkdownColoredStyle($settings['markdown_colored'], $settings['markdown_colored_custom']);
 }
 $attachment_previews_in_note_setting = poznoteSettingEnabled($settings['attachment_previews_in_note'], false);
 $attachments_at_bottom_setting = poznoteSettingEnabled($settings['attachments_at_bottom'], false);
