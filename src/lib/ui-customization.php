@@ -452,9 +452,8 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
                 // which always emits .note-icon.
                 $rules[] = '.note-icon { display: none !important; }';
             } elseif ($id === 'folder-note-count') {
-                // The (n) after a folder name. !important beats the
-                // .hide-folder-counts hover-reveal in css/sidebar.css, which
-                // otherwise brings the count back on hover.
+                // The (n) after a folder name, always shown unless hidden here
+                // (the legacy hide_folder_counts hover-reveal is gone).
                 $rules[] = '.folder-note-count { display: none !important; }';
             } elseif ($id === 'outline-panel') {
                 $rules[] = '#outline-panel { display: none !important; }';

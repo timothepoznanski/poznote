@@ -108,7 +108,6 @@
             'show_note_icons',
             'type_based_note_icons',
             'note_color_palette',
-            'hide_folder_counts',
             'hide_folder_actions',
             'highlight_current_folder_tree',
             'folder_tree_dim_level',
@@ -950,7 +949,7 @@
     }
 
     // Diary entry title formats; must mirror getDiaryDateFormats() in functions.php.
-    var DIARY_DATE_FORMATS = ['ymd', 'dmy_slash', 'mdy_slash', 'dmy_dot', 'ymd_slash'];
+    var DIARY_DATE_FORMATS = ['ymd', 'dmy_slash', 'mdy_slash', 'dmy_dot', 'ymd_slash', 'long'];
 
     function isCustomDiaryDateFormat(value) {
         return typeof value === 'string' && value.indexOf('custom:') === 0;
@@ -971,7 +970,7 @@
         if (!/^[A-Za-z0-9\s\/.,_\-()]+$/.test(value)) return false;
 
         // Longest token first, matching the PHP compiler's greedy scan.
-        var tokens = [['YYYY','y'], ['YY','y'], ['MMMM','m'], ['MMM','m'], ['MM','m'], ['DD','d']];
+        var tokens = [['YYYY','y'], ['YY','y'], ['MMMM','m'], ['MMM','m'], ['MM','m'], ['dddd','w'], ['DD','d'], ['D','d']];
         var seen = {};
         for (var i = 0; i < value.length; i++) {
             for (var t = 0; t < tokens.length; t++) {
@@ -1011,6 +1010,8 @@
                 return tr('modals.diary_date_format.options.dmy_dot', {}, 'DD.MM.YYYY');
             case 'ymd_slash':
                 return tr('modals.diary_date_format.options.ymd_slash', {}, 'YYYY/MM/DD');
+            case 'long':
+                return tr('modals.diary_date_format.options.long', {}, 'Saturday, September 12, 2026');
             case 'ymd':
             default:
                 return tr('modals.diary_date_format.options.ymd', {}, 'YYYY-MM-DD');
@@ -1078,7 +1079,8 @@
             ymd_hi: true,
             ymd_his: true,
             dmy_hi: true,
-            mdy_hia: true
+            mdy_hia: true,
+            long: true
         };
         return allowed[value] ? value : 'default';
     }
@@ -1110,6 +1112,8 @@
                 return tr('modals.date_time_format.options.dmy_hi', {}, 'DD/MM/YYYY HH:mm');
             case 'mdy_hia':
                 return tr('modals.date_time_format.options.mdy_hia', {}, 'MM/DD/YYYY hh:mm AM/PM');
+            case 'long':
+                return tr('modals.date_time_format.options.long', {}, 'Saturday, September 12, 2026 14:05');
             case 'default':
             default:
                 return tr('modals.date_time_format.options.default', {}, 'YYYY-MM-DD HH:mm');

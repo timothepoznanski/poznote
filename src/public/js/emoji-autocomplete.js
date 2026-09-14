@@ -21,11 +21,11 @@
         // Smileys
         ['😀', 'grinning'], ['😃', 'smiley'], ['😄', 'smile'], ['😁', 'grin'],
         ['😆', 'laughing satisfied'], ['😅', 'sweat_smile'], ['😂', 'joy'], ['🤣', 'rofl'],
-        ['🙂', 'slightly_smiling_face'], ['😉', 'wink'], ['😊', 'blush'], ['😇', 'innocent'],
+        ['🙂', 'slightly_smiling_face'], ['😉', 'wink'], ['🙃', 'upside_down_face'], ['😊', 'blush'], ['😇', 'innocent'],
         ['😍', 'heart_eyes'], ['🤩', 'star_struck'], ['😘', 'kissing_heart'], ['😋', 'yum'],
         ['😜', 'stuck_out_tongue_winking_eye'], ['🤪', 'zany_face'], ['🤔', 'thinking'],
         ['🤨', 'raised_eyebrow'], ['😐', 'neutral_face'], ['😑', 'expressionless'],
-        ['🙄', 'roll_eyes'], ['😏', 'smirk'], ['😬', 'grimacing'], ['🤥', 'lying_face'],
+        ['🙄', 'roll_eyes'], ['😏', 'smirk'], ['😒', 'unamused'], ['😬', 'grimacing'], ['🤥', 'lying_face'],
         ['😌', 'relieved'], ['😴', 'sleeping'], ['😷', 'mask'], ['🤯', 'exploding_head mind_blown'],
         ['🥳', 'partying_face'], ['😎', 'sunglasses'], ['🤓', 'nerd_face'], ['😕', 'confused'],
         ['😟', 'worried'], ['🙁', 'slightly_frowning_face'], ['😮', 'open_mouth'],

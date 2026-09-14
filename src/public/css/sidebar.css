@@ -191,40 +191,6 @@
     font-weight: var(--pz-weight-normal);
 }
 
-.hide-folder-counts .folder-note-count {
-    display: none;
-}
-
-/* When folder counts are globally hidden, reveal them when the user hovers the folder
-   or focuses it via keyboard for accessibility. Use opacity + transform for a smooth
-   unobtrusive transition rather than abruptly toggling display. */
-.hide-folder-counts .folder-note-count {
-    /* keep them removed from layout by default */
-    display: inline-block;
-    /* ensure inline layout for transition */
-    opacity: 0;
-    transform: translateY(-2px) scale(0.98);
-    transition: opacity 120ms ease, transform 120ms ease;
-    pointer-events: none;
-    /* avoid interfering with folder clicks */
-}
-
-/* Keyed on .folder-toggle (the visible row), NOT .folder-header: the header
-   wraps .folder-content and thus the whole subtree, so hovering or focusing
-   any note revealed every ancestor folder's count at once. */
-.hide-folder-counts .folder-toggle:hover .folder-note-count,
-.hide-folder-counts .folder-toggle:focus-within .folder-note-count {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    pointer-events: auto;
-}
-
-/* For keyboard-only users, provide a visible focus outline on the folder-toggle */
-.hide-folder-counts .folder-toggle:focus-within {
-    outline: 2px solid rgba(59, 130, 246, 0.18);
-    border-radius: var(--pz-radius);
-}
-
 /* Folder content / notes styling */
 .note-in-folder {
     padding-left: 26px;

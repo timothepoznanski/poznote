@@ -183,7 +183,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 39; // 39: workspaces.display_order (manual workspace order)
+    $CURRENT_SCHEMA_VERSION = 40; // 40: show_note_created/show_note_icons '0' -> hidden_ui_elements panel keys
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -593,7 +593,6 @@ try {
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_created', '1')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_icons', '1')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('type_based_note_icons', '1')");
-        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('hide_folder_counts', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_age_filter_days', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('date_time_format', 'default')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('diary_date_format', 'ymd')");
@@ -852,6 +851,54 @@ try {
         } catch(Exception $e) {
             // Log error but don't fail database connection
             error_log("Failed to create welcome note: " . $e->getMessage());
+        }
+
+        // === Legacy display toggles moved to the "Element visibility" modal ===
+        // show_note_created and show_note_icons lost their Settings cards: the
+        // modal checkboxes (panel:note-created-date, panel:note-icons) can only
+        // hide the element, so an account whose legacy toggle was '0' could
+        // never show it again. Carry the choice over as a hidden panel key and
+        // turn the legacy toggle back on. Idempotent: once the toggle is '1'
+        // nothing happens, and an existing key is not added twice.
+        try {
+            $legacyPanelToggles = [
+                'show_note_created' => 'panel:note-created-date',
+                'show_note_icons' => 'panel:note-icons',
+            ];
+            $legacyStmt = $con->prepare("SELECT value FROM settings WHERE key = ?");
+            $keysToHide = [];
+            foreach ($legacyPanelToggles as $legacyKey => $panelKey) {
+                $legacyStmt->execute([$legacyKey]);
+                $legacyValue = $legacyStmt->fetchColumn();
+                if ($legacyValue !== false && in_array(strtolower(trim((string)$legacyValue)), ['0', 'false'], true)) {
+                    $keysToHide[$legacyKey] = $panelKey;
+                }
+            }
+            if (!empty($keysToHide)) {
+                $legacyStmt->execute(['hidden_ui_elements']);
+                $hiddenRaw = $legacyStmt->fetchColumn();
+                $hiddenList = json_decode($hiddenRaw === false ? '[]' : (string)$hiddenRaw, true);
+                if (!is_array($hiddenList)) {
+                    $hiddenList = [];
+                }
+                foreach ($keysToHide as $panelKey) {
+                    if (!in_array($panelKey, $hiddenList, true)) {
+                        $hiddenList[] = $panelKey;
+                    }
+                }
+                $con->beginTransaction();
+                $writeStmt = $con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
+                $writeStmt->execute(['hidden_ui_elements', json_encode(array_values($hiddenList))]);
+                foreach (array_keys($keysToHide) as $legacyKey) {
+                    $writeStmt->execute([$legacyKey, '1']);
+                }
+                $con->commit();
+            }
+        } catch (Exception $e) {
+            if ($con->inTransaction()) {
+                $con->rollBack();
+            }
+            error_log('db_connect: legacy display toggle migration failed: ' . $e->getMessage());
         }
 
         // === Update schema version (last, so a failed bootstrap retries on the next request) ===

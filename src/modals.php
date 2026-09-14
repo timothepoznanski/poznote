@@ -1193,6 +1193,7 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
                 <label><input type="radio" name="dateTimeFormat" value="ymd_his"> <?php echo t_h('modals.date_time_format.options.ymd_his', [], 'YYYY-MM-DD HH:mm:ss'); ?></label>
                 <label><input type="radio" name="dateTimeFormat" value="dmy_hi"> <?php echo t_h('modals.date_time_format.options.dmy_hi', [], 'DD/MM/YYYY HH:mm'); ?></label>
                 <label><input type="radio" name="dateTimeFormat" value="mdy_hia"> <?php echo t_h('modals.date_time_format.options.mdy_hia', [], 'MM/DD/YYYY hh:mm AM/PM'); ?></label>
+                <label><input type="radio" name="dateTimeFormat" value="long"> <?php echo t_h('modals.date_time_format.options.long', [], 'Saturday, September 12, 2026 14:05'); ?></label>
                 <label><input type="radio" name="dateTimeFormat" value="custom"> <?php echo t_h('modals.date_time_format.options.custom', [], 'Custom'); ?></label>
                 <input type="text" id="dateTimeFormatCustomInput" maxlength="80" placeholder="<?php echo t_h('modals.date_time_format.custom_placeholder', [], 'YYYY-MM-DD HH:mm:ss'); ?>" style="width: 100%; box-sizing: border-box; margin: 4px 0 0 24px;">
                 <div class="date-format-tokens-wrap" style="margin: 4px 0 0 24px;">
@@ -1241,6 +1242,7 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
                 <label><input type="radio" name="diaryDateFormat" value="mdy_slash"> <?php echo t_h('modals.diary_date_format.options.mdy_slash', [], 'MM/DD/YYYY'); ?></label>
                 <label><input type="radio" name="diaryDateFormat" value="dmy_dot"> <?php echo t_h('modals.diary_date_format.options.dmy_dot', [], 'DD.MM.YYYY'); ?></label>
                 <label><input type="radio" name="diaryDateFormat" value="ymd_slash"> <?php echo t_h('modals.diary_date_format.options.ymd_slash', [], 'YYYY/MM/DD'); ?></label>
+                <label><input type="radio" name="diaryDateFormat" value="long"> <?php echo t_h('modals.diary_date_format.options.long', [], 'Saturday, September 12, 2026'); ?></label>
                 <label><input type="radio" name="diaryDateFormat" value="custom"> <?php echo t_h('modals.diary_date_format.options.custom', [], 'Custom'); ?></label>
                 <input type="text" id="diaryDateFormatCustomInput" maxlength="80" placeholder="<?php echo t_h('modals.diary_date_format.custom_placeholder', [], 'DD MMMM YYYY'); ?>" style="width: 100%; box-sizing: border-box; margin: 4px 0 0 24px;">
                 <div class="date-format-tokens-wrap" style="margin: 4px 0 0 24px;">

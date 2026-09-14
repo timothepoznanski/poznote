@@ -271,6 +271,8 @@ function poznoteCssManifest(): array
             'css/home/alerts.css',
             'css/dashboard.css',
             'css/outline.css',
+            // Callouts of the journal entries, as on the public note page
+            'css/tasks.css',
             'css/diary.css',
             '@theme',
             '@icon-sidebar',

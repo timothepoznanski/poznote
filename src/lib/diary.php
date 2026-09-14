@@ -31,7 +31,51 @@ function getDiaryDateFormats(): array {
         'mdy_slash' => ['pattern' => 'm/d/Y',  'regex' => '/^(?<m>\d{2})\/(?<d>\d{2})\/(?<y>\d{4})$/'],
         'dmy_dot'   => ['pattern' => 'd.m.Y',  'regex' => '/^(?<d>\d{2})\.(?<m>\d{2})\.(?<y>\d{4})$/'],
         'ymd_slash' => ['pattern' => 'Y/m/d',  'regex' => '/^(?<y>\d{4})\/(?<m>\d{2})\/(?<d>\d{2})$/'],
+        // Spelled-out day in the user's language ("Saturday, September 12, 2026",
+        // "Samedi 12 septembre 2026"...). No date() pattern: see
+        // getDateNameLocales(), which formats and parses it.
+        'long'      => ['pattern' => null, 'long' => true, 'regex' => null],
     ];
+}
+
+/**
+ * The 'YYYY-MM-DD' day a 'long' title designates, in any app language (a title
+ * keeps its day after the user switches language), or null. The weekday must
+ * be one of the language's names but is not checked against the date.
+ */
+function parseDiaryLongDateTitle(string $heading): ?string {
+    foreach (getDateNameLocales() as $locale) {
+        $alternation = function (array $names): string {
+            return implode('|', array_map(function ($name) { return preg_quote($name, '/'); }, $names));
+        };
+        $regex = '';
+        foreach (preg_split('/(\{wd\}|\{month\}|\{m\}|\{d\}|\{y\})/', $locale['layout'], -1, PREG_SPLIT_DELIM_CAPTURE) as $piece) {
+            switch ($piece) {
+                case '{wd}':    $regex .= '(?:' . $alternation($locale['days']) . ')'; break;
+                case '{month}': $regex .= '(?<mn>' . $alternation($locale['months']) . ')'; break;
+                case '{m}':     $regex .= '(?<m>\d{1,2})'; break;
+                case '{d}':     $regex .= '(?<d>\d{1,2})'; break;
+                case '{y}':     $regex .= '(?<y>\d{4})'; break;
+                default:        $regex .= preg_quote($piece, '/');
+            }
+        }
+        if (!preg_match('/^' . $regex . '$/iu', $heading, $m)) continue;
+
+        if (isset($m['mn']) && $m['mn'] !== '') {
+            $month = 0;
+            foreach ($locale['months'] as $index => $name) {
+                if (mb_strtolower($name) === mb_strtolower($m['mn'])) $month = $index + 1;
+            }
+        } else {
+            $month = (int)($m['m'] ?? 0);
+        }
+        $year = (int)$m['y'];
+        $day = (int)$m['d'];
+        if ($month > 0 && checkdate($month, $day, $year)) {
+            return sprintf('%04d-%02d-%02d', $year, $month, $day);
+        }
+    }
+    return null;
 }
 
 /**
@@ -41,15 +85,21 @@ function getDiaryDateFormats(): array {
  *
  * Only date tokens are offered. A diary title designates a day, so a time part
  * would make two entries of the same day look like different days.
+ *
+ * Names (dddd, MMMM, MMM) are in the user's language: their 'php' is a
+ * placeholder swapped for the name by applyDateNameTokens() (lib/datetime.php).
+ * The weekday is decoration, the day is rebuilt from year, month and day.
  */
 function getDiaryDateCustomTokens(): array {
     return [
         'YYYY' => ['php' => 'Y', 'regex' => '(?<y>\d{4})', 'part' => 'y'],
         'YY'   => ['php' => 'y', 'regex' => '(?<y2>\d{2})', 'part' => 'y'],
-        'MMMM' => ['php' => 'F', 'regex' => '(?<mn>[^\d\/.,_\-\s]+)', 'part' => 'm'],
-        'MMM'  => ['php' => 'M', 'regex' => '(?<ms>[^\d\/.,_\-\s]+)', 'part' => 'm'],
+        'MMMM' => ['php' => DATE_NAME_MONTH, 'regex' => '(?<mn>' . dateNamesAlternation('months') . ')', 'part' => 'm'],
+        'MMM'  => ['php' => DATE_NAME_MONTH_SHORT, 'regex' => '(?<ms>' . dateNamesAlternation('short') . ')', 'part' => 'm'],
         'MM'   => ['php' => 'm', 'regex' => '(?<m>\d{2})', 'part' => 'm'],
+        'dddd' => ['php' => DATE_NAME_WEEKDAY, 'regex' => dateNamesAlternation('days'), 'part' => 'w'],
         'DD'   => ['php' => 'd', 'regex' => '(?<d>\d{2})', 'part' => 'd'],
+        'D'    => ['php' => 'j', 'regex' => '(?<d>\d{1,2})', 'part' => 'd'],
     ];
 }
 
@@ -174,13 +224,6 @@ function getDiaryDateFormatSpec(): array {
 }
 
 /**
- * PHP date() pattern used to title new diary entries.
- */
-function getDiaryDateFormatPattern(): string {
-    return getDiaryDateFormatSpec()['pattern'];
-}
-
-/**
  * Title of the diary entry for a day, in the configured format.
  * $date is a DateTimeInterface or a 'YYYY-MM-DD' string.
  */
@@ -190,22 +233,32 @@ function formatDiaryEntryTitle($date): string {
         if ($parsed === false) return (string)$date;
         $date = $parsed;
     }
-    return $date->format(getDiaryDateFormatPattern());
+    return formatDiaryDateWithSpec($date, getDiaryDateFormatSpec(), (string)getUserLanguage());
+}
+
+/**
+ * A day rendered with a format spec (built-in or compiled custom) in $lang.
+ */
+function formatDiaryDateWithSpec(DateTimeInterface $date, array $spec, string $lang): string {
+    if (!empty($spec['long'])) {
+        return formatLongDate($date, $lang);
+    }
+    return applyDateNameTokens($date->format($spec['pattern']), $date, $lang);
 }
 
 /**
  * Month number a MMMM/MMM capture designates (1-12), or 0 when the name
- * belongs to no month. Matched against the month names of the active locale
- * as date() would render them, so parsing mirrors formatting.
+ * belongs to no month. Every app language is tried, full and short names,
+ * so a title keeps its day after the user switches language.
  */
 function diaryMonthNameToNumber(string $name): int {
     $name = mb_strtolower(trim($name));
     if ($name === '') return 0;
-    for ($month = 1; $month <= 12; $month++) {
-        $ref = new DateTime(sprintf('2000-%02d-01', $month));
-        if (mb_strtolower($ref->format('F')) === $name
-            || mb_strtolower($ref->format('M')) === $name) {
-            return $month;
+    foreach (getDateNameLocales() as $locale) {
+        foreach (['months', 'short'] as $kind) {
+            foreach ($locale[$kind] as $index => $known) {
+                if (mb_strtolower($known) === $name) return $index + 1;
+            }
         }
     }
     return 0;
@@ -279,6 +332,11 @@ function parseDiaryEntryTitle(string $heading): ?string {
     }
 
     foreach ($ordered as $format) {
+        if (!empty($format['long'])) {
+            $long = parseDiaryLongDateTitle($heading);
+            if ($long !== null) return $long;
+            continue;
+        }
         if (!preg_match($format['regex'], $heading, $m)) continue;
 
         // Two-digit years follow date()'s 'y' round-trip: 70-99 => 1970-1999.
