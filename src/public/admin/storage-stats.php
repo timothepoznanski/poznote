@@ -544,6 +544,7 @@ foreach ($stats as $r) {
     <title><?php echo t_h('admin_tools.storage_stats.title', [], 'Storage statistics'); ?></title>
     <meta name="color-scheme" content="dark light">
     <script src="../js/theme-init.js?v=<?php echo $v; ?>"></script>
+    <script src="../js/session-guard.js?v=<?php echo $v; ?>"></script>
     <?php poznoteRenderStylesheets('admin/storage-stats', ['prefix' => '../']); ?>
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">

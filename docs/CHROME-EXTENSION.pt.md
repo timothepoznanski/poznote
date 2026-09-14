@@ -30,6 +30,6 @@ Instale a extensão diretamente pela Chrome Web Store: [Instalar a extensão](ht
    - **Workspace** e, opcionalmente, **Folder**: onde as páginas salvas devem ficar
 3. Salve. A extensão identifica seu perfil sozinha e fica pronta para uso.
 
-A senha da sua conta também funciona aqui, mas uma senha de aplicativo é a credencial mais adequada para uma extensão: ela só acessa a API, nunca a interface web nem as configurações da sua conta, fica limitada ao seu próprio perfil, e revogá-la no Poznote desconecta a extensão sem alterar mais nada. Veja [Senhas de aplicativo](../README.pt.md#senhas-de-aplicativo) para a lista completa de limites.
+A senha da sua conta também funciona aqui, mas uma senha de aplicativo é a credencial mais adequada para uma extensão: ela só acessa a API, nunca a interface web nem as configurações da sua conta, fica limitada ao seu próprio perfil, e revogá-la no Poznote desconecta a extensão sem alterar mais nada. Veja [Senhas de aplicativo](README.pt.md#senhas-de-aplicativo) para a lista completa de limites.
 
 > **Se a sua instância é apenas SSO,** uma senha de aplicativo é a única forma de conectar a extensão: o formulário de login de que a extensão precisa não existe para a sua conta. Crie uma em **Configurações > Senhas de aplicativo** exatamente como descrito acima.

@@ -240,6 +240,7 @@ $notifyCandidates = listNewUserNotificationCandidates();
     <title><?php echo t_h('smtp_admin.title', [], 'SMTP Configuration'); ?> - Poznote</title>
     <meta name="color-scheme" content="dark light">
     <script src="../js/theme-init.js?v=<?php echo $v; ?>"></script>
+    <script src="../js/session-guard.js?v=<?php echo $v; ?>"></script>
     <?php poznoteRenderStylesheets('admin/smtp', ['prefix' => '../']); ?>
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">

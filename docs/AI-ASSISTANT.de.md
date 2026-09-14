@@ -195,6 +195,12 @@ docker exec <poznote-webserver-container> curl -s -m 3 http://172.17.0.1:11434/
 
 Liefert dieser Befehl nichts zurück, liegt das Problem an der Bindung von Ollama oder an einer Firewall, nicht an Poznote. Die Schaltfläche **Zugang prüfen und Modelle auflisten** auf der Einstellungsseite führt dieselbe Prüfung durch und füllt bei Erfolg die Modellauswahl.
 
+## Verbindungsfehler
+
+Eine Anfrage, die scheitert, bevor der KI-Server irgendetwas geantwortet hat (DNS-Zeitüberschreitung, abgelehnte Verbindung, nicht abgeschlossener TLS-Handshake), wird automatisch erneut gesendet, bis zu drei Versuche hintereinander mit einer kurzen Pause dazwischen. Der Chat zeigt währenddessen eine Zeile *neuer Versuch*, und nichts geht verloren, da der Server noch nicht mit der Antwort begonnen hatte. Scheitert auch der letzte Versuch, erscheint der Fehler im Chat mit einer Schaltfläche **Erneut versuchen**, die dieselbe Nachricht noch einmal sendet, ohne dass Sie sie neu eingeben müssen.
+
+Ein Fehler, der auftritt, nachdem die Antwort bereits zu streamen begonnen hat, wird nicht wiederholt, da ein Teil der Antwort schon auf dem Bildschirm steht: verwenden Sie die Schaltfläche **Erneut versuchen**.
+
 ## Datenschutz
 
 Der KI-Server wird vom Poznote-Server aus aufgerufen, niemals von Ihrem Browser. Mit einer lokalen Ollama- oder LM Studio-Instanz verlassen Ihre Notizen und Unterhaltungen nie Ihren Rechner. Mit einem Cloud-Anbieter werden die Teile Ihrer Notizen, die der Assistent zum Beantworten liest, an diesen Anbieter gesendet.

@@ -287,6 +287,7 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="pwa/poznote.png?v=<?php echo $v; ?>">
     <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
+    <script src="js/session-guard.js?v=<?php echo $v; ?>"></script>
     <?php if ($workspaceResolvedInternally !== null): ?>
     <script>
         // The workspace was resolved server-side without a redirect; reflect

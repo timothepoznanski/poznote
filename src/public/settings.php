@@ -314,6 +314,7 @@ if ($canUseUserWebhooks) {
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="pwa/poznote.png?v=<?php echo $cache_v; ?>">
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="js/session-guard.js?v=<?php echo $cache_v; ?>"></script>
     <script>
         // Settings page text size (Font size card): applied before the first
         // paint so the page does not render at the default size and then

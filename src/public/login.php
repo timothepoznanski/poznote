@@ -205,6 +205,10 @@ if (isset($_GET['oidc_error'])) {
             <h1 class="login-title"><?php echo htmlspecialchars($login_display_name !== '' ? $login_display_name : 'Poznote'); ?></h1>
         </div>
 
+        <?php if (isset($_GET['expired']) && !$renderAccountSelection): ?>
+        <div class="info session-expired-notice"><?php echo t_h('login.session_expired', [], 'Your session has ended. Sign in again to get back to where you were.', $currentLang); ?></div>
+        <?php endif; ?>
+
         <?php
         // Password login is governed solely by POZNOTE_OIDC_DISABLE_NORMAL_LOGIN.
         // The form is either rendered and usable, or not rendered at all.

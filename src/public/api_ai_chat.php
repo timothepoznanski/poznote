@@ -36,6 +36,7 @@ require_once __DIR__ . '/../ai_config.php';
 require_once __DIR__ . '/../markdown_parser.php';
 require_once __DIR__ . '/../html_to_markdown.php';
 require_once __DIR__ . '/../lib/ai-tools.php';
+require_once __DIR__ . '/../lib/ai-upstream.php';
 
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
@@ -138,15 +139,26 @@ if ($action === 'test') {
         CURLOPT_CONNECTTIMEOUT => 5,
         CURLOPT_TIMEOUT => 15,
     ]);
-    $body = curl_exec($ch);
-    $err = curl_error($ch);
-    $status = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+    // Issue #1388: a resolver hiccup should not fail the check any more than
+    // it fails a chat message (see the streaming loop below)
+    $attempt = 0;
+    while (true) {
+        $attempt++;
+        $body = curl_exec($ch);
+        $err = curl_error($ch);
+        $status = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+        if ($body !== false || $attempt >= AI_UPSTREAM_MAX_ATTEMPTS
+            || !aiUpstreamIsTransientCurlError(curl_errno($ch), curl_getinfo($ch, CURLINFO_CONNECT_TIME) > 0)) {
+            break;
+        }
+        sleep(aiUpstreamRetryDelaySeconds($attempt));
+    }
     curl_close($ch);
 
     header('Content-Type: application/json');
     if ($body === false) {
         http_response_code(502);
-        echo json_encode(['success' => false, 'error' => $err]);
+        echo json_encode(['success' => false, 'error' => aiUnreachableMessage($err, $attempt)]);
         exit;
     }
     if ($status < 200 || $status >= 300) {
@@ -748,6 +760,8 @@ function aiStreamRound($url, $headers, $payload) {
         'status' => null,
         'errorBody' => '',
         'curlErr' => '',
+        'curlErrno' => 0,
+        'connected' => false,  // TCP connection established (CURLINFO_CONNECT_TIME > 0)
         'aborted' => false,
         'content' => '',
         'toolCalls' => [],   // index => ['id' =>, 'name' =>, 'arguments' =>]
@@ -834,6 +848,8 @@ function aiStreamRound($url, $headers, $payload) {
     ]);
     $ok = curl_exec($ch);
     $state['curlErr'] = curl_error($ch);
+    $state['curlErrno'] = curl_errno($ch);
+    $state['connected'] = curl_getinfo($ch, CURLINFO_CONNECT_TIME) > 0;
     curl_close($ch);
     if ($ok !== false && $lineBuf !== '') {
         $handleLine(rtrim($lineBuf, "\r"));
@@ -844,6 +860,20 @@ function aiStreamRound($url, $headers, $payload) {
 function aiEmitError($detail) {
     echo 'data: ' . json_encode(['poznote_error' => $detail]) . "\n\n";
     flush();
+}
+
+/**
+ * The error shown when the AI server never answered. After several attempts
+ * the message says so, so that the user knows the failure was not a one-off
+ * and looks at the network rather than pasting the message a fourth time.
+ */
+function aiUnreachableMessage($curlErr, $attempts) {
+    $err = $curlErr !== '' ? $curlErr : 'Connection failed';
+    if ($attempts < 2) {
+        return $err;
+    }
+    return t('ai_chat.unreachable', ['attempts' => $attempts, 'error' => $err],
+        'The AI server could not be reached after {{attempts}} attempts: {{error}}');
 }
 
 $toolsSupported = true;
@@ -865,7 +895,30 @@ for ($round = 0; $round < $maxRounds; $round++) {
         $payload['tools'] = $aiTools;
     }
 
-    $state = aiStreamRound($completionsUrl, $upstreamHeaders, $payload);
+    // Issue #1388: "Could not resolve host: api.openai.com (Timeout while
+    // contacting DNS servers)" and its kind fail before the server has
+    // answered, so nothing of this round has reached the browser yet and the
+    // same request is simply sent again, a couple of times, before giving
+    // up. The panel is told each time so the pause does not look like a hang.
+    $attempt = 0;
+    while (true) {
+        $attempt++;
+        $state = aiStreamRound($completionsUrl, $upstreamHeaders, $payload);
+        if ($state['aborted'] || $state['status'] !== null || $attempt >= AI_UPSTREAM_MAX_ATTEMPTS
+            || !aiUpstreamIsTransientCurlError($state['curlErrno'], $state['connected'])) {
+            break;
+        }
+        echo 'data: ' . json_encode(['poznote_retry' => [
+            'attempt' => $attempt + 1,
+            'max' => AI_UPSTREAM_MAX_ATTEMPTS,
+            'error' => $state['curlErr'],
+        ]]) . "\n\n";
+        flush();
+        sleep(aiUpstreamRetryDelaySeconds($attempt));
+        if (connection_aborted()) {
+            exit;
+        }
+    }
 
     if ($state['aborted']) {
         exit;
@@ -898,7 +951,7 @@ for ($round = 0; $round < $maxRounds; $round++) {
         break;
     }
     if ($state['status'] === null) {
-        aiEmitError($state['curlErr'] !== '' ? $state['curlErr'] : 'Connection failed');
+        aiEmitError(aiUnreachableMessage($state['curlErr'], $attempt));
         break;
     }
 

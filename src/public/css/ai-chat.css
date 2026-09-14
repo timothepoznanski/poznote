@@ -245,6 +245,33 @@ a.ai-chat-header-btn {
     font-size: 12.5px;
 }
 
+/* Sends the failed message again (issue #1388); inherits the error colours
+   so it needs no dark-mode rule of its own */
+.ai-chat-retry {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+    padding: 3px 10px;
+    font: inherit;
+    font-size: 12px;
+    color: inherit;
+    background: transparent;
+    border: 1px solid currentColor;
+    border-radius: var(--pz-radius-lg);
+    cursor: pointer;
+}
+
+.ai-chat-retry:hover {
+    background: var(--pz-danger-soft);
+}
+
+.ai-chat-retry .lucide {
+    width: 13px;
+    height: 13px;
+    background-color: currentColor;
+}
+
 .ai-chat-msg-assistant.ai-chat-pending::after {
     /* CSS-drawn caret: block characters like ▍ render too thick */
     content: '';

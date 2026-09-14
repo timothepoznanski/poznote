@@ -54,6 +54,7 @@ if (!$note) {
     $v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     ?>
     <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
+    <script src="js/session-guard.js?v=<?php echo $v; ?>"></script>
     <?php poznoteRenderStylesheets('attachments'); ?>
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <style>

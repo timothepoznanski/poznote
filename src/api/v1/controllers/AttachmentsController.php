@@ -412,13 +412,10 @@ class AttachmentsController {
             }
 
             if (!$isAuthenticated) {
-                http_response_code(401);
-                if (!(defined('OIDC_DISABLE_BASIC_AUTH') && OIDC_DISABLE_BASIC_AUTH)) {
-                    header('WWW-Authenticate: Basic realm="Poznote API"');
-                }
-                header('Content-Type: application/json');
-                echo json_encode(['error' => 'Authentication required']);
-                exit;
+                // A link to an attachment opened without a session lands on
+                // the login page and comes back here afterwards; the app's
+                // own calls get a bare 401 (see poznoteDenyUnauthenticatedRequest).
+                poznoteDenyUnauthenticatedRequest('Authentication required', '/login.php', false);
             }
         }
         

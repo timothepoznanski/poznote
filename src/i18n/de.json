@@ -2410,7 +2410,8 @@
       "sign_out": "Abmelden",
       "invalid": "Dieses Konto kann nicht ausgewählt werden."
     },
-    "or": "oder"
+    "or": "oder",
+    "session_expired": "Ihre Sitzung ist abgelaufen. Melden Sie sich erneut an, um dorthin zurückzukehren, wo Sie waren."
   },
   "restore_import": {
     "page": {
@@ -4381,6 +4382,9 @@
     "tool_list": "Neueste Notizen auflisten",
     "no_tools_notice": "Dieses Modell unterstützt keine Tools — der Assistent kann Ihre Notizen nicht durchsuchen.",
     "no_tools_reasoning_notice": "Dieses Modell lehnt Tools beim aktuellen Denkaufwand ab, der Assistent kann Ihre Notizen daher nicht durchsuchen. Stellen Sie den Denkaufwand in den Einstellungen des KI-Assistenten auf „Keiner“.",
+    "unreachable": "Der KI-Server war nach {{attempts}} Versuchen nicht erreichbar: {{error}}",
+    "retrying": "Verbindung zum KI-Server fehlgeschlagen, neuer Versuch ({{attempt}}/{{max}})",
+    "retry": "Erneut versuchen",
     "tool_rename": "Notiz #{{id}} wird umbenannt in „{{title}}“",
     "tool_update": "Notiz #{{id}} wird bearbeitet",
     "tool_create": "Notiz wird erstellt: {{title}}",

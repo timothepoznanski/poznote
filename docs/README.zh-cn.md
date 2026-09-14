@@ -1,6 +1,6 @@
 <!-- lang-selector -->
 <p align="center">
-  <a href="README.md">English</a> ·
+  <a href="../README.md">English</a> ·
   <a href="README.fr.md">Français</a> ·
   <a href="README.de.md">Deutsch</a> ·
   <a href="README.es.md">Español</a> ·
@@ -12,7 +12,7 @@
 
 
 <p align="center">
-  <img src="images/poznote-logo-text.png" alt="Poznote Logo" width="400">
+  <img src="../images/poznote-logo-text.png" alt="Poznote Logo" width="400">
 </p>
 
 <h2 align="center">
@@ -34,7 +34,7 @@
 </p>
 
 <p align="center">
-  <img src="images/pres1.png" alt="Poznote-light" width="100%">
+  <img src="../images/pres1.png" alt="Poznote-light" width="100%">
 </p>
 
 ### 功能
@@ -332,7 +332,7 @@ mkdir -p data
 sudo chown -R 1000:1000 data
 ```
 
-这里通常不需要 `sudo`：如果您的用户 uid 已经是 `1000`，可以跳过 `chown`；在 rootless Podman/Docker 上，它无需 root 权限即可运行，参见[以 rootless 方式运行](docs/TROUBLESHOOTING.zh-cn.md#running-rootless)。
+这里通常不需要 `sudo`：如果您的用户 uid 已经是 `1000`，可以跳过 `chown`；在 rootless Podman/Docker 上，它无需 root 权限即可运行，参见[以 rootless 方式运行](TROUBLESHOOTING.zh-cn.md#running-rootless)。
 
 创建环境变量文件：
 ```bash
@@ -359,13 +359,13 @@ docker compose -f docker-compose.rootless.yml pull
 docker compose -f docker-compose.rootless.yml up -d
 ```
 
-如需将现有的 Poznote 实例迁移到 rootless 变体，或了解更多细节，请参阅故障排除指南中的[以 rootless 方式运行](docs/TROUBLESHOOTING.zh-cn.md#running-rootless)。
+如需将现有的 Poznote 实例迁移到 rootless 变体，或了解更多细节，请参阅故障排除指南中的[以 rootless 方式运行](TROUBLESHOOTING.zh-cn.md#running-rootless)。
 
 </details>
 
 <br>
 
-> 如果在安装过程中遇到问题，请参阅[故障排除指南](docs/TROUBLESHOOTING.zh-cn.md)。
+> 如果在安装过程中遇到问题，请参阅[故障排除指南](TROUBLESHOOTING.zh-cn.md)。
 
 ## 访问
 
@@ -393,8 +393,8 @@ docker compose -f docker-compose.rootless.yml up -d
 - `POZNOTE_OIDC_CLIENT_SECRET`
 - `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN`
 - 可选的运行时覆盖参数，例如 `POZNOTE_MCP_PORT` 和 `POZNOTE_DEBUG`
-- `POZNOTE_PHP_FPM_MAX_CHILDREN`，用于在繁忙的实例上调整同时处理的 PHP 请求数（默认 10），参见[故障排除指南](docs/TROUBLESHOOTING.zh-cn.md#the-app-stops-answering-under-load)
-- `POZNOTE_PHP_MEMORY_LIMIT`，用于调整每个请求的 PHP 内存上限，单位为 MB（默认 512），参见[故障排除指南](docs/TROUBLESHOOTING.zh-cn.md#a-request-runs-out-of-memory)
+- `POZNOTE_PHP_FPM_MAX_CHILDREN`，用于在繁忙的实例上调整同时处理的 PHP 请求数（默认 10），参见[故障排除指南](TROUBLESHOOTING.zh-cn.md#the-app-stops-answering-under-load)
+- `POZNOTE_PHP_MEMORY_LIMIT`，用于调整每个请求的 PHP 内存上限，单位为 MB（默认 512），参见[故障排除指南](TROUBLESHOOTING.zh-cn.md#a-request-runs-out-of-memory)
 - `POZNOTE_SETTINGS_PASSWORD`，用于在打开设置页面前额外要求输入一个密码，默认留空
 - `POZNOTE_MCP_AUTH_TOKEN`，用于要求 MCP 客户端提供 bearer token，参见 [MCP 服务器](#mcp-服务器)
 
@@ -569,7 +569,7 @@ curl -u 'username:pzn_2f7c…' https://YOUR_SERVER/api/v1/notes
 
 应用密码只能访问 REST API，而且仅限其所属资料：它无法打开网页界面、调用管理端点、修改您的密码或管理您的账户，即使账户是管理员也不行。因此，泄露的应用密码只会暴露一个账户的笔记，不会波及更多内容，撤销它即可堵住漏洞。在仅 SSO 的实例上，由 OIDC 创建的账户完全没有密码，应用密码是 API 通过 Basic Auth 接受的唯一凭据。
 
-完整的限制列表以及管理应用密码的端点见 [REST API 文档](docs/API-REST.md#authentication)。
+完整的限制列表以及管理应用密码的端点见 [REST API 文档](API-REST.md#authentication)。
 
 ## 笔记类型
 
@@ -850,7 +850,7 @@ Poznote 会记录在实例上执行的敏感操作的历史，让管理员可以
 
 Poznote 可以在实例上发生某些事件时通知外部服务，方法是向您注册的端点发送出站 Webhook（带 JSON 负载的 HTTP POST 请求），从而接入 n8n、Zapier 或您自己的脚本等自动化工具。管理员在 **设置 > 管理工具 > 管理员 Webhook** 中注册实例事件（账户、配额、注册），每个用户都可以在 **设置 > 用户 Webhook** 中为自己的笔记和提醒注册端点。
 
-当 Webhook 设置了密钥时，投递会使用 HMAC-SHA256 签名，笔记内容从不发送。所有事件、负载字段、签名验证和投递保证都在 **[Webhook 文档](docs/WEBHOOKS.zh-cn.md)** 中说明。
+当 Webhook 设置了密钥时，投递会使用 HMAC-SHA256 签名，笔记内容从不发送。所有事件、负载字段、签名验证和投递保证都在 **[Webhook 文档](WEBHOOKS.zh-cn.md)** 中说明。
 
 ## Git 同步
 
@@ -1215,7 +1215,7 @@ Poznote 内置 AI 聊天功能，可以连接本地的 [Ollama](https://ollama.c
 
 管理员在 **设置 → 管理工具 → AI 助手** 中启用后，每个资料的左侧图标栏中都会出现 **AI 助手** 按钮。AI 服务器由 Poznote 服务器调用，绝不会从您的浏览器调用，因此使用本地 Ollama 实例时，您的笔记永远不会离开您的机器。
 
-助手能做什么、如何选择提供商和模型、个人 API 密钥，以及如何从 Poznote 容器连接本地服务器，请参阅 [AI 助手文档](docs/AI-ASSISTANT.zh-cn.md)。如果想让外部 AI 助手（VS Code Copilot、Claude CLI 等）来管理您的笔记，请参阅下文的 [MCP 服务器](#mcp-服务器)。
+助手能做什么、如何选择提供商和模型、个人 API 密钥，以及如何从 Poznote 容器连接本地服务器，请参阅 [AI 助手文档](AI-ASSISTANT.zh-cn.md)。如果想让外部 AI 助手（VS Code Copilot、Claude CLI 等）来管理您的笔记，请参阅下文的 [MCP 服务器](#mcp-服务器)。
 
 ## 转录（语音转文字）
 
@@ -1223,7 +1223,7 @@ Poznote 内置 AI 聊天功能，可以连接本地的 [Ollama](https://ollama.c
 
 管理员在 **设置 → 管理工具 → 转录** 中启用后，斜杠菜单的 **插入** 下会出现 **听写**，音频附件上也会出现 **转录** 按钮。
 
-服务器的搭建、模型的选择以及其他所有内容，请参阅[转录文档](docs/TRANSCRIPTION.zh-cn.md)。
+服务器的搭建、模型的选择以及其他所有内容，请参阅[转录文档](TRANSCRIPTION.zh-cn.md)。
 
 ## MCP 服务器
 
@@ -1234,13 +1234,13 @@ Poznote 包含一个 Model Context Protocol (MCP) 服务器，让 GitHub Copilot
 - “列出我的 Poznote 工作区中的所有笔记”
 - “用新信息更新笔记 42”
 
-MCP 服务器随官方 `docker-compose.yml` 一起提供，并且只发布在 `127.0.0.1` 上，因此默认情况下，您机器之外的任何设备都无法访问它。安装、客户端配置、端口和调试的覆盖参数，以及在进一步暴露它时如何用 `POZNOTE_MCP_AUTH_TOKEN` 加以保护，请参阅 [MCP 服务器文档](docs/MCP-SERVER.zh-cn.md)。
+MCP 服务器随官方 `docker-compose.yml` 一起提供，并且只发布在 `127.0.0.1` 上，因此默认情况下，您机器之外的任何设备都无法访问它。安装、客户端配置、端口和调试的覆盖参数，以及在进一步暴露它时如何用 `POZNOTE_MCP_AUTH_TOKEN` 加以保护，请参阅 [MCP 服务器文档](MCP-SERVER.zh-cn.md)。
 
 ## Chrome 扩展
 
 **Poznote URL Saver** 是一款浏览器扩展，只需点击一下，即可将当前页面的 URL 甚至整页截图保存到您的 Poznote 实例。从 Chrome 网上应用店安装：[安装扩展](https://chromewebstore.google.com/detail/bmjclfamahegmgillaghhmnbkjebipbh?utm_source=item-share-cb)
 
-扩展使用您的用户名和一个[应用密码](#应用密码)连接到您的实例。配置步骤请参阅 [Chrome 扩展文档](docs/CHROME-EXTENSION.zh-cn.md)。
+扩展使用您的用户名和一个[应用密码](#应用密码)连接到您的实例。配置步骤请参阅 [Chrome 扩展文档](CHROME-EXTENSION.zh-cn.md)。
 
 ## 在 Android 上分享到 Poznote
 
@@ -1257,7 +1257,7 @@ MCP 服务器随官方 `docker-compose.yml` 一起提供，并且只发布在 `1
 
 Poznote 提供全面的 RESTful API v1，可以通过编程方式访问笔记、文件夹、工作区、标签、附件、备份、设置等。
 
-包含所有端点、参数和 curl 示例的完整 API 参考，请参阅 **[REST API 文档](docs/API-REST.md)**。
+包含所有端点、参数和 curl 示例的完整 API 参考，请参阅 **[REST API 文档](API-REST.md)**。
 
 ### 快速开始
 

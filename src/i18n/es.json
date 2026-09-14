@@ -2410,7 +2410,8 @@
       "sign_out": "Cerrar sesión",
       "invalid": "No se puede seleccionar esta cuenta."
     },
-    "or": "o"
+    "or": "o",
+    "session_expired": "Tu sesión ha expirado. Vuelve a iniciar sesión para regresar a donde estabas."
   },
   "restore_import": {
     "page": {
@@ -4382,6 +4383,9 @@
     "tool_list": "Listando notas recientes",
     "no_tools_notice": "Este modelo no admite herramientas: el asistente no puede consultar tus notas.",
     "no_tools_reasoning_notice": "Este modelo rechaza las herramientas con el esfuerzo de razonamiento actual, por lo que el asistente no puede consultar sus notas. Ponga el esfuerzo de razonamiento en Ninguno en los ajustes del asistente de IA.",
+    "unreachable": "No se pudo contactar con el servidor de IA tras {{attempts}} intentos: {{error}}",
+    "retrying": "La conexión con el servidor de IA falló, reintentando ({{attempt}}/{{max}})",
+    "retry": "Reintentar",
     "tool_rename": "Renombrando la nota #{{id}} a «{{title}}»",
     "tool_update": "Editando la nota #{{id}}",
     "tool_create": "Creando la nota: {{title}}",

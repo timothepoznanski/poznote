@@ -86,7 +86,7 @@ podman unshare chown -R 1000:1000 data
 rootlesskit chown -R 1000:1000 data
 ```
 
-Pour une nouvelle installation, suivez la [méthode d'installation rootless](../README.fr.md#rootless) du README. Pour migrer une instance Poznote existante, arrêtez-la, sauvegardez votre répertoire de données et changez-en le propriétaire, puis démarrez la variante rootless :
+Pour une nouvelle installation, suivez la [méthode d'installation rootless](README.fr.md#rootless) du README. Pour migrer une instance Poznote existante, arrêtez-la, sauvegardez votre répertoire de données et changez-en le propriétaire, puis démarrez la variante rootless :
 
 ```bash
 docker compose down

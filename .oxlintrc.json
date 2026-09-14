@@ -7,7 +7,7 @@
   //
   // Run locally the way CI does (keep the paths in sync with ci-js.yml):
   //   npx --yes oxlint@1.55.0 \
-  //     src poznote-url-saver excalidraw-build markdown-editor-build
+  //     src poznote-url-saver build
   //
   // The oxlint version is PINNED in .github/workflows/ci-js.yml (env block).
   // That block also holds the procedure to follow when upgrading it: a new
@@ -16,7 +16,7 @@
   // touching the severities below.
 
   // Vendored bundles and installed packages - never hand-edited.
-  // NB: the *sources* under excalidraw-build/ and markdown-editor-build/ are
+  // NB: the *sources* under build/excalidraw/ and build/markdown-editor/ are
   // ours and are linted; only their node_modules are skipped.
   "ignorePatterns": [
     "src/public/api-docs/**",

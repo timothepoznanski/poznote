@@ -140,6 +140,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     <title><?php echo t_h('welcome_page.page_title', [], 'Welcome'); ?> - <?php echo getPageTitle(); ?></title>
     <meta name="color-scheme" content="dark light">
     <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
+    <script src="js/session-guard.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <?php poznoteRenderStylesheets('welcome'); ?>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">

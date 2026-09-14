@@ -13,7 +13,7 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 echo "Rebuilding Markdown CodeMirror bundle..."
 
-cd "$ROOT_DIR/markdown-editor-build"
+cd "$ROOT_DIR/build/markdown-editor"
 
 echo "Installing/updating dependencies..."
 npm install

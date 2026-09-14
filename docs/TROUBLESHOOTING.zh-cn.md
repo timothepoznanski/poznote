@@ -86,7 +86,7 @@ podman unshare chown -R 1000:1000 data
 rootlesskit chown -R 1000:1000 data
 ```
 
-全新安装请按照 README 中的 [Rootless 安装方法](../README.zh-cn.md#rootless) 进行。要迁移现有的 Poznote 实例，请先停止它，备份数据目录并重新设置其所有者，然后启动 rootless 变体：
+全新安装请按照 README 中的 [Rootless 安装方法](README.zh-cn.md#rootless) 进行。要迁移现有的 Poznote 实例，请先停止它，备份数据目录并重新设置其所有者，然后启动 rootless 变体：
 
 ```bash
 docker compose down

@@ -1,14 +1,19 @@
 #!/bin/bash
 
 # Script to rebuild the Excalidraw bundle
-# Usage: ./rebuild-excalidraw.sh
+# Usage: ./tools/rebuild-excalidraw.sh
 #
 # After a rebuild that changes @excalidraw/excalidraw or its dependencies,
 # update the matching entry in vendor.json (version, updated, verified).
 
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
 echo "Rebuilding Excalidraw bundle..."
 
-cd excalidraw-build
+cd "$ROOT_DIR/build/excalidraw"
 
 echo "Installing/updating dependencies..."
 npm install
@@ -17,11 +22,9 @@ echo "Building bundle..."
 npm run build
 
 echo "Copying excalidraw-assets (fonts and lazy-loaded chunks)..."
-cp -r node_modules/@excalidraw/excalidraw/dist/excalidraw-assets ../src/js/excalidraw-dist/
+cp -r node_modules/@excalidraw/excalidraw/dist/excalidraw-assets "$ROOT_DIR/src/public/js/excalidraw-dist/"
 
 echo "Build completed!"
 echo "Bundle location: src/public/js/excalidraw-dist/excalidraw-bundle.iife.js"
 echo "Assets location: src/public/js/excalidraw-dist/excalidraw-assets/"
 echo "You can now refresh your Excalidraw editor page."
-
-cd ..

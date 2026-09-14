@@ -2411,7 +2411,8 @@
       "sign_out": "退出登录",
       "invalid": "无法选择此账户。"
     },
-    "or": "或"
+    "or": "或",
+    "session_expired": "您的会话已结束。请重新登录以返回之前的页面。"
   },
   "restore_import": {
     "page": {
@@ -4481,6 +4482,9 @@
     "tool_list": "列出最近的笔记",
     "no_tools_notice": "该模型不支持工具调用——助手无法浏览你的笔记。",
     "no_tools_reasoning_notice": "此模型在当前推理强度下拒绝工具调用，助手因此无法浏览您的笔记。请在 AI 助手设置中将推理强度设为“无”。",
+    "unreachable": "尝试 {{attempts}} 次后仍无法连接 AI 服务器：{{error}}",
+    "retrying": "连接 AI 服务器失败，正在重试（{{attempt}}/{{max}}）",
+    "retry": "重试",
     "tool_rename": "正在将笔记 #{{id}} 重命名为“{{title}}”",
     "tool_update": "正在编辑笔记 #{{id}}",
     "tool_create": "正在创建笔记：{{title}}",

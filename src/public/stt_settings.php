@@ -95,6 +95,7 @@ $sttSettingsScope = 'instance';
     <meta name="color-scheme" content="dark light">
     <?php $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion())); ?>
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="js/session-guard.js?v=<?php echo $cache_v; ?>"></script>
     <?php poznoteRenderStylesheets('stt_settings'); ?>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">

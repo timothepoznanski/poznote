@@ -126,6 +126,7 @@ function runScanner(bool $doDelete): array {
     <title><?php echo t_h('admin_tools.orphan_scanner.title', [], 'Orphan attachments scanner'); ?></title>
     <meta name="color-scheme" content="dark light">
     <script src="../js/theme-init.js?v=<?php echo $v; ?>"></script>
+    <script src="../js/session-guard.js?v=<?php echo $v; ?>"></script>
     <?php poznoteRenderStylesheets('admin/orphan-scanner', ['prefix' => '../']); ?>
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">
