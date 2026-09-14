@@ -2410,7 +2410,8 @@
       "sign_out": "Sair",
       "invalid": "Não foi possível selecionar esta conta."
     },
-    "or": "ou"
+    "or": "ou",
+    "session_expired": "A sua sessão expirou. Inicie sessão novamente para voltar onde estava."
   },
   "restore_import": {
     "page": {
@@ -4382,6 +4383,9 @@
     "tool_list": "Listando notas recentes",
     "no_tools_notice": "Este modelo não suporta ferramentas — o assistente não pode consultar as suas notas.",
     "no_tools_reasoning_notice": "Este modelo recusa as ferramentas com o esforço de raciocínio atual, pelo que o assistente não consegue consultar as suas notas. Defina o esforço de raciocínio como Nenhum nas definições do assistente de IA.",
+    "unreachable": "Não foi possível contatar o servidor de IA após {{attempts}} tentativas: {{error}}",
+    "retrying": "A conexão com o servidor de IA falhou, tentando novamente ({{attempt}}/{{max}})",
+    "retry": "Tentar novamente",
     "tool_rename": "Renomeando a nota #{{id}} para \"{{title}}\"",
     "tool_update": "Editando a nota #{{id}}",
     "tool_create": "Criando a nota: {{title}}",

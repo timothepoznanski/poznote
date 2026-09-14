@@ -195,6 +195,12 @@ docker exec <poznote-webserver-container> curl -s -m 3 http://172.17.0.1:11434/
 
 Si esto no devuelve nada, el problema está en la dirección en la que escucha Ollama o en un cortafuegos, no en Poznote. El botón **Comprobar el acceso y listar los modelos** de la página de configuración realiza la misma comprobación y rellena la lista de modelos si tiene éxito.
 
+## Errores de conexión
+
+Una petición que falla antes de que el servidor de IA haya respondido nada (un tiempo de espera de DNS agotado, una conexión rechazada, una negociación TLS que nunca termina) se envía de nuevo automáticamente, hasta tres intentos seguidos con una breve pausa entre ellos. Mientras tanto el chat muestra una línea *reintentando*, y no se pierde nada porque el servidor no había empezado a responder. Si el último intento también falla, el error aparece en el chat con un botón **Reintentar** que envía el mismo mensaje otra vez sin tener que volver a escribirlo.
+
+Un error que ocurre una vez que la respuesta ha empezado a llegar no se reintenta, ya que parte de la respuesta está ya en pantalla: usa el botón **Reintentar**.
+
 ## Privacidad
 
 El servidor de IA se llama desde el servidor de Poznote, nunca desde tu navegador. Con una instancia local de Ollama o LM Studio, tus notas y conversaciones nunca salen de tu máquina. Con un proveedor en la nube, las partes de tus notas que el asistente lee para responder se envían a ese proveedor.

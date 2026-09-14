@@ -880,6 +880,7 @@ try {
     $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     ?>
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="js/session-guard.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
     <?php poznoteRenderStylesheets('workspaces'); ?>
 </head>

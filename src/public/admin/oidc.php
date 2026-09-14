@@ -119,6 +119,7 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
     <title><?php echo t_h('oidc_admin.title', [], 'OIDC Configuration'); ?> - Poznote</title>
     <meta name="color-scheme" content="dark light">
     <script src="../js/theme-init.js?v=<?php echo $v; ?>"></script>
+    <script src="../js/session-guard.js?v=<?php echo $v; ?>"></script>
     <?php poznoteRenderStylesheets('admin/oidc', ['prefix' => '../']); ?>
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">

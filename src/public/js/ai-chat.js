@@ -357,6 +357,42 @@
         scrollToBottom();
     }
 
+    // Issue #1388: the server is sending the request again after a network
+    // failure (DNS timeout, refused connection). Shown as an activity line,
+    // like a tool call, so the pause reads as progress rather than a hang.
+    function appendRetryNotice(retry, pendingBubble) {
+        var div = document.createElement('div');
+        div.className = 'ai-chat-tool';
+        var icon = document.createElement('i');
+        icon.className = 'lucide lucide-refresh-cw';
+        div.appendChild(icon);
+        var label = t('ai_chat.retrying', {}, 'Connection to the AI server failed, retrying ({{attempt}}/{{max}})')
+            .replace('{{attempt}}', String(retry.attempt || '?'))
+            .replace('{{max}}', String(retry.max || '?'));
+        div.appendChild(document.createTextNode(' ' + label));
+        div.title = String(retry.error || '');
+        messagesEl().insertBefore(div, pendingBubble);
+        scrollToBottom();
+    }
+
+    // A failed turn keeps its text on a Retry button, so that the user does
+    // not have to paste the message again when the failure was a one-off
+    function appendRetryButton(errorBubble, text) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ai-chat-retry';
+        var icon = document.createElement('i');
+        icon.className = 'lucide lucide-refresh-cw';
+        btn.appendChild(icon);
+        btn.appendChild(document.createTextNode(' ' + t('ai_chat.retry', {}, 'Retry')));
+        btn.addEventListener('click', function () {
+            errorBubble.remove();
+            send(text);
+        });
+        errorBubble.appendChild(document.createElement('br'));
+        errorBubble.appendChild(btn);
+    }
+
     function saveConversation(workspace) {
         var key = storageKey(workspace !== undefined ? workspace : currentWorkspace());
         try {
@@ -567,20 +603,33 @@
         updateWorkspaceIndicator();
     }
 
-    function send() {
+    /**
+     * Send the input field, or, when retryText is given, send that text
+     * again after a failed turn: its bubble is still on screen, only the
+     * conversation entry (dropped by finish()) is put back.
+     */
+    function send(retryText) {
         if (streaming) {
             if (abortController) abortController.abort();
             return;
         }
-        var input = document.getElementById('ai-chat-input');
-        var text = input ? input.value.trim() : '';
-        if (!text) return;
-        input.value = '';
-        input.style.height = 'auto';
-        input.style.overflowY = 'hidden';
+        var isRetry = typeof retryText === 'string';
+        var text;
+        if (isRetry) {
+            text = retryText;
+        } else {
+            var input = document.getElementById('ai-chat-input');
+            text = input ? input.value.trim() : '';
+            if (!text) return;
+            input.value = '';
+            input.style.height = 'auto';
+            input.style.overflowY = 'hidden';
+        }
 
         conversation.push({ role: 'user', content: text });
-        appendBubble('ai-chat-msg-user', text);
+        if (!isRetry) {
+            appendBubble('ai-chat-msg-user', text);
+        }
 
         var body = { messages: conversation };
         var workspace = currentWorkspace();
@@ -629,6 +678,10 @@
                     appendToolActivity(obj.poznote_tool, bubble);
                     return;
                 }
+                if (obj.poznote_retry) {
+                    appendRetryNotice(obj.poznote_retry, bubble);
+                    return;
+                }
                 if (obj.poznote_notice === 'tools_unsupported' || obj.poznote_notice === 'tools_need_reasoning_none') {
                     appendToolsUnsupportedNotice(bubble, obj.poznote_notice);
                     return;
@@ -669,9 +722,10 @@
                 return;
             }
             bubble.remove();
-            appendBubble('ai-chat-msg-error',
+            var errorBubble = appendBubble('ai-chat-msg-error',
                 t('ai_chat.error', { error: (err && err.message) || 'unknown' }, 'Error: {{error}}')
                     .replace('{{error}}', (err && err.message) || 'unknown'));
+            appendRetryButton(errorBubble, text);
             finish(true);
         });
 

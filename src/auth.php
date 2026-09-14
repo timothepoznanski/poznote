@@ -36,6 +36,35 @@ $configured_port = $_ENV['HTTP_WEB_PORT'] ?? '8040';
 $session_name = 'POZNOTE_SESSION_' . $configured_port;
 session_name($session_name);
 
+// Sessions live in the data volume, not in the container's /tmp: recreating
+// the container (an update, a rollout) then keeps everyone signed in, since
+// the browser still holds its cookie and the file that cookie names is still
+// there (issue #1389). The directory is created on first use, stays private
+// to the PHP user, and nginx never serves anything under /data/.
+$sessionSavePath = __DIR__ . '/data/sessions';
+if (!is_dir($sessionSavePath)) {
+    @mkdir($sessionSavePath, 0700, true);
+}
+if (is_dir($sessionSavePath) && is_writable($sessionSavePath)) {
+    // A session opened before this directory existed is still in the old
+    // location: carry it over once, so the update that ships this change is
+    // not itself the restart that signs everyone out.
+    $currentSessionId = (string)($_COOKIE[$session_name] ?? '');
+    if ($currentSessionId !== '' && preg_match('/^[a-zA-Z0-9,-]{22,256}$/', $currentSessionId)) {
+        $legacySessionDir = (string)session_save_path();
+        if ($legacySessionDir === '') {
+            $legacySessionDir = sys_get_temp_dir();
+        }
+        $legacySessionFile = rtrim($legacySessionDir, '/') . '/sess_' . $currentSessionId;
+        $movedSessionFile = $sessionSavePath . '/sess_' . $currentSessionId;
+        if (!is_file($movedSessionFile) && is_file($legacySessionFile) && @copy($legacySessionFile, $movedSessionFile)) {
+            @chmod($movedSessionFile, 0600);
+            @unlink($legacySessionFile);
+        }
+    }
+    session_save_path($sessionSavePath);
+}
+
 session_start();
 
 // Prevent browser caching to ensure fresh content on every load (especially for home and settings)
@@ -1316,6 +1345,56 @@ function logout() {
     exit;
 }
 
+/**
+ * Turns away a request that carries no usable credential, in the shape its
+ * caller can act on (issue #1389):
+ *
+ *  - a top-level navigation goes to the login page, with the current URL as
+ *    the place to come back to once signed in;
+ *  - a call made by a page's script gets a bare 401 with a JSON body, and
+ *    js/session-guard.js sends the page to the login form itself. No Basic
+ *    challenge here: the browser would answer it with its own username and
+ *    password dialog, which cannot sign an SSO account in and hides the login
+ *    page that could;
+ *  - anything else is an API client and gets what it always had. From an API
+ *    gate that is 401 plus the Basic challenge (withheld when account
+ *    passwords are barred from the API); from a page gate, the redirect to
+ *    the login form.
+ *
+ * @param string $message   Error text for the JSON body.
+ * @param string $loginPath Path to login.php from the request's URL.
+ * @param bool   $isPage    True from a page gate (requireAuth), false from an
+ *                          API gate.
+ */
+function poznoteDenyUnauthenticatedRequest(string $message, string $loginPath, bool $isPage): void {
+    require_once __DIR__ . '/lib/request-kind.php';
+    $kind = poznoteClassifyRequest($_SERVER);
+
+    $sendToLogin = $isPage ? ($kind !== POZNOTE_REQUEST_SCRIPT) : ($kind === POZNOTE_REQUEST_DOCUMENT);
+    if ($sendToLogin) {
+        $params = [];
+        if (isAccountSelectionRequired()) {
+            $params['select_account'] = '1';
+        }
+        // Only a page the browser can land on again is worth coming back to.
+        $method = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
+        if ($kind === POZNOTE_REQUEST_DOCUMENT && in_array($method, ['GET', 'HEAD'], true)) {
+            $params['redirect'] = getCurrentRelativeRequestUri();
+        }
+        header('Location: ' . $loginPath . ($params === [] ? '' : '?' . http_build_query($params)));
+        exit;
+    }
+
+    http_response_code(401);
+    $basicAuthDisabled = defined('OIDC_DISABLE_BASIC_AUTH') && OIDC_DISABLE_BASIC_AUTH;
+    if ($kind === POZNOTE_REQUEST_CLIENT && !$basicAuthDisabled) {
+        header('WWW-Authenticate: Basic realm="Poznote API"');
+    }
+    header('Content-Type: application/json');
+    echo json_encode(['error' => $message]);
+    exit;
+}
+
 function requireAuth() {
     if (maybeAuthenticatePublicWorkspaceRequest()) {
         enforcePublicWorkspaceRequestAccess();
@@ -1323,8 +1402,7 @@ function requireAuth() {
     }
 
     if (!isAuthenticated()) {
-        header('Location: ' . (isAccountSelectionRequired() ? 'login.php?select_account=1' : 'login.php'));
-        exit;
+        poznoteDenyUnauthenticatedRequest('Authentication required', 'login.php', true);
     }
 
     syncUserPreferenceCookie();
@@ -1639,13 +1717,7 @@ function authenticateApiBasicAuth(bool $requireAdmin = false): array {
     
     if ($basicCredentials === null) {
         $msg = api_t('auth.api.authentication_required', [], 'Authentication required');
-        header('HTTP/1.1 401 Unauthorized');
-        if (!$basicAuthDisabled) {
-            header('WWW-Authenticate: Basic realm="Poznote API"');
-        }
-        header('Content-Type: application/json');
-        echo json_encode(['error' => $msg]);
-        exit;
+        poznoteDenyUnauthenticatedRequest($msg, '/login.php', false);
     }
     
     // "Disable Basic auth" is about account passwords: an SSO-only instance

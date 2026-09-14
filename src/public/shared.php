@@ -104,6 +104,7 @@ usort($shared_folders, function($a, $b) {
 	<title><?php echo getPageTitle(); ?></title>
 	<meta name="color-scheme" content="dark light">
 	<script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
+	<script src="js/session-guard.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 	<?php poznoteRenderStylesheets('shared'); ?>
 	<script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>

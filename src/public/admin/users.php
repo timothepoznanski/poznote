@@ -595,6 +595,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     <title><?php echo getPageTitle(); ?></title>
     <meta name="color-scheme" content="dark light">
     <script src="../js/theme-init.js?v=<?php echo $v; ?>"></script>
+    <script src="../js/session-guard.js?v=<?php echo $v; ?>"></script>
     <?php poznoteRenderStylesheets('admin/users', ['prefix' => '../']); ?>
     <style>
         /* The 12-column table needs ~1740px, more than the shared 1400px

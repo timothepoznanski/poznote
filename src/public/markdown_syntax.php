@@ -394,6 +394,7 @@ $examples = [
     <title><?php echo t_h('markdown_syntax.page_title', [], 'Markdown syntax'); ?> - Poznote</title>
     <meta name="color-scheme" content="dark light">
     <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
+    <script src="js/session-guard.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <?php poznoteRenderStylesheets('markdown_syntax'); ?>
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 </head>

@@ -195,6 +195,12 @@ docker exec <poznote-webserver-container> curl -s -m 3 http://172.17.0.1:11434/
 
 If this returns nothing, the problem is the Ollama binding or a firewall, not Poznote. The **Check access and list models** button in the settings page performs the same check and fills the model dropdown on success.
 
+## Connection errors
+
+A request that fails before the AI server has answered anything (a DNS timeout, a refused connection, a TLS handshake that never completes) is sent again automatically, up to three attempts in a row with a short pause between them. The chat shows a *retrying* line meanwhile, and nothing is lost since the server had not started answering. When the last attempt fails too, the error appears in the chat with a **Retry** button that sends the same message again without retyping it.
+
+An error that occurs once the answer has started streaming is not retried, since part of the answer is already on screen: use the **Retry** button.
+
 ## Privacy
 
 The AI server is called from the Poznote server, never from your browser. With a local Ollama or LM Studio instance, your notes and conversations never leave your machine. With a cloud provider, the parts of your notes the assistant reads to answer are sent to that provider.

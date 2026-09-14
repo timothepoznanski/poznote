@@ -148,6 +148,7 @@ if ($note_id > 0) {
     
     <!-- Theme initialization - CSP compliant -->
     <script src="js/excalidraw-theme-init.js?v=<?php echo $themeAssetVersion; ?>"></script>
+    <script src="js/session-guard.js?v=<?php echo $themeAssetVersion; ?>"></script>
     
     <?php poznoteRenderStylesheets('excalidraw_editor'); ?>
     

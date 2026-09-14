@@ -195,6 +195,12 @@ docker exec <poznote-webserver-container> curl -s -m 3 http://172.17.0.1:11434/
 
 Si cette commande ne renvoie rien, le problème vient de l'adresse d'écoute d'Ollama ou d'un pare-feu, pas de Poznote. Le bouton **Vérifier l'accès et lister les modèles** de la page de paramètres effectue la même vérification et remplit la liste déroulante des modèles en cas de succès.
 
+## Erreurs de connexion
+
+Une requête qui échoue avant que le serveur IA n'ait répondu quoi que ce soit (délai DNS dépassé, connexion refusée, négociation TLS qui n'aboutit pas) est renvoyée automatiquement, jusqu'à trois tentatives d'affilée avec une courte pause entre elles. Le chat affiche une ligne *nouvelle tentative* pendant ce temps, et rien n'est perdu puisque le serveur n'avait pas commencé à répondre. Si la dernière tentative échoue aussi, l'erreur apparaît dans le chat avec un bouton **Réessayer** qui renvoie le même message sans avoir à le retaper.
+
+Une erreur survenue une fois que la réponse a commencé à s'afficher n'est pas retentée, puisqu'une partie de la réponse est déjà à l'écran : utilisez le bouton **Réessayer**.
+
 ## Confidentialité
 
 Le serveur IA est appelé depuis le serveur Poznote, jamais depuis votre navigateur. Avec une instance locale d'Ollama ou de LM Studio, vos notes et vos conversations ne quittent jamais votre machine. Avec un fournisseur cloud, les parties de vos notes que l'assistant lit pour répondre sont envoyées à ce fournisseur.

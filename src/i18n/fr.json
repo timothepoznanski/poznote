@@ -2415,7 +2415,8 @@
       "sign_out": "Se déconnecter",
       "invalid": "Impossible de sélectionner ce compte."
     },
-    "or": "ou"
+    "or": "ou",
+    "session_expired": "Votre session a expiré. Reconnectez-vous pour revenir là où vous étiez."
   },
   "restore_import": {
     "page": {
@@ -4486,6 +4487,9 @@
     "tool_list": "Liste des notes récentes",
     "no_tools_notice": "Ce modèle ne supporte pas les outils — l'assistant ne peut pas parcourir vos notes.",
     "no_tools_reasoning_notice": "Ce modèle refuse les outils avec l'effort de raisonnement actuel, l'assistant ne peut donc pas parcourir vos notes. Réglez l'effort de raisonnement sur Aucun dans les paramètres de l'assistant IA.",
+    "unreachable": "Impossible de joindre le serveur IA après {{attempts}} tentatives : {{error}}",
+    "retrying": "La connexion au serveur IA a échoué, nouvelle tentative ({{attempt}}/{{max}})",
+    "retry": "Réessayer",
     "tool_rename": "Renommage de la note #{{id}} en « {{title}} »",
     "tool_update": "Modification de la note #{{id}}",
     "tool_create": "Création de la note : {{title}}",

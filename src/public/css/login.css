@@ -382,6 +382,12 @@ input[type="password"]::placeholder {
     text-align: left;
 }
 
+/* Shown above the form when js/session-guard.js brought the user here */
+.session-expired-notice {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
 .info a {
     color: var(--pz-accent);
     text-decoration: none;

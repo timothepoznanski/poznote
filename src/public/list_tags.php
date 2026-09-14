@@ -64,6 +64,7 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<title><?php echo getPageTitle(); ?></title>
 	<meta name="color-scheme" content="dark light">
 	<script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
+	<script src="js/session-guard.js?v=<?php echo $cache_v; ?>"></script>
 	<?php poznoteRenderStylesheets('list_tags'); ?>
 	<script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
