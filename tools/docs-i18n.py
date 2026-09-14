@@ -6,8 +6,9 @@ Usage:
     python3 tools/docs-i18n.py fix          # selectors, links and anchors
 
 Every page in PAGES has one translation per language in LANGUAGES, stored
-next to it as <name>.<lang>.md (README.fr.md, docs/MCP-SERVER.fr.md), so the
-relative image paths are the same in both.
+next to it as <name>.<lang>.md (docs/MCP-SERVER.fr.md). The root README is
+the exception: its translations live in docs/ (docs/README.fr.md) so the
+repository root only carries the English one.
 
 Translators keep every link target and #anchor exactly as in English. `fix`
 then does three things on every page:
@@ -16,7 +17,10 @@ then does three things on every page:
      top of the page, English included;
   2. points relative links to a translated page at the same language
      (docs/MCP-SERVER.md -> docs/MCP-SERVER.fr.md); API-REST.md and the other
-     untranslated pages keep their English link;
+     untranslated pages keep their English link. A relative target copied
+     verbatim from an English page that lives in another directory (the
+     README's images/ and docs/ links, once the translation sits in docs/)
+     is re-based on the translated page's location;
   3. rewrites #anchors that come from a heading. A translated heading gets a
      different GitHub slug, so the anchor is resolved to the Nth heading of
      the English target page and replaced by the slug of the Nth heading of
@@ -70,15 +74,28 @@ INLINE_CODE_RE = re.compile(r"(`+)(.+?)\1")
 EM_DASH_RE = re.compile(r"\s—\s|—")
 
 
+# Pages whose translations do not sit next to the English file.
+TRANSLATION_DIRS = {
+    "README.md": "docs",
+}
+
+
 def translated_path(page, lang):
     if lang == "en":
         return page
     stem = page[:-3]
+    if page in TRANSLATION_DIRS:
+        stem = f"{TRANSLATION_DIRS[page]}/{Path(stem).name}"
     return f"{stem}.{lang}.md"
 
 
 def english_path(path):
-    """docs/MCP-SERVER.fr.md -> (docs/MCP-SERVER.md, "fr")."""
+    """docs/MCP-SERVER.fr.md -> (docs/MCP-SERVER.md, "fr"),
+    docs/README.fr.md -> (README.md, "fr")."""
+    for page in TRANSLATION_DIRS:
+        for lang in LANGUAGES:
+            if lang != "en" and path == translated_path(page, lang):
+                return page, lang
     for lang in LANGUAGES:
         if lang != "en" and path.endswith(f".{lang}.md"):
             return path[: -len(f".{lang}.md")] + ".md", lang
@@ -248,8 +265,17 @@ def fix_link_target(doc_rel, lang, target):
     if is_external(target) or target.startswith("#") and lang == "en":
         return target
     path, anchor = resolve(doc_rel, target)
+    if lang != "en" and path and not (ROOT / path).exists():
+        # Target copied verbatim from the English page, which may live in
+        # another directory: resolve it from there instead.
+        en_rel, _ = english_path(doc_rel)
+        from_en, _ = resolve(en_rel, target)
+        if (ROOT / from_en).exists():
+            path = from_en
     if not path.endswith(".md"):
-        return target
+        if lang == "en" or not path or not (ROOT / path).exists():
+            return target
+        return relative(doc_rel, path) + (f"#{anchor}" if anchor else "")
     en_target, _ = english_path(path)
     new_path = path
     if lang != "en" and en_target in PAGES and (ROOT / translated_path(en_target, lang)).is_file():
@@ -323,9 +349,14 @@ def rewrite_line_links(rel, lang, line):
             f"[{m.group(2)}]({fix_link_target(rel, lang, m.group(3))})",
             piece,
         )
+        piece = MD_LINK_RE.sub(
+            lambda m: m.group(0) if not m.group(1) else
+            f"![{m.group(2)}]({fix_link_target(rel, lang, m.group(3))})",
+            piece,
+        )
         piece = re.sub(
-            r"\bhref=\"([^\"]+)\"",
-            lambda m: f"href=\"{fix_link_target(rel, lang, m.group(1))}\"",
+            r"\b(href|src)=\"([^\"]+)\"",
+            lambda m: f"{m.group(1)}=\"{fix_link_target(rel, lang, m.group(2))}\"",
             piece,
         )
         pieces[k] = piece
@@ -400,8 +431,12 @@ def check():
             report(rel, f"explicit anchors differ: missing {sorted(en.explicit - doc.explicit)}, "
                         f"extra {sorted(doc.explicit - en.explicit)}")
 
-        en_images = [t for _, k, t in en.links() if k == "image"]
-        tr_images = [t for _, k, t in doc.links() if k == "image"]
+        def image_paths(d):
+            return [t if is_external(t) or t.startswith("data:") else resolve(d.rel, t)[0]
+                    for _, k, t in d.links() if k == "image"]
+
+        en_images = image_paths(en)
+        tr_images = image_paths(doc)
         if en_images != tr_images:
             report(rel, "images differ from English")
 

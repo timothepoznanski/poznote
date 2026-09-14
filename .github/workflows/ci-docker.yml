@@ -12,14 +12,12 @@ on:
     paths:
       - 'Dockerfile'
       - 'docker/**'
-      - 'init.sh'
       - 'docker-compose*.yml'
       - '.github/workflows/ci-docker.yml'
   pull_request:
     paths:
       - 'Dockerfile'
       - 'docker/**'
-      - 'init.sh'
       - 'docker-compose*.yml'
       - '.github/workflows/ci-docker.yml'
 

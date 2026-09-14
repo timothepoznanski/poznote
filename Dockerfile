@@ -57,7 +57,7 @@ WORKDIR /var/www/html
 
 # Copy initialization script and write the build-time version marker.
 # Application source is copied per final stage below (ownership differs).
-COPY init.sh /usr/local/bin/init.sh
+COPY docker/init.sh /usr/local/bin/init.sh
 RUN chmod +x /usr/local/bin/init.sh \
     && printf '%s\n' "<?php" "define('APP_VERSION', '${APP_VERSION}');" > /var/www/html/version.php \
     && chmod 755 /var/www/html

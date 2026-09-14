@@ -261,10 +261,10 @@
         }
       ],
       "build": {
-        "dir": "excalidraw-build",
+        "dir": "build/excalidraw",
         "script": "tools/rebuild-excalidraw.sh",
-        "manifest": "excalidraw-build/package.json",
-        "lockfile": "excalidraw-build/package-lock.json"
+        "manifest": "build/excalidraw/package.json",
+        "lockfile": "build/excalidraw/package-lock.json"
       },
       "vendored": "2025-10-25",
       "updated": "2026-08-04",
@@ -272,7 +272,7 @@
       "loaded_by": [
         "src/public/excalidraw_editor.php"
       ],
-      "notes": "Built here, not downloaded: the committed bundle also contains React 18.3.1, react-dom and lodash. Run 'npm audit' in excalidraw-build for advisories covering the whole dependency tree; package-lock.json is the authoritative version record."
+      "notes": "Built here, not downloaded: the committed bundle also contains React 18.3.1, react-dom and lodash. Run 'npm audit' in build/excalidraw for advisories covering the whole dependency tree; package-lock.json is the authoritative version record."
     },
     {
       "id": "codemirror",
@@ -287,10 +287,10 @@
         }
       ],
       "build": {
-        "dir": "markdown-editor-build",
+        "dir": "build/markdown-editor",
         "script": "tools/rebuild-markdown-editor.sh",
-        "manifest": "markdown-editor-build/package.json",
-        "lockfile": "markdown-editor-build/package-lock.json"
+        "manifest": "build/markdown-editor/package.json",
+        "lockfile": "build/markdown-editor/package-lock.json"
       },
       "vendored": "2026-06-20",
       "updated": "2026-09-03",
@@ -299,7 +299,7 @@
         "src/public/index.php",
         "src/public/js/markdown-editor.js (bridge)"
       ],
-      "notes": "Built here from about twenty @codemirror packages, so there is no single version number: package-lock.json is the authoritative record and 'npm audit' in markdown-editor-build is the advisory check."
+      "notes": "Built here from about twenty @codemirror packages, so there is no single version number: package-lock.json is the authoritative record and 'npm audit' in build/markdown-editor is the advisory check."
     }
   ]
 }

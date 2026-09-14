@@ -1,8 +1,8 @@
 name: CI - Docs
 
 # The README and the pages in docs/ (except API-REST.md) are translated into
-# every app language, next to the English page: README.fr.md,
-# docs/WEBHOOKS.de.md, and so on. tools/docs-i18n.py check fails when a
+# every app language, under docs/: docs/README.fr.md, docs/WEBHOOKS.de.md,
+# and so on. tools/docs-i18n.py check fails when a
 # translation drifts from its English page in a way that breaks the rendered
 # docs: a missing page, a heading added on one side only (the heading anchors
 # are mapped by position, so every later link would point to the wrong

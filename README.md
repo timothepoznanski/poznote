@@ -1,12 +1,12 @@
 <!-- lang-selector -->
 <p align="center">
   <b>English</b> ·
-  <a href="README.fr.md">Français</a> ·
-  <a href="README.de.md">Deutsch</a> ·
-  <a href="README.es.md">Español</a> ·
-  <a href="README.pt.md">Português</a> ·
-  <a href="README.ru.md">Русский</a> ·
-  <a href="README.zh-cn.md">简体中文</a>
+  <a href="docs/README.fr.md">Français</a> ·
+  <a href="docs/README.de.md">Deutsch</a> ·
+  <a href="docs/README.es.md">Español</a> ·
+  <a href="docs/README.pt.md">Português</a> ·
+  <a href="docs/README.ru.md">Русский</a> ·
+  <a href="docs/README.zh-cn.md">简体中文</a>
 </p>
 <!-- /lang-selector -->
 

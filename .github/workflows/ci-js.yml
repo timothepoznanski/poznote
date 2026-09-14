@@ -44,7 +44,7 @@ on:
 #   1. Set OXLINT_VERSION to the new release.
 #   2. Run the exact same command as the job below, from the repo root:
 #        npx --yes oxlint@<VERSION> \
-#          src poznote-url-saver excalidraw-build markdown-editor-build
+#          src poznote-url-saver build
 #   3. Read the ERROR lines only. Warnings never fail the build and can be
 #      left alone. For each new error, decide:
 #        - a genuine bug        -> fix the code
@@ -54,8 +54,8 @@ on:
 #   4. Re-run until the command exits 0, then commit ci-js.yml and
 #      .oxlintrc.json in the SAME commit.
 #
-# Do not "fix" a new error by editing anything under excalidraw-build/ or
-# markdown-editor-build/ without rebuilding the corresponding bundle: those
+# Do not "fix" a new error by editing anything under build/excalidraw/ or
+# build/markdown-editor/ without rebuilding the corresponding bundle: those
 # sources compile into src/public/js/excalidraw-dist and src/public/js/codemirror-dist, and
 # editing one without the other leaves the shipped bundle out of sync.
 #
@@ -81,9 +81,9 @@ jobs:
 
       # Vendored bundles (swagger-ui, mermaid, katex, highlight.js, excalidraw,
       # codemirror, *.min.js) and node_modules are excluded via .oxlintrc.json.
-      # The *-build directories hold the hand-written sources that compile into
+      # The build/ directories hold the hand-written sources that compile into
       # src/public/js/{excalidraw,codemirror}-dist, so they are linted too.
       - name: Lint JavaScript
         run: |
           npx --yes "oxlint@${OXLINT_VERSION}" \
-            src poznote-url-saver excalidraw-build markdown-editor-build
+            src poznote-url-saver build

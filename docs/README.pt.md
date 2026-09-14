@@ -1,6 +1,6 @@
 <!-- lang-selector -->
 <p align="center">
-  <a href="README.md">English</a> ·
+  <a href="../README.md">English</a> ·
   <a href="README.fr.md">Français</a> ·
   <a href="README.de.md">Deutsch</a> ·
   <a href="README.es.md">Español</a> ·
@@ -12,7 +12,7 @@
 
 
 <p align="center">
-  <img src="images/poznote-logo-text.png" alt="Poznote Logo" width="400">
+  <img src="../images/poznote-logo-text.png" alt="Poznote Logo" width="400">
 </p>
 
 <h2 align="center">
@@ -34,7 +34,7 @@ Uma alternativa gratuita, auto-hospedada e de código aberto ao Notion, Obsidian
 </p>
 
 <p align="center">
-  <img src="images/pres1.png" alt="Poznote-light" width="100%">
+  <img src="../images/pres1.png" alt="Poznote-light" width="100%">
 </p>
 
 ### Recursos
@@ -332,7 +332,7 @@ mkdir -p data
 sudo chown -R 1000:1000 data
 ```
 
-Muitas vezes o `sudo` não é necessário aqui: se o seu usuário já tem o uid `1000`, o `chown` pode ser pulado, e no Podman/Docker rootless ele pode ser executado sem root, veja [Execução rootless](docs/TROUBLESHOOTING.pt.md#running-rootless).
+Muitas vezes o `sudo` não é necessário aqui: se o seu usuário já tem o uid `1000`, o `chown` pode ser pulado, e no Podman/Docker rootless ele pode ser executado sem root, veja [Execução rootless](TROUBLESHOOTING.pt.md#running-rootless).
 
 Crie o arquivo de ambiente:
 ```bash
@@ -359,13 +359,13 @@ Inicie os contêineres do Poznote:
 docker compose -f docker-compose.rootless.yml up -d
 ```
 
-Para migrar uma instância existente do Poznote para a variante rootless, ou para mais detalhes, veja [Execução rootless](docs/TROUBLESHOOTING.pt.md#running-rootless) no Guia de solução de problemas.
+Para migrar uma instância existente do Poznote para a variante rootless, ou para mais detalhes, veja [Execução rootless](TROUBLESHOOTING.pt.md#running-rootless) no Guia de solução de problemas.
 
 </details>
 
 <br>
 
-> Se encontrar problemas na instalação, consulte o [Guia de solução de problemas](docs/TROUBLESHOOTING.pt.md).
+> Se encontrar problemas na instalação, consulte o [Guia de solução de problemas](TROUBLESHOOTING.pt.md).
 
 ## Acesso
 
@@ -393,8 +393,8 @@ A maioria das configurações do dia a dia é alterada pela interface do Poznote
 - `POZNOTE_OIDC_CLIENT_SECRET`
 - `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN`
 - Substituições opcionais de execução, como `POZNOTE_MCP_PORT` e `POZNOTE_DEBUG`
-- `POZNOTE_PHP_FPM_MAX_CHILDREN` para alterar o número de requisições PHP simultâneas (padrão 10) em uma instância muito usada, veja o [Guia de solução de problemas](docs/TROUBLESHOOTING.pt.md#the-app-stops-answering-under-load)
-- `POZNOTE_PHP_MEMORY_LIMIT` para alterar o limite de memória do PHP por requisição, em MB (padrão 512), veja o [Guia de solução de problemas](docs/TROUBLESHOOTING.pt.md#a-request-runs-out-of-memory)
+- `POZNOTE_PHP_FPM_MAX_CHILDREN` para alterar o número de requisições PHP simultâneas (padrão 10) em uma instância muito usada, veja o [Guia de solução de problemas](TROUBLESHOOTING.pt.md#the-app-stops-answering-under-load)
+- `POZNOTE_PHP_MEMORY_LIMIT` para alterar o limite de memória do PHP por requisição, em MB (padrão 512), veja o [Guia de solução de problemas](TROUBLESHOOTING.pt.md#a-request-runs-out-of-memory)
 - `POZNOTE_SETTINGS_PASSWORD` para pedir uma senha adicional antes de abrir a página de Configurações, vazio por padrão
 - `POZNOTE_MCP_AUTH_TOKEN` para exigir um token bearer dos clientes MCP, veja [Servidor MCP](#servidor-mcp)
 
@@ -569,7 +569,7 @@ curl -u 'username:pzn_2f7c…' https://YOUR_SERVER/api/v1/notes
 
 Uma senha de aplicativo só alcança a API REST, e apenas para o próprio perfil: ela não pode abrir a interface web, chamar um endpoint de administração, alterar sua senha nem gerenciar sua conta, mesmo quando a conta é de administrador. Por isso uma senha vazada expõe as notas de uma única conta e nada mais, e revogá-la fecha a brecha. Em uma instância apenas SSO, onde as contas criadas pelo OIDC não têm senha nenhuma, ela é a única credencial que a API aceita via Basic Auth.
 
-A lista completa de limites e os endpoints que gerenciam as senhas de aplicativo estão na [documentação da API REST](docs/API-REST.md#authentication).
+A lista completa de limites e os endpoints que gerenciam as senhas de aplicativo estão na [documentação da API REST](API-REST.md#authentication).
 
 ## Tipos de nota
 
@@ -850,7 +850,7 @@ O registro guarda o fato de que uma operação aconteceu, não os dados que ela 
 
 O Poznote pode notificar serviços externos quando algo acontece na instância, enviando webhooks de saída (requisições HTTP POST com um payload JSON) para os endpoints que você cadastrar, o que permite conectá-lo a ferramentas de automação como n8n, Zapier ou seus próprios scripts. Os administradores cadastram os eventos da instância (contas, cotas, inscrições) em **Configurações > Ferramentas de administração > Webhooks de administrador**, e cada usuário pode cadastrar endpoints para as próprias notas e lembretes em **Configurações > Webhooks de usuário**.
 
-As entregas são assinadas com HMAC-SHA256 quando o webhook tem um segredo, e o conteúdo das notas nunca é enviado. Todos os eventos, os campos do payload, a verificação da assinatura e as garantias de entrega estão descritos na **[documentação de Webhooks](docs/WEBHOOKS.pt.md)**.
+As entregas são assinadas com HMAC-SHA256 quando o webhook tem um segredo, e o conteúdo das notas nunca é enviado. Todos os eventos, os campos do payload, a verificação da assinatura e as garantias de entrega estão descritos na **[documentação de Webhooks](WEBHOOKS.pt.md)**.
 
 ## Sincronização Git
 
@@ -1215,7 +1215,7 @@ O Poznote inclui um chat de IA integrado que se conecta a uma instância local d
 
 Um administrador o ativa em **Configurações → Ferramentas de administração → Assistente IA**, e cada perfil passa então a ter um botão **Assistente IA** na barra de ícones à esquerda. O servidor de IA é chamado pelo servidor do Poznote, nunca pelo seu navegador, então com uma instância local do Ollama suas notas nunca saem da sua máquina.
 
-O que o assistente sabe fazer, a escolha de um provedor e de um modelo, as chaves de API pessoais e a conexão de um servidor local a partir do contêiner do Poznote estão descritos na [documentação do Assistente IA](docs/AI-ASSISTANT.pt.md). Para deixar um assistente de IA externo (VS Code Copilot, Claude CLI...) gerenciar suas notas, veja o [Servidor MCP](#servidor-mcp) abaixo.
+O que o assistente sabe fazer, a escolha de um provedor e de um modelo, as chaves de API pessoais e a conexão de um servidor local a partir do contêiner do Poznote estão descritos na [documentação do Assistente IA](AI-ASSISTANT.pt.md). Para deixar um assistente de IA externo (VS Code Copilot, Claude CLI...) gerenciar suas notas, veja o [Servidor MCP](#servidor-mcp) abaixo.
 
 ## Transcrição (fala para texto)
 
@@ -1223,7 +1223,7 @@ Transforme voz em texto de nota com um servidor de fala para texto que você mes
 
 Depois que um administrador ativa o recurso em **Configurações → Ferramentas de administração → Transcrição**, você ganha **Ditar** em **Inserir** no menu de barra (slash), e um botão **Transcrever** nos anexos de áudio.
 
-A configuração de um servidor, a escolha do modelo e todo o resto estão na [documentação da Transcrição](docs/TRANSCRIPTION.pt.md).
+A configuração de um servidor, a escolha do modelo e todo o resto estão na [documentação da Transcrição](TRANSCRIPTION.pt.md).
 
 ## Servidor MCP
 
@@ -1234,13 +1234,13 @@ O Poznote inclui um servidor Model Context Protocol (MCP) que permite a assisten
 - "Liste todas as notas do meu espaço de trabalho do Poznote"
 - "Atualize a nota 42 com novas informações"
 
-O servidor MCP vem com o `docker-compose.yml` oficial e é publicado apenas em `127.0.0.1`, então, por padrão, nada fora da sua máquina consegue acessá-lo. A instalação, a configuração dos clientes, as substituições de porta e de depuração, e como protegê-lo com `POZNOTE_MCP_AUTH_TOKEN` quando você o expõe mais estão descritos na [documentação do Servidor MCP](docs/MCP-SERVER.pt.md).
+O servidor MCP vem com o `docker-compose.yml` oficial e é publicado apenas em `127.0.0.1`, então, por padrão, nada fora da sua máquina consegue acessá-lo. A instalação, a configuração dos clientes, as substituições de porta e de depuração, e como protegê-lo com `POZNOTE_MCP_AUTH_TOKEN` quando você o expõe mais estão descritos na [documentação do Servidor MCP](MCP-SERVER.pt.md).
 
 ## Extensão do Chrome
 
 O **Poznote URL Saver** é uma extensão de navegador que salva com um único clique a URL, ou até uma captura de tela da página inteira, da página atual na sua instância do Poznote. Instale-a pela Chrome Web Store: [Instalar a extensão](https://chromewebstore.google.com/detail/bmjclfamahegmgillaghhmnbkjebipbh?utm_source=item-share-cb)
 
-A extensão se conecta à sua instância com o seu nome de usuário e uma [senha de aplicativo](#senhas-de-aplicativo). Os passos de configuração estão na [documentação da extensão do Chrome](docs/CHROME-EXTENSION.pt.md).
+A extensão se conecta à sua instância com o seu nome de usuário e uma [senha de aplicativo](#senhas-de-aplicativo). Os passos de configuração estão na [documentação da extensão do Chrome](CHROME-EXTENSION.pt.md).
 
 ## Compartilhar com o Poznote no Android
 
@@ -1257,7 +1257,7 @@ Para usar:
 
 O Poznote oferece uma API RESTful v1 abrangente para acesso programático a notas, pastas, espaços de trabalho, tags, anexos, backups, configurações e muito mais.
 
-Para a referência completa da API, com todos os endpoints, parâmetros e exemplos com curl, consulte a **[Documentação da API REST](docs/API-REST.md)**.
+Para a referência completa da API, com todos os endpoints, parâmetros e exemplos com curl, consulte a **[Documentação da API REST](API-REST.md)**.
 
 ### Início rápido
 
