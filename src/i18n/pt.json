@@ -332,7 +332,8 @@
     "modal": {
       "search_placeholder": "Buscar por uma nota...",
       "recent_notes": "Notas recentes",
-      "create_button": "Criar e vincular"
+      "create_button": "Criar e vincular",
+      "all_workspaces": "Buscar em todos os espaços de trabalho"
     },
     "empty": {
       "no_notes_found": "Nenhuma nota encontrada",

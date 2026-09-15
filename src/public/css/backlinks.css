@@ -77,3 +77,18 @@
 .backlink-link:visited {
     color: var(--pz-accent);
 }
+
+/* Workspace of a linking note that lives in another workspace */
+.backlink-workspace {
+    margin-left: 6px;
+    padding: 0 6px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm);
+    font-size: 11px;
+    line-height: 16px;
+    color: var(--pz-text-muted);
+}
+
+.backlink-link:hover .backlink-workspace {
+    text-decoration: none;
+}

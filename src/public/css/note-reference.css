@@ -207,6 +207,35 @@
     font-size: 10px;
 }
 
+.note-reference-item-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 12px;
+}
+
+/* "Search all workspaces" checkbox under the search field */
+.note-reference-all-workspaces {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: -4px 0 12px;
+    padding-left: 4px;
+    font-size: 13px;
+    color: var(--text-muted, var(--pz-text-muted));
+    cursor: pointer;
+    user-select: none;
+}
+
+.note-reference-all-workspaces[hidden] {
+    display: none;
+}
+
+.note-reference-all-workspaces input {
+    margin: 0;
+    cursor: pointer;
+}
+
 /* Internal note links in content */
 a.note-internal-link,
 span.note-internal-link {

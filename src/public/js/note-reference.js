@@ -9,6 +9,7 @@
     // ============================================================================
     
     const RECENT_NOTES_KEY = 'poznote_recent_notes';
+    const ALL_WORKSPACES_KEY = 'poznote_note_reference_all_workspaces';
     const MAX_RECENT_NOTES = 10;
     const SEARCH_DEBOUNCE_MS = 200;
     const MAX_SEARCH_RESULTS = 20;
@@ -46,6 +47,34 @@
             return selectedWorkspace;
         }
         return '';
+    }
+
+    /**
+     * Whether the picker lists the notes of every workspace (remembered per browser)
+     */
+    function isAllWorkspacesSearch() {
+        try {
+            return localStorage.getItem(ALL_WORKSPACES_KEY) === '1';
+        } catch (e) {
+            return false;
+        }
+    }
+
+    /**
+     * Task and title inputs get a [[Title]] reference, which only resolves
+     * within the current workspace; editors get an id link that works anywhere.
+     */
+    function canLinkAcrossWorkspaces() {
+        if (isPublicWorkspaceMode()) return false;
+        return !(savedEditableElement && savedEditableElement.tagName === 'INPUT');
+    }
+
+    function setAllWorkspacesSearch(enabled) {
+        try {
+            localStorage.setItem(ALL_WORKSPACES_KEY, enabled ? '1' : '0');
+        } catch (e) {
+            console.debug('note-reference: setAllWorkspacesSearch() failed:', e);
+        }
     }
 
     // ============================================================================
@@ -205,6 +234,12 @@
         
         modal.style.display = 'flex';
         
+        const allWorkspacesToggle = document.getElementById('noteReferenceAllWorkspaces');
+        if (allWorkspacesToggle) {
+            allWorkspacesToggle.checked = isAllWorkspacesSearch();
+            allWorkspacesToggle.closest('label').hidden = !canLinkAcrossWorkspaces();
+        }
+
         // Clear and focus search input
         const searchInput = document.getElementById('noteReferenceSearch');
         if (searchInput) {
@@ -267,7 +302,7 @@
     /**
      * Render a single note item in the list
      */
-    function renderNoteItem(note, isRecent) {
+    function renderNoteItem(note, isRecent, workspace) {
         const item = document.createElement('div');
         item.className = 'note-reference-item';
         if (isRecent) {
@@ -276,11 +311,16 @@
         
         const heading = note.heading || tr('note_reference.untitled', {}, 'Untitled');
         const folder = note.folder || '';
+        // Only notes of another workspace are labelled with theirs
+        const otherWorkspace = note.workspace && note.workspace !== workspace ? note.workspace : '';
         
         item.innerHTML = `
             <div class="note-reference-item-content">
                 <span class="note-reference-item-title">${escapeHtml(heading)}</span>
-                ${folder ? `<span class="note-reference-item-folder"><i class="lucide lucide-folder"></i> ${escapeHtml(folder)}</span>` : ''}
+                ${(folder || otherWorkspace) ? `<span class="note-reference-item-meta">
+                    ${otherWorkspace ? `<span class="note-reference-item-folder note-reference-item-workspace"><i class="lucide lucide-layers"></i> ${escapeHtml(otherWorkspace)}</span>` : ''}
+                    ${folder ? `<span class="note-reference-item-folder"><i class="lucide lucide-folder"></i> ${escapeHtml(folder)}</span>` : ''}
+                </span>` : ''}
             </div>
         `;
         
@@ -305,9 +345,13 @@
         
         try {
             const workspace = getCurrentWorkspace();
+            const allWorkspaces = isAllWorkspacesSearch() && canLinkAcrossWorkspaces();
             
-            // Fetch notes from RESTful API: GET /api/v1/notes
-            const response = await fetch(`/api/v1/notes?workspace=${encodeURIComponent(workspace)}`);
+            // Fetch notes from RESTful API: GET /api/v1/notes (no workspace
+            // parameter lists the notes of every workspace)
+            const response = await fetch(allWorkspaces
+                ? '/api/v1/notes'
+                : `/api/v1/notes?workspace=${encodeURIComponent(workspace)}`);
             const data = await response.json();
             
             if (!data.success || !data.notes) {
@@ -356,7 +400,7 @@
             
             displayNotes.forEach(note => {
                 const isRecent = recentIds.includes(String(note.id));
-                const item = renderNoteItem(note, isRecent);
+                const item = renderNoteItem(note, isRecent, workspace);
                 listContainer.appendChild(item);
             });
             
@@ -554,11 +598,56 @@
     }
 
     /**
+     * Workspace of a note, or null when it cannot be told (public workspace,
+     * missing note, network error): callers then stay in the current one.
+     */
+    async function getNoteWorkspace(noteId) {
+        if (isPublicWorkspaceMode()) return null;
+        try {
+            const response = await fetch(`/api/v1/notes/resolve?reference=${encodeURIComponent(noteId)}`);
+            if (!response.ok) return null;
+            const data = await response.json();
+            return data.success && typeof data.workspace === 'string' && data.workspace !== '' ? data.workspace : null;
+        } catch (e) {
+            console.debug('note-reference: getNoteWorkspace() failed:', e);
+            return null;
+        }
+    }
+
+    function isPublicWorkspaceMode() {
+        if (document.body && document.body.classList.contains('public-workspace-readonly')) return true;
+        if (typeof window.isPublicWorkspaceNavigationActive === 'function') return window.isPublicWorkspaceNavigationActive();
+        return typeof window.isPublicWorkspaceAccess !== 'undefined' && !!window.isPublicWorkspaceAccess;
+    }
+
+    /**
      * Navigate to a referenced note
      */
-    window.navigateToNote = function(noteId) {
+    // Note whose workspace lookup is in flight: a click on a link in the
+    // editor reaches both the editor link handler (events-rte-fields.js)
+    // and the handler below, the second call is dropped.
+    let pendingNavigationNoteId = null;
+
+    window.navigateToNote = async function(noteId) {
         const workspace = getCurrentWorkspace();
         const isMobile = window.innerWidth <= 800;
+
+        if (pendingNavigationNoteId === String(noteId)) return;
+        pendingNavigationNoteId = String(noteId);
+
+        // A link may target a note of another workspace: the in-page loaders
+        // only work within the current one, so switch with a page load.
+        let targetWorkspace = null;
+        try {
+            targetWorkspace = await getNoteWorkspace(noteId);
+        } finally {
+            pendingNavigationNoteId = null;
+        }
+        if (targetWorkspace && targetWorkspace !== workspace) {
+            const tabParam = isMobile ? '&scroll=1' : '&newtab=1';
+            window.location.href = `index.php?workspace=${encodeURIComponent(targetWorkspace)}&note=${encodeURIComponent(noteId)}${tabParam}`;
+            return;
+        }
 
         // On desktop with tabs enabled, open in a new tab
         if (!isMobile && window.tabManager && typeof window.tabManager.openInNewTab === 'function') {
@@ -627,6 +716,20 @@
     }
 
     /**
+     * Initialize the "search all workspaces" checkbox
+     */
+    function initAllWorkspacesToggle() {
+        const toggle = document.getElementById('noteReferenceAllWorkspaces');
+        if (!toggle) return;
+        toggle.addEventListener('change', function() {
+            setAllWorkspacesSearch(toggle.checked);
+            const searchInput = document.getElementById('noteReferenceSearch');
+            loadNotesList(searchInput ? searchInput.value : '');
+            if (searchInput) searchInput.focus();
+        });
+    }
+
+    /**
      * Initialize the "create & link" button
      */
     function initCreateButton() {
@@ -665,6 +768,7 @@
             initSearchInput();
             initModalBackdrop();
             initCreateButton();
+            initAllWorkspacesToggle();
         });
     }
 

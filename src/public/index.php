@@ -95,6 +95,34 @@ $gitProvider = function_exists('getGitProviderName') ? getGitProviderName($gitSy
 // A replaceState snippet in <head> reflects the resolved workspace in the
 // URL so client scripts that read it from location.search keep working.
 $workspaceResolvedInternally = null;
+
+// A ?note=<id> link may target a note of another workspace (links between
+// workspaces, a link pasted without its workspace). Open the note in its own
+// workspace instead of falling back to the latest note of the current one.
+// Plain page loads only: a note-pane fragment is swapped into a page whose
+// workspace cannot change, and a public-workspace visitor stays in the
+// shared workspace.
+if (!$isRightColFragment
+    && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET'
+    && isset($_GET['note']) && is_string($_GET['note']) && ctype_digit($_GET['note'])
+    && !(function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive())) {
+    $noteWorkspaceStmt = $con->prepare('SELECT workspace FROM entries WHERE id = ? AND trash = 0');
+    $noteWorkspaceStmt->execute([(int) $_GET['note']]);
+    $noteWorkspace = $noteWorkspaceStmt->fetchColumn();
+    if (is_string($noteWorkspace) && $noteWorkspace !== '') {
+        $requestedWorkspace = isset($_GET['workspace']) && is_string($_GET['workspace']) ? $_GET['workspace'] : null;
+        if ($requestedWorkspace === null) {
+            $_GET['workspace'] = $noteWorkspace;
+            $workspaceResolvedInternally = $noteWorkspace;
+        } elseif ($requestedWorkspace !== $noteWorkspace) {
+            $redirectQuery = $_GET;
+            $redirectQuery['workspace'] = $noteWorkspace;
+            header('Location: index.php?' . http_build_query($redirectQuery));
+            exit;
+        }
+    }
+}
+
 if (!isset($_GET['workspace']) && !isset($_POST['workspace'])) {
     // Use getWorkspaceFilter() which handles the full priority logic:
     // 1. default_workspace if set to a specific workspace

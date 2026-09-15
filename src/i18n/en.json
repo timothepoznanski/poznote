@@ -3973,7 +3973,8 @@
     "modal": {
       "create_button": "Create & link",
       "recent_notes": "Recent notes",
-      "search_placeholder": "Search for a note..."
+      "search_placeholder": "Search for a note...",
+      "all_workspaces": "Search all workspaces"
     },
     "untitled": "Untitled",
     "empty": {

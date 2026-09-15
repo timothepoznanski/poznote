@@ -332,7 +332,8 @@
     "modal": {
       "search_placeholder": "Nach einer Notiz suchen...",
       "recent_notes": "Kürzliche Notizen",
-      "create_button": "Erstellen & verlinken"
+      "create_button": "Erstellen & verlinken",
+      "all_workspaces": "In allen Arbeitsbereichen suchen"
     },
     "empty": {
       "no_notes_found": "Keine Notizen gefunden",

@@ -282,14 +282,14 @@ curl -u 'username:password' -H "X-User-ID: 1" \
 GET /notes/resolve
 ```
 
-Resolve a note by title (reference) inside a workspace.
+Resolve a note by ID or title (reference). The response includes the note's `id`, `heading` and `workspace`.
 
 **Query Parameters:**
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `reference` | string | Note title to search for |
-| `workspace` | string | Workspace to search in |
+| `reference` | string | Note ID, or title to search for |
+| `workspace` | string | Workspace to search in (omit to search every workspace) |
 
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \
@@ -1535,7 +1535,14 @@ curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
 GET /notes/{id}/backlinks
 ```
 
-Get all notes that link to this note. Supports HTML links, URL parameters, and wiki-link syntax `[[Note Title]]`.
+Get all notes that link to this note. Supports HTML links, URL parameters, and wiki-link syntax `[[Note Title]]`. Each backlink includes its `id`, `heading` and `workspace`. A `[[Note Title]]` only counts from notes of the same workspace, since wiki links resolve within their own workspace.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `workspace` | string | Workspace of the note, also limits the linking notes to that workspace |
+| `all_workspaces` | string | `1` to collect linking notes from every workspace while `workspace` still scopes the note itself |
 
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \

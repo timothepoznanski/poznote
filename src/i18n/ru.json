@@ -3974,7 +3974,8 @@
     "modal": {
       "create_button": "Создать и связать",
       "recent_notes": "Недавние заметки",
-      "search_placeholder": "Поиск заметки..."
+      "search_placeholder": "Поиск заметки...",
+      "all_workspaces": "Искать во всех рабочих пространствах"
     },
     "untitled": "Без названия",
     "empty": {
