@@ -247,9 +247,10 @@ docker compose up -d
 <details>
 <summary><strong>☁️ Cloud</strong></summary><br>
 
-Vous ne voulez pas gérer de serveur ? Poznote peut être déployé dans le cloud en quelques minutes.
+Vous ne voulez pas gérer de serveur ? Deux hébergeurs font tourner Poznote pour vous. Dans les deux cas, il faut d'abord créer un compte chez l'hébergeur, puis déployer Poznote depuis son catalogue en quelques clics. Les deux offrent du crédit gratuit à l'inscription, vous pouvez donc essayer sans rien payer.
 
-Consultez les options d'hébergement cloud sur [poznote.com/hosting.html](https://poznote.com/hosting.html).
+- **[Caliber Node](https://calibernode.com/cloud-apps/poznote)**, à partir de 2,50 $ par mois : les mises à jour arrivent dès leur sortie, formules fixes (vous passez à la formule supérieure si besoin), console SSH et snapshots automatiques inclus. Idéal si vous voulez avoir le moins de choses possible à gérer et que vous n'avez pas énormément de notes.
+- **[PikaPods](https://www.pikapods.com/pods?run=poznote)**, à partir de 2 $ par mois : les mises à jour sont testées avant déploiement et arrivent donc un peu plus tard, RAM, CPU et disque réglables indépendamment, sauvegardes automatiques mais c'est vous qui configurez où elles sont stockées (S3). Idéal si vous voulez pouvoir grandir au fil de vos notes.
 
 </details>
 

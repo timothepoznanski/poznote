@@ -247,9 +247,10 @@ docker compose up -d
 <details>
 <summary><strong>☁️ Nuvem</strong></summary><br>
 
-Não quer administrar um servidor? O Poznote pode ser implantado na nuvem em poucos minutos.
+Não quer administrar um servidor? Dois provedores hospedam o Poznote para você. Em ambos, primeiro é preciso criar uma conta no provedor e depois implantar o Poznote a partir do catálogo dele em poucos cliques. Os dois oferecem crédito grátis no cadastro, então você pode testar sem pagar nada.
 
-Veja as opções de hospedagem em nuvem em [poznote.com/hosting.html](https://poznote.com/hosting.html).
+- **[Caliber Node](https://calibernode.com/cloud-apps/poznote)**, a partir de US$ 2,50 por mês: as atualizações chegam assim que são lançadas, planos fixos (se precisar de mais, você passa para o próximo), console SSH e snapshots automáticos incluídos. Ideal se você quer ter o mínimo possível para gerenciar e não tem tantas notas.
+- **[PikaPods](https://www.pikapods.com/pods?run=poznote)**, a partir de US$ 2 por mês: as atualizações são testadas antes da liberação e chegam um pouco depois, RAM, CPU e disco ajustáveis separadamente, backups automáticos, mas você configura onde eles ficam armazenados (S3). Ideal se você quer espaço para crescer conforme suas notas aumentam.
 
 </details>
 
