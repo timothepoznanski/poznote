@@ -181,8 +181,26 @@ define('TAG_COLORS_SETTING', 'tag_colors');
  * Global settings cache - loads all settings in one query and caches them
  * This dramatically reduces database queries when settings are accessed multiple times
  */
-function getSetting($key, $default = null) {
+/**
+ * The per-request settings cache behind getSetting(), by reference so it can
+ * be dropped. It is filled on the first read and never refreshed on its own:
+ * a setting written later in the same request (the first-run bootstrap in
+ * db_connect.php seeds 'welcome_setup' after the language lookups have
+ * already filled it) is invisible to getSetting() unless the writer calls
+ * poznoteResetSettingsCache().
+ */
+function &poznoteSettingsCacheRef() {
     static $cache = null;
+    return $cache;
+}
+
+function poznoteResetSettingsCache() {
+    $cache = &poznoteSettingsCacheRef();
+    $cache = null;
+}
+
+function getSetting($key, $default = null) {
+    $cache = &poznoteSettingsCacheRef();
     
     // Load all settings on first call
     if ($cache === null) {

@@ -841,6 +841,13 @@ try {
                 // page load to welcome.php while this key is 'pending', and
                 // the guide flips it to 'done' once it is finished or skipped.
                 $con->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('welcome_setup', 'pending')");
+                // The language lookups above already filled getSetting()'s
+                // per-request cache, without this key: drop it so the
+                // redirect in index.php sees 'pending' on this very first
+                // load instead of the next one.
+                if (function_exists('poznoteResetSettingsCache')) {
+                    poznoteResetSettingsCache();
+                }
             }
             // Legacy migration: ensure folder_id is populated and entry snippets exist.
             // Only runs on schema-version changes (and after backup restores, which
