@@ -192,8 +192,13 @@
         });
 
         // Click outside to close
+        var pressedOnBackdrop = false;
+        modal.addEventListener('mousedown', function (e) {
+            pressedOnBackdrop = (e.target === modal);
+        });
         modal.addEventListener('click', function (e) {
-            if (e.target === modal) modal.style.display = 'none';
+            if (e.target === modal && pressedOnBackdrop) modal.style.display = 'none';
+            pressedOnBackdrop = false;
         });
 
         // Save
@@ -347,8 +352,13 @@
             modal.remove();
         }
         document.getElementById('clCancelBtn').addEventListener('click', close);
+        var pressedOnBackdrop = false;
+        modal.addEventListener('mousedown', function (e) {
+            pressedOnBackdrop = (e.target === modal);
+        });
         modal.addEventListener('click', function (e) {
-            if (e.target === modal) close();
+            if (e.target === modal && pressedOnBackdrop) close();
+            pressedOnBackdrop = false;
         });
         document.addEventListener('keydown', onKey);
 

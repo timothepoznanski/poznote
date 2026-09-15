@@ -1834,10 +1834,15 @@ function insertHTMLAtSelection(html) {
     }
 
     // Close modal on backdrop click
+    var pickerMouseDownTarget = null;
+    document.addEventListener('mousedown', function (e) {
+        pickerMouseDownTarget = e.target;
+    });
     document.addEventListener('click', function (e) {
         var modal = document.getElementById('attachmentPickerModal');
-        if (modal && e.target === modal) {
+        if (modal && e.target === modal && pickerMouseDownTarget === modal) {
             window.closeAttachmentPickerModal();
         }
+        pickerMouseDownTarget = null;
     });
 })();

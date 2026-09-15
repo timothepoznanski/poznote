@@ -901,8 +901,13 @@
         // Clicking the backdrop closes it, like the other dialogs. Stopping the
         // microphone matters more here than elsewhere: a dialog dismissed with
         // the recorder still running would keep the tab's mic indicator lit.
+        var pressedOnBackdrop = false;
+        modal.addEventListener('mousedown', function (event) {
+            pressedOnBackdrop = (event.target === modal);
+        });
         modal.addEventListener('click', function (event) {
-            if (event.target === modal) closeModal();
+            if (event.target === modal && pressedOnBackdrop) closeModal();
+            pressedOnBackdrop = false;
         });
 
         document.addEventListener('keydown', function (event) {

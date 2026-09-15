@@ -146,10 +146,15 @@ function attachTaskEditModalHandlers(modal) {
         cancelBtn.addEventListener('click', closeTaskEditModal);
     }
 
+    var pressedOnBackdrop = false;
+    modal.addEventListener('mousedown', function(e) {
+        pressedOnBackdrop = (e.target === modal);
+    });
     modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
+        if (e.target === modal && pressedOnBackdrop) {
             closeTaskEditModal();
         }
+        pressedOnBackdrop = false;
     });
 
     modal.dataset.handlersAttached = 'true';

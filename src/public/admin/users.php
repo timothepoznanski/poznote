@@ -1745,12 +1745,19 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 
         // === Event Listeners ===
 
-        // Close modal when clicking outside
+        // Close modal when clicking outside. A text selection that starts inside
+        // the dialog and ends on the backdrop also fires a click on the backdrop,
+        // so only close when the press started on the backdrop too.
         document.querySelectorAll('.modal').forEach(modal => {
+            let pressedOnBackdrop = false;
+            modal.addEventListener('mousedown', function(e) {
+                pressedOnBackdrop = (e.target === this);
+            });
             modal.addEventListener('click', function(e) {
-                if (e.target === this) {
+                if (e.target === this && pressedOnBackdrop) {
                     this.classList.remove('active');
                 }
+                pressedOnBackdrop = false;
             });
         });
 

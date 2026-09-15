@@ -313,9 +313,17 @@ class ModalAlert {
             overlay.classList.add('show');
         });
 
-        // Close on overlay click
+        // Close on overlay click. A text selection that starts inside the
+        // dialog and ends on the overlay also fires a click on the overlay,
+        // so only close when the press started on the overlay too.
+        let pressedOnOverlay = false;
+        overlay.onmousedown = (e) => {
+            pressedOnOverlay = (e.target === overlay);
+        };
         overlay.onclick = (e) => {
-            if (e.target === overlay) {
+            const backdropClick = (e.target === overlay && pressedOnOverlay);
+            pressedOnOverlay = false;
+            if (backdropClick) {
                 this.closeModal(overlay);
                 if (config.buttons.length > 0 && config.buttons[0].action) {
                     config.buttons[0].action(); // Execute first button action (usually cancel)

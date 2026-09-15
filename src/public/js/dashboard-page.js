@@ -1680,8 +1680,13 @@
 
         var modal = document.getElementById('noteColorModal');
         if (modal) {
+            var pressedOnBackdrop = false;
+            modal.addEventListener('mousedown', function (e) {
+                pressedOnBackdrop = (e.target === modal);
+            });
             modal.addEventListener('click', function (e) {
-                if (e.target === modal) closeNoteColorModal();
+                if (e.target === modal && pressedOnBackdrop) closeNoteColorModal();
+                pressedOnBackdrop = false;
             });
         }
 

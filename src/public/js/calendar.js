@@ -541,10 +541,15 @@ class MiniCalendar {
         const modal = modalContainer.querySelector('.calendar-notes-modal-overlay');
 
         // Close modal on overlay click
+        let pressedOnBackdrop = false;
+        modal.addEventListener('mousedown', (e) => {
+            pressedOnBackdrop = (e.target === modal);
+        });
         modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
+            if (e.target === modal && pressedOnBackdrop) {
                 modal.remove();
             }
+            pressedOnBackdrop = false;
         });
 
         // Close modal on close button click

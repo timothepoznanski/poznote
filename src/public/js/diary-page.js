@@ -1236,8 +1236,13 @@
                 });
         }
 
+        var pressedOnBackdrop = false;
+        overlay.addEventListener('mousedown', function (e) {
+            pressedOnBackdrop = (e.target === overlay);
+        });
         overlay.addEventListener('click', function (e) {
-            if (e.target === overlay) close();
+            if (e.target === overlay && pressedOnBackdrop) close();
+            pressedOnBackdrop = false;
         });
         overlay.querySelector('[data-action="close-modal"]').addEventListener('click', close);
         submitBtn.addEventListener('click', submit);

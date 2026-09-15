@@ -1028,8 +1028,13 @@ window.addEventListener('resize', sizeActivityTableScroll);
     cancelBtn.addEventListener('click', close);
 
     // Backdrop click, matching the admin/users.php modals.
+    var pressedOnBackdrop = false;
+    modal.addEventListener('mousedown', function (e) {
+        pressedOnBackdrop = (e.target === modal);
+    });
     modal.addEventListener('click', function (e) {
-        if (e.target === modal) { close(); }
+        if (e.target === modal && pressedOnBackdrop) { close(); }
+        pressedOnBackdrop = false;
     });
 
     document.addEventListener('keydown', function (e) {

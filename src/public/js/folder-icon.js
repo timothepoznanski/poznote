@@ -1074,10 +1074,15 @@ document.addEventListener('DOMContentLoaded', function () {
     // Close modal when clicking outside
     const modal = document.getElementById('folderIconModal');
     if (modal) {
+        let pressedOnBackdrop = false;
+        modal.addEventListener('mousedown', function (event) {
+            pressedOnBackdrop = (event.target === modal);
+        });
         modal.addEventListener('click', function (event) {
-            if (event.target === modal) {
+            if (event.target === modal && pressedOnBackdrop) {
                 closeFolderIconModal();
             }
+            pressedOnBackdrop = false;
         });
     }
 });

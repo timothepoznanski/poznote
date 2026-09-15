@@ -96,8 +96,13 @@
             modal.style.display = 'none';
         });
 
+        var pressedOnBackdrop = false;
+        modal.addEventListener('mousedown', function (e) {
+            pressedOnBackdrop = (e.target === modal);
+        });
         modal.addEventListener('click', function (e) {
-            if (e.target === modal) modal.style.display = 'none';
+            if (e.target === modal && pressedOnBackdrop) modal.style.display = 'none';
+            pressedOnBackdrop = false;
         });
 
         deleteBtn.addEventListener('click', function () {
