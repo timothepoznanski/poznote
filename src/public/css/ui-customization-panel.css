@@ -215,12 +215,17 @@ body:has(#ai-chat-panel.ai-chat-open) #edgeAiChatBtn {
 }
 
 /* No rule under the titles in the narrow column, and room between the
-   title, its hint and the first checkbox */
+   title, its hint and the first checkbox (!important beats the global
+   h4 margin reset in base.css) */
 #uiCustomizationPanel .ui-custom-section-title {
     cursor: pointer;
     border-bottom: none;
     padding-bottom: 0;
-    margin-bottom: 12px;
+}
+
+#uiCustomizationPanel .ui-custom-section-title:not(.ui-custom-section-collapsed),
+#uiCustomizationPanel.ui-custom-filtering .ui-custom-section-title {
+    margin-bottom: 12px !important;
 }
 
 #uiCustomizationPanel .ui-custom-section-hint {
