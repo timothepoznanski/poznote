@@ -876,11 +876,16 @@
     }
 
     // Close modal on backdrop click
+    var snapshotMouseDownTarget = null;
+    document.addEventListener('mousedown', function (e) {
+        snapshotMouseDownTarget = e.target;
+    });
     document.addEventListener('click', function (e) {
         var modal = document.getElementById('snapshotModal');
-        if (modal && e.target === modal) {
+        if (modal && e.target === modal && snapshotMouseDownTarget === modal) {
             closeSnapshotModal();
         }
+        snapshotMouseDownTarget = null;
     });
 
     // Close modal on Escape key

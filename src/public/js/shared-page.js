@@ -1732,10 +1732,15 @@
         updatePasswordToggleState();
         updatePreviewUrl();
 
+        var pressedOnBackdrop = false;
+        modal.addEventListener('mousedown', function(event) {
+            pressedOnBackdrop = (event.target === modal);
+        });
         modal.addEventListener('click', function(event) {
-            if (event.target === modal) {
+            if (event.target === modal && pressedOnBackdrop) {
                 closeModal();
             }
+            pressedOnBackdrop = false;
         });
     }
 
@@ -2040,10 +2045,15 @@
         modal.appendChild(content);
         document.body.appendChild(modal);
 
+        var pressedOnBackdrop = false;
+        modal.addEventListener('mousedown', function(event) {
+            pressedOnBackdrop = (event.target === modal);
+        });
         modal.addEventListener('click', function(event) {
-            if (event.target === modal) {
+            if (event.target === modal && pressedOnBackdrop) {
                 closeModal();
             }
+            pressedOnBackdrop = false;
         });
     }
 

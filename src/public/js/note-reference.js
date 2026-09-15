@@ -645,10 +645,15 @@
         const modal = document.getElementById('noteReferenceModal');
         if (!modal) return;
         
+        let pressedOnBackdrop = false;
+        modal.addEventListener('mousedown', function(e) {
+            pressedOnBackdrop = (e.target === modal);
+        });
         modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
+            if (e.target === modal && pressedOnBackdrop) {
                 closeNoteReferenceModal();
             }
+            pressedOnBackdrop = false;
         });
     }
 

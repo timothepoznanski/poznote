@@ -192,8 +192,14 @@
         var modal = getModal();
         if (!modal) return;
 
+        var pressedOnBackdrop = false;
+        modal.addEventListener('mousedown', function (event) {
+            pressedOnBackdrop = (event.target === modal);
+        });
         modal.addEventListener('click', function (event) {
-            if (event.target === modal || event.target.closest('[data-icon-sidebar-color-cancel]')) {
+            var backdropClick = (event.target === modal && pressedOnBackdrop);
+            pressedOnBackdrop = false;
+            if (backdropClick || event.target.closest('[data-icon-sidebar-color-cancel]')) {
                 close();
                 return;
             }

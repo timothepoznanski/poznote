@@ -594,8 +594,13 @@ function showWorkspaceShareOptionsModal(button) {
         });
     });
 
+    var pressedOnBackdrop = false;
+    modal.addEventListener('mousedown', function (event) {
+        pressedOnBackdrop = (event.target === modal);
+    });
     modal.addEventListener('click', function (event) {
-        if (event.target === modal) closeModal();
+        if (event.target === modal && pressedOnBackdrop) closeModal();
+        pressedOnBackdrop = false;
     });
 
     modal.addEventListener('keydown', function (event) {

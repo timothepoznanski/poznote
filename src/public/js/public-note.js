@@ -578,10 +578,15 @@
 
         if (saveBtn) saveBtn.addEventListener('click', savePublicTaskEditModal);
         if (cancelBtn) cancelBtn.addEventListener('click', closePublicTaskEditModal);
+        var pressedOnBackdrop = false;
+        overlay.addEventListener('mousedown', function(e) {
+            pressedOnBackdrop = (e.target === overlay);
+        });
         overlay.addEventListener('click', function(e) {
-            if (e.target === overlay) {
+            if (e.target === overlay && pressedOnBackdrop) {
                 closePublicTaskEditModal();
             }
+            pressedOnBackdrop = false;
         });
 
         return overlay;

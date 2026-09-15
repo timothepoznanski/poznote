@@ -224,8 +224,8 @@
 <div class="ui-custom-section" data-ui-pages="notes">
 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.workspace_menu', [], 'Workspace Menu'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
 <div class="ui-custom-items">
-    <label class="ui-custom-item"><input type="checkbox" data-ui-key="wsmenu:edit-workspaces" checked><span><?php echo t_h('workspaces.menu.edit_workspaces', [], 'Edit workspaces'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="wsmenu:new-workspace" checked><span><?php echo t_h('workspaces.menu.new_workspace', [], 'New workspace'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="wsmenu:edit-workspaces" checked><span><?php echo t_h('workspaces.menu.edit_workspaces', [], 'Edit workspaces'); ?></span></label>
 </div>
 </div>
 

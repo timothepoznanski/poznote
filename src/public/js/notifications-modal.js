@@ -215,10 +215,16 @@
         return 'index.php' + (params.length ? '?' + params.join('&') : '');
     }
 
+    var notificationsMouseDownTarget = null;
+    document.addEventListener('mousedown', function (event) {
+        notificationsMouseDownTarget = event.target;
+    });
     document.addEventListener('click', function (event) {
         var modal = document.getElementById('notificationsModal');
+        var pressedOnBackdrop = (notificationsMouseDownTarget === modal);
+        notificationsMouseDownTarget = null;
         if (event.target === modal) {
-            closeNotificationsModal();
+            if (pressedOnBackdrop) closeNotificationsModal();
             return;
         }
 

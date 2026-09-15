@@ -467,10 +467,15 @@
 
         document.body.appendChild(modal);
 
+        var pressedOnBackdrop = false;
+        modal.addEventListener('mousedown', function (e) {
+            pressedOnBackdrop = (e.target === modal);
+        });
         modal.addEventListener('click', function (e) {
-            if (e.target === modal || e.target.className === 'image-preview-close') {
+            if ((e.target === modal && pressedOnBackdrop) || e.target.className === 'image-preview-close') {
                 document.body.removeChild(modal);
             }
+            pressedOnBackdrop = false;
         });
     }
 
@@ -505,10 +510,15 @@
 
         document.body.appendChild(modal);
 
+        var pressedOnBackdrop = false;
+        modal.addEventListener('mousedown', function (e) {
+            pressedOnBackdrop = (e.target === modal);
+        });
         modal.addEventListener('click', function (e) {
-            if (e.target === modal || e.target.className === 'pdf-preview-close') {
+            if ((e.target === modal && pressedOnBackdrop) || e.target.className === 'pdf-preview-close') {
                 document.body.removeChild(modal);
             }
+            pressedOnBackdrop = false;
         });
     }
 
@@ -595,12 +605,20 @@
                 content.style.zIndex = '30001';
             }
 
+            var pressedOnBackdrop = false;
+            function overlayMouseDownHandler(e) {
+                pressedOnBackdrop = (e.target === modal);
+            }
             function overlayClickHandler(e) {
-                if (e.target === modal) {
+                if (e.target === modal && pressedOnBackdrop) {
                     closeDeleteAttachmentConfirmModal();
                 }
+                pressedOnBackdrop = false;
             }
 
+            modal.removeEventListener('mousedown', modal.__overlayMouseDownHandler || overlayMouseDownHandler);
+            modal.__overlayMouseDownHandler = overlayMouseDownHandler;
+            modal.addEventListener('mousedown', modal.__overlayMouseDownHandler);
             modal.removeEventListener('click', modal.__overlayHandler || overlayClickHandler);
             modal.__overlayHandler = overlayClickHandler;
             modal.addEventListener('click', modal.__overlayHandler);
