@@ -3870,7 +3870,13 @@
     "popup_title": "Attention",
     "lost_to_other_tab": "You no longer hold the edit lock for this note. It is now being edited in another tab.",
     "lost_to_user": "You no longer hold the edit lock for this note. {{user}} is now editing it.",
-    "public_visitor": "a visitor on the public share link"
+    "public_visitor": "a visitor on the public share link",
+    "take_over": "Take over",
+    "take_over_title": "Take over editing?",
+    "take_over_confirm": "{{user}} is currently editing this note. If you take over, their editor becomes read-only and the changes they have not saved yet stay on their device. Continue?",
+    "take_over_failed": "Unable to take over this note.",
+    "taken_over_notice": "You took over editing this note.",
+    "lost_unsaved_kept": "Your unsaved changes here are kept on this device and offered again once the note is free."
   },
   "live_refresh": {
     "note_changed": "This note was modified outside this tab.",
@@ -3880,7 +3886,9 @@
     "keep_mine": "Keep my version",
     "discard_confirm": "Reloading will discard the changes you made here. Continue?",
     "discard_title": "Discard unsaved changes?",
-    "note_refreshed": "Refreshed with changes made outside this tab."
+    "note_refreshed": "Refreshed with changes made outside this tab.",
+    "note_merged": "Merged with changes made outside this tab.",
+    "note_changed_conflict": "This note was modified outside this tab while you have unsaved changes here. The two sets of changes overlap, so they could not be merged automatically."
   },
   "dashboard": {
     "title": "Notes board",

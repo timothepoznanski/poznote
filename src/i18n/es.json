@@ -4247,7 +4247,13 @@
     "popup_title": "Atención",
     "lost_to_other_tab": "Ya no tiene el bloqueo de edición de esta nota. Ahora se está editando en otra pestaña.",
     "lost_to_user": "Ya no tiene el bloqueo de edición de esta nota. {{user}} la está editando ahora.",
-    "public_visitor": "un visitante del enlace público"
+    "public_visitor": "un visitante del enlace público",
+    "take_over": "Tomar el control",
+    "take_over_title": "¿Tomar el control de la edición?",
+    "take_over_confirm": "{{user}} está editando esta nota. Si tomas el control, su editor pasará a solo lectura y los cambios que aún no haya guardado se quedarán en su dispositivo. ¿Continuar?",
+    "take_over_failed": "No se pudo tomar el control de esta nota.",
+    "taken_over_notice": "Has tomado el control de la edición de esta nota.",
+    "lost_unsaved_kept": "Tus cambios sin guardar se conservan en este dispositivo y se te ofrecerán de nuevo cuando la nota quede libre."
   },
   "live_refresh": {
     "note_changed": "Esta nota se modificó fuera de esta pestaña.",
@@ -4257,7 +4263,9 @@
     "keep_mine": "Conservar mi versión",
     "discard_confirm": "Al recargar se descartarán los cambios que hiciste aquí. ¿Continuar?",
     "discard_title": "¿Descartar los cambios sin guardar?",
-    "note_refreshed": "Actualizada con los cambios hechos fuera de esta pestaña."
+    "note_refreshed": "Actualizada con los cambios hechos fuera de esta pestaña.",
+    "note_merged": "Fusionada con los cambios hechos fuera de esta pestaña.",
+    "note_changed_conflict": "Esta nota se modificó fuera de esta pestaña mientras tienes cambios sin guardar aquí. Los dos conjuntos de cambios se solapan, por lo que no se pudieron fusionar automáticamente."
   },
   "dashboard": {
     "title": "Tablero de notas",

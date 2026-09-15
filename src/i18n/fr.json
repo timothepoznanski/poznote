@@ -4351,7 +4351,13 @@
     "popup_title": "Attention",
     "lost_to_other_tab": "Vous n'avez plus le verrou d'édition sur cette note. Elle est maintenant modifiée dans un autre onglet.",
     "lost_to_user": "Vous n'avez plus le verrou d'édition sur cette note. {{user}} la modifie maintenant.",
-    "public_visitor": "un visiteur du lien de partage public"
+    "public_visitor": "un visiteur du lien de partage public",
+    "take_over": "Prendre la main",
+    "take_over_title": "Prendre la main sur l'édition ?",
+    "take_over_confirm": "{{user}} est en train de modifier cette note. Si vous prenez la main, son éditeur passe en lecture seule et ses modifications non encore enregistrées restent sur son appareil. Continuer ?",
+    "take_over_failed": "Impossible de prendre la main sur cette note.",
+    "taken_over_notice": "Vous avez pris la main sur cette note.",
+    "lost_unsaved_kept": "Vos modifications non enregistrées ici sont conservées sur cet appareil et vous seront proposées à nouveau dès que la note sera libre."
   },
   "live_refresh": {
     "note_changed": "Cette note a été modifiée en dehors de cet onglet.",
@@ -4361,7 +4367,9 @@
     "keep_mine": "Garder ma version",
     "discard_confirm": "Recharger va abandonner les modifications faites ici. Continuer ?",
     "discard_title": "Abandonner les modifications non enregistrées ?",
-    "note_refreshed": "Actualisée avec les modifications faites en dehors de cet onglet."
+    "note_refreshed": "Actualisée avec les modifications faites en dehors de cet onglet.",
+    "note_merged": "Fusionnée avec les modifications faites en dehors de cet onglet.",
+    "note_changed_conflict": "Cette note a été modifiée en dehors de cet onglet alors que vous avez des modifications non enregistrées ici. Les deux séries de modifications se chevauchent, elles n'ont pas pu être fusionnées automatiquement."
   },
   "dashboard": {
     "title": "Tableau de notes",

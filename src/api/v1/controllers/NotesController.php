@@ -284,16 +284,25 @@ class NotesController {
             return;
         }
 
+        // "takeover": replace a lock held by another user or a public visitor
+        // (the Take over button of the read-only banner). Their own tabs never
+        // need it, the same account re-acquires its lock from any session.
+        $takeover = !empty($input['takeover']) && filter_var($input['takeover'], FILTER_VALIDATE_BOOLEAN);
+
         $result = acquireNoteEditLock(
             $this->getNoteLockTargetUserId(),
             $noteId,
             $this->getNoteLockHolderUserId(),
-            $editorSessionId
+            $editorSessionId,
+            90,
+            'user',
+            $takeover
         );
 
         if (!empty($result['success'])) {
             $this->sendSuccess([
                 'lock' => $this->buildNoteEditLockPayload($result['lock'] ?? null, $editorSessionId),
+                'taken_over' => !empty($result['taken_over']),
             ]);
             return;
         }

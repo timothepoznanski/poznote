@@ -1235,6 +1235,20 @@ function triggerBackgroundPush() {
 // ============================================================================
 
 // Expose auto-save functions globally
+// The state of the open note as this tab last saved or loaded it: the base
+// of the three-way merge in js/live-refresh.js. Null for any other note.
+window.getNoteSavedBaseline = function (noteId) {
+    if (!noteId || String(noteId) !== String(noteid) || lastSavedContent === null) {
+        return null;
+    }
+    return { content: lastSavedContent, title: lastSavedTitle, tags: lastSavedTags };
+};
+// A title adopted from the server by that merge is not a local edit.
+window.adoptNoteSavedTitle = function (noteId, title) {
+    if (noteId && String(noteId) === String(noteid)) {
+        lastSavedTitle = title;
+    }
+};
 window.markNoteAsModified = markNoteAsModified;
 window.hasUnsavedChanges = hasUnsavedChanges;
 window.clearDraft = clearDraft;

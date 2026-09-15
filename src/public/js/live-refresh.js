@@ -13,8 +13,10 @@
  *   - sidebar tree: reloaded in place (refreshNotesListAfterFolderAction),
  *     unless the user is interacting with it (inline rename, drag...)
  *   - open note: reloaded in place when it has no unsaved edits, no focus
- *     and no selection; otherwise a banner offers to reload it, or to keep
- *     and save this tab's version instead
+ *     and no selection. With unsaved edits, a markdown note is merged with
+ *     the outside change when the two touched different lines
+ *     (js/markdown-merge.js) and saved; otherwise a banner offers to reload
+ *     it, or to keep and save this tab's version instead
  *   - cached notes: their cached DOM is dropped so the next visit refetches
  *
  * It also keeps the server "content version" of each note it knows about,
@@ -657,7 +659,8 @@
 
     /**
      * Returns true when the outside change was applied here (note reloaded),
-     * false when the user was only told about it.
+     * false when the user was only told about it, or when a merge was
+     * started: the merge adopts the server version itself once it lands.
      */
     function handleActiveNoteChanged(noteId, info, serverContentVersion) {
         if (!info.exists || info.trash) {
@@ -667,8 +670,155 @@
         if (canAutoReloadNote(noteId) && reloadNote(noteId, true)) {
             return true;
         }
+        if (hasUnsavedChanges(noteId)) {
+            tryMergeOutsideChange(noteId).then(function (merged) {
+                // Still flagged: not reloaded or resolved while merging
+                if (!merged && outOfSync[noteId]) {
+                    showBanner(noteId, 'changed', serverContentVersion);
+                }
+            });
+            return false;
+        }
         showBanner(noteId, 'changed', serverContentVersion);
         return false;
+    }
+
+    // ------------------------------------------------------------------
+    // Three-way merge of an outside change into this tab's unsaved edits
+    // (markdown notes, js/markdown-merge.js)
+    // ------------------------------------------------------------------
+
+    // A merged note is saved right away; when that save is refused in turn
+    // (someone wrote again meanwhile), the merge runs again against the newer
+    // server version. Bounded so two busy writers cannot loop forever.
+    var MAX_MERGE_ATTEMPTS = 3;
+    var mergeAttempts = Object.create(null);
+    var mergeInFlight = Object.create(null);
+    // The last merge that gave up on a note: the banner says why.
+    var mergeConflicts = Object.create(null);
+
+    function isMarkdownNote(noteId) {
+        var entry = document.getElementById('entry' + noteId);
+        return !!(entry && entry.getAttribute('data-note-type') === 'markdown');
+    }
+
+    // The page stores tags space-separated, the API comma-separated.
+    function normalizeTagList(value) {
+        return String(value || '').split(/[\s,]+/).filter(Boolean).sort().join(' ');
+    }
+
+    function fetchServerNoteState(noteId) {
+        return fetch('/api/v1/notes/' + encodeURIComponent(noteId), {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            cache: 'no-store',
+            credentials: 'same-origin'
+        }).then(function (response) {
+            return response.ok ? response.json() : null;
+        }).then(function (data) {
+            var note = (data && data.success && data.note) ? data.note : null;
+            if (!note || typeof note.version !== 'string' || typeof note.content !== 'string') {
+                return null;
+            }
+            return {
+                version: note.version,
+                content: note.content,
+                heading: (typeof note.heading === 'string') ? note.heading : null,
+                tags: (typeof note.tags === 'string') ? note.tags : ''
+            };
+        }).catch(function () {
+            return null;
+        });
+    }
+
+    /**
+     * Fold the server version of a markdown note into the unsaved edits of
+     * this tab, using the version this tab last saved as the base. Resolves
+     * true when the merged note is on screen and being saved, false when the
+     * user has to decide (overlapping edits, not a markdown note, too many
+     * attempts...); the caller then shows the banner.
+     */
+    function tryMergeOutsideChange(noteId) {
+        if (!isMarkdownNote(noteId)
+            || typeof window.mergeMarkdownThreeWay !== 'function'
+            || typeof window.replaceMarkdownNoteContent !== 'function'
+            || typeof window.getNoteSavedBaseline !== 'function'
+            || typeof window.getMarkdownContentForNote !== 'function') {
+            return Promise.resolve(false);
+        }
+        if (mergeInFlight[noteId]) {
+            return mergeInFlight[noteId];
+        }
+        if ((mergeAttempts[noteId] || 0) >= MAX_MERGE_ATTEMPTS) {
+            return Promise.resolve(false);
+        }
+        var baseline = window.getNoteSavedBaseline(noteId);
+        if (!baseline || typeof baseline.content !== 'string') {
+            return Promise.resolve(false);
+        }
+        mergeAttempts[noteId] = (mergeAttempts[noteId] || 0) + 1;
+
+        var pending = fetchServerNoteState(noteId).then(function (server) {
+            delete mergeInFlight[noteId];
+            if (!server || String(window.noteid || '') !== String(noteId) || window.isLoadingNote || isNoteLocked(noteId)) {
+                return false;
+            }
+
+            var card = document.getElementById('note' + noteId);
+            var titleInput = document.getElementById('inp' + noteId);
+            var tagsInput = document.getElementById('tags' + noteId);
+            if (!card) {
+                return false;
+            }
+
+            // Title and tags are not merged, only carried over when this tab
+            // left them alone; a tag change from outside needs the tag row
+            // rebuilt, which only a reload does.
+            var titleHere = titleInput ? titleInput.value : null;
+            var titleChangedHere = titleInput && baseline.title !== null && titleHere !== baseline.title;
+            var titleChangedThere = server.heading !== null && baseline.title !== null && server.heading !== baseline.title;
+            if (titleChangedHere && titleChangedThere && server.heading !== titleHere) {
+                return false;
+            }
+            if (tagsInput && baseline.tags !== null && normalizeTagList(server.tags) !== normalizeTagList(baseline.tags)) {
+                return false;
+            }
+
+            var local = window.getMarkdownContentForNote(noteId);
+            if (local === null) {
+                return false;
+            }
+            var merged = window.mergeMarkdownThreeWay(baseline.content, local, server.content);
+            if (merged === null) {
+                mergeConflicts[noteId] = true;
+                return false;
+            }
+            if (!window.replaceMarkdownNoteContent(noteId, merged)) {
+                return false;
+            }
+            if (titleChangedThere && !titleChangedHere && titleInput) {
+                titleInput.value = server.heading;
+                if (typeof window.adoptNoteSavedTitle === 'function') {
+                    window.adoptNoteSavedTitle(noteId, server.heading);
+                }
+            }
+
+            delete mergeConflicts[noteId];
+            delete outOfSync[noteId];
+            contentVersions[noteId] = server.version;
+            removeBanner(noteId);
+            showRefreshedNotice(noteId, t('live_refresh.note_merged', {}, 'Merged with changes made outside this tab.'), true);
+            if (typeof window.saveNoteToServer === 'function') {
+                window.saveNoteToServer();
+            } else if (typeof saveNoteToServer === 'function') {
+                saveNoteToServer();
+            }
+            return true;
+        }).catch(function () {
+            delete mergeInFlight[noteId];
+            return false;
+        });
+        mergeInFlight[noteId] = pending;
+        return pending;
     }
 
     function getBannerAnchor(noteId) {
@@ -728,7 +878,7 @@
         }
 
         var unsaved = hasUnsavedChanges(noteId);
-        var signature = kind + '|' + (unsaved ? 'unsaved' : 'clean');
+        var signature = kind + '|' + (unsaved ? (mergeConflicts[noteId] ? 'conflict' : 'unsaved') : 'clean');
         var existing = card.querySelector('.note-external-change-banner:not(.is-draft-recovery)');
         if (existing && existing.dataset.bannerSignature === signature) {
             // Same message already on screen (a save retried and was refused
@@ -752,9 +902,13 @@
             return;
         }
 
-        text.textContent = unsaved
-            ? t('live_refresh.note_changed_unsaved', {}, 'This note was modified outside this tab while you have unsaved changes here.')
-            : t('live_refresh.note_changed', {}, 'This note was modified outside this tab.');
+        if (unsaved && mergeConflicts[noteId]) {
+            text.textContent = t('live_refresh.note_changed_conflict', {}, 'This note was modified outside this tab while you have unsaved changes here. The two sets of changes overlap, so they could not be merged automatically.');
+        } else if (unsaved) {
+            text.textContent = t('live_refresh.note_changed_unsaved', {}, 'This note was modified outside this tab while you have unsaved changes here.');
+        } else {
+            text.textContent = t('live_refresh.note_changed', {}, 'This note was modified outside this tab.');
+        }
         banner.appendChild(text);
 
         var actions = document.createElement('span');
@@ -845,6 +999,8 @@
         // dropped above or by the reload), so this tab matches it again.
         if (loadedId) {
             delete outOfSync[loadedId];
+            delete mergeAttempts[loadedId];
+            delete mergeConflicts[loadedId];
         }
         if (restore && loadedId && String(restore.noteId) === String(loadedId)) {
             window.requestAnimationFrame(function () {
@@ -926,6 +1082,8 @@
         if (noteId && typeof version === 'string' && version) {
             contentVersions[noteId] = version;
             delete outOfSync[noteId];
+            delete mergeAttempts[noteId];
+            delete mergeConflicts[noteId];
         }
     };
 
@@ -943,7 +1101,7 @@
 
     // Called by the autosave when the API refused a save with 409. The note
     // stays flagged (so later polls do not silently adopt the server version)
-    // until the user reloads or keeps their own version.
+    // until the merge lands, or the user reloads or keeps their own version.
     window.handleNoteVersionConflict = function (noteId, serverContentVersion) {
         noteId = normalizeNoteId(noteId);
         if (!noteId) {
@@ -951,7 +1109,11 @@
         }
         outOfSync[noteId] = true;
         ensureStyles();
-        showBanner(noteId, 'changed', serverContentVersion || null);
+        tryMergeOutsideChange(noteId).then(function (merged) {
+            if (!merged && outOfSync[noteId]) {
+                showBanner(noteId, 'changed', serverContentVersion || null);
+            }
+        });
     };
 
     // ------------------------------------------------------------------

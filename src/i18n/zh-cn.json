@@ -4346,7 +4346,13 @@
     "popup_title": "注意",
     "lost_to_other_tab": "您已不再持有这条笔记的编辑锁。现在它正在另一个标签页中被编辑。",
     "lost_to_user": "您已不再持有这条笔记的编辑锁。现在 {{user}} 正在编辑它。",
-    "public_visitor": "公开分享链接的访客"
+    "public_visitor": "公开分享链接的访客",
+    "take_over": "接管",
+    "take_over_title": "接管编辑？",
+    "take_over_confirm": "{{user}} 正在编辑此笔记。如果您接管，对方的编辑器将变为只读，其尚未保存的更改会保留在其设备上。是否继续？",
+    "take_over_failed": "无法接管此笔记。",
+    "taken_over_notice": "您已接管此笔记的编辑。",
+    "lost_unsaved_kept": "您在此处未保存的更改已保留在此设备上，笔记空闲后会再次提供。"
   },
   "live_refresh": {
     "note_changed": "此笔记已在本标签页之外被修改。",
@@ -4356,7 +4362,9 @@
     "keep_mine": "保留我的版本",
     "discard_confirm": "重新加载将丢弃你在这里所做的更改。是否继续？",
     "discard_title": "放弃未保存的更改？",
-    "note_refreshed": "已更新为本标签页之外所做的更改。"
+    "note_refreshed": "已更新为本标签页之外所做的更改。",
+    "note_merged": "已与此标签页之外所做的更改合并。",
+    "note_changed_conflict": "此笔记在此标签页之外被修改，而您在此处有未保存的更改。两组更改相互重叠，无法自动合并。"
   },
   "dashboard": {
     "title": "笔记看板",

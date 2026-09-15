@@ -768,6 +768,7 @@ Acquire an exclusive edit lock for a note.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `editor_session_id` | string | Yes | Unique ID of the editing session |
+| `takeover` | boolean | No | Take the lock from its current holder (another user of the account, or a visitor on a public share link) instead of getting `423 Locked`. The previous holder's next heartbeat fails and their editor turns read-only; the edits they had not saved stay in their local draft. The response then carries `"taken_over": true`. |
 
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \
