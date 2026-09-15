@@ -332,7 +332,8 @@
     "modal": {
       "search_placeholder": "Buscar una nota...",
       "recent_notes": "Notas recientes",
-      "create_button": "Crear y enlazar"
+      "create_button": "Crear y enlazar",
+      "all_workspaces": "Buscar en todos los espacios de trabajo"
     },
     "empty": {
       "no_notes_found": "No se encontraron notas",
@@ -3879,7 +3880,9 @@
     "logout": {
       "confirm": "¿Seguro que quieres cerrar sesión?",
       "signed_in_as": "Has iniciado sesión como {{username}}",
-      "in_progress": "Cerrando sesión..."
+      "in_progress": "Cerrando sesión...",
+      "switch_intro": "Cambia a otra cuenta o cierra la sesión por completo.",
+      "switch_in_progress": "Cambiando de cuenta..."
     }
   },
   "password": {

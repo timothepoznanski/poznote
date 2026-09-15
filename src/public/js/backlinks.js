@@ -9,6 +9,9 @@
  *   1. HTML internal-link attribute  — data-note-id="{id}"
  *   2. URL-based link                — ?note={id}
  *   3. Wiki-link syntax              — [[Note Title]]
+ *
+ * Notes of other workspaces that link here are listed too, labelled with
+ * their workspace (except on a read-only public workspace).
  */
 (function () {
     'use strict';
@@ -73,6 +76,8 @@
 
         if (isPublicWorkspaceActive()) {
             params.set('public_workspace', '1');
+        } else {
+            params.set('all_workspaces', '1');
         }
 
         var query = params.toString();
@@ -124,23 +129,37 @@
             list.appendChild(tasksLink);
         }
 
+        var currentWorkspace = getWorkspaceName();
         backlinks.forEach(function (link) {
             var ws = (typeof selectedWorkspace !== 'undefined') ? selectedWorkspace : '';
-            var href = (typeof window.buildNoteNavigationUrl === 'function')
-                ? window.buildNoteNavigationUrl(link.id, ws)
-                : 'index.php?note=' + encodeURIComponent(link.id) +
-                    (ws ? '&workspace=' + encodeURIComponent(ws) : '');
+            // A note of another workspace opens with a page load in its own
+            // workspace: the AJAX loader only works within the current one
+            var otherWorkspace = link.workspace && currentWorkspace && link.workspace !== currentWorkspace
+                ? link.workspace : '';
+            var href = otherWorkspace
+                ? 'index.php?workspace=' + encodeURIComponent(otherWorkspace) + '&note=' + encodeURIComponent(link.id)
+                : (typeof window.buildNoteNavigationUrl === 'function')
+                    ? window.buildNoteNavigationUrl(link.id, ws)
+                    : 'index.php?note=' + encodeURIComponent(link.id) +
+                        (ws ? '&workspace=' + encodeURIComponent(ws) : '');
 
             var a = document.createElement('a');
             a.href      = href;
             a.className = 'backlink-link';
             a.setAttribute('data-note-id', link.id);
             a.textContent = link.heading;
+            if (otherWorkspace) {
+                var wsLabel = document.createElement('span');
+                wsLabel.className = 'backlink-workspace';
+                wsLabel.textContent = otherWorkspace;
+                a.appendChild(wsLabel);
+                a.title = otherWorkspace + ' / ' + link.heading;
+            }
 
             /* Use AJAX navigation when available */
             a.addEventListener('click', function (e) {
                 e.preventDefault();
-                if (typeof window.loadNoteDirectly === 'function') {
+                if (!otherWorkspace && typeof window.loadNoteDirectly === 'function') {
                     window.loadNoteDirectly(href, String(link.id), e, a);
                 } else {
                     window.location.href = href;

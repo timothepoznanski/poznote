@@ -8,6 +8,10 @@
  *   1. HTML internal link attribute  — data-note-id="{id}"
  *   2. URL-based link                — ?note={id} or &note={id}
  *   3. Wiki-link syntax              — [[Note Title]]
+ *
+ * A [[Note Title]] only resolves inside its own workspace, so it counts only
+ * for notes of the target's workspace; id-based links count from any
+ * workspace.
  */
 require_once __DIR__ . '/../../../note_loader.php';
 
@@ -54,13 +58,19 @@ class BacklinksController
 
         try {
             $workspace = '';
+            // all_workspaces=1: the workspace parameter still scopes the
+            // target note, but linking notes are collected from every workspace
+            $allWorkspaces = false;
             if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
                 $workspace = (string) (function_exists('getPublicWorkspaceName') ? getPublicWorkspaceName() : '');
-            } elseif (isset($_GET['workspace']) && is_string($_GET['workspace'])) {
-                $workspace = trim($_GET['workspace']);
+            } else {
+                if (isset($_GET['workspace']) && is_string($_GET['workspace'])) {
+                    $workspace = trim($_GET['workspace']);
+                }
+                $allWorkspaces = ($_GET['all_workspaces'] ?? '') === '1';
             }
 
-            $targetSql = 'SELECT id, heading FROM entries WHERE id = ? AND trash = 0';
+            $targetSql = 'SELECT id, heading, workspace FROM entries WHERE id = ? AND trash = 0';
             $targetParams = [$noteId];
             if ($workspace !== '') {
                 $targetSql .= ' AND workspace = ?';
@@ -87,14 +97,15 @@ class BacklinksController
             }
 
             $targetHeading = (string) ($targetNote['heading'] ?? '');
+            $targetWorkspace = (string) ($targetNote['workspace'] ?? '');
 
-            $candidateSql = "SELECT id, heading, type
+            $candidateSql = "SELECT id, heading, type, workspace
                    FROM entries
                   WHERE trash = 0
                     AND id != ?
                     AND type IN ('note', 'markdown', 'tasklist')";
             $candidateParams = [$noteId];
-            if ($workspace !== '') {
+            if ($workspace !== '' && !$allWorkspaces) {
                 $candidateSql .= ' AND workspace = ?';
                 $candidateParams[] = $workspace;
             }
@@ -135,6 +146,7 @@ class BacklinksController
 
                 // 3. Wiki-link syntax: [[Note Title]]
                 if (!$found && $targetHeading !== '' &&
+                    (string) $note['workspace'] === $targetWorkspace &&
                     strpos($content, '[[' . $targetHeading . ']]') !== false
                 ) {
                     $found = true;
@@ -144,6 +156,7 @@ class BacklinksController
                     $backlinks[] = [
                         'id'      => (int) $note['id'],
                         'heading' => $note['heading'] !== '' ? $note['heading'] : 'Untitled',
+                        'workspace' => (string) $note['workspace'],
                     ];
                 }
             }

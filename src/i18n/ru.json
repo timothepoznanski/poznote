@@ -3504,7 +3504,9 @@
     "logout": {
       "confirm": "Вы действительно хотите выйти?",
       "signed_in_as": "Вы вошли как {{username}}",
-      "in_progress": "Выход..."
+      "in_progress": "Выход...",
+      "switch_intro": "Переключитесь на другую учётную запись или полностью выйдите.",
+      "switch_in_progress": "Переключение учётной записи..."
     }
   },
   "password": {
@@ -3974,7 +3976,8 @@
     "modal": {
       "create_button": "Создать и связать",
       "recent_notes": "Недавние заметки",
-      "search_placeholder": "Поиск заметки..."
+      "search_placeholder": "Поиск заметки...",
+      "all_workspaces": "Искать во всех рабочих пространствах"
     },
     "untitled": "Без названия",
     "empty": {

@@ -3503,7 +3503,9 @@
     "logout": {
       "confirm": "Are you sure you want to log out?",
       "signed_in_as": "You are signed in as {{username}}",
-      "in_progress": "Logging out..."
+      "in_progress": "Logging out...",
+      "switch_intro": "Switch to another account, or log out completely.",
+      "switch_in_progress": "Switching account..."
     }
   },
   "password": {
@@ -3973,7 +3975,8 @@
     "modal": {
       "create_button": "Create & link",
       "recent_notes": "Recent notes",
-      "search_placeholder": "Search for a note..."
+      "search_placeholder": "Search for a note...",
+      "all_workspaces": "Search all workspaces"
     },
     "untitled": "Untitled",
     "empty": {

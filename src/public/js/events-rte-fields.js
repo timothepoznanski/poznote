@@ -176,6 +176,16 @@ function handleInternalNoteLink(href) {
     if (!noteMatch || !noteMatch[1]) return false;
 
     var targetNoteId = noteMatch[1];
+
+    // A link without a workspace may target a note of another workspace:
+    // navigateToNote (note-reference.js) looks the workspace up before
+    // opening. Its own click handler fires for the same link right after
+    // this one and is dropped as a duplicate.
+    if (!workspaceMatch && typeof window.navigateToNote === 'function') {
+        window.navigateToNote(targetNoteId);
+        return true;
+    }
+
     var targetWorkspace = workspaceMatch
         ? decodeURIComponent(workspaceMatch[1])
         : (window.selectedWorkspace || window.getSelectedWorkspace());

@@ -331,7 +331,8 @@
     "modal": {
       "search_placeholder": "搜索笔记...",
       "recent_notes": "最近的笔记",
-      "create_button": "新建并链接"
+      "create_button": "新建并链接",
+      "all_workspaces": "搜索所有工作区"
     },
     "empty": {
       "no_notes_found": "未找到笔记",
@@ -3978,7 +3979,9 @@
     "logout": {
       "confirm": "确定要退出登录吗？",
       "signed_in_as": "您当前登录的账户是 {{username}}",
-      "in_progress": "正在退出登录..."
+      "in_progress": "正在退出登录...",
+      "switch_intro": "切换到其他账户，或完全退出登录。",
+      "switch_in_progress": "正在切换账户..."
     }
   },
   "password": {

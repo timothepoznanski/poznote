@@ -347,6 +347,55 @@ function selectAuthenticatedAccount(int $targetUserId): bool {
     return setActiveUserAccount($targetUser);
 }
 
+/**
+ * Accounts the signed-in person can switch to without signing in again, their
+ * own first. Empty unless there is a real choice: a public workspace visitor or
+ * someone with a single account has nothing to switch to.
+ */
+function getSwitchableAccountProfiles(): array {
+    if (!isRealUserAuthenticated()) {
+        return [];
+    }
+
+    $authUserId = (int)(getAuthenticatedUserId() ?? 0);
+    if ($authUserId <= 0) {
+        return [];
+    }
+
+    require_once __DIR__ . '/users/db_master.php';
+    $profiles = getUserAccessibleProfiles($authUserId);
+
+    return count($profiles) > 1 ? $profiles : [];
+}
+
+/**
+ * Leave the active account for another one the signed-in person can open. The
+ * login identity is kept, so no password or SSO round trip is needed; only the
+ * session state that belongs to the account being left is dropped.
+ */
+function switchActiveAccount(int $targetUserId): bool {
+    if (!isRealUserAuthenticated()) {
+        return false;
+    }
+
+    $previousUserId = (int)(getCurrentUserId() ?? 0);
+    if (!selectAuthenticatedAccount($targetUserId)) {
+        return false;
+    }
+
+    if ($previousUserId !== $targetUserId) {
+        unset(
+            $_SESSION['last_sync_result'],
+            $_SESSION['git_sync_progress'],
+            $_SESSION['git_sync_running'],
+            $_SESSION['git_sync_async_result'],
+            $_SESSION['git_sync_state_file']
+        );
+    }
+
+    return true;
+}
+
 function validateActiveAccountAccess(): bool {
     $authUserId = (int)getAuthenticatedUserId();
     $activeUserId = (int)getCurrentUserId();

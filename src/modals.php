@@ -1319,6 +1319,10 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
         <div class="note-reference-search">
             <input type="text" id="noteReferenceSearch" placeholder="<?php echo t_h('note_reference.modal.search_placeholder', [], 'Search for a note...'); ?>" autocomplete="off">
         </div>
+        <label class="note-reference-all-workspaces">
+            <input type="checkbox" id="noteReferenceAllWorkspaces">
+            <span><?php echo t_h('note_reference.modal.all_workspaces', [], 'Search all workspaces'); ?></span>
+        </label>
         <div class="note-reference-recent-label"><?php echo t_h('note_reference.modal.recent_notes', [], 'Recent notes'); ?></div>
         <div id="noteReferenceList" class="note-reference-list">
             <!-- Notes will be populated here -->

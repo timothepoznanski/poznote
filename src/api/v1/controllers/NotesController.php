@@ -2401,13 +2401,13 @@ class NotesController {
             if (is_numeric($reference)) {
                 $noteId = intval($reference);
                 if ($workspace) {
-                    $sql = "SELECT id, heading FROM entries WHERE trash = 0 AND id = ? AND workspace = ?";
+                    $sql = "SELECT id, heading, workspace FROM entries WHERE trash = 0 AND id = ? AND workspace = ?";
                     $params = [$noteId, $workspace];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
                 } else {
-                    $sql = "SELECT id, heading FROM entries WHERE trash = 0 AND id = ?";
+                    $sql = "SELECT id, heading, workspace FROM entries WHERE trash = 0 AND id = ?";
                     $params = [$noteId];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $stmt = $this->con->prepare($sql);
@@ -2415,14 +2415,14 @@ class NotesController {
                 }
             } else {
                 if ($workspace) {
-                    $sql = "SELECT id, heading FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ?";
+                    $sql = "SELECT id, heading, workspace FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ?";
                     $params = ['%' . $reference . '%', $workspace];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $sql .= " ORDER BY updated DESC LIMIT 1";
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
                 } else {
-                    $sql = "SELECT id, heading FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?)";
+                    $sql = "SELECT id, heading, workspace FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?)";
                     $params = ['%' . $reference . '%'];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $sql .= " ORDER BY updated DESC LIMIT 1";
@@ -2436,7 +2436,8 @@ class NotesController {
             if ($note) {
                 $this->sendSuccess([
                     'id' => $note['id'],
-                    'heading' => $note['heading']
+                    'heading' => $note['heading'],
+                    'workspace' => $note['workspace']
                 ]);
             } else {
                 $this->sendError(404, 'Note not found');
