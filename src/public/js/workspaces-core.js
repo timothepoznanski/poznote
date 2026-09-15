@@ -215,8 +215,8 @@ function displayWorkspaceMenu(menu, workspaces, username, actingAs) {
     if (menuHtml !== '' && !(editHidden && createHidden)) {
         menuHtml += '<div class="workspace-menu-divider"></div>';
     }
-    menuHtml += workspaceMenuActionHtml('data-workspace-url', 'workspaces.php', 'edit-workspaces', 'lucide-settings', wsTr('workspaces.menu.edit_workspaces', {}, 'Edit workspaces'));
     menuHtml += workspaceMenuActionHtml('data-workspace-action', 'create', 'new-workspace', 'lucide-plus-circle', wsTr('workspaces.menu.new_workspace', {}, 'New workspace'));
+    menuHtml += workspaceMenuActionHtml('data-workspace-url', 'workspaces.php', 'edit-workspaces', 'lucide-settings', wsTr('workspaces.menu.edit_workspaces', {}, 'Edit workspaces'));
 
     menu.innerHTML = menuHtml;
 
