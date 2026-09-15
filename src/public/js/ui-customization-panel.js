@@ -288,8 +288,24 @@
         }
     }
 
+    // Check all / Uncheck all replaces the section's selection wholesale (and
+    // saves immediately), so ask first, like the Settings modal does
+    function confirmToggleAll(done) {
+        var tr = typeof window.t === 'function'
+            ? window.t
+            : function (key, params, fallback) { return fallback; };
+        var message = tr('modals.ui_customization.toggle_all_warning', {},
+            'This will lose all your existing customizations. Do you want to continue?');
+        if (window.modalAlert && typeof window.modalAlert.confirm === 'function') {
+            window.modalAlert.confirm(message, tr('modals.ui_customization.panel_title', {}, 'Customize this page'))
+                .then(function (confirmed) { if (confirmed) done(); });
+        } else if (window.confirm(message)) {
+            done();
+        }
+    }
+
     function init() {
-        panel = document.getElementById('uiCustomizationPanel');
+        panel =document.getElementById('uiCustomizationPanel');
         toggleButton = document.getElementById('uiCustomizationPanelToggle');
         if (!panel || !toggleButton) return;
 
@@ -322,11 +338,13 @@
             if (toggleAll) {
                 var section = toggleAll.closest('.ui-custom-section');
                 if (!section) return;
-                var checkboxes = section.querySelectorAll('[data-ui-key]:not(:disabled)');
-                var allChecked = Array.prototype.every.call(checkboxes, function (cb) { return cb.checked; });
-                checkboxes.forEach(function (cb) { cb.checked = !allChecked; });
-                updateSectionToggleButton(section);
-                commit();
+                confirmToggleAll(function () {
+                    var checkboxes = section.querySelectorAll('[data-ui-key]:not(:disabled)');
+                    var allChecked = Array.prototype.every.call(checkboxes, function (cb) { return cb.checked; });
+                    checkboxes.forEach(function (cb) { cb.checked = !allChecked; });
+                    updateSectionToggleButton(section);
+                    commit();
+                });
                 return;
             }
 
