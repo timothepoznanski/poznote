@@ -247,9 +247,10 @@ docker compose up -d
 <details>
 <summary><strong>☁️ Cloud</strong></summary><br>
 
-Sie möchten keinen Server verwalten? Poznote lässt sich in wenigen Minuten in der Cloud bereitstellen.
+Sie möchten keinen Server verwalten? Zwei Anbieter betreiben Poznote für Sie. In beiden Fällen legen Sie zuerst ein Konto beim Anbieter an und stellen Poznote dann mit wenigen Klicks aus dessen Katalog bereit. Beide gewähren bei der Registrierung ein Startguthaben, sodass Sie es kostenlos ausprobieren können.
 
-Die Cloud-Hosting-Angebote finden Sie unter [poznote.com/hosting.html](https://poznote.com/hosting.html).
+- **[Caliber Node](https://calibernode.com/cloud-apps/poznote)**, ab 2,50 $ pro Monat: Updates kommen, sobald sie veröffentlicht sind, feste Tarife (bei Bedarf wechseln Sie in den nächsthöheren), SSH-Konsole und automatische Snapshots inklusive. Gut geeignet, wenn Sie möglichst wenig verwalten möchten und nicht allzu viele Notizen haben.
+- **[PikaPods](https://www.pikapods.com/pods?run=poznote)**, ab 2 $ pro Monat: Updates werden vor der Auslieferung getestet und kommen daher etwas später, RAM, CPU und Speicher lassen sich unabhängig voneinander einstellen, Backups laufen automatisch, den Speicherort (S3) richten Sie aber selbst ein. Gut geeignet, wenn Sie mit Ihren Notizen wachsen möchten.
 
 </details>
 

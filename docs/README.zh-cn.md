@@ -247,9 +247,10 @@ docker compose up -d
 <details>
 <summary><strong>☁️ 云端</strong></summary><br>
 
-不想自己管理服务器？Poznote 可以在几分钟内部署到云端。
+不想自己管理服务器？有两家托管商可以为你运行 Poznote。无论选择哪一家，都需要先在托管商处注册账号，然后在其应用目录中点几下即可部署 Poznote。两家在注册时都会赠送免费额度，你可以先免费试用。
 
-云托管方案请见 [poznote.com/hosting.html](https://poznote.com/hosting.html)。
+- **[Caliber Node](https://calibernode.com/cloud-apps/poznote)**，每月 2.50 美元起：新版本发布后立即更新，固定套餐（需要更多资源时升级到下一档），包含 SSH 控制台和自动快照。适合希望尽量少操心、笔记数量不多的用户。
+- **[PikaPods](https://www.pikapods.com/pods?run=poznote)**，每月 2 美元起：更新在推送前经过测试，因此会稍晚一些，内存、CPU 和磁盘可分别调整，备份自动运行，但存储位置（S3）需要你自己配置。适合希望随着笔记增多灵活扩容的用户。
 
 </details>
 
