@@ -3984,7 +3984,9 @@
     "logout": {
       "confirm": "Voulez-vous vraiment vous déconnecter ?",
       "signed_in_as": "Vous êtes connecté en tant que {{username}}",
-      "in_progress": "Déconnexion..."
+      "in_progress": "Déconnexion...",
+      "switch_intro": "Passez à un autre compte, ou déconnectez-vous complètement.",
+      "switch_in_progress": "Changement de compte..."
     }
   },
   "password": {

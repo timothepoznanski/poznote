@@ -132,6 +132,58 @@
     background-color: var(--pz-surface-sunken);
 }
 
+/* Other accounts offered in the logout dialog when the signed-in person can
+   open several (js/profile.js); same look as the account choice of login.php. */
+#confirmLogoutModal .logout-account-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+#confirmLogoutModal .logout-account-option {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--pz-border-light);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+    color: var(--pz-text);
+    font: inherit;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+#confirmLogoutModal .logout-account-option:hover:not(:disabled),
+#confirmLogoutModal .logout-account-option:focus-visible {
+    border-color: var(--pz-accent);
+    background: var(--pz-surface);
+    outline: none;
+}
+
+#confirmLogoutModal .logout-account-option:disabled {
+    cursor: default;
+}
+
+#confirmLogoutModal .logout-account-name {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+#confirmLogoutModal .logout-account-badge {
+    flex: 0 0 auto;
+    padding: 2px 7px;
+    border-radius: var(--pz-radius-sm);
+    background: var(--pz-accent-soft);
+    color: var(--pz-accent);
+    font-size: 12px;
+}
+
 /* Dark mode. Every host page loads css/dark-mode/variables.css, so the tokens
    are always defined; both theme hooks are needed, as elsewhere. */
 html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) {
@@ -153,6 +205,17 @@ html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal, #iconSidebar
 
 html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) .modal-buttons button.btn-cancel:hover {
     background-color: var(--dm-border);
+}
+
+html[data-theme='dark'] #confirmLogoutModal .logout-account-option {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] #confirmLogoutModal .logout-account-option:hover:not(:disabled),
+html[data-theme='dark'] #confirmLogoutModal .logout-account-option:focus-visible {
+    border-color: var(--pz-accent);
+    background: var(--dm-border);
 }
 
 /* ============================================

@@ -327,13 +327,24 @@
         var existing = document.getElementById('confirmLogoutModal');
         if (existing) existing.remove();
 
+        // Set by icon_sidebar.php only when the signed-in person can open
+        // several accounts: the other ones are offered before a full logout.
+        var accountSwitch = window.PoznoteAccountSwitch || null;
+        var otherAccounts = accountSwitch && Array.isArray(accountSwitch.accounts)
+            ? accountSwitch.accounts.filter(function (account) { return !account.current; })
+            : [];
+        var canSwitch = otherAccounts.length > 0;
+
         var modal = document.createElement('div');
         modal.id = 'confirmLogoutModal';
         modal.className = 'modal';
         modal.innerHTML =
             '<div class="modal-content">' +
                 '<h3>' + tr('workspace_menu.logout', {}, 'Logout') + '</h3>' +
-                '<p class="text-small-muted">' + tr('profile.logout.confirm', {}, 'Are you sure you want to log out?') + '</p>' +
+                '<p class="text-small-muted">' + (canSwitch
+                    ? tr('profile.logout.switch_intro', {}, 'Switch to another account, or log out completely.')
+                    : tr('profile.logout.confirm', {}, 'Are you sure you want to log out?')) + '</p>' +
+                (canSwitch ? '<div class="logout-account-list" id="clAccountList"></div>' : '') +
                 '<p class="text-small-muted" id="clSignedInAs" style="display:none;"></p>' +
                 '<div class="modal-buttons">' +
                     '<button type="button" class="btn-cancel" id="clCancelBtn">' + tr('common.cancel', {}, 'Cancel') + '</button>' +
@@ -386,11 +397,64 @@
             });
 
         var confirmBtn = document.getElementById('clConfirmBtn');
+
+        function freezeButtons() {
+            var buttons = modal.querySelectorAll('button');
+            for (var i = 0; i < buttons.length; i++) buttons[i].disabled = true;
+        }
+
+        // Account names are user data: built with textContent, never innerHTML.
+        var accountList = document.getElementById('clAccountList');
+        if (accountList) {
+            otherAccounts.forEach(function (account) {
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'logout-account-option';
+
+                var name = document.createElement('span');
+                name.className = 'logout-account-name';
+                name.textContent = account.username;
+                btn.appendChild(name);
+
+                if (account.own) {
+                    var badge = document.createElement('span');
+                    badge.className = 'logout-account-badge';
+                    badge.textContent = tr('login.account_select.own_account', {}, 'Your account');
+                    btn.appendChild(badge);
+                }
+
+                btn.addEventListener('click', function () {
+                    freezeButtons();
+                    name.textContent = tr('profile.logout.switch_in_progress', {}, 'Switching account...');
+                    // Best effort: the account being left keeps no edit lock on
+                    // the open note (it would otherwise expire on its own).
+                    if (typeof window.releaseCurrentNoteEditLock === 'function') {
+                        try { window.releaseCurrentNoteEditLock(); } catch (e) { /* lock expires anyway */ }
+                    }
+
+                    var form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = accountSwitch.action || 'switch_account.php';
+                    form.style.display = 'none';
+                    [['csrf_token', accountSwitch.csrfToken || ''], ['account_user_id', String(account.id)]].forEach(function (pair) {
+                        var input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = pair[0];
+                        input.value = pair[1];
+                        form.appendChild(input);
+                    });
+                    document.body.appendChild(form);
+                    form.submit();
+                });
+
+                accountList.appendChild(btn);
+            });
+        }
+
         confirmBtn.addEventListener('click', function () {
             // One-way action: freeze the buttons and show progress while the
             // browser navigates to logout.php
-            confirmBtn.disabled = true;
-            document.getElementById('clCancelBtn').disabled = true;
+            freezeButtons();
             confirmBtn.textContent = tr('profile.logout.in_progress', {}, 'Logging out...');
             window.location.href = logoutUrl;
         });

@@ -290,6 +290,32 @@ $iconSidebarBottomItems = [
     ['id' => 'iconSidebarLogoutBtn', 'url' => $iconSidebarBasePath . 'logout.php', 'icon' => 'lucide-log-out', 'label' => t('workspace_menu.logout', [], 'Logout')],
 ];
 
+// Someone who can open several accounts gets them offered in the logout dialog
+// (js/profile.js), which posts the choice to switch_account.php. The token is
+// kept for the whole session so several open tabs all stay valid.
+$iconSidebarAccountSwitch = null;
+$iconSidebarSwitchProfiles = function_exists('getSwitchableAccountProfiles') ? getSwitchableAccountProfiles() : [];
+if (!empty($iconSidebarSwitchProfiles)) {
+    if (empty($_SESSION['account_switch_csrf_token'])) {
+        $_SESSION['account_switch_csrf_token'] = bin2hex(random_bytes(32));
+    }
+    $iconSidebarAuthUserId = (int)(getAuthenticatedUserId() ?? 0);
+    $iconSidebarActiveUserId = (int)(getCurrentUserId() ?? 0);
+    $iconSidebarAccountSwitch = [
+        'action' => $iconSidebarBasePath . 'switch_account.php',
+        'csrfToken' => $_SESSION['account_switch_csrf_token'],
+        'accounts' => array_map(static function (array $profile) use ($iconSidebarAuthUserId, $iconSidebarActiveUserId): array {
+            $id = (int)$profile['id'];
+            return [
+                'id' => $id,
+                'username' => (string)($profile['username'] ?? ''),
+                'own' => $id === $iconSidebarAuthUserId,
+                'current' => $id === $iconSidebarActiveUserId,
+            ];
+        }, $iconSidebarSwitchProfiles),
+    ];
+}
+
 $iconSidebarToggleLabel = t_h('sidebar.toggle_icon_sidebar', [], 'Hide/Show icon sidebar');
 $iconSidebarOverflowLabel = t_h('sidebar.show_hidden_icons', [], 'Show hidden icons');
 
@@ -325,6 +351,9 @@ $iconSidebarProfileStrings = [
     'profile.logout.signed_in_as' => t('profile.logout.signed_in_as', [], 'Signed in as {{username}}'),
     'profile.logout.in_progress' => t('profile.logout.in_progress', [], 'Logging out...'),
     'workspace_menu.logout' => t('workspace_menu.logout', [], 'Logout'),
+    'profile.logout.switch_intro' => t('profile.logout.switch_intro', [], 'Switch to another account, or log out completely.'),
+    'profile.logout.switch_in_progress' => t('profile.logout.switch_in_progress', [], 'Switching account...'),
+    'login.account_select.own_account' => t('login.account_select.own_account', [], 'Your account'),
     'multiuser.admin.email' => t('multiuser.admin.email', [], 'Email'),
     'common.cancel' => t('common.cancel', [], 'Cancel'),
     'common.save' => t('common.save', [], 'Save'),
@@ -335,6 +364,9 @@ $iconSidebarProfileStrings = [
 <link rel="stylesheet" href="<?php echo $iconSidebarAsset('css/profile-modal.css'); ?>">
 <script>
 window.PoznoteProfileI18n = <?php echo json_encode($iconSidebarProfileStrings, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;
+<?php if (!empty($iconSidebarAccountSwitch)): ?>
+window.PoznoteAccountSwitch = <?php echo json_encode($iconSidebarAccountSwitch, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;
+<?php endif; ?>
 </script>
 <script src="<?php echo $iconSidebarAsset('js/profile.js'); ?>" defer></script>
 <script>

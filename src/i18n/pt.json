@@ -3880,7 +3880,9 @@
     "logout": {
       "confirm": "Tem certeza de que deseja sair?",
       "signed_in_as": "Você está conectado como {{username}}",
-      "in_progress": "Saindo..."
+      "in_progress": "Saindo...",
+      "switch_intro": "Mude para outra conta ou termine a sessão por completo.",
+      "switch_in_progress": "A mudar de conta..."
     }
   },
   "password": {
