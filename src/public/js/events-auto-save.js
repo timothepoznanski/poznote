@@ -1259,6 +1259,30 @@ window.adoptNoteSavedTitle = function (noteId, title) {
         lastSavedTitle = title;
     }
 };
+// A note renamed outside its title field (tree inline rename, rename modal,
+// tree undo/redo): show the new title in the open note and make it the saved
+// one. A stored draft still carries the old title (every save leaves one), and
+// the recovery after the reload would take it for an unsaved edit: it gets the
+// new title too.
+window.adoptNoteRename = function (noteId, title) {
+    if (!noteId || typeof title !== 'string') {
+        return;
+    }
+    const titleInput = document.getElementById('inp' + noteId);
+    if (titleInput) {
+        titleInput.value = title;
+        if (String(noteId) === String(noteid) || String(noteId) === getDisplayedNoteId()) {
+            lastSavedTitle = title;
+        }
+    }
+    try {
+        if (localStorage.getItem('poznote_title_' + noteId) !== null) {
+            localStorage.setItem('poznote_title_' + noteId, title);
+        }
+    } catch (e) {
+        // storage unavailable: no draft to carry the title into
+    }
+};
 // What is on screen now IS the server version (js/live-refresh.js applied
 // an outside change in place, nothing of ours in it): make it the saved
 // state, so the editor's own input event does not queue a pointless save

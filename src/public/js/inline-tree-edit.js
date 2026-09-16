@@ -477,6 +477,9 @@
                 return;
             }
             done(true);
+            if (typeof window.adoptNoteRename === 'function') {
+                window.adoptNoteRename(noteId, (data.note && data.note.heading) || name);
+            }
             if (window.PoznoteTreeHistory && previousName) {
                 window.PoznoteTreeHistory.record({
                     type: 'note-rename', noteId: String(noteId), from: previousName, to: name

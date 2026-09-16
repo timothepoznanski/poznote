@@ -71,6 +71,9 @@ function saveNoteName() {
         })
         .then(function (data) {
             if (data && data.success) {
+                if (typeof window.adoptNoteRename === 'function') {
+                    window.adoptNoteRename(noteId, (data.note && data.note.heading) || newName);
+                }
                 closeModal('renameNoteModal');
                 window.location.reload();
                 return;

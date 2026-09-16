@@ -433,7 +433,12 @@
             body: JSON.stringify({ heading: heading, editor_session_id: headers['X-Editor-Session-ID'] || '' })
         }).then(function (response) {
             return response.json().catch(function () { return {}; }).then(function (data) {
-                if (data && data.success) return data;
+                if (data && data.success) {
+                    if (typeof window.adoptNoteRename === 'function') {
+                        window.adoptNoteRename(noteId, (data.note && data.note.heading) || heading);
+                    }
+                    return data;
+                }
                 throw new Error((data && (data.error || data.message)) || ('HTTP ' + response.status));
             });
         });
