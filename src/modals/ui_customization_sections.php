@@ -168,6 +168,7 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:title" checked><span><?php echo t_h('slash_menu.title', [], 'Title'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:format" checked><span><?php echo t_h('slash_menu.format_text', [], 'Format text'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:color" checked><span><?php echo t_h('slash_menu.color', [], 'Color'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:highlight" checked><span><?php echo t_h('slash_menu.highlight', [], 'Highlight'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:code" checked><span><?php echo t_h('slash_menu.code', [], 'Code'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:list" checked><span><?php echo t_h('slash_menu.list', [], 'List'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:tasklist-embed" checked><span><?php echo t_h('slash_menu.tasklist_embed', [], 'Task list'); ?></span></label>

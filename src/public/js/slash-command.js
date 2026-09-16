@@ -746,11 +746,6 @@
         insertInlineElement('em');
     }
 
-    // Insert highlighted text
-    function insertHighlight() {
-        insertInlineElement('mark');
-    }
-
     // Insert strikethrough text
     function insertStrikethrough() {
         insertInlineElement('s');
@@ -785,6 +780,28 @@
                 id: c.id,
                 icon: 'lucide-circle',
                 iconColor: value,
+                label: t('colors.' + c.id, null, c.id.charAt(0).toUpperCase() + c.id.slice(1)),
+                action: () => apply(value)
+            };
+        });
+    }
+
+    // The highlight submenu, the toolbar highlight picker's swatches (issue
+    // #1411). Yellow leads so "/highlight" + Enter keeps the usual highlight.
+    // apply receives the soft value; the icon shows the base colour, which
+    // stays visible where the soft one fades into a dark background.
+    function paletteHighlightItems(apply) {
+        const palette = window.PoznoteColorPalette;
+        const t = window.t || ((key, params, fallback) => fallback);
+        if (!palette) return [];
+        const colors = palette.colors.filter(c => c.id === 'yellow')
+            .concat(palette.colors.filter(c => c.id !== 'yellow'));
+        return colors.map(c => {
+            const value = palette.highlightColor(c.id);
+            return {
+                id: 'highlight-' + c.id,
+                icon: 'lucide-paintbrush',
+                iconColor: palette.textColor(c.id),
                 label: t('colors.' + c.id, null, c.id.charAt(0).toUpperCase() + c.id.slice(1)),
                 action: () => apply(value)
             };
@@ -2327,7 +2344,6 @@
                 submenu: [
                     { id: 'bold', icon: 'lucide-bold', label: t('slash_menu.bold', null, 'Bold'), action: () => insertBold() },
                     { id: 'italic', icon: 'lucide-italic', label: t('slash_menu.italic', null, 'Italic'), action: () => insertItalic() },
-                    { id: 'highlight', icon: 'lucide-fill-drip', label: t('slash_menu.highlight', null, 'Highlight'), action: () => insertHighlight() },
                     { id: 'strikethrough', icon: 'lucide-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => insertStrikethrough() }
                 ]
             },
@@ -2338,6 +2354,12 @@
                 submenu: paletteColorItems(function (value) { insertColor(value); }).concat([
                     { id: 'default', icon: 'lucide-circle', iconColor: 'var(--pz-text)', label: t('colors.default', null, 'Default'), action: () => insertColor('inherit') }
                 ])
+            },
+            {
+                id: 'highlight',
+                icon: 'lucide-paintbrush',
+                label: t('slash_menu.highlight', null, 'Highlight'),
+                submenu: paletteHighlightItems(function (value) { insertInlineElement('span', { backgroundColor: value }); })
             },
             {
                 id: 'code',
@@ -2762,15 +2784,21 @@
                 label: t('slash_menu.color', null, 'Color'),
                 submenu: paletteColorItems(function (value) {
                     wrapMarkdownSelection('<span style="color:' + value + '">', '</span>');
-                }).concat([
-                    {
-                        id: 'bg-yellow',
-                        icon: 'lucide-fill-drip',
-                        iconColor: paletteValue('text', 'yellow'),
-                        label: t('slash_menu.bg_yellow', null, 'Yellow background'),
-                        action: () => wrapMarkdownSelection('<span style="background-color:' + paletteValue('highlight', 'yellow') + '">', '</span>')
+                })
+            },
+            {
+                id: 'highlight',
+                icon: 'lucide-paintbrush',
+                label: t('slash_menu.highlight', null, 'Highlight'),
+                // Yellow is ==text==, like the toolbar (markdown <mark> is
+                // painted yellow); the other colours need a styled span
+                submenu: paletteHighlightItems(function (value) {
+                    if (value === paletteValue('highlight', 'yellow')) {
+                        wrapMarkdownSelection('==', '==', 2);
+                    } else {
+                        wrapMarkdownSelection('<span style="background-color:' + value + '">', '</span>');
                     }
-                ])
+                })
             },
             {
                 id: 'insert',
@@ -3026,25 +3054,34 @@
             }
         };
 
+        // The toolbar highlight helpers: markdown writes ==text== for yellow
+        // and a styled span otherwise, HTML goes through hiliteColor
+        const applyHighlight = function (value) {
+            if (isMarkdown) {
+                if (typeof window.applyMarkdownHighlight === 'function') window.applyMarkdownHighlight(value);
+            } else if (typeof window.applyHighlightToSelection === 'function') {
+                window.applyHighlightToSelection(value);
+            }
+        };
         const highlight = {
             id: 'highlight',
-            icon: 'lucide-fill-drip',
+            icon: 'lucide-paintbrush',
             label: t('slash_menu.highlight', null, 'Highlight'),
-            action: function () {
-                if (isMarkdown) {
-                    if (typeof window.applyMarkdownHighlight === 'function') window.applyMarkdownHighlight();
-                } else if (typeof window.applyHighlightToSelection === 'function') {
-                    window.applyHighlightToSelection(paletteValue('highlight', 'yellow'));
+            submenu: paletteHighlightItems(applyHighlight).concat(isMarkdown ? [] : [
+                {
+                    id: 'highlight-none',
+                    icon: 'lucide-ban',
+                    label: t('editor.colors.none', null, 'None'),
+                    action: () => applyHighlight('none')
                 }
-            }
+            ])
         };
 
         const format = isMarkdown
-            ? [pick('format', 'bold'), pick('format', 'italic'), highlight, pick('format', 'strikethrough')]
+            ? [pick('format', 'bold'), pick('format', 'italic'), pick('format', 'strikethrough')]
             : [
                 { id: 'bold', icon: 'lucide-bold', label: t('slash_menu.bold', null, 'Bold'), action: () => document.execCommand('bold') },
                 { id: 'italic', icon: 'lucide-italic', label: t('slash_menu.italic', null, 'Italic'), action: () => document.execCommand('italic') },
-                highlight,
                 { id: 'strikethrough', icon: 'lucide-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => document.execCommand('strikeThrough') }
             ];
 
@@ -3088,6 +3125,7 @@
                 submenu: format
             },
             color,
+            highlight,
             {
                 id: 'code',
                 icon: 'lucide-code',
