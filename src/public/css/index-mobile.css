@@ -194,6 +194,12 @@ body.mobile-formatting-toolbar-active .color-palette-popup {
     z-index: 2147483002;
 }
 
+/* The slash menu opened on a selection (issue #1410) keeps the formatting toolbar up */
+body.mobile-formatting-toolbar-active .slash-command-menu,
+body.mobile-keyboard-open .slash-command-menu {
+    z-index: 2147483002;
+}
+
 body.mobile-formatting-toolbar-active #linkModal.modal,
 body.mobile-formatting-toolbar-active #tagsModal.modal,
 body.mobile-keyboard-open #tagsModal.modal,

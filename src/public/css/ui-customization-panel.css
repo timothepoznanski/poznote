@@ -199,7 +199,19 @@ html[data-theme='dark'] .page-more-menu-item:focus-visible {
 
 .pz-help-modal-content .pz-help-modal-header h3 {
     flex: 1;
+    min-width: 0;
     margin: 0;
+}
+
+/* On mobile modals/responsive.css turns every .modal-content > div > button
+   into a full-width 44px block, which pushed the close button next to a
+   squeezed, wrapped title. The extra class outweighs that selector. */
+.pz-help-modal-content > .pz-help-modal-header > button {
+    width: 26px !important;
+    height: 26px !important;
+    display: inline-flex !important;
+    margin-bottom: 0 !important;
+    flex-shrink: 0;
 }
 
 .pz-help-modal-body {
