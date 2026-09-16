@@ -498,6 +498,16 @@
             : getBlockLanguage(block);
     }
 
+    function isTouchDevice() {
+        try {
+            var coarsePointer = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+            var touch = (navigator.maxTouchPoints || 0) > 0 || 'ontouchstart' in window;
+            return coarsePointer && touch;
+        } catch (e) {
+            return false;
+        }
+    }
+
     function openModal(block) {
         var modal = document.getElementById(MODAL_ID);
         if (!modal) return;
@@ -510,9 +520,17 @@
         renderLanguageList(getSelectedLanguage(block), '');
         modal.style.display = 'flex';
 
-        if (filterInput) {
-            // Let the modal paint before focusing, otherwise mobile keyboards
-            // and the click that opened the modal fight over the focus.
+        if (isTouchDevice()) {
+            // No autofocus on touch devices: the on-screen keyboard would cover
+            // half of the list. Drop the focus the note kept too, so a keyboard
+            // already up for editing goes away. Tapping the filter still opens it.
+            var active = document.activeElement;
+            if (active && active !== document.body && typeof active.blur === 'function') {
+                active.blur();
+            }
+        } else if (filterInput) {
+            // Let the modal paint before focusing, otherwise the click that
+            // opened the modal fights over the focus.
             setTimeout(function () { filterInput.focus(); }, 0);
         }
     }
