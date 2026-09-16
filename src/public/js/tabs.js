@@ -695,7 +695,7 @@
             });
 
             // Double-click on a tab closes it (same rules as the × button:
-            // pinned tabs and the last remaining tab stay open)
+            // pinned tabs stay open)
             bar.addEventListener('dblclick', function (e) {
                 if (hasDragged || _reorderJustFinished) return;
                 if (e.target.closest('.app-tab-close') || e.target.closest('.app-tab-close-all')) return;
@@ -706,7 +706,7 @@
             });
 
             // Middle-click on a tab closes it (same rules as the × button:
-            // pinned tabs and the last remaining tab stay open)
+            // pinned tabs stay open)
             bar.addEventListener('auxclick', function (e) {
                 if (e.button !== 1) return;
                 if (hasDragged) return;
@@ -757,7 +757,7 @@
 
             el.appendChild(titleSpan);
 
-            if (tabs.length > 1 && !_isPinnedTab(tab)) {
+            if (!_isPinnedTab(tab)) {
                 var closeBtn = document.createElement('button');
                 closeBtn.className = 'app-tab-close';
                 closeBtn.setAttribute('aria-label', 'Close tab');
@@ -876,25 +876,94 @@
         render();
     }
 
+    /**
+     * Close every tab except the pinned ones, the active tab included
+     * ("Close all except this one" keeps it). With nothing pinned the note
+     * pane is left empty.
+     */
     function closeAllTabs() {
-        var hasPinned = tabs.some(function (t) { return _isPinnedTab(t); });
+        var activeClosed = !_isPinnedTab(_findTabById(activeTabId));
+        if (activeClosed) _saveScrollPosition();
 
-        // Keep pinned tabs; also keep the active tab if no pinned tabs exist
         tabs = tabs.filter(function (t) {
             if (_isPinnedTab(t)) return true;
-            if (!hasPinned && t.id === activeTabId) return true;
+            delete _scrollPositions[t.id];
             return false;
         });
+
+        if (!activeClosed) {
+            _saveToStorage();
+            render();
+            return;
+        }
 
         if (tabs.length === 0) {
             activeTabId = null;
             _pendingTabSwitch = null;
-        } else if (hasPinned && !_findTabById(activeTabId)) {
-            // Active tab was closed — switch to first pinned tab
-            activeTabId = tabs[0].id;
+            _saveToStorage();
+            render();
+            _clearContentPane();
+            return;
         }
+
+        // Active tab was closed: switch to the first pinned tab
+        activeTabId = tabs[0].id;
         _saveToStorage();
         render();
+        _loadTabContent(tabs[0]);
+    }
+
+    /**
+     * Empty the note pane once the last tab is closed: the note (or kanban
+     * view) it showed has no tab any more. Pending edits are saved first.
+     */
+    function _clearContentPane() {
+        var currentNoteId = window.noteid;
+        if (currentNoteId && currentNoteId !== -1 &&
+            typeof window.hasUnsavedChanges === 'function' && window.hasUnsavedChanges(currentNoteId) &&
+            typeof window.showSaveInProgressNotification === 'function') {
+            window.showSaveInProgressNotification(_clearContentPaneNow);
+            return;
+        }
+        _clearContentPaneNow();
+    }
+
+    function _clearContentPaneNow() {
+        // Something was opened while the pending save finished
+        if (tabs.length > 0) return;
+
+        if (typeof window.releaseCurrentNoteEditLock === 'function') {
+            window.releaseCurrentNoteEditLock();
+        }
+        if (window._isKanbanViewActive && typeof window.resetKanbanViewState === 'function') {
+            window.resetKanbanViewState();
+        }
+
+        var rightCol = document.getElementById('right_col');
+        if (rightCol) {
+            if (typeof window.destroyMarkdownCodeMirrorEditorsWithin === 'function') {
+                window.destroyMarkdownCodeMirrorEditorsWithin(rightCol);
+            }
+            rightCol.innerHTML = '';
+        }
+        window.noteid = -1;
+
+        document.querySelectorAll('.links_arbo_left.selected-note').forEach(function (link) {
+            link.classList.remove('selected-note');
+        });
+        if (typeof window.refreshOutline === 'function') {
+            window.refreshOutline();
+        }
+
+        // Drop the note / kanban id from the URL so a reload does not reopen it
+        try {
+            var params = new URLSearchParams(window.location.search || '');
+            ['note', 'kanban', 'newtab'].forEach(function (key) { params.delete(key); });
+            var query = params.toString();
+            history.pushState({}, '', 'index.php' + (query ? '?' + query : ''));
+        } catch (e) {
+            console.debug('tabs: _clearContentPaneNow() URL update failed:', e);
+        }
     }
 
     /**
@@ -957,23 +1026,19 @@
         });
         menu.appendChild(pinItem);
 
-        if (tabs.length > 1) {
-            var separator = document.createElement('div');
-            separator.className = 'app-tab-context-separator';
-            menu.appendChild(separator);
-        }
+        var separator = document.createElement('div');
+        separator.className = 'app-tab-context-separator';
+        menu.appendChild(separator);
 
-        // Show close option for all tabs (including pinned)
-        if (tabs.length > 1) {
-            var closeItem = document.createElement('div');
-            closeItem.className = 'app-tab-context-item app-tab-context-item-danger';
-            closeItem.innerHTML = _t('tabs.context_menu.close', 'Close tab');
-            closeItem.addEventListener('click', function () {
-                _removeContextMenu();
-                closeTab(tabId, true);
-            });
-            menu.appendChild(closeItem);
-        }
+        // Show close option for all tabs (including pinned and the last one)
+        var closeItem = document.createElement('div');
+        closeItem.className = 'app-tab-context-item app-tab-context-item-danger';
+        closeItem.innerHTML = _t('tabs.context_menu.close', 'Close tab');
+        closeItem.addEventListener('click', function () {
+            _removeContextMenu();
+            closeTab(tabId, true);
+        });
+        menu.appendChild(closeItem);
 
         var hasOtherClosable = tabs.some(function (t) {
             return t.id !== tabId && !_isPinnedTab(t);
@@ -1311,13 +1376,14 @@
 
     /**
      * Called when a tab's × button is clicked.
-     * Removes the tab and switches to the closest neighbour.
-     * The last remaining tab cannot be closed unless force is true.
+     * Removes the tab and switches to the closest neighbour. Closing the last
+     * tab empties the note pane (#1413).
+     * Pinned tabs cannot be closed unless force is true. keepPane leaves the
+     * pane alone, for callers that navigate away themselves.
      */
-    function closeTab(tabId, force) {
+    function closeTab(tabId, force, keepPane) {
         var tabToClose = _findTabById(tabId);
         if (!force && tabToClose && _isPinnedTab(tabToClose)) return false; // cannot close pinned tab without unpinning
-        if (!force && tabs.length <= 1) return false; // cannot close the last tab via UI
         var idx = _indexById(tabId);
         if (idx === -1) return false;
 
@@ -1328,8 +1394,10 @@
         if (tabs.length === 0) {
             // Last tab closed
             activeTabId = null;
+            _pendingTabSwitch = null;
             _saveToStorage();
             render();
+            if (wasActive && !keepPane) _clearContentPane();
             return true;
         }
 
@@ -1356,14 +1424,15 @@
 
     /**
      * Close all tabs associated with a specific note ID.
-     * Used when a note is deleted.
+     * Used when a note is deleted or archived; the caller then reloads the
+     * page, so the pane is not emptied (nor the gone note saved) here.
      */
     function closeTabByNoteId(noteId) {
         noteId = String(noteId);
         // Iterate backwards to avoid index shifting issues
         for (var i = tabs.length - 1; i >= 0; i--) {
             if (_isNoteTab(tabs[i]) && tabs[i].noteId === noteId) {
-                closeTab(tabs[i].id, true); // true = force close even if it's the last one
+                closeTab(tabs[i].id, true, true); // force close even if pinned, keep the pane
             }
         }
     }
