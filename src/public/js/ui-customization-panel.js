@@ -550,6 +550,15 @@
             commit();
         });
 
+        // A button hidden from its right-click menu (js/icon-sidebar-colors.js)
+        // saved the set itself: adopt it, or the next change here would
+        // write the stale set back and show the button again.
+        document.addEventListener('poznote-hidden-ui-elements-saved', function (e) {
+            if (e.detail && Array.isArray(e.detail.hidden)) {
+                renderState(normalizeKeys(e.detail.hidden));
+            }
+        });
+
         var filter = document.getElementById('uiCustomizationPanelFilter');
         if (filter) {
             filter.addEventListener('input', function () {

@@ -4664,5 +4664,8 @@
       "escape": "Esc",
       "tab": "Tab"
     }
+  },
+  "icon_context_menu": {
+    "hide": "Скрыть кнопку"
   }
 }

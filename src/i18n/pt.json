@@ -4844,5 +4844,8 @@
       "escape": "Esc",
       "tab": "Tab"
     }
+  },
+  "icon_context_menu": {
+    "hide": "Ocultar o botão"
   }
 }

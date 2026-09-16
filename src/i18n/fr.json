@@ -4948,5 +4948,8 @@
       "escape": "Échap",
       "tab": "Tab"
     }
+  },
+  "icon_context_menu": {
+    "hide": "Masquer le bouton"
   }
 }

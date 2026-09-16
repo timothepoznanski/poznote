@@ -4843,5 +4843,8 @@
       "escape": "Esc",
       "tab": "Tab"
     }
+  },
+  "icon_context_menu": {
+    "hide": "Schaltfläche ausblenden"
   }
 }

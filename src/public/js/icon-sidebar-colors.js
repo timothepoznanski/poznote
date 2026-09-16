@@ -3,8 +3,9 @@
  *
  * Drives #iconSidebarColorModal, rendered by icon_sidebar.php next to the rail:
  * the folder colour palette (modals/icon_color_options.php) without the icon
- * grid. A right-click on a rail button opens it and saves the pick straight
- * away; the Icon Sidebar Order modal (js/settings-page.js) opens it with an
+ * grid. A right-click on a rail button opens a small menu (change the colour,
+ * or hide the button); its colour entry opens the modal, which saves the pick
+ * straight away. The Icon Sidebar Order modal (js/settings-page.js) opens it with an
  * onApply callback instead and saves along with the order. The note toolbar
  * (js/toolbar-icon-colors.js) opens it through window.PoznoteIconColorModal.
  *
@@ -217,6 +218,11 @@
         // Capture phase, so the Escape that closes this modal does not also
         // reach the handlers of a modal open beneath it.
         document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape' && menuEl && !menuEl.hidden) {
+                event.stopPropagation();
+                closeContextMenu(true);
+                return;
+            }
             if (event.key !== 'Escape' || !current) return;
             event.stopPropagation();
             close();
@@ -228,8 +234,186 @@
             var button = event.target.closest && event.target.closest('#icon_sidebar .icon-sidebar-btn[id]');
             if (!button || button.id === 'iconSidebarOverflowBtn') return;
             event.preventDefault();
-            open(button.id);
+            var nonHideable = Array.isArray(config.nonHideable) ? config.nonHideable : [];
+            openContextMenu(event, button, {
+                hideKey: nonHideable.indexOf(button.id) === -1 ? 'card:' + button.id : '',
+                onColor: function () { open(button.id); }
+            });
         });
+
+        document.addEventListener('mousedown', function (event) {
+            if (menuEl && !menuEl.hidden && !menuEl.contains(event.target)) closeContextMenu(false);
+        }, true);
+        document.addEventListener('scroll', function (event) {
+            if (menuEl && !menuEl.hidden && !menuEl.contains(event.target)) closeContextMenu(false);
+        }, true);
+        window.addEventListener('resize', function () { closeContextMenu(false); });
+        window.addEventListener('blur', function () { closeContextMenu(false); });
+    }
+
+    // ------------------------------------------------------------------
+    // Right-click menu of an icon button: change its colour, or hide it.
+    // Shared with the note toolbar (js/toolbar-icon-colors.js). Hiding adds
+    // the button's key to the 'hidden_ui_elements' user setting, the one the
+    // UI Customization list edits, so the button shows unchecked there and
+    // comes back from it.
+    // ------------------------------------------------------------------
+
+    var HIDDEN_UI_URL = '/api/v1/settings/hidden_ui_elements';
+    var menuEl = null;
+    // The button the menu was opened on, focused again when it closes.
+    var menuOwner = null;
+
+    function closeContextMenu(restoreFocus) {
+        if (!menuEl || menuEl.hidden) return;
+        menuEl.hidden = true;
+        menuEl.textContent = '';
+        if (restoreFocus && menuOwner && typeof menuOwner.focus === 'function') menuOwner.focus();
+        menuOwner = null;
+    }
+
+    function menuItems() {
+        return menuEl ? Array.prototype.slice.call(menuEl.querySelectorAll('.icon-context-menu-item')) : [];
+    }
+
+    function getMenu() {
+        if (menuEl) return menuEl;
+        menuEl = document.createElement('div');
+        menuEl.id = 'iconContextMenu';
+        menuEl.setAttribute('role', 'menu');
+        menuEl.hidden = true;
+        // Keep the note's caret and selection where they are.
+        menuEl.addEventListener('mousedown', function (event) { event.preventDefault(); });
+        menuEl.addEventListener('contextmenu', function (event) { event.preventDefault(); });
+        menuEl.addEventListener('keydown', function (event) {
+            // Escape is handled by the capture listener in init().
+            if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                var items = menuItems();
+                if (!items.length) return;
+                event.preventDefault();
+                var index = items.indexOf(document.activeElement);
+                var next = event.key === 'ArrowDown' ? index + 1 : index - 1;
+                items[(next + items.length) % items.length].focus();
+            } else if (event.key === 'Tab') {
+                closeContextMenu(false);
+            }
+        });
+        document.body.appendChild(menuEl);
+        return menuEl;
+    }
+
+    function addMenuItem(menu, icon, label, run) {
+        var item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'icon-context-menu-item';
+        item.setAttribute('role', 'menuitem');
+        var i = document.createElement('i');
+        i.className = 'lucide ' + icon;
+        i.setAttribute('aria-hidden', 'true');
+        item.appendChild(i);
+        item.appendChild(document.createTextNode(label));
+        item.addEventListener('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            closeContextMenu(false);
+            run();
+        });
+        menu.appendChild(item);
+    }
+
+    // Adds key to the user's own hidden set, read fresh so a change made in
+    // another tab or in the settings page is not overwritten.
+    function hideUiKey(key, element) {
+        var hidden = [];
+        fetch(HIDDEN_UI_URL, {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' },
+            credentials: 'same-origin'
+        })
+            .then(function (response) { return response.json(); })
+            .then(function (result) {
+                if (!result || !result.success) throw new Error('load failed');
+                try {
+                    var parsed = JSON.parse(result.value || '[]');
+                    if (Array.isArray(parsed)) hidden = parsed;
+                } catch (e) {
+                    console.debug('icon-sidebar-colors: unreadable hidden_ui_elements:', e);
+                }
+                if (hidden.indexOf(key) === -1) hidden.push(key);
+                return fetch(HIDDEN_UI_URL, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ value: JSON.stringify(hidden) })
+                });
+            })
+            .then(function (response) { return response.json(); })
+            .then(function (result) {
+                if (!result || !result.success) throw new Error('save failed');
+                var runtime = window.PoznoteUiCustomization;
+                if (runtime && typeof runtime.apply === 'function') {
+                    runtime.apply(hidden);
+                } else if (element) {
+                    // Pages without the UI Customization runtime (admin pages).
+                    element.style.display = 'none';
+                }
+                try {
+                    document.dispatchEvent(new CustomEvent('poznote-hidden-ui-elements-saved', {
+                        detail: { hidden: hidden.slice() }
+                    }));
+                } catch (e) {
+                    console.debug('icon-sidebar-colors: event dispatch failed:', e);
+                }
+            })
+            .catch(function (error) {
+                console.debug('icon-sidebar-colors: hideUiKey() failed:', error);
+                alert(config.errorSaving || 'Error saving preference');
+            });
+    }
+
+    /**
+     * Show the menu for a right-clicked button.
+     * options.onColor  opens the colour modal
+     * options.hideKey  UI Customization key that hides the button, '' when
+     *                  the button cannot be hidden (the entry is left out)
+     */
+    function openContextMenu(event, owner, options) {
+        var menu = getMenu();
+        closeContextMenu(false);
+        options = options || {};
+
+        if (typeof options.onColor === 'function') {
+            addMenuItem(menu, 'lucide-palette', config.menuChangeColor || 'Change icon color', options.onColor);
+        }
+        if (options.hideKey) {
+            addMenuItem(menu, 'lucide-eye-off', config.menuHide || 'Hide button', function () {
+                hideUiKey(options.hideKey, owner);
+            });
+        }
+        if (!menu.firstChild) return;
+
+        menuOwner = owner || null;
+        menu.hidden = false;
+
+        // A keyboard context menu (Shift+F10, menu key) reports no pointer
+        // position: open under the button instead.
+        var fromKeyboard = !event || (event.clientX === 0 && event.clientY === 0);
+        var x = event ? event.clientX : 0;
+        var y = event ? event.clientY : 0;
+        if (fromKeyboard && owner) {
+            var ownerRect = owner.getBoundingClientRect();
+            x = ownerRect.left;
+            y = ownerRect.bottom;
+        }
+
+        var padding = 8;
+        var rect = menu.getBoundingClientRect();
+        var left = x + rect.width > window.innerWidth - padding ? x - rect.width : x;
+        var top = y + rect.height > window.innerHeight - padding ? y - rect.height : y;
+        menu.style.left = Math.max(padding, Math.min(left, window.innerWidth - rect.width - padding)) + 'px';
+        menu.style.top = Math.max(padding, Math.min(top, window.innerHeight - rect.height - padding)) + 'px';
+
+        if (fromKeyboard) menuItems()[0].focus();
     }
 
     // Any other icon: the caller stores the colour itself.
@@ -240,6 +424,13 @@
             return show(null, options.color, options.icon, options.label, options.onApply);
         },
         iconClassOf: iconClassOf
+    };
+
+    // Right-click menu for any other icon button.
+    // openContextMenu(event, button, { onColor(), hideKey })
+    window.PoznoteIconContextMenu = {
+        open: openContextMenu,
+        close: function () { closeContextMenu(false); }
     };
 
     window.PoznoteIconSidebarColors = {

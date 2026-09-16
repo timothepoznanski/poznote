@@ -4943,5 +4943,8 @@
       "escape": "Esc",
       "tab": "Tab"
     }
+  },
+  "icon_context_menu": {
+    "hide": "隐藏按钮"
   }
 }
