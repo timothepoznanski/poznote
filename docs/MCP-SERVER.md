@@ -67,7 +67,9 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 - `get_reminder` — Get the reminder currently set on a note
 - `set_reminder` — Set or replace a note's reminder, with an optional repeat interval
 - `remove_reminder` — Remove the reminder from a note
+- `list_reminders` — List reminder notifications that have already fired and are still pending (the bell feed of the UI); upcoming reminders are not listable
 - `list_tasks` — List the tasks of a tasklist note, with their IDs, due dates and flags
+- `list_all_tasks` — List the open tasks across every note of a workspace, most urgent first, with filters (due date, important, completed, in-note checklists)
 - `add_task` — Add a single task to a tasklist note, with an optional due date and reminder
 - `update_task` — Update one task (text, due date, reminder, important flag)
 - `complete_task` — Mark a task as done, or reopen it
@@ -79,7 +81,11 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 - `list_templates` — List the template notes `create_note`'s `from_template_id` can start from
 - `get_trash` — List all notes currently in the trash
 - `empty_trash` — Permanently delete all notes in the trash
+- `delete_trash_note` — Permanently delete one note from the trash, instead of emptying the whole trash
 - `restore_note` — Restore a note from the trash
+- `list_snapshots` — List the saved earlier versions of a note, including the safety snapshot taken before each AI or MCP rewrite
+- `get_snapshot` — Read the content of one earlier version of a note, without changing the note
+- `restore_snapshot` — Roll a note back to one of its snapshots (a `snapshot_key` or a `date` is required)
 - `duplicate_note` — Create a duplicate of an existing note
 - `toggle_favorite` — Toggle the favorite status of a note
 - `list_attachments` — List all attachments for a specific note
@@ -91,6 +97,7 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 - `share_note` — Enable public sharing for a note and get the public URL
 - `unshare_note` — Disable public sharing for a note
 - `get_note_share_status` — Get the current sharing status and public URL for a note
+- `get_folder_share_status` — Get the current sharing status and public URL for a folder
 - `list_shared` — List all publicly shared notes and folders
 - `get_backlinks` — Get all notes that link to (reference) a specific note
 - `convert_note` — Convert a note between HTML and Markdown formats
@@ -125,6 +132,10 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 **Reminders and tasks.** `reminder_at` (on `create_note`/`update_note` and `set_reminder`) is an ISO datetime such as `2026-09-01T09:00:00+02:00`; include an offset, or the time is read as UTC. Task due dates (`due_at`) are different: they are local wall-clock values, `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM` with no offset, resolved through the user's configured timezone, and a date without a time reminds at 09:00. Repeat intervals use `<count><unit>` with unit `i`/`h`/`d`/`w`/`m`/`y`, for example `30i`, `1d` or `2w`.
 
 The task tools address one task at a time: call `list_tasks` to get task IDs, then `add_task`, `update_task`, `complete_task` or `delete_task`. Each call carries only that task, so a client never reads a tasklist and sends a whole new array back, and two callers editing different tasks cannot overwrite each other. Poznote stores a note's tasks as a single JSON array, which the server rewrites on every call, so the work one call does still grows with the length of the list. Notifications stay in sync automatically, and completing or deleting a task retires its pending reminder.
+
+**Version history and undo.** Poznote takes a safety snapshot of a note right before the AI assistant or the MCP server rewrites it, so a bad `update_note` can be undone. `list_snapshots` shows the snapshots kept for a note, each with an `origin` that identifies those safety copies; `get_snapshot` reads one without touching the note, and `restore_snapshot` puts its content back. `restore_snapshot` overwrites the current content, so it requires a `snapshot_key` or a `date` rather than falling back to today's snapshot.
+
+**Seeing across notes.** `list_all_tasks` answers "what is left to do" over a whole workspace, where `list_tasks` covers a single note. It returns two kinds of item, told apart by `source`: tasks of a tasklist note, whose ids work with `update_task` and `delete_task`, and checkbox items written inside ordinary notes, whose id is only a position in the note and cannot be addressed that way. `list_reminders` returns the notifications that have already fired and have not been dismissed, capped at 50 by the API. It is not a view of what is coming: Poznote has no endpoint for future reminders, which are read one note at a time with `get_reminder`.
 
 Most tools accept an optional `user_id` argument to target a specific user profile. When provided, the MCP server sends the `X-User-ID` header for that request, allowing you to create or read notes across different profiles without changing the global MCP environment. The exceptions are the system-level tools `get_system_info`, `list_backups`, `create_backup` and `delete_backup`, which do not take `user_id`. To change the default profile used when no `user_id` is passed, see [Default user profile](#default-user-profile).
 

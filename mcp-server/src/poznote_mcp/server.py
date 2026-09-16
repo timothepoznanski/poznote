@@ -33,6 +33,7 @@ import hmac
 import json
 import logging
 import os
+import re
 import socket
 import sys
 import time
@@ -149,6 +150,10 @@ def _assert_port_available(host: str, port: int) -> None:
 # Largest page GET /notes serves in one call; list_notes refuses more so the
 # caller gets a clear error instead of the API's 400.
 MAX_NOTES_PAGE_SIZE = 1000
+
+# Hard LIMIT baked into RemindersController::index. list_reminders reports when
+# a feed came back at that size, so a truncated list is never read as complete.
+REMINDERS_API_LIMIT = 50
 
 # Largest attachment add_attachment accepts. Poznote itself allows 200 MB, but
 # the bytes reach this tool base64-encoded inside a JSON tool call, which is a
@@ -968,6 +973,63 @@ def delete_note(id: int, workspace: Optional[str] = None, user_id: Optional[int]
 # =============================================================================
 
 @mcp.tool()
+def list_reminders(
+    workspace: Optional[str] = None,
+    unread_only: bool = False,
+    user_id: Optional[int] = None,
+) -> str:
+    """List reminder notifications that have ALREADY FIRED and are still pending
+
+    This is the notification feed behind the bell icon in the UI: reminders
+    whose time has passed and that have not been dismissed.
+
+    It is NOT a list of upcoming reminders. Poznote has no endpoint for those,
+    so an empty result here does NOT mean nothing is scheduled: future
+    reminders exist but can only be read one note at a time with get_reminder.
+    Never answer "you have nothing planned" on the strength of this tool.
+
+    The API caps the feed at 50 notifications; "capped_by_api" says when that
+    limit was hit. "total_count" is the real number of pending notifications.
+
+    Args:
+        workspace: Workspace name to filter by (optional)
+        unread_only: Only notifications not yet marked as read (default: False)
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        payload = client.list_reminders(workspace=workspace, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    notifications = payload.get("notifications", [])
+    # The cap applies to what the API returned, before any local filtering.
+    capped = len(notifications) >= REMINDERS_API_LIMIT
+
+    if unread_only:
+        notifications = [n for n in notifications if not n.get("is_read")]
+
+    result = {
+        "count": len(notifications),
+        "unread_count": payload.get("unread_count", 0),
+        "total_count": payload.get("total_count", 0),
+        "capped_by_api": capped,
+        "scope": "already triggered and not dismissed; upcoming reminders are not listable",
+        "notifications": notifications,
+    }
+    if capped:
+        result["note"] = (
+            f"The API returns at most {REMINDERS_API_LIMIT} notifications; "
+            "older pending ones are not shown."
+        )
+    if workspace is not None:
+        result["workspace"] = workspace
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
 def get_reminder(note_id: int, user_id: Optional[int] = None) -> str:
     """Get the reminder currently set on a note
 
@@ -1101,6 +1163,148 @@ def list_tasks(note_id: int, user_id: Optional[int] = None) -> str:
         "count": len(tasks),
         "tasks": tasks,
     }, indent=2, ensure_ascii=False)
+
+
+def _flatten_all_tasks(payload: dict, include_checklists: bool) -> list[dict]:
+    """Turn the API's two task families into one task-centred list.
+
+    Each row carries "source": "tasklist" items have stable ids usable with
+    update_task/complete_task/delete_task, "checklist" items do not (their id
+    is a position in the note source).
+    """
+    rows: list[dict] = []
+
+    for note in payload.get("notes") or []:
+        for task in note.get("tasks") or []:
+            rows.append({
+                "note_id": note.get("id"),
+                "note_title": note.get("heading"),
+                "folder": note.get("folder"),
+                "workspace": note.get("workspace"),
+                "source": "tasklist",
+                "id": task.get("id"),
+                "text": task.get("text", ""),
+                "completed": bool(task.get("completed")),
+                "important": bool(task.get("important")),
+                "dueAt": task.get("dueAt") or "",
+                "dueReminder": bool(task.get("dueReminder")),
+            })
+
+    if include_checklists:
+        for note in payload.get("checklists") or []:
+            for task in note.get("tasks") or []:
+                rows.append({
+                    "note_id": note.get("id"),
+                    "note_title": note.get("heading"),
+                    "folder": note.get("folder"),
+                    "workspace": note.get("workspace"),
+                    "source": "checklist",
+                    "note_type": note.get("type"),
+                    "id": task.get("id"),
+                    "text": task.get("text", ""),
+                    "completed": bool(task.get("completed")),
+                    # Checklist items carry neither flag nor due date.
+                    "important": False,
+                    "dueAt": "",
+                    "dueReminder": False,
+                })
+
+    return rows
+
+
+def _task_sort_key(task: dict):
+    """Dated tasks first by due date ascending, then undated; important first."""
+    due = task.get("dueAt") or ""
+    return (due == "", due, not task.get("important"), str(task.get("text") or ""))
+
+
+@mcp.tool()
+def list_all_tasks(
+    workspace: Optional[str] = None,
+    include_completed: bool = False,
+    due_before: Optional[str] = None,
+    only_important: bool = False,
+    include_checklists: bool = True,
+    limit: int = 100,
+    user_id: Optional[int] = None,
+) -> str:
+    """List the open tasks across every note of a workspace, most urgent first
+
+    This is the cross-note view: use it to answer "what do I have to do", where
+    list_tasks only covers one tasklist note.
+
+    Two kinds of item come back, told apart by "source":
+      * "tasklist" - a task of a tasklist note. Its "id" is stable, so it can
+        be passed to update_task, complete_task or delete_task.
+      * "checklist" - a checkbox written inside a regular HTML or markdown
+        note. Its "id" is the item's position in the note source, NOT an
+        identifier: these CANNOT be changed with update_task/complete_task.
+        Edit the note content instead. They never carry a due date or flag.
+
+    Results are sorted with dated tasks first by due date ascending, then
+    undated ones, important ones first within the same date. "total" is the
+    number of tasks matching the filters and "count" the size of this page, so
+    a truncated list is always visible as has_more.
+
+    Args:
+        workspace: Workspace name; omit to cover every workspace
+        include_completed: Include tasks already done (default: False, only
+            what is left to do)
+        due_before: Keep only tasks due on or before this 'YYYY-MM-DD' date,
+            inclusive. Undated tasks are dropped by this filter.
+        only_important: Keep only tasks flagged important (default: False)
+        include_checklists: Include in-note checkbox items (default: True)
+        limit: Maximum number of tasks to return, 1-1000 (default: 100)
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+
+    # 0 is out of range, not "unset": validate the value as given rather than
+    # letting a falsy limit slide back to the default.
+    page_size = 100 if limit is None else int(limit)
+    if page_size < 1 or page_size > 1000:
+        return json.dumps({"error": "limit must be between 1 and 1000"}, ensure_ascii=False)
+
+    if due_before is not None:
+        due_before = str(due_before).strip()
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", due_before):
+            return json.dumps(
+                {"error": "due_before must be a 'YYYY-MM-DD' date"}, ensure_ascii=False
+            )
+
+    try:
+        payload = client.list_all_tasks(workspace=workspace, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    tasks = _flatten_all_tasks(payload, include_checklists)
+
+    if not include_completed:
+        tasks = [t for t in tasks if not t["completed"]]
+    if only_important:
+        tasks = [t for t in tasks if t["important"]]
+    if due_before:
+        # dueAt is local wall-clock time with no offset ('YYYY-MM-DD' or
+        # 'YYYY-MM-DDTHH:MM'); comparing the date part as a string keeps the
+        # bound inclusive of the whole day without any timezone conversion.
+        tasks = [t for t in tasks if t["dueAt"] and t["dueAt"][:10] <= due_before]
+
+    tasks.sort(key=_task_sort_key)
+
+    total = len(tasks)
+    page = tasks[:page_size]
+
+    result = {
+        "count": len(page),
+        "total": total,
+        "has_more": total > len(page),
+        "tasks": page,
+    }
+    if workspace is not None:
+        result["workspace"] = workspace
+    return json.dumps(result, indent=2, ensure_ascii=False)
 
 
 @mcp.tool()
@@ -1494,6 +1698,59 @@ def empty_trash(user_id: Optional[int] = None) -> str:
     except Exception as exc:
         return _api_error_json(exc)
     return json.dumps({"success": success, "message": "Trash emptied" if success else "Failed to empty trash"}, ensure_ascii=False)
+
+
+@mcp.tool()
+def delete_trash_note(
+    id: int,
+    workspace: Optional[str] = None,
+    user_id: Optional[int] = None,
+) -> str:
+    """Permanently delete ONE note from the trash. This cannot be undone.
+
+    Destroys the note along with its attachments, its snapshots and any public
+    share link, with no way back. Use this instead of empty_trash when only one
+    note should go.
+
+    The note must ALREADY be in the trash: the API refuses a live note with
+    "Note is not in trash". To discard a live note, call delete_note first
+    (which moves it to the trash), then this tool if it must really be erased.
+
+    Args:
+        id: ID of the note to erase, which must already be in the trash
+        workspace: Workspace name (optional)
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        result = client.delete_trash_note(id, workspace=workspace, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    if not result.get("success"):
+        # Pass the API's own wording through: "Note is not in trash" and
+        # "Note not found" are different problems with different fixes.
+        return json.dumps(
+            {
+                "success": False,
+                "note_id": id,
+                "error": result.get("error", "Failed to delete note"),
+            },
+            indent=2,
+            ensure_ascii=False,
+        )
+
+    return json.dumps(
+        {
+            "success": True,
+            "note_id": id,
+            "message": result.get("message") or "Note permanently deleted",
+        },
+        indent=2,
+        ensure_ascii=False,
+    )
 
 
 @mcp.tool()
@@ -1891,6 +2148,221 @@ def get_note_share_status(note_id: int, user_id: Optional[int] = None) -> str:
         return json.dumps({"success": True, "share": share}, indent=2, ensure_ascii=False)
     else:
         return json.dumps({"success": False, "message": "Note is not shared publicly"}, ensure_ascii=False)
+
+
+@mcp.tool()
+def get_folder_share_status(folder_id: int, user_id: Optional[int] = None) -> str:
+    """Get the current sharing status and public URL for a folder
+
+    Read-only: this tool never enables or disables a share. Sharing a folder
+    publishes every note inside it, so turning it on stays a UI action.
+
+    Args:
+        folder_id: ID of the folder (see list_folders)
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        share = client.get_folder_share_status(folder_id, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+    if share:
+        return json.dumps({"success": True, "folder_id": folder_id, "share": share}, indent=2, ensure_ascii=False)
+    return json.dumps(
+        {"success": True, "folder_id": folder_id, "public": False, "message": "Folder is not shared publicly"},
+        indent=2,
+        ensure_ascii=False,
+    )
+
+
+# =============================================================================
+# SNAPSHOTS - Note version history
+# =============================================================================
+
+_SNAPSHOT_DATE_RE = r"\d{4}-\d{2}-\d{2}"
+# Same rule as SnapshotsController::isValidSnapshotKey. Checked here because
+# the API answers a malformed key with the text "Invalid note ID", which
+# would send the caller looking at the wrong argument.
+_SNAPSHOT_KEY_RE = r"\d{4}-\d{2}-\d{2}(?:--[A-Za-z0-9_-]+)?"
+_SNAPSHOT_KEY_HINT = "snapshot_key must be a key returned by list_snapshots (YYYY-MM-DD or YYYY-MM-DD--<suffix>)"
+
+
+@mcp.tool()
+def list_snapshots(note_id: int, user_id: Optional[int] = None) -> str:
+    """List the saved earlier versions (snapshots) of a note
+
+    Poznote snapshots a note automatically on first open of a day, and takes an
+    extra safety snapshot right BEFORE the AI assistant or this MCP server
+    rewrites it. So after a bad update_note, the previous content is still
+    here: look for the most recent entry whose "origin" is "mcp" or "ai" and
+    pass its "snapshot_key" to get_snapshot or restore_snapshot.
+
+    Each entry carries snapshot_key (how to address it), date, heading, type,
+    manual, origin and created_at. Old snapshots expire, so this is a safety
+    net, not a full history.
+
+    Args:
+        note_id: ID of the note
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        result = client.list_snapshots(note_id, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    if result is None:
+        return json.dumps({"error": f"Note {note_id} not found"}, ensure_ascii=False)
+
+    snapshots = result.get("snapshots", [])
+    return json.dumps({
+        "note_id": note_id,
+        "count": len(snapshots),
+        "empty_new_note": result.get("empty_new_note", False),
+        "snapshots": snapshots,
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def get_snapshot(
+    note_id: int,
+    snapshot_key: Optional[str] = None,
+    date: Optional[str] = None,
+    user_id: Optional[int] = None,
+) -> str:
+    """Read the content of one earlier version of a note, without changing it
+
+    Use this to check what a snapshot holds before restoring it. Read-only: the
+    note is untouched.
+
+    Call list_snapshots first and pass a snapshot_key. With neither
+    snapshot_key nor date, the server falls back to TODAY's snapshot, which is
+    usually not the one you want.
+
+    A note that has no snapshot for the selector answers exists=False with no
+    content; that is an answer, not an error.
+
+    Args:
+        note_id: ID of the note
+        snapshot_key: Key of the snapshot, from list_snapshots (preferred)
+        date: 'YYYY-MM-DD' day to read instead, when no key is at hand
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+
+    if snapshot_key is not None:
+        snapshot_key = str(snapshot_key).strip() or None
+        if snapshot_key and not re.fullmatch(_SNAPSHOT_KEY_RE, snapshot_key):
+            return json.dumps({"error": _SNAPSHOT_KEY_HINT}, ensure_ascii=False)
+
+    if date is not None:
+        date = str(date).strip()
+        if not re.fullmatch(_SNAPSHOT_DATE_RE, date):
+            return json.dumps({"error": "date must be a 'YYYY-MM-DD' date"}, ensure_ascii=False)
+
+    try:
+        result = client.get_snapshot(note_id, snapshot_key=snapshot_key, date=date, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    if result is None:
+        return json.dumps({"error": f"Note {note_id} not found"}, ensure_ascii=False)
+
+    if not result.get("exists"):
+        return json.dumps({
+            "note_id": note_id,
+            "exists": False,
+            "message": "No snapshot found for this selector",
+            "snapshot_key": snapshot_key,
+            "date": date,
+        }, indent=2, ensure_ascii=False)
+
+    return json.dumps({
+        "note_id": note_id,
+        "exists": True,
+        "snapshot": result.get("snapshot"),
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def restore_snapshot(
+    note_id: int,
+    snapshot_key: Optional[str] = None,
+    date: Optional[str] = None,
+    user_id: Optional[int] = None,
+) -> str:
+    """Roll a note back to one of its snapshots, OVERWRITING its current content
+
+    The content the note has right now is replaced. Call list_snapshots to pick
+    a snapshot_key, and get_snapshot to check what it holds, before calling
+    this.
+
+    A selector is required: pass snapshot_key (preferred) or date. This tool
+    refuses to run with neither, because the API would silently restore today's
+    snapshot and so could overwrite the note from a version nobody chose.
+
+    Args:
+        note_id: ID of the note to roll back
+        snapshot_key: Key of the snapshot to restore, from list_snapshots
+        date: 'YYYY-MM-DD' day to restore instead, when no key is at hand
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+
+    key = (snapshot_key or "").strip()
+    day = (date or "").strip()
+
+    if not key and not day:
+        return json.dumps({
+            "error": "restore_snapshot needs a snapshot_key or a date.",
+            "hint": (
+                "Call list_snapshots to pick one. Without a selector the API "
+                "would restore today's snapshot, overwriting the note from a "
+                "version you did not choose."
+            ),
+        }, indent=2, ensure_ascii=False)
+
+    if key and not re.fullmatch(_SNAPSHOT_KEY_RE, key):
+        return json.dumps({"error": _SNAPSHOT_KEY_HINT}, ensure_ascii=False)
+
+    if day and not re.fullmatch(_SNAPSHOT_DATE_RE, day):
+        return json.dumps({"error": "date must be a 'YYYY-MM-DD' date"}, ensure_ascii=False)
+
+    try:
+        result = client.restore_snapshot(
+            note_id,
+            snapshot_key=key or None,
+            date=day or None,
+            user_id=user_id,
+        )
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    if not result or not result.get("success"):
+        # The API tells "Note not found" apart from "No snapshot found";
+        # keep its wording so the caller fixes the right argument.
+        return json.dumps(
+            {"error": (result or {}).get("error") or f"No snapshot found to restore for note {note_id}",
+             "note_id": note_id, "snapshot_key": key or None, "date": day or None},
+            indent=2,
+            ensure_ascii=False,
+        )
+
+    return json.dumps({
+        "success": True,
+        "note_id": note_id,
+        "snapshot_key": key or None,
+        "date": day or None,
+        "message": result.get("message") or "Note restored to snapshot state",
+    }, indent=2, ensure_ascii=False)
 
 
 @mcp.tool()
