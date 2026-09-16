@@ -158,6 +158,17 @@
     transition: border-color 0.2s ease, background 0.2s ease;
 }
 
+/* The mobile stacking rule of modals/responsive.css (.modal-content>div>button)
+   forces display: block, which drops the flex row and leaves the arrow glued
+   to the name instead of at the right edge. */
+@media (max-width: 800px) {
+    #confirmLogoutModal .logout-account-option {
+        display: flex !important;
+        height: auto !important;
+        margin-bottom: 0 !important;
+    }
+}
+
 #confirmLogoutModal .logout-account-option:hover:not(:disabled),
 #confirmLogoutModal .logout-account-option:focus-visible {
     border-color: var(--pz-accent);
