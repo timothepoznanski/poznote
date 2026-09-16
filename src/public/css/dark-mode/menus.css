@@ -32,7 +32,7 @@ html[data-theme='dark'] .slash-command-hint {
 
 html[data-theme='dark'] .slash-command-item .slash-command-label,
 html[data-theme='dark'] .slash-command-label {
-    color: var(--pz-text-inverse) !important;
+    color: var(--dm-text-bright) !important;
 }
 
 html[data-theme='dark'] .slash-command-item[data-command-id='cancel'] .slash-command-label {
@@ -50,7 +50,7 @@ html[data-theme='dark'] .slash-date-picker {
 
 html[data-theme='dark'] .slash-date-picker-title,
 html[data-theme='dark'] .slash-date-picker-day {
-    color: var(--pz-text-inverse);
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .slash-date-picker-nav:hover,
@@ -432,7 +432,7 @@ html[data-theme='dark'] .emoji-autocomplete-item.selected {
 }
 
 html[data-theme='dark'] .emoji-autocomplete-name {
-    color: var(--pz-text-inverse);
+    color: var(--dm-text-bright);
 }
 
 /* Create menu: the same dropdown as .folder-actions-menu / .note-actions-menu

@@ -16,7 +16,7 @@ html[data-theme='dark'] .kanban-column-count {
 
 html[data-theme='dark'] .kanban-add-card-btn:hover {
     background: rgba(var(--pz-accent-rgb), 0.2);
-    color: var(--pz-text-inverse);
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .kanban-add-column-btn {
@@ -27,7 +27,7 @@ html[data-theme='dark'] .kanban-add-column-btn {
 
 html[data-theme='dark'] .kanban-add-column-btn:hover {
     background: var(--dm-border);
-    color: var(--pz-text-inverse);
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .kanban-size-toggle {
@@ -38,7 +38,7 @@ html[data-theme='dark'] .kanban-size-toggle {
 
 html[data-theme='dark'] .kanban-size-toggle:hover {
     background: var(--dm-border);
-    color: var(--pz-text-inverse);
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .kanban-sort-toggle {
@@ -49,7 +49,7 @@ html[data-theme='dark'] .kanban-sort-toggle {
 
 html[data-theme='dark'] .kanban-sort-toggle:hover {
     background: var(--dm-border);
-    color: var(--pz-text-inverse);
+    color: var(--dm-text-bright);
 }
 
 /* Kanban Cards */
@@ -79,7 +79,7 @@ html[data-theme='dark'] .kanban-tag {
 html[data-theme='dark'] .kanban-tag-colored {
     background: color-mix(in srgb, var(--tag-color) 24%, var(--dm-surface));
     border-color: color-mix(in srgb, var(--tag-color) 45%, var(--dm-surface));
-    color: color-mix(in srgb, var(--tag-color) 70%, var(--pz-text-inverse));
+    color: color-mix(in srgb, var(--tag-color) 70%, var(--dm-text-bright));
 }
 
 /* Due date badge */
@@ -103,7 +103,7 @@ html[data-theme='dark'] .kanban-scroll-btn {
 
 html[data-theme='dark'] .kanban-scroll-btn:hover {
     background: var(--dm-border);
-    color: var(--pz-text-inverse);
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .kanban-scroll-btn-header {
@@ -113,7 +113,7 @@ html[data-theme='dark'] .kanban-scroll-btn-header {
 
 html[data-theme='dark'] .kanban-scroll-btn-header:hover {
     background: var(--dm-border);
-    color: var(--pz-text-inverse);
+    color: var(--dm-text-bright);
 }
 
 /* Scrollbars */

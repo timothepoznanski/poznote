@@ -163,7 +163,7 @@ html[data-theme='dark'] .code-block-actions-host > .code-block-delete-btn:hover,
 html[data-theme='dark'] .code-block-line-numbers-btn:hover,
 html[data-theme='dark'] .code-block-actions-host > .code-block-line-numbers-btn:hover {
     background: transparent !important;
-    color: var(--pz-text-inverse) !important;
+    color: var(--dm-text-bright) !important;
     opacity: 1 !important;
 }
 
@@ -223,12 +223,12 @@ html[data-theme='dark'] .note-attachment-preview-caption a:focus {
 
 :where(html[data-theme='dark']) ::selection {
     background-color: var(--dm-accent-soft);
-    color: var(--pz-text-inverse);
+    color: var(--dm-text-bright);
 }
 
 :where(html[data-theme='dark']) ::-moz-selection {
     background-color: var(--dm-accent-soft);
-    color: var(--pz-text-inverse);
+    color: var(--dm-text-bright);
 }
 
 /* Search highlights */
