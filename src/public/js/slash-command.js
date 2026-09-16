@@ -70,6 +70,38 @@
         { id: 'caution', labelKey: 'slash_menu.callout_caution', fallback: 'Caution' }
     ];
 
+    // Mermaid diagram starters for Markdown notes (discussion #1404). Each one
+    // is a small working example, so the syntax does not have to be remembered.
+    // The aliases are the Mermaid keywords, which match in every UI language.
+    var MERMAID_DIAGRAMS = [
+        { id: 'mermaid-flowchart', icon: 'lucide-network', labelKey: 'slash_menu.mermaid_flowchart', fallback: 'Flowchart', aliases: ['flowchart', 'graph'],
+            source: 'flowchart TD\n    A[Start] --> B{Decision}\n    B -->|Yes| C[Step 1]\n    B -->|No| D[Step 2]\n    C --> E[End]\n    D --> E' },
+        { id: 'mermaid-sequence', icon: 'lucide-message-square', labelKey: 'slash_menu.mermaid_sequence', fallback: 'Sequence diagram', aliases: ['sequenceDiagram'],
+            source: 'sequenceDiagram\n    participant Alice\n    participant Bob\n    Alice->>Bob: Hello Bob\n    Bob-->>Alice: Hi Alice' },
+        { id: 'mermaid-class', icon: 'lucide-boxes', labelKey: 'slash_menu.mermaid_class', fallback: 'Class diagram', aliases: ['classDiagram', 'uml'],
+            source: 'classDiagram\n    class Animal {\n        +String name\n        +eat()\n    }\n    class Dog {\n        +bark()\n    }\n    Animal <|-- Dog' },
+        { id: 'mermaid-state', icon: 'lucide-circle-dot', labelKey: 'slash_menu.mermaid_state', fallback: 'State diagram', aliases: ['stateDiagram'],
+            source: 'stateDiagram-v2\n    [*] --> Draft\n    Draft --> Review\n    Review --> Draft\n    Review --> Published\n    Published --> [*]' },
+        { id: 'mermaid-er', icon: 'lucide-database', labelKey: 'slash_menu.mermaid_er', fallback: 'Entity relationship', aliases: ['erDiagram'],
+            source: 'erDiagram\n    CUSTOMER ||--o{ ORDER : places\n    ORDER ||--|{ LINE_ITEM : contains\n    PRODUCT ||--o{ LINE_ITEM : "ordered in"' },
+        { id: 'mermaid-gantt', icon: 'lucide-calendar', labelKey: 'slash_menu.mermaid_gantt', fallback: 'Gantt chart', aliases: ['gantt'],
+            source: 'gantt\n    title Project\n    dateFormat YYYY-MM-DD\n    section Planning\n    Research :a1, 2026-01-05, 7d\n    Design :a2, after a1, 5d\n    section Build\n    Development :after a2, 14d' },
+        { id: 'mermaid-pie', icon: 'lucide-pie-chart', labelKey: 'slash_menu.mermaid_pie', fallback: 'Pie chart', aliases: ['pie'],
+            source: 'pie title Pets\n    "Dogs" : 40\n    "Cats" : 35\n    "Birds" : 25' },
+        { id: 'mermaid-mindmap', icon: 'lucide-brain', labelKey: 'slash_menu.mermaid_mindmap', fallback: 'Mindmap', aliases: ['mindmap'],
+            source: 'mindmap\n  root((Topic))\n    Idea A\n      Detail\n    Idea B\n    Idea C' },
+        { id: 'mermaid-timeline', icon: 'lucide-history', labelKey: 'slash_menu.mermaid_timeline', fallback: 'Timeline', aliases: ['timeline'],
+            source: 'timeline\n    title History\n    2024 : Event A\n    2025 : Event B : Event C\n    2026 : Event D' },
+        { id: 'mermaid-journey', icon: 'lucide-footprints', labelKey: 'slash_menu.mermaid_journey', fallback: 'User journey', aliases: ['journey'],
+            source: 'journey\n    title My day\n    section Morning\n      Wake up: 3: Me\n      Coffee: 5: Me\n    section Work\n      Meetings: 2: Me, Team' },
+        { id: 'mermaid-git', icon: 'lucide-git-branch', labelKey: 'slash_menu.mermaid_git', fallback: 'Git graph', aliases: ['gitGraph'],
+            source: 'gitGraph\n    commit\n    branch feature\n    checkout feature\n    commit\n    checkout main\n    commit\n    merge feature' },
+        { id: 'mermaid-quadrant', icon: 'lucide-grid', labelKey: 'slash_menu.mermaid_quadrant', fallback: 'Quadrant chart', aliases: ['quadrantChart'],
+            source: 'quadrantChart\n    title Priorities\n    x-axis Low effort --> High effort\n    y-axis Low impact --> High impact\n    quadrant-1 Big projects\n    quadrant-2 Quick wins\n    quadrant-3 Fill-ins\n    quadrant-4 Thankless tasks\n    Task A: [0.3, 0.8]\n    Task B: [0.7, 0.4]' },
+        { id: 'mermaid-xy', icon: 'lucide-bar-chart', labelKey: 'slash_menu.mermaid_xy', fallback: 'Bar and line chart', aliases: ['xychart', 'bar'],
+            source: 'xychart-beta\n    title Sales\n    x-axis [Jan, Feb, Mar, Apr]\n    y-axis "Revenue" 0 --> 100\n    bar [30, 50, 70, 60]\n    line [30, 50, 70, 60]' }
+    ];
+
     // -------------------------------------------------------------------
     // Slash menu global variables
     // -------------------------------------------------------------------
@@ -1781,6 +1813,37 @@
     // Dictation needs a transcription server; index.php says whether this user
     // has one (see poznoteResolveSttConfig()). Read at menu-open time rather
     // than at load, so it holds whatever the page was served with.
+    // Diagrams section: Excalidraw in every note, Mermaid only in Markdown
+    // notes because HTML notes never render it (discussion #1404)
+    function buildDiagramsSection(t, common, withMermaid) {
+        const items = [common.excalidraw];
+        if (withMermaid) {
+            items.push({
+                id: 'mermaid',
+                icon: 'lucide-shapes',
+                label: t('slash_menu.mermaid', null, 'Mermaid'),
+                aliases: ['mermaid'],
+                submenu: MERMAID_DIAGRAMS.map(function (d) {
+                    return {
+                        id: d.id,
+                        icon: d.icon,
+                        label: t(d.labelKey, null, d.fallback),
+                        aliases: d.aliases,
+                        // Caret at the end of the last diagram line, before the closing fence
+                        action: function () { insertMarkdownAtCursor('```mermaid\n' + d.source + '\n```\n', -5); }
+                    };
+                })
+            });
+        }
+        return {
+            id: 'diagrams',
+            icon: 'lucide-shapes',
+            label: t('slash_menu.diagrams', null, 'Diagrams'),
+            aliases: ['diagram', 'chart'],
+            submenu: items
+        };
+    }
+
     function isSpeechToTextAvailable() {
         return !!(window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.speechToText);
     }
@@ -2473,7 +2536,6 @@
                         }
                     },
                     common.dictate,
-                    common.excalidraw,
                     common.emoji,
                     {
                         id: 'table',
@@ -2497,6 +2559,7 @@
                     }
                 ]
             },
+            buildDiagramsSection(t, common, false),
             buildDateSection(t, insertDate, true),
             {
                 id: 'link-menu',
@@ -2815,7 +2878,6 @@
                         }
                     },
                     common.dictate,
-                    common.excalidraw,
                     common.emoji,
                     {
                         id: 'table',
@@ -2835,6 +2897,7 @@
                     }
                 ]
             },
+            buildDiagramsSection(t, common, true),
             buildDateSection(t, insertDateMarkdown, true),
             {
                 id: 'link-menu',
