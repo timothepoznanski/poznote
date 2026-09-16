@@ -372,24 +372,7 @@ function initializeMarkdownNote(noteId) {
             viewModeBtn.type = 'button';
             viewModeBtn.className = 'toolbar-btn markdown-view-mode-btn note-action-btn';
 
-            // Determine current view mode and set icon/title
-            var currentMode;
-            if (startInSplitMode) {
-                currentMode = 'split';
-                viewModeBtn.innerHTML = '<i class="lucide lucide-file-code"></i>';
-                viewModeBtn.title = window.t('editor.toolbar.switch_to_preview', null, 'Switch to preview mode');
-                viewModeBtn.style.display = 'none'; // Hide in split mode
-            } else if (startInEditMode) {
-                currentMode = 'edit';
-                viewModeBtn.innerHTML = '<i class="lucide lucide-file-code"></i>';
-                viewModeBtn.title = window.t('editor.toolbar.switch_to_preview', null, 'Switch to preview mode');
-            } else {
-                currentMode = 'preview';
-                viewModeBtn.innerHTML = '<i class="lucide lucide-pencil"></i>';
-                viewModeBtn.title = window.t('editor.toolbar.switch_to_edit', null, 'Switch to edit mode');
-            }
-
-            viewModeBtn.setAttribute('data-current-mode', currentMode);
+            var currentMode = startInSplitMode ? 'split' : (startInEditMode ? 'edit' : 'preview');
 
             viewModeBtn.onclick = function (e) {
                 e.preventDefault();
@@ -398,6 +381,12 @@ function initializeMarkdownNote(noteId) {
             };
 
             toolbar.insertBefore(viewModeBtn, toolbar.firstChild);
+
+            // Icon, title, state class and split-mode hiding all come from the
+            // one place that knows them, so the button cannot open in a state
+            // the toggle would never produce. It has to be in the toolbar
+            // first: updateViewModeButton() looks it up by selector.
+            updateViewModeButton(noteId, currentMode);
 
             // Create markdown help button
 
@@ -842,27 +831,64 @@ function getMarkdownContent(noteId) {
     return noteEntry.getAttribute('data-markdown-content') || '';
 }
 
-// Helper function to update view mode button icon and title
+// The pencil is the same in preview and in edit mode, and lights up (blue,
+// .is-edit-mode) only while the editor is live. It used to be blue in both and
+// swap to a file-code icon in edit mode, so the colour said "on" while the icon
+// said "go there": readers of a note kept believing they were already editing
+// it (issue #1406). The title still describes the click, which is what a toggle
+// button should say, and aria-pressed carries the state for screen readers.
+// Split mode has its own toolbar button, so this one steps aside there.
 function updateViewModeButton(noteId, mode) {
     var viewModeBtn = document.querySelector('#note' + noteId + ' .markdown-view-mode-btn');
     if (!viewModeBtn) return;
 
     viewModeBtn.setAttribute('data-current-mode', mode);
 
-    if (mode === 'edit') {
-        viewModeBtn.innerHTML = '<i class="lucide lucide-file-code"></i>';
-        viewModeBtn.title = window.t('editor.toolbar.switch_to_preview', null, 'Switch to preview mode');
-        viewModeBtn.classList.remove('active');
-        viewModeBtn.style.display = '';
-    } else if (mode === 'preview') {
-        viewModeBtn.innerHTML = '<i class="lucide lucide-pencil"></i>';
-        viewModeBtn.title = window.t('editor.toolbar.switch_to_edit', null, 'Switch to edit mode');
-        viewModeBtn.classList.remove('active');
-        viewModeBtn.style.display = '';
-    } else if (mode === 'split') {
-        // Hide the view mode button in split mode
+    if (mode === 'split') {
+        viewModeBtn.classList.remove('is-edit-mode');
         viewModeBtn.style.display = 'none';
+        return;
     }
+
+    viewModeBtn.innerHTML = '<i class="lucide lucide-pencil"></i>';
+    viewModeBtn.title = mode === 'edit'
+        ? window.t('editor.toolbar.switch_to_preview', null, 'Switch to preview mode')
+        : window.t('editor.toolbar.switch_to_edit', null, 'Switch to edit mode');
+    viewModeBtn.setAttribute('aria-label', viewModeBtn.title);
+    viewModeBtn.classList.remove('active');
+    viewModeBtn.style.display = '';
+
+    refreshViewModeButtonState(noteId);
+}
+
+/**
+ * Light the pencil, or put it out.
+ *
+ * Lit means the editor is really taking input, which is not the same as being
+ * in edit mode: a note another user holds the lock on still lets the reader
+ * switch, and the editor comes up read-only (isMarkdownEntryReadOnly). Reading
+ * data-current-mode rather than taking a mode argument lets the lock code call
+ * this on its own, from syncMarkdownEditorEditableState(), whenever a lock is
+ * taken or released.
+ *
+ * Takes a note id or the .noteentry element, like the lock code's other hooks.
+ */
+function refreshViewModeButtonState(noteEntryOrId) {
+    var noteEntry = (noteEntryOrId && noteEntryOrId.nodeType === 1)
+        ? noteEntryOrId
+        : document.getElementById('entry' + noteEntryOrId);
+    if (!noteEntry) return;
+
+    var noteId = noteEntry.getAttribute('data-note-id') || (noteEntry.id || '').replace('entry', '');
+    var viewModeBtn = document.querySelector('#note' + noteId + ' .markdown-view-mode-btn');
+    if (!viewModeBtn) return;
+
+    var readOnly = typeof window.isMarkdownEntryReadOnly === 'function'
+        && window.isMarkdownEntryReadOnly(noteEntry);
+    var lit = viewModeBtn.getAttribute('data-current-mode') === 'edit' && !readOnly;
+
+    viewModeBtn.classList.toggle('is-edit-mode', lit);
+    viewModeBtn.setAttribute('aria-pressed', lit ? 'true' : 'false');
 }
 
 // Switch to split view mode (editor on left, preview on right)
@@ -1008,3 +1034,4 @@ window.replaceMarkdownNoteContent = replaceMarkdownNoteContent;
 window.renderMarkdownPreview = renderMarkdownPreview;
 window.setupMarkdownEditorListeners = setupMarkdownEditorListeners;
 window.updateViewModeButton = updateViewModeButton;
+window.refreshViewModeButtonState = refreshViewModeButtonState;

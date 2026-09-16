@@ -818,6 +818,7 @@
       "view_layout_toggle": "Переключатель вида (сетка / список, размер карточек)",
       "index_search_bar": "Панель поиска",
       "tasklist_progress_bar": "Индикатор выполнения списков задач",
+      "preview_code_block_delete": "Кнопка удаления у блоков кода в режиме предпросмотра markdown",
       "share_restrict_users": "Общий доступ: ограничить определёнными пользователями",
       "share_protocol_toggle": "Общий доступ: переключатель HTTPS",
       "share_shared_with_me": "Общий доступ: «Поделились со мной»",

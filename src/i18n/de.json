@@ -1317,6 +1317,7 @@
       "view_layout_toggle": "Ansichtsumschalter (Raster / Liste, Kartengröße)",
       "index_search_bar": "Suchleiste",
       "tasklist_progress_bar": "Fortschrittsbalken der Aufgabenlisten",
+      "preview_code_block_delete": "Löschen-Schaltfläche an Codeblöcken, in der Markdown-Vorschau",
       "share_restrict_users": "Teilen: auf bestimmte Benutzer beschränken",
       "share_protocol_toggle": "Teilen: HTTPS-Schalter",
       "share_shared_with_me": "Teilen: „Mit mir geteilt“",

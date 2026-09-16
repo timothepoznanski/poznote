@@ -199,17 +199,26 @@ html[data-theme='dark'] .toolbar-btn.btn-save.is-saving i {
 
 /* Markdown toggle icons (legacy support) */
 html[data-theme='dark'] .markdown-edit-btn [class*="lucide-"],
-html[data-theme='dark'] .markdown-preview-btn [class*="lucide-"],
-html[data-theme='dark'] .markdown-view-mode-btn i {
+html[data-theme='dark'] .markdown-preview-btn [class*="lucide-"] {
     color: var(--pz-accent) !important;
     filter: none !important;
 }
 
 html[data-theme='dark'] .markdown-edit-btn:hover [class*="lucide-"],
-html[data-theme='dark'] .markdown-preview-btn:hover [class*="lucide-"],
-html[data-theme='dark'] .markdown-view-mode-btn:hover i {
+html[data-theme='dark'] .markdown-preview-btn:hover [class*="lucide-"] {
     color: var(--pz-accent) !important;
     filter: none !important;
+    transform: scale(1.18);
+}
+
+/* The view-mode toggle is blue only while the editor is live (issue #1406);
+   in preview mode it keeps the toolbar's own icon colour. */
+html[data-theme='dark'] .markdown-view-mode-btn.is-edit-mode i {
+    color: var(--pz-accent) !important;
+    filter: none !important;
+}
+
+html[data-theme='dark'] .markdown-view-mode-btn:hover i {
     transform: scale(1.18);
 }
 

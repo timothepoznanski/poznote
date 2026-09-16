@@ -200,6 +200,13 @@ function syncMarkdownEditorEditableState(noteEntryOrId) {
     }
 
     setMarkdownEditorEditable(editorDiv, isMarkdownEditorDisplayed(noteEntry, editorDiv));
+
+    // The view-mode toggle is lit while the editor really takes input, so a
+    // lock taken or released has to put it out or light it back up
+    // (js/markdown-view-modes.js).
+    if (typeof window.refreshViewModeButtonState === 'function') {
+        window.refreshViewModeButtonState(noteEntry);
+    }
 }
 
 var markdownSplitPaneHeightRaf = null;

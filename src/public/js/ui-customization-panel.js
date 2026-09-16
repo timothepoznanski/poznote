@@ -167,15 +167,27 @@
 
     // Checked means visible. Disabled boxes (locked by the administrator) are
     // not the user's choice: their stored state is kept as is.
+    //
+    // The saved preference covers the whole interface, but the panel only lists
+    // this page (pruneForPage removes the rest of the items outright), so the
+    // keys it does not list are carried over from what was loaded. Without this
+    // pass, toggling one box on the dashboard saved a list built from the
+    // dashboard items alone and dropped every note and settings key the user
+    // had hidden.
     function collectHidden() {
         var hidden = [];
+        var listed = Object.create(null);
         panel.querySelectorAll('[data-ui-key]').forEach(function (cb) {
             var key = cb.getAttribute('data-ui-key');
+            listed[key] = true;
             if (cb.disabled) {
                 if (storedHidden.indexOf(key) !== -1) hidden.push(key);
                 return;
             }
             if (!cb.checked) hidden.push(key);
+        });
+        storedHidden.forEach(function (key) {
+            if (!listed[key]) hidden.push(key);
         });
         return hidden;
     }

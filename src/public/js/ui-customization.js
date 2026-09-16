@@ -428,6 +428,17 @@
                     rules.push('#outlineMobileBackdrop { display: none !important; }');
                 } else if (id === 'tasklist-progress') {
                     rules.push('.tasklist-progress { display: none !important; }');
+                } else if (id === 'preview-code-block-delete') {
+                    // Issue #1406: the markdown preview edits nothing else, and
+                    // the bin sits next to the copy button, so a misclick costs
+                    // the block. Hidden by default, see
+                    // poznoteGetDefaultHiddenUiKeys() in lib/ui-customization.php.
+                    // The three buttons are absolutely positioned at fixed right
+                    // offsets 32px apart (css/code-blocks.css), so the ones that
+                    // stay slide into the gap instead of leaving it empty.
+                    rules.push('.markdown-preview .code-block-delete-btn { display: none !important; }');
+                    rules.push('.markdown-preview .code-block-copy-btn { right: 8px !important; }');
+                    rules.push('.markdown-preview .code-block-line-numbers-btn { right: 40px !important; }');
                 }
             }
         });

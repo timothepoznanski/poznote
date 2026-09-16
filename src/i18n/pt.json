@@ -1317,6 +1317,7 @@
       "view_layout_toggle": "Alternar vista (grade / lista, tamanho dos cartões)",
       "index_search_bar": "Barra de pesquisa",
       "tasklist_progress_bar": "Barra de progresso das listas de tarefas",
+      "preview_code_block_delete": "Botão de eliminar nos blocos de código, na pré-visualização markdown",
       "share_restrict_users": "Partilha: restringir a utilizadores específicos",
       "share_protocol_toggle": "Partilha: interruptor HTTPS",
       "share_shared_with_me": "Partilha: «Partilhado comigo»",

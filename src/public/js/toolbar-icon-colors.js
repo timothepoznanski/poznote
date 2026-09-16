@@ -20,7 +20,7 @@
     // Buttons with no btn-* class of their own.
     var CLASS_KEYS = ['mobile-more-btn', 'markdown-view-mode-btn', 'markdown-split-btn'];
     // Same list as $states in poznoteBuildToolbarIconColorRules().
-    var STATES = ':not(.is-favorite):not(.is-shared):not(.has-attachments):not(.has-reminder):not(.is-saving):not(.is-format-active)';
+    var STATES = ':not(.is-favorite):not(.is-shared):not(.has-attachments):not(.has-reminder):not(.is-saving):not(.is-format-active):not(.is-edit-mode)';
 
     var colors = normalizeColors(window.__POZNOTE_TOOLBAR_ICON_COLORS__);
 

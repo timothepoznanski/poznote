@@ -204,6 +204,7 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:mini-calendar" checked><span><?php echo t_h('common.calendar', [], 'Calendar'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:outline-panel" checked><span><?php echo t_h('common.outline.title', [], 'Outline'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:tasklist-progress" checked><span><?php echo t_h('modals.ui_customization.tasklist_progress_bar', [], 'Task list progress bar'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:preview-code-block-delete" checked><span><?php echo t_h('modals.ui_customization.preview_code_block_delete', [], 'Delete button on code blocks, in markdown preview'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-created-date" checked><span><?php echo t_h('display.cards.show_note_created', [], 'Show creation date'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-icons" checked><span><?php echo t_h('display.cards.show_note_icons', [], 'Show note icons'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:folder-note-count" checked><span><?php echo t_h('display.cards.show_folder_counts', [], 'Show folder counts'); ?></span></label>

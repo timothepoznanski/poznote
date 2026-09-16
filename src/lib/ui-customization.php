@@ -24,6 +24,28 @@ function poznoteGetNonHideableUiKeys() {
 }
 
 /**
+ * UI Customization keys that start out unchecked, instead of the usual
+ * "everything visible until the user hides it".
+ *
+ * The preference itself only ever stores the hidden keys, so a default cannot
+ * live in it: an empty list means "nothing hidden". A key listed here is
+ * instead written into the user's own hidden_ui_elements once, by the schema
+ * bootstrap in db_connect.php, which records what it has already seeded under
+ * 'default_hidden_ui_keys_applied' so a user who ticks the box back on is
+ * never overridden by a later migration.
+ *
+ * panel:preview-code-block-delete is the bin button of a code block inside the
+ * markdown preview (issue #1406). The preview edits nothing else, and a
+ * misclick next to the copy button costs the whole block, so it is off until
+ * asked for.
+ */
+function poznoteGetDefaultHiddenUiKeys() {
+    return [
+        'panel:preview-code-block-delete',
+    ];
+}
+
+/**
  * Map UI customization keys that were renamed to the name in use today, so
  * preferences saved under the old key keep working.
  *
@@ -329,7 +351,7 @@ function poznoteGetToolbarIconColors() {
  * save, active format) still win: they carry information.
  */
 function poznoteBuildToolbarIconColorRules(array $colors) {
-    $states = ':not(.is-favorite):not(.is-shared):not(.has-attachments):not(.has-reminder):not(.is-saving):not(.is-format-active)';
+    $states = ':not(.is-favorite):not(.is-shared):not(.has-attachments):not(.has-reminder):not(.is-saving):not(.is-format-active):not(.is-edit-mode)';
     $rules = [];
     foreach ($colors as $key => $color) {
         $paint = ' { color: ' . $color . '; background-color: ' . $color . '; }';
@@ -461,6 +483,17 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
                 $rules[] = '#outlineMobileBackdrop { display: none !important; }';
             } elseif ($id === 'tasklist-progress') {
                 $rules[] = '.tasklist-progress { display: none !important; }';
+            } elseif ($id === 'preview-code-block-delete') {
+                // The bin button of a code block in the markdown preview, which
+                // the preview has no other use for and which a misclick next to
+                // the copy button turns into a lost block (issue #1406). Hidden
+                // by default, see poznoteGetDefaultHiddenUiKeys() above. The
+                // three buttons are absolutely positioned at fixed right offsets
+                // 32px apart (css/code-blocks.css), so the ones that stay slide
+                // into the gap rather than leaving it empty.
+                $rules[] = '.markdown-preview .code-block-delete-btn { display: none !important; }';
+                $rules[] = '.markdown-preview .code-block-copy-btn { right: 8px !important; }';
+                $rules[] = '.markdown-preview .code-block-line-numbers-btn { right: 40px !important; }';
             }
         } elseif ($type === 'share') {
             // Share dialog blocks are built in JS. The CSS rule covers pages that

@@ -818,6 +818,7 @@
       "view_layout_toggle": "View toggle (grid / list, card size)",
       "index_search_bar": "Search bar",
       "tasklist_progress_bar": "Task list progress bar",
+      "preview_code_block_delete": "Delete button on code blocks, in markdown preview",
       "share_restrict_users": "Share: restrict to specific users",
       "share_protocol_toggle": "Share: HTTPS toggle",
       "share_shared_with_me": "Share: \"Shared with me\"",

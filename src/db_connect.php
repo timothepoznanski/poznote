@@ -183,7 +183,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 40; // 40: show_note_created/show_note_icons '0' -> hidden_ui_elements panel keys
+    $CURRENT_SCHEMA_VERSION = 41; // 41: seed the default-hidden UI customization keys (panel:preview-code-block-delete)
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -906,6 +906,57 @@ try {
                 $con->rollBack();
             }
             error_log('db_connect: legacy display toggle migration failed: ' . $e->getMessage());
+        }
+
+        // === Keys hidden by default (poznoteGetDefaultHiddenUiKeys) ===
+        // UI Customization stores the hidden keys only, so "unchecked out of
+        // the box" cannot be expressed as a setting default: it is seeded into
+        // the account's own list instead, here, where a fresh database (version
+        // 0) and an upgraded one both pass. 'default_hidden_ui_keys_applied'
+        // remembers the keys already seeded, so this runs once per key: a user
+        // who ticks the box back on keeps their choice across later bootstraps.
+        try {
+            $defaultHiddenKeys = function_exists('poznoteGetDefaultHiddenUiKeys')
+                ? poznoteGetDefaultHiddenUiKeys()
+                : [];
+            if (!empty($defaultHiddenKeys)) {
+                $seedStmt = $con->prepare("SELECT value FROM settings WHERE key = ?");
+
+                $seedStmt->execute(['default_hidden_ui_keys_applied']);
+                $appliedRaw = $seedStmt->fetchColumn();
+                $applied = json_decode($appliedRaw === false ? '[]' : (string)$appliedRaw, true);
+                if (!is_array($applied)) {
+                    $applied = [];
+                }
+
+                $toSeed = array_values(array_diff($defaultHiddenKeys, $applied));
+                if (!empty($toSeed)) {
+                    $seedStmt->execute(['hidden_ui_elements']);
+                    $hiddenRaw = $seedStmt->fetchColumn();
+                    $hiddenList = json_decode($hiddenRaw === false ? '[]' : (string)$hiddenRaw, true);
+                    if (!is_array($hiddenList)) {
+                        $hiddenList = [];
+                    }
+
+                    foreach ($toSeed as $defaultKey) {
+                        if (!in_array($defaultKey, $hiddenList, true)) {
+                            $hiddenList[] = $defaultKey;
+                        }
+                        $applied[] = $defaultKey;
+                    }
+
+                    $con->beginTransaction();
+                    $seedWriteStmt = $con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
+                    $seedWriteStmt->execute(['hidden_ui_elements', json_encode(array_values($hiddenList))]);
+                    $seedWriteStmt->execute(['default_hidden_ui_keys_applied', json_encode(array_values(array_unique($applied)))]);
+                    $con->commit();
+                }
+            }
+        } catch (Exception $e) {
+            if ($con->inTransaction()) {
+                $con->rollBack();
+            }
+            error_log('db_connect: default hidden UI key seeding failed: ' . $e->getMessage());
         }
 
         // === Update schema version (last, so a failed bootstrap retries on the next request) ===
