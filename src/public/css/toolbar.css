@@ -69,6 +69,8 @@
     display: inline-block;
     width: 20px;
     height: 20px;
+    /* The dark theme outlines swatches; keep them the size of the None sign. */
+    box-sizing: border-box;
     border-radius: var(--pz-radius-sm);
 }
 
@@ -77,9 +79,10 @@
     transform: translateY(0);
 }
 
+/* Fifteen palette colours and "none": two rows of eight. */
 .color-palette-popup .color-grid {
-    display: flex;
-    flex-wrap: nowrap;
+    display: grid;
+    grid-template-columns: repeat(8, 28px);
     gap: 10px;
     align-items: center;
     justify-content: center;
@@ -97,12 +100,25 @@
     border: none;
     cursor: pointer;
     padding: 0;
-    display: inline-block;
+    /* Centre the swatch (and the "None" sign) in the cell, so every entry
+       sits on the same axis whatever its content. */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     box-sizing: border-box;
 }
 
 .color-item:focus {
     outline: 2px solid var(--pz-accent);
+}
+
+/* The "None" entry: a "no" sign in the swatch's own box, not a swatch. */
+.color-palette-popup .color-swatch-none {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    color: var(--pz-text-muted);
+    background-color: var(--pz-text-muted);
 }
 
 /* baseline removed - simplified palette */

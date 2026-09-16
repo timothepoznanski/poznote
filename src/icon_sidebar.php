@@ -374,6 +374,7 @@ window.PoznoteIconSidebarColorsConfig = <?php echo json_encode([
     'errorSaving' => t('display.alerts.error_saving_preference', [], 'Error saving preference'),
 ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;
 </script>
+<script src="<?php echo $iconSidebarAsset('js/color-palette.js'); ?>" defer></script>
 <script src="<?php echo $iconSidebarAsset('js/icon-sidebar-colors.js'); ?>" defer></script>
 <script src="<?php echo $iconSidebarAsset('js/page-title-workspace-menu.js'); ?>" defer></script>
 <script>

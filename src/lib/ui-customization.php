@@ -5,6 +5,8 @@
  * Extracted from functions.php. Loaded through it, so no caller changed.
  */
 
+require_once __DIR__ . '/color-palette.php';
+
 function poznoteGetNonHideableUiKeys() {
     return [
         'card:home-support-card' => true,
@@ -321,7 +323,7 @@ function poznoteRenderIconSidebarIcon($iconClass, $id, $extraClass = '') {
     $style = '';
     if (isset($colors[$id])) {
         $class .= ' icon-sidebar-icon-colored';
-        $style = ' style="--icon-sidebar-icon-color: ' . $colors[$id] . ';"';
+        $style = ' style="--icon-sidebar-icon-color: ' . poznoteIconColorCss($colors[$id]) . ';"';
     }
     return '<i class="' . htmlspecialchars($class, ENT_QUOTES, 'UTF-8') . '"' . $style . '></i>';
 }
@@ -354,7 +356,8 @@ function poznoteBuildToolbarIconColorRules(array $colors) {
     $states = ':not(.is-favorite):not(.is-shared):not(.has-attachments):not(.has-reminder):not(.is-saving):not(.is-format-active):not(.is-edit-mode)';
     $rules = [];
     foreach ($colors as $key => $color) {
-        $paint = ' { color: ' . $color . '; background-color: ' . $color . '; }';
+        $css = poznoteIconColorCss($color);
+        $paint = ' { color: ' . $css . '; background-color: ' . $css . '; }';
         if (strpos($key, 'menu-') === 0) {
             $rules[] = '.note-edit-toolbar .dropdown-item[data-action="' . substr($key, 5) . '"]:not([data-selector]):not(.has-attachments) i' . $paint;
         } else {

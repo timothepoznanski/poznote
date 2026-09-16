@@ -912,8 +912,10 @@
         // Markdown's == highlight syntax has no per-color variant. When a real
         // color is chosen, wrap the selection in an inline-styled span so the
         // chosen highlight color is preserved; the plain == form stays the
-        // default for the standard yellow highlight and for "none".
-        if (color && color !== 'none' && color !== '#ffe066' &&
+        // default for the standard yellow highlight and for "none". <mark> is
+        // painted with --pz-color-yellow-soft, so both follow the theme.
+        var yellow = window.PoznoteColorPalette ? window.PoznoteColorPalette.highlightColor('yellow') : '';
+        if (color && color !== 'none' && color !== yellow &&
             typeof applyMarkdownBackgroundSpan === 'function') {
             applyMarkdownBackgroundSpan(color);
             return;

@@ -248,7 +248,7 @@ body.mobile-keyboard-open .slash-date-picker {
 }
 
 body.mobile-formatting-toolbar-active .color-palette-popup .color-grid {
-    flex-wrap: nowrap;
+    grid-template-columns: repeat(8, 26px);
     gap: 6px;
     padding: 6px 8px;
 }
@@ -261,7 +261,8 @@ body.mobile-formatting-toolbar-active .color-palette-popup .color-item {
     width: 26px;
 }
 
-body.mobile-formatting-toolbar-active .color-palette-popup .color-swatch {
+body.mobile-formatting-toolbar-active .color-palette-popup .color-swatch,
+body.mobile-formatting-toolbar-active .color-palette-popup .color-swatch-none {
     height: 18px;
     width: 18px;
 }

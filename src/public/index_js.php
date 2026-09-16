@@ -30,6 +30,7 @@ function poznoteGetIndexJsGroups(): array {
     'head' => [
         'js/theme-manager.js',
         'js/modal-alerts.js',
+        'js/color-palette.js',
         'js/toolbar-popups.js',
         'js/toolbar-editor-utils.js',
         'js/toolbar-format.js',

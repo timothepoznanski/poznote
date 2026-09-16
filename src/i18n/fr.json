@@ -1092,13 +1092,6 @@
       }
     },
     "colors": {
-      "black": "Noir",
-      "red": "Rouge",
-      "orange": "Orange",
-      "yellow": "Jaune",
-      "green": "Vert",
-      "blue": "Bleu",
-      "purple": "Violet",
       "none": "Aucun"
     },
     "font_size": {
@@ -1173,16 +1166,6 @@
     "code_block_line_numbers": {
       "show": "Afficher les numéros de ligne",
       "hide": "Masquer les numéros de ligne"
-    },
-    "highlights": {
-      "yellow": "Jaune",
-      "red": "Rouge",
-      "green": "Vert",
-      "blue": "Bleu",
-      "pink": "Rose",
-      "orange": "Orange",
-      "purple": "Violet",
-      "gray": "Gris"
     }
   },
   "info": {
@@ -1547,29 +1530,8 @@
       "default_icon": "Définir l'icône par défaut",
       "reset": "Reset",
       "search_placeholder": "Rechercher des icônes...",
-      "gray": "Gris",
-      "black": "Noir",
       "default": "Par défaut",
-      "amber": "Ambre",
-      "blue": "Bleu",
-      "cyan": "Cyan",
-      "default_color": "Par défaut",
-      "emerald": "Émeraude",
-      "fuchsia": "Fuchsia",
-      "green": "Vert",
-      "indigo": "Indigo",
-      "lime": "Citron vert",
-      "orange": "Orange",
-      "pink": "Rose",
-      "purple": "Violet",
-      "red": "Rouge",
-      "rose": "Rose vif",
-      "sky": "Ciel",
-      "slate": "Ardoise",
-      "stone": "Pierre",
-      "teal": "Sarcelle",
-      "violet": "Mauve",
-      "yellow": "Jaune"
+      "default_color": "Par défaut"
     },
     "linked_selector": {
       "title": "Créer un raccourci d'une note",
@@ -2086,13 +2048,6 @@
     "code_block_placeholder_before": "Écrivez du texte ici…",
     "code_block_placeholder_after": "Écrivez du texte ici…",
     "color": "Couleur",
-    "color_red": "Rouge",
-    "color_blue": "Bleu",
-    "color_green": "Vert",
-    "color_yellow": "Jaune",
-    "color_purple": "Violet",
-    "color_orange": "Orange",
-    "color_black": "Noir",
     "bg_yellow": "Surlignage jaune",
     "youtube_video": "Vidéo YouTube",
     "youtube_modal_title": "Insérer une vidéo YouTube",
@@ -4922,5 +4877,23 @@
       "password_mismatch": "Les deux nouveaux mots de passe ne correspondent pas.",
       "password_too_short": "Le mot de passe doit contenir au moins 4 caractères."
     }
+  },
+  "colors": {
+    "red": "Rouge",
+    "orange": "Orange",
+    "amber": "Ambre",
+    "yellow": "Jaune",
+    "lime": "Citron vert",
+    "green": "Vert",
+    "teal": "Sarcelle",
+    "cyan": "Cyan",
+    "blue": "Bleu",
+    "indigo": "Indigo",
+    "purple": "Violet",
+    "magenta": "Magenta",
+    "pink": "Rose",
+    "brown": "Marron",
+    "gray": "Gris",
+    "default": "Par défaut"
   }
 }

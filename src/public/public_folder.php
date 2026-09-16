@@ -350,7 +350,8 @@ $noteBaseUrl = $protocol . '://' . $host;
     <?php
     $folderCustomIcon = !empty($folder['icon']) ? convertFontAwesomeToLucide($folder['icon']) : null;
     $folderCustomIconColor = !empty($folder['icon_color']) ? $folder['icon_color'] : null;
-    $folderIconStyle = $folderCustomIconColor ? ' style="color: ' . htmlspecialchars($folderCustomIconColor, ENT_QUOTES) . ' !important;"' : '';
+    $folderIconColorCss = poznoteIconColorCss($folderCustomIconColor);
+    $folderIconStyle = $folderIconColorCss !== '' ? ' style="color: ' . htmlspecialchars($folderIconColorCss, ENT_QUOTES) . ' !important;"' : '';
     $folderIconColorAttr = $folderCustomIconColor ? ' data-icon-color="' . htmlspecialchars($folderCustomIconColor, ENT_QUOTES) . '"' : '';
     $isEmojiIcon = $folderCustomIcon && !str_contains($folderCustomIcon, 'lucide');
     ?>
@@ -478,7 +479,8 @@ $noteBaseUrl = $protocol . '://' . $host;
         $showNoteIcons = getSetting('show_note_icons', '1') === '1';
         $noteIconRaw = ($showNoteIcons && !empty($note['icon'])) ? convertFontAwesomeToLucide($note['icon']) : null;
         $noteIconColor = ($showNoteIcons && !empty($note['icon_color'])) ? $note['icon_color'] : null;
-        $noteIconStyle = $noteIconColor ? ' style="color: ' . htmlspecialchars($noteIconColor, ENT_QUOTES) . ' !important;"' : '';
+        $noteIconColorCss = poznoteIconColorCss($noteIconColor);
+        $noteIconStyle = $noteIconColorCss !== '' ? ' style="color: ' . htmlspecialchars($noteIconColorCss, ENT_QUOTES) . ' !important;"' : '';
         $noteIconColorAttr = $noteIconColor ? ' data-icon-color="' . htmlspecialchars($noteIconColor, ENT_QUOTES) . '"' : '';
         $noteIsEmoji = $noteIconRaw && !str_contains($noteIconRaw, 'lucide');
         $noteIconClasses = null;
@@ -524,7 +526,8 @@ $noteBaseUrl = $protocol . '://' . $host;
 
         $subIconRaw = !empty($folderIcons[$folderId]['icon']) ? convertFontAwesomeToLucide($folderIcons[$folderId]['icon']) : null;
         $subIconColor = !empty($folderIcons[$folderId]['icon_color']) ? $folderIcons[$folderId]['icon_color'] : null;
-        $subIconStyle = $subIconColor ? ' style="color: ' . htmlspecialchars($subIconColor, ENT_QUOTES) . ' !important;"' : '';
+        $subIconColorCss = poznoteIconColorCss($subIconColor);
+        $subIconStyle = $subIconColorCss !== '' ? ' style="color: ' . htmlspecialchars($subIconColorCss, ENT_QUOTES) . ' !important;"' : '';
         $subIconColorAttr = $subIconColor ? ' data-icon-color="' . htmlspecialchars($subIconColor, ENT_QUOTES) . '"' : '';
         $subIsEmoji = $subIconRaw && !str_contains($subIconRaw, 'lucide');
         if (!$subIsEmoji && $subIconRaw) {

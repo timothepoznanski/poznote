@@ -1099,14 +1099,7 @@
       "hide": "隐藏行号"
     },
     "colors": {
-      "black": "黑色",
-      "orange": "橙色",
-      "yellow": "黄色",
-      "green": "绿色",
-      "blue": "蓝色",
-      "purple": "紫色",
-      "none": "无",
-      "red": "红色"
+      "none": "无"
     },
     "font_size": {
       "very_small": "极小",
@@ -1171,16 +1164,6 @@
       "remove": "移除链接",
       "cancel": "取消",
       "save": "保存"
-    },
-    "highlights": {
-      "yellow": "黄色",
-      "red": "红色",
-      "green": "绿色",
-      "blue": "蓝色",
-      "pink": "粉色",
-      "orange": "橙色",
-      "purple": "紫色",
-      "gray": "灰色"
     }
   },
   "info": {
@@ -1551,28 +1534,7 @@
       "default_icon": "设置默认图标",
       "reset": "恢复默认行为",
       "search_placeholder": "搜索图标...",
-      "gray": "灰色",
-      "black": "黑色",
-      "amber": "琥珀色",
-      "blue": "蓝色",
-      "cyan": "青色",
-      "default_color": "默认",
-      "emerald": "翠绿色",
-      "fuchsia": "紫红色",
-      "green": "绿色",
-      "indigo": "靛蓝色",
-      "lime": "黄绿色",
-      "orange": "橙色",
-      "pink": "粉色",
-      "purple": "紫色",
-      "red": "红色",
-      "rose": "玫瑰色",
-      "sky": "天蓝色",
-      "slate": "石板灰",
-      "stone": "岩石灰",
-      "teal": "蓝绿色",
-      "violet": "紫罗兰色",
-      "yellow": "黄色"
+      "default_color": "默认"
     },
     "linked_selector": {
       "title": "从笔记创建快捷方式",
@@ -2126,13 +2088,6 @@
     "insert": "插入",
     "media": "媒体",
     "color": "颜色",
-    "color_red": "红色",
-    "color_blue": "蓝色",
-    "color_green": "绿色",
-    "color_yellow": "黄色",
-    "color_purple": "紫色",
-    "color_orange": "橙色",
-    "color_black": "黑色",
     "bg_yellow": "黄色背景",
     "youtube": "YouTube",
     "streaming_videos": "流媒体视频",
@@ -4917,5 +4872,23 @@
       "password_mismatch": "两次输入的新密码不一致。",
       "password_too_short": "密码至少需要 4 个字符。"
     }
+  },
+  "colors": {
+    "red": "红色",
+    "orange": "橙色",
+    "amber": "琥珀色",
+    "yellow": "黄色",
+    "lime": "黄绿色",
+    "green": "绿色",
+    "teal": "蓝绿色",
+    "cyan": "青色",
+    "blue": "蓝色",
+    "indigo": "靛蓝色",
+    "purple": "紫色",
+    "magenta": "品红色",
+    "pink": "粉色",
+    "brown": "棕色",
+    "gray": "灰色",
+    "default": "默认"
   }
 }

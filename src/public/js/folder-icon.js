@@ -777,6 +777,11 @@ function buildIconGridItem(iconClass) {
  */
 function setupColorPicker(currentColor) {
     const colorOptions = document.querySelectorAll('#folderIconModal .folder-color-option');
+    // A colour saved from the old 21-swatch palette selects the swatch that
+    // now stands for it (js/color-palette.js).
+    if (currentColor && window.PoznoteColorPalette) {
+        currentColor = window.PoznoteColorPalette.canonicalIconColor(currentColor);
+    }
 
     colorOptions.forEach(option => {
         const color = option.getAttribute('data-color');
@@ -1015,7 +1020,7 @@ function updateFolderIconInUI(folderId, iconClass, iconColor) {
 
         // Apply color with !important to override CSS rules
         if (iconColor) {
-            folderIconElement.style.setProperty('color', iconColor, 'important');
+            folderIconElement.style.setProperty('color', window.poznoteIconColorCss ? window.poznoteIconColorCss(iconColor) : iconColor, 'important');
             folderIconElement.setAttribute('data-icon-color', iconColor);
         } else {
             folderIconElement.style.removeProperty('color');
@@ -1043,7 +1048,7 @@ function updateNoteIconInUI(noteId, iconClass, iconColor) {
         noteIconElement.setAttribute('data-custom-icon', iconClass ? 'true' : 'false');
 
         if (iconColor) {
-            noteIconElement.style.setProperty('color', iconColor, 'important');
+            noteIconElement.style.setProperty('color', window.poznoteIconColorCss ? window.poznoteIconColorCss(iconColor) : iconColor, 'important');
             noteIconElement.setAttribute('data-icon-color', iconColor);
         } else {
             noteIconElement.style.removeProperty('color');

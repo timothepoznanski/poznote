@@ -37,7 +37,9 @@
 
     function buildRules(map) {
         return Object.keys(map).map(function (key) {
-            var paint = ' { color: ' + map[key] + '; background-color: ' + map[key] + '; }';
+            // Same token mapping as poznoteIconColorCss() on the PHP side.
+            var css = window.poznoteIconColorCss ? window.poznoteIconColorCss(map[key]) : map[key];
+            var paint = ' { color: ' + css + '; background-color: ' + css + '; }';
             if (key.indexOf('menu-') === 0) {
                 return '.note-edit-toolbar .dropdown-item[data-action="' + key.slice(5) + '"]:not([data-selector]):not(.has-attachments) i' + paint;
             }

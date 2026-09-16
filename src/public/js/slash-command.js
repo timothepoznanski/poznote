@@ -763,6 +763,31 @@
         insertInlineElement('span', color !== 'black' ? { color: color } : undefined);
     }
 
+    // A palette value, var(--pz-color-red, #dc2626), so the colour follows the
+    // theme (js/color-palette.js, issue #1408). kind is 'text' or 'highlight'.
+    function paletteValue(kind, id) {
+        const palette = window.PoznoteColorPalette;
+        if (!palette) return '';
+        return kind === 'highlight' ? palette.highlightColor(id) : palette.textColor(id);
+    }
+
+    // One submenu entry per palette colour; apply receives the text value.
+    function paletteColorItems(apply) {
+        const palette = window.PoznoteColorPalette;
+        const t = window.t || ((key, params, fallback) => fallback);
+        if (!palette) return [];
+        return palette.colors.map(c => {
+            const value = palette.textColor(c.id);
+            return {
+                id: c.id,
+                icon: 'lucide-circle',
+                iconColor: value,
+                label: t('colors.' + c.id, null, c.id.charAt(0).toUpperCase() + c.id.slice(1)),
+                action: () => apply(value)
+            };
+        });
+    }
+
     // Insert a code block, optionally without syntax highlighting.
     // With no language at all, a plain block is inserted: no language badge,
     // no syntax highlighting and no line numbers (see .plain-block).
@@ -2021,7 +2046,7 @@
             .map(note => ({
                 id: 'template-' + note.id,
                 icon: note.icon || 'lucide-file-text',
-                iconColor: note.icon_color || null,
+                iconColor: (window.poznoteIconColorCss ? window.poznoteIconColorCss(note.icon_color) : '') || null,
                 label: note.heading || t('note_reference.untitled', null, 'Untitled'),
                 action: function () { insertTemplate(note); }
             }));
@@ -2307,15 +2332,9 @@
                 id: 'color',
                 icon: 'lucide-palette',
                 label: t('slash_menu.color', null, 'Color'),
-                submenu: [
-                    { id: 'red', icon: 'lucide-circle', iconColor: '#e74c3c', label: t('slash_menu.color_red', null, 'Red'), action: () => insertColor('#e74c3c') },
-                    { id: 'blue', icon: 'lucide-circle', iconColor: '#3498db', label: t('slash_menu.color_blue', null, 'Blue'), action: () => insertColor('#3498db') },
-                    { id: 'green', icon: 'lucide-circle', iconColor: '#2ecc71', label: t('slash_menu.color_green', null, 'Green'), action: () => insertColor('#2ecc71') },
-                    { id: 'yellow', icon: 'lucide-circle', iconColor: '#f1c40f', label: t('slash_menu.color_yellow', null, 'Yellow'), action: () => insertColor('#f1c40f') },
-                    { id: 'purple', icon: 'lucide-circle', iconColor: '#9b59b6', label: t('slash_menu.color_purple', null, 'Purple'), action: () => insertColor('#9b59b6') },
-                    { id: 'orange', icon: 'lucide-circle', iconColor: '#e67e22', label: t('slash_menu.color_orange', null, 'Orange'), action: () => insertColor('#e67e22') },
-                    { id: 'black', icon: 'lucide-circle', iconColor: '#000000', label: t('slash_menu.color_black', null, 'Black'), action: () => insertColor('inherit') }
-                ]
+                submenu: paletteColorItems(function (value) { insertColor(value); }).concat([
+                    { id: 'default', icon: 'lucide-circle', iconColor: 'var(--pz-text)', label: t('colors.default', null, 'Default'), action: () => insertColor('inherit') }
+                ])
             },
             {
                 id: 'code',
@@ -2738,15 +2757,17 @@
                 id: 'color',
                 icon: 'lucide-palette',
                 label: t('slash_menu.color', null, 'Color'),
-                submenu: [
-                    { id: 'red', icon: 'lucide-circle', iconColor: '#e74c3c', label: t('slash_menu.color_red', null, 'Red'), action: () => wrapMarkdownSelection('<span style="color:#e74c3c">', '</span>') },
-                    { id: 'blue', icon: 'lucide-circle', iconColor: '#3498db', label: t('slash_menu.color_blue', null, 'Blue'), action: () => wrapMarkdownSelection('<span style="color:#3498db">', '</span>') },
-                    { id: 'green', icon: 'lucide-circle', iconColor: '#2ecc71', label: t('slash_menu.color_green', null, 'Green'), action: () => wrapMarkdownSelection('<span style="color:#2ecc71">', '</span>') },
-                    { id: 'yellow', icon: 'lucide-circle', iconColor: '#f1c40f', label: t('slash_menu.color_yellow', null, 'Yellow'), action: () => wrapMarkdownSelection('<span style="color:#f1c40f">', '</span>') },
-                    { id: 'purple', icon: 'lucide-circle', iconColor: '#9b59b6', label: t('slash_menu.color_purple', null, 'Purple'), action: () => wrapMarkdownSelection('<span style="color:#9b59b6">', '</span>') },
-                    { id: 'orange', icon: 'lucide-circle', iconColor: '#e67e22', label: t('slash_menu.color_orange', null, 'Orange'), action: () => wrapMarkdownSelection('<span style="color:#e67e22">', '</span>') },
-                    { id: 'bg-yellow', icon: 'lucide-fill-drip', iconColor: '#f1c40f', label: t('slash_menu.bg_yellow', null, 'Yellow background'), action: () => wrapMarkdownSelection('<span style="background-color:#f1c40f">', '</span>') }
-                ]
+                submenu: paletteColorItems(function (value) {
+                    wrapMarkdownSelection('<span style="color:' + value + '">', '</span>');
+                }).concat([
+                    {
+                        id: 'bg-yellow',
+                        icon: 'lucide-fill-drip',
+                        iconColor: paletteValue('text', 'yellow'),
+                        label: t('slash_menu.bg_yellow', null, 'Yellow background'),
+                        action: () => wrapMarkdownSelection('<span style="background-color:' + paletteValue('highlight', 'yellow') + '">', '</span>')
+                    }
+                ])
             },
             {
                 id: 'insert',

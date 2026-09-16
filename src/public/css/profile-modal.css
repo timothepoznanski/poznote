@@ -260,7 +260,7 @@ html[data-theme='dark'] #confirmLogoutModal .logout-account-option:focus-visible
    css/folder-icon-modal.css, which only the notes and folders pages load. */
 #iconSidebarColorModal .folder-color-picker {
     display: grid;
-    grid-template-columns: repeat(11, minmax(0, 36px));
+    grid-template-columns: repeat(8, minmax(0, 36px));
     justify-content: center;
     gap: 8px;
     padding: 16px;
@@ -326,7 +326,7 @@ html[data-theme='dark'] #confirmLogoutModal .logout-account-option:focus-visible
 
 @media (max-width: 640px) {
     #iconSidebarColorModal .folder-color-picker {
-        grid-template-columns: repeat(11, minmax(0, 32px));
+        grid-template-columns: repeat(8, minmax(0, 32px));
         gap: 6px;
         padding: 12px;
     }

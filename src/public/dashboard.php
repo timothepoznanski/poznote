@@ -50,7 +50,7 @@ function dashboardBuildNoteData(array $note, string $pageWorkspace): array {
     if ($heading === '') $heading = t('common.untitled', [], 'Untitled');
     $tags = array_values(array_filter(array_map('trim', explode(',', (string)($note['tags'] ?? '')))));
     $iconRaw = !empty($note['icon']) ? convertFontAwesomeToLucide($note['icon']) : '';
-    $iconColor = !empty($note['icon_color']) ? (string)$note['icon_color'] : '';
+    $iconColor = poznoteIconColorCss($note['icon_color'] ?? '');
     $noteColor = !empty($note['color']) ? (string)$note['color'] : '';
     $noteColorHex = $noteColor !== '' ? resolveNoteColorHex($noteColor) : '';
     return [
@@ -520,7 +520,7 @@ function dashboardBuildWorkspaceBoard(PDO $con, string $pageWorkspace, bool $fav
             'icon'     => !empty($f['icon']) ? convertFontAwesomeToLucide($f['icon']) : 'lucide lucide-folder',
             // 'color' is the icon color (legacy name); 'cardColor'/'cardColorHex'
             // carry the card background color, like notes.
-            'color'    => !empty($f['icon_color']) ? $f['icon_color'] : null,
+            'color'    => poznoteIconColorCss($f['icon_color'] ?? '') ?: null,
             'cardColor'    => !empty($f['color']) ? (string)$f['color'] : '',
             'cardColorHex' => !empty($f['color']) ? resolveNoteColorHex((string)$f['color']) : '',
             'pinned'   => !empty($f['pinned']),

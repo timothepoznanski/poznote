@@ -1101,14 +1101,7 @@
       "hide": "Zeilennummern ausblenden"
     },
     "colors": {
-      "black": "Schwarz",
-      "orange": "Orange",
-      "yellow": "Gelb",
-      "green": "Grün",
-      "blue": "Blau",
-      "purple": "Lila",
-      "none": "Keine",
-      "red": "Rot"
+      "none": "Keine"
     },
     "font_size": {
       "very_small": "Sehr klein",
@@ -1173,16 +1166,6 @@
       "remove": "Link entfernen",
       "cancel": "Abbrechen",
       "save": "Speichern"
-    },
-    "highlights": {
-      "yellow": "Gelb",
-      "red": "Rot",
-      "green": "Grün",
-      "blue": "Blau",
-      "pink": "Rosa",
-      "orange": "Orange",
-      "purple": "Lila",
-      "gray": "Grau"
     }
   },
   "info": {
@@ -1542,28 +1525,7 @@
       "default_icon": "Standardsymbol festlegen",
       "reset": "Standardverhalten wiederherstellen",
       "search_placeholder": "Symbole suchen...",
-      "gray": "Grau",
-      "black": "Schwarz",
-      "amber": "Bernstein",
-      "blue": "Blau",
-      "cyan": "Cyan",
-      "default_color": "Standard",
-      "emerald": "Smaragd",
-      "fuchsia": "Fuchsia",
-      "green": "Grün",
-      "indigo": "Indigo",
-      "lime": "Limette",
-      "orange": "Orange",
-      "pink": "Pink",
-      "purple": "Lila",
-      "red": "Rot",
-      "rose": "Rosé",
-      "sky": "Himmelblau",
-      "slate": "Schiefer",
-      "stone": "Stein",
-      "teal": "Blaugrün",
-      "violet": "Violett",
-      "yellow": "Gelb"
+      "default_color": "Standard"
     },
     "linked_selector": {
       "title": "Verknüpfung aus einer Notiz erstellen",
@@ -2128,13 +2090,6 @@
     "insert": "Einfügen",
     "media": "Medien",
     "color": "Farbe",
-    "color_red": "Rot",
-    "color_blue": "Blau",
-    "color_green": "Grün",
-    "color_yellow": "Gelb",
-    "color_purple": "Lila",
-    "color_orange": "Orange",
-    "color_black": "Schwarz",
     "bg_yellow": "Gelber Hintergrund",
     "youtube": "YouTube",
     "streaming_videos": "Streaming-Videos",
@@ -4817,5 +4772,23 @@
       "password_mismatch": "Die beiden neuen Passwörter stimmen nicht überein.",
       "password_too_short": "Das Passwort muss mindestens 4 Zeichen lang sein."
     }
+  },
+  "colors": {
+    "red": "Rot",
+    "orange": "Orange",
+    "amber": "Bernstein",
+    "yellow": "Gelb",
+    "lime": "Limette",
+    "green": "Grün",
+    "teal": "Blaugrün",
+    "cyan": "Cyan",
+    "blue": "Blau",
+    "indigo": "Indigo",
+    "purple": "Lila",
+    "magenta": "Magenta",
+    "pink": "Pink",
+    "brown": "Braun",
+    "gray": "Grau",
+    "default": "Standard"
   }
 }

@@ -1101,14 +1101,7 @@
       "hide": "Ocultar números de línea"
     },
     "colors": {
-      "black": "Negro",
-      "orange": "Naranja",
-      "yellow": "Amarillo",
-      "green": "Verde",
-      "blue": "Azul",
-      "purple": "Morado",
-      "none": "Ninguno",
-      "red": "Rojo"
+      "none": "Ninguno"
     },
     "font_size": {
       "very_small": "Muy pequeño",
@@ -1173,16 +1166,6 @@
       "remove": "Eliminar enlace",
       "cancel": "Cancelar",
       "save": "Guardar"
-    },
-    "highlights": {
-      "yellow": "Amarillo",
-      "red": "Rojo",
-      "green": "Verde",
-      "blue": "Azul",
-      "pink": "Rosa",
-      "orange": "Naranja",
-      "purple": "Morado",
-      "gray": "Gris"
     }
   },
   "info": {
@@ -1542,28 +1525,7 @@
       "default_icon": "Establecer icono predeterminado",
       "reset": "Restaurar el comportamiento predeterminado",
       "search_placeholder": "Buscar iconos...",
-      "gray": "Gris",
-      "black": "Negro",
-      "amber": "Ámbar",
-      "blue": "Azul",
-      "cyan": "Cian",
-      "default_color": "Predeterminado",
-      "emerald": "Esmeralda",
-      "fuchsia": "Fucsia",
-      "green": "Verde",
-      "indigo": "Índigo",
-      "lime": "Lima",
-      "orange": "Naranja",
-      "pink": "Rosa",
-      "purple": "Morado",
-      "red": "Rojo",
-      "rose": "Rosa intenso",
-      "sky": "Celeste",
-      "slate": "Pizarra",
-      "stone": "Piedra",
-      "teal": "Verde azulado",
-      "violet": "Violeta",
-      "yellow": "Amarillo"
+      "default_color": "Predeterminado"
     },
     "linked_selector": {
       "title": "Crear un atajo de una nota",
@@ -2128,13 +2090,6 @@
     "insert": "Insertar",
     "media": "Multimedia",
     "color": "Color",
-    "color_red": "Rojo",
-    "color_blue": "Azul",
-    "color_green": "Verde",
-    "color_yellow": "Amarillo",
-    "color_purple": "Morado",
-    "color_orange": "Naranja",
-    "color_black": "Negro",
     "bg_yellow": "Fondo amarillo",
     "youtube": "YouTube",
     "streaming_videos": "Vídeos en streaming",
@@ -4818,5 +4773,23 @@
       "password_mismatch": "Las dos contraseñas nuevas no coinciden.",
       "password_too_short": "La contraseña debe tener al menos 4 caracteres."
     }
+  },
+  "colors": {
+    "red": "Rojo",
+    "orange": "Naranja",
+    "amber": "Ámbar",
+    "yellow": "Amarillo",
+    "lime": "Lima",
+    "green": "Verde",
+    "teal": "Verde azulado",
+    "cyan": "Cian",
+    "blue": "Azul",
+    "indigo": "Índigo",
+    "purple": "Morado",
+    "magenta": "Magenta",
+    "pink": "Rosa",
+    "brown": "Marrón",
+    "gray": "Gris",
+    "default": "Predeterminado"
   }
 }

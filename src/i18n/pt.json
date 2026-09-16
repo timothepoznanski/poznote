@@ -1101,13 +1101,6 @@
       "hide": "Ocultar números de linha"
     },
     "colors": {
-      "black": "Preto",
-      "red": "Vermelho",
-      "orange": "Laranja",
-      "yellow": "Amarelo",
-      "green": "Verde",
-      "blue": "Azul",
-      "purple": "Roxo",
       "none": "Nenhum"
     },
     "font_size": {
@@ -1173,16 +1166,6 @@
       "remove": "Remover link",
       "cancel": "Cancelar",
       "save": "Salvar"
-    },
-    "highlights": {
-      "yellow": "Amarelo",
-      "red": "Vermelho",
-      "green": "Verde",
-      "blue": "Azul",
-      "pink": "Rosa",
-      "orange": "Laranja",
-      "purple": "Roxo",
-      "gray": "Cinza"
     }
   },
   "info": {
@@ -1542,28 +1525,7 @@
       "default_icon": "Definir ícone padrão",
       "reset": "Restaurar comportamento padrão",
       "search_placeholder": "Pesquisar ícones...",
-      "gray": "Cinza",
-      "black": "Preto",
-      "amber": "Âmbar",
-      "blue": "Azul",
-      "cyan": "Ciano",
-      "default_color": "Padrão",
-      "emerald": "Esmeralda",
-      "fuchsia": "Fúcsia",
-      "green": "Verde",
-      "indigo": "Índigo",
-      "lime": "Lima",
-      "orange": "Laranja",
-      "pink": "Rosa",
-      "purple": "Roxo",
-      "red": "Vermelho",
-      "rose": "Rosa-vivo",
-      "sky": "Céu",
-      "slate": "Ardósia",
-      "stone": "Pedra",
-      "teal": "Verde-azulado",
-      "violet": "Violeta",
-      "yellow": "Amarelo"
+      "default_color": "Padrão"
     },
     "linked_selector": {
       "title": "Criar um atalho a partir de uma nota",
@@ -2128,13 +2090,6 @@
     "insert": "Inserir",
     "media": "Mídia",
     "color": "Cor",
-    "color_red": "Vermelho",
-    "color_blue": "Azul",
-    "color_green": "Verde",
-    "color_yellow": "Amarelo",
-    "color_purple": "Roxo",
-    "color_orange": "Laranja",
-    "color_black": "Preto",
     "bg_yellow": "Fundo amarelo",
     "youtube": "YouTube",
     "streaming_videos": "Vídeos em streaming",
@@ -4818,5 +4773,23 @@
       "password_mismatch": "As duas novas palavras-passe não coincidem.",
       "password_too_short": "A palavra-passe deve ter pelo menos 4 caracteres."
     }
+  },
+  "colors": {
+    "red": "Vermelho",
+    "orange": "Laranja",
+    "amber": "Âmbar",
+    "yellow": "Amarelo",
+    "lime": "Lima",
+    "green": "Verde",
+    "teal": "Verde-azulado",
+    "cyan": "Ciano",
+    "blue": "Azul",
+    "indigo": "Índigo",
+    "purple": "Roxo",
+    "magenta": "Magenta",
+    "pink": "Rosa",
+    "brown": "Marrom",
+    "gray": "Cinza",
+    "default": "Padrão"
   }
 }

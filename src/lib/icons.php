@@ -5,6 +5,8 @@
  * Extracted from functions.php. Loaded through it, so no caller changed.
  */
 
+require_once __DIR__ . '/color-palette.php';
+
 /**
  * Convert Font Awesome icon classes to Lucide icon classes
  * This handles the migration from Font Awesome to Lucide icons
@@ -300,7 +302,8 @@ function renderEditableNoteIcon($noteId, $noteTitle, $iconClass = '', $iconColor
     $noteIconClass = buildNoteIconClass($hasCustomNoteIcon ? $iconClass : $defaultIcon, $defaultIcon);
     $noteIconColor = !empty($iconColor) ? (string)$iconColor : '';
     $classes = trim($noteIconClass . ' note-icon ' . (string)$extraClasses);
-    $iconStyle = $noteIconColor ? " style='color: " . htmlspecialchars($noteIconColor, ENT_QUOTES) . " !important;'" : "";
+    $noteIconColorCss = poznoteIconColorCss($noteIconColor);
+    $iconStyle = $noteIconColorCss !== '' ? " style='color: " . htmlspecialchars($noteIconColorCss, ENT_QUOTES) . " !important;'" : "";
     $iconColorAttr = $noteIconColor ? " data-icon-color='" . htmlspecialchars($noteIconColor, ENT_QUOTES) . "'" : "";
     $changeIconTitle = t_h('notes_list.folder_actions.change_note_icon', [], 'Change note icon');
     // Exposed so the icon picker can restore the right default when the user resets the icon.

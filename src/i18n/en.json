@@ -1054,28 +1054,7 @@
       "default_icon": "Set default icon",
       "reset": "Restore default behavior",
       "search_placeholder": "Search icons...",
-      "gray": "Gray",
-      "black": "Black",
-      "amber": "Amber",
-      "blue": "Blue",
-      "cyan": "Cyan",
-      "default_color": "Default",
-      "emerald": "Emerald",
-      "fuchsia": "Fuchsia",
-      "green": "Green",
-      "indigo": "Indigo",
-      "lime": "Lime",
-      "orange": "Orange",
-      "pink": "Pink",
-      "purple": "Purple",
-      "red": "Red",
-      "rose": "Rose",
-      "sky": "Sky",
-      "slate": "Slate",
-      "stone": "Stone",
-      "teal": "Teal",
-      "violet": "Violet",
-      "yellow": "Yellow"
+      "default_color": "Default"
     },
     "linked_selector": {
       "title": "Create a Shortcut from a Note",
@@ -1629,13 +1608,6 @@
     "insert": "Insert",
     "media": "Media",
     "color": "Color",
-    "color_red": "Red",
-    "color_blue": "Blue",
-    "color_green": "Green",
-    "color_yellow": "Yellow",
-    "color_purple": "Purple",
-    "color_orange": "Orange",
-    "color_black": "Black",
     "bg_yellow": "Yellow background",
     "youtube": "YouTube",
     "streaming_videos": "Streaming videos",
@@ -1831,13 +1803,6 @@
       "hide": "Hide line numbers"
     },
     "colors": {
-      "black": "Black",
-      "red": "Red",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
       "none": "None"
     },
     "font_size": {
@@ -1903,16 +1868,6 @@
       "remove": "Remove link",
       "cancel": "Cancel",
       "save": "Save"
-    },
-    "highlights": {
-      "yellow": "Yellow",
-      "red": "Red",
-      "green": "Green",
-      "blue": "Blue",
-      "pink": "Pink",
-      "orange": "Orange",
-      "purple": "Purple",
-      "gray": "Gray"
     }
   },
   "image_menu": {
@@ -4637,5 +4592,23 @@
     "replaced_all": "Replaced {{count}} match(es)",
     "result": "result",
     "results": "results"
+  },
+  "colors": {
+    "red": "Red",
+    "orange": "Orange",
+    "amber": "Amber",
+    "yellow": "Yellow",
+    "lime": "Lime",
+    "green": "Green",
+    "teal": "Teal",
+    "cyan": "Cyan",
+    "blue": "Blue",
+    "indigo": "Indigo",
+    "purple": "Purple",
+    "magenta": "Magenta",
+    "pink": "Pink",
+    "brown": "Brown",
+    "gray": "Gray",
+    "default": "Default"
   }
 }

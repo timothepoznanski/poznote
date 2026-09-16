@@ -32,12 +32,12 @@ test('a button key paints the button and its menu mirror, never over a state col
     assertContains('.note-edit-toolbar .toolbar-btn.btn-duplicate:not(.is-favorite)', $css);
     assertContains(':not(.has-reminder):not(.is-saving):not(.is-format-active):not(.is-edit-mode) i', $css);
     assertContains('.dropdown-item[data-selector=".btn-duplicate"]', $css);
-    assertContains('background-color: #ef4444;', $css);
+    assertContains('background-color: var(--pz-color-red, #ef4444);', $css);
 });
 
 test('a menu key paints the entries with that action only', function () {
     $css = poznoteBuildToolbarIconColorRules(['menu-print-note' => '#22c55e']);
-    assertSame('.note-edit-toolbar .dropdown-item[data-action="print-note"]:not([data-selector]):not(.has-attachments) i { color: #22c55e; background-color: #22c55e; }', $css);
+    assertSame('.note-edit-toolbar .dropdown-item[data-action="print-note"]:not([data-selector]):not(.has-attachments) i { color: var(--pz-color-green, #22c55e); background-color: var(--pz-color-green, #22c55e); }', $css);
 });
 
 // js/toolbar-icon-colors.js carries its own copy of the state list, to rebuild

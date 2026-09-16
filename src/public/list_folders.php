@@ -159,7 +159,7 @@ function renderFolderListRow($folderId, $folder, $depth, $workspace, $sharedFold
 	$folder_name = htmlspecialchars($folder['name'], ENT_QUOTES);
 	$folder_icon_raw = !empty($folder['icon']) ? $folder['icon'] : null;
 	$folder_icon = $folder_icon_raw ? htmlspecialchars(convertFontAwesomeToLucide($folder_icon_raw), ENT_QUOTES) : 'lucide-folder';
-	$icon_color = !empty($folder['icon_color']) ? htmlspecialchars($folder['icon_color'], ENT_QUOTES) : '';
+	$icon_color = htmlspecialchars(poznoteIconColorCss($folder['icon_color'] ?? ''), ENT_QUOTES);
 	$note_count = (int)$folder['note_count'];
 	$is_shared = isset($sharedFolderIds[(int)$folder['id']]) ? '1' : '0';
 	$is_favorite = !empty($folder['favorite']) ? '1' : '0';
@@ -766,6 +766,7 @@ $currentLang = getUserLanguage();
 	     picker and the modal confirm-button delegation. Load order follows
 	     index_js.php (the utils-*.js set before share.js/folder-icon.js). -->
 	<script src="<?php echo poznoteAsset('js/share.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/color-palette.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/folder-icon.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/modals-events.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/list_folders.js'); ?>"></script>

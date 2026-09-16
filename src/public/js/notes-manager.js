@@ -384,7 +384,7 @@
             } else {
                 var f = folderById[key];
                 var icon   = (f && f.icon)   ? f.icon   : 'lucide-folder';
-                var color  = (f && f.icon_color) ? f.icon_color : '';
+                var color  = (f && f.icon_color) ? iconColorCss(f.icon_color) : '';
                 var path   = (f && f.path)   ? f.path   : (f ? f.name : cfg.txtNoFolder);
                 var style  = color ? ' style="color:' + escHtml(color) + '"' : '';
                 folderLabel.innerHTML = '<i class="lucide ' + escHtml(icon) + '"' + style + '></i> '
@@ -637,7 +637,7 @@
 
         visible.forEach(function (f) {
             var icon  = f.icon  || 'lucide-folder';
-            var color = f.icon_color || '';
+            var color = iconColorCss(f.icon_color || '');
             var opt = buildFolderOption(f.id, f.path || f.name, icon, color);
             nmFolderList.appendChild(opt);
         });
@@ -862,6 +862,11 @@
     // ── Utils ─────────────────────────────────────────────────────────────────
     function show(el) { if (el) el.style.display = ''; }
     function hide(el) { if (el) el.style.display = 'none'; }
+
+    // A stored icon colour as the theme token it stands for (js/color-palette.js).
+    function iconColorCss(color) {
+        return window.poznoteIconColorCss ? window.poznoteIconColorCss(color) : String(color || '');
+    }
 
     function escHtml(str) {
         if (str == null) return '';

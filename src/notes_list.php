@@ -220,7 +220,8 @@ function renderFavoriteFolderItems($favorite_folders, $workspace_filter) {
         }
 
         $customIcon = !empty($favFolder['icon']) ? convertFontAwesomeToLucide($favFolder['icon']) : 'lucide lucide-folder';
-        $iconStyle = !empty($favFolder['icon_color']) ? " style='color: " . htmlspecialchars($favFolder['icon_color'], ENT_QUOTES) . " !important;'" : "";
+        $favIconColorCss = poznoteIconColorCss($favFolder['icon_color'] ?? '');
+        $iconStyle = $favIconColorCss !== '' ? " style='color: " . htmlspecialchars($favIconColorCss, ENT_QUOTES) . " !important;'" : "";
 
         echo "<div class='note-list-item favorite-folder-item'>";
         echo "<a class='links_arbo_left note-in-folder favorite-folder-link' href='" . htmlspecialchars($link, ENT_QUOTES) . "' data-folder-id='" . (int)$favFolder['id'] . "' data-folder='" . htmlspecialchars($favName, ENT_QUOTES) . "'>";
@@ -330,7 +331,8 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             echo "<i class='lucide lucide-star folder-icon'></i>";
         } else {
             $changeIconTitle = t_h('notes_list.folder_actions.change_icon', [], 'Change icon');
-            $iconStyle = $customIconColor ? " style='color: " . htmlspecialchars($customIconColor, ENT_QUOTES) . " !important;'" : "";
+            $customIconColorCss = poznoteIconColorCss($customIconColor);
+            $iconStyle = $customIconColorCss !== '' ? " style='color: " . htmlspecialchars($customIconColorCss, ENT_QUOTES) . " !important;'" : "";
             $iconColorAttr = $customIconColor ? " data-icon-color='" . htmlspecialchars($customIconColor, ENT_QUOTES) . "'" : "";
 
             echo "<i class='$chevron_icon folder-icon folder-list-click-action' data-custom-icon='" . ($customIcon ? 'true' : 'false') . "'$iconColorAttr data-action='open-folder-icon-picker' data-folder-id='$folderId' data-folder-name='" . htmlspecialchars($folderName, ENT_QUOTES) . "' title='" . $changeIconTitle . "'$iconStyle></i>";

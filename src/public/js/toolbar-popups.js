@@ -55,29 +55,73 @@ window.savedRanges = {};
 (function () {
   'use strict';
 
-  const COLORS = [
-    { key: 'editor.colors.black', fallback: 'Black', value: 'rgb(55,53,47)' },
-    { key: 'editor.colors.red', fallback: 'Red', value: 'red' },
-    { key: 'editor.colors.orange', fallback: 'Orange', value: 'orange' },
-    { key: 'editor.colors.yellow', fallback: 'Yellow', value: 'yellow' },
-    { key: 'editor.colors.green', fallback: 'Green', value: 'green' },
-    { key: 'editor.colors.blue', fallback: 'Blue', value: 'blue' },
-    { key: 'editor.colors.purple', fallback: 'Purple', value: 'purple' },
-    { key: 'editor.colors.none', fallback: 'None', value: 'none' }
-  ];
+  // The swatches of the text colour and highlight pickers, from the theme
+  // palette (js/color-palette.js, issue #1408). A value is what gets written
+  // into the note, var(--pz-color-red, #dc2626): the colour follows the theme
+  // and an export still reads the hex. 'none' removes the colour.
+  function paletteSwatches(kind) {
+    const palette = window.PoznoteColorPalette;
+    const swatches = palette ? palette.colors.map(c => ({
+      key: 'colors.' + c.id,
+      fallback: c.id.charAt(0).toUpperCase() + c.id.slice(1),
+      value: kind === 'highlight' ? palette.highlightColor(c.id) : palette.textColor(c.id)
+    })) : [];
+    swatches.push({ key: 'editor.colors.none', fallback: 'None', value: 'none' });
+    return swatches;
+  }
 
-  // Highlight (background) colors — same picker UI as text color.
-  const HIGHLIGHT_COLORS = [
-    { key: 'editor.highlights.yellow', fallback: 'Yellow', value: '#ffe066' },
-    { key: 'editor.highlights.red', fallback: 'Red', value: '#ffa8a8' },
-    { key: 'editor.highlights.green', fallback: 'Green', value: '#b2f2bb' },
-    { key: 'editor.highlights.blue', fallback: 'Blue', value: '#a5d8ff' },
-    { key: 'editor.highlights.pink', fallback: 'Pink', value: '#ffc9de' },
-    { key: 'editor.highlights.orange', fallback: 'Orange', value: '#ffd8a8' },
-    { key: 'editor.highlights.purple', fallback: 'Purple', value: '#d0bfff' },
-    { key: 'editor.highlights.gray', fallback: 'Gray', value: '#dee2e6' },
-    { key: 'editor.colors.none', fallback: 'None', value: 'none' }
-  ];
+  // The hex after the comma of a palette value, '' for anything else.
+  function paletteFallback(value) {
+    const match = /^var\(--pz-color-[a-z]+(?:-soft)?,\s*(#[0-9a-f]{6})\)$/i.exec(String(value || ''));
+    return match ? match[1] : '';
+  }
+
+  // execCommand only takes a plain colour, so a palette value is applied as
+  // its fallback hex and the inline styles it produced are then pointed at the
+  // token. Matching on the exact hex is enough: the command has just written
+  // it, and a copy of the same hex elsewhere in the note is the same colour.
+  function applyPaletteCommand(command, property, value) {
+    const hex = paletteFallback(value);
+    if (!hex) {
+      document.execCommand(command, false, value);
+      return;
+    }
+
+    document.execCommand(command, false, hex);
+
+    const sel = window.getSelection();
+    const anchor = sel && sel.rangeCount > 0 ? sel.getRangeAt(0).commonAncestorContainer : null;
+    const anchorEl = anchor && anchor.nodeType === 1 ? anchor : (anchor ? anchor.parentElement : null);
+    const root = anchorEl ? (anchorEl.closest('.noteentry') || anchorEl.closest('[contenteditable="true"]')) : null;
+    if (!root) return;
+
+    const probe = document.createElement('span');
+    probe.style[property] = hex;
+    const written = probe.style[property];
+    let changed = false;
+
+    root.querySelectorAll('[style]').forEach(el => {
+      if (el.style[property] === written) {
+        el.style[property] = value;
+        changed = true;
+      }
+    });
+    // With styleWithCSS unsupported, foreColor falls back to <font color>.
+    if (property === 'color') {
+      root.querySelectorAll('font[color]').forEach(font => {
+        probe.style.color = font.getAttribute('color');
+        if (probe.style.color === written) {
+          font.removeAttribute('color');
+          font.style.color = value;
+          changed = true;
+        }
+      });
+    }
+
+    if (changed) {
+      root.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  }
 
   // Use global translation function from globals.js.
   // Resolve window.t lazily: it may not be defined yet when this script loads.
@@ -176,7 +220,7 @@ window.savedRanges = {};
       }
     } else {
       try {
-        document.execCommand('foreColor', false, color);
+        applyPaletteCommand('foreColor', 'color', color);
       } catch (e) {
         // fallback: wrap selection in span with inline style
         const sel = window.getSelection();
@@ -214,21 +258,20 @@ window.savedRanges = {};
     const grid = document.createElement('div');
     grid.className = 'color-grid';
 
-    (colors || COLORS).forEach(c => {
+    (colors || paletteSwatches('text')).forEach(c => {
       const item = document.createElement('button');
       item.type = 'button';
       item.className = 'color-item';
       item.setAttribute('data-color', c.value);
       item.setAttribute('title', tr(c.key, c.fallback));
-      // Visual: a small swatch and label (screen readers)
-      const sw = document.createElement('span');
-      sw.className = 'color-swatch';
-      sw.style.background = c.value === 'none' ? 'transparent' : c.value;
+      // Visual: a small swatch, the title carries the name. "None" is a
+      // "no" sign rather than an empty square, which read as white.
+      const sw = document.createElement(c.value === 'none' ? 'i' : 'span');
       if (c.value === 'none') {
-        // Visual: neutral empty swatch with border (no cross)
-        sw.style.border = '1px solid #ccc';
-        sw.style.background = 'transparent';
-        sw.style.display = 'inline-block';
+        sw.className = 'lucide lucide-ban color-swatch-none';
+      } else {
+        sw.className = 'color-swatch';
+        sw.style.background = c.value;
       }
       sw.setAttribute('aria-hidden', 'true');
       item.appendChild(sw);
@@ -330,7 +373,7 @@ window.savedRanges = {};
       }
     } else {
       try {
-        document.execCommand('hiliteColor', false, color);
+        applyPaletteCommand('hiliteColor', 'backgroundColor', color);
       } catch (e) {
           // ignore
           console.debug('toolbar-popups: applyHighlightToSelection() failed:', e);
@@ -384,7 +427,7 @@ window.savedRanges = {};
     openColorPopup(triggerButton, {
       key: 'color',
       selector: '.btn-color',
-      colors: COLORS,
+      colors: paletteSwatches('text'),
       apply: applyColorToSelection
     });
   }
@@ -394,7 +437,7 @@ window.savedRanges = {};
     openColorPopup(triggerButton, {
       key: 'highlight',
       selector: '.btn-highlight',
-      colors: HIGHLIGHT_COLORS,
+      colors: paletteSwatches('highlight'),
       apply: applyHighlightToSelection
     });
   }

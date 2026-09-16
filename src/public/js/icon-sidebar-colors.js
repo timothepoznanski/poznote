@@ -50,7 +50,7 @@
         if (!icon) return;
         if (color) {
             icon.classList.add(COLORED_CLASS);
-            icon.style.setProperty(COLOR_PROPERTY, color);
+            icon.style.setProperty(COLOR_PROPERTY, window.poznoteIconColorCss ? window.poznoteIconColorCss(color) : color);
         } else {
             icon.classList.remove(COLORED_CLASS);
             icon.style.removeProperty(COLOR_PROPERTY);
@@ -75,9 +75,12 @@
         var modal = getModal();
         if (!modal) return;
         selectedColor = color || '';
+        // A colour saved from the old 21-swatch palette selects the swatch
+        // that now stands for it (js/color-palette.js).
+        var swatchColor = window.PoznoteColorPalette ? window.PoznoteColorPalette.canonicalIconColor(selectedColor) : selectedColor;
         modal.querySelectorAll('.folder-color-option').forEach(function (option) {
             var optionColor = (option.getAttribute('data-color') || '').toLowerCase();
-            option.classList.toggle('selected', optionColor === selectedColor);
+            option.classList.toggle('selected', optionColor === swatchColor);
         });
         paintIcon(modal.querySelector('[data-icon-sidebar-color-preview]'), selectedColor);
     }
