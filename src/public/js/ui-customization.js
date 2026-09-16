@@ -54,7 +54,10 @@
         'card:sidebarAiChatBtn': 'card:edgeAiChatBtn',
         // The workspace menu's single "Workspaces" entry became "Edit
         // workspaces" once "New workspace" got its own entry.
-        'wsmenu:goto-workspaces': 'wsmenu:edit-workspaces'
+        'wsmenu:goto-workspaces': 'wsmenu:edit-workspaces',
+        // Markdown syntax left the note's ⋮ menu for the "..." menu of the
+        // floating stack (ui_customization_panel.php).
+        'toolbar:btn-markdown-syntax': 'card:edgeMenuMarkdownSyntax'
     };
 
     function sanitizeHiddenKeys(hidden) {
@@ -141,10 +144,6 @@
             }
 
             var action = item.getAttribute('data-action');
-            if (action === 'open-markdown-syntax' && hiddenKeyMap['toolbar:btn-markdown-syntax']) {
-                return false;
-            }
-
             if (action === 'show-snapshot' && hiddenKeyMap['toolbar:btn-snapshot']) {
                 return false;
             }
@@ -375,9 +374,7 @@
             } else if (type === 'toolbar') {
                 rules.push('.note-edit-toolbar .' + id + ', .note-edit-toolbar .' + id + ':not(.hide-on-selection) { display: none !important; }');
                 rules.push('.mobile-toolbar-menu [data-selector=".' + id + '"] { display: none !important; }');
-                if (id === 'btn-markdown-syntax') {
-                    rules.push('.mobile-toolbar-menu [data-action="open-markdown-syntax"] { display: none !important; }');
-                } else if (id === 'btn-snapshot') {
+                if (id === 'btn-snapshot') {
                     rules.push('.mobile-toolbar-menu [data-action="show-snapshot"] { display: none !important; }');
                 } else if (id === 'btn-split-view') {
                     rules.push('.note-edit-toolbar .markdown-split-btn, .note-edit-toolbar .markdown-split-btn:not(.hide-on-selection) { display: none !important; }');

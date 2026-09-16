@@ -4804,5 +4804,44 @@
     "brown": "Braun",
     "gray": "Grau",
     "default": "Standard"
+  },
+  "page_menu": {
+    "button": "Weitere Optionen"
+  },
+  "keyboard_shortcuts": {
+    "menu_item": "Tastenkürzel",
+    "title": "Tastenkürzel",
+    "setting_hint": "Option in den Einstellungen aktivieren",
+    "sections": {
+      "general": "Allgemein",
+      "editor": "Notizeditor",
+      "tree": "Notiz- und Ordnerbaum"
+    },
+    "save_note": "Notiz speichern",
+    "snapshot": "Snapshot der Notiz erstellen",
+    "note_nav": "Vorherige oder nächste Notiz im Ordner",
+    "close": "Menü, Seitenleiste oder Fenster schließen",
+    "bold": "Fett",
+    "italic": "Kursiv",
+    "underline": "Unterstrichen",
+    "strikethrough": "Durchgestrichen",
+    "link": "Link einfügen",
+    "code_block": "Codeblock",
+    "slash_menu": "Befehlsmenü öffnen",
+    "slash_menu_hint": "Alt + /, wenn die Option in den Einstellungen aktiviert ist",
+    "emoji": "Emoji über seinen Namen einfügen",
+    "indent": "Listenelement ein- oder ausrücken",
+    "checklist_toggle": "Checklistenelement abhaken oder zurücksetzen",
+    "tree_undo": "Letzte Änderung rückgängig machen",
+    "tree_redo": "Wiederholen",
+    "tree_copy": "Ausgewählte Notiz oder Ordner kopieren",
+    "tree_cut": "Ausgewählte Notiz oder Ordner ausschneiden",
+    "tree_paste": "Einfügen",
+    "keys": {
+      "shift": "Umschalt",
+      "enter": "Eingabe",
+      "escape": "Esc",
+      "tab": "Tab"
+    }
   }
 }

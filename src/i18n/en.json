@@ -4624,5 +4624,44 @@
     "brown": "Brown",
     "gray": "Gray",
     "default": "Default"
+  },
+  "page_menu": {
+    "button": "More options"
+  },
+  "keyboard_shortcuts": {
+    "menu_item": "Keyboard shortcuts",
+    "title": "Keyboard shortcuts",
+    "setting_hint": "Option to enable in Settings",
+    "sections": {
+      "general": "General",
+      "editor": "Note editor",
+      "tree": "Notes and folders tree"
+    },
+    "save_note": "Save the note",
+    "snapshot": "Take a snapshot of the note",
+    "note_nav": "Previous or next note in the folder",
+    "close": "Close a menu, panel or window",
+    "bold": "Bold",
+    "italic": "Italic",
+    "underline": "Underline",
+    "strikethrough": "Strikethrough",
+    "link": "Insert a link",
+    "code_block": "Code block",
+    "slash_menu": "Open the command menu",
+    "slash_menu_hint": "Alt + / when the option is enabled in Settings",
+    "emoji": "Insert an emoji by its name",
+    "indent": "Indent or outdent a list item",
+    "checklist_toggle": "Check or uncheck a checklist item",
+    "tree_undo": "Undo the last change",
+    "tree_redo": "Redo",
+    "tree_copy": "Copy the selected note or folder",
+    "tree_cut": "Cut the selected note or folder",
+    "tree_paste": "Paste",
+    "keys": {
+      "shift": "Shift",
+      "enter": "Enter",
+      "escape": "Esc",
+      "tab": "Tab"
+    }
   }
 }

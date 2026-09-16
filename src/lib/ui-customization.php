@@ -67,6 +67,9 @@ function poznoteNormalizeHiddenUiKey($key) {
         // The workspace menu's single "Workspaces" entry became "Edit
         // workspaces" once "New workspace" got its own entry.
         'wsmenu:goto-workspaces' => 'wsmenu:edit-workspaces',
+        // Markdown syntax left the note's ⋮ menu for the "..." menu of the
+        // floating stack (ui_customization_panel.php).
+        'toolbar:btn-markdown-syntax' => 'card:edgeMenuMarkdownSyntax',
     ];
 
     return $renamed[$key] ?? $key;

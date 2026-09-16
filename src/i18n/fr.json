@@ -4909,5 +4909,44 @@
     "brown": "Marron",
     "gray": "Gris",
     "default": "Par défaut"
+  },
+  "page_menu": {
+    "button": "Plus d'options"
+  },
+  "keyboard_shortcuts": {
+    "menu_item": "Raccourcis clavier",
+    "title": "Raccourcis clavier",
+    "setting_hint": "Option à activer dans les paramètres",
+    "sections": {
+      "general": "Général",
+      "editor": "Éditeur de note",
+      "tree": "Arborescence des notes et dossiers"
+    },
+    "save_note": "Enregistrer la note",
+    "snapshot": "Prendre un instantané de la note",
+    "note_nav": "Note précédente ou suivante du dossier",
+    "close": "Fermer un menu, un panneau ou une fenêtre",
+    "bold": "Gras",
+    "italic": "Italique",
+    "underline": "Souligné",
+    "strikethrough": "Barré",
+    "link": "Insérer un lien",
+    "code_block": "Bloc de code",
+    "slash_menu": "Ouvrir le menu de commandes",
+    "slash_menu_hint": "Alt + / si l'option est activée dans les paramètres",
+    "emoji": "Insérer un emoji par son nom",
+    "indent": "Indenter ou désindenter un élément de liste",
+    "checklist_toggle": "Cocher ou décocher un élément de checklist",
+    "tree_undo": "Annuler la dernière modification",
+    "tree_redo": "Rétablir",
+    "tree_copy": "Copier la note ou le dossier sélectionné",
+    "tree_cut": "Couper la note ou le dossier sélectionné",
+    "tree_paste": "Coller",
+    "keys": {
+      "shift": "Maj",
+      "enter": "Entrée",
+      "escape": "Échap",
+      "tab": "Tab"
+    }
   }
 }

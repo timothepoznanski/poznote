@@ -14,86 +14,126 @@
  * from this endpoint's location (src/ root instead of css/).
  */
 
-$groups = [
-    'core' => [
-        'css/lucide.css',
-        'css/tokens.css',
-        'css/base.css',
-        // Shared component bases. index.php is not in the css_assets manifest, so
-        // its bundle has to list them itself. Buttons belong here too: the shared
-        // modals in src/modals.php give this page 8 .btn elements and 66 bare
-        // modifiers (.btn-primary and friends used without .btn), and without the
-        // base those fell back to whatever a page stylesheet happened to say.
-        'css/components/buttons.css',
-        'css/components/forms.css',
-        'css/components/logo.css',
-        'css/utilities.css',
-        'css/layout.css',
-        'css/icon-sidebar.css',
-        'css/icon-sidebar-mobile.css',
-        'css/sidebar.css',
-        'css/outline.css',
-        'css/toolbar.css',
-        'css/menus.css',
-        'css/searchbars.css',
-        'css/notes/subline.css',
-        'css/notes/sidebar.css',
-        'css/notes/tags.css',
-        'css/notes/attachments-row.css',
-        'css/notes/noteentry.css',
-        'css/notes/editor.css',
-        'css/notes/toolbar.css',
-        'css/notes/checkboxes.css',
-        'css/code-blocks.css',
-        'css/checklists.css',
-        'css/folders/headers-toggles.css',
-        'css/folders/actions-menu.css',
-        'css/folders/content.css',
-        'css/folders/selection.css',
-        'css/folders/tree-highlight.css',
-        'css/folders/search.css',
-        'css/folders/animations.css',
-        'css/folders/toolbar-icons.css',
-        'css/folders/table-picker.css',
-        'css/folders/system-folders.css',
-        'css/emoji-picker.css',
-        'css/calendar.css',
-        'css/table-picker.css',
-        'css/slash-commands.css',
-        'css/emoji-autocomplete.css',
-        'css/ai-chat.css',
-        'css/speech-to-text.css',
-        'css/modals/ui-customization.css',
-        'css/ui-customization-panel.css',
-        'css/drag-drop.css',
-        'css/icons.css',
-        'css/tabs.css',
-        'css/tree-inline-edit.css',
-        'css/misc.css',
-    ],
-    'modals' => [
-        'css/modal-alerts.css',
-        'css/modals/base.css',
-        'css/modals/specific-modals.css',
-        'css/modals/attachments.css',
-        'css/modals/share-modal.css',
-        'css/modals/alerts-utilities.css',
-        'css/modals/responsive.css',
-        'css/modals/snapshot.css',
-        'css/modals/reminders.css',
-        'css/tasks.css',
-        'css/markdown.css',
-        'css/excalidraw.css',
-        'css/excalidraw-unified.css',
-        'css/note-reference.css',
-        'css/backlinks.css',
-        'css/search-replace.css',
-        'css/folder-icon-modal.css',
-        'css/kanban.css',
-        'css/background-image.css',
-        'css/public-workspace-readonly.css',
-    ],
-];
+/**
+ * The bundle groups, also used by index.php to build the ?v= cache version so
+ * editing any bundled stylesheet busts the (immutable) bundle URL, like
+ * poznoteGetIndexJsGroups() in index_js.php. Without this the version only
+ * tracked release, theme assets and the JS bundles, and a CSS-only edit stayed
+ * invisible in the browser for a year.
+ */
+function poznoteGetIndexCssGroups(): array {
+    return [
+        'core' => [
+            'css/lucide.css',
+            'css/tokens.css',
+            'css/base.css',
+            // Shared component bases. index.php is not in the css_assets manifest, so
+            // its bundle has to list them itself. Buttons belong here too: the shared
+            // modals in src/modals.php give this page 8 .btn elements and 66 bare
+            // modifiers (.btn-primary and friends used without .btn), and without the
+            // base those fell back to whatever a page stylesheet happened to say.
+            'css/components/buttons.css',
+            'css/components/forms.css',
+            'css/components/logo.css',
+            'css/utilities.css',
+            'css/layout.css',
+            'css/icon-sidebar.css',
+            'css/icon-sidebar-mobile.css',
+            'css/sidebar.css',
+            'css/outline.css',
+            'css/toolbar.css',
+            'css/menus.css',
+            'css/searchbars.css',
+            'css/notes/subline.css',
+            'css/notes/sidebar.css',
+            'css/notes/tags.css',
+            'css/notes/attachments-row.css',
+            'css/notes/noteentry.css',
+            'css/notes/editor.css',
+            'css/notes/toolbar.css',
+            'css/notes/checkboxes.css',
+            'css/code-blocks.css',
+            'css/checklists.css',
+            'css/folders/headers-toggles.css',
+            'css/folders/actions-menu.css',
+            'css/folders/content.css',
+            'css/folders/selection.css',
+            'css/folders/tree-highlight.css',
+            'css/folders/search.css',
+            'css/folders/animations.css',
+            'css/folders/toolbar-icons.css',
+            'css/folders/table-picker.css',
+            'css/folders/system-folders.css',
+            'css/emoji-picker.css',
+            'css/calendar.css',
+            'css/table-picker.css',
+            'css/slash-commands.css',
+            'css/emoji-autocomplete.css',
+            'css/ai-chat.css',
+            'css/speech-to-text.css',
+            'css/modals/ui-customization.css',
+            'css/ui-customization-panel.css',
+            'css/markdown-syntax.css',
+            'css/drag-drop.css',
+            'css/icons.css',
+            'css/tabs.css',
+            'css/tree-inline-edit.css',
+            'css/misc.css',
+        ],
+        'modals' => [
+            'css/modal-alerts.css',
+            'css/modals/base.css',
+            'css/modals/specific-modals.css',
+            'css/modals/attachments.css',
+            'css/modals/share-modal.css',
+            'css/modals/alerts-utilities.css',
+            'css/modals/responsive.css',
+            'css/modals/snapshot.css',
+            'css/modals/reminders.css',
+            'css/tasks.css',
+            'css/markdown.css',
+            'css/excalidraw.css',
+            'css/excalidraw-unified.css',
+            'css/note-reference.css',
+            'css/backlinks.css',
+            'css/search-replace.css',
+            'css/folder-icon-modal.css',
+            'css/kanban.css',
+            'css/background-image.css',
+            'css/public-workspace-readonly.css',
+        ],
+    ];
+}
+
+/**
+ * Newest mtime across every bundled stylesheet, plus css/index-mobile.css
+ * which index.php links separately with the same version.
+ */
+function poznoteGetIndexCssAssetVersion(): string {
+    static $cached = null;
+    if ($cached !== null) {
+        return $cached;
+    }
+
+    $newest = 0;
+    $files = array_merge(['css/index-mobile.css'], ...array_values(poznoteGetIndexCssGroups()));
+    foreach ($files as $file) {
+        $mtime = @filemtime(__DIR__ . '/' . $file);
+        if ($mtime !== false) {
+            $newest = max($newest, (int) $mtime);
+        }
+    }
+
+    $cached = $newest > 0 ? (string) $newest : '';
+    return $cached;
+}
+
+// Included (not requested) by index.php purely for the helpers above.
+if (basename($_SERVER['SCRIPT_NAME'] ?? '') !== 'index_css.php') {
+    return;
+}
+
+$groups = poznoteGetIndexCssGroups();
 
 $group = $_GET['group'] ?? 'core';
 if (!isset($groups[$group])) {

@@ -4904,5 +4904,44 @@
     "brown": "棕色",
     "gray": "灰色",
     "default": "默认"
+  },
+  "page_menu": {
+    "button": "更多选项"
+  },
+  "keyboard_shortcuts": {
+    "menu_item": "键盘快捷键",
+    "title": "键盘快捷键",
+    "setting_hint": "需在设置中启用",
+    "sections": {
+      "general": "通用",
+      "editor": "笔记编辑器",
+      "tree": "笔记和文件夹树"
+    },
+    "save_note": "保存笔记",
+    "snapshot": "为笔记创建快照",
+    "note_nav": "文件夹中的上一篇或下一篇笔记",
+    "close": "关闭菜单、面板或窗口",
+    "bold": "粗体",
+    "italic": "斜体",
+    "underline": "下划线",
+    "strikethrough": "删除线",
+    "link": "插入链接",
+    "code_block": "代码块",
+    "slash_menu": "打开命令菜单",
+    "slash_menu_hint": "在设置中启用该选项后使用 Alt + /",
+    "emoji": "按名称插入表情",
+    "indent": "增加或减少列表项缩进",
+    "checklist_toggle": "勾选或取消勾选清单项",
+    "tree_undo": "撤销上一次更改",
+    "tree_redo": "重做",
+    "tree_copy": "复制所选笔记或文件夹",
+    "tree_cut": "剪切所选笔记或文件夹",
+    "tree_paste": "粘贴",
+    "keys": {
+      "shift": "Shift",
+      "enter": "Enter",
+      "escape": "Esc",
+      "tab": "Tab"
+    }
   }
 }

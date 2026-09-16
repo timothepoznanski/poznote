@@ -1,6 +1,10 @@
 /**
  * Contextual UI Customization panel (ui_customization_panel.php)
  *
+ * Also drives the "..." menu of the floating stack at the bottom-right of the
+ * page, which opens this panel, the keyboard shortcuts modal and the Markdown
+ * syntax modal.
+ *
  * Lists the hideable elements of the page it sits on and applies every change
  * at once through the runtime in js/ui-customization.js, then saves the user's
  * hidden_ui_elements setting. Only the user's own set is edited here: the keys
@@ -16,7 +20,8 @@
     var STATUS_CLEAR_MS = 2000;
 
     var panel = null;
-    var toggleButton = null;
+    var moreButton = null;
+    var moreMenu = null;
     // The user's saved set, as last read from or written to the API. Locked
     // checkboxes keep their stored state on save instead of adopting the lock.
     var storedHidden = [];
@@ -287,7 +292,6 @@
         panel.setAttribute('aria-hidden', open ? 'false' : 'true');
         if ('inert' in panel) panel.inert = !open;
         document.body.classList.toggle('ui-custom-panel-open', open);
-        toggleButton.setAttribute('aria-expanded', open ? 'true' : 'false');
         if (open) {
             setStatus('');
             load();
@@ -316,10 +320,179 @@
         }
     }
 
+    // "..." menu of the floating stack
+    function isMoreMenuOpen() {
+        return !!moreMenu && !moreMenu.hidden;
+    }
+
+    // Entries the UI Customization runtime has not hidden
+    function visibleMoreMenuItems() {
+        return Array.prototype.filter.call(moreMenu.querySelectorAll('.page-more-menu-item'), function (item) {
+            return item.offsetParent !== null;
+        });
+    }
+
+    function setMoreMenuOpen(open) {
+        if (!moreMenu || !moreButton) return;
+        moreMenu.hidden = !open;
+        moreButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) {
+            var items = visibleMoreMenuItems();
+            if (items.length) items[0].focus();
+        }
+    }
+
+    // Help modals of the menu (keyboard shortcuts, Markdown syntax), one open
+    // at a time. The shortcuts markup names Ctrl and Alt; on macOS the
+    // handlers listen to Command and Option instead.
+    var isMacPlatform = /Mac|iPhone|iPad|iPod/.test(navigator.platform || '');
+    var HELP_MODAL_IDS = {
+        'open-keyboard-shortcuts': 'keyboardShortcutsModal',
+        'open-markdown-syntax': 'markdownSyntaxModal'
+    };
+
+    function openHelpModal() {
+        var modals = document.querySelectorAll('.pz-help-modal');
+        for (var i = 0; i < modals.length; i++) {
+            if (modals[i].style.display === 'flex') return modals[i];
+        }
+        return null;
+    }
+
+    function setHelpModalOpen(modal, open) {
+        if (!modal) return;
+        if (open && isMacPlatform) {
+            modal.querySelectorAll('kbd[data-key="mod"]').forEach(function (kbd) { kbd.textContent = '⌘'; });
+            modal.querySelectorAll('kbd[data-key="alt"]').forEach(function (kbd) { kbd.textContent = '⌥'; });
+        }
+        modal.style.display = open ? 'flex' : 'none';
+        if (open) {
+            var body = modal.querySelector('.pz-help-modal-body');
+            if (body) body.scrollTop = 0;
+            // The syntax reference starts on its filter, the shortcuts on
+            // the close button
+            var focusTarget = modal.querySelector('.filter-input') || modal.querySelector('[data-action="close-help-modal"]');
+            if (focusTarget) focusTarget.focus();
+        } else if (moreButton) {
+            moreButton.focus();
+        }
+    }
+
+    // Filter of the Markdown syntax reference (markdown_syntax_content.php)
+    function initMarkdownSyntaxFilter() {
+        var filterInput = document.getElementById('markdownSyntaxFilterInput');
+        if (!filterInput) return;
+
+        var clearButton = document.getElementById('markdownSyntaxClearFilter');
+        var filterStats = document.getElementById('markdownSyntaxFilterStats');
+        var noResults = document.getElementById('markdownSyntaxNoResults');
+        var cards = Array.prototype.slice.call(document.querySelectorAll('[data-syntax-card]'));
+
+        function applyFilter() {
+            var query = normalizeFilterText(filterInput.value);
+            var visibleCount = 0;
+
+            cards.forEach(function (card) {
+                var matches = !query || normalizeFilterText(card.textContent).indexOf(query) !== -1;
+                card.hidden = !matches;
+                if (matches) visibleCount += 1;
+            });
+
+            if (clearButton) clearButton.hidden = query === '';
+            if (filterStats) {
+                filterStats.textContent = query ? visibleCount + ' / ' + cards.length : '';
+                filterStats.hidden = query === '';
+            }
+            if (noResults) noResults.hidden = visibleCount !== 0;
+        }
+
+        function clearFilter() {
+            filterInput.value = '';
+            applyFilter();
+            filterInput.focus();
+        }
+
+        filterInput.addEventListener('input', applyFilter);
+        // Escape empties a filled filter before it closes the modal
+        filterInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && filterInput.value !== '') {
+                e.preventDefault();
+                clearFilter();
+            }
+        });
+        if (clearButton) clearButton.addEventListener('click', clearFilter);
+    }
+
+    function initMoreMenu() {
+        moreButton = document.getElementById('pageMoreMenuBtn');
+        moreMenu = document.getElementById('pageMoreMenu');
+        if (!moreButton || !moreMenu) return;
+
+        initMarkdownSyntaxFilter();
+
+        document.addEventListener('click', function (e) {
+            var action = e.target.closest ? e.target.closest('[data-action]') : null;
+            var name = action ? action.getAttribute('data-action') : '';
+
+            if (name === 'toggle-page-more-menu') {
+                e.preventDefault();
+                setMoreMenuOpen(!isMoreMenuOpen());
+                return;
+            }
+
+            if (isMoreMenuOpen() && !moreMenu.contains(e.target)) {
+                setMoreMenuOpen(false);
+            }
+
+            if (!action || !moreMenu.contains(action)) {
+                // The close button, or a click on the backdrop
+                var modal = openHelpModal();
+                if (modal && (name === 'close-help-modal' || e.target === modal)) {
+                    setHelpModalOpen(modal, false);
+                }
+                return;
+            }
+
+            // An entry of the menu: close it, then run the entry
+            setMoreMenuOpen(false);
+            if (HELP_MODAL_IDS[name]) {
+                e.preventDefault();
+                setHelpModalOpen(document.getElementById(HELP_MODAL_IDS[name]), true);
+            }
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.defaultPrevented || e.key !== 'Escape') return;
+            if (isMoreMenuOpen()) {
+                e.preventDefault();
+                setMoreMenuOpen(false);
+                moreButton.focus();
+                return;
+            }
+            var modal = openHelpModal();
+            if (modal) {
+                e.preventDefault();
+                setHelpModalOpen(modal, false);
+            }
+        });
+
+        // Arrow keys move between the entries, like the other dropdowns
+        moreMenu.addEventListener('keydown', function (e) {
+            if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+            var items = visibleMoreMenuItems();
+            if (!items.length) return;
+            e.preventDefault();
+            var index = items.indexOf(document.activeElement);
+            var next = e.key === 'ArrowDown' ? index + 1 : index - 1;
+            items[(next + items.length) % items.length].focus();
+        });
+    }
+
     function init() {
-        panel =document.getElementById('uiCustomizationPanel');
-        toggleButton = document.getElementById('uiCustomizationPanelToggle');
-        if (!panel || !toggleButton) return;
+        initMoreMenu();
+
+        panel = document.getElementById('uiCustomizationPanel');
+        if (!panel) return;
 
         pruneForPage(panel.getAttribute('data-ui-page') || 'notes');
         initSections();
@@ -333,14 +506,14 @@
         }
 
         document.addEventListener('click', function (e) {
-            if (e.target.closest('[data-action="toggle-ui-customization-panel"]')) {
+            if (e.target.closest && e.target.closest('[data-action="toggle-ui-customization-panel"]')) {
                 e.preventDefault();
                 setOpen(!isOpen());
             }
         });
 
         document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && isOpen()) {
+            if (e.key === 'Escape' && !e.defaultPrevented && isOpen()) {
                 setOpen(false);
             }
         });

@@ -1180,7 +1180,6 @@ function enforcePublicWorkspaceRequestAccess(): void {
         '/restore_import.php',
         '/git_sync.php',
         '/excalidraw_editor.php',
-        '/markdown_syntax.php',
     ];
 
     foreach ($restrictedScripts as $restrictedScript) {

@@ -296,11 +296,17 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     // Cache version based on app version plus theme assets to force reload on theme changes.
     // The bundled js/*.js mtimes are folded in too: the index_js.php bundles are served
     // `immutable`, so a change to any bundled file must change this URL to be picked up.
+    // Same for the css/*.css mtimes of the index_css.php bundles.
     require_once 'index_js.php';
+    require_once 'index_css.php';
     $v = poznoteBuildAssetCacheVersion(getAppVersion());
     $indexJsVersion = poznoteGetIndexJsAssetVersion();
     if ($indexJsVersion !== '') {
         $v .= '-' . $indexJsVersion;
+    }
+    $indexCssVersion = poznoteGetIndexCssAssetVersion();
+    if ($indexCssVersion !== '') {
+        $v .= '-' . $indexCssVersion;
     }
     $v = rawurlencode($v);
     ?>

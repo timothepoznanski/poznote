@@ -4805,5 +4805,44 @@
     "brown": "Marrón",
     "gray": "Gris",
     "default": "Predeterminado"
+  },
+  "page_menu": {
+    "button": "Más opciones"
+  },
+  "keyboard_shortcuts": {
+    "menu_item": "Atajos de teclado",
+    "title": "Atajos de teclado",
+    "setting_hint": "Opción que se activa en Ajustes",
+    "sections": {
+      "general": "General",
+      "editor": "Editor de notas",
+      "tree": "Árbol de notas y carpetas"
+    },
+    "save_note": "Guardar la nota",
+    "snapshot": "Tomar una instantánea de la nota",
+    "note_nav": "Nota anterior o siguiente de la carpeta",
+    "close": "Cerrar un menú, un panel o una ventana",
+    "bold": "Negrita",
+    "italic": "Cursiva",
+    "underline": "Subrayado",
+    "strikethrough": "Tachado",
+    "link": "Insertar un enlace",
+    "code_block": "Bloque de código",
+    "slash_menu": "Abrir el menú de comandos",
+    "slash_menu_hint": "Alt + / si la opción está activada en Ajustes",
+    "emoji": "Insertar un emoji por su nombre",
+    "indent": "Aumentar o reducir la sangría de un elemento de lista",
+    "checklist_toggle": "Marcar o desmarcar un elemento de la lista de verificación",
+    "tree_undo": "Deshacer el último cambio",
+    "tree_redo": "Rehacer",
+    "tree_copy": "Copiar la nota o carpeta seleccionada",
+    "tree_cut": "Cortar la nota o carpeta seleccionada",
+    "tree_paste": "Pegar",
+    "keys": {
+      "shift": "Mayús",
+      "enter": "Intro",
+      "escape": "Esc",
+      "tab": "Tab"
+    }
   }
 }
