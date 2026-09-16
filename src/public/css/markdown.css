@@ -1090,3 +1090,30 @@ html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor,
 html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview {
     scrollbar-width: none;
 }
+
+/* Marker pointing at the line the reader was on, shown briefly after
+   switching between edit, preview and split mode (js/markdown-position.js, #1409). */
+.markdown-position-marker {
+    position: fixed;
+    z-index: 45;
+    width: 4px;
+    border-radius: var(--pz-radius-pill);
+    background: var(--pz-accent);
+    pointer-events: none;
+    opacity: 0;
+    animation: markdown-position-marker-fade 1.4s ease-out forwards;
+}
+
+@keyframes markdown-position-marker-fade {
+    0% { opacity: 0; }
+    12% { opacity: 1; }
+    65% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .markdown-position-marker {
+        animation: none;
+        opacity: 1;
+    }
+}

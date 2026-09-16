@@ -56,6 +56,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/markdown-parser.js',
         'js/markdown-view-modes.js',
         'js/markdown-split-view.js',
+        'js/markdown-position.js',
         'js/markdown-actions.js',
         'js/markdown-merge.js',
     ],

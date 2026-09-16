@@ -182,7 +182,7 @@
         if (!isMarkdownPreviewMode(noteId) || typeof window.switchToEditMode !== 'function') return;
 
         clearHighlights(noteId);
-        window.switchToEditMode(noteId);
+        window.switchToEditMode(noteId, { restorePosition: false });
         findMatches(noteId, { preserveIndex: true, skipScroll: true });
 
         const state = getNoteState(noteId);

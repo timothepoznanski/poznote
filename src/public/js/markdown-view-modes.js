@@ -472,7 +472,10 @@ function initializeMarkdownNote(noteId) {
     }
 }
 
-function switchToEditMode(noteId) {
+// options.restorePosition false leaves the scroll to the caller (search and
+// replace scrolls to its current match itself, and the ratio scroll below used
+// to land 50ms later and carry the match off screen).
+function switchToEditMode(noteId, options) {
     var noteEntry = document.getElementById('entry' + noteId);
     if (!noteEntry) return;
 
@@ -483,6 +486,12 @@ function switchToEditMode(noteId) {
     var previewBtn = document.querySelector('#note' + noteId + ' .markdown-preview-btn');
 
     if (!previewDiv || !editorDiv) return;
+
+    // Where the reader is in the preview, read before it is hidden (#1409)
+    var callerScrolls = !!(options && options.restorePosition === false);
+    var position = !callerScrolls && typeof window.captureMarkdownPreviewPosition === 'function'
+        ? window.captureMarkdownPreviewPosition(noteEntry)
+        : null;
 
     // Save scroll position of the container before layout changes
     var scrollContainer = document.getElementById('right_col');
@@ -498,42 +507,48 @@ function switchToEditMode(noteId) {
     setMarkdownEditorEditable(editorDiv, true);
     noteEntry.setAttribute('contenteditable', 'false');
 
-    // Determine scroll ratio based on source mode
-    // If preview was scrollable (Split Mode), use its internal scroll
-    // If preview was expanded (Preview Mode), use page scroll
-    var scrollRatio = 0;
-    var previewIsScrollable = previewDiv.scrollHeight > previewDiv.clientHeight &&
-        window.getComputedStyle(previewDiv).overflowY !== 'visible';
-
-    if (previewIsScrollable) {
-        var pHeight = previewDiv.scrollHeight - previewDiv.clientHeight;
-        scrollRatio = pHeight > 0 ? previewDiv.scrollTop / pHeight : 0;
+    if (callerScrolls) {
+        // The caller scrolls
+    } else if (position && window.restoreMarkdownEditorPosition(noteEntry, position)) {
+        // Scrolled back to the same source line, see js/markdown-position.js
     } else {
-        var cHeight = scrollContainer ? (scrollContainer.scrollHeight - scrollContainer.clientHeight) : 0;
-        scrollRatio = cHeight > 0 ? savedScrollTop / cHeight : 0;
-    }
+        // Determine scroll ratio based on source mode
+        // If preview was scrollable (Split Mode), use its internal scroll
+        // If preview was expanded (Preview Mode), use page scroll
+        var scrollRatio = 0;
+        var previewIsScrollable = previewDiv.scrollHeight > previewDiv.clientHeight &&
+            window.getComputedStyle(previewDiv).overflowY !== 'visible';
 
-    // Restore scroll position in editor using proportional scroll
-    // Use multiple animation frames to ensure layout is complete
-    requestAnimationFrame(function () {
+        if (previewIsScrollable) {
+            var pHeight = previewDiv.scrollHeight - previewDiv.clientHeight;
+            scrollRatio = pHeight > 0 ? previewDiv.scrollTop / pHeight : 0;
+        } else {
+            var cHeight = scrollContainer ? (scrollContainer.scrollHeight - scrollContainer.clientHeight) : 0;
+            scrollRatio = cHeight > 0 ? savedScrollTop / cHeight : 0;
+        }
+
+        // Restore scroll position in editor using proportional scroll
+        // Use multiple animation frames to ensure layout is complete
         requestAnimationFrame(function () {
-            setTimeout(function () {
-                // In normal Edit Mode, editor expands and main container scrolls
-                if (scrollContainer) {
-                    var containerScrollHeight = scrollContainer.scrollHeight - scrollContainer.clientHeight;
-                    if (containerScrollHeight > 0) {
-                        scrollContainer.scrollTop = scrollRatio * containerScrollHeight;
+            requestAnimationFrame(function () {
+                setTimeout(function () {
+                    // In normal Edit Mode, editor expands and main container scrolls
+                    if (scrollContainer) {
+                        var containerScrollHeight = scrollContainer.scrollHeight - scrollContainer.clientHeight;
+                        if (containerScrollHeight > 0) {
+                            scrollContainer.scrollTop = scrollRatio * containerScrollHeight;
+                        }
                     }
-                }
 
-                // If editor happens to be scrollable internally (e.g. still in split mode or minimal height)
-                var editorScrollHeight = editorDiv.scrollHeight - editorDiv.clientHeight;
-                if (editorScrollHeight > 0) {
-                    editorDiv.scrollTop = scrollRatio * editorScrollHeight;
-                }
-            }, 50);
+                    // If editor happens to be scrollable internally (e.g. still in split mode or minimal height)
+                    var editorScrollHeight = editorDiv.scrollHeight - editorDiv.clientHeight;
+                    if (editorScrollHeight > 0) {
+                        editorDiv.scrollTop = scrollRatio * editorScrollHeight;
+                    }
+                }, 50);
+            });
         });
-    });
+    }
 
     // Show preview button, hide edit button (legacy support)
     if (editBtn) editBtn.style.display = 'none';
@@ -552,7 +567,9 @@ function switchToEditMode(noteId) {
     }
 }
 
-function switchToPreviewMode(noteId) {
+// position: where the reader was in the editor, when the caller had to read it
+// before changing the layout itself (exitSplitMode). Read here otherwise.
+function switchToPreviewMode(noteId, position) {
     var noteEntry = document.getElementById('entry' + noteId);
     if (!noteEntry) return;
 
@@ -567,11 +584,17 @@ function switchToPreviewMode(noteId) {
 
     if (!previewDiv || !editorDiv) return;
 
+    // Where the reader is in the editor, read before it is hidden (#1409).
+    // Null when already in preview (a re-render after a code block action).
+    if (position === undefined) {
+        position = typeof window.captureMarkdownEditorPosition === 'function'
+            ? window.captureMarkdownEditorPosition(noteEntry)
+            : null;
+    }
+
     // Save scroll position of the container before layout changes
     var scrollContainer = document.getElementById('right_col');
     var savedScrollTop = scrollContainer ? scrollContainer.scrollTop : 0;
-
-
 
     // Switch to preview mode
     // Use helper function to properly normalize content
@@ -591,42 +614,46 @@ function switchToPreviewMode(noteId) {
     setMarkdownEditorEditable(editorDiv, false);
     noteEntry.setAttribute('contenteditable', 'false');
 
-    // Determine scroll ratio based on source mode
-    // If editor was scrollable (Split Mode), use its internal scroll
-    // If editor was expanded (Edit Mode), use page scroll
-    var scrollRatio = 0;
-    var editorIsScrollable = editorDiv.scrollHeight > editorDiv.clientHeight &&
-        window.getComputedStyle(editorDiv).overflowY !== 'visible';
-
-    if (editorIsScrollable) {
-        var eHeight = editorDiv.scrollHeight - editorDiv.clientHeight;
-        scrollRatio = eHeight > 0 ? editorDiv.scrollTop / eHeight : 0;
+    if (position && window.restoreMarkdownPreviewPosition(noteEntry, position)) {
+        // Scrolled back to the same source line, see js/markdown-position.js
     } else {
-        var cHeight = scrollContainer ? (scrollContainer.scrollHeight - scrollContainer.clientHeight) : 0;
-        scrollRatio = cHeight > 0 ? savedScrollTop / cHeight : 0;
-    }
+        // Determine scroll ratio based on source mode
+        // If editor was scrollable (Split Mode), use its internal scroll
+        // If editor was expanded (Edit Mode), use page scroll
+        var scrollRatio = 0;
+        var editorIsScrollable = editorDiv.scrollHeight > editorDiv.clientHeight &&
+            window.getComputedStyle(editorDiv).overflowY !== 'visible';
 
-    // Restore scroll position in preview using proportional scroll
-    // Use multiple animation frames to ensure layout is complete
-    requestAnimationFrame(function () {
+        if (editorIsScrollable) {
+            var eHeight = editorDiv.scrollHeight - editorDiv.clientHeight;
+            scrollRatio = eHeight > 0 ? editorDiv.scrollTop / eHeight : 0;
+        } else {
+            var cHeight = scrollContainer ? (scrollContainer.scrollHeight - scrollContainer.clientHeight) : 0;
+            scrollRatio = cHeight > 0 ? savedScrollTop / cHeight : 0;
+        }
+
+        // Restore scroll position in preview using proportional scroll
+        // Use multiple animation frames to ensure layout is complete
         requestAnimationFrame(function () {
-            setTimeout(function () {
-                // In Normal Preview Mode, preview expands and main container scrolls
-                if (scrollContainer) {
-                    var containerScrollHeight = scrollContainer.scrollHeight - scrollContainer.clientHeight;
-                    if (containerScrollHeight > 0) {
-                        scrollContainer.scrollTop = scrollRatio * containerScrollHeight;
+            requestAnimationFrame(function () {
+                setTimeout(function () {
+                    // In Normal Preview Mode, preview expands and main container scrolls
+                    if (scrollContainer) {
+                        var containerScrollHeight = scrollContainer.scrollHeight - scrollContainer.clientHeight;
+                        if (containerScrollHeight > 0) {
+                            scrollContainer.scrollTop = scrollRatio * containerScrollHeight;
+                        }
                     }
-                }
 
-                // If preview happens to be scrollable internally
-                var previewScrollHeight = previewDiv.scrollHeight - previewDiv.clientHeight;
-                if (previewScrollHeight > 0) {
-                    previewDiv.scrollTop = scrollRatio * previewScrollHeight;
-                }
-            }, 50);
+                    // If preview happens to be scrollable internally
+                    var previewScrollHeight = previewDiv.scrollHeight - previewDiv.clientHeight;
+                    if (previewScrollHeight > 0) {
+                        previewDiv.scrollTop = scrollRatio * previewScrollHeight;
+                    }
+                }, 50);
+            });
         });
-    });
+    }
 
     // Show edit button, hide preview button (legacy support)
     if (editBtn) editBtn.style.display = '';
@@ -914,6 +941,18 @@ function switchToSplitMode(noteId) {
 
     if (!previewDiv || !editorDiv) return;
 
+    // Where the reader is, read before the layout changes (#1409)
+    var position = null;
+    if (!noteEntry.classList.contains('markdown-split-mode')) {
+        if (isMarkdownEditorDisplayed(noteEntry, editorDiv)) {
+            position = typeof window.captureMarkdownEditorPosition === 'function'
+                ? window.captureMarkdownEditorPosition(noteEntry)
+                : null;
+        } else if (typeof window.captureMarkdownPreviewPosition === 'function') {
+            position = window.captureMarkdownPreviewPosition(noteEntry);
+        }
+    }
+
     // Calculate scroll ratio relative to the content content (approximated by right_col scroll)
     var scrollContainer = document.getElementById('right_col');
     var savedScrollTop = scrollContainer ? scrollContainer.scrollTop : 0;
@@ -942,6 +981,14 @@ function switchToSplitMode(noteId) {
     setMarkdownEditorEditable(editorDiv, true);
     noteEntry.setAttribute('contenteditable', 'false');
 
+    // Both panes go back to the same source line. Started now rather than in
+    // the timeout below so the caret sync set up further down steps aside
+    // from the start; the holds follow the panes as they get their height.
+    var restored = !!(position && window.restoreMarkdownEditorPosition(noteEntry, position));
+    if (restored) {
+        window.restoreMarkdownPreviewPosition(noteEntry, position, { marker: false });
+    }
+
     // Restore scroll position after layout changes
     // In split mode, the right_col becomes hidden overflow, and panels scroll internally.
     // We must reset right_col to 0 to show the toolbar, and scroll the panels instead.
@@ -955,8 +1002,10 @@ function switchToSplitMode(noteId) {
 
                 updateMarkdownSplitPaneHeight(noteEntry);
 
-                // Apply proportional scroll to editor and preview
-                if (scrollRatio > 0) {
+                if (restored) {
+                    // see js/markdown-position.js
+                } else if (scrollRatio > 0) {
+                    // Apply proportional scroll to editor and preview
                     // editorDiv is the scroll target, not editorContainer: in split
                     // mode the CSS puts overflow-y on .markdown-editor itself
                     // (.noteentry.markdown-split-mode .markdown-editor).
@@ -1001,6 +1050,11 @@ function exitSplitMode(noteId) {
     var editorDiv = noteEntry.querySelector('.markdown-editor');
     var previewDiv = noteEntry.querySelector('.markdown-preview');
 
+    // Read in the split layout, which is about to go (#1409)
+    var position = typeof window.captureMarkdownEditorPosition === 'function'
+        ? window.captureMarkdownEditorPosition(noteEntry)
+        : null;
+
     // Remove split mode class
     noteEntry.classList.remove('markdown-split-mode');
     clearMarkdownSplitPaneHeight(noteEntry);
@@ -1019,7 +1073,7 @@ function exitSplitMode(noteId) {
     }
 
     // Switch to preview mode instead of edit mode
-    switchToPreviewMode(noteId);
+    switchToPreviewMode(noteId, position);
 }
 
 // Public API of this file.

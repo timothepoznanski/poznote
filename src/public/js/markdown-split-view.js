@@ -111,6 +111,12 @@ function syncMarkdownPreviewScrollToEditorCaret(noteEntry, behavior) {
         return false;
     }
 
+    // Just switched to split: the pane is being put back where the reader was
+    // (js/markdown-position.js), more precisely than this block-level sync.
+    if (typeof window.isMarkdownPreviewPositionHeld === 'function' && window.isMarkdownPreviewPositionHeld(noteEntry)) {
+        return false;
+    }
+
     var editorDiv = noteEntry.querySelector('.markdown-editor');
     if (!editorDiv) {
         return false;
