@@ -119,9 +119,19 @@ function setupAutoSaveCheck() {
     // the note becomes editable, before the user can type over it.
     document.addEventListener('noteEditUnlocked', function (event) {
         const noteId = (event && event.detail && event.detail.noteId) ? String(event.detail.noteId) : '';
-        if (noteId && noteId === getDisplayedNoteId()) {
-            considerDraftRecovery(noteId);
+        if (!noteId || noteId !== getDisplayedNoteId()) {
+            return;
         }
+        // Edits typed before the note was locked never reached the server:
+        // their save was refused (or dropped) while another editor held it.
+        // Write them now the note is ours again, which is what the lock
+        // notification promised. A write that landed meanwhile answers 409,
+        // and js/live-refresh.js merges or asks, as for any outside change.
+        if (hasUnsavedChanges(noteId)) {
+            saveToServerDebounced();
+            return;
+        }
+        considerDraftRecovery(noteId);
     });
 }
 
@@ -1247,6 +1257,34 @@ window.getNoteSavedBaseline = function (noteId) {
 window.adoptNoteSavedTitle = function (noteId, title) {
     if (noteId && String(noteId) === String(noteid)) {
         lastSavedTitle = title;
+    }
+};
+// What is on screen now IS the server version (js/live-refresh.js applied
+// an outside change in place, nothing of ours in it): make it the saved
+// state, so the editor's own input event does not queue a pointless save
+// that would bump the note's version for every other open tab.
+window.adoptNoteSavedState = function (noteId) {
+    if (!noteId || String(noteId) !== String(noteid)) {
+        return;
+    }
+    const entryElem = document.getElementById('entry' + noteid);
+    const titleInput = document.getElementById('inp' + noteid);
+    const tagsElem = document.getElementById('tags' + noteid);
+    if (!entryElem) {
+        return;
+    }
+    clearTimeout(saveTimeout);
+    saveTimeout = null;
+    lastSavedContent = (typeof window.getComparableNoteContent === 'function')
+        ? window.getComparableNoteContent(entryElem, noteid)
+        : entryElem.innerHTML;
+    lastSavedTitle = titleInput ? titleInput.value : null;
+    lastSavedTags = tagsElem ? tagsElem.value : null;
+    notesNeedingRefresh.delete(String(noteid));
+    clearDraft(noteid);
+    setNoteSaveButtonState(noteid, false);
+    if (document.title.startsWith('🔴')) {
+        document.title = document.title.replace(/^🔴\s*/, '');
     }
 };
 window.markNoteAsModified = markNoteAsModified;

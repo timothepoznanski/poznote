@@ -145,12 +145,11 @@
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 12px;
     padding: 12px 14px;
     border: 1px solid var(--pz-border-light);
     border-radius: var(--pz-radius-lg);
-    background: var(--pz-bg);
+    background: var(--pz-surface);
     color: var(--pz-text);
     font: inherit;
     font-size: 14px;
@@ -171,8 +170,17 @@
 }
 
 #confirmLogoutModal .logout-account-name {
+    flex: 1 1 auto;
     min-width: 0;
     overflow-wrap: anywhere;
+    font-weight: var(--pz-weight-semibold);
+}
+
+#confirmLogoutModal .logout-account-arrow {
+    flex: 0 0 auto;
+    color: var(--pz-accent);
+    font-size: 16px;
+    line-height: 1;
 }
 
 #confirmLogoutModal .logout-account-badge {
@@ -210,6 +218,7 @@ html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal, #iconSidebar
 html[data-theme='dark'] #confirmLogoutModal .logout-account-option {
     background: var(--dm-surface);
     border-color: var(--dm-border);
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] #confirmLogoutModal .logout-account-option:hover:not(:disabled),
@@ -342,4 +351,148 @@ html[data-theme='dark'] #iconSidebarColorModal .folder-color-default {
         linear-gradient(135deg, var(--dm-border) 25%, var(--dm-bg) 25%, var(--dm-bg) 75%, var(--dm-border) 75%, var(--dm-border));
     background-size: 8px 8px;
     background-position: 0 0, 4px 4px;
+}
+
+/* ============================================
+   My Profile modal (js/profile.js)
+   ============================================ */
+
+/* The heading is just "My Profile": who the profile belongs to is the card
+   below it, so the name and id are readable instead of a heading suffix. */
+#editProfileModal .ep-identity {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 22px;
+    padding: 14px 16px;
+    border: 1px solid var(--pz-border-light);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-surface);
+}
+
+#editProfileModal .ep-avatar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--pz-radius-circle);
+    background: var(--pz-accent);
+    color: var(--pz-text-inverse);
+    font-size: 18px;
+    font-weight: var(--pz-weight-semibold);
+    letter-spacing: 0.02em;
+}
+
+#editProfileModal .ep-identity-text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+#editProfileModal .ep-identity-name {
+    font-size: 17px;
+    font-weight: var(--pz-weight-semibold);
+    overflow-wrap: anywhere;
+}
+
+#editProfileModal .ep-identity-sub {
+    color: var(--pz-text-muted);
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+#editProfileModal .ep-identity-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 3px;
+}
+
+#editProfileModal .ep-badge {
+    padding: 2px 8px;
+    border-radius: var(--pz-radius-pill);
+    background: var(--pz-surface-sunken);
+    color: var(--pz-text-muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+#editProfileModal .ep-badge-admin {
+    background: rgba(var(--pz-accent-rgb), 0.12);
+    color: var(--pz-accent);
+}
+
+/* One rhythm for the fields: the spacing used to be per-element inline
+   styles fighting the shared input margins. */
+#editProfileModal .ep-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+#editProfileModal .ep-fields .form-group {
+    margin: 0;
+}
+
+#editProfileModal .ep-fields label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--pz-text-muted);
+    font-size: 13px;
+    font-weight: var(--pz-weight-medium);
+}
+
+#editProfileModal .ep-fields input {
+    width: 100%;
+    margin: 0;
+    padding: 10px 12px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#editProfileModal .ep-fields input:focus {
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.15);
+}
+
+/* Admin-managed email: reads as locked rather than merely greyed out. */
+#editProfileModal .ep-fields input:disabled {
+    background: var(--pz-surface-sunken);
+    color: var(--pz-text-muted);
+    cursor: not-allowed;
+}
+
+#editProfileModal .edit-profile-email-hint {
+    margin-top: 6px;
+    font-size: 12px;
+}
+
+#editProfileModal .ep-error {
+    margin-top: 14px;
+    padding: 10px 12px;
+    border-left: 3px solid var(--pz-danger);
+    border-radius: var(--pz-radius-sm);
+    background: var(--pz-danger-soft);
+    color: var(--pz-danger-strong);
+    font-size: 14px;
+    text-align: left;
+}
+
+html[data-theme='dark'] #editProfileModal .ep-error {
+    border-left-color: var(--dm-danger);
+    background: var(--dm-danger-soft);
+    color: var(--dm-danger);
+}
+
+html[data-theme='dark'] #editProfileModal .ep-identity {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+/* --pz-accent stays the light blue in dark mode (tokens.css switches the
+   neutrals only), which is too dark for a tint and its own label. */
+html[data-theme='dark'] #editProfileModal .ep-badge-admin {
+    background: rgba(var(--dm-accent-rgb), 0.18);
+    color: var(--dm-accent);
 }

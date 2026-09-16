@@ -3486,7 +3486,6 @@
     "card": "My Profile",
     "modal": {
       "title": "My Profile",
-      "title_of": "Profile of {{name}}",
       "username": "Username",
       "first_name": "First name",
       "last_name": "Last name",
@@ -3859,7 +3858,9 @@
     "error_incorrect": "Incorrect password. Please try again."
   },
   "account_access": {
-    "owner_only_settings": "This account's settings are not accessible because you are not the owner of this account."
+    "owner_only_settings": "This account's settings are not accessible because you are not the owner of this account.",
+    "current_user_label": "Current user",
+    "current_user_id": "ID {{id}}"
   },
   "note_lock": {
     "banner": "Read only: {{user}} is currently editing this note.",

@@ -1014,7 +1014,7 @@ function getPublicWorkspaceRedirectUrl(): string {
     return buildExplicitPublicWorkspaceUrl($workspaceName);
 }
 
-function denyPublicWorkspaceAccessResponse(string $message, int $code = 403): void {
+function denyPublicWorkspaceAccessResponse(string $message, int $code = 403, ?array $account = null): void {
     http_response_code($code);
 
     $acceptHeader = (string)($_SERVER['HTTP_ACCEPT'] ?? '');
@@ -1063,7 +1063,44 @@ function denyPublicWorkspaceAccessResponse(string $message, int $code = 403): vo
                 }
                 .error-icon { font-size: 48px; color: #ef4444; margin-bottom: 20px; }
                 .error-title { font-size: 24px; font-weight: 600; margin-bottom: 12px; color: var(--password-text, #333333); }
-                .error-message { color: var(--password-muted, #666666); margin-bottom: 30px; line-height: 1.5; }
+                .error-message { color: var(--password-muted, #666666); margin-bottom: 20px; line-height: 1.5; }
+                /* Tokens only, no colour fallbacks: css/tokens.css and
+                   css/public_folder.css are loaded above. */
+                .error-account {
+                    margin-bottom: 28px;
+                    padding: 16px;
+                    border: 1px solid var(--password-border);
+                    border-radius: var(--pz-radius-lg);
+                    background: var(--password-bg);
+                }
+                .error-account-label {
+                    display: block;
+                    font-size: 12px;
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                    color: var(--password-muted);
+                }
+                .error-account-name {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    margin-top: 8px;
+                    font-size: 20px;
+                    font-weight: var(--pz-weight-semibold);
+                    color: var(--password-text);
+                    word-break: break-word;
+                }
+                .error-account-id {
+                    display: inline-block;
+                    margin-top: 8px;
+                    padding: 3px 10px;
+                    border: 1px solid var(--password-border);
+                    border-radius: var(--pz-radius-pill);
+                    background: var(--password-card-bg);
+                    font-size: 14px;
+                    color: var(--password-text);
+                }
                 .back-link {
                     display: inline-flex;
                     align-items: center;
@@ -1084,6 +1121,20 @@ function denyPublicWorkspaceAccessResponse(string $message, int $code = 403): vo
                 <div class="error-icon"><i class="lucide lucide-shield"></i></div>
                 <h1 class="error-title"><?php echo htmlspecialchars($title); ?></h1>
                 <p class="error-message"><?php echo htmlspecialchars($message); ?></p>
+                <?php if ($account !== null): ?>
+                <div class="error-account">
+                    <span class="error-account-label"><?php
+                        echo htmlspecialchars((function_exists('t')) ? t('account_access.current_user_label', [], 'Current user') : 'Current user');
+                    ?></span>
+                    <span class="error-account-name">
+                        <i class="lucide lucide-user"></i>
+                        <?php echo htmlspecialchars($account['username']); ?>
+                    </span>
+                    <span class="error-account-id"><?php
+                        echo htmlspecialchars((function_exists('t')) ? t('account_access.current_user_id', ['id' => $account['id']], 'ID {{id}}') : 'ID ' . $account['id']);
+                    ?></span>
+                </div>
+                <?php endif; ?>
                 <a href="<?php echo $prefix; ?>index.php" class="back-link">
                     <i class="lucide lucide-arrow-left"></i>
                     <?php echo (function_exists('t')) ? t('common.back_to_notes', [], 'Back to Notes') : 'Back to Notes'; ?>
@@ -2024,6 +2075,23 @@ function getActiveAccountOwnerRequiredMessage(): string {
     );
 }
 
+/**
+ * Name and id of the account currently in use, for display on denial screens.
+ */
+function getActiveAccountIdentity(): ?array {
+    $activeUser = getCurrentUser();
+    $activeUserId = (int)(getCurrentUserId() ?? 0);
+
+    if (!is_array($activeUser) || $activeUserId <= 0) {
+        return null;
+    }
+
+    return [
+        'username' => (string)($activeUser['username'] ?? ''),
+        'id' => $activeUserId,
+    ];
+}
+
 function requireActiveAccountOwner(?string $message = null): void {
     requireAuth();
 
@@ -2035,7 +2103,7 @@ function requireActiveAccountOwner(?string $message = null): void {
         $message = getActiveAccountOwnerRequiredMessage();
     }
 
-    denyPublicWorkspaceAccessResponse($message, 403);
+    denyPublicWorkspaceAccessResponse($message, 403, getActiveAccountIdentity());
 }
 
 /**

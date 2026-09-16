@@ -3862,7 +3862,6 @@
     "card": "Mein Profil",
     "modal": {
       "title": "Mein Profil",
-      "title_of": "Profil von {{name}}",
       "username": "Benutzername",
       "first_name": "Vorname",
       "last_name": "Nachname",
@@ -4235,7 +4234,9 @@
     "error_incorrect": "Falsches Passwort. Bitte versuchen Sie es erneut."
   },
   "account_access": {
-    "owner_only_settings": "Die Einstellungen dieses Kontos sind nicht zugänglich, da Sie nicht der Besitzer dieses Kontos sind."
+    "owner_only_settings": "Die Einstellungen dieses Kontos sind nicht zugänglich, da Sie nicht der Besitzer dieses Kontos sind.",
+    "current_user_label": "Aktueller Benutzer",
+    "current_user_id": "ID {{id}}"
   },
   "note_lock": {
     "banner": "Nur lesen: {{user}} bearbeitet diese Notiz gerade.",

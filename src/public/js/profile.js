@@ -35,18 +35,54 @@
     }
     var profileCache = null;
 
-    // "Profile of <username> - ID 12". The whole string goes through one
-    // placeholder key so languages that do not use an "X of Y" word order
-    // (ru, zh) can place the name where it belongs.
-    function profileModalTitle(profile) {
-        if (!profile) return tr('profile.modal.title', {}, 'My Profile');
+    // The identity card under the title: who this profile is, before the
+    // fields that change it. The name and id used to be crammed into the
+    // heading as "Profile of <username> - ID 12".
+    function profileFullName(profile) {
+        return [
+            ((profile && profile.first_name) || '').trim(),
+            ((profile && profile.last_name) || '').trim()
+        ].filter(Boolean).join(' ');
+    }
 
-        var name = (profile.username || '').trim();
-        if (!name) return tr('profile.modal.title', {}, 'My Profile');
+    // Initials of the first and last names, or the first letter of the
+    // username for the accounts that carry neither.
+    function profileInitials(profile) {
+        var full = profileFullName(profile);
+        if (full) {
+            var parts = full.split(/\s+/);
+            return (parts[0].charAt(0) + (parts.length > 1 ? parts[parts.length - 1].charAt(0) : '')).toUpperCase();
+        }
 
-        var title = tr('profile.modal.title_of', { name: name }, 'Profile of {{name}}');
-        if (profile.id) title += ' - ' + tr('profile.modal.id', {}, 'ID') + ' ' + profile.id;
-        return title;
+        return (((profile && profile.username) || '').trim().charAt(0) || '?').toUpperCase();
+    }
+
+    function renderProfileIdentity(profile) {
+        var card = document.getElementById('epIdentity');
+        if (!card) return;
+
+        var username = ((profile && profile.username) || '').trim();
+        if (!username) {
+            card.style.display = 'none';
+            return;
+        }
+        card.style.display = '';
+
+        document.getElementById('epAvatar').textContent = profileInitials(profile);
+        document.getElementById('epIdentityName').textContent = username;
+
+        var sub = document.getElementById('epIdentitySub');
+        var full = profileFullName(profile);
+        sub.textContent = full;
+        sub.style.display = full ? '' : 'none';
+
+        var idBadge = document.getElementById('epIdentityId');
+        idBadge.textContent = profile.id ? tr('profile.modal.id', {}, 'ID') + ' ' + profile.id : '';
+        idBadge.style.display = profile.id ? '' : 'none';
+
+        var adminBadge = document.getElementById('epIdentityAdmin');
+        adminBadge.textContent = tr('multiuser.admin.administrator', {}, 'Administrator');
+        adminBadge.style.display = (profile && profile.is_admin) ? '' : 'none';
     }
 
     // ========== Profile data ==========
@@ -77,29 +113,41 @@
 
         modal.innerHTML =
             '<div class="modal-content">' +
-                /* Placeholder until the profile arrives; fillProfileFields
-                   rewrites it as "Profile of <name> (ID n)". */
                 '<h3>' + tr('profile.modal.title', {}, 'My Profile') + '</h3>' +
-                '<div class="form-group" style="margin-bottom: 8px;">' +
-                    '<label for="epUsername" class="text-small-muted">' + tr('profile.modal.username', {}, 'Username') + '</label>' +
-                    '<input type="text" id="epUsername" autocomplete="username" maxlength="60" placeholder="' + tr('profile.modal.username', {}, 'Username') + '" style="width:100%;box-sizing:border-box;">' +
+                /* Hidden until renderProfileIdentity() has a username to show. */
+                '<div class="ep-identity" id="epIdentity" style="display:none;">' +
+                    '<span class="ep-avatar" id="epAvatar" aria-hidden="true"></span>' +
+                    '<span class="ep-identity-text">' +
+                        '<span class="ep-identity-name" id="epIdentityName"></span>' +
+                        '<span class="ep-identity-sub" id="epIdentitySub" style="display:none;"></span>' +
+                        '<span class="ep-identity-badges">' +
+                            '<span class="ep-badge" id="epIdentityId"></span>' +
+                            '<span class="ep-badge ep-badge-admin" id="epIdentityAdmin" style="display:none;"></span>' +
+                        '</span>' +
+                    '</span>' +
                 '</div>' +
-                '<div class="form-group" style="margin-bottom: 8px;">' +
-                    '<label for="epFirstName" class="text-small-muted">' + tr('profile.modal.first_name', {}, 'First name') + '</label>' +
-                    '<input type="text" id="epFirstName" autocomplete="given-name" maxlength="100" placeholder="' + tr('profile.modal.first_name', {}, 'First name') + '" style="width:100%;box-sizing:border-box;">' +
+                '<div class="ep-fields">' +
+                    '<div class="form-group">' +
+                        '<label for="epUsername">' + tr('profile.modal.username', {}, 'Username') + '</label>' +
+                        '<input type="text" id="epUsername" autocomplete="username" maxlength="60" placeholder="' + tr('profile.modal.username', {}, 'Username') + '">' +
+                    '</div>' +
+                    '<div class="form-group">' +
+                        '<label for="epFirstName">' + tr('profile.modal.first_name', {}, 'First name') + '</label>' +
+                        '<input type="text" id="epFirstName" autocomplete="given-name" maxlength="100" placeholder="' + tr('profile.modal.first_name', {}, 'First name') + '">' +
+                    '</div>' +
+                    '<div class="form-group">' +
+                        '<label for="epLastName">' + tr('profile.modal.last_name', {}, 'Last name') + '</label>' +
+                        '<input type="text" id="epLastName" autocomplete="family-name" maxlength="100" placeholder="' + tr('profile.modal.last_name', {}, 'Last name') + '">' +
+                    '</div>' +
+                    '<div class="form-group" id="epEmailGroup">' +
+                        '<label for="epEmail">' + tr('multiuser.admin.email', {}, 'Email') + '</label>' +
+                        '<input type="email" id="epEmail" disabled>' +
+                        '<div class="text-small-muted edit-profile-email-hint">' + tr('profile.modal.email_admin_only', {}, 'Only an administrator can change your email address.') + '</div>' +
+                    '</div>' +
                 '</div>' +
-                '<div class="form-group" style="margin-bottom: 8px;">' +
-                    '<label for="epLastName" class="text-small-muted">' + tr('profile.modal.last_name', {}, 'Last name') + '</label>' +
-                    '<input type="text" id="epLastName" autocomplete="family-name" maxlength="100" placeholder="' + tr('profile.modal.last_name', {}, 'Last name') + '" style="width:100%;box-sizing:border-box;">' +
-                '</div>' +
-                '<div class="form-group" id="epEmailGroup" style="margin-bottom: 8px;">' +
-                    '<label for="epEmail" class="text-small-muted">' + tr('multiuser.admin.email', {}, 'Email') + '</label>' +
-                    '<input type="email" id="epEmail" disabled style="width:100%;box-sizing:border-box;margin-bottom:0;">' +
-                    '<div class="text-small-muted edit-profile-email-hint" style="margin-top:4px;margin-bottom:16px;">' + tr('profile.modal.email_admin_only', {}, 'Only an administrator can change your email address.') + '</div>' +
-                '</div>' +
-                '<div id="epError" class="error" style="color:#dc3545;margin-bottom:10px;display:none;"></div>' +
+                '<div id="epError" class="ep-error" style="display:none;"></div>' +
                 '<div class="modal-buttons">' +
-                    '<button type="button" class="btn-danger" id="epCancelBtn">' + tr('common.cancel', {}, 'Cancel') + '</button>' +
+                    '<button type="button" class="btn-cancel" id="epCancelBtn">' + tr('common.cancel', {}, 'Cancel') + '</button>' +
                     '<button type="button" class="btn-primary" id="epSaveBtn">' + tr('common.save', {}, 'Save') + '</button>' +
                 '</div>' +
             '</div>';
@@ -115,7 +163,8 @@
         if (!modal) return;
 
         var title = modal.querySelector('h3');
-        if (title) title.textContent = profileModalTitle(profileCache);
+        if (title) title.textContent = tr('profile.modal.title', {}, 'My Profile');
+        renderProfileIdentity(profileCache);
 
         var fields = [
             { id: 'epUsername', key: 'profile.modal.username', fallback: 'Username' },
@@ -148,8 +197,7 @@
         document.getElementById('epLastName').value = (profile && profile.last_name) || '';
         document.getElementById('epEmail').value = (profile && profile.email) || '';
 
-        var title = document.querySelector('#editProfileModal h3');
-        if (title) title.textContent = profileModalTitle(profile);
+        renderProfileIdentity(profile);
 
         // Email is admin-managed: the field stays locked for regular users
         // (the API rejects self-service email changes too).
@@ -344,8 +392,9 @@
                 '<p class="text-small-muted">' + (canSwitch
                     ? tr('profile.logout.switch_intro', {}, 'Switch to another account, or log out completely.')
                     : tr('profile.logout.confirm', {}, 'Are you sure you want to log out?')) + '</p>' +
-                (canSwitch ? '<div class="logout-account-list" id="clAccountList"></div>' : '') +
+                // Who is signed in comes before the choice it explains
                 '<p class="text-small-muted" id="clSignedInAs" style="display:none;"></p>' +
+                (canSwitch ? '<div class="logout-account-list" id="clAccountList"></div>' : '') +
                 '<div class="modal-buttons">' +
                     '<button type="button" class="btn-cancel" id="clCancelBtn">' + tr('common.cancel', {}, 'Cancel') + '</button>' +
                     '<button type="button" class="btn-danger" id="clConfirmBtn">' + tr('workspace_menu.logout', {}, 'Logout') + '</button>' +
@@ -422,6 +471,14 @@
                     badge.textContent = tr('login.account_select.own_account', {}, 'Your account');
                     btn.appendChild(badge);
                 }
+
+                // Tells the row apart from the input fields of the sibling
+                // modals, which share this look.
+                var arrow = document.createElement('span');
+                arrow.className = 'logout-account-arrow';
+                arrow.setAttribute('aria-hidden', 'true');
+                arrow.textContent = '→';
+                btn.appendChild(arrow);
 
                 btn.addEventListener('click', function () {
                     freezeButtons();

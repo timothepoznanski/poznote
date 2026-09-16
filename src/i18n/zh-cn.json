@@ -3962,7 +3962,6 @@
     "card": "我的资料",
     "modal": {
       "title": "我的资料",
-      "title_of": "{{name}} 的资料",
       "username": "用户名",
       "first_name": "名字",
       "last_name": "姓氏",
@@ -4335,7 +4334,9 @@
     "error_incorrect": "密码错误，请重试。"
   },
   "account_access": {
-    "owner_only_settings": "此账户的设置无法访问，因为您不是此账户的所有者。"
+    "owner_only_settings": "此账户的设置无法访问，因为您不是此账户的所有者。",
+    "current_user_label": "当前用户",
+    "current_user_id": "ID {{id}}"
   },
   "note_lock": {
     "banner": "只读：{{user}} 当前正在编辑这条笔记。",

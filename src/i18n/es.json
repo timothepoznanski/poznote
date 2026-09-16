@@ -3863,7 +3863,6 @@
     "card": "Mi perfil",
     "modal": {
       "title": "Mi perfil",
-      "title_of": "Perfil de {{name}}",
       "username": "Nombre de usuario",
       "first_name": "Nombre",
       "last_name": "Apellidos",
@@ -4236,7 +4235,9 @@
     "error_incorrect": "Contraseña incorrecta. Inténtelo de nuevo."
   },
   "account_access": {
-    "owner_only_settings": "Los ajustes de esta cuenta no son accesibles porque usted no es el propietario de esta cuenta."
+    "owner_only_settings": "Los ajustes de esta cuenta no son accesibles porque usted no es el propietario de esta cuenta.",
+    "current_user_label": "Usuario actual",
+    "current_user_id": "ID {{id}}"
   },
   "note_lock": {
     "banner": "Solo lectura: {{user}} está editando esta nota en este momento.",

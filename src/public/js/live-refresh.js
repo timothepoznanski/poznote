@@ -13,9 +13,10 @@
  *   - sidebar tree: reloaded in place (refreshNotesListAfterFolderAction),
  *     unless the user is interacting with it (inline rename, drag...)
  *   - open note: reloaded in place when it has no unsaved edits, no focus
- *     and no selection. With unsaved edits, a markdown note is merged with
- *     the outside change when the two touched different lines
- *     (js/markdown-merge.js) and saved; otherwise a banner offers to reload
+ *     and no selection. A markdown note with the caret in it is updated
+ *     around the caret instead; with unsaved edits, it is merged with the
+ *     outside change when the two touched different lines
+ *     (js/markdown-merge.js) and saved. Otherwise a banner offers to reload
  *     it, or to keep and save this tab's version instead
  *   - cached notes: their cached DOM is dropped so the next visit refetches
  *
@@ -670,7 +671,10 @@
         if (canAutoReloadNote(noteId) && reloadNote(noteId, true)) {
             return true;
         }
-        if (hasUnsavedChanges(noteId)) {
+        // Unsaved edits here: merge them with the outside change. Nothing
+        // unsaved but the caret in the note: a markdown note is updated in
+        // place around the caret, no banner, where a reload would drop it.
+        if (hasUnsavedChanges(noteId) || (isMarkdownNote(noteId) && canApplyInPlace(noteId))) {
             tryMergeOutsideChange(noteId).then(function (merged) {
                 // Still flagged: not reloaded or resolved while merging
                 if (!merged && outOfSync[noteId]) {
@@ -681,6 +685,21 @@
         }
         showBanner(noteId, 'changed', serverContentVersion);
         return false;
+    }
+
+    // The conditions of canAutoReloadNote() that are about the page rather
+    // than the note: a change under an open dialog, or on a note pane hidden
+    // behind the list on mobile, is still left to the banner.
+    function canApplyInPlace(noteId) {
+        if (pendingLocalWrites > 0 || window.isLoadingNote || isVisibleModalOpen() || isNoteLocked(noteId)) {
+            return false;
+        }
+        try {
+            if (typeof isMobileDevice === 'function' && isMobileDevice() && !document.body.classList.contains('note-open')) {
+                return false;
+            }
+        } catch (e) { /* ignore */ }
+        return true;
     }
 
     // ------------------------------------------------------------------
@@ -806,6 +825,18 @@
             delete outOfSync[noteId];
             contentVersions[noteId] = server.version;
             removeBanner(noteId);
+
+            // Nothing of ours in the result: the screen now shows the server
+            // version, so there is nothing to save. Saving anyway would bump
+            // the version and make every other open tab refresh in turn.
+            if (merged === server.content) {
+                if (typeof window.adoptNoteSavedState === 'function') {
+                    window.adoptNoteSavedState(noteId);
+                }
+                showRefreshedNotice(noteId, null, true);
+                return true;
+            }
+
             showRefreshedNotice(noteId, t('live_refresh.note_merged', {}, 'Merged with changes made outside this tab.'), true);
             if (typeof window.saveNoteToServer === 'function') {
                 window.saveNoteToServer();

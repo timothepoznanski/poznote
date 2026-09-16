@@ -403,6 +403,11 @@
             if (button) {
                 button.disabled = true;
             }
+            // Same guards as acquireLock(): a status check still in flight
+            // would otherwise answer with the old holder and lock the note
+            // again right after it was taken over.
+            stopHeartbeat();
+            stopStatusChecks();
             acquireRequestId += 1;
             var requestId = acquireRequestId;
 

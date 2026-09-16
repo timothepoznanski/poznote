@@ -3967,7 +3967,6 @@
     "card": "Mon profil",
     "modal": {
       "title": "Mon profil",
-      "title_of": "Profil de {{name}}",
       "username": "Nom d’utilisateur",
       "first_name": "Prénom",
       "last_name": "Nom",
@@ -4340,7 +4339,9 @@
     "error_incorrect": "Mot de passe incorrect. Veuillez réessayer."
   },
   "account_access": {
-    "owner_only_settings": "Les paramètres de ce compte ne sont pas accessibles, car vous n'êtes pas le propriétaire de ce compte."
+    "owner_only_settings": "Les paramètres de ce compte ne sont pas accessibles, car vous n'êtes pas le propriétaire de ce compte.",
+    "current_user_label": "Utilisateur actuel",
+    "current_user_id": "ID {{id}}"
   },
   "note_lock": {
     "banner": "Lecture seule : {{user}} modifie actuellement cette note.",

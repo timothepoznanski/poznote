@@ -334,13 +334,12 @@ $iconSidebarAsset = static function (string $path) use ($iconSidebarBasePath): s
 // language is already known.
 $iconSidebarProfileStrings = [
     'profile.modal.title' => t('profile.modal.title', [], 'My Profile'),
-    // Keeps its {{name}} placeholder: js/profile.js substitutes it client-side.
-    'profile.modal.title_of' => t('profile.modal.title_of', [], 'Profile of {{name}}'),
     'profile.modal.username' => t('profile.modal.username', [], 'Username'),
     'profile.modal.first_name' => t('profile.modal.first_name', [], 'First name'),
     'profile.modal.last_name' => t('profile.modal.last_name', [], 'Last name'),
     'profile.modal.email_admin_only' => t('profile.modal.email_admin_only', [], 'Only an administrator can change your email address.'),
     'profile.modal.id' => t('profile.modal.id', [], 'ID'),
+    'multiuser.admin.administrator' => t('multiuser.admin.administrator', [], 'Administrator'),
     'profile.errors.username_required' => t('profile.errors.username_required', [], 'Username is required'),
     'profile.errors.username_invalid' => t('profile.errors.username_invalid', [], 'Username may only contain letters, digits, dots, underscores and dashes, and cannot be a number'),
     'profile.errors.username_taken' => t('profile.errors.username_taken', [], 'This username is already taken'),
