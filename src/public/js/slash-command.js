@@ -93,6 +93,9 @@
     let codeMirrorSlashEditor = null;
     let codeMirrorSlashFrom = -1;
     let codeMirrorSlashTo = -1;
+    // Set while the menu was opened on a text selection (issue #1410): no "/"
+    // was typed, the selection is kept and only formatting commands are shown
+    let selectionSlashContext = null;
     const SLASH_CURSOR_HIDDEN_CLASS = 'slash-menu-cursor-hidden';
 
     // Touch tracking for distinguishing tap from scroll
@@ -2995,6 +2998,229 @@
         ]);
     }
 
+    // Slash menu opened on a text selection (issue #1410): only the commands
+    // that act on the selected text. Link and the Markdown inline wrappers
+    // already handle a selection and are reused as they are. The rich-text
+    // insert* functions would replace the text, so those go through the same
+    // helpers as the toolbar buttons.
+    function getSelectionSlashCommands(isMarkdown) {
+        const t = window.t || ((key, params, fallback) => fallback);
+        const common = getCommonSlashCommands();
+        const full = isMarkdown ? getMarkdownSlashCommands() : getSlashCommands();
+        const findIn = (list, id) => (list || []).find(c => c.id === id) || null;
+        const pick = (parentId, id) => {
+            const parent = findIn(full, parentId);
+            return parent ? findIn(parent.submenu, id) : null;
+        };
+
+        const applyBlockStyle = function (style) {
+            if (isMarkdown) {
+                if (typeof window.applyMarkdownHeadingLevel === 'function') window.applyMarkdownHeadingLevel(style);
+            } else if (typeof window.applyHtmlBlockStyle === 'function') {
+                window.applyHtmlBlockStyle(style);
+                if (savedNoteEntry) savedNoteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+            if (window.outlinePanel && typeof window.outlinePanel.refresh === 'function') {
+                // Markdown waits for the preview debounce (300ms)
+                setTimeout(() => window.outlinePanel.refresh(), isMarkdown ? 350 : 50);
+            }
+        };
+
+        const highlight = {
+            id: 'highlight',
+            icon: 'lucide-fill-drip',
+            label: t('slash_menu.highlight', null, 'Highlight'),
+            action: function () {
+                if (isMarkdown) {
+                    if (typeof window.applyMarkdownHighlight === 'function') window.applyMarkdownHighlight();
+                } else if (typeof window.applyHighlightToSelection === 'function') {
+                    window.applyHighlightToSelection(paletteValue('highlight', 'yellow'));
+                }
+            }
+        };
+
+        const format = isMarkdown
+            ? [pick('format', 'bold'), pick('format', 'italic'), highlight, pick('format', 'strikethrough')]
+            : [
+                { id: 'bold', icon: 'lucide-bold', label: t('slash_menu.bold', null, 'Bold'), action: () => document.execCommand('bold') },
+                { id: 'italic', icon: 'lucide-italic', label: t('slash_menu.italic', null, 'Italic'), action: () => document.execCommand('italic') },
+                highlight,
+                { id: 'strikethrough', icon: 'lucide-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => document.execCommand('strikeThrough') }
+            ];
+
+        const color = isMarkdown
+            ? findIn(full, 'color')
+            : {
+                id: 'color',
+                icon: 'lucide-palette',
+                label: t('slash_menu.color', null, 'Color'),
+                submenu: paletteColorItems(function (value) {
+                    if (typeof window.applyColorToSelection === 'function') window.applyColorToSelection(value);
+                }).concat([
+                    {
+                        id: 'default',
+                        icon: 'lucide-circle',
+                        iconColor: 'var(--pz-text)',
+                        label: t('colors.default', null, 'Default'),
+                        action: function () {
+                            if (typeof window.applyColorToSelection === 'function') window.applyColorToSelection('none');
+                        }
+                    }
+                ])
+            };
+
+        return filterSlashCommands([
+            {
+                id: 'title',
+                icon: 'lucide-text-height',
+                label: t('slash_menu.title', null, 'Title'),
+                submenu: [
+                    { id: 'normal', label: t('slash_menu.back_to_normal', null, 'Back to normal text'), action: () => applyBlockStyle('normal') },
+                    { id: 'h1', label: t('slash_menu.heading_1', null, 'Heading 1'), action: () => applyBlockStyle('1') },
+                    { id: 'h2', label: t('slash_menu.heading_2', null, 'Heading 2'), action: () => applyBlockStyle('2') },
+                    { id: 'h3', label: t('slash_menu.heading_3', null, 'Heading 3'), action: () => applyBlockStyle('3') }
+                ]
+            },
+            {
+                id: 'format',
+                icon: 'lucide-bold',
+                label: t('slash_menu.format_text', null, 'Format text'),
+                submenu: format
+            },
+            color,
+            {
+                id: 'code',
+                icon: 'lucide-code',
+                label: t('slash_menu.code', null, 'Code'),
+                submenu: [
+                    isMarkdown ? pick('code', 'inline-code') : {
+                        id: 'inline-code',
+                        icon: 'lucide-terminal',
+                        label: t('slash_menu.inline_code', null, 'Inline code'),
+                        action: function () {
+                            if (typeof window.toggleInlineCode === 'function') window.toggleInlineCode();
+                            if (savedNoteEntry) savedNoteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+                        }
+                    },
+                    {
+                        id: 'code-normal',
+                        icon: 'lucide-file-code',
+                        label: t('slash_menu.code_block', null, 'Code block'),
+                        action: function () {
+                            if (isMarkdown) {
+                                if (typeof window.applyMarkdownCodeBlock === 'function') window.applyMarkdownCodeBlock();
+                            } else if (typeof window.toggleCodeBlock === 'function') {
+                                window.toggleCodeBlock();
+                            }
+                        }
+                    }
+                ]
+            },
+            pick('link-menu', 'link'),
+            common.cancel
+        ]);
+    }
+
+    // Where the selection ends: the menu opens there, as it would under a typed "/"
+    function getSelectionSlashAnchorRect(context) {
+        if (context.range) {
+            const end = context.range.cloneRange();
+            end.collapse(false);
+            const rect = end.getBoundingClientRect();
+            if (isUsableAnchorRect(rect)) return rect;
+            const rects = context.range.getClientRects();
+            return rects.length ? rects[rects.length - 1] : context.range.getBoundingClientRect();
+        }
+        const api = getMarkdownCodeMirrorApi();
+        const coords = api && typeof api.getCoordsAtPos === 'function' ? api.getCoordsAtPos(context.editor, context.end) : null;
+        return coords || context.editor.getBoundingClientRect();
+    }
+
+    // Put the selection the menu was opened on back in the editor
+    function restoreSelectionSlashContext(context) {
+        if (!context) return;
+        focusEditableElement(context.editor);
+
+        if (context.range) {
+            try {
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(context.range);
+            } catch (e) {
+                console.debug('slash-command: restoreSelectionSlashContext() failed:', e);
+            }
+            return;
+        }
+
+        const api = getMarkdownCodeMirrorApi();
+        if (api && typeof api.setSelection === 'function') {
+            api.setSelection(context.editor, context.start, context.end);
+        }
+    }
+
+    // Open the menu on a non-empty selection in a note instead of letting the
+    // "/" replace it (issue #1410). Returns true when the menu opened, the
+    // caller then cancels the keystroke.
+    function showSlashMenuForSelection(target) {
+        if (!target || !target.closest || slashMenuElement) return false;
+
+        let context = null;
+        const codeMirrorEditor = getCodeMirrorEditorFromTarget(target);
+        if (codeMirrorEditor) {
+            const snapshot = getCodeMirrorSelectionSnapshot(codeMirrorEditor);
+            if (!snapshot || snapshot.start === snapshot.end) return false;
+            context = { editor: codeMirrorEditor, start: snapshot.start, end: snapshot.end, markdown: true };
+        } else {
+            const sel = window.getSelection();
+            if (!sel || !sel.rangeCount || sel.isCollapsed) return false;
+
+            const range = sel.getRangeAt(0);
+            let container = range.commonAncestorContainer;
+            if (container.nodeType === 3) container = container.parentNode;
+            const editable = container && container.closest ? container.closest('[contenteditable="true"]') : null;
+            const noteEntry = editable ? editable.closest('.noteentry') : null;
+            if (!noteEntry || target.closest('.noteentry') !== noteEntry) return false;
+
+            const noteType = noteEntry.getAttribute('data-note-type');
+            if (noteType === 'tasklist') return false;
+            const isMarkdown = noteType === 'markdown';
+            if (isMarkdown && !editable.classList.contains('markdown-editor')) return false;
+
+            context = { editor: editable, range: range.cloneRange(), markdown: isMarkdown };
+        }
+
+        hideSlashMenu();
+
+        selectionSlashContext = context;
+        savedEditableElement = context.editor;
+        savedNoteEntry = context.editor.closest('.noteentry');
+
+        activeCommandsBuilder = () => getSelectionSlashCommands(context.markdown);
+        activeCommands = activeCommandsBuilder();
+        filterText = '';
+        selectedIndex = 0;
+        filteredCommands = getFilteredCommands('');
+
+        slashMenuElement = document.createElement('div');
+        slashMenuElement.className = 'slash-command-menu';
+        slashMenuElement.innerHTML = buildMenuHTML();
+
+        document.body.appendChild(slashMenuElement);
+        positionMenuAtRect(getSelectionSlashAnchorRect(context));
+
+        requestAnimationFrame(() => {
+            if (slashMenuElement) slashMenuElement.classList.add('show');
+        });
+
+        slashMenuElement.addEventListener('mousedown', handleMenuMouseDown);
+        slashMenuElement.addEventListener('click', handleMenuClick);
+        slashMenuElement.addEventListener('mouseover', handleMenuMouseOver);
+
+        closeMobileKeyboardForSlashMenu(context.editor);
+        hideCursorForSlashMenu();
+        return true;
+    }
+
     // Get current editor context (note type, DOM elements)
     function getEditorContext() {
         if (isMarkdownCodeMirrorEditor(savedEditableElement)) {
@@ -3148,11 +3374,16 @@
 
     // Build slash menu HTML
     function buildMenuHTML() {
+        // Opened on a selection, the typed filter is not in the note: echo it here
+        const filterHTML = selectionSlashContext && filterText
+            ? '<div class="slash-command-filter">/' + escapeHtml(filterText) + '</div>'
+            : '';
+
         if (!filteredCommands.length) {
-            return '<div class="slash-command-empty">No results</div>';
+            return filterHTML + '<div class="slash-command-empty">No results</div>';
         }
 
-        return filteredCommands
+        return filterHTML + filteredCommands
             .map((cmd, idx) => {
                 const selectedClass = idx === selectedIndex ? ' selected' : '';
                 const hasSubmenu = cmd.submenu && cmd.submenu.length > 0;
@@ -3360,6 +3591,7 @@
         slashTextNode = null;
         slashOffset = -1;
         filterText = '';
+        selectionSlashContext = null;
         resetCodeMirrorSlashState();
     }
 
@@ -3782,9 +4014,15 @@
 
         // Delete the slash and filter text (unless keepSlash is true)
         const shouldKeepSlash = foundCmd && foundCmd.keepSlash;
+        const selectionContext = selectionSlashContext;
         let cursorRangeAfterDelete = null;
         let inputCursorPosition = null;
-        if (!shouldKeepSlash) {
+        if (selectionContext) {
+            // Opened on a selection: there is no "/" to delete, the action
+            // formats the selected text so it has to be selected again
+            restoreSelectionSlashContext(selectionContext);
+            cursorRangeAfterDelete = selectionContext.range ? selectionContext.range.cloneRange() : null;
+        } else if (!shouldKeepSlash) {
             deleteSlashText();
             // Save cursor position right after deleteSlashText placed it correctly,
             // because hideSlashMenu() removing the menu DOM can cause the browser
@@ -3832,6 +4070,8 @@
             } catch (e) {
                 console.debug('slash-command: cmd() failed:', e);
             }
+        } else if (selectionContext) {
+            restoreSelectionSlashContext(selectionContext);
         }
         // Also expose it globally so async modal callbacks (link, note-reference)
         // can use it as a reliable fallback for the cursor position.
@@ -4088,6 +4328,26 @@
         if (e.key === 'Enter') {
             e.preventDefault();
             e.stopPropagation();
+        }
+
+        // Opened on a selection: typed keys filter the menu and must not reach
+        // the editor, where they would replace the selected text
+        if (selectionSlashContext && !e.ctrlKey && !e.metaKey && !e.isComposing
+            && (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Delete')) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (e.key === ' ' || (e.key === 'Backspace' && !filterText)) {
+                hideSlashMenu();
+                savedNoteEntry = null;
+                return;
+            }
+            if (e.key === 'Backspace') {
+                filterText = filterText.slice(0, -1);
+            } else if (e.key !== 'Delete') {
+                filterText += e.key;
+            }
+            updateMenuContent();
+            return;
         }
 
         // If a sub-submenu is open (level 3)
@@ -4569,6 +4829,31 @@
         showSlashMenu();
     }
 
+    // "/" on a selection in a note opens the formatting menu (issue #1410).
+    // keydown covers desktop, including CodeMirror which does not fire
+    // beforeinput when it runs on EditContext; beforeinput catches virtual
+    // keyboards, whose keydown reports an "Unidentified" key.
+    function handleSelectionSlashKeydown(e) {
+        if (e.defaultPrevented || e.isComposing || slashMenuElement) return;
+        if (isAltSlashModeEnabled()) {
+            if (!isAltSlashEvent(e)) return;
+        } else if (e.key !== '/' || e.metaKey || (e.ctrlKey && !e.altKey)) {
+            // Ctrl+Alt stays allowed: it is AltGr on Windows
+            return;
+        }
+
+        if (!showSlashMenuForSelection(e.target)) return;
+        e.preventDefault();
+        // handleAltSlashShortcut and handleKeydown listen on the same node
+        e.stopImmediatePropagation();
+    }
+
+    function handleSelectionSlashBeforeInput(e) {
+        if (e.defaultPrevented || e.inputType !== 'insertText' || e.data !== '/' || slashMenuElement) return;
+        if (isAltSlashModeEnabled()) return;
+        if (showSlashMenuForSelection(e.target)) e.preventDefault();
+    }
+
     // Handle click outside menu (close)
     function handleClickOutside(e) {
         if (!slashMenuElement) return;
@@ -4591,6 +4876,8 @@
         if (document.querySelector('.noteentry')) {
             setTimeout(refreshTemplateCache, 1500);
         }
+        document.addEventListener('keydown', handleSelectionSlashKeydown, true);
+        document.addEventListener('beforeinput', handleSelectionSlashBeforeInput, true);
         document.addEventListener('keydown', handleAltSlashShortcut, true);
         document.addEventListener('keydown', handleKeydown, true);
         document.addEventListener('mousedown', handleClickOutside, true);
