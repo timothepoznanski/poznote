@@ -1946,7 +1946,7 @@
     "context_menu": {
       "pin": "Fixar aba",
       "unpin": "Desafixar aba",
-      "close": "Fechar",
+      "close": "Fechar esta",
       "close_all": "Fechar todas",
       "close_others": "Fechar todas exceto esta"
     },

@@ -1033,7 +1033,7 @@
         // Show close option for all tabs (including pinned and the last one)
         var closeItem = document.createElement('div');
         closeItem.className = 'app-tab-context-item app-tab-context-item-danger';
-        closeItem.innerHTML = _t('tabs.context_menu.close', 'Close tab');
+        closeItem.innerHTML = _t('tabs.context_menu.close', 'Close this one');
         closeItem.addEventListener('click', function () {
             _removeContextMenu();
             closeTab(tabId, true);
@@ -1052,6 +1052,19 @@
                 closeOtherTabs(tabId);
             });
             menu.appendChild(closeOthersItem);
+        }
+
+        // Pinned tabs survive "Close all", so only offer it when it closes something
+        var hasClosable = tabs.some(function (t) { return !_isPinnedTab(t); });
+        if (hasClosable) {
+            var closeAllItem = document.createElement('div');
+            closeAllItem.className = 'app-tab-context-item app-tab-context-item-danger';
+            closeAllItem.innerHTML = _t('tabs.context_menu.close_all', 'Close all');
+            closeAllItem.addEventListener('click', function () {
+                _removeContextMenu();
+                closeAllTabs();
+            });
+            menu.appendChild(closeAllItem);
         }
 
         document.body.appendChild(menu);

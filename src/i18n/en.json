@@ -1464,7 +1464,7 @@
     "context_menu": {
       "pin": "Pin tab",
       "unpin": "Unpin tab",
-      "close": "Close",
+      "close": "Close this one",
       "close_all": "Close all",
       "close_others": "Close all except this one"
     },

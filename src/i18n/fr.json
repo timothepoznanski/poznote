@@ -1952,7 +1952,7 @@
     "context_menu": {
       "pin": "Épingler l'onglet",
       "unpin": "Désépingler l'onglet",
-      "close": "Fermer",
+      "close": "Fermer celui-ci",
       "close_all": "Fermer tout",
       "close_others": "Fermer tout sauf celui-ci"
     },

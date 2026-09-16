@@ -1946,7 +1946,7 @@
     "context_menu": {
       "pin": "Tab anheften",
       "unpin": "Tab lösen",
-      "close": "Schließen",
+      "close": "Diesen schließen",
       "close_all": "Alle schließen",
       "close_others": "Alle außer diesem schließen"
     },
