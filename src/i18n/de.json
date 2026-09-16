@@ -3862,7 +3862,6 @@
     "card": "Mein Profil",
     "modal": {
       "title": "Mein Profil",
-      "title_of": "Profil von {{name}}",
       "username": "Benutzername",
       "first_name": "Vorname",
       "last_name": "Nachname",
@@ -4235,7 +4234,9 @@
     "error_incorrect": "Falsches Passwort. Bitte versuchen Sie es erneut."
   },
   "account_access": {
-    "owner_only_settings": "Die Einstellungen dieses Kontos sind nicht zugänglich, da Sie nicht der Besitzer dieses Kontos sind."
+    "owner_only_settings": "Die Einstellungen dieses Kontos sind nicht zugänglich, da Sie nicht der Besitzer dieses Kontos sind.",
+    "current_user_label": "Aktueller Benutzer",
+    "current_user_id": "ID {{id}}"
   },
   "note_lock": {
     "banner": "Nur lesen: {{user}} bearbeitet diese Notiz gerade.",
@@ -4246,7 +4247,13 @@
     "popup_title": "Achtung",
     "lost_to_other_tab": "Sie haben die Bearbeitungssperre für diese Notiz nicht mehr. Sie wird jetzt in einem anderen Tab bearbeitet.",
     "lost_to_user": "Sie haben die Bearbeitungssperre für diese Notiz nicht mehr. {{user}} bearbeitet sie jetzt.",
-    "public_visitor": "ein Besucher über den öffentlichen Freigabelink"
+    "public_visitor": "ein Besucher über den öffentlichen Freigabelink",
+    "take_over": "Übernehmen",
+    "take_over_title": "Bearbeitung übernehmen?",
+    "take_over_confirm": "{{user}} bearbeitet diese Notiz gerade. Wenn Sie übernehmen, wird der Editor der anderen Person schreibgeschützt und ihre noch nicht gespeicherten Änderungen bleiben auf ihrem Gerät. Fortfahren?",
+    "take_over_failed": "Diese Notiz konnte nicht übernommen werden.",
+    "taken_over_notice": "Sie haben die Bearbeitung dieser Notiz übernommen.",
+    "lost_unsaved_kept": "Ihre hier nicht gespeicherten Änderungen bleiben auf diesem Gerät erhalten und werden erneut angeboten, sobald die Notiz frei ist."
   },
   "live_refresh": {
     "note_changed": "Diese Notiz wurde außerhalb dieses Tabs geändert.",
@@ -4256,7 +4263,9 @@
     "keep_mine": "Meine Version behalten",
     "discard_confirm": "Beim Neuladen gehen die hier vorgenommenen Änderungen verloren. Fortfahren?",
     "discard_title": "Nicht gespeicherte Änderungen verwerfen?",
-    "note_refreshed": "Mit den außerhalb dieses Tabs vorgenommenen Änderungen aktualisiert."
+    "note_refreshed": "Mit den außerhalb dieses Tabs vorgenommenen Änderungen aktualisiert.",
+    "note_merged": "Mit den außerhalb dieses Tabs vorgenommenen Änderungen zusammengeführt.",
+    "note_changed_conflict": "Diese Notiz wurde außerhalb dieses Tabs geändert, während Sie hier ungespeicherte Änderungen haben. Die beiden Änderungen überschneiden sich und konnten nicht automatisch zusammengeführt werden."
   },
   "dashboard": {
     "title": "Notiz-Board",

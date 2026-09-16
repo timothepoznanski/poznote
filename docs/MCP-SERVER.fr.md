@@ -67,7 +67,9 @@ Un onglet Poznote ouvert dans le navigateur prend en compte les modifications fa
 - `get_reminder` : obtenir le rappel actuellement défini sur une note
 - `set_reminder` : définir ou remplacer le rappel d'une note, avec un intervalle de répétition facultatif
 - `remove_reminder` : supprimer le rappel d'une note
+- `list_reminders` : lister les notifications de rappel déjà déclenchées et encore en attente (le fil de la cloche de l'interface) ; les rappels à venir ne sont pas listables
 - `list_tasks` : lister les tâches d'une liste de tâches, avec leurs ID, leurs dates d'échéance et leurs indicateurs
+- `list_all_tasks` : lister les tâches à faire de toutes les notes d'un espace de travail, les plus urgentes d'abord, avec des filtres (échéance, importance, tâches terminées, cases à cocher dans les notes)
 - `add_task` : ajouter une tâche à une liste de tâches, avec une date d'échéance et un rappel facultatifs
 - `update_task` : mettre à jour une tâche (texte, date d'échéance, rappel, indicateur important)
 - `complete_task` : marquer une tâche comme terminée, ou la rouvrir
@@ -79,7 +81,11 @@ Un onglet Poznote ouvert dans le navigateur prend en compte les modifications fa
 - `list_templates` : lister les notes modèles à partir desquelles `from_template_id` de `create_note` peut démarrer
 - `get_trash` : lister toutes les notes actuellement dans la corbeille
 - `empty_trash` : supprimer définitivement toutes les notes de la corbeille
+- `delete_trash_note` : supprimer définitivement une seule note de la corbeille, au lieu de vider toute la corbeille
 - `restore_note` : restaurer une note depuis la corbeille
+- `list_snapshots` : lister les versions antérieures enregistrées d'une note, y compris l'instantané de sécurité pris avant chaque réécriture par l'IA ou par MCP
+- `get_snapshot` : lire le contenu d'une version antérieure d'une note, sans modifier la note
+- `restore_snapshot` : restaurer une note dans l'état d'un de ses instantanés (un `snapshot_key` ou une `date` est obligatoire)
 - `duplicate_note` : créer un doublon d'une note existante
 - `toggle_favorite` : ajouter une note aux favoris ou l'en retirer
 - `list_attachments` : lister toutes les pièces jointes d'une note
@@ -91,6 +97,7 @@ Un onglet Poznote ouvert dans le navigateur prend en compte les modifications fa
 - `share_note` : activer le partage public d'une note et obtenir l'URL publique
 - `unshare_note` : désactiver le partage public d'une note
 - `get_note_share_status` : obtenir l'état de partage actuel et l'URL publique d'une note
+- `get_folder_share_status` : obtenir l'état de partage actuel et l'URL publique d'un dossier
 - `list_shared` : lister toutes les notes et tous les dossiers partagés publiquement
 - `get_backlinks` : obtenir toutes les notes qui pointent vers (référencent) une note précise
 - `convert_note` : convertir une note entre les formats HTML et Markdown
@@ -125,6 +132,10 @@ Un onglet Poznote ouvert dans le navigateur prend en compte les modifications fa
 **Rappels et tâches.** `reminder_at` (sur `create_note`/`update_note` et `set_reminder`) est une date-heure ISO telle que `2026-09-01T09:00:00+02:00` ; indiquez un décalage, sinon l'heure est interprétée en UTC. Les dates d'échéance des tâches (`due_at`) sont différentes : ce sont des valeurs d'heure locale, `YYYY-MM-DD` ou `YYYY-MM-DDTHH:MM` sans décalage, interprétées selon le fuseau horaire configuré par l'utilisateur, et une date sans heure déclenche le rappel à 09:00. Les intervalles de répétition s'écrivent `<count><unit>` avec l'unité `i`/`h`/`d`/`w`/`m`/`y`, par exemple `30i`, `1d` ou `2w`.
 
 Les outils de tâches agissent sur une seule tâche à la fois : appelez `list_tasks` pour obtenir les ID des tâches, puis `add_task`, `update_task`, `complete_task` ou `delete_task`. Chaque appel ne transporte que cette tâche : un client ne lit donc jamais une liste de tâches pour renvoyer ensuite un tableau entier, et deux appelants qui modifient des tâches différentes ne peuvent pas écraser le travail l'un de l'autre. Poznote stocke les tâches d'une note sous forme d'un unique tableau JSON, que le serveur réécrit à chaque appel : le travail effectué par un appel augmente donc toujours avec la longueur de la liste. Les notifications restent synchronisées automatiquement, et terminer ou supprimer une tâche retire son rappel en attente.
+
+**Historique des versions et annulation.** Poznote prend un instantané de sécurité d'une note juste avant que l'assistant IA ou le serveur MCP ne la réécrive, ce qui permet d'annuler un `update_note` malheureux. `list_snapshots` affiche les instantanés conservés pour une note, chacun avec un `origin` qui identifie ces copies de sécurité ; `get_snapshot` en lit un sans toucher à la note, et `restore_snapshot` en remet le contenu en place. `restore_snapshot` écrase le contenu actuel : il exige donc un `snapshot_key` ou une `date`, au lieu de retomber sur l'instantané du jour.
+
+**Vues transversales.** `list_all_tasks` répond à « qu'est-ce qu'il me reste à faire » sur tout un espace de travail, là où `list_tasks` ne couvre qu'une note. Il renvoie deux types d'éléments, distingués par `source` : les tâches d'une note liste de tâches, dont les ID fonctionnent avec `update_task` et `delete_task`, et les cases à cocher écrites dans des notes ordinaires, dont l'ID n'est qu'une position dans la note et ne peut pas être utilisé ainsi. `list_reminders` renvoie les notifications déjà déclenchées et non écartées, plafonnées à 50 par l'API. Ce n'est pas une vue de ce qui arrive : Poznote n'a aucun point d'entrée pour les rappels futurs, qui se lisent note par note avec `get_reminder`.
 
 La plupart des outils acceptent un argument facultatif `user_id` pour cibler un profil utilisateur précis. Lorsqu'il est fourni, le serveur MCP envoie l'en-tête `X-User-ID` pour cette requête, ce qui vous permet de créer ou de lire des notes dans différents profils sans modifier l'environnement MCP global. Les exceptions sont les outils système `get_system_info`, `list_backups`, `create_backup` et `delete_backup`, qui ne prennent pas `user_id`. Pour changer le profil utilisé par défaut lorsqu'aucun `user_id` n'est passé, voir [Profil utilisateur par défaut](#profil-utilisateur-par-défaut).
 

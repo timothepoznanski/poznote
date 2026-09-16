@@ -18,6 +18,11 @@
         style.id = 'note-edit-lock-styles';
         style.textContent = [
             '.note-edit-lock-banner {',
+            '    display: flex;',
+            '    align-items: center;',
+            '    justify-content: space-between;',
+            '    gap: 12px;',
+            '    flex-wrap: wrap;',
             '    margin: 12px 0;',
             '    padding: 10px 14px;',
             '    border: 1px solid rgba(180, 122, 0, 0.28);',
@@ -26,6 +31,25 @@
             '    color: #7a5a00;',
             '    font-size: 14px;',
             '    line-height: 1.45;',
+            '}',
+            // Drawn from the banner's own text colour so it needs no colour of
+            // its own, in dark mode included.
+            '.note-edit-lock-banner button {',
+            '    flex-shrink: 0;',
+            '    border: 1px solid currentColor;',
+            '    border-radius: 8px;',
+            '    background: transparent;',
+            '    color: inherit;',
+            '    font: inherit;',
+            '    padding: 4px 12px;',
+            '    cursor: pointer;',
+            '}',
+            '.note-edit-lock-banner button:hover {',
+            '    background: color-mix(in srgb, currentColor 12%, transparent);',
+            '}',
+            '.note-edit-lock-banner button:disabled {',
+            '    opacity: 0.6;',
+            '    cursor: default;',
             '}',
             '.note-lock-disabled {',
             '    opacity: 0.45;',
@@ -310,7 +334,9 @@
         }
     }
 
-    function ensureLockBanner(noteCard, message) {
+    // lock: the lock the banner is about; when another person holds it, the
+    // banner offers to take it over.
+    function ensureLockBanner(noteCard, message, lock) {
         if (!noteCard) {
             return;
         }
@@ -327,7 +353,101 @@
             }
         }
 
-        banner.textContent = message;
+        var noteId = normalizeNoteId(String(noteCard.id || '').replace(/^note/, ''));
+        var canTakeOver = !!(noteId && lock && isLockHeldByDifferentUser(lock) && !isReadonlyWorkspace());
+        var signature = message + '|' + (canTakeOver ? 'takeover' : '');
+        if (banner.dataset.lockBannerSignature === signature) {
+            return;   // same banner already on screen (status check): no blink
+        }
+        banner.dataset.lockBannerSignature = signature;
+        banner.textContent = '';
+
+        var text = document.createElement('span');
+        text.textContent = message;
+        banner.appendChild(text);
+
+        if (canTakeOver) {
+            var button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = t('note_lock.take_over', {}, 'Take over');
+            button.addEventListener('click', function () {
+                takeOverLock(noteId, lock, button);
+            });
+            banner.appendChild(button);
+        }
+    }
+
+    /**
+     * Take the lock from its current holder (after a confirmation): their
+     * editor turns read-only on their next heartbeat, and their unsaved
+     * edits stay in their local draft. The note is then reloaded here, the
+     * holder may have saved since it was opened in this tab.
+     */
+    function takeOverLock(noteId, lock, button) {
+        noteId = normalizeNoteId(noteId);
+        if (!noteId || String(activeNoteId) !== noteId) {
+            return;
+        }
+
+        var message = t('note_lock.take_over_confirm', { user: getLockHolderName(lock) },
+            '{{user}} is currently editing this note. If you take over, their editor becomes read-only and the changes they have not saved yet stay on their device. Continue?');
+        var title = t('note_lock.take_over_title', {}, 'Take over editing?');
+        var confirmed = (window.modalAlert && typeof window.modalAlert.confirm === 'function')
+            ? window.modalAlert.confirm(message, title)
+            : Promise.resolve(window.confirm(message));
+
+        Promise.resolve(confirmed).then(function (ok) {
+            if (!ok || String(activeNoteId) !== noteId) {
+                return;
+            }
+            if (button) {
+                button.disabled = true;
+            }
+            // Same guards as acquireLock(): a status check still in flight
+            // would otherwise answer with the old holder and lock the note
+            // again right after it was taken over.
+            stopHeartbeat();
+            stopStatusChecks();
+            acquireRequestId += 1;
+            var requestId = acquireRequestId;
+
+            return postJson('/api/v1/notes/' + encodeURIComponent(noteId) + '/lock', {
+                editor_session_id: getEditorSessionId(),
+                takeover: true
+            }).then(parseResponse).then(function (result) {
+                if (requestId !== acquireRequestId || String(activeNoteId) !== noteId) {
+                    return;
+                }
+                if (!result.ok || !result.data || !result.data.success) {
+                    if (button) {
+                        button.disabled = false;
+                    }
+                    showLockConflictNotification((result.data && result.data.error) || t('note_lock.take_over_failed', {}, 'Unable to take over this note.'));
+                    return;
+                }
+
+                noteStates[noteId] = {
+                    editable: true,
+                    lock: result.data.lock || null
+                };
+                clearNoteLockedState(noteId);
+                startHeartbeat(noteId);
+                startStatusChecks(noteId);
+
+                var notice = t('note_lock.taken_over_notice', {}, 'You took over editing this note.');
+                if (typeof window.liveRefreshReloadNote === 'function' && window.liveRefreshReloadNote(noteId, notice)) {
+                    return;
+                }
+                if (typeof showNotificationPopup === 'function') {
+                    showNotificationPopup(notice, 'success');
+                }
+            });
+        }).catch(function () {
+            if (button) {
+                button.disabled = false;
+            }
+            showLockConflictNotification(t('note_lock.take_over_failed', {}, 'Unable to take over this note.'));
+        });
     }
 
     function clearLockBanner(noteCard) {
@@ -358,7 +478,7 @@
 
         if (noteCard) {
             noteCard.classList.add('note-edit-locked');
-            ensureLockBanner(noteCard, getLockBannerMessage(lock || null));
+            ensureLockBanner(noteCard, getLockBannerMessage(lock || null), lock || null);
             updateToolbarState(noteCard, true);
         }
 
@@ -565,6 +685,11 @@
         }
 
         var popupMessage = getLockConflictMessage(lock || null, message, reason || 'lost');
+        // Edits typed here and not saved yet are in the local draft
+        // (js/events-auto-save.js), offered again once the note is free.
+        if (popupMessage && typeof window.hasUnsavedChanges === 'function' && window.hasUnsavedChanges(noteId)) {
+            popupMessage += ' ' + t('note_lock.lost_unsaved_kept', {}, 'Your unsaved changes here are kept on this device and offered again once the note is free.');
+        }
         if (popupMessage) {
             showLockConflictNotification(popupMessage);
         }

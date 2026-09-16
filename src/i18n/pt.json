@@ -3863,7 +3863,6 @@
     "card": "Meu perfil",
     "modal": {
       "title": "Meu perfil",
-      "title_of": "Perfil de {{name}}",
       "username": "Nome de usuario",
       "first_name": "Nome",
       "last_name": "Sobrenome",
@@ -4236,7 +4235,9 @@
     "error_incorrect": "Senha incorreta. Tente novamente."
   },
   "account_access": {
-    "owner_only_settings": "As configurações desta conta não estão acessíveis porque você não é o proprietário desta conta."
+    "owner_only_settings": "As configurações desta conta não estão acessíveis porque você não é o proprietário desta conta.",
+    "current_user_label": "Usuário atual",
+    "current_user_id": "ID {{id}}"
   },
   "note_lock": {
     "banner": "Somente leitura: {{user}} está editando esta nota no momento.",
@@ -4247,7 +4248,13 @@
     "popup_title": "Atenção",
     "lost_to_other_tab": "Você não tem mais o bloqueio de edição desta nota. Ela agora está sendo editada em outra aba.",
     "lost_to_user": "Você não tem mais o bloqueio de edição desta nota. {{user}} está editando-a agora.",
-    "public_visitor": "um visitante do link de compartilhamento público"
+    "public_visitor": "um visitante do link de compartilhamento público",
+    "take_over": "Assumir a edição",
+    "take_over_title": "Assumir a edição?",
+    "take_over_confirm": "{{user}} está a editar esta nota. Se assumir a edição, o editor dessa pessoa passa a só leitura e as alterações ainda não guardadas ficam no dispositivo dela. Continuar?",
+    "take_over_failed": "Não foi possível assumir a edição desta nota.",
+    "taken_over_notice": "Assumiu a edição desta nota.",
+    "lost_unsaved_kept": "As suas alterações por guardar ficam neste dispositivo e serão propostas de novo assim que a nota estiver livre."
   },
   "live_refresh": {
     "note_changed": "Esta nota foi modificada fora desta aba.",
@@ -4257,7 +4264,9 @@
     "keep_mine": "Manter a minha versão",
     "discard_confirm": "Recarregar vai descartar as alterações que você fez aqui. Continuar?",
     "discard_title": "Descartar alterações não salvas?",
-    "note_refreshed": "Atualizada com as alterações feitas fora desta aba."
+    "note_refreshed": "Atualizada com as alterações feitas fora desta aba.",
+    "note_merged": "Fundida com as alterações feitas fora deste separador.",
+    "note_changed_conflict": "Esta nota foi modificada fora deste separador enquanto tem alterações por guardar aqui. Os dois conjuntos de alterações sobrepõem-se, pelo que não puderam ser fundidos automaticamente."
   },
   "dashboard": {
     "title": "Quadro de notas",

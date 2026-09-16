@@ -475,6 +475,42 @@ class PoznoteClient:
         data = response.json()
         return data.get("success", False)
 
+    def delete_trash_note(
+        self,
+        note_id: int,
+        workspace: str | None = None,
+        user_id: str | int | None = None,
+    ) -> dict:
+        """Permanently delete one note that is already in the trash.
+
+        404 (no such note) and 400 ("Note is not in trash") are answers the
+        caller needs to read, not transport failures, so they come back as a
+        result rather than an exception.
+        """
+        params: dict = {}
+        self._set_workspace(params, workspace)
+        response = self.client.delete(
+            f"/trash/{note_id}",
+            params=params,
+            headers=self._headers_for_user(user_id),
+        )
+        if response.status_code in (400, 404):
+            try:
+                body = response.json()
+            except ValueError:
+                body = {}
+            return {
+                "success": False,
+                "status": response.status_code,
+                "error": body.get("error") or f"HTTP {response.status_code}",
+            }
+        response.raise_for_status()
+        data = response.json()
+        return {
+            "success": data.get("success", False),
+            "message": data.get("message", ""),
+        }
+
     def restore_note(self, note_id: int, user_id: str | int | None = None) -> bool:
         """Restore a note from trash"""
         response = self.client.post(f"/notes/{note_id}/restore", headers=self._headers_for_user(user_id))
@@ -563,23 +599,32 @@ class PoznoteClient:
         data = response.json()
         return data.get("success", False)
 
+    @staticmethod
+    def _unwrap_share(data: dict) -> dict | None:
+        """Pull the share fields out of a share endpoint response.
+
+        ShareController and FolderShareController echo the share fields at the
+        top level ('public', 'url', 'indexable', ...), with no enclosing
+        'share' key. Returns None when the response says the item is not
+        shared, so callers can tell "no share" from "a share".
+        """
+        if not data.get("success"):
+            return None
+        if not data.get("public"):
+            return None
+        return {k: v for k, v in data.items() if k != "success"}
+
     def get_note_share_status(self, note_id: int, user_id: str | int | None = None) -> dict | None:
         """Get public sharing status for a note"""
         response = self.client.get(f"/notes/{note_id}/share", headers=self._headers_for_user(user_id))
         response.raise_for_status()
-        data = response.json()
-        if data.get("success"):
-            return data.get("share")
-        return None
+        return self._unwrap_share(response.json())
 
     def create_note_share(self, note_id: int, user_id: str | int | None = None) -> dict | None:
         """Enable public sharing for a note and return the link"""
         response = self.client.post(f"/notes/{note_id}/share", headers=self._headers_for_user(user_id))
         response.raise_for_status()
-        data = response.json()
-        if data.get("success"):
-            return data.get("share")
-        return None
+        return self._unwrap_share(response.json())
 
     def delete_note_share(self, note_id: int, user_id: str | int | None = None) -> bool:
         """Disable public sharing for a note"""
@@ -591,11 +636,10 @@ class PoznoteClient:
     def get_folder_share_status(self, folder_id: int, user_id: str | int | None = None) -> dict | None:
         """Get public sharing status for a folder"""
         response = self.client.get(f"/folders/{folder_id}/share", headers=self._headers_for_user(user_id))
+        # A missing folder raises rather than returning None: None already
+        # means "this folder exists and is not shared".
         response.raise_for_status()
-        data = response.json()
-        if data.get("success"):
-            return data.get("share")
-        return None
+        return self._unwrap_share(response.json())
 
     def get_git_status(self, user_id: str | int | None = None) -> dict | None:
         """Get Git synchronization status"""
@@ -849,6 +893,27 @@ class PoznoteClient:
         response.raise_for_status()
         return response.json().get("success", False)
 
+    def list_reminders(self, workspace: str | None = None, user_id: str | int | None = None) -> dict:
+        """List the reminder notifications that have already fired.
+
+        RemindersController::index filters on ``trigger_at <= now`` and
+        ``dismissed = 0`` with a hard ``LIMIT 50``: this is the notification
+        feed behind the UI bell, not a list of upcoming reminders. There is no
+        endpoint for future reminders.
+        """
+        params: dict = {}
+        self._set_workspace(params, workspace)
+        response = self.client.get("/reminders", params=params, headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return {
+                "notifications": data.get("notifications", []),
+                "unread_count": data.get("unread_count", 0),
+                "total_count": data.get("total_count", 0),
+            }
+        return {"notifications": [], "unread_count": 0, "total_count": 0}
+
     # ------------------------------------------------------------------
     # Tasks (inside a tasklist note)
     # ------------------------------------------------------------------
@@ -937,6 +1002,119 @@ class PoznoteClient:
             return False
         response.raise_for_status()
         return response.json().get("success", False)
+
+    def list_all_tasks(self, workspace: str | None = None, user_id: str | int | None = None) -> dict:
+        """Aggregate the tasks of every tasklist note, plus in-note checklists.
+
+        Returns the two families the API keeps apart:
+          * 'notes'      - tasklist notes, whose task ids are stable and can be
+                           passed to update_task / delete_task;
+          * 'checklists' - checkbox items found inside HTML/markdown notes,
+                           whose id is the item's position in the source, not
+                           an identifier. Those cannot be addressed per task.
+        """
+        params: dict = {}
+        self._set_workspace(params, workspace)
+        response = self.client.get("/tasks", params=params, headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return {
+                "notes": data.get("notes", []),
+                "checklists": data.get("checklists", []),
+            }
+        return {"notes": [], "checklists": []}
+
+    # ------------------------------------------------------------------
+    # Snapshots (note version history)
+    # ------------------------------------------------------------------
+
+    def list_snapshots(self, note_id: int, user_id: str | int | None = None) -> dict | None:
+        """List the snapshots kept for one note"""
+        response = self.client.get(f"/notes/{note_id}/snapshots", headers=self._headers_for_user(user_id))
+        if response.status_code == 404:
+            return None
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return {
+                "empty_new_note": data.get("empty_new_note", False),
+                "snapshots": data.get("snapshots", []),
+            }
+        return None
+
+    @staticmethod
+    def _snapshot_params(snapshot_key: str | None, date: str | None) -> dict:
+        """Build the snapshot selector.
+
+        SnapshotsController reads snapshot_key/date from $_GET, so these have
+        to travel as query parameters: sent as a JSON body they are ignored
+        and the controller silently falls back to today's date.
+        """
+        params: dict = {}
+        if snapshot_key:
+            params["snapshot_key"] = snapshot_key
+        if date:
+            params["date"] = date
+        return params
+
+    def get_snapshot(
+        self,
+        note_id: int,
+        snapshot_key: str | None = None,
+        date: str | None = None,
+        user_id: str | int | None = None,
+    ) -> dict | None:
+        """Read one snapshot of a note, content included.
+
+        Returns None when the note itself does not exist. A note with no
+        snapshot for the selector answers 200 with exists=False, which comes
+        back as {'exists': False, 'snapshot': None}.
+        """
+        response = self.client.get(
+            f"/notes/{note_id}/snapshot",
+            params=self._snapshot_params(snapshot_key, date),
+            headers=self._headers_for_user(user_id),
+        )
+        if response.status_code == 404:
+            return None
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return {
+                "exists": bool(data.get("exists")),
+                "snapshot": data.get("snapshot"),
+            }
+        return None
+
+    def restore_snapshot(
+        self,
+        note_id: int,
+        snapshot_key: str | None = None,
+        date: str | None = None,
+        user_id: str | int | None = None,
+    ) -> dict | None:
+        """Overwrite a note with the content of one of its snapshots.
+
+        A 404 means either the note or the selected snapshot is missing; the
+        API says which, so its wording is returned rather than an exception.
+        """
+        response = self.client.post(
+            f"/notes/{note_id}/snapshot/restore",
+            params=self._snapshot_params(snapshot_key, date),
+            headers=self._headers_for_user(user_id),
+        )
+        if response.status_code == 404:
+            try:
+                body = response.json()
+            except ValueError:
+                body = {}
+            return {"success": False, "error": body.get("error") or "Not found"}
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return {"success": True, "message": data.get("message", "")}
+        return {"success": False, "error": data.get("error") or "Restore failed"}
 
     def list_shared(self, workspace: str | None = None, user_id: str | int | None = None) -> dict:
         """List all shared notes and folders"""

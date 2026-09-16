@@ -704,6 +704,61 @@ function getMarkdownContentForNote(noteId) {
     return noteEntry.getAttribute('data-markdown-content') || '';
 }
 
+/**
+ * Replace the markdown source of the note on screen, whatever its view mode
+ * (js/live-refresh.js, after merging a change made outside this tab). The
+ * caret follows its line through the change when the editor has focus. The
+ * editor fires its input event, so the note is marked modified as if typed.
+ */
+function replaceMarkdownNoteContent(noteId, content) {
+    var noteEntry = document.getElementById('entry' + noteId);
+    if (!noteEntry || noteEntry.getAttribute('data-note-type') !== 'markdown') {
+        return false;
+    }
+
+    content = String(content || '');
+    var previous = getMarkdownContentForNote(noteId) || '';
+    var editorDiv = noteEntry.querySelector('.markdown-editor');
+    var previewDiv = noteEntry.querySelector('.markdown-preview');
+
+    if (editorDiv) {
+        var api = getMarkdownCodeMirrorApi();
+        var codeMirror = isCodeMirrorMarkdownEditor(editorDiv);
+        var focused = codeMirror
+            ? !!(api && typeof api.hasFocus === 'function' && api.hasFocus(editorDiv))
+            : !!(document.activeElement && editorDiv.contains(document.activeElement));
+        var selection = focused ? getSelectionOffsetsInTextElement(editorDiv) : null;
+        var start = 0;
+        var end = 0;
+        if (selection && typeof window.mapMarkdownOffsetAfterMerge === 'function') {
+            start = window.mapMarkdownOffsetAfterMerge(previous, content, selection.start);
+            end = window.mapMarkdownOffsetAfterMerge(previous, content, selection.end);
+        }
+
+        if (codeMirror) {
+            setCodeMirrorMarkdownContent(editorDiv, content, { preserveSelection: true });
+            if (selection && api && typeof api.setSelection === 'function') {
+                api.setSelection(editorDiv, start, end);
+            }
+        } else if (selection) {
+            updateMarkdownEditorContent(editorDiv, noteEntry, noteId, content, start, end);
+        } else {
+            renderMarkdownEditorContent(editorDiv, content);
+            editorDiv.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+
+    noteEntry.setAttribute('data-markdown-content', content);
+
+    // Preview or split mode: the rendered side does not follow the editor by
+    // itself (split mode only re-renders on a debounce after typing).
+    if (previewDiv && window.getComputedStyle(previewDiv).display !== 'none') {
+        renderMarkdownPreview(previewDiv, content, noteId);
+    }
+
+    return true;
+}
+
 // Listen to input events in markdown editor to mark note as edited
 function setupMarkdownEditorListeners(noteId) {
     var noteEntry = document.getElementById('entry' + noteId);
@@ -949,6 +1004,7 @@ window.switchToSplitMode = switchToSplitMode;
 window.exitSplitMode = exitSplitMode;
 window.getMarkdownContent = getMarkdownContent;
 window.getMarkdownContentForNote = getMarkdownContentForNote;
+window.replaceMarkdownNoteContent = replaceMarkdownNoteContent;
 window.renderMarkdownPreview = renderMarkdownPreview;
 window.setupMarkdownEditorListeners = setupMarkdownEditorListeners;
 window.updateViewModeButton = updateViewModeButton;

@@ -67,7 +67,9 @@ Ein im Browser geöffneter Poznote-Tab übernimmt die über MCP vorgenommenen Ä
 - `get_reminder`: Die aktuell für eine Notiz gesetzte Erinnerung abrufen
 - `set_reminder`: Die Erinnerung einer Notiz setzen oder ersetzen, optional mit Wiederholungsintervall
 - `remove_reminder`: Die Erinnerung von einer Notiz entfernen
+- `list_reminders`: Erinnerungs-Benachrichtigungen auflisten, die bereits ausgelöst wurden und noch offen sind (der Glocken-Feed der Oberfläche); kommende Erinnerungen lassen sich nicht auflisten
 - `list_tasks`: Die Aufgaben einer Aufgabenlisten-Notiz mit ihren IDs, Fälligkeitsdaten und Markierungen auflisten
+- `list_all_tasks`: Die offenen Aufgaben aller Notizen eines Arbeitsbereichs auflisten, die dringendsten zuerst, mit Filtern (Fälligkeit, Wichtigkeit, erledigte Aufgaben, Kontrollkästchen in Notizen)
 - `add_task`: Eine einzelne Aufgabe zu einer Aufgabenlisten-Notiz hinzufügen, optional mit Fälligkeitsdatum und Erinnerung
 - `update_task`: Eine Aufgabe aktualisieren (Text, Fälligkeitsdatum, Erinnerung, Markierung als wichtig)
 - `complete_task`: Eine Aufgabe als erledigt markieren oder wieder öffnen
@@ -79,7 +81,11 @@ Ein im Browser geöffneter Poznote-Tab übernimmt die über MCP vorgenommenen Ä
 - `list_templates`: Die Vorlagennotizen auflisten, von denen `from_template_id` bei `create_note` ausgehen kann
 - `get_trash`: Alle Notizen auflisten, die sich derzeit im Papierkorb befinden
 - `empty_trash`: Alle Notizen im Papierkorb endgültig löschen
+- `delete_trash_note`: Eine einzelne Notiz endgültig aus dem Papierkorb löschen, statt den ganzen Papierkorb zu leeren
 - `restore_note`: Eine Notiz aus dem Papierkorb wiederherstellen
+- `list_snapshots`: Die gespeicherten früheren Versionen einer Notiz auflisten, einschließlich des Sicherungs-Snapshots vor jeder Überschreibung durch die KI oder MCP
+- `get_snapshot`: Den Inhalt einer früheren Version einer Notiz lesen, ohne die Notiz zu verändern
+- `restore_snapshot`: Eine Notiz auf einen ihrer Snapshots zurücksetzen (ein `snapshot_key` oder ein `date` ist erforderlich)
 - `duplicate_note`: Ein Duplikat einer bestehenden Notiz erstellen
 - `toggle_favorite`: Den Favoritenstatus einer Notiz umschalten
 - `list_attachments`: Alle Anhänge einer bestimmten Notiz auflisten
@@ -91,6 +97,7 @@ Ein im Browser geöffneter Poznote-Tab übernimmt die über MCP vorgenommenen Ä
 - `share_note`: Die öffentliche Freigabe einer Notiz aktivieren und die öffentliche URL abrufen
 - `unshare_note`: Die öffentliche Freigabe einer Notiz deaktivieren
 - `get_note_share_status`: Den aktuellen Freigabestatus und die öffentliche URL einer Notiz abrufen
+- `get_folder_share_status`: Den aktuellen Freigabestatus und die öffentliche URL eines Ordners abrufen
 - `list_shared`: Alle öffentlich freigegebenen Notizen und Ordner auflisten
 - `get_backlinks`: Alle Notizen abrufen, die auf eine bestimmte Notiz verlinken (auf sie verweisen)
 - `convert_note`: Eine Notiz zwischen den Formaten HTML und Markdown konvertieren
@@ -125,6 +132,10 @@ Ein im Browser geöffneter Poznote-Tab übernimmt die über MCP vorgenommenen Ä
 **Erinnerungen und Aufgaben.** `reminder_at` (bei `create_note`/`update_note` und `set_reminder`) ist ein ISO-Zeitstempel wie `2026-09-01T09:00:00+02:00`; geben Sie einen Offset an, sonst wird die Zeit als UTC interpretiert. Fälligkeitsdaten von Aufgaben (`due_at`) funktionieren anders: Es sind lokale Uhrzeitwerte, `YYYY-MM-DD` oder `YYYY-MM-DDTHH:MM` ohne Offset, die über die konfigurierte Zeitzone des Benutzers aufgelöst werden, und ein Datum ohne Uhrzeit erinnert um 09:00 Uhr. Wiederholungsintervalle haben die Form `<count><unit>` mit der Einheit `i`/`h`/`d`/`w`/`m`/`y`, zum Beispiel `30i`, `1d` oder `2w`.
 
 Die Aufgaben-Tools bearbeiten jeweils eine Aufgabe: Rufen Sie `list_tasks` auf, um die Aufgaben-IDs zu erhalten, und dann `add_task`, `update_task`, `complete_task` oder `delete_task`. Jeder Aufruf überträgt nur diese eine Aufgabe, sodass ein Client nie eine Aufgabenliste einliest und ein komplett neues Array zurückschickt, und zwei Aufrufer, die verschiedene Aufgaben bearbeiten, können sich nicht gegenseitig überschreiben. Poznote speichert die Aufgaben einer Notiz als ein einziges JSON-Array, das der Server bei jedem Aufruf neu schreibt; der Aufwand eines Aufrufs wächst also trotzdem mit der Länge der Liste. Benachrichtigungen bleiben automatisch synchron, und das Erledigen oder Löschen einer Aufgabe entfernt ihre ausstehende Erinnerung.
+
+**Versionsverlauf und Rückgängigmachen.** Poznote erstellt einen Sicherungs-Snapshot einer Notiz, unmittelbar bevor der KI-Assistent oder der MCP-Server sie überschreibt, sodass ein missglücktes `update_note` rückgängig gemacht werden kann. `list_snapshots` zeigt die für eine Notiz aufbewahrten Snapshots, jeweils mit einem `origin`, das diese Sicherungskopien kennzeichnet; `get_snapshot` liest einen davon, ohne die Notiz anzurühren, und `restore_snapshot` setzt dessen Inhalt wieder ein. `restore_snapshot` überschreibt den aktuellen Inhalt und verlangt deshalb einen `snapshot_key` oder ein `date`, statt auf den Snapshot des heutigen Tages zurückzufallen.
+
+**Übergreifende Ansichten.** `list_all_tasks` beantwortet die Frage, was noch zu tun ist, für einen ganzen Arbeitsbereich, während `list_tasks` nur eine Notiz abdeckt. Es liefert zwei Arten von Einträgen, unterschieden durch `source`: Aufgaben einer Aufgabenlisten-Notiz, deren IDs mit `update_task` und `delete_task` funktionieren, und Kontrollkästchen in gewöhnlichen Notizen, deren ID nur eine Position in der Notiz ist und sich so nicht ansprechen lässt. `list_reminders` liefert die bereits ausgelösten und nicht verworfenen Benachrichtigungen, von der API auf 50 begrenzt. Es ist keine Vorschau auf Kommendes: Poznote hat keinen Endpunkt für künftige Erinnerungen, die Notiz für Notiz mit `get_reminder` gelesen werden.
 
 Die meisten Tools akzeptieren ein optionales Argument `user_id`, um ein bestimmtes Benutzerprofil anzusprechen. Wird es angegeben, sendet der MCP-Server für diese Anfrage den Header `X-User-ID`, sodass Sie Notizen in verschiedenen Profilen erstellen oder lesen können, ohne die globale MCP-Umgebung zu ändern. Ausgenommen sind die Tools auf Systemebene `get_system_info`, `list_backups`, `create_backup` und `delete_backup`, die kein `user_id` entgegennehmen. Wie Sie das Standardprofil ändern, das ohne `user_id` verwendet wird, lesen Sie unter [Standard-Benutzerprofil](#standard-benutzerprofil).
 

@@ -67,7 +67,9 @@ Una pestaña de Poznote abierta en el navegador recoge en pocos segundos los cam
 - `get_reminder`: obtiene el recordatorio definido actualmente en una nota
 - `set_reminder`: define o sustituye el recordatorio de una nota, con un intervalo de repetición opcional
 - `remove_reminder`: quita el recordatorio de una nota
+- `list_reminders`: lista las notificaciones de recordatorio que ya se activaron y siguen pendientes (el hilo de la campana de la interfaz); los recordatorios futuros no se pueden listar
 - `list_tasks`: lista las tareas de una nota de lista de tareas, con sus ID, fechas de vencimiento e indicadores
+- `list_all_tasks`: lista las tareas pendientes de todas las notas de un espacio de trabajo, las más urgentes primero, con filtros (vencimiento, importancia, tareas completadas, casillas dentro de las notas)
 - `add_task`: añade una única tarea a una nota de lista de tareas, con fecha de vencimiento y recordatorio opcionales
 - `update_task`: actualiza una tarea (texto, fecha de vencimiento, recordatorio, indicador de importante)
 - `complete_task`: marca una tarea como hecha, o la vuelve a abrir
@@ -79,7 +81,11 @@ Una pestaña de Poznote abierta en el navegador recoge en pocos segundos los cam
 - `list_templates`: lista las notas plantilla a partir de las que puede empezar `from_template_id` de `create_note`
 - `get_trash`: lista todas las notas que están en la papelera
 - `empty_trash`: elimina definitivamente todas las notas de la papelera
+- `delete_trash_note`: elimina definitivamente una sola nota de la papelera, en lugar de vaciarla entera
 - `restore_note`: restaura una nota desde la papelera
+- `list_snapshots`: lista las versiones anteriores guardadas de una nota, incluida la instantánea de seguridad tomada antes de cada reescritura por la IA o por MCP
+- `get_snapshot`: lee el contenido de una versión anterior de una nota, sin modificar la nota
+- `restore_snapshot`: devuelve una nota al estado de una de sus instantáneas (se exige un `snapshot_key` o una `date`)
 - `duplicate_note`: crea un duplicado de una nota existente
 - `toggle_favorite`: activa o desactiva el estado de favorita de una nota
 - `list_attachments`: lista todos los archivos adjuntos de una nota concreta
@@ -91,6 +97,7 @@ Una pestaña de Poznote abierta en el navegador recoge en pocos segundos los cam
 - `share_note`: activa el uso compartido público de una nota y obtiene la URL pública
 - `unshare_note`: desactiva el uso compartido público de una nota
 - `get_note_share_status`: obtiene el estado actual de uso compartido y la URL pública de una nota
+- `get_folder_share_status`: obtiene el estado actual de uso compartido y la URL pública de una carpeta
 - `list_shared`: lista todas las notas y carpetas compartidas públicamente
 - `get_backlinks`: obtiene todas las notas que enlazan a (hacen referencia a) una nota concreta
 - `convert_note`: convierte una nota entre los formatos HTML y Markdown
@@ -125,6 +132,10 @@ Una pestaña de Poznote abierta en el navegador recoge en pocos segundos los cam
 **Recordatorios y tareas.** `reminder_at` (en `create_note`/`update_note` y `set_reminder`) es una fecha y hora ISO como `2026-09-01T09:00:00+02:00`; incluye un desfase horario, o la hora se interpreta como UTC. Las fechas de vencimiento de las tareas (`due_at`) son distintas: son valores de hora local, `YYYY-MM-DD` o `YYYY-MM-DDTHH:MM` sin desfase, que se resuelven según la zona horaria configurada por el usuario, y una fecha sin hora avisa a las 09:00. Los intervalos de repetición usan `<count><unit>` con la unidad `i`/`h`/`d`/`w`/`m`/`y`, por ejemplo `30i`, `1d` o `2w`.
 
 Las herramientas de tareas trabajan con una tarea cada vez: llama a `list_tasks` para obtener los ID de las tareas y después a `add_task`, `update_task`, `complete_task` o `delete_task`. Cada llamada solo lleva esa tarea, de modo que un cliente nunca lee una lista de tareas para devolver un array completo nuevo, y dos clientes que editan tareas distintas no pueden sobrescribirse entre sí. Poznote guarda las tareas de una nota como un único array JSON, que el servidor reescribe en cada llamada, así que el trabajo que hace una llamada sigue creciendo con la longitud de la lista. Las notificaciones se mantienen sincronizadas automáticamente, y completar o eliminar una tarea retira su recordatorio pendiente.
+
+**Historial de versiones y deshacer.** Poznote toma una instantánea de seguridad de una nota justo antes de que el asistente de IA o el servidor MCP la reescriba, de modo que un `update_note` desafortunado se puede deshacer. `list_snapshots` muestra las instantáneas conservadas de una nota, cada una con un `origin` que identifica esas copias de seguridad; `get_snapshot` lee una sin tocar la nota, y `restore_snapshot` vuelve a colocar su contenido. `restore_snapshot` sobrescribe el contenido actual, así que exige un `snapshot_key` o una `date` en lugar de recurrir a la instantánea del día.
+
+**Vistas transversales.** `list_all_tasks` responde a qué queda por hacer en todo un espacio de trabajo, mientras que `list_tasks` solo cubre una nota. Devuelve dos tipos de elementos, distinguidos por `source`: tareas de una nota de lista de tareas, cuyos ID funcionan con `update_task` y `delete_task`, y casillas escritas dentro de notas normales, cuyo ID es solo una posición en la nota y no se puede usar así. `list_reminders` devuelve las notificaciones ya activadas y no descartadas, limitadas a 50 por la API. No es una vista de lo que viene: Poznote no tiene ningún punto de acceso para los recordatorios futuros, que se leen nota por nota con `get_reminder`.
 
 La mayoría de las herramientas aceptan un argumento opcional `user_id` para dirigirse a un perfil de usuario concreto. Cuando se indica, el servidor MCP envía la cabecera `X-User-ID` en esa petición, lo que te permite crear o leer notas en distintos perfiles sin cambiar el entorno MCP global. Las excepciones son las herramientas de nivel de sistema `get_system_info`, `list_backups`, `create_backup` y `delete_backup`, que no aceptan `user_id`. Para cambiar el perfil por defecto que se usa cuando no se pasa ningún `user_id`, consulta [Perfil de usuario por defecto](#perfil-de-usuario-por-defecto).
 

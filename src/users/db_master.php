@@ -594,7 +594,12 @@ function getNoteEditLock(int $targetUserId, int $noteId): ?array {
     }
 }
 
-function acquireNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUserId, string $holderSessionId, int $ttlSeconds = 90, string $holderKind = 'user'): array {
+/**
+ * With $takeover, a lock held by someone else is replaced instead of refused:
+ * the previous holder's next heartbeat fails and their editor turns read-only
+ * (js/note-edit-lock.js), their unsaved edits staying in their local draft.
+ */
+function acquireNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUserId, string $holderSessionId, int $ttlSeconds = 90, string $holderKind = 'user', bool $takeover = false): array {
     if ($targetUserId <= 0 || $noteId <= 0 || $holderLoginUserId <= 0) {
         return ['success' => false, 'error' => 'Invalid note edit lock parameters'];
     }
@@ -664,6 +669,18 @@ function acquireNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUse
             $con->commit();
 
             return ['success' => true, 'lock' => getNoteEditLock($targetUserId, $noteId)];
+        }
+
+        if ($takeover) {
+            $update = $con->prepare("
+                UPDATE note_edit_locks
+                SET holder_login_user_id = ?, holder_session_id = ?, holder_kind = ?, created_at = ?, last_seen_at = ?, expires_at = ?
+                WHERE target_user_id = ? AND note_id = ?
+            ");
+            $update->execute([$holderLoginUserId, $holderSessionId, $holderKind, $now, $now, $expiresAt, $targetUserId, $noteId]);
+            $con->commit();
+
+            return ['success' => true, 'taken_over' => true, 'lock' => getNoteEditLock($targetUserId, $noteId)];
         }
 
         $con->rollBack();

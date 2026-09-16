@@ -67,7 +67,9 @@ Uma aba do Poznote aberta no navegador recebe as alterações feitas via MCP em 
 - `get_reminder`: obtém o lembrete atualmente definido em uma nota
 - `set_reminder`: define ou substitui o lembrete de uma nota, com um intervalo de repetição opcional
 - `remove_reminder`: remove o lembrete de uma nota
+- `list_reminders`: lista as notificações de lembrete que já dispararam e continuam pendentes (o fluxo do sino da interface); lembretes futuros não podem ser listados
 - `list_tasks`: lista as tarefas de uma nota do tipo lista de tarefas, com seus IDs, prazos e marcadores
+- `list_all_tasks`: lista as tarefas pendentes de todas as notas de um espaço de trabalho, as mais urgentes primeiro, com filtros (prazo, importância, tarefas concluídas, caixas de seleção dentro das notas)
 - `add_task`: adiciona uma única tarefa a uma nota do tipo lista de tarefas, com prazo e lembrete opcionais
 - `update_task`: atualiza uma tarefa (texto, prazo, lembrete, marcador de importante)
 - `complete_task`: marca uma tarefa como concluída ou a reabre
@@ -79,7 +81,11 @@ Uma aba do Poznote aberta no navegador recebe as alterações feitas via MCP em 
 - `list_templates`: lista as notas modelo que podem servir de ponto de partida para o `from_template_id` de `create_note`
 - `get_trash`: lista todas as notas que estão na lixeira
 - `empty_trash`: exclui definitivamente todas as notas da lixeira
+- `delete_trash_note`: exclui definitivamente uma única nota da lixeira, em vez de esvaziar a lixeira inteira
 - `restore_note`: restaura uma nota da lixeira
+- `list_snapshots`: lista as versões anteriores salvas de uma nota, incluindo o instantâneo de segurança feito antes de cada reescrita pela IA ou pelo MCP
+- `get_snapshot`: lê o conteúdo de uma versão anterior de uma nota, sem alterar a nota
+- `restore_snapshot`: restaura uma nota ao estado de um de seus instantâneos (um `snapshot_key` ou uma `date` é obrigatório)
 - `duplicate_note`: cria uma cópia de uma nota existente
 - `toggle_favorite`: alterna o status de favorito de uma nota
 - `list_attachments`: lista todos os anexos de uma nota específica
@@ -91,6 +97,7 @@ Uma aba do Poznote aberta no navegador recebe as alterações feitas via MCP em 
 - `share_note`: ativa o compartilhamento público de uma nota e obtém a URL pública
 - `unshare_note`: desativa o compartilhamento público de uma nota
 - `get_note_share_status`: obtém o status atual de compartilhamento e a URL pública de uma nota
+- `get_folder_share_status`: obtém o status atual de compartilhamento e a URL pública de uma pasta
 - `list_shared`: lista todas as notas e pastas compartilhadas publicamente
 - `get_backlinks`: obtém todas as notas que apontam para (fazem referência a) uma nota específica
 - `convert_note`: converte uma nota entre os formatos HTML e Markdown
@@ -125,6 +132,10 @@ Uma aba do Poznote aberta no navegador recebe as alterações feitas via MCP em 
 **Lembretes e tarefas.** `reminder_at` (em `create_note`/`update_note` e `set_reminder`) é uma data e hora ISO, como `2026-09-01T09:00:00+02:00`; inclua um offset, senão o horário é interpretado como UTC. Os prazos das tarefas (`due_at`) são diferentes: são valores de horário local, `YYYY-MM-DD` ou `YYYY-MM-DDTHH:MM` sem offset, interpretados no fuso horário configurado pelo usuário, e uma data sem hora gera o lembrete às 09:00. Os intervalos de repetição usam `<count><unit>`, com a unidade `i`/`h`/`d`/`w`/`m`/`y`, por exemplo `30i`, `1d` ou `2w`.
 
 As ferramentas de tarefas tratam de uma tarefa por vez: chame `list_tasks` para obter os IDs das tarefas e depois `add_task`, `update_task`, `complete_task` ou `delete_task`. Cada chamada leva apenas aquela tarefa, então um cliente nunca lê uma lista de tarefas para devolver um array inteiro novo, e dois chamadores editando tarefas diferentes não conseguem sobrescrever o trabalho um do outro. O Poznote armazena as tarefas de uma nota como um único array JSON, que o servidor reescreve a cada chamada, então o trabalho feito por uma chamada ainda cresce com o tamanho da lista. As notificações ficam sincronizadas automaticamente, e concluir ou excluir uma tarefa cancela o lembrete pendente dela.
+
+**Histórico de versões e desfazer.** O Poznote faz um instantâneo de segurança de uma nota logo antes de o assistente de IA ou o servidor MCP reescrevê-la, de modo que um `update_note` infeliz pode ser desfeito. `list_snapshots` mostra os instantâneos guardados de uma nota, cada um com um `origin` que identifica essas cópias de segurança; `get_snapshot` lê um deles sem tocar na nota, e `restore_snapshot` recoloca o conteúdo. `restore_snapshot` sobrescreve o conteúdo atual, por isso exige um `snapshot_key` ou uma `date` em vez de recorrer ao instantâneo do dia.
+
+**Visões transversais.** `list_all_tasks` responde ao que ainda falta fazer em todo um espaço de trabalho, enquanto `list_tasks` cobre apenas uma nota. Ele devolve dois tipos de item, distinguidos por `source`: tarefas de uma nota do tipo lista de tarefas, cujos IDs funcionam com `update_task` e `delete_task`, e caixas de seleção escritas dentro de notas comuns, cujo ID é apenas uma posição na nota e não pode ser usado assim. `list_reminders` devolve as notificações já disparadas e não descartadas, limitadas a 50 pela API. Não é uma visão do que está por vir: o Poznote não tem nenhum endpoint para lembretes futuros, que são lidos nota a nota com `get_reminder`.
 
 A maioria das ferramentas aceita um argumento opcional `user_id` para direcionar a chamada a um perfil de usuário específico. Quando ele é informado, o servidor MCP envia o cabeçalho `X-User-ID` nessa requisição, o que permite criar ou ler notas em perfis diferentes sem alterar o ambiente MCP global. As exceções são as ferramentas de nível de sistema `get_system_info`, `list_backups`, `create_backup` e `delete_backup`, que não aceitam `user_id`. Para mudar o perfil padrão usado quando nenhum `user_id` é passado, veja [Perfil de usuário padrão](#perfil-de-usuário-padrão).
 

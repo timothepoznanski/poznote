@@ -67,7 +67,9 @@ MCP 服务器充当 AI 助手与您的 Poznote 实例之间的桥梁。
 - `get_reminder`：获取笔记当前设置的提醒
 - `set_reminder`：设置或替换笔记的提醒，可选重复间隔
 - `remove_reminder`：移除笔记的提醒
+- `list_reminders`：列出已经触发且尚未忽略的提醒通知（界面上铃铛的消息流）；即将到来的提醒无法列出
 - `list_tasks`：列出任务列表笔记中的任务，包括 ID、截止日期和标记
+- `list_all_tasks`：列出工作区内所有笔记的待办任务，最紧急的排在前面，并支持筛选（截止日期、重要性、已完成任务、笔记内的复选框）
 - `add_task`：向任务列表笔记添加单个任务，可选截止日期和提醒
 - `update_task`：更新单个任务（文本、截止日期、提醒、重要标记）
 - `complete_task`：将任务标记为已完成，或重新打开
@@ -79,7 +81,11 @@ MCP 服务器充当 AI 助手与您的 Poznote 实例之间的桥梁。
 - `list_templates`：列出可供 `create_note` 的 `from_template_id` 使用的模板笔记
 - `get_trash`：列出当前回收站中的所有笔记
 - `empty_trash`：永久删除回收站中的所有笔记
+- `delete_trash_note`：从回收站中永久删除单条笔记，而不是清空整个回收站
 - `restore_note`：从回收站恢复笔记
+- `list_snapshots`：列出笔记已保存的历史版本，包括每次 AI 或 MCP 改写前所做的安全快照
+- `get_snapshot`：读取笔记某个历史版本的内容，不会改动笔记本身
+- `restore_snapshot`：将笔记回滚到它的某个快照（必须提供 `snapshot_key` 或 `date`）
 - `duplicate_note`：创建现有笔记的副本
 - `toggle_favorite`：切换笔记的收藏状态
 - `list_attachments`：列出指定笔记的所有附件
@@ -91,6 +97,7 @@ MCP 服务器充当 AI 助手与您的 Poznote 实例之间的桥梁。
 - `share_note`：为笔记启用公开分享并获取公开 URL
 - `unshare_note`：禁用笔记的公开分享
 - `get_note_share_status`：获取笔记当前的分享状态和公开 URL
+- `get_folder_share_status`：获取文件夹当前的分享状态和公开 URL
 - `list_shared`：列出所有公开分享的笔记和文件夹
 - `get_backlinks`：获取所有链接到（引用）指定笔记的笔记
 - `convert_note`：在 HTML 和 Markdown 格式之间转换笔记
@@ -125,6 +132,10 @@ MCP 服务器充当 AI 助手与您的 Poznote 实例之间的桥梁。
 **提醒与任务。** `reminder_at`（用于 `create_note`/`update_note` 和 `set_reminder`）是 ISO 日期时间，例如 `2026-09-01T09:00:00+02:00`；请包含时区偏移，否则时间会按 UTC 解析。任务截止日期（`due_at`）则不同：它们是本地挂钟时间，格式为 `YYYY-MM-DD` 或 `YYYY-MM-DDTHH:MM`，不带偏移，按用户配置的时区解析；只有日期没有时间时，会在 09:00 提醒。重复间隔使用 `<count><unit>` 格式，单位为 `i`/`h`/`d`/`w`/`m`/`y`，例如 `30i`、`1d` 或 `2w`。
 
 任务工具一次只处理一个任务：先调用 `list_tasks` 获取任务 ID，再调用 `add_task`、`update_task`、`complete_task` 或 `delete_task`。每次调用只携带该任务，因此客户端永远不需要读取整个任务列表再发回一个全新的数组，两个调用方编辑不同任务时也不会互相覆盖。Poznote 将笔记的任务存储为一个 JSON 数组，服务器每次调用都会重写它，因此单次调用的工作量仍会随列表长度增长。通知会自动保持同步，完成或删除任务时会撤销其待发送的提醒。
+
+**版本历史与撤销。** 在 AI 助手或 MCP 服务器改写笔记之前，Poznote 会先为该笔记创建一个安全快照，因此一次失误的 `update_note` 是可以撤销的。`list_snapshots` 列出为某条笔记保留的快照，每个快照都带有标识这类安全副本的 `origin`；`get_snapshot` 在不改动笔记的情况下读取其中一个，`restore_snapshot` 则把它的内容写回去。`restore_snapshot` 会覆盖当前内容，因此必须提供 `snapshot_key` 或 `date`，而不会退回到当天的快照。
+
+**跨笔记视图。** `list_all_tasks` 回答整个工作区“还有什么要做”，而 `list_tasks` 只覆盖单条笔记。它返回两类条目，通过 `source` 区分：任务列表笔记中的任务，其 ID 可配合 `update_task` 和 `delete_task` 使用；以及写在普通笔记里的复选框，其 ID 只是笔记中的位置，无法这样使用。`list_reminders` 返回已经触发且未被忽略的通知，API 最多返回 50 条。它并不是未来事项的视图：Poznote 没有列出未来提醒的接口，这些提醒需要用 `get_reminder` 逐条笔记读取。
 
 大多数工具接受可选的 `user_id` 参数，用于指定特定的用户资料。提供该参数时，MCP 服务器会为该请求发送 `X-User-ID` 标头，让您无需更改全局 MCP 环境即可在不同用户资料之间创建或读取笔记。例外的是系统级工具 `get_system_info`、`list_backups`、`create_backup` 和 `delete_backup`，它们不接受 `user_id`。要更改未传入 `user_id` 时使用的默认用户资料，请参阅[默认用户资料](#默认用户资料)。
 
