@@ -334,6 +334,7 @@
 
 .other-account-toggle,
 .other-account-open,
+.other-account-folders,
 .other-account-row {
     border: none;
     background: transparent;
@@ -357,12 +358,19 @@
     font-weight: var(--pz-weight-semibold);
 }
 
-.other-account-open {
+.other-account-open,
+.other-account-folders {
     flex: 0 0 auto;
     display: flex;
     align-items: center;
     padding: 6px 8px;
     color: var(--pz-text-muted);
+}
+
+/* Like the active row's button, it goes with the tree when the account is
+   folded. */
+.other-account:not(.other-account-expanded) .other-account-folders {
+    display: none;
 }
 
 /* The card already carries the surface tint, so hovers use the accent wash
@@ -371,6 +379,8 @@
 .other-account-toggle:focus-visible,
 .other-account-open:hover,
 .other-account-open:focus-visible,
+.other-account-folders:hover,
+.other-account-folders:focus-visible,
 .other-account-row:hover,
 .other-account-row:focus-visible {
     background: rgba(var(--pz-accent-rgb), 0.08);
@@ -378,7 +388,9 @@
 }
 
 .other-account-open:hover,
-.other-account-open:focus-visible {
+.other-account-open:focus-visible,
+.other-account-folders:hover,
+.other-account-folders:focus-visible {
     color: var(--pz-accent);
 }
 
@@ -392,29 +404,27 @@
 
 .other-account-toggle .lucide,
 .other-account-open .lucide,
-.other-account-row .lucide {
+.other-account-folders .lucide {
     width: 14px;
     height: 14px;
     flex: 0 0 auto;
     color: var(--pz-text-muted);
 }
 
-/* The active account heads the list and carries its own marks: accent icon,
-   full-weight name and the "Active" pill. The others step back: muted icon and name,
-   regular weight, back to the text colour once unfolded. */
-.current-account-header .other-account-toggle .lucide-user {
-    color: var(--pz-accent);
+/* Tree rows take the main tree's glyph size: 1em of the sidebar font, like
+   .folder-icon and .note-icon, so both trees follow the sidebar font size
+   preference the same way. */
+.other-account-row .lucide {
+    width: 1em;
+    height: 1em;
+    flex: 0 0 auto;
+    color: var(--pz-text-muted);
 }
 
-.account-active-badge {
-    flex: 0 0 auto;
-    padding: 1px 6px;
-    border-radius: var(--pz-radius-pill);
-    font-size: 10px;
-    font-weight: var(--pz-weight-semibold);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    background: rgba(var(--pz-accent-rgb), 0.14);
+/* The active account heads the list and carries its own marks: accent icon
+   and full-weight name. The others step back: muted icon and name,
+   regular weight, back to the text colour once unfolded. */
+.current-account-header .other-account-toggle .lucide-circle-user {
     color: var(--pz-accent);
 }
 
@@ -435,23 +445,40 @@
     transform: rotate(90deg);
 }
 
-/* 16px + the rows' own 10px puts their icons under the account icon
+/* 20px + the rows' own 6px puts their icons under the account icon
    (6px + 14px chevron + 6px gap). */
 .other-account-tree {
-    padding: 2px 0 4px 16px;
+    padding: 0 0 4px 20px;
 }
 
+/* Row metrics copied from the main tree so an unfolded account reads at the
+   same density as the active one: note rows are a.links_arbo_left (3px
+   padding, 1.2 line height, 4px above, 5px from icon to title, medium
+   weight, css/toolbar.css and sidebar.css), folder rows .folder-toggle (6px
+   above and 4px below, 2px gap + 8px icon margin, css/drag-drop.css). */
 .other-account-row {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     width: 100%;
-    padding: 5px 10px;
+    margin-top: 4px;
+    padding: 3px 6px;
+    line-height: 1.2;
     text-align: left;
 }
 
+.other-account-row-note {
+    font-weight: var(--pz-weight-medium);
+}
+
 .other-account-row-folder {
+    gap: 10px;
+    margin: 6px 0 4px;
     font-weight: var(--pz-weight-semibold);
+}
+
+.other-account-folder > .other-account-children {
+    margin-bottom: 5px;
 }
 
 /* Note rows in other-account trees remain simple buttons without a read-only

@@ -183,12 +183,14 @@ $expandFoldersButton = $expandFoldersButton ?? '';
 // Collapsible rows of the accounts that are not the active one, listed under
 // its tree: the active account always heads the list. js/other-accounts.js
 // fetches a row's outline from account_tree.php on first expansion. Clicking a note there switches to that
-// account and opens it; the arrow switches without choosing a note.
+// account and opens it; the arrow switches without choosing a note. The button
+// before the arrow expands or collapses every folder of that outline.
 $renderOtherAccounts = static function (array $profiles): void {
     if (empty($profiles)) {
         return;
     }
     $openLabel = t_h('sidebar.other_accounts.open', [], 'Open this account');
+    $expandFoldersLabel = t_h('sidebar.expand_all_folders', [], 'Expand all folders');
     echo '<div class="other-accounts" data-endpoint="account_tree.php">';
     foreach ($profiles as $profile) {
         $name = htmlspecialchars((string)($profile['username'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
@@ -196,8 +198,11 @@ $renderOtherAccounts = static function (array $profiles): void {
             . '<div class="other-account-header">'
             . '<button type="button" class="other-account-toggle" data-other-account="toggle" aria-expanded="false" title="' . $name . '">'
             . '<i class="lucide lucide-chevron-right other-account-chevron" aria-hidden="true"></i>'
-            . '<i class="lucide lucide-user" aria-hidden="true"></i>'
+            . '<i class="lucide lucide-circle-user" aria-hidden="true"></i>'
             . '<span class="other-account-name">' . $name . '</span>'
+            . '</button>'
+            . '<button type="button" class="other-account-folders" data-other-account="folders" title="' . $expandFoldersLabel . '" aria-label="' . $expandFoldersLabel . '">'
+            . '<i class="lucide lucide-chevrons-up-down" aria-hidden="true"></i>'
             . '</button>'
             . '<button type="button" class="other-account-open" data-other-account="open" title="' . $openLabel . '" aria-label="' . $openLabel . '">'
             . '<i class="lucide lucide-arrow-right" aria-hidden="true"></i>'
@@ -223,11 +228,8 @@ if ($showAccountRows):
 <div class="other-account-header current-account-header">
     <button type="button" class="other-account-toggle" data-current-account="toggle" aria-expanded="true" aria-controls="currentAccountTree" title="<?php echo $activeAccountName; ?>">
         <i class="lucide lucide-chevron-right other-account-chevron" aria-hidden="true"></i>
-        <i class="lucide lucide-user" aria-hidden="true"></i>
+        <i class="lucide lucide-circle-user" aria-hidden="true"></i>
         <span class="other-account-name"><?php echo $activeAccountName; ?></span>
-        <?php if (!empty($otherAccountProfiles)): ?>
-        <span class="account-active-badge"><?php echo t_h('sidebar.accounts.active', [], 'Active'); ?></span>
-        <?php endif; ?>
     </button>
     <?php echo $expandFoldersButton; ?>
 </div>

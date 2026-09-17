@@ -130,6 +130,14 @@ function applyIndexIconScale(scale) {
         #left_col .note-title .note-type-icon-inline {
             font-size: ${0.85 * s}em !important;
         }
+
+        /* Other accounts' trees mirror the main tree's folder and note icons */
+        #left_col .other-account-row-folder .lucide {
+            font-size: ${1.0 * s}em !important;
+        }
+        #left_col .other-account-row-note .lucide {
+            font-size: ${0.85 * s}em !important;
+        }
         .innernote .note-title-heading .note-title-icon {
             font-size: ${20 * s}px !important;
         }

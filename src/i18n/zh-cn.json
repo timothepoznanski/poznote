@@ -878,9 +878,6 @@
       "empty": "没有笔记",
       "open": "打开此账户",
       "view_here": "在标签页中显示，不切换账户"
-    },
-    "accounts": {
-      "active": "当前"
     }
   },
   "home": {
