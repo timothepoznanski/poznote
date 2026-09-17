@@ -282,29 +282,128 @@
         }
     }
 
+    // The note shows the diagram through an <img> pointing at this preview.
+    // It used to be a PNG rendered at 1x, which the browser upscales on any
+    // HiDPI screen (issue #1434). An SVG stays crisp at every pixel density
+    // and zoom level, and the <img> markup around it does not change.
+    //
+    // Excalidraw 0.17 writes one @font-face per bundled font into the SVG,
+    // each as a URL. An SVG displayed through <img> loads no external
+    // resource at all, so those rules are dead there and text would fall
+    // back to a system font: rewrite them as data: URIs of the fonts the
+    // diagram really uses. Ids are Excalidraw's FONT_FAMILY constant;
+    // Helvetica (2) is a system font with no file to embed.
+    var EXCALIDRAW_FONT_FILES = {
+        1: { family: 'Virgil', file: 'Virgil.woff2' },
+        3: { family: 'Cascadia', file: 'Cascadia.woff2' },
+        4: { family: 'Assistant', file: 'Assistant-Regular.woff2' }
+    };
+    var fontDataUriPromises = {};
+
+    function getExcalidrawAssetsPath() {
+        var base = String(window.EXCALIDRAW_ASSET_PATH || 'js/excalidraw-dist/');
+        if (base.slice(-1) !== '/') {
+            base += '/';
+        }
+        return base + 'excalidraw-assets/';
+    }
+
+    function fetchFontDataUri(file) {
+        if (!fontDataUriPromises[file]) {
+            fontDataUriPromises[file] = fetch(getExcalidrawAssetsPath() + file)
+                .then(function(response) {
+                    if (!response.ok) {
+                        throw new Error('HTTP ' + response.status);
+                    }
+                    return response.arrayBuffer();
+                })
+                .then(function(buffer) {
+                    var bytes = new Uint8Array(buffer);
+                    var binary = '';
+                    for (var i = 0; i < bytes.length; i += 0x8000) {
+                        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+                    }
+                    return 'data:font/woff2;base64,' + btoa(binary);
+                });
+            // A failed fetch must not poison the later saves of this session
+            fontDataUriPromises[file].catch(function() {
+                delete fontDataUriPromises[file];
+            });
+        }
+        return fontDataUriPromises[file];
+    }
+
+    function getUsedFontIds(elements) {
+        var used = [];
+        (elements || []).forEach(function(element) {
+            if (element && !element.isDeleted && element.type === 'text'
+                && EXCALIDRAW_FONT_FILES[element.fontFamily]
+                && used.indexOf(element.fontFamily) === -1) {
+                used.push(element.fontFamily);
+            }
+        });
+        return used;
+    }
+
+    async function inlineSvgFonts(svg, elements) {
+        var rules = await Promise.all(getUsedFontIds(elements).map(function(fontId) {
+            var font = EXCALIDRAW_FONT_FILES[fontId];
+            return fetchFontDataUri(font.file).then(function(dataUri) {
+                return '@font-face { font-family: "' + font.family + '"; src: url("' + dataUri + '") format("woff2"); }';
+            }, function(error) {
+                // That text then renders in a fallback font; the diagram
+                // itself is intact and the next save embeds it again.
+                console.warn('Excalidraw preview: could not embed font ' + font.file, error);
+                return '';
+            });
+        }));
+        rules = rules.filter(Boolean);
+
+        var style = svg.querySelector('style.style-fonts');
+        if (style) {
+            style.textContent = rules.join('\n');
+        } else if (rules.length) {
+            var svgNs = 'http://www.w3.org/2000/svg';
+            var defs = svg.querySelector('defs');
+            if (!defs) {
+                defs = svg.insertBefore(document.createElementNS(svgNs, 'defs'), svg.firstChild);
+            }
+            style = document.createElementNS(svgNs, 'style');
+            style.setAttribute('class', 'style-fonts');
+            style.textContent = rules.join('\n');
+            defs.appendChild(style);
+        }
+    }
+
+    async function exportPreviewSvg(elements, appState, files) {
+        var svg = await excalidrawAPI.exportToSvg({
+            elements: elements,
+            // exportScale only multiplies the width/height attributes, which
+            // would show the diagram larger than drawn, and exportEmbedScene
+            // would bloat the file with a copy of the JSON the note already
+            // stores: both are user toggles of Excalidraw's own export dialog
+            appState: Object.assign(getExportAppState(appState), {
+                exportScale: 1,
+                exportEmbedScene: false
+            }),
+            files: files,
+            exportPadding: 10
+        });
+        await inlineSvgFonts(svg, elements);
+        return new XMLSerializer().serializeToString(svg);
+    }
+
     // Save embedded diagram
     async function saveEmbeddedDiagram(data, elements, appState, files) {
-        var previewAppState = getExportAppState(appState);
+        var previewSvg = await exportPreviewSvg(elements, appState, files);
 
-        // Generate preview canvas with padding around drawing
-        var canvas = await excalidrawAPI.exportToCanvas({
-            elements: elements,
-            appState: previewAppState,
-            files: files,
-            exportPadding: 10,
-            exportBackground: true
-        });
-        
-        // Convert to base64 image for embedding
-        var base64Image = canvas.toDataURL('image/png');
-        
         var formData = new FormData();
         formData.append('action', 'save_embedded_diagram');
         formData.append('note_id', noteId);
         formData.append('diagram_id', diagramId);
         formData.append('workspace', workspace);
         formData.append('diagram_data', JSON.stringify(data));
-        formData.append('preview_image_base64', base64Image);
+        formData.append('preview_svg', previewSvg);
         
         // Send cursor position if available
         if (cursorPosition !== null) {
@@ -325,21 +424,8 @@
     
     // Save full note
     async function saveFullNote(data, elements, appState, files) {
-        var previewAppState = getExportAppState(appState);
+        var previewSvg = await exportPreviewSvg(elements, appState, files);
 
-        // Generate PNG preview with padding around drawing
-        var canvas = await excalidrawAPI.exportToCanvas({
-            elements: elements,
-            appState: previewAppState,
-            files: files,
-            exportPadding: 10,
-            exportBackground: true
-        });
-        
-        var blob = await new Promise(function(resolve) {
-            canvas.toBlob(resolve, 'image/png');
-        });
-        
         // Send to server. The heading is only used when creating the note:
         // the toolbar <h3> shows "Poznote - <title>", so its textContent must
         // never be echoed back as the note title (it used to grow one
@@ -349,7 +435,7 @@
         formData.append('workspace', workspace);
         formData.append('heading', noteTitle);
         formData.append('diagram_data', JSON.stringify(data));
-        formData.append('preview_image', blob, 'preview.png');
+        formData.append('preview_svg', previewSvg);
 
         var response = await fetch('api_save_excalidraw.php', {
             method: 'POST',
