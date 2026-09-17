@@ -1207,7 +1207,13 @@
         var isLoaded = !!document.getElementById('inp' + noteId);
         if (!isLoaded) {
             _pendingTabSwitch = newTab.id;
-            if (options.isNewNote) {
+            // Not while the note on screen has unsaved changes: the placeholder
+            // replaces it, so loadNoteDirectly() below could no longer save
+            // them and waited for that save forever (issue 1419)
+            var currentNoteId = window.noteid;
+            var leavingUnsaved = currentNoteId && currentNoteId !== -1 && String(currentNoteId) !== noteId
+                && typeof window.hasUnsavedChanges === 'function' && window.hasUnsavedChanges(currentNoteId);
+            if (options.isNewNote && !leavingUnsaved) {
                 _showNewNoteLoadingPlaceholder();
             }
             var url = _buildUrl(noteId);

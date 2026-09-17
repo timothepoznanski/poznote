@@ -328,6 +328,9 @@ function runChangeCheck() {
     clearTimeout(saveTimeout);
     const currentNoteId = noteid; // Capture current note ID
     saveTimeout = setTimeout(() => {
+        // A fired timer is no pending save: left set, it would keep
+        // hasUnsavedChanges() true for every note opened after this one
+        saveTimeout = null;
         // Only save if we're still on the same note
         if (noteid === currentNoteId && isOnline) {
             saveToServerDebounced();
@@ -384,46 +387,31 @@ function saveToServerDebounced() {
         return;
     }
 
-    if (typeof window.isNoteEditingLocked === 'function' && window.isNoteEditingLocked(noteid)) {
-        return;
-    }
-
     // Clear the timeout since we're executing the save now
     clearTimeout(saveTimeout);
     saveTimeout = null;
 
-    // Check that the note elements still exist (user might have navigated away)
-    const titleInput = document.getElementById("inp" + noteid);
-    const entryElem = document.getElementById("entry" + noteid);
-
-    if (!titleInput || !entryElem) {
+    if (typeof window.isNoteEditingLocked === 'function' && window.isNoteEditingLocked(noteid)) {
         return;
     }
 
-    // Check if content has actually changed
-    const draftKey = 'poznote_draft_' + noteStorageId(noteid);
-    const titleKey = 'poznote_title_' + noteStorageId(noteid);
-    const tagsKey = 'poznote_tags_' + noteStorageId(noteid);
+    // Check that the note elements still exist (user might have navigated away)
+    const state = readNoteStateFromScreen(noteid);
+    if (!state || !document.getElementById("inp" + noteid)) {
+        return;
+    }
 
-    const storedDraft = localStorage.getItem(draftKey);
-    const storedTitle = localStorage.getItem(titleKey);
-    const storedTags = localStorage.getItem(tagsKey);
+    // Compared with what is on screen, which is what the save sends: the
+    // stored draft can lag it by its 300ms debounce
+    const contentChanged = state.content !== lastSavedContent;
+    const titleChanged = state.title !== lastSavedTitle;
+    const tagsChanged = (state.tags === null ? '' : state.tags) !== (lastSavedTags === null ? '' : lastSavedTags);
 
-    const currentDraft = storedDraft !== null
-        ? storedDraft
-        : ((typeof window.getComparableNoteContent === 'function')
-            ? window.getComparableNoteContent(entryElem, noteid)
-            : entryElem.innerHTML);
-    const currentTitle = storedTitle !== null ? storedTitle : titleInput.value;
-    const tagsElem = document.getElementById("tags" + noteid);
-    const currentTags = storedTags !== null ? storedTags : (tagsElem ? tagsElem.value : '');
-
-    const contentChanged = currentDraft !== lastSavedContent;
-    const titleChanged = currentTitle !== lastSavedTitle;
-    const tagsChanged = currentTags !== lastSavedTags;
-
-    // Skip save if no changes
+    // Nothing to save (typed then undone): the note is back to its saved
+    // state, so it must stop counting as unsaved. Left flagged, every switch
+    // to another note waited for a save that never came (issue 1419).
     if (!contentChanged && !titleChanged && !tagsChanged) {
+        dropPendingSaveState(noteid);
         return;
     }
 
@@ -475,6 +463,63 @@ function hasUnsavedChangesOnScreen(noteId) {
         runChangeCheck();
     }
     return hasUnsavedChanges(noteId);
+}
+
+/**
+ * Stop counting a note as unsaved: pending-save flag, blue save icon, red dot
+ * in the page title, mobile save indicator. The red dot and the save timer
+ * are page-wide, so whatever keeps them set makes hasUnsavedChanges() true
+ * for every note opened afterwards.
+ */
+function dropPendingSaveState(noteId) {
+    if (noteId !== null && noteId !== undefined) {
+        notesNeedingRefresh.delete(String(noteId));
+        setNoteSaveButtonState(noteId, false);
+    }
+    if (document.title.startsWith('🔴')) {
+        document.title = document.title.replace(/^🔴\s*/, '');
+    }
+    const saveIndicator = document.getElementById('save-indicator');
+    if (saveIndicator) {
+        saveIndicator.style.display = 'none';
+    }
+}
+
+/**
+ * The note is being left while its changes are still not confirmed by the
+ * server (save refused, locked, slow or failing server, empty title...). They
+ * stay on this device as the note's draft, which the draft recovery offers
+ * again when the note is next opened, and the note stops counting as unsaved
+ * so the navigation can go on. Waiting for a save that cannot land used to
+ * restart the save notice forever and lock the app (issue 1419).
+ */
+function keepUnsavedChangesAsDraft(noteId) {
+    if (!noteId || noteId === -1 || noteId === 'search') {
+        return;
+    }
+    clearTimeout(saveTimeout);
+    saveTimeout = null;
+    if (String(noteId) === String(noteid)) {
+        clearTimeout(changeCheckThrottle);
+        changeCheckThrottle = null;
+        pendingChangeCheck = false;
+        const state = readNoteStateFromScreen(noteId);
+        if (state && (state.content !== lastSavedContent || state.title !== lastSavedTitle)) {
+            snapshotNoteStateForSave(noteId);
+        }
+    }
+    // The unsaved flags are what keep a note out of the DOM cache
+    // (js/note-dom-cache.js): this mark does it now they are dropped, so
+    // the note reopens from the server and its draft gets recovered, instead
+    // of the cached edits being taken for the saved state.
+    const entryElem = document.getElementById('entry' + noteId);
+    if (entryElem) {
+        entryElem.setAttribute('data-unsaved-draft', 'true');
+    }
+    if (typeof invalidateNoteDomCache === 'function') {
+        invalidateNoteDomCache(noteId);
+    }
+    dropPendingSaveState(noteId);
 }
 
 // ============================================================================
@@ -708,9 +753,16 @@ function reinitializeAutoSaveState(options) {
         lastSavedTitle = titleInput ? titleInput.value : null;
         lastSavedTags = tagsElem ? tagsElem.value : null;
 
-        // Remove from refresh list if present
-        notesNeedingRefresh.delete(String(currentNoteId));
-        setNoteSaveButtonState(currentNoteId, false);
+        // A freshly loaded note has nothing pending. The save timer and the
+        // red dot are page-wide: whatever the previous note left of them would
+        // make this one count as unsaved and every switch away from it wait
+        // for a save that has nothing to send (issue 1419).
+        clearTimeout(saveTimeout);
+        saveTimeout = null;
+        clearTimeout(changeCheckThrottle);
+        changeCheckThrottle = null;
+        pendingChangeCheck = false;
+        dropPendingSaveState(currentNoteId);
 
         // Reset auto-push flag since we just loaded fresh content
         if (!options.keepAutoPushFlag) {
@@ -1330,6 +1382,7 @@ window.adoptNoteSavedState = function (noteId) {
 window.markNoteAsModified = markNoteAsModified;
 window.hasUnsavedChanges = hasUnsavedChanges;
 window.hasUnsavedChangesOnScreen = hasUnsavedChangesOnScreen;
+window.keepUnsavedChangesAsDraft = keepUnsavedChangesAsDraft;
 window.clearDraft = clearDraft;
 window.writeNoteDraft = writeNoteDraft;
 window.snapshotNoteStateForSave = snapshotNoteStateForSave;

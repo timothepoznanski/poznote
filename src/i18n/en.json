@@ -4234,7 +4234,8 @@
     "notification": {
       "saving": "Saving changes...",
       "saved": "Saved!",
-      "not_saved_yet": "Your latest changes could not be saved yet. They are kept on this device and Poznote keeps trying."
+      "not_saved_yet": "Your latest changes could not be saved yet. They are kept on this device and Poznote keeps trying.",
+      "kept_as_draft": "Not saved yet, your changes are kept on this device"
     },
     "draft": {
       "found_conflict": "This note has unsaved changes from your last visit, but it was also changed elsewhere since. The version you do not keep stays in the note history.",

@@ -922,7 +922,8 @@
     "notification": {
       "saving": "Salvando alterações...",
       "saved": "Salvo!",
-      "not_saved_yet": "Suas últimas alterações ainda não puderam ser salvas. Elas ficam guardadas neste dispositivo e o Poznote continua tentando."
+      "not_saved_yet": "Suas últimas alterações ainda não puderam ser salvas. Elas ficam guardadas neste dispositivo e o Poznote continua tentando.",
+      "kept_as_draft": "Ainda não salvo, suas alterações ficam guardadas neste dispositivo"
     },
     "draft": {
       "found_conflict": "Esta nota tem alterações não salvas da sua última visita, mas também foi modificada em outro lugar desde então. A versão que você não mantiver fica no histórico da nota.",

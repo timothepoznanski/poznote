@@ -547,7 +547,7 @@ window.loadNoteDirectly = function (url, noteId, event, clickedElement, extraOpt
                 // Show save in progress notification
                 if (typeof window.showSaveInProgressNotification === 'function') {
                     window.showSaveInProgressNotification(function () {
-                        window.loadNoteDirectly(url, noteId, null);
+                        window.loadNoteDirectly(url, noteId, null, clickedElement, extraOptions);
                     });
                     return false;
                 }

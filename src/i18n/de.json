@@ -922,7 +922,8 @@
     "notification": {
       "saving": "Änderungen werden gespeichert...",
       "saved": "Gespeichert!",
-      "not_saved_yet": "Ihre letzten Änderungen konnten noch nicht gespeichert werden. Sie bleiben auf diesem Gerät erhalten und Poznote versucht es weiter."
+      "not_saved_yet": "Ihre letzten Änderungen konnten noch nicht gespeichert werden. Sie bleiben auf diesem Gerät erhalten und Poznote versucht es weiter.",
+      "kept_as_draft": "Noch nicht gespeichert, Ihre Änderungen bleiben auf diesem Gerät erhalten"
     },
     "draft": {
       "found_conflict": "Diese Notiz enthält ungespeicherte Änderungen von Ihrem letzten Besuch, wurde seitdem aber auch woanders geändert. Die Version, die Sie nicht behalten, bleibt im Verlauf der Notiz.",
