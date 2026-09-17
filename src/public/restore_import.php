@@ -777,6 +777,11 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
         font-size: 13px; font-weight: normal;
     }
     .chunked-restore-cancel:disabled { opacity: 0.6; cursor: default; }
+    /* .initially-hidden is a low-specificity utility and the display:block
+       above is declared later in the document, so it would win: re-assert
+       the hidden state or the cancel control stays on screen for the whole
+       transfer and after the job has finished. */
+    .chunked-restore-cancel.initially-hidden { display: none; }
     </style>
     <!-- Configuration for JavaScript -->
     <script type="application/json" id="restore-import-config"><?php
