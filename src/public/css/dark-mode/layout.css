@@ -237,15 +237,9 @@ html[data-theme='dark'] .icon-sidebar-bottom {
     border-top-color: var(--dm-border);
 }
 
+/* Same resting colour as the note toolbar icons (.toolbar-btn), no dimming. */
 html[data-theme='dark'] .icon-sidebar-btn {
-    color: var(--dm-text-muted);
-    opacity: 0.4;
-}
-
-html[data-theme='dark'] .icon-sidebar-btn:hover,
-html[data-theme='dark'] .icon-sidebar-btn:focus-visible,
-html[data-theme='dark'] .icon-sidebar-btn.has-notifications {
-    opacity: 1;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .icon-sidebar-btn:hover,
@@ -255,24 +249,16 @@ html[data-theme='dark'] .icon-sidebar-btn:focus-visible {
 }
 
 /* Current page. The light 12%-opacity blue washes out on a dark background, so
-   the selected icon gets a brighter tint and full opacity to stand out from
-   the merely-hovered state above. */
+   the selected icon gets a brighter tint to stand out from the merely-hovered
+   state above. */
 html[data-theme='dark'] .icon-sidebar-btn-active,
 html[data-theme='dark'] .icon-sidebar-btn-active:hover {
     color: var(--dm-accent);
     background: rgba(var(--pz-accent-rgb), 0.30);
-    opacity: 1;
 }
 
 html[data-theme='dark'] .icon-sidebar-btn-active .lucide {
     background-color: var(--dm-accent);
-}
-
-/* An icon with a colour the user picked (js/icon-sidebar-colors.js): the dimmed
-   resting opacity above would wash that colour out. */
-html[data-theme='dark'] .icon-sidebar-btn:has(> .icon-sidebar-icon-colored),
-html[data-theme='dark'] .icon-sidebar-overflow-item:has(> .icon-sidebar-icon-colored) {
-    opacity: 1;
 }
 
 /* Overflow menu: a floating popup rather than part of the rail, so it takes the
@@ -283,17 +269,10 @@ html[data-theme='dark'] #iconSidebarOverflowMenu {
     box-shadow: 0 6px 20px rgba(var(--pz-shadow-rgb), 0.5);
 }
 
-/* Same resting treatment as .icon-sidebar-btn above, dimmed opacity included:
-   the menu lists the rail's own entries and must not read brighter than them. */
+/* Same resting treatment as .icon-sidebar-btn above: the menu lists the rail's
+   own entries and must read the same. */
 html[data-theme='dark'] .icon-sidebar-overflow-item {
-    color: var(--dm-text-muted);
-    opacity: 0.4;
-}
-
-html[data-theme='dark'] .icon-sidebar-overflow-item:hover,
-html[data-theme='dark'] .icon-sidebar-overflow-item:focus-visible,
-html[data-theme='dark'] .icon-sidebar-overflow-item-active {
-    opacity: 1;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .icon-sidebar-overflow-item:hover,
