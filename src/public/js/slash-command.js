@@ -55,6 +55,26 @@
     // Shared with the code block language modal (js/code-block-language.js)
     window.CODE_BLOCK_LANGUAGES = CODE_BLOCK_LANGUAGES;
 
+    // The languages sit directly in the Code submenu, under a separator row,
+    // rather than behind a second submenu. insert() receives the language entry.
+    function buildCodeLanguageItems(t, insert) {
+        const items = [{
+            id: 'block-languages',
+            separator: true,
+            label: t('slash_menu.block_languages', null, 'Block Languages')
+        }];
+        CODE_BLOCK_LANGUAGES.forEach(function (l) {
+            items.push({
+                id: l.id,
+                icon: l.icon,
+                iconColor: l.iconColor,
+                label: l.labelKey ? t(l.labelKey, null, l.fallback) : l.label,
+                action: function () { insert(l); }
+            });
+        });
+        return items;
+    }
+
     function isSyntaxHighlightLanguage(language) {
         var normalizedLanguage = String(language || '').trim().toLowerCase();
         return !!(normalizedLanguage && typeof hljs !== 'undefined' && hljs && typeof hljs.getLanguage === 'function' && hljs.getLanguage(normalizedLanguage));
@@ -1813,16 +1833,17 @@
     // Dictation needs a transcription server; index.php says whether this user
     // has one (see poznoteResolveSttConfig()). Read at menu-open time rather
     // than at load, so it holds whatever the page was served with.
-    // Diagrams section: Excalidraw in every note, Mermaid only in Markdown
-    // notes because HTML notes never render it (discussion #1404)
-    function buildDiagramsSection(t, common, withMermaid) {
+    // Diagram entries, listed at the root of the menu: Excalidraw in every
+    // note, Mermaid only in Markdown notes because HTML notes never render it
+    // (discussion #1404)
+    function buildDiagramItems(t, common, withMermaid) {
         const items = [common.excalidraw];
         if (withMermaid) {
             items.push({
                 id: 'mermaid',
                 icon: 'lucide-shapes',
                 label: t('slash_menu.mermaid', null, 'Mermaid'),
-                aliases: ['mermaid'],
+                aliases: ['mermaid', 'diagram', 'chart'],
                 submenu: MERMAID_DIAGRAMS.map(function (d) {
                     return {
                         id: d.id,
@@ -1835,13 +1856,7 @@
                 })
             });
         }
-        return {
-            id: 'diagrams',
-            icon: 'lucide-shapes',
-            label: t('slash_menu.diagrams', null, 'Diagrams'),
-            aliases: ['diagram', 'chart'],
-            submenu: items
-        };
+        return items;
     }
 
     function isSpeechToTextAvailable() {
@@ -2284,6 +2299,7 @@
                 id: 'excalidraw',
                 icon: 'lucide lucide-paint-brush',
                 label: t('slash_menu.excalidraw', null, 'Excalidraw'),
+                aliases: ['diagram', 'drawing'],
                 action: function () {
                     if (typeof window.insertExcalidrawDiagram === 'function') {
                         window.insertExcalidrawDiagram();
@@ -2449,20 +2465,7 @@
                             insertCodeBlock('code', true);
                         }
                     },
-                    {
-                        id: 'block-languages',
-                        icon: 'lucide-laptop-code',
-                        label: t('slash_menu.block_languages', null, 'Block Languages'),
-                        submenu: CODE_BLOCK_LANGUAGES.map(function (l) {
-                            return {
-                                id: l.id,
-                                icon: l.icon,
-                                iconColor: l.iconColor,
-                                label: l.labelKey ? t(l.labelKey, null, l.fallback) : l.label,
-                                action: function () { insertCodeBlock(l.lang, !!l.disableHighlight); }
-                            };
-                        })
-                    }
+                    ...buildCodeLanguageItems(t, function (l) { insertCodeBlock(l.lang, !!l.disableHighlight); })
                 ]
             },
             {
@@ -2562,7 +2565,7 @@
                     }
                 ]
             },
-            buildDiagramsSection(t, common, false),
+            ...buildDiagramItems(t, common, false),
             buildDateSection(t, insertDate, true),
             {
                 id: 'link-menu',
@@ -2690,21 +2693,14 @@
                         }
                     },
                     {
-                        id: 'streaming-videos',
-                        icon: 'lucide-video',
-                        label: t('slash_menu.streaming_videos', null, 'Streaming videos'),
-                        submenu: [
-                            {
-                                id: 'bilibili-video',
-                                icon: 'lucide lucide-video',
-                                label: t('slash_menu.bilibili', null, 'Bilibili'),
-                                action: function () {
-                                    if (typeof window.insertStreamingVideo === 'function') {
-                                        window.insertStreamingVideo();
-                                    }
-                                }
+                        id: 'bilibili-video',
+                        icon: 'lucide lucide-video',
+                        label: t('slash_menu.bilibili', null, 'Bilibili'),
+                        action: function () {
+                            if (typeof window.insertStreamingVideo === 'function') {
+                                window.insertStreamingVideo();
                             }
-                        ]
+                        }
                     },
                     {
                         id: 'mp4-video',
@@ -2778,20 +2774,7 @@
                             insertMarkdownAtCursor('```code\n\n```\n', -5);
                         }
                     },
-                    {
-                        id: 'block-languages',
-                        icon: 'lucide-laptop-code',
-                        label: t('slash_menu.block_languages', null, 'Block Languages'),
-                        submenu: CODE_BLOCK_LANGUAGES.map(function (l) {
-                            return {
-                                id: l.id,
-                                icon: l.icon,
-                                iconColor: l.iconColor,
-                                label: l.labelKey ? t(l.labelKey, null, l.fallback) : l.label,
-                                action: function () { insertMarkdownAtCursor('```' + l.lang + '\n\n```\n', -5); }
-                            };
-                        })
-                    }
+                    ...buildCodeLanguageItems(t, function (l) { insertMarkdownAtCursor('```' + l.lang + '\n\n```\n', -5); })
                 ]
             },
             {
@@ -2903,7 +2886,7 @@
                     }
                 ]
             },
-            buildDiagramsSection(t, common, true),
+            ...buildDiagramItems(t, common, true),
             buildDateSection(t, insertDateMarkdown, true),
             {
                 id: 'link-menu',
@@ -3051,21 +3034,14 @@
                         }
                     },
                     {
-                        id: 'streaming-videos',
-                        icon: 'lucide-video',
-                        label: t('slash_menu.streaming_videos', null, 'Streaming videos'),
-                        submenu: [
-                            {
-                                id: 'bilibili-video',
-                                icon: 'lucide lucide-video',
-                                label: t('slash_menu.bilibili', null, 'Bilibili'),
-                                action: function () {
-                                    if (typeof window.insertStreamingVideoMarkdown === 'function') {
-                                        window.insertStreamingVideoMarkdown();
-                                    }
-                                }
+                        id: 'bilibili-video',
+                        icon: 'lucide lucide-video',
+                        label: t('slash_menu.bilibili', null, 'Bilibili'),
+                        action: function () {
+                            if (typeof window.insertStreamingVideoMarkdown === 'function') {
+                                window.insertStreamingVideoMarkdown();
                             }
-                        ]
+                        }
                     },
                     {
                         id: 'mp4-video',
@@ -3425,6 +3401,7 @@
             } else if (cmdMatches && cmd.submenu && cmd.submenu.length > 0) {
                 // Command with submenu matches - add all submenu items directly
                 cmd.submenu.forEach(subItem => {
+                    if (subItem.separator) return;
                     if (subItem.submenu && subItem.submenu.length > 0) {
                         // If submenu item has sub-submenu, add all sub-submenu items
                         subItem.submenu.forEach(subSubItem => {
@@ -3445,6 +3422,7 @@
             } else if (cmd.submenu && cmd.submenu.length > 0) {
                 // Command doesn't match but might have matching submenu items
                 cmd.submenu.forEach(subItem => {
+                    if (subItem.separator) return;
                     const subItemMatches = commandMatchesSearch(subItem, search);
 
                     if (subItemMatches && (!subItem.submenu || subItem.submenu.length === 0)) {
@@ -3525,9 +3503,15 @@
                 '</div>';
         }
 
+        // The index is the one in `items`, not in the rendered list: a row hidden
+        // on mobile, or a separator, must not shift what the keyboard selects
         html += items
-            .filter(item => !isMobile || !item.mobileHidden)
-            .map((item, idx) => {
+            .map((item, idx) => ({ item: item, idx: idx }))
+            .filter(entry => !isMobile || !entry.item.mobileHidden)
+            .map(({ item, idx }) => {
+                if (item.separator) {
+                    return '<div class="slash-command-separator"><span>' + escapeHtml(item.label) + '</span></div>';
+                }
                 const selectedClass = idx === selectedSubmenuIndex ? ' selected' : '';
                 const hasSubmenu = item.submenu && item.submenu.length > 0;
                 const submenuIndicator = hasSubmenu ? '<i class="lucide lucide-chevron-right slash-command-submenu-indicator"></i>' : '';
@@ -3536,7 +3520,7 @@
                 const disabledClass = item.disabled ? ' slash-command-disabled' : '';
                 const hintHtml = item.hint ? '<span class="slash-command-hint">' + escapeHtml(item.hint) + '</span>' : '';
                 return (
-                    '<div class="slash-command-item' + selectedClass + disabledClass + '" data-submenu-id="' + item.id + '" data-has-sub-submenu="' + hasSubmenu + '">' +
+                    '<div class="slash-command-item' + selectedClass + disabledClass + '" data-submenu-id="' + item.id + '" data-submenu-index="' + idx + '" data-has-sub-submenu="' + hasSubmenu + '">' +
                     iconHtml +
                     '<span class="slash-command-label">' + escapeHtml(item.label) + hintHtml + '</span>' +
                     submenuIndicator +
@@ -3806,14 +3790,37 @@
     // Update the .selected class on submenu items without rebuilding DOM
     function updateSubmenuSelectedClass() {
         if (!submenuElement) return;
-        const items = submenuElement.querySelectorAll('.slash-command-item:not(.slash-command-back)');
-        items.forEach((el, idx) => {
-            if (idx === selectedSubmenuIndex) {
+        const items = submenuElement.querySelectorAll('.slash-command-item[data-submenu-index]');
+        items.forEach(el => {
+            if (Number(el.getAttribute('data-submenu-index')) === selectedSubmenuIndex) {
                 el.classList.add('selected');
+                scrollMenuItemIntoView(submenuElement, el);
             } else {
                 el.classList.remove('selected');
             }
         });
+    }
+
+    // The submenu scrolls once it is longer than the viewport allows, and
+    // scrollIntoView() on a fixed menu would scroll the page as well
+    function scrollMenuItemIntoView(container, el) {
+        if (!container || !el || container.scrollHeight <= container.clientHeight) return;
+        const top = el.offsetTop;
+        const bottom = top + el.offsetHeight;
+        if (top < container.scrollTop) {
+            container.scrollTop = top;
+        } else if (bottom > container.scrollTop + container.clientHeight) {
+            container.scrollTop = bottom - container.clientHeight;
+        }
+    }
+
+    // Separator rows are labels, not commands: the keyboard steps over them
+    function nextSubmenuIndex(items, from, direction) {
+        for (let i = 0; i < items.length; i++) {
+            from = (from + direction + items.length) % items.length;
+            if (items[from] && !items[from].separator) return from;
+        }
+        return from;
     }
 
     // Update the .selected class on sub-submenu items without rebuilding DOM
@@ -3849,7 +3856,9 @@
         hideSubmenu();
 
         currentSubmenu = cmd.submenu;
-        selectedSubmenuIndex = 0;
+        selectedSubmenuIndex = cmd.submenu[0] && cmd.submenu[0].separator
+            ? nextSubmenuIndex(cmd.submenu, 0, 1)
+            : 0;
 
         submenuElement = document.createElement('div');
         submenuElement.className = 'slash-command-menu slash-command-submenu';
@@ -4513,7 +4522,7 @@
                 case 'ArrowDown':
                     e.preventDefault();
                     if (currentSubmenu.length) {
-                        selectedSubmenuIndex = (selectedSubmenuIndex + 1) % currentSubmenu.length;
+                        selectedSubmenuIndex = nextSubmenuIndex(currentSubmenu, selectedSubmenuIndex, 1);
                         updateSubmenuSelectedClass();
                     }
                     break;
@@ -4521,7 +4530,7 @@
                 case 'ArrowUp':
                     e.preventDefault();
                     if (currentSubmenu.length) {
-                        selectedSubmenuIndex = (selectedSubmenuIndex - 1 + currentSubmenu.length) % currentSubmenu.length;
+                        selectedSubmenuIndex = nextSubmenuIndex(currentSubmenu, selectedSubmenuIndex, -1);
                         updateSubmenuSelectedClass();
                     }
                     break;
@@ -4546,7 +4555,7 @@
 
                 case 'Enter':
                     e.preventDefault();
-                    if (currentSubmenu.length) {
+                    if (currentSubmenu.length && !currentSubmenu[selectedSubmenuIndex].separator) {
                         executeCommand(currentSubmenu[selectedSubmenuIndex].id, true, false);
                     }
                     break;

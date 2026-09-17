@@ -26,6 +26,14 @@ html[data-theme='dark'] .slash-command-item.slash-command-disabled.selected {
     background: transparent;
 }
 
+html[data-theme='dark'] .slash-command-separator {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .slash-command-separator::after {
+    background: var(--dm-border);
+}
+
 html[data-theme='dark'] .slash-command-hint {
     color: var(--dm-text-muted);
 }
