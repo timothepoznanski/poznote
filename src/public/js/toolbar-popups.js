@@ -59,12 +59,17 @@ window.savedRanges = {};
   // palette (js/color-palette.js, issue #1408). A value is what gets written
   // into the note, var(--pz-color-red, #dc2626): the colour follows the theme
   // and an export still reads the hex. 'none' removes the colour.
+  // A highlight swatch is painted stronger than the soft value it applies:
+  // at the real strength the row looked greyed out, as if disabled.
   function paletteSwatches(kind) {
     const palette = window.PoznoteColorPalette;
     const swatches = palette ? palette.colors.map(c => ({
       key: 'colors.' + c.id,
       fallback: c.id.charAt(0).toUpperCase() + c.id.slice(1),
-      value: kind === 'highlight' ? palette.highlightColor(c.id) : palette.textColor(c.id)
+      value: kind === 'highlight' ? palette.highlightColor(c.id) : palette.textColor(c.id),
+      swatch: kind === 'highlight'
+        ? 'color-mix(in srgb, ' + palette.textColor(c.id) + ' 65%, var(--pz-bg))'
+        : ''
     })) : [];
     swatches.push({ key: 'editor.colors.none', fallback: 'None', value: 'none' });
     return swatches;
@@ -271,7 +276,7 @@ window.savedRanges = {};
         sw.className = 'lucide lucide-ban color-swatch-none';
       } else {
         sw.className = 'color-swatch';
-        sw.style.background = c.value;
+        sw.style.background = c.swatch || c.value;
       }
       sw.setAttribute('aria-hidden', 'true');
       item.appendChild(sw);
