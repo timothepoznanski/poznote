@@ -1125,18 +1125,41 @@ Il n'y a pas de limite de taille en pratique pour l'archive. Comme pour une rest
 
 <a id="import-obsidian-notes"></a>
 <details>
-<summary><strong>Importer des notes Obsidian</strong></summary>
+<summary><strong>Migrer un vault Obsidian</strong></summary>
 <br>
 
-Importez une archive ZIP contenant plusieurs notes issues d'Obsidian :
+Un vault Obsidian est un dossier de fichiers Markdown, il s'importe donc tel quel, dans une seule archive ZIP.
 
-  - Les archives ZIP peuvent contenir jusqu'à 300 fichiers, un nombre réglable dans Paramètres > Outils d'administration > Limites d'import
-  - Poznote détecte et recrée automatiquement l'arborescence des dossiers
-  - Poznote détecte automatiquement les tags existants à créer
-  - Poznote importe automatiquement les images si elles se trouvent à la racine du fichier zip
+**Étapes**
+
+1. Compressez le dossier de votre vault dans un fichier ZIP. Aucun nettoyage préalable n'est nécessaire : les dossiers cachés comme `.obsidian` ou `.trash` sont ignorés.
+2. Dans Poznote, ouvrez **Paramètres > Restauration / Import** et allez à la section qui importe des fichiers et des archives ZIP. Choisissez le workspace de destination (un workspace neuf et vide permet de contrôler facilement le résultat), sélectionnez le ZIP et lancez l'import. Déposer le ZIP sur la liste des notes de la page principale fait la même chose.
+3. Lisez le résumé affiché à la fin : il donne le nombre de notes, de dossiers, d'images et de fichiers PDF importés, et nomme les fichiers qui n'ont pas pu l'être.
+
+Un ZIP peut contenir jusqu'à 300 notes (les images et les PDF ne comptent pas), une limite qu'un administrateur peut relever dans Paramètres > Outils d'administration > Limites d'import. La taille de l'archive n'est pas limitée, voir [Importer un fichier ZIP](#import-zip-notes).
+
+**Ce qui est repris**
+
+  - Notes : chaque fichier `.md` devient une note Markdown portant le nom du fichier, ou celui de la clé `title` de son front matter.
+  - Dossiers : l'arborescence du vault est recréée, sous-dossiers compris. Quand tout le vault se trouve dans un unique dossier à la racine du ZIP, ce dossier est ignoré.
+  - Tags : la clé `tags` du front matter, et une ligne de `#tags` tout en haut d'une note. Les espaces d'un tag deviennent des underscores.
+  - Front matter : `title`, `folder`, `tags`, `favorite`, `created` et `updated` sont lus, voir [Prise en charge du front matter Markdown](#markdown-front-matter).
+  - Liens entre notes : `[[Titre de la note]]` fonctionne tel quel. Poznote le résout par le titre, l'affiche comme un lien interne et le compte dans les rétroliens et dans le graphe.
+  - Images : `![[image.png]]`, `![[image.png|légende]]` et `![légende](image.png)` deviennent des pièces jointes de la note et s'affichent à leur place, où que l'image soit rangée dans le vault (à côté des notes, dans un sous-dossier ou dans un dossier `attachments`).
+  - Fichiers PDF : un PDF lié depuis une note (`![[fichier.pdf]]`, `[[fichier.pdf]]` ou un lien Markdown) est mis en pièce jointe de cette note, et le lien pointe vers la pièce jointe. Tout autre PDF, à côté des notes ou dans un dossier `attachments`, devient une note portant le nom du fichier, avec le PDF en pièce jointe, dans le dossier qui correspond à sa place dans le vault.
+
+**Ce qui ne l'est pas**
+
+  - Les liens avec alias ou vers un titre (`[[Note|alias]]`, `[[Note#Titre]]`) restent dans le texte mais ne mènent à aucune note.
+  - Les notes incluses (`![[Autre note]]`) et le contenu des plugins : requêtes Dataview, fichiers `.canvas`, dessins faits avec le plugin Excalidraw d'Obsidian.
+  - Les tags écrits au milieu d'une note restent du texte.
+  - Les fichiers d'autres types posés à côté des notes (audio, vidéo, documents Office) sont ignorés. Ajoutez-les ensuite en pièce jointe de la note concernée.
+
+Les images et les PDF sont retrouvés par leur nom de fichier, pas par leur chemin. Si deux fichiers du vault portent le même nom, renommez-en un avant l'import.
 
 </details>
 
+<a id="markdown-front-matter"></a>
 <details>
 <summary><strong>Prise en charge du front matter Markdown</strong></summary>
 <br>

@@ -2460,7 +2460,8 @@
       "notes_imported": "{{count}} Notiz(en) in Arbeitsbereich \"{{workspace}}\", Ordner \"{{folder}}\" importiert.",
       "attachments_imported": "{{message}}",
       "notes_imported_zip": "{{count}} Notiz(en) aus ZIP in Arbeitsbereich \"{{workspace}}\", Ordner \"{{folder}}\" importiert.",
-      "notes_imported_with_folders": "{{count}} Notiz(en) importiert und {{folders}} Ordner im Arbeitsbereich „{{workspace}}“ erstellt."
+      "notes_imported_with_folders": "{{count}} Notiz(en) importiert und {{folders}} Ordner im Arbeitsbereich „{{workspace}}“ erstellt.",
+      "pdf_notes_created": "{{count}} PDF-Datei(en) als Notizen importiert, jeweils als Anhang einer nach der Datei benannten Notiz."
     },
     "skipped_attachments": {
       "header": "Übersprungene blockierte Anhangsdateien:",

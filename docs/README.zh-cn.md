@@ -1125,18 +1125,41 @@ Poznote 通过网页界面（**设置 > 还原 / 导入**）提供灵活的还�
 
 <a id="import-obsidian-notes"></a>
 <details>
-<summary><strong>导入 Obsidian 笔记</strong></summary>
+<summary><strong>迁移 Obsidian 仓库</strong></summary>
 <br>
 
-导入包含多条 Obsidian 笔记的 ZIP 归档：
+Obsidian 仓库就是一个存放 Markdown 文件的文件夹，因此可以原样打包成一个 ZIP 归档直接导入。
 
-  - ZIP 归档最多可包含 300 个文件，可在 设置 > 管理工具 > 导入限制 中配置
-  - Poznote 会自动检测并重建文件夹结构
-  - Poznote 会自动检测已有的标签并创建
-  - 如果图片位于 zip 文件的根目录，Poznote 会自动导入它们
+**步骤**
+
+1. 将仓库文件夹压缩为 ZIP 文件。无需事先清理：`.obsidian`、`.trash` 等隐藏文件夹会被忽略。
+2. 在 Poznote 中打开 **设置 > 还原 / 导入**，进入导入文件和 ZIP 归档的部分。选择目标工作区（使用全新的空工作区便于检查结果），选择 ZIP 并开始导入。把 ZIP 拖放到主页面的笔记列表上效果相同。
+3. 阅读导入结束时显示的摘要：其中列出已导入的笔记、文件夹、图片和 PDF 文件的数量，并指出未能导入的文件。
+
+一个 ZIP 最多可包含 300 条笔记（图片和 PDF 文件不计入），管理员可在 设置 > 管理工具 > 导入限制 中提高该上限。归档大小没有限制，参见[导入 ZIP 文件](#import-zip-notes)。
+
+**会保留的内容**
+
+  - 笔记：每个 `.md` 文件都会成为一条 Markdown 笔记，以文件名命名，或以 front matter 中的 `title` 键命名。
+  - 文件夹：仓库的文件夹结构（包括子文件夹）会被重建。如果整个仓库位于 ZIP 顶层的唯一文件夹中，该文件夹会被跳过。
+  - 标签：front matter 中的 `tags` 键，以及笔记最开头的一行 `#tags`。标签中的空格会变成下划线。
+  - Front matter：会读取 `title`、`folder`、`tags`、`favorite`、`created` 和 `updated`，参见 [Markdown Front Matter 支持](#markdown-front-matter)。
+  - 笔记之间的链接：`[[笔记标题]]` 可直接使用。Poznote 按标题解析，将其显示为内部链接，并计入反向链接和关系图。
+  - 图片：`![[image.png]]`、`![[image.png|说明]]` 和 `![说明](image.png)` 会成为笔记的附件并在原位置显示，无论图片存放在仓库的何处（笔记旁边、子文件夹或 `attachments` 文件夹中）。
+  - PDF 文件：被笔记引用的 PDF（`![[file.pdf]]`、`[[file.pdf]]` 或 Markdown 链接）会附加到该笔记，链接指向该附件。其他 PDF，无论位于笔记旁边还是 `attachments` 文件夹中，都会各自成为一条以文件名命名的笔记，并以该 PDF 作为附件，放在与其在仓库中位置对应的文件夹里。
+
+**不会保留的内容**
+
+  - 带别名或指向标题的链接（`[[笔记|别名]]`、`[[笔记#标题]]`）会保留在文本中，但无法解析到笔记。
+  - 嵌入的笔记（`![[其他笔记]]`）和插件内容：Dataview 查询、`.canvas` 文件、用 Obsidian 的 Excalidraw 插件绘制的图。
+  - 写在笔记中间的标签会保留为普通文本。
+  - 位于笔记旁边的其他类型文件（音频、视频、Office 文档）会被忽略。请在导入后将它们附加到相应的笔记。
+
+图片和 PDF 文件按文件名匹配，而不是按路径。如果仓库中有两个文件同名，请在导入前重命名其中一个。
 
 </details>
 
+<a id="markdown-front-matter"></a>
 <details>
 <summary><strong>Markdown Front Matter 支持</strong></summary>
 <br>

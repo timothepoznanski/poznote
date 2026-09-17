@@ -2070,7 +2070,8 @@
       "notes_imported": "Импортировано {{count}} заметок в рабочее пространство \"{{workspace}}\", папку \"{{folder}}\".",
       "attachments_imported": "{{message}}",
       "notes_imported_zip": "Импортировано {{count}} заметок из ZIP в рабочее пространство \"{{workspace}}\", папку \"{{folder}}\".",
-      "notes_imported_with_folders": "Импортировано заметок: {{count}}, создано папок: {{folders}} в рабочем пространстве «{{workspace}}»."
+      "notes_imported_with_folders": "Импортировано заметок: {{count}}, создано папок: {{folders}} в рабочем пространстве «{{workspace}}».",
+      "pdf_notes_created": "PDF-файлов импортировано как заметки: {{count}}. Каждый прикреплён к заметке с именем файла."
     },
     "skipped_attachments": {
       "header": "Пропущенные заблокированные файлы вложений:",

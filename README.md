@@ -1125,18 +1125,41 @@ There is no practical size limit on the archive. Like a complete restore, it is 
 
 <a id="import-obsidian-notes"></a>
 <details>
-<summary><strong>Import Obsidian Notes</strong></summary>
+<summary><strong>Migrate an Obsidian vault</strong></summary>
 <br>
 
-Import a ZIP archive containing multiple notes from Obsidian:
+An Obsidian vault is a folder of Markdown files, so it can be imported as it is, in a single ZIP archive.
 
-  - ZIP archives can contain up to 300 files, configurable in Settings > Admin Tools > Import Limits
-  - Poznote automatically detects and recreates the folder structure
-  - Poznote automatically detects existing tags to create
-  - Poznote automatically imports images if they are at the zip file root
+**Steps**
+
+1. Compress your vault folder into a ZIP file. There is nothing to clean up first: hidden folders such as `.obsidian` or `.trash` are ignored.
+2. In Poznote, open **Settings > Restore/Import** and go to the section that imports files and ZIP archives. Pick the destination workspace (a new, empty workspace makes the result easy to check), select the ZIP and start the import. Dropping the ZIP onto the notes list of the main page does the same thing.
+3. Read the summary shown at the end: it gives the number of notes, folders, images and PDF files imported, and names the files that could not be.
+
+A ZIP can hold up to 300 notes (images and PDF files do not count), a limit an administrator can raise in Settings > Admin Tools > Import Limits. The size of the archive is not limited, see [Import ZIP file](#import-zip-notes).
+
+**What is carried over**
+
+  - Notes: every `.md` file becomes a Markdown note named after the file, or after the `title` key of its front matter.
+  - Folders: the folder tree of the vault is recreated, subfolders included. When the whole vault sits in a single top-level folder of the ZIP, that folder is skipped.
+  - Tags: the `tags` key of the front matter, and a line of `#tags` at the very top of a note. Spaces in a tag become underscores.
+  - Front matter: `title`, `folder`, `tags`, `favorite`, `created` and `updated` are read, see [Markdown Front Matter Support](#markdown-front-matter).
+  - Links between notes: `[[Note title]]` works as it is. Poznote resolves it by title, shows it as an internal link and counts it in the backlinks and in the graph.
+  - Images: `![[image.png]]`, `![[image.png|caption]]` and `![caption](image.png)` become attachments of the note and are displayed in place, wherever the image is stored in the vault (next to the notes, in a subfolder or in an `attachments` folder).
+  - PDF files: a PDF linked from a note (`![[file.pdf]]`, `[[file.pdf]]` or a Markdown link) is attached to that note, and the link points to the attachment. Any other PDF, next to the notes or in an `attachments` folder, becomes a note named after the file, with the PDF as its attachment, in the folder matching its place in the vault.
+
+**What is not**
+
+  - Links with an alias or a heading (`[[Note|alias]]`, `[[Note#Heading]]`) stay in the text but do not resolve to a note.
+  - Note embeds (`![[Other note]]`) and plugin content: Dataview queries, `.canvas` files, drawings made with the Obsidian Excalidraw plugin.
+  - Tags written in the middle of a note stay as plain text.
+  - Files of other types lying next to the notes (audio, video, Office documents) are ignored. Attach them to the relevant note afterwards.
+
+Images and PDF files are matched by file name, not by path. If two files of the vault share the same name, rename one of them before the import.
 
 </details>
 
+<a id="markdown-front-matter"></a>
 <details>
 <summary><strong>Markdown Front Matter Support</strong></summary>
 <br>

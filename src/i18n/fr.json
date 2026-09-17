@@ -2465,7 +2465,8 @@
       "notes_imported": "Importé {{count}} note(s) dans l'espace de travail \"{{workspace}}\", dossier \"{{folder}}\".",
       "attachments_imported": "{{message}}",
       "notes_imported_zip": "Importé {{count}} note(s) depuis le ZIP dans l'espace de travail \"{{workspace}}\", dossier \"{{folder}}\".",
-      "notes_imported_with_folders": "{{count}} note(s) importée(s) et {{folders}} dossier(s) créé(s) dans l'espace de travail « {{workspace}} »."
+      "notes_imported_with_folders": "{{count}} note(s) importée(s) et {{folders}} dossier(s) créé(s) dans l'espace de travail « {{workspace}} ».",
+      "pdf_notes_created": "{{count}} fichier(s) PDF importé(s) en tant que notes, chacun en pièce jointe d'une note portant le nom du fichier."
     },
     "skipped_attachments": {
       "header": "Fichiers de pièces jointes bloqués ignorés :",

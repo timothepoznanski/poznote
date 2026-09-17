@@ -2461,7 +2461,8 @@
       "notes_imported": "已将 {{count}} 篇笔记导入到工作区 \"{{workspace}}\" 的文件夹 \"{{folder}}\" 中。",
       "attachments_imported": "{{message}}",
       "notes_imported_zip": "已从 ZIP 导入 {{count}} 篇笔记到工作区 \"{{workspace}}\" 的文件夹 \"{{folder}}\" 中。",
-      "notes_imported_with_folders": "已在工作区“{{workspace}}”中导入 {{count}} 条笔记并创建 {{folders}} 个文件夹。"
+      "notes_imported_with_folders": "已在工作区“{{workspace}}”中导入 {{count}} 条笔记并创建 {{folders}} 个文件夹。",
+      "pdf_notes_created": "已将 {{count}} 个 PDF 文件导入为笔记，每个文件都作为附件添加到以文件名命名的笔记中。"
     },
     "skipped_attachments": {
       "header": "已跳过的被阻止附件文件：",

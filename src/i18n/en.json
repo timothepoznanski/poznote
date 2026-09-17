@@ -2070,7 +2070,8 @@
       "notes_imported": "Imported {{count}} note(s) into workspace \"{{workspace}}\", folder \"{{folder}}\".",
       "attachments_imported": "{{message}}",
       "notes_imported_zip": "Imported {{count}} note(s) from ZIP into workspace \"{{workspace}}\", folder \"{{folder}}\".",
-      "notes_imported_with_folders": "Imported {{count}} note(s) and created {{folders}} folder(s) in workspace \"{{workspace}}\"."
+      "notes_imported_with_folders": "Imported {{count}} note(s) and created {{folders}} folder(s) in workspace \"{{workspace}}\".",
+      "pdf_notes_created": "{{count}} PDF file(s) imported as notes, each one attached to a note named after the file."
     },
     "skipped_attachments": {
       "header": "Skipped blocked attachment files:",

@@ -2460,7 +2460,8 @@
       "notes_imported": "Importadas {{count}} nota(s) para espaço de trabalho \"{{workspace}}\", pasta \"{{folder}}\".",
       "attachments_imported": "{{message}}",
       "notes_imported_zip": "Importadas {{count}} nota(s) do ZIP para espaço de trabalho \"{{workspace}}\", pasta \"{{folder}}\".",
-      "notes_imported_with_folders": "{{count}} nota(s) importada(s) e {{folders}} pasta(s) criada(s) no espaço de trabalho \"{{workspace}}\"."
+      "notes_imported_with_folders": "{{count}} nota(s) importada(s) e {{folders}} pasta(s) criada(s) no espaço de trabalho \"{{workspace}}\".",
+      "pdf_notes_created": "{{count}} ficheiro(s) PDF importado(s) como notas, cada um anexado a uma nota com o nome do ficheiro."
     },
     "skipped_attachments": {
       "header": "Arquivos de anexos bloqueados ignorados:",
