@@ -1284,7 +1284,7 @@ function poznoteResolveImportedImageReferences($con, string $content, $noteId, s
                 // Relative Markdown links. A Poznote export names its files after
                 // the attachment id (attachments/<uniqid>.pdf) and carries the real
                 // filename in the label: those belong to the export pass below.
-                $content = preg_replace_callback('/!?\[([^\]]*)\]\(<?([^()<>]+?\.pdf)(?:#[^()<>\s]*)?>?\)/i', function($matches) use ($linkDocument, $attachmentIdMap) {
+                $content = preg_replace_callback('/!?\[([^\]]*)\]\(<?([^()<>]+?\.pdf)(?:#[^()<>\s]*)?>?\)/i', function($matches) use ($linkDocument) {
                     $target = trim($matches[2]);
                     if (preg_match('#^(?:[a-z][a-z0-9+.-]*:|//)#i', $target)) {
                         return $matches[0];
