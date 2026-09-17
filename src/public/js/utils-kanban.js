@@ -216,11 +216,10 @@ function closeKanbanView() {
     var rightCol = document.getElementById('right_col');
 
     if (window.tabManager && window.innerWidth > 800 && typeof window.tabManager.getActiveTabType === 'function' && window.tabManager.getActiveTabType() === 'kanban') {
-        if (typeof window.tabManager.closeActiveTab === 'function' && window.tabManager.closeActiveTab(false)) {
-            return;
-        }
+        // The tab manager loads the neighbour tab, or empties the pane when
+        // this was the last tab. Forced so a pinned kanban tab closes too.
         if (typeof window.tabManager.closeActiveTab === 'function' && window.tabManager.closeActiveTab(true)) {
-            setRightColumnContentPreservingTabs('');
+            return;
         }
     }
 

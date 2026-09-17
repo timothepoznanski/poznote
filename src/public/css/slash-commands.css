@@ -90,6 +90,15 @@
     font-size: 13px;
 }
 
+/* Typed filter, shown when the menu was opened on a selection (nothing is typed into the note) */
+.slash-command-filter {
+    padding: 4px 10px 8px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid var(--pz-border);
+    color: var(--pz-text-muted);
+    font-size: 13px;
+}
+
 /* Informational rows, like "No templates yet" in the Template submenu */
 .slash-command-item.slash-command-disabled {
     cursor: default;

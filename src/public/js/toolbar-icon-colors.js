@@ -2,9 +2,11 @@
  * Note toolbar icon colours.
  *
  * A right-click on a toolbar button, or on an entry of a toolbar menu (⋮,
- * task list actions), opens the icon colour modal of the rail
- * (window.PoznoteIconColorModal, js/icon-sidebar-colors.js) and saves the pick
- * under the 'toolbar_icon_colors' user setting straight away.
+ * task list actions), opens the icon menu of the rail
+ * (window.PoznoteIconContextMenu, js/icon-sidebar-colors.js): its colour entry
+ * opens the icon colour modal (window.PoznoteIconColorModal) and saves the
+ * pick under the 'toolbar_icon_colors' user setting straight away, its hide
+ * entry hides the button through the UI Customization list.
  *
  * The colours are painted by the <style id="toolbar-icon-colors-styles">
  * poznoteRenderToolbarIconColorsBootstrap() emits in index.php's <head>, not
@@ -20,7 +22,7 @@
     // Buttons with no btn-* class of their own.
     var CLASS_KEYS = ['mobile-more-btn', 'markdown-view-mode-btn', 'markdown-split-btn'];
     // Same list as $states in poznoteBuildToolbarIconColorRules().
-    var STATES = ':not(.is-favorite):not(.is-shared):not(.has-attachments):not(.has-reminder):not(.is-saving):not(.is-format-active)';
+    var STATES = ':not(.is-favorite):not(.is-shared):not(.has-attachments):not(.has-reminder):not(.is-saving):not(.is-format-active):not(.is-edit-mode)';
 
     var colors = normalizeColors(window.__POZNOTE_TOOLBAR_ICON_COLORS__);
 
@@ -37,7 +39,9 @@
 
     function buildRules(map) {
         return Object.keys(map).map(function (key) {
-            var paint = ' { color: ' + map[key] + '; background-color: ' + map[key] + '; }';
+            // Same token mapping as poznoteIconColorCss() on the PHP side.
+            var css = window.poznoteIconColorCss ? window.poznoteIconColorCss(map[key]) : map[key];
+            var paint = ' { color: ' + css + '; background-color: ' + css + '; }';
             if (key.indexOf('menu-') === 0) {
                 return '.note-edit-toolbar .dropdown-item[data-action="' + key.slice(5) + '"]:not([data-selector]):not(.has-attachments) i' + paint;
             }
@@ -124,21 +128,48 @@
             });
     }
 
+    // Colour keys whose button is hidden under another UI Customization key:
+    // the ⋮ entries that mirror a button, and the buttons named by a class the
+    // visibility list does not use.
+    var HIDE_KEY_ALIASES = {
+        'btn-search-replace-format': 'btn-search-replace',
+        'markdown-split-btn': 'btn-split-view',
+        'menu-show-snapshot': 'btn-snapshot',
+        'menu-insert-audio-file': 'btn-audio',
+        'menu-clear-completed-tasks': 'btn-clear-completed',
+        'menu-uncheck-all-tasks': 'btn-uncheck-all',
+        'menu-print-note': 'btn-print'
+    };
+
+    // The UI Customization key that hides a toolbar button, '' when the
+    // visibility list (ui_customization_panel.php, on this page) has no box
+    // for it: a key it does not list could never be shown again.
+    function hideKeyOf(key) {
+        var uiKey = 'toolbar:' + (HIDE_KEY_ALIASES[key] || key);
+        return document.querySelector('[data-ui-key="' + uiKey + '"]') ? uiKey : '';
+    }
+
     document.addEventListener('contextmenu', function (event) {
         var modal = window.PoznoteIconColorModal;
+        var menu = window.PoznoteIconContextMenu;
         var target = event.target.closest && event.target.closest('.note-edit-toolbar .toolbar-btn, .note-edit-toolbar .dropdown-item');
-        if (!modal || !target) return;
+        if (!modal || !menu || !target) return;
 
         var key = keyOf(target);
         if (!key) return;
 
         event.preventDefault();
-        modal.open({
-            color: colors[key] || '',
-            icon: modal.iconClassOf(target.querySelector('.lucide')),
-            label: labelOf(target),
-            onApply: function (color) {
-                save(key, color);
+        menu.open(event, target, {
+            hideKey: hideKeyOf(key),
+            onColor: function () {
+                modal.open({
+                    color: colors[key] || '',
+                    icon: modal.iconClassOf(target.querySelector('.lucide')),
+                    label: labelOf(target),
+                    onApply: function (color) {
+                        save(key, color);
+                    }
+                });
             }
         });
     });

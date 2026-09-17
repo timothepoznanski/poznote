@@ -24,6 +24,22 @@ let isOnline = navigator.onLine;
 let notesNeedingRefresh = new Set();
 
 // ============================================================================
+// STORAGE KEYS
+// ============================================================================
+
+/**
+ * The part of a localStorage key that names a note. Note ids repeat from one
+ * account to the next, so an account opened through granted access gets keys
+ * of its own (js/theme-init.js): a draft must never surface in another
+ * account's note of the same id. Also used by js/excalidraw.js.
+ */
+function noteStorageId(noteId) {
+    return typeof window.__poznoteNoteStorageId === 'function'
+        ? window.__poznoteNoteStorageId(noteId)
+        : String(noteId);
+}
+
+// ============================================================================
 // AUTO-PUSH FLAG MANAGEMENT (localStorage only - single source of truth)
 // ============================================================================
 
@@ -43,7 +59,7 @@ function getAutoPushFlag() {
     if (!id) return false;
     
     try {
-        return localStorage.getItem('poznote_needs_auto_push_' + id) === 'true';
+        return localStorage.getItem('poznote_needs_auto_push_' + noteStorageId(id)) === 'true';
     } catch (e) {
         return false;
     }
@@ -62,9 +78,9 @@ function setAutoPushFlag(value) {
     
     try {
         if (value) {
-            localStorage.setItem('poznote_needs_auto_push_' + id, 'true');
+            localStorage.setItem('poznote_needs_auto_push_' + noteStorageId(id), 'true');
         } else {
-            localStorage.removeItem('poznote_needs_auto_push_' + id);
+            localStorage.removeItem('poznote_needs_auto_push_' + noteStorageId(id));
         }
     } catch (e) {
         // Ignore localStorage errors
@@ -88,7 +104,7 @@ function setupAutoSaveCheck() {
 
         // Try to sync any pending changes
         if (noteid !== -1 && noteid !== 'search' && noteid !== null && noteid !== undefined) {
-            const draftKey = 'poznote_draft_' + noteid;
+            const draftKey = 'poznote_draft_' + noteStorageId(noteid);
             const draft = localStorage.getItem(draftKey);
 
             if (draft && draft !== lastSavedContent) {
@@ -385,9 +401,9 @@ function saveToServerDebounced() {
     }
 
     // Check if content has actually changed
-    const draftKey = 'poznote_draft_' + noteid;
-    const titleKey = 'poznote_title_' + noteid;
-    const tagsKey = 'poznote_tags_' + noteid;
+    const draftKey = 'poznote_draft_' + noteStorageId(noteid);
+    const titleKey = 'poznote_title_' + noteStorageId(noteid);
+    const tagsKey = 'poznote_tags_' + noteStorageId(noteid);
 
     const storedDraft = localStorage.getItem(draftKey);
     const storedTitle = localStorage.getItem(titleKey);
@@ -648,10 +664,10 @@ function emergencySave(noteId) {
  */
 function clearDraft(noteId) {
     try {
-        localStorage.removeItem('poznote_draft_' + noteId);
-        localStorage.removeItem('poznote_title_' + noteId);
-        localStorage.removeItem('poznote_tags_' + noteId);
-        localStorage.removeItem(DRAFT_META_PREFIX + noteId);
+        localStorage.removeItem('poznote_draft_' + noteStorageId(noteId));
+        localStorage.removeItem('poznote_title_' + noteStorageId(noteId));
+        localStorage.removeItem('poznote_tags_' + noteStorageId(noteId));
+        localStorage.removeItem(DRAFT_META_PREFIX + noteStorageId(noteId));
     } catch (err) {
         console.warn('[Poznote Auto-Save] Failed to clear draft:', err);
     }
@@ -826,7 +842,7 @@ function snapshotNoteStateForSave(noteId) {
 
 function readDraftMeta(noteId) {
     try {
-        const meta = JSON.parse(localStorage.getItem(DRAFT_META_PREFIX + noteId) || 'null');
+        const meta = JSON.parse(localStorage.getItem(DRAFT_META_PREFIX + noteStorageId(noteId)) || 'null');
         return (meta && typeof meta === 'object') ? meta : null;
     } catch (e) {
         return null;
@@ -843,13 +859,13 @@ function writeNoteDraft(noteId, content, title, tags) {
         return;
     }
     try {
-        const isNewDraft = localStorage.getItem('poznote_draft_' + noteId) === null;
-        localStorage.setItem('poznote_draft_' + noteId, content);
+        const isNewDraft = localStorage.getItem('poznote_draft_' + noteStorageId(noteId)) === null;
+        localStorage.setItem('poznote_draft_' + noteStorageId(noteId), content);
         if (title !== null && title !== undefined) {
-            localStorage.setItem('poznote_title_' + noteId, title);
+            localStorage.setItem('poznote_title_' + noteStorageId(noteId), title);
         }
         if (tags !== null && tags !== undefined) {
-            localStorage.setItem('poznote_tags_' + noteId, tags);
+            localStorage.setItem('poznote_tags_' + noteStorageId(noteId), tags);
         }
 
         // The version is the one the server held when this draft started:
@@ -866,7 +882,7 @@ function writeNoteDraft(noteId, content, title, tags) {
         }
         meta.session = (typeof window.getCurrentEditorSessionId === 'function') ? window.getCurrentEditorSessionId() : '';
         meta.ts = Date.now();
-        localStorage.setItem(DRAFT_META_PREFIX + noteId, JSON.stringify(meta));
+        localStorage.setItem(DRAFT_META_PREFIX + noteStorageId(noteId), JSON.stringify(meta));
     } catch (err) {
         // localStorage quota exceeded or other error
         console.warn('[Poznote Auto-Save] Failed to save to localStorage:', err);
@@ -875,14 +891,14 @@ function writeNoteDraft(noteId, content, title, tags) {
 
 function readNoteDraft(noteId) {
     try {
-        const content = localStorage.getItem('poznote_draft_' + noteId);
+        const content = localStorage.getItem('poznote_draft_' + noteStorageId(noteId));
         if (content === null) {
             return null;
         }
         return {
             content: content,
-            title: localStorage.getItem('poznote_title_' + noteId),
-            tags: localStorage.getItem('poznote_tags_' + noteId),
+            title: localStorage.getItem('poznote_title_' + noteStorageId(noteId)),
+            tags: localStorage.getItem('poznote_tags_' + noteStorageId(noteId)),
             meta: readDraftMeta(noteId) || {}
         };
     } catch (e) {
@@ -1149,7 +1165,7 @@ function finishDraftRecovery(noteId) {
     clearDraft(noteId);
     if (window.POZNOTE_CONFIG?.gitSyncAutoPush) {
         try {
-            localStorage.setItem('poznote_needs_auto_push_' + noteId, 'true');
+            localStorage.setItem('poznote_needs_auto_push_' + noteStorageId(noteId), 'true');
         } catch (e) { /* ignore */ }
     }
     reloadNoteAfterDraftRecovery(noteId, 0);
@@ -1259,6 +1275,30 @@ window.adoptNoteSavedTitle = function (noteId, title) {
         lastSavedTitle = title;
     }
 };
+// A note renamed outside its title field (tree inline rename, rename modal,
+// tree undo/redo): show the new title in the open note and make it the saved
+// one. A stored draft still carries the old title (every save leaves one), and
+// the recovery after the reload would take it for an unsaved edit: it gets the
+// new title too.
+window.adoptNoteRename = function (noteId, title) {
+    if (!noteId || typeof title !== 'string') {
+        return;
+    }
+    const titleInput = document.getElementById('inp' + noteId);
+    if (titleInput) {
+        titleInput.value = title;
+        if (String(noteId) === String(noteid) || String(noteId) === getDisplayedNoteId()) {
+            lastSavedTitle = title;
+        }
+    }
+    try {
+        if (localStorage.getItem('poznote_title_' + noteStorageId(noteId)) !== null) {
+            localStorage.setItem('poznote_title_' + noteStorageId(noteId), title);
+        }
+    } catch (e) {
+        // storage unavailable: no draft to carry the title into
+    }
+};
 // What is on screen now IS the server version (js/live-refresh.js applied
 // an outside change in place, nothing of ours in it): make it the saved
 // state, so the editor's own input event does not queue a pointless save
@@ -1289,6 +1329,7 @@ window.adoptNoteSavedState = function (noteId) {
 };
 window.markNoteAsModified = markNoteAsModified;
 window.hasUnsavedChanges = hasUnsavedChanges;
+window.hasUnsavedChangesOnScreen = hasUnsavedChangesOnScreen;
 window.clearDraft = clearDraft;
 window.writeNoteDraft = writeNoteDraft;
 window.snapshotNoteStateForSave = snapshotNoteStateForSave;

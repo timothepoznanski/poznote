@@ -108,7 +108,7 @@
         // custom color (or none) forced over the dark-mode recolor filter
         icon.className = iconClass || 'lucide-folder';
         if (iconColor) {
-            icon.style.setProperty('color', iconColor, 'important');
+            icon.style.setProperty('color', window.poznoteIconColorCss ? window.poznoteIconColorCss(iconColor) : iconColor, 'important');
         } else {
             icon.style.removeProperty('color');
         }

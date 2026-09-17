@@ -70,6 +70,38 @@
         { id: 'caution', labelKey: 'slash_menu.callout_caution', fallback: 'Caution' }
     ];
 
+    // Mermaid diagram starters for Markdown notes (discussion #1404). Each one
+    // is a small working example, so the syntax does not have to be remembered.
+    // The aliases are the Mermaid keywords, which match in every UI language.
+    var MERMAID_DIAGRAMS = [
+        { id: 'mermaid-flowchart', icon: 'lucide-network', labelKey: 'slash_menu.mermaid_flowchart', fallback: 'Flowchart', aliases: ['flowchart', 'graph'],
+            source: 'flowchart TD\n    A[Start] --> B{Decision}\n    B -->|Yes| C[Step 1]\n    B -->|No| D[Step 2]\n    C --> E[End]\n    D --> E' },
+        { id: 'mermaid-sequence', icon: 'lucide-message-square', labelKey: 'slash_menu.mermaid_sequence', fallback: 'Sequence diagram', aliases: ['sequenceDiagram'],
+            source: 'sequenceDiagram\n    participant Alice\n    participant Bob\n    Alice->>Bob: Hello Bob\n    Bob-->>Alice: Hi Alice' },
+        { id: 'mermaid-class', icon: 'lucide-boxes', labelKey: 'slash_menu.mermaid_class', fallback: 'Class diagram', aliases: ['classDiagram', 'uml'],
+            source: 'classDiagram\n    class Animal {\n        +String name\n        +eat()\n    }\n    class Dog {\n        +bark()\n    }\n    Animal <|-- Dog' },
+        { id: 'mermaid-state', icon: 'lucide-circle-dot', labelKey: 'slash_menu.mermaid_state', fallback: 'State diagram', aliases: ['stateDiagram'],
+            source: 'stateDiagram-v2\n    [*] --> Draft\n    Draft --> Review\n    Review --> Draft\n    Review --> Published\n    Published --> [*]' },
+        { id: 'mermaid-er', icon: 'lucide-database', labelKey: 'slash_menu.mermaid_er', fallback: 'Entity relationship', aliases: ['erDiagram'],
+            source: 'erDiagram\n    CUSTOMER ||--o{ ORDER : places\n    ORDER ||--|{ LINE_ITEM : contains\n    PRODUCT ||--o{ LINE_ITEM : "ordered in"' },
+        { id: 'mermaid-gantt', icon: 'lucide-calendar', labelKey: 'slash_menu.mermaid_gantt', fallback: 'Gantt chart', aliases: ['gantt'],
+            source: 'gantt\n    title Project\n    dateFormat YYYY-MM-DD\n    section Planning\n    Research :a1, 2026-01-05, 7d\n    Design :a2, after a1, 5d\n    section Build\n    Development :after a2, 14d' },
+        { id: 'mermaid-pie', icon: 'lucide-pie-chart', labelKey: 'slash_menu.mermaid_pie', fallback: 'Pie chart', aliases: ['pie'],
+            source: 'pie title Pets\n    "Dogs" : 40\n    "Cats" : 35\n    "Birds" : 25' },
+        { id: 'mermaid-mindmap', icon: 'lucide-brain', labelKey: 'slash_menu.mermaid_mindmap', fallback: 'Mindmap', aliases: ['mindmap'],
+            source: 'mindmap\n  root((Topic))\n    Idea A\n      Detail\n    Idea B\n    Idea C' },
+        { id: 'mermaid-timeline', icon: 'lucide-history', labelKey: 'slash_menu.mermaid_timeline', fallback: 'Timeline', aliases: ['timeline'],
+            source: 'timeline\n    title History\n    2024 : Event A\n    2025 : Event B : Event C\n    2026 : Event D' },
+        { id: 'mermaid-journey', icon: 'lucide-footprints', labelKey: 'slash_menu.mermaid_journey', fallback: 'User journey', aliases: ['journey'],
+            source: 'journey\n    title My day\n    section Morning\n      Wake up: 3: Me\n      Coffee: 5: Me\n    section Work\n      Meetings: 2: Me, Team' },
+        { id: 'mermaid-git', icon: 'lucide-git-branch', labelKey: 'slash_menu.mermaid_git', fallback: 'Git graph', aliases: ['gitGraph'],
+            source: 'gitGraph\n    commit\n    branch feature\n    checkout feature\n    commit\n    checkout main\n    commit\n    merge feature' },
+        { id: 'mermaid-quadrant', icon: 'lucide-grid', labelKey: 'slash_menu.mermaid_quadrant', fallback: 'Quadrant chart', aliases: ['quadrantChart'],
+            source: 'quadrantChart\n    title Priorities\n    x-axis Low effort --> High effort\n    y-axis Low impact --> High impact\n    quadrant-1 Big projects\n    quadrant-2 Quick wins\n    quadrant-3 Fill-ins\n    quadrant-4 Thankless tasks\n    Task A: [0.3, 0.8]\n    Task B: [0.7, 0.4]' },
+        { id: 'mermaid-xy', icon: 'lucide-bar-chart', labelKey: 'slash_menu.mermaid_xy', fallback: 'Bar and line chart', aliases: ['xychart', 'bar'],
+            source: 'xychart-beta\n    title Sales\n    x-axis [Jan, Feb, Mar, Apr]\n    y-axis "Revenue" 0 --> 100\n    bar [30, 50, 70, 60]\n    line [30, 50, 70, 60]' }
+    ];
+
     // -------------------------------------------------------------------
     // Slash menu global variables
     // -------------------------------------------------------------------
@@ -93,6 +125,9 @@
     let codeMirrorSlashEditor = null;
     let codeMirrorSlashFrom = -1;
     let codeMirrorSlashTo = -1;
+    // Set while the menu was opened on a text selection (issue #1410): no "/"
+    // was typed, the selection is kept and only formatting commands are shown
+    let selectionSlashContext = null;
     const SLASH_CURSOR_HIDDEN_CLASS = 'slash-menu-cursor-hidden';
 
     // Touch tracking for distinguishing tap from scroll
@@ -743,11 +778,6 @@
         insertInlineElement('em');
     }
 
-    // Insert highlighted text
-    function insertHighlight() {
-        insertInlineElement('mark');
-    }
-
     // Insert strikethrough text
     function insertStrikethrough() {
         insertInlineElement('s');
@@ -761,6 +791,53 @@
     // Insert colored text
     function insertColor(color) {
         insertInlineElement('span', color !== 'black' ? { color: color } : undefined);
+    }
+
+    // A palette value, var(--pz-color-red, #dc2626), so the colour follows the
+    // theme (js/color-palette.js, issue #1408). kind is 'text' or 'highlight'.
+    function paletteValue(kind, id) {
+        const palette = window.PoznoteColorPalette;
+        if (!palette) return '';
+        return kind === 'highlight' ? palette.highlightColor(id) : palette.textColor(id);
+    }
+
+    // One submenu entry per palette colour; apply receives the text value.
+    function paletteColorItems(apply) {
+        const palette = window.PoznoteColorPalette;
+        const t = window.t || ((key, params, fallback) => fallback);
+        if (!palette) return [];
+        return palette.colors.map(c => {
+            const value = palette.textColor(c.id);
+            return {
+                id: c.id,
+                icon: 'lucide-circle',
+                iconColor: value,
+                label: t('colors.' + c.id, null, c.id.charAt(0).toUpperCase() + c.id.slice(1)),
+                action: () => apply(value)
+            };
+        });
+    }
+
+    // The highlight submenu, the toolbar highlight picker's swatches (issue
+    // #1411). Yellow leads so "/highlight" + Enter keeps the usual highlight.
+    // apply receives the soft value; the icon shows the base colour, which
+    // stays visible where the soft one fades into a dark background.
+    function paletteHighlightItems(apply) {
+        const palette = window.PoznoteColorPalette;
+        const t = window.t || ((key, params, fallback) => fallback);
+        if (!palette) return [];
+        const colors = palette.colors.filter(c => c.id === 'yellow')
+            .concat(palette.colors.filter(c => c.id !== 'yellow'));
+        return colors.map(c => {
+            const value = palette.highlightColor(c.id);
+            return {
+                id: 'highlight-' + c.id,
+                icon: 'lucide-paintbrush',
+                iconColor: palette.textColor(c.id),
+                label: t('colors.' + c.id, null, c.id.charAt(0).toUpperCase() + c.id.slice(1)),
+                action: () => apply(value)
+            };
+        });
     }
 
     // Insert a code block, optionally without syntax highlighting.
@@ -1736,6 +1813,37 @@
     // Dictation needs a transcription server; index.php says whether this user
     // has one (see poznoteResolveSttConfig()). Read at menu-open time rather
     // than at load, so it holds whatever the page was served with.
+    // Diagrams section: Excalidraw in every note, Mermaid only in Markdown
+    // notes because HTML notes never render it (discussion #1404)
+    function buildDiagramsSection(t, common, withMermaid) {
+        const items = [common.excalidraw];
+        if (withMermaid) {
+            items.push({
+                id: 'mermaid',
+                icon: 'lucide-shapes',
+                label: t('slash_menu.mermaid', null, 'Mermaid'),
+                aliases: ['mermaid'],
+                submenu: MERMAID_DIAGRAMS.map(function (d) {
+                    return {
+                        id: d.id,
+                        icon: d.icon,
+                        label: t(d.labelKey, null, d.fallback),
+                        aliases: d.aliases,
+                        // Caret at the end of the last diagram line, before the closing fence
+                        action: function () { insertMarkdownAtCursor('```mermaid\n' + d.source + '\n```\n', -5); }
+                    };
+                })
+            });
+        }
+        return {
+            id: 'diagrams',
+            icon: 'lucide-shapes',
+            label: t('slash_menu.diagrams', null, 'Diagrams'),
+            aliases: ['diagram', 'chart'],
+            submenu: items
+        };
+    }
+
     function isSpeechToTextAvailable() {
         return !!(window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.speechToText);
     }
@@ -2021,7 +2129,7 @@
             .map(note => ({
                 id: 'template-' + note.id,
                 icon: note.icon || 'lucide-file-text',
-                iconColor: note.icon_color || null,
+                iconColor: (window.poznoteIconColorCss ? window.poznoteIconColorCss(note.icon_color) : '') || null,
                 label: note.heading || t('note_reference.untitled', null, 'Untitled'),
                 action: function () { insertTemplate(note); }
             }));
@@ -2299,7 +2407,6 @@
                 submenu: [
                     { id: 'bold', icon: 'lucide-bold', label: t('slash_menu.bold', null, 'Bold'), action: () => insertBold() },
                     { id: 'italic', icon: 'lucide-italic', label: t('slash_menu.italic', null, 'Italic'), action: () => insertItalic() },
-                    { id: 'highlight', icon: 'lucide-fill-drip', label: t('slash_menu.highlight', null, 'Highlight'), action: () => insertHighlight() },
                     { id: 'strikethrough', icon: 'lucide-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => insertStrikethrough() }
                 ]
             },
@@ -2307,15 +2414,15 @@
                 id: 'color',
                 icon: 'lucide-palette',
                 label: t('slash_menu.color', null, 'Color'),
-                submenu: [
-                    { id: 'red', icon: 'lucide-circle', iconColor: '#e74c3c', label: t('slash_menu.color_red', null, 'Red'), action: () => insertColor('#e74c3c') },
-                    { id: 'blue', icon: 'lucide-circle', iconColor: '#3498db', label: t('slash_menu.color_blue', null, 'Blue'), action: () => insertColor('#3498db') },
-                    { id: 'green', icon: 'lucide-circle', iconColor: '#2ecc71', label: t('slash_menu.color_green', null, 'Green'), action: () => insertColor('#2ecc71') },
-                    { id: 'yellow', icon: 'lucide-circle', iconColor: '#f1c40f', label: t('slash_menu.color_yellow', null, 'Yellow'), action: () => insertColor('#f1c40f') },
-                    { id: 'purple', icon: 'lucide-circle', iconColor: '#9b59b6', label: t('slash_menu.color_purple', null, 'Purple'), action: () => insertColor('#9b59b6') },
-                    { id: 'orange', icon: 'lucide-circle', iconColor: '#e67e22', label: t('slash_menu.color_orange', null, 'Orange'), action: () => insertColor('#e67e22') },
-                    { id: 'black', icon: 'lucide-circle', iconColor: '#000000', label: t('slash_menu.color_black', null, 'Black'), action: () => insertColor('inherit') }
-                ]
+                submenu: paletteColorItems(function (value) { insertColor(value); }).concat([
+                    { id: 'default', icon: 'lucide-circle', iconColor: 'var(--pz-text)', label: t('colors.default', null, 'Default'), action: () => insertColor('inherit') }
+                ])
+            },
+            {
+                id: 'highlight',
+                icon: 'lucide-paintbrush',
+                label: t('slash_menu.highlight', null, 'Highlight'),
+                submenu: paletteHighlightItems(function (value) { insertInlineElement('span', { backgroundColor: value }); })
             },
             {
                 id: 'code',
@@ -2429,7 +2536,6 @@
                         }
                     },
                     common.dictate,
-                    common.excalidraw,
                     common.emoji,
                     {
                         id: 'table',
@@ -2453,6 +2559,7 @@
                     }
                 ]
             },
+            buildDiagramsSection(t, common, false),
             buildDateSection(t, insertDate, true),
             {
                 id: 'link-menu',
@@ -2738,15 +2845,23 @@
                 id: 'color',
                 icon: 'lucide-palette',
                 label: t('slash_menu.color', null, 'Color'),
-                submenu: [
-                    { id: 'red', icon: 'lucide-circle', iconColor: '#e74c3c', label: t('slash_menu.color_red', null, 'Red'), action: () => wrapMarkdownSelection('<span style="color:#e74c3c">', '</span>') },
-                    { id: 'blue', icon: 'lucide-circle', iconColor: '#3498db', label: t('slash_menu.color_blue', null, 'Blue'), action: () => wrapMarkdownSelection('<span style="color:#3498db">', '</span>') },
-                    { id: 'green', icon: 'lucide-circle', iconColor: '#2ecc71', label: t('slash_menu.color_green', null, 'Green'), action: () => wrapMarkdownSelection('<span style="color:#2ecc71">', '</span>') },
-                    { id: 'yellow', icon: 'lucide-circle', iconColor: '#f1c40f', label: t('slash_menu.color_yellow', null, 'Yellow'), action: () => wrapMarkdownSelection('<span style="color:#f1c40f">', '</span>') },
-                    { id: 'purple', icon: 'lucide-circle', iconColor: '#9b59b6', label: t('slash_menu.color_purple', null, 'Purple'), action: () => wrapMarkdownSelection('<span style="color:#9b59b6">', '</span>') },
-                    { id: 'orange', icon: 'lucide-circle', iconColor: '#e67e22', label: t('slash_menu.color_orange', null, 'Orange'), action: () => wrapMarkdownSelection('<span style="color:#e67e22">', '</span>') },
-                    { id: 'bg-yellow', icon: 'lucide-fill-drip', iconColor: '#f1c40f', label: t('slash_menu.bg_yellow', null, 'Yellow background'), action: () => wrapMarkdownSelection('<span style="background-color:#f1c40f">', '</span>') }
-                ]
+                submenu: paletteColorItems(function (value) {
+                    wrapMarkdownSelection('<span style="color:' + value + '">', '</span>');
+                })
+            },
+            {
+                id: 'highlight',
+                icon: 'lucide-paintbrush',
+                label: t('slash_menu.highlight', null, 'Highlight'),
+                // Yellow is ==text==, like the toolbar (markdown <mark> is
+                // painted yellow); the other colours need a styled span
+                submenu: paletteHighlightItems(function (value) {
+                    if (value === paletteValue('highlight', 'yellow')) {
+                        wrapMarkdownSelection('==', '==', 2);
+                    } else {
+                        wrapMarkdownSelection('<span style="background-color:' + value + '">', '</span>');
+                    }
+                })
             },
             {
                 id: 'insert',
@@ -2763,7 +2878,6 @@
                         }
                     },
                     common.dictate,
-                    common.excalidraw,
                     common.emoji,
                     {
                         id: 'table',
@@ -2783,6 +2897,7 @@
                     }
                 ]
             },
+            buildDiagramsSection(t, common, true),
             buildDateSection(t, insertDateMarkdown, true),
             {
                 id: 'link-menu',
@@ -2974,6 +3089,239 @@
         ]);
     }
 
+    // Slash menu opened on a text selection (issue #1410): only the commands
+    // that act on the selected text. Link and the Markdown inline wrappers
+    // already handle a selection and are reused as they are. The rich-text
+    // insert* functions would replace the text, so those go through the same
+    // helpers as the toolbar buttons.
+    function getSelectionSlashCommands(isMarkdown) {
+        const t = window.t || ((key, params, fallback) => fallback);
+        const common = getCommonSlashCommands();
+        const full = isMarkdown ? getMarkdownSlashCommands() : getSlashCommands();
+        const findIn = (list, id) => (list || []).find(c => c.id === id) || null;
+        const pick = (parentId, id) => {
+            const parent = findIn(full, parentId);
+            return parent ? findIn(parent.submenu, id) : null;
+        };
+
+        const applyBlockStyle = function (style) {
+            if (isMarkdown) {
+                if (typeof window.applyMarkdownHeadingLevel === 'function') window.applyMarkdownHeadingLevel(style);
+            } else if (typeof window.applyHtmlBlockStyle === 'function') {
+                window.applyHtmlBlockStyle(style);
+                if (savedNoteEntry) savedNoteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+            if (window.outlinePanel && typeof window.outlinePanel.refresh === 'function') {
+                // Markdown waits for the preview debounce (300ms)
+                setTimeout(() => window.outlinePanel.refresh(), isMarkdown ? 350 : 50);
+            }
+        };
+
+        // The toolbar highlight helpers: markdown writes ==text== for yellow
+        // and a styled span otherwise, HTML goes through hiliteColor
+        const applyHighlight = function (value) {
+            if (isMarkdown) {
+                if (typeof window.applyMarkdownHighlight === 'function') window.applyMarkdownHighlight(value);
+            } else if (typeof window.applyHighlightToSelection === 'function') {
+                window.applyHighlightToSelection(value);
+            }
+        };
+        const highlight = {
+            id: 'highlight',
+            icon: 'lucide-paintbrush',
+            label: t('slash_menu.highlight', null, 'Highlight'),
+            submenu: paletteHighlightItems(applyHighlight).concat(isMarkdown ? [] : [
+                {
+                    id: 'highlight-none',
+                    icon: 'lucide-ban',
+                    label: t('editor.colors.none', null, 'None'),
+                    action: () => applyHighlight('none')
+                }
+            ])
+        };
+
+        const format = isMarkdown
+            ? [pick('format', 'bold'), pick('format', 'italic'), pick('format', 'strikethrough')]
+            : [
+                { id: 'bold', icon: 'lucide-bold', label: t('slash_menu.bold', null, 'Bold'), action: () => document.execCommand('bold') },
+                { id: 'italic', icon: 'lucide-italic', label: t('slash_menu.italic', null, 'Italic'), action: () => document.execCommand('italic') },
+                { id: 'strikethrough', icon: 'lucide-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => document.execCommand('strikeThrough') }
+            ];
+
+        const color = isMarkdown
+            ? findIn(full, 'color')
+            : {
+                id: 'color',
+                icon: 'lucide-palette',
+                label: t('slash_menu.color', null, 'Color'),
+                submenu: paletteColorItems(function (value) {
+                    if (typeof window.applyColorToSelection === 'function') window.applyColorToSelection(value);
+                }).concat([
+                    {
+                        id: 'default',
+                        icon: 'lucide-circle',
+                        iconColor: 'var(--pz-text)',
+                        label: t('colors.default', null, 'Default'),
+                        action: function () {
+                            if (typeof window.applyColorToSelection === 'function') window.applyColorToSelection('none');
+                        }
+                    }
+                ])
+            };
+
+        return filterSlashCommands([
+            {
+                id: 'title',
+                icon: 'lucide-text-height',
+                label: t('slash_menu.title', null, 'Title'),
+                submenu: [
+                    { id: 'normal', label: t('slash_menu.back_to_normal', null, 'Back to normal text'), action: () => applyBlockStyle('normal') },
+                    { id: 'h1', label: t('slash_menu.heading_1', null, 'Heading 1'), action: () => applyBlockStyle('1') },
+                    { id: 'h2', label: t('slash_menu.heading_2', null, 'Heading 2'), action: () => applyBlockStyle('2') },
+                    { id: 'h3', label: t('slash_menu.heading_3', null, 'Heading 3'), action: () => applyBlockStyle('3') }
+                ]
+            },
+            {
+                id: 'format',
+                icon: 'lucide-bold',
+                label: t('slash_menu.format_text', null, 'Format text'),
+                submenu: format
+            },
+            color,
+            highlight,
+            {
+                id: 'code',
+                icon: 'lucide-code',
+                label: t('slash_menu.code', null, 'Code'),
+                submenu: [
+                    isMarkdown ? pick('code', 'inline-code') : {
+                        id: 'inline-code',
+                        icon: 'lucide-terminal',
+                        label: t('slash_menu.inline_code', null, 'Inline code'),
+                        action: function () {
+                            if (typeof window.toggleInlineCode === 'function') window.toggleInlineCode();
+                            if (savedNoteEntry) savedNoteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+                        }
+                    },
+                    {
+                        id: 'code-normal',
+                        icon: 'lucide-file-code',
+                        label: t('slash_menu.code_block', null, 'Code block'),
+                        action: function () {
+                            if (isMarkdown) {
+                                if (typeof window.applyMarkdownCodeBlock === 'function') window.applyMarkdownCodeBlock();
+                            } else if (typeof window.toggleCodeBlock === 'function') {
+                                window.toggleCodeBlock();
+                            }
+                        }
+                    }
+                ]
+            },
+            pick('link-menu', 'link'),
+            common.cancel
+        ]);
+    }
+
+    // Where the selection ends: the menu opens there, as it would under a typed "/"
+    function getSelectionSlashAnchorRect(context) {
+        if (context.range) {
+            const end = context.range.cloneRange();
+            end.collapse(false);
+            const rect = end.getBoundingClientRect();
+            if (isUsableAnchorRect(rect)) return rect;
+            const rects = context.range.getClientRects();
+            return rects.length ? rects[rects.length - 1] : context.range.getBoundingClientRect();
+        }
+        const api = getMarkdownCodeMirrorApi();
+        const coords = api && typeof api.getCoordsAtPos === 'function' ? api.getCoordsAtPos(context.editor, context.end) : null;
+        return coords || context.editor.getBoundingClientRect();
+    }
+
+    // Put the selection the menu was opened on back in the editor
+    function restoreSelectionSlashContext(context) {
+        if (!context) return;
+        focusEditableElement(context.editor);
+
+        if (context.range) {
+            try {
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(context.range);
+            } catch (e) {
+                console.debug('slash-command: restoreSelectionSlashContext() failed:', e);
+            }
+            return;
+        }
+
+        const api = getMarkdownCodeMirrorApi();
+        if (api && typeof api.setSelection === 'function') {
+            api.setSelection(context.editor, context.start, context.end);
+        }
+    }
+
+    // Open the menu on a non-empty selection in a note instead of letting the
+    // "/" replace it (issue #1410). Returns true when the menu opened, the
+    // caller then cancels the keystroke.
+    function showSlashMenuForSelection(target) {
+        if (!target || !target.closest || slashMenuElement) return false;
+
+        let context = null;
+        const codeMirrorEditor = getCodeMirrorEditorFromTarget(target);
+        if (codeMirrorEditor) {
+            const snapshot = getCodeMirrorSelectionSnapshot(codeMirrorEditor);
+            if (!snapshot || snapshot.start === snapshot.end) return false;
+            context = { editor: codeMirrorEditor, start: snapshot.start, end: snapshot.end, markdown: true };
+        } else {
+            const sel = window.getSelection();
+            if (!sel || !sel.rangeCount || sel.isCollapsed) return false;
+
+            const range = sel.getRangeAt(0);
+            let container = range.commonAncestorContainer;
+            if (container.nodeType === 3) container = container.parentNode;
+            const editable = container && container.closest ? container.closest('[contenteditable="true"]') : null;
+            const noteEntry = editable ? editable.closest('.noteentry') : null;
+            if (!noteEntry || target.closest('.noteentry') !== noteEntry) return false;
+
+            const noteType = noteEntry.getAttribute('data-note-type');
+            if (noteType === 'tasklist') return false;
+            const isMarkdown = noteType === 'markdown';
+            if (isMarkdown && !editable.classList.contains('markdown-editor')) return false;
+
+            context = { editor: editable, range: range.cloneRange(), markdown: isMarkdown };
+        }
+
+        hideSlashMenu();
+
+        selectionSlashContext = context;
+        savedEditableElement = context.editor;
+        savedNoteEntry = context.editor.closest('.noteentry');
+
+        activeCommandsBuilder = () => getSelectionSlashCommands(context.markdown);
+        activeCommands = activeCommandsBuilder();
+        filterText = '';
+        selectedIndex = 0;
+        filteredCommands = getFilteredCommands('');
+
+        slashMenuElement = document.createElement('div');
+        slashMenuElement.className = 'slash-command-menu';
+        slashMenuElement.innerHTML = buildMenuHTML();
+
+        document.body.appendChild(slashMenuElement);
+        positionMenuAtRect(getSelectionSlashAnchorRect(context));
+
+        requestAnimationFrame(() => {
+            if (slashMenuElement) slashMenuElement.classList.add('show');
+        });
+
+        slashMenuElement.addEventListener('mousedown', handleMenuMouseDown);
+        slashMenuElement.addEventListener('click', handleMenuClick);
+        slashMenuElement.addEventListener('mouseover', handleMenuMouseOver);
+
+        closeMobileKeyboardForSlashMenu(context.editor);
+        hideCursorForSlashMenu();
+        return true;
+    }
+
     // Get current editor context (note type, DOM elements)
     function getEditorContext() {
         if (isMarkdownCodeMirrorEditor(savedEditableElement)) {
@@ -3127,11 +3475,16 @@
 
     // Build slash menu HTML
     function buildMenuHTML() {
+        // Opened on a selection, the typed filter is not in the note: echo it here
+        const filterHTML = selectionSlashContext && filterText
+            ? '<div class="slash-command-filter">/' + escapeHtml(filterText) + '</div>'
+            : '';
+
         if (!filteredCommands.length) {
-            return '<div class="slash-command-empty">No results</div>';
+            return filterHTML + '<div class="slash-command-empty">No results</div>';
         }
 
-        return filteredCommands
+        return filterHTML + filteredCommands
             .map((cmd, idx) => {
                 const selectedClass = idx === selectedIndex ? ' selected' : '';
                 const hasSubmenu = cmd.submenu && cmd.submenu.length > 0;
@@ -3339,6 +3692,7 @@
         slashTextNode = null;
         slashOffset = -1;
         filterText = '';
+        selectionSlashContext = null;
         resetCodeMirrorSlashState();
     }
 
@@ -3761,9 +4115,15 @@
 
         // Delete the slash and filter text (unless keepSlash is true)
         const shouldKeepSlash = foundCmd && foundCmd.keepSlash;
+        const selectionContext = selectionSlashContext;
         let cursorRangeAfterDelete = null;
         let inputCursorPosition = null;
-        if (!shouldKeepSlash) {
+        if (selectionContext) {
+            // Opened on a selection: there is no "/" to delete, the action
+            // formats the selected text so it has to be selected again
+            restoreSelectionSlashContext(selectionContext);
+            cursorRangeAfterDelete = selectionContext.range ? selectionContext.range.cloneRange() : null;
+        } else if (!shouldKeepSlash) {
             deleteSlashText();
             // Save cursor position right after deleteSlashText placed it correctly,
             // because hideSlashMenu() removing the menu DOM can cause the browser
@@ -3811,6 +4171,8 @@
             } catch (e) {
                 console.debug('slash-command: cmd() failed:', e);
             }
+        } else if (selectionContext) {
+            restoreSelectionSlashContext(selectionContext);
         }
         // Also expose it globally so async modal callbacks (link, note-reference)
         // can use it as a reliable fallback for the cursor position.
@@ -4067,6 +4429,26 @@
         if (e.key === 'Enter') {
             e.preventDefault();
             e.stopPropagation();
+        }
+
+        // Opened on a selection: typed keys filter the menu and must not reach
+        // the editor, where they would replace the selected text
+        if (selectionSlashContext && !e.ctrlKey && !e.metaKey && !e.isComposing
+            && (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Delete')) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (e.key === ' ' || (e.key === 'Backspace' && !filterText)) {
+                hideSlashMenu();
+                savedNoteEntry = null;
+                return;
+            }
+            if (e.key === 'Backspace') {
+                filterText = filterText.slice(0, -1);
+            } else if (e.key !== 'Delete') {
+                filterText += e.key;
+            }
+            updateMenuContent();
+            return;
         }
 
         // If a sub-submenu is open (level 3)
@@ -4548,6 +4930,31 @@
         showSlashMenu();
     }
 
+    // "/" on a selection in a note opens the formatting menu (issue #1410).
+    // keydown covers desktop, including CodeMirror which does not fire
+    // beforeinput when it runs on EditContext; beforeinput catches virtual
+    // keyboards, whose keydown reports an "Unidentified" key.
+    function handleSelectionSlashKeydown(e) {
+        if (e.defaultPrevented || e.isComposing || slashMenuElement) return;
+        if (isAltSlashModeEnabled()) {
+            if (!isAltSlashEvent(e)) return;
+        } else if (e.key !== '/' || e.metaKey || (e.ctrlKey && !e.altKey)) {
+            // Ctrl+Alt stays allowed: it is AltGr on Windows
+            return;
+        }
+
+        if (!showSlashMenuForSelection(e.target)) return;
+        e.preventDefault();
+        // handleAltSlashShortcut and handleKeydown listen on the same node
+        e.stopImmediatePropagation();
+    }
+
+    function handleSelectionSlashBeforeInput(e) {
+        if (e.defaultPrevented || e.inputType !== 'insertText' || e.data !== '/' || slashMenuElement) return;
+        if (isAltSlashModeEnabled()) return;
+        if (showSlashMenuForSelection(e.target)) e.preventDefault();
+    }
+
     // Handle click outside menu (close)
     function handleClickOutside(e) {
         if (!slashMenuElement) return;
@@ -4570,6 +4977,8 @@
         if (document.querySelector('.noteentry')) {
             setTimeout(refreshTemplateCache, 1500);
         }
+        document.addEventListener('keydown', handleSelectionSlashKeydown, true);
+        document.addEventListener('beforeinput', handleSelectionSlashBeforeInput, true);
         document.addEventListener('keydown', handleAltSlashShortcut, true);
         document.addEventListener('keydown', handleKeydown, true);
         document.addEventListener('mousedown', handleClickOutside, true);

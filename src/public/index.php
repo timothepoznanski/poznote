@@ -66,7 +66,9 @@ require_once __DIR__ . '/../db_connect.php';
 if (!$isRightColFragment
     && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET'
     && getSetting('welcome_setup', '') === 'pending'
-    && !(function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive())) {
+    && !(function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive())
+    && !(function_exists('isActiveAccountOwnedByAuthenticatedUser')
+        && !isActiveAccountOwnedByAuthenticatedUser())) {
     header('Location: welcome.php');
     exit;
 }
@@ -296,11 +298,17 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     // Cache version based on app version plus theme assets to force reload on theme changes.
     // The bundled js/*.js mtimes are folded in too: the index_js.php bundles are served
     // `immutable`, so a change to any bundled file must change this URL to be picked up.
+    // Same for the css/*.css mtimes of the index_css.php bundles.
     require_once 'index_js.php';
+    require_once 'index_css.php';
     $v = poznoteBuildAssetCacheVersion(getAppVersion());
     $indexJsVersion = poznoteGetIndexJsAssetVersion();
     if ($indexJsVersion !== '') {
         $v .= '-' . $indexJsVersion;
+    }
+    $indexCssVersion = poznoteGetIndexCssAssetVersion();
+    if ($indexCssVersion !== '') {
+        $v .= '-' . $indexCssVersion;
     }
     $v = rawurlencode($v);
     ?>
@@ -618,6 +626,41 @@ if ($isPublicWorkspaceReadonly) {
     ?>
 
         
+    <?php
+    // The active account heads the notes list: a collapsible row with its name
+    // (notes_list.php), which also carries the "Expand all folders" button at
+    // its end. Someone who can open other accounts (Admin > User Management)
+    // gets them listed in a block under the tree, on the plain tree only: a
+    // search or a folder view scopes the list to the active account. A public
+    // workspace visitor has no account to name.
+    $otherAccountProfiles = [];
+    $activeAccountProfile = null;
+    $showAccountRows = false;
+    if (!$isPublicWorkspaceReadonly) {
+        $activeAccountProfile = function_exists('getCurrentUser') ? getCurrentUser() : null;
+        if (is_array($activeAccountProfile) && (string)($activeAccountProfile['username'] ?? '') !== '') {
+            $showAccountRows = true;
+        } else {
+            $activeAccountProfile = null;
+        }
+        $isPlainTree = empty($search) && empty($tags_search) && empty($created_from) && empty($created_to) && empty($folder_filter);
+        if ($isPlainTree && function_exists('getSwitchableAccountProfiles')) {
+            // The active account heads the list, the others follow in one
+            // order (the login's own first, then by name, see
+            // getUserAccessibleProfiles()).
+            $activeAccountId = (int)(getCurrentUserId() ?? 0);
+            foreach (getSwitchableAccountProfiles() as $accountProfile) {
+                if ((int)$accountProfile['id'] !== $activeAccountId) {
+                    $otherAccountProfiles[] = $accountProfile;
+                }
+            }
+        }
+    }
+    $expandFoldersButton = '<button class="sidebar-folder-toggle" id="sidebarExpandFoldersBtn" data-action="toggle-all-folders" title="' . t_h('sidebar.expand_all_folders', [], 'Expand all folders') . '" aria-label="' . t_h('sidebar.expand_all_folders', [], 'Expand all folders') . '">'
+        . '<i class="lucide lucide-chevrons-up-down"></i>'
+        . '</button>';
+    ?>
+
     <!-- MENU RIGHT COLUMN -->	 
     <div class="sidebar-header">
         <div class="sidebar-title-row">
@@ -637,9 +680,7 @@ if ($isPublicWorkspaceReadonly) {
             </div>
             <div class="sidebar-title-actions">
                 <?php if (!$isPublicWorkspaceReadonly): ?>
-                    <button class="sidebar-folder-toggle" id="sidebarExpandFoldersBtn" data-action="toggle-all-folders" title="<?php echo t_h('sidebar.expand_all_folders', [], 'Expand all folders'); ?>" aria-label="<?php echo t_h('sidebar.expand_all_folders', [], 'Expand all folders'); ?>">
-                        <i class="lucide lucide-chevron-down"></i>
-                    </button>
+                    <?php if (!$showAccountRows) echo $expandFoldersButton; ?>
                     <button class="sidebar-folder-toggle<?php echo $notifications_count > 0 ? ' has-notifications' : ''; ?>" id="sidebarNotificationsBtn" data-action="open-notifications-modal" title="<?php echo t_h('reminder.notifications', [], 'Notifications'); ?>" aria-label="<?php echo t_h('reminder.notifications', [], 'Notifications'); ?>"<?php echo $notifications_total > 0 ? '' : ' hidden'; ?>>
                         <i class="lucide lucide-bell"></i>
                     </button>

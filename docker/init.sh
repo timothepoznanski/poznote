@@ -56,15 +56,21 @@ if [ -n "${POZNOTE_PHP_FPM_MAX_CHILDREN:-}" ]; then
                 # Rewritten through /tmp rather than sed -i: in the rootless
                 # image the file is ours but its directory stays root's, and
                 # sed -i needs to create a temporary file next to it.
+                # The write is tested rather than trusted to -w above: root
+                # passes -w on a read-only bind mount, and a failed write
+                # under set -e would stop the container instead of warning.
                 FPM_TMP="$(mktemp)"
-                sed \
+                if sed \
                     -e "s/^pm\.max_children = .*/pm.max_children = $FPM_MAX/" \
                     -e "s/^pm\.start_servers = .*/pm.start_servers = $FPM_START/" \
                     -e "s/^pm\.max_spare_servers = .*/pm.max_spare_servers = $FPM_MAX_SPARE/" \
                     "$FPM_POOL" > "$FPM_TMP" \
-                    && cat "$FPM_TMP" > "$FPM_POOL"
+                    && { cat "$FPM_TMP" > "$FPM_POOL"; } 2>/dev/null; then
+                    echo "php-fpm: pm.max_children = $FPM_MAX (POZNOTE_PHP_FPM_MAX_CHILDREN)"
+                else
+                    echo "WARNING: $FPM_POOL is not writable, POZNOTE_PHP_FPM_MAX_CHILDREN not applied." >&2
+                fi
                 rm -f "$FPM_TMP"
-                echo "php-fpm: pm.max_children = $FPM_MAX (POZNOTE_PHP_FPM_MAX_CHILDREN)"
             fi
             ;;
     esac
@@ -93,10 +99,48 @@ if [ -n "${POZNOTE_PHP_MEMORY_LIMIT:-}" ]; then
                 # Same detour through /tmp as above: in the rootless image the
                 # file is ours but its directory is not.
                 INI_TMP="$(mktemp)"
-                sed -e "s/^memory_limit = .*/memory_limit = ${MEM_LIMIT}M/" "$PHP_INI" > "$INI_TMP" \
-                    && cat "$INI_TMP" > "$PHP_INI"
+                if sed -e "s/^memory_limit = .*/memory_limit = ${MEM_LIMIT}M/" "$PHP_INI" > "$INI_TMP" \
+                    && { cat "$INI_TMP" > "$PHP_INI"; } 2>/dev/null; then
+                    echo "php: memory_limit = ${MEM_LIMIT}M (POZNOTE_PHP_MEMORY_LIMIT)"
+                else
+                    echo "WARNING: $PHP_INI is not writable, POZNOTE_PHP_MEMORY_LIMIT not applied." >&2
+                fi
                 rm -f "$INI_TMP"
-                echo "php: memory_limit = ${MEM_LIMIT}M (POZNOTE_PHP_MEMORY_LIMIT)"
+            fi
+            ;;
+    esac
+fi
+
+# Port nginx listens on. The image default (80, or 8080 in the rootless
+# image) stays private to the container as long as Docker maps a host port
+# onto it (HTTP_WEB_PORT). With network_mode: host there is no mapping: nginx
+# binds the host's own interfaces, where 80 usually belongs to another web
+# server, so the port itself has to move. Applied on every start.
+NGINX_SITE="/etc/nginx/http.d/default.conf"
+if [ -n "${POZNOTE_LISTEN_PORT:-}" ]; then
+    LISTEN_PORT="$POZNOTE_LISTEN_PORT"
+    case "$LISTEN_PORT" in
+        *[!0-9]*|''|??????*)
+            echo "WARNING: POZNOTE_LISTEN_PORT='$LISTEN_PORT' is not a port number, keeping the image default." >&2
+            ;;
+        *)
+            if [ "$LISTEN_PORT" -lt 1 ] || [ "$LISTEN_PORT" -gt 65535 ]; then
+                echo "WARNING: POZNOTE_LISTEN_PORT=$LISTEN_PORT is outside 1-65535, keeping the image default." >&2
+            elif [ ! -w "$NGINX_SITE" ]; then
+                echo "WARNING: $NGINX_SITE is not writable, POZNOTE_LISTEN_PORT not applied." >&2
+            else
+                # Same detour through /tmp as above: in the rootless image the
+                # file is ours but its directory is not.
+                NGINX_TMP="$(mktemp)"
+                sed -e "s/^\([[:space:]]*\)listen [0-9]\{1,5\};/\1listen $LISTEN_PORT;/" "$NGINX_SITE" > "$NGINX_TMP"
+                if ! grep -q "^[[:space:]]*listen $LISTEN_PORT;" "$NGINX_TMP"; then
+                    echo "WARNING: no 'listen <port>;' line in $NGINX_SITE, POZNOTE_LISTEN_PORT not applied." >&2
+                elif ! { cat "$NGINX_TMP" > "$NGINX_SITE"; } 2>/dev/null; then
+                    echo "WARNING: $NGINX_SITE is not writable, POZNOTE_LISTEN_PORT not applied." >&2
+                else
+                    echo "nginx: listen $LISTEN_PORT (POZNOTE_LISTEN_PORT)"
+                fi
+                rm -f "$NGINX_TMP"
             fi
             ;;
     esac

@@ -696,7 +696,9 @@
       "error_loading": "加载工作区出错",
       "logout": "注销",
       "edit_workspaces": "编辑工作区",
-      "new_workspace": "新建工作区"
+      "new_workspace": "新建工作区",
+      "accounts": "账户",
+      "title": "工作区"
     },
     "errors": {
       "already_exists": "同名工作区已存在",
@@ -869,7 +871,17 @@
     "collapse_all_folders": "折叠所有文件夹",
     "toggle": "显示/隐藏左侧边栏",
     "toggle_icon_sidebar": "显示/隐藏图标侧边栏",
-    "show_hidden_icons": "显示隐藏的图标"
+    "show_hidden_icons": "显示隐藏的图标",
+    "other_accounts": {
+      "title": "其他账户",
+      "error": "无法加载此账户的笔记",
+      "empty": "没有笔记",
+      "open": "打开此账户",
+      "view_here": "在标签页中显示，不切换账户"
+    },
+    "accounts": {
+      "active": "当前"
+    }
   },
   "home": {
     "title": "仪表盘",
@@ -902,7 +914,8 @@
       "select_type": "请至少选择一个搜索选项（笔记或标签）",
       "single_letter_warning": "使用单字母单词搜索可能会返回过多结果。请尝试使用更长的单词进行精确搜索。",
       "invalid_date_range": "开始日期必须早于或等于结束日期。"
-    }
+    },
+    "placeholder_account": "在 {{account}} 中搜索..."
   },
   "autosave": {
     "confirm_switch": "⚠️ 检测到未保存的更改\n\n您有未保存的更改，如果现在切换，这些更改将会丢失。\n\n点击“确定”保存并继续，或点击“取消”留下。\n（停止输入 2 秒后将自动保存）",
@@ -1099,14 +1112,7 @@
       "hide": "隐藏行号"
     },
     "colors": {
-      "black": "黑色",
-      "orange": "橙色",
-      "yellow": "黄色",
-      "green": "绿色",
-      "blue": "蓝色",
-      "purple": "紫色",
-      "none": "无",
-      "red": "红色"
+      "none": "无"
     },
     "font_size": {
       "very_small": "极小",
@@ -1171,16 +1177,6 @@
       "remove": "移除链接",
       "cancel": "取消",
       "save": "保存"
-    },
-    "highlights": {
-      "yellow": "黄色",
-      "red": "红色",
-      "green": "绿色",
-      "blue": "蓝色",
-      "pink": "粉色",
-      "orange": "橙色",
-      "purple": "紫色",
-      "gray": "灰色"
     }
   },
   "info": {
@@ -1315,6 +1311,7 @@
       "view_layout_toggle": "视图切换（网格 / 列表、卡片大小）",
       "index_search_bar": "搜索栏",
       "tasklist_progress_bar": "任务列表进度条",
+      "preview_code_block_delete": "Markdown 预览中代码块的删除按钮",
       "share_restrict_users": "分享：限制为特定用户",
       "share_protocol_toggle": "分享：HTTPS 开关",
       "share_shared_with_me": "分享：“与我共享”",
@@ -1550,28 +1547,7 @@
       "default_icon": "设置默认图标",
       "reset": "恢复默认行为",
       "search_placeholder": "搜索图标...",
-      "gray": "灰色",
-      "black": "黑色",
-      "amber": "琥珀色",
-      "blue": "蓝色",
-      "cyan": "青色",
-      "default_color": "默认",
-      "emerald": "翠绿色",
-      "fuchsia": "紫红色",
-      "green": "绿色",
-      "indigo": "靛蓝色",
-      "lime": "黄绿色",
-      "orange": "橙色",
-      "pink": "粉色",
-      "purple": "紫色",
-      "red": "红色",
-      "rose": "玫瑰色",
-      "sky": "天蓝色",
-      "slate": "石板灰",
-      "stone": "岩石灰",
-      "teal": "蓝绿色",
-      "violet": "紫罗兰色",
-      "yellow": "黄色"
+      "default_color": "默认"
     },
     "linked_selector": {
       "title": "从笔记创建快捷方式",
@@ -1981,7 +1957,7 @@
     "context_menu": {
       "pin": "固定标签页",
       "unpin": "取消固定标签页",
-      "close": "关闭",
+      "close": "关闭此标签页",
       "close_all": "关闭所有",
       "close_others": "关闭除此之外的所有标签页"
     },
@@ -2053,7 +2029,22 @@
     "done": "已完成",
     "image": "图片",
     "take_photo": "拍照",
+    "diagrams": "图表",
     "excalidraw": "Excalidraw",
+    "mermaid": "Mermaid",
+    "mermaid_flowchart": "流程图",
+    "mermaid_sequence": "时序图",
+    "mermaid_class": "类图",
+    "mermaid_state": "状态图",
+    "mermaid_er": "实体关系图",
+    "mermaid_gantt": "甘特图",
+    "mermaid_pie": "饼图",
+    "mermaid_mindmap": "思维导图",
+    "mermaid_timeline": "时间线",
+    "mermaid_journey": "用户旅程",
+    "mermaid_git": "Git 图",
+    "mermaid_quadrant": "象限图",
+    "mermaid_xy": "柱状图和折线图",
     "emoji": "表情符号",
     "table": "表格",
     "separator": "分隔符",
@@ -2125,14 +2116,6 @@
     "insert": "插入",
     "media": "媒体",
     "color": "颜色",
-    "color_red": "红色",
-    "color_blue": "蓝色",
-    "color_green": "绿色",
-    "color_yellow": "黄色",
-    "color_purple": "紫色",
-    "color_orange": "橙色",
-    "color_black": "黑色",
-    "bg_yellow": "黄色背景",
     "youtube": "YouTube",
     "streaming_videos": "流媒体视频",
     "bilibili": "Bilibili",
@@ -4916,5 +4899,70 @@
       "password_mismatch": "两次输入的新密码不一致。",
       "password_too_short": "密码至少需要 4 个字符。"
     }
+  },
+  "colors": {
+    "red": "红色",
+    "orange": "橙色",
+    "amber": "琥珀色",
+    "yellow": "黄色",
+    "lime": "黄绿色",
+    "green": "绿色",
+    "teal": "蓝绿色",
+    "cyan": "青色",
+    "blue": "蓝色",
+    "indigo": "靛蓝色",
+    "purple": "紫色",
+    "magenta": "品红色",
+    "pink": "粉色",
+    "brown": "棕色",
+    "gray": "灰色",
+    "default": "默认"
+  },
+  "page_menu": {
+    "button": "更多选项"
+  },
+  "keyboard_shortcuts": {
+    "menu_item": "键盘快捷键",
+    "title": "键盘快捷键",
+    "setting_hint": "需在设置中启用",
+    "sections": {
+      "general": "通用",
+      "editor": "笔记编辑器",
+      "tree": "笔记和文件夹树"
+    },
+    "save_note": "保存笔记",
+    "snapshot": "为笔记创建快照",
+    "note_nav": "文件夹中的上一篇或下一篇笔记",
+    "close": "关闭菜单、面板或窗口",
+    "bold": "粗体",
+    "italic": "斜体",
+    "underline": "下划线",
+    "strikethrough": "删除线",
+    "link": "插入链接",
+    "code_block": "代码块",
+    "slash_menu": "打开命令菜单",
+    "slash_menu_hint": "在设置中启用该选项后使用 Alt + /",
+    "emoji": "按名称插入表情",
+    "indent": "增加或减少列表项缩进",
+    "checklist_toggle": "勾选或取消勾选清单项",
+    "tree_undo": "撤销上一次更改",
+    "tree_redo": "重做",
+    "tree_copy": "复制所选笔记或文件夹",
+    "tree_cut": "剪切所选笔记或文件夹",
+    "tree_paste": "粘贴",
+    "keys": {
+      "shift": "Shift",
+      "enter": "Enter",
+      "escape": "Esc",
+      "tab": "Tab"
+    }
+  },
+  "icon_context_menu": {
+    "hide": "隐藏按钮"
+  },
+  "account_note": {
+    "banner": "来自账户 {{account}} 的笔记，只读",
+    "open_to_edit": "打开以编辑",
+    "not_found": "此笔记已不可用。"
   }
 }

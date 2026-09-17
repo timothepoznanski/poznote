@@ -483,25 +483,7 @@
                 btn.addEventListener('click', function () {
                     freezeButtons();
                     name.textContent = tr('profile.logout.switch_in_progress', {}, 'Switching account...');
-                    // Best effort: the account being left keeps no edit lock on
-                    // the open note (it would otherwise expire on its own).
-                    if (typeof window.releaseCurrentNoteEditLock === 'function') {
-                        try { window.releaseCurrentNoteEditLock(); } catch (e) { /* lock expires anyway */ }
-                    }
-
-                    var form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = accountSwitch.action || 'switch_account.php';
-                    form.style.display = 'none';
-                    [['csrf_token', accountSwitch.csrfToken || ''], ['account_user_id', String(account.id)]].forEach(function (pair) {
-                        var input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = pair[0];
-                        input.value = pair[1];
-                        form.appendChild(input);
-                    });
-                    document.body.appendChild(form);
-                    form.submit();
+                    submitAccountSwitch(account.id);
                 });
 
                 accountList.appendChild(btn);
@@ -517,6 +499,106 @@
         });
         confirmBtn.focus();
     }
+
+    // ========== Account switching ==========
+
+    // Leaves the active account for another one the signed-in person can
+    // open, by posting to switch_account.php (a form, not fetch: the answer is
+    // a redirect into the other account). `landing` may carry a note id or a
+    // workspace name to open there, see switch_account.php. Shared by the
+    // logout dialog above, the workspace menu (js/workspaces-core.js) and the
+    // notes list's "Other accounts" block (js/other-accounts.js).
+    var accountSwitchPending = false;
+    var ACCOUNT_SWITCH_WAIT_MS = 2500;
+
+    function submitAccountSwitch(accountId, landing) {
+        var accountSwitch = window.PoznoteAccountSwitch || null;
+        if (!accountSwitch || !accountId) return false;
+
+        if (accountSwitchPending) return true;
+        accountSwitchPending = true;
+
+        // From here on a 409 "account_switched" on this page is expected.
+        if (typeof window.poznoteAccountSwitchStarted === 'function') {
+            window.poznoteAccountSwitchStarted();
+        }
+
+        leaveOpenNote(function () {
+            postAccountSwitch(accountSwitch, accountId, landing);
+        });
+        return true;
+    }
+    window.poznoteSwitchAccount = submitAccountSwitch;
+
+    // The open note is saved and its edit lock released BEFORE the switch is
+    // posted. Sent alongside it, those calls could reach the server once the
+    // session already names the other account: refused there (409), so the
+    // last keystrokes were lost, and never applied to the other account's
+    // note of the same id. Bounded: a slow or failing server does not hold
+    // the switch, the local draft keeps the text.
+    function leaveOpenNote(done) {
+        var finished = false;
+        function finish() {
+            if (finished) return;
+            finished = true;
+            clearTimeout(timer);
+            done();
+        }
+        var timer = setTimeout(finish, ACCOUNT_SWITCH_WAIT_MS);
+
+        function release() {
+            var released = null;
+            if (typeof window.releaseCurrentNoteEditLock === 'function') {
+                try { released = window.releaseCurrentNoteEditLock(); } catch (e) { /* lock expires anyway */ }
+            }
+            Promise.resolve(released).then(finish, finish);
+        }
+
+        var openNote = typeof window.noteid !== 'undefined' ? window.noteid : null;
+        var unsaved = false;
+        try {
+            unsaved = typeof window.hasUnsavedChangesOnScreen === 'function' && window.hasUnsavedChangesOnScreen(openNote);
+        } catch (e) { unsaved = false; }
+
+        if (unsaved && typeof window.saveNoteToServer === 'function') {
+            try {
+                window.saveNoteToServer({ onSaved: release });
+            } catch (e) {
+                release();
+            }
+            return;
+        }
+        release();
+    }
+
+    function postAccountSwitch(accountSwitch, accountId, landing) {
+        var fields = [['csrf_token', accountSwitch.csrfToken || ''], ['account_user_id', String(accountId)]];
+        if (landing && landing.note) fields.push(['note', String(landing.note)]);
+        if (landing && landing.workspace) fields.push(['workspace', String(landing.workspace)]);
+
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = accountSwitch.action || 'switch_account.php';
+        form.style.display = 'none';
+        fields.forEach(function (pair) {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = pair[0];
+            input.value = pair[1];
+            form.appendChild(input);
+        });
+        document.body.appendChild(form);
+        form.submit();
+
+        // Still here a moment later: the person chose to stay (the browser's
+        // "unsaved changes" prompt), so another try must be possible.
+        setTimeout(function () { accountSwitchPending = false; }, 3000);
+    }
+
+    // Back from the other account through the back/forward cache.
+    window.addEventListener('pageshow', function (e) {
+        if (e && e.persisted) accountSwitchPending = false;
+    });
 
     // ========== Init ==========
 

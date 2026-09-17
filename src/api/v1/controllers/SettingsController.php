@@ -83,6 +83,16 @@ class SettingsController {
         }
     }
 
+    /**
+     * Writes stay with the account's owner. Reads do not: the settings table
+     * of an account holds display preferences (tasklist insert order, icon
+     * colours, hidden UI elements, ...) that the page needs to render that
+     * account the way its owner sees it, and someone granted access to the
+     * account (Admin > User Management) already sees everything else in it.
+     * Without reads, every such preference lookup logged a 403 on a borrowed
+     * account and fell back to defaults. Global settings keep their own
+     * admin check in loadGlobalSettings() and show().
+     */
     private function requireActiveAccountOwner(): void {
         if (function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser()) {
             $message = function_exists('getActiveAccountOwnerRequiredMessage')
@@ -541,7 +551,7 @@ class SettingsController {
      */
     public function index() {
         try {
-            $this->requireActiveAccountOwner();
+            // Reads are open to a borrowed account, see requireActiveAccountOwner().
             $requestedKeys = $this->getRequestedKeys();
 
             if ($requestedKeys === null) {
@@ -603,8 +613,7 @@ class SettingsController {
         }
         
         try {
-            $this->requireActiveAccountOwner();
-
+            // Reads are open to a borrowed account, see requireActiveAccountOwner().
             // For global settings, use getGlobalSetting function
             if ($this->isGlobalSetting($key)) {
                 $this->requireGlobalSettingsAdmin();

@@ -44,7 +44,7 @@ html[data-theme='dark'] .modal-buttons button:hover {
 
 html[data-theme='dark'] .modal-buttons button:first-child {
     background-color: var(--dm-active);
-    color: var(--pz-text-inverse);
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] .modal-buttons button:first-child:hover {
@@ -392,7 +392,7 @@ html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-cancel:hover {
 
 html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-primary {
     background-color: var(--dm-active);
-    color: var(--pz-text-inverse);
+    color: var(--dm-text-bright);
     border: none;
 }
 
@@ -596,7 +596,7 @@ html[data-theme='dark'] #noteWidthModal .note-width-unit {
 
 html[data-theme='dark'] #fontSizeModal .modal-footer .btn-primary {
     background-color: var(--dm-active);
-    color: var(--pz-text-inverse);
+    color: var(--dm-text-bright);
 }
 
 html[data-theme='dark'] #fontSizeModal .modal-footer .btn-primary:hover {
@@ -662,7 +662,7 @@ html[data-theme='dark'] .folder-option:hover {
 
 html[data-theme='dark'] .folder-option.selected {
     background-color: var(--dm-active);
-    color: var(--pz-text-inverse);
+    color: var(--dm-text-bright);
 }
 
 /* ============================================

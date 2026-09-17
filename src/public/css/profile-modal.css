@@ -158,6 +158,17 @@
     transition: border-color 0.2s ease, background 0.2s ease;
 }
 
+/* The mobile stacking rule of modals/responsive.css (.modal-content>div>button)
+   forces display: block, which drops the flex row and leaves the arrow glued
+   to the name instead of at the right edge. */
+@media (max-width: 800px) {
+    #confirmLogoutModal .logout-account-option {
+        display: flex !important;
+        height: auto !important;
+        margin-bottom: 0 !important;
+    }
+}
+
 #confirmLogoutModal .logout-account-option:hover:not(:disabled),
 #confirmLogoutModal .logout-account-option:focus-visible {
     border-color: var(--pz-accent);
@@ -260,7 +271,7 @@ html[data-theme='dark'] #confirmLogoutModal .logout-account-option:focus-visible
    css/folder-icon-modal.css, which only the notes and folders pages load. */
 #iconSidebarColorModal .folder-color-picker {
     display: grid;
-    grid-template-columns: repeat(11, minmax(0, 36px));
+    grid-template-columns: repeat(8, minmax(0, 36px));
     justify-content: center;
     gap: 8px;
     padding: 16px;
@@ -326,7 +337,7 @@ html[data-theme='dark'] #confirmLogoutModal .logout-account-option:focus-visible
 
 @media (max-width: 640px) {
     #iconSidebarColorModal .folder-color-picker {
-        grid-template-columns: repeat(11, minmax(0, 32px));
+        grid-template-columns: repeat(8, minmax(0, 32px));
         gap: 6px;
         padding: 12px;
     }
@@ -495,4 +506,70 @@ html[data-theme='dark'] #editProfileModal .ep-identity {
 html[data-theme='dark'] #editProfileModal .ep-badge-admin {
     background: rgba(var(--dm-accent-rgb), 0.18);
     color: var(--dm-accent);
+}
+
+/* Right-click menu of a rail or note toolbar button (change the colour, hide
+   the button), built by js/icon-sidebar-colors.js. Self-contained like the
+   modals above: half the rail's host pages skip the menu stylesheets. */
+#iconContextMenu {
+    position: fixed;
+    z-index: 10002;
+    min-width: 180px;
+    padding: 6px 0;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.15);
+    font-family: 'Inter', sans-serif;
+}
+
+#iconContextMenu[hidden] {
+    display: none;
+}
+
+#iconContextMenu .icon-context-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 15px;
+    border: none;
+    background: none;
+    color: var(--pz-text);
+    font-family: inherit;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+}
+
+#iconContextMenu .icon-context-menu-item:hover,
+#iconContextMenu .icon-context-menu-item:focus-visible {
+    outline: none;
+    background-color: var(--pz-surface);
+}
+
+#iconContextMenu .icon-context-menu-item i {
+    width: 16px;
+    height: 16px;
+    color: var(--pz-text-muted);
+    background-color: var(--pz-text-muted);
+}
+
+html[data-theme='dark'] #iconContextMenu {
+    border-color: var(--dm-border);
+    background: var(--dm-surface);
+}
+
+html[data-theme='dark'] #iconContextMenu .icon-context-menu-item {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] #iconContextMenu .icon-context-menu-item:hover,
+html[data-theme='dark'] #iconContextMenu .icon-context-menu-item:focus-visible {
+    background-color: var(--dm-surface-hover);
+}
+
+html[data-theme='dark'] #iconContextMenu .icon-context-menu-item i {
+    color: var(--dm-text-muted);
+    background-color: var(--dm-text-muted);
 }

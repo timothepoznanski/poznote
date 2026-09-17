@@ -114,10 +114,6 @@ html[data-theme='dark'] #folder-favorites .note-title::before {
    Folders
    ============================================ */
 
-html[data-theme='dark'] .favorites-separator {
-    border-bottom-color: var(--dm-border);
-}
-
 html[data-theme='dark'] .folder-header {
     color: var(--dm-text);
 }

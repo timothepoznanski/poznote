@@ -645,22 +645,6 @@
                     triggerMobileToolbarAudioInsert(target);
                 }
                 break;
-            case 'open-markdown-syntax': {
-                var toolbarElForSyntax = target.closest('.note-edit-toolbar');
-                if (toolbarElForSyntax) {
-                    var menuElForSyntax = toolbarElForSyntax.querySelector('.mobile-toolbar-menu');
-                    if (menuElForSyntax) menuElForSyntax.hidden = true;
-                    var toggleBtnForSyntax = toolbarElForSyntax.querySelector('.mobile-more-btn');
-                    if (toggleBtnForSyntax) toggleBtnForSyntax.setAttribute('aria-expanded', 'false');
-                }
-
-                var syntaxUrl = 'markdown_syntax.php';
-                if (window.selectedWorkspace) {
-                    syntaxUrl += '?workspace=' + encodeURIComponent(window.selectedWorkspace);
-                }
-                window.open(syntaxUrl, '_blank', 'noopener');
-                break;
-            }
             case 'duplicate-note':
                 if (noteId && typeof duplicateNote === 'function') {
                     duplicateNote(noteId);

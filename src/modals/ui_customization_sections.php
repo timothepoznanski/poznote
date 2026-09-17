@@ -141,7 +141,6 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-publish" checked><span><?php echo t_h('index.toolbar.share_note', [], 'Share'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-attachment" checked><span><?php echo t_h('modals.attachment.title', [], 'Attachments'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-reminder" checked><span><?php echo t_h('modals.ui_customization.reminder_bell', [], 'Bell icon (reminder)'); ?></span></label>
-    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-markdown-syntax" checked><span><?php echo t_h('markdown_syntax.menu_item', [], 'Markdown syntax'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-open-new-tab" checked><span><?php echo t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-duplicate" checked><span><?php echo t_h('common.duplicate', [], 'Duplicate'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-move" checked><span><?php echo t_h('common.move', [], 'Move'); ?></span></label>
@@ -168,6 +167,7 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:title" checked><span><?php echo t_h('slash_menu.title', [], 'Title'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:format" checked><span><?php echo t_h('slash_menu.format_text', [], 'Format text'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:color" checked><span><?php echo t_h('slash_menu.color', [], 'Color'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:highlight" checked><span><?php echo t_h('slash_menu.highlight', [], 'Highlight'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:code" checked><span><?php echo t_h('slash_menu.code', [], 'Code'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:list" checked><span><?php echo t_h('slash_menu.list', [], 'List'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:tasklist-embed" checked><span><?php echo t_h('slash_menu.tasklist_embed', [], 'Task list'); ?></span></label>
@@ -183,7 +183,9 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:insert-time" checked><span><?php echo t_h('slash_menu.date_section', [], 'Calendar and time') . ' › ' . t_h('slash_menu.time', [], 'Time'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:insert-datetime" checked><span><?php echo t_h('slash_menu.date_section', [], 'Calendar and time') . ' › ' . t_h('slash_menu.date_time', [], 'Date and time'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:journal-link" checked><span><?php echo t_h('slash_menu.date_section', [], 'Calendar and time') . ' › ' . t_h('slash_menu.journal_link', [], 'Link to diary entry'); ?></span></label>
-    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:excalidraw" checked><span>Excalidraw</span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:diagrams" checked><span><?php echo t_h('slash_menu.diagrams', [], 'Diagrams'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:excalidraw" checked><span><?php echo t_h('slash_menu.diagrams', [], 'Diagrams'); ?> › Excalidraw</span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:mermaid" checked><span><?php echo t_h('slash_menu.diagrams', [], 'Diagrams'); ?> › Mermaid</span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:table" checked><span><?php echo t_h('slash_menu.table', [], 'Table'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:separator" checked><span><?php echo t_h('slash_menu.separator', [], 'Separator'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:note-reference" checked><span><?php echo t_h('slash_menu.link_to_note', [], 'Link to note'); ?></span></label>
@@ -202,8 +204,10 @@
 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.panels', [], 'Other'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
 <div class="ui-custom-items">
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:mini-calendar" checked><span><?php echo t_h('common.calendar', [], 'Calendar'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:other-accounts" checked><span><?php echo t_h('sidebar.other_accounts.title', [], 'Other accounts'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:outline-panel" checked><span><?php echo t_h('common.outline.title', [], 'Outline'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:tasklist-progress" checked><span><?php echo t_h('modals.ui_customization.tasklist_progress_bar', [], 'Task list progress bar'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:preview-code-block-delete" checked><span><?php echo t_h('modals.ui_customization.preview_code_block_delete', [], 'Delete button on code blocks, in markdown preview'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-created-date" checked><span><?php echo t_h('display.cards.show_note_created', [], 'Show creation date'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-icons" checked><span><?php echo t_h('display.cards.show_note_icons', [], 'Show note icons'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:folder-note-count" checked><span><?php echo t_h('display.cards.show_folder_counts', [], 'Show folder counts'); ?></span></label>
@@ -211,6 +215,8 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebarExpandFoldersBtn" checked><span><?php echo t_h('sidebar.expand_all_folders', [], 'Expand all folders'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebarNotificationsBtn" checked><span><?php echo t_h('reminder.notifications', [], 'Notifications'); ?></span></label>
     <label class="ui-custom-item" data-ui-pages="notes dashboard"><input type="checkbox" data-ui-key="card:edgeAiChatBtn" checked><span><?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?></span></label>
+    <label class="ui-custom-item" data-ui-pages="notes dashboard settings"><input type="checkbox" data-ui-key="card:edgeMenuShortcuts" checked><span><?php echo t_h('keyboard_shortcuts.menu_item', [], 'Keyboard shortcuts'); ?></span></label>
+    <label class="ui-custom-item" data-ui-pages="notes dashboard settings"><input type="checkbox" data-ui-key="card:edgeMenuMarkdownSyntax" checked><span><?php echo t_h('markdown_syntax.menu_item', [], 'Markdown syntax'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:search-bar-container" checked><span><?php echo t_h('modals.ui_customization.index_search_bar', [], 'Search bar'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="share:restrict-users" checked><span><?php echo t_h('modals.ui_customization.share_restrict_users', [], 'Share: restrict to specific users'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="share:protocol-toggle" checked><span><?php echo t_h('modals.ui_customization.share_protocol_toggle', [], 'Share: HTTPS toggle'); ?></span></label>

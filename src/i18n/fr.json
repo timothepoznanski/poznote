@@ -697,7 +697,9 @@
       "logout": "Déconnexion",
       "acting_as": " (en tant que {{user}})",
       "edit_workspaces": "Modifier les espaces de travail",
-      "new_workspace": "Nouvel espace de travail"
+      "new_workspace": "Nouvel espace de travail",
+      "accounts": "Comptes",
+      "title": "Espaces de travail"
     },
     "errors": {
       "already_exists": "Un espace de travail portant ce nom existe déjà",
@@ -870,7 +872,17 @@
     "collapse_all_folders": "Tout replier",
     "toggle": "Cacher/Afficher la colonne de gauche",
     "toggle_icon_sidebar": "Cacher/Afficher la barre d'icônes",
-    "show_hidden_icons": "Afficher les icônes masquées"
+    "show_hidden_icons": "Afficher les icônes masquées",
+    "other_accounts": {
+      "title": "Autres comptes",
+      "error": "Impossible de charger les notes de ce compte",
+      "empty": "Aucune note",
+      "open": "Ouvrir ce compte",
+      "view_here": "Afficher dans un onglet, sans changer de compte"
+    },
+    "accounts": {
+      "active": "Actif"
+    }
   },
   "home": {
     "title": "Tableau de bord",
@@ -903,7 +915,8 @@
       "select_type": "Veuillez sélectionner au moins une option de recherche (Notes ou Tags)",
       "single_letter_warning": "La recherche avec des mots d’une seule lettre peut retourner trop de résultats. Essayez d’utiliser des mots plus longs pour une recherche plus précise.",
       "invalid_date_range": "La date de début doit être antérieure ou égale à la date de fin."
-    }
+    },
+    "placeholder_account": "Rechercher dans {{account}}..."
   },
   "autosave": {
     "confirm_switch": "⚠️ Modifications non enregistrées\n\nVous avez des modifications non enregistrées qui seront perdues si vous changez maintenant.\n\nCliquez sur OK pour enregistrer et continuer, ou Annuler pour rester.\n(L’enregistrement automatique se déclenche 2 secondes après avoir arrêté de saisir)",
@@ -1092,13 +1105,6 @@
       }
     },
     "colors": {
-      "black": "Noir",
-      "red": "Rouge",
-      "orange": "Orange",
-      "yellow": "Jaune",
-      "green": "Vert",
-      "blue": "Bleu",
-      "purple": "Violet",
       "none": "Aucun"
     },
     "font_size": {
@@ -1173,16 +1179,6 @@
     "code_block_line_numbers": {
       "show": "Afficher les numéros de ligne",
       "hide": "Masquer les numéros de ligne"
-    },
-    "highlights": {
-      "yellow": "Jaune",
-      "red": "Rouge",
-      "green": "Vert",
-      "blue": "Bleu",
-      "pink": "Rose",
-      "orange": "Orange",
-      "purple": "Violet",
-      "gray": "Gris"
     }
   },
   "info": {
@@ -1317,6 +1313,7 @@
       "view_layout_toggle": "Bascule de vue (grille / liste, taille des cartes)",
       "index_search_bar": "Barre de recherche",
       "tasklist_progress_bar": "Barre de progression des listes de tâches",
+      "preview_code_block_delete": "Bouton de suppression des blocs de code, dans l'aperçu markdown",
       "share_restrict_users": "Partage : restreindre à des utilisateurs spécifiques",
       "share_protocol_toggle": "Partage : bascule HTTPS",
       "share_shared_with_me": "Partage : « Partagé avec moi »",
@@ -1546,29 +1543,8 @@
       "default_icon": "Définir l'icône par défaut",
       "reset": "Reset",
       "search_placeholder": "Rechercher des icônes...",
-      "gray": "Gris",
-      "black": "Noir",
       "default": "Par défaut",
-      "amber": "Ambre",
-      "blue": "Bleu",
-      "cyan": "Cyan",
-      "default_color": "Par défaut",
-      "emerald": "Émeraude",
-      "fuchsia": "Fuchsia",
-      "green": "Vert",
-      "indigo": "Indigo",
-      "lime": "Citron vert",
-      "orange": "Orange",
-      "pink": "Rose",
-      "purple": "Violet",
-      "red": "Rouge",
-      "rose": "Rose vif",
-      "sky": "Ciel",
-      "slate": "Ardoise",
-      "stone": "Pierre",
-      "teal": "Sarcelle",
-      "violet": "Mauve",
-      "yellow": "Jaune"
+      "default_color": "Par défaut"
     },
     "linked_selector": {
       "title": "Créer un raccourci d'une note",
@@ -1989,7 +1965,7 @@
     "context_menu": {
       "pin": "Épingler l'onglet",
       "unpin": "Désépingler l'onglet",
-      "close": "Fermer",
+      "close": "Fermer celui-ci",
       "close_all": "Fermer tout",
       "close_others": "Fermer tout sauf celui-ci"
     },
@@ -2062,7 +2038,22 @@
     "done": "Fait",
     "image": "Image",
     "take_photo": "Prendre une photo",
+    "diagrams": "Diagrammes",
     "excalidraw": "Excalidraw",
+    "mermaid": "Mermaid",
+    "mermaid_flowchart": "Organigramme",
+    "mermaid_sequence": "Diagramme de séquence",
+    "mermaid_class": "Diagramme de classes",
+    "mermaid_state": "Diagramme d'états",
+    "mermaid_er": "Entité-relation",
+    "mermaid_gantt": "Diagramme de Gantt",
+    "mermaid_pie": "Camembert",
+    "mermaid_mindmap": "Carte mentale",
+    "mermaid_timeline": "Frise chronologique",
+    "mermaid_journey": "Parcours utilisateur",
+    "mermaid_git": "Graphe Git",
+    "mermaid_quadrant": "Matrice à quadrants",
+    "mermaid_xy": "Histogramme et courbe",
     "emoji": "Emoji",
     "table": "Tableau",
     "separator": "Séparateur",
@@ -2085,14 +2076,6 @@
     "code_block_placeholder_before": "Écrivez du texte ici…",
     "code_block_placeholder_after": "Écrivez du texte ici…",
     "color": "Couleur",
-    "color_red": "Rouge",
-    "color_blue": "Bleu",
-    "color_green": "Vert",
-    "color_yellow": "Jaune",
-    "color_purple": "Violet",
-    "color_orange": "Orange",
-    "color_black": "Noir",
-    "bg_yellow": "Surlignage jaune",
     "youtube_video": "Vidéo YouTube",
     "youtube_modal_title": "Insérer une vidéo YouTube",
     "youtube_url_label": "URL ou ID de la vidéo YouTube :",
@@ -4921,5 +4904,70 @@
       "password_mismatch": "Les deux nouveaux mots de passe ne correspondent pas.",
       "password_too_short": "Le mot de passe doit contenir au moins 4 caractères."
     }
+  },
+  "colors": {
+    "red": "Rouge",
+    "orange": "Orange",
+    "amber": "Ambre",
+    "yellow": "Jaune",
+    "lime": "Citron vert",
+    "green": "Vert",
+    "teal": "Sarcelle",
+    "cyan": "Cyan",
+    "blue": "Bleu",
+    "indigo": "Indigo",
+    "purple": "Violet",
+    "magenta": "Magenta",
+    "pink": "Rose",
+    "brown": "Marron",
+    "gray": "Gris",
+    "default": "Par défaut"
+  },
+  "page_menu": {
+    "button": "Plus d'options"
+  },
+  "keyboard_shortcuts": {
+    "menu_item": "Raccourcis clavier",
+    "title": "Raccourcis clavier",
+    "setting_hint": "Option à activer dans les paramètres",
+    "sections": {
+      "general": "Général",
+      "editor": "Éditeur de note",
+      "tree": "Arborescence des notes et dossiers"
+    },
+    "save_note": "Enregistrer la note",
+    "snapshot": "Prendre un instantané de la note",
+    "note_nav": "Note précédente ou suivante du dossier",
+    "close": "Fermer un menu, un panneau ou une fenêtre",
+    "bold": "Gras",
+    "italic": "Italique",
+    "underline": "Souligné",
+    "strikethrough": "Barré",
+    "link": "Insérer un lien",
+    "code_block": "Bloc de code",
+    "slash_menu": "Ouvrir le menu de commandes",
+    "slash_menu_hint": "Alt + / si l'option est activée dans les paramètres",
+    "emoji": "Insérer un emoji par son nom",
+    "indent": "Indenter ou désindenter un élément de liste",
+    "checklist_toggle": "Cocher ou décocher un élément de checklist",
+    "tree_undo": "Annuler la dernière modification",
+    "tree_redo": "Rétablir",
+    "tree_copy": "Copier la note ou le dossier sélectionné",
+    "tree_cut": "Couper la note ou le dossier sélectionné",
+    "tree_paste": "Coller",
+    "keys": {
+      "shift": "Maj",
+      "enter": "Entrée",
+      "escape": "Échap",
+      "tab": "Tab"
+    }
+  },
+  "icon_context_menu": {
+    "hide": "Masquer le bouton"
+  },
+  "account_note": {
+    "banner": "Note du compte {{account}}, en lecture seule",
+    "open_to_edit": "Ouvrir pour modifier",
+    "not_found": "Cette note n'est plus disponible."
   }
 }

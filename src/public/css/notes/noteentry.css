@@ -176,6 +176,15 @@ textarea:focus {
     font-size: var(--note-font-size, 15px) !important;
 }
 
+/* A highlight without a colour of its own (== in markdown, the /highlight
+   slash command) takes the palette's yellow, so it follows the theme like the
+   ones picked from the highlight button. The code-block rules still win. */
+.noteentry mark,
+.markdown-preview mark {
+    background-color: var(--pz-color-yellow-soft);
+    color: inherit;
+}
+
 .noteentry p,
 .noteentry div {
     margin: 0;

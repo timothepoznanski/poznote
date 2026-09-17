@@ -68,6 +68,12 @@ body.public-note-page {
     white-space: normal;
 }
 
+/* Same highlight colour as in the app (css/notes/noteentry.css). */
+.public-note .content mark {
+    background-color: var(--pz-color-yellow-soft);
+    color: inherit;
+}
+
 .public-note .content.public-note-markdown {
     padding-bottom: 16px;
     box-sizing: border-box;

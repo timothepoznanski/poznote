@@ -929,7 +929,8 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
                     $pnIconColorAttr = '';
                     if (!$pnIsEmoji && $pnIconRaw) {
                         $pnIconClasses = str_contains($pnIconRaw, 'lucide ') ? $pnIconRaw : 'lucide ' . $pnIconRaw;
-                        $pnIconStyle = $pnIconColor ? ' style="color: ' . htmlspecialchars($pnIconColor, ENT_QUOTES) . ' !important;"' : '';
+                        $pnIconColorCss = poznoteIconColorCss($pnIconColor);
+                        $pnIconStyle = $pnIconColorCss !== '' ? ' style="color: ' . htmlspecialchars($pnIconColorCss, ENT_QUOTES) . ' !important;"' : '';
                         $pnIconColorAttr = $pnIconColor ? ' data-icon-color="' . htmlspecialchars($pnIconColor, ENT_QUOTES) . '"' : '';
                     }
                     ?>

@@ -68,7 +68,7 @@ function diaryBuildNoteData(array $note, string $pageWorkspace): array {
     if ($heading === '') $heading = t('common.untitled', [], 'Untitled');
     $tags = array_values(array_filter(array_map('trim', explode(',', (string)($note['tags'] ?? '')))));
     $iconRaw = !empty($note['icon']) ? convertFontAwesomeToLucide($note['icon']) : '';
-    $iconColor = !empty($note['icon_color']) ? (string)$note['icon_color'] : '';
+    $iconColor = poznoteIconColorCss($note['icon_color'] ?? '');
     $created = convertUtcToUserTimezone((string)($note['created'] ?? ''), 'Y-m-d');
     $titleDate = parseDiaryEntryTitle(trim((string)($note['heading'] ?? '')));
     return [

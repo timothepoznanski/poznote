@@ -258,6 +258,63 @@ function setAuthenticatedIdentity(array $authUser, ?string $authMethod = null): 
     syncUserPreferenceCookie();
 }
 
+/**
+ * Mirror of the ACTIVE account in a cookie the page scripts can read
+ * (poznote_uid above is the login identity). The active account is session
+ * state, so a switch made in one tab (switch_account.php, the login-time
+ * account choice) silently redirects every later call of the other open
+ * tabs, and of a page brought back from the back-forward cache, to the new
+ * account while they still show the old one. js/session-guard.js compares
+ * this cookie with the value it saw at load and reloads such a tab.
+ */
+function syncActiveAccountCookie(): void {
+    $activeUserId = (int)(getCurrentUserId() ?? 0);
+    if ($activeUserId <= 0 || headers_sent()) {
+        return;
+    }
+    if ((string)($_COOKIE['poznote_account'] ?? '') === (string)$activeUserId) {
+        return;
+    }
+    $_COOKIE['poznote_account'] = (string)$activeUserId;
+    setcookie('poznote_account', (string)$activeUserId, [
+        'expires'  => 0,
+        'path'     => '/',
+        'domain'   => '',
+        'secure'   => $GLOBALS['isSecure'] ?? false,
+        'httponly' => false,
+        'samesite' => 'Lax',
+    ]);
+}
+
+/**
+ * Second half of the same protection, server-side: js/session-guard.js sends
+ * the account its page was rendered for as X-Poznote-Account on every call.
+ * A call whose header names another account than the session's active one
+ * comes from a tab that missed a switch, and acting on it would apply that
+ * tab's ids (note 94, folder 5) to the wrong account's data. Refused with
+ * 409 and a marker the guard recognises; it then reloads its page. Calls
+ * without the header (navigations, API clients, older pages) are untouched.
+ */
+function enforceActiveAccountHeader(): void {
+    $header = trim((string)($_SERVER['HTTP_X_POZNOTE_ACCOUNT'] ?? ''));
+    if ($header === '' || !ctype_digit($header)) {
+        return;
+    }
+    $activeUserId = (int)(getCurrentUserId() ?? 0);
+    if ($activeUserId <= 0 || (int)$header === $activeUserId) {
+        return;
+    }
+    http_response_code(409);
+    header('Content-Type: application/json');
+    header('Cache-Control: no-store');
+    echo json_encode([
+        'success' => false,
+        'error' => 'account_switched',
+        'active_account' => $activeUserId,
+    ]);
+    exit;
+}
+
 function setActiveUserAccount(array $targetUser): bool {
     $targetUserId = (int)($targetUser['id'] ?? 0);
     if ($targetUserId <= 0 || empty($targetUser['active'])) {
@@ -267,6 +324,7 @@ function setActiveUserAccount(array $targetUser): bool {
     $_SESSION['user_id'] = $targetUserId;
     $_SESSION['user'] = $targetUser;
     unset($_SESSION['account_selection_required']);
+    syncActiveAccountCookie();
 
     return true;
 }
@@ -1180,7 +1238,6 @@ function enforcePublicWorkspaceRequestAccess(): void {
         '/restore_import.php',
         '/git_sync.php',
         '/excalidraw_editor.php',
-        '/markdown_syntax.php',
     ];
 
     foreach ($restrictedScripts as $restrictedScript) {
@@ -1506,6 +1563,8 @@ function requireAuth() {
     }
 
     syncUserPreferenceCookie();
+    syncActiveAccountCookie();
+    enforceActiveAccountHeader();
 
     enforcePublicWorkspaceRequestAccess();
 }
@@ -1940,6 +1999,7 @@ function requireApiAuth() {
                 denyPublicWorkspaceWriteAccess();
             }
         }
+        enforceActiveAccountHeader();
         return;
     }
     
@@ -2007,6 +2067,7 @@ function requireApiAuth() {
 function requireApiAuthUser() {
     // Header credentials take precedence over an existing session (see requireApiAuth)
     if (isAuthenticated() && !hasApiAuthCredentials()) {
+        enforceActiveAccountHeader();
         return;
     }
     
@@ -2145,6 +2206,7 @@ function requireApiAuthAdmin() {
             echo json_encode(['error' => api_t('auth.api.admin_required', [], 'Admin access required')]);
             exit;
         }
+        enforceActiveAccountHeader();
         return;
     }
     

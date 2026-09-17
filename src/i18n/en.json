@@ -324,7 +324,9 @@
   "workspaces": {
     "menu": {
       "edit_workspaces": "Edit workspaces",
-      "new_workspace": "New workspace"
+      "new_workspace": "New workspace",
+      "accounts": "Accounts",
+      "title": "Workspaces"
     },
     "errors": {
       "already_exists": "A workspace with this name already exists",
@@ -818,6 +820,7 @@
       "view_layout_toggle": "View toggle (grid / list, card size)",
       "index_search_bar": "Search bar",
       "tasklist_progress_bar": "Task list progress bar",
+      "preview_code_block_delete": "Delete button on code blocks, in markdown preview",
       "share_restrict_users": "Share: restrict to specific users",
       "share_protocol_toggle": "Share: HTTPS toggle",
       "share_shared_with_me": "Share: \"Shared with me\"",
@@ -1053,28 +1056,7 @@
       "default_icon": "Set default icon",
       "reset": "Restore default behavior",
       "search_placeholder": "Search icons...",
-      "gray": "Gray",
-      "black": "Black",
-      "amber": "Amber",
-      "blue": "Blue",
-      "cyan": "Cyan",
-      "default_color": "Default",
-      "emerald": "Emerald",
-      "fuchsia": "Fuchsia",
-      "green": "Green",
-      "indigo": "Indigo",
-      "lime": "Lime",
-      "orange": "Orange",
-      "pink": "Pink",
-      "purple": "Purple",
-      "red": "Red",
-      "rose": "Rose",
-      "sky": "Sky",
-      "slate": "Slate",
-      "stone": "Stone",
-      "teal": "Teal",
-      "violet": "Violet",
-      "yellow": "Yellow"
+      "default_color": "Default"
     },
     "linked_selector": {
       "title": "Create a Shortcut from a Note",
@@ -1484,7 +1466,7 @@
     "context_menu": {
       "pin": "Pin tab",
       "unpin": "Unpin tab",
-      "close": "Close",
+      "close": "Close this one",
       "close_all": "Close all",
       "close_others": "Close all except this one"
     },
@@ -1557,7 +1539,22 @@
     "done": "Done",
     "image": "Image",
     "take_photo": "Take a photo",
+    "diagrams": "Diagrams",
     "excalidraw": "Excalidraw",
+    "mermaid": "Mermaid",
+    "mermaid_flowchart": "Flowchart",
+    "mermaid_sequence": "Sequence diagram",
+    "mermaid_class": "Class diagram",
+    "mermaid_state": "State diagram",
+    "mermaid_er": "Entity relationship",
+    "mermaid_gantt": "Gantt chart",
+    "mermaid_pie": "Pie chart",
+    "mermaid_mindmap": "Mindmap",
+    "mermaid_timeline": "Timeline",
+    "mermaid_journey": "User journey",
+    "mermaid_git": "Git graph",
+    "mermaid_quadrant": "Quadrant chart",
+    "mermaid_xy": "Bar and line chart",
     "emoji": "Emoji",
     "table": "Table",
     "separator": "Separator",
@@ -1628,14 +1625,6 @@
     "insert": "Insert",
     "media": "Media",
     "color": "Color",
-    "color_red": "Red",
-    "color_blue": "Blue",
-    "color_green": "Green",
-    "color_yellow": "Yellow",
-    "color_purple": "Purple",
-    "color_orange": "Orange",
-    "color_black": "Black",
-    "bg_yellow": "Yellow background",
     "youtube": "YouTube",
     "streaming_videos": "Streaming videos",
     "bilibili": "Bilibili",
@@ -1830,13 +1819,6 @@
       "hide": "Hide line numbers"
     },
     "colors": {
-      "black": "Black",
-      "red": "Red",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
       "none": "None"
     },
     "font_size": {
@@ -1902,16 +1884,6 @@
       "remove": "Remove link",
       "cancel": "Cancel",
       "save": "Save"
-    },
-    "highlights": {
-      "yellow": "Yellow",
-      "red": "Red",
-      "green": "Green",
-      "blue": "Blue",
-      "pink": "Pink",
-      "orange": "Orange",
-      "purple": "Purple",
-      "gray": "Gray"
     }
   },
   "image_menu": {
@@ -2605,7 +2577,17 @@
     "collapse_all_folders": "Collapse all folders",
     "toggle": "Hide/Show left column",
     "toggle_icon_sidebar": "Hide/Show icon sidebar",
-    "show_hidden_icons": "Show hidden icons"
+    "show_hidden_icons": "Show hidden icons",
+    "other_accounts": {
+      "title": "Other accounts",
+      "error": "Could not load the notes of this account",
+      "empty": "No notes",
+      "open": "Open this account",
+      "view_here": "Show in a tab, without switching account"
+    },
+    "accounts": {
+      "active": "Active"
+    }
   },
   "home": {
     "title": "Dashboard",
@@ -2638,7 +2620,8 @@
       "select_type": "Please select at least one search option (Notes or Tags)",
       "single_letter_warning": "Searching with single-letter words can return too many results. Try using longer words for a more precise search.",
       "invalid_date_range": "The start date must be before or equal to the end date."
-    }
+    },
+    "placeholder_account": "Search in {{account}}..."
   },
   "icon_names": {
     "briefcase": "briefcase",
@@ -4636,5 +4619,70 @@
     "replaced_all": "Replaced {{count}} match(es)",
     "result": "result",
     "results": "results"
+  },
+  "colors": {
+    "red": "Red",
+    "orange": "Orange",
+    "amber": "Amber",
+    "yellow": "Yellow",
+    "lime": "Lime",
+    "green": "Green",
+    "teal": "Teal",
+    "cyan": "Cyan",
+    "blue": "Blue",
+    "indigo": "Indigo",
+    "purple": "Purple",
+    "magenta": "Magenta",
+    "pink": "Pink",
+    "brown": "Brown",
+    "gray": "Gray",
+    "default": "Default"
+  },
+  "page_menu": {
+    "button": "More options"
+  },
+  "keyboard_shortcuts": {
+    "menu_item": "Keyboard shortcuts",
+    "title": "Keyboard shortcuts",
+    "setting_hint": "Option to enable in Settings",
+    "sections": {
+      "general": "General",
+      "editor": "Note editor",
+      "tree": "Notes and folders tree"
+    },
+    "save_note": "Save the note",
+    "snapshot": "Take a snapshot of the note",
+    "note_nav": "Previous or next note in the folder",
+    "close": "Close a menu, panel or window",
+    "bold": "Bold",
+    "italic": "Italic",
+    "underline": "Underline",
+    "strikethrough": "Strikethrough",
+    "link": "Insert a link",
+    "code_block": "Code block",
+    "slash_menu": "Open the command menu",
+    "slash_menu_hint": "Alt + / when the option is enabled in Settings",
+    "emoji": "Insert an emoji by its name",
+    "indent": "Indent or outdent a list item",
+    "checklist_toggle": "Check or uncheck a checklist item",
+    "tree_undo": "Undo the last change",
+    "tree_redo": "Redo",
+    "tree_copy": "Copy the selected note or folder",
+    "tree_cut": "Cut the selected note or folder",
+    "tree_paste": "Paste",
+    "keys": {
+      "shift": "Shift",
+      "enter": "Enter",
+      "escape": "Esc",
+      "tab": "Tab"
+    }
+  },
+  "icon_context_menu": {
+    "hide": "Hide button"
+  },
+  "account_note": {
+    "banner": "Note from the account {{account}}, read-only",
+    "open_to_edit": "Open to edit",
+    "not_found": "This note is no longer available."
   }
 }

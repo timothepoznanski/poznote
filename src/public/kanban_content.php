@@ -492,7 +492,7 @@ try {
                     <i class="<?php echo htmlspecialchars($icon); ?> folder-icon kanban-subfolder-icon"
                        data-folder-id="<?php echo $folderId; ?>"
                        data-icon-color="<?php echo htmlspecialchars($iconColor, ENT_QUOTES); ?>"
-                       <?php echo $iconColor ? 'style="color: ' . htmlspecialchars($iconColor, ENT_QUOTES) . ' !important;"' : ''; ?>></i>
+                       <?php $iconColorCss = poznoteIconColorCss($iconColor); echo $iconColorCss !== '' ? 'style="color: ' . htmlspecialchars($iconColorCss, ENT_QUOTES) . ' !important;"' : ''; ?>></i>
                     <span class="kanban-subfolder-name"><?php echo htmlspecialchars($folderName, ENT_QUOTES); ?></span>
                     <span class="kanban-subfolder-count"><?php echo $activeCount; ?></span>
                 </button>
@@ -550,14 +550,14 @@ try {
                 $pFolderIconRaw = $parentFolder['icon'] ?? null;
                 $pFolderIcon = $pFolderIconRaw ? convertFontAwesomeToLucide($pFolderIconRaw) : 'lucide-folder';
                 $pIconColor = $parentFolder['icon_color'] ?? '';
-                $pIconStyle = $pIconColor ? "style=\"color: {$pIconColor} !important;\"" : '';
+                $pIconColorCss = htmlspecialchars(poznoteIconColorCss($pIconColor), ENT_QUOTES);
                 ?>
                 <i class="<?php echo htmlspecialchars($pFolderIcon); ?> folder-icon" 
                    data-action="open-folder-icon-picker" 
                    data-folder-id="<?php echo $folder_id; ?>" 
                    data-folder-name="<?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?>"
                    data-icon-color="<?php echo htmlspecialchars($pIconColor, ENT_QUOTES); ?>"
-                   style="cursor: pointer; <?php echo $pIconColor ? "color: {$pIconColor} !important;" : ''; ?>"></i>
+                   style="cursor: pointer; <?php echo $pIconColorCss !== '' ? "color: {$pIconColorCss} !important;" : ''; ?>"></i>
                 <span data-action="rename-folder" 
                       data-folder-id="<?php echo $folder_id; ?>" 
                       data-folder-name="<?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?>"
@@ -632,14 +632,14 @@ try {
                         $folderIconRaw = $subfolder['icon'] ?? null;
                         $folderIcon = $folderIconRaw ? convertFontAwesomeToLucide($folderIconRaw) : 'lucide-folder';
                         $iconColor = $subfolder['icon_color'] ?? '';
-                        $iconStyle = $iconColor ? "style=\"color: {$iconColor} !important;\"" : '';
+                        $iconColorCss = htmlspecialchars(poznoteIconColorCss($iconColor), ENT_QUOTES);
                         ?>
                         <i class="<?php echo htmlspecialchars($folderIcon); ?> folder-icon" 
                            data-action="open-folder-icon-picker" 
                            data-folder-id="<?php echo $subfolder['id']; ?>" 
                            data-folder-name="<?php echo htmlspecialchars($subfolder['name'], ENT_QUOTES); ?>"
                            data-icon-color="<?php echo htmlspecialchars($iconColor, ENT_QUOTES); ?>"
-                           style="cursor: pointer; <?php echo $iconColor ? "color: {$iconColor} !important;" : ''; ?>"></i>
+                           style="cursor: pointer; <?php echo $iconColorCss !== '' ? "color: {$iconColorCss} !important;" : ''; ?>"></i>
                         <span data-action="rename-folder" 
                               data-folder-id="<?php echo $subfolder['id']; ?>" 
                               data-folder-name="<?php echo htmlspecialchars($subfolder['name'], ENT_QUOTES); ?>"

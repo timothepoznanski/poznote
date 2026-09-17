@@ -697,7 +697,9 @@
       "error_loading": "Error al cargar espacios de trabajo",
       "logout": "Cerrar sesión",
       "edit_workspaces": "Editar espacios de trabajo",
-      "new_workspace": "Nuevo espacio de trabajo"
+      "new_workspace": "Nuevo espacio de trabajo",
+      "accounts": "Cuentas",
+      "title": "Espacios de trabajo"
     },
     "errors": {
       "already_exists": "Ya existe un espacio de trabajo con este nombre",
@@ -870,7 +872,17 @@
     "collapse_all_folders": "Contraer todas las carpetas",
     "toggle": "Mostrar/Ocultar la columna izquierda",
     "toggle_icon_sidebar": "Mostrar/Ocultar la barra de iconos",
-    "show_hidden_icons": "Mostrar los iconos ocultos"
+    "show_hidden_icons": "Mostrar los iconos ocultos",
+    "other_accounts": {
+      "title": "Otras cuentas",
+      "error": "No se pudieron cargar las notas de esta cuenta",
+      "empty": "Sin notas",
+      "open": "Abrir esta cuenta",
+      "view_here": "Mostrar en una pestaña, sin cambiar de cuenta"
+    },
+    "accounts": {
+      "active": "Activa"
+    }
   },
   "home": {
     "title": "Panel",
@@ -903,7 +915,8 @@
       "select_type": "Por favor selecciona al menos una opción de búsqueda (Notas o Etiquetas)",
       "single_letter_warning": "Buscar con palabras de una sola letra puede devolver demasiados resultados. Intenta usar palabras más largas para una búsqueda más precisa.",
       "invalid_date_range": "La fecha de inicio debe ser anterior o igual a la fecha de fin."
-    }
+    },
+    "placeholder_account": "Buscar en {{account}}..."
   },
   "autosave": {
     "confirm_switch": "⚠️ Cambios no guardados detectados\n\nTienes cambios no guardados que se perderán si cambias ahora.\n\nHaz clic en Aceptar para guardar y continuar, o Cancelar para quedarte.\n(El autoguardado ocurre 2 segundos después de que dejes de escribir)",
@@ -1101,14 +1114,7 @@
       "hide": "Ocultar números de línea"
     },
     "colors": {
-      "black": "Negro",
-      "orange": "Naranja",
-      "yellow": "Amarillo",
-      "green": "Verde",
-      "blue": "Azul",
-      "purple": "Morado",
-      "none": "Ninguno",
-      "red": "Rojo"
+      "none": "Ninguno"
     },
     "font_size": {
       "very_small": "Muy pequeño",
@@ -1173,16 +1179,6 @@
       "remove": "Eliminar enlace",
       "cancel": "Cancelar",
       "save": "Guardar"
-    },
-    "highlights": {
-      "yellow": "Amarillo",
-      "red": "Rojo",
-      "green": "Verde",
-      "blue": "Azul",
-      "pink": "Rosa",
-      "orange": "Naranja",
-      "purple": "Morado",
-      "gray": "Gris"
     }
   },
   "info": {
@@ -1317,6 +1313,7 @@
       "view_layout_toggle": "Alternar vista (cuadrícula / lista, tamaño de tarjetas)",
       "index_search_bar": "Barra de búsqueda",
       "tasklist_progress_bar": "Barra de progreso de las listas de tareas",
+      "preview_code_block_delete": "Botón de eliminar en los bloques de código, en la vista previa de markdown",
       "share_restrict_users": "Compartir: restringir a usuarios específicos",
       "share_protocol_toggle": "Compartir: interruptor HTTPS",
       "share_shared_with_me": "Compartir: «Compartido conmigo»",
@@ -1541,28 +1538,7 @@
       "default_icon": "Establecer icono predeterminado",
       "reset": "Restaurar el comportamiento predeterminado",
       "search_placeholder": "Buscar iconos...",
-      "gray": "Gris",
-      "black": "Negro",
-      "amber": "Ámbar",
-      "blue": "Azul",
-      "cyan": "Cian",
-      "default_color": "Predeterminado",
-      "emerald": "Esmeralda",
-      "fuchsia": "Fucsia",
-      "green": "Verde",
-      "indigo": "Índigo",
-      "lime": "Lima",
-      "orange": "Naranja",
-      "pink": "Rosa",
-      "purple": "Morado",
-      "red": "Rojo",
-      "rose": "Rosa intenso",
-      "sky": "Celeste",
-      "slate": "Pizarra",
-      "stone": "Piedra",
-      "teal": "Verde azulado",
-      "violet": "Violeta",
-      "yellow": "Amarillo"
+      "default_color": "Predeterminado"
     },
     "linked_selector": {
       "title": "Crear un atajo de una nota",
@@ -1983,7 +1959,7 @@
     "context_menu": {
       "pin": "Fijar pestaña",
       "unpin": "Desfijar pestaña",
-      "close": "Cerrar",
+      "close": "Cerrar esta",
       "close_all": "Cerrar todas",
       "close_others": "Cerrar todas excepto esta"
     },
@@ -2055,7 +2031,22 @@
     "done": "Hecho",
     "image": "Imagen",
     "take_photo": "Hacer una foto",
+    "diagrams": "Diagramas",
     "excalidraw": "Excalidraw",
+    "mermaid": "Mermaid",
+    "mermaid_flowchart": "Diagrama de flujo",
+    "mermaid_sequence": "Diagrama de secuencia",
+    "mermaid_class": "Diagrama de clases",
+    "mermaid_state": "Diagrama de estados",
+    "mermaid_er": "Entidad-relación",
+    "mermaid_gantt": "Diagrama de Gantt",
+    "mermaid_pie": "Gráfico circular",
+    "mermaid_mindmap": "Mapa mental",
+    "mermaid_timeline": "Cronología",
+    "mermaid_journey": "Recorrido del usuario",
+    "mermaid_git": "Gráfico de Git",
+    "mermaid_quadrant": "Gráfico de cuadrantes",
+    "mermaid_xy": "Gráfico de barras y líneas",
     "emoji": "Emoji",
     "table": "Tabla",
     "separator": "Separador",
@@ -2127,14 +2118,6 @@
     "insert": "Insertar",
     "media": "Multimedia",
     "color": "Color",
-    "color_red": "Rojo",
-    "color_blue": "Azul",
-    "color_green": "Verde",
-    "color_yellow": "Amarillo",
-    "color_purple": "Morado",
-    "color_orange": "Naranja",
-    "color_black": "Negro",
-    "bg_yellow": "Fondo amarillo",
     "youtube": "YouTube",
     "streaming_videos": "Vídeos en streaming",
     "bilibili": "Bilibili",
@@ -4817,5 +4800,70 @@
       "password_mismatch": "Las dos contraseñas nuevas no coinciden.",
       "password_too_short": "La contraseña debe tener al menos 4 caracteres."
     }
+  },
+  "colors": {
+    "red": "Rojo",
+    "orange": "Naranja",
+    "amber": "Ámbar",
+    "yellow": "Amarillo",
+    "lime": "Lima",
+    "green": "Verde",
+    "teal": "Verde azulado",
+    "cyan": "Cian",
+    "blue": "Azul",
+    "indigo": "Índigo",
+    "purple": "Morado",
+    "magenta": "Magenta",
+    "pink": "Rosa",
+    "brown": "Marrón",
+    "gray": "Gris",
+    "default": "Predeterminado"
+  },
+  "page_menu": {
+    "button": "Más opciones"
+  },
+  "keyboard_shortcuts": {
+    "menu_item": "Atajos de teclado",
+    "title": "Atajos de teclado",
+    "setting_hint": "Opción que se activa en Ajustes",
+    "sections": {
+      "general": "General",
+      "editor": "Editor de notas",
+      "tree": "Árbol de notas y carpetas"
+    },
+    "save_note": "Guardar la nota",
+    "snapshot": "Tomar una instantánea de la nota",
+    "note_nav": "Nota anterior o siguiente de la carpeta",
+    "close": "Cerrar un menú, un panel o una ventana",
+    "bold": "Negrita",
+    "italic": "Cursiva",
+    "underline": "Subrayado",
+    "strikethrough": "Tachado",
+    "link": "Insertar un enlace",
+    "code_block": "Bloque de código",
+    "slash_menu": "Abrir el menú de comandos",
+    "slash_menu_hint": "Alt + / si la opción está activada en Ajustes",
+    "emoji": "Insertar un emoji por su nombre",
+    "indent": "Aumentar o reducir la sangría de un elemento de lista",
+    "checklist_toggle": "Marcar o desmarcar un elemento de la lista de verificación",
+    "tree_undo": "Deshacer el último cambio",
+    "tree_redo": "Rehacer",
+    "tree_copy": "Copiar la nota o carpeta seleccionada",
+    "tree_cut": "Cortar la nota o carpeta seleccionada",
+    "tree_paste": "Pegar",
+    "keys": {
+      "shift": "Mayús",
+      "enter": "Intro",
+      "escape": "Esc",
+      "tab": "Tab"
+    }
+  },
+  "icon_context_menu": {
+    "hide": "Ocultar el botón"
+  },
+  "account_note": {
+    "banner": "Nota de la cuenta {{account}}, solo lectura",
+    "open_to_edit": "Abrir para editar",
+    "not_found": "Esta nota ya no está disponible."
   }
 }

@@ -130,6 +130,50 @@
     --pz-mark: #ffff00;
     --pz-mark-active: #ff9d00;
     --pz-mark-active-border: #d35400;
+
+    /* The colour palette users pick from (issue #1408): text colour, highlight,
+       slash menu, and the icons of folders, notes, the icon rail and the
+       toolbar. Notes store var(--pz-color-red, #dc2626), so redefining one of
+       these fifteen on :root (or in a dark block) recolours every note and icon
+       painted with it. lib/color-palette.php and js/color-palette.js hold the
+       same values as the fallbacks written into content; change all three.
+
+       The -soft variants are highlights. They are derived, not listed: the
+       colour mixed into the page background, so they stay pale on a light
+       theme and dark on a dark one, and follow a theme that only sets the base
+       colour. Tune the strength with --pz-color-soft-mix. Override these on
+       :root, where the mix is computed, not on a descendant. */
+    --pz-color-red: #dc2626;
+    --pz-color-orange: #ea580c;
+    --pz-color-amber: #d97706;
+    --pz-color-yellow: #eab308;
+    --pz-color-lime: #84cc16;
+    --pz-color-green: #16a34a;
+    --pz-color-teal: #0d9488;
+    --pz-color-cyan: #0891b2;
+    --pz-color-blue: #2563eb;
+    --pz-color-indigo: #4f46e5;
+    --pz-color-purple: #9333ea;
+    --pz-color-magenta: #c026d3;
+    --pz-color-pink: #db2777;
+    --pz-color-brown: #92400e;
+    --pz-color-gray: #6b7280;
+    --pz-color-soft-mix: 30%;
+    --pz-color-red-soft: color-mix(in srgb, var(--pz-color-red) var(--pz-color-soft-mix), var(--pz-bg));
+    --pz-color-orange-soft: color-mix(in srgb, var(--pz-color-orange) var(--pz-color-soft-mix), var(--pz-bg));
+    --pz-color-amber-soft: color-mix(in srgb, var(--pz-color-amber) var(--pz-color-soft-mix), var(--pz-bg));
+    --pz-color-yellow-soft: color-mix(in srgb, var(--pz-color-yellow) var(--pz-color-soft-mix), var(--pz-bg));
+    --pz-color-lime-soft: color-mix(in srgb, var(--pz-color-lime) var(--pz-color-soft-mix), var(--pz-bg));
+    --pz-color-green-soft: color-mix(in srgb, var(--pz-color-green) var(--pz-color-soft-mix), var(--pz-bg));
+    --pz-color-teal-soft: color-mix(in srgb, var(--pz-color-teal) var(--pz-color-soft-mix), var(--pz-bg));
+    --pz-color-cyan-soft: color-mix(in srgb, var(--pz-color-cyan) var(--pz-color-soft-mix), var(--pz-bg));
+    --pz-color-blue-soft: color-mix(in srgb, var(--pz-color-blue) var(--pz-color-soft-mix), var(--pz-bg));
+    --pz-color-indigo-soft: color-mix(in srgb, var(--pz-color-indigo) var(--pz-color-soft-mix), var(--pz-bg));
+    --pz-color-purple-soft: color-mix(in srgb, var(--pz-color-purple) var(--pz-color-soft-mix), var(--pz-bg));
+    --pz-color-magenta-soft: color-mix(in srgb, var(--pz-color-magenta) var(--pz-color-soft-mix), var(--pz-bg));
+    --pz-color-pink-soft: color-mix(in srgb, var(--pz-color-pink) var(--pz-color-soft-mix), var(--pz-bg));
+    --pz-color-brown-soft: color-mix(in srgb, var(--pz-color-brown) var(--pz-color-soft-mix), var(--pz-bg));
+    --pz-color-gray-soft: color-mix(in srgb, var(--pz-color-gray) var(--pz-color-soft-mix), var(--pz-bg));
 }
 
 /* ============================================
@@ -181,6 +225,26 @@ html[data-theme='dark'] {
     --pz-mark: var(--dm-warning);
     --pz-mark-active: var(--dm-warning-hover);
     --pz-mark-active-border: var(--dm-warning-hover);
+
+    /* The user palette, lighter so it reads as text and icons on a dark
+       ground (contrast 5.1 to 10.2 on #252526). Highlights are mixed with
+       less colour, so light text keeps a contrast of 4.4 or more on them. */
+    --pz-color-red: #f87171;
+    --pz-color-orange: #fb923c;
+    --pz-color-amber: #fbbf24;
+    --pz-color-yellow: #facc15;
+    --pz-color-lime: #a3e635;
+    --pz-color-green: #4ade80;
+    --pz-color-teal: #2dd4bf;
+    --pz-color-cyan: #22d3ee;
+    --pz-color-blue: #60a5fa;
+    --pz-color-indigo: #818cf8;
+    --pz-color-purple: #c084fc;
+    --pz-color-magenta: #e879f9;
+    --pz-color-pink: #f472b6;
+    --pz-color-brown: #c8a27a;
+    --pz-color-gray: #9ca3af;
+    --pz-color-soft-mix: 25%;
 
     /* The light tokens, switched for this theme.
 

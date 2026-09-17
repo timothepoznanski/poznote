@@ -20,8 +20,7 @@ body.highlight-folder-tree {
 }
 
 body.highlight-folder-tree .notes-list-scrollable-content:has(.folder-tree-active) .folder-toggle,
-body.highlight-folder-tree .notes-list-scrollable-content:has(.folder-tree-active) .note-list-item,
-body.highlight-folder-tree .notes-list-scrollable-content:has(.folder-tree-active) .favorites-separator {
+body.highlight-folder-tree .notes-list-scrollable-content:has(.folder-tree-active) .note-list-item {
     opacity: var(--folder-tree-dim-opacity, 0.65);
     transition: opacity 0.15s ease;
 }

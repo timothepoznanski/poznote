@@ -72,8 +72,10 @@ The first three only need PHP. The JavaScript one needs Node, and only its `corr
 
 ```bash
 cp .env.template .env    # set HTTP_WEB_PORT
-docker compose -f docker-compose-dev.yml up -d
+docker compose -f docker-compose-dev.yml up -d --build
 ```
+
+Keep `--build` after pulling changes: the nginx config is mounted from the repository but the rest of `docker/` is baked into the image, and the two must match.
 
 ## A few conventions
 

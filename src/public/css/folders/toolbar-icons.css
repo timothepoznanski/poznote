@@ -21,25 +21,21 @@
     filter: none;
 }
 
-/* Blue color for markdown view mode toggle button */
-.toolbar-btn.markdown-view-mode-btn i,
-.toolbar-btn.markdown-view-mode-btn [class*="lucide-"] {
+/* Blue for the markdown view mode toggle, on the same reading as the states
+   above: lit while the editor is live, plain in preview mode (issue #1406). */
+.toolbar-btn.markdown-view-mode-btn.is-edit-mode i,
+.toolbar-btn.markdown-view-mode-btn.is-edit-mode [class*="lucide-"] {
     color: var(--pz-accent);
     filter: none;
 }
 
-.toolbar-btn.markdown-view-mode-btn:hover i,
-.toolbar-btn.markdown-view-mode-btn:hover [class*="lucide-"] {
-    color: var(--pz-accent);
-    filter: none;
-    transform: scale(1.18);
-}
-
-/* The markdown split-view button keeps the default icon colour: nothing to
-   declare, since no rule above tints it. */
+/* The markdown split-view button keeps the default icon colour, and so does
+   the view-mode toggle while it is off: nothing to declare for either. */
 
 .toolbar-btn.markdown-split-btn:hover i,
-.toolbar-btn.markdown-split-btn:hover [class*="lucide-"] {
+.toolbar-btn.markdown-split-btn:hover [class*="lucide-"],
+.toolbar-btn.markdown-view-mode-btn:hover i,
+.toolbar-btn.markdown-view-mode-btn:hover [class*="lucide-"] {
     transform: scale(1.18);
 }
 

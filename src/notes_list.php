@@ -85,7 +85,13 @@ $search_combined_value = ($search_in_notes_value === '1' && $search_in_tags_valu
                     </button>
                 </div>
                 <div class="searchbar-input-wrapper searchbar-has-date-toggle<?php echo (!empty($search) || !empty($tags_search) || $has_created_date_filter) ? ' searchbar-has-clear' : ''; ?>">
-                    <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="<?php echo t_h('search.placeholder_notes'); ?>" value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
+                    <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="<?php echo t_h('search.placeholder_notes'); ?>"<?php
+                        // Several accounts in the list below: the search only covers the
+                        // active one, and its placeholder says which (js/unified-search.js).
+                        if (!empty($otherAccountProfiles) && !empty($activeAccountProfile['username'])) {
+                            echo ' data-account-name="' . htmlspecialchars((string)$activeAccountProfile['username'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '"';
+                        }
+                    ?> value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
                     <button type="button" id="search-date-toggle" class="searchbar-date-toggle<?php echo $has_created_date_filter ? ' active' : ''; ?>" data-action="toggle-date-filter" title="<?php echo t_h('search.toggle_date_filter', [], 'Toggle date filter'); ?>" aria-label="<?php echo t_h('search.toggle_date_filter', [], 'Toggle date filter'); ?>" aria-controls="search-date-filter" aria-expanded="<?php echo $has_created_date_filter ? 'true' : 'false'; ?>">
                         <i class="lucide lucide-calendar"></i>
                     </button>
@@ -165,7 +171,68 @@ $search_combined_value = ($search_in_notes_value === '1' && $search_in_tags_valu
 </div>
 <?php endif; ?>
 
+<?php
+// $showAccountRows, $activeAccountProfile and $otherAccountProfiles are decided
+// by index.php before the sidebar header (the "Expand all folders" button
+// moves between the title row and the account row below).
+$otherAccountProfiles = $otherAccountProfiles ?? [];
+$activeAccountProfile = $activeAccountProfile ?? null;
+$showAccountRows = !empty($showAccountRows);
+$expandFoldersButton = $expandFoldersButton ?? '';
+
+// Collapsible rows of the accounts that are not the active one, listed under
+// its tree: the active account always heads the list. js/other-accounts.js
+// fetches a row's outline from account_tree.php on first expansion. Clicking a note there switches to that
+// account and opens it; the arrow switches without choosing a note.
+$renderOtherAccounts = static function (array $profiles): void {
+    if (empty($profiles)) {
+        return;
+    }
+    $openLabel = t_h('sidebar.other_accounts.open', [], 'Open this account');
+    echo '<div class="other-accounts" data-endpoint="account_tree.php">';
+    foreach ($profiles as $profile) {
+        $name = htmlspecialchars((string)($profile['username'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        echo '<div class="other-account" data-account-id="' . (int)$profile['id'] . '">'
+            . '<div class="other-account-header">'
+            . '<button type="button" class="other-account-toggle" data-other-account="toggle" aria-expanded="false" title="' . $name . '">'
+            . '<i class="lucide lucide-chevron-right other-account-chevron" aria-hidden="true"></i>'
+            . '<i class="lucide lucide-user" aria-hidden="true"></i>'
+            . '<span class="other-account-name">' . $name . '</span>'
+            . '</button>'
+            . '<button type="button" class="other-account-open" data-other-account="open" title="' . $openLabel . '" aria-label="' . $openLabel . '">'
+            . '<i class="lucide lucide-arrow-right" aria-hidden="true"></i>'
+            . '</button>'
+            . '</div>'
+            . '<div class="other-account-tree" hidden></div>'
+            . '</div>';
+    }
+    echo '</div>';
+};
+?>
 <div class="notes-list-scrollable-content">
+<?php
+
+// The active account heads the list with the same collapsible row the other
+// accounts get below (js/other-accounts.js folds #currentAccountTree, the
+// whole own tree), whether or not there are other accounts, with the
+// "Expand all folders" button at its end, where the other rows carry their
+// "Open this account" arrow.
+if ($showAccountRows):
+    $activeAccountName = htmlspecialchars((string)($activeAccountProfile['username'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+?>
+<div class="other-account-header current-account-header">
+    <button type="button" class="other-account-toggle" data-current-account="toggle" aria-expanded="true" aria-controls="currentAccountTree" title="<?php echo $activeAccountName; ?>">
+        <i class="lucide lucide-chevron-right other-account-chevron" aria-hidden="true"></i>
+        <i class="lucide lucide-user" aria-hidden="true"></i>
+        <span class="other-account-name"><?php echo $activeAccountName; ?></span>
+        <?php if (!empty($otherAccountProfiles)): ?>
+        <span class="account-active-badge"><?php echo t_h('sidebar.accounts.active', [], 'Active'); ?></span>
+        <?php endif; ?>
+    </button>
+    <?php echo $expandFoldersButton; ?>
+</div>
+<div class="current-account-tree" id="currentAccountTree" data-account-id="<?php echo (int)(getCurrentUserId() ?? 0); ?>">
+<?php endif; ?>
 
 <?php
 
@@ -220,7 +287,8 @@ function renderFavoriteFolderItems($favorite_folders, $workspace_filter) {
         }
 
         $customIcon = !empty($favFolder['icon']) ? convertFontAwesomeToLucide($favFolder['icon']) : 'lucide lucide-folder';
-        $iconStyle = !empty($favFolder['icon_color']) ? " style='color: " . htmlspecialchars($favFolder['icon_color'], ENT_QUOTES) . " !important;'" : "";
+        $favIconColorCss = poznoteIconColorCss($favFolder['icon_color'] ?? '');
+        $iconStyle = $favIconColorCss !== '' ? " style='color: " . htmlspecialchars($favIconColorCss, ENT_QUOTES) . " !important;'" : "";
 
         echo "<div class='note-list-item favorite-folder-item'>";
         echo "<a class='links_arbo_left note-in-folder favorite-folder-link' href='" . htmlspecialchars($link, ENT_QUOTES) . "' data-folder-id='" . (int)$favFolder['id'] . "' data-folder='" . htmlspecialchars($favName, ENT_QUOTES) . "'>";
@@ -330,7 +398,8 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             echo "<i class='lucide lucide-star folder-icon'></i>";
         } else {
             $changeIconTitle = t_h('notes_list.folder_actions.change_icon', [], 'Change icon');
-            $iconStyle = $customIconColor ? " style='color: " . htmlspecialchars($customIconColor, ENT_QUOTES) . " !important;'" : "";
+            $customIconColorCss = poznoteIconColorCss($customIconColor);
+            $iconStyle = $customIconColorCss !== '' ? " style='color: " . htmlspecialchars($customIconColorCss, ENT_QUOTES) . " !important;'" : "";
             $iconColorAttr = $customIconColor ? " data-icon-color='" . htmlspecialchars($customIconColor, ENT_QUOTES) . "'" : "";
 
             echo "<i class='$chevron_icon folder-icon folder-list-click-action' data-custom-icon='" . ($customIcon ? 'true' : 'false') . "'$iconColorAttr data-action='open-folder-icon-picker' data-folder-id='$folderId' data-folder-name='" . htmlspecialchars($folderName, ENT_QUOTES) . "' title='" . $changeIconTitle . "'$iconStyle></i>";
@@ -475,13 +544,6 @@ if ($favoritesFolder && ($favorites_count > 0 || (!empty($favorite_folders) && !
     foreach($favoritesFolder as $folderId => $folderData) {
         displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined, $displayUncategorizedFirst, $created_from, $created_to);
     }
-    // Light separator between the Favorites section and the rest of the list.
-    // In search mode displayFolderRecursive() skips an empty Favorites folder,
-    // so mirror that check to avoid an orphaned line; under a folder filter the
-    // section has no header, so no separator either.
-    if (empty($folder_filter) && (!$is_search_mode || countNotesRecursively(reset($favoritesFolder)) > 0)) {
-        echo '<div class="favorites-separator"></div>';
-    }
 }
 
 // Add drop zone for moving notes to root (no folder)
@@ -538,6 +600,11 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         renderNoteListItem($row1, $noteClass, $isSelected, $link, '', '');
     }
 }
+
+if ($showAccountRows) {
+    echo '</div><!-- End of current-account-tree -->';
+}
+$renderOtherAccounts($otherAccountProfiles);
 ?>
 </div><!-- End of notes-list-scrollable-content -->
 

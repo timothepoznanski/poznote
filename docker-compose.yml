@@ -13,12 +13,16 @@ services:
       POZNOTE_PHP_FPM_MAX_CHILDREN: ${POZNOTE_PHP_FPM_MAX_CHILDREN:-}
       # PHP memory limit per request, in MB (image default 512, see docker/php/php.ini)
       POZNOTE_PHP_MEMORY_LIMIT: ${POZNOTE_PHP_MEMORY_LIMIT:-}
+      # Port nginx listens on inside the container (image default 80), for network_mode: host
+      POZNOTE_LISTEN_PORT: ${POZNOTE_LISTEN_PORT:-}
     ports:
       - "${HTTP_WEB_PORT}:80"
     volumes:
       - "./data:/var/www/html/data"
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--timeout=5", "-O", "/dev/null", "http://127.0.0.1/api/health"]
+      # Port read from the nginx config rather than POZNOTE_LISTEN_PORT, so an
+      # invalid value (ignored by the init script) does not fail the check
+      test: ["CMD-SHELL", "port=$$(grep -o 'listen [0-9][0-9]*;' /etc/nginx/http.d/default.conf | head -n 1 | tr -dc 0-9); wget --quiet --tries=1 --timeout=5 -O /dev/null http://127.0.0.1:$${port:-80}/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3

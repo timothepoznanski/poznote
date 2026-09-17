@@ -1133,6 +1133,8 @@ class NotesController {
                         $contentToSave = sanitizeHtml($entry);
                     }
 
+                    $contentToSave = $this->adoptForeignAttachments((int)$id, (string)$type, (string)$contentToSave);
+
                     $write_result = file_put_contents($filename, $contentToSave);
                     
                     // Update the entry content in database with sanitized version
@@ -1456,6 +1458,10 @@ class NotesController {
                     }
                 }
 
+                // Content pasted from another note or another account still
+                // addresses that note's attachments: copy them into this one.
+                $contentToSave = $this->adoptForeignAttachments($noteId, (string)$noteType, (string)$contentToSave);
+
                 // An AI assistant writing through the MCP server may drop
                 // most of a note in one call: keep the previous version as
                 // a snapshot first. The web editor never takes this path.
@@ -1562,6 +1568,12 @@ class NotesController {
                 // Include updated linked note IDs if any
                 if (!empty($updatedLinkedNotes)) {
                     $response['updated_linked_notes'] = $updatedLinkedNotes;
+                }
+
+                // Attachment addresses rewritten by adoptForeignAttachments():
+                // the editor still holds the old ones (js/attachment-adoption.js).
+                if (!empty($this->adoptedAttachments)) {
+                    $response['adopted_attachments'] = $this->adoptedAttachments;
                 }
 
                 // If git_push was explicitly requested, do synchronous push and include result
@@ -2183,6 +2195,7 @@ class NotesController {
             if ($noteType === 'note' && $content !== '') {
                 $content = sanitizeHtml($content);
             }
+            $content = $this->adoptForeignAttachments($noteId, (string)$noteType, (string)$content);
             
             // Write file
             $filename = getEntryFilename($noteId, $noteType);
@@ -3046,6 +3059,44 @@ class NotesController {
      * @param array $existingAttachments Existing attachments array
      * @return array ['content' => modified HTML, 'new_attachments' => array of new attachments]
      */
+    /** Addresses rewritten by the last adoptForeignAttachments() call, for the response. */
+    private $adoptedAttachments = [];
+
+    /**
+     * Makes the note own the attachments its content points at: a reference
+     * to another note's file, or to a file of another account the signed-in
+     * person can open, is copied into this note and its address rewritten
+     * (lib/attachment-adoption.php). Returns the content to store.
+     */
+    private function adoptForeignAttachments(int $noteId, string $noteType, string $content): string {
+        $this->adoptedAttachments = [];
+        if ($content === '' || !in_array($noteType, ['note', 'markdown'], true)) {
+            return $content;
+        }
+
+        try {
+            require_once dirname(__DIR__, 3) . '/lib/attachment-adoption.php';
+            $stmt = $this->con->prepare('SELECT attachments FROM entries WHERE id = ?');
+            $stmt->execute([$noteId]);
+            $existing = json_decode((string)($stmt->fetchColumn() ?: '[]'), true);
+            if (!is_array($existing)) {
+                $existing = [];
+            }
+
+            $result = poznoteAdoptForeignAttachments($this->con, $noteId, $content, $existing);
+            if (!empty($result['new_attachments'])) {
+                $stmt = $this->con->prepare('UPDATE entries SET attachments = ? WHERE id = ?');
+                $stmt->execute([json_encode(array_merge($existing, $result['new_attachments'])), $noteId]);
+            }
+            $this->adoptedAttachments = $result['adopted'];
+            return $result['content'];
+        } catch (Throwable $e) {
+            // Never lose a save over this: the text is stored as it came.
+            error_log('attachment adoption failed for note ' . $noteId . ': ' . $e->getMessage());
+            return $content;
+        }
+    }
+
     private function convertBase64ImagesToAttachments(string $content, int $noteId, array $existingAttachments): array {
         $newAttachments = [];
         $attachmentsDir = getAttachmentsPath();

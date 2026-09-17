@@ -1,23 +1,23 @@
-.markdown-syntax-page {
-    max-width: 880px;
-}
-
-.markdown-syntax-content {
-    overflow: visible;
-}
-
+/* Markdown syntax reference (markdown_syntax_content.php), shown in
+   #markdownSyntaxModal from the "..." menu at the bottom-right of the page.
+   The modal frame itself is .pz-help-modal (css/ui-customization-panel.css). */
 .markdown-syntax-intro {
-    margin: 0 0 18px;
+    margin: 0 0 14px;
     color: var(--pz-text-secondary);
-    line-height: 1.65;
-    max-width: 72ch;
+    font-size: 0.875rem;
+    line-height: 1.6;
 }
 
 .markdown-syntax-filter-bar {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin: 0 0 22px;
+    margin: 0 0 16px;
+}
+
+.markdown-syntax-filter-bar [hidden],
+.markdown-syntax-empty[hidden] {
+    display: none !important;
 }
 
 .markdown-syntax-filter-bar .filter-input-wrapper {
@@ -34,9 +34,12 @@
     pointer-events: none;
 }
 
+/* !important beats the blanket .modal-content input padding of
+   modals/responsive.css, which would slide the text under the icon (its 16px
+   font size stays: it keeps iOS from zooming in on focus) */
 .markdown-syntax-filter-bar .filter-input {
     width: 100%;
-    padding: 11px 42px 11px 38px;
+    padding: 10px 42px 10px 38px !important;
     border: 1px solid var(--pz-border);
     border-radius: var(--pz-radius-lg);
     font-size: 14px;
@@ -87,7 +90,7 @@
     border: 1px solid var(--pz-border-light);
     border-radius: var(--pz-radius-lg);
     background: var(--pz-bg);
-    padding: 18px;
+    padding: 16px;
     box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
@@ -101,15 +104,20 @@
 }
 
 .syntax-card h2 {
-    margin: 0 0 8px;
+    margin: 0 0 6px;
     color: var(--pz-text);
-    font-size: 20px;
+    font-size: 16px;
 }
 
 .syntax-card p {
     margin: 0 0 12px;
     color: var(--pz-text-secondary);
+    font-size: 0.875rem;
     line-height: 1.55;
+}
+
+.syntax-card[hidden] {
+    display: none;
 }
 
 .syntax-card pre {
@@ -122,6 +130,14 @@
     padding: 12px;
     font-size: 13px;
     line-height: 1.55;
+}
+
+/* js/copy-code-on-focus.js adds a copy button to every code block, placed
+   at right: 40px to leave room for the delete button (css/code-blocks.css).
+   The delete button only exists inside a note, so here the copy button takes
+   its place at the edge. */
+.syntax-card .code-block-copy-btn {
+    right: 8px;
 }
 
 .syntax-card pre code {

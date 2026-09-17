@@ -177,7 +177,7 @@
 
 .folder-color-picker {
     display: grid;
-    grid-template-columns: repeat(11, minmax(0, 36px));
+    grid-template-columns: repeat(8, minmax(0, 36px));
     justify-content: center;
     gap: 8px;
     padding: 16px;
@@ -274,7 +274,7 @@
     }
 
     .folder-color-picker {
-        grid-template-columns: repeat(11, minmax(0, 32px));
+        grid-template-columns: repeat(8, minmax(0, 32px));
         padding: 12px;
         gap: 6px;
     }

@@ -102,6 +102,51 @@ docker compose -f docker-compose.rootless.yml up -d
 
 </details>
 
+<a id="running-with-host-network"></a>
+<details>
+<summary><strong>Запуск с <code>network_mode: host</code></strong></summary>
+<br>
+
+По умолчанию Docker сопоставляет порт хоста с контейнером: веб-сервер слушает порт `80` внутри контейнера (`8080` для rootless-образа), а `HTTP_WEB_PORT` задаёт порт на хосте. С `network_mode: host` сопоставления нет. Контейнер напрямую занимает порты хоста, где порт `80` обычно уже принадлежит другому веб-серверу или контейнеру.
+
+Задайте порт, который слушает веб-сервер, через `POZNOTE_LISTEN_PORT` в `.env` (для rootless-образа порт выше 1023):
+
+```bash
+POZNOTE_LISTEN_PORT=8040
+```
+
+Затем в `docker-compose.yml` (или `docker-compose.rootless.yml`) замените раздел `ports:` обоих сервисов на `network_mode: host`. Серверу MCP нужны ещё два изменения: он больше не может обратиться к веб-серверу по имени сервиса, а его образ слушает все интерфейсы, что в режиме host означает все интерфейсы хоста. Направьте его на новый порт и привяжите к localhost:
+
+```yaml
+  mcp-server:
+    image: ghcr.io/timothepoznanski/poznote-mcp:6
+    restart: always
+    network_mode: host
+    command: ["sh", "-c", "poznote-mcp serve --host=127.0.0.1 --port=$${MCP_PORT}"]
+    environment:
+      POZNOTE_API_URL: http://127.0.0.1:${POZNOTE_LISTEN_PORT}/api/v1
+      MCP_PORT: ${POZNOTE_MCP_PORT:-8045}
+      POZNOTE_DEBUG: ${POZNOTE_DEBUG:-false}
+      POZNOTE_USER_ID: ${POZNOTE_USER_ID:-1}
+      POZNOTE_MCP_AUTH_TOKEN: ${POZNOTE_MCP_AUTH_TOKEN:-}
+    volumes:
+      - "./data:/var/www/html/data:ro"
+    depends_on:
+      - webserver
+```
+
+Пересоздайте контейнеры (перезапуск не перечитывает переменные окружения):
+
+```bash
+docker compose up -d --force-recreate
+```
+
+Значение применяется скриптом инициализации контейнера при каждом запуске; недопустимое значение отмечается в логе, и сохраняется значение образа по умолчанию. `HTTP_WEB_PORT` больше не используется, а `POZNOTE_MCP_PORT` теперь задаёт порт, который слушает сервер MCP. Проверка работоспособности в текущем `docker-compose.yml` следует за `POZNOTE_LISTEN_PORT`: если ваш файл всё ещё обращается к `http://127.0.0.1/api/health`, скачайте его заново или измените URL, иначе контейнер останется `unhealthy` или будет проверять то, что ещё отвечает на порту `80`.
+
+В режиме host веб-сервер слушает все интерфейсы хоста: фильтруйте порт межсетевым экраном или оставьте его доступным только через ваш обратный прокси. Внутри контейнера nginx и PHP общаются через unix-сокет, поэтому Poznote не занимает на хосте других портов, и несколько экземпляров могут работать рядом на разных портах.
+
+</details>
+
 <details>
 <summary><strong>«This site can't be reached»</strong></summary>
  <br>

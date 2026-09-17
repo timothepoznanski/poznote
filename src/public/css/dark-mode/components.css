@@ -365,7 +365,7 @@ html[data-theme='dark'] .btn-rename:hover {
 
 html[data-theme='dark'] .btn-background {
     background-color: var(--dm-neutral);
-    color: var(--pz-text-inverse);
+    color: var(--dm-text-bright);
     border-color: var(--dm-neutral);
 }
 

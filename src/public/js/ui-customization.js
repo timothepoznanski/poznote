@@ -54,7 +54,10 @@
         'card:sidebarAiChatBtn': 'card:edgeAiChatBtn',
         // The workspace menu's single "Workspaces" entry became "Edit
         // workspaces" once "New workspace" got its own entry.
-        'wsmenu:goto-workspaces': 'wsmenu:edit-workspaces'
+        'wsmenu:goto-workspaces': 'wsmenu:edit-workspaces',
+        // Markdown syntax left the note's ⋮ menu for the "..." menu of the
+        // floating stack (ui_customization_panel.php).
+        'toolbar:btn-markdown-syntax': 'card:edgeMenuMarkdownSyntax'
     };
 
     function sanitizeHiddenKeys(hidden) {
@@ -141,10 +144,6 @@
             }
 
             var action = item.getAttribute('data-action');
-            if (action === 'open-markdown-syntax' && hiddenKeyMap['toolbar:btn-markdown-syntax']) {
-                return false;
-            }
-
             if (action === 'show-snapshot' && hiddenKeyMap['toolbar:btn-snapshot']) {
                 return false;
             }
@@ -375,9 +374,7 @@
             } else if (type === 'toolbar') {
                 rules.push('.note-edit-toolbar .' + id + ', .note-edit-toolbar .' + id + ':not(.hide-on-selection) { display: none !important; }');
                 rules.push('.mobile-toolbar-menu [data-selector=".' + id + '"] { display: none !important; }');
-                if (id === 'btn-markdown-syntax') {
-                    rules.push('.mobile-toolbar-menu [data-action="open-markdown-syntax"] { display: none !important; }');
-                } else if (id === 'btn-snapshot') {
+                if (id === 'btn-snapshot') {
                     rules.push('.mobile-toolbar-menu [data-action="show-snapshot"] { display: none !important; }');
                 } else if (id === 'btn-split-view') {
                     rules.push('.note-edit-toolbar .markdown-split-btn, .note-edit-toolbar .markdown-split-btn:not(.hide-on-selection) { display: none !important; }');
@@ -412,6 +409,8 @@
             } else if (type === 'panel') {
                 if (id === 'mini-calendar') {
                     rules.push('.mini-calendar-container { display: none !important; }');
+                } else if (id === 'other-accounts') {
+                    rules.push('.other-accounts { display: none !important; }');
                 } else if (id === 'folder-actions-toggle') {
                     rules.push('.folder-actions-toggle { display: none !important; }');
                 } else if (id === 'note-actions-toggle') {
@@ -428,6 +427,17 @@
                     rules.push('#outlineMobileBackdrop { display: none !important; }');
                 } else if (id === 'tasklist-progress') {
                     rules.push('.tasklist-progress { display: none !important; }');
+                } else if (id === 'preview-code-block-delete') {
+                    // Issue #1406: the markdown preview edits nothing else, and
+                    // the bin sits next to the copy button, so a misclick costs
+                    // the block. Hidden by default, see
+                    // poznoteGetDefaultHiddenUiKeys() in lib/ui-customization.php.
+                    // The three buttons are absolutely positioned at fixed right
+                    // offsets 32px apart (css/code-blocks.css), so the ones that
+                    // stay slide into the gap instead of leaving it empty.
+                    rules.push('.markdown-preview .code-block-delete-btn { display: none !important; }');
+                    rules.push('.markdown-preview .code-block-copy-btn { right: 8px !important; }');
+                    rules.push('.markdown-preview .code-block-line-numbers-btn { right: 40px !important; }');
                 }
             }
         });

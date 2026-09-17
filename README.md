@@ -396,6 +396,7 @@ Most day-to-day settings are changed from the Poznote interface. Use the `.env` 
 - Optional runtime overrides such as `POZNOTE_MCP_PORT` and `POZNOTE_DEBUG`
 - `POZNOTE_PHP_FPM_MAX_CHILDREN` to change the number of simultaneous PHP requests (default 10) on a busy instance, see the [Troubleshooting Guide](docs/TROUBLESHOOTING.md#the-app-stops-answering-under-load)
 - `POZNOTE_PHP_MEMORY_LIMIT` to change the PHP memory limit per request, in MB (default 512), see the [Troubleshooting Guide](docs/TROUBLESHOOTING.md#a-request-runs-out-of-memory)
+- `POZNOTE_LISTEN_PORT` to change the port the web server listens on inside the container (default 80), only needed with `network_mode: host`, see the [Troubleshooting Guide](docs/TROUBLESHOOTING.md#running-with-host-network)
 - `POZNOTE_SETTINGS_PASSWORD` to ask for an extra password before the Settings page opens, left empty by default
 - `POZNOTE_MCP_AUTH_TOKEN` to require a bearer token from MCP clients, see [MCP Server](#mcp-server)
 

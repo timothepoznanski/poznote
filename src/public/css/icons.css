@@ -79,22 +79,32 @@
     filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
 
-/* Make markdown toggle icons blue */
+/* Make markdown toggle icons blue. The pair below is the legacy one, never
+   rendered any more; the toggle in use is .markdown-view-mode-btn. */
 .markdown-edit-btn [class*="lucide-"],
-.markdown-preview-btn [class*="lucide-"],
-.markdown-view-mode-btn i {
+.markdown-preview-btn [class*="lucide-"] {
     color: var(--pz-accent) !important;
 }
 
 .markdown-edit-btn:hover [class*="lucide-"],
-.markdown-preview-btn:hover [class*="lucide-"],
-.markdown-view-mode-btn:hover i {
+.markdown-preview-btn:hover [class*="lucide-"] {
     color: var(--pz-accent) !important;
     transform: scale(1.18);
 }
 
-/* Split view button - normal icon color */
-.markdown-split-btn:hover i {
+/* The view-mode toggle shows the same pencil in both modes and is blue only
+   while the editor is live (.is-edit-mode, set by updateViewModeButton() in
+   js/markdown-view-modes.js). It used to be blue in preview mode too, and
+   swapped to another icon in edit mode: colour said "on" while the icon said
+   "go there", so readers of a note believed they were already editing
+   (issue #1406). Off, it looks like the split-view toggle beside it. */
+.markdown-view-mode-btn.is-edit-mode i {
+    color: var(--pz-accent) !important;
+}
+
+/* Split view and view mode buttons - normal icon color */
+.markdown-split-btn:hover i,
+.markdown-view-mode-btn:hover i {
     transform: scale(1.18);
 }
 

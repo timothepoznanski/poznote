@@ -78,11 +78,11 @@ function saveFolderName() {
         });
 }
 
+// Every folder of the tree, the Favorites section included: it folds like any
+// other folder, so "Collapse all folders" folds it too (it used to be skipped
+// and stayed open over a fully collapsed tree).
 function getFolderContentElements() {
-    return Array.prototype.slice.call(document.querySelectorAll('#left_col .folder-content[id]')).filter(function (content) {
-        var folderHeader = content.closest('.folder-header');
-        return !folderHeader || folderHeader.getAttribute('data-folder') !== 'Favorites';
-    });
+    return Array.prototype.slice.call(document.querySelectorAll('#left_col .folder-content[id]'));
 }
 
 function isFolderContentOpen(content) {
@@ -156,9 +156,11 @@ function updateToggleAllFoldersButton() {
         button.setAttribute('aria-label', title);
         button.setAttribute('aria-expanded', shouldExpand ? 'false' : 'true');
 
+        // Unfold / fold glyphs (chevrons pointing apart, then together): a
+        // single chevron read as "open this one", not "open them all".
         if (icon) {
-            icon.classList.toggle('lucide-chevron-down', shouldExpand);
-            icon.classList.toggle('lucide-chevron-up', !shouldExpand);
+            icon.classList.toggle('lucide-chevrons-up-down', shouldExpand);
+            icon.classList.toggle('lucide-chevrons-down-up', !shouldExpand);
         }
     });
 }

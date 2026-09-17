@@ -697,7 +697,9 @@
       "error_loading": "Fehler beim Laden der Arbeitsbereiche",
       "logout": "Abmelden",
       "edit_workspaces": "Arbeitsbereiche bearbeiten",
-      "new_workspace": "Neuer Arbeitsbereich"
+      "new_workspace": "Neuer Arbeitsbereich",
+      "accounts": "Konten",
+      "title": "Arbeitsbereiche"
     },
     "errors": {
       "already_exists": "Ein Arbeitsbereich mit diesem Namen existiert bereits",
@@ -870,7 +872,17 @@
     "collapse_all_folders": "Alle Ordner zuklappen",
     "toggle": "Linke Spalte ein-/ausblenden",
     "toggle_icon_sidebar": "Icon-Seitenleiste ein-/ausblenden",
-    "show_hidden_icons": "Ausgeblendete Symbole anzeigen"
+    "show_hidden_icons": "Ausgeblendete Symbole anzeigen",
+    "other_accounts": {
+      "title": "Andere Konten",
+      "error": "Die Notizen dieses Kontos konnten nicht geladen werden",
+      "empty": "Keine Notizen",
+      "open": "Dieses Konto öffnen",
+      "view_here": "In einem Tab anzeigen, ohne das Konto zu wechseln"
+    },
+    "accounts": {
+      "active": "Aktiv"
+    }
   },
   "home": {
     "title": "Dashboard",
@@ -903,7 +915,8 @@
       "select_type": "Bitte wählen Sie mindestens eine Suchoption aus (Notizen oder Tags)",
       "single_letter_warning": "Suche nach einzelnen Buchstaben kann zu viele Ergebnisse zurückgeben. Versuchen Sie längere Wörter für eine präzisere Suche.",
       "invalid_date_range": "Das Startdatum muss vor oder am Enddatum liegen."
-    }
+    },
+    "placeholder_account": "In {{account}} suchen..."
   },
   "autosave": {
     "confirm_switch": "⚠️ Ungespeicherte Änderungen erkannt\n\nSie haben ungespeicherte Änderungen, die verloren gehen, wenn Sie jetzt wechseln.\n\nKlicken Sie auf OK, um zu speichern und fortzufahren, oder Abbrechen, um zu bleiben.\n(Auto-Speicherung erfolgt 2 Sekunden nachdem Sie aufgehört haben zu tippen)",
@@ -1101,14 +1114,7 @@
       "hide": "Zeilennummern ausblenden"
     },
     "colors": {
-      "black": "Schwarz",
-      "orange": "Orange",
-      "yellow": "Gelb",
-      "green": "Grün",
-      "blue": "Blau",
-      "purple": "Lila",
-      "none": "Keine",
-      "red": "Rot"
+      "none": "Keine"
     },
     "font_size": {
       "very_small": "Sehr klein",
@@ -1173,16 +1179,6 @@
       "remove": "Link entfernen",
       "cancel": "Abbrechen",
       "save": "Speichern"
-    },
-    "highlights": {
-      "yellow": "Gelb",
-      "red": "Rot",
-      "green": "Grün",
-      "blue": "Blau",
-      "pink": "Rosa",
-      "orange": "Orange",
-      "purple": "Lila",
-      "gray": "Grau"
     }
   },
   "info": {
@@ -1317,6 +1313,7 @@
       "view_layout_toggle": "Ansichtsumschalter (Raster / Liste, Kartengröße)",
       "index_search_bar": "Suchleiste",
       "tasklist_progress_bar": "Fortschrittsbalken der Aufgabenlisten",
+      "preview_code_block_delete": "Löschen-Schaltfläche an Codeblöcken, in der Markdown-Vorschau",
       "share_restrict_users": "Teilen: auf bestimmte Benutzer beschränken",
       "share_protocol_toggle": "Teilen: HTTPS-Schalter",
       "share_shared_with_me": "Teilen: „Mit mir geteilt“",
@@ -1541,28 +1538,7 @@
       "default_icon": "Standardsymbol festlegen",
       "reset": "Standardverhalten wiederherstellen",
       "search_placeholder": "Symbole suchen...",
-      "gray": "Grau",
-      "black": "Schwarz",
-      "amber": "Bernstein",
-      "blue": "Blau",
-      "cyan": "Cyan",
-      "default_color": "Standard",
-      "emerald": "Smaragd",
-      "fuchsia": "Fuchsia",
-      "green": "Grün",
-      "indigo": "Indigo",
-      "lime": "Limette",
-      "orange": "Orange",
-      "pink": "Pink",
-      "purple": "Lila",
-      "red": "Rot",
-      "rose": "Rosé",
-      "sky": "Himmelblau",
-      "slate": "Schiefer",
-      "stone": "Stein",
-      "teal": "Blaugrün",
-      "violet": "Violett",
-      "yellow": "Gelb"
+      "default_color": "Standard"
     },
     "linked_selector": {
       "title": "Verknüpfung aus einer Notiz erstellen",
@@ -1983,7 +1959,7 @@
     "context_menu": {
       "pin": "Tab anheften",
       "unpin": "Tab lösen",
-      "close": "Schließen",
+      "close": "Diesen schließen",
       "close_all": "Alle schließen",
       "close_others": "Alle außer diesem schließen"
     },
@@ -2056,7 +2032,22 @@
     "done": "Erledigt",
     "image": "Bild",
     "take_photo": "Foto aufnehmen",
+    "diagrams": "Diagramme",
     "excalidraw": "Excalidraw",
+    "mermaid": "Mermaid",
+    "mermaid_flowchart": "Flussdiagramm",
+    "mermaid_sequence": "Sequenzdiagramm",
+    "mermaid_class": "Klassendiagramm",
+    "mermaid_state": "Zustandsdiagramm",
+    "mermaid_er": "Entity-Relationship",
+    "mermaid_gantt": "Gantt-Diagramm",
+    "mermaid_pie": "Kreisdiagramm",
+    "mermaid_mindmap": "Mindmap",
+    "mermaid_timeline": "Zeitleiste",
+    "mermaid_journey": "User Journey",
+    "mermaid_git": "Git-Graph",
+    "mermaid_quadrant": "Quadrantendiagramm",
+    "mermaid_xy": "Balken- und Liniendiagramm",
     "emoji": "Emoji",
     "table": "Tabelle",
     "separator": "Trennlinie",
@@ -2127,14 +2118,6 @@
     "insert": "Einfügen",
     "media": "Medien",
     "color": "Farbe",
-    "color_red": "Rot",
-    "color_blue": "Blau",
-    "color_green": "Grün",
-    "color_yellow": "Gelb",
-    "color_purple": "Lila",
-    "color_orange": "Orange",
-    "color_black": "Schwarz",
-    "bg_yellow": "Gelber Hintergrund",
     "youtube": "YouTube",
     "streaming_videos": "Streaming-Videos",
     "bilibili": "Bilibili",
@@ -4816,5 +4799,70 @@
       "password_mismatch": "Die beiden neuen Passwörter stimmen nicht überein.",
       "password_too_short": "Das Passwort muss mindestens 4 Zeichen lang sein."
     }
+  },
+  "colors": {
+    "red": "Rot",
+    "orange": "Orange",
+    "amber": "Bernstein",
+    "yellow": "Gelb",
+    "lime": "Limette",
+    "green": "Grün",
+    "teal": "Blaugrün",
+    "cyan": "Cyan",
+    "blue": "Blau",
+    "indigo": "Indigo",
+    "purple": "Lila",
+    "magenta": "Magenta",
+    "pink": "Pink",
+    "brown": "Braun",
+    "gray": "Grau",
+    "default": "Standard"
+  },
+  "page_menu": {
+    "button": "Weitere Optionen"
+  },
+  "keyboard_shortcuts": {
+    "menu_item": "Tastenkürzel",
+    "title": "Tastenkürzel",
+    "setting_hint": "Option in den Einstellungen aktivieren",
+    "sections": {
+      "general": "Allgemein",
+      "editor": "Notizeditor",
+      "tree": "Notiz- und Ordnerbaum"
+    },
+    "save_note": "Notiz speichern",
+    "snapshot": "Snapshot der Notiz erstellen",
+    "note_nav": "Vorherige oder nächste Notiz im Ordner",
+    "close": "Menü, Seitenleiste oder Fenster schließen",
+    "bold": "Fett",
+    "italic": "Kursiv",
+    "underline": "Unterstrichen",
+    "strikethrough": "Durchgestrichen",
+    "link": "Link einfügen",
+    "code_block": "Codeblock",
+    "slash_menu": "Befehlsmenü öffnen",
+    "slash_menu_hint": "Alt + /, wenn die Option in den Einstellungen aktiviert ist",
+    "emoji": "Emoji über seinen Namen einfügen",
+    "indent": "Listenelement ein- oder ausrücken",
+    "checklist_toggle": "Checklistenelement abhaken oder zurücksetzen",
+    "tree_undo": "Letzte Änderung rückgängig machen",
+    "tree_redo": "Wiederholen",
+    "tree_copy": "Ausgewählte Notiz oder Ordner kopieren",
+    "tree_cut": "Ausgewählte Notiz oder Ordner ausschneiden",
+    "tree_paste": "Einfügen",
+    "keys": {
+      "shift": "Umschalt",
+      "enter": "Eingabe",
+      "escape": "Esc",
+      "tab": "Tab"
+    }
+  },
+  "icon_context_menu": {
+    "hide": "Schaltfläche ausblenden"
+  },
+  "account_note": {
+    "banner": "Notiz aus dem Konto {{account}}, schreibgeschützt",
+    "open_to_edit": "Zum Bearbeiten öffnen",
+    "not_found": "Diese Notiz ist nicht mehr verfügbar."
   }
 }

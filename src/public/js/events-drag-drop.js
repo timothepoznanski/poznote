@@ -112,6 +112,11 @@ function isExternalFileDrag(e) {
 }
 
 // Initialize drag-and-drop for notes between folders and workspace
+function isTouchDragDevice() {
+    return typeof window.matchMedia === 'function'
+        && window.matchMedia('(pointer: coarse)').matches;
+}
+
 function setupNoteDragDropEvents() {
     // Remove existing event listeners to avoid duplicates
     document.querySelectorAll('.links_arbo_left').forEach(function (link) {
@@ -135,7 +140,7 @@ function setupNoteDragDropEvents() {
     var isReadOnly = isPublicWorkspaceReadOnly();
 
     noteLinks.forEach(function (link, index) {
-        var isMobile = window.innerWidth <= 800;
+        var isMobile = isTouchDragDevice();
 
         // On mobile, disable HTML5 dragging on note links.
         // Draggable anchors can intermittently swallow taps (treated as scroll/drag),
@@ -656,6 +661,10 @@ function clearNoteDropIndicators(activeItem) {
         row.classList.remove('note-drop-before');
         row.classList.remove('note-drop-after');
     });
+    if (!activeItem) {
+        window.noteDropIndicatorItem = null;
+        window.noteDropIndicatorPosition = null;
+    }
 }
 
 // The row sits inside its folder's .folder-header, whose dragenter handler
@@ -718,9 +727,15 @@ function findNearestNoteRowForDrop(e, folderHeader, dragData) {
 }
 
 function applyNoteDropIndicator(item, position) {
+    var previousItem = window.noteDropIndicatorItem;
+    var previousPosition = window.noteDropIndicatorPosition;
+    if (previousItem === item && previousPosition === position) return;
+
     clearNoteDropIndicators(item);
     item.classList.toggle('note-drop-before', position === 'before');
     item.classList.toggle('note-drop-after', position === 'after');
+    window.noteDropIndicatorItem = item;
+    window.noteDropIndicatorPosition = position;
 }
 
 function handleNoteReorderDragOver(e) {
@@ -755,6 +770,10 @@ function handleNoteReorderDragLeave(e) {
     }
     item.classList.remove('note-drop-before');
     item.classList.remove('note-drop-after');
+    if (window.noteDropIndicatorItem === item) {
+        window.noteDropIndicatorItem = null;
+        window.noteDropIndicatorPosition = null;
+    }
 }
 
 // True while a root note (no folder) is dragged over the root area of the
@@ -799,6 +818,10 @@ function handleNoteReorderDrop(e) {
     var item = e.currentTarget;
     item.classList.remove('note-drop-before');
     item.classList.remove('note-drop-after');
+    if (window.noteDropIndicatorItem === item) {
+        window.noteDropIndicatorItem = null;
+        window.noteDropIndicatorPosition = null;
+    }
 
     var data = null;
     try {
@@ -925,7 +948,7 @@ function moveNoteToRoot(noteId) {
 
 // Setup drag and drop events for folders. Called from setupNoteDragDropEvents to initialize folder dragging
 function setupFolderDragDropEvents() {
-    var isMobile = window.innerWidth <= 800;
+    var isMobile = isTouchDragDevice();
     var isReadOnly = isPublicWorkspaceReadOnly();
 
     // Get all folder toggle elements (excluding system folders)

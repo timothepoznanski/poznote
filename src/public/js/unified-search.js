@@ -364,6 +364,18 @@ class SearchManager {
         const activeTypes = this.getActiveSearchTypes(isMobile);
         const key = activeTypes.length > 1 ? 'both' : (activeTypes[0] || 'notes');
 
+        // Several accounts in the list under the search bar (notes_list.php
+        // sets data-account-name then): the search only covers the active
+        // one, so the placeholder names it; the two scope icons already say
+        // notes or tags.
+        const accountName = elements.searchInput.getAttribute('data-account-name');
+        if (accountName) {
+            const template = window.t ? window.t('search.placeholder_account', null, 'Search in {{account}}...') : 'Search in {{account}}...';
+            elements.searchInput.placeholder = template.split('{{account}}').join(accountName);
+            elements.searchInput.disabled = false;
+            return;
+        }
+
         elements.searchInput.placeholder = placeholders[key] || placeholders.notes;
         elements.searchInput.disabled = false;
     }

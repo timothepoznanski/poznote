@@ -290,9 +290,11 @@ $iconSidebarBottomItems = [
     ['id' => 'iconSidebarLogoutBtn', 'url' => $iconSidebarBasePath . 'logout.php', 'icon' => 'lucide-log-out', 'label' => t('workspace_menu.logout', [], 'Logout')],
 ];
 
-// Someone who can open several accounts gets them offered in the logout dialog
-// (js/profile.js), which posts the choice to switch_account.php. The token is
-// kept for the whole session so several open tabs all stay valid.
+// Someone who can open several accounts (Admin > User Management) gets them
+// offered in the logout dialog (js/profile.js), in the notes list's workspace
+// menu (js/workspaces-core.js) and in its "Other accounts" block
+// (js/other-accounts.js); all post the choice to switch_account.php. The
+// token is kept for the whole session so several open tabs all stay valid.
 $iconSidebarAccountSwitch = null;
 $iconSidebarSwitchProfiles = function_exists('getSwitchableAccountProfiles') ? getSwitchableAccountProfiles() : [];
 if (!empty($iconSidebarSwitchProfiles)) {
@@ -372,8 +374,17 @@ window.PoznoteAccountSwitch = <?php echo json_encode($iconSidebarAccountSwitch, 
 window.PoznoteIconSidebarColorsConfig = <?php echo json_encode([
     'colors' => (object)poznoteGetIconSidebarColors(),
     'errorSaving' => t('display.alerts.error_saving_preference', [], 'Error saving preference'),
+    // Right-click menu of the rail and the note toolbar. The rail buttons the
+    // UI Customization list refuses to hide get no "Hide" entry.
+    'nonHideable' => array_values(array_filter(array_map(
+        fn($key) => strpos($key, 'card:') === 0 ? substr($key, 5) : '',
+        array_keys(poznoteGetNonHideableUiKeys())
+    ))),
+    'menuChangeColor' => t('modals.icon_sidebar_order.change_color', [], 'Change icon color'),
+    'menuHide' => t('icon_context_menu.hide', [], 'Hide button'),
 ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;
 </script>
+<script src="<?php echo $iconSidebarAsset('js/color-palette.js'); ?>" defer></script>
 <script src="<?php echo $iconSidebarAsset('js/icon-sidebar-colors.js'); ?>" defer></script>
 <script src="<?php echo $iconSidebarAsset('js/page-title-workspace-menu.js'); ?>" defer></script>
 <script>
@@ -477,9 +488,10 @@ try {
 <button type="button" id="iconSidebarToggle" title="<?php echo $iconSidebarToggleLabel; ?>" aria-label="<?php echo $iconSidebarToggleLabel; ?>" aria-expanded="true" aria-controls="icon_sidebar">
     <i class="lucide lucide-chevron-left"></i>
 </button>
-<!-- Colour of one icon: right-click on a rail button, the icons of the Icon
-     Sidebar Order modal (settings.php), or a right-click on a note toolbar
-     button (js/toolbar-icon-colors.js, which is why the modal lives here, on
+<!-- Colour of one icon: the "Change icon color" entry of the right-click menu
+     on a rail button, the icons of the Icon Sidebar Order modal (settings.php),
+     or the same menu on a note toolbar button
+     (js/toolbar-icon-colors.js, which is why the modal lives here, on
      every page with the rail). The folder icon modal's palette without its icon
      grid. Driven by js/icon-sidebar-colors.js,
      styled by css/profile-modal.css like the rail's other modals, since half

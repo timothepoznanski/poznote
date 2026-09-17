@@ -1,5 +1,5 @@
 /* Contextual UI Customization panel (ui_customization_panel.php): a floating
-   trigger at the bottom-right of the page and a column docked on the right,
+   "..." menu at the bottom-right of the page and a column docked on the right,
    laid out like #ai-chat-panel (css/ai-chat.css). The checklist inside reuses
    the .ui-custom-* rules of css/modals/ui-customization.css. */
 
@@ -79,11 +79,240 @@
 
 /* Each panel has its own close button, so its toggle hides while it is
    open (html.ai-chat-open is the pre-paint restore of the AI chat state,
-   see js/ai-chat.js) */
-body.ui-custom-panel-open .ui-custom-panel-toggle,
+   see js/ai-chat.js). The "..." menu goes with the customization panel it
+   opens. */
+body.ui-custom-panel-open .pz-edge-menu-anchor,
 html.ai-chat-open #edgeAiChatBtn,
 body:has(#ai-chat-panel.ai-chat-open) #edgeAiChatBtn {
     display: none;
+}
+
+/* "..." menu of the stack: customize this page, keyboard shortcuts, Markdown
+   syntax. Same look as the create menu (css/folders/actions-menu.css), opened
+   to the left of its button so it covers neither the button nor the AI
+   assistant above it. */
+.pz-edge-menu-anchor {
+    position: relative;
+    display: flex;
+}
+
+.page-more-menu {
+    position: absolute;
+    right: calc(100% + 8px);
+    bottom: 0;
+    min-width: 210px;
+    padding: 4px 0;
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border-strong);
+    border-radius: var(--pz-radius);
+    box-shadow: 0 4px 6px -1px rgba(var(--pz-shadow-rgb), 0.1), 0 2px 4px -1px rgba(var(--pz-shadow-rgb), 0.06);
+    pointer-events: auto;
+    z-index: 10000;
+}
+
+.page-more-menu[hidden] {
+    display: none;
+}
+
+.page-more-menu-item {
+    width: 100%;
+    padding: 7px 14px;
+    border: none;
+    background: transparent;
+    color: var(--pz-text);
+    font: inherit;
+    font-size: 0.9em;
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.15s ease;
+}
+
+.page-more-menu-item:hover,
+.page-more-menu-item:focus-visible {
+    background-color: var(--pz-surface-hover);
+    outline: none;
+}
+
+.page-more-menu-item [class*="lucide-"] {
+    font-size: 0.85em;
+    width: 15px;
+    color: var(--pz-text-muted);
+    filter: none;
+}
+
+.page-more-menu-item:hover [class*="lucide-"],
+.page-more-menu-item:focus-visible [class*="lucide-"] {
+    color: var(--pz-text);
+}
+
+html[data-theme='dark'] .page-more-menu {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    box-shadow: 0 8px 24px rgba(var(--pz-shadow-rgb), 0.35);
+}
+
+html[data-theme='dark'] .page-more-menu-item,
+html[data-theme='dark'] .page-more-menu-item [class*="lucide-"] {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .page-more-menu-item:hover,
+html[data-theme='dark'] .page-more-menu-item:focus-visible {
+    background-color: var(--dm-surface-hover);
+}
+
+/* Help modals of the "..." menu (keyboard shortcuts, Markdown syntax). Scoped
+   with the class pair: this sheet can load before css/modals/base.css, and
+   modals/responsive.css adds a 5% top margin that pushed the screen-capped
+   dialog below the fold. Only the body scrolls, the title stays in view. */
+.modal.pz-help-modal {
+    align-items: center;
+}
+
+.pz-help-modal .pz-help-modal-content {
+    width: 94%;
+    max-width: 620px !important;
+    max-height: 100%;
+    margin: 0 auto !important;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* The syntax cards carry code examples: a little more room */
+.markdown-syntax-modal .pz-help-modal-content {
+    max-width: 720px !important;
+}
+
+.pz-help-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 20px 20px 12px 24px;
+    flex-shrink: 0;
+}
+
+.pz-help-modal-content .pz-help-modal-header h3 {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+}
+
+/* On mobile modals/responsive.css turns every .modal-content > div > button
+   into a full-width 44px block, which pushed the close button next to a
+   squeezed, wrapped title. The extra class outweighs that selector. */
+.pz-help-modal-content > .pz-help-modal-header > button {
+    width: 26px !important;
+    height: 26px !important;
+    display: inline-flex !important;
+    margin-bottom: 0 !important;
+    flex-shrink: 0;
+}
+
+.pz-help-modal-body {
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0 24px 20px;
+}
+
+.keyboard-shortcuts-group + .keyboard-shortcuts-group {
+    margin-top: 18px;
+}
+
+/* !important beats the global h4 margin reset in base.css */
+.keyboard-shortcuts-group-title {
+    margin: 0 0 6px !important;
+    font-size: 0.75rem;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.keyboard-shortcuts-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.keyboard-shortcuts-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--pz-border-light);
+    font-size: 0.875rem;
+    color: var(--pz-text);
+}
+
+.keyboard-shortcuts-item:last-child {
+    border-bottom: none;
+}
+
+.keyboard-shortcuts-label {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.keyboard-shortcuts-hint {
+    font-size: 0.78rem;
+    color: var(--pz-text-subtle);
+}
+
+.keyboard-shortcuts-keys {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.keyboard-shortcuts-combo {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.keyboard-shortcuts-plus,
+.keyboard-shortcuts-or {
+    font-size: 0.75rem;
+    color: var(--pz-text-subtle);
+}
+
+.keyboard-shortcuts-keys kbd {
+    min-width: 22px;
+    padding: 2px 6px;
+    box-sizing: border-box;
+    border: 1px solid var(--pz-border-strong);
+    border-bottom-width: 2px;
+    border-radius: var(--pz-radius-sm);
+    background: var(--pz-surface);
+    color: var(--pz-text);
+    font-family: inherit;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    text-align: center;
+}
+
+html[data-theme='dark'] .keyboard-shortcuts-keys kbd {
+    background: var(--dm-surface-hover);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+@media (max-width: 800px) {
+    .keyboard-shortcuts-item {
+        align-items: flex-start;
+    }
 }
 
 /* Raised over the arrows below it: one arrow showing is a button plus a gap,

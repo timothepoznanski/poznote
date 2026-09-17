@@ -396,6 +396,7 @@ Die meisten alltäglichen Einstellungen ändern Sie in der Poznote-Oberfläche. 
 - Optionale Laufzeit-Überschreibungen wie `POZNOTE_MCP_PORT` und `POZNOTE_DEBUG`
 - `POZNOTE_PHP_FPM_MAX_CHILDREN`, um auf einer stark ausgelasteten Instanz die Anzahl gleichzeitiger PHP-Anfragen zu ändern (Standard 10), siehe [Leitfaden zur Fehlerbehebung](TROUBLESHOOTING.de.md#the-app-stops-answering-under-load)
 - `POZNOTE_PHP_MEMORY_LIMIT`, um das PHP-Speicherlimit pro Anfrage in MB zu ändern (Standard 512), siehe [Leitfaden zur Fehlerbehebung](TROUBLESHOOTING.de.md#a-request-runs-out-of-memory)
+- `POZNOTE_LISTEN_PORT`, um den Port zu ändern, auf dem der Webserver im Container lauscht (Standard 80), nur mit `network_mode: host` nötig, siehe [Leitfaden zur Fehlerbehebung](TROUBLESHOOTING.de.md#running-with-host-network)
 - `POZNOTE_SETTINGS_PASSWORD`, um vor dem Öffnen der Einstellungsseite ein zusätzliches Passwort abzufragen, standardmäßig leer
 - `POZNOTE_MCP_AUTH_TOKEN`, um von MCP-Clients ein Bearer-Token zu verlangen, siehe [MCP-Server](#mcp-server)
 

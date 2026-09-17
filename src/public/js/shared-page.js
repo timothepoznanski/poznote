@@ -2086,7 +2086,7 @@
         var noteIconClass = (note.icon && note.icon !== 'lucide-sticky-note') ? note.icon : 'lucide-sticky-note';
         typeIcon.className = 'lucide ' + noteIconClass + ' note-icon shared-type-icon';
         if (note.icon_color) {
-            typeIcon.style.setProperty('color', note.icon_color, 'important');
+            typeIcon.style.setProperty('color', window.poznoteIconColorCss ? window.poznoteIconColorCss(note.icon_color) : note.icon_color, 'important');
             typeIcon.setAttribute('data-icon-color', note.icon_color);
         }
         nameContainer.appendChild(typeIcon);
@@ -2293,7 +2293,7 @@
         var folderIconClass = (folder.icon && folder.icon !== 'lucide-folder') ? folder.icon : 'lucide-folder';
         typeIcon.className = 'lucide ' + folderIconClass + ' folder-icon shared-type-icon';
         if (folder.icon_color) {
-            typeIcon.style.setProperty('color', folder.icon_color, 'important');
+            typeIcon.style.setProperty('color', window.poznoteIconColorCss ? window.poznoteIconColorCss(folder.icon_color) : folder.icon_color, 'important');
             typeIcon.setAttribute('data-icon-color', folder.icon_color);
         }
         nameContainer.appendChild(typeIcon);
@@ -2420,7 +2420,7 @@
         var customIconClass = sharedItem.icon || defaultIconClass;
         typeIcon.className = 'lucide ' + customIconClass + ' ' + (isFolder ? 'folder-icon' : 'note-icon') + ' shared-type-icon';
         if (sharedItem.icon_color) {
-            typeIcon.style.setProperty('color', sharedItem.icon_color, 'important');
+            typeIcon.style.setProperty('color', window.poznoteIconColorCss ? window.poznoteIconColorCss(sharedItem.icon_color) : sharedItem.icon_color, 'important');
             typeIcon.setAttribute('data-icon-color', sharedItem.icon_color);
         }
         nameContainer.appendChild(typeIcon);

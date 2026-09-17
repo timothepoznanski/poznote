@@ -361,6 +361,12 @@ function saveNoteToServer(options) {
                 if (data.note && data.note.version && typeof window.setLiveNoteContentVersion === 'function') {
                     window.setLiveNoteContentVersion(noteid, data.note.version);
                 }
+                // Attachments copied into the note by this save (content pasted
+                // from another note or account): swap their addresses before
+                // the saved state is recorded (js/attachment-adoption.js).
+                if (data.adopted_attachments && typeof window.poznoteApplyAdoptedAttachments === 'function') {
+                    window.poznoteApplyAdoptedAttachments(noteid, data.adopted_attachments);
+                }
                 var responseTitle = (data.note && data.note.heading) ? data.note.heading : headi;
                 handleSaveResponse(JSON.stringify({ date: new Date().toLocaleDateString(), title: responseTitle, original_title: headi }));
                 if (typeof options.onSaved === 'function') {
