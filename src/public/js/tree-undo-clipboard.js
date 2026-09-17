@@ -6,17 +6,27 @@
  *
  *   Ctrl+Z          undo the last tree change
  *   Ctrl+Shift+Z    redo it (Ctrl+Y works too)
- *   Ctrl+C / X / V  copy, cut and paste the focused note or folder
+ *   Ctrl+C / X / V  copy, cut and paste the selected notes and folders
+ *   Del             move them to the trash (Cmd+Backspace on macOS)
  *
  * The shortcuts only fire outside text fields and editors, and Ctrl+C/X leave
  * a text selection to the browser, so copying text in a note keeps working.
  * On macOS the Command key replaces Ctrl.
  *
- * Which row the shortcuts act on: the last note or folder row clicked or
- * right-clicked in the tree, falling back to the note that is open. Clicking
- * the empty part of the tree targets the root, so a cut note can be pasted
- * out of every folder. The same actions sit in the row context menus (⋮ or
- * right-click), where paste goes into the folder of the row.
+ * Which rows the shortcuts act on: the multi-selection built with Ctrl+Click
+ * and Shift+Click (js/tree-selection.js) when there is one, otherwise the last
+ * note or folder row clicked or right-clicked in the tree, falling back to the
+ * note that is open. Del is stricter: without a selection it needs the last
+ * click to have been in the tree, so a Del pressed after clicking elsewhere
+ * never trashes the open note. Clicking the empty part of the tree targets the
+ * root, so a cut note can be pasted out of every folder. The same actions sit
+ * in the row context menus (⋮ or right-click), where paste goes into the
+ * folder of the row.
+ *
+ * An action on several rows is recorded as one {type: 'batch', entries}
+ * history entry, so a single Ctrl+Z takes the whole set back. When a batch
+ * stops halfway, the part that went through and the part that did not are
+ * split into two entries so neither is replayed twice.
  *
  * Every tree action reloads the page (that is how the existing move, delete
  * and rename flows refresh the tree), so the history and the clipboard live
@@ -240,10 +250,17 @@
         writeJson(TOAST_KEY, message);
     }
 
+    function errorToastAfterReload(message) {
+        writeJson(TOAST_KEY, { error: message });
+    }
+
     function showPendingToast() {
         var message = readJson(TOAST_KEY, null);
-        if (message) {
-            writeJson(TOAST_KEY, null);
+        if (!message) return;
+        writeJson(TOAST_KEY, null);
+        if (message.error) {
+            errorToast(message.error);
+        } else {
             toast(message);
         }
     }
@@ -553,9 +570,20 @@
         writeJson(HISTORY_KEY, history);
     }
 
+    // Several changes made by one action: a lone change is kept as itself
+    function batchEntry(entries) {
+        return entries.length === 1 ? entries[0] : { type: 'batch', entries: entries };
+    }
+
+    function isValidEntry(entry) {
+        if (!entry) return false;
+        if (entry.type === 'batch') return Array.isArray(entry.entries) && entry.entries.length > 0;
+        return !!EXECUTORS[entry.type];
+    }
+
     /** Add a finished tree change to the undo stack (clears the redo stack) */
     function record(entry) {
-        if (!entry || !EXECUTORS[entry.type]) return;
+        if (!isValidEntry(entry)) return;
         var history = loadHistory();
         history.undo.push(entry);
         if (history.undo.length > MAX_ENTRIES) {
@@ -566,6 +594,9 @@
     }
 
     function actionLabel(entry) {
+        if (entry.type === 'batch') {
+            return tr('tree_history.actions.batch', '{{count}} items', { count: entry.entries.length });
+        }
         var key = EXECUTORS[entry.type] ? EXECUTORS[entry.type].label : entry.type;
         return tr('tree_history.actions.' + key, key);
     }
@@ -586,27 +617,52 @@
         }
 
         var entry = fromStack.pop();
-        var executor = EXECUTORS[entry.type];
-        if (!executor) {
+        if (!isValidEntry(entry)) {
             saveHistory(history);
             step(direction);
             return;
         }
 
+        // A batch is taken back last change first and replayed in its order
+        var parts = (entry.type === 'batch' ? entry.entries : [entry]).filter(function (part) {
+            return !!EXECUTORS[part.type];
+        });
+        var ordered = direction === 'undo' ? parts.slice().reverse() : parts.slice();
+        var done = [];
+        var removedNoteIds = [];
+
         running = true;
-        executor[direction](entry).then(function (removedNoteIds) {
+        sequence(ordered, function (part) {
+            return EXECUTORS[part.type][direction](part).then(function (removed) {
+                done.push(part);
+                removedNoteIds = removedNoteIds.concat(removed || []);
+            });
+        }).then(function () {
             toStack.push(entry);
             saveHistory(history);
             toastAfterReload(direction === 'undo'
                 ? tr('tree_history.undone', 'Undo: {{action}}', { action: actionLabel(entry) })
                 : tr('tree_history.redone', 'Redo: {{action}}', { action: actionLabel(entry) }));
-            reloadTree(removedNoteIds || []);
+            reloadTree(removedNoteIds);
         }).catch(function (error) {
-            // Left on its stack: the user can fix the conflict and try again
-            running = false;
-            errorToast(direction === 'undo'
+            var message = direction === 'undo'
                 ? tr('tree_history.undo_failed', 'Undo failed: {{error}}', { error: error.message })
-                : tr('tree_history.redo_failed', 'Redo failed: {{error}}', { error: error.message }));
+                : tr('tree_history.redo_failed', 'Redo failed: {{error}}', { error: error.message });
+
+            if (!done.length) {
+                // Left on its stack: the user can fix the conflict and try again
+                running = false;
+                errorToast(message);
+                return;
+            }
+
+            // Part of a batch went through: that part moves across, the rest
+            // stays where it was, both in their original order
+            fromStack.push(batchEntry(parts.filter(function (part) { return done.indexOf(part) === -1; })));
+            toStack.push(batchEntry(parts.filter(function (part) { return done.indexOf(part) !== -1; })));
+            saveHistory(history);
+            errorToastAfterReload(message);
+            reloadTree(removedNoteIds);
         });
     }
 
@@ -614,13 +670,21 @@
     // Clipboard
     // ============================================
 
+    /**
+     * The clipboard is {mode, workspace, items: [{type, id, name, folderId | parentId}]}.
+     * A tab still holding the single-item shape of earlier versions
+     * ({type, id, mode, ...}) reads as a one-item list.
+     */
     function getClipboard() {
-        var item = readJson(CLIPBOARD_KEY, null);
-        return (item && item.type && item.id) ? item : null;
+        var stored = readJson(CLIPBOARD_KEY, null);
+        if (stored && stored.type && stored.id) {
+            stored = { mode: stored.mode, workspace: stored.workspace, items: [stored] };
+        }
+        return (stored && Array.isArray(stored.items) && stored.items.length) ? stored : null;
     }
 
-    function setClipboard(item) {
-        writeJson(CLIPBOARD_KEY, item);
+    function setClipboard(clipboard) {
+        writeJson(CLIPBOARD_KEY, clipboard);
         markCutRows();
     }
 
@@ -628,56 +692,177 @@
         setClipboard(null);
     }
 
-    function copyNote(noteId, mode) {
-        var state = noteState(noteId);
-        setClipboard({
-            type: 'note', id: String(noteId), name: state.name, mode: mode,
-            workspace: state.workspace, folderId: state.folderId
+    /**
+     * Drop the targets a folder of the same set already covers: copying,
+     * moving or trashing a folder takes its notes and subfolders along, and
+     * acting on them a second time would fail or duplicate them.
+     */
+    function withoutNested(targets) {
+        var folderIds = targets.filter(function (t) { return t.type === 'folder'; }).map(function (t) { return String(t.id); });
+        return targets.filter(function (target) {
+            var element = target.type === 'note' ? noteLink(target.id) : folderHeader(target.id);
+            if (!element) return true;
+            return !folderIds.some(function (folderId) {
+                var ancestor = folderHeader(folderId);
+                return !!(ancestor && ancestor.contains(element) && ancestor !== element);
+            });
         });
-        toast(mode === 'cut'
-            ? tr('tree_clipboard.cut_note', 'Cut "{{name}}"', { name: state.name })
-            : tr('tree_clipboard.copied_note', 'Copied "{{name}}"', { name: state.name }));
+    }
+
+    /**
+     * Put notes and folders on the clipboard. targets is [{type, id}] in tree
+     * order; shortcuts are left out of a copy, where the duplicate would not
+     * point anywhere (same rule as the row menus).
+     */
+    function copyItems(targets, mode) {
+        var items = [];
+        withoutNested(targets || []).forEach(function (target) {
+            if (target.type === 'note') {
+                var link = noteLink(target.id);
+                if (mode === 'copy' && link && link.getAttribute('data-note-type') === 'linked') return;
+                var note = noteState(target.id);
+                items.push({ type: 'note', id: String(target.id), name: note.name, folderId: note.folderId });
+            } else if (target.type === 'folder') {
+                var folder = folderState(target.id);
+                items.push({ type: 'folder', id: String(target.id), name: folder.name, parentId: folder.parentId });
+            }
+        });
+        if (!items.length) return;
+
+        setClipboard({ mode: mode, workspace: currentWorkspace(), items: items });
+
+        if (items.length > 1) {
+            toast(mode === 'cut'
+                ? tr('tree_clipboard.cut_items', 'Cut {{count}} items', { count: items.length })
+                : tr('tree_clipboard.copied_items', 'Copied {{count}} items', { count: items.length }));
+            return;
+        }
+        var item = items[0];
+        if (item.type === 'note') {
+            toast(mode === 'cut'
+                ? tr('tree_clipboard.cut_note', 'Cut "{{name}}"', { name: item.name })
+                : tr('tree_clipboard.copied_note', 'Copied "{{name}}"', { name: item.name }));
+        } else {
+            toast(mode === 'cut'
+                ? tr('tree_clipboard.cut_folder', 'Cut folder "{{name}}"', { name: item.name })
+                : tr('tree_clipboard.copied_folder', 'Copied folder "{{name}}"', { name: item.name }));
+        }
+    }
+
+    function copyNote(noteId, mode) {
+        copyItems([{ type: 'note', id: noteId }], mode);
     }
 
     function copyFolder(folderId, mode) {
-        var state = folderState(folderId);
-        setClipboard({
-            type: 'folder', id: String(folderId), name: state.name, mode: mode,
-            workspace: state.workspace, parentId: state.parentId
-        });
-        toast(mode === 'cut'
-            ? tr('tree_clipboard.cut_folder', 'Cut folder "{{name}}"', { name: state.name })
-            : tr('tree_clipboard.copied_folder', 'Copied folder "{{name}}"', { name: state.name }));
+        copyItems([{ type: 'folder', id: folderId }], mode);
     }
 
-    // Dim the rows of a cut item until it is pasted, like a file manager
+    // Dim the rows of cut items until they are pasted, like a file manager
     function markCutRows() {
         document.querySelectorAll('.tree-clipboard-cut').forEach(function (el) {
             el.classList.remove('tree-clipboard-cut');
         });
-        var item = getClipboard();
-        if (!item || item.mode !== 'cut' || item.workspace !== currentWorkspace()) return;
+        var clipboard = getClipboard();
+        if (!clipboard || clipboard.mode !== 'cut' || clipboard.workspace !== currentWorkspace()) return;
+
+        clipboard.items.forEach(function (item) {
+            if (item.type === 'note') {
+                document.querySelectorAll('.links_arbo_left[data-note-db-id="' + item.id + '"]').forEach(function (link) {
+                    (link.closest('.note-list-item') || link).classList.add('tree-clipboard-cut');
+                });
+            } else {
+                var header = folderHeader(item.id);
+                var toggle = header ? header.querySelector(':scope > .folder-toggle') : null;
+                if (toggle) toggle.classList.add('tree-clipboard-cut');
+            }
+        });
+    }
+
+    /**
+     * The request pasting one clipboard item, resolving with its history
+     * entry; or {skip: message} when the item has nothing to do there.
+     */
+    function pasteItem(item, mode, sourceWorkspace, dest) {
+        var sameWorkspace = sourceWorkspace === dest.workspace;
+        var named = Object.assign({}, dest, { name: item.name });
+
+        if (item.type === 'note' && mode === 'copy') {
+            return {
+                run: function () {
+                    return duplicateNoteInto(item.id, sourceWorkspace, named).then(function (newId) {
+                        return {
+                            type: 'note-copy', sourceNoteId: item.id, sourceWorkspace: sourceWorkspace,
+                            newNoteId: newId, folderId: dest.folderId, workspace: dest.workspace, name: item.name
+                        };
+                    });
+                }
+            };
+        }
 
         if (item.type === 'note') {
-            document.querySelectorAll('.links_arbo_left[data-note-db-id="' + item.id + '"]').forEach(function (link) {
-                (link.closest('.note-list-item') || link).classList.add('tree-clipboard-cut');
-            });
-        } else {
-            var header = folderHeader(item.id);
-            var toggle = header ? header.querySelector(':scope > .folder-toggle') : null;
-            if (toggle) toggle.classList.add('tree-clipboard-cut');
+            if (sameWorkspace && sameId(item.folderId, dest.folderId)) {
+                return { skip: tr('tree_clipboard.already_there', 'Already in this folder') };
+            }
+            return {
+                run: function () {
+                    var noteFrom = sameWorkspace ? noteState(item.id) : { folderId: item.folderId, workspace: sourceWorkspace };
+                    return moveNote(item.id, dest).then(function () {
+                        return {
+                            type: 'note-move', noteId: item.id,
+                            from: { folderId: noteFrom.folderId, workspace: noteFrom.workspace },
+                            to: { folderId: dest.folderId, workspace: dest.workspace }
+                        };
+                    });
+                }
+            };
         }
+
+        if (mode === 'copy') {
+            return {
+                run: function () {
+                    return duplicateFolderInto(item.id, sourceWorkspace, named).then(function (newId) {
+                        return {
+                            type: 'folder-copy', sourceFolderId: item.id, sourceWorkspace: sourceWorkspace,
+                            newFolderId: newId, parentId: dest.parentId, workspace: dest.workspace, name: item.name
+                        };
+                    });
+                }
+            };
+        }
+
+        if (sameWorkspace && (sameId(item.id, dest.parentId) || (dest.parentId && isFolderInside(dest.parentId, item.id)))) {
+            return { skip: tr('tree_clipboard.cannot_paste_into_itself', 'A folder cannot be pasted into itself') };
+        }
+        if (sameWorkspace && sameId(item.parentId, dest.parentId)) {
+            return { skip: tr('tree_clipboard.already_there', 'Already in this folder') };
+        }
+        return {
+            run: function () {
+                var folderFrom = sameWorkspace ? folderState(item.id) : { parentId: item.parentId, workspace: sourceWorkspace };
+                return placeFolder(item.id, { parentId: dest.parentId, workspace: dest.workspace }).then(function () {
+                    return {
+                        type: 'folder-move', folderId: item.id,
+                        from: {
+                            parentId: folderFrom.parentId, workspace: folderFrom.workspace,
+                            prevSiblingId: folderFrom.prevSiblingId || null, nextSiblingId: folderFrom.nextSiblingId || null
+                        },
+                        to: { parentId: dest.parentId, workspace: dest.workspace }
+                    };
+                });
+            }
+        };
     }
 
     /**
      * Paste the clipboard into a folder (null for the root of the current
-     * workspace). Copies duplicate, cuts move; both are recorded so Ctrl+Z
-     * takes them back, and both consume the clipboard on success.
+     * workspace). Copies duplicate, cuts move; the items go one after the
+     * other and are recorded as one history entry so Ctrl+Z takes them all
+     * back. The clipboard is consumed once anything was pasted.
      */
     function paste(targetFolderId) {
         if (isReadOnly() || running) return;
-        var item = getClipboard();
-        if (!item) {
+        var clipboard = getClipboard();
+        if (!clipboard) {
             toast(tr('tree_clipboard.nothing_to_paste', 'Nothing to paste'));
             return;
         }
@@ -685,74 +870,185 @@
         var dest = {
             folderId: targetFolderId || null,
             parentId: targetFolderId || null,
-            workspace: currentWorkspace(),
-            name: item.name
+            workspace: currentWorkspace()
         };
-        var sameWorkspace = item.workspace === dest.workspace;
-        var request;
 
-        if (item.type === 'note' && item.mode === 'copy') {
-            request = duplicateNoteInto(item.id, item.workspace, dest).then(function (newId) {
-                record({
-                    type: 'note-copy', sourceNoteId: item.id, sourceWorkspace: item.workspace,
-                    newNoteId: newId, folderId: dest.folderId, workspace: dest.workspace, name: item.name
-                });
-            });
-        } else if (item.type === 'note') {
-            if (sameWorkspace && sameId(item.folderId, dest.folderId)) {
-                toast(tr('tree_clipboard.already_there', 'Already in this folder'));
-                return;
+        var skipMessage = null;
+        var jobs = [];
+        clipboard.items.forEach(function (item) {
+            var job = pasteItem(item, clipboard.mode, clipboard.workspace, dest);
+            if (job.skip) {
+                skipMessage = job.skip;
+            } else {
+                jobs.push(job);
             }
-            var noteFrom = sameWorkspace ? noteState(item.id) : { folderId: item.folderId, workspace: item.workspace };
-            request = moveNote(item.id, dest).then(function () {
-                record({
-                    type: 'note-move', noteId: item.id,
-                    from: { folderId: noteFrom.folderId, workspace: noteFrom.workspace },
-                    to: { folderId: dest.folderId, workspace: dest.workspace }
-                });
-            });
-        } else if (item.mode === 'copy') {
-            request = duplicateFolderInto(item.id, item.workspace, dest).then(function (newId) {
-                record({
-                    type: 'folder-copy', sourceFolderId: item.id, sourceWorkspace: item.workspace,
-                    newFolderId: newId, parentId: dest.parentId, workspace: dest.workspace, name: item.name
-                });
-            });
-        } else {
-            if (sameWorkspace && (sameId(item.id, dest.parentId) || (dest.parentId && isFolderInside(dest.parentId, item.id)))) {
-                toast(tr('tree_clipboard.cannot_paste_into_itself', 'A folder cannot be pasted into itself'));
-                return;
-            }
-            if (sameWorkspace && sameId(item.parentId, dest.parentId)) {
-                toast(tr('tree_clipboard.already_there', 'Already in this folder'));
-                return;
-            }
-            var folderFrom = sameWorkspace ? folderState(item.id) : { parentId: item.parentId, workspace: item.workspace };
-            request = placeFolder(item.id, { parentId: dest.parentId, workspace: dest.workspace }).then(function () {
-                record({
-                    type: 'folder-move', folderId: item.id,
-                    from: {
-                        parentId: folderFrom.parentId, workspace: folderFrom.workspace,
-                        prevSiblingId: folderFrom.prevSiblingId || null, nextSiblingId: folderFrom.nextSiblingId || null
-                    },
-                    to: { parentId: dest.parentId, workspace: dest.workspace }
-                });
-            });
+        });
+        if (!jobs.length) {
+            toast(skipMessage);
+            return;
         }
 
+        var entries = [];
         running = true;
-        request.then(function () {
+        sequence(jobs, function (job) {
+            return job.run().then(function (entry) { entries.push(entry); });
+        }).then(function () {
+            record(batchEntry(entries));
             // Paste is a one-time action: consume the clipboard so a stale
             // Copy/Cut cannot be pasted again later by accident
             clearClipboard();
             rememberFolderOpen(dest.folderId);
-            toastAfterReload(item.type === 'note'
-                ? tr('tree_clipboard.pasted_note', 'Pasted "{{name}}"', { name: item.name })
-                : tr('tree_clipboard.pasted_folder', 'Pasted folder "{{name}}"', { name: item.name }));
+            var items = clipboard.items;
+            if (items.length > 1) {
+                toastAfterReload(tr('tree_clipboard.pasted_items', 'Pasted {{count}} items', { count: entries.length }));
+            } else {
+                toastAfterReload(items[0].type === 'note'
+                    ? tr('tree_clipboard.pasted_note', 'Pasted "{{name}}"', { name: items[0].name })
+                    : tr('tree_clipboard.pasted_folder', 'Pasted folder "{{name}}"', { name: items[0].name }));
+            }
             reloadTree([]);
         }).catch(function (error) {
-            running = false;
-            errorToast(tr('tree_clipboard.paste_failed', 'Paste failed: {{error}}', { error: error.message }));
+            var message = tr('tree_clipboard.paste_failed', 'Paste failed: {{error}}', { error: error.message });
+            if (!entries.length) {
+                running = false;
+                errorToast(message);
+                return;
+            }
+            // Some items landed: keep them undoable, and show the tree they changed
+            record(batchEntry(entries));
+            clearClipboard();
+            rememberFolderOpen(dest.folderId);
+            errorToastAfterReload(message);
+            reloadTree([]);
+        });
+    }
+
+    // ============================================
+    // Delete
+    // ============================================
+
+    function trashNote(noteId, workspace) {
+        var linkedIds = linkedNoteIds(noteId);
+        var url = '/api/v1/notes/' + encode(noteId) + '?permanent=false&workspace=' + encode(workspace);
+        return api('DELETE', url).then(function () {
+            return {
+                entry: { type: 'note-delete', noteId: String(noteId), linkedIds: linkedIds, workspace: workspace },
+                removed: [String(noteId)].concat(linkedIds)
+            };
+        });
+    }
+
+    function trashFolder(folderId, workspace) {
+        return deleteFolderRequest(folderId, workspace).then(function (data) {
+            var snapshot = data.restore_snapshot || null;
+            return {
+                entry: snapshot ? { type: 'folder-delete', folderId: String(folderId), snapshot: snapshot } : null,
+                removed: ((snapshot && snapshot.notes) || []).map(function (note) { return String(note.id); })
+            };
+        });
+    }
+
+    function afterNotesTrashed(noteIds) {
+        noteIds.forEach(function (noteId) {
+            if (typeof window.invalidateNoteDomCache === 'function') window.invalidateNoteDomCache(noteId);
+            if (window.tabManager && typeof window.tabManager.closeTabByNoteId === 'function') {
+                window.tabManager.closeTabByNoteId(noteId);
+            }
+        });
+        if (noteIds.length && window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+            window.setNeedsAutoPush(true);
+        }
+    }
+
+    /**
+     * Move notes and folders to the trash. One row goes through the same flow
+     * as its menu's Delete item (shortcut dialog for a shortcut, content
+     * warning for a non-empty folder); several rows ask once, then go one
+     * after the other and are recorded as one history entry.
+     */
+    function deleteItems(targets) {
+        if (isReadOnly() || running) return;
+        targets = withoutNested(targets || []).filter(function (target) {
+            return target.type === 'note' ? !!noteLink(target.id) : !!folderHeader(target.id);
+        });
+
+        // A shortcut goes to the trash with its note: trashing it on its own
+        // first would leave nothing for the note's delete to take along
+        var noteIds = targets.filter(function (t) { return t.type === 'note'; }).map(function (t) { return String(t.id); });
+        targets = targets.filter(function (target) {
+            if (target.type !== 'note') return true;
+            var link = noteLink(target.id);
+            var linkedTo = link && link.getAttribute('data-note-type') === 'linked' ? link.getAttribute('data-linked-note-id') : null;
+            return !(linkedTo && noteIds.indexOf(String(linkedTo)) !== -1);
+        });
+        if (!targets.length) return;
+
+        if (targets.length === 1) {
+            var single = targets[0];
+            if (single.type === 'note') {
+                if (typeof window.deleteNote === 'function') window.deleteNote(single.id);
+            } else if (typeof window.deleteFolder === 'function') {
+                window.deleteFolder(single.id, folderState(single.id).name);
+            }
+            return;
+        }
+
+        var run = function () { runDelete(targets); };
+        var message = deleteConfirmMessage(targets);
+        if (typeof window.showConfirmModal !== 'function') {
+            if (window.confirm(message)) run();
+            return;
+        }
+        window.showConfirmModal(
+            tr('tree_selection.delete_title', 'Delete {{count}} items', { count: targets.length }),
+            message,
+            run,
+            { confirmText: tr('common.delete', 'Delete'), danger: true, hideSaveAndExit: true }
+        );
+    }
+
+    function deleteConfirmMessage(targets) {
+        var count = targets.length;
+        var hasFolder = targets.some(function (target) { return target.type === 'folder'; });
+        var message = hasFolder
+            ? tr('tree_selection.delete_message',
+                '{{count}} items will be moved to the trash, notes inside the selected folders included. Ctrl+Z brings them back.',
+                { count: count })
+            : tr('tree_selection.delete_message_notes',
+                '{{count}} notes will be moved to the trash. Ctrl+Z brings them back.',
+                { count: count });
+        return isMacPlatform ? message.replace(/Ctrl\+/g, '⌘') : message;
+    }
+
+    function runDelete(targets) {
+        if (running) return;
+        var workspace = currentWorkspace();
+        var entries = [];
+        var removed = [];
+
+        running = true;
+        sequence(targets, function (target) {
+            var request = target.type === 'note' ? trashNote(target.id, workspace) : trashFolder(target.id, workspace);
+            return request.then(function (result) {
+                if (result.entry) entries.push(result.entry);
+                removed = removed.concat(result.removed);
+            });
+        }).then(function () {
+            if (entries.length) record(batchEntry(entries));
+            afterNotesTrashed(removed);
+            toastAfterReload(tr('tree_selection.deleted_items', 'Moved {{count}} items to the trash', { count: targets.length }));
+            reloadTree(removed);
+        }).catch(function (error) {
+            var message = tr('tree_selection.delete_failed', 'Delete failed: {{error}}', { error: error.message });
+            if (!entries.length && !removed.length) {
+                running = false;
+                errorToast(message);
+                return;
+            }
+            if (entries.length) record(batchEntry(entries));
+            afterNotesTrashed(removed);
+            errorToastAfterReload(message);
+            reloadTree(removed);
         });
     }
 
@@ -761,6 +1057,8 @@
     // ============================================
 
     var treeFocus = null;
+    // Whether the last click landed in the tree (Del needs it, see the header)
+    var treeActive = false;
 
     function noteFocusFromLink(link) {
         return {
@@ -777,7 +1075,8 @@
 
     function trackFocus(event) {
         var target = event.target;
-        if (!target || !target.closest || !target.closest('#left_col')) return;
+        treeActive = !!(target && target.closest && target.closest('#left_col'));
+        if (!treeActive) return;
         if (target.closest('.note-actions-menu, .folder-actions-menu, .create-menu')) return;
 
         // The row holds the link and its ⋮ toggle side by side: a click on
@@ -843,8 +1142,39 @@
         return !!(selection && !selection.isCollapsed && String(selection).length > 0);
     }
 
+    function selectedTargets() {
+        var selection = window.PoznoteTreeSelection;
+        return (selection && selection.count() > 0) ? selection.items() : [];
+    }
+
+    // Del, or Cmd+Backspace on macOS where keyboards have no forward Delete
+    function isDeleteKey(e) {
+        if (e.altKey || e.shiftKey) return false;
+        if (e.key === 'Delete') return !(e.ctrlKey || e.metaKey);
+        return isMacPlatform && e.key === 'Backspace' && e.metaKey && !e.ctrlKey;
+    }
+
+    function handleDeleteKey(e) {
+        if (!hasTree() || isReadOnly()) return;
+        if (isTextEditingContext(e.target) || isModalOpen()) return;
+
+        var targets = selectedTargets();
+        if (!targets.length) {
+            if (!treeActive) return;
+            var focus = currentFocus();
+            if (!focus || focus.type === 'root') return;
+            targets = [{ type: focus.type, id: focus.id }];
+        }
+        e.preventDefault();
+        deleteItems(targets);
+    }
+
     function handleKeydown(e) {
         if (e.defaultPrevented) return;
+        if (isDeleteKey(e)) {
+            handleDeleteKey(e);
+            return;
+        }
         if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
 
         var key = (e.key || '').toLowerCase();
@@ -870,6 +1200,13 @@
             if (!getClipboard()) return;
             e.preventDefault();
             paste(pasteTargetFromFocus());
+            return;
+        }
+
+        var selected = selectedTargets();
+        if (selected.length) {
+            e.preventDefault();
+            copyItems(selected, isCut ? 'cut' : 'copy');
             return;
         }
 
@@ -970,6 +1307,8 @@
         clear: clearClipboard,
         copyNote: copyNote,
         copyFolder: copyFolder,
+        copyItems: copyItems,
+        deleteItems: deleteItems,
         paste: paste,
         syncMenu: syncMenu
     };

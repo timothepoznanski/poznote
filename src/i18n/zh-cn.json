@@ -1914,7 +1914,8 @@
       "paste_note": "粘贴笔记",
       "paste_folder": "粘贴文件夹",
       "rename_note": "重命名笔记",
-      "rename_folder": "重命名文件夹"
+      "rename_folder": "重命名文件夹",
+      "batch": "{{count}} 项"
     }
   },
   "tree_clipboard": {
@@ -1927,7 +1928,10 @@
     "nothing_to_paste": "没有可粘贴的内容",
     "already_there": "已在此文件夹中",
     "cannot_paste_into_itself": "文件夹不能粘贴到自身中",
-    "paste_failed": "粘贴失败：{{error}}"
+    "paste_failed": "粘贴失败：{{error}}",
+    "copied_items": "已复制 {{count}} 项",
+    "cut_items": "已剪切 {{count}} 项",
+    "pasted_items": "已粘贴 {{count}} 项"
   },
   "note_color": {
     "modal_title": "笔记颜色",
@@ -4945,15 +4949,20 @@
     "checklist_toggle": "勾选或取消勾选清单项",
     "tree_undo": "撤销上一次更改",
     "tree_redo": "重做",
-    "tree_copy": "复制所选笔记或文件夹",
-    "tree_cut": "剪切所选笔记或文件夹",
+    "tree_copy": "复制所选笔记和文件夹",
+    "tree_cut": "剪切所选笔记和文件夹",
     "tree_paste": "粘贴",
     "keys": {
       "shift": "Shift",
       "enter": "Enter",
       "escape": "Esc",
-      "tab": "Tab"
-    }
+      "tab": "Tab",
+      "delete": "Del",
+      "click": "单击"
+    },
+    "tree_select_toggle": "将笔记或文件夹加入选择，或从选择中移除",
+    "tree_select_range": "选择到此行为止的所有行",
+    "tree_delete": "将所选笔记和文件夹移到回收站"
   },
   "icon_context_menu": {
     "hide": "隐藏按钮"
@@ -4962,5 +4971,13 @@
     "banner": "来自账户 {{account}} 的笔记，只读",
     "open_to_edit": "打开以编辑",
     "not_found": "此笔记已不可用。"
+  },
+  "tree_selection": {
+    "count": "已选择 {{count}} 项",
+    "delete_title": "删除 {{count}} 项",
+    "delete_message": "{{count}} 项将被移到回收站，包括所选文件夹中的笔记。按 Ctrl+Z 可恢复。",
+    "delete_message_notes": "{{count}} 条笔记将被移到回收站。按 Ctrl+Z 可恢复。",
+    "deleted_items": "已将 {{count}} 项移到回收站",
+    "delete_failed": "删除失败：{{error}}"
   }
 }

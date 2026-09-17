@@ -629,7 +629,12 @@ function deleteNote(noteId) {
 
     for (let link of selectedLinks) {
         const linkType = link.getAttribute('data-note-type');
-        if (linkType === 'linked') {
+        // Only when the open shortcut is the note being deleted (its own id
+        // from the tree, its target's id from the toolbar): deleting another
+        // row from the tree must not open the shortcut dialog
+        const isThisNote = String(link.getAttribute('data-note-db-id')) === String(noteId)
+            || String(link.getAttribute('data-linked-note-id')) === String(noteId);
+        if (linkType === 'linked' && isThisNote) {
             isLinkedNote = true;
             linkedNoteDbId = link.getAttribute('data-note-db-id');
             linkedNoteTargetId = link.getAttribute('data-linked-note-id');

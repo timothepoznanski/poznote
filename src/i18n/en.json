@@ -1425,7 +1425,8 @@
       "paste_note": "Paste note",
       "paste_folder": "Paste folder",
       "rename_note": "Rename note",
-      "rename_folder": "Rename folder"
+      "rename_folder": "Rename folder",
+      "batch": "{{count}} items"
     }
   },
   "tree_clipboard": {
@@ -1438,7 +1439,10 @@
     "nothing_to_paste": "Nothing to paste",
     "already_there": "Already in this folder",
     "cannot_paste_into_itself": "A folder cannot be pasted into itself",
-    "paste_failed": "Paste failed: {{error}}"
+    "paste_failed": "Paste failed: {{error}}",
+    "copied_items": "Copied {{count}} items",
+    "cut_items": "Cut {{count}} items",
+    "pasted_items": "Pasted {{count}} items"
   },
   "note_color": {
     "modal_title": "Note color",
@@ -4665,15 +4669,20 @@
     "checklist_toggle": "Check or uncheck a checklist item",
     "tree_undo": "Undo the last change",
     "tree_redo": "Redo",
-    "tree_copy": "Copy the selected note or folder",
-    "tree_cut": "Cut the selected note or folder",
+    "tree_copy": "Copy the selected notes and folders",
+    "tree_cut": "Cut the selected notes and folders",
     "tree_paste": "Paste",
     "keys": {
       "shift": "Shift",
       "enter": "Enter",
       "escape": "Esc",
-      "tab": "Tab"
-    }
+      "tab": "Tab",
+      "delete": "Del",
+      "click": "Click"
+    },
+    "tree_select_toggle": "Add a note or folder to the selection, or remove it",
+    "tree_select_range": "Select every row up to this one",
+    "tree_delete": "Move the selected notes and folders to the trash"
   },
   "icon_context_menu": {
     "hide": "Hide button"
@@ -4682,5 +4691,13 @@
     "banner": "Note from the account {{account}}, read-only",
     "open_to_edit": "Open to edit",
     "not_found": "This note is no longer available."
+  },
+  "tree_selection": {
+    "count": "{{count}} selected",
+    "delete_title": "Delete {{count}} items",
+    "delete_message": "{{count}} items will be moved to the trash, notes inside the selected folders included. Ctrl+Z brings them back.",
+    "delete_message_notes": "{{count}} notes will be moved to the trash. Ctrl+Z brings them back.",
+    "deleted_items": "Moved {{count}} items to the trash",
+    "delete_failed": "Delete failed: {{error}}"
   }
 }

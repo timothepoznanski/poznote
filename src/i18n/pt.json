@@ -1916,7 +1916,8 @@
       "paste_note": "Colar nota",
       "paste_folder": "Colar pasta",
       "rename_note": "Renomear nota",
-      "rename_folder": "Renomear pasta"
+      "rename_folder": "Renomear pasta",
+      "batch": "{{count}} itens"
     }
   },
   "tree_clipboard": {
@@ -1929,7 +1930,10 @@
     "nothing_to_paste": "Nada para colar",
     "already_there": "Já está nesta pasta",
     "cannot_paste_into_itself": "Uma pasta não pode ser colada dentro dela mesma",
-    "paste_failed": "Falha ao colar: {{error}}"
+    "paste_failed": "Falha ao colar: {{error}}",
+    "copied_items": "{{count}} itens copiados",
+    "cut_items": "{{count}} itens recortados",
+    "pasted_items": "{{count}} itens colados"
   },
   "note_color": {
     "modal_title": "Cor da nota",
@@ -4846,15 +4850,20 @@
     "checklist_toggle": "Marcar ou desmarcar um item da checklist",
     "tree_undo": "Anular a última alteração",
     "tree_redo": "Refazer",
-    "tree_copy": "Copiar a nota ou pasta selecionada",
-    "tree_cut": "Cortar a nota ou pasta selecionada",
+    "tree_copy": "Copiar as notas e pastas selecionadas",
+    "tree_cut": "Recortar as notas e pastas selecionadas",
     "tree_paste": "Colar",
     "keys": {
       "shift": "Shift",
       "enter": "Enter",
       "escape": "Esc",
-      "tab": "Tab"
-    }
+      "tab": "Tab",
+      "delete": "Del",
+      "click": "Clique"
+    },
+    "tree_select_toggle": "Adicionar uma nota ou pasta à seleção, ou removê-la",
+    "tree_select_range": "Selecionar todas as linhas até esta",
+    "tree_delete": "Mover as notas e pastas selecionadas para a lixeira"
   },
   "icon_context_menu": {
     "hide": "Ocultar o botão"
@@ -4863,5 +4872,13 @@
     "banner": "Nota da conta {{account}}, só de leitura",
     "open_to_edit": "Abrir para editar",
     "not_found": "Esta nota já não está disponível."
+  },
+  "tree_selection": {
+    "count": "{{count}} selecionados",
+    "delete_title": "Excluir {{count}} itens",
+    "delete_message": "{{count}} itens serão movidos para a lixeira, incluindo as notas das pastas selecionadas. Ctrl+Z os recupera.",
+    "delete_message_notes": "{{count}} notas serão movidas para a lixeira. Ctrl+Z as recupera.",
+    "deleted_items": "{{count}} itens movidos para a lixeira",
+    "delete_failed": "Falha ao excluir: {{error}}"
   }
 }

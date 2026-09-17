@@ -64,9 +64,12 @@ $pzShortcutGroups = [
         'items' => [
             ['keys' => [['mod', 'Z']], 'label' => t_h('keyboard_shortcuts.tree_undo', [], 'Undo the last change')],
             ['keys' => [['mod', 'Shift', 'Z'], ['mod', 'Y']], 'label' => t_h('keyboard_shortcuts.tree_redo', [], 'Redo')],
-            ['keys' => [['mod', 'C']], 'label' => t_h('keyboard_shortcuts.tree_copy', [], 'Copy the selected note or folder')],
-            ['keys' => [['mod', 'X']], 'label' => t_h('keyboard_shortcuts.tree_cut', [], 'Cut the selected note or folder')],
+            ['keys' => [['mod', 'Click']], 'label' => t_h('keyboard_shortcuts.tree_select_toggle', [], 'Add a note or folder to the selection, or remove it')],
+            ['keys' => [['Shift', 'Click']], 'label' => t_h('keyboard_shortcuts.tree_select_range', [], 'Select every row up to this one')],
+            ['keys' => [['mod', 'C']], 'label' => t_h('keyboard_shortcuts.tree_copy', [], 'Copy the selected notes and folders')],
+            ['keys' => [['mod', 'X']], 'label' => t_h('keyboard_shortcuts.tree_cut', [], 'Cut the selected notes and folders')],
             ['keys' => [['mod', 'V']], 'label' => t_h('keyboard_shortcuts.tree_paste', [], 'Paste')],
+            ['keys' => [['Del']], 'label' => t_h('keyboard_shortcuts.tree_delete', [], 'Move the selected notes and folders to the trash')],
         ],
     ],
 ];
@@ -79,6 +82,8 @@ $pzShortcutKeyLabels = [
     'Enter' => t_h('keyboard_shortcuts.keys.enter', [], 'Enter'),
     'Esc' => t_h('keyboard_shortcuts.keys.escape', [], 'Esc'),
     'Tab' => t_h('keyboard_shortcuts.keys.tab', [], 'Tab'),
+    'Del' => t_h('keyboard_shortcuts.keys.delete', [], 'Del'),
+    'Click' => t_h('keyboard_shortcuts.keys.click', [], 'Click'),
 ];
 $pzMoreMenuLabel = t_h('page_menu.button', [], 'More options');
 require_once __DIR__ . '/markdown_syntax_content.php';

@@ -1916,7 +1916,8 @@
       "paste_note": "Notiz einfügen",
       "paste_folder": "Ordner einfügen",
       "rename_note": "Notiz umbenennen",
-      "rename_folder": "Ordner umbenennen"
+      "rename_folder": "Ordner umbenennen",
+      "batch": "{{count}} Elemente"
     }
   },
   "tree_clipboard": {
@@ -1929,7 +1930,10 @@
     "nothing_to_paste": "Nichts zum Einfügen",
     "already_there": "Bereits in diesem Ordner",
     "cannot_paste_into_itself": "Ein Ordner kann nicht in sich selbst eingefügt werden",
-    "paste_failed": "Einfügen fehlgeschlagen: {{error}}"
+    "paste_failed": "Einfügen fehlgeschlagen: {{error}}",
+    "copied_items": "{{count}} Elemente kopiert",
+    "cut_items": "{{count}} Elemente ausgeschnitten",
+    "pasted_items": "{{count}} Elemente eingefügt"
   },
   "note_color": {
     "modal_title": "Notizfarbe",
@@ -4845,15 +4849,20 @@
     "checklist_toggle": "Checklistenelement abhaken oder zurücksetzen",
     "tree_undo": "Letzte Änderung rückgängig machen",
     "tree_redo": "Wiederholen",
-    "tree_copy": "Ausgewählte Notiz oder Ordner kopieren",
-    "tree_cut": "Ausgewählte Notiz oder Ordner ausschneiden",
+    "tree_copy": "Ausgewählte Notizen und Ordner kopieren",
+    "tree_cut": "Ausgewählte Notizen und Ordner ausschneiden",
     "tree_paste": "Einfügen",
     "keys": {
       "shift": "Umschalt",
       "enter": "Eingabe",
       "escape": "Esc",
-      "tab": "Tab"
-    }
+      "tab": "Tab",
+      "delete": "Entf",
+      "click": "Klick"
+    },
+    "tree_select_toggle": "Notiz oder Ordner zur Auswahl hinzufügen oder daraus entfernen",
+    "tree_select_range": "Alle Zeilen bis zu dieser auswählen",
+    "tree_delete": "Ausgewählte Notizen und Ordner in den Papierkorb verschieben"
   },
   "icon_context_menu": {
     "hide": "Schaltfläche ausblenden"
@@ -4862,5 +4871,13 @@
     "banner": "Notiz aus dem Konto {{account}}, schreibgeschützt",
     "open_to_edit": "Zum Bearbeiten öffnen",
     "not_found": "Diese Notiz ist nicht mehr verfügbar."
+  },
+  "tree_selection": {
+    "count": "{{count}} ausgewählt",
+    "delete_title": "{{count}} Elemente löschen",
+    "delete_message": "{{count}} Elemente werden in den Papierkorb verschoben, einschließlich der Notizen in den ausgewählten Ordnern. Strg+Z stellt sie wieder her.",
+    "delete_message_notes": "{{count}} Notizen werden in den Papierkorb verschoben. Strg+Z stellt sie wieder her.",
+    "deleted_items": "{{count}} Elemente in den Papierkorb verschoben",
+    "delete_failed": "Löschen fehlgeschlagen: {{error}}"
   }
 }

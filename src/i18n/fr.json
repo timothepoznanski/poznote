@@ -1922,7 +1922,8 @@
       "paste_note": "Coller la note",
       "paste_folder": "Coller le dossier",
       "rename_note": "Renommer la note",
-      "rename_folder": "Renommer le dossier"
+      "rename_folder": "Renommer le dossier",
+      "batch": "{{count}} éléments"
     }
   },
   "tree_clipboard": {
@@ -1935,7 +1936,10 @@
     "nothing_to_paste": "Rien à coller",
     "already_there": "Déjà dans ce dossier",
     "cannot_paste_into_itself": "Un dossier ne peut pas être collé dans lui-même",
-    "paste_failed": "Échec du collage : {{error}}"
+    "paste_failed": "Échec du collage : {{error}}",
+    "copied_items": "{{count}} éléments copiés",
+    "cut_items": "{{count}} éléments coupés",
+    "pasted_items": "{{count}} éléments collés"
   },
   "note_color": {
     "modal_title": "Couleur de la note",
@@ -4950,15 +4954,20 @@
     "checklist_toggle": "Cocher ou décocher un élément de checklist",
     "tree_undo": "Annuler la dernière modification",
     "tree_redo": "Rétablir",
-    "tree_copy": "Copier la note ou le dossier sélectionné",
-    "tree_cut": "Couper la note ou le dossier sélectionné",
+    "tree_copy": "Copier les notes et dossiers sélectionnés",
+    "tree_cut": "Couper les notes et dossiers sélectionnés",
     "tree_paste": "Coller",
     "keys": {
       "shift": "Maj",
       "enter": "Entrée",
       "escape": "Échap",
-      "tab": "Tab"
-    }
+      "tab": "Tab",
+      "delete": "Suppr",
+      "click": "Clic"
+    },
+    "tree_select_toggle": "Ajouter une note ou un dossier à la sélection, ou l'en retirer",
+    "tree_select_range": "Sélectionner toutes les lignes jusqu'à celle-ci",
+    "tree_delete": "Placer les notes et dossiers sélectionnés dans la corbeille"
   },
   "icon_context_menu": {
     "hide": "Masquer le bouton"
@@ -4967,5 +4976,13 @@
     "banner": "Note du compte {{account}}, en lecture seule",
     "open_to_edit": "Ouvrir pour modifier",
     "not_found": "Cette note n'est plus disponible."
+  },
+  "tree_selection": {
+    "count": "{{count}} sélectionnés",
+    "delete_title": "Supprimer {{count}} éléments",
+    "delete_message": "{{count}} éléments vont être placés dans la corbeille, y compris les notes des dossiers sélectionnés. Ctrl+Z les restaure.",
+    "delete_message_notes": "{{count}} notes vont être placées dans la corbeille. Ctrl+Z les restaure.",
+    "deleted_items": "{{count}} éléments placés dans la corbeille",
+    "delete_failed": "Échec de la suppression : {{error}}"
   }
 }

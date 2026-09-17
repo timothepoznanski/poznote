@@ -1916,7 +1916,8 @@
       "paste_note": "Pegar nota",
       "paste_folder": "Pegar carpeta",
       "rename_note": "Renombrar nota",
-      "rename_folder": "Renombrar carpeta"
+      "rename_folder": "Renombrar carpeta",
+      "batch": "{{count}} elementos"
     }
   },
   "tree_clipboard": {
@@ -1929,7 +1930,10 @@
     "nothing_to_paste": "Nada que pegar",
     "already_there": "Ya está en esta carpeta",
     "cannot_paste_into_itself": "Una carpeta no se puede pegar dentro de sí misma",
-    "paste_failed": "Error al pegar: {{error}}"
+    "paste_failed": "Error al pegar: {{error}}",
+    "copied_items": "{{count}} elementos copiados",
+    "cut_items": "{{count}} elementos cortados",
+    "pasted_items": "{{count}} elementos pegados"
   },
   "note_color": {
     "modal_title": "Color de la nota",
@@ -4846,15 +4850,20 @@
     "checklist_toggle": "Marcar o desmarcar un elemento de la lista de verificación",
     "tree_undo": "Deshacer el último cambio",
     "tree_redo": "Rehacer",
-    "tree_copy": "Copiar la nota o carpeta seleccionada",
-    "tree_cut": "Cortar la nota o carpeta seleccionada",
+    "tree_copy": "Copiar las notas y carpetas seleccionadas",
+    "tree_cut": "Cortar las notas y carpetas seleccionadas",
     "tree_paste": "Pegar",
     "keys": {
       "shift": "Mayús",
       "enter": "Intro",
       "escape": "Esc",
-      "tab": "Tab"
-    }
+      "tab": "Tab",
+      "delete": "Supr",
+      "click": "Clic"
+    },
+    "tree_select_toggle": "Añadir una nota o carpeta a la selección, o quitarla",
+    "tree_select_range": "Seleccionar todas las filas hasta esta",
+    "tree_delete": "Mover las notas y carpetas seleccionadas a la papelera"
   },
   "icon_context_menu": {
     "hide": "Ocultar el botón"
@@ -4863,5 +4872,13 @@
     "banner": "Nota de la cuenta {{account}}, solo lectura",
     "open_to_edit": "Abrir para editar",
     "not_found": "Esta nota ya no está disponible."
+  },
+  "tree_selection": {
+    "count": "{{count}} seleccionados",
+    "delete_title": "Eliminar {{count}} elementos",
+    "delete_message": "{{count}} elementos se moverán a la papelera, incluidas las notas de las carpetas seleccionadas. Ctrl+Z los recupera.",
+    "delete_message_notes": "{{count}} notas se moverán a la papelera. Ctrl+Z las recupera.",
+    "deleted_items": "{{count}} elementos movidos a la papelera",
+    "delete_failed": "Error al eliminar: {{error}}"
   }
 }
