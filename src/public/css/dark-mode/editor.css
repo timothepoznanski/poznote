@@ -62,8 +62,9 @@ html[data-theme='dark'] .pz-edge-btn:focus {
     background: var(--dm-surface-hover);
 }
 
-/* Readable text colors: preserve inline color styles, links, and syntax highlighting */
-html[data-theme='dark'] .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.code-line):not(.search-highlight):not(.search-highlight-active):not([class^="md-"]):not([class*=" md-"]):not(.markdown-codemirror-host *) {
+/* Readable text colors: preserve inline color styles, links, syntax highlighting
+   and Mermaid labels (js/mermaid-theme.js picks those against their fill) */
+html[data-theme='dark'] .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.code-line):not(.search-highlight):not(.search-highlight-active):not([class^="md-"]):not([class*=" md-"]):not(.markdown-codemirror-host *):not(.mermaid *) {
     color: var(--dm-text) !important;
 }
 

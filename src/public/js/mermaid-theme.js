@@ -141,9 +141,11 @@
     function buildConfig(t) {
         var bg = t.bg;
         var text = t.text;
-        // How much colour goes into a fill: enough to tell sections apart,
-        // little enough that the theme's text colour still reads on it.
-        var fillAmount = t.isDark ? 0.35 : 0.45;
+        // How much colour goes into a section fill. A light theme gets a pastel
+        // under its dark text. A dark theme gets the palette colour itself under
+        // a label in the ground colour: mixing a bright hue into a dark ground
+        // turns it muddy (orange came out brown).
+        var fillAmount = t.isDark ? 1 : 0.45;
 
         var fills = SERIES.map(function (id) { return mix(t.colors[id], bg, fillAmount); });
         var labels = fills.map(function (f) { return readableOn(f, text, bg); });
@@ -153,7 +155,7 @@
         var softFill = mix(text, bg, 0.08);
         var faintFill = mix(text, bg, 0.04);
         var noteFill = mix(t.colors.yellow, bg, t.isDark ? 0.25 : 0.3);
-        var rootFill = mix(t.accent, bg, t.isDark ? 0.4 : 0.5);
+        var rootFill = t.isDark ? t.accent : mix(t.accent, bg, 0.5);
 
         var v = {
             darkMode: t.isDark,
@@ -234,7 +236,7 @@
 
             // Pie
             pieTitleTextColor: hex(text),
-            pieSectionTextColor: hex(text),
+            pieSectionTextColor: hex(labels[0]),
             pieLegendTextColor: hex(text),
             pieStrokeColor: hex(bg),
             pieOuterStrokeColor: hex(t.border),
@@ -282,7 +284,10 @@
         }
         css += '.section-root rect,.section-root path,.section-root circle,.section-root polygon{fill:' + hex(rootFill) + ';}' +
             '.section-root text{fill:' + hex(readableOn(rootFill, text, bg)) + ';}' +
-            '.section-root span{color:' + hex(readableOn(rootFill, text, bg)) + ';}';
+            '.section-root span{color:' + hex(readableOn(rootFill, text, bg)) + ';}' +
+            // The timeline axis and its dashed lines take the label colour, which
+            // is the ground itself on a dark theme.
+            '.lineWrapper line{stroke:' + hex(t.muted) + ';}';
 
         return {
             startOnLoad: false,
