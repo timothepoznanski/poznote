@@ -396,6 +396,7 @@ docker compose -f docker-compose.rootless.yml up -d
 - Необязательных переопределений среды выполнения, например `POZNOTE_MCP_PORT` и `POZNOTE_DEBUG`
 - `POZNOTE_PHP_FPM_MAX_CHILDREN`, чтобы изменить число одновременных запросов PHP (по умолчанию 10) на нагруженном экземпляре, см. [руководство по устранению неполадок](TROUBLESHOOTING.ru.md#the-app-stops-answering-under-load)
 - `POZNOTE_PHP_MEMORY_LIMIT`, чтобы изменить лимит памяти PHP на один запрос, в МБ (по умолчанию 512), см. [руководство по устранению неполадок](TROUBLESHOOTING.ru.md#a-request-runs-out-of-memory)
+- `POZNOTE_LISTEN_PORT`, чтобы изменить порт, который веб-сервер слушает внутри контейнера (по умолчанию 80), нужен только с `network_mode: host`, см. [руководство по устранению неполадок](TROUBLESHOOTING.ru.md#running-with-host-network)
 - `POZNOTE_SETTINGS_PASSWORD`, чтобы запрашивать дополнительный пароль перед открытием страницы настроек (по умолчанию пусто)
 - `POZNOTE_MCP_AUTH_TOKEN`, чтобы требовать bearer-токен от MCP-клиентов, см. [MCP-сервер](#mcp-сервер)
 

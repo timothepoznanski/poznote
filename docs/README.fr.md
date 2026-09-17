@@ -396,6 +396,7 @@ La plupart des réglages du quotidien se modifient depuis l'interface de Poznote
 - Des surcharges d'exécution facultatives, comme `POZNOTE_MCP_PORT` et `POZNOTE_DEBUG`
 - `POZNOTE_PHP_FPM_MAX_CHILDREN` pour changer le nombre de requêtes PHP simultanées (10 par défaut) sur une instance très sollicitée, voir le [guide de dépannage](TROUBLESHOOTING.fr.md#the-app-stops-answering-under-load)
 - `POZNOTE_PHP_MEMORY_LIMIT` pour changer la limite de mémoire PHP par requête, en Mo (512 par défaut), voir le [guide de dépannage](TROUBLESHOOTING.fr.md#a-request-runs-out-of-memory)
+- `POZNOTE_LISTEN_PORT` pour changer le port d'écoute du serveur web dans le conteneur (80 par défaut), utile uniquement avec `network_mode: host`, voir le [guide de dépannage](TROUBLESHOOTING.fr.md#running-with-host-network)
 - `POZNOTE_SETTINGS_PASSWORD` pour demander un mot de passe supplémentaire avant l'ouverture de la page Paramètres, vide par défaut
 - `POZNOTE_MCP_AUTH_TOKEN` pour exiger un jeton bearer des clients MCP, voir [Serveur MCP](#serveur-mcp)
 

@@ -396,6 +396,7 @@ docker compose -f docker-compose.rootless.yml up -d
 - 可选的运行时覆盖参数，例如 `POZNOTE_MCP_PORT` 和 `POZNOTE_DEBUG`
 - `POZNOTE_PHP_FPM_MAX_CHILDREN`，用于在繁忙的实例上调整同时处理的 PHP 请求数（默认 10），参见[故障排除指南](TROUBLESHOOTING.zh-cn.md#the-app-stops-answering-under-load)
 - `POZNOTE_PHP_MEMORY_LIMIT`，用于调整每个请求的 PHP 内存上限，单位为 MB（默认 512），参见[故障排除指南](TROUBLESHOOTING.zh-cn.md#a-request-runs-out-of-memory)
+- `POZNOTE_LISTEN_PORT`，用于修改网页服务器在容器内监听的端口（默认 80），仅在使用 `network_mode: host` 时需要，参见[故障排除指南](TROUBLESHOOTING.zh-cn.md#running-with-host-network)
 - `POZNOTE_SETTINGS_PASSWORD`，用于在打开设置页面前额外要求输入一个密码，默认留空
 - `POZNOTE_MCP_AUTH_TOKEN`，用于要求 MCP 客户端提供 bearer token，参见 [MCP 服务器](#mcp-服务器)
 

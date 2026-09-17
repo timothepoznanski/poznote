@@ -102,6 +102,51 @@ rootless 网页服务器在内部监听 `8080` 端口而不是 `80`（只能使�
 
 </details>
 
+<a id="running-with-host-network"></a>
+<details>
+<summary><strong>使用 <code>network_mode: host</code> 运行</strong></summary>
+<br>
+
+默认情况下，Docker 会把宿主机端口映射到容器：网页服务器在容器内监听 `80` 端口（rootless 镜像为 `8080`），`HTTP_WEB_PORT` 决定宿主机上的端口。使用 `network_mode: host` 时没有端口映射，容器直接占用宿主机的端口，而宿主机的 `80` 端口通常已被其他网页服务器或容器占用。
+
+在 `.env` 中用 `POZNOTE_LISTEN_PORT` 设置网页服务器监听的端口（rootless 镜像需使用大于 1023 的端口）：
+
+```bash
+POZNOTE_LISTEN_PORT=8040
+```
+
+然后在 `docker-compose.yml`（或 `docker-compose.rootless.yml`）中，把两个服务的 `ports:` 部分替换为 `network_mode: host`。MCP 服务器还需要两处修改：它无法再通过服务名访问网页服务器，而且它的镜像监听所有网络接口，在 host 模式下就是宿主机的所有网络接口。请将它指向新端口，并绑定到 localhost：
+
+```yaml
+  mcp-server:
+    image: ghcr.io/timothepoznanski/poznote-mcp:6
+    restart: always
+    network_mode: host
+    command: ["sh", "-c", "poznote-mcp serve --host=127.0.0.1 --port=$${MCP_PORT}"]
+    environment:
+      POZNOTE_API_URL: http://127.0.0.1:${POZNOTE_LISTEN_PORT}/api/v1
+      MCP_PORT: ${POZNOTE_MCP_PORT:-8045}
+      POZNOTE_DEBUG: ${POZNOTE_DEBUG:-false}
+      POZNOTE_USER_ID: ${POZNOTE_USER_ID:-1}
+      POZNOTE_MCP_AUTH_TOKEN: ${POZNOTE_MCP_AUTH_TOKEN:-}
+    volumes:
+      - "./data:/var/www/html/data:ro"
+    depends_on:
+      - webserver
+```
+
+重新创建容器（重启不会重新加载环境变量）：
+
+```bash
+docker compose up -d --force-recreate
+```
+
+该值由容器的初始化脚本在每次启动时应用；如果值无效，会在日志中报告，并保留镜像的默认值。`HTTP_WEB_PORT` 不再使用，`POZNOTE_MCP_PORT` 现在用于设置 MCP 服务器监听的端口。当前 `docker-compose.yml` 的健康检查会跟随 `POZNOTE_LISTEN_PORT`：如果您的文件仍在访问 `http://127.0.0.1/api/health`，请重新下载该文件或修改 URL，否则容器会一直处于 `unhealthy` 状态，或检查的是 `80` 端口上其他应答的服务。
+
+在 host 模式下，网页服务器监听宿主机的所有网络接口：请用防火墙过滤该端口，或只允许通过反向代理访问。容器内部的 nginx 与 PHP 通过 unix 套接字通信，因此 Poznote 不会占用宿主机上的其他端口，多个实例可以在不同端口上并行运行。
+
+</details>
+
 <details>
 <summary><strong>“This site can't be reached”</strong></summary>
  <br>

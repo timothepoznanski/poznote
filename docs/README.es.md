@@ -396,6 +396,7 @@ La mayoría de los ajustes del día a día se cambian desde la interfaz de Pozno
 - Variables opcionales de ejecución, como `POZNOTE_MCP_PORT` y `POZNOTE_DEBUG`
 - `POZNOTE_PHP_FPM_MAX_CHILDREN` para cambiar el número de peticiones PHP simultáneas (10 por defecto) en una instancia muy solicitada, consulta la [Guía de resolución de problemas](TROUBLESHOOTING.es.md#the-app-stops-answering-under-load)
 - `POZNOTE_PHP_MEMORY_LIMIT` para cambiar el límite de memoria de PHP por petición, en MB (512 por defecto), consulta la [Guía de resolución de problemas](TROUBLESHOOTING.es.md#a-request-runs-out-of-memory)
+- `POZNOTE_LISTEN_PORT` para cambiar el puerto en el que escucha el servidor web dentro del contenedor (80 por defecto), solo necesario con `network_mode: host`, consulta la [Guía de resolución de problemas](TROUBLESHOOTING.es.md#running-with-host-network)
 - `POZNOTE_SETTINGS_PASSWORD` para pedir una contraseña adicional antes de abrir la página de Configuración, vacía por defecto
 - `POZNOTE_MCP_AUTH_TOKEN` para exigir un token bearer a los clientes MCP, consulta [Servidor MCP](#servidor-mcp)
 

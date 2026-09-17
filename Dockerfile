@@ -95,7 +95,9 @@ RUN addgroup -g 1000 poznote && adduser -u 1000 -G poznote -s /bin/sh -D poznote
 #     supervisord itself already runs as "poznote"
 #   - php-fpm pool: drop "user"/"group" (only meaningful for a root master
 #     process; harmless when left in, since FPM just logs a NOTICE and
-#     ignores them, but stripping them keeps startup logs clean)
+#     ignores them, but stripping them keeps startup logs clean), and the
+#     socket's "listen.owner"/"listen.group" (a non-root master cannot chown
+#     the socket; nginx runs as "poznote" too, so the default owner fits)
 RUN sed -i 's/listen 80;/listen 8080;/' /etc/nginx/http.d/default.conf \
     && sed -i '/^user /d' /etc/nginx/nginx.conf \
     && sed -i \
@@ -105,11 +107,13 @@ RUN sed -i 's/listen 80;/listen 8080;/' /etc/nginx/http.d/default.conf \
     && sed -i \
          -e '/^user = www-data$/d' \
          -e '/^group = www-data$/d' \
+         -e '/^listen\.owner = www-data$/d' \
+         -e '/^listen\.group = www-data$/d' \
          /usr/local/etc/php-fpm.d/www.conf \
     && grep -q 'listen 8080;' /etc/nginx/http.d/default.conf \
     && ! grep -q '^user ' /etc/nginx/nginx.conf \
     && ! grep -qE '^user=(root|www-data)$' /etc/supervisor/conf.d/supervisord.conf \
-    && ! grep -qE '^(user|group) = www-data$' /usr/local/etc/php-fpm.d/www.conf
+    && ! grep -qE '^(user|group|listen\.owner|listen\.group) = www-data$' /usr/local/etc/php-fpm.d/www.conf
 
 # Runtime directories that root would normally create/open on demand at
 # startup. Since nothing here runs as root, they must be pre-created and
@@ -121,9 +125,10 @@ RUN mkdir -p /var/log/supervisor /run/nginx \
     && chown -R poznote:poznote /var/log /var/lib/nginx /run
 
 # init.sh rewrites pm.max_children in the pool config when
-# POZNOTE_PHP_FPM_MAX_CHILDREN is set, and memory_limit in php.ini when
-# POZNOTE_PHP_MEMORY_LIMIT is set; as "poznote" it needs to own both files.
-RUN chown poznote:poznote /usr/local/etc/php-fpm.d/www.conf /usr/local/etc/php/php.ini
+# POZNOTE_PHP_FPM_MAX_CHILDREN is set, memory_limit in php.ini when
+# POZNOTE_PHP_MEMORY_LIMIT is set, and the nginx listen port when
+# POZNOTE_LISTEN_PORT is set; as "poznote" it needs to own all three files.
+RUN chown poznote:poznote /usr/local/etc/php-fpm.d/www.conf /usr/local/etc/php/php.ini /etc/nginx/http.d/default.conf
 
 # Copy application source, owned by the unprivileged user
 COPY --chown=poznote:poznote ./src /var/www/html
