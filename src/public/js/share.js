@@ -154,6 +154,12 @@ function refreshNotesListAfterFolderAction(folderIdToOpen, options) {
                         window.reinitializeFavoritesToggle();
                     }
 
+                    // Account rows (js/other-accounts.js): listeners and
+                    // unfolded states of the rebuilt markup.
+                    if (typeof window.reinitializeAccountRows === 'function') {
+                        window.reinitializeAccountRows();
+                    }
+
                     if (!options.skipKanbanViewRefresh && typeof window.refreshKanbanView === 'function') {
                         window.refreshKanbanView();
                     }

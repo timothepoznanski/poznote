@@ -192,7 +192,7 @@ if ($showAccountRows):
     </button>
     <?php echo $expandFoldersButton; ?>
 </div>
-<div class="current-account-tree" id="currentAccountTree">
+<div class="current-account-tree" id="currentAccountTree" data-account-id="<?php echo (int)(getCurrentUserId() ?? 0); ?>">
 <?php endif; ?>
 
 <?php
