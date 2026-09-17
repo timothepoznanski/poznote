@@ -158,8 +158,10 @@ html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::befor
     background: rgba(var(--pz-accent-rgb), 0.05);
 }
 
-.markdown-codemirror-host .cm-selectionBackground,
-.markdown-codemirror-host .cm-focused .cm-selectionBackground {
+/* Mirrors CodeMirror's own selectors plus one class: its base theme paints
+   #d9d9d9/#d7d4f0 (#222/#233 in dark) and outranked the shorter version (#1424). */
+.markdown-codemirror-host .cm-editor .cm-selectionBackground,
+.markdown-codemirror-host .cm-editor.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground {
     background: rgba(var(--pz-accent-rgb), 0.22);
 }
 
