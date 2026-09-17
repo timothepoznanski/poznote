@@ -204,6 +204,7 @@
 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.panels', [], 'Other'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
 <div class="ui-custom-items">
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:mini-calendar" checked><span><?php echo t_h('common.calendar', [], 'Calendar'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:other-accounts" checked><span><?php echo t_h('sidebar.other_accounts.title', [], 'Other accounts'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:outline-panel" checked><span><?php echo t_h('common.outline.title', [], 'Outline'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:tasklist-progress" checked><span><?php echo t_h('modals.ui_customization.tasklist_progress_bar', [], 'Task list progress bar'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:preview-code-block-delete" checked><span><?php echo t_h('modals.ui_customization.preview_code_block_delete', [], 'Delete button on code blocks, in markdown preview'); ?></span></label>

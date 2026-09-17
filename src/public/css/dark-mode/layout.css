@@ -114,12 +114,15 @@ html[data-theme='dark'] #folder-favorites .note-title::before {
    Folders
    ============================================ */
 
-html[data-theme='dark'] .favorites-separator {
-    border-bottom-color: var(--dm-border);
-}
-
 html[data-theme='dark'] .folder-header {
     color: var(--dm-text);
+}
+
+/* The surface tint that sets the other accounts apart in light reads as a
+   heavy slab on the dark grounds: the rows alone separate them there. Black
+   is html.theme-black[data-theme='dark'], so this covers it too. */
+html[data-theme='dark'] .other-accounts {
+    background: transparent;
 }
 
 html[data-theme='dark'] .folder-header h2 {

@@ -697,7 +697,9 @@
       "logout": "Déconnexion",
       "acting_as": " (en tant que {{user}})",
       "edit_workspaces": "Modifier les espaces de travail",
-      "new_workspace": "Nouvel espace de travail"
+      "new_workspace": "Nouvel espace de travail",
+      "accounts": "Comptes",
+      "title": "Espaces de travail"
     },
     "errors": {
       "already_exists": "Un espace de travail portant ce nom existe déjà",
@@ -870,7 +872,13 @@
     "collapse_all_folders": "Tout replier",
     "toggle": "Cacher/Afficher la colonne de gauche",
     "toggle_icon_sidebar": "Cacher/Afficher la barre d'icônes",
-    "show_hidden_icons": "Afficher les icônes masquées"
+    "show_hidden_icons": "Afficher les icônes masquées",
+    "other_accounts": {
+      "title": "Autres comptes",
+      "error": "Impossible de charger les notes de ce compte",
+      "empty": "Aucune note",
+      "open": "Ouvrir ce compte"
+    }
   },
   "home": {
     "title": "Tableau de bord",

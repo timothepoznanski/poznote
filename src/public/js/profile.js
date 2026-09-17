@@ -483,25 +483,7 @@
                 btn.addEventListener('click', function () {
                     freezeButtons();
                     name.textContent = tr('profile.logout.switch_in_progress', {}, 'Switching account...');
-                    // Best effort: the account being left keeps no edit lock on
-                    // the open note (it would otherwise expire on its own).
-                    if (typeof window.releaseCurrentNoteEditLock === 'function') {
-                        try { window.releaseCurrentNoteEditLock(); } catch (e) { /* lock expires anyway */ }
-                    }
-
-                    var form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = accountSwitch.action || 'switch_account.php';
-                    form.style.display = 'none';
-                    [['csrf_token', accountSwitch.csrfToken || ''], ['account_user_id', String(account.id)]].forEach(function (pair) {
-                        var input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = pair[0];
-                        input.value = pair[1];
-                        form.appendChild(input);
-                    });
-                    document.body.appendChild(form);
-                    form.submit();
+                    submitAccountSwitch(account.id);
                 });
 
                 accountList.appendChild(btn);
@@ -517,6 +499,45 @@
         });
         confirmBtn.focus();
     }
+
+    // ========== Account switching ==========
+
+    // Leaves the active account for another one the signed-in person can
+    // open, by posting to switch_account.php (a form, not fetch: the answer is
+    // a redirect into the other account). `landing` may carry a note id or a
+    // workspace name to open there, see switch_account.php. Shared by the
+    // logout dialog above, the workspace menu (js/workspaces-core.js) and the
+    // notes list's "Other accounts" block (js/other-accounts.js).
+    function submitAccountSwitch(accountId, landing) {
+        var accountSwitch = window.PoznoteAccountSwitch || null;
+        if (!accountSwitch || !accountId) return false;
+
+        // Best effort: the account being left keeps no edit lock on the open
+        // note (it would otherwise expire on its own).
+        if (typeof window.releaseCurrentNoteEditLock === 'function') {
+            try { window.releaseCurrentNoteEditLock(); } catch (e) { /* lock expires anyway */ }
+        }
+
+        var fields = [['csrf_token', accountSwitch.csrfToken || ''], ['account_user_id', String(accountId)]];
+        if (landing && landing.note) fields.push(['note', String(landing.note)]);
+        if (landing && landing.workspace) fields.push(['workspace', String(landing.workspace)]);
+
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = accountSwitch.action || 'switch_account.php';
+        form.style.display = 'none';
+        fields.forEach(function (pair) {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = pair[0];
+            input.value = pair[1];
+            form.appendChild(input);
+        });
+        document.body.appendChild(form);
+        form.submit();
+        return true;
+    }
+    window.poznoteSwitchAccount = submitAccountSwitch;
 
     // ========== Init ==========
 

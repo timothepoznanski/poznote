@@ -290,9 +290,11 @@ $iconSidebarBottomItems = [
     ['id' => 'iconSidebarLogoutBtn', 'url' => $iconSidebarBasePath . 'logout.php', 'icon' => 'lucide-log-out', 'label' => t('workspace_menu.logout', [], 'Logout')],
 ];
 
-// Someone who can open several accounts gets them offered in the logout dialog
-// (js/profile.js), which posts the choice to switch_account.php. The token is
-// kept for the whole session so several open tabs all stay valid.
+// Someone who can open several accounts (Admin > User Management) gets them
+// offered in the logout dialog (js/profile.js), in the notes list's workspace
+// menu (js/workspaces-core.js) and in its "Other accounts" block
+// (js/other-accounts.js); all post the choice to switch_account.php. The
+// token is kept for the whole session so several open tabs all stay valid.
 $iconSidebarAccountSwitch = null;
 $iconSidebarSwitchProfiles = function_exists('getSwitchableAccountProfiles') ? getSwitchableAccountProfiles() : [];
 if (!empty($iconSidebarSwitchProfiles)) {

@@ -216,13 +216,6 @@
     opacity: 0.8;
 }
 
-/* Light separator between the Favorites section and the notes/folders below.
-   Only rendered by notes_list.php when the Favorites section is displayed. */
-.favorites-separator {
-    border-bottom: 1px solid var(--pz-border);
-    margin: 6px 4px 6px 0;
-}
-
 /* Favorite folder shortcuts inside the Favorites section */
 .favorite-folder-item .favorite-folder-icon {
     font-size: 0.95em;
@@ -266,4 +259,179 @@
 .links_arbo_left.selected-note .note-title {
     color: var(--pz-accent-strong);
     font-weight: var(--pz-weight-semibold);
+}
+
+/* "Other accounts" block at the bottom of the notes list (notes_list.php,
+   js/other-accounts.js): one collapsible block per account this login can
+   open besides the active one, its tree fetched on first expansion and shown
+   read-only. Every account, the active one included, has the same row above
+   its tree, so the rows themselves separate the accounts: no rule between
+   them, only the surface tint on the foreign ones. Tokens only, so the dark
+   and named themes need no twin rules. */
+.other-accounts {
+    margin: 6px 0 10px;
+    padding: 4px 0 6px;
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-surface);
+}
+
+.other-account + .other-account {
+    margin-top: 2px;
+}
+
+.other-account-header {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+/* The active account gets the same row as the other accounts below, and
+   the same chevron: folding it hides the whole own tree
+   (#currentAccountTree). Expanded is the resting state. */
+.current-account-header .other-account-chevron {
+    transform: rotate(90deg);
+}
+
+.current-account-header.current-account-collapsed .other-account-chevron {
+    transform: none;
+}
+
+/* "Expand all folders" at the end of the active account's row (index.php
+   moves it out of the title row when the account rows are shown): the same
+   box as .other-account-open, so its glyph lines up with the arrows of the
+   other accounts. 16px makes the 0.875em glyph 14px like theirs. */
+.current-account-header .sidebar-folder-toggle {
+    flex: 0 0 auto;
+    min-width: 0;
+    min-height: 0;
+    padding: 6px 8px;
+    font-size: 16px;
+}
+
+/* Sized in px like the arrows: the icon-scale preference
+   (js/index-icon-scale-settings.js) restates the glyph's font-size with
+   !important, and the other rows do not follow that preference. */
+.current-account-header .sidebar-folder-toggle .lucide {
+    width: 14px;
+    height: 14px;
+}
+
+/* The own tree is indented under its account row the way the other accounts'
+   trees are under theirs: measured, their root rows' icons sit 26px in and
+   the own folder icons 6px in, hence 20px. */
+.current-account-tree {
+    padding-left: 20px;
+}
+
+.other-account-toggle,
+.other-account-open,
+.other-account-row {
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: var(--sidebar-font-size, 13px);
+    color: var(--pz-text);
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    border-radius: var(--pz-radius);
+}
+
+.other-account-toggle {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px 6px 6px;
+    text-align: left;
+    font-weight: var(--pz-weight-semibold);
+}
+
+.other-account-open {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    color: var(--pz-text-muted);
+}
+
+/* The card already carries the surface tint, so hovers use the accent wash
+   the rail's menus use rather than the surface colour again. */
+.other-account-toggle:hover,
+.other-account-toggle:focus-visible,
+.other-account-open:hover,
+.other-account-open:focus-visible,
+.other-account-row:hover,
+.other-account-row:focus-visible {
+    background: rgba(var(--pz-accent-rgb), 0.08);
+    outline: none;
+}
+
+.other-account-open:hover,
+.other-account-open:focus-visible {
+    color: var(--pz-accent);
+}
+
+.other-account-name,
+.other-account-row span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.other-account-toggle .lucide,
+.other-account-open .lucide,
+.other-account-row .lucide {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 auto;
+    color: var(--pz-text-muted);
+}
+
+/* The account icon takes the accent, like the folder icons of the tree. */
+.other-account-toggle .lucide-user {
+    color: var(--pz-accent);
+}
+
+.other-account-chevron {
+    transition: transform 0.15s ease;
+}
+
+.other-account-expanded .other-account-chevron {
+    transform: rotate(90deg);
+}
+
+/* 16px + the rows' own 10px puts their icons under the account icon
+   (6px + 14px chevron + 6px gap). */
+.other-account-tree {
+    padding: 2px 0 4px 16px;
+}
+
+.other-account-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    padding: 5px 10px;
+    text-align: left;
+}
+
+.other-account-row-folder {
+    font-weight: var(--pz-weight-semibold);
+}
+
+.other-account-row-workspace {
+    color: var(--pz-text-muted);
+}
+
+.other-account-children {
+    padding-left: 14px;
+}
+
+.other-account-status {
+    padding: 6px 10px;
+    font-size: 12px;
+    color: var(--pz-text-muted);
 }

@@ -696,7 +696,9 @@
       "error_loading": "加载工作区出错",
       "logout": "注销",
       "edit_workspaces": "编辑工作区",
-      "new_workspace": "新建工作区"
+      "new_workspace": "新建工作区",
+      "accounts": "账户",
+      "title": "工作区"
     },
     "errors": {
       "already_exists": "同名工作区已存在",
@@ -869,7 +871,13 @@
     "collapse_all_folders": "折叠所有文件夹",
     "toggle": "显示/隐藏左侧边栏",
     "toggle_icon_sidebar": "显示/隐藏图标侧边栏",
-    "show_hidden_icons": "显示隐藏的图标"
+    "show_hidden_icons": "显示隐藏的图标",
+    "other_accounts": {
+      "title": "其他账户",
+      "error": "无法加载此账户的笔记",
+      "empty": "没有笔记",
+      "open": "打开此账户"
+    }
   },
   "home": {
     "title": "仪表盘",

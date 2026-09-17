@@ -156,9 +156,11 @@ function updateToggleAllFoldersButton() {
         button.setAttribute('aria-label', title);
         button.setAttribute('aria-expanded', shouldExpand ? 'false' : 'true');
 
+        // Unfold / fold glyphs (chevrons pointing apart, then together): a
+        // single chevron read as "open this one", not "open them all".
         if (icon) {
-            icon.classList.toggle('lucide-chevron-down', shouldExpand);
-            icon.classList.toggle('lucide-chevron-up', !shouldExpand);
+            icon.classList.toggle('lucide-chevrons-up-down', shouldExpand);
+            icon.classList.toggle('lucide-chevrons-down-up', !shouldExpand);
         }
     });
 }

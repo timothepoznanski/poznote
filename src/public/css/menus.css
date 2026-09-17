@@ -87,7 +87,7 @@
 }
 
 .workspace-menu-item {
-    padding: 12px 16px;
+    padding: 8px 16px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -146,6 +146,24 @@
     height: 1px;
     background-color: var(--pz-border);
     margin: 4px 0;
+}
+
+/* Section headings of the workspace menu (js/workspaces-core.js):
+   "Accounts" over the accounts this login can switch to, then "Workspaces"
+   over the list, so the two lists are not read as one. */
+.workspace-menu-label {
+    padding: 6px 16px 2px;
+    font-size: 11px;
+    font-weight: var(--pz-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--pz-text-muted);
+}
+
+/* The first heading sits right under the menu's top edge, so it gets a
+   little more air than the one that follows a divider. */
+.workspace-menu-label:first-child {
+    padding-top: 10px;
 }
 
 /* MENU LEFT */

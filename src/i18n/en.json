@@ -324,7 +324,9 @@
   "workspaces": {
     "menu": {
       "edit_workspaces": "Edit workspaces",
-      "new_workspace": "New workspace"
+      "new_workspace": "New workspace",
+      "accounts": "Accounts",
+      "title": "Workspaces"
     },
     "errors": {
       "already_exists": "A workspace with this name already exists",
@@ -2575,7 +2577,13 @@
     "collapse_all_folders": "Collapse all folders",
     "toggle": "Hide/Show left column",
     "toggle_icon_sidebar": "Hide/Show icon sidebar",
-    "show_hidden_icons": "Show hidden icons"
+    "show_hidden_icons": "Show hidden icons",
+    "other_accounts": {
+      "title": "Other accounts",
+      "error": "Could not load the notes of this account",
+      "empty": "No notes",
+      "open": "Open this account"
+    }
   },
   "home": {
     "title": "Dashboard",

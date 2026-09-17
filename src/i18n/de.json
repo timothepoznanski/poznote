@@ -697,7 +697,9 @@
       "error_loading": "Fehler beim Laden der Arbeitsbereiche",
       "logout": "Abmelden",
       "edit_workspaces": "Arbeitsbereiche bearbeiten",
-      "new_workspace": "Neuer Arbeitsbereich"
+      "new_workspace": "Neuer Arbeitsbereich",
+      "accounts": "Konten",
+      "title": "Arbeitsbereiche"
     },
     "errors": {
       "already_exists": "Ein Arbeitsbereich mit diesem Namen existiert bereits",
@@ -870,7 +872,13 @@
     "collapse_all_folders": "Alle Ordner zuklappen",
     "toggle": "Linke Spalte ein-/ausblenden",
     "toggle_icon_sidebar": "Icon-Seitenleiste ein-/ausblenden",
-    "show_hidden_icons": "Ausgeblendete Symbole anzeigen"
+    "show_hidden_icons": "Ausgeblendete Symbole anzeigen",
+    "other_accounts": {
+      "title": "Andere Konten",
+      "error": "Die Notizen dieses Kontos konnten nicht geladen werden",
+      "empty": "Keine Notizen",
+      "open": "Dieses Konto öffnen"
+    }
   },
   "home": {
     "title": "Dashboard",

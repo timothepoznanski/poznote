@@ -165,7 +165,35 @@ $search_combined_value = ($search_in_notes_value === '1' && $search_in_tags_valu
 </div>
 <?php endif; ?>
 
+<?php
+// $showAccountRows, $activeAccountProfile and $otherAccountProfiles are decided
+// by index.php before the sidebar header (the "Expand all folders" button
+// moves between the title row and the account row below).
+$otherAccountProfiles = $otherAccountProfiles ?? [];
+$activeAccountProfile = $activeAccountProfile ?? null;
+$showAccountRows = !empty($showAccountRows);
+$expandFoldersButton = $expandFoldersButton ?? '';
+?>
 <div class="notes-list-scrollable-content">
+<?php
+// The active account heads the list with the same collapsible row the other
+// accounts get below (js/other-accounts.js folds #currentAccountTree, the
+// whole own tree), whether or not there are other accounts, with the
+// "Expand all folders" button at its end, where the other rows carry their
+// "Open this account" arrow.
+if ($showAccountRows):
+    $activeAccountName = htmlspecialchars((string)($activeAccountProfile['username'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+?>
+<div class="other-account-header current-account-header">
+    <button type="button" class="other-account-toggle" data-current-account="toggle" aria-expanded="true" aria-controls="currentAccountTree" title="<?php echo $activeAccountName; ?>">
+        <i class="lucide lucide-chevron-right other-account-chevron" aria-hidden="true"></i>
+        <i class="lucide lucide-user" aria-hidden="true"></i>
+        <span class="other-account-name"><?php echo $activeAccountName; ?></span>
+    </button>
+    <?php echo $expandFoldersButton; ?>
+</div>
+<div class="current-account-tree" id="currentAccountTree">
+<?php endif; ?>
 
 <?php
 
@@ -477,13 +505,6 @@ if ($favoritesFolder && ($favorites_count > 0 || (!empty($favorite_folders) && !
     foreach($favoritesFolder as $folderId => $folderData) {
         displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined, $displayUncategorizedFirst, $created_from, $created_to);
     }
-    // Light separator between the Favorites section and the rest of the list.
-    // In search mode displayFolderRecursive() skips an empty Favorites folder,
-    // so mirror that check to avoid an orphaned line; under a folder filter the
-    // section has no header, so no separator either.
-    if (empty($folder_filter) && (!$is_search_mode || countNotesRecursively(reset($favoritesFolder)) > 0)) {
-        echo '<div class="favorites-separator"></div>';
-    }
 }
 
 // Add drop zone for moving notes to root (no folder)
@@ -540,7 +561,31 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         renderNoteListItem($row1, $noteClass, $isSelected, $link, '', '');
     }
 }
+
+if ($showAccountRows) {
+    echo '</div><!-- End of current-account-tree -->';
+}
+if (!empty($otherAccountProfiles)):
 ?>
+<div class="other-accounts" id="otherAccounts" data-endpoint="account_tree.php">
+    <?php foreach ($otherAccountProfiles as $profile): ?>
+    <?php $otherAccountName = htmlspecialchars((string)($profile['username'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>
+    <div class="other-account" data-account-id="<?php echo (int)$profile['id']; ?>">
+        <div class="other-account-header">
+            <button type="button" class="other-account-toggle" data-other-account="toggle" aria-expanded="false" title="<?php echo $otherAccountName; ?>">
+                <i class="lucide lucide-chevron-right other-account-chevron" aria-hidden="true"></i>
+                <i class="lucide lucide-user" aria-hidden="true"></i>
+                <span class="other-account-name"><?php echo $otherAccountName; ?></span>
+            </button>
+            <button type="button" class="other-account-open" data-other-account="open" title="<?php echo t_h('sidebar.other_accounts.open', [], 'Open this account'); ?>" aria-label="<?php echo t_h('sidebar.other_accounts.open', [], 'Open this account'); ?>">
+                <i class="lucide lucide-arrow-right" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div class="other-account-tree" hidden></div>
+    </div>
+    <?php endforeach; ?>
+</div>
+<?php endif; ?>
 </div><!-- End of notes-list-scrollable-content -->
 
 <?php

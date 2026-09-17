@@ -697,7 +697,9 @@
       "error_loading": "Error al cargar espacios de trabajo",
       "logout": "Cerrar sesión",
       "edit_workspaces": "Editar espacios de trabajo",
-      "new_workspace": "Nuevo espacio de trabajo"
+      "new_workspace": "Nuevo espacio de trabajo",
+      "accounts": "Cuentas",
+      "title": "Espacios de trabajo"
     },
     "errors": {
       "already_exists": "Ya existe un espacio de trabajo con este nombre",
@@ -870,7 +872,13 @@
     "collapse_all_folders": "Contraer todas las carpetas",
     "toggle": "Mostrar/Ocultar la columna izquierda",
     "toggle_icon_sidebar": "Mostrar/Ocultar la barra de iconos",
-    "show_hidden_icons": "Mostrar los iconos ocultos"
+    "show_hidden_icons": "Mostrar los iconos ocultos",
+    "other_accounts": {
+      "title": "Otras cuentas",
+      "error": "No se pudieron cargar las notas de esta cuenta",
+      "empty": "Sin notas",
+      "open": "Abrir esta cuenta"
+    }
   },
   "home": {
     "title": "Panel",

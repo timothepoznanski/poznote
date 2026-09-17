@@ -141,6 +141,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/table-cell-selection.js',
         'js/system-menu.js',
         'js/notes-list-events.js',
+        'js/other-accounts.js',
         'js/folder-icon.js',
         'js/folder-tree-highlight.js',
         'js/kanban.js',
