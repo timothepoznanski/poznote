@@ -171,8 +171,10 @@ textarea:focus {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
+/* Inline formatting inside a heading (underline, strikethrough, bold...)
+   inherits the heading size instead of dropping to the body size (#1418). */
 .noteentry,
-.noteentry *:not(.lucide):not([class*="lucide-"]):not(i):not(a):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6):not(pre):not(pre *):not(code):not(code *):not(.code-block):not(.code-block *):not(.hljs):not(.hljs *) {
+.noteentry *:not(.lucide):not([class*="lucide-"]):not(i):not(a):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6):not(h1 *):not(h2 *):not(h3 *):not(h4 *):not(h5 *):not(h6 *):not(pre):not(pre *):not(code):not(code *):not(.code-block):not(.code-block *):not(.hljs):not(.hljs *) {
     font-size: var(--note-font-size, 15px) !important;
 }
 
