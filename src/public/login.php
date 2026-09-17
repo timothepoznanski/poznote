@@ -21,6 +21,8 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
 
 $error = '';
 $oidcError = '';
+// No autofocus right after a logout: on a phone it pops the keyboard up.
+$justLoggedOut = consumeJustLoggedOutCookie();
 
 // Load configured login display name from global settings
 try {
@@ -273,7 +275,7 @@ if (isset($_GET['oidc_error'])) {
                     <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($redirectAfter, ENT_QUOTES); ?>">
                 <?php endif; ?>
                 <div class="form-group">
-                    <input type="text" id="username" name="username" placeholder="<?php echo t_h('login.fields.username_or_email', [], 'Username or Email', $currentLang ?? 'en'); ?>" required autofocus autocomplete="username">
+                    <input type="text" id="username" name="username" placeholder="<?php echo t_h('login.fields.username_or_email', [], 'Username or Email', $currentLang ?? 'en'); ?>" required<?php if (!$justLoggedOut): ?> autofocus<?php endif; ?> autocomplete="username">
                 </div>
                 <div class="form-group">
                     <div class="password-wrapper">
@@ -304,7 +306,7 @@ if (isset($_GET['oidc_error'])) {
                     </div>
                 <?php endif; ?>
 
-                <a class="login-button oidc-button" href="#" id="oidc-login-btn"<?php if (!$passwordLoginVisible): ?> autofocus<?php endif; ?>><?php echo t_h('login.oidc_button', ['provider' => (defined('OIDC_PROVIDER_NAME') ? OIDC_PROVIDER_NAME : 'SSO')], 'Continue with SSO', $currentLang ?? 'en'); ?></a>
+                <a class="login-button oidc-button" href="#" id="oidc-login-btn"<?php if (!$passwordLoginVisible && !$justLoggedOut): ?> autofocus<?php endif; ?>><?php echo t_h('login.oidc_button', ['provider' => (defined('OIDC_PROVIDER_NAME') ? OIDC_PROVIDER_NAME : 'SSO')], 'Continue with SSO', $currentLang ?? 'en'); ?></a>
                 <a class="login-button oidc-button oidc-other-account-button" href="#" id="oidc-other-account-btn" hidden style="display:none"><?php echo t_h('login.oidc_other_account', [], 'Sign in with another account', $currentLang ?? 'en'); ?></a>
             <?php endif; ?>
             
@@ -319,7 +321,7 @@ if (isset($_GET['oidc_error'])) {
     </div>
     <?php
     $loginConfig = [
-        'focusOidc' => !$renderAccountSelection && !$passwordLoginVisible && function_exists('oidc_is_enabled') && oidc_is_enabled(),
+        'focusOidc' => !$justLoggedOut && !$renderAccountSelection && !$passwordLoginVisible && function_exists('oidc_is_enabled') && oidc_is_enabled(),
         'showPasswordTitle' => t('login.show_password', [], 'Show password', $currentLang ?? 'en'),
         'hidePasswordTitle' => t('login.hide_password', [], 'Hide password', $currentLang ?? 'en'),
         'oidcEnabled' => !$renderAccountSelection && function_exists('oidc_is_enabled') && oidc_is_enabled(),

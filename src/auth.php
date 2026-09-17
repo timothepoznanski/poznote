@@ -184,6 +184,47 @@ function clearUserPreferenceCookie(): void {
     unset($_COOKIE['poznote_uid']);
 }
 
+/**
+ * Short-lived marker read once by login.php: a page reached by logging out
+ * must not autofocus a field, or a phone opens its keyboard over the page.
+ * A cookie rather than a query parameter because an SSO logout comes back
+ * through the provider's registered post-logout URL, which cannot carry it.
+ */
+const JUST_LOGGED_OUT_COOKIE = 'poznote_logged_out';
+
+function setJustLoggedOutCookie(): void {
+    if (headers_sent()) {
+        return;
+    }
+    setcookie(JUST_LOGGED_OUT_COOKIE, '1', [
+        'expires'  => time() + 300,
+        'path'     => '/',
+        'domain'   => '',
+        'secure'   => $GLOBALS['isSecure'] ?? false,
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
+}
+
+/** True when the request follows a logout; the marker is cleared on read. */
+function consumeJustLoggedOutCookie(): bool {
+    if (empty($_COOKIE[JUST_LOGGED_OUT_COOKIE])) {
+        return false;
+    }
+    if (!headers_sent()) {
+        setcookie(JUST_LOGGED_OUT_COOKIE, '', [
+            'expires'  => time() - 3600,
+            'path'     => '/',
+            'domain'   => '',
+            'secure'   => $GLOBALS['isSecure'] ?? false,
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]);
+    }
+    unset($_COOKIE[JUST_LOGGED_OUT_COOKIE]);
+    return true;
+}
+
 function createRememberMeHash(string $username, int $userId, int $timestamp, string $secret): string {
     return hash_hmac('sha256', $username . ':' . $userId . ':' . $timestamp, $secret);
 }
@@ -1492,6 +1533,7 @@ function logout() {
         setRememberMeCookie('', time() - 3600);
     }
     clearUserPreferenceCookie();
+    setJustLoggedOutCookie();
 
     if (is_string($oidcLogoutUrl) && $oidcLogoutUrl !== '') {
         header('Location: ' . $oidcLogoutUrl);

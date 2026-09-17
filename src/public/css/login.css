@@ -199,7 +199,8 @@ input[type="password"]::placeholder {
     color: var(--pz-text-muted);
     font-size: 0.875rem;
     font-weight: var(--pz-weight-medium);
-    background: var(--pz-bg);
+    /* Same fill as body, so the label reads as a gap in the rule, not a chip. */
+    background: var(--pz-surface);
     padding: 0 0.75rem;
     position: relative;
 }
@@ -228,7 +229,9 @@ input[type="password"]::placeholder {
     margin-top: 0.75rem;
 }
 
-.oidc-button:hover {
+/* Doubled class: .login-button:hover further down would otherwise repaint the
+   SSO button with the accent colour on hover and while it is pressed. */
+.oidc-button.oidc-button:hover {
     background: color-mix(in srgb, var(--pz-text) 85%, rgb(var(--pz-shadow-rgb)));
 }
 
