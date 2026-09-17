@@ -4926,6 +4926,8 @@
   "keyboard_shortcuts": {
     "menu_item": "键盘快捷键",
     "title": "键盘快捷键",
+    "filter_placeholder": "筛选快捷键...",
+    "no_results": "没有与搜索匹配的快捷键。",
     "setting_hint": "需在设置中启用",
     "sections": {
       "general": "通用",

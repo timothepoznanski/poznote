@@ -4931,6 +4931,8 @@
   "keyboard_shortcuts": {
     "menu_item": "Raccourcis clavier",
     "title": "Raccourcis clavier",
+    "filter_placeholder": "Filtrer les raccourcis...",
+    "no_results": "Aucun raccourci ne correspond à votre recherche.",
     "setting_hint": "Option à activer dans les paramètres",
     "sections": {
       "general": "Général",

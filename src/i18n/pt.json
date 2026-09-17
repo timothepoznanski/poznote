@@ -4827,6 +4827,8 @@
   "keyboard_shortcuts": {
     "menu_item": "Atalhos de teclado",
     "title": "Atalhos de teclado",
+    "filter_placeholder": "Filtrar atalhos...",
+    "no_results": "Nenhum atalho corresponde à sua pesquisa.",
     "setting_hint": "Opção a ativar nas Configurações",
     "sections": {
       "general": "Geral",

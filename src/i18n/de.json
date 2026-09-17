@@ -4826,6 +4826,8 @@
   "keyboard_shortcuts": {
     "menu_item": "Tastenkürzel",
     "title": "Tastenkürzel",
+    "filter_placeholder": "Tastenkürzel filtern...",
+    "no_results": "Keine Tastenkürzel entsprechen Ihrer Suche.",
     "setting_hint": "Option in den Einstellungen aktivieren",
     "sections": {
       "general": "Allgemein",

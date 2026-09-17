@@ -1,106 +1,12 @@
 /* Markdown syntax reference (markdown_syntax_content.php), shown in
    #markdownSyntaxModal from the "..." menu at the bottom-right of the page.
-   The modal frame itself is .pz-help-modal (css/ui-customization-panel.css). */
+   The modal frame, filter bar and card frame are the shared .pz-help-* rules
+   of css/ui-customization-panel.css. */
 .markdown-syntax-intro {
     margin: 0 0 14px;
     color: var(--pz-text-secondary);
     font-size: 0.875rem;
     line-height: 1.6;
-}
-
-.markdown-syntax-filter-bar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 0 0 16px;
-}
-
-.markdown-syntax-filter-bar [hidden],
-.markdown-syntax-empty[hidden] {
-    display: none !important;
-}
-
-.markdown-syntax-filter-bar .filter-input-wrapper {
-    position: relative;
-    flex: 1;
-    display: flex;
-    align-items: center;
-}
-
-.markdown-syntax-filter-icon {
-    position: absolute;
-    left: 12px;
-    color: var(--pz-text-subtle);
-    pointer-events: none;
-}
-
-/* !important beats the blanket .modal-content input padding of
-   modals/responsive.css, which would slide the text under the icon (its 16px
-   font size stays: it keeps iOS from zooming in on focus) */
-.markdown-syntax-filter-bar .filter-input {
-    width: 100%;
-    padding: 10px 42px 10px 38px !important;
-    border: 1px solid var(--pz-border);
-    border-radius: var(--pz-radius-lg);
-    font-size: 14px;
-    color: var(--text-color, var(--pz-text));
-    background: var(--input-bg, var(--pz-bg));
-    transition: border-color 0.2s, box-shadow 0.2s;
-    box-sizing: border-box;
-}
-
-.markdown-syntax-filter-bar .filter-input:focus {
-    outline: none;
-    border-color: var(--pz-accent);
-    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
-}
-
-.markdown-syntax-filter-bar .clear-filter-btn {
-    position: absolute;
-    right: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    border: none;
-    padding: 4px 6px;
-    border-radius: var(--pz-radius);
-    color: var(--pz-text-muted);
-    cursor: pointer;
-}
-
-.markdown-syntax-filter-bar .clear-filter-btn:hover {
-    background: var(--pz-surface-hover);
-    color: var(--pz-text);
-}
-
-.markdown-syntax-filter-bar .filter-stats {
-    font-size: 13px;
-    color: var(--muted-color, var(--pz-text-muted));
-    white-space: nowrap;
-}
-
-.markdown-syntax-list {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.syntax-card {
-    border: 1px solid var(--pz-border-light);
-    border-radius: var(--pz-radius-lg);
-    background: var(--pz-bg);
-    padding: 16px;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
-}
-
-.syntax-card-category {
-    margin: 0 0 10px;
-    color: var(--pz-accent);
-    font-size: 12px;
-    font-weight: var(--pz-weight-bold);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
 }
 
 .syntax-card h2 {
@@ -109,15 +15,11 @@
     font-size: 16px;
 }
 
-.syntax-card p {
+.syntax-card-description {
     margin: 0 0 12px;
     color: var(--pz-text-secondary);
     font-size: 0.875rem;
     line-height: 1.55;
-}
-
-.syntax-card[hidden] {
-    display: none;
 }
 
 .syntax-card pre {
@@ -145,31 +47,6 @@
     white-space: pre;
 }
 
-.markdown-syntax-empty {
-    margin: 0;
-    padding: 16px 18px;
-    border: 1px dashed var(--pz-border);
-    border-radius: var(--pz-radius-lg);
-    background: var(--pz-surface);
-    color: var(--pz-text-secondary);
-    line-height: 1.6;
-}
-
-@media (max-width: 640px) {
-    .markdown-syntax-filter-bar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .markdown-syntax-filter-bar .filter-stats {
-        align-self: flex-start;
-    }
-
-    .syntax-card {
-        padding: 16px;
-    }
-}
-
 html[data-theme='dark'] .markdown-syntax-intro {
     color: var(--dm-text-muted, var(--dm-text-subtle));
 }
@@ -178,27 +55,12 @@ html[data-theme='dark'] .syntax-card h2 {
     color: var(--dm-text, var(--dm-text-bright));
 }
 
-html[data-theme='dark'] .syntax-card {
-    border-color: var(--dm-border, var(--dm-border));
-    background: var(--dm-surface, var(--dm-content-bg));
-}
-
-html[data-theme='dark'] .syntax-card p {
+html[data-theme='dark'] .syntax-card-description {
     color: var(--dm-text-muted, var(--dm-text-subtle));
-}
-
-html[data-theme='dark'] .syntax-card-category {
-    color: var(--dm-accent, var(--dm-accent));
 }
 
 html[data-theme='dark'] .syntax-card pre {
     border-color: var(--dm-border, var(--dm-border));
     background: var(--dm-bg, var(--dm-content-bg));
     color: var(--dm-text, var(--dm-text-bright));
-}
-
-html[data-theme='dark'] .markdown-syntax-empty {
-    border-color: var(--dm-border, var(--dm-border));
-    background: var(--dm-surface, var(--dm-content-bg));
-    color: var(--dm-text-muted, var(--dm-text-subtle));
 }

@@ -4646,6 +4646,8 @@
   "keyboard_shortcuts": {
     "menu_item": "Keyboard shortcuts",
     "title": "Keyboard shortcuts",
+    "filter_placeholder": "Filter shortcuts...",
+    "no_results": "No shortcuts match your search.",
     "setting_hint": "Option to enable in Settings",
     "sections": {
       "general": "General",

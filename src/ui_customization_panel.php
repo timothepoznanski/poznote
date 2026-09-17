@@ -34,6 +34,7 @@ $uiCustomizationPanelAiLabel = t_h('ai_chat.toolbar_button', [], 'AI assistant')
  * js/emoji-autocomplete.js and js/tree-undo-clipboard.js (tree).
  */
 $pzShortcutSettingHint = t_h('keyboard_shortcuts.setting_hint', [], 'Option to enable in Settings');
+$pzShortcutFilterPlaceholder = t_h('keyboard_shortcuts.filter_placeholder', [], 'Filter shortcuts...');
 $pzShortcutGroups = [
     [
         'title' => t_h('keyboard_shortcuts.sections.general', [], 'General'),
@@ -134,12 +135,25 @@ require_once __DIR__ . '/markdown_syntax_content.php';
                 </button>
             </div>
             <div class="pz-help-modal-body">
+                <div class="pz-help-filter-bar">
+                    <div class="filter-input-wrapper">
+                        <i class="lucide lucide-search pz-help-filter-icon" aria-hidden="true"></i>
+                        <input type="text" id="keyboardShortcutsFilterInput" class="filter-input" autocomplete="off"
+                            placeholder="<?php echo $pzShortcutFilterPlaceholder; ?>" aria-label="<?php echo $pzShortcutFilterPlaceholder; ?>">
+                        <button type="button" class="clear-filter-btn" hidden
+                            title="<?php echo t_h('search.clear', [], 'Clear search'); ?>" aria-label="<?php echo t_h('search.clear', [], 'Clear search'); ?>">
+                            <i class="lucide lucide-x" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div class="filter-stats" hidden></div>
+                </div>
+                <div class="pz-help-cards">
                 <?php foreach ($pzShortcutGroups as $group): ?>
-                <section class="keyboard-shortcuts-group">
-                    <h4 class="keyboard-shortcuts-group-title"><?php echo $group['title']; ?></h4>
+                <section class="pz-help-card">
+                    <h4 class="pz-help-card-category"><?php echo $group['title']; ?></h4>
                     <ul class="keyboard-shortcuts-list">
                         <?php foreach ($group['items'] as $item): ?>
-                        <li class="keyboard-shortcuts-item">
+                        <li class="keyboard-shortcuts-item" data-help-entry>
                             <span class="keyboard-shortcuts-label"><?php echo $item['label']; ?><?php if (!empty($item['hint'])): ?><span class="keyboard-shortcuts-hint"><?php echo $item['hint']; ?></span><?php endif; ?></span>
                             <span class="keyboard-shortcuts-keys">
                                 <?php foreach ($item['keys'] as $comboIndex => $combo): ?>
@@ -165,6 +179,8 @@ require_once __DIR__ . '/markdown_syntax_content.php';
                     </ul>
                 </section>
                 <?php endforeach; ?>
+                </div>
+                <p class="pz-help-empty" hidden><?php echo t_h('keyboard_shortcuts.no_results', [], 'No shortcuts match your search.'); ?></p>
             </div>
         </div>
     </div>
