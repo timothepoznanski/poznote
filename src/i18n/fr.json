@@ -361,7 +361,8 @@
       "delete": "Supprimer",
       "open_attachments": "Ouvrir les pièces jointes",
       "download": "Télécharger {{filename}}",
-      "copy_link": "Copier le lien"
+      "copy_link": "Copier le lien",
+      "move": "Déplacer vers une autre note"
     },
     "errors": {
       "select_file": "Veuillez sélectionner un fichier à télécharger.",
@@ -382,12 +383,15 @@
       "blocked_mime_unlockable": "Ce fichier est détecté comme {{mime}} et bloqué par défaut. Vous pouvez autoriser les scripts et exécutables dans Paramètres > Outils d'administration > Pièces jointes scripts et exécutables.",
       "blocked_mime_locked": "Ce fichier est détecté comme {{mime}}, qu'un serveur web peut exécuter : il ne peut jamais être joint.",
       "blocked_extension_unlockable_user": "Les fichiers {{ext}} sont bloqués sur cette instance. Un administrateur peut les autoriser dans Paramètres > Outils d'administration > Pièces jointes scripts et exécutables.",
-      "blocked_mime_unlockable_user": "Ce fichier est détecté comme {{mime}} et bloqué sur cette instance. Un administrateur peut autoriser les scripts et exécutables dans Paramètres > Outils d'administration > Pièces jointes scripts et exécutables."
+      "blocked_mime_unlockable_user": "Ce fichier est détecté comme {{mime}} et bloqué sur cette instance. Un administrateur peut autoriser les scripts et exécutables dans Paramètres > Outils d'administration > Pièces jointes scripts et exécutables.",
+      "move_failed": "Échec du déplacement : {{error}}",
+      "move_failed_generic": "Échec du déplacement."
     },
     "messages": {
       "upload_success": "Fichier téléchargé avec succès !",
       "deleted_success": "Pièce jointe supprimée avec succès",
-      "link_copied": "Lien copié !"
+      "link_copied": "Lien copié !",
+      "moved_success": "Pièce jointe déplacée vers « {{heading}} »"
     },
     "page": {
       "title": "Gérer les pièces jointes",
@@ -443,7 +447,17 @@
       "delete": "Supprimer",
       "delete_confirm_title": "Supprimer la pièce jointe",
       "delete_confirm_message": "Supprimer « {{filename}} » ? La pièce jointe est retirée de la note et ne pourra pas être récupérée.",
-      "delete_confirm_message_unnamed": "Supprimer cette pièce jointe ? Elle est retirée de la note et ne pourra pas être récupérée."
+      "delete_confirm_message_unnamed": "Supprimer cette pièce jointe ? Elle est retirée de la note et ne pourra pas être récupérée.",
+      "move": "Déplacer vers une autre note"
+    },
+    "move": {
+      "title": "Déplacer la pièce jointe",
+      "description": "Choisissez la note qui reçoit « {{filename}} ».",
+      "description_unnamed": "Choisissez la note qui reçoit cette pièce jointe.",
+      "search_placeholder": "Rechercher une note...",
+      "empty": "Aucune autre note trouvée",
+      "moving": "Déplacement...",
+      "kept_notice": "Une copie reste dans cette note, dont le contenu utilise le fichier."
     }
   },
   "auth": {
@@ -2163,7 +2177,11 @@
       "storage_s3_quota_reached": "Limite de stockage S3 atteinte : cette instance autorise au maximum {{max}} Mo de stockage S3 pour cet utilisateur.",
       "backups_s3_quota_reached": "Limite de sauvegardes S3 atteinte : cette instance autorise au maximum {{max}} Mo d'archives de sauvegarde pour cet utilisateur.",
       "cannot_delete_last_workspace": "Impossible de supprimer le dernier espace de travail",
-      "workspace_required": "L'espace de travail est requis"
+      "workspace_required": "L'espace de travail est requis",
+      "attachment_not_found": "Pièce jointe introuvable",
+      "attachment_move_same_note": "Cette pièce jointe est déjà sur cette note",
+      "attachment_move_target_not_found": "La note de destination est introuvable",
+      "attachment_move_target_shortcut": "Un raccourci ne peut pas avoir ses propres pièces jointes"
     }
   },
   "ui": {

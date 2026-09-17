@@ -636,7 +636,8 @@
       "delete": "Delete",
       "open_attachments": "Open attachments",
       "download": "Download {{filename}}",
-      "copy_link": "Copy link"
+      "copy_link": "Copy link",
+      "move": "Move to another note"
     },
     "errors": {
       "select_file": "Please select a file to upload.",
@@ -657,12 +658,15 @@
       "blocked_mime_unlockable": "This file is detected as {{mime}} and is blocked by default. You can allow scripts and executables in Settings > Admin Tools > Script and executable attachments.",
       "blocked_mime_locked": "This file is detected as {{mime}}, which a web server can execute, so it can never be attached.",
       "blocked_extension_unlockable_user": "{{ext}} files are blocked on this instance. An administrator can allow them in Settings > Admin Tools > Script and executable attachments.",
-      "blocked_mime_unlockable_user": "This file is detected as {{mime}} and is blocked on this instance. An administrator can allow scripts and executables in Settings > Admin Tools > Script and executable attachments."
+      "blocked_mime_unlockable_user": "This file is detected as {{mime}} and is blocked on this instance. An administrator can allow scripts and executables in Settings > Admin Tools > Script and executable attachments.",
+      "move_failed": "Move failed: {{error}}",
+      "move_failed_generic": "Move failed."
     },
     "messages": {
       "upload_success": "File uploaded successfully!",
       "deleted_success": "Attachment deleted successfully",
-      "link_copied": "Link copied!"
+      "link_copied": "Link copied!",
+      "moved_success": "Attachment moved to \"{{heading}}\""
     },
     "page": {
       "title": "Manage attachments",
@@ -717,7 +721,17 @@
       "delete": "Delete",
       "delete_confirm_title": "Delete attachment",
       "delete_confirm_message": "Delete \"{{filename}}\"? It is removed from the note and cannot be recovered.",
-      "delete_confirm_message_unnamed": "Delete this attachment? It is removed from the note and cannot be recovered."
+      "delete_confirm_message_unnamed": "Delete this attachment? It is removed from the note and cannot be recovered.",
+      "move": "Move to another note"
+    },
+    "move": {
+      "title": "Move attachment",
+      "description": "Choose the note that receives \"{{filename}}\".",
+      "description_unnamed": "Choose the note that receives this attachment.",
+      "search_placeholder": "Search for a note...",
+      "empty": "No other note found",
+      "moving": "Moving...",
+      "kept_notice": "A copy stays in this note, whose content uses the file."
     }
   },
   "modals": {
@@ -1666,7 +1680,11 @@
       "storage_s3_quota_reached": "S3 storage limit reached: this instance allows at most {{max}} MB of S3 storage for this user.",
       "backups_s3_quota_reached": "S3 backups limit reached: this instance allows at most {{max}} MB of backup archives for this user.",
       "cannot_delete_last_workspace": "Cannot delete the last workspace",
-      "workspace_required": "Workspace is required"
+      "workspace_required": "Workspace is required",
+      "attachment_not_found": "Attachment not found",
+      "attachment_move_same_note": "This attachment is already on that note",
+      "attachment_move_target_not_found": "The note to move it to was not found",
+      "attachment_move_target_shortcut": "A shortcut cannot hold attachments of its own"
     }
   },
   "ui": {

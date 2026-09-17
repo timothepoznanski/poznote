@@ -362,7 +362,8 @@
       "delete": "Eliminar",
       "open_attachments": "Abrir adjuntos",
       "download": "Descargar {{filename}}",
-      "copy_link": "Copiar enlace"
+      "copy_link": "Copiar enlace",
+      "move": "Mover a otra nota"
     },
     "errors": {
       "select_file": "Por favor selecciona un archivo para subir.",
@@ -383,12 +384,15 @@
       "blocked_mime_unlockable": "Este archivo se detecta como {{mime}} y está bloqueado de forma predeterminada. Puedes permitir scripts y ejecutables en Configuración > Herramientas de administración > Adjuntos de scripts y ejecutables.",
       "blocked_mime_locked": "Este archivo se detecta como {{mime}}, que un servidor web puede ejecutar, por lo que nunca se puede adjuntar.",
       "blocked_extension_unlockable_user": "Los archivos {{ext}} están bloqueados en esta instancia. Un administrador puede permitirlos en Configuración > Herramientas de administración > Adjuntos de scripts y ejecutables.",
-      "blocked_mime_unlockable_user": "Este archivo se detecta como {{mime}} y está bloqueado en esta instancia. Un administrador puede permitir scripts y ejecutables en Configuración > Herramientas de administración > Adjuntos de scripts y ejecutables."
+      "blocked_mime_unlockable_user": "Este archivo se detecta como {{mime}} y está bloqueado en esta instancia. Un administrador puede permitir scripts y ejecutables en Configuración > Herramientas de administración > Adjuntos de scripts y ejecutables.",
+      "move_failed": "Error al mover: {{error}}",
+      "move_failed_generic": "Error al mover."
     },
     "messages": {
       "upload_success": "¡Archivo subido exitosamente!",
       "deleted_success": "Adjunto eliminado exitosamente",
-      "link_copied": "¡Enlace copiado!"
+      "link_copied": "¡Enlace copiado!",
+      "moved_success": "Adjunto movido a «{{heading}}»"
     },
     "page": {
       "title": "Administrar adjuntos",
@@ -444,7 +448,17 @@
       "delete": "Eliminar",
       "delete_confirm_title": "Eliminar adjunto",
       "delete_confirm_message": "¿Eliminar «{{filename}}»? Se quita de la nota y no se puede recuperar.",
-      "delete_confirm_message_unnamed": "¿Eliminar este adjunto? Se quita de la nota y no se puede recuperar."
+      "delete_confirm_message_unnamed": "¿Eliminar este adjunto? Se quita de la nota y no se puede recuperar.",
+      "move": "Mover a otra nota"
+    },
+    "move": {
+      "title": "Mover adjunto",
+      "description": "Elige la nota que recibirá «{{filename}}».",
+      "description_unnamed": "Elige la nota que recibirá este adjunto.",
+      "search_placeholder": "Buscar una nota...",
+      "empty": "No se encontró ninguna otra nota",
+      "moving": "Moviendo...",
+      "kept_notice": "Queda una copia en esta nota, cuyo contenido usa el archivo."
     }
   },
   "auth": {
@@ -2157,7 +2171,11 @@
       "no_token_generated": "No se generó ningún enlace",
       "server_error": "Error del servidor: {{error}}",
       "cannot_delete_last_workspace": "No se puede eliminar el último espacio de trabajo",
-      "workspace_required": "Se requiere el espacio de trabajo"
+      "workspace_required": "Se requiere el espacio de trabajo",
+      "attachment_not_found": "Adjunto no encontrado",
+      "attachment_move_same_note": "Este adjunto ya está en esa nota",
+      "attachment_move_target_not_found": "No se encontró la nota de destino",
+      "attachment_move_target_shortcut": "Un acceso directo no puede tener adjuntos propios"
     }
   },
   "ui": {

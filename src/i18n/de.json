@@ -362,7 +362,8 @@
       "delete": "Löschen",
       "open_attachments": "Anhänge öffnen",
       "download": "Herunterladen {{filename}}",
-      "copy_link": "Link kopieren"
+      "copy_link": "Link kopieren",
+      "move": "In eine andere Notiz verschieben"
     },
     "errors": {
       "select_file": "Bitte wählen Sie eine Datei zum Hochladen aus.",
@@ -383,12 +384,15 @@
       "blocked_mime_unlockable": "Diese Datei wird als {{mime}} erkannt und ist standardmäßig blockiert. Sie können Skripte und ausführbare Dateien unter Einstellungen > Administrationswerkzeuge > Skript- und Programmanhänge erlauben.",
       "blocked_mime_locked": "Diese Datei wird als {{mime}} erkannt, was ein Webserver ausführen kann, deshalb lässt sie sich nie anhängen.",
       "blocked_extension_unlockable_user": "{{ext}}-Dateien sind auf dieser Instanz blockiert. Ein Administrator kann sie unter Einstellungen > Administrationswerkzeuge > Skript- und Programmanhänge erlauben.",
-      "blocked_mime_unlockable_user": "Diese Datei wird als {{mime}} erkannt und ist auf dieser Instanz blockiert. Ein Administrator kann Skripte und ausführbare Dateien unter Einstellungen > Administrationswerkzeuge > Skript- und Programmanhänge erlauben."
+      "blocked_mime_unlockable_user": "Diese Datei wird als {{mime}} erkannt und ist auf dieser Instanz blockiert. Ein Administrator kann Skripte und ausführbare Dateien unter Einstellungen > Administrationswerkzeuge > Skript- und Programmanhänge erlauben.",
+      "move_failed": "Verschieben fehlgeschlagen: {{error}}",
+      "move_failed_generic": "Verschieben fehlgeschlagen."
     },
     "messages": {
       "upload_success": "Datei erfolgreich hochgeladen!",
       "deleted_success": "Anhang erfolgreich gelöscht",
-      "link_copied": "Link kopiert!"
+      "link_copied": "Link kopiert!",
+      "moved_success": "Anhang nach „{{heading}}“ verschoben"
     },
     "page": {
       "title": "Anhänge verwalten",
@@ -444,7 +448,17 @@
       "delete": "Löschen",
       "delete_confirm_title": "Anhang löschen",
       "delete_confirm_message": "„{{filename}}“ löschen? Der Anhang wird aus der Notiz entfernt und kann nicht wiederhergestellt werden.",
-      "delete_confirm_message_unnamed": "Diesen Anhang löschen? Er wird aus der Notiz entfernt und kann nicht wiederhergestellt werden."
+      "delete_confirm_message_unnamed": "Diesen Anhang löschen? Er wird aus der Notiz entfernt und kann nicht wiederhergestellt werden.",
+      "move": "In eine andere Notiz verschieben"
+    },
+    "move": {
+      "title": "Anhang verschieben",
+      "description": "Wählen Sie die Notiz, die „{{filename}}“ erhält.",
+      "description_unnamed": "Wählen Sie die Notiz, die diesen Anhang erhält.",
+      "search_placeholder": "Notiz suchen...",
+      "empty": "Keine andere Notiz gefunden",
+      "moving": "Wird verschoben...",
+      "kept_notice": "Eine Kopie bleibt in dieser Notiz, deren Inhalt die Datei verwendet."
     }
   },
   "auth": {
@@ -2157,7 +2171,11 @@
       "no_token_generated": "Kein Link erstellt",
       "server_error": "Serverfehler: {{error}}",
       "cannot_delete_last_workspace": "Der letzte Arbeitsbereich kann nicht gelöscht werden",
-      "workspace_required": "Arbeitsbereich ist erforderlich"
+      "workspace_required": "Arbeitsbereich ist erforderlich",
+      "attachment_not_found": "Anhang nicht gefunden",
+      "attachment_move_same_note": "Dieser Anhang liegt bereits an dieser Notiz",
+      "attachment_move_target_not_found": "Die Zielnotiz wurde nicht gefunden",
+      "attachment_move_target_shortcut": "Eine Verknüpfung kann keine eigenen Anhänge haben"
     }
   },
   "ui": {

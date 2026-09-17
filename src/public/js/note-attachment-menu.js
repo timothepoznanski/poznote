@@ -1,6 +1,7 @@
 /**
  * Right-click menu on an attachment inside a note: open, download, transcribe
- * (audio only, and only when a speech-to-text server is configured) and delete.
+ * (audio only, and only when a speech-to-text server is configured), move to
+ * another note and delete.
  *
  * An attachment shows up in a note in several shapes, all covered here:
  *   - a link to it, in a rich-text note or in the Markdown preview
@@ -197,6 +198,13 @@
         return !(typeof window.isNoteEditingLocked === 'function' && window.isNoteEditingLocked(target.noteId));
     }
 
+    /** Same conditions as deleting: it takes the attachment out of this note. */
+    function canMove(target, attachment) {
+        if (!attachment || String(target.hostNoteId) !== String(target.noteId)) return false;
+        if (typeof window.openAttachmentMoveDialog !== 'function') return false;
+        return !(typeof window.isNoteEditingLocked === 'function' && window.isNoteEditingLocked(target.noteId));
+    }
+
     function attachmentUrl(target, forceDownload) {
         if (typeof window.buildAttachmentPreviewUrl === 'function') {
             return window.buildAttachmentPreviewUrl(target.noteId, target.attachmentId, forceDownload);
@@ -228,6 +236,52 @@
     function transcribe(target) {
         var inNote = target.anchor && target.anchor.closest && target.anchor.closest('.noteentry');
         window.transcribeAttachment(target.noteId, target.attachmentId, target.filename, inNote ? target.anchor : null);
+    }
+
+    /**
+     * Hand the attachment to another note (js/attachment-move.js), then bring
+     * both notes back in line with what they hold now: the one it left no
+     * longer shows it, unless its own content still uses the file, and the one
+     * it joined does.
+     */
+    function moveToAnotherNote(target) {
+        var workspace = '';
+        if (typeof window.getSelectedWorkspace === 'function') {
+            workspace = window.getSelectedWorkspace() || '';
+        }
+
+        window.openAttachmentMoveDialog({
+            noteId: target.noteId,
+            attachmentId: target.attachmentId,
+            workspace: workspace,
+            filename: target.filename,
+            onMoved: function (result) {
+                [result.sourceNoteId, result.targetNoteId].forEach(function (noteId) {
+                    delete listCache[noteId];
+                    if (typeof window.refreshAttachmentPreviewsForNote === 'function') {
+                        window.refreshAttachmentPreviewsForNote(noteId);
+                    }
+                    if (typeof window.updateAttachmentCountInMenu === 'function') {
+                        window.updateAttachmentCountInMenu(noteId);
+                    }
+                });
+
+                if (window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.gitSyncAutoPush &&
+                    typeof window.setNeedsAutoPush === 'function') {
+                    window.setNeedsAutoPush(true);
+                }
+
+                if (typeof window.showNotificationPopup === 'function') {
+                    var message = t('attachments.messages.moved_success', { heading: result.targetNoteHeading },
+                        'Attachment moved to "{{heading}}"');
+                    if (result.keptInSource) {
+                        message += ' ' + t('attachments.move.kept_notice', null,
+                            'A copy stays in this note, whose content uses the file.');
+                    }
+                    window.showNotificationPopup(message, 'success');
+                }
+            }
+        });
     }
 
     function confirmDelete(target) {
@@ -300,6 +354,9 @@
         if (canTranscribe(attachment)) {
             addItem(menu, 'transcribe', 'lucide-mic', t('attachments.context_menu.transcribe', null, 'Transcribe'));
         }
+        if (canMove(target, attachment)) {
+            addItem(menu, 'move', 'lucide-file-output', t('attachments.context_menu.move', null, 'Move to another note'));
+        }
         if (canDelete(target, attachment)) {
             addItem(menu, 'delete', 'lucide-trash-2', t('attachments.context_menu.delete', null, 'Delete'), 'image-menu-item-danger');
         }
@@ -322,6 +379,7 @@
             if (action === 'open') openAttachment(target);
             else if (action === 'download') downloadAttachmentFile(target);
             else if (action === 'transcribe') transcribe(target);
+            else if (action === 'move') moveToAnotherNote(target);
             else if (action === 'delete') confirmDelete(target);
         });
 

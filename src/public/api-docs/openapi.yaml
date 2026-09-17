@@ -2684,6 +2684,68 @@ paths:
         '200':
           description: Attachment deleted
 
+  /notes/{noteId}/attachments/{attachmentId}/move:
+    post:
+      tags: [Attachments]
+      summary: Move an attachment to another note
+      description: >
+        Moves the attachment to another note of the same account, in any
+        workspace. The file follows it, except when the note it leaves still
+        points at it, from its content or from a snapshot: the target then
+        gets its own copy, so both addresses keep resolving and deleting one
+        never takes the other's file away. kept_in_source says which of the
+        two happened.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: noteId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: attachmentId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: '6a296134d3bd0'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [target_note_id]
+              properties:
+                target_note_id:
+                  type: integer
+                  description: The note that receives the attachment
+      responses:
+        '200':
+          description: Attachment moved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  attachment_id:
+                    type: string
+                    description: Its id on the target note
+                  target_note_id:
+                    type: integer
+                  target_note_heading:
+                    type: string
+                  kept_in_source:
+                    type: boolean
+                    description: Whether a copy stayed on the source note
+        '400':
+          description: Missing target_note_id, same note, or a shortcut target
+        '404':
+          description: Note, attachment or target note not found
+        '413':
+          description: Storage limit reached while copying the file
+
   # ==================
   # Folders Endpoints
   # ==================

@@ -361,7 +361,8 @@
       "delete": "删除",
       "open_attachments": "打开附件",
       "download": "下载 {{filename}}",
-      "copy_link": "复制链接"
+      "copy_link": "复制链接",
+      "move": "移动到其他笔记"
     },
     "errors": {
       "select_file": "请选择要上传的文件。",
@@ -382,12 +383,15 @@
       "blocked_mime_unlockable": "该文件被识别为 {{mime}}，默认被阻止。您可以在“设置 > 管理工具 > 脚本和可执行文件附件”中允许脚本和可执行文件。",
       "blocked_mime_locked": "该文件被识别为 {{mime}}，Web 服务器可能执行此类型，因此永远无法作为附件上传。",
       "blocked_extension_unlockable_user": "{{ext}} 文件在本实例上被阻止。管理员可以在“设置 > 管理工具 > 脚本和可执行文件附件”中允许它们。",
-      "blocked_mime_unlockable_user": "该文件被识别为 {{mime}}，在本实例上被阻止。管理员可以在“设置 > 管理工具 > 脚本和可执行文件附件”中允许脚本和可执行文件。"
+      "blocked_mime_unlockable_user": "该文件被识别为 {{mime}}，在本实例上被阻止。管理员可以在“设置 > 管理工具 > 脚本和可执行文件附件”中允许脚本和可执行文件。",
+      "move_failed": "移动失败：{{error}}",
+      "move_failed_generic": "移动失败。"
     },
     "messages": {
       "upload_success": "文件上传成功！",
       "deleted_success": "附件删除成功",
-      "link_copied": "链接已复制！"
+      "link_copied": "链接已复制！",
+      "moved_success": "附件已移动到「{{heading}}」"
     },
     "page": {
       "title": "管理附件",
@@ -443,7 +447,17 @@
       "delete": "删除",
       "delete_confirm_title": "删除附件",
       "delete_confirm_message": "删除“{{filename}}”？它将从笔记中移除且无法恢复。",
-      "delete_confirm_message_unnamed": "删除此附件？它将从笔记中移除且无法恢复。"
+      "delete_confirm_message_unnamed": "删除此附件？它将从笔记中移除且无法恢复。",
+      "move": "移动到其他笔记"
+    },
+    "move": {
+      "title": "移动附件",
+      "description": "选择接收「{{filename}}」的笔记。",
+      "description_unnamed": "选择接收此附件的笔记。",
+      "search_placeholder": "搜索笔记...",
+      "empty": "未找到其他笔记",
+      "moving": "移动中...",
+      "kept_notice": "本笔记的内容仍在使用该文件，因此会保留一份副本。"
     }
   },
   "auth": {
@@ -2155,7 +2169,11 @@
       "storage_s3_quota_reached": "已达到 S3 存储上限:此实例最多允许该用户使用 {{max}} MB 的 S3 存储。",
       "backups_s3_quota_reached": "已达到 S3 备份上限:此实例最多允许该用户使用 {{max}} MB 的备份存档。",
       "cannot_delete_last_workspace": "无法删除最后一个工作区",
-      "workspace_required": "需要指定工作区"
+      "workspace_required": "需要指定工作区",
+      "attachment_not_found": "未找到附件",
+      "attachment_move_same_note": "该附件已在这条笔记上",
+      "attachment_move_target_not_found": "未找到目标笔记",
+      "attachment_move_target_shortcut": "快捷方式不能拥有自己的附件"
     }
   },
   "ui": {

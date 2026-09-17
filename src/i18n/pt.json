@@ -362,7 +362,8 @@
       "delete": "Excluir",
       "open_attachments": "Abrir anexos",
       "download": "Baixar {{filename}}",
-      "copy_link": "Copiar link"
+      "copy_link": "Copiar link",
+      "move": "Mover para outra nota"
     },
     "errors": {
       "select_file": "Por favor, selecione um arquivo para enviar.",
@@ -383,12 +384,15 @@
       "blocked_mime_unlockable": "Este arquivo é detectado como {{mime}} e é bloqueado por padrão. Você pode permitir scripts e executáveis em Configurações > Ferramentas de administração > Anexos de scripts e executáveis.",
       "blocked_mime_locked": "Este arquivo é detectado como {{mime}}, que um servidor web pode executar, por isso nunca pode ser anexado.",
       "blocked_extension_unlockable_user": "Os arquivos {{ext}} estão bloqueados nesta instância. Um administrador pode permiti-los em Configurações > Ferramentas de administração > Anexos de scripts e executáveis.",
-      "blocked_mime_unlockable_user": "Este arquivo é detectado como {{mime}} e está bloqueado nesta instância. Um administrador pode permitir scripts e executáveis em Configurações > Ferramentas de administração > Anexos de scripts e executáveis."
+      "blocked_mime_unlockable_user": "Este arquivo é detectado como {{mime}} e está bloqueado nesta instância. Um administrador pode permitir scripts e executáveis em Configurações > Ferramentas de administração > Anexos de scripts e executáveis.",
+      "move_failed": "Falha ao mover: {{error}}",
+      "move_failed_generic": "Falha ao mover."
     },
     "messages": {
       "upload_success": "Arquivo enviado com sucesso!",
       "deleted_success": "Anexo excluído com sucesso",
-      "link_copied": "Link copiado!"
+      "link_copied": "Link copiado!",
+      "moved_success": "Anexo movido para \"{{heading}}\""
     },
     "page": {
       "title": "Gerenciar Anexos",
@@ -444,7 +448,17 @@
       "delete": "Excluir",
       "delete_confirm_title": "Excluir anexo",
       "delete_confirm_message": "Excluir \"{{filename}}\"? Ele será removido da nota e não poderá ser recuperado.",
-      "delete_confirm_message_unnamed": "Excluir este anexo? Ele será removido da nota e não poderá ser recuperado."
+      "delete_confirm_message_unnamed": "Excluir este anexo? Ele será removido da nota e não poderá ser recuperado.",
+      "move": "Mover para outra nota"
+    },
+    "move": {
+      "title": "Mover anexo",
+      "description": "Escolha a nota que vai receber \"{{filename}}\".",
+      "description_unnamed": "Escolha a nota que vai receber este anexo.",
+      "search_placeholder": "Buscar uma nota...",
+      "empty": "Nenhuma outra nota encontrada",
+      "moving": "Movendo...",
+      "kept_notice": "Uma cópia fica nesta nota, cujo conteúdo usa o arquivo."
     }
   },
   "auth": {
@@ -2157,7 +2171,11 @@
       "storage_s3_quota_reached": "Limite de armazenamento S3 atingido: esta instância permite no máximo {{max}} MB de armazenamento S3 para este usuário.",
       "backups_s3_quota_reached": "Limite de backups S3 atingido: esta instância permite no máximo {{max}} MB de arquivos de backup para este usuário.",
       "cannot_delete_last_workspace": "Não é possível excluir o último espaço de trabalho",
-      "workspace_required": "O espaço de trabalho é obrigatório"
+      "workspace_required": "O espaço de trabalho é obrigatório",
+      "attachment_not_found": "Anexo não encontrado",
+      "attachment_move_same_note": "Este anexo já está nessa nota",
+      "attachment_move_target_not_found": "A nota de destino não foi encontrada",
+      "attachment_move_target_shortcut": "Um atalho não pode ter anexos próprios"
     }
   },
   "ui": {

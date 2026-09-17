@@ -2377,6 +2377,30 @@ curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/attachments/456
 ```
 
+### Move Attachment
+
+```
+POST /notes/{noteId}/attachments/{attachmentId}/move
+```
+
+Move an attachment to another note of the same account, in any workspace. The response carries its new `attachment_id` on that note.
+
+The file follows it, unless the note it leaves still points at it, from its content or from one of its snapshots: the target then gets its own copy, so both addresses keep working and deleting one note's attachment never takes the other's file away. `kept_in_source` says which of the two happened. A shortcut note cannot be the target, since it serves the attachments of the note it points at.
+
+**Request Body (application/json):**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `target_note_id` | integer | The note that receives the attachment |
+| `workspace` | string | Workspace context of the source note |
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"target_note_id": 789}' \
+  http://YOUR_SERVER/api/v1/notes/123/attachments/456/move
+```
+
 ---
 
 ## Backups
@@ -3520,6 +3544,7 @@ curl http://YOUR_SERVER/api_health.php
 | `POST` | `/notes/{noteId}/attachments` | Upload attachment |
 | `GET` | `/notes/{noteId}/attachments/{attachmentId}` | Download attachment |
 | `DELETE` | `/notes/{noteId}/attachments/{attachmentId}` | Delete attachment |
+| `POST` | `/notes/{noteId}/attachments/{attachmentId}/move` | Move attachment to another note |
 
 ### Backups
 | Method | Endpoint | Description |

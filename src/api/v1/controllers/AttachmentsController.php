@@ -7,6 +7,7 @@
  *   POST   /api/v1/notes/{noteId}/attachments                   - Upload an attachment
  *   GET    /api/v1/notes/{noteId}/attachments/{attachmentId}    - Download an attachment
  *   DELETE /api/v1/notes/{noteId}/attachments/{attachmentId}    - Delete an attachment
+ *   POST   /api/v1/notes/{noteId}/attachments/{attachmentId}/move - Move an attachment to another note
  */
 
 require_once __DIR__ . '/../../../note_loader.php';
@@ -808,6 +809,227 @@ class AttachmentsController {
         }
 
         return false;
+    }
+
+    /**
+     * POST /api/v1/notes/{noteId}/attachments/{attachmentId}/move
+     *
+     * Move an attachment to another note of the same account. The file itself
+     * stays where it is unless the note it leaves still points at it, from its
+     * content or from one of its snapshots: the target then gets a copy, so
+     * both addresses keep resolving and neither note can delete the other's
+     * bytes (poznotePlanAttachmentMove()).
+     */
+    public function move($noteId, $attachmentId) {
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($input)) {
+            $input = [];
+        }
+        $workspace = $_GET['workspace'] ?? ($input['workspace'] ?? null);
+        $sourceNoteId = (int)$noteId;
+        $attachmentId = (string)$attachmentId;
+        $targetNoteId = (int)($input['target_note_id'] ?? $_POST['target_note_id'] ?? 0);
+
+        if ($sourceNoteId <= 0 || $attachmentId === '' || $targetNoteId <= 0) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Note ID, attachment ID and target_note_id are required']);
+            return;
+        }
+
+        if ($sourceNoteId === $targetNoteId) {
+            http_response_code(400);
+            echo json_encode([
+                'success' => false,
+                'message' => t('api.errors.attachment_move_same_note', [], 'This attachment is already on that note'),
+            ]);
+            return;
+        }
+
+        $copiedFilename = null;
+
+        try {
+            $query = 'SELECT id, heading, attachments, entry, type, workspace FROM entries WHERE id = ? AND trash = 0';
+            $params = [$sourceNoteId];
+            if ($workspace) {
+                $query .= ' AND workspace = ?';
+                $params[] = $workspace;
+            }
+            $stmt = $this->con->prepare($query);
+            $stmt->execute($params);
+            $source = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$source) {
+                http_response_code(404);
+                echo json_encode(['success' => false, 'message' => t('api.errors.note_not_found', [], 'Note not found')]);
+                return;
+            }
+
+            $attachments = poznoteDecodeAttachments($source['attachments'] ?? '');
+            $sourceIndex = null;
+            foreach ($attachments as $index => $attachment) {
+                if (is_array($attachment) && (string)($attachment['id'] ?? '') === $attachmentId) {
+                    $sourceIndex = $index;
+                    break;
+                }
+            }
+
+            // A snapshot-only record is not part of the note any more: it has
+            // nothing to move, and moving it would take the file its snapshots
+            // still need.
+            if ($sourceIndex === null || poznoteAttachmentIsSnapshotOnly($attachments[$sourceIndex])) {
+                http_response_code(404);
+                echo json_encode(['success' => false, 'message' => t('api.errors.attachment_not_found', [], 'Attachment not found')]);
+                return;
+            }
+            $record = $attachments[$sourceIndex];
+
+            $stmt = $this->con->prepare('SELECT id, heading, workspace, attachments, linked_note_id FROM entries WHERE id = ? AND trash = 0');
+            $stmt->execute([$targetNoteId]);
+            $target = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$target) {
+                http_response_code(404);
+                echo json_encode(['success' => false, 'message' => t('api.errors.attachment_move_target_not_found', [], 'The note to move it to was not found')]);
+                return;
+            }
+
+            // A shortcut serves the attachments of the note it points at and
+            // has none of its own; a record stored on it would never be shown.
+            if (!empty($target['linked_note_id'])) {
+                http_response_code(400);
+                echo json_encode([
+                    'success' => false,
+                    'message' => t('api.errors.attachment_move_target_shortcut', [], 'A shortcut cannot hold attachments of its own'),
+                ]);
+                return;
+            }
+
+            $plan = poznotePlanAttachmentMove(
+                $record,
+                $this->readNoteContent($sourceNoteId, $source),
+                poznoteAttachmentIsReferencedInSnapshots($sourceNoteId, $record)
+            );
+
+            $filename = (string)($record['filename'] ?? '');
+            $targetFilename = $filename;
+
+            if ($plan['duplicate_file']) {
+                $storage = $this->storage();
+                $localPath = $filename !== '' ? $storage->localFile($filename) : null;
+                if ($localPath === null || !is_readable($localPath)) {
+                    http_response_code(404);
+                    echo json_encode(['success' => false, 'message' => 'Attachment file not found']);
+                    return;
+                }
+
+                $size = (int)($record['file_size'] ?? 0);
+                if ($size <= 0) {
+                    $size = (int)filesize($localPath);
+                }
+                $quotaError = poznoteCheckAttachmentStorageQuota($size);
+                if ($quotaError !== null) {
+                    http_response_code(413);
+                    echo json_encode(['success' => false, 'message' => $quotaError]);
+                    return;
+                }
+
+                $fileType = (string)($record['file_type'] ?? 'application/octet-stream');
+                $extension = strtolower((string)pathinfo($filename, PATHINFO_EXTENSION));
+                $targetFilename = uniqid() . '_' . time() . ($extension !== '' ? '.' . $extension : '');
+                if (!$storage->storeFile($localPath, $targetFilename, $fileType)) {
+                    http_response_code(500);
+                    echo json_encode(['success' => false, 'message' => 'Failed to copy the attachment file']);
+                    return;
+                }
+                $copiedFilename = $targetFilename;
+            }
+
+            $targetAttachments = poznoteDecodeAttachments($target['attachments'] ?? '');
+            $movedRecord = $record;
+            // The bookkeeping of the note it leaves says nothing about the one
+            // it joins (lib/attachment-adoption.php).
+            unset($movedRecord['snapshot_only'], $movedRecord['adopted_from']);
+            $movedRecord['id'] = $this->freshAttachmentId($targetAttachments);
+            $movedRecord['filename'] = $targetFilename;
+            $targetAttachments[] = $movedRecord;
+
+            if ($plan['keep_in_source']) {
+                if ($plan['snapshot_only']) {
+                    $attachments[$sourceIndex]['snapshot_only'] = true;
+                }
+            } else {
+                array_splice($attachments, $sourceIndex, 1);
+            }
+
+            $this->con->beginTransaction();
+            try {
+                $update = $this->con->prepare('UPDATE entries SET attachments = ? WHERE id = ?');
+                $update->execute([json_encode(array_values($attachments)), $sourceNoteId]);
+                $update->execute([json_encode(array_values($targetAttachments)), $targetNoteId]);
+                $this->con->commit();
+            } catch (Exception $e) {
+                $this->con->rollBack();
+                throw $e;
+            }
+
+            $this->triggerGitSync($targetNoteId, 'push', $copiedFilename ?? '');
+            $this->triggerGitSync($sourceNoteId, 'push', '');
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Attachment moved successfully',
+                'attachment_id' => $movedRecord['id'],
+                'source_note_id' => $sourceNoteId,
+                'target_note_id' => $targetNoteId,
+                'target_note_heading' => (string)($target['heading'] ?? ''),
+                'target_workspace' => (string)($target['workspace'] ?? ''),
+                'kept_in_source' => (bool)$plan['keep_in_source'],
+            ]);
+        } catch (Exception $e) {
+            if ($copiedFilename !== null) {
+                $this->storage()->delete($copiedFilename);
+            }
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Error moving attachment: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * An attachment id no record of the note already uses.
+     */
+    private function freshAttachmentId(array $attachments): string {
+        $taken = [];
+        foreach ($attachments as $attachment) {
+            if (is_array($attachment) && isset($attachment['id'])) {
+                $taken[(string)$attachment['id']] = true;
+            }
+        }
+
+        do {
+            $id = uniqid();
+        } while (isset($taken[$id]));
+
+        return $id;
+    }
+
+    /**
+     * The note's content as it is on disk, which is what the app reads and
+     * what an import rewrites; the entries row can lag behind it.
+     */
+    private function readNoteContent(int $noteId, array $row): string {
+        $content = (string)($row['entry'] ?? '');
+
+        if (function_exists('getEntryFilename')) {
+            $file = getEntryFilename($noteId, $row['type'] ?? 'note');
+            if ($file && is_readable($file)) {
+                $fileContent = @file_get_contents($file);
+                if (is_string($fileContent) && $fileContent !== '') {
+                    $content = $fileContent;
+                }
+            }
+        }
+
+        return $content;
     }
 
     /**

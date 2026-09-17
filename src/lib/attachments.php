@@ -192,6 +192,38 @@ function poznoteFilterVisibleAttachments($attachments) {
     }));
 }
 
+/**
+ * What moving an attachment to another note has to do with the file behind it.
+ *
+ * The record always leaves the note it was attached to, but the file cannot
+ * always follow it. An attachment is addressed as
+ * /api/v1/notes/<note>/attachments/<id>, an address that only resolves while
+ * that note holds a record with that id, and the note it leaves may still
+ * point at it: from its own content, or from a snapshot that a restore would
+ * bring back. In that case the source keeps its record, hidden when only a
+ * snapshot needs it, and the target gets a copy of the file rather than the
+ * file itself.
+ *
+ * Copying instead of sharing the filename is what makes the two records
+ * independent: deleting one note's attachment (or pruning its snapshots)
+ * deletes the file it names, and that must never be the other note's bytes.
+ *
+ * @param array       $attachment            the record being moved
+ * @param string|null $sourceContent         current content of the source note
+ * @param bool        $referencedInSnapshots whether a snapshot of the source note points at it
+ * @return array{keep_in_source: bool, snapshot_only: bool, duplicate_file: bool}
+ */
+function poznotePlanAttachmentMove(array $attachment, $sourceContent, bool $referencedInSnapshots): array {
+    $referencedInContent = poznoteAttachmentIsReferencedInContent($attachment, (string)$sourceContent);
+    $keepInSource = $referencedInContent || $referencedInSnapshots;
+
+    return [
+        'keep_in_source' => $keepInSource,
+        'snapshot_only' => $keepInSource && !$referencedInContent,
+        'duplicate_file' => $keepInSource,
+    ];
+}
+
 function poznoteCountDisplayableAttachments($attachments, $content = '') {
     $count = 0;
     foreach (poznoteFilterVisibleAttachments($attachments) as $attachment) {
