@@ -181,6 +181,53 @@ window.savedRanges = {};
     }
   }
 
+  // The highlight counterpart of removeInlineColorInRange(). hiliteColor with a
+  // keyword is not honoured by every browser: where it is ignored the span stays
+  // put with its background, so the "None" swatch looked like it did nothing
+  // (#1425). Strip the inline background by hand and unwrap the spans that are
+  // left with nothing else to say.
+  function removeInlineHighlightInRange(range) {
+    try {
+      const root = range.commonAncestorContainer.nodeType === 1 ? range.commonAncestorContainer : range.commonAncestorContainer.parentElement;
+      if (!root) return;
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null, false);
+      const toClean = [];
+      while (walker.nextNode()) {
+        const el = walker.currentNode;
+        if (!el.style || (!el.style.backgroundColor && !el.style.background)) continue;
+        if (range.intersectsNode(el)) toClean.push(el);
+      }
+      if (!toClean.length) return;
+
+      toClean.forEach(el => {
+        el.style.removeProperty('background-color');
+        el.style.removeProperty('background');
+        if (el.getAttribute('style') === '') el.removeAttribute('style');
+        unwrapBareInlineWrapper(el);
+      });
+
+      const host = root.closest ? (root.closest('.noteentry') || root.closest('[contenteditable="true"]')) : null;
+      if (host) {
+        host.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    } catch (e) {
+        // swallow
+        console.debug('toolbar-popups: removeInlineHighlightInRange() failed:', e);
+    }
+  }
+
+  // A <span> or <font> the highlighter left behind once its background is gone
+  // carries nothing, so it is unwrapped rather than kept: repeated highlight and
+  // unhighlight rounds would otherwise pile empty wrappers into the note.
+  function unwrapBareInlineWrapper(el) {
+    if (el.tagName !== 'SPAN' && el.tagName !== 'FONT') return;
+    if (el.attributes.length) return;
+    const parent = el.parentNode;
+    if (!parent) return;
+    while (el.firstChild) parent.insertBefore(el.firstChild, el);
+    parent.removeChild(el);
+  }
+
   // Apply color (or remove it) to the saved selection
   function applyColorToSelection(color) {
     // Check if we're in markdown mode
@@ -375,6 +422,10 @@ window.savedRanges = {};
       } catch (e) {
           // ignore
           console.debug('toolbar-popups: applyHighlightToSelection() failed:', e);
+      }
+      const sel = window.getSelection();
+      if (sel.rangeCount > 0) {
+        removeInlineHighlightInRange(sel.getRangeAt(0));
       }
     } else {
       try {

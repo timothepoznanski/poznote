@@ -599,7 +599,17 @@ function initTextSelectionHandlers() {
                     }
                     if (currentElement.contentEditable === 'true') {
                         editableElement = currentElement;
-                        var editableCodeBlockType = getSelectionHtmlCodeBlockType(currentElement, range);
+                        // CodeMirror carries contenteditable on .cm-content, inside the
+                        // .markdown-editor host, so the walk stops here before reaching the
+                        // markdown branch above. A fence is only visible in the markdown
+                        // source: reading the rendered HTML instead found no code block at
+                        // all and left the whole toolbar up inside a fenced block.
+                        var markdownHost = currentElement.closest
+                            ? currentElement.closest('.markdown-editor')
+                            : null;
+                        var editableCodeBlockType = markdownHost
+                            ? getSelectionCodeBlockType(markdownHost, range)
+                            : getSelectionHtmlCodeBlockType(currentElement, range);
                         isLanguageCodeSelection = editableCodeBlockType === 'language';
                         isPlainCodeSelection = editableCodeBlockType === 'plain';
                         break;

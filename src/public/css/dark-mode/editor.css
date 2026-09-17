@@ -92,13 +92,12 @@ html[data-theme='dark'] .noteentry pre code.code-line-numbers .code-line::before
     opacity: 0.55;
 }
 
-/* Highlighter inside code blocks: preserve dark background with readable highlight */
-html[data-theme='dark'] .noteentry pre *[style*="background"],
-html[data-theme='dark'] .noteentry code *[style*="background"],
-html[data-theme='dark'] .noteentry .code-block *[style*="background"] {
-    background: linear-gradient(rgba(255, 255, 0, 0.4), rgba(255, 255, 0, 0.4)), var(--dm-code-bg) !important;
-    color: var(--dm-text) !important;
-}
+/* Highlighted text inside a code block is left to the colour the picker wrote,
+   like anywhere else in the note. The palette's soft tokens are mixed against
+   the page background, so they are already dark here; the legacy pastel
+   highlights below get their text colour fixed by the rules further down.
+   The fixed yellow gradient this rule used to paint turned every colour yellow
+   and stayed visible after a highlight was removed (#1425). */
 
 /* Inline code only (not inside pre blocks with syntax highlighting) */
 html[data-theme='dark'] .noteentry code:not([class*="hljs"]):not([class*="language-"]) {
