@@ -322,9 +322,11 @@
         });
     }
 
+    // Returns where the block sat ({ block, parent, next }) so the deletion
+    // can be undone, or null when there was nothing to remove.
     function removeCodeBlockDom(block, copyButton, deleteButton) {
         var targetBlock = getCodeBlockElement(block);
-        if (!targetBlock) return;
+        if (!targetBlock) return null;
 
         var actionHost = targetBlock.parentElement;
         if (!actionHost || !actionHost.classList || !actionHost.classList.contains('code-block-actions-host')) {
@@ -335,11 +337,19 @@
         removeNode(deleteButton || findActionButton(targetBlock, actionHost, 'code-block-delete-btn'));
         removeNode(findActionButton(targetBlock, actionHost, 'code-block-lang-btn'));
         removeNode(findActionButton(targetBlock, actionHost, 'code-block-line-numbers-btn'));
+
+        var position = { block: targetBlock, parent: targetBlock.parentNode, next: targetBlock.nextSibling };
         removeNode(targetBlock);
 
         if (isDisposableActionHost(actionHost)) {
+            // The host goes with its block: the block comes back in the host's
+            // place and the observer below wraps it again
+            position.parent = actionHost.parentNode;
+            position.next = actionHost.nextSibling;
             removeNode(actionHost);
         }
+
+        return position;
     }
 
     function findMarkdownFenceRange(lines, targetIndex) {
@@ -402,6 +412,29 @@
 
         lines.splice(range.start, range.end - range.start + 1);
         var newContent = lines.join('\n');
+        applyMarkdownSource(noteEntry, editorDiv, noteId, newContent);
+
+        lastDeletion = {
+            noteEntry: noteEntry,
+            isStillCurrent: function() {
+                return currentMarkdownSource(noteId, editorDiv) === newContent;
+            },
+            restore: function() {
+                applyMarkdownSource(noteEntry, editorDiv, noteId, content);
+            }
+        };
+
+        return true;
+    }
+
+    function currentMarkdownSource(noteId, editorDiv) {
+        return typeof window.getMarkdownContent === 'function'
+            ? window.getMarkdownContent(noteId)
+            : editorDiv.textContent;
+    }
+
+    // Write a new Markdown source into the note and redraw what is on screen
+    function applyMarkdownSource(noteEntry, editorDiv, noteId, newContent) {
         if (typeof window.renderMarkdownEditorContent === 'function') {
             window.renderMarkdownEditorContent(editorDiv, newContent);
         } else {
@@ -418,9 +451,89 @@
         } else if (typeof window.switchToPreviewMode === 'function') {
             window.switchToPreviewMode(noteId);
         }
-
-        return true;
     }
+
+    // ------------------------------------------------------------------
+    // Undo of a deletion (Ctrl+Z)
+    // ------------------------------------------------------------------
+    // The delete button takes the block out behind the browser's undo stack
+    // (DOM removal in a rich-text note, source rewrite from the preview in a
+    // Markdown one), and the confirm dialog leaves the focus on <body>, where
+    // Ctrl+Z belongs to the tree history (js/tree-undo-clipboard.js). The last
+    // deletion is therefore kept here and put back on Ctrl+Z, as long as the
+    // note still reads exactly as the deletion left it: anything typed since
+    // has to be undone first, which keeps the steps in order.
+    var lastDeletion = null;
+
+    function rememberDomDeletion(noteEntry, position) {
+        if (!noteEntry || !position || !position.parent) {
+            lastDeletion = null;
+            return;
+        }
+
+        // Whitespace is left out: the line-number gutter re-syncs the other
+        // blocks after an input and may turn a <br> into a newline
+        var readText = function() {
+            return noteEntry.textContent.replace(/\s+/g, '');
+        };
+        var textAfter = readText();
+
+        lastDeletion = {
+            noteEntry: noteEntry,
+            isStillCurrent: function() {
+                return position.parent.isConnected && readText() === textAfter;
+            },
+            restore: function() {
+                var next = position.next && position.next.parentNode === position.parent ? position.next : null;
+                position.parent.insertBefore(position.block, next);
+
+                if (typeof window.markNoteAsModified === 'function') {
+                    window.markNoteAsModified();
+                }
+                noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+
+                if (position.block.scrollIntoView) {
+                    position.block.scrollIntoView({ block: 'nearest' });
+                }
+            }
+        };
+    }
+
+    function handleUndoShortcut(e) {
+        if (!lastDeletion || e.defaultPrevented) return;
+        if (!(e.ctrlKey || e.metaKey) || e.shiftKey || e.altKey) return;
+        if ((e.key || '').toLowerCase() !== 'z') return;
+
+        var target = e.target && e.target.closest ? e.target : null;
+        // A field or the Markdown source editor undoes its own text (the
+        // editor's history holds the rewrite, so it brings the block back)
+        if (target && target.closest('input, textarea, select, .markdown-editor')) return;
+        // Another note: leave its undo alone
+        var targetNote = target ? target.closest('.noteentry') : null;
+        if (targetNote && targetNote !== lastDeletion.noteEntry) return;
+
+        if (!lastDeletion.noteEntry.isConnected || !lastDeletion.isStillCurrent()) {
+            if (!lastDeletion.noteEntry.isConnected) lastDeletion = null;
+            return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        var deletion = lastDeletion;
+        lastDeletion = null;
+        deletion.restore();
+    }
+
+    // Capture phase: ahead of the browser's own undo and of the tree history
+    document.addEventListener('keydown', handleUndoShortcut, true);
+
+    // A click in the tree hands Ctrl+Z back to the tree history
+    document.addEventListener('mousedown', function(e) {
+        if (lastDeletion && e.target && e.target.closest && e.target.closest('#left_col')) {
+            lastDeletion = null;
+        }
+    }, true);
 
     function ensureCodeBlockActionHost(block) {
         block = getCodeBlockElement(block);
@@ -630,7 +743,7 @@
 
                     // --- Rich-text mode: remove the DOM block directly ---
                     var noteentry = block.closest('.noteentry') || document.querySelector('.noteentry');
-                    removeCodeBlockDom(block, btn, delBtn);
+                    rememberDomDeletion(noteentry, removeCodeBlockDom(block, btn, delBtn));
                     if (typeof window.markNoteAsModified === 'function') {
                         window.markNoteAsModified();
                     }
