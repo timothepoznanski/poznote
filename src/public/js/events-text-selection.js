@@ -140,8 +140,9 @@ function initTextSelectionHandlers() {
         return null;
     }
 
-    // Classify a markdown selection: 'task' | 'ul' | 'ol' when every
-    // non-empty selected line is that list type, null otherwise
+    // Classify a markdown selection: type is 'task' | 'ul' | 'ol' when every
+    // non-empty selected line is that list type, null otherwise. insideItemText
+    // is true when the selection stays within one item's text, after its marker
     function getMarkdownListSelectionType(editor, range) {
         var offsets = getSelectionOffsetsWithinMarkdownEditor(editor, range);
         if (!offsets) return null;
@@ -153,6 +154,8 @@ function initTextSelectionHandlers() {
         var lines = text.split('\n');
         var position = 0;
         var selectionType = null;
+        var selectedLineCount = 0;
+        var insideItemText = false;
 
         for (var i = 0; i < lines.length; i++) {
             var lineStart = position;
@@ -161,16 +164,20 @@ function initTextSelectionHandlers() {
             if (lineStart <= selectionEnd && lineEnd >= selectionStart) {
                 if (lines[i].trim() !== '') {
                     var lineType = null;
-                    if (/^\s*[-*+]\s+\[[ xX]\]/.test(lines[i])) {
+                    var marker = lines[i].match(/^\s*[-*+]\s+\[[ xX]\]\s*/);
+                    if (marker) {
                         lineType = 'task';
-                    } else if (/^\s*[-*+]\s+/.test(lines[i])) {
+                    } else if ((marker = lines[i].match(/^\s*[-*+]\s+/))) {
                         lineType = 'ul';
-                    } else if (/^\s*\d+(?:\.\d+)*\.\s+/.test(lines[i])) {
+                    } else if ((marker = lines[i].match(/^\s*\d+(?:\.\d+)*\.\s+/))) {
                         lineType = 'ol';
                     }
                     if (!lineType) return null;
                     if (selectionType && selectionType !== lineType) return null;
                     selectionType = lineType;
+                    selectedLineCount++;
+                    insideItemText = selectionStart >= lineStart + marker[0].length
+                        && selectionEnd <= lineEnd;
                 }
             }
 
@@ -178,7 +185,12 @@ function initTextSelectionHandlers() {
             position = lineEnd + 1;
         }
 
-        return selectionType;
+        if (!selectionType) return null;
+
+        return {
+            type: selectionType,
+            insideItemText: selectedLineCount === 1 && insideItemText
+        };
     }
 
     function isListSelectionAllowedButton(button, selectionType) {
@@ -610,16 +622,20 @@ function initTextSelectionHandlers() {
                     var listSelectionEditor = editableElement.closest
                         ? editableElement.closest('.markdown-editor')
                         : null;
-                    var listSelectionType = listSelectionEditor
+                    var listSelection = listSelectionEditor
                         ? getMarkdownListSelectionType(listSelectionEditor, range)
                         : null;
+                    var listSelectionType = listSelection ? listSelection.type : null;
+                    // Words picked inside one item get the full toolbar (#1420), whole
+                    // lines or several items get the list-only one
+                    var isListOnlySelection = !!listSelection && !listSelection.insideItemText;
                     for (var i = 0; i < textFormatButtons.length; i++) {
                         if (isPlainCodeSelection && isPlainCodeBlockedButton(textFormatButtons[i])) {
                             textFormatButtons[i].classList.remove('show-on-selection');
-                        } else if (listSelectionType && !isListSelectionAllowedButton(textFormatButtons[i], listSelectionType)) {
+                        } else if (isListOnlySelection && !isListSelectionAllowedButton(textFormatButtons[i], listSelectionType)) {
                             // List-only selection: keep just the list conversion/toggle buttons
                             textFormatButtons[i].classList.remove('show-on-selection');
-                        } else if (!listSelectionType && textFormatButtons[i].classList.contains('btn-task-remove')) {
+                        } else if (listSelectionType !== 'task' && textFormatButtons[i].classList.contains('btn-task-remove')) {
                             // Remove-checkboxes only makes sense on a checkbox selection
                             textFormatButtons[i].classList.remove('show-on-selection');
                         } else {
