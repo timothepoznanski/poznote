@@ -2397,7 +2397,10 @@
                 submenu: [
                     { id: 'h1', label: t('slash_menu.heading_1', null, 'Heading 1'), action: () => insertHeading(1) },
                     { id: 'h2', label: t('slash_menu.heading_2', null, 'Heading 2'), action: () => insertHeading(2) },
-                    { id: 'h3', label: t('slash_menu.heading_3', null, 'Heading 3'), action: () => insertHeading(3) }
+                    { id: 'h3', label: t('slash_menu.heading_3', null, 'Heading 3'), action: () => insertHeading(3) },
+                    { id: 'h4', label: t('slash_menu.heading_4', null, 'Heading 4'), action: () => insertHeading(4) },
+                    { id: 'h5', label: t('slash_menu.heading_5', null, 'Heading 5'), action: () => insertHeading(5) },
+                    { id: 'h6', label: t('slash_menu.heading_6', null, 'Heading 6'), action: () => insertHeading(6) }
                 ]
             },
             {
@@ -2745,7 +2748,10 @@
                 submenu: [
                     { id: 'h1', label: t('slash_menu.heading_1', null, 'Heading 1'), action: () => insertMarkdownPrefixAtLineStart('# ') },
                     { id: 'h2', label: t('slash_menu.heading_2', null, 'Heading 2'), action: () => insertMarkdownPrefixAtLineStart('## ') },
-                    { id: 'h3', label: t('slash_menu.heading_3', null, 'Heading 3'), action: () => insertMarkdownPrefixAtLineStart('### ') }
+                    { id: 'h3', label: t('slash_menu.heading_3', null, 'Heading 3'), action: () => insertMarkdownPrefixAtLineStart('### ') },
+                    { id: 'h4', label: t('slash_menu.heading_4', null, 'Heading 4'), action: () => insertMarkdownPrefixAtLineStart('#### ') },
+                    { id: 'h5', label: t('slash_menu.heading_5', null, 'Heading 5'), action: () => insertMarkdownPrefixAtLineStart('##### ') },
+                    { id: 'h6', label: t('slash_menu.heading_6', null, 'Heading 6'), action: () => insertMarkdownPrefixAtLineStart('###### ') }
                 ]
             },
             {
@@ -3178,7 +3184,10 @@
                     { id: 'normal', label: t('slash_menu.back_to_normal', null, 'Back to normal text'), action: () => applyBlockStyle('normal') },
                     { id: 'h1', label: t('slash_menu.heading_1', null, 'Heading 1'), action: () => applyBlockStyle('1') },
                     { id: 'h2', label: t('slash_menu.heading_2', null, 'Heading 2'), action: () => applyBlockStyle('2') },
-                    { id: 'h3', label: t('slash_menu.heading_3', null, 'Heading 3'), action: () => applyBlockStyle('3') }
+                    { id: 'h3', label: t('slash_menu.heading_3', null, 'Heading 3'), action: () => applyBlockStyle('3') },
+                    { id: 'h4', label: t('slash_menu.heading_4', null, 'Heading 4'), action: () => applyBlockStyle('4') },
+                    { id: 'h5', label: t('slash_menu.heading_5', null, 'Heading 5'), action: () => applyBlockStyle('5') },
+                    { id: 'h6', label: t('slash_menu.heading_6', null, 'Heading 6'), action: () => applyBlockStyle('6') }
                 ]
             },
             {

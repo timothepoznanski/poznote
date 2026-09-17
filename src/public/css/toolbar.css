@@ -202,6 +202,21 @@
     font-weight: var(--pz-weight-bold);
 }
 
+.font-size-popup .style-h4 {
+    font-size: 0.95rem;
+    font-weight: var(--pz-weight-bold);
+}
+
+.font-size-popup .style-h5 {
+    font-size: 0.85rem;
+    font-weight: var(--pz-weight-bold);
+}
+
+.font-size-popup .style-h6 {
+    font-size: 0.78rem;
+    font-weight: var(--pz-weight-bold);
+}
+
 .btn-attachment.has-attachments i {
     /* adjust icon tint to match the blue color */
     filter: none !important;

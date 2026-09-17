@@ -222,10 +222,12 @@ textarea:focus {
     margin: 1em 0;
 }
 
+/* margin !important: base.css resets every h4 margin to 0 !important for the
+   note title heading, which would otherwise flatten H4 blocks inside a note */
 .noteentry h4 {
     font-size: 1em !important;
     font-weight: var(--pz-weight-bold);
-    margin: 1.33em 0;
+    margin: 1.33em 0 !important;
 }
 
 .noteentry h5 {

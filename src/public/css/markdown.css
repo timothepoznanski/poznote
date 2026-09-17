@@ -313,10 +313,11 @@ body.slash-menu-cursor-hidden * {
     margin: 0.83em 0;
 }
 
+/* margin !important: see the note title h4 reset in base.css */
 .markdown-preview h4 {
     font-size: 1em;
     font-weight: var(--pz-weight-bold);
-    margin: 1em 0;
+    margin: 1em 0 !important;
 }
 
 .markdown-preview h5 {
