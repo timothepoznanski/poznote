@@ -887,13 +887,16 @@ html[data-theme='dark'] .katex {
     padding: 0 !important;
 }
 
-/* Hide overflow on parent containers when in split mode */
+/* Hide overflow on parent containers when in split mode. clip, not hidden:
+   a hidden box is still a scroll container, so the editor caret scrolled
+   #right_col by the note's bottom margin, and the sticky toolbar (whose
+   scrollport became .innernote) rose with it toward the tab bar. */
 .innernote:has(.noteentry.markdown-split-mode) {
-    overflow: hidden !important;
+    overflow: clip !important;
 }
 
 #right_col:has(.noteentry.markdown-split-mode) {
-    overflow: hidden !important;
+    overflow: clip !important;
 }
 
 /* Split mode splits the note column between the editor and the preview, so the
