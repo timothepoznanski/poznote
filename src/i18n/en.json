@@ -2584,9 +2584,6 @@
       "empty": "No notes",
       "open": "Open this account",
       "view_here": "Show in a tab, without switching account"
-    },
-    "accounts": {
-      "active": "Active"
     }
   },
   "home": {

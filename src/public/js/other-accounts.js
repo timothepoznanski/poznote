@@ -8,8 +8,9 @@
  * (the eye at the end of its row reads it here instead, without switching);
  * the arrow next to the account name switches without choosing a note. Both
  * go through window.poznoteSwitchAccount (js/profile.js), which posts to
- * switch_account.php. Account rows, workspace headings and folders only fold
- * and unfold.
+ * switch_account.php. The button before the arrow expands or collapses every
+ * folder of the outline. Account rows, workspace headings and folders only
+ * fold and unfold.
  *
  * The active account gets the same row above its own tree, which the chevron
  * folds as a whole (#currentAccountTree).
@@ -233,6 +234,7 @@
             var open = children.hidden;
             show(open);
             rememberFolderIn(accountId, folder.id, open);
+            syncFoldersButton(header.closest('.other-account'));
         });
 
         return wrap;
@@ -275,38 +277,39 @@
             return;
         }
 
-        var several = workspaces.length > 1;
         workspaces.forEach(function (ws) {
             if ((ws.folders || []).length + (ws.notes || []).length === 0) return;
             var section = document.createElement('div');
             section.className = 'other-account-workspace';
             var body = document.createElement('div');
-            body.className = several ? 'other-account-children' : 'other-account-root';
+            body.className = 'other-account-children';
             renderInto(body, accountId, ws);
-            if (several) {
-                // A workspace heading folds and unfolds its content, like an
-                // account row or a folder; it does not switch. Opening the
-                // account in a given workspace is the workspace menu's job
-                // (js/workspaces-core.js). Unfolded unless it was folded.
-                var heading = row('other-account-row-workspace', 'lucide-layers', ws.name);
-                var chevron = icon('lucide-chevron-right');
-                chevron.classList.add('other-account-workspace-chevron');
-                heading.appendChild(chevron);
-                var showWorkspace = function (open) {
-                    body.hidden = !open;
-                    heading.setAttribute('aria-expanded', open ? 'true' : 'false');
-                };
-                showWorkspace(!isWorkspaceFoldedIn(accountId, ws.name));
-                heading.addEventListener('click', function () {
-                    var open = body.hidden;
-                    showWorkspace(open);
-                    rememberWorkspaceIn(accountId, ws.name, open);
-                });
-                section.appendChild(heading);
-            }
+            // Every workspace gets its heading, a lone one included, so the
+            // reader always sees which workspace the notes come from. It
+            // folds and unfolds its content, like an account row or a folder;
+            // it does not switch. Opening the account in a given workspace is
+            // the workspace menu's job (js/workspaces-core.js). Unfolded
+            // unless it was folded.
+            var heading = row('other-account-row-workspace', 'lucide-layers', ws.name);
+            var chevron = icon('lucide-chevron-right');
+            chevron.classList.add('other-account-workspace-chevron');
+            heading.appendChild(chevron);
+            var showWorkspace = function (open) {
+                body.hidden = !open;
+                heading.setAttribute('aria-expanded', open ? 'true' : 'false');
+            };
+            showWorkspace(!isWorkspaceFoldedIn(accountId, ws.name));
+            heading.addEventListener('click', function () {
+                var open = body.hidden;
+                showWorkspace(open);
+                rememberWorkspaceIn(accountId, ws.name, open);
+                syncFoldersButton(heading.closest('.other-account'));
+            });
+            section.appendChild(heading);
             section.appendChild(body);
             container.appendChild(section);
         });
+        syncFoldersButton(container.closest('.other-account'));
     }
 
     // Outlines already fetched on this page, by account id. The notes list is
@@ -314,6 +317,76 @@
     // (refreshNotesListAfterFolderAction in js/share.js), which would
     // otherwise refetch and flash "Loading..." in every unfolded block.
     var outlines = {};
+
+    // ========== Expand / collapse all folders of an outline ==========
+
+    function outlineFolderIds(nodes, ids) {
+        (nodes || []).forEach(function (node) {
+            (node.folders || []).forEach(function (folder) {
+                ids.push(folder.id);
+                outlineFolderIds([folder], ids);
+            });
+        });
+        return ids;
+    }
+
+    function shownWorkspaceNames(workspaces) {
+        return workspaces.filter(function (ws) {
+            return (ws.folders || []).length + (ws.notes || []).length > 0;
+        }).map(function (ws) { return ws.name; });
+    }
+
+    // Expand while anything is still folded (a folder, or a workspace heading
+    // hiding its folders), collapse once everything is open: the rule of the
+    // active tree's button (getShouldExpandAllFolders, js/utils-folder-tree.js).
+    function shouldExpandAllIn(accountId) {
+        var workspaces = outlines[accountId];
+        if (!workspaces) return true;
+        var folded = outlineFolderIds(workspaces, []).some(function (id) {
+            return !isFolderOpenIn(accountId, id);
+        });
+        return folded || shownWorkspaceNames(workspaces).some(function (name) {
+            return isWorkspaceFoldedIn(accountId, name);
+        });
+    }
+
+    function syncFoldersButton(block) {
+        var button = block && block.querySelector('[data-other-account="folders"]');
+        if (!button) return;
+        var expand = shouldExpandAllIn(block.getAttribute('data-account-id'));
+        var label = expand
+            ? tr('sidebar.expand_all_folders', null, 'Expand all folders')
+            : tr('sidebar.collapse_all_folders', null, 'Collapse all folders');
+        button.title = label;
+        button.setAttribute('aria-label', label);
+        var glyph = button.querySelector('.lucide');
+        if (glyph) {
+            glyph.classList.toggle('lucide-chevrons-up-down', expand);
+            glyph.classList.toggle('lucide-chevrons-down-up', !expand);
+        }
+    }
+
+    // Expanding also unfolds the workspace headings, or the opened folders
+    // would stay out of sight; collapsing leaves the headings as they are.
+    function toggleAllFoldersIn(block) {
+        var accountId = block.getAttribute('data-account-id');
+        var workspaces = outlines[accountId];
+        var tree = block.querySelector('.other-account-tree');
+        if (!workspaces || !tree) return;
+
+        var expand = shouldExpandAllIn(accountId);
+        var states = readAccountFolders(accountId);
+        outlineFolderIds(workspaces, []).forEach(function (id) {
+            states['folder-' + id] = expand ? 'open' : 'closed';
+        });
+        writeAccountFolders(accountId, states);
+        if (expand) {
+            shownWorkspaceNames(workspaces).forEach(function (name) {
+                rememberWorkspaceIn(accountId, name, true);
+            });
+        }
+        renderTree(tree, accountId, workspaces);
+    }
 
     function load(block) {
         var tree = block.querySelector('.other-account-tree');
@@ -418,6 +491,10 @@
             if (control.getAttribute('data-other-account') === 'open') {
                 control.disabled = true;
                 switchTo(block.getAttribute('data-account-id'));
+                return;
+            }
+            if (control.getAttribute('data-other-account') === 'folders') {
+                toggleAllFoldersIn(block);
                 return;
             }
             var isOpen = control.getAttribute('aria-expanded') === 'true';
