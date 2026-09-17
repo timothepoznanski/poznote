@@ -2582,7 +2582,11 @@
       "title": "Other accounts",
       "error": "Could not load the notes of this account",
       "empty": "No notes",
-      "open": "Open this account"
+      "open": "Open this account",
+      "view_here": "Show in a tab, without switching account"
+    },
+    "accounts": {
+      "active": "Active"
     }
   },
   "home": {
@@ -2616,7 +2620,8 @@
       "select_type": "Please select at least one search option (Notes or Tags)",
       "single_letter_warning": "Searching with single-letter words can return too many results. Try using longer words for a more precise search.",
       "invalid_date_range": "The start date must be before or equal to the end date."
-    }
+    },
+    "placeholder_account": "Search in {{account}}..."
   },
   "icon_names": {
     "briefcase": "briefcase",
@@ -4674,5 +4679,10 @@
   },
   "icon_context_menu": {
     "hide": "Hide button"
+  },
+  "account_note": {
+    "banner": "Note from the account {{account}}, read-only",
+    "open_to_edit": "Open to edit",
+    "not_found": "This note is no longer available."
   }
 }

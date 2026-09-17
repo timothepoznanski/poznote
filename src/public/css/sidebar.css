@@ -264,19 +264,21 @@
 /* "Other accounts" block at the bottom of the notes list (notes_list.php,
    js/other-accounts.js): one collapsible block per account this login can
    open besides the active one, its tree fetched on first expansion and shown
-   read-only. Every account, the active one included, has the same row above
-   its tree, so the rows themselves separate the accounts: no rule between
-   them, only the surface tint on the foreign ones. Tokens only, so the dark
-   and named themes need no twin rules. */
+   read-only. A light rule sets each account apart from the one above it,
+   with the same room over and under the line (18px to the nearest text, the
+   rows bring part of it). No tint behind the block: the column already has the surface colour,
+   so it never showed in light, and dark and black were asked without it.
+   Tokens only, so the dark and named themes need no twin rules. */
 .other-accounts {
-    margin: 6px 0 10px;
-    padding: 4px 0 6px;
-    border-radius: var(--pz-radius-lg);
-    background: var(--pz-surface);
+    margin: 15px 0 10px;
+    padding: 11px 0 6px;
+    border-top: 1px solid var(--pz-border);
 }
 
 .other-account + .other-account {
-    margin-top: 2px;
+    margin-top: 9px;
+    padding-top: 11px;
+    border-top: 1px solid var(--pz-border);
 }
 
 .other-account-header {
@@ -294,6 +296,13 @@
 
 .current-account-header.current-account-collapsed .other-account-chevron {
     transform: none;
+}
+
+/* A folded account shows no folder to expand or collapse: its "Expand all
+   folders" button goes with the tree (the class is set by
+   js/other-accounts.js). */
+.current-account-header.current-account-collapsed .sidebar-folder-toggle {
+    display: none;
 }
 
 /* "Expand all folders" at the end of the active account's row (index.php
@@ -390,9 +399,32 @@
     color: var(--pz-text-muted);
 }
 
-/* The account icon takes the accent, like the folder icons of the tree. */
-.other-account-toggle .lucide-user {
+/* The active account heads the list and carries its own marks: accent icon,
+   full-weight name and the "Active" pill. The others step back: muted icon and name,
+   regular weight, back to the text colour once unfolded. */
+.current-account-header .other-account-toggle .lucide-user {
     color: var(--pz-accent);
+}
+
+.account-active-badge {
+    flex: 0 0 auto;
+    padding: 1px 6px;
+    border-radius: var(--pz-radius-pill);
+    font-size: 10px;
+    font-weight: var(--pz-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: rgba(var(--pz-accent-rgb), 0.14);
+    color: var(--pz-accent);
+}
+
+.other-accounts .other-account-name {
+    color: var(--pz-text-muted);
+    font-weight: var(--pz-weight-normal);
+}
+
+.other-accounts .other-account-expanded .other-account-name {
+    color: var(--pz-text);
 }
 
 .other-account-chevron {
@@ -422,8 +454,34 @@
     font-weight: var(--pz-weight-semibold);
 }
 
+/* Note rows in other-account trees remain simple buttons without a read-only
+   preview action. */
+.other-account-note {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    border-radius: var(--pz-radius);
+}
+
+.other-account-note .other-account-row {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+}
+
 .other-account-row-workspace {
     color: var(--pz-text-muted);
+}
+
+/* Fold mark of a workspace heading, after its name. */
+.other-account-row .other-account-workspace-chevron {
+    width: 12px;
+    height: 12px;
+    transition: transform 0.15s ease;
+}
+
+.other-account-row-workspace[aria-expanded='true'] .other-account-workspace-chevron {
+    transform: rotate(90deg);
 }
 
 .other-account-children {

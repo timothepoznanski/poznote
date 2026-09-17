@@ -645,6 +645,9 @@ if ($isPublicWorkspaceReadonly) {
         }
         $isPlainTree = empty($search) && empty($tags_search) && empty($created_from) && empty($created_to) && empty($folder_filter);
         if ($isPlainTree && function_exists('getSwitchableAccountProfiles')) {
+            // The active account heads the list, the others follow in one
+            // order (the login's own first, then by name, see
+            // getUserAccessibleProfiles()).
             $activeAccountId = (int)(getCurrentUserId() ?? 0);
             foreach (getSwitchableAccountProfiles() as $accountProfile) {
                 if ((int)$accountProfile['id'] !== $activeAccountId) {

@@ -877,7 +877,11 @@
       "title": "Andere Konten",
       "error": "Die Notizen dieses Kontos konnten nicht geladen werden",
       "empty": "Keine Notizen",
-      "open": "Dieses Konto öffnen"
+      "open": "Dieses Konto öffnen",
+      "view_here": "In einem Tab anzeigen, ohne das Konto zu wechseln"
+    },
+    "accounts": {
+      "active": "Aktiv"
     }
   },
   "home": {
@@ -911,7 +915,8 @@
       "select_type": "Bitte wählen Sie mindestens eine Suchoption aus (Notizen oder Tags)",
       "single_letter_warning": "Suche nach einzelnen Buchstaben kann zu viele Ergebnisse zurückgeben. Versuchen Sie längere Wörter für eine präzisere Suche.",
       "invalid_date_range": "Das Startdatum muss vor oder am Enddatum liegen."
-    }
+    },
+    "placeholder_account": "In {{account}} suchen..."
   },
   "autosave": {
     "confirm_switch": "⚠️ Ungespeicherte Änderungen erkannt\n\nSie haben ungespeicherte Änderungen, die verloren gehen, wenn Sie jetzt wechseln.\n\nKlicken Sie auf OK, um zu speichern und fortzufahren, oder Abbrechen, um zu bleiben.\n(Auto-Speicherung erfolgt 2 Sekunden nachdem Sie aufgehört haben zu tippen)",
@@ -4854,5 +4859,10 @@
   },
   "icon_context_menu": {
     "hide": "Schaltfläche ausblenden"
+  },
+  "account_note": {
+    "banner": "Notiz aus dem Konto {{account}}, schreibgeschützt",
+    "open_to_edit": "Zum Bearbeiten öffnen",
+    "not_found": "Diese Notiz ist nicht mehr verfügbar."
   }
 }

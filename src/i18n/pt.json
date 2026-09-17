@@ -877,7 +877,11 @@
       "title": "Outras contas",
       "error": "Não foi possível carregar as notas desta conta",
       "empty": "Sem notas",
-      "open": "Abrir esta conta"
+      "open": "Abrir esta conta",
+      "view_here": "Mostrar num separador, sem mudar de conta"
+    },
+    "accounts": {
+      "active": "Ativa"
     }
   },
   "home": {
@@ -911,7 +915,8 @@
       "select_type": "Por favor, selecione pelo menos uma opção de busca (Notas ou Etiquetas)",
       "single_letter_warning": "Buscar com palavras de uma única letra pode retornar muitos resultados. Tente usar palavras mais longas para uma busca mais precisa.",
       "invalid_date_range": "A data de início deve ser anterior ou igual à data de fim."
-    }
+    },
+    "placeholder_account": "Pesquisar em {{account}}..."
   },
   "autosave": {
     "confirm_switch": "⚠️ Alterações Não Salvas Detectadas\n\nVocê tem alterações não salvas que serão perdidas se continuar agora.\n\nClique em OK para salvar e continuar, ou Cancelar para ficar.\n(Auto-salvamento ocorre 2 segundos após você parar de digitar)",
@@ -4855,5 +4860,10 @@
   },
   "icon_context_menu": {
     "hide": "Ocultar o botão"
+  },
+  "account_note": {
+    "banner": "Nota da conta {{account}}, só de leitura",
+    "open_to_edit": "Abrir para editar",
+    "not_found": "Esta nota já não está disponível."
   }
 }

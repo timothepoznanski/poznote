@@ -81,6 +81,16 @@
         window.location.replace(window.location.pathname);
     }
 
+    // This page is the one switching (js/profile.js): its last calls may
+    // reach the server after the switch and come back 409, and reloading
+    // then would cancel the navigation into the other account, landing note
+    // included.
+    // Not for ever: the person may decline to leave (unsaved changes prompt).
+    window.poznoteAccountSwitchStarted = function () {
+        reloadingForAccount = true;
+        setTimeout(function () { reloadingForAccount = false; }, 10000);
+    };
+
     function checkAccountCookie() {
         if (!pageAccount) {
             return;
@@ -92,7 +102,10 @@
     }
 
     window.addEventListener('pageshow', function (e) {
-        if (e && e.persisted) checkAccountCookie();
+        if (e && e.persisted) {
+            reloadingForAccount = false;
+            checkAccountCookie();
+        }
     });
     document.addEventListener('visibilitychange', function () {
         if (document.visibilityState === 'visible') checkAccountCookie();

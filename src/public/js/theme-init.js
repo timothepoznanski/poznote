@@ -95,6 +95,30 @@ window.__poznoteThemeStorage = window.__poznoteThemeStorage || (function () {
     };
 })();
 
+// The ACTIVE account when it is not the login's own, i.e. an account opened
+// through the access granted in Admin > User Management (poznote_account is
+// set by auth.php with the response that rendered this page). Note ids and
+// workspace names repeat from one account to the next, so what this browser
+// keeps under them (drafts, open tabs) is kept apart for such an account:
+// a draft of note 5 here must never be offered in the other account's note 5.
+// The login's own account keeps the historical keys, nothing to migrate.
+window.__poznoteBorrowedAccountId = (function () {
+    try {
+        var match = document.cookie.match(/(?:^|;\s*)poznote_account=(\d+)/);
+        var account = match ? match[1] : '';
+        return account && window.__poznoteUserId && account !== window.__poznoteUserId ? account : '';
+    } catch (e) {
+        return '';
+    }
+})();
+
+// The part of a storage key that names a note: 'poznote_draft_' + this.
+window.__poznoteNoteStorageId = function (noteId) {
+    return window.__poznoteBorrowedAccountId
+        ? 'a' + window.__poznoteBorrowedAccountId + '_' + noteId
+        : String(noteId);
+};
+
 // Open tabs are stored per user and per workspace. Unlike the display
 // preferences above there is no migration from the legacy shared key: adopting
 // the tabs of whoever used the browser before is exactly the leak this scoping
@@ -102,6 +126,7 @@ window.__poznoteThemeStorage = window.__poznoteThemeStorage || (function () {
 // the legacy key are dropped once so they cannot resurface later.
 window.__poznoteTabsStorageKey = function (workspace) {
     var key = 'poznote_tabs_' + (workspace || 'default');
+    if (window.__poznoteBorrowedAccountId) key += '::a' + window.__poznoteBorrowedAccountId;
     return window.__poznoteUserId ? key + '::u' + window.__poznoteUserId : key;
 };
 

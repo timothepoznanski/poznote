@@ -1,14 +1,15 @@
 /**
- * "Other accounts" block at the bottom of the notes list (notes_list.php).
+ * Rows of the other accounts in the notes list (notes_list.php).
  *
  * One collapsible block per account the signed-in person can open besides
- * the active one. Expanding a block fetches that account's outline from
+ * the active one, listed under its tree. Expanding a block fetches that account's outline from
  * account_tree.php (workspaces, folders, live notes, no content) and renders
- * it read-only. Clicking a note switches to that account and opens the note;
- * the arrow next to the account name switches without choosing a note, and a
- * workspace heading opens the account in that workspace. All go through
- * window.poznoteSwitchAccount (js/profile.js), which posts to
- * switch_account.php.
+ * it read-only. Clicking a note switches to that account and opens the note
+ * (the eye at the end of its row reads it here instead, without switching);
+ * the arrow next to the account name switches without choosing a note. Both
+ * go through window.poznoteSwitchAccount (js/profile.js), which posts to
+ * switch_account.php. Account rows, workspace headings and folders only fold
+ * and unfold.
  *
  * The active account gets the same row above its own tree, which the chevron
  * folds as a whole (#currentAccountTree).
@@ -40,6 +41,7 @@
     var FOLDER_PREFIX = 'folder_';
     var FOLDER_OWNER_KEY = 'pz_folder_states_account';
     var ACCOUNT_FOLDERS_PREFIX = 'pz_account_folder_states:';
+    var ACCOUNT_WORKSPACES_PREFIX = 'pz_account_workspace_states:';
 
     var tr = function (key, vars, fallback) {
         if (typeof window.t === 'function') return window.t(key, vars, fallback);
@@ -147,6 +149,23 @@
         writeAccountFolders(accountId, states);
     }
 
+    // Workspace headings of an outline: only the folded ones are recorded.
+    // A map of their own: the folder map above is copied into the main tree's
+    // folder_* keys when its account becomes active.
+    function isWorkspaceFoldedIn(accountId, name) {
+        return readJson(localStorage, ACCOUNT_WORKSPACES_PREFIX + accountId, {})[name] === 'closed';
+    }
+
+    function rememberWorkspaceIn(accountId, name, open) {
+        var states = readJson(localStorage, ACCOUNT_WORKSPACES_PREFIX + accountId, {});
+        if (open) {
+            delete states[name];
+        } else {
+            states[name] = 'closed';
+        }
+        writeJson(localStorage, ACCOUNT_WORKSPACES_PREFIX + accountId, states);
+    }
+
     // Runs while the deferred bundle executes, before any DOMContentLoaded
     // handler restores the tree from the unscoped keys.
     (function () {
@@ -219,13 +238,21 @@
         return wrap;
     }
 
+    // Clicking the row switches to the account and opens the note there. The
+    // eye at its end, shown on hover, reads the note HERE instead, in a tab of
+    // the active account, without switching (js/account-note-view.js).
     function renderNote(accountId, note) {
         var title = note.title || tr('index.note.new_note', {}, 'New note');
+        var wrap = document.createElement('div');
+        wrap.className = 'other-account-note';
+
         var btn = row('other-account-row-note', note.type === 'tasklist' ? 'lucide-check-square' : 'lucide-file-alt', title);
         btn.addEventListener('click', function () {
             switchTo(accountId, { note: note.id });
         });
-        return btn;
+        wrap.appendChild(btn);
+
+        return wrap;
     }
 
     function renderInto(container, accountId, node) {
@@ -253,17 +280,30 @@
             if ((ws.folders || []).length + (ws.notes || []).length === 0) return;
             var section = document.createElement('div');
             section.className = 'other-account-workspace';
-            if (several) {
-                // A workspace heading opens the account in that workspace.
-                var heading = row('other-account-row-workspace', 'lucide-layers', ws.name, tr('sidebar.other_accounts.open', {}, 'Open this account'));
-                heading.addEventListener('click', function () {
-                    switchTo(accountId, { workspace: ws.name });
-                });
-                section.appendChild(heading);
-            }
             var body = document.createElement('div');
             body.className = several ? 'other-account-children' : 'other-account-root';
             renderInto(body, accountId, ws);
+            if (several) {
+                // A workspace heading folds and unfolds its content, like an
+                // account row or a folder; it does not switch. Opening the
+                // account in a given workspace is the workspace menu's job
+                // (js/workspaces-core.js). Unfolded unless it was folded.
+                var heading = row('other-account-row-workspace', 'lucide-layers', ws.name);
+                var chevron = icon('lucide-chevron-right');
+                chevron.classList.add('other-account-workspace-chevron');
+                heading.appendChild(chevron);
+                var showWorkspace = function (open) {
+                    body.hidden = !open;
+                    heading.setAttribute('aria-expanded', open ? 'true' : 'false');
+                };
+                showWorkspace(!isWorkspaceFoldedIn(accountId, ws.name));
+                heading.addEventListener('click', function () {
+                    var open = body.hidden;
+                    showWorkspace(open);
+                    rememberWorkspaceIn(accountId, ws.name, open);
+                });
+                section.appendChild(heading);
+            }
             section.appendChild(body);
             container.appendChild(section);
         });
@@ -356,9 +396,10 @@
     function init() {
         initCurrentAccount();
 
-        var root = document.getElementById('otherAccounts');
-        if (!root) return;
+        document.querySelectorAll('.other-accounts').forEach(initOtherAccounts);
+    }
 
+    function initOtherAccounts(root) {
         root.querySelectorAll('.other-account').forEach(function (block) {
             var accountId = block.getAttribute('data-account-id');
             var state = readRowState(accountId);

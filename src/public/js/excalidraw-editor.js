@@ -5,6 +5,13 @@
 (function() {
     'use strict';
 
+    // Per-account part of a note's localStorage keys, see js/theme-init.js.
+    function noteStorageId(noteId) {
+        return typeof window.__poznoteNoteStorageId === 'function'
+            ? window.__poznoteNoteStorageId(noteId)
+            : String(noteId);
+    }
+
     // Name the window so the "Browse libraries" link targets it: the external
     // library site returns the chosen library by navigating this window to
     // <same url>#addLibrary=..., which the Excalidraw bundle picks up live.
@@ -509,9 +516,9 @@
                     
                     // Clear localStorage draft to prevent auto-restore from overriding the saved diagram
                     try {
-                        localStorage.removeItem('poznote_draft_' + noteId);
-                        localStorage.removeItem('poznote_title_' + noteId);
-                        localStorage.removeItem('poznote_tags_' + noteId);
+                        localStorage.removeItem('poznote_draft_' + noteStorageId(noteId));
+                        localStorage.removeItem('poznote_title_' + noteStorageId(noteId));
+                        localStorage.removeItem('poznote_tags_' + noteStorageId(noteId));
                     } catch (err) {
                         // Ignore
                         console.debug('excalidraw-editor: now() failed:', err);
@@ -579,9 +586,9 @@
                     
                     // Clear localStorage draft to prevent auto-restore from overriding the saved diagram
                     try {
-                        localStorage.removeItem('poznote_draft_' + noteId);
-                        localStorage.removeItem('poznote_title_' + noteId);
-                        localStorage.removeItem('poznote_tags_' + noteId);
+                        localStorage.removeItem('poznote_draft_' + noteStorageId(noteId));
+                        localStorage.removeItem('poznote_title_' + noteStorageId(noteId));
+                        localStorage.removeItem('poznote_tags_' + noteStorageId(noteId));
                     } catch (err) {
                         // Ignore
                         console.debug('excalidraw-editor: now() failed:', err);

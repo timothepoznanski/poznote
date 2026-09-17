@@ -877,7 +877,11 @@
       "title": "Autres comptes",
       "error": "Impossible de charger les notes de ce compte",
       "empty": "Aucune note",
-      "open": "Ouvrir ce compte"
+      "open": "Ouvrir ce compte",
+      "view_here": "Afficher dans un onglet, sans changer de compte"
+    },
+    "accounts": {
+      "active": "Actif"
     }
   },
   "home": {
@@ -911,7 +915,8 @@
       "select_type": "Veuillez sélectionner au moins une option de recherche (Notes ou Tags)",
       "single_letter_warning": "La recherche avec des mots d’une seule lettre peut retourner trop de résultats. Essayez d’utiliser des mots plus longs pour une recherche plus précise.",
       "invalid_date_range": "La date de début doit être antérieure ou égale à la date de fin."
-    }
+    },
+    "placeholder_account": "Rechercher dans {{account}}..."
   },
   "autosave": {
     "confirm_switch": "⚠️ Modifications non enregistrées\n\nVous avez des modifications non enregistrées qui seront perdues si vous changez maintenant.\n\nCliquez sur OK pour enregistrer et continuer, ou Annuler pour rester.\n(L’enregistrement automatique se déclenche 2 secondes après avoir arrêté de saisir)",
@@ -4959,5 +4964,10 @@
   },
   "icon_context_menu": {
     "hide": "Masquer le bouton"
+  },
+  "account_note": {
+    "banner": "Note du compte {{account}}, en lecture seule",
+    "open_to_edit": "Ouvrir pour modifier",
+    "not_found": "Cette note n'est plus disponible."
   }
 }

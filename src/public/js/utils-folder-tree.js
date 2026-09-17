@@ -78,11 +78,11 @@ function saveFolderName() {
         });
 }
 
+// Every folder of the tree, the Favorites section included: it folds like any
+// other folder, so "Collapse all folders" folds it too (it used to be skipped
+// and stayed open over a fully collapsed tree).
 function getFolderContentElements() {
-    return Array.prototype.slice.call(document.querySelectorAll('#left_col .folder-content[id]')).filter(function (content) {
-        var folderHeader = content.closest('.folder-header');
-        return !folderHeader || folderHeader.getAttribute('data-folder') !== 'Favorites';
-    });
+    return Array.prototype.slice.call(document.querySelectorAll('#left_col .folder-content[id]'));
 }
 
 function isFolderContentOpen(content) {

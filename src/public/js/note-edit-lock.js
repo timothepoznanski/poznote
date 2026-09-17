@@ -646,13 +646,16 @@
         }, intervalMs || STATUS_CHECK_INTERVAL_MS);
     }
 
+    // Both return a promise settled once the server answered (never
+    // rejected), for the rare caller that has to wait: an account switch
+    // must not overtake the release (js/profile.js).
     function releaseLock(noteId) {
         noteId = normalizeNoteId(noteId);
         if (!noteId || isReadonlyWorkspace()) {
-            return;
+            return Promise.resolve(null);
         }
 
-        postJson('/api/v1/notes/' + encodeURIComponent(noteId) + '/lock/release', {
+        return postJson('/api/v1/notes/' + encodeURIComponent(noteId) + '/lock/release', {
             editor_session_id: getEditorSessionId()
         }, true).catch(function () {
             return null;
@@ -662,14 +665,15 @@
     function releaseCurrentLock() {
         var noteId = normalizeNoteId(activeNoteId);
         if (!noteId) {
-            return;
+            return Promise.resolve(null);
         }
 
         stopHeartbeat();
         stopStatusChecks();
-        releaseLock(noteId);
+        var released = releaseLock(noteId);
         activeNoteId = null;
         delete noteStates[noteId];
+        return released;
     }
 
     function handleLockConflict(noteId, lock, message, reason) {

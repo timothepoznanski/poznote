@@ -75,6 +75,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/live-refresh.js',
         'js/date-time-format.js',
         'js/attachments.js',
+        'js/attachment-adoption.js',
         'js/note-attachment-menu.js',
         'js/tags-modal.js',
         'js/events-utils.js',

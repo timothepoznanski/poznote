@@ -77,3 +77,32 @@ test('hand-ordered folders come first, then names case-insensitively', function 
     assertSame(['First', 'Pinned', 'Alpha', 'zeta'], array_column($tree[0]['folders'], 'name'));
     assertSame(['A', 'b'], array_column($tree[0]['notes'], 'title'));
 });
+
+test('notes follow the account sort setting, and a folder its own', function () {
+    $folders = [
+        ['id' => 1, 'name' => 'Own sort', 'parent_id' => null, 'workspace' => 'W', 'sort_setting' => 'alphabet'],
+        ['id' => 2, 'name' => 'Default', 'parent_id' => null, 'workspace' => 'W', 'sort_setting' => ''],
+    ];
+    $notes = [];
+    foreach ([1, 2, 0] as $folderId) {
+        foreach ([['b', '2026-01-01', '2026-03-01', 0], ['a', '2026-02-01', '2026-01-01', 2], ['c', '2026-03-01', '2026-02-01', 1]] as $i => [$title, $created, $updated, $order]) {
+            $notes[] = ['id' => $folderId * 10 + $i + 1, 'heading' => $title, 'folder_id' => $folderId ?: null, 'workspace' => 'W',
+                'created' => $created, 'updated' => $updated, 'display_order' => $order];
+        }
+    }
+    $titles = static function (array $tree): array {
+        return [
+            array_column($tree[0]['folders'][1]['notes'], 'title'),
+            array_column($tree[0]['folders'][0]['notes'], 'title'),
+            array_column($tree[0]['notes'], 'title'),
+        ];
+    };
+
+    // [own-sort folder, default folder, root]
+    assertSame([['a', 'b', 'c'], ['b', 'c', 'a'], ['b', 'c', 'a']], $titles(poznoteBuildAccountTree([['name' => 'W']], $folders, $notes, 'updated_desc')));
+    assertSame([['a', 'b', 'c'], ['c', 'a', 'b'], ['c', 'a', 'b']], $titles(poznoteBuildAccountTree([['name' => 'W']], $folders, $notes, 'created_desc')));
+    // manual: unplaced (order 0) first, then the saved positions
+    assertSame([['a', 'b', 'c'], ['b', 'c', 'a'], ['b', 'c', 'a']], $titles(poznoteBuildAccountTree([['name' => 'W']], $folders, $notes, 'manual')));
+    // sort keys never leave the builder
+    assertSame(['id', 'title', 'type'], array_keys(poznoteBuildAccountTree([['name' => 'W']], $folders, $notes, 'manual')[0]['notes'][0]));
+});

@@ -116,7 +116,8 @@
     }
 
     function _getTabType(tab) {
-        return tab && tab.type === 'kanban' ? 'kanban' : 'note';
+        if (tab && tab.type === 'kanban') return 'kanban';
+        return 'note';
     }
 
     function _isNoteTab(tab) {
@@ -1261,6 +1262,9 @@
         _loadKanbanTab(newTab);
     }
 
+    /**
+     * Opens, or comes back to, the read-only view of a note of another account.
+     */
     /**
      * Called when a tab is clicked.
      * Sets _pendingTabSwitch so _onNoteLoaded knows not to update tab state,

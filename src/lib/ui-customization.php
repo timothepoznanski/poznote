@@ -461,6 +461,8 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
         } elseif ($type === 'panel') {
             if ($id === 'mini-calendar') {
                 $rules[] = '.mini-calendar-container { display: none !important; }';
+            } elseif ($id === 'other-accounts') {
+                $rules[] = '.other-accounts { display: none !important; }';
             } elseif ($id === 'folder-actions-toggle') {
                 // The ⋮ button on folder rows. The menu itself is shared and
                 // stays in the DOM: with no toggle it can no longer be opened.

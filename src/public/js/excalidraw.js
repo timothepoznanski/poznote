@@ -349,9 +349,9 @@ function saveNoteAndWaitForCompletion() {
 
                     // Clear draft from localStorage
                     try {
-                        localStorage.removeItem('poznote_draft_' + noteid);
-                        localStorage.removeItem('poznote_title_' + noteid);
-                        localStorage.removeItem('poznote_tags_' + noteid);
+                        localStorage.removeItem('poznote_draft_' + noteStorageId(noteid));
+                        localStorage.removeItem('poznote_title_' + noteStorageId(noteid));
+                        localStorage.removeItem('poznote_tags_' + noteStorageId(noteid));
                     } catch (err) {
                         // Ignore errors
                         console.debug('excalidraw: saveNoteAndWaitForCompletion() failed:', err);

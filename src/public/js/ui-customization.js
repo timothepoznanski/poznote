@@ -410,7 +410,7 @@
                 if (id === 'mini-calendar') {
                     rules.push('.mini-calendar-container { display: none !important; }');
                 } else if (id === 'other-accounts') {
-                    rules.push('#otherAccounts { display: none !important; }');
+                    rules.push('.other-accounts { display: none !important; }');
                 } else if (id === 'folder-actions-toggle') {
                     rules.push('.folder-actions-toggle { display: none !important; }');
                 } else if (id === 'note-actions-toggle') {

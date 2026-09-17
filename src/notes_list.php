@@ -85,7 +85,13 @@ $search_combined_value = ($search_in_notes_value === '1' && $search_in_tags_valu
                     </button>
                 </div>
                 <div class="searchbar-input-wrapper searchbar-has-date-toggle<?php echo (!empty($search) || !empty($tags_search) || $has_created_date_filter) ? ' searchbar-has-clear' : ''; ?>">
-                    <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="<?php echo t_h('search.placeholder_notes'); ?>" value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
+                    <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="<?php echo t_h('search.placeholder_notes'); ?>"<?php
+                        // Several accounts in the list below: the search only covers the
+                        // active one, and its placeholder says which (js/unified-search.js).
+                        if (!empty($otherAccountProfiles) && !empty($activeAccountProfile['username'])) {
+                            echo ' data-account-name="' . htmlspecialchars((string)$activeAccountProfile['username'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '"';
+                        }
+                    ?> value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
                     <button type="button" id="search-date-toggle" class="searchbar-date-toggle<?php echo $has_created_date_filter ? ' active' : ''; ?>" data-action="toggle-date-filter" title="<?php echo t_h('search.toggle_date_filter', [], 'Toggle date filter'); ?>" aria-label="<?php echo t_h('search.toggle_date_filter', [], 'Toggle date filter'); ?>" aria-controls="search-date-filter" aria-expanded="<?php echo $has_created_date_filter ? 'true' : 'false'; ?>">
                         <i class="lucide lucide-calendar"></i>
                     </button>
@@ -173,9 +179,39 @@ $otherAccountProfiles = $otherAccountProfiles ?? [];
 $activeAccountProfile = $activeAccountProfile ?? null;
 $showAccountRows = !empty($showAccountRows);
 $expandFoldersButton = $expandFoldersButton ?? '';
+
+// Collapsible rows of the accounts that are not the active one, listed under
+// its tree: the active account always heads the list. js/other-accounts.js
+// fetches a row's outline from account_tree.php on first expansion. Clicking a note there switches to that
+// account and opens it; the arrow switches without choosing a note.
+$renderOtherAccounts = static function (array $profiles): void {
+    if (empty($profiles)) {
+        return;
+    }
+    $openLabel = t_h('sidebar.other_accounts.open', [], 'Open this account');
+    echo '<div class="other-accounts" data-endpoint="account_tree.php">';
+    foreach ($profiles as $profile) {
+        $name = htmlspecialchars((string)($profile['username'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        echo '<div class="other-account" data-account-id="' . (int)$profile['id'] . '">'
+            . '<div class="other-account-header">'
+            . '<button type="button" class="other-account-toggle" data-other-account="toggle" aria-expanded="false" title="' . $name . '">'
+            . '<i class="lucide lucide-chevron-right other-account-chevron" aria-hidden="true"></i>'
+            . '<i class="lucide lucide-user" aria-hidden="true"></i>'
+            . '<span class="other-account-name">' . $name . '</span>'
+            . '</button>'
+            . '<button type="button" class="other-account-open" data-other-account="open" title="' . $openLabel . '" aria-label="' . $openLabel . '">'
+            . '<i class="lucide lucide-arrow-right" aria-hidden="true"></i>'
+            . '</button>'
+            . '</div>'
+            . '<div class="other-account-tree" hidden></div>'
+            . '</div>';
+    }
+    echo '</div>';
+};
 ?>
 <div class="notes-list-scrollable-content">
 <?php
+
 // The active account heads the list with the same collapsible row the other
 // accounts get below (js/other-accounts.js folds #currentAccountTree, the
 // whole own tree), whether or not there are other accounts, with the
@@ -189,6 +225,9 @@ if ($showAccountRows):
         <i class="lucide lucide-chevron-right other-account-chevron" aria-hidden="true"></i>
         <i class="lucide lucide-user" aria-hidden="true"></i>
         <span class="other-account-name"><?php echo $activeAccountName; ?></span>
+        <?php if (!empty($otherAccountProfiles)): ?>
+        <span class="account-active-badge"><?php echo t_h('sidebar.accounts.active', [], 'Active'); ?></span>
+        <?php endif; ?>
     </button>
     <?php echo $expandFoldersButton; ?>
 </div>
@@ -565,27 +604,8 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
 if ($showAccountRows) {
     echo '</div><!-- End of current-account-tree -->';
 }
-if (!empty($otherAccountProfiles)):
+$renderOtherAccounts($otherAccountProfiles);
 ?>
-<div class="other-accounts" id="otherAccounts" data-endpoint="account_tree.php">
-    <?php foreach ($otherAccountProfiles as $profile): ?>
-    <?php $otherAccountName = htmlspecialchars((string)($profile['username'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>
-    <div class="other-account" data-account-id="<?php echo (int)$profile['id']; ?>">
-        <div class="other-account-header">
-            <button type="button" class="other-account-toggle" data-other-account="toggle" aria-expanded="false" title="<?php echo $otherAccountName; ?>">
-                <i class="lucide lucide-chevron-right other-account-chevron" aria-hidden="true"></i>
-                <i class="lucide lucide-user" aria-hidden="true"></i>
-                <span class="other-account-name"><?php echo $otherAccountName; ?></span>
-            </button>
-            <button type="button" class="other-account-open" data-other-account="open" title="<?php echo t_h('sidebar.other_accounts.open', [], 'Open this account'); ?>" aria-label="<?php echo t_h('sidebar.other_accounts.open', [], 'Open this account'); ?>">
-                <i class="lucide lucide-arrow-right" aria-hidden="true"></i>
-            </button>
-        </div>
-        <div class="other-account-tree" hidden></div>
-    </div>
-    <?php endforeach; ?>
-</div>
-<?php endif; ?>
 </div><!-- End of notes-list-scrollable-content -->
 
 <?php

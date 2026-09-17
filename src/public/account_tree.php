@@ -59,6 +59,7 @@ $workspaces = [];
 $folders = [];
 $notes = [];
 $colors = [];
+$noteListSort = 'updated_desc';
 
 // An account that has never been opened has no database yet: an empty tree,
 // not an error.
@@ -73,8 +74,13 @@ if (is_file($dbPath)) {
         if ($workspacesOnly) {
             $colors = poznoteGetWorkspaceColorsMap($pdo);
         } else {
-            $folders = $pdo->query('SELECT id, name, parent_id, workspace, display_order FROM folders')->fetchAll(PDO::FETCH_ASSOC);
-            $notes = $pdo->query('SELECT id, heading, folder_id, workspace, type FROM entries WHERE trash = 0')->fetchAll(PDO::FETCH_ASSOC);
+            $folders = $pdo->query('SELECT id, name, parent_id, workspace, display_order, sort_setting FROM folders')->fetchAll(PDO::FETCH_ASSOC);
+            $notes = $pdo->query('SELECT id, heading, folder_id, workspace, type, created, updated, display_order FROM entries WHERE trash = 0')->fetchAll(PDO::FETCH_ASSOC);
+            // The account's own sort preference, so its outline lists the
+            // notes in the order its full tree does.
+            $sortStmt = $pdo->prepare('SELECT value FROM settings WHERE key = ?');
+            $sortStmt->execute(['note_list_sort']);
+            $noteListSort = (string)($sortStmt->fetchColumn() ?: 'updated_desc');
         }
     } catch (Exception $e) {
         error_log('account_tree: cannot read account ' . $targetUserId . ': ' . $e->getMessage());
@@ -106,5 +112,5 @@ if ($workspacesOnly) {
 $respond(200, [
     'success' => true,
     'account' => $account,
-    'workspaces' => poznoteBuildAccountTree($workspaces, $folders, $notes),
+    'workspaces' => poznoteBuildAccountTree($workspaces, $folders, $notes, $noteListSort),
 ]);

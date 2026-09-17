@@ -4,6 +4,13 @@
 (function () {
     'use strict';
 
+    // Per-account part of a note's localStorage keys, see js/theme-init.js.
+    function noteStorageId(noteId) {
+        return typeof window.__poznoteNoteStorageId === 'function'
+            ? window.__poznoteNoteStorageId(noteId)
+            : String(noteId);
+    }
+
     // Get configuration from data attributes on body
     var noteId = null;
     var noteWorkspace = null;
@@ -248,7 +255,7 @@
                     // Mark that this note needs an auto-push (if auto-push enabled)
                     if (window.POZNOTE_CONFIG?.gitSyncAutoPush) {
                         try {
-                            localStorage.setItem('poznote_needs_auto_push_' + noteId, 'true');
+                            localStorage.setItem('poznote_needs_auto_push_' + noteStorageId(noteId), 'true');
                         } catch (e) {
                             console.debug('attachments-page: uploadAttachment() failed:', e);
                         }
@@ -576,7 +583,7 @@
                     // Mark that this note needs an auto-push (if auto-push enabled)
                     if (window.POZNOTE_CONFIG?.gitSyncAutoPush) {
                         try {
-                            localStorage.setItem('poznote_needs_auto_push_' + noteId, 'true');
+                            localStorage.setItem('poznote_needs_auto_push_' + noteStorageId(noteId), 'true');
                         } catch (e) {
                             console.debug('attachments-page: deleteAttachment() failed:', e);
                         }

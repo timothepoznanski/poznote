@@ -876,7 +876,11 @@
       "title": "其他账户",
       "error": "无法加载此账户的笔记",
       "empty": "没有笔记",
-      "open": "打开此账户"
+      "open": "打开此账户",
+      "view_here": "在标签页中显示，不切换账户"
+    },
+    "accounts": {
+      "active": "当前"
     }
   },
   "home": {
@@ -910,7 +914,8 @@
       "select_type": "请至少选择一个搜索选项（笔记或标签）",
       "single_letter_warning": "使用单字母单词搜索可能会返回过多结果。请尝试使用更长的单词进行精确搜索。",
       "invalid_date_range": "开始日期必须早于或等于结束日期。"
-    }
+    },
+    "placeholder_account": "在 {{account}} 中搜索..."
   },
   "autosave": {
     "confirm_switch": "⚠️ 检测到未保存的更改\n\n您有未保存的更改，如果现在切换，这些更改将会丢失。\n\n点击“确定”保存并继续，或点击“取消”留下。\n（停止输入 2 秒后将自动保存）",
@@ -4954,5 +4959,10 @@
   },
   "icon_context_menu": {
     "hide": "隐藏按钮"
+  },
+  "account_note": {
+    "banner": "来自账户 {{account}} 的笔记，只读",
+    "open_to_edit": "打开以编辑",
+    "not_found": "此笔记已不可用。"
   }
 }
