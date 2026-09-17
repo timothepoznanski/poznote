@@ -995,6 +995,7 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
 <script src="<?php echo poznoteAsset('js/modal-alerts.js'); ?>"></script>
 <script src="<?php echo poznoteAsset('js/math-renderer.js'); ?>"></script>
 <script src="<?php echo poznoteAsset('js/outline-panel.js'); ?>"></script>
+<script src="<?php echo poznoteAsset('js/mermaid-theme.js'); ?>"></script>
 <script src="<?php echo poznoteAsset('js/public-note.js'); ?>"></script>
 <?php if ($noteBodyEditable): ?>
 <script src="<?php echo poznoteAsset('js/public-note-edit.js'); ?>"></script>
