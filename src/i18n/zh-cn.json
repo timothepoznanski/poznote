@@ -5000,6 +5000,12 @@
     "delete_message": "{{count}} 项将被移到回收站，包括所选文件夹中的笔记。按 Ctrl+Z 可恢复。",
     "delete_message_notes": "{{count}} 条笔记将被移到回收站。按 Ctrl+Z 可恢复。",
     "deleted_items": "已将 {{count}} 项移到回收站",
-    "delete_failed": "删除失败：{{error}}"
+    "delete_failed": "删除失败：{{error}}",
+    "moved_items": "已移动 {{count}} 项",
+    "move_failed": "移动失败：{{error}}",
+    "cannot_move_into_itself": "文件夹不能移动到自身中",
+    "favorited_items": "已将 {{count}} 项添加到收藏",
+    "favorite_failed": "无法更新收藏：{{error}}",
+    "already_favorites": "已在收藏中"
   }
 }

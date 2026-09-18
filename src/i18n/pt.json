@@ -4901,6 +4901,12 @@
     "delete_message": "{{count}} itens serão movidos para a lixeira, incluindo as notas das pastas selecionadas. Ctrl+Z os recupera.",
     "delete_message_notes": "{{count}} notas serão movidas para a lixeira. Ctrl+Z as recupera.",
     "deleted_items": "{{count}} itens movidos para a lixeira",
-    "delete_failed": "Falha ao excluir: {{error}}"
+    "delete_failed": "Falha ao excluir: {{error}}",
+    "moved_items": "{{count}} itens movidos",
+    "move_failed": "Falha ao mover: {{error}}",
+    "cannot_move_into_itself": "Uma pasta não pode ser movida para dentro dela mesma",
+    "favorited_items": "{{count}} itens adicionados aos favoritos",
+    "favorite_failed": "Não foi possível atualizar os favoritos: {{error}}",
+    "already_favorites": "Já está nos favoritos"
   }
 }

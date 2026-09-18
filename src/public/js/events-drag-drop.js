@@ -1,6 +1,8 @@
 // Drag & drop system for Poznote
 // Handles file uploads, note movement between folders, note reordering
-// (drop before/after another note) and folder reorganization
+// (drop before/after another note) and folder reorganization. A row that
+// belongs to a multi-selection (js/tree-selection.js) drags the whole
+// selection, see "Multi-selection drags" at the end of this file.
 
 // Setup drag-and-drop handlers for file uploads
 function setupDragDropEvents() {
@@ -318,6 +320,10 @@ function setupNoteDragDropEvents() {
             // Check if we're not over a folder header
             var isOverFolder = e.target.closest('.folder-header');
             if (!isOverFolder && window.currentDragData) {
+                if (isSelectionDrag(window.currentDragData)) {
+                    handleSelectionRootDragOver(e, window.currentDragData);
+                    return;
+                }
                 // Root note over the root area: position change among root
                 // notes (rows themselves are handled by handleNoteReorderDragOver)
                 if (isRootNoteDragOverRoot(window.currentDragData, e.target)) {
@@ -360,6 +366,10 @@ function setupNoteDragDropEvents() {
             // Check if we're not over a folder header
             var isOverFolder = e.target.closest('.folder-header');
             if (!isOverFolder && window.currentDragData) {
+                if (isSelectionDrag(window.currentDragData)) {
+                    handleSelectionRootDrop(e, window.currentDragData);
+                    return;
+                }
                 // Root note dropped in the root area: reorder beside the nearest row
                 if (isRootNoteDragOverRoot(window.currentDragData, e.target)) {
                     var nearestRootRow = findNearestRootNoteRowForDrop(e, window.currentDragData);
@@ -431,6 +441,12 @@ function handleNoteDragStart(e) {
     var currentFolderId = noteLink.getAttribute('data-folder-id');
 
     if (noteId) {
+        var selectionDrag = selectionDragData('note', noteId);
+        if (selectionDrag) {
+            startSelectionDrag(e, selectionDrag);
+            return;
+        }
+
         var dragData = {
             noteId: noteId,
             currentFolder: currentFolder || null,
@@ -497,6 +513,10 @@ function cleanupDraggingNotes() {
         link.classList.remove('dragging');
         link.removeAttribute('data-dragging');
         link.style.cssText = '';
+    });
+    // Folder toggles dimmed as part of a dragged selection
+    document.querySelectorAll('.folder-toggle.folder-dragging').forEach(function (toggle) {
+        toggle.classList.remove('folder-dragging');
     });
     // Remove source folder visual feedback
     document.querySelectorAll('.folder-header.folder-source-drag').forEach(function (header) {
@@ -650,6 +670,11 @@ function handleRootDrop(e) {
     try {
         var data = JSON.parse(e.dataTransfer.getData('text/plain'));
 
+        if (isSelectionDrag(data)) {
+            moveSelection(data, { folderId: null });
+            return;
+        }
+
         // Only proceed if note is currently in a folder (not already in root)
         if (data.noteId && data.currentFolderId) {
             moveNoteToRoot(data.noteId);
@@ -708,9 +733,13 @@ function clearEnclosingFolderDropIndicators(item) {
 // drag can only change the note's position, never its folder, so the folder
 // handlers must not offer "move into this folder".
 function isNoteDragInOwnFolder(dragData, folderHeader) {
-    if (!dragData || dragData.type === 'folder' || !dragData.noteId || !folderHeader) return false;
+    if (!dragData || dragData.type === 'folder' || !folderHeader) return false;
     if (folderHeader.classList.contains('system-folder')) return false;
     var targetFolderId = folderHeader.getAttribute('data-folder-id') || '';
+    if (isSelectionDrag(dragData)) {
+        return isSelectionOfNotesIn(dragData, targetFolderId);
+    }
+    if (!dragData.noteId) return false;
     var currentFolderId = dragData.currentFolderId ? String(dragData.currentFolderId) : '';
     return currentFolderId !== '' && currentFolderId === String(targetFolderId);
 }
@@ -731,7 +760,7 @@ function findNearestNoteRowForDrop(e, folderHeader, dragData) {
     var best = null;
     content.querySelectorAll(':scope > .note-list-item').forEach(function (item) {
         var target = getNoteReorderTarget(item);
-        if (!target || target.noteId === String(dragData.noteId)) return;
+        if (!target || isDraggedNote(dragData, target.noteId)) return;
         var rect = item.getBoundingClientRect();
         var distance, position;
         if (e.clientY < rect.top) {
@@ -768,12 +797,13 @@ function handleNoteReorderDragOver(e) {
 
     var dragData = window.currentDragData;
     // Folders dropped on a note row fall through to the folder-header
-    // handlers (drop "inside" that folder)
-    if (!dragData || dragData.type === 'folder' || !dragData.noteId) return;
+    // handlers (drop "inside" that folder); a selection lines its notes up
+    // here and puts its folders into the row's folder
+    if (!dragData || dragData.type === 'folder' || (!dragData.noteId && !isSelectionDrag(dragData))) return;
 
     var item = e.currentTarget;
     var target = getNoteReorderTarget(item);
-    if (!target || target.noteId === String(dragData.noteId)) return;
+    if (!target || isDraggedNote(dragData, target.noteId) || isInsideSelectedFolder(dragData, item)) return;
 
     e.preventDefault();
     e.stopPropagation();
@@ -804,10 +834,17 @@ function handleNoteReorderDragLeave(e) {
 // True while a root note (no folder) is dragged over the root area of the
 // list, outside any folder: only its position among root notes can change.
 function isRootNoteDragOverRoot(dragData, element) {
-    if (!dragData || dragData.type === 'folder' || !dragData.noteId || dragData.currentFolderId) return false;
+    if (!isRootNotesDrag(dragData)) return false;
     if (!element || !element.closest) return false;
     if (element.closest('.folder-header')) return false;
     return !!element.closest('.notes-list-scrollable-content');
+}
+
+// A root note, or a selection made only of root notes
+function isRootNotesDrag(dragData) {
+    if (!dragData || dragData.type === 'folder') return false;
+    if (isSelectionDrag(dragData)) return isSelectionOfNotesIn(dragData, '');
+    return !!dragData.noteId && !dragData.currentFolderId;
 }
 
 // Nearest root note row for a pointer over the root area (gaps between
@@ -817,7 +854,7 @@ function findNearestRootNoteRowForDrop(e, dragData) {
     document.querySelectorAll('.note-list-item').forEach(function (item) {
         if (item.closest('.folder-header')) return;
         var target = getNoteReorderTarget(item);
-        if (!target || target.noteId === String(dragData.noteId)) return;
+        if (!target || isDraggedNote(dragData, target.noteId)) return;
         var rect = item.getBoundingClientRect();
         var distance, position;
         if (e.clientY < rect.top) {
@@ -854,14 +891,19 @@ function handleNoteReorderDrop(e) {
     } catch (err) {
         data = window.currentDragData;
     }
-    if (!data || data.type === 'folder' || !data.noteId) return;
+    if (!data || data.type === 'folder' || (!data.noteId && !isSelectionDrag(data))) return;
 
     var target = getNoteReorderTarget(item);
-    if (!target || target.noteId === String(data.noteId)) return;
+    if (!target || isDraggedNote(data, target.noteId) || isInsideSelectedFolder(data, item)) return;
 
     e.preventDefault();
     e.stopPropagation();
     cleanupDraggingNotes();
+
+    if (isSelectionDrag(data)) {
+        moveSelectionBesideNote(data, target, getNoteDropPosition(e, item));
+        return;
+    }
 
     reorderNoteBesideTarget(data.noteId, target.noteId, getNoteDropPosition(e, item));
 }
@@ -1029,6 +1071,12 @@ function handleFolderDragStart(e) {
         return;
     }
 
+    var selectionDrag = selectionDragData('folder', folderId);
+    if (selectionDrag) {
+        startSelectionDrag(e, selectionDrag);
+        return;
+    }
+
     var dragData = {
         type: 'folder',
         folderId: folderId,
@@ -1090,6 +1138,10 @@ function handleFolderDragEnd(e) {
         folderHeader.style.border = '';
         folderHeader.style.transform = '';
     }
+    // A dragged selection also dims note rows and other folder toggles, and
+    // may leave a before/after line on a note row
+    cleanupDraggingNotes();
+    clearNoteDropIndicators(null);
 
     // Clean up all folder drag-over states
     document.querySelectorAll('.folder-header.drag-over, .folder-header.folder-drop-target, .folder-header.folder-drop-before, .folder-header.folder-drop-after, .folder-header.folder-drop-inside, .folder-header.folder-source-drag').forEach(function (header) {
@@ -1558,6 +1610,12 @@ function handleFolderDragEnterEnhanced(e) {
         return;
     }
 
+    // A selection cannot land in one of its own folders, nor where every
+    // item already is (Public and Tags never take a selection)
+    if (isSelectionDrag(dragData) && !canDropSelectionOnFolder(dragData, folderHeader)) {
+        return;
+    }
+
     // Own folder: position change only, handled in handleFolderDragOverEnhanced
     if (isNoteDragInOwnFolder(dragData, folderHeader)) {
         return;
@@ -1612,6 +1670,12 @@ function handleFolderDragOverEnhanced(e) {
     // Prevent drag-over effect for Tags folder
     if (targetFolder === 'Tags') {
         e.dataTransfer.dropEffect = 'none';
+        return;
+    }
+
+    if (isSelectionDrag(dragData) && !canDropSelectionOnFolder(dragData, folderHeader)) {
+        e.dataTransfer.dropEffect = 'none';
+        clearFolderDropIndicator(folderHeader);
         return;
     }
 
@@ -1730,6 +1794,11 @@ function handleFolderDropEnhanced(e) {
             return;
         }
 
+        if (isSelectionDrag(data)) {
+            dropSelectionOnFolder(e, data, folderHeader);
+            return;
+        }
+
         // Handle note drop (existing behavior)
         // Remove dragging class from all notes
         document.querySelectorAll('.links_arbo_left.dragging').forEach(function (link) {
@@ -1831,4 +1900,231 @@ function moveFolderBesideTarget(folderId, targetFolderId, position) {
 // Move folder to root (remove from parent folder)
 function moveFolderToRoot(folderId) {
     moveFolderToParent(folderId, null);
+}
+
+// ---- Multi-selection drags (js/tree-selection.js) ----
+//
+// A row dragged while it belongs to a selection of several rows takes the
+// whole selection along: dragData is {type: 'selection', items: [{type, id}]}.
+// Folder headers take the set inside, a note row lines the notes up before
+// or after it (the folders go into the row's folder) and the root area moves
+// everything out of its folders. Trash trashes the set, Favorites adds it,
+// Public and Tags refuse. The requests, one per item recorded as a single
+// undo entry, live in js/tree-undo-clipboard.js (moveItems, favoriteItems).
+
+// The selection to drag when this row is part of one, or null for an
+// ordinary single-row drag. Dragging a row outside the selection moves that
+// row alone and drops the selection, like a file manager.
+function selectionDragData(rowType, rowId) {
+    var selection = window.PoznoteTreeSelection;
+    if (!selection || selection.count() < 2) return null;
+
+    var items = selection.items();
+    var included = items.some(function (item) {
+        return item.type === rowType && String(item.id) === String(rowId);
+    });
+    if (!included) {
+        selection.clear();
+        return null;
+    }
+    return { type: 'selection', items: items };
+}
+
+function isSelectionDrag(dragData) {
+    return !!(dragData && dragData.type === 'selection' && Array.isArray(dragData.items) && dragData.items.length > 0);
+}
+
+// True for the dragged note itself, alone or among a selection
+function isDraggedNote(dragData, noteId) {
+    if (!dragData) return false;
+    if (isSelectionDrag(dragData)) {
+        return dragData.items.some(function (item) {
+            return item.type === 'note' && String(item.id) === String(noteId);
+        });
+    }
+    return !!dragData.noteId && String(dragData.noteId) === String(noteId);
+}
+
+function selectedFolderHeader(item) {
+    if (item.type !== 'folder') return null;
+    return document.querySelector('.folder-header[data-folder-id="' + String(item.id) + '"]:not(.system-folder)');
+}
+
+// True when the element is a selected folder or sits inside one: a folder
+// cannot land in itself or among its own contents
+function isInsideSelectedFolder(dragData, element) {
+    if (!isSelectionDrag(dragData) || !element) return false;
+    return dragData.items.some(function (item) {
+        var header = selectedFolderHeader(item);
+        return !!header && header.contains(element);
+    });
+}
+
+// Folder id of the row an item is shown in ('' at the root)
+function selectionItemParentId(item) {
+    if (item.type === 'note') {
+        var row = findNoteRowElement(item.id);
+        var link = row ? row.querySelector('a.links_arbo_left') : null;
+        return link ? (link.getAttribute('data-folder-id') || '') : '';
+    }
+    var parentHeader = getParentFolderHeader(selectedFolderHeader(item));
+    return parentHeader ? (parentHeader.getAttribute('data-folder-id') || '') : '';
+}
+
+// True when every item is a note already in this folder ('' for the root):
+// such a drop can only change positions
+function isSelectionOfNotesIn(dragData, folderId) {
+    var target = folderId ? String(folderId) : '';
+    return dragData.items.every(function (item) {
+        return item.type === 'note' && selectionItemParentId(item) === target;
+    });
+}
+
+// True when at least one item is not a direct child of this folder yet
+function selectionHasItemsOutside(dragData, folderId) {
+    var target = folderId ? String(folderId) : '';
+    return dragData.items.some(function (item) {
+        return selectionItemParentId(item) !== target;
+    });
+}
+
+function canDropSelectionOnFolder(dragData, folderHeader) {
+    if (!isSelectionDrag(dragData) || !folderHeader) return false;
+    if (folderHeader.classList.contains('system-folder')) {
+        var name = folderHeader.getAttribute('data-folder');
+        return name === 'Favorites' || name === 'Trash';
+    }
+    if (isInsideSelectedFolder(dragData, folderHeader)) return false;
+
+    var folderId = folderHeader.getAttribute('data-folder-id') || '';
+    return selectionHasItemsOutside(dragData, folderId) || isSelectionOfNotesIn(dragData, folderId);
+}
+
+function startSelectionDrag(e, dragData) {
+    e.dataTransfer.setData('text/plain', JSON.stringify(dragData));
+    e.dataTransfer.effectAllowed = 'move';
+    window.currentDragData = dragData;
+
+    var count = dragData.items.length;
+    var label = (typeof window.t === 'function')
+        ? window.t('tree_selection.count', { count: count }, count + ' selected')
+        : count + ' selected';
+    var dragImage = document.createElement('div');
+    dragImage.style.cssText = 'position: absolute; top: -1000px; padding: 10px 15px; background: rgba(0, 123, 255, 0.15); border: 2px solid rgba(0, 123, 255, 0.4); border-radius: 8px; font-weight: 500; color: #007bff; display: flex; align-items: center; gap: 8px;';
+    var icon = document.createElement('i');
+    icon.className = 'lucide lucide-layers';
+    dragImage.appendChild(icon);
+    dragImage.appendChild(document.createTextNode(label));
+    document.body.appendChild(dragImage);
+
+    try {
+        e.dataTransfer.setDragImage(dragImage, 50, 20);
+    } catch (err) {
+        console.debug('events-drag-drop: startSelectionDrag() failed:', err);
+    }
+    setTimeout(function () {
+        if (dragImage.parentNode) {
+            dragImage.parentNode.removeChild(dragImage);
+        }
+    }, 0);
+
+    // Every selected row dims, both rows of a favorited note included
+    dragData.items.forEach(function (item) {
+        if (item.type === 'note') {
+            document.querySelectorAll('#left_col .links_arbo_left[data-note-db-id="' + String(item.id) + '"]').forEach(function (link) {
+                link.classList.add('dragging');
+                link.setAttribute('data-dragging', 'true');
+            });
+            return;
+        }
+        var toggle = getFolderToggleElement(selectedFolderHeader(item));
+        if (toggle) toggle.classList.add('folder-dragging');
+    });
+}
+
+function moveSelection(dragData, dest) {
+    var clipboard = window.PoznoteTreeClipboard;
+    if (clipboard && typeof clipboard.moveItems === 'function') {
+        clipboard.moveItems(dragData.items, dest);
+    }
+}
+
+// Drop beside a note row: the notes line up there, the folders go into the
+// row's folder (null at the root)
+function moveSelectionBesideNote(dragData, target, position) {
+    moveSelection(dragData, {
+        folderId: target.link.getAttribute('data-folder-id') || null,
+        targetNoteId: target.noteId,
+        position: position
+    });
+}
+
+// Root area: a selection of root notes changes position beside the nearest
+// row, anything else moves out of its folders
+function handleSelectionRootDragOver(e, dragData) {
+    if (isRootNoteDragOverRoot(dragData, e.target)) {
+        var nearest = findNearestRootNoteRowForDrop(e, dragData);
+        if (nearest) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            applyNoteDropIndicator(nearest.item, nearest.position);
+        } else {
+            clearNoteDropIndicators(null);
+        }
+        return;
+    }
+    if (selectionHasItemsOutside(dragData, '')) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    }
+}
+
+function handleSelectionRootDrop(e, dragData) {
+    if (isRootNoteDragOverRoot(dragData, e.target)) {
+        var nearest = findNearestRootNoteRowForDrop(e, dragData);
+        clearNoteDropIndicators(null);
+        if (nearest) {
+            e.preventDefault();
+            cleanupDraggingNotes();
+            moveSelection(dragData, { folderId: null, targetNoteId: nearest.noteId, position: nearest.position });
+        }
+        return;
+    }
+    if (selectionHasItemsOutside(dragData, '')) {
+        e.preventDefault();
+        cleanupDraggingNotes();
+        moveSelection(dragData, { folderId: null });
+    }
+}
+
+function dropSelectionOnFolder(e, dragData, folderHeader) {
+    cleanupDraggingNotes();
+    clearNoteDropIndicators(null);
+
+    var clipboard = window.PoznoteTreeClipboard;
+    if (!clipboard || !canDropSelectionOnFolder(dragData, folderHeader)) return;
+
+    if (folderHeader.classList.contains('system-folder')) {
+        var name = folderHeader.getAttribute('data-folder');
+        if (name === 'Trash' && typeof clipboard.deleteItems === 'function') {
+            clipboard.deleteItems(dragData.items);
+        } else if (name === 'Favorites' && typeof clipboard.favoriteItems === 'function') {
+            clipboard.favoriteItems(dragData.items);
+        }
+        return;
+    }
+
+    var targetFolderId = folderHeader.getAttribute('data-folder-id') || null;
+
+    // Own folder: only positions change, beside the nearest row (a drop on
+    // the folder toggle itself changes nothing)
+    if (isNoteDragInOwnFolder(dragData, folderHeader)) {
+        var nearestRow = findNearestNoteRowForDrop(e, folderHeader, dragData);
+        if (nearestRow) {
+            moveSelection(dragData, { folderId: targetFolderId, targetNoteId: nearestRow.noteId, position: nearestRow.position });
+        }
+        return;
+    }
+
+    moveSelection(dragData, { folderId: targetFolderId });
 }

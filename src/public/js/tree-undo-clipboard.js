@@ -11,7 +11,8 @@
  *
  * The shortcuts only fire outside text fields and editors, and Ctrl+C/X leave
  * a text selection to the browser, so copying text in a note keeps working.
- * On macOS the Command key replaces Ctrl.
+ * On macOS the Command key replaces Ctrl. Dropping a dragged multi-selection
+ * (js/events-drag-drop.js) comes through moveItems() and favoriteItems().
  *
  * Which rows the shortcuts act on: the multi-selection built with Ctrl+Click
  * and Shift+Click (js/tree-selection.js) when there is one, otherwise the last
@@ -924,6 +925,179 @@
     }
 
     // ============================================
+    // Drop of a dragged multi-selection (js/events-drag-drop.js)
+    // ============================================
+
+    function reorderNoteRequest(noteId, targetNoteId, position, workspace) {
+        return api('POST', '/api/v1/notes/reorder', {
+            workspace: workspace,
+            note_id: parseInt(noteId, 10),
+            target_note_id: parseInt(targetNoteId, 10),
+            position: position
+        });
+    }
+
+    /**
+     * Move dropped notes and folders. dest.folderId is the folder they land
+     * in (null for the root of the current workspace). With dest.targetNoteId
+     * and dest.position the notes line up before or after that row instead,
+     * in tree order, and only the folders go into dest.folderId. Items
+     * already there are skipped; the rest go one after the other and are
+     * recorded as one history entry. A pure change of position is not
+     * recorded, like a single dragged note.
+     */
+    function moveItems(targets, dest) {
+        if (isReadOnly() || running) return;
+        var workspace = currentWorkspace();
+        var folderId = dest && dest.folderId ? String(dest.folderId) : null;
+        var beside = dest && dest.targetNoteId
+            ? { noteId: String(dest.targetNoteId), position: dest.position === 'after' ? 'after' : 'before' }
+            : null;
+
+        var items = withoutNested(targets || []);
+        var skipMessage = null;
+        var jobs = [];
+
+        items.forEach(function (item) {
+            if (item.type !== 'folder') return;
+            if (sameId(item.id, folderId) || (folderId && isFolderInside(folderId, item.id))) {
+                skipMessage = tr('tree_selection.cannot_move_into_itself', 'A folder cannot be moved into itself');
+                return;
+            }
+            var from = folderState(item.id);
+            if (sameId(from.parentId, folderId)) {
+                skipMessage = tr('tree_clipboard.already_there', 'Already in this folder');
+                return;
+            }
+            jobs.push(function () {
+                return placeFolder(item.id, { parentId: folderId, workspace: workspace }).then(function () {
+                    return {
+                        type: 'folder-move', folderId: String(item.id),
+                        from: {
+                            parentId: from.parentId, workspace: workspace,
+                            prevSiblingId: from.prevSiblingId || null, nextSiblingId: from.nextSiblingId || null
+                        },
+                        to: { parentId: folderId, workspace: workspace }
+                    };
+                });
+            });
+        });
+
+        // Before the target the notes go in one at a time, each right ahead
+        // of it; after the target the set is walked backwards, so the tree
+        // order comes out the same either way
+        var notes = items.filter(function (item) { return item.type === 'note'; });
+        if (beside && beside.position === 'after') notes.reverse();
+        notes.forEach(function (item) {
+            var from = noteState(item.id);
+            var changesFolder = !sameId(from.folderId, folderId);
+            if (!beside && !changesFolder) {
+                skipMessage = tr('tree_clipboard.already_there', 'Already in this folder');
+                return;
+            }
+            var entry = changesFolder ? {
+                type: 'note-move', noteId: String(item.id),
+                from: { folderId: from.folderId, workspace: workspace },
+                to: { folderId: folderId, workspace: workspace }
+            } : null;
+            jobs.push(function () {
+                var request = beside
+                    ? reorderNoteRequest(item.id, beside.noteId, beside.position, workspace)
+                    : moveNote(item.id, { folderId: folderId, workspace: workspace });
+                return request.then(function () { return entry; });
+            });
+        });
+
+        if (!jobs.length) {
+            if (skipMessage) toast(skipMessage);
+            return;
+        }
+
+        var entries = [];
+        var done = 0;
+        var finish = function (errorMessage) {
+            if (entries.length) record(batchEntry(entries));
+            rememberFolderOpen(folderId);
+            if (errorMessage) {
+                errorToastAfterReload(errorMessage);
+            } else {
+                toastAfterReload(tr('tree_selection.moved_items', 'Moved {{count}} items', { count: done }));
+            }
+            reloadTree([]);
+        };
+
+        running = true;
+        sequence(jobs, function (job) {
+            return job().then(function (entry) {
+                done++;
+                if (entry) entries.push(entry);
+            });
+        }).then(function () {
+            finish(null);
+        }).catch(function (error) {
+            var message = tr('tree_selection.move_failed', 'Move failed: {{error}}', { error: error.message });
+            if (!done) {
+                running = false;
+                errorToast(message);
+                return;
+            }
+            // Some items landed: keep them undoable, and show the tree they changed
+            finish(message);
+        });
+    }
+
+    /**
+     * Add dropped notes and folders to the favorites. The note endpoint
+     * toggles, so notes the Favorites section already lists are left alone;
+     * folders are set outright.
+     */
+    function favoriteItems(targets) {
+        if (isReadOnly() || running) return;
+        var workspace = currentWorkspace();
+        var jobs = [];
+
+        (targets || []).forEach(function (item) {
+            if (item.type === 'note') {
+                if (document.querySelector('.folder-header[data-folder="Favorites"] .links_arbo_left[data-note-db-id="' + item.id + '"]')) return;
+                jobs.push(function () {
+                    return api('POST', '/api/v1/notes/' + encode(item.id) + '/favorite?workspace=' + encode(workspace), { workspace: workspace });
+                });
+            } else if (item.type === 'folder') {
+                var toggle = document.querySelector('.folder-actions-toggle[data-folder-id="' + item.id + '"]');
+                if (toggle && toggle.getAttribute('data-favorite') === '1') return;
+                jobs.push(function () {
+                    return api('PUT', '/api/v1/folders/' + encode(item.id) + '/favorite', { favorite: true });
+                });
+            }
+        });
+
+        if (!jobs.length) {
+            toast(tr('tree_selection.already_favorites', 'Already in favorites'));
+            return;
+        }
+
+        var done = 0;
+        running = true;
+        sequence(jobs, function (job) {
+            return job().then(function () { done++; });
+        }).then(function () {
+            rememberFolderOpen('favorites');
+            toastAfterReload(tr('tree_selection.favorited_items', 'Added {{count}} items to favorites', { count: done }));
+            reloadTree([]);
+        }).catch(function (error) {
+            var message = tr('tree_selection.favorite_failed', 'Could not update favorites: {{error}}', { error: error.message });
+            if (!done) {
+                running = false;
+                errorToast(message);
+                return;
+            }
+            rememberFolderOpen('favorites');
+            errorToastAfterReload(message);
+            reloadTree([]);
+        });
+    }
+
+    // ============================================
     // Delete
     // ============================================
 
@@ -1309,6 +1483,8 @@
         copyFolder: copyFolder,
         copyItems: copyItems,
         deleteItems: deleteItems,
+        moveItems: moveItems,
+        favoriteItems: favoriteItems,
         paste: paste,
         syncMenu: syncMenu
     };

@@ -4720,6 +4720,12 @@
     "delete_message": "{{count}} items will be moved to the trash, notes inside the selected folders included. Ctrl+Z brings them back.",
     "delete_message_notes": "{{count}} notes will be moved to the trash. Ctrl+Z brings them back.",
     "deleted_items": "Moved {{count}} items to the trash",
-    "delete_failed": "Delete failed: {{error}}"
+    "delete_failed": "Delete failed: {{error}}",
+    "moved_items": "Moved {{count}} items",
+    "move_failed": "Move failed: {{error}}",
+    "cannot_move_into_itself": "A folder cannot be moved into itself",
+    "favorited_items": "Added {{count}} items to favorites",
+    "favorite_failed": "Could not update favorites: {{error}}",
+    "already_favorites": "Already in favorites"
   }
 }

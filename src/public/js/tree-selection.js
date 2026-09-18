@@ -18,8 +18,11 @@
  *
  * This file only owns the selection. What acts on it lives in
  * js/tree-undo-clipboard.js: Del, Ctrl+C / X / V, and the undo of those, which
- * read the set through window.PoznoteTreeSelection.items(). Every one of those
- * actions reloads the page, which is what clears the selection afterwards.
+ * read the set through window.PoznoteTreeSelection.items(). Dragging a
+ * selected row drags the whole selection (js/events-drag-drop.js); dragging
+ * a row outside it moves that row alone and clears the selection. Every one
+ * of those actions reloads the page, which is what clears the selection
+ * afterwards.
  *
  * Rows are keyed "note:<id>" / "folder:<id>". A favorited note has a second
  * row in the Favorites section and a favorite folder a shortcut row there;

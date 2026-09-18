@@ -4900,6 +4900,12 @@
     "delete_message": "{{count}} Elemente werden in den Papierkorb verschoben, einschließlich der Notizen in den ausgewählten Ordnern. Strg+Z stellt sie wieder her.",
     "delete_message_notes": "{{count}} Notizen werden in den Papierkorb verschoben. Strg+Z stellt sie wieder her.",
     "deleted_items": "{{count}} Elemente in den Papierkorb verschoben",
-    "delete_failed": "Löschen fehlgeschlagen: {{error}}"
+    "delete_failed": "Löschen fehlgeschlagen: {{error}}",
+    "moved_items": "{{count}} Elemente verschoben",
+    "move_failed": "Verschieben fehlgeschlagen: {{error}}",
+    "cannot_move_into_itself": "Ein Ordner kann nicht in sich selbst verschoben werden",
+    "favorited_items": "{{count}} Elemente zu den Favoriten hinzugefügt",
+    "favorite_failed": "Favoriten konnten nicht aktualisiert werden: {{error}}",
+    "already_favorites": "Bereits in den Favoriten"
   }
 }

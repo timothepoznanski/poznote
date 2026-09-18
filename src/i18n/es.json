@@ -4901,6 +4901,12 @@
     "delete_message": "{{count}} elementos se moverán a la papelera, incluidas las notas de las carpetas seleccionadas. Ctrl+Z los recupera.",
     "delete_message_notes": "{{count}} notas se moverán a la papelera. Ctrl+Z las recupera.",
     "deleted_items": "{{count}} elementos movidos a la papelera",
-    "delete_failed": "Error al eliminar: {{error}}"
+    "delete_failed": "Error al eliminar: {{error}}",
+    "moved_items": "{{count}} elementos movidos",
+    "move_failed": "Error al mover: {{error}}",
+    "cannot_move_into_itself": "Una carpeta no se puede mover dentro de sí misma",
+    "favorited_items": "{{count}} elementos añadidos a favoritos",
+    "favorite_failed": "No se pudieron actualizar los favoritos: {{error}}",
+    "already_favorites": "Ya está en favoritos"
   }
 }
