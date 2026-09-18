@@ -592,7 +592,8 @@ function moveNoteToTargetFolder(noteId, targetFolderIdOrName) {
         { folder_id: targetFolderId || '', workspace: targetWorkspace },
         function (data) {
             recordNoteMoveForUndo(noteId, noteBefore, targetFolderId || null, targetWorkspace);
-            refreshSidebarAfterMove(data);
+            keepTreeSelection([{ type: 'note', id: noteId }], false);
+            refreshSidebarAfterMove(data, targetFolderId);
         },
         'Error moving note: '
     );
@@ -974,6 +975,9 @@ function reorderNoteBesideTarget(noteId, targetNoteId, position) {
         .then(function (r) { return r.json(); })
         .then(function (data) {
             if (data && data.success) {
+                // The row we dropped beside was on screen, so its folder is
+                // already open: only the selection has to be set (#1441)
+                keepTreeSelection([{ type: 'note', id: noteId }], false);
                 if (!movedInDom) {
                     refreshSidebarAfterMove(data);
                 }
@@ -999,6 +1003,7 @@ function moveNoteToRoot(noteId) {
         { workspace: targetWorkspace },
         function (data) {
             recordNoteMoveForUndo(noteId, noteBefore, null, targetWorkspace);
+            keepTreeSelection([{ type: 'note', id: noteId }], false);
             refreshSidebarAfterMove(data);
         },
         'Error removing note from folder: '
@@ -1858,6 +1863,8 @@ function moveFolderToParent(folderId, newParentFolderId) {
                 parentId: newParentFolderId ? String(newParentFolderId) : null,
                 workspace: workspace
             });
+            markFolderPathOpen(newParentFolderId);
+            keepTreeSelection([{ type: 'folder', id: folderId }], true);
             location.reload();
         },
         'Error moving folder: '
@@ -1883,6 +1890,7 @@ function moveFolderBesideTarget(folderId, targetFolderId, position) {
                 position: position,
                 workspace: workspace
             });
+            keepTreeSelection([{ type: 'folder', id: folderId }], true);
             location.reload();
         },
         'Error reordering folder: '

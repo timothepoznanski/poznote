@@ -266,16 +266,19 @@ function apiPostJson(url, body, onSuccess, errorPrefix) {
         });
 }
 
-// Refresh the sidebar after a folder/note move action
-function refreshSidebarAfterMove(data) {
+// Refresh the sidebar after a folder/note move action. destFolderId is the
+// folder the notes landed in, if any: it and its ancestors are opened so the
+// move does not look like the notes vanished (issue #1441).
+function refreshSidebarAfterMove(data, destFolderId) {
     if (data && data.share_delta && typeof updateSharedCount === 'function') {
         updateSharedCount(data.share_delta);
     }
     if (typeof refreshNotesListAfterFolderAction === 'function') {
-        setTimeout(function () { refreshNotesListAfterFolderAction(); }, 200);
+        setTimeout(function () { refreshNotesListAfterFolderAction(destFolderId); }, 200);
     } else {
         setTimeout(function () {
             if (typeof persistFolderStatesFromDOM === 'function') { persistFolderStatesFromDOM(); }
+            if (typeof markFolderPathOpen === 'function') { markFolderPathOpen(destFolderId); }
             location.reload();
         }, 500);
     }

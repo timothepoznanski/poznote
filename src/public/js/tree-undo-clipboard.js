@@ -275,6 +275,7 @@
         } catch (e) {
             console.debug('tree-undo-clipboard: reloadTree() failed:', e);
         }
+        writeFoldersToOpen();
 
         var open = openNoteId();
         var openNoteGone = !!(open && (removedNoteIds || []).some(function (id) { return sameId(id, open); }));
@@ -289,10 +290,39 @@
         }
     }
 
+    var foldersToOpen = [];
+
+    /**
+     * Ask for a destination folder to be open on the next page: what just
+     * landed there has to be on screen, not folded away (issue #1441). The
+     * keys are only written by reloadTree(), because
+     * persistFolderStatesFromDOM() runs first there and would otherwise put
+     * the closed state straight back over them.
+     */
     function rememberFolderOpen(folderId) {
-        if (!folderId) return;
-        try { localStorage.setItem('folder_folder-' + String(folderId), 'open'); } catch (e) {
-            console.debug('tree-undo-clipboard: rememberFolderOpen() failed:', e);
+        if (!folderId || foldersToOpen.indexOf(folderId) !== -1) return;
+        foldersToOpen.push(folderId);
+    }
+
+    // The destination and its ancestors
+    function writeFoldersToOpen() {
+        foldersToOpen.forEach(function (folderId) {
+            if (typeof window.markFolderPathOpen === 'function') {
+                window.markFolderPathOpen(folderId);
+                return;
+            }
+            try { localStorage.setItem('folder_folder-' + String(folderId), 'open'); } catch (e) {
+                console.debug('tree-undo-clipboard: writeFoldersToOpen() failed:', e);
+            }
+        });
+        foldersToOpen = [];
+    }
+
+    // Keep what an action just moved or pasted selected once the page is back
+    function rememberSelection(targets) {
+        var selection = window.PoznoteTreeSelection;
+        if (selection && typeof selection.selectAfterReload === 'function') {
+            selection.selectAfterReload(targets);
         }
     }
 
@@ -861,6 +891,17 @@
         };
     }
 
+    /** What the paste put in the destination: the copies, or the items a cut moved */
+    function pastedTargets(entries) {
+        return entries.map(function (entry) {
+            if (entry.type === 'note-copy') return { type: 'note', id: entry.newNoteId };
+            if (entry.type === 'folder-copy') return { type: 'folder', id: entry.newFolderId };
+            if (entry.type === 'note-move') return { type: 'note', id: entry.noteId };
+            if (entry.type === 'folder-move') return { type: 'folder', id: entry.folderId };
+            return null;
+        }).filter(Boolean);
+    }
+
     /**
      * Paste the clipboard into a folder (null for the root of the current
      * workspace). Copies duplicate, cuts move; the items go one after the
@@ -906,6 +947,7 @@
             // Copy/Cut cannot be pasted again later by accident
             clearClipboard();
             rememberFolderOpen(dest.folderId);
+            rememberSelection(pastedTargets(entries));
             var items = clipboard.items;
             if (items.length > 1) {
                 toastAfterReload(tr('tree_clipboard.pasted_items', 'Pasted {{count}} items', { count: entries.length }));
@@ -926,6 +968,7 @@
             record(batchEntry(entries));
             clearClipboard();
             rememberFolderOpen(dest.folderId);
+            rememberSelection(pastedTargets(entries));
             errorToastAfterReload(message);
             reloadTree([]);
         });
@@ -1025,6 +1068,7 @@
         var finish = function (errorMessage) {
             if (entries.length) record(batchEntry(entries));
             rememberFolderOpen(folderId);
+            rememberSelection(items);
             if (errorMessage) {
                 errorToastAfterReload(errorMessage);
             } else {

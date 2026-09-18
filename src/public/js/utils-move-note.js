@@ -299,6 +299,9 @@ function moveNoteToFolder() {
                 try { closeModal('moveNoteFolderModal'); } catch (e) {
                     console.debug('utils-move-note: moveNoteToFolder() failed:', e);
                 }
+                // Show where the note went, and keep it selected there (#1441)
+                markFolderPathOpen(targetFolderId);
+                keepTreeSelection([{ type: 'note', id: noteId }], true);
                 location.reload();
             } else {
                 var err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';

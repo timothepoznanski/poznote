@@ -259,6 +259,19 @@ function renderMoveNoteRecentFolders(folders, excludeFolderId) {
     syncMoveNoteRecentSelection(select.value);
 }
 
+// The notes a folder holds itself, as tree selection targets. Its subfolders
+// keep their own notes, so only the rows directly under it count.
+function directNoteTargets(folderId) {
+    var content = document.getElementById('folder-' + String(folderId));
+    if (!content) return [];
+
+    var targets = [];
+    content.querySelectorAll(':scope > .note-list-item > a.links_arbo_left[data-note-db-id]').forEach(function (link) {
+        targets.push({ type: 'note', id: link.getAttribute('data-note-db-id') });
+    });
+    return targets;
+}
+
 function executeMoveAllFiles() {
     var sourceFolderElement = document.getElementById('sourceFolderName');
     var sourceFolderId = sourceFolderElement.dataset.folderId;
@@ -283,6 +296,10 @@ function executeMoveAllFiles() {
     // Move all files
     // Use "0" for "No folder" if targetFolderId is empty
     var targetId = targetFolderId === '' ? '0' : targetFolderId;
+
+    // The notes about to move, read before the tree is redrawn: the endpoint
+    // takes the direct notes of the folder and answers with a count only
+    var movedNotes = directNoteTargets(sourceFolderId);
 
     fetch('/api/v1/folders/move-files', {
         method: 'POST',
@@ -326,6 +343,9 @@ function executeMoveAllFiles() {
                 }
                 // Successfully moved files - no notification needed
                 closeModal('moveFolderFilesModal');
+                // Show where the notes went, and keep them selected (#1441)
+                markFolderPathOpen(targetId === '0' ? null : targetId);
+                keepTreeSelection(movedNotes, true);
                 // Refresh the page to reflect changes
                 location.reload();
             } else {
@@ -505,6 +525,9 @@ function executeMoveFolderToSubfolder() {
                     'success'
                 );
                 closeModal('moveFolderModal');
+                // Show where the folder went, and keep it selected there (#1441)
+                markFolderPathOpen(targetParentId);
+                keepTreeSelection([{ type: 'folder', id: sourceFolderId }], true);
                 // Refresh the page to reflect changes
                 location.reload();
             } else {

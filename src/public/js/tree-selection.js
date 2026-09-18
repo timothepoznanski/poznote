@@ -20,9 +20,11 @@
  * js/tree-undo-clipboard.js: Del, Ctrl+C / X / V, and the undo of those, which
  * read the set through window.PoznoteTreeSelection.items(). Dragging a
  * selected row drags the whole selection (js/events-drag-drop.js); dragging
- * a row outside it moves that row alone and clears the selection. Every one
- * of those actions reloads the page, which is what clears the selection
- * afterwards.
+ * a row outside it moves that row alone and clears the selection. Those
+ * actions redraw the tree, which is what clears the selection afterwards,
+ * except for a move: what was moved stays selected (issue #1441), through
+ * select() when the tree is swapped in place and selectAfterReload() when
+ * the page reloads.
  *
  * Rows are keyed "note:<id>" / "folder:<id>". A favorited note has a second
  * row in the Favorites section and a favorite folder a shortcut row there;
@@ -209,6 +211,65 @@
             return (ia === -1 ? order.length : ia) - (ib === -1 ? order.length : ib);
         });
         return sorted.map(parseKey);
+    }
+
+    // ============================================
+    // Selection kept across a move (issue #1441)
+    // ============================================
+
+    var PENDING_KEY = 'poznote_tree_pending_selection';
+
+    function keysFromItems(list) {
+        var keys = [];
+        (list || []).forEach(function (item) {
+            if (!item || !item.type || item.id === null || item.id === undefined || item.id === '') return;
+            var key = item.type + ':' + String(item.id);
+            if (keys.indexOf(key) === -1) keys.push(key);
+        });
+        return keys;
+    }
+
+    /** Select these rows now, for a move that redraws the tree in place */
+    function selectItems(list) {
+        if (isReadOnly()) return;
+        var keys = keysFromItems(list);
+        if (keys.length) anchorKey = keys[keys.length - 1];
+        setSelection(keys);
+    }
+
+    /** Same, for a move that reloads the page: init() reads it back */
+    function selectItemsAfterReload(list) {
+        if (isReadOnly()) return;
+        try {
+            sessionStorage.setItem(PENDING_KEY, JSON.stringify(keysFromItems(list)));
+        } catch (e) {
+            console.debug('tree-selection: selectItemsAfterReload() failed:', e);
+        }
+    }
+
+    function applyPendingSelection() {
+        var raw = null;
+        try {
+            raw = sessionStorage.getItem(PENDING_KEY);
+            // One shot: read once, whatever the tree turns out to hold
+            if (raw !== null) sessionStorage.removeItem(PENDING_KEY);
+        } catch (e) {
+            return;
+        }
+        if (!raw || isReadOnly()) return;
+
+        var keys = [];
+        try {
+            keys = JSON.parse(raw) || [];
+        } catch (e) {
+            return;
+        }
+        // Rows that did not come back (moved to another workspace, left out
+        // by a search) simply leave the selection
+        var found = keys.filter(function (key) { return rowElementsForKey(key).length > 0; });
+        if (!found.length) return;
+        anchorKey = found[found.length - 1];
+        setSelection(found);
     }
 
     // The tree is swapped wholesale by refreshNotesListAfterFolderAction():
@@ -422,12 +483,16 @@
         if (window.MutationObserver) {
             new MutationObserver(function () { pruneSelection(); }).observe(leftCol, { childList: true });
         }
+
+        applyPendingSelection();
     }
 
     window.PoznoteTreeSelection = {
         items: items,
         count: function () { return selectedKeys.length; },
-        clear: clearSelection
+        clear: clearSelection,
+        select: selectItems,
+        selectAfterReload: selectItemsAfterReload
     };
 
     if (document.readyState === 'loading') {
