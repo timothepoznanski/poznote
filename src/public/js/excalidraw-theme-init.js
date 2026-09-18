@@ -84,24 +84,15 @@ window.__poznoteUserStorage = window.__poznoteUserStorage || (function () {
         return effectiveTheme === 'dark' ? '#252526' : '#ffffff';
     }
 
-    function getCanvasBackground(theme, effectiveTheme) {
-        if (theme === 'black') {
-            return '#f2f7ff';
-        }
-        return effectiveTheme === 'dark' ? '#e9e9ea' : '#ffffff';
-    }
-
     function applyBodyThemeClasses(theme, effectiveTheme) {
         if (!document.body) {
             return;
         }
 
         var background = getThemeBackground(theme, effectiveTheme);
-        var canvasBackground = getCanvasBackground(theme, effectiveTheme);
         document.body.classList.toggle('dark-mode', effectiveTheme === 'dark');
         document.body.classList.toggle('black-mode', theme === 'black');
         document.body.style.setProperty('--excalidraw-note-background', background);
-        document.body.style.setProperty('--excalidraw-canvas-background', canvasBackground);
 
         if (document.body.classList.contains('excalidraw-editor-page')) {
             document.body.style.backgroundColor = background;
@@ -117,11 +108,9 @@ window.__poznoteUserStorage = window.__poznoteUserStorage || (function () {
         }
         var effectiveTheme = theme === 'black' ? 'dark' : theme;
         var background = getThemeBackground(theme, effectiveTheme);
-        var canvasBackground = getCanvasBackground(theme, effectiveTheme);
         document.documentElement.setAttribute('data-theme', effectiveTheme === 'dark' ? 'dark' : 'light');
         document.documentElement.classList.toggle('theme-black', theme === 'black');
         document.documentElement.style.setProperty('--excalidraw-note-background', background);
-        document.documentElement.style.setProperty('--excalidraw-canvas-background', canvasBackground);
         document.documentElement.style.backgroundColor = background;
         document.documentElement.style.colorScheme = effectiveTheme === 'dark' ? 'dark' : 'light';
 

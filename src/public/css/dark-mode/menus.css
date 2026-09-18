@@ -208,6 +208,14 @@ html[data-theme='dark'] img.img-with-border-no-padding {
     border-color: var(--dm-border);
 }
 
+/* An Excalidraw preview whose file carries no theme is inverted here
+   (--pz-excalidraw-filter in tokens.css), and a filter takes the element's own
+   background with it: the mat above is the note's ground, so inverted it would
+   ring the drawing with a light halo (issue #1445). */
+html[data-theme='dark'] img.excalidraw-image-neutral.img-with-border {
+    background: transparent;
+}
+
 /* ============================================
    Workspace Menu
    ============================================ */

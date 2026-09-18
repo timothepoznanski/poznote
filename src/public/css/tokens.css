@@ -180,6 +180,14 @@
     --pz-color-pink-soft: color-mix(in srgb, var(--pz-color-pink) var(--pz-color-soft-mix), var(--pz-bg));
     --pz-color-brown-soft: color-mix(in srgb, var(--pz-color-brown) var(--pz-color-soft-mix), var(--pz-bg));
     --pz-color-gray-soft: color-mix(in srgb, var(--pz-color-gray) var(--pz-color-soft-mix), var(--pz-bg));
+
+    /* Excalidraw previews. A diagram is stored with no ground of its own and
+       with the colours Excalidraw authors in light mode, so the note shows
+       through behind it. A dark mode inverts it, which is how a black stroke
+       becomes a light one: the same filter Excalidraw puts on its own canvas.
+       Setting it here is what makes a theme change reach the diagram with no
+       re-save (issue #1445). */
+    --pz-excalidraw-filter: none;
 }
 
 /* ============================================
@@ -187,6 +195,9 @@
    ============================================ */
 
 html[data-theme='dark'] {
+    /* See --pz-excalidraw-filter on :root above. */
+    --pz-excalidraw-filter: invert(93%) hue-rotate(180deg);
+
     /* Text scale. Contrast on --dm-content-bg is 11.6 / 8.2 / 5.9 / 4.3, the same
        shape the black theme below already had. --dm-text-muted used to be
        #c5c5c5, which is BRIGHTER than --dm-text: the muted level was louder than
@@ -532,4 +543,13 @@ html[data-theme='dark'] {
 /* Prevent transition flash on initial load */
 html[data-theme='dark'] * {
     transition: background-color 0.0s, color 0.0s, border-color 0.0s !important;
+}
+
+/* The one rule that consumes --pz-excalidraw-filter, and it lives here
+   because this is the only stylesheet every page that can render a note body
+   loads: the note editor, the journal, a share page, the notes manager. A
+   diagram whose preview carries no theme would otherwise be drawn in dark
+   strokes on a dark ground on whichever of them lacked the rule. */
+.excalidraw-image-neutral {
+    filter: var(--pz-excalidraw-filter, none);
 }

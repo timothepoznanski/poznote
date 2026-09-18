@@ -7,6 +7,7 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../functions.php';
 require_once __DIR__ . '/../db_connect.php';
+require_once __DIR__ . '/../lib/excalidraw-preview.php';
 
 // Check that the request is POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -38,59 +39,23 @@ function excalidrawAssertNoteNotLockedByOther(int $note_id): void {
 
 /**
  * The preview the note displays through <img>: the SVG Excalidraw exported,
- * crisp at any pixel density (issue #1434). Returns null when the request
+ * crisp at any pixel density (issue #1434), with the theme it was exported
+ * under taken back out of it (issue #1445). Returns null when the request
  * carries none, and answers 400 when it carries something that is not an
- * Excalidraw SVG.
+ * Excalidraw SVG. Both rules live in lib/excalidraw-preview.php.
  */
 function excalidrawReadPreviewSvg(): ?string {
     $svg = $_POST['preview_svg'] ?? '';
     if (!is_string($svg) || trim($svg) === '') {
         return null;
     }
-    if (!excalidrawIsAcceptablePreviewSvg($svg)) {
+    $svg = poznoteStripExcalidrawPreviewTheme($svg);
+    if (!poznoteIsAcceptableExcalidrawPreviewSvg($svg)) {
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Invalid image type']);
         exit;
     }
     return $svg;
-}
-
-/**
- * The SVG is only ever displayed through <img>, where nothing in it can run,
- * and is served with the sandbox headers every SVG attachment gets. These
- * checks refuse what Excalidraw never produces (scripts, handlers, HTML
- * islands, references outside the file) so the file cannot be repurposed.
- */
-function excalidrawIsAcceptablePreviewSvg(string $svg): bool {
-    $trimmed = ltrim($svg);
-    if (stripos($trimmed, '<svg') !== 0 && stripos($trimmed, '<?xml') !== 0) {
-        return false;
-    }
-
-    $finfo = finfo_open(FILEINFO_MIME_TYPE);
-    $mimeType = $finfo ? finfo_buffer($finfo, $svg) : false;
-    if ($finfo) {
-        finfo_close($finfo);
-    }
-    if ($mimeType !== 'image/svg+xml') {
-        return false;
-    }
-
-    if (preg_match('/<\s*(script|foreignObject|iframe|embed|object)\b/i', $svg)) {
-        return false;
-    }
-    // Event handler attributes. Text content is entity-escaped in the
-    // serialized SVG, so a raw "<" only ever opens a real tag here.
-    if (preg_match('/<[^>]*\son[a-z]+\s*=/i', $svg)) {
-        return false;
-    }
-    // Excalidraw only references its embedded images (data:) and its own
-    // <symbol> definitions (#).
-    if (preg_match('/\b(?:xlink:)?href\s*=\s*["\'](?!data:image\/|#)/i', $svg)) {
-        return false;
-    }
-
-    return true;
 }
 
 if ($action === 'save_embedded_diagram') {
@@ -288,8 +253,12 @@ if ($note_id > 0) {
     $excalidraw_placeholder = htmlspecialchars($excalidraw_placeholder, ENT_QUOTES);
 
     if ($attachmentId) {
-        // Build img classes preserving border settings
-        $img_classes = 'excalidraw-image';
+        // Build img classes preserving border settings.
+        // excalidraw-image-neutral says the file carries no theme, so the page
+        // may paint the ground behind it and invert it in a dark theme
+        // (issue #1445). A preview saved before that has the theme baked in
+        // and keeps the class off, which leaves it rendered untouched.
+        $img_classes = 'excalidraw-image excalidraw-image-neutral';
         if (!empty($existing_img_classes)) {
             if (strpos($existing_img_classes, 'img-with-border-no-padding') !== false) {
                 $img_classes .= ' img-with-border-no-padding';
@@ -491,8 +460,9 @@ function saveEmbeddedDiagram() {
             }
         }
         
-        // Build class attribute preserving border classes
-        $img_classes = 'excalidraw-image';
+        // Build class attribute preserving border classes.
+        // excalidraw-image-neutral: see the note on the full-note save above.
+        $img_classes = 'excalidraw-image excalidraw-image-neutral';
         if (!empty($existing_img_classes)) {
             // Preserve img-with-border and img-with-border-no-padding classes
             if (strpos($existing_img_classes, 'img-with-border-no-padding') !== false) {
