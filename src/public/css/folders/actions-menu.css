@@ -318,6 +318,34 @@ html[data-theme='dark'] .note-actions-menu-item.active i {
     opacity: 0.45;
 }
 
+/* ... and its icon turns into a pair of scissors, so a cut row reads as a
+   move rather than a copy (issue #1412). Row icons are CSS masks, so only
+   the mask image is swapped: size and the icon colour are left alone. The
+   scissors mask is the one css/lucide.css gives .lucide-scissors. */
+.tree-clipboard-cut .note-icon,
+.folder-toggle.tree-clipboard-cut > .folder-icon {
+    -webkit-mask-image: url("data:image/svg+xml,%3C%21--%20%40license%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-scissors%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Ccircle%20cx%3D%276%27%20cy%3D%276%27%20r%3D%273%27%20%2F%3E%20%3Cpath%20d%3D%27M8.12%208.12%2012%2012%27%20%2F%3E%20%3Cpath%20d%3D%27M20%204%208.12%2015.88%27%20%2F%3E%20%3Ccircle%20cx%3D%276%27%20cy%3D%2718%27%20r%3D%273%27%20%2F%3E%20%3Cpath%20d%3D%27M14.8%2014.8%2020%2020%27%20%2F%3E%20%3C%2Fsvg%3E");
+    mask-image: url("data:image/svg+xml,%3C%21--%20%40license%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-scissors%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Ccircle%20cx%3D%276%27%20cy%3D%276%27%20r%3D%273%27%20%2F%3E%20%3Cpath%20d%3D%27M8.12%208.12%2012%2012%27%20%2F%3E%20%3Cpath%20d%3D%27M20%204%208.12%2015.88%27%20%2F%3E%20%3Ccircle%20cx%3D%276%27%20cy%3D%2718%27%20r%3D%273%27%20%2F%3E%20%3Cpath%20d%3D%27M14.8%2014.8%2020%2020%27%20%2F%3E%20%3C%2Fsvg%3E");
+}
+
+/* With note icons hidden (UI customization) a note row has no icon to swap,
+   so the scissors goes in front of the title instead. */
+.tree-clipboard-cut .note-title:not(:has(.note-icon))::before {
+    content: '';
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin-right: 6px;
+    vertical-align: -0.125em;
+    background-color: currentColor;
+    -webkit-mask-image: url("data:image/svg+xml,%3C%21--%20%40license%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-scissors%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Ccircle%20cx%3D%276%27%20cy%3D%276%27%20r%3D%273%27%20%2F%3E%20%3Cpath%20d%3D%27M8.12%208.12%2012%2012%27%20%2F%3E%20%3Cpath%20d%3D%27M20%204%208.12%2015.88%27%20%2F%3E%20%3Ccircle%20cx%3D%276%27%20cy%3D%2718%27%20r%3D%273%27%20%2F%3E%20%3Cpath%20d%3D%27M14.8%2014.8%2020%2020%27%20%2F%3E%20%3C%2Fsvg%3E");
+    mask-image: url("data:image/svg+xml,%3C%21--%20%40license%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-scissors%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Ccircle%20cx%3D%276%27%20cy%3D%276%27%20r%3D%273%27%20%2F%3E%20%3Cpath%20d%3D%27M8.12%208.12%2012%2012%27%20%2F%3E%20%3Cpath%20d%3D%27M20%204%208.12%2015.88%27%20%2F%3E%20%3Ccircle%20cx%3D%276%27%20cy%3D%2718%27%20r%3D%273%27%20%2F%3E%20%3Cpath%20d%3D%27M14.8%2014.8%2020%2020%27%20%2F%3E%20%3C%2Fsvg%3E");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+}
+
 /* Rows picked with Ctrl+Click / Shift+Click (js/tree-selection.js). The tint
    goes on the note link rather than its row: the link is the visible band,
    the row box also holds the link's top margin. :hover is named so the grey
