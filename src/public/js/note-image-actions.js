@@ -57,9 +57,15 @@ function performImageDeletion(img) {
         // Find the container (could be excalidraw-container or just the img itself)
         const container = img.closest('.excalidraw-container');
         const elementToRemove = container || img;
+        const previousNode = elementToRemove.previousSibling;
+        const nextNode = elementToRemove.nextSibling;
 
         // Remove the element from DOM
         elementToRemove.remove();
+
+        if (container) {
+            removeExcalidrawPlaceholdersAround(previousNode, nextNode);
+        }
 
         // Clean up any following empty elements or line breaks
         const nextElement = elementToRemove.nextElementSibling;
@@ -83,6 +89,49 @@ function performImageDeletion(img) {
     } catch (error) {
         console.warn('Error deleting image:', error);
     }
+}
+
+/**
+ * The next node on one side of a position, whitespace-only text nodes skipped
+ */
+function skipBlankTextNodes(node, direction) {
+    while (node && node.nodeType === Node.TEXT_NODE && node.textContent.trim() === '') {
+        node = node[direction];
+    }
+    return node;
+}
+
+/**
+ * True for a "Write outside the diagram here…" paragraph the user never typed in.
+ * Older insertions stored the hint as literal dots instead of data-ph.
+ */
+function isEmptyExcalidrawPlaceholder(node) {
+    if (!node || node.nodeType !== Node.ELEMENT_NODE || !node.classList.contains('excalidraw-placeholder')) {
+        return false;
+    }
+    if (node.querySelector(':not(br)')) {
+        return false;
+    }
+    return /^(?:\.{3}|…)?$/.test(node.textContent.replace(/[\s​]/g, ''));
+}
+
+/**
+ * Remove the placeholder paragraphs left on each side of a deleted Excalidraw
+ * diagram. Takes the diagram's former siblings, since it is already out of the DOM.
+ * A paragraph holding user text stays, and so does one that still borders
+ * another diagram.
+ */
+function removeExcalidrawPlaceholdersAround(previousNode, nextNode) {
+    [[previousNode, 'previousSibling'], [nextNode, 'nextSibling']].forEach(function (side) {
+        const direction = side[1];
+        const placeholder = skipBlankTextNodes(side[0], direction);
+        if (!isEmptyExcalidrawPlaceholder(placeholder)) return;
+
+        const beyond = skipBlankTextNodes(placeholder[direction], direction);
+        if (beyond && beyond.nodeType === Node.ELEMENT_NODE && beyond.classList.contains('excalidraw-container')) return;
+
+        placeholder.remove();
+    });
 }
 
 function deleteImageAttachmentIfOwnedByNote(img, expectedNoteId) {
@@ -783,3 +832,4 @@ function hideImageLinkToast(toast) {
 })();
 
 window.invalidateNoteDomCache = invalidateNoteDomCache;
+window.removeExcalidrawPlaceholdersAround = removeExcalidrawPlaceholdersAround;
