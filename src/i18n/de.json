@@ -495,7 +495,6 @@
       "index_icon_scale": "Passen Sie die Größe der Symbole in der Notizenliste an.",
       "timezone": "Legen Sie die Zeitzone für die Anzeige von Datum und Uhrzeit fest.",
       "date_time_format": "Wählen Sie, wie Datum und Uhrzeit angezeigt werden.",
-      "note_sort": "Wählen Sie die Sortierung der Notizen in der Liste.",
       "note_age_filter": "Nur Notizen anzeigen, die innerhalb der gewählten Anzahl von Tagen geändert wurden.",
       "tasklist_insert_order": "Wählen Sie, ob neue Aufgaben oben oder unten in Aufgabenlisten eingefügt werden.",
       "diary_note_type": "Wählen Sie das Notizformat für neue Tagebucheinträge.",
@@ -816,7 +815,6 @@
       "markdown_default_view_mode": "Standardansicht",
       "login_display": "Login-Seiten-Titel",
       "note_font_size": "Schriftgröße",
-      "note_sort_order": "Notizen-Sortierreihenfolge",
       "note_age_filter": "Altersfilter",
       "tasklist_insert_order": "Einfüge-Reihenfolge der Aufgaben",
       "diary_default_note_type": "Format der Tagebucheinträge",
@@ -1627,16 +1625,6 @@
       "title": "Aufgabenliste einfügen",
       "description": "Wählen Sie die Aufgabenliste, die in dieser Notiz angezeigt werden soll.",
       "confirm": "Einfügen"
-    },
-    "note_sort": {
-      "title": "Notizen-Sortierreihenfolge",
-      "description": "Wählen Sie aus, wie Notizen in der Notizenliste geordnet werden:",
-      "options": {
-        "last_modified": "Zuletzt geändert",
-        "last_created": "Zuletzt erstellt",
-        "alphabetical": "Alphabetisch",
-        "manual": "Manuell (Drag & Drop)"
-      }
     },
     "folder_tree_highlight": {
       "title": "Aktuellen Ordnerbaum hervorheben",
@@ -3623,10 +3611,15 @@
   },
   "sort": {
     "header": "Sortieren nach",
-    "alphabet": "Name",
-    "created": "Erstellungsdatum",
-    "modified": "Änderungsdatum",
-    "manual": "Manuell"
+    "button_title": "Sortieren nach: {{mode}}",
+    "save_failed": "Sortierung konnte nicht geändert werden",
+    "modes": {
+      "name": "Name",
+      "date_modified": "Änderungsdatum",
+      "date_created": "Erstellungsdatum",
+      "type": "Typ",
+      "custom": "Benutzerdefiniert"
+    }
   },
   "calendar": {
     "months": {

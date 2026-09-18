@@ -693,6 +693,7 @@ class NotesController {
                 'updated_desc' => "CASE WHEN folder_id IS NULL THEN $folder_null_case ELSE $folder_case END, folder, updated DESC",
                 'created_desc' => "CASE WHEN folder_id IS NULL THEN $folder_null_case ELSE $folder_case END, folder, created DESC",
                 'heading_asc'  => 'folder, heading COLLATE NOCASE ASC',
+                'type_asc'     => "CASE WHEN folder_id IS NULL THEN $folder_null_case ELSE $folder_case END, folder, type COLLATE NOCASE, heading COLLATE NOCASE ASC",
                 // Drag-and-drop order: unplaced notes (display_order 0) first,
                 // newest update first, then the saved positions
                 'manual'       => "CASE WHEN folder_id IS NULL THEN $folder_null_case ELSE $folder_case END, folder, CASE WHEN display_order > 0 THEN 1 ELSE 0 END, display_order, updated DESC"

@@ -494,7 +494,6 @@
       "index_icon_scale": "Ajustez la taille des icônes dans la liste des notes.",
       "timezone": "Définissez le fuseau horaire utilisé pour afficher les dates et heures.",
       "date_time_format": "Choisissez le format d'affichage des dates et heures.",
-      "note_sort": "Choisissez l'ordre des notes dans la liste.",
       "note_age_filter": "Affichez uniquement les notes modifiées durant les derniers jours choisis.",
       "tasklist_insert_order": "Choisissez si les nouvelles tâches sont ajoutées en haut ou en bas des listes de tâches.",
       "diary_note_type": "Choisissez le format de note utilisé pour les nouvelles entrées de journal.",
@@ -816,7 +815,6 @@
       "markdown_default_view_mode": "Mode d'ouverture",
       "login_display": "Titre page de connexion",
       "note_font_size": "Taille de police",
-      "note_sort_order": "Tri des notes",
       "note_age_filter": "Filtre d’ancienneté",
       "tasklist_insert_order": "Ordre d'insertion des tâches",
       "diary_default_note_type": "Format des entrées de journal",
@@ -1633,16 +1631,6 @@
       "success": "Note convertie avec succès !",
       "error": "Échec de la conversion de la note",
       "duplicate_button": "Dupliquer"
-    },
-    "note_sort": {
-      "title": "Ordre de tri des notes",
-      "description": "Choisissez l’ordre d’affichage des notes dans la liste :",
-      "options": {
-        "last_modified": "Dernière modification",
-        "last_created": "Dernière création",
-        "alphabetical": "Alphabétique",
-        "manual": "Manuel (glisser-déposer)"
-      }
     },
     "folder_tree_highlight": {
       "title": "Mettre en avant le dossier courant",
@@ -3728,10 +3716,15 @@
   },
   "sort": {
     "header": "Trier par",
-    "alphabet": "Nom",
-    "created": "Date de création",
-    "modified": "Date de modification",
-    "manual": "Manuel"
+    "button_title": "Trier par : {{mode}}",
+    "save_failed": "Impossible de changer le tri",
+    "modes": {
+      "name": "Nom",
+      "date_modified": "Date de modification",
+      "date_created": "Date de création",
+      "type": "Type",
+      "custom": "Personnalisé"
+    }
   },
   "calendar": {
     "months": {

@@ -16,7 +16,7 @@ $workspace = trim(getWorkspaceFilter());
 
 // Build query to get all folders
 $select_query = "SELECT f.id, f.name, f.icon, f.icon_color, f.display_order, f.parent_id,
-                 f.sort_setting, f.favorite,
+                 f.created, f.favorite,
                  (SELECT COUNT(*) FROM entries e WHERE e.folder_id = f.id AND e.trash = 0) as note_count
                  FROM folders f";
 
@@ -28,8 +28,6 @@ if (!empty($workspace)) {
 	$search_params[] = $workspace;
 }
 
-$select_query .= " ORDER BY CASE WHEN f.display_order > 0 THEN 0 ELSE 1 END, f.display_order, f.name COLLATE NOCASE";
-
 $stmt = $con->prepare($select_query);
 $stmt->execute($search_params);
 
@@ -37,6 +35,9 @@ $folders = [];
 while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 	$folders[(int)$row['id']] = $row;
 }
+
+// Same order as the sidebar tree: the one global sort mode (#1442)
+$folders = sortFolders($folders, poznoteNormalizeNoteSort(getSetting('note_list_sort', POZNOTE_NOTE_SORT_DEFAULT)));
 
 // Folders are listed as a tree (same parent_id hierarchy as the sidebar in
 // index.php) rather than flat, so subfolders read as belonging to their parent.
@@ -163,7 +164,6 @@ function renderFolderListRow($folderId, $folder, $depth, $workspace, $sharedFold
 	$note_count = (int)$folder['note_count'];
 	$is_shared = isset($sharedFolderIds[(int)$folder['id']]) ? '1' : '0';
 	$is_favorite = !empty($folder['favorite']) ? '1' : '0';
-	$current_sort = htmlspecialchars((string)($folder['sort_setting'] ?? ''), ENT_QUOTES);
 
 	$kanban_url = 'index.php?kanban=' . $folder_id . '&workspace=' . urlencode($workspace);
 
@@ -180,7 +180,7 @@ function renderFolderListRow($folderId, $folder, $depth, $workspace, $sharedFold
 	// Folder identity, carried by every action button of the row
 	$folderAttrs = ' data-folder-id="' . $folder_id . '" data-folder-name="' . $folder_name . '"'
 		. ' data-note-count="' . $note_count . '" data-shared="' . $is_shared . '"'
-		. ' data-favorite="' . $is_favorite . '" data-current-sort="' . $current_sort . '"';
+		. ' data-favorite="' . $is_favorite . '"';
 
 	echo '<div class="folder-list-actions">';
 

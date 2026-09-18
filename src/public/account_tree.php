@@ -74,9 +74,9 @@ if (is_file($dbPath)) {
         if ($workspacesOnly) {
             $colors = poznoteGetWorkspaceColorsMap($pdo);
         } else {
-            $folders = $pdo->query('SELECT id, name, parent_id, workspace, display_order, sort_setting FROM folders')->fetchAll(PDO::FETCH_ASSOC);
+            $folders = $pdo->query('SELECT id, name, parent_id, workspace, created, display_order FROM folders')->fetchAll(PDO::FETCH_ASSOC);
             $notes = $pdo->query('SELECT id, heading, folder_id, workspace, type, created, updated, display_order FROM entries WHERE trash = 0')->fetchAll(PDO::FETCH_ASSOC);
-            // The account's own sort preference, so its outline lists the
+            // The account's own sort mode, so its outline lists folders and
             // notes in the order its full tree does.
             $sortStmt = $pdo->prepare('SELECT value FROM settings WHERE key = ?');
             $sortStmt->execute(['note_list_sort']);

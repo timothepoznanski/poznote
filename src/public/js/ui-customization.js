@@ -396,9 +396,6 @@
                 rules.push('.workspace-menu-item[data-action="' + id + '"] { display: none !important; }');
             } else if (type === 'folder') {
                 rules.push('.folder-actions-menu-item[data-action="' + id + '"] { display: none !important; }');
-                if (id === 'toggle-sort-submenu') {
-                    rules.push('.sort-submenu { display: none !important; }');
-                }
             } else if (type === 'note') {
                 // Scoped to the menu: the same data-action values are used by
                 // the note toolbar and by the note icons in the tree, which

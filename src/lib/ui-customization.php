@@ -22,6 +22,12 @@ function poznoteGetNonHideableUiKeys() {
         // The mobile "back to notes" toolbar button is the way back to the
         // note list on small screens, so it is no longer offered for hiding.
         'toolbar:btn-home' => true,
+        // Sorting became one global mode with its own button in the sidebar
+        // title row (#1442): the per-folder "Sort by" submenu and the Settings
+        // card that held the global default are both gone. The sidebar button
+        // is hideable under card:sidebarSortBtn.
+        'folder:toggle-sort-submenu' => true,
+        'card:note-sort-card' => true,
     ];
 }
 
@@ -455,9 +461,6 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
             $rules[] = '.workspace-menu-item[data-action="' . $id . '"] { display: none !important; }';
         } elseif ($type === 'folder') {
             $rules[] = '.folder-actions-menu-item[data-action="' . $id . '"] { display: none !important; }';
-            if ($id === 'toggle-sort-submenu') {
-                $rules[] = '.sort-submenu { display: none !important; }';
-            }
         } elseif ($type === 'panel') {
             if ($id === 'mini-calendar') {
                 $rules[] = '.mini-calendar-container { display: none !important; }';

@@ -3,6 +3,8 @@
  * Management of folder and note display
  */
 
+require_once __DIR__ . '/lib/note-sort.php';
+
 // Constants
 define('FAVORITES_FOLDER_NAME', 'Favorites');
 
@@ -26,54 +28,6 @@ function countNotesRecursively($folderData) {
 }
 
 /**
- * Map the global note_list_sort setting to a per-folder sort type
- * ('alphabet', 'created', 'modified' or 'manual').
- *
- * @param string $default_sort Global setting value
- * @return string Folder sort type
- */
-function noteListSortToFolderSortType($default_sort) {
-    switch ($default_sort) {
-        case 'heading_asc':
-            return 'alphabet';
-        case 'created_desc':
-            return 'created';
-        case 'manual':
-            return 'manual';
-        case 'updated_desc':
-        default:
-            return 'modified';
-    }
-}
-
-/**
- * Comparator for the 'manual' sort (drag-and-drop ordering).
- *
- * Notes with a display_order (> 0) keep their saved position. Notes without
- * one (0: created or moved in after the last drop) come first, newest update
- * first, so a fresh note is visible at the top until the user places it.
- * The reorder endpoint renumbers every sibling on each drop, so mixed lists
- * only exist between a drop and the next one.
- *
- * @param array $a Note row
- * @param array $b Note row
- * @return int
- */
-function compareNotesManualOrder($a, $b) {
-    $orderA = isset($a['display_order']) ? (int)$a['display_order'] : 0;
-    $orderB = isset($b['display_order']) ? (int)$b['display_order'] : 0;
-    if ($orderA > 0 && $orderB > 0) {
-        if ($orderA !== $orderB) return $orderA <=> $orderB;
-        return ((int)($a['id'] ?? 0)) <=> ((int)($b['id'] ?? 0));
-    }
-    if ($orderA > 0) return 1;
-    if ($orderB > 0) return -1;
-    $cmp = strcmp($b['updated'] ?? '', $a['updated'] ?? '');
-    if ($cmp !== 0) return $cmp;
-    return ((int)($b['id'] ?? 0)) <=> ((int)($a['id'] ?? 0));
-}
-
-/**
  * Organize notes by folder
  * Returns array with 'folders' and 'uncategorized_notes' keys
  * OPTIMIZED: Pre-loads all folder data to avoid N+1 queries
@@ -81,16 +35,16 @@ function compareNotesManualOrder($a, $b) {
  * @param PDOStatement $stmt_left Statement containing notes to organize
  * @param PDO $con Database connection
  * @param string|null $workspace_filter Optional workspace filter
- * @param string $default_sort Default sort order ('updated_desc', 'heading_asc', 'created_desc', 'manual')
+ * @param string $sort_mode Global sort mode, see src/lib/note-sort.php
  * @return array Array with 'folders' and 'uncategorized_notes' keys
  */
-function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sort = 'updated_desc') {
+function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $sort_mode = POZNOTE_NOTE_SORT_DEFAULT) {
     $folders = [];
     $uncategorized_notes = []; // Notes without folder
     
     // PRE-LOAD all folders in one query to avoid N+1 problem
     $folders_cache = [];
-    $folders_query = "SELECT id, name, icon, icon_color, kanban_enabled, sort_setting, display_order, favorite FROM folders";
+    $folders_query = "SELECT id, name, icon, icon_color, kanban_enabled, created, display_order, favorite FROM folders";
     if ($workspace_filter) {
         $folders_query .= " WHERE workspace = ?";
         $folders_stmt = $con->prepare($folders_query);
@@ -104,7 +58,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
             'icon' => $folder_row['icon'] ?? null,
             'icon_color' => $folder_row['icon_color'] ?? null,
             'kanban_enabled' => (int)($folder_row['kanban_enabled'] ?? 0),
-            'sort_setting' => $folder_row['sort_setting'] ?? null,
+            'created' => $folder_row['created'] ?? '',
             'display_order' => (int)($folder_row['display_order'] ?? 0),
             'favorite' => (int)($folder_row['favorite'] ?? 0)
         ];
@@ -124,7 +78,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
         $folderIcon = null;
         $folderIconColor = null;
         $kanbanEnabled = 0;
-        $sortSetting = null;
+        $folderCreated = '';
         $displayOrder = 0;
         $isFavorite = 0;
 
@@ -133,7 +87,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
             $folderIcon = $folders_cache[$folderId]['icon'];
             $folderIconColor = $folders_cache[$folderId]['icon_color'];
             $kanbanEnabled = $folders_cache[$folderId]['kanban_enabled'];
-            $sortSetting = $folders_cache[$folderId]['sort_setting'];
+            $folderCreated = $folders_cache[$folderId]['created'];
             $displayOrder = $folders_cache[$folderId]['display_order'];
             $isFavorite = $folders_cache[$folderId]['favorite'];
         }
@@ -145,7 +99,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
                 'icon' => $folderIcon,
                 'icon_color' => $folderIconColor,
                 'kanban_enabled' => $kanbanEnabled,
-                'sort_setting' => $sortSetting,
+                'created' => $folderCreated,
                 'display_order' => $displayOrder,
                 'favorite' => $isFavorite,
                 'notes' => []
@@ -155,49 +109,14 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
         $folders[$folderId]['notes'][] = $row1;
     }
     
-    // Sort notes within folders based on folder-specific sort_setting or default sort
+    // One mode for the whole tree (#1442): a folder no longer carries a sort
+    // of its own.
     foreach ($folders as &$folder) {
-        $sortType = null;
-        
-        // Folder-specific sort setting overrides global default
-        if (isset($folder['sort_setting']) && !empty($folder['sort_setting'])) {
-            $sortType = $folder['sort_setting'];
-        } else {
-            // Map global setting to folder sort type
-            $sortType = noteListSortToFolderSortType($default_sort);
-        }
-        
-        // Ensure effective sort type is used for UI rendering (e.g., checkmark display)
-        if ($sortType) {
-            $folder['sort_setting'] = $sortType;
-        }
-        
-        // Apply sort based on determined type
-        if ($sortType === 'alphabet') {
-            usort($folder['notes'], function($a, $b) {
-                // Use heading, fallback to empty string for natural case-insensitive sorting
-                $headingA = isset($a['heading']) ? mb_strtolower($a['heading'], 'UTF-8') : '';
-                $headingB = isset($b['heading']) ? mb_strtolower($b['heading'], 'UTF-8') : '';
-                return strnatcasecmp($headingA, $headingB);
-            });
-        } elseif ($sortType === 'created') {
-            usort($folder['notes'], function($a, $b) {
-                $createdA = $a['created'] ?? '';
-                $createdB = $b['created'] ?? '';
-                // Newest first
-                return strcmp($createdB, $createdA);
-            });
-        } elseif ($sortType === 'modified') {
-            usort($folder['notes'], function($a, $b) {
-                $updatedA = $a['updated'] ?? '';
-                $updatedB = $b['updated'] ?? '';
-                // Newest first
-                return strcmp($updatedB, $updatedA);
-            });
-        } elseif ($sortType === 'manual') {
-            usort($folder['notes'], 'compareNotesManualOrder');
-        }
+        usort($folder['notes'], function ($a, $b) use ($sort_mode) {
+            return poznoteCompareNotes($sort_mode, $a, $b);
+        });
     }
+    unset($folder);
     
     return [
         'folders' => $folders,
@@ -215,13 +134,13 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
  * @return array Updated folders array including empty folders
  */
 function addEmptyFolders($con, $folders, $workspace_filter) {
-    $folders_sql = "SELECT id, name, icon, icon_color, kanban_enabled, sort_setting, display_order, favorite FROM folders";
+    $folders_sql = "SELECT id, name, icon, icon_color, kanban_enabled, created, display_order, favorite FROM folders";
     $params = [];
     if (!empty($workspace_filter)) {
         $folders_sql .= " WHERE workspace = ?";
         $params[] = $workspace_filter;
     }
-    $folders_sql .= " ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE";
+    $folders_sql .= " ORDER BY name COLLATE NOCASE";
 
     $empty_folders_query = $con->prepare($folders_sql);
     $empty_folders_query->execute($params);
@@ -231,7 +150,7 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
         $folderIcon = $folder_row['icon'] ?? null;
         $folderIconColor = $folder_row['icon_color'] ?? null;
         $kanbanEnabled = (int)($folder_row['kanban_enabled'] ?? 0);
-        $sortSetting = $folder_row['sort_setting'] ?? null;
+        $folderCreated = $folder_row['created'] ?? '';
         $displayOrder = (int)($folder_row['display_order'] ?? 0);
         $isFavorite = (int)($folder_row['favorite'] ?? 0);
 
@@ -242,17 +161,17 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
                 'icon' => $folderIcon,
                 'icon_color' => $folderIconColor,
                 'kanban_enabled' => $kanbanEnabled,
-                'sort_setting' => $sortSetting,
+                'created' => $folderCreated,
                 'display_order' => $displayOrder,
                 'favorite' => $isFavorite,
                 'notes' => []
             ];
         } else {
-            // Update icon, color, kanban_enabled and sort_setting if folder already exists
+            // Update icon, color, kanban_enabled and dates if folder already exists
             $folders[$folderId]['icon'] = $folderIcon;
             $folders[$folderId]['icon_color'] = $folderIconColor;
             $folders[$folderId]['kanban_enabled'] = $kanbanEnabled;
-            $folders[$folderId]['sort_setting'] = $sortSetting;
+            $folders[$folderId]['created'] = $folderCreated;
             $folders[$folderId]['display_order'] = $displayOrder;
             $folders[$folderId]['favorite'] = $isFavorite;
         }
@@ -295,29 +214,27 @@ function ensureFavoritesFolder($folders) {
 }
 
 /**
- * Sort folders (Favorites first, then saved display order, then alphabetically by name)
- * Works with folder arrays containing 'id' and 'name'
- * 
+ * Sort folders under the global sort mode, Favorites always first.
+ *
+ * The flat map is sorted once and buildFolderHierarchy() keeps that order
+ * while nesting the rows, so one pass orders every sibling group. Only the
+ * Custom mode reads display_order: the other modes ignore the hand-set
+ * positions without erasing them, which is what lets a user step away from
+ * Custom and come back to the arrangement they left (#1442).
+ *
  * @param array $folders Folders to sort
+ * @param string $sort_mode Global sort mode, see src/lib/note-sort.php
  * @return array Sorted folders array
  */
-function sortFolders($folders) {
-    uksort($folders, function($a, $b) use ($folders) {
+function sortFolders($folders, $sort_mode = POZNOTE_NOTE_SORT_DEFAULT) {
+    uksort($folders, function($a, $b) use ($folders, $sort_mode) {
         $folderA = $folders[$a];
         $folderB = $folders[$b];
-        $nameA = $folderA['name'];
-        $nameB = $folderB['name'];
-        $orderA = isset($folderA['display_order']) ? (int)$folderA['display_order'] : 0;
-        $orderB = isset($folderB['display_order']) ? (int)$folderB['display_order'] : 0;
         
-        if ($nameA === FAVORITES_FOLDER_NAME) return -1;
-        if ($nameB === FAVORITES_FOLDER_NAME) return 1;
-        if ($orderA > 0 || $orderB > 0) {
-            if ($orderA <= 0) return 1;
-            if ($orderB <= 0) return -1;
-            if ($orderA !== $orderB) return $orderA <=> $orderB;
-        }
-        return strcasecmp($nameA, $nameB);
+        if (($folderA['name'] ?? '') === FAVORITES_FOLDER_NAME) return -1;
+        if (($folderB['name'] ?? '') === FAVORITES_FOLDER_NAME) return 1;
+        
+        return poznoteCompareFolders($sort_mode, $folderA, $folderB);
     });
     
     return $folders;
@@ -387,7 +304,7 @@ function shouldFolderBeOpen($con, $folderData, $is_search_mode, $folders_with_re
  * Only emits the three-dot toggle button. The dropdown itself is a single
  * shared menu rendered once per page by renderFolderActionsMenu(); the
  * toggle carries everything the client needs to populate it (folder id/name,
- * note count, shared state, current sort). This keeps the sidebar DOM small:
+ * note count, shared state). This keeps the sidebar DOM small:
  * one menu instead of ~15 hidden menu items per folder.
  *
  * @param int $folderId Folder ID
@@ -395,11 +312,10 @@ function shouldFolderBeOpen($con, $folderData, $is_search_mode, $folders_with_re
  * @param PDO $con Database connection
  * @param string|null $workspace_filter Workspace filter
  * @param int $noteCount Number of notes in folder
- * @param string|null $currentSort Current sort setting
  * @param bool $isFavorite Whether the folder is marked as favorite
  * @return string HTML for folder actions
  */
-function generateFolderActions($folderId, $folderName, $con, $workspace_filter, $noteCount = 0, $currentSort = null, $isFavorite = false) {
+function generateFolderActions($folderId, $folderName, $con, $workspace_filter, $noteCount = 0, $isFavorite = false) {
     static $sharedFoldersCache = null;
 
     if ($folderName === FAVORITES_FOLDER_NAME) {
@@ -421,12 +337,11 @@ function generateFolderActions($folderId, $folderName, $con, $workspace_filter, 
 
     $isShared = isset($sharedFoldersCache[(int)$folderId]);
     $htmlEscapedFolderName = htmlspecialchars($folderName, ENT_QUOTES);
-    $htmlCurrentSort = htmlspecialchars((string)($currentSort ?? ''), ENT_QUOTES);
 
     return "<div class='folder-actions-toggle' data-action='toggle-folder-actions-menu'"
         . " data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'"
         . " data-note-count='" . (int)$noteCount . "' data-shared='" . ($isShared ? '1' : '0') . "'"
-        . " data-current-sort='$htmlCurrentSort' data-favorite='" . ($isFavorite ? '1' : '0') . "'"
+        . " data-favorite='" . ($isFavorite ? '1' : '0') . "'"
         . " title='" . t_h('notes_list.folder_actions.menu', [], 'Folder actions') . "'>"
         . "<i class='lucide lucide-more-vertical'></i>"
         . "</div>";
@@ -438,7 +353,7 @@ function generateFolderActions($folderId, $folderName, $con, $workspace_filter, 
  * Emitted once per page (see notes_list.php). On open, the client
  * (toggleFolderActionsMenu in js/utils-menus.js) copies the folder id/name onto
  * every action item, shows/hides the count-dependent and share-state items,
- * marks the active sort option and positions the menu next to the toggle.
+ * and positions the menu next to the toggle.
  *
  * Items are grouped by what they act on (view, move, publish, name, delete)
  * with .folder-actions-menu-separator between groups. A separator left with
@@ -560,34 +475,6 @@ function renderFolderActionsMenu() {
     $menu .= "<i class='lucide lucide-pencil'></i>";
     $menu .= "<span>" . t_h('notes_list.folder_actions.rename_folder', [], 'Rename') . "</span>";
     $menu .= "</div>";
-
-    // Sort Options Definition
-    $sortTypes = [
-        'alphabet' => ['icon' => 'lucide lucide-arrow-down-a-z', 'label' => t_h('sort.alphabet', [], 'Name')],
-        'created' => ['icon' => 'lucide lucide-calendar-plus', 'label' => t_h('sort.created', [], 'Date Created')],
-        'modified' => ['icon' => 'lucide lucide-calendar', 'label' => t_h('sort.modified', [], 'Date Modified')],
-        // Drag-and-drop order; selected automatically when a note is dropped
-        // before/after another one (see /api/v1/notes/reorder)
-        'manual' => ['icon' => 'lucide lucide-grip-vertical', 'label' => t_h('sort.manual', [], 'Manual')]
-    ];
-
-    // Sort Submenu Toggle (Accordion style); the client swaps the label for
-    // the active sort option, falling back to data-default-label
-    $defaultSortLabel = t_h('sort.header', [], 'Sort by');
-    $menu .= "<div class='folder-actions-menu-item' data-action='toggle-sort-submenu'>";
-    $menu .= "<i class='lucide lucide-arrow-up-down-amount-down'></i>";
-    $menu .= "<span class='sort-header-label' data-default-label='" . $defaultSortLabel . "'>" . $defaultSortLabel . "</span>";
-    $menu .= "</div>";
-
-    // Sort Options Container
-    $menu .= "<div class='sort-submenu' style='display: none; background: rgba(0,0,0,0.03);'>";
-    foreach ($sortTypes as $type => $data) {
-        $menu .= "<div class='folder-actions-menu-item submenu-item' data-action='sort-folder' data-sort-type='$type' style='padding-left: 28px;'>";
-        $menu .= "<i class='" . $data['icon'] . "'></i>";
-        $menu .= "<span class='sort-option-label'>" . $data['label'] . "</span>";
-        $menu .= "</div>";
-    }
-    $menu .= "</div>"; // Close sort-submenu
 
     $menu .= "<div class='folder-actions-menu-separator'></div>";
 

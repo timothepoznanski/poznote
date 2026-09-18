@@ -452,9 +452,11 @@ if (poznoteMarkdownColoredEnabled($settings['markdown_colored'])) {
 $attachment_previews_in_note_setting = poznoteSettingEnabled($settings['attachment_previews_in_note'], false);
 $attachments_at_bottom_setting = poznoteSettingEnabled($settings['attachments_at_bottom'], false);
 $backlinks_at_bottom_setting = poznoteSettingEnabled($settings['backlinks_at_bottom'], false);
-// Load note list sort preference using previously loaded settings
-$note_list_sort_type = 'updated_desc'; // default
-$pref = $settings['note_list_sort'];
+// The one sort order of the tree (#1442), stepped through by the button in the
+// sidebar title row. src/lib/note-sort.php holds the modes and the comparators;
+// the SQL below only pre-orders the rows, organizeNotesByFolder() and
+// sortFolders() decide what the sidebar shows.
+$note_list_sort_type = poznoteNormalizeNoteSort($settings['note_list_sort']);
 $notes_without_folders_after = poznoteSettingEnabled($settings['notes_without_folders_after_folders'], true);
 
 $folder_null_case = $notes_without_folders_after ? '1' : '0';
@@ -464,16 +466,13 @@ $allowed_sorts = [
     'updated_desc' => "CASE WHEN folder_id IS NULL THEN $folder_null_case ELSE $folder_case END, folder, updated DESC",
     'created_desc' => "CASE WHEN folder_id IS NULL THEN $folder_null_case ELSE $folder_case END, folder, created DESC",
     'heading_asc'  => "folder, heading COLLATE NOCASE ASC",
+    'type_asc'     => "CASE WHEN folder_id IS NULL THEN $folder_null_case ELSE $folder_case END, folder, type COLLATE NOCASE, heading COLLATE NOCASE ASC",
     // Drag-and-drop order: unplaced notes (display_order 0) first, newest
-    // update first, then the saved positions (see compareNotesManualOrder)
+    // update first, then the saved positions (see poznoteComparePlacedOrder)
     'manual'       => "CASE WHEN folder_id IS NULL THEN $folder_null_case ELSE $folder_case END, folder, CASE WHEN display_order > 0 THEN 1 ELSE 0 END, display_order, updated DESC"
 ];
 
-$note_list_order_by = $allowed_sorts['updated_desc']; // default
-if ($pref && isset($allowed_sorts[$pref])) {
-    $note_list_order_by = $allowed_sorts[$pref];
-    $note_list_sort_type = $pref;
-}
+$note_list_order_by = $allowed_sorts[$note_list_sort_type];
 
 // Set body classes
 $body_classes = trim($extra_body_classes);
@@ -665,6 +664,14 @@ if ($isPublicWorkspaceReadonly) {
     $expandFoldersButton = '<button class="sidebar-folder-toggle" id="sidebarExpandFoldersBtn" data-action="toggle-all-folders" title="' . t_h('sidebar.expand_all_folders', [], 'Expand all folders') . '" aria-label="' . t_h('sidebar.expand_all_folders', [], 'Expand all folders') . '">'
         . '<i class="lucide lucide-chevrons-up-down"></i>'
         . '</button>';
+
+    // Sort mode button (#1442): one click steps to the next mode, the way the
+    // theme button steps to the next theme. The icon and the title name the
+    // mode in use, not the one the next click brings. js/note-sort-cycle.js
+    // saves the setting and rebuilds the list; the markup is re-rendered with
+    // the new mode on every sidebar refresh, so data-sort-mode stays true.
+    [$noteSortLabelKey, $noteSortLabelFallback] = poznoteNoteSortLabel($note_list_sort_type);
+    $noteSortTitle = t_h('sort.button_title', ['mode' => t($noteSortLabelKey, [], $noteSortLabelFallback)], 'Sort by: {{mode}}');
     ?>
 
     <!-- MENU RIGHT COLUMN -->	 
@@ -686,6 +693,9 @@ if ($isPublicWorkspaceReadonly) {
             </div>
             <div class="sidebar-title-actions">
                 <?php if (!$isPublicWorkspaceReadonly): ?>
+                    <button class="sidebar-folder-toggle" id="sidebarSortBtn" data-action="cycle-note-sort" data-sort-mode="<?php echo htmlspecialchars($note_list_sort_type, ENT_QUOTES); ?>" title="<?php echo $noteSortTitle; ?>" aria-label="<?php echo $noteSortTitle; ?>">
+                        <i class="lucide <?php echo htmlspecialchars(poznoteNoteSortIcon($note_list_sort_type), ENT_QUOTES); ?>"></i>
+                    </button>
                     <?php if (!$showAccountRows) echo $expandFoldersButton; ?>
                     <button class="sidebar-folder-toggle<?php echo $notifications_count > 0 ? ' has-notifications' : ''; ?>" id="sidebarNotificationsBtn" data-action="open-notifications-modal" title="<?php echo t_h('reminder.notifications', [], 'Notifications'); ?>" aria-label="<?php echo t_h('reminder.notifications', [], 'Notifications'); ?>"<?php echo $notifications_total > 0 ? '' : ' hidden'; ?>>
                         <i class="lucide lucide-bell"></i>
@@ -778,7 +788,7 @@ if ($isPublicWorkspaceReadonly) {
             $folders = ensureFavoritesFolder($folders);
 
             // Sort folders
-            $folders = sortFolders($folders);
+            $folders = sortFolders($folders, $note_list_sort_type);
 
             // Get total notes count for folder opening logic
             $total_notes = getTotalNotesCount($con, $workspace_filter);

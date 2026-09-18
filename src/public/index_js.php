@@ -130,6 +130,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/clickable-tags.js',
         'js/font-size-settings.js',
         'js/note-width-toggle.js',
+        'js/note-sort-cycle.js',
         'js/index-icon-scale-settings.js',
         'js/background-settings.js',
         'js/tasklist-core.js',

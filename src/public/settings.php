@@ -122,7 +122,6 @@ $settingsPageUserKeys = [
     'backlinks_at_bottom',
     'default_image_border_no_padding',
     'center_note_content',
-    'note_list_sort',
     'note_age_filter_days',
     'snapshots_keep_count',
     'snapshots_safety_keep_count',
@@ -897,16 +896,6 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.date_time_format', [], 'Date & time format'); ?></span>
                     <span id="date-time-format-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                </div>
-            </div>
-
-            <!-- Note Sort Order -->
-            <div class="home-card" id="note-sort-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.note_sort', [], 'Choose how notes are ordered in the list.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-arrow-up-down-amount-down"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.note_sort_order', [], 'Note sorting'); ?></span>
-                    <span id="note-sort-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                 </div>
             </div>
 

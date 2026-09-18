@@ -390,8 +390,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         
         // Escape for HTML attributes
         $htmlFolderName = htmlspecialchars($folderName, ENT_QUOTES, 'UTF-8');
-        $currentSort = $folderData['sort_setting'] ?? '';
-        echo "<div class='$folderClass' data-folder-id='" . (int)$folderId . "' data-folder='$htmlFolderName' data-folder-key='folder_" . (int)$folderId . "' data-sort-setting='" . htmlspecialchars($currentSort, ENT_QUOTES) . "' data-action='select-folder'>";
+        echo "<div class='$folderClass' data-folder-id='" . (int)$folderId . "' data-folder='$htmlFolderName' data-folder-key='folder_" . (int)$folderId . "' data-action='select-folder'>";
         // Make the entire folder toggle area clickable to open/close the folder
         // draggable is set here to avoid capturing note drag events from folder-content
         echo "<div class='folder-toggle' data-action='toggle-folder' data-folder-dom-id='$folderDomId' data-folder-id='$folderId' data-folder='$folderName'$draggableAttr>";
@@ -423,7 +422,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         echo "<span class='folder-actions'>";
         
         // Generate folder actions
-        echo generateFolderActions($folderId, $folderName, $con, $workspace_filter, $noteCount, $currentSort, !empty($folderData['favorite']));
+        echo generateFolderActions($folderId, $folderName, $con, $workspace_filter, $noteCount, !empty($folderData['favorite']));
         
         echo "</span>";
         echo "</div>";
@@ -526,8 +525,9 @@ if (!empty($folder_tree_active_name) && $folder_tree_active_name !== FAVORITES_F
 // ORDER BY) instead of re-querying the settings table.
 $displayUncategorizedFirst = !(isset($notes_without_folders_after) ? $notes_without_folders_after : true);
 
-// If sorting alphabetically, always display uncategorized notes at the end
-if (isset($note_list_sort_type) && $note_list_sort_type === 'heading_asc') {
+// Sorting by name or by type orders the tree on a key the position in the list
+// cannot express, so the notes without a folder go to the end.
+if (isset($note_list_sort_type) && ($note_list_sort_type === 'heading_asc' || $note_list_sort_type === 'type_asc')) {
     $displayUncategorizedFirst = false;
 }
 
@@ -561,19 +561,11 @@ if (empty($folder_filter)) {
 
 // Display uncategorized notes (notes without folder) AFTER Favorites if sorting by date
 if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder_filter) && $displayUncategorizedFirst) {
-    // Sort uncategorized notes by date (updated or created depending on sort type)
+    // Same comparator as the notes inside a folder
     $sortedUncategorized = $uncategorized_notes;
-    if ($note_list_sort_type === 'updated_desc') {
-        usort($sortedUncategorized, function($a, $b) {
-            return strcmp($b['updated'] ?? '', $a['updated'] ?? '');
-        });
-    } elseif ($note_list_sort_type === 'created_desc') {
-        usort($sortedUncategorized, function($a, $b) {
-            return strcmp($b['created'] ?? '', $a['created'] ?? '');
-        });
-    } elseif ($note_list_sort_type === 'manual') {
-        usort($sortedUncategorized, 'compareNotesManualOrder');
-    }
+    usort($sortedUncategorized, function($a, $b) use ($note_list_sort_type) {
+        return poznoteCompareNotes($note_list_sort_type, $a, $b);
+    });
     
     foreach ($sortedUncategorized as $row1) {
         $isSelected = ((isset($note) && $row1["id"] == $note) || ($selected_linked_note_id > 0 && $selected_linked_note_id == $row1["id"])) ? 'selected-note' : '';

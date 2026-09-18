@@ -184,7 +184,7 @@ List all notes for a user with optional filtering and sorting.
 | `created_from` | date | Filter notes created on or after this date (`YYYY-MM-DD`) |
 | `created_to` | date | Filter notes created on or before this date (`YYYY-MM-DD`) |
 | `favorite` | boolean | Filter favorites only |
-| `sort` | string | Sort order: `updated_desc`, `created_desc`, `heading_asc` |
+| `sort` | string | Sort order: `updated_desc`, `created_desc`, `heading_asc`, `type_asc`, `manual`; defaults to the account's own setting |
 | `get_folders` | boolean | Include folder information |
 | `limit` | integer | Page size, 1 to 1000. Omit to get every matching note |
 | `offset` | integer | Number of matching notes to skip, for the next page |
@@ -703,9 +703,9 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
 POST /notes/reorder
 ```
 
-Move a note before or after another note (manual drag-and-drop order). The note lands in the target note's folder (or at the root when the target has none), every note there is renumbered, and that folder switches to the `manual` sort so the position sticks. For a root note the global note sort setting becomes `manual`; folders that were following the global default keep their current ordering.
+Move a note before or after another note (drag-and-drop order). The note lands in the target note's folder (or at the root when the target has none), every note there is renumbered, and the tree switches to the `manual` sort mode ("Custom" in the interface) so the position sticks. The saved positions are never erased, so leaving that mode and coming back restores the arrangement.
 
-With `"scope": "dashboard"` the request reorders the note's card on the dashboard instead: the rank is written to the note's `dashboard_order` (a column of its own, the sidebar's `display_order` is untouched), the target must be in the same folder, and neither the folder's sort setting nor the note's `updated` date change. The dashboard shows pinned cards first, then placed cards in saved order, with cards that were never placed ahead of them by newest update.
+With `"scope": "dashboard"` the request reorders the note's card on the dashboard instead: the rank is written to the note's `dashboard_order` (a column of its own, the sidebar's `display_order` is untouched), the target must be in the same folder, and neither the tree's sort mode nor the note's `updated` date change. The dashboard shows pinned cards first, then placed cards in saved order, with cards that were never placed ahead of them by newest update.
 
 **Request Body (JSON):**
 
@@ -1870,7 +1870,7 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
 POST /folders/reorder
 ```
 
-Reorder a folder before or after a sibling folder (same workspace).
+Reorder a folder before or after a sibling folder (same workspace). The siblings are renumbered from the order the current sort mode displays, and the tree switches to the `manual` mode, exactly like a note reorder. Moving a folder into or out of another one is `POST /folders/{id}/move` instead, which leaves the sort mode alone.
 
 **Request Body (JSON):**
 

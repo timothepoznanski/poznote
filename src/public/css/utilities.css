@@ -131,9 +131,11 @@ body #right_col .notecard[data-content-width] {
     }
 }
 
-/* Transient label for the toolbar width toggle: the reflow alone does not
-   say which of the width steps you just landed on. */
-#note-width-toast {
+/* Transient label for a control that cycles through states: the reflow alone
+   does not say which step you just landed on. Used by the toolbar width toggle
+   and by the sidebar sort button (#1442). */
+#note-width-toast,
+.pz-toast {
     position: fixed;
     bottom: 1.5rem;
     left: 50%;
@@ -150,17 +152,20 @@ body #right_col .notecard[data-content-width] {
     white-space: nowrap;
 }
 
-#note-width-toast.note-width-toast--visible {
+#note-width-toast.note-width-toast--visible,
+.pz-toast.pz-toast--visible {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
 }
 
-#note-width-toast.note-width-toast--hidden {
+#note-width-toast.note-width-toast--hidden,
+.pz-toast.pz-toast--hidden {
     opacity: 0;
     transform: translateX(-50%) translateY(0.5rem);
 }
 
-html[data-theme='dark'] #note-width-toast {
+html[data-theme='dark'] #note-width-toast,
+html[data-theme='dark'] .pz-toast {
     background: var(--dm-border-light);
     color: var(--dm-text-bright);
 }

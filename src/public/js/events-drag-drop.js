@@ -942,13 +942,10 @@ function moveNoteRowInDom(noteId, targetNoteId, position) {
         parent.insertBefore(spacer, dragRow.nextSibling);
     }
 
-    // The container now follows the manual sort (the server sets it too)
-    var header = dragRow.closest('.folder-header');
-    if (header) {
-        header.setAttribute('data-sort-setting', 'manual');
-        var folderId = header.getAttribute('data-folder-id');
-        var toggle = folderId ? header.querySelector('.folder-actions-toggle[data-folder-id="' + folderId + '"]') : null;
-        if (toggle) toggle.setAttribute('data-current-sort', 'manual');
+    // The tree now follows the Custom sort (the server sets it too, see
+    // enableManualNoteSort): the sidebar button has to say so
+    if (typeof window.markNoteSortCustom === 'function') {
+        window.markNoteSortCustom();
     }
     return true;
 }
