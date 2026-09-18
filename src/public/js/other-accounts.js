@@ -13,7 +13,8 @@
  * fold and unfold.
  *
  * The active account gets the same row above its own tree, which the chevron
- * folds as a whole (#currentAccountTree).
+ * folds as a whole (#currentAccountTree). Like the blocks below, that row is
+ * only rendered where several accounts are reachable (index.php).
  *
  * What is unfolded follows the account, not its place in the list: switching
  * accounts moves the active one to the top and the previous one down here,

@@ -627,29 +627,35 @@ if ($isPublicWorkspaceReadonly) {
 
         
     <?php
-    // The active account heads the notes list: a collapsible row with its name
-    // (notes_list.php), which also carries the "Expand all folders" button at
-    // its end. Someone who can open other accounts (Admin > User Management)
-    // gets them listed in a block under the tree, on the plain tree only: a
-    // search or a folder view scopes the list to the active account. A public
-    // workspace visitor has no account to name.
+    // Account rows only exist where there is a choice of account: the signed-in
+    // person can open several of them (their own plus grants from Admin >
+    // User Management). The active one then heads the notes list as a
+    // collapsible row with its name (notes_list.php), carrying the
+    // "Expand all folders" button at its end, and the others are listed in a
+    // block under its tree, on the plain tree only: a search or a folder view
+    // scopes the list to the active account. With a single account the tree is
+    // not named at all (issue #1436), and a public workspace visitor has no
+    // account to name either.
     $otherAccountProfiles = [];
     $activeAccountProfile = null;
     $showAccountRows = false;
     if (!$isPublicWorkspaceReadonly) {
+        // Empty unless several accounts are reachable, see
+        // getSwitchableAccountProfiles().
+        $switchableProfiles = function_exists('getSwitchableAccountProfiles') ? getSwitchableAccountProfiles() : [];
         $activeAccountProfile = function_exists('getCurrentUser') ? getCurrentUser() : null;
-        if (is_array($activeAccountProfile) && (string)($activeAccountProfile['username'] ?? '') !== '') {
+        if (!empty($switchableProfiles) && is_array($activeAccountProfile) && (string)($activeAccountProfile['username'] ?? '') !== '') {
             $showAccountRows = true;
         } else {
             $activeAccountProfile = null;
         }
         $isPlainTree = empty($search) && empty($tags_search) && empty($created_from) && empty($created_to) && empty($folder_filter);
-        if ($isPlainTree && function_exists('getSwitchableAccountProfiles')) {
+        if ($isPlainTree && !empty($switchableProfiles)) {
             // The active account heads the list, the others follow in one
             // order (the login's own first, then by name, see
             // getUserAccessibleProfiles()).
             $activeAccountId = (int)(getCurrentUserId() ?? 0);
-            foreach (getSwitchableAccountProfiles() as $accountProfile) {
+            foreach ($switchableProfiles as $accountProfile) {
                 if ((int)$accountProfile['id'] !== $activeAccountId) {
                     $otherAccountProfiles[] = $accountProfile;
                 }

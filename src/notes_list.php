@@ -219,9 +219,10 @@ $renderOtherAccounts = static function (array $profiles): void {
 
 // The active account heads the list with the same collapsible row the other
 // accounts get below (js/other-accounts.js folds #currentAccountTree, the
-// whole own tree), whether or not there are other accounts, with the
-// "Expand all folders" button at its end, where the other rows carry their
-// "Open this account" arrow.
+// whole own tree), with the "Expand all folders" button at its end, where the
+// other rows carry their "Open this account" arrow. Only where several
+// accounts are reachable: with a single one no row names the tree and the
+// button stays in the title row (index.php).
 if ($showAccountRows):
     $activeAccountName = htmlspecialchars((string)($activeAccountProfile['username'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 ?>
