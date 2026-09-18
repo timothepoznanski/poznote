@@ -722,9 +722,12 @@
             if (lineEnd === -1) lineEnd = fullText.length;
 
             var sourceLine = fullText.slice(lineStart, lineEnd);
-            var nextLine = sourceLine.match(/^#{1,6}\s+/)
-                ? sourceLine.replace(/^#{1,6}\s+/, '')
-                : prefix + sourceLine;
+            // Up to three spaces of indentation still make a heading in
+            // CommonMark, so toggling one off has to see them; toggling one on
+            // drops them, otherwise the line would only look like a heading.
+            var nextLine = sourceLine.match(/^ {0,3}#{1,6}\s+/)
+                ? sourceLine.replace(/^ {0,3}#{1,6}\s+/, '')
+                : prefix + sourceLine.replace(/^ {0,3}/, '');
 
             replaceMarkdownRangeAndSelect(
                 editor,
@@ -755,15 +758,15 @@
         
         var line = text.substring(lineStart, lineEnd);
         
-        // Check if already a heading
-        var headingPattern = /^#{1,6}\s+/;
+        // Check if already a heading (up to three spaces of indentation)
+        var headingPattern = /^ {0,3}#{1,6}\s+/;
         var newLine;
         if (headingPattern.test(line)) {
             // Remove heading
             newLine = line.replace(headingPattern, '');
         } else {
             // Add heading
-            newLine = prefix + line;
+            newLine = prefix + line.replace(/^ {0,3}/, '');
         }
         
         // Replace the line
@@ -798,7 +801,7 @@
             selectedText = fullText.slice(offsets.start, offsets.end);
 
             if (style === 'normal') {
-                var cleanText = selectedText.replace(/^#{1,6}\s+/, '');
+                var cleanText = selectedText.replace(/^ {0,3}#{1,6}\s+/, '');
                 replaceMarkdownRangeAndSelect(editor, offsets.start, offsets.end, cleanText, offsets.start, offsets.start + cleanText.length);
                 return;
             }
@@ -815,7 +818,7 @@
         
         if (style === 'normal') {
             // For normal text, just remove any heading markers at the start
-            var cleanText = selectedText.replace(/^#{1,6}\s+/, '');
+            var cleanText = selectedText.replace(/^ {0,3}#{1,6}\s+/, '');
             document.execCommand('insertText', false, cleanText);
         } else {
             // For headings, we need to ensure proper line breaks

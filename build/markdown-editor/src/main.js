@@ -610,6 +610,54 @@ function EditorSelectionRange(anchor, head) {
   return EditorSelection.range(anchor, head)
 }
 
+// --- #1422 Enter: break the line at column 0 (start) ---
+// CodeMirror's default Enter (insertNewlineAndIndent) asks the language how far
+// to indent the new line; lang-markdown answers null for a markdown Document,
+// so the command falls back to copying the current line's leading whitespace.
+// In prose that is wrong: pressing Enter in front of an indented "### Title" to
+// move the heading onto its own line puts the same spaces back in front of it,
+// and a "#" that is not at the start of the line is not a heading, so the title
+// silently stops rendering as one (issue #1422).
+//
+// Indentation does carry meaning inside code blocks and around list markers, so
+// those keep the default behaviour (list and quote lines are continued by
+// insertNewlineContinueMarkup, which runs before this binding). Everywhere else
+// Enter starts the new line at column 0.
+const INDENT_SENSITIVE_NODES = ['FencedCode', 'CodeBlock', 'BulletList', 'OrderedList', 'Blockquote']
+
+function isIndentSensitivePosition(state, pos) {
+  for (let node = syntaxTree(state).resolveInner(pos, -1); node; node = node.parent) {
+    if (INDENT_SENSITIVE_NODES.indexOf(node.name) !== -1) return true
+  }
+  return false
+}
+
+function insertNewlineAtColumnZero({ state, dispatch }) {
+  if (state.readOnly) return false
+
+  for (const range of state.selection.ranges) {
+    if (isIndentSensitivePosition(state, range.from)) return false
+  }
+
+  const changes = state.changeByRange(range => {
+    let { from, to } = range
+    const line = state.doc.lineAt(from)
+    // Whitespace the caret sits in goes with the break rather than being split
+    // between the two lines (this part matches CodeMirror's own default).
+    while (to < line.to && /\s/.test(line.text[to - line.from])) to++
+    if (from > line.from && !/\S/.test(line.text.slice(0, from - line.from))) from = line.from
+
+    return {
+      changes: { from, to, insert: state.lineBreak },
+      range: EditorSelection.cursor(from + state.lineBreak.length)
+    }
+  })
+
+  dispatch(state.update(changes, { scrollIntoView: true, userEvent: 'input' }))
+  return true
+}
+// --- #1422 Enter: break the line at column 0 (end) ---
+
 function runMarkdownTableEnter(host) {
   return function run() {
     if (!host || typeof window.handleMarkdownTableEnter !== 'function') {
@@ -1063,6 +1111,7 @@ function createEditor(host, options = {}) {
       keymap.of([
         { key: 'Enter', run: runMarkdownTableEnter(host) },
         { key: 'Enter', run: insertNewlineContinueMarkup },
+        { key: 'Enter', run: insertNewlineAtColumnZero },
         { key: 'Mod-Space', run: startCompletion },
         { key: 'Ctrl-Space', run: startCompletion },
         { key: 'Mod-Shift-b', run: toggleFencedCodeBlock },

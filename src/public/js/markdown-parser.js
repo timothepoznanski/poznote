@@ -1634,8 +1634,10 @@ function parseMarkdown(text) {
             continue;
         }
 
-        // Headers (h1-h6)
-        var headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
+        // Headers (h1-h6). Up to three spaces of indentation are allowed
+        // before the hashes, as in CommonMark; four spaces were already taken
+        // by the indented code block rule above.
+        var headingMatch = line.match(/^ {0,3}(#{1,6})\s+(.+)$/);
         if (headingMatch) {
             flushParagraph();
             var level = headingMatch[1].length;

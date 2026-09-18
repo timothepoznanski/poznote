@@ -923,8 +923,11 @@ function parseMarkdown($text) {
             continue;
         }
         
-        // Headers
-        if (preg_match('/^(#{1,6})\s+(.+)$/', $line, $matches)) {
+        // Headers. CommonMark, GitHub and Obsidian all allow up to three
+        // spaces of indentation before the hashes (four spaces makes the line
+        // an indented code block instead), and notes written elsewhere do
+        // arrive that way.
+        if (preg_match('/^ {0,3}(#{1,6})\s+(.+)$/', $line, $matches)) {
             $flushParagraph();
             $level = strlen($matches[1]);
             $content = $applyInlineStyles($matches[2]);
