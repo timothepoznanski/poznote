@@ -321,6 +321,14 @@ html[data-theme='dark'] .page-more-menu-item:focus-visible {
     text-transform: uppercase;
 }
 
+/* The editor and tree sections carry the same keys, so they say under their
+   title that each only answers while its own pane has the focus */
+.pz-help-card-note {
+    margin: -4px 0 10px;
+    font-size: 0.78rem;
+    color: var(--pz-text-subtle);
+}
+
 .pz-help-empty {
     margin: 0;
     padding: 16px 18px;

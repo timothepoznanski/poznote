@@ -100,8 +100,10 @@ function refreshNotesListAfterFolderAction(folderIdToOpen, options) {
         persistFolderStatesFromDOM();
     }
 
-    if (folderIdToOpen !== null && folderIdToOpen !== undefined && folderIdToOpen !== '') {
-        localStorage.setItem('folder_folder-' + String(folderIdToOpen), 'open');
+    // After persistFolderStatesFromDOM(), which would write the closed state
+    // of the destination back over this
+    if (typeof markFolderPathOpen === 'function') {
+        markFolderPathOpen(folderIdToOpen);
     }
 
     const url = new URL(window.location.href);

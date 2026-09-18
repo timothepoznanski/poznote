@@ -169,7 +169,6 @@
       "index_icon_scale": "Adjust the size of the icons in the note list.",
       "timezone": "Set the timezone used to display dates and times.",
       "date_time_format": "Choose how dates and times are displayed.",
-      "note_sort": "Choose how notes are ordered in the list.",
       "note_age_filter": "Only show notes updated within the chosen number of days.",
       "tasklist_insert_order": "Choose whether new tasks are added to the top or the bottom of task lists.",
       "diary_note_type": "Choose the note format used for new diary entries.",
@@ -453,7 +452,6 @@
       "markdown_default_view_mode": "Default view mode",
       "login_display": "Login page title",
       "note_font_size": "Font size",
-      "note_sort_order": "Note sorting",
       "note_age_filter": "Note age filter",
       "tasklist_insert_order": "Task list insert order",
       "diary_default_note_type": "Diary entry format",
@@ -1147,16 +1145,6 @@
       "title": "Insert task list",
       "description": "Choose the task list to display in this note.",
       "confirm": "Insert"
-    },
-    "note_sort": {
-      "title": "Note sort order",
-      "description": "Choose how notes are ordered in the notes list:",
-      "options": {
-        "last_modified": "Last modified",
-        "last_created": "Last created",
-        "alphabetical": "Alphabetical",
-        "manual": "Manual (drag and drop)"
-      }
     },
     "folder_tree_highlight": {
       "title": "Highlight current folder tree",
@@ -3120,10 +3108,15 @@
   },
   "sort": {
     "header": "Sort by",
-    "alphabet": "Name",
-    "created": "Date Created",
-    "modified": "Date Modified",
-    "manual": "Manual"
+    "button_title": "Sort by: {{mode}}",
+    "save_failed": "Could not change the sort order",
+    "modes": {
+      "name": "Name",
+      "date_modified": "Date modified",
+      "date_created": "Date created",
+      "type": "Type",
+      "custom": "Custom"
+    }
   },
   "calendar": {
     "months": {
@@ -4672,7 +4665,9 @@
     "sections": {
       "general": "General",
       "editor": "Note editor",
-      "tree": "Notes and folders tree"
+      "editor_focus": "Active while the note has the focus",
+      "tree": "Notes and folders tree",
+      "tree_focus": "Active while the tree has the focus"
     },
     "save_note": "Save the note",
     "snapshot": "Take a snapshot of the note",
@@ -4689,6 +4684,9 @@
     "emoji": "Insert an emoji by its name",
     "indent": "Indent or outdent a list item",
     "checklist_toggle": "Check or uncheck a checklist item",
+    "tree_move": "Move to the note or folder above or below",
+    "tree_open_folder": "Open a folder, or step into it",
+    "tree_close_folder": "Close a folder, or go up to the one holding the row",
     "tree_undo": "Undo the last change",
     "tree_redo": "Redo",
     "tree_copy": "Copy the selected notes and folders",

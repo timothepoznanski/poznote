@@ -592,7 +592,8 @@ function moveNoteToTargetFolder(noteId, targetFolderIdOrName) {
         { folder_id: targetFolderId || '', workspace: targetWorkspace },
         function (data) {
             recordNoteMoveForUndo(noteId, noteBefore, targetFolderId || null, targetWorkspace);
-            refreshSidebarAfterMove(data);
+            keepTreeSelection([{ type: 'note', id: noteId }], false);
+            refreshSidebarAfterMove(data, targetFolderId);
         },
         'Error moving note: '
     );
@@ -941,13 +942,10 @@ function moveNoteRowInDom(noteId, targetNoteId, position) {
         parent.insertBefore(spacer, dragRow.nextSibling);
     }
 
-    // The container now follows the manual sort (the server sets it too)
-    var header = dragRow.closest('.folder-header');
-    if (header) {
-        header.setAttribute('data-sort-setting', 'manual');
-        var folderId = header.getAttribute('data-folder-id');
-        var toggle = folderId ? header.querySelector('.folder-actions-toggle[data-folder-id="' + folderId + '"]') : null;
-        if (toggle) toggle.setAttribute('data-current-sort', 'manual');
+    // The tree now follows the Custom sort (the server sets it too, see
+    // enableManualNoteSort): the sidebar button has to say so
+    if (typeof window.markNoteSortCustom === 'function') {
+        window.markNoteSortCustom();
     }
     return true;
 }
@@ -974,6 +972,9 @@ function reorderNoteBesideTarget(noteId, targetNoteId, position) {
         .then(function (r) { return r.json(); })
         .then(function (data) {
             if (data && data.success) {
+                // The row we dropped beside was on screen, so its folder is
+                // already open: only the selection has to be set (#1441)
+                keepTreeSelection([{ type: 'note', id: noteId }], false);
                 if (!movedInDom) {
                     refreshSidebarAfterMove(data);
                 }
@@ -999,6 +1000,7 @@ function moveNoteToRoot(noteId) {
         { workspace: targetWorkspace },
         function (data) {
             recordNoteMoveForUndo(noteId, noteBefore, null, targetWorkspace);
+            keepTreeSelection([{ type: 'note', id: noteId }], false);
             refreshSidebarAfterMove(data);
         },
         'Error removing note from folder: '
@@ -1858,6 +1860,8 @@ function moveFolderToParent(folderId, newParentFolderId) {
                 parentId: newParentFolderId ? String(newParentFolderId) : null,
                 workspace: workspace
             });
+            markFolderPathOpen(newParentFolderId);
+            keepTreeSelection([{ type: 'folder', id: folderId }], true);
             location.reload();
         },
         'Error moving folder: '
@@ -1883,6 +1887,7 @@ function moveFolderBesideTarget(folderId, targetFolderId, position) {
                 position: position,
                 workspace: workspace
             });
+            keepTreeSelection([{ type: 'folder', id: folderId }], true);
             location.reload();
         },
         'Error reordering folder: '
@@ -1911,15 +1916,13 @@ function selectionDragData(rowType, rowId) {
     var selection = window.PoznoteTreeSelection;
     if (!selection || selection.count() < 2) return null;
 
-    var items = selection.items();
-    var included = items.some(function (item) {
-        return item.type === rowType && String(item.id) === String(rowId);
-    });
-    if (!included) {
+    // A row inside a selected folder is part of the selection as well: the
+    // folder is tinted as one block and stands for everything in it
+    if (!selection.covers(rowType, rowId)) {
         selection.clear();
         return null;
     }
-    return { type: 'selection', items: items };
+    return { type: 'selection', items: selection.items() };
 }
 
 function isSelectionDrag(dragData) {

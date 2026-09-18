@@ -933,8 +933,9 @@ function extractHeadings(noteElement) {
                     return;
                 }
 
-                // Match markdown headings: # Title, ## Title, etc.
-                const match = line.match(/^(#{1,6})\s+(.+)$/);
+                // Match markdown headings: # Title, ## Title, etc., with the
+                // up-to-three-spaces indentation CommonMark allows.
+                const match = line.match(/^ {0,3}(#{1,6})\s+(.+)$/);
                 if (match) {
                     const level = match[1].length;
                     const rawText = match[2].trim();

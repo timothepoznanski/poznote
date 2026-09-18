@@ -946,26 +946,6 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
 <!-- Task Due Date Modal (due date + optional reminder for one task) -->
 <?php include 'task_due_modal.php'; ?>
 
-<!-- Note sort order modal -->
-<div id="noteSortModal" class="modal">
-    <div class="modal-content">
-        <h3><?php echo t_h('modals.note_sort.title', [], 'Note sort order'); ?></h3>
-        <div class="modal-body">
-            <p><?php echo t_h('modals.note_sort.description', [], 'Choose how notes are ordered in the notes list:'); ?></p>
-            <div class="radio-options">
-                <label><input type="radio" name="noteSort" value="updated_desc"> <?php echo t_h('modals.note_sort.options.last_modified', [], 'Last modified'); ?></label>
-                <label><input type="radio" name="noteSort" value="created_desc"> <?php echo t_h('modals.note_sort.options.last_created', [], 'Last created'); ?></label>
-                <label><input type="radio" name="noteSort" value="heading_asc"> <?php echo t_h('modals.note_sort.options.alphabetical', [], 'Alphabetical'); ?></label>
-                <label><input type="radio" name="noteSort" value="manual"> <?php echo t_h('modals.note_sort.options.manual', [], 'Manual (drag and drop)'); ?></label>
-            </div>
-        </div>
-        <div class="modal-buttons">
-            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="noteSortModal"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-primary" id="saveNoteSortModalBtn"><?php echo t_h('common.save'); ?></button>
-        </div>
-    </div>
-</div>
-
 <!-- Highlight current folder tree: how far the rest of the notes list fades -->
 <div id="folderTreeHighlightModal" class="modal">
     <div class="modal-content">

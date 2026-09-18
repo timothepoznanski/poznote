@@ -15,35 +15,32 @@
  * a database.
  */
 
+require_once __DIR__ . '/note-sort.php';
+
 /**
  * Nest workspaces, folders and notes.
  *
- * Notes come out in the order the account's own tree shows them
- * (folders_display.php): the account's note_list_sort setting, unless the
- * folder carries a sort_setting of its own. Switching accounts then turns an
- * outline into the full tree, and back, without a note changing place.
+ * Folders and notes come out in the order the account's own tree shows them
+ * (folders_display.php): its note_list_sort setting, one mode for the whole
+ * tree since #1442. Switching accounts then turns an outline into the full
+ * tree, and back, without anything changing place.
  *
  * @param array $workspaces rows with 'name', in display order
  * @param array $folders    rows with 'id', 'name', 'parent_id', 'workspace',
- *                          optional 'display_order', 'sort_setting'
- *                          (alphabet | created | modified | manual)
+ *                          optional 'created', 'display_order'
  * @param array $notes      rows with 'id', 'heading', 'folder_id',
  *                          'workspace', optional 'type', 'created',
  *                          'updated', 'display_order'
- * @param string $noteListSort the account's note_list_sort setting
- *                          (updated_desc | created_desc | heading_asc |
- *                          manual); anything else reads as heading_asc
+ * @param string $noteListSort the account's note_list_sort setting, see
+ *                          src/lib/note-sort.php; anything else reads as the
+ *                          default mode
  * @return array list of ['name', 'folders' => [...], 'notes' => [...]]; a
  *               folder is ['id', 'name', 'folders', 'notes'], a note is
  *               ['id', 'title', 'type']
  */
 function poznoteBuildAccountTree(array $workspaces, array $folders, array $notes, string $noteListSort = 'heading_asc'): array
 {
-    $defaultSort = [
-        'updated_desc' => 'modified',
-        'created_desc' => 'created',
-        'manual' => 'manual',
-    ][$noteListSort] ?? 'alphabet';
+    $sortMode = poznoteNormalizeNoteSort($noteListSort);
 
     $tree = [];
     $order = [];
@@ -80,10 +77,8 @@ function poznoteBuildAccountTree(array $workspaces, array $folders, array $notes
             'name' => (string)($row['name'] ?? ''),
             'parent_id' => isset($row['parent_id']) && $row['parent_id'] !== null && $row['parent_id'] !== '' ? (int)$row['parent_id'] : 0,
             'workspace' => $ensureWorkspace((string)($row['workspace'] ?? '')),
+            'created' => (string)($row['created'] ?? ''),
             'display_order' => (int)($row['display_order'] ?? 0),
-            'sort' => in_array((string)($row['sort_setting'] ?? ''), ['alphabet', 'created', 'modified', 'manual'], true)
-                ? (string)$row['sort_setting']
-                : $defaultSort,
             'folders' => [],
             'notes' => [],
         ];
@@ -128,9 +123,10 @@ function poznoteBuildAccountTree(array $workspaces, array $folders, array $notes
             'title' => (string)($row['heading'] ?? ''),
             'type' => (string)($row['type'] ?? 'note'),
             // Sort keys, dropped before the tree leaves this function.
-            '_created' => (string)($row['created'] ?? ''),
-            '_updated' => (string)($row['updated'] ?? ''),
-            '_order' => (int)($row['display_order'] ?? 0),
+            'heading' => (string)($row['heading'] ?? ''),
+            'created' => (string)($row['created'] ?? ''),
+            'updated' => (string)($row['updated'] ?? ''),
+            'display_order' => (int)($row['display_order'] ?? 0),
         ];
         $folderId = isset($row['folder_id']) && $row['folder_id'] !== null && $row['folder_id'] !== '' ? (int)$row['folder_id'] : 0;
         if ($folderId > 0 && isset($byId[$folderId])) {
@@ -141,46 +137,18 @@ function poznoteBuildAccountTree(array $workspaces, array $folders, array $notes
         }
     }
 
-    // Same order as list_folders.php: a hand-set position first, then the name.
-    $sortFolders = static function (array $ids) use ($byId): array {
-        usort($ids, static function (int $a, int $b) use ($byId): int {
-            $oa = $byId[$a]['display_order'];
-            $ob = $byId[$b]['display_order'];
-            if (($oa > 0) !== ($ob > 0)) {
-                return $oa > 0 ? -1 : 1;
-            }
-            if ($oa !== $ob) {
-                return $oa <=> $ob;
-            }
-            return strcasecmp($byId[$a]['name'], $byId[$b]['name']);
+    // Both comparators come from src/lib/note-sort.php, the ones the account's
+    // own sidebar sorts with. The rows are adapted to the column names those
+    // functions expect ('heading', 'updated', 'display_order').
+    $sortFolders = static function (array $ids) use ($byId, $sortMode): array {
+        usort($ids, static function (int $a, int $b) use ($byId, $sortMode): int {
+            return poznoteCompareFolders($sortMode, $byId[$a], $byId[$b]);
         });
         return $ids;
     };
-    // Same comparators as folders_display.php (newest first for the dates,
-    // compareNotesManualOrder() for the hand-set order). Equal dates keep the
-    // creation order there (a stable sort over rows read in id order), hence
-    // the ascending id here.
-    $sortNotes = static function (array $list, string $sort): array {
-        usort($list, static function (array $a, array $b) use ($sort): int {
-            if ($sort === 'created') {
-                return strcmp($b['_created'], $a['_created']) ?: ($a['id'] <=> $b['id']);
-            }
-            if ($sort === 'modified') {
-                return strcmp($b['_updated'], $a['_updated']) ?: ($a['id'] <=> $b['id']);
-            }
-            if ($sort === 'manual') {
-                if ($a['_order'] > 0 && $b['_order'] > 0) {
-                    return ($a['_order'] <=> $b['_order']) ?: ($a['id'] <=> $b['id']);
-                }
-                if ($a['_order'] > 0) {
-                    return 1;
-                }
-                if ($b['_order'] > 0) {
-                    return -1;
-                }
-                return strcmp($b['_updated'], $a['_updated']) ?: ($b['id'] <=> $a['id']);
-            }
-            return strnatcasecmp(mb_strtolower($a['title'], 'UTF-8'), mb_strtolower($b['title'], 'UTF-8'));
+    $sortNotes = static function (array $list) use ($sortMode): array {
+        usort($list, static function (array $a, array $b) use ($sortMode): int {
+            return poznoteCompareNotes($sortMode, $a, $b);
         });
         return array_map(static function (array $note): array {
             return ['id' => $note['id'], 'title' => $note['title'], 'type' => $note['type']];
@@ -192,7 +160,7 @@ function poznoteBuildAccountTree(array $workspaces, array $folders, array $notes
         foreach ($sortFolders($childrenOf[$id] ?? []) as $childId) {
             $node['folders'][] = $build($childId);
         }
-        $node['notes'] = $sortNotes($notesOfFolder[$id] ?? [], $byId[$id]['sort']);
+        $node['notes'] = $sortNotes($notesOfFolder[$id] ?? []);
         return $node;
     };
 
@@ -202,7 +170,7 @@ function poznoteBuildAccountTree(array $workspaces, array $folders, array $notes
 
     $out = [];
     foreach ($order as $name) {
-        $tree[$name]['notes'] = $sortNotes($tree[$name]['notes'], $defaultSort);
+        $tree[$name]['notes'] = $sortNotes($tree[$name]['notes']);
         $out[] = $tree[$name];
     }
     return $out;

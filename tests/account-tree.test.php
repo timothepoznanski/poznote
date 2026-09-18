@@ -59,29 +59,32 @@ test('a note or folder naming a missing workspace still shows up', function () {
     assertSame('Note in gone folder', $tree[1]['notes'][0]['title']);
 });
 
-test('hand-ordered folders come first, then names case-insensitively', function () {
-    $tree = poznoteBuildAccountTree(
-        [['name' => 'W']],
-        [
-            ['id' => 1, 'name' => 'zeta', 'parent_id' => null, 'workspace' => 'W', 'display_order' => 0],
-            ['id' => 2, 'name' => 'Alpha', 'parent_id' => null, 'workspace' => 'W', 'display_order' => 0],
-            ['id' => 3, 'name' => 'Pinned', 'parent_id' => null, 'workspace' => 'W', 'display_order' => 2],
-            ['id' => 4, 'name' => 'First', 'parent_id' => null, 'workspace' => 'W', 'display_order' => 1],
-        ],
-        [
-            ['id' => 5, 'heading' => 'b', 'folder_id' => null, 'workspace' => 'W'],
-            ['id' => 6, 'heading' => 'A', 'folder_id' => null, 'workspace' => 'W'],
-        ]
-    );
+test('folders follow the sort mode, hand-set positions only under Custom', function () {
+    $folders = [
+        ['id' => 1, 'name' => 'zeta', 'parent_id' => null, 'workspace' => 'W', 'display_order' => 0],
+        ['id' => 2, 'name' => 'Alpha', 'parent_id' => null, 'workspace' => 'W', 'display_order' => 0],
+        ['id' => 3, 'name' => 'Pinned', 'parent_id' => null, 'workspace' => 'W', 'display_order' => 2],
+        ['id' => 4, 'name' => 'First', 'parent_id' => null, 'workspace' => 'W', 'display_order' => 1],
+    ];
+    $notes = [
+        ['id' => 5, 'heading' => 'b', 'folder_id' => null, 'workspace' => 'W'],
+        ['id' => 6, 'heading' => 'A', 'folder_id' => null, 'workspace' => 'W'],
+    ];
 
-    assertSame(['First', 'Pinned', 'Alpha', 'zeta'], array_column($tree[0]['folders'], 'name'));
+    $tree = poznoteBuildAccountTree([['name' => 'W']], $folders, $notes, 'heading_asc');
+    assertSame(['Alpha', 'First', 'Pinned', 'zeta'], array_column($tree[0]['folders'], 'name'));
     assertSame(['A', 'b'], array_column($tree[0]['notes'], 'title'));
+
+    // Custom is the only mode that reads display_order; the positions are
+    // still there under the others, they are just not looked at.
+    $tree = poznoteBuildAccountTree([['name' => 'W']], $folders, $notes, 'manual');
+    assertSame(['First', 'Pinned', 'Alpha', 'zeta'], array_column($tree[0]['folders'], 'name'));
 });
 
-test('notes follow the account sort setting, and a folder its own', function () {
+test('one sort mode orders every folder and the root alike', function () {
     $folders = [
-        ['id' => 1, 'name' => 'Own sort', 'parent_id' => null, 'workspace' => 'W', 'sort_setting' => 'alphabet'],
-        ['id' => 2, 'name' => 'Default', 'parent_id' => null, 'workspace' => 'W', 'sort_setting' => ''],
+        ['id' => 1, 'name' => 'One', 'parent_id' => null, 'workspace' => 'W'],
+        ['id' => 2, 'name' => 'Two', 'parent_id' => null, 'workspace' => 'W'],
     ];
     $notes = [];
     foreach ([1, 2, 0] as $folderId) {
@@ -92,17 +95,33 @@ test('notes follow the account sort setting, and a folder its own', function () 
     }
     $titles = static function (array $tree): array {
         return [
-            array_column($tree[0]['folders'][1]['notes'], 'title'),
             array_column($tree[0]['folders'][0]['notes'], 'title'),
+            array_column($tree[0]['folders'][1]['notes'], 'title'),
             array_column($tree[0]['notes'], 'title'),
         ];
     };
+    $everywhere = static function (array $order): array {
+        return [$order, $order, $order];
+    };
 
-    // [own-sort folder, default folder, root]
-    assertSame([['a', 'b', 'c'], ['b', 'c', 'a'], ['b', 'c', 'a']], $titles(poznoteBuildAccountTree([['name' => 'W']], $folders, $notes, 'updated_desc')));
-    assertSame([['a', 'b', 'c'], ['c', 'a', 'b'], ['c', 'a', 'b']], $titles(poznoteBuildAccountTree([['name' => 'W']], $folders, $notes, 'created_desc')));
+    assertSame($everywhere(['b', 'c', 'a']), $titles(poznoteBuildAccountTree([['name' => 'W']], $folders, $notes, 'updated_desc')));
+    assertSame($everywhere(['c', 'a', 'b']), $titles(poznoteBuildAccountTree([['name' => 'W']], $folders, $notes, 'created_desc')));
+    assertSame($everywhere(['a', 'b', 'c']), $titles(poznoteBuildAccountTree([['name' => 'W']], $folders, $notes, 'heading_asc')));
     // manual: unplaced (order 0) first, then the saved positions
-    assertSame([['a', 'b', 'c'], ['b', 'c', 'a'], ['b', 'c', 'a']], $titles(poznoteBuildAccountTree([['name' => 'W']], $folders, $notes, 'manual')));
+    assertSame($everywhere(['b', 'c', 'a']), $titles(poznoteBuildAccountTree([['name' => 'W']], $folders, $notes, 'manual')));
     // sort keys never leave the builder
     assertSame(['id', 'title', 'type'], array_keys(poznoteBuildAccountTree([['name' => 'W']], $folders, $notes, 'manual')[0]['notes'][0]));
+});
+
+test('the type mode groups notes by kind, then by title', function () {
+    $notes = [
+        ['id' => 1, 'heading' => 'draw', 'folder_id' => null, 'workspace' => 'W', 'type' => 'excalidraw'],
+        ['id' => 2, 'heading' => 'zeta', 'folder_id' => null, 'workspace' => 'W', 'type' => 'note'],
+        ['id' => 3, 'heading' => 'todo', 'folder_id' => null, 'workspace' => 'W', 'type' => 'tasklist'],
+        ['id' => 4, 'heading' => 'alpha', 'folder_id' => null, 'workspace' => 'W', 'type' => 'note'],
+        ['id' => 5, 'heading' => 'readme', 'folder_id' => null, 'workspace' => 'W', 'type' => 'markdown'],
+    ];
+
+    $tree = poznoteBuildAccountTree([['name' => 'W']], [], $notes, 'type_asc');
+    assertSame(['alpha', 'zeta', 'readme', 'todo', 'draw'], array_column($tree[0]['notes'], 'title'));
 });

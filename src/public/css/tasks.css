@@ -762,14 +762,17 @@ details.callout:not([open]) .callout-fold-icon {
     fill: var(--pz-success-hover);
 }
 
+/* The only callout family without a semantic token of its own: it borrows the
+   user palette's purple, so it follows a theme like the four around it instead
+   of staying GitHub's #8250df everywhere (issue #1444). */
 .callout-important {
-    border-left-color: #8250df;
+    border-left-color: var(--pz-color-purple);
 }
 
 .callout-important .callout-icon-svg,
 .callout-important .callout-title-text {
-    color: #8250df;
-    fill: #8250df;
+    color: var(--pz-color-purple);
+    fill: var(--pz-color-purple);
 }
 
 .callout-warning {

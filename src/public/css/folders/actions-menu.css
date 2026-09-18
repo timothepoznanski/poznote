@@ -318,6 +318,34 @@ html[data-theme='dark'] .note-actions-menu-item.active i {
     opacity: 0.45;
 }
 
+/* ... and its icon turns into a pair of scissors, so a cut row reads as a
+   move rather than a copy (issue #1412). Row icons are CSS masks, so only
+   the mask image is swapped: size and the icon colour are left alone. The
+   scissors mask is the one css/lucide.css gives .lucide-scissors. */
+.tree-clipboard-cut .note-icon,
+.folder-toggle.tree-clipboard-cut > .folder-icon {
+    -webkit-mask-image: url("data:image/svg+xml,%3C%21--%20%40license%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-scissors%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Ccircle%20cx%3D%276%27%20cy%3D%276%27%20r%3D%273%27%20%2F%3E%20%3Cpath%20d%3D%27M8.12%208.12%2012%2012%27%20%2F%3E%20%3Cpath%20d%3D%27M20%204%208.12%2015.88%27%20%2F%3E%20%3Ccircle%20cx%3D%276%27%20cy%3D%2718%27%20r%3D%273%27%20%2F%3E%20%3Cpath%20d%3D%27M14.8%2014.8%2020%2020%27%20%2F%3E%20%3C%2Fsvg%3E");
+    mask-image: url("data:image/svg+xml,%3C%21--%20%40license%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-scissors%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Ccircle%20cx%3D%276%27%20cy%3D%276%27%20r%3D%273%27%20%2F%3E%20%3Cpath%20d%3D%27M8.12%208.12%2012%2012%27%20%2F%3E%20%3Cpath%20d%3D%27M20%204%208.12%2015.88%27%20%2F%3E%20%3Ccircle%20cx%3D%276%27%20cy%3D%2718%27%20r%3D%273%27%20%2F%3E%20%3Cpath%20d%3D%27M14.8%2014.8%2020%2020%27%20%2F%3E%20%3C%2Fsvg%3E");
+}
+
+/* With note icons hidden (UI customization) a note row has no icon to swap,
+   so the scissors goes in front of the title instead. */
+.tree-clipboard-cut .note-title:not(:has(.note-icon))::before {
+    content: '';
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin-right: 6px;
+    vertical-align: -0.125em;
+    background-color: currentColor;
+    -webkit-mask-image: url("data:image/svg+xml,%3C%21--%20%40license%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-scissors%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Ccircle%20cx%3D%276%27%20cy%3D%276%27%20r%3D%273%27%20%2F%3E%20%3Cpath%20d%3D%27M8.12%208.12%2012%2012%27%20%2F%3E%20%3Cpath%20d%3D%27M20%204%208.12%2015.88%27%20%2F%3E%20%3Ccircle%20cx%3D%276%27%20cy%3D%2718%27%20r%3D%273%27%20%2F%3E%20%3Cpath%20d%3D%27M14.8%2014.8%2020%2020%27%20%2F%3E%20%3C%2Fsvg%3E");
+    mask-image: url("data:image/svg+xml,%3C%21--%20%40license%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-scissors%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Ccircle%20cx%3D%276%27%20cy%3D%276%27%20r%3D%273%27%20%2F%3E%20%3Cpath%20d%3D%27M8.12%208.12%2012%2012%27%20%2F%3E%20%3Cpath%20d%3D%27M20%204%208.12%2015.88%27%20%2F%3E%20%3Ccircle%20cx%3D%276%27%20cy%3D%2718%27%20r%3D%273%27%20%2F%3E%20%3Cpath%20d%3D%27M14.8%2014.8%2020%2020%27%20%2F%3E%20%3C%2Fsvg%3E");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+}
+
 /* Rows picked with Ctrl+Click / Shift+Click (js/tree-selection.js). The tint
    goes on the note link rather than its row: the link is the visible band,
    the row box also holds the link's top margin. :hover is named so the grey
@@ -333,6 +361,85 @@ html[data-theme='dark'] .note-list-item.tree-multi-selected > a.links_arbo_left,
 html[data-theme='dark'] .folder-toggle.tree-multi-selected,
 html[data-theme='dark'] .folder-toggle.tree-multi-selected:hover {
     background-color: rgba(var(--dm-accent-rgb), 0.2) !important;
+}
+
+/* A selected folder is one block around its header row and everything it
+   holds (.folder-header wraps both), since that is what Del or a drag takes.
+   The header row drops its own tint so the block is one even layer. */
+.folder-header.tree-multi-selected-folder {
+    background-color: rgba(var(--pz-accent-rgb), 0.14);
+}
+
+.folder-header.tree-multi-selected-folder > .folder-toggle.tree-multi-selected,
+.folder-header.tree-multi-selected-folder > .folder-toggle.tree-multi-selected:hover {
+    background-color: transparent;
+}
+
+/* The rows inside keep the block whole: no hover band, and no surface behind
+   the open note. Their title still turns accent on hover. */
+.folder-header.tree-multi-selected-folder .folder-toggle:hover,
+.folder-header.tree-multi-selected-folder .note-list-item > a.links_arbo_left,
+.folder-header.tree-multi-selected-folder .note-list-item > a.links_arbo_left:hover {
+    background-color: transparent;
+}
+
+html[data-theme='dark'] .folder-header.tree-multi-selected-folder {
+    background-color: rgba(var(--dm-accent-rgb), 0.2);
+}
+
+/* !important: the rules these answer are (above, and dark-mode/layout.css) */
+html[data-theme='dark'] .folder-header.tree-multi-selected-folder > .folder-toggle.tree-multi-selected,
+html[data-theme='dark'] .folder-header.tree-multi-selected-folder > .folder-toggle.tree-multi-selected:hover,
+html[data-theme='dark'] .folder-header.tree-multi-selected-folder .folder-toggle:hover,
+html[data-theme='dark'] .folder-header.tree-multi-selected-folder .note-list-item > a.links_arbo_left,
+html[data-theme='dark'] .folder-header.tree-multi-selected-folder .note-list-item > a.links_arbo_left:hover {
+    background-color: transparent !important;
+}
+
+/* Pointer hidden while the tree is driven with the arrow keys
+   (js/tree-keyboard-nav.js), and the row hovers muted with it: the mouse
+   usually rests on the row that was clicked, which would otherwise keep its
+   hover band, its accent title and its three dots next to the row the
+   keyboard is on. Any real mouse move, click or wheel turn brings it all
+   back. A selected row keeps its tint, which is not a hover. */
+html.tree-keyboard-mouse-hidden,
+html.tree-keyboard-mouse-hidden * {
+    cursor: none !important;
+}
+
+/* The note rows are where the mouse rests after a click, and they are the one
+   place the rule above loses: drag-drop.css gives them `cursor: pointer`
+   !important through .note-in-folder.links_arbo_left[draggable="true"], which
+   outweighs a lone class plus `*`. The id here outweighs it back. */
+html.tree-keyboard-mouse-hidden #left_col * {
+    cursor: none !important;
+}
+
+/* !important: the dark row hover is (dark-mode/layout.css) */
+html.tree-keyboard-mouse-hidden #left_col .folder-toggle:not(.tree-multi-selected):hover,
+html.tree-keyboard-mouse-hidden #left_col .note-list-item:not(.tree-multi-selected) > a.links_arbo_left:not(.selected-note):hover {
+    background-color: transparent !important;
+}
+
+/* The open note: no !important here, its own dark surface is one and has to
+   stay, while the light hover band it replaces is not */
+html.tree-keyboard-mouse-hidden #left_col .note-list-item:not(.tree-multi-selected) > a.links_arbo_left.selected-note:hover {
+    background-color: transparent;
+}
+
+/* inherit: the link carries the same text colour as its title in every theme */
+html.tree-keyboard-mouse-hidden #left_col a.links_arbo_left:not(.selected-note):hover .note-title {
+    color: inherit !important;
+}
+
+/* Only where the three dots hide without a hover: touch screens keep them on
+   (media blocks above) */
+@media (hover: hover) and (min-width: 801px) {
+    html.tree-keyboard-mouse-hidden #left_col .folder-toggle:hover .folder-actions-toggle:not(.open),
+    html.tree-keyboard-mouse-hidden #left_col .note-list-item:hover .note-actions-toggle:not(.open),
+    html.tree-keyboard-mouse-hidden #left_col .note-list-item:hover .note-actions-item {
+        display: none;
+    }
 }
 
 /* "N selected" line on top of the menu for the whole selection */

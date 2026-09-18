@@ -29,6 +29,7 @@
  */
 
 require_once __DIR__ . '/../../../note_loader.php';
+require_once __DIR__ . '/../../../lib/note-sort.php';
 
 class FoldersController {
     private PDO $db;
@@ -119,17 +120,12 @@ class FoldersController {
         }
         unset($folder);
         
-        // Sort folders at each level by saved order, with name as a fallback
-        $sortFolders = function(&$folders) use (&$sortFolders) {
-            usort($folders, function($a, $b) {
-                $orderA = isset($a['display_order']) ? (int)$a['display_order'] : 0;
-                $orderB = isset($b['display_order']) ? (int)$b['display_order'] : 0;
-                if ($orderA > 0 || $orderB > 0) {
-                    if ($orderA <= 0) return 1;
-                    if ($orderB <= 0) return -1;
-                    if ($orderA !== $orderB) return $orderA <=> $orderB;
-                }
-                return strcasecmp($a['name'], $b['name']);
+        // Sort folders at each level the way the sidebar shows them, so a
+        // picker built from this tree lists them in the order the user knows
+        $sortMode = $this->getGlobalNoteListSort();
+        $sortFolders = function(&$folders) use (&$sortFolders, $sortMode) {
+            usort($folders, function($a, $b) use ($sortMode) {
+                return poznoteCompareFolders($sortMode, $a, $b);
             });
             
             foreach ($folders as &$folder) {
@@ -267,12 +263,20 @@ class FoldersController {
         return false;
     }
 
+    /**
+     * Ids of the folders sharing a parent, in the order the sidebar shows them
+     * under the current sort mode, optionally without one of them.
+     *
+     * reorder() splices the dragged folder into this list and renumbers it, so
+     * the list has to be what the user was looking at when they dropped: under
+     * Name that is the alphabetical order, not the saved display_order.
+     */
     private function getOrderedSiblingIds(string $workspace, ?int $parentId, ?int $excludeFolderId = null): array {
         if ($parentId === null) {
-            $sql = 'SELECT id FROM folders WHERE workspace = ? AND parent_id IS NULL';
+            $sql = 'SELECT id, name, created, display_order FROM folders WHERE workspace = ? AND parent_id IS NULL';
             $params = [$workspace];
         } else {
-            $sql = 'SELECT id FROM folders WHERE workspace = ? AND parent_id = ?';
+            $sql = 'SELECT id, name, created, display_order FROM folders WHERE workspace = ? AND parent_id = ?';
             $params = [$workspace, $parentId];
         }
 
@@ -281,11 +285,16 @@ class FoldersController {
             $params[] = $excludeFolderId;
         }
 
-        $sql .= ' ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE, id';
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        return array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+        $sortMode = $this->getGlobalNoteListSort();
+        usort($rows, function ($a, $b) use ($sortMode) {
+            return poznoteCompareFolders($sortMode, $a, $b);
+        });
+
+        return array_map(function ($row) { return (int)$row['id']; }, $rows);
     }
 
     /**
@@ -407,6 +416,8 @@ class FoldersController {
                     'color_hex' => $f['color_hex'],
                     'display_order' => $f['display_order'],
                     'is_diary' => $f['is_diary'],
+                    // buildHierarchy() sorts on it under the date modes
+                    'created' => $f['created'],
                     'path' => $this->computeFolderPath($id, $foldersById),
                 ];
             }
@@ -1561,6 +1572,12 @@ class FoldersController {
 
     /**
      * POST /api/v1/folders/reorder - Move a folder before/after another folder
+     *
+     * The sibling list is read in the order the current sort mode displays it,
+     * the dragged folder is spliced in and every sibling is renumbered from 1.
+     * Like a note drop, this is a hand-made arrangement, so the tree switches
+     * to the Custom mode and the positions stick (#1442). Moving a folder into
+     * another one goes through move() instead and leaves the mode alone.
      */
     public function reorder(): void {
         $data = $this->getInputData();
@@ -1654,6 +1671,8 @@ class FoldersController {
                     $updateOrder->execute([$displayOrder, $id]);
                 }
             }
+
+            $this->enableManualNoteSort();
 
             $this->db->commit();
         } catch (Exception $e) {
@@ -2764,12 +2783,8 @@ class FoldersController {
      * Drag-and-drop ordering for the sidebar. The dragged note lands in the
      * target note's folder (or at the root when the target has none), every
      * sibling there is renumbered from 1 following the order the user
-     * currently sees, and the container switches to the 'manual' sort so the
-     * position sticks:
-     *   - a folder gets sort_setting = 'manual';
-     *   - the root follows the global note_list_sort, which becomes 'manual'.
-     *     Folders that were inheriting the global default keep the ordering
-     *     they show today by having it copied into their own sort_setting.
+     * currently sees, and the tree switches to the Custom sort mode so the
+     * position sticks (see enableManualNoteSort).
      *
      * Body: { "note_id": 12, "target_note_id": 34, "position": "before"|"after",
      *         "workspace": "Poznote" (optional check),
@@ -2882,8 +2897,8 @@ class FoldersController {
             }
         }
 
-        $sortType = $this->resolveNoteSortType($targetFolderId);
-        $orderedIds = $this->getOrderedSiblingNoteIds($targetWorkspace, $targetFolderId, $sortType, $noteId);
+        $sortMode = $this->getGlobalNoteListSort();
+        $orderedIds = $this->getOrderedSiblingNoteIds($targetWorkspace, $targetFolderId, $sortMode, $noteId);
         $targetIndex = array_search($targetNoteId, $orderedIds, true);
 
         if ($targetIndex === false) {
@@ -2920,7 +2935,7 @@ class FoldersController {
                 }
             }
 
-            $this->enableManualNoteSort($targetFolderId);
+            $this->enableManualNoteSort();
 
             $this->db->commit();
         } catch (Exception $e) {
@@ -3051,65 +3066,30 @@ class FoldersController {
     }
 
     /**
-     * Raw global note_list_sort setting ('updated_desc' when unset).
+     * The global sort mode, the one order the whole tree follows (#1442).
+     * POZNOTE_NOTE_SORT_DEFAULT when the setting is unset or unreadable.
      */
     private function getGlobalNoteListSort(): string {
         try {
             $stmt = $this->db->prepare('SELECT value FROM settings WHERE key = ?');
             $stmt->execute(['note_list_sort']);
-            $pref = trim((string)$stmt->fetchColumn());
-            if (in_array($pref, ['updated_desc', 'created_desc', 'heading_asc', 'manual'], true)) {
-                return $pref;
-            }
+            return poznoteNormalizeNoteSort($stmt->fetchColumn());
         } catch (Exception $e) {
-            // fall through to the default
             error_log('FoldersController: getGlobalNoteListSort() failed: ' . $e->getMessage());
+            return POZNOTE_NOTE_SORT_DEFAULT;
         }
-        return 'updated_desc';
-    }
-
-    /**
-     * Same mapping as noteListSortToFolderSortType() in folders_display.php.
-     */
-    private static function noteListSortToFolderSortType(string $pref): string {
-        switch ($pref) {
-            case 'heading_asc':
-                return 'alphabet';
-            case 'created_desc':
-                return 'created';
-            case 'manual':
-                return 'manual';
-            default:
-                return 'modified';
-        }
-    }
-
-    /**
-     * Effective sort type of a folder (or of the root when null): the
-     * folder's own sort_setting, else the global default.
-     */
-    private function resolveNoteSortType(?int $folderId): string {
-        if ($folderId !== null) {
-            $stmt = $this->db->prepare('SELECT sort_setting FROM folders WHERE id = ?');
-            $stmt->execute([$folderId]);
-            $setting = trim((string)$stmt->fetchColumn());
-            if (in_array($setting, ['alphabet', 'created', 'modified', 'manual'], true)) {
-                return $setting;
-            }
-        }
-        return self::noteListSortToFolderSortType($this->getGlobalNoteListSort());
     }
 
     /**
      * Ids of the notes shown in a folder (or at the root), in the order the
-     * sidebar displays them for the given sort type, excluding one note.
-     * Mirrors the comparators of organizeNotesByFolder() so the dragged note
-     * is inserted relative to what the user actually saw.
+     * sidebar displays them under the current sort mode, excluding one note.
+     * Uses the comparators of src/lib/note-sort.php, the ones
+     * organizeNotesByFolder() sorts with, so the dragged note is inserted
+     * relative to what the user actually saw.
      */
-    private function getOrderedSiblingNoteIds(string $workspace, ?int $folderId, string $sortType, int $excludeNoteId): array {
-        $sql = 'SELECT id, heading, created, updated, display_order FROM entries WHERE trash = 0 AND workspace = ? AND id != ? AND '
-            . ($folderId === null ? 'folder_id IS NULL' : 'folder_id = ?')
-            . ' ORDER BY updated DESC, id DESC';
+    private function getOrderedSiblingNoteIds(string $workspace, ?int $folderId, string $sortMode, int $excludeNoteId): array {
+        $sql = 'SELECT id, heading, type, created, updated, display_order FROM entries WHERE trash = 0 AND workspace = ? AND id != ? AND '
+            . ($folderId === null ? 'folder_id IS NULL' : 'folder_id = ?');
         $params = [$workspace, $excludeNoteId];
         if ($folderId !== null) {
             $params[] = $folderId;
@@ -3118,20 +3098,9 @@ class FoldersController {
         $stmt->execute($params);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if ($sortType === 'alphabet') {
-            usort($rows, function ($a, $b) {
-                $headingA = isset($a['heading']) ? mb_strtolower((string)$a['heading'], 'UTF-8') : '';
-                $headingB = isset($b['heading']) ? mb_strtolower((string)$b['heading'], 'UTF-8') : '';
-                return strnatcasecmp($headingA, $headingB);
-            });
-        } elseif ($sortType === 'created') {
-            usort($rows, function ($a, $b) {
-                return strcmp((string)($b['created'] ?? ''), (string)($a['created'] ?? ''));
-            });
-        } elseif ($sortType === 'manual') {
-            usort($rows, [self::class, 'compareNotesManualOrder']);
-        }
-        // 'modified' is the SQL order already
+        usort($rows, function ($a, $b) use ($sortMode) {
+            return poznoteCompareNotes($sortMode, $a, $b);
+        });
 
         return array_map(function ($row) {
             return (int)$row['id'];
@@ -3139,56 +3108,31 @@ class FoldersController {
     }
 
     /**
-     * Same rule as compareNotesManualOrder() in folders_display.php: placed
-     * notes (display_order > 0) in saved order, unplaced ones first by
-     * newest update.
-     */
-    private static function compareNotesManualOrder(array $a, array $b): int {
-        return self::compareNotesPlacedOrder($a, $b, 'display_order');
-    }
-
-    /**
-     * Placed notes ($column > 0) in saved order, unplaced ones first by newest
-     * update; ties broken on id so the order is total. Shared by the sidebar
-     * (display_order) and the dashboard (dashboard_order).
+     * Placed rows ($column > 0) in saved order, unplaced ones first by newest
+     * update: poznoteComparePlacedOrder() in src/lib/note-sort.php, wrapped so
+     * the usort([self::class, ...]) callers keep a method to point at. The
+     * sidebar passes display_order, the dashboard its own column.
      */
     private static function compareNotesPlacedOrder(array $a, array $b, string $column): int {
-        $orderA = (int)($a[$column] ?? 0);
-        $orderB = (int)($b[$column] ?? 0);
-        if ($orderA > 0 && $orderB > 0) {
-            if ($orderA !== $orderB) return $orderA <=> $orderB;
-            return ((int)($a['id'] ?? 0)) <=> ((int)($b['id'] ?? 0));
-        }
-        if ($orderA > 0) return 1;
-        if ($orderB > 0) return -1;
-        $cmp = strcmp((string)($b['updated'] ?? ''), (string)($a['updated'] ?? ''));
-        if ($cmp !== 0) return $cmp;
-        return ((int)($b['id'] ?? 0)) <=> ((int)($a['id'] ?? 0));
+        return poznoteComparePlacedOrder($a, $b, $column);
     }
 
     /**
-     * Make the container of a reordered note keep manual positions.
+     * Switch the tree to the Custom order after a drop.
      *
-     * Runs inside the reorder transaction. For the root the global setting
-     * flips to 'manual'; folders without a sort_setting of their own were
-     * following that global value, so it is copied onto them first and they
-     * keep displaying exactly what they display today.
+     * Runs inside the reorder transaction. Dragging an item to a new position
+     * is only meaningful if the position sticks, so a drop under any other
+     * mode moves the whole tree to Custom (#1442). Moving an item into or out
+     * of a folder is not a reorder and never comes through here.
+     *
+     * Nothing else is rewritten: the display_order values the other modes
+     * ignore stay as they are, which is what makes leaving Custom and coming
+     * back to it a no-op.
      */
-    private function enableManualNoteSort(?int $folderId): void {
-        if ($folderId !== null) {
-            $stmt = $this->db->prepare("UPDATE folders SET sort_setting = 'manual' WHERE id = ?");
-            $stmt->execute([$folderId]);
+    private function enableManualNoteSort(): void {
+        if ($this->getGlobalNoteListSort() === 'manual') {
             return;
         }
-
-        $pref = $this->getGlobalNoteListSort();
-        if ($pref === 'manual') {
-            return;
-        }
-
-        $inherited = self::noteListSortToFolderSortType($pref);
-        $freeze = $this->db->prepare("UPDATE folders SET sort_setting = ? WHERE sort_setting IS NULL OR sort_setting = ''");
-        $freeze->execute([$inherited]);
 
         $setGlobal = $this->db->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('note_list_sort', 'manual')");
         $setGlobal->execute();

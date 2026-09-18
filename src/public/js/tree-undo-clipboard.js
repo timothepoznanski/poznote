@@ -9,8 +9,11 @@
  *   Ctrl+C / X / V  copy, cut and paste the selected notes and folders
  *   Del             move them to the trash (Cmd+Backspace on macOS)
  *
- * The shortcuts only fire outside text fields and editors, and Ctrl+C/X leave
- * a text selection to the browser, so copying text in a note keeps working.
+ * They only answer while the tree owns the keyboard (js/pane-focus.js): the
+ * same keys belong to the note once it has been clicked into, so a Ctrl+Z
+ * meant for the text being written never takes a note out of a folder. They
+ * also stay out of text fields and editors, and Ctrl+C/X leave a text
+ * selection to the browser, so copying text keeps working.
  * On macOS the Command key replaces Ctrl. Dropping a dragged multi-selection
  * (js/events-drag-drop.js) comes through moveItems() and favoriteItems().
  *
@@ -272,6 +275,7 @@
         } catch (e) {
             console.debug('tree-undo-clipboard: reloadTree() failed:', e);
         }
+        writeFoldersToOpen();
 
         var open = openNoteId();
         var openNoteGone = !!(open && (removedNoteIds || []).some(function (id) { return sameId(id, open); }));
@@ -286,10 +290,39 @@
         }
     }
 
+    var foldersToOpen = [];
+
+    /**
+     * Ask for a destination folder to be open on the next page: what just
+     * landed there has to be on screen, not folded away (issue #1441). The
+     * keys are only written by reloadTree(), because
+     * persistFolderStatesFromDOM() runs first there and would otherwise put
+     * the closed state straight back over them.
+     */
     function rememberFolderOpen(folderId) {
-        if (!folderId) return;
-        try { localStorage.setItem('folder_folder-' + String(folderId), 'open'); } catch (e) {
-            console.debug('tree-undo-clipboard: rememberFolderOpen() failed:', e);
+        if (!folderId || foldersToOpen.indexOf(folderId) !== -1) return;
+        foldersToOpen.push(folderId);
+    }
+
+    // The destination and its ancestors
+    function writeFoldersToOpen() {
+        foldersToOpen.forEach(function (folderId) {
+            if (typeof window.markFolderPathOpen === 'function') {
+                window.markFolderPathOpen(folderId);
+                return;
+            }
+            try { localStorage.setItem('folder_folder-' + String(folderId), 'open'); } catch (e) {
+                console.debug('tree-undo-clipboard: writeFoldersToOpen() failed:', e);
+            }
+        });
+        foldersToOpen = [];
+    }
+
+    // Keep what an action just moved or pasted selected once the page is back
+    function rememberSelection(targets) {
+        var selection = window.PoznoteTreeSelection;
+        if (selection && typeof selection.selectAfterReload === 'function') {
+            selection.selectAfterReload(targets);
         }
     }
 
@@ -585,6 +618,10 @@
     /** Add a finished tree change to the undo stack (clears the redo stack) */
     function record(entry) {
         if (!isValidEntry(entry)) return;
+        // Organizing the tree is the tree at work, wherever the action was
+        // started from: the Ctrl+Z that takes it back comes after the reload
+        // it triggers, with nothing clicked since (js/pane-focus.js)
+        if (window.PoznotePaneFocus) window.PoznotePaneFocus.set('tree');
         var history = loadHistory();
         history.undo.push(entry);
         if (history.undo.length > MAX_ENTRIES) {
@@ -854,6 +891,17 @@
         };
     }
 
+    /** What the paste put in the destination: the copies, or the items a cut moved */
+    function pastedTargets(entries) {
+        return entries.map(function (entry) {
+            if (entry.type === 'note-copy') return { type: 'note', id: entry.newNoteId };
+            if (entry.type === 'folder-copy') return { type: 'folder', id: entry.newFolderId };
+            if (entry.type === 'note-move') return { type: 'note', id: entry.noteId };
+            if (entry.type === 'folder-move') return { type: 'folder', id: entry.folderId };
+            return null;
+        }).filter(Boolean);
+    }
+
     /**
      * Paste the clipboard into a folder (null for the root of the current
      * workspace). Copies duplicate, cuts move; the items go one after the
@@ -899,6 +947,7 @@
             // Copy/Cut cannot be pasted again later by accident
             clearClipboard();
             rememberFolderOpen(dest.folderId);
+            rememberSelection(pastedTargets(entries));
             var items = clipboard.items;
             if (items.length > 1) {
                 toastAfterReload(tr('tree_clipboard.pasted_items', 'Pasted {{count}} items', { count: entries.length }));
@@ -919,6 +968,7 @@
             record(batchEntry(entries));
             clearClipboard();
             rememberFolderOpen(dest.folderId);
+            rememberSelection(pastedTargets(entries));
             errorToastAfterReload(message);
             reloadTree([]);
         });
@@ -1018,6 +1068,7 @@
         var finish = function (errorMessage) {
             if (entries.length) record(batchEntry(entries));
             rememberFolderOpen(folderId);
+            rememberSelection(items);
             if (errorMessage) {
                 errorToastAfterReload(errorMessage);
             } else {
@@ -1273,6 +1324,26 @@
         }
     }
 
+    /**
+     * Point the focus at a row that was reached with the arrow keys
+     * (js/tree-keyboard-nav.js), so paste goes where the keyboard is the way
+     * it goes where the last click was. It does not set treeActive: Del
+     * without a selection still needs a click in the tree.
+     * @param {{type: string, id: string|number}} item - Row to focus
+     */
+    function setFocus(item) {
+        if (!item || !item.id) return;
+        if (item.type === 'note') {
+            var link = noteLink(item.id);
+            if (link) treeFocus = noteFocusFromLink(link);
+            return;
+        }
+        if (item.type === 'folder') {
+            var header = folderHeader(item.id);
+            if (header && !header.classList.contains('system-folder')) treeFocus = folderFocusFromHeader(header);
+        }
+    }
+
     function currentFocus() {
         if (treeFocus) {
             // The row may be gone after a refresh of the tree
@@ -1295,6 +1366,16 @@
     // ============================================
     // Keyboard shortcuts
     // ============================================
+
+    /**
+     * The note has its own shortcuts on the same keys, so the tree only answers
+     * while it owns the keyboard (js/pane-focus.js). Without that module the
+     * shortcuts stay as they were, always on.
+     */
+    function treeOwnsKeyboard() {
+        var paneFocus = window.PoznotePaneFocus;
+        return paneFocus ? paneFocus.isTree() : true;
+    }
 
     function isTextEditingContext(target) {
         return !!(target && target.closest && target.closest(
@@ -1329,7 +1410,7 @@
     }
 
     function handleDeleteKey(e) {
-        if (!hasTree() || isReadOnly()) return;
+        if (!hasTree() || isReadOnly() || !treeOwnsKeyboard()) return;
         if (isTextEditingContext(e.target) || isModalOpen()) return;
 
         var targets = selectedTargets();
@@ -1359,7 +1440,7 @@
         var isPaste = key === 'v' && !e.shiftKey;
         if (!(isUndo || isRedo || isCopy || isCut || isPaste)) return;
 
-        if (!hasTree() || isReadOnly()) return;
+        if (!hasTree() || isReadOnly() || !treeOwnsKeyboard()) return;
         if (isTextEditingContext(e.target) || isModalOpen()) return;
         // Copying selected text is the browser's job
         if ((isCopy || isCut) && hasTextSelection()) return;
@@ -1486,6 +1567,7 @@
         moveItems: moveItems,
         favoriteItems: favoriteItems,
         paste: paste,
+        setFocus: setFocus,
         syncMenu: syncMenu
     };
 

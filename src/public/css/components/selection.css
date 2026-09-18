@@ -1,0 +1,16 @@
+/* ============================================
+   Text selection
+   ============================================
+   Without a rule here the browser paints its own selection colour, which no
+   palette can reach: the dark layer had a themed one (dark-mode/editor.css)
+   while every light theme showed a grey or a blue nobody had chosen, and in
+   the same note the markdown editor, which draws its own, showed the accent.
+   That is the second half of #1424.
+
+   --pz-selection is the one value: the markdown editor, which draws its own
+   selection instead of letting the browser paint it, reads the same token, so
+   a selection looks the same in read and in edit mode. The token switches with
+   the theme, so this rule is written once and needs no dark counterpart. */
+::selection {
+    background-color: var(--pz-selection);
+}

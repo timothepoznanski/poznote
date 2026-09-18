@@ -42,20 +42,20 @@
     var TXT_INIT_ERROR_TEMPLATE = config.txt.initErrorTemplate || 'Error initializing Excalidraw: {{error}}';
     var TXT_ERROR_TEMPLATE = config.txt.errorTemplate || 'Error: {{error}}';
     var TXT_SAVE_FAILED = config.txt.saveFailed || 'Save failed';
+    // The note background of each theme, so the editor draws on the same
+    // ground the note shows the diagram on. The canvas itself is transparent
+    // and lets this show through, see getCanvasBackground().
     var EXCALIDRAW_THEME_COLORS = {
         light: {
             noteBackground: '#ffffff',
-            canvasBackground: '#ffffff',
             itemStroke: '#1e1e1e'
         },
         dark: {
             noteBackground: '#252526',
-            canvasBackground: '#e9e9ea',
             itemStroke: '#1e1e1e'
         },
         black: {
             noteBackground: '#141821',
-            canvasBackground: '#f2f7ff',
             itemStroke: '#1e1e1e'
         }
     };
@@ -124,7 +124,7 @@
             existingData = {
                 elements: existingData.elements,
                 appState: {
-                    viewBackgroundColor: getCanvasBackground(initialPoznoteTheme),
+                    viewBackgroundColor: getCanvasBackground(),
                     zoom: existingData.appState.zoom || { value: 1 },
                     scrollX: existingData.appState.scrollX || 0,
                     scrollY: existingData.appState.scrollY || 0,
@@ -147,7 +147,6 @@
     var excalidrawAPI = null;
     var hasChanges = false;
     var initialElements = null;
-    var initialAppState = null;
 
     // Function to enable/disable the save button based on changes.
     // "Save and exit" is intentionally always clickable: it must stay usable
@@ -157,14 +156,17 @@
         if (saveBtn) saveBtn.disabled = !hasChanges;
     }
 
-    // Function to check if there are changes
+    // Function to check if there are changes.
+    // Only the elements are compared: the appState the editor forces is
+    // derived from the current theme, and the preview no longer carries a
+    // theme, so a theme change is not a change to the diagram. It used to be
+    // tracked here, which armed Save with nothing to save (issue #1445).
     function checkForChanges() {
-        if (!excalidrawAPI || !initialElements || !initialAppState) {
+        if (!excalidrawAPI || !initialElements) {
             return;
         }
         
         var currentElements = excalidrawAPI.getSceneElements();
-        var currentAppState = getTrackedAppState(excalidrawAPI.getAppState());
         applyEditorShellTheme();
         
         // Check if elements count changed
@@ -175,16 +177,7 @@
         }
         
         // Check if any element has changed
-        var currentJSON = JSON.stringify(currentElements);
-        var initialJSON = JSON.stringify(initialElements);
-        var currentAppStateJSON = JSON.stringify(currentAppState);
-        var initialAppStateJSON = JSON.stringify(initialAppState);
-        
-        if (currentJSON !== initialJSON || currentAppStateJSON !== initialAppStateJSON) {
-            hasChanges = true;
-        } else {
-            hasChanges = false;
-        }
+        hasChanges = JSON.stringify(currentElements) !== JSON.stringify(initialElements);
         
         updateSaveButtonsState();
     }
@@ -224,7 +217,6 @@
         document.body.classList.toggle('excalidraw-shell-dark', normalizedTheme === 'dark');
         document.body.classList.toggle('excalidraw-shell-light', normalizedTheme !== 'dark');
         document.body.style.setProperty('--excalidraw-note-background', getNoteBackground(poznoteTheme));
-        document.body.style.setProperty('--excalidraw-canvas-background', getCanvasBackground(poznoteTheme));
         applyExcalidrawDomTheme(normalizedTheme);
     }
 
@@ -232,8 +224,13 @@
         return getThemeColors(theme).noteBackground;
     }
 
-    function getCanvasBackground(theme) {
-        return getThemeColors(theme).canvasBackground;
+    // Excalidraw paints nothing behind the drawing: the canvas is transparent
+    // and the page shows the note background of the current theme through it
+    // (css/excalidraw.css). A dark shell inverts the canvas, so a colour here
+    // would be inverted with it and never match the note; the ground has to
+    // sit outside the filter.
+    function getCanvasBackground() {
+        return 'transparent';
     }
 
     function getCurrentItemStrokeColor(theme) {
@@ -257,21 +254,12 @@
         var theme = normalizeTheme(poznoteTheme);
         return Object.assign({}, appState || {}, {
             theme: theme,
-            viewBackgroundColor: getCanvasBackground(poznoteTheme),
+            viewBackgroundColor: getCanvasBackground(),
             currentItemStrokeColor: getCurrentItemStrokeColor(poznoteTheme),
             currentItemBackgroundColor: 'transparent',
             exportBackground: true,
             exportWithDarkMode: theme === 'dark'
         });
-    }
-
-    function getTrackedAppState(appState) {
-        var exportAppState = getExportAppState(appState);
-        return {
-            theme: exportAppState.theme,
-            exportWithDarkMode: exportAppState.exportWithDarkMode,
-            viewBackgroundColor: exportAppState.viewBackgroundColor || '#ffffff'
-        };
     }
 
     function syncExcalidrawTheme() {
@@ -384,7 +372,18 @@
             // stores: both are user toggles of Excalidraw's own export dialog
             appState: Object.assign(getExportAppState(appState), {
                 exportScale: 1,
-                exportEmbedScene: false
+                exportEmbedScene: false,
+                // The preview carries no theme of its own (issue #1445).
+                // exportBackground would paint the canvas colour into the
+                // file as a <rect> and exportWithDarkMode would add the
+                // invert filter that turns a black stroke into a light one,
+                // both frozen at the moment of the save: the note then kept
+                // showing the theme it was drawn under until it was reopened
+                // and saved again. Stored bare instead, the note paints the
+                // ground behind it and a dark theme inverts it in CSS, so a
+                // theme change shows through straight away.
+                exportBackground: false,
+                exportWithDarkMode: false
             }),
             files: files,
             exportPadding: 10
@@ -514,7 +513,7 @@
                     elements: [],
                     appState: {
                         theme: currentTheme,
-                        viewBackgroundColor: getCanvasBackground(currentPoznoteTheme),
+                        viewBackgroundColor: getCanvasBackground(),
                         currentItemStrokeColor: getCurrentItemStrokeColor(currentPoznoteTheme),
                         currentItemBackgroundColor: 'transparent',
                         exportBackground: true,
@@ -526,7 +525,7 @@
                 excalidrawAPI = window.PoznoteExcalidraw.init('app', {
                     initialData: safeInitialData,
                     theme: currentTheme,
-                    canvasBackgroundColor: getCanvasBackground(currentPoznoteTheme),
+                    canvasBackgroundColor: getCanvasBackground(),
                     currentItemStrokeColor: getCurrentItemStrokeColor(currentPoznoteTheme),
                     currentItemBackgroundColor: 'transparent'
                 });
@@ -539,7 +538,6 @@
                 setTimeout(function() {
                     if (excalidrawAPI) {
                         initialElements = JSON.parse(JSON.stringify(excalidrawAPI.getSceneElements()));
-                        initialAppState = getTrackedAppState(excalidrawAPI.getAppState());
                         syncExcalidrawTheme();
                         
                         // Set up change detection interval
@@ -612,7 +610,6 @@
                     
                     // Reset change tracking after save
                     initialElements = JSON.parse(JSON.stringify(excalidrawAPI.getSceneElements()));
-                    initialAppState = getTrackedAppState(excalidrawAPI.getAppState());
                     hasChanges = false;
                     updateSaveButtonsState();
                     

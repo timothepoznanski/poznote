@@ -80,14 +80,17 @@
         return !!(normalizedLanguage && typeof hljs !== 'undefined' && hljs && typeof hljs.getLanguage === 'function' && hljs.getLanguage(normalizedLanguage));
     }
 
-    // Available callout / quote types
+    // Available callout / quote types (issue #1444). The icon mirrors the one the
+    // inserted callout draws, and iconColor is the token that paints that callout
+    // in tasks.css, so the row previews the block it inserts in every theme.
+    // A plain blockquote has no accent colour, so its icon keeps the menu grey.
     var CALLOUT_TYPES = [
-        { id: 'plain', labelKey: 'slash_menu.blockquote', fallback: 'Blockquote' },
-        { id: 'note', labelKey: 'slash_menu.callout_note', fallback: 'Note' },
-        { id: 'tip', labelKey: 'slash_menu.callout_tip', fallback: 'Tip' },
-        { id: 'important', labelKey: 'slash_menu.callout_important', fallback: 'Important' },
-        { id: 'warning', labelKey: 'slash_menu.callout_warning', fallback: 'Warning' },
-        { id: 'caution', labelKey: 'slash_menu.callout_caution', fallback: 'Caution' }
+        { id: 'plain', icon: 'lucide-quote', labelKey: 'slash_menu.blockquote', fallback: 'Blockquote' },
+        { id: 'note', icon: 'lucide-info-circle', iconColor: 'var(--pz-accent)', labelKey: 'slash_menu.callout_note', fallback: 'Note' },
+        { id: 'tip', icon: 'lucide-lightbulb', iconColor: 'var(--pz-success-hover)', labelKey: 'slash_menu.callout_tip', fallback: 'Tip' },
+        { id: 'important', icon: 'lucide-alert-circle', iconColor: 'var(--pz-color-purple)', labelKey: 'slash_menu.callout_important', fallback: 'Important' },
+        { id: 'warning', icon: 'lucide-alert-triangle', iconColor: 'var(--pz-warning-strong)', labelKey: 'slash_menu.callout_warning', fallback: 'Warning' },
+        { id: 'caution', icon: 'lucide-alert-octagon', iconColor: 'var(--pz-danger-hover)', labelKey: 'slash_menu.callout_caution', fallback: 'Caution' }
     ];
 
     // Mermaid diagram starters for Markdown notes (discussion #1404). Each one
@@ -2525,7 +2528,7 @@
                 icon: 'lucide-info-circle',
                 label: t('slash_menu.quote', null, 'Quote'),
                 submenu: CALLOUT_TYPES.map(function (c) {
-                    return { id: c.id, label: t(c.labelKey, null, c.fallback), action: function () { insertCallout(c.id); } };
+                    return { id: c.id, icon: c.icon, iconColor: c.iconColor, label: t(c.labelKey, null, c.fallback), action: function () { insertCallout(c.id); } };
                 })
             },
             {
@@ -2827,7 +2830,7 @@
                         var title = t(c.labelKey, null, c.fallback);
                         prefix = '> [!' + c.fallback + '] ' + title + '\n> ';
                     }
-                    return { id: c.id, label: t(c.labelKey, null, c.fallback), action: function () { insertMarkdownAtCursor(prefix, 0); } };
+                    return { id: c.id, icon: c.icon, iconColor: c.iconColor, label: t(c.labelKey, null, c.fallback), action: function () { insertMarkdownAtCursor(prefix, 0); } };
                 })
             },
             {

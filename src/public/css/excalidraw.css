@@ -446,7 +446,6 @@ body.excalidraw-editor-page {
     --excalidraw-toolbar-height: 48px;
     --excalidraw-viewport-height: 100vh;
     --excalidraw-note-background: #ffffff;
-    --excalidraw-canvas-background: #ffffff;
     margin: 0;
     background: var(--pz-bg);
     color: var(--pz-text);
@@ -475,9 +474,14 @@ body.excalidraw-editor-page .excalidraw .excalidraw__canvas-wrapper {
     background: var(--excalidraw-note-background, var(--pz-bg));
 }
 
+/* Nothing is painted behind the drawing: the canvas is transparent and the
+   wrapper above shows the note background of the current theme through it,
+   the same ground the note shows the diagram on. A colour here would be
+   inverted along with the canvas in a dark shell and could never match
+   (issue #1445). */
 body.excalidraw-editor-page .excalidraw canvas[data-excalidraw-canvas],
 body.excalidraw-editor-page .excalidraw canvas.static {
-    background: var(--excalidraw-canvas-background, var(--pz-bg));
+    background: transparent;
 }
 
 body.excalidraw-editor-page .excalidraw canvas.interactive {

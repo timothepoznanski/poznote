@@ -121,11 +121,6 @@ html[data-theme='dark'] .markdown-codemirror-host .cm-activeLine {
     background: rgba(var(--dm-accent-rgb), 0.12);
 }
 
-html[data-theme='dark'] .markdown-codemirror-host .cm-editor .cm-selectionBackground,
-html[data-theme='dark'] .markdown-codemirror-host .cm-editor.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground {
-    background: rgba(var(--dm-accent-rgb), 0.28);
-}
-
 html[data-theme='dark'] .markdown-codemirror-host .cm-placeholder {
     color: var(--dm-text-muted);
 }

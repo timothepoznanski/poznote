@@ -123,7 +123,6 @@
             'backlinks_at_bottom',
             'default_image_border_no_padding',
             'center_note_content',
-            'note_list_sort',
             'note_age_filter_days',
             'snapshots_keep_count',
             'snapshots_safety_keep_count',
@@ -639,35 +638,6 @@
                 badge.textContent = getLanguageLabel(langValue);
                 badge.className = 'setting-status enabled';
             }
-        });
-    }
-
-    function refreshNoteSortBadge() {
-        getSetting('note_list_sort', function (value) {
-            var badge = document.getElementById('note-sort-badge');
-            if (!badge) return;
-
-            var sortValue = value || 'updated_desc';
-            var sortLabel;
-
-            switch (sortValue) {
-                case 'created_desc':
-                    sortLabel = tr('modals.note_sort.options.last_created', {}, 'Last created');
-                    break;
-                case 'heading_asc':
-                    sortLabel = tr('modals.note_sort.options.alphabetical', {}, 'Alphabetical');
-                    break;
-                case 'manual':
-                    sortLabel = tr('modals.note_sort.options.manual', {}, 'Manual (drag and drop)');
-                    break;
-                case 'updated_desc':
-                default:
-                    sortLabel = tr('modals.note_sort.options.last_modified', {}, 'Last modified');
-                    break;
-            }
-
-            badge.textContent = sortLabel;
-            badge.className = 'setting-status enabled';
         });
     }
 
@@ -1931,19 +1901,6 @@
         });
     }
 
-    function openNoteSortModal() {
-        var modal = document.getElementById('noteSortModal');
-        if (!modal) return;
-        getSetting('note_list_sort', function (value) {
-            var v = value || 'updated_desc';
-            var radios = document.getElementsByName('noteSort');
-            for (var i = 0; i < radios.length; i++) {
-                radios[i].checked = (radios[i].value === v);
-            }
-            modal.style.display = 'flex';
-        });
-    }
-
     var MARKDOWN_COLORED_DEFAULTS = {
         h1: '#007db8',
         h2: '#1a7f37',
@@ -2518,11 +2475,6 @@
             languageCard.addEventListener('click', showLanguageModal);
         }
 
-        var noteSortCard = document.getElementById('note-sort-card');
-        if (noteSortCard) {
-            noteSortCard.addEventListener('click', openNoteSortModal);
-        }
-
         var markdownColoredCard = document.getElementById('markdown-colored-card');
         if (markdownColoredCard) {
             markdownColoredCard.addEventListener('click', openMarkdownColoredModal);
@@ -2893,30 +2845,6 @@
         var indexIconScaleCard = document.getElementById('index-icon-scale-card');
         if (indexIconScaleCard && typeof window.showIndexIconScalePrompt === 'function') {
             indexIconScaleCard.addEventListener('click', window.showIndexIconScalePrompt);
-        }
-
-        // Save note sort modal button
-        var saveNoteSortBtn = document.getElementById('saveNoteSortModalBtn');
-        if (saveNoteSortBtn) {
-            saveNoteSortBtn.addEventListener('click', function () {
-                var radios = document.getElementsByName('noteSort');
-                var selected = null;
-                for (var i = 0; i < radios.length; i++) {
-                    if (radios[i].checked) { selected = radios[i].value; break; }
-                }
-                if (!selected) selected = 'updated_desc';
-                setSetting('note_list_sort', selected, function (success) {
-                    if (success) {
-                        try { closeModal('noteSortModal'); } catch (e) {
-                            console.debug('settings-page: onError() failed:', e);
-                        }
-                        reloadOpener();
-                        refreshNoteSortBadge();
-                    } else {
-                        alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
-                    }
-                });
-            });
         }
 
         // Colored markdown modal: show color pickers only for the custom template
@@ -3492,7 +3420,6 @@
             refreshFontSizeBadge();
             refreshMainFontBadge();
             refreshMarkdownFontBadge();
-            refreshNoteSortBadge();
             refreshNoteAgeFilterBadge();
             refreshSnapshotsBadge();
             refreshNoteColorPaletteBadge();
@@ -4127,7 +4054,6 @@
             refreshFontSizeBadge();
             refreshMainFontBadge();
             refreshMarkdownFontBadge();
-            refreshNoteSortBadge();
             refreshNoteAgeFilterBadge();
             refreshSnapshotsBadge();
             refreshNoteColorPaletteBadge();
@@ -5115,7 +5041,6 @@
     // ========== Global API ==========
     // Expose functions for external access and inline HTML handlers
     window.showLanguageModal = showLanguageModal;
-    window.openNoteSortModal = openNoteSortModal;
     window.openNoteAgeFilterModal = openNoteAgeFilterModal;
     window.showTimezonePrompt = showTimezonePrompt;
     window.openDateTimeFormatModal = openDateTimeFormatModal;
@@ -5124,7 +5049,6 @@
     window.refreshLanguageBadge = refreshLanguageBadge;
     window.refreshLoginDisplayBadge = refreshLoginDisplayBadge;
     window.refreshFontSizeBadge = refreshFontSizeBadge;
-    window.refreshNoteSortBadge = refreshNoteSortBadge;
     window.refreshNoteAgeFilterBadge = refreshNoteAgeFilterBadge;
     window.refreshTasklistInsertOrderBadge = refreshTasklistInsertOrderBadge;
     window.refreshDiaryNoteTypeBadge = refreshDiaryNoteTypeBadge;

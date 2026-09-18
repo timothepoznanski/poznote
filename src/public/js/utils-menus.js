@@ -12,7 +12,7 @@
 // A single shared dropdown (#folder-actions-menu, rendered once by
 // folders_display.php) serves every folder's three-dot toggle. On open it is
 // populated from the toggle's data attributes (folder id/name, note count,
-// shared/favorite state, current sort) and positioned next to the toggle.
+// shared/favorite state) and positioned next to the toggle.
 
 function populateFolderActionsMenu(menu, toggle) {
     var folderId = toggle.getAttribute('data-folder-id') || '';
@@ -20,7 +20,6 @@ function populateFolderActionsMenu(menu, toggle) {
     var noteCount = parseInt(toggle.getAttribute('data-note-count'), 10) || 0;
     var isShared = toggle.getAttribute('data-shared') === '1';
     var isFavorite = toggle.getAttribute('data-favorite') === '1';
-    var currentSort = toggle.getAttribute('data-current-sort') || '';
 
     menu.setAttribute('data-folder-id', folderId);
 
@@ -49,29 +48,6 @@ function populateFolderActionsMenu(menu, toggle) {
     });
     menu.querySelectorAll('.favorite-state-not-favorite').forEach(function (item) {
         item.style.display = isFavorite ? 'none' : '';
-    });
-
-    // Sort options: highlight the active one and reflect it in the header label
-    var activeLabel = null;
-    menu.querySelectorAll('[data-action="sort-folder"]').forEach(function (item) {
-        var isActive = currentSort && item.getAttribute('data-sort-type') === currentSort;
-        item.classList.toggle('active', !!isActive);
-        if (isActive) {
-            var optionLabel = item.querySelector('.sort-option-label');
-            if (optionLabel) activeLabel = optionLabel.textContent;
-        }
-    });
-    var headerLabel = menu.querySelector('.sort-header-label');
-    if (headerLabel) {
-        headerLabel.textContent = activeLabel || headerLabel.getAttribute('data-default-label') || headerLabel.textContent;
-    }
-
-    // Start with the sort submenu collapsed
-    menu.querySelectorAll('.sort-submenu').forEach(function (submenu) {
-        submenu.style.display = 'none';
-    });
-    menu.querySelectorAll('.sort-chevron').forEach(function (chevron) {
-        chevron.style.transform = 'rotate(0deg)';
     });
 
     syncActionsMenuSeparators(menu);
@@ -242,39 +218,6 @@ function positionMenuAtPoint(menu, x, y) {
 }
 
 /**
- * Re-fit an open dropdown after its content grew or shrank in place (the sort
- * submenu expanding, #1428). adjustMenuPosition / positionMenuAtPoint only
- * measure the menu as it is when it opens, submenu collapsed, so a menu that
- * fitted then could push its new rows below the viewport with no way to reach
- * them. Slides the menu up as far as needed, and only scrolls it when it is
- * taller than the viewport.
- */
-function refitMenuInViewport(menu, revealElement) {
-    if (!menu || !menu.classList.contains('show')) return;
-
-    var margin = 10;
-    var viewportHeight = window.innerHeight;
-
-    menu.style.maxHeight = '';
-    menu.style.overflowY = '';
-
-    var rect = menu.getBoundingClientRect();
-    if (rect.bottom > viewportHeight - margin) {
-        menu.style.top = Math.max(margin, viewportHeight - margin - rect.height) + 'px';
-        if (rect.height > viewportHeight - 2 * margin) {
-            menu.style.maxHeight = (viewportHeight - 2 * margin) + 'px';
-            menu.style.overflowY = 'auto';
-        }
-    }
-
-    if (revealElement && menu.style.overflowY === 'auto') {
-        revealElement.scrollIntoView({ block: 'nearest' });
-    }
-}
-
-window.refitMenuInViewport = refitMenuInViewport;
-
-/**
  * Hidden by UI customization? syncFolderActionToggles / syncNoteActionToggles
  * in js/ui-customization.js set that inline display when every item of the
  * matching menu is unchecked. Checked instead of the computed style because
@@ -325,13 +268,6 @@ function closeFolderActionsMenu(folderId) {
     var menu = document.getElementById('folder-actions-menu');
     if (menu) {
         menu.classList.remove('show');
-        // Unexpand sort submenus
-        menu.querySelectorAll('.sort-submenu').forEach(function (submenu) {
-            submenu.style.display = 'none';
-        });
-        menu.querySelectorAll('.sort-chevron').forEach(function (chevron) {
-            chevron.style.transform = 'rotate(0deg)';
-        });
     }
     clearFolderActionsToggleOpen();
 }
@@ -437,13 +373,6 @@ document.addEventListener('click', function (event) {
     if (!event.target.closest('.folder-actions') && !event.target.closest('.folder-actions-menu')) {
         document.querySelectorAll('.folder-actions-menu.show').forEach(function (menu) {
             menu.classList.remove('show');
-            // Unexpand sort submenus
-            menu.querySelectorAll('.sort-submenu').forEach(function (submenu) {
-                submenu.style.display = 'none';
-            });
-            menu.querySelectorAll('.sort-chevron').forEach(function (chevron) {
-                chevron.style.transform = 'rotate(0deg)';
-            });
         });
         clearFolderActionsToggleOpen();
     }

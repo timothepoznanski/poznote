@@ -228,6 +228,14 @@ document.addEventListener('DOMContentLoaded', function () {
                                                 if (typeof window.deleteAttachment === 'function') {
                                                     window.deleteAttachment(attachmentId, noteId);
                                                 }
+
+                                                // A diagram deleted from the keyboard leaves its placeholder lines behind
+                                                if (node.classList.contains('excalidraw-container') && typeof window.removeExcalidrawPlaceholdersAround === 'function') {
+                                                    window.removeExcalidrawPlaceholdersAround(mutation.previousSibling, mutation.nextSibling);
+                                                    if (typeof window.markNoteAsModified === 'function') {
+                                                        window.markNoteAsModified();
+                                                    }
+                                                }
                                             }
                                         }, 100);
                                     }

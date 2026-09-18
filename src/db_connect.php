@@ -183,7 +183,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 41; // 41: seed the default-hidden UI customization keys (panel:preview-code-block-delete)
+    $CURRENT_SCHEMA_VERSION = 42; // 42: one global sort mode for the tree, keeping a hand-made arrangement (#1442)
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -400,6 +400,10 @@ try {
             if (!in_array('kanban_enabled', $existingColumns)) {
                 $con->exec("ALTER TABLE folders ADD COLUMN kanban_enabled INTEGER DEFAULT 0");
             }
+            // Per-folder sort order, replaced by the one global mode in
+            // #1442. Nothing reads it any more; the column stays so an export
+            // taken before the change still imports, and so a downgrade finds
+            // its data where it left it.
             if (!in_array('sort_setting', $existingColumns)) {
                 $con->exec("ALTER TABLE folders ADD COLUMN sort_setting TEXT");
             }
@@ -957,6 +961,38 @@ try {
                 $con->rollBack();
             }
             error_log('db_connect: default hidden UI key seeding failed: ' . $e->getMessage());
+        }
+
+        // === Sorting became one global mode (#1442) ===
+        //
+        // Sibling folders used to follow display_order whatever the global
+        // note_list_sort was, and a folder could carry a sort of its own. Both
+        // are gone: the tree now follows one mode, and only Custom reads the
+        // hand-set positions. An account that arranged anything by hand would
+        // therefore see that arrangement ignored on the first page after the
+        // upgrade, so it starts on Custom instead.
+        //
+        // Only where the global setting is still the default: an account that
+        // deliberately picked "alphabetical" or "last created" keeps it, and
+        // sees its notes in that order, which is what it asked for. Under
+        // Custom a note that was never dropped sorts by newest change, exactly
+        // what the default showed, so nothing else moves.
+        try {
+            $sortStmt = $con->prepare("SELECT value FROM settings WHERE key = ?");
+            $sortStmt->execute(['note_list_sort']);
+            $storedSort = $sortStmt->fetchColumn();
+            $sortIsDefault = ($storedSort === false || trim((string)$storedSort) === '' || (string)$storedSort === 'updated_desc');
+
+            if ($sortIsDefault) {
+                $arranged = (int)$con->query("SELECT EXISTS (SELECT 1 FROM folders WHERE display_order > 0)
+                    OR EXISTS (SELECT 1 FROM entries WHERE display_order > 0)
+                    OR EXISTS (SELECT 1 FROM folders WHERE sort_setting = 'manual')")->fetchColumn();
+                if ($arranged === 1) {
+                    $con->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('note_list_sort', 'manual')");
+                }
+            }
+        } catch (Exception $e) {
+            error_log('db_connect: global sort migration failed: ' . $e->getMessage());
         }
 
         // === Update schema version (last, so a failed bootstrap retries on the next request) ===

@@ -314,83 +314,6 @@
     }
 
     /**
-     * Handle folder sorting
-     * @param {Event} event - The click event
-     * @param {HTMLElement} element - The action element
-     */
-    function handleFolderSort(event, element) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        var folderId = parseInt(element.getAttribute('data-folder-id'), 10);
-        var sortType = element.getAttribute('data-sort-type') || 'modified';
-
-        // Persist the new sort on the folder's toggle so the shared menu shows
-        // the right active option next time it opens for this folder
-        var folderToggle = document.querySelector('.folder-actions-toggle[data-folder-id="' + folderId + '"]');
-        if (folderToggle) {
-            folderToggle.setAttribute('data-current-sort', sortType);
-        }
-
-        // Update UI: checkmark and active highlighting
-        var parentMenu = element.closest('.folder-actions-menu');
-        if (parentMenu) {
-            var siblings = parentMenu.querySelectorAll('[data-action="sort-folder"]');
-            siblings.forEach(function (el) {
-                el.classList.remove('active');
-            });
-            element.classList.add('active');
-
-            // Update header label
-            var submenuContainer = element.parentElement;
-            if (submenuContainer && submenuContainer.classList.contains('sort-submenu')) {
-                var toggleBtn = submenuContainer.previousElementSibling;
-                if (toggleBtn && toggleBtn.getAttribute('data-action') === 'toggle-sort-submenu') {
-                    var headerLabel = toggleBtn.querySelector('.sort-header-label');
-                    var optionLabel = element.querySelector('.sort-option-label');
-                    if (headerLabel && optionLabel) {
-                        headerLabel.textContent = optionLabel.textContent;
-                    }
-                }
-            }
-        }
-
-        if (typeof window.closeFolderActionsMenu === 'function') {
-            window.closeFolderActionsMenu(folderId);
-        }
-
-        if (!folderId) return;
-
-        // Save sort setting to database
-        var saved = fetch('api_save_folder_sort.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                folder_id: folderId,
-                sort_type: sortType
-            })
-        }).catch(function (err) {
-            console.error('Failed to save sort setting', err);
-        });
-
-        if (sortType === 'manual') {
-            // Drag-and-drop positions live in the database (entries.display_order),
-            // so there is nothing to sort client-side: reload the list once saved.
-            saved.then(function () {
-                if (typeof window.refreshNotesListAfterFolderAction === 'function') {
-                    window.refreshNotesListAfterFolderAction(folderId);
-                } else {
-                    location.reload();
-                }
-            });
-        } else if (typeof window.sortNotesInFolder === 'function') {
-            window.sortNotesInFolder(folderId, sortType);
-        }
-    }
-
-    /**
      * Handle opening all notes in a folder in tabs
      * @param {Event} event - The click event
      * @param {HTMLElement} element - The action element
@@ -464,25 +387,6 @@
                 var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
                 if (folderId && typeof window.toggleFolderActionsMenu === 'function') {
                     window.toggleFolderActionsMenu(folderId);
-                }
-            },
-            'toggle-sort-submenu': function () {
-                event.preventDefault();
-                event.stopPropagation();
-                var chevron = actionElement.querySelector('.sort-chevron');
-                var submenu = actionElement.nextElementSibling;
-
-                if (submenu && submenu.classList.contains('sort-submenu')) {
-                    var isVisible = submenu.style.display === 'block';
-                    submenu.style.display = isVisible ? 'none' : 'block';
-                    if (chevron) {
-                        chevron.style.transform = isVisible ? 'rotate(0deg)' : 'rotate(90deg)';
-                    }
-                    // The menu was placed with the submenu collapsed; the
-                    // extra rows can land below the viewport (#1428)
-                    if (typeof window.refitMenuInViewport === 'function') {
-                        window.refitMenuInViewport(actionElement.closest('.folder-actions-menu'), submenu);
-                    }
                 }
             },
             'toggle-note-actions-menu': function () {
@@ -584,10 +488,6 @@
 
             case 'open-kanban-view':
                 handleOpenKanban(event, actionElement);
-                break;
-
-            case 'sort-folder':
-                handleFolderSort(event, actionElement);
                 break;
 
             case 'open-all-notes-in-tabs':
@@ -856,95 +756,9 @@
     }
 
     // =====================================================
-    // UTILITY FUNCTIONS
-    // =====================================================
-
-    /**
-     * Sort notes within a folder DOM element
-     * @param {number} folderId - The ID of the folder to sort
-     * @param {string} sortType - The sort criteria ('alphabet', 'created', 'modified');
-     *   'manual' is server-side only (handleFolderSort reloads the list instead)
-     */
-    function sortNotesInFolder(folderId, sortType) {
-        var folderContentId = 'folder-' + folderId;
-        var folderContent = document.getElementById(folderContentId);
-        if (!folderContent) return;
-
-        // Get all note wrapper items (only direct children to avoid subfolder notes)
-        // Notes are wrapped in .note-list-item divs; fall back to bare <a> for compatibility
-        var noteItems = Array.from(folderContent.querySelectorAll(':scope > .note-list-item'));
-        if (noteItems.length === 0) {
-            noteItems = Array.from(folderContent.querySelectorAll(':scope > a.links_arbo_left'));
-        }
-        if (noteItems.length === 0) return;
-
-        // Helper: get the <a> link from a note item (wrapper div or bare anchor)
-        function getNoteLink(item) {
-            return item.tagName === 'A' ? item : item.querySelector('a.links_arbo_left');
-        }
-
-        // Sort the items array based on sort type
-        noteItems.sort(function (a, b) {
-            var linkA = getNoteLink(a);
-            var linkB = getNoteLink(b);
-            var valA, valB;
-
-            switch (sortType) {
-                case 'alphabet':
-                    valA = ((linkA && linkA.querySelector('.note-title')) ? linkA.querySelector('.note-title').textContent : '').toLowerCase();
-                    valB = ((linkB && linkB.querySelector('.note-title')) ? linkB.querySelector('.note-title').textContent : '').toLowerCase();
-                    return valA.localeCompare(valB);
-
-                case 'created':
-                    // Descending order (newest first)
-                    valA = (linkA && linkA.getAttribute('data-created')) || '';
-                    valB = (linkB && linkB.getAttribute('data-created')) || '';
-                    return valA < valB ? 1 : (valA > valB ? -1 : 0);
-
-                case 'modified':
-                default:
-                    // Descending order (newest first)
-                    valA = (linkA && linkA.getAttribute('data-updated')) || '';
-                    valB = (linkB && linkB.getAttribute('data-updated')) || '';
-                    return valA < valB ? 1 : (valA > valB ? -1 : 0);
-            }
-        });
-
-        // Find insertion point (before first subfolder if exists)
-        var firstSubfolder = folderContent.querySelector(':scope > .folder-header');
-
-        // Use document fragment for better performance
-        var fragment = document.createDocumentFragment();
-
-        // Reorder note items with spacers
-        noteItems.forEach(function (item) {
-            // Remove existing spacer after this item
-            var next = item.nextElementSibling;
-            if (next && next.classList.contains('pxbetweennotes')) {
-                next.remove();
-            }
-
-            fragment.appendChild(item);
-
-            // Add spacer between notes
-            var spacer = document.createElement('div');
-            spacer.className = 'pxbetweennotes';
-            fragment.appendChild(spacer);
-        });
-
-        // Insert sorted content at appropriate position
-        if (firstSubfolder) {
-            folderContent.insertBefore(fragment, firstSubfolder);
-        } else {
-            folderContent.appendChild(fragment);
-        }
-    }
-
-    // =====================================================
     // EXPOSE PUBLIC API
     // =====================================================
 
-    window.sortNotesInFolder = sortNotesInFolder;
     window.reinitializeFavoritesToggle = reinitializeFavoritesToggle;
 
     // =====================================================

@@ -138,9 +138,13 @@
     font-size: 0.875em !important;
 }
 
+/* The sort and expand-all glyphs sit next to the plus below, and read heavier
+   than it at the same size, so they are stepped down to the size the bell
+   already uses: the plus is the one control of the row that is meant to stand
+   out. */
 .sidebar-folder-toggle i,
 .sidebar-folder-toggle [class*="lucide-"] {
-    font-size: 1.05em !important;
+    font-size: 0.85em !important;
 }
 
 /* Icône plus-circle un peu plus grande */

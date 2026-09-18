@@ -62,7 +62,7 @@ function buildNoteCardPreview($noteId, $type) {
 
     if ($type === 'markdown') {
         $text = preg_replace('/```[^\n]*\n([\s\S]*?)```/', ' $1 ', $raw);
-        $text = preg_replace('/^#{1,6}\s+/m', '', $text);
+        $text = preg_replace('/^ {0,3}#{1,6}\s+/m', '', $text);
         $text = preg_replace('/!\[[^\]]*\]\([^)]*\)/', ' ', $text);
         $text = preg_replace('/\[([^\]]*)\]\([^)]*\)/', '$1', $text);
         $text = str_replace(['**', '__', '*', '`', '> '], ' ', $text);

@@ -258,6 +258,51 @@ function scrollFolderHeaderIntoLeftColumn(header) {
 }
 
 /**
+ * Remember a folder and its ancestors as open, so what a move just dropped in
+ * there is on screen once the tree is drawn again (issue #1441). Nothing
+ * opens right away: restoreFolderStates() reads these keys on the next
+ * render, so this has to run after persistFolderStatesFromDOM(), which would
+ * otherwise write the closed state back over it.
+ * @param {string|number|null} folderId - Destination folder ID (null/'' for the root)
+ */
+function markFolderPathOpen(folderId) {
+    if (folderId === null || folderId === undefined || folderId === '') return;
+
+    var domId = 'folder-' + String(folderId);
+    var content = document.getElementById(domId);
+
+    try {
+        localStorage.setItem('folder_' + domId, 'open');
+        // A destination nested in a closed folder would stay out of sight
+        while (content && content.parentElement) {
+            content = content.parentElement.closest('.folder-content');
+            if (content && content.id) localStorage.setItem('folder_' + content.id, 'open');
+        }
+    } catch (e) {
+        console.debug('utils-folder-tree: markFolderPathOpen() failed:', e);
+    }
+}
+
+/**
+ * Keep what an action just moved selected in the tree (issue #1441), the way
+ * a file manager does: the tint is the confirmation that the items landed
+ * somewhere. Pages without the tree (settings, trash, list_folders) have no
+ * selection module and ignore the call.
+ * @param {Array<{type: string, id: string|number}>} items - Moved notes and folders
+ * @param {boolean} reloads - True when the caller is about to reload the page
+ */
+function keepTreeSelection(items, reloads) {
+    var selection = window.PoznoteTreeSelection;
+    if (!selection) return;
+
+    if (reloads) {
+        selection.selectAfterReload(items);
+    } else {
+        selection.select(items);
+    }
+}
+
+/**
  * Persist current folder open/closed states to localStorage
  * Useful before actions that reload the page (e.g., drag & drop moves)
  */
