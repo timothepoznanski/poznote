@@ -159,10 +159,22 @@ html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::befor
 }
 
 /* Mirrors CodeMirror's own selectors plus one class: its base theme paints
-   #d9d9d9/#d7d4f0 (#222/#233 in dark) and outranked the shorter version (#1424). */
+   #d9d9d9/#d7d4f0 (#222/#233 in dark) and outranked the shorter version (#1424).
+   --pz-selection switches with the theme, so this rule serves both. */
 .markdown-codemirror-host .cm-editor .cm-selectionBackground,
 .markdown-codemirror-host .cm-editor.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground {
-    background: rgba(var(--pz-accent-rgb), 0.22);
+    background: var(--pz-selection);
+}
+
+/* CodeMirror draws the selection itself and hides the browser's own with
+   `::selection { background-color: transparent !important }`. Firefox ignores a
+   fully transparent selection background and paints its default colour instead,
+   so the glyphs got the browser's grey and the rest of each line box our accent,
+   which is the two-coloured selection of #1424. A hair of alpha is honoured
+   there and stays invisible, so both browsers show the drawn colour alone. */
+.markdown-codemirror-host .cm-line::selection,
+.markdown-codemirror-host .cm-line ::selection {
+    background-color: rgba(0, 0, 0, 0.004) !important;
 }
 
 .markdown-codemirror-host .cm-placeholder {

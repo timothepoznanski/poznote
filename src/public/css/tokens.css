@@ -51,6 +51,12 @@
     --pz-accent-hover: #005a8a;
     /* Same colour as RGB channels, for tints: rgba(var(--pz-accent-rgb), 0.1) */
     --pz-accent-rgb: 0, 125, 184;
+    /* Selected text, everywhere: the global ::selection rule
+       (components/selection.css) and the rect the markdown editor draws for
+       itself (markdown.css) both read this one value, so a selection looks the
+       same in read and in edit mode. Translucent on purpose: it composites over
+       whatever is underneath, so nothing it covers loses its contrast. */
+    --pz-selection: rgba(var(--pz-accent-rgb), 0.22);
     /* Hyperlinks. Kept as its own name because it shipped: a custom stylesheet
        out there may already set --pz-link, and dropping the name would make
        that override silently do nothing. It defaults to the accent now; the
@@ -280,6 +286,9 @@ html[data-theme='dark'] {
     --pz-disabled: var(--dm-disabled);
     --pz-scrollbar: var(--dm-scrollbar);
     --pz-scrollbar-hover: var(--dm-scrollbar-hover);
+    /* A tint of the dark accent, a little stronger than the light one because
+       it has less ground to stand out from. */
+    --pz-selection: rgba(var(--dm-accent-rgb), 0.28);
     --dm-border: #404040;
     --dm-border-light: #555555;
     --dm-accent: #4a9eff;

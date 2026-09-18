@@ -35,6 +35,7 @@ function poznoteGetIndexCssGroups(): array {
             'css/components/buttons.css',
             'css/components/forms.css',
             'css/components/logo.css',
+            'css/components/selection.css',
             'css/utilities.css',
             'css/layout.css',
             'css/icon-sidebar.css',

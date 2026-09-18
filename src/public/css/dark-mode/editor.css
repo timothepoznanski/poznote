@@ -218,18 +218,10 @@ html[data-theme='dark'] .note-attachment-preview-caption a:focus {
 }
 
 /* ============================================
-   Text Selection & Highlighting
-   ============================================ */
-
-:where(html[data-theme='dark']) ::selection {
-    background-color: var(--dm-accent-soft);
-    color: var(--dm-text-bright);
-}
-
-:where(html[data-theme='dark']) ::-moz-selection {
-    background-color: var(--dm-accent-soft);
-    color: var(--dm-text-bright);
-}
+   Highlighting
+   ============================================
+   Selected text is themed once for both modes, through --pz-selection and the
+   global rule in css/components/selection.css. */
 
 /* Search highlights */
 :where(html[data-theme='dark']) mark,
