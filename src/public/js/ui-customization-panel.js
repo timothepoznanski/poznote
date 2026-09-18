@@ -361,16 +361,11 @@
 
     function setHelpModalOpen(modal, open) {
         if (!modal) return;
-        if (open && isMacPlatform) {
-            modal.querySelectorAll('kbd[data-key="mod"]').forEach(function (kbd) { kbd.textContent = '⌘'; });
-            modal.querySelectorAll('kbd[data-key="alt"]').forEach(function (kbd) { kbd.textContent = '⌥'; });
-        }
         modal.style.display = open ? 'flex' : 'none';
         if (open) {
             var body = modal.querySelector('.pz-help-modal-body');
             if (body) body.scrollTop = 0;
-            // The syntax reference starts on its filter, the shortcuts on
-            // the close button
+            // Both start on their filter
             var focusTarget = modal.querySelector('.filter-input') || modal.querySelector('[data-action="close-help-modal"]');
             if (focusTarget) focusTarget.focus();
         } else if (moreButton) {
@@ -378,29 +373,64 @@
         }
     }
 
-    // Filter of the Markdown syntax reference (markdown_syntax_content.php)
-    function initMarkdownSyntaxFilter() {
-        var filterInput = document.getElementById('markdownSyntaxFilterInput');
+    // Text a help entry is matched on: its text nodes joined by a space, so a
+    // label and its hint stay two words and "Ctrl + S" reads as "ctrl+s"
+    function helpFilterText(node) {
+        var parts = [];
+        var walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+        while (walker.nextNode()) parts.push(walker.currentNode.nodeValue);
+        return normalizeFilterText(parts.join(' ')).replace(/ ?\+ ?/g, '+');
+    }
+
+    // Filter of a help modal. The Markdown syntax reference matches whole
+    // cards; a shortcut section matches its rows ([data-help-entry]) and
+    // hides when none is left, unless its title matches, which keeps them all.
+    function initHelpFilter(modal) {
+        var filterInput = modal.querySelector('.pz-help-filter-bar .filter-input');
         if (!filterInput) return;
 
-        var clearButton = document.getElementById('markdownSyntaxClearFilter');
-        var filterStats = document.getElementById('markdownSyntaxFilterStats');
-        var noResults = document.getElementById('markdownSyntaxNoResults');
-        var cards = Array.prototype.slice.call(document.querySelectorAll('[data-syntax-card]'));
+        var clearButton = modal.querySelector('.pz-help-filter-bar .clear-filter-btn');
+        var filterStats = modal.querySelector('.pz-help-filter-bar .filter-stats');
+        var noResults = modal.querySelector('.pz-help-empty');
+        var cards = Array.prototype.map.call(modal.querySelectorAll('.pz-help-card'), function (card) {
+            var category = card.querySelector('.pz-help-card-category');
+            var entries = Array.prototype.map.call(card.querySelectorAll('[data-help-entry]'), function (entry) {
+                return { node: entry, text: helpFilterText(entry) };
+            });
+            return {
+                node: card,
+                text: helpFilterText(card),
+                category: category ? helpFilterText(category) : '',
+                entries: entries
+            };
+        });
+        var total = cards.reduce(function (sum, card) { return sum + (card.entries.length || 1); }, 0);
 
         function applyFilter() {
-            var query = normalizeFilterText(filterInput.value);
+            var query = normalizeFilterText(filterInput.value).replace(/ ?\+ ?/g, '+');
             var visibleCount = 0;
 
             cards.forEach(function (card) {
-                var matches = !query || normalizeFilterText(card.textContent).indexOf(query) !== -1;
-                card.hidden = !matches;
-                if (matches) visibleCount += 1;
+                if (!card.entries.length) {
+                    var matches = !query || card.text.indexOf(query) !== -1;
+                    card.node.hidden = !matches;
+                    if (matches) visibleCount += 1;
+                    return;
+                }
+                var keepAll = !query || card.category.indexOf(query) !== -1;
+                var shown = 0;
+                card.entries.forEach(function (entry) {
+                    var entryMatches = keepAll || entry.text.indexOf(query) !== -1;
+                    entry.node.hidden = !entryMatches;
+                    if (entryMatches) shown += 1;
+                });
+                card.node.hidden = shown === 0;
+                visibleCount += shown;
             });
 
             if (clearButton) clearButton.hidden = query === '';
             if (filterStats) {
-                filterStats.textContent = query ? visibleCount + ' / ' + cards.length : '';
+                filterStats.textContent = query ? visibleCount + ' / ' + total : '';
                 filterStats.hidden = query === '';
             }
             if (noResults) noResults.hidden = visibleCount !== 0;
@@ -428,7 +458,12 @@
         moreMenu = document.getElementById('pageMoreMenu');
         if (!moreButton || !moreMenu) return;
 
-        initMarkdownSyntaxFilter();
+        // Before the filters read the text, so a search matches what is shown
+        if (isMacPlatform) {
+            document.querySelectorAll('.pz-help-modal kbd[data-key="mod"]').forEach(function (kbd) { kbd.textContent = '⌘'; });
+            document.querySelectorAll('.pz-help-modal kbd[data-key="alt"]').forEach(function (kbd) { kbd.textContent = '⌥'; });
+        }
+        document.querySelectorAll('.pz-help-modal').forEach(initHelpFilter);
 
         document.addEventListener('click', function (e) {
             var action = e.target.closest ? e.target.closest('[data-action]') : null;

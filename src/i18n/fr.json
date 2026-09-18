@@ -361,7 +361,8 @@
       "delete": "Supprimer",
       "open_attachments": "Ouvrir les pièces jointes",
       "download": "Télécharger {{filename}}",
-      "copy_link": "Copier le lien"
+      "copy_link": "Copier le lien",
+      "move": "Déplacer vers une autre note"
     },
     "errors": {
       "select_file": "Veuillez sélectionner un fichier à télécharger.",
@@ -382,12 +383,15 @@
       "blocked_mime_unlockable": "Ce fichier est détecté comme {{mime}} et bloqué par défaut. Vous pouvez autoriser les scripts et exécutables dans Paramètres > Outils d'administration > Pièces jointes scripts et exécutables.",
       "blocked_mime_locked": "Ce fichier est détecté comme {{mime}}, qu'un serveur web peut exécuter : il ne peut jamais être joint.",
       "blocked_extension_unlockable_user": "Les fichiers {{ext}} sont bloqués sur cette instance. Un administrateur peut les autoriser dans Paramètres > Outils d'administration > Pièces jointes scripts et exécutables.",
-      "blocked_mime_unlockable_user": "Ce fichier est détecté comme {{mime}} et bloqué sur cette instance. Un administrateur peut autoriser les scripts et exécutables dans Paramètres > Outils d'administration > Pièces jointes scripts et exécutables."
+      "blocked_mime_unlockable_user": "Ce fichier est détecté comme {{mime}} et bloqué sur cette instance. Un administrateur peut autoriser les scripts et exécutables dans Paramètres > Outils d'administration > Pièces jointes scripts et exécutables.",
+      "move_failed": "Échec du déplacement : {{error}}",
+      "move_failed_generic": "Échec du déplacement."
     },
     "messages": {
       "upload_success": "Fichier téléchargé avec succès !",
       "deleted_success": "Pièce jointe supprimée avec succès",
-      "link_copied": "Lien copié !"
+      "link_copied": "Lien copié !",
+      "moved_success": "Pièce jointe déplacée vers « {{heading}} »"
     },
     "page": {
       "title": "Gérer les pièces jointes",
@@ -443,7 +447,17 @@
       "delete": "Supprimer",
       "delete_confirm_title": "Supprimer la pièce jointe",
       "delete_confirm_message": "Supprimer « {{filename}} » ? La pièce jointe est retirée de la note et ne pourra pas être récupérée.",
-      "delete_confirm_message_unnamed": "Supprimer cette pièce jointe ? Elle est retirée de la note et ne pourra pas être récupérée."
+      "delete_confirm_message_unnamed": "Supprimer cette pièce jointe ? Elle est retirée de la note et ne pourra pas être récupérée.",
+      "move": "Déplacer vers une autre note"
+    },
+    "move": {
+      "title": "Déplacer la pièce jointe",
+      "description": "Choisissez la note qui reçoit « {{filename}} ».",
+      "description_unnamed": "Choisissez la note qui reçoit cette pièce jointe.",
+      "search_placeholder": "Rechercher une note...",
+      "empty": "Aucune autre note trouvée",
+      "moving": "Déplacement...",
+      "kept_notice": "Une copie reste dans cette note, dont le contenu utilise le fichier."
     }
   },
   "auth": {
@@ -922,7 +936,8 @@
     "notification": {
       "saving": "Enregistrement des modifications…",
       "saved": "Enregistré !",
-      "not_saved_yet": "Vos dernières modifications n'ont pas encore pu être enregistrées. Elles sont conservées sur cet appareil et Poznote réessaie."
+      "not_saved_yet": "Vos dernières modifications n'ont pas encore pu être enregistrées. Elles sont conservées sur cet appareil et Poznote réessaie.",
+      "kept_as_draft": "Pas encore enregistré, vos modifications sont conservées sur cet appareil"
     },
     "draft": {
       "found_conflict": "Cette note contient des modifications non enregistrées de votre dernière visite, mais elle a aussi été modifiée ailleurs depuis. La version que vous ne gardez pas reste dans l'historique de la note.",
@@ -1921,7 +1936,8 @@
       "paste_note": "Coller la note",
       "paste_folder": "Coller le dossier",
       "rename_note": "Renommer la note",
-      "rename_folder": "Renommer le dossier"
+      "rename_folder": "Renommer le dossier",
+      "batch": "{{count}} éléments"
     }
   },
   "tree_clipboard": {
@@ -1934,7 +1950,10 @@
     "nothing_to_paste": "Rien à coller",
     "already_there": "Déjà dans ce dossier",
     "cannot_paste_into_itself": "Un dossier ne peut pas être collé dans lui-même",
-    "paste_failed": "Échec du collage : {{error}}"
+    "paste_failed": "Échec du collage : {{error}}",
+    "copied_items": "{{count}} éléments copiés",
+    "cut_items": "{{count}} éléments coupés",
+    "pasted_items": "{{count}} éléments collés"
   },
   "note_color": {
     "modal_title": "Couleur de la note",
@@ -2018,6 +2037,9 @@
     "heading_1": "Titre 1",
     "heading_2": "Titre 2",
     "heading_3": "Titre 3",
+    "heading_4": "Titre 4",
+    "heading_5": "Titre 5",
+    "heading_6": "Titre 6",
     "format_text": "Formater le texte",
     "red": "Rouge",
     "bold": "Gras",
@@ -2035,7 +2057,6 @@
     "done": "Fait",
     "image": "Image",
     "take_photo": "Prendre une photo",
-    "diagrams": "Diagrammes",
     "excalidraw": "Excalidraw",
     "mermaid": "Mermaid",
     "mermaid_flowchart": "Organigramme",
@@ -2122,7 +2143,6 @@
     "insert": "Insérer",
     "media": "Médias",
     "youtube": "YouTube",
-    "streaming_videos": "Vidéos en streaming",
     "bilibili": "Bilibili",
     "invalid_url": "URL invalide",
     "bilibili_invalid_url": "Veuillez saisir une URL Bilibili valide",
@@ -2157,7 +2177,11 @@
       "storage_s3_quota_reached": "Limite de stockage S3 atteinte : cette instance autorise au maximum {{max}} Mo de stockage S3 pour cet utilisateur.",
       "backups_s3_quota_reached": "Limite de sauvegardes S3 atteinte : cette instance autorise au maximum {{max}} Mo d'archives de sauvegarde pour cet utilisateur.",
       "cannot_delete_last_workspace": "Impossible de supprimer le dernier espace de travail",
-      "workspace_required": "L'espace de travail est requis"
+      "workspace_required": "L'espace de travail est requis",
+      "attachment_not_found": "Pièce jointe introuvable",
+      "attachment_move_same_note": "Cette pièce jointe est déjà sur cette note",
+      "attachment_move_target_not_found": "La note de destination est introuvable",
+      "attachment_move_target_shortcut": "Un raccourci ne peut pas avoir ses propres pièces jointes"
     }
   },
   "ui": {
@@ -2441,7 +2465,8 @@
       "notes_imported": "Importé {{count}} note(s) dans l'espace de travail \"{{workspace}}\", dossier \"{{folder}}\".",
       "attachments_imported": "{{message}}",
       "notes_imported_zip": "Importé {{count}} note(s) depuis le ZIP dans l'espace de travail \"{{workspace}}\", dossier \"{{folder}}\".",
-      "notes_imported_with_folders": "{{count}} note(s) importée(s) et {{folders}} dossier(s) créé(s) dans l'espace de travail « {{workspace}} »."
+      "notes_imported_with_folders": "{{count}} note(s) importée(s) et {{folders}} dossier(s) créé(s) dans l'espace de travail « {{workspace}} ».",
+      "pdf_notes_created": "{{count}} fichier(s) PDF importé(s) en tant que notes, chacun en pièce jointe d'une note portant le nom du fichier."
     },
     "skipped_attachments": {
       "header": "Fichiers de pièces jointes bloqués ignorés :",
@@ -4926,6 +4951,8 @@
   "keyboard_shortcuts": {
     "menu_item": "Raccourcis clavier",
     "title": "Raccourcis clavier",
+    "filter_placeholder": "Filtrer les raccourcis...",
+    "no_results": "Aucun raccourci ne correspond à votre recherche.",
     "setting_hint": "Option à activer dans les paramètres",
     "sections": {
       "general": "Général",
@@ -4949,15 +4976,20 @@
     "checklist_toggle": "Cocher ou décocher un élément de checklist",
     "tree_undo": "Annuler la dernière modification",
     "tree_redo": "Rétablir",
-    "tree_copy": "Copier la note ou le dossier sélectionné",
-    "tree_cut": "Couper la note ou le dossier sélectionné",
+    "tree_copy": "Copier les notes et dossiers sélectionnés",
+    "tree_cut": "Couper les notes et dossiers sélectionnés",
     "tree_paste": "Coller",
     "keys": {
       "shift": "Maj",
       "enter": "Entrée",
       "escape": "Échap",
-      "tab": "Tab"
-    }
+      "tab": "Tab",
+      "delete": "Suppr",
+      "click": "Clic"
+    },
+    "tree_select_toggle": "Ajouter une note ou un dossier à la sélection, ou l'en retirer",
+    "tree_select_range": "Sélectionner toutes les lignes jusqu'à celle-ci",
+    "tree_delete": "Placer les notes et dossiers sélectionnés dans la corbeille"
   },
   "icon_context_menu": {
     "hide": "Masquer le bouton"
@@ -4966,5 +4998,19 @@
     "banner": "Note du compte {{account}}, en lecture seule",
     "open_to_edit": "Ouvrir pour modifier",
     "not_found": "Cette note n'est plus disponible."
+  },
+  "tree_selection": {
+    "count": "{{count}} sélectionnés",
+    "delete_title": "Supprimer {{count}} éléments",
+    "delete_message": "{{count}} éléments vont être placés dans la corbeille, y compris les notes des dossiers sélectionnés. Ctrl+Z les restaure.",
+    "delete_message_notes": "{{count}} notes vont être placées dans la corbeille. Ctrl+Z les restaure.",
+    "deleted_items": "{{count}} éléments placés dans la corbeille",
+    "delete_failed": "Échec de la suppression : {{error}}",
+    "moved_items": "{{count}} éléments déplacés",
+    "move_failed": "Échec du déplacement : {{error}}",
+    "cannot_move_into_itself": "Un dossier ne peut pas être déplacé dans lui-même",
+    "favorited_items": "{{count}} éléments ajoutés aux favoris",
+    "favorite_failed": "Impossible de mettre à jour les favoris : {{error}}",
+    "already_favorites": "Déjà dans les favoris"
   }
 }

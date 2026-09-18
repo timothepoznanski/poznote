@@ -33,6 +33,7 @@ function poznoteGetThemeAssetVersion() {
         'js/theme-manager.js',
         'js/public-note-theme-init.js',
         'js/public-note.js',
+        'js/mermaid-theme.js',
         'js/excalidraw-theme-init.js',
         'js/excalidraw.js',
         'js/excalidraw-editor.js',

@@ -42,6 +42,9 @@
         TXT.openNewTab = body.getAttribute('data-txt-open-new-tab') || 'Open in new tab';
         TXT.download = body.getAttribute('data-txt-download') || 'Download';
         TXT.transcribe = body.getAttribute('data-txt-transcribe') || 'Transcribe into the note';
+        TXT.move = body.getAttribute('data-txt-move') || 'Move to another note';
+        TXT.moveSuccess = body.getAttribute('data-txt-move-success') || 'Attachment moved to "{{heading}}"';
+        TXT.moveKept = body.getAttribute('data-txt-move-kept') || 'A copy stays in this note, whose content uses the file.';
         TXT.pdfLabel = body.getAttribute('data-txt-pdf-label') || 'PDF';
         TXT.deletedSuccess = body.getAttribute('data-txt-deleted-success') || 'Attachment deleted successfully';
         TXT.deleteFailedPrefix = body.getAttribute('data-txt-delete-failed-prefix') || 'Deletion failed: {{error}}';
@@ -447,6 +450,14 @@
                       '</svg>' +
                       '</button>'
                     : '') +
+                '<button type="button" data-action="move" data-attachment-id="' + safeId + '" class="btn-icon btn-move" title="' + escapeHtml(TXT.move) + '" aria-label="' + escapeHtml(TXT.move) + '">' +
+                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+                '<path d="M4.226 20.925A2 2 0 0 0 6 22h12a2 2 0 0 0 2-2V8a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 14 2H6a2 2 0 0 0-2 2v3.127"></path>' +
+                '<path d="M14 2v5a1 1 0 0 0 1 1h5"></path>' +
+                '<path d="m5 11-3 3"></path>' +
+                '<path d="m5 17-3-3h10"></path>' +
+                '</svg>' +
+                '</button>' +
                 '<button type="button" data-action="delete" data-attachment-id="' + safeId + '" class="btn-icon btn-delete" title="' + escapeHtml(TXT.deleteTxt) + '">' +
                 '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
                 '<polyline points="3,6 5,6 21,6"></polyline>' +
@@ -597,6 +608,54 @@
             .catch(function (error) {
                 showNotification(TXT.deleteFailedGeneric, 'error');
             });
+    }
+
+    /**
+     * Hand the attachment to another note through the shared picker
+     * (js/attachment-move.js). This page has no window.t, so the dialog is
+     * given the strings <body> carries, under the keys it looks them up by.
+     */
+    function moveAttachmentToAnotherNote(attachmentId, fileName) {
+        if (typeof window.openAttachmentMoveDialog !== 'function') return;
+
+        var body = document.body;
+        window.openAttachmentMoveDialog({
+            noteId: noteId,
+            attachmentId: attachmentId,
+            workspace: noteWorkspace,
+            filename: fileName,
+            labels: {
+                'attachments.move.title': body.getAttribute('data-txt-move-title'),
+                'attachments.move.description': body.getAttribute('data-txt-move-description'),
+                'attachments.move.description_unnamed': body.getAttribute('data-txt-move-description-unnamed'),
+                'attachments.move.search_placeholder': body.getAttribute('data-txt-move-search'),
+                'attachments.move.empty': body.getAttribute('data-txt-move-empty'),
+                'attachments.move.moving': body.getAttribute('data-txt-move-moving'),
+                'attachments.errors.move_failed': body.getAttribute('data-txt-move-failed-prefix'),
+                'attachments.errors.move_failed_generic': body.getAttribute('data-txt-move-failed-generic'),
+                'note_reference.error.loading_notes': body.getAttribute('data-txt-notes-loading-error'),
+                'note_reference.untitled': body.getAttribute('data-txt-untitled'),
+                'common.loading': body.getAttribute('data-txt-loading'),
+                'common.cancel': TXT.cancel
+            },
+            onMoved: function (result) {
+                var message = TXT.moveSuccess.replace('{{heading}}', result.targetNoteHeading);
+                if (result.keptInSource) {
+                    message += ' ' + TXT.moveKept;
+                }
+                showNotification(message, 'success');
+
+                if (window.POZNOTE_CONFIG?.gitSyncAutoPush) {
+                    try {
+                        localStorage.setItem('poznote_needs_auto_push_' + noteStorageId(noteId), 'true');
+                    } catch (e) {
+                        console.debug('attachments-page: moveAttachmentToAnotherNote() failed:', e);
+                    }
+                }
+
+                loadAttachments();
+            }
+        });
     }
 
     // Show delete confirmation modal
@@ -752,6 +811,10 @@
             case 'transcribe':
                 event.preventDefault();
                 transcribeIntoNote(attachmentId, fileName);
+                break;
+            case 'move':
+                event.preventDefault();
+                moveAttachmentToAnotherNote(attachmentId, fileName);
                 break;
             case 'delete':
                 event.preventDefault();

@@ -478,6 +478,11 @@
                     if (chevron) {
                         chevron.style.transform = isVisible ? 'rotate(0deg)' : 'rotate(90deg)';
                     }
+                    // The menu was placed with the submenu collapsed; the
+                    // extra rows can land below the viewport (#1428)
+                    if (typeof window.refitMenuInViewport === 'function') {
+                        window.refitMenuInViewport(actionElement.closest('.folder-actions-menu'), submenu);
+                    }
                 }
             },
             'toggle-note-actions-menu': function () {

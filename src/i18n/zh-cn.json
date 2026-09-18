@@ -361,7 +361,8 @@
       "delete": "删除",
       "open_attachments": "打开附件",
       "download": "下载 {{filename}}",
-      "copy_link": "复制链接"
+      "copy_link": "复制链接",
+      "move": "移动到其他笔记"
     },
     "errors": {
       "select_file": "请选择要上传的文件。",
@@ -382,12 +383,15 @@
       "blocked_mime_unlockable": "该文件被识别为 {{mime}}，默认被阻止。您可以在“设置 > 管理工具 > 脚本和可执行文件附件”中允许脚本和可执行文件。",
       "blocked_mime_locked": "该文件被识别为 {{mime}}，Web 服务器可能执行此类型，因此永远无法作为附件上传。",
       "blocked_extension_unlockable_user": "{{ext}} 文件在本实例上被阻止。管理员可以在“设置 > 管理工具 > 脚本和可执行文件附件”中允许它们。",
-      "blocked_mime_unlockable_user": "该文件被识别为 {{mime}}，在本实例上被阻止。管理员可以在“设置 > 管理工具 > 脚本和可执行文件附件”中允许脚本和可执行文件。"
+      "blocked_mime_unlockable_user": "该文件被识别为 {{mime}}，在本实例上被阻止。管理员可以在“设置 > 管理工具 > 脚本和可执行文件附件”中允许脚本和可执行文件。",
+      "move_failed": "移动失败：{{error}}",
+      "move_failed_generic": "移动失败。"
     },
     "messages": {
       "upload_success": "文件上传成功！",
       "deleted_success": "附件删除成功",
-      "link_copied": "链接已复制！"
+      "link_copied": "链接已复制！",
+      "moved_success": "附件已移动到「{{heading}}」"
     },
     "page": {
       "title": "管理附件",
@@ -443,7 +447,17 @@
       "delete": "删除",
       "delete_confirm_title": "删除附件",
       "delete_confirm_message": "删除“{{filename}}”？它将从笔记中移除且无法恢复。",
-      "delete_confirm_message_unnamed": "删除此附件？它将从笔记中移除且无法恢复。"
+      "delete_confirm_message_unnamed": "删除此附件？它将从笔记中移除且无法恢复。",
+      "move": "移动到其他笔记"
+    },
+    "move": {
+      "title": "移动附件",
+      "description": "选择接收「{{filename}}」的笔记。",
+      "description_unnamed": "选择接收此附件的笔记。",
+      "search_placeholder": "搜索笔记...",
+      "empty": "未找到其他笔记",
+      "moving": "移动中...",
+      "kept_notice": "本笔记的内容仍在使用该文件，因此会保留一份副本。"
     }
   },
   "auth": {
@@ -921,7 +935,8 @@
     "notification": {
       "saving": "正在保存更改...",
       "saved": "已保存！",
-      "not_saved_yet": "您最近的更改暂时无法保存。它们已保留在此设备上，Poznote 会继续尝试。"
+      "not_saved_yet": "您最近的更改暂时无法保存。它们已保留在此设备上，Poznote 会继续尝试。",
+      "kept_as_draft": "尚未保存，您的更改已保留在此设备上"
     },
     "draft": {
       "found_conflict": "此笔记有您上次访问时未保存的更改，但此后它也在其他地方被修改过。您不保留的版本会留在笔记历史中。",
@@ -1913,7 +1928,8 @@
       "paste_note": "粘贴笔记",
       "paste_folder": "粘贴文件夹",
       "rename_note": "重命名笔记",
-      "rename_folder": "重命名文件夹"
+      "rename_folder": "重命名文件夹",
+      "batch": "{{count}} 项"
     }
   },
   "tree_clipboard": {
@@ -1926,7 +1942,10 @@
     "nothing_to_paste": "没有可粘贴的内容",
     "already_there": "已在此文件夹中",
     "cannot_paste_into_itself": "文件夹不能粘贴到自身中",
-    "paste_failed": "粘贴失败：{{error}}"
+    "paste_failed": "粘贴失败：{{error}}",
+    "copied_items": "已复制 {{count}} 项",
+    "cut_items": "已剪切 {{count}} 项",
+    "pasted_items": "已粘贴 {{count}} 项"
   },
   "note_color": {
     "modal_title": "笔记颜色",
@@ -2010,6 +2029,9 @@
     "heading_1": "一级标题",
     "heading_2": "二级标题",
     "heading_3": "三级标题",
+    "heading_4": "四级标题",
+    "heading_5": "五级标题",
+    "heading_6": "六级标题",
     "format_text": "文本格式",
     "red": "红色",
     "bold": "加粗",
@@ -2026,7 +2048,6 @@
     "done": "已完成",
     "image": "图片",
     "take_photo": "拍照",
-    "diagrams": "图表",
     "excalidraw": "Excalidraw",
     "mermaid": "Mermaid",
     "mermaid_flowchart": "流程图",
@@ -2114,7 +2135,6 @@
     "media": "媒体",
     "color": "颜色",
     "youtube": "YouTube",
-    "streaming_videos": "流媒体视频",
     "bilibili": "Bilibili",
     "invalid_url": "无效的 URL",
     "bilibili_invalid_url": "请输入有效的 Bilibili URL",
@@ -2149,7 +2169,11 @@
       "storage_s3_quota_reached": "已达到 S3 存储上限:此实例最多允许该用户使用 {{max}} MB 的 S3 存储。",
       "backups_s3_quota_reached": "已达到 S3 备份上限:此实例最多允许该用户使用 {{max}} MB 的备份存档。",
       "cannot_delete_last_workspace": "无法删除最后一个工作区",
-      "workspace_required": "需要指定工作区"
+      "workspace_required": "需要指定工作区",
+      "attachment_not_found": "未找到附件",
+      "attachment_move_same_note": "该附件已在这条笔记上",
+      "attachment_move_target_not_found": "未找到目标笔记",
+      "attachment_move_target_shortcut": "快捷方式不能拥有自己的附件"
     }
   },
   "ui": {
@@ -2437,7 +2461,8 @@
       "notes_imported": "已将 {{count}} 篇笔记导入到工作区 \"{{workspace}}\" 的文件夹 \"{{folder}}\" 中。",
       "attachments_imported": "{{message}}",
       "notes_imported_zip": "已从 ZIP 导入 {{count}} 篇笔记到工作区 \"{{workspace}}\" 的文件夹 \"{{folder}}\" 中。",
-      "notes_imported_with_folders": "已在工作区“{{workspace}}”中导入 {{count}} 条笔记并创建 {{folders}} 个文件夹。"
+      "notes_imported_with_folders": "已在工作区“{{workspace}}”中导入 {{count}} 条笔记并创建 {{folders}} 个文件夹。",
+      "pdf_notes_created": "已将 {{count}} 个 PDF 文件导入为笔记，每个文件都作为附件添加到以文件名命名的笔记中。"
     },
     "skipped_attachments": {
       "header": "已跳过的被阻止附件文件：",
@@ -4921,6 +4946,8 @@
   "keyboard_shortcuts": {
     "menu_item": "键盘快捷键",
     "title": "键盘快捷键",
+    "filter_placeholder": "筛选快捷键...",
+    "no_results": "没有与搜索匹配的快捷键。",
     "setting_hint": "需在设置中启用",
     "sections": {
       "general": "通用",
@@ -4944,15 +4971,20 @@
     "checklist_toggle": "勾选或取消勾选清单项",
     "tree_undo": "撤销上一次更改",
     "tree_redo": "重做",
-    "tree_copy": "复制所选笔记或文件夹",
-    "tree_cut": "剪切所选笔记或文件夹",
+    "tree_copy": "复制所选笔记和文件夹",
+    "tree_cut": "剪切所选笔记和文件夹",
     "tree_paste": "粘贴",
     "keys": {
       "shift": "Shift",
       "enter": "Enter",
       "escape": "Esc",
-      "tab": "Tab"
-    }
+      "tab": "Tab",
+      "delete": "Del",
+      "click": "单击"
+    },
+    "tree_select_toggle": "将笔记或文件夹加入选择，或从选择中移除",
+    "tree_select_range": "选择到此行为止的所有行",
+    "tree_delete": "将所选笔记和文件夹移到回收站"
   },
   "icon_context_menu": {
     "hide": "隐藏按钮"
@@ -4961,5 +4993,19 @@
     "banner": "来自账户 {{account}} 的笔记，只读",
     "open_to_edit": "打开以编辑",
     "not_found": "此笔记已不可用。"
+  },
+  "tree_selection": {
+    "count": "已选择 {{count}} 项",
+    "delete_title": "删除 {{count}} 项",
+    "delete_message": "{{count}} 项将被移到回收站，包括所选文件夹中的笔记。按 Ctrl+Z 可恢复。",
+    "delete_message_notes": "{{count}} 条笔记将被移到回收站。按 Ctrl+Z 可恢复。",
+    "deleted_items": "已将 {{count}} 项移到回收站",
+    "delete_failed": "删除失败：{{error}}",
+    "moved_items": "已移动 {{count}} 项",
+    "move_failed": "移动失败：{{error}}",
+    "cannot_move_into_itself": "文件夹不能移动到自身中",
+    "favorited_items": "已将 {{count}} 项添加到收藏",
+    "favorite_failed": "无法更新收藏：{{error}}",
+    "already_favorites": "已在收藏中"
   }
 }

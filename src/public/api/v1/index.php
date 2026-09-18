@@ -790,6 +790,11 @@ $router->delete('/notes/{noteId}/attachments/{attachmentId}', function($params) 
     $attachmentsController->destroy($params['noteId'], $params['attachmentId']);
 });
 
+// Move an attachment to another note
+$router->post('/notes/{noteId}/attachments/{attachmentId}/move', function($params) use ($attachmentsController) {
+    $attachmentsController->move($params['noteId'], $params['attachmentId']);
+});
+
 // ======================
 // Settings Routes
 // ======================

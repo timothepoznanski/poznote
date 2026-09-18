@@ -240,6 +240,11 @@
         // Update toggle button/badge if it exists
         // We pass the selected mode (a theme id or 'system') to update UI correctly
         updateThemeUI(theme);
+
+        // Diagrams are drawn with the theme's colours baked into their SVG.
+        if (typeof window.poznoteRefreshMermaidTheme === 'function') {
+            window.poznoteRefreshMermaidTheme();
+        }
     }
 
     /**

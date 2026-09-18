@@ -211,6 +211,19 @@
     transform: translateY(-1px);
 }
 
+/* Move to another note. Neutral like transcribe: the three hues each stand for
+   what they do (blue opens, green downloads, red deletes) and a fourth one
+   here would claim an emphasis this action does not have. */
+.btn-icon.btn-move {
+    background: var(--pz-neutral);
+    color: var(--pz-text-inverse);
+}
+
+.btn-icon.btn-move:hover {
+    background: var(--pz-neutral-hover);
+    transform: translateY(-1px);
+}
+
 /* Prevent modal global rules from making .btn-icon full width */
 .modal .btn-icon {
     display: inline-flex !important;

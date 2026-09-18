@@ -14,6 +14,14 @@
      * Uses 'base' theme for dark mode with custom colors for better integration
      */
     function getMermaidConfig(isDark) {
+        // The theme's own colours when js/mermaid-theme.js is loaded.
+        if (typeof window.poznoteMermaidTheme === 'function') {
+            try {
+                return window.poznoteMermaidTheme().config;
+            } catch (e) {
+                console.debug('public-note: poznoteMermaidTheme() failed:', e);
+            }
+        }
         if (isDark) {
             return {
                 startOnLoad: false,

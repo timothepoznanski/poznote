@@ -78,6 +78,32 @@
 
 .slash-command-submenu {
     width: 200px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* Label row inside a submenu, e.g. "Block Languages" above the code languages */
+.slash-command-separator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 6px 10px 2px;
+    color: var(--pz-text-subtle);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    user-select: none;
+}
+
+.slash-command-separator::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--pz-border);
+}
+
+.slash-command-menu > .slash-command-separator:first-child {
+    margin-top: 2px;
 }
 
 .slash-command-submenu .slash-command-item {

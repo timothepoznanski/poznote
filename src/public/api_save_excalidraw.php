@@ -36,6 +36,63 @@ function excalidrawAssertNoteNotLockedByOther(int $note_id): void {
     }
 }
 
+/**
+ * The preview the note displays through <img>: the SVG Excalidraw exported,
+ * crisp at any pixel density (issue #1434). Returns null when the request
+ * carries none, and answers 400 when it carries something that is not an
+ * Excalidraw SVG.
+ */
+function excalidrawReadPreviewSvg(): ?string {
+    $svg = $_POST['preview_svg'] ?? '';
+    if (!is_string($svg) || trim($svg) === '') {
+        return null;
+    }
+    if (!excalidrawIsAcceptablePreviewSvg($svg)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Invalid image type']);
+        exit;
+    }
+    return $svg;
+}
+
+/**
+ * The SVG is only ever displayed through <img>, where nothing in it can run,
+ * and is served with the sandbox headers every SVG attachment gets. These
+ * checks refuse what Excalidraw never produces (scripts, handlers, HTML
+ * islands, references outside the file) so the file cannot be repurposed.
+ */
+function excalidrawIsAcceptablePreviewSvg(string $svg): bool {
+    $trimmed = ltrim($svg);
+    if (stripos($trimmed, '<svg') !== 0 && stripos($trimmed, '<?xml') !== 0) {
+        return false;
+    }
+
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mimeType = $finfo ? finfo_buffer($finfo, $svg) : false;
+    if ($finfo) {
+        finfo_close($finfo);
+    }
+    if ($mimeType !== 'image/svg+xml') {
+        return false;
+    }
+
+    if (preg_match('/<\s*(script|foreignObject|iframe|embed|object)\b/i', $svg)) {
+        return false;
+    }
+    // Event handler attributes. Text content is entity-escaped in the
+    // serialized SVG, so a raw "<" only ever opens a real tag here.
+    if (preg_match('/<[^>]*\son[a-z]+\s*=/i', $svg)) {
+        return false;
+    }
+    // Excalidraw only references its embedded images (data:) and its own
+    // <symbol> definitions (#).
+    if (preg_match('/\b(?:xlink:)?href\s*=\s*["\'](?!data:image\/|#)/i', $svg)) {
+        return false;
+    }
+
+    return true;
+}
+
 if ($action === 'save_embedded_diagram') {
     // Handle embedded diagram save
     saveEmbeddedDiagram();
@@ -47,7 +104,6 @@ $note_id = intval($_POST['note_id'] ?? 0);
 $workspace = trim($_POST['workspace'] ?? '') ?: getWorkspaceFilter();
 $heading = trim($_POST['heading'] ?? '') ?: 'New note';
 $diagram_data = $_POST['diagram_data'] ?? '';
-$preview_image = $_FILES['preview_image'] ?? null;
 
 if ($workspace === '') {
     http_response_code(400);
@@ -74,25 +130,10 @@ if ($note_id > 0) {
     excalidrawAssertNoteNotLockedByOther($note_id);
 }
 
-// Save preview image as attachment if provided
+// Save the preview as an attachment if provided
 $attachmentId = null;
-$mime_type = '';
-if ($preview_image && $preview_image['error'] === UPLOAD_ERR_OK) {
-    // Validate it's an image
-    $finfo = finfo_open(FILEINFO_MIME_TYPE);
-    $mime_type = $finfo ? finfo_file($finfo, $preview_image['tmp_name']) : false;
-    if ($finfo) {
-        finfo_close($finfo);
-    }
-    
-    if (!is_string($mime_type) || !in_array($mime_type, ['image/png', 'image/jpeg', 'image/gif'], true)) {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'Invalid image type']);
-        exit;
-    }
-    
-    // Read image data for later saving as attachment
-    $image_data = file_get_contents($preview_image['tmp_name']);
+$image_data = excalidrawReadPreviewSvg();
+if ($image_data !== null) {
     $attachmentId = uniqid();
 }
 
@@ -191,8 +232,8 @@ if ($note_id > 0) {
         }
     }
     
-    // Handle attachment if preview image was provided
-    if ($attachmentId && isset($image_data)) {
+    // Handle attachment if a preview was provided
+    if ($attachmentId !== null && $image_data !== null) {
         // Get existing attachments
         $stmt = $con->prepare("SELECT attachments FROM entries WHERE id = ? AND workspace = ? AND trash = 0");
         $stmt->execute([$note_id, $workspace]);
@@ -222,18 +263,17 @@ if ($note_id > 0) {
             $existingAttachments = $updatedAttachments;
         }
 
-        // Save new image as attachment
-        $extension = ($mime_type === 'image/png') ? 'png' : (($mime_type === 'image/jpeg') ? 'jpg' : 'gif');
-        $attachmentFilename = $attachmentId . '_' . time() . '.' . $extension;
+        // Save the new preview as attachment
+        $attachmentFilename = $attachmentId . '_' . time() . '.svg';
 
-        if (poznoteStoreAttachmentContent($image_data, $attachmentFilename, $mime_type)) {
+        if (poznoteStoreAttachmentContent($image_data, $attachmentFilename, 'image/svg+xml')) {
             // Add to attachments list
             $existingAttachments[] = [
                 'id' => $attachmentId,
                 'filename' => $attachmentFilename,
-                'original_filename' => 'excalidraw_preview.' . $extension,
+                'original_filename' => 'excalidraw_preview.svg',
                 'file_size' => strlen($image_data),
-                'file_type' => $mime_type,
+                'file_type' => 'image/svg+xml',
                 'uploaded_at' => date('Y-m-d H:i:s')
             ];
             
@@ -313,7 +353,6 @@ function saveEmbeddedDiagram() {
     $diagram_id = isset($_POST['diagram_id']) ? trim($_POST['diagram_id']) : '';
     $workspace = trim($_POST['workspace'] ?? '') ?: getWorkspaceFilter();
     $diagram_data = isset($_POST['diagram_data']) ? $_POST['diagram_data'] : '';
-    $preview_image_base64 = isset($_POST['preview_image_base64']) ? $_POST['preview_image_base64'] : '';
     $cursor_position = isset($_POST['cursor_position']) ? intval($_POST['cursor_position']) : null;
     $excalidraw_placeholder = t('editor.excalidraw.placeholder_outside', [], 'Write outside the diagram here…');
     $excalidraw_placeholder = htmlspecialchars($excalidraw_placeholder, ENT_QUOTES);
@@ -367,64 +406,60 @@ function saveEmbeddedDiagram() {
             }
         }
         
-        // Save preview image as attachment if provided
+        // Save the preview as an attachment if provided
         $attachmentId = null;
-        if (!empty($preview_image_base64) && strpos($preview_image_base64, 'data:image/png;base64,') === 0) {
-            $base64_data = substr($preview_image_base64, strlen('data:image/png;base64,'));
-            $image_data = base64_decode($base64_data);
-            
-            if ($image_data !== false) {
-                // Get existing attachments from the already validated note row.
-                $existingAttachments = !empty($row['attachments']) ? json_decode($row['attachments'], true) : [];
-                if (!is_array($existingAttachments)) $existingAttachments = [];
-                
-                // Find and remove old Excalidraw image for this diagram
-                $oldAttachmentId = null;
-                
-                // Extract old attachment ID from existing HTML for this specific diagram
-                $diagram_pattern = '/<div[^>]*id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<img[^>]+src="\/api\/v1\/notes\/' . preg_quote($note_id, '/') . '\/attachments\/([a-zA-Z0-9._-]+)"[^>]*>.*?<\/div>/s';
-                $diagram_pattern_alt = '/<div[^>]*class="excalidraw-container"[^>]*id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<img[^>]+src="\/api\/v1\/notes\/' . preg_quote($note_id, '/') . '\/attachments\/([a-zA-Z0-9._-]+)"[^>]*>.*?<\/div>/s';
-                
-                if (preg_match($diagram_pattern, $html_content, $matches) || preg_match($diagram_pattern_alt, $html_content, $matches)) {
-                    $oldAttachmentId = $matches[1];
-                }
-                
-                // Remove old attachment if found
-                if ($oldAttachmentId) {
-                    $updatedAttachments = [];
-                    foreach ($existingAttachments as $attachment) {
-                        if (isset($attachment['id']) && $attachment['id'] === $oldAttachmentId) {
-                            // Delete the old file (local disk or S3 bucket)
-                            poznoteDeleteAttachmentFile($attachment['filename'] ?? '');
-                        } else {
-                            $updatedAttachments[] = $attachment;
-                        }
-                    }
-                    $existingAttachments = $updatedAttachments;
-                }
-                
-                // Save new image as attachment
-                $attachmentId = uniqid();
-                $filename = $attachmentId . '_' . time() . '.png';
+        $image_data = excalidrawReadPreviewSvg();
+        if ($image_data !== null) {
+            // Get existing attachments from the already validated note row.
+            $existingAttachments = !empty($row['attachments']) ? json_decode($row['attachments'], true) : [];
+            if (!is_array($existingAttachments)) $existingAttachments = [];
 
-                if (poznoteStoreAttachmentContent($image_data, $filename, 'image/png')) {
-                    // Add to attachments list
-                    $existingAttachments[] = [
-                        'id' => $attachmentId,
-                        'filename' => $filename,
-                        'original_filename' => 'excalidraw_' . $diagram_id . '.png',
-                        'file_size' => strlen($image_data),
-                        'file_type' => 'image/png',
-                        'uploaded_at' => date('Y-m-d H:i:s')
-                    ];
-                    
-                    // Update attachments in database
-                    $updateStmt = $con->prepare("UPDATE entries SET attachments = ? WHERE id = ? AND workspace = ? AND trash = 0");
-                    $updateStmt->execute([json_encode($existingAttachments), $note_id, $workspace]);
+            // Find and remove old Excalidraw image for this diagram
+            $oldAttachmentId = null;
+
+            // Extract old attachment ID from existing HTML for this specific diagram
+            $diagram_pattern = '/<div[^>]*id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<img[^>]+src="\/api\/v1\/notes\/' . preg_quote($note_id, '/') . '\/attachments\/([a-zA-Z0-9._-]+)"[^>]*>.*?<\/div>/s';
+            $diagram_pattern_alt = '/<div[^>]*class="excalidraw-container"[^>]*id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<img[^>]+src="\/api\/v1\/notes\/' . preg_quote($note_id, '/') . '\/attachments\/([a-zA-Z0-9._-]+)"[^>]*>.*?<\/div>/s';
+
+            if (preg_match($diagram_pattern, $html_content, $matches) || preg_match($diagram_pattern_alt, $html_content, $matches)) {
+                $oldAttachmentId = $matches[1];
+            }
+
+            // Remove old attachment if found
+            if ($oldAttachmentId) {
+                $updatedAttachments = [];
+                foreach ($existingAttachments as $attachment) {
+                    if (isset($attachment['id']) && $attachment['id'] === $oldAttachmentId) {
+                        // Delete the old file (local disk or S3 bucket)
+                        poznoteDeleteAttachmentFile($attachment['filename'] ?? '');
+                    } else {
+                        $updatedAttachments[] = $attachment;
+                    }
                 }
+                $existingAttachments = $updatedAttachments;
+            }
+
+            // Save the new preview as attachment
+            $attachmentId = uniqid();
+            $filename = $attachmentId . '_' . time() . '.svg';
+
+            if (poznoteStoreAttachmentContent($image_data, $filename, 'image/svg+xml')) {
+                // Add to attachments list
+                $existingAttachments[] = [
+                    'id' => $attachmentId,
+                    'filename' => $filename,
+                    'original_filename' => 'excalidraw_' . $diagram_id . '.svg',
+                    'file_size' => strlen($image_data),
+                    'file_type' => 'image/svg+xml',
+                    'uploaded_at' => date('Y-m-d H:i:s')
+                ];
+
+                // Update attachments in database
+                $updateStmt = $con->prepare("UPDATE entries SET attachments = ? WHERE id = ? AND workspace = ? AND trash = 0");
+                $updateStmt->execute([json_encode($existingAttachments), $note_id, $workspace]);
             }
         }
-        
+
         // Extract existing image classes and style to preserve border settings
         $existing_img_classes = '';
         $existing_img_style = '';

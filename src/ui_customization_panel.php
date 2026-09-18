@@ -34,6 +34,7 @@ $uiCustomizationPanelAiLabel = t_h('ai_chat.toolbar_button', [], 'AI assistant')
  * js/emoji-autocomplete.js and js/tree-undo-clipboard.js (tree).
  */
 $pzShortcutSettingHint = t_h('keyboard_shortcuts.setting_hint', [], 'Option to enable in Settings');
+$pzShortcutFilterPlaceholder = t_h('keyboard_shortcuts.filter_placeholder', [], 'Filter shortcuts...');
 $pzShortcutGroups = [
     [
         'title' => t_h('keyboard_shortcuts.sections.general', [], 'General'),
@@ -64,9 +65,12 @@ $pzShortcutGroups = [
         'items' => [
             ['keys' => [['mod', 'Z']], 'label' => t_h('keyboard_shortcuts.tree_undo', [], 'Undo the last change')],
             ['keys' => [['mod', 'Shift', 'Z'], ['mod', 'Y']], 'label' => t_h('keyboard_shortcuts.tree_redo', [], 'Redo')],
-            ['keys' => [['mod', 'C']], 'label' => t_h('keyboard_shortcuts.tree_copy', [], 'Copy the selected note or folder')],
-            ['keys' => [['mod', 'X']], 'label' => t_h('keyboard_shortcuts.tree_cut', [], 'Cut the selected note or folder')],
+            ['keys' => [['mod', 'Click']], 'label' => t_h('keyboard_shortcuts.tree_select_toggle', [], 'Add a note or folder to the selection, or remove it')],
+            ['keys' => [['Shift', 'Click']], 'label' => t_h('keyboard_shortcuts.tree_select_range', [], 'Select every row up to this one')],
+            ['keys' => [['mod', 'C']], 'label' => t_h('keyboard_shortcuts.tree_copy', [], 'Copy the selected notes and folders')],
+            ['keys' => [['mod', 'X']], 'label' => t_h('keyboard_shortcuts.tree_cut', [], 'Cut the selected notes and folders')],
             ['keys' => [['mod', 'V']], 'label' => t_h('keyboard_shortcuts.tree_paste', [], 'Paste')],
+            ['keys' => [['Del']], 'label' => t_h('keyboard_shortcuts.tree_delete', [], 'Move the selected notes and folders to the trash')],
         ],
     ],
 ];
@@ -79,6 +83,8 @@ $pzShortcutKeyLabels = [
     'Enter' => t_h('keyboard_shortcuts.keys.enter', [], 'Enter'),
     'Esc' => t_h('keyboard_shortcuts.keys.escape', [], 'Esc'),
     'Tab' => t_h('keyboard_shortcuts.keys.tab', [], 'Tab'),
+    'Del' => t_h('keyboard_shortcuts.keys.delete', [], 'Del'),
+    'Click' => t_h('keyboard_shortcuts.keys.click', [], 'Click'),
 ];
 $pzMoreMenuLabel = t_h('page_menu.button', [], 'More options');
 require_once __DIR__ . '/markdown_syntax_content.php';
@@ -129,12 +135,25 @@ require_once __DIR__ . '/markdown_syntax_content.php';
                 </button>
             </div>
             <div class="pz-help-modal-body">
+                <div class="pz-help-filter-bar">
+                    <div class="filter-input-wrapper">
+                        <i class="lucide lucide-search pz-help-filter-icon" aria-hidden="true"></i>
+                        <input type="text" id="keyboardShortcutsFilterInput" class="filter-input" autocomplete="off"
+                            placeholder="<?php echo $pzShortcutFilterPlaceholder; ?>" aria-label="<?php echo $pzShortcutFilterPlaceholder; ?>">
+                        <button type="button" class="clear-filter-btn" hidden
+                            title="<?php echo t_h('search.clear', [], 'Clear search'); ?>" aria-label="<?php echo t_h('search.clear', [], 'Clear search'); ?>">
+                            <i class="lucide lucide-x" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div class="filter-stats" hidden></div>
+                </div>
+                <div class="pz-help-cards">
                 <?php foreach ($pzShortcutGroups as $group): ?>
-                <section class="keyboard-shortcuts-group">
-                    <h4 class="keyboard-shortcuts-group-title"><?php echo $group['title']; ?></h4>
+                <section class="pz-help-card">
+                    <h4 class="pz-help-card-category"><?php echo $group['title']; ?></h4>
                     <ul class="keyboard-shortcuts-list">
                         <?php foreach ($group['items'] as $item): ?>
-                        <li class="keyboard-shortcuts-item">
+                        <li class="keyboard-shortcuts-item" data-help-entry>
                             <span class="keyboard-shortcuts-label"><?php echo $item['label']; ?><?php if (!empty($item['hint'])): ?><span class="keyboard-shortcuts-hint"><?php echo $item['hint']; ?></span><?php endif; ?></span>
                             <span class="keyboard-shortcuts-keys">
                                 <?php foreach ($item['keys'] as $comboIndex => $combo): ?>
@@ -160,6 +179,8 @@ require_once __DIR__ . '/markdown_syntax_content.php';
                     </ul>
                 </section>
                 <?php endforeach; ?>
+                </div>
+                <p class="pz-help-empty" hidden><?php echo t_h('keyboard_shortcuts.no_results', [], 'No shortcuts match your search.'); ?></p>
             </div>
         </div>
     </div>

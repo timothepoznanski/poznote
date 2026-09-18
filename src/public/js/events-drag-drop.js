@@ -1,6 +1,8 @@
 // Drag & drop system for Poznote
 // Handles file uploads, note movement between folders, note reordering
-// (drop before/after another note) and folder reorganization
+// (drop before/after another note) and folder reorganization. A row that
+// belongs to a multi-selection (js/tree-selection.js) drags the whole
+// selection, see "Multi-selection drags" at the end of this file.
 
 // Setup drag-and-drop handlers for file uploads
 function setupDragDropEvents() {
@@ -309,12 +311,19 @@ function setupNoteDragDropEvents() {
     });
 
     // Add global drop handler for dropping outside folders (move to no folder or move folder to root)
+    // Bound once: this setup runs again after every list refresh, and the
+    // handlers are anonymous, so each extra copy would repeat the drop's request.
     var notesListContainer = document.querySelector('.notes_list, #notes-list, body');
-    if (notesListContainer) {
+    if (notesListContainer && !notesListContainer.poznoteRootDropBound) {
+        notesListContainer.poznoteRootDropBound = true;
         notesListContainer.addEventListener('dragover', function (e) {
             // Check if we're not over a folder header
             var isOverFolder = e.target.closest('.folder-header');
             if (!isOverFolder && window.currentDragData) {
+                if (isSelectionDrag(window.currentDragData)) {
+                    handleSelectionRootDragOver(e, window.currentDragData);
+                    return;
+                }
                 // Root note over the root area: position change among root
                 // notes (rows themselves are handled by handleNoteReorderDragOver)
                 if (isRootNoteDragOverRoot(window.currentDragData, e.target)) {
@@ -333,10 +342,22 @@ function setupNoteDragDropEvents() {
                     e.preventDefault();
                     e.dataTransfer.dropEffect = 'move';
                 }
-                // For folders: allow drop to move to root (only for subfolders)
+                // For folders: the gap between two top-level rows reorders
+                // beside the nearest one, anywhere else moves to root (a
+                // folder already at the root has nothing to gain there)
                 if (window.currentDragData.type === 'folder') {
-                    e.preventDefault();
-                    e.dataTransfer.dropEffect = 'move';
+                    var rootFolderTarget = resolveTopLevelFolderDropTarget(e, window.currentDragData);
+                    if (rootFolderTarget) {
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = 'move';
+                        applyFolderDropIndicator(rootFolderTarget.header, rootFolderTarget.position);
+                    } else {
+                        clearOtherFolderDropIndicators(null);
+                        if (!isFolderDragAlreadyTopLevel(window.currentDragData)) {
+                            e.preventDefault();
+                            e.dataTransfer.dropEffect = 'move';
+                        }
+                    }
                 }
             }
         });
@@ -345,6 +366,10 @@ function setupNoteDragDropEvents() {
             // Check if we're not over a folder header
             var isOverFolder = e.target.closest('.folder-header');
             if (!isOverFolder && window.currentDragData) {
+                if (isSelectionDrag(window.currentDragData)) {
+                    handleSelectionRootDrop(e, window.currentDragData);
+                    return;
+                }
                 // Root note dropped in the root area: reorder beside the nearest row
                 if (isRootNoteDragOverRoot(window.currentDragData, e.target)) {
                     var nearestRootRow = findNearestRootNoteRowForDrop(e, window.currentDragData);
@@ -361,10 +386,20 @@ function setupNoteDragDropEvents() {
                     e.preventDefault();
                     moveNoteToRoot(window.currentDragData.noteId);
                 }
-                // Handle folder drop to root
+                // Handle folder drop outside any folder: beside the nearest
+                // top-level row when the pointer is in the gap next to it,
+                // to root otherwise
                 if (window.currentDragData.type === 'folder' && window.currentDragData.folderId) {
                     e.preventDefault();
-                    moveFolderToRoot(window.currentDragData.folderId);
+                    var droppedFolderData = window.currentDragData;
+                    var rootDropTarget = getShownFolderDropTarget(droppedFolderData)
+                        || resolveTopLevelFolderDropTarget(e, droppedFolderData);
+                    clearOtherFolderDropIndicators(null);
+                    if (rootDropTarget) {
+                        dropFolderOnTarget(droppedFolderData, rootDropTarget.header, rootDropTarget.position);
+                    } else if (!isFolderDragAlreadyTopLevel(droppedFolderData)) {
+                        moveFolderToRoot(droppedFolderData.folderId);
+                    }
                 }
             }
         });
@@ -406,6 +441,12 @@ function handleNoteDragStart(e) {
     var currentFolderId = noteLink.getAttribute('data-folder-id');
 
     if (noteId) {
+        var selectionDrag = selectionDragData('note', noteId);
+        if (selectionDrag) {
+            startSelectionDrag(e, selectionDrag);
+            return;
+        }
+
         var dragData = {
             noteId: noteId,
             currentFolder: currentFolder || null,
@@ -418,17 +459,9 @@ function handleNoteDragStart(e) {
         // Store drag data globally for mouseup fallback
         window.currentDragData = dragData;
 
-        // Create a custom drag image with styles already applied
+        // Create a custom drag image (styles in css/drag-drop.css .tree-drag-ghost-note)
         var dragImage = noteLink.cloneNode(true);
-        dragImage.style.position = 'absolute';
-        dragImage.style.top = '-1000px';
-        dragImage.style.opacity = '0.85';
-        dragImage.style.backgroundColor = 'rgba(0, 123, 255, 0.08)';
-        dragImage.style.border = '1px solid rgba(0, 123, 255, 0.3)';
-        dragImage.style.transform = 'scale(1.02)';
-        dragImage.style.padding = '10px';
-        dragImage.style.borderRadius = '4px';
-        dragImage.style.boxShadow = '0 2px 8px rgba(0, 123, 255, 0.15)';
+        dragImage.classList.add('tree-drag-ghost-note');
         dragImage.style.width = noteLink.offsetWidth + 'px';
         dragImage.style.height = noteLink.offsetHeight + 'px';
         document.body.appendChild(dragImage);
@@ -472,6 +505,10 @@ function cleanupDraggingNotes() {
         link.classList.remove('dragging');
         link.removeAttribute('data-dragging');
         link.style.cssText = '';
+    });
+    // Folder toggles dimmed as part of a dragged selection
+    document.querySelectorAll('.folder-toggle.folder-dragging').forEach(function (toggle) {
+        toggle.classList.remove('folder-dragging');
     });
     // Remove source folder visual feedback
     document.querySelectorAll('.folder-header.folder-source-drag').forEach(function (header) {
@@ -625,6 +662,11 @@ function handleRootDrop(e) {
     try {
         var data = JSON.parse(e.dataTransfer.getData('text/plain'));
 
+        if (isSelectionDrag(data)) {
+            moveSelection(data, { folderId: null });
+            return;
+        }
+
         // Only proceed if note is currently in a folder (not already in root)
         if (data.noteId && data.currentFolderId) {
             moveNoteToRoot(data.noteId);
@@ -683,9 +725,13 @@ function clearEnclosingFolderDropIndicators(item) {
 // drag can only change the note's position, never its folder, so the folder
 // handlers must not offer "move into this folder".
 function isNoteDragInOwnFolder(dragData, folderHeader) {
-    if (!dragData || dragData.type === 'folder' || !dragData.noteId || !folderHeader) return false;
+    if (!dragData || dragData.type === 'folder' || !folderHeader) return false;
     if (folderHeader.classList.contains('system-folder')) return false;
     var targetFolderId = folderHeader.getAttribute('data-folder-id') || '';
+    if (isSelectionDrag(dragData)) {
+        return isSelectionOfNotesIn(dragData, targetFolderId);
+    }
+    if (!dragData.noteId) return false;
     var currentFolderId = dragData.currentFolderId ? String(dragData.currentFolderId) : '';
     return currentFolderId !== '' && currentFolderId === String(targetFolderId);
 }
@@ -706,7 +752,7 @@ function findNearestNoteRowForDrop(e, folderHeader, dragData) {
     var best = null;
     content.querySelectorAll(':scope > .note-list-item').forEach(function (item) {
         var target = getNoteReorderTarget(item);
-        if (!target || target.noteId === String(dragData.noteId)) return;
+        if (!target || isDraggedNote(dragData, target.noteId)) return;
         var rect = item.getBoundingClientRect();
         var distance, position;
         if (e.clientY < rect.top) {
@@ -743,12 +789,13 @@ function handleNoteReorderDragOver(e) {
 
     var dragData = window.currentDragData;
     // Folders dropped on a note row fall through to the folder-header
-    // handlers (drop "inside" that folder)
-    if (!dragData || dragData.type === 'folder' || !dragData.noteId) return;
+    // handlers (drop "inside" that folder); a selection lines its notes up
+    // here and puts its folders into the row's folder
+    if (!dragData || dragData.type === 'folder' || (!dragData.noteId && !isSelectionDrag(dragData))) return;
 
     var item = e.currentTarget;
     var target = getNoteReorderTarget(item);
-    if (!target || target.noteId === String(dragData.noteId)) return;
+    if (!target || isDraggedNote(dragData, target.noteId) || isInsideSelectedFolder(dragData, item)) return;
 
     e.preventDefault();
     e.stopPropagation();
@@ -779,10 +826,17 @@ function handleNoteReorderDragLeave(e) {
 // True while a root note (no folder) is dragged over the root area of the
 // list, outside any folder: only its position among root notes can change.
 function isRootNoteDragOverRoot(dragData, element) {
-    if (!dragData || dragData.type === 'folder' || !dragData.noteId || dragData.currentFolderId) return false;
+    if (!isRootNotesDrag(dragData)) return false;
     if (!element || !element.closest) return false;
     if (element.closest('.folder-header')) return false;
     return !!element.closest('.notes-list-scrollable-content');
+}
+
+// A root note, or a selection made only of root notes
+function isRootNotesDrag(dragData) {
+    if (!dragData || dragData.type === 'folder') return false;
+    if (isSelectionDrag(dragData)) return isSelectionOfNotesIn(dragData, '');
+    return !!dragData.noteId && !dragData.currentFolderId;
 }
 
 // Nearest root note row for a pointer over the root area (gaps between
@@ -792,7 +846,7 @@ function findNearestRootNoteRowForDrop(e, dragData) {
     document.querySelectorAll('.note-list-item').forEach(function (item) {
         if (item.closest('.folder-header')) return;
         var target = getNoteReorderTarget(item);
-        if (!target || target.noteId === String(dragData.noteId)) return;
+        if (!target || isDraggedNote(dragData, target.noteId)) return;
         var rect = item.getBoundingClientRect();
         var distance, position;
         if (e.clientY < rect.top) {
@@ -829,14 +883,19 @@ function handleNoteReorderDrop(e) {
     } catch (err) {
         data = window.currentDragData;
     }
-    if (!data || data.type === 'folder' || !data.noteId) return;
+    if (!data || data.type === 'folder' || (!data.noteId && !isSelectionDrag(data))) return;
 
     var target = getNoteReorderTarget(item);
-    if (!target || target.noteId === String(data.noteId)) return;
+    if (!target || isDraggedNote(data, target.noteId) || isInsideSelectedFolder(data, item)) return;
 
     e.preventDefault();
     e.stopPropagation();
     cleanupDraggingNotes();
+
+    if (isSelectionDrag(data)) {
+        moveSelectionBesideNote(data, target, getNoteDropPosition(e, item));
+        return;
+    }
 
     reorderNoteBesideTarget(data.noteId, target.noteId, getNoteDropPosition(e, item));
 }
@@ -1004,6 +1063,12 @@ function handleFolderDragStart(e) {
         return;
     }
 
+    var selectionDrag = selectionDragData('folder', folderId);
+    if (selectionDrag) {
+        startSelectionDrag(e, selectionDrag);
+        return;
+    }
+
     var dragData = {
         type: 'folder',
         folderId: folderId,
@@ -1018,7 +1083,7 @@ function handleFolderDragStart(e) {
 
     // Create a custom drag image
     var dragImage = document.createElement('div');
-    dragImage.style.cssText = 'position: absolute; top: -1000px; padding: 10px 15px; background: rgba(0, 123, 255, 0.15); border: 2px solid rgba(0, 123, 255, 0.4); border-radius: 8px; font-weight: 500; color: #007bff; display: flex; align-items: center; gap: 8px;';
+    dragImage.className = 'tree-drag-ghost';
     dragImage.innerHTML = '<i class="lucide lucide-folder"></i> ' + (folderName || 'Folder');
     document.body.appendChild(dragImage);
 
@@ -1065,6 +1130,10 @@ function handleFolderDragEnd(e) {
         folderHeader.style.border = '';
         folderHeader.style.transform = '';
     }
+    // A dragged selection also dims note rows and other folder toggles, and
+    // may leave a before/after line on a note row
+    cleanupDraggingNotes();
+    clearNoteDropIndicators(null);
 
     // Clean up all folder drag-over states
     document.querySelectorAll('.folder-header.drag-over, .folder-header.folder-drop-target, .folder-header.folder-drop-before, .folder-header.folder-drop-after, .folder-header.folder-drop-inside, .folder-header.folder-source-drag').forEach(function (header) {
@@ -1228,28 +1297,225 @@ function clearOtherFolderDropIndicators(activeHeader) {
     });
 }
 
-function getFolderDropPosition(e, folderHeader) {
+// Where on a folder row the pointer is: top third 'before', bottom third
+// 'after', middle 'inside'. The zone being shown keeps a little extra room so
+// the indicator does not flip on a one pixel move.
+//   - allowInside false: the row splits in two halves (the dragged folder is
+//     already a direct child, so 'inside' would change nothing);
+//   - allowAfter false: the bottom third counts as 'inside' (an open folder
+//     shows its children right under the row, the slot after it is below them).
+function getFolderDropPosition(e, folderHeader, allowInside, allowAfter) {
     var folderToggle = getFolderToggleElement(folderHeader);
-    if (!folderToggle) return 'inside';
+    if (!folderToggle) return allowInside === false ? 'before' : 'inside';
 
     var rect = folderToggle.getBoundingClientRect();
-    if (e.clientY < rect.top || e.clientY > rect.bottom) {
-        return 'inside';
-    }
-
     var ratio = (e.clientY - rect.top) / Math.max(rect.height, 1);
     var previousPosition = folderHeader.dataset ? (folderHeader.dataset.folderDropPosition || '') : '';
+    var position;
 
-    if (previousPosition === 'before') {
-        return ratio <= 0.36 ? 'before' : 'inside';
-    }
-    if (previousPosition === 'after') {
-        return ratio >= 0.64 ? 'after' : 'inside';
+    if (allowInside === false) {
+        if (previousPosition === 'before') {
+            position = ratio <= 0.6 ? 'before' : 'after';
+        } else if (previousPosition === 'after') {
+            position = ratio >= 0.4 ? 'after' : 'before';
+        } else {
+            position = ratio < 0.5 ? 'before' : 'after';
+        }
+    } else if (previousPosition === 'before') {
+        position = ratio <= 0.42 ? 'before' : (ratio >= 0.67 ? 'after' : 'inside');
+    } else if (previousPosition === 'after') {
+        position = ratio >= 0.58 ? 'after' : (ratio <= 0.33 ? 'before' : 'inside');
+    } else if (ratio <= 0.33) {
+        position = 'before';
+    } else if (ratio >= 0.67) {
+        position = 'after';
+    } else {
+        position = 'inside';
     }
 
-    if (ratio <= 0.24) return 'before';
-    if (ratio >= 0.76) return 'after';
-    return 'inside';
+    // 'inside' even when the caller ruled it out: it then reads as "nothing
+    // to do here", which beats a line jumping to the other side of the row
+    if (position === 'after' && allowAfter === false) {
+        position = 'inside';
+    }
+    return position;
+}
+
+function getFolderDragSourceHeader(dragData) {
+    var sourceFolderId = dragData ? parseInt(dragData.folderId, 10) : 0;
+    if (!sourceFolderId) return null;
+    return document.querySelector('.folder-header[data-folder-id="' + sourceFolderId + '"]');
+}
+
+// Folder header that directly holds this one (null at the top of the list)
+function getParentFolderHeader(folderHeader) {
+    var parent = folderHeader ? folderHeader.parentElement : null;
+    if (!parent || !parent.classList || !parent.classList.contains('folder-content')) return null;
+    return parent.closest('.folder-header');
+}
+
+// True when the dragged folder sits at the workspace root already
+function isFolderDragAlreadyTopLevel(dragData) {
+    var sourceHeader = getFolderDragSourceHeader(dragData);
+    if (!sourceHeader) return false;
+    return !sourceHeader.classList.contains('subfolder') && !getParentFolderHeader(sourceHeader);
+}
+
+function getNeighbourFolderHeader(folderHeader, direction) {
+    var sibling = folderHeader ? folderHeader[direction] : null;
+    while (sibling) {
+        if (sibling.classList && sibling.classList.contains('folder-header') && !sibling.classList.contains('system-folder')) {
+            return sibling;
+        }
+        sibling = sibling[direction];
+    }
+    return null;
+}
+
+// True when the drop would leave the dragged folder exactly where it is
+function isFolderDropNoOp(sourceHeader, targetHeader, position) {
+    if (!sourceHeader || !targetHeader) return false;
+    if (position === 'inside') {
+        return getParentFolderHeader(sourceHeader) === targetHeader;
+    }
+    if (sourceHeader.parentElement !== targetHeader.parentElement) return false;
+    if (position === 'before') {
+        return getNeighbourFolderHeader(sourceHeader, 'nextElementSibling') === targetHeader;
+    }
+    return getNeighbourFolderHeader(sourceHeader, 'previousElementSibling') === targetHeader;
+}
+
+// Folder row nearest to the pointer among the direct children of a container,
+// with the side of it the pointer is on. Covers what is not a folder row: the
+// margins between rows, the indentation strip, the notes listed under them.
+// maxDistance (px) limits how far a row may be; omit it for no limit.
+function findNearestFolderRowForDrop(e, container, dragData, maxDistance) {
+    if (!container || !container.children) return null;
+
+    // The list container also hears drags over the rest of the page
+    var bounds = container.getBoundingClientRect();
+    if (e.clientX < bounds.left || e.clientX > bounds.right) return null;
+
+    var best = null;
+    var bestDistance = Infinity;
+
+    for (var i = 0; i < container.children.length; i++) {
+        var row = container.children[i];
+        if (!row.classList || !row.classList.contains('folder-header')) continue;
+        if (!canDropFolderOnHeader(dragData, row, row.getAttribute('data-folder-id'))) continue;
+
+        var rect = row.getBoundingClientRect();
+        if (rect.height === 0) continue;
+
+        var distance = 0;
+        if (e.clientY < rect.top) distance = rect.top - e.clientY;
+        else if (e.clientY > rect.bottom) distance = e.clientY - rect.bottom;
+
+        if (distance < bestDistance) {
+            bestDistance = distance;
+            best = { header: row, rect: rect };
+        }
+    }
+
+    if (!best) return null;
+    if (typeof maxDistance === 'number' && bestDistance > maxDistance) return null;
+
+    var position;
+    if (e.clientY < best.rect.top) {
+        position = 'before';
+    } else if (e.clientY > best.rect.bottom) {
+        position = 'after';
+    } else {
+        var toggle = getFolderToggleElement(best.header);
+        var toggleRect = toggle ? toggle.getBoundingClientRect() : best.rect;
+        position = e.clientY < toggleRect.top + toggleRect.height / 2 ? 'before' : 'after';
+    }
+
+    return { header: best.header, position: position };
+}
+
+var FOLDER_GAP_SNAP_DISTANCE = 12;
+
+// Where a dragged folder would land for this pointer position over a folder
+// header: { header, position } or null when the drop would do nothing.
+// The header under the pointer is not always the target: between two
+// subfolder rows the pointer is over their parent, yet the user is aiming at
+// the rows, so the nearest one takes the drop (before/after).
+function resolveFolderDropTarget(e, folderHeader, dragData) {
+    if (!folderHeader || !dragData || dragData.type !== 'folder') return null;
+
+    var sourceHeader = getFolderDragSourceHeader(dragData);
+    var alreadyChild = !!sourceHeader && getParentFolderHeader(sourceHeader) === folderHeader;
+    var content = getDirectFolderContentElement(folderHeader);
+    var toggle = getFolderToggleElement(folderHeader);
+    var toggleRect = toggle ? toggle.getBoundingClientRect() : null;
+    var overToggle = !!toggleRect && e.clientY >= toggleRect.top && e.clientY <= toggleRect.bottom;
+    var target = null;
+
+    if (overToggle || !content) {
+        if (canDropFolderOnHeader(dragData, folderHeader, folderHeader.getAttribute('data-folder-id'))) {
+            var showsChildren = isFolderContentOpenForDrag(content) && content.children.length > 0;
+            target = {
+                header: folderHeader,
+                position: getFolderDropPosition(e, folderHeader, !alreadyChild, !showsChildren)
+            };
+        }
+    } else {
+        // Below the row, among the folder's contents. Reordering inside the
+        // folder the dragged one already lives in snaps to the nearest
+        // sibling from anywhere; a folder coming from elsewhere only snaps in
+        // the gap next to a row, and goes inside otherwise.
+        target = findNearestFolderRowForDrop(e, content, dragData, alreadyChild ? undefined : FOLDER_GAP_SNAP_DISTANCE);
+        if (!target && canDropFolderOnHeader(dragData, folderHeader, folderHeader.getAttribute('data-folder-id'))) {
+            target = { header: folderHeader, position: 'inside' };
+        }
+    }
+
+    if (!target || isFolderDropNoOp(sourceHeader, target.header, target.position)) return null;
+    return target;
+}
+
+// Same between the rows at the top of the list, outside any folder header
+function resolveTopLevelFolderDropTarget(e, dragData) {
+    if (!dragData || dragData.type !== 'folder') return null;
+
+    var sourceHeader = getFolderDragSourceHeader(dragData);
+    var anyRow = document.querySelector('.folder-header:not(.system-folder)');
+    while (anyRow && getParentFolderHeader(anyRow)) {
+        anyRow = getParentFolderHeader(anyRow);
+    }
+    if (!anyRow || !anyRow.parentElement) return null;
+
+    var target = findNearestFolderRowForDrop(e, anyRow.parentElement, dragData, FOLDER_GAP_SNAP_DISTANCE);
+    if (!target || isFolderDropNoOp(sourceHeader, target.header, target.position)) return null;
+    return target;
+}
+
+// Drop target the indicator currently shows. A drop goes where the line (or
+// the frame) is: working the position out again from the drop event alone
+// would ignore the extra room the shown zone was given, and land the folder
+// inside its neighbour while the line said "before".
+function getShownFolderDropTarget(dragData) {
+    var shown = document.querySelector('.folder-header[data-folder-drop-position]');
+    if (!shown) return null;
+
+    var position = shown.dataset.folderDropPosition;
+    if (position !== 'before' && position !== 'after' && position !== 'inside') return null;
+    if (!canDropFolderOnHeader(dragData, shown, shown.getAttribute('data-folder-id'))) return null;
+    return { header: shown, position: position };
+}
+
+function dropFolderOnTarget(dragData, targetHeader, position) {
+    var targetFolderId = targetHeader.getAttribute('data-folder-id');
+    if (!canDropFolderOnHeader(dragData, targetHeader, targetFolderId)) return;
+    if (isFolderDropNoOp(getFolderDragSourceHeader(dragData), targetHeader, position)) return;
+
+    if (position === 'before' || position === 'after') {
+        moveFolderBesideTarget(dragData.folderId, targetFolderId, position);
+        return;
+    }
+
+    moveFolderToParent(dragData.folderId, targetFolderId);
 }
 
 function canDropFolderOnHeader(dragData, folderHeader, targetFolderId) {
@@ -1319,21 +1585,26 @@ function handleFolderDragEnterEnhanced(e) {
     folderHeader.dataset.dragEnterCount = '1';
 
     var targetFolder = folderHeader.getAttribute('data-folder');
-    var targetFolderId = folderHeader.getAttribute('data-folder-id');
 
     var dragData = window.currentDragData;
 
     if (dragData && dragData.type === 'folder') {
-        if (!canDropFolderOnHeader(dragData, folderHeader, targetFolderId)) {
+        var enterTarget = resolveFolderDropTarget(e, folderHeader, dragData);
+        if (!enterTarget) {
             return;
         }
-        var folderDropPosition = getFolderDropPosition(e, folderHeader);
-        applyFolderDropIndicator(folderHeader, folderDropPosition);
-        scheduleFolderDragExpand(folderHeader, dragData, folderDropPosition);
+        applyFolderDropIndicator(enterTarget.header, enterTarget.position);
+        scheduleFolderDragExpand(enterTarget.header, dragData, enterTarget.position);
         return;
     }
 
     if (targetFolder === 'Tags') {
+        return;
+    }
+
+    // A selection cannot land in one of its own folders, nor where every
+    // item already is (Public and Tags never take a selection)
+    if (isSelectionDrag(dragData) && !canDropSelectionOnFolder(dragData, folderHeader)) {
         return;
     }
 
@@ -1356,7 +1627,6 @@ function handleFolderDragOverEnhanced(e) {
     if (!folderHeader) return;
 
     var targetFolder = folderHeader.getAttribute('data-folder');
-    var targetFolderId = folderHeader.getAttribute('data-folder-id');
 
     // Check what we're dragging
     var dragData = window.currentDragData;
@@ -1370,16 +1640,21 @@ function handleFolderDragOverEnhanced(e) {
             return;
         }
 
-        if (!canDropFolderOnHeader(dragData, folderHeader, targetFolderId)) {
+        // Nested headers all hear the same event, and all resolve it to the
+        // same innermost one: once is enough
+        if (e.poznoteFolderDragOverHandled) return;
+        e.poznoteFolderDragOverHandled = true;
+
+        var overTarget = resolveFolderDropTarget(e, folderHeader, dragData);
+        if (!overTarget) {
             e.dataTransfer.dropEffect = 'none';
-            clearFolderDropIndicator(folderHeader);
+            clearOtherFolderDropIndicators(null);
             return;
         }
 
         e.dataTransfer.dropEffect = 'move';
-        var folderDropPosition = getFolderDropPosition(e, folderHeader);
-        applyFolderDropIndicator(folderHeader, folderDropPosition);
-        scheduleFolderDragExpand(folderHeader, dragData, folderDropPosition);
+        applyFolderDropIndicator(overTarget.header, overTarget.position);
+        scheduleFolderDragExpand(overTarget.header, dragData, overTarget.position);
         return;
     }
 
@@ -1387,6 +1662,12 @@ function handleFolderDragOverEnhanced(e) {
     // Prevent drag-over effect for Tags folder
     if (targetFolder === 'Tags') {
         e.dataTransfer.dropEffect = 'none';
+        return;
+    }
+
+    if (isSelectionDrag(dragData) && !canDropSelectionOnFolder(dragData, folderHeader)) {
+        e.dataTransfer.dropEffect = 'none';
+        clearFolderDropIndicator(folderHeader);
         return;
     }
 
@@ -1431,7 +1712,18 @@ function handleFolderDragLeaveEnhanced(e) {
             delete folderHeader.dataset.dragEnterCount;
         }
 
-        clearFolderDropIndicator(folderHeader);
+        // A folder drag may show its indicator on a row nearby, not on the
+        // header being left. When the pointer goes on to another header, its
+        // dragover sets the indicator anew; clearing here as well would make
+        // the line blink on every row boundary.
+        if (window.currentDragData && window.currentDragData.type === 'folder') {
+            var enteredHeader = e.relatedTarget && e.relatedTarget.closest ? e.relatedTarget.closest('.folder-header') : null;
+            if (!enteredHeader) {
+                clearOtherFolderDropIndicators(null);
+            }
+        } else {
+            clearFolderDropIndicator(folderHeader);
+        }
         clearNoteDropIndicators(null);
     }
 }
@@ -1446,17 +1738,21 @@ function handleFolderDropEnhanced(e) {
     var folderHeader = e.target.closest('.folder-header');
     if (!folderHeader) return;
 
-    folderHeader.classList.remove('drag-over');
-    folderHeader.classList.remove('folder-drop-target');
-    folderHeader.classList.remove('folder-drop-before');
-    folderHeader.classList.remove('folder-drop-after');
-    folderHeader.classList.remove('folder-drop-inside');
-    clearFolderDragExpandTimer(folderHeader);
+    // Every ancestor header hears the drop of a nested folder and resolves it
+    // to the same innermost header: without this the move was sent once per
+    // nesting level.
+    if (e.poznoteFolderDropHandled) return;
+    e.poznoteFolderDropHandled = true;
+
+    // Read before the indicators are cleared: the drop goes where they point
+    var shownFolderTarget = window.currentDragData && window.currentDragData.type === 'folder'
+        ? getShownFolderDropTarget(window.currentDragData)
+        : null;
+
+    clearOtherFolderDropIndicators(null);
+    clearFolderDragExpandTimer();
     if (folderHeader.dataset && folderHeader.dataset.dragEnterCount) {
         delete folderHeader.dataset.dragEnterCount;
-    }
-    if (folderHeader.dataset && folderHeader.dataset.folderDropPosition) {
-        delete folderHeader.dataset.folderDropPosition;
     }
 
     try {
@@ -1483,19 +1779,15 @@ function handleFolderDropEnhanced(e) {
                 return;
             }
 
-            if (!canDropFolderOnHeader(data, folderHeader, targetFolderId)) {
-                return;
+            var folderDropTarget = shownFolderTarget || resolveFolderDropTarget(e, folderHeader, data);
+            if (folderDropTarget) {
+                dropFolderOnTarget(data, folderDropTarget.header, folderDropTarget.position);
             }
+            return;
+        }
 
-            var dropPosition = getFolderDropPosition(e, folderHeader);
-
-            if (dropPosition === 'before' || dropPosition === 'after') {
-                moveFolderBesideTarget(data.folderId, targetFolderId, dropPosition);
-                return;
-            }
-
-            // Move folder to new parent
-            moveFolderToParent(data.folderId, targetFolderId);
+        if (isSelectionDrag(data)) {
+            dropSelectionOnFolder(e, data, folderHeader);
             return;
         }
 
@@ -1600,4 +1892,231 @@ function moveFolderBesideTarget(folderId, targetFolderId, position) {
 // Move folder to root (remove from parent folder)
 function moveFolderToRoot(folderId) {
     moveFolderToParent(folderId, null);
+}
+
+// ---- Multi-selection drags (js/tree-selection.js) ----
+//
+// A row dragged while it belongs to a selection of several rows takes the
+// whole selection along: dragData is {type: 'selection', items: [{type, id}]}.
+// Folder headers take the set inside, a note row lines the notes up before
+// or after it (the folders go into the row's folder) and the root area moves
+// everything out of its folders. Trash trashes the set, Favorites adds it,
+// Public and Tags refuse. The requests, one per item recorded as a single
+// undo entry, live in js/tree-undo-clipboard.js (moveItems, favoriteItems).
+
+// The selection to drag when this row is part of one, or null for an
+// ordinary single-row drag. Dragging a row outside the selection moves that
+// row alone and drops the selection, like a file manager.
+function selectionDragData(rowType, rowId) {
+    var selection = window.PoznoteTreeSelection;
+    if (!selection || selection.count() < 2) return null;
+
+    var items = selection.items();
+    var included = items.some(function (item) {
+        return item.type === rowType && String(item.id) === String(rowId);
+    });
+    if (!included) {
+        selection.clear();
+        return null;
+    }
+    return { type: 'selection', items: items };
+}
+
+function isSelectionDrag(dragData) {
+    return !!(dragData && dragData.type === 'selection' && Array.isArray(dragData.items) && dragData.items.length > 0);
+}
+
+// True for the dragged note itself, alone or among a selection
+function isDraggedNote(dragData, noteId) {
+    if (!dragData) return false;
+    if (isSelectionDrag(dragData)) {
+        return dragData.items.some(function (item) {
+            return item.type === 'note' && String(item.id) === String(noteId);
+        });
+    }
+    return !!dragData.noteId && String(dragData.noteId) === String(noteId);
+}
+
+function selectedFolderHeader(item) {
+    if (item.type !== 'folder') return null;
+    return document.querySelector('.folder-header[data-folder-id="' + String(item.id) + '"]:not(.system-folder)');
+}
+
+// True when the element is a selected folder or sits inside one: a folder
+// cannot land in itself or among its own contents
+function isInsideSelectedFolder(dragData, element) {
+    if (!isSelectionDrag(dragData) || !element) return false;
+    return dragData.items.some(function (item) {
+        var header = selectedFolderHeader(item);
+        return !!header && header.contains(element);
+    });
+}
+
+// Folder id of the row an item is shown in ('' at the root)
+function selectionItemParentId(item) {
+    if (item.type === 'note') {
+        var row = findNoteRowElement(item.id);
+        var link = row ? row.querySelector('a.links_arbo_left') : null;
+        return link ? (link.getAttribute('data-folder-id') || '') : '';
+    }
+    var parentHeader = getParentFolderHeader(selectedFolderHeader(item));
+    return parentHeader ? (parentHeader.getAttribute('data-folder-id') || '') : '';
+}
+
+// True when every item is a note already in this folder ('' for the root):
+// such a drop can only change positions
+function isSelectionOfNotesIn(dragData, folderId) {
+    var target = folderId ? String(folderId) : '';
+    return dragData.items.every(function (item) {
+        return item.type === 'note' && selectionItemParentId(item) === target;
+    });
+}
+
+// True when at least one item is not a direct child of this folder yet
+function selectionHasItemsOutside(dragData, folderId) {
+    var target = folderId ? String(folderId) : '';
+    return dragData.items.some(function (item) {
+        return selectionItemParentId(item) !== target;
+    });
+}
+
+function canDropSelectionOnFolder(dragData, folderHeader) {
+    if (!isSelectionDrag(dragData) || !folderHeader) return false;
+    if (folderHeader.classList.contains('system-folder')) {
+        var name = folderHeader.getAttribute('data-folder');
+        return name === 'Favorites' || name === 'Trash';
+    }
+    if (isInsideSelectedFolder(dragData, folderHeader)) return false;
+
+    var folderId = folderHeader.getAttribute('data-folder-id') || '';
+    return selectionHasItemsOutside(dragData, folderId) || isSelectionOfNotesIn(dragData, folderId);
+}
+
+function startSelectionDrag(e, dragData) {
+    e.dataTransfer.setData('text/plain', JSON.stringify(dragData));
+    e.dataTransfer.effectAllowed = 'move';
+    window.currentDragData = dragData;
+
+    var count = dragData.items.length;
+    var label = (typeof window.t === 'function')
+        ? window.t('tree_selection.count', { count: count }, count + ' selected')
+        : count + ' selected';
+    var dragImage = document.createElement('div');
+    dragImage.className = 'tree-drag-ghost';
+    var icon = document.createElement('i');
+    icon.className = 'lucide lucide-layers';
+    dragImage.appendChild(icon);
+    dragImage.appendChild(document.createTextNode(label));
+    document.body.appendChild(dragImage);
+
+    try {
+        e.dataTransfer.setDragImage(dragImage, 50, 20);
+    } catch (err) {
+        console.debug('events-drag-drop: startSelectionDrag() failed:', err);
+    }
+    setTimeout(function () {
+        if (dragImage.parentNode) {
+            dragImage.parentNode.removeChild(dragImage);
+        }
+    }, 0);
+
+    // Every selected row dims, both rows of a favorited note included
+    dragData.items.forEach(function (item) {
+        if (item.type === 'note') {
+            document.querySelectorAll('#left_col .links_arbo_left[data-note-db-id="' + String(item.id) + '"]').forEach(function (link) {
+                link.classList.add('dragging');
+                link.setAttribute('data-dragging', 'true');
+            });
+            return;
+        }
+        var toggle = getFolderToggleElement(selectedFolderHeader(item));
+        if (toggle) toggle.classList.add('folder-dragging');
+    });
+}
+
+function moveSelection(dragData, dest) {
+    var clipboard = window.PoznoteTreeClipboard;
+    if (clipboard && typeof clipboard.moveItems === 'function') {
+        clipboard.moveItems(dragData.items, dest);
+    }
+}
+
+// Drop beside a note row: the notes line up there, the folders go into the
+// row's folder (null at the root)
+function moveSelectionBesideNote(dragData, target, position) {
+    moveSelection(dragData, {
+        folderId: target.link.getAttribute('data-folder-id') || null,
+        targetNoteId: target.noteId,
+        position: position
+    });
+}
+
+// Root area: a selection of root notes changes position beside the nearest
+// row, anything else moves out of its folders
+function handleSelectionRootDragOver(e, dragData) {
+    if (isRootNoteDragOverRoot(dragData, e.target)) {
+        var nearest = findNearestRootNoteRowForDrop(e, dragData);
+        if (nearest) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            applyNoteDropIndicator(nearest.item, nearest.position);
+        } else {
+            clearNoteDropIndicators(null);
+        }
+        return;
+    }
+    if (selectionHasItemsOutside(dragData, '')) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    }
+}
+
+function handleSelectionRootDrop(e, dragData) {
+    if (isRootNoteDragOverRoot(dragData, e.target)) {
+        var nearest = findNearestRootNoteRowForDrop(e, dragData);
+        clearNoteDropIndicators(null);
+        if (nearest) {
+            e.preventDefault();
+            cleanupDraggingNotes();
+            moveSelection(dragData, { folderId: null, targetNoteId: nearest.noteId, position: nearest.position });
+        }
+        return;
+    }
+    if (selectionHasItemsOutside(dragData, '')) {
+        e.preventDefault();
+        cleanupDraggingNotes();
+        moveSelection(dragData, { folderId: null });
+    }
+}
+
+function dropSelectionOnFolder(e, dragData, folderHeader) {
+    cleanupDraggingNotes();
+    clearNoteDropIndicators(null);
+
+    var clipboard = window.PoznoteTreeClipboard;
+    if (!clipboard || !canDropSelectionOnFolder(dragData, folderHeader)) return;
+
+    if (folderHeader.classList.contains('system-folder')) {
+        var name = folderHeader.getAttribute('data-folder');
+        if (name === 'Trash' && typeof clipboard.deleteItems === 'function') {
+            clipboard.deleteItems(dragData.items);
+        } else if (name === 'Favorites' && typeof clipboard.favoriteItems === 'function') {
+            clipboard.favoriteItems(dragData.items);
+        }
+        return;
+    }
+
+    var targetFolderId = folderHeader.getAttribute('data-folder-id') || null;
+
+    // Own folder: only positions change, beside the nearest row (a drop on
+    // the folder toggle itself changes nothing)
+    if (isNoteDragInOwnFolder(dragData, folderHeader)) {
+        var nearestRow = findNearestNoteRowForDrop(e, folderHeader, dragData);
+        if (nearestRow) {
+            moveSelection(dragData, { folderId: targetFolderId, targetNoteId: nearestRow.noteId, position: nearestRow.position });
+        }
+        return;
+    }
+
+    moveSelection(dragData, { folderId: targetFolderId });
 }

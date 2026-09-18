@@ -113,22 +113,35 @@ function showSaveInProgressNotification(onCompleteCallback) {
         saveToServerDebounced();
     }
 
+    var finished = false;
+
+    function removeNotification() {
+        if (notification && notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }
+
+    function dismissAndContinue(delay) {
+        setTimeout(function () {
+            removeNotification();
+            if (typeof onCompleteCallback === 'function') {
+                onCompleteCallback();
+            }
+        }, delay);
+    }
+
     // Helper: show "Saved!" then remove + callback
     function showSavedAndDismiss() {
+        if (finished) return;
+        finished = true;
+        clearInterval(checkInterval);
+        clearTimeout(fallbackTimer);
         notification.innerHTML =
             '<div class="save-notification-inner">' +
                 '<div class="save-notification-check">\u2713</div>' +
                 '<span>' + tr('autosave.notification.saved', {}, 'Saved!') + '</span>' +
             '</div>';
-
-        setTimeout(function () {
-            if (notification && notification.parentNode) {
-                notification.parentNode.removeChild(notification);
-            }
-            if (typeof onCompleteCallback === 'function') {
-                onCompleteCallback();
-            }
-        }, 800);
+        dismissAndContinue(800);
     }
 
     // Monitor for save completion
@@ -137,15 +150,29 @@ function showSaveInProgressNotification(onCompleteCallback) {
         var notInRefreshList = !notesNeedingRefresh.has(String(currentNoteId));
         var noRedDot = !document.title.startsWith('\uD83D\uDD34');
         if (noTimeout && notInRefreshList && noRedDot) {
-            clearInterval(checkInterval);
             showSavedAndDismiss();
         }
     }, 100);
 
-    // Fallback timeout
-    setTimeout(function () {
+    // The save did not land in time (locked note, refused or failing save,
+    // slow server...). The changes are kept as the note's draft and the
+    // callback goes on: a callback that navigates would otherwise find the
+    // note still unsaved and start this notice again, forever (issue 1419).
+    var fallbackTimer = setTimeout(function () {
+        if (finished) return;
+        finished = true;
         clearInterval(checkInterval);
-        showSavedAndDismiss();
+        if (typeof window.keepUnsavedChangesAsDraft === 'function') {
+            window.keepUnsavedChangesAsDraft(currentNoteId);
+        }
+        notification.innerHTML =
+            '<div class="save-notification-inner">' +
+                '<span>' + tr('autosave.notification.kept_as_draft', {}, 'Not saved yet, your changes are kept on this device') + '</span>' +
+            '</div>';
+        setTimeout(removeNotification, 2500);
+        if (typeof onCompleteCallback === 'function') {
+            onCompleteCallback();
+        }
     }, 3000);
 }
 

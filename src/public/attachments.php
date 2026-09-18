@@ -137,6 +137,20 @@ if (!$note) {
       data-txt-open-new-tab="<?php echo t_h('attachments.page.open_in_new_tab', [], 'Open in new tab'); ?>"
       data-txt-download="<?php echo t_h('common.download', [], 'Download'); ?>"
       data-txt-transcribe="<?php echo t_h('stt.attachment.transcribe_into_note', [], 'Transcribe into the note'); ?>"
+      data-txt-move="<?php echo t_h('attachments.actions.move', [], 'Move to another note'); ?>"
+      data-txt-move-title="<?php echo t_h('attachments.move.title', [], 'Move attachment'); ?>"
+      data-txt-move-description="<?php echo t_h('attachments.move.description', ['filename' => '{{filename}}'], 'Choose the note that receives "{{filename}}".'); ?>"
+      data-txt-move-description-unnamed="<?php echo t_h('attachments.move.description_unnamed', [], 'Choose the note that receives this attachment.'); ?>"
+      data-txt-move-search="<?php echo t_h('attachments.move.search_placeholder', [], 'Search for a note...'); ?>"
+      data-txt-move-empty="<?php echo t_h('attachments.move.empty', [], 'No other note found'); ?>"
+      data-txt-move-moving="<?php echo t_h('attachments.move.moving', [], 'Moving...'); ?>"
+      data-txt-move-kept="<?php echo t_h('attachments.move.kept_notice', [], 'A copy stays in this note, whose content uses the file.'); ?>"
+      data-txt-move-success="<?php echo t_h('attachments.messages.moved_success', ['heading' => '{{heading}}'], 'Attachment moved to "{{heading}}"'); ?>"
+      data-txt-move-failed-prefix="<?php echo t_h('attachments.errors.move_failed', ['error' => '{{error}}'], 'Move failed: {{error}}'); ?>"
+      data-txt-move-failed-generic="<?php echo t_h('attachments.errors.move_failed_generic', [], 'Move failed.'); ?>"
+      data-txt-notes-loading-error="<?php echo t_h('note_reference.error.loading_notes', [], 'Error loading notes'); ?>"
+      data-txt-loading="<?php echo t_h('common.loading', [], 'Loading...'); ?>"
+      data-txt-untitled="<?php echo t_h('note_reference.untitled', [], 'Untitled'); ?>"
       data-txt-pdf-label="<?php echo t_h('attachments.page.pdf_label', [], 'PDF'); ?>"
       data-txt-deleted-success="<?php echo t_h('attachments.messages.deleted_success', [], 'Attachment deleted successfully'); ?>"
       data-txt-delete-failed-prefix="<?php echo t_h('attachments.errors.deletion_failed', ['error' => '{{error}}'], 'Deletion failed: {{error}}'); ?>"
@@ -236,6 +250,7 @@ if (!$note) {
     </div>
 
     <script src="<?php echo poznoteAsset('js/date-time-format.js'); ?>"></script>
+    <script src="js/attachment-move.js?v=<?php echo $v; ?>"></script>
     <script src="js/attachments-page.js?v=<?php echo $v; ?>"></script>
     
     <!-- Delete Attachment Confirmation Modal -->

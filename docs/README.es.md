@@ -1125,18 +1125,41 @@ No hay límite de tamaño en la práctica para el archivo. Igual que en una rest
 
 <a id="import-obsidian-notes"></a>
 <details>
-<summary><strong>Importar notas de Obsidian</strong></summary>
+<summary><strong>Migrar un vault de Obsidian</strong></summary>
 <br>
 
-Importa un archivo ZIP que contiene varias notas de Obsidian:
+Un vault de Obsidian es una carpeta de archivos Markdown, así que se importa tal cual, en un único archivo ZIP.
 
-  - Los archivos ZIP pueden contener hasta 300 archivos, configurable en Configuración > Herramientas de administración > Límites de importación
-  - Poznote detecta y recrea automáticamente la estructura de carpetas
-  - Poznote detecta automáticamente las etiquetas existentes que hay que crear
-  - Poznote importa automáticamente las imágenes si están en la raíz del archivo zip
+**Pasos**
+
+1. Comprime la carpeta de tu vault en un archivo ZIP. No hace falta limpiar nada antes: las carpetas ocultas como `.obsidian` o `.trash` se ignoran.
+2. En Poznote, abre **Configuración > Restaurar / Importar** y ve a la sección que importa archivos y archivos ZIP. Elige el workspace de destino (un workspace nuevo y vacío permite comprobar fácilmente el resultado), selecciona el ZIP e inicia la importación. Soltar el ZIP sobre la lista de notas de la página principal hace lo mismo.
+3. Lee el resumen que aparece al final: indica el número de notas, carpetas, imágenes y archivos PDF importados, y nombra los archivos que no se pudieron importar.
+
+Un ZIP puede contener hasta 300 notas (las imágenes y los PDF no cuentan), un límite que un administrador puede aumentar en Configuración > Herramientas de administración > Límites de importación. El tamaño del archivo no está limitado, consulta [Importar un archivo ZIP](#import-zip-notes).
+
+**Lo que se conserva**
+
+  - Notas: cada archivo `.md` se convierte en una nota Markdown con el nombre del archivo, o con el de la clave `title` de su front matter.
+  - Carpetas: se recrea el árbol de carpetas del vault, subcarpetas incluidas. Cuando todo el vault está dentro de una única carpeta en la raíz del ZIP, esa carpeta se omite.
+  - Etiquetas: la clave `tags` del front matter y una línea de `#tags` al principio de una nota. Los espacios de una etiqueta se convierten en guiones bajos.
+  - Front matter: se leen `title`, `folder`, `tags`, `favorite`, `created` y `updated`, consulta [Soporte de front matter en Markdown](#markdown-front-matter).
+  - Enlaces entre notas: `[[Título de la nota]]` funciona tal cual. Poznote lo resuelve por el título, lo muestra como enlace interno y lo cuenta en los backlinks y en el grafo.
+  - Imágenes: `![[imagen.png]]`, `![[imagen.png|leyenda]]` y `![leyenda](imagen.png)` se convierten en adjuntos de la nota y se muestran en su sitio, esté donde esté la imagen en el vault (junto a las notas, en una subcarpeta o en una carpeta `attachments`).
+  - Archivos PDF: un PDF enlazado desde una nota (`![[archivo.pdf]]`, `[[archivo.pdf]]` o un enlace Markdown) se adjunta a esa nota, y el enlace apunta al adjunto. Cualquier otro PDF, junto a las notas o en una carpeta `attachments`, se convierte en una nota con el nombre del archivo y el PDF como adjunto, en la carpeta que corresponde a su lugar en el vault.
+
+**Lo que no se conserva**
+
+  - Los enlaces con alias o a un encabezado (`[[Nota|alias]]`, `[[Nota#Encabezado]]`) permanecen en el texto pero no llevan a ninguna nota.
+  - Las notas incrustadas (`![[Otra nota]]`) y el contenido de plugins: consultas Dataview, archivos `.canvas`, dibujos hechos con el plugin Excalidraw de Obsidian.
+  - Las etiquetas escritas en medio de una nota quedan como texto.
+  - Los archivos de otros tipos situados junto a las notas (audio, vídeo, documentos de Office) se ignoran. Adjúntalos después a la nota correspondiente.
+
+Las imágenes y los PDF se localizan por su nombre de archivo, no por su ruta. Si dos archivos del vault tienen el mismo nombre, renombra uno antes de importar.
 
 </details>
 
+<a id="markdown-front-matter"></a>
 <details>
 <summary><strong>Soporte de front matter en Markdown</strong></summary>
 <br>

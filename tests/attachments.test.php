@@ -130,3 +130,38 @@ test('uploading browser and Windows recordings stores them as audio', function (
     // The same WebM bytes under a video name stay a video
     assertSame('video/webm', poznoteValidateAttachmentFile('film.webm', null, $webmAudioHeader)['mime_type']);
 });
+
+// Moving an attachment to another note. The record always leaves, the file
+// only follows when nothing in the note it leaves still points at it: an
+// address is /api/v1/notes/<note>/attachments/<id> and resolves only while
+// that note holds that id.
+
+test('an attachment nothing points at moves whole', function () {
+    $plan = poznotePlanAttachmentMove(['id' => 'abc123', 'filename' => 'abc.pdf'], '<p>Nothing here</p>', false);
+
+    assertFalse($plan['keep_in_source'], 'the note keeps nothing');
+    assertFalse($plan['duplicate_file'], 'no second copy of the file');
+    assertFalse($plan['snapshot_only']);
+});
+
+test('an attachment the note still shows leaves a visible copy behind', function () {
+    $content = '<p><a href="/api/v1/notes/12/attachments/abc123">report.pdf</a></p>';
+    $plan = poznotePlanAttachmentMove(['id' => 'abc123', 'filename' => 'abc.pdf'], $content, false);
+
+    assertTrue($plan['keep_in_source'], 'the link would 404 otherwise');
+    assertTrue($plan['duplicate_file'], 'each note must own its own file');
+    assertFalse($plan['snapshot_only'], 'the content uses it, so it stays visible');
+});
+
+test('an attachment only a snapshot needs is kept hidden', function () {
+    $plan = poznotePlanAttachmentMove(['id' => 'abc123', 'filename' => 'abc.pdf'], '<p>Rewritten since</p>', true);
+
+    assertTrue($plan['keep_in_source']);
+    assertTrue($plan['duplicate_file']);
+    assertTrue($plan['snapshot_only'], 'gone from the note, still there for a restore');
+});
+
+test('a markdown image counts as a reference too', function () {
+    $content = "Before\n\n![shot](/api/v1/notes/12/attachments/abc123)\n";
+    assertTrue(poznotePlanAttachmentMove(['id' => 'abc123'], $content, false)['keep_in_source']);
+});

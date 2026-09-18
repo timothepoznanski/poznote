@@ -206,6 +206,7 @@ function poznoteCssManifest(): array
             'css/home/buttons.css',
             'css/attachments/preview-modal.css',
             'css/attachments/responsive.css',
+            'css/attachment-move.css',
             '@modals',
             '@theme',
             '@icon-sidebar',

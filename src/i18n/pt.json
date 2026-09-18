@@ -362,7 +362,8 @@
       "delete": "Excluir",
       "open_attachments": "Abrir anexos",
       "download": "Baixar {{filename}}",
-      "copy_link": "Copiar link"
+      "copy_link": "Copiar link",
+      "move": "Mover para outra nota"
     },
     "errors": {
       "select_file": "Por favor, selecione um arquivo para enviar.",
@@ -383,12 +384,15 @@
       "blocked_mime_unlockable": "Este arquivo é detectado como {{mime}} e é bloqueado por padrão. Você pode permitir scripts e executáveis em Configurações > Ferramentas de administração > Anexos de scripts e executáveis.",
       "blocked_mime_locked": "Este arquivo é detectado como {{mime}}, que um servidor web pode executar, por isso nunca pode ser anexado.",
       "blocked_extension_unlockable_user": "Os arquivos {{ext}} estão bloqueados nesta instância. Um administrador pode permiti-los em Configurações > Ferramentas de administração > Anexos de scripts e executáveis.",
-      "blocked_mime_unlockable_user": "Este arquivo é detectado como {{mime}} e está bloqueado nesta instância. Um administrador pode permitir scripts e executáveis em Configurações > Ferramentas de administração > Anexos de scripts e executáveis."
+      "blocked_mime_unlockable_user": "Este arquivo é detectado como {{mime}} e está bloqueado nesta instância. Um administrador pode permitir scripts e executáveis em Configurações > Ferramentas de administração > Anexos de scripts e executáveis.",
+      "move_failed": "Falha ao mover: {{error}}",
+      "move_failed_generic": "Falha ao mover."
     },
     "messages": {
       "upload_success": "Arquivo enviado com sucesso!",
       "deleted_success": "Anexo excluído com sucesso",
-      "link_copied": "Link copiado!"
+      "link_copied": "Link copiado!",
+      "moved_success": "Anexo movido para \"{{heading}}\""
     },
     "page": {
       "title": "Gerenciar Anexos",
@@ -444,7 +448,17 @@
       "delete": "Excluir",
       "delete_confirm_title": "Excluir anexo",
       "delete_confirm_message": "Excluir \"{{filename}}\"? Ele será removido da nota e não poderá ser recuperado.",
-      "delete_confirm_message_unnamed": "Excluir este anexo? Ele será removido da nota e não poderá ser recuperado."
+      "delete_confirm_message_unnamed": "Excluir este anexo? Ele será removido da nota e não poderá ser recuperado.",
+      "move": "Mover para outra nota"
+    },
+    "move": {
+      "title": "Mover anexo",
+      "description": "Escolha a nota que vai receber \"{{filename}}\".",
+      "description_unnamed": "Escolha a nota que vai receber este anexo.",
+      "search_placeholder": "Buscar uma nota...",
+      "empty": "Nenhuma outra nota encontrada",
+      "moving": "Movendo...",
+      "kept_notice": "Uma cópia fica nesta nota, cujo conteúdo usa o arquivo."
     }
   },
   "auth": {
@@ -922,7 +936,8 @@
     "notification": {
       "saving": "Salvando alterações...",
       "saved": "Salvo!",
-      "not_saved_yet": "Suas últimas alterações ainda não puderam ser salvas. Elas ficam guardadas neste dispositivo e o Poznote continua tentando."
+      "not_saved_yet": "Suas últimas alterações ainda não puderam ser salvas. Elas ficam guardadas neste dispositivo e o Poznote continua tentando.",
+      "kept_as_draft": "Ainda não salvo, suas alterações ficam guardadas neste dispositivo"
     },
     "draft": {
       "found_conflict": "Esta nota tem alterações não salvas da sua última visita, mas também foi modificada em outro lugar desde então. A versão que você não mantiver fica no histórico da nota.",
@@ -1915,7 +1930,8 @@
       "paste_note": "Colar nota",
       "paste_folder": "Colar pasta",
       "rename_note": "Renomear nota",
-      "rename_folder": "Renomear pasta"
+      "rename_folder": "Renomear pasta",
+      "batch": "{{count}} itens"
     }
   },
   "tree_clipboard": {
@@ -1928,7 +1944,10 @@
     "nothing_to_paste": "Nada para colar",
     "already_there": "Já está nesta pasta",
     "cannot_paste_into_itself": "Uma pasta não pode ser colada dentro dela mesma",
-    "paste_failed": "Falha ao colar: {{error}}"
+    "paste_failed": "Falha ao colar: {{error}}",
+    "copied_items": "{{count}} itens copiados",
+    "cut_items": "{{count}} itens recortados",
+    "pasted_items": "{{count}} itens colados"
   },
   "note_color": {
     "modal_title": "Cor da nota",
@@ -2012,6 +2031,9 @@
     "heading_1": "Cabeçalho 1",
     "heading_2": "Cabeçalho 2",
     "heading_3": "Cabeçalho 3",
+    "heading_4": "Cabeçalho 4",
+    "heading_5": "Cabeçalho 5",
+    "heading_6": "Cabeçalho 6",
     "format_text": "Formatar texto",
     "red": "Vermelho",
     "bold": "Negrito",
@@ -2028,7 +2050,6 @@
     "done": "Feito",
     "image": "Imagem",
     "take_photo": "Tirar uma foto",
-    "diagrams": "Diagramas",
     "excalidraw": "Excalidraw",
     "mermaid": "Mermaid",
     "mermaid_flowchart": "Fluxograma",
@@ -2116,7 +2137,6 @@
     "media": "Mídia",
     "color": "Cor",
     "youtube": "YouTube",
-    "streaming_videos": "Vídeos em streaming",
     "bilibili": "Bilibili",
     "invalid_url": "URL inválida",
     "bilibili_invalid_url": "Digite uma URL válida do Bilibili",
@@ -2151,7 +2171,11 @@
       "storage_s3_quota_reached": "Limite de armazenamento S3 atingido: esta instância permite no máximo {{max}} MB de armazenamento S3 para este usuário.",
       "backups_s3_quota_reached": "Limite de backups S3 atingido: esta instância permite no máximo {{max}} MB de arquivos de backup para este usuário.",
       "cannot_delete_last_workspace": "Não é possível excluir o último espaço de trabalho",
-      "workspace_required": "O espaço de trabalho é obrigatório"
+      "workspace_required": "O espaço de trabalho é obrigatório",
+      "attachment_not_found": "Anexo não encontrado",
+      "attachment_move_same_note": "Este anexo já está nessa nota",
+      "attachment_move_target_not_found": "A nota de destino não foi encontrada",
+      "attachment_move_target_shortcut": "Um atalho não pode ter anexos próprios"
     }
   },
   "ui": {
@@ -2436,7 +2460,8 @@
       "notes_imported": "Importadas {{count}} nota(s) para espaço de trabalho \"{{workspace}}\", pasta \"{{folder}}\".",
       "attachments_imported": "{{message}}",
       "notes_imported_zip": "Importadas {{count}} nota(s) do ZIP para espaço de trabalho \"{{workspace}}\", pasta \"{{folder}}\".",
-      "notes_imported_with_folders": "{{count}} nota(s) importada(s) e {{folders}} pasta(s) criada(s) no espaço de trabalho \"{{workspace}}\"."
+      "notes_imported_with_folders": "{{count}} nota(s) importada(s) e {{folders}} pasta(s) criada(s) no espaço de trabalho \"{{workspace}}\".",
+      "pdf_notes_created": "{{count}} ficheiro(s) PDF importado(s) como notas, cada um anexado a uma nota com o nome do ficheiro."
     },
     "skipped_attachments": {
       "header": "Arquivos de anexos bloqueados ignorados:",
@@ -4822,6 +4847,8 @@
   "keyboard_shortcuts": {
     "menu_item": "Atalhos de teclado",
     "title": "Atalhos de teclado",
+    "filter_placeholder": "Filtrar atalhos...",
+    "no_results": "Nenhum atalho corresponde à sua pesquisa.",
     "setting_hint": "Opção a ativar nas Configurações",
     "sections": {
       "general": "Geral",
@@ -4845,15 +4872,20 @@
     "checklist_toggle": "Marcar ou desmarcar um item da checklist",
     "tree_undo": "Anular a última alteração",
     "tree_redo": "Refazer",
-    "tree_copy": "Copiar a nota ou pasta selecionada",
-    "tree_cut": "Cortar a nota ou pasta selecionada",
+    "tree_copy": "Copiar as notas e pastas selecionadas",
+    "tree_cut": "Recortar as notas e pastas selecionadas",
     "tree_paste": "Colar",
     "keys": {
       "shift": "Shift",
       "enter": "Enter",
       "escape": "Esc",
-      "tab": "Tab"
-    }
+      "tab": "Tab",
+      "delete": "Del",
+      "click": "Clique"
+    },
+    "tree_select_toggle": "Adicionar uma nota ou pasta à seleção, ou removê-la",
+    "tree_select_range": "Selecionar todas as linhas até esta",
+    "tree_delete": "Mover as notas e pastas selecionadas para a lixeira"
   },
   "icon_context_menu": {
     "hide": "Ocultar o botão"
@@ -4862,5 +4894,19 @@
     "banner": "Nota da conta {{account}}, só de leitura",
     "open_to_edit": "Abrir para editar",
     "not_found": "Esta nota já não está disponível."
+  },
+  "tree_selection": {
+    "count": "{{count}} selecionados",
+    "delete_title": "Excluir {{count}} itens",
+    "delete_message": "{{count}} itens serão movidos para a lixeira, incluindo as notas das pastas selecionadas. Ctrl+Z os recupera.",
+    "delete_message_notes": "{{count}} notas serão movidas para a lixeira. Ctrl+Z as recupera.",
+    "deleted_items": "{{count}} itens movidos para a lixeira",
+    "delete_failed": "Falha ao excluir: {{error}}",
+    "moved_items": "{{count}} itens movidos",
+    "move_failed": "Falha ao mover: {{error}}",
+    "cannot_move_into_itself": "Uma pasta não pode ser movida para dentro dela mesma",
+    "favorited_items": "{{count}} itens adicionados aos favoritos",
+    "favorite_failed": "Não foi possível atualizar os favoritos: {{error}}",
+    "already_favorites": "Já está nos favoritos"
   }
 }

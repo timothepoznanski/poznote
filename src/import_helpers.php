@@ -1239,12 +1239,63 @@ function poznoteCountImportableZipEntries(ZipArchive $zip): int
  * from importIndividualNotesZip(), where it was 200 lines nested three levels
  * deep inside the import loop.
  *
+ * $importedDocuments maps the lowercase basename of every PDF of the archive
+ * to its stored file. $usedAttachmentFiles, when given, collects the stored
+ * filename of every attachment this note ended up with, so the caller knows
+ * which PDFs no note pointed at.
+ *
  * @return string The content with every reference rewritten.
  */
-function poznoteResolveImportedImageReferences($con, string $content, $noteId, string $noteType, array $importedImages, array $attachmentIdMap): string
+function poznoteResolveImportedImageReferences($con, string $content, $noteId, string $noteType, array $importedImages, array $attachmentIdMap, array $importedDocuments = [], ?array &$usedAttachmentFiles = null): string
 {
         $noteAttachments = [];
-        if ($noteType === 'markdown' && (!empty($importedImages) || !empty($attachmentIdMap))) {
+        if ($noteType === 'markdown' && (!empty($importedImages) || !empty($attachmentIdMap) || !empty($importedDocuments))) {
+            // PDFs of an Obsidian vault: ![[doc.pdf]], [[doc.pdf]] and
+            // [label](doc.pdf) all become a link to the attached file. Runs
+            // before the image pass, which would turn an unknown ![[...]]
+            // embed into a Markdown image.
+            if (!empty($importedDocuments)) {
+                $linkDocument = function ($reference, $label) use ($noteId, $importedDocuments, &$noteAttachments) {
+                    $reference = rawurldecode(str_replace('\\', '/', trim((string)$reference)));
+                    $documentKey = strtolower(basename($reference));
+                    if (!isset($importedDocuments[$documentKey])) {
+                        return null;
+                    }
+
+                    $documentInfo = $importedDocuments[$documentKey];
+                    $attachmentId = addImportedPoznoteAttachmentToNote($noteAttachments, $documentInfo, $documentInfo['original_filename'] ?? null);
+                    if ($attachmentId === null) {
+                        return null;
+                    }
+
+                    $label = trim((string)$label);
+                    if ($label === '') {
+                        $label = $documentInfo['original_filename'] ?? basename($reference);
+                    }
+
+                    return '[' . $label . '](/api/v1/notes/' . $noteId . '/attachments/' . $attachmentId . ')';
+                };
+
+                // Wikilinks, embedded or not, with an optional #page=3 anchor and |alias
+                $content = preg_replace_callback('/!?\[\[([^\]|#]+\.pdf)(?:#[^\]|]*)?(?:\|([^\]]*))?\]\]/i', function($matches) use ($linkDocument) {
+                    return $linkDocument($matches[1], $matches[2] ?? '') ?? $matches[0];
+                }, $content);
+
+                // Relative Markdown links. A Poznote export names its files after
+                // the attachment id (attachments/<uniqid>.pdf) and carries the real
+                // filename in the label: those belong to the export pass below.
+                $content = preg_replace_callback('/!?\[([^\]]*)\]\(<?([^()<>]+?\.pdf)(?:#[^()<>\s]*)?>?\)/i', function($matches) use ($linkDocument) {
+                    $target = trim($matches[2]);
+                    if (preg_match('#^(?:[a-z][a-z0-9+.-]*:|//)#i', $target)) {
+                        return $matches[0];
+                    }
+                    if (preg_match('#(?:^|/)attachments/[0-9a-f]{13}\.pdf$#i', $target)) {
+                        return $matches[0];
+                    }
+                    return $linkDocument($target, $matches[1]) ?? $matches[0];
+                }, $content);
+            }
+
             if (!empty($importedImages)) {
             // Match Obsidian wikilink image syntax: ![[filename.ext]] or ![[filename.ext|alt text]]
             $content = preg_replace_callback('/!\[\[([^\]|]+)(?:\|([^\]]*))?\]\]/', function($matches) use ($noteId, $importedImages, &$noteAttachments) {
@@ -1444,6 +1495,12 @@ function poznoteResolveImportedImageReferences($con, string $content, $noteId, s
             }
         }
 
+        if ($usedAttachmentFiles !== null) {
+            foreach ($noteAttachments as $noteAttachment) {
+                $usedAttachmentFiles[$noteAttachment['filename']] = true;
+            }
+        }
+
     return $content;
 }
 
@@ -1561,6 +1618,11 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
     $importedImages = []; // Maps original filename (lowercase) to stored attachment info
     $importedImagesCount = 0;
     $attachmentIdMap = []; // Maps attachment IDs from exported notes to stored attachment info
+    // PDFs are picked up wherever they sit in the archive: an Obsidian vault
+    // keeps them next to the notes or in its attachments folder
+    $importedPdfs = []; // Every stored PDF, in archive order
+    $importedDocuments = []; // Maps original filename (lowercase) to stored PDF info
+    $usedAttachmentFiles = []; // Stored filenames that ended up attached to a note
 
     // Enforce the storage quota over the whole attachments pass BEFORE storing
     // anything: the per-note check in importSingleNoteFile() never sees these
@@ -1576,7 +1638,7 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
             continue;
         }
         $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        if (preg_match('#(?:^|/)attachments/[^/]+$#', $fileName) || in_array($fileExtension, $imageExtensions, true)) {
+        if (preg_match('#(?:^|/)attachments/[^/]+$#', $fileName) || $fileExtension === 'pdf' || in_array($fileExtension, $imageExtensions, true)) {
             $attachmentsBytesEstimate += max(0, (int)($stat['size'] ?? 0));
         }
     }
@@ -1642,7 +1704,8 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         // images: PDFs and other documents must be restored too. Outside that
         // folder only images are relevant (Obsidian-style ![[image.png]] refs).
         $isPoznoteAttachment = (bool)preg_match('#(?:^|/)attachments/([^/]+)$#', $fileName, $matches);
-        if (!$isPoznoteAttachment && !in_array($fileExtension, $imageExtensions)) {
+        $isPdf = ($fileExtension === 'pdf');
+        if (!$isPoznoteAttachment && !$isPdf && !in_array($fileExtension, $imageExtensions)) {
             continue;
         }
 
@@ -1683,6 +1746,52 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
                     'file_type' => $mimeType
                 ];
                 $importedImagesCount++;
+                $bumpAttachmentUsage(strlen($imageContent));
+
+                // A Poznote export names its files after the attachment id
+                // (uniqid) and is fully served by $attachmentIdMap. Anything
+                // else is a vault whose attachment folder happens to be named
+                // "attachments": its files are referred to by name
+                // (![[photo.png]]), and its PDFs get the same treatment as the
+                // ones lying next to the notes.
+                $isExportedAttachmentId = (bool)preg_match('/^[0-9a-f]{13}$/i', $attachmentId);
+                if (!$isExportedAttachmentId && ($isPdf || in_array($fileExtension, $imageExtensions, true))) {
+                    $namedInfo = $attachmentIdMap[$attachmentId] + [
+                        'original_filename' => basename($fileName),
+                        'zip_path' => $fileName
+                    ];
+                    if ($isPdf) {
+                        $importedPdfs[] = $namedInfo;
+                        $importedDocuments[strtolower(basename($fileName))] = $namedInfo;
+                    } else {
+                        $importedImages[strtolower(basename($fileName))] = $namedInfo;
+                    }
+                }
+            }
+        } elseif ($isPdf) {
+            // Loose PDF, next to the notes. Same blocked-type rules as above:
+            // the extension alone does not make the content a PDF.
+            $validation = poznoteValidateAttachmentFile(basename($fileName), null, $imageContent);
+            if (!$validation['success']) {
+                continue;
+            }
+
+            $uniqueFilename = uniqid() . '_' . time() . '.pdf';
+            $mimeType = $validation['mime_type'] ?? null;
+            if ($mimeType === null || $mimeType === '') {
+                $mimeType = 'application/pdf';
+            }
+
+            if (poznoteStoreAttachmentContent($imageContent, $uniqueFilename, $mimeType)) {
+                $pdfInfo = [
+                    'unique_filename' => $uniqueFilename,
+                    'original_filename' => basename($fileName),
+                    'file_size' => strlen($imageContent),
+                    'file_type' => $mimeType,
+                    'zip_path' => $fileName
+                ];
+                $importedPdfs[] = $pdfInfo;
+                $importedDocuments[strtolower(basename($fileName))] = $pdfInfo;
                 $bumpAttachmentUsage(strlen($imageContent));
             }
         } else {
@@ -1736,6 +1845,45 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         return ['success' => false, 'error' => 'Cannot start database transaction: ' . $e->getMessage()];
     }
     
+    // Folder a file of the archive lands in: [folder id, legacy folder name].
+    // $ownSubfolder keeps the file's own directory even when no note sits in a
+    // subfolder (a PDF in attachments/ next to root-level notes).
+    $resolveTargetFolder = function ($fileName, $ownSubfolder = false) use ($con, $workspace, $folder, $hasSubfolders, $rootFolderName, $createFolderHierarchy) {
+        $targetFolderId = null;
+        $targetFolderName = $folder; // Use provided folder as default
+
+        $dirPath = dirname($fileName);
+        $inSubfolder = ($dirPath !== '.' && $dirPath !== '');
+
+        if ($hasSubfolders || ($ownSubfolder && $inSubfolder)) {
+            // Remove root folder if all files are in a single root folder
+            if ($rootFolderName && ($dirPath === $rootFolderName || strpos($dirPath, $rootFolderName . '/') === 0)) {
+                $dirPath = substr($dirPath, strlen($rootFolderName));
+                $dirPath = trim($dirPath, '/');
+            }
+
+            // Create folder hierarchy if path is not empty
+            // Skip 'Uncategorized' — it is a placeholder used by structured exports for unfoldered notes
+            if (!empty($dirPath) && $dirPath !== '.' && $dirPath !== 'Uncategorized') {
+                $targetFolderId = $createFolderHierarchy($dirPath);
+                // Get the leaf folder name for legacy support
+                $segments = explode('/', $dirPath);
+                $targetFolderName = end($segments);
+            }
+        } else if ($folder !== null && $folder !== '') {
+            // Use the provided folder parameter if no subfolders in ZIP
+            $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
+            $fStmt->execute([$folder, $workspace]);
+            $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
+            if ($folderData) {
+                $targetFolderId = (int)$folderData['id'];
+                $targetFolderName = $folder;
+            }
+        }
+
+        return [$targetFolderId, $targetFolderName];
+    };
+
     // Second pass: actually import the files
     $processedNotes = 0;
     for ($i = 0; $i < $zip->numFiles; $i++) {
@@ -1768,38 +1916,8 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         }
         
         // Determine folder from ZIP structure (if hasSubfolders is true)
-        $targetFolderId = null;
-        $targetFolderName = $folder; // Use provided folder as default
-        
-        if ($hasSubfolders) {
-            // Extract directory path from file path
-            $dirPath = dirname($fileName);
-            
-            // Remove root folder if all files are in a single root folder
-            if ($rootFolderName && strpos($dirPath, $rootFolderName) === 0) {
-                $dirPath = substr($dirPath, strlen($rootFolderName));
-                $dirPath = trim($dirPath, '/');
-            }
-            
-            // Create folder hierarchy if path is not empty
-            // Skip 'Uncategorized' — it is a placeholder used by structured exports for unfoldered notes
-            if (!empty($dirPath) && $dirPath !== '.' && $dirPath !== 'Uncategorized') {
-                $targetFolderId = $createFolderHierarchy($dirPath);
-                // Get the leaf folder name for legacy support
-                $segments = explode('/', $dirPath);
-                $targetFolderName = end($segments);
-            }
-        } else if ($folder !== null && $folder !== '') {
-            // Use the provided folder parameter if no subfolders in ZIP
-            $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
-            $fStmt->execute([$folder, $workspace]);
-            $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
-            if ($folderData) {
-                $targetFolderId = (int)$folderData['id'];
-                $targetFolderName = $folder;
-            }
-        }
-        
+        [$targetFolderId, $targetFolderName] = $resolveTargetFolder($fileName);
+
         try {
             // Import note using shared helper (skip file write - image processing may modify content)
             $result = importSingleNoteFile($con, $content, $fileName, $fileExtension, $workspace, $targetFolderName, $targetFolderId, $entriesPath, false);
@@ -1815,7 +1933,7 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
             
             // Process Obsidian-style image references ![[image.png]] and convert to standard markdown
             // Also build the attachments array for this note
-            $content = poznoteResolveImportedImageReferences($con, $content, $noteId, $noteType, $importedImages, $attachmentIdMap);
+            $content = poznoteResolveImportedImageReferences($con, $content, $noteId, $noteType, $importedImages, $attachmentIdMap, $importedDocuments, $usedAttachmentFiles);
             
             // Save content to file
             if (writeNoteToFile($entriesPath, $noteId, $noteType, $title, $content)) {
@@ -1833,6 +1951,54 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         }
     }
     
+    // Third pass: a PDF no note pointed at becomes a note of its own, titled
+    // after the file, with the PDF as its attachment
+    $pdfNotesCount = 0;
+    foreach ($importedPdfs as $pdfInfo) {
+        if (isset($usedAttachmentFiles[$pdfInfo['unique_filename']])) {
+            continue;
+        }
+
+        $pdfName = $pdfInfo['original_filename'];
+
+        try {
+            $quotaError = poznoteCheckNoteQuota($con);
+            if ($quotaError !== null) {
+                throw new Exception($quotaError);
+            }
+
+            [$targetFolderId, $targetFolderName] = $resolveTargetFolder($pdfInfo['zip_path'], true);
+
+            $title = pathinfo($pdfName, PATHINFO_FILENAME);
+            if ($title === '') {
+                $title = $pdfName;
+            }
+            // A vault often holds "report.md" next to "report.pdf"
+            $title = generateUniqueTitle($title, null, $workspace, $targetFolderId);
+
+            $noteId = insertNoteIntoDb($con, $title, '', $targetFolderName, $targetFolderId, $workspace, 'markdown', '', 0, null, null);
+
+            $noteAttachments = [];
+            addImportedPoznoteAttachmentToNote($noteAttachments, $pdfInfo, $pdfName);
+            $updateStmt = $con->prepare("UPDATE entries SET attachments = ? WHERE id = ?");
+            $updateStmt->execute([json_encode($noteAttachments), $noteId]);
+
+            if (!writeNoteToFile($entriesPath, $noteId, 'markdown', $title, '')) {
+                $stmt = $con->prepare("DELETE FROM entries WHERE id = ?");
+                $stmt->execute([$noteId]);
+                throw new Exception('Cannot write file');
+            }
+
+            $usedAttachmentFiles[$pdfInfo['unique_filename']] = true;
+            $pdfNotesCount++;
+        } catch (Exception $e) {
+            // Nothing references the stored file any more
+            poznoteDeleteAttachmentFile($pdfInfo['unique_filename']);
+            $errorCount++;
+            $errors[] = $pdfName . ': ' . $e->getMessage();
+        }
+    }
+
     // Commit the transaction
     try {
         if ($transactionStarted) {
@@ -1863,6 +2029,10 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
     // Add info about imported images
     if ($importedImagesCount > 0) {
         $messageParts[] = $importedImagesCount . ' image(s) imported as attachments';
+    }
+
+    if ($pdfNotesCount > 0) {
+        $messageParts[] = t('restore_import.messages.pdf_notes_created', ['count' => $pdfNotesCount], '{{count}} PDF file(s) imported as notes, each one attached to a note named after the file.');
     }
     
     if ($errorCount > 0) {

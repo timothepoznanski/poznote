@@ -384,9 +384,9 @@ function poznoteRenderMarkdownSyntaxContent() {
     ?>
             <p class="markdown-syntax-intro"><?php echo htmlspecialchars($copy['intro'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></p>
 
-            <div class="markdown-syntax-filter-bar">
+            <div class="pz-help-filter-bar">
                 <div class="filter-input-wrapper">
-                    <i class="lucide lucide-search markdown-syntax-filter-icon" aria-hidden="true"></i>
+                    <i class="lucide lucide-search pz-help-filter-icon" aria-hidden="true"></i>
                     <input
                         type="text"
                         id="markdownSyntaxFilterInput"
@@ -408,19 +408,19 @@ function poznoteRenderMarkdownSyntaxContent() {
                 <div id="markdownSyntaxFilterStats" class="filter-stats" hidden></div>
             </div>
 
-            <div class="markdown-syntax-list" id="markdownSyntaxList">
+            <div class="pz-help-cards" id="markdownSyntaxList">
                 <?php foreach ($cardsInOrder as $item): ?>
                     <?php $sectionId = $item['section_id']; ?>
                     <?php $cardId = $item['card_id']; ?>
-                    <article class="syntax-card" data-syntax-card>
-                        <p class="syntax-card-category"><?php echo htmlspecialchars($copy['nav'][$sectionId], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></p>
+                    <article class="pz-help-card syntax-card">
+                        <p class="pz-help-card-category"><?php echo htmlspecialchars($copy['nav'][$sectionId], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></p>
                         <h2><?php echo htmlspecialchars($copy['cards'][$cardId]['title'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></h2>
-                        <p><?php echo htmlspecialchars($copy['cards'][$cardId]['description'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></p>
+                        <p class="syntax-card-description"><?php echo htmlspecialchars($copy['cards'][$cardId]['description'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></p>
                         <pre><code><?php echo htmlspecialchars($examples[$cardId], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></code></pre>
                     </article>
                 <?php endforeach; ?>
             </div>
 
-            <p id="markdownSyntaxNoResults" class="markdown-syntax-empty" hidden><?php echo htmlspecialchars($noResultsText, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></p>
+            <p id="markdownSyntaxNoResults" class="pz-help-empty" hidden><?php echo htmlspecialchars($noResultsText, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></p>
     <?php
 }

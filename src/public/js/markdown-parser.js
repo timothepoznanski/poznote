@@ -114,17 +114,22 @@ function initMermaid(retryCount) {
         console.debug('markdown-parser: renderMermaidError() failed:', e0);
     }
 
-    var theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default';
+    // Colours come from the active theme's tokens (js/mermaid-theme.js). `theme`
+    // is the key of those resolved colours, so a theme switch redraws.
+    var mermaidTheme = typeof window.poznoteMermaidTheme === 'function' ? window.poznoteMermaidTheme() : null;
+    var isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
+    var mermaidConfig = mermaidTheme ? mermaidTheme.config : {
+        startOnLoad: false,
+        theme: isDarkTheme ? 'dark' : 'default',
+        flowchart: {
+            htmlLabels: false
+        }
+    };
+    var theme = mermaidTheme ? mermaidTheme.key : mermaidConfig.theme;
 
     // Initialize Mermaid only once per theme to prevent issues with re-initialization
     if (!window.mermaidInitialized || window.mermaidTheme !== theme) {
-        mermaid.initialize({
-            startOnLoad: false,
-            theme: theme,
-            flowchart: {
-                htmlLabels: false
-            }
-        });
+        mermaid.initialize(mermaidConfig);
         window.mermaidInitialized = true;
         window.mermaidTheme = theme;
     }
@@ -246,13 +251,7 @@ function initMermaid(retryCount) {
         // Fallback for older versions
         try {
             if (!window.mermaidInitialized || window.mermaidTheme !== theme) {
-                mermaid.initialize({
-                    startOnLoad: false,
-                    theme: theme,
-                    flowchart: {
-                        htmlLabels: false
-                    }
-                });
+                mermaid.initialize(mermaidConfig);
                 window.mermaidInitialized = true;
                 window.mermaidTheme = theme;
             }

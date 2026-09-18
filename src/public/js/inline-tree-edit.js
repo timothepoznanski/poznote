@@ -119,6 +119,24 @@
     }
 
     /**
+     * A note row wraps its title in <a href>. Firefox treats a press inside a
+     * link as a press on the link, which takes the focus away from the input
+     * and ends the edit before the caret is placed (issue #1412). Without its
+     * href the anchor is plain text for the time of the edit.
+     */
+    function suspendLink(label) {
+        var link = label.closest('a[href]');
+        if (!link) return null;
+        var href = link.getAttribute('href');
+        link.removeAttribute('href');
+        return { link: link, href: href };
+    }
+
+    function resumeLink(suspended) {
+        if (suspended) suspended.link.setAttribute('href', suspended.href);
+    }
+
+    /**
      * Swap a tree row's label for an input and drive its lifecycle.
      *
      * @param {Object} spec
@@ -137,6 +155,8 @@
         var originalHtml = label.innerHTML;
         var input = buildInput(spec.value, spec.placeholder);
         var draggables = suspendDrag(row);
+        var suspendedLink = suspendLink(label);
+        var pressedInside = false;
         var finished = false;
         var saving = false;
 
@@ -150,6 +170,7 @@
             finished = true;
             activeEdit = null;
             resumeDrag(draggables);
+            resumeLink(suspendedLink);
             if (spec.discard) {
                 spec.discard();
             } else {
@@ -205,7 +226,20 @@
             }
         });
 
+        // A press inside the input is never "clicking away": if the browser
+        // still moves the focus out on it, take it back instead of committing.
+        input.addEventListener('mousedown', function () {
+            pressedInside = true;
+            setTimeout(function () { pressedInside = false; }, 0);
+        });
+
         input.addEventListener('blur', function () {
+            if (pressedInside && !finished && !saving) {
+                setTimeout(function () {
+                    if (!finished && !saving) input.focus();
+                }, 0);
+                return;
+            }
             commit();
         });
 

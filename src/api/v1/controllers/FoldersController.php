@@ -1408,7 +1408,7 @@ class FoldersController {
         $newParentPath = isset($data['new_parent_folder']) ? trim((string)$data['new_parent_folder']) : null;
         
         // Get folder info
-        $stmt = $this->db->prepare('SELECT id, name, workspace, parent_id FROM folders WHERE id = ?');
+        $stmt = $this->db->prepare('SELECT id, name, workspace, parent_id, display_order FROM folders WHERE id = ?');
         $stmt->execute([$folderId]);
         $folder = $stmt->fetch(PDO::FETCH_ASSOC);
         
@@ -1493,10 +1493,15 @@ class FoldersController {
             return;
         }
         
+        // Same parent, same workspace: nothing moves. The update below would
+        // still clear display_order and lose the folder's manual position.
+        $currentParentId = $folder['parent_id'] !== null ? (int)$folder['parent_id'] : null;
+        $isSamePlace = $currentParentId === $targetParentId && $targetWorkspace === $originalWorkspace;
+
         // Update folder and its contents recursively
         try {
             // Get all affected folder IDs before starting the update
-            $allAffectedFolderIds = $this->getAllFolderIds($folderId, $originalWorkspace);
+            $allAffectedFolderIds = $isSamePlace ? [] : $this->getAllFolderIds($folderId, $originalWorkspace);
             
             $this->db->beginTransaction();
             
@@ -1548,7 +1553,7 @@ class FoldersController {
                 'name' => $folderName,
                 'workspace' => $targetWorkspace,
                 'parent_id' => $targetParentId,
-                'display_order' => 0,
+                'display_order' => $isSamePlace ? (int)($folder['display_order'] ?? 0) : 0,
                 'path' => $this->computeFolderPath($folderId, $byId),
             ]
         ]);

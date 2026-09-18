@@ -317,3 +317,27 @@ html[data-theme='dark'] .note-actions-menu-item.active i {
 .folder-toggle.tree-clipboard-cut {
     opacity: 0.45;
 }
+
+/* Rows picked with Ctrl+Click / Shift+Click (js/tree-selection.js). The tint
+   goes on the note link rather than its row: the link is the visible band,
+   the row box also holds the link's top margin. :hover is named so the grey
+   row hover does not replace the tint under the pointer. */
+.note-list-item.tree-multi-selected > a.links_arbo_left,
+.folder-toggle.tree-multi-selected,
+.folder-toggle.tree-multi-selected:hover {
+    background-color: rgba(var(--pz-accent-rgb), 0.14);
+}
+
+/* Dark: the tree paints note links with !important (dark-mode/layout.css) */
+html[data-theme='dark'] .note-list-item.tree-multi-selected > a.links_arbo_left,
+html[data-theme='dark'] .folder-toggle.tree-multi-selected,
+html[data-theme='dark'] .folder-toggle.tree-multi-selected:hover {
+    background-color: rgba(var(--dm-accent-rgb), 0.2) !important;
+}
+
+/* "N selected" line on top of the menu for the whole selection */
+.tree-selection-menu-count {
+    padding: 4px 14px 6px;
+    font-size: 0.8em;
+    color: var(--pz-text-muted);
+}

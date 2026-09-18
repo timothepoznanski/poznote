@@ -242,6 +242,39 @@ function positionMenuAtPoint(menu, x, y) {
 }
 
 /**
+ * Re-fit an open dropdown after its content grew or shrank in place (the sort
+ * submenu expanding, #1428). adjustMenuPosition / positionMenuAtPoint only
+ * measure the menu as it is when it opens, submenu collapsed, so a menu that
+ * fitted then could push its new rows below the viewport with no way to reach
+ * them. Slides the menu up as far as needed, and only scrolls it when it is
+ * taller than the viewport.
+ */
+function refitMenuInViewport(menu, revealElement) {
+    if (!menu || !menu.classList.contains('show')) return;
+
+    var margin = 10;
+    var viewportHeight = window.innerHeight;
+
+    menu.style.maxHeight = '';
+    menu.style.overflowY = '';
+
+    var rect = menu.getBoundingClientRect();
+    if (rect.bottom > viewportHeight - margin) {
+        menu.style.top = Math.max(margin, viewportHeight - margin - rect.height) + 'px';
+        if (rect.height > viewportHeight - 2 * margin) {
+            menu.style.maxHeight = (viewportHeight - 2 * margin) + 'px';
+            menu.style.overflowY = 'auto';
+        }
+    }
+
+    if (revealElement && menu.style.overflowY === 'auto') {
+        revealElement.scrollIntoView({ block: 'nearest' });
+    }
+}
+
+window.refitMenuInViewport = refitMenuInViewport;
+
+/**
  * Hidden by UI customization? syncFolderActionToggles / syncNoteActionToggles
  * in js/ui-customization.js set that inline display when every item of the
  * matching menu is unchecked. Checked instead of the computed style because

@@ -1125,18 +1125,41 @@ Não há limite de tamanho na prática para o arquivo. Assim como na restauraç�
 
 <a id="import-obsidian-notes"></a>
 <details>
-<summary><strong>Importar notas do Obsidian</strong></summary>
+<summary><strong>Migrar um vault do Obsidian</strong></summary>
 <br>
 
-Importe um arquivo ZIP contendo várias notas do Obsidian:
+Um vault do Obsidian é uma pasta de arquivos Markdown, por isso pode ser importado como está, em um único arquivo ZIP.
 
-  - Os arquivos ZIP podem conter até 300 arquivos, valor configurável em Configurações > Ferramentas de administração > Limites de importação
-  - O Poznote detecta e recria automaticamente a estrutura de pastas
-  - O Poznote detecta automaticamente as tags existentes a criar
-  - O Poznote importa automaticamente as imagens se elas estiverem na raiz do arquivo zip
+**Passos**
+
+1. Compacte a pasta do seu vault em um arquivo ZIP. Não é preciso limpar nada antes: pastas ocultas como `.obsidian` ou `.trash` são ignoradas.
+2. No Poznote, abra **Configurações > Restaurar / Importar** e vá até a seção que importa arquivos e arquivos ZIP. Escolha o workspace de destino (um workspace novo e vazio facilita a conferência do resultado), selecione o ZIP e inicie a importação. Soltar o ZIP sobre a lista de notas da página principal faz a mesma coisa.
+3. Leia o resumo exibido ao final: ele informa o número de notas, pastas, imagens e arquivos PDF importados, e cita os arquivos que não puderam ser importados.
+
+Um ZIP pode conter até 300 notas (imagens e PDFs não contam), limite que um administrador pode aumentar em Configurações > Ferramentas de administração > Limites de importação. O tamanho do arquivo não é limitado, consulte [Importar arquivo ZIP](#import-zip-notes).
+
+**O que é mantido**
+
+  - Notas: cada arquivo `.md` vira uma nota Markdown com o nome do arquivo, ou com o da chave `title` do front matter.
+  - Pastas: a árvore de pastas do vault é recriada, incluindo subpastas. Quando todo o vault está em uma única pasta na raiz do ZIP, essa pasta é ignorada.
+  - Tags: a chave `tags` do front matter e uma linha de `#tags` bem no início de uma nota. Espaços em uma tag viram sublinhados.
+  - Front matter: `title`, `folder`, `tags`, `favorite`, `created` e `updated` são lidos, consulte [Suporte a front matter em Markdown](#markdown-front-matter).
+  - Links entre notas: `[[Título da nota]]` funciona como está. O Poznote o resolve pelo título, exibe como link interno e o conta nos backlinks e no grafo.
+  - Imagens: `![[imagem.png]]`, `![[imagem.png|legenda]]` e `![legenda](imagem.png)` viram anexos da nota e são exibidas no lugar, onde quer que a imagem esteja no vault (ao lado das notas, em uma subpasta ou em uma pasta `attachments`).
+  - Arquivos PDF: um PDF referenciado em uma nota (`![[arquivo.pdf]]`, `[[arquivo.pdf]]` ou um link Markdown) é anexado a essa nota, e o link aponta para o anexo. Qualquer outro PDF, ao lado das notas ou em uma pasta `attachments`, vira uma nota com o nome do arquivo e o PDF como anexo, na pasta que corresponde ao seu lugar no vault.
+
+**O que não é mantido**
+
+  - Links com alias ou para um título (`[[Nota|alias]]`, `[[Nota#Título]]`) permanecem no texto, mas não levam a nenhuma nota.
+  - Notas incorporadas (`![[Outra nota]]`) e conteúdo de plugins: consultas Dataview, arquivos `.canvas`, desenhos feitos com o plugin Excalidraw do Obsidian.
+  - Tags escritas no meio de uma nota permanecem como texto.
+  - Arquivos de outros tipos ao lado das notas (áudio, vídeo, documentos do Office) são ignorados. Anexe-os depois à nota correspondente.
+
+Imagens e PDFs são localizados pelo nome do arquivo, não pelo caminho. Se dois arquivos do vault tiverem o mesmo nome, renomeie um deles antes da importação.
 
 </details>
 
+<a id="markdown-front-matter"></a>
 <details>
 <summary><strong>Suporte a front matter em Markdown</strong></summary>
 <br>

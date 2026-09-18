@@ -1125,18 +1125,41 @@ Für das Archiv gibt es praktisch keine Größenbeschränkung. Wie bei einer vol
 
 <a id="import-obsidian-notes"></a>
 <details>
-<summary><strong>Obsidian-Notizen importieren</strong></summary>
+<summary><strong>Einen Obsidian-Vault migrieren</strong></summary>
 <br>
 
-Importieren Sie ein ZIP-Archiv mit mehreren Notizen aus Obsidian:
+Ein Obsidian-Vault ist ein Ordner mit Markdown-Dateien und lässt sich daher unverändert in einem einzigen ZIP-Archiv importieren.
 
-  - ZIP-Archive können bis zu 300 Dateien enthalten, einstellbar unter Einstellungen > Admin-Werkzeuge > Importlimits
-  - Poznote erkennt die Ordnerstruktur automatisch und legt sie neu an
-  - Poznote erkennt vorhandene Tags automatisch und legt sie an
-  - Poznote importiert Bilder automatisch, sofern sie im Stammverzeichnis der ZIP-Datei liegen
+**Schritte**
+
+1. Komprimieren Sie den Ordner Ihres Vaults zu einer ZIP-Datei. Vorher muss nichts bereinigt werden: Versteckte Ordner wie `.obsidian` oder `.trash` werden ignoriert.
+2. Öffnen Sie in Poznote **Einstellungen > Wiederherstellen / Importieren** und gehen Sie zum Abschnitt, der Dateien und ZIP-Archive importiert. Wählen Sie den Ziel-Workspace (ein neuer, leerer Workspace macht das Ergebnis leicht überprüfbar), wählen Sie die ZIP-Datei aus und starten Sie den Import. Die ZIP-Datei auf die Notizliste der Hauptseite zu ziehen, bewirkt dasselbe.
+3. Lesen Sie die Zusammenfassung am Ende: Sie nennt die Anzahl der importierten Notizen, Ordner, Bilder und PDF-Dateien sowie die Dateien, die nicht importiert werden konnten.
+
+Eine ZIP-Datei kann bis zu 300 Notizen enthalten (Bilder und PDF-Dateien zählen nicht mit). Ein Administrator kann dieses Limit unter Einstellungen > Admin-Werkzeuge > Importlimits anheben. Die Größe des Archivs ist nicht begrenzt, siehe [ZIP-Datei importieren](#import-zip-notes).
+
+**Was übernommen wird**
+
+  - Notizen: Jede `.md`-Datei wird zu einer Markdown-Notiz, benannt nach der Datei oder nach dem Schlüssel `title` ihres Front Matters.
+  - Ordner: Die Ordnerstruktur des Vaults wird samt Unterordnern neu angelegt. Liegt der gesamte Vault in einem einzigen Ordner auf oberster Ebene der ZIP-Datei, wird dieser Ordner übersprungen.
+  - Tags: der Schlüssel `tags` des Front Matters und eine Zeile mit `#tags` ganz oben in einer Notiz. Leerzeichen in einem Tag werden zu Unterstrichen.
+  - Front Matter: `title`, `folder`, `tags`, `favorite`, `created` und `updated` werden gelesen, siehe [Unterstützung von Markdown-Front-Matter](#markdown-front-matter).
+  - Links zwischen Notizen: `[[Titel der Notiz]]` funktioniert unverändert. Poznote löst den Link über den Titel auf, zeigt ihn als internen Link an und berücksichtigt ihn in den Backlinks und im Graphen.
+  - Bilder: `![[bild.png]]`, `![[bild.png|Beschriftung]]` und `![Beschriftung](bild.png)` werden zu Anhängen der Notiz und an Ort und Stelle angezeigt, egal wo das Bild im Vault liegt (neben den Notizen, in einem Unterordner oder in einem Ordner `attachments`).
+  - PDF-Dateien: Ein aus einer Notiz verlinktes PDF (`![[datei.pdf]]`, `[[datei.pdf]]` oder ein Markdown-Link) wird an diese Notiz angehängt, und der Link zeigt auf den Anhang. Jedes andere PDF, neben den Notizen oder in einem Ordner `attachments`, wird zu einer nach der Datei benannten Notiz mit dem PDF als Anhang, im Ordner, der seinem Platz im Vault entspricht.
+
+**Was nicht übernommen wird**
+
+  - Links mit Alias oder auf eine Überschrift (`[[Notiz|Alias]]`, `[[Notiz#Überschrift]]`) bleiben im Text, führen aber zu keiner Notiz.
+  - Eingebettete Notizen (`![[Andere Notiz]]`) und Plugin-Inhalte: Dataview-Abfragen, `.canvas`-Dateien, Zeichnungen aus dem Excalidraw-Plugin von Obsidian.
+  - Tags mitten in einer Notiz bleiben einfacher Text.
+  - Dateien anderer Typen neben den Notizen (Audio, Video, Office-Dokumente) werden ignoriert. Hängen Sie sie anschließend an die betreffende Notiz an.
+
+Bilder und PDF-Dateien werden über den Dateinamen zugeordnet, nicht über den Pfad. Tragen zwei Dateien des Vaults denselben Namen, benennen Sie eine davon vor dem Import um.
 
 </details>
 
+<a id="markdown-front-matter"></a>
 <details>
 <summary><strong>Unterstützung von Markdown-Front-Matter</strong></summary>
 <br>

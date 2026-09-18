@@ -306,6 +306,7 @@ function saveNoteToServer(options) {
     }
 
     var editorSessionId = _getEditorSessionIdForSave();
+    var savingNoteId = noteid;
 
     // The exact state being sent becomes the draft, and its fingerprint
     // travels with the request (js/events-auto-save.js, DRAFT STORAGE)
@@ -357,6 +358,21 @@ function saveNoteToServer(options) {
         })
         .then(function (result) {
             var data = result.data || {};
+            // Another note was opened while this save was in flight: everything
+            // below works on the open note (global noteid) and would give it
+            // this note's version, saved state and draft. The note left behind
+            // only needs its draft dropped when it is exactly what was saved;
+            // otherwise the draft recovery sorts it out when it is reopened.
+            if (String(noteid) !== String(savingNoteId)) {
+                if (result.ok && data.success && stateHash && typeof window.clearDraft === 'function') {
+                    var leftDraft = (typeof readNoteDraft === 'function') ? readNoteDraft(savingNoteId) : null;
+                    if (leftDraft && typeof draftStateSignature === 'function'
+                        && draftStateSignature(leftDraft.content, leftDraft.title, leftDraft.tags) === stateHash) {
+                        window.clearDraft(savingNoteId);
+                    }
+                }
+                return;
+            }
             if (result.ok && data.success) {
                 if (data.note && data.note.version && typeof window.setLiveNoteContentVersion === 'function') {
                     window.setLiveNoteContentVersion(noteid, data.note.version);
@@ -472,6 +488,10 @@ function saveNoteToServer(options) {
         })
         .catch(function (error) {
             console.error('[Poznote Auto-Save] Network error:', error.message);
+            // The note was left meanwhile: its draft stays for the recovery
+            if (String(noteid) !== String(savingNoteId)) {
+                return;
+            }
             // Kept on this device and retried, no alarming dialog
             if (typeof window.noteSaveFailed === 'function') {
                 window.noteSaveFailed(noteid);
@@ -609,7 +629,12 @@ function deleteNote(noteId) {
 
     for (let link of selectedLinks) {
         const linkType = link.getAttribute('data-note-type');
-        if (linkType === 'linked') {
+        // Only when the open shortcut is the note being deleted (its own id
+        // from the tree, its target's id from the toolbar): deleting another
+        // row from the tree must not open the shortcut dialog
+        const isThisNote = String(link.getAttribute('data-note-db-id')) === String(noteId)
+            || String(link.getAttribute('data-linked-note-id')) === String(noteId);
+        if (linkType === 'linked' && isThisNote) {
             isLinkedNote = true;
             linkedNoteDbId = link.getAttribute('data-note-db-id');
             linkedNoteTargetId = link.getAttribute('data-linked-note-id');

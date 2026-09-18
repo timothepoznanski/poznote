@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
-import { Excalidraw, exportToCanvas, useHandleLibrary } from '@excalidraw/excalidraw';
+import { Excalidraw, exportToCanvas, exportToSvg, useHandleLibrary } from '@excalidraw/excalidraw';
 import _ from 'lodash';
 
 // Make lodash available globally for Excalidraw
@@ -375,12 +375,18 @@ window.PoznoteExcalidraw = {
       exportToCanvas: async (exportOptions) => {
         return await exportToCanvas(exportOptions);
       },
+      // The note preview is the exported SVG (crisp on HiDPI screens, issue
+      // #1434); the editor page inlines the fonts before uploading it.
+      exportToSvg: async (exportOptions) => {
+        return await exportToSvg(exportOptions);
+      },
       syncTheme: () => {
         syncForcedAppState();
       }
     };
   },
   
-  // Direct export function
-  exportToCanvas: exportToCanvas
+  // Direct export functions
+  exportToCanvas: exportToCanvas,
+  exportToSvg: exportToSvg
 };

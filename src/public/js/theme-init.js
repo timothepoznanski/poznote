@@ -342,31 +342,53 @@ window.__poznoteClearUserStorage = function (userId) {
     // local() matches exact family or PostScript names only (no fontconfig
     // aliasing), so each stack lists Windows/macOS names plus their
     // metric-compatible Linux equivalents (Liberation, Arimo/Tinos/Gelasio,
-    // DejaVu).
+    // DejaVu), in the same family order for both weights so the bold of the
+    // regular that matched is the one found.
+    //
+    // A semibold list must only ever name semibold or bold faces. It used to
+    // end with the regular names as a "stay in one family" fallback, and that
+    // fallback killed bold outright (issue #1423): the face is declared
+    // font-weight: 600 below, browsers only synthesise bold for a face whose
+    // declared weight is under 600, so a regular face registered there
+    // rendered every <b>, **bold** and heading at regular weight. On a Linux
+    // desktop without Roboto or Ubuntu that was the 'system' stack's outcome
+    // in every browser. When no bold face resolves the 600 face now fails to
+    // load and bold text falls through to the next family of the page's
+    // font-family stack, which is still bold.
     var FONTS = {
         system: {
             regular: ['Segoe UI', 'Roboto', 'Helvetica Neue', 'Ubuntu', 'Cantarell', 'Noto Sans', 'Liberation Sans', 'DejaVu Sans', 'Arial'],
-            semibold: ['Segoe UI Semibold', 'SegoeUI-SemiBold', 'Roboto Medium', 'Roboto-Medium', 'HelveticaNeue-Medium', 'Ubuntu Medium', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Ubuntu', 'Cantarell', 'Noto Sans', 'Liberation Sans', 'DejaVu Sans', 'Arial']
+            semibold: [
+                'Segoe UI Semibold', 'SegoeUI-SemiBold', 'Segoe UI Bold', 'SegoeUI-Bold',
+                'Roboto Medium', 'Roboto-Medium', 'Roboto Bold', 'Roboto-Bold',
+                'Helvetica Neue Medium', 'HelveticaNeue-Medium', 'Helvetica Neue Bold', 'HelveticaNeue-Bold',
+                'Ubuntu Medium', 'Ubuntu-Medium', 'Ubuntu Bold', 'Ubuntu-Bold',
+                'Cantarell Bold', 'Cantarell-Bold',
+                'Noto Sans SemiBold', 'NotoSans-SemiBold', 'Noto Sans Bold', 'NotoSans-Bold',
+                'Liberation Sans Bold', 'LiberationSans-Bold',
+                'DejaVu Sans Bold', 'DejaVuSans-Bold',
+                'Arial Bold', 'Arial-BoldMT'
+            ]
         },
         arial: {
             regular: ['Arial', 'ArialMT', 'Helvetica', 'Liberation Sans', 'Arimo'],
-            semibold: ['Arial Bold', 'Arial-BoldMT', 'Helvetica Bold', 'Liberation Sans Bold', 'Arimo Bold', 'Arial', 'Liberation Sans', 'Arimo']
+            semibold: ['Arial Bold', 'Arial-BoldMT', 'Helvetica Bold', 'Helvetica-Bold', 'Liberation Sans Bold', 'LiberationSans-Bold', 'Arimo Bold', 'Arimo-Bold']
         },
         verdana: {
             regular: ['Verdana', 'DejaVu Sans'],
-            semibold: ['Verdana Bold', 'Verdana-Bold', 'DejaVu Sans Bold', 'Verdana', 'DejaVu Sans']
+            semibold: ['Verdana Bold', 'Verdana-Bold', 'DejaVu Sans Bold', 'DejaVuSans-Bold']
         },
         trebuchet: {
             regular: ['Trebuchet MS', 'TrebuchetMS'],
-            semibold: ['Trebuchet MS Bold', 'TrebuchetMS-Bold', 'Trebuchet MS']
+            semibold: ['Trebuchet MS Bold', 'TrebuchetMS-Bold']
         },
         georgia: {
             regular: ['Georgia', 'Gelasio', 'DejaVu Serif'],
-            semibold: ['Georgia Bold', 'Georgia-Bold', 'Gelasio Bold', 'DejaVu Serif Bold', 'Georgia', 'Gelasio', 'DejaVu Serif']
+            semibold: ['Georgia Bold', 'Georgia-Bold', 'Gelasio Bold', 'Gelasio-Bold', 'DejaVu Serif Bold', 'DejaVuSerif-Bold']
         },
         times: {
             regular: ['Times New Roman', 'TimesNewRomanPSMT', 'Liberation Serif', 'Tinos'],
-            semibold: ['Times New Roman Bold', 'TimesNewRomanPS-BoldMT', 'Liberation Serif Bold', 'Tinos Bold', 'Times New Roman', 'Liberation Serif', 'Tinos']
+            semibold: ['Times New Roman Bold', 'TimesNewRomanPS-BoldMT', 'Liberation Serif Bold', 'LiberationSerif-Bold', 'Tinos Bold', 'Tinos-Bold']
         }
     };
 

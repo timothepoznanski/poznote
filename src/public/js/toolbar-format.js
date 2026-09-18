@@ -36,7 +36,10 @@ function changeFontSize() {
     { value: 'normal', key: 'slash_menu.back_to_normal', fallback: 'Back to normal text', preview: 'Text', previewClass: 'style-normal' },
     { value: '1', key: 'slash_menu.heading_1', fallback: 'Heading 1', preview: 'H1', previewClass: 'style-h1' },
     { value: '2', key: 'slash_menu.heading_2', fallback: 'Heading 2', preview: 'H2', previewClass: 'style-h2' },
-    { value: '3', key: 'slash_menu.heading_3', fallback: 'Heading 3', preview: 'H3', previewClass: 'style-h3' }
+    { value: '3', key: 'slash_menu.heading_3', fallback: 'Heading 3', preview: 'H3', previewClass: 'style-h3' },
+    { value: '4', key: 'slash_menu.heading_4', fallback: 'Heading 4', preview: 'H4', previewClass: 'style-h4' },
+    { value: '5', key: 'slash_menu.heading_5', fallback: 'Heading 5', preview: 'H5', previewClass: 'style-h5' },
+    { value: '6', key: 'slash_menu.heading_6', fallback: 'Heading 6', preview: 'H6', previewClass: 'style-h6' }
   ];
 
   // Build popup content

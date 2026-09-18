@@ -220,18 +220,148 @@ html[data-theme='dark'] .page-more-menu-item:focus-visible {
     padding: 0 24px 20px;
 }
 
-.keyboard-shortcuts-group + .keyboard-shortcuts-group {
-    margin-top: 18px;
+/* Filter bar, cards and empty state shared by both help modals: the
+   Markdown syntax cards (markdown_syntax_content.php) and the shortcut
+   sections, filtered by js/ui-customization-panel.js */
+.pz-help-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 16px;
 }
 
-/* !important beats the global h4 margin reset in base.css */
-.keyboard-shortcuts-group-title {
-    margin: 0 0 6px !important;
-    font-size: 0.75rem;
-    font-weight: var(--pz-weight-semibold);
+.pz-help-filter-bar [hidden],
+.pz-help-empty[hidden],
+.pz-help-card[hidden] {
+    display: none !important;
+}
+
+.pz-help-filter-bar .filter-input-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.pz-help-filter-icon {
+    position: absolute;
+    left: 12px;
+    color: var(--pz-text-subtle);
+    pointer-events: none;
+}
+
+/* !important beats the blanket .modal-content input padding of
+   modals/responsive.css, which would slide the text under the icon (its 16px
+   font size stays: it keeps iOS from zooming in on focus) */
+.pz-help-filter-bar .filter-input {
+    width: 100%;
+    padding: 10px 42px 10px 38px !important;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    font-size: 14px;
+    color: var(--text-color, var(--pz-text));
+    background: var(--input-bg, var(--pz-bg));
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.pz-help-filter-bar .filter-input:focus {
+    outline: none;
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
+}
+
+.pz-help-filter-bar .clear-filter-btn {
+    position: absolute;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 4px 6px;
+    border-radius: var(--pz-radius);
     color: var(--pz-text-muted);
+    cursor: pointer;
+}
+
+.pz-help-filter-bar .clear-filter-btn:hover {
+    background: var(--pz-surface-hover);
+    color: var(--pz-text);
+}
+
+.pz-help-filter-bar .filter-stats {
+    font-size: 13px;
+    color: var(--muted-color, var(--pz-text-muted));
+    white-space: nowrap;
+}
+
+.pz-help-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.pz-help-card {
+    border: 1px solid var(--pz-border-light);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+    padding: 16px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+/* !important beats the global h4 margin reset in base.css (the shortcut
+   sections title their card with an h4) */
+.pz-help-card-category {
+    margin: 0 0 10px !important;
+    color: var(--pz-accent);
+    font-size: 12px;
+    font-weight: var(--pz-weight-bold);
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+}
+
+.pz-help-empty {
+    margin: 0;
+    padding: 16px 18px;
+    border: 1px dashed var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-surface);
+    color: var(--pz-text-secondary);
+    line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+    .pz-help-filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .pz-help-filter-bar .filter-stats {
+        align-self: flex-start;
+    }
+}
+
+html[data-theme='dark'] .pz-help-card {
+    border-color: var(--dm-border);
+    background: var(--dm-surface, var(--dm-content-bg));
+}
+
+html[data-theme='dark'] .pz-help-card-category {
+    color: var(--dm-accent);
+}
+
+/* dark-mode/pages.css paints every .filter-stats as a pill, which read as
+   selected text here, with no padding: plain muted text as in light */
+html[data-theme='dark'] .pz-help-filter-bar .filter-stats {
+    background-color: transparent;
+    color: var(--dm-text-muted, var(--dm-text-subtle));
+}
+
+html[data-theme='dark'] .pz-help-empty {
+    border-color: var(--dm-border);
+    background: var(--dm-surface, var(--dm-content-bg));
+    color: var(--dm-text-muted, var(--dm-text-subtle));
 }
 
 .keyboard-shortcuts-list {
@@ -246,13 +376,18 @@ html[data-theme='dark'] .page-more-menu-item:focus-visible {
     justify-content: space-between;
     gap: 16px;
     padding: 7px 0;
-    border-bottom: 1px solid var(--pz-border-light);
     font-size: 0.875rem;
     color: var(--pz-text);
 }
 
-.keyboard-shortcuts-item:last-child {
-    border-bottom: none;
+.keyboard-shortcuts-item[hidden] {
+    display: none;
+}
+
+/* The divider sits above every row after the first one shown, so rows hidden
+   by the filter leave no stray line at either end of the card */
+.keyboard-shortcuts-item:not([hidden]) ~ .keyboard-shortcuts-item {
+    border-top: 1px solid var(--pz-border-light);
 }
 
 .keyboard-shortcuts-label {

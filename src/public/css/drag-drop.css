@@ -19,53 +19,43 @@
     cursor: grabbing;
 }
 
+/* Drag feedback never changes the size of a box: no border, padding, margin
+   or scale. A row that grows under the pointer pushes its neighbours away,
+   the pointer ends up over another row and the drop target flips with it
+   (discussion #1430). The frames are outlines, which take no room. */
 .folder-toggle.folder-dragging,
 .folder-header.folder-dragging {
     opacity: 0.6;
-    background-color: rgba(255, 152, 0, 0.08);
-    border: 2px dashed rgba(255, 152, 0, 0.4);
-    transform: scale(0.98) !important;
-    padding: 4px !important;
 }
 
 .folder-header.folder-source-drag {
     background-color: rgba(255, 152, 0, 0.08);
-    border: 2px solid rgba(255, 152, 0, 0.3);
+    outline: 2px solid rgba(255, 152, 0, 0.3);
+    outline-offset: -2px;
     border-radius: var(--pz-radius-lg)!important;
-    padding: 4px !important;
-    margin: 2px 0 !important;
-    box-shadow: 0 0 6px rgba(255, 152, 0, 0.2);
-    transition: all 0.2s ease !important;
 }
 
-.folder-header.drag-over {
-    background-color: rgba(var(--pz-accent-rgb), 0.12);
-    border: 2px dashed var(--pz-accent);
-    border-radius: var(--pz-radius-lg)!important;
-    box-shadow: 0 0 8px rgba(var(--pz-accent-rgb), 0.3);
-    padding: 4px !important;
-    margin: 2px 0 !important;
-    transition: all 0.2s ease !important;
-}
-
+.folder-header.drag-over,
 .folder-header.folder-drop-target {
-    background-color: rgba(var(--pz-accent-rgb), 0.15);
-    border: 2px dashed var(--pz-accent);
-    box-shadow: 0 0 12px rgba(var(--pz-accent-rgb), 0.4);
-    padding: 4px !important;
-    margin: 2px 0 !important;
-    transform: scale(1.02);
-    transition: all 0.2s ease !important;
+    background-color: rgba(var(--pz-accent-rgb), 0.12);
+    outline: 2px dashed var(--pz-accent);
+    outline-offset: -2px;
+    border-radius: var(--pz-radius-lg)!important;
 }
 
 .folder-header.folder-drop-before,
 .folder-header.folder-drop-after {
     border-radius: var(--pz-radius-lg)!important;
-    transition: all 0.2s ease !important;
+}
+
+/* The "after" line sits under the whole folder, children included: that is
+   where the dropped folder lands when the target is open. */
+.folder-header.folder-drop-after {
+    position: relative;
 }
 
 .folder-header.folder-drop-before>.folder-toggle::before,
-.folder-header.folder-drop-after>.folder-toggle::after {
+.folder-header.folder-drop-after::after {
     content: '';
     position: absolute;
     left: 6px;
@@ -82,7 +72,7 @@
     top: -3px;
 }
 
-.folder-header.folder-drop-after>.folder-toggle::after {
+.folder-header.folder-drop-after::after {
     bottom: -3px;
 }
 
@@ -122,31 +112,19 @@ html[data-theme='dark'] .note-list-item.note-drop-after::after {
 }
 
 /* Dark mode folder dragging */
-html[data-theme='dark'] .folder-header.folder-dragging {
-    background-color: rgba(255, 167, 38, 0.12);
-    border-color: rgba(255, 167, 38, 0.5);
-}
-
 html[data-theme='dark'] .folder-header.folder-source-drag {
     background-color: rgba(255, 167, 38, 0.12);
-    border: 2px solid rgba(255, 167, 38, 0.4);
-    box-shadow: 0 0 6px rgba(255, 167, 38, 0.3);
+    outline-color: rgba(255, 167, 38, 0.4);
 }
 
-html[data-theme='dark'] .folder-header.drag-over {
-    background-color: rgba(74, 144, 226, 0.15);
-    border: 2px dashed var(--dm-accent);
-    box-shadow: 0 0 8px rgba(74, 144, 226, 0.4);
-}
-
+html[data-theme='dark'] .folder-header.drag-over,
 html[data-theme='dark'] .folder-header.folder-drop-target {
-    background-color: rgba(74, 144, 226, 0.2);
-    border: 2px dashed var(--dm-accent);
-    box-shadow: 0 0 12px rgba(74, 144, 226, 0.5);
+    background-color: rgba(74, 144, 226, 0.15);
+    outline-color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .folder-header.folder-drop-before>.folder-toggle::before,
-html[data-theme='dark'] .folder-header.folder-drop-after>.folder-toggle::after {
+html[data-theme='dark'] .folder-header.folder-drop-after::after {
     background: var(--dm-accent);
     box-shadow: 0 0 8px rgba(74, 144, 226, 0.55);
 }
@@ -257,6 +235,50 @@ html[data-theme='dark'] .root-drop-zone.drag-over {
 
 html[data-theme='dark'] .drop-zone-content {
     color: var(--dm-text-bright);
+}
+
+/* Ghost that follows the pointer during a tree drag, built by
+   js/events-drag-drop.js (handleNoteDragStart, handleFolderDragStart,
+   startSelectionDrag). It sits off-screen at the end of the body:
+   setDragImage() only needs it painted once, the script removes it on the
+   next tick. A folder or a multi-selection gets a badge, a single note gets
+   a copy of its own row so the ghost keeps the title and its icons. */
+.tree-drag-ghost {
+    position: absolute;
+    top: -1000px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    border: 2px solid rgba(var(--pz-accent-rgb), 0.4);
+    border-radius: var(--pz-radius-lg);
+    background: rgba(var(--pz-accent-rgb), 0.15);
+    color: var(--pz-accent);
+    font-weight: var(--pz-weight-medium);
+}
+
+a.links_arbo_left.tree-drag-ghost-note {
+    position: absolute;
+    top: -1000px;
+    opacity: 0.85;
+    transform: scale(1.02);
+    padding: 10px;
+    border: 1px solid rgba(var(--pz-accent-rgb), 0.3);
+    border-radius: var(--pz-radius-sm);
+    background-color: rgba(var(--pz-accent-rgb), 0.08);
+    box-shadow: 0 2px 8px rgba(var(--pz-accent-rgb), 0.15);
+}
+
+html[data-theme='dark'] .tree-drag-ghost {
+    border-color: rgba(var(--dm-accent-rgb), 0.4);
+    background: rgba(var(--dm-accent-rgb), 0.15);
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] a.links_arbo_left.tree-drag-ghost-note {
+    border-color: rgba(var(--dm-accent-rgb), 0.3);
+    background-color: rgba(var(--dm-accent-rgb), 0.08);
+    box-shadow: 0 2px 8px rgba(var(--dm-accent-rgb), 0.15);
 }
 
 /* Note dragging styles - applies to ALL notes */

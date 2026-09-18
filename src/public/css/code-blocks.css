@@ -358,15 +358,17 @@ code span,
     /* inherit font size from parent */
 }
 
-/* Préserver le background gris même avec du surlignage dans les blocs de code */
-/* Simple and effective solution: background override for highlighted elements */
+/* Highlighted text inside a code block keeps the block's font. It used to be
+   painted with a fixed yellow gradient on top of the block's grey, which made
+   every palette colour come out yellow and left a visible tint behind a
+   highlight that had just been removed (#1425): the inline colour now paints
+   on its own, like everywhere else in the note. */
 pre *[style*="background"],
 code *[style*="background"],
 .code-block *[style*="background"],
 .noteentry pre *[style*="background"],
 .noteentry code *[style*="background"],
 .noteentry .code-block *[style*="background"] {
-    background: linear-gradient(rgba(255, 255, 0, 0.4), rgba(255, 255, 0, 0.4)), var(--pz-surface-hover);
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
     font-size: inherit;
     /* inherit font size from parent */

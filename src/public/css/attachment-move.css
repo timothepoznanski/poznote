@@ -1,0 +1,119 @@
+/* ============================================
+   Move an attachment to another note
+   The note picker built by js/attachment-move.js, shown both on the
+   attachments page and over a note on index.php.
+   ============================================ */
+
+.attachment-move-content {
+    max-width: 520px;
+}
+
+.attachment-move-description {
+    margin: 0 0 14px 0;
+    color: var(--pz-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+.attachment-move-search {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.attachment-move-list {
+    max-height: 320px;
+    overflow-y: auto;
+    border: 1px solid var(--pz-border-light);
+    border-radius: var(--pz-radius-lg);
+}
+
+/* While the move is in flight: the answer decides what the list becomes. */
+.attachment-move-list.is-busy {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.attachment-move-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--pz-border-light);
+}
+
+.attachment-move-item:last-child {
+    border-bottom: none;
+}
+
+.attachment-move-item:hover,
+.attachment-move-item:focus-visible {
+    background-color: var(--pz-surface);
+    outline: none;
+}
+
+.attachment-move-item-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    flex: 1;
+}
+
+.attachment-move-item-title {
+    font-size: 0.9rem;
+    font-weight: var(--pz-weight-medium);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.attachment-move-item-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    font-size: 0.78rem;
+    color: var(--pz-text-muted);
+}
+
+.attachment-move-item-tag {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+}
+
+.attachment-move-item-tag .lucide {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+}
+
+.attachment-move-item-status {
+    flex-shrink: 0;
+    font-size: 0.78rem;
+    color: var(--pz-text-muted);
+}
+
+.attachment-move-empty {
+    padding: 22px;
+    text-align: center;
+    color: var(--pz-text-muted);
+    font-size: 0.88rem;
+}
+
+.attachment-move-error {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: var(--pz-radius);
+    background-color: var(--pz-danger-soft);
+    color: var(--pz-danger);
+    font-size: 0.85rem;
+    line-height: 1.45;
+}
+
+/* The neutrals switch with the theme in tokens.css; the status colours do not. */
+html[data-theme='dark'] .attachment-move-error {
+    background-color: var(--dm-danger-soft);
+    color: var(--dm-danger);
+}

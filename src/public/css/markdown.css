@@ -158,8 +158,10 @@ html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::befor
     background: rgba(var(--pz-accent-rgb), 0.05);
 }
 
-.markdown-codemirror-host .cm-selectionBackground,
-.markdown-codemirror-host .cm-focused .cm-selectionBackground {
+/* Mirrors CodeMirror's own selectors plus one class: its base theme paints
+   #d9d9d9/#d7d4f0 (#222/#233 in dark) and outranked the shorter version (#1424). */
+.markdown-codemirror-host .cm-editor .cm-selectionBackground,
+.markdown-codemirror-host .cm-editor.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground {
     background: rgba(var(--pz-accent-rgb), 0.22);
 }
 
@@ -311,10 +313,11 @@ body.slash-menu-cursor-hidden * {
     margin: 0.83em 0;
 }
 
+/* margin !important: see the note title h4 reset in base.css */
 .markdown-preview h4 {
     font-size: 1em;
     font-weight: var(--pz-weight-bold);
-    margin: 1em 0;
+    margin: 1em 0 !important;
 }
 
 .markdown-preview h5 {
@@ -825,19 +828,14 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
     justify-content: flex-start;
 }
 
-/* Mermaid diagrams */
+/* Mermaid diagrams. The box sits on the page ground in every theme: the diagram
+   colours are mixed into this background (js/mermaid-theme.js). */
 .mermaid {
     margin: 1em 0;
     text-align: center;
     background-color: var(--pz-bg);
-    /* Ensure visibility in dark mode if mermaid doesn't handle it */
     padding: 10px;
     border-radius: var(--pz-radius-sm);
-}
-
-/* Dark mode adjustment for mermaid container */
-html[data-theme='dark'] .mermaid {
-    background-color: var(--dm-surface);
 }
 
 /* Math equations styling */
@@ -887,13 +885,16 @@ html[data-theme='dark'] .katex {
     padding: 0 !important;
 }
 
-/* Hide overflow on parent containers when in split mode */
+/* Hide overflow on parent containers when in split mode. clip, not hidden:
+   a hidden box is still a scroll container, so the editor caret scrolled
+   #right_col by the note's bottom margin, and the sticky toolbar (whose
+   scrollport became .innernote) rose with it toward the tab bar. */
 .innernote:has(.noteentry.markdown-split-mode) {
-    overflow: hidden !important;
+    overflow: clip !important;
 }
 
 #right_col:has(.noteentry.markdown-split-mode) {
-    overflow: hidden !important;
+    overflow: clip !important;
 }
 
 /* Split mode splits the note column between the editor and the preview, so the

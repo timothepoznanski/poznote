@@ -113,6 +113,13 @@ function storeCurrentNoteDomInCache(nextNoteId, targetUrl, options) {
         return;
     }
 
+    // Left with changes kept as a draft (keepUnsavedChangesAsDraft in
+    // js/events-auto-save.js): what is on screen is not the saved note
+    if (currentEntry.getAttribute('data-unsaved-draft') === 'true') {
+        invalidateNoteDomCache(currentNoteId);
+        return;
+    }
+
     var key = getNoteDomCacheKey(currentNoteId, window.location.href || targetUrl || '');
     var fragment = document.createDocumentFragment();
     while (currentRightColumn.firstChild) {
