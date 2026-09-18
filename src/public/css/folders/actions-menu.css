@@ -374,6 +374,14 @@ html.tree-keyboard-mouse-hidden * {
     cursor: none !important;
 }
 
+/* The note rows are where the mouse rests after a click, and they are the one
+   place the rule above loses: drag-drop.css gives them `cursor: pointer`
+   !important through .note-in-folder.links_arbo_left[draggable="true"], which
+   outweighs a lone class plus `*`. The id here outweighs it back. */
+html.tree-keyboard-mouse-hidden #left_col * {
+    cursor: none !important;
+}
+
 /* !important: the dark row hover is (dark-mode/layout.css) */
 html.tree-keyboard-mouse-hidden #left_col .folder-toggle:not(.tree-multi-selected):hover,
 html.tree-keyboard-mouse-hidden #left_col .note-list-item:not(.tree-multi-selected) > a.links_arbo_left:not(.selected-note):hover {
