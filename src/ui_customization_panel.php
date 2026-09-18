@@ -31,7 +31,9 @@ $uiCustomizationPanelAiLabel = t_h('ai_chat.toolbar_button', [], 'AI assistant')
  * "alt" Alt (⌥ on macOS), swapped by js/ui-customization-panel.js on open.
  * The handlers live in js/keyboard-shortcuts.js (general), js/events-rte-notes.js
  * plus build/markdown-editor/src/main.js (editor), js/checklist.js, js/slash-command.js,
- * js/emoji-autocomplete.js and js/tree-undo-clipboard.js (tree).
+ * js/emoji-autocomplete.js and js/tree-undo-clipboard.js (tree). The editor and
+ * the tree share keys (Ctrl+Z, Ctrl+C / X / V, Del), so each section says it
+ * only answers while its own pane has the focus (js/pane-focus.js).
  */
 $pzShortcutSettingHint = t_h('keyboard_shortcuts.setting_hint', [], 'Option to enable in Settings');
 $pzShortcutFilterPlaceholder = t_h('keyboard_shortcuts.filter_placeholder', [], 'Filter shortcuts...');
@@ -47,6 +49,7 @@ $pzShortcutGroups = [
     ],
     [
         'title' => t_h('keyboard_shortcuts.sections.editor', [], 'Note editor'),
+        'note' => t_h('keyboard_shortcuts.sections.editor_focus', [], 'Active while the note has the focus'),
         'items' => [
             ['keys' => [['mod', 'B']], 'label' => t_h('keyboard_shortcuts.bold', [], 'Bold')],
             ['keys' => [['mod', 'I']], 'label' => t_h('keyboard_shortcuts.italic', [], 'Italic')],
@@ -62,6 +65,7 @@ $pzShortcutGroups = [
     ],
     [
         'title' => t_h('keyboard_shortcuts.sections.tree', [], 'Notes and folders tree'),
+        'note' => t_h('keyboard_shortcuts.sections.tree_focus', [], 'Active while the tree has the focus'),
         'items' => [
             ['keys' => [['mod', 'Z']], 'label' => t_h('keyboard_shortcuts.tree_undo', [], 'Undo the last change')],
             ['keys' => [['mod', 'Shift', 'Z'], ['mod', 'Y']], 'label' => t_h('keyboard_shortcuts.tree_redo', [], 'Redo')],
@@ -151,6 +155,7 @@ require_once __DIR__ . '/markdown_syntax_content.php';
                 <?php foreach ($pzShortcutGroups as $group): ?>
                 <section class="pz-help-card">
                     <h4 class="pz-help-card-category"><?php echo $group['title']; ?></h4>
+                    <?php if (!empty($group['note'])): ?><p class="pz-help-card-note"><?php echo $group['note']; ?></p><?php endif; ?>
                     <ul class="keyboard-shortcuts-list">
                         <?php foreach ($group['items'] as $item): ?>
                         <li class="keyboard-shortcuts-item" data-help-entry>

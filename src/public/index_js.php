@@ -102,6 +102,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/utils-note-rename.js',
         'js/utils-kanban.js',
         'js/inline-tree-edit.js',
+        'js/pane-focus.js',
         'js/tree-undo-clipboard.js',
         'js/tree-selection.js',
         'js/search-highlight.js',

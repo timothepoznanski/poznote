@@ -9,8 +9,11 @@
  *   Ctrl+C / X / V  copy, cut and paste the selected notes and folders
  *   Del             move them to the trash (Cmd+Backspace on macOS)
  *
- * The shortcuts only fire outside text fields and editors, and Ctrl+C/X leave
- * a text selection to the browser, so copying text in a note keeps working.
+ * They only answer while the tree owns the keyboard (js/pane-focus.js): the
+ * same keys belong to the note once it has been clicked into, so a Ctrl+Z
+ * meant for the text being written never takes a note out of a folder. They
+ * also stay out of text fields and editors, and Ctrl+C/X leave a text
+ * selection to the browser, so copying text keeps working.
  * On macOS the Command key replaces Ctrl. Dropping a dragged multi-selection
  * (js/events-drag-drop.js) comes through moveItems() and favoriteItems().
  *
@@ -585,6 +588,10 @@
     /** Add a finished tree change to the undo stack (clears the redo stack) */
     function record(entry) {
         if (!isValidEntry(entry)) return;
+        // Organizing the tree is the tree at work, wherever the action was
+        // started from: the Ctrl+Z that takes it back comes after the reload
+        // it triggers, with nothing clicked since (js/pane-focus.js)
+        if (window.PoznotePaneFocus) window.PoznotePaneFocus.set('tree');
         var history = loadHistory();
         history.undo.push(entry);
         if (history.undo.length > MAX_ENTRIES) {
@@ -1296,6 +1303,16 @@
     // Keyboard shortcuts
     // ============================================
 
+    /**
+     * The note has its own shortcuts on the same keys, so the tree only answers
+     * while it owns the keyboard (js/pane-focus.js). Without that module the
+     * shortcuts stay as they were, always on.
+     */
+    function treeOwnsKeyboard() {
+        var paneFocus = window.PoznotePaneFocus;
+        return paneFocus ? paneFocus.isTree() : true;
+    }
+
     function isTextEditingContext(target) {
         return !!(target && target.closest && target.closest(
             'input, textarea, select, [contenteditable]:not([contenteditable="false"]), ' +
@@ -1329,7 +1346,7 @@
     }
 
     function handleDeleteKey(e) {
-        if (!hasTree() || isReadOnly()) return;
+        if (!hasTree() || isReadOnly() || !treeOwnsKeyboard()) return;
         if (isTextEditingContext(e.target) || isModalOpen()) return;
 
         var targets = selectedTargets();
@@ -1359,7 +1376,7 @@
         var isPaste = key === 'v' && !e.shiftKey;
         if (!(isUndo || isRedo || isCopy || isCut || isPaste)) return;
 
-        if (!hasTree() || isReadOnly()) return;
+        if (!hasTree() || isReadOnly() || !treeOwnsKeyboard()) return;
         if (isTextEditingContext(e.target) || isModalOpen()) return;
         // Copying selected text is the browser's job
         if ((isCopy || isCut) && hasTextSelection()) return;

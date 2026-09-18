@@ -458,11 +458,11 @@
     // ------------------------------------------------------------------
     // The delete button takes the block out behind the browser's undo stack
     // (DOM removal in a rich-text note, source rewrite from the preview in a
-    // Markdown one), and the confirm dialog leaves the focus on <body>, where
-    // Ctrl+Z belongs to the tree history (js/tree-undo-clipboard.js). The last
-    // deletion is therefore kept here and put back on Ctrl+Z, as long as the
-    // note still reads exactly as the deletion left it: anything typed since
-    // has to be undone first, which keeps the steps in order.
+    // Markdown one), and the confirm dialog leaves the focus on <body>, so
+    // there is no editor to take the Ctrl+Z either. The last deletion is
+    // therefore kept here and put back on Ctrl+Z, as long as the note still
+    // reads exactly as the deletion left it: anything typed since has to be
+    // undone first, which keeps the steps in order.
     var lastDeletion = null;
 
     function rememberDomDeletion(noteEntry, position) {
@@ -528,7 +528,7 @@
     // Capture phase: ahead of the browser's own undo and of the tree history
     document.addEventListener('keydown', handleUndoShortcut, true);
 
-    // A click in the tree hands Ctrl+Z back to the tree history
+    // A click in the tree hands Ctrl+Z back to it (js/pane-focus.js)
     document.addEventListener('mousedown', function(e) {
         if (lastDeletion && e.target && e.target.closest && e.target.closest('#left_col')) {
             lastDeletion = null;

@@ -4957,7 +4957,9 @@
     "sections": {
       "general": "Général",
       "editor": "Éditeur de note",
-      "tree": "Arborescence des notes et dossiers"
+      "editor_focus": "Actif quand la note a le focus",
+      "tree": "Arborescence des notes et dossiers",
+      "tree_focus": "Actif quand l'arborescence a le focus"
     },
     "save_note": "Enregistrer la note",
     "snapshot": "Prendre un instantané de la note",

@@ -4852,7 +4852,9 @@
     "sections": {
       "general": "Allgemein",
       "editor": "Notizeditor",
-      "tree": "Notiz- und Ordnerbaum"
+      "editor_focus": "Aktiv, solange die Notiz den Fokus hat",
+      "tree": "Notiz- und Ordnerbaum",
+      "tree_focus": "Aktiv, solange der Baum den Fokus hat"
     },
     "save_note": "Notiz speichern",
     "snapshot": "Snapshot der Notiz erstellen",

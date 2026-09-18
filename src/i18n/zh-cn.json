@@ -4952,7 +4952,9 @@
     "sections": {
       "general": "通用",
       "editor": "笔记编辑器",
-      "tree": "笔记和文件夹树"
+      "editor_focus": "焦点位于笔记中时生效",
+      "tree": "笔记和文件夹树",
+      "tree_focus": "焦点位于树中时生效"
     },
     "save_note": "保存笔记",
     "snapshot": "为笔记创建快照",

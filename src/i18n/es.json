@@ -4853,7 +4853,9 @@
     "sections": {
       "general": "General",
       "editor": "Editor de notas",
-      "tree": "Árbol de notas y carpetas"
+      "editor_focus": "Activo mientras la nota tiene el foco",
+      "tree": "Árbol de notas y carpetas",
+      "tree_focus": "Activo mientras el árbol tiene el foco"
     },
     "save_note": "Guardar la nota",
     "snapshot": "Tomar una instantánea de la nota",
