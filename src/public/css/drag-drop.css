@@ -237,6 +237,50 @@ html[data-theme='dark'] .drop-zone-content {
     color: var(--dm-text-bright);
 }
 
+/* Ghost that follows the pointer during a tree drag, built by
+   js/events-drag-drop.js (handleNoteDragStart, handleFolderDragStart,
+   startSelectionDrag). It sits off-screen at the end of the body:
+   setDragImage() only needs it painted once, the script removes it on the
+   next tick. A folder or a multi-selection gets a badge, a single note gets
+   a copy of its own row so the ghost keeps the title and its icons. */
+.tree-drag-ghost {
+    position: absolute;
+    top: -1000px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    border: 2px solid rgba(var(--pz-accent-rgb), 0.4);
+    border-radius: var(--pz-radius-lg);
+    background: rgba(var(--pz-accent-rgb), 0.15);
+    color: var(--pz-accent);
+    font-weight: var(--pz-weight-medium);
+}
+
+a.links_arbo_left.tree-drag-ghost-note {
+    position: absolute;
+    top: -1000px;
+    opacity: 0.85;
+    transform: scale(1.02);
+    padding: 10px;
+    border: 1px solid rgba(var(--pz-accent-rgb), 0.3);
+    border-radius: var(--pz-radius-sm);
+    background-color: rgba(var(--pz-accent-rgb), 0.08);
+    box-shadow: 0 2px 8px rgba(var(--pz-accent-rgb), 0.15);
+}
+
+html[data-theme='dark'] .tree-drag-ghost {
+    border-color: rgba(var(--dm-accent-rgb), 0.4);
+    background: rgba(var(--dm-accent-rgb), 0.15);
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] a.links_arbo_left.tree-drag-ghost-note {
+    border-color: rgba(var(--dm-accent-rgb), 0.3);
+    background-color: rgba(var(--dm-accent-rgb), 0.08);
+    box-shadow: 0 2px 8px rgba(var(--dm-accent-rgb), 0.15);
+}
+
 /* Note dragging styles - applies to ALL notes */
 .dragging {
     opacity: 0.85;

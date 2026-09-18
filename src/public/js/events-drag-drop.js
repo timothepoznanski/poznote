@@ -459,17 +459,9 @@ function handleNoteDragStart(e) {
         // Store drag data globally for mouseup fallback
         window.currentDragData = dragData;
 
-        // Create a custom drag image with styles already applied
+        // Create a custom drag image (styles in css/drag-drop.css .tree-drag-ghost-note)
         var dragImage = noteLink.cloneNode(true);
-        dragImage.style.position = 'absolute';
-        dragImage.style.top = '-1000px';
-        dragImage.style.opacity = '0.85';
-        dragImage.style.backgroundColor = 'rgba(0, 123, 255, 0.08)';
-        dragImage.style.border = '1px solid rgba(0, 123, 255, 0.3)';
-        dragImage.style.transform = 'scale(1.02)';
-        dragImage.style.padding = '10px';
-        dragImage.style.borderRadius = '4px';
-        dragImage.style.boxShadow = '0 2px 8px rgba(0, 123, 255, 0.15)';
+        dragImage.classList.add('tree-drag-ghost-note');
         dragImage.style.width = noteLink.offsetWidth + 'px';
         dragImage.style.height = noteLink.offsetHeight + 'px';
         document.body.appendChild(dragImage);
@@ -1091,7 +1083,7 @@ function handleFolderDragStart(e) {
 
     // Create a custom drag image
     var dragImage = document.createElement('div');
-    dragImage.style.cssText = 'position: absolute; top: -1000px; padding: 10px 15px; background: rgba(0, 123, 255, 0.15); border: 2px solid rgba(0, 123, 255, 0.4); border-radius: 8px; font-weight: 500; color: #007bff; display: flex; align-items: center; gap: 8px;';
+    dragImage.className = 'tree-drag-ghost';
     dragImage.innerHTML = '<i class="lucide lucide-folder"></i> ' + (folderName || 'Folder');
     document.body.appendChild(dragImage);
 
@@ -2010,7 +2002,7 @@ function startSelectionDrag(e, dragData) {
         ? window.t('tree_selection.count', { count: count }, count + ' selected')
         : count + ' selected';
     var dragImage = document.createElement('div');
-    dragImage.style.cssText = 'position: absolute; top: -1000px; padding: 10px 15px; background: rgba(0, 123, 255, 0.15); border: 2px solid rgba(0, 123, 255, 0.4); border-radius: 8px; font-weight: 500; color: #007bff; display: flex; align-items: center; gap: 8px;';
+    dragImage.className = 'tree-drag-ghost';
     var icon = document.createElement('i');
     icon.className = 'lucide lucide-layers';
     dragImage.appendChild(icon);
