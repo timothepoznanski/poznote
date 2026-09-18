@@ -105,6 +105,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/pane-focus.js',
         'js/tree-undo-clipboard.js',
         'js/tree-selection.js',
+        'js/tree-keyboard-nav.js',
         'js/search-highlight.js',
         'js/keyboard-shortcuts.js',
         'js/date-picker-popup.js',

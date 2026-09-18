@@ -363,6 +363,44 @@ html[data-theme='dark'] .folder-toggle.tree-multi-selected:hover {
     background-color: rgba(var(--dm-accent-rgb), 0.2) !important;
 }
 
+/* Pointer hidden while the tree is driven with the arrow keys
+   (js/tree-keyboard-nav.js), and the row hovers muted with it: the mouse
+   usually rests on the row that was clicked, which would otherwise keep its
+   hover band, its accent title and its three dots next to the row the
+   keyboard is on. Any real mouse move, click or wheel turn brings it all
+   back. A selected row keeps its tint, which is not a hover. */
+html.tree-keyboard-mouse-hidden,
+html.tree-keyboard-mouse-hidden * {
+    cursor: none !important;
+}
+
+/* !important: the dark row hover is (dark-mode/layout.css) */
+html.tree-keyboard-mouse-hidden #left_col .folder-toggle:not(.tree-multi-selected):hover,
+html.tree-keyboard-mouse-hidden #left_col .note-list-item:not(.tree-multi-selected) > a.links_arbo_left:not(.selected-note):hover {
+    background-color: transparent !important;
+}
+
+/* The open note: no !important here, its own dark surface is one and has to
+   stay, while the light hover band it replaces is not */
+html.tree-keyboard-mouse-hidden #left_col .note-list-item:not(.tree-multi-selected) > a.links_arbo_left.selected-note:hover {
+    background-color: transparent;
+}
+
+/* inherit: the link carries the same text colour as its title in every theme */
+html.tree-keyboard-mouse-hidden #left_col a.links_arbo_left:not(.selected-note):hover .note-title {
+    color: inherit !important;
+}
+
+/* Only where the three dots hide without a hover: touch screens keep them on
+   (media blocks above) */
+@media (hover: hover) and (min-width: 801px) {
+    html.tree-keyboard-mouse-hidden #left_col .folder-toggle:hover .folder-actions-toggle:not(.open),
+    html.tree-keyboard-mouse-hidden #left_col .note-list-item:hover .note-actions-toggle:not(.open),
+    html.tree-keyboard-mouse-hidden #left_col .note-list-item:hover .note-actions-item {
+        display: none;
+    }
+}
+
 /* "N selected" line on top of the menu for the whole selection */
 .tree-selection-menu-count {
     padding: 4px 14px 6px;

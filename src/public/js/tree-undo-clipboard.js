@@ -1324,6 +1324,26 @@
         }
     }
 
+    /**
+     * Point the focus at a row that was reached with the arrow keys
+     * (js/tree-keyboard-nav.js), so paste goes where the keyboard is the way
+     * it goes where the last click was. It does not set treeActive: Del
+     * without a selection still needs a click in the tree.
+     * @param {{type: string, id: string|number}} item - Row to focus
+     */
+    function setFocus(item) {
+        if (!item || !item.id) return;
+        if (item.type === 'note') {
+            var link = noteLink(item.id);
+            if (link) treeFocus = noteFocusFromLink(link);
+            return;
+        }
+        if (item.type === 'folder') {
+            var header = folderHeader(item.id);
+            if (header && !header.classList.contains('system-folder')) treeFocus = folderFocusFromHeader(header);
+        }
+    }
+
     function currentFocus() {
         if (treeFocus) {
             // The row may be gone after a refresh of the tree
@@ -1547,6 +1567,7 @@
         moveItems: moveItems,
         favoriteItems: favoriteItems,
         paste: paste,
+        setFocus: setFocus,
         syncMenu: syncMenu
     };
 

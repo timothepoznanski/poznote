@@ -18,7 +18,9 @@
  *
  * This file only owns the selection. What acts on it lives in
  * js/tree-undo-clipboard.js: Del, Ctrl+C / X / V, and the undo of those, which
- * read the set through window.PoznoteTreeSelection.items(). Dragging a
+ * read the set through window.PoznoteTreeSelection.items(). The arrow keys
+ * move it from row to row (js/tree-keyboard-nav.js), through the same rows
+ * list and select(). Dragging a
  * selected row drags the whole selection (js/events-drag-drop.js); dragging
  * a row outside it moves that row alone and clears the selection. Those
  * actions redraw the tree, which is what clears the selection afterwards,
@@ -492,7 +494,11 @@
         count: function () { return selectedKeys.length; },
         clear: clearSelection,
         select: selectItems,
-        selectAfterReload: selectItemsAfterReload
+        selectAfterReload: selectItemsAfterReload,
+        // Rows on screen and the one a move starts from, for the arrow keys
+        // (js/tree-keyboard-nav.js)
+        rows: visibleRows,
+        current: anchorOrOpenNote
     };
 
     if (document.readyState === 'loading') {

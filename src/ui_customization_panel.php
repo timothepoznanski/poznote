@@ -31,7 +31,7 @@ $uiCustomizationPanelAiLabel = t_h('ai_chat.toolbar_button', [], 'AI assistant')
  * "alt" Alt (⌥ on macOS), swapped by js/ui-customization-panel.js on open.
  * The handlers live in js/keyboard-shortcuts.js (general), js/events-rte-notes.js
  * plus build/markdown-editor/src/main.js (editor), js/checklist.js, js/slash-command.js,
- * js/emoji-autocomplete.js and js/tree-undo-clipboard.js (tree). The editor and
+ * js/emoji-autocomplete.js, js/tree-undo-clipboard.js and js/tree-keyboard-nav.js (tree). The editor and
  * the tree share keys (Ctrl+Z, Ctrl+C / X / V, Del), so each section says it
  * only answers while its own pane has the focus (js/pane-focus.js).
  */
@@ -67,6 +67,9 @@ $pzShortcutGroups = [
         'title' => t_h('keyboard_shortcuts.sections.tree', [], 'Notes and folders tree'),
         'note' => t_h('keyboard_shortcuts.sections.tree_focus', [], 'Active while the tree has the focus'),
         'items' => [
+            ['keys' => [['↑'], ['↓']], 'label' => t_h('keyboard_shortcuts.tree_move', [], 'Move to the note or folder above or below')],
+            ['keys' => [['→']], 'label' => t_h('keyboard_shortcuts.tree_open_folder', [], 'Open a folder, or step into it')],
+            ['keys' => [['←']], 'label' => t_h('keyboard_shortcuts.tree_close_folder', [], 'Close a folder, or go up to the one holding the row')],
             ['keys' => [['mod', 'Z']], 'label' => t_h('keyboard_shortcuts.tree_undo', [], 'Undo the last change')],
             ['keys' => [['mod', 'Shift', 'Z'], ['mod', 'Y']], 'label' => t_h('keyboard_shortcuts.tree_redo', [], 'Redo')],
             ['keys' => [['mod', 'Click']], 'label' => t_h('keyboard_shortcuts.tree_select_toggle', [], 'Add a note or folder to the selection, or remove it')],
