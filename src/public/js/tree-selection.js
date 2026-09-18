@@ -32,6 +32,15 @@
  * row in the Favorites section and a favorite folder a shortcut row there;
  * both rows light up together and count once. System folders (Favorites,
  * Tags, Trash, Public) and the read-only "Other accounts" block never join.
+ *
+ * A selected folder stands for everything in it, so it is tinted as one block
+ * around its rows and those rows are never in the set next to it: selecting
+ * the folder takes them out, which leaves no "folder and half of its notes"
+ * for Del or a drag to make sense of. Inside the block a row counts as part
+ * of the selection (right-click, drag). Ctrl+Click on one takes it out: the
+ * folder gives way to the rest of what it holds. A Shift+Click range takes a
+ * folder only when all the rows it shows are in the range, or when the folder
+ * is one of the two ends.
  */
 (function () {
     'use strict';
@@ -139,18 +148,114 @@
     }
 
     // ============================================
+    // Folders and what they hold
+    // ============================================
+
+    function folderHeaderForKey(key) {
+        var parsed = parseKey(key);
+        if (parsed.type !== 'folder') return null;
+        return document.querySelector('#left_col .folder-header[data-folder-id="' + parsed.id + '"]:not(.system-folder)');
+    }
+
+    function isFavoritesRow(element) {
+        return !!element.closest('.folder-header.system-folder');
+    }
+
+    /** The folders a row sits in, nearest first, as keys. A closed folder still holds its rows */
+    function ancestorKeys(key) {
+        var parsed = parseKey(key);
+        var node = null;
+        if (parsed.type === 'note') {
+            // The row in the tree proper: the one Favorites shows lives elsewhere
+            var links = document.querySelectorAll('#left_col .links_arbo_left[data-note-db-id="' + parsed.id + '"]');
+            for (var i = 0; i < links.length && !node; i++) {
+                if (!isFavoritesRow(links[i]) && !links[i].closest('.other-accounts')) node = links[i];
+            }
+        } else {
+            var own = folderHeaderForKey(key);
+            node = own ? own.parentElement : null;
+        }
+
+        var keys = [];
+        var header = node ? node.closest('.folder-header') : null;
+        while (header) {
+            var folderId = header.getAttribute('data-folder-id');
+            if (folderId && !header.classList.contains('system-folder')) keys.push('folder:' + folderId);
+            header = header.parentElement ? header.parentElement.closest('.folder-header') : null;
+        }
+        return keys;
+    }
+
+    /** The notes and folders directly in a folder, as keys */
+    function childKeys(folderKey) {
+        var header = folderHeaderForKey(folderKey);
+        var content = header ? header.querySelector(':scope > .folder-content') : null;
+        var keys = [];
+        if (!content) return keys;
+        Array.prototype.forEach.call(content.children, function (child) {
+            var row = null;
+            if (child.classList.contains('note-list-item')) {
+                row = rowFromNoteItem(child);
+            } else if (child.classList.contains('folder-header')) {
+                var toggle = child.querySelector(':scope > .folder-toggle');
+                row = toggle ? rowFromFolderToggle(toggle) : null;
+            }
+            if (row && keys.indexOf(row.key) === -1) keys.push(row.key);
+        });
+        return keys;
+    }
+
+    /** The folder of this set that holds the row, or null */
+    function coveringKey(key, keys) {
+        var ancestors = ancestorKeys(key);
+        for (var i = 0; i < ancestors.length; i++) {
+            if (keys.indexOf(ancestors[i]) !== -1) return ancestors[i];
+        }
+        return null;
+    }
+
+    function isSelectedOrCovered(key) {
+        return selectedKeys.indexOf(key) !== -1 || coveringKey(key, selectedKeys) !== null;
+    }
+
+    // A row taken out of a selected folder: the folder gives way to the rest
+    // of what it holds, and so does every folder between the two
+    function takeOut(keys, key, covering) {
+        var path = ancestorKeys(key);
+        path = path.slice(0, path.indexOf(covering) + 1);
+
+        var result = keys.filter(function (k) { return k !== covering; });
+        var left = key;
+        path.forEach(function (folderKey) {
+            childKeys(folderKey).forEach(function (child) {
+                if (child !== left) result.push(child);
+            });
+            left = folderKey;
+        });
+        return result;
+    }
+
+    // ============================================
     // Selection state
     // ============================================
 
     function render() {
-        document.querySelectorAll('.tree-multi-selected').forEach(function (el) {
-            el.classList.remove('tree-multi-selected');
+        document.querySelectorAll('.tree-multi-selected, .tree-multi-selected-folder').forEach(function (el) {
+            el.classList.remove('tree-multi-selected', 'tree-multi-selected-folder');
         });
         selectedKeys.forEach(function (key) {
             rowElementsForKey(key).forEach(function (el) {
                 el.classList.add('tree-multi-selected');
             });
+            // A folder is tinted as one block, its rows included
+            var header = folderHeaderForKey(key);
+            if (header) header.classList.add('tree-multi-selected-folder');
         });
+    }
+
+    // A selected folder stands for everything in it: the rows it holds leave the set
+    function withoutCovered(keys) {
+        return keys.filter(function (key) { return coveringKey(key, keys) === null; });
     }
 
     function setSelection(keys) {
@@ -158,7 +263,7 @@
         keys.forEach(function (key) {
             if (key && unique.indexOf(key) === -1) unique.push(key);
         });
-        selectedKeys = unique;
+        selectedKeys = withoutCovered(unique);
         render();
     }
 
@@ -172,45 +277,82 @@
     function toggleRow(key) {
         var keys = selectedKeys.slice();
         var index = keys.indexOf(key);
-        if (index === -1) {
-            keys.push(key);
-        } else {
+        var covering = index === -1 ? coveringKey(key, keys) : null;
+        if (index !== -1) {
             keys.splice(index, 1);
+        } else if (covering) {
+            keys = takeOut(keys, key, covering);
+        } else {
+            keys.push(key);
         }
         anchorKey = key;
         setSelection(keys);
     }
 
-    function selectRange(key, additive) {
-        var rows = visibleRows();
-        var order = [];
-        rows.forEach(function (row) {
-            if (order.indexOf(row.key) === -1) order.push(row.key);
-        });
+    // A favorited note and a favorite folder have a second row in Favorites:
+    // the one in the section that was clicked is the one a range runs from
+    function indexOfRowKey(rows, key, inFavorites) {
+        var other = -1;
+        for (var i = 0; i < rows.length; i++) {
+            if (rows[i].key !== key) continue;
+            if (isFavoritesRow(rows[i].element) === inFavorites) return i;
+            if (other === -1) other = i;
+        }
+        return other;
+    }
 
-        var from = order.indexOf(anchorOrOpenNote());
-        var to = order.indexOf(key);
+    function selectRange(clicked, additive) {
+        var rows = visibleRows();
+        var to = -1;
+        for (var i = 0; i < rows.length && to === -1; i++) {
+            if (rows[i].element === clicked.element) to = i;
+        }
         if (to === -1) return;
+
+        var fromKey = anchorOrOpenNote();
+        var from = fromKey ? indexOfRowKey(rows, fromKey, isFavoritesRow(clicked.element)) : -1;
         if (from === -1) {
             from = to;
-            anchorKey = key;
+            fromKey = clicked.key;
+            anchorKey = clicked.key;
         }
 
-        var range = order.slice(Math.min(from, to), Math.max(from, to) + 1);
+        var first = Math.min(from, to);
+        var last = Math.max(from, to);
+        var range = [];
+        for (var j = first; j <= last; j++) {
+            var key = rows[j].key;
+            if (range.indexOf(key) !== -1) continue;
+            // A folder is taken whole: past the two ends it only joins when
+            // every row it shows is in the range too
+            if (key !== clicked.key && key !== fromKey && !folderFitsIn(key, rows, first, last)) continue;
+            range.push(key);
+        }
         setSelection(additive ? selectedKeys.concat(range) : range);
+    }
+
+    function folderFitsIn(key, rows, first, last) {
+        var header = folderHeaderForKey(key);
+        if (!header) return true;
+        for (var i = 0; i < rows.length; i++) {
+            if ((i < first || i > last) && header.contains(rows[i].element)) return false;
+        }
+        return true;
     }
 
     /** Selected rows in tree order, as {type, id} */
     function items() {
-        var order = [];
-        visibleRows().forEach(function (row) {
-            if (order.indexOf(row.key) === -1) order.push(row.key);
+        var rows = visibleRows();
+        var place = {};
+        rows.forEach(function (row, index) {
+            // The row in the tree proper gives the place, the one in Favorites only when it is alone on screen
+            if (!(row.key in place) || !isFavoritesRow(row.element)) place[row.key] = index;
         });
         // A selected row may have been folded away since: it still counts, after the visible ones
         var sorted = selectedKeys.slice().sort(function (a, b) {
-            var ia = order.indexOf(a);
-            var ib = order.indexOf(b);
-            return (ia === -1 ? order.length : ia) - (ib === -1 ? order.length : ib);
+            var ia = (a in place) ? place[a] : rows.length;
+            var ib = (b in place) ? place[b] : rows.length;
+            return ia - ib;
         });
         return sorted.map(parseKey);
     }
@@ -278,6 +420,8 @@
     // rows that did not come back leave the selection
     function pruneSelection() {
         var kept = selectedKeys.filter(function (key) { return rowElementsForKey(key).length > 0; });
+        // A row that came back inside a selected folder is covered by it now
+        kept = withoutCovered(kept);
         if (kept.length !== selectedKeys.length) {
             selectedKeys = kept;
         }
@@ -316,7 +460,7 @@
             e.preventDefault();
             e.stopPropagation();
             if (e.shiftKey) {
-                selectRange(row.key, modifier);
+                selectRange(row, modifier);
             } else {
                 toggleRow(row.key);
             }
@@ -346,7 +490,8 @@
         var row = rowFromTarget(e.target);
         if (!row) return;
 
-        if (selectedKeys.length > 1 && selectedKeys.indexOf(row.key) !== -1) {
+        // A row inside a selected folder is part of the selection as well
+        if (selectedKeys.length > 1 && isSelectedOrCovered(row.key)) {
             e.preventDefault();
             e.stopPropagation();
             openMenu(e.clientX, e.clientY);
@@ -492,6 +637,8 @@
     window.PoznoteTreeSelection = {
         items: items,
         count: function () { return selectedKeys.length; },
+        // True for a selected row and for a row inside a selected folder
+        covers: function (type, id) { return isSelectedOrCovered(type + ':' + String(id)); },
         clear: clearSelection,
         select: selectItems,
         selectAfterReload: selectItemsAfterReload,

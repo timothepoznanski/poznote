@@ -1916,15 +1916,13 @@ function selectionDragData(rowType, rowId) {
     var selection = window.PoznoteTreeSelection;
     if (!selection || selection.count() < 2) return null;
 
-    var items = selection.items();
-    var included = items.some(function (item) {
-        return item.type === rowType && String(item.id) === String(rowId);
-    });
-    if (!included) {
+    // A row inside a selected folder is part of the selection as well: the
+    // folder is tinted as one block and stands for everything in it
+    if (!selection.covers(rowType, rowId)) {
         selection.clear();
         return null;
     }
-    return { type: 'selection', items: items };
+    return { type: 'selection', items: selection.items() };
 }
 
 function isSelectionDrag(dragData) {

@@ -363,6 +363,39 @@ html[data-theme='dark'] .folder-toggle.tree-multi-selected:hover {
     background-color: rgba(var(--dm-accent-rgb), 0.2) !important;
 }
 
+/* A selected folder is one block around its header row and everything it
+   holds (.folder-header wraps both), since that is what Del or a drag takes.
+   The header row drops its own tint so the block is one even layer. */
+.folder-header.tree-multi-selected-folder {
+    background-color: rgba(var(--pz-accent-rgb), 0.14);
+}
+
+.folder-header.tree-multi-selected-folder > .folder-toggle.tree-multi-selected,
+.folder-header.tree-multi-selected-folder > .folder-toggle.tree-multi-selected:hover {
+    background-color: transparent;
+}
+
+/* The rows inside keep the block whole: no hover band, and no surface behind
+   the open note. Their title still turns accent on hover. */
+.folder-header.tree-multi-selected-folder .folder-toggle:hover,
+.folder-header.tree-multi-selected-folder .note-list-item > a.links_arbo_left,
+.folder-header.tree-multi-selected-folder .note-list-item > a.links_arbo_left:hover {
+    background-color: transparent;
+}
+
+html[data-theme='dark'] .folder-header.tree-multi-selected-folder {
+    background-color: rgba(var(--dm-accent-rgb), 0.2);
+}
+
+/* !important: the rules these answer are (above, and dark-mode/layout.css) */
+html[data-theme='dark'] .folder-header.tree-multi-selected-folder > .folder-toggle.tree-multi-selected,
+html[data-theme='dark'] .folder-header.tree-multi-selected-folder > .folder-toggle.tree-multi-selected:hover,
+html[data-theme='dark'] .folder-header.tree-multi-selected-folder .folder-toggle:hover,
+html[data-theme='dark'] .folder-header.tree-multi-selected-folder .note-list-item > a.links_arbo_left,
+html[data-theme='dark'] .folder-header.tree-multi-selected-folder .note-list-item > a.links_arbo_left:hover {
+    background-color: transparent !important;
+}
+
 /* Pointer hidden while the tree is driven with the arrow keys
    (js/tree-keyboard-nav.js), and the row hovers muted with it: the mouse
    usually rests on the row that was clicked, which would otherwise keep its
