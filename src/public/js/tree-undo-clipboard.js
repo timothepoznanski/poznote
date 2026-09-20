@@ -7,7 +7,8 @@
  *   Ctrl+Z          undo the last tree change
  *   Ctrl+Shift+Z    redo it (Ctrl+Y works too)
  *   Ctrl+C / X / V  copy, cut and paste the selected notes and folders
- *   Del             move them to the trash (Cmd+Backspace on macOS)
+ *   Del             move them to the trash, after a confirmation
+ *                   (Cmd+Backspace on macOS)
  *
  * They only answer while the tree owns the keyboard (js/pane-focus.js): the
  * same keys belong to the note once it has been clicked into, so a Ctrl+Z
@@ -1230,13 +1231,66 @@
         }
     }
 
+    /** Ctrl+Z reads as the Command key on macOS keyboards */
+    function withPlatformKeys(message) {
+        return isMacPlatform ? message.replace(/Ctrl\+/g, '⌘') : message;
+    }
+
+    function confirmDelete(title, message, run) {
+        if (typeof window.showConfirmModal !== 'function') {
+            if (window.confirm(message)) run();
+            return;
+        }
+        window.showConfirmModal(
+            title,
+            message,
+            run,
+            { confirmText: tr('common.delete', 'Delete'), danger: true, hideSaveAndExit: true }
+        );
+    }
+
+    /**
+     * One note to the trash, through the flow of its menu's Delete item. The
+     * confirmation is handed to it rather than asked here: a shortcut row asks
+     * its own question (trash the shortcut alone or the note behind it) and
+     * only what would go straight to the trash comes back to us.
+     */
+    function deleteSingleNote(noteId, confirmFirst) {
+        if (typeof window.deleteNote !== 'function') return;
+        if (!confirmFirst) {
+            window.deleteNote(noteId);
+            return;
+        }
+        window.deleteNote(noteId, {
+            confirmBeforeTrash: function (proceed) {
+                var name = noteState(noteId).name;
+                confirmDelete(
+                    tr('tree_selection.delete_note_title', 'Delete note'),
+                    withPlatformKeys(name
+                        ? tr('tree_selection.delete_note_message',
+                            '\u201c{{name}}\u201d will be moved to the trash. Ctrl+Z brings it back.',
+                            { name: name })
+                        : tr('tree_selection.delete_note_message_untitled',
+                            'This note will be moved to the trash. Ctrl+Z brings it back.')),
+                    proceed
+                );
+            }
+        });
+    }
+
     /**
      * Move notes and folders to the trash. One row goes through the same flow
      * as its menu's Delete item (shortcut dialog for a shortcut, content
      * warning for a non-empty folder); several rows ask once, then go one
      * after the other and are recorded as one history entry.
+     *
+     * options.confirm asks before a row that would otherwise go straight to
+     * the trash, for the Del shortcut, which is easy to press by mistake
+     * (#1459), while the red Delete item of a menu is deliberate enough on its
+     * own. Rows that already open a dialog of their own are left as they are,
+     * so nothing is asked twice.
      */
-    function deleteItems(targets) {
+    function deleteItems(targets, options) {
         if (isReadOnly() || running) return;
         targets = withoutNested(targets || []).filter(function (target) {
             return target.type === 'note' ? !!noteLink(target.id) : !!folderHeader(target.id);
@@ -1253,27 +1307,24 @@
         });
         if (!targets.length) return;
 
+        var confirmFirst = !!(options && options.confirm);
+
         if (targets.length === 1) {
             var single = targets[0];
             if (single.type === 'note') {
-                if (typeof window.deleteNote === 'function') window.deleteNote(single.id);
+                deleteSingleNote(single.id, confirmFirst);
             } else if (typeof window.deleteFolder === 'function') {
-                window.deleteFolder(single.id, folderState(single.id).name);
+                // A folder with notes or subfolders always shows what it
+                // takes along; an empty one only asks for the Del shortcut
+                window.deleteFolder(single.id, folderState(single.id).name, { confirmIfEmpty: confirmFirst });
             }
             return;
         }
 
-        var run = function () { runDelete(targets); };
-        var message = deleteConfirmMessage(targets);
-        if (typeof window.showConfirmModal !== 'function') {
-            if (window.confirm(message)) run();
-            return;
-        }
-        window.showConfirmModal(
+        confirmDelete(
             tr('tree_selection.delete_title', 'Delete {{count}} items', { count: targets.length }),
-            message,
-            run,
-            { confirmText: tr('common.delete', 'Delete'), danger: true, hideSaveAndExit: true }
+            deleteConfirmMessage(targets),
+            function () { runDelete(targets); }
         );
     }
 
@@ -1287,7 +1338,7 @@
             : tr('tree_selection.delete_message_notes',
                 '{{count}} notes will be moved to the trash. Ctrl+Z brings them back.',
                 { count: count });
-        return isMacPlatform ? message.replace(/Ctrl\+/g, '⌘') : message;
+        return withPlatformKeys(message);
     }
 
     function runDelete(targets) {
@@ -1466,7 +1517,7 @@
             targets = [{ type: focus.type, id: focus.id }];
         }
         e.preventDefault();
-        deleteItems(targets);
+        deleteItems(targets, { confirm: true });
     }
 
     function handleKeydown(e) {
