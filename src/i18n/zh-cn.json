@@ -4967,6 +4967,8 @@
     "tree_move": "移动到上方或下方的笔记或文件夹",
     "tree_open_folder": "展开文件夹，或进入其中",
     "tree_close_folder": "折叠文件夹，或返回上级文件夹",
+    "tree_rename": "重命名笔记或文件夹",
+    "tree_open": "打开笔记，或展开和折叠文件夹",
     "tree_undo": "撤销上一次更改",
     "tree_redo": "重做",
     "tree_copy": "复制所选笔记和文件夹",
@@ -4978,6 +4980,7 @@
       "escape": "Esc",
       "tab": "Tab",
       "delete": "Del",
+      "space": "空格",
       "click": "单击"
     },
     "tree_select_toggle": "将笔记或文件夹加入选择，或从选择中移除",

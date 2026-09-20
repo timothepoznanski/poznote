@@ -4868,6 +4868,8 @@
     "tree_move": "Ir para a nota ou pasta acima ou abaixo",
     "tree_open_folder": "Abrir uma pasta ou entrar nela",
     "tree_close_folder": "Fechar uma pasta ou subir para a que a contém",
+    "tree_rename": "Renomear a nota ou a pasta",
+    "tree_open": "Abrir a nota, ou abrir e fechar a pasta",
     "tree_undo": "Anular a última alteração",
     "tree_redo": "Refazer",
     "tree_copy": "Copiar as notas e pastas selecionadas",
@@ -4879,6 +4881,7 @@
       "escape": "Esc",
       "tab": "Tab",
       "delete": "Del",
+      "space": "Espaço",
       "click": "Clique"
     },
     "tree_select_toggle": "Adicionar uma nota ou pasta à seleção, ou removê-la",

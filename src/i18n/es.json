@@ -4868,6 +4868,8 @@
     "tree_move": "Ir a la nota o carpeta de arriba o de abajo",
     "tree_open_folder": "Abrir una carpeta o entrar en ella",
     "tree_close_folder": "Cerrar una carpeta o subir a la que la contiene",
+    "tree_rename": "Cambiar el nombre de la nota o de la carpeta",
+    "tree_open": "Abrir la nota, o abrir y cerrar la carpeta",
     "tree_undo": "Deshacer el último cambio",
     "tree_redo": "Rehacer",
     "tree_copy": "Copiar las notas y carpetas seleccionadas",
@@ -4879,6 +4881,7 @@
       "escape": "Esc",
       "tab": "Tab",
       "delete": "Supr",
+      "space": "Espacio",
       "click": "Clic"
     },
     "tree_select_toggle": "Añadir una nota o carpeta a la selección, o quitarla",

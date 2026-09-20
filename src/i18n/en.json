@@ -4687,6 +4687,8 @@
     "tree_move": "Move to the note or folder above or below",
     "tree_open_folder": "Open a folder, or step into it",
     "tree_close_folder": "Close a folder, or go up to the one holding the row",
+    "tree_rename": "Rename the note or folder",
+    "tree_open": "Open the note, or open and close the folder",
     "tree_undo": "Undo the last change",
     "tree_redo": "Redo",
     "tree_copy": "Copy the selected notes and folders",
@@ -4698,6 +4700,7 @@
       "escape": "Esc",
       "tab": "Tab",
       "delete": "Del",
+      "space": "Space",
       "click": "Click"
     },
     "tree_select_toggle": "Add a note or folder to the selection, or remove it",

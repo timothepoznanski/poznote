@@ -70,6 +70,8 @@ $pzShortcutGroups = [
             ['keys' => [['↑'], ['↓']], 'label' => t_h('keyboard_shortcuts.tree_move', [], 'Move to the note or folder above or below')],
             ['keys' => [['→']], 'label' => t_h('keyboard_shortcuts.tree_open_folder', [], 'Open a folder, or step into it')],
             ['keys' => [['←']], 'label' => t_h('keyboard_shortcuts.tree_close_folder', [], 'Close a folder, or go up to the one holding the row')],
+            ['keys' => [['Enter']], 'label' => t_h('keyboard_shortcuts.tree_rename', [], 'Rename the note or folder')],
+            ['keys' => [['Space']], 'label' => t_h('keyboard_shortcuts.tree_open', [], 'Open the note, or open and close the folder')],
             ['keys' => [['mod', 'Z']], 'label' => t_h('keyboard_shortcuts.tree_undo', [], 'Undo the last change')],
             ['keys' => [['mod', 'Shift', 'Z'], ['mod', 'Y']], 'label' => t_h('keyboard_shortcuts.tree_redo', [], 'Redo')],
             ['keys' => [['mod', 'Click']], 'label' => t_h('keyboard_shortcuts.tree_select_toggle', [], 'Add a note or folder to the selection, or remove it')],
@@ -91,6 +93,7 @@ $pzShortcutKeyLabels = [
     'Esc' => t_h('keyboard_shortcuts.keys.escape', [], 'Esc'),
     'Tab' => t_h('keyboard_shortcuts.keys.tab', [], 'Tab'),
     'Del' => t_h('keyboard_shortcuts.keys.delete', [], 'Del'),
+    'Space' => t_h('keyboard_shortcuts.keys.space', [], 'Space'),
     'Click' => t_h('keyboard_shortcuts.keys.click', [], 'Click'),
 ];
 $pzMoreMenuLabel = t_h('page_menu.button', [], 'More options');

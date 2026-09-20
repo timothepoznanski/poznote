@@ -5,12 +5,22 @@
  *   Left          close an open folder, otherwise go up to the folder holding
  *                 the row
  *   Right         open a closed folder, otherwise step into it
+ *   Enter         rename the row where it sits
+ *   Space         open the row: the note in the editor, a folder open or closed
  *
  * The arrows used to scroll the tree. They now move the selection built by
  * Ctrl+Click and Shift+Click (js/tree-selection.js), so a row reached with the
  * keyboard is copied, cut or trashed by the shortcuts of
  * js/tree-undo-clipboard.js exactly like a clicked one, and the tree scrolls
  * only far enough to keep the row that was reached in sight.
+ *
+ * Enter and Space act on the row the arrows are on. Enter opens the inline
+ * rename the row's actions menu opens (js/inline-tree-edit.js), pointed at
+ * this row rather than at the one clicked last, and Space does what a click on
+ * the row does instead of scrolling the page. Both are left to the page while
+ * nothing points into the tree yet, where the arrows would take the first row:
+ * renaming or opening a row that was never shown as the one chosen is not
+ * something the other arrow takes back.
  *
  * Like the other tree shortcuts they only answer while the tree owns the
  * keyboard (js/pane-focus.js): the same keys move the caret in the note. They
@@ -92,6 +102,20 @@
             if (window.getComputedStyle(modals[i]).display !== 'none') return true;
         }
         return false;
+    }
+
+    /**
+     * Enter and Space belong to whatever holds the focus when that is a button
+     * or another control: the three dots of a row, the create, sort and sidebar
+     * buttons, anything Tab reaches, which are all activated by those two keys.
+     * A row is let through: a clicked one keeps the focus on its <a>, whose
+     * Enter would open the note the row is already showing, and the arrows drop
+     * the focus themselves (dropTreeFocus).
+     */
+    function focusedControlKeepsKey(target) {
+        if (!target || target === document.body || target === document.documentElement) return false;
+        if (!target.closest) return false;
+        return !target.closest('a.links_arbo_left, .folder-toggle');
     }
 
     // A row menu takes the arrows for itself, or at least must not have the
@@ -289,6 +313,76 @@
     }
 
     // ============================================
+    // Renaming and opening a row
+    // ============================================
+
+    /** The name a folder row carries, on the toggle or on a Favorites shortcut link */
+    function folderNameOf(element) {
+        var own = element.getAttribute('data-folder');
+        if (own) return own;
+        var link = element.querySelector('[data-folder]');
+        return link ? link.getAttribute('data-folder') : '';
+    }
+
+    /**
+     * The title a note row shows. Its actions button carries it whole; the
+     * label is read for a row that has no button, and only its text, since the
+     * note type and custom icons sit in there too.
+     */
+    function noteTitleOf(element) {
+        var actions = element.querySelector('.note-actions-toggle[data-note-title]');
+        if (actions) return actions.getAttribute('data-note-title') || '';
+
+        var label = element.querySelector('.note-title');
+        if (!label) return '';
+        return Array.prototype.reduce.call(label.childNodes, function (text, node) {
+            return node.nodeType === 3 ? text + node.textContent : text;
+        }, '').trim();
+    }
+
+    /**
+     * Enter: rename the row where it sits. The two entry points the actions
+     * menus use are called, so a row the tree cannot edit in place keeps the
+     * modal they fall back to. A note names its row first: it may have a second
+     * one in the Favorites section, and the rename goes to the row clicked last
+     * without being told otherwise (js/inline-tree-edit.js).
+     */
+    function renameRow(row) {
+        var item = parseKey(row.key);
+
+        if (item.type === 'folder') {
+            var name = folderNameOf(row.element);
+            if (name && typeof window.editFolderName === 'function') {
+                window.editFolderName(item.id, name);
+            }
+            return;
+        }
+
+        if (typeof window.renameNote !== 'function') return;
+        var inlineEdit = window.PoznoteInlineTreeEdit;
+        if (inlineEdit && typeof inlineEdit.focusNoteRow === 'function') {
+            inlineEdit.focusNoteRow(row.element);
+        }
+        window.renameNote(item.id, noteTitleOf(row.element));
+    }
+
+    /**
+     * Space: do what a click on the row does, which is to open the note in the
+     * editor, to open or close a folder, and to go to the folder a Favorites
+     * shortcut stands for. The link is clicked rather than loaded by hand so
+     * that the note being left is saved on the way out exactly as it is by a
+     * click (js/events-navigation.js).
+     */
+    function openRow(row) {
+        if (folderContentOf(row.element)) {
+            toggleFolderRow(row.element);
+            return;
+        }
+        var link = row.element.querySelector('a.links_arbo_left');
+        if (link) link.click();
+    }
+
+    // ============================================
     // Scrolling
     // ============================================
 
@@ -386,7 +480,9 @@
 
         var key = e.key;
         var isHorizontal = (key === 'ArrowLeft' || key === 'ArrowRight' || key === 'Left' || key === 'Right');
-        if (!isHorizontal && !Object.prototype.hasOwnProperty.call(STEPS, key)) return;
+        var isRename = (key === 'Enter');
+        var isOpen = (key === ' ' || key === 'Spacebar');
+        if (!isHorizontal && !isRename && !isOpen && !Object.prototype.hasOwnProperty.call(STEPS, key)) return;
 
         if (!hasTree() || isReadOnly() || !treeOwnsKeyboard(e.target)) return;
         if (isTextEditingContext(e.target) || isModalOpen() || isRowMenuOpen()) return;
@@ -395,6 +491,26 @@
         // look for the row the cursor is on
         var list = rows();
         if (!list.length) return;
+
+        // Enter and Space need a row of their own: they act on one instead of
+        // moving to it, so they are left to the page until something points
+        // into the tree
+        if (isRename || isOpen) {
+            if (focusedControlKeepsKey(e.target)) return;
+            var cursor = cursorIndex(list);
+            if (cursor === -1) return;
+            e.preventDefault();
+            if (isRename) {
+                // The focus and the pointer are left alone: the rename input
+                // takes the focus to be typed into, and a click away commits it
+                renameRow(list[cursor]);
+            } else {
+                dropTreeFocus();
+                setMouseHidden(true);
+                openRow(list[cursor]);
+            }
+            return;
+        }
 
         // Answered even when the move goes nowhere (first or last row, a note
         // under Right): the arrows belong to the tree, they no longer scroll it

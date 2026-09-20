@@ -4972,6 +4972,8 @@
     "tree_move": "Aller à la note ou au dossier au-dessus ou en dessous",
     "tree_open_folder": "Ouvrir un dossier, ou y entrer",
     "tree_close_folder": "Fermer un dossier, ou remonter à celui qui contient la ligne",
+    "tree_rename": "Renommer la note ou le dossier",
+    "tree_open": "Ouvrir la note, ou ouvrir et fermer le dossier",
     "tree_undo": "Annuler la dernière modification",
     "tree_redo": "Rétablir",
     "tree_copy": "Copier les notes et dossiers sélectionnés",
@@ -4983,6 +4985,7 @@
       "escape": "Échap",
       "tab": "Tab",
       "delete": "Suppr",
+      "space": "Espace",
       "click": "Clic"
     },
     "tree_select_toggle": "Ajouter une note ou un dossier à la sélection, ou l'en retirer",

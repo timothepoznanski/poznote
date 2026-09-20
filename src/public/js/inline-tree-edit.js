@@ -19,9 +19,10 @@
     var REVEAL_KEY = 'poznoteTreeReveal';
     var FLASH_MS = 1600;
 
-    // Row whose note actions menu was opened last. A note can appear twice in
-    // the tree (its folder plus the Favorites section), so a rename has to
-    // edit the row the menu was opened from, not the first id match.
+    // Row a rename of a note has to edit: a note can appear twice in the tree
+    // (its folder plus the Favorites section), so the first id match is not
+    // enough. It is the row whose note actions menu was opened last, or the row
+    // the arrow keys are on when they ask for the rename (focusNoteRow below).
     var lastNoteRow = null;
 
     // The edit in progress; starting another one cancels it first.
@@ -601,10 +602,22 @@
         }, true);
     });
 
+    /**
+     * Point the next renameNote() at a row, the way opening that row's actions
+     * menu does. The arrow keys reach a row without clicking it (issue #1443),
+     * so the row they are on has to be named before Enter asks for the rename.
+     */
+    function focusNoteRow(row) {
+        if (row && row.classList && row.classList.contains('note-list-item')) {
+            lastNoteRow = row;
+        }
+    }
+
     window.PoznoteInlineTreeEdit = {
         createFolder: createFolder,
         renameFolder: renameFolder,
-        renameNote: renameNote
+        renameNote: renameNote,
+        focusNoteRow: focusNoteRow
     };
 
     if (document.readyState === 'loading') {
