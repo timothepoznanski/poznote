@@ -372,15 +372,15 @@ class GitSync {
             ];
         }
         
-        // For Forgejo/Gitea, testing /user first can help diagnose token/user issues
+        // For Forgejo/Gitea, testing /user first can help diagnose token/user issues.
+        // A token scoped to a single repository cannot carry read:user, so a refused
+        // scope here says nothing about the repository: the probe never decides the
+        // test, and a scope complaint is dropped instead of being reported as a cause.
+        $userProbeError = null;
         if ($this->provider === 'forgejo') {
             $userResponse = $this->apiRequest('GET', "/user");
-            if (isset($userResponse['error'])) {
-                $truncatedToken = substr($this->token, 0, 4) . '...' . substr($this->token, -4);
-                return [
-                    'success' => false,
-                    'error' => "Auth failed: " . $userResponse['error'] . " (URL: " . $this->apiBase . ", Provider: " . $this->provider . ", Token starts with: " . substr($this->token, 0, 4) . ")"
-                ];
+            if (isset($userResponse['error']) && !$this->isMissingScopeError($userResponse['error'])) {
+                $userProbeError = $userResponse['error'];
             }
         }
 
@@ -410,7 +410,7 @@ class GitSync {
         if (isset($response['error'])) {
             return [
                 'success' => false,
-                'error' => $response['error']
+                'error' => $this->withUserProbeDetail($response['error'], $userProbeError)
             ];
         }
         
@@ -426,8 +426,35 @@ class GitSync {
         
         return [
             'success' => false,
-            'error' => 'Unable to access repository. Check your token and repository name.'
+            'error' => $this->withUserProbeDetail('Unable to access repository. Check your token and repository name.', $userProbeError)
         ];
+    }
+    
+    /**
+     * Tell whether a Forgejo error only refuses a token scope, which repository-scoped
+     * tokens cannot be granted and which therefore says nothing about repository access
+     * @param mixed $error Error reported by the API
+     * @return bool
+     */
+    private function isMissingScopeError($error) {
+        return is_string($error) && stripos($error, 'required scope') !== false;
+    }
+    
+    /**
+     * Append the diagnostic /user probe error to a repository error, when there is one
+     * @param string $error Error reported by the repository request
+     * @param string|null $userProbeError Error reported by the earlier /user probe
+     * @return string
+     */
+    private function withUserProbeDetail($error, $userProbeError) {
+        if ($userProbeError === null) {
+            return $error;
+        }
+        $context = "URL: " . $this->apiBase . ", Provider: " . $this->provider . ", Token starts with: " . substr($this->token, 0, 4);
+        if (trim((string)$userProbeError) === trim((string)$error)) {
+            return $error . " (" . $context . ")";
+        }
+        return $error . " | /user check: " . $userProbeError . " (" . $context . ")";
     }
     
     /**
