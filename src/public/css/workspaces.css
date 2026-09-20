@@ -167,14 +167,14 @@ body {
 }
 
 html[data-theme='dark'] .ws-drag-handle {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .ws-drag-handle:hover,
 html[data-theme='dark'] .ws-drag-handle:focus-visible {
-    background: var(--dm-surface-hover);
-    border-color: var(--dm-border);
-    color: var(--pz-accent);
+    background: var(--pz-surface-hover);
+    border-color: var(--pz-border);
+    color: var(--pz-accent-text);
 }
 
 /* Row actions: one icon per action (share, rename, tags, background, move
@@ -246,8 +246,8 @@ html[data-theme='dark'] .ws-drag-handle:focus-visible {
 
 .ws-icon-btn.ws-icon-btn-danger:hover,
 .ws-icon-btn.ws-icon-btn-danger:focus-visible {
-    color: var(--pz-danger);
-    background: rgba(220, 53, 69, 0.08);
+    color: var(--pz-danger-text);
+    background: color-mix(in srgb, var(--pz-danger) 8%, transparent);
     border-color: transparent;
 }
 
@@ -260,24 +260,24 @@ html[data-theme='dark'] .ws-drag-handle:focus-visible {
 }
 
 html[data-theme='dark'] .ws-icon-btn {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .ws-icon-btn:hover,
 html[data-theme='dark'] .ws-icon-btn:focus-visible {
-    background: var(--dm-surface-hover);
-    border-color: var(--dm-border);
-    color: var(--pz-accent);
+    background: var(--pz-surface-hover);
+    border-color: var(--pz-border);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .ws-icon-btn.is-shared {
-    color: var(--dm-warning);
+    color: var(--pz-warning-text);
 }
 
 html[data-theme='dark'] .ws-icon-btn.ws-icon-btn-danger:hover,
 html[data-theme='dark'] .ws-icon-btn.ws-icon-btn-danger:focus-visible {
-    color: var(--dm-danger);
-    background: rgba(255, 107, 107, 0.12);
+    color: var(--pz-danger-text);
+    background: color-mix(in srgb, var(--pz-danger-text) 12%, transparent);
 }
 
 .workspace-info-modal-content {
@@ -289,7 +289,7 @@ html[data-theme='dark'] .ws-icon-btn.ws-icon-btn-danger:focus-visible {
 }
 
 .workspace-info-modal-content h3 .lucide {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     vertical-align: -2px;
 }
 
@@ -348,7 +348,7 @@ a.workspace-name-link {
 
 a.workspace-name-link:hover,
 a.workspace-name-link:focus-visible {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     text-decoration: underline;
     text-underline-offset: 3px;
 }
@@ -423,7 +423,7 @@ a.workspace-name-link:focus-visible {
 }
 
 .ws-color-option.selected {
-    border-color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
 }
 
 .ws-color-swatch {
@@ -465,12 +465,8 @@ html[data-theme='dark'] .ws-color-swatch {
 }
 
 html[data-theme='dark'] .ws-tag-chip {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
     background: rgba(var(--pz-highlight-rgb), 0.08);
-}
-
-html[data-theme='dark'] .ws-tags-help {
-    color: var(--dm-text-muted);
 }
 
 .workspace-share-panel {
@@ -510,13 +506,13 @@ html[data-theme='dark'] .ws-tags-help {
 .workspace-share-link {
     display: inline-block;
     margin-top: 10px;
-    color: var(--pz-accent-hover);
+    color: var(--pz-accent-text-hover);
     font-size: 13px;
     word-break: break-all;
 }
 
 .workspace-share-link:hover {
-    color: var(--pz-accent-hover);
+    color: var(--pz-accent-text-hover);
 }
 
 .shared-edit-token-modal .shared-edit-token-modal-content {
@@ -547,7 +543,7 @@ html[data-theme='dark'] .ws-tags-help {
 
 .shared-edit-token-modal .shared-edit-token-field-label {
     font-weight: var(--pz-weight-semibold);
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
 }
 
 .shared-edit-token-modal .workspace-share-modal-url-row {
@@ -578,7 +574,7 @@ html[data-theme='dark'] .ws-tags-help {
 .shared-edit-token-modal .workspace-share-modal-url {
     display: block;
     width: 100%;
-    color: var(--pz-accent-hover);
+    color: var(--pz-accent-text-hover);
     font-size: 14px;
     line-height: normal;
     overflow: hidden;
@@ -593,7 +589,7 @@ html[data-theme='dark'] .ws-tags-help {
 .shared-edit-token-modal .workspace-share-modal-copy-btn {
     background: var(--pz-surface-hover);
     border: 1px solid var(--pz-border-strong);
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
     flex-shrink: 0;
     align-self: center;
     width: 40px;
@@ -608,11 +604,11 @@ html[data-theme='dark'] .ws-tags-help {
 }
 
 .shared-edit-token-modal .workspace-share-modal-url.is-preview {
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
 }
 
 .shared-edit-token-modal a.workspace-share-modal-url:hover {
-    color: var(--pz-accent-hover);
+    color: var(--pz-accent-text-hover);
     text-decoration: underline;
 }
 
@@ -651,7 +647,7 @@ html[data-theme='dark'] .ws-tags-help {
     align-self: stretch;
     background: var(--pz-surface-hover);
     border: 1px solid var(--pz-border-strong);
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
     border-radius: var(--pz-radius);
 }
 
@@ -692,7 +688,7 @@ html[data-theme='dark'] .ws-tags-help {
 }
 
 .shared-edit-token-modal .indexable-label-text {
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
 }
 
 .shared-edit-token-modal .share-user-list-container {
@@ -719,7 +715,7 @@ html[data-theme='dark'] .ws-tags-help {
     align-items: center;
     gap: 8px;
     padding: 9px 10px;
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
 }
 
 .shared-edit-token-modal .share-user-list-row + .share-user-list-row {
@@ -744,23 +740,23 @@ html[data-theme='dark'] .ws-tags-help {
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-modal-content {
-    background: linear-gradient(180deg, var(--dm-surface) 0%, var(--dm-content-bg) 100%);
-    color: var(--dm-text-bright);
+    background: linear-gradient(180deg, var(--pz-surface) 0%, var(--pz-bg) 100%);
+    color: var(--pz-text-strong);
     border: 1px solid rgba(var(--pz-highlight-rgb), 0.08);
     box-shadow: 0 28px 64px rgba(var(--pz-shadow-rgb), 0.48);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-modal-content h3 {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-modal-content p {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-field-label,
 html[data-theme='dark'] .shared-edit-token-modal .indexable-label-text {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-url-row {
@@ -769,44 +765,44 @@ html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-url-row 
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-url {
-    color: var(--dm-accent-hover);
+    color: var(--pz-accent-text-hover);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-url.is-preview {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal a.workspace-share-modal-url:hover {
-    color: var(--dm-accent-hover);
+    color: var(--pz-accent-text-hover);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .modal-password-input {
-    background: var(--dm-surface-hover);
-    border-color: var(--dm-neutral);
-    color: var(--dm-text-bright);
+    background: var(--pz-surface-hover);
+    border-color: var(--pz-surface-strong);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .modal-password-input::placeholder {
-    color: var(--dm-text);
+    color: var(--pz-text);
     opacity: 1;
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .modal-password-input:focus {
     outline: none;
-    border-color: var(--dm-accent-hover);
-    box-shadow: 0 0 0 2px rgba(102, 179, 255, 0.18);
+    border-color: var(--pz-accent-text-hover);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--pz-accent-text-hover) 18%, transparent);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-password-toggle,
 html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-copy-btn {
-    background: var(--dm-surface-raised);
-    border-color: var(--dm-neutral);
-    color: var(--dm-text-bright);
+    background: var(--pz-surface-sunken);
+    border-color: var(--pz-surface-strong);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .shared-edit-token-password-toggle:hover,
 html[data-theme='dark'] .shared-edit-token-modal .workspace-share-modal-copy-btn:hover {
-    background: var(--dm-neutral);
+    background: var(--pz-surface-strong);
     color: var(--pz-text-inverse);
 }
 
@@ -817,14 +813,14 @@ html[data-theme='dark'] .shared-edit-token-modal .share-restrict-users-wrap {
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .share-user-list-container {
-    background: var(--dm-surface);
+    background: var(--pz-surface);
     border-color: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .share-user-list-row,
 html[data-theme='dark'] .shared-edit-token-modal .share-user-list-name,
 html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .share-user-list-row + .share-user-list-row {
@@ -832,7 +828,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-row + .share-u
 }
 
 html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-error {
-    color: var(--dm-danger);
+    color: var(--pz-danger-text);
 }
 
 /* Boutons d'action */
@@ -922,21 +918,21 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
 
 .action-btn:hover {
     background-color: var(--pz-surface);
-    border-color: #adb5bd;
+    border-color: var(--pz-text-subtle);
 }
 
 .btn-rename {
-    background-color: var(--pz-warning);
+    background-color: var(--pz-warning-text);
     color: var(--pz-text-inverse);
-    border-color: var(--pz-warning);
+    border-color: var(--pz-warning-text);
     display: inline-flex;
     align-items: center;
     justify-content: center;
 }
 
 .btn-rename:hover {
-    background-color: var(--pz-warning-hover);
-    border-color: var(--pz-warning-hover);
+    background-color: var(--pz-warning-text-hover);
+    border-color: var(--pz-warning-text-hover);
 }
 
 .btn-background {
@@ -977,7 +973,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
 
 .btn-icon:hover {
     background: var(--pz-surface);
-    border-color: #bbb;
+    border-color: var(--pz-text-subtle);
 }
 
 .btn-icon svg {
@@ -986,13 +982,13 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
 }
 
 .btn-download:hover {
-    color: var(--pz-success);
-    border-color: var(--pz-success);
+    color: var(--pz-success-text);
+    border-color: var(--pz-success-text);
 }
 
 .btn-delete:hover {
-    color: var(--pz-danger);
-    border-color: var(--pz-danger);
+    color: var(--pz-danger-text);
+    border-color: var(--pz-danger-text);
 }
 
 .workspace-list .action-btn:active { transform: translateY(1px); }
@@ -1117,7 +1113,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
     .workspace-list .ws-col-actions.is-open .ws-actions-toggle {
         background: var(--pz-surface-hover);
         border-color: var(--pz-border);
-        color: var(--pz-accent);
+        color: var(--pz-accent-text);
     }
 
     /* The overflow menu: absolute inside .ws-col-actions, so it hangs under the
@@ -1180,7 +1176,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
     .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger .lucide,
     .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger:hover,
     .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger:focus-visible {
-        color: var(--pz-danger);
+        color: var(--pz-danger-text);
     }
 
     .workspace-list .ws-actions-menu .ws-icon-btn-text {
@@ -1188,32 +1184,32 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
     }
 
     html[data-theme='dark'] .workspace-list .ws-actions-menu {
-        background: var(--dm-bg);
-        border-color: var(--dm-border);
+        background: var(--pz-chrome-bg);
+        border-color: var(--pz-border);
     }
 
     html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn {
-        color: var(--dm-text);
+        color: var(--pz-text);
     }
 
     html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn .lucide {
-        color: var(--dm-text-muted);
+        color: var(--pz-text-muted);
     }
 
     html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn:hover,
     html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn:focus-visible {
-        color: var(--dm-text);
+        color: var(--pz-text);
     }
 
     html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn.is-shared .lucide {
-        color: var(--dm-warning);
+        color: var(--pz-warning-text);
     }
 
     html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger,
     html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger .lucide,
     html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger:hover,
     html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger:focus-visible {
-        color: var(--dm-danger);
+        color: var(--pz-danger-text);
     }
     
     .workspace-list .btn {
@@ -1313,7 +1309,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
 
 .btn-icon:hover {
     background: var(--pz-surface);
-    border-color: #bbb;
+    border-color: var(--pz-text-subtle);
 }
 
 .btn-icon svg {
@@ -1322,13 +1318,13 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
 }
 
 .btn-download:hover {
-    color: var(--pz-success);
-    border-color: var(--pz-success);
+    color: var(--pz-success-text);
+    border-color: var(--pz-success-text);
 }
 
 .btn-delete:hover {
-    color: var(--pz-danger);
-    border-color: var(--pz-danger);
+    color: var(--pz-danger-text);
+    border-color: var(--pz-danger-text);
 }
 
 .workspace-list ul li {
@@ -1364,7 +1360,7 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
 /* Default workspace status message */
 .default-workspace-status {
     margin-top: 8px;
-    color: var(--pz-success);
+    color: var(--pz-success-text);
     display: none;
 }
 

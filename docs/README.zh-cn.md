@@ -768,11 +768,11 @@ Poznote 允许您隐藏不使用的元素，让界面更加简洁。
     --pz-accent-rgb: 214, 51, 108;   /* same colour, channels only, used for tints */
 }
 html[data-theme='dark'] {
-    --dm-accent: #f783ac;            /* lighter, because it sits on a dark ground */
+    --pz-accent-text: #f783ac;       /* lighter, because it sits on a dark ground */
 }
 ```
 
-之所以用两个令牌而不是一个，是因为*填充色*和*文字色*不能是同一种颜色：`--pz-accent` 用于填充按钮，`--dm-accent` 则是深色模式下作为文字的强调色。
+之所以用两个令牌而不是一个，是因为*填充色*和*文字色*不能是同一种颜色：`--pz-accent` 用于填充按钮，`--pz-accent-text` 则是用于文字、图标和描边的强调色。在浅色主题中它会自动跟随 `--pz-accent`；深色背景则需要更亮的值。每个令牌在所有主题中都使用同一个 `--pz-*` 名称，变化的只是它的值。旧样式表中的 `--dm-*` 名称仍然有效。
 
 **为笔记工具栏图标重新着色**
 
@@ -803,8 +803,6 @@ html[data-theme='dark'] {
 **编写完整主题**
 
 在 `:root` 上覆盖浅色令牌，在 `:root[data-theme='dark']` 上覆盖深色令牌，仅此而已。`src/public/css/README.md` 记录了每个令牌并给出了完整示例；`src/public/css/tokens.css` 中内置的薰衣草、棕褐和终端主题也是同样的东西，写法完全一样。
-
-主题目前还有一处无法覆盖：少数由页面规则显式着色的图标，在深色模式下会显示为通用的图标灰色。
 
 </details>
 

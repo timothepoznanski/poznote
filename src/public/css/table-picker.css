@@ -68,7 +68,7 @@
 
 .table-picker-insert-btn {
     padding: 6px 14px;
-    background: var(--pz-accent);
+    background: var(--pz-accent-text);
     color: var(--pz-text-inverse);
     border: none;
     border-radius: var(--pz-radius-sm);
@@ -109,7 +109,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
     transition: background 0.15s;
 }
 
@@ -118,7 +118,7 @@
 }
 
 .table-context-menu-item.danger {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 .table-context-menu-item.danger:hover {
@@ -151,17 +151,17 @@ html[data-theme='dark'] .noteentry table th.pz-cell-selected {
 
 /* Dark mode */
 html[data-theme='dark'] .table-context-menu {
-    background: var(--dm-content-bg);
-    border-color: var(--dm-border);
+    background: var(--pz-bg);
+    border-color: var(--pz-border);
     box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.4);
 }
 
 html[data-theme='dark'] .table-context-menu-item {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .table-context-menu-item.danger {
-    color: var(--dm-danger);
+    color: var(--pz-danger-text);
 }
 
 html[data-theme='dark'] .table-context-menu-item.danger:hover {
@@ -169,5 +169,5 @@ html[data-theme='dark'] .table-context-menu-item.danger:hover {
 }
 
 html[data-theme='dark'] .table-context-menu-separator {
-    background: var(--dm-surface-hover);
+    background: var(--pz-surface-hover);
 }

@@ -88,9 +88,9 @@
 
 /* Dark mode - search */
 html[data-theme='dark'] .home-search-input {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
-    color: var(--dm-text);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .home-search-input:focus {
@@ -99,6 +99,6 @@ html[data-theme='dark'] .home-search-input:focus {
 }
 
 html[data-theme='dark'] .home-search-clear:hover {
-    color: var(--dm-text);
+    color: var(--pz-text);
     background: rgba(var(--pz-highlight-rgb), 0.08);
 }

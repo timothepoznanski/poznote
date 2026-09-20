@@ -44,7 +44,7 @@
 .diary-month-title {
     font-size: 15px;
     font-weight: var(--pz-weight-bold);
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
     margin: 0 0 2px;
     padding-bottom: 6px;
     border-bottom: 1.5px solid var(--pz-border);
@@ -105,12 +105,12 @@
     border-radius: var(--pz-radius-pill);
     font-size: 13px;
     font-weight: var(--pz-weight-semibold);
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
     white-space: nowrap;
 }
 
 .diary-switch-btn:hover {
-    border-color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
 }
 
 .diary-switch-link {
@@ -123,7 +123,7 @@
 }
 
 .diary-switch-btn:not(.diary-switch-active) .diary-switch-link:hover {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .diary-switch-delete {
@@ -170,8 +170,8 @@
 }
 
 .diary-switch-btn.diary-switch-active {
-    background: var(--pz-accent);
-    border-color: var(--pz-accent);
+    background: var(--pz-accent-text);
+    border-color: var(--pz-accent-text);
     color: var(--pz-text-inverse);
 }
 
@@ -192,13 +192,13 @@
 
 .diary-new-modal .diary-new-input:focus {
     outline: none;
-    border-color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
 }
 
 .diary-new-modal .diary-new-error {
     margin: 8px 0 0;
     font-size: 13px;
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 /* Desktop renames and deletes a diary from the pill's right-click menu, so
@@ -237,7 +237,7 @@
     border: none;
     background: none;
     font-size: 14px;
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
     text-align: left;
     cursor: pointer;
 }
@@ -259,22 +259,22 @@
 }
 
 html[data-theme='dark'] .diary-context-menu {
-    border-color: var(--dm-border);
+    border-color: var(--pz-border);
     box-shadow: 0 4px 16px rgba(var(--pz-shadow-rgb), 0.4);
 }
 
 html[data-theme='dark'] .diary-context-menu-item {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .diary-context-menu-item:hover,
 html[data-theme='dark'] .diary-context-menu-item:focus-visible {
-    background: var(--dm-surface-hover);
+    background: var(--pz-surface-hover);
 }
 
 html[data-theme='dark'] .diary-context-menu-item.danger,
 html[data-theme='dark'] .diary-context-menu-item.danger [class*="lucide-"] {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 /* The diary's destructive confirmations (move an entry to the trash, delete
@@ -300,16 +300,16 @@ html[data-theme='dark'] .alert-modal-button.secondary.diary-confirm-cancel:hover
 
 /* Highlight today's card in the grid */
 .diary-card-today {
-    border-color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
 }
 
 .diary-today-tag {
-    background: var(--pz-accent);
+    background: var(--pz-accent-text);
     color: var(--pz-text-inverse);
 }
 
 .diary-empty .lucide {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 /* ---------- Journal view ----------
@@ -317,8 +317,8 @@ html[data-theme='dark'] .alert-modal-button.secondary.diary-confirm-cancel:hover
    board's size/layout controls act on cards only, so they step aside. */
 
 .diary-journal-toggle.active {
-    border-color: var(--pz-accent);
-    color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
+    color: var(--pz-accent-text);
     background: var(--pz-surface-hover);
 }
 
@@ -410,7 +410,7 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
     margin: 0;
     font-size: 19px;
     font-weight: var(--pz-weight-bold);
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -427,7 +427,7 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
 }
 
 .diary-journal-title a:hover {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .diary-journal-icon {
@@ -457,7 +457,7 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
 
 /* An error can be a sentence: it gets its own row under the title */
 .diary-journal-save-status.is-error {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
     order: 1;
     flex-basis: 100%;
     white-space: normal;
@@ -485,14 +485,14 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
 
 .diary-journal-edit:hover,
 .diary-journal-edit:focus-visible {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     background: var(--pz-surface-hover);
 }
 
 /* The pencil shows a check while its entry is being edited */
 .diary-journal-entry.is-editing .diary-journal-edit,
 .diary-journal-entry.is-editing .diary-journal-edit [class*="lucide-"] {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .diary-journal-tags {
@@ -553,7 +553,7 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
 }
 
 .diary-journal-body a {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     text-decoration: none;
 }
 
@@ -588,7 +588,7 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
 }
 
 .diary-journal-body .diary-journal-tasks li.important span {
-    color: var(--pz-danger-hover);
+    color: var(--pz-danger-text-hover);
     font-weight: var(--pz-weight-semibold);
 }
 
@@ -734,7 +734,7 @@ body.markdown-colored .diary-journal-markdown hr {
 
 .diary-journal-error {
     margin-top: 8px;
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 /* ---------- Journal inline editing ----------
@@ -752,7 +752,7 @@ body.markdown-colored .diary-journal-markdown hr {
     border: 1px solid var(--pz-accent);
     border-radius: var(--pz-radius);
     background: var(--pz-surface);
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
     font: inherit;
     line-height: inherit;
     outline: none;
@@ -784,54 +784,54 @@ body.markdown-colored .diary-journal-markdown hr {
 
 /* Dark mode */
 html[data-theme='dark'] .diary-month-title {
-    color: var(--dm-text-bright);
-    border-bottom-color: var(--dm-border);
+    color: var(--pz-text-strong);
+    border-bottom-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .diary-card-today {
-    border-color: var(--dm-accent);
+    border-color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .diary-today-tag {
-    background: var(--dm-accent);
-    color: var(--dm-text-bright);
+    background: var(--pz-accent-text);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .diary-switch-btn {
-    border-color: var(--dm-border);
-    color: var(--dm-text-bright);
+    border-color: var(--pz-border);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .diary-switch-btn:hover {
-    border-color: var(--dm-accent);
+    border-color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .diary-switch-btn:not(.diary-switch-active) .diary-switch-link:hover {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .diary-switch-delete,
 html[data-theme='dark'] .diary-switch-delete [class*="lucide-"] {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .diary-switch-delete:hover,
 html[data-theme='dark'] .diary-switch-delete:focus-visible {
-    background: var(--dm-surface-hover);
-    color: var(--pz-danger);
+    background: var(--pz-surface-hover);
+    color: var(--pz-danger-text);
 }
 
 /* Not the background: a lucide icon is a mask painted with it */
 html[data-theme='dark'] .diary-switch-delete:hover [class*="lucide-"],
 html[data-theme='dark'] .diary-switch-delete:focus-visible [class*="lucide-"] {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
     transform: none;
 }
 
 html[data-theme='dark'] .diary-switch-active .diary-switch-delete,
 html[data-theme='dark'] .diary-switch-active .diary-switch-delete [class*="lucide-"],
 html[data-theme='dark'] .diary-switch-active .diary-switch-delete:hover [class*="lucide-"] {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .diary-switch-active .diary-switch-delete:hover {
@@ -839,53 +839,53 @@ html[data-theme='dark'] .diary-switch-active .diary-switch-delete:hover {
 }
 
 html[data-theme='dark'] .diary-switch-btn.diary-switch-active {
-    background: var(--dm-accent);
-    border-color: var(--dm-accent);
-    color: var(--dm-text-bright);
+    background: var(--pz-accent-text);
+    border-color: var(--pz-accent-text);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .diary-new-modal .diary-new-input {
-    border-color: var(--dm-border);
-    color: var(--dm-text-bright);
+    border-color: var(--pz-border);
+    color: var(--pz-text-strong);
 }
 
 /* Journal view, dark: the dark board button and icon painters outweigh the
    light rules above, and titles use the bright text like the month titles. */
 .diary-journal-toggle.active [class*="lucide-"] {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .diary-journal-toggle.active {
-    border-color: var(--dm-accent);
-    color: var(--dm-accent);
-    background: var(--dm-surface-hover);
+    border-color: var(--pz-accent-text);
+    color: var(--pz-accent-text);
+    background: var(--pz-surface-hover);
 }
 
 html[data-theme='dark'] .diary-journal-toggle.active [class*="lucide-"] {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .diary-journal-entry {
-    border-color: var(--dm-border);
-    background: var(--dm-surface);
+    border-color: var(--pz-border);
+    background: var(--pz-surface);
 }
 
 html[data-theme='dark'] .diary-journal-title {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .diary-journal-edit:hover [class*="lucide-"],
 html[data-theme='dark'] .diary-journal-edit:focus-visible [class*="lucide-"],
 html[data-theme='dark'] .diary-journal-entry.is-editing .diary-journal-edit [class*="lucide-"] {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .diary-journal-editor {
-    border-color: var(--dm-accent);
-    background: var(--dm-surface);
-    color: var(--dm-text-bright);
+    border-color: var(--pz-accent-text);
+    background: var(--pz-surface);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .diary-journal-editor-richtext:empty::before {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
 }

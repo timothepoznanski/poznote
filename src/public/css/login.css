@@ -128,7 +128,7 @@ input[type="password"] {
 input[type="text"]:focus,
 input[type="password"]:focus {
     outline: none;
-    border-color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
     box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.12);
 }
 
@@ -200,7 +200,7 @@ input[type="password"]::placeholder {
     font-size: 0.875rem;
     font-weight: var(--pz-weight-medium);
     /* Same fill as body, so the label reads as a gap in the rule, not a chip. */
-    background: var(--pz-surface);
+    background: var(--pz-chrome-bg);
     padding: 0 0.75rem;
     position: relative;
 }
@@ -253,7 +253,7 @@ input[type="password"]::placeholder {
 }
 
 .login-button:hover {
-    background: var(--pz-accent-strong);
+    background: var(--pz-accent-hover);
 }
 
 .login-button:active {
@@ -306,7 +306,7 @@ input[type="password"]::placeholder {
 
 .account-option:hover,
 .account-option:focus {
-    border-color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
     background: var(--pz-surface);
     outline: none;
 }
@@ -346,7 +346,7 @@ input[type="password"]::placeholder {
 }
 
 .error {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
     margin-top: 0.5rem;
     font-size: 0.875rem;
     font-weight: var(--pz-weight-medium);
@@ -392,7 +392,7 @@ input[type="password"]::placeholder {
 }
 
 .info a {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     text-decoration: none;
 }
 
@@ -415,7 +415,7 @@ input[type="password"]::placeholder {
 }
 
 .github-link a {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     text-decoration: none;
     font-weight: var(--pz-weight-medium);
     display: inline-flex;
@@ -438,43 +438,43 @@ input[type="password"]::placeholder {
    ============================================ */
 
 :where(html[data-theme='dark']) body {
-    background-color: var(--dm-bg);
-    color: var(--dm-text);
+    background-color: var(--pz-chrome-bg);
+    color: var(--pz-text);
 }
 
 :where(html[data-theme='dark']) label,
 html[data-theme='dark'] .remember-me-label {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 :where(html[data-theme='dark']) input[type="text"],
 :where(html[data-theme='dark']) input[type="password"] {
-    background-color: var(--dm-surface);
-    border-color: var(--dm-border);
+    background-color: var(--pz-surface);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .password-toggle:hover {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] input[type="text"]:focus,
 html[data-theme='dark'] input[type="password"]:focus {
-    border-color: var(--dm-accent);
-    box-shadow: 0 0 0 3px rgba(var(--dm-accent-rgb), 0.18);
+    border-color: var(--pz-accent-text);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-text-rgb), 0.18);
 }
 
 html[data-theme='dark'] .github-link a {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .github-link a:hover {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .admin-warning {
     background: rgba(197, 48, 48, 0.1);
-    border-color: var(--dm-danger-hover);
-    color: var(--dm-danger);
+    border-color: var(--pz-danger-text-hover);
+    color: var(--pz-danger-text);
 }
 
 html[data-theme='dark'] .admin-warning code {
@@ -483,32 +483,32 @@ html[data-theme='dark'] .admin-warning code {
 }
 
 html[data-theme='dark'] .account-select-logout:hover {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .account-option {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .account-option:hover,
 html[data-theme='dark'] .account-option:focus {
-    background: var(--dm-surface-hover);
-    border-color: var(--dm-accent);
+    background: var(--pz-surface-hover);
+    border-color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .account-option-badge {
-    background: rgba(var(--dm-accent-rgb), 0.16);
-    color: var(--dm-accent-hover);
+    background: rgba(var(--pz-accent-text-rgb), 0.16);
+    color: var(--pz-accent-text-hover);
 }
 
 html[data-theme='dark'] .oidc-divider::before,
 html[data-theme='dark'] .oidc-divider::after {
-    background: var(--dm-border-light);
+    background: var(--pz-border-strong);
 }
 
 html[data-theme='dark'] .oidc-divider span {
-    background: var(--dm-bg);
+    background: var(--pz-chrome-bg);
 }
 
 /* The base rule fills the button with --pz-text and labels it --pz-text-inverse.
@@ -516,20 +516,20 @@ html[data-theme='dark'] .oidc-divider span {
    accent button. A raised surface keeps the SSO button one visual step below
    the primary action and stays in the theme's own palette. */
 html[data-theme='dark'] .oidc-button {
-    background: var(--dm-surface-raised);
-    color: var(--dm-text-bright);
-    border-color: var(--dm-border-light);
+    background: var(--pz-surface-sunken);
+    color: var(--pz-text-strong);
+    border-color: var(--pz-border-strong);
 }
 
 html[data-theme='dark'] .oidc-button:hover {
-    background: color-mix(in srgb, var(--dm-surface-raised) 85%, var(--dm-text-bright));
-    border-color: var(--dm-text-subtle);
+    background: color-mix(in srgb, var(--pz-surface-sunken) 85%, var(--pz-text-strong));
+    border-color: var(--pz-text-subtle);
 }
 
 html[data-theme='dark'] .oidc-other-account-button {
     background: transparent;
-    color: var(--dm-text-bright);
-    border-color: var(--dm-border-light);
+    color: var(--pz-text-strong);
+    border-color: var(--pz-border-strong);
 }
 
 html[data-theme='dark'] .oidc-other-account-button:hover {

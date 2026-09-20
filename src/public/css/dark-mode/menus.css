@@ -7,8 +7,8 @@
    ============================================ */
 
 html[data-theme='dark'] .slash-command-menu {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .slash-command-item:hover,
@@ -27,38 +27,38 @@ html[data-theme='dark'] .slash-command-item.slash-command-disabled.selected {
 }
 
 html[data-theme='dark'] .slash-command-separator {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .slash-command-separator::after {
-    background: var(--dm-border);
+    background: var(--pz-border);
 }
 
 html[data-theme='dark'] .slash-command-hint {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .slash-command-item .slash-command-label,
 html[data-theme='dark'] .slash-command-label {
-    color: var(--dm-text-bright) !important;
+    color: var(--pz-text-strong) !important;
 }
 
 html[data-theme='dark'] .slash-command-item[data-command-id='cancel'] .slash-command-label {
-    color: var(--dm-danger) !important;
+    color: var(--pz-danger-text) !important;
 }
 
 html[data-theme='dark'] .slash-command-icon:not([style*="color"]) {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .slash-date-picker {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .slash-date-picker-title,
 html[data-theme='dark'] .slash-date-picker-day {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .slash-date-picker-nav:hover,
@@ -68,17 +68,17 @@ html[data-theme='dark'] .slash-date-picker-day:hover {
 
 html[data-theme='dark'] .slash-date-picker-day.today {
     background: rgba(59, 130, 246, 0.25);
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .slash-date-picker-day.selected,
 html[data-theme='dark'] .slash-date-picker-day.selected:hover {
-    background: var(--dm-accent);
+    background: var(--pz-accent-text);
     color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .slash-date-picker-today-btn {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .slash-date-picker-today-btn:hover {
@@ -86,39 +86,39 @@ html[data-theme='dark'] .slash-date-picker-today-btn:hover {
 }
 
 html[data-theme='dark'] .slash-date-picker-remove-btn {
-    background: var(--dm-content-bg);
-    border-color: var(--dm-danger-hover);
-    color: var(--dm-danger);
+    background: var(--pz-bg);
+    border-color: var(--pz-danger-text-hover);
+    color: var(--pz-danger-text);
 }
 
 html[data-theme='dark'] .slash-date-picker-remove-btn:hover {
-    background: var(--dm-danger-soft);
-    border-color: var(--dm-danger-hover);
+    background: var(--pz-danger-soft);
+    border-color: var(--pz-danger-text-hover);
 }
 
 html[data-theme='dark'] .slash-date-picker-remove-time-btn {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
-    color: var(--dm-text-muted);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .slash-date-picker-remove-time-btn:hover {
-    border-color: var(--dm-accent);
-    color: var(--dm-accent);
+    border-color: var(--pz-accent-text);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .slash-date-picker-time-btn {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
-    color: var(--dm-text);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .slash-date-picker-time-btn i {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .slash-time-cell {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .slash-time-cell:hover {
@@ -127,21 +127,21 @@ html[data-theme='dark'] .slash-time-cell:hover {
 
 html[data-theme='dark'] .slash-time-cell.selected,
 html[data-theme='dark'] .slash-time-cell.selected:hover {
-    background: var(--dm-accent);
+    background: var(--pz-accent-text);
     color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .slash-date-picker-actions-row {
-    border-top-color: var(--dm-border);
+    border-top-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .slash-date-picker-apply-btn {
-    background: var(--dm-accent);
+    background: var(--pz-accent-text);
     color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .slash-date-picker-apply-btn:hover {
-    background: var(--dm-accent);
+    background: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .slash-command-back {
@@ -157,55 +157,55 @@ html[data-theme='dark'] .slash-command-back:hover {
    ============================================ */
 
 html[data-theme='dark'] .image-menu {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .image-menu-item {
-    color: var(--dm-text);
-    border-bottom-color: var(--dm-border);
+    color: var(--pz-text);
+    border-bottom-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .image-menu-item:hover {
     background-color: rgba(var(--pz-highlight-rgb), 0.08);
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .image-menu-item i {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .image-submenu {
-    background: var(--dm-content-bg);
-    border-color: var(--dm-border);
+    background: var(--pz-bg);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .image-submenu-item {
-    color: var(--dm-text);
-    border-bottom-color: var(--dm-border);
+    color: var(--pz-text);
+    border-bottom-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .image-submenu-item:hover {
-    background-color: var(--dm-surface);
-    color: var(--dm-accent-hover);
+    background-color: var(--pz-surface);
+    color: var(--pz-accent-text-hover);
 }
 
 html[data-theme='dark'] .image-menu-item[data-action='delete-image'] i {
-    color: var(--dm-danger-hover);
+    color: var(--pz-danger-text-hover);
 }
 
 html[data-theme='dark'] .image-menu-item.image-menu-item-danger,
 html[data-theme='dark'] .image-menu-item.image-menu-item-danger i {
-    color: var(--dm-danger-hover);
+    color: var(--pz-danger-text-hover);
 }
 
 html[data-theme='dark'] img.img-with-border {
-    border-color: var(--dm-border);
-    background: var(--dm-content-bg);
+    border-color: var(--pz-border);
+    background: var(--pz-bg);
 }
 
 html[data-theme='dark'] img.img-with-border-no-padding {
-    border-color: var(--dm-border);
+    border-color: var(--pz-border);
 }
 
 /* An Excalidraw preview whose file carries no theme is inverted here
@@ -221,27 +221,27 @@ html[data-theme='dark'] img.excalidraw-image-neutral.img-with-border {
    ============================================ */
 
 html[data-theme='dark'] .workspace-menu {
-    background-color: var(--dm-surface);
-    border-color: var(--dm-border);
+    background-color: var(--pz-surface);
+    border-color: var(--pz-border);
     box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.5);
 }
 
 html[data-theme='dark'] .workspace-menu-item {
-    color: var(--dm-text);
-    border-bottom-color: var(--dm-border);
+    color: var(--pz-text);
+    border-bottom-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .workspace-menu-item:hover {
-    background-color: var(--dm-surface-hover);
+    background-color: var(--pz-surface-hover);
 }
 
 html[data-theme='dark'] .workspace-menu-item.current-workspace {
     background-color: transparent;
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .workspace-menu-item i {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .workspace-menu-item .workspace-menu-dot {
@@ -249,15 +249,15 @@ html[data-theme='dark'] .workspace-menu-item .workspace-menu-dot {
 }
 
 html[data-theme='dark'] .workspace-menu-item:hover i {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .workspace-menu-item.current-workspace i {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .workspace-menu-divider {
-    background-color: var(--dm-border);
+    background-color: var(--pz-border);
 }
 
 /* ============================================
@@ -267,7 +267,7 @@ html[data-theme='dark'] .workspace-menu-divider {
 html[data-theme='dark'] .folder-actions-toggle,
 html[data-theme='dark'] .note-actions-toggle,
 html[data-theme='dark'] .note-actions-item {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .folder-actions-toggle:hover,
@@ -275,7 +275,7 @@ html[data-theme='dark'] .note-actions-toggle:hover,
 html[data-theme='dark'] .note-actions-toggle.open,
 html[data-theme='dark'] .note-actions-item:hover {
     background: rgba(var(--pz-highlight-rgb), 0.12);
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .folder-actions-toggle:hover i,
@@ -284,46 +284,46 @@ html[data-theme='dark'] .note-actions-toggle:hover i,
 html[data-theme='dark'] .note-actions-toggle:hover [class*="lucide-"],
 html[data-theme='dark'] .note-actions-item:hover i,
 html[data-theme='dark'] .note-actions-item:hover [class*="lucide-"] {
-    color: var(--dm-accent-hover);
+    color: var(--pz-accent-text-hover);
 }
 
 /* Group separators of both menus (light rule in css/folders/actions-menu.css):
    the light grey would read as a hard line on the dark surface. */
 html[data-theme='dark'] .folder-actions-menu-separator,
 html[data-theme='dark'] .note-actions-menu-separator {
-    background: var(--dm-border);
+    background: var(--pz-border);
 }
 
 html[data-theme='dark'] .folder-actions-menu,
 html[data-theme='dark'] .note-actions-menu {
-    background: var(--dm-surface);
-    border: 1px solid var(--dm-border);
+    background: var(--pz-surface);
+    border: 1px solid var(--pz-border);
     box-shadow: 0 8px 24px rgba(var(--pz-shadow-rgb), 0.35);
 }
 
 html[data-theme='dark'] .folder-actions-menu-item,
 html[data-theme='dark'] .note-actions-menu-item {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .folder-actions-menu-item:hover,
 html[data-theme='dark'] .note-actions-menu-item:hover {
-    background-color: var(--dm-surface-hover);
+    background-color: var(--pz-surface-hover);
 }
 
 html[data-theme='dark'] .folder-actions-menu-item i,
 html[data-theme='dark'] .note-actions-menu-item i {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .folder-actions-menu-item:hover i,
 html[data-theme='dark'] .note-actions-menu-item:hover i {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .folder-actions-menu-item.danger,
 html[data-theme='dark'] .note-actions-menu-item.danger {
-    color: var(--dm-danger);
+    color: var(--pz-danger-text);
 }
 
 html[data-theme='dark'] .folder-actions-menu-item.danger:hover,
@@ -333,12 +333,12 @@ html[data-theme='dark'] .note-actions-menu-item.danger:hover {
 
 html[data-theme='dark'] .folder-actions-menu-item.danger i,
 html[data-theme='dark'] .note-actions-menu-item.danger i {
-    color: var(--dm-danger);
+    color: var(--pz-danger-text);
 }
 
 html[data-theme='dark'] .folder-actions-menu-item.shared,
 html[data-theme='dark'] .note-actions-menu-item.shared {
-    color: var(--dm-danger);
+    color: var(--pz-danger-text);
 }
 
 html[data-theme='dark'] .folder-actions-menu-item.shared:hover,
@@ -348,12 +348,12 @@ html[data-theme='dark'] .note-actions-menu-item.shared:hover {
 
 html[data-theme='dark'] .folder-actions-menu-item.shared i,
 html[data-theme='dark'] .note-actions-menu-item.shared i {
-    color: var(--dm-danger);
+    color: var(--pz-danger-text);
 }
 
 html[data-theme='dark'] .folder-actions-menu-separator,
 html[data-theme='dark'] .note-actions-menu-separator {
-    background: var(--dm-border);
+    background: var(--pz-border);
 }
 
 /* ============================================
@@ -361,50 +361,46 @@ html[data-theme='dark'] .note-actions-menu-separator {
    ============================================ */
 
 html[data-theme='dark'] .export-option {
-    border-color: var(--dm-border);
+    border-color: var(--pz-border);
     background-color: transparent;
 }
 
 html[data-theme='dark'] .export-option:hover {
-    background-color: var(--dm-surface);
+    background-color: var(--pz-surface);
     border-color: var(--pz-accent);
 }
 
-html[data-theme='dark'] .export-option span {
-    color: var(--dm-text);
-}
-
 html[data-theme='dark'] .export-option p {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .export-option i {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 /* Mobile toolbar dropdown menu */
 html[data-theme='dark'] .note-edit-toolbar .mobile-toolbar-menu {
-    background: var(--dm-content-bg);
-    border: 1px solid var(--dm-border);
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border);
     box-shadow: 0 8px 24px rgba(var(--pz-shadow-rgb), 0.35);
 }
 
 html[data-theme='dark'] .note-edit-toolbar .dropdown-menu {
-    background-color: var(--dm-content-bg);
-    border-color: var(--dm-border);
+    background-color: var(--pz-bg);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .note-edit-toolbar .mobile-toolbar-item {
-    color: var(--dm-text);
-    border-bottom: 1px solid var(--dm-border);
+    color: var(--pz-text);
+    border-bottom: 1px solid var(--pz-border);
 }
 
 html[data-theme='dark'] .note-edit-toolbar .mobile-toolbar-item:hover {
-    background-color: var(--dm-surface);
+    background-color: var(--pz-surface);
 }
 
 html[data-theme='dark'] .note-edit-toolbar .mobile-toolbar-item i {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 /* ============================================
@@ -412,25 +408,25 @@ html[data-theme='dark'] .note-edit-toolbar .mobile-toolbar-item i {
    ============================================ */
 
 html[data-theme='dark'] .dropdown-menu {
-    background-color: var(--dm-bg);
-    border-color: var(--dm-border);
+    background-color: var(--pz-chrome-bg);
+    border-color: var(--pz-border);
     box-shadow: 0 4px 16px rgba(var(--pz-shadow-rgb), 0.5);
 }
 
 html[data-theme='dark'] .dropdown-item {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .dropdown-item:hover {
-    background-color: var(--dm-surface);
+    background-color: var(--pz-surface);
 }
 
 html[data-theme='dark'] .dropdown-item i {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .dropdown-item:hover i {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 /* ============================================
@@ -438,8 +434,8 @@ html[data-theme='dark'] .dropdown-item:hover i {
    ============================================ */
 
 html[data-theme='dark'] .emoji-autocomplete-menu {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .emoji-autocomplete-item:hover,
@@ -448,39 +444,35 @@ html[data-theme='dark'] .emoji-autocomplete-item.selected {
 }
 
 html[data-theme='dark'] .emoji-autocomplete-name {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 /* Create menu: the same dropdown as .folder-actions-menu / .note-actions-menu
    above, kept in its own block rather than folded into those selector lists so
    this file stays easy to diff. */
 html[data-theme='dark'] .create-menu {
-    background: var(--dm-surface);
-    border: 1px solid var(--dm-border);
+    background: var(--pz-surface);
+    border: 1px solid var(--pz-border);
     box-shadow: 0 8px 24px rgba(var(--pz-shadow-rgb), 0.35);
 }
 
 html[data-theme='dark'] .create-menu-item {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .create-menu-item:hover {
-    background-color: var(--dm-surface-hover);
+    background-color: var(--pz-surface-hover);
 }
 
 html[data-theme='dark'] .create-menu-item i {
-    color: var(--dm-text);
-}
-
-html[data-theme='dark'] .create-menu-item:hover i {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .create-menu .create-section:not(:first-child) {
-    border-top-color: var(--dm-border);
+    border-top-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .folder-actions-menu-item .actions-menu-shortcut,
 html[data-theme='dark'] .note-actions-menu-item .actions-menu-shortcut {
-    color: var(--dm-text-subtle);
+    color: var(--pz-text-subtle);
 }

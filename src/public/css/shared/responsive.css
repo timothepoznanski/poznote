@@ -264,7 +264,7 @@
     }
 
     html[data-theme='dark'] .shared-note-item {
-        background: var(--dm-content-bg);
+        background: var(--pz-bg);
         box-shadow: 0 8px 20px rgba(var(--pz-shadow-rgb), 0.22);
     }
 
@@ -296,24 +296,24 @@
     }
 
     html[data-theme='dark'] body.shared-page {
-        background: var(--dm-bg);
+        background: var(--pz-chrome-bg);
     }
 
     html[data-theme='dark'] .indexable-label-text {
-        color: var(--dm-text-bright);
+        color: var(--pz-text-strong);
     }
 
     html[data-theme='dark'] .shared-note-item {
-        border-color: var(--dm-border-light);
+        border-color: var(--pz-border-strong);
         background-color: rgba(var(--pz-highlight-rgb), 0.05);
     }
 
     html[data-theme='dark'] .note-name {
-        color: var(--dm-accent);
+        color: var(--pz-accent-text);
     }
 
     html[data-theme='dark'] .note-token {
-        color: var(--dm-text);
+        color: var(--pz-text);
     }
 }
 

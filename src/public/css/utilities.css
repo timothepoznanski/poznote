@@ -166,6 +166,6 @@ body #right_col .notecard[data-content-width] {
 
 html[data-theme='dark'] #note-width-toast,
 html[data-theme='dark'] .pz-toast {
-    background: var(--dm-border-light);
-    color: var(--dm-text-bright);
+    background: var(--pz-border-strong);
+    color: var(--pz-text-strong);
 }

@@ -65,8 +65,7 @@
 
 /* Mode sombre */
 html[data-theme='dark'] .excalidraw-container {
-    background-color: transparent;
-    border-color: var(--dm-border);
+    border-color: var(--pz-border);
 }
 
 /* Responsive */

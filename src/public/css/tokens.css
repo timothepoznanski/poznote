@@ -3,7 +3,26 @@
    ============================================
    This stylesheet is the one every page loads, so it is where the shared
    tokens live: the colours, and the one layout value that is themeable.
-   Light values on :root, dark/black values in the --dm-* blocks below.
+
+   One vocabulary, in every theme (discussion #1460). A role has one name,
+   --pz-something, and a theme only changes its value: the light value sits
+   on :root, the dark one in html[data-theme='dark'], and a named theme
+   overrides whichever it needs. The stylesheets read --pz-* and nothing
+   else (tools/css-check.php holds that line), so a rule can be written once
+   for every theme, and a custom stylesheet has a single list to fill in:
+
+       --pz-color-*   the fifteen colours users pick from, and their -soft wash
+       --pz-*         every structural and semantic role
+
+   A custom stylesheet overrides only the values it wants to differ, on :root
+   for a light theme and in html[data-theme='dark'] for a dark one. Whatever
+   it leaves out keeps the value declared here.
+
+   The --dm-* names further down are the older vocabulary of the dark layer.
+   They are still where the dark VALUES are stored, which is what keeps the
+   stylesheets already in the wild working: one that sets --dm-text still
+   moves --pz-text, one that reads var(--dm-text) still gets a colour. Nothing
+   in the app reads them any more, and a new theme does not need them.
 
    It used to be css/dark-mode/variables.css, which was wrong twice over: it
    sat inside the dark layer while holding the LIGHT palette on :root, and a
@@ -62,8 +81,9 @@
        that override silently do nothing. It defaults to the accent now; the
        value it used to carry, #2e8cfa, had contrast 3.36 on white and failed
        WCAG AA for body text. Override it to colour links alone, or --pz-accent
-       to move both. */
-    --pz-link: var(--pz-accent);
+       to move both. It follows --pz-accent-text, the accent as text, so a link
+       is the accent in a light theme and its readable version on a dark one. */
+    --pz-link: var(--pz-accent-text);
     /* The two ends of the greyscale, used with an alpha to darken or lighten
        whatever is under them: shadows, scrims and pressed states take the
        shadow channel, raised surfaces and hairlines on a dark ground take the
@@ -72,7 +92,8 @@
        black and white re-points these two and every elevation follows. */
     --pz-shadow-rgb: 0, 0, 0;
     --pz-highlight-rgb: 255, 255, 255;
-    /* Neutral palette of the light theme. Dark and black use --dm-* below. */
+    /* Neutral palette. These are the light values; the dark block gives the
+       same names their dark ones. */
     /* Text scale, four steps. Contrast on white is 12.6 / 7.6 / 4.8 / 2.5, and
        the app used 62 different greys to express them. Pick by role, not by
        taste, so a theme only has to redefine four values. */
@@ -181,6 +202,53 @@
     --pz-color-brown-soft: color-mix(in srgb, var(--pz-color-brown) var(--pz-color-soft-mix), var(--pz-bg));
     --pz-color-gray-soft: color-mix(in srgb, var(--pz-color-gray) var(--pz-color-soft-mix), var(--pz-bg));
 
+    /* The roles that only the dark layer used to name. The dark theme paints
+       these with values of its own; the light theme never needed a separate
+       one, so each points at the light token that already does the job, and
+       follows it when a theme changes that one. A theme that wants them to
+       differ sets them like any other token. */
+    /* Text that has to stand out from the body copy: a heading, the label of a
+       selected row, a value next to its muted caption. Light has no step
+       darker than --pz-text; a dark theme brightens it. */
+    --pz-text-strong: var(--pz-text);
+    /* One step past the surface scale: the ground of a quiet control that
+       carries ordinary text, a Cancel button, a scrollbar thumb, a media
+       player. Not --pz-neutral, which is a fill under an INVERSE label: a
+       theme whose inverse label is dark makes that one light. */
+    --pz-surface-strong: var(--pz-surface-sunken);
+    --pz-surface-strong-hover: var(--pz-border-strong);
+    /* The ground of the application chrome, as opposed to --pz-bg, the sheet
+       the content is written on: the side columns, the panels docked to the
+       note, the pages that have no note. */
+    --pz-chrome-bg: var(--pz-surface);
+    --pz-sidebar-bg: var(--pz-surface);       /* the band holding the search bar */
+    --pz-sidebar-surface: var(--pz-bg);       /* a field or a hovered row inside it */
+    --pz-code-bg: var(--pz-surface);          /* code blocks in a note */
+    --pz-active-bg: var(--pz-accent-soft);    /* the row or option that is current */
+    --pz-tabbar-bg: var(--pz-bg);
+    --pz-tab-bg: var(--pz-surface-hover);
+    --pz-tab-hover-bg: var(--pz-surface-sunken);
+    --pz-tab-active-bg: var(--pz-bg);
+    --pz-icon-hover: var(--pz-accent);
+    /* Each semantic colour again, for where it stands on the page by itself:
+       a link, an icon, an outline, a dot. --pz-accent is a FILL, the ground of
+       a button that carries a --pz-text-inverse label, and a fill that holds a
+       white label is too dark to read as a line on a dark ground. So a colour
+       has two names, and a dark theme gives the second one a brighter value.
+       In a light theme both jobs take the same colour, hence the aliases.
+       -text-hover is its hovered state. The wash that goes behind it is -soft,
+       and -strong is the shade for text ON that wash; those two switch with
+       the theme like the neutrals do. */
+    --pz-accent-text: var(--pz-accent);
+    --pz-accent-text-hover: var(--pz-accent-hover);
+    --pz-accent-text-rgb: var(--pz-accent-rgb);
+    --pz-danger-text: var(--pz-danger);
+    --pz-danger-text-hover: var(--pz-danger-hover);
+    --pz-success-text: var(--pz-success);
+    --pz-success-text-hover: var(--pz-success-hover);
+    --pz-warning-text: var(--pz-warning);
+    --pz-warning-text-hover: var(--pz-warning-hover);
+
     /* Excalidraw previews. A diagram is stored with no ground of its own and
        with the colours Excalidraw authors in light mode, so the note shows
        through behind it. A dark mode inverts it, which is how a black stroke
@@ -192,7 +260,12 @@
 
 /* ============================================
    Dark Mode - CSS Custom Properties & Base
-   ============================================ */
+   ============================================
+   Two halves. The --dm-* declarations hold the dark values (see the header
+   for why they keep that name). The --pz-* declarations after them give each
+   one its universal name, which is the only name the stylesheets read. A
+   dark variant such as theme-black changes the --dm-* values and every
+   --pz-* follows; a custom stylesheet can set either, and --pz-* wins. */
 
 html[data-theme='dark'] {
     /* See --pz-excalidraw-filter on :root above. */
@@ -274,11 +347,12 @@ html[data-theme='dark'] {
        themes, and a component whose dark override was simply forgotten stops
        rendering dark text on a dark ground.
 
-       Only the NEUTRALS switch. The accent and the status colours deliberately
-       do not: --dm-accent is bright because it has to read as text on a dark
-       ground, and using it as a fill would put white on #4a9eff at a contrast of
-       2.2. A fill and a label cannot be the same token; the dark layer already
-       states the fills it wants. */
+       The neutrals switch, and so does everything that stands on the ground by
+       itself. The accent and the status FILLS deliberately do not: the dark
+       accent is bright because it has to read as text on a dark ground, and
+       using it as a fill would put white on #4a9eff at a contrast of 2.2. A
+       fill and a label cannot be the same token, which is why each family also
+       has a -text name further down. */
     --pz-bg: var(--dm-content-bg);
     --pz-surface: var(--dm-surface);
     --pz-surface-hover: var(--dm-surface-hover);
@@ -297,6 +371,43 @@ html[data-theme='dark'] {
     --pz-disabled: var(--dm-disabled);
     --pz-scrollbar: var(--dm-scrollbar);
     --pz-scrollbar-hover: var(--dm-scrollbar-hover);
+    /* The roles the dark layer named on its own, under their universal names
+       (their light values are on :root). These are what dark rules read. */
+    --pz-text-strong: var(--dm-text-bright);
+    --pz-surface-strong: var(--dm-neutral);
+    --pz-surface-strong-hover: var(--dm-neutral-hover);
+    --pz-chrome-bg: var(--dm-bg);
+    --pz-sidebar-bg: var(--dm-sidebar-bg);
+    --pz-sidebar-surface: var(--dm-sidebar-surface);
+    --pz-code-bg: var(--dm-code-bg);
+    --pz-active-bg: var(--dm-active);
+    --pz-tabbar-bg: var(--dm-tabbar-bg);
+    --pz-tab-bg: var(--dm-tab-bg);
+    --pz-tab-hover-bg: var(--dm-tab-hover-bg);
+    --pz-tab-active-bg: var(--dm-tab-active-bg);
+    --pz-icon-hover: var(--dm-icon-hover);
+    --pz-accent-text: var(--dm-accent);
+    --pz-accent-text-hover: var(--dm-accent-hover);
+    --pz-accent-text-rgb: var(--dm-accent-rgb);
+    --pz-danger-text: var(--dm-danger);
+    --pz-danger-text-hover: var(--dm-danger-hover);
+    --pz-success-text: var(--dm-success);
+    --pz-success-text-hover: var(--dm-success-hover);
+    --pz-warning-text: var(--dm-warning);
+    --pz-warning-text-hover: var(--dm-warning-hover);
+    /* The wash and the text that goes on it. They used to keep their light
+       values here, so an alert no dark rule had reached stayed a pale box with
+       dark text in the middle of a dark page. A wash has to switch together
+       with its text, or one of the two becomes unreadable: a dark wash under
+       the deep light shade, or a bright label on a pale box. */
+    --pz-accent-soft: var(--dm-accent-soft);
+    --pz-accent-strong: var(--dm-accent);
+    --pz-danger-soft: var(--dm-danger-soft);
+    --pz-danger-strong: var(--dm-danger);
+    --pz-success-soft: var(--dm-success-soft);
+    --pz-success-strong: var(--dm-success);
+    --pz-warning-soft: var(--dm-warning-soft);
+    --pz-warning-strong: var(--dm-warning);
     /* A tint of the dark accent, a little stronger than the light one because
        it has less ground to stand out from. */
     --pz-selection: rgba(var(--dm-accent-rgb), 0.28);
@@ -462,28 +573,25 @@ html.theme-terminal[data-theme='dark'] {
     --dm-tab-active-bg: #10301a;
 
     /* Fills keep their own label colour: the phosphor green is a text colour,
-       so anything filled with it takes the tube's black back. */
+       so anything filled with it takes the tube's black back. The washes are
+       left to the bridge (they are this theme's --dm-*-soft); -strong is
+       stated because this theme wants the brightest green on a wash. */
     --pz-accent: #2fae54;
     --pz-accent-hover: #4ee87a;
     --pz-accent-strong: #b6ffc8;
-    --pz-accent-soft: #0a2a14;
     --pz-accent-rgb: 47, 174, 84;
     --pz-text-inverse: #041008;
     --pz-danger: #e04c3f;
     --pz-danger-hover: #ff5f56;
     --pz-danger-strong: #ff8a84;
-    --pz-danger-soft: #2e0a08;
     --pz-success: #2fae54;
     --pz-success-hover: #4ee87a;
     --pz-success-strong: #b6ffc8;
-    --pz-success-soft: #0a2a14;
     --pz-warning: #a37516;
     --pz-warning-hover: #ffbd2e;
     --pz-warning-strong: #ffd473;
-    --pz-warning-soft: #2e2205;
     --pz-neutral: #16512a;
     --pz-neutral-hover: #1f7a3a;
-    --pz-icon: #2fae54;
     --pz-shadow-rgb: 0, 0, 0;
     --pz-highlight-rgb: 78, 232, 122;
 }

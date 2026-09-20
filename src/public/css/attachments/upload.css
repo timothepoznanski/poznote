@@ -35,7 +35,7 @@
 }
 
 .file-input:hover {
-    border-color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
 }
 
 .accepted-types {
@@ -49,7 +49,7 @@
     display: none;
     margin-top: 10px;
     padding: 8px 12px;
-    background: #e8f4f8;
+    background: color-mix(in srgb, var(--pz-accent) 9%, var(--pz-bg));
     border: 1px solid var(--pz-accent);
     border-radius: var(--pz-radius-sm);
     color: var(--pz-accent);
@@ -211,6 +211,6 @@
 .progress-text {
     text-align: center;
     font-size: 14px;
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     font-weight: var(--pz-weight-medium);
 }

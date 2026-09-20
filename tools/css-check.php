@@ -678,6 +678,80 @@ foreach ($files as $file) {
     }
 }
 
+// ---------------------------------------------------------------------------
+// One vocabulary: the app reads --pz-* and nothing else.
+//
+// The dark layer used to paint with names of its own, --dm-text next to
+// --pz-text, 2,100 times over. A theme then had two lists to fill in, a rule
+// could not be written once for both modes, and a --dm-* name that strayed
+// into a light rule resolved to nothing: the declaration was dropped and the
+// element fell back to whatever it inherited (the search highlight, the
+// Change password hint). Every role now has one --pz-* name whose value the
+// theme changes, and css/tokens.css is the only file allowed to say --dm-*,
+// where those names survive as the storage of the dark values so that custom
+// stylesheets written against them keep working (discussion #1460).
+//
+// The second half guards the other end of the same contract: a var(--pz-x)
+// that nothing declares looks like a token and is not one, so a theme author
+// overrides it in vain and a typo renders as the inherited colour, silently.
+$declared = [];
+$allCss = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS));
+foreach ($allCss as $f) {
+    if ($f->isFile() && strtolower($f->getExtension()) === 'css') {
+        $body = preg_replace('!/\*.*?\*/!s', '', (string) file_get_contents($f->getPathname()));
+        if (preg_match_all('/(--pz-[\w-]+)\s*:/', $body, $d)) {
+            $declared += array_flip($d[1]);
+        }
+    }
+}
+foreach ($files as $file) {
+    $rel = str_starts_with($file, $root) ? 'src/public/css' . substr($file, strlen($root)) : $file;
+    $css = preg_replace_callback('!/\*.*?\*/!s', function ($m) {
+        return str_repeat("\n", substr_count($m[0], "\n"));     // keep the line numbers
+    }, (string) file_get_contents($file));
+    foreach (explode("\n", $css) as $n => $text) {
+        if (!str_ends_with($file, '/tokens.css') && preg_match('/--dm-[\w-]+/', $text, $hit)) {
+            echo "$rel:" . ($n + 1) . ": {$hit[0]} is the legacy dark vocabulary. Read the --pz-* "
+               . "role instead (the list is in css/tokens.css), it switches with the theme.\n";
+            $errors++;
+        }
+        if (preg_match_all('/var\(\s*(--pz-[\w-]+)/', $text, $uses)) {
+            foreach ($uses[1] as $name) {
+                if (!isset($declared[$name])) {
+                    echo "$rel:" . ($n + 1) . ": var($name) is declared nowhere. A typo, or a token "
+                       . "that still has to be added to css/tokens.css.\n";
+                    $errors++;
+                }
+            }
+        }
+    }
+}
+// The same vocabulary rule for the styles written in PHP and JS. Only real
+// uses are matched, var(--dm-x) and a --dm-x: declaration, so a sentence that
+// names the old tokens in a comment is left alone.
+if (is_dir($srcDir)) {
+    $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($srcDir, FilesystemIterator::SKIP_DOTS));
+    foreach ($it as $f) {
+        $path = str_replace('\\', '/', $f->getPathname());
+        if (!$f->isFile() || !preg_match('/\.(php|js)$/', $path) || str_contains($path, '/css/')
+            || str_contains($path, '/vendor/') || str_contains($path, '-dist') || str_contains($path, 'node_modules')) {
+            continue;
+        }
+        foreach ($vendorish as $v) {
+            if (str_contains(strtolower($path), $v)) {
+                continue 2;
+            }
+        }
+        foreach (explode("\n", (string) file_get_contents($path)) as $n => $text) {
+            if (preg_match('/var\(\s*--dm-[\w-]+|(?<![\w-])--dm-[\w-]+\s*:/', $text, $hit)) {
+                echo substr($path, strlen($repo) + 1) . ':' . ($n + 1) . ": {$hit[0]} is the legacy dark "
+                   . "vocabulary. Read the --pz-* role instead (css/tokens.css).\n";
+                $errors++;
+            }
+        }
+    }
+}
+
 if ($errors === 0) {
     echo count($files) . " stylesheet(s) balanced, $literals colour literal(s) in CSS, $markup in PHP/JS\n";
     exit(0);

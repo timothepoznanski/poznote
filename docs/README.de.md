@@ -768,11 +768,11 @@ Farben, Abstände, Radien und Schriftstärken sind Design-Tokens, daher bestehen
     --pz-accent-rgb: 214, 51, 108;   /* same colour, channels only, used for tints */
 }
 html[data-theme='dark'] {
-    --dm-accent: #f783ac;            /* lighter, because it sits on a dark ground */
+    --pz-accent-text: #f783ac;       /* lighter, because it sits on a dark ground */
 }
 ```
 
-Zwei Tokens statt einem, weil eine *Füllung* und eine *Beschriftung* nicht dieselbe Farbe haben können: `--pz-accent` füllt Schaltflächen, `--dm-accent` ist die Akzentfarbe als Text im Dunkelmodus.
+Zwei Tokens statt einem, weil eine *Füllung* und eine *Beschriftung* nicht dieselbe Farbe haben können: `--pz-accent` füllt Schaltflächen, `--pz-accent-text` ist die Akzentfarbe für Text, Symbole und Umrisse. In einem hellen Design folgt es `--pz-accent` von selbst; ein dunkler Grund braucht einen helleren Wert. Jedes Token behält in jedem Design denselben `--pz-*`-Namen, nur sein Wert ändert sich. Die `--dm-*`-Namen älterer Stylesheets funktionieren weiterhin.
 
 **Symbole der Notiz-Werkzeugleiste umfärben**
 
@@ -803,8 +803,6 @@ Für ein einzelnes Symbol braucht es kein CSS: Klicken Sie es in der Notiz-Symbo
 **Ein vollständiges Design schreiben**
 
 Überschreiben Sie die Tokens auf `:root` für hell und auf `:root[data-theme='dark']` für dunkel, und sonst nichts. `src/public/css/README.md` dokumentiert jedes Token und zeigt ein vollständiges Beispiel; die integrierten Designs Lavendel, Sepia und Terminal in `src/public/css/tokens.css` sind genau dasselbe, auf dieselbe Weise geschrieben.
-
-Eines kann ein Design noch nicht erreichen: Einige wenige Symbole, die eine Seitenregel ausdrücklich einfärbt, erscheinen im Dunkelmodus im allgemeinen Symbolgrau.
 
 </details>
 

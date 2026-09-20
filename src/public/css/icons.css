@@ -15,7 +15,7 @@
 .toolbar-btn.btn-attachment.has-attachments i,
 .toolbar-btn.btn-reminder.has-reminder i,
 .toolbar-btn.btn-save.is-saving i {
-    color: var(--pz-accent) !important;
+    color: var(--pz-accent-text) !important;
 }
 
 /* The markdown split-view button keeps the default icon colour: nothing to
@@ -51,7 +51,7 @@
 
 [class*="lucide-"]:hover {
     transform: scale(1.18);
-    color: var(--pz-accent);
+    color: var(--pz-icon-hover);
 }
 
 /* The icon rail colours its icons via currentColor, not the global filter. The
@@ -119,13 +119,13 @@
 
 .lucide-bold:hover {
     transform: scale(1.2);
-    color: var(--pz-accent) !important;
+    color: var(--pz-accent-text) !important;
 }
 
 /* Red color for cancel icon in mobile slash menu */
 .slash-command-icon.lucide-times-circle,
 .slash-command-item .slash-command-icon.lucide-times-circle {
-    color: var(--pz-danger) !important;
+    color: var(--pz-danger-text) !important;
     font-weight: var(--pz-weight-normal);
 }
 

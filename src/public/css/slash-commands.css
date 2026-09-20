@@ -61,12 +61,12 @@
 
 .slash-command-label {
     font-size: 14px;
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
     flex: 1;
 }
 
 .slash-command-item[data-command-id="cancel"] .slash-command-label {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
     font-weight: var(--pz-weight-semibold);
 }
 
@@ -170,7 +170,7 @@
 .slash-date-picker-title {
     font-size: 13px;
     font-weight: var(--pz-weight-semibold);
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
 }
 
 .slash-date-picker-nav,
@@ -210,7 +210,7 @@
 
 .slash-date-picker-day {
     font-size: 13px;
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
     padding: 4px 0;
 }
 
@@ -220,7 +220,7 @@
 
 .slash-date-picker-day.today {
     background: rgba(11, 120, 230, 0.1);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     font-weight: var(--pz-weight-bold);
 }
 
@@ -230,7 +230,7 @@
 
 .slash-date-picker-day.selected,
 .slash-date-picker-day.selected:hover {
-    background: var(--pz-accent);
+    background: var(--pz-accent-text);
     color: var(--pz-text-inverse);
     font-weight: var(--pz-weight-bold);
 }
@@ -278,12 +278,12 @@
 }
 
 .slash-date-picker-time-btn:hover {
-    border-color: var(--pz-accent);
-    color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
+    color: var(--pz-accent-text);
 }
 
 .slash-date-picker-time-btn:hover i {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 /* Pointer hidden while the date/time popup is driven from the keyboard
@@ -332,7 +332,7 @@ html.slash-date-picker-mouse-hidden .slash-date-picker .slash-time-cell:not(.sel
 
 .slash-time-cell.selected,
 .slash-time-cell.selected:hover {
-    background: var(--pz-accent);
+    background: var(--pz-accent-text);
     color: var(--pz-text-inverse);
     font-weight: var(--pz-weight-bold);
 }
@@ -345,12 +345,12 @@ html.slash-date-picker-mouse-hidden .slash-date-picker .slash-time-cell:not(.sel
     font-size: 12px;
     font-weight: var(--pz-weight-semibold);
     color: var(--pz-text-inverse);
-    background: var(--pz-accent);
+    background: var(--pz-accent-text);
     padding: 4px 12px;
 }
 
 .slash-date-picker-apply-btn:hover {
-    background: var(--pz-accent);
+    background: var(--pz-accent-text);
 }
 
 /* Pill buttons matching the task due-date chip look */
@@ -375,7 +375,7 @@ html.slash-date-picker-mouse-hidden .slash-date-picker .slash-time-cell:not(.sel
 
 .slash-date-picker-remove-btn {
     border: 1px solid var(--pz-danger-soft);
-    background: #fdf2f2;
+    background: color-mix(in srgb, var(--pz-danger) 7%, var(--pz-bg));
     color: var(--pz-danger-hover);
 }
 
@@ -391,13 +391,13 @@ html.slash-date-picker-mouse-hidden .slash-date-picker .slash-time-cell:not(.sel
 }
 
 .slash-date-picker-remove-time-btn:hover {
-    border-color: var(--pz-accent);
-    color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
+    color: var(--pz-accent-text);
 }
 
 .slash-date-picker-today-btn {
     font-size: 12px;
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     padding: 4px 8px;
 }
 

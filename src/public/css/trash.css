@@ -86,7 +86,7 @@ body.trash-page {
     color: var(--pz-text-muted);
     white-space: nowrap;
     padding: 6px 12px;
-    background-color: #f0f7ff;
+    background-color: color-mix(in srgb, var(--pz-accent) 5%, var(--pz-bg));
     border-radius: var(--pz-radius);
     font-weight: var(--pz-weight-medium);
     margin-left: 10px;
@@ -131,8 +131,8 @@ body.trash-page {
 
 .trash-search-input:focus {
     outline: none;
-    border-color: var(--pz-accent);
-    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
+    border-color: var(--pz-accent-text);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-text-rgb), 0.1);
 }
 
 .clear-filter-btn {
@@ -175,7 +175,7 @@ body.trash-page {
     padding: 3px;
     border: 1px solid var(--pz-border);
     border-radius: var(--pz-radius-lg);
-    background-color: var(--pz-surface);
+    background-color: var(--pz-chrome-bg);
 }
 
 .trash-sort-option {
@@ -190,12 +190,12 @@ body.trash-page {
 }
 
 .trash-sort-option:hover {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .trash-sort-option.is-active {
     background-color: var(--pz-bg);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     font-weight: var(--pz-weight-semibold);
     box-shadow: 0 1px 2px rgba(var(--pz-shadow-rgb), 0.08);
 }
@@ -288,28 +288,28 @@ body.trash-page {
     width: 17px;
     height: 17px;
     color: var(--pz-text-muted);
-    background-color: #666;
+    background-color: var(--pz-text-muted);
     pointer-events: none;
 }
 
 .trash-restore-btn:hover {
-    background: #e8f8ee;
-    border-color: #bbe8cc;
+    background: color-mix(in srgb, var(--pz-success) 10%, var(--pz-bg));
+    border-color: color-mix(in srgb, var(--pz-success) 30%, var(--pz-bg));
 }
 
 .trash-restore-btn:hover .lucide {
-    color: var(--pz-success);
-    background-color: var(--pz-success);
+    color: var(--pz-success-text);
+    background-color: var(--pz-success-text);
 }
 
 .trash-delete-btn:hover {
-    background: #fdecec;
+    background: color-mix(in srgb, var(--pz-danger) 10%, var(--pz-bg));
     border-color: var(--pz-danger-soft);
 }
 
 .trash-delete-btn:hover .lucide {
-    color: var(--pz-danger);
-    background-color: var(--pz-danger);
+    color: var(--pz-danger-text);
+    background-color: var(--pz-danger-text);
 }
 
 /* Collapsed content preview with fade-out */
@@ -346,7 +346,7 @@ body.trash-page {
     border: none;
     border-radius: var(--pz-radius);
     background: transparent;
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     font-size: 12.5px;
     font-family: 'Inter', sans-serif;
     cursor: pointer;
@@ -357,14 +357,14 @@ body.trash-page {
 }
 
 .trash-expand-btn:hover {
-    background: #f0f7ff;
+    background: color-mix(in srgb, var(--pz-accent) 5%, var(--pz-bg));
 }
 
 .trash-expand-btn .lucide {
     width: 13px;
     height: 13px;
-    color: var(--pz-accent);
-    background-color: var(--pz-accent);
+    color: var(--pz-accent-text);
+    background-color: var(--pz-accent-text);
     vertical-align: -2px;
     margin-right: 4px;
 }
@@ -431,7 +431,7 @@ body.trash-page {
 }
 
 .searchtrash:focus {
-    border-bottom: 1px solid var(--pz-accent);
+    border-bottom: 1px solid var(--pz-accent-text);
 }
 
 /* Notice de recherche */
@@ -454,7 +454,7 @@ body.trash-page {
 }
 
 .trash-clear-search:hover {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 .lucide-x {
@@ -633,62 +633,62 @@ body.trash-page {
 /* Dark Mode Support for Trash Page */
 html[data-theme='dark'] body.trash-page,
 html[data-theme='dark'] body.trash-page {
-    background-color: var(--dm-content-bg);
-    background: var(--dm-content-bg);
-    color: var(--dm-text);
+    background-color: var(--pz-bg);
+    background: var(--pz-bg);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .trash-search-input,
 html[data-theme='dark'] .trash-search-input {
-    background-color: var(--dm-surface);
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .clear-filter-btn {
-    color: var(--dm-text-subtle);
+    color: var(--pz-text-subtle);
 }
 
 html[data-theme='dark'] .trash-notecard {
-    background-color: var(--dm-surface);
-    border-color: var(--dm-border);
+    background-color: var(--pz-surface);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .trash-innernote {
-    /* background-color: var(--dm-surface) !important; */
-    color: var(--dm-text-bright);
+    /* background-color: var(--pz-surface) !important; */
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .css-title {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .trash-no-notes {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .trash-search-notice {
-    background-color: var(--dm-content-bg);
-    border-color: var(--dm-accent-soft);
-    color: var(--dm-accent-hover);
+    background-color: var(--pz-bg);
+    border-color: var(--pz-accent-soft);
+    color: var(--pz-accent-text-hover);
 }
 
 html[data-theme='dark'] .trash-search-results {
-    background-color: var(--dm-accent-soft);
-    color: var(--dm-accent-hover);
+    background-color: var(--pz-accent-soft);
+    color: var(--pz-accent-text-hover);
 }
 
 html[data-theme='dark'] .lastupdated {
-    color: var(--dm-text-subtle);
+    color: var(--pz-text-subtle);
 }
 
 html[data-theme='dark'] .noteentry {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .trash-page-count,
 html[data-theme='dark'] .trash-limit-notice {
-    color: var(--dm-text-subtle);
+    color: var(--pz-text-subtle);
 }
 
 html[data-theme='dark'] .trash-notecard {
@@ -696,52 +696,28 @@ html[data-theme='dark'] .trash-notecard {
 }
 
 html[data-theme='dark'] .trash-note-header {
-    border-bottom-color: var(--dm-border);
-}
-
-html[data-theme='dark'] .trash-action-btn .lucide {
-    color: var(--dm-text-muted);
-    background-color: var(--dm-text-muted);
+    border-bottom-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .trash-restore-btn:hover {
-    background: rgba(34, 197, 94, 0.12);
-    border-color: rgba(34, 197, 94, 0.3);
-}
-
-html[data-theme='dark'] .trash-restore-btn:hover .lucide {
-    color: var(--dm-success);
-    background-color: var(--dm-success);
+    background: color-mix(in srgb, var(--pz-success-text-hover) 12%, transparent);
+    border-color: color-mix(in srgb, var(--pz-success-text-hover) 30%, transparent);
 }
 
 html[data-theme='dark'] .trash-delete-btn:hover {
-    background: rgba(220, 38, 38, 0.12);
-    border-color: rgba(220, 38, 38, 0.3);
+    background: color-mix(in srgb, var(--pz-danger-text-hover) 12%, transparent);
+    border-color: color-mix(in srgb, var(--pz-danger-text-hover) 30%, transparent);
 }
 
-html[data-theme='dark'] .trash-delete-btn:hover .lucide {
-    color: var(--dm-danger);
-    background-color: var(--dm-danger);
-}
-
-/* The card's inner surface is --dm-content-bg (see dark-mode/pages.css .trash-innernote) */
+/* The card's inner surface is --pz-bg (see dark-mode/pages.css .trash-innernote) */
 html[data-theme='dark'] .trash-preview-fade {
-    background: linear-gradient(to bottom, rgba(var(--pz-shadow-rgb), 0), var(--dm-content-bg));
+    background: linear-gradient(to bottom, rgba(var(--pz-shadow-rgb), 0), var(--pz-bg));
 }
 
 html[data-theme='dark'] .trash-expand-btn:hover {
-    background: rgba(var(--dm-accent-rgb), 0.1);
-}
-
-html[data-theme='dark'] .trash-expand-btn {
-    color: var(--dm-accent);
-}
-
-html[data-theme='dark'] .trash-expand-btn .lucide {
-    color: var(--dm-accent);
-    background-color: var(--dm-accent);
+    background: rgba(var(--pz-accent-text-rgb), 0.1);
 }
 
 html[data-theme='dark'] .trash-no-notes-icon {
-    background: var(--dm-surface);
+    background: var(--pz-surface);
 }

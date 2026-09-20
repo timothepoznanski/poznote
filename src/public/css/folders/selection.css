@@ -20,7 +20,7 @@
 }
 
 .folder-option:hover {
-    background-color: #f0f6ff;
+    background-color: color-mix(in srgb, var(--pz-accent) 5%, var(--pz-bg));
 }
 
 .folder-option.selected {

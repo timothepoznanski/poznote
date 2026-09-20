@@ -21,7 +21,7 @@
 }
 
 .folder-icon-modal-content h3 i {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 /* Reduce space above the search bar */
@@ -47,7 +47,7 @@
 }
 
 .folder-icon-search-wrapper input:focus {
-    border-color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
 }
 
 /* Recently used icons row */
@@ -72,7 +72,7 @@
     max-height: 200px;
     overflow-y: auto;
     padding: 10px;
-    background: var(--pz-surface);
+    background: var(--pz-chrome-bg);
     border: 1px solid var(--pz-border);
     border-radius: var(--pz-radius-lg);
     margin-bottom: 20px;
@@ -99,13 +99,13 @@
 
 .folder-icon-item:hover {
     background: var(--pz-surface-hover);
-    border-color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
     transform: scale(1.05);
 }
 
 .folder-icon-item.selected {
-    background: #eef2ff;
-    border-color: var(--pz-accent);
+    background: color-mix(in srgb, var(--pz-accent) 6%, var(--pz-bg));
+    border-color: var(--pz-accent-text);
     box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
 }
 
@@ -181,7 +181,7 @@
     justify-content: center;
     gap: 8px;
     padding: 16px;
-    background: var(--pz-surface);
+    background: var(--pz-chrome-bg);
     border: 1px solid var(--pz-border);
     border-radius: var(--pz-radius-lg);
 }
@@ -224,12 +224,12 @@
 }
 
 .folder-color-option:hover .folder-color-swatch {
-    border-color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 .folder-color-option.selected .folder-color-swatch {
-    border-color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }
 

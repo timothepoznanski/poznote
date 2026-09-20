@@ -79,7 +79,7 @@
     display: block;
     font-weight: var(--pz-weight-semibold);
     margin-bottom: 10px;
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
 }
 
 .background-opacity-control input[type="range"] {
@@ -112,24 +112,16 @@
 
 #backgroundOpacityValue {
     font-weight: var(--pz-weight-bold);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 /* Dark mode support */
 html[data-theme='dark'] .background-preview-container {
-    border-color: var(--dm-border);
-    background-color: var(--dm-content-bg);
-}
-
-html[data-theme='dark'] .background-preview .no-background-text {
-    color: var(--dm-text-subtle);
-}
-
-html[data-theme='dark'] .background-opacity-control label {
-    color: var(--dm-text-bright);
+    border-color: var(--pz-border);
+    background-color: var(--pz-bg);
 }
 
 html[data-theme='dark'] .background-opacity-control input[type="range"] {
-    background: var(--dm-surface-raised);
+    background: var(--pz-surface-sunken);
 }
 

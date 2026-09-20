@@ -27,7 +27,7 @@
 
 /* The text-color palette icon used to be forced to `color: inherit`, which on a
    <button> resolves to the UA's buttontext (black in light mode) or to the dark
-   theme's --dm-text, never to the --pz-icon grey every other toolbar icon uses.
+   theme's --pz-text, never to the --pz-icon grey every other toolbar icon uses.
    It stood out as the one black icon in the row of formatting buttons that the
    selection reveals, and it was also the only one turning red on hover. It now
    simply follows icons.css like its neighbours. */

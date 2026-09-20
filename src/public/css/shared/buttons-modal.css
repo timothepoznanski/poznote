@@ -8,13 +8,13 @@
 /* Action button of a share made inaccessible: same amber eye-off as the
    badge next to the share name, still opens the revoke modal. */
 .btn-share-disabled {
-    background: rgba(245, 158, 11, 0.15);
-    color: var(--pz-warning-hover);
+    background: color-mix(in srgb, var(--pz-warning) 15%, transparent);
+    color: var(--pz-warning-text-hover);
     border: none;
 }
 
 .btn-share-disabled:hover {
-    background: rgba(245, 158, 11, 0.3);
+    background: color-mix(in srgb, var(--pz-warning) 30%, transparent);
 }
 
 /* Greyed-out action button (e.g. token edit on a note shared through a
@@ -22,7 +22,7 @@
    on both light and dark backgrounds. */
 .note-actions .btn:disabled,
 .note-actions .btn:disabled:hover {
-    background: rgba(108, 117, 125, 0.25);
+    background: color-mix(in srgb, var(--pz-neutral) 25%, transparent);
     color: var(--pz-text-muted);
     cursor: not-allowed;
     opacity: 1;
@@ -104,8 +104,8 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-modal-content {
     overflow-x: hidden;
     box-sizing: border-box;
     padding: 18px 20px 20px;
-    border: 1px solid rgba(15, 23, 42, 0.08);
-    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2);
+    border: 1px solid rgba(var(--pz-shadow-rgb), 0.08);
+    box-shadow: 0 24px 60px rgba(var(--pz-shadow-rgb), 0.2);
 }
 
 body.shared-page .shared-edit-token-modal {
@@ -119,7 +119,7 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title {
     padding: 0 0 14px;
     margin-bottom: 2px;
     background: linear-gradient(180deg, rgba(var(--pz-accent-rgb), 0.08), rgba(var(--pz-accent-rgb), 0));
-    border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+    border-bottom: 1px solid rgba(var(--pz-shadow-rgb), 0.1);
 }
 
 body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title h3 {
@@ -236,7 +236,7 @@ body.shared-page .shared-edit-token-modal .share-indexable-wrap,
 body.shared-page .shared-edit-token-modal .share-restrict-users-wrap {
     margin-top: 2px;
     padding-top: 14px;
-    border-top: 1px solid rgba(15, 23, 42, 0.1);
+    border-top: 1px solid rgba(var(--pz-shadow-rgb), 0.1);
 }
 
 body.shared-page .shared-edit-token-modal .share-indexable-label {
@@ -258,8 +258,8 @@ body.shared-page .shared-edit-token-modal .share-user-list-container {
     margin-top: 12px;
     padding: 12px 14px;
     border-radius: var(--pz-radius-xl);
-    border: 1px solid rgba(15, 23, 42, 0.1);
-    background: rgba(15, 23, 42, 0.025);
+    border: 1px solid rgba(var(--pz-shadow-rgb), 0.1);
+    background: color-mix(in srgb, var(--pz-text) 2.5%, transparent);
     max-height: 220px;
     overflow-y: auto;
 }
@@ -284,7 +284,7 @@ body.shared-page .shared-edit-token-modal .share-user-list-row {
 }
 
 body.shared-page .shared-edit-token-modal .share-user-list-row + .share-user-list-row {
-    border-top: 1px solid rgba(15, 23, 42, 0.07);
+    border-top: 1px solid rgba(var(--pz-shadow-rgb), 0.07);
 }
 
 body.shared-page .shared-edit-token-modal .share-user-list-row input[type="checkbox"] {
@@ -335,8 +335,8 @@ body.shared-page .shared-revoke-modal .shared-revoke-modal-content {
     max-width: min(680px, calc(100vw - 32px));
     box-sizing: border-box;
     padding: 18px 20px 20px;
-    border: 1px solid rgba(15, 23, 42, 0.08);
-    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2);
+    border: 1px solid rgba(var(--pz-shadow-rgb), 0.08);
+    box-shadow: 0 24px 60px rgba(var(--pz-shadow-rgb), 0.2);
 }
 
 body.shared-page .shared-revoke-modal .shared-revoke-modal-text {

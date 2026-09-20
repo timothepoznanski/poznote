@@ -460,7 +460,7 @@
 
 /* Kept-count number in the description, links to its setting */
 .snapshot-keep-count-link {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     font-weight: var(--pz-weight-semibold);
     text-decoration: underline dotted;
     text-underline-offset: 2px;
@@ -468,7 +468,7 @@
 }
 
 .snapshot-keep-count-link:hover {
-    color: var(--pz-accent-hover);
+    color: var(--pz-accent-text-hover);
     text-decoration-style: solid;
 }
 
@@ -629,11 +629,11 @@
     }
 
     #snapshotModal .snapshot-modal-actions .snapshot-restore-btn i.lucide {
-        color: var(--pz-accent) !important;
+        color: var(--pz-accent-text) !important;
     }
 
     #snapshotModal .snapshot-modal-actions .btn-danger i.lucide {
-        color: var(--pz-danger-hover) !important;
+        color: var(--pz-danger-text-hover) !important;
     }
 
     #snapshotModal .snapshot-modal-actions .snapshot-take-btn i.lucide {
@@ -641,7 +641,7 @@
     }
 
     #snapshotModal .snapshot-modal-actions .snapshot-markdown-preview-btn i.lucide {
-        color: var(--pz-accent) !important;
+        color: var(--pz-accent-text) !important;
     }
 
     #snapshotModal .snapshot-modal-actions button span {

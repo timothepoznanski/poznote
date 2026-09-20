@@ -54,10 +54,10 @@
 }
 
 .alert-error {
-    background: linear-gradient(90deg, #fff1f0 0%, var(--pz-danger-soft) 100%);
+    background: linear-gradient(90deg, color-mix(in srgb, var(--pz-danger-soft) 35%, var(--pz-bg)) 0%, var(--pz-danger-soft) 100%);
     color: var(--pz-danger-strong);
     border-left: 6px solid var(--pz-danger-hover);
-    box-shadow: 0 6px 18px rgba(200, 36, 51, 0.12);
+    box-shadow: 0 6px 18px color-mix(in srgb, var(--pz-danger-text-hover) 12%, transparent);
     padding: 14px 18px;
     border-radius: var(--pz-radius);
 }

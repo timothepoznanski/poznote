@@ -647,19 +647,19 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
             padding: 3px 6px;
             cursor: pointer;
         }
-        /* Dark mode uses its own --dm-* palette; without this the select stays
+        /* The select above is painted with light literals; without this it stays
            white-on-white. The option list is painted by the OS, hence styling
            both the control and its options. */
         :root[data-theme='dark'] .users-pager-size select,
         body.dark-mode .users-pager-size select {
-            color: var(--dm-text);
-            background: var(--dm-surface);
-            border-color: var(--dm-border);
+            color: var(--pz-text);
+            background: var(--pz-surface);
+            border-color: var(--pz-border);
         }
         :root[data-theme='dark'] .users-pager-size select option,
         body.dark-mode .users-pager-size select option {
-            color: var(--dm-text);
-            background: var(--dm-surface);
+            color: var(--pz-text);
+            background: var(--pz-surface);
         }
         /* The wrapper is height-capped by JS to the viewport so the
            horizontal scrollbar is always on screen; rows scroll vertically
@@ -729,7 +729,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
             }
             :root[data-theme='dark'] .users-table thead th,
             body.dark-mode .users-table thead th {
-                background: var(--dm-content-bg);
+                background: var(--pz-bg);
             }
             /* The oversized monospace ID would set the row height on its own. */
             .users-table td.user-id-cell {

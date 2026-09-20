@@ -339,7 +339,7 @@ $currentLang = getUserLanguage();
 		}
 		html[data-theme='dark'] .folder-inline-action-btn,
 		body.dark-mode .folder-inline-action-btn {
-			color: var(--dm-text-muted, #9ca3af);
+			color: var(--pz-text-muted, #9ca3af);
 		}
 		html[data-theme='dark'] .folder-inline-action-btn:hover,
 		body.dark-mode .folder-inline-action-btn:hover {
@@ -377,7 +377,7 @@ $currentLang = getUserLanguage();
 		}
 		html[data-theme='dark'] .folder-list-menu-btn,
 		body.dark-mode .folder-list-menu-btn {
-			color: var(--dm-text-muted, #9ca3af);
+			color: var(--pz-text-muted, #9ca3af);
 		}
 		html[data-theme='dark'] .folder-list-menu-btn:hover,
 		body.dark-mode .folder-list-menu-btn:hover {

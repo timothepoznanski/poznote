@@ -111,7 +111,7 @@ body {
 .sidebar-howto{
     background: transparent;
     border: none;
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     font-size: 1.3rem;
     cursor: pointer;
     padding: 6px;
@@ -140,7 +140,7 @@ body {
 
 .sidebar-howto:focus,
 .sidebar-plus:focus {
-    outline: 2px solid var(--pz-accent);
+    outline: 2px solid var(--pz-accent-text);
     outline-offset: 2px;
 }
 
@@ -228,7 +228,7 @@ body {
 
 .toggle-sidebar-btn:hover {
     background: var(--pz-surface);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.1);
 }
 

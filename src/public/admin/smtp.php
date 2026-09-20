@@ -498,8 +498,8 @@ $notifyCandidates = listNewUserNotificationCandidates();
         }
         html[data-theme='dark'] .smtp-section h2,
         body.dark-mode .smtp-section h2 {
-            color: var(--dm-text);
-            border-bottom-color: var(--dm-accent);
+            color: var(--pz-text);
+            border-bottom-color: var(--pz-accent-text);
         }
         html[data-theme='dark'] .smtp-hint,
         body.dark-mode .smtp-hint {
@@ -515,13 +515,13 @@ $notifyCandidates = listNewUserNotificationCandidates();
         }
         html[data-theme='dark'] .smtp-switch-state,
         body.dark-mode .smtp-switch-state {
-            color: var(--dm-text-muted);
+            color: var(--pz-text-muted);
         }
         html[data-theme='dark'] .smtp-password-toggle:hover,
         html[data-theme='dark'] .smtp-password-toggle:focus-visible,
         body.dark-mode .smtp-password-toggle:hover,
         body.dark-mode .smtp-password-toggle:focus-visible {
-            color: var(--dm-accent, #4da3ff);
+            color: var(--pz-accent-text, #4da3ff);
             background: rgba(77, 163, 255, 0.14);
         }
         html[data-theme='dark'] .smtp-field input,

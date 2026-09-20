@@ -94,7 +94,7 @@
 .modal-content input:focus,
 .modal-content select:focus {
     outline: none;
-    border-color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
 }
 
 .modal .form-group label {
@@ -209,7 +209,7 @@
 html[data-theme='dark'] .modal-buttons button.btn-primary:disabled,
 html[data-theme='dark'] .modal-buttons button.btn-primary:disabled:hover {
     background-color: rgba(var(--pz-highlight-rgb), 0.06) !important;
-    color: var(--dm-text-subtle) !important;
+    color: var(--pz-text-subtle) !important;
     border-color: rgba(var(--pz-highlight-rgb), 0.12) !important;
 }
 
@@ -221,7 +221,7 @@ html[data-theme='dark'] .modal-buttons button.btn-primary:disabled:hover {
     margin: 12px 0 10px 0;
     padding: 10px 12px;
     border-radius: var(--pz-radius-lg);
-    background: #eff6ff;
+    background: color-mix(in srgb, var(--pz-accent) 5%, var(--pz-bg));
     color: var(--pz-accent-strong);
     font-size: 0.85rem;
     line-height: 1.45;
@@ -236,7 +236,7 @@ html[data-theme='dark'] .modal-buttons button.btn-primary:disabled:hover {
 
 html[data-theme='dark'] .modal .modal-info-note {
     background: rgba(59, 130, 246, 0.14);
-    color: var(--dm-accent-hover);
+    color: var(--pz-accent-text-hover);
 }
 
 .modal-buttons button.btn-cancel {
@@ -470,7 +470,7 @@ html[data-theme='dark'] .modal .modal-info-note {
 }
 
 .note-palette-remove:hover {
-    background: #fef2f2;
+    background: color-mix(in srgb, var(--pz-danger) 7%, var(--pz-bg));
     border-color: var(--pz-danger-soft);
 }
 
@@ -498,7 +498,7 @@ html[data-theme='dark'] .modal .modal-info-note {
 .modal-content button.note-palette-add:hover {
     border-color: var(--pz-accent);
     color: var(--pz-accent) !important;
-    background: #f0f9ff;
+    background: color-mix(in srgb, var(--pz-accent) 5%, var(--pz-bg));
 }
 
 .modal-content .note-palette-add .lucide {
@@ -555,45 +555,45 @@ html[data-theme='dark'] .modal .modal-info-note {
 }
 
 html[data-theme='dark'] #noteColorPaletteModal .modal-buttons button.note-palette-back {
-    border-color: var(--dm-border);
+    border-color: var(--pz-border);
     background: transparent;
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #noteColorPaletteModal .modal-buttons button.note-palette-back:hover {
-    border-color: var(--dm-text-muted);
-    background: var(--dm-surface-hover);
+    border-color: var(--pz-text-muted);
+    background: var(--pz-surface-hover);
 }
 
 html[data-theme='dark'] #noteColorPaletteModal .modal-buttons {
-    border-top-color: var(--dm-border);
+    border-top-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .modal-content .note-palette-add,
 html[data-theme='dark'] .modal-content button.note-palette-add {
-    border-color: var(--dm-border);
+    border-color: var(--pz-border);
     background: transparent;
-    color: var(--dm-text-muted) !important;
+    color: var(--pz-text-muted) !important;
 }
 
 html[data-theme='dark'] .modal-content .note-palette-add:hover,
 html[data-theme='dark'] .modal-content button.note-palette-add:hover {
     border-color: var(--pz-accent);
-    color: var(--pz-accent) !important;
-    background: var(--dm-surface-hover);
+    color: var(--pz-accent-text) !important;
+    background: var(--pz-surface-hover);
 }
 
 html[data-theme='dark'] .note-palette-row input.note-palette-name,
 html[data-theme='dark'] .note-palette-row input.note-palette-color,
 html[data-theme='dark'] .note-palette-remove {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
-    color: var(--dm-text);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .note-palette-remove:hover {
-    background: var(--dm-surface-hover);
-    color: var(--dm-danger);
+    background: var(--pz-surface-hover);
+    color: var(--pz-danger-text);
 }
 
 /* ============================================

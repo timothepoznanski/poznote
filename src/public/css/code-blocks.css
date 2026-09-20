@@ -12,7 +12,7 @@
 pre.code-block,
 .noteentry pre {
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
-    background-color: var(--pz-surface);
+    background-color: var(--pz-code-bg);
     /* border: 1px solid #e1e1e1; */
     border-radius: var(--pz-radius-sm);
     padding: 20px 20px;
@@ -131,7 +131,7 @@ pre.code-block .code-block-line-numbers-btn,
 pre.code-block .code-block-delete-btn,
 .noteentry pre .code-block-delete-btn {
     right: 8px;
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 .code-block-copy-btn:hover,
@@ -165,16 +165,16 @@ pre.code-block .code-block-delete-btn,
 }
 
 .code-block-lang-btn:focus-visible {
-    outline: 2px solid var(--pz-accent);
+    outline: 2px solid var(--pz-accent-text);
     outline-offset: -2px;
 }
 
 .code-block-copy-btn:hover {
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
 }
 
 .code-block-delete-btn:hover {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 .code-block-copy-btn:active,
@@ -210,7 +210,7 @@ pre.code-block .code-block-delete-btn,
 }
 
 .code-block-actions-host > .code-block-delete-btn {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 .code-block-actions-host > .code-block-copy-btn:hover,
@@ -221,11 +221,11 @@ pre.code-block .code-block-delete-btn,
 
 .code-block-actions-host > .code-block-copy-btn:hover,
 .code-block-actions-host > .code-block-line-numbers-btn:hover {
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
 }
 
 .code-block-actions-host > .code-block-delete-btn:hover {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 .code-block-actions-host > .code-block-copy-btn svg,

@@ -768,11 +768,11 @@ Les couleurs, espacements, rayons et graisses de police sont des design tokens :
     --pz-accent-rgb: 214, 51, 108;   /* same colour, channels only, used for tints */
 }
 html[data-theme='dark'] {
-    --dm-accent: #f783ac;            /* lighter, because it sits on a dark ground */
+    --pz-accent-text: #f783ac;       /* lighter, because it sits on a dark ground */
 }
 ```
 
-Deux tokens plutôt qu'un, car un *remplissage* et un *libellé* ne peuvent pas avoir la même couleur : `--pz-accent` remplit les boutons, `--dm-accent` est l'accent utilisé comme couleur de texte en mode sombre.
+Deux tokens plutôt qu'un, car un *remplissage* et un *libellé* ne peuvent pas avoir la même couleur : `--pz-accent` remplit les boutons, `--pz-accent-text` est l'accent utilisé pour le texte, les icônes et les contours. Dans un thème clair il suit `--pz-accent` tout seul ; un fond sombre demande une valeur plus claire. Chaque token garde le même nom `--pz-*` dans tous les thèmes, seule sa valeur change. Les noms `--dm-*` des feuilles de style plus anciennes continuent de fonctionner.
 
 **Recolorer les icônes de la barre d'outils des notes**
 
@@ -803,8 +803,6 @@ Pour colorer une seule icône, pas besoin de CSS : faites un clic droit dessus d
 **Écrire un thème complet**
 
 Surchargez les tokens sur `:root` pour le mode clair et sur `:root[data-theme='dark']` pour le mode sombre, et rien d'autre. `src/public/css/README.md` documente chaque token et montre un exemple complet ; les thèmes intégrés Lavande, Sépia et Terminal de `src/public/css/tokens.css` sont exactement cela, écrits de la même façon.
-
-Une chose reste pour l'instant hors de portée d'un thème : quelques icônes qu'une règle de page colore explicitement s'affichent dans le gris générique des icônes en mode sombre.
 
 </details>
 

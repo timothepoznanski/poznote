@@ -5,56 +5,56 @@
  */
 
 html[data-theme='dark'] body.shared-page {
-    background-color: var(--dm-content-bg);
-    color: var(--dm-text);
+    background-color: var(--pz-bg);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .note-link {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .url-input {
-    background-color: var(--dm-surface);
-    border-color: var(--dm-border);
-    color: var(--dm-text);
+    background-color: var(--pz-surface);
+    border-color: var(--pz-border);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .modal-content {
-    background-color: var(--dm-content-bg);
+    background-color: var(--pz-bg);
 }
 
 html[data-theme='dark'] .modal-header {
-    border-bottom-color: var(--dm-border);
+    border-bottom-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .modal-footer {
-    border-top-color: var(--dm-border);
+    border-top-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .error-message {
-    background-color: var(--dm-content-bg);
-    border-left-color: var(--dm-danger-hover);
-    color: var(--dm-danger);
+    background-color: var(--pz-bg);
+    border-left-color: var(--pz-danger-text-hover);
+    color: var(--pz-danger-text);
 }
 
 html[data-theme='dark'] body.shared-page::-webkit-scrollbar {
-    background-color: var(--dm-surface);
+    background-color: var(--pz-surface);
 }
 
 html[data-theme='dark'] body.shared-page::-webkit-scrollbar-thumb {
-    background-color: var(--dm-border-light);
+    background-color: var(--pz-border-strong);
 }
 
 html[data-theme='dark'] body.shared-page::-webkit-scrollbar-thumb:hover {
-    background-color: var(--dm-neutral);
+    background-color: var(--pz-surface-strong);
 }
 
 html[data-theme='dark'] .shared-note-item {
-    border-color: var(--dm-border);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .shared-note-item:hover {
-    background-color: rgba(77, 185, 235, 0.08);
+    background-color: rgba(var(--pz-accent-text-rgb), 0.08);
 }
 
 html[data-theme='dark'] .shared-filter-bar {
@@ -64,21 +64,21 @@ html[data-theme='dark'] .shared-filter-bar {
 }
 
 html[data-theme='dark'] .shared-filter-tree-actions .btn {
-    background: rgba(51, 65, 85, 0.38);
-    border-color: rgba(148, 163, 184, 0.22);
-    color: var(--dm-text-bright);
+    background: color-mix(in srgb, var(--pz-accent-soft) 38%, transparent);
+    border-color: color-mix(in srgb, var(--pz-text-muted) 22%, transparent);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .shared-filter-tree-actions .btn:hover {
-    background: rgba(77, 185, 235, 0.12);
-    border-color: rgba(77, 185, 235, 0.24);
-    color: var(--dm-accent-hover);
+    background: rgba(var(--pz-accent-text-rgb), 0.12);
+    border-color: rgba(var(--pz-accent-text-rgb), 0.24);
+    color: var(--pz-accent-text-hover);
 }
 
 html[data-theme='dark'] .shared-filter-tree-actions .btn:disabled {
-    background: rgba(51, 65, 85, 0.26);
-    border-color: rgba(148, 163, 184, 0.14);
-    color: rgba(200, 208, 216, 0.54);
+    background: color-mix(in srgb, var(--pz-accent-soft) 26%, transparent);
+    border-color: color-mix(in srgb, var(--pz-text-muted) 14%, transparent);
+    color: var(--pz-text-subtle);
 }
 
 html[data-theme='dark'] .shared-notes-header {
@@ -86,51 +86,51 @@ html[data-theme='dark'] .shared-notes-header {
 }
 
 html[data-theme='dark'] .shared-notes-header-cell {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 /* Soft action buttons: brighter icon hues so the tinted chips stay readable
    on a dark background; hover keeps the full-color treatment. */
 html[data-theme='dark'] .note-actions .btn-success {
-    background: rgba(74, 222, 128, 0.14);
-    color: var(--dm-success);
+    background: color-mix(in srgb, var(--pz-success-text) 14%, transparent);
+    color: var(--pz-success-text);
 }
 
 html[data-theme='dark'] .note-actions .btn-success:hover {
-    background: var(--dm-success-hover);
+    background: var(--pz-success-text-hover);
     color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .note-actions .btn-primary {
-    background: rgba(var(--dm-accent-rgb), 0.14);
-    color: var(--dm-accent);
+    background: rgba(var(--pz-accent-text-rgb), 0.14);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .note-actions .btn-primary:hover {
-    background: var(--dm-accent);
+    background: var(--pz-accent-text);
     color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .note-actions .btn-danger {
-    background: rgba(248, 113, 113, 0.14);
-    color: var(--dm-danger);
+    background: color-mix(in srgb, var(--pz-danger-text) 14%, transparent);
+    color: var(--pz-danger-text);
 }
 
 html[data-theme='dark'] .note-actions .btn-danger:hover {
-    background: var(--dm-danger-hover);
+    background: var(--pz-danger-text-hover);
     color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .indexable-label-text {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .note-name {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .note-token {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .note-token-wrap {
@@ -138,30 +138,24 @@ html[data-theme='dark'] .note-token-wrap {
 }
 
 html[data-theme='dark'] .folder-badge {
-    color: var(--dm-text-bright);
-    background-color: transparent;
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .shared-folder-toggle {
-    background: rgba(77, 185, 235, 0.1);
-    color: var(--dm-accent-hover);
+    background: rgba(var(--pz-accent-text-rgb), 0.1);
+    color: var(--pz-accent-text-hover);
 }
 
 html[data-theme='dark'] .shared-folder-toggle:hover {
-    background: rgba(77, 185, 235, 0.18);
-}
-
-html[data-theme='dark'] .folder-badge:hover {
-    background-color: transparent;
-    color: inherit;
+    background: rgba(var(--pz-accent-text-rgb), 0.18);
 }
 
 html[data-theme='dark'] .note-actions-placeholder {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .shared-header-help {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .shared-header-help:hover,
@@ -172,14 +166,14 @@ html[data-theme='dark'] .shared-header-help:focus-visible {
 
 /* Type filter buttons - dark mode */
 html[data-theme='dark'] .filter-type-btn {
-    background: var(--dm-surface);
-    color: var(--dm-text-muted);
-    border-color: var(--dm-border);
+    background: var(--pz-surface);
+    color: var(--pz-text-muted);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .filter-type-btn:hover {
     border-color: var(--pz-accent);
-    color: var(--dm-accent-hover);
+    color: var(--pz-accent-text-hover);
     background: rgba(var(--pz-accent-rgb), 0.18);
 }
 
@@ -190,7 +184,7 @@ html[data-theme='dark'] .filter-type-btn.active {
 }
 
 html[data-theme='dark'] .shared-type-icon:not([data-icon-color]) {
-    color: var(--dm-text-subtle);
+    color: var(--pz-text-subtle);
 }
 
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title h3,
@@ -199,22 +193,22 @@ html[data-theme='dark'] body.shared-page .shared-edit-token-modal .indexable-lab
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value,
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value label,
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value span {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title-link {
-    color: var(--dm-text-bright);
-    background: rgba(102, 179, 255, 0.1);
-    border: 1px solid rgba(102, 179, 255, 0.14);
+    color: var(--pz-text-strong);
+    background: color-mix(in srgb, var(--pz-accent-text-hover) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--pz-accent-text-hover) 14%, transparent);
 }
 
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .shared-edit-token-url-preview:hover,
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title-link:hover {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .shared-edit-token-modal-content {
-    background: linear-gradient(180deg, var(--dm-content-bg) 0%, var(--dm-content-bg) 100%);
+    background: linear-gradient(180deg, var(--pz-bg) 0%, var(--pz-bg) 100%);
     border-color: rgba(var(--pz-highlight-rgb), 0.08);
     box-shadow: 0 28px 64px rgba(var(--pz-shadow-rgb), 0.48);
 }
@@ -232,38 +226,38 @@ html[data-theme='dark'] body.shared-page .shared-edit-token-modal .shared-edit-t
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value input,
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value select,
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .modal-password-input {
-    background-color: var(--dm-surface-hover);
-    border-color: var(--dm-neutral-hover);
-    color: var(--dm-text-bright);
+    background-color: var(--pz-surface-hover);
+    border-color: var(--pz-surface-strong-hover);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value input::placeholder,
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value select::placeholder,
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .modal-password-input::placeholder {
-    color: var(--dm-text);
+    color: var(--pz-text);
     opacity: 1;
 }
 
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value input:focus,
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value select:focus,
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .modal-password-input:focus {
-    border-color: var(--dm-accent-hover);
-    box-shadow: 0 0 0 2px rgba(102, 179, 255, 0.18);
+    border-color: var(--pz-accent-text-hover);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--pz-accent-text-hover) 18%, transparent);
     outline: none;
 }
 
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .shared-edit-token-inline-renew,
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .shared-edit-token-url-copy,
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .shared-edit-token-password-toggle {
-    background: var(--dm-surface-raised);
-    border-color: var(--dm-neutral-hover);
-    color: var(--dm-text-bright);
+    background: var(--pz-surface-sunken);
+    border-color: var(--pz-surface-strong-hover);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .shared-edit-token-inline-renew:hover,
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .shared-edit-token-url-copy:hover,
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .shared-edit-token-password-toggle:hover {
-    background: var(--dm-surface-raised);
+    background: var(--pz-surface-sunken);
     color: var(--pz-text-inverse);
 }
 
@@ -284,9 +278,9 @@ html[data-theme='dark'] body.shared-page .shared-edit-token-modal .share-user-li
 
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .share-user-list-message,
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .share-user-list-name {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] body.shared-page .shared-edit-token-modal .share-user-list-message.is-error {
-    color: var(--dm-danger);
+    color: var(--pz-danger-text);
 }

@@ -107,13 +107,13 @@
     padding: 10px 12px;
     border-radius: var(--pz-radius);
     background-color: var(--pz-danger-soft);
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
     font-size: 0.85rem;
     line-height: 1.45;
 }
 
 /* The neutrals switch with the theme in tokens.css; the status colours do not. */
 html[data-theme='dark'] .attachment-move-error {
-    background-color: var(--dm-danger-soft);
-    color: var(--dm-danger);
+    background-color: var(--pz-danger-soft);
+    color: var(--pz-danger-text);
 }

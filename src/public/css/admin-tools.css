@@ -75,10 +75,10 @@ html[data-theme='dark'] .dr-hero p {
     margin-top: 8px;
     padding: 8px 12px;
     background: rgba(59,130,246,.1);
-    border-left: 3px solid var(--pz-accent);
+    border-left: 3px solid var(--pz-accent-text);
     border-radius: var(--pz-radius);
     font-size: 0.85rem;
-    color: var(--pz-accent-hover);
+    color: var(--pz-accent-text-hover);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -86,7 +86,7 @@ html[data-theme='dark'] .dr-hero p {
 
 html[data-theme='dark'] .deletion-notice {
     background: rgba(59,130,246,.15);
-    color: var(--dm-accent-hover);
+    color: var(--pz-accent-text-hover);
 }
 
 .btn-view-files {
@@ -102,8 +102,8 @@ html[data-theme='dark'] .deletion-notice {
 
 .btn-view-files:hover {
     background: var(--pz-surface-sunken);
-    border-color: var(--pz-accent);
-    color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .btn-view-files {
@@ -113,8 +113,8 @@ html[data-theme='dark'] .btn-view-files {
 
 html[data-theme='dark'] .btn-view-files:hover {
     background: rgba(var(--pz-highlight-rgb), .1);
-    border-color: var(--dm-accent);
-    color: var(--dm-accent);
+    border-color: var(--pz-accent-text);
+    color: var(--pz-accent-text);
 }
 
 /* Modal Styles */
@@ -269,12 +269,12 @@ html[data-theme='dark'] .btn-view-files:hover {
 }
 
 html[data-theme='dark'] .status-clean { 
-    background: rgba(34,197,94,.15); 
-    color: var(--dm-success); 
+    background: color-mix(in srgb, var(--pz-success-text-hover) 15%, transparent); 
+    color: var(--pz-success-text); 
 }
 html[data-theme='dark'] .status-warning { 
     background: rgba(234,179,8,.15); 
-    color: var(--dm-warning); 
+    color: var(--pz-warning-text); 
 }
 
 /* ── Orphan Scanner Buttons ── */
@@ -389,15 +389,15 @@ html[data-theme='dark'] .status-warning {
    "used / limit" pair turns orange from 50% of the quota and red from 80%. */
 .quota-level-warn,
 .quota-level-warn .quota-inline {
-    color: var(--pz-warning-hover);
+    color: var(--pz-warning-text-hover);
 }
 .quota-level-danger,
 .quota-level-danger .quota-inline {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 html[data-theme='dark'] .quota-level-warn {
-    color: var(--dm-warning);
+    color: var(--pz-warning-text);
 }
 html[data-theme='dark'] .quota-level-danger {
-    color: var(--dm-danger);
+    color: var(--pz-danger-text);
 }

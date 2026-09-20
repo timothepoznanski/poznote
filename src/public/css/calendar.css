@@ -88,7 +88,7 @@
 .mini-calendar-today:hover,
 .mini-calendar-toggle:hover {
     background: rgba(var(--pz-accent-rgb), 0.1);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .mini-calendar-nav i,
@@ -153,11 +153,11 @@
 /* Today indicator */
 .mini-calendar-day-today {
     background: rgba(11, 120, 230, 0.1);
-    border: 1px solid var(--pz-accent);
+    border: 1px solid var(--pz-accent-text);
 }
 
 .mini-calendar-day-today .mini-calendar-day-number {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     font-weight: var(--pz-weight-bold);
 }
 
@@ -174,12 +174,12 @@
     width: 2.5px;
     height: 2.5px;
     border-radius: var(--pz-radius-circle);
-    background: var(--pz-accent);
+    background: var(--pz-accent-text);
 }
 
 .mini-calendar-dot-more {
     font-size: 6px;
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     font-weight: var(--pz-weight-semibold);
     line-height: 1;
 }
@@ -301,7 +301,7 @@
 
 .calendar-note-item:hover {
     background: var(--pz-surface-hover);
-    border-color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
     box-shadow: 0 2px 4px rgba(var(--pz-shadow-rgb), 0.05);
 }
 
@@ -377,5 +377,5 @@
 }
 
 .calendar-notes-modal .btn-close-red:hover {
-    background: var(--pz-danger-hover);
+    background: var(--pz-danger-text-hover);
 }

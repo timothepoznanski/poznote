@@ -9,113 +9,85 @@
    ============================================ */
 
 html[data-theme='dark'] .name_tags {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .name_tags * {
-    color: var(--dm-text) !important;
+    color: var(--pz-text) !important;
 }
 
 html[data-theme='dark'] .tag-item {
-    background-color: var(--dm-surface);
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
+    border-color: var(--pz-border);
 }
 
 :where(html[data-theme='dark']) h1 {
-    color: var(--dm-text) !important;
+    color: var(--pz-text) !important;
 }
 
 html[data-theme='dark'] .tags-info {
-    color: var(--dm-text);
-}
-
-html[data-theme='dark'] .tag-name {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 /* Editable tags */
 html[data-theme='dark'] .clickable-tag-wrapper {
-    border-color: var(--dm-border);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .clickable-tag-wrapper:hover {
-    border-color: var(--dm-border-light);
-}
-
-html[data-theme='dark'] .clickable-tag {
-    color: var(--dm-accent);
-}
-
-html[data-theme='dark'] .clickable-tag:hover {
-    color: var(--dm-accent-hover);
+    border-color: var(--pz-border-strong);
 }
 
 html[data-theme='dark'] .clickable-tag:visited {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .clickable-tag:hover:visited {
-    color: var(--dm-accent-hover);
-}
-
-html[data-theme='dark'] .tag-delete-button {
-    color: var(--dm-text-subtle);
-}
-
-html[data-theme='dark'] .tag-delete-button:hover {
-    color: var(--dm-danger);
+    color: var(--pz-accent-text-hover);
 }
 
 html[data-theme='dark'] .clickable-tag-wrapper.tag-highlight {
-    background: var(--dm-warning-soft);
+    background: var(--pz-warning-soft);
 }
 
 html[data-theme='dark'] .clickable-tag-wrapper.tag-highlight .clickable-tag {
-    color: var(--dm-warning);
+    color: var(--pz-warning-text);
 }
 
 html[data-theme='dark'] .tag-input {
     background: transparent;
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    color: var(--pz-text);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .tag-input::placeholder {
-    color: var(--dm-text-subtle);
+    color: var(--pz-text-subtle);
 }
 
 /* Folder name badge */
 html[data-theme='dark'] .folder_name {
-    border-color: var(--dm-border);
-    color: var(--dm-text);
+    border-color: var(--pz-border);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .folder_name:hover {
-    border-color: var(--dm-border-light);
-}
-
-html[data-theme='dark'] .folder-path-segment:hover {
-    color: var(--dm-accent);
-}
-
-html[data-theme='dark'] .folder-path-separator {
-    color: var(--dm-text-subtle);
+    border-color: var(--pz-border-strong);
 }
 
 /* Tag suggestions dropdown */
 html[data-theme='dark'] .tag-suggestions {
-    background-color: var(--dm-surface) !important;
-    border-color: var(--dm-border) !important;
+    background-color: var(--pz-surface) !important;
+    border-color: var(--pz-border) !important;
     box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.4) !important;
 }
 
 html[data-theme='dark'] .tag-suggestion-item {
-    color: var(--dm-text) !important;
+    color: var(--pz-text) !important;
 }
 
 html[data-theme='dark'] .tag-suggestion-item:hover {
-    background-color: var(--dm-surface) !important;
+    background-color: var(--pz-surface) !important;
 }
 
 html[data-theme='dark'] .tag-suggestion-item.highlighted {
@@ -128,103 +100,91 @@ html[data-theme='dark'] .tag-suggestion-item.highlighted {
    ============================================ */
 
 html[data-theme='dark'] .task-item {
-    background-color: var(--dm-surface);
-    border-color: var(--dm-border);
+    background-color: var(--pz-surface);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .task-text {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .task-input {
-    background-color: var(--dm-surface);
-    border-color: var(--dm-border);
-    color: var(--dm-text);
+    background-color: var(--pz-surface);
+    border-color: var(--pz-border);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .task-edit-input {
-    background-color: var(--dm-surface);
+    background-color: var(--pz-surface);
     border-color: var(--pz-accent);
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .task-edit-textarea {
-    background-color: var(--dm-surface);
-    border-color: var(--dm-border);
-    color: var(--dm-text);
+    background-color: var(--pz-surface);
+    border-color: var(--pz-border);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .task-edit-hint {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .task-item:hover {
-    background-color: var(--dm-surface);
+    background-color: var(--pz-surface);
 }
 
 html[data-theme='dark'] .task-checkbox {
-    border-color: var(--dm-border);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .task-delete-btn i,
 html[data-theme='dark'] .task-important-btn i,
 html[data-theme='dark'] .task-drag-handle i {
-    color: var(--dm-text);
-}
-
-html[data-theme='dark'] .task-delete-btn:hover i {
-    color: var(--dm-danger);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .task-important-btn:hover i {
-    color: var(--dm-warning);
+    color: var(--pz-warning-text);
 }
 
 html[data-theme='dark'] .task-important-btn.is-favorite i {
-    color: var(--dm-danger) !important;
+    color: var(--pz-danger-text) !important;
 }
 
 html[data-theme='dark'] .task-due-btn i {
-    color: var(--dm-text);
-}
-
-html[data-theme='dark'] .task-due-btn:hover i {
-    color: var(--dm-accent);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .task-due-chip {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
-    color: var(--dm-text-muted);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .task-due-chip:hover {
-    border-color: var(--dm-accent);
-    color: var(--dm-accent);
+    border-color: var(--pz-accent-text);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .task-due-chip.overdue {
-    background: var(--dm-content-bg);
-    border-color: var(--dm-danger-hover);
-    color: var(--dm-danger);
+    background: var(--pz-bg);
+    border-color: var(--pz-danger-text-hover);
+    color: var(--pz-danger-text);
 }
 
 html[data-theme='dark'] .task-menu-btn i {
-    color: var(--dm-text);
-}
-
-html[data-theme='dark'] .task-menu-btn:hover i {
-    color: var(--dm-accent);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .task-actions-menu {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
     box-shadow: 0 12px 30px rgba(var(--pz-shadow-rgb), 0.5);
 }
 
 html[data-theme='dark'] .task-actions-menu-item {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .task-actions-menu-item:hover {
@@ -232,44 +192,43 @@ html[data-theme='dark'] .task-actions-menu-item:hover {
 }
 
 html[data-theme='dark'] .task-actions-menu-item i {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
-/* The :is() ID boost + !important outguns the `.noteentry *` --dm-text
+/* The :is() ID boost + !important outguns the `.noteentry *` --pz-text
    blanket from dark-mode/editor.css */
 html[data-theme='dark'] .tasklist-progress-label:is(#pz-specificity-boost, *) {
-    color: var(--dm-text-muted) !important;
+    color: var(--pz-text-muted) !important;
 }
 
 html[data-theme='dark'] .tasklist-progress-bar {
-    background-color: var(--dm-surface);
+    background-color: var(--pz-surface);
 }
 
 /* Important task styling for dark mode */
 html[data-theme='dark'] .task-item.important {
-    border-color: var(--dm-danger-hover);
-    background: var(--dm-content-bg);
+    border-color: var(--pz-danger-text-hover);
+    background: var(--pz-bg);
 }
 
 html[data-theme='dark'] .task-item.important .task-text {
-    color: var(--dm-danger);
-    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-danger-text);
 }
 
 html[data-theme='dark'] .task-item.important .task-text a {
-    color: var(--dm-danger);
+    color: var(--pz-danger-text);
     font-weight: var(--pz-weight-semibold);
 }
 
 html[data-theme='dark'] .task-item.important .task-text a:hover {
-    color: var(--dm-danger);
+    color: var(--pz-danger-text);
     text-decoration: underline;
 }
 
 /* Task order buttons */
 html[data-theme='dark'] .btn-task-order.active {
     background-color: rgba(var(--pz-accent-rgb), 0.2);
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .btn-task-order:hover {
@@ -285,30 +244,30 @@ html[data-theme='dark'] .btn-task-order.active:hover {
    ============================================ */
 
 html[data-theme='dark'] .form-group input {
-    background-color: var(--dm-surface);
-    color: var(--dm-text);
-    border-color: var(--dm-border-light);
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
+    border-color: var(--pz-border-strong);
 }
 
 html[data-theme='dark'] .form-group input::placeholder {
-    color: var(--dm-text-subtle);
+    color: var(--pz-text-subtle);
 }
 
 html[data-theme='dark'] .form-group input:focus {
-    background-color: var(--dm-surface-hover);
-    border-color: var(--dm-accent);
+    background-color: var(--pz-surface-hover);
+    border-color: var(--pz-accent-text);
     outline: none;
 }
 
 html[data-theme='dark'] .form-group select {
-    background-color: var(--dm-border);
-    color: var(--dm-text);
-    border-color: var(--dm-border-light);
+    background-color: var(--pz-border);
+    color: var(--pz-text);
+    border-color: var(--pz-border-strong);
 }
 
 html[data-theme='dark'] .form-group select option {
-    background-color: var(--dm-border);
-    color: var(--dm-text);
+    background-color: var(--pz-border);
+    color: var(--pz-text);
 }
 
 /* ============================================
@@ -317,14 +276,14 @@ html[data-theme='dark'] .form-group select option {
 
 html[data-theme='dark'] .btn,
 html[data-theme='dark'] .btn-secondary {
-    background-color: var(--dm-surface);
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .btn:hover,
 html[data-theme='dark'] .btn-secondary:hover {
-    background-color: var(--dm-surface-hover);
+    background-color: var(--pz-surface-hover);
 }
 
 /* Plain weight. These used to be, because dark-mode/modals.css styles
@@ -345,33 +304,33 @@ html[data-theme='dark'] .btn-primary:hover {
 }
 
 html[data-theme='dark'] .btn-rename {
-    background-color: var(--dm-warning);
-    color: var(--dm-content-bg);
-    border-color: var(--dm-warning);
+    background-color: var(--pz-warning-text);
+    color: var(--pz-bg);
+    border-color: var(--pz-warning-text);
 }
 
 html[data-theme='dark'] .btn-rename:disabled {
-    background-color: var(--dm-surface-raised);
-    color: var(--dm-text-subtle);
-    border-color: var(--dm-border-light);
+    background-color: var(--pz-surface-sunken);
+    color: var(--pz-text-subtle);
+    border-color: var(--pz-border-strong);
     opacity: 0.6;
 }
 
 html[data-theme='dark'] .btn-warning:hover,
 html[data-theme='dark'] .btn-rename:hover {
-    background-color: var(--dm-warning-hover);
-    border-color: var(--dm-warning-hover);
+    background-color: var(--pz-warning-text-hover);
+    border-color: var(--pz-warning-text-hover);
 }
 
 html[data-theme='dark'] .btn-background {
-    background-color: var(--dm-neutral);
-    color: var(--dm-text-bright);
-    border-color: var(--dm-neutral);
+    background-color: var(--pz-surface-strong);
+    color: var(--pz-text-strong);
+    border-color: var(--pz-surface-strong);
 }
 
 html[data-theme='dark'] .btn-background:hover {
-    background-color: var(--dm-neutral-hover);
-    border-color: var(--dm-border-light);
+    background-color: var(--pz-surface-strong-hover);
+    border-color: var(--pz-border-strong);
 }
 
 html[data-theme='dark'] .btn-danger,
@@ -383,8 +342,8 @@ html[data-theme='dark'] .btn-delete-ws {
 
 html[data-theme='dark'] .btn-danger:hover,
 html[data-theme='dark'] .btn-delete-ws:hover {
-    background-color: var(--dm-danger-hover);
-    border-color: var(--dm-danger-hover);
+    background-color: var(--pz-danger-text-hover);
+    border-color: var(--pz-danger-text-hover);
 }
 
 html[data-theme='dark'] .btn-success {
@@ -394,18 +353,18 @@ html[data-theme='dark'] .btn-success {
 }
 
 html[data-theme='dark'] .btn-success:hover {
-    background-color: var(--dm-success-hover);
-    border-color: var(--dm-success-hover);
+    background-color: var(--pz-success-text-hover);
+    border-color: var(--pz-success-text-hover);
 }
 
 html[data-theme='dark'] .btn-cancel {
-    background-color: var(--dm-border);
-    color: var(--dm-text);
-    border-color: var(--dm-border-light);
+    background-color: var(--pz-border);
+    color: var(--pz-text);
+    border-color: var(--pz-border-strong);
 }
 
 html[data-theme='dark'] .btn-cancel:hover {
-    background-color: var(--dm-surface-raised);
+    background-color: var(--pz-surface-sunken);
 }
 
 /* ============================================
@@ -421,19 +380,19 @@ html[data-theme='dark'] .btn-cancel:hover {
    the highlight on the current page. .btn no longer needs excluding either:
    at (0,0,1) every component that states a colour already outranks this. */
 :where(html[data-theme='dark']) a {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 :where(html[data-theme='dark']) a:hover {
-    color: var(--dm-accent-hover);
+    color: var(--pz-accent-text-hover);
 }
 
 html[data-theme='dark'] .back-link {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .back-link:hover {
-    color: var(--dm-accent-hover);
+    color: var(--pz-accent-text-hover);
 }
 
 /* ============================================
@@ -441,13 +400,13 @@ html[data-theme='dark'] .back-link:hover {
    ============================================ */
 
 html[data-theme='dark'] .setting-status.enabled {
-    background-color: var(--dm-success-soft);
-    color: var(--dm-success);
+    background-color: var(--pz-success-soft);
+    color: var(--pz-success-text);
 }
 
 html[data-theme='dark'] .setting-status.disabled {
-    background-color: var(--dm-danger-soft);
-    color: var(--dm-danger);
+    background-color: var(--pz-danger-soft);
+    color: var(--pz-danger-text);
 }
 
 /* ============================================
@@ -455,54 +414,54 @@ html[data-theme='dark'] .setting-status.disabled {
    ============================================ */
 
 html[data-theme='dark'] .alert {
-    background-color: var(--dm-surface);
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .alert-success {
-    background-color: var(--dm-success-soft);
-    color: var(--dm-success);
-    border-color: var(--dm-success-soft);
+    background-color: var(--pz-success-soft);
+    color: var(--pz-success-text);
+    border-color: var(--pz-success-soft);
 }
 
 html[data-theme='dark'] .alert-danger,
 html[data-theme='dark'] .alert-error {
-    background-color: var(--dm-danger-soft);
-    color: var(--dm-danger);
-    border-color: var(--dm-danger-soft);
+    background-color: var(--pz-danger-soft);
+    color: var(--pz-danger-text);
+    border-color: var(--pz-danger-soft);
 }
 
 /* Without this the generic .alert above wins and warnings read as a
    neutral grey panel, losing the caution signal entirely. */
 html[data-theme='dark'] .alert-warning {
-    background-color: var(--dm-warning-soft);
-    color: var(--dm-warning);
-    border-color: var(--dm-warning-soft);
+    background-color: var(--pz-warning-soft);
+    color: var(--pz-warning-text);
+    border-color: var(--pz-warning-soft);
 }
 
 html[data-theme='dark'] #poznoteToast {
-    background-color: var(--dm-surface);
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] #poznoteToast.notification-success {
-    color: var(--dm-success);
-    border-color: var(--dm-success);
-    box-shadow: 0 4px 16px rgba(74, 222, 128, 0.2);
+    color: var(--pz-success-text);
+    border-color: var(--pz-success-text);
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--pz-success-text) 20%, transparent);
 }
 
 html[data-theme='dark'] #poznoteToast.notification-error {
-    color: var(--dm-danger);
-    border-color: var(--dm-danger);
+    color: var(--pz-danger-text);
+    border-color: var(--pz-danger-text);
     box-shadow: 0 4px 16px rgba(248, 113, 113, 0.2);
 }
 
 html[data-theme='dark'] #poznoteToast.notification-warning {
-    color: var(--dm-accent);
-    border-color: var(--dm-accent);
-    box-shadow: 0 4px 16px rgba(var(--dm-accent-rgb), 0.2);
+    color: var(--pz-accent-text);
+    border-color: var(--pz-accent-text);
+    box-shadow: 0 4px 16px rgba(var(--pz-accent-text-rgb), 0.2);
 }
 
 /* ============================================
@@ -510,15 +469,15 @@ html[data-theme='dark'] #poznoteToast.notification-warning {
    ============================================ */
 
 html[data-theme='dark'] .emoji-hint {
-    background: var(--dm-surface);
-    border-left-color: var(--dm-accent);
-    color: var(--dm-text);
+    background: var(--pz-surface);
+    border-left-color: var(--pz-accent-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .emoji-hint kbd {
-    background: var(--dm-bg);
-    border-color: var(--dm-border);
-    color: var(--dm-text);
+    background: var(--pz-chrome-bg);
+    border-color: var(--pz-border);
+    color: var(--pz-text);
 }
 
 /* ============================================
@@ -526,49 +485,49 @@ html[data-theme='dark'] .emoji-hint kbd {
    ============================================ */
 
 html[data-theme='dark'] .table-picker-popup {
-    background-color: var(--dm-surface);
-    border-color: var(--dm-border);
+    background-color: var(--pz-surface);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .table-picker-header {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .table-picker-input-section {
-    border-top-color: var(--dm-border);
+    border-top-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .table-picker-input-field-label {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .table-picker-input-field {
-    background-color: var(--dm-bg);
-    border-color: var(--dm-border);
-    color: var(--dm-text);
+    background-color: var(--pz-chrome-bg);
+    border-color: var(--pz-border);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .table-picker-input-field:focus {
-    border-color: var(--dm-accent-hover);
+    border-color: var(--pz-accent-text-hover);
     box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.15);
 }
 
 html[data-theme='dark'] .table-picker-input-field:hover {
-    border-color: var(--dm-border-light);
+    border-color: var(--pz-border-strong);
 }
 
 html[data-theme='dark'] .table-picker-insert-btn {
-    background: var(--dm-accent);
+    background: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .table-picker-insert-btn:hover {
-    background: var(--dm-accent);
+    background: var(--pz-accent-text);
 }
 
 /* Color palette popup */
 html[data-theme='dark'] .color-palette-popup {
-    background-color: var(--dm-surface);
-    border-color: var(--dm-border);
+    background-color: var(--pz-surface);
+    border-color: var(--pz-border);
 }
 
 /* ============================================
@@ -576,43 +535,43 @@ html[data-theme='dark'] .color-palette-popup {
    ============================================ */
 
 :where(html[data-theme='dark']) table {
-    border-color: var(--dm-border);
+    border-color: var(--pz-border);
 }
 
 :where(html[data-theme='dark']) table th {
-    background-color: var(--dm-surface);
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
+    border-color: var(--pz-border);
 }
 
 :where(html[data-theme='dark']) table td {
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    color: var(--pz-text);
+    border-color: var(--pz-border);
 }
 
 /* Inserted tables */
 html[data-theme='dark'] .noteentry table.inserted-table td,
 html[data-theme='dark'] .noteentry table.inserted-table th {
-    border-color: var(--dm-border);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .noteentry table.inserted-table th {
-    background-color: var(--dm-surface);
+    background-color: var(--pz-surface);
 }
 
 /* Table context menu */
 html[data-theme='dark'] .table-context-menu {
-    background: var(--dm-surface) !important;
-    border-color: var(--dm-border) !important;
+    background: var(--pz-surface) !important;
+    border-color: var(--pz-border) !important;
     box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.4) !important;
 }
 
 html[data-theme='dark'] .table-context-menu-item {
-    color: var(--dm-text-bright) !important;
+    color: var(--pz-text-strong) !important;
 }
 
 html[data-theme='dark'] .table-context-menu-item[style*="color: #dc2626"] {
-    color: var(--dm-danger) !important;
+    color: var(--pz-danger-text) !important;
 }
 
 /* ============================================
@@ -625,16 +584,16 @@ html[data-theme='dark'] ::-webkit-scrollbar {
 }
 
 :where(html[data-theme='dark']) ::-webkit-scrollbar-track {
-    background: var(--dm-bg);
+    background: var(--pz-chrome-bg);
 }
 
 :where(html[data-theme='dark']) ::-webkit-scrollbar-thumb {
-    background: var(--dm-border);
+    background: var(--pz-border);
     border-radius: var(--pz-radius);
 }
 
 :where(html[data-theme='dark']) ::-webkit-scrollbar-thumb:hover {
-    background: var(--dm-surface-raised);
+    background: var(--pz-surface-sunken);
 }
 
 /* ============================================
@@ -646,54 +605,54 @@ html[data-theme='dark'] ::-webkit-scrollbar {
    ============================================ */
 
 html[data-theme='dark'] #ai-chat-panel {
-    background: var(--dm-bg);
+    background: var(--pz-chrome-bg);
 }
 
 html[data-theme='dark'] .ai-chat-resize-handle {
-    border-left-color: var(--dm-border);
+    border-left-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .ai-chat-resize-handle:hover {
-    border-left-color: var(--dm-border);
+    border-left-color: var(--pz-border);
 }
 
 html[data-theme='dark'] #ai-chat-panel.ai-chat-resizing .ai-chat-resize-handle {
-    border-left-color: var(--dm-accent);
+    border-left-color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .ai-chat-title {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .ai-chat-header-btn {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .ai-chat-header-btn:hover,
 html[data-theme='dark'] .ai-chat-header-btn:focus {
-    background: var(--dm-surface-hover);
-    color: var(--dm-accent);
+    background: var(--pz-surface-hover);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .ai-chat-empty {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .ai-chat-msg-user {
-    background: var(--dm-active);
-    color: var(--dm-text);
+    background: var(--pz-active-bg);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .ai-chat-msg-assistant {
-    background: var(--dm-surface);
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    background: var(--pz-surface);
+    color: var(--pz-text);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .ai-chat-msg-error {
-    background: var(--dm-content-bg);
-    color: var(--dm-danger);
-    border-color: var(--dm-danger-soft);
+    background: var(--pz-bg);
+    color: var(--pz-danger-text);
+    border-color: var(--pz-danger-soft);
 }
 
 html[data-theme='dark'] .ai-chat-md code,
@@ -702,53 +661,53 @@ html[data-theme='dark'] .ai-chat-md pre {
 }
 
 html[data-theme='dark'] .ai-chat-md blockquote {
-    border-left-color: var(--dm-border);
-    color: var(--dm-text-muted);
+    border-left-color: var(--pz-border);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .ai-chat-md th,
 html[data-theme='dark'] .ai-chat-md td {
-    border-color: var(--dm-border);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .ai-chat-md a {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .ai-chat-tool,
 html[data-theme='dark'] .ai-chat-context {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .ai-chat-notice {
-    color: var(--dm-warning-hover);
-    background: var(--dm-content-bg);
-    border-color: var(--dm-warning-soft);
+    color: var(--pz-warning-text-hover);
+    background: var(--pz-bg);
+    border-color: var(--pz-warning-soft);
 }
 
 html[data-theme='dark'] .ai-chat-inputbar {
-    background: var(--dm-bg);
-    border-top-color: var(--dm-border);
+    background: var(--pz-chrome-bg);
+    border-top-color: var(--pz-border);
 }
 
 html[data-theme='dark'] #ai-chat-input {
-    background: var(--dm-surface);
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    background: var(--pz-surface);
+    color: var(--pz-text);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] #ai-chat-input:focus {
-    border-color: var(--dm-accent);
+    border-color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .ai-chat-send-btn {
-    background: var(--dm-accent);
+    background: var(--pz-accent-text);
     color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .ai-chat-send-btn:disabled {
-    background: var(--dm-surface-hover);
-    color: var(--dm-text-muted);
+    background: var(--pz-surface-hover);
+    color: var(--pz-text-muted);
 }
 
 /* ============================================
@@ -756,7 +715,7 @@ html[data-theme='dark'] .ai-chat-send-btn:disabled {
    ============================================ */
 
 html[data-theme='dark'] .tasklist-embed-widget {
-    border-color: var(--dm-border);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .tasklist-embed-task:hover,
@@ -765,42 +724,42 @@ html[data-theme='dark'] .tasklist-embed-task:focus-within {
 }
 
 html[data-theme='dark'] .tasklist-embed-toggle {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .tasklist-embed-toggle:hover {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
-/* The :is() ID boost + !important outguns the `.noteentry *` --dm-text
+/* The :is() ID boost + !important outguns the `.noteentry *` --pz-text
    blanket from dark-mode/editor.css */
 html[data-theme='dark'] .tasklist-embed-count:is(#pz-specificity-boost, *),
 html[data-theme='dark'] .tasklist-embed-due:is(#pz-specificity-boost, *) {
-    color: var(--dm-text-muted) !important;
+    color: var(--pz-text-muted) !important;
 }
 
 html[data-theme='dark'] .tasklist-embed-due.overdue:is(#pz-specificity-boost, *) {
-    color: var(--dm-danger) !important;
+    color: var(--pz-danger-text) !important;
 }
 
 html[data-theme='dark'] .tasklist-embed-task.completed .tasklist-embed-text:is(#pz-specificity-boost, *) {
-    color: var(--dm-text-subtle) !important;
+    color: var(--pz-text-subtle) !important;
 }
 
 html[data-theme='dark'] .tasklist-embed-empty:is(#pz-specificity-boost, *),
 html[data-theme='dark'] .tasklist-embed-unavailable:is(#pz-specificity-boost, *) {
-    color: var(--dm-text-subtle) !important;
+    color: var(--pz-text-subtle) !important;
 }
 
 /* Inline editing controls of the embedded task list. The `.noteentry *`
-   --dm-text blanket also hits the buttons, so their colors need the :is()
+   --pz-text blanket also hits the buttons, so their colors need the :is()
    ID boost + !important; the icons simply inherit from their control. */
 html[data-theme='dark'] .tasklist-embed-add-input:focus {
-    border-bottom-color: var(--dm-border);
+    border-bottom-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .tasklist-embed-add-input::placeholder {
-    color: var(--dm-text-subtle);
+    color: var(--pz-text-subtle);
 }
 
 html[data-theme='dark'] .tasklist-embed-action i:is(#pz-specificity-boost, *),
@@ -811,23 +770,23 @@ html[data-theme='dark'] .tasklist-embed-add > i:is(#pz-specificity-boost, *) {
 
 html[data-theme='dark'] .tasklist-embed-action:is(#pz-specificity-boost, *),
 html[data-theme='dark'] .tasklist-embed-add:is(#pz-specificity-boost, *) {
-    color: var(--dm-text-muted) !important;
+    color: var(--pz-text-muted) !important;
 }
 
 html[data-theme='dark'] .tasklist-embed-action-important.is-active:is(#pz-specificity-boost, *),
 html[data-theme='dark'] .tasklist-embed-action-important:hover:is(#pz-specificity-boost, *) {
-    color: var(--dm-warning-hover) !important;
+    color: var(--pz-warning-text-hover) !important;
 }
 
 html[data-theme='dark'] .tasklist-embed-action-due:hover:is(#pz-specificity-boost, *),
 html[data-theme='dark'] button.tasklist-embed-due:hover:is(#pz-specificity-boost, *) {
-    color: var(--dm-accent) !important;
+    color: var(--pz-accent-text) !important;
 }
 
 html[data-theme='dark'] .tasklist-embed-action-delete:hover:is(#pz-specificity-boost, *) {
-    color: var(--dm-danger) !important;
+    color: var(--pz-danger-text) !important;
 }
 
 html[data-theme='dark'] .tasklist-embed-error:is(#pz-specificity-boost, *) {
-    color: var(--dm-danger) !important;
+    color: var(--pz-danger-text) !important;
 }

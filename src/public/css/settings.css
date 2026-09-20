@@ -109,7 +109,7 @@ body.settings-page {
 
 html[data-theme='light'] #changePasswordModal .change-password-description,
 body:not(.dark-mode) #changePasswordModal .change-password-description {
-    color: var(--dm-text-subtle);
+    color: var(--pz-text-muted);
 }
 
 /* Status notice: says which password the "current password" field expects. */
@@ -130,20 +130,20 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
 #changePasswordModal .change-password-status-custom {
     background: var(--pz-success-soft);
     color: var(--pz-success-strong);
-    border-left-color: var(--pz-success);
+    border-left-color: var(--pz-success-text);
 }
 
 /* Still on the shared default: worth acting on, so flag it. */
 #changePasswordModal .change-password-status-default {
     background: var(--pz-warning-soft);
     color: var(--pz-warning-strong);
-    border-left-color: var(--pz-warning);
+    border-left-color: var(--pz-warning-text);
 }
 
 #changePasswordModal .change-password-status-sso {
     background: var(--pz-accent-soft);
     color: var(--pz-accent-strong);
-    border-left-color: var(--pz-accent);
+    border-left-color: var(--pz-accent-text);
 }
 
 /* App passwords modal (js/app-passwords.js): a create row, the secret shown
@@ -195,7 +195,7 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
 }
 
 #appPasswordsModal .app-passwords-error {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
     margin: 0 0 10px 0;
     font-size: 0.9rem;
 }
@@ -291,7 +291,7 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
 }
 
 #appPasswordsModal .app-password-expired {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 #appPasswordsModal .app-password-revoke {
@@ -420,8 +420,8 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
 }
 
 .settings-view-toggle:hover {
-    border-color: var(--pz-accent);
-    color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
+    color: var(--pz-accent-text);
 }
 
 .settings-view-toggle .lucide {
@@ -444,14 +444,14 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
 }
 
 html[data-theme='dark'] .settings-view-toggle {
-    background: var(--dm-surface, var(--dm-content-bg));
-    border-color: var(--dm-border, var(--dm-border));
-    color: var(--dm-text-muted, var(--dm-text-muted));
+    background: var(--pz-surface, var(--pz-bg));
+    border-color: var(--pz-border);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .settings-view-toggle:hover {
-    border-color: var(--dm-accent, var(--dm-accent));
-    color: var(--dm-accent, var(--dm-accent));
+    border-color: var(--pz-accent-text);
+    color: var(--pz-accent-text);
 }
 
 /* Collapse/expand all sections, at the right end of the filter row. Same
@@ -473,8 +473,8 @@ html[data-theme='dark'] .settings-view-toggle:hover {
 }
 
 .settings-collapse-all:hover {
-    border-color: var(--pz-accent);
-    color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
+    color: var(--pz-accent-text);
 }
 
 .settings-collapse-all .lucide {
@@ -488,14 +488,14 @@ html[data-theme='dark'] .settings-view-toggle:hover {
 }
 
 html[data-theme='dark'] .settings-collapse-all {
-    background: var(--dm-surface, var(--dm-content-bg));
-    border-color: var(--dm-border);
-    color: var(--dm-text-muted);
+    background: var(--pz-surface, var(--pz-bg));
+    border-color: var(--pz-border);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .settings-collapse-all:hover {
-    border-color: var(--dm-accent);
-    color: var(--dm-accent);
+    border-color: var(--pz-accent-text);
+    color: var(--pz-accent-text);
 }
 
 /* ---------- List layout: cards become compact full-width rows ---------- */
@@ -627,7 +627,7 @@ html[data-theme='dark'] .settings-collapse-all:hover {
 }
 
 .home-card.is-pinned .settings-card-pin i {
-    background-color: var(--pz-accent);
+    background-color: var(--pz-accent-text);
     opacity: 1;
 }
 
@@ -635,7 +635,7 @@ html[data-theme='dark'] .settings-collapse-all:hover {
    pinned indicator, on the source card and on its clone alike. */
 
 html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
-    background-color: var(--dm-accent);
+    background-color: var(--pz-accent-text);
 }
 
 /* Change Password card when a password change is impossible (SSO-only instance,
@@ -660,16 +660,16 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
 .delete-warning-box {
     margin-top: 15px;
     padding: 12px 14px;
-    border: 1px solid rgba(220, 53, 69, 0.35);
+    border: 1px solid color-mix(in srgb, var(--pz-danger) 35%, transparent);
     border-left: 3px solid var(--pz-danger);
     border-radius: var(--pz-radius);
-    background: rgba(220, 53, 69, 0.06);
+    background: color-mix(in srgb, var(--pz-danger) 6%, transparent);
     text-align: left;
 }
 
 .delete-warning-box .delete-warning {
     margin: 0 0 8px;
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
     font-weight: var(--pz-weight-medium);
 }
 
@@ -796,7 +796,7 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
        so the list reads as one text, not a bold row among regular ones. */
     .settings-nav-item.is-active {
         background: rgba(var(--pz-accent-rgb), 0.1);
-        color: var(--pz-accent);
+        color: var(--pz-accent-text);
     }
 
     .settings-nav-item .lucide {
@@ -993,7 +993,7 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
     }
 
     .home-container.settings-with-nav .settings-toggle-card .setting-status.enabled {
-        background: var(--pz-accent);
+        background: var(--pz-accent-text);
     }
 
     .home-container.settings-with-nav .settings-toggle-card .setting-status.enabled::after {
@@ -1003,25 +1003,25 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
     /* ----- Dark mode ----- */
 
     html[data-theme='dark'] .home-container.settings-with-nav .home-grid:not([hidden]) {
-        background: var(--dm-surface);
-        border-color: var(--dm-border);
+        background: var(--pz-surface);
+        border-color: var(--pz-border);
     }
 
     html[data-theme='dark'] .home-container.settings-with-nav .home-card + .home-card::after {
-        background: var(--dm-border);
+        background: var(--pz-border);
     }
 
     html[data-theme='dark'] .settings-nav-item {
-        color: var(--dm-text);
+        color: var(--pz-text);
     }
 
     html[data-theme='dark'] .settings-nav-item:hover {
-    background: var(--dm-surface-hover);
+    background: var(--pz-surface-hover);
 }
 
     html[data-theme='dark'] .settings-nav-item.is-active {
-        background: rgba(var(--dm-accent-rgb), 0.16);
-        color: var(--dm-accent);
+        background: rgba(var(--pz-accent-text-rgb), 0.16);
+        color: var(--pz-accent-text);
     }
 
     html[data-theme='dark'] .home-container.settings-with-nav .settings-toggle-card .setting-status {
@@ -1033,7 +1033,7 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
     }
 
     html[data-theme='dark'] .home-container.settings-with-nav .settings-toggle-card .setting-status.enabled {
-        background: var(--dm-accent);
+        background: var(--pz-accent-text);
     }
 }
 

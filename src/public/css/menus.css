@@ -106,7 +106,7 @@
 
 .workspace-menu-item.current-workspace {
     font-weight: var(--pz-weight-semibold);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .workspace-menu-item i {
@@ -139,7 +139,7 @@
 }
 
 .workspace-menu-item.current-workspace i {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .workspace-menu-divider {
@@ -180,7 +180,7 @@
     height: 36px;
     cursor: pointer;
     margin: 4px;
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     font-size: 16px;
     border-radius: var(--pz-radius-sm);
     transition: background-color 0.2s, color 0.2s;
@@ -188,7 +188,7 @@
 
 .list_tags:hover {
     background-color: rgba(var(--pz-accent-rgb), 0.1);
-    color: var(--pz-accent-hover);
+    color: var(--pz-accent-text-hover);
 }
 
 /* Share / Export dropdown styles */
@@ -237,21 +237,21 @@
 
 .actions-menu-item:hover {
     background-color: var(--pz-surface);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .actions-menu-item i {
     margin-right: 10px;
     width: 16px;
     text-align: center;
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     width: 24px !important;
     font-size: 20px !important;
 }
 
 /* Make delete icon red in actions menu */
 .actions-menu-item .lucide-trash-2 {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
     filter: none;
 }
 

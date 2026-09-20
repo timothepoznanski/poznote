@@ -403,11 +403,11 @@ if ($backupsColumnVisible) {
     }
     html[data-theme='dark'] .quota-card,
     body.dark-mode .quota-card {
-        --quota-accent: var(--dm-accent, #4a9eff);
+        --quota-accent: var(--pz-accent-text, #4a9eff);
         --quota-icon: #6f7885;
-        background: var(--dm-surface, #333);
-        border-color: var(--dm-border, #404040);
-        color: var(--dm-text, #bebebe);
+        background: var(--pz-surface, #333);
+        border-color: var(--pz-border, #404040);
+        color: var(--pz-text, #bebebe);
     }
     html[data-theme='dark'] .quota-card.quota-level-warn,
     body.dark-mode .quota-card.quota-level-warn {
@@ -425,11 +425,11 @@ if ($backupsColumnVisible) {
     body.dark-mode .quota-card-meta,
     html[data-theme='dark'] .quota-card-breakdown,
     body.dark-mode .quota-card-breakdown {
-        color: var(--dm-text-muted, #c5c5c5);
+        color: var(--pz-text-muted, #c5c5c5);
     }
     html[data-theme='dark'] .quota-card-breakdown,
     body.dark-mode .quota-card-breakdown {
-        border-top-color: var(--dm-border, #404040);
+        border-top-color: var(--pz-border, #404040);
     }
     @media (max-width: 540px) {
         .quota-card {

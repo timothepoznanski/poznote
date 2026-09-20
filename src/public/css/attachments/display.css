@@ -38,7 +38,7 @@
 .error-message {
     text-align: center;
     padding: 20px;
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
     background: var(--pz-danger-soft);
     border: 1px solid var(--pz-danger-soft);
     border-radius: var(--pz-radius-sm);

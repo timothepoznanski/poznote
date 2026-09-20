@@ -23,7 +23,7 @@
     margin: 0;
     font-size: 18px;
     font-weight: var(--pz-weight-semibold);
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
 }
 
 .excalidraw-toolbar .toolbar-btn {
@@ -36,7 +36,7 @@
     border: 1px solid var(--border-color, var(--pz-border));
     border-radius: var(--pz-radius);
     background: var(--bg-secondary, var(--pz-surface-hover));
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -168,28 +168,28 @@ div[onclick*="openExcalidrawNote"] {
 
 /* Dark mode styles */
 html[data-theme='dark'] .excalidraw-toolbar {
-    background: var(--dm-bg, var(--dm-content-bg));
-    border-bottom-color: var(--dm-border, var(--dm-border));
+    background: var(--pz-chrome-bg, var(--pz-bg));
+    border-bottom-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .excalidraw-toolbar h3 {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .excalidraw-toolbar .toolbar-btn {
-    background: var(--dm-surface, var(--dm-surface));
-    border-color: var(--dm-border, var(--dm-border));
-    color: var(--dm-text-bright);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .excalidraw-toolbar .toolbar-btn:hover {
-    background: var(--dm-surface-hover, var(--dm-surface-hover));
-    border-color: var(--dm-border-light, var(--dm-border-light));
+    background: var(--pz-surface-hover);
+    border-color: var(--pz-border-strong);
 }
 
 html[data-theme='dark'] .excalidraw-preview-container {
-    border-color: var(--dm-border, var(--dm-border));
-    background: var(--dm-surface, var(--dm-surface));
+    border-color: var(--pz-border);
+    background: var(--pz-surface);
 }
 
 /* Mobile responsive */
@@ -265,8 +265,8 @@ html[data-theme='dark'] .excalidraw-preview-container {
     /* Dark mode adjustments for mobile */
     html[data-theme='dark'] .excalidraw-toolbar,
     html[data-theme='dark'] div[style*="justify-content: space-between"][style*="align-items: center"] {
-        background: var(--dm-bg, var(--dm-content-bg));
-        border-bottom-color: var(--dm-border, var(--dm-border));
+        background: var(--pz-chrome-bg, var(--pz-bg));
+        border-bottom-color: var(--pz-border);
     }
 
     /* The spacer only balances the desktop layout; it steals 100px here */
@@ -502,8 +502,8 @@ body.excalidraw-editor-page .excalidraw .layer-ui__wrapper {
 
 html[data-theme='dark'] body.excalidraw-editor-page,
 body.excalidraw-editor-page.excalidraw-shell-dark {
-    background: var(--dm-content-bg, var(--dm-content-bg));
-    color: var(--dm-text, var(--dm-text));
+    background: var(--pz-bg);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] body.excalidraw-editor-page #app,
@@ -576,8 +576,8 @@ html body.excalidraw-editor-page.excalidraw-shell-light .excalidraw {
 
 html[data-theme='dark'] body.excalidraw-editor-page .poznote-toolbar,
 body.excalidraw-editor-page.excalidraw-shell-dark .poznote-toolbar {
-    background: var(--dm-surface, var(--dm-surface));
-    border-bottom-color: var(--dm-border, var(--dm-border));
+    background: var(--pz-surface);
+    border-bottom-color: var(--pz-border);
     box-shadow: 0 1px 3px rgba(var(--pz-shadow-rgb), 0.35);
 }
 
@@ -618,7 +618,7 @@ html body.excalidraw-editor-page.excalidraw-shell-light .poznote-toolbar {
 
 html[data-theme='dark'] body.excalidraw-editor-page .poznote-toolbar-title,
 body.excalidraw-editor-page.excalidraw-shell-dark .poznote-toolbar-title {
-    color: var(--dm-text, var(--dm-text));
+    color: var(--pz-text);
 }
 
 html body.excalidraw-editor-page.excalidraw-shell-light .poznote-toolbar-title {
@@ -710,7 +710,7 @@ html body.excalidraw-editor-page.excalidraw-shell-light .poznote-toolbar-title {
 
 html[data-theme='dark'] body.excalidraw-editor-page .excalidraw-app-container,
 body.excalidraw-editor-page.excalidraw-shell-dark .excalidraw-app-container {
-    background: var(--dm-content-bg, var(--dm-content-bg));
+    background: var(--pz-bg);
 }
 
 html body.excalidraw-editor-page.excalidraw-shell-light .excalidraw-app-container {
@@ -729,7 +729,7 @@ html body.excalidraw-editor-page.excalidraw-shell-light .excalidraw-app-containe
 
 html[data-theme='dark'] body.excalidraw-editor-page .excalidraw-loading,
 body.excalidraw-editor-page.excalidraw-shell-dark .excalidraw-loading {
-    color: var(--dm-text, var(--dm-text));
+    color: var(--pz-text);
 }
 
 html body.excalidraw-editor-page.excalidraw-shell-light .excalidraw-loading {
@@ -738,7 +738,7 @@ html body.excalidraw-editor-page.excalidraw-shell-light .excalidraw-loading {
 
 /* Button hover states - moved from inline styles for CSP compliance */
 .excalidraw-toolbar-btn:hover {
-    background: var(--pz-accent-strong);
+    background: var(--pz-accent-hover);
 }
 
 .excalidraw-save-btn:hover {

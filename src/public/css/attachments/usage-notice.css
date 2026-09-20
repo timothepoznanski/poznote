@@ -7,28 +7,19 @@
     margin-top: 10px;
     font-size: 14px;
     line-height: 1.4;
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 .attachment-usage-notice .lucide-alert-triangle {
     flex: none;
     margin-top: 2px;
-    color: var(--pz-danger);
-    background-color: var(--pz-danger);
+    color: var(--pz-danger-text);
+    background-color: var(--pz-danger-text);
 }
 
 .attachment-usage-notice a {
     color: inherit;
     text-decoration: underline;
-}
-
-html[data-theme='dark'] .attachment-usage-notice {
-    color: var(--dm-danger);
-}
-
-html[data-theme='dark'] .attachment-usage-notice .lucide-alert-triangle {
-    color: var(--dm-danger);
-    background-color: var(--dm-danger);
 }
 
 /* Directly under a page title (attachments_list.php), the notice is centred

@@ -40,7 +40,7 @@ body {
 }
 
 .favorite-yes {
-    color: var(--pz-warning);
+    color: var(--pz-warning-text);
     font-weight: var(--pz-weight-semibold);
 }
 

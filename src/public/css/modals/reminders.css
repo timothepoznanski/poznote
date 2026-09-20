@@ -4,7 +4,7 @@
 
 /* ---- Reminder button in toolbar ---- */
 .btn-reminder.has-reminder {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .btn-reminder.has-reminder i {
@@ -44,7 +44,7 @@
 
 .reminder-datetime-input:focus {
     outline: none;
-    border-color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
     box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.15);
 }
 
@@ -80,7 +80,7 @@
 }
 
 .reminder-datetime-part:hover {
-    border-color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
 }
 
 .reminder-datetime-part.initially-hidden {
@@ -111,7 +111,7 @@
 .reminder-repeat-label i {
     width: 16px;
     height: 16px;
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     flex-shrink: 0;
 }
 
@@ -150,7 +150,7 @@
 .reminder-repeat-unit:focus,
 .reminder-repeat-interval:focus {
     outline: none;
-    border-color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
     box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.15);
 }
 
@@ -227,7 +227,7 @@
 .reminder-email-title i {
     width: 16px;
     height: 16px;
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     flex-shrink: 0;
 }
 
@@ -250,7 +250,7 @@
     background: rgba(74, 144, 217, 0.08);
     border-radius: var(--pz-radius);
     font-size: 13px;
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     margin: 8px 0;
 }
 
@@ -341,7 +341,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .notification-icon i {

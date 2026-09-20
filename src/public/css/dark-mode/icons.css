@@ -1,51 +1,53 @@
 /* ============================================
-   Dark Mode - Icon Filters
+   Dark Mode - Icons
    ============================================
-    Makes all Lucide icons lighter in dark mode.
-   Excludes icons that have custom colors (folder icons,
-   slash command icons, kanban icons, markdown buttons,
-   toolbar active states, search type buttons).
+   The default icon colour of the dark mode, at ZERO weight.
+
+   css/icons.css gives every Lucide icon --pz-icon, but only index.php loads
+   it; on every other page an icon inherits its colour in the light theme, and
+   this file is what gives it one in the dark theme. So the rule has to stay.
+
+   What had to go is its weight. Written as html[data-theme='dark'] [class*=...]
+   it was (0,2,0), against the (0,1,0) to (0,2,0) of the page rules that give an
+   icon a colour of its own, and it loads after them. In dark mode it won, and
+   sixty-odd icons that are accent-coloured in the light theme (the favourite
+   star, a shared note, an active filter) came out in the generic grey. It
+   could not simply be weakened while those rules painted with --pz-accent, a
+   FILL, which reads at 2.8:1 on the dark ground; they now paint with
+   --pz-accent-text, which is bright there (discussion #1460).
+
+   The whole selector sits inside :where(), so it weighs nothing: it still
+   beats inheritance, which is all a default has to do, and any rule that
+   names an icon wins whatever the load order.
    ============================================ */
-
-/* Lucide icons are CSS masks painted with `background-color: currentColor`
-   (see lucide.css), so recolouring one is just setting `color` on it.
-
-   This used to be `filter: brightness(0) saturate(0%) invert(80%) !important`,
-   which forces a grey whatever colour the icon asks for. Every icon that has a
-   colour of its own then had to be carved out by hand, and the selector grew to
-   fourteen chained :not(), several of them holding a descendant selector. A
-   custom theme could not override it either: discussion #1261 shows a user
-   copying that whole selector verbatim just to switch it off.
-
-   With `color`, an icon that sets its own colour simply wins, by specificity or
-   by being an inline style. No exclusion list is needed. */
-html[data-theme='dark'] [class*="lucide-"] {
-    color: var(--dm-icon);
+:where(html[data-theme='dark'] [class*="lucide-"]) {
+    color: var(--pz-icon);
     transition: transform 0.2s ease, color 0.2s ease;
 }
 
+/* The hover keeps its weight, on purpose. An icon in a menu row is coloured by
+   a dark rule of its own, html[data-theme='dark'] .create-menu-item i at
+   (0,2,2), which the light hover in css/icons.css (0,2,0) cannot beat: without
+   this rule a menu icon would answer the pointer in the light theme and not in
+   the dark one. Measured with the states forced in a browser: nine menus. */
 html[data-theme='dark'] [class*="lucide-"]:hover {
     transform: scale(1.18);
-    color: var(--dm-icon-hover);
+    color: var(--pz-icon-hover);
 }
 
 /* The language marks of the code submenu are masks of the same kind under their
    own prefix (see devicon.css), and css/icons.css already hands them --pz-icon,
-   which is --dm-icon here. Only the hover is left to match. The carrier is
+   which takes its dark value here. Only the hover is left to match. The carrier is
    wrapped in :where() so the rule weighs what a light twin would weigh and
    still wins by load order. */
 :where(html[data-theme='dark']) [class*="devicon-"]:hover {
     transform: scale(1.18);
-    color: var(--dm-icon-hover);
+    color: var(--pz-icon-hover);
 }
 
 /* Sidebar plus button */
 html[data-theme='dark'] .sidebar-plus {
     filter: brightness(0) saturate(0%) invert(80%) !important;
-}
-
-html[data-theme='dark'] .sidebar-folder-toggle [class*="lucide-"] {
-    color: inherit;
 }
 
 /* Default-credential alert (settings.php): the shield carries the alert's own

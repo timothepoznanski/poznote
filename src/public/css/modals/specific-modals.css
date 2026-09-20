@@ -386,7 +386,7 @@
 }
 
 #updateModal .modal-content h3 {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     margin-bottom: 15px;
     font-size: 24px;
 }
@@ -411,7 +411,7 @@
 }
 
 #updateModal .version-info strong {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     font-weight: var(--pz-weight-semibold);
 }
 
@@ -429,7 +429,7 @@
 }
 
 #updateModal .backup-warning strong {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
     font-weight: var(--pz-weight-semibold);
 }
 
@@ -453,7 +453,7 @@
 #updateModal .btn-cancel:hover {
     background-color: var(--pz-neutral-hover) !important;
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3);
+    box-shadow: 0 4px 10px color-mix(in srgb, var(--pz-neutral) 30%, transparent);
 }
 
 #updateModal .btn-cancel:active {
@@ -505,7 +505,7 @@
 }
 
 #confirmModal .btn-secondary:hover {
-    background-color: var(--pz-accent-strong) !important;
+    background-color: var(--pz-accent-hover) !important;
 }
 
 #confirmModal .btn-danger {
@@ -537,7 +537,7 @@
 }
 
 #confirmModal #confirmButton.btn-primary:hover {
-    background-color: var(--pz-accent-strong) !important;
+    background-color: var(--pz-accent-hover) !important;
 }
 
 #confirmModal .modal-buttons {
@@ -726,7 +726,7 @@
 }
 
 #restoreConfirmModal .btn-primary:hover {
-    background-color: var(--pz-accent-strong) !important;
+    background-color: var(--pz-accent-hover) !important;
 }
 
 /* ============================================
@@ -911,8 +911,8 @@
 
 .workspace-select:focus {
     outline: none;
-    border-color: var(--pz-accent);
-    box-shadow: 0 0 0 2px rgba(var(--pz-accent-rgb), 0.2);
+    border-color: var(--pz-accent-text);
+    box-shadow: 0 0 0 2px rgba(var(--pz-accent-text-rgb), 0.2);
 }
 
 /* ============================================
@@ -1192,7 +1192,7 @@
 
 .code-block-language-filter:focus {
     outline: none;
-    border-color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
 }
 
 /* Inherit the modal text color so dark mode needs no override. */

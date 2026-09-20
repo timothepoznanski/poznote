@@ -54,7 +54,7 @@
 
 .direct-copy-command {
     background-color: var(--pz-surface-hover);
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
     padding: 10px;
     border: 1px solid var(--pz-border);
     border-radius: var(--pz-radius-sm);
@@ -68,11 +68,11 @@
 
 /* Text colors */
 .text-danger {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 .text-warning-bold {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
     font-weight: var(--pz-weight-bold);
 }
 
@@ -82,7 +82,6 @@
 }
 
 html[data-theme='dark'] .direct-copy-command {
-    background-color: var(--dm-content-bg);
-    border-color: var(--dm-border-light);
-    color: var(--dm-text-bright);
+    background-color: var(--pz-bg);
+    border-color: var(--pz-border-strong);
 }

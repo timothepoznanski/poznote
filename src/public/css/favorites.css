@@ -67,7 +67,7 @@ body.favorites-page {
     color: var(--pz-text-muted);
     white-space: nowrap;
     padding: 6px 12px;
-    background-color: #f0f7ff;
+    background-color: color-mix(in srgb, var(--pz-accent) 5%, var(--pz-bg));
     border-radius: var(--pz-radius);
     font-weight: var(--pz-weight-medium);
 }
@@ -103,7 +103,7 @@ body.favorites-page {
 .note-name {
     font-weight: var(--pz-weight-medium);
     font-size: 16px;
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     text-decoration: none;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -143,7 +143,7 @@ body.favorites-page {
     background-color: var(--pz-surface);
     border: 1px solid var(--pz-danger-soft);
     border-radius: var(--pz-radius-sm);
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
     font-size: 18px;
     cursor: pointer;
     padding: 0;
@@ -188,39 +188,38 @@ body.favorites-page {
 
 /* Dark mode */
 html[data-theme='dark'] body.favorites-page {
-    background-color: var(--dm-content-bg);
-    color: var(--dm-text);
+    background-color: var(--pz-bg);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .note-name {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .folder-badge {
-    background-color: var(--dm-surface);
-    color: var(--dm-text-muted);
+    background-color: var(--pz-surface);
 }
 
 html[data-theme='dark'] .filter-input {
-    background-color: var(--dm-surface);
-    border-color: var(--dm-border);
-    color: var(--dm-text);
+    background-color: var(--pz-surface);
+    border-color: var(--pz-border);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .filter-stats {
-    background-color: var(--dm-accent-soft);
-    color: var(--dm-accent-hover);
+    background-color: var(--pz-accent-soft);
+    color: var(--pz-accent-text-hover);
 }
 
 html[data-theme='dark'] .btn-unfavorite {
-    background-color: var(--dm-content-bg);
-    border-color: var(--dm-danger-soft);
-    color: var(--dm-danger);
+    background-color: var(--pz-bg);
+    border-color: var(--pz-danger-soft);
+    color: var(--pz-danger-text);
 }
 
 html[data-theme='dark'] .btn-unfavorite:hover {
-    background-color: var(--dm-danger-soft);
-    border-color: var(--dm-danger-hover);
+    background-color: var(--pz-danger-soft);
+    border-color: var(--pz-danger-text-hover);
 }
 
 .clear-filter-btn:hover {

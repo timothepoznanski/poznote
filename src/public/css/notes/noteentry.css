@@ -80,7 +80,7 @@ p.code-block-placeholder-after[data-ph]:empty:before {
     border: 1px solid rgba(var(--pz-shadow-rgb), 0.12);
     border-radius: var(--pz-radius);
     background: rgba(var(--pz-highlight-rgb), 0.96);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     box-shadow: 0 5px 14px rgba(15, 23, 42, 0.14);
     cursor: pointer;
     display: inline-flex;
@@ -104,7 +104,7 @@ p.code-block-placeholder-after[data-ph]:empty:before {
 }
 
 .note-scroll-edge-btn:focus-visible {
-    outline: 2px solid var(--pz-accent);
+    outline: 2px solid var(--pz-accent-text);
     outline-offset: 2px;
 }
 

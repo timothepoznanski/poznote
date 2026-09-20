@@ -80,7 +80,7 @@ input:checked+.toggle-slider {
 }
 
 input:focus+.toggle-slider {
-    box-shadow: 0 0 1px var(--pz-success);
+    box-shadow: 0 0 1px var(--pz-success-text);
 }
 
 input:checked+.toggle-slider:before {
@@ -102,20 +102,20 @@ input:checked+.toggle-slider:before {
 
 /* Dark Mode - Share Modal */
 html[data-theme='dark'] #shareModal .modal-content {
-    background-color: var(--dm-content-bg);
-    color: var(--dm-text);
+    background-color: var(--pz-bg);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #shareModal h3 {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .toggle-slider {
-    background-color: var(--dm-border-light);
+    background-color: var(--pz-border-strong);
 }
 
 html[data-theme='dark'] input:checked+.toggle-slider {
-    background-color: var(--dm-success-hover);
+    background-color: var(--pz-success-text-hover);
 }
 
 /* ============================================
@@ -156,12 +156,12 @@ html[data-theme='dark'] input:checked+.toggle-slider {
 
 /* Dark Mode - Folder Share Modal */
 html[data-theme='dark'] #folderShareModal .modal-content {
-    background-color: var(--dm-content-bg);
-    color: var(--dm-text);
+    background-color: var(--pz-bg);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #folderShareModal h3 {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 /* ============================================
@@ -183,11 +183,11 @@ html[data-theme='dark'] #folderShareModal h3 {
 }
 
 html[data-theme='dark'] #sharedViaFolderModal .modal-content {
-    background-color: var(--dm-content-bg);
-    color: var(--dm-text);
+    background-color: var(--pz-bg);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #sharedViaFolderModal h3 {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 

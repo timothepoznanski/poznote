@@ -81,7 +81,7 @@
 
 :is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) input:focus {
     outline: none;
-    border-color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
 }
 
 :is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) .modal-buttons {
@@ -189,7 +189,7 @@
 
 #confirmLogoutModal .logout-account-arrow {
     flex: 0 0 auto;
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     font-size: 16px;
     line-height: 1;
 }
@@ -199,7 +199,7 @@
     padding: 2px 7px;
     border-radius: var(--pz-radius-sm);
     background: var(--pz-accent-soft);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     font-size: 12px;
 }
 
@@ -209,33 +209,29 @@ html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal, #iconSidebar
     background-color: rgba(var(--pz-shadow-rgb), 0.8);
 }
 
-html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) .modal-content {
-    background-color: var(--dm-content-bg);
-}
-
 html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) input {
-    background-color: var(--dm-surface);
-    border-color: var(--dm-border);
+    background-color: var(--pz-surface);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) .modal-buttons button.btn-cancel {
-    background-color: var(--dm-surface);
+    background-color: var(--pz-surface);
 }
 
 html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) .modal-buttons button.btn-cancel:hover {
-    background-color: var(--dm-border);
+    background-color: var(--pz-border);
 }
 
 html[data-theme='dark'] #confirmLogoutModal .logout-account-option {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
-    color: var(--dm-text);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #confirmLogoutModal .logout-account-option:hover:not(:disabled),
 html[data-theme='dark'] #confirmLogoutModal .logout-account-option:focus-visible {
     border-color: var(--pz-accent);
-    background: var(--dm-border);
+    background: var(--pz-border);
 }
 
 /* ============================================
@@ -275,7 +271,7 @@ html[data-theme='dark'] #confirmLogoutModal .logout-account-option:focus-visible
     justify-content: center;
     gap: 8px;
     padding: 16px;
-    background: var(--pz-surface);
+    background: var(--pz-chrome-bg);
     border: 1px solid var(--pz-border);
     border-radius: var(--pz-radius-lg);
 }
@@ -319,13 +315,13 @@ html[data-theme='dark'] #confirmLogoutModal .logout-account-option:focus-visible
 }
 
 #iconSidebarColorModal .folder-color-option:hover .folder-color-swatch {
-    border-color: var(--pz-accent);
-    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
+    border-color: var(--pz-accent-text);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-text-rgb), 0.1);
 }
 
 #iconSidebarColorModal .folder-color-option.selected .folder-color-swatch {
-    border-color: var(--pz-accent);
-    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.2);
+    border-color: var(--pz-accent-text);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-text-rgb), 0.2);
 }
 
 #iconSidebarColorModal .folder-color-default {
@@ -344,24 +340,21 @@ html[data-theme='dark'] #confirmLogoutModal .logout-account-option:focus-visible
 }
 
 html[data-theme='dark'] #iconSidebarColorModal .folder-color-picker {
-    background: var(--dm-bg);
-    border-color: var(--dm-border);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] #iconSidebarColorModal .folder-color-swatch {
-    border-color: var(--dm-border);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] #iconSidebarColorModal .folder-color-option:hover .folder-color-swatch,
 html[data-theme='dark'] #iconSidebarColorModal .folder-color-option.selected .folder-color-swatch {
-    border-color: var(--dm-accent);
+    border-color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] #iconSidebarColorModal .folder-color-default {
-    background: linear-gradient(135deg, var(--dm-border) 25%, transparent 25%, transparent 75%, var(--dm-border) 75%, var(--dm-border)),
-        linear-gradient(135deg, var(--dm-border) 25%, var(--dm-bg) 25%, var(--dm-bg) 75%, var(--dm-border) 75%, var(--dm-border));
-    background-size: 8px 8px;
-    background-position: 0 0, 4px 4px;
+    background: linear-gradient(135deg, var(--pz-border) 25%, transparent 25%, transparent 75%, var(--pz-border) 75%, var(--pz-border)),
+        linear-gradient(135deg, var(--pz-border) 25%, var(--pz-chrome-bg) 25%, var(--pz-chrome-bg) 75%, var(--pz-border) 75%, var(--pz-border));
 }
 
 /* ============================================
@@ -433,7 +426,7 @@ html[data-theme='dark'] #iconSidebarColorModal .folder-color-default {
 
 #editProfileModal .ep-badge-admin {
     background: rgba(var(--pz-accent-rgb), 0.12);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 /* One rhythm for the fields: the spacing used to be per-element inline
@@ -464,7 +457,7 @@ html[data-theme='dark'] #iconSidebarColorModal .folder-color-default {
 }
 
 #editProfileModal .ep-fields input:focus {
-    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.15);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-text-rgb), 0.15);
 }
 
 /* Admin-managed email: reads as locked rather than merely greyed out. */
@@ -491,21 +484,21 @@ html[data-theme='dark'] #iconSidebarColorModal .folder-color-default {
 }
 
 html[data-theme='dark'] #editProfileModal .ep-error {
-    border-left-color: var(--dm-danger);
-    background: var(--dm-danger-soft);
-    color: var(--dm-danger);
+    border-left-color: var(--pz-danger-text);
+    background: var(--pz-danger-soft);
+    color: var(--pz-danger-text);
 }
 
 html[data-theme='dark'] #editProfileModal .ep-identity {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
 }
 
 /* --pz-accent stays the light blue in dark mode (tokens.css switches the
    neutrals only), which is too dark for a tint and its own label. */
 html[data-theme='dark'] #editProfileModal .ep-badge-admin {
-    background: rgba(var(--dm-accent-rgb), 0.18);
-    color: var(--dm-accent);
+    background: rgba(var(--pz-accent-text-rgb), 0.18);
+    color: var(--pz-accent-text);
 }
 
 /* Right-click menu of a rail or note toolbar button (change the colour, hide
@@ -556,20 +549,20 @@ html[data-theme='dark'] #editProfileModal .ep-badge-admin {
 }
 
 html[data-theme='dark'] #iconContextMenu {
-    border-color: var(--dm-border);
-    background: var(--dm-surface);
+    border-color: var(--pz-border);
+    background: var(--pz-surface);
 }
 
 html[data-theme='dark'] #iconContextMenu .icon-context-menu-item {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #iconContextMenu .icon-context-menu-item:hover,
 html[data-theme='dark'] #iconContextMenu .icon-context-menu-item:focus-visible {
-    background-color: var(--dm-surface-hover);
+    background-color: var(--pz-surface-hover);
 }
 
 html[data-theme='dark'] #iconContextMenu .icon-context-menu-item i {
-    color: var(--dm-text-muted);
-    background-color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
+    background-color: var(--pz-text-muted);
 }

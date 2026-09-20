@@ -9,46 +9,46 @@ html[data-theme='dark'] .modal {
 
 /* Modal content base */
 html[data-theme='dark'] .modal-content {
-    background-color: var(--dm-content-bg);
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    background-color: var(--pz-bg);
+    color: var(--pz-text);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .modal-content h3 {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] #confirmModal .modal-content h3 {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 /* Modal form controls */
 html[data-theme='dark'] .modal-content input,
 html[data-theme='dark'] .modal-content select,
 html[data-theme='dark'] .modal-content textarea {
-    background-color: var(--dm-surface);
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
+    border-color: var(--pz-border);
 }
 
 /* Modal buttons */
 html[data-theme='dark'] .modal-buttons button {
-    background-color: var(--dm-surface);
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .modal-buttons button:hover {
-    background-color: var(--dm-surface-hover);
+    background-color: var(--pz-surface-hover);
 }
 
 html[data-theme='dark'] .modal-buttons button:first-child {
-    background-color: var(--dm-active);
-    color: var(--dm-text-bright);
+    background-color: var(--pz-active-bg);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .modal-buttons button:first-child:hover {
-    background-color: var(--dm-accent-soft);
+    background-color: var(--pz-accent-soft);
 }
 
 /* The variants, scoped to the dialog, exactly as modals/base.css does it for the
@@ -78,8 +78,8 @@ html[data-theme='dark'] .modal-buttons button.btn-delete-ws {
 
 html[data-theme='dark'] .modal-buttons button.btn-danger:hover,
 html[data-theme='dark'] .modal-buttons button.btn-delete-ws:hover {
-    background-color: var(--dm-danger-hover);
-    border-color: var(--dm-danger-hover);
+    background-color: var(--pz-danger-text-hover);
+    border-color: var(--pz-danger-text-hover);
 }
 
 html[data-theme='dark'] .modal-buttons button.btn-success {
@@ -89,18 +89,18 @@ html[data-theme='dark'] .modal-buttons button.btn-success {
 }
 
 html[data-theme='dark'] .modal-buttons button.btn-success:hover {
-    background-color: var(--dm-success-hover);
-    border-color: var(--dm-success-hover);
+    background-color: var(--pz-success-text-hover);
+    border-color: var(--pz-success-text-hover);
 }
 
 html[data-theme='dark'] .modal-buttons button.btn-cancel {
-    background-color: var(--dm-border);
-    color: var(--dm-text);
-    border-color: var(--dm-border-light);
+    background-color: var(--pz-border);
+    color: var(--pz-text);
+    border-color: var(--pz-border-strong);
 }
 
 html[data-theme='dark'] .modal-buttons button.btn-cancel:hover {
-    background-color: var(--dm-surface-raised);
+    background-color: var(--pz-surface-sunken);
 }
 
 /* ============================================
@@ -109,29 +109,29 @@ html[data-theme='dark'] .modal-buttons button.btn-cancel:hover {
 
 html[data-theme='dark'] #reminderModal .modal-content,
 html[data-theme='dark'] #taskDueModal .modal-content {
-    background: linear-gradient(180deg, var(--dm-content-bg) 0%, var(--dm-content-bg) 100%);
+    background: linear-gradient(180deg, var(--pz-bg) 0%, var(--pz-bg) 100%);
     border: 1px solid rgba(var(--pz-highlight-rgb), 0.06);
     box-shadow: 0 18px 44px rgba(var(--pz-shadow-rgb), 0.38);
 }
 
 html[data-theme='dark'] #reminderModal .modal-content h3,
 html[data-theme='dark'] #taskDueModal .modal-content h3 {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-datetime-input,
 html[data-theme='dark'] #taskDueModal .reminder-datetime-input {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
-    color: var(--dm-text-bright);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
+    color: var(--pz-text-strong);
     box-shadow: inset 0 1px 0 rgba(var(--pz-highlight-rgb), 0.03);
     color-scheme: dark;
 }
 
 html[data-theme='dark'] #reminderModal .reminder-datetime-input:focus,
 html[data-theme='dark'] #taskDueModal .reminder-datetime-input:focus {
-    border-color: var(--dm-accent);
-    box-shadow: 0 0 0 3px rgba(var(--dm-accent-rgb), 0.18);
+    border-color: var(--pz-accent-text);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-text-rgb), 0.18);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-datetime-input::-webkit-calendar-picker-indicator,
@@ -142,19 +142,19 @@ html[data-theme='dark'] #taskDueModal .reminder-datetime-input::-webkit-calendar
 
 html[data-theme='dark'] #reminderModal .reminder-datetime-part,
 html[data-theme='dark'] #taskDueModal .reminder-datetime-part {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
-    color: var(--dm-text-bright);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-datetime-part i,
 html[data-theme='dark'] #taskDueModal .reminder-datetime-part i {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-datetime-part:hover,
 html[data-theme='dark'] #taskDueModal .reminder-datetime-part:hover {
-    border-color: var(--dm-accent);
+    border-color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-select,
@@ -163,9 +163,9 @@ html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-unit
 html[data-theme='dark'] :is(#taskDueModal, #taskDueModal) .reminder-repeat-unit,
 html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-interval,
 html[data-theme='dark'] :is(#taskDueModal, #taskDueModal) .reminder-repeat-interval {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
-    color: var(--dm-text-bright);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
+    color: var(--pz-text-strong);
     box-shadow: inset 0 1px 0 rgba(var(--pz-highlight-rgb), 0.03);
     color-scheme: dark;
 }
@@ -176,55 +176,55 @@ html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-unit
 html[data-theme='dark'] :is(#taskDueModal, #taskDueModal) .reminder-repeat-unit:focus,
 html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-interval:focus,
 html[data-theme='dark'] :is(#taskDueModal, #taskDueModal) .reminder-repeat-interval:focus {
-    border-color: var(--dm-accent);
-    box-shadow: 0 0 0 3px rgba(var(--dm-accent-rgb), 0.18);
+    border-color: var(--pz-accent-text);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-text-rgb), 0.18);
 }
 
 html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-label i,
 html[data-theme='dark'] :is(#taskDueModal, #taskDueModal) .reminder-repeat-label i {
-    color: var(--dm-accent-hover);
+    color: var(--pz-accent-text-hover);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-email-option,
 html[data-theme='dark'] #taskDueModal .reminder-email-option {
-    background: var(--dm-surface);
+    background: var(--pz-surface);
     border-color: rgba(var(--pz-highlight-rgb), 0.08);
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-email-option:hover,
 html[data-theme='dark'] #taskDueModal .reminder-email-option:hover,
 html[data-theme='dark'] #reminderModal .reminder-email-option:focus-within,
 html[data-theme='dark'] #taskDueModal .reminder-email-option:focus-within {
-    background: var(--dm-surface);
-    border-color: rgba(var(--dm-accent-rgb), 0.24);
+    background: var(--pz-surface);
+    border-color: rgba(var(--pz-accent-text-rgb), 0.24);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-email-title,
 html[data-theme='dark'] #taskDueModal .reminder-email-title {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-email-title i,
 html[data-theme='dark'] #taskDueModal .reminder-email-title i {
-    color: var(--dm-accent-hover);
+    color: var(--pz-accent-text-hover);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-email-hint,
 html[data-theme='dark'] #taskDueModal .reminder-email-hint {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-repeat-hint,
 html[data-theme='dark'] #taskDueModal .reminder-repeat-hint {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-current-info,
 html[data-theme='dark'] #taskDueModal .reminder-current-info {
-    background: rgba(var(--dm-accent-rgb), 0.11);
-    border: 1px solid rgba(var(--dm-accent-rgb), 0.18);
-    color: var(--dm-accent-hover);
+    background: rgba(var(--pz-accent-text-rgb), 0.11);
+    border: 1px solid rgba(var(--pz-accent-text-rgb), 0.18);
+    color: var(--pz-accent-text-hover);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-modal-action,
@@ -234,35 +234,35 @@ html[data-theme='dark'] #taskDueModal .reminder-modal-action {
 
 html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-cancel,
 html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-cancel {
-    background: var(--dm-surface-raised);
-    border-color: var(--dm-border-light);
-    color: var(--dm-text-bright);
+    background: var(--pz-surface-sunken);
+    border-color: var(--pz-border-strong);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-cancel:hover,
 html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-cancel:hover {
-    background: var(--dm-neutral);
-    border-color: var(--dm-border-light);
+    background: var(--pz-surface-strong);
+    border-color: var(--pz-border-strong);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-primary,
 html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-primary {
-    background: var(--dm-accent);
+    background: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-primary:hover,
 html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-primary:hover {
-    background: var(--dm-accent);
+    background: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-danger,
 html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-danger {
-    background: var(--dm-danger-hover) !important;
+    background: var(--pz-danger-text-hover) !important;
 }
 
 html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-danger:hover,
 html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-danger:hover {
-    background: var(--dm-danger-hover) !important;
+    background: var(--pz-danger-text-hover) !important;
 }
 
 /* ============================================
@@ -270,69 +270,69 @@ html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-danger:hover 
    ============================================ */
 
 html[data-theme='dark'] #notificationsModal .modal-content {
-    background: linear-gradient(180deg, var(--dm-content-bg) 0%, var(--dm-content-bg) 100%);
+    background: linear-gradient(180deg, var(--pz-bg) 0%, var(--pz-bg) 100%);
     border: 1px solid rgba(var(--pz-highlight-rgb), 0.06);
     box-shadow: 0 18px 44px rgba(var(--pz-shadow-rgb), 0.38);
 }
 
 html[data-theme='dark'] #notificationsModal .modal-content h3 {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] #notificationsModal .notification-item {
-    background: var(--dm-surface);
+    background: var(--pz-surface);
     border: 1px solid rgba(var(--pz-highlight-rgb), 0.06);
 }
 
 html[data-theme='dark'] #notificationsModal .notification-item:hover {
-    background: var(--dm-surface);
+    background: var(--pz-surface);
 }
 
 html[data-theme='dark'] #notificationsModal .notification-item.unread {
-    background: rgba(var(--dm-accent-rgb), 0.14);
-    border-color: rgba(var(--dm-accent-rgb), 0.22);
+    background: rgba(var(--pz-accent-text-rgb), 0.14);
+    border-color: rgba(var(--pz-accent-text-rgb), 0.22);
 }
 
 html[data-theme='dark'] #notificationsModal .notification-item.unread:hover {
-    background: rgba(var(--dm-accent-rgb), 0.2);
+    background: rgba(var(--pz-accent-text-rgb), 0.2);
 }
 
 html[data-theme='dark'] #notificationsModal .notification-icon {
-    background: rgba(var(--dm-accent-rgb), 0.14);
-    color: var(--dm-accent-hover);
+    background: rgba(var(--pz-accent-text-rgb), 0.14);
+    color: var(--pz-accent-text-hover);
 }
 
 html[data-theme='dark'] #notificationsModal .notification-heading {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] #notificationsModal .notification-time {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #notificationsModal .notification-action-btn {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #notificationsModal .notification-action-btn:hover {
-    color: var(--dm-danger);
-    background: rgba(239, 68, 68, 0.14);
+    color: var(--pz-danger-text);
+    background: color-mix(in srgb, var(--pz-danger-text-hover) 14%, transparent);
 }
 
 html[data-theme='dark'] #notificationsModal .notifications-empty {
     opacity: 0.72;
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] #notificationsModal .modal-buttons .btn-cancel {
-    background: var(--dm-surface-raised);
-    border-color: var(--dm-border-light);
-    color: var(--dm-text-bright);
+    background: var(--pz-surface-sunken);
+    border-color: var(--pz-border-strong);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] #notificationsModal .modal-buttons .btn-cancel:hover {
-    background: var(--dm-neutral);
-    border-color: var(--dm-border-light);
+    background: var(--pz-surface-strong);
+    border-color: var(--pz-border-strong);
 }
 
 /* ============================================
@@ -340,20 +340,20 @@ html[data-theme='dark'] #notificationsModal .modal-buttons .btn-cancel:hover {
    ============================================ */
 
 html[data-theme='dark'] .move-task-list {
-    border-color: var(--dm-border);
-    background-color: var(--dm-sidebar-surface);
+    border-color: var(--pz-border);
+    background-color: var(--pz-sidebar-surface);
 }
 
 html[data-theme='dark'] .move-task-item {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .move-task-item.selected {
-    background: var(--dm-active);
+    background: var(--pz-active-bg);
 }
 
 html[data-theme='dark'] .move-task-item.move-task-create {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 /* ============================================
@@ -361,50 +361,50 @@ html[data-theme='dark'] .move-task-item.move-task-create {
    ============================================ */
 
 html[data-theme='dark'] #moveFolderFilesModal .modal-content h3 {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #moveFolderFilesModal .modal-content p {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #moveFolderFilesModal select#moveFolderFilesTargetSelect {
-    background-color: var(--dm-surface);
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] #moveFolderFilesModal select#moveFolderFilesTargetSelect:focus {
     outline: none;
-    border-color: var(--dm-accent);
-    box-shadow: 0 0 0 2px rgba(var(--dm-accent-rgb), 0.25);
+    border-color: var(--pz-accent-text);
+    box-shadow: 0 0 0 2px rgba(var(--pz-accent-text-rgb), 0.25);
 }
 
 html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-cancel {
-    background-color: var(--dm-surface);
-    color: var(--dm-text);
-    border: 1px solid var(--dm-border);
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
+    border: 1px solid var(--pz-border);
 }
 
 html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-cancel:hover {
-    background-color: var(--dm-surface-hover);
+    background-color: var(--pz-surface-hover);
 }
 
 html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-primary {
-    background-color: var(--dm-active);
-    color: var(--dm-text-bright);
+    background-color: var(--pz-active-bg);
+    color: var(--pz-text-strong);
     border: none;
 }
 
 html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-primary:hover {
-    background-color: var(--dm-accent-soft);
+    background-color: var(--pz-accent-soft);
 }
 
 html[data-theme='dark'] #moveFolderFilesModal .modal-error-message,
 html[data-theme='dark'] #createWorkspaceModal .modal-error-message {
-    background-color: rgba(255, 77, 77, 0.08);
-    color: var(--dm-danger);
-    border: 1px solid var(--dm-danger-soft);
+    background-color: color-mix(in srgb, var(--pz-danger-text) 8%, transparent);
+    color: var(--pz-danger-text);
+    border: 1px solid var(--pz-danger-soft);
     border-radius: var(--pz-radius-sm);
     padding: 8px 10px;
 }
@@ -414,27 +414,27 @@ html[data-theme='dark'] #createWorkspaceModal .modal-error-message {
    ============================================ */
 
 html[data-theme='dark'] #moveNotesModal .modal-content {
-    background-color: var(--dm-bg);
-    color: var(--dm-text);
+    background-color: var(--pz-chrome-bg);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #moveNotesModal .modal-content h3 {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #moveNotesModal .modal-content label {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #moveNotesModal select {
-    background-color: var(--dm-surface);
-    border-color: var(--dm-border);
+    background-color: var(--pz-surface);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] #moveNotesModal select:focus {
     outline: none;
-    border-color: var(--dm-accent);
-    box-shadow: 0 0 0 2px rgba(var(--dm-accent-rgb), 0.25);
+    border-color: var(--pz-accent-text);
+    box-shadow: 0 0 0 2px rgba(var(--pz-accent-text-rgb), 0.25);
 }
 
 /* ============================================
@@ -442,23 +442,23 @@ html[data-theme='dark'] #moveNotesModal select:focus {
    ============================================ */
 
 html[data-theme='dark'] #moveNoteFolderModal .modal-content label {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #moveNoteFolderModal .move-note-recent-label {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #moveNoteFolderModal .move-note-inline-create-toggle {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] #moveNoteFolderModal .move-note-inline-create-toggle:hover {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] #moveNoteFolderModal .move-note-inline-create button.btn-cancel {
-    border-color: var(--dm-border);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] #moveNoteFolderModal .move-note-inline-create button.btn-cancel:hover {
@@ -466,14 +466,14 @@ html[data-theme='dark'] #moveNoteFolderModal .move-note-inline-create button.btn
 }
 
 html[data-theme='dark'] #moveNoteFolderModal .move-note-recent-folder {
-    border-color: var(--dm-border);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] #moveNoteFolderModal .move-note-recent-folder:hover,
 html[data-theme='dark'] #moveNoteFolderModal .move-note-recent-folder.is-selected {
-    background: rgba(var(--dm-accent-rgb), 0.16);
-    border-color: var(--dm-accent);
-    color: var(--dm-text-bright);
+    background: rgba(var(--pz-accent-text-rgb), 0.16);
+    border-color: var(--pz-accent-text);
+    color: var(--pz-text-strong);
 }
 
 /* ============================================
@@ -481,28 +481,28 @@ html[data-theme='dark'] #moveNoteFolderModal .move-note-recent-folder.is-selecte
    ============================================ */
 
 html[data-theme='dark'] #renameModal .modal-content {
-    background-color: var(--dm-bg);
-    color: var(--dm-text);
+    background-color: var(--pz-chrome-bg);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #renameModal .modal-content h3 {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #renameModal .modal-content label {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #renameModal input {
-    background-color: var(--dm-surface);
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] #renameModal input:focus {
     outline: none;
-    border-color: var(--dm-accent);
-    box-shadow: 0 0 0 2px rgba(var(--dm-accent-rgb), 0.25);
+    border-color: var(--pz-accent-text);
+    box-shadow: 0 0 0 2px rgba(var(--pz-accent-text-rgb), 0.25);
 }
 
 /* ============================================
@@ -510,16 +510,16 @@ html[data-theme='dark'] #renameModal input:focus {
    ============================================ */
 
 html[data-theme='dark'] #deleteModal .modal-content {
-    background-color: var(--dm-bg);
-    color: var(--dm-text);
+    background-color: var(--pz-chrome-bg);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #deleteModal .modal-content h3 {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #deleteModal .modal-content p {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 /* Irreversible-deletion warning headline (base styles in settings.css):
@@ -528,19 +528,19 @@ html[data-theme='dark'] #deleteModal .modal-content p {
    the dark panel, so a lighter red. #deleteAccountModal is the self-service
    twin built by js/delete-account.js on the settings page. */
 html[data-theme='dark'] :is(#deleteModal, #deleteAccountModal) .delete-warning-box .delete-warning {
-    color: var(--dm-danger);
+    color: var(--pz-danger-text);
 }
 
 html[data-theme='dark'] #deleteModal input {
-    background-color: var(--dm-surface);
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] #deleteModal input:focus {
     outline: none;
-    border-color: var(--dm-accent);
-    box-shadow: 0 0 0 2px rgba(var(--dm-accent-rgb), 0.25);
+    border-color: var(--pz-accent-text);
+    box-shadow: 0 0 0 2px rgba(var(--pz-accent-text-rgb), 0.25);
 }
 
 /* ============================================
@@ -548,35 +548,35 @@ html[data-theme='dark'] #deleteModal input:focus {
    ============================================ */
 
 html[data-theme='dark'] #fontSizeModal .modal-header h2 {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #fontSizeModal .modal-body p,
 html[data-theme='dark'] #noteWidthModal .modal-body p {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #fontSizeModal .font-size-controls label,
 html[data-theme='dark'] #noteWidthModal .font-size-controls label {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] #fontSizeModal .font-size-controls input,
 html[data-theme='dark'] #noteWidthModal .font-size-controls input {
-    background-color: var(--dm-surface);
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] #noteWidthModal .btn-full-width-footer {
-    background-color: var(--dm-surface) !important;
-    color: var(--dm-text) !important;
-    border-color: var(--dm-border) !important;
+    background-color: var(--pz-surface) !important;
+    color: var(--pz-text) !important;
+    border-color: var(--pz-border) !important;
 }
 
 html[data-theme='dark'] #noteWidthModal .btn-full-width-footer:hover {
-    background-color: var(--dm-surface) !important;
-    border-color: var(--dm-border-light) !important;
+    background-color: var(--pz-surface) !important;
+    border-color: var(--pz-border-strong) !important;
 }
 
 html[data-theme='dark'] #noteWidthModal .btn-full-width-footer.active {
@@ -587,37 +587,37 @@ html[data-theme='dark'] #noteWidthModal .btn-full-width-footer.active {
 
 html[data-theme='dark'] #fontSizeModal .font-size-controls input::placeholder,
 html[data-theme='dark'] #noteWidthModal .font-size-controls input::placeholder {
-    color: var(--dm-text-subtle);
+    color: var(--pz-text-subtle);
 }
 
 html[data-theme='dark'] #noteWidthModal .note-width-unit {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] #fontSizeModal .modal-footer .btn-primary {
-    background-color: var(--dm-active);
-    color: var(--dm-text-bright);
+    background-color: var(--pz-active-bg);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] #fontSizeModal .modal-footer .btn-primary:hover {
-    background-color: var(--dm-accent-soft);
+    background-color: var(--pz-accent-soft);
 }
 
 html[data-theme='dark'] #fontSizeModal .modal-buttons .btn-primary {
-    background-color: var(--dm-danger-hover) !important;
+    background-color: var(--pz-danger-text-hover) !important;
     color: var(--pz-text-inverse) !important;
-    border-color: var(--dm-danger-hover) !important;
+    border-color: var(--pz-danger-text-hover) !important;
 }
 
 html[data-theme='dark'] #fontSizeModal .modal-buttons .btn-primary:hover {
-    background-color: var(--dm-danger-hover) !important;
-    border-color: var(--dm-danger-hover) !important;
+    background-color: var(--pz-danger-text-hover) !important;
+    border-color: var(--pz-danger-text-hover) !important;
     opacity: 1;
 }
 
 html[data-theme='dark'] #fontSizeModal .modal-buttons .btn-cancel:hover {
-    background-color: var(--dm-surface-hover);
-    color: var(--dm-text-bright);
+    background-color: var(--pz-surface-hover);
+    color: var(--pz-text-strong);
 }
 
 /* ============================================
@@ -625,26 +625,26 @@ html[data-theme='dark'] #fontSizeModal .modal-buttons .btn-cancel:hover {
    ============================================ */
 
 html[data-theme='dark'] #shareModal h3 {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 /* Toggle switch: shared component, also used outside the share modals */
 html[data-theme='dark'] .toggle-slider {
-    background-color: var(--dm-border-light);
+    background-color: var(--pz-border-strong);
 }
 
 html[data-theme='dark'] input:checked+.toggle-slider {
-    background-color: var(--dm-success-hover) !important;
+    background-color: var(--pz-success-text-hover) !important;
 }
 
 /* Folder Share Modal */
 html[data-theme='dark'] #folderShareModal .modal-content {
-    background-color: var(--dm-content-bg);
-    color: var(--dm-text-bright);
+    background-color: var(--pz-bg);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] #folderShareModal h3 {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 /* ============================================
@@ -652,17 +652,17 @@ html[data-theme='dark'] #folderShareModal h3 {
    ============================================ */
 
 html[data-theme='dark'] .folder-option {
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    color: var(--pz-text);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .folder-option:hover {
-    background-color: var(--dm-surface);
+    background-color: var(--pz-surface);
 }
 
 html[data-theme='dark'] .folder-option.selected {
-    background-color: var(--dm-active);
-    color: var(--dm-text-bright);
+    background-color: var(--pz-active-bg);
+    color: var(--pz-text-strong);
 }
 
 /* ============================================
@@ -671,14 +671,14 @@ html[data-theme='dark'] .folder-option.selected {
 
 html[data-theme='dark'] .import-confirm-modal-content,
 html[data-theme='dark'] .custom-alert-content {
-    background-color: var(--dm-surface);
-    color: var(--dm-text);
-    border: 1px solid var(--dm-border);
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
+    border: 1px solid var(--pz-border);
 }
 
 html[data-theme='dark'] .import-confirm-modal-content p,
 html[data-theme='dark'] .custom-alert-content p {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .import-confirm-modal-content .btn-cancel,
@@ -687,9 +687,9 @@ html[data-theme='dark'] #deleteFolderModal .btn-cancel,
 html[data-theme='dark'] #deleteConfirmModal .btn-cancel,
 html[data-theme='dark'] #emptyTrashConfirmModal .btn-cancel,
 html[data-theme='dark'] #restoreConfirmModal .btn-cancel {
-    background-color: var(--dm-danger-hover) !important;
+    background-color: var(--pz-danger-text-hover) !important;
     color: var(--pz-text-inverse) !important;
-    border-color: var(--dm-danger-hover) !important;
+    border-color: var(--pz-danger-text-hover) !important;
 }
 
 html[data-theme='dark'] .import-confirm-modal-content .btn-cancel:hover,
@@ -698,42 +698,42 @@ html[data-theme='dark'] #deleteFolderModal .btn-cancel:hover,
 html[data-theme='dark'] #deleteConfirmModal .btn-cancel:hover,
 html[data-theme='dark'] #emptyTrashConfirmModal .btn-cancel:hover,
 html[data-theme='dark'] #restoreConfirmModal .btn-cancel:hover {
-    background-color: var(--dm-danger-hover) !important;
-    border-color: var(--dm-danger-hover) !important;
+    background-color: var(--pz-danger-text-hover) !important;
+    border-color: var(--pz-danger-text-hover) !important;
 }
 
 html[data-theme='dark'] #deleteFolderModal .btn-cancel {
-    background-color: var(--dm-border) !important;
-    color: var(--dm-text) !important;
-    border-color: var(--dm-border-light) !important;
+    background-color: var(--pz-border) !important;
+    color: var(--pz-text) !important;
+    border-color: var(--pz-border-strong) !important;
 }
 
 html[data-theme='dark'] #deleteFolderModal .btn-cancel:hover {
-    background-color: var(--dm-surface-raised) !important;
-    border-color: var(--dm-border) !important;
+    background-color: var(--pz-surface-sunken) !important;
+    border-color: var(--pz-border) !important;
 }
 
 /* Snapshot Modal Dark Mode */
 html[data-theme='dark'] #snapshotModal .snapshot-modal-content {
-    background: linear-gradient(180deg, var(--dm-content-bg) 0%, var(--dm-content-bg) 100%);
+    background: linear-gradient(180deg, var(--pz-bg) 0%, var(--pz-bg) 100%);
     border: 1px solid rgba(var(--pz-highlight-rgb), 0.06);
     box-shadow: 0 18px 44px rgba(var(--pz-shadow-rgb), 0.38);
 }
 
 html[data-theme='dark'] .snapshot-modal-header {
-    border-bottom-color: var(--dm-border);
+    border-bottom-color: var(--pz-border);
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-modal-header h3 {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-modal-description {
-    color: rgba(218, 226, 237, 0.82);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .snapshot-meta-item {
-    color: rgba(232, 238, 247, 0.86);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-meta-item .lucide {
@@ -741,9 +741,9 @@ html[data-theme='dark'] #snapshotModal .snapshot-meta-item .lucide {
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview {
-    border-color: var(--dm-border);
-    background: var(--dm-content-bg) !important;
-    color: var(--dm-text, var(--dm-text-bright)) !important;
+    border-color: var(--pz-border);
+    background: var(--pz-bg) !important;
+    color: var(--pz-text, var(--pz-text-strong)) !important;
     box-shadow: inset 0 1px 0 rgba(var(--pz-highlight-rgb), 0.02);
 }
 
@@ -766,48 +766,48 @@ html[data-theme='dark'] #snapshotModal .snapshot-content-preview article {
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview a {
-    color: var(--dm-accent, var(--dm-accent-hover)) !important;
+    color: var(--pz-accent-text, var(--pz-accent-text-hover)) !important;
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview blockquote {
-    border-left-color: var(--dm-border, var(--dm-border)) !important;
-    color: var(--dm-text-muted, var(--dm-text)) !important;
+    border-left-color: var(--pz-border) !important;
+    color: var(--pz-text-muted, var(--pz-text)) !important;
     background: transparent !important;
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview pre {
-    background-color: var(--dm-surface, var(--dm-content-bg)) !important;
-    border-color: var(--dm-border, var(--dm-border)) !important;
+    background-color: var(--pz-surface, var(--pz-bg)) !important;
+    border-color: var(--pz-border) !important;
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview code:not([class*="hljs"]):not([class*="language-"]) {
-    background-color: var(--dm-surface, var(--dm-content-bg)) !important;
-    color: var(--dm-text, var(--dm-text-bright)) !important;
+    background-color: var(--pz-surface, var(--pz-bg)) !important;
+    color: var(--pz-text, var(--pz-text-strong)) !important;
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview pre code:not([class*="hljs"]):not([class*="language-"]) {
     background-color: transparent !important;
-    color: var(--dm-text-muted, var(--dm-text-bright)) !important;
+    color: var(--pz-text-muted, var(--pz-text-strong)) !important;
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview table,
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview th,
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview td {
-    border-color: var(--dm-border, var(--dm-border)) !important;
+    border-color: var(--pz-border) !important;
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview th,
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview td {
-    background-color: var(--dm-surface, var(--dm-content-bg)) !important;
-    color: var(--dm-text, var(--dm-text-bright)) !important;
+    background-color: var(--pz-surface, var(--pz-bg)) !important;
+    color: var(--pz-text, var(--pz-text-strong)) !important;
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-content-preview hr {
-    border-top-color: var(--dm-border, var(--dm-border)) !important;
+    border-top-color: var(--pz-border) !important;
 }
 
 html[data-theme='dark'] .snapshot-modal-actions {
-    border-top-color: var(--dm-border);
+    border-top-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .snapshot-state > div:first-child {
@@ -815,19 +815,19 @@ html[data-theme='dark'] .snapshot-state > div:first-child {
 }
 
 html[data-theme='dark'] .snapshot-date-list {
-    border-right-color: var(--dm-border);
+    border-right-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .snapshot-date-btn {
-    color: rgba(239, 244, 250, 0.92);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .snapshot-date-list-header {
-    color: rgba(213, 220, 230, 0.8);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-date-secondary {
-    color: rgba(181, 190, 202, 0.88);
+    color: var(--pz-text-muted);
     opacity: 1;
 }
 
@@ -836,55 +836,55 @@ html[data-theme='dark'] .snapshot-date-btn:hover {
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-state-title {
-    color: var(--dm-text, var(--dm-text-bright));
+    color: var(--pz-text, var(--pz-text-strong));
 }
 
 html[data-theme='dark'] #snapshotModal .snapshot-state-hint {
-    color: var(--dm-text-muted, var(--dm-text));
+    color: var(--pz-text-muted, var(--pz-text));
     opacity: 1;
 }
 
 /* Update Modal Specific */
 html[data-theme='dark'] #updateModal .version-info {
-    background-color: var(--dm-surface) !important;
-    border: 1px solid var(--dm-border) !important;
+    background-color: var(--pz-surface) !important;
+    border: 1px solid var(--pz-border) !important;
 }
 
 html[data-theme='dark'] #updateModal .version-info p {
-    color: var(--dm-text-bright) !important;
+    color: var(--pz-text-strong) !important;
 }
 
 html[data-theme='dark'] #updateModal .modal-content p {
-    color: var(--dm-text) !important;
+    color: var(--pz-text) !important;
 }
 
 html[data-theme='dark'] #updateModal .backup-warning {
-    background-color: var(--dm-content-bg);
-    border-color: var(--dm-warning-soft);
+    background-color: var(--pz-bg);
+    border-color: var(--pz-warning-soft);
 }
 
 /* Update Check Modal Specific */
 html[data-theme='dark'] #updateCheckModal .modal-content {
-    background-color: var(--dm-content-bg) !important;
-    color: var(--dm-text) !important;
+    background-color: var(--pz-bg) !important;
+    color: var(--pz-text) !important;
 }
 
 html[data-theme='dark'] #updateCheckModal .modal-content h3 {
-    color: var(--dm-accent) !important;
+    color: var(--pz-accent-text) !important;
 }
 
 html[data-theme='dark'] #updateCheckModal .modal-content p {
-    color: var(--dm-text) !important;
+    color: var(--pz-text) !important;
 }
 
 /* Custom date pattern token legend */
 html[data-theme='dark'] .date-format-tokens {
-    color: var(--dm-text-muted, var(--dm-text-muted)) !important;
+    color: var(--pz-text-muted) !important;
 }
 
 html[data-theme='dark'] .date-format-tokens dt code {
     background: rgba(var(--pz-highlight-rgb), 0.1) !important;
-    color: var(--dm-text) !important;
+    color: var(--pz-text) !important;
 }
 
 /* ============================================
@@ -896,19 +896,19 @@ html[data-theme='dark'] .date-format-tokens dt code {
    remap both scales and would be right either way. */
 
 html[data-theme='dark'] #changePasswordModal .change-password-status-custom {
-    background: var(--dm-success-soft);
-    color: var(--dm-success);
-    border-left-color: var(--dm-success);
+    background: var(--pz-success-soft);
+    color: var(--pz-success-text);
+    border-left-color: var(--pz-success-text);
 }
 
 html[data-theme='dark'] #changePasswordModal .change-password-status-default {
-    background: var(--dm-warning-soft);
-    color: var(--dm-warning);
-    border-left-color: var(--dm-warning);
+    background: var(--pz-warning-soft);
+    color: var(--pz-warning-text);
+    border-left-color: var(--pz-warning-text);
 }
 
 html[data-theme='dark'] #changePasswordModal .change-password-status-sso {
-    background: var(--dm-accent-soft);
-    color: var(--dm-accent);
-    border-left-color: var(--dm-accent);
+    background: var(--pz-accent-soft);
+    color: var(--pz-accent-text);
+    border-left-color: var(--pz-accent-text);
 }

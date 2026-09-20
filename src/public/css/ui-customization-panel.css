@@ -56,14 +56,14 @@
 .pz-edge-btn:hover,
 .pz-edge-btn:focus {
     opacity: 1;
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     transform: translateY(-1px);
     box-shadow: 0 7px 18px rgba(var(--pz-shadow-rgb), 0.18);
     outline: none;
 }
 
 .pz-edge-btn:focus-visible {
-    outline: 2px solid var(--pz-accent);
+    outline: 2px solid var(--pz-accent-text);
     outline-offset: 2px;
 }
 
@@ -150,19 +150,19 @@ body:has(#ai-chat-panel.ai-chat-open) #edgeAiChatBtn {
 }
 
 html[data-theme='dark'] .page-more-menu {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
     box-shadow: 0 8px 24px rgba(var(--pz-shadow-rgb), 0.35);
 }
 
 html[data-theme='dark'] .page-more-menu-item,
 html[data-theme='dark'] .page-more-menu-item [class*="lucide-"] {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .page-more-menu-item:hover,
 html[data-theme='dark'] .page-more-menu-item:focus-visible {
-    background-color: var(--dm-surface-hover);
+    background-color: var(--pz-surface-hover);
 }
 
 /* Help modals of the "..." menu (keyboard shortcuts, Markdown syntax). Scoped
@@ -267,8 +267,8 @@ html[data-theme='dark'] .page-more-menu-item:focus-visible {
 
 .pz-help-filter-bar .filter-input:focus {
     outline: none;
-    border-color: var(--pz-accent);
-    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
+    border-color: var(--pz-accent-text);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-text-rgb), 0.1);
 }
 
 .pz-help-filter-bar .clear-filter-btn {
@@ -314,7 +314,7 @@ html[data-theme='dark'] .page-more-menu-item:focus-visible {
    sections title their card with an h4) */
 .pz-help-card-category {
     margin: 0 0 10px !important;
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     font-size: 12px;
     font-weight: var(--pz-weight-bold);
     letter-spacing: 0.08em;
@@ -351,25 +351,21 @@ html[data-theme='dark'] .page-more-menu-item:focus-visible {
 }
 
 html[data-theme='dark'] .pz-help-card {
-    border-color: var(--dm-border);
-    background: var(--dm-surface, var(--dm-content-bg));
-}
-
-html[data-theme='dark'] .pz-help-card-category {
-    color: var(--dm-accent);
+    border-color: var(--pz-border);
+    background: var(--pz-surface, var(--pz-bg));
 }
 
 /* dark-mode/pages.css paints every .filter-stats as a pill, which read as
    selected text here, with no padding: plain muted text as in light */
 html[data-theme='dark'] .pz-help-filter-bar .filter-stats {
     background-color: transparent;
-    color: var(--dm-text-muted, var(--dm-text-subtle));
+    color: var(--pz-text-muted, var(--pz-text-subtle));
 }
 
 html[data-theme='dark'] .pz-help-empty {
-    border-color: var(--dm-border);
-    background: var(--dm-surface, var(--dm-content-bg));
-    color: var(--dm-text-muted, var(--dm-text-subtle));
+    border-color: var(--pz-border);
+    background: var(--pz-surface, var(--pz-bg));
+    color: var(--pz-text-muted, var(--pz-text-subtle));
 }
 
 .keyboard-shortcuts-list {
@@ -447,9 +443,8 @@ html[data-theme='dark'] .pz-help-empty {
 }
 
 html[data-theme='dark'] .keyboard-shortcuts-keys kbd {
-    background: var(--dm-surface-hover);
-    border-color: var(--dm-border);
-    color: var(--dm-text);
+    background: var(--pz-surface-hover);
+    border-color: var(--pz-border);
 }
 
 @media (max-width: 800px) {
@@ -555,7 +550,7 @@ html[data-theme='dark'] .keyboard-shortcuts-keys kbd {
 .ui-custom-panel-header-btn:hover,
 .ui-custom-panel-header-btn:focus {
     background: rgba(var(--pz-accent-rgb), 0.1);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 /* The only part that scrolls: the header and status keep their height.
@@ -618,11 +613,11 @@ html[data-theme='dark'] .keyboard-shortcuts-keys kbd {
 }
 
 .ui-custom-panel-status-saved {
-    color: var(--pz-success);
+    color: var(--pz-success-text);
 }
 
 .ui-custom-panel-status-error {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 /* dashboard.php scrolls the body: pin the column like the AI chat panel */

@@ -16,7 +16,7 @@
     overflow-x: hidden;
     padding: 0px 16px 16px 16px;
     box-sizing: border-box;
-    background: var(--pz-surface);
+    background: var(--pz-chrome-bg);
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
@@ -39,7 +39,7 @@
     z-index: 1;
     margin: -16px -16px 16px;
     padding: 16px 16px 12px;
-    background: var(--pz-surface);
+    background: var(--pz-chrome-bg);
     /* border-bottom: 1px solid #dee2e6; */
 }
 
@@ -74,7 +74,7 @@
 .outline-close-btn:hover,
 .outline-close-btn:focus {
     background: rgba(var(--pz-accent-rgb), 0.1);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .outline-close-btn i {
@@ -114,12 +114,12 @@
 
 .outline-nav-link:hover {
     background: rgba(var(--pz-accent-rgb), 0.1);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .outline-nav-link.active {
     background: rgba(var(--pz-accent-rgb), 0.15);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     font-weight: var(--pz-weight-medium);
 }
 
@@ -175,7 +175,7 @@
 /* Outline resize handle */
 .outline-resize-handle {
     height: 100vh;
-    background: var(--pz-surface);
+    background: var(--pz-chrome-bg);
     cursor: col-resize;
     position: relative;
     flex-shrink: 0;
@@ -201,7 +201,7 @@
     transform: translateY(-50%);
     width: 16px;
     height: 25px;
-    background: var(--pz-bg);
+    background: var(--pz-sidebar-surface);
     border: 1px solid var(--pz-border-strong);
     border-radius: var(--pz-radius-sm) 0 0 var(--pz-radius-sm);
     cursor: pointer;
@@ -232,7 +232,7 @@ body:not(.outline-collapsed) .toggle-outline-btn {
 
 .toggle-outline-btn:hover {
     background: var(--pz-surface);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.1);
 }
 
@@ -379,56 +379,55 @@ body.kanban-active .toggle-outline-btn {
 }
 
 html[data-theme='dark'] #outline-panel {
-    background: var(--dm-bg);
+    background: var(--pz-chrome-bg);
     border-left: none;
 }
 
 html[data-theme='dark'] .outline-header {
-    background: var(--dm-bg);
-    border-bottom-color: var(--dm-border);
+    border-bottom-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .outline-nav-link {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html.theme-black[data-theme='dark'] .outline-nav-link {
-    color: var(--dm-text-subtle);
+    color: var(--pz-text-subtle);
 }
 
 html[data-theme='dark'] .outline-nav-link:hover {
-    background: var(--dm-sidebar-surface);
-    color: var(--dm-accent);
+    background: var(--pz-sidebar-surface);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .outline-nav-link.active {
-    background: var(--dm-active);
-    color: var(--dm-accent);
+    background: var(--pz-active-bg);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .outline-resize-handle {
-    background: var(--dm-bg);
-    border-left-color: var(--dm-border);
+    background: var(--pz-chrome-bg);
+    border-left-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .toggle-outline-btn {
-    background: var(--dm-sidebar-surface);
-    border-color: var(--dm-border);
+    background: var(--pz-sidebar-surface);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .toggle-outline-btn:hover {
-    background: var(--dm-surface-hover);
-    color: var(--dm-accent);
+    background: var(--pz-surface-hover);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .toggle-outline-btn:disabled,
 html[data-theme='dark'] .toggle-outline-btn[aria-disabled="true"] {
-    background: var(--dm-sidebar-surface);
+    background: var(--pz-sidebar-surface);
 }
 
 html[data-theme='dark'] .toggle-outline-btn:disabled:hover,
 html[data-theme='dark'] .toggle-outline-btn[aria-disabled="true"]:hover {
-    background: var(--dm-sidebar-surface);
+    background: var(--pz-sidebar-surface);
 }
 
 .heading-anchor--floating {
@@ -493,8 +492,8 @@ html[data-theme='dark'] .toggle-outline-btn[aria-disabled="true"]:hover {
 }
 
 html[data-theme='dark'] #heading-copy-toast {
-    background: var(--dm-border-light);
-    color: var(--dm-text-bright);
+    background: var(--pz-border-strong);
+    color: var(--pz-text-strong);
 }
 
 /* The flash behind the heading an outline link scrolled to. A fixed overlay

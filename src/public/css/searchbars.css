@@ -251,7 +251,7 @@
 }
 
 .searchbar-clear .clear-icon {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
     font-size: 16px;
     font-weight: var(--pz-weight-bold);
     line-height: 1;
@@ -305,7 +305,7 @@
 .folder-filter-banner-icon:hover,
 .folder-filter-banner-icon:focus-visible {
     /* Lucide icons are CSS masks: recolor needs background-color too */
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     background-color: var(--pz-accent);
 }
 
@@ -322,7 +322,7 @@
 }
 
 .folder-filter-banner-clear .clear-icon {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
     font-size: 14px;
     line-height: 1;
 }
@@ -400,12 +400,12 @@
 /* Search validation error styles */
 .search-validation-error {
     background-color: var(--pz-danger-soft);
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
     padding: 8px 12px;
     border-radius: var(--pz-radius-sm);
     font-size: 0.85em;
     margin: 8px 0 4px 0;
-    border-left: 3px solid var(--pz-danger);
+    border-left: 3px solid var(--pz-danger-text);
     animation: slideDown 0.3s ease-out;
 }
 
@@ -442,15 +442,15 @@
 }
 
 .search-type-btn:hover i {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .search-type-btn.active i {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .search-type-btn.active:hover i {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .searchbar-row {
