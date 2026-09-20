@@ -316,6 +316,20 @@ textarea:focus {
     image-rendering: auto;
 }
 
+/* An image being uploaded into a note (js/attachments.js, js/slash-command.js):
+   a dashed grey plate holding the space until the upload answers, then the
+   class comes off and the picture takes over. This was an inline style with two
+   hex greys, written into the note markup itself: no theme could reach it, it
+   flashed white in dark mode, and a save landing mid-upload kept it in the
+   note. */
+.image-uploading-placeholder {
+    opacity: 0.5;
+    min-width: 100px;
+    min-height: 100px;
+    background: var(--pz-surface);
+    border: 2px dashed var(--pz-border-strong);
+}
+
 .noteentry iframe {
     aspect-ratio: 16 / 9;
     border: none;

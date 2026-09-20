@@ -29,6 +29,16 @@ html[data-theme='dark'] [class*="lucide-"]:hover {
     color: var(--dm-icon-hover);
 }
 
+/* The language marks of the code submenu are masks of the same kind under their
+   own prefix (see devicon.css), and css/icons.css already hands them --pz-icon,
+   which is --dm-icon here. Only the hover is left to match. The carrier is
+   wrapped in :where() so the rule weighs what a light twin would weigh and
+   still wins by load order. */
+:where(html[data-theme='dark']) [class*="devicon-"]:hover {
+    transform: scale(1.18);
+    color: var(--dm-icon-hover);
+}
+
 /* Sidebar plus button */
 html[data-theme='dark'] .sidebar-plus {
     filter: brightness(0) saturate(0%) invert(80%) !important;

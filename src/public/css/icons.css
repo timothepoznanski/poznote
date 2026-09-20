@@ -29,8 +29,13 @@
    Lucide icons are CSS masks painted with `background-color: currentColor`
    (lucide.css), so `color` does the same job and lets an icon override it the
    normal way. A coloured folder icon carries style="color: X !important" from
-   PHP and simply wins; nothing has to be carved out. */
-[class*="lucide-"] {
+   PHP and simply wins; nothing has to be carved out.
+
+   The language marks of the code submenu (devicon.css) are the same kind of
+   mask under their own prefix, so they belong to the same default: one icon
+   colour in the menu, whatever the theme. */
+[class*="lucide-"],
+[class*="devicon-"] {
     color: var(--pz-icon);
     transition: transform 0.2s ease, color 0.2s ease;
 }

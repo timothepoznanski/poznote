@@ -150,6 +150,26 @@
       "notes": "Generated, not downloaded: tools/generate-lucide-icons.py fetches individual SVGs from unpkg and emits one CSS mask rule per icon, with the upstream version kept in each embedded @license comment. LUCIDE_VERSION in that script must match the version here. The file is appended to over time, so its sha256 changes whenever an icon is added without any upstream version change. src/public/css/lucide-icons-map.json is a Poznote alias table, not upstream content."
     },
     {
+      "id": "devicon",
+      "version": "2.17.0",
+      "license": "MIT",
+      "homepage": "https://github.com/devicons/devicon",
+      "files": [
+        {
+          "path": "src/public/css/devicon.css",
+          "url": "https://raw.githubusercontent.com/devicons/devicon/v2.17.0/icons/<name>/<name>-plain.svg",
+          "sha256": "604d75cd727264fd4a9fa5d6d46e8fa27a48436fe0ade81cfe86e291f5a34330"
+        }
+      ],
+      "vendored": "2026-09-20",
+      "updated": "2026-09-20",
+      "verified": "2026-09-20",
+      "loaded_by": [
+        "src/public/index_css.php (the ?group=core bundle of index.php)"
+      ],
+      "notes": "Generated, not downloaded, like lucide.css: tools/generate-devicon-icons.py fetches one SVG per language from the tag above and emits a CSS mask rule, dropping the brand colours a mask cannot carry anyway (issue #1444). DEVICON_VERSION in that script must match the version here, and its ICONS table is the list of marks vendored: 17 of the 19 languages in the code submenu, a single variant each (-original for markdown and rust), not the ~200 icons devicon ships. SQL and XML are not here, they keep a Lucide icon."
+    },
+    {
       "id": "inter",
       "version": "4.001",
       "license": "OFL-1.1",

@@ -20,6 +20,7 @@ themes work and which variables a custom stylesheet can rely on.
 | `public_note.css`, `public_folder.css`, `login.css` | pages served without a session |
 | `dark-mode/` | the dark/black theme layer, see below |
 | `lucide.css` | generated icon CSS (`tools/generate-lucide-icons.py`), never edited by hand |
+| `devicon.css` | the language marks of the code submenu, generated the same way (`tools/generate-devicon-icons.py`), never edited by hand |
 
 ## How pages load CSS
 

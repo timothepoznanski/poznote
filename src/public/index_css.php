@@ -25,6 +25,7 @@ function poznoteGetIndexCssGroups(): array {
     return [
         'core' => [
             'css/lucide.css',
+            'css/devicon.css',
             'css/tokens.css',
             'css/base.css',
             // Shared component bases. index.php is not in the css_assets manifest, so
