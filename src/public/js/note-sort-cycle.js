@@ -13,6 +13,10 @@
 //
 // The order of MODES and the icons mirror poznoteNoteSortModes() and
 // poznoteNoteSortIcon() in src/lib/note-sort.php. Keep the two in step.
+//
+// The five icons share their left half, the down arrow of lucide-arrow-down-a-z,
+// and change only the mark on its right, so the button stays one control; the
+// four composed classes are defined at the end of css/lucide.css.
 
 (function () {
     'use strict';
@@ -21,10 +25,10 @@
 
     var ICONS = {
         heading_asc: 'lucide-arrow-down-a-z',
-        updated_desc: 'lucide-calendar',
-        created_desc: 'lucide-calendar-plus',
-        type_asc: 'lucide-shapes',
-        manual: 'lucide-grip-vertical'
+        updated_desc: 'lucide-sort-date-modified',
+        created_desc: 'lucide-sort-date-created',
+        type_asc: 'lucide-sort-type',
+        manual: 'lucide-sort-custom'
     };
 
     var LABELS = {

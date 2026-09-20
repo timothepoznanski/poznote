@@ -53,6 +53,22 @@ test('every mode has an icon and a label', function () {
     }
 });
 
+test('the icon of every mode is defined and keeps the shared arrow', function () {
+    // One control, not five: the button changes the mark on the right of the
+    // glyph and never the down arrow on its left (#1442). A class that no
+    // longer exists in lucide.css would leave an empty square in the sidebar.
+    $lucide = (string)file_get_contents(__DIR__ . '/../src/public/css/lucide.css');
+    foreach (poznoteNoteSortModes() as $mode) {
+        $icon = poznoteNoteSortIcon($mode);
+        $pattern = '/\\.' . preg_quote($icon, '/') . ' \\{\\s*-webkit-mask-image: url\\("data:image\\/svg\\+xml,([^"]*)"\\)/';
+        $matches = [];
+        assertTrue(preg_match($pattern, $lucide, $matches) === 1, $icon . ' is defined in lucide.css');
+        $svg = rawurldecode($matches[1] ?? '');
+        assertContains('m3 16 4 4 4-4', $svg, $mode . ' keeps the shared arrow head');
+        assertContains('M7 20V4', $svg, $mode . ' keeps the shared arrow stem');
+    }
+});
+
 test('notes: name is natural and case-insensitive, dates are newest first', function () {
     $rows = [
         ['id' => 1, 'heading' => 'Note 10', 'created' => '2026-01-03', 'updated' => '2026-02-01'],

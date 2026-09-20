@@ -5054,3 +5054,66 @@
   background-image: none;
 }
 
+/* Sort modes (#1442) - composed here, not Lucide icon names.
+   The sidebar sort button keeps one glyph and changes one half of it: the left
+   half is the down arrow of lucide-arrow-down-a-z (ISC, v0.575.0), which the
+   Name mode still uses whole, and the right half is the mark of the mode. Drawn
+   on Lucide's 24x24 grid with its stroke width and round caps, so the five read
+   as one family. The marks, arrow paths omitted:
+
+     sort-date-modified  <circle cx="16.5" cy="12" r="4.5"/>
+                         <path d="M16.5 8.8v3.2l2.3 1.3"/>
+     sort-date-created   <circle cx="16" cy="10.5" r="4.5"/>
+                         <path d="M16 7.3v3.2l2.3 1.3"/>
+                         <path d="M18.5 18h4"/><path d="M20.5 16v4"/>
+     sort-type           <path d="m17.5 3.5 4 6h-8Z"/>
+                         <rect x="15" y="14" width="5.5" height="5.5" rx="1"/>
+     sort-custom         six r="1" dots at x 15/20, y 6/12/18
+
+   tools/generate-lucide-icons.py cannot rebuild these four: edit the paths
+   above, re-encode, and keep poznoteNoteSortIcon() in src/lib/note-sort.php
+   and ICONS in src/public/js/note-sort-cycle.js pointing at the same names. */
+
+.lucide-sort-date-modified {
+  -webkit-mask-image: url("data:image/svg+xml,%3C%21--%20arrow%3A%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-sort-date-modified%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Cpath%20d%3D%27m3%2016%204%204%204-4%27%20%2F%3E%20%3Cpath%20d%3D%27M7%2020V4%27%20%2F%3E%20%3Ccircle%20cx%3D%2716.5%27%20cy%3D%2712%27%20r%3D%274.5%27%20%2F%3E%20%3Cpath%20d%3D%27M16.5%208.8v3.2l2.3%201.3%27%20%2F%3E%20%3C%2Fsvg%3E");
+  mask-image: url("data:image/svg+xml,%3C%21--%20arrow%3A%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-sort-date-modified%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Cpath%20d%3D%27m3%2016%204%204%204-4%27%20%2F%3E%20%3Cpath%20d%3D%27M7%2020V4%27%20%2F%3E%20%3Ccircle%20cx%3D%2716.5%27%20cy%3D%2712%27%20r%3D%274.5%27%20%2F%3E%20%3Cpath%20d%3D%27M16.5%208.8v3.2l2.3%201.3%27%20%2F%3E%20%3C%2Fsvg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  background-color: currentColor;
+  background-image: none;
+}
+
+.lucide-sort-date-created {
+  -webkit-mask-image: url("data:image/svg+xml,%3C%21--%20arrow%3A%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-sort-date-created%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Cpath%20d%3D%27m3%2016%204%204%204-4%27%20%2F%3E%20%3Cpath%20d%3D%27M7%2020V4%27%20%2F%3E%20%3Ccircle%20cx%3D%2716%27%20cy%3D%2710.5%27%20r%3D%274.5%27%20%2F%3E%20%3Cpath%20d%3D%27M16%207.3v3.2l2.3%201.3%27%20%2F%3E%20%3Cpath%20d%3D%27M18.5%2018h4%27%20%2F%3E%20%3Cpath%20d%3D%27M20.5%2016v4%27%20%2F%3E%20%3C%2Fsvg%3E");
+  mask-image: url("data:image/svg+xml,%3C%21--%20arrow%3A%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-sort-date-created%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Cpath%20d%3D%27m3%2016%204%204%204-4%27%20%2F%3E%20%3Cpath%20d%3D%27M7%2020V4%27%20%2F%3E%20%3Ccircle%20cx%3D%2716%27%20cy%3D%2710.5%27%20r%3D%274.5%27%20%2F%3E%20%3Cpath%20d%3D%27M16%207.3v3.2l2.3%201.3%27%20%2F%3E%20%3Cpath%20d%3D%27M18.5%2018h4%27%20%2F%3E%20%3Cpath%20d%3D%27M20.5%2016v4%27%20%2F%3E%20%3C%2Fsvg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  background-color: currentColor;
+  background-image: none;
+}
+
+.lucide-sort-type {
+  -webkit-mask-image: url("data:image/svg+xml,%3C%21--%20arrow%3A%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-sort-type%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Cpath%20d%3D%27m3%2016%204%204%204-4%27%20%2F%3E%20%3Cpath%20d%3D%27M7%2020V4%27%20%2F%3E%20%3Cpath%20d%3D%27m17.5%203.5%204%206h-8Z%27%20%2F%3E%20%3Crect%20x%3D%2715%27%20y%3D%2714%27%20width%3D%275.5%27%20height%3D%275.5%27%20rx%3D%271%27%20%2F%3E%20%3C%2Fsvg%3E");
+  mask-image: url("data:image/svg+xml,%3C%21--%20arrow%3A%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-sort-type%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Cpath%20d%3D%27m3%2016%204%204%204-4%27%20%2F%3E%20%3Cpath%20d%3D%27M7%2020V4%27%20%2F%3E%20%3Cpath%20d%3D%27m17.5%203.5%204%206h-8Z%27%20%2F%3E%20%3Crect%20x%3D%2715%27%20y%3D%2714%27%20width%3D%275.5%27%20height%3D%275.5%27%20rx%3D%271%27%20%2F%3E%20%3C%2Fsvg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  background-color: currentColor;
+  background-image: none;
+}
+
+.lucide-sort-custom {
+  -webkit-mask-image: url("data:image/svg+xml,%3C%21--%20arrow%3A%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-sort-custom%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Cpath%20d%3D%27m3%2016%204%204%204-4%27%20%2F%3E%20%3Cpath%20d%3D%27M7%2020V4%27%20%2F%3E%20%3Ccircle%20cx%3D%2715%27%20cy%3D%276%27%20r%3D%271%27%20%2F%3E%20%3Ccircle%20cx%3D%2715%27%20cy%3D%2712%27%20r%3D%271%27%20%2F%3E%20%3Ccircle%20cx%3D%2715%27%20cy%3D%2718%27%20r%3D%271%27%20%2F%3E%20%3Ccircle%20cx%3D%2720%27%20cy%3D%276%27%20r%3D%271%27%20%2F%3E%20%3Ccircle%20cx%3D%2720%27%20cy%3D%2712%27%20r%3D%271%27%20%2F%3E%20%3Ccircle%20cx%3D%2720%27%20cy%3D%2718%27%20r%3D%271%27%20%2F%3E%20%3C%2Fsvg%3E");
+  mask-image: url("data:image/svg+xml,%3C%21--%20arrow%3A%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-sort-custom%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Cpath%20d%3D%27m3%2016%204%204%204-4%27%20%2F%3E%20%3Cpath%20d%3D%27M7%2020V4%27%20%2F%3E%20%3Ccircle%20cx%3D%2715%27%20cy%3D%276%27%20r%3D%271%27%20%2F%3E%20%3Ccircle%20cx%3D%2715%27%20cy%3D%2712%27%20r%3D%271%27%20%2F%3E%20%3Ccircle%20cx%3D%2715%27%20cy%3D%2718%27%20r%3D%271%27%20%2F%3E%20%3Ccircle%20cx%3D%2720%27%20cy%3D%276%27%20r%3D%271%27%20%2F%3E%20%3Ccircle%20cx%3D%2720%27%20cy%3D%2712%27%20r%3D%271%27%20%2F%3E%20%3Ccircle%20cx%3D%2720%27%20cy%3D%2718%27%20r%3D%271%27%20%2F%3E%20%3C%2Fsvg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  background-color: currentColor;
+  background-image: none;
+}
