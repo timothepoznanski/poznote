@@ -13,6 +13,10 @@
 //
 // The order of MODES and the icons mirror poznoteNoteSortModes() and
 // poznoteNoteSortIcon() in src/lib/note-sort.php. Keep the two in step.
+//
+// The five icons share their left half, the down arrow of lucide-arrow-down-a-z,
+// and change only the mark on its right, so the button stays one control; the
+// four composed classes are defined at the end of css/lucide.css.
 
 (function () {
     'use strict';
@@ -21,10 +25,10 @@
 
     var ICONS = {
         heading_asc: 'lucide-arrow-down-a-z',
-        updated_desc: 'lucide-calendar',
-        created_desc: 'lucide-calendar-plus',
-        type_asc: 'lucide-shapes',
-        manual: 'lucide-grip-vertical'
+        updated_desc: 'lucide-sort-date-modified',
+        created_desc: 'lucide-sort-date-created',
+        type_asc: 'lucide-sort-type',
+        manual: 'lucide-sort-custom'
     };
 
     var LABELS = {
@@ -140,11 +144,28 @@
             .finally(function () { saving = false; });
     }
 
+    // The mode the tree follows right now. The button carries it, and is
+    // repainted by markCustom() without waiting for a reload, so it is a
+    // truer source than the setting the page was rendered with. Callers use
+    // it to tell a drop that places a row (Custom only) from a drop that just
+    // moves it somewhere else (#1441).
+    function currentMode() {
+        var button = document.querySelector('[data-action="cycle-note-sort"]');
+        if (button) return normalize(button.getAttribute('data-sort-mode'));
+        return normalize(window.defaultNoteSortType);
+    }
+
+    window.poznoteNoteSortMode = currentMode;
+
     // A drop that reorders rows switches the tree to Custom server side
     // (enableManualNoteSort). Where the drop is applied in the DOM instead of
     // reloading the list, the button has to follow, or it keeps naming the
     // mode the tree just left.
     function markCustom() {
+        // Kept in step for the pages where the button is hidden: it is what
+        // currentMode() falls back to
+        window.defaultNoteSortType = 'manual';
+
         var button = document.querySelector('[data-action="cycle-note-sort"]');
         if (!button || button.getAttribute('data-sort-mode') === 'manual') return;
 

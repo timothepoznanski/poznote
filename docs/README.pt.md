@@ -768,11 +768,11 @@ Cores, espaçamentos, raios e pesos de fonte são design tokens, então a maiori
     --pz-accent-rgb: 214, 51, 108;   /* same colour, channels only, used for tints */
 }
 html[data-theme='dark'] {
-    --dm-accent: #f783ac;            /* lighter, because it sits on a dark ground */
+    --pz-accent-text: #f783ac;       /* lighter, because it sits on a dark ground */
 }
 ```
 
-Dois tokens em vez de um porque um *preenchimento* e um *rótulo* não podem ter a mesma cor: `--pz-accent` preenche os botões, `--dm-accent` é a cor de destaque aplicada ao texto no modo escuro.
+Dois tokens em vez de um porque um *preenchimento* e um *rótulo* não podem ter a mesma cor: `--pz-accent` preenche os botões, `--pz-accent-text` é a cor de destaque para texto, ícones e contornos. Num tema claro ele segue `--pz-accent` sozinho; um fundo escuro precisa de um valor mais claro. Cada token mantém o mesmo nome `--pz-*` em todos os temas, só o valor muda. Os nomes `--dm-*` das folhas de estilo mais antigas continuam a funcionar.
 
 **Recolorir os ícones da barra de ferramentas da nota**
 
@@ -803,8 +803,6 @@ Para colorir um único ícone não é preciso CSS: clique com o botão direito n
 **Escrever um tema completo**
 
 Sobrescreva os tokens em `:root` para o modo claro e em `:root[data-theme='dark']` para o escuro, e nada mais. O `src/public/css/README.md` documenta todos os tokens e mostra um exemplo completo; os temas integrados Lavanda, Sépia e Terminal em `src/public/css/tokens.css` são exatamente isso, escritos da mesma forma.
-
-Uma coisa que um tema ainda não alcança: alguns ícones que uma regra de página colore explicitamente aparecem no cinza genérico de ícone no modo escuro.
 
 </details>
 

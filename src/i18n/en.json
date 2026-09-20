@@ -1225,7 +1225,7 @@
         "custom": "Custom"
       },
       "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
-      "custom_hint": "Tokens: YYYY, MMMM, MMM, MM, dddd, DD, D, HH, h, hh, mm, ss, A",
+      "custom_hint": "Tokens: YYYY, MMMM, MMM, MM, dddd, ddd, DD, D, HH, h, hh, mm, ss, A",
       "custom_invalid": "Enter a valid custom format.",
       "tokens_title": "Tokens:",
       "tokens": {
@@ -1234,6 +1234,7 @@
         "MMM": "short month name (Sep)",
         "MM": "month (08)",
         "dddd": "weekday name (Saturday)",
+        "ddd": "short weekday name (Sat)",
         "DD": "day (16)",
         "D": "day without leading zero (5)",
         "HH": "hour, 24h (14)",
@@ -1269,7 +1270,7 @@
         "custom": "Custom"
       },
       "custom_placeholder": "DD MMMM YYYY",
-      "custom_hint": "Tokens: YYYY, YY, MMMM, MMM, MM, dddd, DD, D. A year, a month and a day are required.",
+      "custom_hint": "Tokens: YYYY, YY, MMMM, MMM, MM, dddd, ddd, DD, D. A year, a month and a day are required.",
       "custom_invalid": "Enter a valid custom format, with a year, a month and a day.",
       "hint": "Existing entries keep their title and stay linked to their day.",
       "tokens_title": "Tokens:",
@@ -1280,6 +1281,7 @@
         "MMM": "short month name (Sep)",
         "MM": "month (08)",
         "dddd": "weekday name (Saturday)",
+        "ddd": "short weekday name (Sat)",
         "DD": "day (05)",
         "D": "day without leading zero (5)"
       },
@@ -1895,6 +1897,10 @@
       "remove": "Remove link",
       "cancel": "Cancel",
       "save": "Save"
+    },
+    "paste": {
+      "images_dropped_one": "1 image could not be pasted. Copy it on its own to add it.",
+      "images_dropped_other": "{{count}} images could not be pasted. Copy them one by one to add them."
     }
   },
   "image_menu": {
@@ -4687,6 +4693,8 @@
     "tree_move": "Move to the note or folder above or below",
     "tree_open_folder": "Open a folder, or step into it",
     "tree_close_folder": "Close a folder, or go up to the one holding the row",
+    "tree_rename": "Rename the note or folder",
+    "tree_open": "Open the note, or open and close the folder",
     "tree_undo": "Undo the last change",
     "tree_redo": "Redo",
     "tree_copy": "Copy the selected notes and folders",
@@ -4698,6 +4706,7 @@
       "escape": "Esc",
       "tab": "Tab",
       "delete": "Del",
+      "space": "Space",
       "click": "Click"
     },
     "tree_select_toggle": "Add a note or folder to the selection, or remove it",
@@ -4717,6 +4726,9 @@
     "delete_title": "Delete {{count}} items",
     "delete_message": "{{count}} items will be moved to the trash, notes inside the selected folders included. Ctrl+Z brings them back.",
     "delete_message_notes": "{{count}} notes will be moved to the trash. Ctrl+Z brings them back.",
+    "delete_note_title": "Delete note",
+    "delete_note_message": "“{{name}}” will be moved to the trash. Ctrl+Z brings it back.",
+    "delete_note_message_untitled": "This note will be moved to the trash. Ctrl+Z brings it back.",
     "deleted_items": "Moved {{count}} items to the trash",
     "delete_failed": "Delete failed: {{error}}",
     "moved_items": "Moved {{count}} items",

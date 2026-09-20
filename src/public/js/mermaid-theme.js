@@ -124,9 +124,9 @@
                 text: get('var(--pz-text, ' + (isDark ? '#bebebe' : '#333333') + ')'),
                 muted: get('var(--pz-text-muted, ' + (isDark ? '#a0a0a0' : '#6b7280') + ')'),
                 border: get('var(--pz-border-strong, ' + (isDark ? '#555555' : '#d1d5db') + ')'),
-                // The dark layer keeps its own accent: --pz-accent is the light
-                // fill, too dark to read as a line on a dark ground.
-                accent: get(isDark ? 'var(--dm-accent, var(--pz-accent, #4a9eff))' : 'var(--pz-accent, #007db8)'),
+                // The accent as a line, not as a fill: --pz-accent has to hold
+                // a white label, which makes it too dark to read on a dark ground.
+                accent: get('var(--pz-accent-text, ' + (isDark ? '#4a9eff' : '#007db8') + ')'),
                 colors: {}
             };
             SERIES.concat(['yellow', 'gray']).forEach(function (id) {

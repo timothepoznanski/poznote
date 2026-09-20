@@ -26,7 +26,7 @@
 
 .home-card:hover {
     border-color: var(--pz-accent);
-    box-shadow: 0 4px 12px rgba(var(--pz-accent-rgb), 0.15);
+    box-shadow: 0 4px 12px rgba(var(--pz-accent-text-rgb), 0.15);
     transform: translateY(-2px);
     /* The transform creates a stacking context: without a z-index the
        help tooltip (z-index inside the card) paints under later sibling
@@ -55,8 +55,8 @@
     height: 18px;
     margin-top: -9px;
     margin-left: -9px;
-    border: 2px solid rgba(var(--pz-accent-rgb), 0.22);
-    border-top-color: var(--pz-accent);
+    border: 2px solid rgba(var(--pz-accent-text-rgb), 0.22);
+    border-top-color: var(--pz-accent-text);
     border-radius: var(--pz-radius-pill);
     animation: lucide-spin 0.8s linear infinite;
 }
@@ -76,7 +76,7 @@
 
 .home-card-icon i {
     font-size: 18px;
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     font-style: normal;
 }
 
@@ -88,7 +88,7 @@
 }
 
 .home-card-red .home-card-icon i {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 html[data-theme='dark'] .home-card-red .home-card-icon {
@@ -96,8 +96,8 @@ html[data-theme='dark'] .home-card-red .home-card-icon {
 }
 
 .home-card-red:hover {
-    border-color: var(--pz-danger);
-    box-shadow: 0 4px 12px color-mix(in srgb, var(--pz-danger) 15%, transparent);
+    border-color: var(--pz-danger-text);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--pz-danger-text) 15%, transparent);
 }
 
 /* Support card heart animation */
@@ -114,7 +114,7 @@ html[data-theme='dark'] .home-card-red .home-card-icon {
 }
 
 #support-card .home-card-icon i {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
     animation: heartbeat 3.5s ease-in-out infinite;
 }
 

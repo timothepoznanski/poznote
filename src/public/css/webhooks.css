@@ -8,9 +8,9 @@
     color: var(--pz-warning-strong);
 }
 html[data-theme='dark'] .webhooks-page .alert-warning {
-    background: rgba(255, 193, 7, 0.12);
-    border-color: rgba(255, 193, 7, 0.35);
-    color: var(--dm-warning);
+    background: color-mix(in srgb, var(--pz-warning-text) 12%, transparent);
+    border-color: color-mix(in srgb, var(--pz-warning-text) 35%, transparent);
+    color: var(--pz-warning-text);
 }
 .webhooks-section h2 {
     margin: 0 0 16px;
@@ -188,8 +188,8 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     max-width: 100%;
     padding: 2px 7px;
     border-radius: var(--pz-radius-sm);
-    background: rgba(0, 124, 186, 0.08);
-    border: 1px solid rgba(0, 124, 186, 0.18);
+    background: rgba(var(--pz-accent-rgb), 0.08);
+    border: 1px solid rgba(var(--pz-accent-rgb), 0.18);
     color: var(--pz-text-secondary);
     font-size: 0.76rem;
     line-height: 1.5;
@@ -209,8 +209,8 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     letter-spacing: 0.04em;
     text-transform: uppercase;
 }
-.webhooks-state.is-enabled { color: var(--pz-success-hover); }
-.webhooks-state.is-disabled { color: var(--pz-danger-hover); }
+.webhooks-state.is-enabled { color: var(--pz-success-text-hover); }
+.webhooks-state.is-disabled { color: var(--pz-danger-text-hover); }
 .webhooks-item-actions {
     display: flex;
     justify-content: flex-end;
@@ -269,18 +269,18 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
 }
 .webhooks-actions-item:hover {
     background: var(--pz-surface-hover);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 .webhooks-actions-item .lucide {
     width: 16px;
     height: 16px;
     flex: 0 0 auto;
-    background-color: var(--pz-accent);
+    background-color: var(--pz-accent-text);
 }
 .webhooks-actions-item.is-danger { color: var(--pz-danger-hover); }
 .webhooks-actions-item.is-danger:hover {
     background: rgba(192, 57, 43, 0.08);
-    color: var(--pz-danger-hover);
+    color: var(--pz-danger-text-hover);
 }
 .webhooks-actions-item.is-danger .lucide { background-color: var(--pz-danger-hover); }
 
@@ -300,17 +300,17 @@ html[data-theme='dark'] .webhooks-page .alert-warning {
     flex-wrap: wrap;
 }
 html[data-theme='dark'] .webhooks-section h2 {
-    color: var(--dm-text);
-    border-bottom-color: var(--dm-accent);
+    color: var(--pz-text);
+    border-bottom-color: var(--pz-accent-text);
 }
 html[data-theme='dark'] .webhooks-hint,
 html[data-theme='dark'] .webhooks-section-hint {
     color: rgba(var(--pz-highlight-rgb), 0.62);
 }
 html[data-theme='dark'] .webhooks-field input {
-    background: var(--input-bg, var(--dm-content-bg));
-    border-color: var(--border-color, var(--dm-border));
-    color: var(--dm-text-bright);
+    background: var(--input-bg, var(--pz-bg));
+    border-color: var(--border-color, var(--pz-border));
+    color: var(--pz-text-strong);
 }
 html[data-theme='dark'] .webhooks-item-description {
     color: rgba(var(--pz-highlight-rgb), 0.62);
@@ -321,21 +321,21 @@ html[data-theme='dark'] .webhooks-item-event {
     color: rgba(var(--pz-highlight-rgb), 0.75);
 }
 html[data-theme='dark'] .webhooks-actions-menu {
-    background: var(--dm-surface, var(--dm-content-bg));
+    background: var(--pz-surface, var(--pz-bg));
     border-color: rgba(var(--pz-highlight-rgb), 0.14);
     box-shadow: 0 6px 18px rgba(var(--pz-shadow-rgb), 0.5);
 }
 html[data-theme='dark'] .webhooks-actions-item {
-    color: var(--dm-text, var(--dm-text-bright));
+    color: var(--pz-text, var(--pz-text-strong));
 }
 html[data-theme='dark'] .webhooks-actions-item:hover {
     background: rgba(var(--pz-highlight-rgb), 0.08);
 }
 html[data-theme='dark'] .webhooks-actions-item.is-danger {
-    color: var(--dm-danger);
+    color: var(--pz-danger-text);
 }
 html[data-theme='dark'] .webhooks-actions-item.is-danger .lucide {
-    background-color: var(--dm-danger);
+    background-color: var(--pz-danger-text);
 }
 html[data-theme='dark'] .webhooks-edit {
     border-top-color: rgba(var(--pz-highlight-rgb), 0.12);

@@ -21,7 +21,7 @@
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    background: var(--pz-surface);
+    background: var(--pz-chrome-bg);
     box-sizing: border-box;
     overflow: hidden;
     transition: width 0.25s ease;
@@ -60,7 +60,7 @@ html.ai-chat-open #ai-chat-panel,
 }
 
 #ai-chat-panel.ai-chat-resizing .ai-chat-resize-handle {
-    border-left-color: var(--pz-accent);
+    border-left-color: var(--pz-accent-text);
 }
 
 /* Header */
@@ -104,7 +104,7 @@ html.ai-chat-open #ai-chat-panel,
 .ai-chat-header-btn:hover,
 .ai-chat-header-btn:focus {
     background: rgba(var(--pz-accent-rgb), 0.1);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 /* The settings shortcut is a link styled like the header buttons */
@@ -230,7 +230,7 @@ a.ai-chat-header-btn {
 }
 
 .ai-chat-md a {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .ai-chat-md img {
@@ -239,7 +239,7 @@ a.ai-chat-header-btn {
 
 .ai-chat-msg-error {
     align-self: stretch;
-    background: #fdecea;
+    background: color-mix(in srgb, var(--pz-danger) 10%, var(--pz-bg));
     color: var(--pz-danger-hover);
     border: 1px solid var(--pz-danger-soft);
     font-size: 12.5px;
@@ -313,7 +313,7 @@ a.ai-chat-header-btn {
 .ai-chat-model-link {
     min-width: 0;
     overflow: hidden;
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -366,7 +366,7 @@ a.ai-chat-header-btn {
     gap: 8px;
     padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
     border-top: 1px solid var(--pz-border);
-    background: var(--pz-surface);
+    background: var(--pz-chrome-bg);
 }
 
 #ai-chat-input {
@@ -389,7 +389,7 @@ a.ai-chat-header-btn {
 
 #ai-chat-input:focus {
     outline: none;
-    border-color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
 }
 
 .ai-chat-send-btn {
@@ -398,7 +398,7 @@ a.ai-chat-header-btn {
     flex-shrink: 0;
     border: none;
     border-radius: var(--pz-radius-lg);
-    background: var(--pz-accent);
+    background: var(--pz-accent-text);
     color: var(--pz-text-inverse);
     cursor: pointer;
     display: inline-flex;

@@ -123,7 +123,7 @@
 }
 
 .import-confirm-modal-content .btn-cancel:hover {
-    background-color: var(--pz-danger-hover);
+    background-color: var(--pz-danger-text-hover);
 }
 
 /* Custom Alert Message */
@@ -158,7 +158,7 @@
 .custom-alert-content h3 {
     margin-top: 0;
     margin-bottom: 15px;
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
     font-size: 18px;
     font-weight: var(--pz-weight-semibold);
 }
@@ -177,7 +177,7 @@
     font-size: 14px;
     font-family: 'Inter', sans-serif;
     transition: background-color 0.2s;
-    background-color: var(--pz-accent);
+    background-color: var(--pz-accent-text);
     color: var(--pz-text-inverse);
 }
 
@@ -192,45 +192,45 @@ html[data-theme='dark'] .custom-alert {
 
 html[data-theme='dark'] .import-confirm-modal .import-confirm-modal-content,
 html[data-theme='dark'] .custom-alert-content {
-    background-color: var(--dm-bg);
-    color: var(--dm-text);
-    border: 1px solid var(--dm-border);
+    background-color: var(--pz-chrome-bg);
+    color: var(--pz-text);
+    border: 1px solid var(--pz-border);
     box-shadow: 0 18px 44px rgba(var(--pz-shadow-rgb), 0.42);
 }
 
 html[data-theme='dark'] .import-confirm-modal .import-confirm-modal-content h3 {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .direct-copy-restore-processing {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .direct-copy-restore-spinner {
     border-color: rgba(var(--pz-highlight-rgb), 0.22);
-    border-top-color: var(--dm-accent-hover);
+    border-top-color: var(--pz-accent-text-hover);
 }
 
 html[data-theme='dark'] .import-confirm-modal .import-confirm-modal-content .btn-cancel {
-    background-color: var(--dm-surface-raised);
-    color: var(--dm-text-bright);
-    border: 1px solid var(--dm-border-light);
+    background-color: var(--pz-surface-sunken);
+    color: var(--pz-text-strong);
+    border: 1px solid var(--pz-border-strong);
 }
 
 html[data-theme='dark'] .import-confirm-modal .import-confirm-modal-content .btn-cancel:hover {
-    background-color: var(--dm-neutral);
-    border-color: var(--dm-border-light);
+    background-color: var(--pz-surface-strong);
+    border-color: var(--pz-border-strong);
 }
 
 html[data-theme='dark'] .import-confirm-modal .btn-confirm,
 html[data-theme='dark'] .alert-ok-button {
-    background-color: var(--dm-accent);
+    background-color: var(--pz-accent-text);
     color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .import-confirm-modal .btn-confirm:hover,
 html[data-theme='dark'] .alert-ok-button:hover {
-    background-color: var(--dm-accent);
+    background-color: var(--pz-accent-text);
 }
 
 /* Responsive for modals */

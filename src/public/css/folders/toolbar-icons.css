@@ -8,7 +8,7 @@
 /* When attachments exist, make the paperclip icon blue */
 .btn-attachment.has-attachments i.lucide-paperclip,
 .btn-attachment.has-attachments .lucide-paperclip {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 /* Blue color for favorite star when marked as favorite */
@@ -17,7 +17,7 @@
 .toolbar-btn.btn-publish.is-shared i.lucide-share-2,
 .toolbar-btn.btn-publish.is-shared .lucide-share-2,
 .toolbar-btn.btn-attachment.has-attachments i {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     filter: none;
 }
 
@@ -25,7 +25,7 @@
    above: lit while the editor is live, plain in preview mode (issue #1406). */
 .toolbar-btn.markdown-view-mode-btn.is-edit-mode i,
 .toolbar-btn.markdown-view-mode-btn.is-edit-mode [class*="lucide-"] {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     filter: none;
 }
 

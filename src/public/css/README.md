@@ -20,6 +20,7 @@ themes work and which variables a custom stylesheet can rely on.
 | `public_note.css`, `public_folder.css`, `login.css` | pages served without a session |
 | `dark-mode/` | the dark/black theme layer, see below |
 | `lucide.css` | generated icon CSS (`tools/generate-lucide-icons.py`), never edited by hand |
+| `devicon.css` | the language marks of the code submenu, generated the same way (`tools/generate-devicon-icons.py`), never edited by hand |
 
 ## How pages load CSS
 
@@ -70,8 +71,9 @@ themes work and which variables a custom stylesheet can rely on.
   `dark-mode/*.css` (index order: layout, menus, editor, modals,
   components, pages, markdown, kanban, icons, calendar) or, for page-specific
   files, next to the light rules in the same file.
-- The black theme only swaps the `--dm-*` values (`tokens.css`),
-  it has no rules of its own. Keep it that way.
+- A theme is a list of token values (`tokens.css`) and has no rules of its
+  own: black and terminal change the dark values, lavender and sepia the light
+  ones. Keep it that way.
 - Every page loads the whole `@theme` group, never a slice of it. Nineteen of
   them used to load part of it, which is how `markdown_syntax.php` ended up
   rendering the icon sidebar with no dark styling at all.
@@ -154,39 +156,80 @@ them and a background there breaks their native rendering.
 
 Everything a theme has to repaint is a token, so a custom stylesheet (Settings >
 Custom CSS, injected last on every page) can be nothing but a list of overrides.
-Two blocks, the shape a Catppuccin-style theme already has: light values on
-`:root`, dark values on `:root[data-theme='dark']`, and the black variant on
-`html.theme-black[data-theme='dark']` if you want a third.
 
-Light, on `:root`:
+**One vocabulary.** A role has one name, `--pz-something`, in every theme, and a
+theme only changes its value. The stylesheets read `--pz-*` and nothing else
+(`tools/css-check.php` fails on anything else), so the same list repaints the
+light and the dark mode:
 
     surfaces   --pz-bg --pz-surface --pz-surface-hover --pz-surface-sunken
-    text       --pz-text --pz-text-secondary --pz-text-muted --pz-text-subtle
-               --pz-text-inverse
+               --pz-surface-strong --pz-surface-strong-hover
+    chrome     --pz-chrome-bg --pz-sidebar-bg --pz-sidebar-surface --pz-code-bg
+               --pz-active-bg
+    tabs       --pz-tabbar-bg --pz-tab-bg --pz-tab-hover-bg --pz-tab-active-bg
+    text       --pz-text-strong --pz-text --pz-text-secondary --pz-text-muted
+               --pz-text-subtle --pz-text-inverse
     borders    --pz-border-light --pz-border --pz-border-strong
     accent     --pz-accent --pz-accent-hover --pz-accent-strong --pz-accent-soft
                --pz-accent-rgb --pz-link
+               --pz-accent-text --pz-accent-text-hover --pz-accent-text-rgb
     status     --pz-danger --pz-danger-hover --pz-danger-strong --pz-danger-soft
-               --pz-success --pz-success-hover --pz-success-strong --pz-success-soft
-               --pz-warning --pz-warning-hover --pz-warning-strong --pz-warning-soft
-    icons      --pz-icon
+               --pz-danger-text --pz-danger-text-hover
+               (the same six for --pz-success-* and --pz-warning-*)
+    controls   --pz-neutral --pz-neutral-hover --pz-disabled
+               --pz-scrollbar --pz-scrollbar-hover
+    icons      --pz-icon --pz-icon-hover
+    marks      --pz-mark --pz-mark-active --pz-mark-active-border --pz-selection
+    depth      --pz-shadow-rgb --pz-highlight-rgb
+    palette    --pz-color-red ... --pz-color-gray, each with a derived -soft
 
-Dark, the same shape under `--dm-`:
+Where to put the values:
 
-    surfaces   --dm-content-bg --dm-bg --dm-sidebar-bg --dm-sidebar-surface
-               --dm-surface --dm-surface-hover --dm-surface-raised --dm-code-bg
-    text       --dm-text-bright --dm-text --dm-text-muted --dm-text-subtle
-    borders    --dm-border --dm-border-light
-    accent     --dm-accent --dm-accent-hover --dm-accent-soft --dm-active
-    status     --dm-danger --dm-danger-hover --dm-danger-soft
-               --dm-success --dm-success-hover --dm-success-soft
-               --dm-warning --dm-warning-hover --dm-warning-soft
-    icons      --dm-icon --dm-icon-hover
-    tabs       --dm-tabbar-bg --dm-tab-bg --dm-tab-hover-bg --dm-tab-active-bg
+```css
+:root {                                  /* the light mode */
+    --pz-bg: #eff1f5;
+    --pz-accent: #1e66f5;
+}
+html[data-theme='dark'] {                /* the dark mode, every dark variant */
+    --pz-bg: #1e1e2e;
+    --pz-accent-text: #89b4fa;
+}
+html.theme-black[data-theme='dark'] {    /* one variant only, if you want a third */
+    --pz-bg: #11111b;
+}
+```
 
-Every semantic family has the same four steps, so there are only four questions
-per family: the fill, its hover, the deep shade for text on the wash, and the
-wash itself.
+Override only what differs. Whatever a stylesheet leaves out keeps the value
+`tokens.css` declares, and the tokens that are aliases follow the one they point
+at: in the light mode `--pz-accent-text` is `var(--pz-accent)`, `--pz-chrome-bg`
+is `var(--pz-surface)`, `--pz-text-strong` is `var(--pz-text)`, so setting the
+right-hand one moves both.
+
+**Why a colour has two names.** `--pz-accent` is a FILL: the ground of a button
+that carries a `--pz-text-inverse` label. `--pz-accent-text` is the same colour
+standing on the page by itself: a link, an icon, an outline, a dot. In a light
+theme they are one colour. On a dark ground they cannot be: a fill that holds a
+white label is too dark to read as a line, which is why the dark mode gives
+`-text` a brighter value and leaves the fill alone. The status families work the
+same way. `-soft` is the wash that goes behind such text and `-strong` the shade
+for text ON that wash; those two switch together with the theme. A theme whose fills
+carry a dark label (Catppuccin does this) sets both names to the same value and
+`--pz-text-inverse` to its ground colour.
+
+Every semantic family has the same steps, so there are few questions per family:
+the fill and its hover, the wash and the shade for text on it, then the colour
+as text and its hover.
+
+**The `--dm-*` names** are the older vocabulary of the dark layer. They are
+still declared, in the dark block of `tokens.css`, where they hold the dark
+values each `--pz-*` points at. That is what keeps a stylesheet written before
+this change working: one that sets `--dm-text` still moves `--pz-text`, one that
+reads `var(--dm-text)` still gets a colour. Nothing in the app reads them, new
+code must not, and a new theme does not need them. When a stylesheet sets both
+names of one role, `--pz-*` wins. One limit: the bridge is computed on `<html>`,
+so a legacy `--dm-*` override has to be set there (`html[data-theme='dark']` or
+`:root[data-theme='dark']`, which is what this file always showed), not on
+`body.dark-mode` alone.
 
 Measured on eight pages: overriding the surface, text, border and accent tokens
 leaves 0 surfaces carrying a colour of the app's own.
@@ -208,10 +251,13 @@ If you find yourself reaching for `!important` in `dark-mode/`, check first
 whether a generic rule in the same layer is simply more specific than the
 variant you are writing. That is usually what is happening.
 
-Two things are still out of reach and need rules of your own: the dark theme's
-own `--dm-*` values behave differently (see above), and about two dozen very
-pale washes sit between the neutral scale and the status scale and are still
-literal.
+Two things are still out of reach and need rules of your own. The FILLS
+(`--pz-accent`, `--pz-danger`, ...) keep their light value in the built-in dark
+themes, because they carry a white label there too; a dark theme whose label is
+dark states them itself. And a few very pale washes sit between the neutral
+scale and the status scale and are still literal; the ones that have a dark
+twin are mixed from the tokens
+(`color-mix(in srgb, var(--pz-danger) 7%, var(--pz-bg))`).
 
 ## Variables
 
@@ -232,17 +278,16 @@ Light (on `:root`):
 | `--pz-surface` | `#f8f9fa` | panels, cards, code backgrounds |
 | `--pz-surface-hover` | `#f3f4f6` | hover rows and items |
 | `--pz-danger` | `#dc3545` | destructive actions, errors |
-| `--pz-link` | `#2e8cfa` | hyperlinks in notes |
+| `--pz-link` | `var(--pz-accent)` | hyperlinks in notes |
 | `--pz-accent-strong` | `#0b4da6` | selected note/folder title in the sidebar |
 | `--pz-accent-soft` | `#e3f2fd` | active item background |
 | `--pz-success` | `#28a745` | success alerts, enabled states |
 | `--pz-warning` | `#ffc107` | warning alerts, badges |
 
-Dark and black (on `html[data-theme='dark']` / `html.theme-black[data-theme='dark']`):
-`--dm-text`, `--dm-text-muted`, `--dm-bg`, `--dm-content-bg`, `--dm-sidebar-bg`,
-`--dm-sidebar-surface`, `--dm-surface`, `--dm-surface-hover`, `--dm-border`,
-`--dm-border-light`, `--dm-accent`, `--dm-active`, `--dm-code-bg`,
-`--dm-tabbar-bg`, `--dm-tab-bg`, `--dm-tab-hover-bg`, `--dm-tab-active-bg`.
+Dark and black give the same names their dark values, on
+`html[data-theme='dark']` / `html.theme-black[data-theme='dark']`. The full list
+and the reasoning behind each scale are in `tokens.css`; "Writing a palette"
+above has the map.
 
 These names are part of the custom-CSS contract: rename nothing, add freely.
 Re-theming example for a custom stylesheet:
@@ -252,16 +297,21 @@ Re-theming example for a custom stylesheet:
     --pz-accent: #7c3aed; --pz-accent-hover: #5b21b6; --pz-accent-rgb: 124, 58, 237;
     --pz-text: #2b2118; --pz-border: #e6dccb; --pz-surface: #f7f1e6;   /* sepia-ish light */
 }
-html[data-theme='dark'] { --dm-accent: #a78bfa; --dm-bg: #1a1625; --dm-content-bg: #1a1625; }
+html[data-theme='dark'] { --pz-accent-text: #a78bfa; --pz-chrome-bg: #1a1625; --pz-bg: #1a1625; }
 ```
 
 ## Conventions
 
-- New colours: use the `--pz-*` tokens in light rules and `--dm-*` in dark
-  rules when the colour is one of the tokens above; literals are fine for
-  everything else. Dark rules use the `--dm-*` tokens wherever the value is one of them
-  (`#252526` is `--dm-content-bg`, `#333333` is `--dm-surface`, ...); a `#333`
-  in a dark rule is a surface, never `--pz-text`.
+- Colours: read a `--pz-*` token, in light and in dark rules alike. `--dm-*`
+  is legacy storage inside `tokens.css` and `css-check` rejects it anywhere
+  else, as it rejects a `var(--pz-x)` that nothing declares. Pick the token by
+  ROLE, not by value: in a dark rule `#333333` is `--pz-surface`, never
+  `--pz-text`, although both are `#333333` somewhere. A tint of a token is
+  `color-mix(in srgb, var(--pz-danger) 12%, transparent)`, not an `rgba()`
+  literal. Literals are fine for what is not a role (a video letterbox, the
+  text on a yellow highlight), and the ratchet counts them.
+- Before adding a dark rule, check whether the light rule already reads tokens
+  that switch. If it does, the dark rule restates it and is not needed.
 - Prefer one rule with grouped selectors over two identical rules (the folder
   and note action menus in `folders/actions-menu.css` are the model); rules
   that are byte-identical in two files always loaded together are duplicates,

@@ -7,8 +7,8 @@
    ============================================ */
 
 html[data-theme='dark'] .markdown-preview {
-    background-color: var(--dm-content-bg);
-    color: var(--dm-text);
+    background-color: var(--pz-bg);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .markdown-preview h1,
@@ -17,81 +17,71 @@ html[data-theme='dark'] .markdown-preview h3,
 html[data-theme='dark'] .markdown-preview h4,
 html[data-theme='dark'] .markdown-preview h5,
 html[data-theme='dark'] .markdown-preview h6 {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 /* Heading anchor links */
 html[data-theme='dark'] .heading-anchor {
-    color: var(--dm-text) !important;
+    color: var(--pz-text) !important;
 }
 
 html[data-theme='dark'] .markdown-preview h1,
 html[data-theme='dark'] .markdown-preview h2 {
-    border-bottom-color: var(--dm-border);
+    border-bottom-color: var(--pz-border);
 }
 
 /* Inline code only */
 html[data-theme='dark'] .markdown-preview code:not([class*="hljs"]):not([class*="language-"]) {
-    background-color: var(--dm-surface);
-    color: var(--dm-text);
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .markdown-preview pre code:not([class*="hljs"]):not([class*="language-"]) {
     background-color: transparent !important;
-    color: var(--dm-text-muted) !important;
+    color: var(--pz-text-muted) !important;
 }
 
 html[data-theme='dark'] .markdown-preview pre {
-    background-color: var(--dm-surface);
+    background-color: var(--pz-surface);
 }
 
 html[data-theme='dark'] .markdown-preview blockquote {
-    border-left-color: var(--dm-border);
-    color: var(--dm-text);
+    border-left-color: var(--pz-border);
+    color: var(--pz-text);
 }
 
 /* Tables */
 html[data-theme='dark'] .noteentry table,
 html[data-theme='dark'] .markdown-preview table {
-    border-color: var(--dm-border);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .noteentry table th,
 html[data-theme='dark'] .noteentry table td,
 html[data-theme='dark'] .markdown-preview table th,
 html[data-theme='dark'] .markdown-preview table td {
-    border-color: var(--dm-border);
-    color: var(--dm-text);
-    background-color: var(--dm-surface);
+    border-color: var(--pz-border);
+    color: var(--pz-text);
+    background-color: var(--pz-surface);
 }
 
 html[data-theme='dark'] .noteentry table th,
 html[data-theme='dark'] .markdown-preview table th {
-    background-color: var(--dm-surface);
-    font-weight: var(--pz-weight-bold);
-}
-
-html[data-theme='dark'] .markdown-preview a {
-    color: var(--dm-accent);
+    background-color: var(--pz-surface);
 }
 
 html[data-theme='dark'] .markdown-preview hr {
-    border-top-color: var(--dm-border);
-}
-
-/* Interactive markdown checkbox */
-html[data-theme='dark'] .markdown-preview .markdown-task-checkbox {
-    accent-color: var(--dm-accent);
+    border-top-color: var(--pz-border);
 }
 
 /* Click-to-navigate hover in split mode */
 html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview [data-line]:not(.markdown-task-checkbox):not(summary):not(details):hover {
-    background-color: rgba(var(--dm-accent-rgb), 0.1);
+    background-color: rgba(var(--pz-accent-text-rgb), 0.1);
 }
 
 html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor {
     background-color: transparent;
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .markdown-codemirror-host {
@@ -114,31 +104,31 @@ html[data-theme='dark'] .markdown-codemirror-host {
 
 html[data-theme='dark'] .markdown-codemirror-host .cm-editor {
     background-color: transparent;
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .markdown-codemirror-host .cm-activeLine {
-    background: rgba(var(--dm-accent-rgb), 0.12);
+    background: rgba(var(--pz-accent-text-rgb), 0.12);
 }
 
 html[data-theme='dark'] .markdown-codemirror-host .cm-placeholder {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .cm-tooltip {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
-    color: var(--dm-text);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .cm-tooltip-autocomplete ul li[aria-selected] {
-    background: var(--dm-accent);
+    background: var(--pz-accent-text);
     color: var(--pz-text-inverse);
 }
 
 /* Checked task item text */
 html[data-theme='dark'] .markdown-preview li.task-list-item input[type="checkbox"]:checked+span {
-    color: var(--dm-text-subtle);
+    color: var(--pz-text-subtle);
 }
 
 /* ============================================
@@ -177,7 +167,7 @@ html[data-theme='dark'] body.markdown-colored .markdown-codemirror-host {
 /* Code block background tint over the dark surface; !important mirrors the
    light-mode rule in css/markdown.css (see the pre.code-block override) */
 html[data-theme='dark'] body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, pre:not(.indented-pre):not(.mermaid)) {
-    background: color-mix(in srgb, var(--mdc-codeblock) 10%, var(--dm-surface)) !important;
+    background: color-mix(in srgb, var(--mdc-codeblock) 10%, var(--pz-surface)) !important;
 }
 
 /* ============================================
@@ -188,20 +178,20 @@ html[data-theme='dark'] .toolbar-btn.is-favorite i,
 html[data-theme='dark'] .toolbar-btn.is-shared i,
 html[data-theme='dark'] .toolbar-btn.has-attachments i,
 html[data-theme='dark'] .toolbar-btn.btn-save.is-saving i {
-    color: var(--pz-accent) !important;
+    color: var(--pz-accent-text) !important;
     filter: none !important;
 }
 
 /* Markdown toggle icons (legacy support) */
 html[data-theme='dark'] .markdown-edit-btn [class*="lucide-"],
 html[data-theme='dark'] .markdown-preview-btn [class*="lucide-"] {
-    color: var(--pz-accent) !important;
+    color: var(--pz-accent-text) !important;
     filter: none !important;
 }
 
 html[data-theme='dark'] .markdown-edit-btn:hover [class*="lucide-"],
 html[data-theme='dark'] .markdown-preview-btn:hover [class*="lucide-"] {
-    color: var(--pz-accent) !important;
+    color: var(--pz-accent-text) !important;
     filter: none !important;
     transform: scale(1.18);
 }
@@ -209,15 +199,11 @@ html[data-theme='dark'] .markdown-preview-btn:hover [class*="lucide-"] {
 /* The view-mode toggle is blue only while the editor is live (issue #1406);
    in preview mode it keeps the toolbar's own icon colour. */
 html[data-theme='dark'] .markdown-view-mode-btn.is-edit-mode i {
-    color: var(--pz-accent) !important;
+    color: var(--pz-accent-text) !important;
     filter: none !important;
-}
-
-html[data-theme='dark'] .markdown-view-mode-btn:hover i {
-    transform: scale(1.18);
 }
 
 /* Slash through icon when active (in split mode) */
 html[data-theme='dark'] .toolbar-btn.markdown-split-btn.active::after {
-    background-color: var(--dm-text-muted);
+    background-color: var(--pz-text-muted);
 }

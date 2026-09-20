@@ -24,7 +24,7 @@ body.welcome-page {
     padding-block: 40px;
     padding-inline: 16px;
     min-height: 100vh;
-    --welcome-accent: var(--pz-accent);
+    --welcome-accent: var(--pz-accent-text);
     --welcome-danger: var(--pz-danger-strong);
     --welcome-danger-bg: var(--pz-danger-soft);
 }
@@ -33,9 +33,9 @@ body.welcome-page {
    One rule instead of a dark layer, because everything else on this page is a
    neutral and css/tokens.css already switches those. */
 html[data-theme='dark'] body.welcome-page {
-    --welcome-accent: var(--dm-accent);
-    --welcome-danger: var(--dm-danger);
-    --welcome-danger-bg: var(--dm-danger-soft);
+    --welcome-accent: var(--pz-accent-text);
+    --welcome-danger: var(--pz-danger-text);
+    --welcome-danger-bg: var(--pz-danger-soft);
 }
 
 .welcome-shell {

@@ -60,7 +60,20 @@ test('custom name tokens are written in the user language and parsed back in any
     assertTrue((bool) preg_match($short['regex'], '05 sept. 2026', $m));
     assertSame(9, diaryMonthNameToNumber($m['ms']));
 
+    $shortDay = compileDiaryDateCustomFormat('ddd DD MMM YYYY');
+    assertSame('Sat 05 Sep 2026', formatDiaryDateWithSpec($day, $shortDay, 'en'));
+    assertSame('Sam. 05 sept. 2026', formatDiaryDateWithSpec($day, $shortDay, 'fr'));
+    assertSame('周六 05 9月 2026', formatDiaryDateWithSpec($day, $shortDay, 'zh-cn'));
+    foreach (['fr', 'en', 'de', 'es', 'pt', 'ru', 'zh-cn'] as $lang) {
+        $title = formatDiaryDateWithSpec($day, $shortDay, $lang);
+        assertTrue((bool) preg_match($shortDay['regex'], $title, $m), $lang . ' short weekday title must match its regex');
+        assertSame('05', $m['d'], $lang);
+        assertSame(9, diaryMonthNameToNumber($m['ms']), $lang);
+    }
+    assertFalse((bool) preg_match($shortDay['regex'], 'Sam 05 Sep 2026'), 'the short weekday must be a day name');
+
     assertSame(null, compileDiaryDateCustomFormat('D DD MM YYYY'), 'D and DD are the same part');
+    assertSame(null, compileDiaryDateCustomFormat('dddd ddd DD MM YYYY'), 'one weekday per pattern');
     assertSame(null, compileDiaryDateCustomFormat('dddd MM YYYY'), 'the weekday is not a day');
     assertSame('d/m/Y', compileDiaryDateCustomFormat('DD/MM/YYYY')['pattern']);
 });

@@ -61,7 +61,7 @@
     left: 6px;
     right: 6px;
     height: 3px;
-    background: var(--pz-accent);
+    background: var(--pz-accent-text);
     border-radius: var(--pz-radius-pill);
     box-shadow: 0 0 8px rgba(var(--pz-accent-rgb), 0.45);
     pointer-events: none;
@@ -90,7 +90,7 @@
     left: 6px;
     right: 6px;
     height: 3px;
-    background: var(--pz-accent);
+    background: var(--pz-accent-text);
     border-radius: var(--pz-radius-pill);
     box-shadow: 0 0 8px rgba(var(--pz-accent-rgb), 0.45);
     pointer-events: none;
@@ -107,7 +107,7 @@
 
 html[data-theme='dark'] .note-list-item.note-drop-before::before,
 html[data-theme='dark'] .note-list-item.note-drop-after::after {
-    background: var(--dm-accent);
+    background: var(--pz-accent-text);
     box-shadow: 0 0 8px rgba(74, 144, 226, 0.55);
 }
 
@@ -120,12 +120,12 @@ html[data-theme='dark'] .folder-header.folder-source-drag {
 html[data-theme='dark'] .folder-header.drag-over,
 html[data-theme='dark'] .folder-header.folder-drop-target {
     background-color: rgba(74, 144, 226, 0.15);
-    outline-color: var(--dm-accent);
+    outline-color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .folder-header.folder-drop-before>.folder-toggle::before,
 html[data-theme='dark'] .folder-header.folder-drop-after::after {
-    background: var(--dm-accent);
+    background: var(--pz-accent-text);
     box-shadow: 0 0 8px rgba(74, 144, 226, 0.55);
 }
 
@@ -198,10 +198,10 @@ html[data-theme='dark'] .folder-header.folder-drop-after::after {
 }
 
 .root-drop-zone.drag-over {
-    border-color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
     background-color: var(--pz-accent-soft);
     transform: scale(1.02) !important;
-    box-shadow: 0 4px 12px rgba(var(--pz-accent-rgb), 0.3);
+    box-shadow: 0 4px 12px rgba(var(--pz-accent-text-rgb), 0.3);
 }
 
 .drop-zone-content {
@@ -224,17 +224,16 @@ html[data-theme='dark'] .folder-header.folder-drop-after::after {
 
 /* Dark mode for drop zone */
 html[data-theme='dark'] .root-drop-zone {
-    background-color: var(--dm-surface);
-    border-color: var(--dm-border-light);
+    border-color: var(--pz-border-strong);
 }
 
 html[data-theme='dark'] .root-drop-zone.drag-over {
-    background-color: var(--dm-accent-soft);
-    border-color: var(--dm-accent);
+    background-color: var(--pz-accent-soft);
+    border-color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .drop-zone-content {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 /* Ghost that follows the pointer during a tree drag, built by
@@ -252,8 +251,8 @@ html[data-theme='dark'] .drop-zone-content {
     padding: 10px 15px;
     border: 2px solid rgba(var(--pz-accent-rgb), 0.4);
     border-radius: var(--pz-radius-lg);
-    background: rgba(var(--pz-accent-rgb), 0.15);
-    color: var(--pz-accent);
+    background: rgba(var(--pz-accent-text-rgb), 0.15);
+    color: var(--pz-accent-text);
     font-weight: var(--pz-weight-medium);
 }
 
@@ -265,27 +264,27 @@ a.links_arbo_left.tree-drag-ghost-note {
     padding: 10px;
     border: 1px solid rgba(var(--pz-accent-rgb), 0.3);
     border-radius: var(--pz-radius-sm);
-    background-color: rgba(var(--pz-accent-rgb), 0.08);
-    box-shadow: 0 2px 8px rgba(var(--pz-accent-rgb), 0.15);
+    background-color: rgba(var(--pz-accent-text-rgb), 0.08);
+    box-shadow: 0 2px 8px rgba(var(--pz-accent-text-rgb), 0.15);
 }
 
 html[data-theme='dark'] .tree-drag-ghost {
-    border-color: rgba(var(--dm-accent-rgb), 0.4);
-    background: rgba(var(--dm-accent-rgb), 0.15);
-    color: var(--dm-accent);
+    border-color: rgba(var(--pz-accent-text-rgb), 0.4);
+    background: rgba(var(--pz-accent-text-rgb), 0.15);
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] a.links_arbo_left.tree-drag-ghost-note {
-    border-color: rgba(var(--dm-accent-rgb), 0.3);
-    background-color: rgba(var(--dm-accent-rgb), 0.08);
-    box-shadow: 0 2px 8px rgba(var(--dm-accent-rgb), 0.15);
+    border-color: rgba(var(--pz-accent-text-rgb), 0.3);
+    background-color: rgba(var(--pz-accent-text-rgb), 0.08);
+    box-shadow: 0 2px 8px rgba(var(--pz-accent-text-rgb), 0.15);
 }
 
 /* Note dragging styles - applies to ALL notes */
 .dragging {
     opacity: 0.85;
     background-color: rgba(var(--pz-accent-rgb), 0.05);
-    border-left: 2px solid rgba(var(--pz-accent-rgb), 0.3);
+    border-left: 2px solid rgba(var(--pz-accent-text-rgb), 0.3);
     transform: scale(0.98) !important;
     cursor: grabbing !important;
 }
@@ -296,8 +295,8 @@ a.links_arbo_left.dragging,
 .note-without-folder.dragging {
     opacity: 0.85;
     background-color: rgba(var(--pz-accent-rgb), 0.05);
-    border-left: 2px solid rgba(var(--pz-accent-rgb), 0.3);
-    box-shadow: 0 2px 6px rgba(var(--pz-accent-rgb), 0.15);
+    border-left: 2px solid rgba(var(--pz-accent-text-rgb), 0.3);
+    box-shadow: 0 2px 6px rgba(var(--pz-accent-text-rgb), 0.15);
     transform: scale(0.98) !important;
     z-index: 1000 !important;
     position: relative !important;
@@ -393,16 +392,16 @@ a.links_arbo_left.dragging,
 
 /* Subtle outline on the whole sidebar while files are dragged over it */
 #left_col.file-import-drop-active {
-    outline: 2px dashed rgba(var(--pz-accent-rgb), 0.5);
+    outline: 2px dashed rgba(var(--pz-accent-text-rgb), 0.5);
     outline-offset: -4px;
 }
 
 /* The folder that will receive the imported notes */
 .folder-header.file-import-drop-target {
     background-color: rgba(var(--pz-accent-rgb), 0.15);
-    border: 2px dashed var(--pz-accent);
+    border: 2px dashed var(--pz-accent-text);
     border-radius: var(--pz-radius-lg)!important;
-    box-shadow: 0 0 12px rgba(var(--pz-accent-rgb), 0.35);
+    box-shadow: 0 0 12px rgba(var(--pz-accent-text-rgb), 0.35);
     padding: 4px !important;
     margin: 2px 0 !important;
     transition: all 0.2s ease !important;
@@ -432,7 +431,7 @@ a.links_arbo_left.dragging,
     align-items: center;
     gap: 10px;
     padding: 18px 22px;
-    border: 2px dashed var(--pz-accent);
+    border: 2px dashed var(--pz-accent-text);
     border-radius: var(--pz-radius-xl);
     background: rgba(var(--pz-accent-rgb), 0.06);
     max-width: 100%;
@@ -440,8 +439,8 @@ a.links_arbo_left.dragging,
 
 .sidebar-file-import-overlay-inner .lucide {
     font-size: 28px;
-    color: var(--pz-accent);
-    background-color: var(--pz-accent);
+    color: var(--pz-accent-text);
+    background-color: var(--pz-accent-text);
 }
 
 .sidebar-file-import-overlay-text {

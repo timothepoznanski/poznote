@@ -48,19 +48,19 @@
 }
 
 html[data-theme='dark'] .markdown-syntax-intro {
-    color: var(--dm-text-muted, var(--dm-text-subtle));
+    color: var(--pz-text-muted, var(--pz-text-subtle));
 }
 
 html[data-theme='dark'] .syntax-card h2 {
-    color: var(--dm-text, var(--dm-text-bright));
+    color: var(--pz-text, var(--pz-text-strong));
 }
 
 html[data-theme='dark'] .syntax-card-description {
-    color: var(--dm-text-muted, var(--dm-text-subtle));
+    color: var(--pz-text-muted, var(--pz-text-subtle));
 }
 
 html[data-theme='dark'] .syntax-card pre {
-    border-color: var(--dm-border, var(--dm-border));
-    background: var(--dm-bg, var(--dm-content-bg));
-    color: var(--dm-text, var(--dm-text-bright));
+    border-color: var(--pz-border);
+    background: var(--pz-chrome-bg, var(--pz-bg));
+    color: var(--pz-text, var(--pz-text-strong));
 }

@@ -36,18 +36,31 @@ test('every fallback is the light value of its token', function () {
         assertContains('--pz-color-' . $id . ': ' . $entry['hex'] . ';', $root[1], $id);
         assertContains('--pz-color-' . $id . '-soft: color-mix(', $root[1], $id . '-soft');
     }
-    assertContains('--pz-color-soft-mix: 30%;', $root[1]);
+    assertContains('--pz-color-soft-mix: 50%;', $root[1]);
+    // Yellow, the highlighter, is mixed stronger than the rest (discussion #1451).
+    assertContains('--pz-color-yellow-soft-mix: 65%;', $root[1]);
+    assertContains('--pz-color-yellow-soft: color-mix(in srgb, var(--pz-color-yellow) var(--pz-color-yellow-soft-mix),', $root[1]);
 });
 
-test('every soft fallback is 30% of its colour over white, like the light token', function () {
+test('every soft fallback is its colour mixed over white, like the light token', function () {
     foreach (poznoteColorPalette() as $id => $entry) {
+        $percent = $id === 'yellow' ? 65 : 50;
         $mixed = '#';
         foreach ([1, 3, 5] as $offset) {
             $channel = hexdec(substr($entry['hex'], $offset, 2));
-            $mixed .= sprintf('%02x', (int)round(0.3 * $channel + 0.7 * 255));
+            $mixed .= sprintf('%02x', (int)round(($percent * $channel + (100 - $percent) * 255) / 100));
         }
         assertSame($mixed, $entry['soft'], $id);
     }
+});
+
+test('a dark theme mixes yellow like the other highlights', function () {
+    $css = file_get_contents(dirname(__DIR__) . '/src/public/css/tokens.css');
+    if (!preg_match("/\nhtml\[data-theme='dark'\]\s*\{(.*?)\n\}/s", $css, $dark)) {
+        fail('could not find the dark block of tokens.css');
+    }
+    // 65% of yellow under light text drops its contrast to 2:1.
+    assertContains('--pz-color-yellow-soft-mix: var(--pz-color-soft-mix);', $dark[1]);
 });
 
 test('a palette icon colour renders as its token, whatever its case', function () {

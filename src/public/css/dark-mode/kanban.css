@@ -1,178 +1,176 @@
 
 
 html[data-theme='dark'] .kanban-column {
-    background: var(--dm-bg);
-    border-color: var(--dm-border);
+    background: var(--pz-chrome-bg);
+    border-color: var(--pz-border);
     box-shadow: 0 4px 6px -1px rgba(var(--pz-shadow-rgb), 0.4);
 }
 
 html[data-theme='dark'] .kanban-column-header {
-    border-bottom-color: var(--dm-border);
+    border-bottom-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .kanban-column-count {
-    background: var(--dm-surface);
+    background: var(--pz-surface);
 }
 
 html[data-theme='dark'] .kanban-add-card-btn:hover {
     background: rgba(var(--pz-accent-rgb), 0.2);
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .kanban-add-column-btn {
-    background: var(--dm-surface);
-    color: var(--dm-text-muted);
-    border-color: var(--dm-border);
+    background: var(--pz-surface);
+    color: var(--pz-text-muted);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .kanban-add-column-btn:hover {
-    background: var(--dm-border);
-    color: var(--dm-text-bright);
+    background: var(--pz-border);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .kanban-size-toggle {
-    background: var(--dm-surface);
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    background: var(--pz-surface);
+    color: var(--pz-text);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .kanban-size-toggle:hover {
-    background: var(--dm-border);
-    color: var(--dm-text-bright);
+    background: var(--pz-border);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .kanban-sort-toggle {
-    background: var(--dm-surface);
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    background: var(--pz-surface);
+    color: var(--pz-text);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .kanban-sort-toggle:hover {
-    background: var(--dm-border);
-    color: var(--dm-text-bright);
+    background: var(--pz-border);
+    color: var(--pz-text-strong);
 }
 
 /* Kanban Cards */
 html[data-theme='dark'] .kanban-card {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
     box-shadow: 0 1px 3px rgba(var(--pz-shadow-rgb), 0.4);
 }
 
 html[data-theme='dark'] .kanban-card:hover {
-    border-color: var(--dm-neutral);
-    background: var(--dm-surface);
+    border-color: var(--pz-surface-strong);
+    background: var(--pz-surface);
     box-shadow: 0 4px 6px -1px rgba(var(--pz-shadow-rgb), 0.5);
 }
 
 html[data-theme='dark'] .kanban-card-meta {
-    color: var(--dm-text-subtle);
+    color: var(--pz-text-subtle);
 }
 
 /* Tags */
 html[data-theme='dark'] .kanban-tag {
-    background: var(--dm-border);
-    border-color: var(--dm-border-light);
-    color: var(--dm-text);
+    background: var(--pz-border);
+    border-color: var(--pz-border-strong);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .kanban-tag-colored {
-    background: color-mix(in srgb, var(--tag-color) 24%, var(--dm-surface));
-    border-color: color-mix(in srgb, var(--tag-color) 45%, var(--dm-surface));
-    color: color-mix(in srgb, var(--tag-color) 70%, var(--dm-text-bright));
+    background: color-mix(in srgb, var(--tag-color) 24%, var(--pz-surface));
+    border-color: color-mix(in srgb, var(--tag-color) 45%, var(--pz-surface));
+    color: color-mix(in srgb, var(--tag-color) 70%, var(--pz-text-strong));
 }
 
 /* Due date badge */
 html[data-theme='dark'] .kanban-card-due {
-    background: var(--dm-bg);
-    border-color: var(--dm-border-light);
-    color: var(--dm-text-muted);
+    border-color: var(--pz-border-strong);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .kanban-card-due.overdue {
-    background: var(--dm-content-bg);
-    border-color: var(--dm-danger-hover);
-    color: var(--dm-danger);
+    background: var(--pz-bg);
+    border-color: var(--pz-danger-text-hover);
+    color: var(--pz-danger-text);
 }
 
 html[data-theme='dark'] .kanban-scroll-btn {
-    background: var(--dm-surface);
-    color: var(--dm-text-muted);
-    border-color: var(--dm-border-light);
+    background: var(--pz-surface);
+    color: var(--pz-text-muted);
+    border-color: var(--pz-border-strong);
 }
 
 html[data-theme='dark'] .kanban-scroll-btn:hover {
-    background: var(--dm-border);
-    color: var(--dm-text-bright);
+    background: var(--pz-border);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .kanban-scroll-btn-header {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .kanban-scroll-btn-header:hover {
-    background: var(--dm-border);
-    color: var(--dm-text-bright);
+    background: var(--pz-border);
 }
 
 /* Scrollbars */
 html[data-theme='dark'] .kanban-board::-webkit-scrollbar-track {
-    background: var(--dm-bg);
+    background: var(--pz-chrome-bg);
 }
 
 html[data-theme='dark'] .kanban-board::-webkit-scrollbar-thumb {
-    background: var(--dm-border);
+    background: var(--pz-border);
 }
 
 html[data-theme='dark'] .kanban-board::-webkit-scrollbar-thumb:hover {
-    background: var(--dm-border-light);
+    background: var(--pz-border-strong);
 }
 
 html[data-theme='dark'] .kanban-column-content.drag-over,
 html[data-theme='dark'] .kanban-subfolder-content.drag-over {
-    border-color: var(--dm-accent);
+    border-color: var(--pz-accent-text);
 }
 
 /* ===== Card completion button ===== */
 html[data-theme='dark'] .kanban-card-complete-btn {
-    background: var(--dm-surface);
-    border-color: var(--dm-border-light);
-    color: var(--dm-text-muted);
+    background: var(--pz-surface);
+    border-color: var(--pz-border-strong);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .kanban-card-complete-btn:hover {
-    background: rgba(34, 197, 94, 0.15);
-    border-color: var(--dm-success-hover);
-    color: var(--dm-success-hover);
+    background: color-mix(in srgb, var(--pz-success-text-hover) 15%, transparent);
+    border-color: var(--pz-success-text-hover);
+    color: var(--pz-success-text-hover);
 }
 
 html[data-theme='dark'] .kanban-card-completed .kanban-card-complete-btn {
-    background: var(--dm-success-hover);
-    border-color: var(--dm-success-hover);
+    background: var(--pz-success-text-hover);
+    border-color: var(--pz-success-text-hover);
     color: var(--pz-text-inverse);
 }
 
 /* ===== Completed cards ===== */
 html[data-theme='dark'] .kanban-card-completed {
-    background: var(--dm-bg);
-    border-color: var(--dm-border);
+    background: var(--pz-chrome-bg);
+    border-color: var(--pz-border);
 }
 
 /* ===== Completed section ===== */
 html[data-theme='dark'] .kanban-completed-toggle {
-    border-top-color: var(--dm-border);
-    color: var(--dm-text-muted);
+    border-top-color: var(--pz-border);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .kanban-completed-count {
-    background: var(--dm-border);
+    background: var(--pz-border);
 }
 
 /* ===== Nested subfolder groups ===== */
 html[data-theme='dark'] .kanban-subfolder-section {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .kanban-subfolder-toggle:hover {
@@ -180,9 +178,9 @@ html[data-theme='dark'] .kanban-subfolder-toggle:hover {
 }
 
 html[data-theme='dark'] .kanban-subfolder-count {
-    background: var(--dm-border);
+    background: var(--pz-border);
 }
 
 html[data-theme='dark'] .kanban-subfolder-section.is-expanded > .kanban-subfolder-content:empty {
-    border-color: var(--dm-border);
+    border-color: var(--pz-border);
 }

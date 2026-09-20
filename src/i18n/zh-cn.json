@@ -1187,6 +1187,10 @@
       "remove": "移除链接",
       "cancel": "取消",
       "save": "保存"
+    },
+    "paste": {
+      "images_dropped_one": "有 1 张图片无法粘贴。请单独复制该图片后再粘贴。",
+      "images_dropped_other": "有 {{count}} 张图片无法粘贴。请逐张复制后再粘贴。"
     }
   },
   "info": {
@@ -1697,7 +1701,7 @@
         "custom": "自定义"
       },
       "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
-      "custom_hint": "标记：YYYY、MMMM、MMM、MM、dddd、DD、D、HH、h、hh、mm、ss、A",
+      "custom_hint": "标记：YYYY、MMMM、MMM、MM、dddd、ddd、DD、D、HH、h、hh、mm、ss、A",
       "custom_invalid": "请输入有效的自定义格式。",
       "tokens_title": "占位符：",
       "tokens": {
@@ -1706,6 +1710,7 @@
         "MMM": "月份简称 (9月)",
         "MM": "月 (08)",
         "dddd": "星期 (星期六)",
+        "ddd": "星期简称 (周六)",
         "DD": "日 (16)",
         "D": "日，不补零 (5)",
         "HH": "小时，24 小时制 (14)",
@@ -1741,7 +1746,7 @@
         "custom": "自定义"
       },
       "custom_placeholder": "DD MMMM YYYY",
-      "custom_hint": "可用标记：YYYY、YY、MMMM、MMM、MM、dddd、DD、D。必须包含年、月和日。",
+      "custom_hint": "可用标记：YYYY、YY、MMMM、MMM、MM、dddd、ddd、DD、D。必须包含年、月和日。",
       "custom_invalid": "请输入有效的自定义格式，需包含年、月和日。",
       "hint": "已有条目保留原标题，并仍与其日期关联。",
       "tokens_title": "占位符：",
@@ -1752,6 +1757,7 @@
         "MMM": "月份简称 (9月)",
         "MM": "月 (08)",
         "dddd": "星期 (星期六)",
+        "ddd": "星期简称 (周六)",
         "DD": "日 (05)",
         "D": "日，不补零 (5)"
       },
@@ -4967,6 +4973,8 @@
     "tree_move": "移动到上方或下方的笔记或文件夹",
     "tree_open_folder": "展开文件夹，或进入其中",
     "tree_close_folder": "折叠文件夹，或返回上级文件夹",
+    "tree_rename": "重命名笔记或文件夹",
+    "tree_open": "打开笔记，或展开和折叠文件夹",
     "tree_undo": "撤销上一次更改",
     "tree_redo": "重做",
     "tree_copy": "复制所选笔记和文件夹",
@@ -4978,6 +4986,7 @@
       "escape": "Esc",
       "tab": "Tab",
       "delete": "Del",
+      "space": "空格",
       "click": "单击"
     },
     "tree_select_toggle": "将笔记或文件夹加入选择，或从选择中移除",
@@ -4997,6 +5006,9 @@
     "delete_title": "删除 {{count}} 项",
     "delete_message": "{{count}} 项将被移到回收站，包括所选文件夹中的笔记。按 Ctrl+Z 可恢复。",
     "delete_message_notes": "{{count}} 条笔记将被移到回收站。按 Ctrl+Z 可恢复。",
+    "delete_note_title": "删除笔记",
+    "delete_note_message": "“{{name}}” 将被移到回收站。按 Ctrl+Z 可恢复。",
+    "delete_note_message_untitled": "该笔记将被移到回收站。按 Ctrl+Z 可恢复。",
     "deleted_items": "已将 {{count}} 项移到回收站",
     "delete_failed": "删除失败：{{error}}",
     "moved_items": "已移动 {{count}} 项",

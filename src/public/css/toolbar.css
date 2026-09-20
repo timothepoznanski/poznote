@@ -62,7 +62,7 @@
 }
 
 .color-item:focus {
-    outline: 2px solid var(--pz-accent);
+    outline: 2px solid var(--pz-accent-text);
 }
 
 .color-swatch {
@@ -109,7 +109,7 @@
 }
 
 .color-item:focus {
-    outline: 2px solid var(--pz-accent);
+    outline: 2px solid var(--pz-accent-text);
 }
 
 /* The "None" entry: a "no" sign in the swatch's own box, not a swatch. */
@@ -220,16 +220,16 @@
 .btn-attachment.has-attachments i {
     /* adjust icon tint to match the blue color */
     filter: none !important;
-    color: var(--pz-accent) !important;
+    color: var(--pz-accent-text) !important;
 }
 
 .btn-attachment.has-attachments:hover i {
     filter: none !important;
-    color: var(--pz-accent-hover) !important;
+    color: var(--pz-accent-text-hover) !important;
 }
 
 .dropdown-item.has-attachments i {
-    color: var(--pz-accent) !important;
+    color: var(--pz-accent-text) !important;
 }
 
 /* Note Header */
@@ -332,12 +332,12 @@ body:not(.has-background-image) .note-header {
 
 .toolbar-btn.is-format-active {
     background-color: var(--pz-accent-soft) !important;
-    color: var(--pz-accent) !important;
+    color: var(--pz-accent-text) !important;
 }
 
 html[data-theme='dark'] .toolbar-btn.is-format-active {
-    background-color: var(--dm-accent-soft) !important;
-    color: var(--dm-accent) !important;
+    background-color: var(--pz-accent-soft) !important;
+    color: var(--pz-accent-text) !important;
 }
 
 /* Note action buttons: visible by default, hidden during selection */

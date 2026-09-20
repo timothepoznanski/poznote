@@ -6,7 +6,7 @@
  * window.PoznoteColorPalette
  *   colors                 [{ id, hex, soft }] in swatch order
  *   textColor(id)          'var(--pz-color-red, #dc2626)', written into notes
- *   highlightColor(id)     'var(--pz-color-red-soft, #f5bebe)'
+ *   highlightColor(id)     'var(--pz-color-red-soft, #ee9393)'
  *   iconColorCss(color)    token for a stored icon hex, '' when unsafe
  *   canonicalIconColor(c)  the swatch hex a legacy icon colour now selects
  */
@@ -14,21 +14,21 @@
     'use strict';
 
     var COLORS = [
-        { id: 'red', hex: '#dc2626', soft: '#f5bebe' },
-        { id: 'orange', hex: '#ea580c', soft: '#f9cdb6' },
-        { id: 'amber', hex: '#d97706', soft: '#f4d6b4' },
-        { id: 'yellow', hex: '#eab308', soft: '#f9e8b5' },
-        { id: 'lime', hex: '#84cc16', soft: '#daf0b9' },
-        { id: 'green', hex: '#16a34a', soft: '#b9e3c9' },
-        { id: 'teal', hex: '#0d9488', soft: '#b6dfdb' },
-        { id: 'cyan', hex: '#0891b2', soft: '#b5dee8' },
-        { id: 'blue', hex: '#2563eb', soft: '#bed0f9' },
-        { id: 'indigo', hex: '#4f46e5', soft: '#cac8f7' },
-        { id: 'purple', hex: '#9333ea', soft: '#dfc2f9' },
-        { id: 'magenta', hex: '#c026d3', soft: '#ecbef2' },
-        { id: 'pink', hex: '#db2777', soft: '#f4bed6' },
-        { id: 'brown', hex: '#92400e', soft: '#dec6b7' },
-        { id: 'gray', hex: '#6b7280', soft: '#d3d5d9' }
+        { id: 'red', hex: '#dc2626', soft: '#ee9393' },
+        { id: 'orange', hex: '#ea580c', soft: '#f5ac86' },
+        { id: 'amber', hex: '#d97706', soft: '#ecbb83' },
+        { id: 'yellow', hex: '#eab308', soft: '#f1ce5e' },
+        { id: 'lime', hex: '#84cc16', soft: '#c2e68b' },
+        { id: 'green', hex: '#16a34a', soft: '#8bd1a5' },
+        { id: 'teal', hex: '#0d9488', soft: '#86cac4' },
+        { id: 'cyan', hex: '#0891b2', soft: '#84c8d9' },
+        { id: 'blue', hex: '#2563eb', soft: '#92b1f5' },
+        { id: 'indigo', hex: '#4f46e5', soft: '#a7a3f2' },
+        { id: 'purple', hex: '#9333ea', soft: '#c999f5' },
+        { id: 'magenta', hex: '#c026d3', soft: '#e093e9' },
+        { id: 'pink', hex: '#db2777', soft: '#ed93bb' },
+        { id: 'brown', hex: '#92400e', soft: '#c9a087' },
+        { id: 'gray', hex: '#6b7280', soft: '#b5b9c0' }
     ];
 
     var LEGACY_ICON_TOKENS = {

@@ -15,7 +15,7 @@
 
 .form-group.drag-over {
     background-color: var(--pz-accent-soft);
-    border: 2px dashed var(--pz-accent);
+    border: 2px dashed var(--pz-accent-text);
 }
 
 .form-group.drag-over input[type="file"],
@@ -34,7 +34,7 @@
     display: none;
     align-items: center;
     justify-content: center;
-    background: rgba(227, 242, 253, 0.95);
+    background: color-mix(in srgb, var(--pz-accent-soft) 95%, transparent);
     border-radius: var(--pz-radius-lg);
     pointer-events: none;
     z-index: 10;
@@ -43,8 +43,8 @@
 .drop-overlay-text {
     font-size: 1.2em;
     font-weight: var(--pz-weight-semibold);
-    color: var(--pz-accent);
-    background: rgba(var(--pz-highlight-rgb), 0.95);
+    color: var(--pz-accent-text);
+    background: color-mix(in srgb, var(--pz-bg) 95%, transparent);
     padding: 20px 30px;
     border-radius: var(--pz-radius-lg);
     box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);

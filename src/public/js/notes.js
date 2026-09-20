@@ -618,8 +618,13 @@ function _updateUIAfterSave(timeText, titleChanged) {
  * Delete a note (move to trash)
  * Handles both regular notes and linked notes
  * @param {string|number} noteId - The note ID to delete
+ * @param {Object} [options] - options.confirmBeforeTrash(proceed) asks before
+ *   the note leaves for the trash, and is only called once the dialogs above
+ *   have been ruled out, so a shortcut keeps its own question and nothing is
+ *   asked twice. The Del shortcut of the tree passes it (#1459); the red
+ *   Delete item of a menu deletes straight away.
  */
-function deleteNote(noteId) {
+function deleteNote(noteId, options) {
     // Check if the selected link in the list is a linked note
     // (since linked notes redirect to their target, we need to check the list item)
     const selectedLinks = document.querySelectorAll('.links_arbo_left.selected-note');
@@ -663,6 +668,20 @@ function deleteNote(noteId) {
         }
     }
 
+    if (options && typeof options.confirmBeforeTrash === 'function') {
+        options.confirmBeforeTrash(function () { sendNoteToTrash(noteId); });
+        return;
+    }
+
+    sendNoteToTrash(noteId);
+}
+
+/**
+ * Move a note to the trash, once every dialog has had its say.
+ * @param {string|number} noteId - The note ID to delete
+ * @private
+ */
+function sendNoteToTrash(noteId) {
     const workspace = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? pageWorkspace : null;
 
     // Build query params for RESTful API

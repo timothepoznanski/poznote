@@ -21,27 +21,28 @@
 
 /**
  * id => [hex, soft]. `hex` is the light-theme value of --pz-color-<id>,
- * `soft` the light value of --pz-color-<id>-soft (30% of the colour over
- * white). Both are the fallbacks written into note content. Order is the
- * order of the swatches: round the colour wheel, then the two neutrals.
+ * `soft` the light value of --pz-color-<id>-soft (half of the colour over
+ * white, 65% for yellow, the highlighter). Both are the fallbacks written
+ * into note content. Order is the order of the swatches: round the colour
+ * wheel, then the two neutrals.
  */
 function poznoteColorPalette() {
     return [
-        'red'     => ['hex' => '#dc2626', 'soft' => '#f5bebe'],
-        'orange'  => ['hex' => '#ea580c', 'soft' => '#f9cdb6'],
-        'amber'   => ['hex' => '#d97706', 'soft' => '#f4d6b4'],
-        'yellow'  => ['hex' => '#eab308', 'soft' => '#f9e8b5'],
-        'lime'    => ['hex' => '#84cc16', 'soft' => '#daf0b9'],
-        'green'   => ['hex' => '#16a34a', 'soft' => '#b9e3c9'],
-        'teal'    => ['hex' => '#0d9488', 'soft' => '#b6dfdb'],
-        'cyan'    => ['hex' => '#0891b2', 'soft' => '#b5dee8'],
-        'blue'    => ['hex' => '#2563eb', 'soft' => '#bed0f9'],
-        'indigo'  => ['hex' => '#4f46e5', 'soft' => '#cac8f7'],
-        'purple'  => ['hex' => '#9333ea', 'soft' => '#dfc2f9'],
-        'magenta' => ['hex' => '#c026d3', 'soft' => '#ecbef2'],
-        'pink'    => ['hex' => '#db2777', 'soft' => '#f4bed6'],
-        'brown'   => ['hex' => '#92400e', 'soft' => '#dec6b7'],
-        'gray'    => ['hex' => '#6b7280', 'soft' => '#d3d5d9'],
+        'red'     => ['hex' => '#dc2626', 'soft' => '#ee9393'],
+        'orange'  => ['hex' => '#ea580c', 'soft' => '#f5ac86'],
+        'amber'   => ['hex' => '#d97706', 'soft' => '#ecbb83'],
+        'yellow'  => ['hex' => '#eab308', 'soft' => '#f1ce5e'],
+        'lime'    => ['hex' => '#84cc16', 'soft' => '#c2e68b'],
+        'green'   => ['hex' => '#16a34a', 'soft' => '#8bd1a5'],
+        'teal'    => ['hex' => '#0d9488', 'soft' => '#86cac4'],
+        'cyan'    => ['hex' => '#0891b2', 'soft' => '#84c8d9'],
+        'blue'    => ['hex' => '#2563eb', 'soft' => '#92b1f5'],
+        'indigo'  => ['hex' => '#4f46e5', 'soft' => '#a7a3f2'],
+        'purple'  => ['hex' => '#9333ea', 'soft' => '#c999f5'],
+        'magenta' => ['hex' => '#c026d3', 'soft' => '#e093e9'],
+        'pink'    => ['hex' => '#db2777', 'soft' => '#ed93bb'],
+        'brown'   => ['hex' => '#92400e', 'soft' => '#c9a087'],
+        'gray'    => ['hex' => '#6b7280', 'soft' => '#b5b9c0'],
     ];
 }
 

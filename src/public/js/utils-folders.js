@@ -108,7 +108,15 @@ function newFolderViaModal() {
     );
 }
 
-function deleteFolder(folderId, folderName) {
+/**
+ * Delete a folder (its notes go to the trash). A folder with notes or
+ * subfolders always shows what it takes along first; an empty one goes
+ * straight away, unless options.confirmIfEmpty asks for the same dialog,
+ * which is what the Del shortcut does (#1459).
+ */
+function deleteFolder(folderId, folderName, options) {
+    var confirmIfEmpty = !!(options && options.confirmIfEmpty);
+
     // First, check how many notes sont dans ce dossier
     var params = new URLSearchParams({
         action: 'count_notes_in_folder',
@@ -129,7 +137,7 @@ function deleteFolder(folderId, folderName) {
                 var subfolderCount = data.subfolder_count || 0;
 
                 // If the folder is empty and has no subfolders, delete without confirmation
-                if (noteCount === 0 && subfolderCount === 0) {
+                if (noteCount === 0 && subfolderCount === 0 && !confirmIfEmpty) {
                     executeDeleteFolderOperation(folderId, folderName);
                     return;
                 }
@@ -173,6 +181,11 @@ function deleteFolder(folderId, folderName) {
                         }
                         detailsList.appendChild(noteLi);
                     }
+                }
+
+                if (detailsList) {
+                    // An empty folder has nothing to list: keep its space out
+                    detailsList.style.display = detailsList.children.length ? '' : 'none';
                 }
 
                 if (noteElement) {

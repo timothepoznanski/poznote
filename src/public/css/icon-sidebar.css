@@ -114,7 +114,7 @@
 .icon-sidebar-overflow-item:hover,
 .icon-sidebar-overflow-item:focus-visible {
     background: rgba(var(--pz-accent-rgb), 0.08);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     text-decoration: none;
 }
 
@@ -127,7 +127,7 @@
 }
 
 .icon-sidebar-overflow-item-active {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     background: rgba(var(--pz-accent-rgb), 0.12);
 }
 
@@ -206,14 +206,14 @@
 
 .icon-sidebar-btn:hover,
 .icon-sidebar-btn:focus-visible {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     background: rgba(var(--pz-accent-rgb), 0.08);
 }
 
 /* Current page. Lives here rather than in css/icon-sidebar-page.css so that
    index.php, which loads only this file, highlights its Home entry too. */
 .icon-sidebar-btn-active {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     background: rgba(var(--pz-accent-rgb), 0.12);
 }
 
@@ -271,7 +271,7 @@
 }
 
 .icon-sidebar-btn.has-notifications .lucide-bell {
-    color: var(--pz-warning-hover);
+    color: var(--pz-warning-text-hover);
 }
 
 /* Collapse toggle: sits at the very bottom, just right of the rail's divider
@@ -298,7 +298,7 @@
 
 #iconSidebarToggle:hover {
     background: var(--pz-surface);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.1);
 }
 
@@ -360,7 +360,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
 
 .poznote-back-to-note-btn i,
 .poznote-back-btn i {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 /* The settings sub-pages each use their own container (.settings-container,
@@ -405,7 +405,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
 }
 
 .poznote-page-title i {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 /* The book glyph's ink sits high in its box, so a box-centred icon still reads
@@ -449,11 +449,11 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
 .poznote-page-title-workspace[aria-expanded="true"] {
     background: rgba(var(--pz-accent-rgb), 0.08);
     border-color: rgba(var(--pz-accent-rgb), 0.4);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .poznote-page-title-workspace:focus-visible {
-    outline: 2px solid var(--pz-accent);
+    outline: 2px solid var(--pz-accent-text);
     outline-offset: 2px;
 }
 
@@ -541,7 +541,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
 .poznote-page-title-workspace-item:hover,
 .poznote-page-title-workspace-item:focus-visible {
     background: rgba(var(--pz-accent-rgb), 0.08);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     outline: none;
 }
 
@@ -575,7 +575,7 @@ button.poznote-page-title-workspace-item {
 /* Tick on the current workspace, pushed to the right edge. */
 .poznote-page-title-workspace-item .lucide-check {
     margin-left: auto;
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 /* Colour of the workspace (workspaces.php), the dashboard breadcrumb's dot.
@@ -611,7 +611,7 @@ button.poznote-page-title-workspace-item {
 .poznote-page-title-workspace-item-manage:focus-visible .lucide,
 .poznote-page-title-workspace-item-action:hover .lucide,
 .poznote-page-title-workspace-item-action:focus-visible .lucide {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 /* trash.php, diary.php and graph.php give their container no top padding, so

@@ -59,8 +59,10 @@ window.savedRanges = {};
   // palette (js/color-palette.js, issue #1408). A value is what gets written
   // into the note, var(--pz-color-red, #dc2626): the colour follows the theme
   // and an export still reads the hex. 'none' removes the colour.
-  // A highlight swatch is painted stronger than the soft value it applies:
-  // at the real strength the row looked greyed out, as if disabled.
+  // A highlight swatch is painted at 65% whatever the theme. That is what
+  // yellow applies on a light theme and a little more than the other colours
+  // do, but far more than the 25% of a dark theme, where a row at the real
+  // strength looked greyed out, as if disabled.
   function paletteSwatches(kind) {
     const palette = window.PoznoteColorPalette;
     const swatches = palette ? palette.colors.map(c => ({

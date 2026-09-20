@@ -94,7 +94,7 @@
    ============================================ */
 
 .text-danger {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 .text-muted {
@@ -178,5 +178,5 @@
 }
 
 .backup-warning-text {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }

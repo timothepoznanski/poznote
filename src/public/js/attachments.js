@@ -1476,7 +1476,7 @@ function handleHTMLImageInsert(file, dropTarget, dropPoint) {
 
     // Insert a placeholder while uploading
     var placeholderId = createUploadPlaceholderId('image-upload');
-    var placeholderHtml = '<img src="" alt="' + tr('attachments.upload.uploading', {}, 'Uploading...') + '" class="image-uploading-placeholder" data-upload-placeholder-id="' + placeholderId + '" style="opacity: 0.5; min-width: 100px; min-height: 100px; background: #f0f0f0; border: 2px dashed #ccc;" />';
+    var placeholderHtml = '<img src="" alt="' + tr('attachments.upload.uploading', {}, 'Uploading...') + '" class="image-uploading-placeholder" data-upload-placeholder-id="' + placeholderId + '" />';
 
     // A drop lands at the pointed position, not at the previous cursor
     if (dropPoint) {
@@ -1543,11 +1543,6 @@ function handleHTMLImageInsert(file, dropTarget, dropPoint) {
                     placeholderImg.alt = file.name;
                     placeholderImg.classList.remove('image-uploading-placeholder');
                     placeholderImg.removeAttribute('data-upload-placeholder-id');
-                    placeholderImg.style.opacity = '';
-                    placeholderImg.style.minWidth = '';
-                    placeholderImg.style.minHeight = '';
-                    placeholderImg.style.background = '';
-                    placeholderImg.style.border = '';
                     placeholderImg.setAttribute('loading', 'lazy');
                     placeholderImg.setAttribute('decoding', 'async');
                     if (window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.defaultImageBorderNoPadding) {

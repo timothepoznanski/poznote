@@ -1189,6 +1189,10 @@
       "remove": "Eliminar enlace",
       "cancel": "Cancelar",
       "save": "Guardar"
+    },
+    "paste": {
+      "images_dropped_one": "No se pudo pegar 1 imagen. Cópiala por separado para añadirla.",
+      "images_dropped_other": "No se pudieron pegar {{count}} imágenes. Cópialas una por una para añadirlas."
     }
   },
   "info": {
@@ -1705,7 +1709,7 @@
         "custom": "Personalizado"
       },
       "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
-      "custom_hint": "Tokens: YYYY, MMMM, MMM, MM, dddd, DD, D, HH, h, hh, mm, ss, A",
+      "custom_hint": "Tokens: YYYY, MMMM, MMM, MM, dddd, ddd, DD, D, HH, h, hh, mm, ss, A",
       "custom_invalid": "Introduce un formato personalizado válido.",
       "tokens_title": "Tokens:",
       "tokens": {
@@ -1714,6 +1718,7 @@
         "MMM": "nombre del mes abreviado (sept)",
         "MM": "mes (08)",
         "dddd": "día de la semana (Sábado)",
+        "ddd": "día de la semana abreviado (Sáb)",
         "DD": "día (16)",
         "D": "día sin cero inicial (5)",
         "HH": "hora, 24 h (14)",
@@ -1749,7 +1754,7 @@
         "custom": "Personalizado"
       },
       "custom_placeholder": "DD MMMM YYYY",
-      "custom_hint": "Tokens: YYYY, YY, MMMM, MMM, MM, dddd, DD, D. Se requieren un año, un mes y un día.",
+      "custom_hint": "Tokens: YYYY, YY, MMMM, MMM, MM, dddd, ddd, DD, D. Se requieren un año, un mes y un día.",
       "custom_invalid": "Introduzca un formato personalizado válido, con un año, un mes y un día.",
       "hint": "Las entradas existentes conservan su título y siguen vinculadas a su día.",
       "tokens_title": "Tokens:",
@@ -1760,6 +1765,7 @@
         "MMM": "nombre del mes abreviado (sept)",
         "MM": "mes (08)",
         "dddd": "día de la semana (Sábado)",
+        "ddd": "día de la semana abreviado (Sáb)",
         "DD": "día (05)",
         "D": "día sin cero inicial (5)"
       },
@@ -4868,6 +4874,8 @@
     "tree_move": "Ir a la nota o carpeta de arriba o de abajo",
     "tree_open_folder": "Abrir una carpeta o entrar en ella",
     "tree_close_folder": "Cerrar una carpeta o subir a la que la contiene",
+    "tree_rename": "Cambiar el nombre de la nota o de la carpeta",
+    "tree_open": "Abrir la nota, o abrir y cerrar la carpeta",
     "tree_undo": "Deshacer el último cambio",
     "tree_redo": "Rehacer",
     "tree_copy": "Copiar las notas y carpetas seleccionadas",
@@ -4879,6 +4887,7 @@
       "escape": "Esc",
       "tab": "Tab",
       "delete": "Supr",
+      "space": "Espacio",
       "click": "Clic"
     },
     "tree_select_toggle": "Añadir una nota o carpeta a la selección, o quitarla",
@@ -4898,6 +4907,9 @@
     "delete_title": "Eliminar {{count}} elementos",
     "delete_message": "{{count}} elementos se moverán a la papelera, incluidas las notas de las carpetas seleccionadas. Ctrl+Z los recupera.",
     "delete_message_notes": "{{count}} notas se moverán a la papelera. Ctrl+Z las recupera.",
+    "delete_note_title": "Eliminar la nota",
+    "delete_note_message": "«{{name}}» se moverá a la papelera. Ctrl+Z la recupera.",
+    "delete_note_message_untitled": "Esta nota se moverá a la papelera. Ctrl+Z la recupera.",
     "deleted_items": "{{count}} elementos movidos a la papelera",
     "delete_failed": "Error al eliminar: {{error}}",
     "moved_items": "{{count}} elementos movidos",

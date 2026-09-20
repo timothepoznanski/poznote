@@ -39,15 +39,15 @@
 /* Unread reminders: amber bell, mirroring .icon-sidebar-btn.has-notifications.
    Needs !important to beat the shared var(--pz-accent) below. */
 #sidebarNotificationsBtn.has-notifications .lucide-bell {
-    color: var(--pz-warning-hover) !important;
-    background-color: var(--pz-warning-hover);
+    color: var(--pz-warning-text-hover) !important;
+    background-color: var(--pz-warning-text-hover);
 }
 
 .sidebar-folder-toggle,
 .sidebar-howto{
     background: transparent;
     border: none;
-    color: var(--pz-accent) !important;
+    color: var(--pz-accent-text) !important;
     font-size: 1.3rem;
     cursor: pointer;
     padding: 6px;
@@ -68,7 +68,7 @@
 .sidebar-folder-toggle:focus,
 .sidebar-howto:focus,
 .sidebar-plus:focus {
-    outline: 2px solid var(--pz-accent);
+    outline: 2px solid var(--pz-accent-text);
     outline-offset: 2px;
 }
 
@@ -107,7 +107,7 @@
 .sidebar-folder-toggle:focus,
 .sidebar-howto:focus,
 .sidebar-plus:focus {
-    outline: 2px solid var(--pz-accent);
+    outline: 2px solid var(--pz-accent-text);
     outline-offset: 2px;
 }
 
@@ -236,7 +236,7 @@
 
 .note-icon:hover {
     transform: scale(1.15);
-    color: var(--pz-accent) !important;
+    color: var(--pz-accent-text) !important;
 }
 
 /* Notes without folder - indent to align with folder items */
@@ -395,7 +395,7 @@
 .other-account-open:focus-visible,
 .other-account-folders:hover,
 .other-account-folders:focus-visible {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .other-account-name,
@@ -429,7 +429,7 @@
    and full-weight name. The others step back: muted icon and name,
    regular weight, back to the text colour once unfolded. */
 .current-account-header .other-account-toggle .lucide-circle-user {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .other-accounts .other-account-name {

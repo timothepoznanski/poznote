@@ -737,6 +737,26 @@ function isNoteDragInOwnFolder(dragData, folderHeader) {
     return currentFolderId !== '' && currentFolderId === String(targetFolderId);
 }
 
+// The sort mode the tree follows (js/note-sort-cycle.js). Without that
+// module every drop keeps the behaviour it had, the one Custom asks for.
+function isManualNoteSort() {
+    return typeof window.poznoteNoteSortMode !== 'function' || window.poznoteNoteSortMode() === 'manual';
+}
+
+// A drop before or after a row only places the note there in the Custom
+// order; under any other mode the tree sorts itself and the position is lost
+// the moment the list comes back. So a drop that also changes folder is read
+// as what is left of it, a move into that folder, and the row handlers step
+// aside: the folder header (or the root area) takes the drop, highlights the
+// destination as a whole and moves the note without switching the tree to
+// Custom (#1441). Inside the folder the note already lives in, the position
+// is all there is, and the drop keeps asking for Custom.
+function isPlainMoveBesideRow(dragData, item) {
+    if (isManualNoteSort()) return false;
+    if (isNoteDragInOwnFolder(dragData, item.closest('.folder-header'))) return false;
+    return !isRootNoteDragOverRoot(dragData, item);
+}
+
 // Nearest note row of a folder for a pointer that is over the folder's
 // content but not over a row itself (gaps between rows, padding). Returns
 // {item, noteId, position} or null when the pointer is on the folder toggle
@@ -797,6 +817,8 @@ function handleNoteReorderDragOver(e) {
     var item = e.currentTarget;
     var target = getNoteReorderTarget(item);
     if (!target || isDraggedNote(dragData, target.noteId) || isInsideSelectedFolder(dragData, item)) return;
+    // Left to the folder the row sits in, which shows itself as the destination
+    if (isPlainMoveBesideRow(dragData, item)) return;
 
     e.preventDefault();
     e.stopPropagation();
@@ -888,6 +910,8 @@ function handleNoteReorderDrop(e) {
 
     var target = getNoteReorderTarget(item);
     if (!target || isDraggedNote(data, target.noteId) || isInsideSelectedFolder(data, item)) return;
+    // Same as in the dragover: the folder header, or the root area, takes it
+    if (isPlainMoveBesideRow(data, item)) return;
 
     e.preventDefault();
     e.stopPropagation();
@@ -1510,9 +1534,18 @@ function getShownFolderDropTarget(dragData) {
 function dropFolderOnTarget(dragData, targetHeader, position) {
     var targetFolderId = targetHeader.getAttribute('data-folder-id');
     if (!canDropFolderOnHeader(dragData, targetHeader, targetFolderId)) return;
-    if (isFolderDropNoOp(getFolderDragSourceHeader(dragData), targetHeader, position)) return;
+    var sourceHeader = getFolderDragSourceHeader(dragData);
+    if (isFolderDropNoOp(sourceHeader, targetHeader, position)) return;
 
     if (position === 'before' || position === 'after') {
+        // Beside a folder of another level, and outside the Custom order,
+        // only the level survives the next sort: the folder joins it as a
+        // plain move, which leaves the tree on its sort mode (#1441)
+        var targetParent = getParentFolderHeader(targetHeader);
+        if (!isManualNoteSort() && getParentFolderHeader(sourceHeader) !== targetParent) {
+            moveFolderToParent(dragData.folderId, targetParent ? targetParent.getAttribute('data-folder-id') : null);
+            return;
+        }
         moveFolderBesideTarget(dragData.folderId, targetFolderId, position);
         return;
     }

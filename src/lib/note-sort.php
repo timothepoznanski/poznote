@@ -67,17 +67,23 @@ function poznoteNextNoteSort($value): string
 }
 
 /**
- * Lucide class of the button for a mode. The icon names the mode in use, not
- * the one the next click brings, like the theme button.
+ * Icon class of the button for a mode. The icon names the mode in use, not the
+ * one the next click brings, like the theme button.
+ *
+ * The five keep the same left half, the down arrow of lucide-arrow-down-a-z,
+ * and differ only in the mark on its right. Five unrelated glyphs made the
+ * button a different control on every click, and the mode is named anyway by
+ * the title and the label that follows a click. The four composed classes sit
+ * at the end of src/public/css/lucide.css; Name wears the Lucide icon whole.
  */
 function poznoteNoteSortIcon(string $mode): string
 {
     $icons = [
         'heading_asc' => 'lucide-arrow-down-a-z',
-        'updated_desc' => 'lucide-calendar',
-        'created_desc' => 'lucide-calendar-plus',
-        'type_asc' => 'lucide-shapes',
-        'manual' => 'lucide-grip-vertical',
+        'updated_desc' => 'lucide-sort-date-modified',
+        'created_desc' => 'lucide-sort-date-created',
+        'type_asc' => 'lucide-sort-type',
+        'manual' => 'lucide-sort-custom',
     ];
     return $icons[poznoteNormalizeNoteSort($mode)];
 }

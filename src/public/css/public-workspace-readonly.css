@@ -93,7 +93,7 @@ body.public-workspace-readonly .folder-wrapper .folder_name {
 }
 
 html[data-theme='dark'] .public-workspace-theme-toggle {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .public-workspace-theme-toggle:hover,

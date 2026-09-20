@@ -80,7 +80,7 @@ p.code-block-placeholder-after[data-ph]:empty:before {
     border: 1px solid rgba(var(--pz-shadow-rgb), 0.12);
     border-radius: var(--pz-radius);
     background: rgba(var(--pz-highlight-rgb), 0.96);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     box-shadow: 0 5px 14px rgba(15, 23, 42, 0.14);
     cursor: pointer;
     display: inline-flex;
@@ -104,7 +104,7 @@ p.code-block-placeholder-after[data-ph]:empty:before {
 }
 
 .note-scroll-edge-btn:focus-visible {
-    outline: 2px solid var(--pz-accent);
+    outline: 2px solid var(--pz-accent-text);
     outline-offset: 2px;
 }
 
@@ -314,6 +314,20 @@ textarea:focus {
     content-visibility: auto;
     contain-intrinsic-size: 300px 200px;
     image-rendering: auto;
+}
+
+/* An image being uploaded into a note (js/attachments.js, js/slash-command.js):
+   a dashed grey plate holding the space until the upload answers, then the
+   class comes off and the picture takes over. This was an inline style with two
+   hex greys, written into the note markup itself: no theme could reach it, it
+   flashed white in dark mode, and a save landing mid-upload kept it in the
+   note. */
+.image-uploading-placeholder {
+    opacity: 0.5;
+    min-width: 100px;
+    min-height: 100px;
+    background: var(--pz-surface);
+    border: 2px dashed var(--pz-border-strong);
 }
 
 .noteentry iframe {

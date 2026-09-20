@@ -29,27 +29,35 @@
     }
 
 
-    // Available languages for code blocks (used by HTML and Markdown menus)
+    // Available languages for code blocks (used by HTML and Markdown menus).
+    // Issue #1444: each row carries the mark of its language instead of the same
+    // <> for twelve of them. The marks come from devicon and are emitted as CSS
+    // masks by tools/generate-devicon-icons.py, so the shape stays recognisable
+    // while the colour stays the one every other menu icon uses, in every theme.
+    // Devicon has no SQL mark at all and its XML one is a handwritten word that
+    // is unreadable at 16px, so those two keep a Lucide icon. Kept in
+    // alphabetical order, which is also the order of the code block language
+    // modal (js/code-block-language.js reads the list as it is).
     var CODE_BLOCK_LANGUAGES = [
-        { id: 'code-javascript', icon: 'lucide-code', iconColor: '#f7df1e', label: 'JavaScript', lang: 'javascript' },
-        { id: 'code-typescript', icon: 'lucide-code', iconColor: '#3178c6', label: 'TypeScript', lang: 'typescript' },
-        { id: 'code-python', icon: 'lucide-code', iconColor: '#3776ab', label: 'Python', lang: 'python' },
-        { id: 'code-html', icon: 'lucide-code', iconColor: '#e34f26', label: 'HTML', lang: 'html' },
-        { id: 'code-css', icon: 'lucide-code', iconColor: '#1572b6', label: 'CSS', lang: 'css' },
-        { id: 'code-json', icon: 'lucide-code', iconColor: '#292929', label: 'JSON', lang: 'json' },
-        { id: 'code-bash', icon: 'lucide-terminal', iconColor: '#4eaa25', label: 'Bash', lang: 'bash' },
-        { id: 'code-powershell', icon: 'lucide-terminal', iconColor: '#012456', label: 'PowerShell', lang: 'powershell' },
-        { id: 'code-sql', icon: 'lucide-database', iconColor: '#336791', label: 'SQL', lang: 'sql' },
-        { id: 'code-php', icon: 'lucide-code', iconColor: '#777bb4', label: 'PHP', lang: 'php' },
-        { id: 'code-java', icon: 'lucide-code', iconColor: '#007396', label: 'Java', lang: 'java' },
-        { id: 'code-csharp', icon: 'lucide-code', iconColor: '#239120', label: 'C#', lang: 'csharp' },
-        { id: 'code-cpp', icon: 'lucide-code', iconColor: '#00599c', label: 'C++', lang: 'cpp' },
-        { id: 'code-go', icon: 'lucide-code', iconColor: '#00add8', label: 'Go', lang: 'go' },
-        { id: 'code-rust', icon: 'lucide-code', iconColor: '#b7410e', label: 'Rust', lang: 'rust' },
-        { id: 'code-ruby', icon: 'lucide-gem', iconColor: '#cc342d', label: 'Ruby', lang: 'ruby' },
-        { id: 'code-yaml', icon: 'lucide-file-code', iconColor: '#cb171e', label: 'YAML', lang: 'yaml' },
-        { id: 'code-xml', icon: 'lucide-file-code', iconColor: '#0060ac', label: 'XML', lang: 'xml' },
-        { id: 'code-markdown', icon: 'lucide-file-code', iconColor: '#083fa1', label: 'Markdown', lang: 'markdown' }
+        { id: 'code-bash', icon: 'devicon-bash', label: 'Bash', lang: 'bash' },
+        { id: 'code-csharp', icon: 'devicon-csharp', label: 'C#', lang: 'csharp' },
+        { id: 'code-cpp', icon: 'devicon-cplusplus', label: 'C++', lang: 'cpp' },
+        { id: 'code-css', icon: 'devicon-css3', label: 'CSS', lang: 'css' },
+        { id: 'code-go', icon: 'devicon-go', label: 'Go', lang: 'go' },
+        { id: 'code-html', icon: 'devicon-html5', label: 'HTML', lang: 'html' },
+        { id: 'code-java', icon: 'devicon-java', label: 'Java', lang: 'java' },
+        { id: 'code-javascript', icon: 'devicon-javascript', label: 'JavaScript', lang: 'javascript' },
+        { id: 'code-json', icon: 'devicon-json', label: 'JSON', lang: 'json' },
+        { id: 'code-markdown', icon: 'devicon-markdown', label: 'Markdown', lang: 'markdown' },
+        { id: 'code-php', icon: 'devicon-php', label: 'PHP', lang: 'php' },
+        { id: 'code-powershell', icon: 'devicon-powershell', label: 'PowerShell', lang: 'powershell' },
+        { id: 'code-python', icon: 'devicon-python', label: 'Python', lang: 'python' },
+        { id: 'code-ruby', icon: 'devicon-ruby', label: 'Ruby', lang: 'ruby' },
+        { id: 'code-rust', icon: 'devicon-rust', label: 'Rust', lang: 'rust' },
+        { id: 'code-sql', icon: 'lucide-database', label: 'SQL', lang: 'sql' },
+        { id: 'code-typescript', icon: 'devicon-typescript', label: 'TypeScript', lang: 'typescript' },
+        { id: 'code-xml', icon: 'lucide-file-code', label: 'XML', lang: 'xml' },
+        { id: 'code-yaml', icon: 'devicon-yaml', label: 'YAML', lang: 'yaml' }
     ];
 
     // Shared with the code block language modal (js/code-block-language.js)
@@ -67,7 +75,6 @@
             items.push({
                 id: l.id,
                 icon: l.icon,
-                iconColor: l.iconColor,
                 label: l.labelKey ? t(l.labelKey, null, l.fallback) : l.label,
                 action: function () { insert(l); }
             });
@@ -1399,7 +1406,7 @@
 
                     // Insert a placeholder while uploading
                     const placeholderId = 'image-upload-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
-                    const placeholderHtml = '<img src="" alt="Uploading..." class="image-uploading-placeholder" data-upload-placeholder-id="' + placeholderId + '" style="opacity: 0.5; min-width: 100px; min-height: 100px; background: #f0f0f0; border: 2px dashed #ccc;" />';
+                    const placeholderHtml = '<img src="" alt="Uploading..." class="image-uploading-placeholder" data-upload-placeholder-id="' + placeholderId + '" />';
                     if (range && selection) {
                         selection.removeAllRanges();
                         selection.addRange(range);
@@ -1435,11 +1442,6 @@
                                     placeholderImg.alt = file.name;
                                     placeholderImg.classList.remove('image-uploading-placeholder');
                                     placeholderImg.removeAttribute('data-upload-placeholder-id');
-                                    placeholderImg.style.opacity = '';
-                                    placeholderImg.style.minWidth = '';
-                                    placeholderImg.style.minHeight = '';
-                                    placeholderImg.style.background = '';
-                                    placeholderImg.style.border = '';
                                     placeholderImg.setAttribute('loading', 'lazy');
                                     placeholderImg.setAttribute('decoding', 'async');
                                 }

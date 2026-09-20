@@ -297,6 +297,29 @@
         return noteEntry ? String(noteEntry.getAttribute('data-note-id')) : null;
     }
 
+    /**
+     * The rail's Home link asks index.php for nothing in particular, and the
+     * page then falls back to the last edited note. That fallback has to be
+     * turned off while every tab is closed, or Home would put a note back in
+     * the pane the user emptied, with no tab to close it again (issue #1462).
+     * The flag is dropped again as soon as something is open, so Home keeps
+     * restoring the open tabs. A workspace that never stored a tab state is
+     * not "emptied" and keeps the fallback, like any first visit.
+     */
+    function _syncHomeLink() {
+        var link = document.getElementById('iconSidebarHomeBtn');
+        if (!link || link.tagName !== 'A') return;
+
+        try {
+            var url = new URL(link.getAttribute('href') || 'index.php', window.location.href);
+            if (tabs.length === 0 && _loadFromStorage()) url.searchParams.set('blank', '1');
+            else url.searchParams.delete('blank');
+            link.setAttribute('href', url.pathname + url.search);
+        } catch (e) {
+            console.debug('tabs: _syncHomeLink() failed:', e);
+        }
+    }
+
     function _shouldRestoreActiveTabContent(tab) {
         if (!tab) return false;
         if (_isKanbanTab(tab)) return true;
@@ -578,6 +601,8 @@
         // A reorder drag owns the bar's DOM: rebuilding it mid-drag would drop
         // the element under the cursor. The drag re-renders when it ends.
         if (_reorder && _reorder.active) return;
+
+        _syncHomeLink();
 
         var rightPane = document.getElementById('right_pane') || document.getElementById('right_col');
         if (!rightPane) return;
@@ -929,7 +954,12 @@
         _clearContentPaneNow();
     }
 
-    function _clearContentPaneNow() {
+    /**
+     * @param {boolean} [replaceUrl] Correct the URL with replaceState instead
+     *        of pushState: on page load there is no navigation to record, only
+     *        a URL that does not match the empty pane.
+     */
+    function _clearContentPaneNow(replaceUrl) {
         // Something was opened while the pending save finished
         if (tabs.length > 0) return;
 
@@ -956,15 +986,21 @@
             window.refreshOutline();
         }
 
-        // Drop the note / kanban id from the URL so a reload does not reopen it
+        // Drop the note / kanban id from the URL so a reload does not reopen
+        // it, and flag the pane as blank: index.php otherwise falls back to
+        // the last edited note whenever nothing is requested (issue #1462).
         try {
             var params = new URLSearchParams(window.location.search || '');
             ['note', 'kanban', 'newtab'].forEach(function (key) { params.delete(key); });
-            var query = params.toString();
-            history.pushState({}, '', 'index.php' + (query ? '?' + query : ''));
+            params.set('blank', '1');
+            var url = 'index.php?' + params.toString();
+            if (replaceUrl) history.replaceState(history.state, '', url);
+            else history.pushState({}, '', url);
         } catch (e) {
             console.debug('tabs: _clearContentPaneNow() URL update failed:', e);
         }
+
+        _syncHomeLink();
     }
 
     /**
@@ -1598,6 +1634,21 @@
 
         // Try to restore from localStorage
         var stored = _loadFromStorage();
+
+        // A stored state holding no tab means the user closed everything: the
+        // pane is meant to be empty. index.php still falls back to the last
+        // edited note when the URL asks for nothing and carries no blank=1
+        // (a bookmark, a workspace switch, an older link), so drop that note
+        // rather than show one no tab could close (issue #1462). A browser
+        // with nothing stored at all is a first visit, and keeps the fallback.
+        if (stored && stored.tabs.length === 0 && !currentNoteId && !currentKanbanFolderId) {
+            tabs = [];
+            activeTabId = null;
+            render();
+            if (_getRenderedNoteId()) _clearContentPaneNow(true);
+            return;
+        }
+
         if (stored && stored.tabs.length > 0) {
             tabs = stored.tabs.filter(function (tab) {
                 if (!tab) return false;
@@ -1620,9 +1671,14 @@
             });
 
             if (tabs.length === 0) {
+                // Every stored tab was unusable: same empty pane as above, so
+                // the page's fallback note must not stay behind either.
                 activeTabId = null;
                 _saveToStorage();
                 render();
+                if (!currentNoteId && !currentKanbanFolderId && _getRenderedNoteId()) {
+                    _clearContentPaneNow(true);
+                }
                 return;
             }
 
@@ -1703,10 +1759,16 @@
             return;
         }
 
-        // No stored tabs — create first tab from the current note
-        if (currentNoteId) {
-            var title = _readTitle(currentNoteId, _getDefaultTitle());
-            tabs = [{ id: _generateId(), type: 'note', noteId: currentNoteId, title: title }];
+        // No stored tabs — create first tab from the current note. On a first
+        // visit the URL names no note and index.php falls back to the last
+        // edited one, which the page config does not report: take the note the
+        // page actually rendered, so the landing note gets a tab like any
+        // other and can be closed (issue #1462).
+        var landingNoteId = currentNoteId || (currentKanbanFolderId ? null : _getRenderedNoteId());
+
+        if (landingNoteId) {
+            var title = _readTitle(landingNoteId, _getDefaultTitle());
+            tabs = [{ id: _generateId(), type: 'note', noteId: landingNoteId, title: title }];
             activeTabId = tabs[0].id;
             _saveToStorage();
             render();

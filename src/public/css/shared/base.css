@@ -182,7 +182,7 @@ body.shared-page {
 }
 
 .shared-filter-tree-actions .btn:focus-visible {
-    outline: 2px solid rgba(var(--pz-accent-rgb), 0.22);
+    outline: 2px solid rgba(var(--pz-accent-text-rgb), 0.22);
     outline-offset: 2px;
 }
 
@@ -261,7 +261,7 @@ body.shared-page {
     color: var(--text-muted, var(--pz-text-muted));
     white-space: nowrap;
     padding: 6px 12px;
-    background-color: #f0f7ff;
+    background-color: color-mix(in srgb, var(--pz-accent) 5%, var(--pz-bg));
     border-radius: var(--pz-radius);
     font-weight: var(--pz-weight-medium);
 }

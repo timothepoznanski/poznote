@@ -46,7 +46,7 @@
 }
 
 .card-header h3 i.card-icon {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     font-size: 20px;
 }
 

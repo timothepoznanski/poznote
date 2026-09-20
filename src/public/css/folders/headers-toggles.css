@@ -30,7 +30,7 @@
 
 .folder-icon[data-action='open-kanban-view']:hover {
     transform: scale(1.15);
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 .folder-icon {

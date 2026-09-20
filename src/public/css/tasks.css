@@ -85,8 +85,8 @@
 
 .task-input:focus {
     outline: none;
-    border-color: var(--pz-accent);
-    box-shadow: 0 0 0 2px rgba(var(--pz-accent-rgb), 0.1);
+    border-color: var(--pz-accent-text);
+    box-shadow: 0 0 0 2px rgba(var(--pz-accent-text-rgb), 0.1);
 }
 
 
@@ -146,8 +146,8 @@
 
 /* Drag & drop visual helpers */
 .task-item.drag-over {
-    outline: 2px dashed rgba(var(--pz-accent-rgb), 0.35);
-    background: #eef9ff;
+    outline: 2px dashed rgba(var(--pz-accent-text-rgb), 0.35);
+    background: color-mix(in srgb, var(--pz-accent) 6%, var(--pz-bg));
 }
 
 .task-item.dragging {
@@ -155,7 +155,7 @@
     /* transform: rotate(3deg) scale(1.05); */
     box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.15);
     z-index: 1000;
-    border: 4px solid var(--pz-accent);
+    border: 4px solid var(--pz-accent-text);
 }
 
 /* Placeholder used for touch drag-and-drop */
@@ -166,7 +166,7 @@
 
 .task-item.completed {
     background: var(--pz-surface-hover);
-    border-color: #c8e6c9;
+    border-color: color-mix(in srgb, var(--pz-success) 25%, var(--pz-bg));
     opacity: 0.8;
 }
 
@@ -214,13 +214,13 @@
 }
 
 .task-text a {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     text-decoration: none;
     word-break: break-all;
 }
 
 .task-text a:hover {
-    color: var(--pz-accent-hover);
+    color: var(--pz-accent-text-hover);
     text-decoration: underline;
 }
 
@@ -289,8 +289,8 @@
 }
 
 .task-edit-textarea:focus {
-    border-color: var(--pz-accent);
-    box-shadow: 0 0 0 2px rgba(var(--pz-accent-rgb), 0.1);
+    border-color: var(--pz-accent-text);
+    box-shadow: 0 0 0 2px rgba(var(--pz-accent-text-rgb), 0.1);
 }
 
 .task-edit-hint {
@@ -303,7 +303,7 @@
 .task-edit-error {
     display: none;
     margin: 0;
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
     font-size: 13px;
     line-height: 1.35;
 }
@@ -387,7 +387,7 @@
 }
 
 .task-delete-btn:hover i {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 .task-important-btn:hover i {
@@ -395,7 +395,7 @@
 }
 
 .task-move-btn:hover i {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .task-due-btn {
@@ -421,7 +421,7 @@
 }
 
 .task-due-btn:hover i {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 /* Due date pill shown next to the task text when a date is set */
@@ -449,13 +449,13 @@
 }
 
 .task-due-chip:hover {
-    border-color: var(--pz-accent);
-    color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
+    color: var(--pz-accent-text);
 }
 
 .task-due-chip.overdue {
     border-color: var(--pz-danger-soft);
-    background: #fdf2f2;
+    background: color-mix(in srgb, var(--pz-danger) 7%, var(--pz-bg));
     color: var(--pz-danger-hover);
 }
 
@@ -495,7 +495,7 @@
 }
 
 .task-menu-btn:hover i {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 /* Popup menu opened by the three-dot button */
@@ -528,7 +528,7 @@
 }
 
 .task-actions-menu-item:hover {
-    background: rgba(15, 23, 42, 0.06);
+    background: rgba(var(--pz-shadow-rgb), 0.06);
 }
 
 .task-actions-menu-item i {
@@ -619,11 +619,11 @@
 /* Red star icon for important tasks */
 .task-item.important .task-icon-star,
 .task-item.important .lucide-star {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 .task-important-btn.is-favorite i {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 
@@ -642,7 +642,7 @@
 
 .btn-task-order.active {
     background-color: rgba(var(--pz-accent-rgb), 0.1);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .btn-task-order:hover {
@@ -658,7 +658,7 @@
    the known types override them below. */
 .callout {
     display: block;
-    border-left: 3px solid var(--pz-accent);
+    border-left: 3px solid var(--pz-accent-text);
     padding: 8px 0 8px 12px;
     margin: 12px 0;
 }
@@ -710,8 +710,8 @@
 
 .callout .callout-icon-svg,
 .callout .callout-title-text {
-    color: var(--pz-accent);
-    fill: var(--pz-accent);
+    color: var(--pz-accent-text);
+    fill: var(--pz-accent-text);
 }
 
 /* Foldable callouts (Obsidian "[!type]+" / "[!type]-" syntax) */
@@ -743,23 +743,23 @@ details.callout:not([open]) .callout-fold-icon {
 
 /* Callout colors - border, icon and title */
 .callout-note {
-    border-left-color: var(--pz-accent);
+    border-left-color: var(--pz-accent-text);
 }
 
 .callout-note .callout-icon-svg,
 .callout-note .callout-title-text {
-    color: var(--pz-accent);
-    fill: var(--pz-accent);
+    color: var(--pz-accent-text);
+    fill: var(--pz-accent-text);
 }
 
 .callout-tip {
-    border-left-color: var(--pz-success-hover);
+    border-left-color: var(--pz-success-text-hover);
 }
 
 .callout-tip .callout-icon-svg,
 .callout-tip .callout-title-text {
-    color: var(--pz-success-hover);
-    fill: var(--pz-success-hover);
+    color: var(--pz-success-text-hover);
+    fill: var(--pz-success-text-hover);
 }
 
 /* The only callout family without a semantic token of its own: it borrows the
@@ -786,13 +786,13 @@ details.callout:not([open]) .callout-fold-icon {
 }
 
 .callout-caution {
-    border-left-color: var(--pz-danger-hover);
+    border-left-color: var(--pz-danger-text-hover);
 }
 
 .callout-caution .callout-icon-svg,
 .callout-caution .callout-title-text {
-    color: var(--pz-danger-hover);
-    fill: var(--pz-danger-hover);
+    color: var(--pz-danger-text-hover);
+    fill: var(--pz-danger-text-hover);
 }
 
 /* Toggle / Collapsible block styles */
@@ -923,11 +923,11 @@ details.callout:not([open]) .callout-fold-icon {
 
 /* Dark mode adjustments */
 html[data-theme='dark'] .toggle-block {
-    border-color: var(--dm-border);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .toggle-block[open]>summary {
-    border-bottom-color: var(--dm-border);
+    border-bottom-color: var(--pz-border);
 }
 
 /* ============================================
@@ -980,7 +980,7 @@ html[data-theme='dark'] .toggle-block[open]>summary {
 }
 
 .noteentry .tasklist-embed-toggle:hover {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .noteentry .tasklist-embed-toggle i {
@@ -1092,11 +1092,11 @@ html[data-theme='dark'] .toggle-block[open]>summary {
 }
 
 .noteentry button.tasklist-embed-due:hover {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .noteentry .tasklist-embed-due.overdue {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 /* Row controls (due date, important, delete): revealed while the row is
@@ -1139,15 +1139,15 @@ html[data-theme='dark'] .toggle-block[open]>summary {
 
 .noteentry .tasklist-embed-action-important.is-active,
 .noteentry .tasklist-embed-action-important:hover {
-    color: var(--pz-warning-hover);
+    color: var(--pz-warning-text-hover);
 }
 
 .noteentry .tasklist-embed-action-due:hover {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .noteentry .tasklist-embed-action-delete:hover {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 /* "Add a task" field at the bottom of the list */
@@ -1201,7 +1201,7 @@ html[data-theme='dark'] .toggle-block[open]>summary {
 
 .noteentry .tasklist-embed-error {
     margin-top: 6px;
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 .noteentry .tasklist-embed-empty:is(#pz-specificity-boost, *),

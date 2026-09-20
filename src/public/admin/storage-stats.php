@@ -629,12 +629,12 @@ foreach ($stats as $r) {
         background: var(--bg-secondary, #f9f9f9);
         box-shadow: 0 1px 0 var(--border-color, #e5e7eb);
     }
-    /* The dark palette is --dm-*; without this the sticky header keeps the
+    /* The header above is painted with light literals; without this it keeps the
        light background above and rows would scroll under a white band. */
     :root[data-theme='dark'] .results-table thead th,
     body.dark-mode .results-table thead th {
-        background: var(--dm-content-bg);
-        box-shadow: 0 1px 0 var(--dm-border);
+        background: var(--pz-bg);
+        box-shadow: 0 1px 0 var(--pz-border);
     }
     /* The totals row is pinned to the bottom of the scroller for the same
        reason the headers are pinned to the top: it is the figure the admin
@@ -648,8 +648,8 @@ foreach ($stats as $r) {
     }
     :root[data-theme='dark'] .results-table tfoot td,
     body.dark-mode .results-table tfoot td {
-        background: var(--dm-content-bg);
-        box-shadow: 0 -1px 0 var(--dm-border);
+        background: var(--pz-bg);
+        box-shadow: 0 -1px 0 var(--pz-border);
     }
     /* Tighter rows than the 12px 20px admin-tools default, and headers
        centered over their (mostly numeric) columns */
@@ -697,19 +697,19 @@ foreach ($stats as $r) {
         padding: 3px 6px;
         cursor: pointer;
     }
-    /* Dark mode uses its own --dm-* palette; without this the select stays
+    /* The select above is painted with light literals; without this it stays
        white-on-white. The option list is painted by the OS, hence styling
        both the control and its options. */
     :root[data-theme='dark'] .users-pager-size select,
     body.dark-mode .users-pager-size select {
-        color: var(--dm-text);
-        background: var(--dm-surface);
-        border-color: var(--dm-border);
+        color: var(--pz-text);
+        background: var(--pz-surface);
+        border-color: var(--pz-border);
     }
     :root[data-theme='dark'] .users-pager-size select option,
     body.dark-mode .users-pager-size select option {
-        color: var(--dm-text);
-        background: var(--dm-surface);
+        color: var(--pz-text);
+        background: var(--pz-surface);
     }
     /* Slightly larger column headers, smaller cell values than the
        admin-tools defaults (0.7rem / 1rem). Weight is dialled back from the

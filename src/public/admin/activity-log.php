@@ -577,12 +577,12 @@ function activityExportUrl(string $action, string $search): string {
         font-weight: 600;
         white-space: nowrap;
     }
-    /* The dark palette is --dm-*; without this the sticky header keeps the
+    /* The header above is painted with light literals; without this it keeps the
        light background and rows would scroll under a white band. */
     :root[data-theme='dark'] .results-table thead th,
     body.dark-mode .results-table thead th {
-        background: var(--dm-content-bg);
-        box-shadow: 0 1px 0 var(--dm-border);
+        background: var(--pz-bg);
+        box-shadow: 0 1px 0 var(--pz-border);
     }
     /* admin-tools.css collapses the borders, which makes Chromium paint row
        content over the sticky header. Separate borders render identically
@@ -668,19 +668,19 @@ function activityExportUrl(string $action, string $search): string {
         padding: 3px 6px;
         cursor: pointer;
     }
-    /* Dark mode uses its own --dm-* palette; without this the select stays
+    /* The select above is painted with light literals; without this it stays
        white-on-white. The option list is painted by the OS, hence styling
        both the control and its options. */
     :root[data-theme='dark'] .activity-pager-size select,
     body.dark-mode .activity-pager-size select {
-        color: var(--dm-text);
-        background: var(--dm-surface);
-        border-color: var(--dm-border);
+        color: var(--pz-text);
+        background: var(--pz-surface);
+        border-color: var(--pz-border);
     }
     :root[data-theme='dark'] .activity-pager-size select option,
     body.dark-mode .activity-pager-size select option {
-        color: var(--dm-text);
-        background: var(--dm-surface);
+        color: var(--pz-text);
+        background: var(--pz-surface);
     }
 
     /* Hover help listing every logged operation, replacing the long intro

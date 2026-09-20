@@ -15,7 +15,7 @@
 .toolbar-btn.btn-attachment.has-attachments i,
 .toolbar-btn.btn-reminder.has-reminder i,
 .toolbar-btn.btn-save.is-saving i {
-    color: var(--pz-accent) !important;
+    color: var(--pz-accent-text) !important;
 }
 
 /* The markdown split-view button keeps the default icon colour: nothing to
@@ -29,8 +29,13 @@
    Lucide icons are CSS masks painted with `background-color: currentColor`
    (lucide.css), so `color` does the same job and lets an icon override it the
    normal way. A coloured folder icon carries style="color: X !important" from
-   PHP and simply wins; nothing has to be carved out. */
-[class*="lucide-"] {
+   PHP and simply wins; nothing has to be carved out.
+
+   The language marks of the code submenu (devicon.css) are the same kind of
+   mask under their own prefix, so they belong to the same default: one icon
+   colour in the menu, whatever the theme. */
+[class*="lucide-"],
+[class*="devicon-"] {
     color: var(--pz-icon);
     transition: transform 0.2s ease, color 0.2s ease;
 }
@@ -46,7 +51,7 @@
 
 [class*="lucide-"]:hover {
     transform: scale(1.18);
-    color: var(--pz-accent);
+    color: var(--pz-icon-hover);
 }
 
 /* The icon rail colours its icons via currentColor, not the global filter. The
@@ -114,13 +119,13 @@
 
 .lucide-bold:hover {
     transform: scale(1.2);
-    color: var(--pz-accent) !important;
+    color: var(--pz-accent-text) !important;
 }
 
 /* Red color for cancel icon in mobile slash menu */
 .slash-command-icon.lucide-times-circle,
 .slash-command-item .slash-command-icon.lucide-times-circle {
-    color: var(--pz-danger) !important;
+    color: var(--pz-danger-text) !important;
     font-weight: var(--pz-weight-normal);
 }
 

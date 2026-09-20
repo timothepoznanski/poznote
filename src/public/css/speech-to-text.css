@@ -103,7 +103,7 @@
 
 .dictate-error {
     margin: 0 0 4px;
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
     font-size: 0.9rem;
 }
 

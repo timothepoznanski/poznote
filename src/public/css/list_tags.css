@@ -72,7 +72,7 @@ html.tags-page {
 }
 
 .tag-item:hover {
-    border-color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(var(--pz-shadow-rgb), 0.15);
 }
@@ -170,15 +170,11 @@ html.tags-page {
 }
 
 .tag-color-filter-clear:hover {
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .tag-color-filter-swatch.active {
     border-color: #e2e8f0;
-}
-
-html[data-theme='dark'] .tag-color-filter-clear:hover {
-    color: var(--dm-text-bright);
 }
 
 /* Color picker grid inside the tag color modal */
@@ -263,7 +259,7 @@ html[data-theme='dark'] .tag-color-swatch.selected {
     background: none;
     border: none;
     font-size: 14px;
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
     cursor: pointer;
     text-align: left;
     font-family: 'Inter', sans-serif;
@@ -275,34 +271,34 @@ html[data-theme='dark'] .tag-color-swatch.selected {
 }
 
 .tag-context-menu-item.danger {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 .tag-context-menu-item.danger:hover {
-    background: #fdf0f0;
+    background: color-mix(in srgb, var(--pz-danger) 8%, var(--pz-bg));
 }
 
 /* Dark mode */
 html[data-theme='dark'] .tag-context-menu {
-    background: var(--dm-content-bg);
-    border-color: var(--dm-border);
+    background: var(--pz-bg);
+    border-color: var(--pz-border);
     box-shadow: 0 4px 16px rgba(var(--pz-shadow-rgb), 0.4);
 }
 
 html[data-theme='dark'] .tag-context-menu-item {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .tag-context-menu-item:hover {
-    background: var(--dm-tab-active-bg);
+    background: var(--pz-tab-active-bg);
 }
 
 html[data-theme='dark'] .tag-context-menu-item.danger {
-    color: var(--dm-danger);
+    color: var(--pz-danger-text);
 }
 
 html[data-theme='dark'] .tag-context-menu-item.danger:hover {
-    background: var(--dm-content-bg);
+    background: var(--pz-bg);
 }
 
 /* Rename input inside the modal */
@@ -323,13 +319,13 @@ html[data-theme='dark'] .tag-context-menu-item.danger:hover {
 }
 
 html[data-theme='dark'] .tag-rename-input {
-    background: var(--dm-surface);
-    border-color: var(--dm-border-light);
-    color: var(--dm-text-bright);
+    background: var(--pz-surface);
+    border-color: var(--pz-border-strong);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .tag-rename-input:focus {
-    border-color: var(--dm-accent-hover);
+    border-color: var(--pz-accent-text-hover);
 }
 
 /* Mobile styles */

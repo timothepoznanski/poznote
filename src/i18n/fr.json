@@ -1189,6 +1189,10 @@
     "code_block_line_numbers": {
       "show": "Afficher les numéros de ligne",
       "hide": "Masquer les numéros de ligne"
+    },
+    "paste": {
+      "images_dropped_one": "1 image n’a pas pu être collée. Copiez-la seule pour l’ajouter.",
+      "images_dropped_other": "{{count}} images n’ont pas pu être collées. Copiez-les une par une pour les ajouter."
     }
   },
   "info": {
@@ -1711,7 +1715,7 @@
         "custom": "Personnalisé"
       },
       "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
-      "custom_hint": "Tokens : YYYY, MMMM, MMM, MM, dddd, DD, D, HH, h, hh, mm, ss, A",
+      "custom_hint": "Tokens : YYYY, MMMM, MMM, MM, dddd, ddd, DD, D, HH, h, hh, mm, ss, A",
       "custom_invalid": "Saisissez un format personnalisé valide.",
       "tokens_title": "Jetons :",
       "tokens": {
@@ -1720,6 +1724,7 @@
         "MMM": "nom du mois abrégé (sept.)",
         "MM": "mois (08)",
         "dddd": "nom du jour (Samedi)",
+        "ddd": "nom du jour abrégé (Sam.)",
         "DD": "jour (16)",
         "D": "jour sans zéro (5)",
         "HH": "heure, 24 h (14)",
@@ -1755,7 +1760,7 @@
         "custom": "Personnalisé"
       },
       "custom_placeholder": "DD MMMM YYYY",
-      "custom_hint": "Jetons : YYYY, YY, MMMM, MMM, MM, dddd, DD, D. Une année, un mois et un jour sont obligatoires.",
+      "custom_hint": "Jetons : YYYY, YY, MMMM, MMM, MM, dddd, ddd, DD, D. Une année, un mois et un jour sont obligatoires.",
       "custom_invalid": "Saisissez un format personnalisé valide, avec une année, un mois et un jour.",
       "hint": "Les entrées existantes conservent leur titre et restent rattachées à leur jour.",
       "tokens_title": "Jetons :",
@@ -1766,6 +1771,7 @@
         "MMM": "nom du mois abrégé (sept.)",
         "MM": "mois (08)",
         "dddd": "nom du jour (Samedi)",
+        "ddd": "nom du jour abrégé (Sam.)",
         "DD": "jour (05)",
         "D": "jour sans zéro (5)"
       },
@@ -4972,6 +4978,8 @@
     "tree_move": "Aller à la note ou au dossier au-dessus ou en dessous",
     "tree_open_folder": "Ouvrir un dossier, ou y entrer",
     "tree_close_folder": "Fermer un dossier, ou remonter à celui qui contient la ligne",
+    "tree_rename": "Renommer la note ou le dossier",
+    "tree_open": "Ouvrir la note, ou ouvrir et fermer le dossier",
     "tree_undo": "Annuler la dernière modification",
     "tree_redo": "Rétablir",
     "tree_copy": "Copier les notes et dossiers sélectionnés",
@@ -4983,6 +4991,7 @@
       "escape": "Échap",
       "tab": "Tab",
       "delete": "Suppr",
+      "space": "Espace",
       "click": "Clic"
     },
     "tree_select_toggle": "Ajouter une note ou un dossier à la sélection, ou l'en retirer",
@@ -5002,6 +5011,9 @@
     "delete_title": "Supprimer {{count}} éléments",
     "delete_message": "{{count}} éléments vont être placés dans la corbeille, y compris les notes des dossiers sélectionnés. Ctrl+Z les restaure.",
     "delete_message_notes": "{{count}} notes vont être placées dans la corbeille. Ctrl+Z les restaure.",
+    "delete_note_title": "Supprimer la note",
+    "delete_note_message": "« {{name}} » va être placée dans la corbeille. Ctrl+Z la restaure.",
+    "delete_note_message_untitled": "Cette note va être placée dans la corbeille. Ctrl+Z la restaure.",
     "deleted_items": "{{count}} éléments placés dans la corbeille",
     "delete_failed": "Échec de la suppression : {{error}}",
     "moved_items": "{{count}} éléments déplacés",

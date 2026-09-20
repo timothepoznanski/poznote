@@ -62,7 +62,7 @@ body {
     width: 20px;
     height: 20px;
     border: 3px solid rgba(var(--pz-shadow-rgb), 0.08);
-    border-top-color: var(--pz-accent);
+    border-top-color: var(--pz-accent-text);
     border-radius: var(--pz-radius-circle);
     animation: spin 1s linear infinite;
 }
@@ -103,7 +103,7 @@ body {
 
 /* Text warning styles */
 .text-warning-bold {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
     font-weight: var(--pz-weight-bold);
 }
 
@@ -164,7 +164,7 @@ body {
 .export-help .lucide {
     width: 16px;
     height: 16px;
-    background-color: var(--pz-accent);
+    background-color: var(--pz-accent-text);
     opacity: 0.85;
     transition: opacity 0.15s ease;
 }

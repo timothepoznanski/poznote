@@ -47,9 +47,9 @@ html[data-theme='dark'] .empty-state-title {
 }
 
 html[data-theme='dark'] .empty-state-description {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .summary-header .subtitle-text {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
 }

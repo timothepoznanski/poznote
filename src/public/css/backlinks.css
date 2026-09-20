@@ -57,7 +57,7 @@
 
 /* Individual link — identical to .attachment-link */
 .backlink-link {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     text-decoration: none;
     font-size: 14px;
     transition: color 0.2s;
@@ -70,12 +70,12 @@
 }
 
 .backlink-link:hover {
-    color: var(--pz-accent-hover);
+    color: var(--pz-accent-text-hover);
     text-decoration: underline;
 }
 
 .backlink-link:visited {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 /* Workspace of a linking note that lives in another workspace */

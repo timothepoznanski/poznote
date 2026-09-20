@@ -372,13 +372,13 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
         }
         html[data-theme='dark'] .oidc-section h2,
         body.dark-mode .oidc-section h2 {
-            color: var(--dm-text);
-            border-bottom-color: var(--dm-accent);
+            color: var(--pz-text);
+            border-bottom-color: var(--pz-accent-text);
         }
 
         html[data-theme='dark'] .oidc-switch-state,
         body.dark-mode .oidc-switch-state {
-            color: var(--dm-text-muted);
+            color: var(--pz-text-muted);
         }
         @media (max-width: 800px) {
             .oidc-switch-row {

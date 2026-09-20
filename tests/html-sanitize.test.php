@@ -42,3 +42,26 @@ test('sanitizeMarkdownContent leaves quoted markup alone', function () {
     $out = sanitizeMarkdownContent("Voici du code :\n\n```html\n<script>alert(1)</script>\n```\n");
     assertContains('<script>alert(1)</script>', $out, 'a code sample is not an XSS payload');
 });
+
+// A page copied from the web is wrapped in semantic containers. Taking their
+// subtree along with them emptied the whole note, which is how content pasted
+// from a modern site disappeared on the next save.
+
+test('sanitizeHtml keeps the content of a disallowed container', function () {
+    assertSame('<div><p>hello</p></div>', sanitizeHtml('<section><p>hello</p></section>'));
+    assertSame('<div><h2>T</h2><p>body</p></div>', sanitizeHtml('<article><h2>T</h2><p>body</p></article>'));
+    assertSame('<b>bold</b>', sanitizeHtml('<font color="red"><b>bold</b></font>'));
+});
+
+test('sanitizeHtml still drops what a container hides', function () {
+    assertSame('<div><p>text</p></div>', sanitizeHtml('<section><script>alert(1)</script><p>text</p></section>'));
+    assertSame('<div>visible</div>', sanitizeHtml('<div><style>.a{color:red}</style>visible</div>'));
+    assertSame('<div><p>keep</p></div>', sanitizeHtml('<section><iframe src="https://evil.test/x"></iframe><p>keep</p></section>'));
+    assertNotContains('onclick', sanitizeHtml('<section onclick="alert(1)"><p>t</p></section>'));
+});
+
+test('sanitizeHtml drops the labels inside an svg', function () {
+    $out = sanitizeHtml('<p>a</p><svg><title>Icon name</title><path d="M0 0"/></svg>');
+    assertNotContains('Icon name', $out, 'an svg label is not note text');
+    assertContains('<path d="M0 0">', $out);
+});

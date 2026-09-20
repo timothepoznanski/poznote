@@ -768,11 +768,11 @@ Colours, spacing, radii and font weights are design tokens, so most changes are 
     --pz-accent-rgb: 214, 51, 108;   /* same colour, channels only, used for tints */
 }
 html[data-theme='dark'] {
-    --dm-accent: #f783ac;            /* lighter, because it sits on a dark ground */
+    --pz-accent-text: #f783ac;       /* lighter, because it sits on a dark ground */
 }
 ```
 
-Two tokens rather than one because a *fill* and a *label* cannot be the same colour: `--pz-accent` fills buttons, `--dm-accent` is the accent as text in dark mode.
+Two tokens rather than one because a *fill* and a *label* cannot be the same colour: `--pz-accent` fills buttons, `--pz-accent-text` is the accent as text, icons and outlines. In a light theme it follows `--pz-accent` by itself; a dark ground needs a lighter value. Every token keeps the same `--pz-*` name in every theme, only its value changes. The `--dm-*` names of older stylesheets keep working.
 
 **Recolour the note toolbar icons**
 
@@ -803,8 +803,6 @@ No CSS needed to colour a single icon: right-click it in the note toolbar or in 
 **Write a full theme**
 
 Override the tokens on `:root` for light and on `:root[data-theme='dark']` for dark, and nothing else. `src/public/css/README.md` documents every token and shows a complete example; the built-in Lavender, Sepia and Terminal themes in `src/public/css/tokens.css` are the same thing, written the same way.
-
-One thing a theme cannot reach yet: a handful of icons that a page rule colours explicitly render in the generic icon grey in dark mode.
 
 </details>
 

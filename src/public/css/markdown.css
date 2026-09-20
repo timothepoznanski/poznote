@@ -91,7 +91,7 @@
 }
 
 html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::before {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 .markdown-codemirror-host {
@@ -293,7 +293,7 @@ html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::befor
 }
 
 .cm-tooltip-autocomplete ul li[aria-selected] {
-    background: var(--pz-accent);
+    background: var(--pz-accent-text);
     color: var(--pz-text-inverse);
 }
 
@@ -514,7 +514,7 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
 }
 
 .markdown-preview a {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     text-decoration: none;
 }
 
@@ -647,7 +647,7 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
    below are only fallbacks, dark fallbacks in css/dark-mode/markdown.css).
    The colour declarations need BOTH the !important and the unmatched #id
    inside :is(): they fight the blanket
-   `.noteentry * { color: var(--dm-text) !important }` rule in
+   `.noteentry * { color: var(--pz-text) !important }` rule in
    css/dark-mode/editor.css, which is important and very specific (nine :not()
    arguments). Dropping either one leaves headings and inline code plain in the
    dark and black themes only (issue #1347); with both, one set of rules serves
@@ -763,7 +763,7 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
     cursor: pointer;
     width: 16px;
     height: 16px;
-    accent-color: var(--pz-accent);
+    accent-color: var(--pz-accent-text);
 }
 
 .markdown-preview .markdown-task-checkbox:hover {
@@ -797,7 +797,7 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
 
 /* Indicateur visuel pour le drag & drop */
 .noteentry.drag-over {
-    border: 2px dashed var(--pz-accent);
+    border: 2px dashed var(--pz-accent-text);
     background-color: rgba(var(--pz-accent-rgb), 0.05);
     transition: all 0.2s ease;
 }
@@ -883,7 +883,7 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
 
 /* Dark mode adjustments for math */
 html[data-theme='dark'] .katex {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 /* Split view mode styles */
@@ -980,12 +980,12 @@ html[data-theme='dark'] .katex {
 /* Dark mode border for split view */
 html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container,
 html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview {
-    background: var(--dm-content-bg);
+    background: var(--pz-bg);
 }
 
 html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container,
 html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor {
-    border-right-color: var(--dm-border);
+    border-right-color: var(--pz-border);
 }
 
 body.markdown-split-card-view .noteentry.markdown-split-mode {
@@ -1043,7 +1043,7 @@ body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
 
 html[data-theme='dark'] body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor-container,
 html[data-theme='dark'] body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
-    border-color: var(--dm-border);
+    border-color: var(--pz-border);
 }
 
 /* Scrollbar styling for split view columns */

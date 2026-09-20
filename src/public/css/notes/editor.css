@@ -50,5 +50,5 @@ hr {
     font-style: italic;
     font-weight: var(--pz-weight-normal);
     margin-top: 7px;
-    color: rgb(51, 51, 51);
+    color: var(--pz-text);
 }

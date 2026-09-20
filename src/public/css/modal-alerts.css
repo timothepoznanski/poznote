@@ -34,7 +34,7 @@
 }
 
 .note-creation-loading-content i {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     font-size: 34px;
     line-height: 1;
 }
@@ -44,8 +44,8 @@ html[data-theme='dark'] .note-creation-loading-modal {
 }
 
 html[data-theme='dark'] .note-creation-loading-dialog {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
     box-shadow: 0 18px 40px rgba(var(--pz-shadow-rgb), 0.42);
 }
 
@@ -106,19 +106,19 @@ html[data-theme='dark'] .note-creation-loading-dialog {
 }
 
 .alert-modal-icon.warning {
-    color: var(--pz-warning-hover);
+    color: var(--pz-warning-text-hover);
 }
 
 .alert-modal-icon.error {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 .alert-modal-icon.info {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .alert-modal-icon.success {
-    color: var(--pz-success);
+    color: var(--pz-success-text);
 }
 
 .alert-modal-body {
@@ -191,35 +191,35 @@ html[data-theme='dark'] .note-creation-loading-dialog {
 /* Dark mode support */
 html[data-theme='dark'] .alert-modal,
 .dark-mode .alert-modal {
-    background: var(--dm-surface);
-    color: var(--dm-text-bright);
+    background: var(--pz-surface);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .alert-modal-header,
 .dark-mode .alert-modal-header {
-    border-color: var(--dm-border-light);
+    border-color: var(--pz-border-strong);
 }
 
 html[data-theme='dark'] .alert-modal-title,
 .dark-mode .alert-modal-title {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .alert-modal-body,
 .dark-mode .alert-modal-body {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .alert-modal-button,
 .dark-mode .alert-modal-button {
-    background-color: var(--dm-surface);
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .alert-modal-button:hover,
 .dark-mode .alert-modal-button:hover {
-    background-color: var(--dm-surface-hover);
+    background-color: var(--pz-surface-hover);
 }
 
 html[data-theme='dark'] .alert-modal-button.primary,
@@ -237,24 +237,24 @@ html[data-theme='dark'] .alert-modal-button.primary:hover,
    otherwise win over the light-mode danger shorthand. */
 html[data-theme='dark'] .alert-modal-button.primary.danger,
 .dark-mode .alert-modal-button.primary.danger {
-    background-color: var(--dm-danger-hover);
+    background-color: var(--pz-danger-text-hover);
     color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .alert-modal-button.primary.danger:hover,
 .dark-mode .alert-modal-button.primary.danger:hover {
-    background-color: var(--dm-danger-hover);
+    background-color: var(--pz-danger-text-hover);
 }
 
 html[data-theme='dark'] .alert-modal-button.secondary,
 .dark-mode .alert-modal-button.secondary {
-    background-color: var(--dm-danger-hover);
+    background-color: var(--pz-danger-text-hover);
     color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .alert-modal-button.secondary:hover,
 .dark-mode .alert-modal-button.secondary:hover {
-    background-color: var(--dm-danger-hover);
+    background-color: var(--pz-danger-text-hover);
 }
 
 html[data-theme='dark'] .alert-modal.snapshot-restore-confirm .alert-modal-button.primary,
@@ -354,7 +354,7 @@ html[data-theme='dark'] .progress-container,
 /* Dark mode spinner */
 html[data-theme='dark'] .spinner,
 .dark-mode .spinner {
-    border-color: var(--dm-border-light);
+    border-color: var(--pz-border-strong);
     border-top-color: var(--pz-accent);
 }
 
@@ -382,8 +382,8 @@ html[data-theme='dark'] .spinner,
     flex: none;
     margin-top: 3px;
     font-size: 1.1rem;
-    color: var(--pz-accent);
-    background-color: var(--pz-accent);
+    color: var(--pz-accent-text);
+    background-color: var(--pz-accent-text);
 }
 
 .admin-contact-option-title {
@@ -404,7 +404,7 @@ html[data-theme='dark'] .spinner,
     align-items: center;
     gap: 5px;
     margin-top: 8px;
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     font-weight: var(--pz-weight-semibold);
     text-decoration: none;
 }
@@ -448,8 +448,8 @@ html[data-theme='dark'] .spinner,
 }
 
 .admin-contact-copy:hover {
-    border-color: var(--pz-accent);
-    color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
+    color: var(--pz-accent-text);
 }
 
 .admin-contact-copy .lucide {
@@ -457,10 +457,10 @@ html[data-theme='dark'] .spinner,
 }
 
 html[data-theme='dark'] .admin-contact-option {
-    background: var(--dm-surface, var(--dm-content-bg));
-    border-color: var(--dm-border, var(--dm-border));
+    background: var(--pz-surface, var(--pz-bg));
+    border-color: var(--pz-border);
 }html[data-theme='dark'] .admin-contact-email,
 html[data-theme='dark'] .admin-contact-copy {
     background: transparent;
-    border-color: var(--dm-border, var(--dm-border));
+    border-color: var(--pz-border);
 }

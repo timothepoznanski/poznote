@@ -178,7 +178,7 @@
 }
 
 .shared-folder-toggle:focus-visible {
-    outline: 2px solid rgba(var(--pz-accent-rgb), 0.45);
+    outline: 2px solid rgba(var(--pz-accent-text-rgb), 0.45);
     outline-offset: 2px;
 }
 
@@ -204,7 +204,7 @@
 .note-name {
     font-weight: var(--pz-weight-medium);
     font-size: 13px;
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     text-decoration: none;
     min-width: 0;
     overflow: hidden;
@@ -219,14 +219,14 @@
 .shared-password-icon.is-password-protected,
 .shared-restricted-icon.is-restricted {
     filter: none;
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 /* Disabled (inaccessible) share: the row stays listed, the badge and the
    struck-through token signal that the public link no longer resolves. */
 .shared-disabled-icon {
     filter: none;
-    color: var(--pz-warning-hover);
+    color: var(--pz-warning-text-hover);
 }
 
 .shared-note-item.is-share-disabled .note-token {
@@ -323,7 +323,7 @@ html[data-theme='dark'] .shared-via-parent {
 
 .folder-name-path {
     font-weight: var(--pz-weight-medium);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -340,7 +340,7 @@ html[data-theme='dark'] .shared-via-parent {
 }
 
 html[data-theme='dark'] .folder-name-path {
-    color: var(--dm-accent);
+    color: var(--pz-accent-text);
 }
 
 .folder-name-path i {
@@ -355,7 +355,7 @@ html[data-theme='dark'] .folder-name-path {
 
 .folder-name-text {
     font-size: 13px;
-    color: var(--text-color, var(--dm-text, var(--pz-text)));
+    color: var(--text-color, var(--pz-text));
     cursor: pointer;
     user-select: none;
 }
@@ -508,23 +508,23 @@ html[data-theme='dark'] .folder-name-path {
     }
 
     .note-actions .btn-success:hover {
-        background: var(--pz-success-hover);
+        background: var(--pz-success-text-hover);
         color: var(--pz-text-inverse);
     }
 
     .note-actions .btn-primary {
         background: rgba(var(--pz-accent-rgb), 0.13);
-        color: var(--pz-accent, var(--pz-accent));
+        color: var(--pz-accent-text);
     }
 
     .note-actions .btn-primary:hover {
-        background: var(--pz-accent, var(--pz-accent));
+        background: var(--pz-accent-text);
         color: var(--pz-text-inverse);
     }
 
     .note-actions .btn-danger {
         background: rgba(224, 75, 75, 0.13);
-        color: var(--pz-danger);
+        color: var(--pz-danger-text);
     }
 
     .note-actions .btn-danger:hover {

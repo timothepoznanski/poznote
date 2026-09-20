@@ -179,8 +179,13 @@ $currentWorkspaceSynced = ($workspace_filter === '' || $workspace_filter === '__
 // When the URL targets a Kanban board (?kanban=<id>) without an explicit
 // note, skip the latest-note fallback: the board is fetched client-side and
 // the note would otherwise stay visible in the right column after a reload.
+// blank=1 says the note pane is empty on purpose: every tab was closed, so
+// the pane must stay empty instead of bringing the last edited note back
+// with no tab to close it (issue #1462). js/tabs.js puts the flag in the URL
+// when it empties the pane and on the rail's Home link while nothing is open.
 $kanban_restore_id = intval($_GET['kanban'] ?? 0);
-if ($kanban_restore_id > 0 && empty($note)) {
+$blank_note_pane = ($_GET['blank'] ?? '') === '1';
+if (($kanban_restore_id > 0 || $blank_note_pane) && empty($note)) {
     $note_load_result = [];
 } else {
     $note_load_result = loadNoteData($con, $note, $workspace_filter);

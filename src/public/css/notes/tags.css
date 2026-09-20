@@ -53,7 +53,7 @@
 }
 
 .folder-path-segment:hover {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     text-decoration: underline;
 }
 
@@ -153,7 +153,7 @@
 }
 
 .clickable-tag {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     padding: 4px 8px 4px 8px;
     font-size: 13px;
     cursor: pointer;
@@ -163,16 +163,16 @@
 }
 
 .clickable-tag:hover {
-    color: var(--pz-accent-hover);
+    color: var(--pz-accent-text-hover);
     text-decoration: none;
 }
 
 .clickable-tag:visited {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .clickable-tag:hover:visited {
-    color: var(--pz-accent-hover);
+    color: var(--pz-accent-text-hover);
 }
 
 /* Color dot for tags that have a color set (see js/clickable-tags.js).
@@ -201,7 +201,7 @@
 }
 
 .tag-delete-button:hover {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 /* Tag Highlight state */
@@ -285,7 +285,7 @@
 
 .tags-modal-item-name {
     font-size: 14px;
-    color: var(--pz-text);
+    color: var(--pz-text-strong);
     flex-grow: 1;
     margin-right: 10px;
     outline: none;
@@ -296,7 +296,7 @@
 
 .tags-modal-item-name:focus {
     background: rgba(59, 130, 246, 0.1);
-    box-shadow: 0 0 0 1px var(--pz-accent);
+    box-shadow: 0 0 0 1px var(--pz-accent-text);
 }
 
 .tags-modal-item-delete {
@@ -307,7 +307,7 @@
 }
 
 .tags-modal-item-delete:hover {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
 }
 
 .tags-modal-input-wrapper {
@@ -326,27 +326,27 @@
 }
 
 #tagsModalInput:focus {
-    border-color: var(--pz-accent);
+    border-color: var(--pz-accent-text);
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
 
 /* Dark Mode support for Tags Modal */
 html[data-theme='dark'] .tags-modal-item {
-    background: var(--dm-content-bg);
-    border-color: var(--dm-border);
+    background: var(--pz-bg);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .tags-modal-item-name {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .tags-modal-item-name:focus {
-    background: rgba(var(--dm-accent-rgb), 0.2);
-    box-shadow: 0 0 0 1px var(--dm-accent);
+    background: rgba(var(--pz-accent-text-rgb), 0.2);
+    box-shadow: 0 0 0 1px var(--pz-accent-text);
 }
 
 html[data-theme='dark'] #tagsModalInput {
-    background: var(--dm-content-bg);
-    border-color: var(--dm-border);
-    color: var(--dm-text-bright);
+    background: var(--pz-bg);
+    border-color: var(--pz-border);
+    color: var(--pz-text-strong);
 }

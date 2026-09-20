@@ -124,7 +124,7 @@ $allBackupUsers = listAllUserProfiles();
     /* Sticky header: needs border-collapse:separate (above) and a solid
        background, otherwise the scrolling rows show through it */
     .s3-backup-table thead th { position: sticky; top: 0; z-index: 1; background: #fff; }
-    body.dark-mode .s3-backup-table thead th { background: var(--dm-bg); }
+    body.dark-mode .s3-backup-table thead th { background: var(--pz-chrome-bg); }
     /* Every cell stays on one line; the wrapper scrolls sideways when the
        archive names are too long rather than wrapping them over two rows */
     .s3-backup-table th, .s3-backup-table td { white-space: nowrap; }
@@ -134,7 +134,7 @@ $allBackupUsers = listAllUserProfiles();
        archive names push the table into horizontal scrolling. */
     .s3-backup-table th:last-child, .s3-backup-table td.s3-backup-actions-cell { text-align: right; position: sticky; right: 0; background: #fff; }
     body.dark-mode .s3-backup-table th:last-child,
-    body.dark-mode .s3-backup-table td.s3-backup-actions-cell { background: var(--dm-bg); }
+    body.dark-mode .s3-backup-table td.s3-backup-actions-cell { background: var(--pz-chrome-bg); }
     /* The pinned header corner must outrank both sticky axes */
     .s3-backup-table thead th:last-child { z-index: 2; }
     /* Sortable headers, mirroring the .users-sort-link look from users.css

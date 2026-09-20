@@ -98,6 +98,29 @@ function getStoredActiveTabContext(workspace) {
     return null;
 }
 
+/**
+ * True when this workspace has a stored tab state holding no tab at all: the
+ * user closed every note pane tab, so index.php must be told to leave the
+ * pane empty (blank=1) rather than fall back to the last edited note, which
+ * would come back with no tab to close it (issue #1462). A browser that
+ * stored nothing yet is a first visit, and keeps the fallback.
+ * @param {string} workspace
+ * @returns {boolean}
+ */
+function hasEmptyStoredTabs(workspace) {
+    try {
+        var raw = localStorage.getItem(window.__poznoteTabsStorageKey(workspace || 'default'));
+        if (!raw) return false;
+
+        var data = JSON.parse(raw);
+        return !!data && Array.isArray(data.tabs) && data.tabs.length === 0;
+    } catch (e) {
+        // Storage may be unavailable in private mode.
+        console.debug('navigation: hasEmptyStoredTabs() failed:', e);
+        return false;
+    }
+}
+
 function getBackToNotesUrl() {
     var pageWorkspace = getPageWorkspace();
     var workspace = getEffectiveWorkspace(pageWorkspace);
@@ -111,6 +134,8 @@ function getBackToNotesUrl() {
         params.note = context.noteId;
     } else if (context && context.type === 'kanban' && context.folderId) {
         params.kanban = context.folderId;
+    } else if (hasEmptyStoredTabs(workspace)) {
+        params.blank = '1';
     }
 
     return buildUrl('index.php', params);
@@ -171,6 +196,7 @@ window.getPageWorkspace = getPageWorkspace;
 window.getEffectiveWorkspace = getEffectiveWorkspace;
 window.buildUrl = buildUrl;
 window.getStoredActiveTabContext = getStoredActiveTabContext;
+window.hasEmptyStoredTabs = hasEmptyStoredTabs;
 window.getBackToNotesUrl = getBackToNotesUrl;
 window.goBackToNotes = goBackToNotes;
 window.goBackToNote = goBackToNote;
@@ -181,5 +207,20 @@ document.addEventListener('DOMContentLoaded', function () {
     var backToNotesLink = document.getElementById('backToNotesLink');
     if (backToNotesLink) {
         backToNotesLink.href = getBackToNotesUrl();
+    }
+
+    // The rail's Home link is rendered server-side as a plain index.php link,
+    // where the note pane falls back to the last edited note. While every tab
+    // is closed that pane must stay empty (issue #1462), which only the
+    // browser knows about: carry the flag on the link.
+    var homeLink = document.getElementById('iconSidebarHomeBtn');
+    if (homeLink && homeLink.tagName === 'A' && hasEmptyStoredTabs(getEffectiveWorkspace(getPageWorkspace()))) {
+        try {
+            var homeUrl = new URL(homeLink.getAttribute('href') || 'index.php', window.location.href);
+            homeUrl.searchParams.set('blank', '1');
+            homeLink.setAttribute('href', homeUrl.pathname + homeUrl.search);
+        } catch (e) {
+            console.debug('navigation: home link update failed:', e);
+        }
     }
 });

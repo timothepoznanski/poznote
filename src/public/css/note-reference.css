@@ -69,7 +69,7 @@
 }
 
 .note-reference-modal-content h3 i {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 .note-reference-description {
@@ -239,7 +239,7 @@
 /* Internal note links in content */
 a.note-internal-link,
 span.note-internal-link {
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     text-decoration: none;
     padding: 0 2px;
     border-radius: var(--pz-radius-sm);
@@ -264,17 +264,17 @@ a.note-internal-link:hover {
 
 /* Dark mode adjustments */
 html[data-theme='dark'] .note-reference-modal-content {
-    background-color: var(--dm-content-bg, var(--dm-content-bg));
+    background-color: var(--pz-bg);
 }
 
 html[data-theme='dark'] .note-reference-modal-header h3 {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .note-reference-search-input {
-    background: var(--dm-surface, var(--dm-surface));
-    border-color: var(--dm-border, var(--dm-border));
-    color: var(--dm-text-bright);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .note-reference-search-input:focus {
@@ -283,9 +283,9 @@ html[data-theme='dark'] .note-reference-search-input:focus {
 }
 
 html[data-theme='dark'] .note-reference-search input {
-    background: var(--dm-surface, var(--dm-surface));
-    border-color: var(--dm-border, var(--dm-border));
-    color: var(--dm-text-bright);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .note-reference-search input:focus {
@@ -294,12 +294,12 @@ html[data-theme='dark'] .note-reference-search input:focus {
 }
 
 html[data-theme='dark'] .note-reference-list {
-    border-color: var(--dm-border);
-    background-color: var(--dm-surface);
+    border-color: var(--pz-border);
+    background-color: var(--pz-surface);
 }
 
 html[data-theme='dark'] .note-reference-item {
-    border-bottom-color: var(--dm-border);
+    border-bottom-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .note-reference-item:hover {
@@ -307,23 +307,23 @@ html[data-theme='dark'] .note-reference-item:hover {
 }
 
 html[data-theme='dark'] .note-reference-item-title {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .note-reference-heading {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .note-reference-icon {
-    color: var(--dm-text-subtle);
+    color: var(--pz-text-subtle);
 }
 
 html[data-theme='dark'] .note-reference-item-folder {
-    color: var(--dm-text-subtle);
+    color: var(--pz-text-subtle);
 }
 
 html[data-theme='dark'] a.note-internal-link {
-    color: var(--dm-accent-hover);
+    color: var(--pz-accent-text-hover);
 }
 
 html[data-theme='dark'] a.note-internal-link:hover {

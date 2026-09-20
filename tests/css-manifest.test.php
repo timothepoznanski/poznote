@@ -74,7 +74,7 @@ test('every page loads the whole dark layer, not a slice of it', function () {
 });
 
 test('a page using the dark layer also loads the tokens it reads', function () {
-    // dark-mode/*.css consume --dm-* from css/tokens.css. Order does not matter,
+    // dark-mode/*.css consume the tokens of css/tokens.css. Order does not matter,
     // custom properties resolve at computed-value time wherever they are
     // declared, but a page that loads the dark layer without the tokens gets a
     // dark theme made of unresolved var() and renders unstyled.

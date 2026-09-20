@@ -8,13 +8,13 @@
 
 /* Dark mode - base */
 html[data-theme='dark'] .home-page {
-    background: var(--dm-content-bg);
+    background: var(--pz-bg);
 }
 
 /* Dark mode - cards */
 html[data-theme='dark'] .home-card {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
 }
 
 html[data-theme='dark'] .home-card:hover {
@@ -27,15 +27,15 @@ html[data-theme='dark'] .home-card-icon {
 
 /* Dark mode - debug info */
 html[data-theme='dark'] .debug-info {
-    background: var(--dm-sidebar-surface);
-    border-color: var(--dm-border);
-    color: var(--dm-text);
+    background: var(--pz-sidebar-surface);
+    border-color: var(--pz-border);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .debug-info h4 {
-    color: var(--dm-text);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .debug-info pre {
-    color: var(--dm-text-muted);
+    color: var(--pz-text-muted);
 }

@@ -86,7 +86,7 @@ function parseDiaryLongDateTitle(string $heading): ?string {
  * Only date tokens are offered. A diary title designates a day, so a time part
  * would make two entries of the same day look like different days.
  *
- * Names (dddd, MMMM, MMM) are in the user's language: their 'php' is a
+ * Names (dddd, ddd, MMMM, MMM) are in the user's language: their 'php' is a
  * placeholder swapped for the name by applyDateNameTokens() (lib/datetime.php).
  * The weekday is decoration, the day is rebuilt from year, month and day.
  */
@@ -98,6 +98,7 @@ function getDiaryDateCustomTokens(): array {
         'MMM'  => ['php' => DATE_NAME_MONTH_SHORT, 'regex' => '(?<ms>' . dateNamesAlternation('short') . ')', 'part' => 'm'],
         'MM'   => ['php' => 'm', 'regex' => '(?<m>\d{2})', 'part' => 'm'],
         'dddd' => ['php' => DATE_NAME_WEEKDAY, 'regex' => dateNamesAlternation('days'), 'part' => 'w'],
+        'ddd'  => ['php' => DATE_NAME_WEEKDAY_SHORT, 'regex' => dateNamesAlternation('days_short'), 'part' => 'w'],
         'DD'   => ['php' => 'd', 'regex' => '(?<d>\d{2})', 'part' => 'd'],
         'D'    => ['php' => 'j', 'regex' => '(?<d>\d{1,2})', 'part' => 'd'],
     ];

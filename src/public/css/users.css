@@ -15,12 +15,12 @@
 }
 
 html[data-theme='dark'] {
-    --bg-color: var(--dm-bg);
-    --bg-secondary: var(--dm-surface);
-    --bg-hover: var(--dm-surface-hover);
-    --text-color: var(--dm-text);
-    --text-muted: var(--dm-text-muted);
-    --border-color: var(--dm-border);
+    --bg-color: var(--pz-chrome-bg);
+    --bg-secondary: var(--pz-surface);
+    --bg-hover: var(--pz-surface-hover);
+    --text-color: var(--pz-text);
+    --text-muted: var(--pz-text-muted);
+    --border-color: var(--pz-border);
 }
 
 .admin-container {
@@ -234,7 +234,7 @@ html[data-theme='dark'] {
 }
 
 html[data-theme='dark'] .users-header-help {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .users-header-help:hover,
@@ -276,7 +276,7 @@ html[data-theme='dark'] .users-header-help:focus-visible {
 }
 
 html[data-theme='dark'] .users-table td {
-    color: var(--dm-text-bright);
+    color: var(--pz-text-strong);
 }
 
 /* User Info */
@@ -625,13 +625,13 @@ html[data-theme='dark'] .users-table td {
 }
 
 html[data-theme='dark'] .account-access-state {
-    background: rgba(220, 53, 69, 0.18);
-    color: var(--dm-danger);
+    background: color-mix(in srgb, var(--pz-danger) 18%, transparent);
+    color: var(--pz-danger-text);
 }
 
 html[data-theme='dark'] .account-access-own-label {
-    background: rgba(var(--dm-accent-rgb), 0.16);
-    color: var(--dm-accent-hover);
+    background: rgba(var(--pz-accent-text-rgb), 0.16);
+    color: var(--pz-accent-text-hover);
 }
 
 .modal-title {
@@ -672,8 +672,8 @@ html[data-theme='dark'] .account-access-own-label {
 .form-group input:not([type="checkbox"]):focus,
 .form-group select:focus {
     outline: none;
-    border-color: var(--pz-accent);
-    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
+    border-color: var(--pz-accent-text);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-text-rgb), 0.1);
 }
 
 .form-actions {
@@ -732,7 +732,7 @@ html[data-theme='dark'] .account-access-own-label {
 }
 
 .delete-warning {
-    color: var(--pz-danger);
+    color: var(--pz-danger-text);
     font-weight: var(--pz-weight-medium);
     margin-top: 15px;
 }
@@ -757,7 +757,7 @@ html[data-theme='dark'] .account-access-own-label {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
     text-decoration: none;
     margin-bottom: 20px;
 }
@@ -909,21 +909,21 @@ input:disabled+.slider {
     }
 
     html[data-theme='dark'] .actions-center .btn-secondary {
-        background: var(--dm-surface-hover);
-        color: var(--dm-text-bright);
+        background: var(--pz-surface-hover);
+        color: var(--pz-text-strong);
     }
 
     html[data-theme='dark'] .actions-center .btn-secondary:hover {
-        background: var(--dm-surface-raised);
+        background: var(--pz-surface-sunken);
     }
 
     html[data-theme='dark'] .actions-center .btn-danger {
-        background: var(--dm-danger-hover);
+        background: var(--pz-danger-text-hover);
         color: var(--pz-text-inverse);
     }
 
     html[data-theme='dark'] .actions-center .btn-danger:hover {
-        background: var(--dm-danger-hover);
+        background: var(--pz-danger-text-hover);
     }
 
     .modal-content {
