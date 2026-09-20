@@ -169,7 +169,13 @@
        colour mixed into the page background, so they stay pale on a light
        theme and dark on a dark one, and follow a theme that only sets the base
        colour. Tune the strength with --pz-color-soft-mix. Override these on
-       :root, where the mix is computed, not on a descendant. */
+       :root, where the mix is computed, not on a descendant.
+
+       Yellow has a mix of its own, --pz-color-yellow-soft-mix. It is the
+       highlighter (== in markdown, /highlight, <mark>), and the lightest colour
+       of the palette: at the strength of the others it is a cream that a white
+       page swallows (discussion #1451). 65% is the old #ffe066 marker again,
+       with the note text still at 8:1 on it. */
     --pz-color-red: #dc2626;
     --pz-color-orange: #ea580c;
     --pz-color-amber: #d97706;
@@ -185,11 +191,12 @@
     --pz-color-pink: #db2777;
     --pz-color-brown: #92400e;
     --pz-color-gray: #6b7280;
-    --pz-color-soft-mix: 30%;
+    --pz-color-soft-mix: 50%;
+    --pz-color-yellow-soft-mix: 65%;
     --pz-color-red-soft: color-mix(in srgb, var(--pz-color-red) var(--pz-color-soft-mix), var(--pz-bg));
     --pz-color-orange-soft: color-mix(in srgb, var(--pz-color-orange) var(--pz-color-soft-mix), var(--pz-bg));
     --pz-color-amber-soft: color-mix(in srgb, var(--pz-color-amber) var(--pz-color-soft-mix), var(--pz-bg));
-    --pz-color-yellow-soft: color-mix(in srgb, var(--pz-color-yellow) var(--pz-color-soft-mix), var(--pz-bg));
+    --pz-color-yellow-soft: color-mix(in srgb, var(--pz-color-yellow) var(--pz-color-yellow-soft-mix), var(--pz-bg));
     --pz-color-lime-soft: color-mix(in srgb, var(--pz-color-lime) var(--pz-color-soft-mix), var(--pz-bg));
     --pz-color-green-soft: color-mix(in srgb, var(--pz-color-green) var(--pz-color-soft-mix), var(--pz-bg));
     --pz-color-teal-soft: color-mix(in srgb, var(--pz-color-teal) var(--pz-color-soft-mix), var(--pz-bg));
@@ -335,6 +342,7 @@ html[data-theme='dark'] {
     --pz-color-brown: #c8a27a;
     --pz-color-gray: #9ca3af;
     --pz-color-soft-mix: 25%;
+    --pz-color-yellow-soft-mix: var(--pz-color-soft-mix);
 
     /* The light tokens, switched for this theme.
 
