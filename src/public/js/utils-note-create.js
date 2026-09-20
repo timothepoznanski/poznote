@@ -166,12 +166,166 @@ function openCreatedNoteWithInternalTabs(noteId, noteTitle, folderId) {
     });
 }
 
+var FOCUS_CREATED_NOTE_TITLE_KEY = 'poznote_focus_created_note_title';
+
+// A request older than this is stale: the note it named never opened (the
+// creation failed, the tab was closed), and the next note to open must not
+// inherit the focus meant for it.
+var FOCUS_CREATED_NOTE_TITLE_MAX_AGE_MS = 30000;
+
+/**
+ * Ask for the title of a note that was just created to take the focus once it
+ * is on screen (discussion 1448), so its name can be typed right away.
+ *
+ * The note opens after the request that created it, and the way it gets there
+ * differs (a new internal tab, a full page load from create.php or a phone),
+ * so the request outlives the current page in sessionStorage and is consumed
+ * by whichever load puts that note in the DOM.
+ * @param {string|number} noteId - The note that was just created
+ */
+function requestCreatedNoteTitleFocus(noteId) {
+    if (!noteId) return;
+
+    try {
+        sessionStorage.setItem(FOCUS_CREATED_NOTE_TITLE_KEY, JSON.stringify({
+            noteId: String(noteId),
+            at: Date.now()
+        }));
+    } catch (error) {
+        // Ignore storage errors: the note still opens, just without the focus.
+        console.debug('utils-note-create: requestCreatedNoteTitleFocus() failed:', error);
+    }
+}
+
+function clearCreatedNoteTitleFocusRequest() {
+    try {
+        sessionStorage.removeItem(FOCUS_CREATED_NOTE_TITLE_KEY);
+    } catch (error) {
+        console.debug('utils-note-create: clearCreatedNoteTitleFocusRequest() failed:', error);
+    }
+}
+
+/**
+ * The note id a pending focus request names, or null when there is none left.
+ */
+function readCreatedNoteTitleFocusRequest() {
+    var raw = null;
+
+    try {
+        raw = sessionStorage.getItem(FOCUS_CREATED_NOTE_TITLE_KEY);
+    } catch (error) {
+        return null;
+    }
+
+    if (!raw) return null;
+
+    var request = null;
+    try {
+        request = JSON.parse(raw);
+    } catch (error) {
+        clearCreatedNoteTitleFocusRequest();
+        return null;
+    }
+
+    if (!request || !request.noteId) {
+        clearCreatedNoteTitleFocusRequest();
+        return null;
+    }
+
+    var age = Date.now() - (typeof request.at === 'number' ? request.at : 0);
+    if (!isFinite(age) || age < 0 || age > FOCUS_CREATED_NOTE_TITLE_MAX_AGE_MS) {
+        clearCreatedNoteTitleFocusRequest();
+        return null;
+    }
+
+    return String(request.noteId);
+}
+
+/**
+ * Put the caret in the title of the note a pending request names, if that note
+ * is the one now on screen. Does nothing when there is no request, or when the
+ * note it named is not the one that just loaded.
+ * @returns {boolean} true when the title took the focus
+ */
+function focusCreatedNoteTitle() {
+    var noteId = readCreatedNoteTitleFocusRequest();
+    if (!noteId) return false;
+
+    var titleInput = document.getElementById('inp' + noteId);
+    if (!titleInput) {
+        // Another note is on screen: the created one is still on its way
+        // (the desktop reload opens it in a tab once tabManager is up).
+        return false;
+    }
+
+    // A note that just loaded holds its title read-only while the edit lock is
+    // being checked (js/note-edit-lock.js). The request is kept: the
+    // noteEditUnlocked that ends the check brings us back here.
+    if (titleInput.readOnly || titleInput.disabled) {
+        return false;
+    }
+
+    clearCreatedNoteTitleFocusRequest();
+
+    // The title of a note that still carries the default heading is rendered
+    // empty (note_display.php). A note created with a name of its own, from a
+    // broken link for instance, is opened to be read, not renamed.
+    if (titleInput.value !== '') {
+        return false;
+    }
+
+    // The note can land while the user is already typing somewhere else.
+    var active = document.activeElement;
+    if (active && active !== titleInput && (active.isContentEditable
+        || active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT')) {
+        return false;
+    }
+
+    try {
+        titleInput.focus({ preventScroll: true });
+    } catch (error) {
+        titleInput.focus();
+    }
+
+    return true;
+}
+
+/**
+ * Same, but out of the way of the slide that brings the note pane in on a
+ * phone (index-events.js checkAndScrollToNote): focusing mid-slide has the
+ * browser scroll the input into view and fight the animation.
+ */
+function scheduleCreatedNoteTitleFocus() {
+    if (window.innerWidth > 800) {
+        focusCreatedNoteTitle();
+        return;
+    }
+
+    window.setTimeout(focusCreatedNoteTitle, 400);
+}
+
+// A note opened over AJAX (an internal tab) announces itself; a note rendered
+// by the page itself is already there when the document is ready. Either way
+// its title only takes the focus once the edit lock has been checked.
+document.addEventListener('noteLoaded', scheduleCreatedNoteTitleFocus);
+document.addEventListener('noteEditUnlocked', scheduleCreatedNoteTitleFocus);
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', scheduleCreatedNoteTitleFocus);
+} else {
+    // Deferred bundles run with the document parsed but before the rest of the
+    // page sets itself up: let that finish rather than take a focus it may
+    // still move.
+    window.setTimeout(scheduleCreatedNoteTitleFocus, 0);
+}
+
 function navigateToCreatedNoteInInternalTab(noteId, noteTitle, workspaceName, folderId) {
     if (!noteId) {
         return Promise.resolve(false);
     }
 
     rememberFolderStatesForCreatedNote(folderId);
+    requestCreatedNoteTitleFocus(noteId);
 
     var workspace = normalizeCreatedNoteWorkspace(workspaceName);
 

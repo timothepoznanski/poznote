@@ -90,6 +90,52 @@ function handleTagsBlur(e) {
 }
 
 /**
+ * Move the caret from a note title down into the body of that same note.
+ *
+ * Where that is depends on the note: a markdown note writes in the editor
+ * inside its .noteentry rather than the element itself, and out of reach while
+ * the note shows its preview, and a task list writes in its new-task field.
+ * @param {HTMLElement} titleInput - The .css-title input of the note
+ * @returns {boolean} true when the caret left the title
+ */
+function focusNoteBodyFromTitle(titleInput) {
+    var noteId = titleInput && titleInput.id ? titleInput.id.replace(/^inp/, '') : '';
+    var noteEntry = noteId ? document.getElementById('entry' + noteId) : null;
+    if (!noteEntry) {
+        noteEntry = document.querySelector('.noteentry');
+    }
+    if (!noteEntry) return false;
+
+    var noteType = noteEntry.getAttribute('data-note-type');
+
+    if (noteType === 'markdown') {
+        var editorDiv = noteEntry.querySelector('.markdown-editor');
+        if (!editorDiv || !editorDiv.getClientRects().length) return false;
+
+        var codeMirror = window.PoznoteMarkdownCodeMirror;
+        if (codeMirror && typeof codeMirror.isCodeMirrorEditor === 'function'
+            && codeMirror.isCodeMirrorEditor(editorDiv) && typeof codeMirror.focus === 'function') {
+            codeMirror.focus(editorDiv);
+            return true;
+        }
+
+        editorDiv.focus();
+        return true;
+    }
+
+    if (noteType === 'tasklist') {
+        var taskInput = noteEntry.querySelector('.task-input');
+        if (!taskInput || taskInput.disabled || !taskInput.getClientRects().length) return false;
+
+        taskInput.focus();
+        return true;
+    }
+
+    noteEntry.focus();
+    return true;
+}
+
+/**
  * Handle title field keyboard shortcuts
  * Enter: Move to note content, Escape: Blur field
  * @param {Event} e - The keyboard event
@@ -101,13 +147,12 @@ function handleTitleKeydown(e) {
         if (window.updateidhead) {
             window.updateidhead(e.target);
         }
-        // Immediate save for title changes (no debounce)
-        if (typeof window.saveNoteToServer === 'function') {
+        // Leaving the field saves it immediately (handleTitleBlur), so only a
+        // caret that stays put still needs a save here: sending both made the
+        // same note two PATCH calls, the second one on a version the first had
+        // just replaced (409).
+        if (!focusNoteBodyFromTitle(e.target) && typeof window.saveNoteToServer === 'function') {
             window.saveNoteToServer();
-        }
-        var noteentry = document.querySelector('.noteentry');
-        if (noteentry) {
-            noteentry.focus();
         }
     } else if (e.key === 'Escape') {
         // Update noteid before blur triggers save
