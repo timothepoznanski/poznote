@@ -1705,7 +1705,7 @@
         "custom": "Personalizado"
       },
       "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
-      "custom_hint": "Tokens: YYYY, MMMM, MMM, MM, dddd, DD, D, HH, h, hh, mm, ss, A",
+      "custom_hint": "Tokens: YYYY, MMMM, MMM, MM, dddd, ddd, DD, D, HH, h, hh, mm, ss, A",
       "custom_invalid": "Insira um formato personalizado válido.",
       "tokens_title": "Tokens:",
       "tokens": {
@@ -1714,6 +1714,7 @@
         "MMM": "nome do mês abreviado (set)",
         "MM": "mês (08)",
         "dddd": "dia da semana (Sábado)",
+        "ddd": "dia da semana abreviado (Sáb)",
         "DD": "dia (16)",
         "D": "dia sem zero à esquerda (5)",
         "HH": "hora, 24 h (14)",
@@ -1749,7 +1750,7 @@
         "custom": "Personalizado"
       },
       "custom_placeholder": "DD MMMM YYYY",
-      "custom_hint": "Tokens: YYYY, YY, MMMM, MMM, MM, dddd, DD, D. São obrigatórios um ano, um mês e um dia.",
+      "custom_hint": "Tokens: YYYY, YY, MMMM, MMM, MM, dddd, ddd, DD, D. São obrigatórios um ano, um mês e um dia.",
       "custom_invalid": "Introduza um formato personalizado válido, com um ano, um mês e um dia.",
       "hint": "As entradas existentes mantêm o título e continuam associadas ao seu dia.",
       "tokens_title": "Tokens:",
@@ -1760,6 +1761,7 @@
         "MMM": "nome do mês abreviado (set)",
         "MM": "mês (08)",
         "dddd": "dia da semana (Sábado)",
+        "ddd": "dia da semana abreviado (Sáb)",
         "DD": "dia (05)",
         "D": "dia sem zero à esquerda (5)"
       },

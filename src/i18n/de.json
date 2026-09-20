@@ -1705,7 +1705,7 @@
         "custom": "Benutzerdefiniert"
       },
       "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
-      "custom_hint": "Tokens: YYYY, MMMM, MMM, MM, dddd, DD, D, HH, h, hh, mm, ss, A",
+      "custom_hint": "Tokens: YYYY, MMMM, MMM, MM, dddd, ddd, DD, D, HH, h, hh, mm, ss, A",
       "custom_invalid": "Geben Sie ein gültiges benutzerdefiniertes Format ein.",
       "tokens_title": "Token:",
       "tokens": {
@@ -1714,6 +1714,7 @@
         "MMM": "kurzer Monatsname (Sept.)",
         "MM": "Monat (08)",
         "dddd": "Wochentag (Samstag)",
+        "ddd": "kurzer Wochentag (Sa.)",
         "DD": "Tag (16)",
         "D": "Tag ohne führende Null (5)",
         "HH": "Stunde, 24 h (14)",
@@ -1749,7 +1750,7 @@
         "custom": "Benutzerdefiniert"
       },
       "custom_placeholder": "DD MMMM YYYY",
-      "custom_hint": "Token: YYYY, YY, MMMM, MMM, MM, dddd, DD, D. Jahr, Monat und Tag sind erforderlich.",
+      "custom_hint": "Token: YYYY, YY, MMMM, MMM, MM, dddd, ddd, DD, D. Jahr, Monat und Tag sind erforderlich.",
       "custom_invalid": "Geben Sie ein gültiges benutzerdefiniertes Format mit Jahr, Monat und Tag ein.",
       "hint": "Bestehende Einträge behalten ihren Titel und bleiben ihrem Tag zugeordnet.",
       "tokens_title": "Token:",
@@ -1760,6 +1761,7 @@
         "MMM": "kurzer Monatsname (Sept.)",
         "MM": "Monat (08)",
         "dddd": "Wochentag (Samstag)",
+        "ddd": "kurzer Wochentag (Sa.)",
         "DD": "Tag (05)",
         "D": "Tag ohne führende Null (5)"
       },

@@ -1697,7 +1697,7 @@
         "custom": "自定义"
       },
       "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
-      "custom_hint": "标记：YYYY、MMMM、MMM、MM、dddd、DD、D、HH、h、hh、mm、ss、A",
+      "custom_hint": "标记：YYYY、MMMM、MMM、MM、dddd、ddd、DD、D、HH、h、hh、mm、ss、A",
       "custom_invalid": "请输入有效的自定义格式。",
       "tokens_title": "占位符：",
       "tokens": {
@@ -1706,6 +1706,7 @@
         "MMM": "月份简称 (9月)",
         "MM": "月 (08)",
         "dddd": "星期 (星期六)",
+        "ddd": "星期简称 (周六)",
         "DD": "日 (16)",
         "D": "日，不补零 (5)",
         "HH": "小时，24 小时制 (14)",
@@ -1741,7 +1742,7 @@
         "custom": "自定义"
       },
       "custom_placeholder": "DD MMMM YYYY",
-      "custom_hint": "可用标记：YYYY、YY、MMMM、MMM、MM、dddd、DD、D。必须包含年、月和日。",
+      "custom_hint": "可用标记：YYYY、YY、MMMM、MMM、MM、dddd、ddd、DD、D。必须包含年、月和日。",
       "custom_invalid": "请输入有效的自定义格式，需包含年、月和日。",
       "hint": "已有条目保留原标题，并仍与其日期关联。",
       "tokens_title": "占位符：",
@@ -1752,6 +1753,7 @@
         "MMM": "月份简称 (9月)",
         "MM": "月 (08)",
         "dddd": "星期 (星期六)",
+        "ddd": "星期简称 (周六)",
         "DD": "日 (05)",
         "D": "日，不补零 (5)"
       },

@@ -1225,7 +1225,7 @@
         "custom": "Custom"
       },
       "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
-      "custom_hint": "Tokens: YYYY, MMMM, MMM, MM, dddd, DD, D, HH, h, hh, mm, ss, A",
+      "custom_hint": "Tokens: YYYY, MMMM, MMM, MM, dddd, ddd, DD, D, HH, h, hh, mm, ss, A",
       "custom_invalid": "Enter a valid custom format.",
       "tokens_title": "Tokens:",
       "tokens": {
@@ -1234,6 +1234,7 @@
         "MMM": "short month name (Sep)",
         "MM": "month (08)",
         "dddd": "weekday name (Saturday)",
+        "ddd": "short weekday name (Sat)",
         "DD": "day (16)",
         "D": "day without leading zero (5)",
         "HH": "hour, 24h (14)",
@@ -1269,7 +1270,7 @@
         "custom": "Custom"
       },
       "custom_placeholder": "DD MMMM YYYY",
-      "custom_hint": "Tokens: YYYY, YY, MMMM, MMM, MM, dddd, DD, D. A year, a month and a day are required.",
+      "custom_hint": "Tokens: YYYY, YY, MMMM, MMM, MM, dddd, ddd, DD, D. A year, a month and a day are required.",
       "custom_invalid": "Enter a valid custom format, with a year, a month and a day.",
       "hint": "Existing entries keep their title and stay linked to their day.",
       "tokens_title": "Tokens:",
@@ -1280,6 +1281,7 @@
         "MMM": "short month name (Sep)",
         "MM": "month (08)",
         "dddd": "weekday name (Saturday)",
+        "ddd": "short weekday name (Sat)",
         "DD": "day (05)",
         "D": "day without leading zero (5)"
       },

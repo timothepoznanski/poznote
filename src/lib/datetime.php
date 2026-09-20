@@ -78,7 +78,7 @@ function getUserTimezone() {
 
 /**
  * Day and month names per app language, for the 'long' formats (with their
- * layout) and the dddd/MMMM/MMM custom tokens of the diary and date & time
+ * layout) and the dddd/ddd/MMMM/MMM custom tokens of the diary and date & time
  * formats. PHP has no locale-aware date() and the images ship without intl,
  * so the names live here, mirrored in js/date-time-format.js. Layout: {wd}
  * weekday, {month} month name, {m} month number, {d} day, {y} year. Names are
@@ -87,47 +87,54 @@ function getUserTimezone() {
 function getDateNameLocales(): array {
     return [
         'en' => [
-            'layout' => '{wd}, {month} {d}, {y}',
-            'days'   => ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-            'months' => ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-            'short'  => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            'layout'     => '{wd}, {month} {d}, {y}',
+            'days'       => ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+            'days_short' => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+            'months'     => ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+            'short'      => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         ],
         'fr' => [
-            'layout' => '{wd} {d} {month} {y}',
-            'days'   => ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
-            'months' => ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
-            'short'  => ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'],
+            'layout'     => '{wd} {d} {month} {y}',
+            'days'       => ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+            'days_short' => ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'],
+            'months'     => ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
+            'short'      => ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'],
         ],
         'de' => [
-            'layout' => '{wd}, {d}. {month} {y}',
-            'days'   => ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'],
-            'months' => ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
-            'short'  => ['Jan.', 'Feb.', 'März', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.', 'Sept.', 'Okt.', 'Nov.', 'Dez.'],
+            'layout'     => '{wd}, {d}. {month} {y}',
+            'days'       => ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'],
+            'days_short' => ['So.', 'Mo.', 'Di.', 'Mi.', 'Do.', 'Fr.', 'Sa.'],
+            'months'     => ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+            'short'      => ['Jan.', 'Feb.', 'März', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.', 'Sept.', 'Okt.', 'Nov.', 'Dez.'],
         ],
         'es' => [
-            'layout' => '{wd}, {d} de {month} de {y}',
-            'days'   => ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
-            'months' => ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
-            'short'  => ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sept', 'oct', 'nov', 'dic'],
+            'layout'     => '{wd}, {d} de {month} de {y}',
+            'days'       => ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+            'days_short' => ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+            'months'     => ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
+            'short'      => ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sept', 'oct', 'nov', 'dic'],
         ],
         'pt' => [
-            'layout' => '{wd}, {d} de {month} de {y}',
-            'days'   => ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'],
-            'months' => ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'],
-            'short'  => ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'],
+            'layout'     => '{wd}, {d} de {month} de {y}',
+            'days'       => ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'],
+            'days_short' => ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+            'months'     => ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'],
+            'short'      => ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'],
         ],
         'ru' => [
             // Month names in the genitive, as a date uses them
-            'layout' => '{wd}, {d} {month} {y} г.',
-            'days'   => ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
-            'months' => ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'],
-            'short'  => ['янв.', 'февр.', 'мар.', 'апр.', 'мая', 'июн.', 'июл.', 'авг.', 'сент.', 'окт.', 'нояб.', 'дек.'],
+            'layout'     => '{wd}, {d} {month} {y} г.',
+            'days'       => ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+            'days_short' => ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+            'months'     => ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'],
+            'short'      => ['янв.', 'февр.', 'мар.', 'апр.', 'мая', 'июн.', 'июл.', 'авг.', 'сент.', 'окт.', 'нояб.', 'дек.'],
         ],
         'zh-cn' => [
-            'layout' => '{y}年{m}月{d}日{wd}',
-            'days'   => ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
-            'months' => ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
-            'short'  => ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+            'layout'     => '{y}年{m}月{d}日{wd}',
+            'days'       => ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
+            'days_short' => ['周日', '周一', '周二', '周三', '周四', '周五', '周六'],
+            'months'     => ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+            'short'      => ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
         ],
     ];
 }
@@ -143,7 +150,7 @@ function getDateNameLocale(string $lang): array {
 /**
  * Names of every app language in one regex alternation, case-insensitive:
  * a title keeps being recognized after the user switches language.
- * $kind is 'days', 'months' or 'short'.
+ * $kind is 'days', 'days_short', 'months' or 'short'.
  */
 function dateNamesAlternation(string $kind): string {
     static $cache = [];
@@ -181,22 +188,24 @@ const DATE_NAME_MONTH = "\x01";
 const DATE_NAME_MONTH_SHORT = "\x02";
 const DATE_NAME_WEEKDAY = "\x03";
 const DATE_NAME_LONG_DATE = "\x04";
+const DATE_NAME_WEEKDAY_SHORT = "\x05";
 
 /**
  * Replace the name placeholders of a formatted date with the names of $lang
  * (the user's language by default).
  */
 function applyDateNameTokens(string $formatted, DateTimeInterface $date, ?string $lang = null): string {
-    if (strpbrk($formatted, DATE_NAME_MONTH . DATE_NAME_MONTH_SHORT . DATE_NAME_WEEKDAY . DATE_NAME_LONG_DATE) === false) {
+    if (strpbrk($formatted, DATE_NAME_MONTH . DATE_NAME_MONTH_SHORT . DATE_NAME_WEEKDAY . DATE_NAME_WEEKDAY_SHORT . DATE_NAME_LONG_DATE) === false) {
         return $formatted;
     }
     $lang = $lang ?? (function_exists('getUserLanguage') ? (string)getUserLanguage() : 'en');
     $locale = getDateNameLocale($lang);
     return strtr($formatted, [
-        DATE_NAME_MONTH       => $locale['months'][(int)$date->format('n') - 1],
-        DATE_NAME_MONTH_SHORT => $locale['short'][(int)$date->format('n') - 1],
-        DATE_NAME_WEEKDAY     => $locale['days'][(int)$date->format('w')],
-        DATE_NAME_LONG_DATE   => formatLongDate($date, $lang),
+        DATE_NAME_MONTH         => $locale['months'][(int)$date->format('n') - 1],
+        DATE_NAME_MONTH_SHORT   => $locale['short'][(int)$date->format('n') - 1],
+        DATE_NAME_WEEKDAY       => $locale['days'][(int)$date->format('w')],
+        DATE_NAME_WEEKDAY_SHORT => $locale['days_short'][(int)$date->format('w')],
+        DATE_NAME_LONG_DATE     => formatLongDate($date, $lang),
     ]);
 }
 
@@ -240,6 +249,7 @@ function customDateTimePatternToPhpFormat($pattern) {
         'MMM' => DATE_NAME_MONTH_SHORT,
         'MM' => 'm',
         'dddd' => DATE_NAME_WEEKDAY,
+        'ddd' => DATE_NAME_WEEKDAY_SHORT,
         'DD' => 'd',
         'D' => 'j',
         'HH' => 'H',

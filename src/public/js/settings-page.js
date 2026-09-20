@@ -940,7 +940,7 @@
         if (!/^[A-Za-z0-9\s\/.,_\-()]+$/.test(value)) return false;
 
         // Longest token first, matching the PHP compiler's greedy scan.
-        var tokens = [['YYYY','y'], ['YY','y'], ['MMMM','m'], ['MMM','m'], ['MM','m'], ['dddd','w'], ['DD','d'], ['D','d']];
+        var tokens = [['YYYY','y'], ['YY','y'], ['MMMM','m'], ['MMM','m'], ['MM','m'], ['dddd','w'], ['ddd','w'], ['DD','d'], ['D','d']];
         var seen = {};
         for (var i = 0; i < value.length; i++) {
             for (var t = 0; t < tokens.length; t++) {

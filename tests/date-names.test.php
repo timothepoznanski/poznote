@@ -6,6 +6,7 @@ test('every shipped language has day and month names', function () {
     foreach (poznoteSupportedLanguages() as $lang) {
         assertTrue(isset($locales[$lang]), "no date names for '{$lang}'");
         assertSame(7, count($locales[$lang]['days']), $lang);
+        assertSame(7, count($locales[$lang]['days_short']), $lang);
         assertSame(12, count($locales[$lang]['months']), $lang);
         assertSame(12, count($locales[$lang]['short']), $lang);
     }
@@ -23,6 +24,11 @@ test('date & time name tokens and the long format use the given language', funct
     assertSame('Samedi 5 septembre 2026, 14:07', applyDateNameTokens($date->format($format), $date, 'fr'));
     assertSame('Saturday 5 September 2026, 14:07', applyDateNameTokens($date->format($format), $date, 'en'));
     assertSame('05 Sep 2026', applyDateNameTokens($date->format(customDateTimePatternToPhpFormat('DD MMM YYYY')), $date, 'en'));
+
+    // dddd is tried first, so ddd only wins where it stands alone
+    $short = customDateTimePatternToPhpFormat('ddd DD MMM YYYY');
+    assertSame('Sat 05 Sep 2026', applyDateNameTokens($date->format($short), $date, 'en'));
+    assertSame('Sam. 05 sept. 2026', applyDateNameTokens($date->format($short), $date, 'fr'));
 
     $long = getDateTimeFormatPatterns()['long'];
     assertSame('Samstag, 5. September 2026 14:07', applyDateNameTokens($date->format($long), $date, 'de'));
