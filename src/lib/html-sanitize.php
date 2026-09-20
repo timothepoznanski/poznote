@@ -223,7 +223,7 @@ function sanitizeHtml($html) {
         'p', 'br', 'div', 'span', 'a', 'strong', 'b', 'em', 'i', 'u', 's', 'strike',
         'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
         'ul', 'ol', 'li', 'dl', 'dt', 'dd',
-        'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td',
+        'table', 'caption', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td',
         'blockquote', 'pre', 'code', 'hr',
         'img', 'figure', 'figcaption',
         'details', 'summary',
@@ -264,7 +264,27 @@ function sanitizeHtml($html) {
     
     // Global allowed attributes (safe for all tags)
     $globalAllowedAttrs = ['id', 'class', 'style'];
-    
+
+    // Disallowed tags dropped with everything they contain: what is inside
+    // them is code, styling or form plumbing, never note text. Every other
+    // disallowed tag keeps its children (see the unwrap pass below).
+    $strippedTags = [
+        'script', 'style', 'noscript', 'template',
+        'object', 'embed', 'applet', 'param', 'canvas', 'map', 'area',
+        'frame', 'frameset', 'noframes',
+        'head', 'title', 'link', 'meta', 'base',
+        'select', 'option', 'optgroup', 'datalist', 'textarea'
+    ];
+
+    // Disallowed containers that hold real content: replaced by a <div> so
+    // their text keeps a line of its own instead of running into the
+    // neighbouring paragraph.
+    $blockLevelTags = [
+        'section', 'article', 'main', 'header', 'footer', 'nav',
+        'address', 'hgroup', 'form', 'fieldset', 'legend',
+        'center', 'dir', 'menu'
+    ];
+
     // Dangerous patterns to remove
     $dangerousPatterns = [
         // Remove javascript: protocol
@@ -313,12 +333,14 @@ function sanitizeHtml($html) {
     // Remove all disallowed tags
     $allElements = $xpath->query('//body//*');
     $elementsToRemove = [];
-    
+    $elementsToUnwrap = [];
+
     foreach ($allElements as $element) {
         $tagName = strtolower($element->tagName);
-        
-        // Check if this element is inside a <code> or <pre> block
+
+        // Check if this element is inside a <code>, <pre> or <svg> block
         $isInCodeBlock = false;
+        $isInSvg = false;
         $parent = $element->parentNode;
         while ($parent && $parent->nodeType === XML_ELEMENT_NODE) {
             $parentTag = strtolower($parent->tagName);
@@ -326,9 +348,12 @@ function sanitizeHtml($html) {
                 $isInCodeBlock = true;
                 break;
             }
+            if ($parentTag === 'svg') {
+                $isInSvg = true;
+            }
             $parent = $parent->parentNode;
         }
-        
+
         // If it's a dangerous tag inside a code block, encode it as text instead of removing
         if ($isInCodeBlock && in_array($tagName, ['script', 'iframe', 'object', 'embed', 'applet', 'form', 'style'])) {
             // Convert the element to text (encode it)
@@ -338,12 +363,22 @@ function sanitizeHtml($html) {
             continue;
         }
         
-        // If tag is not in allowed list, mark for removal
+        // If tag is not in allowed list, mark it for removal or for unwrapping.
+        // Taking the subtree along used to empty whole notes: content pasted
+        // or imported from the web sits inside <section>, <article>,
+        // <header>... and left with them. Only markup whose content is not
+        // note text goes away entirely; the rest hands over its children.
+        // Inside an <svg>, unknown elements are dropped too: their text
+        // (<title>, <desc>) is not part of the note either.
         if (!in_array($tagName, $allowedTags)) {
-            $elementsToRemove[] = $element;
+            if ($isInSvg || in_array($tagName, $strippedTags)) {
+                $elementsToRemove[] = $element;
+            } else {
+                $elementsToUnwrap[] = $element;
+            }
             continue;
         }
-        
+
         // Check and sanitize attributes
         $attributesToRemove = [];
         foreach ($element->attributes as $attr) {
@@ -405,13 +440,35 @@ function sanitizeHtml($html) {
         }
     }
     
-    // Remove disallowed elements
+    // Remove disallowed elements. This runs before the unwrapping so that a
+    // dropped subtree can never be lifted back into the note by one of its
+    // own ancestors giving up its children.
     foreach ($elementsToRemove as $element) {
         if ($element->parentNode) {
             $element->parentNode->removeChild($element);
         }
     }
-    
+
+    // Replace the other disallowed elements by their children, in document
+    // order so that a container handed over by its parent is still reached.
+    foreach ($elementsToUnwrap as $element) {
+        $parent = $element->parentNode;
+        if (!$parent) {
+            continue;
+        }
+        if (!$element->hasChildNodes()) {
+            $parent->removeChild($element);
+            continue;
+        }
+        $replacement = in_array(strtolower($element->tagName), $blockLevelTags)
+            ? $dom->createElement('div')
+            : $dom->createDocumentFragment();
+        while ($element->firstChild) {
+            $replacement->appendChild($element->firstChild);
+        }
+        $parent->replaceChild($replacement, $element);
+    }
+
     // Get the sanitized HTML (only body content)
     $body = $dom->getElementsByTagName('body')->item(0);
     if ($body) {
