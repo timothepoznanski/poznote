@@ -34,7 +34,9 @@
  *
  * Every tree action reloads the page (that is how the existing move, delete
  * and rename flows refresh the tree), so the history and the clipboard live
- * in sessionStorage: they survive the reload and stay private to the tab.
+ * in sessionStorage: they survive the reload and stay private to the tab. A
+ * paste of a single note opens it on the way back, and the others keep what
+ * landed selected (#1441).
  *
  * History entries are plain objects {type, ...} with one executor per type
  * in EXECUTORS below. Both directions talk to the same REST endpoints the
@@ -269,13 +271,31 @@
         }
     }
 
-    function reloadTree(removedNoteIds) {
+    function noteUrl(noteId) {
+        if (typeof window.buildNoteNavigationUrl === 'function') {
+            return window.buildNoteNavigationUrl(noteId, currentWorkspace());
+        }
+        return 'index.php?workspace=' + encode(currentWorkspace()) + '&note=' + encode(noteId);
+    }
+
+    /**
+     * Draw the tree again with what the action changed. showNoteId opens that
+     * note on the way, for an action whose result is a note to look at.
+     * @param {Array<string|number>} removedNoteIds - Notes the action took away
+     * @param {string|number} [showNoteId] - Note to open instead of staying on the current one
+     */
+    function reloadTree(removedNoteIds, showNoteId) {
         try {
             if (typeof window.persistFolderStatesFromDOM === 'function') window.persistFolderStatesFromDOM();
         } catch (e) {
             console.debug('tree-undo-clipboard: reloadTree() failed:', e);
         }
         writeFoldersToOpen();
+
+        if (showNoteId) {
+            window.location.href = noteUrl(showNoteId);
+            return;
+        }
 
         var open = openNoteId();
         var openNoteGone = !!(open && (removedNoteIds || []).some(function (id) { return sameId(id, open); }));
@@ -346,11 +366,21 @@
         });
     }
 
+    // The sort mode the tree follows (js/note-sort-cycle.js). Without that
+    // module every action keeps the behaviour it had, the one Custom asks for.
+    function isManualSort() {
+        return typeof window.poznoteNoteSortMode !== 'function' || window.poznoteNoteSortMode() === 'manual';
+    }
+
     /**
      * Put a folder back at a recorded place. dest is either a drop beside a
      * folder ({targetFolderId, position}) or a parent plus the neighbours the
      * folder had ({parentId, prevSiblingId, nextSiblingId}); the neighbour
      * restores the order, and is skipped when it no longer exists.
+     *
+     * Only the Custom order keeps a place of its own: under any other mode the
+     * parent is the whole of it, and asking for the neighbour back would
+     * switch the tree to Custom for an undo (#1441).
      */
     function placeFolder(folderId, dest) {
         if (dest.targetFolderId && dest.position) {
@@ -363,7 +393,7 @@
         }).then(function () {
             var sibling = dest.prevSiblingId ? { id: dest.prevSiblingId, position: 'after' }
                 : (dest.nextSiblingId ? { id: dest.nextSiblingId, position: 'before' } : null);
-            if (!sibling) return;
+            if (!sibling || !isManualSort()) return;
             return reorderFolder(folderId, sibling.id, sibling.position, dest.workspace)
                 .catch(function () { /* neighbour gone: the parent is already right */ });
         });
@@ -903,6 +933,17 @@
     }
 
     /**
+     * The note a paste ends on, when it pasted a single one. It opens rather
+     * than the tree keeping the note that was being read, so one row is the
+     * current one instead of two, the row that landed tinted as selected next
+     * to the open note in its own colour (#1441). Several items, or a folder,
+     * have nothing to open and keep the selection instead.
+     */
+    function singlePastedNote(targets) {
+        return (targets.length === 1 && targets[0].type === 'note' && targets[0].id) ? targets[0].id : null;
+    }
+
+    /**
      * Paste the clipboard into a folder (null for the root of the current
      * workspace). Copies duplicate, cuts move; the items go one after the
      * other and are recorded as one history entry so Ctrl+Z takes them all
@@ -947,7 +988,9 @@
             // Copy/Cut cannot be pasted again later by accident
             clearClipboard();
             rememberFolderOpen(dest.folderId);
-            rememberSelection(pastedTargets(entries));
+            var pasted = pastedTargets(entries);
+            var noteToOpen = singlePastedNote(pasted);
+            if (!noteToOpen) rememberSelection(pasted);
             var items = clipboard.items;
             if (items.length > 1) {
                 toastAfterReload(tr('tree_clipboard.pasted_items', 'Pasted {{count}} items', { count: entries.length }));
@@ -956,7 +999,7 @@
                     ? tr('tree_clipboard.pasted_note', 'Pasted "{{name}}"', { name: items[0].name })
                     : tr('tree_clipboard.pasted_folder', 'Pasted folder "{{name}}"', { name: items[0].name }));
             }
-            reloadTree([]);
+            reloadTree([], noteToOpen);
         }).catch(function (error) {
             var message = tr('tree_clipboard.paste_failed', 'Paste failed: {{error}}', { error: error.message });
             if (!entries.length) {
@@ -968,9 +1011,11 @@
             record(batchEntry(entries));
             clearClipboard();
             rememberFolderOpen(dest.folderId);
-            rememberSelection(pastedTargets(entries));
+            var landed = pastedTargets(entries);
+            var openAfterError = singlePastedNote(landed);
+            if (!openAfterError) rememberSelection(landed);
             errorToastAfterReload(message);
-            reloadTree([]);
+            reloadTree([], openAfterError);
         });
     }
 

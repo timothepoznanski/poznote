@@ -140,11 +140,28 @@
             .finally(function () { saving = false; });
     }
 
+    // The mode the tree follows right now. The button carries it, and is
+    // repainted by markCustom() without waiting for a reload, so it is a
+    // truer source than the setting the page was rendered with. Callers use
+    // it to tell a drop that places a row (Custom only) from a drop that just
+    // moves it somewhere else (#1441).
+    function currentMode() {
+        var button = document.querySelector('[data-action="cycle-note-sort"]');
+        if (button) return normalize(button.getAttribute('data-sort-mode'));
+        return normalize(window.defaultNoteSortType);
+    }
+
+    window.poznoteNoteSortMode = currentMode;
+
     // A drop that reorders rows switches the tree to Custom server side
     // (enableManualNoteSort). Where the drop is applied in the DOM instead of
     // reloading the list, the button has to follow, or it keeps naming the
     // mode the tree just left.
     function markCustom() {
+        // Kept in step for the pages where the button is hidden: it is what
+        // currentMode() falls back to
+        window.defaultNoteSortType = 'manual';
+
         var button = document.querySelector('[data-action="cycle-note-sort"]');
         if (!button || button.getAttribute('data-sort-mode') === 'manual') return;
 
