@@ -682,7 +682,6 @@ html[data-theme='dark'] .custom-alert-content p {
 }
 
 html[data-theme='dark'] .import-confirm-modal-content .btn-cancel,
-html[data-theme='dark'] #confirmModal .btn-cancel,
 html[data-theme='dark'] #deleteFolderModal .btn-cancel,
 html[data-theme='dark'] #deleteConfirmModal .btn-cancel,
 html[data-theme='dark'] #emptyTrashConfirmModal .btn-cancel,
@@ -693,7 +692,6 @@ html[data-theme='dark'] #restoreConfirmModal .btn-cancel {
 }
 
 html[data-theme='dark'] .import-confirm-modal-content .btn-cancel:hover,
-html[data-theme='dark'] #confirmModal .btn-cancel:hover,
 html[data-theme='dark'] #deleteFolderModal .btn-cancel:hover,
 html[data-theme='dark'] #deleteConfirmModal .btn-cancel:hover,
 html[data-theme='dark'] #emptyTrashConfirmModal .btn-cancel:hover,

@@ -570,16 +570,10 @@
     max-width: 200px !important;
 }
 
+/* Only the width: Cancel keeps the neutral colours of .modal-buttons */
 #confirmModal .modal-buttons .btn-cancel {
-    background-color: var(--pz-danger) !important;
-    color: var(--pz-text-inverse) !important;
-    border: none !important;
     min-width: 90px !important;
     flex: 0 0 110px !important;
-}
-
-#confirmModal .modal-buttons .btn-cancel:hover {
-    background-color: var(--pz-danger-hover) !important;
 }
 
 @media (max-width: 420px) {
