@@ -202,26 +202,140 @@ function handleUrlPaste(plainText, htmlData) {
 }
 
 /**
- * Handle image paste from clipboard
+ * Find the first image file sitting on the clipboard
  * @param {DataTransferItemList} items - Clipboard items
- * @param {HTMLElement} note - The note entry element
- * @returns {boolean} True if image was found and handled
+ * @returns {File|null} The image file, or null when the clipboard has none
  */
-function handleImagePaste(items, note) {
-    if (!items) return false;
+function getClipboardImageFile(items) {
+    if (!items) return null;
 
     for (var i = 0; i < items.length; i++) {
         var item = items[i];
         if (item && item.kind === 'file' && item.type && item.type.startsWith('image/')) {
             var file = item.getAsFile();
-            if (file && typeof handleImageFilesAndInsert === 'function') {
-                handleImageFilesAndInsert([file], note);
-                return true;
-            }
+            if (file) return file;
         }
     }
 
-    return false;
+    return null;
+}
+
+/**
+ * Handle image paste from clipboard
+ * @param {File} file - The image file found on the clipboard
+ * @param {HTMLElement} note - The note entry element
+ * @returns {boolean} True if the image was handled
+ */
+function handleImagePaste(file, note) {
+    if (!file || typeof handleImageFilesAndInsert !== 'function') return false;
+
+    handleImageFilesAndInsert([file], note);
+    return true;
+}
+
+/**
+ * Decide whether the clipboard HTML must win over an image file present on
+ * the clipboard at the same time.
+ *
+ * OneNote, Outlook or Excel put two flavours of the same selection on the
+ * clipboard: the content itself as text/html, and a bitmap of the whole
+ * selection. Inserting that bitmap turned a page of text and pictures into
+ * one flat image, no longer editable and invisible to the search (#1467).
+ *
+ * The bitmap still wins where it is the only real content: a screenshot
+ * (no HTML at all) and an image copied on its own from a web page, whose
+ * HTML is just the <img> tag. Keeping the file there uploads a local copy
+ * instead of pointing the note at someone else's server.
+ *
+ * @param {string} htmlData - The text/html flavour of the clipboard
+ * @returns {boolean} True when the HTML carries more than the picture
+ */
+function clipboardHtmlBeatsImage(htmlData) {
+    if (!htmlData || htmlData.trim() === '') return false;
+
+    var doc = new DOMParser().parseFromString(htmlData, 'text/html');
+    if (!doc || !doc.body) return false;
+
+    // Office clipboards ship their own <style> rules and comments inside the
+    // fragment; drop them first so they do not read as copied text
+    doc.body.querySelectorAll('script, style, noscript, template, title').forEach(function (el) {
+        el.remove();
+    });
+
+    // Zero-width characters are not text either, and trim() keeps them: a
+    // lone picture padded with one would win here, then lose its only image
+    // to the cleanup and paste as an invisible character
+    var text = (doc.body.textContent || '').replace(/[\u200B-\u200D\u2060\uFEFF]/g, '').trim();
+    if (text !== '') return true;
+
+    // No text at all: several pictures still beat one flattened bitmap
+    return doc.body.querySelectorAll('img').length > 1;
+}
+
+/**
+ * Decide whether an <img> src can load once inside a note.
+ *
+ * Relative and protocol-relative URLs are fine; an explicit scheme has to be
+ * one the page can fetch. Content copied from OneNote, Word or a mail client
+ * points its pictures at the source machine (file:///...) or at an email
+ * store (cid:...), which would be saved as a permanently broken image. Same
+ * for blob: URLs (WhatsApp Web, Teams): they only resolve inside the page
+ * that created them, and Poznote never writes one into a note itself.
+ *
+ * @param {string} src - The img src attribute
+ * @returns {boolean} True when the image is worth keeping
+ */
+function isLoadableImageSrc(src) {
+    src = (src || '').trim();
+    if (src === '') return false;
+
+    var scheme = /^([a-z][a-z0-9+.-]*):/i.exec(src);
+    if (!scheme) return true;
+
+    return ['http', 'https', 'data'].indexOf(scheme[1].toLowerCase()) !== -1;
+}
+
+var pasteDroppedImagesToastTimeout = null;
+
+/**
+ * Tell the user that pictures were left out of a paste.
+ *
+ * Dropping them silently hid the loss: the broken image icon they used to
+ * leave behind was at least a hint that something belonged there. Copying a
+ * picture on its own puts its bitmap on the clipboard, which does paste.
+ *
+ * @param {number} count - How many images the cleanup removed
+ */
+function showPasteDroppedImagesToast(count) {
+    if (!document.body) return;
+
+    var fallback = count === 1
+        ? '1 image could not be pasted. Copy it on its own to add it.'
+        : '{{count}} images could not be pasted. Copy them one by one to add them.';
+    var key = count === 1 ? 'editor.paste.images_dropped_one' : 'editor.paste.images_dropped_other';
+    var message = (typeof window.t === 'function')
+        ? window.t(key, { count: count }, fallback)
+        : fallback.replace('{{count}}', String(count));
+
+    var toast = document.getElementById('paste-dropped-images-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'paste-dropped-images-toast';
+        toast.className = 'pz-toast pz-toast--message';
+        toast.setAttribute('role', 'status');
+        document.body.appendChild(toast);
+    }
+
+    toast.textContent = message;
+    toast.classList.remove('pz-toast--hidden');
+    toast.classList.add('pz-toast--visible');
+
+    // A full sentence, so it stays longer than the one-word state labels
+    clearTimeout(pasteDroppedImagesToastTimeout);
+    pasteDroppedImagesToastTimeout = setTimeout(function () {
+        toast.classList.remove('pz-toast--visible');
+        toast.classList.add('pz-toast--hidden');
+    }, 6000);
 }
 
 /**
@@ -258,6 +372,17 @@ function handleRichTextPaste(htmlData) {
     });
     doc.body.querySelectorAll('iframe').forEach(function (el) {
         if (!isTrustedEmbedSrc(el.getAttribute('src'))) el.remove();
+    });
+
+    // Same for pictures the browser cannot fetch from here: an Office or
+    // mail clipboard points them at the source machine, and the sanitizer
+    // stores such a src happily, leaving a broken image in the note forever.
+    var droppedImages = 0;
+    doc.body.querySelectorAll('img').forEach(function (el) {
+        if (!isLoadableImageSrc(el.getAttribute('src'))) {
+            el.remove();
+            droppedImages++;
+        }
     });
 
     // Remove conflicting attributes from all elements
@@ -302,6 +427,10 @@ function handleRichTextPaste(htmlData) {
     // Insert cleaned HTML and signal success to prevent browser default paste
     document.execCommand('insertHTML', false, cleanHtml);
     triggerNoteSave();
+
+    // Said only once the rest went in: when nothing survives, the caller
+    // falls back to the clipboard bitmap and no picture is missing
+    if (droppedImages > 0) showPasteDroppedImagesToast(droppedImages);
     return true;
 }
 
@@ -470,9 +599,16 @@ function setupPasteHandling() {
 
             var isMarkdownNote = note.getAttribute('data-note-type') === 'markdown';
             var items = (e.clipboardData && e.clipboardData.items) ? e.clipboardData.items : null;
+            var htmlData = e.clipboardData ? e.clipboardData.getData('text/html') : '';
 
-            // Handle image paste
-            if (handleImagePaste(items, note)) {
+            // Handle image paste. An image file and the HTML can describe the
+            // same selection (OneNote, Outlook, Excel), and the HTML wins
+            // then: it keeps the text editable and searchable. Markdown notes
+            // stay on the image, having no rich text paste path to fall back
+            // on.
+            var imageFile = getClipboardImageFile(items);
+            var htmlWins = !isMarkdownNote && !!imageFile && clipboardHtmlBeatsImage(htmlData);
+            if (!htmlWins && handleImagePaste(imageFile, note)) {
                 e.preventDefault();
                 return;
             }
@@ -480,7 +616,6 @@ function setupPasteHandling() {
             // Skip rich text processing for markdown notes
             if (isMarkdownNote) return;
 
-            var htmlData = e.clipboardData ? e.clipboardData.getData('text/html') : '';
             var plainText = e.clipboardData ? e.clipboardData.getData('text/plain') : '';
 
             // Windows editors (VS Code, Notepad++) put CRLF on the clipboard.
@@ -508,6 +643,14 @@ function setupPasteHandling() {
 
             // Handle rich text paste (cleanup styles like black text in dark mode)
             if (htmlData && handleRichTextPaste(htmlData)) {
+                e.preventDefault();
+                return;
+            }
+
+            // The HTML won but nothing survived its cleanup (every picture
+            // pointed at the source machine, say): the flattened bitmap is
+            // still better than pasting nothing
+            if (htmlWins && handleImagePaste(imageFile, note)) {
                 e.preventDefault();
                 return;
             }

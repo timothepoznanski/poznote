@@ -169,3 +169,13 @@ html[data-theme='dark'] .pz-toast {
     background: var(--pz-border-strong);
     color: var(--pz-text-strong);
 }
+
+/* A sentence rather than a one-word label: it wraps instead of running off a
+   phone screen. The width is explicit because a box placed at left: 50%
+   shrinks to fit half the viewport, which would wrap far too early. */
+.pz-toast.pz-toast--message {
+    width: max-content;
+    max-width: calc(100vw - 2rem);
+    white-space: normal;
+    text-align: center;
+}

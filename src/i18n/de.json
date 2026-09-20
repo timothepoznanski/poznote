@@ -1189,6 +1189,10 @@
       "remove": "Link entfernen",
       "cancel": "Abbrechen",
       "save": "Speichern"
+    },
+    "paste": {
+      "images_dropped_one": "1 Bild konnte nicht eingefügt werden. Kopieren Sie es einzeln, um es hinzuzufügen.",
+      "images_dropped_other": "{{count}} Bilder konnten nicht eingefügt werden. Kopieren Sie sie einzeln, um sie hinzuzufügen."
     }
   },
   "info": {

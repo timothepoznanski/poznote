@@ -1189,6 +1189,10 @@
       "remove": "Remover link",
       "cancel": "Cancelar",
       "save": "Salvar"
+    },
+    "paste": {
+      "images_dropped_one": "Não foi possível colar 1 imagem. Copie-a separadamente para adicioná-la.",
+      "images_dropped_other": "Não foi possível colar {{count}} imagens. Copie-as uma a uma para adicioná-las."
     }
   },
   "info": {

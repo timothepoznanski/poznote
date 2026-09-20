@@ -1187,6 +1187,10 @@
       "remove": "移除链接",
       "cancel": "取消",
       "save": "保存"
+    },
+    "paste": {
+      "images_dropped_one": "有 1 张图片无法粘贴。请单独复制该图片后再粘贴。",
+      "images_dropped_other": "有 {{count}} 张图片无法粘贴。请逐张复制后再粘贴。"
     }
   },
   "info": {

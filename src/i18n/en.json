@@ -1897,6 +1897,10 @@
       "remove": "Remove link",
       "cancel": "Cancel",
       "save": "Save"
+    },
+    "paste": {
+      "images_dropped_one": "1 image could not be pasted. Copy it on its own to add it.",
+      "images_dropped_other": "{{count}} images could not be pasted. Copy them one by one to add them."
     }
   },
   "image_menu": {
