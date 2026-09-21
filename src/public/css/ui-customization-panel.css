@@ -131,6 +131,10 @@ body:has(#ai-chat-panel.ai-chat-open) #edgeAiChatBtn {
     transition: background-color 0.15s ease;
 }
 
+.page-more-menu-item[hidden] {
+    display: none;
+}
+
 .page-more-menu-item:hover,
 .page-more-menu-item:focus-visible {
     background-color: var(--pz-surface-hover);

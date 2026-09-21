@@ -345,8 +345,17 @@
         });
     }
 
+    // The Markdown syntax entry only makes sense while a Markdown note is
+    // open, so it is off on the dashboard and settings pages too
+    function syncMarkdownSyntaxItem() {
+        var item = document.getElementById('edgeMenuMarkdownSyntax');
+        if (!item) return;
+        item.hidden = !document.querySelector('#right_col .noteentry[data-note-type="markdown"]');
+    }
+
     function setMoreMenuOpen(open) {
         if (!moreMenu || !moreButton) return;
+        if (open) syncMarkdownSyntaxItem();
         moreMenu.hidden = !open;
         moreButton.setAttribute('aria-expanded', open ? 'true' : 'false');
         if (open) {
@@ -372,12 +381,32 @@
         return null;
     }
 
+    function isTouchDevice() {
+        try {
+            var coarsePointer = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+            var touch = (navigator.maxTouchPoints || 0) > 0 || 'ontouchstart' in window;
+            return coarsePointer && touch;
+        } catch (e) {
+            return false;
+        }
+    }
+
     function setHelpModalOpen(modal, open) {
         if (!modal) return;
         modal.style.display = open ? 'flex' : 'none';
         if (open) {
             var body = modal.querySelector('.pz-help-modal-body');
             if (body) body.scrollTop = 0;
+            if (isTouchDevice()) {
+                // No autofocus on touch devices: the on-screen keyboard would
+                // come up over a modal opened to be read. Drop the focus the
+                // menu entry got too. Tapping the filter still opens it.
+                var active = document.activeElement;
+                if (active && active !== document.body && typeof active.blur === 'function') {
+                    active.blur();
+                }
+                return;
+            }
             // Both start on their filter
             var focusTarget = modal.querySelector('.filter-input') || modal.querySelector('[data-action="close-help-modal"]');
             if (focusTarget) focusTarget.focus();

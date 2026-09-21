@@ -302,6 +302,13 @@ body.mobile-keyboard-open #right_col .note-header {
     z-index: 2147483000;
 }
 
+/* The Customize panel and the AI chat slide over the note (z-index 1200): the
+   keyboard their inputs open must not lift the note toolbar above them. */
+body.ui-custom-panel-open #right_col .note-header,
+body:has(#ai-chat-panel.ai-chat-open) #right_col .note-header {
+    z-index: 1200;
+}
+
 body.mobile-formatting-toolbar-active .color-palette-popup {
     z-index: 2147483002;
 }
@@ -332,7 +339,9 @@ body.mobile-keyboard-open #attachmentPickerModal.modal,
 body.mobile-formatting-toolbar-active #noteReferenceModal.modal,
 body.mobile-keyboard-open #noteReferenceModal.modal,
 body.mobile-formatting-toolbar-active #codeBlockLanguageModal.modal,
-body.mobile-keyboard-open #codeBlockLanguageModal.modal {
+body.mobile-keyboard-open #codeBlockLanguageModal.modal,
+body.mobile-formatting-toolbar-active .pz-help-modal.modal,
+body.mobile-keyboard-open .pz-help-modal.modal {
     z-index: 2147483004 !important;
 }
 
@@ -356,7 +365,9 @@ body.mobile-keyboard-open #attachmentPickerModal .modal-content,
 body.mobile-formatting-toolbar-active #noteReferenceModal .modal-content,
 body.mobile-keyboard-open #noteReferenceModal .modal-content,
 body.mobile-formatting-toolbar-active #codeBlockLanguageModal .modal-content,
-body.mobile-keyboard-open #codeBlockLanguageModal .modal-content {
+body.mobile-keyboard-open #codeBlockLanguageModal .modal-content,
+body.mobile-formatting-toolbar-active .pz-help-modal .modal-content,
+body.mobile-keyboard-open .pz-help-modal .modal-content {
     z-index: 2147483005 !important;
 }
 
