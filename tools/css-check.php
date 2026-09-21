@@ -497,7 +497,7 @@ $exempt = is_file($baselineFile)
 $repo = dirname(__DIR__);
 $markup = 0;
 $markupPer = [];
-$vendorish = ['mermaid', 'swagger', 'katex', 'excalidraw', 'codemirror', '/lib/', '.min.js', 'highlight'];
+$vendorish = ['mermaid', 'swagger', 'katex', 'excalidraw', 'codemirror', 'qrcode-generator', '/lib/', '.min.js', 'highlight'];
 $srcDir = $repo . '/src';
 if (is_dir($srcDir)) {
     $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($srcDir, FilesystemIterator::SKIP_DOTS));

@@ -187,6 +187,39 @@ Como alternativa, instale o Poznote em um diretório fora de `/root`, como `/opt
 
 </details>
 
+<details>
+<summary><strong>Senha de administrador perdida</strong></summary>
+<br>
+
+Se outro administrador ainda conseguir entrar, ele pode definir uma nova senha para você em **Settings > Admin Tools > User Management**. Caso contrário, redefina a senha direto no banco de dados mestre. A partir do seu diretório do Poznote, no host (a ferramenta de linha de comando `sqlite3` precisa estar instalada nele, ela não faz parte da imagem do Poznote):
+
+```bash
+sudo sqlite3 data/master.db "UPDATE users SET password_hash=NULL, password_login_disabled=0 WHERE id=1;"
+```
+
+Isso apaga a senha salva da primeira conta (id 1, sempre administrador), e o padrão embutido volta a valer: entre com o nome de usuário dessa conta e a senha `admin`, e troque-a em seguida em **Settings > Change Password**. Para redefinir outra conta, troque `WHERE id=1` por `WHERE username='nome_do_usuario'`; um usuário comum volta para a senha `user`.
+
+Se a autenticação de dois fatores estiver ativada nessa conta, o formulário de login continua pedindo um código depois da senha. Veja a próxima entrada se o aparelho também foi perdido.
+
+</details>
+
+<a id="two-factor-lockout"></a>
+<details>
+<summary><strong>Bloqueado pela autenticação de dois fatores (aparelho e códigos de recuperação perdidos)</strong></summary>
+<br>
+
+Cada código de recuperação entregue ao ativar a autenticação de dois fatores permite entrar uma vez: na tela do código, escolha **Use a recovery code**. Sem nenhum deles, um administrador pode desativar a autenticação de dois fatores para você em **Settings > Admin Tools > User Management**, na janela da senha da sua conta.
+
+Se você for o único administrador, remova o segundo fator direto no banco de dados mestre. A partir do seu diretório do Poznote, no host (a ferramenta de linha de comando `sqlite3` precisa estar instalada nele):
+
+```bash
+sudo sqlite3 data/master.db "DELETE FROM user_totp_recovery_codes WHERE user_id=1; DELETE FROM user_totp WHERE user_id=1;"
+```
+
+Troque `1` pelo id da conta (`sudo sqlite3 data/master.db "SELECT id, username FROM users;"` lista todas). A senha sozinha volta a permitir o login, os cookies "Remember me" emitidos para essa conta deixam de funcionar, e a autenticação de dois fatores pode ser configurada de novo em **Settings > Two-factor authentication**.
+
+</details>
+
 <a id="the-app-stops-answering-under-load"></a>
 <details>
 <summary><strong>O aplicativo para de responder sob carga (erros de salvamento automático, "server reached pm.max_children")</strong></summary>

@@ -102,6 +102,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'selec
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
+// Second step of a password login on a profile with two-factor on. The
+// password was accepted by authenticate(), which parked the login in the
+// session instead of opening it; this finishes or abandons it.
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['action'] ?? '', ['totp_verify', 'totp_cancel'], true)) {
+    $totpAction = $_POST['action'];
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
+        $error = t('login.two_factor.invalid_code', [], 'Incorrect code. Try again.', $currentLang);
+    } elseif ($totpAction === 'totp_cancel') {
+        cancelTotpLoginChallenge();
+    } elseif (getPendingTotpLoginChallenge() === null) {
+        $error = t('login.two_factor.expired', [], 'The verification step expired. Sign in again.', $currentLang);
+    } elseif (completeTotpLoginChallenge((string)($_POST['totp_code'] ?? ''))) {
+        if (!isAccountSelectionRequired()) {
+            poznoteRenderLoginRedirectAndExit($redirectAfter, $currentLang);
+        }
+    } elseif (getPendingTotpLoginChallenge() === null) {
+        // Last try used up: back to the password form.
+        $error = t('login.two_factor.too_many_tries', [], 'Too many incorrect codes. Sign in again.', $currentLang);
+    } else {
+        $error = t('login.two_factor.invalid_code', [], 'Incorrect code. Try again.', $currentLang);
+    }
+
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // If already authenticated, redirect to home
 if (isAuthenticated()) {
     poznoteRenderLoginRedirectAndExit($redirectAfter, $currentLang ?? 'en');
@@ -143,6 +168,9 @@ if ($_POST && ($_POST['action'] ?? '') !== 'select_account' && isset($_POST['use
         }
 
         poznoteRenderLoginRedirectAndExit($redirectAfter, $currentLang ?? 'en');
+    } elseif (getPendingTotpLoginChallenge() !== null) {
+        // Password accepted, second factor still owed: not an error, the page
+        // renders the code form below.
     } else {
         $error = t('login.errors.invalid_credentials', [], 'Incorrect username or password.', $currentLang ?? 'en');
     }
@@ -154,6 +182,7 @@ render_page:
 $renderAccountSelection = isAccountSelectionRequired();
 $accountSelectionProfiles = $renderAccountSelection ? getPendingAccountSelectionProfiles() : [];
 $authenticatedUser = $renderAccountSelection ? getAuthenticatedUser() : null;
+$renderTotpChallenge = !$renderAccountSelection && getPendingTotpLoginChallenge() !== null;
 
 // OIDC error feedback
 if (isset($_GET['oidc_error'])) {
@@ -207,7 +236,7 @@ if (isset($_GET['oidc_error'])) {
             <h1 class="login-title"><?php echo htmlspecialchars($login_display_name !== '' ? $login_display_name : 'Poznote'); ?></h1>
         </div>
 
-        <?php if (isset($_GET['expired']) && !$renderAccountSelection): ?>
+        <?php if (isset($_GET['expired']) && !$renderAccountSelection && !$renderTotpChallenge): ?>
         <div class="info session-expired-notice"><?php echo t_h('login.session_expired', [], 'Your session has ended. Sign in again to get back to where you were.', $currentLang); ?></div>
         <?php endif; ?>
 
@@ -228,7 +257,7 @@ if (isset($_GET['oidc_error'])) {
         $defaultAdminProfile = poznoteFindPristineDefaultProfile();
         $defaultAdminUsername = $defaultAdminProfile['username'] ?? null;
 
-        if ($defaultAdminUsername): 
+        if ($defaultAdminUsername && !$renderTotpChallenge): 
         ?>
         <div class="admin-warning">
             <?php echo t('login.admin_warning', ['username' => $defaultAdminUsername], 'Please log in with the username <code>' . htmlspecialchars($defaultAdminUsername) . '</code> and the password <code>admin</code>. Once logged in, change your password immediately in the settings. You can also change your username.', $currentLang ?? 'en'); ?>
@@ -266,6 +295,48 @@ if (isset($_GET['oidc_error'])) {
                 </form>
 
                 <a class="account-select-logout" href="logout.php"><?php echo t_h('login.account_select.sign_out', [], 'Sign out', $currentLang ?? 'en'); ?></a>
+            </div>
+        <?php elseif ($renderTotpChallenge): ?>
+            <div class="totp-challenge-panel">
+                <p class="account-select-intro" id="totp-intro"
+                   data-code-text="<?php echo t_h('login.two_factor.intro', [], 'Enter the 6-digit code from your authenticator app.', $currentLang); ?>"
+                   data-recovery-text="<?php echo t_h('login.two_factor.recovery_intro', [], 'Enter one of your recovery codes. Each code works once.', $currentLang); ?>">
+                    <?php echo t_h('login.two_factor.intro', [], 'Enter the 6-digit code from your authenticator app.', $currentLang); ?>
+                </p>
+
+                <form method="POST" class="totp-challenge-form" autocomplete="off">
+                    <input type="hidden" name="action" value="totp_verify">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES); ?>">
+                    <?php if ($redirectAfter !== null): ?>
+                        <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($redirectAfter, ENT_QUOTES); ?>">
+                    <?php endif; ?>
+                    <div class="form-group">
+                        <input type="text" id="totp_code" name="totp_code" class="totp-code-input" required autofocus
+                               inputmode="numeric" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" maxlength="16"
+                               placeholder="<?php echo t_h('login.two_factor.code_placeholder', [], 'Verification code', $currentLang); ?>"
+                               data-code-placeholder="<?php echo t_h('login.two_factor.code_placeholder', [], 'Verification code', $currentLang); ?>"
+                               data-recovery-placeholder="<?php echo t_h('login.two_factor.recovery_placeholder', [], 'Recovery code', $currentLang); ?>">
+                        <?php if ($error): ?>
+                            <div class="error"><?php echo htmlspecialchars($error); ?></div>
+                        <?php endif; ?>
+                    </div>
+                    <button type="submit" class="login-button"><?php echo t_h('login.two_factor.verify', [], 'Verify', $currentLang); ?></button>
+                </form>
+
+                <!-- The field takes either kind of code; the link only swaps the
+                     wording and the on-screen keyboard (js/login-page.js). -->
+                <a class="account-select-logout" href="#" id="totp-recovery-toggle"
+                   data-code-text="<?php echo t_h('login.two_factor.use_recovery', [], 'Use a recovery code', $currentLang); ?>"
+                   data-recovery-text="<?php echo t_h('login.two_factor.use_app', [], 'Use the authenticator app', $currentLang); ?>"><?php echo t_h('login.two_factor.use_recovery', [], 'Use a recovery code', $currentLang); ?></a>
+
+                <form method="POST" class="totp-cancel-form">
+                    <input type="hidden" name="action" value="totp_cancel">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES); ?>">
+                    <?php if ($redirectAfter !== null): ?>
+                        <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($redirectAfter, ENT_QUOTES); ?>">
+                    <?php endif; ?>
+                    <button type="submit" class="totp-cancel-button"><?php echo t_h('login.two_factor.cancel', [], 'Back to sign in', $currentLang); ?></button>
+                </form>
             </div>
         <?php else: ?>
             <?php if ($showNormalLogin): ?>
@@ -321,10 +392,10 @@ if (isset($_GET['oidc_error'])) {
     </div>
     <?php
     $loginConfig = [
-        'focusOidc' => !$justLoggedOut && !$renderAccountSelection && !$passwordLoginVisible && function_exists('oidc_is_enabled') && oidc_is_enabled(),
+        'focusOidc' => !$justLoggedOut && !$renderAccountSelection && !$renderTotpChallenge && !$passwordLoginVisible && function_exists('oidc_is_enabled') && oidc_is_enabled(),
         'showPasswordTitle' => t('login.show_password', [], 'Show password', $currentLang ?? 'en'),
         'hidePasswordTitle' => t('login.hide_password', [], 'Hide password', $currentLang ?? 'en'),
-        'oidcEnabled' => !$renderAccountSelection && function_exists('oidc_is_enabled') && oidc_is_enabled(),
+        'oidcEnabled' => !$renderAccountSelection && !$renderTotpChallenge && function_exists('oidc_is_enabled') && oidc_is_enabled(),
         // Template for the OIDC button when the last SSO account is remembered on
         // this device; {{account}} is replaced client-side with the stored email
         'oidcAccountButtonTemplate' => t('login.oidc_button_account', [], 'Continue with {{account}}', $currentLang ?? 'en'),

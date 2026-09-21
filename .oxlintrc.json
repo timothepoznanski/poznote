@@ -25,6 +25,7 @@
     "src/public/js/highlight/**",
     "src/public/js/katex/**",
     "src/public/js/mermaid/**",
+    "src/public/js/qrcode-generator/**",
     "**/node_modules/**",
     "**/*.min.js"
   ],

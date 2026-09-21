@@ -383,6 +383,10 @@ function startAuthenticatedUserSession(array $authUser, ?string $authMethod = nu
 
     setAuthenticatedIdentity($authUser, $authMethod);
 
+    // A login that completes, by whichever route, ends any second step left
+    // pending in this session (password typed, then SSO used instead).
+    unset($_SESSION['totp_login_challenge']);
+
     // Single hook for every interactive login: the password form, OIDC and the
     // remember-me cookie all land here. Logged at this point rather than on
     // return, because the identity is already established even when the call
@@ -1476,25 +1480,161 @@ function authenticate($username, $password, $rememberMe = false) {
     }
 
     if ($authenticated) {
+        // 3. Second factor. The password alone opens nothing on a profile with
+        // two-factor on: the login is parked in the session and login.php asks
+        // for the code (completeTotpLoginChallenge()). The failure counter is
+        // left as it is, so wrong codes keep adding to it.
+        try {
+            require_once __DIR__ . '/users/totp.php';
+            $needsSecondFactor = isUserTotpEnabled($userId);
+        } catch (Throwable $e) {
+            // Unknown state is not "no second factor": refuse the login.
+            error_log("Poznote Auth: two-factor state unreadable for user '$username': " . $e->getMessage());
+            return false;
+        }
+        if ($needsSecondFactor) {
+            beginTotpLoginChallenge($user, (string)$username, (bool)$rememberMe);
+            return false;
+        }
+
         clearLoginRateLimit((string)$username);
         startAuthenticatedUserSession($user);
         updateUserLastLogin($userId);
 
-        // Set remember me cookie if requested
-        $secretToUse = $rememberMe ? getRememberMeSecret($user) : null;
-        if ($rememberMe && $secretToUse !== null) {
-            $timestamp = time();
-            $actualUsername = $user['username'];
-
-            // Format: actual_username:user_id:timestamp:hash
-            $token = buildRememberMeToken($actualUsername, (int)$userId, $timestamp, $secretToUse);
-            setRememberMeCookie($token, time() + REMEMBER_ME_DURATION);
+        if ($rememberMe) {
+            issueRememberMeCookie($user);
         }
 
         return true;
     }
 
     return false;
+}
+
+function issueRememberMeCookie(array $user): void {
+    $secretToUse = getRememberMeSecret($user);
+    if ($secretToUse === null) {
+        return;
+    }
+
+    // Format: actual_username:user_id:timestamp:hash
+    $token = buildRememberMeToken((string)$user['username'], (int)$user['id'], time(), $secretToUse);
+    setRememberMeCookie($token, time() + REMEMBER_ME_DURATION);
+}
+
+// --- Second step of a password login (two-factor, see src/lib/totp.php) ---
+//
+// Between the password and the code nothing is authenticated: the session
+// only remembers who passed the first step, under a key isAuthenticated()
+// never looks at. The challenge is short-lived and allows a few tries, after
+// which the password has to be typed again; wrong codes also feed the same
+// progressive delay as wrong passwords.
+define('TOTP_LOGIN_CHALLENGE_SECONDS', 5 * 60);
+define('TOTP_LOGIN_CHALLENGE_MAX_TRIES', 5);
+
+function beginTotpLoginChallenge(array $user, string $loginIdentifier, bool $rememberMe): void {
+    // Same reason as in startAuthenticatedUserSession(): the session now
+    // carries a half-login, it must not keep an ID chosen before it.
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_regenerate_id(true);
+    }
+
+    $_SESSION['totp_login_challenge'] = [
+        'user_id' => (int)$user['id'],
+        'identifier' => $loginIdentifier,
+        'remember_me' => $rememberMe,
+        'expires_at' => time() + TOTP_LOGIN_CHALLENGE_SECONDS,
+        'tries' => 0,
+    ];
+}
+
+/**
+ * The pending second step of this session, or null. An expired or exhausted
+ * challenge is dropped on the way.
+ */
+function getPendingTotpLoginChallenge(): ?array {
+    $challenge = $_SESSION['totp_login_challenge'] ?? null;
+    if (!is_array($challenge)) {
+        return null;
+    }
+
+    if ((int)($challenge['user_id'] ?? 0) <= 0
+        || (int)($challenge['expires_at'] ?? 0) < time()
+        || (int)($challenge['tries'] ?? 0) >= TOTP_LOGIN_CHALLENGE_MAX_TRIES) {
+        unset($_SESSION['totp_login_challenge']);
+        return null;
+    }
+
+    return $challenge;
+}
+
+function cancelTotpLoginChallenge(): void {
+    unset($_SESSION['totp_login_challenge']);
+}
+
+/**
+ * Finishes a password login with an authenticator code or a recovery code.
+ * Returns true once the session is authenticated, exactly like authenticate():
+ * the caller still has to check isAccountSelectionRequired().
+ */
+function completeTotpLoginChallenge(string $code): bool {
+    $challenge = getPendingTotpLoginChallenge();
+    if ($challenge === null) {
+        return false;
+    }
+
+    require_once __DIR__ . '/users/db_master.php';
+    require_once __DIR__ . '/users/totp.php';
+
+    $userId = (int)$challenge['user_id'];
+    $identifier = (string)$challenge['identifier'];
+
+    if (throttleLoginAttempt($identifier)) {
+        return false;
+    }
+
+    // The profile may have been disabled since the password was checked.
+    $user = getUserProfileById($userId);
+    if (!$user || !$user['active']) {
+        cancelTotpLoginChallenge();
+        return false;
+    }
+
+    try {
+        $factor = verifyUserSecondFactor($userId, $code);
+    } catch (Throwable $e) {
+        error_log("Poznote Auth: two-factor check failed for user $userId: " . $e->getMessage());
+        $factor = null;
+    }
+
+    if ($factor === null) {
+        error_log("Poznote Auth: wrong two-factor code for user '" . ($user['username'] ?? $userId) . "'");
+        recordFailedLoginAttempt($identifier);
+        $_SESSION['totp_login_challenge']['tries'] = (int)$challenge['tries'] + 1;
+        return false;
+    }
+
+    clearLoginRateLimit($identifier);
+    startAuthenticatedUserSession($user);
+    updateUserLastLogin($userId);
+
+    if ($factor === 'recovery') {
+        // Worth a trace of its own: either the user lost their device, or
+        // someone else holds one of their printed codes.
+        logActivity(
+            ACTIVITY_TWO_FACTOR_RECOVERY_USED,
+            ['remaining' => countUserTotpRecoveryCodes($userId)],
+            'web',
+            $userId,
+            $user['username'] ?? null
+        );
+    }
+
+    if (!empty($challenge['remember_me'])) {
+        issueRememberMeCookie($user);
+    }
+
+    return true;
 }
 
 function logout() {
@@ -1950,7 +2090,11 @@ function authenticateApiBasicAuth(bool $requireAdmin = false): array {
     // Same response for bad credentials and insufficient role (no role disclosure),
     // but only genuine credential failures count towards the rate limit.
     if (!$credentialsValid || ($requireAdmin && !(bool)$authUser['is_admin'])) {
-        if (!$credentialsValid) {
+        // A correct password sent without a code is not a guess at anything,
+        // and it is what a client configured before two-factor was switched on
+        // sends on every poll: counting it would walk the account into the
+        // hard block and lock its owner out of the login form.
+        if (!$credentialsValid && poznoteApiSecondFactorRejection() !== 'missing') {
             recordFailedLoginAttempt((string)$loginIdentifier);
         }
         // A valid app password on an admin route is the one case that gets
@@ -1960,6 +2104,22 @@ function authenticateApiBasicAuth(bool $requireAdmin = false): array {
         if ($credentialsValid && ($authUser['_api_auth_method'] ?? '') === 'app_password') {
             $msg = api_t('auth.api.app_password_admin_forbidden', [], 'App passwords cannot access administrator endpoints');
             header('HTTP/1.1 403 Forbidden');
+            header('Content-Type: application/json');
+            echo json_encode(['error' => $msg]);
+            exit;
+        }
+        // Two-factor is the other case that gets told why. It does confirm
+        // the password to whoever sent it, which is the trade every service
+        // with an OTP header makes: a client given the account password by
+        // habit would otherwise never find out an app password is expected.
+        // A wrong code was counted above like a wrong password, so the code
+        // cannot be guessed at a faster rate.
+        if (!$credentialsValid && poznoteApiSecondFactorRejection() !== null) {
+            $msg = poznoteApiSecondFactorRejection() === 'missing'
+                ? api_t('auth.api.two_factor_required', [], 'Two-factor authentication is enabled on this account: use an app password, or send the current code in the X-Poznote-OTP header')
+                : api_t('auth.api.two_factor_invalid', [], 'Invalid two-factor code');
+            header('HTTP/1.1 401 Unauthorized');
+            header('X-Poznote-OTP: required');
             header('Content-Type: application/json');
             echo json_encode(['error' => $msg]);
             exit;
@@ -2021,8 +2181,41 @@ function resolveApiBasicAuthUser(array $basicCredentials): ?array {
     if (!verifyUserPassword($userId, $password)) {
         return null;
     }
+
+    // With two-factor on, the account password is not enough here either,
+    // otherwise the API would be the way around the login form. Clients are
+    // meant to use an app password; the account password still works when the
+    // current code comes with it in X-Poznote-OTP, which is what keeps admin
+    // routes (closed to app passwords) reachable from a terminal.
+    try {
+        require_once __DIR__ . '/users/totp.php';
+        if (isUserTotpEnabled($userId)) {
+            $otp = trim((string)($_SERVER['HTTP_X_POZNOTE_OTP'] ?? ''));
+            if ($otp === '' || !verifyUserTotpCode($userId, $otp, false)) {
+                poznoteApiSecondFactorRejection($otp === '' ? 'missing' : 'invalid');
+                return null;
+            }
+        }
+    } catch (Throwable $e) {
+        error_log("Poznote Auth: two-factor state unreadable for API user $userId: " . $e->getMessage());
+        return null;
+    }
+
     $authUser['_api_auth_method'] = 'basic';
     return $authUser;
+}
+
+/**
+ * Why resolveApiBasicAuthUser() turned down a correct account password, if it
+ * did: 'missing' or 'invalid' second factor. Called with a value to record it,
+ * without one to read it.
+ */
+function poznoteApiSecondFactorRejection(?string $reason = null): ?string {
+    static $rejection = null;
+    if ($reason !== null) {
+        $rejection = $reason;
+    }
+    return $rejection;
 }
 
 function requireApiAuth() {

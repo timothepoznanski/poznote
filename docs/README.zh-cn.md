@@ -247,10 +247,7 @@ docker compose up -d
 <details>
 <summary><strong>☁️ 云端</strong></summary><br>
 
-不想自己管理服务器？有两家托管商可以为你运行 Poznote。无论选择哪一家，都需要先在托管商处注册账号，然后在其应用目录中点几下即可部署 Poznote。两家在注册时都会赠送免费额度，你可以先免费试用。
-
-- **[Caliber Node](https://calibernode.com/cloud-apps/poznote)**，每月 2.50 美元起：新版本发布后立即更新，固定套餐（需要更多资源时升级到下一档），包含 SSH 控制台和自动快照。适合希望尽量少操心、笔记数量不多的用户。
-- **[PikaPods](https://www.pikapods.com/pods?run=poznote)**，每月 2 美元起：更新在推送前经过测试，因此会稍晚一些，内存、CPU 和磁盘可分别调整，备份自动运行，但存储位置（S3）需要你自己配置。适合希望随着笔记增多灵活扩容的用户。
+不想自己管理服务器？托管商可以为你运行 Poznote 并保持在线。在[这里](https://poznote.com/hosting.html)查看可用的托管商以及如何选择。
 
 </details>
 
@@ -499,6 +496,16 @@ Poznote 通过用户名或电子邮件地址加密码，对照用户的个人资
 - **保持登录 30 天** 选项会将会话保留 30 天。
 - 修改密码后，该用户现有的“保持登录”cookie 将全部失效。
 
+#### 双重身份验证
+
+每位用户都可以在 **Settings > Two-factor authentication** 中启用双重身份验证（TOTP）。输入密码后，登录表单会要求提供身份验证器应用（Aegis、Google Authenticator、1Password、Bitwarden 等）生成的 6 位验证码。
+
+- 设置时会显示在浏览器中绘制的二维码，以及十个一次性恢复代码，请妥善保存以防手机丢失。
+- 它保护的是密码登录。SSO 登录由身份提供商及其自身的第二重验证负责。
+- 启用期间，REST API 不再单独接受账户密码：请为客户端创建[应用密码](#应用密码)，或在 `X-Poznote-OTP` 请求头中发送当前验证码。
+- 如果用户同时丢失了设备和恢复代码，管理员可以在 **Settings > Admin Tools > User Management**（密码对话框）中为其停用。
+- 启用或停用都会使该用户现有的 “Remember me” cookie 失效。
+
 #### 默认密码
 
 - 管理员账户：`admin`
@@ -525,6 +532,7 @@ Poznote 支持 OpenID Connect（授权码 + PKCE），用于集成单点登录�
 6. 如果 `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true`，用户名/密码表单将被隐藏，登录页面变为仅支持 SSO。
 7. 启用 OIDC 后，REST API 客户端可以使用 `Authorization: Bearer <OIDC JWT>` 进行身份验证；Poznote 会校验提供商的 JWKS、issuer、过期时间、audience 以及已配置的访问控制。
 8. 完全无法执行 OIDC 流程的客户端（浏览器扩展、移动应用、脚本）改用[应用密码](#应用密码)，每个用户可在自己的设置中创建。
+9. [双重身份验证](#双重身份验证)只作用于密码登录表单：SSO 登录永远不会要求 Poznote 验证码。请改为在身份提供商中强制启用第二重验证。同时拥有密码和 SSO 身份的用户保留两种登录方式，而 SSO 方式的安全性取决于身份提供商的策略。
 
 #### 配置
 

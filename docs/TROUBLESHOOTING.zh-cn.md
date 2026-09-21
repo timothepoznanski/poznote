@@ -187,6 +187,39 @@ volumes:
 
 </details>
 
+<details>
+<summary><strong>管理员密码丢失</strong></summary>
+<br>
+
+如果另一位管理员仍能登录，可以在 **Settings > Admin Tools > User Management** 中为您设置新密码。否则，请直接在主数据库中重置。在主机上的 Poznote 目录中执行（主机上需安装 `sqlite3` 命令行工具，Poznote 镜像中不包含它）：
+
+```bash
+sudo sqlite3 data/master.db "UPDATE users SET password_hash=NULL, password_login_disabled=0 WHERE id=1;"
+```
+
+这会清除第一个账户（id 1，始终是管理员）已保存的密码，内置默认值随之重新生效：使用该账户的用户名和密码 `admin` 登录，然后立即在 **Settings > Change Password** 中修改。要重置其他账户，请将 `WHERE id=1` 替换为 `WHERE username='其用户名'`；普通用户会回退到密码 `user`。
+
+如果该账户启用了双重身份验证，登录表单在密码之后仍会要求输入验证码。如果设备也丢失了，请参阅下一条。
+
+</details>
+
+<a id="two-factor-lockout"></a>
+<details>
+<summary><strong>被双重身份验证锁在门外（设备和恢复代码均已丢失）</strong></summary>
+<br>
+
+启用双重身份验证时获得的每个恢复代码都可用于登录一次：在验证码界面选择 **Use a recovery code**。如果一个都没有，管理员可以在 **Settings > Admin Tools > User Management** 中您账户的密码对话框里为您停用双重身份验证。
+
+如果您是唯一的管理员，请直接在主数据库中移除第二重验证。在主机上的 Poznote 目录中执行（主机上需安装 `sqlite3` 命令行工具）：
+
+```bash
+sudo sqlite3 data/master.db "DELETE FROM user_totp_recovery_codes WHERE user_id=1; DELETE FROM user_totp WHERE user_id=1;"
+```
+
+将 `1` 替换为该账户的 id（`sudo sqlite3 data/master.db "SELECT id, username FROM users;"` 可列出所有账户）。之后仅凭密码即可登录，为该账户签发的 “Remember me” cookie 将失效，并且可以在 **Settings > Two-factor authentication** 中重新设置双重身份验证。
+
+</details>
+
 <a id="the-app-stops-answering-under-load"></a>
 <details>
 <summary><strong>应用在高负载下停止响应（自动保存出错，“server reached pm.max_children”）</strong></summary>

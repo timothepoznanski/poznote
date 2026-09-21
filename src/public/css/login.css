@@ -345,6 +345,37 @@ input[type="password"]::placeholder {
     text-decoration: underline;
 }
 
+/* Two-factor step (login.php): one code field, then two quiet links. */
+.totp-code-input {
+    text-align: center;
+    letter-spacing: 0.2em;
+    font-variant-numeric: tabular-nums;
+}
+
+.totp-code-input::placeholder {
+    letter-spacing: normal;
+}
+
+.totp-cancel-form {
+    margin: 0.5rem 0 0;
+    text-align: center;
+}
+
+.totp-cancel-button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--pz-text-secondary);
+    font: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.totp-cancel-button:hover {
+    color: var(--pz-accent-strong);
+    text-decoration: underline;
+}
+
 .error {
     color: var(--pz-danger-text);
     margin-top: 0.5rem;

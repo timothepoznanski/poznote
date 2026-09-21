@@ -982,6 +982,27 @@ $router->delete('/users/me/app-passwords/{id}', function($params) use ($usersCon
     echo json_encode($usersController->revokeAppPassword($params['id']));
 });
 
+// Two-factor authentication on password sign-in, see src/lib/totp.php
+$router->get('/users/me/two-factor', function($params) use ($usersController) {
+    echo json_encode($usersController->twoFactorStatus());
+});
+
+$router->post('/users/me/two-factor/setup', function($params) use ($usersController) {
+    echo json_encode($usersController->twoFactorSetup());
+});
+
+$router->post('/users/me/two-factor/enable', function($params) use ($usersController) {
+    echo json_encode($usersController->twoFactorEnable());
+});
+
+$router->post('/users/me/two-factor/disable', function($params) use ($usersController) {
+    echo json_encode($usersController->twoFactorDisable());
+});
+
+$router->post('/users/me/two-factor/recovery-codes', function($params) use ($usersController) {
+    echo json_encode($usersController->twoFactorRegenerateRecoveryCodes());
+});
+
 // Get user ID by username (admin only, used by backup scripts)
 $router->get('/users/lookup/{username}', function($params) use ($usersController) {
     echo json_encode($usersController->lookup($params['username']));
@@ -1027,6 +1048,11 @@ $router->delete('/admin/users/{id}', function($params) use ($usersController) {
 // Admin: Reset or set a user's password
 $router->post('/admin/users/{id}/reset-password', function($params) use ($usersController) {
     echo json_encode($usersController->adminResetPassword($params['id']));
+});
+
+// Admin: Switch a user's two-factor authentication off (lost device)
+$router->post('/admin/users/{id}/two-factor/reset', function($params) use ($usersController) {
+    echo json_encode($usersController->adminResetTwoFactor($params['id']));
 });
 
 // Admin: Get a user's password status

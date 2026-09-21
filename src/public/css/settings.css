@@ -305,6 +305,161 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     color: var(--pz-text-muted);
 }
 
+/* Two-factor modal (js/two-factor.js): one view at a time, swapped in place
+   (off, scanning the secret, recovery codes, on). Only --pz-* tokens, like
+   the app passwords modal above. */
+#twoFactorModal .modal-content {
+    max-width: 520px;
+}
+
+#twoFactorModal .two-factor-description {
+    line-height: 1.45;
+    margin: 0 0 12px 0;
+}
+
+#twoFactorModal .two-factor-error {
+    color: var(--pz-danger-text);
+    margin: 0 0 10px 0;
+    font-size: 0.9rem;
+}
+
+#twoFactorModal input[type="password"],
+#twoFactorModal input[type="text"] {
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* The SVG paints its own white ground and quiet zone, so the code stays black
+   on white in the dark themes too: an inverted QR code is refused by several
+   authenticator apps. */
+#twoFactorModal .two-factor-qr {
+    width: 200px;
+    max-width: 100%;
+    margin: 0 auto 12px auto;
+    border-radius: var(--pz-radius);
+    overflow: hidden;
+    line-height: 0;
+}
+
+#twoFactorModal .two-factor-qr svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+#twoFactorModal .two-factor-secret-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+#twoFactorModal .two-factor-secret {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 6px 8px;
+    border-radius: var(--pz-radius);
+    background-color: var(--pz-surface-sunken);
+    font-family: monospace;
+    font-size: 0.9rem;
+    user-select: all;
+}
+
+#twoFactorModal .two-factor-copy {
+    flex: 0 0 auto;
+    padding: 6px 14px;
+}
+
+#twoFactorModal .two-factor-code {
+    font-variant-numeric: tabular-nums;
+}
+
+#twoFactorModal .two-factor-recovery-list {
+    list-style: none;
+    margin: 0 0 10px 0;
+    padding: 10px 12px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 16px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    background-color: var(--pz-surface);
+}
+
+#twoFactorModal .two-factor-recovery-list code {
+    font-family: monospace;
+    font-size: 0.95rem;
+    user-select: all;
+}
+
+#twoFactorModal .two-factor-recovery-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+#twoFactorModal .two-factor-recovery-actions .btn {
+    padding: 6px 14px;
+}
+
+#twoFactorModal .two-factor-section {
+    padding-top: 12px;
+    margin-top: 12px;
+    border-top: 1px solid var(--pz-border);
+}
+
+#twoFactorModal .two-factor-section p {
+    margin: 4px 0 8px 0;
+    line-height: 1.45;
+}
+
+/* Same correction as the app passwords create row: the modal-wide input
+   margins would push the fields off the button's line. */
+#twoFactorModal .two-factor-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+#twoFactorModal .two-factor-row input {
+    flex: 1 1 150px;
+    width: auto;
+    min-width: 0;
+    margin: 0;
+}
+
+#twoFactorModal .two-factor-row .btn {
+    flex: 0 0 auto;
+    padding: 9px 16px;
+}
+
+/* The turn-off fields share a line only when both placeholders fit. */
+#twoFactorModal .two-factor-fields input {
+    flex-basis: 180px;
+}
+
+/* Grey Cancel / Close, the one the logout confirmation uses. Without it the
+   dialog footer colours buttons by position (modals/base.css): the first one
+   blue like an action, a lone one outlined. */
+#twoFactorModal .modal-buttons button.btn-cancel {
+    border: none;
+    background-color: var(--pz-surface-sunken);
+    color: var(--pz-text);
+}
+
+#twoFactorModal .modal-buttons button.btn-cancel:hover {
+    background-color: var(--pz-border);
+}
+
+/* The rows above reset the modal-wide input margins, so the last block of
+   every view would otherwise sit against the dialog buttons. */
+#twoFactorModal #tfBody > :last-child {
+    margin-bottom: 16px;
+}
+
 /* Settings Category Titles */
 /* Semibold: the section titles head the cards below them, so they sit a step
    above the card titles (regular) instead of a step below. css/fonts.css,

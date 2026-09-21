@@ -1484,6 +1484,13 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                 <div id="pw_status" class="password-status-text"></div>
             </div>
 
+            <!-- Only shown when the user has two-factor on: the way out for
+                 someone who lost their device and their recovery codes. -->
+            <div class="password-two-factor-row" id="pw_two_factor_row" style="display: none;">
+                <span class="password-two-factor-text"><?php echo t_h('multiuser.admin.two_factor.enabled_detail', [], 'Two-factor authentication is on for this user.'); ?></span>
+                <button type="button" class="btn btn-secondary" id="pw_two_factor_reset_btn" onclick="resetUserTwoFactor()"><?php echo t_h('multiuser.admin.two_factor.reset', [], 'Turn off two-factor'); ?></button>
+            </div>
+
             <!-- Typed twice, like the user's own change-password modal: an
                  admin setting a password for someone else never gets to find
                  out it was mistyped. -->
@@ -1620,6 +1627,69 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
             }
 
             statusRow.style.display = statusEl.textContent.trim() === '' ? 'none' : 'flex';
+
+            var twoFactorRow = document.getElementById('pw_two_factor_row');
+            if (twoFactorRow) {
+                twoFactorRow.style.display = data && data.two_factor_enabled ? 'flex' : 'none';
+                disarmTwoFactorReset();
+            }
+        }
+
+        var twoFactorResetLabel = <?php echo json_encode(t('multiuser.admin.two_factor.reset', [], 'Turn off two-factor')); ?>;
+        var twoFactorResetTimer = null;
+
+        function disarmTwoFactorReset() {
+            var btn = document.getElementById('pw_two_factor_reset_btn');
+            clearTimeout(twoFactorResetTimer);
+            if (!btn) return;
+            btn.classList.remove('is-armed');
+            btn.disabled = false;
+            btn.textContent = twoFactorResetLabel;
+        }
+
+        // The user loses a protection they chose, so the button asks once: a
+        // first click arms it, a second within a few seconds confirms.
+        function resetUserTwoFactor() {
+            var btn = document.getElementById('pw_two_factor_reset_btn');
+            var userId = document.getElementById('pw_user_id').value;
+            var errorEl = document.getElementById('pw_error');
+            var successEl = document.getElementById('pw_success');
+
+            if (!btn.classList.contains('is-armed')) {
+                btn.classList.add('is-armed');
+                btn.textContent = <?php echo json_encode(t('multiuser.admin.two_factor.confirm_reset', [], 'Confirm')); ?>;
+                twoFactorResetTimer = setTimeout(disarmTwoFactorReset, 4000);
+                return;
+            }
+
+            clearTimeout(twoFactorResetTimer);
+            btn.disabled = true;
+            errorEl.style.display = 'none';
+            successEl.style.display = 'none';
+
+            fetch('/api/v1/admin/users/' + userId + '/two-factor/reset', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                credentials: 'same-origin',
+                body: '{}'
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    successEl.textContent = <?php echo json_encode(t('multiuser.admin.two_factor.reset_done', [], 'Two-factor authentication turned off. This user now signs in with their password alone.')); ?>;
+                    successEl.style.display = 'block';
+                    loadPasswordStatus(userId);
+                } else {
+                    disarmTwoFactorReset();
+                    errorEl.textContent = data.error || 'Error';
+                    errorEl.style.display = 'block';
+                }
+            })
+            .catch(() => {
+                disarmTwoFactorReset();
+                errorEl.textContent = 'Error';
+                errorEl.style.display = 'block';
+            });
         }
 
         function loadPasswordStatus(userId) {

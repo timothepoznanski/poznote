@@ -478,6 +478,8 @@
       "change_password_sso_only": "Esta instancia solo usa SSO, por lo que nunca se aceptaría una contraseña local al iniciar sesión. Los cambios de contraseña están desactivados.",
       "change_password_no_local": "Tu cuenta inicia sesión mediante tu proveedor de identidad y no tiene contraseña local, por lo que no hay contraseña actual con la que confirmar un cambio. Un administrador puede establecer una desde Herramientas de administración > Usuarios.",
       "app_passwords": "Crea contraseñas para aplicaciones y extensiones que se conectan a través de la API, como la extensión del navegador. Funcionan aunque inicies sesión con SSO, no permiten abrir la interfaz web ni modificar tu cuenta, y se pueden revocar en cualquier momento.",
+      "two_factor": "Pedir un código de una aplicación de autenticación después de la contraseña al iniciar sesión.",
+      "two_factor_sso": "La autenticación de dos factores protege el inicio de sesión con contraseña. Tu cuenta inicia sesión a través de tu proveedor de identidad, que gestiona su propio segundo factor.",
       "git_sync": "Respalda tus notas en un repositorio Git y consulta el historial de sincronización.",
       "extension": "Instala la extensión del navegador para guardar páginas web en Poznote.",
       "install_app": "Instala Poznote como aplicación en tu dispositivo (PWA).",
@@ -616,6 +618,7 @@
       "user_management": "Gestión de usuarios",
       "change_password": "Cambiar contraseña",
       "app_passwords": "Contraseñas de aplicación",
+      "two_factor": "Autenticación de dos factores",
       "delete_account": "Eliminar cuenta",
       "import_limits": "Límites de importación",
       "user_quotas": "Cuotas de usuario",
@@ -2448,7 +2451,20 @@
       "invalid": "No se puede seleccionar esta cuenta."
     },
     "or": "o",
-    "session_expired": "Tu sesión ha expirado. Vuelve a iniciar sesión para regresar a donde estabas."
+    "session_expired": "Tu sesión ha expirado. Vuelve a iniciar sesión para regresar a donde estabas.",
+    "two_factor": {
+      "intro": "Introduce el código de 6 dígitos de tu aplicación de autenticación.",
+      "recovery_intro": "Introduce uno de tus códigos de recuperación. Cada código funciona una sola vez.",
+      "code_placeholder": "Código de verificación",
+      "recovery_placeholder": "Código de recuperación",
+      "verify": "Verificar",
+      "use_recovery": "Usar un código de recuperación",
+      "use_app": "Usar la aplicación de autenticación",
+      "cancel": "Volver al inicio de sesión",
+      "invalid_code": "Código incorrecto. Inténtalo de nuevo.",
+      "expired": "El paso de verificación ha caducado. Inicia sesión de nuevo.",
+      "too_many_tries": "Demasiados códigos incorrectos. Inicia sesión de nuevo."
+    }
   },
   "restore_import": {
     "page": {
@@ -3457,6 +3473,12 @@
         "changed_at_prefix": "Actualizada:",
         "status_sso_only_detail": "Este usuario inicia sesión mediante SSO y no tiene contraseña. Establezca una a continuación si se necesita el inicio de sesión con contraseña."
       },
+      "two_factor": {
+        "enabled_detail": "La autenticación de dos factores está activada para este usuario.",
+        "reset": "Desactivar dos factores",
+        "confirm_reset": "Confirmar",
+        "reset_done": "Autenticación de dos factores desactivada. Este usuario inicia sesión ahora solo con su contraseña."
+      },
       "errors": {
         "cannot_delete_self": "No puedes borrar tu propio perfil",
         "cannot_change_self": "No puedes cambiar tu propio estado/rol",
@@ -3794,7 +3816,12 @@
       "backup_created": "Copia de seguridad creada",
       "backup_restored": "Copia de seguridad restaurada",
       "trash_emptied": "Papelera vaciada",
-      "note_deleted": "Nota eliminada definitivamente"
+      "note_deleted": "Nota eliminada definitivamente",
+      "two_factor_enabled": "Dos factores activado",
+      "two_factor_disabled": "Dos factores desactivado",
+      "two_factor_reset": "Dos factores desactivado por un admin",
+      "two_factor_recovery_used": "Inicio de sesión con un código de recuperación",
+      "two_factor_recovery_regenerated": "Códigos de recuperación regenerados"
     },
     "filters": {
       "all_actions": "Todas las acciones",
@@ -3818,7 +3845,8 @@
       "empty_value": "vacío",
       "s3_objects_deleted": "{{count}} objetos S3 eliminados",
       "s3_cleanup_failed": "falló la limpieza de S3",
-      "expires_at": "caduca el {{date}}"
+      "expires_at": "caduca el {{date}}",
+      "recovery_codes_remaining": "quedan {{count}}"
     },
     "destinations": {
       "download": "descarga",
@@ -3963,6 +3991,50 @@
       "limit_reached": "Límite alcanzado: revoca una contraseña de aplicación antes de crear otra.",
       "load_failed": "No se pudieron cargar tus contraseñas de aplicación.",
       "generic": "Algo salió mal. Inténtalo de nuevo."
+    }
+  },
+  "two_factor": {
+    "status": {
+      "enabled": "Activada",
+      "disabled": "Desactivada"
+    },
+    "modal": {
+      "title": "Autenticación de dos factores",
+      "description": "Después de la contraseña, el inicio de sesión pide un código de 6 dígitos de una aplicación de autenticación en tu teléfono (Aegis, Google Authenticator, 1Password, Bitwarden...). Quien conozca tu contraseña seguirá sin poder abrir tu cuenta.",
+      "api_notice": "Las aplicaciones que se conectan a la API con la contraseña de tu cuenta (extensión del navegador, servidor MCP, scripts) dejarán de funcionar: dale a cada una una contraseña de aplicación.",
+      "sso_notice": "El inicio de sesión mediante SSO no pide este código: lo protege tu proveedor de identidad, así que activa allí su propio segundo factor.",
+      "current_password": "Contraseña actual",
+      "cancel": "Cancelar",
+      "setup": "Configurar",
+      "scan": "Escanea este código QR con tu aplicación de autenticación, o introduce la clave a mano, y luego escribe el código de 6 dígitos que muestra la aplicación.",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "code": "Código de 6 dígitos",
+      "enable": "Activar",
+      "recovery_intro": "La autenticación de dos factores está activada. Guarda estos códigos de recuperación en un lugar seguro, lejos de tu teléfono: cada uno te permite iniciar sesión una vez si pierdes tu dispositivo. No se volverán a mostrar.",
+      "download": "Descargar",
+      "saved_codes": "He guardado mis códigos",
+      "recovery_remaining_one": "Queda 1 código de recuperación.",
+      "recovery_remaining_other": "Quedan {{count}} códigos de recuperación.",
+      "enabled_since": "Activada desde el {{date}}.",
+      "enabled": "La autenticación de dos factores está activada.",
+      "recovery_title": "Códigos de recuperación",
+      "recovery_help": "Generar códigos nuevos anula los anteriores. Confirma con un código de tu aplicación de autenticación.",
+      "regenerate": "Códigos nuevos",
+      "disable_title": "Desactivar",
+      "disable_help": "Tu contraseña volverá a bastar para iniciar sesión. Confirma con tu contraseña y un código de tu aplicación, o un código de recuperación.",
+      "code_or_recovery": "Código o código de recuperación",
+      "disable": "Desactivar",
+      "close": "Cerrar"
+    },
+    "errors": {
+      "invalid_code": "Código incorrecto. Comprueba la hora de tu dispositivo e inténtalo de nuevo.",
+      "invalid_password": "La contraseña actual es incorrecta.",
+      "too_many": "Demasiados intentos fallidos. Inténtalo más tarde.",
+      "generic": "Algo ha salido mal. Inténtalo de nuevo.",
+      "password_required": "Introduce tu contraseña actual.",
+      "code_required": "Introduce el código que muestra tu aplicación de autenticación.",
+      "disable_required": "Introduce tu contraseña actual y un código."
     }
   },
   "delete_account": {

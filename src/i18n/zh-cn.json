@@ -477,6 +477,8 @@
       "change_password_sso_only": "此实例仅使用 SSO，因此登录时永远不会接受本地密码。密码修改已禁用。",
       "change_password_no_local": "您的账户通过身份提供商登录且没有本地密码，因此没有当前密码可用于确认更改。管理员可以在管理工具 > 用户中为您设置一个。",
       "app_passwords": "为通过 API 连接的应用和扩展（例如浏览器扩展）创建密码。即使您通过 SSO 登录，它们也能使用；它们无法打开网页界面或更改您的账户，并且可以随时撤销。",
+      "two_factor": "登录时在输入密码后，要求提供身份验证器应用中的验证码。",
+      "two_factor_sso": "双重身份验证保护的是密码登录。您的账户通过身份提供商登录，第二重验证由其自行处理。",
       "git_sync": "将笔记备份到 Git 仓库并查看同步历史。",
       "extension": "安装浏览器扩展，将网页保存到 Poznote。",
       "install_app": "将 Poznote 作为应用安装到您的设备（PWA）。",
@@ -615,6 +617,7 @@
       "storage_stats_user": "用户存储统计",
       "change_password": "修改密码",
       "app_passwords": "应用密码",
+      "two_factor": "双重身份验证",
       "delete_account": "删除账户",
       "import_limits": "导入限制",
       "user_quotas": "用户配额",
@@ -2449,7 +2452,20 @@
       "invalid": "无法选择此账户。"
     },
     "or": "或",
-    "session_expired": "您的会话已结束。请重新登录以返回之前的页面。"
+    "session_expired": "您的会话已结束。请重新登录以返回之前的页面。",
+    "two_factor": {
+      "intro": "请输入身份验证器应用中的 6 位验证码。",
+      "recovery_intro": "请输入一个恢复代码。每个代码只能使用一次。",
+      "code_placeholder": "验证码",
+      "recovery_placeholder": "恢复代码",
+      "verify": "验证",
+      "use_recovery": "使用恢复代码",
+      "use_app": "使用身份验证器应用",
+      "cancel": "返回登录",
+      "invalid_code": "验证码不正确，请重试。",
+      "expired": "验证步骤已过期，请重新登录。",
+      "too_many_tries": "错误的验证码次数过多，请重新登录。"
+    }
   },
   "restore_import": {
     "page": {
@@ -3462,6 +3478,12 @@
         "changed_at_prefix": "更新时间：",
         "status_sso_only_detail": "该用户通过 SSO 登录，没有密码。如需密码登录，请在下方设置一个。"
       },
+      "two_factor": {
+        "enabled_detail": "该用户已启用双重身份验证。",
+        "reset": "停用双重验证",
+        "confirm_reset": "确认",
+        "reset_done": "双重身份验证已停用。该用户现在仅凭密码登录。"
+      },
       "password": "密码",
       "confirm_password": "确认密码",
       "new_password": "新密码",
@@ -3893,7 +3915,12 @@
       "backup_created": "已创建备份",
       "backup_restored": "已恢复备份",
       "trash_emptied": "已清空回收站",
-      "note_deleted": "笔记已永久删除"
+      "note_deleted": "笔记已永久删除",
+      "two_factor_enabled": "已启用双重验证",
+      "two_factor_disabled": "已停用双重验证",
+      "two_factor_reset": "管理员停用了双重验证",
+      "two_factor_recovery_used": "使用恢复代码登录",
+      "two_factor_recovery_regenerated": "已重新生成恢复代码"
     },
     "filters": {
       "all_actions": "所有操作",
@@ -3917,7 +3944,8 @@
       "empty_value": "空",
       "s3_objects_deleted": "已删除 {{count}} 个 S3 对象",
       "s3_cleanup_failed": "S3 清理失败",
-      "expires_at": "过期于 {{date}}"
+      "expires_at": "过期于 {{date}}",
+      "recovery_codes_remaining": "剩余 {{count}} 个"
     },
     "destinations": {
       "download": "下载",
@@ -4062,6 +4090,50 @@
       "limit_reached": "已达上限：请先撤销一个应用密码，再创建新的。",
       "load_failed": "无法加载您的应用密码。",
       "generic": "出现错误，请重试。"
+    }
+  },
+  "two_factor": {
+    "status": {
+      "enabled": "已启用",
+      "disabled": "已停用"
+    },
+    "modal": {
+      "title": "双重身份验证",
+      "description": "输入密码后，登录还会要求提供手机上身份验证器应用（Aegis、Google Authenticator、1Password、Bitwarden 等）生成的 6 位验证码。即使有人得知您的密码，也无法打开您的账户。",
+      "api_notice": "使用账户密码通过 API 连接的应用（浏览器扩展、MCP 服务器、脚本）将无法继续使用：请为它们各自创建应用密码。",
+      "sso_notice": "通过 SSO 登录不会要求此验证码：该登录由您的身份提供商保护，请在那里启用其自身的第二重验证。",
+      "current_password": "当前密码",
+      "cancel": "取消",
+      "setup": "设置",
+      "scan": "用身份验证器应用扫描此二维码，或手动输入密钥，然后输入应用显示的 6 位验证码。",
+      "copy": "复制",
+      "copied": "已复制",
+      "code": "6 位验证码",
+      "enable": "启用",
+      "recovery_intro": "双重身份验证已启用。请将这些恢复代码保存在安全的地方，不要只存在手机上：如果设备丢失，每个代码可用于登录一次。它们不会再次显示。",
+      "download": "下载",
+      "saved_codes": "我已保存代码",
+      "recovery_remaining_one": "还剩 1 个恢复代码。",
+      "recovery_remaining_other": "还剩 {{count}} 个恢复代码。",
+      "enabled_since": "自 {{date}} 起启用。",
+      "enabled": "双重身份验证已启用。",
+      "recovery_title": "恢复代码",
+      "recovery_help": "生成新代码会使旧代码失效。请用身份验证器应用中的验证码确认。",
+      "regenerate": "生成新代码",
+      "disable_title": "停用",
+      "disable_help": "之后仅凭密码即可登录。请用密码以及应用中的验证码或一个恢复代码确认。",
+      "code_or_recovery": "验证码或恢复代码",
+      "disable": "停用",
+      "close": "关闭"
+    },
+    "errors": {
+      "invalid_code": "验证码不正确。请检查设备时间后重试。",
+      "invalid_password": "当前密码不正确。",
+      "too_many": "失败次数过多，请稍后再试。",
+      "generic": "出了点问题，请重试。",
+      "password_required": "请输入当前密码。",
+      "code_required": "请输入身份验证器应用显示的验证码。",
+      "disable_required": "请输入当前密码和验证码。"
     }
   },
   "delete_account": {

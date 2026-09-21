@@ -320,6 +320,26 @@
         "src/public/js/markdown-editor.js (bridge)"
       ],
       "notes": "Built here from about twenty @codemirror packages, so there is no single version number: package-lock.json is the authoritative record and 'npm audit' in build/markdown-editor is the advisory check."
+    },
+    {
+      "id": "qrcode-generator",
+      "version": "1.4.4",
+      "license": "MIT",
+      "homepage": "https://github.com/kazuhikoarase/qrcode-generator",
+      "files": [
+        {
+          "path": "src/public/js/qrcode-generator/qrcode.js",
+          "url": "https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js",
+          "sha256": "18ae399f81182bc9de916e9c77b195df20cc58d6f2d55a62b085a299f1bf1780"
+        }
+      ],
+      "vendored": "2026-09-21",
+      "updated": "2026-09-21",
+      "verified": "2026-09-21",
+      "loaded_by": [
+        "src/public/js/two-factor.js (injected on demand, when the two-factor setup shows its QR code)"
+      ],
+      "notes": "Browser build exposing window.qrcode. Draws the otpauth:// QR code of the two-factor setup in the browser, so the shared secret is never sent to a third-party QR service. Unminified upstream file: no .min.js is published."
     }
   ]
 }

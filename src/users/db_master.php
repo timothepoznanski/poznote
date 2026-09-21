@@ -2349,16 +2349,24 @@ function getRememberMeSecret(array $user): ?string {
 
     $storedHash = getUserPasswordHash($userId);
     if ($storedHash !== null) {
-        return $storedHash;
+        $secret = $storedHash;
+    } elseif (isPasswordLoginDisabled($user)) {
+        return null;
+    } elseif ((bool)$user['is_admin']) {
+        // Fall back to hardcoded default password
+        $secret = defined('AUTH_PASSWORD') ? AUTH_PASSWORD : 'admin';
+    } else {
+        $secret = defined('AUTH_USER_PASSWORD') ? AUTH_USER_PASSWORD : 'user';
     }
 
-    if (isPasswordLoginDisabled($user)) {
+    // With two-factor on, the cookie is bound to the second factor as well
+    // (see bindRememberMeSecretToTotp()). If that state cannot be read there is
+    // no secret to sign with: the holder goes back through the login form.
+    try {
+        require_once __DIR__ . '/totp.php';
+        return bindRememberMeSecretToTotp($userId, $secret);
+    } catch (Throwable $e) {
+        error_log("Failed to read two-factor state for user $userId: " . $e->getMessage());
         return null;
     }
-
-    // Fall back to hardcoded default password
-    if ((bool)$user['is_admin']) {
-        return defined('AUTH_PASSWORD') ? AUTH_PASSWORD : 'admin';
-    }
-    return defined('AUTH_USER_PASSWORD') ? AUTH_USER_PASSWORD : 'user';
 }

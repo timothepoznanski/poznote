@@ -477,6 +477,8 @@
       "change_password_sso_only": "Cette instance utilise uniquement le SSO, donc un mot de passe local ne serait jamais accepté à la connexion. Les changements de mot de passe sont désactivés.",
       "change_password_no_local": "Votre compte se connecte via votre fournisseur d'identité et n'a pas de mot de passe local, il n'y a donc aucun mot de passe actuel pour confirmer un changement. Un administrateur peut vous en définir un depuis Outils d'administration > Utilisateurs.",
       "app_passwords": "Créez des mots de passe pour les applications et extensions qui se connectent via l'API, comme l'extension de navigateur. Ils fonctionnent même si vous vous connectez via SSO, ne permettent ni d'ouvrir l'interface web ni de modifier votre compte, et peuvent être révoqués à tout moment.",
+      "two_factor": "Demander un code d'une application d'authentification après votre mot de passe lors de la connexion.",
+      "two_factor_sso": "L'authentification à deux facteurs protège la connexion par mot de passe. Votre compte se connecte via votre fournisseur d'identité, qui gère son propre second facteur.",
       "git_sync": "Sauvegardez vos notes dans un dépôt Git et consultez l'historique de synchronisation.",
       "extension": "Installez l'extension de navigateur pour enregistrer des pages web dans Poznote.",
       "install_app": "Installez Poznote comme application sur votre appareil (PWA).",
@@ -615,6 +617,7 @@
       "storage_stats_user": "Statistiques de stockage utilisateur",
       "change_password": "Changer le mot de passe",
       "app_passwords": "Mots de passe d'application",
+      "two_factor": "Authentification à deux facteurs",
       "delete_account": "Supprimer le compte",
       "import_limits": "Limites d'import",
       "user_quotas": "Quotas utilisateurs",
@@ -2453,7 +2456,20 @@
       "invalid": "Impossible de sélectionner ce compte."
     },
     "or": "ou",
-    "session_expired": "Votre session a expiré. Reconnectez-vous pour revenir là où vous étiez."
+    "session_expired": "Votre session a expiré. Reconnectez-vous pour revenir là où vous étiez.",
+    "two_factor": {
+      "intro": "Saisissez le code à 6 chiffres de votre application d'authentification.",
+      "recovery_intro": "Saisissez l'un de vos codes de récupération. Chaque code ne fonctionne qu'une fois.",
+      "code_placeholder": "Code de vérification",
+      "recovery_placeholder": "Code de récupération",
+      "verify": "Vérifier",
+      "use_recovery": "Utiliser un code de récupération",
+      "use_app": "Utiliser l'application d'authentification",
+      "cancel": "Retour à la connexion",
+      "invalid_code": "Code incorrect. Réessayez.",
+      "expired": "L'étape de vérification a expiré. Reconnectez-vous.",
+      "too_many_tries": "Trop de codes incorrects. Reconnectez-vous."
+    }
   },
   "restore_import": {
     "page": {
@@ -3457,6 +3473,12 @@
         "changed_at_prefix": "Mise à jour :",
         "status_sso_only_detail": "Cet utilisateur se connecte via SSO et n'a pas de mot de passe. Définissez-en un ci-dessous si la connexion par mot de passe est nécessaire."
       },
+      "two_factor": {
+        "enabled_detail": "L'authentification à deux facteurs est activée pour cet utilisateur.",
+        "reset": "Désactiver la double authentification",
+        "confirm_reset": "Confirmer",
+        "reset_done": "Authentification à deux facteurs désactivée. Cet utilisateur se connecte désormais avec son seul mot de passe."
+      },
       "password": "Mot de passe",
       "profile": "Sélectionnez votre profil",
       "confirm_password": "Confirmer le mot de passe",
@@ -3898,7 +3920,12 @@
       "backup_created": "Sauvegarde créée",
       "backup_restored": "Sauvegarde restaurée",
       "trash_emptied": "Corbeille vidée",
-      "note_deleted": "Note supprimée définitivement"
+      "note_deleted": "Note supprimée définitivement",
+      "two_factor_enabled": "Double authentification activée",
+      "two_factor_disabled": "Double authentification désactivée",
+      "two_factor_reset": "Double authentification désactivée par un admin",
+      "two_factor_recovery_used": "Connexion avec un code de récupération",
+      "two_factor_recovery_regenerated": "Codes de récupération régénérés"
     },
     "filters": {
       "all_actions": "Toutes les actions",
@@ -3922,7 +3949,8 @@
       "empty_value": "vide",
       "s3_objects_deleted": "{{count}} objets S3 supprimés",
       "s3_cleanup_failed": "échec du nettoyage S3",
-      "expires_at": "expire le {{date}}"
+      "expires_at": "expire le {{date}}",
+      "recovery_codes_remaining": "{{count}} restants"
     },
     "destinations": {
       "download": "téléchargement",
@@ -4067,6 +4095,50 @@
       "limit_reached": "Limite atteinte : révoquez un mot de passe d'application avant d'en créer un autre.",
       "load_failed": "Impossible de charger vos mots de passe d'application.",
       "generic": "Une erreur est survenue. Réessayez."
+    }
+  },
+  "two_factor": {
+    "status": {
+      "enabled": "Activée",
+      "disabled": "Désactivée"
+    },
+    "modal": {
+      "title": "Authentification à deux facteurs",
+      "description": "Après votre mot de passe, la connexion demande un code à 6 chiffres fourni par une application d'authentification sur votre téléphone (Aegis, Google Authenticator, 1Password, Bitwarden...). Quelqu'un qui apprend votre mot de passe ne peut toujours pas ouvrir votre compte.",
+      "api_notice": "Les applications qui se connectent à l'API avec le mot de passe de votre compte (extension de navigateur, serveur MCP, scripts) cesseront de fonctionner : donnez plutôt un mot de passe d'application à chacune.",
+      "sso_notice": "La connexion par SSO ne demande pas ce code : elle est protégée par votre fournisseur d'identité, activez donc son propre second facteur de son côté.",
+      "current_password": "Mot de passe actuel",
+      "cancel": "Annuler",
+      "setup": "Configurer",
+      "scan": "Scannez ce QR code avec votre application d'authentification, ou saisissez la clé à la main, puis tapez le code à 6 chiffres affiché par l'application.",
+      "copy": "Copier",
+      "copied": "Copié",
+      "code": "Code à 6 chiffres",
+      "enable": "Activer",
+      "recovery_intro": "L'authentification à deux facteurs est activée. Conservez ces codes de récupération en lieu sûr, ailleurs que sur votre téléphone : chacun vous connecte une fois si vous perdez votre appareil. Ils ne seront plus affichés.",
+      "download": "Télécharger",
+      "saved_codes": "J'ai enregistré mes codes",
+      "recovery_remaining_one": "1 code de récupération restant.",
+      "recovery_remaining_other": "{{count}} codes de récupération restants.",
+      "enabled_since": "Activée depuis le {{date}}.",
+      "enabled": "L'authentification à deux facteurs est activée.",
+      "recovery_title": "Codes de récupération",
+      "recovery_help": "Générer de nouveaux codes annule les anciens. Confirmez avec un code de votre application d'authentification.",
+      "regenerate": "Nouveaux codes",
+      "disable_title": "Désactiver",
+      "disable_help": "Votre mot de passe suffira de nouveau pour vous connecter. Confirmez avec votre mot de passe et un code de votre application, ou un code de récupération.",
+      "code_or_recovery": "Code ou code de récupération",
+      "disable": "Désactiver",
+      "close": "Fermer"
+    },
+    "errors": {
+      "invalid_code": "Code incorrect. Vérifiez l'heure de votre appareil et réessayez.",
+      "invalid_password": "Le mot de passe actuel est incorrect.",
+      "too_many": "Trop de tentatives échouées. Réessayez plus tard.",
+      "generic": "Une erreur est survenue. Réessayez.",
+      "password_required": "Saisissez votre mot de passe actuel.",
+      "code_required": "Saisissez le code affiché par votre application d'authentification.",
+      "disable_required": "Saisissez votre mot de passe actuel et un code."
     }
   },
   "delete_account": {

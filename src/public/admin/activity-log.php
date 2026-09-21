@@ -403,6 +403,16 @@ function activityDetailsText(string $action, ?string $json): string {
             }
             return implode(' · ', $parts);
 
+        case ACTIVITY_TWO_FACTOR_RESET:
+            return empty($d['performed_by'])
+                ? ''
+                : t('activity_log.details.performed_by', ['user' => $d['performed_by']], 'by {{user}}');
+
+        case ACTIVITY_TWO_FACTOR_RECOVERY_USED:
+            return isset($d['remaining'])
+                ? t('activity_log.details.recovery_codes_remaining', ['count' => (int)$d['remaining']], '{{count}} left')
+                : '';
+
         case ACTIVITY_PROFILE_UPDATED:
         case ACTIVITY_QUOTA_UPDATED:
             $parts = [];

@@ -63,6 +63,15 @@ What an app password can and cannot do:
 
 The list in `Settings > App passwords` shows, for each one, the first characters of the secret (to tell them apart), when it was created, and when it was last used, which makes an unused credential easy to spot and remove. Each account can hold up to 25.
 
+**Two-factor authentication.** A user can turn on two-factor authentication in `Settings > Two-factor authentication`: the login form then asks for a TOTP code from an authenticator app after the password. It applies to password sign-in only, an SSO login is left to the identity provider. On an account with two-factor on, the API no longer accepts the account password on its own over Basic auth, otherwise the API would be the way around the second factor. Two options remain. Give each client an app password, which works unchanged. Or send the current 6-digit code with the account password in the `X-Poznote-OTP` header, which is what keeps `/api/v1/admin/*` (closed to app passwords) reachable from a terminal:
+
+```bash
+curl -u 'username:password' -H 'X-User-ID: 1' -H 'X-Poznote-OTP: 123456' \
+  http://YOUR_SERVER/api/v1/notes
+```
+
+Without the header the API answers `401` with an `X-Poznote-OTP: required` response header and a message saying so. A code sent this way stays valid for its whole window (up to 90 seconds), so a script can make several requests with it. Recovery codes are not accepted here.
+
 OIDC Bearer JWT authentication is available when OIDC is enabled. Poznote validates the token signature with the provider JWKS, checks issuer, expiration, and audience, then maps the token claims to a Poznote profile using the same OIDC linking rules as interactive login (`sub`, then `preferred_username`, then `email`). Group and user allowlists, disabled profiles, and auto-create settings are also enforced.
 
 ```bash
@@ -99,7 +108,7 @@ curl -u 'username:password' -H "X-User-ID: 1" \
 **Endpoints that do NOT require the `X-User-ID` header:**
 - **Admin endpoints**: `/api/v1/admin/*`
 - **Public endpoints**: `/api/v1/users/profiles`
-- **User profile endpoints**: `/api/v1/users/me`, `/api/v1/users/me/password`, `/api/v1/users/me/password-status`, `/api/v1/users/me/app-passwords`
+- **User profile endpoints**: `/api/v1/users/me`, `/api/v1/users/me/password`, `/api/v1/users/me/password-status`, `/api/v1/users/me/app-passwords`, `/api/v1/users/me/two-factor`
 - **System endpoints**: `/api/v1/system/*` (version, updates, i18n)
 - **Shared endpoints**: `/api/v1/shared`, `/api/v1/shared/with-me`
 
@@ -3017,6 +3026,84 @@ curl -X DELETE -u 'username:password' \
   http://YOUR_SERVER/api/v1/users/me/app-passwords/3
 ```
 
+### Two-Factor Authentication
+
+Two-factor authentication (TOTP) on password sign-in, managed by the user it belongs to. None of these endpoints is available to requests authenticated with an app password, and none requires `X-User-ID`.
+
+```
+GET /users/me/two-factor
+```
+
+Returns whether two-factor is on.
+
+```json
+{
+  "enabled": true,
+  "enabled_at": "2026-09-21 20:14",
+  "recovery_codes_remaining": 9,
+  "unavailable_reason": null
+}
+```
+
+`unavailable_reason` is `sso_only` or `no_local_password` when the account never signs in with a local password, in which case there is no login for a second factor to protect.
+
+```
+POST /users/me/two-factor/setup
+```
+
+Start switching two-factor on. Nothing is stored yet: the secret waits in the session until it is confirmed, so an abandoned setup locks nobody out. Needs a session, so call it with cookies kept between requests.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `current_password` | string | Yes | The account password |
+
+```json
+{
+  "secret": "RXEVC7EP35CLQTZNBVQ2TZZYRLDTMZIC",
+  "otpauth_uri": "otpauth://totp/Poznote:username?secret=RXEVC7EP35CLQTZNBVQ2TZZYRLDTMZIC&issuer=Poznote&algorithm=SHA1&digits=6&period=30",
+  "issuer": "Poznote",
+  "account": "username"
+}
+```
+
+```
+POST /users/me/two-factor/enable
+```
+
+Confirm the setup with a first code from the authenticator app. The response carries the ten recovery codes, the only time they are returned.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | 6-digit code for the secret returned by `setup` |
+
+```json
+{
+  "success": true,
+  "recovery_codes": ["2PZR5-UJEQU", "K7QF2-9WMXA"],
+  "enabled": true,
+  "recovery_codes_remaining": 10
+}
+```
+
+```
+POST /users/me/two-factor/recovery-codes
+```
+
+Replace the recovery codes; the previous ones stop working. Body: `code`, a 6-digit code from the app (a recovery code is not accepted). The response has the same shape as `enable`.
+
+```
+POST /users/me/two-factor/disable
+```
+
+Switch two-factor off. Both factors are asked for.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `current_password` | string | Yes | The account password |
+| `code` | string | Yes | 6-digit code from the app, or a recovery code |
+
+A wrong code answers `400` with `"code": "invalid_code"`, a wrong password `403` with `"code": "invalid_password"`. Both count towards the same progressive delay as failed logins, and `429` is returned once that limit is reached.
+
 ### Delete My Account
 
 ```
@@ -3182,6 +3269,17 @@ curl -X POST -u 'username:password' \
 ```
 
 ### Get User Password Status
+
+```
+POST /admin/users/{id}/two-factor/reset
+```
+
+Switch a user's two-factor authentication off, for someone who lost their device and their recovery codes. They sign in with the password alone afterwards and can set it up again. Answers `409` when two-factor is not on for that user. The action is recorded in the activity log.
+
+```bash
+curl -X POST -u 'admin:password' \
+  http://YOUR_SERVER/api/v1/admin/users/2/two-factor/reset
+```
 
 ```
 GET /admin/users/{id}/password-status
@@ -3591,6 +3689,11 @@ curl http://YOUR_SERVER/api_health.php
 | `GET` | `/users/me/app-passwords` | List app passwords |
 | `POST` | `/users/me/app-passwords` | Create app password |
 | `DELETE` | `/users/me/app-passwords/{id}` | Revoke app password |
+| `GET` | `/users/me/two-factor` | Two-factor status |
+| `POST` | `/users/me/two-factor/setup` | Start two-factor setup |
+| `POST` | `/users/me/two-factor/enable` | Confirm setup, get recovery codes |
+| `POST` | `/users/me/two-factor/recovery-codes` | Replace recovery codes |
+| `POST` | `/users/me/two-factor/disable` | Turn two-factor off |
 | `DELETE` | `/users/me` | Delete own account |
 | `GET` | `/users/lookup/{username}` | Lookup by name |
 
@@ -3603,6 +3706,7 @@ curl http://YOUR_SERVER/api_health.php
 | `PATCH` | `/admin/users/{id}` | Update user |
 | `DELETE` | `/admin/users/{id}` | Delete user |
 | `POST` | `/admin/users/{id}/reset-password` | Reset password |
+| `POST` | `/admin/users/{id}/two-factor/reset` | Turn a user's two-factor off |
 | `GET` | `/admin/users/{id}/password-status` | Password status |
 | `GET` | `/admin/stats` | System stats |
 | `POST` | `/admin/repair` | Repair database |
