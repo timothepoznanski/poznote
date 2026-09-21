@@ -461,9 +461,25 @@
                 header.appendChild(sourceBadge);
             }
 
+            var done = note.tasks.filter(function (t) { return t.completed; }).length;
+            var percent = note.tasks.length > 0 ? Math.round((done / note.tasks.length) * 100) : 0;
+
+            // Completion of this list alone, next to its "done / total" count
+            var bar = document.createElement('div');
+            bar.className = 'tasks-note-progress-bar';
+            bar.setAttribute('role', 'progressbar');
+            bar.setAttribute('aria-valuemin', '0');
+            bar.setAttribute('aria-valuemax', '100');
+            bar.setAttribute('aria-valuenow', String(percent));
+            bar.title = percent + '%';
+            var fill = document.createElement('div');
+            fill.className = 'tasks-note-progress-fill';
+            fill.style.width = percent + '%';
+            bar.appendChild(fill);
+            header.appendChild(bar);
+
             var count = document.createElement('span');
             count.className = 'tasks-note-count';
-            var done = note.tasks.filter(function (t) { return t.completed; }).length;
             count.textContent = done + ' / ' + note.tasks.length;
             header.appendChild(count);
 
