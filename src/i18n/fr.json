@@ -1897,6 +1897,13 @@
       "no_notes_title": "Aucune note",
       "no_notes_in_folder": "Ce dossier ne contient aucune note",
       "too_many_notes": "Ce dossier contient {{count}} notes. Seules les {{max}} premières seront ouvertes pour ne pas surcharger votre navigateur.",
+      "subfolders_only_title": "Ouvrir les notes des sous-dossiers",
+      "subfolders_only_message": "Ce dossier ne contient aucune note directement, mais ses sous-dossiers contiennent {{count}} notes. Voulez-vous ouvrir toutes ces notes ?",
+      "subfolders_only_message_one": "Ce dossier ne contient aucune note directement, mais ses sous-dossiers contiennent 1 note. Voulez-vous l'ouvrir ?",
+      "open_limit_notice": "Seules les {{max}} premières seront ouvertes pour ne pas surcharger votre navigateur.",
+      "open_all_confirm": "Tout ouvrir",
+      "with_subfolders_message": "Ce dossier contient des notes, et ses sous-dossiers aussi. Voulez-vous ouvrir uniquement les notes de ce dossier ({{own}}) ou toutes les notes, sous-dossiers compris ({{total}}) ?",
+      "this_folder_only": "Ce dossier uniquement",
       "show_only": "Afficher seulement ce dossier"
     },
     "folder_filter": {

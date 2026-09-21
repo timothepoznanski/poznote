@@ -104,6 +104,11 @@
         panel.classList.toggle('ui-custom-filtering', query.length > 0);
 
         panel.querySelectorAll('.ui-custom-section').forEach(function (section) {
+            // Left out by CSS on this viewport (data-ui-viewport): a match in
+            // it must not keep the "no results" message away
+            if (section.getAttribute('data-ui-viewport') === 'mobile'
+                && !window.matchMedia('(max-width: 800px)').matches) return;
+
             var visibleItems = 0;
             section.querySelectorAll('.ui-custom-item').forEach(function (item) {
                 var matches = !query || normalizeFilterText(item.textContent).indexOf(query) !== -1;

@@ -1396,6 +1396,13 @@
       "no_notes_title": "No notes",
       "no_notes_in_folder": "This folder contains no notes",
       "too_many_notes": "This folder contains {{count}} notes. Only the first {{max}} will be opened to avoid overwhelming your browser.",
+      "subfolders_only_title": "Open subfolder notes",
+      "subfolders_only_message": "This folder has no notes of its own, but its subfolders contain {{count}} notes. Do you want to open all of these notes?",
+      "subfolders_only_message_one": "This folder has no notes of its own, but its subfolders contain 1 note. Do you want to open it?",
+      "open_limit_notice": "Only the first {{max}} will be opened to avoid overwhelming your browser.",
+      "open_all_confirm": "Open all",
+      "with_subfolders_message": "This folder contains notes, and its subfolders do too. Do you want to open only the notes of this folder ({{own}}) or all notes including subfolders ({{total}})?",
+      "this_folder_only": "This folder only",
       "show_only": "Show only this folder"
     },
     "folder_filter": {

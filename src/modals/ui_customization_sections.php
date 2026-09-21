@@ -198,8 +198,10 @@
 </div>
 
 <!-- Mobile Editor Bar Section (mobile_editor_bar.php): plain card: keys, one per button id.
-     data-ui-section-id: the bar's own Customize button opens the panel on this section. -->
-<div class="ui-custom-section" data-ui-pages="notes" data-ui-section-id="mobile-editor-bar">
+     data-ui-section-id: the bar's own Customize button opens the panel on this section.
+     data-ui-viewport="mobile": left out of the "Customize this page" panel on a desktop
+     viewport, where the bar never shows (css/ui-customization-panel.css). -->
+<div class="ui-custom-section" data-ui-pages="notes" data-ui-section-id="mobile-editor-bar" data-ui-viewport="mobile">
 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.mobile_editor_bar', [], 'Mobile editor bar'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
 <p class="ui-custom-section-hint"><?php echo t_h('modals.ui_customization.mobile_editor_bar_hint', [], 'Bar shown above the on-screen keyboard while a note is being edited on a phone or tablet.'); ?></p>
 <div class="ui-custom-items">
