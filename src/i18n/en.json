@@ -152,6 +152,8 @@
       "change_password_sso_only": "This instance uses SSO only, so a local password would never be accepted at sign-in. Password changes are disabled.",
       "change_password_no_local": "Your account signs in through your identity provider and has no local password, so there is no current password to confirm a change with. An administrator can set one for you from Admin Tools > Users.",
       "app_passwords": "Create passwords for apps and extensions that connect through the API, such as the browser extension. They work even when you sign in through SSO, cannot open the web interface or change your account, and can be revoked at any time.",
+      "two_factor": "Ask for a code from an authenticator app after your password when signing in.",
+      "two_factor_sso": "Two-factor authentication protects password sign-in. Your account signs in through your identity provider, which handles its own second factor.",
       "git_sync": "Back up your notes to a Git repository and view the synchronization history.",
       "extension": "Install the browser extension to save web pages into Poznote.",
       "install_app": "Install Poznote as an application on your device (PWA).",
@@ -271,6 +273,7 @@
       "storage_stats_user": "User Storage statistics",
       "change_password": "Change Password",
       "app_passwords": "App passwords",
+      "two_factor": "Two-factor authentication",
       "delete_account": "Delete Account",
       "import_limits": "Import Limits",
       "user_quotas": "User quotas",
@@ -2058,7 +2061,20 @@
       "invalid": "Unable to select this account."
     },
     "or": "or",
-    "session_expired": "Your session has ended. Sign in again to get back to where you were."
+    "session_expired": "Your session has ended. Sign in again to get back to where you were.",
+    "two_factor": {
+      "intro": "Enter the 6-digit code from your authenticator app.",
+      "recovery_intro": "Enter one of your recovery codes. Each code works once.",
+      "code_placeholder": "Verification code",
+      "recovery_placeholder": "Recovery code",
+      "verify": "Verify",
+      "use_recovery": "Use a recovery code",
+      "use_app": "Use the authenticator app",
+      "cancel": "Back to sign in",
+      "invalid_code": "Incorrect code. Try again.",
+      "expired": "The verification step expired. Sign in again.",
+      "too_many_tries": "Too many incorrect codes. Sign in again."
+    }
   },
   "restore_import": {
     "page": {
@@ -3290,7 +3306,12 @@
       "backup_created": "Backup created",
       "backup_restored": "Backup restored",
       "trash_emptied": "Trash emptied",
-      "note_deleted": "Note permanently deleted"
+      "note_deleted": "Note permanently deleted",
+      "two_factor_enabled": "Two-factor enabled",
+      "two_factor_disabled": "Two-factor disabled",
+      "two_factor_reset": "Two-factor turned off by an admin",
+      "two_factor_recovery_used": "Signed in with a recovery code",
+      "two_factor_recovery_regenerated": "Recovery codes regenerated"
     },
     "filters": {
       "all_actions": "All actions",
@@ -3314,7 +3335,8 @@
       "empty_value": "empty",
       "s3_objects_deleted": "{{count}} S3 objects deleted",
       "s3_cleanup_failed": "S3 cleanup failed",
-      "expires_at": "expires {{date}}"
+      "expires_at": "expires {{date}}",
+      "recovery_codes_remaining": "{{count}} left"
     },
     "destinations": {
       "download": "download",
@@ -3468,6 +3490,12 @@
         "changed_at_prefix": "Updated:",
         "status_sso_only_detail": "This user signs in through SSO and has no password. Set one below if password login is needed."
       },
+      "two_factor": {
+        "enabled_detail": "Two-factor authentication is on for this user.",
+        "reset": "Turn off two-factor",
+        "confirm_reset": "Confirm",
+        "reset_done": "Two-factor authentication turned off. This user now signs in with their password alone."
+      },
       "errors": {
         "cannot_delete_self": "You cannot delete your own profile",
         "cannot_change_self": "You cannot change your own status/role",
@@ -3585,6 +3613,50 @@
       "limit_reached": "Limit reached: revoke an app password before creating another.",
       "load_failed": "Could not load your app passwords.",
       "generic": "Something went wrong. Try again."
+    }
+  },
+  "two_factor": {
+    "status": {
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "modal": {
+      "title": "Two-factor authentication",
+      "description": "After your password, sign-in asks for a 6-digit code from an authenticator app on your phone (Aegis, Google Authenticator, 1Password, Bitwarden...). Someone who learns your password still cannot open your account.",
+      "api_notice": "Apps that connect through the API with your account password (browser extension, MCP server, scripts) will stop working: give each of them an app password instead.",
+      "sso_notice": "Signing in with SSO does not ask for this code: that login is protected by your identity provider, so turn on its own second factor there.",
+      "current_password": "Current password",
+      "cancel": "Cancel",
+      "setup": "Set up",
+      "scan": "Scan this QR code with your authenticator app, or enter the key by hand, then type the 6-digit code the app shows.",
+      "copy": "Copy",
+      "copied": "Copied",
+      "code": "6-digit code",
+      "enable": "Enable",
+      "recovery_intro": "Two-factor authentication is on. Keep these recovery codes somewhere safe, away from your phone: each one signs you in once if you lose your device. They will not be shown again.",
+      "download": "Download",
+      "saved_codes": "I have saved my codes",
+      "recovery_remaining_one": "1 recovery code left.",
+      "recovery_remaining_other": "{{count}} recovery codes left.",
+      "enabled_since": "Enabled since {{date}}.",
+      "enabled": "Two-factor authentication is on.",
+      "recovery_title": "Recovery codes",
+      "recovery_help": "Generating new codes cancels the old ones. Confirm with a code from your authenticator app.",
+      "regenerate": "New codes",
+      "disable_title": "Turn off",
+      "disable_help": "Your password alone will sign you in again. Confirm with your password and a code from your app, or a recovery code.",
+      "code_or_recovery": "Code or recovery code",
+      "disable": "Turn off",
+      "close": "Close"
+    },
+    "errors": {
+      "invalid_code": "Incorrect code. Check the time on your device and try again.",
+      "invalid_password": "Current password is incorrect.",
+      "too_many": "Too many failed attempts. Try again later.",
+      "generic": "Something went wrong. Try again.",
+      "password_required": "Enter your current password.",
+      "code_required": "Enter the code shown by your authenticator app.",
+      "disable_required": "Enter your current password and a code."
     }
   },
   "delete_account": {

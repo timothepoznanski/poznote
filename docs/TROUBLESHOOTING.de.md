@@ -187,6 +187,39 @@ Alternativ installieren Sie Poznote in einem Verzeichnis außerhalb von `/root`,
 
 </details>
 
+<details>
+<summary><strong>Administratorpasswort verloren</strong></summary>
+<br>
+
+Kann sich ein anderer Administrator noch anmelden, kann er Ihnen unter **Settings > Admin Tools > User Management** ein neues Passwort setzen. Andernfalls setzen Sie es direkt in der Master-Datenbank zurück. Aus Ihrem Poznote-Verzeichnis, auf dem Host (das Kommandozeilenwerkzeug `sqlite3` muss dort installiert sein, es ist nicht Teil des Poznote-Images):
+
+```bash
+sudo sqlite3 data/master.db "UPDATE users SET password_hash=NULL, password_login_disabled=0 WHERE id=1;"
+```
+
+Das löscht das gespeicherte Passwort des ersten Kontos (id 1, immer ein Administrator), sodass wieder der eingebaute Standard gilt: Melden Sie sich mit dem Benutzernamen dieses Kontos und dem Passwort `admin` an und ändern Sie es sofort unter **Settings > Change Password**. Um ein anderes Konto zurückzusetzen, ersetzen Sie `WHERE id=1` durch `WHERE username='sein_benutzername'`; ein Standardbenutzer fällt auf das Passwort `user` zurück.
+
+Ist für dieses Konto die Zwei-Faktor-Authentifizierung aktiv, verlangt das Anmeldeformular nach dem Passwort weiterhin einen Code. Siehe den nächsten Eintrag, falls auch das Gerät verloren ist.
+
+</details>
+
+<a id="two-factor-lockout"></a>
+<details>
+<summary><strong>Durch die Zwei-Faktor-Authentifizierung ausgesperrt (Gerät und Wiederherstellungscodes verloren)</strong></summary>
+<br>
+
+Jeder Wiederherstellungscode, den Sie beim Aktivieren der Zwei-Faktor-Authentifizierung erhalten haben, meldet Sie einmal an: Wählen Sie auf dem Code-Bildschirm **Use a recovery code**. Ohne einen dieser Codes kann ein Administrator die Zwei-Faktor-Authentifizierung für Sie unter **Settings > Admin Tools > User Management** deaktivieren, im Passwortdialog Ihres Kontos.
+
+Sind Sie der einzige Administrator, entfernen Sie den zweiten Faktor direkt in der Master-Datenbank. Aus Ihrem Poznote-Verzeichnis, auf dem Host (das Kommandozeilenwerkzeug `sqlite3` muss dort installiert sein):
+
+```bash
+sudo sqlite3 data/master.db "DELETE FROM user_totp_recovery_codes WHERE user_id=1; DELETE FROM user_totp WHERE user_id=1;"
+```
+
+Ersetzen Sie `1` durch die id des Kontos (`sudo sqlite3 data/master.db "SELECT id, username FROM users;"` listet sie auf). Das Passwort allein meldet Sie wieder an, für dieses Konto ausgestellte Remember-me-Cookies funktionieren nicht mehr, und die Zwei-Faktor-Authentifizierung lässt sich unter **Settings > Two-factor authentication** erneut einrichten.
+
+</details>
+
 <a id="the-app-stops-answering-under-load"></a>
 <details>
 <summary><strong>Die App reagiert unter Last nicht mehr (Fehler beim automatischen Speichern, „server reached pm.max_children“)</strong></summary>

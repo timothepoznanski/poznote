@@ -247,10 +247,7 @@ docker compose up -d
 <details>
 <summary><strong>☁️ Cloud</strong></summary><br>
 
-Don't want to manage a server? Two hosts run Poznote for you. With either one, you first need to create an account with the host, then you deploy Poznote from their catalog in a few clicks. Both give you free credit when you sign up, so you can try without paying anything.
-
-- **[Caliber Node](https://calibernode.com/cloud-apps/poznote)**, from $2.50 a month: updates arrive as soon as they are released, fixed plans (you move up to the next tier if you need more), SSH console and automatic snapshots included. A good fit if you want as little to manage as possible and don't have that many notes.
-- **[PikaPods](https://www.pikapods.com/pods?run=poznote)**, from $2 a month: updates are tested before rollout so they arrive a little later, RAM, CPU and disk can be adjusted independently, backups run automatically but you set up where they are stored (S3). A good fit if you want room to grow as your notes pile up.
+Don't want to manage a server? A hosting company can run Poznote for you and keep it online. See the available hosts and how to choose between them [here](https://poznote.com/hosting.html).
 
 </details>
 
@@ -499,6 +496,16 @@ Passwords are managed through the Poznote web interface, not through `.env`:
 - The **Remember me** option keeps the session for 30 days.
 - Changing a password invalidates existing remember-me cookies for that user.
 
+#### Two-factor authentication
+
+Each user can turn on two-factor authentication (TOTP) from **Settings > Two-factor authentication**. After the password, the login form then asks for a 6-digit code from an authenticator app (Aegis, Google Authenticator, 1Password, Bitwarden...).
+
+- Setup shows a QR code, drawn in the browser, and ten single-use recovery codes to keep in case the phone is lost.
+- It protects password sign-in. An SSO login is left to the identity provider and its own second factor.
+- While it is on, the REST API no longer accepts the account password on its own: give clients an [app password](#app-passwords), or send the current code in the `X-Poznote-OTP` header.
+- An administrator can turn it off for a user who lost both their device and their recovery codes, from **Settings > Admin Tools > User Management** (password dialog).
+- Turning it on or off invalidates existing remember-me cookies for that user.
+
 #### Default passwords
 
 - Administrator accounts: `admin`
@@ -525,6 +532,7 @@ Poznote supports OpenID Connect (authorization code + PKCE) for single sign-on i
 6. If `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true`, the username/password form is hidden and the login page becomes SSO-only.
 7. REST API clients can authenticate with `Authorization: Bearer <OIDC JWT>` when OIDC is enabled; Poznote validates the provider JWKS, issuer, expiration, audience, and configured access controls.
 8. Clients that cannot perform an OIDC flow at all (browser extension, mobile app, scripts) use an [app password](#app-passwords) instead, which each user creates from their own settings.
+9. [Two-factor authentication](#two-factor-authentication) only covers the password form: an SSO login never asks for the Poznote code. Require a second factor in the identity provider instead. A user who has both a password and an SSO identity keeps both ways in, and the SSO one is only as strong as the provider's policy.
 
 #### Configuration
 

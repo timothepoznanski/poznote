@@ -187,6 +187,39 @@ Alternatively, install Poznote in a directory outside of `/root`, such as `/opt/
 
 </details>
 
+<details>
+<summary><strong>Lost administrator password</strong></summary>
+<br>
+
+If another administrator can still sign in, they can set a new password for you from **Settings > Admin Tools > User Management**. Otherwise, reset it directly in the master database. From your Poznote directory, on the host (the `sqlite3` command-line tool must be installed there, it is not part of the Poznote image):
+
+```bash
+sudo sqlite3 data/master.db "UPDATE users SET password_hash=NULL, password_login_disabled=0 WHERE id=1;"
+```
+
+This clears the stored password of the first account (id 1, always an administrator), so the built-in default applies again: sign in with that account's username and the password `admin`, then change it right away in **Settings > Change Password**. To reset another account, replace `WHERE id=1` with `WHERE username='its_username'`; a standard user falls back to the password `user`.
+
+If two-factor authentication is on for that account, the login form still asks for a code after the password. See the next entry if the device is lost too.
+
+</details>
+
+<a id="two-factor-lockout"></a>
+<details>
+<summary><strong>Locked out by two-factor authentication (device and recovery codes lost)</strong></summary>
+<br>
+
+Each recovery code handed over when two-factor authentication was turned on signs you in once: on the code screen, choose **Use a recovery code**. Without any of them, an administrator can turn two-factor off for you from **Settings > Admin Tools > User Management**, in the password dialog of your account.
+
+If you are the only administrator, remove the second factor directly in the master database. From your Poznote directory, on the host (the `sqlite3` command-line tool must be installed there):
+
+```bash
+sudo sqlite3 data/master.db "DELETE FROM user_totp_recovery_codes WHERE user_id=1; DELETE FROM user_totp WHERE user_id=1;"
+```
+
+Replace `1` with the id of the account (`sudo sqlite3 data/master.db "SELECT id, username FROM users;"` lists them). The password alone signs you in again, remember-me cookies issued for that account stop working, and two-factor authentication can be set up again from **Settings > Two-factor authentication**.
+
+</details>
+
 <a id="the-app-stops-answering-under-load"></a>
 <details>
 <summary><strong>The app stops answering under load (autosave errors, "server reached pm.max_children")</strong></summary>

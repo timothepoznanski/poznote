@@ -277,27 +277,6 @@ html[data-theme='dark'] .diary-context-menu-item.danger [class*="lucide-"] {
     color: var(--pz-danger-text);
 }
 
-/* The diary's destructive confirmations (move an entry to the trash, delete
-   a diary) have a red confirm button: css/modal-alerts.css paints the cancel
-   button red too, so here it is neutral grey to leave one red choice. */
-.alert-modal-button.secondary.diary-confirm-cancel {
-    background: var(--pz-neutral);
-    color: var(--pz-text-inverse);
-}
-
-.alert-modal-button.secondary.diary-confirm-cancel:hover {
-    background: var(--pz-neutral-hover);
-}
-
-html[data-theme='dark'] .alert-modal-button.secondary.diary-confirm-cancel {
-    background-color: var(--pz-neutral);
-    color: var(--pz-text-inverse);
-}
-
-html[data-theme='dark'] .alert-modal-button.secondary.diary-confirm-cancel:hover {
-    background-color: var(--pz-neutral-hover);
-}
-
 /* Highlight today's card in the grid */
 .diary-card-today {
     border-color: var(--pz-accent-text);

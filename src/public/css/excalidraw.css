@@ -693,13 +693,14 @@ html body.excalidraw-editor-page.excalidraw-shell-light .poznote-toolbar-title {
     cursor: not-allowed;
 }
 
-.excalidraw-btn-red {
-    background: var(--pz-danger);
-    border: 1px solid var(--pz-danger);
+.excalidraw-btn-neutral {
+    background: var(--pz-neutral);
+    border: 1px solid var(--pz-neutral);
 }
 
-.excalidraw-btn-red:hover {
-    background: var(--pz-danger);
+.excalidraw-btn-neutral:hover {
+    background: var(--pz-neutral-hover);
+    border-color: var(--pz-neutral-hover);
 }
 
 /* Excalidraw app container */
@@ -743,10 +744,6 @@ html body.excalidraw-editor-page.excalidraw-shell-light .excalidraw-loading {
 
 .excalidraw-save-btn:hover {
     background: var(--pz-success-hover);
-}
-
-#cancelBtn:hover {
-    background: var(--pz-danger-hover);
 }
 
 #saveAndExitBtn:hover {

@@ -478,6 +478,8 @@
       "change_password_sso_only": "Diese Instanz verwendet ausschliesslich SSO, daher wuerde ein lokales Passwort bei der Anmeldung nie akzeptiert. Passwortaenderungen sind deaktiviert.",
       "change_password_no_local": "Ihr Konto meldet sich ueber Ihren Identitaetsanbieter an und hat kein lokales Passwort, daher gibt es kein aktuelles Passwort zur Bestaetigung einer Aenderung. Ein Administrator kann eines fuer Sie unter Admin-Tools > Benutzer festlegen.",
       "app_passwords": "Erstellen Sie Passwörter für Apps und Erweiterungen, die sich über die API verbinden, etwa die Browser-Erweiterung. Sie funktionieren auch bei Anmeldung über SSO, können weder die Weboberfläche öffnen noch Ihr Konto ändern und lassen sich jederzeit widerrufen.",
+      "two_factor": "Bei der Anmeldung nach dem Passwort einen Code aus einer Authenticator-App verlangen.",
+      "two_factor_sso": "Die Zwei-Faktor-Authentifizierung schützt die Anmeldung mit Passwort. Ihr Konto meldet sich über Ihren Identitätsanbieter an, der seinen eigenen zweiten Faktor verwaltet.",
       "git_sync": "Sichern Sie Ihre Notizen in einem Git-Repository und sehen Sie den Synchronisationsverlauf.",
       "extension": "Installieren Sie die Browser-Erweiterung, um Webseiten in Poznote zu speichern.",
       "install_app": "Installieren Sie Poznote als Anwendung auf Ihrem Gerät (PWA).",
@@ -616,6 +618,7 @@
       "user_management": "Benutzerverwaltung",
       "change_password": "Passwort ändern",
       "app_passwords": "App-Passwörter",
+      "two_factor": "Zwei-Faktor-Authentifizierung",
       "delete_account": "Konto löschen",
       "import_limits": "Importlimits",
       "user_quotas": "Benutzerkontingente",
@@ -2448,7 +2451,20 @@
       "invalid": "Dieses Konto kann nicht ausgewählt werden."
     },
     "or": "oder",
-    "session_expired": "Ihre Sitzung ist abgelaufen. Melden Sie sich erneut an, um dorthin zurückzukehren, wo Sie waren."
+    "session_expired": "Ihre Sitzung ist abgelaufen. Melden Sie sich erneut an, um dorthin zurückzukehren, wo Sie waren.",
+    "two_factor": {
+      "intro": "Geben Sie den 6-stelligen Code aus Ihrer Authenticator-App ein.",
+      "recovery_intro": "Geben Sie einen Ihrer Wiederherstellungscodes ein. Jeder Code funktioniert nur einmal.",
+      "code_placeholder": "Bestätigungscode",
+      "recovery_placeholder": "Wiederherstellungscode",
+      "verify": "Bestätigen",
+      "use_recovery": "Wiederherstellungscode verwenden",
+      "use_app": "Authenticator-App verwenden",
+      "cancel": "Zurück zur Anmeldung",
+      "invalid_code": "Falscher Code. Versuchen Sie es erneut.",
+      "expired": "Der Bestätigungsschritt ist abgelaufen. Melden Sie sich erneut an.",
+      "too_many_tries": "Zu viele falsche Codes. Melden Sie sich erneut an."
+    }
   },
   "restore_import": {
     "page": {
@@ -3456,6 +3472,12 @@
         "changed_at_prefix": "Aktualisiert:",
         "status_sso_only_detail": "Dieser Benutzer meldet sich über SSO an und hat kein Passwort. Legen Sie unten eines fest, wenn die Passwortanmeldung benötigt wird."
       },
+      "two_factor": {
+        "enabled_detail": "Die Zwei-Faktor-Authentifizierung ist für diesen Benutzer aktiviert.",
+        "reset": "Zwei-Faktor deaktivieren",
+        "confirm_reset": "Bestätigen",
+        "reset_done": "Zwei-Faktor-Authentifizierung deaktiviert. Dieser Benutzer meldet sich jetzt nur mit seinem Passwort an."
+      },
       "errors": {
         "cannot_delete_self": "Sie können Ihr eigenes Profil nicht löschen",
         "cannot_change_self": "Sie können Ihren eigenen Status/Rolle nicht ändern",
@@ -3793,7 +3815,12 @@
       "backup_created": "Backup erstellt",
       "backup_restored": "Backup wiederhergestellt",
       "trash_emptied": "Papierkorb geleert",
-      "note_deleted": "Notiz endgültig gelöscht"
+      "note_deleted": "Notiz endgültig gelöscht",
+      "two_factor_enabled": "Zwei-Faktor aktiviert",
+      "two_factor_disabled": "Zwei-Faktor deaktiviert",
+      "two_factor_reset": "Zwei-Faktor von einem Admin deaktiviert",
+      "two_factor_recovery_used": "Anmeldung mit Wiederherstellungscode",
+      "two_factor_recovery_regenerated": "Wiederherstellungscodes neu erzeugt"
     },
     "filters": {
       "all_actions": "Alle Aktionen",
@@ -3817,7 +3844,8 @@
       "empty_value": "leer",
       "s3_objects_deleted": "{{count}} S3-Objekte gelöscht",
       "s3_cleanup_failed": "S3-Bereinigung fehlgeschlagen",
-      "expires_at": "läuft ab am {{date}}"
+      "expires_at": "läuft ab am {{date}}",
+      "recovery_codes_remaining": "{{count}} übrig"
     },
     "destinations": {
       "download": "Download",
@@ -3962,6 +3990,50 @@
       "limit_reached": "Limit erreicht: Widerrufen Sie ein App-Passwort, bevor Sie ein neues erstellen.",
       "load_failed": "Ihre App-Passwörter konnten nicht geladen werden.",
       "generic": "Etwas ist schiefgelaufen. Versuchen Sie es erneut."
+    }
+  },
+  "two_factor": {
+    "status": {
+      "enabled": "Aktiviert",
+      "disabled": "Deaktiviert"
+    },
+    "modal": {
+      "title": "Zwei-Faktor-Authentifizierung",
+      "description": "Nach Ihrem Passwort verlangt die Anmeldung einen 6-stelligen Code aus einer Authenticator-App auf Ihrem Telefon (Aegis, Google Authenticator, 1Password, Bitwarden...). Wer Ihr Passwort erfährt, kann Ihr Konto trotzdem nicht öffnen.",
+      "api_notice": "Apps, die sich mit Ihrem Kontopasswort über die API verbinden (Browsererweiterung, MCP-Server, Skripte), funktionieren dann nicht mehr: Geben Sie jeder stattdessen ein App-Passwort.",
+      "sso_notice": "Die Anmeldung über SSO fragt diesen Code nicht ab: Sie wird von Ihrem Identitätsanbieter geschützt, aktivieren Sie also dort dessen eigenen zweiten Faktor.",
+      "current_password": "Aktuelles Passwort",
+      "cancel": "Abbrechen",
+      "setup": "Einrichten",
+      "scan": "Scannen Sie diesen QR-Code mit Ihrer Authenticator-App oder geben Sie den Schlüssel von Hand ein, und tippen Sie dann den 6-stelligen Code ein, den die App anzeigt.",
+      "copy": "Kopieren",
+      "copied": "Kopiert",
+      "code": "6-stelliger Code",
+      "enable": "Aktivieren",
+      "recovery_intro": "Die Zwei-Faktor-Authentifizierung ist aktiviert. Bewahren Sie diese Wiederherstellungscodes sicher auf, getrennt von Ihrem Telefon: Jeder meldet Sie einmal an, falls Sie Ihr Gerät verlieren. Sie werden nicht erneut angezeigt.",
+      "download": "Herunterladen",
+      "saved_codes": "Ich habe meine Codes gespeichert",
+      "recovery_remaining_one": "1 Wiederherstellungscode übrig.",
+      "recovery_remaining_other": "{{count}} Wiederherstellungscodes übrig.",
+      "enabled_since": "Aktiviert seit {{date}}.",
+      "enabled": "Die Zwei-Faktor-Authentifizierung ist aktiviert.",
+      "recovery_title": "Wiederherstellungscodes",
+      "recovery_help": "Neue Codes machen die alten ungültig. Bestätigen Sie mit einem Code aus Ihrer Authenticator-App.",
+      "regenerate": "Neue Codes",
+      "disable_title": "Deaktivieren",
+      "disable_help": "Ihr Passwort allein reicht dann wieder für die Anmeldung. Bestätigen Sie mit Ihrem Passwort und einem Code aus Ihrer App oder einem Wiederherstellungscode.",
+      "code_or_recovery": "Code oder Wiederherstellungscode",
+      "disable": "Deaktivieren",
+      "close": "Schließen"
+    },
+    "errors": {
+      "invalid_code": "Falscher Code. Prüfen Sie die Uhrzeit Ihres Geräts und versuchen Sie es erneut.",
+      "invalid_password": "Das aktuelle Passwort ist falsch.",
+      "too_many": "Zu viele Fehlversuche. Versuchen Sie es später erneut.",
+      "generic": "Etwas ist schiefgelaufen. Versuchen Sie es erneut.",
+      "password_required": "Geben Sie Ihr aktuelles Passwort ein.",
+      "code_required": "Geben Sie den Code ein, den Ihre Authenticator-App anzeigt.",
+      "disable_required": "Geben Sie Ihr aktuelles Passwort und einen Code ein."
     }
   },
   "delete_account": {

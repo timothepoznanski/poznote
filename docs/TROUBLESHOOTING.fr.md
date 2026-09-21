@@ -187,6 +187,39 @@ Vous pouvez aussi installer Poznote dans un répertoire situé en dehors de `/ro
 
 </details>
 
+<details>
+<summary><strong>Mot de passe administrateur perdu</strong></summary>
+<br>
+
+Si un autre administrateur peut encore se connecter, il peut vous définir un nouveau mot de passe depuis **Settings > Admin Tools > User Management**. Sinon, réinitialisez-le directement dans la base de données maître. Depuis votre répertoire Poznote, sur l'hôte (l'outil en ligne de commande `sqlite3` doit y être installé, il ne fait pas partie de l'image Poznote) :
+
+```bash
+sudo sqlite3 data/master.db "UPDATE users SET password_hash=NULL, password_login_disabled=0 WHERE id=1;"
+```
+
+Cela efface le mot de passe enregistré du premier compte (id 1, toujours administrateur), de sorte que la valeur par défaut s'applique de nouveau : connectez-vous avec le nom d'utilisateur de ce compte et le mot de passe `admin`, puis changez-le aussitôt dans **Settings > Change Password**. Pour réinitialiser un autre compte, remplacez `WHERE id=1` par `WHERE username='son_nom'` ; un utilisateur standard retombe sur le mot de passe `user`.
+
+Si l'authentification à deux facteurs est activée sur ce compte, le formulaire de connexion demande toujours un code après le mot de passe. Voyez l'entrée suivante si l'appareil est perdu lui aussi.
+
+</details>
+
+<a id="two-factor-lockout"></a>
+<details>
+<summary><strong>Bloqué par l'authentification à deux facteurs (appareil et codes de récupération perdus)</strong></summary>
+<br>
+
+Chaque code de récupération remis à l'activation de l'authentification à deux facteurs vous connecte une fois : sur l'écran du code, choisissez **Use a recovery code**. Sans aucun de ces codes, un administrateur peut désactiver l'authentification à deux facteurs pour vous depuis **Settings > Admin Tools > User Management**, dans la fenêtre du mot de passe de votre compte.
+
+Si vous êtes le seul administrateur, supprimez le second facteur directement dans la base de données maître. Depuis votre répertoire Poznote, sur l'hôte (l'outil en ligne de commande `sqlite3` doit y être installé) :
+
+```bash
+sudo sqlite3 data/master.db "DELETE FROM user_totp_recovery_codes WHERE user_id=1; DELETE FROM user_totp WHERE user_id=1;"
+```
+
+Remplacez `1` par l'id du compte (`sudo sqlite3 data/master.db "SELECT id, username FROM users;"` les liste). Le mot de passe seul vous connecte de nouveau, les cookies « Remember me » émis pour ce compte cessent de fonctionner, et l'authentification à deux facteurs peut être reconfigurée depuis **Settings > Two-factor authentication**.
+
+</details>
+
 <a id="the-app-stops-answering-under-load"></a>
 <details>
 <summary><strong>L'application ne répond plus sous la charge (erreurs d'enregistrement automatique, "server reached pm.max_children")</strong></summary>

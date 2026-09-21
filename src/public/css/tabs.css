@@ -136,7 +136,7 @@
 .app-tab-close-all:hover {
     background: var(--pz-surface-hover);
     border-color: var(--pz-border-strong);
-    color: var(--pz-danger-hover);
+    color: var(--pz-text-strong);
 }
 
 .app-tab-close-all .lucide {
@@ -300,7 +300,7 @@ html[data-theme='dark'] .app-tab-close-all {
 
 html[data-theme='dark'] .app-tab-close-all:hover {
     background: var(--pz-surface-hover);
-    color: var(--pz-danger-text);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .app-tab.app-tab-dragging {

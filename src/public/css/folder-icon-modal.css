@@ -136,7 +136,7 @@
 
 .folder-icon-modal-content .modal-buttons .btn-cancel {
     margin-left: auto;
-    background: var(--pz-danger);
+    background: var(--pz-neutral);
     color: var(--pz-text-inverse);
     border: none;
     padding: 10px 20px;
@@ -147,7 +147,7 @@
 }
 
 .folder-icon-modal-content .modal-buttons .btn-cancel:hover {
-    background: var(--pz-danger-hover);
+    background: var(--pz-neutral-hover);
 }
 
 /* Scrollbar styling for icon grid */

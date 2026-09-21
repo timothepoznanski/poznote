@@ -187,6 +187,39 @@ Como alternativa, instala Poznote en un directorio fuera de `/root`, como `/opt/
 
 </details>
 
+<details>
+<summary><strong>Contraseña de administrador perdida</strong></summary>
+<br>
+
+Si otro administrador todavía puede iniciar sesión, puede definirte una nueva contraseña desde **Settings > Admin Tools > User Management**. Si no, restablécela directamente en la base de datos maestra. Desde tu directorio de Poznote, en el host (la herramienta de línea de comandos `sqlite3` debe estar instalada allí, no forma parte de la imagen de Poznote):
+
+```bash
+sudo sqlite3 data/master.db "UPDATE users SET password_hash=NULL, password_login_disabled=0 WHERE id=1;"
+```
+
+Esto borra la contraseña almacenada de la primera cuenta (id 1, siempre administrador), de modo que vuelve a aplicarse el valor por defecto: inicia sesión con el nombre de usuario de esa cuenta y la contraseña `admin`, y cámbiala enseguida en **Settings > Change Password**. Para restablecer otra cuenta, sustituye `WHERE id=1` por `WHERE username='su_nombre'`; un usuario estándar vuelve a la contraseña `user`.
+
+Si la autenticación de dos factores está activada en esa cuenta, el formulario de inicio de sesión sigue pidiendo un código después de la contraseña. Consulta la entrada siguiente si también se ha perdido el dispositivo.
+
+</details>
+
+<a id="two-factor-lockout"></a>
+<details>
+<summary><strong>Bloqueado por la autenticación de dos factores (dispositivo y códigos de recuperación perdidos)</strong></summary>
+<br>
+
+Cada código de recuperación entregado al activar la autenticación de dos factores te permite iniciar sesión una vez: en la pantalla del código, elige **Use a recovery code**. Sin ninguno de ellos, un administrador puede desactivarte la autenticación de dos factores desde **Settings > Admin Tools > User Management**, en el diálogo de contraseña de tu cuenta.
+
+Si eres el único administrador, elimina el segundo factor directamente en la base de datos maestra. Desde tu directorio de Poznote, en el host (la herramienta de línea de comandos `sqlite3` debe estar instalada allí):
+
+```bash
+sudo sqlite3 data/master.db "DELETE FROM user_totp_recovery_codes WHERE user_id=1; DELETE FROM user_totp WHERE user_id=1;"
+```
+
+Sustituye `1` por el id de la cuenta (`sudo sqlite3 data/master.db "SELECT id, username FROM users;"` los lista). La contraseña sola vuelve a bastar para iniciar sesión, las cookies de «Remember me» emitidas para esa cuenta dejan de funcionar, y la autenticación de dos factores puede configurarse de nuevo desde **Settings > Two-factor authentication**.
+
+</details>
+
 <a id="the-app-stops-answering-under-load"></a>
 <details>
 <summary><strong>La aplicación deja de responder bajo carga (errores de autoguardado, «server reached pm.max_children»)</strong></summary>

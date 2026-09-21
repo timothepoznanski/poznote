@@ -56,7 +56,7 @@ components:
       # nosemgrep: yaml.openapi.security.use-of-basic-authentication.use-of-basic-authentication
       type: http
       scheme: basic
-      description: HTTP Basic Auth with the profile's username and either its account password (include X-User-ID for data endpoints) or an app password created in Settings > App passwords (X-User-ID implied; API only, no admin routes, no account management, works on SSO-only instances).
+      description: HTTP Basic Auth with the profile's username and either its account password (include X-User-ID for data endpoints) or an app password created in Settings > App passwords (X-User-ID implied; API only, no admin routes, no account management, works on SSO-only instances). When two-factor authentication is on for the account, the account password is only accepted together with the current code in the X-Poznote-OTP header.
     BearerAuth:
       type: http
       scheme: bearer
@@ -4313,6 +4313,150 @@ paths:
         '404':
           description: No such app password on this profile
 
+  /users/me/two-factor:
+    get:
+      tags: [Users]
+      summary: Two-factor authentication status
+      description: |
+        Two-factor authentication asks for a TOTP code from an authenticator app after the
+        password on the login form. It applies to password sign-in only. While it is on, the API
+        refuses the account password over Basic auth unless the current code comes with it in the
+        X-Poznote-OTP header; app passwords work unchanged.
+        Does NOT require X-User-ID header. Not available to requests authenticated with an app password.
+      responses:
+        '200':
+          description: Status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled: { type: boolean }
+                  enabled_at: { type: string, nullable: true }
+                  recovery_codes_remaining: { type: integer }
+                  unavailable_reason:
+                    type: string
+                    nullable: true
+                    enum: [sso_only, no_local_password]
+        '403':
+          description: Requested with an app password
+
+  /users/me/two-factor/setup:
+    post:
+      tags: [Users]
+      summary: Start switching two-factor on
+      description: |
+        Returns a new secret for the authenticator app. Nothing is stored until /enable confirms
+        it with a first code; the pending secret lives in the session, so keep cookies between the two calls.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [current_password]
+              properties:
+                current_password: { type: string }
+      responses:
+        '200':
+          description: Secret and otpauth URI
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  secret: { type: string, description: Base32 shared secret }
+                  otpauth_uri: { type: string }
+                  issuer: { type: string }
+                  account: { type: string }
+        '403':
+          description: Wrong password, app password, or password sign-in not available for this account
+        '409':
+          description: Two-factor is already on
+        '429':
+          description: Too many failed attempts
+
+  /users/me/two-factor/enable:
+    post:
+      tags: [Users]
+      summary: Confirm the two-factor setup
+      description: The recovery codes are in this response and nowhere else afterwards.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code: { type: string, description: 6-digit code for the secret returned by setup }
+      responses:
+        '200':
+          description: Two-factor is on
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  recovery_codes:
+                    type: array
+                    items: { type: string }
+                  enabled: { type: boolean }
+                  recovery_codes_remaining: { type: integer }
+        '400':
+          description: Incorrect code
+        '409':
+          description: No setup in progress, or two-factor already on
+        '429':
+          description: Too many failed attempts
+
+  /users/me/two-factor/recovery-codes:
+    post:
+      tags: [Users]
+      summary: Replace the recovery codes
+      description: The previous codes stop working. A recovery code is not accepted as confirmation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code: { type: string, description: 6-digit code from the authenticator app }
+      responses:
+        '200':
+          description: New recovery codes
+        '400':
+          description: Incorrect code
+        '409':
+          description: Two-factor is not on
+
+  /users/me/two-factor/disable:
+    post:
+      tags: [Users]
+      summary: Switch two-factor off
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [current_password, code]
+              properties:
+                current_password: { type: string }
+                code: { type: string, description: 6-digit code from the app, or a recovery code }
+      responses:
+        '200':
+          description: Two-factor is off
+        '400':
+          description: Incorrect code
+        '403':
+          description: Wrong password, or requested with an app password
+        '409':
+          description: Two-factor is not on
+
   /users/lookup/{username}:
     get:
       tags: [Users]
@@ -4642,6 +4786,30 @@ paths:
           description: Admin access required
         '404':
           description: User not found
+
+  /admin/users/{id}/two-factor/reset:
+    post:
+      tags: [Users]
+      summary: Switch a user's two-factor off (admin only)
+      description: |
+        For a user who lost their device and their recovery codes. They sign in with the password
+        alone afterwards. Recorded in the activity log.
+        Requires admin privileges. Does NOT require X-User-ID header.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Two-factor switched off
+        '403':
+          description: Admin access required
+        '404':
+          description: User not found
+        '409':
+          description: Two-factor is not on for this user
 
   /admin/users/{id}/password-status:
     get:

@@ -47,6 +47,11 @@ const ACTIVITY_LOGIN              = 'user.login';
 const ACTIVITY_LOGOUT             = 'user.logout';
 const ACTIVITY_APP_PASSWORD_CREATED = 'app_password.created';
 const ACTIVITY_APP_PASSWORD_REVOKED = 'app_password.revoked';
+const ACTIVITY_TWO_FACTOR_ENABLED  = 'two_factor.enabled';
+const ACTIVITY_TWO_FACTOR_DISABLED = 'two_factor.disabled';
+const ACTIVITY_TWO_FACTOR_RESET    = 'two_factor.reset';
+const ACTIVITY_TWO_FACTOR_RECOVERY_USED = 'two_factor.recovery_used';
+const ACTIVITY_TWO_FACTOR_RECOVERY_REGENERATED = 'two_factor.recovery_regenerated';
 
 /**
  * Every action the log can hold, in the order the admin filter lists them.
@@ -68,6 +73,11 @@ function activityLogActions(): array {
         ACTIVITY_ACCESS_REVOKED,
         ACTIVITY_APP_PASSWORD_CREATED,
         ACTIVITY_APP_PASSWORD_REVOKED,
+        ACTIVITY_TWO_FACTOR_ENABLED,
+        ACTIVITY_TWO_FACTOR_DISABLED,
+        ACTIVITY_TWO_FACTOR_RESET,
+        ACTIVITY_TWO_FACTOR_RECOVERY_USED,
+        ACTIVITY_TWO_FACTOR_RECOVERY_REGENERATED,
         ACTIVITY_WORKSPACE_CREATED,
         ACTIVITY_WORKSPACE_DELETED,
         ACTIVITY_WORKSPACE_SHARED,

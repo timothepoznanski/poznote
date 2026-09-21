@@ -478,6 +478,8 @@
       "change_password_sso_only": "Esta instancia usa apenas SSO, portanto uma senha local nunca seria aceita no login. As alteracoes de senha estao desativadas.",
       "change_password_no_local": "Sua conta faz login pelo seu provedor de identidade e nao tem senha local, portanto nao ha senha atual para confirmar uma alteracao. Um administrador pode definir uma em Ferramentas de administracao > Usuarios.",
       "app_passwords": "Crie senhas para aplicativos e extensões que se conectam pela API, como a extensão do navegador. Elas funcionam mesmo quando você entra por SSO, não permitem abrir a interface web nem alterar sua conta, e podem ser revogadas a qualquer momento.",
+      "two_factor": "Pedir um código de um aplicativo autenticador depois da senha ao entrar.",
+      "two_factor_sso": "A autenticação de dois fatores protege o login com senha. Sua conta entra pelo seu provedor de identidade, que cuida do próprio segundo fator.",
       "git_sync": "Faça backup das suas notas em um repositório Git e veja o histórico de sincronização.",
       "extension": "Instale a extensão do navegador para salvar páginas web no Poznote.",
       "install_app": "Instale o Poznote como aplicativo no seu dispositivo (PWA).",
@@ -616,6 +618,7 @@
       "user_management": "Gestão de utilizadores",
       "change_password": "Mudar palavra-passe",
       "app_passwords": "Senhas de aplicativo",
+      "two_factor": "Autenticação de dois fatores",
       "delete_account": "Eliminar conta",
       "import_limits": "Limites de importação",
       "user_quotas": "Cotas de usuário",
@@ -2448,7 +2451,20 @@
       "invalid": "Não foi possível selecionar esta conta."
     },
     "or": "ou",
-    "session_expired": "A sua sessão expirou. Inicie sessão novamente para voltar onde estava."
+    "session_expired": "A sua sessão expirou. Inicie sessão novamente para voltar onde estava.",
+    "two_factor": {
+      "intro": "Digite o código de 6 dígitos do seu aplicativo autenticador.",
+      "recovery_intro": "Digite um dos seus códigos de recuperação. Cada código funciona uma única vez.",
+      "code_placeholder": "Código de verificação",
+      "recovery_placeholder": "Código de recuperação",
+      "verify": "Verificar",
+      "use_recovery": "Usar um código de recuperação",
+      "use_app": "Usar o aplicativo autenticador",
+      "cancel": "Voltar ao login",
+      "invalid_code": "Código incorreto. Tente novamente.",
+      "expired": "A etapa de verificação expirou. Entre novamente.",
+      "too_many_tries": "Muitos códigos incorretos. Entre novamente."
+    }
   },
   "restore_import": {
     "page": {
@@ -3457,6 +3473,12 @@
         "changed_at_prefix": "Atualizada:",
         "status_sso_only_detail": "Este utilizador inicia sessão através de SSO e não tem palavra-passe. Defina uma abaixo se o início de sessão com palavra-passe for necessário."
       },
+      "two_factor": {
+        "enabled_detail": "A autenticação de dois fatores está ativada para este usuário.",
+        "reset": "Desativar dois fatores",
+        "confirm_reset": "Confirmar",
+        "reset_done": "Autenticação de dois fatores desativada. Este usuário agora entra apenas com a senha."
+      },
       "errors": {
         "cannot_delete_self": "Você não pode excluir seu próprio perfil",
         "cannot_change_self": "Você não pode alterar seu próprio status/função",
@@ -3794,7 +3816,12 @@
       "backup_created": "Backup criado",
       "backup_restored": "Backup restaurado",
       "trash_emptied": "Lixo esvaziado",
-      "note_deleted": "Nota eliminada definitivamente"
+      "note_deleted": "Nota eliminada definitivamente",
+      "two_factor_enabled": "Dois fatores ativado",
+      "two_factor_disabled": "Dois fatores desativado",
+      "two_factor_reset": "Dois fatores desativado por um admin",
+      "two_factor_recovery_used": "Login com um código de recuperação",
+      "two_factor_recovery_regenerated": "Códigos de recuperação gerados novamente"
     },
     "filters": {
       "all_actions": "Todas as ações",
@@ -3818,7 +3845,8 @@
       "empty_value": "vazio",
       "s3_objects_deleted": "{{count}} objetos S3 eliminados",
       "s3_cleanup_failed": "falha na limpeza do S3",
-      "expires_at": "expira em {{date}}"
+      "expires_at": "expira em {{date}}",
+      "recovery_codes_remaining": "restam {{count}}"
     },
     "destinations": {
       "download": "transferência",
@@ -3963,6 +3991,50 @@
       "limit_reached": "Limite atingido: revogue uma senha de aplicativo antes de criar outra.",
       "load_failed": "Não foi possível carregar suas senhas de aplicativo.",
       "generic": "Algo deu errado. Tente novamente."
+    }
+  },
+  "two_factor": {
+    "status": {
+      "enabled": "Ativada",
+      "disabled": "Desativada"
+    },
+    "modal": {
+      "title": "Autenticação de dois fatores",
+      "description": "Depois da senha, o login pede um código de 6 dígitos de um aplicativo autenticador no seu celular (Aegis, Google Authenticator, 1Password, Bitwarden...). Quem descobrir sua senha continua sem conseguir abrir sua conta.",
+      "api_notice": "Aplicativos que se conectam à API com a senha da sua conta (extensão do navegador, servidor MCP, scripts) deixarão de funcionar: dê a cada um uma senha de aplicativo.",
+      "sso_notice": "O login por SSO não pede este código: ele é protegido pelo seu provedor de identidade, então ative lá o segundo fator dele.",
+      "current_password": "Senha atual",
+      "cancel": "Cancelar",
+      "setup": "Configurar",
+      "scan": "Escaneie este QR code com seu aplicativo autenticador, ou digite a chave manualmente, e depois informe o código de 6 dígitos que o aplicativo mostra.",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "code": "Código de 6 dígitos",
+      "enable": "Ativar",
+      "recovery_intro": "A autenticação de dois fatores está ativada. Guarde estes códigos de recuperação em um lugar seguro, longe do seu celular: cada um permite entrar uma vez se você perder o aparelho. Eles não serão exibidos novamente.",
+      "download": "Baixar",
+      "saved_codes": "Salvei meus códigos",
+      "recovery_remaining_one": "Resta 1 código de recuperação.",
+      "recovery_remaining_other": "Restam {{count}} códigos de recuperação.",
+      "enabled_since": "Ativada desde {{date}}.",
+      "enabled": "A autenticação de dois fatores está ativada.",
+      "recovery_title": "Códigos de recuperação",
+      "recovery_help": "Gerar novos códigos invalida os antigos. Confirme com um código do seu aplicativo autenticador.",
+      "regenerate": "Novos códigos",
+      "disable_title": "Desativar",
+      "disable_help": "Sua senha voltará a bastar para entrar. Confirme com sua senha e um código do aplicativo, ou um código de recuperação.",
+      "code_or_recovery": "Código ou código de recuperação",
+      "disable": "Desativar",
+      "close": "Fechar"
+    },
+    "errors": {
+      "invalid_code": "Código incorreto. Verifique o horário do seu aparelho e tente novamente.",
+      "invalid_password": "A senha atual está incorreta.",
+      "too_many": "Muitas tentativas malsucedidas. Tente mais tarde.",
+      "generic": "Algo deu errado. Tente novamente.",
+      "password_required": "Digite sua senha atual.",
+      "code_required": "Digite o código exibido pelo seu aplicativo autenticador.",
+      "disable_required": "Digite sua senha atual e um código."
     }
   },
   "delete_account": {

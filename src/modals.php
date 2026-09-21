@@ -858,7 +858,7 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
             <p id="convertNoteWarning" class="convert-warning"></p>
         </div>
         <div class="modal-buttons">
-            <button type="button" class="btn-danger" data-action="close-modal" data-modal="convertNoteModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="convertNoteModal"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-success" id="duplicateBeforeConvertBtn"><?php echo t_h('modals.convert.duplicate_button', [], 'Duplicate'); ?></button>
             <button type="button" class="btn-primary" id="confirmConvertBtn"><?php echo t_h('common.convert', [], 'Convert'); ?></button>
         </div>
@@ -1463,7 +1463,7 @@ include __DIR__ . '/modals/tag_folder_notes_modal.php';
             <button type="button" class="btn-primary"<?php echo $modalsPasswordDisabled
                 ? ' disabled aria-disabled="true" title="' . $modalsPasswordDisabledHelp . '"'
                 : ' data-action="open-password-settings"'; ?>><?php echo t_h('modals.user_settings_info.change_password_button', [], 'Change Password'); ?></button>
-            <button type="button" class="btn-danger" data-action="close-user-settings-info-modal"><?php echo t_h('common.close'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-user-settings-info-modal"><?php echo t_h('common.close'); ?></button>
         </div>
     </div>
 </div>
@@ -1655,7 +1655,7 @@ $iconSidebarOrderDividerRow = static function (): string {
                     <p class="snapshot-state-hint"><?php echo t_h('snapshot.modal.empty_hint', [], 'A snapshot is created automatically when the note is first opened during the day. You can also add extra snapshots manually at any time.'); ?></p>
                     <div class="modal-buttons" style="margin-top:20px;">
                         <button type="button" class="btn-cancel snapshot-take-btn" onclick="takeSnapshotNow()"><?php echo t_h('snapshot.modal.take_now', [], 'Take snapshot now'); ?></button>
-                        <button type="button" class="btn-danger" onclick="closeSnapshotModal()"><?php echo t_h('common.close'); ?></button>
+                        <button type="button" class="btn-cancel" onclick="closeSnapshotModal()"><?php echo t_h('common.close'); ?></button>
                     </div>
                 </div>
 
@@ -1678,7 +1678,7 @@ $iconSidebarOrderDividerRow = static function (): string {
                         <button type="button" class="btn-danger snapshot-delete-btn" onclick="deleteSnapshot()"><i class="lucide lucide-trash-2"></i><span><?php echo t_h('snapshot.modal.delete', [], 'Delete this snapshot'); ?></span></button>
                         <button type="button" class="btn-cancel snapshot-take-btn" onclick="takeSnapshotNow()"><i class="lucide lucide-camera"></i><span><?php echo t_h('snapshot.modal.take_now', [], 'Take snapshot now'); ?></span></button>
                         <button type="button" class="btn-primary snapshot-restore-btn" onclick="restoreSnapshot()"><i class="lucide lucide-rotate-ccw"></i><span><?php echo t_h('snapshot.modal.restore_state', [], 'Restore this state'); ?></span></button>
-                        <button type="button" class="btn-danger" onclick="closeSnapshotModal()"><i class="lucide lucide-x"></i><span><?php echo t_h('common.close'); ?></span></button>
+                        <button type="button" class="btn-cancel snapshot-close-btn" onclick="closeSnapshotModal()"><i class="lucide lucide-x"></i><span><?php echo t_h('common.close'); ?></span></button>
                     </div>
                 </div>
             </div>

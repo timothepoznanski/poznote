@@ -66,6 +66,31 @@
                 });
             }
 
+            // Two-factor step: the one field accepts an authenticator code or a
+            // recovery code. The link swaps the wording and, on a phone, the
+            // numeric keypad for the full keyboard a recovery code needs.
+            var totpToggle = document.getElementById('totp-recovery-toggle');
+            var totpInput = document.getElementById('totp_code');
+            var totpIntro = document.getElementById('totp-intro');
+
+            if (totpToggle && totpInput) {
+                var recoveryMode = false;
+                totpToggle.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    recoveryMode = !recoveryMode;
+                    var mode = recoveryMode ? 'recovery' : 'code';
+                    totpInput.setAttribute('inputmode', recoveryMode ? 'text' : 'numeric');
+                    totpInput.setAttribute('autocomplete', recoveryMode ? 'off' : 'one-time-code');
+                    totpInput.placeholder = totpInput.getAttribute('data-' + mode + '-placeholder') || '';
+                    totpToggle.textContent = totpToggle.getAttribute('data-' + mode + '-text') || '';
+                    if (totpIntro) {
+                        totpIntro.textContent = totpIntro.getAttribute('data-' + mode + '-text') || '';
+                    }
+                    totpInput.value = '';
+                    totpInput.focus();
+                });
+            }
+
             // OIDC login: redirect without creating a Poznote remember-me cookie.
             if (config.oidcEnabled) {
                 var oidcLoginBtn = document.getElementById('oidc-login-btn');

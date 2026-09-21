@@ -129,7 +129,7 @@
                 '</div>' +
                 '<div id="cpError" class="error" style="color:#dc3545;margin-bottom:10px;display:none;"></div>' +
                 '<div class="modal-buttons">' +
-                    '<button type="button" class="btn-danger" id="cpCancelBtn">' + tr('common.cancel', {}, 'Cancel') + '</button>' +
+                    '<button type="button" class="btn-cancel" id="cpCancelBtn">' + tr('common.cancel', {}, 'Cancel') + '</button>' +
                     '<button type="button" class="btn-primary" id="cpSaveBtn">' + tr('common.save', {}, 'Save') + '</button>' +
                 '</div>' +
             '</div>';

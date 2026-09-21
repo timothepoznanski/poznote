@@ -181,6 +181,17 @@ try {
 }
 $settingsAppPasswordsActive = (int)($settingsPageConfig['appPasswords']['active_count'] ?? 0);
 
+// Two-factor card: seed the badge like the two above.
+$settingsTwoFactorEnabled = false;
+try {
+    require_once __DIR__ . '/../users/totp.php';
+    $settingsTwoFactorUserId = (int)(getCurrentUserId() ?? 0);
+    $settingsTwoFactorEnabled = $settingsTwoFactorUserId > 0 && isUserTotpEnabled($settingsTwoFactorUserId);
+} catch (Throwable $e) {
+    $settingsTwoFactorEnabled = false;
+}
+$settingsPageConfig['twoFactor'] = ['enabled' => $settingsTwoFactorEnabled];
+
 // Whether a local password is of any use to this user. Unusable in two cases:
 // the instance is SSO-only, so no password would ever be accepted at login;
 // or this profile was provisioned without a credential, so there is no current
@@ -452,6 +463,26 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.change_password', [], 'Change Password'); ?></span>
                     <span id="password-status-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+            <!-- Two-factor authentication (greyed out when sign-in never uses a local
+                 password, unless it is already on and has to stay manageable) -->
+            <?php $settingsTwoFactorDisabled = $settingsChangePasswordDisabled && !$settingsTwoFactorEnabled; ?>
+            <div class="home-card<?php echo $settingsTwoFactorDisabled ? ' home-card-disabled' : ''; ?>" id="two-factor-card"<?php echo $settingsTwoFactorDisabled ? ' aria-disabled="true"' : ''; ?>>
+                <span class="setting-help" data-tooltip="<?php echo $settingsTwoFactorDisabled
+                    ? t_h('settings.card_help.two_factor_sso', [], 'Two-factor authentication protects password sign-in. Your account signs in through your identity provider, which handles its own second factor.')
+                    : t_h('settings.card_help.two_factor', [], 'Ask for a code from an authenticator app after your password when signing in.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-smartphone"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.two_factor', [], 'Two-factor authentication'); ?></span>
+                    <span id="two-factor-status-badge" class="setting-status <?php echo $settingsTwoFactorEnabled ? 'enabled' : 'disabled'; ?>"><?php
+                        echo $settingsTwoFactorEnabled
+                            ? t_h('two_factor.status.enabled', [], 'Enabled')
+                            : t_h('two_factor.status.disabled', [], 'Disabled');
+                    ?></span>
                 </div>
             </div>
 
@@ -1491,7 +1522,7 @@ if ($canUseUserWebhooks) {
             <div class="modal-buttons" style="flex-wrap: nowrap; justify-content: space-between;">
                 <button type="button" class="btn-primary" id="openGithubApiDocsBtn" style="flex: 1 1 0;"><?php echo t_h('modals.api_rest.github_option', [], 'GitHub'); ?></button>
                 <button type="button" class="btn-primary" id="openSwaggerApiBtn" style="flex: 1 1 0;"><?php echo t_h('modals.api_rest.swagger_option', [], 'Swagger'); ?></button>
-                <button type="button" class="btn-danger" id="closeApiRestModalBtn" style="flex: 1 1 0;"><?php echo t_h('common.cancel'); ?></button>
+                <button type="button" class="btn-cancel" id="closeApiRestModalBtn" style="flex: 1 1 0;"><?php echo t_h('common.cancel'); ?></button>
             </div>
         </div>
     </div>
@@ -1546,6 +1577,7 @@ if ($canUseUserWebhooks) {
     <script src="<?php echo poznoteAsset('js/panel-back.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/ui-customization-panel.js'); ?>"></script>
     <script src="js/change-password.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/change-password.js') ?: time(); ?>"></script>
+    <script src="js/two-factor.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/two-factor.js') ?: time(); ?>"></script>
     <script src="js/app-passwords.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/app-passwords.js') ?: time(); ?>"></script>
     <!-- js/profile.js (My Profile card and modal) is loaded by icon_sidebar.php,
          which every page carrying the rail includes. -->

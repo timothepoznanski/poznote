@@ -200,6 +200,15 @@ function routeTable(): array
         'GET /users/me/app-passwords' => [SCOPED],
         'POST /users/me/app-passwords' => [SCOPED, 'body' => ['label' => 'replay probe']],
         'DELETE /users/me/app-passwords/{id}' => [OWNED, 'target' => ['id' => 'app_password']],
+        'GET /users/me/two-factor' => [SCOPED],
+        'POST /users/me/two-factor/setup' => [EXCLUDED,
+            'reason' => 'acts on the caller only and needs the caller\'s own password; carries no identifier to replay'],
+        'POST /users/me/two-factor/enable' => [EXCLUDED,
+            'reason' => 'would put a second factor on B mid-run; carries no identifier to replay'],
+        'POST /users/me/two-factor/disable' => [EXCLUDED,
+            'reason' => 'acts on the caller only and needs a live code; carries no identifier to replay'],
+        'POST /users/me/two-factor/recovery-codes' => [EXCLUDED,
+            'reason' => 'acts on the caller only and needs a live code; carries no identifier to replay'],
         'POST /users/me/password' => [EXCLUDED, 'reason' => 'would change B\'s password mid-run'],
         'DELETE /users/me' => [EXCLUDED, 'reason' => 'would delete B mid-run; carries no identifier to replay'],
         // A directory of usernames, on purpose: the share dialogs need it, and
@@ -238,6 +247,7 @@ function routeTable(): array
         'DELETE /admin/users/{id}' => [ADMIN, 'target' => ['id' => 'user']],
         'POST /admin/users/{id}/reset-password' => [ADMIN, 'target' => ['id' => 'user'],
             'body' => ['action' => 'set_password', 'new_password' => 'taken-over']],
+        'POST /admin/users/{id}/two-factor/reset' => [ADMIN, 'target' => ['id' => 'user'], 'body' => []],
         'GET /admin/users/{id}/password-status' => [ADMIN, 'target' => ['id' => 'user']],
         'POST /admin/repair' => [ADMIN, 'body' => []],
 

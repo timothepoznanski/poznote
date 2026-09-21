@@ -247,10 +247,7 @@ docker compose up -d
 <details>
 <summary><strong>☁️ Nube</strong></summary><br>
 
-¿No quieres administrar un servidor? Dos proveedores alojan Poznote por ti. En ambos casos, primero debes crear una cuenta en el proveedor y luego desplegar Poznote desde su catálogo en unos pocos clics. Los dos ofrecen crédito gratuito al registrarte, así que puedes probarlo sin pagar nada.
-
-- **[Caliber Node](https://calibernode.com/cloud-apps/poznote)**, desde 2,50 $ al mes: las actualizaciones llegan en cuanto se publican, planes fijos (si necesitas más, pasas al siguiente), consola SSH y snapshots automáticos incluidos. Ideal si quieres gestionar lo mínimo posible y no tienes demasiadas notas.
-- **[PikaPods](https://www.pikapods.com/pods?run=poznote)**, desde 2 $ al mes: las actualizaciones se prueban antes de desplegarse, por lo que llegan un poco más tarde, RAM, CPU y disco ajustables por separado, copias de seguridad automáticas pero tú configuras dónde se guardan (S3). Ideal si quieres margen para crecer a medida que aumentan tus notas.
+¿No quieres administrar un servidor? Un proveedor de alojamiento puede ejecutar Poznote por ti y mantenerlo en línea. Consulta los proveedores disponibles y cómo elegir entre ellos [aquí](https://poznote.com/hosting.html).
 
 </details>
 
@@ -499,6 +496,16 @@ Las contraseñas se gestionan desde la interfaz web de Poznote, no desde `.env`:
 - La opción **Recordarme por 30 días** mantiene la sesión abierta durante ese tiempo.
 - Cambiar una contraseña invalida las cookies de «recordarme» existentes de ese usuario.
 
+#### Autenticación de dos factores
+
+Cada usuario puede activar la autenticación de dos factores (TOTP) desde **Settings > Two-factor authentication**. Después de la contraseña, el formulario de inicio de sesión pide entonces un código de 6 dígitos de una aplicación de autenticación (Aegis, Google Authenticator, 1Password, Bitwarden...).
+
+- La configuración muestra un código QR, dibujado en el navegador, y diez códigos de recuperación de un solo uso que conviene guardar por si se pierde el teléfono.
+- Protege el inicio de sesión con contraseña. Un inicio de sesión SSO queda en manos del proveedor de identidad y de su propio segundo factor.
+- Mientras está activada, la API REST ya no acepta la contraseña de la cuenta por sí sola: da a los clientes una [contraseña de aplicación](#contraseñas-de-aplicación), o envía el código actual en la cabecera `X-Poznote-OTP`.
+- Un administrador puede desactivarla para un usuario que haya perdido tanto su dispositivo como sus códigos de recuperación, desde **Settings > Admin Tools > User Management** (diálogo de contraseña).
+- Activarla o desactivarla invalida las cookies de «Remember me» existentes de ese usuario.
+
 #### Contraseñas por defecto
 
 - Cuentas de administrador: `admin`
@@ -525,6 +532,7 @@ Poznote admite OpenID Connect (código de autorización + PKCE) para el inicio d
 6. Si `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true`, el formulario de usuario y contraseña se oculta y la página de inicio de sesión pasa a ser solo SSO.
 7. Los clientes de la API REST pueden autenticarse con `Authorization: Bearer <OIDC JWT>` cuando OIDC está activado; Poznote valida el JWKS del proveedor, el emisor, la caducidad, la audiencia y los controles de acceso configurados.
 8. Los clientes que no pueden realizar ningún flujo OIDC (extensión del navegador, aplicación móvil, scripts) usan en su lugar una [contraseña de aplicación](#contraseñas-de-aplicación), que cada usuario crea desde su propia configuración.
+9. La [autenticación de dos factores](#autenticación-de-dos-factores) solo cubre el formulario de contraseña: un inicio de sesión SSO nunca pide el código de Poznote. Exige en su lugar un segundo factor en el proveedor de identidad. Un usuario que tiene a la vez contraseña e identidad SSO conserva ambos accesos, y el de SSO solo es tan fuerte como la política del proveedor.
 
 #### Configuración
 

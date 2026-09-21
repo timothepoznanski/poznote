@@ -841,8 +841,342 @@ class UsersController {
             // panel would report "uses the default password" for a profile where
             // the default is rejected.
             'password_login_available' => hasCustomPassword((int)$id) || !isPasswordLoginDisabled($user),
-            'password_changed_at' => $this->formatPasswordChangedAt($user['password_changed_at'] ?? null)
+            'password_changed_at' => $this->formatPasswordChangedAt($user['password_changed_at'] ?? null),
+            'two_factor_enabled' => $this->isTwoFactorEnabledFor((int)$id)
         ];
+    }
+
+    // ==================================================================
+    // Two-factor authentication (src/lib/totp.php, src/users/totp.php)
+    // ==================================================================
+
+    private function isTwoFactorEnabledFor(int $userId): bool {
+        require_once dirname(__DIR__, 3) . '/users/totp.php';
+        try {
+            return isUserTotpEnabled($userId);
+        } catch (Throwable $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Whether a second factor would ever be asked of this profile. It belongs
+     * to password sign-in: on an SSO-only instance, or for a profile that has
+     * no password at all, there is no login it could protect.
+     */
+    private function twoFactorUnavailableReason(int $userId): ?string {
+        $oidcPath = dirname(__DIR__, 3) . '/public/oidc.php';
+        if (is_file($oidcPath)) {
+            require_once $oidcPath;
+        }
+        if (function_exists('oidc_is_enabled') && oidc_is_enabled()
+            && defined('OIDC_DISABLE_NORMAL_LOGIN') && OIDC_DISABLE_NORMAL_LOGIN) {
+            return 'sso_only';
+        }
+        $profile = getUserProfileById($userId);
+        if ($profile && !hasCustomPassword($userId) && isPasswordLoginDisabled($profile)) {
+            return 'no_local_password';
+        }
+        return null;
+    }
+
+    /**
+     * Common entry of the /users/me/two-factor endpoints: the guards, then the
+     * profile id. Returns [userId, null] or [0, errorResponse].
+     */
+    private function twoFactorContext(): array {
+        if ($err = $this->requireActiveAccountOwner()) return [0, $err];
+        if ($err = $this->requireFullCredentials()) return [0, $err];
+
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/totp.php';
+        require_once dirname(__DIR__, 3) . '/ActivityLog.php';
+
+        $userId = (int)getCurrentUserId();
+        if ($userId <= 0) {
+            http_response_code(401);
+            return [0, ['error' => 'Not authenticated']];
+        }
+        return [$userId, null];
+    }
+
+    /**
+     * Codes and the password typed in these endpoints are guesses like the ones
+     * on the login form, from someone who already holds a session: they share
+     * its progressive delay, so a stolen session cannot be used to hammer them.
+     * Returns an error response when the attempt must be refused outright.
+     */
+    private function twoFactorThrottle(int $userId) {
+        $identifier = $this->twoFactorRateLimitIdentifier($userId);
+        if (function_exists('throttleLoginAttempt') && throttleLoginAttempt($identifier)) {
+            http_response_code(429);
+            return ['error' => 'Too many failed attempts. Try again later.'];
+        }
+        return null;
+    }
+
+    private function twoFactorRateLimitIdentifier(int $userId): string {
+        $profile = getUserProfileById($userId);
+        return (string)($profile['username'] ?? ('id-' . $userId));
+    }
+
+    private function twoFactorRecordFailure(int $userId): void {
+        if (function_exists('recordFailedLoginAttempt')) {
+            recordFailedLoginAttempt($this->twoFactorRateLimitIdentifier($userId));
+        }
+    }
+
+    private function twoFactorStatusPayload(int $userId): array {
+        $row = getUserTotpRow($userId);
+        return [
+            'enabled' => $row !== null,
+            'enabled_at' => $row !== null ? $this->formatPasswordChangedAt($row['enabled_at']) : null,
+            'recovery_codes_remaining' => $row !== null ? countUserTotpRecoveryCodes($userId) : 0,
+            'unavailable_reason' => $this->twoFactorUnavailableReason($userId),
+            // An SSO login never asks for the code (the identity provider owns
+            // that factor), so an account that has both a password and an SSO
+            // identity keeps one way in the code does not cover. The modal says
+            // so, but only where SSO exists: elsewhere it would be noise.
+            'sso_login_available' => function_exists('oidc_is_enabled') && oidc_is_enabled(),
+        ];
+    }
+
+    /**
+     * GET /api/v1/users/me/two-factor - Whether two-factor is on
+     */
+    public function twoFactorStatus() {
+        [$userId, $err] = $this->twoFactorContext();
+        if ($err) return $err;
+
+        return $this->twoFactorStatusPayload($userId);
+    }
+
+    /**
+     * POST /api/v1/users/me/two-factor/setup - Start switching two-factor on
+     * Body: { current_password: string }
+     *
+     * Returns a new secret for the authenticator app. Nothing is stored yet:
+     * the secret waits in the session until /enable proves the app produces
+     * the right codes, so a setup abandoned half-way locks nobody out.
+     */
+    public function twoFactorSetup() {
+        [$userId, $err] = $this->twoFactorContext();
+        if ($err) return $err;
+
+        if ($this->twoFactorUnavailableReason($userId) !== null) {
+            http_response_code(403);
+            return ['error' => 'Two-factor authentication applies to password sign-in, which is not available for this account.'];
+        }
+        if (isUserTotpEnabled($userId)) {
+            http_response_code(409);
+            return ['error' => 'Two-factor authentication is already enabled'];
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        $password = is_array($data) ? (string)($data['current_password'] ?? '') : '';
+        if ($password === '') {
+            http_response_code(400);
+            return ['error' => 'Your current password is required'];
+        }
+        if ($err = $this->twoFactorThrottle($userId)) return $err;
+        if (!verifyUserPassword($userId, $password)) {
+            $this->twoFactorRecordFailure($userId);
+            http_response_code(403);
+            return ['error' => 'Current password is incorrect', 'code' => 'invalid_password'];
+        }
+
+        $profile = getUserProfileById($userId);
+        $issuer = (string)(getGlobalSetting('login_display_name', '') ?: '');
+        if (trim($issuer) === '') {
+            $issuer = 'Poznote';
+        }
+        $secret = totpGenerateSecret();
+        $_SESSION['totp_setup'] = ['user_id' => $userId, 'secret' => $secret, 'started_at' => time()];
+
+        return [
+            'secret' => $secret,
+            'otpauth_uri' => totpProvisioningUri($secret, (string)($profile['username'] ?? ''), $issuer),
+            'issuer' => $issuer,
+            'account' => (string)($profile['username'] ?? ''),
+        ];
+    }
+
+    /**
+     * POST /api/v1/users/me/two-factor/enable - Confirm the setup with a first code
+     * Body: { code: string }
+     * The recovery codes are in this response and nowhere else afterwards.
+     */
+    public function twoFactorEnable() {
+        [$userId, $err] = $this->twoFactorContext();
+        if ($err) return $err;
+
+        $setup = $_SESSION['totp_setup'] ?? null;
+        if (!is_array($setup) || (int)($setup['user_id'] ?? 0) !== $userId
+            || (int)($setup['started_at'] ?? 0) < time() - 3600) {
+            unset($_SESSION['totp_setup']);
+            http_response_code(409);
+            return ['error' => 'No two-factor setup in progress. Start again.'];
+        }
+        if (isUserTotpEnabled($userId)) {
+            unset($_SESSION['totp_setup']);
+            http_response_code(409);
+            return ['error' => 'Two-factor authentication is already enabled'];
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        $code = is_array($data) ? (string)($data['code'] ?? '') : '';
+
+        if ($err = $this->twoFactorThrottle($userId)) return $err;
+        $step = totpVerifyCode((string)$setup['secret'], $code);
+        if ($step === null) {
+            $this->twoFactorRecordFailure($userId);
+            http_response_code(400);
+            return ['error' => 'Incorrect code', 'code' => 'invalid_code'];
+        }
+
+        $recoveryCodes = enableUserTotp($userId, (string)$setup['secret'], $step);
+        if ($recoveryCodes === null) {
+            http_response_code(500);
+            return ['error' => 'Failed to enable two-factor authentication'];
+        }
+        unset($_SESSION['totp_setup']);
+
+        // The remember-me cookie is signed with a secret that now includes the
+        // second factor: re-sign this device's cookie, it just proved both.
+        $profile = getUserProfileById($userId);
+        if ($profile) {
+            $this->reissueRememberMeCookie($profile);
+        }
+
+        logActivity(ACTIVITY_TWO_FACTOR_ENABLED, [], 'self');
+
+        return ['success' => true, 'recovery_codes' => $recoveryCodes] + $this->twoFactorStatusPayload($userId);
+    }
+
+    /**
+     * POST /api/v1/users/me/two-factor/disable - Switch two-factor off
+     * Body: { current_password: string, code: string }
+     * The code is an authenticator code or a recovery code: both factors are
+     * asked for, since a session plus the password is exactly what two-factor
+     * assumes an attacker may have.
+     */
+    public function twoFactorDisable() {
+        [$userId, $err] = $this->twoFactorContext();
+        if ($err) return $err;
+
+        if (!isUserTotpEnabled($userId)) {
+            http_response_code(409);
+            return ['error' => 'Two-factor authentication is not enabled'];
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        $password = is_array($data) ? (string)($data['current_password'] ?? '') : '';
+        $code = is_array($data) ? (string)($data['code'] ?? '') : '';
+        if ($password === '' || $code === '') {
+            http_response_code(400);
+            return ['error' => 'Your current password and a code are required'];
+        }
+
+        if ($err = $this->twoFactorThrottle($userId)) return $err;
+        if (!verifyUserPassword($userId, $password)) {
+            $this->twoFactorRecordFailure($userId);
+            http_response_code(403);
+            return ['error' => 'Current password is incorrect', 'code' => 'invalid_password'];
+        }
+        if (verifyUserSecondFactor($userId, $code) === null) {
+            $this->twoFactorRecordFailure($userId);
+            http_response_code(400);
+            return ['error' => 'Incorrect code', 'code' => 'invalid_code'];
+        }
+
+        if (!disableUserTotp($userId)) {
+            http_response_code(500);
+            return ['error' => 'Failed to disable two-factor authentication'];
+        }
+
+        $profile = getUserProfileById($userId);
+        if ($profile) {
+            $this->reissueRememberMeCookie($profile);
+        }
+
+        logActivity(ACTIVITY_TWO_FACTOR_DISABLED, [], 'self');
+
+        return ['success' => true] + $this->twoFactorStatusPayload($userId);
+    }
+
+    /**
+     * POST /api/v1/users/me/two-factor/recovery-codes - Replace the recovery codes
+     * Body: { code: string } - an authenticator code; a recovery code is not
+     * accepted here, or one leaked code would be enough to mint ten more.
+     */
+    public function twoFactorRegenerateRecoveryCodes() {
+        [$userId, $err] = $this->twoFactorContext();
+        if ($err) return $err;
+
+        if (!isUserTotpEnabled($userId)) {
+            http_response_code(409);
+            return ['error' => 'Two-factor authentication is not enabled'];
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        $code = is_array($data) ? (string)($data['code'] ?? '') : '';
+
+        if ($err = $this->twoFactorThrottle($userId)) return $err;
+        if (!verifyUserTotpCode($userId, $code)) {
+            $this->twoFactorRecordFailure($userId);
+            http_response_code(400);
+            return ['error' => 'Incorrect code', 'code' => 'invalid_code'];
+        }
+
+        $recoveryCodes = regenerateUserTotpRecoveryCodes($userId);
+        if ($recoveryCodes === null) {
+            http_response_code(500);
+            return ['error' => 'Failed to generate recovery codes'];
+        }
+
+        logActivity(ACTIVITY_TWO_FACTOR_RECOVERY_REGENERATED, [], 'self');
+
+        return ['success' => true, 'recovery_codes' => $recoveryCodes] + $this->twoFactorStatusPayload($userId);
+    }
+
+    /**
+     * POST /api/v1/admin/users/{id}/two-factor/reset - Admin: switch a user's two-factor off
+     * For a user who lost their device and their recovery codes. They sign in
+     * with the password alone afterwards and can set it up again.
+     */
+    public function adminResetTwoFactor($id) {
+        if ($err = $this->requireAdmin()) return $err;
+
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/totp.php';
+        require_once dirname(__DIR__, 3) . '/ActivityLog.php';
+
+        $user = getUserProfileById((int)$id);
+        if (!$user) {
+            http_response_code(404);
+            return ['error' => 'User not found'];
+        }
+        if (!isUserTotpEnabled((int)$id)) {
+            http_response_code(409);
+            return ['error' => 'Two-factor authentication is not enabled for this user'];
+        }
+        if (!disableUserTotp((int)$id)) {
+            http_response_code(500);
+            return ['error' => 'Failed to reset two-factor authentication'];
+        }
+
+        // Filed under the user it happened to, like the other admin actions
+        // on an account, with the admin named in the details.
+        [, $actingAdminName] = currentActivityActor();
+        logActivity(
+            ACTIVITY_TWO_FACTOR_RESET,
+            ['performed_by' => $actingAdminName],
+            'admin',
+            (int)$id,
+            $user['username'] ?? null
+        );
+
+        return ['success' => true, 'message' => 'Two-factor authentication disabled for this user'];
     }
 
     /**

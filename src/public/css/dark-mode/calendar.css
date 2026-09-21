@@ -58,11 +58,11 @@ html[data-theme='dark'] .calendar-notes-modal .btn-open-all:hover {
     background: var(--pz-accent-hover);
 }
 
-html[data-theme='dark'] .calendar-notes-modal .btn-close-red {
-    background: var(--pz-danger-text-hover);
-    color: var(--pz-text-inverse);
+html[data-theme='dark'] .calendar-notes-modal .btn-close {
+    background: var(--pz-border);
+    color: var(--pz-text);
 }
 
-html[data-theme='dark'] .calendar-notes-modal .btn-close-red:hover {
-    background: var(--pz-danger-text-hover);
+html[data-theme='dark'] .calendar-notes-modal .btn-close:hover {
+    background: var(--pz-surface-sunken);
 }
