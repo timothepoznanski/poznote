@@ -153,6 +153,118 @@ body.mobile-keyboard-open #right_pane {
     height: var(--mobile-visual-viewport-height, 100vh) !important;
 }
 
+/* Mobile editor bar (mobile_editor_bar.php, js/mobile-editor-bar.js): pinned to
+   the bottom edge of the visual viewport, i.e. right above the keyboard. top is
+   used instead of bottom because the keyboard does not shrink the layout
+   viewport on iOS, where bottom: 0 sits behind the keys. */
+:root {
+    --mobile-editor-bar-height: 46px;
+}
+
+body.mobile-editor-bar-visible .mobile-editor-bar {
+    display: flex;
+    align-items: stretch;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: calc(var(--mobile-visual-viewport-top, 0px) + var(--mobile-visual-viewport-height, 100vh) - var(--mobile-editor-bar-height));
+    height: var(--mobile-editor-bar-height);
+    box-sizing: border-box;
+    padding: 0 max(4px, env(safe-area-inset-right, 0px)) 0 max(4px, env(safe-area-inset-left, 0px));
+    background: var(--pz-bg);
+    border-top: 1px solid var(--pz-border);
+    box-shadow: 0 -4px 14px rgba(var(--pz-shadow-rgb), 0.08);
+    z-index: 2147483000;
+    /* A tap on the bar must never start a text selection or a callout */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+.mobile-editor-bar-scroll {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.mobile-editor-bar-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.mobile-editor-bar-btn {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 38px;
+    padding: 0;
+    border: none;
+    border-radius: var(--pz-radius-sm);
+    background: transparent;
+    color: var(--pz-text-muted);
+    font-size: 1.15rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-editor-bar-btn:active {
+    background: var(--pz-accent-soft);
+    color: var(--pz-accent-text);
+}
+
+.mobile-editor-bar-insert {
+    color: var(--pz-accent-text);
+}
+
+/* The icon follows its button. :hover is named because it sticks after a tap
+   on a touch screen: the global icon hover (css/icons.css) would leave the last
+   tapped icon enlarged and accent-coloured. */
+.mobile-editor-bar .mobile-editor-bar-btn i[class*="lucide-"],
+.mobile-editor-bar .mobile-editor-bar-btn i[class*="lucide-"]:hover {
+    color: inherit !important;
+    transform: none;
+    pointer-events: none;
+}
+
+.mobile-editor-bar-sep {
+    flex: 0 0 auto;
+    width: 1px;
+    height: 20px;
+    margin: 0 4px;
+    background: var(--pz-border);
+}
+
+/* Hide keyboard and "...": stay in place while the rest of the bar scrolls */
+.mobile-editor-bar-pinned {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: 4px;
+    padding-left: 4px;
+    border-left: 1px solid var(--pz-border);
+}
+
+/* The pane gives up the height of the bar so the caret never types under it */
+body.mobile-keyboard-open.mobile-editor-bar-visible #right_pane {
+    height: calc(var(--mobile-visual-viewport-height, 100vh) - var(--mobile-editor-bar-height)) !important;
+}
+
+/* The floating buttons of the bottom-right corner would sit on the bar where
+   the keyboard resizes the layout (Android); they are of no use while typing. */
+body.mobile-editor-bar-visible .pz-edge-stack,
+body.mobile-editor-bar-visible .note-scroll-edge-btn {
+    display: none !important;
+}
+
 #right_col {
     overflow-y: auto !important;
     position: relative;
@@ -190,6 +302,13 @@ body.mobile-keyboard-open #right_col .note-header {
     z-index: 2147483000;
 }
 
+/* The Customize panel and the AI chat slide over the note (z-index 1200): the
+   keyboard their inputs open must not lift the note toolbar above them. */
+body.ui-custom-panel-open #right_col .note-header,
+body:has(#ai-chat-panel.ai-chat-open) #right_col .note-header {
+    z-index: 1200;
+}
+
 body.mobile-formatting-toolbar-active .color-palette-popup {
     z-index: 2147483002;
 }
@@ -220,7 +339,9 @@ body.mobile-keyboard-open #attachmentPickerModal.modal,
 body.mobile-formatting-toolbar-active #noteReferenceModal.modal,
 body.mobile-keyboard-open #noteReferenceModal.modal,
 body.mobile-formatting-toolbar-active #codeBlockLanguageModal.modal,
-body.mobile-keyboard-open #codeBlockLanguageModal.modal {
+body.mobile-keyboard-open #codeBlockLanguageModal.modal,
+body.mobile-formatting-toolbar-active .pz-help-modal.modal,
+body.mobile-keyboard-open .pz-help-modal.modal {
     z-index: 2147483004 !important;
 }
 
@@ -244,7 +365,9 @@ body.mobile-keyboard-open #attachmentPickerModal .modal-content,
 body.mobile-formatting-toolbar-active #noteReferenceModal .modal-content,
 body.mobile-keyboard-open #noteReferenceModal .modal-content,
 body.mobile-formatting-toolbar-active #codeBlockLanguageModal .modal-content,
-body.mobile-keyboard-open #codeBlockLanguageModal .modal-content {
+body.mobile-keyboard-open #codeBlockLanguageModal .modal-content,
+body.mobile-formatting-toolbar-active .pz-help-modal .modal-content,
+body.mobile-keyboard-open .pz-help-modal .modal-content {
     z-index: 2147483005 !important;
 }
 

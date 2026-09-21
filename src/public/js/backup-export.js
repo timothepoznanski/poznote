@@ -2,7 +2,7 @@
  * Backup Export Page JavaScript
  * Handles backup and export functionality including:
  * - Complete backup as a background job (built by a server-side worker,
- *   polled here, downloaded once ready)
+ *   polled here, offered as a download link once ready)
  * - Exporting notes, attachments, and structured data
  * - Loading workspace selection for exports
  */
@@ -100,17 +100,14 @@ function loadWorkspacesForStructuredExport() {
 // a synchronous build inside the POST cannot survive the timeout of a proxy
 // sitting in front of the instance for large accounts, and would occupy a
 // php-fpm worker for many minutes. Here the page starts the job, polls its
-// status, and triggers the download once the file is ready; the download
-// itself streams immediately so no timeout applies. A page reload while the
-// build runs picks the job back up.
+// status, and shows a download link once the file is ready (the download is
+// never started on the user's behalf); the download itself streams
+// immediately so no timeout applies. A page reload while the build runs
+// picks the job back up.
 
 var backupJob = {
     config: null,
-    pollTimer: null,
-    // Id of the job THIS tab started. The download only auto-starts for that
-    // exact job, so neither a reload showing an already-finished archive nor
-    // an in-flight resume response for an older job can trigger one.
-    autoDownloadJobId: null
+    pollTimer: null
 };
 
 function backupJobConfig() {
@@ -141,13 +138,6 @@ function backupJobFormatBytes(bytes) {
     var i = 0, v = bytes;
     while (v >= 1024 && i < units.length - 1) { v /= 1024; i++; }
     return (i === 0 ? v : v.toFixed(1)) + ' ' + units[i];
-}
-
-function backupJobFormatElapsed(fromEpochSeconds) {
-    var seconds = Math.max(0, Math.round(Date.now() / 1000 - fromEpochSeconds));
-    var minutes = Math.floor(seconds / 60);
-    if (minutes <= 0) return seconds + ' s';
-    return minutes + ' min ' + (seconds % 60) + ' s';
 }
 
 function backupJobElements() {
@@ -197,10 +187,9 @@ function backupJobRenderRunning(job) {
         els.button.setAttribute('aria-disabled', 'true');
     }
     if (els.spinnerText) {
-        var since = job.started_at || job.created_at;
         els.spinnerText.textContent = job.status === 'queued'
             ? backupJobText('queued', 'Export queued...')
-            : backupJobText('preparing', 'Preparing the archive... ({{elapsed}})', { elapsed: backupJobFormatElapsed(since) });
+            : backupJobText('preparing', 'Preparing the archive...');
     }
 }
 
@@ -211,17 +200,13 @@ function backupJobRenderReady(job) {
     if (els.readyText) {
         els.readyText.textContent = backupJobText(
             'ready',
-            'Your archive is ready ({{size}}). The download starts automatically; it stays available here for 24 hours.',
+            'Your archive is ready ({{size}}). It stays available here for 24 hours.',
             { size: backupJobFormatBytes(job.size) }
         );
     }
     var url = 'api_backup_job.php?action=download&job_id=' + encodeURIComponent(job.id);
     if (els.downloadLink) els.downloadLink.setAttribute('href', url);
     if (els.discardBtn) els.discardBtn.dataset.jobId = job.id;
-    if (backupJob.autoDownloadJobId === job.id) {
-        backupJob.autoDownloadJobId = null;
-        window.location.href = url;
-    }
 }
 
 function backupJobRenderError(message) {
@@ -285,7 +270,6 @@ function backupJobStart(form) {
                 backupJobRenderError(backupJobText('startError', 'Cannot start the export: {{error}}', { error: data.error || 'unknown' }));
                 return;
             }
-            backupJob.autoDownloadJobId = data.job.id;
             backupJobRenderRunning(data.job);
             backupJobStartPolling(data.job.id);
         })
@@ -302,10 +286,6 @@ function backupJobResume() {
         .then(function(data) {
             if (!data.success || !data.job) return;
             if (data.job.status === 'queued' || data.job.status === 'running') {
-                // Deliberately NOT arming autoDownload here: only the tab
-                // that started the export downloads on completion. Otherwise
-                // every open tab watching the same job would fire its own
-                // download of the same multi-hundred-MB archive.
                 backupJobRenderRunning(data.job);
                 backupJobStartPolling(data.job.id);
             } else if (data.job.status === 'done') {

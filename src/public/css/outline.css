@@ -391,10 +391,6 @@ html[data-theme='dark'] .outline-nav-link {
     color: var(--pz-text-strong);
 }
 
-html.theme-black[data-theme='dark'] .outline-nav-link {
-    color: var(--pz-text-subtle);
-}
-
 html[data-theme='dark'] .outline-nav-link:hover {
     background: var(--pz-sidebar-surface);
     color: var(--pz-accent-text);

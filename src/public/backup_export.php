@@ -788,9 +788,9 @@ function createBackup() {
         echo json_encode([
             'csrfToken' => $backupExportCsrfToken,
             'i18n' => [
-                'preparing' => t('backup_export.job.preparing', [], 'Preparing the archive... ({{elapsed}})'),
+                'preparing' => t('backup_export.job.preparing', [], 'Preparing the archive...'),
                 'queued' => t('backup_export.job.queued', [], 'Export queued...'),
-                'ready' => t('backup_export.job.ready', [], 'Your archive is ready ({{size}}). The download starts automatically; it stays available here for 24 hours.'),
+                'ready' => t('backup_export.job.ready', [], 'Your archive is ready ({{size}}). It stays available here for 24 hours.'),
                 'error' => t('backup_export.job.error', [], 'The export failed: {{error}}'),
                 'startError' => t('backup_export.job.start_error', [], 'Cannot start the export: {{error}}'),
             ],

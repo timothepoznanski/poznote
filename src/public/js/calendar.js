@@ -1,6 +1,7 @@
 /**
  * Mini Calendar Component for Poznote
- * Displays a calendar at the bottom of the left sidebar with dots indicating notes created on each day
+ * Displays a calendar at the bottom of the left sidebar, with the number of notes created
+ * and the number of notes last modified under each day
  */
 
 class MiniCalendar {
@@ -8,11 +9,15 @@ class MiniCalendar {
         this.currentDate = new Date();
         this.currentMonth = this.currentDate.getMonth();
         this.currentYear = this.currentDate.getFullYear();
-        this.notesData = {};
+        // Notes per YYYY-MM-DD, by creation and by last modification date
+        this.countsByMode = { created: {}, modified: {} };
+        this.fetchGeneration = 0;
         this.translations = window.calendarTranslations || this.getDefaultTranslations();
         // Default to hidden until the user explicitly toggles it.
         const storedVisibility = localStorage.getItem('calendarVisible');
         this.isVisible = storedVisibility === null ? false : storedVisibility === 'true';
+        // Which notes the day modal lists: 'created' or 'modified'.
+        this.mode = localStorage.getItem('calendarMode') === 'modified' ? 'modified' : 'created';
         this.init();
     }
 
@@ -23,9 +28,13 @@ class MiniCalendar {
             previousMonth: 'Previous month',
             nextMonth: 'Next month',
             today: 'Today',
+            modes: {
+                created: 'Created',
+                modified: 'Modified'
+            },
+            dayCounts: 'Created: {{created}} / Modified: {{modified}}',
             modal: {
                 title: 'Notes from',
-                open: 'Open',
                 open_all: 'Open All',
                 close: 'Close',
                 no_notes: 'No notes on this day.',
@@ -105,20 +114,33 @@ class MiniCalendar {
 
     /**
      * Fetch notes data from the database
-     * Groups notes by creation date
+     * Groups notes by creation date and by last modification date
      */
     async fetchNotesData() {
+        const generation = ++this.fetchGeneration;
         try {
-            // Fetch notes data via AJAX
-            const response = await fetch(this.buildCalendarApiUrl('api/v1/calendar/notes-by-date.php'));
-            if (response.ok) {
-                const data = await response.json();
-                this.notesData = data;
-                this.render();
-            }
+            const [created, modified] = await Promise.all(['created', 'modified'].map(async mode => {
+                const response = await fetch(this.buildCalendarApiUrl('api/v1/calendar/notes-by-date.php', { mode }));
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return response.json();
+            }));
+            // A refresh started while this one was in flight wins
+            if (generation !== this.fetchGeneration) return;
+            this.countsByMode = { created: created || {}, modified: modified || {} };
+            this.render();
         } catch (error) {
             console.error('Error fetching calendar data:', error);
         }
+    }
+
+    /**
+     * Switch the day modal list between created and last modified notes
+     */
+    setMode(mode) {
+        const next = mode === 'modified' ? 'modified' : 'created';
+        if (next === this.mode) return;
+        this.mode = next;
+        localStorage.setItem('calendarMode', next);
     }
 
     /**
@@ -129,11 +151,14 @@ class MiniCalendar {
     }
 
     /**
-     * Get the number of notes created on a specific date
+     * Get the number of notes created and last modified on a specific date
      */
-    getNotesCount(year, month, day) {
+    getDayCounts(year, month, day) {
         const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        return this.notesData[dateKey] || 0;
+        return {
+            created: Number(this.countsByMode.created[dateKey]) || 0,
+            modified: Number(this.countsByMode.modified[dateKey]) || 0
+        };
     }
 
     /**
@@ -253,20 +278,21 @@ class MiniCalendar {
                 </div>
             `;
         } else {
-            // When visible, show full calendar
+            const dayCounts = this.translations.dayCounts || this.getDefaultTranslations().dayCounts;
+
             html = `
                 <div class="mini-calendar-header">
+                    <div class="mini-calendar-month-year">
+                        ${this.getMonthName(this.currentMonth)} <span class="mini-calendar-year">${this.currentYear}</span>
+                    </div>
                     <button class="mini-calendar-nav" data-action="prev-month" title="${this.translations.previousMonth}">
                         <i class="lucide lucide-chevron-left"></i>
                     </button>
-                    <div class="mini-calendar-month-year">
-                        ${this.getMonthName(this.currentMonth)} ${this.currentYear}
-                    </div>
-                    <button class="mini-calendar-nav" data-action="next-month" title="${this.translations.nextMonth}">
-                        <i class="lucide lucide-chevron-right"></i>
-                    </button>
                     <button class="mini-calendar-today" data-action="today" title="${this.translations.today}">
                         <i class="lucide lucide-calendar"></i>
+                    </button>
+                    <button class="mini-calendar-nav" data-action="next-month" title="${this.translations.nextMonth}">
+                        <i class="lucide lucide-chevron-right"></i>
                     </button>
                     <button class="mini-calendar-toggle" data-action="toggle" title="${this.translations.hideCalendar || 'Hide calendar'}">
                         <i class="lucide lucide-chevron-down"></i>
@@ -286,15 +312,23 @@ class MiniCalendar {
 
             // Add days of the month
             for (let day = 1; day <= daysInMonth; day++) {
-                const notesCount = this.getNotesCount(this.currentYear, this.currentMonth, day);
+                const counts = this.getDayCounts(this.currentYear, this.currentMonth, day);
+                const hasNotes = counts.created > 0 || counts.modified > 0;
                 const isToday = isCurrentMonth && day === today.getDate();
                 const todayClass = isToday ? ' mini-calendar-day-today' : '';
-                const hasNotesClass = notesCount > 0 ? ' mini-calendar-day-has-notes' : '';
+                const hasNotesClass = hasNotes ? ' mini-calendar-day-has-notes' : '';
+                // created/modified, the tooltip naming which is which
+                const title = hasNotes
+                    ? ` title="${this.escapeHtml(dayCounts.split('{{created}}').join(counts.created).split('{{modified}}').join(counts.modified))}"`
+                    : '';
+                const countsHtml = hasNotes
+                    ? `<span class="mini-calendar-count-created">${counts.created}</span><span class="mini-calendar-count-sep">/</span><span class="mini-calendar-count-modified">${counts.modified}</span>`
+                    : '';
 
                 html += `
-                    <div class="mini-calendar-day${todayClass}${hasNotesClass}" data-day="${day}" data-notes-count="${notesCount}">
+                    <div class="mini-calendar-day${todayClass}${hasNotesClass}" data-day="${day}"${title}>
                         <span class="mini-calendar-day-number">${day}</span>
-                        ${this.renderNoteDots(notesCount)}
+                        <span class="mini-calendar-day-count">${countsHtml}</span>
                     </div>
                 `;
             }
@@ -306,25 +340,21 @@ class MiniCalendar {
     }
 
     /**
-     * Render note dots for a day
-     * Shows up to 3 dots, with a "+" indicator if there are more
+     * Render the Created / Modified switch shown in the day modal, each
+     * option with its number of notes (`counts` = { created, modified })
      */
-    renderNoteDots(count) {
-        if (count === 0) return '';
-
-        const dotsToShow = Math.min(count, 3);
-        let dotsHtml = '<div class="mini-calendar-dots">';
-
-        for (let i = 0; i < dotsToShow; i++) {
-            dotsHtml += '<span class="mini-calendar-dot"></span>';
-        }
-
-        if (count > 3) {
-            dotsHtml += '<span class="mini-calendar-dot-more">+</span>';
-        }
-
-        dotsHtml += '</div>';
-        return dotsHtml;
+    renderModeSwitch(counts) {
+        const modes = this.translations.modes || {};
+        return `
+            <div class="calendar-mode-switch" role="group">
+                ${['created', 'modified'].map(mode => `
+                    <button type="button" class="calendar-mode-option${mode === this.mode ? ' active' : ''}" data-mode="${mode}" aria-pressed="${mode === this.mode}">
+                        ${this.escapeHtml(modes[mode] || (mode === 'modified' ? 'Modified' : 'Created'))}
+                        <span class="calendar-mode-count">${counts[mode]}</span>
+                    </button>
+                `).join('')}
+            </div>
+        `;
     }
 
     /**
@@ -370,22 +400,31 @@ class MiniCalendar {
     }
 
     /**
+     * Fetch the notes created (or last modified, per the current mode) on a date.
+     * Returns null when the request fails.
+     */
+    async fetchNotesOnDate(dateStr) {
+        const response = await fetch(this.buildCalendarApiUrl('api/v1/calendar/notes-on-date.php', { date: dateStr, mode: this.mode }));
+        if (!response.ok) {
+            console.error('Failed to fetch notes for date:', dateStr);
+            return null;
+        }
+        return response.json();
+    }
+
+    /**
      * Show modal with notes from a specific date
      */
     async filterNotesByDate(dateStr) {
         try {
             // Fetch the day's notes and its diary entry status in parallel
-            const [notesResponse, diaryResponse] = await Promise.all([
-                fetch(this.buildCalendarApiUrl('api/v1/calendar/notes-on-date.php', { date: dateStr })),
+            const [notes, diaryResponse] = await Promise.all([
+                this.fetchNotesOnDate(dateStr),
                 fetch(this.buildCalendarApiUrl('api/v1/calendar/diary-entry.php', { date: dateStr }))
             ]);
 
-            if (!notesResponse.ok) {
-                console.error('Failed to fetch notes for date:', dateStr);
-                return;
-            }
+            if (!notes) return;
 
-            const notes = await notesResponse.json();
             const diary = diaryResponse.ok ? await diaryResponse.json() : null;
 
             // Show modal with notes list and diary entry action
@@ -469,21 +508,30 @@ class MiniCalendar {
     }
 
     /**
+     * Render the notes list of the day modal
+     */
+    renderNotesListHtml(notes) {
+        return notes.length > 0
+            ? notes.map(note => `
+                <button type="button" class="calendar-note-item" data-note-id="${note.id}" data-note-title="${this.escapeHtml(note.title || 'Untitled')}">
+                    <span class="calendar-note-title">${this.escapeHtml(note.title || 'Untitled')}</span>
+                </button>
+            `).join('')
+            : `<div class="calendar-notes-empty">${this.translations.modal.no_notes || 'No notes on this day.'}</div>`;
+    }
+
+    /**
      * Show modal with list of notes from a specific date
      */
     showNotesModal(notes, dateStr, diary) {
         const formattedDate = this.formatDateForModal(dateStr);
-
-        const notesHtml = notes.length > 0
-            ? notes.map(note => `
-                <div class="calendar-note-item" data-note-id="${note.id}">
-                    <span class="calendar-note-title">${this.escapeHtml(note.title || 'Untitled')}</span>
-                    <button class="calendar-note-open-btn" data-note-id="${note.id}" data-note-title="${this.escapeHtml(note.title || 'Untitled')}">
-                        ${this.translations.modal.open}
-                    </button>
-                </div>
-            `).join('')
-            : `<div class="calendar-notes-empty">${this.translations.modal.no_notes || 'No notes on this day.'}</div>`;
+        // Replaced when the Created / Modified switch reloads the list
+        let currentNotes = notes;
+        // Notes per mode on this day: the calendar's figures, the shown list
+        // being the fresher source for its own mode
+        const [year, month, day] = dateStr.split('-').map(Number);
+        const dayCounts = this.getDayCounts(year, month - 1, day);
+        dayCounts[this.mode] = notes.length;
 
         // One button per diary when the workspace has several; the payload of
         // each is normalized to the shape openOrCreateDiaryEntry expects.
@@ -517,14 +565,15 @@ class MiniCalendar {
                 <div class="modal-dialog calendar-notes-modal">
                     <div class="modal-header">
                         <h3 class="modal-title">${this.translations.modal.title} ${formattedDate}</h3>
+                        ${this.renderModeSwitch(dayCounts)}
                     </div>
                     <div class="modal-body">
                         <div class="calendar-notes-list">
-                            ${notesHtml}
+                            ${this.renderNotesListHtml(notes)}
                         </div>
                     </div>
                     <div class="modal-footer">
-                        ${notes.length > 0 ? `<button class="btn-open-all" data-action="open-all">${this.translations.modal.open_all}</button>` : ''}
+                        <button class="btn-open-all" data-action="open-all"${notes.length > 0 ? '' : ' hidden'}>${this.translations.modal.open_all}</button>
                         ${diaryBtnHtml}
                         <button class="btn-close-red" data-action="close-modal">${this.translations.modal.close}</button>
                     </div>
@@ -539,6 +588,8 @@ class MiniCalendar {
 
         // Add event listeners
         const modal = modalContainer.querySelector('.calendar-notes-modal-overlay');
+        const list = modal.querySelector('.calendar-notes-list');
+        const openAllBtn = modal.querySelector('[data-action="open-all"]');
 
         // Close modal on overlay click
         let pressedOnBackdrop = false;
@@ -560,16 +611,14 @@ class MiniCalendar {
         });
 
         // Open all notes when clicking "Open All" button
-        modal.querySelectorAll('[data-action="open-all"]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                notes.forEach(note => {
-                    if (window.tabManager) {
-                        window.tabManager.openInNewTab(note.id, note.title || 'Untitled');
-                    }
-                });
-                // Close modal after opening all notes
-                modal.remove();
+        openAllBtn.addEventListener('click', () => {
+            currentNotes.forEach(note => {
+                if (window.tabManager) {
+                    window.tabManager.openInNewTab(note.id, note.title || 'Untitled');
+                }
             });
+            // Close modal after opening all notes
+            modal.remove();
         });
 
         // Open (or create) the diary entry for this day
@@ -581,38 +630,36 @@ class MiniCalendar {
             });
         });
 
-        // Open note in tab when clicking "Open" button
-        modal.querySelectorAll('.calendar-note-open-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const noteId = btn.getAttribute('data-note-id');
-                const noteTitle = btn.getAttribute('data-note-title');
+        // Created / Modified: remembers the choice and reloads this day's list
+        // in place
+        const modeOptions = modal.querySelectorAll('.calendar-mode-option');
+        modeOptions.forEach(option => {
+            option.addEventListener('click', async () => {
+                const mode = option.getAttribute('data-mode');
+                if (mode === this.mode) return;
+                this.setMode(mode);
+                modeOptions.forEach(other => {
+                    const active = other.getAttribute('data-mode') === this.mode;
+                    other.classList.toggle('active', active);
+                    other.setAttribute('aria-pressed', String(active));
+                });
 
-                if (window.tabManager) {
-                    window.tabManager.openInNewTab(noteId, noteTitle);
-                } else {
-                    // Fallback: redirect to note
-                    window.location.href = `index.php?note=${noteId}`;
-                }
+                const requested = this.mode;
+                const fresh = await this.fetchNotesOnDate(dateStr).catch(() => null);
+                if (!fresh || requested !== this.mode || !modal.isConnected) return;
+                currentNotes = fresh;
+                list.innerHTML = this.renderNotesListHtml(fresh);
+                openAllBtn.hidden = fresh.length === 0;
+                option.querySelector('.calendar-mode-count').textContent = fresh.length;
             });
         });
 
-        // Also allow clicking on the note item itself
-        modal.querySelectorAll('.calendar-note-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                // Don't trigger if clicking the button
-                if (e.target.classList.contains('calendar-note-open-btn')) return;
-
-                const noteId = item.getAttribute('data-note-id');
-                const btn = item.querySelector('.calendar-note-open-btn');
-                const noteTitle = btn.getAttribute('data-note-title');
-
-                if (window.tabManager) {
-                    window.tabManager.openInNewTab(noteId, noteTitle);
-                } else {
-                    window.location.href = `index.php?note=${noteId}`;
-                }
-            });
+        // Open a note in a tab from its row, delegated so the rows the mode
+        // switch re-renders keep working
+        list.addEventListener('click', (e) => {
+            const item = e.target.closest('.calendar-note-item');
+            if (!item) return;
+            this.openNoteInTab(item.getAttribute('data-note-id'), item.getAttribute('data-note-title'));
         });
     }
 }

@@ -63,8 +63,11 @@ html[data-theme='dark'] .pz-edge-btn:focus {
 }
 
 /* Readable text colors: preserve inline color styles, links, syntax highlighting
-   and Mermaid labels (js/mermaid-theme.js picks those against their fill) */
-html[data-theme='dark'] .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.code-line):not(.search-highlight):not(.search-highlight-active):not([class^="md-"]):not([class*=" md-"]):not(.markdown-codemirror-host *):not(.mermaid *) {
+   and Mermaid labels (js/mermaid-theme.js picks those against their fill).
+   Inline formatting inside a coloured run is left alone too: bolding part of a
+   coloured span nests a style-less <b> in it, which has to inherit that colour
+   instead of being painted back to the default text colour (#1401). */
+html[data-theme='dark'] .noteentry *:not([style*="color"]):not(:is(b, strong, i, em, u, s, strike, del, ins, sub, sup, small, span, font):is([style*="color"] *)):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.code-line):not(.search-highlight):not(.search-highlight-active):not([class^="md-"]):not([class*=" md-"]):not(.markdown-codemirror-host *):not(.mermaid *) {
     color: var(--pz-text) !important;
 }
 

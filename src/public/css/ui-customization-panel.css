@@ -131,6 +131,10 @@ body:has(#ai-chat-panel.ai-chat-open) #edgeAiChatBtn {
     transition: background-color 0.15s ease;
 }
 
+.page-more-menu-item[hidden] {
+    display: none;
+}
+
 .page-more-menu-item:hover,
 .page-more-menu-item:focus-visible {
     background-color: var(--pz-surface-hover);
@@ -584,6 +588,16 @@ html[data-theme='dark'] .keyboard-shortcuts-keys kbd {
 /* No rule under the titles in the narrow column, and room between the
    title, its hint and the first checkbox (!important beats the global
    h4 margin reset in base.css) */
+/* "Customize this page" lists what the page shows: a section about something
+   that only exists on a phone (the mobile editor bar) is left out on a desktop
+   viewport. The Settings modal keeps it, so the bar can still be set up (or
+   locked by an administrator) from a computer. */
+@media (min-width: 801px) {
+    #uiCustomizationPanel .ui-custom-section[data-ui-viewport="mobile"] {
+        display: none !important;
+    }
+}
+
 #uiCustomizationPanel .ui-custom-section-title {
     cursor: pointer;
     border-bottom: none;

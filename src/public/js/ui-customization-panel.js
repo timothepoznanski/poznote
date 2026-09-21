@@ -104,6 +104,11 @@
         panel.classList.toggle('ui-custom-filtering', query.length > 0);
 
         panel.querySelectorAll('.ui-custom-section').forEach(function (section) {
+            // Left out by CSS on this viewport (data-ui-viewport): a match in
+            // it must not keep the "no results" message away
+            if (section.getAttribute('data-ui-viewport') === 'mobile'
+                && !window.matchMedia('(max-width: 800px)').matches) return;
+
             var visibleItems = 0;
             section.querySelectorAll('.ui-custom-item').forEach(function (item) {
                 var matches = !query || normalizeFilterText(item.textContent).indexOf(query) !== -1;
@@ -130,6 +135,19 @@
         if (title) title.classList.toggle('ui-custom-section-collapsed', collapsed);
         var toggle = section.querySelector('.ui-custom-section-toggle');
         if (toggle) toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    }
+
+    // Unfolds one section (data-ui-section-id) and folds the others
+    function revealSection(sectionId) {
+        var target = null;
+        panel.querySelectorAll('.ui-custom-section').forEach(function (section) {
+            var match = section.getAttribute('data-ui-section-id') === sectionId;
+            setSectionCollapsed(section, !match);
+            if (match) target = section;
+        });
+        if (target && typeof target.scrollIntoView === 'function') {
+            target.scrollIntoView({ block: 'start' });
+        }
     }
 
     function initSections() {
@@ -332,8 +350,17 @@
         });
     }
 
+    // The Markdown syntax entry only makes sense while a Markdown note is
+    // open, so it is off on the dashboard and settings pages too
+    function syncMarkdownSyntaxItem() {
+        var item = document.getElementById('edgeMenuMarkdownSyntax');
+        if (!item) return;
+        item.hidden = !document.querySelector('#right_col .noteentry[data-note-type="markdown"]');
+    }
+
     function setMoreMenuOpen(open) {
         if (!moreMenu || !moreButton) return;
+        if (open) syncMarkdownSyntaxItem();
         moreMenu.hidden = !open;
         moreButton.setAttribute('aria-expanded', open ? 'true' : 'false');
         if (open) {
@@ -359,12 +386,32 @@
         return null;
     }
 
+    function isTouchDevice() {
+        try {
+            var coarsePointer = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+            var touch = (navigator.maxTouchPoints || 0) > 0 || 'ontouchstart' in window;
+            return coarsePointer && touch;
+        } catch (e) {
+            return false;
+        }
+    }
+
     function setHelpModalOpen(modal, open) {
         if (!modal) return;
         modal.style.display = open ? 'flex' : 'none';
         if (open) {
             var body = modal.querySelector('.pz-help-modal-body');
             if (body) body.scrollTop = 0;
+            if (isTouchDevice()) {
+                // No autofocus on touch devices: the on-screen keyboard would
+                // come up over a modal opened to be read. Drop the focus the
+                // menu entry got too. Tapping the filter still opens it.
+                var active = document.activeElement;
+                if (active && active !== document.body && typeof active.blur === 'function') {
+                    active.blur();
+                }
+                return;
+            }
             // Both start on their filter
             var focusTarget = modal.querySelector('.filter-input') || modal.querySelector('[data-action="close-help-modal"]');
             if (focusTarget) focusTarget.focus();
@@ -541,10 +588,19 @@
         }
 
         document.addEventListener('click', function (e) {
-            if (e.target.closest && e.target.closest('[data-action="toggle-ui-customization-panel"]')) {
-                e.preventDefault();
-                setOpen(!isOpen());
+            var trigger = e.target.closest ? e.target.closest('[data-action="toggle-ui-customization-panel"]') : null;
+            if (!trigger) return;
+            e.preventDefault();
+
+            // A trigger naming a section (the mobile editor bar) opens the
+            // panel on it instead of toggling
+            var sectionId = trigger.getAttribute('data-ui-section');
+            if (sectionId) {
+                setOpen(true);
+                revealSection(sectionId);
+                return;
             }
+            setOpen(!isOpen());
         });
 
         document.addEventListener('keydown', function (e) {

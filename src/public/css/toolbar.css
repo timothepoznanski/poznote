@@ -457,3 +457,8 @@ a.links_arbo_left.selected-note {
         display: none !important;
     }
 }
+
+/* Mobile editor bar (mobile_editor_bar.php): only css/index-mobile.css shows it */
+.mobile-editor-bar {
+    display: none;
+}

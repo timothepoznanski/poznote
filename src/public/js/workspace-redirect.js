@@ -10,12 +10,27 @@
     var dataElement = document.getElementById('workspace-redirect-data');
     if (!dataElement) return;
     
+    // The server already refuses a target that leaves the app
+    // (lib/safe-redirect.php). This asks the browser's own URL parser the same
+    // question, since it is the one that decides where the navigation goes:
+    // "javascript:" has no origin, "/\host" and "//host" have another one.
+    function resolveInsideApp(target) {
+        if (typeof target !== 'string' || target === '') return null;
+        try {
+            var url = new URL(target, window.location.href);
+            var isWeb = url.protocol === 'http:' || url.protocol === 'https:';
+            return isWeb && url.origin === window.location.origin ? url.href : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
     try {
         var config = JSON.parse(dataElement.textContent);
-        var redirectAfter = config.redirectAfter || null;
-        
+        var redirectAfter = resolveInsideApp(config.redirectAfter);
+
         // If a specific redirect URL is provided (from OIDC flow), use it
-        if (redirectAfter && typeof redirectAfter === 'string' && redirectAfter !== '') {
+        if (redirectAfter) {
             window.location.href = redirectAfter;
         } else {
             // Redirect to index without workspace parameter - server will handle

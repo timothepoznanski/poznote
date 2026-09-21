@@ -197,6 +197,30 @@
 </div>
 </div>
 
+<!-- Mobile Editor Bar Section (mobile_editor_bar.php): plain card: keys, one per button id.
+     data-ui-section-id: the bar's own Customize button opens the panel on this section.
+     data-ui-viewport="mobile": left out of the "Customize this page" panel on a desktop
+     viewport, where the bar never shows (css/ui-customization-panel.css). -->
+<div class="ui-custom-section" data-ui-pages="notes" data-ui-section-id="mobile-editor-bar" data-ui-viewport="mobile">
+<h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.mobile_editor_bar', [], 'Mobile editor bar'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+<p class="ui-custom-section-hint"><?php echo t_h('modals.ui_customization.mobile_editor_bar_hint', [], 'Bar shown above the on-screen keyboard while a note is being edited on a phone or tablet.'); ?></p>
+<div class="ui-custom-items">
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileEditorBar" checked><span><?php echo t_h('modals.ui_customization.mobile_editor_bar_show', [], 'Show the bar'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarInsert" checked><span><?php echo t_h('mobile_editor_bar.insert', [], 'Insert (slash menu)'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarUndo" checked><span><?php echo t_h('mobile_editor_bar.undo', [], 'Undo'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarRedo" checked><span><?php echo t_h('mobile_editor_bar.redo', [], 'Redo'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarBold" checked><span><?php echo t_h('editor.toolbar.bold', [], 'Bold'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarItalic" checked><span><?php echo t_h('editor.toolbar.italic', [], 'Italic'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarListUl" checked><span><?php echo t_h('editor.toolbar.bullet_list', [], 'Bullet list'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarListOl" checked><span><?php echo t_h('editor.toolbar.numbered_list', [], 'Numbered list'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarChecklist" checked><span><?php echo t_h('editor.toolbar.toggle_checklist', [], 'Toggle checklist'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarOutdent" checked><span><?php echo t_h('mobile_editor_bar.outdent', [], 'Outdent'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarIndent" checked><span><?php echo t_h('mobile_editor_bar.indent', [], 'Indent'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarHideKeyboard" checked><span><?php echo t_h('mobile_editor_bar.hide_keyboard', [], 'Hide keyboard'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarCustomize" checked><span><?php echo t_h('modals.ui_customization.panel_title', [], 'Customize this page'); ?></span></label>
+</div>
+</div>
+
 <!-- Other Section -->
 <div class="ui-custom-section" data-ui-pages="notes">
 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.panels', [], 'Other'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>

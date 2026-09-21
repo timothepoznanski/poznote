@@ -264,8 +264,17 @@ function showInfoModal(title, message, reloadAfter = false) {
     modal.style.display = 'flex';
 }
 
+// Limit the number of tabs opened at once to avoid overwhelming the browser
+var OPEN_ALL_MAX_TABS = 20;
+
 /**
  * Open all notes in a folder in separate tabs
+ *
+ * A folder whose subfolders also hold notes asks first: a folder with notes of
+ * its own offers "this folder only" or "open all", one holding nothing but
+ * subfolders offers to open theirs. Subfolders count at any depth (the tree
+ * renders them inside the parent's #folder-{id} content, collapsed ones too).
+ *
  * @param {number} folderId - The folder ID
  * @param {string} folderName - The folder name
  */
@@ -280,11 +289,22 @@ function openAllFolderNotesInTabs(folderId, folderName) {
         return;
     }
 
-    // Find all notes in the folder
-    // Notes have class 'links_arbo_left' and data-folder-id attribute
-    var noteLinks = document.querySelectorAll('.links_arbo_left[data-folder-id="' + folderId + '"]');
+    // [data-note-id] keeps out the favorite-folder shortcut, which shares the
+    // class and the folder id. Without a #folder-{id} content (the root of a
+    // folder-filtered view) only the folder's own notes are looked up.
+    var folderContent = document.getElementById('folder-' + folderId);
+    var noteLinks = Array.from((folderContent || document).querySelectorAll('.links_arbo_left[data-note-id]'));
+    var ownNoteLinks = noteLinks.filter(function(link) {
+        return link.getAttribute('data-folder-id') === String(folderId);
+    });
+    var allNoteLinks = folderContent ? noteLinks : ownNoteLinks;
 
-    if (noteLinks.length === 0) {
+    if (allNoteLinks.length > ownNoteLinks.length && window.modalAlert && typeof window.modalAlert.showModal === 'function') {
+        confirmOpenWithSubfolderNotes(ownNoteLinks, allNoteLinks);
+        return;
+    }
+
+    if (ownNoteLinks.length === 0) {
         showInfoModal(
             window.t ? window.t('notes_list.folder_actions.no_notes_title', null, 'No notes') : 'No notes',
             window.t ? window.t('notes_list.folder_actions.no_notes_in_folder', null, 'This folder contains no notes') : 'This folder contains no notes'
@@ -292,20 +312,77 @@ function openAllFolderNotesInTabs(folderId, folderName) {
         return;
     }
 
-    // Limit the number of tabs to avoid overwhelming the browser
-    var maxTabs = 20;
-    if (noteLinks.length > maxTabs) {
+    if (ownNoteLinks.length > OPEN_ALL_MAX_TABS) {
         var message = window.t
-            ? window.t('notes_list.folder_actions.too_many_notes', {count: noteLinks.length, max: maxTabs}, 'This folder contains {count} notes. Only the first {max} will be opened to avoid overwhelming your browser.')
-            : 'This folder contains ' + noteLinks.length + ' notes. Only the first ' + maxTabs + ' will be opened to avoid overwhelming your browser.';
+            ? window.t('notes_list.folder_actions.too_many_notes', {count: ownNoteLinks.length, max: OPEN_ALL_MAX_TABS}, 'This folder contains {{count}} notes. Only the first {{max}} will be opened to avoid overwhelming your browser.')
+            : 'This folder contains ' + ownNoteLinks.length + ' notes. Only the first ' + OPEN_ALL_MAX_TABS + ' will be opened to avoid overwhelming your browser.';
 
         if (!confirm(message)) {
             return;
         }
     }
 
-    // Open each note in a new tab
-    var notesToOpen = Array.from(noteLinks).slice(0, maxTabs);
+    openNoteLinksInTabs(ownNoteLinks);
+}
+
+/**
+ * Ask before opening the notes of a folder whose subfolders hold notes too.
+ * With notes of its own the folder gets a third button to open only those.
+ * The tab limit is announced in the same dialog rather than in a second one.
+ * Cancel stays the first button: Escape and a backdrop click run it.
+ * @param {HTMLElement[]} ownNoteLinks - Note links directly in the folder
+ * @param {HTMLElement[]} allNoteLinks - Every note link below the folder, in tree order
+ */
+function confirmOpenWithSubfolderNotes(ownNoteLinks, allNoteLinks) {
+    var ownCount = ownNoteLinks.length;
+    var totalCount = allNoteLinks.length;
+    var title;
+    var message;
+    var buttons = [
+        { text: window.t('common.cancel', null, 'Cancel'), type: 'secondary', action: function() {} }
+    ];
+
+    if (ownCount === 0) {
+        title = window.t('notes_list.folder_actions.subfolders_only_title', null, 'Open subfolder notes');
+        message = totalCount === 1
+            ? window.t('notes_list.folder_actions.subfolders_only_message_one', null, 'This folder has no notes of its own, but its subfolders contain 1 note. Do you want to open it?')
+            : window.t('notes_list.folder_actions.subfolders_only_message', {count: totalCount}, 'This folder has no notes of its own, but its subfolders contain {{count}} notes. Do you want to open all of these notes?');
+    } else {
+        title = window.t('notes_list.folder_actions.open_all_in_tabs', null, 'Open all notes');
+        message = window.t('notes_list.folder_actions.with_subfolders_message', {own: ownCount, total: totalCount}, 'This folder contains notes, and its subfolders do too. Do you want to open only the notes of this folder ({{own}}) or all notes including subfolders ({{total}})?');
+        buttons.push({
+            text: window.t('notes_list.folder_actions.this_folder_only', null, 'This folder only'),
+            type: 'primary',
+            action: function() { openNoteLinksInTabs(ownNoteLinks); }
+        });
+    }
+
+    if (totalCount > OPEN_ALL_MAX_TABS) {
+        message += ' ' + window.t('notes_list.folder_actions.open_limit_notice', {max: OPEN_ALL_MAX_TABS}, 'Only the first {{max}} will be opened to avoid overwhelming your browser.');
+    }
+
+    buttons.push({
+        text: window.t('notes_list.folder_actions.open_all_confirm', null, 'Open all'),
+        type: 'primary',
+        action: function() { openNoteLinksInTabs(allNoteLinks); }
+    });
+
+    window.modalAlert.showModal({
+        type: 'confirm',
+        message: message,
+        alertType: 'info',
+        title: title,
+        modalClass: 'open-all-notes-confirm',
+        buttons: buttons
+    });
+}
+
+/**
+ * Open note links in new tabs, up to OPEN_ALL_MAX_TABS
+ * @param {HTMLElement[]} noteLinks - Note links from the tree
+ */
+function openNoteLinksInTabs(noteLinks) {
+    var notesToOpen = Array.from(noteLinks).slice(0, OPEN_ALL_MAX_TABS);
     notesToOpen.forEach(function(noteLink, index) {
         var noteId = noteLink.getAttribute('data-note-id');
         var noteTitleElement = noteLink.querySelector('.note-title');

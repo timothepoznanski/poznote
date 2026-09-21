@@ -981,8 +981,9 @@ class NotesController {
      *   - workspace: Workspace name
      *   - type: Note type (note, markdown, excalidraw)
      *   - created_date: Optional YYYY-MM-DD date to backdate the note to
-     *     (stored at midday UTC so DATE(created) matches that day in the
-     *     calendar endpoints). Used by diary entry creation.
+     *     (stored at midday in the user's timezone, converted to UTC, so the
+     *     calendar endpoints put it on that day whatever the offset). Used
+     *     by diary entry creation.
      */
     public function create(): void {
         $input = json_decode(file_get_contents('php://input'), true);
@@ -1081,7 +1082,12 @@ class NotesController {
             if (isset($input['created_date'])
                 && preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', trim($input['created_date']), $cd)
                 && checkdate((int)$cd[2], (int)$cd[3], (int)$cd[1])) {
-                $created_utc = trim($input['created_date']) . ' 12:00:00';
+                try {
+                    $noon = new DateTime(trim($input['created_date']) . ' 12:00:00', new DateTimeZone(getUserTimezone()));
+                    $created_utc = $noon->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s');
+                } catch (Exception $e) {
+                    $created_utc = trim($input['created_date']) . ' 12:00:00';
+                }
             }
             
             // Validate linked_note_id if provided

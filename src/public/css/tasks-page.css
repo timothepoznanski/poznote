@@ -305,9 +305,33 @@ html[data-theme='dark'] .tasks-note-source-badge {
     background-color: rgba(var(--pz-accent-text-rgb), 0.15);
 }
 
-.tasks-note-count {
+/* Completion bar of one list, right-aligned next to its count. The track
+   reads surface-sunken like the in-note bar: it stays visible on the card
+   surface in every theme. */
+.tasks-note-progress-bar {
     margin-left: auto;
+    width: 120px;
+    height: 6px;
+    border-radius: var(--pz-radius-sm);
+    background-color: var(--pz-surface-sunken);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.tasks-note-progress-fill {
+    height: 100%;
+    border-radius: var(--pz-radius-sm);
+    background-color: var(--pz-accent);
+}
+
+/* Fixed width, right-aligned: the bars line up from one card to the next
+   whatever the digits of the count */
+.tasks-note-count {
+    min-width: 48px;
+    flex-shrink: 0;
     font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
     color: var(--pz-text-muted);
     white-space: nowrap;
 }
@@ -802,6 +826,36 @@ html[data-theme='dark'] .tasks-note-source-badge {
     .tasks-note-group {
         padding: 10px 12px;
         margin-bottom: 12px;
+    }
+
+    /* No room for the bar next to the title and badges: it moves under them,
+       aligned with the title, into extra bottom padding of the header. Out of
+       the flex flow on purpose: with flex-wrap a long title would take a row
+       of its own instead of ellipsizing. 22px = 8px gap + 6px bar + 8px. */
+    .tasks-note-header {
+        position: relative;
+        padding-bottom: 22px;
+    }
+
+    .tasks-note-group.collapsed .tasks-note-header {
+        padding-bottom: 14px;
+    }
+
+    .tasks-note-count {
+        margin-left: auto;
+    }
+
+    .tasks-note-progress-bar {
+        position: absolute;
+        left: 34px;
+        right: 0;
+        bottom: 8px;
+        width: auto;
+        margin-left: 0;
+    }
+
+    .tasks-note-group.collapsed .tasks-note-progress-bar {
+        bottom: 0;
     }
 
     /* Stacked layout: title and label above the full-width progress bar.

@@ -1346,7 +1346,8 @@
         "icon_sidebar": "Barre d'icônes",
         "folder_actions": "Actions des dossiers",
         "workspace_menu": "Menu du workspace",
-        "note_actions": "Actions des notes"
+        "note_actions": "Actions des notes",
+        "mobile_editor_bar": "Barre d’édition mobile"
       },
       "badge_all_visible": "Tout visible",
       "badge_hidden_count_admin": "{{count}} masqué(s), dont {{admin}} par l'administrateur",
@@ -1370,7 +1371,9 @@
       "panel_all_options": "Toutes les options",
       "panel_saving": "Enregistrement…",
       "panel_saved": "Enregistré",
-      "panel_save_error": "Enregistrement impossible, réessayez."
+      "panel_save_error": "Enregistrement impossible, réessayez.",
+      "mobile_editor_bar_hint": "Barre affichée au-dessus du clavier virtuel pendant l’édition d’une note sur téléphone ou tablette.",
+      "mobile_editor_bar_show": "Afficher la barre"
     },
     "icon_sidebar_order": {
       "title": "Ordre de la barre d'icônes",
@@ -1894,6 +1897,13 @@
       "no_notes_title": "Aucune note",
       "no_notes_in_folder": "Ce dossier ne contient aucune note",
       "too_many_notes": "Ce dossier contient {{count}} notes. Seules les {{max}} premières seront ouvertes pour ne pas surcharger votre navigateur.",
+      "subfolders_only_title": "Ouvrir les notes des sous-dossiers",
+      "subfolders_only_message": "Ce dossier ne contient aucune note directement, mais ses sous-dossiers contiennent {{count}} notes. Voulez-vous ouvrir toutes ces notes ?",
+      "subfolders_only_message_one": "Ce dossier ne contient aucune note directement, mais ses sous-dossiers contiennent 1 note. Voulez-vous l'ouvrir ?",
+      "open_limit_notice": "Seules les {{max}} premières seront ouvertes pour ne pas surcharger votre navigateur.",
+      "open_all_confirm": "Tout ouvrir",
+      "with_subfolders_message": "Ce dossier contient des notes, et ses sous-dossiers aussi. Voulez-vous ouvrir uniquement les notes de ce dossier ({{own}}) ou toutes les notes, sous-dossiers compris ({{total}}) ?",
+      "this_folder_only": "Ce dossier uniquement",
       "show_only": "Afficher seulement ce dossier"
     },
     "folder_filter": {
@@ -2401,9 +2411,9 @@
       "hint": "L'archive est préparée sur le serveur. Pour les gros comptes cela peut prendre plusieurs minutes ; vous pouvez quitter cette page et revenir, la préparation continue.",
       "download": "Télécharger l'archive",
       "discard": "Supprimer l'archive préparée",
-      "preparing": "Préparation de l'archive... ({{elapsed}})",
+      "preparing": "Préparation de l'archive...",
       "queued": "Export en file d'attente...",
-      "ready": "Votre archive est prête ({{size}}). Le téléchargement démarre automatiquement ; elle reste disponible ici pendant 24 heures.",
+      "ready": "Votre archive est prête ({{size}}). Elle reste disponible ici pendant 24 heures.",
       "error": "L'export a échoué : {{error}}",
       "start_error": "Impossible de démarrer l'export : {{error}}"
     }
@@ -3763,9 +3773,13 @@
       "show_calendar": "Afficher le calendrier",
       "hide_calendar": "Masquer le calendrier"
     },
+    "modes": {
+      "created": "Créées",
+      "modified": "Modifiées"
+    },
+    "day_counts": "Créées : {{created}} / Modifiées : {{modified}}",
     "modal": {
       "title": "Notes du",
-      "open": "Ouvrir",
       "open_all": "Tout ouvrir",
       "close": "Fermer",
       "no_notes": "Aucune note ce jour-là.",
@@ -5022,5 +5036,13 @@
     "favorited_items": "{{count}} éléments ajoutés aux favoris",
     "favorite_failed": "Impossible de mettre à jour les favoris : {{error}}",
     "already_favorites": "Déjà dans les favoris"
+  },
+  "mobile_editor_bar": {
+    "insert": "Insérer (menu slash)",
+    "undo": "Annuler",
+    "redo": "Rétablir",
+    "indent": "Augmenter le retrait",
+    "outdent": "Diminuer le retrait",
+    "hide_keyboard": "Masquer le clavier"
   }
 }

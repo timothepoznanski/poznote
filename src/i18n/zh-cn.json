@@ -1344,7 +1344,8 @@
         "icon_sidebar": "图标侧边栏",
         "folder_actions": "文件夹操作",
         "workspace_menu": "工作区菜单",
-        "note_actions": "笔记操作"
+        "note_actions": "笔记操作",
+        "mobile_editor_bar": "移动端编辑栏"
       },
       "check_all": "全选",
       "uncheck_all": "取消全选",
@@ -1368,7 +1369,9 @@
       "panel_all_options": "所有选项",
       "panel_saving": "正在保存…",
       "panel_saved": "已保存",
-      "panel_save_error": "无法保存，请重试。"
+      "panel_save_error": "无法保存，请重试。",
+      "mobile_editor_bar_hint": "在手机或平板上编辑笔记时显示在屏幕键盘上方的工具栏。",
+      "mobile_editor_bar_show": "显示编辑栏"
     },
     "icon_sidebar_order": {
       "title": "图标侧边栏顺序",
@@ -1882,6 +1885,13 @@
       "no_notes_title": "无笔记",
       "no_notes_in_folder": "此文件夹不包含笔记",
       "too_many_notes": "此文件夹包含 {{count}} 条笔记。为避免浏览器负担过重，仅打开前 {{max}} 条。",
+      "subfolders_only_title": "打开子文件夹中的笔记",
+      "subfolders_only_message": "此文件夹本身没有笔记，但其子文件夹中有 {{count}} 条笔记。是否打开所有这些笔记？",
+      "subfolders_only_message_one": "此文件夹本身没有笔记，但其子文件夹中有 1 条笔记。是否打开它？",
+      "open_limit_notice": "为避免浏览器负担过重，仅打开前 {{max}} 条。",
+      "open_all_confirm": "全部打开",
+      "with_subfolders_message": "此文件夹包含笔记，其子文件夹中也有笔记。是只打开此文件夹中的笔记（{{own}}），还是打开包括子文件夹在内的所有笔记（{{total}}）？",
+      "this_folder_only": "仅此文件夹",
       "show_only": "仅显示此文件夹",
       "copy_folder": "复制",
       "cut_folder": "剪切",
@@ -2397,9 +2407,9 @@
       "hint": "存档在服务器上准备。大账户可能需要几分钟；您可以离开此页面稍后再回来，准备工作会继续进行。",
       "download": "下载存档",
       "discard": "删除已准备的存档",
-      "preparing": "正在准备存档... ({{elapsed}})",
+      "preparing": "正在准备存档...",
       "queued": "导出已加入队列...",
-      "ready": "您的存档已准备就绪（{{size}}）。下载将自动开始；存档将在此保留 24 小时。",
+      "ready": "您的存档已准备就绪（{{size}}）。存档将在此保留 24 小时。",
       "error": "导出失败：{{error}}",
       "start_error": "无法启动导出：{{error}}"
     }
@@ -3758,9 +3768,13 @@
       "show_calendar": "显示日历",
       "hide_calendar": "隐藏日历"
     },
+    "modes": {
+      "created": "已创建",
+      "modified": "已修改"
+    },
+    "day_counts": "已创建：{{created}} / 已修改：{{modified}}",
     "modal": {
       "title": "笔记来自",
-      "open": "打开",
       "open_all": "全部打开",
       "close": "关闭",
       "no_notes": "这一天没有笔记。",
@@ -5017,5 +5031,13 @@
     "favorited_items": "已将 {{count}} 项添加到收藏",
     "favorite_failed": "无法更新收藏：{{error}}",
     "already_favorites": "已在收藏中"
+  },
+  "mobile_editor_bar": {
+    "insert": "插入（斜杠菜单）",
+    "undo": "撤销",
+    "redo": "重做",
+    "indent": "增加缩进",
+    "outdent": "减少缩进",
+    "hide_keyboard": "隐藏键盘"
   }
 }

@@ -1346,7 +1346,8 @@
         "icon_sidebar": "Barra de ícones",
         "folder_actions": "Ações de pasta",
         "workspace_menu": "Menu do espaço de trabalho",
-        "note_actions": "Ações das notas"
+        "note_actions": "Ações das notas",
+        "mobile_editor_bar": "Barra de edição móvel"
       },
       "check_all": "Marcar todos",
       "uncheck_all": "Desmarcar todos",
@@ -1370,7 +1371,9 @@
       "panel_all_options": "Todas as opções",
       "panel_saving": "A guardar…",
       "panel_saved": "Guardado",
-      "panel_save_error": "Não foi possível guardar, tente novamente."
+      "panel_save_error": "Não foi possível guardar, tente novamente.",
+      "mobile_editor_bar_hint": "Barra exibida acima do teclado virtual durante a edição de uma nota num telemóvel ou tablet.",
+      "mobile_editor_bar_show": "Mostrar a barra"
     },
     "icon_sidebar_order": {
       "title": "Ordem da barra de ícones",
@@ -1884,6 +1887,13 @@
       "no_notes_title": "Sem notas",
       "no_notes_in_folder": "Esta pasta não contém notas",
       "too_many_notes": "Esta pasta contém {{count}} notas. Apenas as primeiras {{max}} serão abertas para não sobrecarregar seu navegador.",
+      "subfolders_only_title": "Abrir as notas das subpastas",
+      "subfolders_only_message": "Esta pasta não contém notas diretamente, mas as suas subpastas contêm {{count}} notas. Deseja abrir todas estas notas?",
+      "subfolders_only_message_one": "Esta pasta não contém notas diretamente, mas as suas subpastas contêm 1 nota. Deseja abri-la?",
+      "open_limit_notice": "Apenas as primeiras {{max}} serão abertas para não sobrecarregar seu navegador.",
+      "open_all_confirm": "Abrir todas",
+      "with_subfolders_message": "Esta pasta contém notas, e as suas subpastas também. Deseja abrir apenas as notas desta pasta ({{own}}) ou todas as notas, incluindo as subpastas ({{total}})?",
+      "this_folder_only": "Apenas esta pasta",
       "show_only": "Mostrar apenas esta pasta",
       "copy_folder": "Copiar",
       "cut_folder": "Recortar",
@@ -2396,9 +2406,9 @@
       "hint": "O arquivo é preparado no servidor. Para contas grandes pode demorar vários minutos; pode sair desta página e voltar, a preparação continua.",
       "download": "Transferir o arquivo",
       "discard": "Eliminar o arquivo preparado",
-      "preparing": "A preparar o arquivo... ({{elapsed}})",
+      "preparing": "A preparar o arquivo...",
       "queued": "Exportação em fila de espera...",
-      "ready": "O seu arquivo está pronto ({{size}}). A transferência começa automaticamente; fica disponível aqui durante 24 horas.",
+      "ready": "O seu arquivo está pronto ({{size}}). Fica disponível aqui durante 24 horas.",
       "error": "A exportação falhou: {{error}}",
       "start_error": "Não é possível iniciar a exportação: {{error}}"
     }
@@ -3659,9 +3669,13 @@
       "show_calendar": "Mostrar calendário",
       "hide_calendar": "Ocultar calendário"
     },
+    "modes": {
+      "created": "Criadas",
+      "modified": "Modificadas"
+    },
+    "day_counts": "Criadas: {{created}} / Modificadas: {{modified}}",
     "modal": {
       "title": "Notas de",
-      "open": "Abrir",
       "open_all": "Abrir tudo",
       "close": "Fechar",
       "no_notes": "Não há notas neste dia.",
@@ -4918,5 +4932,13 @@
     "favorited_items": "{{count}} itens adicionados aos favoritos",
     "favorite_failed": "Não foi possível atualizar os favoritos: {{error}}",
     "already_favorites": "Já está nos favoritos"
+  },
+  "mobile_editor_bar": {
+    "insert": "Inserir (menu slash)",
+    "undo": "Desfazer",
+    "redo": "Refazer",
+    "indent": "Aumentar recuo",
+    "outdent": "Diminuir recuo",
+    "hide_keyboard": "Ocultar o teclado"
   }
 }
