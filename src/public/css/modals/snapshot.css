@@ -8,9 +8,11 @@
     align-items: flex-start;
 }
 
+/* 1180px keeps the actions bar on one row in every locale: German, the
+   widest, needs 1150px (959px of buttons + the 191px date list). */
 .snapshot-modal-content {
-    max-width: 950px !important;
-    width: 94% !important;
+    max-width: 1180px !important;
+    width: 100% !important;
     max-height: 85vh;
     margin: 12px auto 0 !important;
     display: flex;
@@ -480,15 +482,15 @@
     flex-shrink: 0;
 }
 
-/* Keep every action on one row: longer translated labels (French, Spanish)
-   overflow the 16px/20px sizing that modals/responsive.css forces on all
-   modal buttons, so this bar opts back down to the base 14px. "safe" keeps
-   the first button reachable if a locale still overflows and the bar scrolls. */
+/* Longer translated labels overflow the 16px/20px sizing that
+   modals/responsive.css forces on all modal buttons, so this bar opts back
+   down to the base 14px. The modal is wide enough for one row (see
+   .snapshot-modal-content); on a window too narrow for that the actions wrap
+   onto a second row rather than scrolling sideways. */
 #snapshotModal .snapshot-modal-actions {
-    flex-wrap: nowrap;
-    justify-content: safe flex-end;
+    flex-wrap: wrap;
+    justify-content: flex-end;
     gap: 8px;
-    overflow-x: auto;
 }
 
 #snapshotModal .snapshot-modal-actions button {
