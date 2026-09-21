@@ -283,3 +283,9 @@ body.sidebar-collapsed .toggle-sidebar-btn i {
 #left_col {
     transition: width 0.3s ease, padding 0.3s ease;
 }
+
+/* The transition is for collapsing: while dragging the resize handle it made
+   the edge trail behind the cursor. */
+body.left-col-resizing #left_col {
+    transition: none;
+}

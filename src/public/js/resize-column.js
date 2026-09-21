@@ -51,6 +51,7 @@ function startResizing(e) {
 
     e.preventDefault();
     isResizing = true;
+    document.body.classList.add('left-col-resizing');
     document.body.style.cursor = 'col-resize';
     document.body.style.userSelect = 'none';
 }
@@ -63,8 +64,10 @@ function handleResize(e) {
     const minWidth = 200;
     const maxWidth = 800;
     
-    // Calculate new width based on mouse position
-    const newWidth = Math.min(Math.max(e.clientX, minWidth), maxWidth);
+    // Calculate from the column's own left edge so the icon rail to its
+    // left does not get included in the width.
+    const leftEdge = leftCol ? leftCol.getBoundingClientRect().left : 0;
+    const newWidth = Math.min(Math.max(e.clientX - leftEdge, minWidth), maxWidth);
     
     // Update CSS variable and element width
     document.documentElement.style.setProperty('--left-col-width', newWidth + 'px');
@@ -77,6 +80,7 @@ function stopResizing() {
     if (!isResizing) return;
     
     isResizing = false;
+    document.body.classList.remove('left-col-resizing');
     document.body.style.cursor = '';
     document.body.style.userSelect = '';
     
