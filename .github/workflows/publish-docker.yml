@@ -229,6 +229,7 @@ jobs:
     permissions:
       contents: write
       packages: write
+      pull-requests: read
 
     steps:
       - name: Checkout code
@@ -387,33 +388,48 @@ jobs:
             echo "📦 Creating stable release: $VERSION"
           fi
 
+          COMMIT_SHA=$(git rev-parse HEAD)
           RELEASE_NOTES=""
 
-          # Method 1: Try to find PR number in recent commit messages (last 10 commits)
-          echo "🔍 Searching for PR in recent commits..."
-          PR_NUMBER=$(git log -10 --pretty=%s | grep -oP '(?<=#)\d+(?=\))' | head -1 || echo "")
+          # Candidate PR numbers, most reliable source first. Every candidate is
+          # only a guess: it is used for the release notes when it really is a
+          # pull request with a non-empty description, otherwise the next one is
+          # tried. Scraping '(#123)' out of commit subjects comes last, because
+          # those references are usually issues rather than pull requests: 6.91.0
+          # shipped the default notes because '(#1462)', an issue fixed a few
+          # commits earlier, was picked up before the release PR.
+          CANDIDATES=""
 
-          # Method 2: If no PR found, try to find PR associated with current commit via GitHub API
-          if [ -z "$PR_NUMBER" ]; then
-            echo "🔍 Searching for PR via GitHub API..."
-            COMMIT_SHA=$(git rev-parse HEAD)
-            PR_NUMBER=$(gh pr list --search "$COMMIT_SHA" --state merged --json number --jq '.[0].number' 2>/dev/null || echo "")
+          # Merge commit of the release pull request
+          CANDIDATES="$CANDIDATES $(git log -1 --pretty=%s "$COMMIT_SHA" | grep -oP '^Merge pull request #\K\d+' || true)"
+
+          # Pull requests GitHub itself associates with the pushed commit
+          CANDIDATES="$CANDIDATES $(gh api "repos/$GITHUB_REPOSITORY/commits/$COMMIT_SHA/pulls" --jq '.[].number' 2>/dev/null || true)"
+
+          # Merged pull requests matching the pushed commit
+          CANDIDATES="$CANDIDATES $(gh pr list --search "$COMMIT_SHA" --state merged --json number --jq '.[].number' 2>/dev/null || true)"
+
+          # Squash-merge subject ('... (#123)') on the pushed commit only
+          CANDIDATES="$CANDIDATES $(git log -1 --pretty=%s "$COMMIT_SHA" | grep -oP '\(#\K\d+(?=\)$)' || true)"
+
+          CANDIDATES=$(echo "$CANDIDATES" | tr ' ' '\n' | awk 'NF && !seen[$0]++')
+
+          if [ -z "$CANDIDATES" ]; then
+            echo "⚠️ No pull request found for commit $COMMIT_SHA"
           fi
 
-          # If we found a PR number, get the PR description
-          if [ -n "$PR_NUMBER" ]; then
-            echo "📝 Found PR #$PR_NUMBER, fetching description..."
-            PR_BODY=$(gh pr view $PR_NUMBER --json body --jq '.body' 2>/dev/null || echo "")
+          for PR_NUMBER in $CANDIDATES; do
+            echo "🔍 Checking #$PR_NUMBER..."
+            PR_BODY=$(gh pr view "$PR_NUMBER" --json body --jq '.body' 2>/dev/null || echo "")
 
             if [ -n "$PR_BODY" ]; then
               RELEASE_NOTES="$PR_BODY"
               echo "✅ Using PR #$PR_NUMBER description as release notes"
-            else
-              echo "⚠️ Could not fetch PR description"
+              break
             fi
-          else
-            echo "⚠️ No PR found in recent history or via API"
-          fi
+
+            echo "⚠️ #$PR_NUMBER is not a pull request with a description, trying the next candidate"
+          done
 
           # Fallback: Default message if no PR description found
           if [ -z "$RELEASE_NOTES" ]; then
