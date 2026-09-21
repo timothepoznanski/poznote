@@ -2396,9 +2396,9 @@
       "hint": "Das Archiv wird auf dem Server erstellt. Bei großen Konten kann das mehrere Minuten dauern; Sie können diese Seite verlassen und später zurückkommen, die Erstellung läuft weiter.",
       "download": "Archiv herunterladen",
       "discard": "Vorbereitetes Archiv löschen",
-      "preparing": "Archiv wird erstellt... ({{elapsed}})",
+      "preparing": "Archiv wird erstellt...",
       "queued": "Export in der Warteschlange...",
-      "ready": "Ihr Archiv ist bereit ({{size}}). Der Download startet automatisch; es bleibt hier 24 Stunden verfügbar.",
+      "ready": "Ihr Archiv ist bereit ({{size}}). Es bleibt hier 24 Stunden verfügbar.",
       "error": "Der Export ist fehlgeschlagen: {{error}}",
       "start_error": "Der Export kann nicht gestartet werden: {{error}}"
     }

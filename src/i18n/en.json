@@ -2006,9 +2006,9 @@
       "hint": "The archive is prepared on the server. For large accounts this can take several minutes; you can leave this page and come back, the preparation continues.",
       "download": "Download the archive",
       "discard": "Delete the prepared archive",
-      "preparing": "Preparing the archive... ({{elapsed}})",
+      "preparing": "Preparing the archive...",
       "queued": "Export queued...",
-      "ready": "Your archive is ready ({{size}}). The download starts automatically; it stays available here for 24 hours.",
+      "ready": "Your archive is ready ({{size}}). It stays available here for 24 hours.",
       "error": "The export failed: {{error}}",
       "start_error": "Cannot start the export: {{error}}"
     }

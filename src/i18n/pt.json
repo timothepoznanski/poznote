@@ -2396,9 +2396,9 @@
       "hint": "O arquivo é preparado no servidor. Para contas grandes pode demorar vários minutos; pode sair desta página e voltar, a preparação continua.",
       "download": "Transferir o arquivo",
       "discard": "Eliminar o arquivo preparado",
-      "preparing": "A preparar o arquivo... ({{elapsed}})",
+      "preparing": "A preparar o arquivo...",
       "queued": "Exportação em fila de espera...",
-      "ready": "O seu arquivo está pronto ({{size}}). A transferência começa automaticamente; fica disponível aqui durante 24 horas.",
+      "ready": "O seu arquivo está pronto ({{size}}). Fica disponível aqui durante 24 horas.",
       "error": "A exportação falhou: {{error}}",
       "start_error": "Não é possível iniciar a exportação: {{error}}"
     }

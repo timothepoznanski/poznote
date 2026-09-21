@@ -2401,9 +2401,9 @@
       "hint": "L'archive est préparée sur le serveur. Pour les gros comptes cela peut prendre plusieurs minutes ; vous pouvez quitter cette page et revenir, la préparation continue.",
       "download": "Télécharger l'archive",
       "discard": "Supprimer l'archive préparée",
-      "preparing": "Préparation de l'archive... ({{elapsed}})",
+      "preparing": "Préparation de l'archive...",
       "queued": "Export en file d'attente...",
-      "ready": "Votre archive est prête ({{size}}). Le téléchargement démarre automatiquement ; elle reste disponible ici pendant 24 heures.",
+      "ready": "Votre archive est prête ({{size}}). Elle reste disponible ici pendant 24 heures.",
       "error": "L'export a échoué : {{error}}",
       "start_error": "Impossible de démarrer l'export : {{error}}"
     }
