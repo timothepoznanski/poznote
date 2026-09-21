@@ -111,6 +111,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/date-picker-popup.js',
         'js/task-due-modal.js',
         'js/slash-command.js',
+        'js/mobile-editor-bar.js',
         'js/emoji-autocomplete.js',
         'js/pwa-helpers.js',
         'js/share.js',

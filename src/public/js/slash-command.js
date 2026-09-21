@@ -21,6 +21,16 @@
         return false;
     }
 
+    // On a phone a typed "/" stays a plain character: the Insert button of the
+    // mobile editor bar opens the menu instead (discussion #1465). Keyed on that
+    // button being on screen, so a typed "/" still opens the menu wherever the
+    // bar does not show (desktop, task inputs, a hardware keyboard, the bar or
+    // its button hidden in UI Customization) and the menu is never unreachable.
+    function isTypedSlashTakenByMobileBar() {
+        const button = document.getElementById('mobileBarInsert');
+        return !!(button && button.getClientRects().length > 0);
+    }
+
     // Matches the Alt + / chord. On some keyboard layouts Alt + / emits a different
     // e.key, so accept the physical Slash key (e.code) as well.
     function isAltSlashEvent(e) {
@@ -154,6 +164,7 @@
     let activeCommandsBuilder = null;  // rebuilds activeCommands, for a menu already open when the template list arrives
     let codeMirrorSlashEditor = null;
     let codeMirrorSlashFrom = -1;
+    let slashInsertedByButton = false; // the '/' came from window.openSlashMenuAtCaret, not the keyboard
     let codeMirrorSlashTo = -1;
     // Set while the menu was opened on a text selection (issue #1410): no "/"
     // was typed, the selection is kept and only formatting commands are shown
@@ -3691,6 +3702,7 @@
         slashOffset = -1;
         filterText = '';
         selectionSlashContext = null;
+        slashInsertedByButton = false;
         resetCodeMirrorSlashState();
     }
 
@@ -3955,6 +3967,54 @@
     }
 
     // Delete slash text and search
+    // Takes back the '/' the Insert button of the mobile bar put in when the menu
+    // closes without running a command (Cancel, tap outside): nobody typed it.
+    // Found from the saved slash position, as the keyboard closing with the menu
+    // has usually cleared the selection by then. restoreCaret puts the caret
+    // back where the button found it.
+    function removeButtonSlash(restoreCaret) {
+        if (!slashInsertedByButton) return;
+        slashInsertedByButton = false;
+        const typed = '/' + filterText;
+
+        const api = getMarkdownCodeMirrorApi();
+        if (codeMirrorSlashEditor && api && typeof api.getValue === 'function' && typeof api.replaceRangeKeepSelection === 'function') {
+            const editor = codeMirrorSlashEditor;
+            const from = codeMirrorSlashFrom;
+            const value = api.getValue(editor);
+            if (from < 0 || value.charAt(from) !== '/') return;
+
+            // Not replaceRange: it focuses the editor, which would bring the
+            // keyboard back up after a tap outside the menu
+            const length = value.substr(from, typed.length) === typed ? typed.length : 1;
+            api.replaceRangeKeepSelection(editor, from, from + length, '', restoreCaret ? from : undefined);
+            return;
+        }
+
+        const node = slashTextNode;
+        const offset = slashOffset;
+        if (!node || !node.parentNode || offset < 0 || node.textContent.charAt(offset) !== '/') return;
+
+        const length = node.textContent.substr(offset, typed.length) === typed ? typed.length : 1;
+        const caret = document.createRange();
+        if (length === node.textContent.length) {
+            // The button inserted a text node of its own: remove it, not just
+            // its text, so the line is left as it was
+            caret.setStartBefore(node);
+            node.parentNode.removeChild(node);
+        } else {
+            node.deleteData(offset, length);
+            caret.setStart(node, offset);
+        }
+
+        if (restoreCaret) {
+            caret.collapse(true);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(caret);
+        }
+    }
+
     function deleteSlashText() {
         try {
             const api = getMarkdownCodeMirrorApi();
@@ -4146,6 +4206,9 @@
             // formats the selected text so it has to be selected again
             restoreSelectionSlashContext(selectionContext);
             cursorRangeAfterDelete = selectionContext.range ? selectionContext.range.cloneRange() : null;
+        } else if (shouldKeepSlash && slashInsertedByButton) {
+            // Cancel keeps a typed "/", not the one the Insert button put there
+            removeButtonSlash(true);
         } else if (!shouldKeepSlash) {
             deleteSlashText();
             // Save cursor position right after deleteSlashText placed it correctly,
@@ -4755,7 +4818,7 @@
         editor._cmPrevLength = value.length;
         const lastChar = cursorPos > 0 ? value.charAt(cursorPos - 1) : '';
 
-        if (lastChar === '/' && !isDeleting && !isAltSlashModeEnabled()) {
+        if (lastChar === '/' && !isDeleting && !isAltSlashModeEnabled() && !isTypedSlashTakenByMobileBar()) {
             const textBeforeSlash = value.slice(0, cursorPos - 1);
             const isUrl = /:$/.test(textBeforeSlash) || /:\/$/.test(textBeforeSlash);
 
@@ -4863,7 +4926,7 @@
         // Don't open menu if we're deleting (e.g. backspace landing on a slash)
         const isDeleting = e.inputType && e.inputType.startsWith('delete');
 
-        if (lastChar === '/' && !isDeleting && !isAltSlashModeEnabled()) {
+        if (lastChar === '/' && !isDeleting && !isAltSlashModeEnabled() && !isTypedSlashTakenByMobileBar()) {
             // Check if we're typing a URL - don't open menu in that case
             const textBeforeSlash = textBefore.substring(0, textBefore.length - 1);
             // Detect URL pattern: when typing / directly after : or :/ (protocol)
@@ -4886,17 +4949,22 @@
     function handleAltSlashShortcut(e) {
         if (!isAltSlashEvent(e) || !isAltSlashModeEnabled()) return;
 
-        const target = e.target;
-        if (!target) return;
+        if (openSlashMenuAtCaret(e.target)) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }
+
+    // Opens the menu at the caret of `target` without a typed '/': the Alt + /
+    // shortcut and the mobile editor bar. Returns true when the menu opened.
+    function openSlashMenuAtCaret(target) {
+        if (!target) return false;
 
         // Title inputs and task inputs
         if (target.tagName === 'INPUT'
             && (target.classList.contains('css-title') || target.classList.contains('task-input'))) {
             const isMobileViewport = window.matchMedia && window.matchMedia('(max-width: 800px)').matches;
-            if (target.classList.contains('css-title') && isMobileViewport) return;
-
-            e.preventDefault();
-            e.stopPropagation();
+            if (target.classList.contains('css-title') && isMobileViewport) return false;
 
             const start = target.selectionStart;
             const end = target.selectionEnd;
@@ -4904,20 +4972,17 @@
             const caret = start + 1;
             target.setSelectionRange(caret, caret);
             showSlashMenuForInput(target, caret);
-            return;
+            return true;
         }
 
         // Markdown notes (CodeMirror)
         const codeMirrorEditor = getCodeMirrorEditorFromTarget(target);
         if (codeMirrorEditor) {
             const api = getMarkdownCodeMirrorApi();
-            if (!api || typeof api.getSelectionOffsets !== 'function' || typeof api.replaceRange !== 'function') return;
+            if (!api || typeof api.getSelectionOffsets !== 'function' || typeof api.replaceRange !== 'function') return false;
 
             const offsets = api.getSelectionOffsets(codeMirrorEditor);
-            if (!offsets) return;
-
-            e.preventDefault();
-            e.stopPropagation();
+            if (!offsets) return false;
 
             api.replaceRange(codeMirrorEditor, offsets.start, offsets.end, '/');
             const caret = offsets.start + 1;
@@ -4927,19 +4992,16 @@
                 codeMirrorEditor._cmPrevLength = api.getValue(codeMirrorEditor).length;
             }
             showSlashMenuForCodeMirror(codeMirrorEditor, caret - 1, caret);
-            return;
+            return true;
         }
 
         // HTML notes (contenteditable)
         const noteEntry = target.closest && target.closest('.noteentry');
-        if (!noteEntry) return;
-        if (!getEditorContext()) return;
+        if (!noteEntry) return false;
+        if (!getEditorContext()) return false;
 
         const sel = window.getSelection();
-        if (!sel || !sel.rangeCount) return;
-
-        e.preventDefault();
-        e.stopPropagation();
+        if (!sel || !sel.rangeCount) return false;
 
         const range = sel.getRangeAt(0);
         range.deleteContents();
@@ -4951,6 +5013,7 @@
         sel.addRange(range);
 
         showSlashMenu();
+        return true;
     }
 
     // "/" on a selection in a note opens the formatting menu (issue #1410).
@@ -4964,6 +5027,8 @@
         } else if (e.key !== '/' || e.metaKey || (e.ctrlKey && !e.altKey)) {
             // Ctrl+Alt stays allowed: it is AltGr on Windows
             return;
+        } else if (isTypedSlashTakenByMobileBar()) {
+            return;
         }
 
         if (!showSlashMenuForSelection(e.target)) return;
@@ -4974,7 +5039,7 @@
 
     function handleSelectionSlashBeforeInput(e) {
         if (e.defaultPrevented || e.inputType !== 'insertText' || e.data !== '/' || slashMenuElement) return;
-        if (isAltSlashModeEnabled()) return;
+        if (isAltSlashModeEnabled() || isTypedSlashTakenByMobileBar()) return;
         if (showSlashMenuForSelection(e.target)) e.preventDefault();
     }
 
@@ -4987,6 +5052,7 @@
         const isClickInsideSubSubmenu = subSubmenuElement && subSubmenuElement.contains(e.target);
 
         if (!isClickInsideMenu && !isClickInsideSubmenu && !isClickInsideSubSubmenu) {
+            removeButtonSlash(false);
             hideSlashMenu();
             savedNoteEntry = null;
         }
@@ -5698,6 +5764,16 @@
 
     // Expose hideSlashMenu globally
     window.hideSlashMenu = hideSlashMenu;
+
+    // Opens the menu from a button instead of a typed '/' (mobile editor bar):
+    // the formatting menu on a selection, the insert menu at a bare caret.
+    window.openSlashMenuAtCaret = function (target) {
+        if (slashMenuElement) return false;
+        if (showSlashMenuForSelection(target)) return true;
+        if (!openSlashMenuAtCaret(target)) return false;
+        slashInsertedByButton = !!slashMenuElement;
+        return true;
+    };
 
     window.insertAudioFileWithContext = function (options) {
         options = options || {};

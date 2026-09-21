@@ -880,6 +880,9 @@ if ($isPublicWorkspaceReadonly) {
     // the hideable elements of this page (see ui_customization_panel.php)
     $uiCustomizationPanelPage = 'notes';
     include __DIR__ . '/../ui_customization_panel.php';
+
+    // Editing buttons pinned above the on-screen keyboard (mobile only)
+    include __DIR__ . '/../mobile_editor_bar.php';
     ?>
     <?php endif; ?>
 

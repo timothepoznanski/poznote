@@ -1,5 +1,5 @@
 import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap, snippetCompletion, startCompletion } from '@codemirror/autocomplete'
-import { defaultKeymap, history, historyKeymap, indentLess, indentMore } from '@codemirror/commands'
+import { defaultKeymap, history, historyKeymap, indentLess, indentMore, redo, undo } from '@codemirror/commands'
 import { markdown, markdownLanguage, insertNewlineContinueMarkup } from '@codemirror/lang-markdown'
 import { bracketMatching, HighlightStyle, LanguageDescription, LanguageSupport, StreamLanguage, syntaxHighlighting, syntaxTree } from '@codemirror/language'
 import { cpp } from '@codemirror/lang-cpp'
@@ -811,6 +811,29 @@ function hasFocus(host) {
   return !!(instance && instance.view.hasFocus)
 }
 
+// History and indentation for callers that have no keyboard shortcut to
+// send: the mobile editor bar (Tab and Ctrl+Z do not exist on a touch keyboard).
+function runHistory(host, command) {
+  const instance = getInstance(host)
+  if (!instance || instance.view.composing) return false
+  return command(instance.view)
+}
+
+function undoEdit(host) {
+  return runHistory(host, undo)
+}
+
+function redoEdit(host) {
+  return runHistory(host, redo)
+}
+
+// Same path as the Tab / Shift+Tab keys, ordered list renumbering included
+function indent(host, less) {
+  const instance = getInstance(host)
+  if (!instance || instance.view.composing) return false
+  return runMarkdownOrderedListTab(host, !!less)(instance.view)
+}
+
 function getLastActiveEditor() {
   return lastActiveHost && getInstance(lastActiveHost) ? lastActiveHost : null
 }
@@ -1199,6 +1222,9 @@ window.PoznoteMarkdownCodeMirror = {
   setSelection,
   replaceRange,
   replaceRangeKeepSelection,
+  undo: undoEdit,
+  redo: redoEdit,
+  indent,
   getCoordsAtPos,
   getPosAtCoords,
   scrollToPos,

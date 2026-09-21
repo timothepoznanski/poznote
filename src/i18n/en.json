@@ -851,7 +851,8 @@
         "icon_sidebar": "Icon sidebar",
         "folder_actions": "Folder Actions",
         "workspace_menu": "Workspace Menu",
-        "note_actions": "Note Actions"
+        "note_actions": "Note Actions",
+        "mobile_editor_bar": "Mobile editor bar"
       },
       "badge_all_visible": "All visible",
       "badge_hidden_count_admin": "{{count}} hidden ({{admin}} by the administrator)",
@@ -875,7 +876,9 @@
       "panel_all_options": "All options",
       "panel_saving": "Saving…",
       "panel_saved": "Saved",
-      "panel_save_error": "Could not save, try again."
+      "panel_save_error": "Could not save, try again.",
+      "mobile_editor_bar_hint": "Bar shown above the on-screen keyboard while a note is being edited on a phone or tablet.",
+      "mobile_editor_bar_show": "Show the bar"
     },
     "icon_sidebar_order": {
       "title": "Icon sidebar order",
@@ -4741,5 +4744,13 @@
     "favorited_items": "Added {{count}} items to favorites",
     "favorite_failed": "Could not update favorites: {{error}}",
     "already_favorites": "Already in favorites"
+  },
+  "mobile_editor_bar": {
+    "insert": "Insert (slash menu)",
+    "undo": "Undo",
+    "redo": "Redo",
+    "indent": "Indent",
+    "outdent": "Outdent",
+    "hide_keyboard": "Hide keyboard"
   }
 }

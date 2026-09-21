@@ -1346,7 +1346,8 @@
         "icon_sidebar": "Barra de iconos",
         "folder_actions": "Acciones de carpeta",
         "workspace_menu": "Menú del espacio de trabajo",
-        "note_actions": "Acciones de las notas"
+        "note_actions": "Acciones de las notas",
+        "mobile_editor_bar": "Barra de edición móvil"
       },
       "check_all": "Marcar todo",
       "uncheck_all": "Desmarcar todo",
@@ -1370,7 +1371,9 @@
       "panel_all_options": "Todas las opciones",
       "panel_saving": "Guardando…",
       "panel_saved": "Guardado",
-      "panel_save_error": "No se pudo guardar, inténtalo de nuevo."
+      "panel_save_error": "No se pudo guardar, inténtalo de nuevo.",
+      "mobile_editor_bar_hint": "Barra que aparece sobre el teclado en pantalla mientras se edita una nota en un teléfono o una tableta.",
+      "mobile_editor_bar_show": "Mostrar la barra"
     },
     "icon_sidebar_order": {
       "title": "Orden de la barra de iconos",
@@ -4922,5 +4925,13 @@
     "favorited_items": "{{count}} elementos añadidos a favoritos",
     "favorite_failed": "No se pudieron actualizar los favoritos: {{error}}",
     "already_favorites": "Ya está en favoritos"
+  },
+  "mobile_editor_bar": {
+    "insert": "Insertar (menú slash)",
+    "undo": "Deshacer",
+    "redo": "Rehacer",
+    "indent": "Aumentar sangría",
+    "outdent": "Reducir sangría",
+    "hide_keyboard": "Ocultar el teclado"
   }
 }

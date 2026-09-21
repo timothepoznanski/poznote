@@ -1346,7 +1346,8 @@
         "icon_sidebar": "Barre d'icônes",
         "folder_actions": "Actions des dossiers",
         "workspace_menu": "Menu du workspace",
-        "note_actions": "Actions des notes"
+        "note_actions": "Actions des notes",
+        "mobile_editor_bar": "Barre d’édition mobile"
       },
       "badge_all_visible": "Tout visible",
       "badge_hidden_count_admin": "{{count}} masqué(s), dont {{admin}} par l'administrateur",
@@ -1370,7 +1371,9 @@
       "panel_all_options": "Toutes les options",
       "panel_saving": "Enregistrement…",
       "panel_saved": "Enregistré",
-      "panel_save_error": "Enregistrement impossible, réessayez."
+      "panel_save_error": "Enregistrement impossible, réessayez.",
+      "mobile_editor_bar_hint": "Barre affichée au-dessus du clavier virtuel pendant l’édition d’une note sur téléphone ou tablette.",
+      "mobile_editor_bar_show": "Afficher la barre"
     },
     "icon_sidebar_order": {
       "title": "Ordre de la barre d'icônes",
@@ -5026,5 +5029,13 @@
     "favorited_items": "{{count}} éléments ajoutés aux favoris",
     "favorite_failed": "Impossible de mettre à jour les favoris : {{error}}",
     "already_favorites": "Déjà dans les favoris"
+  },
+  "mobile_editor_bar": {
+    "insert": "Insérer (menu slash)",
+    "undo": "Annuler",
+    "redo": "Rétablir",
+    "indent": "Augmenter le retrait",
+    "outdent": "Diminuer le retrait",
+    "hide_keyboard": "Masquer le clavier"
   }
 }

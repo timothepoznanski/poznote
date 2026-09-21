@@ -132,6 +132,19 @@
         if (toggle) toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
     }
 
+    // Unfolds one section (data-ui-section-id) and folds the others
+    function revealSection(sectionId) {
+        var target = null;
+        panel.querySelectorAll('.ui-custom-section').forEach(function (section) {
+            var match = section.getAttribute('data-ui-section-id') === sectionId;
+            setSectionCollapsed(section, !match);
+            if (match) target = section;
+        });
+        if (target && typeof target.scrollIntoView === 'function') {
+            target.scrollIntoView({ block: 'start' });
+        }
+    }
+
     function initSections() {
         panel.querySelectorAll('.ui-custom-section').forEach(function (section) {
             var title = section.querySelector('.ui-custom-section-title');
@@ -541,10 +554,19 @@
         }
 
         document.addEventListener('click', function (e) {
-            if (e.target.closest && e.target.closest('[data-action="toggle-ui-customization-panel"]')) {
-                e.preventDefault();
-                setOpen(!isOpen());
+            var trigger = e.target.closest ? e.target.closest('[data-action="toggle-ui-customization-panel"]') : null;
+            if (!trigger) return;
+            e.preventDefault();
+
+            // A trigger naming a section (the mobile editor bar) opens the
+            // panel on it instead of toggling
+            var sectionId = trigger.getAttribute('data-ui-section');
+            if (sectionId) {
+                setOpen(true);
+                revealSection(sectionId);
+                return;
             }
+            setOpen(!isOpen());
         });
 
         document.addEventListener('keydown', function (e) {

@@ -1344,7 +1344,8 @@
         "icon_sidebar": "图标侧边栏",
         "folder_actions": "文件夹操作",
         "workspace_menu": "工作区菜单",
-        "note_actions": "笔记操作"
+        "note_actions": "笔记操作",
+        "mobile_editor_bar": "移动端编辑栏"
       },
       "check_all": "全选",
       "uncheck_all": "取消全选",
@@ -1368,7 +1369,9 @@
       "panel_all_options": "所有选项",
       "panel_saving": "正在保存…",
       "panel_saved": "已保存",
-      "panel_save_error": "无法保存，请重试。"
+      "panel_save_error": "无法保存，请重试。",
+      "mobile_editor_bar_hint": "在手机或平板上编辑笔记时显示在屏幕键盘上方的工具栏。",
+      "mobile_editor_bar_show": "显示编辑栏"
     },
     "icon_sidebar_order": {
       "title": "图标侧边栏顺序",
@@ -5021,5 +5024,13 @@
     "favorited_items": "已将 {{count}} 项添加到收藏",
     "favorite_failed": "无法更新收藏：{{error}}",
     "already_favorites": "已在收藏中"
+  },
+  "mobile_editor_bar": {
+    "insert": "插入（斜杠菜单）",
+    "undo": "撤销",
+    "redo": "重做",
+    "indent": "增加缩进",
+    "outdent": "减少缩进",
+    "hide_keyboard": "隐藏键盘"
   }
 }

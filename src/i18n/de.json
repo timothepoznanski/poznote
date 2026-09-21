@@ -1346,7 +1346,8 @@
         "icon_sidebar": "Icon-Seitenleiste",
         "folder_actions": "Ordneraktionen",
         "workspace_menu": "Workspace-Menü",
-        "note_actions": "Notizaktionen"
+        "note_actions": "Notizaktionen",
+        "mobile_editor_bar": "Mobile Editorleiste"
       },
       "check_all": "Alle auswählen",
       "uncheck_all": "Alle abwählen",
@@ -1370,7 +1371,9 @@
       "panel_all_options": "Alle Optionen",
       "panel_saving": "Wird gespeichert…",
       "panel_saved": "Gespeichert",
-      "panel_save_error": "Speichern nicht möglich, bitte erneut versuchen."
+      "panel_save_error": "Speichern nicht möglich, bitte erneut versuchen.",
+      "mobile_editor_bar_hint": "Leiste über der Bildschirmtastatur, während eine Notiz auf einem Smartphone oder Tablet bearbeitet wird.",
+      "mobile_editor_bar_show": "Leiste anzeigen"
     },
     "icon_sidebar_order": {
       "title": "Reihenfolge der Icon-Seitenleiste",
@@ -4921,5 +4924,13 @@
     "favorited_items": "{{count}} Elemente zu den Favoriten hinzugefügt",
     "favorite_failed": "Favoriten konnten nicht aktualisiert werden: {{error}}",
     "already_favorites": "Bereits in den Favoriten"
+  },
+  "mobile_editor_bar": {
+    "insert": "Einfügen (Slash-Menü)",
+    "undo": "Rückgängig",
+    "redo": "Wiederholen",
+    "indent": "Einzug vergrößern",
+    "outdent": "Einzug verkleinern",
+    "hide_keyboard": "Tastatur ausblenden"
   }
 }
