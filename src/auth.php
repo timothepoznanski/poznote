@@ -832,12 +832,8 @@ function getPublicWorkspaceViewerUserId(): int {
 }
 
 function getCurrentRelativeRequestUri(): string {
-    $requestUri = (string)($_SERVER['REQUEST_URI'] ?? 'index.php');
-    if ($requestUri === '' || preg_match('#^[a-zA-Z][a-zA-Z0-9+.-]*://#', $requestUri) || str_starts_with($requestUri, '//')) {
-        return 'index.php';
-    }
-
-    return $requestUri;
+    require_once __DIR__ . '/lib/safe-redirect.php';
+    return poznoteSanitizeLocalRedirect($_SERVER['REQUEST_URI'] ?? null) ?? 'index.php';
 }
 
 function getPublicWorkspacePasswordSessionKey(array $workspaceAccess): string {

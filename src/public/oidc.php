@@ -11,14 +11,11 @@ function oidc_is_enabled() {
  * Sanitize a redirect URL to prevent open redirect attacks.
  * Only allows relative paths within the application.
  * Returns null if the redirect is invalid.
+ * The rules live in lib/safe-redirect.php, shared with the other redirects.
  */
 function oidc_sanitize_redirect($redirect) {
-    if (!is_string($redirect)) return null;
-    $redirect = trim($redirect);
-    if ($redirect === '' || preg_match('#^[a-zA-Z][a-zA-Z0-9+.-]*://#', $redirect) || str_starts_with($redirect, '//')) {
-        return null;
-    }
-    return $redirect;
+    require_once __DIR__ . '/../lib/safe-redirect.php';
+    return poznoteSanitizeLocalRedirect($redirect);
 }
 
 function oidc_base64url_encode($data) {

@@ -44,9 +44,11 @@ function redirectPublicPostToGet(string $fallbackPath): void {
         session_write_close();
     }
 
-    $target = (string)($_SERVER['REQUEST_URI'] ?? '');
-    $target = str_replace(["\r", "\n"], '', $target);
-    if ($target === '' || $target[0] !== '/') {
+    // nginx routes "//host" like "/host" but REQUEST_URI keeps both slashes, and
+    // a share can be named like a host, so the address is checked, not trusted.
+    require_once __DIR__ . '/lib/safe-redirect.php';
+    $target = poznoteSanitizeLocalRedirect($_SERVER['REQUEST_URI'] ?? null);
+    if ($target === null || $target[0] !== '/') {
         $target = buildPublicAppHref($fallbackPath);
     }
 
