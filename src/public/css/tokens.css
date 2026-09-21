@@ -606,9 +606,12 @@ html.theme-terminal[data-theme='dark'] {
 
 html.theme-black[data-theme='dark'] {
     /* Same four steps, in the blue-grey the black theme uses. These two values
-       were already in the right order; bright and subtle extend them. */
+       were already in the right order; bright and subtle extend them.
+       --dm-text was #c0c8d4, 10.5:1 on the note ground where the dark theme
+       reads at 8.2:1; once the tree stopped being dimmed below it (#1457) the
+       whole theme read too bright. #aab3c0 is 8.4:1, the dark theme's level. */
     --dm-text-bright: #e9ecf0;
-    --dm-text: #c0c8d4;
+    --dm-text: #aab3c0;
     --dm-text-muted: #9ba6b5;
     --dm-text-subtle: #818a96;
     /* The neutral controls in this theme's own blue-grey. They were inherited
