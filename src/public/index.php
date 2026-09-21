@@ -935,9 +935,13 @@ window.calendarTranslations = {
     apply: <?php echo json_encode(t('common.apply', [], 'Apply')); ?>,
     showCalendar: <?php echo json_encode(t('calendar.buttons.show_calendar')); ?>,
     hideCalendar: <?php echo json_encode(t('calendar.buttons.hide_calendar')); ?>,
+    modes: {
+        created: <?php echo json_encode(t('calendar.modes.created', [], 'Created')); ?>,
+        modified: <?php echo json_encode(t('calendar.modes.modified', [], 'Modified')); ?>
+    },
+    dayCounts: <?php echo json_encode(t('calendar.day_counts', [], 'Created: {{created}} / Modified: {{modified}}')); ?>,
     modal: {
         title: <?php echo json_encode(t('calendar.modal.title')); ?>,
-        open: <?php echo json_encode(t('calendar.modal.open')); ?>,
         open_all: <?php echo json_encode(t('calendar.modal.open_all')); ?>,
         close: <?php echo json_encode(t('calendar.modal.close')); ?>,
         no_notes: <?php echo json_encode(t('calendar.modal.no_notes', [], 'No notes on this day.')); ?>,

@@ -2,7 +2,8 @@
 /**
  * Calendar API - Notes by Date
  *
- * Returns the number of notes created on each date
+ * Returns the number of notes created (or, with mode=modified, last
+ * modified) on each date, days being taken in the user's timezone
  * Used by the mini calendar component to show dots for days with notes
  */
 
@@ -19,11 +20,12 @@ try {
     // Get workspace filter from query params (optional)
     $workspace_filter = $_GET['workspace'] ?? '';
 
-    // Build query to get notes grouped by creation date
+    // Created (default) or last modified. Notes never saved since their
+    // creation have no updated value, so they fall back to created.
+    $column = ($_GET['mode'] ?? '') === 'modified' ? 'COALESCE(updated, created)' : 'created';
+
     $query = "
-        SELECT
-            DATE(created) as date,
-            COUNT(*) as count
+        SELECT $column AS ts
         FROM entries
         WHERE trash = 0
     ";
@@ -36,14 +38,23 @@ try {
         $params[] = $workspace_filter;
     }
 
-    $query .= " GROUP BY DATE(created)";
-
     $stmt = $con->prepare($query);
     $stmt->execute($params);
 
+    // Timestamps are stored in UTC, so they are grouped here rather than
+    // with DATE(): a note saved at 00:30 in Paris belongs to that day, not
+    // to the UTC day before.
+    $utc = new DateTimeZone('UTC');
+    $userTz = new DateTimeZone(getUserTimezone());
     $results = [];
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $results[$row['date']] = (int)$row['count'];
+    while (($ts = $stmt->fetchColumn()) !== false) {
+        if (empty($ts)) continue;
+        try {
+            $day = (new DateTime($ts, $utc))->setTimezone($userTz)->format('Y-m-d');
+        } catch (Exception $e) {
+            continue;
+        }
+        $results[$day] = ($results[$day] ?? 0) + 1;
     }
 
     echo json_encode($results);

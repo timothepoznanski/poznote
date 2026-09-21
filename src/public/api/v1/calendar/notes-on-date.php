@@ -2,7 +2,8 @@
 /**
  * Calendar API - Notes on Specific Date
  *
- * Returns all notes created on a specific date
+ * Returns all notes created (or, with mode=modified, last modified) on a
+ * specific date, the day being taken in the user's timezone
  * Used by the mini calendar component to open notes from a selected day
  */
 
@@ -32,18 +33,31 @@ try {
         exit;
     }
 
+    // UTC bounds of that day in the user's timezone, the timestamps being
+    // stored in UTC (same day split as notes-by-date.php)
+    $from_utc = dateOnlyFilterToUtcBoundary($date, false);
+    $to_utc = dateOnlyFilterToUtcBoundary($date, true);
+    if ($from_utc === null || $to_utc === null) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Invalid date']);
+        exit;
+    }
+
     // Get workspace filter from query params (optional)
     $workspace_filter = $_GET['workspace'] ?? '';
 
-    // Build query to get notes created on this date
+    // Created (default) or last modified, with the same fallback to
+    // created for notes never saved since their creation
+    $column = ($_GET['mode'] ?? '') === 'modified' ? 'COALESCE(updated, created)' : 'created';
+
     $query = "
         SELECT id, heading
         FROM entries
-        WHERE DATE(created) = ?
+        WHERE datetime($column) BETWEEN ? AND ?
         AND trash = 0
     ";
 
-    $params = [$date];
+    $params = [$from_utc, $to_utc];
 
     // Filter by workspace if specified
     if (!empty($workspace_filter)) {
@@ -51,7 +65,7 @@ try {
         $params[] = $workspace_filter;
     }
 
-    $query .= " ORDER BY created ASC";
+    $query .= " ORDER BY datetime($column) ASC, id ASC";
 
     $stmt = $con->prepare($query);
     $stmt->execute($params);

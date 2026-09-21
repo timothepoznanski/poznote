@@ -3156,9 +3156,13 @@
       "show_calendar": "Показать календарь",
       "hide_calendar": "Скрыть календарь"
     },
+    "modes": {
+      "created": "Созданные",
+      "modified": "Изменённые"
+    },
+    "day_counts": "Созданные: {{created}} / Изменённые: {{modified}}",
     "modal": {
       "title": "Заметки от",
-      "open": "Открыть",
       "open_all": "Открыть все",
       "close": "Закрыть",
       "no_notes": "В этот день заметок нет.",

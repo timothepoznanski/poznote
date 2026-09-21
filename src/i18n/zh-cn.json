@@ -3758,9 +3758,13 @@
       "show_calendar": "显示日历",
       "hide_calendar": "隐藏日历"
     },
+    "modes": {
+      "created": "已创建",
+      "modified": "已修改"
+    },
+    "day_counts": "已创建：{{created}} / 已修改：{{modified}}",
     "modal": {
       "title": "笔记来自",
-      "open": "打开",
       "open_all": "全部打开",
       "close": "关闭",
       "no_notes": "这一天没有笔记。",

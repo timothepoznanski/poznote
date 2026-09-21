@@ -3155,9 +3155,13 @@
       "show_calendar": "Show calendar",
       "hide_calendar": "Hide calendar"
     },
+    "modes": {
+      "created": "Created",
+      "modified": "Modified"
+    },
+    "day_counts": "Created: {{created}} / Modified: {{modified}}",
     "modal": {
       "title": "Notes from",
-      "open": "Open",
       "open_all": "Open All",
       "close": "Close",
       "no_notes": "No notes on this day.",

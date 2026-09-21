@@ -3659,9 +3659,13 @@
       "show_calendar": "Mostrar calendario",
       "hide_calendar": "Ocultar calendario"
     },
+    "modes": {
+      "created": "Creadas",
+      "modified": "Modificadas"
+    },
+    "day_counts": "Creadas: {{created}} / Modificadas: {{modified}}",
     "modal": {
       "title": "Notas del",
-      "open": "Abrir",
       "open_all": "Abrir todo",
       "close": "Cerrar",
       "no_notes": "No hay notas en este día.",

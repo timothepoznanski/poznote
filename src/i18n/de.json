@@ -3658,9 +3658,13 @@
       "show_calendar": "Kalender anzeigen",
       "hide_calendar": "Kalender ausblenden"
     },
+    "modes": {
+      "created": "Erstellt",
+      "modified": "Geändert"
+    },
+    "day_counts": "Erstellt: {{created}} / Geändert: {{modified}}",
     "modal": {
       "title": "Notizen vom",
-      "open": "Öffnen",
       "open_all": "Alle öffnen",
       "close": "Schließen",
       "no_notes": "Keine Notizen an diesem Tag.",
