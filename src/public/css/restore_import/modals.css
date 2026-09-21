@@ -107,23 +107,13 @@
 }
 
 .import-confirm-modal-content .btn-cancel {
-    background-color: var(--pz-surface);
-    color: var(--pz-text);
-    border: 1px solid var(--pz-border);
-}
-
-.import-confirm-modal-content .btn-cancel:hover {
-    background-color: var(--pz-surface-sunken);
-}
-
-.import-confirm-modal-content .btn-cancel {
-    background-color: var(--pz-danger);
+    background-color: var(--pz-neutral);
     color: var(--pz-text-inverse);
     border: none;
 }
 
 .import-confirm-modal-content .btn-cancel:hover {
-    background-color: var(--pz-danger-text-hover);
+    background-color: var(--pz-neutral-hover);
 }
 
 /* Custom Alert Message */
@@ -209,17 +199,6 @@ html[data-theme='dark'] .direct-copy-restore-processing {
 html[data-theme='dark'] .direct-copy-restore-spinner {
     border-color: rgba(var(--pz-highlight-rgb), 0.22);
     border-top-color: var(--pz-accent-text-hover);
-}
-
-html[data-theme='dark'] .import-confirm-modal .import-confirm-modal-content .btn-cancel {
-    background-color: var(--pz-surface-sunken);
-    color: var(--pz-text-strong);
-    border: 1px solid var(--pz-border-strong);
-}
-
-html[data-theme='dark'] .import-confirm-modal .import-confirm-modal-content .btn-cancel:hover {
-    background-color: var(--pz-surface-strong);
-    border-color: var(--pz-border-strong);
 }
 
 html[data-theme='dark'] .import-confirm-modal .btn-confirm,

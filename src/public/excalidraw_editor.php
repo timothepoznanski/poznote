@@ -171,7 +171,7 @@ if ($note_id > 0) {
                 <button id="saveAndExitBtn" class="excalidraw-btn excalidraw-btn-blue">
                     <?php echo t_h('excalidraw.editor.toolbar.save_and_exit', [], 'Save and exit'); ?>
                 </button>
-                <button id="cancelBtn" class="excalidraw-btn excalidraw-btn-red">
+                <button id="cancelBtn" class="excalidraw-btn excalidraw-btn-neutral">
                     <?php echo t_h('excalidraw.editor.toolbar.exit_without_saving', [], 'Exit without saving'); ?>
                 </button>
             </div>

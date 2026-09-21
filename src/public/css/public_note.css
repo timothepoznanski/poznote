@@ -920,7 +920,7 @@ html[data-theme='dark'] .public-note .content [style*="color:black"] {
 }
 
 .public-edit-cancel-btn {
-    color: var(--pz-danger-text);
+    color: var(--pz-text-secondary);
 }
 
 .public-edit-save-btn.is-saving {
@@ -940,8 +940,4 @@ html[data-theme='dark'] .public-note-editor-html {
 
 html[data-theme='dark'] .public-edit-save-btn {
     color: var(--pz-success-text);
-}
-
-html[data-theme='dark'] .public-edit-cancel-btn {
-    color: var(--pz-danger-text);
 }

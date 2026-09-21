@@ -65,19 +65,27 @@
         });
     }
 
-    // Folder actions modal
+    // Folder actions
     //
-    // The three-dot button of each row opens #folderActionsModal, which holds
-    // the same action items as the folder actions dropdown of index.php. The
-    // implementations are reused from the js/utils-*.js set, js/share.js and
-    // js/folder-icon.js, all loaded by this page.
+    // On desktop a row shows its frequent actions as icons and the three-dot
+    // button opens #folderRowActionsMenu, a dropdown with the others. On
+    // mobile the button opens #folderActionsModal, which holds every action
+    // item of the folder actions dropdown of index.php. The implementations
+    // are reused from the js/utils-*.js set, js/share.js and js/folder-icon.js,
+    // all loaded by this page.
     const actionsModal = document.getElementById('folderActionsModal');
     const actionsMenu = document.getElementById('folder-actions-menu');
     const actionsModalTitle = document.getElementById('folderActionsModalTitle');
     const actionsModalIcon = document.getElementById('folderActionsModalIcon');
+    const rowMenu = document.getElementById('folderRowActionsMenu');
 
-    // Folder the modal currently targets
+    // Same breakpoint as the media query hiding the row icons
+    const mobileQuery = window.matchMedia('(max-width: 768px)');
+
+    // Folder the modal or the dropdown currently targets
     let activeFolder = null;
+    // Three-dot button whose dropdown is showing
+    let rowMenuButton = null;
 
     // utils.js and folder-icon.js declare these at script top level, so they
     // land on window even where nothing assigns them explicitly
@@ -99,7 +107,7 @@
             originalUpdateFolderIconInUI(folderId, iconClass, iconColor);
         }
 
-        const btn = document.querySelector('.folder-list-actions [data-action="change-folder-icon"][data-folder-id="' + folderId + '"]');
+        const btn = document.querySelector('.folder-list-menu-btn[data-folder-id="' + folderId + '"]');
         const row = btn && btn.closest('.folder-item');
         const icon = row && row.querySelector('.shared-folder-icon i');
         if (!icon) return;
@@ -119,16 +127,50 @@
         if (actionsModal) actionsModal.style.display = 'none';
     }
 
-    function openActionsModal(button) {
-        if (!actionsModal || !actionsMenu) return;
-
-        activeFolder = {
+    // Folder carried by a three-dot button
+    function readFolder(button) {
+        return {
             id: button.getAttribute('data-folder-id'),
             name: button.getAttribute('data-folder-name') || '',
             noteCount: parseInt(button.getAttribute('data-note-count'), 10) || 0,
             shared: button.getAttribute('data-shared') === '1',
             favorite: button.getAttribute('data-favorite') === '1'
         };
+    }
+
+    // Fit the items of a menu to the folder it opens for
+    function prepareMenu(menu, folder) {
+        // Carry the folder identity onto every action item, like the shared
+        // dropdown of index.php does
+        menu.querySelectorAll('[data-action]').forEach(function(item) {
+            item.setAttribute('data-folder-id', folder.id);
+            item.setAttribute('data-folder-name', folder.name);
+        });
+
+        // Items only relevant when the folder contains notes
+        menu.querySelectorAll('.requires-notes').forEach(function(item) {
+            item.style.display = folder.noteCount > 0 ? '' : 'none';
+        });
+
+        // Share and favorite items: show the variant matching the folder state
+        menu.querySelectorAll('.share-state-shared').forEach(function(item) {
+            item.style.display = folder.shared ? '' : 'none';
+        });
+        menu.querySelectorAll('.share-state-not-shared').forEach(function(item) {
+            item.style.display = folder.shared ? 'none' : '';
+        });
+        menu.querySelectorAll('.favorite-state-favorite').forEach(function(item) {
+            item.style.display = folder.favorite ? '' : 'none';
+        });
+        menu.querySelectorAll('.favorite-state-not-favorite').forEach(function(item) {
+            item.style.display = folder.favorite ? 'none' : '';
+        });
+    }
+
+    function openActionsModal(button) {
+        if (!actionsModal || !actionsMenu) return;
+
+        activeFolder = readFolder(button);
 
         if (actionsModalTitle) actionsModalTitle.textContent = activeFolder.name;
         if (actionsModalIcon) {
@@ -136,33 +178,39 @@
             actionsModalIcon.className = rowIcon ? rowIcon.className : 'lucide lucide-folder';
         }
 
-        // Carry the folder identity onto every action item, like the shared
-        // dropdown of index.php does
-        actionsMenu.querySelectorAll('[data-action]').forEach(function(item) {
-            item.setAttribute('data-folder-id', activeFolder.id);
-            item.setAttribute('data-folder-name', activeFolder.name);
-        });
-
-        // Items only relevant when the folder contains notes
-        actionsMenu.querySelectorAll('.requires-notes').forEach(function(item) {
-            item.style.display = activeFolder.noteCount > 0 ? '' : 'none';
-        });
-
-        // Share and favorite items: show the variant matching the folder state
-        actionsMenu.querySelectorAll('.share-state-shared').forEach(function(item) {
-            item.style.display = activeFolder.shared ? '' : 'none';
-        });
-        actionsMenu.querySelectorAll('.share-state-not-shared').forEach(function(item) {
-            item.style.display = activeFolder.shared ? 'none' : '';
-        });
-        actionsMenu.querySelectorAll('.favorite-state-favorite').forEach(function(item) {
-            item.style.display = activeFolder.favorite ? '' : 'none';
-        });
-        actionsMenu.querySelectorAll('.favorite-state-not-favorite').forEach(function(item) {
-            item.style.display = activeFolder.favorite ? 'none' : '';
-        });
-
+        prepareMenu(actionsMenu, activeFolder);
         actionsModal.style.display = 'flex';
+    }
+
+    function closeRowMenu() {
+        if (rowMenu) rowMenu.classList.remove('show');
+        if (rowMenuButton) rowMenuButton.classList.remove('open');
+        rowMenuButton = null;
+    }
+
+    function openRowMenu(button) {
+        if (!rowMenu) return;
+
+        activeFolder = readFolder(button);
+        prepareMenu(rowMenu, activeFolder);
+
+        rowMenu.classList.add('show');
+        button.classList.add('open');
+        rowMenuButton = button;
+
+        // The menu is position: fixed, so it is placed against the viewport:
+        // right edge on the button's (the button ends the row), below it, or
+        // above it when it would run past the bottom of the window
+        const margin = 8;
+        const buttonRect = button.getBoundingClientRect();
+        const menuRect = rowMenu.getBoundingClientRect();
+        let top = buttonRect.bottom + 4;
+        if (top + menuRect.height > window.innerHeight - margin) {
+            const above = buttonRect.top - menuRect.height - 4;
+            top = above >= margin ? above : Math.max(margin, window.innerHeight - menuRect.height - margin);
+        }
+        rowMenu.style.top = top + 'px';
+        rowMenu.style.left = Math.max(margin, buttonRect.right - menuRect.width) + 'px';
     }
 
     function workspaceQuery(prefix) {
@@ -247,6 +295,15 @@
 
     document.addEventListener('click', function(event) {
         const actionElement = event.target.closest('[data-action]');
+
+        // A click anywhere but the dropdown closes it. Its own button is
+        // remembered first, so a second click on it closes the menu instead of
+        // reopening it.
+        const clickedRowMenuButton = rowMenuButton;
+        if (rowMenuButton && !(rowMenu && rowMenu.contains(event.target))) {
+            closeRowMenu();
+        }
+
         if (!actionElement) return;
 
         const action = actionElement.getAttribute('data-action');
@@ -254,7 +311,11 @@
         if (action === 'open-folder-actions-modal') {
             event.preventDefault();
             event.stopPropagation();
-            openActionsModal(actionElement);
+            if (mobileQuery.matches) {
+                openActionsModal(actionElement);
+            } else if (clickedRowMenuButton !== actionElement) {
+                openRowMenu(actionElement);
+            }
             return;
         }
 
@@ -267,25 +328,35 @@
 
         if (!folderActions[action]) return;
 
-        // Menu items act on the folder the modal was opened for; the inline
-        // icon buttons of a row (desktop) carry their own folder identity
-        const insideMenu = actionsMenu && actionsMenu.contains(actionElement);
+        // Menu items act on the folder the modal or the dropdown was opened
+        // for; the inline icon buttons of a row (desktop) carry their own
+        // folder identity
+        const insideModal = actionsMenu && actionsMenu.contains(actionElement);
+        const insideRowMenu = rowMenu && rowMenu.contains(actionElement);
         const insideRow = !!actionElement.closest('.folder-list-actions');
-        if (!insideMenu && !insideRow) return;
+        if (!insideModal && !insideRowMenu && !insideRow) return;
 
         event.preventDefault();
         event.stopPropagation();
 
-        const folder = insideMenu ? activeFolder : {
-            id: actionElement.getAttribute('data-folder-id'),
-            name: actionElement.getAttribute('data-folder-name') || '',
-            favorite: actionElement.getAttribute('data-favorite') === '1'
-        };
+        const folder = (insideModal || insideRowMenu) ? activeFolder : readFolder(actionElement);
         if (!folder || !folder.id) return;
 
-        // Close the actions modal first so the action's own modal is visible
-        if (insideMenu) closeActionsModal();
+        // Close the menu first so the action's own modal is visible
+        if (insideModal) closeActionsModal();
+        if (insideRowMenu) closeRowMenu();
         folderActions[action](folder);
+    });
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && rowMenuButton) closeRowMenu();
+    });
+    // A fixed dropdown would drift away from its row: close it instead
+    window.addEventListener('scroll', function() {
+        if (rowMenuButton) closeRowMenu();
+    }, true);
+    window.addEventListener('resize', function() {
+        if (rowMenuButton) closeRowMenu();
     });
 
     // Close the actions modal when clicking its backdrop

@@ -686,9 +686,9 @@ html[data-theme='dark'] #deleteFolderModal .btn-cancel,
 html[data-theme='dark'] #deleteConfirmModal .btn-cancel,
 html[data-theme='dark'] #emptyTrashConfirmModal .btn-cancel,
 html[data-theme='dark'] #restoreConfirmModal .btn-cancel {
-    background-color: var(--pz-danger-text-hover) !important;
-    color: var(--pz-text-inverse) !important;
-    border-color: var(--pz-danger-text-hover) !important;
+    background-color: var(--pz-border) !important;
+    color: var(--pz-text) !important;
+    border-color: var(--pz-border-strong) !important;
 }
 
 html[data-theme='dark'] .import-confirm-modal-content .btn-cancel:hover,
@@ -696,17 +696,6 @@ html[data-theme='dark'] #deleteFolderModal .btn-cancel:hover,
 html[data-theme='dark'] #deleteConfirmModal .btn-cancel:hover,
 html[data-theme='dark'] #emptyTrashConfirmModal .btn-cancel:hover,
 html[data-theme='dark'] #restoreConfirmModal .btn-cancel:hover {
-    background-color: var(--pz-danger-text-hover) !important;
-    border-color: var(--pz-danger-text-hover) !important;
-}
-
-html[data-theme='dark'] #deleteFolderModal .btn-cancel {
-    background-color: var(--pz-border) !important;
-    color: var(--pz-text) !important;
-    border-color: var(--pz-border-strong) !important;
-}
-
-html[data-theme='dark'] #deleteFolderModal .btn-cancel:hover {
     background-color: var(--pz-surface-sunken) !important;
     border-color: var(--pz-border) !important;
 }

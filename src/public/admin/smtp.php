@@ -702,7 +702,7 @@ $notifyCandidates = listNewUserNotificationCandidates();
         </div>
 
         <div class="smtp-actions">
-            <a href="../settings.php" class="btn btn-danger"><?php echo t_h('common.cancel', [], 'Cancel'); ?></a>
+            <a href="../settings.php" class="btn btn-secondary"><?php echo t_h('common.cancel', [], 'Cancel'); ?></a>
             <button type="submit" name="action" value="save" class="btn btn-primary"><?php echo t_h('common.save', [], 'Save'); ?></button>
         </div>
     </form>

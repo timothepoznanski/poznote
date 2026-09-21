@@ -689,14 +689,14 @@ html[data-theme='dark'] .note-palette-remove:hover {
 }
 
 .modal-footer .btn-cancel {
-    background-color: var(--pz-danger) !important;
+    background-color: var(--pz-neutral) !important;
     color: var(--pz-text-inverse) !important;
-    border: 1px solid var(--pz-danger) !important;
+    border: 1px solid var(--pz-neutral) !important;
 }
 
 .modal-footer .btn-cancel:hover {
-    background-color: var(--pz-danger-hover) !important;
-    border-color: var(--pz-danger-hover) !important;
+    background-color: var(--pz-neutral-hover) !important;
+    border-color: var(--pz-neutral-hover) !important;
     opacity: 1 !important;
 }
 

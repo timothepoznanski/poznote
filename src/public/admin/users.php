@@ -1348,7 +1348,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                 <input type="text" id="rename_oidc_subject" placeholder="<?php echo t_h('multiuser.admin.oidc_subject_placeholder', [], 'e.g., 510ec799-02f8-42e0-...');?>" onkeydown="if(event.key==='Enter') submitRename()">
             </div>
             <div class="form-actions">
-                <button type="button" class="btn btn-danger" onclick="closeModal('renameModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('renameModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
                 <button type="button" class="btn btn-primary" onclick="submitRename()"><?php echo t_h('common.save', [], 'Save'); ?></button>
             </div>
         </div>
@@ -1449,7 +1449,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 
             <div class="form-actions">
                 <input type="hidden" id="admin_confirm_user_id">
-                <button type="button" class="btn btn-secondary btn-cancel-admin" onclick="closeModal('adminConfirmModal'); location.reload();"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('adminConfirmModal'); location.reload();"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
                 <button type="button" class="btn btn-primary" onclick="confirmAdminPromotion()"><?php echo t_h('multiuser.admin.confirm_admin.confirm_button', [], 'Confirm admin promotion'); ?></button>
             </div>
         </div>
@@ -1507,7 +1507,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                  squeezes the two buttons that end the dialog. -->
             <div class="form-actions password-modal-actions">
                 <button type="button" class="btn btn-secondary" id="pw_reset_btn" onclick="resetPasswordToDefault()"><?php echo t_h('multiuser.admin.password_management.reset_to_default', [], 'Reset to default'); ?></button>
-                <button type="button" class="btn btn-danger" onclick="closeModal('passwordModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
+                <button type="button" class="btn btn-secondary" id="pw_cancel_btn" onclick="closeModal('passwordModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
                 <button type="button" class="btn btn-primary" id="pw_save_btn" onclick="setNewPassword()"><?php echo t_h('common.save', [], 'Save'); ?></button>
             </div>
         </div>

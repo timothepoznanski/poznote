@@ -1522,7 +1522,7 @@ if ($canUseUserWebhooks) {
             <div class="modal-buttons" style="flex-wrap: nowrap; justify-content: space-between;">
                 <button type="button" class="btn-primary" id="openGithubApiDocsBtn" style="flex: 1 1 0;"><?php echo t_h('modals.api_rest.github_option', [], 'GitHub'); ?></button>
                 <button type="button" class="btn-primary" id="openSwaggerApiBtn" style="flex: 1 1 0;"><?php echo t_h('modals.api_rest.swagger_option', [], 'Swagger'); ?></button>
-                <button type="button" class="btn-danger" id="closeApiRestModalBtn" style="flex: 1 1 0;"><?php echo t_h('common.cancel'); ?></button>
+                <button type="button" class="btn-cancel" id="closeApiRestModalBtn" style="flex: 1 1 0;"><?php echo t_h('common.cancel'); ?></button>
             </div>
         </div>
     </div>

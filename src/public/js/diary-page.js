@@ -1400,7 +1400,6 @@
                 alertType: 'warning',
                 confirmText: txt.deleteLabel || 'Delete',
                 cancelText: txt.cancel || 'Cancel',
-                cancelButtonClass: 'diary-confirm-cancel',
                 confirmButtonClass: 'danger'
             })
             : Promise.resolve(window.confirm(message));

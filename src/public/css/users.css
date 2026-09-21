@@ -74,15 +74,6 @@ html[data-theme='dark'] {
     margin-right: 10px;
 }
 
-.btn-cancel-admin {
-    background-color: var(--pz-danger);
-    color: var(--pz-text-inverse);
-}
-
-.btn-cancel-admin:hover {
-    background-color: var(--pz-danger-hover);
-}
-
 /* Table */
 .users-table {
     width: 100%;
@@ -743,7 +734,7 @@ html[data-theme='dark'] .account-access-own-label {
         order: 2;
     }
 
-    .password-modal-actions .btn-danger {
+    .password-modal-actions #pw_cancel_btn {
         order: 3;
     }
 

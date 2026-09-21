@@ -16,11 +16,6 @@ html[data-theme='dark'] .slash-command-item.selected {
     background: rgba(var(--pz-highlight-rgb), 0.08);
 }
 
-html[data-theme='dark'] .slash-command-item[data-command-id='cancel']:hover,
-html[data-theme='dark'] .slash-command-item[data-command-id='cancel'].selected {
-    background: rgba(248, 113, 113, 0.16);
-}
-
 html[data-theme='dark'] .slash-command-item.slash-command-disabled:hover,
 html[data-theme='dark'] .slash-command-item.slash-command-disabled.selected {
     background: transparent;
@@ -44,7 +39,7 @@ html[data-theme='dark'] .slash-command-label {
 }
 
 html[data-theme='dark'] .slash-command-item[data-command-id='cancel'] .slash-command-label {
-    color: var(--pz-danger-text) !important;
+    color: var(--pz-text-secondary) !important;
 }
 
 html[data-theme='dark'] .slash-command-icon:not([style*="color"]) {

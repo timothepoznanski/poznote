@@ -122,10 +122,10 @@
     color: var(--pz-accent-text) !important;
 }
 
-/* Red color for cancel icon in mobile slash menu */
+/* Grey cancel icon in mobile slash menu */
 .slash-command-icon.lucide-times-circle,
 .slash-command-item .slash-command-icon.lucide-times-circle {
-    color: var(--pz-danger-text) !important;
+    color: var(--pz-text-secondary) !important;
     font-weight: var(--pz-weight-normal);
 }
 

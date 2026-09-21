@@ -57,14 +57,51 @@ try {
 /**
  * The folder actions, in the order they appear.
  *
- * Drives both the inline icon buttons of each row (desktop) and the actions
- * modal (mobile), so the two stay in sync. Mirrors the folder actions dropdown
- * of index.php, minus the create entry and the ones needing its notes list DOM.
+ * On desktop the 'inline' ones are icon buttons of each row and the others
+ * fill the dropdown of the row's three-dot button. Mirrors the folder actions
+ * dropdown of index.php, minus the create entry and the ones needing its
+ * notes list DOM.
  *
  * @return array List of action descriptors
  */
-function folderListInlineActions() {
+function folderListActions() {
 	return [
+		[
+			'action' => 'favorite-folder',
+			'icon' => 'lucide-star',
+			'label' => t_h('notes_list.folder_actions.remove_favorite', [], 'Remove from favorites'),
+			'when_favorite' => true,
+			'inline' => true,
+			'active' => true,
+		],
+		[
+			'action' => 'favorite-folder',
+			'icon' => 'lucide-star',
+			'label' => t_h('notes_list.folder_actions.add_favorite', [], 'Add to favorites'),
+			'when_favorite' => false,
+			'inline' => true,
+		],
+		[
+			'action' => 'share-folder',
+			'icon' => 'lucide-share-2',
+			'label' => t_h('notes_list.folder_actions.is_public', [], 'Is public'),
+			'when_shared' => true,
+			'inline' => true,
+			'active' => true,
+		],
+		[
+			'action' => 'share-folder',
+			'icon' => 'lucide-share-2',
+			'label' => t_h('notes_list.folder_actions.share_folder', [], 'Make public'),
+			'when_shared' => false,
+			'inline' => true,
+		],
+		[
+			'action' => 'rename-folder',
+			'icon' => 'lucide-pencil',
+			'label' => t_h('notes_list.folder_actions.rename_folder', [], 'Rename'),
+			'inline' => true,
+		],
 		[
 			'action' => 'open-kanban-view',
 			'icon' => 'lucide-columns-2',
@@ -104,35 +141,6 @@ function folderListInlineActions() {
 			'requires_notes' => true,
 		],
 		[
-			'action' => 'share-folder',
-			'icon' => 'lucide-share-2',
-			'label' => t_h('notes_list.folder_actions.is_public', [], 'Is public'),
-			'when_shared' => true,
-		],
-		[
-			'action' => 'share-folder',
-			'icon' => 'lucide-share-2',
-			'label' => t_h('notes_list.folder_actions.share_folder', [], 'Make public'),
-			'when_shared' => false,
-		],
-		[
-			'action' => 'favorite-folder',
-			'icon' => 'lucide-star',
-			'label' => t_h('notes_list.folder_actions.remove_favorite', [], 'Remove from favorites'),
-			'when_favorite' => true,
-		],
-		[
-			'action' => 'favorite-folder',
-			'icon' => 'lucide-star',
-			'label' => t_h('notes_list.folder_actions.add_favorite', [], 'Add to favorites'),
-			'when_favorite' => false,
-		],
-		[
-			'action' => 'rename-folder',
-			'icon' => 'lucide-pencil',
-			'label' => t_h('notes_list.folder_actions.rename_folder', [], 'Rename'),
-		],
-		[
 			'action' => 'change-folder-icon',
 			'icon' => 'lucide-palette',
 			'label' => t_h('notes_list.folder_actions.change_icon', [], 'Change icon'),
@@ -167,11 +175,11 @@ function renderFolderListRow($folderId, $folder, $depth, $workspace, $sharedFold
 
 	$kanban_url = 'index.php?kanban=' . $folder_id . '&workspace=' . urlencode($workspace);
 
-	echo '<div class="shared-note-item folder-item" data-action="open-folder-kanban" data-kanban-url="' . htmlspecialchars($kanban_url, ENT_QUOTES) . '" data-folder-name="' . $folder_name . '" data-depth="' . (int)$depth . '" style="cursor: pointer; padding: 8px 15px; padding-left: ' . (15 + $depth * 22) . 'px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; box-shadow: none !important;">';
+	echo '<div class="shared-note-item folder-item" data-action="open-folder-kanban" data-kanban-url="' . htmlspecialchars($kanban_url, ENT_QUOTES) . '" data-folder-name="' . $folder_name . '" data-depth="' . (int)$depth . '" style="cursor: pointer; padding: 6px 15px; padding-left: ' . (15 + $depth * 22) . 'px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; box-shadow: none !important;">';
 
 	echo '<div class="note-name-container" style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">';
 	$icon_style = 'style="' . ($icon_color ? 'color: ' . $icon_color . ' !important; ' : '') . 'filter: none !important;"';
-	echo '<div class="shared-folder-icon" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: transparent !important; border-radius: 8px; flex: 0 0 auto;">';
+	echo '<div class="shared-folder-icon" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: transparent !important; border-radius: 8px; flex: 0 0 auto;">';
 	echo '<i class="' . $folder_icon . '" ' . $icon_style . '></i>';
 	echo '</div>';
 	echo '<span class="folder-name-text" style="font-weight: 500; font-size: 16px; color: var(--pz-text);">' . $folder_name . ' <span style="font-size: 14px; color: var(--pz-text-muted); font-weight: 400;">(' . $note_count . ')</span></span>';
@@ -184,38 +192,27 @@ function renderFolderListRow($folderId, $folder, $depth, $workspace, $sharedFold
 
 	echo '<div class="folder-list-actions">';
 
-	// Desktop: every action as its own icon. Mobile keeps only the three-dot
-	// button below, which opens the same actions in a modal.
+	// Desktop: the inline actions as icons, the others in the dropdown of the
+	// three-dot button. Mobile keeps only the three-dot button, which opens
+	// every action in a modal.
 	echo '<div class="folder-inline-actions">';
-	foreach (folderListInlineActions() as $action) {
-		// Items depending on the folder state are hidden the same way the
-		// modal hides them
-		$classes = 'folder-inline-action-btn';
-		// Actions needing notes stay visible when the folder is empty, greyed
-		// out and inert, so the icon columns stay aligned from one row to the next
-		$isPlaceholder = !empty($action['requires_notes']) && $note_count === 0;
-		if ($isPlaceholder) {
-			$classes .= ' is-placeholder';
+	foreach (folderListActions() as $action) {
+		if (empty($action['inline'])) {
+			continue;
 		}
+		// Only the variant matching the folder state is rendered
 		if (isset($action['when_shared']) && $action['when_shared'] !== ($is_shared === '1')) {
 			continue;
 		}
 		if (isset($action['when_favorite']) && $action['when_favorite'] !== ($is_favorite === '1')) {
 			continue;
 		}
-		if (!empty($action['danger'])) {
-			// folder-actions-danger opts the icon out of the dark-mode grey
-			// filter (excluded in css/dark-mode/icons.css) so it stays red
-			$classes .= ' danger folder-actions-danger';
-		}
 
+		$classes = 'folder-inline-action-btn' . (!empty($action['active']) ? ' is-active' : '');
 		$label = $action['label'];
 		echo '<button type="button" class="' . $classes . '"'
 			. ' title="' . $label . '" aria-label="' . $label . '"'
-			. ($isPlaceholder
-				? ' disabled tabindex="-1"'
-				: ' data-action="' . $action['action'] . '"' . $folderAttrs)
-			. '>';
+			. ' data-action="' . $action['action'] . '"' . $folderAttrs . '>';
 		echo '<i class="lucide ' . $action['icon'] . '"></i>';
 		echo '</button>';
 	}
@@ -273,6 +270,12 @@ $currentLang = getUserLanguage();
 		.shared-folder-icon i {
 			transition: color 0.15s ease;
 		}
+		/* css/shared/notes-list.css pads the name cell for the notes table;
+		   a folder row takes its vertical spacing from its own padding only */
+		.folder-item .note-name-container {
+			padding-top: 0;
+			padding-bottom: 0;
+		}
 		.folder-list-actions {
 			display: flex;
 			align-items: center;
@@ -280,8 +283,8 @@ $currentLang = getUserLanguage();
 			gap: 4px;
 			flex: 0 0 auto;
 		}
-		/* Desktop shows every action as an icon; mobile falls back to the
-		   three-dot button opening the actions modal (see the media query). */
+		/* Desktop shows the frequent actions as icons next to the three-dot
+		   button; mobile keeps only the button (see the media query). */
 		.folder-inline-actions {
 			display: flex;
 			align-items: center;
@@ -303,57 +306,34 @@ $currentLang = getUserLanguage();
 			transition: background-color 0.15s ease, color 0.15s ease;
 		}
 		.folder-inline-action-btn,
+		.folder-list-menu-btn,
 		.folder-delete-btn {
 			display: inline-flex;
 		}
-		/* Replaced by the inline icons on desktop */
+		.folder-inline-action-btn,
 		.folder-list-menu-btn {
-			display: none;
 			color: var(--text-muted, #6b7280);
 		}
-		.folder-inline-action-btn {
-			color: var(--text-muted, #6b7280);
-		}
-		/* An action the folder cannot use stays visible, greyed out and inert.
-		   It keeps its pointer events so a click on it is swallowed by the
-		   disabled button instead of falling through to the row, which would
-		   open the kanban view the user never aimed at. */
-		.folder-inline-action-btn.is-placeholder {
-			opacity: 0.35;
-			cursor: default;
-		}
-		.folder-inline-action-btn.is-placeholder:hover {
-			background-color: transparent;
-		}
-		.folder-inline-action-btn:not(.is-placeholder):hover {
+		.folder-inline-action-btn:hover {
 			background-color: rgba(107, 114, 128, 0.12);
 			color: #007DB8;
 		}
-		/* Delete is the one destructive action, so it stays red */
-		.folder-inline-action-btn.danger {
-			color: #dc2626;
-		}
-		.folder-inline-action-btn.danger:hover {
-			background-color: rgba(220, 38, 38, 0.12);
-			color: #b91c1c;
+		/* A favorite or publicly shared folder: its star or share icon is lit */
+		.folder-inline-action-btn.is-active {
+			color: var(--pz-accent-text);
 		}
 		html[data-theme='dark'] .folder-inline-action-btn,
 		body.dark-mode .folder-inline-action-btn {
 			color: var(--pz-text-muted, #9ca3af);
 		}
+		html[data-theme='dark'] .folder-inline-action-btn.is-active,
+		body.dark-mode .folder-inline-action-btn.is-active {
+			color: var(--pz-accent-text);
+		}
 		html[data-theme='dark'] .folder-inline-action-btn:hover,
 		body.dark-mode .folder-inline-action-btn:hover {
 			background-color: rgba(255, 255, 255, 0.08);
 			color: #38bdf8;
-		}
-		html[data-theme='dark'] .folder-inline-action-btn.danger,
-		body.dark-mode .folder-inline-action-btn.danger {
-			color: #f87171;
-		}
-		html[data-theme='dark'] .folder-inline-action-btn.danger:hover,
-		body.dark-mode .folder-inline-action-btn.danger:hover {
-			background-color: rgba(248, 113, 113, 0.15);
-			color: #fca5a5;
 		}
 		/* css/dark-mode/icons.css greys every Lucide icon with an !important
 		   filter; the delete icon has to opt out to stay red */
@@ -364,7 +344,9 @@ $currentLang = getUserLanguage();
 		body.dark-mode .folder-actions-danger [class*="lucide-"] {
 			background-color: currentColor;
 		}
-		.folder-list-menu-btn:hover {
+		/* .open: its dropdown is showing */
+		.folder-list-menu-btn:hover,
+		.folder-list-menu-btn.open {
 			background-color: rgba(107, 114, 128, 0.12);
 			color: #007DB8;
 		}
@@ -372,6 +354,9 @@ $currentLang = getUserLanguage();
 		.folder-list-menu-btn i {
 			font-size: 14px;
 			line-height: 1;
+			/* css/dark-mode/icons.css gives every Lucide icon a colour of its
+			   own, which would beat the button colour set above */
+			color: inherit;
 			/* Lucide icons are CSS masks: the mask needs background-color too */
 			background-color: currentColor;
 		}
@@ -380,9 +365,26 @@ $currentLang = getUserLanguage();
 			color: var(--pz-text-muted, #9ca3af);
 		}
 		html[data-theme='dark'] .folder-list-menu-btn:hover,
-		body.dark-mode .folder-list-menu-btn:hover {
+		body.dark-mode .folder-list-menu-btn:hover,
+		html[data-theme='dark'] .folder-list-menu-btn.open,
+		body.dark-mode .folder-list-menu-btn.open {
 			background-color: rgba(255, 255, 255, 0.08);
 			color: #38bdf8;
+		}
+		/* Half the page width for the filter bar and the list alike: spanning
+		   the whole page left them mostly empty, the row icons far from the
+		   folder names. Mobile keeps the full width. */
+		@media (min-width: 801px) {
+			.shared-filter-bar,
+			#foldersList {
+				max-width: calc(min(var(--shared-content-max-width, 980px), 100%) / 2);
+			}
+			/* Rows edge to edge with the filter bar: the uneven side padding
+			   of css/shared/notes-list.css is laid out for the shared notes table */
+			#foldersList {
+				padding-left: 0;
+				padding-right: 0;
+			}
 		}
 		/* Nested folders: the row keeps a guide line at each depth level */
 		.folder-item[data-depth]:not([data-depth="0"]) .note-name-container::before {
@@ -482,17 +484,6 @@ $currentLang = getUserLanguage();
 			width: 100%;
 			margin: 0;
 		}
-		/* Light mode: red cancel button */
-		html:not([data-theme='dark']) body:not(.dark-mode) #folderActionsModal .modal-buttons .btn-cancel {
-			background-color: #dc2626;
-			border-color: #dc2626;
-			color: #ffffff;
-		}
-		html:not([data-theme='dark']) body:not(.dark-mode) #folderActionsModal .modal-buttons .btn-cancel:hover {
-			background-color: #b91c1c;
-			border-color: #b91c1c;
-			color: #ffffff;
-		}
 		html[data-theme='dark'] #folderActionsModal .folder-actions-modal-header,
 		body.dark-mode #folderActionsModal .folder-actions-modal-header,
 		html[data-theme='dark'] #folderActionsModal .modal-buttons,
@@ -508,13 +499,10 @@ $currentLang = getUserLanguage();
 
 		/* Mobile simplification: list style instead of cards */
 		@media (max-width: 768px) {
-			/* Too narrow for a row of icons: collapse them back into the
-			   three-dot button opening the actions modal */
+			/* Too narrow for a row of icons: every action goes through the
+			   three-dot button, which opens the actions modal here */
 			.folder-inline-actions {
 				display: none;
-			}
-			.folder-list-menu-btn {
-				display: inline-flex;
 			}
 			.shared-container {
 				padding: 10px !important;
@@ -523,9 +511,9 @@ $currentLang = getUserLanguage();
 				/* padding-left carries the per-row indentation of nested
 				   folders (set inline), so it is left out of the !important
 				   shorthand that would otherwise flatten the hierarchy */
-				padding-top: 8px !important;
+				padding-top: 6px !important;
 				padding-right: 15px !important;
-				padding-bottom: 8px !important;
+				padding-bottom: 6px !important;
 				box-shadow: none !important;
 				border-radius: 0 !important;
 				border: none !important;
@@ -538,8 +526,8 @@ $currentLang = getUserLanguage();
 				border-bottom-color: rgba(255, 255, 255, 0.1) !important;
 			}
 			.shared-folder-icon {
-				width: 32px !important;
-				height: 32px !important;
+				width: 28px !important;
+				height: 28px !important;
 				background: transparent !important;
 			}
 			.folder-name-text {
@@ -591,7 +579,34 @@ $currentLang = getUserLanguage();
 		</div>
 	</div>
 
-	<!-- Folder actions modal: opened by the three-dot button of each row.
+	<!-- Desktop dropdown of the three-dot button of each row: the actions that
+	     are not row icons. Shares the look of the index.php folder dropdown
+	     (css/folders/actions-menu.css); list_folders.js places it and carries
+	     the folder identity onto its items. -->
+	<div class="folder-actions-menu" id="folderRowActionsMenu">
+		<?php
+		foreach (folderListActions() as $action) {
+			if (!empty($action['inline'])) {
+				continue;
+			}
+			$classes = 'folder-actions-menu-item';
+			if (!empty($action['requires_notes'])) {
+				$classes .= ' requires-notes';
+			}
+			if (!empty($action['danger'])) {
+				// Set the destructive action apart from the rest
+				echo '<div class="folder-actions-menu-separator"></div>';
+				$classes .= ' danger';
+			}
+			echo '<div class="' . $classes . '" data-action="' . $action['action'] . '">';
+			echo '<i class="lucide ' . $action['icon'] . '"></i>';
+			echo '<span>' . $action['label'] . '</span>';
+			echo '</div>';
+		}
+		?>
+	</div>
+
+	<!-- Folder actions modal: opened by the three-dot button of each row on mobile.
 	     Holds the action items of the folder actions dropdown of index.php
 	     (rendered by renderFolderActionsMenu), minus the create entry and the
 	     ones needing the notes list DOM of index.php (open all in tabs, sort). -->
@@ -765,6 +780,10 @@ $currentLang = getUserLanguage();
 	<!-- Folder action implementations reused from index.php: share modal, icon
 	     picker and the modal confirm-button delegation. Load order follows
 	     index_js.php (the utils-*.js set before share.js/folder-icon.js). -->
+	<!-- share.js reads the public URL protocol from pwa-helpers.js: without
+	     it the share status lookup threw and an already shared folder was
+	     offered a new share -->
+	<script src="<?php echo poznoteAsset('js/pwa-helpers.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/share.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/color-palette.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/folder-icon.js'); ?>"></script>

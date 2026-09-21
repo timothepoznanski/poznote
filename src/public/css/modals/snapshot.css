@@ -638,7 +638,8 @@
         color: var(--pz-danger-text-hover) !important;
     }
 
-    #snapshotModal .snapshot-modal-actions .snapshot-take-btn i.lucide {
+    #snapshotModal .snapshot-modal-actions .snapshot-take-btn i.lucide,
+    #snapshotModal .snapshot-modal-actions .snapshot-close-btn i.lucide {
         color: var(--pz-text-muted) !important;
     }
 

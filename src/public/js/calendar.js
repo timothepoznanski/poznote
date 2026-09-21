@@ -575,7 +575,7 @@ class MiniCalendar {
                     <div class="modal-footer">
                         <button class="btn-open-all" data-action="open-all"${notes.length > 0 ? '' : ' hidden'}>${this.translations.modal.open_all}</button>
                         ${diaryBtnHtml}
-                        <button class="btn-close-red" data-action="close-modal">${this.translations.modal.close}</button>
+                        <button class="btn-close" data-action="close-modal">${this.translations.modal.close}</button>
                     </div>
                 </div>
             </div>

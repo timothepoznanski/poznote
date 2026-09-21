@@ -170,12 +170,12 @@ html[data-theme='dark'] .note-creation-loading-dialog {
 }
 
 .alert-modal-button.secondary {
-    background: var(--pz-danger);
+    background: var(--pz-neutral);
     color: var(--pz-text-inverse);
 }
 
 .alert-modal-button.secondary:hover {
-    background: var(--pz-danger-hover);
+    background: var(--pz-neutral-hover);
 }
 
 /* Destructive confirmation (confirmButtonClass: 'danger'): the confirm button
@@ -258,13 +258,13 @@ html[data-theme='dark'] .alert-modal-button.primary.danger:hover,
 
 html[data-theme='dark'] .alert-modal-button.secondary,
 .dark-mode .alert-modal-button.secondary {
-    background-color: var(--pz-danger-text-hover);
-    color: var(--pz-text-inverse);
+    background-color: var(--pz-border);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .alert-modal-button.secondary:hover,
 .dark-mode .alert-modal-button.secondary:hover {
-    background-color: var(--pz-danger-text-hover);
+    background-color: var(--pz-surface-sunken);
 }
 
 html[data-theme='dark'] .alert-modal.snapshot-restore-confirm .alert-modal-button.primary,
