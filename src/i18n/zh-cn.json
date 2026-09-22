@@ -2051,6 +2051,8 @@
     "list": "列表",
     "bullet_list": "无序列表",
     "numbered_list": "有序列表",
+    "lettered_list": "字母列表",
+    "roman_list": "罗马数字列表",
     "checklist": "清单",
     "done": "已完成",
     "image": "图片",
@@ -2149,7 +2151,9 @@
     "streaming_video_url_prompt": "请输入流媒体视频 URL（YouTube、Vimeo 等）：",
     "bilibili_help": "输入 Bilibili 视频页面 URL（例如 bilibili.com/video/BV...）",
     "bilibili_modal_title": "插入 Bilibili 视频",
-    "video_insert": "插入"
+    "video_insert": "插入",
+    "copy": "复制",
+    "cut": "剪切"
   },
   "api": {
     "settings": {

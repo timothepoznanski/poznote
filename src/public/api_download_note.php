@@ -229,6 +229,16 @@ const EXPORT_STYLES = '
     ol {
         list-style-type: decimal;
     }
+    @counter-style pz-lower-alpha-paren {
+        system: extends lower-alpha;
+        suffix: ") ";
+    }
+    ol[type="a"] {
+        list-style-type: pz-lower-alpha-paren;
+    }
+    ol[type="i"] {
+        list-style-type: lower-roman;
+    }
     a {
         color: #007bff;
         text-decoration: none;

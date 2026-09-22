@@ -646,6 +646,34 @@
     }
 
     /**
+     * Turn the selected lines into a blockquote or a callout (discussion #1465).
+     * `header` is the text after "> " on the first line, "[!Note] Note" for a
+     * callout, empty for a plain blockquote. The selection is widened to whole
+     * lines so a partial selection still quotes the paragraphs it touches.
+     */
+    function applyMarkdownCallout(header) {
+        var context = getCurrentMarkdownEditContext();
+        var editor = context.editor;
+        var offsets = context.offsets;
+        if (!editor || !offsets) return;
+
+        var fullText = getMarkdownEditorValue(editor);
+        var start = fullText.lastIndexOf('\n', offsets.start - 1) + 1;
+        var end = offsets.end;
+        // A selection ending at column 0 of the next line does not cover that line
+        if (end > offsets.start && fullText.charAt(end - 1) === '\n') end -= 1;
+        var lineEnd = fullText.indexOf('\n', end);
+        end = lineEnd === -1 ? fullText.length : lineEnd;
+
+        var quoted = fullText.slice(start, end).split('\n').map(function (line) {
+            return line ? '> ' + line : '>';
+        }).join('\n');
+        var replacement = (header ? '> ' + header + '\n' : '') + quoted;
+
+        replaceMarkdownRangeAndSelect(editor, start, end, replacement, start, start + replacement.length);
+    }
+
+    /**
      * Apply markdown link formatting
      */
     function applyMarkdownLink(url, text) {
@@ -1000,6 +1028,7 @@
     window.applyMarkdownUnderline = applyMarkdownUnderline;
     window.applyMarkdownInlineCode = applyMarkdownInlineCode;
     window.applyMarkdownCodeBlock = applyMarkdownCodeBlock;
+    window.applyMarkdownCallout = applyMarkdownCallout;
     window.applyMarkdownLink = applyMarkdownLink;
     window.applyMarkdownHeading = applyMarkdownHeading;
     window.applyMarkdownHeadingLevel = applyMarkdownHeadingLevel;

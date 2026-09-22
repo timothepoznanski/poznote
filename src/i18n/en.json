@@ -1559,6 +1559,8 @@
     "list": "List",
     "bullet_list": "Bullet list",
     "numbered_list": "Numbered list",
+    "lettered_list": "Lettered list",
+    "roman_list": "Roman numeral list",
     "checklist": "Checklist",
     "done": "Done",
     "image": "Image",
@@ -1656,7 +1658,9 @@
     "streaming_video_url_prompt": "Enter streaming video URL (YouTube, Vimeo, etc.):",
     "bilibili_help": "Enter the Bilibili video page URL (e.g., bilibili.com/video/BV...)",
     "bilibili_modal_title": "Insert Bilibili Video",
-    "video_insert": "Insert"
+    "video_insert": "Insert",
+    "copy": "Copy",
+    "cut": "Cut"
   },
   "api": {
     "settings": {

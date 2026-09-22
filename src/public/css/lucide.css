@@ -5118,3 +5118,39 @@
   background-color: currentColor;
   background-image: none;
 }
+
+/* Lettered and roman lists (#1429) - composed here, not Lucide icon names.
+   The three lines on the right are those of lucide-list-ordered (ISC,
+   v0.575.0), the marks on the left replace its 1 and 2, on the same 24x24
+   grid with the same stroke and round caps:
+
+     list-lettered  a  <circle cx="4.5" cy="7" r="2"/><path d="M6.5 5v4"/>
+                    b  <path d="M3 14v6"/><circle cx="5" cy="18" r="2"/>
+     list-roman     I  <path d="M3 4h3"/><path d="M4.5 4v5"/><path d="M3 9h3"/>
+                    II <path d="M2 15h6"/><path d="M3.5 15v5"/>
+                       <path d="M6.5 15v5"/><path d="M2 20h6"/>
+
+   tools/generate-lucide-icons.py cannot rebuild these two: edit the paths
+   above and re-encode. */
+
+.lucide-list-lettered {
+  -webkit-mask-image: url("data:image/svg+xml,%3C%21--%20lines%3A%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-list-lettered%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Cpath%20d%3D%27M11%205h10%27%20%2F%3E%20%3Cpath%20d%3D%27M11%2012h10%27%20%2F%3E%20%3Cpath%20d%3D%27M11%2019h10%27%20%2F%3E%20%3Ccircle%20cx%3D%274.5%27%20cy%3D%277%27%20r%3D%272%27%20%2F%3E%20%3Cpath%20d%3D%27M6.5%205v4%27%20%2F%3E%20%3Cpath%20d%3D%27M3%2014v6%27%20%2F%3E%20%3Ccircle%20cx%3D%275%27%20cy%3D%2718%27%20r%3D%272%27%20%2F%3E%20%3C%2Fsvg%3E");
+  mask-image: url("data:image/svg+xml,%3C%21--%20lines%3A%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-list-lettered%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Cpath%20d%3D%27M11%205h10%27%20%2F%3E%20%3Cpath%20d%3D%27M11%2012h10%27%20%2F%3E%20%3Cpath%20d%3D%27M11%2019h10%27%20%2F%3E%20%3Ccircle%20cx%3D%274.5%27%20cy%3D%277%27%20r%3D%272%27%20%2F%3E%20%3Cpath%20d%3D%27M6.5%205v4%27%20%2F%3E%20%3Cpath%20d%3D%27M3%2014v6%27%20%2F%3E%20%3Ccircle%20cx%3D%275%27%20cy%3D%2718%27%20r%3D%272%27%20%2F%3E%20%3C%2Fsvg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  background-color: currentColor;
+  background-image: none;
+}
+
+.lucide-list-roman {
+  -webkit-mask-image: url("data:image/svg+xml,%3C%21--%20lines%3A%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-list-roman%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Cpath%20d%3D%27M11%205h10%27%20%2F%3E%20%3Cpath%20d%3D%27M11%2012h10%27%20%2F%3E%20%3Cpath%20d%3D%27M11%2019h10%27%20%2F%3E%20%3Cpath%20d%3D%27M3%204h3%27%20%2F%3E%20%3Cpath%20d%3D%27M4.5%204v5%27%20%2F%3E%20%3Cpath%20d%3D%27M3%209h3%27%20%2F%3E%20%3Cpath%20d%3D%27M2%2015h6%27%20%2F%3E%20%3Cpath%20d%3D%27M3.5%2015v5%27%20%2F%3E%20%3Cpath%20d%3D%27M6.5%2015v5%27%20%2F%3E%20%3Cpath%20d%3D%27M2%2020h6%27%20%2F%3E%20%3C%2Fsvg%3E");
+  mask-image: url("data:image/svg+xml,%3C%21--%20lines%3A%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-list-roman%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Cpath%20d%3D%27M11%205h10%27%20%2F%3E%20%3Cpath%20d%3D%27M11%2012h10%27%20%2F%3E%20%3Cpath%20d%3D%27M11%2019h10%27%20%2F%3E%20%3Cpath%20d%3D%27M3%204h3%27%20%2F%3E%20%3Cpath%20d%3D%27M4.5%204v5%27%20%2F%3E%20%3Cpath%20d%3D%27M3%209h3%27%20%2F%3E%20%3Cpath%20d%3D%27M2%2015h6%27%20%2F%3E%20%3Cpath%20d%3D%27M3.5%2015v5%27%20%2F%3E%20%3Cpath%20d%3D%27M6.5%2015v5%27%20%2F%3E%20%3Cpath%20d%3D%27M2%2020h6%27%20%2F%3E%20%3C%2Fsvg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  background-color: currentColor;
+  background-image: none;
+}

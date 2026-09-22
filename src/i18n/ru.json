@@ -1559,6 +1559,8 @@
     "list": "Список",
     "bullet_list": "Маркированный список",
     "numbered_list": "Нумерованный список",
+    "lettered_list": "Буквенный список",
+    "roman_list": "Список с римскими цифрами",
     "checklist": "Чек-лист",
     "done": "Готово",
     "image": "Изображение",
@@ -1656,7 +1658,9 @@
     "streaming_video_url_prompt": "Введите URL потокового видео (YouTube, Vimeo и т. д.):",
     "bilibili_help": "Введите URL страницы видео Bilibili (например, bilibili.com/video/BV...)",
     "bilibili_modal_title": "Вставить видео Bilibili",
-    "video_insert": "Вставить"
+    "video_insert": "Вставить",
+    "copy": "Копировать",
+    "cut": "Вырезать"
   },
   "api": {
     "settings": {

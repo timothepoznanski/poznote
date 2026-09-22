@@ -244,6 +244,7 @@ function sanitizeHtml($html) {
         'img' => ['src', 'alt', 'title', 'width', 'height', 'data-is-excalidraw', 'data-excalidraw-note-id'],
         'td' => ['colspan', 'rowspan'],
         'th' => ['colspan', 'rowspan', 'scope'],
+        'ol' => ['type'], // Lettered / roman list markers (#1429)
         'div' => ['class', 'data-tasklist-json', 'data-markdown-content', 'data-excalidraw', 'data-diagram-id', 'data-task-embed', 'contenteditable'],
         'span' => ['class'],
         'input' => ['type', 'checked', 'disabled'],
@@ -431,6 +432,11 @@ function sanitizeHtml($html) {
                         $attributesToRemove[] = $attrName;
                     }
                 }
+            }
+
+            // A list marker type is one of the five HTML values
+            if ($attrName === 'type' && $tagName === 'ol' && !preg_match('/^[1aAiI]$/', $attrValue)) {
+                $attributesToRemove[] = $attrName;
             }
         }
         

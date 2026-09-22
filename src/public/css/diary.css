@@ -549,6 +549,34 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
     margin: 0.2em 0;
 }
 
+/* Lettered a) and roman i. lists, laid out as in the editor: the marker in a
+   left-aligned column hanging in the padding (checklists.css, #1429) */
+.diary-journal-body ol:is([type="a"], [type="i"]) {
+    list-style: none;
+    counter-reset: pz-list;
+    padding-left: 2em;
+}
+
+.diary-journal-body ol:is([type="a"], [type="i"])>li {
+    counter-increment: pz-list;
+}
+
+.diary-journal-body ol:is([type="a"], [type="i"])>li::before {
+    display: inline-block;
+    box-sizing: border-box;
+    min-width: 2em;
+    margin-left: -2em;
+    padding-right: 0.25em;
+}
+
+.diary-journal-body ol[type="a"]>li::before {
+    content: counter(pz-list, lower-alpha) ")";
+}
+
+.diary-journal-body ol[type="i"]>li::before {
+    content: counter(pz-list, lower-roman) ".";
+}
+
 .diary-journal-body :is(ul.task-list, ul.diary-journal-tasks) {
     list-style: none;
     padding-left: 0;

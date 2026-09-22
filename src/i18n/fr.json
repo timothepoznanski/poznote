@@ -2060,6 +2060,8 @@
     "list": "Liste",
     "bullet_list": "Liste à puces",
     "numbered_list": "Liste numérotée",
+    "lettered_list": "Liste alphabétique",
+    "roman_list": "Liste en chiffres romains",
     "checklist": "Cases à cocher",
     "done": "Fait",
     "image": "Image",
@@ -2157,7 +2159,9 @@
     "streaming_video_url_prompt": "Saisissez l'URL de la vidéo en streaming (YouTube, Vimeo, etc.) :",
     "bilibili_help": "Saisissez l'URL de la page vidéo Bilibili (par ex. bilibili.com/video/BV...)",
     "bilibili_modal_title": "Insérer une vidéo Bilibili",
-    "video_insert": "Insérer"
+    "video_insert": "Insérer",
+    "copy": "Copier",
+    "cut": "Couper"
   },
   "api": {
     "settings": {

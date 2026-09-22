@@ -213,6 +213,7 @@ function sanitizePublicNoteHtml(string $content): string {
         'source' => ['src', 'srcset', 'type', 'media'],
         'td' => ['colspan', 'rowspan'],
         'th' => ['colspan', 'rowspan', 'scope'],
+        'ol' => ['type'],
         'col' => ['span'],
         'colgroup' => ['span'],
         'input' => ['type', 'checked', 'disabled', 'readonly', 'value', 'placeholder'],
@@ -308,6 +309,11 @@ function sanitizePublicNoteHtml(string $content): string {
                 }
             } elseif ($name === 'style') {
                 if (preg_match('/expression\s*\(|javascript\s*:|vbscript\s*:/i', $attr->value)) {
+                    $el->removeAttribute($attr->name);
+                }
+            } elseif ($name === 'type' && $tag === 'ol') {
+                // A list marker type is one of the five HTML values
+                if (preg_match('/^[1aAiI]$/', $attr->value) !== 1) {
                     $el->removeAttribute($attr->name);
                 }
             }
