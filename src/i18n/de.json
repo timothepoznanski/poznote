@@ -494,7 +494,6 @@
       "main_font": "Wählen Sie die Schriftart für die gesamte Anwendung.",
       "markdown_font": "Wählen Sie die Schriftart für den Markdown-Editor.",
       "markdown_default_view_mode": "Festlegen, ob Markdown-Notizen in der Vorschau, im Bearbeitungsmodus oder geteilt geöffnet werden.",
-      "markdown_remember_view_mode": "Den Ansichtsmodus jeder Markdown-Notiz merken: Eine Notiz, die geteilt, in den Bearbeitungsmodus oder in die Vorschau geschaltet wird, öffnet sich wieder in diesem Modus statt in der Standardansicht. Wird in diesem Browser gespeichert.",
       "font_size": "Passen Sie die Schriftgröße von Notizen, Seitenleiste, Codeblöcken und der Einstellungsseite an.",
       "index_icon_scale": "Passen Sie die Größe der Symbole in der Notizenliste an.",
       "timezone": "Legen Sie die Zeitzone für die Anzeige von Datum und Uhrzeit fest.",
@@ -809,7 +808,6 @@
       "main_font": "App-Schriftart",
       "markdown_font": "Markdown-Editor-Schriftart",
       "markdown_default_view_mode": "Standardansicht",
-      "markdown_remember_view_mode": "Modus pro Notiz merken",
       "login_display": "Login-Seiten-Titel",
       "note_font_size": "Schriftgröße",
       "note_age_filter": "Altersfilter",
@@ -1705,7 +1703,7 @@
         "split_short": "Geteilt",
         "last": "Zuletzt verwendeter Modus"
       },
-      "hint": "Eine Notiz, die in einen anderen Modus geschaltet wird, öffnet sich beim nächsten Mal wieder im Standardmodus, sofern „Modus pro Notiz merken“ nicht aktiviert ist. Neue Notizen öffnen sich immer geteilt."
+      "hint": "Eine Notiz, die in einen anderen Modus geschaltet wird, öffnet sich beim nächsten Mal wieder im Standardmodus. Neue Notizen öffnen sich immer geteilt."
     },
     "diary_date_format": {
       "title": "Datumsformat der Tagebucheinträge",

@@ -494,7 +494,6 @@
       "main_font": "Escolha a fonte usada em todo o aplicativo.",
       "markdown_font": "Escolha a fonte usada no editor markdown.",
       "markdown_default_view_mode": "Escolha se as notas markdown abrem em pré-visualização, edição ou vista dividida.",
-      "markdown_remember_view_mode": "Lembrar o modo de abertura de cada nota markdown: uma nota que você mudar para vista dividida, edição ou pré-visualização abre novamente nesse modo, em vez do modo padrão. Guardado neste navegador.",
       "font_size": "Ajuste o tamanho da fonte das notas, da barra lateral, dos blocos de código e da página de configurações.",
       "index_icon_scale": "Ajuste o tamanho dos ícones na lista de notas.",
       "timezone": "Defina o fuso horário usado para exibir datas e horas.",
@@ -809,7 +808,6 @@
       "main_font": "Fonte do aplicativo",
       "markdown_font": "Fonte do editor markdown",
       "markdown_default_view_mode": "Modo de abertura",
-      "markdown_remember_view_mode": "Lembrar o modo por nota",
       "login_display": "Título da Página de Login",
       "note_font_size": "Tamanho da Fonte",
       "note_age_filter": "Filtro de antiguidade",
@@ -1705,7 +1703,7 @@
         "split_short": "Vista dividida",
         "last": "Último modo usado"
       },
-      "hint": "Uma nota que você mudar para outro modo abre novamente no modo padrão, a menos que «Lembrar o modo por nota» esteja ativado. Notas novas sempre abrem em vista dividida."
+      "hint": "Uma nota que você mudar para outro modo abre novamente no modo padrão. Notas novas sempre abrem em vista dividida."
     },
     "diary_date_format": {
       "title": "Formato de data das entradas do diário",

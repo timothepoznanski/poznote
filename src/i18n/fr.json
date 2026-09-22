@@ -493,7 +493,6 @@
       "main_font": "Choisissez la police utilisée dans toute l'application.",
       "markdown_font": "Choisissez la police utilisée dans l'éditeur markdown.",
       "markdown_default_view_mode": "Choisir si les notes markdown s'ouvrent en aperçu, en édition ou en vue partagée.",
-      "markdown_remember_view_mode": "Mémoriser le mode d'ouverture de chaque note markdown : une note passée en vue partagée, en édition ou en aperçu se rouvre dans ce mode, au lieu du mode par défaut. Mémorisé dans ce navigateur.",
       "font_size": "Ajustez la taille de police des notes, de la barre latérale, des blocs de code et de la page des paramètres.",
       "index_icon_scale": "Ajustez la taille des icônes dans la liste des notes.",
       "timezone": "Définissez le fuseau horaire utilisé pour afficher les dates et heures.",
@@ -809,7 +808,6 @@
       "main_font": "Police de l'application",
       "markdown_font": "Police de l'éditeur markdown",
       "markdown_default_view_mode": "Mode d'ouverture",
-      "markdown_remember_view_mode": "Mémoriser le mode par note",
       "login_display": "Titre page de connexion",
       "note_font_size": "Taille de police",
       "note_age_filter": "Filtre d’ancienneté",
@@ -1711,7 +1709,7 @@
         "split_short": "Vue partagée",
         "last": "Dernier mode utilisé"
       },
-      "hint": "Une note passée dans un autre mode se rouvre ensuite dans le mode par défaut, sauf si « Mémoriser le mode par note » est activé. Les nouvelles notes s'ouvrent toujours en vue partagée."
+      "hint": "Une note passée dans un autre mode se rouvre ensuite dans le mode par défaut. Les nouvelles notes s'ouvrent toujours en vue partagée."
     },
     "diary_date_format": {
       "title": "Format de date des entrées de journal",

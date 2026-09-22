@@ -113,7 +113,6 @@ $settingsPageUserKeys = [
     'folder_tree_dim_level',
     'notes_without_folders_after_folders',
     'markdown_split_card_view',
-    'markdown_remember_view_mode_per_note',
     'markdown_colored',
     'markdown_colored_custom',
     'code_block_word_wrap',
@@ -848,16 +847,6 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.markdown_default_view_mode', [], 'Default view mode'); ?></span>
                     <span id="markdown-default-view-mode-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                </div>
-            </div>
-
-            <!-- Remember the mode each note was switched to -->
-            <div class="home-card" id="markdown-remember-view-mode-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_remember_view_mode', [], 'Remember the view mode of each markdown note: a note you switch to split, edit or preview opens again in that mode, instead of the default view mode. Stored in this browser.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-history"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_remember_view_mode', [], 'Remember view mode per note'); ?></span>
-                    <span id="markdown-remember-view-mode-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
 

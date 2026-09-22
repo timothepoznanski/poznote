@@ -239,10 +239,6 @@ class SettingsController {
             return $normalized;
         }
 
-        if ($key === 'markdown_remember_view_mode_per_note') {
-            return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
-        }
-
         if ($key === 'slash_menu_require_alt') {
             return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
         }

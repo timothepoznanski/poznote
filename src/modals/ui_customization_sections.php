@@ -55,7 +55,6 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:language-card" checked><span><?php echo t_h('settings.language.label', [], 'Language'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:main-font-card" checked><span><?php echo t_h('display.cards.main_font', [], 'App font'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-default-view-mode-card" checked><span><?php echo t_h('display.cards.markdown_default_view_mode', [], 'Default view mode'); ?></span></label>
-        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-remember-view-mode-card" checked><span><?php echo t_h('display.cards.markdown_remember_view_mode', [], 'Remember view mode per note'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-font-card" checked><span><?php echo t_h('display.cards.markdown_font', [], 'Markdown editor font'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:font-size-card" checked><span><?php echo t_h('display.cards.note_font_size', [], 'Font size'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:index-icon-scale-card" checked><span><?php echo t_h('display.cards.index_icon_scale', [], 'Index icon scaling'); ?></span></label>

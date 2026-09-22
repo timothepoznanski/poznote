@@ -275,12 +275,11 @@ $settings = [
     'spellcheck_html_notes' => '0',
     'highlight_current_folder_tree' => '0',
     'folder_tree_dim_level' => '',
-    'markdown_default_view_mode' => 'preview',
-    'markdown_remember_view_mode_per_note' => '0'
+    'markdown_default_view_mode' => 'preview'
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level', 'markdown_default_view_mode', 'markdown_remember_view_mode_per_note')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level', 'markdown_default_view_mode')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -467,10 +466,6 @@ $markdown_default_view_mode = trim((string)$settings['markdown_default_view_mode
 if (!in_array($markdown_default_view_mode, ['preview', 'edit', 'split', 'last'], true)) {
     $markdown_default_view_mode = 'preview';
 }
-// With this on, a note switched to another mode by hand opens in that mode
-// next time, instead of following the default above. The modes are kept in
-// the browser (localStorage), see js/markdown-view-modes.js.
-$markdown_remember_view_mode = poznoteSettingEnabled($settings['markdown_remember_view_mode_per_note'], false) ? '1' : '0';
 // Colored markdown ('0' = off, 'custom' = per-element colors chosen by the
 // user): body class + --mdc-* colours, lib/markdown-colored.php (diary.php
 // builds its <body> the same way for the journal view)
@@ -510,7 +505,7 @@ $body_classes = trim($extra_body_classes);
 $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
 ?>
 
-<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?><?php echo $body_inline_style ? ' style="' . htmlspecialchars($body_inline_style, ENT_QUOTES) . '"' : ''; ?> data-workspace="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>" data-markdown-default-mode="<?php echo htmlspecialchars($markdown_default_view_mode, ENT_QUOTES); ?>" data-markdown-remember-mode="<?php echo $markdown_remember_view_mode; ?>">
+<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?><?php echo $body_inline_style ? ' style="' . htmlspecialchars($body_inline_style, ENT_QUOTES) . '"' : ''; ?> data-workspace="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>" data-markdown-default-mode="<?php echo htmlspecialchars($markdown_default_view_mode, ENT_QUOTES); ?>">
     <script>
     (function () {
         try {
