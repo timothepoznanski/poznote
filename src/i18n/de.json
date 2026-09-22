@@ -2151,7 +2151,9 @@
     "streaming_video_url_prompt": "Geben Sie die URL des Streaming-Videos ein (YouTube, Vimeo usw.):",
     "bilibili_help": "Geben Sie die URL der Bilibili-Videoseite ein (z. B. bilibili.com/video/BV...)",
     "bilibili_modal_title": "Bilibili-Video einfügen",
-    "video_insert": "Einfügen"
+    "video_insert": "Einfügen",
+    "copy": "Kopieren",
+    "cut": "Ausschneiden"
   },
   "api": {
     "settings": {

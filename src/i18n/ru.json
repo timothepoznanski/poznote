@@ -1656,7 +1656,9 @@
     "streaming_video_url_prompt": "Введите URL потокового видео (YouTube, Vimeo и т. д.):",
     "bilibili_help": "Введите URL страницы видео Bilibili (например, bilibili.com/video/BV...)",
     "bilibili_modal_title": "Вставить видео Bilibili",
-    "video_insert": "Вставить"
+    "video_insert": "Вставить",
+    "copy": "Копировать",
+    "cut": "Вырезать"
   },
   "api": {
     "settings": {

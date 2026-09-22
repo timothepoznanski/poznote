@@ -1044,13 +1044,9 @@
         }
     }
 
-    // Insert a callout block (note, warning, info, etc.)
-    function insertCallout(type) {
-        const selection = window.getSelection();
-        if (!selection.rangeCount) return;
-
-        const range = selection.getRangeAt(0);
-
+    // Build an empty callout (aside.callout with title + body) or a plain
+    // blockquote. The body holds a zero-width space so the caret can land in it.
+    function buildCalloutElement(type) {
         let element;
 
         if (!type || type === 'plain') {
@@ -1094,13 +1090,29 @@
             element.appendChild(bodyDiv);
         }
 
+        return element;
+    }
+
+    // Where typed content goes: the body of a callout, the blockquote itself
+    function getCalloutBody(element) {
+        return element.querySelector('.callout-body') || element;
+    }
+
+    // Insert a callout block (note, warning, info, etc.)
+    function insertCallout(type) {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+        const element = buildCalloutElement(type);
+
         // Insert at cursor position
         range.deleteContents();
         range.insertNode(element);
 
         // Prepare the desired selection inside the element but don't apply it yet
         const newRange = document.createRange();
-        const targetNode = type && type !== 'plain' ? element.querySelector('.callout-body') : element;
+        const targetNode = getCalloutBody(element);
         const textNode = targetNode.firstChild || targetNode;
 
         if (textNode.nodeType === 3) {
@@ -1127,6 +1139,77 @@
             sel.removeAllRanges();
             sel.addRange(newRange);
         }
+    }
+
+    // Move the selected blocks of an HTML note into a callout (discussion
+    // #1465). Like the markdown version the selection is widened to whole
+    // blocks: the siblings of the nearest block container (the note itself,
+    // a list item, a table cell, another callout body) that the selection
+    // touches, so a partial selection still wraps the paragraphs it spans.
+    function wrapHtmlSelectionInCallout(type) {
+        const selection = window.getSelection();
+        if (!selection || !selection.rangeCount || selection.isCollapsed) return;
+
+        const range = selection.getRangeAt(0);
+        let common = range.commonAncestorContainer;
+        if (common.nodeType === 3) common = common.parentNode;
+        const editable = common.closest ? common.closest('[contenteditable="true"]') : null;
+        const noteEntry = editable ? editable.closest('.noteentry') : null;
+        if (!noteEntry) return;
+
+        const container = common.closest('.callout-body, blockquote, li, td, th, .toggle-content, [contenteditable="true"]');
+        if (!container || !editable.contains(container)) return;
+
+        // The direct child of `container` holding a range boundary
+        const childAt = function (node, offset) {
+            if (node === container) {
+                return node.childNodes[Math.min(offset, node.childNodes.length - 1)] || null;
+            }
+            while (node && node.parentNode !== container) node = node.parentNode;
+            return node;
+        };
+        const first = childAt(range.startContainer, range.startOffset);
+        let last = childAt(range.endContainer, range.endOffset);
+        if (!first || !last) return;
+
+        // A triple-click or a drag past a line end parks the selection end at
+        // the very start of the next block: nothing of it is selected
+        if (last !== first && range.endContainer !== container) {
+            const head = document.createRange();
+            head.selectNodeContents(last);
+            head.setEnd(range.endContainer, range.endOffset);
+            if (head.toString() === '' && last.previousSibling) last = last.previousSibling;
+        }
+
+        const moved = [];
+        for (let node = first; node; node = node.nextSibling) {
+            moved.push(node);
+            if (node === last) break;
+        }
+        if (!moved.length || moved[moved.length - 1] !== last) return;
+
+        // Inline content sitting directly in the container ends with a <br>:
+        // the callout is a block of its own, that break would add a blank line
+        const lastMoved = moved[moved.length - 1];
+        const isBlock = lastMoved.nodeType === 1 && /^(DIV|P|H[1-6]|UL|OL|BLOCKQUOTE|PRE|TABLE|ASIDE|DETAILS)$/.test(lastMoved.tagName);
+        const trailingBreak = !isBlock && lastMoved.nextSibling && lastMoved.nextSibling.nodeName === 'BR'
+            ? lastMoved.nextSibling
+            : null;
+
+        const element = buildCalloutElement(type);
+        const body = getCalloutBody(element);
+        body.textContent = '';
+        container.insertBefore(element, first);
+        moved.forEach(function (node) { body.appendChild(node); });
+        if (trailingBreak) trailingBreak.remove();
+
+        const newRange = document.createRange();
+        newRange.selectNodeContents(body);
+        newRange.collapse(false);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+
+        noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
     // Insert a toggle element (collapsible/expandable block)
@@ -3138,6 +3221,32 @@
             ])
         };
 
+        // Wraps the selected lines / blocks instead of inserting an empty callout
+        const quote = {
+            id: 'quote',
+            icon: 'lucide-info-circle',
+            label: t('slash_menu.quote', null, 'Quote'),
+            submenu: CALLOUT_TYPES.map(function (c) {
+                const label = t(c.labelKey, null, c.fallback);
+                return {
+                    id: c.id,
+                    icon: c.icon,
+                    iconColor: c.iconColor,
+                    label: label,
+                    action: function () {
+                        if (isMarkdown) {
+                            // The bracket keyword stays English for the parser, the title is translated
+                            if (typeof window.applyMarkdownCallout === 'function') {
+                                window.applyMarkdownCallout(c.id === 'plain' ? '' : '[!' + c.fallback + '] ' + label);
+                            }
+                        } else {
+                            wrapHtmlSelectionInCallout(c.id);
+                        }
+                    }
+                };
+            })
+        };
+
         const format = isMarkdown
             ? [pick('format', 'bold'), pick('format', 'italic'), pick('format', 'strikethrough')]
             : [
@@ -3218,7 +3327,26 @@
                     }
                 ]
             },
+            quote,
             pick('link-menu', 'link'),
+            // The menu replaces the browser one on a right-click, so it has to
+            // cover the clipboard. execCommand works on the restored selection
+            // in both editors: CodeMirror handles the cut event itself.
+            {
+                id: 'copy',
+                icon: 'lucide-copy',
+                label: t('slash_menu.copy', null, 'Copy'),
+                action: () => document.execCommand('copy')
+            },
+            {
+                id: 'cut',
+                icon: 'lucide-scissors',
+                label: t('slash_menu.cut', null, 'Cut'),
+                action: function () {
+                    document.execCommand('cut');
+                    if (!isMarkdown && savedNoteEntry) savedNoteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            },
             common.cancel
         ]);
     }
@@ -3262,8 +3390,9 @@
 
     // Open the menu on a non-empty selection in a note instead of letting the
     // "/" replace it (issue #1410). Returns true when the menu opened, the
-    // caller then cancels the keystroke.
-    function showSlashMenuForSelection(target) {
+    // caller then cancels the keystroke. `anchorRect` overrides where the menu
+    // opens (the pointer for a right-click), the selection end otherwise.
+    function showSlashMenuForSelection(target, anchorRect) {
         if (!target || !target.closest || slashMenuElement) return false;
 
         let context = null;
@@ -3308,7 +3437,7 @@
         slashMenuElement.innerHTML = buildMenuHTML();
 
         document.body.appendChild(slashMenuElement);
-        positionMenuAtRect(getSelectionSlashAnchorRect(context));
+        positionMenuAtRect(anchorRect || getSelectionSlashAnchorRect(context));
 
         requestAnimationFrame(() => {
             if (slashMenuElement) slashMenuElement.classList.add('show');
@@ -5043,6 +5172,20 @@
         if (showSlashMenuForSelection(e.target)) e.preventDefault();
     }
 
+    // Right-click on selected text opens the same formatting menu at the
+    // pointer (discussion #1465), with Copy and Cut so the browser menu is
+    // not missed. Without a selection the browser menu stays: it carries
+    // Paste and the spellcheck suggestions. Desktop only, a long press on a
+    // phone selects a word and shows the native selection toolbar. The
+    // attachment menu runs first and takes the event when it opens.
+    function handleSelectionContextMenu(e) {
+        if (e.defaultPrevented || slashMenuElement) return;
+        if (window.matchMedia && window.matchMedia('(max-width: 800px)').matches) return;
+
+        const pointer = { left: e.clientX, right: e.clientX, top: e.clientY, bottom: e.clientY, width: 0, height: 0 };
+        if (showSlashMenuForSelection(e.target, pointer)) e.preventDefault();
+    }
+
     // Handle click outside menu (close)
     function handleClickOutside(e) {
         if (!slashMenuElement) return;
@@ -5068,6 +5211,7 @@
         }
         document.addEventListener('keydown', handleSelectionSlashKeydown, true);
         document.addEventListener('beforeinput', handleSelectionSlashBeforeInput, true);
+        document.addEventListener('contextmenu', handleSelectionContextMenu);
         document.addEventListener('keydown', handleAltSlashShortcut, true);
         document.addEventListener('keydown', handleKeydown, true);
         document.addEventListener('mousedown', handleClickOutside, true);
