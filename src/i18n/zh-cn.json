@@ -493,6 +493,7 @@
       "main_font": "选择整个应用使用的字体。",
       "markdown_font": "选择 Markdown 编辑器使用的字体。",
       "markdown_default_view_mode": "选择 Markdown 笔记以预览、编辑还是分栏模式打开。",
+      "markdown_remember_view_mode": "记住每条 Markdown 笔记的打开模式：切换到分栏、编辑或预览的笔记会再次以该模式打开，而不是默认模式。保存在此浏览器中。",
       "font_size": "调整笔记、侧边栏、代码块和设置页面的字体大小。",
       "index_icon_scale": "调整笔记列表中图标的大小。",
       "timezone": "设置用于显示日期和时间的时区。",
@@ -807,6 +808,7 @@
       "main_font": "应用字体",
       "markdown_font": "Markdown 编辑器字体",
       "markdown_default_view_mode": "默认打开模式",
+      "markdown_remember_view_mode": "记住每条笔记的模式",
       "login_display": "登录页面标题",
       "note_font_size": "字体大小",
       "note_age_filter": "笔记时间筛选",
@@ -1214,7 +1216,9 @@
     "empty": {
       "no_tags": "无标签"
     },
-    "errors": [],
+    "errors": {
+      "load_failed": "无法加载笔记信息。"
+    },
     "users": {
       "user_id": "用户 #{{id}}",
       "deleted": "用户 #{{id}}"
@@ -1360,7 +1364,7 @@
       "theme_toggle": "主题切换",
       "panel_title": "自定义此页面",
       "panel_button": "自定义界面",
-      "panel_hint": "仅列出此页面的元素。更改会立即生效并自动保存。",
+      "panel_hint": "仅列出此页面的元素。在下方勾选或取消勾选即可显示或隐藏任意元素。",
       "panel_all_options": "所有选项",
       "panel_saving": "正在保存…",
       "panel_saved": "已保存",
@@ -1693,7 +1697,7 @@
         "split_short": "分栏",
         "last": "上次使用的模式"
       },
-      "hint": "切换到其他模式的笔记，下次打开时会恢复为默认模式。新笔记始终以分栏模式打开。"
+      "hint": "切换到其他模式的笔记，下次打开时会恢复为默认模式，除非启用了「记住每条笔记的模式」。新笔记始终以分栏模式打开。"
     },
     "diary_date_format": {
       "title": "日记条目日期格式",
@@ -2205,6 +2209,8 @@
       "note_width": "笔记宽度",
       "note_width_current": "笔记宽度：{{width}}",
       "note_width_default": "默认（{{width}}）",
+      "split_width": "分屏视图宽度",
+      "split_resize": "拖动以调整分栏宽度",
       "convert_to_markdown": "转换为 Markdown",
       "share_note": "共享笔记"
     },
@@ -4982,7 +4988,8 @@
     "default": "默认"
   },
   "page_menu": {
-    "button": "更多选项"
+    "button": "更多选项",
+    "split_view": "分屏视图"
   },
   "keyboard_shortcuts": {
     "menu_item": "键盘快捷键",
@@ -5033,7 +5040,8 @@
     },
     "tree_select_toggle": "将笔记或文件夹加入选择，或从选择中移除",
     "tree_select_range": "选择到此行为止的所有行",
-    "tree_delete": "将所选笔记和文件夹移到回收站"
+    "tree_delete": "将所选笔记和文件夹移到回收站",
+    "focus_mode": "开启或关闭专注模式"
   },
   "icon_context_menu": {
     "hide": "隐藏按钮"
@@ -5067,5 +5075,8 @@
     "indent": "增加缩进",
     "outdent": "减少缩进",
     "hide_keyboard": "隐藏键盘"
+  },
+  "focus_mode": {
+    "button": "专注模式"
   }
 }

@@ -44,7 +44,6 @@
     .note-edit-toolbar .btn-create-linked-note,
     .note-edit-toolbar .btn-download,
     .note-edit-toolbar .btn-convert,
-    .note-edit-toolbar .btn-info,
     .note-edit-toolbar .btn-open-new-tab {
         display: none !important;
     }

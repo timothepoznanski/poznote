@@ -321,8 +321,104 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     transform: rotate(180deg);
 }
 
+/* Focus mode, second step (discussion #1482, js/icon-sidebar-toggle.js): the
+   rail leaves the layout and waits just past the left edge of the viewport,
+   pinned. Hover the edge (#focusModeEdgeZone) and it slides in over the page as
+   a flyout (html.focus-mode-peek); leave it and it slides out again. The
+   collapsed rail joins the flyout too: focus mode owns the chrome while it is
+   on, the collapsed state is kept for when it is turned off. The first step
+   (html.focus-mode alone) leaves the rail where it is and only clears the top
+   of the note, see css/focus-mode.css. Desktop only, mirroring
+   css/index-mobile.css: a phone has no rail to hide.
+
+   The flyout sits over the page's own sticky and floating chrome (the tab
+   bar is a flex item at 1000, the dashboard top bar 100) and under the
+   menus and modals (9999 and up), the rail's overflow menu among them. */
+#focusModeEdgeZone {
+    display: none;
+}
+
+@media (min-width: 801px) {
+    html.focus-mode-full body #icon_sidebar {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1500;
+        transform: translateX(-100%);
+        visibility: hidden;
+        box-shadow: 4px 0 16px rgba(var(--pz-shadow-rgb), 0.12);
+        transition: transform 0.2s ease, visibility 0s linear 0.2s;
+    }
+
+    html.focus-mode-full.focus-mode-peek body #icon_sidebar {
+        transform: none;
+        visibility: visible;
+        transition: transform 0.2s ease, visibility 0s;
+    }
+
+    /* Replaced by the hot zone: the rail is never collapsed in focus mode */
+    html.focus-mode-full #iconSidebarToggle {
+        display: none;
+    }
+
+    html.focus-mode-full #focusModeEdgeZone {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 6px;
+        height: 100vh;
+        z-index: 1499;
+    }
+
+    /* The handle: the visible half of that strip, a tab on the edge of the
+       page shaped like the sidebar and outline toggles it stands in for
+       (.toggle-sidebar-btn in css/layout.css, .toggle-outline-btn in
+       css/outline.css), mirrored to open towards the right. Hovering it opens
+       the flyout, like hovering anywhere else on the strip: it overflows the
+       strip's 6px but is a child of it, so it is part of the same hover
+       target. It steps out of the way while the flyout is over it. */
+    html.focus-mode-full .focus-mode-edge-handle {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--pz-sidebar-surface);
+        border: 1px solid var(--pz-border-strong);
+        border-left: none;
+        border-radius: 0 var(--pz-radius-sm) var(--pz-radius-sm) 0;
+        color: var(--pz-text-muted);
+        box-shadow: 0 2px 4px rgba(var(--pz-shadow-rgb), 0.05);
+        cursor: pointer;
+        transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+
+    html.focus-mode-full #focusModeEdgeZone:hover .focus-mode-edge-handle {
+        background: var(--pz-surface);
+        color: var(--pz-accent-text);
+        box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.1);
+    }
+
+    /* Lucide icons are masks: they take their colour from background-color */
+    html.focus-mode-full .focus-mode-edge-handle .lucide {
+        width: 12px;
+        height: 12px;
+        background-color: currentColor;
+    }
+
+    html.focus-mode-full.focus-mode-peek .focus-mode-edge-handle {
+        opacity: 0;
+    }
+}
+
 /* Back link shown above the title: "Go to note" on the per-note pages
-   (info.php, attachments.php), which the rail cannot link to because the target
+   (attachments.php), which the rail cannot link to because the target
    depends on the note being viewed, and "Back to Settings" on every page opened
    from settings.php (back_to_settings.php). Lives here alongside
    .poznote-page-title so those pages get it from a stylesheet they already

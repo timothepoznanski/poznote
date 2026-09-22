@@ -338,18 +338,19 @@
 
                     echo '<button type="button" class="toolbar-btn btn-snapshot note-action-btn desktop-only" data-action="show-snapshot" data-note-id="'.$row['id'].'" title="'.t_h('snapshot.menu_item', [], 'Snapshots').'"><i class="lucide lucide-history"></i></button>';
 
-                    // Note content width: cycles this note through the width presets,
-                    // overriding the global setting for this note only. Desktop only,
-                    // on mobile the note already fills the screen.
-                    $note_width_title = t_h('index.toolbar.note_width', [], 'Note width');
-                    echo '<button type="button" class="toolbar-btn btn-note-width note-action-btn desktop-only" title="'.$note_width_title.'" aria-label="'.$note_width_title.'" data-action="cycle-note-width" data-note-id="'.$row['id'].'"><i class="lucide lucide-move-horizontal"></i></button>';
+                    // The note width and the split view are set from the "..."
+                    // menu of the floating stack (ui_customization_panel.php),
+                    // with the other controls that change the layout rather
+                    // than the note (discussion 1482).
 
                     // Forward navigation button (desktop only)
                     echo '<button type="button" id="note-history-forward" class="toolbar-btn btn-history-nav btn-history-forward history-disabled" title="' . t_h('editor.toolbar.go_forward', [], 'Go forward') . '" disabled><i class="lucide lucide-circle-chevron-right"></i></button>';
 
                     echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" data-action="delete-note" data-note-id="'.$row['id'].'" title="'.t_h('common.delete', [], 'Delete').'"><i class="lucide lucide-trash-2"></i></button>';
                     
-                    echo '<button type="button" class="toolbar-btn btn-info note-action-btn" title="'.t_h('common.information', [], 'Information').'" data-action="show-note-info" data-note-id="'.$row['id'].'" data-created="'.htmlspecialchars($final_created, ENT_QUOTES).'" data-updated="'.htmlspecialchars($final_updated, ENT_QUOTES).'" data-folder="'.htmlspecialchars($folder_name, ENT_QUOTES).'" data-favorite="'.$is_favorite.'" data-tags="'.htmlspecialchars($tags_data, ENT_QUOTES).'" data-attachments-count="'.$attachments_count.'"><i class="lucide lucide-info-circle"></i></button>';
+                    // Information is an entry of the "..." menu of the floating
+                    // stack (ui_customization_panel.php); it opens #noteInfoModal
+                    // (modals.php), which replaced the old info.php page.
                 
                     // Overflow menu button (3 dots - shown on both mobile and desktop)
                     // Marked as note-action-btn so it can be hidden during text selection (hide-on-selection)
@@ -407,7 +408,6 @@
                     }
 
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="show-snapshot" data-note-id="'.$row['id'].'"><i class="lucide lucide-history"></i> '.t_h('snapshot.menu_item', [], 'Snapshot').'</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-info"><i class="lucide lucide-info"></i> '.t_h('common.information', [], 'Information').'</button>';
                     echo '</div>';
                     echo '</div>';
                 

@@ -870,6 +870,46 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
+<!-- Note information: what the old info.php page showed, opened from the
+     "..." menu at the bottom-right (js/note-info-modal.js). Every value is
+     filled from api_note_info.php, which formats them in the user's language,
+     timezone and date format; the labels below are the only fixed text. -->
+<?php
+$pzNoteInfoRows = [
+    'title' => t_h('info.labels.note_title', [], 'Note title:'),
+    'workspace' => t_h('info.labels.workspace', [], 'Workspace:'),
+    'folder' => t_h('info.labels.folder', [], 'Folder:'),
+    'created' => t_h('info.labels.created', [], 'Created:'),
+    'created_by' => t_h('info.labels.created_by', [], 'Created by:'),
+    'updated' => t_h('info.labels.last_modified', [], 'Last Modified:'),
+    'updated_by' => t_h('info.labels.last_modified_by', [], 'Last modified by:'),
+    'tags' => t_h('info.labels.tags', [], 'Tags:'),
+    'favorite' => t_h('info.labels.favorite', [], 'Favorite:'),
+    'attachments' => t_h('info.labels.attachments', [], 'Attachments:'),
+    'note_id' => t_h('info.labels.note_id', [], 'Note ID:'),
+    'full_path' => t_h('info.labels.full_path', [], 'Full Path:'),
+];
+?>
+<div id="noteInfoModal" class="modal">
+    <div class="modal-content note-info-modal-content">
+        <h3><i class="lucide lucide-info"></i> <?php echo t_h('info.page_title', [], 'Note Information'); ?></h3>
+        <div class="modal-body">
+            <div class="note-info-rows">
+                <?php foreach ($pzNoteInfoRows as $pzNoteInfoKey => $pzNoteInfoLabel): ?>
+                <div class="note-info-row">
+                    <div class="note-info-label"><?php echo $pzNoteInfoLabel; ?></div>
+                    <div class="note-info-value" data-note-info="<?php echo $pzNoteInfoKey; ?>"></div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <p id="noteInfoError" class="note-info-error" role="alert" hidden></p>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="noteInfoModal"><?php echo t_h('common.close'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Paste as Markdown Modal -->
 <div id="pasteMarkdownModal" class="modal">
     <div class="modal-content paste-markdown-modal-content">

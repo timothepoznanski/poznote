@@ -41,6 +41,10 @@ function poznoteGetIndexCssGroups(): array {
             'css/layout.css',
             'css/icon-sidebar.css',
             'css/icon-sidebar-mobile.css',
+            // After layout.css: its focus-mode rules for #left_col outrank the
+            // collapsed state declared there by source order as much as by
+            // specificity.
+            'css/focus-mode.css',
             'css/sidebar.css',
             'css/outline.css',
             'css/toolbar.css',

@@ -236,10 +236,8 @@
             'btn-home',
             'btn-history-nav',
             'btn-download',
-            'btn-info',
             'btn-open-new-tab',
             'markdown-view-mode-btn',
-            'markdown-split-btn',
             'markdown-edit-btn',
             'markdown-preview-btn'
         ];
@@ -261,9 +259,7 @@
             var selector = element.getAttribute('data-selector') || '';
             var keepEnabled = element.getAttribute('data-action') === 'print-note'
                 || selector === '.btn-download'
-                || selector === '.btn-info'
                 || selector === '.markdown-view-mode-btn'
-                || selector === '.markdown-split-btn'
                 || selector === '.markdown-edit-btn'
                 || selector === '.markdown-preview-btn';
             if (!keepEnabled) {

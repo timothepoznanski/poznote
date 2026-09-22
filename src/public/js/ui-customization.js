@@ -57,7 +57,12 @@
         'wsmenu:goto-workspaces': 'wsmenu:edit-workspaces',
         // Markdown syntax left the note's ⋮ menu for the "..." menu of the
         // floating stack (ui_customization_panel.php).
-        'toolbar:btn-markdown-syntax': 'card:edgeMenuMarkdownSyntax'
+        'toolbar:btn-markdown-syntax': 'card:edgeMenuMarkdownSyntax',
+        // The split view and the note width left the toolbar for the same
+        // menu (discussion 1482).
+        'toolbar:btn-split-view': 'card:edgeSplitViewBtn',
+        'toolbar:btn-note-width': 'card:edgeMenuNoteWidth',
+        'toolbar:btn-info': 'card:edgeMenuNoteInfo'
     };
 
     function sanitizeHiddenKeys(hidden) {
@@ -376,8 +381,6 @@
                 rules.push('.mobile-toolbar-menu [data-selector=".' + id + '"] { display: none !important; }');
                 if (id === 'btn-snapshot') {
                     rules.push('.mobile-toolbar-menu [data-action="show-snapshot"] { display: none !important; }');
-                } else if (id === 'btn-split-view') {
-                    rules.push('.note-edit-toolbar .markdown-split-btn, .note-edit-toolbar .markdown-split-btn:not(.hide-on-selection) { display: none !important; }');
                 } else if (id === 'btn-search-replace') {
                     // The selection formatting toolbar has its own copy of the button
                     rules.push('.note-edit-toolbar .btn-search-replace-format, .note-edit-toolbar .btn-search-replace-format.show-on-selection { display: none !important; }');

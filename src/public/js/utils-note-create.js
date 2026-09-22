@@ -570,28 +570,6 @@ function startDownload() {
     window.location = 'api_export_entries.php';
 }
 
-function showNoteInfo(noteId, created, updated, folder, favorite, tags, attachmentsCount) {
-    if (!noteId) {
-        window.showError('Aucun ID de note fourni', 'Erreur');
-        return;
-    }
-
-    try {
-        // Get current workspace using robust method
-        const urlParams = new URLSearchParams(window.location.search);
-        const currentWorkspace = urlParams.get('workspace') ||
-            (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : null) ||
-            (typeof window.selectedWorkspace !== 'undefined' ? window.selectedWorkspace : null) ||
-            '';
-
-        var wsParam = currentWorkspace ? ('&workspace=' + encodeURIComponent(currentWorkspace)) : '';
-        var url = 'info.php?note_id=' + encodeURIComponent(noteId) + wsParam;
-        window.location.href = url;
-    } catch (error) {
-        window.showError('Erreur lors de l\'affichage des informations: ' + error.message, 'Erreur');
-    }
-}
-
 function toggleFavorite(noteId) {
     // Auto-save handles any pending changes automatically
     performFavoriteToggle(noteId);

@@ -114,6 +114,7 @@
             'notes_without_folders_after_folders',
             'markdown_split_card_view',
             'markdown_default_view_mode',
+            'markdown_remember_view_mode_per_note',
             'markdown_colored',
             'markdown_colored_custom',
             'code_block_word_wrap',
@@ -2459,6 +2460,7 @@
         setupToggleCard('markdown-split-card-view-card', 'markdown-split-card-view-status', 'markdown_split_card_view', false, true);
         refreshMarkdownColoredBadge();
         setupToggleCard('code-wrap-card', 'code-wrap-status', 'code_block_word_wrap', false, true);
+        setupToggleCard('markdown-remember-view-mode-card', 'markdown-remember-view-mode-status', 'markdown_remember_view_mode_per_note', false, false);
         setupToggleCard('code-line-numbers-card', 'code-line-numbers-status', 'code_block_line_numbers', false, false);
         setupToggleCard('attachment-previews-card', 'attachment-previews-status', 'attachment_previews_in_note', false, false);
         setupToggleCard('attachments-at-bottom-card', 'attachments-at-bottom-status', 'attachments_at_bottom', false, false);
@@ -4163,7 +4165,10 @@
         'wsmenu:goto-workspaces': 'wsmenu:edit-workspaces',
         'card:iconSidebarNotificationsBtn': 'card:sidebarNotificationsBtn',
         'card:iconSidebarAiChatBtn': 'card:edgeAiChatBtn',
-        'card:sidebarAiChatBtn': 'card:edgeAiChatBtn'
+        'card:sidebarAiChatBtn': 'card:edgeAiChatBtn',
+        'toolbar:btn-split-view': 'card:edgeSplitViewBtn',
+        'toolbar:btn-note-width': 'card:edgeMenuNoteWidth',
+        'toolbar:btn-info': 'card:edgeMenuNoteInfo'
     };
 
     function normalizeHiddenUiKey(key) {

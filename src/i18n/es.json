@@ -494,6 +494,7 @@
       "main_font": "Elige la fuente utilizada en toda la aplicación.",
       "markdown_font": "Elige la fuente utilizada en el editor markdown.",
       "markdown_default_view_mode": "Elige si las notas markdown se abren en vista previa, edición o vista dividida.",
+      "markdown_remember_view_mode": "Recordar el modo de apertura de cada nota markdown: una nota que cambies a vista dividida, edición o vista previa se vuelve a abrir en ese modo, en lugar del modo predeterminado. Se guarda en este navegador.",
       "font_size": "Ajusta el tamaño de fuente de las notas, la barra lateral, los bloques de código y la página de configuración.",
       "index_icon_scale": "Ajusta el tamaño de los iconos en la lista de notas.",
       "timezone": "Define la zona horaria utilizada para mostrar fechas y horas.",
@@ -808,6 +809,7 @@
       "main_font": "Fuente de la aplicación",
       "markdown_font": "Fuente del editor markdown",
       "markdown_default_view_mode": "Modo de apertura",
+      "markdown_remember_view_mode": "Recordar el modo por nota",
       "login_display": "Título de página de inicio de sesión",
       "note_font_size": "Tamaño de fuente",
       "note_age_filter": "Filtro de antigüedad",
@@ -1216,7 +1218,9 @@
     "empty": {
       "no_tags": "Sin etiquetas"
     },
-    "errors": [],
+    "errors": {
+      "load_failed": "No se ha podido cargar la información de la nota."
+    },
     "users": {
       "user_id": "Usuario #{{id}}",
       "deleted": "Usuario #{{id}}"
@@ -1362,7 +1366,7 @@
       "theme_toggle": "Botón de tema",
       "panel_title": "Personalizar esta página",
       "panel_button": "Personalizar la interfaz",
-      "panel_hint": "Solo se muestran los elementos de esta página. Los cambios se aplican de inmediato y se guardan automáticamente.",
+      "panel_hint": "Solo se muestran los elementos de esta página. Oculta o muestra cualquier elemento marcando o desmarcando abajo.",
       "panel_all_options": "Todas las opciones",
       "panel_saving": "Guardando…",
       "panel_saved": "Guardado",
@@ -1701,7 +1705,7 @@
         "split_short": "Vista dividida",
         "last": "Último modo usado"
       },
-      "hint": "Una nota que cambies a otro modo se vuelve a abrir en el modo predeterminado. Las notas nuevas siempre se abren en vista dividida."
+      "hint": "Una nota que cambies a otro modo se vuelve a abrir en el modo predeterminado, salvo que «Recordar el modo por nota» esté activado. Las notas nuevas siempre se abren en vista dividida."
     },
     "diary_date_format": {
       "title": "Formato de fecha de las entradas del diario",
@@ -2207,6 +2211,8 @@
       "note_width": "Ancho de la nota",
       "note_width_current": "Ancho de la nota: {{width}}",
       "note_width_default": "Predeterminado ({{width}})",
+      "split_width": "Ancho de la vista dividida",
+      "split_resize": "Arrastra para redimensionar los paneles",
       "convert_to_markdown": "Convertir a Markdown",
       "share_note": "Compartir"
     },
@@ -4883,7 +4889,8 @@
     "default": "Predeterminado"
   },
   "page_menu": {
-    "button": "Más opciones"
+    "button": "Más opciones",
+    "split_view": "Vista dividida"
   },
   "keyboard_shortcuts": {
     "menu_item": "Atajos de teclado",
@@ -4934,7 +4941,8 @@
     },
     "tree_select_toggle": "Añadir una nota o carpeta a la selección, o quitarla",
     "tree_select_range": "Seleccionar todas las filas hasta esta",
-    "tree_delete": "Mover las notas y carpetas seleccionadas a la papelera"
+    "tree_delete": "Mover las notas y carpetas seleccionadas a la papelera",
+    "focus_mode": "Activar o desactivar el modo enfoque"
   },
   "icon_context_menu": {
     "hide": "Ocultar el botón"
@@ -4968,5 +4976,8 @@
     "indent": "Aumentar sangría",
     "outdent": "Reducir sangría",
     "hide_keyboard": "Ocultar el teclado"
+  },
+  "focus_mode": {
+    "button": "Modo enfoque"
   }
 }

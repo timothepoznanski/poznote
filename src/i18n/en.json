@@ -168,6 +168,7 @@
       "main_font": "Choose the font used throughout the application.",
       "markdown_font": "Choose the font used in the markdown editor.",
       "markdown_default_view_mode": "Choose whether markdown notes open in preview, edit or split mode.",
+      "markdown_remember_view_mode": "Remember the view mode of each markdown note: a note you switch to split, edit or preview opens again in that mode, instead of the default view mode. Stored in this browser.",
       "font_size": "Adjust the font size of notes, sidebar, code blocks and the settings page.",
       "index_icon_scale": "Adjust the size of the icons in the note list.",
       "timezone": "Set the timezone used to display dates and times.",
@@ -445,6 +446,7 @@
       "main_font": "App font",
       "markdown_font": "Markdown editor font",
       "markdown_default_view_mode": "Default view mode",
+      "markdown_remember_view_mode": "Remember view mode per note",
       "login_display": "Login page title",
       "note_font_size": "Font size",
       "note_age_filter": "Note age filter",
@@ -616,7 +618,9 @@
       "user_id": "User #{{id}}",
       "deleted": "User #{{id}}"
     },
-    "errors": []
+    "errors": {
+      "load_failed": "Could not load the note information."
+    }
   },
   "attachments": {
     "empty": "No attachments.",
@@ -867,7 +871,7 @@
       "theme_toggle": "Theme toggle",
       "panel_title": "Customize this page",
       "panel_button": "Customize the interface",
-      "panel_hint": "Only the elements of this page are listed. Changes apply immediately and are saved automatically.",
+      "panel_hint": "Only the elements of this page are listed. Hide or show any element by checking or unchecking below.",
       "panel_all_options": "All options",
       "panel_saving": "Saving…",
       "panel_saved": "Saved",
@@ -1217,7 +1221,7 @@
         "split_short": "Split",
         "last": "Last used mode"
       },
-      "hint": "A note you switch to another mode opens again in the default mode next time. New notes always open in split mode."
+      "hint": "A note you switch to another mode opens again in the default mode next time, unless \"Remember view mode per note\" is on. New notes always open in split mode."
     },
     "diary_date_format": {
       "title": "Diary entry date format",
@@ -1712,6 +1716,8 @@
       "note_width": "Note width",
       "note_width_current": "Note width: {{width}}",
       "note_width_default": "Default ({{width}})",
+      "split_width": "Split view width",
+      "split_resize": "Drag to resize the panes",
       "convert_to_markdown": "Convert to Markdown",
       "share_note": "Share"
     },
@@ -4702,7 +4708,8 @@
     "default": "Default"
   },
   "page_menu": {
-    "button": "More options"
+    "button": "More options",
+    "split_view": "Split view"
   },
   "keyboard_shortcuts": {
     "menu_item": "Keyboard shortcuts",
@@ -4753,7 +4760,8 @@
     },
     "tree_select_toggle": "Add a note or folder to the selection, or remove it",
     "tree_select_range": "Select every row up to this one",
-    "tree_delete": "Move the selected notes and folders to the trash"
+    "tree_delete": "Move the selected notes and folders to the trash",
+    "focus_mode": "Turn focus mode on or off"
   },
   "icon_context_menu": {
     "hide": "Hide button"
@@ -4787,5 +4795,8 @@
     "indent": "Indent",
     "outdent": "Outdent",
     "hide_keyboard": "Hide keyboard"
+  },
+  "focus_mode": {
+    "button": "Focus mode"
   }
 }

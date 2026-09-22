@@ -202,8 +202,3 @@ html[data-theme='dark'] .markdown-view-mode-btn.is-edit-mode i {
     color: var(--pz-accent-text) !important;
     filter: none !important;
 }
-
-/* Slash through icon when active (in split mode) */
-html[data-theme='dark'] .toolbar-btn.markdown-split-btn.active::after {
-    background-color: var(--pz-text-muted);
-}

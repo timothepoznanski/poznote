@@ -102,13 +102,12 @@
    js/markdown-view-modes.js). It used to be blue in preview mode too, and
    swapped to another icon in edit mode: colour said "on" while the icon said
    "go there", so readers of a note believed they were already editing
-   (issue #1406). Off, it looks like the split-view toggle beside it. */
+   (issue #1406). Off, it keeps the toolbar's icon colour. */
 .markdown-view-mode-btn.is-edit-mode i {
     color: var(--pz-accent) !important;
 }
 
-/* Split view and view mode buttons - normal icon color */
-.markdown-split-btn:hover i,
+/* View mode button - normal icon color */
 .markdown-view-mode-btn:hover i {
     transform: scale(1.18);
 }

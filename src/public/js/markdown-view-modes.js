@@ -53,14 +53,20 @@ function prioritizeInitialMarkdownPreviewImages(previewDiv) {
     }
 }
 
-// View mode a markdown note opens in: always the user's default
+// View mode a markdown note opens in: the user's default
 // (markdown_default_view_mode setting, rendered by index.php as
 // data-markdown-default-mode on <body>). Switching a note to another mode is
-// never remembered per note, so a note reopened or reloaded comes back in the
-// configured mode; only the 'last' setting follows the mode last used, through
-// the global key below.
+// remembered for that note only when markdown_remember_view_mode_per_note is
+// on (data-markdown-remember-mode on <body>); without it a note reopened or
+// reloaded comes back in the configured mode, and only the 'last' setting
+// follows the mode last used, through the global key below.
 var _MD_VIEW_MODES = ['preview', 'edit', 'split'];
 var _MD_LAST_MODE_KEY = 'poznote-markdown-view-mode';
+// Modes remembered per note, most recently switched first:
+// [{ id: '12', mode: 'split' }, ...]. The list is capped so the entry cannot
+// grow without end, and it lives in this browser only.
+var _MD_NOTE_MODES_KEY = 'poznote-markdown-note-view-modes';
+var _MD_NOTE_MODES_LIMIT = 200;
 
 function _mdGetDefaultViewMode() {
     var setting = '';
@@ -81,13 +87,79 @@ function _mdGetDefaultViewMode() {
     return _MD_VIEW_MODES.indexOf(setting) !== -1 ? setting : 'preview';
 }
 
-function _mdRememberViewMode(mode) {
+function _mdPerNoteViewModeEnabled() {
+    try {
+        return !!(document.body && document.body.getAttribute('data-markdown-remember-mode') === '1');
+    } catch (e) {
+        return false;
+    }
+}
+
+function _mdReadNoteViewModes() {
+    var raw = null;
+    try {
+        raw = localStorage.getItem(_MD_NOTE_MODES_KEY);
+    } catch (e) {
+        console.warn('Could not read the note view modes from localStorage:', e);
+        return [];
+    }
+
+    if (!raw) return [];
+
+    var parsed = null;
+    try {
+        parsed = JSON.parse(raw);
+    } catch (e) {
+        return [];
+    }
+
+    return Array.isArray(parsed) ? parsed : [];
+}
+
+// Mode this note was last switched to by hand, or null when the setting is off
+// or the note was never switched.
+function _mdGetNoteViewMode(noteId) {
+    if (!noteId || !_mdPerNoteViewModeEnabled()) return null;
+
+    var id = String(noteId);
+    var entries = _mdReadNoteViewModes();
+    for (var i = 0; i < entries.length; i++) {
+        if (entries[i] && String(entries[i].id) === id) {
+            return _MD_VIEW_MODES.indexOf(entries[i].mode) !== -1 ? entries[i].mode : null;
+        }
+    }
+
+    return null;
+}
+
+function _mdRememberNoteViewMode(noteId, mode) {
+    if (!noteId || !_mdPerNoteViewModeEnabled()) return;
+
+    var id = String(noteId);
+    var entries = _mdReadNoteViewModes().filter(function (entry) {
+        return entry && String(entry.id) !== id;
+    });
+    entries.unshift({ id: id, mode: mode });
+    if (entries.length > _MD_NOTE_MODES_LIMIT) {
+        entries.length = _MD_NOTE_MODES_LIMIT;
+    }
+
+    try {
+        localStorage.setItem(_MD_NOTE_MODES_KEY, JSON.stringify(entries));
+    } catch (e) {
+        console.warn('Could not save the note view mode to localStorage:', e);
+    }
+}
+
+function _mdRememberViewMode(mode, noteId) {
     if (_MD_VIEW_MODES.indexOf(mode) === -1) return;
     try {
         localStorage.setItem(_MD_LAST_MODE_KEY, mode);
     } catch (e) {
         console.warn('Could not save view mode to localStorage:', e);
     }
+
+    _mdRememberNoteViewMode(noteId, mode);
 }
 
 /**
@@ -168,9 +240,12 @@ function initializeMarkdownNote(noteId) {
         noteEntry.setAttribute('data-markdown-content', markdownContent);
     }
 
-    // Mode to open this note in: the user's default (markdown_default_view_mode
-    // setting; its 'last' value follows the mode last used on any note).
+    // Mode to open this note in: the mode this note was last switched to when
+    // markdown_remember_view_mode_per_note is on, otherwise the user's default
+    // (markdown_default_view_mode setting; its 'last' value follows the mode
+    // last used on any note).
     var defaultMode = _mdGetDefaultViewMode();
+    var rememberedMode = _mdGetNoteViewMode(noteId);
 
     // Determine initial mode: edit or preview
     var isEmpty = markdownContent.trim() === '';
@@ -219,6 +294,10 @@ function initializeMarkdownNote(noteId) {
     } else if (isEmpty) {
         // New notes on mobile: start in edit mode
         startInEditMode = true;
+    } else if (rememberedMode && !(rememberedMode === 'split' && isMobileViewportCheck)) {
+        // This note was switched by hand and the setting remembers that
+        startInSplitMode = (rememberedMode === 'split');
+        startInEditMode = (rememberedMode === 'edit');
     } else if (defaultMode === 'split' && !isMobileViewportCheck) {
         startInSplitMode = true;
         startInEditMode = false;
@@ -388,42 +467,8 @@ function initializeMarkdownNote(noteId) {
             // first: updateViewModeButton() looks it up by selector.
             updateViewModeButton(noteId, currentMode);
 
-            // Create markdown help button
-
-            // Create split view button (only on desktop, not on mobile)
-            if (!isMobileViewport) {
-                var splitBtn = document.createElement('button');
-                splitBtn.type = 'button';
-                splitBtn.className = 'toolbar-btn markdown-split-btn note-action-btn';
-                splitBtn.innerHTML = '<i class="lucide lucide-columns-2"></i>';
-                splitBtn.title = window.t('editor.toolbar.split_view', null, 'Toggle split view');
-                splitBtn.onclick = function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    var noteEntry = document.getElementById('entry' + noteId);
-                    if (noteEntry && noteEntry.classList.contains('markdown-split-mode')) {
-                        exitSplitMode(noteId);
-                        splitBtn.classList.remove('active');
-                    } else {
-                        switchToSplitMode(noteId);
-                        splitBtn.classList.add('active');
-                    }
-                };
-
-                // Set initial state based on split mode
-                if (startInSplitMode) {
-                    splitBtn.classList.add('active');
-                }
-
-                // Insert split button before favorite button (star)
-                var favoriteBtn = toolbar.querySelector('.btn-favorite');
-                if (favoriteBtn) {
-                    toolbar.insertBefore(splitBtn, favoriteBtn);
-                } else {
-                    toolbar.appendChild(splitBtn);
-                }
-            }
+            // The split view is toggled from the "..." menu of the floating
+            // stack (ui_customization_panel.php), see toggleMarkdownSplitView().
         } else {
             // Update existing button based on current state
             var currentMode;
@@ -453,6 +498,7 @@ function initializeMarkdownNote(noteId) {
     // Setup live preview update if starting in split mode
     if (startInSplitMode) {
         setupSplitModePreviewUpdate(noteId);
+        setupMarkdownSplitResizer(noteEntry);
         scheduleMarkdownSplitPaneHeightUpdate(noteEntry);
         setTimeout(function () {
             updateMarkdownSplitPaneHeight(noteEntry);
@@ -557,7 +603,7 @@ function switchToEditMode(noteId, options) {
     // Update view mode button
     updateViewModeButton(noteId, 'edit');
 
-    _mdRememberViewMode('edit');
+    _mdRememberViewMode('edit', noteId);
 
     // Refresh outline panel if available
     if (window.outlinePanel && window.outlinePanel.refresh) {
@@ -662,7 +708,7 @@ function switchToPreviewMode(noteId, position) {
     // Update view mode button
     updateViewModeButton(noteId, 'preview');
 
-    _mdRememberViewMode('preview');
+    _mdRememberViewMode('preview', noteId);
 
     // Only mark as edited and trigger save if content has changed
     if (previousContent !== markdownContent) {
@@ -866,6 +912,13 @@ function getMarkdownContent(noteId) {
 // button should say, and aria-pressed carries the state for screen readers.
 // Split mode has its own toolbar button, so this one steps aside there.
 function updateViewModeButton(noteId, mode) {
+    // The split-view button of the floating stack is lit by the mode too, and
+    // it is not in the toolbar, so it is refreshed before the early return
+    // below (ui_customization_panel.php, js/ui-customization-panel.js).
+    if (typeof window.poznoteSyncNoteControls === 'function') {
+        window.poznoteSyncNoteControls();
+    }
+
     var viewModeBtn = document.querySelector('#note' + noteId + ' .markdown-view-mode-btn');
     if (!viewModeBtn) return;
 
@@ -970,6 +1023,7 @@ function switchToSplitMode(noteId) {
 
     // Add split mode class to note entry
     noteEntry.classList.add('markdown-split-mode');
+    setupMarkdownSplitResizer(noteEntry);
 
     // Show both editor and preview
     if (editorContainer) {
@@ -1029,7 +1083,7 @@ function switchToSplitMode(noteId) {
     // Update view mode button
     updateViewModeButton(noteId, 'split');
 
-    _mdRememberViewMode('split');
+    _mdRememberViewMode('split', noteId);
 
     // Setup live preview update on input
     setupSplitModePreviewUpdate(noteId);
@@ -1039,6 +1093,21 @@ function switchToSplitMode(noteId) {
         setTimeout(function() {
             window.outlinePanel.refresh();
         }, 100);
+    }
+}
+
+/**
+ * Split view on or off, for the "..." menu of the floating stack
+ * (js/index-events.js, data-action="toggle-split-view").
+ */
+function toggleMarkdownSplitView(noteId) {
+    var noteEntry = document.getElementById('entry' + noteId);
+    if (!noteEntry) return;
+
+    if (noteEntry.classList.contains('markdown-split-mode')) {
+        exitSplitMode(noteId);
+    } else {
+        switchToSplitMode(noteId);
     }
 }
 
@@ -1082,6 +1151,7 @@ window.switchToEditMode = switchToEditMode;
 window.switchToPreviewMode = switchToPreviewMode;
 window.switchToSplitMode = switchToSplitMode;
 window.exitSplitMode = exitSplitMode;
+window.toggleMarkdownSplitView = toggleMarkdownSplitView;
 window.getMarkdownContent = getMarkdownContent;
 window.getMarkdownContentForNote = getMarkdownContentForNote;
 window.replaceMarkdownNoteContent = replaceMarkdownNoteContent;
