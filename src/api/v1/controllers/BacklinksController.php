@@ -24,20 +24,6 @@ class BacklinksController
         $this->con = $con;
     }
 
-    private function appendPublicWorkspaceAgeFilter(string &$sql, array &$params, string $column = 'updated'): void
-    {
-        if (!function_exists('isPublicWorkspaceAccessActive') || !isPublicWorkspaceAccessActive()) {
-            return;
-        }
-
-        $cutoff = getNoteAgeFilterCutoff(getNoteAgeFilterDays($this->con));
-        if ($cutoff === null) {
-            return;
-        }
-
-        $sql .= " AND $column >= ?";
-        $params[] = $cutoff;
-    }
 
     // -------------------------------------------------------------------------
     // Public actions
@@ -59,16 +45,13 @@ class BacklinksController
         try {
             $workspace = '';
             // all_workspaces=1: the workspace parameter still scopes the
-            // target note, but linking notes are collected from every workspace
-            $allWorkspaces = false;
-            if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
-                $workspace = (string) (function_exists('getPublicWorkspaceName') ? getPublicWorkspaceName() : '');
-            } else {
-                if (isset($_GET['workspace']) && is_string($_GET['workspace'])) {
-                    $workspace = trim($_GET['workspace']);
-                }
-                $allWorkspaces = ($_GET['all_workspaces'] ?? '') === '1';
+            // target note, but linking notes are collected from every
+            // workspace. Not for a session confined to a shared workspace.
+            if (isset($_GET['workspace']) && is_string($_GET['workspace'])) {
+                $workspace = trim($_GET['workspace']);
             }
+            $allWorkspaces = ($_GET['all_workspaces'] ?? '') === '1'
+                && !(function_exists('isSharedWorkspaceScopeActive') && isSharedWorkspaceScopeActive());
 
             $targetSql = 'SELECT id, heading, workspace FROM entries WHERE id = ? AND trash = 0';
             $targetParams = [$noteId];
@@ -76,7 +59,6 @@ class BacklinksController
                 $targetSql .= ' AND workspace = ?';
                 $targetParams[] = $workspace;
             }
-            $this->appendPublicWorkspaceAgeFilter($targetSql, $targetParams);
 
             // --- Fetch the target note (we need its heading for wiki-link matching)
             $stmt = $this->con->prepare($targetSql);
@@ -84,14 +66,6 @@ class BacklinksController
             $targetNote = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$targetNote) {
-                if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
-                    $this->sendSuccess([
-                        'backlinks' => [],
-                        'count' => 0,
-                    ]);
-                    return;
-                }
-
                 $this->sendError(404, 'Note not found');
                 return;
             }
@@ -109,7 +83,6 @@ class BacklinksController
                 $candidateSql .= ' AND workspace = ?';
                 $candidateParams[] = $workspace;
             }
-            $this->appendPublicWorkspaceAgeFilter($candidateSql, $candidateParams);
 
             // --- Fetch all non-trash candidate notes (exclude the target itself)
             $stmt = $this->con->prepare($candidateSql);

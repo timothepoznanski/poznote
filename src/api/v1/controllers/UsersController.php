@@ -1274,17 +1274,6 @@ class UsersController {
                         }
                     }
 
-                    // Collect shared workspaces
-                    $tableCheck = $userCon->query("SELECT name FROM sqlite_master WHERE type='table' AND name='shared_workspaces'");
-                    if ($tableCheck->fetch()) {
-                        $stmt = $userCon->query("SELECT token, id FROM shared_workspaces");
-                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                            $st = $masterCon->prepare("INSERT OR REPLACE INTO shared_links (token, user_id, target_type, target_id) VALUES (?, ?, 'workspace', ?)");
-                            $st->execute([$row['token'], $userId, (int)$row['id']]);
-                            $stats['links_rebuilt']++;
-                        }
-                    }
-                    
                     $userCon = null; // Close connection
                     
                 } catch (Exception $e) {

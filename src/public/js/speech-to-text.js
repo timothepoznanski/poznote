@@ -672,8 +672,7 @@
         // text and the save would then be refused, losing it without a word.
         // Refuse up front instead, and leave the text in the box to copy.
         var targetNoteId = context && context.noteEntry ? context.noteEntry.getAttribute('data-note-id') : null;
-        var publicReadonly = !!(document.body && document.body.classList.contains('public-workspace-readonly'));
-        if (publicReadonly || (targetNoteId && typeof window.isNoteEditingLocked === 'function' && window.isNoteEditingLocked(targetNoteId))) {
+        if (targetNoteId && typeof window.isNoteEditingLocked === 'function' && window.isNoteEditingLocked(targetNoteId)) {
             showError(t('stt.errors.note_locked', null, 'This note cannot be edited from here right now, so the text was not inserted. Copy it from the box above.'));
             return;
         }

@@ -29,8 +29,7 @@ function getNoteDomCacheWorkspace(url) {
 }
 
 function getNoteDomCacheKey(noteId, url) {
-    var publicFlag = (typeof window.isPublicWorkspaceNavigationActive === 'function' && window.isPublicWorkspaceNavigationActive()) ? 'public' : 'private';
-    return publicFlag + '|' + getNoteDomCacheWorkspace(url) + '|' + String(noteId);
+    return getNoteDomCacheWorkspace(url) + '|' + String(noteId);
 }
 
 function urlHasSearchContext(url) {

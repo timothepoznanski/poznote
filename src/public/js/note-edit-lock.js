@@ -110,10 +110,6 @@
         }
     }
 
-    function isReadonlyWorkspace() {
-        return !!(document.body && document.body.classList.contains('public-workspace-readonly'));
-    }
-
     function parseResponse(response) {
         return response.json().catch(function () {
             return {};
@@ -353,7 +349,7 @@
         }
 
         var noteId = normalizeNoteId(String(noteCard.id || '').replace(/^note/, ''));
-        var canTakeOver = !!(noteId && lock && isLockHeldByDifferentUser(lock) && !isReadonlyWorkspace());
+        var canTakeOver = !!(noteId && lock && isLockHeldByDifferentUser(lock));
         var signature = message + '|' + (canTakeOver ? 'takeover' : '');
         if (banner.dataset.lockBannerSignature === signature) {
             return;   // same banner already on screen (status check): no blink
@@ -651,7 +647,7 @@
     // must not overtake the release (js/profile.js).
     function releaseLock(noteId) {
         noteId = normalizeNoteId(noteId);
-        if (!noteId || isReadonlyWorkspace()) {
+        if (!noteId) {
             return Promise.resolve(null);
         }
 
@@ -700,7 +696,7 @@
 
     function checkLockStatus(noteId) {
         noteId = normalizeNoteId(noteId);
-        if (!noteId || String(activeNoteId) !== noteId || isReadonlyWorkspace()) {
+        if (!noteId || String(activeNoteId) !== noteId) {
             return;
         }
 
@@ -750,7 +746,7 @@
 
     function refreshLock(noteId) {
         noteId = normalizeNoteId(noteId);
-        if (!noteId || String(activeNoteId) !== noteId || isReadonlyWorkspace()) {
+        if (!noteId || String(activeNoteId) !== noteId) {
             return;
         }
 
@@ -781,7 +777,7 @@
 
     function acquireLock(noteId) {
         noteId = normalizeNoteId(noteId);
-        if (!noteId || isReadonlyWorkspace()) {
+        if (!noteId) {
             return;
         }
 

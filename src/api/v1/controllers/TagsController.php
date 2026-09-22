@@ -115,6 +115,11 @@ class TagsController {
         // Spaces → underscores to match the existing tag normalisation convention
         $newName = str_replace(' ', '_', $newName);
         $workspace = $input['workspace'] ?? null;
+        // Without a workspace the tag is renamed everywhere, except for a
+        // session confined to a workspace shared with it (auth.php).
+        if (($workspace === null || $workspace === '') && function_exists('getSharedWorkspaceScopeName')) {
+            $workspace = getSharedWorkspaceScopeName();
+        }
 
         if (!$this->tagExists($tag, $workspace)) {
             $this->sendTagNotFound($tag);

@@ -96,8 +96,9 @@ window.__poznoteThemeStorage = window.__poznoteThemeStorage || (function () {
 })();
 
 // The ACTIVE account when it is not the login's own, i.e. an account opened
-// through the access granted in Admin > User Management (poznote_account is
-// set by auth.php with the response that rendered this page). Note ids and
+// through the access granted in Admin > User Management, or for a workspace
+// it shares with this login (poznote_account is set by auth.php with the
+// response that rendered this page). Note ids and
 // workspace names repeat from one account to the next, so what this browser
 // keeps under them (drafts, open tabs) is kept apart for such an account:
 // a draft of note 5 here must never be offered in the other account's note 5.

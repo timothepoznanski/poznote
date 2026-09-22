@@ -52,6 +52,7 @@ const NO_GATE = [
     // share password rather than a session, which is the whole feature.
     'public_note.php'    => 'shared note links, gated by share token and optional share password',
     'public_folder.php'  => 'shared folder links, same gate as public_note.php',
+    'public_slug.php'    => 'pretty /<token> URLs, hands the token to public_note.php and its gate',
 
     // Anonymous by design, and touching no user data.
     'api_health.php'     => 'reverse proxy health check, returns status, service name and version only',

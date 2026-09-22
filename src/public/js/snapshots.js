@@ -28,18 +28,6 @@
         return '/api/v1/notes/' + noteId + '/snapshots';
     }
 
-    function isSnapshotAccessBlocked() {
-        if (document.body && document.body.classList.contains('public-workspace-readonly')) {
-            return true;
-        }
-
-        if (typeof window.isPublicWorkspaceNavigationActive === 'function') {
-            return window.isPublicWorkspaceNavigationActive();
-        }
-
-        return typeof window.isPublicWorkspaceAccess !== 'undefined' && window.isPublicWorkspaceAccess;
-    }
-
     function isDarkThemeActive() {
         if (typeof window.getCurrentTheme === 'function') {
             return window.getCurrentTheme() === 'dark';
@@ -264,7 +252,7 @@
      * Only creates one snapshot per note per day.
      */
     window.createNoteSnapshot = function (noteId) {
-        if (isSnapshotAccessBlocked() || !noteId || noteId === -1 || noteId === 'search') return;
+        if (!noteId || noteId === -1 || noteId === 'search') return;
 
         rememberPendingSnapshotCreate(noteId, requestSnapshotCreate(noteId, false)).catch(function (e) {
             // Silently ignore - snapshots are best-effort
@@ -277,7 +265,6 @@
      * Loads the list of available snapshots and selects the most recent one.
      */
     window.showSnapshotModal = function (noteId) {
-        if (isSnapshotAccessBlocked()) return;
 
         if (!noteId) {
             noteId = window.noteid;
@@ -526,7 +513,6 @@
      * Create an additional snapshot immediately.
      */
     window.takeSnapshotNow = function () {
-        if (isSnapshotAccessBlocked()) return;
 
         var modal = document.getElementById('snapshotModal');
         var noteId = modal && modal.dataset.noteId ? modal.dataset.noteId : window.noteid;
@@ -603,7 +589,6 @@
      * the content on screen, then shows a toast.
      */
     window.takeSnapshotShortcut = function () {
-        if (isSnapshotAccessBlocked()) return false;
 
         var noteId = window.noteid;
         if (!noteId || noteId === -1 || noteId === 'search') return false;
@@ -639,7 +624,6 @@
      * Restore note to snapshot state
      */
     window.restoreSnapshot = function () {
-        if (isSnapshotAccessBlocked()) return;
 
         var modal = document.getElementById('snapshotModal');
         if (!modal) return;
@@ -702,7 +686,6 @@
      * Delete the selected snapshot (manual or automatic).
      */
     window.deleteSnapshot = function () {
-        if (isSnapshotAccessBlocked()) return;
 
         var modal = document.getElementById('snapshotModal');
         if (!modal) return;

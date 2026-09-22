@@ -6,7 +6,6 @@ requireActiveAccountOwner();
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../functions.php';
-require_once __DIR__ . '/../share_passwords.php';
 require_once __DIR__ . '/../version_helper.php';
 requireSettingsPassword();
 
@@ -31,21 +30,9 @@ if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQ
 // Handle create/delete actions
 if ($_POST) {
     try {
-        if (!function_exists('buildWorkspaceSharePublicUrl')) {
-            function buildWorkspaceSharePublicUrl(string $workspaceName): string {
-                $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
-
-                return getProtocol() . '://' . $host . buildPublicWorkspacePath($workspaceName);
-            }
-        }
-
-        if (!function_exists('buildWorkspaceShareRegistryKey')) {
-            function buildWorkspaceShareRegistryKey(string $workspaceName): string {
-                return buildPublicWorkspaceRegistryKey($workspaceName);
-            }
-        }
-
         if (!function_exists('sanitizeWorkspaceShareAllowedUsers')) {
+            // The accounts a workspace is shared with, posted as a JSON list
+            // or a comma-separated string of user ids.
             function sanitizeWorkspaceShareAllowedUsers($rawValue): array {
                 if (is_string($rawValue)) {
                     $rawValue = trim($rawValue);
@@ -243,24 +230,9 @@ if ($_POST) {
                 error_log('workspaces: sanitizeWorkspaceShareAllowedUsers() failed: ' . $e->getMessage());
             }
 
-            // Remove shared read-only workspace link if present
-            try {
-                require_once __DIR__ . '/../users/db_master.php';
-
-                $shareStmt = $con->prepare('SELECT token FROM shared_workspaces WHERE workspace_name = ? LIMIT 1');
-                $shareStmt->execute([$name]);
-                $workspaceShareToken = $shareStmt->fetchColumn();
-
-                if ($workspaceShareToken) {
-                    unregisterSharedLink((string)$workspaceShareToken);
-                }
-
-                $deleteShareStmt = $con->prepare('DELETE FROM shared_workspaces WHERE workspace_name = ?');
-                $deleteShareStmt->execute([$name]);
-            } catch (Exception $e) {
-                // Non-fatal: don't block workspace deletion if share cleanup fails
-                error_log('workspaces: sanitizeWorkspaceShareAllowedUsers() failed: ' . $e->getMessage());
-            }
+            // The accounts it was shared with lose it (master.db workspace_shares)
+            require_once __DIR__ . '/../users/db_master.php';
+            deleteWorkspaceShares((int)$_SESSION['user_id'], $name);
 
             // Delete workspace backgrounds folder
             try {
@@ -432,28 +404,9 @@ if ($_POST) {
                     $upd = $con->prepare('UPDATE workspaces SET name = ? WHERE name = ?');
                     $upd->execute([$new_name, $name]);
 
-                    $shareStmt = $con->prepare('SELECT id, token FROM shared_workspaces WHERE workspace_name = ? LIMIT 1');
-                    $shareStmt->execute([$name]);
-                    $existingShare = $shareStmt->fetch(PDO::FETCH_ASSOC) ?: null;
-
-                    if ($existingShare) {
-                        $shareId = (int)$existingShare['id'];
-                        $oldRegistryKey = (string)($existingShare['token'] ?? '');
-                        $newRegistryKey = buildWorkspaceShareRegistryKey($new_name);
-
-                        require_once __DIR__ . '/../users/db_master.php';
-                        if (!isTokenAvailable($newRegistryKey, (int)$_SESSION['user_id'], 'workspace', $shareId)) {
-                            throw new Exception(t('workspaces.share.errors.url_in_use', [], 'A public workspace with this name already exists on this Poznote instance', $currentLang));
-                        }
-
-                        $upd = $con->prepare('UPDATE shared_workspaces SET workspace_name = ?, token = ? WHERE workspace_name = ?');
-                        $upd->execute([$new_name, $newRegistryKey, $name]);
-
-                        if ($oldRegistryKey !== '' && $oldRegistryKey !== $newRegistryKey) {
-                            unregisterSharedLink($oldRegistryKey);
-                        }
-                        registerSharedLink($newRegistryKey, (int)$_SESSION['user_id'], 'workspace', $shareId);
-                    }
+                    // The accounts it is shared with follow the new name
+                    require_once __DIR__ . '/../users/db_master.php';
+                    renameWorkspaceShares((int)$_SESSION['user_id'], $name, $new_name);
 
                     // Move entries to new workspace name
                     $upd = $con->prepare('UPDATE entries SET workspace = ? WHERE workspace = ?');
@@ -641,7 +594,10 @@ if ($_POST) {
                 echo json_encode(['success' => true, 'moved' => $moved ?? 0, 'target' => $target]);
                 exit;
             }
-        } elseif (isset($_POST['action']) && $_POST['action'] === 'upsert_readonly_share') {
+        } elseif (isset($_POST['action']) && $_POST['action'] === 'share_workspace') {
+            // Share the workspace with named accounts of the instance, or
+            // change who it is shared with. They open it from their own
+            // workspace menu and edit it (auth.php, shared workspace scope).
             $name = trim($_POST['name'] ?? '');
 
             if ($name === '') {
@@ -654,129 +610,75 @@ if ($_POST) {
                 throw new Exception(t('workspaces.errors.not_found', [], 'Workspace not found', $currentLang));
             }
 
+            // Under tenant isolation a non-admin must not be able to name
+            // another account, even by posting raw ids past the hidden UI.
+            if (!poznoteCanTargetOtherUsers()) {
+                throw new Exception(t('workspaces.share.errors.not_allowed', [], 'Sharing with other users is not available on this instance', $currentLang));
+            }
+
             require_once __DIR__ . '/../users/db_master.php';
+            $ownerId = (int)$_SESSION['user_id'];
+            $previousUserIds = getWorkspaceShareGranteesByWorkspace($ownerId)[$name] ?? [];
+            $wantedUserIds = sanitizeWorkspaceShareAllowedUsers($_POST['allowed_users'] ?? []);
+            $sharedUserIds = setWorkspaceShareGrantees($ownerId, $name, $wantedUserIds);
 
-            $shareStmt = $con->prepare('SELECT id, token, password, password_encrypted, login_required, allowed_users FROM shared_workspaces WHERE workspace_name = ? LIMIT 1');
-            $shareStmt->execute([$name]);
-            $existingShare = $shareStmt->fetch(PDO::FETCH_ASSOC) ?: null;
-
-            $shareId = $existingShare ? (int)$existingShare['id'] : 0;
-            $oldToken = $existingShare['token'] ?? null;
-            $token = buildWorkspaceShareRegistryKey($name);
-
-            $passwordProvided = array_key_exists('password', $_POST);
-            $password = $passwordProvided ? trim((string)($_POST['password'] ?? '')) : '';
-            $hashedPassword = $passwordProvided
-                ? ($password !== '' ? password_hash($password, PASSWORD_DEFAULT) : null)
-                : ($existingShare['password'] ?? null);
-            $encryptedPassword = $passwordProvided
-                ? poznoteEncryptSharePassword($password)
-                : ($existingShare['password_encrypted'] ?? null);
-
-            $accessOptionsProvided = array_key_exists('login_required', $_POST) || array_key_exists('allowed_users', $_POST);
-            if ($accessOptionsProvided) {
-                $rawLoginRequired = strtolower(trim((string)($_POST['login_required'] ?? '0')));
-                $loginRequired = in_array($rawLoginRequired, ['1', 'true', 'yes', 'on'], true);
-                $allowedUserIds = sanitizeWorkspaceShareAllowedUsers($_POST['allowed_users'] ?? []);
-                // Under tenant isolation a non-admin must not be able to name
-                // another account, even by posting raw ids past the hidden UI.
-                if (!empty($allowedUserIds) && function_exists('poznoteCanTargetOtherUsers') && !poznoteCanTargetOtherUsers()) {
-                    $allowedUserIds = [];
-                }
-                if (!empty($allowedUserIds)) {
-                    $loginRequired = true;
-                }
-                $allowedUsersJson = !empty($allowedUserIds) ? json_encode($allowedUserIds) : null;
-            } else {
-                $loginRequired = !empty($existingShare['login_required']);
-                $allowedUsersJson = $existingShare['allowed_users'] ?? null;
-                $allowedUserIds = !empty($allowedUsersJson) ? sanitizeWorkspaceShareAllowedUsers($allowedUsersJson) : [];
+            $usernamesById = [];
+            foreach (getMasterConnection()->query('SELECT id, username FROM users')->fetchAll(PDO::FETCH_ASSOC) as $masterUser) {
+                $usernamesById[(int)$masterUser['id']] = (string)$masterUser['username'];
             }
+            $sharedUsernames = array_map(static fn(int $id): string => $usernamesById[$id] ?? ('User #' . $id), $sharedUserIds);
 
-            if (!isTokenAvailable($token, (int)$_SESSION['user_id'], 'workspace', $shareId)) {
-                throw new Exception(t('workspaces.share.errors.url_in_use', [], 'A public workspace with this name already exists on this Poznote instance', $currentLang));
-            }
-
-            if ($existingShare) {
-                $updateShare = $con->prepare('UPDATE shared_workspaces SET token = ?, theme = NULL, password = ?, password_encrypted = ?, login_required = ?, allowed_users = ?, created = CURRENT_TIMESTAMP WHERE workspace_name = ?');
-                $updateShare->execute([$token, $hashedPassword, $encryptedPassword, $loginRequired ? 1 : 0, $allowedUsersJson, $name]);
-            } else {
-                $insertShare = $con->prepare('INSERT INTO shared_workspaces (workspace_name, token, password, password_encrypted, login_required, allowed_users) VALUES (?, ?, ?, ?, ?, ?)');
-                $insertShare->execute([$name, $token, $hashedPassword, $encryptedPassword, $loginRequired ? 1 : 0, $allowedUsersJson]);
-
-                $shareLookup = $con->prepare('SELECT id FROM shared_workspaces WHERE workspace_name = ? LIMIT 1');
-                $shareLookup->execute([$name]);
-                $shareId = (int)$shareLookup->fetchColumn();
-            }
-
-            if ($oldToken && $oldToken !== $token) {
-                unregisterSharedLink((string)$oldToken);
-            }
-            if ($shareId > 0) {
-                registerSharedLink($token, (int)$_SESSION['user_id'], 'workspace', $shareId);
-            }
-
-            $publicUrl = buildWorkspaceSharePublicUrl($name);
-
-            // Never record the share password, in cleartext or encrypted; the
-            // log only notes whether one is set.
             require_once __DIR__ . '/../ActivityLog.php';
-            logActivity(ACTIVITY_WORKSPACE_SHARED, [
-                'workspace' => $name,
-                'updated' => (bool)$existingShare,
-                'password_protected' => !empty($hashedPassword),
-                'login_required' => (bool)$loginRequired,
-                'allowed_users' => count($allowedUserIds),
-            ]);
-
-            $message = t('workspaces.share.messages.enabled', [], 'Read-only workspace link enabled', $currentLang);
+            if (!empty($sharedUserIds)) {
+                logActivity(ACTIVITY_WORKSPACE_SHARED, [
+                    'workspace' => $name,
+                    'updated' => !empty($previousUserIds),
+                    'users' => $sharedUsernames,
+                ]);
+                $message = t('workspaces.share.messages.saved', [], 'Workspace sharing updated', $currentLang);
+            } else {
+                if (!empty($previousUserIds)) {
+                    logActivity(ACTIVITY_WORKSPACE_UNSHARED, ['workspace' => $name]);
+                }
+                $message = t('workspaces.share.messages.disabled', [], 'Workspace is no longer shared', $currentLang);
+            }
 
             if (!empty($isAjax)) {
                 header('Content-Type: application/json');
                 echo json_encode([
                     'success' => true,
-                    'public' => true,
-                    'url' => $publicUrl,
-                    'hasPassword' => !empty($hashedPassword),
-                    'passwordValue' => poznoteDecryptSharePassword($encryptedPassword),
-                    'loginRequired' => $loginRequired,
-                    'allowed_users' => !empty($allowedUserIds) ? $allowedUserIds : null,
+                    'shared' => !empty($sharedUserIds),
+                    'allowed_users' => $sharedUserIds,
+                    'shared_with' => $sharedUsernames,
                     'message' => $message,
                 ]);
                 exit;
             }
-        } elseif (isset($_POST['action']) && $_POST['action'] === 'disable_readonly_share') {
+        } elseif (isset($_POST['action']) && $_POST['action'] === 'unshare_workspace') {
             $name = trim($_POST['name'] ?? '');
             if ($name === '') {
                 throw new Exception(t('workspaces.errors.name_required', [], 'Workspace name required', $currentLang));
             }
 
             require_once __DIR__ . '/../users/db_master.php';
-
-            $shareStmt = $con->prepare('SELECT token FROM shared_workspaces WHERE workspace_name = ? LIMIT 1');
-            $shareStmt->execute([$name]);
-            $token = $shareStmt->fetchColumn();
-            if ($token) {
-                unregisterSharedLink((string)$token);
-            }
-
-            $deleteShare = $con->prepare('DELETE FROM shared_workspaces WHERE workspace_name = ?');
-            $deleteShare->execute([$name]);
+            $removed = deleteWorkspaceShares((int)$_SESSION['user_id'], $name);
 
             // Only log when a share actually existed: the UI can post this for
             // an already-unshared workspace.
-            if ($deleteShare->rowCount() > 0) {
+            if ($removed > 0) {
                 require_once __DIR__ . '/../ActivityLog.php';
                 logActivity(ACTIVITY_WORKSPACE_UNSHARED, ['workspace' => $name]);
             }
 
-            $message = t('workspaces.share.messages.disabled', [], 'Read-only workspace link disabled', $currentLang);
+            $message = t('workspaces.share.messages.disabled', [], 'Workspace is no longer shared', $currentLang);
 
             if (!empty($isAjax)) {
                 header('Content-Type: application/json');
                 echo json_encode([
                     'success' => true,
-                    'public' => false,
+                    'shared' => false,
+                    'allowed_users' => [],
+                    'shared_with' => [],
                     'message' => $message,
                 ]);
                 exit;
@@ -792,54 +694,34 @@ if ($_POST) {
     }
 }
 
-if (!function_exists('buildWorkspaceSharePublicUrl')) {
-    function buildWorkspaceSharePublicUrl(string $workspaceName): string {
-        $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
-
-        return getProtocol() . '://' . $host . buildPublicWorkspacePath($workspaceName);
-    }
-}
-
-if (!function_exists('buildWorkspaceShareRegistryKey')) {
-    function buildWorkspaceShareRegistryKey(string $workspaceName): string {
-        return buildPublicWorkspaceRegistryKey($workspaceName);
-    }
-}
-
-// Read existing workspaces and share state
+// Read existing workspaces and who each one is shared with (master.db
+// workspace_shares, see users/db_master.php).
+require_once __DIR__ . '/../users/db_master.php';
+$sharedUserIdsByWorkspace = getWorkspaceShareGranteesByWorkspace((int)$_SESSION['user_id']);
 $workspaces = [];
 $workspaceRows = [];
-$stmt = $con->query('SELECT w.name, w.tags, w.color, sw.token AS readonly_token, sw.password AS readonly_password, sw.password_encrypted AS readonly_password_encrypted, sw.login_required AS readonly_login_required, sw.allowed_users AS readonly_allowed_users FROM workspaces w LEFT JOIN shared_workspaces sw ON sw.workspace_name = w.name ORDER BY ' . poznoteWorkspaceOrderBy($con, 'w'));
+$stmt = $con->query('SELECT name, tags, color FROM workspaces ORDER BY ' . poznoteWorkspaceOrderBy($con));
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $workspaceName = $row['name'];
-    $readonlyToken = $row['readonly_token'] ?? '';
-    $readonlyAllowedUsers = !empty($row['readonly_allowed_users']) ? json_decode($row['readonly_allowed_users'], true) : null;
     $workspaceRows[] = [
         'name' => $workspaceName,
         'tags' => poznoteParseWorkspaceTags($row['tags'] ?? ''),
         'color' => (string)($row['color'] ?? ''),
         'color_hex' => ($row['color'] ?? '') !== '' ? resolveNoteColorHex((string)$row['color']) : '',
-        'readonly_token' => $readonlyToken,
-        'readonly_url' => $readonlyToken !== '' ? buildWorkspaceSharePublicUrl($workspaceName) : '',
-        'readonly_preview_url' => buildWorkspaceSharePublicUrl($workspaceName),
-        'readonly_has_password' => !empty($row['readonly_password']),
-        'readonly_password_value' => poznoteDecryptSharePassword($row['readonly_password_encrypted'] ?? ''),
-        'readonly_login_required' => !empty($row['readonly_login_required']),
-        'readonly_allowed_users' => is_array($readonlyAllowedUsers) ? array_values(array_map('intval', $readonlyAllowedUsers)) : [],
+        'shared_user_ids' => $sharedUserIdsByWorkspace[$workspaceName] ?? [],
     ];
     $workspaces[] = $workspaceName;
 }
 
 $sharedUsernamesById = [];
 try {
-    require_once __DIR__ . '/../users/db_master.php';
     $masterUsers = getMasterConnection()->query('SELECT id, username FROM users')->fetchAll(PDO::FETCH_ASSOC);
     foreach ($masterUsers as $masterUser) {
         $sharedUsernamesById[(int)$masterUser['id']] = (string)$masterUser['username'];
     }
 } catch (Exception $e) {
     // Sharing details remain usable even if the master user database is unavailable.
-    error_log('workspaces: buildWorkspaceShareRegistryKey() failed: ' . $e->getMessage());
+    error_log('workspaces: cannot list usernames: ' . $e->getMessage());
 }
 
 // Count notes per workspace, excluding trashed notes.
@@ -888,28 +770,17 @@ try {
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
     data-current-user-id="<?php echo (int)($_SESSION['user_id'] ?? 0); ?>"
       data-txt-last-opened="<?php echo htmlspecialchars(t('workspaces.default.last_opened', [], 'Last workspace opened', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-    data-txt-workspace-share-enabled="<?php echo htmlspecialchars(t('workspaces.share.status.enabled', [], 'Public read-only enabled', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-    data-txt-workspace-share-disabled="<?php echo htmlspecialchars(t('workspaces.share.status.disabled', [], 'Not shared publicly', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
     data-txt-workspace-share-enable-btn="<?php echo htmlspecialchars(t('workspaces.share.actions.enable', [], 'Share', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
     data-txt-workspace-share-edit-btn="<?php echo htmlspecialchars(t('workspaces.share.actions.edit', [], 'Edit share', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-    data-txt-workspace-share-open-btn="<?php echo htmlspecialchars(t('public.actions.open', [], 'Open public view', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-    data-txt-workspace-share-copy-btn="<?php echo htmlspecialchars(t('workspaces.share.actions.copy_link', [], 'Copy share link', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
     data-txt-workspace-share-disable-btn="<?php echo htmlspecialchars(t('workspaces.share.actions.disable', [], 'Unshare', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-    data-txt-workspace-share-copy-success="<?php echo htmlspecialchars(t('workspaces.share.messages.url_copied', [], 'Share link copied to clipboard!', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-    data-txt-workspace-share-copy-failed="<?php echo htmlspecialchars(t('workspaces.share.errors.copy_failed', [], 'Failed to copy share link', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-    data-txt-workspace-share-help="<?php echo htmlspecialchars(t('workspaces.share.help', [], 'Anyone with this URL opens Poznote directly on this workspace in read-only mode.', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-        data-txt-workspace-share-url-label="<?php echo htmlspecialchars(t('workspaces.share.url_label', [], 'Public URL', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-        data-txt-workspace-share-password-label="<?php echo htmlspecialchars(t('index.public_modal.password', [], 'Password (optional)', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-        data-txt-workspace-share-password-placeholder="<?php echo htmlspecialchars(t('index.public_modal.password_placeholder', [], 'Enter a password', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-        data-txt-show-password="<?php echo htmlspecialchars(t('login.show_password', [], 'Show password', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-        data-txt-hide-password="<?php echo htmlspecialchars(t('login.hide_password', [], 'Hide password', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-        data-txt-workspace-share-require-login="<?php echo htmlspecialchars(t('workspaces.share.options.require_login', [], 'Require Poznote login', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-        data-hide-restrict-users="<?php echo (!poznoteCanTargetOtherUsers() || poznoteIsUiElementHidden('share:restrict-users')) ? '1' : '0'; ?>"
-        data-hide-protocol-toggle="<?php echo poznoteIsUiElementHidden('share:protocol-toggle') ? '1' : '0'; ?>"
-        data-txt-workspace-share-restrict-users="<?php echo htmlspecialchars(t('workspaces.share.options.restrict_users', [], 'Restrict to specific users', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-        data-txt-workspace-share-users-loading="<?php echo htmlspecialchars(t('workspaces.share.options.users_loading', [], 'Loading users...', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-        data-txt-workspace-share-no-users="<?php echo htmlspecialchars(t('workspaces.share.options.no_users_found', [], 'No other users found', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-        data-txt-workspace-share-cancel="<?php echo htmlspecialchars(t('common.cancel', [], 'Cancel', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
+    data-txt-workspace-share-users-loading="<?php echo htmlspecialchars(t('workspaces.share.options.users_loading', [], 'Loading users...', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
+    data-txt-workspace-share-no-users="<?php echo htmlspecialchars(t('workspaces.share.options.no_users_found', [], 'No other users found', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
+    data-txt-workspace-share-cancel="<?php echo htmlspecialchars(t('common.cancel', [], 'Cancel', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
+    data-txt-workspace-info-not-shared="<?php echo htmlspecialchars(t('workspaces.share.status.not_shared', [], 'Not shared', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
+    data-txt-yes="<?php echo htmlspecialchars(t('common.yes', [], 'Yes', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
+    data-txt-no="<?php echo htmlspecialchars(t('common.no', [], 'No', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
+    data-txt-none="<?php echo htmlspecialchars(t('common.none', [], 'None', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
+    data-can-share="<?php echo poznoteCanTargetOtherUsers() ? '1' : '0'; ?>"
       <?php if (!empty($clearSelectedWorkspace) && !$isAjax): ?>
       data-clear-workspace="<?php echo htmlspecialchars(json_encode($workspaces[0] ?? ''), ENT_QUOTES, 'UTF-8'); ?>"
       <?php endif; ?>>
@@ -959,8 +830,8 @@ try {
                         <?php foreach ($workspaceRows as $workspaceRow): ?>
                                 <?php
                                 $ws = $workspaceRow['name'];
-                                $readonlyToken = $workspaceRow['readonly_token'] ?? '';
-                                $workspaceReadonlyEnabled = $readonlyToken !== '';
+                                $sharedUserIds = $workspaceRow['shared_user_ids'] ?? [];
+                                $workspaceShared = !empty($sharedUserIds);
                                 $ws_display = htmlspecialchars($ws);
                             ?>
                             <li class="ws-row" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
@@ -978,10 +849,9 @@ try {
                                     $cnt = isset($workspace_counts[$ws]) ? (int)$workspace_counts[$ws] : 0;
                                     $folderCount = isset($workspace_folder_counts[$ws]) ? (int)$workspace_folder_counts[$ws] : 0;
                                     $wsTags = $workspaceRow['tags'] ?? [];
-                                    $allowedUserIds = $workspaceRow['readonly_allowed_users'] ?? [];
                                     $sharedWith = [];
-                                    foreach ($allowedUserIds as $allowedUserId) {
-                                        $sharedWith[] = $sharedUsernamesById[(int)$allowedUserId] ?? ('User #' . (int)$allowedUserId);
+                                    foreach ($sharedUserIds as $sharedUserId) {
+                                        $sharedWith[] = $sharedUsernamesById[(int)$sharedUserId] ?? ('User #' . (int)$sharedUserId);
                                     }
                                 ?>
                                 <div class="ws-col ws-col-name">
@@ -1002,7 +872,7 @@ try {
                                     </div>
                                 </div>
                                 <?php
-                                    $shareLabel = $workspaceReadonlyEnabled
+                                    $shareLabel = $workspaceShared
                                         ? t_h('workspaces.share.actions.edit', [], 'Edit share', $currentLang)
                                         : t_h('workspaces.share.actions.enable', [], 'Share', $currentLang);
                                     $renameLabel = t_h('common.rename', [], 'Rename', $currentLang);
@@ -1016,20 +886,17 @@ try {
                                 ?>
                                 <div class="ws-col ws-col-actions">
                                     <div class="ws-icon-actions">
+                                        <?php if (poznoteCanTargetOtherUsers()): ?>
                                         <button type="button"
-                                                class="ws-icon-btn btn-share-toggle<?php echo $workspaceReadonlyEnabled ? ' is-shared' : ''; ?>"
+                                                class="ws-icon-btn btn-share-toggle<?php echo $workspaceShared ? ' is-shared' : ''; ?>"
                                                 data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"
-                                                data-shared="<?php echo $workspaceReadonlyEnabled ? '1' : '0'; ?>"
-                                                data-url="<?php echo htmlspecialchars((string)($workspaceRow['readonly_url'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>"
-                                                data-preview-url="<?php echo htmlspecialchars((string)($workspaceRow['readonly_preview_url'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>"
-                                                data-has-password="<?php echo !empty($workspaceRow['readonly_has_password']) ? '1' : '0'; ?>"
-                                                data-password-value="<?php echo htmlspecialchars((string)($workspaceRow['readonly_password_value'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>"
-                                                data-login-required="<?php echo !empty($workspaceRow['readonly_login_required']) ? '1' : '0'; ?>"
-                                                data-allowed-users="<?php echo htmlspecialchars(json_encode($workspaceRow['readonly_allowed_users'] ?? [], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP), ENT_QUOTES, 'UTF-8'); ?>"
-                                                data-action="upsert_readonly_share"
+                                                data-shared="<?php echo $workspaceShared ? '1' : '0'; ?>"
+                                                data-allowed-users="<?php echo htmlspecialchars(json_encode(array_values($sharedUserIds), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP), ENT_QUOTES, 'UTF-8'); ?>"
+                                                data-shared-with="<?php echo htmlspecialchars(json_encode($sharedWith, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP), ENT_QUOTES, 'UTF-8'); ?>"
                                                 title="<?php echo $shareLabel; ?>" aria-label="<?php echo $shareLabel; ?>">
                                             <i class="lucide lucide-share-2"></i><span class="ws-icon-btn-text"><?php echo $shareLabel; ?></span>
                                         </button>
+                                        <?php endif; ?>
                                         <button type="button" class="ws-icon-btn workspace-rename-action" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo $renameLabel; ?>" aria-label="<?php echo $renameLabel; ?>">
                                             <i class="lucide lucide-pencil"></i><span class="ws-icon-btn-text"><?php echo $renameLabel; ?></span>
                                         </button>
@@ -1055,7 +922,7 @@ try {
                                                 data-notes-count="<?php echo $cnt; ?>"
                                                 data-folders-count="<?php echo $folderCount; ?>"
                                                 data-tags="<?php echo htmlspecialchars(json_encode($wsTags, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP), ENT_QUOTES, 'UTF-8'); ?>"
-                                                data-shared="<?php echo $workspaceReadonlyEnabled ? '1' : '0'; ?>"
+                                                data-shared="<?php echo $workspaceShared ? '1' : '0'; ?>"
                                                 data-shared-with="<?php echo htmlspecialchars(json_encode($sharedWith, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP), ENT_QUOTES, 'UTF-8'); ?>"
                                                 title="<?php echo $infoLabel; ?>" aria-label="<?php echo $infoLabel; ?>">
                                             <i class="lucide lucide-info"></i><span class="ws-icon-btn-text"><?php echo $infoLabel; ?></span>

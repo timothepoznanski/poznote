@@ -90,7 +90,12 @@ foreach ($files as $name => $file) {
         $relativePath = substr($filePath, strlen($rootPath) + 1);
         $extension = pathinfo($relativePath, PATHINFO_EXTENSION);
         
-        // Include both HTML and Markdown files, skip index.php and other non-note files
+        // Include both HTML and Markdown files, skip index.php and other non-note files.
+        // An export of one workspace carries that workspace's notes only: the
+        // entries directory holds every note of the account.
+        if ($workspace !== null && !isset($noteTypeMap[intval(pathinfo($relativePath, PATHINFO_FILENAME))])) {
+            continue;
+        }
         if ($extension === 'html' || $extension === 'md') {
             if (file_exists($filePath) && is_readable($filePath)) {
                 // For Markdown files, add front matter with metadata

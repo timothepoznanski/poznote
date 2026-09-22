@@ -58,8 +58,6 @@ function openTaskDueDatePicker(taskId, noteId, event, anchorRectOverride) {
         event.stopPropagation();
     }
 
-    if (isPublicWorkspaceReadOnly()) return;
-
     const noteEntry = document.getElementById('entry' + noteId);
     if (!noteEntry) return;
 
@@ -154,8 +152,6 @@ function openTaskActionsMenu(taskId, noteId, event) {
     }
 
     closeTaskActionsMenu();
-
-    if (isPublicWorkspaceReadOnly()) return;
 
     const noteEntry = document.getElementById('entry' + noteId);
     if (!noteEntry) return;

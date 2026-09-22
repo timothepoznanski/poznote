@@ -33,11 +33,6 @@ $respond = static function (int $status, array $payload): void {
     exit;
 };
 
-// A public-workspace visitor has no login identity to hold access grants.
-if (!isRealUserAuthenticated()) {
-    $respond(403, ['success' => false, 'error' => 'forbidden']);
-}
-
 $authUserId = (int)(getAuthenticatedUserId() ?? 0);
 $targetUserId = isset($_GET['account']) && is_string($_GET['account']) && ctype_digit($_GET['account'])
     ? (int)$_GET['account']
@@ -72,7 +67,7 @@ if (is_file($dbPath)) {
 
         $workspaces = $pdo->query('SELECT name FROM workspaces ORDER BY ' . poznoteWorkspaceOrderBy($pdo))->fetchAll(PDO::FETCH_ASSOC);
         if ($workspacesOnly) {
-            $colors = poznoteGetWorkspaceColorsMap($pdo);
+            $colors = poznoteGetWorkspaceColorsMap($pdo, false);
         } else {
             $folders = $pdo->query('SELECT id, name, parent_id, workspace, created, display_order FROM folders')->fetchAll(PDO::FETCH_ASSOC);
             $notes = $pdo->query('SELECT id, heading, folder_id, workspace, type, created, updated, display_order FROM entries WHERE trash = 0')->fetchAll(PDO::FETCH_ASSOC);

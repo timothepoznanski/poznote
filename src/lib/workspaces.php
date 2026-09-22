@@ -58,8 +58,9 @@ function poznoteWorkspaceOrderBy($pdo = null, string $alias = ''): string {
  * @return string The first workspace name, or empty string if none exists
  */
 function getFirstWorkspaceName() {
-    if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
-        return getPublicWorkspaceName() ?? '';
+    // A session confined to a shared workspace (auth.php) has only that one.
+    if (function_exists('getSharedWorkspaceScopeName') && getSharedWorkspaceScopeName() !== null) {
+        return getSharedWorkspaceScopeName();
     }
 
     global $con;
@@ -92,8 +93,8 @@ function getFirstWorkspaceName() {
 function getWorkspaceFilter() {
     static $cached = null;
 
-    if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
-        return getPublicWorkspaceName() ?? '';
+    if (function_exists('getSharedWorkspaceScopeName') && getSharedWorkspaceScopeName() !== null) {
+        return getSharedWorkspaceScopeName();
     }
     
     // First check URL parameters - but ignore if empty
@@ -213,7 +214,9 @@ function poznoteRenderPageTitleWorkspace($workspace = null, array $options = [])
         : '<i class="lucide lucide-layers poznote-page-title-workspace-icon" aria-hidden="true"></i>';
     $chipName = '<span class="poznote-page-title-workspace-name">' . $escaped . '</span>';
 
-    if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
+    // A session confined to a shared workspace (auth.php) has no other
+    // workspace to switch to from here: a plain chip.
+    if (function_exists('isSharedWorkspaceScopeActive') && isSharedWorkspaceScopeActive()) {
         return '<span class="poznote-page-title-workspace poznote-page-title-workspace-static" title="' . $escaped . '">' . $chipLead . $chipName . '</span>';
     }
 
@@ -333,7 +336,9 @@ function getWorkspaceBackgroundSegment($workspace) {
  */
 function saveLastOpenedWorkspace($workspace) {
     global $con;
-    if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
+    // The owner's "last opened" setting is theirs: a session confined to a
+    // workspace they share (auth.php) leaves it alone.
+    if (function_exists('isSharedWorkspaceScopeActive') && isSharedWorkspaceScopeActive()) {
         return false;
     }
 
@@ -395,16 +400,30 @@ function poznoteGetWorkspaceTagsMap(PDO $con): array {
             error_log('functions: poznoteGetWorkspaceTagsMap() failed: ' . $e2->getMessage());
         }
     }
-    return $map;
+    return poznoteKeepSharedWorkspaceOnly($map);
+}
+
+/**
+ * A session confined to a workspace shared with it (auth.php) knows that
+ * workspace only: maps keyed by workspace name are cut down to it.
+ */
+function poznoteKeepSharedWorkspaceOnly(array $map): array {
+    $scopeName = function_exists('getSharedWorkspaceScopeName') ? getSharedWorkspaceScopeName() : null;
+    if ($scopeName === null) {
+        return $map;
+    }
+    return array_key_exists($scopeName, $map) ? [$scopeName => $map[$scopeName]] : [];
 }
 
 /**
  * Color of every colored workspace, keyed by name: the stored value (palette
  * id or '#rrggbb', same semantics as entries.color) and the hex it resolves
  * to. Workspaces without a color, or whose palette entry was deleted, are
- * absent.
+ * absent. $con is the active account's database unless $ofActiveAccount is
+ * false (account_tree.php reads another account's), which skips the cut to
+ * a shared workspace.
  */
-function poznoteGetWorkspaceColorsMap(PDO $con): array {
+function poznoteGetWorkspaceColorsMap(PDO $con, bool $ofActiveAccount = true): array {
     $map = [];
     try {
         $stmt = $con->query("SELECT name, color FROM workspaces WHERE color IS NOT NULL AND color != ''");
@@ -418,7 +437,7 @@ function poznoteGetWorkspaceColorsMap(PDO $con): array {
         // Column missing on a not-yet-migrated database: no colors
         error_log('functions: poznoteGetWorkspaceColorsMap() failed: ' . $e->getMessage());
     }
-    return $map;
+    return $ofActiveAccount ? poznoteKeepSharedWorkspaceOnly($map) : $map;
 }
 
 /**

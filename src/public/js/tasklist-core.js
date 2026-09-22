@@ -17,10 +17,6 @@ function parseTaskData(element) {
     }
 }
 
-function isPublicWorkspaceReadOnly() {
-    return !!(document.body && document.body.classList.contains('public-workspace-readonly'));
-}
-
 function isTaskEditBlurSavePaused(input) {
     return !!(input && input.dataset && input.dataset.taskEditBlurSavePaused === 'true');
 }

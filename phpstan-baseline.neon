@@ -61,12 +61,6 @@ parameters:
 			path: src/note_display.php
 
 		-
-			message: '#^Variable \$isPublicWorkspaceReadonly might not be defined\.$#'
-			identifier: variable.undefined
-			count: 2
-			path: src/note_display.php
-
-		-
 			message: '#^Variable \$res_right might not be defined\.$#'
 			identifier: variable.undefined
 			count: 1

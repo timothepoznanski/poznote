@@ -488,13 +488,6 @@ function initializeWorkspacesPage() {
     document.addEventListener('click', handleWorkspaceShareToggleClick);
     document.addEventListener('click', handleWorkspaceInfoButtonClick);
     document.addEventListener('click', handleWorkspaceInfoCloseButtonClick);
-    
-    document.addEventListener('submit', handleWorkspaceShareToggleSubmit, true);
-    document.addEventListener('click', function (event) {
-        if (handleWorkspaceReadonlyShareSave(event)) return;
-        if (handleWorkspaceReadonlyShareDisable(event)) return;
-        if (handleWorkspaceReadonlyShareCopy(event)) return;
-    });
 
     // Create workspace form
     var createForm = document.getElementById('create-workspace-form');

@@ -37,9 +37,11 @@ function initializeWorkspacesAndLabels($con) {
         }
     }
     
-    if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
-        $publicWorkspaceName = getPublicWorkspaceName();
-        $workspaces = $publicWorkspaceName !== null && $publicWorkspaceName !== '' ? [$publicWorkspaceName] : [];
+    // A session confined to a workspace shared with it (auth.php) lists that
+    // workspace alone.
+    $sharedWorkspaceName = function_exists('getSharedWorkspaceScopeName') ? getSharedWorkspaceScopeName() : null;
+    if ($sharedWorkspaceName !== null) {
+        $workspaces = [$sharedWorkspaceName];
         $labels = [];
         return;
     }

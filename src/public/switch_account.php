@@ -13,6 +13,17 @@
  * index.php then opens it in its own workspace) or 'workspace' (a workspace
  * name). Without either, index.php opens the account's last opened or default
  * workspace, as after a login.
+ *
+ * With 'workspace' and no access to the whole account, the switch is tried
+ * as a shared workspace (auth.php, openSharedWorkspace): the account opens
+ * confined to that workspace when its owner shares it with the signed-in
+ * person.
+ *
+ * 'next' lands on a page of the account instead of its notes: 'workspaces'
+ * (workspaces.php) or 'new_workspace' (the same page, caret in the creation
+ * field). The workspace menu uses them from inside a shared workspace, whose
+ * "Edit workspaces" and "New workspace" entries lead back to the person's
+ * own account.
  */
 require_once __DIR__ . '/../auth.php';
 
@@ -28,13 +39,20 @@ $location = 'index.php';
 
 $token = $_POST['csrf_token'] ?? '';
 $expected = $_SESSION['account_switch_csrf_token'] ?? '';
+$targetUserId = (int)($_POST['account_user_id'] ?? 0);
+$note = $_POST['note'] ?? '';
+$workspace = $_POST['workspace'] ?? '';
+$validWorkspace = is_string($workspace) && $workspace !== '' && strlen($workspace) <= 255;
+$nextPages = ['workspaces' => 'workspaces.php', 'new_workspace' => 'workspaces.php?new=1'];
+$next = $_POST['next'] ?? '';
+
 if (is_string($token) && is_string($expected) && $expected !== '' && hash_equals($expected, $token)
-    && switchActiveAccount((int)($_POST['account_user_id'] ?? 0))) {
-    $note = $_POST['note'] ?? '';
-    $workspace = $_POST['workspace'] ?? '';
-    if (is_string($note) && ctype_digit($note) && (int)$note > 0) {
+    && (switchActiveAccount($targetUserId) || ($validWorkspace && openSharedWorkspace($targetUserId, $workspace)))) {
+    if (is_string($next) && isset($nextPages[$next])) {
+        $location = $nextPages[$next];
+    } elseif (is_string($note) && ctype_digit($note) && (int)$note > 0) {
         $location .= '?note=' . (int)$note;
-    } elseif (is_string($workspace) && $workspace !== '' && strlen($workspace) <= 255) {
+    } elseif ($validWorkspace) {
         $location .= '?workspace=' . rawurlencode($workspace);
     }
 }

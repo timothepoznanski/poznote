@@ -33,10 +33,6 @@
         return (typeof window.t === 'function') ? window.t(key, vars, fallback) : fallback;
     }
 
-    function isReadonlyPage() {
-        return !!(document.body && document.body.classList.contains('public-workspace-readonly'));
-    }
-
     /** {noteId, attachmentId} for a same-origin attachment URL, or null. */
     function parseAttachmentUrl(value) {
         if (!value) return null;
@@ -74,7 +70,7 @@
      * shows it, and the element the transcript should follow.
      */
     function describeTarget(node) {
-        if (!node || !node.closest || isReadonlyPage()) return null;
+        if (!node || !node.closest) return null;
 
         var card = node.closest('.note-attachment-preview[data-attachment-id]');
         var cards = card ? card.closest('.note-attachment-previews[data-note-id]') : null;
@@ -131,7 +127,7 @@
     }
 
     function describeFrame(frame) {
-        if (!frame || !frame.closest || isReadonlyPage()) return null;
+        if (!frame || !frame.closest) return null;
         var ref = parseAudioPlayerUrl(frame.getAttribute('src')) || parseAttachmentUrl(frame.getAttribute('data-audio-src'));
         if (!ref) return null;
 

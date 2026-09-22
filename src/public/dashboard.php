@@ -214,8 +214,11 @@ function dashboardSaveScopeQuery(PDO $con, array $query): void {
  * the scope restores them too.
  */
 function dashboardResolveRememberedScope(PDO $con, array $params, string $pageWorkspace): array {
-    if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
-        return poznoteResolveWorkspaceScope($con, $params, $pageWorkspace);
+    // A session confined to a workspace shared with it (auth.php) boards
+    // that workspace alone, whatever the URL or the owner's saved scope says.
+    $sharedWorkspaceName = function_exists('getSharedWorkspaceScopeName') ? getSharedWorkspaceScopeName() : null;
+    if ($sharedWorkspaceName !== null) {
+        return poznoteResolveWorkspaceScope($con, ['workspace' => $sharedWorkspaceName], $sharedWorkspaceName);
     }
 
     $requested = strtolower(trim((string)($params['scope'] ?? '')));

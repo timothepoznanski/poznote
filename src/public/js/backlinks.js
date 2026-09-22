@@ -41,18 +41,6 @@
         }
     }
 
-    function isPublicWorkspaceActive() {
-        if (document.body && document.body.classList.contains('public-workspace-readonly')) {
-            return true;
-        }
-
-        if (typeof window.isPublicWorkspaceNavigationActive === 'function') {
-            return window.isPublicWorkspaceNavigationActive();
-        }
-
-        return typeof window.isPublicWorkspaceAccess !== 'undefined' && window.isPublicWorkspaceAccess;
-    }
-
     function getWorkspaceName() {
         if (typeof window.getSelectedWorkspace === 'function') {
             return window.getSelectedWorkspace();
@@ -74,11 +62,8 @@
             params.set('workspace', workspace);
         }
 
-        if (isPublicWorkspaceActive()) {
-            params.set('public_workspace', '1');
-        } else {
-            params.set('all_workspaces', '1');
-        }
+        // Ignored by the server in a workspace shared with this login
+        params.set('all_workspaces', '1');
 
         var query = params.toString();
         return query ? url + '?' + query : url;

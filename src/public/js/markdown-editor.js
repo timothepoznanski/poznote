@@ -129,10 +129,6 @@ function isMarkdownEntryReadOnly(noteEntry) {
         return true;
     }
 
-    if (document.body && document.body.classList.contains('public-workspace-readonly')) {
-        return true;
-    }
-
     var noteId = noteEntry.getAttribute('data-note-id') || (noteEntry.id || '').replace('entry', '');
     return !!(noteId && typeof window.isNoteEditingLocked === 'function' && window.isNoteEditingLocked(noteId));
 }

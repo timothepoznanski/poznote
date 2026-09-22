@@ -31,17 +31,6 @@ require_once __DIR__ . '/../auth.php';
 requireAuth();
 requireActiveAccountOwner();
 
-// A public-workspace session borrows the owner's identity, so
-// requireActiveAccountOwner() alone lets it through; this endpoint would
-// then let an anonymous visitor overwrite the owner's whole account. Deny
-// it the same way the admin API gate does.
-if (isPublicWorkspaceAccessActive()) {
-    http_response_code(403);
-    header('Content-Type: application/json');
-    echo json_encode(['success' => false, 'error' => 'This endpoint is not available in public workspace mode']);
-    exit;
-}
-
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../functions.php';
 require_once __DIR__ . '/../users/db_master.php';

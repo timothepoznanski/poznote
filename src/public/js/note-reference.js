@@ -65,7 +65,6 @@
      * within the current workspace; editors get an id link that works anywhere.
      */
     function canLinkAcrossWorkspaces() {
-        if (isPublicWorkspaceMode()) return false;
         return !(savedEditableElement && savedEditableElement.tagName === 'INPUT');
     }
 
@@ -602,7 +601,6 @@
      * missing note, network error): callers then stay in the current one.
      */
     async function getNoteWorkspace(noteId) {
-        if (isPublicWorkspaceMode()) return null;
         try {
             const response = await fetch(`/api/v1/notes/resolve?reference=${encodeURIComponent(noteId)}`);
             if (!response.ok) return null;
@@ -612,12 +610,6 @@
             console.debug('note-reference: getNoteWorkspace() failed:', e);
             return null;
         }
-    }
-
-    function isPublicWorkspaceMode() {
-        if (document.body && document.body.classList.contains('public-workspace-readonly')) return true;
-        if (typeof window.isPublicWorkspaceNavigationActive === 'function') return window.isPublicWorkspaceNavigationActive();
-        return typeof window.isPublicWorkspaceAccess !== 'undefined' && !!window.isPublicWorkspaceAccess;
     }
 
     /**

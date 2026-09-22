@@ -94,7 +94,8 @@
       "today": "Hoy",
       "yesterday": "Ayer"
     },
-    "network_error": "Error de red"
+    "network_error": "Error de red",
+    "none": "Ninguno"
   },
   "snapshot": {
     "menu_item": "Instantáneas",
@@ -715,7 +716,8 @@
       "edit_workspaces": "Editar espacios de trabajo",
       "new_workspace": "Nuevo espacio de trabajo",
       "accounts": "Cuentas",
-      "title": "Espacios de trabajo"
+      "title": "Espacios de trabajo",
+      "shared_with_me": "Compartidos conmigo"
     },
     "errors": {
       "already_exists": "Ya existe un espacio de trabajo con este nombre",
@@ -746,37 +748,28 @@
     "share": {
       "actions": {
         "enable": "Compartir",
-        "edit": "Editar uso compartido",
-        "copy_link": "Copiar enlace",
+        "edit": "Editar compartir",
         "disable": "Dejar de compartir"
       },
       "confirm": {
-        "title": "Compartir espacio de trabajo en modo solo lectura",
-        "message": "Cualquier persona con la URL del espacio de trabajo \"{{workspace}}\" tendrá acceso a todas las notas y carpetas de este espacio de trabajo en modo solo lectura.",
-        "confirm_button": "Compartir espacio de trabajo"
+        "title": "Compartir espacio de trabajo",
+        "message": "Elige los usuarios que pueden abrir el espacio de trabajo \"{{workspace}}\". Lo encontrarán en su menú de espacios de trabajo y podrán editar sus notas y carpetas."
       },
       "messages": {
-        "enabled": "Enlace de espacio de trabajo de solo lectura activado",
-        "disabled": "Enlace de espacio de trabajo de solo lectura desactivado",
-        "url_copied": "¡Enlace compartido copiado al portapapeles!"
+        "disabled": "El espacio de trabajo ya no está compartido",
+        "url_copied": "¡Enlace compartido copiado al portapapeles!",
+        "saved": "Compartir del espacio de trabajo actualizado"
       },
       "errors": {
-        "url_in_use": "Ya existe un espacio de trabajo público con este nombre en esta instancia de Poznote",
-        "copy_failed": "No se pudo copiar el enlace compartido",
-        "save_failed": "No se pudo guardar el enlace de espacio de trabajo de solo lectura",
-        "disable_failed": "No se pudo desactivar el enlace de espacio de trabajo de solo lectura"
+        "save_failed": "No se pudo actualizar el compartir del espacio de trabajo",
+        "not_allowed": "Compartir con otros usuarios no está disponible en esta instancia"
       },
-      "status": {
-        "enabled": "Solo lectura pública activada",
-        "disabled": "No compartido públicamente"
-      },
-      "help": "Cualquier persona con esta URL abre Poznote directamente en este espacio de trabajo en modo solo lectura.",
-      "url_label": "URL pública",
       "options": {
-        "require_login": "Requerir inicio de sesión en Poznote",
-        "restrict_users": "Restringir a usuarios específicos",
         "users_loading": "Cargando usuarios...",
         "no_users_found": "No se encontraron otros usuarios"
+      },
+      "status": {
+        "not_shared": "No compartido"
       }
     },
     "tags": {
@@ -1480,43 +1473,7 @@
       "delete_title": "Confirmar eliminación de espacio de trabajo",
       "delete_description": "Todas las notas y carpetas serán eliminadas permanentemente y no se pueden recuperar.",
       "delete_placeholder": "Escribe el nombre del espacio de trabajo para confirmar",
-      "delete_button": "Eliminar",
-      "share": {
-        "actions": {
-          "enable": "Compartir",
-          "edit": "Editar el uso compartido",
-          "copy_link": "Copiar enlace",
-          "disable": "Dejar de compartir"
-        },
-        "confirm": {
-          "title": "Compartir el espacio de trabajo en solo lectura",
-          "message": "Cualquiera con la URL del espacio de trabajo «{{workspace}}» tendrá acceso de solo lectura a todas las notas y carpetas de este espacio.",
-          "confirm_button": "Compartir espacio de trabajo"
-        },
-        "messages": {
-          "enabled": "Enlace del espacio en solo lectura activado",
-          "disabled": "Enlace del espacio en solo lectura desactivado",
-          "url_copied": "¡Enlace para compartir copiado al portapapeles!"
-        },
-        "errors": {
-          "url_in_use": "Ya existe un espacio de trabajo público con este nombre en esta instancia de Poznote",
-          "copy_failed": "No se pudo copiar el enlace para compartir",
-          "save_failed": "No se pudo guardar el enlace del espacio en solo lectura",
-          "disable_failed": "No se pudo desactivar el enlace del espacio en solo lectura"
-        },
-        "status": {
-          "enabled": "Solo lectura pública activada",
-          "disabled": "No compartido públicamente"
-        },
-        "help": "Cualquiera con esta URL abre Poznote directamente en este espacio de trabajo, en solo lectura.",
-        "url_label": "URL pública",
-        "options": {
-          "require_login": "Exigir inicio de sesión en Poznote",
-          "restrict_users": "Restringir a usuarios concretos",
-          "users_loading": "Cargando usuarios...",
-          "no_users_found": "No se encontraron otros usuarios"
-        }
-      }
+      "delete_button": "Eliminar"
     },
     "user_settings_info": {
       "title": "Configuración de cuenta",
@@ -2927,8 +2884,7 @@
       "error_incorrect": "Contraseña incorrecta. Inténtelo de nuevo.",
       "additional_password_required": "Esta nota requiere una contraseña adicional. Ingrese la siguiente contraseña para continuar.",
       "placeholder": "Ingrese la contraseña",
-      "unlock": "Desbloquear",
-      "workspace_heading": "Espacio de trabajo protegido con contraseña"
+      "unlock": "Desbloquear"
     },
     "errors": {
       "token_missing": "Falta el enlace",
@@ -3842,15 +3798,14 @@
       "untitled_note": "nota #{{id}}",
       "linked_deleted": "+{{count}} notas vinculadas",
       "share_updated": "ajustes actualizados",
-      "password_protected": "protegido con contraseña",
-      "login_required": "inicio de sesión obligatorio",
       "allowed_users": "limitado a {{count}} usuarios",
       "accounts": "cuentas: {{accounts}}",
       "empty_value": "vacío",
       "s3_objects_deleted": "{{count}} objetos S3 eliminados",
       "s3_cleanup_failed": "falló la limpieza de S3",
       "expires_at": "caduca el {{date}}",
-      "recovery_codes_remaining": "quedan {{count}}"
+      "recovery_codes_remaining": "quedan {{count}}",
+      "shared_with": "compartido con {{users}}"
     },
     "destinations": {
       "download": "descarga",

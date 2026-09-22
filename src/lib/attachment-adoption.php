@@ -201,7 +201,7 @@ function poznoteAdoptForeignAttachments(PDO $con, int $noteId, string $content, 
     // A request carrying API credentials (Basic, Bearer, the MCP service
     // token) acts for the one account it names: the API lets user credentials
     // reach their own data only, and this must not be a way around it.
-    $isWebSession = function_exists('isRealUserAuthenticated') && isRealUserAuthenticated()
+    $isWebSession = function_exists('isAuthenticated') && isAuthenticated()
         && !(function_exists('hasApiAuthCredentials') && hasApiAuthCredentials());
     $authUserId = $isWebSession && function_exists('getAuthenticatedUserId')
         ? (int)(getAuthenticatedUserId() ?? 0)

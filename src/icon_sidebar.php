@@ -295,8 +295,21 @@ $iconSidebarBottomItems = [
 // menu (js/workspaces-core.js) and in its "Other accounts" block
 // (js/other-accounts.js); all post the choice to switch_account.php. The
 // token is kept for the whole session so several open tabs all stay valid.
+// Workspaces other accounts share with the signed-in person come along
+// (auth.php, getSharedWorkspacesForLogin): the workspace menu lists them
+// under "Shared with me", and opening one goes through switch_account.php
+// too. With shared workspaces but a single account, the person's own
+// account is still listed, as the way back from a shared workspace.
 $iconSidebarAccountSwitch = null;
 $iconSidebarSwitchProfiles = function_exists('getSwitchableAccountProfiles') ? getSwitchableAccountProfiles() : [];
+$iconSidebarSharedWorkspaces = function_exists('getSharedWorkspacesForLogin') ? getSharedWorkspacesForLogin() : [];
+$iconSidebarSharedScope = function_exists('getSharedWorkspaceScope') ? getSharedWorkspaceScope() : null;
+if (empty($iconSidebarSwitchProfiles) && !empty($iconSidebarSharedWorkspaces)) {
+    $iconSidebarOwnProfile = function_exists('getAuthenticatedUser') ? getAuthenticatedUser() : null;
+    if (is_array($iconSidebarOwnProfile) && !empty($iconSidebarOwnProfile['id'])) {
+        $iconSidebarSwitchProfiles = [$iconSidebarOwnProfile];
+    }
+}
 if (!empty($iconSidebarSwitchProfiles)) {
     if (empty($_SESSION['account_switch_csrf_token'])) {
         $_SESSION['account_switch_csrf_token'] = bin2hex(random_bytes(32));
@@ -306,15 +319,25 @@ if (!empty($iconSidebarSwitchProfiles)) {
     $iconSidebarAccountSwitch = [
         'action' => $iconSidebarBasePath . 'switch_account.php',
         'csrfToken' => $_SESSION['account_switch_csrf_token'],
-        'accounts' => array_map(static function (array $profile) use ($iconSidebarAuthUserId, $iconSidebarActiveUserId): array {
+        'accounts' => array_map(static function (array $profile) use ($iconSidebarAuthUserId, $iconSidebarActiveUserId, $iconSidebarSharedScope): array {
             $id = (int)$profile['id'];
             return [
                 'id' => $id,
                 'username' => (string)($profile['username'] ?? ''),
                 'own' => $id === $iconSidebarAuthUserId,
-                'current' => $id === $iconSidebarActiveUserId,
+                // Inside a shared workspace no account is "current": the
+                // active one is the owner's, opened for that workspace only.
+                'current' => $iconSidebarSharedScope === null && $id === $iconSidebarActiveUserId,
             ];
         }, $iconSidebarSwitchProfiles),
+        'sharedWorkspaces' => array_map(static function (array $row): array {
+            return [
+                'ownerId' => (int)$row['owner_user_id'],
+                'ownerUsername' => (string)$row['owner_username'],
+                'workspace' => (string)$row['workspace_name'],
+                'current' => !empty($row['current']),
+            ];
+        }, $iconSidebarSharedWorkspaces),
     ];
 }
 

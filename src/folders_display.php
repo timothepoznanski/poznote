@@ -669,7 +669,6 @@ function generateNoteLink($search, $tags_search, $folder_filter, $workspace_filt
     if (!empty($created_to)) $params[] = 'created_to=' . urlencode($created_to);
     if (!empty($folder_filter)) $params[] = 'folder=' . urlencode($folder_filter);
     if (!empty($workspace_filter)) $params[] = 'workspace=' . urlencode($workspace_filter);
-    if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) $params[] = 'public_workspace=1';
     if ($preserve_notes) $params[] = 'preserve_notes=1';
     if ($preserve_tags) $params[] = 'preserve_tags=1';
     if ($search_combined) $params[] = 'search_combined=1';

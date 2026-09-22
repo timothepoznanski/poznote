@@ -575,6 +575,9 @@
         var fields = [['csrf_token', accountSwitch.csrfToken || ''], ['account_user_id', String(accountId)]];
         if (landing && landing.note) fields.push(['note', String(landing.note)]);
         if (landing && landing.workspace) fields.push(['workspace', String(landing.workspace)]);
+        // A page of the account opened, instead of its notes (switch_account.php
+        // knows which ones)
+        if (landing && landing.next) fields.push(['next', String(landing.next)]);
 
         var form = document.createElement('form');
         form.method = 'POST';

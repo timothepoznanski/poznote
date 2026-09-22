@@ -183,7 +183,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 42; // 42: one global sort mode for the tree, keeping a hand-made arrangement (#1442)
+    $CURRENT_SCHEMA_VERSION = 43; // 43: workspace sharing moved to master.db workspace_shares, the public read-only workspace link is gone
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -204,6 +204,7 @@ try {
     try {
         $svStmt = $con->query("SELECT value FROM settings WHERE key = 'schema_version'");
         $svResult = $svStmt->fetchColumn();
+        $svStmt->closeCursor();
         if ($svResult !== false) {
             $currentVersion = (int)$svResult;
         }
@@ -219,6 +220,42 @@ try {
     // missing columns this version expects. Everything below is idempotent,
     // so re-running it is safe.
     if ($currentVersion !== $CURRENT_SCHEMA_VERSION) {
+        // === Workspace sharing moved to master.db (schema 43) ===
+        //
+        // A workspace used to be shared through a public read-only link
+        // (shared_workspaces, one row per workspace, with the accounts the
+        // link was restricted to in allowed_users). It is now shared with
+        // named accounts, who open it from their own workspace menu and edit
+        // it: master.db workspace_shares. The accounts a link was restricted
+        // to keep their access as grantees; a link open to anyone, or to any
+        // signed-in account, had no one to carry over. The link registry rows
+        // and the table itself are then dropped.
+        //
+        // First step of the bootstrap on purpose: DROP TABLE fails with
+        // "database table is locked" while any statement of this connection
+        // still has a cursor open, and the migrations below leave some.
+        if ($currentVersion < 43) {
+            try {
+                $legacyTable = $con->query("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'shared_workspaces'")->fetchColumn();
+                if ($legacyTable && $activeUserId) {
+                    require_once __DIR__ . '/users/db_master.php';
+                    $legacyRows = $con->query('SELECT workspace_name, token, allowed_users FROM shared_workspaces')->fetchAll(PDO::FETCH_ASSOC);
+                    foreach ($legacyRows as $legacyRow) {
+                        $granteeIds = json_decode((string)($legacyRow['allowed_users'] ?? ''), true);
+                        if (is_array($granteeIds) && !empty($granteeIds)) {
+                            setWorkspaceShareGrantees((int)$activeUserId, (string)$legacyRow['workspace_name'], $granteeIds);
+                        }
+                        if (!empty($legacyRow['token'])) {
+                            unregisterSharedLink((string)$legacyRow['token']);
+                        }
+                    }
+                    $con->exec('DROP TABLE shared_workspaces');
+                }
+            } catch (Exception $e) {
+                error_log('db_connect: workspace share migration failed: ' . $e->getMessage());
+            }
+        }
+
         // === TABLE CREATION ===
 
         // Create entries table
@@ -309,19 +346,6 @@ try {
             access_mode TEXT DEFAULT "read_only",
             disabled INTEGER DEFAULT 0,
             FOREIGN KEY(folder_id) REFERENCES folders(id) ON DELETE CASCADE
-        )');
-
-        // Table for public shared workspaces (read-only)
-        $con->exec('CREATE TABLE IF NOT EXISTS shared_workspaces (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            workspace_name TEXT UNIQUE NOT NULL,
-            token TEXT UNIQUE NOT NULL,
-            theme TEXT,
-            password TEXT,
-            password_encrypted TEXT,
-            login_required INTEGER DEFAULT 0,
-            allowed_users TEXT,
-            created DATETIME DEFAULT CURRENT_TIMESTAMP
         )');
 
         // Notifications table for in-app reminders
@@ -483,29 +507,6 @@ try {
             error_log('Could not add missing columns to shared_folders: ' . $e->getMessage());
         }
 
-        // Add missing columns to shared_workspaces
-        try {
-            $cols = $con->query("PRAGMA table_info(shared_workspaces)")->fetchAll(PDO::FETCH_ASSOC);
-            $existingColumns = array_column($cols, 'name');
-            if (!in_array('password', $existingColumns)) {
-                $con->exec("ALTER TABLE shared_workspaces ADD COLUMN password TEXT");
-            }
-            if (!in_array('password_encrypted', $existingColumns)) {
-                $con->exec("ALTER TABLE shared_workspaces ADD COLUMN password_encrypted TEXT");
-            }
-            if (!in_array('theme', $existingColumns)) {
-                $con->exec("ALTER TABLE shared_workspaces ADD COLUMN theme TEXT");
-            }
-            if (!in_array('login_required', $existingColumns)) {
-                $con->exec("ALTER TABLE shared_workspaces ADD COLUMN login_required INTEGER DEFAULT 0");
-            }
-            if (!in_array('allowed_users', $existingColumns)) {
-                $con->exec("ALTER TABLE shared_workspaces ADD COLUMN allowed_users TEXT");
-            }
-        } catch (Exception $e) {
-            error_log('Could not add missing columns to shared_workspaces: ' . $e->getMessage());
-        }
-
         // === REMOVE LEGACY COLUMNS === (Schema version 4)
         // Remove unused subheading and location columns from entries table
         if ($currentVersion < 4) {
@@ -583,8 +584,6 @@ try {
         $con->exec('CREATE INDEX IF NOT EXISTS idx_shared_notes_token ON shared_notes(token)');
         $con->exec('CREATE INDEX IF NOT EXISTS idx_shared_folders_folder_id ON shared_folders(folder_id)');
         $con->exec('CREATE INDEX IF NOT EXISTS idx_shared_folders_token ON shared_folders(token)');
-        $con->exec('CREATE INDEX IF NOT EXISTS idx_shared_workspaces_workspace_name ON shared_workspaces(workspace_name)');
-        $con->exec('CREATE INDEX IF NOT EXISTS idx_shared_workspaces_token ON shared_workspaces(token)');
 
         // === DEFAULT SETTINGS ===
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_font_size', '15')");

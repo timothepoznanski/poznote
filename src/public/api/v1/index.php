@@ -53,32 +53,6 @@ $isSharedEndpoint = strpos($uri, '/api/v1/shared') !== false;
 $isPublicApiEndpoint = strpos($uri, '/api/v1/public') !== false;
 $isAttachmentDownload = $_SERVER['REQUEST_METHOD'] === 'GET' && preg_match('#/api/v1/notes/\d+/attachments/[^/]+#', $uri);
 
-if (function_exists('maybeAuthenticatePublicWorkspaceRequest')
-    && function_exists('isExplicitPublicWorkspaceRequest')
-    && isExplicitPublicWorkspaceRequest()
-    && (!function_exists('isPublicWorkspaceAccessActive') || !isPublicWorkspaceAccessActive())) {
-    maybeAuthenticatePublicWorkspaceRequest();
-}
-
-if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
-    $isAutomaticSnapshotCreate = $_SERVER['REQUEST_METHOD'] === 'POST'
-        && preg_match('#/api/v1/notes/\d+/snapshot$#', $uri)
-        && strtolower((string)($_GET['manual'] ?? $_GET['force'] ?? '0')) === '0';
-
-    if ($isAutomaticSnapshotCreate) {
-        echo json_encode([
-            'success' => true,
-            'skipped' => true,
-            'read_only' => true,
-        ]);
-        exit;
-    }
-
-    if ($isPublicProfilesEndpoint || $isMeEndpoint || $isSharedEndpoint || $isLookupEndpoint || $isAdminEndpoint) {
-        denyPublicWorkspaceAccessResponse('This endpoint is not available in public workspace mode', 403);
-    }
-}
-
 // Require authentication (with X-User-ID for data endpoints, without for admin/public endpoints)
 if ($isPublicApiEndpoint) {
     // No additional authentication required (token validation happens in controller)
@@ -109,13 +83,6 @@ if ($isPublicApiEndpoint) {
 // This ensures the correct user database is used
 require_once __DIR__ . '/../../../db_connect.php';
 require_once __DIR__ . '/../../../functions.php';
-
-if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
-    $publicWorkspaceName = getPublicWorkspaceName();
-    if (is_string($publicWorkspaceName) && $publicWorkspaceName !== '') {
-        $_GET['workspace'] = $publicWorkspaceName;
-    }
-}
 
 require_once dirname(__DIR__, 3) . '/lib/api-response.php';
 
