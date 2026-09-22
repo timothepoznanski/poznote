@@ -2053,6 +2053,8 @@
     "list": "Lista",
     "bullet_list": "Lista com marcadores",
     "numbered_list": "Lista numerada",
+    "lettered_list": "Lista com letras",
+    "roman_list": "Lista com números romanos",
     "checklist": "Lista de verificação",
     "done": "Feito",
     "image": "Imagem",

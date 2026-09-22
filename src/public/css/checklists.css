@@ -176,6 +176,41 @@
     padding-left: 24px;
 }
 
+/* ===== LETTERED AND ROMAN LISTS (#1429) ===== */
+/* <ol type="a"> reads a), b), c) and <ol type="i"> reads i., ii., iii., on
+   the counter above but one level only, indented like a bullet list. The
+   marker sits in a left-aligned column hanging in the padding: a native
+   marker is right-aligned, so i. / ii. / iii. started at three different
+   places. 1.75em holds "viii.", a wider marker pushes its first line instead
+   of overlapping it (the padding keeps the gap, a trailing space would
+   collapse in an inline-block). The attribute match is case-insensitive in
+   HTML, so type="A" / "I" land here too. Same layout on the public page
+   (public_note.css) and in the journal (diary.css). */
+.noteentry ol:is([type="a"], [type="i"]) {
+    padding-left: 40px;
+}
+
+.noteentry li>ol:is([type="a"], [type="i"]) {
+    padding-left: 1.75em;
+}
+
+.noteentry ol:is([type="a"], [type="i"])>li::before {
+    display: inline-block;
+    box-sizing: border-box;
+    min-width: 1.75em;
+    margin-left: -1.75em;
+    margin-right: 0;
+    padding-right: 0.3em;
+}
+
+.noteentry ol[type="a"]>li::before {
+    content: counter(item, lower-alpha) ")";
+}
+
+.noteentry ol[type="i"]>li::before {
+    content: counter(item, lower-roman) ".";
+}
+
 /* Add spacing to bullet list items as well (exclude checklists) */
 .noteentry ul:not(.checklist):not(.task-list)>li:not(.checklist-item):not(.task-list-item) {
     margin-top: 8px;

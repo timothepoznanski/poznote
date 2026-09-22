@@ -132,13 +132,19 @@
   }
 
   /**
-   * Create a new list of the same type as the parent
+   * Create a new list of the same type as the parent. A lettered list
+   * (a, b, c) nests roman numerals (i, ii, iii), the usual outline order;
+   * the other marker types carry over as they are (#1429).
    * @param {HTMLElement} parentList - The parent list to match type
    * @returns {HTMLElement} A new ul or ol element
    */
   function createNestedList(parentList) {
     const tagName = parentList ? parentList.tagName : 'UL';
     const list = document.createElement(tagName);
+    const markerType = tagName === 'OL' ? parentList.getAttribute('type') : null;
+    if (markerType) {
+      list.setAttribute('type', markerType.toLowerCase() === 'a' ? 'i' : markerType);
+    }
     list.style.marginTop = '0';
     list.style.marginBottom = '0';
     return list;

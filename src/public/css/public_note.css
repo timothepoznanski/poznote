@@ -385,6 +385,33 @@ body.public-note-page {
     margin: 0.5em 0;
 }
 
+/* Lettered a) and roman i. lists, laid out as in the editor: the marker in a
+   left-aligned column hanging in the padding (checklists.css, #1429) */
+.public-note .content ol:is([type="a"], [type="i"]) {
+    list-style: none;
+    counter-reset: pz-list;
+}
+
+.public-note .content ol:is([type="a"], [type="i"])>li {
+    counter-increment: pz-list;
+}
+
+.public-note .content ol:is([type="a"], [type="i"])>li::before {
+    display: inline-block;
+    box-sizing: border-box;
+    min-width: 2em;
+    margin-left: -2em;
+    padding-right: 0.25em;
+}
+
+.public-note .content ol[type="a"]>li::before {
+    content: counter(pz-list, lower-alpha) ")";
+}
+
+.public-note .content ol[type="i"]>li::before {
+    content: counter(pz-list, lower-roman) ".";
+}
+
 /* Task list styles */
 .public-note .content ul.task-list {
     list-style: none;

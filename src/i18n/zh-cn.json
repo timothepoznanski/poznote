@@ -2051,6 +2051,8 @@
     "list": "列表",
     "bullet_list": "无序列表",
     "numbered_list": "有序列表",
+    "lettered_list": "字母列表",
+    "roman_list": "罗马数字列表",
     "checklist": "清单",
     "done": "已完成",
     "image": "图片",

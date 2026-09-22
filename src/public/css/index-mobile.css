@@ -624,10 +624,14 @@ body.mobile-formatting-toolbar-active #right_col .note-edit-toolbar .mobile-home
     font-style: normal;
 }
 
-/* Slash command menu on mobile */
+/* Slash command menu on mobile: as tall as the screen allows, so a menu that
+   fits never scrolls. 30px = the 8px kept free above and below by
+   positionMenuAtRect() (js/slash-command.js), plus the 6px padding and 1px
+   border max-height does not count. */
 .slash-command-menu {
     width: min(92vw, 360px);
-    max-height: 60vh;
+    max-height: calc(100vh - 30px);
+    max-height: calc(100dvh - 30px);
     overflow-y: auto;
 }
 

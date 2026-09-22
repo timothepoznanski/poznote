@@ -2060,6 +2060,8 @@
     "list": "Liste",
     "bullet_list": "Liste à puces",
     "numbered_list": "Liste numérotée",
+    "lettered_list": "Liste alphabétique",
+    "roman_list": "Liste en chiffres romains",
     "checklist": "Cases à cocher",
     "done": "Fait",
     "image": "Image",

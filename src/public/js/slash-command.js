@@ -169,6 +169,9 @@
     // Set while the menu was opened on a text selection (issue #1410): no "/"
     // was typed, the selection is kept and only formatting commands are shown
     let selectionSlashContext = null;
+    // Mobile: what the menu was placed against, to place it again once the
+    // virtual keyboard it closes has given the screen height back
+    let slashMenuAnchorRect = null;
     const SLASH_CURSOR_HIDDEN_CLASS = 'slash-menu-cursor-hidden';
 
     // Touch tracking for distinguishing tap from scroll
@@ -1278,8 +1281,9 @@
         }
     }
 
-    // Insert a list (ordered or unordered)
-    function insertList(ordered) {
+    // Insert a list (ordered or unordered). `markerType` is the <ol> type
+    // attribute: 'a' for a lettered list, 'i' for roman numerals (#1429).
+    function insertList(ordered, markerType) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
 
@@ -1287,6 +1291,7 @@
 
         // Create new list
         const list = document.createElement(ordered ? 'ol' : 'ul');
+        if (ordered && markerType) list.setAttribute('type', markerType);
         const li = document.createElement('li');
         li.appendChild(document.createElement('br'));
         list.appendChild(li);
@@ -2574,6 +2579,8 @@
                 submenu: [
                     { id: 'bullets', icon: 'lucide-list-ul', label: t('slash_menu.bullet_list', null, 'Bullet list'), action: () => insertList(false) },
                     { id: 'numbers', icon: 'lucide-list-ol', label: t('slash_menu.numbered_list', null, 'Numbered list'), action: () => insertList(true) },
+                    { id: 'letters', icon: 'lucide-list-lettered', label: t('slash_menu.lettered_list', null, 'Lettered list'), aliases: ['abc', 'letters'], action: () => insertList(true, 'a') },
+                    { id: 'roman', icon: 'lucide-list-roman', label: t('slash_menu.roman_list', null, 'Roman numeral list'), aliases: ['roman'], action: () => insertList(true, 'i') },
                     {
                         id: 'checklist',
                         icon: 'lucide-list-check',
@@ -3727,14 +3734,17 @@
         const padding = 8;
 
         if (isMobile) {
+            slashMenuAnchorRect = rect;
             // On mobile, center horizontally and position near cursor
             const menuWidth = menuRect.width || 360;
             const x = Math.max(padding, (window.innerWidth - menuWidth) / 2);
             // Position below cursor, but ensure it fits on screen
             let y = rect.bottom + 10;
-            // If menu would go below viewport, position above cursor instead
+            // If menu would go below viewport, position above cursor instead,
+            // and over the text when neither side has room for the whole menu
             if (y + menuRect.height > window.innerHeight - padding) {
-                y = Math.max(padding, rect.top - menuRect.height - 10);
+                const above = rect.top - menuRect.height - 10;
+                y = above >= padding ? above : Math.max(padding, window.innerHeight - menuRect.height - padding);
             }
             slashMenuElement.style.left = x + 'px';
             slashMenuElement.style.top = y + 'px';
@@ -3832,7 +3842,16 @@
         filterText = '';
         selectionSlashContext = null;
         slashInsertedByButton = false;
+        slashMenuAnchorRect = null;
         resetCodeMirrorSlashState();
+    }
+
+    // The menu opens with the keyboard still up, then closes it: on Android
+    // (interactive-widget=resizes-content) the viewport grows back, and the
+    // menu, sized and placed for the short one, must use the room it gets
+    function handleSlashMenuViewportResize() {
+        if (!slashMenuElement || !slashMenuAnchorRect || submenuElement) return;
+        positionMenuAtRect(slashMenuAnchorRect);
     }
 
     // Show slash menu for an input field (title or task)
@@ -4587,6 +4606,11 @@
 
     // Handle mouse hover on main menu item to show submenu if available
     function handleMenuMouseOver(e) {
+        // On mobile a tap opens the submenu. The menu can open over the Insert
+        // button of the mobile editor bar that was just tapped, and the
+        // mouseover the browser then fires under the finger must not open one.
+        if (window.innerWidth < 768) return;
+
         const item = e.target.closest && e.target.closest('.slash-command-item');
         if (!item) return;
 
@@ -5215,6 +5239,7 @@
         document.addEventListener('keydown', handleAltSlashShortcut, true);
         document.addEventListener('keydown', handleKeydown, true);
         document.addEventListener('mousedown', handleClickOutside, true);
+        window.addEventListener('resize', handleSlashMenuViewportResize);
 
         // Position caret at the end of the toggle title when clicked
         document.addEventListener('click', function (e) {

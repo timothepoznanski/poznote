@@ -1559,6 +1559,8 @@
     "list": "List",
     "bullet_list": "Bullet list",
     "numbered_list": "Numbered list",
+    "lettered_list": "Lettered list",
+    "roman_list": "Roman numeral list",
     "checklist": "Checklist",
     "done": "Done",
     "image": "Image",
