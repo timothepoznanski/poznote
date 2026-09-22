@@ -166,16 +166,6 @@
     padding-top: 10px;
 }
 
-/* "Shared with me" entries name the workspace, then its owner in a lighter
-   tone at the end of the row. */
-.workspace-menu-item .workspace-menu-shared-owner {
-    margin-left: auto;
-    padding-left: 12px;
-    font-size: 12px;
-    font-weight: var(--pz-weight-normal);
-    color: var(--pz-text-muted);
-}
-
 /* MENU LEFT */
 
 .list_tags[style] {

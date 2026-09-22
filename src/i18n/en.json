@@ -329,8 +329,7 @@
       "edit_workspaces": "Edit workspaces",
       "new_workspace": "New workspace",
       "accounts": "Accounts",
-      "title": "Workspaces",
-      "shared_with_me": "Shared with me"
+      "title": "Workspaces"
     },
     "errors": {
       "already_exists": "A workspace with this name already exists",
@@ -3505,9 +3504,7 @@
     },
     "logout": {
       "confirm": "Are you sure you want to log out?",
-      "signed_in_as": "You are signed in as {{username}}",
       "in_progress": "Logging out...",
-      "switch_intro": "Switch to another account, or log out completely.",
       "switch_in_progress": "Switching account..."
     }
   },

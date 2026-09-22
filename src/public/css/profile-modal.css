@@ -132,77 +132,6 @@
     background-color: var(--pz-surface-sunken);
 }
 
-/* Other accounts offered in the logout dialog when the signed-in person can
-   open several (js/profile.js); same look as the account choice of login.php. */
-#confirmLogoutModal .logout-account-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 16px;
-}
-
-#confirmLogoutModal .logout-account-option {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 14px;
-    border: 1px solid var(--pz-border-light);
-    border-radius: var(--pz-radius-lg);
-    background: var(--pz-surface);
-    color: var(--pz-text);
-    font: inherit;
-    font-size: 14px;
-    text-align: left;
-    cursor: pointer;
-    transition: border-color 0.2s ease, background 0.2s ease;
-}
-
-/* The mobile stacking rule of modals/responsive.css (.modal-content>div>button)
-   forces display: block, which drops the flex row and leaves the arrow glued
-   to the name instead of at the right edge. */
-@media (max-width: 800px) {
-    #confirmLogoutModal .logout-account-option {
-        display: flex !important;
-        height: auto !important;
-        margin-bottom: 0 !important;
-    }
-}
-
-#confirmLogoutModal .logout-account-option:hover:not(:disabled),
-#confirmLogoutModal .logout-account-option:focus-visible {
-    border-color: var(--pz-accent);
-    background: var(--pz-surface);
-    outline: none;
-}
-
-#confirmLogoutModal .logout-account-option:disabled {
-    cursor: default;
-}
-
-#confirmLogoutModal .logout-account-name {
-    flex: 1 1 auto;
-    min-width: 0;
-    overflow-wrap: anywhere;
-    font-weight: var(--pz-weight-semibold);
-}
-
-#confirmLogoutModal .logout-account-arrow {
-    flex: 0 0 auto;
-    color: var(--pz-accent-text);
-    font-size: 16px;
-    line-height: 1;
-}
-
-#confirmLogoutModal .logout-account-badge {
-    flex: 0 0 auto;
-    padding: 2px 7px;
-    border-radius: var(--pz-radius-sm);
-    background: var(--pz-accent-soft);
-    color: var(--pz-accent-text);
-    font-size: 12px;
-}
-
 /* Dark mode. Every host page loads css/dark-mode/variables.css, so the tokens
    are always defined; both theme hooks are needed, as elsewhere. */
 html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) {
@@ -220,18 +149,6 @@ html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal, #iconSidebar
 
 html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) .modal-buttons button.btn-cancel:hover {
     background-color: var(--pz-border);
-}
-
-html[data-theme='dark'] #confirmLogoutModal .logout-account-option {
-    background: var(--pz-surface);
-    border-color: var(--pz-border);
-    color: var(--pz-text);
-}
-
-html[data-theme='dark'] #confirmLogoutModal .logout-account-option:hover:not(:disabled),
-html[data-theme='dark'] #confirmLogoutModal .logout-account-option:focus-visible {
-    border-color: var(--pz-accent);
-    background: var(--pz-border);
 }
 
 /* ============================================

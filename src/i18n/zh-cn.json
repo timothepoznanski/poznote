@@ -715,8 +715,7 @@
       "edit_workspaces": "编辑工作区",
       "new_workspace": "新建工作区",
       "accounts": "账户",
-      "title": "工作区",
-      "shared_with_me": "与我共享"
+      "title": "工作区"
     },
     "errors": {
       "already_exists": "同名工作区已存在",
@@ -3982,9 +3981,7 @@
     },
     "logout": {
       "confirm": "确定要退出登录吗？",
-      "signed_in_as": "您当前登录的账户是 {{username}}",
       "in_progress": "正在退出登录...",
-      "switch_intro": "切换到其他账户，或完全退出登录。",
       "switch_in_progress": "正在切换账户..."
     }
   },

@@ -17,7 +17,16 @@
  * The panel only edits the user's own preference. The instance-wide "Users"
  * column administrators get stays in the settings page modal, which the
  * header link opens (settings.php?open=ui-customization).
+ *
+ * The preference belongs to the account it is stored in, so the panel is for
+ * its owner: someone looking at another account (a workspace shared with
+ * them, an account granted to them) would have every save refused, and the
+ * settings page behind the header link is closed to them as well.
  */
+if (function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser()) {
+    return;
+}
+
 $uiCustomizationPanelPage = isset($uiCustomizationPanelPage) ? (string)$uiCustomizationPanelPage : 'notes';
 $uiCustomizationPanelTitle = t_h('modals.ui_customization.panel_title', [], 'Customize this page');
 // The including page resolves $aiChatEnabled before including the AI chat

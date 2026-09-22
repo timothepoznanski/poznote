@@ -716,8 +716,7 @@
       "edit_workspaces": "Arbeitsbereiche bearbeiten",
       "new_workspace": "Neuer Arbeitsbereich",
       "accounts": "Konten",
-      "title": "Arbeitsbereiche",
-      "shared_with_me": "Mit mir geteilt"
+      "title": "Arbeitsbereiche"
     },
     "errors": {
       "already_exists": "Ein Arbeitsbereich mit diesem Namen existiert bereits",
@@ -3882,9 +3881,7 @@
     },
     "logout": {
       "confirm": "Möchten Sie sich wirklich abmelden?",
-      "signed_in_as": "Sie sind angemeldet als {{username}}",
       "in_progress": "Abmeldung...",
-      "switch_intro": "Wechseln Sie zu einem anderen Konto oder melden Sie sich vollständig ab.",
       "switch_in_progress": "Konto wird gewechselt..."
     }
   },

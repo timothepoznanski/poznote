@@ -89,7 +89,11 @@ require_once __DIR__ . '/../GitSync.php';
 $gitSync = new GitSync($con, $_SESSION['user_id'] ?? null);
 $gitEnabled = GitSync::isEnabled() && $gitSync->isConfigured();
 $isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
-$showGitSync = $gitEnabled; // All users with configured git can sync
+// All users with configured git can sync, except while looking at an account
+// that is not their own (a workspace shared with them, an account granted to
+// them): the repository, its settings and the sync itself belong to the
+// account's owner, and GitSyncController refuses everyone else.
+$showGitSync = $gitEnabled && (!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser());
 $gitProvider = function_exists('getGitProviderName') ? getGitProviderName($gitSync->getProvider()) : 'Git';
 
 // Resolve the workspace when no parameter is present, without redirecting
@@ -658,6 +662,10 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
     $activeAccountProfile = null;
     $showAccountRows = false;
     $isSharedWorkspaceScope = function_exists('isSharedWorkspaceScopeActive') && isSharedWorkspaceScopeActive();
+    // Display preferences belong to the account they are stored in: someone
+    // looking at another account (a shared workspace, a granted account)
+    // cannot change them, so the controls that write them are not shown.
+    $canWriteAccountSettings = !function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser();
     // Empty unless several accounts are reachable, see
     // getSwitchableAccountProfiles().
     $switchableProfiles = function_exists('getSwitchableAccountProfiles') ? getSwitchableAccountProfiles() : [];
@@ -707,9 +715,12 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
                 <i class="lucide lucide-caret-down workspace-dropdown-icon"></i>
             </div>
             <div class="sidebar-title-actions">
+                    <?php // The sort mode is a setting of the account being looked at ?>
+                    <?php if ($canWriteAccountSettings): ?>
                     <button class="sidebar-folder-toggle" id="sidebarSortBtn" data-action="cycle-note-sort" data-sort-mode="<?php echo htmlspecialchars($note_list_sort_type, ENT_QUOTES); ?>" title="<?php echo $noteSortTitle; ?>" aria-label="<?php echo $noteSortTitle; ?>">
                         <i class="lucide <?php echo htmlspecialchars(poznoteNoteSortIcon($note_list_sort_type), ENT_QUOTES); ?>"></i>
                     </button>
+                    <?php endif; ?>
                     <?php if (!$showAccountRows) echo $expandFoldersButton; ?>
                     <button class="sidebar-folder-toggle<?php echo $notifications_count > 0 ? ' has-notifications' : ''; ?>" id="sidebarNotificationsBtn" data-action="open-notifications-modal" title="<?php echo t_h('reminder.notifications', [], 'Notifications'); ?>" aria-label="<?php echo t_h('reminder.notifications', [], 'Notifications'); ?>"<?php echo $notifications_total > 0 ? '' : ' hidden'; ?>>
                         <i class="lucide lucide-bell"></i>
@@ -879,7 +890,8 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
 
     <?php
     // Contextual UI Customization: floating button + docked column listing
-    // the hideable elements of this page (see ui_customization_panel.php)
+    // the hideable elements of this page (see ui_customization_panel.php,
+    // which shows nothing on an account that is not the person's own)
     $uiCustomizationPanelPage = 'notes';
     include __DIR__ . '/../ui_customization_panel.php';
 

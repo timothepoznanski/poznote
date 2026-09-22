@@ -179,19 +179,17 @@ function displayWorkspaceMenu(menu, workspaces, username, actingAs) {
 // account is the wider scope, the workspace the narrower, and both are chosen
 // in the same place.
 //
-// Workspaces other accounts share with this login (workspaces.php > Share)
-// are listed under "Shared with me", each opened through switch_account.php
-// as well: the owner's account then opens confined to that workspace
-// (auth.php, shared workspace scope). Inside such a workspace the menu has no
-// Workspaces section (the owner's list would hold that one workspace, already
-// ticked under "Shared with me"), the Accounts section is the way back to the
-// person's own account, and the management entries act on that own account:
-// they switch back to it first (switch_account.php, 'next').
-
-function isSharedWorkspaceScope() {
-    var accountSwitch = window.PoznoteAccountSwitch;
-    var shared = accountSwitch && Array.isArray(accountSwitch.sharedWorkspaces) ? accountSwitch.sharedWorkspaces : [];
-    return shared.some(function (row) { return !!row.current; });
+// An account that shares a single workspace with this login (workspaces.php >
+// Share) is listed among the accounts just the same; what it offers is then
+// that workspace alone, and opening it confines the session to it (auth.php,
+// shared workspace scope).
+//
+// The management entries need the active account to be the login's own
+// (window.PoznoteActiveAccountIsOwn, icon_sidebar.php): creating a workspace
+// or opening the workspaces page is refused on an account someone else owns,
+// whether it was granted whole or shared one workspace at a time.
+function isOwnAccountActive() {
+    return window.PoznoteActiveAccountIsOwn !== false;
 }
 
 function renderWorkspaceMenu(menu, state) {
@@ -228,12 +226,8 @@ function renderWorkspaceMenu(menu, state) {
     // their own heading.
     var accountSwitch = window.PoznoteAccountSwitch;
     var accounts = accountSwitch && Array.isArray(accountSwitch.accounts) ? accountSwitch.accounts : [];
-    var sharedWorkspaces = accountSwitch && Array.isArray(accountSwitch.sharedWorkspaces) ? accountSwitch.sharedWorkspaces : [];
-    var inSharedScope = isSharedWorkspaceScope();
     var canSwitch = typeof window.poznoteSwitchAccount === 'function';
-    // A single account is only worth listing as the way back from a shared
-    // workspace.
-    var hasAccounts = canSwitch && (accounts.length > 1 || (accounts.length === 1 && inSharedScope));
+    var hasAccounts = canSwitch && accounts.length > 1;
     if (hasAccounts) {
         menuHtml += '<div class="workspace-menu-label">' + escapeWorkspaceMenuText(wsTr('workspaces.menu.accounts', {}, 'Accounts')) + '</div>';
         accounts.forEach(function (account) {
@@ -247,64 +241,41 @@ function renderWorkspaceMenu(menu, state) {
         menuHtml += '<div class="workspace-menu-divider"></div>';
     }
 
-    var showWorkspaces = !(inSharedScope && !foreignAccount);
-    if (showWorkspaces) {
-        menuHtml += '<div class="workspace-menu-label">' + escapeWorkspaceMenuText(wsTr('workspaces.menu.title', {}, 'Workspaces')) + '</div>';
+    menuHtml += '<div class="workspace-menu-label">' + escapeWorkspaceMenuText(wsTr('workspaces.menu.title', {}, 'Workspaces')) + '</div>';
 
-        if (state.loading) {
-            menuHtml += '<div class="workspace-menu-item"><i class="lucide lucide-loader-2 lucide-spin"></i>' + escapeWorkspaceMenuText(wsTr('workspaces.menu.loading', {}, 'Loading workspaces...')) + '</div>';
-        } else if (state.error) {
-            menuHtml += '<div class="workspace-menu-item"><i class="lucide lucide-alert-triangle"></i>' + escapeWorkspaceMenuText(wsTr('workspaces.menu.error_loading', {}, 'Error loading workspaces')) + '</div>';
-        }
-
-        // Create menu elements
-        for (var i = 0; i < workspaces.length; i++) {
-            var workspace = workspaces[i];
-            var isCurrent = !foreignAccount && workspace.name === currentWorkspace;
-            var currentClass = isCurrent ? ' current-workspace' : '';
-            var icon = isCurrent ? 'lucide-check-circle' : 'lucide-layers';
-            var safeName = escapeWorkspaceMenuText(workspace.name);
-            // A colored workspace (workspaces.php > Color) shows its dot in the
-            // icon slot, as on the dashboard; the current one is still told apart
-            // by its bold accent label
-            var mark = workspace.color_hex
-                ? '<span class="workspace-menu-dot" style="background-color:' + escapeWorkspaceMenuText(workspace.color_hex) + '"></span>'
-                : '<i class="' + icon + '"></i>';
-
-            menuHtml += '<div class="workspace-menu-item' + currentClass + '" data-workspace-name="' + safeName + '">';
-            menuHtml += mark;
-            menuHtml += '<span>' + safeName + '</span>';
-            menuHtml += '</div>';
-        }
+    if (state.loading) {
+        menuHtml += '<div class="workspace-menu-item"><i class="lucide lucide-loader-2 lucide-spin"></i>' + escapeWorkspaceMenuText(wsTr('workspaces.menu.loading', {}, 'Loading workspaces...')) + '</div>';
+    } else if (state.error) {
+        menuHtml += '<div class="workspace-menu-item"><i class="lucide lucide-alert-triangle"></i>' + escapeWorkspaceMenuText(wsTr('workspaces.menu.error_loading', {}, 'Error loading workspaces')) + '</div>';
     }
 
-    // Workspaces other accounts share with this login follow the account's
-    // own ones, still above the management entries.
-    if (canSwitch && sharedWorkspaces.length > 0) {
-        if (showWorkspaces) {
-            menuHtml += '<div class="workspace-menu-divider"></div>';
-        }
-        menuHtml += '<div class="workspace-menu-label">' + escapeWorkspaceMenuText(wsTr('workspaces.menu.shared_with_me', {}, 'Shared with me')) + '</div>';
-        sharedWorkspaces.forEach(function (row, index) {
-            var selected = !foreignAccount && !!row.current;
-            menuHtml += '<div class="workspace-menu-item workspace-menu-shared' + (selected ? ' current-workspace' : '') + '" data-shared-index="' + index + '"' + (row.current ? ' data-shared-current="1"' : '') + '>'
-                + '<i class="' + (selected ? 'lucide-check-circle' : 'lucide-users') + '"></i>'
-                + '<span>' + escapeWorkspaceMenuText(row.workspace) + '</span>'
-                + '<span class="workspace-menu-shared-owner">' + escapeWorkspaceMenuText(row.ownerUsername) + '</span>'
-                + '</div>';
-        });
+    // Create menu elements
+    for (var i = 0; i < workspaces.length; i++) {
+        var workspace = workspaces[i];
+        var isCurrent = !foreignAccount && workspace.name === currentWorkspace;
+        var currentClass = isCurrent ? ' current-workspace' : '';
+        var icon = isCurrent ? 'lucide-check-circle' : 'lucide-layers';
+        var safeName = escapeWorkspaceMenuText(workspace.name);
+        // A colored workspace (workspaces.php > Color) shows its dot in the
+        // icon slot, as on the dashboard; the current one is still told apart
+        // by its bold accent label
+        var mark = workspace.color_hex
+            ? '<span class="workspace-menu-dot" style="background-color:' + escapeWorkspaceMenuText(workspace.color_hex) + '"></span>'
+            : '<i class="' + icon + '"></i>';
+
+        menuHtml += '<div class="workspace-menu-item' + currentClass + '" data-workspace-name="' + safeName + '">';
+        menuHtml += mark;
+        menuHtml += '<span>' + safeName + '</span>';
+        menuHtml += '</div>';
     }
 
     // Management entries, always the last ones: the menu opens even when the
     // account has a single workspace (or none), so these stay reachable. The
     // data-action values are the wsmenu:* keys of the UI Customization modal,
     // which hides them through .workspace-menu-item[data-action="..."]. They
-    // act on the active account only, so another account's list goes
-    // without. In a workspace shared with this login they lead back to the
-    // login's own account instead (see the click handlers below).
-    var ownAccount = null;
-    accounts.forEach(function (account) { if (account.own) ownAccount = account; });
-    if (!foreignAccount && (!inSharedScope || (ownAccount && canSwitch))) {
+    // act on the active account only, so another account's list goes without,
+    // and so does an account this login does not own.
+    if (!foreignAccount && isOwnAccountActive()) {
         var uiCustomization = window.PoznoteUiCustomization;
         var editHidden = !!(uiCustomization && uiCustomization.isHidden('wsmenu:edit-workspaces'));
         var createHidden = !!(uiCustomization && uiCustomization.isHidden('wsmenu:new-workspace'));
@@ -335,10 +306,6 @@ function renderWorkspaceMenu(menu, state) {
         item.addEventListener('click', function () {
             var url = this.getAttribute('data-workspace-url');
             closeWorkspaceMenus();
-            if (inSharedScope && ownAccount) {
-                window.poznoteSwitchAccount(ownAccount.id, { next: 'workspaces' });
-                return;
-            }
             window.location.href = url;
         });
     });
@@ -346,25 +313,7 @@ function renderWorkspaceMenu(menu, state) {
     menu.querySelectorAll('.workspace-menu-item[data-workspace-action="create"]').forEach(function (item) {
         item.addEventListener('click', function () {
             closeWorkspaceMenus();
-            if (inSharedScope && ownAccount) {
-                window.poznoteSwitchAccount(ownAccount.id, { next: 'new_workspace' });
-                return;
-            }
             openCreateWorkspaceModal();
-        });
-    });
-
-    menu.querySelectorAll('.workspace-menu-item[data-shared-index]').forEach(function (item) {
-        item.addEventListener('click', function () {
-            if (this.getAttribute('data-shared-current') === '1' && !foreignAccount) {
-                closeWorkspaceMenus();
-                return;
-            }
-            var row = sharedWorkspaces[parseInt(this.getAttribute('data-shared-index'), 10)];
-            if (!row) return;
-            var label = this.querySelector('span');
-            if (label) label.textContent = wsTr('profile.logout.switch_in_progress', {}, 'Switching account...');
-            window.poznoteSwitchAccount(row.ownerId, { workspace: row.workspace });
         });
     });
 
@@ -379,9 +328,12 @@ function renderWorkspaceMenu(menu, state) {
     });
 }
 
-// Account picked in the menu: the active one brings back its own workspaces,
-// another one lists that account's workspaces (name and colour only, from
-// account_tree.php) so one of them can be opened in it.
+// Account picked in the menu: the login's own brings back its workspaces,
+// any other one lists what that account offers (name and colour only, from
+// account_tree.php: every workspace of an account granted whole, the shared
+// ones of an account that shares) so one of them can be opened in it. The
+// account a shared workspace belongs to is listed that way even while it is
+// the one open, since its other shared workspaces are reached from there.
 function chooseWorkspaceMenuAccount(menu, accountId) {
     var accountSwitch = window.PoznoteAccountSwitch;
     var accounts = accountSwitch && Array.isArray(accountSwitch.accounts) ? accountSwitch.accounts : [];
@@ -391,14 +343,14 @@ function chooseWorkspaceMenuAccount(menu, accountId) {
     }
     if (!account) return;
 
-    if (account.current) {
+    if (account.current && account.own) {
         renderWorkspaceMenu(menu, { workspaces: ownWorkspaceMenuData ? ownWorkspaceMenuData.workspaces : [], account: null });
         return;
     }
 
-    // From inside a shared workspace, the login's own account is opened
-    // straight away: its workspaces are not the menu's to list here.
-    if (account.own && isSharedWorkspaceScope()) {
+    // The login's own account, from an account that is not it: opened straight
+    // away, since its workspaces are not this menu's to list.
+    if (account.own) {
         closeWorkspaceMenus();
         window.poznoteSwitchAccount(account.id, {});
         return;

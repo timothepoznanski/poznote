@@ -100,8 +100,8 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
                 </div>
             </a>
 
-            <!-- Workspace, not inside a workspace shared with this login -->
-            <?php if (!(function_exists('isSharedWorkspaceScopeActive') && isSharedWorkspaceScopeActive())): ?>
+            <!-- Workspace: for the owner of the account on screen -->
+            <?php if ((!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser())): ?>
             <a href="#" class="home-card" id="create-workspace-card" data-create-type="workspace" title="<?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?>">
                 <div class="home-card-icon">
                     <i class="lucide lucide-layers"></i>

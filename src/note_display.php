@@ -235,7 +235,11 @@
 
                     echo '<button type="button" class="toolbar-btn btn-favorite note-action-btn'.$favorite_class.'" title="'.$favorite_title.'" data-action="toggle-favorite" data-note-id="'.$row['id'].'"><i class="lucide lucide-star"></i></button>';
 
-                    echo '<button type="button" class="toolbar-btn btn-publish note-action-btn'.$share_class.'" title="'.t_h('index.toolbar.share_note', [], 'Share note').'" data-action="open-share-modal" data-note-id="'.$row['id'].'"'.$share_folder_attrs.'><i class="lucide lucide-share-2"></i></button>';
+                    // Publishing a note on the public web belongs to the owner
+                    // of the account (auth.php refuses it in a shared workspace).
+                    if (!function_exists('isSharedWorkspaceScopeActive') || !isSharedWorkspaceScopeActive()) {
+                        echo '<button type="button" class="toolbar-btn btn-publish note-action-btn'.$share_class.'" title="'.t_h('index.toolbar.share_note', [], 'Share note').'" data-action="open-share-modal" data-note-id="'.$row['id'].'"'.$share_folder_attrs.'><i class="lucide lucide-share-2"></i></button>';
+                    }
                     
                     $attachment_indicator_class = ($visible_attachments_count > 0) ? ' has-attachments' : '';
                     echo '<button type="button" class="toolbar-btn btn-attachment note-action-btn'.$attachment_indicator_class.'" title="'.t_h('index.toolbar.attachments_with_count', ['count' => $visible_attachments_count], 'Attachments ({{count}})').'" data-action="show-attachment-dialog" data-note-id="'.$row['id'].'"><i class="lucide lucide-paperclip"></i></button>';
@@ -386,7 +390,10 @@
                     // Archive: files the note away in the archive workspace with
                     // its folder path. Hidden once that workspace is the one open,
                     // where the action has nothing left to do.
-                    if (trim((string)$workspace_filter) !== POZNOTE_ARCHIVE_WORKSPACE) {
+                    // Archiving moves the note to the Archives workspace, which
+                    // a session confined to a shared workspace cannot reach.
+                    if (trim((string)$workspace_filter) !== POZNOTE_ARCHIVE_WORKSPACE
+                        && (!function_exists('isSharedWorkspaceScopeActive') || !isSharedWorkspaceScopeActive())) {
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="archive-note" data-note-id="'.$row['id'].'" data-note-title="'.htmlspecialchars($title_safe, ENT_QUOTES).'"><i class="lucide lucide-archive"></i> '.t_h('archive.menu_item', [], 'Archive note').'</button>';
                     }
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-download"><i class="lucide lucide-download"></i> '.t_h('common.download', [], 'Download').'</button>';

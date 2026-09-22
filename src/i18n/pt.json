@@ -716,8 +716,7 @@
       "edit_workspaces": "Editar espaços de trabalho",
       "new_workspace": "Novo espaço de trabalho",
       "accounts": "Contas",
-      "title": "Espaços de trabalho",
-      "shared_with_me": "Compartilhados comigo"
+      "title": "Espaços de trabalho"
     },
     "errors": {
       "already_exists": "Já existe um espaço de trabalho com este nome",
@@ -3883,9 +3882,7 @@
     },
     "logout": {
       "confirm": "Tem certeza de que deseja sair?",
-      "signed_in_as": "Você está conectado como {{username}}",
       "in_progress": "Saindo...",
-      "switch_intro": "Mude para outra conta ou termine a sessão por completo.",
       "switch_in_progress": "A mudar de conta..."
     }
   },

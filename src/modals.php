@@ -482,7 +482,7 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
         <div class="form-group">
             <div class="move-note-label-row">
                 <label for="workspaceSelect"><?php echo t_h('modals.move_note_folder.workspace_destination'); ?></label>
-                <?php if (!(function_exists('isSharedWorkspaceScopeActive') && isSharedWorkspaceScopeActive())): ?>
+                <?php if ((!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser())): ?>
                 <button type="button" class="move-note-inline-create-toggle" data-action="toggle-move-create-workspace">
                     <i class="lucide lucide-plus"></i><?php echo t_h('modals.move_note_folder.new_workspace', [], 'New workspace'); ?>
                 </button>
@@ -795,8 +795,8 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
             <i class="lucide lucide-folder"></i>
             <span><?php echo t_h('modals.create.folder.title', [], 'Folder'); ?></span>
         </div>
-        <?php // A workspace shared with this login cannot hold another one ?>
-        <?php if (!(function_exists('isSharedWorkspaceScopeActive') && isSharedWorkspaceScopeActive())): ?>
+        <?php // Creating a workspace is for the owner of the account on screen ?>
+        <?php if ((!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser())): ?>
         <div class="create-menu-item create-note-option" data-type="workspace" data-action="select-create-type" role="menuitem">
             <i class="lucide lucide-layers"></i>
             <span><?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?></span>
@@ -1495,7 +1495,9 @@ include __DIR__ . '/modals/tag_folder_notes_modal.php';
     </div>
 </div>
 
-<!-- UI Customization Modal -->
+<!-- UI Customization Modal: what it saves is a preference of the account on
+     screen, so it is for its owner (see ui_customization_panel.php) -->
+<?php if ((!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser())): ?>
 <div id="uiCustomizationModal" class="modal">
     <div class="modal-content modal-content-wide">
         <div class="modal-header">
@@ -1543,6 +1545,7 @@ include __DIR__ . '/modals/tag_folder_notes_modal.php';
         </div>
     </div>
 </div>
+<?php endif; ?>
 
 <?php
 // Icon Sidebar Order modal. The rows come from the list icon_sidebar.php

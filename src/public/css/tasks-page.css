@@ -171,7 +171,7 @@ body.tasks-page {
     color: var(--pz-accent);
 }
 
-/* Collapse-all / expand-all chevrons, right of the filter input */
+/* Single collapse-all / expand-all toggle, right of the filter input */
 .tasks-collapse-actions {
     display: flex;
     gap: 8px;
@@ -179,16 +179,19 @@ body.tasks-page {
 }
 
 .tasks-collapse-btn {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 29px;
-    height: 29px;
-    padding: 0;
+    gap: 6px;
+    /* Same vertical metrics as the filter chips and the filter input */
+    padding: 6px 12px;
     border: 1px solid var(--border-color, var(--pz-border));
     border-radius: var(--pz-radius-lg);
     background: transparent;
     color: var(--text-color, var(--pz-text));
+    font-size: 13px;
+    font-family: inherit;
+    white-space: nowrap;
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -867,7 +870,7 @@ html[data-theme='dark'] .tasks-note-source-badge {
     }
 
     /* Filter input first (full width, right below the progress bar), then
-       one wrapping row where the collapse/expand chevrons flow right after
+       one wrapping row where the collapse/expand toggle flows right after
        the filter chips (display: contents merges both groups into the bar) */
     .tasks-filter-bar {
         flex-wrap: wrap;

@@ -34,6 +34,8 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
       data-txt-empty-filtered="<?php echo t_h('tasks_page.empty_filtered', [], 'No tasks match this filter.'); ?>"
       data-txt-collapse="<?php echo t_h('tasks_page.collapse', [], 'Collapse'); ?>"
       data-txt-expand="<?php echo t_h('tasks_page.expand', [], 'Expand'); ?>"
+      data-txt-collapse-all="<?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?>"
+      data-txt-expand-all="<?php echo t_h('tasks_page.expand_all', [], 'Expand all'); ?>"
       data-txt-due="<?php echo t_h('tasklist.due_date', [], 'Due date'); ?>"
       data-txt-due-remove="<?php echo t_h('tasklist.due_remove', [], 'Remove due date'); ?>"
       data-txt-due-remove-time="<?php echo t_h('tasklist.due_remove_time', [], 'Remove time'); ?>"
@@ -87,11 +89,9 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 				</button>
 			</div>
 			<div class="tasks-collapse-actions">
-				<button id="collapseAllBtn" class="tasks-collapse-btn" title="<?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?>">
+				<button type="button" id="toggleAllNotesBtn" class="tasks-collapse-btn" aria-expanded="true" title="<?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?>">
 					<i class="lucide lucide-chevron-up"></i>
-				</button>
-				<button id="expandAllBtn" class="tasks-collapse-btn" title="<?php echo t_h('tasks_page.expand_all', [], 'Expand all'); ?>">
-					<i class="lucide lucide-chevron-down"></i>
+					<span id="toggleAllNotesLabel"><?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?></span>
 				</button>
 			</div>
 		</div>

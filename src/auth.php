@@ -728,12 +728,22 @@ function sharedWorkspaceExists(int $ownerUserId, string $workspaceName): bool {
  * owner's account becomes the active one, confined to that workspace. Someone
  * holding full access to the owner's account (Admin > User Management) goes
  * through switchActiveAccount() instead and gets the whole account.
+ *
+ * Without a workspace name, the first one that account shares with the person
+ * opens: "open this account" means its shared part, the only part they have.
  */
-function openSharedWorkspace(int $ownerUserId, string $workspaceName): bool {
+function openSharedWorkspace(int $ownerUserId, string $workspaceName = ''): bool {
     $workspaceName = trim($workspaceName);
     $authUserId = (int)(getAuthenticatedUserId() ?? 0);
-    if (!isAuthenticated() || $authUserId <= 0 || $ownerUserId <= 0 || $workspaceName === '' || $ownerUserId === $authUserId) {
+    if (!isAuthenticated() || $authUserId <= 0 || $ownerUserId <= 0 || $ownerUserId === $authUserId) {
         return false;
+    }
+
+    if ($workspaceName === '') {
+        $workspaceName = (string)(getSharedWorkspaceNamesFromOwner($ownerUserId)[0] ?? '');
+        if ($workspaceName === '') {
+            return false;
+        }
     }
 
     require_once __DIR__ . '/users/db_master.php';
@@ -763,6 +773,20 @@ function openSharedWorkspace(int $ownerUserId, string $workspaceName): bool {
     }
 
     return true;
+}
+
+/**
+ * Names of the workspaces one account shares with the signed-in person, in
+ * the order getWorkspacesSharedWithUser() returns them.
+ */
+function getSharedWorkspaceNamesFromOwner(int $ownerUserId): array {
+    $names = [];
+    foreach (getSharedWorkspacesForLogin() as $row) {
+        if ((int)$row['owner_user_id'] === $ownerUserId) {
+            $names[] = (string)$row['workspace_name'];
+        }
+    }
+    return $names;
 }
 
 /**
@@ -820,7 +844,7 @@ function enforceSharedWorkspaceScopeAccess(): void {
     }
 
     $restrictedPages = [
-        'notes_manager.php', 'settings.php', 'workspaces.php', 'shared.php',
+        'notes_manager.php', 'settings.php', 'workspaces.php', 'shared.php', 'trash.php',
         'backup_export.php', 'restore_import.php', 'git_sync.php',
         'user-webhooks.php', 'storage-stats-user.php', 'ai_settings_user.php', 'stt_settings_user.php',
         'ai_settings.php', 's3_settings.php', 's3_backup_settings.php', 'saas_settings.php', 'stt_settings.php',
@@ -862,8 +886,13 @@ function enforceSharedWorkspaceScopeOnRequest(array $scope): void {
     if (preg_match('#/api/v1/(workspaces|settings)(/|$|\?)#', $uri) && !$isRead) {
         denyAccountAccessResponse('This workspace is shared with you: its settings belong to its owner', 403);
     }
-    if (preg_match('#/api/v1/(shared|backups|git-sync|admin)(/|$|\?)#', $uri)) {
+    if (preg_match('#/api/v1/(shared|backups|git-sync|admin|trash)(/|$|\?)#', $uri)) {
         denyAccountAccessResponse('This endpoint is not available in a shared workspace', 403);
+    }
+    // Publishing a note or a folder on the public web is the owner's call, and
+    // the page that manages those links is theirs too.
+    if (preg_match('#/api/v1/(notes|folders)/\d+/share(/|$|\?)#', $uri)) {
+        denyAccountAccessResponse('Public links are managed by the workspace owner', 403);
     }
 
     $body = [];

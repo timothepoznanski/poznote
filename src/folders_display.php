@@ -445,15 +445,18 @@ function renderFolderActionsMenu() {
     $menu .= "</div>";
 
     // Share folder action: two variants, the client shows the one matching
-    // the folder's shared state (data-shared on the toggle)
-    $menu .= "<div class='folder-actions-menu-item shared share-state-shared' data-action='share-folder'>";
-    $menu .= "<i class='lucide lucide-share-2'></i>";
-    $menu .= "<span>" . t_h('notes_list.folder_actions.is_public', [], 'Is public') . "</span>";
-    $menu .= "</div>";
-    $menu .= "<div class='folder-actions-menu-item share-state-not-shared' data-action='share-folder'>";
-    $menu .= "<i class='lucide lucide-share-2'></i>";
-    $menu .= "<span>" . t_h('notes_list.folder_actions.share_folder', [], 'Make public') . "</span>";
-    $menu .= "</div>";
+    // the folder's shared state (data-shared on the toggle). Not in a
+    // workspace shared with this login, where public links are the owner's.
+    if (!function_exists('isSharedWorkspaceScopeActive') || !isSharedWorkspaceScopeActive()) {
+        $menu .= "<div class='folder-actions-menu-item shared share-state-shared' data-action='share-folder'>";
+        $menu .= "<i class='lucide lucide-share-2'></i>";
+        $menu .= "<span>" . t_h('notes_list.folder_actions.is_public', [], 'Is public') . "</span>";
+        $menu .= "</div>";
+        $menu .= "<div class='folder-actions-menu-item share-state-not-shared' data-action='share-folder'>";
+        $menu .= "<i class='lucide lucide-share-2'></i>";
+        $menu .= "<span>" . t_h('notes_list.folder_actions.share_folder', [], 'Make public') . "</span>";
+        $menu .= "</div>";
+    }
 
     $menu .= "<div class='folder-actions-menu-separator'></div>";
 
@@ -628,7 +631,10 @@ function renderNoteActionsMenu($currentWorkspace = '') {
     // Archive note: moves it to the archive workspace, folder path included.
     // Pointless once the note is already there, so the entry is dropped when
     // that workspace is the one on screen.
-    if (trim((string)$currentWorkspace) !== POZNOTE_ARCHIVE_WORKSPACE) {
+    // A session confined to a workspace shared with it cannot reach the
+    // archive workspace either, so the entry goes as well.
+    if (trim((string)$currentWorkspace) !== POZNOTE_ARCHIVE_WORKSPACE
+        && (!function_exists('isSharedWorkspaceScopeActive') || !isSharedWorkspaceScopeActive())) {
         $menu .= "<div class='note-actions-menu-item' data-action='archive-note'>";
         $menu .= "<i class='lucide lucide-archive'></i>";
         $menu .= "<span>" . t_h('archive.menu_item', [], 'Archive note') . "</span>";

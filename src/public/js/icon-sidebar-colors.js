@@ -231,6 +231,7 @@
         // Every button of the rail, account group included; the overflow
         // button lists entries rather than being one.
         document.addEventListener('contextmenu', function (event) {
+            if (config.canCustomize === false) return;
             var button = event.target.closest && event.target.closest('#icon_sidebar .icon-sidebar-btn[id]');
             if (!button || button.id === 'iconSidebarOverflowBtn') return;
             event.preventDefault();
