@@ -139,7 +139,6 @@ function setupNoteDragDropEvents() {
 
     // Add drag events to all note links (both in folders and without folder)
     var noteLinks = document.querySelectorAll('.links_arbo_left');
-    var isReadOnly = isPublicWorkspaceReadOnly();
 
     noteLinks.forEach(function (link, index) {
         var isMobile = isTouchDragDevice();
@@ -147,7 +146,7 @@ function setupNoteDragDropEvents() {
         // On mobile, disable HTML5 dragging on note links.
         // Draggable anchors can intermittently swallow taps (treated as scroll/drag),
         // which prevents the note open + horizontal scroll from triggering.
-        if (isMobile || isReadOnly) {
+        if (isMobile) {
             link.removeAttribute('draggable');
             link.draggable = false;
         } else {
@@ -161,7 +160,7 @@ function setupNoteDragDropEvents() {
         link.removeEventListener('dragend', handleNoteDragEnd);
 
         // Add fresh event listeners (desktop only)
-        if (!isMobile && !isReadOnly) {
+        if (!isMobile) {
             link.addEventListener('dragstart', handleNoteDragStart, false);
             link.addEventListener('dragend', handleNoteDragEnd, false);
         }
@@ -283,10 +282,6 @@ function setupNoteDragDropEvents() {
             }, false);
         }
     });
-
-    if (isReadOnly) {
-        return;
-    }
 
     // Add drop events to folder headers (using enhanced handlers for folder+note support)
     var folderHeaders = document.querySelectorAll('.folder-header');
@@ -423,10 +418,6 @@ function setupNoteDragDropEvents() {
 
 // Handle start of note drag operation
 function handleNoteDragStart(e) {
-    if (isPublicWorkspaceReadOnly()) {
-        e.preventDefault();
-        return;
-    }
 
     var noteLink = e.target.closest('.links_arbo_left');
     if (!noteLink) {
@@ -1034,7 +1025,6 @@ function moveNoteToRoot(noteId) {
 // Setup drag and drop events for folders. Called from setupNoteDragDropEvents to initialize folder dragging
 function setupFolderDragDropEvents() {
     var isMobile = isTouchDragDevice();
-    var isReadOnly = isPublicWorkspaceReadOnly();
 
     // Get all folder toggle elements (excluding system folders)
     // We target folder-toggle instead of folder-header to avoid capturing note drag events
@@ -1045,7 +1035,7 @@ function setupFolderDragDropEvents() {
         toggle.removeEventListener('dragstart', handleFolderDragStart);
         toggle.removeEventListener('dragend', handleFolderDragEnd);
 
-        if (!isMobile && !isReadOnly) {
+        if (!isMobile) {
             // Ensure draggable is set
             toggle.setAttribute('draggable', 'true');
             toggle.draggable = true;
@@ -1063,10 +1053,6 @@ function setupFolderDragDropEvents() {
 
 // Handle folder drag start
 function handleFolderDragStart(e) {
-    if (isPublicWorkspaceReadOnly()) {
-        e.preventDefault();
-        return;
-    }
 
     // Get the folder-toggle element (the draggable element)
     var folderToggle = e.target.closest('.folder-toggle');

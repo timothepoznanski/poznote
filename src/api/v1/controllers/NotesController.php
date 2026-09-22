@@ -18,19 +18,6 @@ class NotesController {
         $this->con = $con;
     }
 
-    private function appendPublicWorkspaceAgeFilter(string &$sql, array &$params, string $column = 'updated'): void {
-        if (!function_exists('isPublicWorkspaceAccessActive') || !isPublicWorkspaceAccessActive()) {
-            return;
-        }
-
-        $cutoff = getNoteAgeFilterCutoff(getNoteAgeFilterDays($this->con));
-        if ($cutoff === null) {
-            return;
-        }
-
-        $sql .= " AND $column >= ?";
-        $params[] = $cutoff;
-    }
 
     private function getNoteLockTargetUserId(): int {
         return (int) (getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0));
@@ -341,15 +328,10 @@ class NotesController {
      * compare them against the values from their previous poll.
      */
     public function changes(): void {
-        // A public share link is read-only and must not become a probe for
-        // notes outside the workspace it exposes (or older than its age
-        // filter), so the workspace is forced and the lookup is scoped.
-        $publicAccess = function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive();
-        if ($publicAccess) {
-            $workspace = (string) (function_exists('getPublicWorkspaceName') ? getPublicWorkspaceName() : '');
-        } else {
-            $workspace = trim((string)($_GET['workspace'] ?? ''));
-        }
+        // A session confined to a shared workspace (auth.php) must not use
+        // this poll as a probe for notes outside it, so the lookup is scoped.
+        $scoped = function_exists('isSharedWorkspaceScopeActive') && isSharedWorkspaceScopeActive();
+        $workspace = trim((string)($_GET['workspace'] ?? ''));
         if ($workspace === '') {
             $workspace = 'Poznote';
         }
@@ -370,10 +352,9 @@ class NotesController {
                 . "icon, icon_color, color, favorite, pinned, content_width, reminder_at, linked_note_id "
                 . "FROM entries WHERE id IN ($placeholders)";
             $params = $noteIds;
-            if ($publicAccess) {
+            if ($scoped) {
                 $sql .= " AND workspace = ?";
                 $params[] = $workspace;
-                $this->appendPublicWorkspaceAgeFilter($sql, $params);
             }
             $stmt = $this->con->prepare($sql);
             $stmt->execute($params);
@@ -670,7 +651,6 @@ class NotesController {
                 $params[] = $createdToUtc;
             }
 
-            $this->appendPublicWorkspaceAgeFilter($where, $params);
 
             $sql = "SELECT id, heading, type, tags, folder, folder_id, workspace, updated, created, favorite, icon, icon_color, color, content_width, display_order, dashboard_order FROM entries" . $where;
             
@@ -856,13 +836,11 @@ class NotesController {
                 if ($useWorkspaceFilter) {
                     $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
                     $params = [$noteId, $workspace];
-                    $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
                 } else {
                     $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE id = ? AND trash = 0";
                     $params = [$noteId];
-                    $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
                 }
@@ -880,13 +858,11 @@ class NotesController {
                     $refId = (int)$reference;
                     $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
                     $params = [$refId, $workspace];
-                    $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
                 } else {
                     $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ?";
                     $params = ['%' . $reference . '%', $workspace];
-                    $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $sql .= " ORDER BY updated DESC LIMIT 1";
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
@@ -2432,13 +2408,11 @@ class NotesController {
                 if ($workspace) {
                     $sql = "SELECT id, heading, workspace FROM entries WHERE trash = 0 AND id = ? AND workspace = ?";
                     $params = [$noteId, $workspace];
-                    $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
                 } else {
                     $sql = "SELECT id, heading, workspace FROM entries WHERE trash = 0 AND id = ?";
                     $params = [$noteId];
-                    $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
                 }
@@ -2446,14 +2420,12 @@ class NotesController {
                 if ($workspace) {
                     $sql = "SELECT id, heading, workspace FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ?";
                     $params = ['%' . $reference . '%', $workspace];
-                    $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $sql .= " ORDER BY updated DESC LIMIT 1";
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
                 } else {
                     $sql = "SELECT id, heading, workspace FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?)";
                     $params = ['%' . $reference . '%'];
-                    $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $sql .= " ORDER BY updated DESC LIMIT 1";
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
@@ -2498,7 +2470,6 @@ class NotesController {
                 $params[] = $workspace;
             }
 
-            $this->appendPublicWorkspaceAgeFilter($query, $params);
             
             $query .= " ORDER BY updated DESC";
             
@@ -2632,7 +2603,13 @@ class NotesController {
                     WHERE trash = 0
                     AND (type IS NULL OR type = '' OR type IN ('note', 'markdown'))
                     AND (" . implode(' OR ', $conditions) . ")";
-            $this->appendPublicWorkspaceAgeFilter($sql, $params);
+            // A session confined to a shared workspace (auth.php) takes its
+            // templates from that workspace only.
+            $scopeName = function_exists('getSharedWorkspaceScopeName') ? getSharedWorkspaceScopeName() : null;
+            if ($scopeName !== null) {
+                $sql .= " AND workspace = ?";
+                $params[] = $scopeName;
+            }
             $sql .= " ORDER BY heading COLLATE NOCASE, id";
 
             $stmt = $this->con->prepare($sql);
@@ -2973,7 +2950,6 @@ class NotesController {
                 $params[] = $createdToUtc;
             }
 
-            $this->appendPublicWorkspaceAgeFilter($sql, $params);
             
             $sql .= " ORDER BY 
                         CASE WHEN remove_accents(heading) LIKE remove_accents(?) THEN 0 ELSE 1 END,

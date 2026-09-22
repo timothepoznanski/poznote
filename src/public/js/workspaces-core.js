@@ -178,6 +178,20 @@ function displayWorkspaceMenu(menu, workspaces, username, actingAs) {
 // workspace, through switch_account.php. The menu stays open in between: the
 // account is the wider scope, the workspace the narrower, and both are chosen
 // in the same place.
+//
+// An account that shares a single workspace with this login (workspaces.php >
+// Share) is listed among the accounts just the same; what it offers is then
+// that workspace alone, and opening it confines the session to it (auth.php,
+// shared workspace scope).
+//
+// The management entries need the active account to be the login's own
+// (window.PoznoteActiveAccountIsOwn, icon_sidebar.php): creating a workspace
+// or opening the workspaces page is refused on an account someone else owns,
+// whether it was granted whole or shared one workspace at a time.
+function isOwnAccountActive() {
+    return window.PoznoteActiveAccountIsOwn !== false;
+}
+
 function renderWorkspaceMenu(menu, state) {
     // Use window.selectedWorkspace first (set by PHP), then fall back to selectedWorkspace variable
     var currentWorkspace = (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : (selectedWorkspace || '');
@@ -212,7 +226,8 @@ function renderWorkspaceMenu(menu, state) {
     // their own heading.
     var accountSwitch = window.PoznoteAccountSwitch;
     var accounts = accountSwitch && Array.isArray(accountSwitch.accounts) ? accountSwitch.accounts : [];
-    var hasAccounts = accounts.length > 1 && typeof window.poznoteSwitchAccount === 'function';
+    var canSwitch = typeof window.poznoteSwitchAccount === 'function';
+    var hasAccounts = canSwitch && accounts.length > 1;
     if (hasAccounts) {
         menuHtml += '<div class="workspace-menu-label">' + escapeWorkspaceMenuText(wsTr('workspaces.menu.accounts', {}, 'Accounts')) + '</div>';
         accounts.forEach(function (account) {
@@ -258,8 +273,9 @@ function renderWorkspaceMenu(menu, state) {
     // account has a single workspace (or none), so these stay reachable. The
     // data-action values are the wsmenu:* keys of the UI Customization modal,
     // which hides them through .workspace-menu-item[data-action="..."]. They
-    // act on the active account only, so another account's list goes without.
-    if (!foreignAccount) {
+    // act on the active account only, so another account's list goes without,
+    // and so does an account this login does not own.
+    if (!foreignAccount && isOwnAccountActive()) {
         var uiCustomization = window.PoznoteUiCustomization;
         var editHidden = !!(uiCustomization && uiCustomization.isHidden('wsmenu:edit-workspaces'));
         var createHidden = !!(uiCustomization && uiCustomization.isHidden('wsmenu:new-workspace'));
@@ -312,9 +328,12 @@ function renderWorkspaceMenu(menu, state) {
     });
 }
 
-// Account picked in the menu: the active one brings back its own workspaces,
-// another one lists that account's workspaces (name and colour only, from
-// account_tree.php) so one of them can be opened in it.
+// Account picked in the menu: the login's own brings back its workspaces,
+// any other one lists what that account offers (name and colour only, from
+// account_tree.php: every workspace of an account granted whole, the shared
+// ones of an account that shares) so one of them can be opened in it. The
+// account a shared workspace belongs to is listed that way even while it is
+// the one open, since its other shared workspaces are reached from there.
 function chooseWorkspaceMenuAccount(menu, accountId) {
     var accountSwitch = window.PoznoteAccountSwitch;
     var accounts = accountSwitch && Array.isArray(accountSwitch.accounts) ? accountSwitch.accounts : [];
@@ -324,8 +343,16 @@ function chooseWorkspaceMenuAccount(menu, accountId) {
     }
     if (!account) return;
 
-    if (account.current) {
+    if (account.current && account.own) {
         renderWorkspaceMenu(menu, { workspaces: ownWorkspaceMenuData ? ownWorkspaceMenuData.workspaces : [], account: null });
+        return;
+    }
+
+    // The login's own account, from an account that is not it: opened straight
+    // away, since its workspaces are not this menu's to list.
+    if (account.own) {
+        closeWorkspaceMenus();
+        window.poznoteSwitchAccount(account.id, {});
         return;
     }
 

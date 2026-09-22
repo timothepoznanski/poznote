@@ -13,25 +13,10 @@
     let trackedKanbanBoard = null;
     let kanbanScrollResizeObserver = null;
 
-    function isPublicWorkspaceReadOnly() {
-        return !!(document.body && document.body.classList.contains('public-workspace-readonly'));
-    }
-
-    function syncKanbanCardDragState() {
-        const isReadOnly = isPublicWorkspaceReadOnly();
-        document.querySelectorAll('.kanban-card').forEach((card) => {
-            if (isReadOnly) {
-                card.removeAttribute('draggable');
-                card.draggable = false;
-            }
-        });
-    }
-
     /**
      * Initialization called either on DOMContentLoaded or manually when content is loaded via AJAX
      */
     function init() {
-        syncKanbanCardDragState();
         bindKanbanScrollButtons();
         restoreCompletedSectionStates();
         restoreSubfolderSectionStates();
@@ -114,10 +99,6 @@
 
         // Drag Start
         document.addEventListener('dragstart', (e) => {
-            if (isPublicWorkspaceReadOnly()) {
-                e.preventDefault();
-                return;
-            }
 
             // Text-selection drags fire dragstart with a text node target
             const targetEl = e.target instanceof Element ? e.target : e.target && e.target.parentElement;
@@ -152,10 +133,6 @@
 
         // Drag End
         document.addEventListener('dragend', (e) => {
-            if (isPublicWorkspaceReadOnly()) {
-                return;
-            }
-
             // Text-selection drags fire dragend with a text node target
             const targetEl = e.target instanceof Element ? e.target : e.target && e.target.parentElement;
             const card = targetEl && targetEl.closest('.kanban-card');
@@ -174,10 +151,6 @@
 
         // Drag Over - CRITICAL: must prevent default to allow drop
         document.addEventListener('dragover', (e) => {
-            if (isPublicWorkspaceReadOnly()) {
-                return;
-            }
-
             if (!getKanbanDropZone(e.target)) return;
 
             // Important: we are over a drop zone, allow drop
@@ -187,10 +160,6 @@
 
         // Drag Enter
         document.addEventListener('dragenter', (e) => {
-            if (isPublicWorkspaceReadOnly()) {
-                return;
-            }
-
             const zone = getKanbanDropZone(e.target);
             if (!zone) return;
 
@@ -203,10 +172,6 @@
 
         // Drag Leave
         document.addEventListener('dragleave', (e) => {
-            if (isPublicWorkspaceReadOnly()) {
-                return;
-            }
-
             const zone = getKanbanDropZone(e.target);
             if (!zone) return;
 
@@ -220,10 +185,6 @@
 
         // Drop
         document.addEventListener('drop', async (e) => {
-            if (isPublicWorkspaceReadOnly()) {
-                return;
-            }
-
             const columnContent = getKanbanDropZone(e.target);
             if (!columnContent) return;
 
@@ -412,8 +373,6 @@
 
             e.preventDefault();
             e.stopPropagation();
-
-            if (isPublicWorkspaceReadOnly()) return;
 
             const card = btn.closest('.kanban-card');
             if (card) toggleKanbanCardCompleted(card);
@@ -1104,10 +1063,6 @@
     }
 
     async function toggleKanbanTaskFromCard(checkbox) {
-        if (isPublicWorkspaceReadOnly()) {
-            checkbox.checked = !checkbox.checked;
-            return;
-        }
 
         const preview = checkbox.closest('.kanban-tasklist-preview');
         const card = checkbox.closest('.kanban-card');

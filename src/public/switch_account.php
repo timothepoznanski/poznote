@@ -13,6 +13,11 @@
  * index.php then opens it in its own workspace) or 'workspace' (a workspace
  * name). Without either, index.php opens the account's last opened or default
  * workspace, as after a login.
+ *
+ * With 'workspace' and no access to the whole account, the switch is tried
+ * as a shared workspace (auth.php, openSharedWorkspace): the account opens
+ * confined to that workspace when its owner shares it with the signed-in
+ * person.
  */
 require_once __DIR__ . '/../auth.php';
 
@@ -28,13 +33,16 @@ $location = 'index.php';
 
 $token = $_POST['csrf_token'] ?? '';
 $expected = $_SESSION['account_switch_csrf_token'] ?? '';
+$targetUserId = (int)($_POST['account_user_id'] ?? 0);
+$note = $_POST['note'] ?? '';
+$workspace = $_POST['workspace'] ?? '';
+$validWorkspace = is_string($workspace) && $workspace !== '' && strlen($workspace) <= 255;
+
 if (is_string($token) && is_string($expected) && $expected !== '' && hash_equals($expected, $token)
-    && switchActiveAccount((int)($_POST['account_user_id'] ?? 0))) {
-    $note = $_POST['note'] ?? '';
-    $workspace = $_POST['workspace'] ?? '';
+    && (switchActiveAccount($targetUserId) || ($validWorkspace && openSharedWorkspace($targetUserId, $workspace)))) {
     if (is_string($note) && ctype_digit($note) && (int)$note > 0) {
         $location .= '?note=' . (int)$note;
-    } elseif (is_string($workspace) && $workspace !== '' && strlen($workspace) <= 255) {
+    } elseif ($validWorkspace) {
         $location .= '?workspace=' . rawurlencode($workspace);
     }
 }

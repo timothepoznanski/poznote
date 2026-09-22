@@ -35,10 +35,9 @@ require_once __DIR__ . '/../theme_catalog.php';
 require_once __DIR__ . '/../users/db_master.php';
 require_once __DIR__ . '/../lib/default-credentials.php';
 
-// One account, one showing. A public-workspace visitor owns none of these
-// settings, and neither does someone opening an account that is not theirs.
+// One account, one showing. Someone opening an account that is not theirs (a
+// shared workspace, a granted account) owns none of these settings.
 if (getSetting('welcome_setup', '') !== 'pending'
-    || (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive())
     || (function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser())) {
     header('Location: index.php');
     exit;

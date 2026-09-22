@@ -93,7 +93,8 @@
       "today": "Aujourd'hui",
       "yesterday": "Hier"
     },
-    "network_error": "Erreur réseau"
+    "network_error": "Erreur réseau",
+    "none": "Aucun"
   },
   "snapshot": {
     "menu_item": "Snapshots",
@@ -746,37 +747,28 @@
     "share": {
       "actions": {
         "enable": "Partager",
-        "edit": "Editer le partage",
-        "copy_link": "Copier le lien",
+        "edit": "Modifier le partage",
         "disable": "Ne plus partager"
       },
       "confirm": {
-        "title": "Partager l’espace de travail en lecture seule",
-        "message": "Toute personne disposant de l'URL de l'espace de travail \"{{workspace}}\" aura accès à toutes les notes et tous les dossiers de cet espace de travail en lecture seule.",
-        "confirm_button": "Partager l’espace de travail"
+        "title": "Partager l'espace de travail",
+        "message": "Choisissez les utilisateurs qui peuvent ouvrir l'espace de travail « {{workspace}} ». Ils le retrouveront dans leur menu des espaces de travail et pourront modifier ses notes et ses dossiers."
       },
       "messages": {
-        "enabled": "Lien d’espace de travail en lecture seule activé",
-        "disabled": "Lien d’espace de travail en lecture seule désactivé",
-        "url_copied": "Lien de partage copié dans le presse-papiers !"
+        "disabled": "L'espace de travail n'est plus partagé",
+        "url_copied": "Lien de partage copié dans le presse-papiers !",
+        "saved": "Partage de l'espace de travail mis à jour"
       },
       "errors": {
-        "url_in_use": "Un espace de travail public avec ce nom existe déjà sur cette instance Poznote",
-        "copy_failed": "Impossible de copier le lien de partage",
-        "save_failed": "Impossible d’enregistrer le lien d’espace de travail en lecture seule",
-        "disable_failed": "Impossible de désactiver le lien d’espace de travail en lecture seule"
+        "save_failed": "Impossible de mettre à jour le partage de l'espace de travail",
+        "not_allowed": "Le partage avec d'autres utilisateurs n'est pas disponible sur cette instance"
       },
-      "status": {
-        "enabled": "Lecture seule publique activée",
-        "disabled": "Non partagé publiquement"
-      },
-      "help": "Toute personne disposant de cette URL ouvre Poznote directement sur cet espace de travail en lecture seule.",
-      "url_label": "URL publique",
       "options": {
-        "require_login": "Exiger une connexion Poznote",
-        "restrict_users": "Restreindre à des utilisateurs spécifiques",
         "users_loading": "Chargement des utilisateurs...",
         "no_users_found": "Aucun autre utilisateur trouvé"
+      },
+      "status": {
+        "not_shared": "Non partagé"
       }
     },
     "tags": {
@@ -1485,43 +1477,7 @@
       "delete_title": "Confirmer la suppression de l’espace de travail",
       "delete_description": "Toutes les notes et tous les dossiers seront supprimés définitivement et ne pourront pas être récupérés.",
       "delete_placeholder": "Tapez le nom de l’espace de travail pour confirmer",
-      "delete_button": "Supprimer",
-      "share": {
-        "actions": {
-          "enable": "Partager",
-          "edit": "Modifier le partage",
-          "copy_link": "Copier le lien",
-          "disable": "Ne plus partager"
-        },
-        "confirm": {
-          "title": "Partager l'espace de travail en lecture seule",
-          "message": "Toute personne disposant de l'URL de l'espace de travail « {{workspace}} » aura accès en lecture seule à toutes les notes et à tous les dossiers de cet espace.",
-          "confirm_button": "Partager l'espace de travail"
-        },
-        "messages": {
-          "enabled": "Lien de l'espace en lecture seule activé",
-          "disabled": "Lien de l'espace en lecture seule désactivé",
-          "url_copied": "Lien de partage copié dans le presse-papiers !"
-        },
-        "errors": {
-          "url_in_use": "Un espace de travail public porte déjà ce nom sur cette instance Poznote",
-          "copy_failed": "Impossible de copier le lien de partage",
-          "save_failed": "Impossible d'enregistrer le lien de l'espace en lecture seule",
-          "disable_failed": "Impossible de désactiver le lien de l'espace en lecture seule"
-        },
-        "status": {
-          "enabled": "Lecture seule publique activée",
-          "disabled": "Non partagé publiquement"
-        },
-        "help": "Toute personne disposant de cette URL ouvre Poznote directement sur cet espace de travail, en lecture seule.",
-        "url_label": "URL publique",
-        "options": {
-          "require_login": "Exiger une connexion à Poznote",
-          "restrict_users": "Restreindre à certains utilisateurs",
-          "users_loading": "Chargement des utilisateurs...",
-          "no_users_found": "Aucun autre utilisateur trouvé"
-        }
-      }
+      "delete_button": "Supprimer"
     },
     "user_settings_info": {
       "title": "Paramètres du compte",
@@ -2930,7 +2886,6 @@
       "title": "Protégé par mot de passe",
       "note_heading": "Protégé par mot de passe",
       "folder_heading": "Dossier protégé par mot de passe",
-      "workspace_heading": "Espace de travail protégé par mot de passe",
       "error_incorrect": "Mot de passe incorrect. Veuillez réessayer.",
       "additional_password_required": "Cette note nécessite un mot de passe supplémentaire. Veuillez entrer le mot de passe suivant pour continuer.",
       "placeholder": "Entrez le mot de passe",
@@ -3946,15 +3901,14 @@
       "untitled_note": "note #{{id}}",
       "linked_deleted": "+{{count}} notes liées",
       "share_updated": "paramètres mis à jour",
-      "password_protected": "protégé par mot de passe",
-      "login_required": "connexion requise",
       "allowed_users": "limité à {{count}} utilisateurs",
       "accounts": "comptes : {{accounts}}",
       "empty_value": "vide",
       "s3_objects_deleted": "{{count}} objets S3 supprimés",
       "s3_cleanup_failed": "échec du nettoyage S3",
       "expires_at": "expire le {{date}}",
-      "recovery_codes_remaining": "{{count}} restants"
+      "recovery_codes_remaining": "{{count}} restants",
+      "shared_with": "partagé avec {{users}}"
     },
     "destinations": {
       "download": "téléchargement",
@@ -4032,9 +3986,7 @@
     },
     "logout": {
       "confirm": "Voulez-vous vraiment vous déconnecter ?",
-      "signed_in_as": "Vous êtes connecté en tant que {{username}}",
       "in_progress": "Déconnexion...",
-      "switch_intro": "Passez à un autre compte, ou déconnectez-vous complètement.",
       "switch_in_progress": "Changement de compte..."
     }
   },

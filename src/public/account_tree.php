@@ -7,10 +7,12 @@
  *   GET account_tree.php?account=<user id>&workspaces_only=1
  *
  * The signed-in person must have been granted access to that account (Admin >
- * User Management), the same check switch_account.php relies on. The
- * account's database is opened read-only and only listed: workspaces, folders
- * and live notes, no content. With workspaces_only the answer stops at the
- * workspaces (name and colour), which is what the sidebar's workspace menu
+ * User Management), the same check switch_account.php relies on, or the
+ * account must share a workspace with them (workspaces.php > Share), in which
+ * case the answer holds those workspaces and nothing else. The account's
+ * database is opened read-only and only listed: workspaces, folders and live
+ * notes, no content. With workspaces_only the answer stops at the workspaces
+ * (name and colour), which is what the sidebar's workspace menu
  * (js/workspaces-core.js) shows before opening one of them in that account.
  * Nothing here changes the active account.
  */
@@ -33,17 +35,21 @@ $respond = static function (int $status, array $payload): void {
     exit;
 };
 
-// A public-workspace visitor has no login identity to hold access grants.
-if (!isRealUserAuthenticated()) {
-    $respond(403, ['success' => false, 'error' => 'forbidden']);
-}
-
 $authUserId = (int)(getAuthenticatedUserId() ?? 0);
 $targetUserId = isset($_GET['account']) && is_string($_GET['account']) && ctype_digit($_GET['account'])
     ? (int)$_GET['account']
     : 0;
 
-if ($authUserId <= 0 || $targetUserId <= 0 || !canUserAccessAccount($authUserId, $targetUserId)) {
+$fullAccess = $authUserId > 0 && $targetUserId > 0 && canUserAccessAccount($authUserId, $targetUserId);
+
+// Workspaces this account shares with the signed-in person: the answer is
+// cut down to them when the account itself was not granted.
+$sharedWorkspaceNames = [];
+if (!$fullAccess && $authUserId > 0 && $targetUserId > 0 && function_exists('getSharedWorkspaceNamesFromOwner')) {
+    $sharedWorkspaceNames = getSharedWorkspaceNamesFromOwner($targetUserId);
+}
+
+if (!$fullAccess && empty($sharedWorkspaceNames)) {
     $respond(404, ['success' => false, 'error' => 'not_found']);
 }
 
@@ -71,11 +77,23 @@ if (is_file($dbPath)) {
         $pdo->exec('PRAGMA query_only = 1');
 
         $workspaces = $pdo->query('SELECT name FROM workspaces ORDER BY ' . poznoteWorkspaceOrderBy($pdo))->fetchAll(PDO::FETCH_ASSOC);
+        if (!$fullAccess) {
+            $workspaces = array_values(array_filter($workspaces, static function (array $row) use ($sharedWorkspaceNames): bool {
+                return in_array((string)($row['name'] ?? ''), $sharedWorkspaceNames, true);
+            }));
+        }
         if ($workspacesOnly) {
-            $colors = poznoteGetWorkspaceColorsMap($pdo);
+            $colors = poznoteGetWorkspaceColorsMap($pdo, false);
         } else {
             $folders = $pdo->query('SELECT id, name, parent_id, workspace, created, display_order FROM folders')->fetchAll(PDO::FETCH_ASSOC);
             $notes = $pdo->query('SELECT id, heading, folder_id, workspace, type, created, updated, display_order FROM entries WHERE trash = 0')->fetchAll(PDO::FETCH_ASSOC);
+            if (!$fullAccess) {
+                $keepShared = static function (array $row) use ($sharedWorkspaceNames): bool {
+                    return in_array((string)($row['workspace'] ?? ''), $sharedWorkspaceNames, true);
+                };
+                $folders = array_values(array_filter($folders, $keepShared));
+                $notes = array_values(array_filter($notes, $keepShared));
+            }
             // The account's own sort mode, so its outline lists folders and
             // notes in the order its full tree does.
             $sortStmt = $pdo->prepare('SELECT value FROM settings WHERE key = ?');

@@ -55,19 +55,6 @@ class AttachmentsController {
         }
     }
 
-    private function appendPublicWorkspaceAgeFilter(string &$query, array &$params, string $column = 'updated'): void {
-        if (!function_exists('isPublicWorkspaceAccessActive') || !isPublicWorkspaceAccessActive()) {
-            return;
-        }
-
-        $cutoff = getNoteAgeFilterCutoff(getNoteAgeFilterDays($this->con));
-        if ($cutoff === null) {
-            return;
-        }
-
-        $query .= " AND $column >= ?";
-        $params[] = $cutoff;
-    }
 
     private function appendConfiguredNoteAgeFilter(string &$query, array &$params, string $column = 'updated'): void {
         $cutoff = getNoteAgeFilterCutoff(getNoteAgeFilterDays($this->con));
@@ -184,13 +171,11 @@ class AttachmentsController {
             if ($workspace) {
                 $query = "SELECT entry, attachments FROM entries WHERE id = ? AND workspace = ?";
                 $params = [$noteId, $workspace];
-                $this->appendPublicWorkspaceAgeFilter($query, $params);
                 $stmt = $this->con->prepare($query);
                 $stmt->execute($params);
             } else {
                 $query = "SELECT entry, attachments FROM entries WHERE id = ?";
                 $params = [$noteId];
-                $this->appendPublicWorkspaceAgeFilter($query, $params);
                 $stmt = $this->con->prepare($query);
                 $stmt->execute($params);
             }
@@ -425,13 +410,11 @@ class AttachmentsController {
             if ($workspace) {
                 $query = "SELECT attachments, linked_note_id FROM entries WHERE id = ? AND workspace = ?";
                 $params = [$noteId, $workspace];
-                $this->appendPublicWorkspaceAgeFilter($query, $params);
                 $stmt = $this->con->prepare($query);
                 $stmt->execute($params);
             } else {
                 $query = "SELECT attachments, linked_note_id FROM entries WHERE id = ?";
                 $params = [$noteId];
-                $this->appendPublicWorkspaceAgeFilter($query, $params);
                 $stmt = $this->con->prepare($query);
                 $stmt->execute($params);
             }

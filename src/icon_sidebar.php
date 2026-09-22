@@ -102,6 +102,18 @@ $iconSidebarItems = [
     ['id' => 'iconSidebarTrashBtn', 'group' => 'utility', 'url' => $iconSidebarUrl('trash.php'), 'page' => 'trash.php', 'icon' => 'lucide-trash-2', 'label' => t('notes_list.system_folders.trash', [], 'Trash')],
 ];
 
+// A workspace shared with this login (auth.php) opens its owner's account for
+// that one workspace: the views that span the whole account, and the trash and
+// the public links that belong to its owner, are refused there, so they are
+// not offered either.
+$iconSidebarSharedScopeActive = function_exists('isSharedWorkspaceScopeActive') && isSharedWorkspaceScopeActive();
+if ($iconSidebarSharedScopeActive) {
+    $iconSidebarHiddenPages = ['notes_manager.php', 'shared.php', 'trash.php'];
+    $iconSidebarItems = array_values(array_filter($iconSidebarItems, static function (array $item) use ($iconSidebarHiddenPages): bool {
+        return !in_array($item['page'] ?? '', $iconSidebarHiddenPages, true);
+    }));
+}
+
 // Extras carrying an 'after' are pinned next to a navigation entry and are
 // placed at the very end of this file, once the ordering below has run.
 $iconSidebarPinnedItems = [];
@@ -290,13 +302,52 @@ $iconSidebarBottomItems = [
     ['id' => 'iconSidebarLogoutBtn', 'url' => $iconSidebarBasePath . 'logout.php', 'icon' => 'lucide-log-out', 'label' => t('workspace_menu.logout', [], 'Logout')],
 ];
 
+// My Profile, Settings and About all open settings.php, which only the owner
+// of the account being looked at may open (requireActiveAccountOwner): inside
+// a workspace shared with this login, or an account granted to it, the theme
+// switch and the way out are what is left.
+if (!(!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser())) {
+    $iconSidebarBottomHidden = ['iconSidebarProfileBtn', 'iconSidebarSettingsBtn', 'iconSidebarAboutBtn'];
+    $iconSidebarBottomItems = array_values(array_filter($iconSidebarBottomItems, static function (array $item) use ($iconSidebarBottomHidden): bool {
+        return !in_array($item['id'] ?? '', $iconSidebarBottomHidden, true);
+    }));
+}
+
 // Someone who can open several accounts (Admin > User Management) gets them
 // offered in the logout dialog (js/profile.js), in the notes list's workspace
 // menu (js/workspaces-core.js) and in its "Other accounts" block
 // (js/other-accounts.js); all post the choice to switch_account.php. The
 // token is kept for the whole session so several open tabs all stay valid.
+// An account that shares a workspace with the signed-in person (auth.php,
+// getSharedWorkspacesForLogin) is listed here like an account granted whole:
+// choosing it in the workspace menu lists what it shares, which is one
+// workspace rather than all of them (account_tree.php), and picking that
+// workspace opens the account on it through switch_account.php. The person's
+// own account is then listed too, as the way back.
 $iconSidebarAccountSwitch = null;
 $iconSidebarSwitchProfiles = function_exists('getSwitchableAccountProfiles') ? getSwitchableAccountProfiles() : [];
+$iconSidebarSharedWorkspaces = function_exists('getSharedWorkspacesForLogin') ? getSharedWorkspacesForLogin() : [];
+if (!empty($iconSidebarSharedWorkspaces)) {
+    $iconSidebarKnownAccountIds = array_map(static fn(array $profile): int => (int)$profile['id'], $iconSidebarSwitchProfiles);
+    if (empty($iconSidebarKnownAccountIds)) {
+        $iconSidebarOwnProfile = function_exists('getAuthenticatedUser') ? getAuthenticatedUser() : null;
+        if (is_array($iconSidebarOwnProfile) && !empty($iconSidebarOwnProfile['id'])) {
+            $iconSidebarSwitchProfiles = [$iconSidebarOwnProfile];
+            $iconSidebarKnownAccountIds = [(int)$iconSidebarOwnProfile['id']];
+        }
+    }
+    foreach ($iconSidebarSharedWorkspaces as $iconSidebarSharedRow) {
+        $iconSidebarSharedOwnerId = (int)$iconSidebarSharedRow['owner_user_id'];
+        if (in_array($iconSidebarSharedOwnerId, $iconSidebarKnownAccountIds, true)) {
+            continue;
+        }
+        $iconSidebarKnownAccountIds[] = $iconSidebarSharedOwnerId;
+        $iconSidebarSwitchProfiles[] = [
+            'id' => $iconSidebarSharedOwnerId,
+            'username' => (string)$iconSidebarSharedRow['owner_username'],
+        ];
+    }
+}
 if (!empty($iconSidebarSwitchProfiles)) {
     if (empty($_SESSION['account_switch_csrf_token'])) {
         $_SESSION['account_switch_csrf_token'] = bin2hex(random_bytes(32));
@@ -348,13 +399,9 @@ $iconSidebarProfileStrings = [
     'profile.errors.email_invalid' => t('profile.errors.email_invalid', [], 'Invalid email address'),
     'profile.errors.email_taken' => t('profile.errors.email_taken', [], 'This email is already in use'),
     'profile.logout.confirm' => t('profile.logout.confirm', [], 'Are you sure you want to log out?'),
-    // Keeps its {{username}} placeholder: js/profile.js substitutes it client-side.
-    'profile.logout.signed_in_as' => t('profile.logout.signed_in_as', [], 'Signed in as {{username}}'),
     'profile.logout.in_progress' => t('profile.logout.in_progress', [], 'Logging out...'),
     'workspace_menu.logout' => t('workspace_menu.logout', [], 'Logout'),
-    'profile.logout.switch_intro' => t('profile.logout.switch_intro', [], 'Switch to another account, or log out completely.'),
     'profile.logout.switch_in_progress' => t('profile.logout.switch_in_progress', [], 'Switching account...'),
-    'login.account_select.own_account' => t('login.account_select.own_account', [], 'Your account'),
     'multiuser.admin.email' => t('multiuser.admin.email', [], 'Email'),
     'common.cancel' => t('common.cancel', [], 'Cancel'),
     'common.save' => t('common.save', [], 'Save'),
@@ -365,6 +412,10 @@ $iconSidebarProfileStrings = [
 <link rel="stylesheet" href="<?php echo $iconSidebarAsset('css/profile-modal.css'); ?>">
 <script>
 window.PoznoteProfileI18n = <?php echo json_encode($iconSidebarProfileStrings, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;
+// False while the active account is not the login's own (a workspace shared
+// with it, an account granted to it): the scripts then leave out what only
+// its owner may do, such as creating a workspace or editing the list.
+window.PoznoteActiveAccountIsOwn = <?php echo (!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser()) ? 'true' : 'false'; ?>;
 <?php if (!empty($iconSidebarAccountSwitch)): ?>
 window.PoznoteAccountSwitch = <?php echo json_encode($iconSidebarAccountSwitch, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;
 <?php endif; ?>
@@ -373,6 +424,9 @@ window.PoznoteAccountSwitch = <?php echo json_encode($iconSidebarAccountSwitch, 
 <script>
 window.PoznoteIconSidebarColorsConfig = <?php echo json_encode([
     'colors' => (object)poznoteGetIconSidebarColors(),
+    // Both entries of the right-click menu write a setting of the account
+    // being looked at, which only its owner may do (SettingsController).
+    'canCustomize' => !function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser(),
     'errorSaving' => t('display.alerts.error_saving_preference', [], 'Error saving preference'),
     // Right-click menu of the rail and the note toolbar. The rail buttons the
     // UI Customization list refuses to hide get no "Hide" entry.

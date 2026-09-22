@@ -38,19 +38,6 @@ class FoldersController {
         $this->db = $db;
     }
 
-    private function appendPublicWorkspaceAgeFilter(string &$sql, array &$params, string $column = 'updated'): void {
-        if (!function_exists('isPublicWorkspaceAccessActive') || !isPublicWorkspaceAccessActive()) {
-            return;
-        }
-
-        $cutoff = getNoteAgeFilterCutoff(getNoteAgeFilterDays($this->db));
-        if ($cutoff === null) {
-            return;
-        }
-
-        $sql .= " AND $column >= ?";
-        $params[] = $cutoff;
-    }
     
     /**
      * Get the first workspace name if none provided
@@ -193,7 +180,6 @@ class FoldersController {
         
         $query = "SELECT COUNT(*) FROM entries WHERE folder_id = ? AND trash = 0" . $wsCond;
         $params = array_merge([$folderId], $wsParams);
-        $this->appendPublicWorkspaceAgeFilter($query, $params);
         $stmt = $this->db->prepare($query);
         $stmt->execute($params);
         $count += (int)$stmt->fetchColumn();
@@ -233,6 +219,11 @@ class FoldersController {
      * Returns [conditionSQL, params] where conditionSQL is " AND workspace = ?" or empty.
      */
     private function buildWorkspaceCondition(?string $workspace): array {
+        // No workspace means every workspace, except for a session confined
+        // to a workspace shared with it (auth.php), which has only that one.
+        if ($workspace === null && function_exists('getSharedWorkspaceScopeName')) {
+            $workspace = getSharedWorkspaceScopeName();
+        }
         if ($workspace !== null) {
             return [' AND workspace = ?', [$workspace]];
         }
@@ -1039,8 +1030,10 @@ class FoldersController {
      * (old id => new id) and restored_notes (count).
      */
     public function restoreDeleted(): void {
-        if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
-            $this->sendError('This endpoint is not available in public workspace mode', 403);
+        // Restores by folder id reach into the owner's trash, which a session
+        // confined to a shared workspace (auth.php) does not manage.
+        if (function_exists('isSharedWorkspaceScopeActive') && isSharedWorkspaceScopeActive()) {
+            $this->sendError('This endpoint is not available in a shared workspace', 403);
             return;
         }
 
@@ -1930,7 +1923,6 @@ class FoldersController {
         [$wsCond, $wsParams] = $this->buildWorkspaceCondition($workspace);
         $directQuery = "SELECT COUNT(*) FROM entries WHERE folder_id = ? AND trash = 0" . $wsCond;
         $directParams = array_merge([$folderId], $wsParams);
-        $this->appendPublicWorkspaceAgeFilter($directQuery, $directParams);
         $directStmt = $this->db->prepare($directQuery);
         $directStmt->execute($directParams);
         $directCount = (int)$directStmt->fetchColumn();
@@ -2022,7 +2014,6 @@ class FoldersController {
             
             $query = "SELECT COUNT(*) FROM entries WHERE trash = 0 AND folder_id IN ($placeholders)" . $wsCond;
             $countParams = array_merge($allFolderIds, $wsParams);
-            $this->appendPublicWorkspaceAgeFilter($query, $countParams);
             $countStmt = $this->db->prepare($query);
             $countStmt->execute($countParams);
             $counts[$folderId] = (int)$countStmt->fetchColumn();
@@ -2031,7 +2022,6 @@ class FoldersController {
         // Get uncategorized count
         $uncategorizedQuery = "SELECT COUNT(*) FROM entries WHERE trash = 0 AND folder_id IS NULL" . $wsCond;
         $uncatParams = $wsParams;
-        $this->appendPublicWorkspaceAgeFilter($uncategorizedQuery, $uncatParams);
         $uncatStmt = $this->db->prepare($uncategorizedQuery);
         $uncatStmt->execute($uncatParams);
         $counts['uncategorized'] = (int)$uncatStmt->fetchColumn();
@@ -2039,7 +2029,6 @@ class FoldersController {
         // Get favorites count
         $favoriteQuery = "SELECT COUNT(*) FROM entries WHERE trash = 0 AND favorite = 1" . $wsCond;
         $favoriteParams = $wsParams;
-        $this->appendPublicWorkspaceAgeFilter($favoriteQuery, $favoriteParams);
         $favStmt = $this->db->prepare($favoriteQuery);
         $favStmt->execute($favoriteParams);
         $counts['Favorites'] = (int)$favStmt->fetchColumn();
@@ -2416,9 +2405,10 @@ class FoldersController {
             if ($folderData) {
                 $targetFolderId = (int)$folderData['id'];
             } else {
-                // Create folder if it doesn't exist
+                // Create folder if it doesn't exist, in the note's workspace
+                // when the request names none (a NULL workspace hid it)
                 $createStmt = $this->db->prepare("INSERT INTO folders (name, workspace) VALUES (?, ?)");
-                $createStmt->execute([$targetFolder, $workspace]);
+                $createStmt->execute([$targetFolder, $workspace ?? $currentNote['workspace']]);
                 $targetFolderId = (int)$this->db->lastInsertId();
             }
         }
@@ -2505,8 +2495,10 @@ class FoldersController {
      * workspace by archiving date instead of by real last change.
      */
     public function archiveNote(string $noteId): void {
-        if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
-            $this->sendError('This endpoint is not available in public workspace mode', 403);
+        // Archiving moves the note to the owner's Archive workspace, outside
+        // the one a shared-workspace session is confined to (auth.php).
+        if (function_exists('isSharedWorkspaceScopeActive') && isSharedWorkspaceScopeActive()) {
+            $this->sendError('Notes cannot leave a workspace shared with you', 403);
             return;
         }
 
@@ -2795,11 +2787,6 @@ class FoldersController {
      * reorderNoteOnDashboard); the target must be a sibling.
      */
     public function reorderNote(): void {
-        if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
-            $this->sendError('This endpoint is not available in public workspace mode', 403);
-            return;
-        }
-
         $data = $this->getInputData();
 
         $noteId = isset($data['note_id']) ? (int)$data['note_id'] : 0;

@@ -236,6 +236,49 @@ function initializeMasterDatabase(PDO $con): void {
         )
     ");
 
+    // Workspace shares: the owner of a workspace names the accounts that may
+    // open it. A grantee finds the workspace in their own workspace menu and
+    // works in it, with the same write access as the owner, but never sees
+    // the owner's other workspaces (see auth.php, "shared workspace scope").
+    //
+    // An earlier, unreleased draft of the table (owner_id, shared_with_user_id,
+    // permission) may survive in a development database: it is rebuilt in
+    // the current shape, keeping its rows.
+    try {
+        $shareCols = array_column($con->query("PRAGMA table_info(workspace_shares)")->fetchAll(PDO::FETCH_ASSOC), 'name');
+        if (!empty($shareCols) && !in_array('grantee_user_id', $shareCols, true)) {
+            $con->exec("ALTER TABLE workspace_shares RENAME TO workspace_shares_legacy");
+        }
+    } catch (Exception $e) {
+        error_log("Failed to inspect workspace_shares: " . $e->getMessage());
+    }
+    $con->exec("
+        CREATE TABLE IF NOT EXISTS workspace_shares (
+            owner_user_id INTEGER NOT NULL,
+            workspace_name TEXT NOT NULL,
+            grantee_user_id INTEGER NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (owner_user_id, workspace_name, grantee_user_id),
+            FOREIGN KEY (owner_user_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (grantee_user_id) REFERENCES users(id) ON DELETE CASCADE,
+            CHECK (owner_user_id != grantee_user_id)
+        )
+    ");
+    try {
+        $legacyShares = $con->query("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'workspace_shares_legacy'")->fetchColumn();
+        if ($legacyShares) {
+            $con->exec("
+                INSERT OR IGNORE INTO workspace_shares (owner_user_id, workspace_name, grantee_user_id)
+                SELECT owner_id, workspace_name, shared_with_user_id
+                FROM workspace_shares_legacy
+                WHERE owner_id != shared_with_user_id
+            ");
+            $con->exec("DROP TABLE workspace_shares_legacy");
+        }
+    } catch (Exception $e) {
+        error_log("Failed to carry over legacy workspace shares: " . $e->getMessage());
+    }
+
     // Transient edit locks for notes shared across users. holder_kind
     // distinguishes an in-app account holder ('user') from an anonymous
     // editor on a public share link ('public'); public locks store the share
@@ -318,6 +361,7 @@ function initializeMasterDatabase(PDO $con): void {
     $con->exec("CREATE INDEX IF NOT EXISTS idx_shared_links_user ON shared_links(user_id)");
     $con->exec("CREATE INDEX IF NOT EXISTS idx_user_account_access_accessor ON user_account_access(accessor_user_id)");
     $con->exec("CREATE INDEX IF NOT EXISTS idx_user_account_access_target ON user_account_access(target_user_id)");
+    $con->exec("CREATE INDEX IF NOT EXISTS idx_workspace_shares_grantee ON workspace_shares(grantee_user_id)");
     $con->exec("CREATE INDEX IF NOT EXISTS idx_note_edit_locks_holder ON note_edit_locks(holder_login_user_id)");
     $con->exec("CREATE INDEX IF NOT EXISTS idx_note_edit_locks_expires ON note_edit_locks(expires_at)");
     
@@ -504,6 +548,186 @@ function setUserAccountAccessTargets(int $accessorUserId, array $targetUserIds):
             $con->rollBack();
         }
         return ['success' => false, 'error' => $e->getMessage()];
+    }
+}
+
+/**
+ * Replace the accounts a workspace is shared with. The owner cannot be named,
+ * nor an inactive or unknown account. Returns the ids actually recorded.
+ */
+function setWorkspaceShareGrantees(int $ownerUserId, string $workspaceName, array $granteeUserIds): array {
+    $workspaceName = trim($workspaceName);
+    if ($ownerUserId <= 0 || $workspaceName === '') {
+        return [];
+    }
+
+    $wanted = [];
+    foreach ($granteeUserIds as $granteeUserId) {
+        $granteeUserId = (int)$granteeUserId;
+        if ($granteeUserId > 0 && $granteeUserId !== $ownerUserId) {
+            $wanted[$granteeUserId] = true;
+        }
+    }
+
+    $con = null;
+    try {
+        $con = getMasterConnection();
+
+        $validIds = [];
+        if (!empty($wanted)) {
+            $ids = array_keys($wanted);
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $stmt = $con->prepare("SELECT id FROM users WHERE active = 1 AND id IN ($placeholders)");
+            $stmt->execute($ids);
+            $validIds = array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+        }
+
+        $con->beginTransaction();
+        $stmt = $con->prepare("DELETE FROM workspace_shares WHERE owner_user_id = ? AND workspace_name = ?");
+        $stmt->execute([$ownerUserId, $workspaceName]);
+        if (!empty($validIds)) {
+            $stmt = $con->prepare("INSERT OR IGNORE INTO workspace_shares (owner_user_id, workspace_name, grantee_user_id) VALUES (?, ?, ?)");
+            foreach ($validIds as $granteeUserId) {
+                $stmt->execute([$ownerUserId, $workspaceName, $granteeUserId]);
+            }
+        }
+        $con->commit();
+
+        sort($validIds);
+        return $validIds;
+    } catch (Exception $e) {
+        if ($con instanceof PDO && $con->inTransaction()) {
+            $con->rollBack();
+        }
+        error_log("Failed to set workspace share grantees: " . $e->getMessage());
+        return [];
+    }
+}
+
+/**
+ * Ids of the accounts each workspace of an owner is shared with, keyed by
+ * workspace name. Workspaces shared with nobody are absent.
+ */
+function getWorkspaceShareGranteesByWorkspace(int $ownerUserId): array {
+    if ($ownerUserId <= 0) {
+        return [];
+    }
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("
+            SELECT s.workspace_name, s.grantee_user_id
+            FROM workspace_shares s
+            INNER JOIN users u ON u.id = s.grantee_user_id
+            WHERE s.owner_user_id = ? AND u.active = 1
+            ORDER BY s.workspace_name, u.username
+        ");
+        $stmt->execute([$ownerUserId]);
+        $map = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $map[(string)$row['workspace_name']][] = (int)$row['grantee_user_id'];
+        }
+        return $map;
+    } catch (Exception $e) {
+        error_log("Failed to list workspace share grantees: " . $e->getMessage());
+        return [];
+    }
+}
+
+/**
+ * Workspaces shared with an account, owners first by name then by workspace
+ * name: rows of owner_user_id, owner_username, workspace_name. Owners whose
+ * account is inactive are left out.
+ */
+function getWorkspacesSharedWithUser(int $granteeUserId): array {
+    if ($granteeUserId <= 0) {
+        return [];
+    }
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("
+            SELECT s.owner_user_id, u.username AS owner_username, s.workspace_name
+            FROM workspace_shares s
+            INNER JOIN users u ON u.id = s.owner_user_id
+            WHERE s.grantee_user_id = ? AND u.active = 1
+            ORDER BY u.username COLLATE NOCASE, s.workspace_name COLLATE NOCASE
+        ");
+        $stmt->execute([$granteeUserId]);
+        $rows = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $rows[] = [
+                'owner_user_id' => (int)$row['owner_user_id'],
+                'owner_username' => (string)$row['owner_username'],
+                'workspace_name' => (string)$row['workspace_name'],
+            ];
+        }
+        return $rows;
+    } catch (Exception $e) {
+        error_log("Failed to list shared workspaces: " . $e->getMessage());
+        return [];
+    }
+}
+
+/**
+ * True when the owner shares the named workspace with the grantee and both
+ * accounts are active.
+ */
+function isWorkspaceSharedWithUser(int $ownerUserId, string $workspaceName, int $granteeUserId): bool {
+    $workspaceName = trim($workspaceName);
+    if ($ownerUserId <= 0 || $granteeUserId <= 0 || $workspaceName === '' || $ownerUserId === $granteeUserId) {
+        return false;
+    }
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("
+            SELECT COUNT(*)
+            FROM workspace_shares s
+            INNER JOIN users o ON o.id = s.owner_user_id
+            INNER JOIN users g ON g.id = s.grantee_user_id
+            WHERE s.owner_user_id = ? AND s.workspace_name = ? AND s.grantee_user_id = ?
+              AND o.active = 1 AND g.active = 1
+        ");
+        $stmt->execute([$ownerUserId, $workspaceName, $granteeUserId]);
+        return (int)$stmt->fetchColumn() > 0;
+    } catch (Exception $e) {
+        error_log("Failed to check workspace share: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Follow a workspace rename on its shares.
+ */
+function renameWorkspaceShares(int $ownerUserId, string $oldName, string $newName): void {
+    $oldName = trim($oldName);
+    $newName = trim($newName);
+    if ($ownerUserId <= 0 || $oldName === '' || $newName === '' || $oldName === $newName) {
+        return;
+    }
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("UPDATE OR REPLACE workspace_shares SET workspace_name = ? WHERE owner_user_id = ? AND workspace_name = ?");
+        $stmt->execute([$newName, $ownerUserId, $oldName]);
+    } catch (Exception $e) {
+        error_log("Failed to rename workspace shares: " . $e->getMessage());
+    }
+}
+
+/**
+ * Drop every share of a workspace, when it is deleted or unshared.
+ */
+function deleteWorkspaceShares(int $ownerUserId, string $workspaceName): int {
+    $workspaceName = trim($workspaceName);
+    if ($ownerUserId <= 0 || $workspaceName === '') {
+        return 0;
+    }
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("DELETE FROM workspace_shares WHERE owner_user_id = ? AND workspace_name = ?");
+        $stmt->execute([$ownerUserId, $workspaceName]);
+        return $stmt->rowCount();
+    } catch (Exception $e) {
+        error_log("Failed to delete workspace shares: " . $e->getMessage());
+        return 0;
     }
 }
 
@@ -1412,6 +1636,10 @@ function deleteUserProfile(int $id, bool $deleteData = false): array {
         // Delete account access grants involving this user.
         $stmt = $con->prepare("DELETE FROM user_account_access WHERE accessor_user_id = ? OR target_user_id = ?");
         $stmt->execute([$id, $id]);
+
+        // Delete workspace shares the user gave or received.
+        $stmt = $con->prepare("DELETE FROM workspace_shares WHERE owner_user_id = ? OR grantee_user_id = ?");
+        $stmt->execute([$id, $id]);
         
         $stmt = $con->prepare("DELETE FROM users WHERE id = ?");
         $stmt->execute([$id]);
@@ -2124,10 +2352,14 @@ function isTokenAvailable(string $token, int $userId, string $targetType, int $t
  * check could not be performed (in doubt, callers must keep the token).
  */
 function sharedLinkTargetStillExists(int $ownerId, string $targetType, string $token): ?bool {
+    // Workspaces have no public link any more (schema 43 unregisters them
+    // account by account): a row left behind points at nothing.
+    if ($targetType === 'workspace') {
+        return false;
+    }
     $tables = [
         'note' => 'shared_notes',
         'folder' => 'shared_folders',
-        'workspace' => 'shared_workspaces',
     ];
     if (!isset($tables[$targetType]) || $ownerId <= 0) {
         return null;

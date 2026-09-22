@@ -74,10 +74,6 @@
         return !!document.getElementById('left_col');
     }
 
-    function isReadOnly() {
-        return !!(document.body && document.body.classList.contains('public-workspace-readonly'));
-    }
-
     /**
      * The note has the same keys, so the tree only answers while it owns the
      * keyboard (js/pane-focus.js). Without that module the tree answers only
@@ -484,7 +480,7 @@
         var isOpen = (key === ' ' || key === 'Spacebar');
         if (!isHorizontal && !isRename && !isOpen && !Object.prototype.hasOwnProperty.call(STEPS, key)) return;
 
-        if (!hasTree() || isReadOnly() || !treeOwnsKeyboard(e.target)) return;
+        if (!hasTree() || !treeOwnsKeyboard(e.target)) return;
         if (isTextEditingContext(e.target) || isModalOpen() || isRowMenuOpen()) return;
 
         // One sweep of the tree per key press, shared by the move and by the

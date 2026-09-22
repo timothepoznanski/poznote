@@ -28,10 +28,6 @@
         return text;
     }
 
-    function isReadOnlyWorkspace() {
-        return !!(document.body && document.body.classList.contains('public-workspace-readonly'));
-    }
-
     // True only when the drag carries OS files, not a note/folder being moved.
     function dragCarriesFiles(e) {
         if (!e.dataTransfer) return false;
@@ -162,7 +158,7 @@
     }
 
     function handleDragEnter(e) {
-        if (!dragCarriesFiles(e) || isReadOnlyWorkspace()) return;
+        if (!dragCarriesFiles(e)) return;
         e.preventDefault();
         dragDepth++;
         var folder = resolveDropFolder(e.target);
@@ -171,7 +167,7 @@
     }
 
     function handleDragOver(e) {
-        if (!dragCarriesFiles(e) || isReadOnlyWorkspace()) return;
+        if (!dragCarriesFiles(e)) return;
         // Required so the browser lets us receive the drop instead of opening the file.
         e.preventDefault();
         e.stopPropagation();
@@ -199,7 +195,6 @@
         e.stopPropagation();
         endDrag();
 
-        if (isReadOnlyWorkspace()) return;
 
         var files = e.dataTransfer && e.dataTransfer.files ? Array.prototype.slice.call(e.dataTransfer.files) : [];
         if (!files.length) return;
@@ -318,7 +313,7 @@
 
     function init() {
         var sidebar = getSidebar();
-        if (!sidebar || isReadOnlyWorkspace()) return;
+        if (!sidebar) return;
 
         buildOverlay();
 

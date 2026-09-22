@@ -61,12 +61,12 @@ require_once __DIR__ . '/../db_connect.php';
 // building anything. The key is seeded 'pending' when the account database is
 // created and welcome.php flips it to 'done', so this fires exactly once.
 // Only a plain page load is diverted: a note-pane fragment or a POST would
-// lose its payload to the redirect, and a public-workspace visitor owns no
-// settings to walk through.
+// lose its payload to the redirect, and someone opening an account that is
+// not theirs (a shared workspace, a granted account) owns no settings to
+// walk through.
 if (!$isRightColFragment
     && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET'
     && getSetting('welcome_setup', '') === 'pending'
-    && !(function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive())
     && !(function_exists('isActiveAccountOwnedByAuthenticatedUser')
         && !isActiveAccountOwnedByAuthenticatedUser())) {
     header('Location: welcome.php');
@@ -89,7 +89,11 @@ require_once __DIR__ . '/../GitSync.php';
 $gitSync = new GitSync($con, $_SESSION['user_id'] ?? null);
 $gitEnabled = GitSync::isEnabled() && $gitSync->isConfigured();
 $isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
-$showGitSync = $gitEnabled; // All users with configured git can sync
+// All users with configured git can sync, except while looking at an account
+// that is not their own (a workspace shared with them, an account granted to
+// them): the repository, its settings and the sync itself belong to the
+// account's owner, and GitSyncController refuses everyone else.
+$showGitSync = $gitEnabled && (!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser());
 $gitProvider = function_exists('getGitProviderName') ? getGitProviderName($gitSync->getProvider()) : 'Git';
 
 // Resolve the workspace when no parameter is present, without redirecting
@@ -102,12 +106,12 @@ $workspaceResolvedInternally = null;
 // workspaces, a link pasted without its workspace). Open the note in its own
 // workspace instead of falling back to the latest note of the current one.
 // Plain page loads only: a note-pane fragment is swapped into a page whose
-// workspace cannot change, and a public-workspace visitor stays in the
-// shared workspace.
+// workspace cannot change, and a session confined to a shared workspace
+// (auth.php) stays in it.
 if (!$isRightColFragment
     && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET'
     && isset($_GET['note']) && is_string($_GET['note']) && ctype_digit($_GET['note'])
-    && !(function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive())) {
+    && !(function_exists('isSharedWorkspaceScopeActive') && isSharedWorkspaceScopeActive())) {
     $noteWorkspaceStmt = $con->prepare('SELECT workspace FROM entries WHERE id = ? AND trash = 0');
     $noteWorkspaceStmt->execute([(int) $_GET['note']]);
     $noteWorkspace = $noteWorkspaceStmt->fetchColumn();
@@ -122,6 +126,21 @@ if (!$isRightColFragment
             header('Location: index.php?' . http_build_query($redirectQuery));
             exit;
         }
+    }
+}
+
+// A workspace named in the URL that this account does not have (a stale
+// link, a workspace since renamed or deleted, or one that was shared with
+// this login and then unshared: login.php brings the person back to the same
+// URL, in their own account) opens the account's usual workspace instead of
+// an empty tree under a name that does not exist.
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET'
+    && isset($_GET['workspace']) && is_string($_GET['workspace'])
+    && $_GET['workspace'] !== '' && $_GET['workspace'] !== '__last_opened__') {
+    $requestedWorkspaceStmt = $con->prepare('SELECT COUNT(*) FROM workspaces WHERE name = ?');
+    $requestedWorkspaceStmt->execute([$_GET['workspace']]);
+    if ((int)$requestedWorkspaceStmt->fetchColumn() === 0) {
+        unset($_GET['workspace']);
     }
 }
 
@@ -287,8 +306,6 @@ if ($center_note_content_enabled && $width_value !== '1' && $width_value !== 'tr
     }
 }
 
-$isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive();
-
 ?>
 
 <!DOCTYPE html>
@@ -334,9 +351,12 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
         // it in the URL for scripts that read it from location.search.
         (function () {
             try {
+                // A missing parameter, or one naming a workspace the account
+                // does not have, is replaced by the one actually open.
                 var url = new URL(window.location.href);
-                if (!url.searchParams.has('workspace')) {
-                    url.searchParams.set('workspace', <?php echo json_encode($workspaceResolvedInternally, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP); ?>);
+                var resolved = <?php echo json_encode($workspaceResolvedInternally, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP); ?>;
+                if (url.searchParams.get('workspace') !== resolved) {
+                    url.searchParams.set('workspace', resolved);
                     history.replaceState(history.state, '', url);
                 }
             } catch (_error) {
@@ -483,9 +503,6 @@ $note_list_order_by = $allowed_sorts[$note_list_sort_type];
 $body_classes = trim($extra_body_classes);
 // Per-user CSS variables that cannot live in a stylesheet
 $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
-if ($isPublicWorkspaceReadonly) {
-    $body_classes = trim($body_classes . ' public-workspace-readonly');
-}
 ?>
 
 <body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?><?php echo $body_inline_style ? ' style="' . htmlspecialchars($body_inline_style, ENT_QUOTES) . '"' : ''; ?> data-workspace="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>" data-markdown-default-mode="<?php echo htmlspecialchars($markdown_default_view_mode, ENT_QUOTES); ?>">
@@ -638,31 +655,35 @@ if ($isPublicWorkspaceReadonly) {
     // "Expand all folders" button at its end, and the others are listed in a
     // block under its tree, on the plain tree only: a search or a folder view
     // scopes the list to the active account. With a single account the tree is
-    // not named at all (issue #1436), and a public workspace visitor has no
-    // account to name either.
+    // not named at all (issue #1436). A workspace shared with the signed-in
+    // person (auth.php, shared workspace scope) is headed by its owner's name
+    // the same way, since the tree shown is that account's.
     $otherAccountProfiles = [];
     $activeAccountProfile = null;
     $showAccountRows = false;
-    if (!$isPublicWorkspaceReadonly) {
-        // Empty unless several accounts are reachable, see
-        // getSwitchableAccountProfiles().
-        $switchableProfiles = function_exists('getSwitchableAccountProfiles') ? getSwitchableAccountProfiles() : [];
-        $activeAccountProfile = function_exists('getCurrentUser') ? getCurrentUser() : null;
-        if (!empty($switchableProfiles) && is_array($activeAccountProfile) && (string)($activeAccountProfile['username'] ?? '') !== '') {
-            $showAccountRows = true;
-        } else {
-            $activeAccountProfile = null;
-        }
-        $isPlainTree = empty($search) && empty($tags_search) && empty($created_from) && empty($created_to) && empty($folder_filter);
-        if ($isPlainTree && !empty($switchableProfiles)) {
-            // The active account heads the list, the others follow in one
-            // order (the login's own first, then by name, see
-            // getUserAccessibleProfiles()).
-            $activeAccountId = (int)(getCurrentUserId() ?? 0);
-            foreach ($switchableProfiles as $accountProfile) {
-                if ((int)$accountProfile['id'] !== $activeAccountId) {
-                    $otherAccountProfiles[] = $accountProfile;
-                }
+    $isSharedWorkspaceScope = function_exists('isSharedWorkspaceScopeActive') && isSharedWorkspaceScopeActive();
+    // Display preferences belong to the account they are stored in: someone
+    // looking at another account (a shared workspace, a granted account)
+    // cannot change them, so the controls that write them are not shown.
+    $canWriteAccountSettings = !function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser();
+    // Empty unless several accounts are reachable, see
+    // getSwitchableAccountProfiles().
+    $switchableProfiles = function_exists('getSwitchableAccountProfiles') ? getSwitchableAccountProfiles() : [];
+    $activeAccountProfile = function_exists('getCurrentUser') ? getCurrentUser() : null;
+    if ((!empty($switchableProfiles) || $isSharedWorkspaceScope) && is_array($activeAccountProfile) && (string)($activeAccountProfile['username'] ?? '') !== '') {
+        $showAccountRows = true;
+    } else {
+        $activeAccountProfile = null;
+    }
+    $isPlainTree = empty($search) && empty($tags_search) && empty($created_from) && empty($created_to) && empty($folder_filter);
+    if ($isPlainTree && !empty($switchableProfiles)) {
+        // The active account heads the list, the others follow in one
+        // order (the login's own first, then by name, see
+        // getUserAccessibleProfiles()).
+        $activeAccountId = (int)(getCurrentUserId() ?? 0);
+        foreach ($switchableProfiles as $accountProfile) {
+            if ((int)$accountProfile['id'] !== $activeAccountId) {
+                $otherAccountProfiles[] = $accountProfile;
             }
         }
     }
@@ -685,22 +706,21 @@ if ($isPublicWorkspaceReadonly) {
             <?php
             // The title opens the workspace dropdown even when a single
             // workspace exists: the menu also carries the "Edit workspaces" /
-            // "New workspace" entries (js/workspaces-core.js). Only the read-only
-            // public view keeps a plain, non-clickable title.
-            $workspaceMenuEnabled = !$isPublicWorkspaceReadonly;
+            // "New workspace" entries (js/workspaces-core.js), and in a shared
+            // workspace the way back to the person's own account.
             ?>
-            <div class="sidebar-title<?php echo $workspaceMenuEnabled ? '' : ' sidebar-title-static'; ?>"<?php echo $workspaceMenuEnabled ? ' role="button" tabindex="0" data-action="toggle-workspace-menu"' : ''; ?>>
+            <div class="sidebar-title" role="button" tabindex="0" data-action="toggle-workspace-menu">
                 <span class="poznote-logo workspace-title-icon" role="img" aria-label="Poznote"></span>
                 <span class="workspace-title-text"><?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?></span>
-                <?php if ($workspaceMenuEnabled): ?>
                 <i class="lucide lucide-caret-down workspace-dropdown-icon"></i>
-                <?php endif; ?>
             </div>
             <div class="sidebar-title-actions">
-                <?php if (!$isPublicWorkspaceReadonly): ?>
+                    <?php // The sort mode is a setting of the account being looked at ?>
+                    <?php if ($canWriteAccountSettings): ?>
                     <button class="sidebar-folder-toggle" id="sidebarSortBtn" data-action="cycle-note-sort" data-sort-mode="<?php echo htmlspecialchars($note_list_sort_type, ENT_QUOTES); ?>" title="<?php echo $noteSortTitle; ?>" aria-label="<?php echo $noteSortTitle; ?>">
                         <i class="lucide <?php echo htmlspecialchars(poznoteNoteSortIcon($note_list_sort_type), ENT_QUOTES); ?>"></i>
                     </button>
+                    <?php endif; ?>
                     <?php if (!$showAccountRows) echo $expandFoldersButton; ?>
                     <button class="sidebar-folder-toggle<?php echo $notifications_count > 0 ? ' has-notifications' : ''; ?>" id="sidebarNotificationsBtn" data-action="open-notifications-modal" title="<?php echo t_h('reminder.notifications', [], 'Notifications'); ?>" aria-label="<?php echo t_h('reminder.notifications', [], 'Notifications'); ?>"<?php echo $notifications_total > 0 ? '' : ' hidden'; ?>>
                         <i class="lucide lucide-bell"></i>
@@ -708,11 +728,6 @@ if ($isPublicWorkspaceReadonly) {
                     <button class="sidebar-plus" id="sidebarCreateBtn" data-action="toggle-create-menu" title="<?php echo t_h('sidebar.create'); ?>">
                         <i class="lucide lucide-plus-circle"></i>
                     </button>
-                <?php else: ?>
-                    <button type="button" id="publicWorkspaceThemeToggle" class="sidebar-plus public-workspace-theme-toggle" data-theme-toggle title="<?php echo t_h('theme.toggle', [], 'Toggle theme'); ?>" aria-label="<?php echo t_h('theme.toggle', [], 'Toggle theme'); ?>">
-                        <i class="lucide lucide-moon"></i>
-                    </button>
-                <?php endif; ?>
             </div>
 
             <div class="workspace-menu" id="workspaceMenu"></div>
@@ -741,7 +756,6 @@ if ($isPublicWorkspaceReadonly) {
             'userEntriesPath' => "data/users/{$_SESSION['user_id']}/entries/",
             'defaultNoteSortType' => $note_list_sort_type,
             'isAdmin' => function_exists('isCurrentUserAdmin') && isCurrentUserAdmin(),
-            'isPublicWorkspaceAccess' => $isPublicWorkspaceReadonly,
             'canUseSettingsApi' => !function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser(),
             'settings' => [
                 'emoji_icons_enabled' => getSetting('emoji_icons_enabled', '1'),
@@ -874,17 +888,16 @@ if ($isPublicWorkspaceReadonly) {
     <?php include __DIR__ . '/../ai_chat_panel.php'; ?>
     <?php endif; ?>
 
-    <?php if (!$isPublicWorkspaceReadonly): ?>
     <?php
     // Contextual UI Customization: floating button + docked column listing
-    // the hideable elements of this page (see ui_customization_panel.php)
+    // the hideable elements of this page (see ui_customization_panel.php,
+    // which shows nothing on an account that is not the person's own)
     $uiCustomizationPanelPage = 'notes';
     include __DIR__ . '/../ui_customization_panel.php';
 
     // Editing buttons pinned above the on-screen keyboard (mobile only)
     include __DIR__ . '/../mobile_editor_bar.php';
     ?>
-    <?php endif; ?>
 
     <!-- Data for initialization (used by index-events.js) -->
     <?php if (!empty($tasklist_ids)): ?>
@@ -961,7 +974,7 @@ window.NOTIFICATIONS_TXT = {
 </script>
 <script defer src="index_js.php?group=app&v=<?php echo $v; ?>"></script>
 
-<?php if (!$isPublicWorkspaceReadonly && $note && is_numeric($note)): ?>
+<?php if ($note && is_numeric($note)): ?>
 <!-- Data for draft check (used by index-events.js) -->
 <script type="application/json" id="current-note-data"><?php echo json_encode(['noteId' => (string)$note]); ?></script>
 <!-- Create daily snapshot on note load -->

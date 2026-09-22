@@ -25,20 +25,6 @@ class TasksController
         $this->con = $con;
     }
 
-    private function appendPublicWorkspaceAgeFilter(string &$sql, array &$params, string $column = 'updated'): void
-    {
-        if (!function_exists('isPublicWorkspaceAccessActive') || !isPublicWorkspaceAccessActive()) {
-            return;
-        }
-
-        $cutoff = getNoteAgeFilterCutoff(getNoteAgeFilterDays($this->con));
-        if ($cutoff === null) {
-            return;
-        }
-
-        $sql .= " AND $column >= ?";
-        $params[] = $cutoff;
-    }
 
     /**
      * GET /api/v1/tasks
@@ -57,9 +43,7 @@ class TasksController
     {
         try {
             $workspace = '';
-            if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
-                $workspace = (string) (function_exists('getPublicWorkspaceName') ? getPublicWorkspaceName() : '');
-            } elseif (isset($_GET['workspace']) && is_string($_GET['workspace'])) {
+            if (isset($_GET['workspace']) && is_string($_GET['workspace'])) {
                 $workspace = trim($_GET['workspace']);
             }
 
@@ -72,7 +56,6 @@ class TasksController
                 $sql .= ' AND workspace = ?';
                 $params[] = $workspace;
             }
-            $this->appendPublicWorkspaceAgeFilter($sql, $params);
             $sql .= ' ORDER BY updated DESC';
 
             $stmt = $this->con->prepare($sql);
@@ -127,7 +110,6 @@ class TasksController
             $sql .= ' AND workspace = ?';
             $params[] = $workspace;
         }
-        $this->appendPublicWorkspaceAgeFilter($sql, $params);
         $sql .= ' ORDER BY updated DESC';
 
         $stmt = $this->con->prepare($sql);
@@ -355,10 +337,6 @@ class TasksController
 
         $sql = 'SELECT id, heading, type, entry FROM entries WHERE id = ? AND trash = 0';
         $params = [$noteId];
-        if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
-            $sql .= ' AND workspace = ?';
-            $params[] = (string) (function_exists('getPublicWorkspaceName') ? getPublicWorkspaceName() : '');
-        }
 
         $stmt = $this->con->prepare($sql);
         $stmt->execute($params);

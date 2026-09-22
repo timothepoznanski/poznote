@@ -135,10 +135,6 @@
         return noteId;
     }
 
-    function isReadonlyWorkspace() {
-        return !!(document.body && document.body.classList.contains('public-workspace-readonly'));
-    }
-
     function currentWorkspace() {
         try {
             if (typeof window.getSelectedWorkspace === 'function') {
@@ -1057,7 +1053,7 @@
     // ------------------------------------------------------------------
 
     function start() {
-        if (started || isReadonlyWorkspace()) {
+        if (started) {
             return;
         }
         if (!document.getElementById('left_col') && !document.getElementById('right_col')) {

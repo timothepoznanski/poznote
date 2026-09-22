@@ -371,17 +371,16 @@
     // Self-contained like the profile modal above: the rail's Logout button is
     // on nearly every page, while the shared #confirmModal from modals.php only
     // exists on four of them, so showConfirmModal() is not an option here.
+    //
+    // The question and nothing else: no account name and no list of accounts
+    // to open instead. Whose session ends is never in doubt, and naming the
+    // account being looked at (a workspace shared with this login, an account
+    // granted to it) read as if that account were the one signing out. The
+    // ways to open another account are the workspace menu's Accounts section
+    // and the notes list's "Other accounts" block.
     function showLogoutConfirmModal(logoutUrl) {
         var existing = document.getElementById('confirmLogoutModal');
         if (existing) existing.remove();
-
-        // Set by icon_sidebar.php only when the signed-in person can open
-        // several accounts: the other ones are offered before a full logout.
-        var accountSwitch = window.PoznoteAccountSwitch || null;
-        var otherAccounts = accountSwitch && Array.isArray(accountSwitch.accounts)
-            ? accountSwitch.accounts.filter(function (account) { return !account.current; })
-            : [];
-        var canSwitch = otherAccounts.length > 0;
 
         var modal = document.createElement('div');
         modal.id = 'confirmLogoutModal';
@@ -389,12 +388,7 @@
         modal.innerHTML =
             '<div class="modal-content">' +
                 '<h3>' + tr('workspace_menu.logout', {}, 'Logout') + '</h3>' +
-                '<p class="text-small-muted">' + (canSwitch
-                    ? tr('profile.logout.switch_intro', {}, 'Switch to another account, or log out completely.')
-                    : tr('profile.logout.confirm', {}, 'Are you sure you want to log out?')) + '</p>' +
-                // Who is signed in comes before the choice it explains
-                '<p class="text-small-muted" id="clSignedInAs" style="display:none;"></p>' +
-                (canSwitch ? '<div class="logout-account-list" id="clAccountList"></div>' : '') +
+                '<p class="text-small-muted">' + tr('profile.logout.confirm', {}, 'Are you sure you want to log out?') + '</p>' +
                 '<div class="modal-buttons">' +
                     '<button type="button" class="btn-cancel" id="clCancelBtn">' + tr('common.cancel', {}, 'Cancel') + '</button>' +
                     '<button type="button" class="btn-danger" id="clConfirmBtn">' + tr('workspace_menu.logout', {}, 'Logout') + '</button>' +
@@ -422,78 +416,12 @@
         });
         document.addEventListener('keydown', onKey);
 
-        // Remind which account is about to be signed out; purely informative,
-        // so a failed lookup simply leaves the line hidden.
-        fetch('/api/v1/users/me', { credentials: 'same-origin' })
-            .then(function (r) { return r.ok ? r.json() : null; })
-            .then(function (data) {
-                if (!data || !data.username) return;
-                var el = document.getElementById('clSignedInAs');
-                if (!el) return;   // modal already closed
-                var template = tr('profile.logout.signed_in_as', {}, 'You are signed in as {{username}}');
-                var parts = template.split('{{username}}');
-                el.textContent = '';
-                el.appendChild(document.createTextNode(parts[0]));
-                var strong = document.createElement('strong');
-                strong.style.color = 'var(--primary-color, #007DB8)';
-                strong.textContent = data.username;
-                el.appendChild(strong);
-                if (parts[1]) el.appendChild(document.createTextNode(parts[1]));
-                el.style.display = '';
-            })
-            .catch(function (e) {
-                console.debug('profile: close() failed:', e);
-            });
-
         var confirmBtn = document.getElementById('clConfirmBtn');
-
-        function freezeButtons() {
-            var buttons = modal.querySelectorAll('button');
-            for (var i = 0; i < buttons.length; i++) buttons[i].disabled = true;
-        }
-
-        // Account names are user data: built with textContent, never innerHTML.
-        var accountList = document.getElementById('clAccountList');
-        if (accountList) {
-            otherAccounts.forEach(function (account) {
-                var btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'logout-account-option';
-
-                var name = document.createElement('span');
-                name.className = 'logout-account-name';
-                name.textContent = account.username;
-                btn.appendChild(name);
-
-                if (account.own) {
-                    var badge = document.createElement('span');
-                    badge.className = 'logout-account-badge';
-                    badge.textContent = tr('login.account_select.own_account', {}, 'Your account');
-                    btn.appendChild(badge);
-                }
-
-                // Tells the row apart from the input fields of the sibling
-                // modals, which share this look.
-                var arrow = document.createElement('span');
-                arrow.className = 'logout-account-arrow';
-                arrow.setAttribute('aria-hidden', 'true');
-                arrow.textContent = '→';
-                btn.appendChild(arrow);
-
-                btn.addEventListener('click', function () {
-                    freezeButtons();
-                    name.textContent = tr('profile.logout.switch_in_progress', {}, 'Switching account...');
-                    submitAccountSwitch(account.id);
-                });
-
-                accountList.appendChild(btn);
-            });
-        }
-
         confirmBtn.addEventListener('click', function () {
             // One-way action: freeze the buttons and show progress while the
             // browser navigates to logout.php
-            freezeButtons();
+            var buttons = modal.querySelectorAll('button');
+            for (var i = 0; i < buttons.length; i++) buttons[i].disabled = true;
             confirmBtn.textContent = tr('profile.logout.in_progress', {}, 'Logging out...');
             window.location.href = logoutUrl;
         });

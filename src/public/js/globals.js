@@ -46,38 +46,6 @@ function getSelectedWorkspace() {
     return selectedWorkspace || (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace ? window.selectedWorkspace : '') || _dataWorkspace || '';
 }
 
-function isPublicWorkspaceNavigationActive() {
-    if (typeof window.isPublicWorkspaceAccess !== 'undefined' && window.isPublicWorkspaceAccess) {
-        return true;
-    }
-
-    var configElement = document.getElementById('page-config-data');
-    if (configElement) {
-        try {
-            var config = JSON.parse(configElement.textContent);
-            if (config && config.isPublicWorkspaceAccess) {
-                return true;
-            }
-        } catch (e) {
-            // Ignore malformed config and fall back to URL inspection.
-            console.debug('globals: isPublicWorkspaceNavigationActive() failed:', e);
-        }
-    }
-
-    try {
-        var params = new URLSearchParams(window.location.search || '');
-        var value = params.get('public_workspace');
-        if (!value) {
-            return false;
-        }
-
-        value = String(value).toLowerCase();
-        return value === '1' || value === 'true' || value === 'yes';
-    } catch (e) {
-        return false;
-    }
-}
-
 function buildNoteNavigationUrl(noteId, workspace, extraParams) {
     var params = [];
     var effectiveWorkspace = workspace || getSelectedWorkspace();
@@ -86,9 +54,6 @@ function buildNoteNavigationUrl(noteId, workspace, extraParams) {
         params.push('workspace=' + encodeURIComponent(effectiveWorkspace));
     }
 
-    if (isPublicWorkspaceNavigationActive()) {
-        params.push('public_workspace=1');
-    }
 
     if (extraParams && typeof extraParams === 'object') {
         Object.keys(extraParams).forEach(function (key) {
@@ -106,7 +71,6 @@ function buildNoteNavigationUrl(noteId, workspace, extraParams) {
     return 'index.php?' + params.join('&');
 }
 
-window.isPublicWorkspaceNavigationActive = isPublicWorkspaceNavigationActive;
 window.buildNoteNavigationUrl = buildNoteNavigationUrl;
 
 function getPoznotePageConfig() {

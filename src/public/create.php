@@ -100,7 +100,8 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
                 </div>
             </a>
 
-            <!-- Workspace -->
+            <!-- Workspace: for the owner of the account on screen -->
+            <?php if ((!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser())): ?>
             <a href="#" class="home-card" id="create-workspace-card" data-create-type="workspace" title="<?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?>">
                 <div class="home-card-icon">
                     <i class="lucide lucide-layers"></i>
@@ -109,6 +110,7 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
                     <span class="home-card-title"><?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?></span>
                 </div>
             </a>
+            <?php endif; ?>
 
         </div>
 

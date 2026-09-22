@@ -457,7 +457,8 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     outline-offset: 2px;
 }
 
-/* Plain chip for a public-workspace visitor, who has nothing to switch to. */
+/* Plain chip inside a workspace shared with this login, which has nothing
+   else to switch to from here. */
 .poznote-page-title-workspace-static,
 .poznote-page-title-workspace-static:hover {
     background: var(--pz-surface);

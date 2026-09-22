@@ -76,7 +76,8 @@
     "not_available": "Not available",
     "notes": "Notes",
     "saved": "saved",
-    "unknown_error": "Unknown error"
+    "unknown_error": "Unknown error",
+    "none": "None"
   },
   "snapshot": {
     "menu_item": "Snapshots",
@@ -347,37 +348,28 @@
       "actions": {
         "enable": "Share",
         "edit": "Edit share",
-        "copy_link": "Copy link",
         "disable": "Unshare"
       },
       "confirm": {
-        "title": "Share workspace in read-only mode",
-        "message": "Anyone with the URL for workspace \"{{workspace}}\" will have access to all notes and folders in this workspace in read-only mode.",
-        "confirm_button": "Share workspace"
+        "title": "Share workspace",
+        "message": "Pick the users who can open workspace \"{{workspace}}\". They will find it in their workspace menu and can edit its notes and folders."
       },
       "messages": {
-        "enabled": "Read-only workspace link enabled",
-        "disabled": "Read-only workspace link disabled",
-        "url_copied": "Share link copied to clipboard!"
+        "disabled": "Workspace is no longer shared",
+        "url_copied": "Share link copied to clipboard!",
+        "saved": "Workspace sharing updated"
       },
       "errors": {
-        "url_in_use": "A public workspace with this name already exists on this Poznote instance",
-        "copy_failed": "Failed to copy share link",
-        "save_failed": "Failed to save read-only workspace link",
-        "disable_failed": "Failed to disable read-only workspace link"
+        "save_failed": "Failed to update workspace sharing",
+        "not_allowed": "Sharing with other users is not available on this instance"
       },
-      "status": {
-        "enabled": "Public read-only enabled",
-        "disabled": "Not shared publicly"
-      },
-      "help": "Anyone with this URL opens Poznote directly on this workspace in read-only mode.",
       "options": {
-        "require_login": "Require Poznote login",
-        "restrict_users": "Restrict to specific users",
         "users_loading": "Loading users...",
         "no_users_found": "No other users found"
       },
-      "url_label": "Public URL"
+      "status": {
+        "not_shared": "Not shared"
+      }
     },
     "tags": {
       "action": "Tags",
@@ -996,43 +988,7 @@
       "delete_title": "Confirm delete workspace",
       "delete_description": "All notes and folders will be permanently deleted and cannot be recovered.",
       "delete_placeholder": "Type workspace name to confirm",
-      "delete_button": "Delete workspace",
-      "share": {
-        "actions": {
-          "enable": "Share",
-          "edit": "Edit share",
-          "copy_link": "Copy link",
-          "disable": "Unshare"
-        },
-        "confirm": {
-          "title": "Share workspace in read-only mode",
-          "message": "Anyone with the URL for workspace \"{{workspace}}\" will have access to all notes and folders in this workspace in read-only mode.",
-          "confirm_button": "Share workspace"
-        },
-        "messages": {
-          "enabled": "Read-only workspace link enabled",
-          "disabled": "Read-only workspace link disabled",
-          "url_copied": "Share link copied to clipboard!"
-        },
-        "errors": {
-          "url_in_use": "A public workspace with this name already exists on this Poznote instance",
-          "copy_failed": "Failed to copy share link",
-          "save_failed": "Failed to save read-only workspace link",
-          "disable_failed": "Failed to disable read-only workspace link"
-        },
-        "status": {
-          "enabled": "Public read-only enabled",
-          "disabled": "Not shared publicly"
-        },
-        "help": "Anyone with this URL opens Poznote directly on this workspace in read-only mode.",
-        "url_label": "Public URL",
-        "options": {
-          "require_login": "Require Poznote login",
-          "restrict_users": "Restrict to specific users",
-          "users_loading": "Loading users...",
-          "no_users_found": "No other users found"
-        }
-      }
+      "delete_button": "Delete workspace"
     },
     "user_settings_info": {
       "title": "Account Settings",
@@ -2535,7 +2491,6 @@
       "title": "Password Protected",
       "note_heading": "Password Protected",
       "folder_heading": "Password Protected Folder",
-      "workspace_heading": "Password Protected Workspace",
       "error_incorrect": "Incorrect password. Please try again.",
       "additional_password_required": "This note requires an additional password. Please enter the next password to continue.",
       "placeholder": "Enter password",
@@ -3332,15 +3287,14 @@
       "untitled_note": "note #{{id}}",
       "linked_deleted": "+{{count}} linked notes",
       "share_updated": "settings updated",
-      "password_protected": "password protected",
-      "login_required": "login required",
       "allowed_users": "restricted to {{count}} users",
       "accounts": "accounts: {{accounts}}",
       "empty_value": "empty",
       "s3_objects_deleted": "{{count}} S3 objects deleted",
       "s3_cleanup_failed": "S3 cleanup failed",
       "expires_at": "expires {{date}}",
-      "recovery_codes_remaining": "{{count}} left"
+      "recovery_codes_remaining": "{{count}} left",
+      "shared_with": "shared with {{users}}"
     },
     "destinations": {
       "download": "download",
@@ -3550,9 +3504,7 @@
     },
     "logout": {
       "confirm": "Are you sure you want to log out?",
-      "signed_in_as": "You are signed in as {{username}}",
       "in_progress": "Logging out...",
-      "switch_intro": "Switch to another account, or log out completely.",
       "switch_in_progress": "Switching account..."
     }
   },

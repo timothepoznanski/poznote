@@ -38,6 +38,9 @@
     // normally leads there is hidden while the bar shows.
     $pzMobileBarCustomizeLabel = isset($uiCustomizationPanelTitle) ? $uiCustomizationPanelTitle : t_h('modals.ui_customization.panel_title', [], 'Customize this page');
     ?>
+    <?php // The panel it opens is for the owner of the account on screen ?>
+    <?php if ((!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser())): ?>
     <button type="button" id="mobileBarCustomize" class="mobile-editor-bar-btn" data-mobile-bar-action="customize" data-action="toggle-ui-customization-panel" data-ui-section="mobile-editor-bar" aria-controls="uiCustomizationPanel" title="<?php echo $pzMobileBarCustomizeLabel; ?>" aria-label="<?php echo $pzMobileBarCustomizeLabel; ?>"><i class="lucide lucide-eye-off"></i></button>
+    <?php endif; ?>
     </div>
 </div>

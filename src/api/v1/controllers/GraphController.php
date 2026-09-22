@@ -22,20 +22,6 @@ class GraphController
         $this->con = $con;
     }
 
-    private function appendPublicWorkspaceAgeFilter(string &$sql, array &$params, string $column = 'updated'): void
-    {
-        if (!function_exists('isPublicWorkspaceAccessActive') || !isPublicWorkspaceAccessActive()) {
-            return;
-        }
-
-        $cutoff = getNoteAgeFilterCutoff(getNoteAgeFilterDays($this->con));
-        if ($cutoff === null) {
-            return;
-        }
-
-        $sql .= " AND $column >= ?";
-        $params[] = $cutoff;
-    }
 
     // -------------------------------------------------------------------------
     // Public actions
@@ -51,9 +37,7 @@ class GraphController
     {
         try {
             $workspace = '';
-            if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
-                $workspace = (string) (function_exists('getPublicWorkspaceName') ? getPublicWorkspaceName() : '');
-            } elseif (isset($_GET['workspace']) && is_string($_GET['workspace'])) {
+            if (isset($_GET['workspace']) && is_string($_GET['workspace'])) {
                 $workspace = trim($_GET['workspace']);
             }
 
@@ -66,7 +50,6 @@ class GraphController
                 $sql .= ' AND workspace = ?';
                 $params[] = $workspace;
             }
-            $this->appendPublicWorkspaceAgeFilter($sql, $params);
 
             $stmt = $this->con->prepare($sql);
             $stmt->execute($params);

@@ -292,7 +292,7 @@ function setAuthenticatedIdentity(array $authUser, ?string $authMethod = null): 
 
     if ($authMethod !== null && $authMethod !== '') {
         $_SESSION['auth_method'] = $authMethod;
-    } elseif (($_SESSION['auth_method'] ?? '') !== 'public_workspace') {
+    } else {
         unset($_SESSION['auth_method']);
     }
 
@@ -365,6 +365,9 @@ function setActiveUserAccount(array $targetUser): bool {
     $_SESSION['user_id'] = $targetUserId;
     $_SESSION['user'] = $targetUser;
     unset($_SESSION['account_selection_required']);
+    // A plain account selection is never confined to one workspace; only
+    // openSharedWorkspace() sets the scope, right after this.
+    clearSharedWorkspaceScope();
     syncActiveAccountCookie();
 
     return true;
@@ -452,11 +455,12 @@ function selectAuthenticatedAccount(int $targetUserId): bool {
 
 /**
  * Accounts the signed-in person can switch to without signing in again, their
- * own first. Empty unless there is a real choice: a public workspace visitor or
- * someone with a single account has nothing to switch to.
+ * own first. Empty unless there is a real choice: someone with a single
+ * account has nothing to switch to (a shared workspace is not an account,
+ * see getSharedWorkspacesForLogin()).
  */
 function getSwitchableAccountProfiles(): array {
-    if (!isRealUserAuthenticated()) {
+    if (!isAuthenticated()) {
         return [];
     }
 
@@ -477,7 +481,7 @@ function getSwitchableAccountProfiles(): array {
  * session state that belongs to the account being left is dropped.
  */
 function switchActiveAccount(int $targetUserId): bool {
-    if (!isRealUserAuthenticated()) {
+    if (!isAuthenticated()) {
         return false;
     }
 
@@ -511,17 +515,82 @@ function validateActiveAccountAccess(): bool {
         return true;
     }
 
-    require_once __DIR__ . '/users/db_master.php';
-    if (canUserAccessAccount($authUserId, $activeUserId)) {
+    // One master.db round trip per (login, account, scope) and request: this
+    // runs under every isAuthenticated() call.
+    static $verified = null;
+    $scope = getSharedWorkspaceScope();
+    $key = $authUserId . ':' . $activeUserId . ':' . ($scope !== null ? $scope['workspace'] : '');
+    if ($verified === $key) {
         return true;
     }
 
+    require_once __DIR__ . '/users/db_master.php';
+    if (canUserAccessAccount($authUserId, $activeUserId)) {
+        // Full access to the account: no reason to stay confined to one of
+        // its workspaces.
+        clearSharedWorkspaceScope();
+        $verified = $authUserId . ':' . $activeUserId . ':';
+        return true;
+    }
+
+    if ($scope !== null && isWorkspaceSharedWithUser($activeUserId, $scope['workspace'], $authUserId)) {
+        $verified = $key;
+        return true;
+    }
+
+    clearSharedWorkspaceScope();
     unset($_SESSION['user_id'], $_SESSION['user']);
     $_SESSION['account_selection_required'] = true;
     return false;
 }
 
+/**
+ * Sessions opened before the public read-only workspace link was removed may
+ * still carry its state: the visitor was signed in AS the owner (user_id and
+ * login_user_id both the owner's), read-only only because that code refused
+ * writes. Without it such a session would pass for the owner with full
+ * access, so it is taken apart: back to the person's own sign-in when one was
+ * kept aside, anonymous otherwise.
+ */
+function purgeLegacyPublicWorkspaceSession(): void {
+    $user = $_SESSION['user'] ?? null;
+    $loginUser = $_SESSION['login_user'] ?? null;
+    $isLegacy = ($_SESSION['auth_method'] ?? '') === 'public_workspace'
+        || (is_array($user) && !empty($user['_public_workspace']))
+        || (is_array($loginUser) && !empty($loginUser['_public_workspace']))
+        || isset($_SESSION['public_workspace_access']);
+    $original = $_SESSION['public_workspace_original_auth'] ?? null;
+
+    foreach (array_keys($_SESSION) as $key) {
+        if (strpos((string)$key, 'public_workspace') === 0) {
+            unset($_SESSION[$key]);
+        }
+    }
+    if (!$isLegacy) {
+        return;
+    }
+
+    unset($_SESSION['authenticated'], $_SESSION['user_id'], $_SESSION['user'], $_SESSION['login_user_id'],
+        $_SESSION['login_user'], $_SESSION['auth_method'], $_SESSION['account_selection_required']);
+    clearSharedWorkspaceScope();
+
+    if (is_array($original) && !empty($original['authenticated'])
+        && isset($original['user_id'], $original['user']) && (int)$original['user_id'] > 0
+        && is_array($original['user']) && empty($original['user']['_public_workspace'])) {
+        $_SESSION['authenticated'] = true;
+        $_SESSION['user_id'] = (int)$original['user_id'];
+        $_SESSION['user'] = $original['user'];
+        $_SESSION['login_user_id'] = (int)($original['login_user_id'] ?? $original['user_id']);
+        $_SESSION['login_user'] = is_array($original['login_user'] ?? null) ? $original['login_user'] : $original['user'];
+        if (!empty($original['auth_method'])) {
+            $_SESSION['auth_method'] = (string)$original['auth_method'];
+        }
+    }
+}
+
 function isAuthenticated() {
+    purgeLegacyPublicWorkspaceSession();
+
     // Check session first
     if (isset($_SESSION['authenticated']) && $_SESSION['authenticated'] === true) {
         if (!isset($_SESSION['login_user_id']) && isset($_SESSION['user_id'])) {
@@ -595,244 +664,155 @@ function isAuthenticated() {
     return false;
 }
 
-function normalizePublicWorkspaceName(string $workspaceName): string {
+// --- Shared workspace scope -------------------------------------------------
+//
+// A workspace shared with an account (workspaces.php > Share, recorded in
+// master.db workspace_shares) is opened by switching to the owner's account
+// with the session confined to that one workspace: the grantee reads and
+// edits it as the owner would, but the owner's other workspaces, trash of
+// those, settings and backups stay out of reach. The scope sits in the
+// session next to the active account and is checked again on every request
+// (validateActiveAccountAccess), so revoking the share ends the session's
+// access at the next call.
+
+function getSharedWorkspaceScope(): ?array {
+    $scope = $_SESSION['shared_workspace_scope'] ?? null;
+    if (!is_array($scope)) {
+        return null;
+    }
+    $ownerUserId = (int)($scope['owner_user_id'] ?? 0);
+    $workspaceName = trim((string)($scope['workspace'] ?? ''));
+    if ($ownerUserId <= 0 || $workspaceName === '' || $ownerUserId !== (int)($_SESSION['user_id'] ?? 0)) {
+        return null;
+    }
+    return ['owner_user_id' => $ownerUserId, 'workspace' => $workspaceName];
+}
+
+function isSharedWorkspaceScopeActive(): bool {
+    return getSharedWorkspaceScope() !== null;
+}
+
+function getSharedWorkspaceScopeName(): ?string {
+    $scope = getSharedWorkspaceScope();
+    return $scope !== null ? $scope['workspace'] : null;
+}
+
+function clearSharedWorkspaceScope(): void {
+    unset($_SESSION['shared_workspace_scope']);
+}
+
+/**
+ * True when the named workspace exists in the owner's database.
+ */
+function sharedWorkspaceExists(int $ownerUserId, string $workspaceName): bool {
+    require_once __DIR__ . '/users/UserDataManager.php';
+    try {
+        $dbPath = (new UserDataManager($ownerUserId))->getUserDatabasePath();
+        if (!is_file($dbPath)) {
+            return false;
+        }
+        $ownerCon = new PDO('sqlite:' . $dbPath);
+        $ownerCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $ownerCon->exec('PRAGMA busy_timeout = 5000');
+        $stmt = $ownerCon->prepare('SELECT COUNT(*) FROM workspaces WHERE name = ?');
+        $stmt->execute([$workspaceName]);
+        return (int)$stmt->fetchColumn() > 0;
+    } catch (Exception $e) {
+        error_log('Poznote: cannot check shared workspace: ' . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Open a workspace another account shares with the signed-in person: the
+ * owner's account becomes the active one, confined to that workspace. Someone
+ * holding full access to the owner's account (Admin > User Management) goes
+ * through switchActiveAccount() instead and gets the whole account.
+ *
+ * Without a workspace name, the first one that account shares with the person
+ * opens: "open this account" means its shared part, the only part they have.
+ */
+function openSharedWorkspace(int $ownerUserId, string $workspaceName = ''): bool {
     $workspaceName = trim($workspaceName);
+    $authUserId = (int)(getAuthenticatedUserId() ?? 0);
+    if (!isAuthenticated() || $authUserId <= 0 || $ownerUserId <= 0 || $ownerUserId === $authUserId) {
+        return false;
+    }
+
     if ($workspaceName === '') {
-        return '';
-    }
-
-    return function_exists('mb_strtolower')
-        ? mb_strtolower($workspaceName, 'UTF-8')
-        : strtolower($workspaceName);
-}
-
-function buildPublicWorkspaceRegistryKey(string $workspaceName): string {
-    $normalizedWorkspaceName = normalizePublicWorkspaceName($workspaceName);
-    return $normalizedWorkspaceName !== '' ? 'workspace:' . $normalizedWorkspaceName : '';
-}
-
-function getPublicWorkspaceAccess(): ?array {
-    $access = $_SESSION['public_workspace_access'] ?? null;
-    if (!is_array($access)) {
-        return null;
-    }
-
-    $workspaceName = trim((string)($access['workspace_name'] ?? ''));
-    $userId = isset($access['user_id']) ? (int)$access['user_id'] : 0;
-    if ($workspaceName === '' || $userId <= 0) {
-        unset($_SESSION['public_workspace_access']);
-        return null;
-    }
-
-    $access['workspace_name'] = $workspaceName;
-    $access['user_id'] = $userId;
-    $access['target_id'] = isset($access['target_id']) ? (int)$access['target_id'] : 0;
-    $access['registry_key'] = trim((string)($access['registry_key'] ?? buildPublicWorkspaceRegistryKey($workspaceName)));
-    $access['viewer_user_id'] = isset($access['viewer_user_id']) ? max(0, (int)$access['viewer_user_id']) : 0;
-    return $access;
-}
-
-function getPublicWorkspaceName(): ?string {
-    $access = getPublicWorkspaceAccess();
-    return $access['workspace_name'] ?? null;
-}
-
-function isPublicWorkspaceAccessActive(): bool {
-    return getPublicWorkspaceAccess() !== null;
-}
-
-function getRequestedWorkspaceNameForPublicAccess(): string {
-    if (isset($_GET['workspace']) && is_string($_GET['workspace']) && trim($_GET['workspace']) !== '') {
-        return trim($_GET['workspace']);
-    }
-
-    if (isset($_POST['workspace']) && is_string($_POST['workspace']) && trim($_POST['workspace']) !== '') {
-        return trim($_POST['workspace']);
-    }
-
-    $workspaceName = getPublicWorkspaceName();
-    return $workspaceName !== null ? $workspaceName : '';
-}
-
-function resolvePublicWorkspaceAccess(string $workspaceName): ?array {
-    $registryKey = buildPublicWorkspaceRegistryKey($workspaceName);
-    if ($registryKey === '') {
-        return null;
+        $workspaceName = (string)(getSharedWorkspaceNamesFromOwner($ownerUserId)[0] ?? '');
+        if ($workspaceName === '') {
+            return false;
+        }
     }
 
     require_once __DIR__ . '/users/db_master.php';
-    require_once __DIR__ . '/users/UserDataManager.php';
-
-    try {
-        $masterCon = getMasterConnection();
-        $stmt = $masterCon->prepare("SELECT user_id, target_id FROM shared_links WHERE token = ? AND target_type = 'workspace' LIMIT 1");
-        $stmt->execute([$registryKey]);
-        $registryRow = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$registryRow) {
-            return null;
-        }
-
-        $userId = (int)$registryRow['user_id'];
-        $targetId = (int)$registryRow['target_id'];
-        if ($userId <= 0 || $targetId <= 0) {
-            return null;
-        }
-
-        $user = getUserProfileById($userId);
-        if (!$user || !(bool)($user['active'] ?? false)) {
-            return null;
-        }
-
-        $userDataManager = new UserDataManager($userId);
-        $dbPath = $userDataManager->getUserDatabasePath();
-        if (!is_file($dbPath)) {
-            return null;
-        }
-
-        $userCon = new PDO('sqlite:' . $dbPath);
-        $userCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $userCon->exec('PRAGMA busy_timeout = 5000');
-
-        $stmt = $userCon->prepare('SELECT * FROM shared_workspaces WHERE id = ? LIMIT 1');
-        $stmt->execute([$targetId]);
-        $sharedWorkspace = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$sharedWorkspace) {
-            return null;
-        }
-
-        $resolvedWorkspaceName = trim((string)($sharedWorkspace['workspace_name'] ?? ''));
-        if ($resolvedWorkspaceName === '' || normalizePublicWorkspaceName($resolvedWorkspaceName) !== normalizePublicWorkspaceName($workspaceName)) {
-            return null;
-        }
-
-        $stmt = $userCon->prepare('SELECT COUNT(*) FROM workspaces WHERE name = ?');
-        $stmt->execute([$resolvedWorkspaceName]);
-        if ((int)$stmt->fetchColumn() === 0) {
-            return null;
-        }
-
-        return [
-            'user_id' => $userId,
-            'username' => (string)($user['username'] ?? ''),
-            'workspace_name' => $resolvedWorkspaceName,
-            'target_id' => $targetId,
-            'registry_key' => $registryKey,
-            'password' => $sharedWorkspace['password'] ?? null,
-            'login_required' => !empty($sharedWorkspace['login_required']),
-            'allowed_users' => $sharedWorkspace['allowed_users'] ?? null,
-        ];
-    } catch (Exception $e) {
-        error_log('Poznote public workspace access failed: ' . $e->getMessage());
-        return null;
+    if (!isWorkspaceSharedWithUser($ownerUserId, $workspaceName, $authUserId)) {
+        return false;
     }
+
+    $owner = getUserProfileById($ownerUserId);
+    if (!$owner || empty($owner['active']) || !sharedWorkspaceExists($ownerUserId, $workspaceName)) {
+        return false;
+    }
+
+    $previousUserId = (int)(getCurrentUserId() ?? 0);
+    if (!setActiveUserAccount($owner)) {
+        return false;
+    }
+    $_SESSION['shared_workspace_scope'] = ['owner_user_id' => $ownerUserId, 'workspace' => $workspaceName];
+
+    if ($previousUserId !== $ownerUserId) {
+        unset(
+            $_SESSION['last_sync_result'],
+            $_SESSION['git_sync_progress'],
+            $_SESSION['git_sync_running'],
+            $_SESSION['git_sync_async_result'],
+            $_SESSION['git_sync_state_file']
+        );
+    }
+
+    return true;
 }
 
-function isExplicitPublicWorkspaceRequest(): bool {
-    $value = $_GET['public_workspace'] ?? $_POST['public_workspace'] ?? null;
-    return is_string($value) && in_array(strtolower(trim($value)), ['1', 'true', 'yes'], true);
+/**
+ * Names of the workspaces one account shares with the signed-in person, in
+ * the order getWorkspacesSharedWithUser() returns them.
+ */
+function getSharedWorkspaceNamesFromOwner(int $ownerUserId): array {
+    $names = [];
+    foreach (getSharedWorkspacesForLogin() as $row) {
+        if ((int)$row['owner_user_id'] === $ownerUserId) {
+            $names[] = (string)$row['workspace_name'];
+        }
+    }
+    return $names;
 }
 
-function isRealUserAuthenticated(): bool {
+/**
+ * Workspaces other accounts share with the signed-in person, for the
+ * workspace menu: rows of owner_user_id, owner_username, workspace_name and
+ * 'current' (true for the one the session is confined to right now).
+ */
+function getSharedWorkspacesForLogin(): array {
     if (!isAuthenticated()) {
-        return false;
+        return [];
+    }
+    $authUserId = (int)(getAuthenticatedUserId() ?? 0);
+    if ($authUserId <= 0) {
+        return [];
     }
 
-    if (($_SESSION['auth_method'] ?? '') === 'public_workspace') {
-        return false;
+    require_once __DIR__ . '/users/db_master.php';
+    $scope = getSharedWorkspaceScope();
+    $rows = [];
+    foreach (getWorkspacesSharedWithUser($authUserId) as $row) {
+        $row['current'] = $scope !== null
+            && $scope['owner_user_id'] === $row['owner_user_id']
+            && $scope['workspace'] === $row['workspace_name'];
+        $rows[] = $row;
     }
-
-    $user = $_SESSION['user'] ?? null;
-    return !(is_array($user) && !empty($user['_public_workspace']));
-}
-
-function clearPublicWorkspaceAuthentication(): void {
-    $user = $_SESSION['user'] ?? null;
-    $isPublicWorkspaceAuth = ($_SESSION['auth_method'] ?? '') === 'public_workspace'
-        || (is_array($user) && !empty($user['_public_workspace']));
-
-    unset($_SESSION['public_workspace_access']);
-
-    if (!$isPublicWorkspaceAuth) {
-        unset($_SESSION['public_workspace_original_auth']);
-        return;
-    }
-
-    $originalAuth = $_SESSION['public_workspace_original_auth'] ?? null;
-    unset($_SESSION['public_workspace_original_auth']);
-
-    if (is_array($originalAuth) && !empty($originalAuth['authenticated']) && isset($originalAuth['user_id'], $originalAuth['user']) && is_array($originalAuth['user'])) {
-        $_SESSION['authenticated'] = true;
-        $_SESSION['user_id'] = (int)$originalAuth['user_id'];
-        $_SESSION['user'] = $originalAuth['user'];
-
-        if (isset($originalAuth['login_user_id'], $originalAuth['login_user']) && is_array($originalAuth['login_user'])) {
-            $_SESSION['login_user_id'] = (int)$originalAuth['login_user_id'];
-            $_SESSION['login_user'] = $originalAuth['login_user'];
-        } else {
-            $_SESSION['login_user_id'] = (int)$originalAuth['user_id'];
-            $_SESSION['login_user'] = $originalAuth['user'];
-        }
-
-        if (array_key_exists('auth_method', $originalAuth)) {
-            if ($originalAuth['auth_method'] === null || $originalAuth['auth_method'] === '') {
-                unset($_SESSION['auth_method']);
-            } else {
-                $_SESSION['auth_method'] = (string)$originalAuth['auth_method'];
-            }
-        }
-
-        if (!empty($originalAuth['extra_session_keys']) && is_array($originalAuth['extra_session_keys'])) {
-            foreach ($originalAuth['extra_session_keys'] as $sessionKey => $sessionValue) {
-                $_SESSION[$sessionKey] = $sessionValue;
-            }
-        }
-
-        return;
-    }
-
-    unset($_SESSION['authenticated'], $_SESSION['user_id'], $_SESSION['user'], $_SESSION['login_user_id'], $_SESSION['login_user'], $_SESSION['auth_method'], $_SESSION['account_selection_required']);
-}
-
-function storeOriginalAuthForPublicWorkspace(): void {
-    if (!isRealUserAuthenticated() || isset($_SESSION['public_workspace_original_auth'])) {
-        return;
-    }
-
-    $extraSessionKeys = [];
-    foreach ($_SESSION as $sessionKey => $sessionValue) {
-        if (strpos((string)$sessionKey, 'oidc_') === 0) {
-            $extraSessionKeys[$sessionKey] = $sessionValue;
-        }
-    }
-
-    $_SESSION['public_workspace_original_auth'] = [
-        'authenticated' => true,
-        'user_id' => (int)($_SESSION['user_id'] ?? 0),
-        'user' => is_array($_SESSION['user'] ?? null) ? $_SESSION['user'] : [],
-        'login_user_id' => (int)($_SESSION['login_user_id'] ?? ($_SESSION['user_id'] ?? 0)),
-        'login_user' => is_array($_SESSION['login_user'] ?? null) ? $_SESSION['login_user'] : (is_array($_SESSION['user'] ?? null) ? $_SESSION['user'] : []),
-        'auth_method' => $_SESSION['auth_method'] ?? null,
-        'extra_session_keys' => $extraSessionKeys,
-    ];
-}
-
-function hasStoredOriginalAuthForPublicWorkspace(): bool {
-    $originalAuth = $_SESSION['public_workspace_original_auth'] ?? null;
-    return is_array($originalAuth)
-        && !empty($originalAuth['authenticated'])
-        && isset($originalAuth['user_id'], $originalAuth['user'])
-        && (int)$originalAuth['user_id'] > 0
-        && is_array($originalAuth['user'])
-        && !empty($originalAuth['user']);
-}
-
-function getPublicWorkspaceViewerUserId(): int {
-    if (isRealUserAuthenticated()) {
-        return max(0, (int)getAuthenticatedUserId());
-    }
-
-    $access = getPublicWorkspaceAccess();
-    return $access !== null ? max(0, (int)($access['viewer_user_id'] ?? 0)) : 0;
+    return $rows;
 }
 
 function getCurrentRelativeRequestUri(): string {
@@ -840,280 +820,187 @@ function getCurrentRelativeRequestUri(): string {
     return poznoteSanitizeLocalRedirect($_SERVER['REQUEST_URI'] ?? null) ?? 'index.php';
 }
 
-function getPublicWorkspacePasswordSessionKey(array $workspaceAccess): string {
-    $registryKey = (string)($workspaceAccess['registry_key'] ?? '');
-    return 'public_workspace_auth_' . hash('sha256', $registryKey);
-}
+/**
+ * Scripts a session confined to a shared workspace is kept away from: they
+ * manage the owner's whole account (settings, webhooks, backups, Git sync,
+ * the workspace list, the share list, storage), export or list it across its
+ * workspaces, or act on the instance (admin pages, which an administrator
+ * reaches again from their own account). A page redirects to the shared
+ * workspace, a script answers 403.
+ */
+function enforceSharedWorkspaceScopeAccess(): void {
+    $scope = getSharedWorkspaceScope();
+    if ($scope === null) {
+        return;
+    }
 
-function getPublicWorkspaceBasePath(): string {
     $scriptName = (string)($_SERVER['SCRIPT_NAME'] ?? '');
-    $scriptDir = str_replace('\\', '/', dirname($scriptName));
-    if ($scriptDir === '/' || $scriptDir === '\\' || $scriptDir === '.') {
-        return '';
-    }
+    $baseName = basename($scriptName);
 
-    return rtrim($scriptDir, '/');
-}
-
-function buildPublicWorkspacePath(string $workspaceName): string {
-    return getPublicWorkspaceBasePath() . '/' . rawurlencode(normalizePublicWorkspaceName($workspaceName));
-}
-
-function buildExplicitPublicWorkspaceUrl(string $workspaceName): string {
-    return buildPublicWorkspacePath($workspaceName);
-}
-
-function decodePublicWorkspaceAllowedUsers($allowedUsersRaw): array {
-    if (empty($allowedUsersRaw)) {
-        return [];
-    }
-
-    $decoded = is_array($allowedUsersRaw) ? $allowedUsersRaw : json_decode((string)$allowedUsersRaw, true);
-    if (!is_array($decoded)) {
-        return [];
-    }
-
-    return array_values(array_unique(array_filter(array_map('intval', $decoded), function ($id) {
-        return $id > 0;
-    })));
-}
-
-function loadPublicWorkspacePageHelpers(): string {
-    if (!function_exists('t_h')) {
-        require_once __DIR__ . '/functions.php';
-    }
-    if (!function_exists('renderPublicStatusPage')) {
-        require_once __DIR__ . '/public_helpers.php';
-    }
-
-    return function_exists('getUserLanguage') ? getUserLanguage() : 'en';
-}
-
-function renderPublicWorkspaceLoginRequiredPage(array $workspaceAccess): void {
-    $currentLang = loadPublicWorkspacePageHelpers();
-    $redirect = getCurrentRelativeRequestUri();
-    if (empty($_SERVER['POZNOTE_PUBLIC_WORKSPACE_SLUG']) && strpos($redirect, 'public_workspace=') === false) {
-        $redirect .= (strpos($redirect, '?') === false ? '?' : '&') . 'public_workspace=1';
-    }
-    $_SESSION['post_login_redirect'] = $redirect;
-
-    if (!isRealUserAuthenticated()) {
-        clearPublicWorkspaceAuthentication();
-    }
-
-    renderPublicStatusPage($currentLang, [
-        'status' => 403,
-        'title' => t_h('public.login_required_title', [], 'Login Required', $currentLang),
-        'message' => t_h('public.login_required_message', [], 'This content is restricted to specific users. Please log in to access it.', $currentLang),
-        'actions' => [
-            [
-                'href' => '/login.php?redirect=' . rawurlencode($redirect),
-                'label' => t_h('common.login.button', [], 'Log in', $currentLang),
-            ],
-        ],
-    ]);
-}
-
-function renderPublicWorkspaceAccessDeniedPage(array $workspaceAccess = []): void {
-    $currentLang = loadPublicWorkspacePageHelpers();
-
-    renderPublicStatusPage($currentLang, [
-        'status' => 403,
-        'title' => t_h('public.access_denied_title', [], 'Access Denied', $currentLang),
-        'message' => t_h('public.access_denied_message', [], 'You do not have permission to view this content.', $currentLang),
-        'actions' => [
-            [
-                'href' => '/index.php',
-                'label' => t_h('common.back_to_home', [], 'Dashboard', $currentLang),
-            ],
-        ],
-    ]);
-}
-
-function renderPublicWorkspacePasswordPage(array $workspaceAccess, bool $passwordError = false): void {
-    $currentLang = loadPublicWorkspacePageHelpers();
-    $stylesheetHref = getVersionedPublicAppAssetHref('css/public_folder.css');
-    $themeInitHref = getVersionedPublicAppAssetHref('js/theme-init.js');
-    $workspaceName = (string)($workspaceAccess['workspace_name'] ?? '');
-    ?>
-    <!doctype html>
-    <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="robots" content="noindex, nofollow">
-        <title><?php echo t_h('public.protection.title', [], 'Password Protected', $currentLang); ?></title>
-        <script src="<?php echo htmlspecialchars($themeInitHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"></script>
-        <link rel="stylesheet" href="<?php echo htmlspecialchars($stylesheetHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
-    </head>
-    <body class="password-page-body">
-        <div class="password-container">
-            <h2><?php echo t_h('public.protection.workspace_heading', [], 'Password Protected Workspace', $currentLang); ?></h2>
-            <?php if ($passwordError): ?>
-                <div class="error"><?php echo t_h('public.protection.error_incorrect', [], 'Incorrect password. Please try again.', $currentLang); ?></div>
-            <?php endif; ?>
-            <form method="POST" class="password-form">
-                <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($workspaceName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
-                <input type="hidden" name="public_workspace" value="1">
-                <input type="password" name="workspace_password" placeholder="<?php echo t_h('public.protection.placeholder', [], 'Enter password', $currentLang); ?>" required autofocus autocomplete="current-password">
-                <button type="submit"><?php echo t_h('public.protection.unlock', [], 'Unlock', $currentLang); ?></button>
-            </form>
-        </div>
-    </body>
-    </html>
-    <?php
-    exit;
-}
-
-function authorizePublicWorkspaceRequest(array $workspaceAccess, ?int $viewerUserId = null): bool {
-    $allowedUserIds = decodePublicWorkspaceAllowedUsers($workspaceAccess['allowed_users'] ?? null);
-    $loginRequired = !empty($workspaceAccess['login_required']) || !empty($allowedUserIds);
-
-    if (!$loginRequired) {
-        return false;
-    }
-
-    $viewerUserId = $viewerUserId !== null ? max(0, $viewerUserId) : getPublicWorkspaceViewerUserId();
-    if ($viewerUserId <= 0) {
-        renderPublicWorkspaceLoginRequiredPage($workspaceAccess);
-    }
-
-    $ownerId = (int)($workspaceAccess['user_id'] ?? 0);
-    if (!empty($allowedUserIds) && $viewerUserId !== $ownerId && !in_array($viewerUserId, $allowedUserIds, true)) {
-        renderPublicWorkspaceAccessDeniedPage($workspaceAccess);
-    }
-
-    return true;
-}
-
-function getPublicWorkspacePasswordProof(array $workspaceAccess): string {
-    return hash('sha256', (string)($workspaceAccess['password'] ?? ''));
-}
-
-function enforcePublicWorkspacePassword(array $workspaceAccess, bool $passedUserRestriction): void {
-    $storedPassword = (string)($workspaceAccess['password'] ?? '');
-    if ($storedPassword === '' || $passedUserRestriction) {
+    // Leaving the scope, or reading another account the login may open, is
+    // not an action on the owner's workspace.
+    if (in_array($baseName, ['switch_account.php', 'account_tree.php', 'logout.php'], true)) {
         return;
     }
 
-    $sessionKey = getPublicWorkspacePasswordSessionKey($workspaceAccess);
-    $passwordError = false;
-    $workspaceName = trim((string)($workspaceAccess['workspace_name'] ?? ''));
+    $restrictedPages = [
+        'notes_manager.php', 'settings.php', 'workspaces.php', 'shared.php', 'trash.php',
+        'backup_export.php', 'restore_import.php', 'git_sync.php',
+        'user-webhooks.php', 'storage-stats-user.php', 'ai_settings_user.php', 'stt_settings_user.php',
+        'ai_settings.php', 's3_settings.php', 's3_backup_settings.php', 'saas_settings.php', 'stt_settings.php',
+    ];
+    $restrictedScripts = [
+        'api_export_attachments.php', 'api_backup_job.php', 'api_restore_upload.php',
+        'api_s3_backup.php', 'api_s3_storage.php', 'api_upload_css.php',
+    ];
+    $isAdminPath = strpos($scriptName, '/admin/') !== false;
+    if (in_array($baseName, $restrictedScripts, true)) {
+        denyAccountAccessResponse('This action is not available in a workspace shared with you', 403);
+    }
+    if ($isAdminPath || in_array($baseName, $restrictedPages, true)) {
+        header('Location: ' . ($isAdminPath ? '../' : '') . 'index.php?workspace=' . rawurlencode($scope['workspace']));
+        exit;
+    }
 
-    if (isset($_POST['workspace_password'])) {
-        $submittedPassword = (string)$_POST['workspace_password'];
-        if (password_verify($submittedPassword, $storedPassword)) {
-            $_SESSION[$sessionKey] = getPublicWorkspacePasswordProof($workspaceAccess);
-            if ($workspaceName !== '') {
-                header('Location: ' . buildExplicitPublicWorkspaceUrl($workspaceName));
-                exit;
+    enforceSharedWorkspaceScopeOnRequest($scope);
+}
+
+/**
+ * Keep a scoped request inside its workspace. The workspace parameter is
+ * forced to the shared one on the query string and form body (a stale link
+ * lands in the right place), a JSON body naming another workspace is
+ * refused, and every note or folder id the request carries, in the URL of
+ * an API call or in a parameter, must belong to the shared workspace. The
+ * lists of parameter names cover the API controllers and the api_*.php
+ * scripts; an id that matches nothing is left to the handler's own 404.
+ */
+function enforceSharedWorkspaceScopeOnRequest(array $scope): void {
+    $workspaceName = $scope['workspace'];
+
+    // Requests that manage workspaces or the owner's account are not for a
+    // scoped session. Settings stay readable, as for any borrowed account
+    // (SettingsController), since the interface reads display preferences.
+    $uri = (string)($_SERVER['REQUEST_URI'] ?? '');
+    $method = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
+    $isRead = in_array($method, ['GET', 'HEAD', 'OPTIONS'], true);
+    if (preg_match('#/api/v1/(workspaces|settings)(/|$|\?)#', $uri) && !$isRead) {
+        denyAccountAccessResponse('This workspace is shared with you: its settings belong to its owner', 403);
+    }
+    if (preg_match('#/api/v1/(shared|backups|git-sync|admin|trash)(/|$|\?)#', $uri)) {
+        denyAccountAccessResponse('This endpoint is not available in a shared workspace', 403);
+    }
+    // Publishing a note or a folder on the public web is the owner's call, and
+    // the page that manages those links is theirs too.
+    if (preg_match('#/api/v1/(notes|folders)/\d+/share(/|$|\?)#', $uri)) {
+        denyAccountAccessResponse('Public links are managed by the workspace owner', 403);
+    }
+
+    $body = [];
+    $contentType = (string)($_SERVER['CONTENT_TYPE'] ?? '');
+    if (strpos($contentType, 'application/json') !== false) {
+        $decoded = json_decode((string)file_get_contents('php://input'), true);
+        if (is_array($decoded)) {
+            $body = $decoded;
+        }
+    }
+
+    $workspaceKeys = ['workspace', 'target_workspace', 'new_workspace', 'to_workspace', 'destination_workspace'];
+    foreach ($workspaceKeys as $key) {
+        if (isset($_GET[$key]) && is_string($_GET[$key]) && trim($_GET[$key]) !== '') {
+            $_GET[$key] = $workspaceName;
+            $_REQUEST[$key] = $workspaceName;
+        }
+        if (isset($_POST[$key]) && is_string($_POST[$key]) && trim($_POST[$key]) !== '') {
+            $_POST[$key] = $workspaceName;
+            $_REQUEST[$key] = $workspaceName;
+        }
+        if (isset($body[$key]) && is_string($body[$key]) && trim($body[$key]) !== '' && trim($body[$key]) !== $workspaceName) {
+            denyAccountAccessResponse('This workspace is shared with you: notes cannot leave it', 403);
+        }
+    }
+    // Every request is scoped to the shared workspace, also where leaving the
+    // parameter out means "every workspace" (the export scripts, the lists
+    // of the API).
+    $_GET['workspace'] = $workspaceName;
+    $_REQUEST['workspace'] = $workspaceName;
+
+    $noteIds = [];
+    $folderIds = [];
+    if (preg_match('#/api/v1/notes/(\d+)#', $uri, $m)) {
+        $noteIds[] = (int)$m[1];
+    }
+    if (preg_match('#/api/v1/folders/(\d+)#', $uri, $m)) {
+        $folderIds[] = (int)$m[1];
+    }
+    if (preg_match('#/api/v1/trash/(\d+)#', $uri, $m)) {
+        $noteIds[] = (int)$m[1];
+    }
+
+    $collect = static function (array $source, array $keys, array &$into): void {
+        foreach ($keys as $key) {
+            if (!isset($source[$key])) {
+                continue;
             }
-        } else {
-            $passwordError = true;
+            $values = $source[$key];
+            if (is_string($values) && strpos($values, ',') !== false) {
+                $values = explode(',', $values);
+            }
+            foreach ((array)$values as $value) {
+                if (is_scalar($value) && ctype_digit(trim((string)$value)) && (int)$value > 0) {
+                    $into[] = (int)$value;
+                }
+            }
         }
+    };
+    $noteKeys = ['note_id', 'noteId', 'note_ids', 'target_note_id', 'linked_note_id', 'source_note_id', 'original_note_id', 'note', 'select_linked_note'];
+    $folderKeys = ['folder_id', 'folderId', 'folder_ids', 'parent_id', 'parent_folder_id', 'source_folder_id', 'new_parent_id', 'new_parent_folder_id', 'target_folder_id', 'destination_folder_id', 'kanban', 'diary'];
+    foreach ([$_GET, $_POST, $body] as $source) {
+        $collect($source, $noteKeys, $noteIds);
+        $collect($source, $folderKeys, $folderIds);
     }
-
-    $passwordProof = $_SESSION[$sessionKey] ?? null;
-    if (!is_string($passwordProof) || !hash_equals(getPublicWorkspacePasswordProof($workspaceAccess), $passwordProof)) {
-        renderPublicWorkspacePasswordPage($workspaceAccess, $passwordError);
+    // The single-note export scripts name the note "id".
+    if (in_array(basename((string)($_SERVER['SCRIPT_NAME'] ?? '')), ['api_export_note.php', 'api_download_note.php'], true)) {
+        $collect($_GET, ['id'], $noteIds);
     }
-}
-
-function activatePublicWorkspaceAccess(array $workspaceAccess, int $viewerUserId = 0): void {
-    $userId = (int)($workspaceAccess['user_id'] ?? 0);
-    $workspaceName = trim((string)($workspaceAccess['workspace_name'] ?? ''));
-    if ($userId <= 0 || $workspaceName === '') {
+    $noteIds = array_values(array_unique($noteIds));
+    $folderIds = array_values(array_unique($folderIds));
+    if (empty($noteIds) && empty($folderIds)) {
         return;
     }
 
-    storeOriginalAuthForPublicWorkspace();
+    require_once __DIR__ . '/users/UserDataManager.php';
+    try {
+        $dbPath = (new UserDataManager((int)$scope['owner_user_id']))->getUserDatabasePath();
+        if (!is_file($dbPath)) {
+            return;
+        }
+        $ownerCon = new PDO('sqlite:' . $dbPath);
+        $ownerCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $ownerCon->exec('PRAGMA busy_timeout = 5000');
 
-    if ($viewerUserId <= 0 && isRealUserAuthenticated()) {
-        $viewerUserId = max(0, (int)getAuthenticatedUserId());
+        if (!empty($noteIds)) {
+            $placeholders = implode(',', array_fill(0, count($noteIds), '?'));
+            $stmt = $ownerCon->prepare("SELECT COUNT(*) FROM entries WHERE id IN ($placeholders) AND workspace != ?");
+            $stmt->execute(array_merge($noteIds, [$workspaceName]));
+            if ((int)$stmt->fetchColumn() > 0) {
+                denyAccountAccessResponse('This note is outside the workspace shared with you', 403);
+            }
+        }
+        if (!empty($folderIds)) {
+            $placeholders = implode(',', array_fill(0, count($folderIds), '?'));
+            $stmt = $ownerCon->prepare("SELECT COUNT(*) FROM folders WHERE id IN ($placeholders) AND workspace != ?");
+            $stmt->execute(array_merge($folderIds, [$workspaceName]));
+            if ((int)$stmt->fetchColumn() > 0) {
+                denyAccountAccessResponse('This folder is outside the workspace shared with you', 403);
+            }
+        }
+    } catch (Exception $e) {
+        error_log('Poznote: shared workspace scope check failed: ' . $e->getMessage());
+        denyAccountAccessResponse('Shared workspace check failed', 500);
     }
-
-    $_SESSION['authenticated'] = true;
-    $_SESSION['user_id'] = $userId;
-    $_SESSION['user'] = [
-        'id' => $userId,
-        'username' => (string)($workspaceAccess['username'] ?? ''),
-        'is_admin' => false,
-        '_public_workspace' => true,
-    ];
-    $_SESSION['login_user_id'] = $userId;
-    $_SESSION['login_user'] = $_SESSION['user'];
-    $_SESSION['auth_method'] = 'public_workspace';
-    unset($_SESSION['account_selection_required']);
-    $_SESSION['public_workspace_access'] = [
-        'user_id' => $userId,
-        'workspace_name' => $workspaceName,
-        'target_id' => (int)($workspaceAccess['target_id'] ?? 0),
-        'registry_key' => (string)($workspaceAccess['registry_key'] ?? ''),
-        'viewer_user_id' => max(0, $viewerUserId),
-        'activated_at' => time(),
-    ];
 }
 
-function maybeAuthenticatePublicWorkspaceRequest(): bool {
-    $activeAccess = getPublicWorkspaceAccess();
-    $explicitPublicWorkspaceRequest = isExplicitPublicWorkspaceRequest();
-
-    if ($activeAccess !== null && !$explicitPublicWorkspaceRequest) {
-        if (hasStoredOriginalAuthForPublicWorkspace()) {
-            clearPublicWorkspaceAuthentication();
-            return false;
-        }
-
-        $workspaceAccess = resolvePublicWorkspaceAccess((string)$activeAccess['workspace_name']);
-        if ($workspaceAccess === null) {
-            clearPublicWorkspaceAuthentication();
-            return false;
-        }
-
-        $viewerUserId = max(0, (int)($activeAccess['viewer_user_id'] ?? 0));
-        $passedUserRestriction = authorizePublicWorkspaceRequest($workspaceAccess, $viewerUserId);
-        enforcePublicWorkspacePassword($workspaceAccess, $passedUserRestriction);
-
-        activatePublicWorkspaceAccess($workspaceAccess, $viewerUserId);
-        return true;
-    }
-
-    $alreadyAuthenticated = isAuthenticated();
-    if ($alreadyAuthenticated && !$explicitPublicWorkspaceRequest) {
-        return false;
-    }
-
-    $workspaceName = getRequestedWorkspaceNameForPublicAccess();
-    if ($workspaceName === '') {
-        return false;
-    }
-
-    $workspaceAccess = resolvePublicWorkspaceAccess($workspaceName);
-    if ($workspaceAccess === null) {
-        if ($activeAccess !== null) {
-            clearPublicWorkspaceAuthentication();
-        }
-        return false;
-    }
-
-    $viewerUserId = getPublicWorkspaceViewerUserId();
-    $passedUserRestriction = authorizePublicWorkspaceRequest($workspaceAccess, $viewerUserId);
-    enforcePublicWorkspacePassword($workspaceAccess, $passedUserRestriction);
-
-    activatePublicWorkspaceAccess($workspaceAccess, $viewerUserId);
-    return true;
-}
-
-function getPublicWorkspaceRedirectUrl(): string {
-    $workspaceName = getPublicWorkspaceName();
-    if ($workspaceName === null || $workspaceName === '') {
-        return 'index.php';
-    }
-
-    return buildExplicitPublicWorkspaceUrl($workspaceName);
-}
-
-function denyPublicWorkspaceAccessResponse(string $message, int $code = 403, ?array $account = null): void {
+function denyAccountAccessResponse(string $message, int $code = 403, ?array $account = null): void {
     http_response_code($code);
 
     $acceptHeader = (string)($_SERVER['HTTP_ACCEPT'] ?? '');
@@ -1245,53 +1132,6 @@ function denyPublicWorkspaceAccessResponse(string $message, int $code = 403, ?ar
     }
 
     exit;
-}
-
-function denyPublicWorkspaceWriteAccess(string $message = 'This public workspace is read-only'): void {
-    if (!isPublicWorkspaceAccessActive()) {
-        return;
-    }
-
-    denyPublicWorkspaceAccessResponse($message, 403);
-}
-
-function enforcePublicWorkspaceRequestAccess(): void {
-    if (!isPublicWorkspaceAccessActive()) {
-        return;
-    }
-
-    $requestMethod = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
-    if (!in_array($requestMethod, ['GET', 'HEAD', 'OPTIONS'], true)) {
-        denyPublicWorkspaceWriteAccess();
-    }
-
-    $scriptName = (string)($_SERVER['SCRIPT_NAME'] ?? '');
-    $restrictedScripts = [
-        '/dashboard.php',
-        '/favorites.php',
-        '/notes_manager.php',
-        '/trash.php',
-        '/settings.php',
-        '/workspaces.php',
-        '/create.php',
-        '/shared.php',
-        '/backup_export.php',
-        '/restore_import.php',
-        '/git_sync.php',
-        '/excalidraw_editor.php',
-    ];
-
-    foreach ($restrictedScripts as $restrictedScript) {
-        if ($scriptName === $restrictedScript || str_ends_with($scriptName, $restrictedScript)) {
-            header('Location: ' . getPublicWorkspaceRedirectUrl());
-            exit;
-        }
-    }
-
-    if (strpos($scriptName, '/admin/') !== false) {
-        header('Location: ' . getPublicWorkspaceRedirectUrl());
-        exit;
-    }
 }
 
 // --- Brute-force protection for password logins (form + API Basic Auth) ---
@@ -1731,11 +1571,6 @@ function poznoteDenyUnauthenticatedRequest(string $message, string $loginPath, b
 }
 
 function requireAuth() {
-    if (maybeAuthenticatePublicWorkspaceRequest()) {
-        enforcePublicWorkspaceRequestAccess();
-        return;
-    }
-
     if (!isAuthenticated()) {
         poznoteDenyUnauthenticatedRequest('Authentication required', 'login.php', true);
     }
@@ -1744,7 +1579,7 @@ function requireAuth() {
     syncActiveAccountCookie();
     enforceActiveAccountHeader();
 
-    enforcePublicWorkspaceRequestAccess();
+    enforceSharedWorkspaceScopeAccess();
 }
 
 function getMcpServiceTokenPath(): string {
@@ -2224,13 +2059,8 @@ function requireApiAuth() {
     // would otherwise stay pinned to the first profile they targeted, making
     // X-User-ID silently ignored on every later request.
     if (isAuthenticated() && !hasApiAuthCredentials()) {
-        if (isPublicWorkspaceAccessActive()) {
-            $requestMethod = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
-            if (!in_array($requestMethod, ['GET', 'HEAD', 'OPTIONS'], true)) {
-                denyPublicWorkspaceWriteAccess();
-            }
-        }
         enforceActiveAccountHeader();
+        enforceSharedWorkspaceScopeAccess();
         return;
     }
     
@@ -2299,6 +2129,7 @@ function requireApiAuthUser() {
     // Header credentials take precedence over an existing session (see requireApiAuth)
     if (isAuthenticated() && !hasApiAuthCredentials()) {
         enforceActiveAccountHeader();
+        enforceSharedWorkspaceScopeAccess();
         return;
     }
     
@@ -2395,7 +2226,7 @@ function requireActiveAccountOwner(?string $message = null): void {
         $message = getActiveAccountOwnerRequiredMessage();
     }
 
-    denyPublicWorkspaceAccessResponse($message, 403, getActiveAccountIdentity());
+    denyAccountAccessResponse($message, 403, getActiveAccountIdentity());
 }
 
 /**
@@ -2426,9 +2257,7 @@ function requireAdmin() {
 function requireApiAuthAdmin() {
     // Header credentials take precedence over an existing session (see requireApiAuth)
     if (isAuthenticated() && !hasApiAuthCredentials()) {
-        if (isPublicWorkspaceAccessActive()) {
-            denyPublicWorkspaceAccessResponse('This endpoint is not available in public workspace mode', 403);
-        }
+        enforceSharedWorkspaceScopeAccess();
         // Session users must hold the admin role; controllers may re-check,
         // but the gate itself must not let non-admins through.
         if (!isCurrentUserAdmin()) {

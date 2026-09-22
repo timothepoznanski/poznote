@@ -215,7 +215,7 @@ if (!$note) {
                     <div class="attachment-usage-notice">
                         <i class="lucide lucide-alert-triangle"></i>
                         <span><?php echo t_h('attachments.page.note_taking_notice', [], 'You can store media, but large files fill up your space quickly.'); ?>
-                            <a href="storage-stats-user.php"><?php echo t_h('attachments.page.note_taking_notice_link', [], 'View my storage'); ?></a></span>
+                            <?php if (!function_exists('isSharedWorkspaceScopeActive') || !isSharedWorkspaceScopeActive()): ?><a href="storage-stats-user.php"><?php echo t_h('attachments.page.note_taking_notice_link', [], 'View my storage'); ?></a><?php endif; ?></span>
                     </div>
                     <?php endif; ?>
                     <br>

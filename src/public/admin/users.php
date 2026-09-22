@@ -620,6 +620,95 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
         [data-theme='dark'] .user-current {
             color: #4a9eff;
         }
+        /* Row actions: a single kebab per row opening a labelled menu, rather
+           than four bare icon buttons whose meaning had to be guessed from a
+           tooltip. The menu is position:fixed and placed by JS
+           (positionUserActionsMenu) because .table-responsive scrolls in both
+           directions and would clip an absolutely positioned one. */
+        .user-actions {
+            display: flex;
+            justify-content: center;
+        }
+        .user-actions-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            border: 1px solid transparent;
+            border-radius: var(--pz-radius);
+            background: transparent;
+            color: var(--pz-text-secondary);
+            cursor: pointer;
+        }
+        .user-actions-toggle:hover,
+        .user-actions.is-open .user-actions-toggle {
+            background: var(--pz-surface-hover);
+            border-color: var(--pz-border);
+        }
+        .user-actions-toggle i {
+            font-size: 18px;
+            /* The click target is the button: a click landing on the mask
+               would otherwise reach the document handler as "outside". */
+            pointer-events: none;
+        }
+        .user-actions-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            flex-direction: column;
+            align-items: stretch;
+            min-width: 210px;
+            padding: 4px 0;
+            background: var(--pz-chrome-bg);
+            border: 1px solid var(--pz-border-strong);
+            border-radius: var(--pz-radius);
+            box-shadow: 0 4px 6px -1px rgba(var(--pz-shadow-rgb), 0.1), 0 2px 4px -1px rgba(var(--pz-shadow-rgb), 0.06);
+        }
+        .user-actions.is-open .user-actions-menu {
+            display: flex;
+        }
+        .user-actions-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 9px 14px;
+            border: 0;
+            background: transparent;
+            color: var(--pz-text);
+            font: inherit;
+            font-size: 0.9rem;
+            text-align: left;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        .user-actions-item:hover,
+        .user-actions-item:focus-visible {
+            background: var(--pz-surface-hover);
+        }
+        .user-actions-item i {
+            flex: 0 0 auto;
+            font-size: 16px;
+            color: var(--pz-text-muted);
+            /* icons.css scales every lucide mask on hover; a menu row is not a
+               button, so the icon must stay put while the row highlights. */
+            transform: none !important;
+        }
+        .user-actions-item.is-danger,
+        .user-actions-item.is-danger i {
+            color: var(--pz-danger-text);
+        }
+        .user-actions-item[disabled] {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        .user-actions-item[disabled]:hover {
+            background: transparent;
+        }
         /* Same look as the activity log pager. */
         .users-pager {
             display: flex;
@@ -973,6 +1062,109 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 
     document.addEventListener('DOMContentLoaded', markSortedUsersColumn);
 
+    /* === Row actions menu ===
+       One kebab per row, one menu open at a time. The menu is position:fixed
+       and placed from JS: .table-responsive is a scroller in both directions,
+       and an absolutely positioned menu inside it would be clipped away. */
+
+    function closeUserActionsMenu() {
+        document.querySelectorAll('.user-actions.is-open').forEach(function (wrapper) {
+            wrapper.classList.remove('is-open');
+            const toggle = wrapper.querySelector('.user-actions-toggle');
+            if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        });
+    }
+
+    function positionUserActionsMenu(wrapper) {
+        const toggle = wrapper.querySelector('.user-actions-toggle');
+        const menu = wrapper.querySelector('.user-actions-menu');
+        if (!toggle || !menu) return;
+
+        const anchor = toggle.getBoundingClientRect();
+        const width = menu.offsetWidth;
+        const height = menu.offsetHeight;
+        const margin = 8;
+
+        // Hangs under the kebab, right-aligned on it, and flips above when the
+        // bottom of the viewport is closer than the menu is tall: the last rows
+        // of a full table are exactly where this happens.
+        let top = anchor.bottom + 4;
+        if (top + height + margin > window.innerHeight) {
+            top = Math.max(margin, anchor.top - height - 4);
+        }
+        const left = Math.min(
+            Math.max(margin, anchor.right - width),
+            window.innerWidth - width - margin
+        );
+
+        menu.style.top = Math.round(top) + 'px';
+        menu.style.left = Math.round(left) + 'px';
+    }
+
+    function toggleUserActionsMenu(toggle) {
+        const wrapper = toggle.closest('.user-actions');
+        if (!wrapper) return;
+        const wasOpen = wrapper.classList.contains('is-open');
+        closeUserActionsMenu();
+        if (wasOpen) return;
+
+        // The class comes first so the menu has a box to measure; nothing is
+        // painted between here and the positioning below, so it never shows up
+        // at the wrong place first.
+        wrapper.classList.add('is-open');
+        toggle.setAttribute('aria-expanded', 'true');
+        positionUserActionsMenu(wrapper);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.user-actions-toggle').forEach(function (toggle) {
+            toggle.addEventListener('click', function (e) {
+                // Without this the document handler below would close the menu
+                // again in the same click.
+                e.stopPropagation();
+                toggleUserActionsMenu(this);
+            });
+        });
+
+        // Picking an entry closes the menu; the entry's own handler (its inline
+        // onclick, or the .password-action-btn listener) still runs.
+        document.querySelectorAll('.user-actions-item').forEach(function (item) {
+            item.addEventListener('click', closeUserActionsMenu);
+        });
+    });
+
+    /* A fixed menu does not travel with its row, so follow the kebab on every
+       scroll and give up only once the row has left the scroller. Closing on
+       any scroll instead looked simpler but was wrong: focusing a button that
+       is only partly visible makes the browser scroll it into view and fire a
+       scroll event right after the click, which shut the menu as it opened. */
+    function trackOpenUserActionsMenu() {
+        const wrapper = document.querySelector('.user-actions.is-open');
+        if (!wrapper) return;
+
+        const toggle = wrapper.querySelector('.user-actions-toggle');
+        const scroller = wrapper.closest('.table-responsive');
+        const anchor = toggle.getBoundingClientRect();
+        const bounds = scroller ? scroller.getBoundingClientRect() : null;
+        const gone = anchor.bottom <= 0
+            || anchor.top >= window.innerHeight
+            || (bounds !== null && (anchor.bottom <= bounds.top
+                || anchor.top >= bounds.bottom
+                || anchor.right <= bounds.left
+                || anchor.left >= bounds.right));
+
+        if (gone) closeUserActionsMenu();
+        else positionUserActionsMenu(wrapper);
+    }
+
+    document.addEventListener('click', closeUserActionsMenu);
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeUserActionsMenu();
+    });
+    // Capture phase: the scroller's own scroll event does not bubble to window.
+    window.addEventListener('scroll', trackOpenUserActionsMenu, true);
+    window.addEventListener('resize', trackOpenUserActionsMenu);
+
     function openAccessModal(userId, username, accessIds) {
         const normalizedAccessIds = (Array.isArray(accessIds) ? accessIds : []).map(Number);
         document.getElementById('access_user_id').value = userId;
@@ -1185,14 +1377,18 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                                     }
                                 ?>
                                 <?php
-                                    if (empty($accessNames)) {
+                                    // Reaching into another account is the exception, so it is the
+                                    // one worth spotting when scanning the column: only "own account
+                                    // only" stays muted, anything wider is flagged.
+                                    $accessIsExtended = !empty($accessNames);
+                                    if (!$accessIsExtended) {
                                         $accessSummary = t('multiuser.admin.account_access.own_only', [], 'Own account only');
                                     } else {
                                         array_unshift($accessNames, t('multiuser.admin.account_access.own_account', [], 'Own account'));
                                         $accessSummary = implode(', ', $accessNames);
                                     }
                                 ?>
-                                <div class="account-access-summary" title="<?php echo htmlspecialchars($accessSummary, ENT_QUOTES, 'UTF-8'); ?>">
+                                <div class="account-access-summary<?php echo $accessIsExtended ? ' account-access-extended' : ''; ?>" title="<?php echo htmlspecialchars($accessSummary, ENT_QUOTES, 'UTF-8'); ?>">
                                     <?php echo htmlspecialchars($accessSummary, ENT_QUOTES, 'UTF-8'); ?>
                                 </div>
                             </td>
@@ -1222,35 +1418,45 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                             </td>
 
                             <td class="text-center">
-                                <div class="actions actions-center">
-                                        <button class="btn btn-secondary btn-small" title="<?php echo t_h('multiuser.admin.account_access.manage', [], 'Manage note access'); ?>"
+                                <?php $actionsMenuLabel = t_h('multiuser.admin.actions', [], 'Actions'); ?>
+                                <div class="user-actions">
+                                    <button type="button" class="user-actions-toggle" aria-haspopup="true" aria-expanded="false"
+                                        title="<?php echo $actionsMenuLabel; ?>" aria-label="<?php echo $actionsMenuLabel; ?>">
+                                        <i class="lucide-more-horizontal"></i>
+                                    </button>
+                                    <div class="user-actions-menu" role="menu">
+                                        <button type="button" class="user-actions-item" role="menuitem"
                                             onclick="openAccessModal(<?php echo (int)$user['id']; ?>, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($accessIds), ENT_QUOTES); ?>)">
-                                        <i class="lucide-users"></i>
-                                    </button>
+                                            <i class="lucide-users"></i><span><?php echo t_h('multiuser.admin.account_access.manage', [], 'Manage note access'); ?></span>
+                                        </button>
 
-                                        <button class="btn btn-secondary btn-small" title="<?php echo t_h('multiuser.admin.edit_user', [], 'Edit User'); ?>"
+                                        <button type="button" class="user-actions-item" role="menuitem"
                                             onclick="renameUser(<?php echo (int)$user['id']; ?>, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($user['email'] ?? ''), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($user['oidc_subject'] ?? ''), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($user['first_name'] ?? ''), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($user['last_name'] ?? ''), ENT_QUOTES); ?>)">
-                                        <i class="lucide-pencil"></i>
-                                    </button>
+                                            <i class="lucide-pencil"></i><span><?php echo t_h('multiuser.admin.edit_user', [], 'Edit User'); ?></span>
+                                        </button>
 
-                                        <button type="button" class="btn btn-secondary btn-small password-action-btn" title="<?php echo t_h('multiuser.admin.password_management.reset_password', [], 'Reset Password'); ?>"
+                                        <button type="button" class="user-actions-item password-action-btn" role="menuitem"
                                             data-user-id="<?php echo (int)$user['id']; ?>"
                                             data-username="<?php echo htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?>">
-                                        <i class="lucide-key"></i>
-                                    </button>
+                                            <i class="lucide-key"></i><span><?php echo t_h('multiuser.admin.password_management.reset_password', [], 'Reset Password'); ?></span>
+                                        </button>
 
-                                    <?php if ($user['id'] !== 1 && $user['id'] !== $currentAuthUserId): ?>
-                                        <button class="btn btn-danger btn-small" title="<?php echo t_h('common.delete', [], 'Delete'); ?>"
-                                            onclick="openDeleteModal(<?php echo (int)$user['id']; ?>, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>)">
-                                            <i class="lucide-trash-2"></i>
-                                        </button>
-                                    <?php else: ?>
-                                        <button class="btn btn-danger btn-small disabled" title="<?php echo htmlspecialchars($user['id'] === 1
-                                            ? t('multiuser.admin.delete_id_1_locked', [], 'User ID 1 cannot be deleted')
-                                            : t('multiuser.admin.errors.cannot_delete_self', [], 'You cannot delete your own profile'), ENT_QUOTES, 'UTF-8'); ?>" disabled>
-                                            <i class="lucide-trash-2"></i>
-                                        </button>
-                                    <?php endif; ?>
+                                        <?php if ($user['id'] !== 1 && $user['id'] !== $currentAuthUserId): ?>
+                                            <button type="button" class="user-actions-item is-danger" role="menuitem"
+                                                onclick="openDeleteModal(<?php echo (int)$user['id']; ?>, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>)">
+                                                <i class="lucide-trash-2"></i><span><?php echo t_h('common.delete', [], 'Delete'); ?></span>
+                                            </button>
+                                        <?php else: ?>
+                                            <?php // Kept visible rather than dropped: the tooltip is what
+                                                  // explains why this one account cannot be deleted. ?>
+                                            <button type="button" class="user-actions-item is-danger" role="menuitem" disabled
+                                                title="<?php echo htmlspecialchars($user['id'] === 1
+                                                    ? t('multiuser.admin.delete_id_1_locked', [], 'User ID 1 cannot be deleted')
+                                                    : t('multiuser.admin.errors.cannot_delete_self', [], 'You cannot delete your own profile'), ENT_QUOTES, 'UTF-8'); ?>">
+                                                <i class="lucide-trash-2"></i><span><?php echo t_h('common.delete', [], 'Delete'); ?></span>
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
                             </td>
                         </tr>

@@ -214,8 +214,11 @@ function dashboardSaveScopeQuery(PDO $con, array $query): void {
  * the scope restores them too.
  */
 function dashboardResolveRememberedScope(PDO $con, array $params, string $pageWorkspace): array {
-    if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
-        return poznoteResolveWorkspaceScope($con, $params, $pageWorkspace);
+    // A session confined to a workspace shared with it (auth.php) boards
+    // that workspace alone, whatever the URL or the owner's saved scope says.
+    $sharedWorkspaceName = function_exists('getSharedWorkspaceScopeName') ? getSharedWorkspaceScopeName() : null;
+    if ($sharedWorkspaceName !== null) {
+        return poznoteResolveWorkspaceScope($con, ['workspace' => $sharedWorkspaceName], $sharedWorkspaceName);
     }
 
     $requested = strtolower(trim((string)($params['scope'] ?? '')));
@@ -830,7 +833,10 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 					</div>
 				</div>
 				<div class="modal-buttons">
+					<?php // workspaces.php is refused on an account that is not one's own ?>
+					<?php if ((!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser())): ?>
 					<button type="button" class="dashboard-scope-manage-btn" onclick="window.location.href='workspaces.php'"><i class="lucide lucide-layers"></i> <?php echo t_h('dashboard.scope.manage_workspaces', [], 'Manage workspaces'); ?></button>
+					<?php endif; ?>
 					<button type="button" class="btn-cancel" data-action="close-workspace-switcher-modal"><?php echo t_h('common.close'); ?></button>
 					<button type="button" class="btn-primary" id="dashboardScopeApplyBtn" disabled><?php echo t_h('common.apply', [], 'Apply'); ?></button>
 				</div>

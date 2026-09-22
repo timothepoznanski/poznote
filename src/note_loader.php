@@ -65,10 +65,6 @@ function ensureAutomaticSnapshotForOpenedNote($con, $noteId) {
 
     $processedNoteIds[$noteId] = true;
 
-    if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
-        return;
-    }
-
     try {
         require_once __DIR__ . '/api/v1/controllers/SnapshotsController.php';
 
@@ -98,9 +94,6 @@ function loadNoteData($con, &$note, $workspace_filter) {
         $note_id = intval($note);
         $note_where_clause = 'trash = 0 AND id = ? AND workspace = ?';
         $note_params = [$note_id, $workspace_filter];
-        if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
-            appendNoteAgeFilter($note_where_clause, $note_params, getNoteAgeFilterDays($con));
-        }
 
         $stmt = $con->prepare("SELECT * FROM entries WHERE $note_where_clause");
         $stmt->execute($note_params);
@@ -115,9 +108,6 @@ function loadNoteData($con, &$note, $workspace_filter) {
                     'note=' . $linked_note_id,
                     'workspace=' . urlencode($workspace_filter),
                 ];
-                if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
-                    $redirect_params[] = 'public_workspace=1';
-                }
                 $redirect_url = 'index.php?' . implode('&', $redirect_params);
                 if ($selected_linked_note_id > 0) {
                     $redirect_url .= "&select_linked_note=" . $selected_linked_note_id;

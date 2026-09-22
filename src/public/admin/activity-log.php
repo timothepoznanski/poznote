@@ -379,13 +379,11 @@ function activityDetailsText(string $action, ?string $json): string {
             if (!empty($d['updated'])) {
                 $parts[] = t('activity_log.details.share_updated', [], 'settings updated');
             }
-            if (!empty($d['password_protected'])) {
-                $parts[] = t('activity_log.details.password_protected', [], 'password protected');
-            }
-            if (!empty($d['login_required'])) {
-                $parts[] = t('activity_log.details.login_required', [], 'login required');
-            }
-            if (!empty($d['allowed_users'])) {
+            $sharedWith = is_array($d['users'] ?? null) ? $d['users'] : [];
+            if (!empty($sharedWith)) {
+                $parts[] = t('activity_log.details.shared_with', ['users' => implode(', ', array_map('strval', $sharedWith))], 'shared with {{users}}');
+            } elseif (!empty($d['allowed_users'])) {
+                // Rows written before workspace shares named their grantees
                 $parts[] = t('activity_log.details.allowed_users', ['count' => (int)$d['allowed_users']], 'restricted to {{count}} users');
             }
             return implode(' · ', $parts);

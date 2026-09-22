@@ -35,15 +35,13 @@ class WorkspacesController {
      */
     public function index() {
         try {
-            if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
-                $publicWorkspaceName = getPublicWorkspaceName();
-                $rows = [];
-
-                if (is_string($publicWorkspaceName) && $publicWorkspaceName !== '') {
-                    $stmt = $this->con->prepare('SELECT name, created, tags, color FROM workspaces WHERE name = ?');
-                    $stmt->execute([$publicWorkspaceName]);
-                    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                }
+            $scopedWorkspaceName = function_exists('getSharedWorkspaceScopeName') ? getSharedWorkspaceScopeName() : null;
+            if ($scopedWorkspaceName !== null) {
+                // A session confined to a workspace shared with it (auth.php)
+                // sees that workspace alone, not the owner's other ones.
+                $stmt = $this->con->prepare('SELECT name, created, tags, color FROM workspaces WHERE name = ?');
+                $stmt->execute([$scopedWorkspaceName]);
+                $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
             } else {
                 // The order the user arranged on workspaces.php: the sidebar
                 // workspace menu and every other consumer of this endpoint
@@ -64,9 +62,7 @@ class WorkspacesController {
             
             // Get current user
             $currentUser = getCurrentUser();
-            $username = (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive())
-                ? null
-                : ($currentUser['username'] ?? null);
+            $username = $currentUser['username'] ?? null;
             
             // Acting as
             $actingAs = null;

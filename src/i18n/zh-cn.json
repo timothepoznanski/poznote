@@ -93,7 +93,8 @@
       "today": "今天",
       "yesterday": "昨天"
     },
-    "network_error": "网络错误"
+    "network_error": "网络错误",
+    "none": "无"
   },
   "snapshot": {
     "menu_item": "快照",
@@ -746,37 +747,28 @@
       "actions": {
         "enable": "共享",
         "edit": "编辑共享",
-        "copy_link": "复制链接",
         "disable": "取消共享"
       },
       "confirm": {
-        "title": "以只读模式共享工作区",
-        "message": "任何拥有工作区“{{workspace}}”URL 的人都可以以只读模式访问此工作区中的所有笔记和文件夹。",
-        "confirm_button": "分享工作区"
+        "title": "共享工作区",
+        "message": "选择可以打开工作区“{{workspace}}”的用户。他们会在自己的工作区菜单中看到它，并可以编辑其中的笔记和文件夹。"
       },
       "messages": {
-        "enabled": "只读工作区链接已启用",
-        "disabled": "只读工作区链接已禁用",
-        "url_copied": "分享链接已复制到剪贴板！"
+        "disabled": "该工作区已不再共享",
+        "url_copied": "分享链接已复制到剪贴板！",
+        "saved": "工作区共享已更新"
       },
       "errors": {
-        "url_in_use": "此 Poznote 实例中已存在同名公共工作区",
-        "copy_failed": "无法复制分享链接",
-        "save_failed": "无法保存只读工作区链接",
-        "disable_failed": "无法禁用只读工作区链接"
+        "save_failed": "无法更新工作区共享",
+        "not_allowed": "此实例不支持与其他用户共享"
       },
-      "status": {
-        "enabled": "公共只读已启用",
-        "disabled": "未公开共享"
-      },
-      "help": "任何拥有此 URL 的人都会以只读模式直接打开 Poznote 中的此工作区。",
       "options": {
-        "require_login": "需要登录 Poznote",
-        "restrict_users": "限制为特定用户",
         "users_loading": "正在加载用户...",
         "no_users_found": "未找到其他用户"
       },
-      "url_label": "公开 URL"
+      "status": {
+        "not_shared": "未共享"
+      }
     },
     "tags": {
       "action": "标签",
@@ -1489,43 +1481,7 @@
       "delete_title": "确认删除工作区",
       "delete_description": "所有笔记和文件夹将被永久删除且无法恢复。",
       "delete_placeholder": "输入工作区名称以确认",
-      "delete_button": "删除工作区",
-      "share": {
-        "actions": {
-          "enable": "分享",
-          "edit": "编辑分享",
-          "copy_link": "复制链接",
-          "disable": "取消分享"
-        },
-        "confirm": {
-          "title": "以只读方式分享工作区",
-          "message": "任何拥有工作区“{{workspace}}”URL 的人，都能以只读方式访问该工作区中的所有笔记和文件夹。",
-          "confirm_button": "分享工作区"
-        },
-        "messages": {
-          "enabled": "只读工作区链接已启用",
-          "disabled": "只读工作区链接已禁用",
-          "url_copied": "分享链接已复制到剪贴板！"
-        },
-        "errors": {
-          "url_in_use": "此 Poznote 实例上已存在同名的公开工作区",
-          "copy_failed": "复制分享链接失败",
-          "save_failed": "保存只读工作区链接失败",
-          "disable_failed": "禁用只读工作区链接失败"
-        },
-        "status": {
-          "enabled": "已启用公开只读",
-          "disabled": "未公开分享"
-        },
-        "help": "任何拥有此 URL 的人都会直接以只读方式在此工作区中打开 Poznote。",
-        "url_label": "公开 URL",
-        "options": {
-          "require_login": "要求登录 Poznote",
-          "restrict_users": "仅限特定用户",
-          "users_loading": "正在加载用户...",
-          "no_users_found": "未找到其他用户"
-        }
-      }
+      "delete_button": "删除工作区"
     },
     "user_settings_info": {
       "title": "账户设置",
@@ -2928,8 +2884,7 @@
       "error_incorrect": "密码错误，请重试。",
       "additional_password_required": "此笔记需要额外密码。请输入下一个密码以继续。",
       "placeholder": "输入密码",
-      "unlock": "解锁",
-      "workspace_heading": "受密码保护的工作区"
+      "unlock": "解锁"
     },
     "errors": {
       "token_missing": "缺少链接",
@@ -3941,15 +3896,14 @@
       "untitled_note": "笔记 #{{id}}",
       "linked_deleted": "+{{count}} 条关联笔记",
       "share_updated": "设置已更新",
-      "password_protected": "受密码保护",
-      "login_required": "需要登录",
       "allowed_users": "限 {{count}} 位用户",
       "accounts": "账户：{{accounts}}",
       "empty_value": "空",
       "s3_objects_deleted": "已删除 {{count}} 个 S3 对象",
       "s3_cleanup_failed": "S3 清理失败",
       "expires_at": "过期于 {{date}}",
-      "recovery_codes_remaining": "剩余 {{count}} 个"
+      "recovery_codes_remaining": "剩余 {{count}} 个",
+      "shared_with": "共享给 {{users}}"
     },
     "destinations": {
       "download": "下载",
@@ -4027,9 +3981,7 @@
     },
     "logout": {
       "confirm": "确定要退出登录吗？",
-      "signed_in_as": "您当前登录的账户是 {{username}}",
       "in_progress": "正在退出登录...",
-      "switch_intro": "切换到其他账户，或完全退出登录。",
       "switch_in_progress": "正在切换账户..."
     }
   },

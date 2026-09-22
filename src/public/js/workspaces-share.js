@@ -1,7 +1,10 @@
 // Workspace sharing.
-// 
-// Sharing a workspace with other users, the read-only public share link, and the
-// workspace info panel that shows both.
+//
+// A workspace is shared with named accounts of the instance (workspaces.php >
+// Share): the modal below lists the accounts, and the ones picked find the
+// workspace under "Shared with me" in their workspace menu and edit it, as
+// the owner would. Also the workspace info panel, which shows who a
+// workspace is shared with.
 
 function getWorkspaceShareText(attributeName, fallback) {
     if (!document.body) return fallback;
@@ -16,12 +19,8 @@ function getWorkspaceShareConfirmMessage(workspaceName) {
     return wsTr(
         'workspaces.share.confirm.message',
         { workspace: workspaceName },
-        'Anyone with the URL for workspace "{{workspace}}" will have access to all notes and folders in this workspace.\n\nThey will not be able to modify anything. They will only be able to view the content.'
+        'Pick the users who can open workspace "{{workspace}}". They will find it in their workspace menu and can edit its notes and folders.'
     );
-}
-
-function getWorkspaceShareConfirmButtonText() {
-    return wsTr('workspaces.share.confirm.confirm_button', {}, 'Share');
 }
 
 function parseWorkspaceShareAllowedUsers(button) {
@@ -41,13 +40,19 @@ function getCurrentWorkspaceUserId() {
     return isNaN(parsed) ? 0 : parsed;
 }
 
-function updateWorkspaceShareToggleButton(button, isShared, shareState) {
+// Reflect a saved share on the row: the share button (tooltip, tint and the
+// label the mobile actions menu prints next to the icon) and the info
+// button, which reads the same attributes.
+function updateWorkspaceShareToggleButton(button, shareState) {
     if (!button) return;
 
-    button.setAttribute('data-action', 'upsert_readonly_share');
+    var isShared = !!(shareState && shareState.shared);
+    var allowedUsers = (shareState && Array.isArray(shareState.allowed_users)) ? shareState.allowed_users : [];
+    var sharedWith = (shareState && Array.isArray(shareState.shared_with)) ? shareState.shared_with : [];
+
     button.setAttribute('data-shared', isShared ? '1' : '0');
-    // Icon button: the state shows through its tooltip and the is-shared tint,
-    // plus the label the mobile actions menu prints next to the icon
+    button.setAttribute('data-allowed-users', JSON.stringify(allowedUsers));
+    button.setAttribute('data-shared-with', JSON.stringify(sharedWith));
     var shareLabel = isShared
         ? getWorkspaceShareText('workspace-share-edit-btn', 'Edit share')
         : getWorkspaceShareText('workspace-share-enable-btn', 'Share');
@@ -57,21 +62,11 @@ function updateWorkspaceShareToggleButton(button, isShared, shareState) {
     if (shareLabelEl) shareLabelEl.textContent = shareLabel;
     button.classList.toggle('is-shared', isShared);
 
-    if (shareState && Object.prototype.hasOwnProperty.call(shareState, 'url')) {
-        button.setAttribute('data-url', isShared ? (shareState.url || '') : '');
-    } else if (!isShared) {
-        button.setAttribute('data-url', '');
-    }
-
-    if (shareState) {
-        button.setAttribute('data-has-password', shareState.hasPassword ? '1' : '0');
-        button.setAttribute('data-password-value', shareState.hasPassword ? (shareState.passwordValue || '') : '');
-        button.setAttribute('data-login-required', shareState.loginRequired ? '1' : '0');
-        button.setAttribute('data-allowed-users', JSON.stringify(shareState.allowed_users || []));
-    }
-
-    if (!isShared) {
-        button.setAttribute('data-password-value', '');
+    var row = button.closest ? button.closest('.ws-row') : null;
+    var infoButton = row ? row.querySelector('.workspace-info-action') : null;
+    if (infoButton) {
+        infoButton.setAttribute('data-shared', isShared ? '1' : '0');
+        infoButton.setAttribute('data-shared-with', JSON.stringify(sharedWith));
     }
 }
 
@@ -134,18 +129,13 @@ function showWorkspaceShareToast(message, type) {
     }, 2600);
 }
 
+// The share modal: the accounts of the instance as a checkbox list (the
+// owner's own left out), Save writes the picked ones, Unshare clears them.
 function showWorkspaceShareOptionsModal(button) {
     var workspaceName = button.getAttribute('data-ws') || '';
     var isExistingShare = button.getAttribute('data-shared') === '1';
-    var currentShareUrl = button.getAttribute('data-url') || '';
-    var previewShareUrl = currentShareUrl || button.getAttribute('data-preview-url') || '';
-    var currentPasswordValue = button.getAttribute('data-password-value') || '';
     var selectedUserIds = parseWorkspaceShareAllowedUsers(button);
-    var hideRestrictUsers = document.body && document.body.getAttribute('data-hide-restrict-users') === '1';
     var availableUsers = [];
-    var usersLoaded = false;
-    var initialLoginRequired = button.getAttribute('data-login-required') === '1' || selectedUserIds.length > 0;
-    var passwordDirty = false;
 
     var modal = document.createElement('div');
     modal.className = 'modal shared-edit-token-modal';
@@ -163,226 +153,10 @@ function showWorkspaceShareOptionsModal(button) {
     message.style.whiteSpace = 'pre-line';
     content.appendChild(message);
 
-    var shareUrlRow = null;
-    var shareUrlInlineGroup = null;
-    var shareUrlValueWrap = null;
-    var shareUrlCopyBtn = null;
-
-    function ensureShareUrlRow() {
-        if (shareUrlRow) {
-            return;
-        }
-
-        shareUrlRow = document.createElement('div');
-        shareUrlRow.className = 'shared-edit-token-field-row workspace-share-modal-url-row';
-
-        shareUrlInlineGroup = document.createElement('div');
-        shareUrlInlineGroup.className = 'workspace-share-modal-url-inline-group';
-
-        shareUrlValueWrap = document.createElement('div');
-        shareUrlValueWrap.className = 'workspace-share-modal-url-value';
-        shareUrlInlineGroup.appendChild(shareUrlValueWrap);
-
-        shareUrlRow.appendChild(shareUrlInlineGroup);
-        content.appendChild(shareUrlRow);
-    }
-
-    function createShareUrlCopyButton() {
-        var copyBtn = document.createElement('button');
-        copyBtn.type = 'button';
-        copyBtn.className = 'btn btn-secondary shared-edit-token-password-toggle workspace-share-modal-copy-btn';
-        copyBtn.innerHTML = '<i class="lucide lucide-copy"></i>';
-        copyBtn.title = getWorkspaceShareText('workspace-share-copy-btn', 'Copy share link');
-        copyBtn.setAttribute('aria-label', getWorkspaceShareText('workspace-share-copy-btn', 'Copy share link'));
-        copyBtn.addEventListener('click', function () {
-            if (!currentShareUrl) {
-                return;
-            }
-
-            copyBtn.disabled = true;
-            copyWorkspaceShareUrl(currentShareUrl)
-                .then(function () {
-                    showWorkspaceShareToast(
-                        getWorkspaceShareText('workspace-share-copy-success', 'Share link copied to clipboard!'),
-                        'success'
-                    );
-                })
-                .catch(function (err) {
-                    console.error('Error copying workspace share URL from modal:', err);
-                    showWorkspaceShareToast(
-                        getWorkspaceShareText('workspace-share-copy-failed', 'Failed to copy share link'),
-                        'danger'
-                    );
-                })
-                .finally(function () {
-                    copyBtn.disabled = false;
-                });
-        });
-
-        return copyBtn;
-    }
-
-    function renderShareUrlValue() {
-        var displayUrl = currentShareUrl || previewShareUrl;
-
-        if (!displayUrl) {
-            if (shareUrlRow && shareUrlRow.parentNode) {
-                shareUrlRow.parentNode.removeChild(shareUrlRow);
-            }
-            shareUrlRow = null;
-            shareUrlInlineGroup = null;
-            shareUrlValueWrap = null;
-            shareUrlCopyBtn = null;
-            return;
-        }
-
-        ensureShareUrlRow();
-        shareUrlValueWrap.innerHTML = '';
-
-        var urlNode = currentShareUrl ? document.createElement('a') : document.createElement('span');
-        urlNode.className = 'workspace-share-modal-url' + (currentShareUrl ? '' : ' is-preview');
-        urlNode.textContent = displayUrl;
-
-        if (currentShareUrl) {
-            urlNode.href = currentShareUrl;
-            urlNode.target = '_blank';
-            urlNode.rel = 'noopener noreferrer';
-        }
-
-        shareUrlValueWrap.appendChild(urlNode);
-
-        if (currentShareUrl) {
-            if (!shareUrlCopyBtn) {
-                shareUrlCopyBtn = createShareUrlCopyButton();
-                shareUrlInlineGroup.appendChild(shareUrlCopyBtn);
-            }
-        } else if (shareUrlCopyBtn && shareUrlCopyBtn.parentNode) {
-            shareUrlCopyBtn.parentNode.removeChild(shareUrlCopyBtn);
-            shareUrlCopyBtn = null;
-        }
-    }
-
-    renderShareUrlValue();
-
-    var passwordRow = document.createElement('div');
-    passwordRow.className = 'shared-edit-token-field-row';
-
-    var passwordValue = document.createElement('div');
-    passwordValue.className = 'shared-edit-token-field-value';
-
-    var passwordGroup = document.createElement('div');
-    passwordGroup.className = 'shared-edit-token-inline-group';
-
-    var passwordInput = document.createElement('input');
-    passwordInput.type = 'password';
-    passwordInput.value = currentPasswordValue;
-    passwordInput.placeholder = getWorkspaceShareText('workspace-share-password-label', 'Password (optional)');
-    passwordInput.className = 'modal-password-input';
-    passwordInput.autocomplete = 'new-password';
-
-    var togglePasswordBtn = document.createElement('button');
-    togglePasswordBtn.type = 'button';
-    togglePasswordBtn.className = 'btn btn-secondary shared-edit-token-password-toggle';
-    togglePasswordBtn.innerHTML = '<i class="lucide lucide-eye-off"></i>';
-
-    function updatePasswordToggleState() {
-        var isVisible = passwordInput.type === 'text';
-        var label = isVisible
-            ? getWorkspaceShareText('hide-password', 'Hide password')
-            : getWorkspaceShareText('show-password', 'Show password');
-        togglePasswordBtn.title = label;
-        togglePasswordBtn.setAttribute('aria-label', label);
-        togglePasswordBtn.innerHTML = isVisible
-            ? '<i class="lucide lucide-eye-off"></i>'
-            : '<i class="lucide lucide-eye"></i>';
-    }
-
-    togglePasswordBtn.addEventListener('click', function () {
-        passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
-        updatePasswordToggleState();
-        passwordInput.focus();
-        var valueLength = passwordInput.value.length;
-        if (typeof passwordInput.setSelectionRange === 'function') {
-            passwordInput.setSelectionRange(valueLength, valueLength);
-        }
-    });
-
-    passwordInput.addEventListener('input', function () {
-        passwordDirty = true;
-    });
-    updatePasswordToggleState();
-
-    passwordGroup.appendChild(passwordInput);
-    passwordGroup.appendChild(togglePasswordBtn);
-    passwordValue.appendChild(passwordGroup);
-    passwordRow.appendChild(passwordValue);
-    content.appendChild(passwordRow);
-
-    var loginWrap = document.createElement('div');
-    loginWrap.className = 'share-indexable-wrap';
-    loginWrap.style.marginTop = '14px';
-
-    var loginLabel = document.createElement('label');
-    loginLabel.className = 'share-indexable-label';
-    loginLabel.style.display = 'flex';
-    loginLabel.style.alignItems = 'center';
-    loginLabel.style.justifyContent = 'space-between';
-    loginLabel.style.width = '100%';
-
-    var loginText = document.createElement('span');
-    loginText.className = 'indexable-label-text';
-    loginText.textContent = getWorkspaceShareText('workspace-share-require-login', 'Require Poznote login');
-
-    var loginToggle = document.createElement('label');
-    loginToggle.className = 'toggle-switch';
-    var loginCheckbox = document.createElement('input');
-    loginCheckbox.type = 'checkbox';
-    loginCheckbox.checked = initialLoginRequired;
-    var loginSlider = document.createElement('span');
-    loginSlider.className = 'toggle-slider';
-    loginToggle.appendChild(loginCheckbox);
-    loginToggle.appendChild(loginSlider);
-    loginLabel.appendChild(loginText);
-    loginLabel.appendChild(loginToggle);
-    loginWrap.appendChild(loginLabel);
-    content.appendChild(loginWrap);
-
-    var specificUsersWrap = document.createElement('div');
-    specificUsersWrap.className = 'share-restrict-users-wrap';
-    specificUsersWrap.style.marginTop = '14px';
-    specificUsersWrap.style.display = loginCheckbox.checked ? 'block' : 'none';
-
-    var specificUsersLabel = document.createElement('label');
-    specificUsersLabel.className = 'share-indexable-label';
-    specificUsersLabel.style.display = 'flex';
-    specificUsersLabel.style.alignItems = 'center';
-    specificUsersLabel.style.justifyContent = 'space-between';
-    specificUsersLabel.style.width = '100%';
-
-    var specificUsersText = document.createElement('span');
-    specificUsersText.className = 'indexable-label-text';
-    specificUsersText.textContent = getWorkspaceShareText('workspace-share-restrict-users', 'Restrict to specific users');
-
-    var specificUsersToggle = document.createElement('label');
-    specificUsersToggle.className = 'toggle-switch';
-    var specificUsersCheckbox = document.createElement('input');
-    specificUsersCheckbox.type = 'checkbox';
-    specificUsersCheckbox.checked = selectedUserIds.length > 0;
-    var specificUsersSlider = document.createElement('span');
-    specificUsersSlider.className = 'toggle-slider';
-    specificUsersToggle.appendChild(specificUsersCheckbox);
-    specificUsersToggle.appendChild(specificUsersSlider);
-    specificUsersLabel.appendChild(specificUsersText);
-    specificUsersLabel.appendChild(specificUsersToggle);
-    specificUsersWrap.appendChild(specificUsersLabel);
-
     var userListContainer = document.createElement('div');
     userListContainer.className = 'share-user-list-container';
-    userListContainer.style.display = specificUsersCheckbox.checked ? 'block' : 'none';
-    specificUsersWrap.appendChild(userListContainer);
-    if (!hideRestrictUsers) {
-        content.appendChild(specificUsersWrap);
-    }
+    userListContainer.style.marginTop = '14px';
+    content.appendChild(userListContainer);
 
     function renderUserCheckboxes() {
         userListContainer.innerHTML = '';
@@ -442,7 +216,6 @@ function showWorkspaceShareOptionsModal(button) {
                         username: user.username || ''
                     };
                 });
-                usersLoaded = true;
                 renderUserCheckboxes();
             })
             .catch(function () {
@@ -454,23 +227,7 @@ function showWorkspaceShareOptionsModal(button) {
             });
     }
 
-    function updateUserRestrictionVisibility() {
-        if (hideRestrictUsers) return;
-        specificUsersWrap.style.display = loginCheckbox.checked ? 'block' : 'none';
-        userListContainer.style.display = loginCheckbox.checked && specificUsersCheckbox.checked ? 'block' : 'none';
-        if (loginCheckbox.checked && specificUsersCheckbox.checked && !usersLoaded) {
-            loadAvailableUsers();
-        }
-        if (!loginCheckbox.checked || !specificUsersCheckbox.checked) {
-            selectedUserIds = [];
-        }
-    }
-
-    loginCheckbox.addEventListener('change', updateUserRestrictionVisibility);
-    specificUsersCheckbox.addEventListener('change', updateUserRestrictionVisibility);
-    if (loginCheckbox.checked && specificUsersCheckbox.checked && !hideRestrictUsers) {
-        loadAvailableUsers();
-    }
+    loadAvailableUsers();
 
     var actions = document.createElement('div');
     actions.className = 'shared-edit-token-modal-actions';
@@ -491,40 +248,7 @@ function showWorkspaceShareOptionsModal(button) {
     var shareBtn = document.createElement('button');
     shareBtn.type = 'button';
     shareBtn.className = 'btn btn-primary';
-    shareBtn.textContent = isExistingShare
-        ? wsTr('common.save', {}, 'Save')
-        : getWorkspaceShareConfirmButtonText();
-
-    function syncModalShareState(shareState) {
-        isExistingShare = true;
-        currentShareUrl = (shareState && shareState.url) || currentShareUrl;
-        previewShareUrl = currentShareUrl || previewShareUrl;
-        renderShareUrlValue();
-
-        if (passwordDirty) {
-            currentPasswordValue = passwordInput.value.trim();
-        }
-
-        shareBtn.textContent = wsTr('common.save', {}, 'Save');
-
-        if (!unshareBtn) {
-            unshareBtn = document.createElement('button');
-            unshareBtn.type = 'button';
-            unshareBtn.className = 'btn btn-danger';
-            unshareBtn.textContent = getWorkspaceShareText('workspace-share-disable-btn', 'Unshare');
-            unshareBtn.addEventListener('click', function () {
-                unshareBtn.disabled = true;
-                shareBtn.disabled = true;
-                submitWorkspaceShareToggle(button, { action: 'disable_readonly_share' })
-                    .then(closeModal)
-                    .catch(function () {
-                        unshareBtn.disabled = false;
-                        shareBtn.disabled = false;
-                    });
-            });
-            actions.insertBefore(unshareBtn, shareBtn);
-        }
-    }
+    shareBtn.textContent = wsTr('common.save', {}, 'Save');
 
     function closeModal() {
         if (modal.parentNode) {
@@ -532,66 +256,32 @@ function showWorkspaceShareOptionsModal(button) {
         }
     }
 
+    function setBusy(busy) {
+        shareBtn.disabled = busy;
+        if (unshareBtn) unshareBtn.disabled = busy;
+    }
+
     cancelBtn.addEventListener('click', closeModal);
     if (unshareBtn) {
         unshareBtn.addEventListener('click', function () {
-            unshareBtn.disabled = true;
-            shareBtn.disabled = true;
-            submitWorkspaceShareToggle(button, { action: 'disable_readonly_share' })
-                .then(closeModal)
-                .catch(function () {
-                    unshareBtn.disabled = false;
-                    shareBtn.disabled = false;
-                });
+            setBusy(true);
+            submitWorkspaceShare(button, { action: 'unshare_workspace' })
+                .then(function (json) {
+                    showWorkspaceShareToast(json && json.message ? json.message : '', 'success');
+                    closeModal();
+                })
+                .catch(function () { setBusy(false); });
         });
     }
 
     shareBtn.addEventListener('click', function () {
-        var passwordValue = passwordDirty ? passwordInput.value.trim() : undefined;
-
-        shareBtn.disabled = true;
-        submitWorkspaceShareToggle(button, {
-            password: passwordValue,
-            login_required: loginCheckbox.checked,
-            allowed_users: loginCheckbox.checked && specificUsersCheckbox.checked ? selectedUserIds.slice() : []
-        }).then(function (json) {
-            if (passwordDirty) {
-                button.setAttribute('data-password-value', passwordValue || '');
-            }
-            syncModalShareState(json || {});
-            shareBtn.disabled = false;
-            if (unshareBtn) {
-                unshareBtn.disabled = false;
-            }
-            if (!currentShareUrl) {
+        setBusy(true);
+        submitWorkspaceShare(button, { action: 'share_workspace', allowed_users: selectedUserIds.slice() })
+            .then(function (json) {
+                showWorkspaceShareToast(json && json.message ? json.message : '', 'success');
                 closeModal();
-                return json;
-            }
-
-            return copyWorkspaceShareUrl(currentShareUrl)
-                .then(function () {
-                    showWorkspaceShareToast(
-                        getWorkspaceShareText('workspace-share-copy-success', 'Share link copied to clipboard!'),
-                        'success'
-                    );
-                    closeModal();
-                    return json;
-                })
-                .catch(function (err) {
-                    console.error('Error copying workspace share URL after save:', err);
-                    showWorkspaceShareToast(
-                        getWorkspaceShareText('workspace-share-copy-failed', 'Failed to copy share link'),
-                        'danger'
-                    );
-                    closeModal();
-                    return json;
-                });
-        }).catch(function () {
-            shareBtn.disabled = false;
-            if (unshareBtn) {
-                unshareBtn.disabled = false;
-            }
-        });
+            })
+            .catch(function () { setBusy(false); });
     });
 
     var pressedOnBackdrop = false;
@@ -618,9 +308,9 @@ function showWorkspaceShareOptionsModal(button) {
     shareBtn.focus();
 }
 
-function submitWorkspaceShareToggle(button, options) {
+function submitWorkspaceShare(button, options) {
     var wsName = button.getAttribute('data-ws');
-    var action = (options && options.action) || button.getAttribute('data-action');
+    var action = options && options.action;
     if (!wsName || !action || button.disabled) return Promise.resolve();
 
     button.disabled = true;
@@ -629,13 +319,6 @@ function submitWorkspaceShareToggle(button, options) {
         action: action,
         name: wsName
     });
-
-    if (options && Object.prototype.hasOwnProperty.call(options, 'password') && options.password !== undefined) {
-        params.set('password', options.password || '');
-    }
-    if (options && Object.prototype.hasOwnProperty.call(options, 'login_required')) {
-        params.set('login_required', options.login_required ? '1' : '0');
-    }
     if (options && Object.prototype.hasOwnProperty.call(options, 'allowed_users')) {
         params.set('allowed_users', JSON.stringify(options.allowed_users || []));
     }
@@ -653,24 +336,22 @@ function submitWorkspaceShareToggle(button, options) {
     .then(function (json) {
         button.disabled = false;
         if (json && json.success) {
-            var isShared = action === 'upsert_readonly_share';
-            updateWorkspaceShareToggleButton(button, isShared, json);
+            updateWorkspaceShareToggleButton(button, json);
             return json;
-        } else {
-            var message = wsTr(
-                'workspaces.alerts.error_prefix',
-                { error: (json && json.error) || wsTr('workspaces.alerts.unknown_error', {}, 'Unknown error') },
-                'Error: {{error}}'
-            );
-            showWorkspaceShareError(message);
-            throw new Error(message);
         }
+        var message = wsTr(
+            'workspaces.alerts.error_prefix',
+            { error: (json && json.error) || wsTr('workspaces.alerts.unknown_error', {}, 'Unknown error') },
+            'Error: {{error}}'
+        );
+        showWorkspaceShareError(message);
+        throw new Error(message);
     })
     .catch(function (err) {
         button.disabled = false;
-        console.error('Error toggling workspace share:', err);
+        console.error('Error updating workspace share:', err);
         if (!err || !err.message || err.message.indexOf('Error:') !== 0) {
-            showWorkspaceShareError(wsTr('workspaces.alerts.share_error', {}, 'Error updating sharing status'));
+            showWorkspaceShareError(wsTr('workspaces.share.errors.save_failed', {}, 'Failed to update workspace sharing'));
         }
         throw err;
     });
@@ -679,59 +360,8 @@ function submitWorkspaceShareToggle(button, options) {
 function handleWorkspaceShareToggleClick(e) {
     if (e.target && e.target.closest && e.target.closest('.btn-share-toggle')) {
         var btn = e.target.closest('.btn-share-toggle');
-        var action = btn.getAttribute('data-action');
-        if (!action || btn.disabled) return;
-
-        if (action !== 'upsert_readonly_share') {
-            submitWorkspaceShareToggle(btn).catch(function (e) {
-                console.debug('workspaces-share: handleWorkspaceShareToggleClick() failed:', e);
-            });
-            return;
-        }
-
+        if (btn.disabled) return;
         showWorkspaceShareOptionsModal(btn);
-    }
-}
-
-function handleWorkspaceShareToggleSubmit(event) {
-    var form = event.target;
-    if (!form || !form.classList || !form.classList.contains('workspace-share-toggle-form')) {
-        return;
-    }
-
-    if (form.getAttribute('data-confirmed-submit') === '1') {
-        form.removeAttribute('data-confirmed-submit');
-        return;
-    }
-
-    var actionInput = form.querySelector('input[name="action"]');
-    if (!actionInput || actionInput.value !== 'upsert_readonly_share') {
-        return;
-    }
-
-    event.preventDefault();
-
-    var workspaceInput = form.querySelector('input[name="name"]');
-    var workspaceName = workspaceInput ? workspaceInput.value : '';
-    var title = getWorkspaceShareConfirmTitle();
-    var message = getWorkspaceShareConfirmMessage(workspaceName);
-    var confirmText = getWorkspaceShareConfirmButtonText();
-
-    if (window.modalAlert && typeof window.modalAlert.confirm === 'function') {
-        window.modalAlert.confirm(message, title, {
-            alertType: 'info',
-            confirmText: confirmText
-        }).then(function (confirmed) {
-            if (!confirmed) return;
-            form.setAttribute('data-confirmed-submit', '1');
-            form.submit();
-        });
-        return;
-    }
-
-    if (window.confirm(message)) {
-        form.setAttribute('data-confirmed-submit', '1');
-        form.submit();
     }
 }
 
@@ -753,13 +383,15 @@ function handleWorkspaceInfoButtonClick(event) {
     document.getElementById('workspaceInfoTitle').textContent = button.getAttribute('data-ws') || '';
     document.getElementById('workspaceInfoNotes').textContent = button.getAttribute('data-notes-count') || '0';
     document.getElementById('workspaceInfoFolders').textContent = button.getAttribute('data-folders-count') || '0';
-    document.getElementById('workspaceInfoTags').textContent = tags.length ? tags.join(', ') : 'None';
+    document.getElementById('workspaceInfoTags').textContent = tags.length ? tags.join(', ') : getWorkspaceShareText('none', 'None');
 
-    var isShared = button.getAttribute('data-shared') === '1';
-    document.getElementById('workspaceInfoShared').textContent = isShared ? 'Yes' : 'No';
-    document.getElementById('workspaceInfoSharedWith').textContent = !isShared
-        ? 'Not shared'
-        : (sharedWith.length ? sharedWith.join(', ') : 'Anyone with the link');
+    var isShared = button.getAttribute('data-shared') === '1' && sharedWith.length > 0;
+    document.getElementById('workspaceInfoShared').textContent = isShared
+        ? getWorkspaceShareText('yes', 'Yes')
+        : getWorkspaceShareText('no', 'No');
+    document.getElementById('workspaceInfoSharedWith').textContent = isShared
+        ? sharedWith.join(', ')
+        : getWorkspaceShareText('workspace-info-not-shared', 'Not shared');
 
     modal.style.display = 'flex';
 }
@@ -774,217 +406,4 @@ function handleWorkspaceInfoCloseButtonClick(event) {
     if (!button) return;
     event.preventDefault();
     closeWorkspaceInfoModal();
-}
-
-function setWorkspaceShareVisibility(element, visible) {
-    if (!element) return;
-    if (visible) {
-        element.classList.remove('initially-hidden');
-    } else {
-        element.classList.add('initially-hidden');
-    }
-}
-
-function updateWorkspaceSharePanel(panel, shareState) {
-    if (!panel) return;
-
-    var isPublic = !!shareState.public;
-    var badge = panel.querySelector('.workspace-share-badge');
-    var saveButton = panel.querySelector('.btn-save-readonly-share');
-    var openLink = panel.querySelector('.btn-open-readonly-share');
-    var copyButton = panel.querySelector('.btn-copy-readonly-share');
-    var disableButton = panel.querySelector('.btn-disable-readonly-share');
-    var publicLink = panel.querySelector('.workspace-share-link');
-
-    panel.setAttribute('data-public-active', isPublic ? '1' : '0');
-
-    if (badge) {
-        badge.textContent = isPublic
-            ? getWorkspaceShareText('workspace-share-enabled', 'Public read-only enabled')
-            : getWorkspaceShareText('workspace-share-disabled', 'Not shared publicly');
-        badge.classList.toggle('is-enabled', isPublic);
-        badge.classList.toggle('is-disabled', !isPublic);
-    }
-
-    setWorkspaceShareVisibility(saveButton, !isPublic);
-
-    if (openLink) {
-        if (isPublic && shareState.url) {
-            openLink.setAttribute('href', shareState.url);
-        } else {
-            openLink.setAttribute('href', '#');
-        }
-        setWorkspaceShareVisibility(openLink, isPublic && !!shareState.url);
-    }
-
-    if (copyButton) {
-        copyButton.setAttribute('data-url', isPublic ? (shareState.url || '') : '');
-        setWorkspaceShareVisibility(copyButton, isPublic && !!shareState.url);
-    }
-
-    if (disableButton) {
-        setWorkspaceShareVisibility(disableButton, isPublic);
-    }
-
-    if (publicLink) {
-        publicLink.textContent = isPublic ? (shareState.url || '') : '';
-        publicLink.setAttribute('href', isPublic ? (shareState.url || '#') : '#');
-        setWorkspaceShareVisibility(publicLink, isPublic && !!shareState.url);
-    }
-}
-
-function copyWorkspaceShareUrl(url) {
-    if (!url) {
-        return Promise.reject(new Error('Missing URL'));
-    }
-
-    var clipboardUrl = url;
-    try {
-        var parsedUrl = new URL(url, window.location.href);
-        parsedUrl.searchParams.delete('public_workspace');
-        clipboardUrl = parsedUrl.toString();
-    } catch (e) {
-        clipboardUrl = url.replace(/([?&])public_workspace=1(&|$)/, function (match, prefix, suffix) {
-            return prefix === '?' && suffix ? '?' : (prefix === '?' ? '' : prefix);
-        });
-    }
-
-    function fallbackCopy() {
-        return new Promise(function (resolve, reject) {
-            var input = document.createElement('input');
-            input.type = 'text';
-            input.value = clipboardUrl;
-            document.body.appendChild(input);
-            input.select();
-            input.setSelectionRange(0, input.value.length);
-
-            try {
-                var copied = document.execCommand('copy');
-                document.body.removeChild(input);
-                if (copied) {
-                    resolve();
-                } else {
-                    reject(new Error('Copy command failed'));
-                }
-            } catch (err) {
-                document.body.removeChild(input);
-                reject(err);
-            }
-        });
-    }
-
-    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
-        return navigator.clipboard.writeText(clipboardUrl).catch(function () {
-            return fallbackCopy();
-        });
-    }
-
-    return fallbackCopy();
-}
-
-function handleWorkspaceReadonlyShareSave(e) {
-    var button = e.target.closest ? e.target.closest('.btn-save-readonly-share') : null;
-    if (!button) return false;
-
-    var panel = button.closest('.workspace-share-panel');
-    if (!panel) return true;
-
-    var workspaceName = button.getAttribute('data-ws') || panel.getAttribute('data-ws') || '';
-
-    button.disabled = true;
-
-    var params = new URLSearchParams({
-        action: 'upsert_readonly_share',
-        name: workspaceName
-    });
-
-    fetch('workspaces.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
-        },
-        body: params.toString()
-    })
-        .then(function (resp) { return resp.json(); })
-        .then(function (json) {
-            button.disabled = false;
-            if (json && json.success) {
-                updateWorkspaceSharePanel(panel, {
-                    public: true,
-                    url: json.url || ''
-                });
-                showAjaxAlert(json.message || getWorkspaceShareText('workspace-share-enabled', 'Public read-only enabled'), 'success');
-            } else {
-                showAjaxAlert((json && json.error) || wsTr('workspaces.alerts.unknown_error', {}, 'Unknown error'), 'danger');
-            }
-        })
-        .catch(function (err) {
-            button.disabled = false;
-            console.error('Error saving workspace share:', err);
-            showAjaxAlert(wsTr('workspaces.share.errors.save_failed', {}, 'Failed to save read-only workspace link'), 'danger');
-        });
-
-    return true;
-}
-
-function handleWorkspaceReadonlyShareDisable(e) {
-    var button = e.target.closest ? e.target.closest('.btn-disable-readonly-share') : null;
-    if (!button) return false;
-
-    var panel = button.closest('.workspace-share-panel');
-    if (!panel) return true;
-
-    var workspaceName = button.getAttribute('data-ws') || panel.getAttribute('data-ws') || '';
-    button.disabled = true;
-
-    var params = new URLSearchParams({
-        action: 'disable_readonly_share',
-        name: workspaceName
-    });
-
-    fetch('workspaces.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
-        },
-        body: params.toString()
-    })
-        .then(function (resp) { return resp.json(); })
-        .then(function (json) {
-            button.disabled = false;
-            if (json && json.success) {
-                updateWorkspaceSharePanel(panel, { public: false, token: '', url: '' });
-                showAjaxAlert(json.message || getWorkspaceShareText('workspace-share-disabled', 'Not shared publicly'), 'success');
-            } else {
-                showAjaxAlert((json && json.error) || wsTr('workspaces.alerts.unknown_error', {}, 'Unknown error'), 'danger');
-            }
-        })
-        .catch(function (err) {
-            button.disabled = false;
-            console.error('Error disabling workspace share:', err);
-            showAjaxAlert(wsTr('workspaces.share.errors.disable_failed', {}, 'Failed to disable read-only workspace link'), 'danger');
-        });
-
-    return true;
-}
-
-function handleWorkspaceReadonlyShareCopy(e) {
-    var button = e.target.closest ? e.target.closest('.btn-copy-readonly-share') : null;
-    if (!button) return false;
-
-    var url = button.getAttribute('data-url') || '';
-    copyWorkspaceShareUrl(url)
-        .then(function () {
-            showWorkspaceShareToast(getWorkspaceShareText('workspace-share-copy-success', 'Share link copied to clipboard!'), 'success');
-        })
-        .catch(function (err) {
-            console.error('Error copying workspace share URL:', err);
-            showWorkspaceShareToast(getWorkspaceShareText('workspace-share-copy-failed', 'Failed to copy share link'), 'danger');
-        });
-
-    return true;
 }

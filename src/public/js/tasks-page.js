@@ -12,6 +12,8 @@
             txtEmptyFiltered: body.getAttribute('data-txt-empty-filtered') || 'No tasks match this filter.',
             txtCollapse: body.getAttribute('data-txt-collapse') || 'Collapse',
             txtExpand: body.getAttribute('data-txt-expand') || 'Expand',
+            txtCollapseAll: body.getAttribute('data-txt-collapse-all') || 'Collapse all',
+            txtExpandAll: body.getAttribute('data-txt-expand-all') || 'Expand all',
             txtDue: body.getAttribute('data-txt-due') || 'Due date',
             txtDueRemove: body.getAttribute('data-txt-due-remove') || 'Remove due date',
             txtDueRemoveTime: body.getAttribute('data-txt-due-remove-time') || 'Remove time',
@@ -378,6 +380,35 @@
         if (container) container.classList.toggle('view-calendar', viewMode === 'calendar');
     }
 
+    // Collapse/expand is a single toggle, like the shared page: it expands
+    // everything as soon as one visible group is collapsed, and collapses
+    // everything otherwise.
+    function shouldExpandAllGroups() {
+        return getFilteredNotes().some(function (group) {
+            return collapsedNoteIds.has(String(group.note.id));
+        });
+    }
+
+    function syncToggleAllButton() {
+        var btn = document.getElementById('toggleAllNotesBtn');
+        if (!btn) return;
+
+        var shouldExpand = shouldExpandAllGroups();
+        var label = shouldExpand ? config.txtExpandAll : config.txtCollapseAll;
+        var labelEl = document.getElementById('toggleAllNotesLabel');
+        var icon = btn.querySelector('.lucide');
+
+        btn.title = label;
+        btn.setAttribute('aria-expanded', shouldExpand ? 'false' : 'true');
+        if (labelEl) {
+            labelEl.textContent = label;
+        }
+        if (icon) {
+            icon.classList.toggle('lucide-chevron-down', shouldExpand);
+            icon.classList.toggle('lucide-chevron-up', !shouldExpand);
+        }
+    }
+
     function render() {
         updateProgress();
         syncViewUi();
@@ -391,6 +422,8 @@
         } else {
             renderListView(container);
         }
+
+        syncToggleAllButton();
 
         // Resolve [[Note Title]] references into clickable links
         if (typeof window.processNoteReferences === 'function') {
@@ -434,6 +467,7 @@
                 toggle.title = nowCollapsed ? config.txtExpand : config.txtCollapse;
                 toggle.setAttribute('aria-expanded', String(!nowCollapsed));
                 saveCollapsedNoteIds();
+                syncToggleAllButton();
             });
             header.appendChild(toggle);
 
@@ -1219,14 +1253,11 @@
             render();
         }
 
-        var collapseAllBtn = document.getElementById('collapseAllBtn');
-        if (collapseAllBtn) {
-            collapseAllBtn.addEventListener('click', function () { setAllCollapsed(true); });
-        }
-
-        var expandAllBtn = document.getElementById('expandAllBtn');
-        if (expandAllBtn) {
-            expandAllBtn.addEventListener('click', function () { setAllCollapsed(false); });
+        var toggleAllNotesBtn = document.getElementById('toggleAllNotesBtn');
+        if (toggleAllNotesBtn) {
+            toggleAllNotesBtn.addEventListener('click', function () {
+                setAllCollapsed(!shouldExpandAllGroups());
+            });
         }
 
         var viewToggle = document.getElementById('tasksViewToggle');

@@ -94,7 +94,8 @@
       "today": "Heute",
       "yesterday": "Gestern"
     },
-    "network_error": "Netzwerkfehler"
+    "network_error": "Netzwerkfehler",
+    "none": "Keine"
   },
   "snapshot": {
     "menu_item": "Schnappschüsse",
@@ -747,36 +748,27 @@
       "actions": {
         "enable": "Teilen",
         "edit": "Freigabe bearbeiten",
-        "copy_link": "Link kopieren",
         "disable": "Freigabe aufheben"
       },
       "confirm": {
-        "title": "Arbeitsbereich schreibgeschützt teilen",
-        "message": "Jede Person mit der URL des Arbeitsbereichs \"{{workspace}}\" hat Zugriff auf alle Notizen und Ordner in diesem Arbeitsbereich im schreibgeschützten Modus.",
-        "confirm_button": "Arbeitsbereich teilen"
+        "title": "Arbeitsbereich teilen",
+        "message": "Wählen Sie die Benutzer, die den Arbeitsbereich „{{workspace}}“ öffnen dürfen. Sie finden ihn in ihrem Arbeitsbereichsmenü und können seine Notizen und Ordner bearbeiten."
       },
       "messages": {
-        "enabled": "Schreibgeschützter Arbeitsbereichslink aktiviert",
-        "disabled": "Schreibgeschützter Arbeitsbereichslink deaktiviert",
-        "url_copied": "Freigabelink in die Zwischenablage kopiert!"
+        "disabled": "Der Arbeitsbereich wird nicht mehr geteilt",
+        "url_copied": "Freigabelink in die Zwischenablage kopiert!",
+        "saved": "Freigabe des Arbeitsbereichs aktualisiert"
       },
       "errors": {
-        "url_in_use": "Ein öffentlicher Arbeitsbereich mit diesem Namen existiert bereits in dieser Poznote-Instanz",
-        "copy_failed": "Freigabelink konnte nicht kopiert werden",
-        "save_failed": "Schreibgeschützter Arbeitsbereichslink konnte nicht gespeichert werden",
-        "disable_failed": "Schreibgeschützter Arbeitsbereichslink konnte nicht deaktiviert werden"
+        "save_failed": "Die Freigabe des Arbeitsbereichs konnte nicht aktualisiert werden",
+        "not_allowed": "Das Teilen mit anderen Benutzern ist auf dieser Instanz nicht verfügbar"
       },
-      "status": {
-        "enabled": "Öffentlicher schreibgeschützter Zugriff aktiviert",
-        "disabled": "Nicht öffentlich geteilt"
-      },
-      "help": "Jede Person mit dieser URL öffnet Poznote direkt in diesem Arbeitsbereich im schreibgeschützten Modus.",
-      "url_label": "Öffentliche URL",
       "options": {
-        "require_login": "Poznote-Anmeldung erforderlich",
-        "restrict_users": "Auf bestimmte Benutzer beschränken",
         "users_loading": "Benutzer werden geladen...",
         "no_users_found": "Keine anderen Benutzer gefunden"
+      },
+      "status": {
+        "not_shared": "Nicht geteilt"
       }
     },
     "tags": {
@@ -1480,43 +1472,7 @@
       "delete_title": "Arbeitsbereich löschen bestätigen",
       "delete_description": "Alle Notizen und Ordner werden dauerhaft gelöscht und können nicht wiederhergestellt werden.",
       "delete_placeholder": "Arbeitsbereichsnamen eingeben, um zu bestätigen",
-      "delete_button": "Arbeitsbereich löschen",
-      "share": {
-        "actions": {
-          "enable": "Teilen",
-          "edit": "Freigabe bearbeiten",
-          "copy_link": "Link kopieren",
-          "disable": "Freigabe beenden"
-        },
-        "confirm": {
-          "title": "Arbeitsbereich schreibgeschützt teilen",
-          "message": "Jeder mit der URL des Arbeitsbereichs „{{workspace}}“ erhält schreibgeschützten Zugriff auf alle Notizen und Ordner dieses Arbeitsbereichs.",
-          "confirm_button": "Arbeitsbereich teilen"
-        },
-        "messages": {
-          "enabled": "Link zum schreibgeschützten Arbeitsbereich aktiviert",
-          "disabled": "Link zum schreibgeschützten Arbeitsbereich deaktiviert",
-          "url_copied": "Freigabelink in die Zwischenablage kopiert!"
-        },
-        "errors": {
-          "url_in_use": "Auf dieser Poznote-Instanz gibt es bereits einen öffentlichen Arbeitsbereich mit diesem Namen",
-          "copy_failed": "Freigabelink konnte nicht kopiert werden",
-          "save_failed": "Link zum schreibgeschützten Arbeitsbereich konnte nicht gespeichert werden",
-          "disable_failed": "Link zum schreibgeschützten Arbeitsbereich konnte nicht deaktiviert werden"
-        },
-        "status": {
-          "enabled": "Öffentlich schreibgeschützt aktiviert",
-          "disabled": "Nicht öffentlich geteilt"
-        },
-        "help": "Jeder mit dieser URL öffnet Poznote direkt schreibgeschützt in diesem Arbeitsbereich.",
-        "url_label": "Öffentliche URL",
-        "options": {
-          "require_login": "Poznote-Anmeldung verlangen",
-          "restrict_users": "Auf bestimmte Benutzer beschränken",
-          "users_loading": "Benutzer werden geladen...",
-          "no_users_found": "Keine anderen Benutzer gefunden"
-        }
-      }
+      "delete_button": "Arbeitsbereich löschen"
     },
     "user_settings_info": {
       "title": "Kontoeinstellungen",
@@ -2926,8 +2882,7 @@
       "error_incorrect": "Falsches Passwort. Bitte versuchen Sie es erneut.",
       "additional_password_required": "Diese Notiz erfordert ein zusätzliches Passwort. Bitte geben Sie das nächste Passwort ein, um fortzufahren.",
       "placeholder": "Passwort eingeben",
-      "unlock": "Entsperren",
-      "workspace_heading": "Passwortgeschützter Arbeitsbereich"
+      "unlock": "Entsperren"
     },
     "errors": {
       "token_missing": "Link fehlt",
@@ -3841,15 +3796,14 @@
       "untitled_note": "Notiz #{{id}}",
       "linked_deleted": "+{{count}} verknüpfte Notizen",
       "share_updated": "Einstellungen aktualisiert",
-      "password_protected": "passwortgeschützt",
-      "login_required": "Anmeldung erforderlich",
       "allowed_users": "auf {{count}} Benutzer beschränkt",
       "accounts": "Konten: {{accounts}}",
       "empty_value": "leer",
       "s3_objects_deleted": "{{count}} S3-Objekte gelöscht",
       "s3_cleanup_failed": "S3-Bereinigung fehlgeschlagen",
       "expires_at": "läuft ab am {{date}}",
-      "recovery_codes_remaining": "{{count}} übrig"
+      "recovery_codes_remaining": "{{count}} übrig",
+      "shared_with": "geteilt mit {{users}}"
     },
     "destinations": {
       "download": "Download",
@@ -3927,9 +3881,7 @@
     },
     "logout": {
       "confirm": "Möchten Sie sich wirklich abmelden?",
-      "signed_in_as": "Sie sind angemeldet als {{username}}",
       "in_progress": "Abmeldung...",
-      "switch_intro": "Wechseln Sie zu einem anderen Konto oder melden Sie sich vollständig ab.",
       "switch_in_progress": "Konto wird gewechselt..."
     }
   },
