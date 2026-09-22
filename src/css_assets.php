@@ -320,15 +320,6 @@ function poznoteCssManifest(): array
             'css/graph.css',
             '@icon-sidebar',
         ],
-        'info' => [
-            'css/lucide.css',
-            '@components',
-            'css/info.css',
-            'css/home/buttons.css',
-            'css/modal-alerts.css',
-            '@theme',
-            '@icon-sidebar',
-        ],
         'list_folders' => [
             'css/lucide.css',
             '@components',

@@ -29,29 +29,10 @@
     filter: none;
 }
 
-/* The markdown split-view button keeps the default icon colour, and so does
-   the view-mode toggle while it is off: nothing to declare for either. */
+/* The view-mode toggle keeps the default icon colour while it is off:
+   nothing to declare. */
 
-.toolbar-btn.markdown-split-btn:hover i,
-.toolbar-btn.markdown-split-btn:hover [class*="lucide-"],
 .toolbar-btn.markdown-view-mode-btn:hover i,
 .toolbar-btn.markdown-view-mode-btn:hover [class*="lucide-"] {
     transform: scale(1.18);
-}
-
-/* Add slash through icon when in split mode (active state) */
-.toolbar-btn.markdown-split-btn.active {
-    position: relative;
-}
-
-.toolbar-btn.markdown-split-btn.active::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 24px;
-    height: 2px;
-    background-color: #666;
-    transform: translate(-50%, -50%) rotate(-45deg);
-    pointer-events: none;
 }

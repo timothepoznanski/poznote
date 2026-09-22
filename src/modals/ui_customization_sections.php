@@ -152,10 +152,7 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-clear-completed" checked><span><?php echo t_h('tasklist.clear_completed', [], 'Clear completed tasks'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-uncheck-all" checked><span><?php echo t_h('tasklist.uncheck_all', [], 'Uncheck all tasks'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-snapshot" checked><span><?php echo t_h('snapshot.menu_item', [], 'Snapshots'); ?></span></label>
-    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-split-view" checked><span><?php echo t_h('editor.toolbar.split_view', [], 'Toggle split view'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-trash" checked><span><?php echo t_h('common.delete', [], 'Delete'); ?></span></label>
-    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-info" checked><span><?php echo t_h('common.information', [], 'Information'); ?></span></label>
-    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-note-width" checked><span><?php echo t_h('index.toolbar.note_width', [], 'Note width'); ?></span></label>
 </div>
 </div>
 
@@ -239,6 +236,10 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebarExpandFoldersBtn" checked><span><?php echo t_h('sidebar.expand_all_folders', [], 'Expand all folders'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebarNotificationsBtn" checked><span><?php echo t_h('reminder.notifications', [], 'Notifications'); ?></span></label>
     <label class="ui-custom-item" data-ui-pages="notes dashboard"><input type="checkbox" data-ui-key="card:edgeAiChatBtn" checked><span><?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?></span></label>
+    <label class="ui-custom-item" data-ui-pages="notes dashboard settings"><input type="checkbox" data-ui-key="card:edgeFocusModeBtn" checked><span><?php echo t_h('focus_mode.button', [], 'Focus mode'); ?></span></label>
+    <label class="ui-custom-item" data-ui-pages="notes"><input type="checkbox" data-ui-key="card:edgeSplitViewBtn" checked><span><?php echo t_h('page_menu.split_view', [], 'Split view'); ?></span></label>
+    <label class="ui-custom-item" data-ui-pages="notes"><input type="checkbox" data-ui-key="card:edgeMenuNoteWidth" checked><span><?php echo t_h('index.toolbar.note_width', [], 'Note width'); ?></span></label>
+    <label class="ui-custom-item" data-ui-pages="notes"><input type="checkbox" data-ui-key="card:edgeMenuNoteInfo" checked><span><?php echo t_h('common.information', [], 'Information'); ?></span></label>
     <label class="ui-custom-item" data-ui-pages="notes dashboard settings"><input type="checkbox" data-ui-key="card:edgeMenuShortcuts" checked><span><?php echo t_h('keyboard_shortcuts.menu_item', [], 'Keyboard shortcuts'); ?></span></label>
     <label class="ui-custom-item" data-ui-pages="notes dashboard settings"><input type="checkbox" data-ui-key="card:edgeMenuMarkdownSyntax" checked><span><?php echo t_h('markdown_syntax.menu_item', [], 'Markdown syntax'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:search-bar-container" checked><span><?php echo t_h('modals.ui_customization.index_search_bar', [], 'Search bar'); ?></span></label>

@@ -1220,7 +1220,9 @@
       "user_id": "Utilisateur #{{id}}",
       "deleted": "Utilisateur #{{id}}"
     },
-    "errors": []
+    "errors": {
+      "load_failed": "Impossible de charger les informations de la note."
+    }
   },
   "modals": {
     "paste_markdown": {
@@ -1362,7 +1364,7 @@
       "theme_toggle": "Bouton de thème",
       "panel_title": "Personnaliser cette page",
       "panel_button": "Personnaliser l'interface",
-      "panel_hint": "Seuls les éléments de cette page sont listés. Les changements s'appliquent immédiatement et sont enregistrés automatiquement.",
+      "panel_hint": "Seuls les éléments de cette page sont listés. Cachez ou affichez n'importe quel élément en cochant ou décochant ci-dessous.",
       "panel_all_options": "Toutes les options",
       "panel_saving": "Enregistrement…",
       "panel_saved": "Enregistré",
@@ -2213,6 +2215,8 @@
       "note_width": "Largeur de la note",
       "note_width_current": "Largeur de la note : {{width}}",
       "note_width_default": "Par défaut ({{width}})",
+      "split_width": "Largeur de la vue divisée",
+      "split_resize": "Faites glisser pour redimensionner les volets",
       "convert_to_markdown": "Convertir en Markdown",
       "share_note": "Partager la note"
     },
@@ -4987,7 +4991,8 @@
     "default": "Par défaut"
   },
   "page_menu": {
-    "button": "Plus d'options"
+    "button": "Plus d'options",
+    "split_view": "Vue divisée"
   },
   "keyboard_shortcuts": {
     "menu_item": "Raccourcis clavier",
@@ -5038,7 +5043,8 @@
     },
     "tree_select_toggle": "Ajouter une note ou un dossier à la sélection, ou l'en retirer",
     "tree_select_range": "Sélectionner toutes les lignes jusqu'à celle-ci",
-    "tree_delete": "Placer les notes et dossiers sélectionnés dans la corbeille"
+    "tree_delete": "Placer les notes et dossiers sélectionnés dans la corbeille",
+    "focus_mode": "Activer ou désactiver le mode focus"
   },
   "icon_context_menu": {
     "hide": "Masquer le bouton"
@@ -5072,5 +5078,8 @@
     "indent": "Augmenter le retrait",
     "outdent": "Diminuer le retrait",
     "hide_keyboard": "Masquer le clavier"
+  },
+  "focus_mode": {
+    "button": "Mode focus"
   }
 }

@@ -909,10 +909,24 @@ html[data-theme='dark'] .katex {
     overflow: clip !important;
 }
 
-/* Split mode splits the note column between the editor and the preview, so the
-   per-note width toggle has nothing left to widen: hide it while split is on. */
-.innernote:has(.noteentry.markdown-split-mode) .btn-note-width {
-    display: none !important;
+/* A gutter on the right for the floating buttons (discussion 1482).
+   The stack and the note's scroll arrows are pinned 10px from the right of the
+   note column (--pz-docked-*, css/notes/noteentry.css). Every other view
+   leaves them the note's own side margins to float over, but the split view
+   fills the column edge to edge, so they landed on the right pane's border.
+   Those side margins are percentages of the column (1% + 2%,
+   css/notes/noteentry.css), which is both too little to clear the buttons on a
+   laptop and far too much on a wide screen, so the split view replaces them on
+   that side with the room the strip actually needs: 10px for its own offset,
+   one button, and 8px of air. */
+@media (min-width: 801px) {
+    .notecard:has(.noteentry.markdown-split-mode) {
+        margin-right: 0;
+    }
+
+    .innernote:has(.noteentry.markdown-split-mode) {
+        padding-right: calc(var(--pz-edge-btn-size, 32px) + 16px);
+    }
 }
 
 /* Tab bar now lives outside #right_col — split-mode header needs no override */
@@ -1044,6 +1058,116 @@ body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
 html[data-theme='dark'] body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor-container,
 html[data-theme='dark'] body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
     border-color: var(--pz-border);
+}
+
+/* Resizable dual pane (discussion 1483).
+ *
+ * --markdown-split-left is the seam, as a percentage of the note column: the
+ * left pane takes it as its flex basis and the right one keeps the rest, so
+ * one value moves both panes at once. js/markdown-split-resize.js writes it
+ * while the handle is dragged and remembers it for the next note.
+ *
+ * The handle follows the pattern of the left column's own splitter
+ * (.resize-handle, css/layout.css): a zero-width flex item whose border draws
+ * the seam the panes used to draw themselves, with a ::before that widens the
+ * drag target either side and a ::after that shows the grip. Both are painted
+ * over the layout rather than in it, so hovering the handle moves no pane.
+ */
+.noteentry.markdown-split-mode {
+    --markdown-split-left: 50%;
+    --markdown-split-gutter: 0px;
+}
+
+.noteentry.markdown-split-mode > .markdown-editor-container,
+.noteentry.markdown-split-mode > .markdown-editor {
+    flex: 0 0 calc(var(--markdown-split-left, 50%) - var(--markdown-split-gutter, 0px)) !important;
+    width: auto !important;
+}
+
+.noteentry.markdown-split-mode > .markdown-preview {
+    flex: 1 1 0% !important;
+    width: auto !important;
+}
+
+/* The handle owns the seam now, so the panes stop drawing one: two adjacent
+   1px borders read as a 2px divider. */
+body:not(.markdown-split-card-view) .noteentry.markdown-split-mode > .markdown-editor-container,
+body:not(.markdown-split-card-view) .noteentry.markdown-split-mode .markdown-editor {
+    border-right: 0 none !important;
+}
+
+.markdown-split-resizer {
+    display: none;
+}
+
+.noteentry.markdown-split-mode > .markdown-split-resizer {
+    display: block;
+    position: relative;
+    flex: 0 0 auto;
+    width: 0;
+    align-self: stretch;
+    border-right: 1px solid var(--pz-border);
+    cursor: col-resize;
+    touch-action: none;
+}
+
+/* Drag target, wider than the line it moves */
+.noteentry.markdown-split-mode > .markdown-split-resizer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -6px;
+    right: -6px;
+    z-index: 3;
+}
+
+/* A short grip on the seam, so the handle is there to be seen before it is
+   there to be found: a muted pill a couple of lines tall, which takes the
+   accent and grows a little once the pointer is on it. */
+.noteentry.markdown-split-mode > .markdown-split-resizer::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -2px;
+    width: 5px;
+    height: 38px;
+    transform: translateY(-50%);
+    border-radius: var(--pz-radius-pill);
+    background: var(--pz-border-strong);
+    transition: background-color 0.15s ease, height 0.15s ease;
+}
+
+.noteentry.markdown-split-mode > .markdown-split-resizer:hover::after,
+.noteentry.markdown-split-mode > .markdown-split-resizer:focus-visible::after,
+.noteentry.markdown-split-mode > .markdown-split-resizer.is-dragging::after {
+    height: 56px;
+    background: var(--pz-accent-text);
+}
+
+.noteentry.markdown-split-mode > .markdown-split-resizer:focus-visible {
+    outline: none;
+}
+
+/* The pointer keeps the resize cursor and selects no text while it drags,
+   wherever it wanders (js/markdown-split-resize.js) */
+body.markdown-split-resizing {
+    cursor: col-resize;
+    user-select: none;
+}
+
+/* Framed panes draw their own borders, so the seam is the gap between them:
+   the handle sits in the middle of it with nothing but its grip showing, and
+   the left pane gives up half the gap so the percentage stays the
+   percentage. */
+body.markdown-split-card-view .noteentry.markdown-split-mode {
+    --markdown-split-gutter: 8px;
+    gap: 0 !important;
+}
+
+body.markdown-split-card-view .noteentry.markdown-split-mode > .markdown-split-resizer {
+    margin: 0 8px;
+    border-right-color: transparent;
 }
 
 /* Scrollbar styling for split view columns */

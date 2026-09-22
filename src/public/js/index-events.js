@@ -756,15 +756,14 @@
                 }
                 blurAfterPointerActivation(target, e);
                 break;
+            case 'toggle-split-view':
+                if (noteId && typeof window.toggleMarkdownSplitView === 'function') {
+                    window.toggleMarkdownSplitView(noteId);
+                }
+                break;
             case 'show-note-info':
-                if (noteId && typeof showNoteInfo === 'function') {
-                    const created = target.dataset.created;
-                    const updated = target.dataset.updated;
-                    const folder = target.dataset.folder;
-                    const favorite = target.dataset.favorite;
-                    const tags = target.dataset.tags;
-                    const attachmentsCount = target.dataset.attachmentsCount;
-                    showNoteInfo(noteId, created, updated, folder, favorite, tags, attachmentsCount);
+                if (noteId && typeof window.showNoteInfoModal === 'function') {
+                    window.showNoteInfoModal(noteId);
                 }
                 break;
             case 'navigate-tags':
@@ -774,15 +773,6 @@
                 if (typeof downloadAttachment === 'function') {
                     const attachmentId = target.dataset.attachmentId;
                     downloadAttachment(attachmentId, noteId);
-                }
-                break;
-            case 'open-note-info':
-                if (noteId) {
-                    var url = 'info.php?note_id=' + encodeURIComponent(noteId);
-                    if (window.selectedWorkspace) {
-                        url += '&workspace=' + encodeURIComponent(window.selectedWorkspace);
-                    }
-                    window.location.href = url;
                 }
                 break;
             case 'open-kanban-view': {

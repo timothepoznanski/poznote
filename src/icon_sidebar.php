@@ -442,11 +442,22 @@ window.PoznoteIconSidebarColorsConfig = <?php echo json_encode([
 <script src="<?php echo $iconSidebarAsset('js/icon-sidebar-colors.js'); ?>" defer></script>
 <script src="<?php echo $iconSidebarAsset('js/page-title-workspace-menu.js'); ?>" defer></script>
 <script>
-// Apply the collapsed state before the rail paints; js/icon-sidebar-toggle.js
-// owns it afterwards.
+// Apply the collapsed state, and focus mode (discussion 1482), before the
+// rail paints; js/icon-sidebar-toggle.js owns both afterwards. Focus mode goes
+// on <html> so the notes column and the note's title rows, which come later in
+// the page, never paint at all (css/focus-mode.css). Its first step clears the
+// top of the note, the second one also hides the rail and the notes column;
+// 'true' is what the one-step version stored.
 try {
     if (localStorage.getItem('iconSidebarCollapsed') === 'true') {
         document.body.classList.add('icon-sidebar-collapsed');
+    }
+    var pzFocus = localStorage.getItem('focusMode');
+    if (pzFocus === '1' || pzFocus === '2' || pzFocus === 'true') {
+        document.documentElement.classList.add('focus-mode');
+    }
+    if (pzFocus === '2' || pzFocus === 'true') {
+        document.documentElement.classList.add('focus-mode-full');
     }
 } catch (e) {
     console.debug('icon_sidebar: failed:', e);

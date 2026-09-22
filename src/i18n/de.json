@@ -1216,7 +1216,9 @@
     "empty": {
       "no_tags": "Keine Tags"
     },
-    "errors": [],
+    "errors": {
+      "load_failed": "Die Notizinformationen konnten nicht geladen werden."
+    },
     "users": {
       "user_id": "Benutzer #{{id}}",
       "deleted": "Benutzer #{{id}}"
@@ -1362,7 +1364,7 @@
       "theme_toggle": "Design-Umschalter",
       "panel_title": "Diese Seite anpassen",
       "panel_button": "Oberfläche anpassen",
-      "panel_hint": "Nur die Elemente dieser Seite werden aufgeführt. Änderungen gelten sofort und werden automatisch gespeichert.",
+      "panel_hint": "Nur die Elemente dieser Seite werden aufgeführt. Blenden Sie beliebige Elemente ein oder aus, indem Sie sie unten an- oder abwählen.",
       "panel_all_options": "Alle Optionen",
       "panel_saving": "Wird gespeichert…",
       "panel_saved": "Gespeichert",
@@ -2207,6 +2209,8 @@
       "note_width": "Notizbreite",
       "note_width_current": "Notizbreite: {{width}}",
       "note_width_default": "Standard ({{width}})",
+      "split_width": "Breite der geteilten Ansicht",
+      "split_resize": "Ziehen, um die Bereiche anzupassen",
       "convert_to_markdown": "In Markdown konvertieren",
       "share_note": "Teilen"
     },
@@ -4882,7 +4886,8 @@
     "default": "Standard"
   },
   "page_menu": {
-    "button": "Weitere Optionen"
+    "button": "Weitere Optionen",
+    "split_view": "Geteilte Ansicht"
   },
   "keyboard_shortcuts": {
     "menu_item": "Tastenkürzel",
@@ -4933,7 +4938,8 @@
     },
     "tree_select_toggle": "Notiz oder Ordner zur Auswahl hinzufügen oder daraus entfernen",
     "tree_select_range": "Alle Zeilen bis zu dieser auswählen",
-    "tree_delete": "Ausgewählte Notizen und Ordner in den Papierkorb verschieben"
+    "tree_delete": "Ausgewählte Notizen und Ordner in den Papierkorb verschieben",
+    "focus_mode": "Fokusmodus ein- oder ausschalten"
   },
   "icon_context_menu": {
     "hide": "Schaltfläche ausblenden"
@@ -4967,5 +4973,8 @@
     "indent": "Einzug vergrößern",
     "outdent": "Einzug verkleinern",
     "hide_keyboard": "Tastatur ausblenden"
+  },
+  "focus_mode": {
+    "button": "Fokusmodus"
   }
 }

@@ -350,17 +350,67 @@
         });
     }
 
-    // The Markdown syntax entry only makes sense while a Markdown note is
-    // open, so it is off on the dashboard and settings pages too
-    function syncMarkdownSyntaxItem() {
-        var item = document.getElementById('edgeMenuMarkdownSyntax');
-        if (!item) return;
-        item.hidden = !document.querySelector('#right_col .noteentry[data-note-type="markdown"]');
+    // The open note, for the controls that act on it: the split-view button of
+    // the stack and the entries of the menu. Called when a note is loaded, and
+    // again when the menu opens, so an entry can never describe the note that
+    // was open two notes ago. Everything here no-ops on the dashboard and the
+    // settings pages, which open no note and render none of it. The controls
+    // carry the note id their handlers in js/index-events.js read.
+    function syncNoteControls() {
+        var entry = document.querySelector('#right_col .noteentry[data-note-id]');
+        var noteId = entry ? entry.getAttribute('data-note-id') : '';
+        var isMarkdown = !!entry && entry.getAttribute('data-note-type') === 'markdown';
+        var isSplit = !!entry && entry.classList.contains('markdown-split-mode');
+        // The width is stored on the note, so it waits like the other edits
+        // while another session holds the lock (js/note-edit-lock.js)
+        var isLocked = !!entry && typeof window.isNoteEditingLocked === 'function' && window.isNoteEditingLocked(noteId);
+
+        var splitButton = document.getElementById('edgeSplitViewBtn');
+        if (splitButton) {
+            splitButton.hidden = !isMarkdown;
+            splitButton.setAttribute('aria-pressed', isSplit ? 'true' : 'false');
+            splitButton.classList.toggle('is-active', isSplit);
+            splitButton.setAttribute('data-note-id', noteId);
+        }
+
+        var syntaxItem = document.getElementById('edgeMenuMarkdownSyntax');
+        if (syntaxItem) syntaxItem.hidden = !isMarkdown;
+
+        var infoItem = document.getElementById('edgeMenuNoteInfo');
+        if (infoItem) {
+            infoItem.hidden = !entry;
+            infoItem.setAttribute('data-note-id', noteId);
+        }
+
+        // Outside the split view the entry is the note's own width, stored on
+        // the note, so it waits for the lock. Inside it, the same entry cycles
+        // the ratio of the two panes (discussion 1483): that is a layout
+        // preference of this browser, nothing is written to the note, so the
+        // lock does not reach it.
+        var widthItem = document.getElementById('edgeMenuNoteWidth');
+        if (widthItem) {
+            widthItem.hidden = !entry || (isLocked && !isSplit);
+            widthItem.setAttribute('data-note-id', noteId);
+            var label = widthItem.querySelector('.page-more-menu-label');
+            if (label) {
+                label.textContent = widthItem.getAttribute(isSplit ? 'data-label-split' : 'data-label') || label.textContent;
+            }
+            var state = widthItem.querySelector('.page-more-menu-state');
+            if (state) {
+                state.textContent = (noteId && typeof window.describeNoteWidth === 'function')
+                    ? window.describeNoteWidth(noteId)
+                    : '';
+            }
+        }
     }
+
+    // js/markdown-view-modes.js calls this when the note switches between
+    // edit, preview and split: the button of the stack is lit by the mode.
+    window.poznoteSyncNoteControls = syncNoteControls;
 
     function setMoreMenuOpen(open) {
         if (!moreMenu || !moreButton) return;
-        if (open) syncMarkdownSyntaxItem();
+        if (open) syncNoteControls();
         moreMenu.hidden = !open;
         moreButton.setAttribute('aria-expanded', open ? 'true' : 'false');
         if (open) {
@@ -500,6 +550,13 @@
         if (clearButton) clearButton.addEventListener('click', clearFilter);
     }
 
+    function initNoteControls() {
+        syncNoteControls();
+        // Opening another note from the tree or a tab replaces it in place
+        // (js/note-content-init.js), without a page load
+        document.addEventListener('noteLoaded', syncNoteControls);
+    }
+
     function initMoreMenu() {
         moreButton = document.getElementById('pageMoreMenuBtn');
         moreMenu = document.getElementById('pageMoreMenu');
@@ -532,6 +589,14 @@
                 if (modal && (name === 'close-help-modal' || e.target === modal)) {
                     setHelpModalOpen(modal, false);
                 }
+                return;
+            }
+
+            // The width cycles through its steps: the menu stays open so each
+            // click is one step, and its entry says where the note landed
+            // (js/note-width-toggle.js ran on this same click)
+            if (name === 'cycle-note-width') {
+                setTimeout(syncNoteControls, 0);
                 return;
             }
 
@@ -571,6 +636,7 @@
     }
 
     function init() {
+        initNoteControls();
         initMoreMenu();
 
         panel = document.getElementById('uiCustomizationPanel');

@@ -388,42 +388,8 @@ function initializeMarkdownNote(noteId) {
             // first: updateViewModeButton() looks it up by selector.
             updateViewModeButton(noteId, currentMode);
 
-            // Create markdown help button
-
-            // Create split view button (only on desktop, not on mobile)
-            if (!isMobileViewport) {
-                var splitBtn = document.createElement('button');
-                splitBtn.type = 'button';
-                splitBtn.className = 'toolbar-btn markdown-split-btn note-action-btn';
-                splitBtn.innerHTML = '<i class="lucide lucide-columns-2"></i>';
-                splitBtn.title = window.t('editor.toolbar.split_view', null, 'Toggle split view');
-                splitBtn.onclick = function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    var noteEntry = document.getElementById('entry' + noteId);
-                    if (noteEntry && noteEntry.classList.contains('markdown-split-mode')) {
-                        exitSplitMode(noteId);
-                        splitBtn.classList.remove('active');
-                    } else {
-                        switchToSplitMode(noteId);
-                        splitBtn.classList.add('active');
-                    }
-                };
-
-                // Set initial state based on split mode
-                if (startInSplitMode) {
-                    splitBtn.classList.add('active');
-                }
-
-                // Insert split button before favorite button (star)
-                var favoriteBtn = toolbar.querySelector('.btn-favorite');
-                if (favoriteBtn) {
-                    toolbar.insertBefore(splitBtn, favoriteBtn);
-                } else {
-                    toolbar.appendChild(splitBtn);
-                }
-            }
+            // The split view is toggled from the "..." menu of the floating
+            // stack (ui_customization_panel.php), see toggleMarkdownSplitView().
         } else {
             // Update existing button based on current state
             var currentMode;
@@ -453,6 +419,7 @@ function initializeMarkdownNote(noteId) {
     // Setup live preview update if starting in split mode
     if (startInSplitMode) {
         setupSplitModePreviewUpdate(noteId);
+        setupMarkdownSplitResizer(noteEntry);
         scheduleMarkdownSplitPaneHeightUpdate(noteEntry);
         setTimeout(function () {
             updateMarkdownSplitPaneHeight(noteEntry);
@@ -866,6 +833,13 @@ function getMarkdownContent(noteId) {
 // button should say, and aria-pressed carries the state for screen readers.
 // Split mode has its own toolbar button, so this one steps aside there.
 function updateViewModeButton(noteId, mode) {
+    // The split-view button of the floating stack is lit by the mode too, and
+    // it is not in the toolbar, so it is refreshed before the early return
+    // below (ui_customization_panel.php, js/ui-customization-panel.js).
+    if (typeof window.poznoteSyncNoteControls === 'function') {
+        window.poznoteSyncNoteControls();
+    }
+
     var viewModeBtn = document.querySelector('#note' + noteId + ' .markdown-view-mode-btn');
     if (!viewModeBtn) return;
 
@@ -970,6 +944,7 @@ function switchToSplitMode(noteId) {
 
     // Add split mode class to note entry
     noteEntry.classList.add('markdown-split-mode');
+    setupMarkdownSplitResizer(noteEntry);
 
     // Show both editor and preview
     if (editorContainer) {
@@ -1042,6 +1017,21 @@ function switchToSplitMode(noteId) {
     }
 }
 
+/**
+ * Split view on or off, for the "..." menu of the floating stack
+ * (js/index-events.js, data-action="toggle-split-view").
+ */
+function toggleMarkdownSplitView(noteId) {
+    var noteEntry = document.getElementById('entry' + noteId);
+    if (!noteEntry) return;
+
+    if (noteEntry.classList.contains('markdown-split-mode')) {
+        exitSplitMode(noteId);
+    } else {
+        switchToSplitMode(noteId);
+    }
+}
+
 // Exit split view mode (return to edit mode)
 function exitSplitMode(noteId) {
     var noteEntry = document.getElementById('entry' + noteId);
@@ -1082,6 +1072,7 @@ window.switchToEditMode = switchToEditMode;
 window.switchToPreviewMode = switchToPreviewMode;
 window.switchToSplitMode = switchToSplitMode;
 window.exitSplitMode = exitSplitMode;
+window.toggleMarkdownSplitView = toggleMarkdownSplitView;
 window.getMarkdownContent = getMarkdownContent;
 window.getMarkdownContentForNote = getMarkdownContentForNote;
 window.replaceMarkdownNoteContent = replaceMarkdownNoteContent;

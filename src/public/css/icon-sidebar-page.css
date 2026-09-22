@@ -27,6 +27,12 @@ body.has-icon-sidebar.icon-sidebar-collapsed {
     margin-left: 0;
 }
 
+/* Focus mode, second step: the rail is a flyout over the page
+   (css/icon-sidebar.css), so the page takes the full width */
+html.focus-mode-full body.has-icon-sidebar {
+    margin-left: 0;
+}
+
 /* Desktop-only, mirroring css/index-mobile.css */
 @media (max-width: 800px) {
     body.has-icon-sidebar #icon_sidebar,

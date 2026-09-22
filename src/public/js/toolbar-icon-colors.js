@@ -20,7 +20,7 @@
     var STYLE_ID = 'toolbar-icon-colors-styles';
     var KEY_PATTERN = /^[a-z][a-z0-9-]{0,79}$/;
     // Buttons with no btn-* class of their own.
-    var CLASS_KEYS = ['mobile-more-btn', 'markdown-view-mode-btn', 'markdown-split-btn'];
+    var CLASS_KEYS = ['mobile-more-btn', 'markdown-view-mode-btn'];
     // Same list as $states in poznoteBuildToolbarIconColorRules().
     var STATES = ':not(.is-favorite):not(.is-shared):not(.has-attachments):not(.has-reminder):not(.is-saving):not(.is-format-active):not(.is-edit-mode)';
 
@@ -133,7 +133,6 @@
     // visibility list does not use.
     var HIDE_KEY_ALIASES = {
         'btn-search-replace-format': 'btn-search-replace',
-        'markdown-split-btn': 'btn-split-view',
         'menu-show-snapshot': 'btn-snapshot',
         'menu-insert-audio-file': 'btn-audio',
         'menu-clear-completed-tasks': 'btn-clear-completed',

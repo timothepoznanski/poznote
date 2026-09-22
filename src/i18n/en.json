@@ -616,7 +616,9 @@
       "user_id": "User #{{id}}",
       "deleted": "User #{{id}}"
     },
-    "errors": []
+    "errors": {
+      "load_failed": "Could not load the note information."
+    }
   },
   "attachments": {
     "empty": "No attachments.",
@@ -867,7 +869,7 @@
       "theme_toggle": "Theme toggle",
       "panel_title": "Customize this page",
       "panel_button": "Customize the interface",
-      "panel_hint": "Only the elements of this page are listed. Changes apply immediately and are saved automatically.",
+      "panel_hint": "Only the elements of this page are listed. Hide or show any element by checking or unchecking below.",
       "panel_all_options": "All options",
       "panel_saving": "Saving…",
       "panel_saved": "Saved",
@@ -1712,6 +1714,8 @@
       "note_width": "Note width",
       "note_width_current": "Note width: {{width}}",
       "note_width_default": "Default ({{width}})",
+      "split_width": "Split view width",
+      "split_resize": "Drag to resize the panes",
       "convert_to_markdown": "Convert to Markdown",
       "share_note": "Share"
     },
@@ -4702,7 +4706,8 @@
     "default": "Default"
   },
   "page_menu": {
-    "button": "More options"
+    "button": "More options",
+    "split_view": "Split view"
   },
   "keyboard_shortcuts": {
     "menu_item": "Keyboard shortcuts",
@@ -4753,7 +4758,8 @@
     },
     "tree_select_toggle": "Add a note or folder to the selection, or remove it",
     "tree_select_range": "Select every row up to this one",
-    "tree_delete": "Move the selected notes and folders to the trash"
+    "tree_delete": "Move the selected notes and folders to the trash",
+    "focus_mode": "Turn focus mode on or off"
   },
   "icon_context_menu": {
     "hide": "Hide button"
@@ -4787,5 +4793,8 @@
     "indent": "Indent",
     "outdent": "Outdent",
     "hide_keyboard": "Hide keyboard"
+  },
+  "focus_mode": {
+    "button": "Focus mode"
   }
 }

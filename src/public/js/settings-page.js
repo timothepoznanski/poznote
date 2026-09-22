@@ -4163,7 +4163,10 @@
         'wsmenu:goto-workspaces': 'wsmenu:edit-workspaces',
         'card:iconSidebarNotificationsBtn': 'card:sidebarNotificationsBtn',
         'card:iconSidebarAiChatBtn': 'card:edgeAiChatBtn',
-        'card:sidebarAiChatBtn': 'card:edgeAiChatBtn'
+        'card:sidebarAiChatBtn': 'card:edgeAiChatBtn',
+        'toolbar:btn-split-view': 'card:edgeSplitViewBtn',
+        'toolbar:btn-note-width': 'card:edgeMenuNoteWidth',
+        'toolbar:btn-info': 'card:edgeMenuNoteInfo'
     };
 
     function normalizeHiddenUiKey(key) {

@@ -258,7 +258,6 @@ window.deleteNote = deleteNote;
 window.toggleFavorite = toggleFavorite;
 window.toggleFolderFavorite = toggleFolderFavorite;
 window.duplicateNote = duplicateNote;
-window.showNoteInfo = showNoteInfo;
 window.toggleNoteMenu = toggleNoteMenu;
 window.toggleWorkspaceMenu = toggleWorkspaceMenu;
 window.switchToWorkspace = switchToWorkspace;

@@ -77,20 +77,70 @@
     color: inherit;
 }
 
+/* Customize this page: lit while its panel is open, like the AI toggle */
+body.ui-custom-panel-open #edgeCustomizeBtn {
+    opacity: 1;
+    color: var(--pz-accent-text);
+}
+
+/* Focus mode toggle (discussion 1482): two steps, then out
+   (js/icon-sidebar-toggle.js). The icon says what the next click does, so it
+   stays the "go in" arrows until everything is hidden and becomes the "come
+   out" ones on the last step. Lit as soon as either step is on. Desktop only,
+   like the chrome it hides. */
+html.focus-mode-full .pz-edge-focus-icon-on,
+html:not(.focus-mode-full) .pz-edge-focus-icon-off {
+    display: none;
+}
+
+html.focus-mode .pz-edge-focus-btn {
+    opacity: 1;
+    color: var(--pz-accent-text);
+}
+
+/* Split view (discussion 1482): lit while the split is on, like the toggles
+   above. js/ui-customization-panel.js sets is-active and unhides the button
+   for a Markdown note. */
+.pz-edge-split-btn.is-active {
+    opacity: 1;
+    color: var(--pz-accent-text);
+}
+
+.pz-edge-btn[hidden] {
+    display: none;
+}
+
+/* The split view and the width change a layout the phone does not have, and
+   the Customize toggle swaps its button in the stack for an entry of the menu:
+   a phone has little room to spare beside the note. */
+@media (max-width: 800px) {
+    .pz-edge-focus-btn,
+    .pz-edge-split-btn,
+    .page-more-menu-item-desktop,
+    #edgeCustomizeBtn {
+        display: none !important;
+    }
+}
+
+@media (min-width: 801px) {
+    .page-more-menu-item-mobile {
+        display: none !important;
+    }
+}
+
 /* Each panel has its own close button, so its toggle hides while it is
    open (html.ai-chat-open is the pre-paint restore of the AI chat state,
-   see js/ai-chat.js). The "..." menu goes with the customization panel it
-   opens. */
-body.ui-custom-panel-open .pz-edge-menu-anchor,
+   see js/ai-chat.js). */
+body.ui-custom-panel-open #edgeCustomizeBtn,
 html.ai-chat-open #edgeAiChatBtn,
 body:has(#ai-chat-panel.ai-chat-open) #edgeAiChatBtn {
     display: none;
 }
 
-/* "..." menu of the stack: customize this page, keyboard shortcuts, Markdown
-   syntax. Same look as the create menu (css/folders/actions-menu.css), opened
-   to the left of its button so it covers neither the button nor the AI
-   assistant above it. */
+/* "..." menu of the stack: the open note's width and information, keyboard
+   shortcuts, Markdown syntax. Same look as the create menu (css/folders/actions-menu.css),
+   opened to the left of its button so it covers neither the button nor the
+   AI assistant above it. */
 .pz-edge-menu-anchor {
     position: relative;
     display: flex;
@@ -151,6 +201,26 @@ body:has(#ai-chat-panel.ai-chat-open) #edgeAiChatBtn {
 .page-more-menu-item:hover [class*="lucide-"],
 .page-more-menu-item:focus-visible [class*="lucide-"] {
     color: var(--pz-text);
+}
+
+/* Entries that carry a state: the split view's check mark while it is on,
+   the note width's current step after its label (js/ui-customization-panel.js) */
+.page-more-menu-check {
+    display: none;
+    margin-left: auto;
+    color: var(--pz-accent-text) !important;
+}
+
+.page-more-menu-item[aria-checked="true"] .page-more-menu-check {
+    display: inline-block;
+}
+
+.page-more-menu-state {
+    color: var(--pz-text-muted);
+}
+
+.page-more-menu-state:not(:empty)::before {
+    content: ': ';
 }
 
 html[data-theme='dark'] .page-more-menu {
@@ -566,13 +636,15 @@ html[data-theme='dark'] .keyboard-shortcuts-keys kbd {
     padding: 0 16px 12px;
 }
 
-/* Secondary text: read once, then stays out of the way. The id outweighs the
-   dark-mode .ui-custom-description rule in modals/ui-customization.css. */
+/* It says how the panel works, so it sits between hint grey and the body
+   colour: readable, without competing with the items it explains. The id
+   outweighs the dark-mode .ui-custom-description rule in
+   modals/ui-customization.css. */
 #uiCustomizationPanel .ui-custom-panel-hint {
-    margin: 0 0 10px;
-    font-size: 0.78em;
-    line-height: 1.45;
-    color: var(--pz-text-subtle);
+    margin: 0 0 12px;
+    font-size: 0.84em;
+    line-height: 1.5;
+    color: var(--pz-text-muted);
 }
 
 .ui-custom-panel-filter {

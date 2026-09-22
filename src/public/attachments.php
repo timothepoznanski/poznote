@@ -104,14 +104,14 @@ if (!$note) {
         }
 
         /* The bar sits outside .settings-container so it floats above the white
-           card rather than inside it, matching info.php. That card owns the
+           card rather than inside it. That card owns the
            page's top spacing, so the bar supplies its own. */
         .attachments-back-to-note-bar {
             margin: 20px 0 0 0;
         }
 
         /* Tighten the gap between the button and the card below it: the card's
-           own 20px top margin sat them further apart than on info.php. */
+           own 20px top margin sat them further apart. */
         .attachments-back-to-note-bar + .settings-container {
             margin-top: 8px;
         }

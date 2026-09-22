@@ -1216,7 +1216,9 @@
     "empty": {
       "no_tags": "Nenhuma etiqueta"
     },
-    "errors": [],
+    "errors": {
+      "load_failed": "Não foi possível carregar as informações da nota."
+    },
     "users": {
       "user_id": "Usuário #{{id}}",
       "deleted": "Usuário #{{id}}"
@@ -1362,7 +1364,7 @@
       "theme_toggle": "Botão de tema",
       "panel_title": "Personalizar esta página",
       "panel_button": "Personalizar a interface",
-      "panel_hint": "Apenas os elementos desta página são listados. As alterações aplicam-se imediatamente e são guardadas automaticamente.",
+      "panel_hint": "Apenas os elementos desta página são listados. Oculte ou mostre qualquer elemento marcando ou desmarcando abaixo.",
       "panel_all_options": "Todas as opções",
       "panel_saving": "A guardar…",
       "panel_saved": "Guardado",
@@ -2207,6 +2209,8 @@
       "note_width": "Largura da nota",
       "note_width_current": "Largura da nota: {{width}}",
       "note_width_default": "Padrão ({{width}})",
+      "split_width": "Largura da vista dividida",
+      "split_resize": "Arraste para redimensionar os painéis",
       "convert_to_markdown": "Converter para Markdown",
       "share_note": "Compartilhar"
     },
@@ -4883,7 +4887,8 @@
     "default": "Padrão"
   },
   "page_menu": {
-    "button": "Mais opções"
+    "button": "Mais opções",
+    "split_view": "Vista dividida"
   },
   "keyboard_shortcuts": {
     "menu_item": "Atalhos de teclado",
@@ -4934,7 +4939,8 @@
     },
     "tree_select_toggle": "Adicionar uma nota ou pasta à seleção, ou removê-la",
     "tree_select_range": "Selecionar todas as linhas até esta",
-    "tree_delete": "Mover as notas e pastas selecionadas para a lixeira"
+    "tree_delete": "Mover as notas e pastas selecionadas para a lixeira",
+    "focus_mode": "Ativar ou desativar o modo foco"
   },
   "icon_context_menu": {
     "hide": "Ocultar o botão"
@@ -4968,5 +4974,8 @@
     "indent": "Aumentar recuo",
     "outdent": "Diminuir recuo",
     "hide_keyboard": "Ocultar o teclado"
+  },
+  "focus_mode": {
+    "button": "Modo foco"
   }
 }

@@ -1,0 +1,70 @@
+/**
+ * Focus mode on the notes page (discussion #1482)
+ *
+ * Two steps, set before the first paint (icon_sidebar.php) and owned by
+ * js/icon-sidebar-toggle.js:
+ *
+ *   html.focus-mode       clears the rows above the note, so the toolbar sits
+ *                         right over the content. In the split view the two
+ *                         panes are sized from what is left under those rows
+ *                         (js/markdown-editor.js), and on a laptop that was
+ *                         not much.
+ *   html.focus-mode-full  also sends the notes column into a flyout, opened
+ *                         from a hot zone on the left edge of the viewport
+ *                         (html.focus-mode-peek). css/icon-sidebar.css does
+ *                         the same with the icon rail, on every page.
+ *
+ * Only the chrome goes. The tab bar, the outline, the AI assistant and the
+ * floating stack keep their own state: they were opted into, focus mode is
+ * not the place to undo that.
+ *
+ * Desktop only, like the rail: the phone layout has none of this chrome.
+ */
+
+@media (min-width: 801px) {
+    /* Second step. Notes column: pinned right of the rail, off screen until
+       the flyout opens. The width and padding are forced back on because
+       body.sidebar-collapsed (css/layout.css) zeroes both with !important, and
+       a collapsed column in the flyout would be a 0px strip. The stored
+       collapsed state is untouched: it is back the moment focus mode is off. */
+    html.focus-mode-full body #left_col {
+        position: fixed;
+        top: 0;
+        left: var(--icon-sidebar-width);
+        height: 100vh;
+        z-index: 1500;
+        width: var(--left-col-width) !important;
+        min-width: 200px !important;
+        padding: 6px 16px 16px 16px !important;
+        overflow-y: scroll;
+        border-right: 1px solid var(--pz-border);
+        box-shadow: 4px 0 16px rgba(var(--pz-shadow-rgb), 0.12);
+        transform: translateX(calc(-100% - var(--icon-sidebar-width)));
+        visibility: hidden;
+        transition: transform 0.2s ease, visibility 0s linear 0.2s;
+    }
+
+    html.focus-mode-full.focus-mode-peek body #left_col {
+        transform: none;
+        visibility: visible;
+        transition: transform 0.2s ease, visibility 0s;
+    }
+
+    /* The divider and its collapse toggle hang off the column: nothing to
+       drag or collapse while the column is a flyout */
+    html.focus-mode-full #resizeHandle {
+        display: none;
+    }
+
+    /* First step, and the part the second one keeps. Title rows above the
+       content: folder and tags, title, creation date, and the attachments row
+       when it sits up there rather than under the note
+       (attachments_at_bottom). The toolbar stays, it is how the note is
+       saved, shared and left. */
+    html.focus-mode #right_col .innernote > .note-tags-row,
+    html.focus-mode #right_col .innernote > .note-title-heading,
+    html.focus-mode #right_col .innernote > .note-subline,
+    html.focus-mode #right_col .innernote > .note-attachments-row:has(~ .noteentry) {
+        display: none !important;
+    }
+}

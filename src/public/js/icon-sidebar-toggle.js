@@ -13,6 +13,15 @@
  * The group separators icon_sidebar.php draws between the entries are also
  * kept honest here: once UI Customization (or the git scope) has hidden every
  * entry on one side of a line, that line is hidden too.
+ *
+ * Focus mode (discussion #1482) lives here too, because the rail is the one
+ * piece of chrome every page shares: html.focus-mode hides the rail (and, on
+ * the notes page, the notes column and the note's title rows, see
+ * css/focus-mode.css) and a hot zone on the left edge of the viewport slides
+ * them back in as a flyout while the mouse is over it (html.focus-mode-peek).
+ * The state is persisted, so it follows the user from page to page until
+ * turned off: F11, the button of the floating stack
+ * (ui_customization_panel.php) or window.PoznoteFocusMode.
  */
 (function () {
     'use strict';
@@ -419,8 +428,230 @@
         syncLayout();
     }
 
+    // --- Focus mode ---------------------------------------------------------
+
+    // Two steps, then out. The first click clears what sits above the note
+    // (its folder and tags, its title, its date), which is all a wide screen
+    // needs; the second one also sends the rail and the notes column into the
+    // flyout. A third click brings everything back.
+    var FOCUS_STORAGE_KEY = 'focusMode';
+    var FOCUS_OFF = 0;
+    var FOCUS_TOP = 1;
+    var FOCUS_FULL = 2;
+    var FOCUS_CLASS = 'focus-mode';
+    var FOCUS_FULL_CLASS = 'focus-mode-full';
+    var FOCUS_PEEK_CLASS = 'focus-mode-peek';
+    var FOCUS_EDGE_ZONE_ID = 'focusModeEdgeZone';
+    // A pause before the flyout opens, so brushing the edge on the way to the
+    // first character of a line does not pull 400px of chrome over the note,
+    // and a longer one before it closes, so a slip off its edge is forgiven.
+    var FOCUS_PEEK_OPEN_DELAY = 120;
+    var FOCUS_PEEK_CLOSE_DELAY = 300;
+
+    var focusPeekTimer = null;
+
+    // 'true' is what the one-step version of focus mode stored: it hid
+    // everything, so it comes back as the second step.
+    function normalizeFocusLevel(stored) {
+        if (stored === 'true' || stored === '2') return FOCUS_FULL;
+        if (stored === '1') return FOCUS_TOP;
+        return FOCUS_OFF;
+    }
+
+    function readFocusMode() {
+        try {
+            return normalizeFocusLevel(localStorage.getItem(FOCUS_STORAGE_KEY));
+        } catch (error) {
+            return FOCUS_OFF;
+        }
+    }
+
+    function persistFocusMode(level) {
+        try {
+            localStorage.setItem(FOCUS_STORAGE_KEY, String(level));
+        } catch (error) {
+            console.debug('icon-sidebar-toggle: persistFocusMode() failed:', error);
+        }
+    }
+
+    function focusLevel() {
+        var classes = document.documentElement.classList;
+        if (classes.contains(FOCUS_FULL_CLASS)) return FOCUS_FULL;
+
+        return classes.contains(FOCUS_CLASS) ? FOCUS_TOP : FOCUS_OFF;
+    }
+
+    function isFocusMode() {
+        return focusLevel() === FOCUS_FULL;
+    }
+
+    function isFocusPeek() {
+        return document.documentElement.classList.contains(FOCUS_PEEK_CLASS);
+    }
+
+    // The rail and, on the notes page, the notes column: what the flyout shows
+    function focusFlyoutElements() {
+        return [
+            document.getElementById('icon_sidebar'),
+            document.getElementById('left_col'),
+            document.getElementById(FOCUS_EDGE_ZONE_ID)
+        ].filter(Boolean);
+    }
+
+    function focusFlyoutContains(node) {
+        return focusFlyoutElements().some(function (element) {
+            return node && element.contains(node);
+        });
+    }
+
+    function cancelFocusPeekTimer() {
+        clearTimeout(focusPeekTimer);
+        focusPeekTimer = null;
+    }
+
+    function setFocusPeek(open) {
+        cancelFocusPeekTimer();
+        // Nothing is out of reach at the first step, so nothing to fly out
+        if (open && focusLevel() !== FOCUS_FULL) return;
+        document.documentElement.classList.toggle(FOCUS_PEEK_CLASS, open);
+    }
+
+    function scheduleFocusPeek(open) {
+        cancelFocusPeekTimer();
+        focusPeekTimer = setTimeout(function () {
+            focusPeekTimer = null;
+            if (!open) {
+                // Typing in the flyout (tree search, an inline rename) or
+                // reading the rail's overflow menu, which hangs outside it:
+                // the mouse has left but the user has not.
+                if (focusFlyoutContains(document.activeElement) || isMenuOpen()) {
+                    return;
+                }
+            }
+            setFocusPeek(open);
+        }, open ? FOCUS_PEEK_OPEN_DELAY : FOCUS_PEEK_CLOSE_DELAY);
+    }
+
+    // "mixed" is the ARIA value for a toggle that is on without being all the
+    // way on, which is exactly the first step.
+    function syncFocusButtons(level) {
+        var pressed = level === FOCUS_FULL ? 'true' : (level === FOCUS_TOP ? 'mixed' : 'false');
+        Array.prototype.forEach.call(document.querySelectorAll('[data-action="toggle-focus-mode"]'), function (button) {
+            button.setAttribute('aria-pressed', pressed);
+        });
+    }
+
+    function applyFocusMode(level) {
+        document.documentElement.classList.toggle(FOCUS_CLASS, level >= FOCUS_TOP);
+        document.documentElement.classList.toggle(FOCUS_FULL_CLASS, level === FOCUS_FULL);
+        if (level !== FOCUS_FULL) {
+            setFocusPeek(false);
+        }
+        syncFocusButtons(level);
+        // The split view sizes its panes from what is left under the title
+        // rows (js/markdown-editor.js), so it has to measure again.
+        document.dispatchEvent(new CustomEvent('poznote:focus-mode', { detail: { level: level } }));
+    }
+
+    function setFocusMode(level) {
+        level = normalizeFocusLevel(String(level === true ? FOCUS_FULL : (level === false ? FOCUS_OFF : level)));
+        if (level === focusLevel()) return;
+        applyFocusMode(level);
+        persistFocusMode(level);
+    }
+
+    function toggleFocusMode() {
+        setFocusMode((focusLevel() + 1) % 3);
+    }
+
+    // Strip along the left edge of the viewport that opens the flyout, with a
+    // small handle in the middle of it so the flyout is something you see
+    // rather than something you find by accident. Both are only shown by the
+    // CSS at the second step of focus mode (css/icon-sidebar.css).
+    function ensureFocusEdgeZone() {
+        var zone = document.getElementById(FOCUS_EDGE_ZONE_ID);
+        if (zone || !document.body) return;
+
+        zone = document.createElement('div');
+        zone.id = FOCUS_EDGE_ZONE_ID;
+        zone.setAttribute('aria-hidden', 'true');
+
+        var handle = document.createElement('span');
+        handle.className = 'focus-mode-edge-handle';
+        handle.innerHTML = '<i class="lucide lucide-chevron-right"></i>';
+        zone.appendChild(handle);
+
+        document.body.appendChild(zone);
+
+        zone.addEventListener('mouseenter', function () {
+            scheduleFocusPeek(true);
+        });
+        // A tap on a touch screen wide enough for the desktop layout
+        zone.addEventListener('click', function () {
+            setFocusPeek(!isFocusPeek());
+        });
+    }
+
+    function initFocusMode() {
+        // icon_sidebar.php sets the class before the first paint; the stored
+        // value still wins here, for the pages that render the rail some other
+        // way and for a page painted before the store was read.
+        applyFocusMode(readFocusMode());
+        ensureFocusEdgeZone();
+
+        focusFlyoutElements().forEach(function (element) {
+            element.addEventListener('mouseenter', function () {
+                if (!isFocusPeek()) return;
+                cancelFocusPeekTimer();
+            });
+            element.addEventListener('mouseleave', function () {
+                if (!isFocusPeek()) return;
+                scheduleFocusPeek(false);
+            });
+        });
+
+        // A click anywhere else puts the flyout away at once
+        document.addEventListener('mousedown', function (event) {
+            if (isFocusPeek() && !focusFlyoutContains(event.target)) {
+                setFocusPeek(false);
+            }
+        }, true);
+
+        document.addEventListener('click', function (event) {
+            var trigger = event.target.closest ? event.target.closest('[data-action="toggle-focus-mode"]') : null;
+            if (!trigger) return;
+            event.preventDefault();
+            toggleFocusMode();
+            trigger.blur();
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.defaultPrevented || event.key !== 'F11') return;
+            if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+            event.preventDefault();
+            toggleFocusMode();
+        });
+
+        // Another tab of the same account moving it a step
+        window.addEventListener('storage', function (event) {
+            if (event.key !== FOCUS_STORAGE_KEY) return;
+            applyFocusMode(normalizeFocusLevel(event.newValue));
+        });
+    }
+
+    window.PoznoteFocusMode = {
+        OFF: FOCUS_OFF,
+        TOP: FOCUS_TOP,
+        FULL: FOCUS_FULL,
+        level: focusLevel,
+        isEnabled: isFocusMode,
+        set: setFocusMode,
+        toggle: toggleFocusMode
+    };
+
     function init() {
         initOverflow();
+        initFocusMode();
 
         var button = document.getElementById('iconSidebarToggle');
         if (!button) return;

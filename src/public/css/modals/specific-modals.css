@@ -1196,3 +1196,78 @@
     opacity: 0.6;
     text-align: center;
 }
+
+/* ============================================
+   Note Information Modal (#noteInfoModal)
+   ============================================ */
+
+/* The old info.php page laid these out as a full-width table of label and
+   value; in a dialog the same rows read better a little tighter, and the
+   dialog is wider than a standard one because a folder path or a file path
+   has nowhere to wrap. */
+#noteInfoModal .note-info-modal-content {
+    max-width: 640px;
+}
+
+#noteInfoModal h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.note-info-rows {
+    display: flex;
+    flex-direction: column;
+}
+
+.note-info-row {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--pz-border-light);
+}
+
+.note-info-row:last-child {
+    border-bottom: none;
+}
+
+.note-info-label {
+    flex: 0 0 190px;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text-secondary);
+}
+
+.note-info-value {
+    flex: 1;
+    min-width: 0;
+    color: var(--pz-text);
+    /* A file path and a tag list both run long and have no spaces to break on */
+    overflow-wrap: anywhere;
+}
+
+.note-info-favorite-yes {
+    color: var(--pz-warning-text);
+    font-weight: var(--pz-weight-semibold);
+}
+
+.note-info-error {
+    margin: 12px 0 0 0;
+    color: var(--pz-danger-text);
+}
+
+.note-info-error[hidden] {
+    display: none;
+}
+
+/* Phone: the label sits above its value, as it did on the page */
+@media (max-width: 800px) {
+    .note-info-row {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .note-info-label {
+        flex: 0 1 auto;
+    }
+}

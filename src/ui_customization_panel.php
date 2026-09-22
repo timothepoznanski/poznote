@@ -54,6 +54,7 @@ $pzShortcutGroups = [
             ['keys' => [['mod', 'alt', 'S']], 'label' => t_h('keyboard_shortcuts.snapshot', [], 'Take a snapshot of the note')],
             ['keys' => [['alt', '↑'], ['alt', '↓']], 'label' => t_h('keyboard_shortcuts.note_nav', [], 'Previous or next note in the folder'), 'hint' => $pzShortcutSettingHint],
             ['keys' => [['Esc']], 'label' => t_h('keyboard_shortcuts.close', [], 'Close a menu, panel or window')],
+            ['keys' => [['F11']], 'label' => t_h('keyboard_shortcuts.focus_mode', [], 'Turn focus mode on or off')],
         ],
     ],
     [
@@ -106,19 +107,42 @@ $pzShortcutKeyLabels = [
     'Click' => t_h('keyboard_shortcuts.keys.click', [], 'Click'),
 ];
 $pzMoreMenuLabel = t_h('page_menu.button', [], 'More options');
+// Focus mode (discussion 1482): F11 or this button, see js/icon-sidebar-toggle.js
+$pzFocusModeLabel = t_h('focus_mode.button', [], 'Focus mode') . ' (F11)';
+$pzSplitViewLabel = t_h('editor.toolbar.split_view', [], 'Toggle split view');
 require_once __DIR__ . '/markdown_syntax_content.php';
 ?>
-    <!-- Floating stack at the bottom-right of the page: AI assistant, then
-         the "..." menu (customize this page, keyboard shortcuts, Markdown
-         syntax). On the notes page the note's scroll-to-edge arrows
+    <!-- Floating stack at the bottom-right of the page: split view, customize
+         this page, AI assistant, focus mode, then the "..." menu (on the notes
+         page the open note: note width, information; keyboard shortcuts,
+         Markdown syntax). On the notes page the note's scroll-to-edge arrows
          (note_display.php) sit under it, see css/ui-customization-panel.css. -->
     <div class="pz-edge-stack">
+        <?php if ($uiCustomizationPanelPage === 'notes'): ?>
+        <!-- Split view (discussion 1482): used to be a toolbar button. Hidden
+             until a Markdown note is open and lit while the split is on, both
+             from js/ui-customization-panel.js. Desktop only, like the split
+             view itself. -->
+        <button type="button" id="edgeSplitViewBtn" class="pz-edge-btn pz-edge-split-btn" data-action="toggle-split-view" aria-pressed="false" hidden
+            title="<?php echo $pzSplitViewLabel; ?>" aria-label="<?php echo $pzSplitViewLabel; ?>">
+            <i class="lucide lucide-columns-2"></i>
+        </button>
+        <?php endif; ?>
+        <button type="button" id="edgeCustomizeBtn" class="pz-edge-btn" data-action="toggle-ui-customization-panel" aria-controls="uiCustomizationPanel"
+            title="<?php echo $uiCustomizationPanelTitle; ?>" aria-label="<?php echo $uiCustomizationPanelTitle; ?>">
+            <i class="lucide lucide-eye-off"></i>
+        </button>
         <?php if ($uiCustomizationPanelAiChat): ?>
         <button type="button" id="edgeAiChatBtn" class="pz-edge-btn" data-action="toggle-ai-chat"
             title="<?php echo $uiCustomizationPanelAiLabel; ?>" aria-label="<?php echo $uiCustomizationPanelAiLabel; ?>">
             <i class="lucide lucide-bot"></i>
         </button>
         <?php endif; ?>
+        <button type="button" id="edgeFocusModeBtn" class="pz-edge-btn pz-edge-focus-btn" data-action="toggle-focus-mode" aria-pressed="false"
+            title="<?php echo $pzFocusModeLabel; ?>" aria-label="<?php echo $pzFocusModeLabel; ?>">
+            <i class="lucide lucide-maximize-2 pz-edge-focus-icon-on"></i>
+            <i class="lucide lucide-minimize-2 pz-edge-focus-icon-off"></i>
+        </button>
         <div class="pz-edge-menu-anchor">
             <button type="button" id="pageMoreMenuBtn" class="pz-edge-btn page-more-menu-btn" data-action="toggle-page-more-menu"
                 aria-haspopup="true" aria-controls="pageMoreMenu" aria-expanded="false"
@@ -126,10 +150,32 @@ require_once __DIR__ . '/markdown_syntax_content.php';
                 <i class="lucide lucide-more-horizontal"></i>
             </button>
             <div id="pageMoreMenu" class="page-more-menu" role="menu" hidden>
-                <button type="button" class="page-more-menu-item" role="menuitem" data-action="toggle-ui-customization-panel">
+                <!-- Customize this page has a button of its own in the stack,
+                     but a phone has little room to spare beside the note, so
+                     there it moves in here instead (css/ui-customization-panel.css). -->
+                <button type="button" id="edgeMenuCustomize" class="page-more-menu-item page-more-menu-item-mobile" role="menuitem" data-action="toggle-ui-customization-panel" aria-controls="uiCustomizationPanel">
                     <i class="lucide lucide-eye-off"></i>
                     <span><?php echo $uiCustomizationPanelTitle; ?></span>
                 </button>
+                <?php if ($uiCustomizationPanelPage === 'notes'): ?>
+                <!-- The open note (discussion 1482). Both used to be toolbar
+                     buttons; js/ui-customization-panel.js shows them for the
+                     note that is open and keeps the menu open while the width
+                     cycles. The width is desktop only, like the layout it
+                     changes. Inside the dual pane view the same entry cycles
+                     the ratio of the two panes instead (discussion 1483), which
+                     is what its second label is for. -->
+                <button type="button" id="edgeMenuNoteWidth" class="page-more-menu-item page-more-menu-item-desktop" role="menuitem" data-action="cycle-note-width" hidden
+                    data-label="<?php echo t_h('index.toolbar.note_width', [], 'Note width'); ?>"
+                    data-label-split="<?php echo t_h('index.toolbar.split_width', [], 'Dual pane width'); ?>">
+                    <i class="lucide lucide-move-horizontal"></i>
+                    <span><span class="page-more-menu-label"><?php echo t_h('index.toolbar.note_width', [], 'Note width'); ?></span><span class="page-more-menu-state"></span></span>
+                </button>
+                <button type="button" id="edgeMenuNoteInfo" class="page-more-menu-item" role="menuitem" data-action="show-note-info" hidden>
+                    <i class="lucide lucide-info"></i>
+                    <span><?php echo t_h('common.information', [], 'Information'); ?></span>
+                </button>
+                <?php endif; ?>
                 <button type="button" id="edgeMenuShortcuts" class="page-more-menu-item" role="menuitem" data-action="open-keyboard-shortcuts" aria-controls="keyboardShortcutsModal">
                     <i class="lucide lucide-keyboard"></i>
                     <span><?php echo t_h('keyboard_shortcuts.menu_item', [], 'Keyboard shortcuts'); ?></span>
@@ -239,7 +285,7 @@ require_once __DIR__ . '/markdown_syntax_content.php';
             </button>
         </div>
         <div class="ui-custom-panel-body">
-            <p class="ui-custom-description ui-custom-panel-hint"><?php echo t_h('modals.ui_customization.panel_hint', [], 'Only the elements of this page are listed. Changes apply immediately and are saved automatically.'); ?></p>
+            <p class="ui-custom-description ui-custom-panel-hint"><?php echo t_h('modals.ui_customization.panel_hint', [], 'Only the elements of this page are listed. Hide or show any element by checking or unchecking below.'); ?></p>
             <div class="ui-custom-filter ui-custom-panel-filter">
                 <input type="search" id="uiCustomizationPanelFilter" class="ui-custom-filter-input"
                     placeholder="<?php echo t_h('modals.ui_customization.filter_placeholder', [], 'Filter items...'); ?>" autocomplete="off">

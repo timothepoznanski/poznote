@@ -1,5 +1,6 @@
 /**
- * Note content width toggle (index page toolbar).
+ * Note content width toggle ("..." menu of the floating stack,
+ * ui_customization_panel.php).
  *
  * Cycles the opened note through a few width presets, as percentages of the
  * note column, and stores the choice on that note only
@@ -99,17 +100,21 @@
             : 'Default (' + globalWidth.label + ')';
     }
 
-    function updateButton(card, override, globalWidth) {
-        var current = stateLabel(override, globalWidth);
-        var label = (typeof window.t === 'function')
-            ? window.t('index.toolbar.note_width_current', { width: current }, 'Note width: {{width}}')
-            : 'Note width: ' + current;
-        var buttons = card ? card.querySelectorAll('.btn-note-width') : [];
-
-        for (var i = 0; i < buttons.length; i++) {
-            buttons[i].setAttribute('title', label);
-            buttons[i].setAttribute('aria-label', label);
+    // The step the note is on, as the menu entry shows it: "70%", or
+    // "Default (80%)" while the note follows the global setting. While the
+    // dual pane view is open the entry says where its seam is instead
+    // (js/markdown-split-resize.js): the note keeps the full column there, and
+    // it is the two panes that share a width.
+    function describeNoteWidth(noteId) {
+        if (typeof window.describeMarkdownSplitRatio === 'function') {
+            var splitLabel = window.describeMarkdownSplitRatio(noteId);
+            if (splitLabel) return splitLabel;
         }
+
+        var card = getNoteCard(noteId);
+        if (!card) return '';
+
+        return stateLabel(readNoteOverride(card), readGlobalWidth());
     }
 
     // Mirrors what note_display.php renders.
@@ -160,6 +165,13 @@
     }
 
     function cycleNoteWidth(noteId) {
+        // Dual pane view open: the same entry cycles the ratio of the two panes
+        // (discussion 1483, js/markdown-split-resize.js).
+        if (typeof window.cycleMarkdownSplitRatio === 'function'
+            && window.cycleMarkdownSplitRatio(noteId)) {
+            return;
+        }
+
         var card = getNoteCard(noteId);
         if (!card) return;
 
@@ -167,24 +179,13 @@
         var override = nextOverride(readNoteOverride(card), globalWidth.percent);
 
         applyOverride(card, override);
-        updateButton(card, override, globalWidth);
         showWidthToast(stateLabel(override, globalWidth));
         persistOverride(noteId, override);
     }
 
     window.cycleNoteWidth = cycleNoteWidth;
-
-    function refreshButtonLabels() {
-        var globalWidth = readGlobalWidth();
-        var buttons = document.querySelectorAll('.btn-note-width[data-note-id]');
-
-        for (var i = 0; i < buttons.length; i++) {
-            var card = getNoteCard(buttons[i].getAttribute('data-note-id'));
-            updateButton(card, readNoteOverride(card), globalWidth);
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', refreshButtonLabels);
-    // Translations arrive after the first paint, so relabel once they land.
-    document.addEventListener('poznote:i18n:loaded', refreshButtonLabels);
+    window.describeNoteWidth = describeNoteWidth;
+    // Shared with js/markdown-split-resize.js, which says the same kind of
+    // thing about the pane it just moved.
+    window.showNoteWidthToast = showWidthToast;
 })();
