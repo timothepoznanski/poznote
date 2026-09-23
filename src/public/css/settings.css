@@ -515,6 +515,24 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     display: none;
 }
 
+/* Sub-headings inside a section ("Attachments", "Code" in Note content):
+   a small label spanning the card grid. The filter lists matching cards
+   only, so the headings step aside while a term is active;
+   ui-customization.js hides a heading whose cards are all hidden. */
+.settings-group-title {
+    grid-column: 1 / -1;
+    margin: 6px 0 -6px 0;
+    font-size: calc(0.78rem * var(--settings-font-scale, 1));
+    font-weight: var(--pz-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--pz-text-muted);
+}
+
+.home-container.settings-filtering .settings-group-title {
+    display: none;
+}
+
 /* Utility classes */
 .desktop-only {
     display: flex;
@@ -789,6 +807,58 @@ html[data-theme='dark'] .settings-collapse-all:hover {
 /* A pinned card keeps the plain card border: the blue pin icon is the only
    pinned indicator, on the source card and on its clone alike. */
 
+/* ---------- Edit control of the About links ----------
+   Pencil shown to administrators on the Contact, GitHub discussions and
+   Discord cards (settings.php), opening #aboutLinkModal. Same look and same
+   corner as the help icon, which it sits next to; unlike the help icon it
+   stays in list view and on touch screens, since it is an action. */
+.settings-card-edit {
+    position: absolute;
+    top: 6px;
+    right: 28px;
+    z-index: 5;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.settings-card-edit i {
+    display: block;
+    width: 13px;
+    height: 13px;
+    background-color: var(--pz-text-subtle);
+    opacity: 0.55;
+    transition: opacity 0.15s ease;
+}
+
+.settings-card-edit:hover i,
+.settings-card-edit:focus-visible i {
+    opacity: 1;
+    background-color: var(--pz-accent-text);
+}
+
+.view-list .settings-card-edit {
+    position: relative;
+    top: auto;
+    right: auto;
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: 4px;
+    padding: 4px;
+}
+
+/* The default value quoted in the edit modal, and its validation message */
+.about-link-default {
+    word-break: break-all;
+    font-weight: var(--pz-weight-medium);
+}
+
+.about-link-error {
+    margin: 8px 0 0 0;
+    font-size: 0.9em;
+    color: var(--pz-danger-text);
+}
+
 html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
     background-color: var(--pz-accent-text);
 }
@@ -999,6 +1069,18 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
         border-radius: var(--pz-radius-xl);
     }
 
+    /* A sub-heading is a row of the panel too: a top rule separates it from
+       the card above (the first heading of a panel has none). */
+    .home-container.settings-with-nav .settings-group-title {
+        margin: 0;
+        padding: 14px 20px 4px;
+        border-top: 1px solid var(--pz-border);
+    }
+
+    .home-container.settings-with-nav .settings-group-title:first-child {
+        border-top: none;
+    }
+
     .home-container.settings-with-nav .home-card {
         position: relative;
         isolation: isolate;
@@ -1114,6 +1196,18 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
 
     .home-container.settings-with-nav .settings-card-pin {
         order: 3;
+    }
+
+    /* The pencil goes between the value and the help icon */
+    .home-container.settings-with-nav .settings-card-edit {
+        position: relative;
+        top: auto;
+        right: auto;
+        display: inline-flex;
+        align-items: center;
+        flex-shrink: 0;
+        order: 1;
+        margin-left: 6px;
     }
 
     /* Boolean settings: the Enabled/Disabled badge is drawn as a switch (the

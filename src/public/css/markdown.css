@@ -909,26 +909,6 @@ html[data-theme='dark'] .katex {
     overflow: clip !important;
 }
 
-/* A gutter on the right for the floating buttons (discussion 1482).
-   The stack and the note's scroll arrows are pinned 10px from the right of the
-   note column (--pz-docked-*, css/notes/noteentry.css). Every other view
-   leaves them the note's own side margins to float over, but the split view
-   fills the column edge to edge, so they landed on the right pane's border.
-   Those side margins are percentages of the column (1% + 2%,
-   css/notes/noteentry.css), which is both too little to clear the buttons on a
-   laptop and far too much on a wide screen, so the split view replaces them on
-   that side with the room the strip actually needs: 10px for its own offset,
-   one button, and 8px of air. */
-@media (min-width: 801px) {
-    .notecard:has(.noteentry.markdown-split-mode) {
-        margin-right: 0;
-    }
-
-    .innernote:has(.noteentry.markdown-split-mode) {
-        padding-right: calc(var(--pz-edge-btn-size, 32px) + 16px);
-    }
-}
-
 /* Tab bar now lives outside #right_col — split-mode header needs no override */
 
 .noteentry.markdown-split-mode .markdown-editor-container,

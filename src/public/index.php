@@ -759,9 +759,7 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
             'canUseSettingsApi' => !function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser(),
             'settings' => [
                 'emoji_icons_enabled' => getSetting('emoji_icons_enabled', '1'),
-                'slash_menu_require_alt' => getSetting('slash_menu_require_alt', '0'),
-                'note_nav_shortcuts_enabled' => getSetting('note_nav_shortcuts_enabled', '0'),
-                'ctrl_s_save_enabled' => getSetting('ctrl_s_save_enabled', '0'),
+                'slash_menu_trigger' => getSetting('slash_menu_trigger', 'slash'),
                 $currentWorkspaceOpacityKey => getSetting($currentWorkspaceOpacityKey, '25')
             ]
         ];

@@ -311,8 +311,42 @@
         syncSectionVisibility('display', 'settings-display-section-grid');
     }
 
-    function syncSettingsBehaviorSection() {
-        syncSectionVisibility('behavior', 'settings-behavior-section-grid');
+    // Sub-headings inside a settings section (.settings-group-title, e.g.
+    // "Attachments" in Note content): a heading whose cards are all hidden
+    // goes with them.
+    function syncSettingsGroupTitles() {
+        document.querySelectorAll('.settings-group-title').forEach(function (title) {
+            var hasVisibleCard = false;
+            var node = title.nextElementSibling;
+            while (node && !node.classList.contains('settings-group-title')) {
+                if (node.classList.contains('home-card') && isVisibleElement(node)) {
+                    hasVisibleCard = true;
+                    break;
+                }
+                node = node.nextElementSibling;
+            }
+            title.style.display = hasVisibleCard ? '' : 'none';
+        });
+    }
+
+    function syncSettingsSidebarSection() {
+        syncSectionVisibility('sidebar', 'settings-sidebar-section-grid');
+    }
+
+    function syncSettingsNoteContentSection() {
+        syncSectionVisibility('note-content', 'settings-note-content-section-grid');
+    }
+
+    function syncSettingsMarkdownSection() {
+        syncSectionVisibility('markdown', 'settings-markdown-section-grid');
+    }
+
+    function syncSettingsDiarySection() {
+        syncSectionVisibility('diary', 'settings-diary-section-grid');
+    }
+
+    function syncSettingsOtherSection() {
+        syncSectionVisibility('other', 'settings-other-section-grid');
     }
 
     function syncSettingsAdminToolsSection() {
@@ -338,7 +372,12 @@
             syncSettingsAccountSection();
             syncSettingsActionsSection();
             syncSettingsDisplaySection();
-            syncSettingsBehaviorSection();
+            syncSettingsGroupTitles();
+            syncSettingsSidebarSection();
+            syncSettingsNoteContentSection();
+            syncSettingsMarkdownSection();
+            syncSettingsDiarySection();
+            syncSettingsOtherSection();
             syncSettingsAdminToolsSection();
             syncSettingsDocumentationSection();
         });
@@ -370,7 +409,6 @@
             var id = parts[1];
 
             if (type === 'card') {
-                if (id === 'ui-customization-card') return;
                 rules.push('#' + id + ' { display: none !important; }');
 
                 if (CREATE_MENU_OPTION_SELECTORS[key]) {

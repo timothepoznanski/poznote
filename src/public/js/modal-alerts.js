@@ -9,6 +9,10 @@ var tr = window.t || function(key, vars, fallback) {
 };
 
 function shouldSuppressAlertMessage(message) {
+    // The session is gone and js/session-guard.js is taking the page to the
+    // login form: whatever the failed call wanted to say (a 401 body, or a
+    // generic error built from it) is not what the user needs to read.
+    if (window.poznoteSessionGone === true) return true;
     if (message == null) return false;
 
     const normalized = String(message).toLowerCase();

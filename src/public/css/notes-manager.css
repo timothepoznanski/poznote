@@ -295,6 +295,15 @@ html[data-theme='dark'] .nm-folder-option-selected {
     white-space: nowrap;
 }
 
+/* The name is its own element so it can be cut with an ellipsis: a text node
+   inside the flex label would just be clipped mid-letter on a narrow screen. */
+.nm-folder-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .nm-group-select-btn {
     flex-shrink: 0;
     background: none;
@@ -457,22 +466,54 @@ html[data-theme='dark'] .nm-folder-option-selected {
         width: 100%;
     }
 
+    /* Two lines instead of one: the title beside the checkbox, then the tags
+       and the date under it. A grid on the row itself, because the tags are a
+       sibling of the title, not a child, so only the row can place them on a
+       second line while keeping the checkbox column empty there. */
     .nm-note-row {
-        flex-wrap: wrap;
-        align-items: flex-start;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        grid-template-areas:
+            "checkbox title meta"
+            ".        tags  tags";
+        align-items: center;
+        column-gap: 10px;
+        row-gap: 3px;
+    }
+
+    .nm-note-checkbox {
+        grid-area: checkbox;
+        align-self: start;
+        margin-top: 2px;
     }
 
     .nm-note-title-wrap {
-        min-width: calc(100% - 26px);
+        grid-area: title;
+        align-items: flex-start;
     }
 
-    .nm-note-tags,
-    .nm-note-meta {
-        margin-left: 26px;
+    /* Long titles run over two lines rather than being cut after a word. */
+    .nm-note-link {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        white-space: normal;
+        line-height: 1.35;
     }
 
     .nm-note-tags {
+        grid-area: tags;
+        flex-wrap: wrap;
         max-width: 100%;
+        overflow: visible;
+        row-gap: 4px;
+    }
+
+    .nm-note-meta {
+        grid-area: meta;
+        justify-self: end;
+        align-self: start;
+        margin-top: 2px;
     }
 }
 
@@ -610,9 +651,7 @@ html[data-theme='dark'] .nm-modal {
 
     .nm-folder-header          { padding: 10px; }
 
-    .nm-note-row               { padding: 8px 10px; }
-
-    .nm-note-meta              { display: none; }
+    .nm-note-row               { padding: 10px; }
 
     .nm-bulk-bar               { align-items: stretch; }
 
@@ -622,45 +661,16 @@ html[data-theme='dark'] .nm-modal {
 
     .nm-bulk-select            { width: 100%; }
 
-    /* Fix note layout to keep checkbox and title/tags on the same line */
+    /* No room for the date on a phone: the tags take the whole second line,
+       and a note without tags stays on a single line. */
+    .nm-note-meta {
+        display: none;
+    }
+
     .nm-note-row {
-        flex-wrap: nowrap;
-        align-items: flex-start;
-        padding-top: 12px;
-        padding-bottom: 12px;
-    }
-
-    
-    .nm-note-checkbox {
-        margin-top: 3px;
-    }
-
-    .nm-note-title-wrap {
-        flex: 1;
-        min-width: 0;
-        display: grid;
-        grid-template-areas: 
-            "icon title"
-            ". tags";
-        grid-template-columns: auto 1fr;
-        align-items: center;
-        gap: 0 8px;
-    }
-
-    .nm-note-type-icon {
-        grid-area: icon;
-    }
-
-    .nm-note-link {
-        grid-area: title;
-        white-space: normal;
-        line-height: 1.4;
-    }
-
-    .nm-note-tags {
-        grid-area: tags;
-        max-width: 100%;
-        margin-top: 4px;
-        justify-content: flex-start;
+        grid-template-columns: auto minmax(0, 1fr);
+        grid-template-areas:
+            "checkbox title"
+            ".        tags";
     }
 }

@@ -183,7 +183,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 43; // 43: workspace sharing moved to master.db workspace_shares, the public read-only workspace link is gone
+    $CURRENT_SCHEMA_VERSION = 44; // 44: slash_menu_require_alt became slash_menu_trigger, which also has a 'disabled' value
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -201,16 +201,22 @@ try {
         $isFreshDatabase = true;
     }
 
-    try {
-        $svStmt = $con->query("SELECT value FROM settings WHERE key = 'schema_version'");
-        $svResult = $svStmt->fetchColumn();
-        $svStmt->closeCursor();
-        if ($svResult !== false) {
-            $currentVersion = (int)$svResult;
+    // A database created right now has no settings table to read a version
+    // from: asking would only log "no such table: settings", which reads as
+    // a failure in the container logs while the bootstrap below is about to
+    // create that table (the line worried a Kubernetes user after an update).
+    if (!$isFreshDatabase) {
+        try {
+            $svStmt = $con->query("SELECT value FROM settings WHERE key = 'schema_version'");
+            $svResult = $svStmt->fetchColumn();
+            $svStmt->closeCursor();
+            if ($svResult !== false) {
+                $currentVersion = (int)$svResult;
+            }
+        } catch (Exception $e) {
+            // settings table doesn't exist (very old database)
+            error_log('db_connect: failed: ' . $e->getMessage());
         }
-    } catch (Exception $e) {
-        // settings table doesn't exist yet (fresh or very old database)
-        error_log('db_connect: failed: ' . $e->getMessage());
     }
 
     // Run the bootstrap whenever the stored version differs from the code's
@@ -595,15 +601,51 @@ try {
             . ($isFreshDatabase ? 'browser' : 'user') . "')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_created', '1')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_icons', '1')");
-        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('type_based_note_icons', '1')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_age_filter_days', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('date_time_format', 'default')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('diary_date_format', 'ymd')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('markdown_split_card_view', '1')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('markdown_colored', '0')");
-        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('slash_menu_require_alt', '0')");
-        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_nav_shortcuts_enabled', '0')");
-        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('ctrl_s_save_enabled', '0')");
+        // === Command menu shortcut (schema 44) ===
+        //
+        // The two-state slash_menu_require_alt ('/' or Alt + /) became
+        // slash_menu_trigger, which carries a third value: 'disabled', for the
+        // keyboard opening no menu at all. Right-click and the Insert button of
+        // the mobile editor bar still open it, so nothing becomes unreachable.
+        // Runs before the default below so a migrated database keeps the
+        // shortcut its user chose instead of falling back to '/'.
+        if ($currentVersion < 44) {
+            try {
+                $legacyRequireAlt = $con->query("SELECT value FROM settings WHERE key = 'slash_menu_require_alt'")->fetchColumn();
+                if ($legacyRequireAlt !== false) {
+                    $migratedTrigger = in_array((string)$legacyRequireAlt, ['1', 'true'], true) ? 'alt-slash' : 'slash';
+                    $migrate = $con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('slash_menu_trigger', ?)");
+                    $migrate->execute([$migratedTrigger]);
+                    $con->exec("DELETE FROM settings WHERE key = 'slash_menu_require_alt'");
+                }
+
+                // The settings card was renamed with the setting, and its id is
+                // what the hidden and pinned card lists store.
+                $renameCardId = $con->prepare("UPDATE settings SET value = REPLACE(value, 'slash-menu-require-alt-card', 'slash-menu-trigger-card') WHERE key = ? AND value LIKE '%slash-menu-require-alt-card%'");
+                foreach (['hidden_ui_elements', 'settings_pinned_cards'] as $cardListKey) {
+                    $renameCardId->execute([$cardListKey]);
+                }
+
+                // The list an admin hides for everyone lives in master.db, so it
+                // is rewritten by whichever account is migrated first; the ones
+                // after it find nothing left to replace.
+                require_once __DIR__ . '/users/db_master.php';
+                if (function_exists('getGlobalSetting') && function_exists('setGlobalSetting')) {
+                    $globalHidden = (string)getGlobalSetting('hidden_ui_elements_global', '[]');
+                    if (strpos($globalHidden, 'slash-menu-require-alt-card') !== false) {
+                        setGlobalSetting('hidden_ui_elements_global', str_replace('slash-menu-require-alt-card', 'slash-menu-trigger-card', $globalHidden));
+                    }
+                }
+            } catch (Exception $e) {
+                error_log('db_connect: slash menu trigger migration failed: ' . $e->getMessage());
+            }
+        }
+        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('slash_menu_trigger', 'slash')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('attachment_previews_in_note', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('attachments_at_bottom', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('backlinks_at_bottom', '0')");

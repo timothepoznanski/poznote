@@ -4,21 +4,38 @@
 (function () {
     'use strict';
 
-    // Trigger mode: by default the menu opens as soon as "/" is typed. When the
-    // "slash_menu_require_alt" setting is on, a bare "/" stays a literal character
-    // and the menu only opens on Alt + / (see handleAltSlashShortcut).
-    function isAltSlashModeEnabled() {
+    // Which key opens the menu, from the "slash_menu_trigger" setting:
+    //   'slash'     (default) the menu opens as soon as "/" is typed
+    //   'alt-slash' a bare "/" stays a literal character and the menu opens on
+    //               Alt + / instead (see handleAltSlashShortcut)
+    //   'disabled'  no key opens it. A right-click in the note and the Insert
+    //               button of the mobile editor bar still do, so the menu is
+    //               never out of reach.
+    function getSlashMenuTrigger() {
         try {
             if (typeof window.getPoznoteInitialSetting === 'function') {
-                var value = window.getPoznoteInitialSetting('slash_menu_require_alt');
-                if (value !== null && value !== undefined) {
-                    return value === '1' || value === 'true' || value === true;
+                var value = window.getPoznoteInitialSetting('slash_menu_trigger');
+                if (value === 'slash' || value === 'alt-slash' || value === 'disabled') {
+                    return value;
                 }
             }
         } catch (e) {
-            console.debug('slash-command: isAltSlashModeEnabled() failed:', e);
+            console.debug('slash-command: getSlashMenuTrigger() failed:', e);
         }
-        return false;
+        return 'slash';
+    }
+
+    // A typed "/" opens the menu only in the default mode.
+    function isTypedSlashModeEnabled() {
+        return getSlashMenuTrigger() === 'slash';
+    }
+
+    function isAltSlashModeEnabled() {
+        return getSlashMenuTrigger() === 'alt-slash';
+    }
+
+    function isSlashMenuKeyDisabled() {
+        return getSlashMenuTrigger() === 'disabled';
     }
 
     // On a phone a typed "/" stays a plain character: the Insert button of the
@@ -164,7 +181,7 @@
     let activeCommandsBuilder = null;  // rebuilds activeCommands, for a menu already open when the template list arrives
     let codeMirrorSlashEditor = null;
     let codeMirrorSlashFrom = -1;
-    let slashInsertedByButton = false; // the '/' came from window.openSlashMenuAtCaret, not the keyboard
+    let slashInsertedByButton = false; // the '/' came from a right-click or the Insert button, not the keyboard
     let codeMirrorSlashTo = -1;
     // Set while the menu was opened on a text selection (issue #1410): no "/"
     // was typed, the selection is kept and only formatting commands are shown
@@ -4115,8 +4132,28 @@
     }
 
     // Delete slash text and search
-    // Takes back the '/' the Insert button of the mobile bar put in when the menu
-    // closes without running a command (Cancel, tap outside): nobody typed it.
+    // Chrome fills the hole a removed caret host leaves with a
+    // <span>&ZeroWidthSpace;</span> to hold the typing style, which would stay
+    // in the middle of the line. Moving the caret out first leaves no hole to
+    // fill. Only when the caret really is in that node, so a menu dismissed
+    // with the keyboard closed (mobile) still does not pull the caret back.
+    function moveSelectionOutOfNode(node) {
+        const sel = window.getSelection();
+        if (!sel || !sel.rangeCount) return;
+
+        const range = sel.getRangeAt(0);
+        if (typeof range.intersectsNode !== 'function' || !range.intersectsNode(node)) return;
+
+        const outside = document.createRange();
+        outside.setStartBefore(node);
+        outside.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(outside);
+    }
+
+    // Takes back the '/' a right-click or the Insert button of the mobile bar
+    // put in when the menu closes without running a command (Cancel, Escape,
+    // click outside): nobody typed it.
     // Found from the saved slash position, as the keyboard closing with the menu
     // has usually cleared the selection by then. restoreCaret puts the caret
     // back where the button found it.
@@ -4148,6 +4185,7 @@
         if (length === node.textContent.length) {
             // The button inserted a text node of its own: remove it, not just
             // its text, so the line is left as it was
+            moveSelectionOutOfNode(node);
             caret.setStartBefore(node);
             node.parentNode.removeChild(node);
         } else {
@@ -4836,6 +4874,9 @@
 
             case 'Escape':
                 e.preventDefault();
+                // Nobody typed the '/' a right-click or the Insert button put
+                // in, so dismissing the menu has to take it back
+                removeButtonSlash(true);
                 hideSlashMenu();
                 savedNoteEntry = null;
                 break;
@@ -4845,6 +4886,7 @@
                 break;
 
             case ' ':
+                removeButtonSlash(false);
                 hideSlashMenu();
                 savedNoteEntry = null;
                 break;
@@ -4971,7 +5013,7 @@
         editor._cmPrevLength = value.length;
         const lastChar = cursorPos > 0 ? value.charAt(cursorPos - 1) : '';
 
-        if (lastChar === '/' && !isDeleting && !isAltSlashModeEnabled() && !isTypedSlashTakenByMobileBar()) {
+        if (lastChar === '/' && !isDeleting && isTypedSlashModeEnabled() && !isTypedSlashTakenByMobileBar()) {
             const textBeforeSlash = value.slice(0, cursorPos - 1);
             const isUrl = /:$/.test(textBeforeSlash) || /:\/$/.test(textBeforeSlash);
 
@@ -5079,7 +5121,7 @@
         // Don't open menu if we're deleting (e.g. backspace landing on a slash)
         const isDeleting = e.inputType && e.inputType.startsWith('delete');
 
-        if (lastChar === '/' && !isDeleting && !isAltSlashModeEnabled() && !isTypedSlashTakenByMobileBar()) {
+        if (lastChar === '/' && !isDeleting && isTypedSlashModeEnabled() && !isTypedSlashTakenByMobileBar()) {
             // Check if we're typing a URL - don't open menu in that case
             const textBeforeSlash = textBefore.substring(0, textBefore.length - 1);
             // Detect URL pattern: when typing / directly after : or :/ (protocol)
@@ -5109,7 +5151,8 @@
     }
 
     // Opens the menu at the caret of `target` without a typed '/': the Alt + /
-    // shortcut and the mobile editor bar. Returns true when the menu opened.
+    // shortcut, a right-click and the mobile editor bar. Returns true when the
+    // menu opened.
     function openSlashMenuAtCaret(target) {
         if (!target) return false;
 
@@ -5175,6 +5218,7 @@
     // keyboards, whose keydown reports an "Unidentified" key.
     function handleSelectionSlashKeydown(e) {
         if (e.defaultPrevented || e.isComposing || slashMenuElement) return;
+        if (isSlashMenuKeyDisabled()) return;
         if (isAltSlashModeEnabled()) {
             if (!isAltSlashEvent(e)) return;
         } else if (e.key !== '/' || e.metaKey || (e.ctrlKey && !e.altKey)) {
@@ -5192,22 +5236,96 @@
 
     function handleSelectionSlashBeforeInput(e) {
         if (e.defaultPrevented || e.inputType !== 'insertText' || e.data !== '/' || slashMenuElement) return;
-        if (isAltSlashModeEnabled() || isTypedSlashTakenByMobileBar()) return;
+        if (!isTypedSlashModeEnabled() || isTypedSlashTakenByMobileBar()) return;
         if (showSlashMenuForSelection(e.target)) e.preventDefault();
     }
 
-    // Right-click on selected text opens the same formatting menu at the
-    // pointer (discussion #1465), with Copy and Cut so the browser menu is
-    // not missed. Without a selection the browser menu stays: it carries
-    // Paste and the spellcheck suggestions. Desktop only, a long press on a
-    // phone selects a word and shows the native selection toolbar. The
-    // attachment menu runs first and takes the event when it opens.
+    // Right-click in a note opens the same menu "/" does, at the pointer: the
+    // formatting menu on a selection (discussion #1465), with Copy and Cut so
+    // the browser menu is not missed, and the insert menu at a bare caret.
+    // Desktop only, a long press on a phone selects a word and shows the native
+    // selection toolbar. The attachment menu runs first and takes the event when
+    // it opens; the table menu is left the cells it owns.
     function handleSelectionContextMenu(e) {
         if (e.defaultPrevented || slashMenuElement) return;
         if (window.matchMedia && window.matchMedia('(max-width: 800px)').matches) return;
 
         const pointer = { left: e.clientX, right: e.clientX, top: e.clientY, bottom: e.clientY, width: 0, height: 0 };
-        if (showSlashMenuForSelection(e.target, pointer)) e.preventDefault();
+        if (showSlashMenuForSelection(e.target, pointer)) {
+            e.preventDefault();
+            return;
+        }
+
+        if (openSlashMenuAtPointer(e)) {
+            // The '/' was not typed, so it is taken back when the menu closes
+            // without running a command
+            slashInsertedByButton = !!slashMenuElement;
+            e.preventDefault();
+        }
+    }
+
+    // Nothing selected under the pointer: move the caret to the click and open
+    // the insert menu there, the way the Insert button of the mobile bar opens
+    // it at the caret. Returns true when the menu opened.
+    function openSlashMenuAtPointer(e) {
+        const target = e.target;
+        if (!target || !target.closest) return false;
+
+        // The table menu (js/table-context-menu.js) listens on the document too
+        // and is registered after this one, so a cell has to be left to it here
+        // or it would never get the event.
+        if (target.closest('.noteentry td, .noteentry th')) return false;
+
+        const codeMirrorEditor = getCodeMirrorEditorFromTarget(target);
+        if (codeMirrorEditor) {
+            const api = getMarkdownCodeMirrorApi();
+            if (!api || typeof api.getPosAtCoords !== 'function' || typeof api.setSelection !== 'function') return false;
+
+            const position = api.getPosAtCoords(codeMirrorEditor, e.clientX, e.clientY);
+            if (typeof position !== 'number') return false;
+
+            api.setSelection(codeMirrorEditor, position, position);
+            return openSlashMenuAtCaret(codeMirrorEditor);
+        }
+
+        // The body of a note only: the title and task inputs keep the browser
+        // menu, which is the only way left to paste into them with the mouse.
+        const editable = target.closest('[contenteditable="true"]');
+        const noteEntry = editable && editable.closest ? editable.closest('.noteentry') : null;
+        if (!noteEntry || noteEntry.getAttribute('data-note-type') === 'tasklist') return false;
+        if (!placeCaretAtPoint(editable, e.clientX, e.clientY)) return false;
+
+        return openSlashMenuAtCaret(editable);
+    }
+
+    // Moves the caret to viewport coordinates inside `editable`, so the menu
+    // opens where the right-click landed rather than wherever the caret was.
+    // Returns false when the point is not on content of that editable.
+    function placeCaretAtPoint(editable, x, y) {
+        let range = null;
+        if (typeof document.caretRangeFromPoint === 'function') {
+            range = document.caretRangeFromPoint(x, y);
+        } else if (typeof document.caretPositionFromPoint === 'function') {
+            const position = document.caretPositionFromPoint(x, y);
+            if (position && position.offsetNode) {
+                range = document.createRange();
+                range.setStart(position.offsetNode, position.offset);
+            }
+        }
+        if (!range) return false;
+
+        let container = range.startContainer;
+        if (container.nodeType === 3) container = container.parentNode;
+        if (!container || !container.closest || container.closest('[contenteditable="true"]') !== editable) return false;
+
+        range.collapse(true);
+        focusEditableElement(editable);
+
+        const sel = window.getSelection();
+        if (!sel) return false;
+        sel.removeAllRanges();
+        sel.addRange(range);
+        return true;
     }
 
     // Handle click outside menu (close)
@@ -5400,7 +5518,7 @@
                 const pos = target.selectionStart;
 
                 // Check if the last character typed is a slash
-                if (pos > 0 && value[pos - 1] === '/' && !isAltSlashModeEnabled()) {
+                if (pos > 0 && value[pos - 1] === '/' && isTypedSlashModeEnabled()) {
                     // Don't show if we're deleting
                     const isDeleting = e.inputType && e.inputType.startsWith('delete');
                     if (!isDeleting) {
@@ -5935,7 +6053,8 @@
     window.hideSlashMenu = hideSlashMenu;
 
     // Opens the menu from a button instead of a typed '/' (mobile editor bar):
-    // the formatting menu on a selection, the insert menu at a bare caret.
+    // the formatting menu on a selection, the insert menu at a bare caret. The
+    // right-click does the same through handleSelectionContextMenu.
     window.openSlashMenuAtCaret = function (target) {
         if (slashMenuElement) return false;
         if (showSlashMenuForSelection(target)) return true;

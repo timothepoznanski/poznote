@@ -1,24 +1,13 @@
 /**
  * Global keyboard shortcuts
- * - Ctrl+S / Cmd+S: save the current note (setting: ctrl_s_save_enabled)
- * - Ctrl+Alt+S / Cmd+Alt+S: take a snapshot of the current note (always on)
- * - Alt+ArrowUp / Alt+ArrowDown: switch between notes in the current folder (setting: note_nav_shortcuts_enabled)
+ * - Ctrl+S / Cmd+S: save the current note
+ * - Ctrl+Alt+S / Cmd+Alt+S: take a snapshot of the current note
+ * - Alt+ArrowUp / Alt+ArrowDown: switch between notes in the current folder
+ * All three are always on; the former opt-in settings were removed.
  */
 
 (function () {
     'use strict';
-
-    function isShortcutSettingEnabled(key) {
-        try {
-            if (typeof window.getPoznoteInitialSetting === 'function') {
-                var value = window.getPoznoteInitialSetting(key);
-                return value === '1' || value === 'true' || value === true;
-            }
-        } catch (e) {
-            console.debug('keyboard-shortcuts: isShortcutSettingEnabled() failed:', e);
-        }
-        return false;
-    }
 
     var isMacPlatform = /Mac|iPhone|iPad|iPod/.test(navigator.platform || '');
 
@@ -120,7 +109,6 @@
 
         // Ctrl+S / Cmd+S saves the current note (Ctrl+Shift+S stays strikethrough)
         if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && e.key && e.key.toLowerCase() === 's') {
-            if (!isShortcutSettingEnabled('ctrl_s_save_enabled')) return;
             e.preventDefault();
             if (typeof window.saveNoteImmediately === 'function') {
                 // The toast only once the server confirmed the save
@@ -132,7 +120,6 @@
         // Alt+ArrowUp/ArrowDown navigates to the previous/next note in the current folder
         if (e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey &&
             (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
-            if (!isShortcutSettingEnabled('note_nav_shortcuts_enabled')) return;
             // On macOS, Option+Arrow is native text navigation inside editable fields
             if (isMacPlatform && isTextEditingContext(e.target)) return;
             e.preventDefault();

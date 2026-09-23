@@ -379,7 +379,7 @@
 
             if (key === '__none__') {
                 folderLabel.innerHTML = '<i class="lucide lucide-folder-open" style="color: var(--icon-color, #94a3b8);"></i> '
-                    + escHtml(cfg.txtNoFolder);
+                    + '<span class="nm-folder-name">' + escHtml(cfg.txtNoFolder) + '</span>';
                 header.setAttribute('data-folder-id', '');
             } else {
                 var f = folderById[key];
@@ -388,7 +388,7 @@
                 var path   = (f && f.path)   ? f.path   : (f ? f.name : cfg.txtNoFolder);
                 var style  = color ? ' style="color:' + escHtml(color) + '"' : '';
                 folderLabel.innerHTML = '<i class="lucide ' + escHtml(icon) + '"' + style + '></i> '
-                    + escHtml(path);
+                    + '<span class="nm-folder-name">' + escHtml(path) + '</span>';
                 header.setAttribute('data-folder-id', key);
             }
 
