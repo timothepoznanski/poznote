@@ -332,7 +332,7 @@ function ensureMarkdownSplitPaneHeightListeners() {
         scheduleMarkdownSplitPaneHeightUpdate();
     });
 
-    // Focus mode clears the title rows above the panes, or puts them back
+    // Focus mode clears the rows around the title, above the panes, or puts them back
     // (js/icon-sidebar-toggle.js): the panes start somewhere else
     document.addEventListener('poznote:focus-mode', function () {
         scheduleMarkdownSplitPaneHeightUpdate();

@@ -2112,7 +2112,6 @@
     "template_none": "Ainda não há modelos",
     "template_none_hint": "Coloque notas numa pasta ou num espaço de trabalho chamado \"Modelos\"",
     "template_insert_failed": "Não foi possível inserir o modelo",
-    "dictate": "Ditar",
     "record_audio": "Gravar áudio",
     "insert": "Inserir",
     "media": "Mídia",
@@ -4526,7 +4525,7 @@
     "config_title": "Configuração",
     "description": "Conecte o Poznote a um servidor de reconhecimento de voz para transformar a voz em texto nas suas notas. Qualquer servidor compatível com a API de áudio da OpenAI funciona, incluindo um Whisper auto-hospedado, e o áudio nunca sai da máquina que o executa.",
     "enable_label": "Ativar a transcrição",
-    "enable_description": "Adiciona uma entrada Ditar em Inserir no menu de barra de cada nota e uma ação Transcrever nos anexos de áudio.",
+    "enable_description": "Adiciona um botão Transcrever à janela Gravar áudio, em Inserir no menu de barra de cada nota, e uma ação Transcrever nos anexos de áudio.",
     "users_label": "Usuários autorizados a usar o servidor de transcrição configurado pelo administrador",
     "users_description": "Somente os usuários selecionados podem ditar e transcrever com a configuração desta página. Novos usuários não têm acesso até você adicioná-los aqui.",
     "users_filter_placeholder": "Filtrar usuários",
@@ -4545,7 +4544,7 @@
       "save_error": "Falha ao salvar a configuração."
     },
     "max_duration_label": "Duração máxima da gravação",
-    "max_duration_description": "Em minutos, de 1 a {{limit}}. Ditar e Gravar áudio param sozinhos ao atingir esse limite, para que uma aba esquecida gravando não envie uma hora de áudio. A janela mostra o tempo decorrido em relação a esse limite. A transcrição de um anexo existente não é afetada."
+    "max_duration_description": "Em minutos, de 1 a {{limit}}. Gravar áudio para sozinho ao atingir esse limite, para que uma aba esquecida gravando não envie uma hora de áudio. A janela mostra o tempo decorrido em relação a esse limite. A transcrição de um anexo existente não é afetada."
   },
   "stt_settings_user": {
     "title": "Meu servidor de transcrição",
@@ -4562,9 +4561,6 @@
   },
   "stt": {
     "modal": {
-      "title": "Ditar",
-      "recording_hint": "Fale e depois pare a gravação para transcrevê-la. Ela para sozinha depois de {{minutes}} min.",
-      "stop": "Parar e transcrever",
       "transcribing": "Transcrevendo...",
       "transcribing_file": "Transcrevendo {{file}}...",
       "review_label": "Transcrição",
@@ -4582,7 +4578,6 @@
       "no_microphone": "Nenhum microfone foi encontrado.",
       "microphone_failed": "Não foi possível abrir o microfone.",
       "empty_recording": "Nada foi gravado.",
-      "max_duration": "Duração máxima da gravação atingida, transcrevendo o que foi gravado.",
       "nothing_heard": "O servidor não ouviu nada nesta gravação.",
       "no_note": "Abra uma nota primeiro: não há onde colocar o texto.",
       "failed": "Falha na transcrição: {{error}}",
@@ -4614,10 +4609,19 @@
   },
   "audio_recorder": {
     "title": "Gravar áudio",
+    "hint_ready": "Toque em Iniciar para começar a gravar. A gravação para sozinha depois de {{minutes}} min.",
     "hint": "Gravando. Pare para inserir o áudio na nota. A gravação para sozinha depois de {{minutes}} min.",
+    "hint_choice": "Gravando. Pare para inserir o áudio na nota ou para transcrevê-lo em texto. A gravação para sozinha depois de {{minutes}} min.",
+    "start": "Iniciar",
     "stop": "Parar e inserir",
+    "insert_audio": "Inserir o áudio",
+    "transcribe": "Transcrever",
+    "transcribe_note": "Depois de transcrito, você poderá inserir o texto na nota e também anexar o áudio a ela.",
+    "language_auto": "Detectar automaticamente",
+    "language_default": "{{language}} (padrão)",
     "saving": "Salvando a gravação...",
     "max_duration": "Duração máxima da gravação atingida, inserindo o que foi gravado.",
+    "max_duration_choice": "Duração máxima da gravação atingida. Escolha o que fazer com a gravação.",
     "upload_failed": "Não foi possível salvar a gravação: {{error}}",
     "download": "Baixar a gravação",
     "no_note": "Abra uma nota primeiro: a gravação é salva como anexo dessa nota."

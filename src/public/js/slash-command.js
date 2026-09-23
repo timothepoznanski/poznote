@@ -1980,10 +1980,6 @@
         return items;
     }
 
-    function isSpeechToTextAvailable() {
-        return !!(window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.speechToText);
-    }
-
     function isSlashCommandHidden(commandId) {
         var config = window.PoznoteUiCustomization;
         return !!(config && config.hiddenKeyMap && config.hiddenKeyMap['slash:' + commandId]);
@@ -2465,32 +2461,23 @@
                 label: t('slash_menu.take_photo', null, 'Take a photo'),
                 action: function () { insertImage(true); }
             },
-            // Only offered when a transcription server is configured for this
-            // user; filterSlashCommands() drops a null entry.
-            dictate: isSpeechToTextAvailable() ? {
-                id: 'dictate',
-                icon: 'lucide lucide-mic',
-                label: t('slash_menu.dictate', null, 'Dictate'),
-                aliases: ['dictate', 'voice', 'speech', 'transcribe'],
-                action: function () {
-                    if (typeof window.openDictationModal === 'function') {
-                        // The menu is still closing and the caret still moving;
-                        // the modal reads both, so let them settle first, the
-                        // way the emoji picker does.
-                        setTimeout(function () { window.openDictationModal(); }, 10);
-                    }
-                }
-            } : null,
-            // A plain audio recording inserted as an attachment player. Needs no
-            // transcription server, so it is offered to everyone.
+            // Records from the microphone. The dialog's stop buttons insert
+            // the audio or, when a transcription server is configured for this
+            // user, transcribe it (js/speech-to-text.js). Needs no server, so
+            // it is offered to everyone; "dictate" and co. still find it.
             recordAudio: {
                 id: 'record-audio',
-                icon: 'lucide lucide-circle-dot',
+                icon: 'lucide lucide-mic',
                 label: t('slash_menu.record_audio', null, 'Record audio'),
-                aliases: ['record', 'recorder', 'voice note', 'audio note'],
+                aliases: ['record', 'recorder', 'voice note', 'audio note', 'dictate', 'voice', 'speech', 'transcribe'],
+                // The dialog closes the phone keyboard; executeCommand() must
+                // not focus the note behind it again
+                noRefocus: true,
                 action: function () {
                     if (typeof window.openAudioRecorder === 'function') {
-                        // Same settle delay as Dictate: the dialog reads the caret
+                        // The menu is still closing and the caret still moving;
+                        // the dialog reads both, so let them settle first, the
+                        // way the emoji picker does.
                         setTimeout(function () { window.openAudioRecorder(); }, 10);
                     }
                 }
@@ -2664,7 +2651,7 @@
                             insertToggle();
                         }
                     },
-                    common.dictate,
+                    common.recordAudio,
                     common.emoji,
                     {
                         id: 'table',
@@ -2989,7 +2976,7 @@
                             insertMarkdownAtCursor('\n\n<details class="toggle-block" open>\n<summary class="toggle-header">Toggle</summary>\n\n...\n\n</details>\n\n', -17);
                         }
                     },
-                    common.dictate,
+                    common.recordAudio,
                     common.emoji,
                     {
                         id: 'table',
@@ -3271,12 +3258,79 @@
             })
         };
 
+        // Turns the selected lines / blocks into a list, the toolbar list
+        // buttons' path. markerType is the HTML <ol type> ('a', 'i'): an
+        // ordered list already under the selection only changes its marker,
+        // since insertOrderedList would toggle it back to paragraphs.
+        const selectionOrderedList = function () {
+            const sel = window.getSelection();
+            let node = sel && sel.rangeCount ? sel.getRangeAt(0).commonAncestorContainer : null;
+            if (node && node.nodeType === 3) node = node.parentNode;
+            const ol = node && node.closest ? node.closest('ol') : null;
+            return ol && savedNoteEntry && savedNoteEntry.contains(ol) ? ol : null;
+        };
+        const applyList = function (kind, markerType) {
+            if (isMarkdown) {
+                if (typeof window.toggleMarkdownList === 'function') window.toggleMarkdownList(kind);
+                return;
+            }
+            if (kind === 'task') {
+                if (typeof window.toggleChecklistSelection === 'function') window.toggleChecklistSelection();
+                return;
+            }
+            if (kind === 'ul') {
+                document.execCommand('insertUnorderedList');
+                return;
+            }
+            let ol = selectionOrderedList();
+            const currentType = ol ? (ol.getAttribute('type') || '') : null;
+            if (!ol || currentType === (markerType || '')) {
+                document.execCommand('insertOrderedList');
+                ol = selectionOrderedList();
+                if (!ol || currentType !== null) return;
+            }
+            if (markerType) ol.setAttribute('type', markerType);
+            else ol.removeAttribute('type');
+            if (savedNoteEntry) savedNoteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+        };
+        const list = {
+            id: 'list',
+            icon: 'lucide-list-ul',
+            label: t('slash_menu.list', null, 'List'),
+            submenu: [
+                { id: 'bullets', icon: 'lucide-list-ul', label: t('slash_menu.bullet_list', null, 'Bullet list'), action: () => applyList('ul') },
+                { id: 'numbers', icon: 'lucide-list-ol', label: t('slash_menu.numbered_list', null, 'Numbered list'), action: () => applyList('ol') }
+            ].concat(isMarkdown ? [] : [
+                { id: 'letters', icon: 'lucide-list-lettered', label: t('slash_menu.lettered_list', null, 'Lettered list'), action: () => applyList('ol', 'a') },
+                { id: 'roman', icon: 'lucide-list-roman', label: t('slash_menu.roman_list', null, 'Roman numeral list'), action: () => applyList('ol', 'i') }
+            ]).concat([
+                { id: 'checklist', icon: 'lucide-list-check', label: t('slash_menu.checklist', null, 'Checklist'), action: () => applyList('task') }
+            ]).concat(isMarkdown ? [
+                { id: 'task-remove', icon: 'lucide-minus-square', label: t('editor.toolbar.remove_checklist', null, 'Remove checkboxes'), action: () => applyList('task-remove') }
+            ] : [])
+        };
+
+        const underline = {
+            id: 'underline',
+            icon: 'lucide-underline',
+            label: t('editor.toolbar.underline', null, 'Underline'),
+            action: function () {
+                if (isMarkdown) {
+                    if (typeof window.applyMarkdownUnderline === 'function') window.applyMarkdownUnderline();
+                } else {
+                    document.execCommand('underline');
+                }
+            }
+        };
+        // Same order as the selection toolbar; the eraser is HTML only there too
         const format = isMarkdown
-            ? [pick('format', 'bold'), pick('format', 'italic'), pick('format', 'strikethrough')]
+            ? [pick('format', 'bold'), pick('format', 'italic'), underline, pick('format', 'strikethrough')]
             : [
                 { id: 'bold', icon: 'lucide-bold', label: t('slash_menu.bold', null, 'Bold'), action: () => document.execCommand('bold') },
                 { id: 'italic', icon: 'lucide-italic', label: t('slash_menu.italic', null, 'Italic'), action: () => document.execCommand('italic') },
-                { id: 'strikethrough', icon: 'lucide-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => document.execCommand('strikeThrough') }
+                underline,
+                { id: 'strikethrough', icon: 'lucide-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => document.execCommand('strikeThrough') },
+                { id: 'remove-format', icon: 'lucide-eraser', label: t('editor.toolbar.clear_formatting', null, 'Clear formatting'), action: () => document.execCommand('removeFormat') }
             ];
 
         const color = isMarkdown
@@ -3321,6 +3375,7 @@
                 label: t('slash_menu.format_text', null, 'Format text'),
                 submenu: format
             },
+            list,
             color,
             highlight,
             {
@@ -3353,6 +3408,18 @@
             },
             quote,
             pick('link-menu', 'link'),
+            {
+                id: 'search-replace',
+                icon: 'lucide-search',
+                label: t('editor.toolbar.search_replace', null, 'Search and replace'),
+                // Opens prefilled with the restored selection
+                action: function () {
+                    const noteId = savedNoteEntry && savedNoteEntry.id
+                        ? savedNoteEntry.id.replace('entry', '')
+                        : (window.noteid != null ? String(window.noteid) : '');
+                    if (noteId && typeof window.openSearchReplaceModal === 'function') window.openSearchReplaceModal(noteId);
+                }
+            },
             // The menu replaces the browser one on a right-click, so it has to
             // cover the clipboard. execCommand works on the restored selection
             // in both editors: CodeMirror handles the cut event itself.
@@ -4465,7 +4532,8 @@
                 // them — their handlers refocus after the pick)
                 var taskListPickerModal = document.getElementById('taskListPickerModal');
                 var taskListPickerOpen = !!(taskListPickerModal && taskListPickerModal.style.display && taskListPickerModal.style.display !== 'none');
-                if (!shouldKeepSlash && !taskListPickerOpen && !(typeof window.isSlashDatePickerOpen === 'function' && window.isSlashDatePickerOpen())) {
+                var skipRefocus = !!(foundCmd && foundCmd.noRefocus);
+                if (!shouldKeepSlash && !skipRefocus && !taskListPickerOpen && !(typeof window.isSlashDatePickerOpen === 'function' && window.isSlashDatePickerOpen())) {
                     if (savedEditableElement) {
                         focusEditableElement(savedEditableElement);
                     } else if (savedNoteEntry) {
@@ -5933,25 +6001,41 @@
                             mediaHtml = '<iframe class="note-audio-embed" contenteditable="false" scrolling="no" frameborder="0" allow="autoplay" data-is-audio="true" data-audio-src="' + fileUrl + '" src="' + audioPlayerUrl + '"></iframe>';
                         }
 
-                        if (editableElement) {
+                        // Focusing, or setting the selection inside the editable,
+                        // would reopen the phone keyboard the recorder closed
+                        var keepKeyboardClosed = !!(preset && preset.keepKeyboardClosed);
+                        var markdownApi = getMarkdownCodeMirrorApi();
+
+                        if (editableElement && !keepKeyboardClosed) {
                             editableElement.focus();
                         }
 
-                        if (savedRange) {
+                        if (savedRange && !keepKeyboardClosed) {
                             var sel = window.getSelection();
                             sel.removeAllRanges();
                             sel.addRange(savedRange);
                         }
 
+                        // replaceRange() focuses CodeMirror; its update listener
+                        // fires the input event either way
+                        var insertedInMarkdown = isMarkdown && keepKeyboardClosed && savedCodeMirrorSelection
+                            && markdownApi && typeof markdownApi.replaceRangeKeepSelection === 'function'
+                            && markdownApi.replaceRangeKeepSelection(savedCodeMirrorSelection.editor,
+                                Math.min(savedCodeMirrorSelection.start, savedCodeMirrorSelection.end),
+                                Math.max(savedCodeMirrorSelection.start, savedCodeMirrorSelection.end),
+                                mediaHtml + '\n\n');
+
                         if (isMarkdown) {
-                            insertMarkdownAtContext({
-                                noteEntry,
-                                editableElement,
-                                savedRange,
-                                codeMirrorSelection: savedCodeMirrorSelection
-                            }, mediaHtml + '\n\n', 0);
-                            if (editableElement) {
-                                editableElement.dispatchEvent(new Event('input', { bubbles: true }));
+                            if (!insertedInMarkdown) {
+                                insertMarkdownAtContext({
+                                    noteEntry,
+                                    editableElement,
+                                    savedRange,
+                                    codeMirrorSelection: savedCodeMirrorSelection
+                                }, mediaHtml + '\n\n', 0);
+                                if (editableElement) {
+                                    editableElement.dispatchEvent(new Event('input', { bubbles: true }));
+                                }
                             }
                         } else {
                             try {
@@ -5965,11 +6049,14 @@
                                     range = document.createRange();
                                     range.selectNodeContents(editableElement);
                                     range.collapse(false);
-                                    sel.removeAllRanges();
-                                    sel.addRange(range);
+                                    if (!keepKeyboardClosed) {
+                                        sel.removeAllRanges();
+                                        sel.addRange(range);
+                                    }
                                 }
 
                                 if (range) {
+                                    if (keepKeyboardClosed) sel = null;
                                     var temp = document.createElement('div');
                                     temp.innerHTML = mediaHtml;
                                     var mediaEl = temp.firstChild;
@@ -5986,8 +6073,10 @@
                                     range.deleteContents();
                                     range.insertNode(fragment);
                                     range.collapse(false);
-                                    sel.removeAllRanges();
-                                    sel.addRange(range);
+                                    if (sel) {
+                                        sel.removeAllRanges();
+                                        sel.addRange(range);
+                                    }
                                 }
                             } catch (e) {
                                 console.error('Error inserting ' + mediaType + ':', e);
@@ -6087,7 +6176,9 @@
         const savedCodeMirrorSelection = options.codeMirrorSelection || getCodeMirrorSelectionSnapshot(editableElement);
         // options.file: a recording made in the page, uploaded without the picker;
         // options.onUploadError lets the recorder offer it back if the upload fails
-        var preset = options.file ? { file: options.file, onError: options.onUploadError } : null;
+        // options.keepKeyboardClosed: the recorder closed the phone keyboard for its
+        // dialog, and the player goes in without focusing the editor again
+        var preset = options.file ? { file: options.file, onError: options.onUploadError, keepKeyboardClosed: !!options.keepKeyboardClosed } : null;
         insertUploadedAudio(isMarkdown, noteEntry, editableElement, savedRange, savedCodeMirrorSelection, preset);
     };
 

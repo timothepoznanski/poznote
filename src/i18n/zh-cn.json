@@ -2110,7 +2110,6 @@
     "template_none": "暂无模板",
     "template_none_hint": "将笔记放入名为“模板”的文件夹或工作区",
     "template_insert_failed": "无法插入模板",
-    "dictate": "听写",
     "record_audio": "录音",
     "insert": "插入",
     "media": "媒体",
@@ -4625,7 +4624,7 @@
     "config_title": "配置",
     "description": "将 Poznote 连接到语音识别服务器，把语音转成笔记文字。任何支持 OpenAI 音频 API 的服务器都可以，包括自托管的 Whisper，音频不会离开运行它的机器。",
     "enable_label": "启用转录",
-    "enable_description": "在每条笔记的斜杠菜单“插入”下添加“听写”项，并为音频附件添加“转录”操作。",
+    "enable_description": "在“录音”对话框（位于每条笔记斜杠菜单的“插入”下）中添加“转录”按钮，并为音频附件添加“转录”操作。",
     "users_label": "允许使用管理员配置的转录服务器的用户",
     "users_description": "只有选中的用户可以使用本页配置进行听写和转录。新用户在你将其添加到这里之前没有访问权限。",
     "users_filter_placeholder": "筛选用户",
@@ -4644,7 +4643,7 @@
       "save_error": "配置保存失败。"
     },
     "max_duration_label": "最长录音时长",
-    "max_duration_description": "以分钟为单位，范围 1 到 {{limit}}。“听写”和“录音”达到该时长时会自动停止，避免遗忘的标签页发送一小时的音频。对话框会显示已用时间与该上限的对比。不影响对已有附件的转录。"
+    "max_duration_description": "以分钟为单位，范围 1 到 {{limit}}。“录音”达到该时长时会自动停止，避免遗忘的标签页发送一小时的音频。对话框会显示已用时间与该上限的对比。不影响对已有附件的转录。"
   },
   "stt_settings_user": {
     "title": "我的转录服务器",
@@ -4661,9 +4660,6 @@
   },
   "stt": {
     "modal": {
-      "title": "听写",
-      "recording_hint": "开始说话，然后停止录音即可转录。录音会在 {{minutes}} 分钟后自动停止。",
-      "stop": "停止并转录",
       "transcribing": "正在转录...",
       "transcribing_file": "正在转录 {{file}}...",
       "review_label": "转录结果",
@@ -4681,7 +4677,6 @@
       "no_microphone": "未找到麦克风。",
       "microphone_failed": "无法打开麦克风。",
       "empty_recording": "没有录到任何内容。",
-      "max_duration": "已达到最长录音时长，正在转录已录制的内容。",
       "nothing_heard": "服务器在此录音中没有听到任何内容。",
       "no_note": "请先打开一条笔记：没有地方放置文字。",
       "failed": "转录失败：{{error}}",
@@ -4713,10 +4708,19 @@
   },
   "audio_recorder": {
     "title": "录音",
+    "hint_ready": "点击“开始”即可录音。录音会在 {{minutes}} 分钟后自动停止。",
     "hint": "正在录音。停止后即可将音频插入笔记。录音会在 {{minutes}} 分钟后自动停止。",
+    "hint_choice": "正在录音。停止后可将音频插入笔记，或将其转录为文字。录音会在 {{minutes}} 分钟后自动停止。",
+    "start": "开始",
     "stop": "停止并插入",
+    "insert_audio": "插入音频",
+    "transcribe": "转录",
+    "transcribe_note": "转录完成后，可以将文字插入笔记，也可以同时把音频作为附件添加到笔记。",
+    "language_auto": "自动检测",
+    "language_default": "{{language}}（默认）",
     "saving": "正在保存录音...",
     "max_duration": "已达到最长录音时长，正在插入已录制的内容。",
+    "max_duration_choice": "已达到最长录音时长。请选择如何处理这段录音。",
     "upload_failed": "无法保存录音：{{error}}",
     "download": "下载录音",
     "no_note": "请先打开一条笔记：录音会保存为该笔记的附件。"

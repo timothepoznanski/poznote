@@ -15,6 +15,7 @@
  *
  * Actions:
  *   POST ?action=transcribe             multipart {audio: file, language?}
+ *                                       (language: two-letter code, or "auto")
  *                                       → JSON {success, text}
  *   POST ?action=transcribe_attachment  {note_id, attachment_id, language?}
  *                                       → JSON {success, text, filename}
@@ -223,9 +224,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 // A language posted with the request overrides the configured one, so a user
 // who normally dictates in French can transcribe an English recording without
-// going through the settings page.
-$requestLanguage = poznoteSttNormalizeLanguage($_POST['language'] ?? '');
-$language = $requestLanguage !== '' ? $requestLanguage : (string)$sttConfig['language'];
+// going through the settings page. "auto" lets the server detect it even when
+// the configuration fixes one (the recording dialog's language menu).
+$rawRequestLanguage = strtolower(trim((string)($_POST['language'] ?? '')));
+if ($rawRequestLanguage === 'auto') {
+    $language = '';
+} else {
+    $requestLanguage = poznoteSttNormalizeLanguage($rawRequestLanguage);
+    $language = $requestLanguage !== '' ? $requestLanguage : (string)$sttConfig['language'];
+}
 
 if ($action === 'transcribe') {
     $upload = $_FILES['audio'] ?? null;

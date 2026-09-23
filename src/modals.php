@@ -979,8 +979,8 @@ $pzNoteInfoRows = [
             <div id="moveTaskList" class="move-task-list"></div>
         </div>
         <div class="modal-buttons">
-            <button type="button" class="btn-primary" id="confirmMoveTaskBtn"><?php echo t_h('modals.task_move.confirm', [], 'Move task'); ?></button>
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="moveTaskModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="confirmMoveTaskBtn"><?php echo t_h('modals.task_move.confirm', [], 'Move task'); ?></button>
         </div>
     </div>
 </div>
@@ -1294,13 +1294,18 @@ $pzNoteInfoRows = [
 -->
 <div id="dictateModal" class="modal">
     <div class="modal-content dictate-modal-content">
-        <h3><i class="lucide lucide-mic"></i> <span id="dictateTitle"><?php echo t_h('stt.modal.title', [], 'Dictate'); ?></span></h3>
+        <h3><i class="lucide lucide-mic"></i> <span id="dictateTitle"><?php echo t_h('audio_recorder.title', [], 'Record audio'); ?></span></h3>
 
         <div class="dictate-panel" id="dictateRecordPanel">
             <div class="dictate-level" id="dictateLevel" aria-hidden="true"><span class="dictate-level-bar" id="dictateLevelBar"></span></div>
             <?php $dictateMaxMinutes = function_exists('poznoteSttMaxRecordingMinutes') ? poznoteSttMaxRecordingMinutes() : 10; ?>
             <div class="dictate-timer"><span id="dictateTimer">0:00</span><span class="dictate-timer-limit"> / <span id="dictateTimerLimit"><?php echo $dictateMaxMinutes; ?>:00</span></span></div>
-            <p class="dictate-hint" id="dictateHint"><?php echo t_h('stt.modal.recording_hint', ['minutes' => $dictateMaxMinutes], 'Speak, then stop the recording to have it transcribed. It stops on its own after {{minutes}} min.'); ?></p>
+            <p class="dictate-hint" id="dictateHint"><?php echo t_h('audio_recorder.hint_ready', ['minutes' => $dictateMaxMinutes], 'Press Start to begin recording. It stops on its own after {{minutes}} min.'); ?></p>
+            <?php // Filled and preselected by js/speech-to-text.js, only with a transcription server ?>
+            <div class="dictate-language" id="dictateLanguageRow" hidden>
+                <label for="dictateLanguage"><?php echo t_h('stt_settings.language_label', [], 'Spoken language'); ?></label>
+                <select id="dictateLanguage"></select>
+            </div>
         </div>
 
         <div class="dictate-panel" id="dictateWorkPanel" hidden>
@@ -1320,9 +1325,14 @@ $pzNoteInfoRows = [
 
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" id="dictateCancelBtn"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-primary" id="dictateStopBtn"><?php echo t_h('stt.modal.stop', [], 'Stop and transcribe'); ?></button>
+            <?php // Start, then choose what to do with the recording when it stops (js/speech-to-text.js) ?>
+            <button type="button" class="btn-primary" id="dictateStartBtn"><?php echo t_h('audio_recorder.start', [], 'Start'); ?></button>
+            <button type="button" class="btn-primary" id="dictateStopBtn" hidden><?php echo t_h('audio_recorder.insert_audio', [], 'Insert the audio'); ?></button>
+            <button type="button" class="btn-primary" id="dictateTranscribeBtn" aria-describedby="dictateTranscribeNote" hidden><?php echo t_h('audio_recorder.transcribe', [], 'Transcribe'); ?><span class="dictate-footnote-mark" aria-hidden="true">*</span></button>
             <button type="button" class="btn-primary" id="dictateInsertBtn" hidden><?php echo t_h('stt.modal.insert', [], 'Insert'); ?></button>
         </div>
+        <?php // Shown with the Transcribe button it explains (js/speech-to-text.js showPanel) ?>
+        <p class="dictate-footnote" id="dictateTranscribeNote" hidden><span class="dictate-footnote-mark" aria-hidden="true">*</span><?php echo t_h('audio_recorder.transcribe_note', [], 'Once transcribed, you can insert the text into the note and also attach the audio to it.'); ?></p>
     </div>
 </div>
 

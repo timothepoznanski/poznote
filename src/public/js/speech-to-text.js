@@ -7,13 +7,15 @@
  * here talks to that server directly: it usually sits on a private network the
  * page cannot reach, and its key is none of the page's business.
  *
- * Two entry points, both gated on window.POZNOTE_CONFIG.speechToText:
- *   window.openDictationModal()                 the slash menu's "Dictate"
+ * Two entry points:
+ *   window.openAudioRecorder()                  the slash menu's "Record audio"
  *   window.transcribeAttachment(noteId, id, fn) an audio attachment
  *
- * And one that needs no transcription server at all, sharing the same dialog
- * and microphone handling:
- *   window.openAudioRecorder()                  the slash menu's "Record audio"
+ * The recorder needs no transcription server. It waits for its Start button,
+ * and what happens to the recording is chosen when it stops: "Insert the audio" puts a player in the note,
+ * "Transcribe" (only offered when window.POZNOTE_CONFIG.speechToText is set)
+ * turns it into text to review first. transcribeAttachment() is gated on
+ * the same flag.
  *
  * The recording never touches disk unless the user ticks "attach the
  * recording", which goes through the ordinary attachment endpoint and so obeys
@@ -26,8 +28,123 @@
         return (typeof window.t === 'function') ? window.t(key, vars, fallback) : fallback;
     }
 
+    // Same breakpoint as the mobile editor bar (js/mobile-editor-bar.js)
+    function isMobileLayout() {
+        try {
+            return window.matchMedia('(max-width: 800px)').matches;
+        } catch (e) {
+            return window.innerWidth <= 800;
+        }
+    }
+
+    /**
+     * On a phone the on-screen keyboard is only in the way of the dialog, and
+     * reopening it once the text or the player is in the note would cover what
+     * was just inserted. The caret has been captured by then, so the editor can
+     * let go of the focus; the insertion then leaves it alone
+     * (context.keepKeyboardClosed).
+     */
+    function keepKeyboardClosed(context) {
+        if (!context || !isMobileLayout()) return;
+        context.keepKeyboardClosed = true;
+        var active = document.activeElement;
+        if (active && active !== document.body && typeof active.blur === 'function') active.blur();
+    }
+
     function isAvailable() {
         return !!(window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.speechToText);
+    }
+
+    // ------------------------------------------------------------------
+    // Spoken language
+    // ------------------------------------------------------------------
+
+    // The ISO 639-1 codes Whisper knows. Its few non-standard or three-letter
+    // ones (jw, haw, yue) cannot pass poznoteSttNormalizeLanguage() and are
+    // left out.
+    var LANGUAGES = ['af', 'am', 'ar', 'as', 'az', 'ba', 'be', 'bg', 'bn', 'bo', 'br', 'bs', 'ca', 'cs', 'cy',
+        'da', 'de', 'el', 'en', 'es', 'et', 'eu', 'fa', 'fi', 'fo', 'fr', 'gl', 'gu', 'ha', 'he', 'hi', 'hr',
+        'ht', 'hu', 'hy', 'id', 'is', 'it', 'ja', 'ka', 'kk', 'km', 'kn', 'ko', 'la', 'lb', 'ln', 'lo', 'lt',
+        'lv', 'mg', 'mi', 'mk', 'ml', 'mn', 'mr', 'ms', 'mt', 'my', 'ne', 'nl', 'nn', 'no', 'oc', 'pa', 'pl',
+        'ps', 'pt', 'ro', 'ru', 'sa', 'sd', 'si', 'sk', 'sl', 'sn', 'so', 'sq', 'sr', 'su', 'sv', 'sw', 'ta',
+        'te', 'tg', 'th', 'tk', 'tl', 'tr', 'tt', 'uk', 'ur', 'uz', 'vi', 'yi', 'yo', 'zh'];
+
+    // What the configuration sends when the dialog leaves the menu alone,
+    // empty for server-side detection (index.php)
+    function configuredLanguage() {
+        var configured = window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.speechToTextLanguage;
+        return typeof configured === 'string' ? configured : '';
+    }
+
+    function uiLanguage() {
+        return document.documentElement.lang || 'en';
+    }
+
+    /**
+     * Language names in the interface language, from the browser itself, so
+     * no list of names has to be translated. Falls back to the bare code.
+     */
+    function languageNamer() {
+        var names = null;
+        try {
+            if (window.Intl && typeof Intl.DisplayNames === 'function') {
+                names = new Intl.DisplayNames([uiLanguage()], { type: 'language' });
+            }
+        } catch (e) {
+            names = null;
+        }
+        return function (code) {
+            var name = '';
+            try { name = names ? names.of(code) : ''; } catch (e) { name = ''; }
+            if (!name || name === code) return code;
+            // French and others write language names in lower case
+            return name.charAt(0).toLocaleUpperCase(uiLanguage()) + name.slice(1);
+        };
+    }
+
+    function fillLanguageSelect(select) {
+        if (!select || select.options.length > 0) return;
+        var name = languageNamer();
+        var configured = configuredLanguage();
+        var codes = LANGUAGES.slice();
+        if (configured && codes.indexOf(configured) === -1) codes.push(configured);
+
+        var markDefault = function (label, isDefault) {
+            return isDefault ? t('audio_recorder.language_default', { language: label }, '{{language}} (default)') : label;
+        };
+
+        var auto = document.createElement('option');
+        auto.value = 'auto';
+        auto.textContent = markDefault(t('audio_recorder.language_auto', null, 'Detect automatically'), configured === '');
+        select.appendChild(auto);
+
+        codes.map(function (code) { return { code: code, label: name(code) }; })
+            .sort(function (a, b) { return a.label.localeCompare(b.label, uiLanguage()); })
+            .forEach(function (entry) {
+                var option = document.createElement('option');
+                option.value = entry.code;
+                option.textContent = markDefault(entry.label, entry.code === configured);
+                select.appendChild(option);
+            });
+    }
+
+    /** Back to the configured language each time the dialog opens. */
+    function resetLanguageSelect() {
+        var row = el('dictateLanguageRow');
+        var select = el('dictateLanguage');
+        if (!row || !select) return;
+        row.hidden = !isAvailable();
+        if (row.hidden) return;
+        fillLanguageSelect(select);
+        select.value = configuredLanguage() || 'auto';
+    }
+
+    /** "auto" or a code for the transcription request, '' when there is no menu. */
+    function chosenLanguage() {
+        var row = el('dictateLanguageRow');
+        var select = el('dictateLanguage');
+        if (!row || row.hidden || !select) return '';
+        return select.value || '';
     }
 
     function maxSeconds() {
@@ -230,6 +347,10 @@
             payload = (tail.slice(-1) === '\n' ? (tail === '\n\n' ? '' : '\n') : '\n\n') + payload;
         }
 
+        // replaceRange() focuses the editor, which would bring the keyboard back
+        if (context.keepKeyboardClosed && typeof api.replaceRangeKeepSelection === 'function') {
+            if (api.replaceRangeKeepSelection(editor, from, to, payload, from + payload.length)) return true;
+        }
         api.replaceRange(editor, from, to, payload);
         return true;
     }
@@ -238,31 +359,43 @@
         var editable = context.editable;
         if (!editable || !document.body.contains(editable)) return false;
 
-        try { editable.focus({ preventScroll: true }); } catch (e) { editable.focus(); }
+        var html = textToHtml(text);
+        var hasRange = !!(context.range && editable.contains(context.range.commonAncestorContainer));
 
-        var restored = false;
-        if (context.range && editable.contains(context.range.commonAncestorContainer)) {
+        if (!context.keepKeyboardClosed) {
+            try { editable.focus({ preventScroll: true }); } catch (e) { editable.focus(); }
+
+            if (hasRange && typeof window.insertHTMLAtSelection === 'function') {
+                try {
+                    var sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(context.range);
+                    if (window.insertHTMLAtSelection(html)) return true;
+                } catch (e) {
+                    console.debug('speech-to-text: insertIntoRichText() failed:', e);
+                }
+            }
+        }
+
+        var holder = document.createElement('div');
+        holder.innerHTML = html;
+        var fragment = document.createDocumentFragment();
+        while (holder.firstChild) fragment.appendChild(holder.firstChild);
+
+        // Keyboard kept closed: straight into the saved range, since focusing
+        // the editable or even setting the selection in it would reopen it
+        if (context.keepKeyboardClosed && hasRange) {
             try {
-                var sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(context.range);
-                restored = true;
+                context.range.deleteContents();
+                context.range.insertNode(fragment);
+                return true;
             } catch (e) {
                 console.debug('speech-to-text: insertIntoRichText() failed:', e);
             }
         }
 
-        var html = textToHtml(text);
-        if (restored && typeof window.insertHTMLAtSelection === 'function') {
-            if (window.insertHTMLAtSelection(html)) return true;
-        }
-
         // No usable caret: append at the end of the note
-        var holder = document.createElement('div');
-        holder.innerHTML = html;
-        while (holder.firstChild) {
-            editable.appendChild(holder.firstChild);
-        }
+        editable.appendChild(fragment);
         return true;
     }
 
@@ -311,8 +444,12 @@
         context: null,
         noteId: null,
         canKeepAudio: false,
-        // 'dictate' transcribes the recording, 'record' inserts it as audio
-        mode: 'dictate',
+        // What the stopped recording is for: 'record' inserts it as audio,
+        // 'dictate' transcribes it, null while the user has not chosen yet
+        mode: null,
+        // The microphone is recording (or has recorded) since Start was
+        // pressed: the dialog offers the stop buttons instead of Start
+        started: false,
         // Object URL offered when a recording could not be uploaded
         downloadUrl: '',
         // Every dictation gets a number, and the recorder's callbacks carry the
@@ -331,10 +468,44 @@
         Object.keys(panels).forEach(function (key) {
             if (panels[key]) panels[key].hidden = (key !== name);
         });
+        var recordPanel = (name === 'record');
+        var startBtn = el('dictateStartBtn');
         var stopBtn = el('dictateStopBtn');
+        var transcribeBtn = el('dictateTranscribeBtn');
+        var transcribeNote = el('dictateTranscribeNote');
         var insertBtn = el('dictateInsertBtn');
-        if (stopBtn) stopBtn.hidden = (name !== 'record');
+        // Every recording button stays on screen, greyed out while it has
+        // nothing to act on: Start until it is pressed, the two stop buttons
+        // once a recording exists. Transcribe only with a transcription server.
+        var withTranscribe = recordPanel && isAvailable();
+        if (startBtn) {
+            startBtn.hidden = !recordPanel;
+            startBtn.disabled = state.started;
+        }
+        if (stopBtn) {
+            stopBtn.hidden = !recordPanel;
+            stopBtn.disabled = !state.started;
+        }
+        if (transcribeBtn) {
+            transcribeBtn.hidden = !withTranscribe;
+            transcribeBtn.disabled = !state.started;
+        }
+        if (transcribeNote) transcribeNote.hidden = !withTranscribe;
         if (insertBtn) insertBtn.hidden = (name !== 'review');
+    }
+
+    // Nothing left to start, stop or choose: only Cancel stays usable, and the
+    // hint telling how to start or stop goes away
+    function disableRecordButtons() {
+        ['dictateStartBtn', 'dictateStopBtn', 'dictateTranscribeBtn'].forEach(function (id) {
+            var button = el(id);
+            if (button) button.disabled = true;
+        });
+        var hint = el('dictateHint');
+        if (hint) hint.hidden = true;
+        // Nothing will be transcribed either
+        var languageRow = el('dictateLanguageRow');
+        if (languageRow) languageRow.hidden = true;
     }
 
     function showError(message) {
@@ -429,24 +600,38 @@
         if (modal) modal.style.display = 'none';
     }
 
-    function openModal(mode, captureMode) {
+    /** Before Start: how to begin. Once recording: how to stop. */
+    function showRecordHint() {
+        var hint = el('dictateHint');
+        if (!hint) return;
+        hint.hidden = false;
+        var minutes = { minutes: Math.round(maxSeconds() / 60) };
+        if (!state.started) {
+            hint.textContent = t('audio_recorder.hint_ready', minutes, 'Press Start to begin recording. It stops on its own after {{minutes}} min.');
+            return;
+        }
+        hint.textContent = isAvailable()
+            ? t('audio_recorder.hint_choice', minutes, 'Recording. Stop to insert the audio into the note, or to transcribe it into text. It stops on its own after {{minutes}} min.')
+            : t('audio_recorder.hint', minutes, 'Recording. Stop to insert the audio into the note. It stops on its own after {{minutes}} min.');
+    }
+
+    function openModal(mode) {
         var modal = el('dictateModal');
         if (!modal) return false;
-        // Dictation unless told otherwise, so transcribeAttachment() and the
-        // slash menu's Dictate keep their wording without passing anything
-        state.mode = captureMode || 'dictate';
-        var recording = state.mode === 'record';
+        state.mode = null;
+        var canTranscribe = isAvailable();
         var title = el('dictateTitle');
         if (title) {
-            title.textContent = recording
+            title.textContent = mode === 'record'
                 ? t('audio_recorder.title', null, 'Record audio')
-                : t('stt.modal.title', null, 'Dictate');
+                : t('stt.attachment.transcribe', null, 'Transcribe');
         }
+        // With a single way out, the button says it all
         var stopBtn = el('dictateStopBtn');
         if (stopBtn) {
-            stopBtn.textContent = recording
-                ? t('audio_recorder.stop', null, 'Stop and insert')
-                : t('stt.modal.stop', null, 'Stop and transcribe');
+            stopBtn.textContent = canTranscribe
+                ? t('audio_recorder.insert_audio', null, 'Insert the audio')
+                : t('audio_recorder.stop', null, 'Stop and insert');
         }
         showError('');
         var keepRow = el('dictateKeepRow');
@@ -460,13 +645,9 @@
         // automatic stop never comes as a surprise.
         var limit = el('dictateTimerLimit');
         if (limit) limit.textContent = formatElapsed(maxSeconds());
-        var hint = el('dictateHint');
-        if (hint) {
-            var minutes = { minutes: Math.round(maxSeconds() / 60) };
-            hint.textContent = recording
-                ? t('audio_recorder.hint', minutes, 'Recording. Stop to insert the audio into the note. It stops on its own after {{minutes}} min.')
-                : t('stt.modal.recording_hint', minutes, 'Speak, then stop the recording to have it transcribed. It stops on its own after {{minutes}} min.');
-        }
+        state.started = false;
+        showRecordHint();
+        resetLanguageSelect();
         var bar = el('dictateLevelBar');
         if (bar) bar.style.width = '0%';
         showPanel(mode);
@@ -485,8 +666,7 @@
                 ? t('stt.errors.insecure_context', null, 'The microphone needs HTTPS. Open Poznote over https, or through localhost.')
                 : t('stt.errors.unsupported', null, 'This browser cannot record audio.'));
             showPanel('record');
-            var stopBtn = el('dictateStopBtn');
-            if (stopBtn) stopBtn.hidden = true;
+            disableRecordButtons();
             return;
         }
 
@@ -523,25 +703,31 @@
                     state.chunks = [];
                     if (state.blob.size === 0) {
                         showPanel('record');
+                        disableRecordButtons();
                         showError(t('stt.errors.empty_recording', null, 'Nothing was recorded.'));
                         return;
                     }
-                    if (state.mode === 'record') {
-                        insertRecording(runId, state.blob, state.mimeType);
-                    } else {
-                        sendRecording(runId, state.blob, state.mimeType);
-                    }
+                    // Stopped by the time limit with no choice made: the
+                    // recording waits for one of the buttons
+                    if (state.mode) dispatchRecording(runId);
                 });
 
                 state.recorder.start();
+                state.started = true;
+                showPanel('record');
+                showRecordHint();
                 state.startedAt = Date.now();
                 state.timerId = setInterval(tickTimer, 1000);
                 // A tab left recording all afternoon helps nobody, and the
                 // server would then be handed a file it chews on for minutes.
                 state.limitId = setTimeout(function () {
-                    showError(state.mode === 'record'
-                        ? t('audio_recorder.max_duration', null, 'Maximum recording length reached, inserting what was recorded.')
-                        : t('stt.errors.max_duration', null, 'Maximum recording length reached, transcribing what was recorded.'));
+                    if (!isAvailable()) {
+                        showError(t('audio_recorder.max_duration', null, 'Maximum recording length reached, inserting what was recorded.'));
+                        finishWith('record');
+                        return;
+                    }
+                    // Two ways out: stop, keep the audio, and let the user pick
+                    showError(t('audio_recorder.max_duration_choice', null, 'Maximum recording length reached. Choose what to do with the recording.'));
                     stopRecording();
                 }, maxSeconds() * 1000);
                 startLevelMeter(stream);
@@ -555,8 +741,7 @@
                     : (missing
                         ? t('stt.errors.no_microphone', null, 'No microphone was found.')
                         : t('stt.errors.microphone_failed', null, 'The microphone could not be opened.')));
-                var stopBtn = el('dictateStopBtn');
-                if (stopBtn) stopBtn.hidden = true;
+                disableRecordButtons();
             });
     }
 
@@ -564,16 +749,47 @@
         if (state.recorder && state.recorder.state !== 'inactive') {
             try {
                 state.recorder.stop();
-                showPanel('work');
-                var label = el('dictateWorkLabel');
-                if (label) {
-                    label.textContent = state.mode === 'record'
-                        ? t('audio_recorder.saving', null, 'Saving the recording...')
-                        : t('stt.modal.transcribing', null, 'Transcribing...');
-                }
+                if (state.mode) showWorking();
             } catch (e) {
                 showError(t('stt.errors.microphone_failed', null, 'The microphone could not be opened.'));
             }
+        }
+    }
+
+    function showWorking() {
+        showPanel('work');
+        var label = el('dictateWorkLabel');
+        if (label) {
+            label.textContent = state.mode === 'record'
+                ? t('audio_recorder.saving', null, 'Saving the recording...')
+                : t('stt.modal.transcribing', null, 'Transcribing...');
+        }
+    }
+
+    /**
+     * One of the two buttons: stop and use the recording that way. Also works
+     * on a recording already stopped (time limit, failed transcription), which
+     * is still held in state.blob.
+     */
+    function finishWith(mode) {
+        if (state.mode) return;
+        var recording = !!(state.recorder && state.recorder.state !== 'inactive');
+        var held = !!(state.blob && state.blob.size > 0);
+        if (!recording && !held) return;
+        state.mode = mode;
+        if (recording) {
+            stopRecording();
+        } else {
+            showWorking();
+            dispatchRecording(state.runId);
+        }
+    }
+
+    function dispatchRecording(runId) {
+        if (state.mode === 'record') {
+            insertRecording(runId, state.blob, state.mimeType);
+        } else {
+            sendRecording(runId, state.blob, state.mimeType);
         }
     }
 
@@ -583,6 +799,9 @@
 
         var form = new FormData();
         form.append('audio', blob, 'recording.' + extensionForType(mimeType));
+        // The dialog's menu overrides the configured language for this one
+        var language = chosenLanguage();
+        if (language) form.append('language', language);
 
         fetch('api_transcribe.php?action=transcribe', {
             method: 'POST',
@@ -596,9 +815,10 @@
             })
             .catch(function (error) {
                 if (runId !== state.runId) return;
+                // The recording is still here: offer both buttons again, so it
+                // can go in as audio or be sent a second time
+                state.mode = null;
                 showPanel('record');
-                var stopBtn = el('dictateStopBtn');
-                if (stopBtn) stopBtn.hidden = true;
                 showError(t('stt.errors.failed', { error: error.message }, 'Transcription failed: {{error}}'));
             });
     }
@@ -625,7 +845,10 @@
             if (text.trim() === '') {
                 showError(t('stt.errors.nothing_heard', null, 'The server heard nothing in this recording.'));
             }
-            try { area.focus(); } catch (e) { /* not focusable yet */ }
+            // Not on a phone: the keyboard would cover the text to review
+            if (!isMobileLayout()) {
+                try { area.focus(); } catch (e) { /* not focusable yet */ }
+            }
         }
     }
 
@@ -754,6 +977,7 @@
             editableElement: isMarkdown ? context.markdownEditor : context.editable,
             isMarkdown: isMarkdown,
             savedRange: isMarkdown ? null : context.range,
+            keepKeyboardClosed: !!context.keepKeyboardClosed,
             codeMirrorSelection: (isMarkdown && context.markdownSelection)
                 ? { editor: context.markdownEditor, start: context.markdownSelection.start, end: context.markdownSelection.end }
                 : null,
@@ -770,9 +994,8 @@
 
     function reopenWithDownload(blob, fileName, error) {
         state.runId++;
-        if (!openModal('record', 'record')) return;
-        var stopBtn = el('dictateStopBtn');
-        if (stopBtn) stopBtn.hidden = true;
+        if (!openModal('record')) return;
+        disableRecordButtons();
         var message = t('audio_recorder.upload_failed', { error: (error && error.message) || String(error || '') },
             'The recording could not be saved: {{error}}');
         showUploadFailure(message, blob, fileName);
@@ -793,20 +1016,23 @@
             box.appendChild(link);
         }
         box.hidden = false;
-        var stopBtn = el('dictateStopBtn');
-        if (stopBtn) stopBtn.hidden = true;
+        disableRecordButtons();
     }
 
     /**
-     * Record audio straight into the note, without transcription. Offered to
-     * everyone: it needs a microphone, not a transcription server. The limit
-     * is the same Maximum recording length as dictation.
+     * Record from the microphone. Offered to everyone: it needs a microphone,
+     * not a transcription server. The buttons that stop it decide whether it
+     * goes in as audio or, when a server is configured, as text.
      */
     window.openAudioRecorder = function () {
-        var runId = ++state.runId;
+        // Claim a run first: everything after Start is allowed to outlive the
+        // dialog, and this is what tells it that it has.
+        ++state.runId;
         state.context = captureInsertionContext();
+        keepKeyboardClosed(state.context);
         state.noteId = state.context.noteEntry ? state.context.noteEntry.getAttribute('data-note-id') : null;
-        state.canKeepAudio = false;
+        // Transcribed, the recording can also be kept on the note
+        state.canKeepAudio = !!state.noteId;
         state.blob = null;
 
         if (!state.noteId) {
@@ -816,25 +1042,11 @@
             return;
         }
 
-        if (!openModal('record', 'record')) return;
-        startRecording(runId);
+        openModal('record');
     };
 
-    window.openDictationModal = function () {
-        if (!isAvailable()) return;
-
-        // Claim a run first: everything below is allowed to outlive the dialog,
-        // and this is what tells it that it has.
-        var runId = ++state.runId;
-        state.context = captureInsertionContext();
-        state.noteId = state.context.noteEntry ? state.context.noteEntry.getAttribute('data-note-id') : null;
-        // Only offer to keep the recording when there is a note to keep it on
-        state.canKeepAudio = !!state.noteId;
-        state.blob = null;
-
-        if (!openModal('record')) return;
-        startRecording(runId);
-    };
+    // Former name of the same dialog, from when Dictate was its own entry
+    window.openDictationModal = window.openAudioRecorder;
 
     /**
      * Transcribe an audio file already attached to a note. The audio is read
@@ -847,6 +1059,7 @@
 
         var runId = ++state.runId;
         state.context = (anchor && captureContextAfter(anchor, attachmentId)) || captureInsertionContext();
+        keepKeyboardClosed(state.context);
         state.noteId = noteId;
         // It is already an attachment; offering to attach it again is nonsense
         state.canKeepAudio = false;
@@ -888,8 +1101,22 @@
         var modal = el('dictateModal');
         if (!modal) return;
 
+        var startBtn = el('dictateStartBtn');
+        if (startBtn) {
+            startBtn.addEventListener('click', function () {
+                // One microphone request per dialog; the stop buttons take over
+                // as soon as the recorder runs
+                if (startBtn.disabled || state.started) return;
+                startBtn.disabled = true;
+                startRecording(state.runId);
+            });
+        }
+
         var stopBtn = el('dictateStopBtn');
-        if (stopBtn) stopBtn.addEventListener('click', stopRecording);
+        if (stopBtn) stopBtn.addEventListener('click', function () { finishWith('record'); });
+
+        var transcribeBtn = el('dictateTranscribeBtn');
+        if (transcribeBtn) transcribeBtn.addEventListener('click', function () { finishWith('dictate'); });
 
         var insertBtn = el('dictateInsertBtn');
         if (insertBtn) insertBtn.addEventListener('click', confirmInsert);

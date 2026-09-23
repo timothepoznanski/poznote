@@ -16,7 +16,7 @@
  *
  * Focus mode (discussion #1482) lives here too, because the rail is the one
  * piece of chrome every page shares: html.focus-mode hides the rail (and, on
- * the notes page, the notes column and the note's title rows, see
+ * the notes page, the notes column and the rows around the note's title, see
  * css/focus-mode.css) and a hot zone on the left edge of the viewport slides
  * them back in as a flyout while the mouse is over it (html.focus-mode-peek).
  * The state is persisted, so it follows the user from page to page until

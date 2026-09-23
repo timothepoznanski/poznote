@@ -183,6 +183,8 @@ function routeTable(): array
             'upload' => ['name' => 'planted.txt', 'type' => 'text/plain', 'content' => 'planted by the wrong account']],
         'GET /notes/{noteId}/attachments/{attachmentId}' => [OWNED],
         'DELETE /notes/{noteId}/attachments/{attachmentId}' => [OWNED],
+        'POST /notes/{noteId}/attachments/{attachmentId}/move' => [OWNED,
+            'body' => ['target_note_id' => '{other_note}']],
 
         // --- Backups -----------------------------------------------------
         'GET /backups' => [SCOPED],
@@ -562,6 +564,58 @@ function checkShareTokens(IsolationContext $ctx): void
         ]);
         assertStatusIn([400, 401, 403, 404], $response, 'a task from a different note than the token');
     });
+
+    // Attachment downloads. A browser that once answered a Basic prompt keeps
+    // sending those credentials, without X-User-ID, to every page of the
+    // instance, public share pages included.
+    $attachmentPath = '/notes/' . rawurlencode($ctx->fixtures['note'])
+        . '/attachments/' . rawurlencode($ctx->fixtures['attachment']);
+    $shareQuery = ['query' => ['token' => $token]];
+    $strangerNoProfile = $ctx->stranger->api->withUserId(null);
+
+    test('share token: an open share serves its attachment to a visitor sending Basic credentials', function () use ($strangerNoProfile, $ctx, $attachmentPath, $shareQuery) {
+        $response = $strangerNoProfile->request('GET', $attachmentPath, $shareQuery);
+        assertStatusIn([200], $response, 'shared attachment, account credentials without X-User-ID');
+        if (!$response->mentions($ctx->fixtures['marker'])) {
+            fail('the shared attachment came back without its content: ' . $response->summary());
+        }
+    });
+
+    // A share password guards the attachments too. The token routes the
+    // request to the owner's data whoever is signed in, so an account of the
+    // same instance must not pass as "authenticated" there.
+    $owner = $ctx->owner->api;
+    $notePath = '/notes/' . rawurlencode($ctx->fixtures['note']) . '/share';
+    $protect = $owner->request('PATCH', $notePath, ['json' => ['password' => 'isolation-' . $ctx->fixtures['marker']]]);
+    try {
+        test('share token: the share password can be set for the attachment checks', function () use ($protect) {
+            assertStatusIn([200], $protect, 'setting a share password');
+        });
+
+        test('share token: a password share does not serve its attachment without the password', function () use ($anonymous, $ctx, $attachmentPath, $shareQuery) {
+            $response = $anonymous->request('GET', $attachmentPath, $shareQuery);
+            assertStatusIn([401, 403], $response, 'password share attachment, anonymous');
+            assertNoLeak($response, $ctx->fixtures, 'password share attachment, anonymous');
+        });
+
+        test('share token: another account cannot skip the share password', function () use ($ctx, $strangerNoProfile, $attachmentPath, $shareQuery) {
+            foreach (['with its X-User-ID' => $ctx->stranger->api, 'without X-User-ID' => $strangerNoProfile] as $how => $client) {
+                $response = $client->request('GET', $attachmentPath, $shareQuery);
+                assertStatusIn([401, 403, 404], $response, "password share attachment, stranger $how");
+                assertNoLeak($response, $ctx->fixtures, "password share attachment, stranger $how");
+            }
+        });
+
+        test('share token: the owner still reads the attachment of a password share', function () use ($owner, $ctx, $attachmentPath, $shareQuery) {
+            $response = $owner->request('GET', $attachmentPath, $shareQuery);
+            assertStatusIn([200], $response, 'password share attachment, owner');
+            if (!$response->mentions($ctx->fixtures['marker'])) {
+                fail('the owner got the attachment without its content: ' . $response->summary());
+            }
+        });
+    } finally {
+        $owner->request('PATCH', $notePath, ['json' => ['password' => '']]);
+    }
 }
 
 /**

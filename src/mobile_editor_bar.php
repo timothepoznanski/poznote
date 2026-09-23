@@ -18,6 +18,9 @@
 <div id="mobileEditorBar" class="mobile-editor-bar" role="toolbar" aria-label="<?php echo t_h('modals.ui_customization.sections.mobile_editor_bar', [], 'Mobile editor bar'); ?>">
     <div class="mobile-editor-bar-scroll">
         <button type="button" id="mobileBarInsert" class="mobile-editor-bar-btn mobile-editor-bar-insert" data-mobile-bar-action="slash-menu" title="<?php echo t_h('mobile_editor_bar.insert', [], 'Insert (slash menu)'); ?>" aria-label="<?php echo t_h('mobile_editor_bar.insert', [], 'Insert (slash menu)'); ?>"><i class="lucide lucide-plus"></i></button>
+        <?php // Record, then insert the audio or transcribe it; the dialog opens with the keyboard closed (js/speech-to-text.js) ?>
+        <button type="button" id="mobileBarRecordAudio" class="mobile-editor-bar-btn" data-mobile-bar-action="record-audio" title="<?php echo t_h('slash_menu.record_audio', [], 'Record audio'); ?>" aria-label="<?php echo t_h('slash_menu.record_audio', [], 'Record audio'); ?>"><i class="lucide lucide-mic"></i></button>
+        <span class="mobile-editor-bar-sep" aria-hidden="true"></span>
         <button type="button" id="mobileBarUndo" class="mobile-editor-bar-btn" data-mobile-bar-action="undo" title="<?php echo t_h('mobile_editor_bar.undo', [], 'Undo'); ?>" aria-label="<?php echo t_h('mobile_editor_bar.undo', [], 'Undo'); ?>"><i class="lucide lucide-undo-2"></i></button>
         <button type="button" id="mobileBarRedo" class="mobile-editor-bar-btn" data-mobile-bar-action="redo" title="<?php echo t_h('mobile_editor_bar.redo', [], 'Redo'); ?>" aria-label="<?php echo t_h('mobile_editor_bar.redo', [], 'Redo'); ?>"><i class="lucide lucide-redo-2"></i></button>
         <span class="mobile-editor-bar-sep" aria-hidden="true"></span>

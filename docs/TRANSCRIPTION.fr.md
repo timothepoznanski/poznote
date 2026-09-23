@@ -85,11 +85,15 @@ Une fois configurée, la transcription apparaît à deux endroits.
 
 ### Dicter
 
-**Dicter** se trouve sous **Insérer** dans le menu slash de chaque note, en texte enrichi comme en Markdown. Taper `/dict`, `/voice` ou `/transcribe` le trouve directement, car le filtre cherche aussi dans les sous-menus.
+La dictée passe par **Enregistrer un audio**, sous **Insérer** et **Médias** dans le menu slash de chaque note, en texte enrichi comme en Markdown, et dans la barre d'édition au-dessus du clavier sur téléphone. Taper `/dict`, `/voice` ou `/transcribe` le trouve directement, car le filtre cherche aussi dans les sous-menus.
 
-Une boîte de dialogue s'ouvre et l'enregistrement démarre aussitôt. Une barre de niveau montre que le microphone capte bien quelque chose, et le minuteur affiche le temps écoulé par rapport à la durée maximale fixée par l'administrateur, par exemple `1:12 / 10:00`. L'enregistrement s'arrête et part en transcription de lui-même quand il atteint cette limite.
+Une boîte de dialogue s'ouvre, et l'enregistrement démarre quand vous appuyez sur **Démarrer**, qui est aussi le moment où le navigateur demande l'accès au microphone la première fois. Une barre de niveau montre que le microphone capte bien quelque chose, et le minuteur affiche le temps écoulé par rapport à la durée maximale fixée par l'administrateur, par exemple `1:12 / 10:00`.
 
-**Arrêter et transcrire** envoie l'enregistrement. La transcription revient dans une zone de texte où vous pouvez la corriger avant qu'elle n'entre dans la note. **Insérer** la place là où se trouvait votre curseur.
+Quand la transcription est disponible, un menu **Langue parlée** se trouve sous le minuteur. Il part de la langue définie dans la configuration, marquée comme langue par défaut, et le modifier ne vaut que pour cet enregistrement. **Détection automatique** laisse le serveur reconnaître la langue même quand la configuration en fixe une.
+
+Le sort de l'enregistrement se choisit au moment de l'arrêter. **Insérer l'audio** le place dans la note sous forme de lecteur audio, sans transcription. **Transcrire** l'envoie au serveur, et n'apparaît que si la transcription vous est accessible. Quand l'enregistrement atteint la durée maximale, il s'arrête de lui-même et attend que vous choisissiez l'un des deux boutons.
+
+La transcription revient dans une zone de texte où vous pouvez la corriger avant qu'elle n'entre dans la note. **Insérer** la place là où se trouvait votre curseur. Si la transcription échoue, les deux boutons reviennent, pour que l'enregistrement puisse encore être inséré en audio ou renvoyé.
 
 La case **Joindre aussi l'enregistrement à cette note** est décochée par défaut, et l'audio est alors supprimé dès que le texte revient. Cochez-la et l'enregistrement est aussi conservé comme pièce jointe ordinaire nommée `dictation-<date>.<ext>`, pour pouvoir le réécouter ou le transcrire plus tard avec un meilleur modèle.
 
@@ -118,8 +122,8 @@ Tout se trouve dans **Paramètres → Outils d'administration → Transcription*
 | **Clé API** | Envoyée sous la forme `Authorization: Bearer`. Les serveurs locaux n'en demandent généralement pas ; OpenAI si. |
 | **Vérifier l'accès et lister les modèles** | Confirme que le serveur répond et remplit les suggestions de modèles. |
 | **Modèle** | Le nom du modèle envoyé avec chaque requête. Obligatoire pour tous les serveurs, même ceux qui l'ignorent. |
-| **Langue parlée** | Code à deux lettres comme `en`, `fr` ou `de`, ou vide pour laisser le serveur la détecter. |
-| **Durée maximale d'enregistrement** | En minutes, de 1 à 60, 10 par défaut. La dictée s'arrête et part en transcription d'elle-même une fois ce seuil atteint, tout comme **Enregistrer un audio** dans le sous-menu **Médias** du menu slash, qui insère l'enregistrement sans le transcrire. Les pièces jointes ne sont pas concernées. |
+| **Langue parlée** | Code à deux lettres comme `en`, `fr` ou `de`, ou vide pour laisser le serveur la détecter. La fenêtre d'enregistrement la présélectionne, et son menu permet de la remplacer pour un enregistrement. |
+| **Durée maximale d'enregistrement** | En minutes, de 1 à 60, 10 par défaut. **Enregistrer un audio** s'arrête de lui-même une fois ce seuil atteint, puis attend **Insérer l'audio** ou **Transcrire**. Sans transcription, il insère l'audio aussitôt. Les pièces jointes ne sont pas concernées. |
 | **Autoriser les serveurs de transcription personnels** | Permet à chaque utilisateur de définir son propre serveur, voir [Serveurs personnels](#serveurs-personnels). |
 
 ### Choisir un modèle
@@ -247,7 +251,7 @@ docker compose exec webserver curl -s -o /dev/null -w '%{http_code}\n' http://wh
 
 ## Exigences du navigateur
 
-**HTTPS.** Les navigateurs n'accordent le microphone à une page que sur une origine sécurisée : HTTPS, ou `localhost`. En `http` simple sur toute autre adresse, **Dicter** indique qu'il a besoin de HTTPS et n'enregistre rien. La transcription d'une pièce jointe n'est pas concernée, puisque rien n'est enregistré.
+**HTTPS.** Les navigateurs n'accordent le microphone à une page que sur une origine sécurisée : HTTPS, ou `localhost`. En `http` simple sur toute autre adresse, **Enregistrer un audio** indique qu'il a besoin de HTTPS et n'enregistre rien. La transcription d'une pièce jointe n'est pas concernée, puisque rien n'est enregistré.
 
 **L'en-tête `Permissions-Policy`.** Poznote envoie `microphone=(self)`, qui autorise sa propre origine et refuse toutes les autres. Si un reverse proxy placé devant ajoute son propre en-tête `Permissions-Policy`, il peut remplacer celui de Poznote, et un `microphone=()` à cet endroit fait refuser le microphone par le navigateur, quelle que soit l'autorisation accordée au site. La boîte de dialogue affiche alors « Poznote n'a pas été autorisé à utiliser le microphone ». Supprimez l'en-tête au niveau du proxy, ou définissez-y aussi `microphone=(self)`.
 
@@ -265,7 +269,15 @@ L'enregistrement est envoyé à Poznote, qui le transmet ensuite au serveur de t
 
 Poznote n'en garde aucune copie. L'audio réside dans le fichier d'envoi temporaire de PHP le temps d'une requête, sauf si vous cochez **Joindre aussi l'enregistrement à cette note**, ce qui le conserve comme pièce jointe ordinaire, comptée dans votre espace de stockage.
 
-Avec un serveur dans votre propre projet Docker, l'audio ne quitte jamais la machine. Avec OpenAI, il est envoyé à OpenAI.
+Avec Speaches ou whisper.cpp installé comme décrit plus haut, tout est traité sur votre machine et rien ne part en ligne :
+
+- Le navigateur enregistre avec MediaRecorder, pas avec la reconnaissance vocale intégrée du navigateur, qui enverrait l'audio à Google ou Apple.
+- L'enregistrement va uniquement à votre serveur Poznote, et Poznote le transmet uniquement à l'URL configurée sur la page Transcription. Aucun autre hôte n'est contacté.
+- Le seul accès internet est le téléchargement du modèle, une fois, à l'installation. La transcription fonctionne avec le conteneur coupé d'internet.
+- Le texte transcrit atterrit dans votre note comme du texte tapé au clavier, et nulle part ailleurs.
+
+> [!WARNING]
+> Le preset **OpenAI** est l'exception : chaque enregistrement est envoyé aux serveurs d'OpenAI. C'est le seul preset qui le fait, et le seul dont l'URL est fixe et masquée. Si la page Transcription affiche un champ URL, l'audio reste chez le serveur de cette URL.
 
 ## Dépannage
 
@@ -281,8 +293,8 @@ Il doit indiquer `microphone=(self)`. Voir [Exigences du navigateur](#exigences-
 **« Le microphone nécessite HTTPS »**
 Vous êtes en `http` simple sur une adresse autre que `localhost`. Servez Poznote en HTTPS.
 
-**Dicter n'apparaît pas dans le menu slash**
-Il se trouve sous **Insérer** ; `/dict` le trouve où qu'il soit. S'il n'y est pas non plus : la transcription est désactivée, votre profil ne figure pas dans la liste des utilisateurs autorisés, ou la configuration n'a pas d'URL ou pas de modèle.
+**Pas de bouton Transcrire pendant l'enregistrement**
+La transcription est désactivée, votre profil ne figure pas dans la liste des utilisateurs autorisés, ou la configuration n'a pas d'URL ou pas de modèle. **Enregistrer un audio** reste toujours disponible, sous **Insérer** et **Médias** ; `/dict` le trouve.
 
 **Pas de bouton microphone sur une pièce jointe**
 Le fichier n'est pas reconnu comme audio (voir la liste dans [Transcrire une pièce jointe audio](#transcrire-une-pièce-jointe-audio)), ou la transcription n'est pas disponible pour votre profil.

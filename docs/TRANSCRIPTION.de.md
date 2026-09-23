@@ -85,11 +85,15 @@ Nach der Konfiguration erscheint die Transkription an zwei Stellen.
 
 ### Diktieren
 
-**Diktieren** befindet sich unter **Einfügen** im Slash-Menü jeder Notiz, bei Rich-Text- wie bei Markdown-Notizen. Mit `/dict`, `/voice` oder `/transcribe` finden Sie den Eintrag direkt, da der Filter auch Untermenüs durchsucht.
+Das Diktieren läuft über **Audio aufnehmen**, unter **Einfügen** und **Medien** im Slash-Menü jeder Notiz, bei Rich-Text- wie bei Markdown-Notizen, und auf dem Smartphone in der Bearbeitungsleiste über der Tastatur. Mit `/dict`, `/voice` oder `/transcribe` finden Sie den Eintrag direkt, da der Filter auch Untermenüs durchsucht.
 
-Ein Dialog öffnet sich, und die Aufnahme beginnt sofort. Ein Pegelbalken zeigt, dass das Mikrofon tatsächlich etwas aufnimmt, und der Timer zeigt die verstrichene Zeit im Verhältnis zur vom Administrator festgelegten Höchstdauer, zum Beispiel `1:12 / 10:00`. Erreicht die Aufnahme diese Grenze, stoppt sie und wird automatisch transkribiert.
+Ein Dialog öffnet sich, und die Aufnahme beginnt, wenn Sie auf **Starten** drücken; dann fragt der Browser beim ersten Mal auch nach dem Mikrofon. Ein Pegelbalken zeigt, dass das Mikrofon tatsächlich etwas aufnimmt, und der Timer zeigt die verstrichene Zeit im Verhältnis zur vom Administrator festgelegten Höchstdauer, zum Beispiel `1:12 / 10:00`.
 
-**Stoppen und transkribieren** sendet die Aufnahme. Das Transkript erscheint in einem Textfeld, in dem Sie es korrigieren können, bevor es in die Notiz übernommen wird. **Einfügen** setzt es an der Stelle ein, an der Ihr Cursor war.
+Wenn die Transkription verfügbar ist, steht unter dem Timer ein Menü **Gesprochene Sprache**. Es steht zunächst auf der in der Konfiguration festgelegten Sprache, die als Standard markiert ist, und eine Änderung gilt nur für diese Aufnahme. **Automatisch erkennen** lässt den Server die Sprache bestimmen, auch wenn die Konfiguration eine festlegt.
+
+Was mit der Aufnahme geschieht, entscheiden Sie beim Stoppen. **Audio einfügen** fügt sie als Audioplayer in die Notiz ein, ohne Transkription. **Transkribieren** sendet sie an den Server und erscheint nur, wenn die Transkription für Sie verfügbar ist. Erreicht die Aufnahme die Höchstdauer, stoppt sie von selbst und wartet auf eine der beiden Schaltflächen.
+
+Das Transkript erscheint in einem Textfeld, in dem Sie es korrigieren können, bevor es in die Notiz übernommen wird. **Einfügen** setzt es an der Stelle ein, an der Ihr Cursor war. Schlägt die Transkription fehl, erscheinen beide Schaltflächen wieder, sodass die Aufnahme weiterhin als Audio eingefügt oder erneut gesendet werden kann.
 
 Das Kontrollkästchen **Aufnahme zusätzlich an diese Notiz anhängen** ist standardmäßig nicht aktiviert, und das Audio wird dann verworfen, sobald der Text zurückkommt. Aktivieren Sie es, wird die Aufnahme zusätzlich als gewöhnlicher Anhang mit dem Namen `dictation-<date>.<ext>` gespeichert, sodass Sie sie erneut anhören oder später mit einem besseren Modell transkribieren können.
 
@@ -118,8 +122,8 @@ Alles befindet sich unter **Einstellungen → Admin-Werkzeuge → Transkription*
 | **API-Schlüssel** | Wird als `Authorization: Bearer` gesendet. Lokale Server benötigen meist keinen, OpenAI schon. |
 | **Zugang prüfen und Modelle auflisten** | Prüft, ob der Server antwortet, und füllt die Modellvorschläge. |
 | **Modell** | Der Modellname, der mit jeder Anfrage gesendet wird. Für jeden Server erforderlich, auch für die, die ihn ignorieren. |
-| **Gesprochene Sprache** | Zweibuchstabiger Code wie `en`, `fr` oder `de`, oder leer, damit der Server die Sprache erkennt. |
-| **Maximale Aufnahmedauer** | In Minuten, von 1 bis 60, standardmäßig 10. Das Diktat stoppt beim Erreichen dieser Dauer und wird automatisch transkribiert, ebenso **Audio aufnehmen** unter **Medien** im Slash-Menü, das die Aufnahme ohne Transkription einfügt. Anhänge sind davon nicht betroffen. |
+| **Gesprochene Sprache** | Zweibuchstabiger Code wie `en`, `fr` oder `de`, oder leer, damit der Server die Sprache erkennt. Der Aufnahmedialog wählt sie vor, und sein Menü kann sie für eine einzelne Aufnahme überschreiben. |
+| **Maximale Aufnahmedauer** | In Minuten, von 1 bis 60, standardmäßig 10. **Audio aufnehmen** stoppt beim Erreichen dieser Dauer von selbst und wartet dann auf **Audio einfügen** oder **Transkribieren**. Ohne Transkription wird das Audio sofort eingefügt. Anhänge sind davon nicht betroffen. |
 | **Persönliche Transkriptionsserver erlauben** | Erlaubt jedem Benutzer, einen eigenen Server festzulegen, siehe [Persönliche Server](#persönliche-server). |
 
 ### Ein Modell auswählen
@@ -247,7 +251,7 @@ docker compose exec webserver curl -s -o /dev/null -w '%{http_code}\n' http://wh
 
 ## Browseranforderungen
 
-**HTTPS.** Browser gewähren einer Seite nur auf einem sicheren Ursprung Zugriff auf das Mikrofon: HTTPS oder `localhost`. Über einfaches `http` an jeder anderen Adresse meldet **Diktieren**, dass HTTPS erforderlich ist, und nimmt nichts auf. Das Transkribieren eines Anhangs ist davon nicht betroffen, da dabei nichts aufgenommen wird.
+**HTTPS.** Browser gewähren einer Seite nur auf einem sicheren Ursprung Zugriff auf das Mikrofon: HTTPS oder `localhost`. Über einfaches `http` an jeder anderen Adresse meldet **Audio aufnehmen**, dass HTTPS erforderlich ist, und nimmt nichts auf. Das Transkribieren eines Anhangs ist davon nicht betroffen, da dabei nichts aufgenommen wird.
 
 **Der Header `Permissions-Policy`.** Poznote sendet `microphone=(self)`, was den eigenen Ursprung erlaubt und alle anderen ablehnt. Fügt ein vorgeschalteter Reverse Proxy einen eigenen `Permissions-Policy`-Header hinzu, kann dieser den von Poznote überschreiben, und ein `microphone=()` darin sorgt dafür, dass der Browser das Mikrofon verweigert, ganz gleich, was die Website-Berechtigung sagt. Der Dialog zeigt dann „Poznote durfte das Mikrofon nicht verwenden“. Entfernen Sie den Header am Proxy oder setzen Sie dort ebenfalls `microphone=(self)`.
 
@@ -265,7 +269,15 @@ Die Aufnahme wird zu Poznote hochgeladen und von dort an den Transkriptionsserve
 
 Poznote behält keine Kopie. Das Audio liegt für die Dauer einer einzigen Anfrage in der temporären Upload-Datei von PHP, es sei denn, Sie aktivieren **Aufnahme zusätzlich an diese Notiz anhängen**, wodurch es als gewöhnlicher Anhang gespeichert wird, der auf Ihren Speicherplatz angerechnet wird.
 
-Mit einem Server in Ihrem eigenen Docker-Projekt verlässt das Audio den Rechner nie. Mit OpenAI wird es an OpenAI gesendet.
+Mit Speaches oder whisper.cpp, wie oben beschrieben eingerichtet, wird alles auf Ihrem Rechner verarbeitet und nichts geht ins Internet:
+
+- Der Browser nimmt mit MediaRecorder auf, nicht mit der eingebauten Spracherkennung des Browsers, die das Audio an Google oder Apple senden würde.
+- Die Aufnahme geht nur an Ihren Poznote-Server, und Poznote leitet sie nur an die URL weiter, die auf der Seite Transkription eingestellt ist. Kein anderer Host wird kontaktiert.
+- Der einzige Internetzugriff ist der Download des Modells, einmalig, bei der Installation. Die Transkription funktioniert auch, wenn der Container vom Internet getrennt ist.
+- Der transkribierte Text landet in Ihrer Notiz wie getippter Text, und nirgendwo sonst.
+
+> [!WARNING]
+> Die Voreinstellung **OpenAI** ist die Ausnahme: Jede Aufnahme wird an die Server von OpenAI gesendet. Sie ist die einzige Voreinstellung, die das tut, und die einzige, deren URL fest vorgegeben und ausgeblendet ist. Zeigt die Seite Transkription ein URL-Feld an, bleibt das Audio beim Server unter dieser URL.
 
 ## Fehlerbehebung
 
@@ -281,8 +293,8 @@ Er muss `microphone=(self)` lauten. Siehe [Browseranforderungen](#browseranforde
 **„Das Mikrofon benötigt HTTPS“**
 Sie verwenden einfaches `http` an einer anderen Adresse als `localhost`. Stellen Sie Poznote über HTTPS bereit.
 
-**Diktieren fehlt im Slash-Menü**
-Der Eintrag befindet sich unter **Einfügen**; `/dict` findet ihn, wo auch immer er ist. Fehlt er auch dort, ist die Transkription ausgeschaltet, Ihr Profil steht nicht in der Liste der zugelassenen Benutzer, oder in der Konfiguration fehlt die URL oder das Modell.
+**Keine Schaltfläche Transkribieren bei der Aufnahme**
+Die Transkription ist ausgeschaltet, Ihr Profil steht nicht in der Liste der zugelassenen Benutzer, oder in der Konfiguration fehlt die URL oder das Modell. **Audio aufnehmen** selbst ist immer vorhanden, unter **Einfügen** und **Medien**; `/dict` findet den Eintrag.
 
 **Keine Mikrofon-Schaltfläche bei einem Anhang**
 Die Datei wird nicht als Audio erkannt (siehe die Liste unter [Einen Audioanhang transkribieren](#einen-audioanhang-transkribieren)), oder die Transkription steht Ihrem Profil nicht zur Verfügung.
