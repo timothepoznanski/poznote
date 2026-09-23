@@ -436,10 +436,6 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
         [$type, $id] = $parts;
 
         if ($type === 'card') {
-            if ($id === 'ui-customization-card') {
-                continue;
-            }
-
             $rules[] = '#' . $id . ' { display: none !important; }';
             if (isset($createMenuOptionSelectors[$key])) {
                 $rules[] = '#create-menu ' . $createMenuOptionSelectors[$key] . ' { display: none !important; }';

@@ -760,8 +760,6 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
             'settings' => [
                 'emoji_icons_enabled' => getSetting('emoji_icons_enabled', '1'),
                 'slash_menu_trigger' => getSetting('slash_menu_trigger', 'slash'),
-                'note_nav_shortcuts_enabled' => getSetting('note_nav_shortcuts_enabled', '0'),
-                'ctrl_s_save_enabled' => getSetting('ctrl_s_save_enabled', '0'),
                 $currentWorkspaceOpacityKey => getSetting($currentWorkspaceOpacityKey, '25')
             ]
         ];

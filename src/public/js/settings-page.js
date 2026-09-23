@@ -31,7 +31,9 @@
     // every other section and the desktop nav selecting the matching entry.
     var SECTION_DEEP_LINKS = {
         about: 'settings-documentation-section-grid',
-        account: 'settings-account-section-grid'
+        account: 'settings-account-section-grid',
+        // "All options" button of the contextual panel (ui_customization_panel.php)
+        'ui-customization': 'settings-ui-customization-section-grid'
     };
 
     // The section a ?open= deep link names, or null when the param is absent
@@ -106,7 +108,6 @@
             'language',
             'show_note_created',
             'show_note_icons',
-            'type_based_note_icons',
             'note_color_palette',
             'hide_folder_actions',
             'highlight_current_folder_tree',
@@ -136,9 +137,7 @@
             'icon_sidebar_order',
             'settings_pinned_cards',
             'spellcheck_html_notes',
-            'slash_menu_trigger',
-            'note_nav_shortcuts_enabled',
-            'ctrl_s_save_enabled'
+            'slash_menu_trigger'
         ];
 
         if (document.getElementById('login-display-badge')) {
@@ -1907,6 +1906,115 @@
         });
     }
 
+    // ========== About links (Contact, GitHub discussions, Discord) ==========
+    // The three cards link to the Poznote project by default; administrators
+    // get a pencil on each card that opens #aboutLinkModal to point it
+    // elsewhere. The value is a global setting (contact_email, discussions_url,
+    // discord_url), an empty one restores the default, and the card is updated
+    // in place after a save so no reload is needed.
+    function initAboutLinkEditors() {
+        var modal = document.getElementById('aboutLinkModal');
+        var input = document.getElementById('aboutLinkInput');
+        var saveBtn = document.getElementById('aboutLinkSaveBtn');
+        var titleEl = document.getElementById('aboutLinkModalTitle');
+        var defaultEl = document.getElementById('aboutLinkModalDefault');
+        var errorEl = document.getElementById('aboutLinkError');
+        var editButtons = document.querySelectorAll('[data-about-link-edit]');
+        if (!modal || !input || !saveBtn || editButtons.length === 0) return;
+
+        var currentCard = null;
+
+        var showError = function (message) {
+            if (!errorEl) return;
+            errorEl.textContent = message || '';
+            errorEl.hidden = !message;
+        };
+
+        var isValid = function (kind, value) {
+            if (value === '') return true;
+            if (kind === 'email') {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+            }
+            return /^https?:\/\/\S+$/i.test(value);
+        };
+
+        // Reflects a saved value on the card: href, stored value, shown value
+        var applyToCard = function (card, value) {
+            var kind = card.getAttribute('data-about-link-kind');
+            var effective = value !== '' ? value : (card.getAttribute('data-about-link-default') || '');
+            card.setAttribute('data-about-link-value', value);
+            card.setAttribute('href', kind === 'email' ? 'mailto:' + effective : effective);
+            var valueEl = card.querySelector('.about-link-value');
+            if (valueEl) valueEl.textContent = effective;
+        };
+
+        var openFor = function (card) {
+            currentCard = card;
+            if (titleEl) titleEl.textContent = card.getAttribute('data-about-link-title') || '';
+            if (defaultEl) defaultEl.textContent = card.getAttribute('data-about-link-default') || '';
+            input.value = card.getAttribute('data-about-link-value') || '';
+            input.placeholder = card.getAttribute('data-about-link-default') || '';
+            showError('');
+            modal.style.display = 'flex';
+            setTimeout(function () { input.focus(); }, 50);
+        };
+
+        editButtons.forEach(function (btn) {
+            var card = btn.closest('[data-about-link]');
+            if (!card) return;
+            // The card is a link, so the pencil must never reach it
+            var open = function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                openFor(card);
+            };
+            btn.addEventListener('click', open);
+            btn.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') open(e);
+            });
+        });
+
+        var save = function () {
+            if (!currentCard) return;
+            var key = currentCard.getAttribute('data-about-link');
+            var kind = currentCard.getAttribute('data-about-link-kind');
+            var value = input.value.trim();
+            if (!isValid(kind, value)) {
+                showError(input.getAttribute(kind === 'email' ? 'data-invalid-email' : 'data-invalid-url') || '');
+                input.focus();
+                return;
+            }
+            var card = currentCard;
+            saveBtn.disabled = true;
+            setSetting(key, value, function (success) {
+                saveBtn.disabled = false;
+                if (!success) {
+                    showError(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                    return;
+                }
+                applyToCard(card, value);
+                // The pinned clone of the card, if any, mirrors it
+                document.querySelectorAll('[data-pin-clone-of="' + card.id + '"]').forEach(function (clone) {
+                    clone.setAttribute('href', card.getAttribute('href'));
+                    var cloneValue = clone.querySelector('.about-link-value');
+                    var cardValue = card.querySelector('.about-link-value');
+                    if (cloneValue && cardValue) cloneValue.textContent = cardValue.textContent;
+                });
+                try { closeModal('aboutLinkModal'); } catch (e) {
+                    console.debug('settings-page: closeModal(aboutLinkModal) failed:', e);
+                }
+            });
+        };
+
+        saveBtn.addEventListener('click', save);
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                save();
+            }
+        });
+    }
+
     function showLanguageModal() {
         var modal = document.getElementById('languageModal');
         if (!modal) return;
@@ -2294,125 +2402,7 @@
             });
         }
 
-        // Admin contact card (SaaS mode): no mailto, just a modal routing the
-        // user: general questions go to the GitHub discussions (link), account
-        // questions go to the admin's email. Strings come from the card's data
-        // attributes, resolved server-side; the node is built from text nodes,
-        // so none of them is ever parsed as HTML.
-        var adminContactCard = document.getElementById('admin-contact-card');
-        if (adminContactCard) {
-            // One bordered block per channel, icon + title + hint, built from
-            // text nodes so no translated string is ever parsed as HTML
-            var buildContactOption = function (iconClass, titleText, descText) {
-                var opt = document.createElement('div');
-                opt.className = 'admin-contact-option';
-                var icon = document.createElement('i');
-                icon.className = 'lucide ' + iconClass;
-                opt.appendChild(icon);
-                var body = document.createElement('div');
-                var titleEl = document.createElement('span');
-                titleEl.className = 'admin-contact-option-title';
-                titleEl.textContent = titleText;
-                body.appendChild(titleEl);
-                var descEl = document.createElement('span');
-                descEl.className = 'admin-contact-option-desc';
-                descEl.textContent = descText;
-                body.appendChild(descEl);
-                opt.appendChild(body);
-                return { option: opt, body: body };
-            };
-
-            var openAdminContactModal = function () {
-                var data = adminContactCard.dataset;
-                var email = data.email || '';
-                var linkUrl = data.linkUrl || '';
-
-                // Both channels are optional; the card itself only renders
-                // when at least one of them is configured
-                if (!window.modalAlert) {
-                    alert((data.modalTitle || '')
-                        + (linkUrl ? '\n\n' + (data.genericText || '') + '\n' + linkUrl : '')
-                        + (email ? '\n\n' + (data.accountText || '') + '\n' + email : ''));
-                    return;
-                }
-
-                var wrap = document.createElement('div');
-                wrap.className = 'admin-contact-options';
-
-                if (linkUrl !== '') {
-                    var community = buildContactOption('lucide-message-circle', data.genericTitle || '', data.genericText || '');
-                    var link = document.createElement('a');
-                    link.href = linkUrl;
-                    link.target = '_blank';
-                    link.rel = 'noopener noreferrer';
-                    link.textContent = data.linkLabel || linkUrl;
-                    var extIcon = document.createElement('i');
-                    extIcon.className = 'lucide lucide-external-link';
-                    link.appendChild(extIcon);
-                    community.body.appendChild(link);
-                    wrap.appendChild(community.option);
-                }
-
-                if (email === '') {
-                    window.modalAlert.alert('', 'info', data.modalTitle || '', { messageNode: wrap });
-                    return;
-                }
-
-                var mail = buildContactOption('lucide-mail', data.accountTitle || '', data.accountText || '');
-                var row = document.createElement('div');
-                row.className = 'admin-contact-email-row';
-                var emailEl = document.createElement('span');
-                emailEl.className = 'admin-contact-email';
-                emailEl.textContent = email;
-                row.appendChild(emailEl);
-                var copyBtn = document.createElement('button');
-                copyBtn.type = 'button';
-                copyBtn.className = 'admin-contact-copy';
-                var renderCopyBtn = function (iconName, label) {
-                    copyBtn.textContent = '';
-                    var ic = document.createElement('i');
-                    ic.className = 'lucide ' + iconName;
-                    copyBtn.appendChild(ic);
-                    copyBtn.appendChild(document.createTextNode(' ' + label));
-                };
-                renderCopyBtn('lucide-copy', data.copyLabel || 'Copy');
-                copyBtn.addEventListener('click', function () {
-                    var done = function () {
-                        renderCopyBtn('lucide-check', data.copiedLabel || 'Copied!');
-                        setTimeout(function () { renderCopyBtn('lucide-copy', data.copyLabel || 'Copy'); }, 1500);
-                    };
-                    // Old-school path doubles as the fallback when the async
-                    // clipboard is missing (non-secure context) or refused
-                    var legacyCopy = function () {
-                        var tmp = document.createElement('textarea');
-                        tmp.value = email;
-                        document.body.appendChild(tmp);
-                        tmp.select();
-                        try { document.execCommand('copy'); done(); } catch (err) {
-                            console.debug('settings-page: legacyCopy() failed:', err);
-                        }
-                        tmp.remove();
-                    };
-                    if (navigator.clipboard && navigator.clipboard.writeText) {
-                        navigator.clipboard.writeText(email).then(done).catch(legacyCopy);
-                    } else {
-                        legacyCopy();
-                    }
-                });
-                row.appendChild(copyBtn);
-                mail.body.appendChild(row);
-                wrap.appendChild(mail.option);
-
-                window.modalAlert.alert('', 'info', data.modalTitle || '', { messageNode: wrap });
-            };
-            adminContactCard.addEventListener('click', openAdminContactModal);
-            adminContactCard.addEventListener('keydown', function (e) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    openAdminContactModal();
-                }
-            });
-        }
+        initAboutLinkEditors();
 
         if (openGithubApiDocsBtn) {
             openGithubApiDocsBtn.addEventListener('click', function () {
@@ -2472,7 +2462,6 @@
         // show-created-card, note-icons-card and folder-counts-card were
         // replaced by checkboxes in the "Element visibility" modal
         // (panel:note-created-date, panel:note-icons, panel:folder-note-count).
-        setupToggleCard('type-note-icons-card', 'type-note-icons-status', 'type_based_note_icons', false, true);
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
         setupToggleCard('markdown-split-card-view-card', 'markdown-split-card-view-status', 'markdown_split_card_view', false, true);
@@ -2484,8 +2473,6 @@
         setupToggleCard('backlinks-at-bottom-card', 'backlinks-at-bottom-status', 'backlinks_at_bottom', false, false);
         setupToggleCard('default-image-border-card', 'default-image-border-status', 'default_image_border_no_padding', false, false);
         setupToggleCard('spellcheck-html-notes-card', 'spellcheck-html-notes-status', 'spellcheck_html_notes', false, false);
-        setupToggleCard('note-nav-shortcuts-card', 'note-nav-shortcuts-status', 'note_nav_shortcuts_enabled', false, false);
-        setupToggleCard('ctrl-s-save-card', 'ctrl-s-save-status', 'ctrl_s_save_enabled', false, false);
         setupSlashMenuTriggerCard();
 
         // Card click handlers for modal settings
@@ -2509,16 +2496,6 @@
             snapshotsCard.addEventListener('click', openSnapshotsSettingsModal);
         }
 
-        // Deep link from the contextual panel's "All options" button
-        // (ui_customization_panel.php): settings.php?open=ui-customization
-        if (new URLSearchParams(window.location.search || '').get('open') === 'ui-customization') {
-            showUiCustomizationModal();
-            if (window.history && typeof window.history.replaceState === 'function') {
-                var cleanUiCustomizationUrl = new URL(window.location.href);
-                cleanUiCustomizationUrl.searchParams.delete('open');
-                window.history.replaceState({}, '', cleanUiCustomizationUrl.toString());
-            }
-        }
 
         // Deep link from the note's Snapshots modal: settings.php?open=snapshots
         if (new URLSearchParams(window.location.search || '').get('open') === 'snapshots') {
@@ -2754,38 +2731,31 @@
             customCssCard.addEventListener('click', showCustomCssModal);
         }
 
-        // UI Customization card - opens modal (administrators get the extra
-        // "Users" column editing the instance-wide setting)
-        var uiCustomizationCard = document.getElementById('ui-customization-card');
-        if (uiCustomizationCard) {
-            uiCustomizationCard.addEventListener('click', showUiCustomizationModal);
-        }
-
         // Icon Sidebar Order card - opens its own modal (card click, move
         // buttons, save and reset are all bound in there)
         initIconSidebarOrderModal();
 
-        // Init section toggle-all buttons (event delegation, one-time setup)
-        var uiCustomModal = document.getElementById('uiCustomizationModal');
-        if (uiCustomModal) {
+        // Element visibility section (ui_customization_settings.php): the
+        // checklist sits in the page, so it is filled on load. Administrators
+        // get the extra "Users" column editing the instance-wide setting.
+        var uiCustomSettings = document.getElementById('uiCustomizationSettings');
+        if (uiCustomSettings) {
             if (isUiCustomizationAdmin()) {
-                initUiCustomizationAdminColumns(uiCustomModal);
+                initUiCustomizationAdminColumns(uiCustomSettings);
             }
-            initSectionToggleButtons(uiCustomModal);
-            initSectionCollapseButtons(uiCustomModal);
+            initSectionToggleButtons(uiCustomSettings);
+            initSectionCollapseButtons(uiCustomSettings);
+            loadUiCustomizationSettings();
         }
 
-        // Save UI Customization modal button
+        // Save button of the Element visibility section
         var saveUiCustomBtn = document.getElementById('saveUiCustomizationBtn');
         if (saveUiCustomBtn) {
             saveUiCustomBtn.addEventListener('click', function () {
-                var modal = document.getElementById('uiCustomizationModal');
+                var modal = document.getElementById('uiCustomizationSettings');
                 if (!modal) return;
 
                 var onSaved = function () {
-                    try { closeModal('uiCustomizationModal'); } catch (e) {
-                        console.debug('settings-page: onSaved() failed:', e);
-                    }
                     refreshUiCustomizationBadge();
                     reloadOpener();
                     reloadCurrentSettingsPage();
@@ -2801,7 +2771,7 @@
                         return;
                     }
 
-                    if (uiCustomizationModalMode !== 'admin') {
+                    if (uiCustomizationMode !== 'admin') {
                         onSaved();
                         return;
                     }
@@ -2822,7 +2792,7 @@
         var uiCustomizationFilterInput = document.getElementById('uiCustomizationFilterInput');
         if (uiCustomizationFilterInput) {
             uiCustomizationFilterInput.addEventListener('input', function () {
-                applyUiCustomizationFilter(document.getElementById('uiCustomizationModal'), uiCustomizationFilterInput.value);
+                applyUiCustomizationFilter(document.getElementById('uiCustomizationSettings'), uiCustomizationFilterInput.value);
             });
         }
 
@@ -3914,8 +3884,12 @@
                 'settings-account-section-grid': 'lucide-user',
                 'settings-actions-section-grid': 'lucide-zap',
                 'settings-display-section-grid': 'lucide-monitor',
+                'settings-ui-customization-section-grid': 'lucide-eye-off',
+                'settings-sidebar-section-grid': 'lucide-panel-left',
+                'settings-note-content-section-grid': 'lucide-file-text',
                 'settings-markdown-section-grid': 'lucide-file-code',
-                'settings-behavior-section-grid': 'lucide-settings-2',
+                'settings-diary-section-grid': 'lucide-book-open',
+                'settings-other-section-grid': 'lucide-settings-2',
                 'admin-tools-grid': 'lucide-wrench',
                 'settings-documentation-section-grid': 'lucide-info'
             };
@@ -4090,10 +4064,10 @@
     // ========== UI Customization ==========
 
     // Every user edits hidden_ui_elements (their own interface). In 'admin'
-    // mode the modal shows a second checkbox column, "Users", editing
+    // mode the section shows a second checkbox column, "Users", editing
     // hidden_ui_elements_global (applies to every user except administrators)
     // next to the administrator's own "Me" column.
-    var uiCustomizationModalMode = 'user';
+    var uiCustomizationMode = 'user';
     var uiCustomizationUserHiddenSnapshot = [];
     var uiCustomizationGlobalHiddenSnapshot = [];
 
@@ -4104,16 +4078,16 @@
     var UI_CUSTOM_ENABLED_CHECKBOX_SELECTOR = '[data-ui-key]:not(:disabled), [data-ui-global-key]:not(:disabled)';
 
     function isUiCustomizationAdmin() {
-        var card = document.getElementById('ui-customization-card');
-        return !!(card && card.getAttribute('data-ui-admin') === '1');
+        var root = document.getElementById('uiCustomizationSettings');
+        return !!(root && root.getAttribute('data-ui-admin') === '1');
     }
 
-    // Adds the Users column to the modal: a header row naming both columns at
-    // the top of each section and, per item, a second checkbox mirroring the
-    // item's key. The markup in modals.php stays single-column so regular
-    // users are unaffected.
+    // Adds the Users column to the section: a header row naming both columns
+    // at the top of each section and, per item, a second checkbox mirroring
+    // the item's key. The markup in ui_customization_settings.php stays
+    // single-column so regular users are unaffected.
     function initUiCustomizationAdminColumns(modal) {
-        var description = document.getElementById('uiCustomizationModalDescription');
+        var description = document.getElementById('uiCustomizationSettingsDescription');
         var meLabel = (description && description.getAttribute('data-column-me')) || 'Me';
         var usersLabel = (description && description.getAttribute('data-column-users')) || 'Users';
 
@@ -4193,7 +4167,7 @@
     }
 
     function getSupportedUiCustomizationKeys() {
-        var modal = document.getElementById('uiCustomizationModal');
+        var modal = document.getElementById('uiCustomizationSettings');
         var allowed = Object.create(null);
 
         if (!modal) {
@@ -4349,7 +4323,7 @@
     }
 
     function refreshUiCustomizationFilter() {
-        var modal = document.getElementById('uiCustomizationModal');
+        var modal = document.getElementById('uiCustomizationSettings');
         var filterInput = document.getElementById('uiCustomizationFilterInput');
         applyUiCustomizationFilter(modal, filterInput ? filterInput.value : '');
     }
@@ -4622,20 +4596,20 @@
         });
     }
 
-    function openUiCustomizationModal(mode) {
-        var modal = document.getElementById('uiCustomizationModal');
+    function applyUiCustomizationState(mode) {
+        var modal = document.getElementById('uiCustomizationSettings');
         if (!modal) return;
 
-        uiCustomizationModalMode = mode === 'admin' ? 'admin' : 'user';
-        var isAdminMode = uiCustomizationModalMode === 'admin';
+        uiCustomizationMode = mode === 'admin' ? 'admin' : 'user';
+        var isAdminMode = uiCustomizationMode === 'admin';
 
         // Sections marked data-ui-global-only (e.g. the login page) can only be
-        // configured instance-wide: hidden from the per-user modal, and only
-        // their Users checkbox is live in the administrator modal.
+        // configured instance-wide: hidden from the per-user view, and only
+        // their Users checkbox is live in the administrator view.
         modal.classList.toggle('ui-custom-mode-user', !isAdminMode);
         modal.classList.toggle('ui-custom-mode-admin', isAdminMode);
 
-        var description = document.getElementById('uiCustomizationModalDescription');
+        var description = document.getElementById('uiCustomizationSettingsDescription');
         if (description) {
             var descriptionText = description.getAttribute(isAdminMode ? 'data-description-admin' : 'data-description-user');
             if (descriptionText) {
@@ -4719,8 +4693,6 @@
             updateCollapseAllBtn(modal);
 
             applyUiCustomizationFilter(modal, '');
-
-            modal.style.display = 'flex';
         };
 
         getSetting('hidden_ui_elements', function (value) {
@@ -5056,8 +5028,9 @@
         }
     }
 
-    function showUiCustomizationModal() {
-        openUiCustomizationModal(isUiCustomizationAdmin() ? 'admin' : 'user');
+    // Fills the Element visibility section from the saved settings
+    function loadUiCustomizationSettings() {
+        applyUiCustomizationState(isUiCustomizationAdmin() ? 'admin' : 'user');
     }
 
     // ========== Global API ==========

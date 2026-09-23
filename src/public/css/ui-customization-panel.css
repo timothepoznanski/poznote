@@ -77,7 +77,7 @@
     color: inherit;
 }
 
-/* Customize this page: lit while its panel is open, like the AI toggle */
+/* Element visibility: lit while its panel is open, like the AI toggle */
 body.ui-custom-panel-open #edgeCustomizeBtn {
     opacity: 1;
     color: var(--pz-accent-text);
@@ -660,7 +660,7 @@ html[data-theme='dark'] .keyboard-shortcuts-keys kbd {
 /* No rule under the titles in the narrow column, and room between the
    title, its hint and the first checkbox (!important beats the global
    h4 margin reset in base.css) */
-/* "Customize this page" lists what the page shows: a section about something
+/* "Element visibility" lists what the page shows: a section about something
    that only exists on a phone (the mobile editor bar) is left out on a desktop
    viewport. The Settings modal keeps it, so the bar can still be set up (or
    locked by an administrator) from a computer. */

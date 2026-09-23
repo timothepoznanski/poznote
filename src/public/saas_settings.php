@@ -29,27 +29,14 @@ $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_config') {
     $showNotices = isset($_POST['saas_show_storage_notices']) ? '1' : '0';
-    $showAdminContact = isset($_POST['saas_show_admin_contact']) ? '1' : '0';
-    $contactEmail = trim((string)($_POST['saas_admin_contact_email'] ?? ''));
-    $communityUrl = trim((string)($_POST['saas_community_url'] ?? ''));
-    if ($contactEmail !== '' && !filter_var($contactEmail, FILTER_VALIDATE_EMAIL)) {
-        $error = t('saas.messages.invalid_email', [], 'The contact email address is not valid.');
-    } elseif ($communityUrl !== '' && (!filter_var($communityUrl, FILTER_VALIDATE_URL) || !preg_match('#^https?://#i', $communityUrl))) {
-        $error = t('saas.messages.invalid_url', [], 'The community URL is not valid.');
-    } elseif (setGlobalSetting('saas_show_storage_notices', $showNotices)
-        && setGlobalSetting('saas_show_admin_contact', $showAdminContact)
-        && setGlobalSetting('saas_admin_contact_email', $contactEmail)
-        && setGlobalSetting('saas_community_url', $communityUrl)) {
+    if (setGlobalSetting('saas_show_storage_notices', $showNotices)) {
         $message = t('saas.messages.saved', [], 'Configuration saved successfully.');
     } else {
         $error = t('saas.messages.save_error', [], 'Failed to save configuration.');
     }
 }
 
-$showStorageNotices     = poznoteSaasNoticesEnabled();
-$showAdminContact       = poznoteSaasAdminContactEnabled();
-$configuredContactEmail = trim((string)getGlobalSetting('saas_admin_contact_email', ''));
-$configuredCommunityUrl = trim((string)getGlobalSetting('saas_community_url', ''));
+$showStorageNotices = poznoteSaasNoticesEnabled();
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES); ?>">
@@ -125,32 +112,6 @@ $configuredCommunityUrl = trim((string)getGlobalSetting('saas_community_url', ''
                         <span class="label-title"><?php echo t_h('saas.storage_notices_label', [], 'Show storage usage notices'); ?></span>
                         <span class="label-desc"><?php echo t_h('saas.storage_notices_description', [], 'Reminds users that Poznote is a note-taking app, not a photo or video storage service, on the attachment pages, the user storage statistics page and the S3 attachments settings.'); ?></span>
                     </div>
-                </div>
-            </div>
-
-            <div class="git-sync-section">
-                <h2><i class="lucide lucide-help-circle"></i> <?php echo t_h('settings.cards.admin_contact', [], 'Help'); ?></h2>
-                <div class="form-check">
-                    <label class="switch">
-                        <input type="checkbox" name="saas_show_admin_contact" id="saas_show_admin_contact" <?php echo $showAdminContact ? 'checked' : ''; ?>>
-                        <span class="slider round"></span>
-                    </label>
-                    <div class="check-label">
-                        <span class="label-title"><?php echo t_h('saas.admin_contact_label', [], 'Show a Help card'); ?></span>
-                        <span class="label-desc"><?php echo t_h('saas.admin_contact_description', [], 'Adds a Help card in the About section of the settings, for every user, pointing to the community space and, when an address is set below, to the administrator by email.'); ?></span>
-                    </div>
-                </div>
-
-                <div class="git-field-group">
-                    <label class="git-field-label" for="saas_admin_contact_email"><?php echo t_h('saas.admin_contact_email_label', [], 'Email address to display'); ?></label>
-                    <input type="text" name="saas_admin_contact_email" id="saas_admin_contact_email" class="git-field-input"
-                           value="<?php echo htmlspecialchars($configuredContactEmail, ENT_QUOTES); ?>">
-                </div>
-
-                <div class="git-field-group">
-                    <label class="git-field-label" for="saas_community_url"><?php echo t_h('saas.community_url_label', [], 'URL to display'); ?></label>
-                    <input type="text" name="saas_community_url" id="saas_community_url" class="git-field-input"
-                           value="<?php echo htmlspecialchars($configuredCommunityUrl, ENT_QUOTES); ?>">
                 </div>
             </div>
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * Contextual UI Customization panel: the "..." menu at the bottom-right of the
- * page (its "Customize this page" entry) opens a column docked on the right (same arrangement as the AI
+ * page (its "Element visibility" entry) opens a column docked on the right (same arrangement as the AI
  * chat panel, and included right after it as the last flex child of <body>)
  * listing only the hideable elements of the page it is opened on. Ticking a
  * box applies at once and is saved automatically, so the effect of each
@@ -15,8 +15,9 @@
  * checklist itself.
  *
  * The panel only edits the user's own preference. The instance-wide "Users"
- * column administrators get stays in the settings page modal, which the
- * header link opens (settings.php?open=ui-customization).
+ * column administrators get stays in the "Element visibility" section of the
+ * settings page, which the header link opens
+ * (settings.php?open=ui-customization).
  *
  * The preference belongs to the account it is stored in, so the panel is for
  * its owner: someone looking at another account (a workspace shared with
@@ -28,7 +29,7 @@ if (function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccou
 }
 
 $uiCustomizationPanelPage = isset($uiCustomizationPanelPage) ? (string)$uiCustomizationPanelPage : 'notes';
-$uiCustomizationPanelTitle = t_h('modals.ui_customization.panel_title', [], 'Customize this page');
+$uiCustomizationPanelTitle = t_h('modals.ui_customization.panel_title', [], 'Element visibility');
 // The including page resolves $aiChatEnabled before including the AI chat
 // panel; the stack repeats its toggle so the assistant is one tap away.
 $uiCustomizationPanelAiChat = !empty($aiChatEnabled);
@@ -44,15 +45,14 @@ $uiCustomizationPanelAiLabel = t_h('ai_chat.toolbar_button', [], 'AI assistant')
  * the tree share keys (Ctrl+Z, Ctrl+C / X / V, Del), so each section says it
  * only answers while its own pane has the focus (js/pane-focus.js).
  */
-$pzShortcutSettingHint = t_h('keyboard_shortcuts.setting_hint', [], 'Option to enable in Settings');
 $pzShortcutFilterPlaceholder = t_h('keyboard_shortcuts.filter_placeholder', [], 'Filter shortcuts...');
 $pzShortcutGroups = [
     [
         'title' => t_h('keyboard_shortcuts.sections.general', [], 'General'),
         'items' => [
-            ['keys' => [['mod', 'S']], 'label' => t_h('keyboard_shortcuts.save_note', [], 'Save the note'), 'hint' => $pzShortcutSettingHint],
+            ['keys' => [['mod', 'S']], 'label' => t_h('keyboard_shortcuts.save_note', [], 'Save the note')],
             ['keys' => [['mod', 'alt', 'S']], 'label' => t_h('keyboard_shortcuts.snapshot', [], 'Take a snapshot of the note')],
-            ['keys' => [['alt', '↑'], ['alt', '↓']], 'label' => t_h('keyboard_shortcuts.note_nav', [], 'Previous or next note in the folder'), 'hint' => $pzShortcutSettingHint],
+            ['keys' => [['alt', '↑'], ['alt', '↓']], 'label' => t_h('keyboard_shortcuts.note_nav', [], 'Previous or next note in the folder')],
             ['keys' => [['Esc']], 'label' => t_h('keyboard_shortcuts.close', [], 'Close a menu, panel or window')],
             ['keys' => [['F11']], 'label' => t_h('keyboard_shortcuts.focus_mode', [], 'Turn focus mode on or off')],
         ],
@@ -150,7 +150,7 @@ require_once __DIR__ . '/markdown_syntax_content.php';
                 <i class="lucide lucide-more-horizontal"></i>
             </button>
             <div id="pageMoreMenu" class="page-more-menu" role="menu" hidden>
-                <!-- Customize this page has a button of its own in the stack,
+                <!-- Element visibility has a button of its own in the stack,
                      but a phone has little room to spare beside the note, so
                      there it moves in here instead (css/ui-customization-panel.css). -->
                 <button type="button" id="edgeMenuCustomize" class="page-more-menu-item page-more-menu-item-mobile" role="menuitem" data-action="toggle-ui-customization-panel" aria-controls="uiCustomizationPanel">

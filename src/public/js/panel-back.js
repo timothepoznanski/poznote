@@ -2,7 +2,7 @@
  * Mobile: make the device/browser Back button close an open overlay panel
  * instead of leaving the page.
  *
- * The panels concerned (AI chat, "Customize this page") cover the whole
+ * The panels concerned (AI chat, "Element visibility") cover the whole
  * screen below the 801px breakpoint, so from the user's point of view they
  * are a screen of their own: Back should bring the notes back, not the
  * previous page.

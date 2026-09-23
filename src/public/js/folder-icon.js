@@ -412,7 +412,7 @@ const DEFAULT_NOTE_ICONS = ['lucide-file-text', 'lucide-list-todo', 'lucide-file
  * Default icon of a note that has no custom icon.
  *
  * The server stamps the resolved default on the icon element (it depends on the
- * note type and on the 'type_based_note_icons' setting), so read it from there
+ * note type), so read it from there
  * and only fall back to the generic file icon when the attribute is missing.
  */
 function getDefaultNoteIcon(noteIconElement) {

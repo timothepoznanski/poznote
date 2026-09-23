@@ -33,10 +33,10 @@
     <div class="mobile-editor-bar-pinned">
     <button type="button" id="mobileBarHideKeyboard" class="mobile-editor-bar-btn mobile-editor-bar-dismiss" data-mobile-bar-action="hide-keyboard" title="<?php echo t_h('mobile_editor_bar.hide_keyboard', [], 'Hide keyboard'); ?>" aria-label="<?php echo t_h('mobile_editor_bar.hide_keyboard', [], 'Hide keyboard'); ?>"><i class="lucide lucide-keyboard"></i></button>
     <?php
-    // Straight to "Customize this page" with the section of this bar unfolded
+    // Straight to "Element visibility" with the section of this bar unfolded
     // (data-ui-section, js/ui-customization-panel.js): the "..." menu that
     // normally leads there is hidden while the bar shows.
-    $pzMobileBarCustomizeLabel = isset($uiCustomizationPanelTitle) ? $uiCustomizationPanelTitle : t_h('modals.ui_customization.panel_title', [], 'Customize this page');
+    $pzMobileBarCustomizeLabel = isset($uiCustomizationPanelTitle) ? $uiCustomizationPanelTitle : t_h('modals.ui_customization.panel_title', [], 'Element visibility');
     ?>
     <?php // The panel it opens is for the owner of the account on screen ?>
     <?php if ((!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser())): ?>

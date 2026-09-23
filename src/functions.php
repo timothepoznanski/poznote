@@ -367,34 +367,31 @@ function poznoteSaasNoticesEnabled(): bool {
 }
 
 /**
- * Whether the "contact the administrator" card is shown to every user in
- * the About section of the settings page. Hidden by default; enabled from
- * the SaaS mode settings page.
+ * The three contact cards of the About section (settings.php): a contact
+ * email, the GitHub discussions and the Discord server. Each points to the
+ * Poznote project by default; an administrator can point it elsewhere from
+ * the card itself (PUT /api/v1/settings/{key}, a global setting), and an
+ * empty value means "back to the default".
  */
-function poznoteSaasAdminContactEnabled(): bool {
-    require_once __DIR__ . '/users/db_master.php';
-    return getGlobalSetting('saas_show_admin_contact', '0') === '1';
+function poznoteAboutLinkDefaults(): array {
+    return [
+        'contact_email'   => 'contact@poznote.com',
+        'discussions_url' => 'https://github.com/timothepoznanski/poznote/discussions',
+        'discord_url'     => 'https://discord.gg/AWhWWSEkJ',
+    ];
 }
 
 /**
- * URL where users should post general questions, as configured on the SaaS
- * settings page. Empty string when not configured: the Help card then skips
- * the community block (and disappears entirely when the contact email is
- * empty too).
+ * Effective value of one About link: the configured one, or the default.
  */
-function poznoteSaasCommunityUrl(): string {
+function poznoteAboutLink(string $key): string {
+    $defaults = poznoteAboutLinkDefaults();
+    if (!isset($defaults[$key])) {
+        return '';
+    }
     require_once __DIR__ . '/users/db_master.php';
-    return trim((string)getGlobalSetting('saas_community_url', ''));
-}
-
-/**
- * Email address shown on the Help card, as configured on the SaaS settings
- * page. Empty string when not configured: the card then only offers the
- * community space link.
- */
-function poznoteSaasAdminContactEmail(): string {
-    require_once __DIR__ . '/users/db_master.php';
-    return trim((string)getGlobalSetting('saas_admin_contact_email', ''));
+    $value = trim((string)getGlobalSetting($key, ''));
+    return $value !== '' ? $value : $defaults[$key];
 }
 
 

@@ -5,10 +5,10 @@
  * visible; the saved preference lists the unchecked keys (see
  * lib/ui-customization.php for what each key hides).
  *
- * Rendered twice: inside #uiCustomizationModal (modals.php, opened from the
- * settings page, where administrators also get the Users column) and inside
- * the contextual panel (ui_customization_panel.php) on the notes page, the
- * dashboard and the settings page.
+ * Rendered twice: inside the "Element visibility" section of the settings
+ * page (ui_customization_settings.php, where administrators also get the
+ * Users column) and inside the contextual panel (ui_customization_panel.php)
+ * on the notes page, the dashboard and the settings page.
  *
  * data-ui-pages names the pages an element can be seen on ('notes' for
  * index.php, 'dashboard' for dashboard.php, 'settings' for settings.php,
@@ -49,8 +49,6 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:install-app-card" checked><span><?php echo t_h('settings.cards.install_app', [], 'Install application'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:spellcheck-html-notes-card" checked><span><?php echo t_h('display.cards.spellcheck_html_notes', [], 'Spell check'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:slash-menu-trigger-card" checked><span><?php echo t_h('display.cards.slash_menu_trigger', [], 'Command menu shortcut'); ?></span></label>
-        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-nav-shortcuts-card" checked><span><?php echo t_h('display.cards.note_nav_shortcuts', [], 'Switch notes with Alt + ↑/↓'); ?></span></label>
-        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:ctrl-s-save-card" checked><span><?php echo t_h('display.cards.ctrl_s_save', [], 'Save note with Ctrl + S'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:login-display-card" checked><span><?php echo t_h('display.cards.login_display', [], 'Login page title'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:language-card" checked><span><?php echo t_h('settings.language.label', [], 'Language'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:main-font-card" checked><span><?php echo t_h('display.cards.main_font', [], 'App font'); ?></span></label>
@@ -65,7 +63,6 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:tasklist-insert-order-card" checked><span><?php echo t_h('display.cards.tasklist_insert_order', [], 'Task list insert order'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:diary-note-type-card" checked><span><?php echo t_h('display.cards.diary_default_note_type', [], 'Diary entry format'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:diary-date-format-card" checked><span><?php echo t_h('display.cards.diary_date_format', [], 'Diary entry date format'); ?></span></label>
-        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:type-note-icons-card" checked><span><?php echo t_h('display.cards.type_based_note_icons', [], 'Icons by note type'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:folder-tree-highlight-card" checked><span><?php echo t_h('display.cards.highlight_current_folder_tree', [], 'Highlight current folder tree'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-color-palette-card" checked><span><?php echo t_h('display.cards.note_color_palette', [], 'Note colors'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:notes-without-folders-card" checked><span><?php echo t_h('display.cards.notes_without_folders_after', [], 'Notes without folders'); ?></span></label>
@@ -78,7 +75,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:attachments-at-bottom-card" checked><span><?php echo t_h('display.cards.attachments_at_bottom', [], 'Attachments at bottom'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:backlinks-at-bottom-card" checked><span><?php echo t_h('display.cards.backlinks_at_bottom', [], 'Backlinks at bottom'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:default-image-border-card" checked><span><?php echo t_h('display.cards.default_image_border_no_padding', [], 'Default image border (no padding)'); ?></span></label>
-        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:icon-sidebar-order-card" checked><span><?php echo t_h('display.cards.icon_sidebar_order', [], 'Icon sidebar order'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:icon-sidebar-order-card" checked><span><?php echo t_h('display.cards.icon_sidebar_order', [], 'Icon sidebar layout'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:api-rest-card" checked><span><?php echo t_h('settings.cards.api_rest', [], 'API REST'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:users-admin-card" checked><span><?php echo t_h('settings.cards.user_management', [], 'User Management'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:oidc-config-card" checked><span><?php echo t_h('settings.cards.oidc_config', [], 'OIDC / SSO'); ?></span></label>
@@ -104,8 +101,9 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:activity-log-card" checked><span><?php echo t_h('settings.cards.activity_log', [], 'Activity log'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:storage-stats-card" checked><span><?php echo t_h('settings.cards.storage_stats', [], 'Admin storage statistics'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:check-updates-card" checked><span><?php echo t_h('settings.cards.version', [], 'Version'); ?></span></label>
-        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:admin-contact-card" checked><span><?php echo t_h('settings.cards.admin_contact', [], 'Help'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:contact-card" checked><span><?php echo t_h('settings.cards.contact', [], 'Contact'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:github-card" checked><span><?php echo t_h('settings.cards.documentation', [], 'Documentation GitHub'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:discussions-card" checked><span><?php echo t_h('settings.cards.discussions', [], 'GitHub discussions'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:website-card" checked><span><?php echo t_h('settings.cards.website', [], 'Poznote Website'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:tips-card" checked><span><?php echo t_h('settings.cards.tips', [], 'Tips'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:discord-card" checked><span><?php echo t_h('settings.cards.discord', [], 'Discord'); ?></span></label>
@@ -197,7 +195,7 @@
 
 <!-- Mobile Editor Bar Section (mobile_editor_bar.php): plain card: keys, one per button id.
      data-ui-section-id: the bar's own Customize button opens the panel on this section.
-     data-ui-viewport="mobile": left out of the "Customize this page" panel on a desktop
+     data-ui-viewport="mobile": left out of the "Element visibility" panel on a desktop
      viewport, where the bar never shows (css/ui-customization-panel.css). -->
 <div class="ui-custom-section" data-ui-pages="notes" data-ui-section-id="mobile-editor-bar" data-ui-viewport="mobile">
 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.mobile_editor_bar', [], 'Mobile editor bar'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
@@ -215,7 +213,7 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarOutdent" checked><span><?php echo t_h('mobile_editor_bar.outdent', [], 'Outdent'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarIndent" checked><span><?php echo t_h('mobile_editor_bar.indent', [], 'Indent'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarHideKeyboard" checked><span><?php echo t_h('mobile_editor_bar.hide_keyboard', [], 'Hide keyboard'); ?></span></label>
-    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarCustomize" checked><span><?php echo t_h('modals.ui_customization.panel_title', [], 'Customize this page'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarCustomize" checked><span><?php echo t_h('modals.ui_customization.panel_title', [], 'Element visibility'); ?></span></label>
 </div>
 </div>
 

@@ -1,21 +1,50 @@
-/* UI Customization Modal */
-#uiCustomizationModal.modal {
-    padding-top: 16px;
+/* ==========================================================================
+   Element visibility: the UI Customization checklist as a section of the
+   settings page (ui_customization_settings.php, #uiCustomizationSettings)
+   and as the contextual panel (ui_customization_panel.php). The section is
+   the one child of its .home-grid: a bordered panel on desktop
+   (css/settings.css, .settings-with-nav), a plain column on narrow screens.
+   ========================================================================== */
+.ui-custom-settings {
+    /* Spans the card grid of the stacked layout */
+    grid-column: 1 / -1;
+    padding: 16px 20px 18px;
+    box-sizing: border-box;
+    min-width: 0;
 }
 
-.modal-content-wide {
-    max-width: 700px;
-    max-height: 80vh;
-    display: flex;
-    flex-direction: column;
+/* Under 801px the .home-grid is not a bordered panel, so the section draws
+   its own frame, like the cards around it. */
+@media (max-width: 800px) {
+    .ui-custom-settings {
+        background: var(--pz-bg);
+        border: 1px solid var(--pz-border);
+        border-radius: var(--pz-radius-xl);
+    }
 }
 
-.modal-content-wide .modal-body {
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
+/* Hidden-count summary under the description ("All visible", "3 hidden") */
+.ui-custom-summary {
+    margin: -8px 0 14px 0;
+}
+
+.ui-custom-settings-footer {
     display: flex;
-    flex-direction: column;
+    justify-content: flex-end;
+    /* No rule above it: the last section row already draws a bottom border,
+       and a second line 20px under it read as a double separator. */
+    margin-top: 22px;
+}
+
+/* This footer is not a .modal-buttons row, so the button carries the shared
+   .btn base of components/buttons.css. Without it .btn-primary only painted
+   the background and the browser drew the rest: an outset 3D border, 6px of
+   padding and Arial. The radius follows the filter row above rather than the
+   4px of .btn, so the section reads as one family of controls. */
+.ui-custom-save-btn {
+    border-radius: var(--pz-radius-lg);
+    min-width: 120px;
+    font-weight: var(--pz-weight-medium);
 }
 
 .ui-custom-description {
@@ -24,7 +53,7 @@
     font-size: 0.9em;
 }
 
-/* "except administrators": the all-users modal does not apply to admins, which
+/* "except administrators": the Users column does not apply to admins, which
    is easy to miss in the middle of the sentence. */
 .ui-custom-description-highlight {
     color: var(--pz-danger-text);
@@ -42,8 +71,8 @@
 .ui-custom-filter .ui-custom-filter-input {
     flex: 1;
     min-width: 0;
-    /* Cancel .modal-content input margins (base.css) so the input fills the
-       flex row and align-items: stretch gives it and the button equal heights. */
+    /* No base input margin, so the input fills the flex row and
+       align-items: stretch gives it and the button equal heights. */
     margin: 0;
 }
 
@@ -96,16 +125,6 @@
     accent-color: var(--pz-accent);
 }
 
-.ui-custom-sections-scroll {
-    overflow-y: auto;
-    flex: 1;
-    min-height: 0;
-}
-
-#uiCustomizationModal .modal-buttons {
-    padding-top: 15px;
-}
-
 .ui-custom-filter-input {
     width: 100%;
     box-sizing: border-box;
@@ -152,11 +171,11 @@
 
 /* Filtered view keeps its section titles, so it also keeps enough vertical
    room for each title to read as a heading rather than as a stray row. */
-#uiCustomizationModal.ui-custom-filtering .ui-custom-section {
+#uiCustomizationSettings.ui-custom-filtering .ui-custom-section {
     margin-bottom: 16px;
 }
 
-#uiCustomizationModal.ui-custom-filtering .ui-custom-items {
+#uiCustomizationSettings.ui-custom-filtering .ui-custom-items {
     gap: 6px 12px;
 }
 
@@ -206,15 +225,15 @@
 }
 
 /* An active filter overrides collapse so matching items stay visible
-   (settings-page.js toggles .ui-custom-filtering on the modal) */
-#uiCustomizationModal:not(.ui-custom-filtering) .ui-custom-section.ui-custom-section-collapsed .ui-custom-items,
-#uiCustomizationModal:not(.ui-custom-filtering) .ui-custom-section.ui-custom-section-collapsed .ui-custom-section-hint {
+   (settings-page.js toggles .ui-custom-filtering on the section) */
+#uiCustomizationSettings:not(.ui-custom-filtering) .ui-custom-section.ui-custom-section-collapsed .ui-custom-items,
+#uiCustomizationSettings:not(.ui-custom-filtering) .ui-custom-section.ui-custom-section-collapsed .ui-custom-section-hint {
     display: none;
 }
 
 /* Collapsed sections read as a list of headings, so they lose the gap that
    separates a title from its items. */
-#uiCustomizationModal:not(.ui-custom-filtering) .ui-custom-section.ui-custom-section-collapsed {
+#uiCustomizationSettings:not(.ui-custom-filtering) .ui-custom-section.ui-custom-section-collapsed {
     margin-bottom: 8px;
 }
 
@@ -224,7 +243,7 @@
     margin: -4px 0 10px 0;
 }
 
-#uiCustomizationModal.ui-custom-filtering .ui-custom-section-hint {
+#uiCustomizationSettings.ui-custom-filtering .ui-custom-section-hint {
     display: none;
 }
 
@@ -302,10 +321,6 @@
     .ui-custom-items {
         grid-template-columns: 1fr;
     }
-
-    .modal-content-wide {
-        max-height: 90vh;
-    }
 }
 
 /* Dark mode */
@@ -367,13 +382,13 @@ html[data-theme='dark'] .ui-custom-item:hover,
 }
 
 /* Sections only configurable instance-wide (e.g. the login page): hidden in
-   the per-user modal; in the administrator modal only their Users column
+   the per-user view; in the administrator view only their Users column
    applies, so the Me checkbox is blanked out. */
-#uiCustomizationModal.ui-custom-mode-user .ui-custom-section[data-ui-global-only] {
+#uiCustomizationSettings.ui-custom-mode-user .ui-custom-section[data-ui-global-only] {
     display: none !important;
 }
 
-#uiCustomizationModal.ui-custom-mode-admin .ui-custom-section[data-ui-global-only] [data-ui-key] {
+#uiCustomizationSettings.ui-custom-mode-admin .ui-custom-section[data-ui-global-only] [data-ui-key] {
     visibility: hidden;
 }
 
@@ -390,13 +405,13 @@ html[data-theme='dark'] .ui-custom-item:hover,
     display: none;
 }
 
-#uiCustomizationModal.ui-custom-mode-admin .ui-custom-items,
-#uiCustomizationModal.ui-custom-mode-admin.ui-custom-filtering .ui-custom-items {
+#uiCustomizationSettings.ui-custom-mode-admin .ui-custom-items,
+#uiCustomizationSettings.ui-custom-mode-admin.ui-custom-filtering .ui-custom-items {
     grid-template-columns: 1fr;
     gap: 2px;
 }
 
-#uiCustomizationModal.ui-custom-mode-admin .ui-custom-columns {
+#uiCustomizationSettings.ui-custom-mode-admin .ui-custom-columns {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
@@ -410,7 +425,7 @@ html[data-theme='dark'] .ui-custom-item:hover,
 }
 
 /* Header cells match the checkbox cells below: 16px box plus 20px each side */
-#uiCustomizationModal.ui-custom-mode-admin .ui-custom-columns span {
+#uiCustomizationSettings.ui-custom-mode-admin .ui-custom-columns span {
     width: 56px;
     text-align: center;
     overflow: hidden;
@@ -418,23 +433,23 @@ html[data-theme='dark'] .ui-custom-item:hover,
     white-space: nowrap;
 }
 
-#uiCustomizationModal.ui-custom-mode-admin .ui-custom-item span {
+#uiCustomizationSettings.ui-custom-mode-admin .ui-custom-item span {
     order: -1;
     flex: 1;
     min-width: 0;
 }
 
-#uiCustomizationModal.ui-custom-mode-admin .ui-custom-item input[type="checkbox"] {
+#uiCustomizationSettings.ui-custom-mode-admin .ui-custom-item input[type="checkbox"] {
     margin: 0 20px;
 }
 
-#uiCustomizationModal.ui-custom-mode-admin .ui-custom-users-input {
+#uiCustomizationSettings.ui-custom-mode-admin .ui-custom-users-input {
     display: inline-block;
 }
 
 /* A single locked checkbox (tenant isolation manages the Users column for
    that key) rather than the whole row */
-#uiCustomizationModal.ui-custom-mode-admin .ui-custom-item input.ui-custom-input-locked {
+#uiCustomizationSettings.ui-custom-mode-admin .ui-custom-item input.ui-custom-input-locked {
     cursor: not-allowed;
     opacity: 0.4;
 }
@@ -447,8 +462,9 @@ html[data-theme='dark'] .ui-custom-columns,
 /* ============================================
    Icon Sidebar Order Modal
    ============================================
-   Sibling of the UI Customization modal (one chooses which rail buttons show,
-   the other in what order), so it lives here and reuses .ui-custom-description.
+   Sibling of the Element visibility section (one chooses which rail buttons
+   show, the other in what order), so it lives here and reuses
+   .ui-custom-description.
    Neutral translucent greys throughout, like the rules above, so the rows read
    correctly in both themes without dark-mode overrides. */
 

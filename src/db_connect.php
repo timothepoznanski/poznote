@@ -601,7 +601,6 @@ try {
             . ($isFreshDatabase ? 'browser' : 'user') . "')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_created', '1')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_icons', '1')");
-        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('type_based_note_icons', '1')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_age_filter_days', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('date_time_format', 'default')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('diary_date_format', 'ymd')");
@@ -647,8 +646,6 @@ try {
             }
         }
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('slash_menu_trigger', 'slash')");
-        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_nav_shortcuts_enabled', '0')");
-        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('ctrl_s_save_enabled', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('attachment_previews_in_note', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('attachments_at_bottom', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('backlinks_at_bottom', '0')");

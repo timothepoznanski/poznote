@@ -15,6 +15,9 @@ class SettingsController {
     private $globalSettings = [
         'hidden_ui_elements_global',
         'login_display_name',
+        'contact_email',
+        'discussions_url',
+        'discord_url',
         'custom_css_path',
         'theme_list',
         'git_sync_enabled',
@@ -114,6 +117,23 @@ class SettingsController {
             $normalized = poznoteNormalizeCustomCssPath($value);
             if ($normalized === '' && trim((string) $value) !== '') {
                 throw new InvalidArgumentException('invalid custom css path', 400);
+            }
+            return $normalized;
+        }
+
+        // About section links (settings.php): empty restores the default
+        if ($key === 'contact_email') {
+            $normalized = trim((string) $value);
+            if ($normalized !== '' && !filter_var($normalized, FILTER_VALIDATE_EMAIL)) {
+                throw new InvalidArgumentException('invalid email address', 400);
+            }
+            return $normalized;
+        }
+
+        if ($key === 'discussions_url' || $key === 'discord_url') {
+            $normalized = trim((string) $value);
+            if ($normalized !== '' && (!filter_var($normalized, FILTER_VALIDATE_URL) || !preg_match('#^https?://#i', $normalized))) {
+                throw new InvalidArgumentException('invalid url', 400);
             }
             return $normalized;
         }
@@ -245,10 +265,6 @@ class SettingsController {
                 throw new InvalidArgumentException('invalid slash menu trigger', 400);
             }
             return $normalized;
-        }
-
-        if ($key === 'note_nav_shortcuts_enabled' || $key === 'ctrl_s_save_enabled') {
-            return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
         }
 
         if ($key === 'allow_executable_attachments') {

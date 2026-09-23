@@ -331,7 +331,7 @@
         var message = tr('modals.ui_customization.toggle_all_warning', {},
             'This will lose all your existing customizations. Do you want to continue?');
         if (window.modalAlert && typeof window.modalAlert.confirm === 'function') {
-            window.modalAlert.confirm(message, tr('modals.ui_customization.panel_title', {}, 'Customize this page'))
+            window.modalAlert.confirm(message, tr('modals.ui_customization.panel_title', {}, 'Element visibility'))
                 .then(function (confirmed) { if (confirmed) done(); });
         } else if (window.confirm(message)) {
             done();

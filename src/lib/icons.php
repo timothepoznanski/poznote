@@ -272,20 +272,15 @@ function buildNoteIconClass($iconClass, $defaultIcon = 'lucide-file-text') {
  * Default icon for a note that has no custom icon of its own.
  *
  * Task lists and markdown notes get a type-specific icon so they can be told
- * apart from plain HTML notes at a glance in the notes list. Gated by the
- * 'type_based_note_icons' setting (enabled by default); when it is off, every
- * note falls back to the generic file icon as before.
+ * apart from plain HTML notes at a glance in the notes list. Always on: the
+ * former 'type_based_note_icons' setting was removed, a stale '0' row in the
+ * settings table is ignored.
  *
  * Mirrors getNoteTypeIcon() in js/notes-manager.js; js/folder-icon.js does not
  * duplicate the mapping, it reads the resolved default from the
  * data-default-icon attribute stamped by renderEditableNoteIcon() below.
  */
 function defaultNoteIconForType($noteType) {
-    $setting = getSetting('type_based_note_icons', '1');
-    if ($setting === '0' || $setting === 'false') {
-        return 'lucide-file-text';
-    }
-
     switch (strtolower((string)($noteType ?: 'note'))) {
         case 'tasklist':
             return 'lucide-list-todo';

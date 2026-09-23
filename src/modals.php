@@ -1535,58 +1535,6 @@ include __DIR__ . '/modals/tag_folder_notes_modal.php';
     </div>
 </div>
 
-<!-- UI Customization Modal: what it saves is a preference of the account on
-     screen, so it is for its owner (see ui_customization_panel.php) -->
-<?php if ((!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser())): ?>
-<div id="uiCustomizationModal" class="modal">
-    <div class="modal-content modal-content-wide">
-        <div class="modal-header">
-            <h3 id="uiCustomizationModalTitle"><?php echo t_h('modals.ui_customization.title', [], 'UI Customization'); ?></h3>
-        </div>
-        <div class="modal-body">
-            <?php
-            // Administrators get a second checkbox column ("Users") editing the
-            // instance-wide set next to their own ("Me"), see
-            // openUiCustomizationModal() in js/settings-page.js.
-            ?>
-            <p class="ui-custom-description" id="uiCustomizationModalDescription"
-                data-description-user="<?php echo t_h('modals.ui_customization.description', [], 'Show or hide interface elements. Unchecked items will be hidden.'); ?>"
-                data-description-admin="<?php echo t_h('modals.ui_customization.description_admin', [], 'Show or hide interface elements. Unchecked items will be hidden. The "Me" column applies to your own interface, the "Users" column to every user of this instance except administrators.'); ?>"
-                data-description-admin-highlight="<?php echo t_h('modals.ui_customization.description_global_highlight', [], 'except administrators'); ?>"
-                data-column-me="<?php echo t_h('modals.ui_customization.column_me', [], 'Me'); ?>"
-                data-column-users="<?php echo t_h('modals.ui_customization.column_users', [], 'Users'); ?>"><?php echo t_h('modals.ui_customization.description', [], 'Show or hide interface elements. Unchecked items will be hidden.'); ?></p>
-            <div class="ui-custom-filter">
-                <button type="button" id="uiCustomizationToggleAll" class="ui-custom-toggle-all ui-custom-toggle-all-global" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button>
-                <button type="button" id="uiCustomizationCollapseAll" class="ui-custom-collapse-all"
-                    data-label-collapse="<?php echo t_h('modals.ui_customization.collapse_all', [], 'Collapse all'); ?>"
-                    data-label-expand="<?php echo t_h('modals.ui_customization.expand_all', [], 'Expand all'); ?>"><i class="lucide lucide-chevron-down"></i></button>
-                <input
-                    type="search"
-                    id="uiCustomizationFilterInput"
-                    class="ui-custom-filter-input"
-                    placeholder="<?php echo t_h('modals.ui_customization.filter_placeholder', [], 'Filter items...'); ?>"
-                    autocomplete="off">
-            </div>
-            <label class="ui-custom-hidden-only">
-                <input type="checkbox" id="uiCustomizationHiddenOnly">
-                <span><?php echo t_h('modals.ui_customization.show_unchecked_only', [], 'Show only unchecked items'); ?></span>
-            </label>
-            <div class="ui-custom-sections-scroll">
-                <div class="ui-custom-empty" id="uiCustomizationFilterEmpty" hidden
-                    data-empty-default="<?php echo t_h('modals.ui_customization.no_results', [], 'No matching items found.'); ?>"
-                    data-empty-unchecked="<?php echo t_h('modals.ui_customization.no_unchecked_results', [], 'No unchecked items.'); ?>"><?php echo t_h('modals.ui_customization.no_results', [], 'No matching items found.'); ?></div>
-
-                <?php include __DIR__ . '/modals/ui_customization_sections.php'; ?>
-            </div>
-        </div>
-        <div class="modal-buttons">
-            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="uiCustomizationModal"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-primary" id="saveUiCustomizationBtn"><?php echo t_h('common.save'); ?></button>
-        </div>
-    </div>
-</div>
-<?php endif; ?>
-
 <?php
 // Icon Sidebar Order modal. The rows come from the list icon_sidebar.php
 // published while rendering the rail, so the modal can never offer an entry the
