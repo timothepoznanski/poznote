@@ -57,6 +57,27 @@ p.code-block-placeholder-after[data-ph]:empty:before {
     position: relative;
 }
 
+/* A gutter on the right for the floating buttons (discussion 1482).
+   The stack of css/ui-customization-panel.css and the scroll arrows below are
+   pinned 10px from the right of the note column (--pz-docked-*, below), and
+   the note's own side spacing is percentages of that column (1% + 2%), which
+   is both too little to clear them on a laptop and far too much on a wide
+   screen: at 1440px the note body ends 10px behind the strip, so a table
+   border, a code block or the end of a line runs under it. On that side the
+   percentages are therefore replaced by the room the strip actually needs:
+   10px for its own offset, one button, and 8px of air. This holds at every
+   width and in both outline states, and it is what keeps the markdown split
+   view, which fills the column edge to edge, off the right pane's border. */
+@media (min-width: 801px) {
+    .notecard {
+        margin-right: 0;
+    }
+
+    .innernote {
+        padding-right: calc(var(--pz-edge-btn-size, 32px) + 16px);
+    }
+}
+
 /* Scroll-to-edge arrows, fixed at the bottom-right of the note and stacked
    under the floating stack of css/ui-customization-panel.css, whose buttons
    share their size (--pz-edge-btn-size, larger on mobile where they are

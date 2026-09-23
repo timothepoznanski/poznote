@@ -518,7 +518,7 @@
       "backlinks_at_bottom": "将反向链接区域显示在笔记底部而不是顶部。",
       "default_image_border": "默认以带边框且无内边距的方式显示笔记中的图片。",
       "spellcheck_html_notes": "在 HTML 笔记中启用浏览器拼写检查。",
-      "slash_menu_require_alt": "选择通过输入 / 还是 Alt + / 打开命令菜单。",
+      "slash_menu_trigger": "选择通过输入 /、Alt + / 还是完全不用键盘打开命令菜单。无论此设置为何，在笔记中点击右键都会打开它。",
       "note_nav_shortcuts": "使用 Alt + ↑/↓ 切换到当前文件夹中的上一条或下一条笔记。",
       "ctrl_s_save": "使用 Ctrl + S（Mac 上为 Cmd + S）立即保存当前笔记。",
       "ui_customization": "隐藏您不使用的界面元素。",
@@ -837,7 +837,7 @@
       "notes_dashboard": "笔记看板",
       "spellcheck_html_notes": "拼写检查",
       "note_color_palette": "笔记颜色",
-      "slash_menu_require_alt": "命令菜单快捷键",
+      "slash_menu_trigger": "命令菜单快捷键",
       "note_nav_shortcuts": "Alt + ↑/↓ 切换笔记",
       "ctrl_s_save": "Ctrl + S 保存笔记",
       "snapshots": "快照",
@@ -1088,7 +1088,7 @@
       "plain_code": "代码（不高亮）",
       "no_match": "没有匹配的语言"
     },
-    "markdown_placeholder": "编写您的 Markdown，使用 / 打开命令菜单，粘贴图片或在光标处拖放图片。",
+    "markdown_placeholder": "编写您的 Markdown，使用 / 或右键打开命令菜单，粘贴图片或在光标处拖放图片。",
     "markdown_placeholder_mobile": "在此处编写您的 Markdown 或粘贴图片...",
     "excalidraw": {
       "placeholder_outside": "在图形外在此输入…"
@@ -2264,7 +2264,7 @@
       "untitled": "无标题"
     },
     "editor": {
-      "placeholder_desktop": "输入文本，使用 / 打开命令菜单，粘贴图片或在光标处拖放图片。",
+      "placeholder_desktop": "输入文本，使用 / 或右键打开命令菜单，粘贴图片或在光标处拖放图片。",
       "placeholder_mobile": "在此处输入文本或粘贴图片..."
     }
   },
@@ -5013,7 +5013,7 @@
     "link": "插入链接",
     "code_block": "代码块",
     "slash_menu": "打开命令菜单",
-    "slash_menu_hint": "在设置中启用该选项后使用 Alt + /",
+    "slash_menu_hint": "Alt + / 或完全不用快捷键，取决于设置中的选项。在笔记中点击右键始终可以打开它",
     "emoji": "按名称插入表情",
     "indent": "增加或减少列表项缩进",
     "checklist_toggle": "勾选或取消勾选清单项",

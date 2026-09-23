@@ -135,7 +135,7 @@ $settingsPageUserKeys = [
     'icon_sidebar_order',
     'settings_pinned_cards',
     'spellcheck_html_notes',
-    'slash_menu_require_alt',
+    'slash_menu_trigger',
     'note_nav_shortcuts_enabled',
     'ctrl_s_save_enabled',
 ];
@@ -1031,12 +1031,12 @@ if ($canUseUserWebhooks) {
             </div>
 
             <!-- Slash menu trigger -->
-            <div class="home-card" id="slash-menu-require-alt-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.slash_menu_require_alt', [], 'Choose whether the command menu opens by typing / or Alt + /.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+            <div class="home-card" id="slash-menu-trigger-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.slash_menu_trigger', [], 'Choose whether the command menu opens by typing /, with Alt + /, or not from the keyboard at all. A right-click in a note opens it whatever this is set to.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-keyboard"></i></div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.slash_menu_require_alt', [], 'Command menu shortcut'); ?></span>
-                    <span id="slash-menu-require-alt-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('display.cards.slash_menu_trigger', [], 'Command menu shortcut'); ?></span>
+                    <span id="slash-menu-trigger-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
 

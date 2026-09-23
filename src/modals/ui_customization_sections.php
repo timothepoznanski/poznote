@@ -48,7 +48,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:extension-card" checked><span><?php echo t_h('settings.cards.install_extension', [], 'Install extension'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:install-app-card" checked><span><?php echo t_h('settings.cards.install_app', [], 'Install application'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:spellcheck-html-notes-card" checked><span><?php echo t_h('display.cards.spellcheck_html_notes', [], 'Spell check'); ?></span></label>
-        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:slash-menu-require-alt-card" checked><span><?php echo t_h('display.cards.slash_menu_require_alt', [], 'Command menu shortcut'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:slash-menu-trigger-card" checked><span><?php echo t_h('display.cards.slash_menu_trigger', [], 'Command menu shortcut'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-nav-shortcuts-card" checked><span><?php echo t_h('display.cards.note_nav_shortcuts', [], 'Switch notes with Alt + ↑/↓'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:ctrl-s-save-card" checked><span><?php echo t_h('display.cards.ctrl_s_save', [], 'Save note with Ctrl + S'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:login-display-card" checked><span><?php echo t_h('display.cards.login_display', [], 'Login page title'); ?></span></label>

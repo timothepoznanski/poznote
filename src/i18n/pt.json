@@ -519,7 +519,7 @@
       "backlinks_at_bottom": "Mostre a seção de backlinks na parte inferior das notas em vez do topo.",
       "default_image_border": "Exiba por padrão as imagens das notas com borda e sem preenchimento.",
       "spellcheck_html_notes": "Ative o corretor ortográfico do navegador nas notas HTML.",
-      "slash_menu_require_alt": "Escolha se o menu de comandos abre digitando / ou Alt + /.",
+      "slash_menu_trigger": "Escolha se o menu de comandos abre digitando /, com Alt + / ou sem nenhuma tecla. Um clique com o botão direito numa nota abre-o seja qual for esta definição.",
       "note_nav_shortcuts": "Vá para a nota anterior ou seguinte da pasta atual com Alt + ↑/↓.",
       "ctrl_s_save": "Salve imediatamente a nota atual com Ctrl + S (Cmd + S no Mac).",
       "ui_customization": "Oculte os elementos da interface que você não usa.",
@@ -838,7 +838,7 @@
       "notes_dashboard": "Quadro de notas",
       "spellcheck_html_notes": "Verificação ortográfica",
       "note_color_palette": "Cores das notas",
-      "slash_menu_require_alt": "Atalho do menu de comandos",
+      "slash_menu_trigger": "Atalho do menu de comandos",
       "note_nav_shortcuts": "Alternar notas com Alt + ↑/↓",
       "ctrl_s_save": "Salvar nota com Ctrl + S",
       "snapshots": "Instantâneos",
@@ -1090,7 +1090,7 @@
       "plain_code": "Código (sem realce)",
       "no_match": "Nenhuma linguagem correspondente"
     },
-    "markdown_placeholder": "Escreva seu markdown, use / para abrir o menu de comandos, cole imagens ou arraste e solte uma imagem no cursor.",
+    "markdown_placeholder": "Escreva seu markdown, use / ou o clique com o botão direito para abrir o menu de comandos, cole imagens ou arraste e solte uma imagem no cursor.",
     "markdown_placeholder_mobile": "Escreva seu markdown ou cole imagens aqui...",
     "excalidraw": {
       "placeholder_outside": "Escreva fora do diagrama aqui…"
@@ -2266,7 +2266,7 @@
       "untitled": "Sem título"
     },
     "editor": {
-      "placeholder_desktop": "Insira texto, use / para abrir o menu de comandos, cole imagens ou arraste e solte uma imagem no cursor.",
+      "placeholder_desktop": "Insira texto, use / ou o clique com o botão direito para abrir o menu de comandos, cole imagens ou arraste e solte uma imagem no cursor.",
       "placeholder_mobile": "Insira texto ou cole imagens aqui..."
     }
   },
@@ -4914,7 +4914,7 @@
     "link": "Inserir uma ligação",
     "code_block": "Bloco de código",
     "slash_menu": "Abrir o menu de comandos",
-    "slash_menu_hint": "Alt + / quando a opção está ativada nas Configurações",
+    "slash_menu_hint": "Alt + / ou nenhum atalho, conforme a opção nas Configurações. Um clique com o botão direito numa nota abre-o sempre",
     "emoji": "Inserir um emoji pelo nome",
     "indent": "Aumentar ou diminuir o recuo de um item de lista",
     "checklist_toggle": "Marcar ou desmarcar um item da checklist",

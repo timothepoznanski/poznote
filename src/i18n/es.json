@@ -519,7 +519,7 @@
       "backlinks_at_bottom": "Muestra la sección de retroenlaces en la parte inferior de las notas en lugar de arriba.",
       "default_image_border": "Muestra por defecto las imágenes de las notas con borde y sin relleno.",
       "spellcheck_html_notes": "Activa el corrector ortográfico del navegador en las notas HTML.",
-      "slash_menu_require_alt": "Elige si el menú de comandos se abre escribiendo / o Alt + /.",
+      "slash_menu_trigger": "Elige si el menú de comandos se abre escribiendo /, con Alt + / o sin ninguna tecla. Un clic derecho en una nota lo abre sea cual sea este ajuste.",
       "note_nav_shortcuts": "Cambia a la nota anterior o siguiente de la carpeta actual con Alt + ↑/↓.",
       "ctrl_s_save": "Guarda inmediatamente la nota actual con Ctrl + S (Cmd + S en Mac).",
       "ui_customization": "Oculta los elementos de la interfaz que no utilizas.",
@@ -838,7 +838,7 @@
       "notes_dashboard": "Tablero de notas",
       "spellcheck_html_notes": "Corrector ortográfico",
       "note_color_palette": "Colores de notas",
-      "slash_menu_require_alt": "Atajo del menú de comandos",
+      "slash_menu_trigger": "Atajo del menú de comandos",
       "note_nav_shortcuts": "Cambiar de nota con Alt + ↑/↓",
       "ctrl_s_save": "Guardar nota con Ctrl + S",
       "snapshots": "Instantáneas",
@@ -1090,7 +1090,7 @@
       "plain_code": "Código (sin resaltado)",
       "no_match": "Ningún lenguaje coincide"
     },
-    "markdown_placeholder": "Escribe tu markdown, usa / para abrir el menú de comandos, pega imágenes o arrastra y suelta una imagen en el cursor.",
+    "markdown_placeholder": "Escribe tu markdown, usa / o el clic derecho para abrir el menú de comandos, pega imágenes o arrastra y suelta una imagen en el cursor.",
     "markdown_placeholder_mobile": "Escribe tu markdown o pega imágenes aquí...",
     "excalidraw": {
       "placeholder_outside": "Escribe fuera del diagrama aquí…"
@@ -2266,7 +2266,7 @@
       "untitled": "Sin título"
     },
     "editor": {
-      "placeholder_desktop": "Ingresa texto, usa / para abrir el menú de comandos, pega imágenes o arrastra y suelta una imagen en el cursor.",
+      "placeholder_desktop": "Ingresa texto, usa / o el clic derecho para abrir el menú de comandos, pega imágenes o arrastra y suelta una imagen en el cursor.",
       "placeholder_mobile": "Ingresa texto o pega imágenes aquí..."
     }
   },
@@ -4914,7 +4914,7 @@
     "link": "Insertar un enlace",
     "code_block": "Bloque de código",
     "slash_menu": "Abrir el menú de comandos",
-    "slash_menu_hint": "Alt + / si la opción está activada en Ajustes",
+    "slash_menu_hint": "Alt + / o ningún atajo, según la opción en Ajustes. Un clic derecho en una nota siempre lo abre",
     "emoji": "Insertar un emoji por su nombre",
     "indent": "Aumentar o reducir la sangría de un elemento de lista",
     "checklist_toggle": "Marcar o desmarcar un elemento de la lista de verificación",

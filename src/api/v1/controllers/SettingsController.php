@@ -239,8 +239,12 @@ class SettingsController {
             return $normalized;
         }
 
-        if ($key === 'slash_menu_require_alt') {
-            return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
+        if ($key === 'slash_menu_trigger') {
+            $normalized = trim((string) $value);
+            if (!in_array($normalized, ['slash', 'alt-slash', 'disabled'], true)) {
+                throw new InvalidArgumentException('invalid slash menu trigger', 400);
+            }
+            return $normalized;
         }
 
         if ($key === 'note_nav_shortcuts_enabled' || $key === 'ctrl_s_save_enabled') {

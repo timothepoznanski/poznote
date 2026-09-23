@@ -519,7 +519,7 @@
       "backlinks_at_bottom": "Zeigen Sie den Backlink-Bereich unten statt oben in Notizen an.",
       "default_image_border": "Zeigen Sie Bilder in Notizen standardmäßig mit Rahmen und ohne Innenabstand an.",
       "spellcheck_html_notes": "Aktivieren Sie die Rechtschreibprüfung des Browsers in HTML-Notizen.",
-      "slash_menu_require_alt": "Wählen Sie, ob sich das Befehlsmenü mit / oder Alt + / öffnet.",
+      "slash_menu_trigger": "Wählen Sie, ob sich das Befehlsmenü mit /, mit Alt + / oder gar nicht über die Tastatur öffnet. Ein Rechtsklick in einer Notiz öffnet es unabhängig von dieser Einstellung.",
       "note_nav_shortcuts": "Wechseln Sie mit Alt + ↑/↓ zur vorherigen oder nächsten Notiz im aktuellen Ordner.",
       "ctrl_s_save": "Speichern Sie die aktuelle Notiz sofort mit Strg + S (Cmd + S auf dem Mac).",
       "ui_customization": "Blenden Sie Oberflächenelemente aus, die Sie nicht verwenden.",
@@ -838,7 +838,7 @@
       "notes_dashboard": "Notiz-Board",
       "spellcheck_html_notes": "Rechtschreibprüfung",
       "note_color_palette": "Notizfarben",
-      "slash_menu_require_alt": "Tastenkürzel für das Befehlsmenü",
+      "slash_menu_trigger": "Tastenkürzel für das Befehlsmenü",
       "note_nav_shortcuts": "Notizen wechseln mit Alt + ↑/↓",
       "ctrl_s_save": "Notiz mit Strg + S speichern",
       "snapshots": "Schnappschüsse",
@@ -1090,7 +1090,7 @@
       "plain_code": "Code (ohne Hervorhebung)",
       "no_match": "Keine passende Sprache"
     },
-    "markdown_placeholder": "Schreiben Sie Ihr Markdown, verwenden Sie /, um das Befehlsmenü zu öffnen, fügen Sie Bilder ein oder legen Sie ein Bild am Cursor ab.",
+    "markdown_placeholder": "Schreiben Sie Ihr Markdown, verwenden Sie / oder einen Rechtsklick, um das Befehlsmenü zu öffnen, fügen Sie Bilder ein oder legen Sie ein Bild am Cursor ab.",
     "markdown_placeholder_mobile": "Schreiben Sie Ihr Markdown hier oder fügen Sie Bilder ein...",
     "excalidraw": {
       "placeholder_outside": "Hier außerhalb des Diagramms schreiben…"
@@ -2266,7 +2266,7 @@
       "untitled": "Ohne Titel"
     },
     "editor": {
-      "placeholder_desktop": "Text eingeben, / verwenden, um das Befehlsmenü zu öffnen, Bilder einfügen oder ein Bild am Cursor ablegen.",
+      "placeholder_desktop": "Text eingeben, / oder Rechtsklick verwenden, um das Befehlsmenü zu öffnen, Bilder einfügen oder ein Bild am Cursor ablegen.",
       "placeholder_mobile": "Text eingeben oder Bilder einfügen..."
     }
   },
@@ -4913,7 +4913,7 @@
     "link": "Link einfügen",
     "code_block": "Codeblock",
     "slash_menu": "Befehlsmenü öffnen",
-    "slash_menu_hint": "Alt + /, wenn die Option in den Einstellungen aktiviert ist",
+    "slash_menu_hint": "Alt + / oder gar kein Tastenkürzel, je nach Option in den Einstellungen. Ein Rechtsklick in einer Notiz öffnet es immer",
     "emoji": "Emoji über seinen Namen einfügen",
     "indent": "Listenelement ein- oder ausrücken",
     "checklist_toggle": "Checklistenelement abhaken oder zurücksetzen",

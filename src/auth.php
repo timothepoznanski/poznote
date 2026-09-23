@@ -247,8 +247,13 @@ function api_t($key, $vars = [], $default = null) {
         }
     }
 
-    // Try to initialize DB connection so getUserLanguage() can read settings.language.
-    if (!isset($GLOBALS['con'])) {
+    // Try to initialize DB connection so getUserLanguage() can read
+    // settings.language. Only for a signed-in session: without one there is
+    // no user whose language could be read, and db_connect.php would fall
+    // back to the legacy data/database/poznote.db, recreating it empty after
+    // every container start (init.sh removes it) just to answer a 401 in
+    // English anyway.
+    if (!isset($GLOBALS['con']) && !empty($_SESSION['user_id'])) {
         $configPath = __DIR__ . '/config.php';
         $dbPath = __DIR__ . '/db_connect.php';
         if (is_file($configPath)) {

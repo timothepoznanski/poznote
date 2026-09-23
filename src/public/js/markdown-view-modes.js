@@ -255,13 +255,13 @@ function initializeMarkdownNote(noteId) {
         isMobileViewport = false;
     }
     const mobilePlaceholder = window.t ? window.t('editor.markdown_placeholder_mobile', null, 'Write your markdown or paste images here...') : 'Write your markdown or paste images here...';
-    const desktopPlaceholder = window.t ? window.t('editor.markdown_placeholder', null, 'Write your markdown, use / for command menu, paste images or drop an image at cursor.') : 'Write your markdown, use / for command menu, paste images or drop an image at cursor.';
+    const desktopPlaceholder = window.t ? window.t('editor.markdown_placeholder', null, 'Write your markdown, use / or right-click for command menu, paste images or drop an image at cursor.') : 'Write your markdown, use / or right-click for command menu, paste images or drop an image at cursor.';
     editorDiv.setAttribute('data-ph', isMobileViewport ? mobilePlaceholder : desktopPlaceholder);
 
     // Update placeholder when translations load
     document.addEventListener('poznote:i18n:loaded', function () {
         const mobilePh = window.t('editor.markdown_placeholder_mobile', null, 'Write your markdown or paste images here...');
-        const desktopPh = window.t('editor.markdown_placeholder', null, 'Write your markdown, use / for command menu, paste images or drop an image at cursor.');
+        const desktopPh = window.t('editor.markdown_placeholder', null, 'Write your markdown, use / or right-click for command menu, paste images or drop an image at cursor.');
         editorDiv.setAttribute('data-ph', isMobileViewport ? mobilePh : desktopPh);
 
         var liveContent = normalizeContentEditableText(editorDiv);

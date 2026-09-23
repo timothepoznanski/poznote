@@ -57,14 +57,15 @@
     }
 
     /* First step, and the part the second one keeps. Title rows above the
-       content: folder and tags, title, creation date, and the attachments row
-       when it sits up there rather than under the note
-       (attachments_at_bottom). The toolbar stays, it is how the note is
-       saved, shared and left. */
+       content: folder and tags, title, creation date, and the attachments and
+       backlinks rows when they sit up there rather than under the note
+       (attachments_at_bottom, backlinks_at_bottom). The toolbar stays, it is
+       how the note is saved, shared and left. */
     html.focus-mode #right_col .innernote > .note-tags-row,
     html.focus-mode #right_col .innernote > .note-title-heading,
     html.focus-mode #right_col .innernote > .note-subline,
-    html.focus-mode #right_col .innernote > .note-attachments-row:has(~ .noteentry) {
+    html.focus-mode #right_col .innernote > .note-attachments-row:has(~ .noteentry),
+    html.focus-mode #right_col .innernote > .backlinks-row:has(~ .noteentry) {
         display: none !important;
     }
 }

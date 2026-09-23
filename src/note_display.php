@@ -616,7 +616,7 @@
                     $entry_editable = ($note_type === 'markdown') ? 'false' : $editable;
                     $excalidraw_attr = '';
 
-                    $placeholder_desktop = t('index.editor.placeholder_desktop', [], 'Enter text, use / to open commands menu, paste images or drag-and-drop an image at the cursor.');
+                    $placeholder_desktop = t('index.editor.placeholder_desktop', [], 'Enter text, use / or right-click for command menu, paste images or drop an image at cursor.');
                     $placeholder_mobile = t('index.editor.placeholder_mobile', [], 'Enter text or paste images here...');
                     $placeholder_attr = ' data-ph="' . htmlspecialchars($placeholder_desktop, ENT_QUOTES) . '"';
                     // On mobile, slash command is not enabled for HTML + Markdown notes

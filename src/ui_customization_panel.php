@@ -67,7 +67,7 @@ $pzShortcutGroups = [
             ['keys' => [['mod', 'Shift', 'S']], 'label' => t_h('keyboard_shortcuts.strikethrough', [], 'Strikethrough')],
             ['keys' => [['mod', 'K']], 'label' => t_h('keyboard_shortcuts.link', [], 'Insert a link')],
             ['keys' => [['mod', 'Shift', 'B']], 'label' => t_h('keyboard_shortcuts.code_block', [], 'Code block')],
-            ['keys' => [['/']], 'label' => t_h('keyboard_shortcuts.slash_menu', [], 'Open the command menu'), 'hint' => t_h('keyboard_shortcuts.slash_menu_hint', [], 'Alt + / when the option is enabled in Settings')],
+            ['keys' => [['/']], 'label' => t_h('keyboard_shortcuts.slash_menu', [], 'Open the command menu'), 'hint' => t_h('keyboard_shortcuts.slash_menu_hint', [], 'Alt + / or no shortcut at all, depending on the option in Settings. A right-click in a note always opens it')],
             ['keys' => [[':']], 'label' => t_h('keyboard_shortcuts.emoji', [], 'Insert an emoji by its name')],
             ['keys' => [['Tab'], ['Shift', 'Tab']], 'label' => t_h('keyboard_shortcuts.indent', [], 'Indent or outdent a list item')],
             ['keys' => [['mod', 'Enter']], 'label' => t_h('keyboard_shortcuts.checklist_toggle', [], 'Check or uncheck a checklist item')],

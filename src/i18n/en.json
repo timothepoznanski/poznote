@@ -193,7 +193,7 @@
       "backlinks_at_bottom": "Show the backlinks section at the bottom of notes instead of the top.",
       "default_image_border": "Display images in notes with a border and no padding by default.",
       "spellcheck_html_notes": "Enable the browser spell checker in HTML notes.",
-      "slash_menu_require_alt": "Choose whether the command menu opens by typing / or Alt + /.",
+      "slash_menu_trigger": "Choose whether the command menu opens by typing /, with Alt + /, or not from the keyboard at all. A right-click in a note opens it whatever this is set to.",
       "note_nav_shortcuts": "Switch to the previous or next note in the current folder with Alt + ↑/↓.",
       "ctrl_s_save": "Save the current note immediately with Ctrl + S (Cmd + S on Mac).",
       "ui_customization": "Hide interface elements you do not use.",
@@ -476,7 +476,7 @@
       "icon_sidebar_order": "Icon sidebar order",
       "notes_dashboard": "Notes board",
       "spellcheck_html_notes": "Spell check",
-      "slash_menu_require_alt": "Command menu shortcut",
+      "slash_menu_trigger": "Command menu shortcut",
       "note_nav_shortcuts": "Switch notes with Alt + ↑/↓",
       "ctrl_s_save": "Save note with Ctrl + S",
       "snapshots": "Snapshots"
@@ -1767,7 +1767,7 @@
       "untitled": "Untitled"
     },
     "editor": {
-      "placeholder_desktop": "Enter text, use / for command menu, paste images or drop an image at cursor.",
+      "placeholder_desktop": "Enter text, use / or right-click for command menu, paste images or drop an image at cursor.",
       "placeholder_mobile": "Enter text or paste images here..."
     }
   },
@@ -1780,7 +1780,7 @@
       "plain_code": "Code (no highlighting)",
       "no_match": "No matching language"
     },
-    "markdown_placeholder": "Write your markdown, use / for command menu, paste images or drop an image at cursor.",
+    "markdown_placeholder": "Write your markdown, use / or right-click for command menu, paste images or drop an image at cursor.",
     "markdown_placeholder_mobile": "Write your markdown or paste images here...",
     "excalidraw": {
       "placeholder_outside": "Write outside the diagram here…"
@@ -4733,7 +4733,7 @@
     "link": "Insert a link",
     "code_block": "Code block",
     "slash_menu": "Open the command menu",
-    "slash_menu_hint": "Alt + / when the option is enabled in Settings",
+    "slash_menu_hint": "Alt + / or no shortcut at all, depending on the option in Settings. A right-click in a note always opens it",
     "emoji": "Insert an emoji by its name",
     "indent": "Indent or outdent a list item",
     "checklist_toggle": "Check or uncheck a checklist item",

@@ -518,7 +518,7 @@
       "backlinks_at_bottom": "Affichez la section des rétroliens en bas des notes plutôt qu'en haut.",
       "default_image_border": "Affichez par défaut les images des notes avec une bordure et sans marge intérieure.",
       "spellcheck_html_notes": "Activez le correcteur orthographique du navigateur dans les notes HTML.",
-      "slash_menu_require_alt": "Choisissez si le menu de commandes s'ouvre en tapant / ou Alt + /.",
+      "slash_menu_trigger": "Choisissez si le menu de commandes s'ouvre en tapant /, avec Alt + /, ou avec aucune touche. Un clic droit dans une note l'ouvre quel que soit ce réglage.",
       "note_nav_shortcuts": "Passez à la note précédente ou suivante du dossier courant avec Alt + ↑/↓.",
       "ctrl_s_save": "Enregistrez immédiatement la note courante avec Ctrl + S (Cmd + S sur Mac).",
       "ui_customization": "Masquez les éléments de l'interface que vous n'utilisez pas.",
@@ -839,7 +839,7 @@
       "icon_sidebar_order": "Ordre de la barre d'icônes",
       "notes_dashboard": "Tableau de notes",
       "spellcheck_html_notes": "Vérification orthographique",
-      "slash_menu_require_alt": "Raccourci du menu de commandes",
+      "slash_menu_trigger": "Raccourci du menu de commandes",
       "note_nav_shortcuts": "Changer de note avec Alt + ↑/↓",
       "ctrl_s_save": "Enregistrer la note avec Ctrl + S",
       "snapshots": "Snapshots"
@@ -1090,7 +1090,7 @@
       "plain_code": "Code (sans coloration)",
       "no_match": "Aucun langage correspondant"
     },
-    "markdown_placeholder": "Écrivez votre markdown, utilisez / pour ouvrir le menu des commandes, collez des images ou glissez-déposez une image à l’emplacement du curseur.",
+    "markdown_placeholder": "Écrivez votre markdown, utilisez / ou le clic droit pour ouvrir le menu des commandes, collez des images ou glissez-déposez une image à l’emplacement du curseur.",
     "markdown_placeholder_mobile": "Écrivez votre markdown ou collez des images ici...",
     "excalidraw": {
       "placeholder_outside": "Écrivez en dehors du diagramme ici…"
@@ -2268,7 +2268,7 @@
       "untitled": "Sans titre"
     },
     "editor": {
-      "placeholder_desktop": "Saisissez du texte, utilisez / pour ouvrir le menu des commandes, collez des images ou glissez-déposez une image à l’emplacement du curseur.",
+      "placeholder_desktop": "Saisissez du texte, utilisez / ou le clic droit pour ouvrir le menu des commandes, collez des images ou glissez-déposez une image à l’emplacement du curseur.",
       "placeholder_mobile": "Saisissez du texte ou collez des images ici..."
     }
   },
@@ -5018,7 +5018,7 @@
     "link": "Insérer un lien",
     "code_block": "Bloc de code",
     "slash_menu": "Ouvrir le menu de commandes",
-    "slash_menu_hint": "Alt + / si l'option est activée dans les paramètres",
+    "slash_menu_hint": "Alt + / ou aucun raccourci, selon l'option dans les paramètres. Un clic droit dans une note l'ouvre toujours",
     "emoji": "Insérer un emoji par son nom",
     "indent": "Indenter ou désindenter un élément de liste",
     "checklist_toggle": "Cocher ou décocher un élément de checklist",

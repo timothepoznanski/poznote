@@ -136,7 +136,7 @@
             'icon_sidebar_order',
             'settings_pinned_cards',
             'spellcheck_html_notes',
-            'slash_menu_require_alt',
+            'slash_menu_trigger',
             'note_nav_shortcuts_enabled',
             'ctrl_s_save_enabled'
         ];
@@ -384,19 +384,33 @@
         return refresh;
     }
 
-    // Slash menu trigger: click toggles between typing "/" and pressing "Alt + /".
-    // The status badge shows the active shortcut rather than Enabled/Disabled, since
-    // both states are "on" — only the key combination changes.
+    // Slash menu trigger: a click cycles the key that opens the command menu,
+    // "/" then "Alt + /" then no key at all. The badge shows the active shortcut
+    // rather than Enabled/Disabled, since the first two states are both "on".
+    // "Disabled" only silences the keyboard: a right-click in a note and the
+    // Insert button of the mobile editor bar still open the menu.
+    var SLASH_MENU_TRIGGERS = ['slash', 'alt-slash', 'disabled'];
+
+    function normalizeSlashMenuTrigger(value) {
+        var trigger = String(value === null || value === undefined ? '' : value).trim();
+        return SLASH_MENU_TRIGGERS.indexOf(trigger) !== -1 ? trigger : 'slash';
+    }
+
     function setupSlashMenuTriggerCard() {
-        var card = document.getElementById('slash-menu-require-alt-card');
-        var status = document.getElementById('slash-menu-require-alt-status');
+        var card = document.getElementById('slash-menu-trigger-card');
+        var status = document.getElementById('slash-menu-trigger-status');
         if (!card && !status) return;
 
         function refresh() {
-            getSetting('slash_menu_require_alt', function (value) {
-                var requireAlt = isSettingEnabled(value, false, false);
+            getSetting('slash_menu_trigger', function (value) {
                 if (!status) return;
-                status.textContent = requireAlt
+                var trigger = normalizeSlashMenuTrigger(value);
+                if (trigger === 'disabled') {
+                    status.textContent = tr('common.disabled', {}, 'Disabled');
+                    status.className = 'setting-status disabled';
+                    return;
+                }
+                status.textContent = trigger === 'alt-slash'
                     ? tr('display.badges.slash_menu_alt_slash', {}, 'Alt + /')
                     : tr('display.badges.slash_menu_slash', {}, '/');
                 status.className = 'setting-status enabled';
@@ -405,9 +419,14 @@
 
         if (card) {
             card.addEventListener('click', function () {
-                getSetting('slash_menu_require_alt', function (currentValue) {
-                    var requireAlt = isSettingEnabled(currentValue, false, false);
-                    setSetting('slash_menu_require_alt', requireAlt ? '0' : '1', function () {
+                getSetting('slash_menu_trigger', function (currentValue) {
+                    var current = normalizeSlashMenuTrigger(currentValue);
+                    var next = SLASH_MENU_TRIGGERS[(SLASH_MENU_TRIGGERS.indexOf(current) + 1) % SLASH_MENU_TRIGGERS.length];
+                    setSetting('slash_menu_trigger', next, function (success) {
+                        if (!success) {
+                            alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                            return;
+                        }
                         refresh();
                         reloadOpener();
                     });

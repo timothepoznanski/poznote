@@ -156,9 +156,12 @@
             checking = false;
             if (html.indexOf('workspace-redirect-data') === -1) {
                 goToLogin();
+            } else {
+                window.poznoteSessionGone = false;
             }
         }).catch(function (e) {
             checking = false;
+            window.poznoteSessionGone = false;
             console.debug('session-guard: session probe failed:', e);
         });
     }
@@ -176,6 +179,10 @@
             return;
         }
         if (status === 401 || (finalUrl && isLoginPage(finalUrl))) {
+            // The call that got this answer is about to report its failure
+            // to the user. An error dialog would only cover the login page
+            // this file sends them to (js/modal-alerts.js reads the flag).
+            window.poznoteSessionGone = true;
             confirmSessionGone();
         }
     }
