@@ -12,6 +12,9 @@
  * the saved state (loadUiCustomizationSettings) and binds the Save button.
  * Styles: css/modals/ui-customization.css.
  */
+// settings.php resolves $isAdmin before including this file; the guard keeps
+// the fragment self-contained (and PHPStan quiet) when analysed on its own.
+$isAdmin = !empty($isAdmin);
 ?>
 <div id="uiCustomizationSettings" class="ui-custom-settings"<?php echo $isAdmin ? ' data-ui-admin="1"' : ''; ?>>
     <p class="ui-custom-description" id="uiCustomizationSettingsDescription"
