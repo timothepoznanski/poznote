@@ -1,0 +1,115 @@
+/**
+ * Connection banner of js/offline-sync.js (index.php).
+ *
+ * Shown while the server cannot be reached, with a button to the offline
+ * page, and for a few seconds after changes made offline were synced.
+ * Tokens only: the palette switches with the theme.
+ */
+
+.offline-banner {
+    position: fixed;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+    z-index: 10050;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: max-content;
+    max-width: min(640px, calc(100vw - 32px));
+    padding: 10px 10px 10px 16px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+    color: var(--pz-text);
+    box-shadow: 0 8px 24px rgba(var(--pz-shadow-rgb), 0.18);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.offline-banner[hidden] {
+    display: none;
+}
+
+.offline-banner > .lucide {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    color: var(--pz-text-muted);
+}
+
+.offline-banner-text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.offline-banner .offline-banner-open {
+    flex: 0 0 auto;
+    padding: 6px 12px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.offline-banner-close {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: var(--pz-radius-sm);
+    background: transparent;
+    color: var(--pz-text-muted);
+    cursor: pointer;
+}
+
+.offline-banner-close:hover {
+    background: var(--pz-surface-hover);
+}
+
+.offline-banner-close .lucide {
+    width: 16px;
+    height: 16px;
+}
+
+/* Phone: the icon, the text and the close button on the first row, the
+   button under the text, rather than each wrapping onto a line of its own */
+@media (max-width: 800px) {
+    .offline-banner {
+        bottom: 12px;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        align-items: start;
+        column-gap: 10px;
+        row-gap: 10px;
+        width: calc(100vw - 24px);
+        max-width: none;
+        padding: 12px 8px 12px 14px;
+    }
+
+    .offline-banner > .lucide {
+        grid-column: 1;
+        grid-row: 1;
+        margin-top: 1px;
+    }
+
+    .offline-banner-text {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .offline-banner-close {
+        grid-column: 3;
+        grid-row: 1;
+        margin-top: -4px;
+    }
+
+    .offline-banner .offline-banner-open {
+        grid-column: 2 / 4;
+        grid-row: 2;
+        justify-self: start;
+    }
+}

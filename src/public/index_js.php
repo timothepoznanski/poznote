@@ -165,6 +165,8 @@ function poznoteGetIndexJsGroups(): array {
         'js/paste-markdown-modal.js',
         'js/insert-markdown-modal.js',
         'js/speech-to-text.js',
+        'js/offline-store.js',
+        'js/offline-sync.js',
     ],
     ];
 }

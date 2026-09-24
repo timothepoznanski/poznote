@@ -78,9 +78,6 @@ $iconSidebarCurrentPage = $iconSidebarBasePath === '' ? basename($iconSidebarScr
 // param once it has applied the section state, so it also flips the highlight
 // over to the About button to keep the rail matching the cleaned URL.
 $iconSidebarIsAboutView = $iconSidebarCurrentPage === 'settings.php' && (($_GET['open'] ?? '') === 'about');
-// Same idea for My Profile: settings.php?open=account opens the My Account
-// section on its own, so the rail highlights Profile rather than Settings.
-$iconSidebarIsAccountView = $iconSidebarCurrentPage === 'settings.php' && (($_GET['open'] ?? '') === 'account');
 
 // Four groups, top to bottom: the entry points into the app (Home, Dashboard,
 // Graph), the views that hold the content itself (Notes, Tasks, Folders,
@@ -266,8 +263,8 @@ if (function_exists('poznoteTidyIconSidebarDividers')) {
 
 // Account actions, in their own group pinned to the bottom of the rail: only
 // the navigation entries above scroll, this group always stays visible.
-// Logout has no 'page' so it never highlights; Profile splits the settings.php
-// highlight by its ?open flag, the way About does.
+// Logout has no 'page' so it never highlights; About splits the settings.php
+// highlight by its ?open flag.
 // The update badge is admin-only, matching the Check for Updates card in
 // settings.php; js/utils-updates.js reveals every .update-badge when a release is out.
 // A profile still on a shipped default username or password gets a second dot
@@ -282,11 +279,9 @@ require_once __DIR__ . '/lib/default-credentials.php';
 $iconSidebarDefaultCredential = function_exists('getAuthenticatedUserId')
     && poznoteHasDefaultCredential((int)(getAuthenticatedUserId() ?? 0));
 
+// There is no My Profile entry: it opened the My Account section of the same
+// page as Settings, which opens on the pinned settings (discussion #1378).
 $iconSidebarBottomItems = [
-    // ?open=account lands on settings.php with the My Account section open and
-    // every other section closed (js/settings-page.js), where the My Profile
-    // card opens the profile modal.
-    ['id' => 'iconSidebarProfileBtn', 'url' => $iconSidebarUrl('settings.php', ['open' => 'account']), 'icon' => 'lucide-user', 'label' => t('profile.card', [], 'My Profile'), 'activeFlag' => $iconSidebarIsAccountView],
     // Theme switch. It goes nowhere, so it renders as a button rather than a
     // link; js/theme-manager.js picks it up through data-theme-toggle, steps to
     // the next theme of the list on each click and shows the one in use.
@@ -295,19 +290,18 @@ $iconSidebarBottomItems = [
     // every other section collapsed (js/settings-page.js). It is settings.php
     // with a query flag rather than a page of its own, so the settings.php
     // entries of this group split the active state by that flag: About lights
-    // up on ?open=about, My Profile on ?open=account, Settings on every other
-    // settings.php visit.
-    ['id' => 'iconSidebarSettingsBtn', 'url' => $iconSidebarUrl('settings.php'), 'icon' => 'lucide-settings', 'label' => t('sidebar.settings', [], 'Settings'), 'activeFlag' => $iconSidebarCurrentPage === 'settings.php' && !$iconSidebarIsAboutView && !$iconSidebarIsAccountView, 'updateBadge' => function_exists('isCurrentUserAdmin') && isCurrentUserAdmin(), 'attentionBadge' => $iconSidebarDefaultCredential],
+    // up on ?open=about, Settings on every other settings.php visit.
+    ['id' => 'iconSidebarSettingsBtn', 'url' => $iconSidebarUrl('settings.php'), 'icon' => 'lucide-settings', 'label' => t('sidebar.settings', [], 'Settings'), 'activeFlag' => $iconSidebarCurrentPage === 'settings.php' && !$iconSidebarIsAboutView, 'updateBadge' => function_exists('isCurrentUserAdmin') && isCurrentUserAdmin(), 'attentionBadge' => $iconSidebarDefaultCredential],
     ['id' => 'iconSidebarAboutBtn', 'url' => $iconSidebarUrl('settings.php', ['open' => 'about']), 'icon' => 'lucide-info-circle', 'label' => t('settings.categories.documentation', [], 'About'), 'activeFlag' => $iconSidebarIsAboutView],
     ['id' => 'iconSidebarLogoutBtn', 'url' => $iconSidebarBasePath . 'logout.php', 'icon' => 'lucide-log-out', 'label' => t('workspace_menu.logout', [], 'Logout')],
 ];
 
-// My Profile, Settings and About all open settings.php, which only the owner
+// Settings and About both open settings.php, which only the owner
 // of the account being looked at may open (requireActiveAccountOwner): inside
 // a workspace shared with this login, or an account granted to it, the theme
 // switch and the way out are what is left.
 if (!(!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser())) {
-    $iconSidebarBottomHidden = ['iconSidebarProfileBtn', 'iconSidebarSettingsBtn', 'iconSidebarAboutBtn'];
+    $iconSidebarBottomHidden = ['iconSidebarSettingsBtn', 'iconSidebarAboutBtn'];
     $iconSidebarBottomItems = array_values(array_filter($iconSidebarBottomItems, static function (array $item) use ($iconSidebarBottomHidden): bool {
         return !in_array($item['id'] ?? '', $iconSidebarBottomHidden, true);
     }));
@@ -318,37 +312,33 @@ if (!(!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAcc
 // menu (js/workspaces-core.js) and in its "Other accounts" block
 // (js/other-accounts.js); all post the choice to switch_account.php. The
 // token is kept for the whole session so several open tabs all stay valid.
-// An account that shares a workspace with the signed-in person (auth.php,
-// getSharedWorkspacesForLogin) is listed here like an account granted whole:
-// choosing it in the workspace menu lists what it shares, which is one
-// workspace rather than all of them (account_tree.php), and picking that
-// workspace opens the account on it through switch_account.php. The person's
-// own account is then listed too, as the way back.
+// A workspace another account shares with the signed-in person (auth.php,
+// getSharedWorkspacesForLogin) is not an account: the workspace menu lists it
+// under "Shared with me", next to the person's own workspaces, and picking it
+// opens the owner's account on it through switch_account.php (discussion
+// #1489, the owner used to be listed as an account, which hid the workspace
+// one click away). An owner who also granted the whole account is left out
+// of that list: the Accounts section already reaches all its workspaces. The
+// person's own account id comes along as `ownId`, the way back from a
+// shared workspace when there is no Accounts section.
 $iconSidebarAccountSwitch = null;
 $iconSidebarSwitchProfiles = function_exists('getSwitchableAccountProfiles') ? getSwitchableAccountProfiles() : [];
-$iconSidebarSharedWorkspaces = function_exists('getSharedWorkspacesForLogin') ? getSharedWorkspacesForLogin() : [];
-if (!empty($iconSidebarSharedWorkspaces)) {
+$iconSidebarSharedWorkspaces = [];
+if (function_exists('getSharedWorkspacesForLogin')) {
     $iconSidebarKnownAccountIds = array_map(static fn(array $profile): int => (int)$profile['id'], $iconSidebarSwitchProfiles);
-    if (empty($iconSidebarKnownAccountIds)) {
-        $iconSidebarOwnProfile = function_exists('getAuthenticatedUser') ? getAuthenticatedUser() : null;
-        if (is_array($iconSidebarOwnProfile) && !empty($iconSidebarOwnProfile['id'])) {
-            $iconSidebarSwitchProfiles = [$iconSidebarOwnProfile];
-            $iconSidebarKnownAccountIds = [(int)$iconSidebarOwnProfile['id']];
-        }
-    }
-    foreach ($iconSidebarSharedWorkspaces as $iconSidebarSharedRow) {
-        $iconSidebarSharedOwnerId = (int)$iconSidebarSharedRow['owner_user_id'];
-        if (in_array($iconSidebarSharedOwnerId, $iconSidebarKnownAccountIds, true)) {
+    foreach (getSharedWorkspacesForLogin() as $iconSidebarSharedRow) {
+        if (in_array((int)$iconSidebarSharedRow['owner_user_id'], $iconSidebarKnownAccountIds, true)) {
             continue;
         }
-        $iconSidebarKnownAccountIds[] = $iconSidebarSharedOwnerId;
-        $iconSidebarSwitchProfiles[] = [
-            'id' => $iconSidebarSharedOwnerId,
-            'username' => (string)$iconSidebarSharedRow['owner_username'],
+        $iconSidebarSharedWorkspaces[] = [
+            'ownerId' => (int)$iconSidebarSharedRow['owner_user_id'],
+            'ownerUsername' => (string)$iconSidebarSharedRow['owner_username'],
+            'workspace' => (string)$iconSidebarSharedRow['workspace_name'],
+            'current' => !empty($iconSidebarSharedRow['current']),
         ];
     }
 }
-if (!empty($iconSidebarSwitchProfiles)) {
+if (!empty($iconSidebarSwitchProfiles) || !empty($iconSidebarSharedWorkspaces)) {
     if (empty($_SESSION['account_switch_csrf_token'])) {
         $_SESSION['account_switch_csrf_token'] = bin2hex(random_bytes(32));
     }
@@ -357,6 +347,8 @@ if (!empty($iconSidebarSwitchProfiles)) {
     $iconSidebarAccountSwitch = [
         'action' => $iconSidebarBasePath . 'switch_account.php',
         'csrfToken' => $_SESSION['account_switch_csrf_token'],
+        'ownId' => $iconSidebarAuthUserId,
+        'sharedWorkspaces' => $iconSidebarSharedWorkspaces,
         'accounts' => array_map(static function (array $profile) use ($iconSidebarAuthUserId, $iconSidebarActiveUserId): array {
             $id = (int)$profile['id'];
             return [
@@ -404,6 +396,14 @@ $iconSidebarProfileStrings = [
     'profile.logout.switch_in_progress' => t('profile.logout.switch_in_progress', [], 'Switching account...'),
     'multiuser.admin.email' => t('multiuser.admin.email', [], 'Email'),
     'common.cancel' => t('common.cancel', [], 'Cancel'),
+    // Warning of a logout that would erase changes made offline (js/offline-store.js)
+    'offline.signout.loss_title' => t('offline.signout.loss_title', [], 'Your changes will be lost'),
+    'offline.signout.loss_text_one' => t('offline.signout.loss_text_one', [], '1 change made offline has not been synchronized with the server. If you log out now, it will be erased from this device and lost for good.'),
+    'offline.signout.loss_text_other' => t('offline.signout.loss_text_other', [], '{{count}} changes made offline have not been synchronized with the server. If you log out now, they will be erased from this device and lost for good.'),
+    'offline.signout.loss_more' => t('offline.signout.loss_more', [], 'and {{count}} more'),
+    'offline.signout.loss_keep' => t('offline.signout.loss_keep', [], 'To keep them, cancel and stay signed in: they are sent on their own as soon as the connection works.'),
+    'offline.signout.loss_confirm' => t('offline.signout.loss_confirm', [], 'Log out and lose the changes'),
+    'offline.list.untitled' => t('offline.list.untitled', [], 'Untitled'),
     'common.save' => t('common.save', [], 'Save'),
     'common.loading' => t('common.loading', [], 'Loading...'),
     'common.error' => t('common.error', [], 'Error'),
@@ -420,6 +420,8 @@ window.PoznoteActiveAccountIsOwn = <?php echo (!function_exists('isActiveAccount
 window.PoznoteAccountSwitch = <?php echo json_encode($iconSidebarAccountSwitch, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;
 <?php endif; ?>
 </script>
+<?php // Read by the logout dialog: changes made offline a logout would erase ?>
+<script src="<?php echo $iconSidebarAsset('js/offline-store.js'); ?>" defer></script>
 <script src="<?php echo $iconSidebarAsset('js/profile.js'); ?>" defer></script>
 <script>
 window.PoznoteIconSidebarColorsConfig = <?php echo json_encode([
@@ -445,9 +447,8 @@ window.PoznoteIconSidebarColorsConfig = <?php echo json_encode([
 // Apply the collapsed state, and focus mode (discussion 1482), before the
 // rail paints; js/icon-sidebar-toggle.js owns both afterwards. Focus mode goes
 // on <html> so the notes column and the rows around the note's title, which come later in
-// the page, never paint at all (css/focus-mode.css). Its first step clears the
-// top of the note, the second one also hides the rail and the notes column;
-// 'true' is what the one-step version stored.
+// the page, never paint at all (css/focus-mode.css). '1' is on; 'true' and '2'
+// are what earlier versions stored for on.
 try {
     if (localStorage.getItem('iconSidebarCollapsed') === 'true') {
         document.body.classList.add('icon-sidebar-collapsed');
@@ -455,9 +456,6 @@ try {
     var pzFocus = localStorage.getItem('focusMode');
     if (pzFocus === '1' || pzFocus === '2' || pzFocus === 'true') {
         document.documentElement.classList.add('focus-mode');
-    }
-    if (pzFocus === '2' || pzFocus === 'true') {
-        document.documentElement.classList.add('focus-mode-full');
     }
 } catch (e) {
     console.debug('icon_sidebar: failed:', e);
@@ -518,7 +516,7 @@ try {
     <?php
     $iconSidebarLabel = htmlspecialchars($iconSidebarItem['label'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     // 'activeFlag' covers the entries that share a page and split the highlight
-    // by query string (Settings vs About vs My Profile); the rest match on 'page'.
+    // by query string (Settings vs About); the rest match on 'page'.
     $iconSidebarIsCurrent = isset($iconSidebarItem['activeFlag'])
         ? (bool)$iconSidebarItem['activeFlag']
         : (isset($iconSidebarItem['page']) && $iconSidebarItem['page'] === $iconSidebarCurrentPage);

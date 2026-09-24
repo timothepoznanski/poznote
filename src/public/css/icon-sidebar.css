@@ -321,14 +321,13 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     transform: rotate(180deg);
 }
 
-/* Focus mode, second step (discussion #1482, js/icon-sidebar-toggle.js): the
-   rail leaves the layout and waits just past the left edge of the viewport,
-   pinned. Hover the edge (#focusModeEdgeZone) and it slides in over the page as
-   a flyout (html.focus-mode-peek); leave it and it slides out again. The
-   collapsed rail joins the flyout too: focus mode owns the chrome while it is
-   on, the collapsed state is kept for when it is turned off. The first step
-   (html.focus-mode alone) leaves the rail where it is and only clears the top
-   of the note, see css/focus-mode.css. Desktop only, mirroring
+/* Focus mode (discussion #1482, js/icon-sidebar-toggle.js): the rail leaves
+   the layout and waits just past the left edge of the viewport, pinned. Hover
+   the edge (#focusModeEdgeZone) and it slides in over the page as a flyout
+   (html.focus-mode-peek); leave it and it slides out again. The collapsed rail
+   joins the flyout too: focus mode owns the chrome while it is on, the
+   collapsed state is kept for when it is turned off. The notes page does the
+   same with its notes column, see css/focus-mode.css. Desktop only, mirroring
    css/index-mobile.css: a phone has no rail to hide.
 
    The flyout sits over the page's own sticky and floating chrome (the tab
@@ -339,7 +338,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
 }
 
 @media (min-width: 801px) {
-    html.focus-mode-full body #icon_sidebar {
+    html.focus-mode body #icon_sidebar {
         display: flex;
         position: fixed;
         top: 0;
@@ -351,18 +350,18 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
         transition: transform 0.2s ease, visibility 0s linear 0.2s;
     }
 
-    html.focus-mode-full.focus-mode-peek body #icon_sidebar {
+    html.focus-mode.focus-mode-peek body #icon_sidebar {
         transform: none;
         visibility: visible;
         transition: transform 0.2s ease, visibility 0s;
     }
 
     /* Replaced by the hot zone: the rail is never collapsed in focus mode */
-    html.focus-mode-full #iconSidebarToggle {
+    html.focus-mode #iconSidebarToggle {
         display: none;
     }
 
-    html.focus-mode-full #focusModeEdgeZone {
+    html.focus-mode #focusModeEdgeZone {
         display: block;
         position: fixed;
         top: 0;
@@ -379,7 +378,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
        the flyout, like hovering anywhere else on the strip: it overflows the
        strip's 6px but is a child of it, so it is part of the same hover
        target. It steps out of the way while the flyout is over it. */
-    html.focus-mode-full .focus-mode-edge-handle {
+    html.focus-mode .focus-mode-edge-handle {
         position: absolute;
         top: 50%;
         left: 0;
@@ -399,39 +398,37 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
         transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
     }
 
-    html.focus-mode-full #focusModeEdgeZone:hover .focus-mode-edge-handle {
+    html.focus-mode #focusModeEdgeZone:hover .focus-mode-edge-handle {
         background: var(--pz-surface);
         color: var(--pz-accent-text);
         box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.1);
     }
 
     /* Lucide icons are masks: they take their colour from background-color */
-    html.focus-mode-full .focus-mode-edge-handle .lucide {
+    html.focus-mode .focus-mode-edge-handle .lucide {
         width: 12px;
         height: 12px;
         background-color: currentColor;
     }
 
-    html.focus-mode-full.focus-mode-peek .focus-mode-edge-handle {
+    html.focus-mode.focus-mode-peek .focus-mode-edge-handle {
         opacity: 0;
     }
 }
 
 /* Back link shown above the title: "Go to note" on the per-note pages
    (attachments.php), which the rail cannot link to because the target
-   depends on the note being viewed, and "Back to Settings" on every page opened
-   from settings.php (back_to_settings.php). Lives here alongside
-   .poznote-page-title so those pages get it from a stylesheet they already
-   load. */
-.poznote-back-to-note-bar,
-.poznote-back-bar {
+   depends on the note being viewed. (The pages opened from settings.php link
+   back from their title instead, see settings_shell.php.) Lives here
+   alongside .poznote-page-title so those pages get it from a stylesheet they
+   already load. */
+.poznote-back-to-note-bar {
     display: flex;
     justify-content: center;
     margin: 0 0 16px 0;
 }
 
-.poznote-back-to-note-btn,
-.poznote-back-btn {
+.poznote-back-to-note-btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -447,43 +444,14 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     cursor: pointer;
 }
 
-.poznote-back-to-note-btn:hover,
-.poznote-back-btn:hover {
+.poznote-back-to-note-btn:hover {
     background: var(--pz-surface-hover);
     color: var(--pz-text);
     text-decoration: none;
 }
 
-.poznote-back-to-note-btn i,
-.poznote-back-btn i {
+.poznote-back-to-note-btn i {
     color: var(--pz-accent-text);
-}
-
-/* The settings sub-pages each use their own container (.settings-container,
-   .home-container, .backup-container, .admin-container, .dr-page), with its own
-   top offset and its own title spacing. These rules line the "Back to Settings"
-   bar up the same way on all of them: the title keeps the place it has without
-   the bar (91px from the top of the page), and the button sits centred in the
-   space above it, 28px from the top and 28px above the title. */
-.poznote-back-to-settings-bar {
-    /* The hosts' top offset puts the bar at 40px; pull it up to 28px. */
-    margin-top: -12px;
-    margin-bottom: 28px;
-}
-
-/* .admin-container and .dr-page carry no top margin of their own, where the
-   other hosts carry 20px, so their bar already starts at 28px. */
-.admin-container > .poznote-back-to-settings-bar,
-.dr-page > .poznote-back-to-settings-bar {
-    margin-top: 0;
-}
-
-/* Narrow screens shrink the hosts' top padding, so the pull-up would push the
-   button against the top edge. */
-@media (max-width: 800px) {
-    .poznote-back-to-settings-bar {
-        margin-top: 0;
-    }
 }
 
 /* Page title used by the pages whose Notes / Dashboard buttons were replaced by
@@ -762,13 +730,6 @@ button.poznote-page-title-workspace-item {
     .home-container > .poznote-page-title {
         margin-top: 0;
     }
-}
-
-/* A title that follows the "Back to Settings" bar keeps its full gap: the
-   pull-ups above exist to absorb the container's top padding, which the bar now
-   sits in, so applying them here would leave the button touching the title. */
-.poznote-back-to-settings-bar + .poznote-page-title {
-    margin-top: 0;
 }
 
 /* Both pages stack their own controls right under the title, so the shared

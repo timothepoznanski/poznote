@@ -59,6 +59,7 @@ const NO_GATE = [
     'index_css.php'      => 'concatenates the static stylesheets, reads no database',
     'index_js.php'       => 'concatenates the static scripts, reads no database',
     'dark_mode_css.php'  => 'concatenates the dark theme stylesheets, reads no database',
+    'offline.php'        => 'the offline page shell the service worker stores; static interface text only, every note comes from the browser',
 
     // Authenticated, but not through a gate function.
     'audio_player.php'   => 'checks isAuthenticated() by hand and answers 401, because it renders inside a contenteditable iframe where a redirect to login.php would be invisible to the user',

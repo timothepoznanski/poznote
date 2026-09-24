@@ -16,6 +16,7 @@ requireAdmin();
 
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../functions.php';
+require_once __DIR__ . '/../settings_shell.php';
 require_once __DIR__ . '/../version_helper.php';
 requireSettingsPassword();
 require_once __DIR__ . '/../db_connect.php';
@@ -190,9 +191,8 @@ $allBackupUsers = listAllUserProfiles();
 </head>
 <body class="home-page git-sync-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php $iconSidebarWorkspace = $pageWorkspace; include __DIR__ . '/../icon_sidebar.php'; ?>
+    <?php poznoteSettingsShellOpen(['section' => 'admin-tools-grid', 'title' => t('settings.cards.s3_backup', [], 'S3 Backups')]); ?>
     <div class="home-container git-sync-container s3-backup-container">
-    <?php include __DIR__ . '/../back_to_settings.php'; ?>
-    <h1 class="poznote-page-title"><i class="lucide lucide-archive"></i> <?php echo t_h('settings.cards.s3_backup', [], 'S3 Backups'); ?></h1>
 
 
 
@@ -450,6 +450,7 @@ $allBackupUsers = listAllUserProfiles();
         </div>
 
     </div>
+    <?php poznoteSettingsShellClose(); ?>
 
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
@@ -1001,6 +1002,6 @@ $allBackupUsers = listAllUserProfiles();
         refreshList();
     });
     </script>
-    <script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 </body>
 </html>

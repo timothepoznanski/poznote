@@ -183,7 +183,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 44; // 44: slash_menu_require_alt became slash_menu_trigger, which also has a 'disabled' value
+    $CURRENT_SCHEMA_VERSION = 45; // 45: entries.offline and folders.offline, "Keep offline" marks read by the offline manifest
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -835,6 +835,20 @@ try {
             }
         } catch (Exception $e) {
             error_log('Could not add client state columns to entries: ' . $e->getMessage());
+        }
+
+        // Ensure the "Keep offline" columns exist: a note or a folder marked
+        // this way is kept in the browser whatever its date
+        // (api/v1/controllers/OfflineController.php, lib/offline.php).
+        try {
+            foreach (['entries', 'folders'] as $table) {
+                $cols = $con->query("PRAGMA table_info($table)")->fetchAll(PDO::FETCH_ASSOC);
+                if (!in_array('offline', array_column($cols, 'name'))) {
+                    $con->exec("ALTER TABLE $table ADD COLUMN offline INTEGER DEFAULT 0");
+                }
+            }
+        } catch (Exception $e) {
+            error_log('Could not add offline columns: ' . $e->getMessage());
         }
 
         // === DATA DIRECTORIES ===

@@ -1,6 +1,8 @@
 /**
  * The icon rail's own modals: My Profile and the logout confirmation
- * (js/profile.js), and the colour of a rail or note toolbar icon
+ * (js/profile.js), the warning of a logout that would erase changes made
+ * offline (js/offline-store.js, also shown by offline.php, which loads this
+ * sheet), and the colour of a rail or note toolbar icon
  * (js/icon-sidebar-colors.js).
  *
  * All three are opened from the icon rail, which is on nearly every page, while
@@ -15,7 +17,7 @@
  * Loaded by icon_sidebar.php alongside js/profile.js and js/icon-sidebar-colors.js.
  */
 
-:is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) {
+:is(#editProfileModal, #confirmLogoutModal, #offlineLossModal, #iconSidebarColorModal) {
     display: none;
     position: fixed;
     left: 0;
@@ -31,7 +33,7 @@
     background-color: rgba(var(--pz-shadow-rgb), 0.4);
 }
 
-:is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) .modal-content {
+:is(#editProfileModal, #confirmLogoutModal, #offlineLossModal, #iconSidebarColorModal) .modal-content {
     width: 90%;
     max-width: var(--modal-max-width, 420px);
     margin: 0 auto;
@@ -46,26 +48,26 @@
     overflow-x: hidden;
 }
 
-:is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) .modal-content h3 {
+:is(#editProfileModal, #confirmLogoutModal, #offlineLossModal, #iconSidebarColorModal) .modal-content h3 {
     margin: 0 0 15px 0;
     color: var(--pz-text);
     font-size: 18px;
     font-weight: var(--pz-weight-semibold);
 }
 
-:is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) .text-small-muted {
+:is(#editProfileModal, #confirmLogoutModal, #offlineLossModal, #iconSidebarColorModal) .text-small-muted {
     margin-top: 8px;
     color: var(--pz-text-muted);
     font-size: 14px;
 }
 
-:is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) .form-group label {
+:is(#editProfileModal, #confirmLogoutModal, #offlineLossModal, #iconSidebarColorModal) .form-group label {
     display: block;
     margin-bottom: 6px;
     font-weight: var(--pz-weight-semibold);
 }
 
-:is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) input {
+:is(#editProfileModal, #confirmLogoutModal, #offlineLossModal, #iconSidebarColorModal) input {
     max-width: 100%;
     margin-top: 10px;
     margin-bottom: 15px;
@@ -79,12 +81,12 @@
     box-sizing: border-box;
 }
 
-:is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) input:focus {
+:is(#editProfileModal, #confirmLogoutModal, #offlineLossModal, #iconSidebarColorModal) input:focus {
     outline: none;
     border-color: var(--pz-accent-text);
 }
 
-:is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) .modal-buttons {
+:is(#editProfileModal, #confirmLogoutModal, #offlineLossModal, #iconSidebarColorModal) .modal-buttons {
     display: flex;
     gap: 10px;
     justify-content: flex-end;
@@ -93,7 +95,7 @@
     margin-top: 22px;
 }
 
-:is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) .modal-buttons button {
+:is(#editProfileModal, #confirmLogoutModal, #offlineLossModal, #iconSidebarColorModal) .modal-buttons button {
     padding: 8px 14px;
     border: none;
     border-radius: var(--pz-radius-sm);
@@ -103,51 +105,51 @@
     transition: background-color 0.2s;
 }
 
-:is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) .modal-buttons button.btn-primary {
+:is(#editProfileModal, #confirmLogoutModal, #offlineLossModal, #iconSidebarColorModal) .modal-buttons button.btn-primary {
     background-color: var(--pz-accent);
     color: var(--pz-text-inverse);
 }
 
-:is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) .modal-buttons button.btn-primary:hover {
+:is(#editProfileModal, #confirmLogoutModal, #offlineLossModal, #iconSidebarColorModal) .modal-buttons button.btn-primary:hover {
     background-color: var(--pz-accent-hover);
 }
 
-:is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) .modal-buttons button.btn-danger {
+:is(#editProfileModal, #confirmLogoutModal, #offlineLossModal, #iconSidebarColorModal) .modal-buttons button.btn-danger {
     background-color: var(--pz-danger);
     color: var(--pz-text-inverse);
 }
 
-:is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) .modal-buttons button.btn-danger:hover {
+:is(#editProfileModal, #confirmLogoutModal, #offlineLossModal, #iconSidebarColorModal) .modal-buttons button.btn-danger:hover {
     background-color: var(--pz-danger-hover);
 }
 
 /* Grey "Cancel", used by the logout confirmation. .btn-cancel is only styled
    inside .modal-buttons by the shared sheets, which half the host pages skip. */
-:is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) .modal-buttons button.btn-cancel {
+:is(#editProfileModal, #confirmLogoutModal, #offlineLossModal, #iconSidebarColorModal) .modal-buttons button.btn-cancel {
     background-color: var(--pz-surface-sunken);
     color: var(--pz-text);
 }
 
-:is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) .modal-buttons button.btn-cancel:hover {
+:is(#editProfileModal, #confirmLogoutModal, #offlineLossModal, #iconSidebarColorModal) .modal-buttons button.btn-cancel:hover {
     background-color: var(--pz-surface-sunken);
 }
 
 /* Dark mode. Every host page loads css/dark-mode/variables.css, so the tokens
    are always defined; both theme hooks are needed, as elsewhere. */
-html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) {
+html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal, #offlineLossModal, #iconSidebarColorModal) {
     background-color: rgba(var(--pz-shadow-rgb), 0.8);
 }
 
-html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) input {
+html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal, #offlineLossModal, #iconSidebarColorModal) input {
     background-color: var(--pz-surface);
     border-color: var(--pz-border);
 }
 
-html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) .modal-buttons button.btn-cancel {
+html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal, #offlineLossModal, #iconSidebarColorModal) .modal-buttons button.btn-cancel {
     background-color: var(--pz-surface);
 }
 
-html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal, #iconSidebarColorModal) .modal-buttons button.btn-cancel:hover {
+html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal, #offlineLossModal, #iconSidebarColorModal) .modal-buttons button.btn-cancel:hover {
     background-color: var(--pz-border);
 }
 
@@ -482,4 +484,67 @@ html[data-theme='dark'] #iconContextMenu .icon-context-menu-item:focus-visible {
 html[data-theme='dark'] #iconContextMenu .icon-context-menu-item i {
     color: var(--pz-text-muted);
     background-color: var(--pz-text-muted);
+}
+
+/* Logging out would erase changes made offline that the server never got
+   (js/offline-store.js confirmLosingChanges): the dialog says it loudly. */
+#offlineLossModal .modal-content {
+    max-width: 520px;
+}
+
+#offlineLossModal .offline-loss-icon {
+    display: block;
+    width: 44px;
+    height: 44px;
+    margin: 4px auto 12px;
+    background-color: var(--pz-danger-text);
+}
+
+#offlineLossModal .modal-content h3.offline-loss-title {
+    color: var(--pz-danger-text);
+    font-size: 20px;
+    text-align: center;
+}
+
+#offlineLossModal .offline-loss-box {
+    margin: 0 0 16px;
+    padding: 12px 14px;
+    border: 1px solid color-mix(in srgb, var(--pz-danger) 35%, transparent);
+    border-left: 3px solid var(--pz-danger);
+    border-radius: var(--pz-radius);
+    background: color-mix(in srgb, var(--pz-danger) 6%, transparent);
+}
+
+#offlineLossModal .offline-loss-text {
+    margin: 0 0 8px;
+    color: var(--pz-danger-text);
+    font-weight: var(--pz-weight-medium);
+    line-height: 1.5;
+}
+
+#offlineLossModal .offline-loss-list {
+    margin: 0;
+    padding-left: 22px;
+    color: var(--pz-text);
+}
+
+#offlineLossModal .offline-loss-list li {
+    margin-bottom: 3px;
+    overflow-wrap: anywhere;
+}
+
+#offlineLossModal .offline-loss-keep {
+    margin: 0 0 20px;
+    color: var(--pz-text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* modals/responsive.css gives every dialog button a fixed 44px on a phone,
+   which cuts the long "Log out and lose the changes" once it wraps. */
+@media (max-width: 800px) {
+    #offlineLossModal .modal-buttons button {
+        height: auto !important;
+        min-height: 44px;
+    }
 }

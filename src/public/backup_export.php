@@ -4,6 +4,7 @@ requireAuth();
 requireActiveAccountOwner();
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../functions.php';
+require_once __DIR__ . '/../settings_shell.php';
 requireSettingsPassword();
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../users/db_master.php';
@@ -126,9 +127,8 @@ function createBackup() {
 </head>
 <body class="has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php include __DIR__ . '/../icon_sidebar.php'; ?>
+    <?php poznoteSettingsShellOpen(['section' => 'settings-actions-section-grid', 'title' => t('settings.cards.backup_export', [], 'Backup / Export')]); ?>
     <div class="backup-container">
-    <?php include __DIR__ . '/../back_to_settings.php'; ?>
-    <h1 class="poznote-page-title"><i class="lucide lucide-upload"></i> <?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?></h1>
 
         <!-- Complete Backup Section -->
         <div class="backup-section" id="complete-backup-section">
@@ -687,6 +687,7 @@ function createBackup() {
         <!-- Bottom padding for better spacing -->
         <div class="section-bottom-spacer"></div>
     </div>
+    <?php poznoteSettingsShellClose(); ?>
 
     <style>
     /* Collapsible sections: the h3 becomes the clickable header and everything

@@ -166,6 +166,25 @@
     padding-top: 10px;
 }
 
+/* "Shared with me" rows name the workspace, then its owner in a smaller,
+   lighter run at the end of the row. The two runs share a baseline, the icon
+   stays centred as on the other rows. */
+.workspace-menu-item.workspace-menu-shared {
+    align-items: baseline;
+}
+
+.workspace-menu-item.workspace-menu-shared i {
+    align-self: center;
+}
+
+.workspace-menu-item .workspace-menu-shared-owner {
+    margin-left: auto;
+    padding-left: 12px;
+    font-size: 12px;
+    font-weight: var(--pz-weight-normal);
+    color: var(--pz-text-muted);
+}
+
 /* MENU LEFT */
 
 .list_tags[style] {

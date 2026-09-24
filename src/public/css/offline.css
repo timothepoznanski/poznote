@@ -1,0 +1,379 @@
+/**
+ * The offline page (offline.php, js/offline-app.js).
+ *
+ * The page loads index.php's own stylesheet bundles and reuses its markup,
+ * so the sidebar and the note look as they do in the app. What is left here
+ * is what the app has no equivalent for: the sign-in screen, the connection
+ * status, the two sidebar menus and the empty states. Tokens only.
+ */
+
+.offline-page [hidden] {
+    display: none !important;
+}
+
+/* ---- Opening, sign-in, empty device: a screen over the app ---------------- */
+
+/* The warning of a sign-out that would lose changes can open over it
+   (a logout.php reached without a network). */
+.offline-page #offlineLossModal {
+    z-index: 10001 !important;
+}
+
+.offline-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    overflow-y: auto;
+    background: var(--pz-surface);
+}
+
+.offline-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.offline-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 32px 28px;
+    box-sizing: border-box;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-xl);
+    background: var(--pz-bg);
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(var(--pz-shadow-rgb), 0.08);
+}
+
+.offline-logo {
+    width: 56px;
+    height: 56px;
+}
+
+.offline-card-title {
+    margin: 12px 0 8px;
+    color: var(--pz-text);
+    font-size: 24px;
+    font-weight: var(--pz-weight-semibold);
+}
+
+.offline-card-intro {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 8px;
+    margin: 0 0 20px;
+    color: var(--pz-text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.offline-card-intro .lucide {
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+}
+
+.offline-empty-text {
+    display: block;
+}
+
+.offline-signin-form input {
+    display: block;
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 12px;
+    box-sizing: border-box;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    font-family: inherit;
+    font-size: 16px;
+}
+
+.offline-signin-form input:focus {
+    outline: none;
+    border-color: var(--pz-accent);
+}
+
+.offline-signin-form .offline-signin-submit,
+.offline-continue-list .offline-continue-btn {
+    width: 100%;
+}
+
+.offline-error {
+    margin: -4px 0 12px;
+    color: var(--pz-danger-text);
+    font-size: 13px;
+    text-align: left;
+}
+
+.offline-continue {
+    margin-top: 16px;
+}
+
+.offline-continue-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.offline-muted {
+    margin: 0 0 12px;
+    color: var(--pz-text-muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.offline-link-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 20px;
+    padding: 4px;
+    border: none;
+    background: none;
+    color: var(--pz-accent-text);
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.offline-link-button .lucide {
+    width: 14px;
+    height: 14px;
+}
+
+/* ---- Sidebar ---------------------------------------------------------------- */
+
+/* One search icon where the app shows its two scope toggles */
+.offline-page .searchbar-input-wrapper {
+    position: relative;
+}
+
+.offline-search-icon {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    z-index: 1;
+    width: 15px;
+    height: 15px;
+    color: var(--pz-text-muted);
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.offline-page .searchbar-input-wrapper .searchbar-input {
+    padding-left: 38px;
+}
+
+.offline-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    margin: 0 2px 8px;
+    padding: 3px 10px;
+    box-sizing: border-box;
+    border-radius: var(--pz-radius-pill);
+    background: var(--pz-warning-soft);
+    color: var(--pz-warning-strong);
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.offline-status.is-online {
+    background: var(--pz-success-soft);
+    color: var(--pz-success-strong);
+}
+
+.offline-status .lucide {
+    flex: 0 0 auto;
+    width: 13px;
+    height: 13px;
+}
+
+.offline-status-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.offline-page .sidebar-title[aria-haspopup] {
+    cursor: pointer;
+}
+
+.offline-page .offline-workspace-menu {
+    right: auto;
+    left: 0;
+}
+
+.offline-workspace-menu .dropdown-item.active {
+    color: var(--pz-accent-text);
+}
+
+.offline-list-caption {
+    margin: 4px 4px 8px;
+    color: var(--pz-text-muted);
+    font-size: 12px;
+}
+
+.offline-list-empty {
+    margin: 12px 4px;
+    color: var(--pz-text-muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.offline-page .links_arbo_left {
+    position: relative;
+}
+
+/* Changed here, not sent yet */
+.offline-item-pending {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: var(--pz-radius-circle);
+    background: var(--pz-warning);
+    transform: translateY(-50%);
+}
+
+/* ---- Note pane ---------------------------------------------------------------- */
+
+.offline-note-pending {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-left: 12px;
+    color: var(--pz-warning-strong);
+}
+
+.offline-note-pending .lucide {
+    flex: 0 0 auto;
+    width: 13px;
+    height: 13px;
+    margin-top: 0.25em;
+}
+
+/* A phone has no room for it after the date: a line of its own, like the
+   notice of a file left online */
+@media (max-width: 800px) {
+    .offline-note-pending {
+        display: flex;
+        margin: 6px 0 0;
+        padding: 6px 10px;
+        border-radius: var(--pz-radius);
+        background: var(--pz-warning-soft);
+        font-size: 13px;
+        line-height: 1.45;
+    }
+}
+
+/* A file of the note left online by the per-file limit */
+.offline-note-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 8px 0 4px;
+    padding: 6px 10px;
+    border-radius: var(--pz-radius);
+    background: var(--pz-warning-soft);
+    color: var(--pz-warning-strong);
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.offline-note-notice .lucide {
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+    margin-top: 3px;
+}
+
+/* A toolbar with no button until text is selected (js/offline-app.js
+   updateToolbarRoom): the header takes no room, and the formatting buttons
+   appear over the top of the note instead of pushing it down */
+.offline-page .note-header.offline-toolbar-floating {
+    padding-top: 0;
+    padding-bottom: 0;
+    background: transparent;
+}
+
+.offline-page .note-header.offline-toolbar-floating .note-edit-toolbar {
+    position: absolute;
+    top: 6px;
+    left: 0;
+    right: 0;
+    width: max-content;
+    max-width: 100%;
+    margin: 0 auto;
+    border-radius: var(--pz-radius);
+}
+
+.offline-page .note-header.offline-toolbar-floating .note-edit-toolbar:has(.show-on-selection) {
+    padding: 2px 6px;
+    border: 1px solid var(--pz-border);
+    background: var(--pz-bg);
+    box-shadow: 0 4px 14px rgba(var(--pz-shadow-rgb), 0.12);
+}
+
+/* Task actions that need the server */
+.offline-page .task-move-btn,
+.offline-page .task-due-btn {
+    display: none;
+}
+
+.offline-placeholder,
+.offline-unavailable {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 100%;
+    padding: 24px;
+    box-sizing: border-box;
+    color: var(--pz-text-muted);
+    text-align: center;
+}
+
+.offline-placeholder > .lucide,
+.offline-unavailable > .lucide {
+    width: 40px;
+    height: 40px;
+}
+
+.offline-placeholder p {
+    margin: 0;
+}
+
+.offline-unavailable-title {
+    margin: 4px 0 0;
+    color: var(--pz-text);
+    font-size: 20px;
+    font-weight: var(--pz-weight-semibold);
+}
+
+.offline-unavailable-text {
+    max-width: 460px;
+    margin: 4px 0 8px;
+    line-height: 1.5;
+}
+
+/* The list is on screen next to it, except on a phone. */
+.offline-unavailable .offline-back-to-list {
+    display: none;
+}
+
+@media (max-width: 800px) {
+    .offline-unavailable .offline-back-to-list {
+        display: inline-flex;
+    }
+}

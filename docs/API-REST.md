@@ -13,6 +13,7 @@ Poznote provides a comprehensive RESTful API v1 for programmatic access to notes
 - [Notes](#notes)
 - [Note Locks](#note-locks)
 - [Change Detection](#change-detection)
+- [Offline Copies](#offline-copies)
 - [Snapshots](#snapshots)
 - [Tasks](#tasks)
 - [Reminders](#reminders)
@@ -672,6 +673,37 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/favorite
 ```
 
+### Keep Note Offline
+
+```
+PUT /notes/{id}/offline
+```
+
+Keep the note in the browsers where the account is used whatever its date, with all its attachments ([Offline Copies](#offline-copies)), or stop doing so. The state is set explicitly.
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `offline` | boolean | Yes | `true` to keep the note offline, `false` to stop |
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Note offline state updated successfully",
+  "offline": true
+}
+```
+
+```bash
+curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"offline": true}' \
+  http://YOUR_SERVER/api/v1/notes/123/offline
+```
+
 ### Move Note to Folder
 
 ```
@@ -878,6 +910,74 @@ curl -u 'username:password' -H "X-User-ID: 1" \
 ```
 
 `tree_version` covers the workspace list, the folders and the note rows of the workspace (titles, folder, icons, order, tags, update time, trash state...). A note `version` covers its title, content, tags, folder, attachments and display attributes. `content_version` is the same token `GET /notes/{id}` and `PATCH /notes/{id}` return, so it can be sent back as `if_version` (see [Update Note](#update-note)); the web UI autosave does exactly that, so a save never silently overwrites an edit made elsewhere.
+
+## Offline Copies
+
+The web UI keeps the notes modified recently in the browser (IndexedDB) so they can be opened and edited without a network, and sends the changes made offline back through [Update Note](#update-note) and [Create Note](#create-note) once the connection is back. These two endpoints feed that copy. How many days of notes are kept is the `offline_notes_days` user setting (default `5`, `0` turns offline copies off, maximum `30`). The favorites, and the notes and folders marked "Keep offline" ([Keep Note Offline](#keep-note-offline), [Keep Folder Offline](#keep-folder-offline)), are kept whatever their date, with all their attachments. Only the account's owner gets them: an account opened through a grant or a workspace shared with the session answers `403` with `"code": "offline_unavailable"`.
+
+### Get Offline Manifest
+
+```
+GET /offline/manifest
+```
+
+Returns the notes kept offline, without their content: the ones modified in the last `days` days, the favorites and the notes marked "Keep offline" or sitting in a folder marked so, of type `note`, `markdown` or `tasklist`, within `limits` (`notes` notes and `text_mb` MB of text, the recent ones dropped first; the browser applies the file limits `picture_mb`, `pictures` and `pictures_mb` to the images these notes show and to every attachment of the notes kept whatever their date), with the same `version` token as [Get Note](#get-note), usable as `if_version`. `kept` says why each note is there: `note`, `folder`, `favorite` or `recent`. `files` changes whenever the note's list of attachments does (the `version` token only follows the date, title and content): a client compares both to know when to download the note again. `folders` holds only the folders of those notes and their parents. The response has an `ETag`: send it back as `If-None-Match` to get `304 Not Modified` while nothing changed.
+
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  "https://your-poznote-instance.com/api/v1/offline/manifest"
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "user": { "id": 1, "username": "alice", "email": "alice@example.com", "display_name": "Alice" },
+  "days": 5,
+  "limits": { "notes": 300, "text_mb": 50, "picture_mb": 25, "pictures": 400, "pictures_mb": 200 },
+  "workspaces": ["Poznote"],
+  "folders": [{ "id": 3, "name": "Lectures", "parent_id": null, "workspace": "Poznote" }],
+  "notes": [
+    { "id": 42, "heading": "Physics", "type": "markdown", "workspace": "Poznote", "folder_id": 3, "updated": "2026-09-23 14:02:11", "kept": "recent", "version": "8b03f2cfdfd041732b3534f0cddbb3e2", "files": "" }
+  ]
+}
+```
+
+### Get Offline Notes
+
+```
+GET /offline/notes?ids={id,id,...}
+```
+
+Full content of up to 50 notes (not trashed), with their version token and the id, name, type and size of their attachments.
+
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  "https://your-poznote-instance.com/api/v1/offline/notes?ids=42,57"
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "notes": [
+    {
+      "id": 42,
+      "heading": "Physics",
+      "type": "markdown",
+      "workspace": "Poznote",
+      "folder_id": 3,
+      "tags": "school",
+      "updated": "2026-09-23 14:02:11",
+      "version": "8b03f2cfdfd041732b3534f0cddbb3e2",
+      "attachments": [{ "id": "69f45110e619f", "file_type": "image/png", "file_size": 350386 }],
+      "content": "# Physics\n..."
+    }
+  ]
+}
+```
 
 ## Snapshots
 
@@ -2026,6 +2126,37 @@ curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"favorite": true}' \
   http://YOUR_SERVER/api/v1/folders/12/favorite
+```
+
+### Keep Folder Offline
+
+```
+PUT /folders/{id}/offline
+```
+
+Keep the folder's notes, subfolders included, in the browsers where the account is used whatever their date, with all their attachments ([Offline Copies](#offline-copies)), or stop doing so.
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `offline` | boolean | Yes | `true` to keep the folder offline, `false` to stop |
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Folder offline state updated successfully",
+  "offline": true
+}
+```
+
+```bash
+curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"offline": true}' \
+  http://YOUR_SERVER/api/v1/folders/12/offline
 ```
 
 ### Empty Folder
@@ -3331,6 +3462,30 @@ curl -X POST -u 'username:password' \
   http://YOUR_SERVER/api/v1/admin/repair
 ```
 
+### Orphan Attachments
+
+```
+GET /admin/orphan-attachments
+DELETE /admin/orphan-attachments
+```
+
+List, per account, the files of the local attachment folder that no note references any more (files kept in S3 storage are not listed). `DELETE` runs the same scan and deletes those files; it is not available with an app password.
+
+```bash
+curl -u 'username:password' \
+  http://YOUR_SERVER/api/v1/admin/orphan-attachments
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "users": [
+    {"user_id": 1, "total_files": 42, "orphans_found": 2, "orphans_deleted": 0, "files": ["a1b2c3.png", "d4e5f6.pdf"], "error": null}
+  ]
+}
+```
+
 ---
 
 ## Public / Shared Tasks
@@ -3534,6 +3689,12 @@ curl http://YOUR_SERVER/api_health.php
 | `POST` | `/notes/{id}/lock/heartbeat` | Refresh lock |
 | `POST` | `/notes/{id}/lock/release` | Release lock |
 
+### Offline Copies
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/offline/manifest` | Notes kept offline, with their versions |
+| `GET` | `/offline/notes?ids=` | Full content of up to 50 notes |
+
 ### Snapshots
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -3710,6 +3871,8 @@ curl http://YOUR_SERVER/api_health.php
 | `GET` | `/admin/users/{id}/password-status` | Password status |
 | `GET` | `/admin/stats` | System stats |
 | `POST` | `/admin/repair` | Repair database |
+| `GET` | `/admin/orphan-attachments` | List orphan attachment files |
+| `DELETE` | `/admin/orphan-attachments` | Delete orphan attachment files |
 
 ### Public Shares
 | Method | Endpoint | Description |

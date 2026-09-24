@@ -107,6 +107,7 @@ function poznoteGetIndexCssGroups(): array {
             'css/folder-icon-modal.css',
             'css/kanban.css',
             'css/background-image.css',
+            'css/offline-banner.css',
         ],
     ];
 }

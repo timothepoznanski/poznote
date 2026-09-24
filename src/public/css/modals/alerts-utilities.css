@@ -168,15 +168,6 @@
     box-sizing: border-box;
 }
 
-.timezone-select {
-    width: 100%;
-    padding: 8px;
-    margin-top: 10px;
-    border: 1px solid var(--pz-border);
-    border-radius: var(--pz-radius-sm);
-    font-size: 14px;
-}
-
 .backup-warning-text {
     color: var(--pz-danger-text);
 }

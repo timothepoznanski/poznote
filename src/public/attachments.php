@@ -181,6 +181,9 @@ if (!$note) {
         ], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP) ?: '{}';
     ?></script>
     <script src="js/error-handler.js?v=<?php echo $v; ?>"></script>
+    <?php // A file added or removed here reaches the note's offline copy at once (writes only) ?>
+    <script src="<?php echo poznoteAsset('js/offline-store.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/offline-sync.js'); ?>" data-offline-mode="writes"></script>
     
     <?php
     // Built server-side rather than through navigation.js's goBackToNote():
@@ -211,13 +214,6 @@ if (!$note) {
                     <div class="accepted-types">
                         <?php echo t_h('attachments.page.all_types_accepted'); ?>
                     </div>
-                    <?php if (poznoteSaasNoticesEnabled()): ?>
-                    <div class="attachment-usage-notice">
-                        <i class="lucide lucide-alert-triangle"></i>
-                        <span><?php echo t_h('attachments.page.note_taking_notice', [], 'You can store media, but large files fill up your space quickly.'); ?>
-                            <?php if (!function_exists('isSharedWorkspaceScopeActive') || !isSharedWorkspaceScopeActive()): ?><a href="storage-stats-user.php"><?php echo t_h('attachments.page.note_taking_notice_link', [], 'View my storage'); ?></a><?php endif; ?></span>
-                    </div>
-                    <?php endif; ?>
                     <br>
                     <div class="selected-filename" id="selectedFileName"></div>
                 </div>
@@ -264,6 +260,6 @@ if (!$note) {
             </div>
         </div>
     </div>
-    <script src="js/icon-sidebar-toggle.js?v=<?php echo $v; ?>"></script>
+    <script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 </body>
 </html>

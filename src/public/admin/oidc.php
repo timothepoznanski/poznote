@@ -11,6 +11,7 @@ require_once __DIR__ . '/../../auth.php';
 requireAuth();
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../functions.php';
+require_once __DIR__ . '/../../settings_shell.php';
 requireSettingsPassword();
 
 if (!isCurrentUserAdmin()) {
@@ -435,9 +436,8 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
 </head>
 <body class="has-icon-sidebar" data-workspace="<?php echo h($pageWorkspace); ?>">
     <?php $iconSidebarBasePath = '../'; include __DIR__ . '/../../icon_sidebar.php'; ?>
+<?php poznoteSettingsShellOpen(['section' => 'admin-tools-grid', 'title' => t('settings.cards.oidc_config', [], 'OIDC / SSO'), 'basePath' => '../']); ?>
 <div class="settings-container oidc-page">
-<?php $backToSettingsBasePath = '../'; include __DIR__ . '/../../back_to_settings.php'; ?>
-<h1 class="poznote-page-title"><i class="lucide lucide-shield"></i> <?php echo t_h('settings.cards.oidc_config', [], 'OIDC / SSO'); ?></h1>
 
 
     <?php if ($success || $error): ?>
@@ -629,6 +629,7 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
             </div>
         </form>
 </div>
+<?php poznoteSettingsShellClose(); ?>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     var enabledCheckbox = document.getElementById('oidc_enabled');
@@ -788,6 +789,6 @@ document.addEventListener('DOMContentLoaded', function () {
     render();
 });
 </script>
-    <script src="../js/icon-sidebar-toggle.js?v=<?php echo $v; ?>"></script>
+    <script src="../<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 </body>
 </html>

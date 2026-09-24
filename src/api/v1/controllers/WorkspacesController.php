@@ -147,6 +147,10 @@ class WorkspacesController {
 
             $stmt = $this->con->prepare("INSERT INTO workspaces (name, tags, color) VALUES (?, ?, ?)");
             if ($stmt->execute([$name, poznoteSerializeWorkspaceTags($tags), $color])) {
+                // A new workspace starts unshared (users/db_master.php)
+                require_once dirname(__DIR__, 3) . '/users/db_master.php';
+                forgetStaleWorkspaceShares((int)(getCurrentUserId() ?? 0), $name);
+
                 require_once dirname(__DIR__, 3) . '/ActivityLog.php';
                 logActivity(ACTIVITY_WORKSPACE_CREATED, ['workspace' => $name], 'api');
 
@@ -280,6 +284,11 @@ class WorkspacesController {
             
             $stmt = $this->con->prepare("UPDATE workspaces SET name = ? WHERE name = ?");
             if ($stmt->execute([$newName, $name])) {
+                // The accounts it is shared with follow the new name, as on
+                // workspaces.php (master.db workspace_shares)
+                require_once dirname(__DIR__, 3) . '/users/db_master.php';
+                renameWorkspaceShares((int)(getCurrentUserId() ?? 0), $name, $newName);
+
                 if ($hasTags) {
                     $stmt = $this->con->prepare("UPDATE workspaces SET tags = ? WHERE name = ?");
                     $stmt->execute([poznoteSerializeWorkspaceTags($tags), $newName]);
@@ -421,6 +430,11 @@ class WorkspacesController {
             
             $stmt = $this->con->prepare("DELETE FROM workspaces WHERE name = ?");
             if ($stmt->execute([$name])) {
+                // The accounts it was shared with lose it, as on
+                // workspaces.php (master.db workspace_shares)
+                require_once dirname(__DIR__, 3) . '/users/db_master.php';
+                deleteWorkspaceShares((int)(getCurrentUserId() ?? 0), $name);
+
                 // notes_moved, not notes_deleted: this endpoint reassigns the
                 // notes to $targetWorkspace instead of destroying them.
                 require_once dirname(__DIR__, 3) . '/ActivityLog.php';

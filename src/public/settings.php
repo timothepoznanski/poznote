@@ -11,6 +11,7 @@ require_once __DIR__ . '/../db_connect.php';
 // Include page initialization
 require_once __DIR__ . '/../page_init.php';
 require_once __DIR__ . '/../version_helper.php';
+require_once __DIR__ . '/../settings_shell.php';
 
 // Initialize search parameters (needed for workspace filter)
 $search_params = initializeSearchParams();
@@ -112,6 +113,7 @@ $settingsPageUserKeys = [
     'folder_tree_dim_level',
     'notes_without_folders_after_folders',
     'markdown_split_card_view',
+    'markdown_default_view_mode',
     'markdown_colored',
     'markdown_colored_custom',
     'code_block_word_wrap',
@@ -135,6 +137,7 @@ $settingsPageUserKeys = [
     'settings_pinned_cards',
     'spellcheck_html_notes',
     'slash_menu_trigger',
+    'slash_menu_trigger_mobile',
 ];
 
 foreach ($settingsPageUserKeys as $settingsPageKey) {
@@ -358,37 +361,17 @@ if ($canUseUserWebhooks) {
       data-txt-error="<?php echo t_h('common.error'); ?>"
     data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php $iconSidebarWorkspace = $pageWorkspace; include __DIR__ . '/../icon_sidebar.php'; ?>
-    <div class="home-container settings-with-nav">
+    <div class="home-container settings-with-nav settings-shell">
 
-        <h1 class="poznote-page-title">
-            <i class="lucide lucide-settings"></i> <?php echo t_h('settings.title', [], 'Settings'); ?>
-            <span id="settings-current-user-badge" class="settings-current-user-badge"><i class="lucide lucide-user"></i> <?php echo htmlspecialchars((string)($currentUser['username'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></span>
-        </h1>
+        <?php poznoteRenderSettingsTitle(); ?>
 
-        <div class="home-search-container settings-filter-row">
-            <div class="home-search-wrapper">
-                <i class="lucide lucide-search home-search-icon"></i>
-                <input type="text" id="home-search-input" class="home-search-input" placeholder="<?php echo t_h('home.filter_placeholder', [], 'Filter...'); ?>" autocomplete="off">
-                <button type="button" id="home-search-clear" class="home-search-clear" aria-label="<?php echo t_h('search.clear', [], 'Clear search'); ?>" title="<?php echo t_h('search.clear', [], 'Clear search'); ?>">
-                    <i class="lucide lucide-x"></i>
-                </button>
-            </div>
-            <!-- Collapse/expand every section at once. Only useful in the
-                 stacked mobile layout: the desktop nav shows one section at a
-                 time, so css/settings.css hides this button there. -->
-            <button type="button" id="settingsCollapseAll" class="settings-collapse-all"
-                data-label-collapse="<?php echo t_h('settings.collapse_all_sections', [], 'Collapse all'); ?>"
-                data-label-expand="<?php echo t_h('settings.expand_all_sections', [], 'Expand all'); ?>">
-                <i class="lucide lucide-chevron-down"></i>
-            </button>
-        </div>
-
-        <!-- Desktop layout (css/settings.css, .settings-with-nav): the section
-             list on the left is filled by settings-page.js from the category
-             titles below, and only the selected section shows, its cards as
-             rows. Narrow screens hide the list and stack the sections. -->
+        <!-- Desktop layout (css/settings.css, .settings-shell): the filter and
+             the section list on the left (settings_shell.php, shared with the
+             pages opened from here), and only the selected section shows, its
+             cards as rows (js/settings-page.js). Narrow screens hide the list
+             and stack the sections under the filter. -->
         <div class="settings-layout">
-        <nav id="settings-nav" class="settings-nav" aria-label="<?php echo t_h('settings.title', [], 'Settings'); ?>"></nav>
+        <?php poznoteRenderSettingsSidebar(['page' => true, 'workspace' => $pageWorkspace]); ?>
         <div class="settings-content">
 
         <?php if ($settingsHasDefaultCredential): ?>
@@ -429,284 +412,344 @@ if ($canUseUserWebhooks) {
              user (profile, password, API credentials, storage, deletion).
              Kept apart from Actions, which holds app-wide tools. -->
         <h2 class="settings-category-title" id="settings-account-section-title"><?php echo t_h('settings.categories.account', [], 'My Account'); ?></h2>
-        <div class="home-grid" id="settings-account-section-grid">
+        <div class="home-grid settings-grouped" id="settings-account-section-grid">
 
-            <!-- My Profile (username, first/last name) -->
-            <div class="home-card" id="my-profile-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.my_profile', [], 'View and edit your profile information.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-user"></i>
+            <div class="settings-group-title"><?php echo t_h('settings.groups.profile_sign_in', [], 'Profile & sign-in'); ?></div>
+            <div class="settings-group">
+
+                <!-- My Profile (username, first/last name) -->
+                <div class="home-card" id="my-profile-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.my_profile', [], 'View and edit your profile information.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-user"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('profile.card', [], 'My Profile'); ?></span>
+                        <span id="profile-username-badge" class="setting-status enabled"><?php echo htmlspecialchars((string)($currentUser['username'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></span>
+                    </div>
                 </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('profile.card', [], 'My Profile'); ?></span>
-                    <span id="profile-username-badge" class="setting-status enabled"><?php echo htmlspecialchars((string)($currentUser['username'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></span>
+
+                <!-- Change Password (greyed out when sign-in never uses a local password) -->
+                <div class="home-card<?php echo $settingsChangePasswordDisabled ? ' home-card-disabled' : ''; ?>" id="change-password-card"<?php echo $settingsChangePasswordDisabled ? ' aria-disabled="true"' : ''; ?>>
+                    <span class="setting-help" data-tooltip="<?php echo $settingsChangePasswordDisabled
+                        ? $settingsChangePasswordDisabledHelp
+                        : t_h('settings.card_help.change_password', [], 'Change the password used to sign in.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-key"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.change_password', [], 'Change Password'); ?></span>
+                        <span id="password-status-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    </div>
+                </div>
+
+                <!-- Two-factor authentication (greyed out when sign-in never uses a local
+                     password, unless it is already on and has to stay manageable) -->
+                <?php $settingsTwoFactorDisabled = $settingsChangePasswordDisabled && !$settingsTwoFactorEnabled; ?>
+                <div class="home-card<?php echo $settingsTwoFactorDisabled ? ' home-card-disabled' : ''; ?>" id="two-factor-card"<?php echo $settingsTwoFactorDisabled ? ' aria-disabled="true"' : ''; ?>>
+                    <span class="setting-help" data-tooltip="<?php echo $settingsTwoFactorDisabled
+                        ? t_h('settings.card_help.two_factor_sso', [], 'Two-factor authentication protects password sign-in. Your account signs in through your identity provider, which handles its own second factor.')
+                        : t_h('settings.card_help.two_factor', [], 'Ask for a code from an authenticator app after your password when signing in.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-smartphone"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.two_factor', [], 'Two-factor authentication'); ?></span>
+                        <span id="two-factor-status-badge" class="setting-status <?php echo $settingsTwoFactorEnabled ? 'enabled' : 'disabled'; ?>"><?php
+                            echo $settingsTwoFactorEnabled
+                                ? t_h('two_factor.status.enabled', [], 'Enabled')
+                                : t_h('two_factor.status.disabled', [], 'Disabled');
+                        ?></span>
+                    </div>
+                </div>
+
+                <!-- App passwords: revocable API credentials for clients that cannot sign in through SSO -->
+                <div class="home-card" id="app-passwords-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.app_passwords', [], 'Create passwords for apps and extensions that connect through the API, such as the browser extension. They work even when you sign in through SSO, cannot open the web interface or change your account, and can be revoked at any time.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-plug"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.app_passwords', [], 'App passwords'); ?></span>
+                        <span id="app-passwords-status-badge" class="setting-status <?php echo $settingsAppPasswordsActive > 0 ? 'enabled' : 'disabled'; ?>"><?php
+                            if ($settingsAppPasswordsActive === 1) {
+                                echo t_h('app_passwords.status.count_one', [], '1 active');
+                            } elseif ($settingsAppPasswordsActive > 1) {
+                                echo t_h('app_passwords.status.count_other', ['count' => $settingsAppPasswordsActive], '{{count}} active');
+                            } else {
+                                echo t_h('app_passwords.status.none', [], 'None');
+                            }
+                        ?></span>
+                    </div>
+                </div>
+
+                <?php if (getCurrentUserId() !== 1): // user ID 1 is the permanent super-admin and can never be deleted ?>
+                <!-- Delete Account -->
+                <div class="home-card home-card-red" id="delete-account-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.delete_account', [], 'Permanently delete your account and all its data.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-trash-2"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.delete_account', [], 'Delete Account'); ?></span>
+                    </div>
+                </div>
+                <?php endif; ?>
+            </div>
+
+            <div class="settings-group-title"><?php echo t_h('settings.groups.language_region', [], 'Language & region'); ?></div>
+            <div class="settings-group">
+
+                <!-- Language: a list in the row (settings-inline-card, see
+                     initInlineControl() in js/settings-page.js) -->
+                <div class="home-card settings-inline-card" id="language-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.language', [], 'Change the language of the interface.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-flag"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <label class="home-card-title" for="language-select"><?php echo t_h('settings.language.label'); ?></label>
+                        <select id="language-select" class="settings-inline-control settings-inline-select" data-control="language-select">
+                            <?php foreach ([
+                                'zh-cn' => 'settings.language.chinese_simplified',
+                                'en' => 'settings.language.english',
+                                'fr' => 'settings.language.french',
+                                'de' => 'settings.language.german',
+                                'pt' => 'settings.language.portuguese',
+                                'ru' => 'settings.language.russian',
+                                'es' => 'settings.language.spanish',
+                            ] as $settingsLangCode => $settingsLangKey): ?>
+                            <option value="<?php echo $settingsLangCode; ?>"<?php echo $settingsLangCode === $currentLang ? ' selected' : ''; ?>><?php echo t_h($settingsLangKey); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Timezone -->
+                <div class="home-card settings-inline-card" id="timezone-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.timezone', [], 'Set the timezone used to display dates and times.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon"><i class="lucide lucide-clock"></i></div>
+                    <div class="home-card-content">
+                        <label class="home-card-title" for="timezone-select"><?php echo t_h('display.cards.timezone', [], 'Timezone'); ?></label>
+                        <select id="timezone-select" class="settings-inline-control settings-inline-select" data-control="timezone-select">
+    <?php include __DIR__ . '/../timezone_options.php'; ?>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Date and Time Format -->
+                <div class="home-card" id="date-time-format-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.date_time_format', [], 'Choose how dates and times are displayed.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon"><i class="lucide lucide-calendar"></i></div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('display.cards.date_time_format', [], 'Date & time format'); ?></span>
+                        <span id="date-time-format-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Change Password (greyed out when sign-in never uses a local password) -->
-            <div class="home-card<?php echo $settingsChangePasswordDisabled ? ' home-card-disabled' : ''; ?>" id="change-password-card"<?php echo $settingsChangePasswordDisabled ? ' aria-disabled="true"' : ''; ?>>
-                <span class="setting-help" data-tooltip="<?php echo $settingsChangePasswordDisabled
-                    ? $settingsChangePasswordDisabledHelp
-                    : t_h('settings.card_help.change_password', [], 'Change the password used to sign in.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-key"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.change_password', [], 'Change Password'); ?></span>
-                    <span id="password-status-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                </div>
-            </div>
-
-            <!-- Two-factor authentication (greyed out when sign-in never uses a local
-                 password, unless it is already on and has to stay manageable) -->
-            <?php $settingsTwoFactorDisabled = $settingsChangePasswordDisabled && !$settingsTwoFactorEnabled; ?>
-            <div class="home-card<?php echo $settingsTwoFactorDisabled ? ' home-card-disabled' : ''; ?>" id="two-factor-card"<?php echo $settingsTwoFactorDisabled ? ' aria-disabled="true"' : ''; ?>>
-                <span class="setting-help" data-tooltip="<?php echo $settingsTwoFactorDisabled
-                    ? t_h('settings.card_help.two_factor_sso', [], 'Two-factor authentication protects password sign-in. Your account signs in through your identity provider, which handles its own second factor.')
-                    : t_h('settings.card_help.two_factor', [], 'Ask for a code from an authenticator app after your password when signing in.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-smartphone"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.two_factor', [], 'Two-factor authentication'); ?></span>
-                    <span id="two-factor-status-badge" class="setting-status <?php echo $settingsTwoFactorEnabled ? 'enabled' : 'disabled'; ?>"><?php
-                        echo $settingsTwoFactorEnabled
-                            ? t_h('two_factor.status.enabled', [], 'Enabled')
-                            : t_h('two_factor.status.disabled', [], 'Disabled');
-                    ?></span>
+            <div class="settings-group-title"><?php echo t_h('settings.groups.storage', [], 'Storage'); ?></div>
+            <div class="settings-group">
+                <!-- Storage used by this account, at the bottom of the section
+                     rather than behind a card of its own. Measuring it walks the account's
+                     folders (and asks the backup bucket), so the figures load
+                     after the page from storage-stats-user.php?fragment=1. The id
+                     is the former card's, so its Element visibility entry still
+                     hides it. -->
+                <div class="settings-storage-summary" id="storage-stats-user-card"
+                     data-src="storage-stats-user.php?fragment=1<?php echo $pageWorkspace !== '' ? '&amp;workspace=' . urlencode($pageWorkspace) : ''; ?>"
+                     data-error="<?php echo t_h('settings.storage_summary.error', [], 'Storage usage could not be loaded.'); ?>">
+                    <div class="settings-storage-summary-loading"><?php echo t_h('common.loading'); ?></div>
                 </div>
             </div>
-
-            <!-- App passwords: revocable API credentials for clients that cannot sign in through SSO -->
-            <div class="home-card" id="app-passwords-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.app_passwords', [], 'Create passwords for apps and extensions that connect through the API, such as the browser extension. They work even when you sign in through SSO, cannot open the web interface or change your account, and can be revoked at any time.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-plug"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.app_passwords', [], 'App passwords'); ?></span>
-                    <span id="app-passwords-status-badge" class="setting-status <?php echo $settingsAppPasswordsActive > 0 ? 'enabled' : 'disabled'; ?>"><?php
-                        if ($settingsAppPasswordsActive === 1) {
-                            echo t_h('app_passwords.status.count_one', [], '1 active');
-                        } elseif ($settingsAppPasswordsActive > 1) {
-                            echo t_h('app_passwords.status.count_other', ['count' => $settingsAppPasswordsActive], '{{count}} active');
-                        } else {
-                            echo t_h('app_passwords.status.none', [], 'None');
-                        }
-                    ?></span>
-                </div>
-            </div>
-
-            <!-- Storage Statistics (own account) -->
-            <div class="home-card settings-card-clickable" id="storage-stats-user-card" data-href="storage-stats-user.php">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.storage_stats_user', [], 'See how much storage your notes and attachments use.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-pie-chart"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.storage_stats_user', [], 'User Storage statistics'); ?></span>
-                </div>
-            </div>
-
-            <!-- Language -->
-            <div class="home-card" id="language-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.language', [], 'Change the language of the interface.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-flag"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.language.label'); ?></span>
-                    <span id="language-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                </div>
-            </div>
-
-            <!-- Timezone -->
-            <div class="home-card" id="timezone-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.timezone', [], 'Set the timezone used to display dates and times.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-clock"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.timezone', [], 'Timezone'); ?></span>
-                    <span id="timezone-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                </div>
-            </div>
-
-            <!-- Date and Time Format -->
-            <div class="home-card" id="date-time-format-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.date_time_format', [], 'Choose how dates and times are displayed.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-calendar"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.date_time_format', [], 'Date & time format'); ?></span>
-                    <span id="date-time-format-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                </div>
-            </div>
-
-            <?php if (getCurrentUserId() !== 1): // user ID 1 is the permanent super-admin and can never be deleted ?>
-            <!-- Delete Account -->
-            <div class="home-card home-card-red" id="delete-account-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.delete_account', [], 'Permanently delete your account and all its data.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-trash-2"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.delete_account', [], 'Delete Account'); ?></span>
-                </div>
-            </div>
-            <?php endif; ?>
-
         </div>
 
-        <!-- ACTIONS CATEGORY -->
+        <!-- ACTIONS CATEGORY: what leaves the notes or reaches them from
+             outside (backups, sync, integrations, apps). Snapshots and
+             Offline notes came from the former "Other" section: both decide
+             which copies of the notes are kept, and where. -->
         <h2 class="settings-category-title" id="settings-actions-section-title"><?php echo t_h('settings.categories.actions'); ?></h2>
-        <div class="home-grid" id="settings-actions-section-grid">
+        <div class="home-grid settings-grouped" id="settings-actions-section-grid">
 
-            <!-- Git Sync (available to all users) -->
-            <div class="home-card settings-card-clickable" id="git-sync-card" data-href="git_sync.php">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.git_sync', [], 'Back up your notes to a Git repository and view the synchronization history.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <?php
-                    require_once __DIR__ . '/../GitSync.php';
-                    $gitSyncSettings = new GitSync($con ?? null, $_SESSION['user_id'] ?? null);
-                    $settingsGitProvider = $gitSyncSettings->getProvider();
-                    $gitSyncIsConfigured = $gitSyncSettings->isConfigured();
-                    $gitSyncIsEnabled = GitSync::isEnabled();
-                    ?>
-                    <i class="<?php echo ($settingsGitProvider === 'forgejo') ? 'lucide lucide-git-branch' : (($settingsGitProvider === 'gitlab') ? 'lucide lucide-gitlab' : 'lucide lucide-github'); ?>"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?></span>
-                    <span id="git-sync-status-badge" class="setting-status <?php echo (!$gitSyncIsEnabled) ? 'disabled' : ($gitSyncIsConfigured ? 'enabled' : 'disabled'); ?>">
+            <div class="settings-group-title"><?php echo t_h('settings.groups.backup_sync', [], 'Backups & sync'); ?></div>
+            <div class="settings-group">
+
+                <!-- Backup / Export -->
+                <a href="backup_export.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="backup-export-card" title="<?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?>">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.backup_export', [], 'Download your notes, attachments and database as a backup.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-upload"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?></span>
+                    </div>
+                </a>
+
+                <!-- Restore / Import -->
+                <a href="restore_import.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="restore-import-card" title="<?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?>">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.restore_import', [], 'Restore a backup or import notes into this instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-download"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?></span>
+                    </div>
+                </a>
+
+                <!-- Git Sync (available to all users) -->
+                <div class="home-card settings-card-clickable" id="git-sync-card" data-href="git_sync.php">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.git_sync', [], 'Back up your notes to a Git repository and view the synchronization history.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
                         <?php
-                        if (!$gitSyncIsEnabled) {
-                            echo t_h('common.disabled', [], 'Disabled');
-                        } elseif ($gitSyncIsConfigured) {
-                            echo t_h('git_sync.config.token_set', [], 'Configured');
-                        } else {
-                            echo t_h('git_sync.config.not_configured', [], 'Not configured');
-                        }
+                        require_once __DIR__ . '/../GitSync.php';
+                        $gitSyncSettings = new GitSync($con ?? null, $_SESSION['user_id'] ?? null);
+                        $settingsGitProvider = $gitSyncSettings->getProvider();
+                        $gitSyncIsConfigured = $gitSyncSettings->isConfigured();
+                        $gitSyncIsEnabled = GitSync::isEnabled();
                         ?>
-                    </span>
+                        <i class="<?php echo ($settingsGitProvider === 'forgejo') ? 'lucide lucide-git-branch' : (($settingsGitProvider === 'gitlab') ? 'lucide lucide-gitlab' : 'lucide lucide-github'); ?>"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?></span>
+                        <span id="git-sync-status-badge" class="setting-status <?php echo (!$gitSyncIsEnabled) ? 'disabled' : ($gitSyncIsConfigured ? 'enabled' : 'disabled'); ?>">
+                            <?php
+                            if (!$gitSyncIsEnabled) {
+                                echo t_h('common.disabled', [], 'Disabled');
+                            } elseif ($gitSyncIsConfigured) {
+                                echo t_h('git_sync.config.token_set', [], 'Configured');
+                            } else {
+                                echo t_h('git_sync.config.not_configured', [], 'Not configured');
+                            }
+                            ?>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Snapshots -->
+                <div class="home-card" id="snapshots-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.snapshots', [], 'Choose how many automatic daily snapshots are kept per note.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon"><i class="lucide lucide-history"></i></div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('display.cards.snapshots', [], 'Snapshots'); ?></span>
+                        <span id="snapshots-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    </div>
+                </div>
+
+                <!-- Offline notes: kept in the browser by js/offline-sync.js -->
+                <div class="home-card" id="offline-notes-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('offline.settings.help', [], 'Keep the notes you modified recently in your browser, to open and edit them without a network.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon"><i class="lucide lucide-wifi-off"></i></div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('offline.settings.card', [], 'Offline notes'); ?></span>
+                        <span id="offline-notes-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    </div>
                 </div>
             </div>
 
-            <!-- User Webhooks (per account; tenant isolation can block non-admins) -->
-            <?php if ($canUseUserWebhooks): ?>
-            <div class="home-card settings-card-clickable" id="user-webhooks-card" data-href="user-webhooks.php">
-                <span class="setting-help" data-tooltip="<?php echo t_h('webhooks_user.card_help', [], 'Send events about your own notes (reminder triggered, note created or shared) to external services such as ntfy or n8n via webhooks.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-webhook"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('webhooks_user.card', [], 'User Webhooks'); ?></span>
-                    <span class="setting-status <?php echo $active_user_webhooks_count > 0 ? 'enabled' : 'disabled'; ?>">
-                        <?php echo $active_user_webhooks_count > 0 ? $active_user_webhooks_count : t_h('webhooks_admin.status.none', [], 'None'); ?>
-                    </span>
-                </div>
-            </div>
-            <?php endif; ?>
+            <div class="settings-group-title"><?php echo t_h('settings.groups.integrations', [], 'Integrations'); ?></div>
+            <div class="settings-group">
 
-            <!-- My AI Assistant (personal provider and API key) -->
-            <div class="home-card settings-card-clickable" id="ai-assistant-user-card" data-href="ai_settings_user.php">
-                <span class="setting-help" data-tooltip="<?php echo t_h('ai_settings_user.card_help', [], 'Use the AI assistant with your own provider and API key.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-bot"></i>
+                <!-- User Webhooks (per account; tenant isolation can block non-admins) -->
+                <?php if ($canUseUserWebhooks): ?>
+                <div class="home-card settings-card-clickable" id="user-webhooks-card" data-href="user-webhooks.php">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('webhooks_user.card_help', [], 'Send events about your own notes (reminder triggered, note created or shared) to external services such as ntfy or n8n via webhooks.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-webhook"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('webhooks_user.card', [], 'User Webhooks'); ?></span>
+                        <span class="setting-status <?php echo $active_user_webhooks_count > 0 ? 'enabled' : 'disabled'; ?>">
+                            <?php echo $active_user_webhooks_count > 0 ? $active_user_webhooks_count : t_h('webhooks_admin.status.none', [], 'None'); ?>
+                        </span>
+                    </div>
                 </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('ai_settings_user.card', [], 'My AI Assistant'); ?></span>
-                    <?php
-                    require_once __DIR__ . '/../ai_config.php';
-                    $aiUserKeysAllowedCard = poznoteAiUserKeysAllowed();
-                    $aiUserConfigCard = poznoteAiUserConfig($con);
-                    $aiUserHasConfigCard = $aiUserConfigCard['url'] !== '' && $aiUserConfigCard['model'] !== '';
-                    $aiUserActiveCard = $aiUserKeysAllowedCard && poznoteAiConfigUsable($aiUserConfigCard);
-                    ?>
-                    <span class="setting-status <?php echo $aiUserActiveCard ? 'enabled' : 'disabled'; ?>">
+                <?php endif; ?>
+
+                <!-- My AI Assistant (personal provider and API key) -->
+                <div class="home-card settings-card-clickable" id="ai-assistant-user-card" data-href="ai_settings_user.php">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('ai_settings_user.card_help', [], 'Use the AI assistant with your own provider and API key.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-bot"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('ai_settings_user.card', [], 'My AI Assistant'); ?></span>
                         <?php
-                        if ($aiUserActiveCard) {
-                            echo t_h('common.enabled', [], 'Enabled');
-                        } elseif ($aiUserKeysAllowedCard && !$aiUserHasConfigCard) {
-                            echo t_h('git_sync.config.not_configured', [], 'Not configured');
-                        } else {
-                            echo t_h('common.disabled', [], 'Disabled');
-                        }
+                        require_once __DIR__ . '/../ai_config.php';
+                        $aiUserKeysAllowedCard = poznoteAiUserKeysAllowed();
+                        $aiUserConfigCard = poznoteAiUserConfig($con);
+                        $aiUserHasConfigCard = $aiUserConfigCard['url'] !== '' && $aiUserConfigCard['model'] !== '';
+                        $aiUserActiveCard = $aiUserKeysAllowedCard && poznoteAiConfigUsable($aiUserConfigCard);
                         ?>
-                    </span>
+                        <span class="setting-status <?php echo $aiUserActiveCard ? 'enabled' : 'disabled'; ?>">
+                            <?php
+                            if ($aiUserActiveCard) {
+                                echo t_h('common.enabled', [], 'Enabled');
+                            } elseif ($aiUserKeysAllowedCard && !$aiUserHasConfigCard) {
+                                echo t_h('git_sync.config.not_configured', [], 'Not configured');
+                            } else {
+                                echo t_h('common.disabled', [], 'Disabled');
+                            }
+                            ?>
+                        </span>
+                    </div>
                 </div>
-            </div>
 
-            <!-- My transcription server (personal speech-to-text server) -->
-            <div class="home-card settings-card-clickable" id="stt-user-card" data-href="stt_settings_user.php">
-                <span class="setting-help" data-tooltip="<?php echo t_h('stt_settings_user.card_help', [], 'Send your dictation to your own speech-to-text server.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-mic"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('stt_settings_user.card', [], 'My transcription server'); ?></span>
-                    <?php
-                    require_once __DIR__ . '/../stt_config.php';
-                    $sttUserKeysAllowedCard = poznoteSttUserKeysAllowed();
-                    $sttUserConfigCard = poznoteSttUserConfig($con);
-                    $sttUserHasConfigCard = $sttUserConfigCard['url'] !== '' && $sttUserConfigCard['model'] !== '';
-                    $sttUserActiveCard = $sttUserKeysAllowedCard && poznoteSttConfigUsable($sttUserConfigCard);
-                    ?>
-                    <span class="setting-status <?php echo $sttUserActiveCard ? 'enabled' : 'disabled'; ?>">
+                <!-- My transcription server (personal speech-to-text server) -->
+                <div class="home-card settings-card-clickable" id="stt-user-card" data-href="stt_settings_user.php">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('stt_settings_user.card_help', [], 'Send your dictation to your own speech-to-text server.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-mic"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('stt_settings_user.card', [], 'My transcription server'); ?></span>
                         <?php
-                        if ($sttUserActiveCard) {
-                            echo t_h('common.enabled', [], 'Enabled');
-                        } elseif ($sttUserKeysAllowedCard && !$sttUserHasConfigCard) {
-                            echo t_h('git_sync.config.not_configured', [], 'Not configured');
-                        } else {
-                            echo t_h('common.disabled', [], 'Disabled');
-                        }
+                        require_once __DIR__ . '/../stt_config.php';
+                        $sttUserKeysAllowedCard = poznoteSttUserKeysAllowed();
+                        $sttUserConfigCard = poznoteSttUserConfig($con);
+                        $sttUserHasConfigCard = $sttUserConfigCard['url'] !== '' && $sttUserConfigCard['model'] !== '';
+                        $sttUserActiveCard = $sttUserKeysAllowedCard && poznoteSttConfigUsable($sttUserConfigCard);
                         ?>
-                    </span>
+                        <span class="setting-status <?php echo $sttUserActiveCard ? 'enabled' : 'disabled'; ?>">
+                            <?php
+                            if ($sttUserActiveCard) {
+                                echo t_h('common.enabled', [], 'Enabled');
+                            } elseif ($sttUserKeysAllowedCard && !$sttUserHasConfigCard) {
+                                echo t_h('git_sync.config.not_configured', [], 'Not configured');
+                            } else {
+                                echo t_h('common.disabled', [], 'Disabled');
+                            }
+                            ?>
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Browser Extension -->
-            <a href="https://chromewebstore.google.com/detail/poznote-url-saver/bmjclfamahegmgillaghhmnbkjebipbh" target="_blank" rel="noopener noreferrer" class="home-card" id="extension-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.extension', [], 'Install the browser extension to save web pages into Poznote.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-chrome"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.install_extension', [], 'Install extension'); ?></span>
-                </div>
-            </a>
+            <div class="settings-group-title"><?php echo t_h('settings.groups.apps', [], 'Apps'); ?></div>
+            <div class="settings-group">
 
-            <!-- Install App -->
-            <div class="home-card" id="install-app-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.install_app', [], 'Install Poznote as an application on your device (PWA).'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-smartphone"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.install_app', [], 'Install application'); ?></span>
-                    <span id="install-app-status" class="setting-status disabled"><?php echo t_h('settings.install_app.status.unavailable', [], 'Unavailable'); ?></span>
+                <!-- Browser Extension -->
+                <a href="https://chromewebstore.google.com/detail/poznote-url-saver/bmjclfamahegmgillaghhmnbkjebipbh" target="_blank" rel="noopener noreferrer" class="home-card" id="extension-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.extension', [], 'Install the browser extension to save web pages into Poznote.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-chrome"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.install_extension', [], 'Install extension'); ?></span>
+                    </div>
+                </a>
+
+                <!-- Install App -->
+                <div class="home-card" id="install-app-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.install_app', [], 'Install Poznote as an application on your device (PWA).'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-smartphone"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.install_app', [], 'Install application'); ?></span>
+                        <span id="install-app-status" class="setting-status disabled"><?php echo t_h('settings.install_app.status.unavailable', [], 'Unavailable'); ?></span>
+                    </div>
                 </div>
             </div>
-
-            <!-- Backup / Export -->
-            <a href="backup_export.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="backup-export-card" title="<?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?>">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.backup_export', [], 'Download your notes, attachments and database as a backup.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-upload"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?></span>
-                </div>
-            </a>
-
-            <!-- Restore / Import -->
-            <a href="restore_import.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="restore-import-card" title="<?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?>">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.restore_import', [], 'Restore a backup or import notes into this instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-download"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?></span>
-                </div>
-            </a>
-
         </div>
 
         <!-- DISPLAY CATEGORY -->
@@ -720,32 +763,43 @@ if ($canUseUserWebhooks) {
                  (lib/icons.php defaultNoteIconForType). -->
 
             <?php if ($isAdmin): ?>
-            <!-- Login Display -->
-            <div class="home-card" id="login-display-card">
+            <!-- Login Display: a text field in the row, saved when it loses
+                 the focus or on Enter -->
+            <div class="home-card settings-inline-card" id="login-display-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.login_display', [], 'Customize the title displayed on the login page.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-user"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.login_display', [], 'Login page title'); ?></span>
-                    <span id="login-display-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    <label class="home-card-title" for="login-display-input"><?php echo t_h('display.cards.login_display', [], 'Login page title'); ?></label>
+                    <input type="text" id="login-display-input" class="settings-inline-control settings-inline-text" data-control="login-display-input" maxlength="255" autocomplete="off"
+                           placeholder="<?php echo t_h('modals.login_display.placeholder'); ?>">
                 </div>
             </div>
             <?php endif; ?>
 
             <!-- App Font -->
-            <div class="home-card" id="main-font-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.main_font', [], 'Choose the font used throughout the application.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+            <div class="home-card settings-inline-card" id="main-font-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.main_font', [], 'Choose the font used throughout the application.'); ?> <?php echo t_h('modals.main_font.description', [], 'Fonts other than Inter use the fonts installed on your device.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-type"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.main_font', [], 'App font'); ?></span>
-                    <span id="main-font-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    <label class="home-card-title" for="main-font-select"><?php echo t_h('display.cards.main_font', [], 'App font'); ?></label>
+                    <select id="main-font-select" class="settings-inline-control settings-inline-select" data-control="main-font-select">
+                        <option value="inter" style="font-family: 'Inter', sans-serif;"><?php echo t_h('modals.main_font.options.inter', [], 'Inter (default)'); ?></option>
+                        <option value="system" style="font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;"><?php echo t_h('modals.main_font.options.system', [], 'System'); ?></option>
+                        <option value="arial" style="font-family: Arial, Helvetica, sans-serif;">Arial</option>
+                        <option value="verdana" style="font-family: Verdana, sans-serif;">Verdana</option>
+                        <option value="trebuchet" style="font-family: 'Trebuchet MS', sans-serif;">Trebuchet MS</option>
+                        <option value="georgia" style="font-family: Georgia, serif;">Georgia</option>
+                        <option value="times" style="font-family: 'Times New Roman', serif;">Times New Roman</option>
+                    </select>
                 </div>
             </div>
 
-            <!-- Font Size -->
+            <!-- Font Size: four sizes, so a dialog; each badge names what its
+                 value sizes when hovered (data-tooltip, css/home/cards.css) -->
             <div class="home-card" id="font-size-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.font_size', [], 'Adjust the font size of notes, sidebar, code blocks and the settings page.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
@@ -754,23 +808,26 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.note_font_size', [], 'Font size'); ?></span>
                     <div>
-                        <span id="font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                        <span id="sidebar-font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                        <span id="code-block-font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                        <span id="settings-font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                        <span id="font-size-badge" class="setting-status" data-tooltip="<?php echo t_h('settings.value_help.font_size_notes', [], 'Note content'); ?>"><?php echo t_h('common.loading'); ?></span>
+                        <span id="sidebar-font-size-badge" class="setting-status" data-tooltip="<?php echo t_h('settings.value_help.font_size_sidebar', [], 'Sidebar'); ?>"><?php echo t_h('common.loading'); ?></span>
+                        <span id="code-block-font-size-badge" class="setting-status" data-tooltip="<?php echo t_h('settings.value_help.font_size_code_blocks', [], 'Code blocks'); ?>"><?php echo t_h('common.loading'); ?></span>
+                        <span id="settings-font-size-badge" class="setting-status" data-tooltip="<?php echo t_h('settings.value_help.font_size_settings', [], 'Settings page'); ?>"><?php echo t_h('common.loading'); ?></span>
                     </div>
                 </div>
             </div>
 
-            <!-- Index Icon Scale -->
-            <div class="home-card" id="index-icon-scale-card">
+            <!-- Index Icon Scale: a slider in the row -->
+            <div class="home-card settings-inline-card" id="index-icon-scale-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.index_icon_scale', [], 'Adjust the size of the icons in the note list.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-maximize-2"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.index_icon_scale', [], 'Index icon scaling'); ?></span>
-                    <span id="index-icon-scale-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    <label class="home-card-title" for="index-icon-scale-range"><?php echo t_h('display.cards.index_icon_scale', [], 'Index icon scaling'); ?></label>
+                    <span class="settings-inline-range">
+                        <input type="range" id="index-icon-scale-range" class="settings-inline-control" data-control="index-icon-scale-range" min="0.5" max="2.0" step="0.1" value="1.0">
+                        <output class="settings-inline-value" for="index-icon-scale-range">1.0x</output>
+                    </span>
                 </div>
             </div>
 
@@ -842,95 +899,161 @@ if ($canUseUserWebhooks) {
 
         <!-- NOTE CONTENT CATEGORY -->
         <h2 class="settings-category-title" id="note-content"><?php echo t_h('settings.categories.note_content', [], 'Note content'); ?></h2>
-        <div class="home-grid" id="settings-note-content-section-grid">
+        <div class="home-grid settings-grouped" id="settings-note-content-section-grid">
 
             <!-- Show Folder Counts: moved to the "Element visibility" modal
                  (panel:folder-note-count). -->
 
-            <!-- Note Width -->
-            <div class="home-card desktop-only" id="note-width-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.note_width', [], 'Adjust the maximum width of the note content.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-move-horizontal"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.note_content_width', [], 'Note Content Width'); ?></span>
-                    <span id="note-width-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+            <div class="settings-group-title"><?php echo t_h('settings.groups.layout', [], 'Layout'); ?></div>
+            <div class="settings-group">
+
+                <!-- Note Width: a slider in the row, as a percentage of the note
+                     column; the far right end is full width -->
+                <div class="home-card settings-inline-card desktop-only" id="note-width-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.note_width', [], 'Adjust the maximum width of the note content.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon"><i class="lucide lucide-move-horizontal"></i></div>
+                    <div class="home-card-content">
+                        <label class="home-card-title" for="note-width-range"><?php echo t_h('display.cards.note_content_width', [], 'Note Content Width'); ?></label>
+                        <span class="settings-inline-range">
+                            <input type="range" id="note-width-range" class="settings-inline-control" data-control="note-width-range" min="10" max="100" step="5" value="100">
+                            <output class="settings-inline-value" for="note-width-range"><?php echo t_h('modals.note_width.full_width', [], 'Full Width'); ?></output>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Backlinks at Bottom -->
+                <div class="home-card" id="backlinks-at-bottom-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.backlinks_at_bottom', [], 'Show the backlinks section at the bottom of notes instead of the top.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon"><i class="lucide lucide-link"></i></div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('display.cards.backlinks_at_bottom', [], 'Backlinks at bottom'); ?></span>
+                        <span id="backlinks-at-bottom-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                    </div>
+                </div>
+
+                <!-- Default Image Border (No Padding) -->
+                <div class="home-card" id="default-image-border-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.default_image_border', [], 'Display images in notes with a border and no padding by default.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon"><i class="lucide lucide-image"></i></div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('display.cards.default_image_border_no_padding', [], 'Default image border (no padding)'); ?></span>
+                        <span id="default-image-border-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Backlinks at Bottom -->
-            <div class="home-card" id="backlinks-at-bottom-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.backlinks_at_bottom', [], 'Show the backlinks section at the bottom of notes instead of the top.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-link"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.backlinks_at_bottom', [], 'Backlinks at bottom'); ?></span>
-                    <span id="backlinks-at-bottom-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
-                </div>
-            </div>
+            <!-- Editing: how typing in a note behaves. The command menu shortcut
+                 and the task list insert order came from the former "Other"
+                 section. -->
+            <div class="settings-group-title"><?php echo t_h('settings.groups.editing', [], 'Editing'); ?></div>
+            <div class="settings-group">
 
-            <!-- Spellcheck in HTML notes -->
-            <div class="home-card" id="spellcheck-html-notes-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.spellcheck_html_notes', [], 'Enable the browser spell checker in HTML notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-list-check"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.spellcheck_html_notes', [], 'Spell check'); ?></span>
-                    <span id="spellcheck-html-notes-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                <!-- Spellcheck in HTML notes -->
+                <div class="home-card" id="spellcheck-html-notes-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.spellcheck_html_notes', [], 'Enable the browser spell checker in HTML notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon"><i class="lucide lucide-list-check"></i></div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('display.cards.spellcheck_html_notes', [], 'Spell check'); ?></span>
+                        <span id="spellcheck-html-notes-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Default Image Border (No Padding) -->
-            <div class="home-card" id="default-image-border-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.default_image_border', [], 'Display images in notes with a border and no padding by default.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-image"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.default_image_border_no_padding', [], 'Default image border (no padding)'); ?></span>
-                    <span id="default-image-border-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                <!-- Slash menu trigger: the key that opens the command menu, on a
+                     computer (slash_menu_trigger) and on a mobile screen up to
+                     800px wide (slash_menu_trigger_mobile), read by
+                     js/slash-command.js. Both rows show on every device so
+                     either can be set from the other. -->
+                <div class="home-card settings-inline-card settings-card-stacks" id="slash-menu-trigger-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.slash_menu_trigger', [], 'On a computer, choose whether the command menu opens by typing /, with Alt + /, or not from the keyboard at all. A right-click in a note opens it whatever this is set to.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon"><i class="lucide lucide-monitor"></i></div>
+                    <div class="home-card-content">
+                        <label class="home-card-title" for="slash-menu-trigger-select"><?php echo t_h('display.cards.slash_menu_trigger', [], 'Command menu shortcut (computer)'); ?></label>
+                        <select id="slash-menu-trigger-select" class="settings-inline-control settings-inline-select" data-control="slash-menu-trigger-select">
+                            <option value="slash"><?php echo t_h('display.badges.slash_menu_slash', [], '/'); ?></option>
+                            <option value="alt-slash"><?php echo t_h('display.badges.slash_menu_alt_slash', [], 'Alt + /'); ?></option>
+                            <option value="disabled"><?php echo t_h('common.disabled', [], 'Disabled'); ?></option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- The help icon is hidden on touch screens, so the mobile row
+                     says under its title that the + button of the mobile
+                     editor bar opens the same menu. -->
+                <div class="home-card settings-inline-card settings-card-stacks settings-card-with-note" id="slash-menu-trigger-mobile-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.slash_menu_trigger_mobile', [], 'On mobile, choose whether the command menu opens by typing /, with Alt + / from a hardware keyboard, or not from the keyboard at all.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon"><i class="lucide lucide-smartphone"></i></div>
+                    <div class="home-card-content">
+                        <label class="home-card-title" for="slash-menu-trigger-mobile-select"><?php echo t_h('display.cards.slash_menu_trigger_mobile', [], 'Command menu shortcut (mobile)'); ?></label>
+                        <select id="slash-menu-trigger-mobile-select" class="settings-inline-control settings-inline-select" data-control="slash-menu-trigger-mobile-select">
+                            <option value="slash"><?php echo t_h('display.badges.slash_menu_slash', [], '/'); ?></option>
+                            <option value="alt-slash"><?php echo t_h('display.badges.slash_menu_alt_slash', [], 'Alt + /'); ?></option>
+                            <option value="disabled"><?php echo t_h('common.disabled', [], 'Disabled'); ?></option>
+                        </select>
+                        <span class="settings-card-note"><?php echo t_h('settings.card_notes.slash_menu_trigger_mobile', [], 'On mobile, the toolbar above the keyboard has a + button that opens the same menu, whatever this is set to.'); ?></span>
+                    </div>
+                </div>
+
+                <!-- Tasklist Insert Order -->
+                <div class="home-card settings-inline-card" id="tasklist-insert-order-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.tasklist_insert_order', [], 'Choose whether new tasks are added to the top or the bottom of task lists.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon"><i class="lucide lucide-arrow-down"></i></div>
+                    <div class="home-card-content">
+                        <label class="home-card-title" for="tasklist-insert-order-select"><?php echo t_h('display.cards.tasklist_insert_order', [], 'Task list insert order'); ?></label>
+                        <select id="tasklist-insert-order-select" class="settings-inline-control settings-inline-select" data-control="tasklist-insert-order-select">
+                            <option value="top"><?php echo t_h('tasklist.insert_order_top', [], 'Top'); ?></option>
+                            <option value="bottom" selected><?php echo t_h('tasklist.insert_order_bottom', [], 'Bottom'); ?></option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
             <div class="settings-group-title"><?php echo t_h('settings.groups.attachments', [], 'Attachments'); ?></div>
+            <div class="settings-group">
 
-            <!-- Attachments at Bottom -->
-            <div class="home-card" id="attachments-at-bottom-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.attachments_at_bottom', [], 'Show the attachments section at the bottom of notes instead of the top.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-paperclip"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.attachments_at_bottom', [], 'Attachments at bottom'); ?></span>
-                    <span id="attachments-at-bottom-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                <!-- Attachments at Bottom -->
+                <div class="home-card" id="attachments-at-bottom-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.attachments_at_bottom', [], 'Show the attachments section at the bottom of notes instead of the top.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon"><i class="lucide lucide-paperclip"></i></div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('display.cards.attachments_at_bottom', [], 'Attachments at bottom'); ?></span>
+                        <span id="attachments-at-bottom-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Attachment Previews in Notes -->
-            <div class="home-card" id="attachment-previews-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.attachment_previews', [], 'Show previews of attachments inside notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-file-image"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.attachment_previews_in_note', [], 'Attachment previews'); ?></span>
-                    <span id="attachment-previews-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                <!-- Attachment Previews in Notes -->
+                <div class="home-card" id="attachment-previews-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.attachment_previews', [], 'Show previews of attachments inside notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon"><i class="lucide lucide-file-image"></i></div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('display.cards.attachment_previews_in_note', [], 'Attachment previews'); ?></span>
+                        <span id="attachment-previews-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                    </div>
                 </div>
             </div>
 
             <div class="settings-group-title"><?php echo t_h('settings.groups.code', [], 'Code'); ?></div>
+            <div class="settings-group">
 
-            <!-- Code Block Word Wrap -->
-            <div class="home-card" id="code-wrap-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.code_wrap', [], 'Wrap long lines in code blocks instead of scrolling horizontally.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-code"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.code_block_word_wrap', [], 'Code block word wrap'); ?></span>
-                    <span id="code-wrap-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
+                <!-- Code Block Word Wrap -->
+                <div class="home-card" id="code-wrap-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.code_wrap', [], 'Wrap long lines in code blocks instead of scrolling horizontally.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon"><i class="lucide lucide-code"></i></div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('display.cards.code_block_word_wrap', [], 'Code block word wrap'); ?></span>
+                        <span id="code-wrap-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
+                    </div>
+                </div>
+
+                <!-- Code Block Line Numbers -->
+                <div class="home-card" id="code-line-numbers-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.code_line_numbers', [], 'Show line numbers in code blocks in the markdown preview.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon"><i class="lucide lucide-list-ordered"></i></div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('display.cards.code_block_line_numbers', [], 'Code block line numbers'); ?></span>
+                        <span id="code-line-numbers-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                    </div>
                 </div>
             </div>
-
-            <!-- Code Block Line Numbers -->
-            <div class="home-card" id="code-line-numbers-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.code_line_numbers', [], 'Show line numbers in code blocks in the markdown preview.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-list-ordered"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.code_block_line_numbers', [], 'Code block line numbers'); ?></span>
-                    <span id="code-line-numbers-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
-                </div>
-            </div>
-
         </div>
 
         <!-- MARKDOWN CATEGORY -->
@@ -938,24 +1061,41 @@ if ($canUseUserWebhooks) {
         <div class="home-grid" id="settings-markdown-section-grid">
 
             <!-- Default View Mode (preview / edit / split / last used) -->
-            <div class="home-card" id="markdown-default-view-mode-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_default_view_mode', [], 'Choose whether markdown notes open in preview, edit or split mode.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+            <div class="home-card settings-inline-card" id="markdown-default-view-mode-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_default_view_mode', [], 'Choose whether markdown notes open in preview, edit or split mode.'); ?> <?php echo t_h('modals.markdown_default_view_mode.hint', [], 'A note you switch to another mode opens again in the default mode next time. New notes always open in split mode.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-book-open"></i></div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_default_view_mode', [], 'Default view mode'); ?></span>
-                    <span id="markdown-default-view-mode-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    <label class="home-card-title" for="markdown-default-view-mode-select"><?php echo t_h('display.cards.markdown_default_view_mode', [], 'Default view mode'); ?></label>
+                    <select id="markdown-default-view-mode-select" class="settings-inline-control settings-inline-select" data-control="markdown-default-view-mode-select">
+                        <option value="preview"><?php echo t_h('modals.markdown_default_view_mode.options.preview', [], 'Preview'); ?></option>
+                        <option value="edit"><?php echo t_h('modals.markdown_default_view_mode.options.edit', [], 'Edit'); ?></option>
+                        <option value="split"><?php echo t_h('modals.markdown_default_view_mode.options.split_short', [], 'Split'); ?></option>
+                        <option value="last"><?php echo t_h('modals.markdown_default_view_mode.options.last', [], 'Last used mode'); ?></option>
+                    </select>
                 </div>
             </div>
 
             <!-- Markdown Editor Font -->
-            <div class="home-card" id="markdown-font-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_font', [], 'Choose the font used in the markdown editor.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+            <div class="home-card settings-inline-card" id="markdown-font-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('modals.markdown_font.description', [], 'Font used while editing a markdown note. The rendered preview keeps the app font. Fonts use those installed on your device.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-file-code"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_font', [], 'Markdown editor font'); ?></span>
-                    <span id="markdown-font-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    <label class="home-card-title" for="markdown-font-select"><?php echo t_h('display.cards.markdown_font', [], 'Markdown editor font'); ?></label>
+                    <select id="markdown-font-select" class="settings-inline-control settings-inline-select" data-control="markdown-font-select">
+                        <option value="inherit" style="font-family: 'Inter', sans-serif;"><?php echo t_h('modals.markdown_font.options.inherit', [], 'App font (default)'); ?></option>
+                        <option value="monospace" style="font-family: monospace;"><?php echo t_h('modals.markdown_font.options.monospace', [], 'System monospace'); ?></option>
+                        <option value="courier" style="font-family: 'Courier New', Courier, monospace;">Courier New</option>
+                        <option value="consolas" style="font-family: Consolas, monospace;">Consolas</option>
+                        <option value="menlo" style="font-family: Menlo, monospace;">Menlo</option>
+                        <option value="monaco" style="font-family: Monaco, monospace;">Monaco</option>
+                        <option value="jetbrains" style="font-family: 'JetBrains Mono', monospace;">JetBrains Mono</option>
+                        <option value="cascadia" style="font-family: 'Cascadia Code', monospace;">Cascadia Code</option>
+                        <option value="fira" style="font-family: 'Fira Code', monospace;">Fira Code</option>
+                        <option value="sourcecodepro" style="font-family: 'Source Code Pro', monospace;">Source Code Pro</option>
+                        <option value="ubuntumono" style="font-family: 'Ubuntu Mono', monospace;">Ubuntu Mono</option>
+                    </select>
                 </div>
             </div>
 
@@ -986,12 +1126,15 @@ if ($canUseUserWebhooks) {
         <div class="home-grid" id="settings-diary-section-grid">
 
             <!-- Diary Entry Note Type -->
-            <div class="home-card" id="diary-note-type-card">
+            <div class="home-card settings-inline-card" id="diary-note-type-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.diary_note_type', [], 'Choose the note format used for new diary entries.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-book-open"></i></div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.diary_default_note_type', [], 'Diary entry format'); ?></span>
-                    <span id="diary-note-type-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    <label class="home-card-title" for="diary-note-type-select"><?php echo t_h('display.cards.diary_default_note_type', [], 'Diary entry format'); ?></label>
+                    <select id="diary-note-type-select" class="settings-inline-control settings-inline-select" data-control="diary-note-type-select">
+                        <option value="html"><?php echo t_h('modals.create.note.title', [], 'Note'); ?></option>
+                        <option value="markdown"><?php echo t_h('modals.create.markdown.title', [], 'Markdown Note'); ?></option>
+                    </select>
                 </div>
             </div>
 
@@ -1007,373 +1150,340 @@ if ($canUseUserWebhooks) {
 
         </div>
 
-        <!-- OTHER CATEGORY -->
-        <h2 class="settings-category-title" id="other"><?php echo t_h('settings.categories.other', [], 'Other'); ?></h2>
-        <div class="home-grid" id="settings-other-section-grid">
-
-            <!-- Snapshots -->
-            <div class="home-card" id="snapshots-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.snapshots', [], 'Choose how many automatic daily snapshots are kept per note.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-history"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.snapshots', [], 'Snapshots'); ?></span>
-                    <span id="snapshots-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                </div>
-            </div>
-
-            <!-- Tasklist Insert Order -->
-            <div class="home-card" id="tasklist-insert-order-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.tasklist_insert_order', [], 'Choose whether new tasks are added to the top or the bottom of task lists.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-arrow-down"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.tasklist_insert_order', [], 'Task list insert order'); ?></span>
-                    <span id="tasklist-insert-order-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                </div>
-            </div>
-
-            <!-- Slash menu trigger -->
-            <div class="home-card" id="slash-menu-trigger-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.slash_menu_trigger', [], 'Choose whether the command menu opens by typing /, with Alt + /, or not from the keyboard at all. A right-click in a note opens it whatever this is set to.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-keyboard"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.slash_menu_trigger', [], 'Command menu shortcut'); ?></span>
-                    <span id="slash-menu-trigger-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
-                </div>
-            </div>
-
-        </div>
-
         <?php if ($isAdmin): ?>
-        <!-- ADMIN TOOLS CATEGORY -->
+        <!-- ADMIN TOOLS CATEGORY: each group of cards is a panel of its own
+             under its title (.settings-grouped, css/settings.css), rather than
+             one panel ruled into parts. -->
         <h2 class="settings-category-title" id="admin-tools"><?php echo t_h('settings.categories.admin_tools', [], 'Admin Tools'); ?></h2>
-        <div class="home-grid" id="admin-tools-grid">
+        <div class="home-grid settings-grouped" id="admin-tools-grid">
 
             <div class="settings-group-title"><?php echo t_h('settings.groups.users_access', [], 'Users & access'); ?></div>
+            <div class="settings-group">
 
-            <!-- User Management (Admin only) -->
-            <div class="home-card settings-card-clickable" id="users-admin-card" data-href="admin/users.php">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.users_admin', [], 'Create, edit and manage user accounts.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-users-cog"></i>
+                <!-- User Management (Admin only) -->
+                <div class="home-card settings-card-clickable" id="users-admin-card" data-href="admin/users.php">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.users_admin', [], 'Create, edit and manage user accounts.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-users-cog"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.user_management', [], 'User Management'); ?></span>
+                        <span class="setting-status enabled"><?php echo $users_count; ?></span>
+                    </div>
                 </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.user_management', [], 'User Management'); ?></span>
-                    <span class="setting-status enabled"><?php echo $users_count; ?></span>
-                </div>
-            </div>
 
-            <!-- OIDC Configuration -->
-            <div class="home-card settings-card-clickable" id="oidc-config-card" data-href="admin/oidc.php">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.oidc_config', [], 'Configure single sign-on with an OpenID Connect provider.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-shield"></i>
+                <!-- OIDC Configuration -->
+                <div class="home-card settings-card-clickable" id="oidc-config-card" data-href="admin/oidc.php">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.oidc_config', [], 'Configure single sign-on with an OpenID Connect provider.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-shield"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.oidc_config', [], 'OIDC / SSO'); ?></span>
+                        <span class="setting-status <?php echo (defined('OIDC_ENABLED') && OIDC_ENABLED) ? 'enabled' : 'disabled'; ?>">
+                            <?php echo (defined('OIDC_ENABLED') && OIDC_ENABLED) ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
+                        </span>
+                    </div>
                 </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.oidc_config', [], 'OIDC / SSO'); ?></span>
-                    <span class="setting-status <?php echo (defined('OIDC_ENABLED') && OIDC_ENABLED) ? 'enabled' : 'disabled'; ?>">
-                        <?php echo (defined('OIDC_ENABLED') && OIDC_ENABLED) ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
-                    </span>
-                </div>
-            </div>
 
-            <!-- SaaS mode display elements (instance-wide configuration) -->
-            <div class="home-card settings-card-clickable" id="saas-card" data-href="saas_settings.php">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.saas', [], 'Display elements meant for instances offered as a hosted service (SaaS). All hidden by default.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-briefcase"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.saas', [], 'SaaS mode'); ?></span>
-                    <?php $saasNoticesEnabledCard = poznoteSaasNoticesEnabled(); ?>
-                    <span class="setting-status <?php echo $saasNoticesEnabledCard ? 'enabled' : 'disabled'; ?>">
-                        <?php echo $saasNoticesEnabledCard ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
-                    </span>
-                </div>
-            </div>
-
-            <!-- Tenant isolation (SaaS mode) -->
-            <div class="home-card" id="tenant-isolation-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.tenant_isolation', [], 'SaaS mode: choose which capabilities are blocked for non-admin users, such as discovering the other accounts of the instance or registering personal webhooks. Leave everything unchecked for a family or team instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-shield"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.tenant_isolation', [], 'Tenant isolation'); ?></span>
-                    <span id="tenant-isolation-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                </div>
-            </div>
-
-            <div class="settings-group-title"><?php echo t_h('settings.groups.integrations', [], 'Integrations'); ?></div>
-
-            <!-- SMTP Configuration -->
-            <div class="home-card settings-card-clickable" id="smtp-config-card" data-href="admin/smtp.php">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.smtp_config', [], 'Configure the SMTP server used to send emails such as reminders.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-mail"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.smtp_config', [], 'SMTP / Email'); ?></span>
-                    <span class="setting-status <?php echo ($smtp_enabled && $smtp_configured) ? 'enabled' : 'disabled'; ?>">
-                        <?php
-                        if ($smtp_enabled && $smtp_configured) {
-                            echo t_h('common.enabled', [], 'Enabled');
-                        } elseif ($smtp_configured) {
-                            echo t_h('common.disabled', [], 'Disabled');
-                        } else {
-                            echo t_h('smtp_admin.status.not_configured', [], 'Not configured');
-                        }
-                        ?>
-                    </span>
-                </div>
-            </div>
-
-            <!-- Outgoing Webhooks -->
-            <div class="home-card settings-card-clickable" id="webhooks-card" data-href="admin/webhooks.php">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.webhooks', [], 'Send instance events to external services via webhooks.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-webhook"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.webhooks', [], 'Admin Webhooks'); ?></span>
-                    <span class="setting-status <?php echo $active_webhooks_count > 0 ? 'enabled' : 'disabled'; ?>">
-                        <?php echo $active_webhooks_count > 0 ? $active_webhooks_count : t_h('webhooks_admin.status.none', [], 'None'); ?>
-                    </span>
-                </div>
-            </div>
-
-            <!-- AI Assistant (instance-wide configuration) -->
-            <div class="home-card settings-card-clickable" id="ai-assistant-card" data-href="ai_settings.php">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.ai_assistant', [], 'Configure the AI assistant used to chat with your notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-bot"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.ai_assistant', [], 'AI Assistant'); ?></span>
-                    <?php
-                    require_once __DIR__ . '/../ai_config.php';
-                    // Three states, like the SMTP card: a switched-on assistant
-                    // with no server or no model is not "disabled", it is
-                    // waiting for the rest of its configuration.
-                    $aiInstanceCard = poznoteAiInstanceConfig();
-                    $aiInstanceCompleteCard = $aiInstanceCard['url'] !== '' && $aiInstanceCard['model'] !== '';
-                    $aiChatEnabledCard = $aiInstanceCard['enabled'] && $aiInstanceCompleteCard;
-                    ?>
-                    <span class="setting-status <?php echo $aiChatEnabledCard ? 'enabled' : 'disabled'; ?>">
-                        <?php
-                        if ($aiChatEnabledCard) {
-                            echo t_h('common.enabled', [], 'Enabled');
-                        } elseif (!$aiInstanceCompleteCard) {
-                            echo t_h('git_sync.config.not_configured', [], 'Not configured');
-                        } else {
-                            echo t_h('common.disabled', [], 'Disabled');
-                        }
-                        ?>
-                    </span>
-                </div>
-            </div>
-
-            <!-- Transcription (instance-wide speech-to-text server) -->
-            <div class="home-card settings-card-clickable" id="stt-card" data-href="stt_settings.php">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.stt', [], 'Configure the speech-to-text server used to dictate notes and transcribe audio attachments.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-mic"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.stt', [], 'Transcription'); ?></span>
-                    <?php
-                    require_once __DIR__ . '/../stt_config.php';
-                    // Three states, like the AI Assistant card above: switched on
-                    // with no server or no model is not "disabled", it is waiting
-                    // for the rest of its configuration.
-                    $sttInstanceCard = poznoteSttInstanceConfig();
-                    $sttInstanceCompleteCard = $sttInstanceCard['url'] !== '' && $sttInstanceCard['model'] !== '';
-                    $sttEnabledCard = $sttInstanceCard['enabled'] && $sttInstanceCompleteCard;
-                    ?>
-                    <span class="setting-status <?php echo $sttEnabledCard ? 'enabled' : 'disabled'; ?>">
-                        <?php
-                        if ($sttEnabledCard) {
-                            echo t_h('common.enabled', [], 'Enabled');
-                        } elseif (!$sttInstanceCompleteCard) {
-                            echo t_h('git_sync.config.not_configured', [], 'Not configured');
-                        } else {
-                            echo t_h('common.disabled', [], 'Disabled');
-                        }
-                        ?>
-                    </span>
-                </div>
-            </div>
-
-            <!-- Git Sync Global Toggle -->
-            <div class="home-card" id="git-sync-enabled-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.git_sync_enabled', [], 'Enable or disable Git synchronization on this instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-git-branch"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.git_sync_toggle', [], 'Git Sync'); ?></span>
-                    <span id="git-sync-enabled-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                </div>
-            </div>
-
-            <div class="settings-group-title"><?php echo t_h('settings.groups.storage_limits', [], 'Storage & limits'); ?></div>
-
-            <!-- S3 Attachment Storage (instance-wide configuration) -->
-            <div class="home-card settings-card-clickable" id="s3-storage-card" data-href="s3_settings.php">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.s3_storage', [], 'Store note attachments in an S3-compatible object storage instead of the local disk.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-cloud"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.s3_storage', [], 'S3 Attachments'); ?></span>
-                    <?php
-                    require_once __DIR__ . '/../storage/AttachmentStorage.php';
-                    $s3StorageEnabledCard = AttachmentStorage::isEnabled();
-                    ?>
-                    <span class="setting-status <?php echo $s3StorageEnabledCard ? 'enabled' : 'disabled'; ?>">
-                        <?php echo $s3StorageEnabledCard ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
-                    </span>
-                </div>
-            </div>
-
-            <!-- S3 Backups (instance-wide configuration) -->
-            <div class="home-card settings-card-clickable" id="s3-backup-card" data-href="s3_backup_settings.php">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.s3_backup', [], 'Upload complete backup archives to an S3-compatible bucket, manually or on a schedule.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-archive"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.s3_backup', [], 'S3 Backups'); ?></span>
-                    <?php
-                    require_once __DIR__ . '/../S3BackupService.php';
-                    $s3BackupEnabledCard = S3BackupService::isEnabled();
-                    ?>
-                    <span class="setting-status <?php echo $s3BackupEnabledCard ? 'enabled' : 'disabled'; ?>">
-                        <?php echo $s3BackupEnabledCard ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
-                    </span>
-                </div>
-            </div>
-
-            <!-- Script and executable attachments (instance-wide) -->
-            <div class="home-card" id="executable-attachments-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.allow_executable_attachments', [], 'Allow scripts and executables (.sh, .ps1, .bat, .exe, .py, ...) to be attached to notes, for every account on this instance. Poznote never runs them, it only stores and serves them. File types a web server could execute, such as .php, stay blocked.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-file-code"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.allow_executable_attachments', [], 'Script and executable attachments'); ?></span>
-                    <span id="executable-attachments-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                </div>
-            </div>
-
-            <!-- Import Limits -->
-            <div class="home-card" id="import-limits-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.import_limits', [], 'Set the maximum number of files allowed per import.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-upload"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.import_limits', [], 'Import Limits'); ?></span>
-                    <div>
-                        <span id="import-limits-individual-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                        <span id="import-limits-zip-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                <!-- Tenant isolation (SaaS mode) -->
+                <div class="home-card" id="tenant-isolation-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.tenant_isolation', [], 'SaaS mode: choose which capabilities are blocked for non-admin users, such as discovering the other accounts of the instance or registering personal webhooks. Leave everything unchecked for a family or team instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-shield"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.tenant_isolation', [], 'Tenant isolation'); ?></span>
+                        <span id="tenant-isolation-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                     </div>
                 </div>
             </div>
 
-            <!-- Per-user quotas -->
-            <div class="home-card" id="user-quotas-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.user_quotas', [], 'Limit the number of notes and the storage available per user.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-gauge"></i>
+            <div class="settings-group-title"><?php echo t_h('settings.groups.integrations', [], 'Integrations'); ?></div>
+            <div class="settings-group">
+
+                <!-- SMTP Configuration -->
+                <div class="home-card settings-card-clickable" id="smtp-config-card" data-href="admin/smtp.php">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.smtp_config', [], 'Configure the SMTP server used to send emails such as reminders.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-mail"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.smtp_config', [], 'SMTP / Email'); ?></span>
+                        <span class="setting-status <?php echo ($smtp_enabled && $smtp_configured) ? 'enabled' : 'disabled'; ?>">
+                            <?php
+                            if ($smtp_enabled && $smtp_configured) {
+                                echo t_h('common.enabled', [], 'Enabled');
+                            } elseif ($smtp_configured) {
+                                echo t_h('common.disabled', [], 'Disabled');
+                            } else {
+                                echo t_h('smtp_admin.status.not_configured', [], 'Not configured');
+                            }
+                            ?>
+                        </span>
+                    </div>
                 </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.user_quotas', [], 'User quotas'); ?></span>
-                    <div>
+
+                <!-- Outgoing Webhooks -->
+                <div class="home-card settings-card-clickable" id="webhooks-card" data-href="admin/webhooks.php">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.webhooks', [], 'Send instance events to external services via webhooks.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-webhook"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.webhooks', [], 'Admin Webhooks'); ?></span>
+                        <span class="setting-status <?php echo $active_webhooks_count > 0 ? 'enabled' : 'disabled'; ?>">
+                            <?php echo $active_webhooks_count > 0 ? $active_webhooks_count : t_h('webhooks_admin.status.none', [], 'None'); ?>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- AI Assistant (instance-wide configuration) -->
+                <div class="home-card settings-card-clickable" id="ai-assistant-card" data-href="ai_settings.php">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.ai_assistant', [], 'Configure the AI assistant used to chat with your notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-bot"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.ai_assistant', [], 'AI Assistant'); ?></span>
                         <?php
-                        // The badge lists one value per quota the instance
-                        // actually has; the data-* flags tell the script which
-                        // optional pools are in play.
-                        require_once __DIR__ . '/../storage/AttachmentStorage.php';
+                        require_once __DIR__ . '/../ai_config.php';
+                        // Three states, like the SMTP card: a switched-on assistant
+                        // with no server or no model is not "disabled", it is
+                        // waiting for the rest of its configuration.
+                        $aiInstanceCard = poznoteAiInstanceConfig();
+                        $aiInstanceCompleteCard = $aiInstanceCard['url'] !== '' && $aiInstanceCard['model'] !== '';
+                        $aiChatEnabledCard = $aiInstanceCard['enabled'] && $aiInstanceCompleteCard;
                         ?>
-                        <span id="user-quotas-badge" class="setting-status"
-                            <?php echo AttachmentStorage::isEnabled() ? 'data-s3-attachments="1"' : ''; ?>
-                            <?php echo poznoteS3BackupConfigured() ? 'data-s3-backups="1"' : ''; ?>><?php echo t_h('common.loading'); ?></span>
+                        <span class="setting-status <?php echo $aiChatEnabledCard ? 'enabled' : 'disabled'; ?>">
+                            <?php
+                            if ($aiChatEnabledCard) {
+                                echo t_h('common.enabled', [], 'Enabled');
+                            } elseif (!$aiInstanceCompleteCard) {
+                                echo t_h('git_sync.config.not_configured', [], 'Not configured');
+                            } else {
+                                echo t_h('common.disabled', [], 'Disabled');
+                            }
+                            ?>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Transcription (instance-wide speech-to-text server) -->
+                <div class="home-card settings-card-clickable" id="stt-card" data-href="stt_settings.php">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.stt', [], 'Configure the speech-to-text server used to dictate notes and transcribe audio attachments.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-mic"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.stt', [], 'Transcription'); ?></span>
+                        <?php
+                        require_once __DIR__ . '/../stt_config.php';
+                        // Three states, like the AI Assistant card above: switched on
+                        // with no server or no model is not "disabled", it is waiting
+                        // for the rest of its configuration.
+                        $sttInstanceCard = poznoteSttInstanceConfig();
+                        $sttInstanceCompleteCard = $sttInstanceCard['url'] !== '' && $sttInstanceCard['model'] !== '';
+                        $sttEnabledCard = $sttInstanceCard['enabled'] && $sttInstanceCompleteCard;
+                        ?>
+                        <span class="setting-status <?php echo $sttEnabledCard ? 'enabled' : 'disabled'; ?>">
+                            <?php
+                            if ($sttEnabledCard) {
+                                echo t_h('common.enabled', [], 'Enabled');
+                            } elseif (!$sttInstanceCompleteCard) {
+                                echo t_h('git_sync.config.not_configured', [], 'Not configured');
+                            } else {
+                                echo t_h('common.disabled', [], 'Disabled');
+                            }
+                            ?>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Git Sync Global Toggle -->
+                <div class="home-card" id="git-sync-enabled-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.git_sync_enabled', [], 'Enable or disable Git synchronization on this instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-git-branch"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.git_sync_toggle', [], 'Git Sync'); ?></span>
+                        <span id="git-sync-enabled-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-group-title"><?php echo t_h('settings.groups.storage_limits', [], 'Storage & limits'); ?></div>
+            <div class="settings-group">
+
+                <!-- S3 Attachment Storage (instance-wide configuration) -->
+                <div class="home-card settings-card-clickable" id="s3-storage-card" data-href="s3_settings.php">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.s3_storage', [], 'Store note attachments in an S3-compatible object storage instead of the local disk.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-cloud"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.s3_storage', [], 'S3 Attachments'); ?></span>
+                        <?php
+                        require_once __DIR__ . '/../storage/AttachmentStorage.php';
+                        $s3StorageEnabledCard = AttachmentStorage::isEnabled();
+                        ?>
+                        <span class="setting-status <?php echo $s3StorageEnabledCard ? 'enabled' : 'disabled'; ?>">
+                            <?php echo $s3StorageEnabledCard ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- S3 Backups (instance-wide configuration) -->
+                <div class="home-card settings-card-clickable" id="s3-backup-card" data-href="s3_backup_settings.php">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.s3_backup', [], 'Upload complete backup archives to an S3-compatible bucket, manually or on a schedule.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-archive"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.s3_backup', [], 'S3 Backups'); ?></span>
+                        <?php
+                        require_once __DIR__ . '/../S3BackupService.php';
+                        $s3BackupEnabledCard = S3BackupService::isEnabled();
+                        ?>
+                        <span class="setting-status <?php echo $s3BackupEnabledCard ? 'enabled' : 'disabled'; ?>">
+                            <?php echo $s3BackupEnabledCard ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Script and executable attachments (instance-wide) -->
+                <div class="home-card" id="executable-attachments-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.allow_executable_attachments', [], 'Allow scripts and executables (.sh, .ps1, .bat, .exe, .py, ...) to be attached to notes, for every account on this instance. Poznote never runs them, it only stores and serves them. File types a web server could execute, such as .php, stay blocked.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-file-code"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.allow_executable_attachments', [], 'Script and executable attachments'); ?></span>
+                        <span id="executable-attachments-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    </div>
+                </div>
+
+                <!-- Import Limits -->
+                <div class="home-card" id="import-limits-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.import_limits', [], 'Set the maximum number of files allowed per import.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-upload"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.import_limits', [], 'Import Limits'); ?></span>
+                        <div>
+                            <span id="import-limits-individual-badge" class="setting-status" data-tooltip="<?php echo t_h('modals.import_limits.max_individual_files', [], 'Max individual files'); ?>"><?php echo t_h('common.loading'); ?></span>
+                            <span id="import-limits-zip-badge" class="setting-status" data-tooltip="<?php echo t_h('modals.import_limits.max_zip_files', [], 'Max files in ZIP'); ?>"><?php echo t_h('common.loading'); ?></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Per-user quotas -->
+                <div class="home-card" id="user-quotas-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.user_quotas', [], 'Limit the number of notes and the storage available per user.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-gauge"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.user_quotas', [], 'User quotas'); ?></span>
+                        <div>
+                            <?php
+                            // The badge lists one value per quota the instance
+                            // actually has; the data-* flags tell the script which
+                            // optional pools are in play.
+                            require_once __DIR__ . '/../storage/AttachmentStorage.php';
+                            ?>
+                            <?php // data-label-* name each value in the hover text, the
+                                  // labels of the quotas dialog. ?>
+                            <span id="user-quotas-badge" class="setting-status"
+                                data-label-notes="<?php echo t_h('modals.user_quotas.max_notes', [], 'Max notes per user'); ?>"
+                                data-label-storage="<?php echo t_h('modals.user_quotas.max_storage', [], 'Max local storage per user (MB)'); ?>"
+                                data-label-storage-s3="<?php echo t_h('modals.user_quotas.max_storage_s3', [], 'Max S3 attachments storage per user (MB)'); ?>"
+                                data-label-backups-s3="<?php echo t_h('modals.user_quotas.max_backups_s3', [], 'Max S3 backups storage per user (MB)'); ?>"
+                                <?php echo AttachmentStorage::isEnabled() ? 'data-s3-attachments="1"' : ''; ?>
+                                <?php echo poznoteS3BackupConfigured() ? 'data-s3-backups="1"' : ''; ?>><?php echo t_h('common.loading'); ?></span>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="settings-group-title"><?php echo t_h('settings.groups.appearance', [], 'Appearance'); ?></div>
+            <div class="settings-group">
 
-            <!-- Custom CSS Path -->
-            <div class="home-card" id="custom-css-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.custom_css', [], 'Apply your own CSS to customize the appearance of Poznote.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-palette"></i>
+                <!-- Custom CSS Path -->
+                <div class="home-card" id="custom-css-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.custom_css', [], 'Apply your own CSS to customize the appearance of Poznote.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-palette"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.custom_css', [], 'Custom CSS path'); ?></span>
+                        <span id="custom-css-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    </div>
                 </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.custom_css', [], 'Custom CSS path'); ?></span>
-                    <span id="custom-css-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                </div>
-            </div>
 
-            <!-- Theme list: what the rail's theme button walks through -->
-            <div class="home-card" id="theme-list-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.theme_list', [], 'Choose which themes the theme button offers, and in which order.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-sun-moon"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.theme_list', [], 'Theme list'); ?></span>
-                    <span id="theme-list-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                <!-- Theme list: what the rail's theme button walks through -->
+                <div class="home-card" id="theme-list-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.theme_list', [], 'Choose which themes the theme button offers, and in which order.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-sun-moon"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.theme_list', [], 'Theme list'); ?></span>
+                        <span id="theme-list-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    </div>
                 </div>
             </div>
 
             <div class="settings-group-title"><?php echo t_h('settings.groups.maintenance', [], 'Maintenance'); ?></div>
+            <div class="settings-group">
 
-            <!-- Disaster Recovery -->
-            <div class="home-card settings-card-clickable" id="disaster-recovery-card" data-href="admin/disaster-recovery.php">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.disaster_recovery', [], 'Restore the instance from a backup in case of data loss.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-database"></i>
+                <!-- Disaster Recovery: one button, so a dialog (#disasterRecoveryModal)
+                     rather than a page of its own -->
+                <div class="home-card" id="disaster-recovery-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.disaster_recovery', [], 'Restore the instance from a backup in case of data loss.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-database"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('multiuser.admin.maintenance.title', [], 'Disaster Recovery'); ?></span>
+                    </div>
                 </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('multiuser.admin.maintenance.title', [], 'Disaster Recovery'); ?></span>
+
+                <!-- Orphan Scanner: scan and clean up from a dialog (#orphanScannerModal) -->
+                <div class="home-card" id="orphan-scanner-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.orphan_scanner', [], 'Find and clean up attachment files that no longer belong to any note.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-scan"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.orphan_scanner', [], 'Orphan attachments scanner'); ?></span>
+                    </div>
+                </div>
+
+                <!-- Activity Log -->
+                <div class="home-card settings-card-clickable" id="activity-log-card" data-href="admin/activity-log.php">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.activity_log', [], 'Review sensitive operations: account deletions, backups, restores, trash emptying and workspace deletions.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-clipboard-list"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.activity_log', [], 'Activity log'); ?></span>
+                    </div>
+                </div>
+
+                <!-- Storage Statistics -->
+                <div class="home-card settings-card-clickable" id="storage-stats-card" data-href="admin/storage-stats.php">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.storage_stats', [], 'See storage usage across all users of this instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-pie-chart"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.storage_stats', [], 'Admin storage statistics'); ?></span>
+                    </div>
                 </div>
             </div>
-
-            <!-- Orphan Scanner -->
-            <div class="home-card settings-card-clickable" id="orphan-scanner-card" data-href="admin/orphan-scanner.php">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.orphan_scanner', [], 'Find and clean up attachment files that no longer belong to any note.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-scan"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.orphan_scanner', [], 'Orphan attachments scanner'); ?></span>
-                </div>
-            </div>
-
-            <!-- Activity Log -->
-            <div class="home-card settings-card-clickable" id="activity-log-card" data-href="admin/activity-log.php">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.activity_log', [], 'Review sensitive operations: account deletions, backups, restores, trash emptying and workspace deletions.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-clipboard-list"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.activity_log', [], 'Activity log'); ?></span>
-                </div>
-            </div>
-
-            <!-- Storage Statistics -->
-            <div class="home-card settings-card-clickable" id="storage-stats-card" data-href="admin/storage-stats.php">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.storage_stats', [], 'See storage usage across all users of this instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-pie-chart"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.storage_stats', [], 'Admin storage statistics'); ?></span>
-                </div>
-            </div>
-
         </div>
         <?php endif; ?>
 
@@ -1562,6 +1672,50 @@ if ($canUseUserWebhooks) {
             </div>
         </div>
     </div>
+
+    <!-- Rebuild the master database (Disaster Recovery card): one button, so a
+         dialog instead of a page of its own. POST /api/v1/admin/repair; the
+         outcome replaces the description (initMaintenanceModals() in
+         js/settings-page.js). -->
+    <div id="disasterRecoveryModal" class="modal">
+        <div class="modal-content">
+            <h3><?php echo t_h('multiuser.admin.maintenance.title', [], 'Rebuild Master Database'); ?></h3>
+            <p><?php echo t_h('multiuser.admin.maintenance.description', [], 'The main database (master.db) stores user information, their public links, and Poznote\'s global settings. If this file is lost or corrupted, or if some public links stop working after a restore, this tool scans your \'data/users\' folders to automatically re-register accounts, recover their real names from their personal databases, and restore all public sharing links.'); ?></p>
+            <p id="disasterRecoveryResult" class="maintenance-result" hidden></p>
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" data-action="close-modal" data-modal="disasterRecoveryModal"><?php echo t_h('common.close', [], 'Close'); ?></button>
+                <button type="button" class="btn-primary" id="disasterRecoveryRunBtn"><?php echo t_h('multiuser.admin.maintenance.repair_registry', [], 'Rebuild'); ?></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orphan attachments scanner: scan, then delete what was found, from a
+         dialog. GET / DELETE /api/v1/admin/orphan-attachments. -->
+    <div id="orphanScannerModal" class="modal">
+        <div class="modal-content">
+            <h3><?php echo t_h('admin_tools.orphan_scanner.title', [], 'Orphan attachments scanner'); ?></h3>
+            <p><?php echo t_h('admin_tools.orphan_scanner.description', [], 'This tool scans your attachment folders and identifies files that are no longer referenced in any of your notes.'); ?></p>
+            <div id="orphanScannerResults" class="orphan-scanner-results" hidden>
+                <table class="orphan-scanner-table">
+                    <thead>
+                        <tr>
+                            <th><?php echo t_h('admin_tools.orphan_scanner.table_user_id_short', [], 'User'); ?></th>
+                            <th><?php echo t_h('admin_tools.orphan_scanner.table_total_files', [], 'Total Files'); ?></th>
+                            <th><?php echo t_h('admin_tools.orphan_scanner.table_orphans_found_short', [], 'Orphans'); ?></th>
+                            <th><?php echo t_h('admin_tools.orphan_scanner.table_details', [], 'Files'); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <p id="orphanScannerStatus" class="maintenance-result" hidden></p>
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" data-action="close-modal" data-modal="orphanScannerModal"><?php echo t_h('common.close', [], 'Close'); ?></button>
+                <button type="button" class="btn-danger" id="orphanScannerDeleteBtn" hidden><?php echo t_h('admin_tools.orphan_scanner.delete_button', [], 'Delete orphans'); ?></button>
+                <button type="button" class="btn-primary" id="orphanScannerScanBtn"><?php echo t_h('admin_tools.orphan_scanner.scan_button', [], 'Scan for orphans'); ?></button>
+            </div>
+        </div>
+    </div>
     <?php endif; ?>
 
     <?php
@@ -1578,7 +1732,7 @@ if ($canUseUserWebhooks) {
         echo json_encode($settingsPageConfig, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
     ?></script>
     <script src="<?php echo poznoteAsset('js/modal-alerts.js'); ?>"></script>
-    <script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
     <script src="<?php echo poznoteAsset('js/ui.js'); ?>"></script>
@@ -1593,8 +1747,6 @@ if ($canUseUserWebhooks) {
     <script src="<?php echo poznoteAsset('js/utils-note-rename.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/utils-kanban.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/font-size-settings.js'); ?>"></script>
-    <script src="js/index-icon-scale-settings.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/index-icon-scale-settings.js') ?: time(); ?>"></script>
-    <script src="<?php echo poznoteAsset('js/note-width-settings.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/background-settings.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/copy-code-on-focus.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/modals-events.js'); ?>"></script>
@@ -1606,8 +1758,9 @@ if ($canUseUserWebhooks) {
     window.NOTE_COLOR_LOCALIZED_NAMES = <?php echo json_encode(getLocalizedNoteColorNames(), JSON_UNESCAPED_UNICODE); ?>;
     window.NOTE_COLOR_KNOWN_NAMES = <?php echo json_encode(getKnownNoteColorNames(), JSON_UNESCAPED_UNICODE); ?>;
     </script>
+    <script src="<?php echo poznoteAsset('js/offline-store.js'); ?>"></script>
     <script src="js/settings-page.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/settings-page.js') ?: time(); ?>"></script>
-    <script src="js/ui-customization.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="<?php echo poznoteAsset('js/ui-customization.js'); ?>"></script>
     <!-- Contextual UI Customization panel (see ui_customization_panel.php);
          js/panel-back.js lets the device Back button close it on a phone. -->
     <script src="<?php echo poznoteAsset('js/panel-back.js'); ?>"></script>

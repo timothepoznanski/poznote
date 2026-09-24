@@ -971,7 +971,11 @@
         }
 
         var rightCol = document.getElementById('right_col');
-        if (rightCol) {
+        if (typeof window.poznoteClearNotePane === 'function') {
+            // A page whose column holds more than the note (offline.php and
+            // its placeholders) empties it itself
+            window.poznoteClearNotePane();
+        } else if (rightCol) {
             if (typeof window.destroyMarkdownCodeMirrorEditorsWithin === 'function') {
                 window.destroyMarkdownCodeMirrorEditorsWithin(rightCol);
             }
@@ -1474,6 +1478,28 @@
         }
 
         return true;
+    }
+
+    /**
+     * A note that got another id (a note written offline, created on the
+     * server when the connection came back, js/offline-app.js): its tabs
+     * follow it.
+     */
+    function renameNote(oldNoteId, newNoteId) {
+        oldNoteId = String(oldNoteId);
+        newNoteId = String(newNoteId);
+        var changed = false;
+        tabs.forEach(function (tab) {
+            if (_isNoteTab(tab) && tab.noteId === oldNoteId) {
+                tab.noteId = newNoteId;
+                changed = true;
+            }
+        });
+        if (changed) {
+            _saveToStorage();
+            render();
+        }
+        return changed;
     }
 
     function closeActiveTab(force) {
@@ -2008,6 +2034,7 @@
         closeTab: closeTab,
         closeActiveTab: closeActiveTab,
         closeTabByNoteId: closeTabByNoteId,
+        renameNote: renameNote,
         pinTab: pinTab,
         unpinTab: unpinTab,
         closeAllTabs: closeAllTabs,

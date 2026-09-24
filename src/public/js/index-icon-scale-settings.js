@@ -1,94 +1,13 @@
 /**
- * Index icon scale settings module
+ * Index icon scale: sizes the icons of the notes page from the per-user
+ * 'index_icon_scale' value, which the slider of the settings page writes
+ * (Display > Index icon scaling, js/settings-page.js).
  */
 
 // Per-user storage (defined in theme-init.js); falls back to the shared
 // localStorage keys on pages loaded without theme-init.js.
 const indexIconScaleStore = window.__poznoteUserStorage || window.localStorage;
 
-
-// Function to show index icon scale settings prompt
-function showIndexIconScalePrompt() {
-    // Close settings menus
-    if (typeof closeSettingsMenus === 'function') {
-        closeSettingsMenus();
-    }
-
-    // Get modal elements
-    const modal = document.getElementById('indexIconScaleModal');
-    const scaleInput = document.getElementById('indexIconScaleInput');
-    const scaleValueDisplay = document.getElementById('indexIconScaleValue');
-    const cancelBtn = document.getElementById('cancelIndexIconScaleBtn');
-    const saveBtn = document.getElementById('saveIndexIconScaleBtn');
-
-    if (!modal || !scaleInput || !scaleValueDisplay) {
-        return;
-    }
-
-    // Add event listeners if they don't exist yet
-    if (!modal.hasAttribute('data-initialized')) {
-        cancelBtn?.addEventListener('click', closeIndexIconScaleModal);
-        saveBtn?.addEventListener('click', saveIndexIconScale);
-        scaleInput?.addEventListener('input', function() {
-            scaleValueDisplay.textContent = parseFloat(this.value).toFixed(1) + 'x';
-        });
-
-        // Mark as initialized
-        modal.setAttribute('data-initialized', 'true');
-    }
-
-    // Load current setting
-    loadCurrentIndexIconScale();
-
-    // Show modal
-    modal.style.display = 'block';
-}
-
-// Function to close modal
-function closeIndexIconScaleModal() {
-    const modal = document.getElementById('indexIconScaleModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-}
-
-// Function to load current setting
-function loadCurrentIndexIconScale() {
-    const scaleInput = document.getElementById('indexIconScaleInput');
-    const scaleValueDisplay = document.getElementById('indexIconScaleValue');
-
-    const scale = indexIconScaleStore.getItem('index_icon_scale') || '1.0';
-    if (scaleInput) {
-        scaleInput.value = scale;
-    }
-    if (scaleValueDisplay) {
-        scaleValueDisplay.textContent = parseFloat(scale).toFixed(1) + 'x';
-    }
-}
-
-// Function to save setting
-function saveIndexIconScale() {
-    const scaleInput = document.getElementById('indexIconScaleInput');
-    if (!scaleInput) return;
-
-    // Normalize to one decimal place so '1' becomes '1.0', etc.
-    const scale = parseFloat(scaleInput.value).toFixed(1);
-
-    // Save to localStorage for immediate effect
-    indexIconScaleStore.setItem('index_icon_scale', scale);
-
-    updateIndexIconScaleBadge(scale);
-    closeIndexIconScaleModal();
-    applyIndexIconScale(scale);
-}
-
-// Function to update the badge in settings page
-function updateIndexIconScaleBadge(scale) {
-    const badge = document.getElementById('index-icon-scale-badge');
-    if (badge) {
-        badge.textContent = parseFloat(scale).toFixed(1) + 'x';
-    }
-}
 
 // Function to apply the scale (index.php only)
 function applyIndexIconScale(scale) {

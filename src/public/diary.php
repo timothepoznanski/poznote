@@ -335,7 +335,7 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
 	</script>
 	<script src="js/pwa-helpers.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="<?php echo poznoteAsset('js/navigation.js'); ?>"></script>
-	<script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
+	<script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 	<script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="<?php echo poznoteAsset('js/diary-page.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/board-view-menu.js'); ?>"></script>

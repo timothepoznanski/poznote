@@ -695,7 +695,11 @@ function isWorkspaceSharedWithUser(int $ownerUserId, string $workspaceName, int 
 }
 
 /**
- * Follow a workspace rename on its shares.
+ * Follow a workspace rename on its shares. The new name belonged to no
+ * workspace (both callers refuse a rename onto an existing one), so a share
+ * still filed under it is left over from a workspace gone without its shares
+ * and is dropped first: kept, it would grant the renamed workspace to an
+ * account it was never shared with.
  */
 function renameWorkspaceShares(int $ownerUserId, string $oldName, string $newName): void {
     $oldName = trim($oldName);
@@ -703,13 +707,61 @@ function renameWorkspaceShares(int $ownerUserId, string $oldName, string $newNam
     if ($ownerUserId <= 0 || $oldName === '' || $newName === '' || $oldName === $newName) {
         return;
     }
+    $con = null;
     try {
         $con = getMasterConnection();
-        $stmt = $con->prepare("UPDATE OR REPLACE workspace_shares SET workspace_name = ? WHERE owner_user_id = ? AND workspace_name = ?");
+        $con->beginTransaction();
+        $stmt = $con->prepare("DELETE FROM workspace_shares WHERE owner_user_id = ? AND workspace_name = ?");
+        $stmt->execute([$ownerUserId, $newName]);
+        $stmt = $con->prepare("UPDATE workspace_shares SET workspace_name = ? WHERE owner_user_id = ? AND workspace_name = ?");
         $stmt->execute([$newName, $ownerUserId, $oldName]);
+        $con->commit();
     } catch (Exception $e) {
+        if ($con instanceof PDO && $con->inTransaction()) {
+            $con->rollBack();
+        }
         error_log("Failed to rename workspace shares: " . $e->getMessage());
     }
+}
+
+/**
+ * A workspace that has just been created starts unshared. Shares are filed
+ * by name, so one left under that name by a workspace that went away without
+ * its shares (a backup restore, an API delete before 2026-09-24) would
+ * otherwise hand the new workspace to those accounts unasked. Every path that
+ * creates a workspace calls this.
+ */
+function forgetStaleWorkspaceShares(int $ownerUserId, string $workspaceName): int {
+    return deleteWorkspaceShares($ownerUserId, $workspaceName);
+}
+
+/**
+ * Drop the shares of an owner's workspaces that are not among $existingNames,
+ * the workspaces its database holds now (after a backup restore replaced it).
+ * Returns the number of shares removed.
+ */
+function pruneWorkspaceSharesToExisting(int $ownerUserId, array $existingNames): int {
+    if ($ownerUserId <= 0) {
+        return 0;
+    }
+    $keep = [];
+    foreach ($existingNames as $name) {
+        $keep[(string)$name] = true;
+    }
+    $removed = 0;
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("SELECT DISTINCT workspace_name FROM workspace_shares WHERE owner_user_id = ?");
+        $stmt->execute([$ownerUserId]);
+        foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $sharedName) {
+            if (!isset($keep[(string)$sharedName])) {
+                $removed += deleteWorkspaceShares($ownerUserId, (string)$sharedName);
+            }
+        }
+    } catch (Exception $e) {
+        error_log("Failed to prune workspace shares: " . $e->getMessage());
+    }
+    return $removed;
 }
 
 /**

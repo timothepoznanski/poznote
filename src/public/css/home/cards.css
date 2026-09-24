@@ -173,7 +173,11 @@ html[data-theme='dark'] #support-card .home-card-icon {
     opacity: 1;
 }
 
-.setting-help::after {
+/* The same tooltip names what a summarised value stands for: the badges of
+   a card holding several values (Font size, Import limits, User quotas) on
+   settings.php (discussion #1378). */
+.setting-help::after,
+.setting-status[data-tooltip]::after {
     content: attr(data-tooltip);
     position: absolute;
     top: calc(100% + 6px);
@@ -199,7 +203,8 @@ html[data-theme='dark'] #support-card .home-card-icon {
     z-index: 50;
 }
 
-.setting-help:hover::after {
+.setting-help:hover::after,
+.setting-status[data-tooltip]:hover::after {
     opacity: 1;
     visibility: visible;
 }

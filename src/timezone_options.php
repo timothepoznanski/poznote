@@ -2,11 +2,11 @@
 /**
  * The <option> list of the timezone selector.
  *
- * Two places render the same list: the timezone modal of the app
- * (src/modals.php) and the first-run startup guide (src/public/welcome.php).
- * The guide used to copy the modal's innerHTML at runtime, which only worked
- * while both lived on index.php; the guide is a page of its own now, so the
- * list is a partial instead of a duplicate.
+ * Two places render the same list: the Timezone row of the settings page
+ * (src/public/settings.php) and the first-run startup guide
+ * (src/public/welcome.php). The guide used to copy the list's innerHTML at
+ * runtime, which only worked while both lived on index.php; the guide is a
+ * page of its own now, so the list is a partial instead of a duplicate.
  *
  * The group labels carry data-i18n-label so a page that switches language
  * without reloading (the guide does) can retranslate them.

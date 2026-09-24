@@ -15,6 +15,7 @@ requireAdmin();
 
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../functions.php';
+require_once __DIR__ . '/../settings_shell.php';
 require_once __DIR__ . '/../version_helper.php';
 requireSettingsPassword();
 require_once __DIR__ . '/../db_connect.php';
@@ -170,9 +171,8 @@ $s3Enabled = $s3Config['enabled'] === '1';
 </head>
 <body class="home-page git-sync-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php $iconSidebarWorkspace = $pageWorkspace; include __DIR__ . '/../icon_sidebar.php'; ?>
+    <?php poznoteSettingsShellOpen(['section' => 'admin-tools-grid', 'title' => t('settings.cards.s3_storage', [], 'S3 Attachments')]); ?>
     <div class="home-container git-sync-container">
-    <?php include __DIR__ . '/../back_to_settings.php'; ?>
-    <h1 class="poznote-page-title"><i class="lucide lucide-cloud"></i> <?php echo t_h('settings.cards.s3_storage', [], 'S3 Attachments'); ?></h1>
 
 
 
@@ -182,13 +182,6 @@ $s3Enabled = $s3Config['enabled'] === '1';
                 <?php echo t_h('s3_settings.description_scope', [], 'The setting applies to all users of this instance.'); ?><br>
                 <?php echo t_h('s3_settings.attachments_only_note', [], 'Only the attachment files are concerned.'); ?><br>
                 <?php echo t_h('s3_settings.git_sync_note', [], 'Git sync ignores attachments while S3 storage is enabled.'); ?></p>
-            <?php if (poznoteSaasNoticesEnabled()): ?>
-            <div class="attachment-usage-notice">
-                <i class="lucide lucide-alert-triangle"></i>
-                <span><?php echo t_h('attachments.page.note_taking_notice', [], 'You can store media, but large files fill up your space quickly.'); ?>
-                    <a href="storage-stats-user.php"><?php echo t_h('attachments.page.note_taking_notice_link', [], 'View my storage'); ?></a></span>
-            </div>
-            <?php endif; ?>
         </div>
 
         <?php if ($message): ?>
@@ -327,6 +320,7 @@ $s3Enabled = $s3Config['enabled'] === '1';
         </div>
 
     </div>
+    <?php poznoteSettingsShellClose(); ?>
 
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
@@ -471,6 +465,6 @@ $s3Enabled = $s3Config['enabled'] === '1';
         });
     });
     </script>
-    <script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 </body>
 </html>

@@ -201,7 +201,8 @@ $currentWorkspaceSynced = ($workspace_filter === '' || $workspace_filter === '__
 // blank=1 says the note pane is empty on purpose: every tab was closed, so
 // the pane must stay empty instead of bringing the last edited note back
 // with no tab to close it (issue #1462). js/tabs.js puts the flag in the URL
-// when it empties the pane and on the rail's Home link while nothing is open.
+// when it empties the pane, and on the rail's Home link while nothing is open
+// (js/icon-sidebar-toggle.js does it on the other pages, issue #1488).
 $kanban_restore_id = intval($_GET['kanban'] ?? 0);
 $blank_note_pane = ($_GET['blank'] ?? '') === '1';
 if (($kanban_restore_id > 0 || $blank_note_pane) && empty($note)) {
@@ -642,7 +643,7 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
     
     // Secure prepared queries
     // A shortcut without its own icon inherits the icon of the note it links to.
-    $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, created, updated, type, linked_note_id, reminder_at, display_order, "
+    $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, offline, created, updated, type, linked_note_id, reminder_at, display_order, "
         . "COALESCE(NULLIF(icon, ''), (SELECT o.icon FROM entries o WHERE o.id = entries.linked_note_id)) AS icon, "
         . "CASE WHEN NULLIF(icon, '') IS NULL THEN (SELECT o.icon_color FROM entries o WHERE o.id = entries.linked_note_id) ELSE icon_color END AS icon_color "
         . "FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
@@ -763,6 +764,7 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
             'settings' => [
                 'emoji_icons_enabled' => getSetting('emoji_icons_enabled', '1'),
                 'slash_menu_trigger' => getSetting('slash_menu_trigger', 'slash'),
+                'slash_menu_trigger_mobile' => getSetting('slash_menu_trigger_mobile', 'slash'),
                 $currentWorkspaceOpacityKey => getSetting($currentWorkspaceOpacityKey, '25')
             ]
         ];

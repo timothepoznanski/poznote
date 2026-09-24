@@ -44,7 +44,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $sort_mode =
     
     // PRE-LOAD all folders in one query to avoid N+1 problem
     $folders_cache = [];
-    $folders_query = "SELECT id, name, icon, icon_color, kanban_enabled, created, display_order, favorite FROM folders";
+    $folders_query = "SELECT id, name, icon, icon_color, kanban_enabled, created, display_order, favorite, offline FROM folders";
     if ($workspace_filter) {
         $folders_query .= " WHERE workspace = ?";
         $folders_stmt = $con->prepare($folders_query);
@@ -60,7 +60,8 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $sort_mode =
             'kanban_enabled' => (int)($folder_row['kanban_enabled'] ?? 0),
             'created' => $folder_row['created'] ?? '',
             'display_order' => (int)($folder_row['display_order'] ?? 0),
-            'favorite' => (int)($folder_row['favorite'] ?? 0)
+            'favorite' => (int)($folder_row['favorite'] ?? 0),
+            'offline' => (int)($folder_row['offline'] ?? 0)
         ];
     }
     
@@ -81,6 +82,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $sort_mode =
         $folderCreated = '';
         $displayOrder = 0;
         $isFavorite = 0;
+        $isOffline = 0;
 
         if (isset($folders_cache[$folderId])) {
             $folderName = $folders_cache[$folderId]['name'];
@@ -90,6 +92,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $sort_mode =
             $folderCreated = $folders_cache[$folderId]['created'];
             $displayOrder = $folders_cache[$folderId]['display_order'];
             $isFavorite = $folders_cache[$folderId]['favorite'];
+            $isOffline = $folders_cache[$folderId]['offline'];
         }
 
         if (!isset($folders[$folderId])) {
@@ -102,6 +105,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $sort_mode =
                 'created' => $folderCreated,
                 'display_order' => $displayOrder,
                 'favorite' => $isFavorite,
+                'offline' => $isOffline,
                 'notes' => []
             ];
         }
@@ -134,7 +138,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $sort_mode =
  * @return array Updated folders array including empty folders
  */
 function addEmptyFolders($con, $folders, $workspace_filter) {
-    $folders_sql = "SELECT id, name, icon, icon_color, kanban_enabled, created, display_order, favorite FROM folders";
+    $folders_sql = "SELECT id, name, icon, icon_color, kanban_enabled, created, display_order, favorite, offline FROM folders";
     $params = [];
     if (!empty($workspace_filter)) {
         $folders_sql .= " WHERE workspace = ?";
@@ -153,6 +157,7 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
         $folderCreated = $folder_row['created'] ?? '';
         $displayOrder = (int)($folder_row['display_order'] ?? 0);
         $isFavorite = (int)($folder_row['favorite'] ?? 0);
+        $isOffline = (int)($folder_row['offline'] ?? 0);
 
         if (!isset($folders[$folderId])) {
             $folders[$folderId] = [
@@ -164,6 +169,7 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
                 'created' => $folderCreated,
                 'display_order' => $displayOrder,
                 'favorite' => $isFavorite,
+                'offline' => $isOffline,
                 'notes' => []
             ];
         } else {
@@ -174,6 +180,7 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
             $folders[$folderId]['created'] = $folderCreated;
             $folders[$folderId]['display_order'] = $displayOrder;
             $folders[$folderId]['favorite'] = $isFavorite;
+            $folders[$folderId]['offline'] = $isOffline;
         }
     }
 
@@ -315,7 +322,7 @@ function shouldFolderBeOpen($con, $folderData, $is_search_mode, $folders_with_re
  * @param bool $isFavorite Whether the folder is marked as favorite
  * @return string HTML for folder actions
  */
-function generateFolderActions($folderId, $folderName, $con, $workspace_filter, $noteCount = 0, $isFavorite = false) {
+function generateFolderActions($folderId, $folderName, $con, $workspace_filter, $noteCount = 0, $isFavorite = false, $isOffline = false) {
     static $sharedFoldersCache = null;
 
     if ($folderName === FAVORITES_FOLDER_NAME) {
@@ -342,6 +349,7 @@ function generateFolderActions($folderId, $folderName, $con, $workspace_filter, 
         . " data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'"
         . " data-note-count='" . (int)$noteCount . "' data-shared='" . ($isShared ? '1' : '0') . "'"
         . " data-favorite='" . ($isFavorite ? '1' : '0') . "'"
+        . " data-offline='" . ($isOffline ? '1' : '0') . "'"
         . " title='" . t_h('notes_list.folder_actions.menu', [], 'Folder actions') . "'>"
         . "<i class='lucide lucide-more-vertical'></i>"
         . "</div>";
@@ -473,6 +481,18 @@ function renderFolderActionsMenu() {
     $menu .= "<span>" . t_h('notes_list.folder_actions.add_favorite', [], 'Add to favorites') . "</span>";
     $menu .= "</div>";
 
+    // Keep offline: the folder's notes, subfolders included, stay in the
+    // browser whatever their date (Offline Copies, lib/offline.php). Two
+    // variants like Favorite, from data-offline on the toggle.
+    $menu .= "<div class='folder-actions-menu-item offline-state-kept danger' data-action='offline-folder'>";
+    $menu .= "<i class='lucide lucide-wifi-off'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.stop_offline', [], 'Stop keeping offline') . "</span>";
+    $menu .= "</div>";
+    $menu .= "<div class='folder-actions-menu-item offline-state-not-kept' data-action='offline-folder'>";
+    $menu .= "<i class='lucide lucide-wifi-off'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.keep_offline', [], 'Keep offline') . "</span>";
+    $menu .= "</div>";
+
     // Rename folder action
     $menu .= "<div class='folder-actions-menu-item' data-action='rename-folder'>";
     $menu .= "<i class='lucide lucide-pencil'></i>";
@@ -508,7 +528,7 @@ function renderFolderActionsMenu() {
  *                         the favorite variant shown by the menu
  * @return string HTML for the note actions toggle
  */
-function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderName, $isFavorite = false) {
+function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderName, $isFavorite = false, $isOffline = false) {
     $htmlNoteId = htmlspecialchars((string)$noteId, ENT_QUOTES);
     $htmlNoteTitle = htmlspecialchars((string)$noteTitle, ENT_QUOTES);
     $htmlNoteType = htmlspecialchars((string)$noteType, ENT_QUOTES);
@@ -524,6 +544,7 @@ function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderN
         . " data-note-type='$htmlNoteType'"
         . " data-folder-id='$htmlFolderId' data-folder='$htmlFolderName'"
         . " data-favorite='" . ($isFavorite ? '1' : '0') . "'"
+        . " data-offline='" . ($isOffline ? '1' : '0') . "'"
         . " title='" . t_h('notes_list.note_actions.menu', [], 'Note actions') . "'"
         . " aria-label='" . t_h('notes_list.note_actions.menu', [], 'Note actions') . "'>"
         . "<i class='lucide lucide-more-vertical'></i>"
@@ -579,6 +600,24 @@ function renderNoteActionsMenu($currentWorkspace = '') {
     $menu .= "<div class='note-actions-menu-item favorite-state-not-favorite' data-action='toggle-favorite'>";
     $menu .= "<i class='lucide lucide-star'></i>";
     $menu .= "<span>" . t_h('notes_list.folder_actions.add_favorite', [], 'Add to favorites') . "</span>";
+    $menu .= "</div>";
+
+    // Keep offline: the note stays in the browser whatever its date (Offline
+    // Copies, lib/offline.php). Two variants like Favorite, from data-offline
+    // on the toggle, and a line that says whether this browser holds the note
+    // right now (js/offline-sync.js fills it when the menu opens).
+    $menu .= "<div class='note-actions-menu-item offline-state-kept danger' data-action='toggle-offline'>";
+    $menu .= "<i class='lucide lucide-wifi-off'></i>";
+    $menu .= "<span>" . t_h('notes_list.note_actions.stop_offline', [], 'Stop keeping offline') . "</span>";
+    $menu .= "</div>";
+    $menu .= "<div class='note-actions-menu-item offline-state-not-kept' data-action='toggle-offline'>";
+    $menu .= "<i class='lucide lucide-wifi-off'></i>";
+    $menu .= "<span>" . t_h('notes_list.note_actions.keep_offline', [], 'Keep offline') . "</span>";
+    $menu .= "</div>";
+    $menu .= "<div class='note-actions-menu-item menu-info offline-availability' hidden>";
+    $menu .= "<i class='lucide lucide-check'></i>";
+    $menu .= "<span data-available='1'>" . t_h('notes_list.note_actions.available_offline', [], 'Available offline in this browser') . "</span>";
+    $menu .= "<span data-available='0'>" . t_h('notes_list.note_actions.not_available_offline', [], 'Not available offline in this browser') . "</span>";
     $menu .= "</div>";
 
     $menu .= "<div class='note-actions-menu-separator'></div>";

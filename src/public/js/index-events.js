@@ -611,6 +611,11 @@
                     toggleFavorite(noteId);
                 }
                 break;
+            case 'toggle-offline':
+                if (noteId && typeof toggleNoteOffline === 'function') {
+                    toggleNoteOffline(noteId);
+                }
+                break;
             case 'open-share-modal':
                 if (noteId && typeof openPublicShareModal === 'function') {
                     openPublicShareModal(noteId, target);

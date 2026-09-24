@@ -192,14 +192,14 @@
       "backlinks_at_bottom": "Show the backlinks section at the bottom of notes instead of the top.",
       "default_image_border": "Display images in notes with a border and no padding by default.",
       "spellcheck_html_notes": "Enable the browser spell checker in HTML notes.",
-      "slash_menu_trigger": "Choose whether the command menu opens by typing /, with Alt + /, or not from the keyboard at all. A right-click in a note opens it whatever this is set to.",
+      "slash_menu_trigger": "On a computer, choose whether the command menu opens by typing /, with Alt + /, or not from the keyboard at all. A right-click in a note opens it whatever this is set to.",
+      "slash_menu_trigger_mobile": "On mobile, choose whether the command menu opens by typing /, with Alt + / from a hardware keyboard, or not from the keyboard at all.",
       "icon_sidebar_order": "Change the order and the color of the buttons in the icon sidebar and place separators between them.",
       "users_admin": "Create, edit and manage user accounts.",
       "oidc_config": "Configure single sign-on with an OpenID Connect provider.",
       "smtp_config": "Configure the SMTP server used to send emails such as reminders.",
       "webhooks": "Send instance events to external services via webhooks.",
       "ai_assistant": "Configure the AI assistant used to chat with your notes.",
-      "saas": "Display elements meant for instances offered as a hosted service (SaaS). All hidden by default.",
       "git_sync_enabled": "Enable or disable Git synchronization on this instance.",
       "import_limits": "Set the maximum number of files allowed per import.",
       "user_quotas": "Limit the number of notes and the storage available per user.",
@@ -223,6 +223,9 @@
       "highlight_current_folder_tree": "Dim the notes and folders that sit outside the folder hierarchy you are working in, as much or as little as you like.",
       "snapshots": "Choose how many automatic daily snapshots and how many safety snapshots (before an AI or MCP edit) are kept per note.",
       "stt": "Configure the speech-to-text server used to dictate notes and transcribe audio attachments."
+    },
+    "card_notes": {
+      "slash_menu_trigger_mobile": "On mobile, the toolbar above the keyboard has a + button that opens the same menu, whatever this is set to."
     },
     "title": "Settings",
     "collapse_section": "Collapse section",
@@ -251,7 +254,14 @@
       "integrations": "Integrations",
       "storage_limits": "Storage & limits",
       "appearance": "Appearance",
-      "maintenance": "Maintenance"
+      "maintenance": "Maintenance",
+      "backup_sync": "Backups & sync",
+      "editing": "Editing",
+      "apps": "Apps",
+      "profile_sign_in": "Profile & sign-in",
+      "language_region": "Language & region",
+      "storage": "Storage",
+      "layout": "Layout"
     },
     "cards": {
       "tenant_isolation": "Tenant isolation",
@@ -295,7 +305,6 @@
       "smtp_config": "SMTP / Email",
       "webhooks": "Admin Webhooks",
       "ai_assistant": "AI Assistant",
-      "saas": "SaaS mode",
       "s3_storage": "S3 Attachments",
       "s3_backup": "S3 Backups",
       "stt": "Transcription",
@@ -332,6 +341,22 @@
       "saved": "Language saved",
       "save_error": "Could not save language",
       "reload_hint": "Reloading..."
+    },
+    "value_help": {
+      "font_size_notes": "Note content",
+      "font_size_sidebar": "Sidebar",
+      "font_size_code_blocks": "Code blocks",
+      "font_size_settings": "Settings page"
+    },
+    "storage_summary": {
+      "error": "Storage usage could not be loaded.",
+      "notes_detail": "{{active}} in your notes, {{trash}} in the trash",
+      "local": "Space used on the server",
+      "database": "Database",
+      "note_files": "Note files",
+      "attachments": "Attachments",
+      "s3_attachments": "Attachments in S3 storage",
+      "s3_backups": "Backups in S3 storage"
     }
   },
   "workspaces": {
@@ -339,7 +364,8 @@
       "edit_workspaces": "Edit workspaces",
       "new_workspace": "New workspace",
       "accounts": "Accounts",
-      "title": "Workspaces"
+      "title": "Workspaces",
+      "shared_with_me": "Shared with me"
     },
     "errors": {
       "already_exists": "A workspace with this name already exists",
@@ -484,7 +510,8 @@
       "icon_sidebar_order": "Icon sidebar layout",
       "notes_dashboard": "Notes board",
       "spellcheck_html_notes": "Spell check",
-      "slash_menu_trigger": "Command menu shortcut",
+      "slash_menu_trigger": "Command menu shortcut (computer)",
+      "slash_menu_trigger_mobile": "Command menu shortcut (mobile)",
       "snapshots": "Snapshots"
     },
     "badges": {
@@ -674,8 +701,6 @@
       "upload_section_title": "Choose a new attachment",
       "drag_drop_info": "You can drag and drop your file below:",
       "all_types_accepted": "All file types accepted (max 200 MB)",
-      "note_taking_notice": "You can store media, but large files fill up your space quickly.",
-      "note_taking_notice_link": "View my storage",
       "upload_button": "Attach",
       "current_attachments": "Current attachments",
       "loading_attachments": "Loading attachments...",
@@ -1140,6 +1165,8 @@
         "off": "Off",
         "custom": "Custom"
       },
+      "theme_hint": "Each color follows the theme until you change it. The arrow next to a changed color brings it back to the theme.",
+      "reset_element": "Use the theme color",
       "elements": {
         "h1": "Heading 1",
         "h2": "Heading 2",
@@ -1378,7 +1405,9 @@
       "open_all_confirm": "Open all",
       "with_subfolders_message": "This folder contains notes, and its subfolders do too. Do you want to open only the notes of this folder ({{own}}) or all notes including subfolders ({{total}})?",
       "this_folder_only": "This folder only",
-      "show_only": "Show only this folder"
+      "show_only": "Show only this folder",
+      "keep_offline": "Keep offline",
+      "stop_offline": "Stop keeping offline"
     },
     "folder_filter": {
       "exit": "Exit folder view"
@@ -1396,7 +1425,11 @@
       "paste_note": "Paste here",
       "enter_note_name": "Please enter a note title",
       "attachments": "Attachments",
-      "convert_note": "Convert note"
+      "convert_note": "Convert note",
+      "keep_offline": "Keep offline",
+      "stop_offline": "Stop keeping offline",
+      "available_offline": "Available offline in this browser",
+      "not_available_offline": "Not available offline in this browser"
     }
   },
   "tree_history": {
@@ -4538,16 +4571,6 @@
       "results_other": "{{count}} notes found for \"{{term}}\""
     }
   },
-  "saas": {
-    "description": "Display elements that make sense when this instance is offered as a hosted service (SaaS). Everything here is hidden by default.",
-    "section_storage_notices": "Storage notices",
-    "storage_notices_label": "Show storage usage notices",
-    "storage_notices_description": "Reminds users that Poznote is a note-taking app, not a photo or video storage service, on the attachment pages, the user storage statistics page and the S3 attachments settings.",
-    "messages": {
-      "saved": "Configuration saved successfully.",
-      "save_error": "Failed to save configuration."
-    }
-  },
   "archive": {
     "menu_item": "Archive note",
     "confirm_title": "Archive note",
@@ -4800,5 +4823,118 @@
   },
   "focus_mode": {
     "button": "Focus mode"
+  },
+  "offline": {
+    "page_title": "Poznote (offline)",
+    "signout": {
+      "removes": "The notes kept offline will be removed from this device.",
+      "done_title": "You are signed out",
+      "done_text": "The notes kept offline were removed from this device.",
+      "loss_title": "Your changes will be lost",
+      "loss_text_one": "1 change made offline has not been synchronized with the server. If you log out now, it will be erased from this device and lost for good.",
+      "loss_text_other": "{{count}} changes made offline have not been synchronized with the server. If you log out now, they will be erased from this device and lost for good.",
+      "loss_more": "and {{count}} more",
+      "loss_keep": "To keep them, cancel and stay signed in: they are sent on their own as soon as the connection works.",
+      "loss_confirm": "Log out and lose the changes"
+    },
+    "unsupported": "This browser cannot keep notes offline.",
+    "status": {
+      "offline": "Offline",
+      "online": "Online",
+      "syncing": "Syncing…",
+      "pending_one": "1 change waiting",
+      "pending_other": "{{count}} changes waiting"
+    },
+    "signin": {
+      "intro": "You are offline. Sign in to open the notes kept on this device.",
+      "username": "Username or Email",
+      "password": "Password",
+      "submit": "Sign in offline",
+      "checking": "Checking…",
+      "unknown_account": "The notes of this account are not kept on this device.",
+      "wrong_password": "Incorrect password. Use the password you last signed in with on this device.",
+      "continue_intro": "You are still signed in on this device, so your recent notes open without a password.",
+      "continue": "Continue as {{name}}",
+      "retry": "Try to reconnect"
+    },
+    "empty": {
+      "title": "No notes available offline",
+      "text": "No notes are kept on this device yet. Connect to the internet and open Poznote once: the notes you modified in the last days will then be available offline."
+    },
+    "list": {
+      "search": "Search notes",
+      "all_workspaces": "All workspaces",
+      "available": "Available offline",
+      "recent": "Modified in the last {{days}} days",
+      "no_results": "No notes match your search.",
+      "empty": "No notes in this workspace.",
+      "none": "No notes were modified in the last {{days}} days.",
+      "untitled": "Untitled",
+      "not_synced": "Not synced yet"
+    },
+    "new": {
+      "button": "New note",
+      "note": "Note",
+      "markdown": "Markdown note",
+      "tasklist": "Task list"
+    },
+    "note": {
+      "placeholder": "Select a note to open it.",
+      "back": "Back to the list",
+      "modified": "Modified {{date}}",
+      "saved_locally": "Saved on this device. It will be sent to the server when you are back online.",
+      "push_error": "Not sent yet: {{error}}",
+      "too_big": "Not available offline, larger than {{limit}} MB: {{files}}",
+      "file_size": "{{name}} ({{size}} MB)"
+    },
+    "unavailable": {
+      "title": "This note is not available offline",
+      "text": "Only the notes modified in the last {{days}} days are kept on this device. This one will open as soon as you are back online.",
+      "text_generic": "This note is not kept on this device. It will open as soon as you are back online."
+    },
+    "online": {
+      "back": "You are back online.",
+      "synced": "You are back online and your changes have been synced.",
+      "return": "Return to Poznote",
+      "open": "Open Poznote",
+      "sign_in_needed": "You are back online. Sign in to send the changes made offline.",
+      "sign_in": "Sign in",
+      "wrong_account": "You are back online, but the browser is signed in to another account. Open Poznote as {{name}} to send the changes made offline.",
+      "push_failed": "Some changes could not be sent yet ({{error}}). They are kept on this device."
+    },
+    "sync": {
+      "copy_title": "{{title}} (offline copy)",
+      "conflict_copy": "\"{{title}}\" was also changed elsewhere while you were offline. Your version was saved as \"{{copy}}\".",
+      "recreated": "\"{{title}}\" had been deleted elsewhere while you were offline. Your version was saved again as a new note.",
+      "push_failed": "Your offline changes to \"{{title}}\" could not be saved yet ({{error}}). They will be sent again.",
+      "synced_one": "1 note changed offline has been synced.",
+      "synced_other": "{{count}} notes changed offline have been synced."
+    },
+    "banner": {
+      "open": "Open offline notes",
+      "offline": "You are offline. Notes modified recently can still be opened and edited in offline mode.",
+      "offline_no_copies": "You are offline. Changes will be saved when the connection is back."
+    },
+    "settings": {
+      "card": "Offline notes",
+      "help": "Keep the notes you modified recently in your browser, to open and edit them without a network.",
+      "badge": "Last {{days}} days",
+      "description": "The notes you modified in the last days are kept in the browsers where you use Poznote, so they can be opened and edited without a network. Changes made offline are sent as soon as the connection is back. 0 keeps nothing offline.",
+      "kept_rules": "Your favorites, and the notes and folders marked \"Keep offline\" in their menu, are kept whatever their date, with all their attachments.",
+      "unit": "days",
+      "limits_title": "Limits:",
+      "limits_notes": "{{notes}} notes and {{text}} MB of text in total, most recently modified first",
+      "limits_attachments": "Other attachments (PDF, audio, files): favorites and “Keep offline” notes only",
+      "limits_file_size": "Files up to {{size}} MB each: a larger file stays online only",
+      "limits_files_total": "{{count}} files and {{total}} MB in total, at most half the free space of the browser",
+      "warning": "Signing out removes the offline notes from the browser. On a shared computer, sign out when you leave.",
+      "device_status_one": "In this browser: 1 note available offline, updated {{date}}.",
+      "device_status": "In this browser: {{count}} notes available offline, updated {{date}}.",
+      "device_none": "Nothing is kept in this browser yet: open your notes once and they will be.",
+      "device_unsupported": "This browser cannot keep notes offline (it needs a secure HTTPS connection)."
+    },
+    "keep": {
+      "error": "The offline setting could not be saved."
+    }
   }
 }

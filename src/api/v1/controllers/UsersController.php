@@ -1180,6 +1180,24 @@ class UsersController {
     }
 
     /**
+     * GET /api/v1/admin/orphan-attachments - List the attachment files no note
+     * references any more, per account (DELETE removes them).
+     */
+    public function orphanAttachments(bool $delete = false) {
+        if ($err = $this->requireAdmin()) return $err;
+        if ($err = $this->requireActiveAccountOwner()) return $err;
+        if ($delete && ($err = $this->requireFullCredentials())) return $err;
+
+        require_once dirname(__DIR__, 3) . '/users/orphan_attachments.php';
+        try {
+            return ['success' => true, 'users' => poznoteScanOrphanAttachments($delete)];
+        } catch (Throwable $e) {
+            http_response_code(500);
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
+    /**
      * POST /api/v1/admin/repair - Repair master database (Scan & Rebuild)
      */
     public function repair() {
