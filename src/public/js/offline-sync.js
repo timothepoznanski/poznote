@@ -728,7 +728,19 @@
         bannerEl.appendChild(text);
         bannerEl.appendChild(open);
         bannerEl.appendChild(close);
-        document.body.appendChild(bannerEl);
+
+        // Over the note toolbar: right above #right_col, so under the tab bar
+        // (js/tabs.js puts it first in #right_pane) and centred on the note
+        // column (css/offline-banner.css).
+        var rightCol = document.getElementById('right_col');
+        if (rightCol && rightCol.parentNode) {
+            var anchor = document.createElement('div');
+            anchor.className = 'offline-banner-anchor';
+            anchor.appendChild(bannerEl);
+            rightCol.parentNode.insertBefore(anchor, rightCol);
+        } else {
+            document.body.appendChild(bannerEl);
+        }
     }
 
     // The same URL as now (note included): with the server unreachable the

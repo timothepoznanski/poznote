@@ -39,9 +39,8 @@
     var SAVE_DELAY_MS = 400;
     var PUSH_DELAY_MS = 3000;
     var PROBE_INTERVAL_MS = 20000;
+    var SAVED_NOTICE_MS = 3000;
     var NOTE_ICONS = { note: 'lucide-file-text', markdown: 'lucide-file-code', tasklist: 'lucide-list-todo' };
-
-    var lang = (window.POZNOTE_I18N && window.POZNOTE_I18N.lang) || document.documentElement.getAttribute('lang') || 'en';
 
     var state = {
         accounts: [],
@@ -115,33 +114,6 @@
         }
         var date = new Date(String(value).replace(' ', 'T') + 'Z');
         return isNaN(date.getTime()) ? null : date;
-    }
-
-    function formatDate(date) {
-        if (!date) {
-            return '';
-        }
-        var seconds = Math.round((date.getTime() - Date.now()) / 1000);
-        var abs = Math.abs(seconds);
-        try {
-            if (abs < 7 * 86400 && window.Intl && Intl.RelativeTimeFormat) {
-                var rtf = new Intl.RelativeTimeFormat(lang, { numeric: 'auto' });
-                if (abs < 60) {
-                    return rtf.format(0, 'second');
-                }
-                if (abs < 3600) {
-                    return rtf.format(Math.round(seconds / 60), 'minute');
-                }
-                if (abs < 86400) {
-                    return rtf.format(Math.round(seconds / 3600), 'hour');
-                }
-                return rtf.format(Math.round(seconds / 86400), 'day');
-            }
-            var sameYear = date.getFullYear() === new Date().getFullYear();
-            return date.toLocaleDateString(lang, { day: 'numeric', month: 'short', year: sameYear ? undefined : 'numeric' });
-        } catch (e) {
-            return date.toLocaleString();
-        }
     }
 
     function isNarrow() {
@@ -644,13 +616,14 @@
         }
 
         // "Modified in the last N days" only while that is the whole story:
-        // favorites and notes kept with "Keep offline" can be older.
+        // favorites and notes kept with "Keep offline" can be older. No
+        // caption otherwise: every note of this page is available offline.
         var onlyRecent = (state.index.notes || []).every(function (meta) {
             return !meta.kept || meta.kept === 'recent';
         });
-        list.appendChild(el('p', 'offline-list-caption', days && onlyRecent
-            ? ot('list.recent', { days: days }, 'Modified in the last {{days}} days')
-            : ot('list.available', null, 'Available offline')));
+        if (days && onlyRecent) {
+            list.appendChild(el('p', 'offline-list-caption', ot('list.recent', { days: days }, 'Modified in the last {{days}} days')));
+        }
 
         // Folder tree of the listed notes: their folders and the parents.
         var children = {};
@@ -739,9 +712,7 @@
         var bar = el('div', 'note-edit-toolbar');
         var fmt = 'text-format-btn';
         var add = function (button) { bar.appendChild(button); };
-        // No Home button (on a phone the list is one swipe away) and no Save
-        // button further down: every change is kept on the device as it is
-        // typed, there is nothing to save by hand here.
+        add(toolbarButton('btn-home mobile-home-btn', t('editor.toolbar.back_to_notes', null, 'Notes'), 'scroll-to-left-column', 'lucide-home'));
         add(toolbarButton('btn-bold ' + fmt, t('editor.toolbar.bold', null, 'Bold'), 'exec-bold', 'lucide-bold'));
         add(toolbarButton('btn-italic ' + fmt, t('editor.toolbar.italic', null, 'Italic'), 'exec-italic', 'lucide-italic'));
         add(toolbarButton('btn-underline ' + fmt, t('editor.toolbar.underline', null, 'Underline'), 'exec-underline', 'lucide-underline'));
@@ -788,6 +759,9 @@
             add(dropdown);
         }
         add(toolbarButton('btn-checklist note-action-btn', t('editor.toolbar.insert_checklist', null, 'Insert checklist'), 'insert-checklist', 'lucide-list-check'));
+        // Every change is kept on the device as it is typed: Save now only
+        // does it at once, as Ctrl+S does in the app.
+        add(toolbarButton('btn-save note-action-btn', t('editor.toolbar.save_now', null, 'Save now'), 'save-note', 'lucide-save', { 'data-note-id': String(id) }));
         return bar;
     }
 
@@ -848,6 +822,9 @@
             var name = attachment.original_filename || String(attachment.id);
             var link = el('a', 'attachment-link', name);
             link.href = url;
+            // What the app's right-click menu reads (js/note-attachment-menu.js)
+            link.setAttribute('data-attachment-id', String(attachment.id));
+            link.setAttribute('data-note-id', String(id));
             link.target = '_blank';
             link.rel = 'noopener';
             link.title = t('attachments.actions.download', { filename: name }, 'Download {{filename}}');
@@ -898,22 +875,6 @@
         return notice;
     }
 
-    // A toolbar with nothing to show until text is selected (an HTML note:
-    // its buttons are all formatting ones) takes no room: it floats over the
-    // top of the note when they appear, so the text never moves under the
-    // selection (css/offline.css). Measured, not guessed from the type: what
-    // shows depends on the width (css/index-mobile.css).
-    function updateToolbarRoom() {
-        var header = document.querySelector('#offline-note-host .note-header');
-        if (!header) {
-            return;
-        }
-        var persistent = Array.prototype.some.call(header.querySelectorAll('.note-edit-toolbar > *'), function (child) {
-            return !child.classList.contains('text-format-btn') && child.getClientRects().length > 0;
-        });
-        header.classList.toggle('offline-toolbar-floating', !persistent);
-    }
-
     function buildTagsRow(item) {
         var row = el('div', 'note-tags-row');
         var folder = el('div', 'folder-wrapper');
@@ -938,25 +899,31 @@
         return row;
     }
 
-    function renderSubline(id) {
+    // "Saved on this device" answers a save (justSaved): a few seconds, the
+    // dot in the list keeps saying the change waits. A change the server
+    // refused stays said until it goes.
+    var savedNoticeTimer = null;
+    function renderSubline(id, justSaved) {
         var subline = byId('offline-subline-' + id);
         if (!subline) {
             return;
         }
+        clearTimeout(savedNoticeTimer);
         subline.textContent = '';
-        var item = findItem(id);
-        var time = item ? itemTime(item) : 0;
-        if (time) {
-            subline.appendChild(el('span', 'note-sub-created', ot('note.modified', { date: formatDate(new Date(time)) }, 'Modified {{date}}')));
-        }
         var entry = state.outbox[id];
-        if (entry) {
-            var status = el('span', 'offline-note-pending');
-            status.appendChild(icon('lucide-cloud-off'));
-            status.appendChild(el('span', '', entry.lastError
-                ? ot('note.push_error', { error: entry.lastError }, 'Not sent yet: {{error}}')
-                : ot('note.saved_locally', null, 'Saved on this device. It will be sent to the server when you are back online.')));
-            subline.appendChild(status);
+        if (!entry || (!entry.lastError && !justSaved)) {
+            return;
+        }
+        var status = el('span', 'offline-note-pending');
+        status.appendChild(icon('lucide-cloud-off'));
+        status.appendChild(el('span', '', entry.lastError
+            ? ot('note.push_error', { error: entry.lastError }, 'Not sent yet: {{error}}')
+            : ot('note.saved_locally', null, 'Saved on this device. It will be sent to the server when you are back online.')));
+        subline.appendChild(status);
+        if (!entry.lastError) {
+            savedNoticeTimer = setTimeout(function () {
+                status.remove();
+            }, SAVED_NOTICE_MS);
         }
     }
 
@@ -990,6 +957,11 @@
         }
         card.appendChild(inner);
 
+        // The list of files comes with the server copy: a change made here
+        // (outbox) carries the text only.
+        var server = state.server[id];
+        var attachmentsRow = buildAttachmentsRow(id, server ? server.attachments : null, note.content);
+
         var header = el('div', 'note-header');
         header.appendChild(buildToolbar(id, type));
         if (type === 'note' || type === 'markdown') {
@@ -997,10 +969,6 @@
         }
         inner.appendChild(header);
         inner.appendChild(buildTagsRow(item));
-        // The list of files comes with the server copy: a change made here
-        // (outbox) carries the text only.
-        var server = state.server[id];
-        var attachmentsRow = buildAttachmentsRow(id, server ? server.attachments : null, note.content);
         if (attachmentsRow) {
             inner.appendChild(attachmentsRow);
         }
@@ -1084,10 +1052,6 @@
         if (type === 'note' && typeof window.applySyntaxHighlighting === 'function') {
             try { window.applySyntaxHighlighting(entry); } catch (e) { /* ignore */ }
         }
-        // Once the editors have set up their buttons (the Markdown view mode
-        // one among them), some of it on the next frame
-        updateToolbarRoom();
-        window.requestAnimationFrame(updateToolbarRoom);
     }
 
     // A ticked box only changes a property: write it into the markup the way
@@ -1455,7 +1419,7 @@
             if (state.currentId === id && state.dirtyId === null) {
                 setSaveButtonState(false);
             }
-            renderSubline(id);
+            renderSubline(id, true);
             renderList();
             updateStatus();
             schedulePush();
@@ -1553,17 +1517,17 @@
         return Object.keys(state.outbox).length;
     }
 
+    // The icon before the list's title tells the state, its tooltip the words.
     function updateStatus() {
         var status = byId('offline-status');
-        var text = status.querySelector('.offline-status-text');
-        var statusIcon = status.querySelector('.lucide');
         var pending = pendingCount();
+        var iconName;
         var label;
         if (state.pushing) {
-            statusIcon.className = 'lucide lucide-refresh-cw';
+            iconName = 'lucide-refresh-cw';
             label = ot('status.syncing', null, 'Syncing…');
         } else {
-            statusIcon.className = 'lucide ' + (state.online ? 'lucide-wifi' : 'lucide-wifi-off');
+            iconName = state.online ? 'lucide-wifi' : 'lucide-wifi-off';
             label = state.online ? ot('status.online', null, 'Online') : ot('status.offline', null, 'Offline');
             if (pending) {
                 label += ' · ' + (pending === 1
@@ -1571,8 +1535,9 @@
                     : ot('status.pending_other', { count: pending }, '{{count}} changes waiting'));
             }
         }
-        text.textContent = label;
-        status.classList.toggle('is-online', state.online);
+        status.className = 'lucide ' + iconName + ' workspace-title-icon offline-title-status' + (state.online ? ' is-online' : '');
+        status.title = label;
+        status.setAttribute('aria-label', label);
     }
 
     function probeServer() {
@@ -1854,12 +1819,6 @@
         byId('offline-empty-retry-btn').addEventListener('click', function () { window.location.reload(); });
         byId('offline-logout-btn').addEventListener('click', confirmSignOut);
         byId('offline-unavailable-back').addEventListener('click', backToList);
-
-        var roomTimer = null;
-        window.addEventListener('resize', function () {
-            clearTimeout(roomTimer);
-            roomTimer = setTimeout(updateToolbarRoom, 150);
-        });
 
         byId('unified-search').addEventListener('input', function (event) {
             state.search = event.target.value || '';

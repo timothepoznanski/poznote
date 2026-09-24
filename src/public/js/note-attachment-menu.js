@@ -384,11 +384,24 @@
         menuEl = menu;
     }
 
+    /**
+     * Whether an entry of the menu depends on the attachment's record. Not on
+     * the offline page (offline.php), which has none of them: there the
+     * request would only fail, or hang on a dead network before the menu.
+     */
+    function needsRecord() {
+        return typeof window.deleteAttachment === 'function' ||
+            typeof window.openAttachmentMoveDialog === 'function' ||
+            !!(window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.speechToText &&
+                typeof window.transcribeAttachment === 'function');
+    }
+
     /** Resolve the attachment, then show the menu unless something else happened meanwhile. */
     function openFor(target, x, y) {
         closeMenu();
         var token = openToken;
-        findAttachment(target.noteId, target.attachmentId).then(function (attachment) {
+        var record = needsRecord() ? findAttachment(target.noteId, target.attachmentId) : Promise.resolve(null);
+        record.then(function (attachment) {
             if (token !== openToken) return;
             showMenu(target, attachment, x, y);
         });

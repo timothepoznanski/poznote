@@ -9,14 +9,29 @@
 #app-tab-bar {
     display: flex;
     align-items: flex-end;
-    gap: 5px;
+    gap: 4px;
     padding: 6px 8px 0;
     background: var(--pz-tabbar-bg);
     border-bottom: 1px solid var(--pz-border);
-    overflow-x: auto;
     flex-shrink: 0;
     min-height: 32px;
     z-index: 1000;
+}
+
+/* The row of tabs itself. It is the only part of the bar that scrolls, so the
+   overflow chevrons and "Close all tabs" around it stay put. Positioned so the
+   tabs' offsetLeft is measured from it (js/tabs.js pages and reveals tabs with
+   it). */
+.app-tab-strip {
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    flex: 1 1 auto;
+    min-width: 0;
+    position: relative;
+    overflow-x: auto;
+    overflow-y: hidden;
+    align-self: stretch;
     /* Hide scrollbar but keep scrollability */
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -24,15 +39,8 @@
     cursor: grab;
 }
 
-#app-tab-bar::-webkit-scrollbar {
+.app-tab-strip::-webkit-scrollbar {
     display: none;
-}
-
-/* The sticky "Close all tabs" button is pinned to the bar's content edge, so
-   the bar drops its right padding: otherwise scrolling tabs would show through
-   the 8px gutter left past the button. */
-#app-tab-bar.has-close-all {
-    padding-right: 0;
 }
 
 .app-tab {
@@ -100,31 +108,61 @@
     color: var(--pz-text-strong);
 }
 
+/* ── Overflow chevrons ── */
+
+/* Shown only while the tabs do not all fit (.has-overflow, set by
+   js/tabs.js); each one pages the strip towards its side and is disabled once
+   that end is reached. Sized and aligned like "Close all tabs". */
+.app-tab-scroll-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    margin-bottom: 4px;
+    border: none;
+    border-radius: var(--pz-radius-sm);
+    background: none;
+    color: var(--pz-text-muted);
+    cursor: pointer;
+}
+
+#app-tab-bar.has-overflow .app-tab-scroll-btn {
+    display: flex;
+}
+
+.app-tab-scroll-btn:hover:not(:disabled) {
+    background: var(--pz-surface-hover);
+    color: var(--pz-text-strong);
+}
+
+.app-tab-scroll-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.app-tab-scroll-btn .lucide {
+    width: 16px;
+    height: 16px;
+    background-color: currentColor;
+}
+
 /* ── "Close all tabs" button ── */
 
-/* Pinned to the right end of the bar: `margin-left: auto` parks it there while
-   the tabs fit, `position: sticky` keeps it on screen once they overflow and
-   the bar scrolls. The background is opaque so tabs scroll underneath it. */
+/* Sits after the strip, which takes all the free width, so it stays at the
+   right end of the bar whether or not the tabs overflow. */
 .app-tab-close-all {
     display: flex;
     align-items: center;
     gap: 5px;
-    margin-left: auto;
-    position: sticky;
-    /* Both offsets keep the same 8px gap on the right: `right` applies while the
-       bar scrolls and the button is stuck, `margin-right` while the tabs still
-       fit. The solid box-shadow below is not a visual shadow: it paints that
-       gap opaque so a tab scrolling past cannot show through it, so it has to
-       carry the bar's own background and not a hardcoded white. */
-    right: 8px;
-    margin-right: 8px;
     flex-shrink: 0;
     padding: 4px 10px;
     margin-bottom: 4px;
     border: 1px solid var(--pz-border);
     border-radius: var(--pz-radius);
     background: var(--pz-bg);
-    box-shadow: 9px 0 0 0 var(--pz-tabbar-bg);
     color: var(--pz-text-muted);
     font-family: inherit;
     font-size: 0.75rem;
@@ -144,6 +182,21 @@
     height: 14px;
     flex-shrink: 0;
     background-color: currentColor;
+}
+
+/* The cross is red in every theme and state, like "Close all" in the tab
+   context menu. The id outweighs the icon defaults, including the dark hover
+   in dark-mode/icons.css (0,3,1). */
+#app-tab-bar .app-tab-close-all .lucide {
+    color: var(--pz-danger-text);
+}
+
+/* Trimmed to its cap height, the label is centred on the cross by its letters
+   and not by its line box. Where the glyphs sit in that box depends on how the
+   font metrics round at the current zoom: at 90% the text rose 1.5px above the
+   cross. Browsers without text-box keep the untrimmed box. */
+.app-tab-close-all-label {
+    text-box: trim-both cap alphabetic;
 }
 
 /* Keep only the icon when the pane is too narrow for the label. */
@@ -172,8 +225,8 @@
 
 /* Pressing a tab drags it to a new position (js/tabs.js); the bar's empty
    space keeps its drag-to-scroll. */
-#app-tab-bar.is-reordering,
-#app-tab-bar.is-reordering .app-tab {
+.app-tab-strip.is-reordering,
+.app-tab-strip.is-reordering .app-tab {
     cursor: grabbing;
 }
 
@@ -184,7 +237,7 @@ body.app-tab-reordering {
 
 /* Tabs pushed aside slide to their new place. The dragged one follows the
    pointer frame by frame, so its own transform must never be animated. */
-#app-tab-bar.is-reordering .app-tab {
+.app-tab-strip.is-reordering .app-tab {
     transition: background 0.1s ease, transform 0.14s ease;
 }
 
@@ -295,7 +348,6 @@ html[data-theme='dark'] .app-tab-close-all {
     background: var(--pz-bg);
     border-color: var(--pz-border);
     color: var(--pz-text-muted);
-    box-shadow: 9px 0 0 0 var(--pz-tabbar-bg);
 }
 
 html[data-theme='dark'] .app-tab-close-all:hover {
