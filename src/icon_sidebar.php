@@ -404,6 +404,14 @@ $iconSidebarProfileStrings = [
     'profile.logout.switch_in_progress' => t('profile.logout.switch_in_progress', [], 'Switching account...'),
     'multiuser.admin.email' => t('multiuser.admin.email', [], 'Email'),
     'common.cancel' => t('common.cancel', [], 'Cancel'),
+    // Warning of a logout that would erase changes made offline (js/offline-store.js)
+    'offline.signout.loss_title' => t('offline.signout.loss_title', [], 'Your changes will be lost'),
+    'offline.signout.loss_text_one' => t('offline.signout.loss_text_one', [], '1 change made offline has not been synchronized with the server. If you log out now, it will be erased from this device and lost for good.'),
+    'offline.signout.loss_text_other' => t('offline.signout.loss_text_other', [], '{{count}} changes made offline have not been synchronized with the server. If you log out now, they will be erased from this device and lost for good.'),
+    'offline.signout.loss_more' => t('offline.signout.loss_more', [], 'and {{count}} more'),
+    'offline.signout.loss_keep' => t('offline.signout.loss_keep', [], 'To keep them, cancel and stay signed in: they are sent on their own as soon as the connection works.'),
+    'offline.signout.loss_confirm' => t('offline.signout.loss_confirm', [], 'Log out and lose the changes'),
+    'offline.list.untitled' => t('offline.list.untitled', [], 'Untitled'),
     'common.save' => t('common.save', [], 'Save'),
     'common.loading' => t('common.loading', [], 'Loading...'),
     'common.error' => t('common.error', [], 'Error'),
@@ -420,6 +428,8 @@ window.PoznoteActiveAccountIsOwn = <?php echo (!function_exists('isActiveAccount
 window.PoznoteAccountSwitch = <?php echo json_encode($iconSidebarAccountSwitch, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;
 <?php endif; ?>
 </script>
+<?php // Read by the logout dialog: changes made offline a logout would erase ?>
+<script src="<?php echo $iconSidebarAsset('js/offline-store.js'); ?>" defer></script>
 <script src="<?php echo $iconSidebarAsset('js/profile.js'); ?>" defer></script>
 <script>
 window.PoznoteIconSidebarColorsConfig = <?php echo json_encode([

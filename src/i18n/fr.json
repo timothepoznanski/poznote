@@ -5088,7 +5088,17 @@
   },
   "offline": {
     "page_title": "Poznote (hors ligne)",
-    "lock_hint": "Verrouiller les notes hors ligne",
+    "signout": {
+      "removes": "Les notes conservées hors ligne seront supprimées de cet appareil.",
+      "done_title": "Déconnexion effectuée",
+      "done_text": "Les notes conservées hors ligne ont été supprimées de cet appareil.",
+      "loss_title": "Vos modifications vont être perdues",
+      "loss_text_one": "1 modification faite hors ligne n'a pas été synchronisée avec le serveur. Si vous vous déconnectez maintenant, elle sera effacée de cet appareil et perdue définitivement.",
+      "loss_text_other": "{{count}} modifications faites hors ligne n'ont pas été synchronisées avec le serveur. Si vous vous déconnectez maintenant, elles seront effacées de cet appareil et perdues définitivement.",
+      "loss_more": "et {{count}} autres",
+      "loss_keep": "Pour les garder, annulez sans vous déconnecter : elles partent d'elles-mêmes dès que la connexion fonctionne.",
+      "loss_confirm": "Me déconnecter et perdre les modifications"
+    },
     "unsupported": "Ce navigateur ne peut pas conserver de notes hors ligne.",
     "status": {
       "offline": "Hors ligne",
@@ -5114,15 +5124,13 @@
       "text": "Aucune note n'est encore conservée sur cet appareil. Connectez-vous à internet et ouvrez Poznote une fois : les notes modifiées ces derniers jours seront alors disponibles hors ligne."
     },
     "list": {
-      "label": "Notes",
       "search": "Rechercher des notes",
       "all_workspaces": "Tous les espaces de travail",
       "available": "Disponibles hors ligne",
-      "other": "Autres notes",
-      "other_hint": "Non disponibles hors ligne",
-      "more": "{{count}} notes de plus, utilisez la recherche pour les trouver",
+      "recent": "Modifiées ces {{days}} derniers jours",
       "no_results": "Aucune note ne correspond à votre recherche.",
       "empty": "Aucune note dans cet espace de travail.",
+      "none": "Aucune note n'a été modifiée ces {{days}} derniers jours.",
       "untitled": "Sans titre",
       "not_synced": "Pas encore synchronisée"
     },
@@ -5130,38 +5138,19 @@
       "button": "Nouvelle note",
       "note": "Note",
       "markdown": "Note Markdown",
-      "tasklist": "Liste de tâches",
-      "default_title": "Nouvelle note"
+      "tasklist": "Liste de tâches"
     },
     "note": {
       "placeholder": "Sélectionnez une note pour l'ouvrir.",
       "back": "Retour à la liste",
-      "title_placeholder": "Titre",
-      "content": "Contenu de la note",
       "modified": "Modifiée {{date}}",
       "saved_locally": "Enregistrée sur cet appareil. Elle sera envoyée au serveur dès que vous serez de nouveau en ligne.",
-      "push_error": "Pas encore envoyée : {{error}}",
-      "edit": "Modifier",
-      "preview": "Aperçu"
-    },
-    "toolbar": {
-      "bold": "Gras",
-      "italic": "Italique",
-      "underline": "Souligné",
-      "strikethrough": "Barré",
-      "heading": "Titre",
-      "bullet_list": "Liste à puces",
-      "numbered_list": "Liste numérotée"
-    },
-    "tasks": {
-      "add_placeholder": "Ajoutez une tâche et appuyez sur Entrée",
-      "delete": "Supprimer la tâche",
-      "empty": "Aucune tâche pour l'instant."
+      "push_error": "Pas encore envoyée : {{error}}"
     },
     "unavailable": {
+      "title": "Cette note n'est pas disponible hors ligne",
       "text": "Seules les notes modifiées ces {{days}} derniers jours sont conservées sur cet appareil. Celle-ci s'ouvrira dès que vous serez de nouveau en ligne.",
-      "text_generic": "Cette note n'est pas conservée sur cet appareil. Elle s'ouvrira dès que vous serez de nouveau en ligne.",
-      "unsupported_type": "Ce type de note (un dessin, par exemple) ne peut pas être ouvert hors ligne. Il s'ouvrira dès que vous serez de nouveau en ligne."
+      "text_generic": "Cette note n'est pas conservée sur cet appareil. Elle s'ouvrira dès que vous serez de nouveau en ligne."
     },
     "online": {
       "back": "Vous êtes de nouveau en ligne.",
@@ -5192,7 +5181,12 @@
       "badge": "{{days}} derniers jours",
       "description": "Les notes modifiées ces derniers jours sont conservées dans les navigateurs où vous utilisez Poznote, pour pouvoir les ouvrir et les modifier sans réseau. Les modifications faites hors ligne sont envoyées dès le retour de la connexion. 0 ne conserve rien hors ligne.",
       "unit": "jours",
+      "limits_title": "Limites :",
+      "limits_notes": "{{notes}} notes et {{text}} Mo de texte au total, les plus récemment modifiées d'abord",
+      "limits_pictures": "Images : {{picture}} Mo chacune, {{pictures}} et {{total}} Mo au total, au plus la moitié de l'espace libre",
+      "limits_attachments": "Autres pièces jointes (PDF, audio, fichiers) : en ligne uniquement",
       "warning": "La déconnexion supprime les notes hors ligne du navigateur. Sur un ordinateur partagé, déconnectez-vous en partant.",
+      "device_status_one": "Dans ce navigateur : 1 note disponible hors ligne, mise à jour le {{date}}.",
       "device_status": "Dans ce navigateur : {{count}} notes disponibles hors ligne, mises à jour le {{date}}.",
       "device_none": "Rien n'est encore conservé dans ce navigateur : ouvrez vos notes une fois et elles le seront.",
       "device_unsupported": "Ce navigateur ne peut pas conserver de notes hors ligne (une connexion HTTPS sécurisée est nécessaire)."

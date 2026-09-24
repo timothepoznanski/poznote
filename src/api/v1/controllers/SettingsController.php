@@ -313,11 +313,10 @@ class SettingsController {
         }
 
         // Days of recently modified notes kept offline in the browser, 0 = off
-        // (OfflineController::MAX_DAYS)
         if ($key === 'offline_notes_days') {
             $intVal = (int) $value;
-            if ($intVal < 0 || $intVal > 30) {
-                throw new InvalidArgumentException('value must be between 0 and 30', 400);
+            if ($intVal < 0 || $intVal > POZNOTE_OFFLINE_MAX_DAYS) {
+                throw new InvalidArgumentException('value must be between 0 and ' . POZNOTE_OFFLINE_MAX_DAYS, 400);
             }
             return (string) $intVal;
         }

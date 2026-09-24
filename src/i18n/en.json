@@ -4803,7 +4803,17 @@
   },
   "offline": {
     "page_title": "Poznote (offline)",
-    "lock_hint": "Lock the offline notes",
+    "signout": {
+      "removes": "The notes kept offline will be removed from this device.",
+      "done_title": "You are signed out",
+      "done_text": "The notes kept offline were removed from this device.",
+      "loss_title": "Your changes will be lost",
+      "loss_text_one": "1 change made offline has not been synchronized with the server. If you log out now, it will be erased from this device and lost for good.",
+      "loss_text_other": "{{count}} changes made offline have not been synchronized with the server. If you log out now, they will be erased from this device and lost for good.",
+      "loss_more": "and {{count}} more",
+      "loss_keep": "To keep them, cancel and stay signed in: they are sent on their own as soon as the connection works.",
+      "loss_confirm": "Log out and lose the changes"
+    },
     "unsupported": "This browser cannot keep notes offline.",
     "status": {
       "offline": "Offline",
@@ -4829,15 +4839,13 @@
       "text": "No notes are kept on this device yet. Connect to the internet and open Poznote once: the notes you modified in the last days will then be available offline."
     },
     "list": {
-      "label": "Notes",
       "search": "Search notes",
       "all_workspaces": "All workspaces",
       "available": "Available offline",
-      "other": "Other notes",
-      "other_hint": "Not available offline",
-      "more": "{{count}} more notes, use the search to find them",
+      "recent": "Modified in the last {{days}} days",
       "no_results": "No notes match your search.",
       "empty": "No notes in this workspace.",
+      "none": "No notes were modified in the last {{days}} days.",
       "untitled": "Untitled",
       "not_synced": "Not synced yet"
     },
@@ -4845,38 +4853,19 @@
       "button": "New note",
       "note": "Note",
       "markdown": "Markdown note",
-      "tasklist": "Task list",
-      "default_title": "New note"
+      "tasklist": "Task list"
     },
     "note": {
       "placeholder": "Select a note to open it.",
       "back": "Back to the list",
-      "title_placeholder": "Title",
-      "content": "Note content",
       "modified": "Modified {{date}}",
       "saved_locally": "Saved on this device. It will be sent to the server when you are back online.",
-      "push_error": "Not sent yet: {{error}}",
-      "edit": "Edit",
-      "preview": "Preview"
-    },
-    "toolbar": {
-      "bold": "Bold",
-      "italic": "Italic",
-      "underline": "Underline",
-      "strikethrough": "Strikethrough",
-      "heading": "Heading",
-      "bullet_list": "Bulleted list",
-      "numbered_list": "Numbered list"
-    },
-    "tasks": {
-      "add_placeholder": "Add a task and press Enter",
-      "delete": "Delete task",
-      "empty": "No tasks yet."
+      "push_error": "Not sent yet: {{error}}"
     },
     "unavailable": {
+      "title": "This note is not available offline",
       "text": "Only the notes modified in the last {{days}} days are kept on this device. This one will open as soon as you are back online.",
-      "text_generic": "This note is not kept on this device. It will open as soon as you are back online.",
-      "unsupported_type": "This kind of note (a drawing, for instance) cannot be opened offline. It will open as soon as you are back online."
+      "text_generic": "This note is not kept on this device. It will open as soon as you are back online."
     },
     "online": {
       "back": "You are back online.",
@@ -4907,7 +4896,12 @@
       "badge": "Last {{days}} days",
       "description": "The notes you modified in the last days are kept in the browsers where you use Poznote, so they can be opened and edited without a network. Changes made offline are sent as soon as the connection is back. 0 keeps nothing offline.",
       "unit": "days",
+      "limits_title": "Limits:",
+      "limits_notes": "{{notes}} notes and {{text}} MB of text in total, most recently modified first",
+      "limits_pictures": "Pictures: {{picture}} MB each, {{pictures}} and {{total}} MB in total, at most half the free space",
+      "limits_attachments": "Other attachments (PDF, audio, files): online only",
       "warning": "Signing out removes the offline notes from the browser. On a shared computer, sign out when you leave.",
+      "device_status_one": "In this browser: 1 note available offline, updated {{date}}.",
       "device_status": "In this browser: {{count}} notes available offline, updated {{date}}.",
       "device_none": "Nothing is kept in this browser yet: open your notes once and they will be.",
       "device_unsupported": "This browser cannot keep notes offline (it needs a secure HTTPS connection)."

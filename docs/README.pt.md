@@ -81,7 +81,7 @@ https://discord.gg/AWhWWSEkJ
 - [Backups S3](#backups-s3)
 - [Backup / Exportar](#backup--exportar)
 - [Restaurar / Importar](#restaurar--importar)
-- [Visualização offline](#visualização-offline)
+- [Offline](#offline)
 - [Várias instâncias](#várias-instâncias)
 - [Assistente IA](#assistente-ia)
 - [Transcrição (fala para texto)](#transcrição-fala-para-texto)
@@ -1208,9 +1208,33 @@ updated: 2024-01-20 15:45:00
 </details>
 
 
-## Visualização offline
+## Offline
+
+O Poznote continua funcionando sem rede de duas formas: as notas que você modificou recentemente continuam disponíveis no seu navegador, prontas para serem lidas e editadas, e um backup completo pode ser consultado em qualquer lugar como uma exportação somente leitura.
+
+<details>
+<summary><strong>Notas offline</strong></summary>
+<br>
+
+As notas que você modificou nos últimos 5 dias são mantidas em cada navegador onde você usa o Poznote, e essa cópia é atualizada após cada salvamento. Na sala de aula, no trem ou em qualquer lugar sem Wi-Fi, abra o endereço de sempre do Poznote: o navegador mostra a versão offline do Poznote, com a mesma barra lateral, os mesmos editores, a mesma barra de ferramentas e a mesma busca, listando apenas as notas mantidas offline.
+
+*   **Login:** digite a senha com que você entrou pela última vez neste navegador, ela é verificada sem o servidor. Se você nunca digitou sua senha neste navegador (SSO, login automático), a última conta usada abre com um botão **Continuar como**.
+*   **Leitura e edição:** notas HTML, notas Markdown e listas de tarefas abrem no editor de sempre, e é possível criar notas novas. Os outros tipos de nota, como os desenhos, ficam disponíveis apenas online. As alterações ficam guardadas no navegador até serem enviadas.
+*   **De volta online:** as alterações são enviadas automaticamente. Se uma nota também foi alterada no servidor nesse meio-tempo, as duas versões são mescladas quando possível; caso contrário, sua versão offline é mantida como uma nota separada chamada "... (cópia offline)". Uma nota excluída no servidor nesse meio-tempo é criada novamente.
+*   **Configuração:** **Configurações > Outros > Notas offline** define quantos dias de notas são mantidos (5 por padrão, até 30, 0 desativa as notas offline) e mostra o que o navegador atual contém.
+*   **Limites:** no máximo 300 notas e 50 MB de texto, primeiro as modificadas mais recentemente. As imagens exibidas nessas notas também são mantidas, até 8 MB cada, 400 imagens e 200 MB no total, e nunca mais da metade do espaço livre do navegador. Os outros anexos (PDF, áudio, arquivos) abrem apenas online.
+*   **Requisitos:** o Poznote precisa ser servido por HTTPS (os navegadores só mantêm páginas offline em uma conexão segura, `http://localhost` também funciona) e ter sido aberto uma vez online no navegador, após o login, para que a cópia seja feita.
+*   **Privacidade:** apenas as notas da sua própria conta são mantidas, não as de uma conta ou de um espaço de trabalho compartilhado com você. Elas ficam armazenadas sem criptografia no navegador. Sair da conta as remove do navegador (inclusive as alterações ainda não enviadas, depois de um aviso que as lista): em um computador compartilhado, saia da conta ao ir embora. Sair da conta também funciona sem rede, pela página offline: as notas são removidas na hora, e a sessão no servidor termina na próxima vez que o Poznote for aberto online.
+
+</details>
+
+<details>
+<summary><strong>Exportação offline</strong></summary>
+<br>
 
 O **📦 Backup Completo** cria uma versão offline e independente das suas notas. Basta extrair o ZIP e abrir o `index.html` em qualquer navegador. Assim você pode ler suas notas offline, mas sem todas as funcionalidades do Poznote: é uma exportação somente leitura.
+
+</details>
 
 ## Várias instâncias
 

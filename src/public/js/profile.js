@@ -378,7 +378,39 @@
     // granted to it) read as if that account were the one signing out. The
     // ways to open another account are the workspace menu's Accounts section
     // and the notes list's "Other accounts" block.
+    //
+    // A logout also erases the changes made offline that the server never got
+    // (js/offline-login.js). They normally go out as soon as a page loads; if
+    // some are left, one more try, then the loud warning of
+    // js/offline-store.js instead of the plain question.
+    var LOGOUT_SEND_WAIT_MS = 5000;
     function showLogoutConfirmModal(logoutUrl) {
+        var offline = window.PoznoteOffline;
+        if (!offline || !offline.isSupported()) {
+            showPlainLogoutModal(logoutUrl);
+            return;
+        }
+        offline.getUnsentChanges().then(function (entries) {
+            if (!entries.length || typeof window.poznoteOfflineSyncNow !== 'function') {
+                return entries;
+            }
+            var waited = new Promise(function (resolve) { setTimeout(resolve, LOGOUT_SEND_WAIT_MS); });
+            var sent = Promise.resolve(window.poznoteOfflineSyncNow()).catch(function () { return null; });
+            return Promise.race([sent, waited]).then(offline.getUnsentChanges);
+        }).then(function (entries) {
+            if (!entries.length) {
+                showPlainLogoutModal(logoutUrl);
+                return;
+            }
+            offline.confirmLosingChanges(entries).then(function (sure) {
+                if (sure) window.location.href = logoutUrl;
+            });
+        }).catch(function () {
+            showPlainLogoutModal(logoutUrl);
+        });
+    }
+
+    function showPlainLogoutModal(logoutUrl) {
         var existing = document.getElementById('confirmLogoutModal');
         if (existing) existing.remove();
 

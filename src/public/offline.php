@@ -9,6 +9,11 @@
  * the last days, read and edited on the device, sent to the server once the
  * connection is back. js/offline-app.js does all of it.
  *
+ * It looks and edits like index.php: same stylesheet bundles, same sidebar
+ * and note markup, and the app's own editor modules (the index_js.php head
+ * bundle, the selection toolbar, the task list scripts), wired to the device
+ * instead of the server.
+ *
  * The page carries no account data at all, only the interface in the
  * language asked for (?lang=, the user's language when the app stores it).
  * No auth.php here: whoever fetches it gets the same page.
@@ -16,6 +21,10 @@
 
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../lib/i18n.php';
+require_once __DIR__ . '/../lib/note-titles.php';
+require_once __DIR__ . '/../version_helper.php';
+require_once __DIR__ . '/index_js.php';
+require_once __DIR__ . '/index_css.php';
 
 header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-src 'none'; frame-ancestors 'self'; form-action 'self';");
 header('X-Content-Type-Options: nosniff');
@@ -28,37 +37,70 @@ $lang = poznoteNormalizeLanguageCode($_GET['lang'] ?? '')
     ?? 'en';
 
 $tr = static function (string $key, string $default, array $vars = []) use ($lang): string {
-    return t_h('offline.' . $key, $vars, $default, $lang);
+    return t_h($key, $vars, $default, $lang);
 };
 
-// Every string of the offline section, English first so a missing
-// translation still reads as text, for js/offline-app.js.
-$offlineStrings = array_replace_recursive(
-    (array)(loadI18nDictionary('en')['offline'] ?? []),
-    (array)(loadI18nDictionary($lang)['offline'] ?? [])
-);
+// The whole dictionary, English under the chosen language: the app modules
+// running here translate their own labels (js/offline-boot.js).
+$strings = array_replace_recursive(loadI18nDictionary('en'), $lang === 'en' ? [] : loadI18nDictionary($lang));
 
-$styles = poznoteCssResolve('offline');
+// Same bundle URLs and version as index.php, so an asset cached for one is
+// the asset of the other.
+$v = poznoteBuildAssetCacheVersion(getAppVersion());
+foreach ([poznoteGetIndexJsAssetVersion(), poznoteGetIndexCssAssetVersion()] as $part) {
+    if ($part !== '') {
+        $v .= '-' . $part;
+    }
+}
+$v = rawurlencode($v);
+
+$styles = [
+    'index_css.php?group=core&v=' . $v,
+    'index_css.php?group=modals&v=' . $v,
+    'dark_mode_css.php?v=' . $v,
+    'css/syntax-highlight.css?v=' . $v,
+    // The warning of a sign-out that would lose changes (js/offline-store.js)
+    poznoteAsset('css/profile-modal.css'),
+    poznoteAsset('css/offline.css'),
+];
+$mobileStyle = 'css/index-mobile.css?v=' . $v;
+
+$globalsScript = poznoteAsset('js/globals.js');
 $scripts = [
-    'js/theme-init.js',
-    'js/markdown-source.js',
-    'js/markdown-parser.js',
-    'js/markdown-merge.js',
-    'js/offline-store.js',
-    'js/offline-app.js',
+    poznoteAsset('js/offline-boot.js'),
+    $globalsScript,
+    'index_js.php?group=head&v=' . $v,
+    'js/codemirror-dist/markdown-codemirror.iife.js?v=' . $v,
+    'js/highlight/highlight.min.js?v=' . $v,
+    'js/highlight/powershell.min.js?v=' . $v,
+    'js/syntax-highlight.js?v=' . $v,
+    poznoteAsset('js/events-text-selection.js'),
+    poznoteAsset('js/tasklist-core.js'),
+    poznoteAsset('js/tasklist-render.js'),
+    poznoteAsset('js/tasklist-crud.js'),
+    poznoteAsset('js/tasklist-actions.js'),
+    poznoteAsset('js/tasklist-edit-modal.js'),
+    poznoteAsset('js/tasklist-order-drag.js'),
+    poznoteAsset('js/offline-store.js'),
+    poznoteAsset('js/offline-app.js'),
 ];
 
-// What the page needs offline, stored next to it by js/offline-sync.js. The
-// fonts are reached through css/fonts.css, which the browser would otherwise
-// only request once the page is already offline.
-$assets = [];
-foreach (array_merge($styles, $scripts) as $file) {
-    $assets[] = poznoteAsset($file);
-}
-foreach (['Light', 'Regular', 'SemiBold'] as $weight) {
-    $assets[] = 'webfonts/Inter/static/Inter_24pt-' . $weight . '.ttf';
-}
-$assets[] = 'favicon.svg';
+// What the page needs offline, stored next to it by js/offline-sync.js.
+// SortableJS is injected by js/tasklist-order-drag.js with the version of
+// js/globals.js (window.poznoteAssetUrl); the fonts are reached through the
+// stylesheets, which the browser would only ask for once already offline.
+$globalsQuery = (string)parse_url($globalsScript, PHP_URL_QUERY);
+$assets = array_merge(
+    [poznoteAsset('js/theme-init.js'), $mobileStyle],
+    $styles,
+    $scripts,
+    [
+        'js/Sortable.min.js' . ($globalsQuery !== '' ? '?' . $globalsQuery : ''),
+        'webfonts/Inter/static/Inter_24pt-Regular.ttf',
+        'webfonts/Inter/static/Inter_24pt-SemiBold.ttf',
+        'favicon.svg',
+    ]
+);
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($lang, ENT_QUOTES); ?>">
@@ -66,163 +108,147 @@ $assets[] = 'favicon.svg';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="color-scheme" content="dark light">
-    <title><?php echo $tr('page_title', 'Poznote (offline)'); ?></title>
+    <title><?php echo $tr('offline.page_title', 'Poznote (offline)'); ?></title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <script src="<?php echo htmlspecialchars(poznoteAsset('js/theme-init.js'), ENT_QUOTES); ?>"></script>
-    <?php poznoteRenderStylesheets('offline'); ?>
+    <link rel="stylesheet" href="<?php echo htmlspecialchars($styles[0], ENT_QUOTES); ?>">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars($mobileStyle, ENT_QUOTES); ?>" media="(max-width: 800px)">
+    <?php foreach (array_slice($styles, 1) as $style): ?>
+    <link rel="stylesheet" href="<?php echo htmlspecialchars($style, ENT_QUOTES); ?>">
+    <?php endforeach; ?>
     <script type="application/json" id="offline-shell-assets"><?php echo json_encode($assets, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP); ?></script>
-    <script type="application/json" id="offline-i18n"><?php echo json_encode($offlineStrings, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP); ?></script>
+    <script type="application/json" id="offline-i18n"><?php echo json_encode(['lang' => $lang, 'strings' => $strings, 'defaultNoteTitles' => getDefaultNoteTitles()], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP); ?></script>
+    <!-- Read by js/globals.js: no settings API offline -->
+    <script type="application/json" id="page-config-data">{"canUseSettingsApi":false,"settings":{"emoji_icons_enabled":"1"}}</script>
 </head>
-<body class="offline-page">
-    <div id="offline-root" class="offline-root">
+<body class="offline-page" data-markdown-default-mode="preview">
 
-        <!-- Opening: shown until the page knows what the device holds -->
+    <!-- Opening, offline sign-in, empty device: over the app until it opens -->
+    <div class="offline-screen" id="offline-screen">
         <section id="offline-loading" class="offline-center">
             <span class="poznote-logo offline-logo" role="img" aria-label="Poznote"></span>
         </section>
 
-        <!-- Offline sign-in -->
         <section id="offline-signin" class="offline-center" hidden>
             <div class="offline-card">
                 <span class="poznote-logo offline-logo" role="img" aria-label="Poznote"></span>
                 <h1 class="offline-card-title">Poznote</h1>
+                <p class="offline-muted" id="offline-signin-signed-out" hidden><?php echo $tr('offline.signout.done_text', 'The notes kept offline were removed from this device.'); ?></p>
                 <p class="offline-card-intro">
                     <i class="lucide lucide-wifi-off" aria-hidden="true"></i>
-                    <span><?php echo $tr('signin.intro', 'You are offline. Sign in to open the notes kept on this device.'); ?></span>
+                    <span><?php echo $tr('offline.signin.intro', 'You are offline. Sign in to open the notes kept on this device.'); ?></span>
                 </p>
 
                 <form id="offline-signin-form" class="offline-signin-form" autocomplete="on" hidden>
                     <input type="text" id="offline-username" name="username" autocomplete="username" required
-                           placeholder="<?php echo $tr('signin.username', 'Username or Email'); ?>"
-                           aria-label="<?php echo $tr('signin.username', 'Username or Email'); ?>">
+                           placeholder="<?php echo $tr('offline.signin.username', 'Username or Email'); ?>"
+                           aria-label="<?php echo $tr('offline.signin.username', 'Username or Email'); ?>">
                     <input type="password" id="offline-password" name="password" autocomplete="current-password" required
-                           placeholder="<?php echo $tr('signin.password', 'Password'); ?>"
-                           aria-label="<?php echo $tr('signin.password', 'Password'); ?>">
+                           placeholder="<?php echo $tr('offline.signin.password', 'Password'); ?>"
+                           aria-label="<?php echo $tr('offline.signin.password', 'Password'); ?>">
                     <div class="offline-error" id="offline-signin-error" role="alert" hidden></div>
-                    <button type="submit" class="btn btn-primary offline-signin-submit" id="offline-signin-submit"><?php echo $tr('signin.submit', 'Sign in offline'); ?></button>
+                    <button type="submit" class="btn btn-primary offline-signin-submit" id="offline-signin-submit"><?php echo $tr('offline.signin.submit', 'Sign in offline'); ?></button>
                 </form>
 
                 <div id="offline-continue" class="offline-continue" hidden>
-                    <p class="offline-muted"><?php echo $tr('signin.continue_intro', 'You are still signed in on this device, so your recent notes open without a password.'); ?></p>
+                    <p class="offline-muted"><?php echo $tr('offline.signin.continue_intro', 'You are still signed in on this device, so your recent notes open without a password.'); ?></p>
                     <div id="offline-continue-list" class="offline-continue-list"></div>
                 </div>
 
                 <button type="button" class="offline-link-button" id="offline-retry-btn">
                     <i class="lucide lucide-refresh-cw" aria-hidden="true"></i>
-                    <span><?php echo $tr('signin.retry', 'Try to reconnect'); ?></span>
+                    <span><?php echo $tr('offline.signin.retry', 'Try to reconnect'); ?></span>
                 </button>
             </div>
         </section>
 
-        <!-- Nothing kept on this device, or a browser that cannot keep anything -->
         <section id="offline-empty" class="offline-center" hidden>
             <div class="offline-card">
                 <span class="poznote-logo offline-logo" role="img" aria-label="Poznote"></span>
-                <h1 class="offline-card-title"><?php echo $tr('empty.title', 'No notes available offline'); ?></h1>
-                <p class="offline-card-intro offline-empty-text" id="offline-empty-text"><?php echo $tr('empty.text', 'No notes are kept on this device yet. Connect to the internet and open Poznote once: the notes you modified in the last days will then be available offline.'); ?></p>
-                <button type="button" class="btn btn-primary" id="offline-empty-retry-btn"><?php echo $tr('signin.retry', 'Try to reconnect'); ?></button>
+                <h1 class="offline-card-title" id="offline-empty-title"><?php echo $tr('offline.empty.title', 'No notes available offline'); ?></h1>
+                <p class="offline-card-intro offline-empty-text" id="offline-empty-text"><?php echo $tr('offline.empty.text', 'No notes are kept on this device yet. Connect to the internet and open Poznote once: the notes you modified in the last days will then be available offline.'); ?></p>
+                <button type="button" class="btn btn-primary" id="offline-empty-retry-btn"><?php echo $tr('offline.signin.retry', 'Try to reconnect'); ?></button>
             </div>
         </section>
+    </div>
 
-        <!-- The notes -->
-        <div id="offline-app" class="offline-app" hidden>
-            <header class="offline-topbar">
-                <span class="offline-brand">
-                    <span class="poznote-logo offline-brand-logo" aria-hidden="true"></span>
-                    <span class="offline-brand-name">Poznote</span>
-                </span>
-                <span class="offline-status" id="offline-status" role="status">
-                    <i class="lucide lucide-wifi-off" aria-hidden="true"></i>
-                    <span class="offline-status-text"><?php echo $tr('status.offline', 'Offline'); ?></span>
-                </span>
-                <span class="offline-topbar-spacer"></span>
-                <span class="offline-account-name" id="offline-account-name"></span>
-                <button type="button" class="offline-icon-button" id="offline-lock-btn"
-                        title="<?php echo $tr('lock_hint', 'Lock the offline notes'); ?>"
-                        aria-label="<?php echo $tr('lock_hint', 'Lock the offline notes'); ?>">
-                    <i class="lucide lucide-lock" aria-hidden="true"></i>
-                </button>
-            </header>
-
-            <div class="offline-online-banner" id="offline-online-banner" role="status" hidden>
-                <i class="lucide lucide-wifi" aria-hidden="true"></i>
-                <span class="offline-online-text" id="offline-online-text"></span>
-                <a class="btn btn-primary offline-online-action" id="offline-online-action" href="index.php"></a>
+    <!-- LEFT COLUMN: same markup as index.php, notes kept offline only -->
+    <div id="left_col">
+        <div class="sidebar-header">
+            <div class="sidebar-title-row">
+                <div class="sidebar-title" role="button" tabindex="0" id="offline-workspace-title" aria-haspopup="true" aria-expanded="false">
+                    <span class="poznote-logo workspace-title-icon" role="img" aria-label="Poznote"></span>
+                    <span class="workspace-title-text" id="offline-workspace-name">Poznote</span>
+                    <i class="lucide lucide-caret-down workspace-dropdown-icon" id="offline-workspace-caret" hidden></i>
+                </div>
+                <div class="sidebar-title-actions">
+                    <button type="button" class="sidebar-folder-toggle" id="offline-logout-btn"
+                            title="<?php echo $tr('workspace_menu.logout', 'Logout'); ?>"
+                            aria-label="<?php echo $tr('workspace_menu.logout', 'Logout'); ?>">
+                        <i class="lucide lucide-log-out"></i>
+                    </button>
+                    <button type="button" class="sidebar-plus" id="offline-new-btn" aria-haspopup="true" aria-expanded="false"
+                            title="<?php echo $tr('offline.new.button', 'New note'); ?>"
+                            aria-label="<?php echo $tr('offline.new.button', 'New note'); ?>">
+                        <i class="lucide lucide-plus-circle"></i>
+                    </button>
+                </div>
+                <div class="dropdown-menu offline-workspace-menu" id="offline-workspace-menu" role="menu" hidden></div>
+                <div class="dropdown-menu offline-new-menu" id="offline-new-menu" role="menu" hidden>
+                    <button type="button" class="dropdown-item" role="menuitem" data-type="note"><i class="lucide lucide-file-text"></i> <?php echo $tr('offline.new.note', 'Note'); ?></button>
+                    <button type="button" class="dropdown-item" role="menuitem" data-type="markdown"><i class="lucide lucide-file-code"></i> <?php echo $tr('offline.new.markdown', 'Markdown note'); ?></button>
+                    <button type="button" class="dropdown-item" role="menuitem" data-type="tasklist"><i class="lucide lucide-list-todo"></i> <?php echo $tr('offline.new.tasklist', 'Task list'); ?></button>
+                </div>
             </div>
-
-            <div class="offline-layout">
-                <aside class="offline-sidebar">
-                    <div class="offline-sidebar-tools">
-                        <div class="offline-search-row">
-                            <i class="lucide lucide-search" aria-hidden="true"></i>
-                            <input type="search" id="offline-search" autocomplete="off"
-                                   placeholder="<?php echo $tr('list.search', 'Search notes'); ?>"
-                                   aria-label="<?php echo $tr('list.search', 'Search notes'); ?>">
-                        </div>
-                        <div class="offline-tools-row">
-                            <select id="offline-workspace" class="offline-workspace" aria-label="Workspace" hidden></select>
-                            <div class="offline-new">
-                                <button type="button" class="btn btn-primary offline-new-btn" id="offline-new-btn" aria-haspopup="true" aria-expanded="false">
-                                    <i class="lucide lucide-plus" aria-hidden="true"></i>
-                                    <span><?php echo $tr('new.button', 'New note'); ?></span>
-                                </button>
-                                <div class="offline-new-menu" id="offline-new-menu" role="menu" hidden>
-                                    <button type="button" role="menuitem" data-type="note"><i class="lucide lucide-file-text" aria-hidden="true"></i><span><?php echo $tr('new.note', 'Note'); ?></span></button>
-                                    <button type="button" role="menuitem" data-type="markdown"><i class="lucide lucide-file-code" aria-hidden="true"></i><span><?php echo $tr('new.markdown', 'Markdown note'); ?></span></button>
-                                    <button type="button" role="menuitem" data-type="tasklist"><i class="lucide lucide-list-checks" aria-hidden="true"></i><span><?php echo $tr('new.tasklist', 'Task list'); ?></span></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <nav class="offline-list" id="offline-list" aria-label="<?php echo $tr('list.label', 'Notes'); ?>"></nav>
-                </aside>
-
-                <main class="offline-main" id="offline-main">
-                    <div class="offline-placeholder" id="offline-placeholder">
-                        <i class="lucide lucide-file-text" aria-hidden="true"></i>
-                        <p><?php echo $tr('note.placeholder', 'Select a note to open it.'); ?></p>
-                    </div>
-
-                    <article class="offline-note" id="offline-note" hidden>
-                        <div class="offline-note-header">
-                            <button type="button" class="offline-icon-button offline-back-btn" id="offline-back-btn"
-                                    title="<?php echo $tr('note.back', 'Back to the list'); ?>"
-                                    aria-label="<?php echo $tr('note.back', 'Back to the list'); ?>">
-                                <i class="lucide lucide-arrow-left" aria-hidden="true"></i>
-                            </button>
-                            <input type="text" class="offline-note-title" id="offline-note-title" autocomplete="off"
-                                   placeholder="<?php echo $tr('note.title_placeholder', 'Title'); ?>"
-                                   aria-label="<?php echo $tr('note.title_placeholder', 'Title'); ?>">
-                            <button type="button" class="btn btn-secondary offline-mode-btn" id="offline-mode-btn" hidden></button>
-                        </div>
-                        <div class="offline-note-meta" id="offline-note-meta"></div>
-                        <div class="offline-toolbar" id="offline-html-toolbar" role="toolbar" hidden>
-                            <button type="button" data-command="bold" title="<?php echo $tr('toolbar.bold', 'Bold'); ?>" aria-label="<?php echo $tr('toolbar.bold', 'Bold'); ?>"><i class="lucide lucide-bold" aria-hidden="true"></i></button>
-                            <button type="button" data-command="italic" title="<?php echo $tr('toolbar.italic', 'Italic'); ?>" aria-label="<?php echo $tr('toolbar.italic', 'Italic'); ?>"><i class="lucide lucide-italic" aria-hidden="true"></i></button>
-                            <button type="button" data-command="underline" title="<?php echo $tr('toolbar.underline', 'Underline'); ?>" aria-label="<?php echo $tr('toolbar.underline', 'Underline'); ?>"><i class="lucide lucide-underline" aria-hidden="true"></i></button>
-                            <button type="button" data-command="strikeThrough" title="<?php echo $tr('toolbar.strikethrough', 'Strikethrough'); ?>" aria-label="<?php echo $tr('toolbar.strikethrough', 'Strikethrough'); ?>"><i class="lucide lucide-strikethrough" aria-hidden="true"></i></button>
-                            <span class="offline-toolbar-separator" aria-hidden="true"></span>
-                            <button type="button" data-command="formatBlock" data-value="h2" title="<?php echo $tr('toolbar.heading', 'Heading'); ?>" aria-label="<?php echo $tr('toolbar.heading', 'Heading'); ?>"><i class="lucide lucide-heading" aria-hidden="true"></i></button>
-                            <button type="button" data-command="insertUnorderedList" title="<?php echo $tr('toolbar.bullet_list', 'Bulleted list'); ?>" aria-label="<?php echo $tr('toolbar.bullet_list', 'Bulleted list'); ?>"><i class="lucide lucide-list" aria-hidden="true"></i></button>
-                            <button type="button" data-command="insertOrderedList" title="<?php echo $tr('toolbar.numbered_list', 'Numbered list'); ?>" aria-label="<?php echo $tr('toolbar.numbered_list', 'Numbered list'); ?>"><i class="lucide lucide-list-ordered" aria-hidden="true"></i></button>
-                        </div>
-                        <div class="offline-note-body" id="offline-note-body"></div>
-                    </article>
-
-                    <div class="offline-unavailable" id="offline-unavailable" hidden>
-                        <i class="lucide lucide-cloud-off" aria-hidden="true"></i>
-                        <h2 class="offline-unavailable-title" id="offline-unavailable-title"></h2>
-                        <p class="offline-unavailable-meta" id="offline-unavailable-meta"></p>
-                        <p class="offline-unavailable-text" id="offline-unavailable-text"></p>
-                        <button type="button" class="btn btn-secondary offline-back-to-list" id="offline-unavailable-back"><?php echo $tr('note.back', 'Back to the list'); ?></button>
-                    </div>
-                </main>
+            <div class="offline-status" id="offline-status" role="status">
+                <i class="lucide lucide-wifi-off"></i>
+                <span class="offline-status-text"><?php echo $tr('offline.status.offline', 'Offline'); ?></span>
             </div>
+        </div>
+
+        <div class="contains_forms_search" id="search-bar-container">
+            <div class="unified-search-container">
+                <div class="searchbar-row">
+                    <div class="searchbar-input-wrapper">
+                        <i class="lucide lucide-search offline-search-icon" aria-hidden="true"></i>
+                        <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search" type="text"
+                               class="search form-control searchbar-input"
+                               placeholder="<?php echo $tr('offline.list.search', 'Search notes'); ?>"
+                               aria-label="<?php echo $tr('offline.list.search', 'Search notes'); ?>">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="notes-list-scrollable-content" id="offline-list"></div>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div id="right_pane">
+        <div id="right_col">
+            <div class="offline-placeholder" id="offline-placeholder">
+                <i class="lucide lucide-file-text" aria-hidden="true"></i>
+                <p><?php echo $tr('offline.note.placeholder', 'Select a note to open it.'); ?></p>
+            </div>
+            <div class="offline-unavailable" id="offline-unavailable" hidden>
+                <i class="lucide lucide-cloud-off" aria-hidden="true"></i>
+                <h2 class="offline-unavailable-title" id="offline-unavailable-title"></h2>
+                <p class="offline-unavailable-text" id="offline-unavailable-text"></p>
+                <button type="button" class="btn btn-secondary offline-back-to-list" id="offline-unavailable-back"><?php echo $tr('offline.note.back', 'Back to the list'); ?></button>
+            </div>
+            <div id="offline-note-host"></div>
         </div>
     </div>
 
-    <?php foreach (array_slice($scripts, 1) as $script): ?>
-    <script src="<?php echo htmlspecialchars(poznoteAsset($script), ENT_QUOTES); ?>"></script>
+    <!-- Back online: same banner as the app (css/offline-banner.css) -->
+    <div class="offline-banner" id="offline-online-banner" role="status" hidden>
+        <i class="lucide lucide-wifi"></i>
+        <span class="offline-banner-text" id="offline-online-text"></span>
+        <a class="btn btn-primary offline-banner-open" id="offline-online-action" href="index.php"></a>
+    </div>
+
+    <?php foreach ($scripts as $script): ?>
+    <script src="<?php echo htmlspecialchars($script, ENT_QUOTES); ?>"></script>
     <?php endforeach; ?>
 </body>
 </html>

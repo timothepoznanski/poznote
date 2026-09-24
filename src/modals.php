@@ -1122,11 +1122,17 @@ $pzNoteInfoRows = [
     <div class="modal-content">
         <h3><?php echo t_h('offline.settings.card', [], 'Offline notes'); ?></h3>
         <div class="modal-body">
+            <p id="offlineNotesDeviceStatus" hidden></p>
             <p><?php echo t_h('offline.settings.description', [], 'The notes you modified in the last days are kept in the browsers where you use Poznote, so they can be opened and edited without a network. Changes made offline are sent as soon as the connection is back. 0 keeps nothing offline.'); ?></p>
             <div class="radio-options">
-                <label><input type="number" id="offlineNotesDaysInput" min="0" max="30" step="1" value="5" style="width:80px; margin:0; padding:4px 8px;"> <?php echo t_h('offline.settings.unit', [], 'days'); ?></label>
+                <label><input type="number" id="offlineNotesDaysInput" min="0" max="<?php echo POZNOTE_OFFLINE_MAX_DAYS; ?>" step="1" value="<?php echo POZNOTE_OFFLINE_DEFAULT_DAYS; ?>" data-default="<?php echo POZNOTE_OFFLINE_DEFAULT_DAYS; ?>" style="width:80px; margin:0; padding:4px 8px;"> <?php echo t_h('offline.settings.unit', [], 'days'); ?></label>
             </div>
-            <p id="offlineNotesDeviceStatus"></p>
+            <p><?php echo t_h('offline.settings.limits_title', [], 'Limits:'); ?></p>
+            <ul class="offline-limits">
+                <li><?php echo t_h('offline.settings.limits_notes', ['notes' => POZNOTE_OFFLINE_MAX_NOTES, 'text' => POZNOTE_OFFLINE_MAX_TEXT_MB], '{{notes}} notes and {{text}} MB of text in total, most recently modified first'); ?></li>
+                <li><?php echo t_h('offline.settings.limits_pictures', ['picture' => POZNOTE_OFFLINE_MAX_PICTURE_MB, 'pictures' => POZNOTE_OFFLINE_MAX_PICTURES, 'total' => POZNOTE_OFFLINE_MAX_PICTURES_MB], 'Pictures: {{picture}} MB each, {{pictures}} and {{total}} MB in total, at most half the free space'); ?></li>
+                <li><?php echo t_h('offline.settings.limits_attachments', [], 'Other attachments (PDF, audio, files): online only'); ?></li>
+            </ul>
             <p><?php echo t_h('offline.settings.warning', [], 'Signing out removes the offline notes from the browser. On a shared computer, sign out when you leave.'); ?></p>
         </div>
         <div class="modal-buttons">

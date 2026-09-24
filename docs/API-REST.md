@@ -890,7 +890,7 @@ The web UI keeps the notes modified recently in the browser (IndexedDB) so they 
 GET /offline/manifest
 ```
 
-Returns the account's note list (metadata only, for the offline sidebar) and flags the notes kept offline: the most recently modified ones of the last `days` days (at most `max_notes`), of type `note`, `markdown` or `tasklist`. Those carry the same `version` token as [Get Note](#get-note), usable as `if_version`. The response has an `ETag`: send it back as `If-None-Match` to get `304 Not Modified` while nothing changed.
+Returns the notes kept offline, without their content: the most recently modified ones of the last `days` days, of type `note`, `markdown` or `tasklist`, within `limits` (`notes` notes and `text_mb` MB of text; the browser applies the picture limits `picture_mb`, `pictures` and `pictures_mb` to the images these notes show), with the same `version` token as [Get Note](#get-note), usable as `if_version`. `folders` holds only the folders of those notes and their parents. The response has an `ETag`: send it back as `If-None-Match` to get `304 Not Modified` while nothing changed.
 
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \
@@ -904,12 +904,11 @@ curl -u 'username:password' -H "X-User-ID: 1" \
   "success": true,
   "user": { "id": 1, "username": "alice", "email": "alice@example.com", "display_name": "Alice" },
   "days": 5,
-  "max_notes": 300,
+  "limits": { "notes": 300, "text_mb": 50, "picture_mb": 8, "pictures": 400, "pictures_mb": 200 },
   "workspaces": ["Poznote"],
   "folders": [{ "id": 3, "name": "Lectures", "parent_id": null, "workspace": "Poznote" }],
   "notes": [
-    { "id": 42, "heading": "Physics", "type": "markdown", "workspace": "Poznote", "folder_id": 3, "updated": "2026-09-23 14:02:11", "offline": 1, "version": "8b03f2cfdfd041732b3534f0cddbb3e2" },
-    { "id": 7, "heading": "Old notes", "type": "note", "workspace": "Poznote", "folder_id": null, "updated": "2026-05-02 09:30:00" }
+    { "id": 42, "heading": "Physics", "type": "markdown", "workspace": "Poznote", "folder_id": 3, "updated": "2026-09-23 14:02:11", "version": "8b03f2cfdfd041732b3534f0cddbb3e2" }
   ]
 }
 ```
@@ -3607,7 +3606,7 @@ curl http://YOUR_SERVER/api_health.php
 ### Offline Copies
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/offline/manifest` | Note list and versions of the notes kept offline |
+| `GET` | `/offline/manifest` | Notes kept offline, with their versions |
 | `GET` | `/offline/notes?ids=` | Full content of up to 50 notes |
 
 ### Snapshots

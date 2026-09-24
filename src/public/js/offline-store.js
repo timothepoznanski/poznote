@@ -19,7 +19,12 @@
  *   outbox    what was changed offline and still has to reach the server
  *             (a note's new title/content, or a note created offline, with a
  *             negative temporary id)
- *   meta      small device-wide values ('current' = account last synced here)
+ *   meta      small device-wide values ('current' = account last synced here,
+ *             'signedOut' = a sign-out whose server session is still open)
+ *
+ * A sign-out erases all of an account's records, outbox included; when that
+ * would lose changes, confirmLosingChanges() is the warning every sign-out
+ * path shows first (js/profile.js, js/offline-app.js).
  *
  * Exposed as window.PoznoteOffline.
  */
@@ -230,18 +235,24 @@
      * turned off). Changes still waiting in the outbox are kept: they reach
      * the server the next time this account signs in on this browser.
      */
-    function forgetAccount(userId) {
+    // `options.withOutbox`: the changes not sent yet go too (a sign-out).
+    // Without it they stay, to go out at the account's next sign-in.
+    function forgetAccount(userId, options) {
         userId = Number(userId);
-        var work = transaction(['accounts', 'notes', 'indexes'], 'readwrite', function (stores) {
+        var withOutbox = !!(options && options.withOutbox);
+        var storeNames = withOutbox ? ['accounts', 'notes', 'indexes', 'outbox'] : ['accounts', 'notes', 'indexes'];
+        var work = transaction(storeNames, 'readwrite', function (stores) {
             stores.accounts.delete(userId);
             stores.indexes.delete(userId);
-            stores.notes.index('userId').openKeyCursor(IDBKeyRange.only(userId)).onsuccess = function (event) {
-                var cursor = event.target.result;
-                if (cursor) {
-                    stores.notes.delete(cursor.primaryKey);
-                    cursor.continue();
-                }
-            };
+            (withOutbox ? ['notes', 'outbox'] : ['notes']).forEach(function (name) {
+                stores[name].index('userId').openKeyCursor(IDBKeyRange.only(userId)).onsuccess = function (event) {
+                    var cursor = event.target.result;
+                    if (cursor) {
+                        stores[name].delete(cursor.primaryKey);
+                        cursor.continue();
+                    }
+                };
+            });
         });
         return work.then(function () {
             if (window.caches) {
@@ -860,6 +871,128 @@
         });
     }
 
+    // ---- Sign-out ------------------------------------------------------------
+
+    // The changes a sign-out would erase: those of the account last signed
+    // in on this device, which is the one a sign-out forgets.
+    function getUnsentChanges() {
+        return getMeta('current').then(function (current) {
+            return current && current.userId ? getOutbox(current.userId) : [];
+        }).catch(function () {
+            return [];
+        });
+    }
+
+    // Same lookup as js/profile.js: the strings icon_sidebar.php resolved in
+    // the user's language first (pages without js/globals.js), then window.t.
+    function tr(key, vars, fallback) {
+        var preset = window.PoznoteProfileI18n && window.PoznoteProfileI18n[key];
+        var text = typeof preset === 'string' ? preset : null;
+        if (text === null && typeof window.t === 'function') {
+            return window.t(key, vars || null, fallback);
+        }
+        return String(text !== null ? text : fallback).replace(/\{\{(\w+)\}\}/g, function (match, name) {
+            return vars && vars[name] !== undefined ? String(vars[name]) : match;
+        });
+    }
+
+    // A loss accepted in the app is not asked about again by the offline page
+    // standing in for logout.php (js/offline-app.js), in the same tab.
+    var LOSS_ACCEPTED_KEY = 'poznote_offline_loss_accepted_at';
+    var LOSS_ACCEPTED_TTL_MS = 60 * 1000;
+
+    function takeLossAccepted() {
+        try {
+            var at = Number(window.sessionStorage.getItem(LOSS_ACCEPTED_KEY) || 0);
+            window.sessionStorage.removeItem(LOSS_ACCEPTED_KEY);
+            return at > 0 && Date.now() - at < LOSS_ACCEPTED_TTL_MS;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    /**
+     * The warning shown before a sign-out that would erase changes the server
+     * never got. Resolves true when the person signs out anyway.
+     */
+    function confirmLosingChanges(entries) {
+        var MAX_LISTED = 5;
+        return new Promise(function (resolve) {
+            var make = function (tag, className, text) {
+                var node = document.createElement(tag);
+                if (className) {
+                    node.className = className;
+                }
+                if (text !== undefined) {
+                    node.textContent = text;
+                }
+                return node;
+            };
+            var count = entries.length;
+            var modal = make('div', 'modal offline-loss-modal');
+            modal.id = 'offlineLossModal';
+            modal.setAttribute('role', 'alertdialog');
+            var content = make('div', 'modal-content');
+            var sign = make('i', 'lucide lucide-alert-triangle offline-loss-icon');
+            sign.setAttribute('aria-hidden', 'true');
+            content.appendChild(sign);
+            var title = make('h3', 'offline-loss-title', tr('offline.signout.loss_title', null, 'Your changes will be lost'));
+            title.id = 'offlineLossTitle';
+            modal.setAttribute('aria-labelledby', title.id);
+            content.appendChild(title);
+
+            var box = make('div', 'offline-loss-box');
+            box.appendChild(make('p', 'offline-loss-text', count === 1
+                ? tr('offline.signout.loss_text_one', null, '1 change made offline has not been synchronized with the server. If you log out now, it will be erased from this device and lost for good.')
+                : tr('offline.signout.loss_text_other', { count: count }, '{{count}} changes made offline have not been synchronized with the server. If you log out now, they will be erased from this device and lost for good.')));
+            var list = make('ul', 'offline-loss-list');
+            entries.slice(0, MAX_LISTED).forEach(function (entry) {
+                list.appendChild(make('li', null, entry.heading || tr('offline.list.untitled', null, 'Untitled')));
+            });
+            if (count > MAX_LISTED) {
+                list.appendChild(make('li', null, tr('offline.signout.loss_more', { count: count - MAX_LISTED }, 'and {{count}} more')));
+            }
+            box.appendChild(list);
+            content.appendChild(box);
+            content.appendChild(make('p', 'offline-loss-keep', tr('offline.signout.loss_keep', null, 'To keep them, cancel and stay signed in: they are sent on their own as soon as the connection works.')));
+
+            var buttons = make('div', 'modal-buttons');
+            var cancel = make('button', 'btn-cancel', tr('common.cancel', null, 'Cancel'));
+            var confirm = make('button', 'btn-danger', tr('offline.signout.loss_confirm', null, 'Log out and lose the changes'));
+            cancel.type = 'button';
+            confirm.type = 'button';
+            buttons.appendChild(cancel);
+            buttons.appendChild(confirm);
+            content.appendChild(buttons);
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+            modal.style.display = 'flex';
+
+            var done = function (answer) {
+                document.removeEventListener('keydown', onKey);
+                modal.remove();
+                if (answer) {
+                    try {
+                        window.sessionStorage.setItem(LOSS_ACCEPTED_KEY, String(Date.now()));
+                    } catch (e) {
+                        console.debug('offline-store: the accepted loss could not be noted:', e);
+                    }
+                }
+                resolve(answer);
+            };
+            var onKey = function (event) {
+                if (event.key === 'Escape') {
+                    done(false);
+                }
+            };
+            document.addEventListener('keydown', onKey);
+            cancel.addEventListener('click', function () { done(false); });
+            confirm.addEventListener('click', function () { done(true); });
+            // The safe choice has the focus.
+            cancel.focus();
+        });
+    }
+
     window.PoznoteOffline = {
         SHELL_CACHE: SHELL_CACHE,
         MEDIA_CACHE_PREFIX: MEDIA_CACHE_PREFIX,
@@ -891,6 +1024,9 @@
         storePendingVerifier: storePendingVerifier,
         clearPendingVerifier: clearPendingVerifier,
         takePendingVerifier: takePendingVerifier,
-        loginMatchesAccount: loginMatchesAccount
+        loginMatchesAccount: loginMatchesAccount,
+        getUnsentChanges: getUnsentChanges,
+        confirmLosingChanges: confirmLosingChanges,
+        takeLossAccepted: takeLossAccepted
     };
 })();

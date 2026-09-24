@@ -81,7 +81,7 @@ https://discord.gg/AWhWWSEkJ
 - [S3 Backups](#s3-backups)
 - [Backup / Export](#backup--export)
 - [Restore / Import](#restore--import)
-- [Offline View](#offline-view)
+- [Offline](#offline)
 - [Multiple Instances](#multiple-instances)
 - [AI Assistant](#ai-assistant)
 - [Transcription (speech to text)](#transcription-speech-to-text)
@@ -1208,9 +1208,33 @@ updated: 2024-01-20 15:45:00
 </details>
 
 
-## Offline View
+## Offline
+
+Poznote keeps working without a network in two ways: the notes you modified recently stay available in your browser, ready to be read and edited, and a complete backup can be browsed anywhere as a read-only export.
+
+<details>
+<summary><strong>Offline notes</strong></summary>
+<br>
+
+The notes you modified in the last 5 days are kept in each browser where you use Poznote, and this copy is refreshed after every save. In a classroom, on a train or anywhere without Wi-Fi, open the usual Poznote address: the browser shows the offline version of Poznote, with the same sidebar, editors, toolbar and search, listing only the notes kept offline.
+
+*   **Signing in:** type the password you last signed in with in this browser, it is checked without the server. If you never typed your password in this browser (SSO, automatic sign-in), the last account used there opens with a **Continue as** button.
+*   **Reading and editing:** HTML notes, Markdown notes and task lists open in their usual editor, and new notes can be created. Other note types, such as drawings, stay online only. Changes are kept in the browser until they are sent.
+*   **Back online:** the changes are sent automatically. If a note was also changed on the server in the meantime, both versions are merged when possible, otherwise your offline version is kept as a separate note named "... (offline copy)". A note deleted on the server in the meantime is created again.
+*   **Settings:** **Settings > Other > Offline notes** sets how many days of notes are kept (5 by default, up to 30, 0 turns offline notes off) and shows what the current browser holds.
+*   **Limits:** at most 300 notes and 50 MB of text, the most recently modified first. The pictures shown in these notes are kept too, up to 8 MB each, 400 pictures and 200 MB in total, and never more than half the free space of the browser. Other attachments (PDF, audio, files) open online only.
+*   **Requirements:** Poznote must be served over HTTPS (browsers keep pages offline only on a secure connection, `http://localhost` also works) and opened once online in the browser, after signing in, for the copy to be made.
+*   **Privacy:** only the notes of your own account are kept, not those of an account or a workspace shared with you. They are stored unencrypted in the browser. Signing out removes them from the browser (changes not sent yet too, after a warning that lists them): on a shared computer, sign out when you leave. Signing out also works without a network, from the offline page: the notes are removed at once, and the session on the server ends the next time Poznote opens online.
+
+</details>
+
+<details>
+<summary><strong>Offline export</strong></summary>
+<br>
 
 The **📦 Complete Backup** creates a standalone offline version of your notes. Simply extract the ZIP and open `index.html` in any web browser. This allows you to read your notes offline, but without the full Poznote functionality, it's a read-only export.
+
+</details>
 
 ## Multiple Instances
 

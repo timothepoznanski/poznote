@@ -8,7 +8,11 @@
  *    it when Poznote is opened without a network. The password itself is
  *    never stored.
  *  - Right after a sign-out, what this device kept for the account that
- *    signed out is forgotten (changes still waiting to be sent excepted).
+ *    signed out is forgotten, changes still waiting to be sent included (the
+ *    logout dialog warned first, js/profile.js).
+ *  - A sign-out made on the offline page while the server could not be
+ *    reached leaves a mark that has the session closed later
+ *    (js/offline-sync.js); this page means no session is left to close.
  */
 (function () {
     'use strict';
@@ -26,12 +30,17 @@
         config = {};
     }
 
+    Store.deleteMeta('signedOut').catch(function (e) {
+        console.debug('offline-login: clearing the sign-out mark failed:', e);
+    });
+
     if (config.justLoggedOut) {
+        Store.takeLossAccepted();
         Store.getMeta('current').then(function (current) {
             if (!current || !current.userId) {
                 return null;
             }
-            return Store.forgetAccount(current.userId).then(function () {
+            return Store.forgetAccount(current.userId, { withOutbox: true }).then(function () {
                 return Store.deleteMeta('current');
             });
         }).catch(function (e) {

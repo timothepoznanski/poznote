@@ -528,6 +528,16 @@ html[data-theme='dark'] .modal .modal-info-note {
     white-space: nowrap;
 }
 
+/* Offline notes: wide enough for each limit to hold on one line. */
+#offlineNotesModal .modal-content {
+    max-width: 780px;
+}
+
+#offlineNotesModal .offline-limits {
+    margin: 0 0 16px;
+    padding-left: 20px;
+}
+
 @media (max-width: 480px) {
     #noteColorPaletteModal .modal-buttons {
         flex-wrap: wrap;

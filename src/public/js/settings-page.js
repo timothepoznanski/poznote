@@ -891,9 +891,11 @@
     }
 
     // Offline notes (js/offline-sync.js): days of recently modified notes kept
-    // in the browser, 5 when never set, 0 = none.
-    var OFFLINE_NOTES_DEFAULT_DAYS = 5;
-    var OFFLINE_NOTES_MAX_DAYS = 30;
+    // in the browser, 0 = none. Default and maximum come from the modal's
+    // field (POZNOTE_OFFLINE_* in functions.php).
+    var offlineDaysInput = document.getElementById('offlineNotesDaysInput');
+    var OFFLINE_NOTES_DEFAULT_DAYS = offlineDaysInput ? Number(offlineDaysInput.getAttribute('data-default')) || 5 : 5;
+    var OFFLINE_NOTES_MAX_DAYS = offlineDaysInput ? Number(offlineDaysInput.getAttribute('max')) || 30 : 30;
 
     function getOfflineNotesDays(value) {
         if (value === null || value === undefined || String(value).trim() === '') {
@@ -919,29 +921,43 @@
     function refreshOfflineNotesDeviceStatus() {
         var status = document.getElementById('offlineNotesDeviceStatus');
         if (!status) return;
+        // First line of the modal: hidden while it has nothing to say
+        var show = function (text) {
+            status.textContent = text;
+            status.hidden = !text;
+        };
         var store = window.PoznoteOffline;
         if (!store || !store.isSupported()) {
-            status.textContent = tr('offline.settings.device_unsupported', {}, 'This browser cannot keep notes offline (it needs a secure HTTPS connection).');
+            show(tr('offline.settings.device_unsupported', {}, 'This browser cannot keep notes offline (it needs a secure HTTPS connection).'));
             return;
         }
         var accountId = Number((document.cookie.match(/(?:^|;\s*)poznote_account=(\d+)/) || [])[1] || 0);
         if (!accountId) {
-            status.textContent = '';
+            show('');
             return;
         }
         Promise.all([store.getAccount(accountId), store.getNotes(accountId)]).then(function (both) {
             var account = both[0];
             var count = (both[1] || []).length;
             if (!account || !account.lastSyncAt) {
-                status.textContent = tr('offline.settings.device_none', {}, 'Nothing is kept in this browser yet: open your notes once and they will be.');
+                show(tr('offline.settings.device_none', {}, 'Nothing is kept in this browser yet: open your notes once and they will be.'));
                 return;
             }
-            status.textContent = tr('offline.settings.device_status', {
-                count: count,
-                date: new Date(account.lastSyncAt).toLocaleString()
-            }, 'In this browser: ' + count + ' notes available offline, updated ' + new Date(account.lastSyncAt).toLocaleString() + '.');
+            var uiLang = (window.POZNOTE_I18N && window.POZNOTE_I18N.lang) || document.documentElement.lang || undefined;
+            var updated;
+            try {
+                updated = new Date(account.lastSyncAt).toLocaleString(uiLang);
+            } catch (e) {
+                updated = new Date(account.lastSyncAt).toLocaleString();
+            }
+            show(count === 1
+                ? tr('offline.settings.device_status_one', { date: updated }, 'In this browser: 1 note available offline, updated ' + updated + '.')
+                : tr('offline.settings.device_status', {
+                    count: count,
+                    date: updated
+                }, 'In this browser: ' + count + ' notes available offline, updated ' + updated + '.'));
         }).catch(function () {
-            status.textContent = '';
+            show('');
         });
     }
 

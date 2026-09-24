@@ -3,9 +3,13 @@
  *
  * While the app is open and the network works, this keeps the browser's
  * offline copies (js/offline-store.js) up to date:
- *  - pushes what was changed on the offline page first (offline.php), then
- *    downloads the notes modified in the last days (GET api/v1/offline/...),
- *    only those whose version changed, and the pictures they show;
+ *  - the note the app just saved (or created, renamed, moved, whose tasks
+ *    changed): its copy is refreshed right after the save, so what was
+ *    written last is always what opens offline;
+ *  - on load and every few minutes: pushes what was changed on the offline
+ *    page first (offline.php), then downloads the notes modified in the last
+ *    days (GET api/v1/offline/...), only those whose version changed, and the
+ *    pictures they show (changes made elsewhere: another device, the API);
  *  - files the password verifier parked by the login page under the account
  *    that just signed in (the offline sign-in checks it);
  *  - stores the offline page itself for the service worker (sw.js), which
@@ -21,6 +25,23 @@
     if (!Store || !Store.isSupported()) {
         return;
     }
+    // Signed out on the offline page while the server could not be reached
+    // (js/offline-app.js): the session left open ends now, before anything
+    // is kept again. The mark goes first, so a failure cannot loop.
+    var leaving = false;
+    var signingOut = Store.getMeta('signedOut').then(function (signedOut) {
+        if (!signedOut) {
+            return false;
+        }
+        leaving = true;
+        return Store.deleteMeta('signedOut').then(function () {
+            window.location.replace('logout.php');
+            return true;
+        });
+    }).catch(function (e) {
+        console.debug('offline-sync: the sign-out mark could not be read:', e);
+        return false;
+    });
     // An account opened through a grant is not the user's to keep offline
     // (the API refuses it too).
     if (window.__poznoteBorrowedAccountId) {
@@ -31,12 +52,19 @@
     var MIN_GAP_MS = 20 * 1000;
     var PROBE_INTERVAL_MS = 15 * 1000;
     var BATCH_SIZE = 50;
-    var MEDIA_MAX_BYTES = 8 * 1024 * 1024;
-    var MEDIA_MAX_FILES = 400;
+    // Pictures of the offline notes: limits sent by the server with the
+    // manifest (POZNOTE_OFFLINE_* in functions.php), these values until then.
+    // Never more than half the room the browser has left, whatever they say.
+    // The notes' text has its own budget on the server (OfflineController).
+    var MB = 1024 * 1024;
+    var limits = { picture_mb: 8, pictures: 400, pictures_mb: 200 };
+    // Body classes of index.php that describe a moment, not a preference.
+    var TRANSIENT_BODY_CLASS = /^(note-open|mobile-|modal-|ui-custom-panel-open|note-creation|left-col-resizing|has-background-image|has-internal-tabs|outline-collapsed|sidebar-collapsed|icon-sidebar-collapsed|focus-mode|dragging|is-)/;
     var ATTACHMENT_URL = /\/?api\/v1\/notes\/(\d+)\/attachments\/([A-Za-z0-9_.-]+)/g;
 
     var running = null;
     var lastRunAt = 0;
+    var syncStartedAt = 0;
     var shellStored = false;
     var offlineDays = null;
     var bannerEl = null;
@@ -116,15 +144,32 @@
         };
     }
 
+    function isQuotaError(error) {
+        return !!error && (error.name === 'QuotaExceededError' || /quota/i.test(String(error.message || '')));
+    }
+
+    // Most recent first: when the browser runs out of room, what is kept is
+    // what was modified last.
     function downloadNotes(userId, ids) {
         var batches = [];
         for (var i = 0; i < ids.length; i += BATCH_SIZE) {
             batches.push(ids.slice(i, i + BATCH_SIZE));
         }
+        var full = false;
         return batches.reduce(function (chain, batch) {
             return chain.then(function () {
+                if (full) {
+                    return null;
+                }
                 return fetchNotes(batch).then(function (notes) {
                     return Store.putNotes(notes.map(function (note) { return toRecord(userId, note); }));
+                }).catch(function (e) {
+                    if (isQuotaError(e)) {
+                        full = true;
+                        console.warn('offline-sync: the browser has no room left for more offline notes');
+                        return null;
+                    }
+                    throw e;
                 });
             });
         }, Promise.resolve());
@@ -132,18 +177,50 @@
 
     // ---- Pictures shown in the offline notes -------------------------------
 
+    // The pictures the notes show, most recently modified note first.
     function attachmentUrls(records) {
-        var urls = {};
-        records.forEach(function (record) {
+        var urls = [];
+        var seen = {};
+        records.slice().sort(function (a, b) {
+            return String(b.updated || '').localeCompare(String(a.updated || ''));
+        }).forEach(function (record) {
             var content = String(record.content || '');
             var match;
             ATTACHMENT_URL.lastIndex = 0;
             while ((match = ATTACHMENT_URL.exec(content)) !== null) {
                 var url = new URL('/api/v1/notes/' + match[1] + '/attachments/' + match[2], window.location.origin).href;
-                urls[url] = true;
+                if (!seen[url]) {
+                    seen[url] = true;
+                    urls.push(url);
+                }
             }
         });
-        return Object.keys(urls).slice(0, MEDIA_MAX_FILES);
+        return urls.slice(0, limits.pictures);
+    }
+
+    // Room for pictures: the fixed budget, or half of what the browser still
+    // grants this site plus what the pictures already take, if that is less.
+    function mediaBudget(currentBytes) {
+        if (!navigator.storage || typeof navigator.storage.estimate !== 'function') {
+            return Promise.resolve(limits.pictures_mb * MB);
+        }
+        return navigator.storage.estimate().then(function (estimate) {
+            var free = Math.max(0, (estimate.quota || 0) - (estimate.usage || 0));
+            return estimate.quota ? Math.min(limits.pictures_mb * MB, currentBytes + free / 2) : limits.pictures_mb * MB;
+        }, function () {
+            return limits.pictures_mb * MB;
+        });
+    }
+
+    function useLimits(account) {
+        var sent = account && account.limits;
+        if (sent && sent.picture_mb && sent.pictures && sent.pictures_mb) {
+            limits = { picture_mb: Number(sent.picture_mb), pictures: Number(sent.pictures), pictures_mb: Number(sent.pictures_mb) };
+        }
+    }
+
+    function cachedSize(response) {
+        return Number(response && response.headers.get('X-Offline-Size')) || 0;
     }
 
     function cacheMedia(userId, records) {
@@ -155,29 +232,54 @@
         wanted.forEach(function (url) { wantedSet[url] = true; });
 
         return window.caches.open(Store.mediaCacheName(userId)).then(function (cache) {
+            // Forget pictures no offline note shows any more, and measure the rest.
             return cache.keys().then(function (keys) {
                 var have = {};
-                var drops = [];
-                keys.forEach(function (request) {
-                    if (wantedSet[request.url]) {
-                        have[request.url] = true;
-                    } else {
-                        drops.push(cache.delete(request));
+                return Promise.all(keys.map(function (request) {
+                    if (!wantedSet[request.url]) {
+                        return cache.delete(request);
                     }
-                });
-                return Promise.all(drops).then(function () {
-                    var missing = wanted.filter(function (url) { return !have[url]; });
-                    return missing.reduce(function (chain, url) {
+                    return cache.match(request).then(function (response) {
+                        have[request.url] = cachedSize(response);
+                    });
+                })).then(function () {
+                    var current = Object.keys(have).reduce(function (sum, url) { return sum + have[url]; }, 0);
+                    return mediaBudget(current);
+                }).then(function (budget) {
+                    var used = 0;
+                    var full = false;
+                    return wanted.reduce(function (chain, url) {
                         return chain.then(function () {
+                            if (Object.prototype.hasOwnProperty.call(have, url)) {
+                                // Kept while it fits, in priority order.
+                                used += have[url];
+                                return used > budget ? cache.delete(url) : null;
+                            }
+                            if (full || used >= budget) {
+                                return null;
+                            }
                             return fetch(url, { credentials: 'same-origin' }).then(function (response) {
                                 var type = response.headers.get('Content-Type') || '';
-                                var size = Number(response.headers.get('Content-Length') || 0);
+                                var announced = Number(response.headers.get('Content-Length') || 0);
                                 // Only pictures are shown inline; big files stay online.
-                                if (!response.ok || type.indexOf('image/') !== 0 || size > MEDIA_MAX_BYTES) {
+                                if (!response.ok || type.indexOf('image/') !== 0 || announced > limits.picture_mb * MB) {
                                     return null;
                                 }
-                                return cache.put(url, response);
-                            }).catch(function () { return null; });
+                                return response.blob().then(function (blob) {
+                                    if (blob.size > limits.picture_mb * MB || used + blob.size > budget) {
+                                        return null;
+                                    }
+                                    used += blob.size;
+                                    return cache.put(url, new Response(blob, {
+                                        headers: { 'Content-Type': type, 'X-Offline-Size': String(blob.size) }
+                                    }));
+                                });
+                            }).catch(function (e) {
+                                if (isQuotaError(e)) {
+                                    full = true;
+                                }
+                                return null;
+                            });
                         });
                     }, Promise.resolve());
                 });
@@ -185,6 +287,27 @@
         }).catch(function (e) {
             console.debug('offline-sync: cacheMedia() failed:', e);
         });
+    }
+
+    // How the account displays notes (index.php body classes, markdown view
+    // mode, sizes): the offline page applies the same.
+    function captureDisplay() {
+        var bodyClasses = Array.prototype.filter.call(document.body.classList, function (name) {
+            return !TRANSIENT_BODY_CLASS.test(name);
+        });
+        var rootStyle = window.getComputedStyle(document.documentElement);
+        var rootVars = {};
+        ['--note-font-size', '--sidebar-font-size', '--note-max-width', '--left-col-width'].forEach(function (name) {
+            var value = rootStyle.getPropertyValue(name).trim();
+            if (value) {
+                rootVars[name] = value;
+            }
+        });
+        return {
+            bodyClasses: bodyClasses,
+            markdownDefaultMode: document.body.getAttribute('data-markdown-default-mode') || '',
+            rootVars: rootVars
+        };
     }
 
     // ---- The offline page, stored for the service worker --------------------
@@ -298,6 +421,7 @@
     // ---- One sync -----------------------------------------------------------
 
     function runSync() {
+        syncStartedAt = Date.now();
         var pageAccount = Number(readCookie('poznote_account') || 0);
         var stored = null;
 
@@ -324,6 +448,7 @@
                 account.email = data.user.email || '';
                 account.displayName = data.user.display_name || account.username;
                 account.days = Number(data.days) || 0;
+                account.limits = data.limits || account.limits || null;
                 account.manifestEtag = manifest.etag || '';
                 return handleManifest(account, data);
             });
@@ -331,8 +456,10 @@
 
     function handleManifest(account, data) {
         var userId = Number(account.userId);
+        useLimits(account);
         account.lastSyncAt = Date.now();
         account.language = currentLanguage();
+        account.display = captureDisplay();
         offlineDays = account.days;
 
         // A password typed on the login page of this tab, for this account.
@@ -407,7 +534,7 @@
             })]);
         }).then(function (both) {
             var local = both[0];
-            var wanted = both[1].filter(function (note) { return note.offline; });
+            var wanted = both[1];
             var localById = {};
             local.forEach(function (record) { localById[record.id] = record; });
             var wantedIds = {};
@@ -419,7 +546,11 @@
                     toFetch.push(note.id);
                 }
             });
-            var toDrop = local.filter(function (record) { return !wantedIds[record.id]; }).map(function (record) { return record.id; });
+            // A copy refreshed by a save made while this sync ran is newer
+            // than the list it compares against: it stays.
+            var toDrop = local.filter(function (record) {
+                return !wantedIds[record.id] && !(record.cachedAt > syncStartedAt);
+            }).map(function (record) { return record.id; });
 
             return downloadNotes(userId, toFetch)
                 .then(function () {
@@ -435,6 +566,9 @@
     }
 
     function syncNow(force) {
+        if (leaving) {
+            return Promise.resolve();
+        }
         if (running) {
             return running;
         }
@@ -601,11 +735,124 @@
         }, 1000);
     }
 
+    // ---- The copy follows every save ---------------------------------------------
+
+    var refreshIds = {};
+    var refreshTimer = null;
+    var NOTE_WRITE_URL = /\/api\/v1\/notes\/(\d+)(\/[^?#]*)?$/;
+    // Writes that leave the note as it was
+    var NOT_A_NOTE_CHANGE = /^\/(lock|snapshot|beacon|task-reminder)/;
+
+    function queueRefresh(noteId) {
+        refreshIds[noteId] = true;
+        clearTimeout(refreshTimer);
+        // Coalesces the requests of one action (a save, its tag update...).
+        refreshTimer = setTimeout(refreshQueued, 300);
+    }
+
+    // Re-read the notes just written and store their copy, as the full sync
+    // would: a note saved now is a note modified in the last days.
+    function refreshQueued() {
+        var ids = Object.keys(refreshIds).map(Number);
+        refreshIds = {};
+        var userId = Number(readCookie('poznote_account') || 0);
+        if (!ids.length || !userId) {
+            return Promise.resolve();
+        }
+        return Store.getAccount(userId).then(function (account) {
+            if (!account || !account.days) {
+                return null;
+            }
+            useLimits(account);
+            return fetchNotes(ids).then(function (notes) {
+                var kept = notes.filter(function (note) {
+                    return note.type === 'note' || note.type === 'markdown' || note.type === 'tasklist';
+                });
+                var keptIds = {};
+                kept.forEach(function (note) { keptIds[note.id] = true; });
+                var gone = ids.filter(function (id) { return !keptIds[id]; });
+                return Store.putNotes(kept.map(function (note) { return toRecord(userId, note); }))
+                    .then(function () {
+                        return gone.length ? Store.deleteNotes(userId, gone) : null;
+                    })
+                    .then(function () {
+                        return Store.getIndex(userId);
+                    })
+                    .then(function (index) {
+                        index = index || { userId: userId, notes: [], folders: [], workspaces: [], days: account.days };
+                        var byId = {};
+                        kept.forEach(function (note) { byId[note.id] = note; });
+                        var list = (index.notes || []).filter(function (meta) {
+                            return !byId[meta.id] && gone.indexOf(Number(meta.id)) === -1;
+                        });
+                        kept.forEach(function (note) {
+                            list.unshift({
+                                id: Number(note.id),
+                                heading: note.heading,
+                                type: note.type,
+                                workspace: note.workspace,
+                                folder_id: note.folder_id === undefined ? null : note.folder_id,
+                                updated: note.updated,
+                                version: note.version
+                            });
+                        });
+                        index.notes = list;
+                        return Store.putIndex(index);
+                    })
+                    .then(function () {
+                        return kept.length ? Store.getNotes(userId).then(function (records) {
+                            return cacheMedia(userId, records);
+                        }) : null;
+                    });
+            });
+        }).catch(function (e) {
+            console.debug('offline-sync: refreshing the copy of a saved note failed:', e);
+        });
+    }
+
+    function onNoteWrite(method, rawUrl, response) {
+        var url;
+        try {
+            url = new URL(String(rawUrl || ''), window.location.href);
+        } catch (e) {
+            return;
+        }
+        // The push of offline changes updates the copies itself.
+        if (url.origin !== window.location.origin || url.searchParams.get('offline_sync') === '1') {
+            return;
+        }
+        var match = NOTE_WRITE_URL.exec(url.pathname);
+        if (match) {
+            if (!match[2] && method === 'DELETE') {
+                // In the trash now: the next sync drops its copy.
+                return;
+            }
+            if (!NOT_A_NOTE_CHANGE.test(match[2] || '')) {
+                queueRefresh(Number(match[1]));
+            }
+            return;
+        }
+        // A note created in the app
+        if (url.pathname.endsWith('/api/v1/notes') && method === 'POST') {
+            response.clone().json().then(function (data) {
+                if (data && data.note && data.note.id) {
+                    queueRefresh(Number(data.note.id));
+                }
+            }).catch(function () {});
+        }
+    }
+
     if (typeof window.fetch === 'function') {
         var nativeFetch = window.fetch;
-        window.fetch = function () {
+        window.fetch = function (input, init) {
             var result = nativeFetch.apply(this, arguments);
-            result.catch(function (error) {
+            var method = String((init && init.method) || (input && typeof input === 'object' && input.method) || 'GET').toUpperCase();
+            var url = (input && typeof input === 'object' && input.url) || String(input);
+            result.then(function (response) {
+                if (method !== 'GET' && method !== 'HEAD' && response && response.ok) {
+                    onNoteWrite(method, url, response);
+                }
+            }, function (error) {
                 if (error && error.name === 'TypeError') {
                     checkAfterFailure();
                 }
@@ -653,9 +900,15 @@
     function start() {
         var begin = function () { syncNow(true); };
         var pageAccount = Number(readCookie('poznote_account') || 0);
-        (pageAccount ? Store.getOutbox(pageAccount) : Promise.resolve([])).catch(function () {
-            return [];
-        }).then(function (pending) {
+        signingOut.then(function (leaving) {
+            if (leaving) {
+                return null;
+            }
+            return (pageAccount ? Store.getOutbox(pageAccount) : Promise.resolve([])).catch(function () {
+                return [];
+            }).then(startWith);
+        });
+        function startWith(pending) {
             // Changes made offline go out at once, before anything is typed
             // on top of the old version.
             if (pending.length) {
@@ -671,7 +924,7 @@
                     begin();
                 }
             }, 1500);
-        });
+        }
     }
 
     if (document.readyState === 'complete') {

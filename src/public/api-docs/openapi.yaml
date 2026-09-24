@@ -1385,14 +1385,16 @@ paths:
   /offline/manifest:
     get:
       tags: [Notes]
-      summary: Note list and versions of the notes kept offline
+      summary: Notes kept offline, with their versions
       description: |
         Feeds the browser's offline copies (js/offline-sync.js). Returns the
-        account's note list (metadata only) and flags with `offline: 1` the
         notes modified in the last `days` days (user setting
-        `offline_notes_days`, default 5, 0 = off), with their version token.
-        Answers 304 to a matching If-None-Match. Refused (403,
-        `offline_unavailable`) on an account the session does not own.
+        `offline_notes_days`, default 5, 0 = off), most recent first within
+        `limits`, without content, with their version token, and the
+        folders of those notes.
+        `limits` gives the limits in force. Answers 304 to
+        a matching If-None-Match. Refused (403, `offline_unavailable`) on an
+        account the session does not own.
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
         - name: If-None-Match
@@ -1414,8 +1416,19 @@ paths:
                     type: object
                   days:
                     type: integer
-                  max_notes:
-                    type: integer
+                  limits:
+                    type: object
+                    properties:
+                      notes:
+                        type: integer
+                      text_mb:
+                        type: integer
+                      picture_mb:
+                        type: integer
+                      pictures:
+                        type: integer
+                      pictures_mb:
+                        type: integer
                   workspaces:
                     type: array
                     items:

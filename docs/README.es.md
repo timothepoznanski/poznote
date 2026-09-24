@@ -81,7 +81,7 @@ https://discord.gg/AWhWWSEkJ
 - [Copias de seguridad S3](#copias-de-seguridad-s3)
 - [Copia de seguridad / Exportar](#copia-de-seguridad--exportar)
 - [Restaurar / Importar](#restaurar--importar)
-- [Vista sin conexión](#vista-sin-conexión)
+- [Sin conexión](#sin-conexión)
 - [Varias instancias](#varias-instancias)
 - [Asistente IA](#asistente-ia)
 - [Transcripción (voz a texto)](#transcripción-voz-a-texto)
@@ -1208,9 +1208,33 @@ updated: 2024-01-20 15:45:00
 </details>
 
 
-## Vista sin conexión
+## Sin conexión
+
+Poznote sigue funcionando sin red de dos maneras: las notas que modificaste recientemente siguen disponibles en tu navegador, listas para leerlas y editarlas, y una copia de seguridad completa puede consultarse en cualquier lugar como una exportación de solo lectura.
+
+<details>
+<summary><strong>Notas sin conexión</strong></summary>
+<br>
+
+Las notas que modificaste en los últimos 5 días se guardan en cada navegador donde usas Poznote, y esta copia se actualiza después de cada guardado. En clase, en el tren o en cualquier lugar sin Wi-Fi, abre la dirección habitual de Poznote: el navegador muestra la versión sin conexión de Poznote, con la misma barra lateral, los mismos editores, la misma barra de herramientas y la misma búsqueda, y solo lista las notas guardadas sin conexión.
+
+*   **Inicio de sesión:** escribe la contraseña con la que iniciaste sesión por última vez en este navegador, se comprueba sin el servidor. Si nunca escribiste tu contraseña en este navegador (SSO, inicio de sesión automático), la última cuenta usada se abre con un botón **Continuar como**.
+*   **Lectura y edición:** las notas HTML, las notas Markdown y las listas de tareas se abren en su editor habitual, y puedes crear notas nuevas. Los demás tipos de notas, como los dibujos, solo están disponibles en línea. Los cambios se guardan en el navegador hasta que se envían.
+*   **De vuelta en línea:** los cambios se envían automáticamente. Si una nota también se modificó en el servidor mientras tanto, las dos versiones se combinan cuando es posible; si no, tu versión sin conexión se guarda como una nota aparte llamada "... (copia sin conexión)". Una nota eliminada en el servidor mientras tanto se vuelve a crear.
+*   **Ajustes:** **Configuración > Otros > Notas sin conexión** define cuántos días de notas se guardan (5 por defecto, hasta 30, 0 desactiva las notas sin conexión) y muestra lo que contiene el navegador actual.
+*   **Límites:** como máximo 300 notas y 50 MB de texto, primero las modificadas más recientemente. Las imágenes que muestran estas notas también se guardan, hasta 8 MB cada una, 400 imágenes y 200 MB en total, y nunca más de la mitad del espacio libre del navegador. Los demás adjuntos (PDF, audio, archivos) solo se abren en línea.
+*   **Requisitos:** Poznote debe servirse por HTTPS (los navegadores solo guardan páginas sin conexión en una conexión segura, `http://localhost` también funciona) y haberse abierto una vez en línea en el navegador, tras iniciar sesión, para que se haga la copia.
+*   **Privacidad:** solo se guardan las notas de tu propia cuenta, no las de una cuenta o un espacio de trabajo compartidos contigo. Se almacenan sin cifrar en el navegador. Cerrar sesión las elimina del navegador (también los cambios aún no enviados, tras un aviso que los enumera): en un ordenador compartido, cierra sesión al irte. Cerrar sesión también funciona sin red, desde la página sin conexión: las notas se eliminan al momento y la sesión en el servidor termina la próxima vez que Poznote se abra en línea.
+
+</details>
+
+<details>
+<summary><strong>Exportación sin conexión</strong></summary>
+<br>
 
 La **📦 Copia de seguridad completa** crea una versión independiente de tus notas para consultarla sin conexión. Solo tienes que extraer el ZIP y abrir `index.html` en cualquier navegador web. Así puedes leer tus notas sin conexión, pero sin todas las funciones de Poznote: es una exportación de solo lectura.
+
+</details>
 
 ## Varias instancias
 

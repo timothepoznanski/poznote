@@ -81,7 +81,7 @@ https://discord.gg/AWhWWSEkJ
 - [Sauvegardes S3](#sauvegardes-s3)
 - [Sauvegarde / Export](#sauvegarde--export)
 - [Restauration / Import](#restauration--import)
-- [Consultation hors ligne](#consultation-hors-ligne)
+- [Hors ligne](#hors-ligne)
 - [Instances multiples](#instances-multiples)
 - [Assistant IA](#assistant-ia)
 - [Transcription (reconnaissance vocale)](#transcription-reconnaissance-vocale)
@@ -1208,9 +1208,33 @@ updated: 2024-01-20 15:45:00
 </details>
 
 
-## Consultation hors ligne
+## Hors ligne
+
+Poznote continue de fonctionner sans réseau de deux façons : les notes modifiées récemment restent disponibles dans votre navigateur, prêtes à être lues et modifiées, et une sauvegarde complète peut être consultée n'importe où comme un export en lecture seule.
+
+<details>
+<summary><strong>Notes hors ligne</strong></summary>
+<br>
+
+Les notes modifiées ces 5 derniers jours sont conservées dans chaque navigateur où vous utilisez Poznote, et cette copie est mise à jour après chaque enregistrement. En classe, dans le train ou partout sans Wi-Fi, ouvrez l'adresse habituelle de Poznote : le navigateur affiche la version hors ligne de Poznote, avec la même barre latérale, les mêmes éditeurs, la même barre d'outils et la même recherche, en ne listant que les notes conservées hors ligne.
+
+*   **Connexion :** saisissez le mot de passe utilisé lors de votre dernière connexion dans ce navigateur, il est vérifié sans le serveur. Si vous n'avez jamais saisi votre mot de passe dans ce navigateur (SSO, connexion automatique), le dernier compte utilisé s'ouvre avec un bouton **Continuer en tant que**.
+*   **Lecture et modification :** les notes HTML, les notes Markdown et les listes de tâches s'ouvrent dans leur éditeur habituel, et vous pouvez créer de nouvelles notes. Les autres types de notes, comme les dessins, restent accessibles en ligne uniquement. Les modifications sont gardées dans le navigateur jusqu'à leur envoi.
+*   **Retour du réseau :** les modifications sont envoyées automatiquement. Si une note a aussi été modifiée sur le serveur entre-temps, les deux versions sont fusionnées quand c'est possible, sinon votre version hors ligne est gardée dans une note à part nommée « ... (copie hors ligne) ». Une note supprimée sur le serveur entre-temps est recréée.
+*   **Réglages :** **Paramètres > Autre > Notes hors ligne** définit combien de jours de notes sont conservés (5 par défaut, jusqu'à 30, 0 désactive les notes hors ligne) et indique ce que contient le navigateur utilisé.
+*   **Limites :** 300 notes et 50 Mo de texte au plus, les plus récemment modifiées d'abord. Les images affichées dans ces notes sont conservées aussi, jusqu'à 8 Mo chacune, 400 images et 200 Mo au total, et jamais plus de la moitié de l'espace libre du navigateur. Les autres pièces jointes (PDF, audio, fichiers) s'ouvrent en ligne uniquement.
+*   **Prérequis :** Poznote doit être servi en HTTPS (les navigateurs ne gardent des pages hors ligne que sur une connexion sécurisée, `http://localhost` fonctionne aussi) et avoir été ouvert une fois en ligne dans le navigateur, après connexion, pour que la copie soit faite.
+*   **Confidentialité :** seules les notes de votre propre compte sont conservées, pas celles d'un compte ou d'un espace de travail partagé avec vous. Elles sont stockées sans chiffrement dans le navigateur. La déconnexion les supprime du navigateur (les modifications pas encore envoyées aussi, après un avertissement qui les liste) : sur un ordinateur partagé, déconnectez-vous en partant. La déconnexion fonctionne aussi sans réseau, depuis la page hors ligne : les notes sont supprimées tout de suite, et la session sur le serveur se termine à la prochaine ouverture de Poznote en ligne.
+
+</details>
+
+<details>
+<summary><strong>Export hors ligne</strong></summary>
+<br>
 
 La **📦 Sauvegarde complète** crée une version hors ligne autonome de vos notes. Il suffit d'extraire le ZIP et d'ouvrir `index.html` dans n'importe quel navigateur web. Vous pouvez ainsi lire vos notes hors ligne, mais sans toutes les fonctionnalités de Poznote : il s'agit d'un export en lecture seule.
+
+</details>
 
 ## Instances multiples
 

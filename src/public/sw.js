@@ -6,8 +6,9 @@
  * nothing else goes through a cache: API calls, PHP fragments and uploads hit
  * the network exactly as without a service worker.
  *
- *  1. Static assets (js, css, images, fonts): network first, the cached copy
- *     when the network fails.
+ *  1. Static assets (js, css, images, fonts, and the concatenated bundles
+ *     index_css.php / index_js.php / dark_mode_css.php): network first, the
+ *     cached copy when the network fails.
  *  2. Page navigations: always the network. When the server cannot be reached
  *     (no connection, or a reverse proxy answering 502/503/504), the offline
  *     page (offline.php, stored by js/offline-sync.js) is served in its place:
@@ -20,12 +21,14 @@
 const STATIC_CACHE = 'poznote-static-v5';
 const SHELL_CACHE = 'poznote-offline-shell';
 const MEDIA_CACHE_PREFIX = 'poznote-offline-media-';
-const STATIC_ASSET_PATTERN = /\.(?:css|js|png|svg|ico|woff2?|ttf)$/i;
+const STATIC_ASSET_PATTERN = /(?:\.(?:css|js|png|svg|ico|woff2?|ttf)|\/(?:index_css|index_js|dark_mode_css)\.php)$/i;
 const ATTACHMENT_PATTERN = /\/api\/v1\/notes\/\d+\/attachments\/[^/]+$/;
 
-// Navigations that must never be answered by the offline page: signing out
-// and the SSO round trip only make sense with the server.
-const NO_FALLBACK_PAGES = ['logout.php', 'oidc_login.php', 'oidc_callback.php'];
+// Navigations that must never be answered by the offline page: the SSO round
+// trip only makes sense with the server. A logout that cannot reach the
+// server does get the offline page, which signs out on the device
+// (js/offline-app.js) and has the server session closed later.
+const NO_FALLBACK_PAGES = ['oidc_login.php', 'oidc_callback.php'];
 
 function scopeUrl(path) {
   return new URL(path, self.registration.scope).href;
@@ -57,13 +60,23 @@ self.addEventListener('activate', (event) => {
   })());
 });
 
-// Remove cached entries that share a pathname with `url` but carry a different
-// query string, i.e. the same asset from an earlier release.
+// The asset an URL names, whatever its version: path and query string
+// without the ?v= cache buster (index_css.php?group=core and ?group=modals
+// are two different assets).
+function assetIdentity(url) {
+  const params = new URLSearchParams(url.search);
+  params.delete('v');
+  params.delete('m');
+  return url.pathname + '?' + params.toString();
+}
+
+// Remove cached entries of the same asset from an earlier release.
 async function dropOtherVersions(cache, url) {
+  const identity = assetIdentity(url);
   const keys = await cache.keys();
   await Promise.all(keys.map((request) => {
     const cachedUrl = new URL(request.url);
-    if (cachedUrl.pathname === url.pathname && cachedUrl.search !== url.search) {
+    if (cachedUrl.search !== url.search && assetIdentity(cachedUrl) === identity) {
       return cache.delete(request);
     }
     return null;

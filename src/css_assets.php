@@ -20,8 +20,8 @@
  *
  * Two entry points stay hand-written on purpose: index.php serves its CSS as
  * two concatenated bundles (index_css.php) with a media-scoped link and an
- * inline <style> in the middle, and api_export_attachments.php writes a
- * standalone export document. The password-gate <head> of settings.php,
+ * inline <style> in the middle (offline.php reuses those same bundles), and
+ * api_export_attachments.php writes a standalone export document. The password-gate <head> of settings.php,
  * public_note.php and public_folder.php is also left alone: it is a separate,
  * two-stylesheet document rendered before the real page.
  */
@@ -373,15 +373,6 @@ function poznoteCssManifest(): array
             'css/notes-manager.css',
             '@icon-sidebar',
             '@theme',
-        ],
-        // The page the service worker serves without a network (offline.php)
-        'offline' => [
-            'css/fonts.css',
-            'css/lucide.css',
-            '@components',
-            '@theme',
-            'css/markdown.css',
-            'css/offline.css',
         ],
         'public_folder' => [
             'css/lucide.css',

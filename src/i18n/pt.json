@@ -4984,7 +4984,17 @@
   },
   "offline": {
     "page_title": "Poznote (offline)",
-    "lock_hint": "Bloquear as notas offline",
+    "signout": {
+      "removes": "As notas mantidas offline serão removidas deste dispositivo.",
+      "done_title": "Você saiu da conta",
+      "done_text": "As notas mantidas offline foram removidas deste dispositivo.",
+      "loss_title": "Suas alterações serão perdidas",
+      "loss_text_one": "1 alteração feita offline não foi sincronizada com o servidor. Se você sair agora, ela será apagada deste dispositivo e perdida para sempre.",
+      "loss_text_other": "{{count}} alterações feitas offline não foram sincronizadas com o servidor. Se você sair agora, elas serão apagadas deste dispositivo e perdidas para sempre.",
+      "loss_more": "e mais {{count}}",
+      "loss_keep": "Para mantê-las, cancele e continue conectado: elas são enviadas sozinhas assim que a conexão funcionar.",
+      "loss_confirm": "Sair e perder as alterações"
+    },
     "unsupported": "Este navegador não consegue guardar notas offline.",
     "status": {
       "offline": "Offline",
@@ -5010,15 +5020,13 @@
       "text": "Nenhuma nota está guardada neste dispositivo ainda. Conecte-se à internet e abra o Poznote uma vez: as notas modificadas nos últimos dias ficarão então disponíveis offline."
     },
     "list": {
-      "label": "Notas",
       "search": "Pesquisar notas",
       "all_workspaces": "Todos os espaços de trabalho",
       "available": "Disponíveis offline",
-      "other": "Outras notas",
-      "other_hint": "Não disponíveis offline",
-      "more": "Mais {{count}} notas, use a pesquisa para encontrá-las",
+      "recent": "Modificadas nos últimos {{days}} dias",
       "no_results": "Nenhuma nota corresponde à sua pesquisa.",
       "empty": "Nenhuma nota neste espaço de trabalho.",
+      "none": "Nenhuma nota foi modificada nos últimos {{days}} dias.",
       "untitled": "Sem título",
       "not_synced": "Ainda não sincronizada"
     },
@@ -5026,38 +5034,19 @@
       "button": "Nova nota",
       "note": "Nota",
       "markdown": "Nota Markdown",
-      "tasklist": "Lista de tarefas",
-      "default_title": "Nova nota"
+      "tasklist": "Lista de tarefas"
     },
     "note": {
       "placeholder": "Selecione uma nota para abri-la.",
       "back": "Voltar à lista",
-      "title_placeholder": "Título",
-      "content": "Conteúdo da nota",
       "modified": "Modificada {{date}}",
       "saved_locally": "Salva neste dispositivo. Ela será enviada ao servidor quando você estiver online de novo.",
-      "push_error": "Ainda não enviada: {{error}}",
-      "edit": "Editar",
-      "preview": "Pré-visualização"
-    },
-    "toolbar": {
-      "bold": "Negrito",
-      "italic": "Itálico",
-      "underline": "Sublinhado",
-      "strikethrough": "Riscado",
-      "heading": "Título",
-      "bullet_list": "Lista com marcadores",
-      "numbered_list": "Lista numerada"
-    },
-    "tasks": {
-      "add_placeholder": "Digite uma tarefa e pressione Enter",
-      "delete": "Excluir tarefa",
-      "empty": "Nenhuma tarefa ainda."
+      "push_error": "Ainda não enviada: {{error}}"
     },
     "unavailable": {
+      "title": "Esta nota não está disponível offline",
       "text": "Somente as notas modificadas nos últimos {{days}} dias ficam guardadas neste dispositivo. Esta vai abrir assim que você estiver online de novo.",
-      "text_generic": "Esta nota não está guardada neste dispositivo. Ela vai abrir assim que você estiver online de novo.",
-      "unsupported_type": "Este tipo de nota (um desenho, por exemplo) não pode ser aberto offline. Ele vai abrir assim que você estiver online de novo."
+      "text_generic": "Esta nota não está guardada neste dispositivo. Ela vai abrir assim que você estiver online de novo."
     },
     "online": {
       "back": "Você está online de novo.",
@@ -5088,7 +5077,12 @@
       "badge": "Últimos {{days}} dias",
       "description": "As notas modificadas nos últimos dias ficam guardadas nos navegadores onde você usa o Poznote, para poder abri-las e editá-las sem rede. As alterações feitas offline são enviadas assim que a conexão volta. 0 não guarda nada offline.",
       "unit": "dias",
+      "limits_title": "Limites:",
+      "limits_notes": "{{notes}} notas e {{text}} MB de texto no total, primeiro as modificadas mais recentemente",
+      "limits_pictures": "Imagens: {{picture}} MB cada, {{pictures}} e {{total}} MB no total, no máximo metade do espaço livre",
+      "limits_attachments": "Outros anexos (PDF, áudio, arquivos): somente online",
       "warning": "Sair da conta remove as notas offline do navegador. Em um computador compartilhado, saia da conta ao ir embora.",
+      "device_status_one": "Neste navegador: 1 nota disponível offline, atualizada em {{date}}.",
       "device_status": "Neste navegador: {{count}} notas disponíveis offline, atualizadas em {{date}}.",
       "device_none": "Nada está guardado neste navegador ainda: abra suas notas uma vez e elas serão guardadas.",
       "device_unsupported": "Este navegador não consegue guardar notas offline (é preciso uma conexão HTTPS segura)."
