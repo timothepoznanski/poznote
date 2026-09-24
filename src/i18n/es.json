@@ -1902,7 +1902,8 @@
       "paste_into_folder": "Pegar en la carpeta",
       "change_note_icon": "Cambiar el icono de la nota",
       "keep_offline": "Guardar sin conexión",
-      "stop_offline": "Dejar de guardar sin conexión"
+      "stop_offline": "Dejar de guardar sin conexión",
+      "kept_offline": "Guardado sin conexión en este navegador"
     },
     "folder_filter": {
       "exit": "Salir de la vista de la carpeta"

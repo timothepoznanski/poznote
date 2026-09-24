@@ -1902,7 +1902,8 @@
       "paste_into_folder": "Colar na pasta",
       "change_note_icon": "Alterar ícone da nota",
       "keep_offline": "Manter offline",
-      "stop_offline": "Deixar de manter offline"
+      "stop_offline": "Deixar de manter offline",
+      "kept_offline": "Mantido offline neste navegador"
     },
     "folder_filter": {
       "exit": "Sair da vista da pasta"

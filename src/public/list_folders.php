@@ -16,7 +16,7 @@ $workspace = trim(getWorkspaceFilter());
 
 // Build query to get all folders
 $select_query = "SELECT f.id, f.name, f.icon, f.icon_color, f.display_order, f.parent_id,
-                 f.created, f.favorite,
+                 f.created, f.favorite, f.offline,
                  (SELECT COUNT(*) FROM entries e WHERE e.folder_id = f.id AND e.trash = 0) as note_count
                  FROM folders f";
 
@@ -112,6 +112,22 @@ function folderListActions() {
 			'icon' => 'lucide-filter',
 			'label' => t_h('notes_list.folder_actions.show_only', [], 'Show only this folder'),
 		],
+		// Keep offline: the folder's notes, subfolders included, stay in the
+		// browser whatever their date (Offline Copies). Two variants, the one
+		// matching the folder state is shown (state_class, list_folders.js).
+		[
+			'action' => 'offline-folder',
+			'icon' => 'lucide-wifi-off',
+			'label' => t_h('notes_list.folder_actions.stop_offline', [], 'Stop keeping offline'),
+			'state_class' => 'offline-state-kept',
+			'undo' => true,
+		],
+		[
+			'action' => 'offline-folder',
+			'icon' => 'lucide-wifi-off',
+			'label' => t_h('notes_list.folder_actions.keep_offline', [], 'Keep offline'),
+			'state_class' => 'offline-state-not-kept',
+		],
 		[
 			'action' => 'move-folder-files',
 			'icon' => 'lucide-folder-open',
@@ -172,6 +188,7 @@ function renderFolderListRow($folderId, $folder, $depth, $workspace, $sharedFold
 	$note_count = (int)$folder['note_count'];
 	$is_shared = isset($sharedFolderIds[(int)$folder['id']]) ? '1' : '0';
 	$is_favorite = !empty($folder['favorite']) ? '1' : '0';
+	$is_offline = !empty($folder['offline']) ? '1' : '0';
 
 	$kanban_url = 'index.php?kanban=' . $folder_id . '&workspace=' . urlencode($workspace);
 
@@ -188,7 +205,7 @@ function renderFolderListRow($folderId, $folder, $depth, $workspace, $sharedFold
 	// Folder identity, carried by every action button of the row
 	$folderAttrs = ' data-folder-id="' . $folder_id . '" data-folder-name="' . $folder_name . '"'
 		. ' data-note-count="' . $note_count . '" data-shared="' . $is_shared . '"'
-		. ' data-favorite="' . $is_favorite . '"';
+		. ' data-favorite="' . $is_favorite . '" data-offline="' . $is_offline . '"';
 
 	echo '<div class="folder-list-actions">';
 
@@ -593,6 +610,13 @@ $currentLang = getUserLanguage();
 			if (!empty($action['requires_notes'])) {
 				$classes .= ' requires-notes';
 			}
+			if (!empty($action['state_class'])) {
+				$classes .= ' ' . $action['state_class'];
+			}
+			if (!empty($action['undo'])) {
+				// Undoing a state reads in red, as removing a favorite does
+				$classes .= ' danger';
+			}
 			if (!empty($action['danger'])) {
 				// Set the destructive action apart from the rest
 				echo '<div class="folder-actions-menu-separator"></div>';
@@ -661,6 +685,14 @@ $currentLang = getUserLanguage();
 					<div class="folder-actions-menu-item favorite-state-not-favorite" data-action="favorite-folder">
 						<i class="lucide lucide-star"></i>
 						<span><?php echo t_h('notes_list.folder_actions.add_favorite', [], 'Add to favorites'); ?></span>
+					</div>
+					<div class="folder-actions-menu-item offline-state-kept danger" data-action="offline-folder">
+						<i class="lucide lucide-wifi-off"></i>
+						<span><?php echo t_h('notes_list.folder_actions.stop_offline', [], 'Stop keeping offline'); ?></span>
+					</div>
+					<div class="folder-actions-menu-item offline-state-not-kept" data-action="offline-folder">
+						<i class="lucide lucide-wifi-off"></i>
+						<span><?php echo t_h('notes_list.folder_actions.keep_offline', [], 'Keep offline'); ?></span>
 					</div>
 					<div class="folder-actions-menu-item" data-action="rename-folder">
 						<i class="lucide lucide-pencil"></i>
@@ -788,6 +820,13 @@ $currentLang = getUserLanguage();
 	<script src="<?php echo poznoteAsset('js/color-palette.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/folder-icon.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/modals-events.js'); ?>"></script>
+	<?php // "Keep offline" brings this browser's copies up to date at once (writes-only mode) ?>
+	<script src="<?php echo poznoteAsset('js/offline-store.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/offline-sync.js'); ?>" data-offline-mode="writes"></script>
 	<script src="<?php echo poznoteAsset('js/list_folders.js'); ?>"></script>
+	<?php // Marks the notes and folders kept offline in this browser ?>
+	<script src="<?php echo poznoteAsset('js/offline-marks.js'); ?>" defer
+		data-note-title="<?php echo t_h('notes_list.note_actions.available_offline', [], 'Available offline in this browser'); ?>"
+		data-folder-title="<?php echo t_h('notes_list.folder_actions.kept_offline', [], 'Kept offline in this browser'); ?>"></script>
 </body>
 </html>

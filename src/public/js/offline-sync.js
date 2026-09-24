@@ -519,10 +519,14 @@
         useLimits(account);
         account.lastSyncAt = Date.now();
         account.language = currentLanguage();
-        account.display = captureDisplay();
-        // The offline page resumes the tabs open in this workspace (js/tabs.js)
-        if (window.selectedWorkspace) {
-            account.workspace = String(window.selectedWorkspace);
+        // What index.php looks like, only read on index.php: another page
+        // (writes-only mode) keeps what the last sync there recorded
+        if (!WRITES_ONLY) {
+            account.display = captureDisplay();
+            // The offline page resumes the tabs open in this workspace (js/tabs.js)
+            if (window.selectedWorkspace) {
+                account.workspace = String(window.selectedWorkspace);
+            }
         }
         offlineDays = account.days;
 
@@ -576,7 +580,7 @@
                 return applyManifest(userId, fresh);
             })
             .then(function () {
-                return account.days ? storeOfflinePage() : null;
+                return account.days && !WRITES_ONLY ? storeOfflinePage() : null;
             });
     }
 
@@ -587,6 +591,7 @@
                 notes: data.notes || [],
                 folders: data.folders || [],
                 workspaces: data.workspaces || [],
+                keptFolders: data.kept_folders || [],
                 days: Number(data.days) || 0,
                 syncedAt: Date.now()
             })
@@ -805,7 +810,10 @@
     var refreshTimer = null;
     var NOTE_WRITE_URL = /\/api\/v1\/notes\/(\d+)(\/[^?#]*)?$/;
     // Writes that leave the note as it was
-    var NOT_A_NOTE_CHANGE = /^\/(lock|snapshot|beacon|task-reminder)/;
+    // Writes that leave the note as it was. Keeping a note offline or not
+    // changes what the manifest lists, which the full sync that follows
+    // applies (a copy refreshed here would outlive a "stop keeping").
+    var NOT_A_NOTE_CHANGE = /^\/(lock|snapshot|beacon|task-reminder|offline)/;
 
     function queueRefresh(noteId) {
         refreshIds[noteId] = true;
@@ -962,6 +970,12 @@
     }
 
     if (WRITES_ONLY) {
+        // A page acting on several notes at once (notes_manager.php) has the
+        // copies brought up to date right after, without the parts of the
+        // sync that belong to index.php (captureDisplay, the offline page)
+        window.poznoteOfflineSyncNow = function () {
+            return syncNow(true);
+        };
         return;
     }
 
