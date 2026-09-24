@@ -138,7 +138,7 @@ $sttSettingsScope = 'instance';
                         </label>
                         <div class="check-label">
                             <span class="label-title"><?php echo t_h('stt_settings.enable_label', [], 'Enable transcription'); ?></span>
-                            <span class="label-desc"><?php echo t_h('stt_settings.enable_description', [], 'Adds a Dictate entry under Insert in the slash menu of every note, and a Transcribe action on audio attachments.'); ?></span>
+                            <span class="label-desc"><?php echo t_h('stt_settings.enable_description', [], 'Adds a Transcribe button to the Record audio dialog, found under Insert in the slash menu of every note, and a Transcribe action on audio attachments.'); ?></span>
                         </div>
                     </div>
 
@@ -196,7 +196,7 @@ $sttSettingsScope = 'instance';
                         <input type="number" name="stt_max_recording_minutes" id="stt_max_recording_minutes" class="git-field-input"
                                value="<?php echo poznoteSttMaxRecordingMinutes(); ?>"
                                min="1" max="<?php echo POZNOTE_STT_MAX_RECORDING_MINUTES_LIMIT; ?>" step="1" required>
-                        <span class="label-desc"><?php echo t_h('stt_settings.max_duration_description', ['limit' => POZNOTE_STT_MAX_RECORDING_MINUTES_LIMIT], 'In minutes, from 1 to {{limit}}. Dictate and Record audio stop on their own when they get there, so a tab left recording cannot send an hour of audio. The dialog shows the elapsed time against this limit. Transcribing an existing attachment is not affected.'); ?></span>
+                        <span class="label-desc"><?php echo t_h('stt_settings.max_duration_description', ['limit' => POZNOTE_STT_MAX_RECORDING_MINUTES_LIMIT], 'In minutes, from 1 to {{limit}}. Record audio stops on its own when it gets there, so a tab left recording cannot send an hour of audio. The dialog shows the elapsed time against this limit. Transcribing an existing attachment is not affected.'); ?></span>
                     </div>
 
                     <div class="form-check">

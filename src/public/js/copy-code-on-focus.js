@@ -572,10 +572,9 @@
         return !!(block && block.closest('.noteentry'));
     }
 
-    // Add copy button to code blocks
-    function addCopyButtonToCodeBlocks() {
-        // Find all code blocks
-        var codeBlocks = getCodeBlockElements(document);
+    // Add copy button to code blocks: the given ones, or every block of the page
+    function addCopyButtonToCodeBlocks(blocks) {
+        var codeBlocks = Array.isArray(blocks) ? blocks : getCodeBlockElements(document);
         
         codeBlocks.forEach(function(block) {
             // Skip inline code elements
@@ -767,20 +766,36 @@
 
     // Detect horizontal overflow on code blocks and toggle 'has-x-overflow' class
     // to avoid reserving scrollbar space when no horizontal scroll is needed.
-    function updateCodeBlockOverflow() {
-        var blocks = getCodeBlockElements(document);
-        var highlightedCodeBlocks = document.querySelectorAll('pre code.hljs.has-x-overflow');
+    // blocks: the ones to check, every block of the page otherwise (the
+    // resize listener passes an event).
+    function updateCodeBlockOverflow(blocks) {
+        var scoped = Array.isArray(blocks);
+        if (!scoped) {
+            blocks = getCodeBlockElements(document);
+        }
+
+        var highlightedCodeBlocks = [];
+        if (scoped) {
+            blocks.forEach(function(block) {
+                block.querySelectorAll('code.hljs.has-x-overflow').forEach(function(codeBlock) {
+                    highlightedCodeBlocks.push(codeBlock);
+                });
+            });
+        } else {
+            highlightedCodeBlocks = document.querySelectorAll('pre code.hljs.has-x-overflow');
+        }
 
         highlightedCodeBlocks.forEach(function(codeBlock) {
             codeBlock.classList.remove('has-x-overflow');
         });
 
-        blocks.forEach(function(block) {
-            if (block.scrollWidth > block.clientWidth) {
-                block.classList.add('has-x-overflow');
-            } else {
-                block.classList.remove('has-x-overflow');
-            }
+        // Every measure first, then every class: toggling a class between two
+        // measures forced the browser to lay the page out again for each block
+        var overflowing = blocks.map(function(block) {
+            return block.scrollWidth > block.clientWidth;
+        });
+        blocks.forEach(function(block, index) {
+            block.classList.toggle('has-x-overflow', overflowing[index]);
         });
     }
 
@@ -798,32 +813,35 @@
         }
     }
 
-    // Watch for dynamically added code blocks
+    // Watch for dynamically added code blocks. Only the added blocks are set
+    // up: going over every block of the page each time cost hundreds of ms per
+    // markdown preview update on a note with many code blocks.
     function observeCodeBlocks() {
         var observer = new MutationObserver(function(mutations) {
-            var shouldUpdate = false;
-            
-            mutations.forEach(function(mutation) {
-                if (mutation.addedNodes.length > 0) {
-                    mutation.addedNodes.forEach(function(node) {
-                        if (node.nodeType === 1) { // Element node
-                            var tagName = node.tagName ? node.tagName.toLowerCase() : '';
-                            if (tagName === 'pre' || node.classList && node.classList.contains('code-block')) {
-                                shouldUpdate = true;
-                            } else if (node.querySelectorAll) {
-                                var hasCodeBlocks = node.querySelectorAll('pre, .code-block').length > 0;
-                                if (hasCodeBlocks) {
-                                    shouldUpdate = true;
-                                }
-                            }
-                        }
-                    });
+            var addedBlocks = [];
+
+            function addBlock(candidate) {
+                var block = getCodeBlockElement(candidate);
+                if (block && block.isConnected && addedBlocks.indexOf(block) === -1) {
+                    addedBlocks.push(block);
                 }
+            }
+
+            mutations.forEach(function(mutation) {
+                mutation.addedNodes.forEach(function(node) {
+                    if (node.nodeType !== 1) return; // Element nodes only
+                    if (node.matches && node.matches('pre:not(.indented-pre), .code-block')) {
+                        addBlock(node);
+                    }
+                    if (node.querySelectorAll) {
+                        getCodeBlockElements(node).forEach(addBlock);
+                    }
+                });
             });
-            
-            if (shouldUpdate) {
-                addCopyButtonToCodeBlocks();
-                updateCodeBlockOverflow();
+
+            if (addedBlocks.length > 0) {
+                addCopyButtonToCodeBlocks(addedBlocks);
+                updateCodeBlockOverflow(addedBlocks);
             }
         });
         

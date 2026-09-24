@@ -85,11 +85,15 @@ Once configured, transcription appears in two places.
 
 ### Dictate
 
-**Dictate** sits under **Insert** in the slash menu of every note, rich text and Markdown alike. Typing `/dict`, `/voice` or `/transcribe` finds it directly, since the filter searches submenus.
+Dictation goes through **Record audio**, under **Insert** and **Media** in the slash menu of every note, rich text and Markdown alike, and on the editing bar above the keyboard on a phone. Typing `/dict`, `/voice` or `/transcribe` finds it directly, since the filter searches submenus.
 
-A dialog opens and recording starts at once. A level bar shows the microphone is actually picking something up, and the timer shows the elapsed time against the maximum length set by the administrator, for example `1:12 / 10:00`. Recording stops and transcribes on its own when it reaches that limit.
+A dialog opens, and recording starts when you press **Start**, which is also when the browser asks for the microphone the first time. A level bar shows the microphone is actually picking something up, and the timer shows the elapsed time against the maximum length set by the administrator, for example `1:12 / 10:00`.
 
-**Stop and transcribe** sends the recording. The transcript comes back in a text box where you can correct it before it goes into the note. **Insert** puts it where your cursor was.
+With transcription available, a **Spoken language** menu sits under the timer. It starts on the language set in the configuration, marked as the default, and changing it only applies to this recording. **Detect automatically** lets the server work out the language even when the configuration sets one.
+
+What happens to the recording is chosen when you stop it. **Insert the audio** puts it in the note as an audio player, with no transcription. **Transcribe** sends it to the server, and only shows when transcription is available to you. When the recording reaches the maximum length it stops on its own and waits for one of the two buttons.
+
+The transcript comes back in a text box where you can correct it before it goes into the note. **Insert** puts it where your cursor was. If the transcription fails, both buttons come back, so the recording can still go in as audio or be sent again.
 
 The **Also attach the recording to this note** checkbox is unticked by default, and the audio is then discarded once the text comes back. Tick it and the recording is also saved as an ordinary attachment named `dictation-<date>.<ext>`, so you can listen to it again or transcribe it later with a better model.
 
@@ -118,8 +122,8 @@ Everything is on **Settings → Admin Tools → Transcription** (administrator o
 | **API key** | Sent as `Authorization: Bearer`. Local servers usually need none; OpenAI does. |
 | **Check access and list models** | Confirms the server answers and fills the model suggestions. |
 | **Model** | The model name sent with each request. Required for every server, even the ones that ignore it. |
-| **Spoken language** | Two-letter code such as `en`, `fr` or `de`, or empty to let the server detect it. |
-| **Maximum recording length** | In minutes, from 1 to 60, 10 by default. Dictation stops and transcribes on its own when it gets there, and so does **Record audio** in the slash menu's **Media**, which inserts the recording without transcribing it. Attachments are not affected. |
+| **Spoken language** | Two-letter code such as `en`, `fr` or `de`, or empty to let the server detect it. The recording dialog preselects it, and its menu can override it for one recording. |
+| **Maximum recording length** | In minutes, from 1 to 60, 10 by default. **Record audio** stops on its own when it gets there, and then waits for **Insert the audio** or **Transcribe**. Without transcription, it inserts the audio right away. Attachments are not affected. |
 | **Allow personal transcription servers** | Lets every user set their own server, see [Personal servers](#personal-servers). |
 
 ### Choosing a model
@@ -247,7 +251,7 @@ docker compose exec webserver curl -s -o /dev/null -w '%{http_code}\n' http://wh
 
 ## Browser requirements
 
-**HTTPS.** Browsers only give a page the microphone on a secure origin: HTTPS, or `localhost`. Over plain `http` on any other address, **Dictate** says it needs HTTPS and records nothing. Transcribing an attachment is unaffected, since nothing is recorded.
+**HTTPS.** Browsers only give a page the microphone on a secure origin: HTTPS, or `localhost`. Over plain `http` on any other address, **Record audio** says it needs HTTPS and records nothing. Transcribing an attachment is unaffected, since nothing is recorded.
 
 **The `Permissions-Policy` header.** Poznote sends `microphone=(self)`, which allows its own origin and refuses every other. If a reverse proxy in front adds its own `Permissions-Policy` header, it can override Poznote's, and a `microphone=()` there makes the browser refuse the microphone whatever the site permission says. The dialog then shows "Poznote was not allowed to use the microphone". Remove the header at the proxy, or set `microphone=(self)` there too.
 
@@ -265,7 +269,15 @@ The recording is uploaded to Poznote and forwarded to the transcription server f
 
 Poznote keeps no copy. The audio lives in PHP's temporary upload file for the length of one request, unless you tick **Also attach the recording to this note**, which saves it as an ordinary attachment that counts toward your storage.
 
-With a server in your own Docker project, the audio never leaves the machine. With OpenAI, it is sent to OpenAI.
+With Speaches or whisper.cpp set up as described above, everything is processed on your machine and nothing goes online:
+
+- The browser records with MediaRecorder, not with the browser's built-in speech recognition, which would send the audio to Google or Apple.
+- The recording goes to your Poznote server only, and Poznote forwards it only to the URL set on the Transcription page. No other host is contacted.
+- The only internet access is the model download, once, at install time. Transcribing works with the container cut off from the internet.
+- The transcribed text lands in your note like text you typed, and nowhere else.
+
+> [!WARNING]
+> The **OpenAI** preset is the exception: every recording is sent to OpenAI's servers. It is the only preset that does this, and the only one whose URL is fixed and hidden. If the Transcription page shows a URL field, the audio stays with the server at that URL.
 
 ## Troubleshooting
 
@@ -281,8 +293,8 @@ It must read `microphone=(self)`. See [Browser requirements](#browser-requiremen
 **"The microphone needs HTTPS"**
 You are on plain `http` at an address other than `localhost`. Serve Poznote over HTTPS.
 
-**Dictate is not in the slash menu**
-It is under **Insert**; `/dict` finds it wherever it is. If it is missing there too: transcription is off, your profile is not in the allowed-users list, or the configuration has no URL or no model.
+**No Transcribe button when recording**
+Transcription is off, your profile is not in the allowed-users list, or the configuration has no URL or no model. **Record audio** itself is always there, under **Insert** and **Media**; `/dict` finds it.
 
 **No microphone button on an attachment**
 The file is not recognised as audio (see the list in [Transcribe an audio attachment](#transcribe-an-audio-attachment)), or transcription is not available to your profile.

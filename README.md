@@ -1253,7 +1253,7 @@ What the assistant can do, choosing a provider and a model, personal API keys, a
 
 Turn voice into note text with a speech-to-text server you run yourself. Poznote embeds no speech model: it talks to any server exposing the OpenAI audio API (`POST /v1/audio/transcriptions`), such as a self-hosted Whisper, so the audio never has to leave your machine.
 
-Once an administrator enables it in **Settings → Admin Tools → Transcription**, you get **Dictate** under **Insert** in the slash menu, and a **Transcribe** button on audio attachments.
+Once an administrator enables it in **Settings → Admin Tools → Transcription**, **Record audio** under **Insert** in the slash menu gains a **Transcribe** button next to **Insert the audio**, and audio attachments get a **Transcribe** button.
 
 Setting up a server, choosing a model, and everything else is in the [Transcription documentation](docs/TRANSCRIPTION.md).
 

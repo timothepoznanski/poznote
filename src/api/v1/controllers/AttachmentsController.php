@@ -375,33 +375,29 @@ class AttachmentsController {
         
         // If not publicly shared, require authentication
         if (!$isPubliclyShared) {
-            // Check if user is authenticated
-            $isAuthenticated = false;
-            
-            // Check session authentication
-            if (function_exists('isAuthenticated') && isAuthenticated()) {
-                $isAuthenticated = true;
-            }
-            
-            // Check API credentials supplied with the request.
-            if (!$isAuthenticated && getApiBearerToken() !== null) {
-                authenticateApiBearerToken();
-                $isAuthenticated = true;
-            }
-
-            if (!$isAuthenticated) {
-                // Account password or app password, same rule as the API gate.
-                $basicCredentials = getApiBasicCredentials();
-                if ($basicCredentials !== null && resolveApiBasicAuthUser($basicCredentials) !== null) {
-                    $isAuthenticated = true;
-                }
-            }
-
-            if (!$isAuthenticated) {
+            // API credentials were already turned into a session by the
+            // router, which also picked the profile whose data is open. Share
+            // links skip that step, so credentials alone must not count here:
+            // they name no profile and would read whichever data is open.
+            // With a share token, db_connect.php opened the share owner's data
+            // whoever is signed in, so a session only counts when it is that
+            // owner's: anyone else would read the owner's file without the
+            // share's password.
+            $sharedDataOpen = !empty($_GET['token']) || !empty($_GET['folder_token']);
+            $sessionOwnsOpenData = !$sharedDataOpen
+                || (isset($_SESSION['user_id'], $GLOBALS['activeUserId'])
+                    && (int)$_SESSION['user_id'] === (int)$GLOBALS['activeUserId']);
+            if (!(function_exists('isAuthenticated') && isAuthenticated())) {
                 // A link to an attachment opened without a session lands on
                 // the login page and comes back here afterwards; the app's
                 // own calls get a bare 401 (see poznoteDenyUnauthenticatedRequest).
                 poznoteDenyUnauthenticatedRequest('Authentication required', '/login.php', false);
+            }
+            if (!$sessionOwnsOpenData) {
+                // Signed in already: sending them to the login page would
+                // bring them straight back here, in a loop.
+                http_response_code(403);
+                exit('Access denied');
             }
         }
         

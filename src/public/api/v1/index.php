@@ -58,9 +58,14 @@ if ($isPublicApiEndpoint) {
     // No additional authentication required (token validation happens in controller)
 } elseif ($isAttachmentDownload) {
     // Attachment downloads check authentication conditionally (public shared notes don't need auth)
-    // Try to authenticate if credentials provided, but don't require it
+    // Try to authenticate if credentials provided, but don't require it.
+    // A share link (token / folder_token) is left to the controller unless a
+    // profile is named: a browser that once answered a Basic prompt keeps
+    // sending those credentials, and requireApiAuth() would refuse them for
+    // the missing X-User-ID before the share could be checked.
+    $isShareLinkRequest = !empty($_GET['token']) || !empty($_GET['folder_token']);
     try {
-        if (isset($_SERVER['HTTP_X_USER_ID']) || hasApiAuthCredentials()) {
+        if (isset($_SERVER['HTTP_X_USER_ID']) || (hasApiAuthCredentials() && !$isShareLinkRequest)) {
             @requireApiAuth();
         }
     } catch (Exception $e) {

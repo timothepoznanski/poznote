@@ -8,64 +8,14 @@
  * - User selects their profile on login page
  */
 
-// Detect if behind a reverse proxy (HTTPS termination)
-$isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-         || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
-         || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on')
-         || (!empty($_SERVER['HTTP_X_FORWARDED_PORT']) && $_SERVER['HTTP_X_FORWARDED_PORT'] === '443');
+require_once __DIR__ . '/lib/session.php';
 
-// Allow override via environment variable for edge cases
-$forceSecureCookies = getenv('POZNOTE_FORCE_SECURE_COOKIES');
-if ($forceSecureCookies !== false && $forceSecureCookies !== '') {
-    $isSecure = filter_var($forceSecureCookies, FILTER_VALIDATE_BOOLEAN);
-}
-
-// Configure session cookie for reverse proxy compatibility
-$cookieParams = [
-    'lifetime' => 0,
-    'path' => '/',
-    'domain' => '',
-    'secure' => $isSecure,
-    'httponly' => true,
-    'samesite' => 'Lax'
-];
-session_set_cookie_params($cookieParams);
-
-// Configure session name based on configured port to allow multiple instances
+// Read as globals by the cookie helpers below and by REMEMBER_ME_COOKIE
+$isSecure = poznoteSessionCookieIsSecure();
 $configured_port = $_ENV['HTTP_WEB_PORT'] ?? '8040';
-$session_name = 'POZNOTE_SESSION_' . $configured_port;
-session_name($session_name);
 
-// Sessions live in the data volume, not in the container's /tmp: recreating
-// the container (an update, a rollout) then keeps everyone signed in, since
-// the browser still holds its cookie and the file that cookie names is still
-// there (issue #1389). The directory is created on first use, stays private
-// to the PHP user, and nginx never serves anything under /data/.
-$sessionSavePath = __DIR__ . '/data/sessions';
-if (!is_dir($sessionSavePath)) {
-    @mkdir($sessionSavePath, 0700, true);
-}
-if (is_dir($sessionSavePath) && is_writable($sessionSavePath)) {
-    // A session opened before this directory existed is still in the old
-    // location: carry it over once, so the update that ships this change is
-    // not itself the restart that signs everyone out.
-    $currentSessionId = (string)($_COOKIE[$session_name] ?? '');
-    if ($currentSessionId !== '' && preg_match('/^[a-zA-Z0-9,-]{22,256}$/', $currentSessionId)) {
-        $legacySessionDir = (string)session_save_path();
-        if ($legacySessionDir === '') {
-            $legacySessionDir = sys_get_temp_dir();
-        }
-        $legacySessionFile = rtrim($legacySessionDir, '/') . '/sess_' . $currentSessionId;
-        $movedSessionFile = $sessionSavePath . '/sess_' . $currentSessionId;
-        if (!is_file($movedSessionFile) && is_file($legacySessionFile) && @copy($legacySessionFile, $movedSessionFile)) {
-            @chmod($movedSessionFile, 0600);
-            @unlink($legacySessionFile);
-        }
-    }
-    session_save_path($sessionSavePath);
-}
-
-session_start();
+// Same session as the public share pages (see lib/session.php)
+poznoteStartSession();
 
 // Prevent browser caching to ensure fresh content on every load (especially for home and settings)
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");

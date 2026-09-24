@@ -6,8 +6,12 @@
  * the review textarea on every state change.
  */
 
+/* Through the variable: a plain max-width loses to .modal-content in
+   modals/base.css. Sized for the Transcribe footnote to hold on one line:
+   measured in Inter at 0.8rem, French is the longest at 583px, plus 56px of
+   padding. That also leaves room for the four buttons on one row. */
 .dictate-modal-content {
-    max-width: 520px;
+    --modal-max-width: 660px;
     width: 100%;
 }
 
@@ -61,6 +65,26 @@
     font-size: 0.9rem;
 }
 
+/* Spoken language for this recording (js/speech-to-text.js), preselected on
+   the configured one. The select drops the stacked-form margins that
+   .modal-content select carries (modals/base.css). */
+.dictate-language {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--pz-text-muted);
+}
+
+.dictate-language[hidden] { display: none; }
+
+.dictate-modal-content .dictate-language select {
+    margin: 0;
+    padding: 6px 10px;
+}
+
 /* The app's own spinner (lucide-loader-2 lucide-spin, as in the other waiting
    states), so only the gap before the label is ours. */
 .dictate-hint .lucide-loader-2 {
@@ -112,4 +136,29 @@
 @media (max-width: 600px) {
     .dictate-timer { font-size: 1.6rem; }
     .dictate-panel { min-height: 112px; }
+}
+
+/* "Transcribe*" and its footnote under the buttons: the review step that
+   follows also offers to attach the audio. Right-aligned under the button
+   row on a desktop; the phone stacks the buttons full width. */
+.dictate-footnote {
+    margin: 10px 0 0;
+    font-size: 0.8rem;
+    color: var(--pz-text-muted);
+    text-align: right;
+}
+
+.dictate-footnote-mark {
+    margin-left: 1px;
+}
+
+.dictate-footnote .dictate-footnote-mark {
+    margin: 0 3px 0 0;
+}
+
+@media (max-width: 800px) {
+    .dictate-footnote {
+        margin-top: 0;
+        text-align: left;
+    }
 }

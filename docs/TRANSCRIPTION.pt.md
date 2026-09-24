@@ -85,11 +85,15 @@ Depois de configurada, a transcrição aparece em dois lugares.
 
 ### Ditar
 
-**Ditar** fica em **Inserir** no menu de comandos de toda nota, tanto em texto formatado quanto em Markdown. Digitar `/dict`, `/voice` ou `/transcribe` encontra o item diretamente, já que o filtro também pesquisa nos submenus.
+O ditado passa por **Gravar áudio**, em **Inserir** e **Mídia** no menu de comandos de toda nota, tanto em texto formatado quanto em Markdown, e na barra de edição acima do teclado no celular. Digitar `/dict`, `/voice` ou `/transcribe` encontra o item diretamente, já que o filtro também pesquisa nos submenus.
 
-Uma caixa de diálogo se abre e a gravação começa na hora. Uma barra de nível mostra que o microfone está realmente captando algo, e o cronômetro mostra o tempo decorrido em relação à duração máxima definida pelo administrador, por exemplo `1:12 / 10:00`. A gravação para e é transcrita sozinha quando atinge esse limite.
+Uma caixa de diálogo se abre, e a gravação começa quando você toca em **Iniciar**, que é também quando o navegador pede o microfone pela primeira vez. Uma barra de nível mostra que o microfone está realmente captando algo, e o cronômetro mostra o tempo decorrido em relação à duração máxima definida pelo administrador, por exemplo `1:12 / 10:00`.
 
-**Parar e transcrever** envia a gravação. A transcrição volta em uma caixa de texto onde você pode corrigi-la antes que ela entre na nota. **Inserir** a coloca onde estava o seu cursor.
+Quando a transcrição está disponível, um menu **Idioma falado** fica abaixo do cronômetro. Ele começa no idioma definido na configuração, marcado como padrão, e mudá-lo vale apenas para esta gravação. **Detectar automaticamente** deixa o servidor reconhecer o idioma mesmo quando a configuração define um.
+
+O que acontece com a gravação é escolhido quando você a para. **Inserir o áudio** a coloca na nota como um reprodutor de áudio, sem transcrição. **Transcrever** a envia ao servidor, e só aparece quando a transcrição está disponível para você. Quando a gravação atinge a duração máxima, ela para sozinha e espera um dos dois botões.
+
+A transcrição volta em uma caixa de texto onde você pode corrigi-la antes que ela entre na nota. **Inserir** a coloca onde estava o seu cursor. Se a transcrição falhar, os dois botões voltam, para que a gravação ainda possa entrar como áudio ou ser enviada de novo.
 
 A caixa de seleção **Anexar também a gravação a esta nota** vem desmarcada por padrão, e o áudio é então descartado assim que o texto volta. Marque-a e a gravação também é salva como um anexo comum chamado `dictation-<date>.<ext>`, para você ouvi-la de novo ou transcrevê-la mais tarde com um modelo melhor.
 
@@ -118,8 +122,8 @@ Tudo fica em **Configurações → Ferramentas de administração → Transcriç
 | **Chave de API** | Enviada como `Authorization: Bearer`. Servidores locais geralmente não precisam de nenhuma; a OpenAI precisa. |
 | **Verificar o acesso e listar os modelos** | Confirma que o servidor responde e preenche as sugestões de modelo. |
 | **Modelo** | O nome do modelo enviado em cada requisição. Obrigatório para todos os servidores, mesmo os que o ignoram. |
-| **Idioma falado** | Código de duas letras como `en`, `fr` ou `de`, ou vazio para deixar o servidor detectá-lo. |
-| **Duração máxima da gravação** | Em minutos, de 1 a 60, 10 por padrão. O ditado para e é transcrito sozinho quando chega lá, assim como **Gravar áudio** em **Mídia** no menu de barra, que insere a gravação sem transcrevê-la. Os anexos não são afetados. |
+| **Idioma falado** | Código de duas letras como `en`, `fr` ou `de`, ou vazio para deixar o servidor detectá-lo. A janela de gravação o pré-seleciona, e o menu dela permite trocá-lo para uma gravação. |
+| **Duração máxima da gravação** | Em minutos, de 1 a 60, 10 por padrão. **Gravar áudio** para sozinho quando chega lá, e então espera **Inserir o áudio** ou **Transcrever**. Sem transcrição, ele insere o áudio na hora. Os anexos não são afetados. |
 | **Permitir servidores de transcrição pessoais** | Permite que cada usuário defina seu próprio servidor, veja [Servidores pessoais](#servidores-pessoais). |
 
 ### Escolher um modelo
@@ -247,7 +251,7 @@ docker compose exec webserver curl -s -o /dev/null -w '%{http_code}\n' http://wh
 
 ## Requisitos do navegador
 
-**HTTPS.** Os navegadores só dão acesso ao microfone a uma página em uma origem segura: HTTPS, ou `localhost`. Em `http` simples em qualquer outro endereço, **Ditar** avisa que precisa de HTTPS e não grava nada. Transcrever um anexo não é afetado, já que nada é gravado.
+**HTTPS.** Os navegadores só dão acesso ao microfone a uma página em uma origem segura: HTTPS, ou `localhost`. Em `http` simples em qualquer outro endereço, **Gravar áudio** avisa que precisa de HTTPS e não grava nada. Transcrever um anexo não é afetado, já que nada é gravado.
 
 **O cabeçalho `Permissions-Policy`.** O Poznote envia `microphone=(self)`, que permite a própria origem e recusa todas as outras. Se um proxy reverso na frente adicionar o próprio cabeçalho `Permissions-Policy`, ele pode sobrescrever o do Poznote, e um `microphone=()` ali faz o navegador recusar o microfone, seja qual for a permissão do site. A caixa de diálogo então mostra "O Poznote não teve permissão para usar o microfone". Remova o cabeçalho no proxy, ou defina `microphone=(self)` lá também.
 
@@ -265,7 +269,15 @@ A gravação é enviada ao Poznote e encaminhada ao servidor de transcrição a 
 
 O Poznote não guarda nenhuma cópia. O áudio fica no arquivo temporário de upload do PHP durante uma única requisição, a menos que você marque **Anexar também a gravação a esta nota**, o que o salva como um anexo comum que conta para o seu armazenamento.
 
-Com um servidor no seu próprio projeto Docker, o áudio nunca sai da máquina. Com a OpenAI, ele é enviado à OpenAI.
+Com o Speaches ou o whisper.cpp configurado como descrito acima, tudo é processado na sua máquina e nada vai para a internet:
+
+- O navegador grava com o MediaRecorder, não com o reconhecimento de voz embutido do navegador, que enviaria o áudio ao Google ou à Apple.
+- A gravação vai apenas para o seu servidor Poznote, e o Poznote a encaminha apenas para a URL configurada na página Transcrição. Nenhum outro servidor é contatado.
+- O único acesso à internet é o download do modelo, uma vez, na instalação. A transcrição funciona com o contêiner desconectado da internet.
+- O texto transcrito chega à sua nota como texto digitado, e a nenhum outro lugar.
+
+> [!WARNING]
+> A predefinição **OpenAI** é a exceção: cada gravação é enviada aos servidores da OpenAI. É a única predefinição que faz isso, e a única cuja URL é fixa e oculta. Se a página Transcrição mostra um campo URL, o áudio fica no servidor dessa URL.
 
 ## Solução de problemas
 
@@ -281,8 +293,8 @@ Ele precisa ser `microphone=(self)`. Veja [Requisitos do navegador](#requisitos-
 **"O microfone precisa de HTTPS"**
 Você está em `http` simples em um endereço que não é `localhost`. Sirva o Poznote por HTTPS.
 
-**Ditar não aparece no menu de comandos**
-Ele fica em **Inserir**; `/dict` o encontra onde quer que esteja. Se ele também não aparecer ali: a transcrição está desativada, o seu perfil não está na lista de usuários autorizados, ou a configuração não tem URL ou modelo.
+**Nenhum botão Transcrever ao gravar**
+A transcrição está desativada, o seu perfil não está na lista de usuários autorizados, ou a configuração não tem URL ou modelo. O próprio **Gravar áudio** está sempre lá, em **Inserir** e **Mídia**; `/dict` o encontra.
 
 **Nenhum botão de microfone em um anexo**
 O arquivo não é reconhecido como áudio (veja a lista em [Transcrever um anexo de áudio](#transcrever-um-anexo-de-áudio)), ou a transcrição não está disponível para o seu perfil.

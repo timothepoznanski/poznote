@@ -89,11 +89,7 @@ try {
     // Only enforce password when user has NOT been authenticated via allowed_users.
     // When allowed_users passes, the password should not create an additional barrier.
     if (!$passedUserRestriction && !empty($storedPassword)) {
-        if (session_status() === PHP_SESSION_NONE) {
-            $configured_port = $_ENV['HTTP_WEB_PORT'] ?? '8040';
-            session_name('POZNOTE_SESSION_' . $configured_port);
-        }
-        session_start();
+        poznoteStartSession();
         $sessionKey = 'public_folder_auth_' . $token;
         
         if (isset($_POST['folder_password'])) {

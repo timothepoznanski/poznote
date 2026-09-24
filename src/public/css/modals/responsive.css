@@ -122,6 +122,14 @@
         height: 44px !important;
     }
 
+    /* The display: block !important above would otherwise override the
+       hidden attribute that scripts toggle on buttons (e.g. the dictation
+       modal's Stop and Insert steps) */
+    .modal-buttons button[hidden],
+    .modal-content>div>button[hidden] {
+        display: none !important;
+    }
+
     .modal-buttons {
         flex-direction: column !important;
         gap: 10px !important;

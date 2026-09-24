@@ -124,8 +124,13 @@ body #right_col .notecard[data-content-width] {
        around it (title, tags, attachments): halving an already narrowed note
        would leave two unusable panes, and the surroundings have to match the
        full-width panes below them. The width setting therefore does not apply
-       while the split is open, in either pane. */
-    #right_col .innernote:has(.noteentry.markdown-split-mode) > :not(.note-header):not(.note-scroll-edge-controls) {
+       while the split is open, in either pane.
+       A class set with the split (js/markdown-view-modes.js), not
+       .innernote:has(.noteentry.markdown-split-mode): with that :has(),
+       Chromium restyled the whole note on every DOM change during the split,
+       and Mermaid, which inserts and measures thousands of elements per
+       diagram, froze the page for minutes. */
+    #right_col .innernote.markdown-split-open > :not(.note-header):not(.note-scroll-edge-controls) {
         max-width: none;
     }
 }

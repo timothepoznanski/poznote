@@ -2,8 +2,9 @@
  * Mobile editor bar (discussion #1465).
  *
  * A row of editing buttons pinned above the on-screen keyboard while the body
- * of a note is being edited: slash menu, undo/redo, bold/italic, lists and
- * indentation, none of which a touch keyboard can reach by shortcut.
+ * of a note is being edited: slash menu, audio recording, undo/redo,
+ * bold/italic, lists and indentation, none of which a touch keyboard can
+ * reach by shortcut.
  *
  * Markup: mobile_editor_bar.php. Styles: css/index-mobile.css.
  *
@@ -52,12 +53,23 @@
         return !!(api && editor && typeof api.isCodeMirrorEditor === 'function' && api.isCodeMirrorEditor(editor));
     }
 
+    // A dialog over the note (dictation, audio recorder, ...) is not a place
+    // to edit the note: the bar would sit on top of it.
+    function isDialogOpen() {
+        var modals = document.querySelectorAll('.modal');
+        for (var i = 0; i < modals.length; i++) {
+            if (modals[i].getClientRects().length > 0) return true;
+        }
+        return false;
+    }
+
     function syncVisibility() {
         if (!bar || !document.body) return;
 
         var visible = isMobileViewport()
             && document.body.classList.contains('mobile-keyboard-open')
-            && !!getActiveNoteEditor();
+            && !!getActiveNoteEditor()
+            && !isDialogOpen();
 
         if (visible === document.body.classList.contains('mobile-editor-bar-visible')) return;
         document.body.classList.toggle('mobile-editor-bar-visible', visible);
@@ -156,6 +168,13 @@
                 if (typeof window.openSlashMenuAtCaret === 'function') {
                     window.openSlashMenuAtCaret(document.activeElement);
                 }
+                break;
+            case 'record-audio':
+                // js/speech-to-text.js reads the caret, then closes the keyboard
+                // for the dialog and keeps it closed when the result goes in
+                if (typeof window.openAudioRecorder === 'function') window.openAudioRecorder();
+                // Gone at once, not after the keyboard has finished closing
+                syncVisibility();
                 break;
             case 'undo':
                 runHistory(editor, false);

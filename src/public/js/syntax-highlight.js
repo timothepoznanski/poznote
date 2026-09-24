@@ -766,6 +766,30 @@
         setTimeout(hookReinitializeNoteContent, 200);
     }
 
+    // Only what was added gets highlighted, in one batch. This used to run a
+    // pass over the whole note for each added block, and a markdown preview
+    // render adds all the note's blocks at once: a note with N code blocks got
+    // N full passes (N x N highlights), which pinned the CPU for minutes and
+    // ran again on every split-mode re-render.
+    var pendingHighlightRoots = new Set();
+    var pendingHighlightTimer = null;
+
+    function scheduleHighlight(root) {
+        pendingHighlightRoots.add(root);
+        if (pendingHighlightTimer !== null) return;
+
+        pendingHighlightTimer = setTimeout(function() {
+            pendingHighlightTimer = null;
+            var roots = Array.from(pendingHighlightRoots);
+            pendingHighlightRoots.clear();
+            roots.forEach(function(root) {
+                // Replaced by a later render in the meantime
+                if (!root.isConnected) return;
+                applySyntaxHighlighting(root);
+            });
+        }, 50);
+    }
+
     // Listen for content changes in note entries (for live preview)
     var observer = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
@@ -773,11 +797,12 @@
                 mutation.addedNodes.forEach(function(node) {
                     if (node.nodeType === 1) { // Element node
                         // Check if it's a code block or contains code blocks
-                        if (node.tagName === 'PRE' || node.tagName === 'CODE' ||
+                        if (node.tagName === 'PRE' ||
                             (node.querySelectorAll && node.querySelectorAll('pre code[class*="language-"]').length > 0)) {
-                            setTimeout(function() {
-                                applySyntaxHighlighting(node.closest ? node.closest('.noteentry') || document : document);
-                            }, 50);
+                            scheduleHighlight(node);
+                        } else if (node.tagName === 'CODE' && node.closest('pre')) {
+                            // applySyntaxHighlighting() looks below its root
+                            scheduleHighlight(node.closest('pre'));
                         }
                     }
                 });

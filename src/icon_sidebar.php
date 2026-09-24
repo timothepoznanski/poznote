@@ -444,7 +444,7 @@ window.PoznoteIconSidebarColorsConfig = <?php echo json_encode([
 <script>
 // Apply the collapsed state, and focus mode (discussion 1482), before the
 // rail paints; js/icon-sidebar-toggle.js owns both afterwards. Focus mode goes
-// on <html> so the notes column and the note's title rows, which come later in
+// on <html> so the notes column and the rows around the note's title, which come later in
 // the page, never paint at all (css/focus-mode.css). Its first step clears the
 // top of the note, the second one also hides the rail and the notes column;
 // 'true' is what the one-step version stored.

@@ -405,13 +405,15 @@
 
     function handleCodeMirrorInput(editor) {
         var api = getCmApi();
-        if (!api || typeof api.getSelectionOffsets !== 'function' || typeof api.getValue !== 'function') return;
+        if (!api || typeof api.getSelectionOffsets !== 'function' || typeof api.getLineAt !== 'function') return;
         var selOff = api.getSelectionOffsets(editor);
         if (!selOff || selOff.start !== selOff.end) { hideMenu(); return; }
-        var value = api.getValue(editor);
-        var cursor = Math.max(0, Math.min(selOff.end, value.length));
-        var lineStart = value.lastIndexOf('\n', cursor - 1) + 1;
-        var textBefore = value.slice(lineStart, cursor);
+        // Only the caret's line: this runs on every keystroke, and reading the
+        // whole document each time is slow on long notes
+        var line = api.getLineAt(editor, selOff.end);
+        if (!line) { hideMenu(); return; }
+        var cursor = Math.max(line.from, Math.min(selOff.end, line.to));
+        var textBefore = line.text.slice(0, cursor - line.from);
 
         var done = textBefore.match(COMPLETE_RE);
         if (done && typeof api.replaceRange === 'function') {

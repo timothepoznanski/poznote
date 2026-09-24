@@ -313,11 +313,7 @@ try {
     if (!empty($allowedUsersRaw)) {
         $allowedUserIds = is_array($allowedUsersRaw) ? $allowedUsersRaw : json_decode($allowedUsersRaw, true);
         if (is_array($allowedUserIds) && !empty($allowedUserIds)) {
-            if (session_status() === PHP_SESSION_NONE) {
-                $configured_port = $_ENV['HTTP_WEB_PORT'] ?? '8040';
-                session_name('POZNOTE_SESSION_' . $configured_port);
-                session_start();
-            }
+            poznoteStartSession();
             $currentUserId = $_SESSION['user_id'] ?? null;
             // The share owner always has access
             $isOwner = $currentUserId !== null && (int)$currentUserId === (int)$activeUserId;
@@ -367,11 +363,7 @@ try {
     if (!$passedUserRestriction && !empty($folderAllowedUsersRaw)) {
         $folderAllowedUserIds = is_array($folderAllowedUsersRaw) ? $folderAllowedUsersRaw : json_decode($folderAllowedUsersRaw, true);
         if (is_array($folderAllowedUserIds) && !empty($folderAllowedUserIds)) {
-            if (session_status() === PHP_SESSION_NONE) {
-                $configured_port = $_ENV['HTTP_WEB_PORT'] ?? '8040';
-                session_name('POZNOTE_SESSION_' . $configured_port);
-                session_start();
-            }
+            poznoteStartSession();
             $currentUserId = $_SESSION['user_id'] ?? null;
             $isOwner = $currentUserId !== null && (int)$currentUserId === (int)$activeUserId;
             if (!$isOwner) {
@@ -410,11 +402,7 @@ try {
     }
 
     if (!empty($requiredAuths)) {
-        if (session_status() === PHP_SESSION_NONE) {
-            $configured_port = $_ENV['HTTP_WEB_PORT'] ?? '8040';
-            session_name('POZNOTE_SESSION_' . $configured_port);
-        }
-        session_start();
+        poznoteStartSession();
 
         // If accessed via a shared folder, also accept that folder's auth session.
         if (!empty($folderToken)) {

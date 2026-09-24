@@ -2112,7 +2112,6 @@
     "template_none": "Aún no hay plantillas",
     "template_none_hint": "Coloca notas en una carpeta o un espacio de trabajo llamado «Plantillas»",
     "template_insert_failed": "No se pudo insertar la plantilla",
-    "dictate": "Dictar",
     "record_audio": "Grabar audio",
     "insert": "Insertar",
     "media": "Multimedia",
@@ -4526,7 +4525,7 @@
     "config_title": "Configuración",
     "description": "Conecta Poznote a un servidor de reconocimiento de voz para convertir la voz en texto de tus notas. Funciona cualquier servidor compatible con la API de audio de OpenAI, incluido un Whisper autoalojado, y el audio nunca sale de la máquina que lo ejecuta.",
     "enable_label": "Activar la transcripción",
-    "enable_description": "Añade una entrada Dictar en Insertar del menú de barra de cada nota, y una acción Transcribir en los adjuntos de audio.",
+    "enable_description": "Añade un botón Transcribir a la ventana Grabar audio, en Insertar del menú de barra de cada nota, y una acción Transcribir en los adjuntos de audio.",
     "users_label": "Usuarios autorizados a usar el servidor de transcripción configurado por el administrador",
     "users_description": "Solo los usuarios seleccionados pueden dictar y transcribir con la configuración de esta página. Los usuarios nuevos no tienen acceso hasta que los añadas aquí.",
     "users_filter_placeholder": "Filtrar usuarios",
@@ -4545,7 +4544,7 @@
       "save_error": "No se pudo guardar la configuración."
     },
     "max_duration_label": "Duración máxima de grabación",
-    "max_duration_description": "En minutos, de 1 a {{limit}}. Dictar y Grabar audio se detienen solos al llegar a ese límite, para que una pestaña olvidada grabando no pueda enviar una hora de audio. La ventana muestra el tiempo transcurrido frente a este límite. No afecta a la transcripción de un adjunto existente."
+    "max_duration_description": "En minutos, de 1 a {{limit}}. Grabar audio se detiene solo al llegar a ese límite, para que una pestaña olvidada grabando no pueda enviar una hora de audio. La ventana muestra el tiempo transcurrido frente a este límite. No afecta a la transcripción de un adjunto existente."
   },
   "stt_settings_user": {
     "title": "Mi servidor de transcripción",
@@ -4562,9 +4561,6 @@
   },
   "stt": {
     "modal": {
-      "title": "Dictar",
-      "recording_hint": "Habla y después detén la grabación para transcribirla. Se detiene sola tras {{minutes}} min.",
-      "stop": "Detener y transcribir",
       "transcribing": "Transcribiendo...",
       "transcribing_file": "Transcribiendo {{file}}...",
       "review_label": "Transcripción",
@@ -4582,7 +4578,6 @@
       "no_microphone": "No se ha encontrado ningún micrófono.",
       "microphone_failed": "No se pudo abrir el micrófono.",
       "empty_recording": "No se ha grabado nada.",
-      "max_duration": "Se alcanzó la duración máxima de grabación, se transcribe lo grabado.",
       "nothing_heard": "El servidor no oyó nada en esta grabación.",
       "no_note": "Abre primero una nota: no hay dónde poner el texto.",
       "failed": "Error en la transcripción: {{error}}",
@@ -4614,10 +4609,19 @@
   },
   "audio_recorder": {
     "title": "Grabar audio",
+    "hint_ready": "Pulsa Iniciar para empezar a grabar. Se detiene sola tras {{minutes}} min.",
     "hint": "Grabando. Detén la grabación para insertar el audio en la nota. Se detiene sola tras {{minutes}} min.",
+    "hint_choice": "Grabando. Detén la grabación para insertar el audio en la nota o para transcribirlo a texto. Se detiene sola tras {{minutes}} min.",
+    "start": "Iniciar",
     "stop": "Detener e insertar",
+    "insert_audio": "Insertar el audio",
+    "transcribe": "Transcribir",
+    "transcribe_note": "Una vez transcrito, podrás insertar el texto en la nota y además adjuntarle el audio.",
+    "language_auto": "Detectar automáticamente",
+    "language_default": "{{language}} (predeterminado)",
     "saving": "Guardando la grabación...",
     "max_duration": "Se alcanzó la duración máxima de grabación, se inserta lo grabado.",
+    "max_duration_choice": "Se alcanzó la duración máxima de grabación. Elige qué hacer con la grabación.",
     "upload_failed": "No se pudo guardar la grabación: {{error}}",
     "download": "Descargar la grabación",
     "no_note": "Abre primero una nota: la grabación se guarda como adjunto de esa nota."

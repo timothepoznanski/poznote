@@ -203,6 +203,7 @@
 <div class="ui-custom-items">
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileEditorBar" checked><span><?php echo t_h('modals.ui_customization.mobile_editor_bar_show', [], 'Show the bar'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarInsert" checked><span><?php echo t_h('mobile_editor_bar.insert', [], 'Insert (slash menu)'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarRecordAudio" checked><span><?php echo t_h('slash_menu.record_audio', [], 'Record audio'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarUndo" checked><span><?php echo t_h('mobile_editor_bar.undo', [], 'Undo'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarRedo" checked><span><?php echo t_h('mobile_editor_bar.redo', [], 'Redo'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarBold" checked><span><?php echo t_h('editor.toolbar.bold', [], 'Bold'); ?></span></label>

@@ -1617,7 +1617,6 @@
     "template_none": "No templates yet",
     "template_none_hint": "Put notes in a folder or a workspace named \"Templates\"",
     "template_insert_failed": "Could not insert the template",
-    "dictate": "Dictate",
     "record_audio": "Record audio",
     "insert": "Insert",
     "media": "Media",
@@ -4173,7 +4172,7 @@
     "config_title": "Configuration",
     "description": "Connect Poznote to a speech-to-text server so voice can be turned into note text. Any server speaking the OpenAI audio API works, including self-hosted Whisper servers, and the audio never leaves the machine that runs it.",
     "enable_label": "Enable transcription",
-    "enable_description": "Adds a Dictate entry under Insert in the slash menu of every note, and a Transcribe action on audio attachments.",
+    "enable_description": "Adds a Transcribe button to the Record audio dialog, found under Insert in the slash menu of every note, and a Transcribe action on audio attachments.",
     "users_label": "Users allowed to use the transcription server configured by the administrator",
     "users_description": "Only the selected users can dictate and transcribe with the configuration on this page. New users have no access until you add them here.",
     "users_filter_placeholder": "Filter users",
@@ -4192,7 +4191,7 @@
       "save_error": "Failed to save configuration."
     },
     "max_duration_label": "Maximum recording length",
-    "max_duration_description": "In minutes, from 1 to {{limit}}. Dictate and Record audio stop on their own when they get there, so a tab left recording cannot send an hour of audio. The dialog shows the elapsed time against this limit. Transcribing an existing attachment is not affected."
+    "max_duration_description": "In minutes, from 1 to {{limit}}. Record audio stops on its own when it gets there, so a tab left recording cannot send an hour of audio. The dialog shows the elapsed time against this limit. Transcribing an existing attachment is not affected."
   },
   "stt_settings_user": {
     "title": "My transcription server",
@@ -4209,9 +4208,6 @@
   },
   "stt": {
     "modal": {
-      "title": "Dictate",
-      "recording_hint": "Speak, then stop the recording to have it transcribed. It stops on its own after {{minutes}} min.",
-      "stop": "Stop and transcribe",
       "transcribing": "Transcribing...",
       "transcribing_file": "Transcribing {{file}}...",
       "review_label": "Transcription",
@@ -4229,7 +4225,6 @@
       "no_microphone": "No microphone was found.",
       "microphone_failed": "The microphone could not be opened.",
       "empty_recording": "Nothing was recorded.",
-      "max_duration": "Maximum recording length reached, transcribing what was recorded.",
       "nothing_heard": "The server heard nothing in this recording.",
       "no_note": "Open a note first: there is nowhere to put the text.",
       "failed": "Transcription failed: {{error}}",
@@ -4261,10 +4256,19 @@
   },
   "audio_recorder": {
     "title": "Record audio",
+    "hint_ready": "Press Start to begin recording. It stops on its own after {{minutes}} min.",
     "hint": "Recording. Stop to insert the audio into the note. It stops on its own after {{minutes}} min.",
+    "hint_choice": "Recording. Stop to insert the audio into the note, or to transcribe it into text. It stops on its own after {{minutes}} min.",
+    "start": "Start",
     "stop": "Stop and insert",
+    "insert_audio": "Insert the audio",
+    "transcribe": "Transcribe",
+    "transcribe_note": "Once transcribed, you can insert the text into the note and also attach the audio to it.",
+    "language_auto": "Detect automatically",
+    "language_default": "{{language}} (default)",
     "saving": "Saving the recording...",
     "max_duration": "Maximum recording length reached, inserting what was recorded.",
+    "max_duration_choice": "Maximum recording length reached. Choose what to do with the recording.",
     "upload_failed": "The recording could not be saved: {{error}}",
     "download": "Download the recording",
     "no_note": "Open a note first: the recording is saved as an attachment of that note."

@@ -4,6 +4,8 @@
  * Used by public_note.php and public_folder.php.
  */
 
+require_once __DIR__ . '/lib/session.php';
+
 function getPublicAppPathPrefix() {
     $scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\');
     if ($scriptDir === '' || $scriptDir === '.') {
@@ -465,11 +467,7 @@ function checkPublicUserRestriction($allowedUsersRaw, $activeUserId, $currentLan
         return false;
     }
     
-    if (session_status() === PHP_SESSION_NONE) {
-        $configured_port = $_ENV['HTTP_WEB_PORT'] ?? '8040';
-        session_name('POZNOTE_SESSION_' . $configured_port);
-        session_start();
-    }
+    poznoteStartSession();
     $currentUserId = $_SESSION['user_id'] ?? null;
     
     // The share owner always has access

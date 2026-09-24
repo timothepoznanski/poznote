@@ -269,7 +269,11 @@
 
     function initializeTaskListEmbeds(root) {
         var scope = (root && typeof root.querySelectorAll === 'function') ? root : document;
-        var embeds = scope.querySelectorAll('.tasklist-embed[data-task-embed]');
+        var embeds = Array.prototype.slice.call(scope.querySelectorAll('.tasklist-embed[data-task-embed]'));
+        // The root itself, when a markdown preview update hands over one block
+        if (typeof scope.matches === 'function' && scope.matches('.tasklist-embed[data-task-embed]')) {
+            embeds.unshift(scope);
+        }
         embeds.forEach(function (embed) {
             hydrateEmbed(embed);
         });

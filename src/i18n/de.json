@@ -2112,7 +2112,6 @@
     "template_none": "Noch keine Vorlagen",
     "template_none_hint": "Lege Notizen in einen Ordner oder einen Arbeitsbereich namens „Vorlagen“",
     "template_insert_failed": "Die Vorlage konnte nicht eingefügt werden",
-    "dictate": "Diktieren",
     "record_audio": "Audio aufnehmen",
     "insert": "Einfügen",
     "media": "Medien",
@@ -4525,7 +4524,7 @@
     "config_title": "Konfiguration",
     "description": "Verbinden Sie Poznote mit einem Spracherkennungsserver, um Sprache in Notiztext umzuwandeln. Jeder Server mit der Audio-API von OpenAI funktioniert, auch ein selbst gehosteter Whisper-Server, und die Audiodaten verlassen nie den Rechner, auf dem er läuft.",
     "enable_label": "Transkription aktivieren",
-    "enable_description": "Fügt im Slash-Menü jeder Notiz unter Einfügen den Eintrag Diktieren hinzu sowie die Aktion Transkribieren bei Audioanhängen.",
+    "enable_description": "Fügt dem Dialog Audio aufnehmen, im Slash-Menü jeder Notiz unter Einfügen, die Schaltfläche Transkribieren hinzu sowie die Aktion Transkribieren bei Audioanhängen.",
     "users_label": "Benutzer, die den vom Administrator konfigurierten Transkriptionsserver verwenden dürfen",
     "users_description": "Nur die ausgewählten Benutzer können mit der Konfiguration auf dieser Seite diktieren und transkribieren. Neue Benutzer haben keinen Zugriff, bis Sie sie hier hinzufügen.",
     "users_filter_placeholder": "Benutzer filtern",
@@ -4544,7 +4543,7 @@
       "save_error": "Konfiguration konnte nicht gespeichert werden."
     },
     "max_duration_label": "Maximale Aufnahmedauer",
-    "max_duration_description": "In Minuten, von 1 bis {{limit}}. Diktieren und Audio aufnehmen stoppen beim Erreichen dieser Dauer von selbst, damit ein vergessener Tab keine Stunde Audio senden kann. Der Dialog zeigt die verstrichene Zeit im Verhältnis zu diesem Limit. Die Transkription eines vorhandenen Anhangs ist nicht betroffen."
+    "max_duration_description": "In Minuten, von 1 bis {{limit}}. Audio aufnehmen stoppt beim Erreichen dieser Dauer von selbst, damit ein vergessener Tab keine Stunde Audio senden kann. Der Dialog zeigt die verstrichene Zeit im Verhältnis zu diesem Limit. Die Transkription eines vorhandenen Anhangs ist nicht betroffen."
   },
   "stt_settings_user": {
     "title": "Mein Transkriptionsserver",
@@ -4561,9 +4560,6 @@
   },
   "stt": {
     "modal": {
-      "title": "Diktieren",
-      "recording_hint": "Sprechen Sie und beenden Sie dann die Aufnahme, um sie transkribieren zu lassen. Sie stoppt nach {{minutes}} Min. von selbst.",
-      "stop": "Stoppen und transkribieren",
       "transcribing": "Wird transkribiert...",
       "transcribing_file": "{{file}} wird transkribiert...",
       "review_label": "Transkription",
@@ -4581,7 +4577,6 @@
       "no_microphone": "Es wurde kein Mikrofon gefunden.",
       "microphone_failed": "Das Mikrofon konnte nicht geöffnet werden.",
       "empty_recording": "Es wurde nichts aufgenommen.",
-      "max_duration": "Maximale Aufnahmedauer erreicht, das Aufgenommene wird transkribiert.",
       "nothing_heard": "Der Server hat in dieser Aufnahme nichts gehört.",
       "no_note": "Öffnen Sie zuerst eine Notiz: Es gibt keinen Ort für den Text.",
       "failed": "Transkription fehlgeschlagen: {{error}}",
@@ -4613,10 +4608,19 @@
   },
   "audio_recorder": {
     "title": "Audio aufnehmen",
+    "hint_ready": "Drücken Sie auf Starten, um die Aufnahme zu beginnen. Sie stoppt nach {{minutes}} Min. von selbst.",
     "hint": "Aufnahme läuft. Beenden Sie sie, um das Audio in die Notiz einzufügen. Sie stoppt nach {{minutes}} Min. von selbst.",
+    "hint_choice": "Aufnahme läuft. Beenden Sie sie, um das Audio in die Notiz einzufügen oder es in Text zu transkribieren. Sie stoppt nach {{minutes}} Min. von selbst.",
+    "start": "Starten",
     "stop": "Stoppen und einfügen",
+    "insert_audio": "Audio einfügen",
+    "transcribe": "Transkribieren",
+    "transcribe_note": "Nach der Transkription können Sie den Text in die Notiz einfügen und auch das Audio anhängen.",
+    "language_auto": "Automatisch erkennen",
+    "language_default": "{{language}} (Standard)",
     "saving": "Aufnahme wird gespeichert...",
     "max_duration": "Maximale Aufnahmedauer erreicht, das Aufgenommene wird eingefügt.",
+    "max_duration_choice": "Maximale Aufnahmedauer erreicht. Wählen Sie, was mit der Aufnahme geschehen soll.",
     "upload_failed": "Die Aufnahme konnte nicht gespeichert werden: {{error}}",
     "download": "Aufnahme herunterladen",
     "no_note": "Öffnen Sie zuerst eine Notiz: Die Aufnahme wird als Anhang dieser Notiz gespeichert."

@@ -575,10 +575,13 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
             'backlinksAtBottom' => $backlinks_at_bottom_setting,
             'defaultImageBorderNoPadding' => poznoteSettingEnabled($settings['default_image_border_no_padding'], false),
             'archiveWorkspace' => POZNOTE_ARCHIVE_WORKSPACE,
-            // Gates the slash menu's Dictate entry and the Transcribe action on
+            // Gates the Transcribe button of Record audio and the Transcribe action on
             // audio attachments (js/speech-to-text.js). The endpoint checks the
             // same thing again: this only decides what is offered.
             'speechToText' => $sttEnabled,
+            // Preselected in the dialog's language menu, which can override it
+            // for one recording; empty means the server detects the language
+            'speechToTextLanguage' => $sttEnabled ? (string)$sttConfig['language'] : '',
             'speechToTextMaxSeconds' => poznoteSttMaxRecordingSeconds()
         ], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP) ?: '{}';
     ?></script>

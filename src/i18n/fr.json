@@ -2119,7 +2119,6 @@
     "template_none": "Aucun modèle pour l'instant",
     "template_none_hint": "Placez des notes dans un dossier ou un espace de travail nommé « Modèles »",
     "template_insert_failed": "Impossible d'insérer le modèle",
-    "dictate": "Dicter",
     "record_audio": "Enregistrer un audio",
     "insert": "Insérer",
     "media": "Médias",
@@ -4630,7 +4629,7 @@
     "config_title": "Configuration",
     "description": "Connectez Poznote à un serveur de reconnaissance vocale pour transformer la voix en texte dans vos notes. Tout serveur compatible avec l'API audio d'OpenAI fonctionne, y compris un Whisper auto-hébergé, et l'audio ne quitte jamais la machine qui l'exécute.",
     "enable_label": "Activer la transcription",
-    "enable_description": "Ajoute une entrée Dicter sous Insérer dans le menu slash de chaque note, et une action Transcrire sur les pièces jointes audio.",
+    "enable_description": "Ajoute un bouton Transcrire à la fenêtre Enregistrer un audio, sous Insérer dans le menu slash de chaque note, et une action Transcrire sur les pièces jointes audio.",
     "users_label": "Utilisateurs autorisés à utiliser le serveur de transcription configuré par l'administrateur",
     "users_description": "Seuls les utilisateurs sélectionnés peuvent dicter et transcrire avec la configuration de cette page. Les nouveaux utilisateurs n'y ont pas accès tant que vous ne les ajoutez pas ici.",
     "users_filter_placeholder": "Filtrer les utilisateurs",
@@ -4649,7 +4648,7 @@
       "save_error": "Échec de l'enregistrement de la configuration."
     },
     "max_duration_label": "Durée maximale d'enregistrement",
-    "max_duration_description": "En minutes, de 1 à {{limit}}. Dicter et Enregistrer un audio s'arrêtent d'eux-mêmes une fois ce seuil atteint, pour qu'un onglet oublié en enregistrement ne puisse pas envoyer une heure d'audio. La fenêtre affiche le temps écoulé face à cette limite. La transcription d'une pièce jointe existante n'est pas concernée."
+    "max_duration_description": "En minutes, de 1 à {{limit}}. Enregistrer un audio s'arrête de lui-même une fois ce seuil atteint, pour qu'un onglet oublié en enregistrement ne puisse pas envoyer une heure d'audio. La fenêtre affiche le temps écoulé face à cette limite. La transcription d'une pièce jointe existante n'est pas concernée."
   },
   "stt_settings_user": {
     "title": "Mon serveur de transcription",
@@ -4666,9 +4665,6 @@
   },
   "stt": {
     "modal": {
-      "title": "Dicter",
-      "recording_hint": "Parlez, puis arrêtez l'enregistrement pour le faire transcrire. Il s'arrête de lui-même au bout de {{minutes}} min.",
-      "stop": "Arrêter et transcrire",
       "transcribing": "Transcription en cours...",
       "transcribing_file": "Transcription de {{file}}...",
       "review_label": "Transcription",
@@ -4686,7 +4682,6 @@
       "no_microphone": "Aucun microphone n'a été trouvé.",
       "microphone_failed": "Impossible d'ouvrir le microphone.",
       "empty_recording": "Rien n'a été enregistré.",
-      "max_duration": "Durée maximale d'enregistrement atteinte, transcription de ce qui a été enregistré.",
       "nothing_heard": "Le serveur n'a rien entendu dans cet enregistrement.",
       "no_note": "Ouvrez d'abord une note : il n'y a nulle part où mettre le texte.",
       "failed": "Échec de la transcription : {{error}}",
@@ -4718,10 +4713,19 @@
   },
   "audio_recorder": {
     "title": "Enregistrer un audio",
+    "hint_ready": "Appuyez sur Démarrer pour lancer l'enregistrement. Il s'arrête de lui-même au bout de {{minutes}} min.",
     "hint": "Enregistrement en cours. Arrêtez pour insérer l'audio dans la note. Il s'arrête de lui-même au bout de {{minutes}} min.",
+    "hint_choice": "Enregistrement en cours. Arrêtez pour insérer l'audio dans la note, ou pour le transcrire en texte. Il s'arrête de lui-même au bout de {{minutes}} min.",
+    "start": "Démarrer",
     "stop": "Arrêter et insérer",
+    "insert_audio": "Insérer l'audio",
+    "transcribe": "Transcrire",
+    "transcribe_note": "Une fois transcrit, vous pourrez insérer le texte dans la note et aussi y ajouter l'audio en pièce jointe.",
+    "language_auto": "Détection automatique",
+    "language_default": "{{language}} (par défaut)",
     "saving": "Sauvegarde de l'enregistrement...",
     "max_duration": "Durée maximale d'enregistrement atteinte, insertion de ce qui a été enregistré.",
+    "max_duration_choice": "Durée maximale d'enregistrement atteinte. Choisissez quoi faire de l'enregistrement.",
     "upload_failed": "L'enregistrement n'a pas pu être sauvegardé : {{error}}",
     "download": "Télécharger l'enregistrement",
     "no_note": "Ouvrez d'abord une note : l'enregistrement est sauvegardé comme pièce jointe de cette note."
