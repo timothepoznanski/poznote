@@ -763,6 +763,32 @@ function getValue(host) {
   return instance ? instance.view.state.doc.toString() : ''
 }
 
+// Cheap reads for code that runs on every keystroke. getValue builds the
+// whole document as one string, which on a long note costs milliseconds and a
+// document-sized allocation per call.
+function getLength(host) {
+  const instance = getInstance(host)
+  return instance ? instance.view.state.doc.length : 0
+}
+
+function sliceText(host, from, to) {
+  const instance = getInstance(host)
+  if (!instance) return ''
+  const doc = instance.view.state.doc
+  const start = Math.max(0, Math.min(from, doc.length))
+  const end = Math.max(start, Math.min(to, doc.length))
+  return doc.sliceString(start, end)
+}
+
+// The line holding position: { from, to, text }, offsets in the document
+function getLineAt(host, position) {
+  const instance = getInstance(host)
+  if (!instance) return null
+  const doc = instance.view.state.doc
+  const line = doc.lineAt(Math.max(0, Math.min(position, doc.length)))
+  return { from: line.from, to: line.to, text: line.text }
+}
+
 function setValue(host, value, options = {}) {
   const instance = getInstance(host)
   if (!instance) return false
@@ -1213,6 +1239,9 @@ window.PoznoteMarkdownCodeMirror = {
   destroyEditor,
   destroyEditorsWithin,
   getValue,
+  getLength,
+  sliceText,
+  getLineAt,
   getLastActiveEditor,
   setValue,
   setReadOnly,

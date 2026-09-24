@@ -20,8 +20,14 @@
         // Locate math elements first: when there are none (the vast majority
         // of calls, including every MutationObserver tick), exit before any
         // KaTeX loading/availability logic runs.
-        const mathBlocks = element.querySelectorAll('.math-block');
-        const mathInline = element.querySelectorAll('.math-inline');
+        const mathBlocks = Array.from(element.querySelectorAll('.math-block'));
+        const mathInline = Array.from(element.querySelectorAll('.math-inline'));
+        // The element itself, when a markdown preview update hands over one block
+        if (element.classList && element.classList.contains('math-block')) {
+            mathBlocks.unshift(element);
+        } else if (element.classList && element.classList.contains('math-inline')) {
+            mathInline.unshift(element);
+        }
         if (mathBlocks.length === 0 && mathInline.length === 0) {
             return;
         }

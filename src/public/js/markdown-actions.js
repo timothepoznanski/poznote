@@ -285,8 +285,8 @@ function toggleMarkdownCheckbox(checkbox, lineNumber) {
 
     // If in split mode, update the preview (but preserve checkbox states that just changed)
     if (noteEntry.classList.contains('markdown-split-mode') && previewDiv) {
-        // Re-render the preview
-        renderMarkdownPreview(previewDiv, newContent, noteId, { delay: 50 });
+        // Re-render the preview (only the toggled block, see renderMarkdownPreview)
+        renderMarkdownPreview(previewDiv, newContent, noteId, { delay: 50, incremental: true });
     }
 }
 
@@ -473,19 +473,42 @@ function navigateToEditorLine(lineNumber, noteEntry) {
  * Setup interactivity for markdown preview (checkbox toggling and click-to-navigate)
  * @param {number} noteId - The note ID
  */
-function setupPreviewInteractivity(noteId) {
+// Elements matching selector within roots, the roots themselves included
+function _mdQueryPreviewRoots(roots, selector) {
+    var found = [];
+    roots.forEach(function (root) {
+        if (root.matches && root.matches(selector)) {
+            found.push(root);
+        }
+        var matches = root.querySelectorAll(selector);
+        for (var i = 0; i < matches.length; i++) {
+            found.push(matches[i]);
+        }
+    });
+    return found;
+}
+
+// roots: the preview blocks to set up, when an incremental render
+// (renderMarkdownPreview) replaced only those; the whole preview otherwise
+function setupPreviewInteractivity(noteId, roots) {
     var noteEntry = document.getElementById('entry' + noteId);
     if (!noteEntry) return;
 
     var previewDiv = noteEntry.querySelector('.markdown-preview');
     if (!previewDiv) return;
 
+    var scopes = roots || [previewDiv];
+
     if (typeof window.processNoteReferences === 'function') {
-        try {
-            window.processNoteReferences(previewDiv);
-        } catch (e) {
-            console.error('Error processing note references in markdown preview:', e);
-        }
+        scopes.forEach(function (scope) {
+            // The walker only skips code above the root, not the root itself
+            if (scope !== previewDiv && scope.closest('pre, code')) return;
+            try {
+                window.processNoteReferences(scope);
+            } catch (e) {
+                console.error('Error processing note references in markdown preview:', e);
+            }
+        });
     }
 
     if (typeof reinitializeImageClickHandlers === 'function') {
@@ -497,7 +520,7 @@ function setupPreviewInteractivity(noteId) {
     }
 
     // Right-click context menu on tables in preview (same gesture as HTML tables)
-    var previewTables = previewDiv.querySelectorAll('table[data-start-line]');
+    var previewTables = _mdQueryPreviewRoots(scopes, 'table[data-start-line]');
     previewTables.forEach(function(table) {
         if (table._mdTableClickHandler) {
             table.removeEventListener('click', table._mdTableClickHandler);
@@ -528,7 +551,7 @@ function setupPreviewInteractivity(noteId) {
     var isInSplitMode = noteEntry.classList.contains('markdown-split-mode');
 
     // Setup checkbox click handlers
-    var checkboxes = previewDiv.querySelectorAll('.markdown-task-checkbox');
+    var checkboxes = _mdQueryPreviewRoots(scopes, '.markdown-task-checkbox');
     checkboxes.forEach(function (checkbox) {
         // Remove any existing listener
         checkbox.removeEventListener('click', checkbox._checkboxClickHandler);
@@ -546,7 +569,7 @@ function setupPreviewInteractivity(noteId) {
     // Setup click-to-navigate only in split mode
     if (isInSplitMode) {
         // Find all elements with data-line attributes
-        var lineElements = previewDiv.querySelectorAll('[data-line]');
+        var lineElements = _mdQueryPreviewRoots(scopes, '[data-line]');
         lineElements.forEach(function (element) {
             // Skip checkboxes (they have their own handler)
             if (element.classList.contains('markdown-task-checkbox')) return;

@@ -261,20 +261,16 @@ function saveNoteToServer(options) {
     // Serialize checklist data before saving
     serializeChecklists(entryElem);
 
-    var ent = cleanSearchHighlightsFromElement(entryElem);
-    // Strip non-breaking spaces before <br>: blank lines render fine as
-    // <div><br></div>, and injected &nbsp; used to accumulate across
-    // save/reload cycles (also cleans up notes polluted by older versions)
-    ent = ent.replace(/(?:&nbsp;|\u00A0)*<br\s*[\/]?>/gi, "<br>");
-
-    var entcontent = getTextContentFromElement(entryElem);
+    // The note's HTML is only serialized when it is what gets saved: on a
+    // markdown note it meant cloning the whole rendered preview just to throw
+    // the result away, hundreds of ms on every save of a long note
+    var ent = null;
 
     // Check if this is a task list note or markdown note
     var noteType = entryElem.getAttribute('data-note-type') || 'note';
     if (noteType === 'tasklist') {
         // For task list notes, save the JSON data instead of HTML
-        entcontent = getTaskListData(noteid) || '';
-        ent = entcontent; // Also save JSON to HTML file for consistency
+        ent = getTaskListData(noteid) || '';
     } else if (noteType === 'markdown') {
         // Align table columns at save time (the caret's own table is left as-is)
         if (typeof window.formatMarkdownTablesBeforeSave === 'function') {
@@ -282,16 +278,18 @@ function saveNoteToServer(options) {
         }
         // For markdown notes, save the raw markdown content
         if (typeof getMarkdownContentForNote === 'function') {
-            var markdownContent = getMarkdownContentForNote(noteid);
-            if (markdownContent !== null) {
-                ent = markdownContent;
-                entcontent = markdownContent;
-            }
+            ent = getMarkdownContentForNote(noteid);
         }
-    } else if (noteType === 'excalidraw') {
-        // For Excalidraw notes in the new unified system, treat as regular HTML
-        // The HTML already contains the image and hidden data, so save as-is
-        // This allows text to be added around the Excalidraw diagram
+    }
+    // Excalidraw notes in the unified system are saved as regular HTML: it
+    // already contains the image and hidden data, and text can sit around it
+
+    if (ent === null) {
+        ent = cleanSearchHighlightsFromElement(entryElem);
+        // Strip non-breaking spaces before <br>: blank lines render fine as
+        // <div><br></div>, and injected &nbsp; used to accumulate across
+        // save/reload cycles (also cleans up notes polluted by older versions)
+        ent = ent.replace(/(?:&nbsp;|\u00A0)*<br\s*[\/]?>/gi, "<br>");
     }
 
     var tags = tagsElem ? tagsElem.value : '';
@@ -1034,16 +1032,6 @@ function unwrapCodeBlockActionHost(host) {
 function cleanSearchHighlightsFromElement(element) {
     var cleaned = stripSearchHighlights(element);
     return cleaned ? cleaned.innerHTML : "";
-}
-
-/**
- * Get text content from an element without search highlights
- * @param {HTMLElement} element - The element to extract text from
- * @returns {string} Plain text content
- */
-function getTextContentFromElement(element) {
-    var cleaned = stripSearchHighlights(element);
-    return cleaned ? (cleaned.textContent || "") : "";
 }
 
 function getComparableNoteContent(entryElem, noteId) {

@@ -8,6 +8,9 @@
 let isResizingOutline = false;
 let currentNoteId = null;
 let currentOutlineSignature = null;
+let currentOutlineHeadings = null;
+// Last extraction from a markdown note, see extractHeadings()
+let markdownOutlineCache = null;
 let hasInitializedOutlinePanel = false;
 let hasInitializedHeadingAnchorHandlers = false;
 let floatingHeadingAnchor = null;
@@ -592,6 +595,21 @@ function slugifyHeadingText(text) {
 function getHeadingTextContent(heading) {
     if (!heading) return '';
 
+    // Runtime anchors only hold an SVG icon: without text of their own they
+    // change nothing, and cloning every heading on each outline update adds
+    // up on long notes
+    var anchors = heading.querySelectorAll(HEADING_ANCHOR_SELECTOR + ', [data-heading-anchor="true"]');
+    var anchorsHaveText = false;
+    for (var i = 0; i < anchors.length; i++) {
+        if (anchors[i].textContent) {
+            anchorsHaveText = true;
+            break;
+        }
+    }
+    if (!anchorsHaveText) {
+        return (heading.textContent || '').trim();
+    }
+
     var clone = heading.cloneNode(true);
     stripRuntimeHeadingAnchorsFromElement(clone);
     return (clone.textContent || '').trim();
@@ -868,38 +886,86 @@ function addHeadingAnchorLink(heading) {
 
     let anchor = heading.querySelector(HEADING_ANCHOR_SELECTOR);
     if (!anchor) {
+        // Built completely before it goes in the page: in Chromium, writing
+        // contenteditable on an element already in the page forces a style
+        // and layout pass over the whole page, tens of ms on a long note, for
+        // every heading (a note with 265 headings froze for a minute)
         anchor = document.createElement('a');
         anchor.innerHTML = HEADING_ANCHOR_SVG;
+        applyHeadingAnchorAttributes(anchor, heading.id);
         heading.appendChild(anchor);
+        return;
     }
 
-    anchor.className = 'heading-anchor';
-    anchor.href = '#' + heading.id;
-    anchor.title = 'Copy section link';
-    anchor.setAttribute('aria-hidden', 'true');
-    anchor.setAttribute('contenteditable', 'false');
-    anchor.setAttribute('draggable', 'false');
-    anchor.setAttribute('data-heading-anchor', 'true');
+    applyHeadingAnchorAttributes(anchor, heading.id);
+}
+
+// Writes only the attributes that differ: an anchor already in the page must
+// not get contenteditable written again (see addHeadingAnchorLink)
+function applyHeadingAnchorAttributes(anchor, headingId) {
+    const attributes = {
+        'class': 'heading-anchor',
+        'href': '#' + headingId,
+        'title': 'Copy section link',
+        'aria-hidden': 'true',
+        'contenteditable': 'false',
+        'draggable': 'false',
+        'data-heading-anchor': 'true'
+    };
+    Object.keys(attributes).forEach(name => {
+        if (anchor.getAttribute(name) !== attributes[name]) {
+            anchor.setAttribute(name, attributes[name]);
+        }
+    });
 }
 
 /**
  * Extract headings from a note element
  */
+function sameElementList(a, b) {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+        if (a[i] !== b[i]) return false;
+    }
+    return true;
+}
+
 function extractHeadings(noteElement) {
     if (!noteElement) return [];
-
-    cleanupStaleHeadingAnchorLinks(noteElement);
-
-    const headings = [];
 
     // Check if this is a markdown note
     const markdownEditor = noteElement.querySelector('.markdown-editor');
     const markdownPreview = noteElement.querySelector('.markdown-preview');
     const isSplitMode = noteElement.classList.contains('markdown-split-mode');
+    const markdownContent = markdownEditor ? getMarkdownEditorContent(markdownEditor) : '';
+
+    // Read before cleanupStaleHeadingAnchorLinks() writes: reading layout
+    // (offsetParent) after a write forces a reflow
+    let previewHeadingElements = [];
+    let hasVisiblePreview = false;
+    if (markdownContent && markdownPreview) {
+        hasVisiblePreview = markdownPreview.offsetParent !== null;
+        previewHeadingElements = Array.from(markdownPreview.querySelectorAll(HEADING_SELECTOR));
+    }
+
+    // One edit refreshes the outline several times (typing, then the preview
+    // update and the DOM change it causes). While the markdown source, its
+    // preview headings and the mode are the same, the previous extraction
+    // still holds, and on a long note it costs tens of ms.
+    const cache = markdownOutlineCache;
+    if (markdownContent && cache && cache.noteElement === noteElement && cache.source === markdownContent &&
+        cache.isSplitMode === isSplitMode && cache.hasVisiblePreview === hasVisiblePreview &&
+        sameElementList(cache.previewHeadingElements, previewHeadingElements)) {
+        return cache.headings;
+    }
+    markdownOutlineCache = null;
+
+    cleanupStaleHeadingAnchorLinks(noteElement);
+
+    const headings = [];
 
     // For markdown notes, always extract from source (works for all modes)
     if (markdownEditor) {
-        const markdownContent = getMarkdownEditorContent(markdownEditor);
         if (markdownContent) {
             const lines = markdownContent.split('\n');
             let inCodeBlock = false;
@@ -909,10 +975,8 @@ function extractHeadings(noteElement) {
             // heading is quadratic and interleaves DOM reads with the anchor
             // writes below, forcing reflows on heading-rich notes.
             const previewHeadingsByText = new Map();
-            let hasVisiblePreview = false;
             if (markdownPreview) {
-                hasVisiblePreview = markdownPreview.offsetParent !== null;
-                markdownPreview.querySelectorAll(HEADING_SELECTOR).forEach(h => {
+                previewHeadingElements.forEach(h => {
                     const headingText = getHeadingTextContent(h);
                     let sameTextHeadings = previewHeadingsByText.get(headingText);
                     if (!sameTextHeadings) {
@@ -973,6 +1037,15 @@ function extractHeadings(noteElement) {
                     });
                 }
             });
+
+            markdownOutlineCache = {
+                noteElement: noteElement,
+                source: markdownContent,
+                isSplitMode: isSplitMode,
+                hasVisiblePreview: hasVisiblePreview,
+                previewHeadingElements: previewHeadingElements,
+                headings: headings
+            };
             return headings;
         }
     }
@@ -1307,6 +1380,20 @@ function highlightOutlineTarget(element) {
     follow();
 }
 
+// The outline links scroll to these: a preview heading replaced by a new
+// element, or a mode change, needs new links even when the text is the same
+function sameOutlineTargets(headings, previous) {
+    if (!previous || headings.length !== previous.length) return false;
+    for (let i = 0; i < headings.length; i++) {
+        if (headings[i].element !== previous[i].element ||
+            headings[i].isSplitMode !== previous[i].isSplitMode ||
+            headings[i].hasPreview !== previous[i].hasPreview) {
+            return false;
+        }
+    }
+    return true;
+}
+
 /**
  * Update outline for currently active note
  */
@@ -1322,11 +1409,19 @@ function updateOutlineForCurrentNote(forceUpdate = false) {
     if (!visibleNote) {
         updateOutlineToggleAvailability(null);
         currentNoteId = null;
+        markdownOutlineCache = null;
+        currentOutlineHeadings = null;
         if (currentOutlineSignature !== null) {
             currentOutlineSignature = null;
             renderOutline([]);
         }
         return;
+    }
+
+    // The cache holds the previous note's source and preview headings: not
+    // worth keeping once another note is on screen
+    if (markdownOutlineCache && markdownOutlineCache.noteElement !== visibleNote) {
+        markdownOutlineCache = null;
     }
 
     // Extract note ID from the element
@@ -1341,6 +1436,7 @@ function updateOutlineForCurrentNote(forceUpdate = false) {
     const isDisabled = updateOutlineToggleAvailability(visibleNote);
 
     if (isDisabled) {
+        currentOutlineHeadings = null;
         if (currentOutlineSignature !== null) {
             currentOutlineSignature = null;
             renderOutline([]);
@@ -1353,8 +1449,9 @@ function updateOutlineForCurrentNote(forceUpdate = false) {
 
     // Skip re-render if headings haven't changed
     const sig = headingsSignature(headings);
-    if (sig === currentOutlineSignature) return;
+    if (sig === currentOutlineSignature && sameOutlineTargets(headings, currentOutlineHeadings)) return;
     currentOutlineSignature = sig;
+    currentOutlineHeadings = headings;
 
     renderOutline(headings);
 }

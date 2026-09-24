@@ -544,7 +544,7 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     }
 }
 
-/* ---------- Filter row: view toggle + search input ---------- */
+/* ---------- Filter row: search input + collapse-all ---------- */
 
 .settings-filter-row {
     align-items: stretch;
@@ -577,59 +577,9 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     margin: 0;
 }
 
-/* Same look as the dashboard's .board-view-btn */
-.settings-view-toggle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 42px;
-    background: var(--pz-bg);
-    border: 1px solid var(--pz-border);
-    border-radius: var(--pz-radius-lg);
-    color: var(--pz-text-muted);
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: border-color 0.2s ease, color 0.2s ease;
-}
-
-.settings-view-toggle:hover {
-    border-color: var(--pz-accent-text);
-    color: var(--pz-accent-text);
-}
-
-.settings-view-toggle .lucide {
-    width: 16px;
-    height: 16px;
-}
-
-/* The toggle shows the layout a click switches TO:
-   list icon in grid mode, grid icon in list mode */
-.settings-view-toggle .lucide-grid {
-    display: none;
-}
-
-.settings-view-toggle.is-list .lucide-layout-list {
-    display: none;
-}
-
-.settings-view-toggle.is-list .lucide-grid {
-    display: inline-block;
-}
-
-html[data-theme='dark'] .settings-view-toggle {
-    background: var(--pz-surface, var(--pz-bg));
-    border-color: var(--pz-border);
-    color: var(--pz-text-muted);
-}
-
-html[data-theme='dark'] .settings-view-toggle:hover {
-    border-color: var(--pz-accent-text);
-    color: var(--pz-accent-text);
-}
-
 /* Collapse/expand all sections, at the right end of the filter row. Same
-   look as the view toggle above; the chevron mirrors the section chevrons,
-   pointing right once everything is collapsed. */
+   look as the dashboard's .board-view-btn; the chevron mirrors the section
+   chevrons, pointing right once everything is collapsed. */
 .settings-collapse-all {
     display: inline-flex;
     align-items: center;
@@ -671,98 +621,93 @@ html[data-theme='dark'] .settings-collapse-all:hover {
     color: var(--pz-accent-text);
 }
 
-/* ---------- List layout: cards become compact full-width rows ---------- */
+/* ---------- Mobile layout: cards as compact full-width rows ----------
+   Below 801px the sections stack and their cards are rows, the list look of
+   the desktop layout further down (which takes over from 801px). */
 
-/* On desktop the rows don't need the full grid width: halve the container */
-@media (min-width: 1024px) {
-    .home-container.view-list {
-        max-width: 600px;
+@media (max-width: 800px) {
+    .settings-with-nav .home-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
     }
-}
 
-.view-list .home-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
+    .settings-with-nav .home-card {
+        padding: 8px 14px;
+        border-radius: var(--pz-radius-lg);
+    }
 
-.view-list .home-card {
-    padding: 8px 14px;
-    border-radius: var(--pz-radius-lg);
-}
+    .settings-with-nav .home-card:hover {
+        transform: none;
+    }
 
-.view-list .home-card:hover {
-    transform: none;
-}
+    .settings-with-nav .home-card-icon {
+        width: 30px;
+        height: 30px;
+    }
 
-.view-list .home-card-icon {
-    width: 30px;
-    height: 30px;
-}
+    .settings-with-nav .home-card-icon i {
+        font-size: 15px;
+    }
 
-.view-list .home-card-icon i {
-    font-size: 15px;
-}
+    .settings-with-nav .home-card-content {
+        flex: 1;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+    }
 
-.view-list .home-card-content {
-    flex: 1;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-    min-width: 0;
-}
+    .settings-with-nav .home-card-title {
+        -webkit-line-clamp: 1;
+        line-clamp: 1;
+    }
 
-.view-list .home-card-title {
-    -webkit-line-clamp: 1;
-    line-clamp: 1;
-}
+    /* Status badges move to the right edge of the row */
+    .settings-with-nav .home-card-content > .setting-status,
+    .settings-with-nav .home-card-content > .home-card-count,
+    .settings-with-nav .home-card-content > div {
+        margin-left: auto;
+    }
 
-/* Status badges move to the right edge of the row */
-.view-list .home-card-content > .setting-status,
-.view-list .home-card-content > .home-card-count,
-.view-list .home-card-content > div {
-    margin-left: auto;
-}
+    .settings-with-nav .home-card-content > div {
+        display: flex;
+        gap: 6px;
+        flex-shrink: 0;
+    }
 
-.view-list .home-card-content > div {
-    display: flex;
-    gap: 6px;
-    flex-shrink: 0;
-}
+    .settings-with-nav .setting-status {
+        align-self: center;
+        flex-shrink: 0;
+    }
 
-.view-list .setting-status {
-    align-self: center;
-    flex-shrink: 0;
-}
+    /* The rows are compact: no help icon. The pin stays, in the flow at the
+       end of the row rather than in the bottom-right corner, which the
+       compact row has no space for. */
+    .settings-with-nav .setting-help {
+        display: none;
+    }
 
-/* List view rows are compact: no help icon. The pin stays, since the list is
-   the mobile default and pinning would otherwise need a switch back to the
-   grid; it sits in the flow at the end of the row rather than in the
-   bottom-right corner, which the compact row has no space for. */
-.view-list .setting-help {
-    display: none;
-}
-
-.view-list .settings-card-pin {
-    position: relative;
-    top: auto;
-    right: auto;
-    bottom: auto;
-    display: inline-flex;
-    align-items: center;
-    flex-shrink: 0;
-    margin-left: 4px;
-    /* Comfortable tap target on touch without widening the row */
-    padding: 4px;
+    .settings-with-nav .settings-card-pin {
+        position: relative;
+        top: auto;
+        right: auto;
+        bottom: auto;
+        display: inline-flex;
+        align-items: center;
+        flex-shrink: 0;
+        margin-left: 4px;
+        /* Comfortable tap target on touch without widening the row */
+        padding: 4px;
+    }
 }
 
 /* ---------- Pin button ----------
    Added by settings-page.js on every card. Styled exactly like the help icon
    (same size, same muted grey, always visible); a pinned card shows it in
    blue instead (same pattern as the dashboard pin).
-   Absolutely positioned, so it reserves no space: bottom-right corner in grid
-   view; in the flow at the end of the row in list view and in the desktop
-   layout. */
+   Absolutely positioned by default, so it reserves no space; the mobile rows
+   and the desktop layout put it in the flow at the end of the row. */
 
 /* The empty pinned section is hidden through the `hidden` attribute, but the
    .home-grid display rules above are author styles and would win over the
@@ -811,7 +756,7 @@ html[data-theme='dark'] .settings-collapse-all:hover {
    Pencil shown to administrators on the Contact, GitHub discussions and
    Discord cards (settings.php), opening #aboutLinkModal. Same look and same
    corner as the help icon, which it sits next to; unlike the help icon it
-   stays in list view and on touch screens, since it is an action. */
+   stays in the mobile rows and on touch screens, since it is an action. */
 .settings-card-edit {
     position: absolute;
     top: 6px;
@@ -836,15 +781,17 @@ html[data-theme='dark'] .settings-collapse-all:hover {
     background-color: var(--pz-accent-text);
 }
 
-.view-list .settings-card-edit {
-    position: relative;
-    top: auto;
-    right: auto;
-    display: inline-flex;
-    align-items: center;
-    flex-shrink: 0;
-    margin-left: 4px;
-    padding: 4px;
+@media (max-width: 800px) {
+    .settings-with-nav .settings-card-edit {
+        position: relative;
+        top: auto;
+        right: auto;
+        display: inline-flex;
+        align-items: center;
+        flex-shrink: 0;
+        margin-left: 4px;
+        padding: 4px;
+    }
 }
 
 /* The default value quoted in the edit modal, and its validation message */
@@ -939,8 +886,8 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
    settings.php only (.settings-with-nav on the container). settings-page.js
    builds the list from the category titles, marks the selected title and grid
    with .settings-section-active and keeps the choice per user. Below 801px
-   the list is hidden and the sections stack as before (collapsible, grid or
-   list through the toggle), so nothing in the media query applies there.
+   the list is hidden and the sections stack as before (collapsible, cards as
+   rows), so nothing in the media query applies there.
    ========================================================================== */
 
 .settings-nav {
@@ -950,17 +897,15 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
 @media (min-width: 801px) {
     /* A little wider than the plain page (800px): the list takes its 220px
        and the rows keep about the width of the old list view (600px), so a
-       value stays close to its label. Also outranks the 600px cap of
-       .view-list, which is a mobile preference here. */
+       value stays close to its label. */
     .home-container.settings-with-nav {
         --settings-nav-width: 220px;
         --settings-nav-gap: 32px;
         max-width: 900px;
     }
 
-    /* Rows are the only layout here, and one section shows at a time: the
-       grid/list toggle and the collapse-all button stay mobile-only */
-    .settings-with-nav .settings-view-toggle,
+    /* One section shows at a time: the collapse-all button stays
+       mobile-only */
     .settings-with-nav .settings-collapse-all {
         display: none;
     }

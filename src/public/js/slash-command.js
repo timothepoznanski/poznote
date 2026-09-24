@@ -5001,16 +5001,16 @@
 
     function updateFilterFromCodeMirror() {
         const api = getMarkdownCodeMirrorApi();
-        if (!slashMenuElement || !codeMirrorSlashEditor || !api || typeof api.getValue !== 'function') return;
+        if (!slashMenuElement || !codeMirrorSlashEditor || !api || typeof api.getLength !== 'function' || typeof api.sliceText !== 'function') return;
 
         const selectionOffsets = typeof api.getSelectionOffsets === 'function'
             ? api.getSelectionOffsets(codeMirrorSlashEditor)
             : null;
-        const value = api.getValue(codeMirrorSlashEditor);
+        const docLength = api.getLength(codeMirrorSlashEditor);
         const cursorPos = selectionOffsets ? selectionOffsets.end : codeMirrorSlashTo;
-        const safeStart = Math.max(0, Math.min(codeMirrorSlashFrom + 1, value.length));
-        const safeEnd = Math.max(safeStart, Math.min(cursorPos, value.length));
-        const textAfterSlash = value.slice(safeStart, safeEnd);
+        const safeStart = Math.max(0, Math.min(codeMirrorSlashFrom + 1, docLength));
+        const safeEnd = Math.max(safeStart, Math.min(cursorPos, docLength));
+        const textAfterSlash = api.sliceText(codeMirrorSlashEditor, safeStart, safeEnd);
         const spaceIndex = textAfterSlash.search(/[\s\n]/);
 
         filterText = spaceIndex >= 0 ? textAfterSlash.substring(0, spaceIndex) : textAfterSlash;
@@ -5063,13 +5063,16 @@
 
     function handleCodeMirrorInput(e, editor) {
         const api = getMarkdownCodeMirrorApi();
-        if (!api || !editor || typeof api.getValue !== 'function' || typeof api.getSelectionOffsets !== 'function') return;
+        if (!api || !editor || typeof api.getLength !== 'function' || typeof api.sliceText !== 'function' || typeof api.getSelectionOffsets !== 'function') return;
 
         const selectionOffsets = api.getSelectionOffsets(editor);
         if (!selectionOffsets || selectionOffsets.start !== selectionOffsets.end) return;
 
-        const value = api.getValue(editor);
-        const cursorPos = Math.max(0, Math.min(selectionOffsets.end, value.length));
+        // Length and the few characters before the caret, never the whole
+        // document: this runs on every keystroke, and serializing a long note
+        // each time is slow
+        const docLength = api.getLength(editor);
+        const cursorPos = Math.max(0, Math.min(selectionOffsets.end, docLength));
         // e.inputType is undefined on plain Event('input') dispatched by CM's updateListener.
         // Fall back to comparing doc length with the previously seen value length.
         // Sentinel -1 means "never seen" — on the first call we can't know if content was
@@ -5077,12 +5080,13 @@
         // first event is treated as non-delete. This is acceptable: the first input on a
         // fresh editor is virtually never a delete-that-reveals-a-slash.
         const prevLength = editor._cmPrevLength !== undefined ? editor._cmPrevLength : -1;
-        const isDeleting = (e.inputType && e.inputType.startsWith('delete')) || (prevLength !== -1 && value.length < prevLength);
-        editor._cmPrevLength = value.length;
-        const lastChar = cursorPos > 0 ? value.charAt(cursorPos - 1) : '';
+        const isDeleting = (e.inputType && e.inputType.startsWith('delete')) || (prevLength !== -1 && docLength < prevLength);
+        editor._cmPrevLength = docLength;
+        const lastChar = cursorPos > 0 ? api.sliceText(editor, cursorPos - 1, cursorPos) : '';
 
         if (lastChar === '/' && !isDeleting && isTypedSlashModeEnabled() && !isTypedSlashTakenByMobileBar()) {
-            const textBeforeSlash = value.slice(0, cursorPos - 1);
+            // The URL tests below only look at the last two characters
+            const textBeforeSlash = api.sliceText(editor, Math.max(0, cursorPos - 3), cursorPos - 1);
             const isUrl = /:$/.test(textBeforeSlash) || /:\/$/.test(textBeforeSlash);
 
             if (!isUrl) {

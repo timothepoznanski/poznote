@@ -3842,33 +3842,7 @@
             updateCollapseAllBtn();
         }
 
-        // Card/list layout toggle next to the filter bar (same pattern as the
-        // dashboard's board-view-menu.js), persisted per user.
-        var viewToggle = document.getElementById('settingsViewToggle');
         var homeContainer = document.querySelector('.home-container');
-        if (viewToggle && homeContainer) {
-            var viewStore = window.__poznoteUserStorage || window.localStorage;
-            var viewLayout = 'grid';
-            try {
-                if (viewStore.getItem('settingsViewLayout') === 'list') viewLayout = 'list';
-            } catch (e) { /* storage unavailable */ }
-
-            var applyViewLayout = function () {
-                homeContainer.classList.toggle('view-list', viewLayout === 'list');
-                viewToggle.classList.toggle('is-list', viewLayout === 'list');
-                // The toggle advertises the layout a click switches TO
-                viewToggle.title = viewToggle.getAttribute(viewLayout === 'grid' ? 'data-label-list' : 'data-label-grid') || '';
-            };
-            applyViewLayout();
-
-            viewToggle.addEventListener('click', function () {
-                viewLayout = viewLayout === 'grid' ? 'list' : 'grid';
-                try {
-                    viewStore.setItem('settingsViewLayout', viewLayout);
-                } catch (e) { /* storage unavailable */ }
-                applyViewLayout();
-            });
-        }
 
         // Desktop layout: the section list on the left, one section shown at
         // a time with its cards as rows (css/settings.css, .settings-with-nav).

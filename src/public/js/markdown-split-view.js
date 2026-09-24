@@ -217,6 +217,17 @@ function setupMarkdownPreviewScrollSync(noteEntry, editorDiv) {
     scheduleMarkdownPreviewScrollToEditorCaret(noteEntry);
 }
 
+// Pause after the last keystroke before the preview catches up. A render
+// costs more on a long note (parsing alone is about 100 ms per MB), so the
+// wait grows with the note: 300 ms on a short one, up to 1 s from about 1 MB.
+function getSplitPreviewUpdateDelay(editorDiv) {
+    var api = window.PoznoteMarkdownCodeMirror;
+    var length = api && typeof api.getLength === 'function' && api.isCodeMirrorEditor(editorDiv)
+        ? api.getLength(editorDiv)
+        : 0;
+    return Math.min(1000, 300 + Math.round(length / 1500));
+}
+
 // Setup live preview update in split mode
 function setupSplitModePreviewUpdate(noteId) {
     var noteEntry = document.getElementById('entry' + noteId);
@@ -248,15 +259,14 @@ function setupSplitModePreviewUpdate(noteId) {
 
             renderMarkdownPreview(previewDiv, content, noteId, {
                 placeholder: window.t ? window.t('editor.messages.split_preview_placeholder', null, 'Preview will appear here as you type...') : 'Preview will appear here as you type...',
-                delay: 50
+                delay: 50,
+                incremental: true
             });
             scheduleMarkdownPreviewScrollToEditorCaret(noteEntry);
-
-            // Refresh outline panel if available
-            if (window.outlinePanel && window.outlinePanel.refresh) {
-                window.outlinePanel.refresh();
-            }
-        }, 300); // 300ms debounce
+            // No outline refresh here: the outline follows the typing and the
+            // preview change through its own listeners, and a forced refresh
+            // rebuilt the whole outline on every pause
+        }, getSplitPreviewUpdateDelay(editorDiv));
     };
 
     editorDiv.addEventListener('input', editorDiv._splitModeInputListener);

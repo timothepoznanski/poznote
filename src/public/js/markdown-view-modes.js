@@ -3,6 +3,10 @@
 // Rendering a note's preview, initialising a markdown note, and switching a
 // note between edit, preview and split mode.
 
+// options.incremental (split mode, which re-renders on every typing pause):
+// only the blocks that changed since the previous render are replaced and
+// post-processed. Replacing the whole preview makes the browser lay out and
+// highlight the entire note again, about a second per render on a 1 MB note.
 function renderMarkdownPreview(previewDiv, markdownContent, noteId, options) {
     options = options || {};
     var placeholder = options.placeholder || (window.t ? window.t('editor.messages.preview_mode_hint', null, 'You are in preview mode. Switch to edit mode using the button in the toolbar to start writing markdown.') : 'You are in preview mode. Switch to edit mode using the button in the toolbar to start writing markdown.');
@@ -10,28 +14,223 @@ function renderMarkdownPreview(previewDiv, markdownContent, noteId, options) {
     var delay = options.delay || 100;
 
     if (markdownContent.trim() === '') {
+        previewDiv._markdownPreviewBlocks = null;
         previewDiv.innerHTML = '<div class="markdown-preview-placeholder">' + placeholder + '</div>';
         previewDiv.classList.add('empty');
     } else {
-        previewDiv.innerHTML = parseMarkdown(markdownContent);
+        var html = parseMarkdown(markdownContent);
+        var changedNodes = options.incremental ? _mdPatchMarkdownPreview(previewDiv, html) : null;
+        if (changedNodes === null) {
+            previewDiv.innerHTML = html;
+            previewDiv._markdownPreviewBlocks = options.incremental ? _mdIndexMarkdownPreviewBlocks(previewDiv.childNodes) : null;
+        }
+        // What the post-processing below has to cover
+        var roots = changedNodes === null ? [previewDiv] : changedNodes.filter(function (node) {
+            return node.nodeType === 1;
+        });
+
         prioritizeInitialMarkdownPreviewImages(previewDiv);
         previewDiv.classList.remove('empty');
         if (typeof window.initializeTaskListEmbeds === 'function') {
-            window.initializeTaskListEmbeds(previewDiv);
+            roots.forEach(function (root) {
+                window.initializeTaskListEmbeds(root);
+            });
         }
-        if (postProcess && noteId) {
+        if (postProcess && noteId && roots.length > 0) {
             setTimeout(function () {
+                // A later render may have replaced some of them meanwhile
+                var liveRoots = roots.filter(function (root) {
+                    return root.isConnected;
+                });
+                if (liveRoots.length === 0) return;
+
                 initMermaid();
-                if (typeof renderMathInElement === 'function') {
-                    renderMathInElement(previewDiv);
-                }
-                if (typeof applySyntaxHighlighting === 'function') {
-                    applySyntaxHighlighting(previewDiv);
-                }
-                setupPreviewInteractivity(noteId);
+                liveRoots.forEach(function (root) {
+                    if (typeof renderMathInElement === 'function') {
+                        renderMathInElement(root);
+                    }
+                    if (typeof applySyntaxHighlighting === 'function') {
+                        applySyntaxHighlighting(root);
+                    }
+                });
+                setupPreviewInteractivity(noteId, changedNodes === null ? null : liveRoots);
             }, delay);
         }
     }
+}
+
+// Split mode is a class on the note entry, mirrored on its .innernote for
+// css/utilities.css: a .innernote:has(.noteentry.markdown-split-mode) selector
+// there made Chromium restyle the whole note on every DOM change while the
+// split was open (Mermaid diagrams froze the page for minutes).
+function _mdSetMarkdownSplitClass(noteEntry, isSplit) {
+    noteEntry.classList.toggle('markdown-split-mode', isSplit);
+    var innerNote = noteEntry.closest('.innernote');
+    if (innerNote) {
+        innerNote.classList.toggle('markdown-split-open', isSplit);
+    }
+}
+
+// Line attributes the parser writes, pointing back at the markdown source
+var _MD_PREVIEW_LINE_ATTR_REGEX = / data-(start-)?line="(\d+)"/g;
+
+// A top-level node of a fresh render, as compared between two renders: its
+// HTML with the source line numbers taken out, and those numbers apart, so a
+// block that only moved (lines added or removed above it) is recognised.
+function _mdMarkdownPreviewBlockKey(node) {
+    if (node.nodeType !== 1) {
+        return { html: '#' + node.nodeType + ':' + node.nodeValue, lines: [] };
+    }
+
+    var lines = [];
+    var html = node.outerHTML.replace(_MD_PREVIEW_LINE_ATTR_REGEX, function (match, start, line) {
+        lines.push(Number(line));
+        return ' data-' + (start || '') + 'line=""';
+    });
+    return { html: html, lines: lines };
+}
+
+// Must run on the parser's output, before any post-processing touches it
+function _mdIndexMarkdownPreviewBlocks(childNodes) {
+    var nodes = Array.prototype.slice.call(childNodes);
+    return {
+        nodes: nodes,
+        keys: nodes.map(_mdMarkdownPreviewBlockKey)
+    };
+}
+
+function _mdSameMarkdownPreviewLines(oldLines, newLines, shift) {
+    if (oldLines.length !== newLines.length) return false;
+    for (var i = 0; i < oldLines.length; i++) {
+        if (oldLines[i] + shift !== newLines[i]) return false;
+    }
+    return true;
+}
+
+// Direct child of previewDiv holding node (post-processing wraps code blocks
+// in an action host), null once node left the preview
+function _mdMarkdownPreviewTopLevel(previewDiv, node) {
+    while (node && node.parentNode !== previewDiv) {
+        node = node.parentNode;
+    }
+    return node;
+}
+
+// Replace, in a preview rendered with options.incremental, the blocks that
+// differ from html, and return the nodes inserted. Blocks after the change
+// are kept as they are, their line attributes moved by the lines added or
+// removed. Returns null when the preview cannot be patched safely: the caller
+// then renders it in full.
+function _mdPatchMarkdownPreview(previewDiv, html) {
+    var state = previewDiv._markdownPreviewBlocks;
+    if (!state || previewDiv.classList.contains('empty')) return null;
+
+    // The indexed nodes must still be in the preview, in the same order:
+    // otherwise something rewrote part of it since the last render
+    var oldNodes = state.nodes;
+    var oldKeys = state.keys;
+    var tops = [];
+    var child = previewDiv.firstChild;
+    for (var i = 0; i < oldNodes.length; i++) {
+        tops[i] = _mdMarkdownPreviewTopLevel(previewDiv, oldNodes[i]);
+        while (child && child !== tops[i]) {
+            child = child.nextSibling;
+        }
+        if (!tops[i] || !child) return null;
+    }
+
+    var template = document.createElement('template');
+    template.innerHTML = html;
+    var next = _mdIndexMarkdownPreviewBlocks(template.content.childNodes);
+    var newNodes = next.nodes;
+    var newKeys = next.keys;
+
+    // Unchanged blocks at the start: same HTML, same lines
+    var start = 0;
+    while (start < oldKeys.length && start < newKeys.length &&
+        oldKeys[start].html === newKeys[start].html &&
+        _mdSameMarkdownPreviewLines(oldKeys[start].lines, newKeys[start].lines, 0)) {
+        start++;
+    }
+
+    // Unchanged blocks at the end: same HTML, every line moved by the same shift
+    var oldEnd = oldKeys.length;
+    var newEnd = newKeys.length;
+    var shift = null;
+    while (oldEnd > start && newEnd > start && oldKeys[oldEnd - 1].html === newKeys[newEnd - 1].html) {
+        var oldLines = oldKeys[oldEnd - 1].lines;
+        var newLines = newKeys[newEnd - 1].lines;
+        if (oldLines.length > 0) {
+            var blockShift = newLines[0] - oldLines[0];
+            if (shift === null) shift = blockShift;
+            if (blockShift !== shift || !_mdSameMarkdownPreviewLines(oldLines, newLines, shift)) break;
+        }
+        oldEnd--;
+        newEnd--;
+    }
+
+    // The replaced range sits between the last kept block of the start and
+    // the first kept block of the end
+    var before = start > 0 ? tops[start - 1] : null;
+    var after = oldEnd < oldNodes.length ? tops[oldEnd] : null;
+    if (before && after && (before === after || !(before.compareDocumentPosition(after) & Node.DOCUMENT_POSITION_FOLLOWING))) {
+        return null;
+    }
+    for (var r = start; r < oldEnd; r++) {
+        if (tops[r] === before || tops[r] === after) return null;
+    }
+
+    // Everything between the two, extra nodes added since included
+    var node = before ? before.nextSibling : previewDiv.firstChild;
+    while (node && node !== after) {
+        var following = node.nextSibling;
+        previewDiv.removeChild(node);
+        node = following;
+    }
+
+    var inserted = newNodes.slice(start, newEnd);
+    var fragment = document.createDocumentFragment();
+    inserted.forEach(function (insertedNode) {
+        fragment.appendChild(insertedNode);
+    });
+    previewDiv.insertBefore(fragment, after);
+
+    if (shift) {
+        for (var k = oldEnd; k < oldNodes.length; k++) {
+            _mdShiftMarkdownPreviewLines(oldNodes[k], shift);
+        }
+    }
+
+    state.nodes = oldNodes.slice(0, start).concat(inserted, oldNodes.slice(oldEnd));
+    state.keys = newKeys;
+    return inserted;
+}
+
+function _mdShiftMarkdownPreviewLines(node, shift) {
+    if (node.nodeType !== 1) return;
+
+    var elements = Array.prototype.slice.call(node.querySelectorAll('[data-line], [data-start-line]'));
+    if (node.matches('[data-line], [data-start-line]')) {
+        elements.push(node);
+    }
+    elements.forEach(function (element) {
+        ['data-line', 'data-start-line'].forEach(function (name) {
+            var value = element.getAttribute(name);
+            if (value !== null && /^\d+$/.test(value)) {
+                element.setAttribute(name, String(Number(value) + shift));
+            }
+        });
+    });
+
+    // The outline names preview headings after their source line
+    // (md-heading-<line>-...), and only names those without an id
+    var headings = Array.prototype.slice.call(node.querySelectorAll('[id^="md-heading-"]'));
+    if (node.matches('[id^="md-heading-"]')) {
+        headings.push(node);
+    }
+    headings.forEach(function (heading) {
+        heading.removeAttribute('id');
+    });
 }
 
 function prioritizeInitialMarkdownPreviewImages(previewDiv) {
@@ -303,7 +502,7 @@ function initializeMarkdownNote(noteId) {
     // Set initial display states using setProperty to override any CSS !important rules
     if (startInSplitMode) {
         // Split mode: show both editor and preview side by side
-        noteEntry.classList.add('markdown-split-mode');
+        _mdSetMarkdownSplitClass(noteEntry, true);
         editorContainer.style.setProperty('display', 'flex', 'important');
         previewDiv.style.setProperty('display', 'block', 'important');
         setMarkdownEditorEditable(editorDiv, true);
@@ -936,14 +1135,16 @@ function switchToSplitMode(noteId) {
     // Update preview content before showing
     var markdownContent = normalizeContentEditableText(editorDiv);
 
+    // Indexed for the incremental renders of the typing that follows
     renderMarkdownPreview(previewDiv, markdownContent, noteId, {
-        placeholder: window.t ? window.t('editor.messages.split_preview_placeholder', null, 'Preview will appear here as you type...') : 'Preview will appear here as you type...'
+        placeholder: window.t ? window.t('editor.messages.split_preview_placeholder', null, 'Preview will appear here as you type...') : 'Preview will appear here as you type...',
+        incremental: true
     });
 
     noteEntry.setAttribute('data-markdown-content', markdownContent);
 
     // Add split mode class to note entry
-    noteEntry.classList.add('markdown-split-mode');
+    _mdSetMarkdownSplitClass(noteEntry, true);
     setupMarkdownSplitResizer(noteEntry);
 
     // Show both editor and preview
@@ -1046,7 +1247,7 @@ function exitSplitMode(noteId) {
         : null;
 
     // Remove split mode class
-    noteEntry.classList.remove('markdown-split-mode');
+    _mdSetMarkdownSplitClass(noteEntry, false);
     clearMarkdownSplitPaneHeight(noteEntry);
 
     // Remove split mode input listener
