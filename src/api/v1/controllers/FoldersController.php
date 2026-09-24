@@ -2591,6 +2591,9 @@ class FoldersController {
             if ($workspaceCreated) {
                 $createWorkspaceStmt = $this->db->prepare('INSERT INTO workspaces (name) VALUES (?)');
                 $createWorkspaceStmt->execute([$archiveWorkspace]);
+                // A new workspace starts unshared (users/db_master.php)
+                require_once dirname(__DIR__, 3) . '/users/db_master.php';
+                forgetStaleWorkspaceShares((int)(getCurrentUserId() ?? 0), $archiveWorkspace);
             }
 
             // Mirror the path, reusing any level already archived before

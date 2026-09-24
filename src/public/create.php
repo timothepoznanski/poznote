@@ -178,6 +178,6 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
         });
     });
     </script>
-    <script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 </body>
 </html>

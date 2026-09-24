@@ -3462,6 +3462,30 @@ curl -X POST -u 'username:password' \
   http://YOUR_SERVER/api/v1/admin/repair
 ```
 
+### Orphan Attachments
+
+```
+GET /admin/orphan-attachments
+DELETE /admin/orphan-attachments
+```
+
+List, per account, the files of the local attachment folder that no note references any more (files kept in S3 storage are not listed). `DELETE` runs the same scan and deletes those files; it is not available with an app password.
+
+```bash
+curl -u 'username:password' \
+  http://YOUR_SERVER/api/v1/admin/orphan-attachments
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "users": [
+    {"user_id": 1, "total_files": 42, "orphans_found": 2, "orphans_deleted": 0, "files": ["a1b2c3.png", "d4e5f6.pdf"], "error": null}
+  ]
+}
+```
+
 ---
 
 ## Public / Shared Tasks
@@ -3847,6 +3871,8 @@ curl http://YOUR_SERVER/api_health.php
 | `GET` | `/admin/users/{id}/password-status` | Password status |
 | `GET` | `/admin/stats` | System stats |
 | `POST` | `/admin/repair` | Repair database |
+| `GET` | `/admin/orphan-attachments` | List orphan attachment files |
+| `DELETE` | `/admin/orphan-attachments` | Delete orphan attachment files |
 
 ### Public Shares
 | Method | Endpoint | Description |

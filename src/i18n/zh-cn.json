@@ -400,8 +400,6 @@
       "upload_section_title": "上传新附件",
       "drag_drop_info": "您可以将文件拖放到下方:",
       "all_types_accepted": "接受所有文件类型 (最大 200MB)",
-      "note_taking_notice": "Poznote 是笔记应用：可以存放媒体文件，但大文件会很快占满空间。",
-      "note_taking_notice_link": "查看我的存储空间",
       "upload_button": "添加",
       "current_attachments": "当前附件",
       "loading_attachments": "正在加载附件...",
@@ -517,14 +515,14 @@
       "backlinks_at_bottom": "将反向链接区域显示在笔记底部而不是顶部。",
       "default_image_border": "默认以带边框且无内边距的方式显示笔记中的图片。",
       "spellcheck_html_notes": "在 HTML 笔记中启用浏览器拼写检查。",
-      "slash_menu_trigger": "选择通过输入 /、Alt + / 还是完全不用键盘打开命令菜单。无论此设置为何，在笔记中点击右键都会打开它。",
+      "slash_menu_trigger": "在电脑上，选择通过输入 /、Alt + / 还是完全不用键盘打开命令菜单。无论此设置为何，在笔记中点击右键都会打开它。",
+      "slash_menu_trigger_mobile": "在移动设备上，选择通过输入 /、使用实体键盘按 Alt + / 还是完全不用键盘打开命令菜单。",
       "icon_sidebar_order": "更改图标侧边栏中按钮的顺序和颜色，并在按钮之间放置分隔线。",
       "users_admin": "创建、编辑和管理用户账户。",
       "oidc_config": "配置 OpenID Connect 提供商的单点登录。",
       "smtp_config": "配置用于发送提醒等邮件的 SMTP 服务器。",
       "webhooks": "通过 Webhook 将实例事件发送到外部服务。",
       "ai_assistant": "配置用于与笔记对话的 AI 助手。",
-      "saas": "面向作为托管服务（SaaS）提供的实例的显示元素。默认全部隐藏。",
       "git_sync_enabled": "启用或禁用此实例的 Git 同步。",
       "import_limits": "设置每次导入允许的最大文件数量。",
       "user_quotas": "限制每个用户的笔记数量和可用存储空间。",
@@ -548,6 +546,9 @@
       "highlight_current_folder_tree": "按你喜欢的程度淡化当前所在文件夹层级之外的笔记和文件夹。",
       "snapshots": "选择每条笔记保留多少个每日自动快照，以及多少个安全快照（AI 或 MCP 编辑前）。",
       "stt": "配置用于听写笔记和转录音频附件的语音识别服务器。"
+    },
+    "card_notes": {
+      "slash_menu_trigger_mobile": "在移动设备上，键盘上方的工具栏有一个 + 按钮，无论此设置为何，它都会打开同一个菜单。"
     },
     "title": "设置",
     "collapse_section": "折叠此部分",
@@ -576,7 +577,14 @@
       "integrations": "集成",
       "storage_limits": "存储与限制",
       "appearance": "外观",
-      "maintenance": "维护"
+      "maintenance": "维护",
+      "backup_sync": "备份与同步",
+      "editing": "编辑",
+      "apps": "应用",
+      "profile_sign_in": "个人资料与登录",
+      "language_region": "语言与地区",
+      "storage": "存储",
+      "layout": "布局"
     },
     "sections": {
       "account_display": "账户与显示",
@@ -639,7 +647,6 @@
       "smtp_config": "SMTP / 邮件",
       "webhooks": "管理员 Webhook",
       "ai_assistant": "AI 助手",
-      "saas": "SaaS 模式",
       "s3_storage": "S3 附件",
       "s3_backup": "S3 备份",
       "stt": "转录",
@@ -662,6 +669,22 @@
         "unavailable": "不可用",
         "installed": "已安装"
       }
+    },
+    "value_help": {
+      "font_size_notes": "笔记内容",
+      "font_size_sidebar": "侧边栏",
+      "font_size_code_blocks": "代码块",
+      "font_size_settings": "设置页面"
+    },
+    "storage_summary": {
+      "error": "无法加载存储使用情况。",
+      "notes_detail": "笔记中 {{active}} 篇，回收站中 {{trash}} 篇",
+      "local": "服务器上已用空间",
+      "database": "数据库",
+      "note_files": "笔记文件",
+      "attachments": "附件",
+      "s3_attachments": "S3 存储中的附件",
+      "s3_backups": "S3 存储中的备份"
     }
   },
   "workspaces": {
@@ -725,7 +748,8 @@
       "edit_workspaces": "编辑工作区",
       "new_workspace": "新建工作区",
       "accounts": "账户",
-      "title": "工作区"
+      "title": "工作区",
+      "shared_with_me": "与我共享"
     },
     "errors": {
       "already_exists": "同名工作区已存在",
@@ -845,7 +869,8 @@
       "notes_dashboard": "笔记看板",
       "spellcheck_html_notes": "拼写检查",
       "note_color_palette": "笔记颜色",
-      "slash_menu_trigger": "命令菜单快捷键",
+      "slash_menu_trigger": "命令菜单快捷键（电脑）",
+      "slash_menu_trigger_mobile": "命令菜单快捷键（移动设备）",
       "snapshots": "快照",
       "show_note_icons": "显示笔记图标"
     },
@@ -1616,6 +1641,8 @@
         "off": "关闭",
         "custom": "自定义"
       },
+      "theme_hint": "每种颜色都跟随主题，直到你修改它。已修改颜色旁边的箭头可将其恢复为主题颜色。",
+      "reset_element": "使用主题颜色",
       "elements": {
         "h1": "标题 1",
         "h2": "标题 2",
@@ -4919,16 +4946,6 @@
     "empty": "此列表中还没有任务。",
     "add_placeholder": "添加任务...",
     "save_error": "无法保存任务列表。"
-  },
-  "saas": {
-    "description": "当此实例作为托管服务（SaaS）提供时有用的显示元素。默认全部隐藏。",
-    "section_storage_notices": "存储空间提醒",
-    "storage_notices_label": "显示存储空间提醒",
-    "storage_notices_description": "在附件页面、用户存储统计页面和 S3 附件设置中提醒用户：Poznote 是一款笔记应用，而非照片或视频存储服务。",
-    "messages": {
-      "saved": "配置保存成功。",
-      "save_error": "保存配置失败。"
-    }
   },
   "archive": {
     "menu_item": "归档笔记",

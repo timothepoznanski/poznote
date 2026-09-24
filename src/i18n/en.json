@@ -192,14 +192,14 @@
       "backlinks_at_bottom": "Show the backlinks section at the bottom of notes instead of the top.",
       "default_image_border": "Display images in notes with a border and no padding by default.",
       "spellcheck_html_notes": "Enable the browser spell checker in HTML notes.",
-      "slash_menu_trigger": "Choose whether the command menu opens by typing /, with Alt + /, or not from the keyboard at all. A right-click in a note opens it whatever this is set to.",
+      "slash_menu_trigger": "On a computer, choose whether the command menu opens by typing /, with Alt + /, or not from the keyboard at all. A right-click in a note opens it whatever this is set to.",
+      "slash_menu_trigger_mobile": "On mobile, choose whether the command menu opens by typing /, with Alt + / from a hardware keyboard, or not from the keyboard at all.",
       "icon_sidebar_order": "Change the order and the color of the buttons in the icon sidebar and place separators between them.",
       "users_admin": "Create, edit and manage user accounts.",
       "oidc_config": "Configure single sign-on with an OpenID Connect provider.",
       "smtp_config": "Configure the SMTP server used to send emails such as reminders.",
       "webhooks": "Send instance events to external services via webhooks.",
       "ai_assistant": "Configure the AI assistant used to chat with your notes.",
-      "saas": "Display elements meant for instances offered as a hosted service (SaaS). All hidden by default.",
       "git_sync_enabled": "Enable or disable Git synchronization on this instance.",
       "import_limits": "Set the maximum number of files allowed per import.",
       "user_quotas": "Limit the number of notes and the storage available per user.",
@@ -223,6 +223,9 @@
       "highlight_current_folder_tree": "Dim the notes and folders that sit outside the folder hierarchy you are working in, as much or as little as you like.",
       "snapshots": "Choose how many automatic daily snapshots and how many safety snapshots (before an AI or MCP edit) are kept per note.",
       "stt": "Configure the speech-to-text server used to dictate notes and transcribe audio attachments."
+    },
+    "card_notes": {
+      "slash_menu_trigger_mobile": "On mobile, the toolbar above the keyboard has a + button that opens the same menu, whatever this is set to."
     },
     "title": "Settings",
     "collapse_section": "Collapse section",
@@ -251,7 +254,14 @@
       "integrations": "Integrations",
       "storage_limits": "Storage & limits",
       "appearance": "Appearance",
-      "maintenance": "Maintenance"
+      "maintenance": "Maintenance",
+      "backup_sync": "Backups & sync",
+      "editing": "Editing",
+      "apps": "Apps",
+      "profile_sign_in": "Profile & sign-in",
+      "language_region": "Language & region",
+      "storage": "Storage",
+      "layout": "Layout"
     },
     "cards": {
       "tenant_isolation": "Tenant isolation",
@@ -295,7 +305,6 @@
       "smtp_config": "SMTP / Email",
       "webhooks": "Admin Webhooks",
       "ai_assistant": "AI Assistant",
-      "saas": "SaaS mode",
       "s3_storage": "S3 Attachments",
       "s3_backup": "S3 Backups",
       "stt": "Transcription",
@@ -332,6 +341,22 @@
       "saved": "Language saved",
       "save_error": "Could not save language",
       "reload_hint": "Reloading..."
+    },
+    "value_help": {
+      "font_size_notes": "Note content",
+      "font_size_sidebar": "Sidebar",
+      "font_size_code_blocks": "Code blocks",
+      "font_size_settings": "Settings page"
+    },
+    "storage_summary": {
+      "error": "Storage usage could not be loaded.",
+      "notes_detail": "{{active}} in your notes, {{trash}} in the trash",
+      "local": "Space used on the server",
+      "database": "Database",
+      "note_files": "Note files",
+      "attachments": "Attachments",
+      "s3_attachments": "Attachments in S3 storage",
+      "s3_backups": "Backups in S3 storage"
     }
   },
   "workspaces": {
@@ -339,7 +364,8 @@
       "edit_workspaces": "Edit workspaces",
       "new_workspace": "New workspace",
       "accounts": "Accounts",
-      "title": "Workspaces"
+      "title": "Workspaces",
+      "shared_with_me": "Shared with me"
     },
     "errors": {
       "already_exists": "A workspace with this name already exists",
@@ -484,7 +510,8 @@
       "icon_sidebar_order": "Icon sidebar layout",
       "notes_dashboard": "Notes board",
       "spellcheck_html_notes": "Spell check",
-      "slash_menu_trigger": "Command menu shortcut",
+      "slash_menu_trigger": "Command menu shortcut (computer)",
+      "slash_menu_trigger_mobile": "Command menu shortcut (mobile)",
       "snapshots": "Snapshots"
     },
     "badges": {
@@ -674,8 +701,6 @@
       "upload_section_title": "Choose a new attachment",
       "drag_drop_info": "You can drag and drop your file below:",
       "all_types_accepted": "All file types accepted (max 200 MB)",
-      "note_taking_notice": "You can store media, but large files fill up your space quickly.",
-      "note_taking_notice_link": "View my storage",
       "upload_button": "Attach",
       "current_attachments": "Current attachments",
       "loading_attachments": "Loading attachments...",
@@ -1140,6 +1165,8 @@
         "off": "Off",
         "custom": "Custom"
       },
+      "theme_hint": "Each color follows the theme until you change it. The arrow next to a changed color brings it back to the theme.",
+      "reset_element": "Use the theme color",
       "elements": {
         "h1": "Heading 1",
         "h2": "Heading 2",
@@ -4542,16 +4569,6 @@
       "results_for": "Results for \"{{term}}\"",
       "results_one": "1 note found for \"{{term}}\"",
       "results_other": "{{count}} notes found for \"{{term}}\""
-    }
-  },
-  "saas": {
-    "description": "Display elements that make sense when this instance is offered as a hosted service (SaaS). Everything here is hidden by default.",
-    "section_storage_notices": "Storage notices",
-    "storage_notices_label": "Show storage usage notices",
-    "storage_notices_description": "Reminds users that Poznote is a note-taking app, not a photo or video storage service, on the attachment pages, the user storage statistics page and the S3 attachments settings.",
-    "messages": {
-      "saved": "Configuration saved successfully.",
-      "save_error": "Failed to save configuration."
     }
   },
   "archive": {

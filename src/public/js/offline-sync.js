@@ -352,15 +352,18 @@
                 rootVars[name] = value;
             }
         });
-        // The slash menu's preferences: its key, and the commands hidden
-        // in UI Customization
-        var slashTrigger = typeof window.getPoznoteInitialSetting === 'function' ? window.getPoznoteInitialSetting('slash_menu_trigger') : null;
+        // The slash menu's preferences: its key on a computer and on a
+        // mobile, and the commands hidden in UI Customization
+        var readInitialSetting = typeof window.getPoznoteInitialSetting === 'function' ? window.getPoznoteInitialSetting : function () { return null; };
+        var slashTrigger = readInitialSetting('slash_menu_trigger');
+        var slashTriggerMobile = readInitialSetting('slash_menu_trigger_mobile');
         var hiddenMap = (window.PoznoteUiCustomization && window.PoznoteUiCustomization.hiddenKeyMap) || {};
         return {
             bodyClasses: bodyClasses,
             markdownDefaultMode: document.body.getAttribute('data-markdown-default-mode') || '',
             rootVars: rootVars,
             slashMenuTrigger: slashTrigger ? String(slashTrigger) : '',
+            slashMenuTriggerMobile: slashTriggerMobile ? String(slashTriggerMobile) : '',
             hiddenSlashCommands: Object.keys(hiddenMap).filter(function (key) {
                 return key.indexOf('slash:') === 0 && hiddenMap[key];
             })

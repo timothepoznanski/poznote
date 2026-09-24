@@ -136,7 +136,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	};
 	</script>
 	<script src="<?php echo poznoteAsset('js/navigation.js'); ?>"></script>
-	<script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
+	<script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 	<script src="js/note-reference.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/date-time-format.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/date-picker-popup.js?v=<?php echo $cache_v; ?>"></script>

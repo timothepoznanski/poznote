@@ -181,19 +181,6 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
-<!-- Login Display Name Modal -->
-<div id="loginDisplayModal" class="modal">
-    <div class="modal-content">
-        <h3><?php echo t_h('modals.login_display.title'); ?></h3>
-        <p><?php echo t_h('modals.login_display.description'); ?></p>
-        <input type="text" id="loginDisplayInput" placeholder="<?php echo t_h('modals.login_display.placeholder'); ?>" maxlength="255" />
-        <div class="modal-buttons">
-            <button type="button" class="btn-cancel" data-action="close-login-display-modal"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-primary" id="saveLoginDisplayBtn"><?php echo t_h('common.save'); ?></button>
-        </div>
-    </div>
-</div>
-
 <!-- Custom CSS Modal: the stylesheets stored in data/css/ -->
 <div id="customCssModal" class="modal">
     <div class="modal-content">
@@ -385,47 +372,6 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
         <div class="modal-buttons">
             <button type="button" id="cancelFontSizeBtn" class="btn-cancel"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" id="saveFontSizeBtn" class="btn-primary"><?php echo t_h('common.save'); ?></button>
-        </div>
-    </div>
-</div>
-
-<!-- Note Width Settings Modal -->
-<div id="noteWidthModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3><?php echo t_h('modals.note_width.title', [], 'Note Content Width'); ?></h3>
-        </div>
-        <div class="modal-body">
-            <p><?php echo t_h('modals.note_width.description', [], 'Select the maximum width for your notes content, as a percentage of the note column (100 = full width):'); ?></p>
-            <div class="note-width-input-container">
-                <input type="number" id="noteWidthInput" min="10" max="100" step="5" value="60" placeholder="60">
-                <span class="note-width-unit">%</span>
-            </div>
-        </div>
-        <div class="modal-buttons">
-            <button type="button" class="btn-cancel" id="cancelNoteWidthBtn"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" id="fullWidthBtn" class="btn-secondary btn-full-width-footer"><?php echo t_h('modals.note_width.full_width', [], 'Full Width'); ?></button>
-            <button type="button" class="btn-primary" id="saveNoteWidthBtn"><?php echo t_h('common.save'); ?></button>
-        </div>
-    </div>
-</div>
-
-<!-- Index Icon Scale Settings Modal -->
-<div id="indexIconScaleModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3><?php echo t_h('modals.index_icon_scale.title', [], 'Index Icon Scaling'); ?></h3>
-        </div>
-        <div class="modal-body">
-            <p><?php echo t_h('modals.index_icon_scale.description', [], 'Adjust the size of icons on the index page:'); ?></p>
-            <div style="display: flex; flex-direction: column; gap: 10px; align-items: center; margin: 20px 0;">
-                <input type="range" id="indexIconScaleInput" min="0.5" max="2.0" step="0.1" value="1.0" style="width: 100%;">
-                <span id="indexIconScaleValue" style="font-weight: bold; font-size: 1.2em;">1.0x</span>
-            </div>
-        </div>
-        <div class="modal-buttons">
-            <button type="button" id="cancelIndexIconScaleBtn" class="btn btn-cancel"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" id="saveIndexIconScaleBtn" class="btn btn-primary"><?php echo t_h('common.save'); ?></button>
         </div>
     </div>
 </div>
@@ -1019,6 +965,7 @@ $pzNoteInfoRows = [
 </div>
 
 <!-- Colored markdown modal -->
+<?php $modalsMdcResetLabel = t_h('modals.markdown_colored.reset_element', [], 'Use the theme color'); ?>
 <div id="markdownColoredModal" class="modal">
     <div class="modal-content">
         <h3><?php echo t_h('modals.markdown_colored.title', [], 'Colored markdown'); ?></h3>
@@ -1028,17 +975,18 @@ $pzNoteInfoRows = [
                 <label><input type="radio" name="markdownColoredTheme" value="custom"> <?php echo t_h('modals.markdown_colored.options.custom', [], 'Custom'); ?></label>
             </div>
             <div id="markdownColoredCustomRow" class="mdc-custom-row">
-                <label><span><?php echo t_h('modals.markdown_colored.elements.h1', [], 'Heading 1'); ?></span> <input type="color" id="markdownColoredH1Input" data-mdc-element="h1" value="#007db8"></label>
-                <label><span><?php echo t_h('modals.markdown_colored.elements.h2', [], 'Heading 2'); ?></span> <input type="color" id="markdownColoredH2Input" data-mdc-element="h2" value="#1a7f37"></label>
-                <label><span><?php echo t_h('modals.markdown_colored.elements.h3', [], 'Heading 3'); ?></span> <input type="color" id="markdownColoredH3Input" data-mdc-element="h3" value="#8250df"></label>
-                <label><span><?php echo t_h('modals.markdown_colored.elements.h4', [], 'Heading 4'); ?></span> <input type="color" id="markdownColoredH4Input" data-mdc-element="h4" value="#bf3989"></label>
-                <label><span><?php echo t_h('modals.markdown_colored.elements.h5', [], 'Heading 5'); ?></span> <input type="color" id="markdownColoredH5Input" data-mdc-element="h5" value="#1b7c83"></label>
-                <label><span><?php echo t_h('modals.markdown_colored.elements.h6', [], 'Heading 6'); ?></span> <input type="color" id="markdownColoredH6Input" data-mdc-element="h6" value="#656d76"></label>
-                <label><span><?php echo t_h('modals.markdown_colored.elements.code', [], 'Inline code'); ?></span> <input type="color" id="markdownColoredCodeInput" data-mdc-element="code" value="#b34e00"></label>
-                <label><span><?php echo t_h('modals.markdown_colored.elements.codeblock', [], 'Code block background'); ?></span> <input type="color" id="markdownColoredCodeblockInput" data-mdc-element="codeblock" value="#b34e00"></label>
-                <label><span><?php echo t_h('modals.markdown_colored.elements.quote', [], 'Quotes'); ?></span> <input type="color" id="markdownColoredQuoteInput" data-mdc-element="quote" value="#007db8"></label>
-                <label><span><?php echo t_h('modals.markdown_colored.elements.table', [], 'Table headers'); ?></span> <input type="color" id="markdownColoredTableInput" data-mdc-element="table" value="#007db8"></label>
-                <label><span><?php echo t_h('modals.markdown_colored.elements.hr', [], 'Separators'); ?></span> <input type="color" id="markdownColoredHrInput" data-mdc-element="hr" value="#007db8"></label>
+                <p class="modal-hint mdc-theme-hint"><?php echo t_h('modals.markdown_colored.theme_hint', [], 'Each color follows the theme until you change it. The arrow next to a changed color brings it back to the theme.'); ?></p>
+                <label><span><?php echo t_h('modals.markdown_colored.elements.h1', [], 'Heading 1'); ?></span> <input type="color" id="markdownColoredH1Input" data-mdc-element="h1"><button type="button" class="mdc-reset" data-mdc-reset="h1" title="<?php echo $modalsMdcResetLabel; ?>" aria-label="<?php echo $modalsMdcResetLabel; ?>"><i class="lucide lucide-undo-2"></i></button></label>
+                <label><span><?php echo t_h('modals.markdown_colored.elements.h2', [], 'Heading 2'); ?></span> <input type="color" id="markdownColoredH2Input" data-mdc-element="h2"><button type="button" class="mdc-reset" data-mdc-reset="h2" title="<?php echo $modalsMdcResetLabel; ?>" aria-label="<?php echo $modalsMdcResetLabel; ?>"><i class="lucide lucide-undo-2"></i></button></label>
+                <label><span><?php echo t_h('modals.markdown_colored.elements.h3', [], 'Heading 3'); ?></span> <input type="color" id="markdownColoredH3Input" data-mdc-element="h3"><button type="button" class="mdc-reset" data-mdc-reset="h3" title="<?php echo $modalsMdcResetLabel; ?>" aria-label="<?php echo $modalsMdcResetLabel; ?>"><i class="lucide lucide-undo-2"></i></button></label>
+                <label><span><?php echo t_h('modals.markdown_colored.elements.h4', [], 'Heading 4'); ?></span> <input type="color" id="markdownColoredH4Input" data-mdc-element="h4"><button type="button" class="mdc-reset" data-mdc-reset="h4" title="<?php echo $modalsMdcResetLabel; ?>" aria-label="<?php echo $modalsMdcResetLabel; ?>"><i class="lucide lucide-undo-2"></i></button></label>
+                <label><span><?php echo t_h('modals.markdown_colored.elements.h5', [], 'Heading 5'); ?></span> <input type="color" id="markdownColoredH5Input" data-mdc-element="h5"><button type="button" class="mdc-reset" data-mdc-reset="h5" title="<?php echo $modalsMdcResetLabel; ?>" aria-label="<?php echo $modalsMdcResetLabel; ?>"><i class="lucide lucide-undo-2"></i></button></label>
+                <label><span><?php echo t_h('modals.markdown_colored.elements.h6', [], 'Heading 6'); ?></span> <input type="color" id="markdownColoredH6Input" data-mdc-element="h6"><button type="button" class="mdc-reset" data-mdc-reset="h6" title="<?php echo $modalsMdcResetLabel; ?>" aria-label="<?php echo $modalsMdcResetLabel; ?>"><i class="lucide lucide-undo-2"></i></button></label>
+                <label><span><?php echo t_h('modals.markdown_colored.elements.code', [], 'Inline code'); ?></span> <input type="color" id="markdownColoredCodeInput" data-mdc-element="code"><button type="button" class="mdc-reset" data-mdc-reset="code" title="<?php echo $modalsMdcResetLabel; ?>" aria-label="<?php echo $modalsMdcResetLabel; ?>"><i class="lucide lucide-undo-2"></i></button></label>
+                <label><span><?php echo t_h('modals.markdown_colored.elements.codeblock', [], 'Code block background'); ?></span> <input type="color" id="markdownColoredCodeblockInput" data-mdc-element="codeblock"><button type="button" class="mdc-reset" data-mdc-reset="codeblock" title="<?php echo $modalsMdcResetLabel; ?>" aria-label="<?php echo $modalsMdcResetLabel; ?>"><i class="lucide lucide-undo-2"></i></button></label>
+                <label><span><?php echo t_h('modals.markdown_colored.elements.quote', [], 'Quotes'); ?></span> <input type="color" id="markdownColoredQuoteInput" data-mdc-element="quote"><button type="button" class="mdc-reset" data-mdc-reset="quote" title="<?php echo $modalsMdcResetLabel; ?>" aria-label="<?php echo $modalsMdcResetLabel; ?>"><i class="lucide lucide-undo-2"></i></button></label>
+                <label><span><?php echo t_h('modals.markdown_colored.elements.table', [], 'Table headers'); ?></span> <input type="color" id="markdownColoredTableInput" data-mdc-element="table"><button type="button" class="mdc-reset" data-mdc-reset="table" title="<?php echo $modalsMdcResetLabel; ?>" aria-label="<?php echo $modalsMdcResetLabel; ?>"><i class="lucide lucide-undo-2"></i></button></label>
+                <label><span><?php echo t_h('modals.markdown_colored.elements.hr', [], 'Separators'); ?></span> <input type="color" id="markdownColoredHrInput" data-mdc-element="hr"><button type="button" class="mdc-reset" data-mdc-reset="hr" title="<?php echo $modalsMdcResetLabel; ?>" aria-label="<?php echo $modalsMdcResetLabel; ?>"><i class="lucide lucide-undo-2"></i></button></label>
             </div>
         </div>
         <div class="modal-buttons">
@@ -1144,96 +1092,6 @@ $pzNoteInfoRows = [
     </div>
 </div>
 
-<!-- Language selection modal -->
-<div id="languageModal" class="modal">
-    <div class="modal-content">
-        <h3><?php echo t_h('settings.language.label'); ?></h3>
-        <div class="modal-body">
-            <p><?php echo t_h('modals.language.description', [], 'Select your preferred language:'); ?></p>
-            <div class="radio-options">
-                <label><input type="radio" name="languageChoice" value="zh-cn"> <?php echo t_h('settings.language.chinese_simplified'); ?></label>
-                <label><input type="radio" name="languageChoice" value="en"> <?php echo t_h('settings.language.english'); ?></label>
-                <label><input type="radio" name="languageChoice" value="fr"> <?php echo t_h('settings.language.french'); ?></label>
-                <label><input type="radio" name="languageChoice" value="de"> <?php echo t_h('settings.language.german'); ?></label>
-                <label><input type="radio" name="languageChoice" value="pt"> <?php echo t_h('settings.language.portuguese'); ?></label>
-                <label><input type="radio" name="languageChoice" value="ru"> <?php echo t_h('settings.language.russian'); ?></label>
-                <label><input type="radio" name="languageChoice" value="es"> <?php echo t_h('settings.language.spanish'); ?></label>
-            </div>
-        </div>
-        <div class="modal-buttons">
-            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="languageModal"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-primary" id="saveLanguageModalBtn"><?php echo t_h('common.save'); ?></button>
-        </div>
-    </div>
-</div>
-
-<!-- Main font selection modal -->
-<div id="mainFontModal" class="modal">
-    <div class="modal-content">
-        <h3><?php echo t_h('modals.main_font.title', [], 'App font'); ?></h3>
-        <div class="modal-body">
-            <p><?php echo t_h('modals.main_font.description', [], 'Fonts other than Inter use the fonts installed on your device.'); ?></p>
-            <select id="mainFontSelect">
-                <option value="inter" style="font-family: 'Inter', sans-serif;"><?php echo t_h('modals.main_font.options.inter', [], 'Inter (default)'); ?></option>
-                <option value="system" style="font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;"><?php echo t_h('modals.main_font.options.system', [], 'System'); ?></option>
-                <option value="arial" style="font-family: Arial, Helvetica, sans-serif;">Arial</option>
-                <option value="verdana" style="font-family: Verdana, sans-serif;">Verdana</option>
-                <option value="trebuchet" style="font-family: 'Trebuchet MS', sans-serif;">Trebuchet MS</option>
-                <option value="georgia" style="font-family: Georgia, serif;">Georgia</option>
-                <option value="times" style="font-family: 'Times New Roman', serif;">Times New Roman</option>
-            </select>
-        </div>
-        <div class="modal-buttons">
-            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="mainFontModal"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-primary" id="saveMainFontModalBtn"><?php echo t_h('common.save'); ?></button>
-        </div>
-    </div>
-</div>
-
-<!-- Markdown editor font selection modal -->
-<div id="markdownFontModal" class="modal">
-    <div class="modal-content">
-        <h3><?php echo t_h('modals.markdown_font.title', [], 'Markdown editor font'); ?></h3>
-        <div class="modal-body">
-            <p><?php echo t_h('modals.markdown_font.description', [], 'Font used while editing a markdown note. The rendered preview keeps the app font. Fonts use those installed on your device.'); ?></p>
-            <select id="markdownFontSelect">
-                <option value="inherit" style="font-family: 'Inter', sans-serif;"><?php echo t_h('modals.markdown_font.options.inherit', [], 'App font (default)'); ?></option>
-                <option value="monospace" style="font-family: monospace;"><?php echo t_h('modals.markdown_font.options.monospace', [], 'System monospace'); ?></option>
-                <option value="courier" style="font-family: 'Courier New', Courier, monospace;">Courier New</option>
-                <option value="consolas" style="font-family: Consolas, monospace;">Consolas</option>
-                <option value="menlo" style="font-family: Menlo, monospace;">Menlo</option>
-                <option value="monaco" style="font-family: Monaco, monospace;">Monaco</option>
-                <option value="jetbrains" style="font-family: 'JetBrains Mono', monospace;">JetBrains Mono</option>
-                <option value="cascadia" style="font-family: 'Cascadia Code', monospace;">Cascadia Code</option>
-                <option value="fira" style="font-family: 'Fira Code', monospace;">Fira Code</option>
-                <option value="sourcecodepro" style="font-family: 'Source Code Pro', monospace;">Source Code Pro</option>
-                <option value="ubuntumono" style="font-family: 'Ubuntu Mono', monospace;">Ubuntu Mono</option>
-            </select>
-        </div>
-        <div class="modal-buttons">
-            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="markdownFontModal"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-primary" id="saveMarkdownFontModalBtn"><?php echo t_h('common.save'); ?></button>
-        </div>
-    </div>
-</div>
-
-<!-- Timezone modal -->
-<div id="timezoneModal" class="modal">
-    <div class="modal-content">
-        <h3><?php echo t_h('modals.timezone.title', [], 'Timezone'); ?></h3>
-        <div class="modal-body">
-            <p><?php echo t_h('modals.timezone.description', [], 'Select your timezone:'); ?></p>
-            <select id="timezoneSelect" class="timezone-select">
-<?php include __DIR__ . '/timezone_options.php'; ?>
-            </select>
-        </div>
-        <div class="modal-buttons">
-            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="timezoneModal"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-primary" id="saveTimezoneModalBtn"><?php echo t_h('common.save'); ?></button>
-        </div>
-    </div>
-</div>
-
 <!-- Date and time format modal -->
 <div id="dateTimeFormatModal" class="modal">
     <div class="modal-content">
@@ -1257,27 +1115,6 @@ $pzNoteInfoRows = [
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="dateTimeFormatModal"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" id="saveDateTimeFormatModalBtn"><?php echo t_h('common.save'); ?></button>
-        </div>
-    </div>
-</div>
-
-<!-- Markdown default view mode modal -->
-<div id="markdownDefaultViewModeModal" class="modal">
-    <div class="modal-content">
-        <h3><?php echo t_h('modals.markdown_default_view_mode.title', [], 'Default view mode'); ?></h3>
-        <div class="modal-body">
-            <p><?php echo t_h('modals.markdown_default_view_mode.description', [], 'Choose how markdown notes open:'); ?></p>
-            <div class="radio-options">
-                <label><input type="radio" name="markdownDefaultViewMode" value="preview"> <?php echo t_h('modals.markdown_default_view_mode.options.preview', [], 'Preview'); ?></label>
-                <label><input type="radio" name="markdownDefaultViewMode" value="edit"> <?php echo t_h('modals.markdown_default_view_mode.options.edit', [], 'Edit'); ?></label>
-                <label><input type="radio" name="markdownDefaultViewMode" value="split"> <?php echo t_h('modals.markdown_default_view_mode.options.split', [], 'Split (editor and preview side by side)'); ?></label>
-                <label><input type="radio" name="markdownDefaultViewMode" value="last"> <?php echo t_h('modals.markdown_default_view_mode.options.last', [], 'Last used mode'); ?></label>
-            </div>
-            <p class="modal-hint"><?php echo t_h('modals.markdown_default_view_mode.hint', [], 'A note you switch to another mode opens again in the default mode next time. New notes always open in split mode.'); ?></p>
-        </div>
-        <div class="modal-buttons">
-            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="markdownDefaultViewModeModal"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-primary" id="saveMarkdownDefaultViewModeModalBtn"><?php echo t_h('common.save'); ?></button>
         </div>
     </div>
 </div>

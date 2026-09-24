@@ -355,16 +355,6 @@ function getPageTitle() {
 
 
 
-/**
- * Whether the SaaS-mode storage usage notices are shown (red "note-taking
- * app, not media storage" reminders on the attachment pages, the user
- * storage statistics page and the S3 attachments settings). Hidden by
- * default; the admin enables them from the SaaS mode settings page.
- */
-function poznoteSaasNoticesEnabled(): bool {
-    require_once __DIR__ . '/users/db_master.php';
-    return getGlobalSetting('saas_show_storage_notices', '0') === '1';
-}
 
 /**
  * The three contact cards of the About section (settings.php): a contact

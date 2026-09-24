@@ -467,6 +467,33 @@ docker compose up -d
 
 Vos données sont conservées dans le répertoire `./data` et ne sont pas affectées par la mise à jour.
 
+### Versions bêta
+
+Les versions bêta apportent de nouvelles fonctionnalités avant leur sortie en version stable, et figurent comme pré-versions sur la [page des releases](https://github.com/timothepoznanski/poznote/releases). Elles sont publiées sous le tag `latest-and-beta`, qui pointe toujours vers la version la plus récente, bêta ou stable.
+
+Pour les utiliser, modifiez les deux lignes `image` de votre `docker-compose.yml` et gardez le reste du fichier tel quel :
+```yaml
+services:
+  webserver:
+    image: ghcr.io/timothepoznanski/poznote:latest-and-beta
+    ...
+  mcp-server:
+    image: ghcr.io/timothepoznanski/poznote-mcp:latest-and-beta
+    ...
+```
+
+Avec la variante [rootless](#rootless), l'image du webserver dans `docker-compose.rootless.yml` devient `poznote:latest-and-beta-rootless`, et l'image MCP reste la même : `poznote-mcp:latest-and-beta`.
+
+Téléchargez les images et redémarrez les conteneurs :
+```bash
+docker compose pull
+docker compose up -d
+```
+
+*   **Avant de passer en bêta :** une bêta peut encore contenir des bugs, faites donc d'abord une [sauvegarde](#sauvegarde--export). Les problèmes peuvent être signalés dans les [issues GitHub](https://github.com/timothepoznanski/poznote/issues) ou sur [Discord](https://discord.gg/AWhWWSEkJ).
+*   **Mises à jour :** chaque `docker compose pull` récupère ensuite la dernière bêta, ou la version stable une fois sortie. La procédure de mise à jour ci-dessus télécharge un nouveau `docker-compose.yml` qui utilise de nouveau les tags stables : modifiez donc à nouveau les deux lignes `image` après cette étape.
+*   **Retour à la version stable :** comme une bêta peut modifier la base de données, revenir à une version stable plus ancienne risque de ne pas fonctionner. Attendez la prochaine version stable, qui contient les changements de la bêta, puis suivez la procédure de mise à jour ci-dessus.
+
 ## Authentification
 
 Poznote prend en charge plusieurs méthodes d'authentification, dont les comptes locaux et les fournisseurs d'identité externes. Les applications et extensions qui dialoguent avec l'API REST utilisent des [mots de passe d'application](#mots-de-passe-dapplication), un identifiant distinct décrit dans la section suivante.
@@ -656,7 +683,7 @@ Les snapshots conservent les versions précédentes du contenu d'une note pour q
 <summary><strong>Fonctionnement des snapshots</strong></summary>
 <br>
 
-*   **Automatiques :** un snapshot est pris la première fois qu'une note est ouverte chaque jour. Les 3 snapshots automatiques les plus récents sont conservés par note ; ce nombre se modifie dans **Paramètres > Comportement > Snapshots**.
+*   **Automatiques :** un snapshot est pris la première fois qu'une note est ouverte chaque jour. Les 3 snapshots automatiques les plus récents sont conservés par note ; ce nombre se modifie dans **Paramètres > Actions > Snapshots**.
 *   **Manuels :** « Prendre un snapshot maintenant » ajoute un snapshot à tout moment, tout comme **Ctrl + Alt + S** (Cmd + Alt + S sur Mac) lorsqu'une note est ouverte. Les snapshots manuels sont illimités et ne sont pas comptés dans ce nombre.
 *   **Avant une modification par l'IA :** un snapshot est pris automatiquement juste avant que l'[assistant IA](#assistant-ia) ou le [serveur MCP](#serveur-mcp) ne modifie le contenu d'une note : une réécriture qui tourne mal s'annule donc en un clic. Ces snapshots portent la mention « Avant modification par l'IA » ou « Avant modification MCP » dans l'historique, ne sont pas pris lorsque le dernier snapshot contient déjà le même contenu, et les 20 plus récents sont conservés par note, un nombre que vous pouvez modifier dans **Paramètres → Snapshots** (de 1 à 200) si votre instance modifie beaucoup de notes via l'IA ou MCP.
 *   **Expiration :** chaque snapshot, automatique ou manuel, est supprimé 30 jours après avoir été pris. Un snapshot peut aussi être supprimé à la main depuis la fenêtre Snapshots.
@@ -1222,7 +1249,7 @@ Les notes modifiées ces 5 derniers jours sont conservées dans chaque navigateu
 *   **Lecture et modification :** les notes HTML, les notes Markdown et les listes de tâches s'ouvrent dans leur éditeur habituel, et vous pouvez créer de nouvelles notes. Le menu / et le menu du clic droit fonctionnent aussi, sans les commandes qui ont besoin du serveur (images et fichiers à envoyer, modèles, dessins, liens vers d'autres notes). Les autres types de notes, comme les dessins, restent accessibles en ligne uniquement. Les modifications sont gardées dans le navigateur jusqu'à leur envoi.
 *   **Garder hors ligne :** les favoris sont toujours conservés, et **Garder hors ligne** dans le menu d'une note ou d'un dossier (sous-dossiers compris) la conserve quelle que soit sa date, avec toutes ses pièces jointes (PDF, audio, fichiers) jusqu'à 25 Mo chacune. Le même menu d'une note indique si elle est disponible hors ligne dans ce navigateur.
 *   **Retour du réseau :** les modifications sont envoyées automatiquement. Si une note a aussi été modifiée sur le serveur entre-temps, les deux versions sont fusionnées quand c'est possible, sinon votre version hors ligne est gardée dans une note à part nommée « ... (copie hors ligne) ». Une note supprimée sur le serveur entre-temps est recréée.
-*   **Réglages :** **Paramètres > Autre > Notes hors ligne** définit combien de jours de notes sont conservés (5 par défaut, jusqu'à 30, 0 désactive les notes hors ligne) et indique ce que contient le navigateur utilisé.
+*   **Réglages :** **Paramètres > Actions > Notes hors ligne** définit combien de jours de notes sont conservés (5 par défaut, jusqu'à 30, 0 désactive les notes hors ligne) et indique ce que contient le navigateur utilisé.
 *   **Limites :** 300 notes et 50 Mo de texte au plus, les plus récemment modifiées d'abord. Les fichiers sont conservés aussi : les images affichées dans ces notes, et toutes les pièces jointes (PDF, audio, fichiers) des favoris et des notes gardées avec **Garder hors ligne**, jusqu'à 25 Mo chacun, 400 fichiers et 200 Mo au total, et jamais plus de la moitié de l'espace libre du navigateur. Un fichier plus gros reste en ligne uniquement, et la note le signale quand elle est ouverte hors ligne.
 *   **Prérequis :** Poznote doit être servi en HTTPS (les navigateurs ne gardent des pages hors ligne que sur une connexion sécurisée, `http://localhost` fonctionne aussi) et avoir été ouvert une fois en ligne dans le navigateur, après connexion, pour que la copie soit faite.
 *   **Confidentialité :** seules les notes de votre propre compte sont conservées, pas celles d'un compte ou d'un espace de travail partagé avec vous. Elles sont stockées sans chiffrement dans le navigateur. La déconnexion les supprime du navigateur (les modifications pas encore envoyées aussi, après un avertissement qui les liste) : sur un ordinateur partagé, déconnectez-vous en partant. La déconnexion fonctionne aussi sans réseau, depuis la page hors ligne : les notes sont supprimées tout de suite, et la session sur le serveur se termine à la prochaine ouverture de Poznote en ligne.

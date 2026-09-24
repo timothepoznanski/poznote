@@ -401,8 +401,6 @@
       "upload_section_title": "Subir nuevo adjunto",
       "drag_drop_info": "Puedes arrastrar y soltar tu archivo a continuación:",
       "all_types_accepted": "Todos los tipos de archivo aceptados (máx 200MB)",
-      "note_taking_notice": "Poznote es una aplicación de notas: puede guardar medios, pero los archivos grandes llenan rápido su espacio.",
-      "note_taking_notice_link": "Ver mi almacenamiento",
       "upload_button": "Adjuntar",
       "current_attachments": "Adjuntos actuales",
       "loading_attachments": "Cargando adjuntos...",
@@ -518,14 +516,14 @@
       "backlinks_at_bottom": "Muestra la sección de retroenlaces en la parte inferior de las notas en lugar de arriba.",
       "default_image_border": "Muestra por defecto las imágenes de las notas con borde y sin relleno.",
       "spellcheck_html_notes": "Activa el corrector ortográfico del navegador en las notas HTML.",
-      "slash_menu_trigger": "Elige si el menú de comandos se abre escribiendo /, con Alt + / o sin ninguna tecla. Un clic derecho en una nota lo abre sea cual sea este ajuste.",
+      "slash_menu_trigger": "En el ordenador, elige si el menú de comandos se abre escribiendo /, con Alt + / o sin ninguna tecla. Un clic derecho en una nota lo abre sea cual sea este ajuste.",
+      "slash_menu_trigger_mobile": "En el móvil, elige si el menú de comandos se abre escribiendo /, con Alt + / desde un teclado físico o sin ninguna tecla.",
       "icon_sidebar_order": "Cambie el orden y el color de los botones de la barra de iconos y coloque separadores entre ellos.",
       "users_admin": "Crea, edita y gestiona las cuentas de usuario.",
       "oidc_config": "Configura el inicio de sesión único con un proveedor OpenID Connect.",
       "smtp_config": "Configura el servidor SMTP usado para enviar correos como los recordatorios.",
       "webhooks": "Envía los eventos de la instancia a servicios externos mediante webhooks.",
       "ai_assistant": "Configura el asistente de IA usado para conversar con tus notas.",
-      "saas": "Elementos de visualización para instancias ofrecidas como servicio alojado (SaaS). Todos ocultos por defecto.",
       "git_sync_enabled": "Activa o desactiva la sincronización Git en esta instancia.",
       "import_limits": "Define el número máximo de archivos permitidos por importación.",
       "user_quotas": "Limita el número de notas y el almacenamiento disponible por usuario.",
@@ -549,6 +547,9 @@
       "highlight_current_folder_tree": "Atenuar, tanto como quieras, las notas y carpetas que están fuera de la jerarquía de carpetas en la que trabajas.",
       "snapshots": "Elija cuántas instantáneas automáticas diarias y cuántas instantáneas de seguridad (antes de una edición de IA o MCP) se conservan por nota.",
       "stt": "Configura el servidor de reconocimiento de voz que se usa para dictar notas y transcribir adjuntos de audio."
+    },
+    "card_notes": {
+      "slash_menu_trigger_mobile": "En el móvil, la barra de herramientas sobre el teclado tiene un botón + que abre el mismo menú, sea cual sea este ajuste."
     },
     "title": "Configuración",
     "collapse_section": "Contraer la sección",
@@ -577,7 +578,14 @@
       "integrations": "Integraciones",
       "storage_limits": "Almacenamiento y límites",
       "appearance": "Apariencia",
-      "maintenance": "Mantenimiento"
+      "maintenance": "Mantenimiento",
+      "backup_sync": "Copias de seguridad y sincronización",
+      "editing": "Edición",
+      "apps": "Aplicaciones",
+      "profile_sign_in": "Perfil e inicio de sesión",
+      "language_region": "Idioma y región",
+      "storage": "Almacenamiento",
+      "layout": "Diseño"
     },
     "sections": {
       "account_display": "Cuenta y Visualización",
@@ -640,7 +648,6 @@
       "smtp_config": "SMTP / Correo",
       "webhooks": "Webhooks de administrador",
       "ai_assistant": "Asistente IA",
-      "saas": "Modo SaaS",
       "s3_storage": "Adjuntos S3",
       "s3_backup": "Copias de seguridad S3",
       "stt": "Transcripción",
@@ -663,6 +670,22 @@
         "unavailable": "No disponible",
         "installed": "Ya instalada"
       }
+    },
+    "value_help": {
+      "font_size_notes": "Contenido de la nota",
+      "font_size_sidebar": "Barra lateral",
+      "font_size_code_blocks": "Bloques de código",
+      "font_size_settings": "Página de ajustes"
+    },
+    "storage_summary": {
+      "error": "No se pudo cargar el uso del almacenamiento.",
+      "notes_detail": "{{active}} en tus notas, {{trash}} en la papelera",
+      "local": "Espacio usado en el servidor",
+      "database": "Base de datos",
+      "note_files": "Archivos de notas",
+      "attachments": "Archivos adjuntos",
+      "s3_attachments": "Archivos adjuntos en el almacenamiento S3",
+      "s3_backups": "Copias de seguridad en el almacenamiento S3"
     }
   },
   "workspaces": {
@@ -726,7 +749,8 @@
       "edit_workspaces": "Editar espacios de trabajo",
       "new_workspace": "Nuevo espacio de trabajo",
       "accounts": "Cuentas",
-      "title": "Espacios de trabajo"
+      "title": "Espacios de trabajo",
+      "shared_with_me": "Compartidos conmigo"
     },
     "errors": {
       "already_exists": "Ya existe un espacio de trabajo con este nombre",
@@ -846,7 +870,8 @@
       "notes_dashboard": "Tablero de notas",
       "spellcheck_html_notes": "Corrector ortográfico",
       "note_color_palette": "Colores de notas",
-      "slash_menu_trigger": "Atajo del menú de comandos",
+      "slash_menu_trigger": "Atajo del menú de comandos (ordenador)",
+      "slash_menu_trigger_mobile": "Atajo del menú de comandos (móvil)",
       "snapshots": "Instantáneas",
       "show_note_icons": "Mostrar iconos de las notas"
     },
@@ -1624,6 +1649,8 @@
         "off": "Desactivado",
         "custom": "Personalizado"
       },
+      "theme_hint": "Cada color sigue el tema hasta que lo cambias. La flecha junto a un color cambiado lo devuelve al del tema.",
+      "reset_element": "Usar el color del tema",
       "elements": {
         "h1": "Título 1",
         "h2": "Título 2",
@@ -4820,16 +4847,6 @@
     "empty": "Aún no hay tareas en esta lista.",
     "add_placeholder": "Añadir una tarea...",
     "save_error": "No se pudo guardar la lista de tareas."
-  },
-  "saas": {
-    "description": "Elementos de visualización útiles cuando esta instancia se ofrece como servicio alojado (SaaS). Todo está oculto por defecto.",
-    "section_storage_notices": "Avisos de almacenamiento",
-    "storage_notices_label": "Mostrar los avisos de almacenamiento",
-    "storage_notices_description": "Recuerda a los usuarios que Poznote es una aplicación de toma de notas, no un servicio de almacenamiento de fotos o vídeos, en las páginas de adjuntos, la página de estadísticas de almacenamiento del usuario y los ajustes de adjuntos S3.",
-    "messages": {
-      "saved": "Configuración guardada correctamente.",
-      "save_error": "Error al guardar la configuración."
-    }
   },
   "archive": {
     "menu_item": "Archivar la nota",

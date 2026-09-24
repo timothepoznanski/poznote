@@ -75,11 +75,41 @@
     height: 16px;
 }
 
+/* Phone: the icon, the text and the close button on the first row, the
+   button under the text, rather than each wrapping onto a line of its own */
 @media (max-width: 800px) {
     .offline-banner {
         bottom: 12px;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        align-items: start;
+        column-gap: 10px;
+        row-gap: 10px;
         width: calc(100vw - 24px);
         max-width: none;
-        flex-wrap: wrap;
+        padding: 12px 8px 12px 14px;
+    }
+
+    .offline-banner > .lucide {
+        grid-column: 1;
+        grid-row: 1;
+        margin-top: 1px;
+    }
+
+    .offline-banner-text {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .offline-banner-close {
+        grid-column: 3;
+        grid-row: 1;
+        margin-top: -4px;
+    }
+
+    .offline-banner .offline-banner-open {
+        grid-column: 2 / 4;
+        grid-row: 2;
+        justify-self: start;
     }
 }

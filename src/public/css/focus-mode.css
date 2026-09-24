@@ -1,19 +1,16 @@
 /**
  * Focus mode on the notes page (discussion #1482)
  *
- * Two steps, set before the first paint (icon_sidebar.php) and owned by
- * js/icon-sidebar-toggle.js:
+ * html.focus-mode, set before the first paint (icon_sidebar.php) and owned
+ * by js/icon-sidebar-toggle.js, is on or off. On:
  *
- *   html.focus-mode       clears the rows around the title (tags, date,
- *                         attachments, backlinks), so only the toolbar and the
- *                         title sit over the content. In the split view the two
- *                         panes are sized from what is left under those rows
- *                         (js/markdown-editor.js), and on a laptop that was
- *                         not much.
- *   html.focus-mode-full  also sends the notes column into a flyout, opened
- *                         from a hot zone on the left edge of the viewport
- *                         (html.focus-mode-peek). css/icon-sidebar.css does
- *                         the same with the icon rail, on every page.
+ *   - the rows around the title (tags, date, attachments, backlinks) go, so
+ *     only the toolbar and the title sit over the content. In the split view
+ *     the two panes are sized from what is left under those rows
+ *     (js/markdown-editor.js), and on a laptop that was not much;
+ *   - the notes column goes into a flyout, opened from a hot zone on the left
+ *     edge of the viewport (html.focus-mode-peek). css/icon-sidebar.css does
+ *     the same with the icon rail, on every page.
  *
  * Only the chrome goes. The tab bar, the outline, the AI assistant and the
  * floating stack keep their own state: they were opted into, focus mode is
@@ -23,12 +20,12 @@
  */
 
 @media (min-width: 801px) {
-    /* Second step. Notes column: pinned right of the rail, off screen until
-       the flyout opens. The width and padding are forced back on because
+    /* Notes column: pinned right of the rail, off screen until the flyout
+       opens. The width and padding are forced back on because
        body.sidebar-collapsed (css/layout.css) zeroes both with !important, and
        a collapsed column in the flyout would be a 0px strip. The stored
        collapsed state is untouched: it is back the moment focus mode is off. */
-    html.focus-mode-full body #left_col {
+    html.focus-mode body #left_col {
         position: fixed;
         top: 0;
         left: var(--icon-sidebar-width);
@@ -45,7 +42,7 @@
         transition: transform 0.2s ease, visibility 0s linear 0.2s;
     }
 
-    html.focus-mode-full.focus-mode-peek body #left_col {
+    html.focus-mode.focus-mode-peek body #left_col {
         transform: none;
         visibility: visible;
         transition: transform 0.2s ease, visibility 0s;
@@ -53,16 +50,15 @@
 
     /* The divider and its collapse toggle hang off the column: nothing to
        drag or collapse while the column is a flyout */
-    html.focus-mode-full #resizeHandle {
+    html.focus-mode #resizeHandle {
         display: none;
     }
 
-    /* First step, and the part the second one keeps. Rows around the title:
-       folder and tags, creation date, and the attachments and backlinks rows
-       when they sit up there rather than under the note (attachments_at_bottom,
-       backlinks_at_bottom). The title stays, it says which note this is and
-       it is where the note is renamed. So does the toolbar, it is how the
-       note is saved, shared and left. */
+    /* Rows around the title: folder and tags, creation date, and the
+       attachments and backlinks rows when they sit up there rather than under
+       the note (attachments_at_bottom, backlinks_at_bottom). The title stays,
+       it says which note this is and it is where the note is renamed. So does
+       the toolbar, it is how the note is saved, shared and left. */
     html.focus-mode #right_col .innernote > .note-tags-row,
     html.focus-mode #right_col .innernote > .note-subline,
     html.focus-mode #right_col .innernote > .note-attachments-row:has(~ .noteentry),

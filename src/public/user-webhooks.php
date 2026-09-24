@@ -14,6 +14,7 @@ require_once __DIR__ . '/../auth.php';
 requireAuth();
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../functions.php';
+require_once __DIR__ . '/../settings_shell.php';
 requireSettingsPassword();
 
 if (!poznoteCanUseUserWebhooks()) {
@@ -184,9 +185,8 @@ foreach ($eventHelpDefaults as $eventName => $default) {
 </head>
 <body class="has-icon-sidebar" data-workspace="<?php echo user_webhooks_h($pageWorkspace); ?>">
     <?php include __DIR__ . '/../icon_sidebar.php'; ?>
+<?php poznoteSettingsShellOpen(['section' => 'settings-actions-section-grid', 'title' => t('webhooks_user.card', [], 'User Webhooks')]); ?>
 <div class="settings-container webhooks-page">
-<?php include __DIR__ . '/../back_to_settings.php'; ?>
-<h1 class="poznote-page-title"><i class="lucide lucide-webhook"></i> <?php echo t_h('webhooks_user.card', [], 'User Webhooks'); ?></h1>
 
 
     <?php if ($success || $warning || $error): ?>
@@ -358,8 +358,9 @@ foreach ($eventHelpDefaults as $eventName => $default) {
         <?php endif; ?>
     </div>
 </div>
+<?php poznoteSettingsShellClose(); ?>
 <script src="js/modal-alerts.js?v=<?php echo $v; ?>"></script>
 <script src="js/webhooks-page.js?v=<?php echo $v; ?>"></script>
-    <script src="js/icon-sidebar-toggle.js?v=<?php echo $v; ?>"></script>
+    <script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 </body>
 </html>

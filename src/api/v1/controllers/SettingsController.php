@@ -217,6 +217,9 @@ class SettingsController {
 
         if ($key === 'markdown_colored_custom') {
             // Stored as JSON: {"h1":"#rrggbb",...,"h6":...,"code":...,"codeblock":...,"quote":...,"table":...,"hr":...}
+            // An element the user picked no colour for is stored as "" and
+            // follows the theme (lib/markdown-colored.php); an absent key is
+            // read the same way once the legacy expansion below has run.
             $raw = is_string($value) ? trim($value) : '';
             if ($raw === '') {
                 return '';
@@ -239,7 +242,7 @@ class SettingsController {
             $colors = [];
             foreach (['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'code', 'codeblock', 'quote', 'table', 'hr'] as $element) {
                 $color = (string) ($decoded[$element] ?? '');
-                if (!preg_match('/^#[0-9a-fA-F]{6}$/', $color)) {
+                if ($color !== '' && !preg_match('/^#[0-9a-fA-F]{6}$/', $color)) {
                     throw new InvalidArgumentException('invalid markdown custom colors', 400);
                 }
                 $colors[$element] = strtolower($color);
@@ -259,7 +262,7 @@ class SettingsController {
             return $normalized;
         }
 
-        if ($key === 'slash_menu_trigger') {
+        if ($key === 'slash_menu_trigger' || $key === 'slash_menu_trigger_mobile') {
             $normalized = trim((string) $value);
             if (!in_array($normalized, ['slash', 'alt-slash', 'disabled'], true)) {
                 throw new InvalidArgumentException('invalid slash menu trigger', 400);

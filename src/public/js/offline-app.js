@@ -206,12 +206,17 @@
         });
         // The slash menu (js/slash-command.js) reads its key from the page
         // config and the hidden commands from UI Customization, as in the app
-        if (display.slashMenuTrigger) {
+        if (display.slashMenuTrigger || display.slashMenuTriggerMobile) {
             var configEl = byId('page-config-data');
             try {
                 var config = JSON.parse(configEl.textContent || '{}') || {};
                 config.settings = config.settings || {};
-                config.settings.slash_menu_trigger = display.slashMenuTrigger;
+                if (display.slashMenuTrigger) {
+                    config.settings.slash_menu_trigger = display.slashMenuTrigger;
+                }
+                if (display.slashMenuTriggerMobile) {
+                    config.settings.slash_menu_trigger_mobile = display.slashMenuTriggerMobile;
+                }
                 configEl.textContent = JSON.stringify(config);
             } catch (e) {
                 console.debug('offline-app: the slash menu setting could not be applied:', e);
@@ -734,7 +739,9 @@
         var bar = el('div', 'note-edit-toolbar');
         var fmt = 'text-format-btn';
         var add = function (button) { bar.appendChild(button); };
-        add(toolbarButton('btn-home mobile-home-btn', t('editor.toolbar.back_to_notes', null, 'Notes'), 'scroll-to-left-column', 'lucide-home'));
+        // No Home button (on a phone the list is one swipe away) and no Save
+        // button further down: every change is kept on the device as it is
+        // typed, there is nothing to save by hand here.
         add(toolbarButton('btn-bold ' + fmt, t('editor.toolbar.bold', null, 'Bold'), 'exec-bold', 'lucide-bold'));
         add(toolbarButton('btn-italic ' + fmt, t('editor.toolbar.italic', null, 'Italic'), 'exec-italic', 'lucide-italic'));
         add(toolbarButton('btn-underline ' + fmt, t('editor.toolbar.underline', null, 'Underline'), 'exec-underline', 'lucide-underline'));
@@ -781,7 +788,6 @@
             add(dropdown);
         }
         add(toolbarButton('btn-checklist note-action-btn', t('editor.toolbar.insert_checklist', null, 'Insert checklist'), 'insert-checklist', 'lucide-list-check'));
-        add(toolbarButton('btn-save note-action-btn', t('editor.toolbar.save_now', null, 'Save now'), 'save-note', 'lucide-save', { 'data-note-id': String(id) }));
         return bar;
     }
 
@@ -890,6 +896,22 @@
         notice.appendChild(icon('lucide-alert-triangle'));
         notice.appendChild(el('span', null, ot('note.too_big', { limit: String(limitMb), files: names.join(', ') }, 'Not available offline, larger than {{limit}} MB: {{files}}')));
         return notice;
+    }
+
+    // A toolbar with nothing to show until text is selected (an HTML note:
+    // its buttons are all formatting ones) takes no room: it floats over the
+    // top of the note when they appear, so the text never moves under the
+    // selection (css/offline.css). Measured, not guessed from the type: what
+    // shows depends on the width (css/index-mobile.css).
+    function updateToolbarRoom() {
+        var header = document.querySelector('#offline-note-host .note-header');
+        if (!header) {
+            return;
+        }
+        var persistent = Array.prototype.some.call(header.querySelectorAll('.note-edit-toolbar > *'), function (child) {
+            return !child.classList.contains('text-format-btn') && child.getClientRects().length > 0;
+        });
+        header.classList.toggle('offline-toolbar-floating', !persistent);
     }
 
     function buildTagsRow(item) {
@@ -1062,6 +1084,10 @@
         if (type === 'note' && typeof window.applySyntaxHighlighting === 'function') {
             try { window.applySyntaxHighlighting(entry); } catch (e) { /* ignore */ }
         }
+        // Once the editors have set up their buttons (the Markdown view mode
+        // one among them), some of it on the next frame
+        updateToolbarRoom();
+        window.requestAnimationFrame(updateToolbarRoom);
     }
 
     // A ticked box only changes a property: write it into the markup the way
@@ -1828,6 +1854,12 @@
         byId('offline-empty-retry-btn').addEventListener('click', function () { window.location.reload(); });
         byId('offline-logout-btn').addEventListener('click', confirmSignOut);
         byId('offline-unavailable-back').addEventListener('click', backToList);
+
+        var roomTimer = null;
+        window.addEventListener('resize', function () {
+            clearTimeout(roomTimer);
+            roomTimer = setTimeout(updateToolbarRoom, 150);
+        });
 
         byId('unified-search').addEventListener('input', function (event) {
             state.search = event.target.value || '';

@@ -467,6 +467,33 @@ docker compose up -d
 
 Ihre Daten bleiben im Verzeichnis `./data` erhalten und sind von der Aktualisierung nicht betroffen.
 
+### Beta-Versionen
+
+Beta-Versionen bringen neue Funktionen, bevor sie als stabile Version erscheinen, und sind auf der [Release-Seite](https://github.com/timothepoznanski/poznote/releases) als Vorabversionen aufgeführt. Sie werden unter dem Tag `latest-and-beta` veröffentlicht, das immer auf die neueste Version zeigt, ob Beta oder stabil.
+
+Um sie zu verwenden, ändern Sie die beiden `image`-Zeilen Ihrer `docker-compose.yml` und lassen den Rest der Datei unverändert:
+```yaml
+services:
+  webserver:
+    image: ghcr.io/timothepoznanski/poznote:latest-and-beta
+    ...
+  mcp-server:
+    image: ghcr.io/timothepoznanski/poznote-mcp:latest-and-beta
+    ...
+```
+
+Bei der [Rootless](#rootless)-Variante wird das Webserver-Image in `docker-compose.rootless.yml` zu `poznote:latest-and-beta-rootless`, das MCP-Image bleibt dasselbe: `poznote-mcp:latest-and-beta`.
+
+Laden Sie die Images herunter und starten Sie die Container neu:
+```bash
+docker compose pull
+docker compose up -d
+```
+
+*   **Vor dem Wechsel:** Eine Beta kann noch Fehler enthalten, erstellen Sie daher zuerst ein [Backup](#sicherung--export). Probleme können in den [GitHub-Issues](https://github.com/timothepoznanski/poznote/issues) oder auf [Discord](https://discord.gg/AWhWWSEkJ) gemeldet werden.
+*   **Aktualisierungen:** Jedes `docker compose pull` holt danach die neueste Beta oder, sobald sie erschienen ist, die stabile Version. Die obige Anleitung zur Aktualisierung lädt eine neue `docker-compose.yml` herunter, die wieder die stabilen Tags verwendet, ändern Sie daher die beiden `image`-Zeilen nach diesem Schritt erneut.
+*   **Zurück zur stabilen Version:** Da eine Beta die Datenbank ändern kann, funktioniert die Rückkehr zu einer älteren stabilen Version möglicherweise nicht. Warten Sie auf die nächste stabile Version, die die Änderungen der Beta enthält, und folgen Sie dann der obigen Anleitung zur Aktualisierung.
+
 ## Authentifizierung
 
 Poznote unterstützt mehrere Authentifizierungsmethoden, darunter lokale Konten und externe Identitätsanbieter. Apps und Erweiterungen, die mit der REST-API kommunizieren, verwenden [App-Passwörter](#app-passwörter), eine eigene Art von Zugangsdaten, die im nächsten Abschnitt beschrieben wird.
@@ -656,7 +683,7 @@ Schnappschüsse bewahren frühere Versionen des Inhalts einer Notiz auf, sodass 
 <summary><strong>So funktionieren Schnappschüsse</strong></summary>
 <br>
 
-*   **Automatisch:** Beim ersten Öffnen einer Notiz an einem Tag wird ein Schnappschuss erstellt. Pro Notiz werden die 3 neuesten automatischen Schnappschüsse aufbewahrt; diese Anzahl lässt sich unter **Einstellungen > Verhalten > Schnappschüsse** ändern.
+*   **Automatisch:** Beim ersten Öffnen einer Notiz an einem Tag wird ein Schnappschuss erstellt. Pro Notiz werden die 3 neuesten automatischen Schnappschüsse aufbewahrt; diese Anzahl lässt sich unter **Einstellungen > Aktionen > Schnappschüsse** ändern.
 *   **Manuell:** „Jetzt Schnappschuss erstellen“ fügt jederzeit einen Schnappschuss hinzu, ebenso **Strg + Alt + S** (Cmd + Alt + S auf dem Mac) bei geöffneter Notiz. Manuelle Schnappschüsse sind unbegrenzt und zählen nicht zu dieser Anzahl.
 *   **Vor einer KI-Änderung:** Unmittelbar bevor der [KI-Assistent](#ki-assistent) oder der [MCP-Server](#mcp-server) den Inhalt einer Notiz ändert, wird automatisch ein Schnappschuss erstellt, sodass sich eine misslungene Umformulierung mit einem Klick rückgängig machen lässt. Diese Schnappschüsse sind im Verlauf mit „Vor KI-Änderung“ oder „Vor MCP-Änderung“ gekennzeichnet und werden übersprungen, wenn der letzte Schnappschuss bereits denselben Inhalt enthält. Pro Notiz werden die 20 neuesten aufbewahrt, eine Anzahl, die Sie unter **Einstellungen → Schnappschüsse** ändern können (1 bis 200), falls auf Ihrer Instanz viele Notizen über KI oder MCP bearbeitet werden.
 *   **Ablauf:** Jeder Schnappschuss, ob automatisch oder manuell, wird 30 Tage nach seiner Erstellung gelöscht. Ein Schnappschuss kann auch von Hand im Dialog „Schnappschüsse“ gelöscht werden.
@@ -1222,7 +1249,7 @@ Die in den letzten 5 Tagen geänderten Notizen werden in jedem Browser aufbewahr
 *   **Lesen und Bearbeiten:** HTML-Notizen, Markdown-Notizen und Aufgabenlisten öffnen sich in ihrem gewohnten Editor, und neue Notizen können erstellt werden. Das /-Menü und das Rechtsklick-Menü funktionieren ebenfalls, ohne die Befehle, die den Server brauchen (hochzuladende Bilder und Dateien, Vorlagen, Zeichnungen, Links zu anderen Notizen). Andere Notiztypen, etwa Zeichnungen, bleiben nur online verfügbar. Änderungen bleiben im Browser, bis sie gesendet sind.
 *   **Offline behalten:** Favoriten werden immer aufbewahrt, und **Offline behalten** im Menü einer Notiz oder eines Ordners (Unterordner eingeschlossen) bewahrt sie unabhängig vom Datum auf, mit allen Anhängen (PDF, Audio, Dateien) bis 25 MB pro Datei. Dasselbe Menü einer Notiz zeigt an, ob sie in diesem Browser offline verfügbar ist.
 *   **Wieder online:** Die Änderungen werden automatisch gesendet. Wurde eine Notiz inzwischen auch auf dem Server geändert, werden beide Fassungen nach Möglichkeit zusammengeführt, andernfalls wird Ihre Offline-Fassung als eigene Notiz mit dem Namen „... (Offline-Kopie)“ behalten. Eine inzwischen auf dem Server gelöschte Notiz wird neu angelegt.
-*   **Einstellungen:** **Einstellungen > Sonstiges > Offline-Notizen** legt fest, wie viele Tage an Notizen aufbewahrt werden (standardmäßig 5, bis zu 30, 0 schaltet Offline-Notizen aus), und zeigt, was der aktuelle Browser enthält.
+*   **Einstellungen:** **Einstellungen > Aktionen > Offline-Notizen** legt fest, wie viele Tage an Notizen aufbewahrt werden (standardmäßig 5, bis zu 30, 0 schaltet Offline-Notizen aus), und zeigt, was der aktuelle Browser enthält.
 *   **Grenzen:** höchstens 300 Notizen und 50 MB Text, die zuletzt geänderten zuerst. Auch Dateien werden aufbewahrt: die in diesen Notizen angezeigten Bilder und alle Anhänge (PDF, Audio, Dateien) der Favoriten und der mit **Offline behalten** markierten Notizen, bis zu 25 MB pro Datei, 400 Dateien und 200 MB insgesamt, und nie mehr als die Hälfte des freien Speicherplatzes des Browsers. Eine größere Datei bleibt nur online, und die Notiz weist offline darauf hin.
 *   **Voraussetzungen:** Poznote muss über HTTPS bereitgestellt werden (Browser halten Seiten nur über eine sichere Verbindung offline bereit, `http://localhost` funktioniert ebenfalls) und nach der Anmeldung einmal online im Browser geöffnet worden sein, damit die Kopie angelegt wird.
 *   **Datenschutz:** Nur die Notizen Ihres eigenen Kontos werden aufbewahrt, nicht die eines mit Ihnen geteilten Kontos oder Arbeitsbereichs. Sie werden unverschlüsselt im Browser gespeichert. Die Abmeldung entfernt sie aus dem Browser (auch noch nicht gesendete Änderungen, nach einer Warnung, die sie auflistet): Melden Sie sich an einem gemeinsam genutzten Computer ab, wenn Sie gehen. Die Abmeldung funktioniert auch ohne Netzwerk über die Offline-Seite: Die Notizen werden sofort entfernt, und die Sitzung auf dem Server endet, sobald Poznote das nächste Mal online geöffnet wird.

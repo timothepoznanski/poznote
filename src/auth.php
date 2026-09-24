@@ -802,7 +802,7 @@ function enforceSharedWorkspaceScopeAccess(): void {
         'notes_manager.php', 'settings.php', 'workspaces.php', 'shared.php', 'trash.php',
         'backup_export.php', 'restore_import.php', 'git_sync.php',
         'user-webhooks.php', 'storage-stats-user.php', 'ai_settings_user.php', 'stt_settings_user.php',
-        'ai_settings.php', 's3_settings.php', 's3_backup_settings.php', 'saas_settings.php', 'stt_settings.php',
+        'ai_settings.php', 's3_settings.php', 's3_backup_settings.php', 'stt_settings.php',
     ];
     $restrictedScripts = [
         'api_export_attachments.php', 'api_backup_job.php', 'api_restore_upload.php',

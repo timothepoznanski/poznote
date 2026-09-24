@@ -1033,6 +1033,15 @@ $router->post('/admin/repair', function($params) use ($usersController) {
     echo json_encode($usersController->repair());
 });
 
+// Admin: Attachment files no note references any more (scan, then delete)
+$router->get('/admin/orphan-attachments', function($params) use ($usersController) {
+    echo json_encode($usersController->orphanAttachments(false));
+});
+
+$router->delete('/admin/orphan-attachments', function($params) use ($usersController) {
+    echo json_encode($usersController->orphanAttachments(true));
+});
+
 // Admin: Delete a user profile
 $router->delete('/admin/users/{id}', function($params) use ($usersController) {
     echo json_encode($usersController->delete($params['id'], $_GET));

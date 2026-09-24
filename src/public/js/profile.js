@@ -568,10 +568,6 @@
             card.addEventListener('click', showProfileModal);
         }
 
-        // The icon rail entry (icon_sidebar.php) is a plain link to
-        // settings.php?open=account: it opens the My Account section rather
-        // than this modal, which the card above opens once there.
-
         // Default-credentials alert (settings.php): the username half of it
         // is fixed in this same modal, so open it straight away rather than
         // sending the reader off to find the card.

@@ -467,6 +467,33 @@ docker compose up -d
 
 Your data is preserved in the `./data` directory and will not be affected by the update.
 
+### Beta versions
+
+Beta versions bring new features before they are released as stable, and are listed as pre-releases on the [releases page](https://github.com/timothepoznanski/poznote/releases). They are published under the `latest-and-beta` tag, which always points to the newest version, beta or stable.
+
+To use them, change the two `image` lines of your `docker-compose.yml` and keep the rest of the file as it is:
+```yaml
+services:
+  webserver:
+    image: ghcr.io/timothepoznanski/poznote:latest-and-beta
+    ...
+  mcp-server:
+    image: ghcr.io/timothepoznanski/poznote-mcp:latest-and-beta
+    ...
+```
+
+With the [rootless](#rootless) variant, the webserver image in `docker-compose.rootless.yml` becomes `poznote:latest-and-beta-rootless`, and the MCP image is the same `poznote-mcp:latest-and-beta`.
+
+Download the images and restart the containers:
+```bash
+docker compose pull
+docker compose up -d
+```
+
+*   **Before switching:** a beta can still contain bugs, so make a [backup](#backup--export) first. Problems can be reported in the [GitHub issues](https://github.com/timothepoznanski/poznote/issues) or on [Discord](https://discord.gg/AWhWWSEkJ).
+*   **Updates:** each `docker compose pull` then gets the newest beta, or the stable version once it is released. The update procedure above downloads a new `docker-compose.yml` that uses the stable tags again, so change the two `image` lines once more after that step.
+*   **Back to stable:** a beta can change the database, so going back to an older stable version may not work. Wait for the next stable version, which includes the changes of the beta, then follow the update procedure above.
+
 ## Authentication
 
 Poznote supports multiple authentication methods including local accounts and external identity providers. Apps and extensions that talk to the REST API use [app passwords](#app-passwords), a separate credential described in the next section.
@@ -656,7 +683,7 @@ Snapshots keep earlier versions of a note's content so you can go back to a prev
 <summary><strong>How snapshots work</strong></summary>
 <br>
 
-*   **Automatic:** a snapshot is taken the first time a note is opened each day. The 3 most recent automatic snapshots are kept per note; this number can be changed under **Settings > Behavior > Snapshots**.
+*   **Automatic:** a snapshot is taken the first time a note is opened each day. The 3 most recent automatic snapshots are kept per note; this number can be changed under **Settings > Actions > Snapshots**.
 *   **Manual:** "Take snapshot now" adds a snapshot at any time, and so does **Ctrl + Alt + S** (Cmd + Alt + S on Mac) while a note is open. Manual snapshots are unlimited and do not count toward that number.
 *   **Before an AI edit:** a snapshot is taken automatically right before the [AI assistant](#ai-assistant) or the [MCP server](#mcp-server) changes the content of a note, so a rewrite that goes wrong is one click away from being undone. These snapshots are labeled "Before AI edit" or "Before MCP edit" in the history, are skipped when the latest snapshot already holds the same content, and the 20 most recent ones are kept per note, a number you can change in **Settings → Snapshots** (1 to 200) if your instance edits a lot of notes through AI or MCP.
 *   **Expiry:** every snapshot, automatic or manual, is deleted 30 days after it was taken. A snapshot can also be deleted by hand from the Snapshots modal.
@@ -1222,7 +1249,7 @@ The notes you modified in the last 5 days are kept in each browser where you use
 *   **Reading and editing:** HTML notes, Markdown notes and task lists open in their usual editor, and new notes can be created. The / menu and the right-click menu work too, without the commands that need the server (pictures and files to upload, templates, drawings, links to other notes). Other note types, such as drawings, stay online only. Changes are kept in the browser until they are sent.
 *   **Keep offline:** favorites are always kept, and **Keep offline** in the menu of a note or of a folder (subfolders included) keeps it whatever its date, with all its attachments (PDF, audio, files) up to 25 MB each. The same menu of a note says whether it is available offline in this browser.
 *   **Back online:** the changes are sent automatically. If a note was also changed on the server in the meantime, both versions are merged when possible, otherwise your offline version is kept as a separate note named "... (offline copy)". A note deleted on the server in the meantime is created again.
-*   **Settings:** **Settings > Other > Offline notes** sets how many days of notes are kept (5 by default, up to 30, 0 turns offline notes off) and shows what the current browser holds.
+*   **Settings:** **Settings > Actions > Offline notes** sets how many days of notes are kept (5 by default, up to 30, 0 turns offline notes off) and shows what the current browser holds.
 *   **Limits:** at most 300 notes and 50 MB of text, the most recently modified first. Files are kept too: the pictures shown in these notes, and every attachment (PDF, audio, files) of the favorites and the notes kept with **Keep offline**, up to 25 MB each, 400 files and 200 MB in total, and never more than half the free space of the browser. A larger file stays online only, and the note says so when it is opened offline.
 *   **Requirements:** Poznote must be served over HTTPS (browsers keep pages offline only on a secure connection, `http://localhost` also works) and opened once online in the browser, after signing in, for the copy to be made.
 *   **Privacy:** only the notes of your own account are kept, not those of an account or a workspace shared with you. They are stored unencrypted in the browser. Signing out removes them from the browser (changes not sent yet too, after a warning that lists them): on a shared computer, sign out when you leave. Signing out also works without a network, from the offline page: the notes are removed at once, and the session on the server ends the next time Poznote opens online.

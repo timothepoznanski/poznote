@@ -682,7 +682,7 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
    body.markdown-colored and the --mdc-* colours inlined on <body> come from
    lib/markdown-colored.php (diary.php, as index.php). Same tints as the note
    preview in css/markdown.css and, like there, markdown entries only; the
-   dark fallbacks of the tokens live in css/dark-mode/markdown.css. */
+   theme defaults of the variables live in css/tokens.css. */
 
 body.markdown-colored .diary-journal-markdown h1 {
     color: var(--mdc-h1);

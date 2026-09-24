@@ -401,8 +401,6 @@
       "upload_section_title": "Neuen Anhang hochladen",
       "drag_drop_info": "Sie können Ihre Datei unten ablegen:",
       "all_types_accepted": "Alle Dateitypen akzeptiert (max 200MB)",
-      "note_taking_notice": "Poznote ist eine Notiz-App: Sie können Medien speichern, aber große Dateien füllen Ihren Speicher schnell.",
-      "note_taking_notice_link": "Meinen Speicher ansehen",
       "upload_button": "Anhängen",
       "current_attachments": "Aktuelle Anhänge",
       "loading_attachments": "Anhänge werden geladen...",
@@ -518,14 +516,14 @@
       "backlinks_at_bottom": "Zeigen Sie den Backlink-Bereich unten statt oben in Notizen an.",
       "default_image_border": "Zeigen Sie Bilder in Notizen standardmäßig mit Rahmen und ohne Innenabstand an.",
       "spellcheck_html_notes": "Aktivieren Sie die Rechtschreibprüfung des Browsers in HTML-Notizen.",
-      "slash_menu_trigger": "Wählen Sie, ob sich das Befehlsmenü mit /, mit Alt + / oder gar nicht über die Tastatur öffnet. Ein Rechtsklick in einer Notiz öffnet es unabhängig von dieser Einstellung.",
+      "slash_menu_trigger": "Wählen Sie für den Computer, ob sich das Befehlsmenü mit /, mit Alt + / oder gar nicht über die Tastatur öffnet. Ein Rechtsklick in einer Notiz öffnet es unabhängig von dieser Einstellung.",
+      "slash_menu_trigger_mobile": "Wählen Sie für Mobilgeräte, ob sich das Befehlsmenü mit /, mit Alt + / auf einer Hardwaretastatur oder gar nicht über die Tastatur öffnet.",
       "icon_sidebar_order": "Ändern Sie die Reihenfolge und die Farbe der Schaltflächen in der Icon-Seitenleiste und setzen Sie Trennlinien dazwischen.",
       "users_admin": "Benutzerkonten erstellen, bearbeiten und verwalten.",
       "oidc_config": "Konfigurieren Sie Single Sign-On mit einem OpenID-Connect-Anbieter.",
       "smtp_config": "Konfigurieren Sie den SMTP-Server für den E-Mail-Versand, z. B. für Erinnerungen.",
       "webhooks": "Senden Sie Instanzereignisse per Webhooks an externe Dienste.",
       "ai_assistant": "Konfigurieren Sie den KI-Assistenten für den Chat mit Ihren Notizen.",
-      "saas": "Anzeigeelemente für Instanzen, die als gehosteter Dienst (SaaS) angeboten werden. Standardmäßig alle ausgeblendet.",
       "git_sync_enabled": "Aktivieren oder deaktivieren Sie die Git-Synchronisation auf dieser Instanz.",
       "import_limits": "Legen Sie die maximale Anzahl von Dateien pro Import fest.",
       "user_quotas": "Begrenzen Sie die Anzahl der Notizen und den Speicherplatz pro Benutzer.",
@@ -549,6 +547,9 @@
       "highlight_current_folder_tree": "Notizen und Ordner außerhalb der Ordnerhierarchie, in der Sie arbeiten, so stark abschwächen, wie Sie möchten.",
       "snapshots": "Wählen Sie, wie viele automatische tägliche Schnappschüsse und wie viele Sicherheits-Schnappschüsse (vor einer KI- oder MCP-Änderung) pro Notiz aufbewahrt werden.",
       "stt": "Den Spracherkennungsserver konfigurieren, mit dem Notizen diktiert und Audioanhänge transkribiert werden."
+    },
+    "card_notes": {
+      "slash_menu_trigger_mobile": "Auf Mobilgeräten hat die Leiste über der Tastatur eine +-Schaltfläche, die unabhängig von dieser Einstellung dasselbe Menü öffnet."
     },
     "title": "Einstellungen",
     "collapse_section": "Bereich einklappen",
@@ -577,7 +578,14 @@
       "integrations": "Integrationen",
       "storage_limits": "Speicher und Limits",
       "appearance": "Erscheinungsbild",
-      "maintenance": "Wartung"
+      "maintenance": "Wartung",
+      "backup_sync": "Sicherungen und Synchronisierung",
+      "editing": "Bearbeitung",
+      "apps": "Apps",
+      "profile_sign_in": "Profil und Anmeldung",
+      "language_region": "Sprache und Region",
+      "storage": "Speicher",
+      "layout": "Layout"
     },
     "sections": {
       "account_display": "Konto & Anzeige",
@@ -640,7 +648,6 @@
       "smtp_config": "SMTP / E-Mail",
       "webhooks": "Admin-Webhooks",
       "ai_assistant": "KI-Assistent",
-      "saas": "SaaS-Modus",
       "s3_storage": "S3-Anhänge",
       "s3_backup": "S3-Sicherungen",
       "stt": "Transkription",
@@ -663,6 +670,22 @@
         "unavailable": "Nicht verfügbar",
         "installed": "Bereits installiert"
       }
+    },
+    "value_help": {
+      "font_size_notes": "Notizinhalt",
+      "font_size_sidebar": "Seitenleiste",
+      "font_size_code_blocks": "Codeblöcke",
+      "font_size_settings": "Einstellungsseite"
+    },
+    "storage_summary": {
+      "error": "Die Speichernutzung konnte nicht geladen werden.",
+      "notes_detail": "{{active}} in Ihren Notizen, {{trash}} im Papierkorb",
+      "local": "Belegter Speicher auf dem Server",
+      "database": "Datenbank",
+      "note_files": "Notizdateien",
+      "attachments": "Anhänge",
+      "s3_attachments": "Anhänge im S3-Speicher",
+      "s3_backups": "Sicherungen im S3-Speicher"
     }
   },
   "workspaces": {
@@ -726,7 +749,8 @@
       "edit_workspaces": "Arbeitsbereiche bearbeiten",
       "new_workspace": "Neuer Arbeitsbereich",
       "accounts": "Konten",
-      "title": "Arbeitsbereiche"
+      "title": "Arbeitsbereiche",
+      "shared_with_me": "Mit mir geteilt"
     },
     "errors": {
       "already_exists": "Ein Arbeitsbereich mit diesem Namen existiert bereits",
@@ -846,7 +870,8 @@
       "notes_dashboard": "Notiz-Board",
       "spellcheck_html_notes": "Rechtschreibprüfung",
       "note_color_palette": "Notizfarben",
-      "slash_menu_trigger": "Tastenkürzel für das Befehlsmenü",
+      "slash_menu_trigger": "Tastenkürzel für das Befehlsmenü (Computer)",
+      "slash_menu_trigger_mobile": "Tastenkürzel für das Befehlsmenü (Mobilgerät)",
       "snapshots": "Schnappschüsse",
       "show_note_icons": "Notizsymbole anzeigen"
     },
@@ -1624,6 +1649,8 @@
         "off": "Aus",
         "custom": "Benutzerdefiniert"
       },
+      "theme_hint": "Jede Farbe folgt dem Theme, bis Sie sie ändern. Der Pfeil neben einer geänderten Farbe setzt sie auf die Farbe des Themes zurück.",
+      "reset_element": "Farbe des Themes verwenden",
       "elements": {
         "h1": "Überschrift 1",
         "h2": "Überschrift 2",
@@ -4819,16 +4846,6 @@
     "empty": "Noch keine Aufgaben in dieser Liste.",
     "add_placeholder": "Aufgabe hinzufügen...",
     "save_error": "Die Aufgabenliste konnte nicht gespeichert werden."
-  },
-  "saas": {
-    "description": "Anzeigeelemente, die sinnvoll sind, wenn diese Instanz als gehosteter Dienst (SaaS) angeboten wird. Standardmäßig ist alles ausgeblendet.",
-    "section_storage_notices": "Speicherhinweise",
-    "storage_notices_label": "Speicherhinweise anzeigen",
-    "storage_notices_description": "Erinnert die Benutzer auf den Anhangseiten, der Speicherstatistik-Seite und den S3-Anhangseinstellungen daran, dass Poznote eine Notiz-App ist und kein Speicherdienst für Fotos oder Videos.",
-    "messages": {
-      "saved": "Konfiguration erfolgreich gespeichert.",
-      "save_error": "Konfiguration konnte nicht gespeichert werden."
-    }
   },
   "archive": {
     "menu_item": "Notiz archivieren",

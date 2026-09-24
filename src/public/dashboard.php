@@ -926,7 +926,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 		<script src="<?php echo poznoteAsset('js/markdown-parser.js'); ?>"></script>
 		<script src="<?php echo poznoteAsset('js/ai-chat.js'); ?>"></script>
 		<?php endif; ?>
-    <script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
     <!-- Contextual UI Customization panel (see ui_customization_panel.php) -->
     <script src="<?php echo poznoteAsset('js/ui-customization.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/ui-customization-panel.js'); ?>"></script>

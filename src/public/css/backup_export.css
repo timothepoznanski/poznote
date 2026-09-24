@@ -40,6 +40,13 @@ body {
     border-radius: var(--pz-radius);
 }
 
+/* Inside the Settings frame, with no panel around them (settings_shell.php,
+   'panel' off), the sections take the panel's ground: white on the grey
+   page like a settings section, the page's own ground in the dark themes. */
+.settings-subpage-bare .backup-section {
+    background: var(--pz-bg);
+}
+
 .backup-section h3 {
     margin-top: 0;
     color: var(--pz-text);

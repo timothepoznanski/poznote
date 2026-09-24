@@ -22,13 +22,6 @@ $currentLang = getUserLanguage();
 	<?php include __DIR__ . '/../icon_sidebar.php'; ?>
 	<div class="shared-container">
 		<h1 class="poznote-page-title"><i class="lucide lucide-paperclip"></i> <?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?> <?php echo poznoteRenderPageTitleWorkspace($pageWorkspace); ?></h1>
-		<?php if (poznoteSaasNoticesEnabled()): ?>
-		<div class="attachment-usage-notice">
-			<i class="lucide lucide-alert-triangle"></i>
-			<span><?php echo t_h('attachments.page.note_taking_notice', [], 'You can store media, but large files fill up your space quickly.'); ?>
-				<?php if (!function_exists('isSharedWorkspaceScopeActive') || !isSharedWorkspaceScopeActive()): ?><a href="storage-stats-user.php"><?php echo t_h('attachments.page.note_taking_notice_link', [], 'View my storage'); ?></a><?php endif; ?></span>
-		</div>
-		<?php endif; ?>
 
 
 		

@@ -214,13 +214,6 @@ if (!$note) {
                     <div class="accepted-types">
                         <?php echo t_h('attachments.page.all_types_accepted'); ?>
                     </div>
-                    <?php if (poznoteSaasNoticesEnabled()): ?>
-                    <div class="attachment-usage-notice">
-                        <i class="lucide lucide-alert-triangle"></i>
-                        <span><?php echo t_h('attachments.page.note_taking_notice', [], 'You can store media, but large files fill up your space quickly.'); ?>
-                            <?php if (!function_exists('isSharedWorkspaceScopeActive') || !isSharedWorkspaceScopeActive()): ?><a href="storage-stats-user.php"><?php echo t_h('attachments.page.note_taking_notice_link', [], 'View my storage'); ?></a><?php endif; ?></span>
-                    </div>
-                    <?php endif; ?>
                     <br>
                     <div class="selected-filename" id="selectedFileName"></div>
                 </div>
@@ -267,6 +260,6 @@ if (!$note) {
             </div>
         </div>
     </div>
-    <script src="js/icon-sidebar-toggle.js?v=<?php echo $v; ?>"></script>
+    <script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 </body>
 </html>

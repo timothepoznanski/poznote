@@ -77,6 +77,34 @@ components:
       description: User profile ID to access. Required for account-password Basic Auth and internal service-token data requests. OIDC Bearer JWT and app-password requests default to their own profile when omitted. Account-access grants from the web UI do not allow non-admin API credentials to target another profile; use admin credentials or the internal service token for cross-profile API access. Use GET /users/profiles to list available profiles.
 
   schemas:
+    OrphanAttachmentsResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        users:
+          type: array
+          items:
+            type: object
+            properties:
+              user_id:
+                type: integer
+              total_files:
+                type: integer
+                description: Files in the account's local attachment folder
+              orphans_found:
+                type: integer
+              orphans_deleted:
+                type: integer
+                description: Always 0 for GET
+              files:
+                type: array
+                description: Names of the orphan files
+                items:
+                  type: string
+              error:
+                type: string
+                nullable: true
     AppPassword:
       type: object
       properties:
@@ -5071,6 +5099,39 @@ paths:
                           type: string
         '403':
           description: Admin access required
+
+  /admin/orphan-attachments:
+    get:
+      tags: [Users]
+      summary: List orphan attachment files (admin only)
+      description: |
+        Scan the local attachment folder of every account and list the files
+        no note of that account references any more. Files kept in S3 storage
+        are not listed. Requires admin privileges. Does NOT require X-User-ID header.
+      responses:
+        '200':
+          description: One row per account folder
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrphanAttachmentsResult'
+        '403':
+          description: Admin access required
+    delete:
+      tags: [Users]
+      summary: Delete orphan attachment files (admin only)
+      description: |
+        Same scan as GET, then delete every file it lists. Not available with
+        an app password. Requires admin privileges. Does NOT require X-User-ID header.
+      responses:
+        '200':
+          description: One row per account folder, with the number of files deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrphanAttachmentsResult'
+        '403':
+          description: Admin access required, or app password used
 
   # ==================
   # Public Tasks Endpoints (token-based, no Basic Auth)

@@ -135,22 +135,9 @@ html[data-theme='dark'] .markdown-preview li.task-list-item input[type="checkbox
    Colored markdown (display setting)
    ============================================ */
 
-/* The styling rules live in css/markdown.css and read the --mdc-* variables.
-   The user's colors are inlined on <body> and win over these, staying
-   identical in both themes; the values below are only dark fallbacks. */
-html[data-theme='dark'] body.markdown-colored {
-    --mdc-h1: #58a6ff;
-    --mdc-h2: #3fb950;
-    --mdc-h3: #d2a8ff;
-    --mdc-h4: #f778ba;
-    --mdc-h5: #39c5cf;
-    --mdc-h6: #8b949e;
-    --mdc-code: #ffa657;
-    --mdc-codeblock: #ffa657;
-    --mdc-quote: #58a6ff;
-    --mdc-table: #58a6ff;
-    --mdc-hr: #58a6ff;
-}
+/* The styling rules live in css/markdown.css and read the --mdc-* variables,
+   whose defaults (css/tokens.css) come from the palette and switch with it,
+   so no dark value is needed here. */
 
 /* Re-assert the editor token mapping over the dark CM palette above */
 html[data-theme='dark'] body.markdown-colored .markdown-codemirror-host {

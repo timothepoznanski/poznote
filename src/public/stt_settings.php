@@ -14,6 +14,7 @@ requireAdmin();
 
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../functions.php';
+require_once __DIR__ . '/../settings_shell.php';
 require_once __DIR__ . '/../version_helper.php';
 requireSettingsPassword();
 require_once __DIR__ . '/../db_connect.php';
@@ -102,9 +103,8 @@ $sttSettingsScope = 'instance';
 </head>
 <body class="home-page git-sync-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php $iconSidebarWorkspace = $pageWorkspace; include __DIR__ . '/../icon_sidebar.php'; ?>
+    <?php poznoteSettingsShellOpen(['section' => 'admin-tools-grid', 'title' => t('settings.cards.stt', [], 'Transcription')]); ?>
     <div class="home-container git-sync-container">
-    <?php include __DIR__ . '/../back_to_settings.php'; ?>
-    <h1 class="poznote-page-title"><i class="lucide lucide-mic"></i> <?php echo t_h('settings.cards.stt', [], 'Transcription'); ?></h1>
 
         <div class="git-sync-header">
             <p class="git-sync-description"><?php echo t_h('stt_settings.description', [], 'Connect Poznote to a speech-to-text server so voice can be turned into note text. Any server speaking the OpenAI audio API works, including self-hosted Whisper servers, and the audio never leaves the machine that runs it.'); ?></p>
@@ -225,8 +225,9 @@ $sttSettingsScope = 'instance';
         </div>
 
     </div>
+    <?php poznoteSettingsShellClose(); ?>
 
-    <script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
     <?php include __DIR__ . '/../stt_settings_script.php'; ?>
 </body>

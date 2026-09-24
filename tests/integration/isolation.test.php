@@ -252,6 +252,8 @@ function routeTable(): array
         'POST /admin/users/{id}/two-factor/reset' => [ADMIN, 'target' => ['id' => 'user'], 'body' => []],
         'GET /admin/users/{id}/password-status' => [ADMIN, 'target' => ['id' => 'user']],
         'POST /admin/repair' => [ADMIN, 'body' => []],
+        'GET /admin/orphan-attachments' => [ADMIN],
+        'DELETE /admin/orphan-attachments' => [ADMIN],
 
         // --- Public share tokens -----------------------------------------
         'PATCH /public/notes/content' => [PUBLIC_TOKEN],

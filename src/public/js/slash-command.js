@@ -4,17 +4,22 @@
 (function () {
     'use strict';
 
-    // Which key opens the menu, from the "slash_menu_trigger" setting:
+    // Which key opens the menu, from the "slash_menu_trigger" setting on a
+    // computer and "slash_menu_trigger_mobile" on a mobile screen (the 800px
+    // breakpoint of the mobile layout and of the mobile editor bar):
     //   'slash'     (default) the menu opens as soon as "/" is typed
     //   'alt-slash' a bare "/" stays a literal character and the menu opens on
     //               Alt + / instead (see handleAltSlashShortcut)
     //   'disabled'  no key opens it. A right-click in the note and the Insert
     //               button of the mobile editor bar still do, so the menu is
     //               never out of reach.
+    // Read on every keystroke rather than once, so a window resized across
+    // the breakpoint follows the matching setting.
     function getSlashMenuTrigger() {
         try {
             if (typeof window.getPoznoteInitialSetting === 'function') {
-                var value = window.getPoznoteInitialSetting('slash_menu_trigger');
+                var isMobileViewport = window.matchMedia && window.matchMedia('(max-width: 800px)').matches;
+                var value = window.getPoznoteInitialSetting(isMobileViewport ? 'slash_menu_trigger_mobile' : 'slash_menu_trigger');
                 if (value === 'slash' || value === 'alt-slash' || value === 'disabled') {
                     return value;
                 }
@@ -36,16 +41,6 @@
 
     function isSlashMenuKeyDisabled() {
         return getSlashMenuTrigger() === 'disabled';
-    }
-
-    // On a phone a typed "/" stays a plain character: the Insert button of the
-    // mobile editor bar opens the menu instead (discussion #1465). Keyed on that
-    // button being on screen, so a typed "/" still opens the menu wherever the
-    // bar does not show (desktop, task inputs, a hardware keyboard, the bar or
-    // its button hidden in UI Customization) and the menu is never unreachable.
-    function isTypedSlashTakenByMobileBar() {
-        const button = document.getElementById('mobileBarInsert');
-        return !!(button && button.getClientRects().length > 0);
     }
 
     // Matches the Alt + / chord. On some keyboard layouts Alt + / emits a different
@@ -5108,7 +5103,7 @@
         editor._cmPrevLength = docLength;
         const lastChar = cursorPos > 0 ? api.sliceText(editor, cursorPos - 1, cursorPos) : '';
 
-        if (lastChar === '/' && !isDeleting && isTypedSlashModeEnabled() && !isTypedSlashTakenByMobileBar()) {
+        if (lastChar === '/' && !isDeleting && isTypedSlashModeEnabled()) {
             // The URL tests below only look at the last two characters
             const textBeforeSlash = api.sliceText(editor, Math.max(0, cursorPos - 3), cursorPos - 1);
             const isUrl = /:$/.test(textBeforeSlash) || /:\/$/.test(textBeforeSlash);
@@ -5217,7 +5212,7 @@
         // Don't open menu if we're deleting (e.g. backspace landing on a slash)
         const isDeleting = e.inputType && e.inputType.startsWith('delete');
 
-        if (lastChar === '/' && !isDeleting && isTypedSlashModeEnabled() && !isTypedSlashTakenByMobileBar()) {
+        if (lastChar === '/' && !isDeleting && isTypedSlashModeEnabled()) {
             // Check if we're typing a URL - don't open menu in that case
             const textBeforeSlash = textBefore.substring(0, textBefore.length - 1);
             // Detect URL pattern: when typing / directly after : or :/ (protocol)
@@ -5320,8 +5315,6 @@
         } else if (e.key !== '/' || e.metaKey || (e.ctrlKey && !e.altKey)) {
             // Ctrl+Alt stays allowed: it is AltGr on Windows
             return;
-        } else if (isTypedSlashTakenByMobileBar()) {
-            return;
         }
 
         if (!showSlashMenuForSelection(e.target)) return;
@@ -5332,7 +5325,7 @@
 
     function handleSelectionSlashBeforeInput(e) {
         if (e.defaultPrevented || e.inputType !== 'insertText' || e.data !== '/' || slashMenuElement) return;
-        if (!isTypedSlashModeEnabled() || isTypedSlashTakenByMobileBar()) return;
+        if (!isTypedSlashModeEnabled()) return;
         if (showSlashMenuForSelection(e.target)) e.preventDefault();
     }
 

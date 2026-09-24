@@ -672,3 +672,34 @@ html[data-theme='dark'] * {
 .excalidraw-image-neutral {
     filter: var(--pz-excalidraw-filter, none);
 }
+
+/* Colored markdown (the display setting): what each element is painted with
+   until the user picks a colour of their own, taken from the theme palette so
+   it follows light, dark and any custom theme. A picked colour is inlined on
+   <body> by lib/markdown-colored.php and wins over these. Declared here and
+   not in css/markdown.css because the journal view (css/diary.css) reads them
+   too, and the settings modal resolves them on a .markdown-colored probe to
+   show the theme's own colour in its pickers (js/settings-page.js).
+   The colours used as text (headings, inline code) are pulled toward the
+   theme's text colour in light modes: the light palette is made for fills and
+   left green, teal and orange under 4.5:1 on white, sepia and lavender. At
+   60% every one of them clears 4.5:1 on all three (inline code on its own
+   tint included). Dark modes keep the palette as it is. */
+.markdown-colored {
+    --mdc-text-mix: 60%;
+    --mdc-h1: color-mix(in srgb, var(--pz-color-blue) var(--mdc-text-mix), var(--pz-text));
+    --mdc-h2: color-mix(in srgb, var(--pz-color-green) var(--mdc-text-mix), var(--pz-text));
+    --mdc-h3: color-mix(in srgb, var(--pz-color-purple) var(--mdc-text-mix), var(--pz-text));
+    --mdc-h4: color-mix(in srgb, var(--pz-color-pink) var(--mdc-text-mix), var(--pz-text));
+    --mdc-h5: color-mix(in srgb, var(--pz-color-teal) var(--mdc-text-mix), var(--pz-text));
+    --mdc-h6: color-mix(in srgb, var(--pz-color-gray) var(--mdc-text-mix), var(--pz-text));
+    --mdc-code: color-mix(in srgb, var(--pz-color-orange) var(--mdc-text-mix), var(--pz-text));
+    --mdc-codeblock: var(--pz-color-orange);
+    --mdc-quote: var(--pz-accent-text);
+    --mdc-table: var(--pz-accent-text);
+    --mdc-hr: var(--pz-accent-text);
+}
+
+html[data-theme='dark'] .markdown-colored {
+    --mdc-text-mix: 100%;
+}

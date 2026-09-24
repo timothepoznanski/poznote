@@ -31,6 +31,8 @@
     // every other section and the desktop nav selecting the matching entry.
     var SECTION_DEEP_LINKS = {
         about: 'settings-documentation-section-grid',
+        // The "View my storage" links (attachment pages, S3 settings) and the
+        // former storage-stats-user.php page: the figures close My Account
         account: 'settings-account-section-grid',
         // "All options" button of the contextual panel (ui_customization_panel.php)
         'ui-customization': 'settings-ui-customization-section-grid'
@@ -42,20 +44,6 @@
     function deepLinkSectionGridId() {
         var open = new URLSearchParams(window.location.search || '').get('open') || '';
         return SECTION_DEEP_LINKS[open] || null;
-    }
-
-    // Get language label from code
-    function getLanguageLabel(code) {
-        switch (code) {
-            case 'zh-cn': return tr('settings.language.chinese_simplified', {}, 'Chinese (Simplified)');
-            case 'en': return tr('settings.language.english', {}, 'English');
-            case 'fr': return tr('settings.language.french', {}, 'French');
-            case 'de': return tr('settings.language.german', {}, 'German');
-            case 'pt': return tr('settings.language.portuguese', {}, 'Portuguese');
-            case 'ru': return tr('settings.language.russian', {}, 'Russian');
-            case 'es': return tr('settings.language.spanish', {}, 'Spanish');
-            default: return tr('settings.language.english', {}, 'English');
-        }
     }
 
     // ========== API Helpers ==========
@@ -138,10 +126,11 @@
             'icon_sidebar_order',
             'settings_pinned_cards',
             'spellcheck_html_notes',
-            'slash_menu_trigger'
+            'slash_menu_trigger',
+            'slash_menu_trigger_mobile'
         ];
 
-        if (document.getElementById('login-display-badge')) {
+        if (document.getElementById('login-display-input')) {
             keys.push('login_display_name');
         }
         if (isUiCustomizationAdmin()) {
@@ -384,11 +373,136 @@
         return refresh;
     }
 
-    // Slash menu trigger: a click cycles the key that opens the command menu,
-    // "/" then "Alt + /" then no key at all. The badge shows the active shortcut
-    // rather than Enabled/Disabled, since the first two states are both "on".
-    // "Disabled" only silences the keyboard: a right-click in a note and the
-    // Insert button of the mobile editor bar still open the menu.
+    // ========== Inline controls ==========
+
+    // A setting made of one small control (a list, a slider, a text field)
+    // shows that control in its row rather than behind a dialog (discussion
+    // #1378): the row is a .settings-inline-card and the control a
+    // .settings-inline-control, which saves on change. A click elsewhere on
+    // the row hands the control the focus, and opens a list.
+    //
+    // options:
+    //   load(done)          reads the current value, done(value)
+    //   save(value, done)   stores it, done(success)
+    //   format(value)       text of the row's <output>, for a slider
+    //   preview(value)      applied while a slider moves, before the save
+    //   prepare(control, value, done)  runs before the value is shown (the
+    //                       font lists hide what this device does not have)
+
+    // Pinned clones copy the row's markup, so the current value has to live in
+    // the attributes as well as in the property: the selected option carries
+    // `selected`, a slider or a field its `value` attribute.
+    function reflectInlineValue(control) {
+        if (control.tagName === 'SELECT') {
+            Array.prototype.forEach.call(control.options, function (option) {
+                option.toggleAttribute('selected', option.value === control.value);
+            });
+        } else {
+            control.setAttribute('value', control.value);
+        }
+    }
+
+    function initInlineControl(controlId, options) {
+        var control = document.getElementById(controlId);
+        if (!control) return;
+        var card = control.closest('.home-card');
+        var output = card ? card.querySelector('.settings-inline-value') : null;
+
+        function show(value) {
+            if (output && options.format) output.textContent = options.format(value);
+        }
+
+        function load() {
+            options.load(function (value) {
+                var apply = function () {
+                    value = value === null || value === undefined ? '' : String(value);
+                    // A stored value missing from the list (a timezone typed
+                    // elsewhere, a font from a later version) is kept as an
+                    // extra entry rather than shown as the first one.
+                    if (control.tagName === 'SELECT' && value !== '' && !Array.prototype.some.call(control.options, function (o) { return o.value === value; })) {
+                        var extra = document.createElement('option');
+                        extra.value = value;
+                        extra.textContent = value;
+                        control.insertBefore(extra, control.firstChild);
+                    }
+                    control.value = value;
+                    reflectInlineValue(control);
+                    show(control.value);
+                };
+                if (options.prepare) options.prepare(control, value, apply);
+                else apply();
+            });
+        }
+
+        control.addEventListener('input', function () {
+            if (options.preview) options.preview(control.value);
+            show(control.value);
+        });
+        control.addEventListener('change', function () {
+            var value = control.value;
+            show(value);
+            options.save(value, function (success) {
+                if (!success) {
+                    alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                    load();
+                    return;
+                }
+                reflectInlineValue(control);
+            });
+        });
+        // Enter in a text field saves it the way leaving it does
+        if (control.tagName === 'INPUT' && control.type === 'text') {
+            control.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    control.blur();
+                }
+            });
+        }
+
+        if (card) {
+            card.addEventListener('click', function (e) {
+                if (e.target.closest('.settings-inline-control, .setting-help, .settings-card-pin')) return;
+                focusInlineControl(control);
+            });
+        }
+
+        load();
+    }
+
+    function focusInlineControl(control) {
+        control.focus();
+        if (control.tagName === 'SELECT' && typeof control.showPicker === 'function') {
+            try { control.showPicker(); } catch (e) { /* not allowed here, focus is enough */ }
+        }
+    }
+
+    // Save helper for the controls backed by a per-user setting
+    function saveSettingValue(key, after) {
+        return function (value, done) {
+            setSetting(key, value, function (success) {
+                done(success);
+                if (success) {
+                    reloadOpener();
+                    if (after) after(value);
+                }
+            });
+        };
+    }
+
+    function loadSettingValue(key, normalize) {
+        return function (done) {
+            getSetting(key, function (value) {
+                done(normalize ? normalize(value) : value);
+            });
+        };
+    }
+
+    // Slash menu trigger: the key that opens the command menu, "/", "Alt + /"
+    // or none, set apart for a computer (slash_menu_trigger) and a mobile
+    // screen (slash_menu_trigger_mobile). "Disabled" only silences the
+    // keyboard: a right-click in a note and the Insert button of the mobile
+    // editor bar still open the menu.
     var SLASH_MENU_TRIGGERS = ['slash', 'alt-slash', 'disabled'];
 
     function normalizeSlashMenuTrigger(value) {
@@ -396,64 +510,156 @@
         return SLASH_MENU_TRIGGERS.indexOf(trigger) !== -1 ? trigger : 'slash';
     }
 
-    function setupSlashMenuTriggerCard() {
-        var card = document.getElementById('slash-menu-trigger-card');
-        var status = document.getElementById('slash-menu-trigger-status');
-        if (!card && !status) return;
+    // center_note_content: a percentage of the note column ('60%'), '0' for
+    // full width, or legacy values ('1'/'true' = 800px, bare pixel number).
+    // The slider only knows percentages: a legacy pixel width shows as the
+    // full-width end with its value, until the slider moves.
+    var noteWidthLegacyLabel = '';
 
-        function refresh() {
-            getSetting('slash_menu_trigger', function (value) {
-                if (!status) return;
-                var trigger = normalizeSlashMenuTrigger(value);
-                if (trigger === 'disabled') {
-                    status.textContent = tr('common.disabled', {}, 'Disabled');
-                    status.className = 'setting-status disabled';
-                    return;
-                }
-                status.textContent = trigger === 'alt-slash'
-                    ? tr('display.badges.slash_menu_alt_slash', {}, 'Alt + /')
-                    : tr('display.badges.slash_menu_slash', {}, '/');
-                status.className = 'setting-status enabled';
-            });
+    function noteWidthSliderValue(value) {
+        value = (value === null || value === undefined) ? '' : String(value).trim();
+        noteWidthLegacyLabel = '';
+        if (/^\d+%$/.test(value)) {
+            return String(Math.max(10, Math.min(100, parseInt(value, 10))));
         }
-
-        if (card) {
-            card.addEventListener('click', function () {
-                getSetting('slash_menu_trigger', function (currentValue) {
-                    var current = normalizeSlashMenuTrigger(currentValue);
-                    var next = SLASH_MENU_TRIGGERS[(SLASH_MENU_TRIGGERS.indexOf(current) + 1) % SLASH_MENU_TRIGGERS.length];
-                    setSetting('slash_menu_trigger', next, function (success) {
-                        if (!success) {
-                            alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
-                            return;
-                        }
-                        refresh();
-                        reloadOpener();
-                    });
-                });
-            });
+        if (value !== '' && value !== '0' && value !== 'false' && value !== '100%') {
+            noteWidthLegacyLabel = (value === '1' || value === 'true' ? '800' : value) + 'px';
         }
-
-        refresh();
+        return '100';
     }
 
-    // ========== Badge Refresh Functions ==========
+    function noteWidthLabel(value) {
+        if (noteWidthLegacyLabel) return noteWidthLegacyLabel;
+        var width = parseInt(value, 10);
+        return (isNaN(width) || width >= 100)
+            ? tr('modals.note_width.full_width', {}, 'Full Width')
+            : width + '%';
+    }
 
-    function refreshLoginDisplayBadge() {
-        var txt = getTranslations();
-        var badge = document.getElementById('login-display-badge');
-        if (!badge) return;
+    function initInlineControls() {
+        var store = window.__poznoteUserStorage || window.localStorage;
 
-        getSetting('login_display_name', function (value) {
-            if (value && value.trim()) {
-                badge.textContent = value.trim();
-                badge.className = 'setting-status enabled';
-            } else {
-                badge.textContent = txt.notDefined;
-                badge.className = 'setting-status disabled';
+        initInlineControl('language-select', {
+            load: loadSettingValue('language', function (value) { return value || 'en'; }),
+            // The whole page is translated server side: reload it in the new language
+            save: saveSettingValue('language', function () {
+                setTimeout(function () { window.location.reload(); }, 300);
+            })
+        });
+
+        initInlineControl('timezone-select', {
+            load: loadSettingValue('timezone', function (value) { return (value && value.trim()) || 'Europe/Paris'; }),
+            save: saveSettingValue('timezone')
+        });
+
+        // Both fonts live in the browser (per user, theme-init.js applies
+        // them before the first paint). The lists hide the fonts this device
+        // does not have, keeping the stored one so it can be changed.
+        var hideMissingFonts = function (probe) {
+            return function (control, value, done) {
+                probe(function (available) {
+                    Array.prototype.forEach.call(control.options, function (option) {
+                        var show = option.value === value || available[option.value] !== false;
+                        option.hidden = !show;
+                        option.disabled = !show;
+                    });
+                    done();
+                });
+            };
+        };
+
+        initInlineControl('main-font-select', {
+            load: function (done) { done(store.getItem('main_font') || 'inter'); },
+            prepare: hideMissingFonts(probeMainFonts),
+            save: function (value, done) {
+                store.setItem('main_font', value);
+                if (typeof window.__poznoteApplyMainFont === 'function') {
+                    window.__poznoteApplyMainFont(value);
+                }
+                done(true);
+                reloadOpener();
+            }
+        });
+
+        initInlineControl('markdown-font-select', {
+            load: function (done) { done(store.getItem('markdown_font') || 'inherit'); },
+            prepare: hideMissingFonts(probeMarkdownFonts),
+            save: function (value, done) {
+                store.setItem('markdown_font', value);
+                if (typeof window.__poznoteApplyEditorFont === 'function') {
+                    window.__poznoteApplyEditorFont(value);
+                }
+                done(true);
+                reloadOpener();
+            }
+        });
+
+        // Read by js/index-icon-scale-settings.js on the notes page
+        initInlineControl('index-icon-scale-range', {
+            load: function (done) { done(parseFloat(store.getItem('index_icon_scale') || '1.0').toFixed(1)); },
+            format: function (value) { return parseFloat(value).toFixed(1) + 'x'; },
+            save: function (value, done) {
+                store.setItem('index_icon_scale', parseFloat(value).toFixed(1));
+                done(true);
+                reloadOpener();
+            }
+        });
+
+        initInlineControl('note-width-range', {
+            load: loadSettingValue('center_note_content', noteWidthSliderValue),
+            format: noteWidthLabel,
+            preview: function () { noteWidthLegacyLabel = ''; },
+            // 100 is full width, stored as '0' like before so existing
+            // readers keep working
+            save: function (value, done) {
+                var width = parseInt(value, 10);
+                noteWidthLegacyLabel = '';
+                saveSettingValue('center_note_content')(
+                    (isNaN(width) || width >= 100) ? '0' : Math.max(10, width) + '%',
+                    done
+                );
+            }
+        });
+
+        initInlineControl('markdown-default-view-mode-select', {
+            load: loadSettingValue('markdown_default_view_mode', normalizeMarkdownDefaultViewMode),
+            save: saveSettingValue('markdown_default_view_mode')
+        });
+
+        initInlineControl('slash-menu-trigger-select', {
+            load: loadSettingValue('slash_menu_trigger', normalizeSlashMenuTrigger),
+            save: saveSettingValue('slash_menu_trigger')
+        });
+
+        initInlineControl('slash-menu-trigger-mobile-select', {
+            load: loadSettingValue('slash_menu_trigger_mobile', normalizeSlashMenuTrigger),
+            save: saveSettingValue('slash_menu_trigger_mobile')
+        });
+
+        initInlineControl('tasklist-insert-order-select', {
+            load: loadSettingValue('tasklist_insert_order', function (value) {
+                return value === 'top' ? 'top' : 'bottom';
+            }),
+            save: saveSettingValue('tasklist_insert_order')
+        });
+
+        initInlineControl('diary-note-type-select', {
+            load: loadSettingValue('diary_default_note_type', function (value) {
+                return value === 'markdown' ? 'markdown' : 'html';
+            }),
+            save: saveSettingValue('diary_default_note_type')
+        });
+
+        // Instance-wide (master database), administrators only
+        initInlineControl('login-display-input', {
+            load: loadSettingValue('login_display_name', function (value) { return (value || '').trim(); }),
+            save: function (value, done) {
+                setSetting('login_display_name', value.trim(), done);
             }
         });
     }
+
+    // ========== Badge Refresh Functions ==========
 
     // The settings page default is viewport dependent (13px on phones); the
     // literal mirrors js/font-size-settings.js for the rare load order where
@@ -481,19 +687,6 @@
                 badge.className = 'setting-status enabled';
             }
         });
-    }
-
-    function getMainFontLabel(fontKey) {
-        var labels = {
-            inter: tr('modals.main_font.options.inter', {}, 'Inter (default)'),
-            system: tr('modals.main_font.options.system', {}, 'System'),
-            arial: 'Arial',
-            verdana: 'Verdana',
-            trebuchet: 'Trebuchet MS',
-            georgia: 'Georgia',
-            times: 'Times New Roman'
-        };
-        return labels[fontKey] || labels.inter;
     }
 
     // Probe which main-font options actually resolve on this device.
@@ -538,32 +731,6 @@
         });
     }
 
-    function refreshMainFontBadge() {
-        var badge = document.getElementById('main-font-badge');
-        if (badge) {
-            var font = (window.__poznoteUserStorage || localStorage).getItem('main_font') || 'inter';
-            badge.textContent = getMainFontLabel(font);
-            badge.className = 'setting-status enabled';
-        }
-    }
-
-    function getMarkdownFontLabel(fontKey) {
-        var labels = {
-            inherit: tr('modals.markdown_font.options.inherit', {}, 'App font (default)'),
-            monospace: tr('modals.markdown_font.options.monospace', {}, 'System monospace'),
-            courier: 'Courier New',
-            consolas: 'Consolas',
-            menlo: 'Menlo',
-            monaco: 'Monaco',
-            jetbrains: 'JetBrains Mono',
-            cascadia: 'Cascadia Code',
-            fira: 'Fira Code',
-            sourcecodepro: 'Source Code Pro',
-            ubuntumono: 'Ubuntu Mono'
-        };
-        return labels[fontKey] || labels.inherit;
-    }
-
     // Probe which markdown-editor fonts exist on this device. Only the first
     // name of each stack is tested: the rest are fallbacks that would make an
     // absent font look available. 'inherit' is the default and 'monospace' is
@@ -606,56 +773,6 @@
             } catch (e) {
                 result[key] = true;
                 done();
-            }
-        });
-    }
-
-    function refreshMarkdownFontBadge() {
-        var badge = document.getElementById('markdown-font-badge');
-        if (badge) {
-            var font = (window.__poznoteUserStorage || localStorage).getItem('markdown_font') || 'inherit';
-            badge.textContent = getMarkdownFontLabel(font);
-            badge.className = 'setting-status enabled';
-        }
-    }
-
-    function refreshIndexIconScaleBadge() {
-        var badge = document.getElementById('index-icon-scale-badge');
-        if (badge) {
-            var scale = (window.__poznoteUserStorage || localStorage).getItem('index_icon_scale') || '1.0';
-            badge.textContent = parseFloat(scale).toFixed(1) + 'x';
-            badge.className = 'setting-status enabled';
-        }
-    }
-
-    // center_note_content: a percentage of the note column ('60%'), '0' for
-    // full width, or legacy values ('1'/'true' = 800px, bare pixel number).
-    function refreshNoteWidthBadge() {
-        getSetting('center_note_content', function (value) {
-            var badge = document.getElementById('note-width-badge');
-            if (badge) {
-                value = (value === null || value === undefined) ? '' : String(value).trim();
-                if (value === '0' || value === 'false' || value === '' || value === '100%') {
-                    badge.textContent = tr('modals.note_width.full_width', {}, 'Full Width');
-                } else if (/^\d+%$/.test(value)) {
-                    badge.textContent = value;
-                } else {
-                    var width = value;
-                    if (width === '1' || width === 'true') width = '800';
-                    badge.textContent = width + 'px';
-                }
-                badge.className = 'setting-status enabled';
-            }
-        });
-    }
-
-    function refreshLanguageBadge() {
-        getSetting('language', function (value) {
-            var badge = document.getElementById('language-badge');
-            if (badge) {
-                var langValue = value || 'en';
-                badge.textContent = getLanguageLabel(langValue);
-                badge.className = 'setting-status enabled';
             }
         });
     }
@@ -972,53 +1089,6 @@
         });
     }
 
-    function refreshTasklistInsertOrderBadge() {
-        getSetting('tasklist_insert_order', function (value) {
-            var badge = document.getElementById('tasklist-insert-order-badge');
-            if (!badge) return;
-
-            var order = (value === 'top' || value === 'bottom') ? value : 'bottom';
-            var isTop = order === 'top';
-
-            badge.textContent = isTop
-                ? tr('tasklist.insert_order_top', {}, 'Top')
-                : tr('tasklist.insert_order_bottom', {}, 'Bottom');
-            badge.className = 'setting-status enabled';
-
-            var card = document.getElementById('tasklist-insert-order-card');
-            if (card) {
-                var icon = card.querySelector('.home-card-icon i');
-                if (icon) {
-                    icon.classList.toggle('lucide-arrow-up', isTop);
-                    icon.classList.toggle('lucide-arrow-down', !isTop);
-                }
-            }
-        });
-    }
-
-    function refreshDiaryNoteTypeBadge() {
-        getSetting('diary_default_note_type', function (value) {
-            var badge = document.getElementById('diary-note-type-badge');
-            if (!badge) return;
-
-            var isMarkdown = value === 'markdown';
-
-            badge.textContent = isMarkdown
-                ? tr('modals.create.markdown.title', {}, 'Markdown Note')
-                : tr('modals.create.note.title', {}, 'Note');
-            badge.className = 'setting-status enabled';
-
-            var card = document.getElementById('diary-note-type-card');
-            if (card) {
-                var icon = card.querySelector('.home-card-icon i');
-                if (icon) {
-                    icon.classList.toggle('lucide-file-code', isMarkdown);
-                    icon.classList.toggle('lucide-book-open', !isMarkdown);
-                }
-            }
-        });
-    }
-
     // Diary entry title formats; must mirror getDiaryDateFormats() in functions.php.
     var DIARY_DATE_FORMATS = ['ymd', 'dmy_slash', 'mdy_slash', 'dmy_dot', 'ymd_slash', 'long'];
 
@@ -1125,21 +1195,6 @@
         });
     }
 
-    function refreshTimezoneBadge() {
-        getSetting('timezone', function (value) {
-            var badge = document.getElementById('timezone-badge');
-            if (badge) {
-                if (value && value.trim()) {
-                    badge.textContent = value.trim();
-                    badge.className = 'setting-status enabled';
-                } else {
-                    badge.textContent = 'Europe/Paris';
-                    badge.className = 'setting-status disabled';
-                }
-            }
-        });
-    }
-
     function normalizeDateTimeFormat(value) {
         if (typeof value === 'string' && value.indexOf('custom:') === 0 && value.slice(7).trim() !== '') {
             return 'custom:' + value.slice(7).trim();
@@ -1191,57 +1246,8 @@
         }
     }
 
-    function getMarkdownDefaultViewModeLabel(mode) {
-        switch (mode) {
-            case 'edit':
-                return tr('modals.markdown_default_view_mode.options.edit', {}, 'Edit');
-            case 'split':
-                return tr('modals.markdown_default_view_mode.options.split_short', {}, 'Split');
-            case 'last':
-                return tr('modals.markdown_default_view_mode.options.last', {}, 'Last used mode');
-            default:
-                return tr('modals.markdown_default_view_mode.options.preview', {}, 'Preview');
-        }
-    }
-
     function normalizeMarkdownDefaultViewMode(value) {
         return ['preview', 'edit', 'split', 'last'].indexOf(value) !== -1 ? value : 'preview';
-    }
-
-    function refreshMarkdownDefaultViewModeBadge() {
-        getSetting('markdown_default_view_mode', function (value) {
-            var badge = document.getElementById('markdown-default-view-mode-badge');
-            if (!badge) return;
-
-            var mode = normalizeMarkdownDefaultViewMode(value);
-            badge.textContent = getMarkdownDefaultViewModeLabel(mode);
-            badge.className = 'setting-status enabled';
-
-            var card = document.getElementById('markdown-default-view-mode-card');
-            if (card) {
-                var icon = card.querySelector('.home-card-icon i');
-                if (icon) {
-                    icon.classList.toggle('lucide-book-open', mode === 'preview');
-                    icon.classList.toggle('lucide-pencil', mode === 'edit');
-                    icon.classList.toggle('lucide-columns-2', mode === 'split');
-                    icon.classList.toggle('lucide-history', mode === 'last');
-                }
-            }
-        });
-    }
-
-    function openMarkdownDefaultViewModeModal() {
-        var modal = document.getElementById('markdownDefaultViewModeModal');
-        if (!modal) return;
-
-        getSetting('markdown_default_view_mode', function (value) {
-            var currentValue = normalizeMarkdownDefaultViewMode(value);
-            var radios = document.getElementsByName('markdownDefaultViewMode');
-            for (var i = 0; i < radios.length; i++) {
-                radios[i].checked = (radios[i].value === currentValue);
-            }
-            modal.style.display = 'flex';
-        });
     }
 
     function refreshDateTimeFormatBadge() {
@@ -1297,7 +1303,8 @@
     /**
      * The card shows the raw quota values only, comma-separated and in the
      * same order as the fields of the modal behind it (notes, local storage,
-     * S3 attachments, S3 backups). 0 means no limit and renders as "∞".
+     * S3 attachments, S3 backups), and names each one on hover (data-tooltip,
+     * one line per value). 0 means no limit and renders as "∞".
      * Badges whose S3 feature is disabled are not in the DOM, so they are
      * skipped and the list closes up.
      */
@@ -1306,10 +1313,10 @@
         if (!badge) return;
 
         var pools = [
-            { key: 'user_max_notes', shown: true },
-            { key: 'user_max_storage_mb', shown: true },
-            { key: 'user_max_storage_s3_mb', shown: !!badge.dataset.s3Attachments },
-            { key: 'user_max_backups_s3_mb', shown: !!badge.dataset.s3Backups }
+            { key: 'user_max_notes', label: 'notes', shown: true },
+            { key: 'user_max_storage_mb', label: 'storage', shown: true },
+            { key: 'user_max_storage_s3_mb', label: 'storage-s3', shown: !!badge.dataset.s3Attachments },
+            { key: 'user_max_backups_s3_mb', label: 'backups-s3', shown: !!badge.dataset.s3Backups }
         ].filter(function (pool) { return pool.shown; });
 
         var values = new Array(pools.length);
@@ -1322,6 +1329,11 @@
                 if (--pending > 0) return;
 
                 badge.textContent = values.join(', ');
+                // The bare values mean little on their own: the hover text
+                // names each one, with the labels of the quotas dialog.
+                badge.setAttribute('data-tooltip', pools.map(function (p, i) {
+                    return (badge.getAttribute('data-label-' + p.label) || p.key) + ': ' + values[i];
+                }).join('\n'));
                 // "Enabled" here means at least one pool is actually capped
                 var anyLimited = values.some(function (v) { return v !== '∞'; });
                 badge.className = 'setting-status ' + (anyLimited ? 'enabled' : 'disabled');
@@ -2098,20 +2110,12 @@
         });
     }
 
-    function showLanguageModal() {
-        var modal = document.getElementById('languageModal');
-        if (!modal) return;
-        getSetting('language', function (value) {
-            var v = value || 'en';
-            var radios = document.getElementsByName('languageChoice');
-            for (var i = 0; i < radios.length; i++) {
-                radios[i].checked = (radios[i].value === v);
-            }
-            modal.style.display = 'flex';
-        });
-    }
-
-    var MARKDOWN_COLORED_DEFAULTS = {
+    // Colored markdown: an element follows the theme (css/tokens.css,
+    // .markdown-colored) until the user picks a colour for it; the stored JSON
+    // holds "" for the ones that follow. These are the fixed colours the modal
+    // used to prefill and save for all eleven, read back as "follow the theme"
+    // like POZNOTE_MARKDOWN_COLORED_LEGACY_DEFAULTS in lib/markdown-colored.php.
+    var MARKDOWN_COLORED_LEGACY_DEFAULTS = {
         h1: '#007db8',
         h2: '#1a7f37',
         h3: '#8250df',
@@ -2125,15 +2129,68 @@
         hr: '#007db8'
     };
 
-    // Values saved before per-level heading colors existed used a single
+    // The colour the user picked for an element, null when it follows the
+    // theme. Values saved before per-level heading colors existed used a single
     // 'heading' color and had no code block background.
     function markdownColoredStoredColor(parsed, el) {
-        var isColor = function (v) { return /^#[0-9a-fA-F]{6}$/.test(v || ''); };
-        if (!parsed) return null;
-        if (isColor(parsed[el])) return parsed[el];
-        if (/^h[1-6]$/.test(el) && isColor(parsed.heading)) return parsed.heading;
-        if (el === 'codeblock' && isColor(parsed.code)) return parsed.code;
-        return null;
+        if (!parsed || typeof parsed !== 'object') return null;
+        var value = parsed[el];
+        if (value === undefined) {
+            if (/^h[1-6]$/.test(el)) value = parsed.heading;
+            else if (el === 'codeblock') value = parsed.code;
+        }
+        if (!/^#[0-9a-fA-F]{6}$/.test(value || '')) return null;
+        return value.toLowerCase() === MARKDOWN_COLORED_LEGACY_DEFAULTS[el] ? null : value.toLowerCase();
+    }
+
+    // The theme's colour for an element as #rrggbb, which is all a colour
+    // input accepts. A probe carrying .markdown-colored resolves the default
+    // against the current theme (a custom stylesheet included). The light
+    // defaults are color-mix(), which computes to color(srgb r g b); any other
+    // syntax a theme may use goes through a canvas to get sRGB bytes.
+    var markdownColoredCanvas = null;
+    function markdownColoredThemeColor(el) {
+        var probe = document.createElement('span');
+        probe.className = 'markdown-colored';
+        probe.hidden = true;
+        probe.style.color = 'var(--mdc-' + el + ')';
+        document.body.appendChild(probe);
+        var computed = getComputedStyle(probe).color;
+        probe.remove();
+        var toHex = function (channels) {
+            return '#' + channels.map(function (c) {
+                var v = Math.max(0, Math.min(255, Math.round(c)));
+                return (v < 16 ? '0' : '') + v.toString(16);
+            }).join('');
+        };
+        var m = /^rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)/.exec(computed);
+        if (m) return toHex([+m[1], +m[2], +m[3]]);
+        m = /^color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)/.exec(computed);
+        if (m) return toHex([m[1] * 255, m[2] * 255, m[3] * 255]);
+        try {
+            if (!markdownColoredCanvas) {
+                markdownColoredCanvas = document.createElement('canvas');
+                markdownColoredCanvas.width = 1;
+                markdownColoredCanvas.height = 1;
+            }
+            var ctx = markdownColoredCanvas.getContext('2d');
+            ctx.clearRect(0, 0, 1, 1);
+            ctx.fillStyle = computed;
+            ctx.fillRect(0, 0, 1, 1);
+            var px = ctx.getImageData(0, 0, 1, 1).data;
+            return toHex([px[0], px[1], px[2]]);
+        } catch (e) {
+            console.debug('settings-page: markdownColoredThemeColor() failed:', e);
+            return MARKDOWN_COLORED_LEGACY_DEFAULTS[el];
+        }
+    }
+
+    // A picker is "picked" once the user changed it or it opened on a stored
+    // colour; its reset button (css/modals/base.css) only shows then.
+    function setMarkdownColoredPicked(input, picked) {
+        input.toggleAttribute('data-mdc-picked', picked);
+        var label = input.closest('label');
+        if (label) label.classList.toggle('mdc-picked', picked);
     }
 
     function normalizeMarkdownColoredTheme(value) {
@@ -2186,7 +2243,9 @@
                 var inputs = document.querySelectorAll('#markdownColoredCustomRow input[data-mdc-element]');
                 inputs.forEach(function (input) {
                     var el = input.getAttribute('data-mdc-element');
-                    input.value = markdownColoredStoredColor(parsed, el) || MARKDOWN_COLORED_DEFAULTS[el];
+                    var stored = markdownColoredStoredColor(parsed, el);
+                    input.value = stored || markdownColoredThemeColor(el);
+                    setMarkdownColoredPicked(input, !!stored);
                 });
                 updateMarkdownColoredCustomRow();
                 modal.style.display = 'flex';
@@ -2320,19 +2379,6 @@
         });
     }
 
-    function showTimezonePrompt() {
-        var modal = document.getElementById('timezoneModal');
-        if (!modal) return;
-        getSetting('timezone', function (value) {
-            var currentValue = value || 'Europe/Paris';
-            var select = document.getElementById('timezoneSelect');
-            if (select) {
-                select.value = currentValue;
-            }
-            modal.style.display = 'flex';
-        });
-    }
-
     function openDateTimeFormatModal() {
         var modal = document.getElementById('dateTimeFormatModal');
         if (!modal) return;
@@ -2383,6 +2429,244 @@
 
 
 
+    // ========== My Account: storage used ==========
+
+    // The account's storage closes the My Account section instead of sitting
+    // behind a card of its own (discussion #1378). Measuring it walks the
+    // account's folders and asks the backup bucket, so the figures arrive
+    // after the page, rendered by storage-stats-user.php?fragment=1.
+    function loadStorageSummary() {
+        var box = document.getElementById('storage-stats-user-card');
+        var src = box ? box.getAttribute('data-src') : '';
+        if (!src) return;
+
+        fetch(src, { credentials: 'same-origin', headers: { 'Accept': 'text/html' } })
+            .then(function (r) {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.text();
+            })
+            .then(function (html) {
+                box.innerHTML = html;
+            })
+            .catch(function (e) {
+                console.debug('settings-page: loadStorageSummary() failed:', e);
+                var message = document.createElement('div');
+                message.className = 'settings-storage-summary-loading';
+                message.textContent = box.getAttribute('data-error') || '';
+                box.replaceChildren(message);
+            });
+    }
+
+    // ========== Admin Tools: maintenance dialogs ==========
+
+    // Rebuilding the master database and cleaning up orphan attachments are
+    // one or two buttons each: dialogs over the Admin Tools section rather
+    // than pages of their own (discussion #1378).
+    function setMaintenanceBusy(button, busy) {
+        if (!button) return;
+        if (busy) {
+            button.dataset.label = button.textContent;
+            button.textContent = tr('multiuser.admin.processing', {}, 'Processing...');
+        } else if (button.dataset.label) {
+            button.textContent = button.dataset.label;
+        }
+        button.disabled = busy;
+    }
+
+    function showMaintenanceResult(element, text, isError) {
+        if (!element) return;
+        element.textContent = text;
+        element.classList.toggle('is-error', !!isError);
+        element.hidden = !text;
+    }
+
+    function maintenanceRequest(method) {
+        return fetch('/api/v1/admin/' + (method === 'POST' ? 'repair' : 'orphan-attachments'), {
+            method: method,
+            headers: { 'Accept': 'application/json' },
+            credentials: 'same-origin'
+        }).then(function (r) {
+            return r.json().catch(function () {
+                throw new Error('HTTP ' + r.status);
+            });
+        });
+    }
+
+    function renderOrphanScan(tbody, users) {
+        tbody.replaceChildren();
+        users.forEach(function (row) {
+            var line = document.createElement('tr');
+            var cells = [String(row.user_id), String(row.total_files || 0)];
+            cells.forEach(function (text) {
+                var td = document.createElement('td');
+                td.textContent = text;
+                line.appendChild(td);
+            });
+
+            var countCell = document.createElement('td');
+            var count = document.createElement('span');
+            count.className = 'orphan-count' + ((row.orphans_found || 0) > 0 ? ' has-orphans' : '');
+            count.textContent = String(row.orphans_found || 0);
+            countCell.appendChild(count);
+            line.appendChild(countCell);
+
+            // Files: the error, what the delete removed, or the list itself,
+            // folded so a large account does not stretch the dialog
+            var filesCell = document.createElement('td');
+            var files = Array.isArray(row.files) ? row.files : [];
+            if (row.error) {
+                filesCell.className = 'orphan-error';
+                filesCell.textContent = row.error;
+            } else if ((row.orphans_deleted || 0) > 0) {
+                filesCell.textContent = tr('admin_tools.orphan_scanner.deleted_files', { count: row.orphans_deleted }, 'Deleted ' + row.orphans_deleted + ' files');
+            } else if (files.length > 0) {
+                var details = document.createElement('details');
+                var summary = document.createElement('summary');
+                summary.textContent = tr('admin_tools.orphan_scanner.view_files', { count: files.length }, 'View ' + files.length + ' files');
+                var list = document.createElement('ul');
+                files.forEach(function (name) {
+                    var item = document.createElement('li');
+                    item.textContent = name;
+                    list.appendChild(item);
+                });
+                details.appendChild(summary);
+                details.appendChild(list);
+                filesCell.appendChild(details);
+            } else {
+                filesCell.textContent = '-';
+            }
+            line.appendChild(filesCell);
+            tbody.appendChild(line);
+        });
+    }
+
+    function initMaintenanceModals() {
+        var repairCard = document.getElementById('disaster-recovery-card');
+        var repairModal = document.getElementById('disasterRecoveryModal');
+        var repairButton = document.getElementById('disasterRecoveryRunBtn');
+        var repairResult = document.getElementById('disasterRecoveryResult');
+
+        var openRepair = function () {
+            if (!repairModal) return;
+            showMaintenanceResult(repairResult, '', false);
+            repairModal.style.display = 'flex';
+        };
+        if (repairCard) repairCard.addEventListener('click', openRepair);
+
+        if (repairButton) {
+            repairButton.addEventListener('click', function () {
+                setMaintenanceBusy(repairButton, true);
+                maintenanceRequest('POST')
+                    .then(function (result) {
+                        if (!result || !result.success) {
+                            showMaintenanceResult(repairResult, tr('multiuser.admin.maintenance.repair_registry_error', { error: (result && result.error) || '' }, 'Rebuild error: ' + ((result && result.error) || '')), true);
+                            return;
+                        }
+                        var stats = result.stats || {};
+                        var text = tr('multiuser.admin.maintenance.repair_registry_success', {
+                            scanned: stats.users_scanned,
+                            added: stats.users_added,
+                            links: stats.links_rebuilt
+                        }, 'Master database rebuilt.');
+                        if (Array.isArray(stats.errors) && stats.errors.length > 0) {
+                            text += '\n\n' + tr('multiuser.admin.errors_label', {}, 'Errors:') + '\n' + stats.errors.join('\n');
+                        }
+                        showMaintenanceResult(repairResult, text, false);
+                    })
+                    .catch(function (e) {
+                        showMaintenanceResult(repairResult, tr('multiuser.admin.network_error', {}, 'Network error: ') + e.message, true);
+                    })
+                    .then(function () {
+                        setMaintenanceBusy(repairButton, false);
+                    });
+            });
+        }
+
+        var orphanCard = document.getElementById('orphan-scanner-card');
+        var orphanModal = document.getElementById('orphanScannerModal');
+        var scanButton = document.getElementById('orphanScannerScanBtn');
+        var deleteButton = document.getElementById('orphanScannerDeleteBtn');
+        var results = document.getElementById('orphanScannerResults');
+        var tbody = results ? results.querySelector('tbody') : null;
+        var status = document.getElementById('orphanScannerStatus');
+
+        var showOrphans = function (users, afterDelete) {
+            users = Array.isArray(users) ? users : [];
+            renderOrphanScan(tbody, users);
+            results.hidden = users.length === 0;
+            var found = users.some(function (row) { return (row.orphans_found || 0) > 0 && !(row.orphans_deleted > 0); });
+            if (deleteButton) deleteButton.hidden = !found;
+            if (users.length === 0) {
+                showMaintenanceResult(status, tr('public.no_filter_results', {}, 'No results found.'), false);
+            } else {
+                showMaintenanceResult(status, '', false);
+            }
+            if (afterDelete && deleteButton) deleteButton.hidden = true;
+        };
+
+        var openOrphans = function () {
+            if (!orphanModal) return;
+            if (results) results.hidden = true;
+            if (deleteButton) deleteButton.hidden = true;
+            showMaintenanceResult(status, '', false);
+            orphanModal.style.display = 'flex';
+        };
+        if (orphanCard) orphanCard.addEventListener('click', openOrphans);
+
+        var runOrphans = function (method, button) {
+            setMaintenanceBusy(button, true);
+            maintenanceRequest(method)
+                .then(function (result) {
+                    if (!result || !result.success) {
+                        showMaintenanceResult(status, (result && result.error) || tr('common.error', {}, 'Error'), true);
+                        return;
+                    }
+                    showOrphans(result.users, method === 'DELETE');
+                })
+                .catch(function (e) {
+                    showMaintenanceResult(status, tr('multiuser.admin.network_error', {}, 'Network error: ') + e.message, true);
+                })
+                .then(function () {
+                    setMaintenanceBusy(button, false);
+                });
+        };
+
+        if (scanButton && tbody) {
+            scanButton.addEventListener('click', function () {
+                runOrphans('GET', scanButton);
+            });
+        }
+
+        if (deleteButton && tbody) {
+            deleteButton.addEventListener('click', function () {
+                var message = tr('admin_tools.orphan_scanner.delete_confirm', {}, 'Are you sure you want to permanently delete these files?');
+                var confirmed = window.modalAlert && typeof window.modalAlert.confirm === 'function'
+                    ? window.modalAlert.confirm(message, deleteButton.textContent, {
+                        alertType: 'warning',
+                        confirmText: deleteButton.textContent,
+                        confirmButtonClass: 'danger'
+                    })
+                    : Promise.resolve(window.confirm(message));
+                confirmed.then(function (ok) {
+                    if (ok) runOrphans('DELETE', deleteButton);
+                });
+            });
+        }
+
+        // The former pages admin/disaster-recovery.php and
+        // admin/orphan-scanner.php now land here: ?open= opens their dialog.
+        var open = new URLSearchParams(window.location.search || '').get('open');
+        if (open === 'disaster-recovery' || open === 'orphan-scanner') {
+            if (open === 'disaster-recovery') openRepair();
+            else openOrphans();
+            if (window.history && typeof window.history.replaceState === 'function') {
+                var cleanUrl = new URL(window.location.href);
+                cleanUrl.searchParams.delete('open');
+                window.history.replaceState(window.history.state, '', cleanUrl.toString());
+            }
+        }
+    }
+
     // ========== Initialization ==========
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -2411,27 +2695,14 @@
             });
         }
 
-        // Navigation cards (left column)
-        var navCards = {
-            'backup-export-card': 'backup_export.php',
-            'restore-import-card': 'restore_import.php',
-            'users-admin-card': 'admin/users.php'
-        };
-        Object.keys(navCards).forEach(function (cardId) {
-            var card = document.getElementById(cardId);
-            if (card) {
-                card.addEventListener('click', function () {
-                    window.location = navCards[cardId];
-                });
-            }
-        });
-
-        // Generic clickable cards with data-href attribute (excluding already handled cards)
+        // Cards opening a page: the ones that are not links carry the target
+        // in data-href. Backup / Export and Restore / Import are <a> cards,
+        // which the browser follows on its own: a second window.location on
+        // them started two navigations, the second cancelling the first and
+        // its service worker preload ("navigation preload request was
+        // cancelled"), and dropped the workspace their href carries.
         var clickableCards = document.querySelectorAll('.settings-card-clickable[data-href]');
         clickableCards.forEach(function (card) {
-            // Skip if already handled in navCards
-            if (card.id && navCards[card.id]) return;
-
             card.addEventListener('click', function () {
                 var href = card.getAttribute('data-href');
                 if (href) {
@@ -2486,6 +2757,8 @@
         }
 
         initAboutLinkEditors();
+        initMaintenanceModals();
+        loadStorageSummary();
 
         if (openGithubApiDocsBtn) {
             openGithubApiDocsBtn.addEventListener('click', function () {
@@ -2556,14 +2829,11 @@
         setupToggleCard('backlinks-at-bottom-card', 'backlinks-at-bottom-status', 'backlinks_at_bottom', false, false);
         setupToggleCard('default-image-border-card', 'default-image-border-status', 'default_image_border_no_padding', false, false);
         setupToggleCard('spellcheck-html-notes-card', 'spellcheck-html-notes-status', 'spellcheck_html_notes', false, false);
-        setupSlashMenuTriggerCard();
+
+        // Settings shown as a control in their row (initInlineControl)
+        initInlineControls();
 
         // Card click handlers for modal settings
-        var languageCard = document.getElementById('language-card');
-        if (languageCard) {
-            languageCard.addEventListener('click', showLanguageModal);
-        }
-
         var markdownColoredCard = document.getElementById('markdown-colored-card');
         if (markdownColoredCard) {
             markdownColoredCard.addEventListener('click', openMarkdownColoredModal);
@@ -2631,19 +2901,9 @@
             paletteSaveBtn.addEventListener('click', saveNoteColorPalette);
         }
 
-        var timezoneCard = document.getElementById('timezone-card');
-        if (timezoneCard) {
-            timezoneCard.addEventListener('click', showTimezonePrompt);
-        }
-
         var dateTimeFormatCard = document.getElementById('date-time-format-card');
         if (dateTimeFormatCard) {
             dateTimeFormatCard.addEventListener('click', openDateTimeFormatModal);
-        }
-
-        var markdownDefaultViewModeCard = document.getElementById('markdown-default-view-mode-card');
-        if (markdownDefaultViewModeCard) {
-            markdownDefaultViewModeCard.addEventListener('click', openMarkdownDefaultViewModeModal);
         }
 
         var diaryDateFormatCard = document.getElementById('diary-date-format-card');
@@ -2717,101 +2977,6 @@
         var tenantIsolationCard = document.getElementById('tenant-isolation-card');
         if (tenantIsolationCard) {
             tenantIsolationCard.addEventListener('click', showTenantIsolationModal);
-        }
-
-        // Tasklist insert order card - toggles between top and bottom
-        var tasklistInsertOrderCard = document.getElementById('tasklist-insert-order-card');
-        if (tasklistInsertOrderCard) {
-            tasklistInsertOrderCard.addEventListener('click', function () {
-                getSetting('tasklist_insert_order', function (currentValue) {
-                    var current = (currentValue === 'top' || currentValue === 'bottom') ? currentValue : 'bottom';
-                    var next = current === 'top' ? 'bottom' : 'top';
-                    setSetting('tasklist_insert_order', next, function (success) {
-                        if (success) {
-                            refreshTasklistInsertOrderBadge();
-                            reloadOpener();
-                        } else {
-                            alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
-                        }
-                    });
-                });
-            });
-        }
-
-        // Diary entry format card - toggles between HTML and markdown notes
-        var diaryNoteTypeCard = document.getElementById('diary-note-type-card');
-        if (diaryNoteTypeCard) {
-            diaryNoteTypeCard.addEventListener('click', function () {
-                getSetting('diary_default_note_type', function (currentValue) {
-                    var next = currentValue === 'markdown' ? 'html' : 'markdown';
-                    setSetting('diary_default_note_type', next, function (success) {
-                        if (success) {
-                            refreshDiaryNoteTypeBadge();
-                            reloadOpener();
-                        } else {
-                            alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
-                        }
-                    });
-                });
-            });
-        }
-
-        // Main font card - opens font selection modal
-        var mainFontCard = document.getElementById('main-font-card');
-        if (mainFontCard) {
-            mainFontCard.addEventListener('click', function () {
-                var modal = document.getElementById('mainFontModal');
-                if (!modal) return;
-                var current = (window.__poznoteUserStorage || localStorage).getItem('main_font') || 'inter';
-                probeMainFonts(function (available) {
-                    var select = document.getElementById('mainFontSelect');
-                    if (select) {
-                        for (var i = 0; i < select.options.length; i++) {
-                            var option = select.options[i];
-                            // Hide fonts this device does not have; keep the
-                            // stored choice visible even if it is unavailable
-                            // here so it can be changed.
-                            var show = option.value === current || available[option.value] !== false;
-                            option.hidden = !show;
-                            option.disabled = !show;
-                        }
-                        select.value = current;
-                    }
-                    modal.style.display = 'flex';
-                });
-            });
-        }
-
-        // Markdown editor font card - opens font selection modal
-        var markdownFontCard = document.getElementById('markdown-font-card');
-        if (markdownFontCard) {
-            markdownFontCard.addEventListener('click', function () {
-                var modal = document.getElementById('markdownFontModal');
-                if (!modal) return;
-                var current = (window.__poznoteUserStorage || localStorage).getItem('markdown_font') || 'inherit';
-                probeMarkdownFonts(function (available) {
-                    var select = document.getElementById('markdownFontSelect');
-                    if (select) {
-                        for (var i = 0; i < select.options.length; i++) {
-                            var option = select.options[i];
-                            // Hide fonts this device does not have; keep the
-                            // stored choice visible even if it is unavailable
-                            // here so it can be changed.
-                            var show = option.value === current || available[option.value] !== false;
-                            option.hidden = !show;
-                            option.disabled = !show;
-                        }
-                        select.value = current;
-                    }
-                    modal.style.display = 'flex';
-                });
-            });
-        }
-
-        // Login display card - delegates to ui.js
-        var loginDisplayCard = document.getElementById('login-display-card');
-        if (loginDisplayCard && typeof window.showLoginDisplayNamePrompt === 'function') {
-            loginDisplayCard.addEventListener('click', window.showLoginDisplayNamePrompt);
         }
 
         var customCssCard = document.getElementById('custom-css-card');
@@ -2918,17 +3083,25 @@
             disableFolderTreeHighlightBtn.addEventListener('click', disableFolderTreeHighlight);
         }
 
-        // Index icon scale card - delegates to index-icon-scale-settings.js
-        var indexIconScaleCard = document.getElementById('index-icon-scale-card');
-        if (indexIconScaleCard && typeof window.showIndexIconScalePrompt === 'function') {
-            indexIconScaleCard.addEventListener('click', window.showIndexIconScalePrompt);
-        }
-
         // Colored markdown modal: show color pickers only for the custom template
         var mdcRadios = document.getElementsByName('markdownColoredTheme');
         for (var mdcIdx = 0; mdcIdx < mdcRadios.length; mdcIdx++) {
             mdcRadios[mdcIdx].addEventListener('change', updateMarkdownColoredCustomRow);
         }
+        document.querySelectorAll('#markdownColoredCustomRow input[data-mdc-element]').forEach(function (input) {
+            input.addEventListener('input', function () {
+                setMarkdownColoredPicked(input, true);
+            });
+        });
+        document.querySelectorAll('#markdownColoredCustomRow [data-mdc-reset]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var el = button.getAttribute('data-mdc-reset');
+                var input = document.querySelector('#markdownColoredCustomRow input[data-mdc-element="' + el + '"]');
+                if (!input) return;
+                input.value = markdownColoredThemeColor(el);
+                setMarkdownColoredPicked(input, false);
+            });
+        });
 
         var saveMarkdownColoredBtn = document.getElementById('saveMarkdownColoredBtn');
         if (saveMarkdownColoredBtn) {
@@ -2955,7 +3128,7 @@
                     var colors = {};
                     document.querySelectorAll('#markdownColoredCustomRow input[data-mdc-element]').forEach(function (input) {
                         var el = input.getAttribute('data-mdc-element');
-                        colors[el] = input.value || MARKDOWN_COLORED_DEFAULTS[el];
+                        colors[el] = input.hasAttribute('data-mdc-picked') ? input.value : '';
                     });
                     setSetting('markdown_colored_custom', JSON.stringify(colors), function (ok) {
                         if (!ok) { finishMarkdownColored(false); return; }
@@ -3049,75 +3222,7 @@
             });
         }
 
-        // Save language modal button
-        var saveLangBtn = document.getElementById('saveLanguageModalBtn');
-        if (saveLangBtn) {
-            saveLangBtn.addEventListener('click', function () {
-                var radios = document.getElementsByName('languageChoice');
-                var selected = null;
-                for (var i = 0; i < radios.length; i++) {
-                    if (radios[i].checked) { selected = radios[i].value; break; }
-                }
-                if (!selected) selected = 'en';
-                setSetting('language', selected, function (success) {
-                    if (success) {
-                        try { closeModal('languageModal'); } catch (e) {
-                            console.debug('settings-page: finishMarkdownColored() failed:', e);
-                        }
-                        refreshLanguageBadge();
-                        setTimeout(function () { window.location.reload(); }, 300);
-                    } else {
-                        alert(tr('settings.language.save_error', {}, 'Error saving language'));
-                    }
-                });
-            });
-        }
-
-        // Save timezone modal button
-        var saveTimezoneBtn = document.getElementById('saveTimezoneModalBtn');
-        if (saveTimezoneBtn) {
-            saveTimezoneBtn.addEventListener('click', function () {
-                var select = document.getElementById('timezoneSelect');
-                var selectedTimezone = select ? select.value : 'Europe/Paris';
-                setSetting('timezone', selectedTimezone, function (success) {
-                    if (success) {
-                        try { closeModal('timezoneModal'); } catch (e) {
-                            console.debug('settings-page: finishMarkdownColored() failed:', e);
-                        }
-                        refreshTimezoneBadge();
-                        reloadOpener();
-                    } else {
-                        alert(tr('display.timezone.alerts.update_error', {}, 'Error updating timezone'));
-                    }
-                });
-            });
-        }
-
         // Save date and time format modal button
-        var saveMarkdownDefaultViewModeBtn = document.getElementById('saveMarkdownDefaultViewModeModalBtn');
-        if (saveMarkdownDefaultViewModeBtn) {
-            saveMarkdownDefaultViewModeBtn.addEventListener('click', function () {
-                var radios = document.getElementsByName('markdownDefaultViewMode');
-                var selected = 'preview';
-                for (var i = 0; i < radios.length; i++) {
-                    if (radios[i].checked) { selected = radios[i].value; break; }
-                }
-                selected = normalizeMarkdownDefaultViewMode(selected);
-
-                setSetting('markdown_default_view_mode', selected, function (success) {
-                    if (success) {
-                        try { closeModal('markdownDefaultViewModeModal'); } catch (e) {
-                            console.debug('settings-page: closeModal(markdownDefaultViewModeModal) failed:', e);
-                        }
-                        refreshMarkdownDefaultViewModeBadge();
-                        reloadOpener();
-                    } else {
-                        alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
-                    }
-                });
-            });
-        }
-
         var saveDateTimeFormatBtn = document.getElementById('saveDateTimeFormatModalBtn');
         if (saveDateTimeFormatBtn) {
             saveDateTimeFormatBtn.addEventListener('click', function () {
@@ -3189,42 +3294,6 @@
                         alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
                     }
                 });
-            });
-        }
-
-        // Save main font modal button
-        var saveMainFontBtn = document.getElementById('saveMainFontModalBtn');
-        if (saveMainFontBtn) {
-            saveMainFontBtn.addEventListener('click', function () {
-                var select = document.getElementById('mainFontSelect');
-                var selected = (select && select.value) || 'inter';
-                (window.__poznoteUserStorage || localStorage).setItem('main_font', selected);
-                if (typeof window.__poznoteApplyMainFont === 'function') {
-                    window.__poznoteApplyMainFont(selected);
-                }
-                try { closeModal('mainFontModal'); } catch (e) {
-                    console.debug('settings-page: selected() failed:', e);
-                }
-                refreshMainFontBadge();
-                reloadOpener();
-            });
-        }
-
-        // Save markdown editor font modal button
-        var saveMarkdownFontBtn = document.getElementById('saveMarkdownFontModalBtn');
-        if (saveMarkdownFontBtn) {
-            saveMarkdownFontBtn.addEventListener('click', function () {
-                var select = document.getElementById('markdownFontSelect');
-                var selected = (select && select.value) || 'inherit';
-                (window.__poznoteUserStorage || localStorage).setItem('markdown_font', selected);
-                if (typeof window.__poznoteApplyEditorFont === 'function') {
-                    window.__poznoteApplyEditorFont(selected);
-                }
-                try { closeModal('markdownFontModal'); } catch (e) {
-                    console.debug('settings-page: selected() failed:', e);
-                }
-                refreshMarkdownFontBadge();
-                reloadOpener();
             });
         }
 
@@ -3511,24 +3580,14 @@
 
         // Load all badges on page load. Most values are already embedded in page-config-data.
         preloadSettings(getSettingsPreloadKeys()).then(function () {
-            refreshLanguageBadge();
-            refreshLoginDisplayBadge();
             refreshFontSizeBadge();
-            refreshMainFontBadge();
-            refreshMarkdownFontBadge();
             refreshNoteAgeFilterBadge();
             refreshSnapshotsBadge();
             refreshOfflineNotesBadge();
             refreshNoteColorPaletteBadge();
-            refreshTasklistInsertOrderBadge();
-            refreshDiaryNoteTypeBadge();
             refreshDiaryDateFormatBadge();
             refreshToolbarModeBadge();
-            refreshTimezoneBadge();
             refreshDateTimeFormatBadge();
-            refreshMarkdownDefaultViewModeBadge();
-            refreshNoteWidthBadge();
-            refreshIndexIconScaleBadge();
             refreshCustomCssBadge();
             refreshThemeListBadge();
             refreshImportLimitsBadges();
@@ -3585,6 +3644,15 @@
                     var title = titleEl ? titleEl.textContent.toLowerCase() : '';
                     var statusEl = card.querySelector('.setting-status');
                     var status = statusEl ? statusEl.textContent.toLowerCase() : '';
+                    // A row with a control of its own matches on its value too
+                    var inlineControl = card.querySelector('.settings-inline-control');
+                    if (inlineControl) {
+                        var inlineText = inlineControl.tagName === 'SELECT'
+                            ? (inlineControl.selectedIndex >= 0 ? inlineControl.options[inlineControl.selectedIndex].text : '')
+                            : inlineControl.value;
+                        var inlineOutput = card.querySelector('.settings-inline-value');
+                        status += ' ' + (inlineText + ' ' + (inlineOutput ? inlineOutput.textContent : '')).toLowerCase();
+                    }
 
                     var isMatch = title.includes(term) || status.includes(term);
                     card.style.display = isMatch ? 'flex' : 'none';
@@ -3672,9 +3740,18 @@
             var stripIds = function (root) {
                 root.removeAttribute('id');
                 root.querySelectorAll('[id]').forEach(function (el) { el.removeAttribute('id'); });
+                // A label or an output naming the original's control would
+                // act on that one, out of sight in its own section.
+                root.querySelectorAll('[for]').forEach(function (el) { el.removeAttribute('for'); });
             };
 
             var syncCloneContent = function (orig, clone) {
+                // Left alone while one of its controls is in use: the original
+                // follows it (see buildClone), and rewriting the clone would
+                // pull the control from under the pointer. It catches up when
+                // the focus leaves.
+                var active = document.activeElement;
+                if (active && clone.contains(active) && active.classList.contains('settings-inline-control')) return;
                 clone.className = orig.className;
                 clone.innerHTML = orig.innerHTML;
                 stripIds(clone);
@@ -3696,7 +3773,33 @@
                         togglePin(orig);
                         return;
                     }
+                    // A row carrying its own control works in the clone
+                    if (e.target.closest('.settings-inline-control')) return;
+                    var cloneControl = clone.querySelector('.settings-inline-control');
+                    if (cloneControl) {
+                        if (!e.target.closest('.setting-help')) focusInlineControl(cloneControl);
+                        return;
+                    }
                     if (clone.tagName !== 'A') orig.click();
+                });
+                // A change made in the clone's control is made on the
+                // original's, whose listeners preview and save it.
+                ['input', 'change'].forEach(function (type) {
+                    clone.addEventListener(type, function (e) {
+                        var control = e.target.closest ? e.target.closest('.settings-inline-control') : null;
+                        var origControl = control ? document.getElementById(control.getAttribute('data-control') || '') : null;
+                        if (!origControl) return;
+                        origControl.value = control.value;
+                        origControl.dispatchEvent(new Event(type, { bubbles: true }));
+                        // The clone is not rewritten while in use: carry the
+                        // readout (a slider's value) across by hand.
+                        var origOutput = orig.querySelector('.settings-inline-value');
+                        var cloneOutput = clone.querySelector('.settings-inline-value');
+                        if (origOutput && cloneOutput) cloneOutput.textContent = origOutput.textContent;
+                    });
+                });
+                clone.addEventListener('focusout', function () {
+                    setTimeout(function () { syncCloneContent(orig, clone); }, 0);
                 });
                 // Badges refresh asynchronously on the original (and after
                 // settings changes); mirror every change into the clone.
@@ -3910,9 +4013,10 @@
             sectionLabelRefreshers.forEach(function (refresh) { refresh(); });
         });
 
-        // Deep link from the rail's About and My Profile buttons:
-        // settings.php?open=about / ?open=account shows that section on its
-        // own, instead of the default view where only "Pinned" is expanded.
+        // Deep link from the rail's About button, or a link to the account's
+        // storage: settings.php?open=about / ?open=account shows that section
+        // on its own, instead of the default view where only "Pinned" is
+        // expanded.
         var deepLinkGrid = document.getElementById(deepLinkSectionGridId() || '');
         if (deepLinkGrid) {
             document.querySelectorAll('.settings-category-title').forEach(function (title) {
@@ -3931,9 +4035,8 @@
                 deepLinkTitle.scrollIntoView({ block: 'start' });
             }
             // ?open= deliberately stays in the URL: icon_sidebar.php reads it
-            // to highlight About or My Profile instead of Settings, so
-            // stripping it would move the highlight back to Settings on the
-            // next reload.
+            // to highlight About instead of Settings, so stripping it would
+            // move the highlight back to Settings on the next reload.
         }
 
         if (collapseAllBtn) {
@@ -3953,28 +4056,15 @@
         var homeContainer = document.querySelector('.home-container');
 
         // Desktop layout: the section list on the left, one section shown at
-        // a time with its cards as rows (css/settings.css, .settings-with-nav).
-        // The items come from the category titles, so they follow the
-        // server-side translation and the admin-only sections. Narrow screens
-        // hide the list and keep the stacked sections above.
+        // a time with its cards as rows (css/settings.css, .settings-shell).
+        // The list is rendered by settings_shell.php, the same one the pages
+        // opened from here show; each entry links to its section, which this
+        // page opens in place instead. Narrow screens hide the list and keep
+        // the stacked sections above.
         var settingsNav = document.getElementById('settings-nav');
         if (settingsNav && homeContainer && homeContainer.classList.contains('settings-with-nav')) {
             var NAV_STATE_KEY = 'settingsActiveSection';
             var navStore = window.__poznoteUserStorage || window.localStorage;
-            var NAV_ICONS = {
-                'settings-pinned-section-grid': 'lucide-pin',
-                'settings-account-section-grid': 'lucide-user',
-                'settings-actions-section-grid': 'lucide-zap',
-                'settings-display-section-grid': 'lucide-monitor',
-                'settings-ui-customization-section-grid': 'lucide-eye-off',
-                'settings-sidebar-section-grid': 'lucide-panel-left',
-                'settings-note-content-section-grid': 'lucide-file-text',
-                'settings-markdown-section-grid': 'lucide-file-code',
-                'settings-diary-section-grid': 'lucide-book-open',
-                'settings-other-section-grid': 'lucide-settings-2',
-                'admin-tools-grid': 'lucide-wrench',
-                'settings-documentation-section-grid': 'lucide-info'
-            };
             var navSections = []; // { key, title, grid, item }
             var activeSectionKey = null;
 
@@ -3993,6 +4083,15 @@
                 return !section.title.hidden && section.title.style.display !== 'none';
             };
 
+            // The pages opened from here draw the same list without this
+            // page's cards to count: they read which sections to leave out.
+            var publishHiddenSections = function () {
+                var hidden = navSections.filter(function (section) {
+                    return section.key !== 'settings-pinned-section-grid' && !isSectionAvailable(section);
+                }).map(function (section) { return section.key; });
+                try { navStore.setItem('settingsNavHiddenSections', JSON.stringify(hidden)); } catch (e) { /* storage unavailable */ }
+            };
+
             var applyActiveSection = function () {
                 navSections.forEach(function (section) {
                     var active = section.key === activeSectionKey;
@@ -4002,6 +4101,7 @@
                     section.item.setAttribute('aria-current', active ? 'true' : 'false');
                     section.item.hidden = !isSectionAvailable(section);
                 });
+                publishHiddenSections();
             };
 
             var activateSection = function (key, persist) {
@@ -4033,80 +4133,85 @@
                 applyActiveSection();
             };
 
-            // The Version card lives in the About section, so its update badge
-            // is out of sight while another section is shown: the About entry
-            // carries one too, to say which section to open. It mirrors the
-            // card badge because the nav is built after utils-updates.js may
-            // already have revealed the badges, and js/utils-updates.js
-            // reveals or hides every .update-badge on later checks.
-            var buildNavBadge = function () {
-                var cardBadge = document.querySelector('#check-updates-card .update-badge');
-                if (!cardBadge) return null;
-                var badge = document.createElement('span');
-                badge.className = 'update-badge update-badge-inline';
-                if (cardBadge.classList.contains('update-badge-hidden')) {
-                    badge.classList.add('update-badge-hidden');
-                } else {
-                    badge.style.display = 'inline-block';
+            // The address follows the open section, so a reload stays on it.
+            // A ?open= deep link goes, and the rail moves its highlight from
+            // About back to Settings, as the next load would.
+            var syncSectionUrl = function (key) {
+                if (!window.history || typeof window.history.replaceState !== 'function') return;
+                var url = new URL(window.location.href);
+                if (url.searchParams.has('open')) {
+                    url.searchParams.delete('open');
+                    var aboutBtn = document.getElementById('iconSidebarAboutBtn');
+                    var settingsBtn = document.getElementById('iconSidebarSettingsBtn');
+                    if (aboutBtn && settingsBtn && aboutBtn.classList.contains('icon-sidebar-btn-active')) {
+                        aboutBtn.classList.remove('icon-sidebar-btn-active');
+                        aboutBtn.removeAttribute('aria-current');
+                        settingsBtn.classList.add('icon-sidebar-btn-active');
+                        settingsBtn.setAttribute('aria-current', 'page');
+                    }
                 }
-                return badge;
+                url.hash = 'section=' + key;
+                window.history.replaceState(window.history.state, '', url.toString());
             };
 
-            var buildNavItem = function (key, labelText) {
-                var item = document.createElement('button');
-                item.type = 'button';
-                item.className = 'settings-nav-item';
-                item.setAttribute('data-section', key);
-                var icon = document.createElement('i');
-                icon.className = 'lucide ' + (NAV_ICONS[key] || 'lucide-settings');
-                var label = document.createElement('span');
-                label.className = 'settings-nav-label';
-                label.textContent = labelText;
-                item.appendChild(icon);
-                item.appendChild(label);
-                if (key === 'settings-documentation-section-grid') {
-                    var navBadge = buildNavBadge();
-                    if (navBadge) item.appendChild(navBadge);
+            settingsNav.querySelectorAll('.settings-nav-item[data-section]').forEach(function (item) {
+                var key = item.getAttribute('data-section');
+                var grid = document.getElementById(key);
+                var title = grid ? grid.previousElementSibling : null;
+                if (!grid || !title || !title.classList.contains('settings-category-title')) {
+                    item.hidden = true;
+                    return;
                 }
-                item.addEventListener('click', function () {
+                item.addEventListener('click', function (e) {
+                    e.preventDefault();
                     // Picking a section replaces the filter: its rows are
                     // what was asked for.
                     if (searchInput && searchInput.value !== '') {
                         searchInput.value = '';
                         searchInput.dispatchEvent(new Event('input'));
                     }
-                    activateSection(key, true);
+                    if (activateSection(key, true)) syncSectionUrl(key);
                 });
-                return item;
-            };
-
-            document.querySelectorAll('.settings-category-title').forEach(function (title) {
-                var grid = title.nextElementSibling;
-                if (!grid || !grid.classList.contains('home-grid')) return;
-                var key = grid.id || title.id;
-                if (!key) return;
-                // The chevron button appended above holds no text
-                var item = buildNavItem(key, (title.textContent || '').trim());
-                settingsNav.appendChild(item);
                 navSections.push({ key: key, title: title, grid: grid, item: item });
             });
 
-            // Initial section: the rail's About / My Profile deep link, then a
-            // #hash naming a section (title or grid id), then the saved
+            // Initial section: the rail's About deep link, then a #hash naming
+            // a section (#section=<grid id>, which the Back link of the pages
+            // opened from here and the address bar use, or the older
+            // #<title or grid id>), then the pinned settings, which is what the
+            // rail's Settings button opens (discussion #1378), then the saved
             // choice, then the first listed section.
             var initialKey = deepLinkSectionGridId();
+            var hashKey = null;
             if (!initialKey && window.location.hash) {
-                var hashId = decodeURIComponent(window.location.hash.slice(1));
+                var hashId = decodeURIComponent(window.location.hash.slice(1)).replace(/^section=/, '');
                 navSections.forEach(function (section) {
-                    if (section.key === hashId) initialKey = section.key;
-                    else if (section.grid.id === hashId) initialKey = section.key;
-                    else if (section.title.id === hashId) initialKey = section.key;
+                    if (section.key === hashId || section.grid.id === hashId || section.title.id === hashId) {
+                        hashKey = section.key;
+                    }
                 });
+                initialKey = hashKey;
+            }
+            var pinnedSection = findSection('settings-pinned-section-grid');
+            if (!initialKey && pinnedSection && isSectionAvailable(pinnedSection)) {
+                initialKey = pinnedSection.key;
             }
             if (!initialKey) {
                 try { initialKey = navStore.getItem(NAV_STATE_KEY); } catch (e) { /* storage unavailable */ }
             }
             if (!initialKey || !activateSection(initialKey, false)) refreshNav();
+
+            // The stacked layout of narrow screens has no list: a section named
+            // by the #hash is opened and brought into view instead.
+            var hashSection = findSection(hashKey);
+            if (hashSection && !isSettingsNavLayout() && isSectionAvailable(hashSection)) {
+                collapsibleSections.forEach(function (section) {
+                    if (section.title === hashSection.title) section.apply(false);
+                });
+                persistSectionStates();
+                updateCollapseAllBtn();
+                hashSection.title.scrollIntoView({ block: 'start' });
+            }
 
             if (typeof MutationObserver !== 'undefined') {
                 var navObserver = new MutationObserver(refreshNav);
@@ -4123,22 +4228,50 @@
             }
         }
 
+        // A card that opens one of the pages of the frame (settings_shell.php)
+        // notes the section on display, so that page's Back link returns to
+        // it: Pinned, say, rather than the section the page belongs to.
+        try { window.sessionStorage.removeItem('settingsReturnSection'); } catch (e) { /* storage unavailable */ }
+        document.addEventListener('click', function (e) {
+            var card = e.target.closest ? e.target.closest('.home-card') : null;
+            if (!card) return;
+            var href = card.getAttribute('data-href') || (card.tagName === 'A' ? card.getAttribute('href') : '');
+            if (!href || card.getAttribute('target') === '_blank' || /^[a-z]+:/i.test(href)) return;
+            var activeItem = homeContainer && !homeContainer.classList.contains('settings-filtering')
+                ? document.querySelector('.settings-nav-item.is-active')
+                : null;
+            var grid = card.closest('.home-grid');
+            var section = activeItem ? activeItem.getAttribute('data-section') : (grid ? grid.id : '');
+            try {
+                if (section) window.sessionStorage.setItem('settingsReturnSection', section);
+            } catch (err) { /* storage unavailable */ }
+        }, true);
+
+        // A term typed in the filter of a page opened from here
+        // (settings_shell.php) arrives as ?q=: it goes on filtering here.
+        var carriedTerm = new URLSearchParams(window.location.search || '').get('q');
+        if (carriedTerm && searchInput) {
+            searchInput.value = carriedTerm;
+            searchInput.dispatchEvent(new Event('input'));
+            searchInput.focus();
+            searchInput.setSelectionRange(carriedTerm.length, carriedTerm.length);
+            if (window.history && typeof window.history.replaceState === 'function') {
+                var termlessUrl = new URL(window.location.href);
+                termlessUrl.searchParams.delete('q');
+                window.history.replaceState(window.history.state, '', termlessUrl.toString());
+            }
+        }
+
         // Re-translate badges when i18n is loaded
         document.addEventListener('poznote:i18n:loaded', function () {
-            refreshLanguageBadge();
             refreshFontSizeBadge();
-            refreshMainFontBadge();
-            refreshMarkdownFontBadge();
             refreshNoteAgeFilterBadge();
             refreshSnapshotsBadge();
             refreshOfflineNotesBadge();
             refreshNoteColorPaletteBadge();
-            refreshTasklistInsertOrderBadge();
-            refreshDiaryNoteTypeBadge();
             refreshDiaryDateFormatBadge();
             refreshToolbarModeBadge();
             refreshDateTimeFormatBadge();
-            refreshMarkdownDefaultViewModeBadge();
             refreshInstallAppBadge();
             refreshCustomCssBadge();
         });
@@ -5118,24 +5251,14 @@
 
     // ========== Global API ==========
     // Expose functions for external access and inline HTML handlers
-    window.showLanguageModal = showLanguageModal;
     window.openNoteAgeFilterModal = openNoteAgeFilterModal;
-    window.showTimezonePrompt = showTimezonePrompt;
     window.openDateTimeFormatModal = openDateTimeFormatModal;
-    window.openMarkdownDefaultViewModeModal = openMarkdownDefaultViewModeModal;
     window.openDiaryDateFormatModal = openDiaryDateFormatModal;
-    window.refreshLanguageBadge = refreshLanguageBadge;
-    window.refreshLoginDisplayBadge = refreshLoginDisplayBadge;
     window.refreshFontSizeBadge = refreshFontSizeBadge;
     window.refreshNoteAgeFilterBadge = refreshNoteAgeFilterBadge;
-    window.refreshTasklistInsertOrderBadge = refreshTasklistInsertOrderBadge;
-    window.refreshDiaryNoteTypeBadge = refreshDiaryNoteTypeBadge;
     window.refreshDiaryDateFormatBadge = refreshDiaryDateFormatBadge;
     window.refreshToolbarModeBadge = refreshToolbarModeBadge;
-    window.refreshTimezoneBadge = refreshTimezoneBadge;
     window.refreshDateTimeFormatBadge = refreshDateTimeFormatBadge;
-    window.refreshMarkdownDefaultViewModeBadge = refreshMarkdownDefaultViewModeBadge;
-    window.refreshNoteWidthBadge = refreshNoteWidthBadge;
     window.refreshCustomCssBadge = refreshCustomCssBadge;
     window.getSetting = getSetting;
     window.setSetting = setSetting;

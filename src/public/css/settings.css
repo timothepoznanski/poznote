@@ -546,31 +546,27 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
 
 /* ---------- Filter row: search input + collapse-all ---------- */
 
+/* Top of the left column of the frame (settings_shell.php): above the
+   section list from 801px, above the stacked sections below that. */
 .settings-filter-row {
+    display: flex;
     align-items: stretch;
     gap: 8px;
     margin-top: 20px;
     margin-bottom: 12px;
 }
 
-/* The row's bottom margin collapses with the first category title's larger
-   top margin (1.5rem), so shrink that title's margin for the gap to change.
-   The first title may be the hidden "Pinned" one: the shrunk margin goes to
-   every title that no visible title precedes, i.e. the first shown. */
+/* On narrow screens the row's bottom margin collapses with the first
+   category title's larger top margin (1.5rem), so shrink that title's margin
+   for the gap to change. The first title may be the hidden "Pinned" one: the
+   shrunk margin goes to every title that no visible title precedes, i.e. the
+   first shown. */
 .settings-content > .settings-category-title {
     margin-top: 1rem;
 }
 
 .settings-content > .settings-category-title:not([hidden]) ~ .settings-category-title {
     margin-top: 1.5rem;
-}
-
-/* home/responsive.css hides .home-search-container on desktop; the settings
-   filter row must stay visible at every width (loaded after responsive.css) */
-@media (min-width: 801px) {
-    .settings-filter-row {
-        display: flex;
-    }
 }
 
 .settings-filter-row .home-search-wrapper {
@@ -869,25 +865,14 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
     margin-bottom: 24px;
 }
 
-/* Markdown default view mode modal: the hint under the radios is the last
-   thing in the body, so it carries the gap to the buttons instead of
-   .radio-options. */
-#markdownDefaultViewModeModal .radio-options {
-    margin-bottom: 12px;
-}
-#markdownDefaultViewModeModal .modal-hint {
-    margin: 0 0 24px;
-    font-size: 13px;
-    opacity: 0.8;
-}
-
 /* ==========================================================================
-   Desktop layout: section list on the left, rows on the right
-   settings.php only (.settings-with-nav on the container). settings-page.js
-   builds the list from the category titles, marks the selected title and grid
-   with .settings-section-active and keeps the choice per user. Below 801px
-   the list is hidden and the sections stack as before (collapsible, cards as
-   rows), so nothing in the media query applies there.
+   The Settings frame (settings_shell.php): the filter and the section list
+   on the left, a section or one of the pages it opens on the right. Shared by
+   settings.php (.settings-with-nav on the container, whose selected title
+   and grid settings-page.js marks with .settings-section-active) and the
+   pages reached from it (.settings-subpage). Below 801px the list is hidden:
+   settings.php stacks its sections as before (collapsible, cards as rows) and
+   a page shows its own content under the title.
    ========================================================================== */
 
 .settings-nav {
@@ -898,10 +883,19 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
     /* A little wider than the plain page (800px): the list takes its 220px
        and the rows keep about the width of the old list view (600px), so a
        value stays close to its label. */
-    .home-container.settings-with-nav {
+    .settings-shell {
         --settings-nav-width: 220px;
         --settings-nav-gap: 32px;
+    }
+
+    .home-container.settings-with-nav,
+    .settings-shell.settings-subpage {
         max-width: 900px;
+    }
+
+    /* Pages built around a wide table (users, activity log, storage) */
+    .settings-shell.settings-subpage.settings-shell-wide {
+        max-width: none;
     }
 
     /* One section shows at a time: the collapse-all button stays
@@ -910,33 +904,42 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
         display: none;
     }
 
-    /* The page title and the filter row sit above the content column, not
-       above the whole container: same left offset as the content, so they
-       centre on the rows rather than on the list + rows. */
-    .settings-with-nav .poznote-page-title,
-    .settings-with-nav .settings-filter-row {
+    /* The page title sits above the content column, not above the whole
+       container: same left offset as the content, so it centres on the rows
+       rather than on the list + rows. */
+    .settings-shell .poznote-page-title {
         margin-left: calc(var(--settings-nav-width) + var(--settings-nav-gap));
     }
 
-    .settings-with-nav .settings-layout {
+    .settings-shell .settings-layout {
         display: grid;
         grid-template-columns: var(--settings-nav-width) minmax(0, 1fr);
         gap: var(--settings-nav-gap);
         align-items: start;
     }
 
-    .settings-with-nav .settings-nav {
+    /* The filter heads the list, the way a system settings window puts its
+       search field; both stay in view while the content scrolls. */
+    .settings-shell .settings-sidebar {
+        position: sticky;
+        top: 24px;
+    }
+
+    .settings-shell .settings-filter-row {
+        margin: 0 0 12px 0;
+    }
+
+    .settings-shell .settings-nav {
         display: flex;
         flex-direction: column;
         gap: 2px;
-        position: sticky;
-        top: 24px;
     }
 
     .settings-nav-item {
         display: flex;
         align-items: center;
         gap: 10px;
+        box-sizing: border-box;
         width: 100%;
         padding: 9px 12px;
         border: none;
@@ -948,6 +951,7 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
         font-weight: var(--pz-weight-normal);
         line-height: 1.3;
         text-align: left;
+        text-decoration: none;
         cursor: pointer;
         transition: background-color 0.12s ease, color 0.12s ease;
     }
@@ -960,6 +964,7 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
     .settings-nav-item:hover {
         background: rgba(var(--pz-shadow-rgb), 0.04);
         color: var(--pz-text);
+        text-decoration: none;
     }
 
     /* Colour and background carry the active state; the weight stays the same
@@ -1300,4 +1305,610 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
 
 .settings-default-credentials-actions .btn-secondary:hover {
     background: var(--pz-surface);
+}
+
+/* ==========================================================================
+   Sections split into panels (.settings-grouped, Admin Tools)
+   Each group of cards is a panel of its own under its title, instead of one
+   panel ruled into parts by the group titles. Below 801px the rows stand
+   apart anyway: the group only keeps their spacing.
+   ========================================================================== */
+
+.settings-group.settings-group-empty,
+.home-container.settings-filtering .settings-group:not(:has(> .home-card[style*="flex"])) {
+    display: none;
+}
+
+@media (max-width: 800px) {
+    .settings-with-nav .settings-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+@media (min-width: 801px) {
+    .home-container.settings-with-nav .home-grid.settings-grouped:not([hidden]) {
+        background: transparent;
+        border: 0;
+        border-radius: 0;
+    }
+
+    html[data-theme='dark'] .home-container.settings-with-nav .home-grid.settings-grouped:not([hidden]) {
+        background: transparent;
+    }
+
+    .home-container.settings-with-nav .settings-grouped > .settings-group-title {
+        padding: 0 4px 8px;
+        border-top: 0;
+    }
+
+    .home-container.settings-with-nav .settings-grouped > .settings-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 22px;
+        background: var(--pz-bg);
+        border: 1px solid var(--pz-border);
+        border-radius: var(--pz-radius-xl);
+    }
+
+    .home-container.settings-with-nav .settings-grouped > .settings-group:last-child {
+        margin-bottom: 0;
+    }
+
+    html[data-theme='dark'] .home-container.settings-with-nav .settings-grouped > .settings-group {
+        background: var(--pz-surface);
+        border-color: var(--pz-border);
+    }
+}
+
+/* ==========================================================================
+   Pages opened from settings.php, inside the frame (settings_shell.php)
+   ========================================================================== */
+
+/* The frame has the size and padding of settings.php's .home-container,
+   which these pages do not otherwise load, and the page its background
+   (.home-page in css/home/base.css and css/home/dark-mode.css). It carries
+   the font of body.settings-page too: some of these pages set none on their
+   body (admin/users.php), which left the title and the section list in the
+   browser's serif, and naming Inter first lets the App font setting apply
+   (js/theme-init.js swaps the 'Inter' face). */
+.settings-shell.settings-subpage {
+    margin: 0 auto;
+    padding: 40px 20px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* At least a screen high, like .home-page: js/theme-init.js paints the html
+   element with the theme's ground, which showed under a short page (Restore /
+   Import with its cards folded). */
+body:has(> .settings-shell.settings-subpage) {
+    min-height: 100vh;
+    margin-top: 0;
+    margin-bottom: 0;
+    background: var(--pz-surface);
+}
+
+html[data-theme='dark'] body:has(> .settings-shell.settings-subpage) {
+    background: var(--pz-bg);
+}
+
+/* With 'panel' => true (User Management), the page's content sits in a
+   panel, where a section of settings.php shows its rows. It keeps the page
+   ground its controls were drawn for, in both themes. */
+.settings-subpage-body {
+    padding: 20px 24px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-xl);
+    background: var(--pz-bg);
+}
+
+/* The same pull-up as on settings.php (css/icon-sidebar.css), which absorbs
+   the container's top padding above the title. */
+.settings-shell.settings-subpage > .poznote-page-title {
+    margin-top: -14px;
+}
+
+/* The page's title, in the place of a section title: the section it belongs
+   to, which the link goes back to, then its own name. */
+.settings-category-title.settings-subpage-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 1rem 0;
+    font-size: calc(1.2rem * var(--settings-font-scale, 1));
+}
+
+.settings-subpage-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--pz-text-muted);
+    font-weight: var(--pz-weight-normal);
+    text-decoration: none;
+}
+
+.settings-subpage-back:hover {
+    color: var(--pz-accent-text);
+    text-decoration: none;
+}
+
+.settings-subpage-back .lucide {
+    width: 16px;
+    height: 16px;
+}
+
+.settings-subpage-separator.lucide {
+    width: 14px;
+    height: 14px;
+    background-color: var(--pz-text-subtle);
+}
+
+/* Most pages go without the panel (settings_shell.php, 'panel' is off by
+   default): they are made of framed blocks already, and a frame around
+   frames adds nothing. Two classes, so it also wins over the narrow-screen
+   padding below. */
+.settings-subpage-body.settings-subpage-bare {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+/* The page's own container fills the content column: its width, margins
+   and padding were those of a page of its own. */
+.settings-subpage-body > .home-container,
+.settings-subpage-body > .admin-container,
+.settings-subpage-body > .settings-container,
+.settings-subpage-body > .backup-container {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+}
+
+@media (max-width: 800px) {
+    /* No section list on narrow screens, and the filter belongs to
+       settings.php: the page goes straight under its title. */
+    .settings-subpage .settings-sidebar {
+        display: none;
+    }
+
+    /* css/workspaces.css pads .settings-container with !important there */
+    .settings-subpage-body > .settings-container {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .settings-shell.settings-subpage {
+        padding: 20px 15px;
+    }
+
+    .settings-subpage-body {
+        padding: 14px 12px;
+    }
+
+    .settings-shell.settings-subpage > .poznote-page-title {
+        margin-top: 0;
+    }
+}
+
+/* ==========================================================================
+   Settings shown as a control in their row (.settings-inline-card)
+   A list, a slider or a text field that saves on change, in the place of the
+   value badge, rather than a dialog for one or two small controls
+   (discussion #1378; initInlineControl() in js/settings-page.js).
+   ========================================================================== */
+
+.home-card.settings-inline-card {
+    cursor: default;
+}
+
+.settings-with-nav .home-card-content > .settings-inline-control,
+.settings-with-nav .home-card-content > .settings-inline-range {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+/* The two Command menu shortcut rows: on a phone the control leaves their
+   title too little room and it would be cut, while the device in brackets
+   at its end is what tells the two apart. There the title takes the whole
+   row and the control goes under it. */
+@media (max-width: 800px) {
+    .settings-with-nav .settings-card-stacks .home-card-content {
+        flex-wrap: wrap;
+        row-gap: 4px;
+    }
+
+    .settings-with-nav .settings-card-stacks .home-card-title {
+        flex-basis: 100%;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+    }
+
+    .settings-with-nav .settings-card-stacks .home-card-content > .settings-inline-control {
+        margin-left: 0;
+    }
+}
+
+/* A line of explanation under the title and the control, across the row
+   (Command menu shortcut on mobile). The help icon is hidden on touch
+   screens, this line is not. */
+.settings-card-with-note .home-card-content {
+    flex-wrap: wrap;
+    row-gap: 2px;
+}
+
+/* The title gives way to the control, on a phone it takes a second line
+   rather than pushing the control down to a line of its own */
+.settings-card-with-note .home-card-title {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.settings-card-note {
+    flex-basis: 100%;
+    font-size: calc(0.78rem * var(--settings-font-scale, 1));
+    line-height: 1.4;
+    color: var(--pz-text-muted);
+}
+
+.settings-inline-select,
+.settings-inline-text {
+    box-sizing: border-box;
+    max-width: 55%;
+    padding: 5px 8px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    background-color: var(--pz-bg);
+    color: var(--pz-text);
+    font: inherit;
+    font-size: calc(13px * var(--settings-font-scale, 1));
+    cursor: pointer;
+}
+
+.settings-inline-text {
+    width: 240px;
+    cursor: text;
+}
+
+.settings-inline-select:focus,
+.settings-inline-text:focus {
+    outline: none;
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
+}
+
+.settings-inline-range {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.settings-inline-range input[type="range"] {
+    width: 160px;
+    margin: 0;
+    accent-color: var(--pz-accent);
+    cursor: pointer;
+}
+
+/* The slider's value: fixed width so the slider does not move as it changes */
+.settings-inline-value {
+    min-width: 4.5em;
+    font-size: calc(0.75rem * var(--settings-font-scale, 1));
+    font-weight: var(--pz-weight-semibold);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    color: var(--pz-text-secondary);
+}
+
+html[data-theme='dark'] .settings-inline-select,
+html[data-theme='dark'] .settings-inline-text {
+    background-color: var(--pz-surface);
+    border-color: var(--pz-border);
+    color: var(--pz-text);
+}
+
+@media (max-width: 600px) {
+    .settings-inline-range input[type="range"] {
+        width: 110px;
+    }
+
+    .settings-inline-text {
+        width: 160px;
+    }
+}
+
+/* A badge that summarises a value (Font size, Import limits, User quotas)
+   names it on hover: the tooltip is the help icon's (css/home/cards.css),
+   one line per value. */
+.setting-status[data-tooltip] {
+    position: relative;
+    cursor: help;
+}
+
+.setting-status[data-tooltip]::after {
+    white-space: pre-line;
+}
+
+/* ==========================================================================
+   Storage used, the last group of My Account
+   Loaded from storage-stats-user.php?fragment=1 (loadStorageSummary() in
+   js/settings-page.js): one row per quota, drawn like the setting rows. What
+   is counted on the left with what it is made of underneath, the figure on
+   the right with its limit and a fill bar when there is one.
+   ========================================================================== */
+
+.settings-storage-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.home-container.settings-filtering .settings-storage-summary {
+    display: none;
+}
+
+.settings-storage-summary-loading {
+    padding: 10px 16px;
+    font-size: calc(0.85rem * var(--settings-font-scale, 1));
+    color: var(--pz-text-muted);
+}
+
+/* Below 801px each row stands apart, like the setting rows there */
+.settings-storage-row {
+    --storage-accent: var(--pz-accent-text);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 14px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+    color: var(--pz-text);
+    text-decoration: none;
+}
+
+html[data-theme='dark'] .settings-storage-row {
+    background: var(--pz-surface);
+}
+
+a.settings-storage-row:hover,
+a.settings-storage-row:focus-visible {
+    border-color: var(--pz-accent);
+    text-decoration: none;
+}
+
+.settings-storage-row.quota-level-warn {
+    --storage-accent: var(--pz-warning-text);
+}
+
+.settings-storage-row.quota-level-danger {
+    --storage-accent: var(--pz-danger-text);
+}
+
+.settings-storage-icon.lucide {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    background-color: var(--pz-text-muted);
+}
+
+.settings-storage-text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.settings-storage-label {
+    font-size: calc(15px * var(--settings-font-scale, 1));
+}
+
+.settings-storage-detail {
+    font-size: calc(0.78rem * var(--settings-font-scale, 1));
+    color: var(--pz-text-muted);
+}
+
+.settings-storage-figure {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+    min-width: 7.5em;
+    text-align: right;
+}
+
+.settings-storage-value {
+    font-size: calc(0.95rem * var(--settings-font-scale, 1));
+    font-weight: var(--pz-weight-semibold);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.quota-level-warn .settings-storage-value,
+.quota-level-danger .settings-storage-value {
+    color: var(--storage-accent);
+}
+
+.settings-storage-limit {
+    font-weight: var(--pz-weight-normal);
+    color: var(--pz-text-muted);
+}
+
+.settings-storage-bar {
+    width: 100%;
+    height: 5px;
+    overflow: hidden;
+    border-radius: var(--pz-radius-pill);
+    background: var(--pz-surface-sunken);
+}
+
+.settings-storage-bar > span {
+    display: block;
+    height: 100%;
+    border-radius: var(--pz-radius-pill);
+    background: var(--storage-accent);
+}
+
+.settings-storage-meta {
+    font-size: calc(0.72rem * var(--settings-font-scale, 1));
+    color: var(--pz-text-muted);
+    white-space: nowrap;
+}
+
+@media (min-width: 801px) {
+    /* Rows of the group's panel: no frame of their own, a divider between
+       them inset like the setting rows' */
+    .settings-storage-summary {
+        gap: 0;
+    }
+
+    .settings-storage-row,
+    html[data-theme='dark'] .settings-storage-row {
+        position: relative;
+        padding: 10px 16px;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+    }
+
+    .settings-storage-row + .settings-storage-row::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 16px;
+        right: 16px;
+        height: 1px;
+        background: var(--pz-surface-sunken);
+        pointer-events: none;
+    }
+
+    html[data-theme='dark'] .settings-storage-row + .settings-storage-row::after {
+        background: var(--pz-border);
+    }
+
+    /* The hover highlight is inset, so it stays inside the panel's rounded
+       corners, the way the setting rows draw theirs */
+    a.settings-storage-row {
+        isolation: isolate;
+    }
+
+    a.settings-storage-row::before {
+        content: '';
+        position: absolute;
+        inset: 3px 6px;
+        z-index: -1;
+        border-radius: var(--pz-radius-lg);
+        background: var(--pz-surface-hover);
+        opacity: 0;
+        transition: opacity 0.12s ease;
+        pointer-events: none;
+    }
+
+    a.settings-storage-row:hover::before,
+    a.settings-storage-row:focus-visible::before {
+        opacity: 1;
+    }
+}
+
+/* ==========================================================================
+   Admin Tools: rebuild the master database, orphan attachments scanner
+   (dialogs of settings.php, initMaintenanceModals() in js/settings-page.js)
+   ========================================================================== */
+
+.maintenance-result {
+    margin: 12px 0 0 0;
+    padding: 10px 12px;
+    border-radius: var(--pz-radius);
+    background: var(--pz-success-soft);
+    color: var(--pz-success-strong);
+    font-size: 0.9rem;
+    line-height: 1.45;
+    white-space: pre-wrap;
+}
+
+.maintenance-result.is-error {
+    background: var(--pz-danger-soft);
+    color: var(--pz-danger-strong);
+}
+
+#orphanScannerModal .modal-content {
+    max-width: 640px;
+}
+
+/* Room between the outcome (or the table) and the buttons: .modal-buttons
+   only pushes itself down with margin-top: auto, which is nothing here. */
+#disasterRecoveryModal .modal-buttons,
+#orphanScannerModal .modal-buttons {
+    margin-top: 20px;
+}
+
+/* .modal-buttons gives its buttons a display of their own */
+#orphanScannerModal .modal-buttons button[hidden] {
+    display: none;
+}
+
+.orphan-scanner-results {
+    max-height: 45vh;
+    margin-top: 12px;
+    overflow: auto;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+}
+
+/* separate, not collapse: collapsed borders do not travel with a sticky
+   header cell */
+.orphan-scanner-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.88rem;
+}
+
+.orphan-scanner-table th,
+.orphan-scanner-table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--pz-border);
+    text-align: left;
+    vertical-align: top;
+}
+
+.orphan-scanner-table th {
+    position: sticky;
+    top: 0;
+    background: var(--pz-surface);
+    color: var(--pz-text-muted);
+    font-weight: var(--pz-weight-semibold);
+}
+
+.orphan-scanner-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.orphan-count.has-orphans {
+    color: var(--pz-warning-text);
+    font-weight: var(--pz-weight-semibold);
+}
+
+.orphan-error {
+    color: var(--pz-danger-text);
+}
+
+.orphan-scanner-table summary {
+    color: var(--pz-accent-text);
+    cursor: pointer;
+}
+
+.orphan-scanner-table ul {
+    margin: 6px 0 0 0;
+    padding-left: 18px;
+    font-family: monospace;
+    font-size: 0.8rem;
+    word-break: break-all;
 }

@@ -467,6 +467,33 @@ docker compose up -d
 
 Seus dados ficam preservados no diretório `./data` e não são afetados pela atualização.
 
+### Versões beta
+
+As versões beta trazem novos recursos antes de serem lançadas como versão estável, e aparecem como pré-lançamentos na [página de releases](https://github.com/timothepoznanski/poznote/releases). Elas são publicadas com a tag `latest-and-beta`, que sempre aponta para a versão mais recente, beta ou estável.
+
+Para usá-las, altere as duas linhas `image` do seu `docker-compose.yml` e mantenha o resto do arquivo como está:
+```yaml
+services:
+  webserver:
+    image: ghcr.io/timothepoznanski/poznote:latest-and-beta
+    ...
+  mcp-server:
+    image: ghcr.io/timothepoznanski/poznote-mcp:latest-and-beta
+    ...
+```
+
+Com a variante [rootless](#rootless), a imagem do webserver em `docker-compose.rootless.yml` passa a ser `poznote:latest-and-beta-rootless`, e a imagem MCP continua a mesma: `poznote-mcp:latest-and-beta`.
+
+Baixe as imagens e reinicie os contêineres:
+```bash
+docker compose pull
+docker compose up -d
+```
+
+*   **Antes de mudar:** uma beta ainda pode conter bugs, então faça primeiro um [backup](#backup--exportar). Os problemas podem ser relatados nas [issues do GitHub](https://github.com/timothepoznanski/poznote/issues) ou no [Discord](https://discord.gg/AWhWWSEkJ).
+*   **Atualizações:** a partir daí, cada `docker compose pull` baixa a beta mais recente, ou a versão estável quando ela for lançada. O procedimento de atualização acima baixa um novo `docker-compose.yml` que volta a usar as tags estáveis, então altere novamente as duas linhas `image` depois dessa etapa.
+*   **Voltar para a versão estável:** como uma beta pode alterar o banco de dados, voltar para uma versão estável mais antiga pode não funcionar. Aguarde a próxima versão estável, que inclui as mudanças da beta, e então siga o procedimento de atualização acima.
+
 ## Autenticação
 
 O Poznote oferece vários métodos de autenticação, incluindo contas locais e provedores de identidade externos. Aplicativos e extensões que se comunicam com a API REST usam [senhas de aplicativo](#senhas-de-aplicativo), uma credencial à parte descrita na seção seguinte.
@@ -656,7 +683,7 @@ Os instantâneos guardam versões anteriores do conteúdo de uma nota para que v
 <summary><strong>Como funcionam os instantâneos</strong></summary>
 <br>
 
-*   **Automáticos:** um instantâneo é criado na primeira vez que a nota é aberta a cada dia. Os 3 instantâneos automáticos mais recentes são mantidos por nota; esse número pode ser alterado em **Configurações > Comportamento > Instantâneos**.
+*   **Automáticos:** um instantâneo é criado na primeira vez que a nota é aberta a cada dia. Os 3 instantâneos automáticos mais recentes são mantidos por nota; esse número pode ser alterado em **Configurações > Ações > Instantâneos**.
 *   **Manuais:** "Criar instantâneo agora" adiciona um instantâneo a qualquer momento, assim como **Ctrl + Alt + S** (Cmd + Alt + S no Mac) com uma nota aberta. Os instantâneos manuais são ilimitados e não contam para esse número.
 *   **Antes de uma edição por IA:** um instantâneo é criado automaticamente logo antes de o [Assistente IA](#assistente-ia) ou o [servidor MCP](#servidor-mcp) alterar o conteúdo de uma nota, então uma reescrita que dê errado pode ser desfeita com um clique. Esses instantâneos aparecem como "Antes da alteração pela IA" ou "Antes da alteração por MCP" no histórico, não são criados quando o instantâneo mais recente já tem o mesmo conteúdo, e os 20 mais recentes são mantidos por nota, número que você pode alterar em **Configurações → Instantâneos** (1 a 200) se a sua instância edita muitas notas por IA ou MCP.
 *   **Expiração:** todo instantâneo, automático ou manual, é excluído 30 dias depois de criado. Um instantâneo também pode ser excluído manualmente na janela Instantâneos.
@@ -1222,7 +1249,7 @@ As notas que você modificou nos últimos 5 dias são mantidas em cada navegador
 *   **Leitura e edição:** notas HTML, notas Markdown e listas de tarefas abrem no editor de sempre, e é possível criar notas novas. O menu / e o menu do clique direito também funcionam, sem os comandos que precisam do servidor (imagens e arquivos para enviar, modelos, desenhos, links para outras notas). Os outros tipos de nota, como os desenhos, ficam disponíveis apenas online. As alterações ficam guardadas no navegador até serem enviadas.
 *   **Manter offline:** os favoritos são sempre mantidos, e **Manter offline** no menu de uma nota ou de uma pasta (subpastas incluídas) a mantém seja qual for a data, com todos os anexos (PDF, áudio, arquivos) de até 25 MB cada. O mesmo menu de uma nota indica se ela está disponível offline neste navegador.
 *   **De volta online:** as alterações são enviadas automaticamente. Se uma nota também foi alterada no servidor nesse meio-tempo, as duas versões são mescladas quando possível; caso contrário, sua versão offline é mantida como uma nota separada chamada "... (cópia offline)". Uma nota excluída no servidor nesse meio-tempo é criada novamente.
-*   **Configuração:** **Configurações > Outros > Notas offline** define quantos dias de notas são mantidos (5 por padrão, até 30, 0 desativa as notas offline) e mostra o que o navegador atual contém.
+*   **Configuração:** **Configurações > Ações > Notas offline** define quantos dias de notas são mantidos (5 por padrão, até 30, 0 desativa as notas offline) e mostra o que o navegador atual contém.
 *   **Limites:** no máximo 300 notas e 50 MB de texto, primeiro as modificadas mais recentemente. Os arquivos também são mantidos: as imagens exibidas nessas notas e todos os anexos (PDF, áudio, arquivos) dos favoritos e das notas mantidas com **Manter offline**, até 25 MB cada, 400 arquivos e 200 MB no total, e nunca mais da metade do espaço livre do navegador. Um arquivo maior fica apenas online, e a nota avisa quando é aberta offline.
 *   **Requisitos:** o Poznote precisa ser servido por HTTPS (os navegadores só mantêm páginas offline em uma conexão segura, `http://localhost` também funciona) e ter sido aberto uma vez online no navegador, após o login, para que a cópia seja feita.
 *   **Privacidade:** apenas as notas da sua própria conta são mantidas, não as de uma conta ou de um espaço de trabalho compartilhado com você. Elas ficam armazenadas sem criptografia no navegador. Sair da conta as remove do navegador (inclusive as alterações ainda não enviadas, depois de um aviso que as lista): em um computador compartilhado, saia da conta ao ir embora. Sair da conta também funciona sem rede, pela página offline: as notas são removidas na hora, e a sessão no servidor termina na próxima vez que o Poznote for aberto online.

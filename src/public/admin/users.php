@@ -12,6 +12,7 @@ require_once __DIR__ . '/../../auth.php';
 requireAuth();
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../functions.php';
+require_once __DIR__ . '/../../settings_shell.php';
 requireSettingsPassword();
 require_once __DIR__ . '/../../db_connect.php';
 
@@ -1194,9 +1195,8 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     <!-- ========================================
          ADMIN CONTAINER - User Management
          ======================================== -->
+    <?php poznoteSettingsShellOpen(['section' => 'admin-tools-grid', 'title' => t('settings.cards.user_management', [], 'User Management'), 'basePath' => '../', 'wide' => true, 'panel' => true]); ?>
     <div class="admin-container">
-        <?php $backToSettingsBasePath = '../'; include __DIR__ . '/../../back_to_settings.php'; ?>
-        <h1 class="poznote-page-title"><i class="lucide lucide-users-cog"></i> <?php echo t_h('settings.cards.user_management', [], 'User Management'); ?></h1>
         <!-- Header with navigation and actions -->
         <div class="admin-header">
             <div>
@@ -1501,6 +1501,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
             </form>
         </div>
     </div>
+    <?php poznoteSettingsShellClose(); ?>
 
     <!-- ========================================
          MODALS
@@ -2052,6 +2053,6 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
             }
         });
     </script>
-    <script src="../js/icon-sidebar-toggle.js?v=<?php echo $v; ?>"></script>
+    <script src="../<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 </body>
 </html>

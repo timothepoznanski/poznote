@@ -248,15 +248,31 @@
 
 .offline-note-pending {
     display: inline-flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 6px;
     margin-left: 12px;
     color: var(--pz-warning-strong);
 }
 
 .offline-note-pending .lucide {
+    flex: 0 0 auto;
     width: 13px;
     height: 13px;
+    margin-top: 0.25em;
+}
+
+/* A phone has no room for it after the date: a line of its own, like the
+   notice of a file left online */
+@media (max-width: 800px) {
+    .offline-note-pending {
+        display: flex;
+        margin: 6px 0 0;
+        padding: 6px 10px;
+        border-radius: var(--pz-radius);
+        background: var(--pz-warning-soft);
+        font-size: 13px;
+        line-height: 1.45;
+    }
 }
 
 /* A file of the note left online by the per-file limit */
@@ -279,6 +295,33 @@
     width: 14px;
     height: 14px;
     margin-top: 3px;
+}
+
+/* A toolbar with no button until text is selected (js/offline-app.js
+   updateToolbarRoom): the header takes no room, and the formatting buttons
+   appear over the top of the note instead of pushing it down */
+.offline-page .note-header.offline-toolbar-floating {
+    padding-top: 0;
+    padding-bottom: 0;
+    background: transparent;
+}
+
+.offline-page .note-header.offline-toolbar-floating .note-edit-toolbar {
+    position: absolute;
+    top: 6px;
+    left: 0;
+    right: 0;
+    width: max-content;
+    max-width: 100%;
+    margin: 0 auto;
+    border-radius: var(--pz-radius);
+}
+
+.offline-page .note-header.offline-toolbar-floating .note-edit-toolbar:has(.show-on-selection) {
+    padding: 2px 6px;
+    border: 1px solid var(--pz-border);
+    background: var(--pz-bg);
+    box-shadow: 0 4px 14px rgba(var(--pz-shadow-rgb), 0.12);
 }
 
 /* Task actions that need the server */

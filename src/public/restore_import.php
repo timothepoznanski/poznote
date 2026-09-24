@@ -4,6 +4,7 @@ requireAuth();
 requireActiveAccountOwner();
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../functions.php';
+require_once __DIR__ . '/../settings_shell.php';
 requireSettingsPassword();
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../version_helper.php';
@@ -198,9 +199,8 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
 </head>
 <body class="has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php include __DIR__ . '/../icon_sidebar.php'; ?>
+    <?php poznoteSettingsShellOpen(['section' => 'settings-actions-section-grid', 'title' => t('settings.cards.restore_import', [], 'Restore / Import')]); ?>
     <div class="backup-container">
-    <?php include __DIR__ . '/../back_to_settings.php'; ?>
-    <h1 class="poznote-page-title"><i class="lucide lucide-download"></i> <?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?></h1>
 
         
         <!-- Global Messages Section - Always visible at the top -->
@@ -588,6 +588,7 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
         <!-- Bottom padding for better spacing -->
         <div class="section-bottom-spacer"></div>
     </div>
+    <?php poznoteSettingsShellClose(); ?>
 
     <!-- Simple Import Confirmation Modal -->
     <div id="importConfirmModal" class="import-confirm-modal">
