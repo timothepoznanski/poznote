@@ -1902,7 +1902,8 @@
       "paste_into_folder": "In Ordner einfügen",
       "change_note_icon": "Notizsymbol ändern",
       "keep_offline": "Offline behalten",
-      "stop_offline": "Nicht mehr offline behalten"
+      "stop_offline": "Nicht mehr offline behalten",
+      "kept_offline": "In diesem Browser offline behalten"
     },
     "folder_filter": {
       "exit": "Ordneransicht verlassen"

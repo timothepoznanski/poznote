@@ -100,6 +100,7 @@ class OfflineController {
             // version token is computed from the content, as show() does, so
             // it can be sent back as "if_version".
             $notes = [];
+            $keptFolders = [];
             if ($days > 0) {
                 $cutoff = gmdate('Y-m-d H:i:s', time() - $days * 86400);
                 $keptFolders = poznoteOfflineFolderIds($allFolders);
@@ -189,6 +190,9 @@ class OfflineController {
                 ],
                 'workspaces' => array_values(array_map('strval', $workspaces)),
                 'folders' => array_values($folders),
+                // Folders kept whole ("Keep offline", or under one), for the
+                // marks of the note and folder lists (js/offline-marks.js)
+                'kept_folders' => array_map('intval', array_keys($keptFolders)),
                 'notes' => $notes,
             ];
 
