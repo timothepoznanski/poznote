@@ -86,6 +86,9 @@ $scripts = [
     poznoteAsset('js/ui.js'),
     poznoteAsset('js/date-picker-popup.js'),
     poznoteAsset('js/slash-command.js'),
+    // Right-click on an attachment: Open and Download, served from the copy
+    // kept on the device (sw.js)
+    poznoteAsset('js/note-attachment-menu.js'),
     poznoteAsset('js/offline-store.js'),
     poznoteAsset('js/offline-app.js'),
 ];
@@ -186,7 +189,10 @@ $assets = array_merge(
         <div class="sidebar-header">
             <div class="sidebar-title-row">
                 <div class="sidebar-title" role="button" tabindex="0" id="offline-workspace-title" aria-haspopup="true" aria-expanded="false">
-                    <span class="poznote-logo workspace-title-icon" role="img" aria-label="Poznote"></span>
+                    <!-- The connection state, where the app shows the Poznote logo (js/offline-app.js updateStatus) -->
+                    <i class="lucide lucide-wifi-off workspace-title-icon offline-title-status" id="offline-status" role="img"
+                       title="<?php echo $tr('offline.status.offline', 'Offline'); ?>"
+                       aria-label="<?php echo $tr('offline.status.offline', 'Offline'); ?>"></i>
                     <span class="workspace-title-text" id="offline-workspace-name">Poznote</span>
                     <i class="lucide lucide-caret-down workspace-dropdown-icon" id="offline-workspace-caret" hidden></i>
                 </div>
@@ -209,10 +215,6 @@ $assets = array_merge(
                     <button type="button" class="dropdown-item" role="menuitem" data-type="tasklist"><i class="lucide lucide-list-todo"></i> <?php echo $tr('offline.new.tasklist', 'Task list'); ?></button>
                 </div>
             </div>
-            <div class="offline-status" id="offline-status" role="status">
-                <i class="lucide lucide-wifi-off"></i>
-                <span class="offline-status-text"><?php echo $tr('offline.status.offline', 'Offline'); ?></span>
-            </div>
         </div>
 
         <div class="contains_forms_search" id="search-bar-container">
@@ -234,6 +236,14 @@ $assets = array_merge(
 
     <!-- RIGHT COLUMN -->
     <div id="right_pane" data-tabs-script="<?php echo htmlspecialchars($tabsScript, ENT_QUOTES); ?>">
+        <!-- Back online: same banner as the app, over the note toolbar (css/offline-banner.css) -->
+        <div class="offline-banner-anchor">
+            <div class="offline-banner" id="offline-online-banner" role="status" hidden>
+                <i class="lucide lucide-wifi"></i>
+                <span class="offline-banner-text" id="offline-online-text"></span>
+                <a class="btn btn-primary offline-banner-open" id="offline-online-action" href="index.php"></a>
+            </div>
+        </div>
         <div id="right_col">
             <div class="offline-placeholder" id="offline-placeholder">
                 <i class="lucide lucide-file-text" aria-hidden="true"></i>
@@ -247,13 +257,6 @@ $assets = array_merge(
             </div>
             <div id="offline-note-host"></div>
         </div>
-    </div>
-
-    <!-- Back online: same banner as the app (css/offline-banner.css) -->
-    <div class="offline-banner" id="offline-online-banner" role="status" hidden>
-        <i class="lucide lucide-wifi"></i>
-        <span class="offline-banner-text" id="offline-online-text"></span>
-        <a class="btn btn-primary offline-banner-open" id="offline-online-action" href="index.php"></a>
     </div>
 
     <?php foreach ($scripts as $script): ?>

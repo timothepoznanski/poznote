@@ -358,16 +358,16 @@
     var REORDER_EDGE_ZONE_PX = 44;
     var REORDER_EDGE_SPEED_PX = 14;
 
-    /** @type {null|{bar: HTMLElement, el: HTMLElement, tabId: string, startX: number, grabOffsetX: number, pointerX: number, active: boolean, translate: number, rafId: number}} */
+    /** @type {null|{strip: HTMLElement, el: HTMLElement, tabId: string, startX: number, grabOffsetX: number, pointerX: number, active: boolean, translate: number, rafId: number}} */
     var _reorder = null;
 
     /** Set right after a reorder drag so the trailing click does not switch tab. */
     var _reorderJustFinished = false;
 
     /** Remember the press without starting anything visible yet. */
-    function _reorderArm(bar, tabEl, e) {
+    function _reorderArm(strip, tabEl, e) {
         _reorder = {
-            bar: bar,
+            strip: strip,
             el: tabEl,
             tabId: tabEl.getAttribute('data-tab-id'),
             startX: e.clientX,
@@ -383,7 +383,7 @@
         var state = _reorder;
         state.active = true;
         state.el.classList.add('app-tab-dragging');
-        state.bar.classList.add('is-reordering');
+        state.strip.classList.add('is-reordering');
         document.body.classList.add('app-tab-reordering');
         state.rafId = requestAnimationFrame(_reorderFrame);
     }
@@ -400,19 +400,19 @@
         _reorder.rafId = requestAnimationFrame(_reorderFrame);
     }
 
-    /** Scroll the bar when the dragged tab is held against either end. */
+    /** Scroll the strip when the dragged tab is held against either end. */
     function _reorderAutoScroll() {
         var state = _reorder;
-        var maxScroll = state.bar.scrollWidth - state.bar.clientWidth;
+        var maxScroll = state.strip.scrollWidth - state.strip.clientWidth;
         if (maxScroll <= 0) return;
 
-        var barRect = state.bar.getBoundingClientRect();
+        var stripRect = state.strip.getBoundingClientRect();
         var delta = 0;
-        if (state.pointerX < barRect.left + REORDER_EDGE_ZONE_PX) delta = -REORDER_EDGE_SPEED_PX;
-        else if (state.pointerX > barRect.right - REORDER_EDGE_ZONE_PX) delta = REORDER_EDGE_SPEED_PX;
+        if (state.pointerX < stripRect.left + REORDER_EDGE_ZONE_PX) delta = -REORDER_EDGE_SPEED_PX;
+        else if (state.pointerX > stripRect.right - REORDER_EDGE_ZONE_PX) delta = REORDER_EDGE_SPEED_PX;
         if (!delta) return;
 
-        state.bar.scrollLeft = Math.max(0, Math.min(maxScroll, state.bar.scrollLeft + delta));
+        state.strip.scrollLeft = Math.max(0, Math.min(maxScroll, state.strip.scrollLeft + delta));
     }
 
     /** Keep the dragged tab under the cursor, then re-slot it among its neighbours. */
@@ -420,17 +420,17 @@
         var state = _reorder;
         if (!state || !state.active) return;
 
-        // The tab's untransformed position moves whenever the bar scrolls or the
-        // tab changes place, so it is re-derived from the live rect every frame.
+        // The tab's untransformed position moves whenever the strip scrolls or
+        // the tab changes place, so it is re-derived from the live rect every frame.
         var naturalLeft = state.el.getBoundingClientRect().left - state.translate;
-        var barRect = state.bar.getBoundingClientRect();
+        var stripRect = state.strip.getBoundingClientRect();
         var width = state.el.offsetWidth;
 
-        // Clamped to the bar: the bar clips its overflow, so a tab dragged past
+        // Clamped to the strip: it clips its overflow, so a tab dragged past
         // an edge would simply disappear instead of following the pointer.
         var visualLeft = Math.min(
-            Math.max(state.pointerX - state.grabOffsetX, barRect.left),
-            Math.max(barRect.right - width, barRect.left)
+            Math.max(state.pointerX - state.grabOffsetX, stripRect.left),
+            Math.max(stripRect.right - width, stripRect.left)
         );
         state.translate = visualLeft - naturalLeft;
         state.el.style.transform = 'translateX(' + state.translate + 'px)';
@@ -445,7 +445,7 @@
         var isPinned = _isPinnedTab(draggedTab);
 
         var neighbours = [];
-        var tabElements = state.bar.querySelectorAll('.app-tab[data-tab-id]');
+        var tabElements = state.strip.querySelectorAll('.app-tab[data-tab-id]');
         for (var i = 0; i < tabElements.length; i++) {
             var el = tabElements[i];
             if (el === state.el) continue;
@@ -470,7 +470,7 @@
         if (reference === state.el || reference === state.el.nextSibling) return;
 
         _reorderFlip(function () {
-            state.bar.insertBefore(state.el, reference);
+            state.strip.insertBefore(state.el, reference);
         });
 
         // The move changed the tab's untransformed position: re-anchor it on
@@ -486,7 +486,7 @@
      */
     function _reorderFlip(mutate) {
         var state = _reorder;
-        var tabElements = state.bar.querySelectorAll('.app-tab[data-tab-id]');
+        var tabElements = state.strip.querySelectorAll('.app-tab[data-tab-id]');
         var before = [];
         for (var i = 0; i < tabElements.length; i++) {
             before.push(tabElements[i].getBoundingClientRect().left);
@@ -506,7 +506,7 @@
             moved[k].el.style.transition = 'none';
             moved[k].el.style.transform = 'translateX(' + moved[k].shift + 'px)';
         }
-        void state.bar.offsetWidth; // flush the offset before animating it away
+        void state.strip.offsetWidth; // flush the offset before animating it away
         for (var m = 0; m < moved.length; m++) {
             moved[m].el.style.transition = '';
             moved[m].el.style.transform = '';
@@ -515,9 +515,9 @@
 
     /** Adopt the order the bar now shows and persist it. */
     function _reorderCommit() {
-        var bar = _reorder.bar;
+        var strip = _reorder.strip;
         var ordered = [];
-        var tabElements = bar.querySelectorAll('.app-tab[data-tab-id]');
+        var tabElements = strip.querySelectorAll('.app-tab[data-tab-id]');
         for (var i = 0; i < tabElements.length; i++) {
             var tab = _findTabById(tabElements[i].getAttribute('data-tab-id'));
             if (tab && ordered.indexOf(tab) === -1) ordered.push(tab);
@@ -547,7 +547,7 @@
         state.el.style.transform = '';
         state.el.style.transition = '';
         state.el.classList.remove('app-tab-dragging');
-        state.bar.classList.remove('is-reordering');
+        state.strip.classList.remove('is-reordering');
         document.body.classList.remove('app-tab-reordering');
 
         if (state.active) {
@@ -591,6 +591,133 @@
         });
     }
 
+    // ── Overflow chevrons ──────────────────────────────────────────────────
+
+    /**
+     * When the tabs do not all fit, a chevron at each end of the strip pages
+     * through them. Both show as soon as the strip overflows; the one whose
+     * end is reached is disabled rather than hidden, so the tabs do not shift
+     * under the pointer when it gets there.
+     */
+
+    /** Where the smooth scroll started by a chevron is heading, while it runs. */
+    var _tabScrollTarget = null;
+    var _tabScrollTargetTimer = null;
+
+    /** @type {ResizeObserver|null} */
+    var _tabBarResizeObserver = null;
+
+    function _createTabScrollButton(direction) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'app-tab-scroll-btn app-tab-scroll-' + direction;
+        btn.innerHTML = '<i class="lucide lucide-chevron-' + (direction === 'next' ? 'right' : 'left') + '"></i>';
+        return btn;
+    }
+
+    /** Set on every render: the bar outlives the i18n load that translates it. */
+    function _labelTabScrollButtons(bar) {
+        var buttons = bar.querySelectorAll('.app-tab-scroll-btn');
+        for (var i = 0; i < buttons.length; i++) {
+            var label = buttons[i].classList.contains('app-tab-scroll-next')
+                ? _t('tabs.scroll_right', 'Scroll tabs right')
+                : _t('tabs.scroll_left', 'Scroll tabs left');
+            buttons[i].title = label;
+            buttons[i].setAttribute('aria-label', label);
+        }
+    }
+
+    /**
+     * Show the chevrons while the strip overflows and disable the one whose end
+     * is reached. Overflow is judged against the width the strip would have
+     * without them, or showing them would be enough to keep them shown.
+     */
+    function _updateTabScrollButtons() {
+        var bar = document.getElementById('app-tab-bar');
+        var strip = bar ? bar.querySelector('.app-tab-strip') : null;
+        if (!strip || !bar.offsetWidth) return;
+        var prev = bar.querySelector('.app-tab-scroll-prev');
+        var next = bar.querySelector('.app-tab-scroll-next');
+
+        var available = bar.classList.contains('has-overflow')
+            ? next.getBoundingClientRect().right - prev.getBoundingClientRect().left
+            : strip.getBoundingClientRect().width;
+        bar.classList.toggle('has-overflow', strip.scrollWidth > available + 1);
+
+        var maxScroll = strip.scrollWidth - strip.clientWidth;
+        prev.disabled = strip.scrollLeft <= 1;
+        next.disabled = strip.scrollLeft >= maxScroll - 1;
+    }
+
+    function _onTabStripScroll(e) {
+        if (_tabScrollTarget !== null && Math.abs(e.target.scrollLeft - _tabScrollTarget) < 1) {
+            _tabScrollTarget = null;
+        }
+        _updateTabScrollButtons();
+    }
+
+    /**
+     * Re-check the overflow when the bar is resized (pane or window) or a tab
+     * changes width outside a render (web font landing, search filter hiding it).
+     * Toggling the chevrons resizes only the strip, which is not observed.
+     */
+    function _observeTabBarSize(bar) {
+        if (typeof ResizeObserver === 'undefined') return;
+        if (!_tabBarResizeObserver) {
+            _tabBarResizeObserver = new ResizeObserver(function () {
+                _updateTabScrollButtons();
+            });
+        }
+        _tabBarResizeObserver.disconnect();
+        _tabBarResizeObserver.observe(bar);
+        var tabElements = bar.querySelectorAll('.app-tab[data-tab-id]');
+        for (var i = 0; i < tabElements.length; i++) {
+            _tabBarResizeObserver.observe(tabElements[i]);
+        }
+    }
+
+    /**
+     * Page the strip one way (-1 left, 1 right), landing on a tab edge: the
+     * first tab cut off on that side becomes the first one fully shown on the
+     * other, so paging never skips a tab.
+     */
+    function _scrollTabsPage(strip, direction) {
+        var viewWidth = strip.clientWidth;
+        var maxScroll = strip.scrollWidth - viewWidth;
+        // A click during the smooth scroll pages on from where it is heading
+        var from = _tabScrollTarget !== null ? _tabScrollTarget : strip.scrollLeft;
+        var target = null;
+
+        var tabElements = strip.querySelectorAll('.app-tab[data-tab-id]');
+        for (var k = 0; k < tabElements.length; k++) {
+            var el = tabElements[direction > 0 ? k : tabElements.length - 1 - k];
+            if (!el.offsetWidth) continue; // hidden by the search filter
+            var left = el.offsetLeft;
+            var right = left + el.offsetWidth;
+            if (direction > 0 && right > from + viewWidth + 1) {
+                target = left;
+                break;
+            }
+            if (direction < 0 && left < from - 1) {
+                target = right - viewWidth;
+                break;
+            }
+        }
+        // A tab wider than the strip leaves no edge to land on: page by the width
+        if (target === null || (target - from) * direction < 1) target = from + direction * viewWidth;
+        target = Math.max(0, Math.min(maxScroll, target));
+        if (Math.abs(target - strip.scrollLeft) < 1) return;
+
+        var reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+        if (!reduceMotion) {
+            _tabScrollTarget = target;
+            // Dropped even if the scroll never gets there (interrupted by a drag)
+            clearTimeout(_tabScrollTargetTimer);
+            _tabScrollTargetTimer = setTimeout(function () { _tabScrollTarget = null; }, 800);
+        }
+        strip.scrollTo({ left: target, behavior: reduceMotion ? 'auto' : 'smooth' });
+    }
+
     // ── Render ─────────────────────────────────────────────────────────────
 
     /**
@@ -622,9 +749,19 @@
         }
         document.body.classList.add('has-internal-tabs');
         if (bar) bar.style.display = '';
+        var strip = bar ? bar.querySelector('.app-tab-strip') : null;
         if (!bar) {
             bar = document.createElement('div');
             bar.id = 'app-tab-bar';
+
+            // Only the strip of tabs scrolls: the chevrons on either side of
+            // it and "Close all tabs" (added by each render) stay in place.
+            strip = document.createElement('div');
+            strip.className = 'app-tab-strip';
+            bar.appendChild(_createTabScrollButton('prev'));
+            bar.appendChild(strip);
+            bar.appendChild(_createTabScrollButton('next'));
+            strip.addEventListener('scroll', _onTabStripScroll, { passive: true });
 
             // Drag-to-scroll functionality
             var isDragging = false;
@@ -643,43 +780,43 @@
                 }
                 // Only the primary button drags the bar
                 if (e.button !== 0) return;
-                // Don't start dragging on the close buttons
-                if (e.target.closest('.app-tab-close') || e.target.closest('.app-tab-close-all')) return;
+                // Don't start dragging on the buttons
+                if (e.target.closest('.app-tab-close') || e.target.closest('.app-tab-close-all') ||
+                    e.target.closest('.app-tab-scroll-btn')) return;
 
                 // Pressing a tab arms a reorder drag (like browser tabs); the
                 // bar's empty space keeps the drag-to-scroll below.
                 var pressedTab = e.target.closest('.app-tab');
                 if (pressedTab) {
-                    _reorderArm(bar, pressedTab, e);
+                    _reorderArm(strip, pressedTab, e);
                     return;
                 }
 
                 isDragging = true;
                 hasDragged = false;
-                startX = e.pageX - bar.offsetLeft;
-                scrollLeft = bar.scrollLeft;
-                bar.style.cursor = 'grabbing';
+                startX = e.pageX;
+                scrollLeft = strip.scrollLeft;
+                strip.style.cursor = 'grabbing';
                 bar.style.userSelect = 'none';
             });
 
             document.addEventListener('mousemove', function (e) {
                 if (!isDragging) return;
                 e.preventDefault();
-                var x = e.pageX - bar.offsetLeft;
-                var walk = (x - startX) * 1.5; // Scroll speed multiplier
+                var walk = (e.pageX - startX) * 1.5; // Scroll speed multiplier
 
                 // If moved more than 5px, consider it a drag
                 if (Math.abs(walk) > 5) {
                     hasDragged = true;
                 }
 
-                bar.scrollLeft = scrollLeft - walk;
+                strip.scrollLeft = scrollLeft - walk;
             });
 
             document.addEventListener('mouseup', function () {
                 if (isDragging) {
                     isDragging = false;
-                    bar.style.cursor = '';
+                    strip.style.cursor = '';
                     bar.style.userSelect = '';
 
                     // Reset hasDragged after a short delay to allow click event to check it
@@ -692,7 +829,7 @@
             bar.addEventListener('mouseleave', function () {
                 if (isDragging) {
                     isDragging = false;
-                    bar.style.cursor = '';
+                    strip.style.cursor = '';
                     bar.style.userSelect = '';
                 }
             });
@@ -708,6 +845,11 @@
 
                 if (e.target.closest('.app-tab-close-all')) {
                     closeAllTabs();
+                    return;
+                }
+                var scrollBtn = e.target.closest('.app-tab-scroll-btn');
+                if (scrollBtn) {
+                    _scrollTabsPage(strip, scrollBtn.classList.contains('app-tab-scroll-next') ? 1 : -1);
                     return;
                 }
                 var closeBtn = e.target.closest('.app-tab-close');
@@ -756,7 +898,7 @@
         }
 
         // Clear existing tabs
-        bar.innerHTML = '';
+        strip.innerHTML = '';
 
         tabs.forEach(function (tab) {
             var el = document.createElement('div');
@@ -790,13 +932,14 @@
                 closeBtn.textContent = '×';
                 el.appendChild(closeBtn);
             }
-            bar.appendChild(el);
+            strip.appendChild(el);
         });
 
         // "Close all tabs" runs the same action as the right-click menu, but
-        // is reachable without knowing the menu exists. Pinned to the right
-        // edge (sticky) so it stays put while the bar scrolls.
-        bar.classList.toggle('has-close-all', tabs.length > 1);
+        // is reachable without knowing the menu exists. It sits outside the
+        // strip, at the right end of the bar, so it stays put while tabs scroll.
+        var previousCloseAll = bar.querySelector('.app-tab-close-all');
+        if (previousCloseAll) previousCloseAll.remove();
         if (tabs.length > 1) {
             var closeAllLabel = _t('tabs.close_all_tabs', 'Close all tabs');
             var closeAllBtn = document.createElement('button');
@@ -816,20 +959,20 @@
 
         _applySearchTabVisibility();
 
-        // Ensure active tab is visible if bar overflowed — scroll only the bar horizontally
+        _labelTabScrollButtons(bar);
+        _updateTabScrollButtons();
+        _observeTabBarSize(bar);
+
+        // Ensure active tab is visible if the strip overflowed — scroll only the strip horizontally
         if (activeTabId) {
-            var activeEl = bar.querySelector('.app-tab.active');
+            var activeEl = strip.querySelector('.app-tab.active');
             if (activeEl) {
-                // The "Close all tabs" button is sticky at the right end, so the
-                // space it covers is not usable to show the active tab.
-                var closeAllEl = bar.querySelector('.app-tab-close-all');
-                var trailingWidth = closeAllEl ? closeAllEl.offsetWidth : 0;
                 var tabLeft = activeEl.offsetLeft;
                 var tabRight = tabLeft + activeEl.offsetWidth;
-                if (tabLeft < bar.scrollLeft) {
-                    bar.scrollLeft = tabLeft;
-                } else if (tabRight > bar.scrollLeft + bar.offsetWidth - trailingWidth) {
-                    bar.scrollLeft = tabRight - bar.offsetWidth + trailingWidth;
+                if (tabLeft < strip.scrollLeft) {
+                    strip.scrollLeft = tabLeft;
+                } else if (tabRight > strip.scrollLeft + strip.clientWidth) {
+                    strip.scrollLeft = tabRight - strip.clientWidth;
                 }
             }
         }

@@ -1990,7 +1990,9 @@
       "close_all": "关闭所有",
       "close_others": "关闭除此之外的所有标签页"
     },
-    "close_all_tabs": "关闭所有标签页"
+    "close_all_tabs": "关闭所有标签页",
+    "scroll_left": "向左滚动标签页",
+    "scroll_right": "向右滚动标签页"
   },
   "notes_manager": {
     "actions": "批量操作",
@@ -5145,7 +5147,6 @@
     "list": {
       "search": "搜索笔记",
       "all_workspaces": "所有工作区",
-      "available": "可离线使用",
       "recent": "最近 {{days}} 天内修改",
       "no_results": "没有符合搜索条件的笔记。",
       "empty": "此工作区中没有笔记。",
@@ -5162,7 +5163,6 @@
     "note": {
       "placeholder": "选择一条笔记以打开。",
       "back": "返回列表",
-      "modified": "修改于 {{date}}",
       "saved_locally": "已保存在此设备上。恢复联网后将发送到服务器。",
       "push_error": "尚未发送：{{error}}",
       "too_big": "超过 {{limit}} MB，无法离线使用：{{files}}",

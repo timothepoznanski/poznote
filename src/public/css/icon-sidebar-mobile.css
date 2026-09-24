@@ -37,37 +37,29 @@
         margin-left: var(--icon-sidebar-width);
     }
 
-    /* index.php slides between its two columns by scrolling <body> sideways
-       (window.scrollToRightColumn in js/index-events.js scrolls by exactly one
-       viewport width), so the columns must keep their full width and the row
-       must stay wider than the screen. The rail is therefore pinned on top and
-       the row is pushed clear of it, rather than shrunk to fit. */
+    /* index.php (and offline.php) slide between their two columns by
+       scrolling <body> sideways (window.scrollToRightColumn in
+       js/index-events.js), so the columns keep the screen's width and the row
+       stays wider than the screen. The rail belongs to the list: absolute in
+       <body>, which is the scroller (position: fixed, css/index-mobile.css),
+       it sits in the margin left of the list and slides in and out with it.
+       Out of sight on the note, it never covers it, and nothing has to hide it
+       or resize the columns halfway through a swipe. */
     body:not(.has-icon-sidebar) #icon_sidebar {
-        position: fixed;
+        position: absolute;
         left: 0;
         top: 0;
         z-index: 10;
         height: 100%;
     }
 
-    /* The rail is pinned over the left edge, so the notes list has to give up
-       that width rather than be pushed right: a margin alone would shift its
-       full-viewport width off-screen and crop the search bar and create button.
-       #right_pane keeps its full width so the note still fills the screen. */
-    body:not(.has-icon-sidebar) #left_col {
+    /* The list gives up the rail's width rather than be pushed right: a margin
+       alone would shift its full-viewport width off-screen and crop the search
+       bar and create button. Only beside a rail. */
+    body:not(.has-icon-sidebar) #icon_sidebar ~ #left_col {
         margin-left: var(--icon-sidebar-width);
         width: calc(100% - var(--icon-sidebar-width)) !important;
         min-width: 0 !important;
-    }
-
-    /* Reading a note on mobile: the note takes the whole screen. js/note-loader-common.js
-       puts .note-open on <body> while the note pane is showing. */
-    html body.note-open :is(#icon_sidebar)#icon_sidebar {
-        display: none !important;
-    }
-
-    body.note-open:not(.has-icon-sidebar) #left_col {
-        margin-left: 0;
     }
 
     /* The collapse chevron sits over the content at this width. */

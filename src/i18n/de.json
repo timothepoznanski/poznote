@@ -1992,7 +1992,9 @@
       "close_all": "Alle schließen",
       "close_others": "Alle außer diesem schließen"
     },
-    "close_all_tabs": "Alle Tabs schließen"
+    "close_all_tabs": "Alle Tabs schließen",
+    "scroll_left": "Tabs nach links scrollen",
+    "scroll_right": "Tabs nach rechts scrollen"
   },
   "notes_manager": {
     "actions": "Stapelaktionen",
@@ -5045,7 +5047,6 @@
     "list": {
       "search": "Notizen durchsuchen",
       "all_workspaces": "Alle Arbeitsbereiche",
-      "available": "Offline verfügbar",
       "recent": "In den letzten {{days}} Tagen geändert",
       "no_results": "Keine Notiz entspricht Ihrer Suche.",
       "empty": "Keine Notizen in diesem Arbeitsbereich.",
@@ -5062,7 +5063,6 @@
     "note": {
       "placeholder": "Wählen Sie eine Notiz aus, um sie zu öffnen.",
       "back": "Zurück zur Liste",
-      "modified": "Geändert {{date}}",
       "saved_locally": "Auf diesem Gerät gespeichert. Die Notiz wird an den Server gesendet, sobald Sie wieder online sind.",
       "push_error": "Noch nicht gesendet: {{error}}",
       "too_big": "Offline nicht verfügbar, größer als {{limit}} MB: {{files}}",

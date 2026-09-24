@@ -1992,7 +1992,9 @@
       "close_all": "Cerrar todas",
       "close_others": "Cerrar todas excepto esta"
     },
-    "close_all_tabs": "Cerrar todas las pestañas"
+    "close_all_tabs": "Cerrar todas las pestañas",
+    "scroll_left": "Desplazar las pestañas a la izquierda",
+    "scroll_right": "Desplazar las pestañas a la derecha"
   },
   "notes_manager": {
     "actions": "Acciones masivas",
@@ -5046,7 +5048,6 @@
     "list": {
       "search": "Buscar notas",
       "all_workspaces": "Todos los espacios de trabajo",
-      "available": "Disponibles sin conexión",
       "recent": "Modificadas en los últimos {{days}} días",
       "no_results": "Ninguna nota coincide con su búsqueda.",
       "empty": "No hay notas en este espacio de trabajo.",
@@ -5063,7 +5064,6 @@
     "note": {
       "placeholder": "Seleccione una nota para abrirla.",
       "back": "Volver a la lista",
-      "modified": "Modificada {{date}}",
       "saved_locally": "Guardada en este dispositivo. Se enviará al servidor cuando vuelva a tener conexión.",
       "push_error": "Aún no enviada: {{error}}",
       "too_big": "No disponible sin conexión, más de {{limit}} MB: {{files}}",

@@ -171,35 +171,16 @@
     padding-left: 38px;
 }
 
-.offline-status {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    max-width: 100%;
-    margin: 0 2px 8px;
-    padding: 3px 10px;
-    box-sizing: border-box;
-    border-radius: var(--pz-radius-pill);
-    background: var(--pz-warning-soft);
-    color: var(--pz-warning-strong);
-    font-size: 12px;
-    white-space: nowrap;
-}
-
-.offline-status.is-online {
-    background: var(--pz-success-soft);
-    color: var(--pz-success-strong);
-}
-
-.offline-status .lucide {
+/* The connection state before the list's title, in the Poznote logo's place.
+   Hoverable, unlike the logo, for the tooltip that spells it out. */
+.offline-title-status {
     flex: 0 0 auto;
-    width: 13px;
-    height: 13px;
+    color: var(--pz-warning-strong);
+    pointer-events: auto;
 }
 
-.offline-status-text {
-    overflow: hidden;
-    text-overflow: ellipsis;
+.offline-title-status.is-online {
+    color: var(--pz-success-strong);
 }
 
 .offline-page .sidebar-title[aria-haspopup] {
@@ -246,11 +227,17 @@
 
 /* ---- Note pane ---------------------------------------------------------------- */
 
+/* The note's subline only says that a change was just kept on the device,
+   or could not be sent (js/offline-app.js renderSubline): no line at all
+   otherwise */
+.offline-page .note-subline:empty {
+    display: none;
+}
+
 .offline-note-pending {
     display: inline-flex;
     align-items: flex-start;
     gap: 6px;
-    margin-left: 12px;
     color: var(--pz-warning-strong);
 }
 
@@ -261,8 +248,7 @@
     margin-top: 0.25em;
 }
 
-/* A phone has no room for it after the date: a line of its own, like the
-   notice of a file left online */
+/* Phone: a panel of its own, like the notice of a file left online */
 @media (max-width: 800px) {
     .offline-note-pending {
         display: flex;
@@ -297,31 +283,13 @@
     margin-top: 3px;
 }
 
-/* A toolbar with no button until text is selected (js/offline-app.js
-   updateToolbarRoom): the header takes no room, and the formatting buttons
-   appear over the top of the note instead of pushing it down */
-.offline-page .note-header.offline-toolbar-floating {
-    padding-top: 0;
-    padding-bottom: 0;
-    background: transparent;
-}
-
-.offline-page .note-header.offline-toolbar-floating .note-edit-toolbar {
-    position: absolute;
-    top: 6px;
-    left: 0;
-    right: 0;
-    width: max-content;
-    max-width: 100%;
-    margin: 0 auto;
-    border-radius: var(--pz-radius);
-}
-
-.offline-page .note-header.offline-toolbar-floating .note-edit-toolbar:has(.show-on-selection) {
-    padding: 2px 6px;
-    border: 1px solid var(--pz-border);
-    background: var(--pz-bg);
-    box-shadow: 0 4px 14px rgba(var(--pz-shadow-rgb), 0.12);
+/* Phone: Save now beside Home, which css/index-mobile.css keeps in the app's
+   toolbar, until text is selected and the formatting buttons take their
+   place (js/events-text-selection.js). */
+@media (max-width: 800px) {
+    .offline-page .note-edit-toolbar .btn-save:not(.hide-on-selection) {
+        display: flex !important;
+    }
 }
 
 /* Task actions that need the server */
