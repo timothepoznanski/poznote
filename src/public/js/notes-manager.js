@@ -562,6 +562,11 @@
             return;
         }
 
+        if (action === 'keep-offline' || action === 'stop-offline') {
+            performOfflineUpdate(action === 'keep-offline');
+            return;
+        }
+
         if (action === 'trash') {
             performTrash();
         }
@@ -801,6 +806,46 @@
                 nmBulkActionSelect.disabled = false;
             }
             updateBulkBar();
+        }).catch(function (err) {
+            nmBulkActionSelect.disabled = false;
+            alert(cfg.txtError + ': ' + err.message);
+            loadAll();
+        });
+    }
+
+    // Keep the selected notes offline whatever their date, or stop (a note
+    // still recent, a favorite or in a folder kept offline stays offline).
+    // The copies of this browser and the marks of the list follow at once
+    // (js/offline-sync.js in writes-only mode, js/offline-marks.js).
+    function performOfflineUpdate(keep) {
+        if (selectedIds.size === 0) return;
+
+        nmBulkActionSelect.disabled = true;
+
+        requestSelectedNotes(function (note) {
+            return {
+                url: apiUrl('notes/' + note.id + '/offline' + wsQuery()),
+                options: {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ offline: keep })
+                }
+            };
+        }).then(function (result) {
+            if (result.changedCount > 0) {
+                selectedIds.clear();
+                loadAll();
+            } else {
+                nmBulkActionSelect.disabled = false;
+            }
+            updateBulkBar();
+            if (typeof window.poznoteOfflineSyncNow === 'function') {
+                Promise.resolve(window.poznoteOfflineSyncNow()).then(function () {
+                    if (typeof window.poznoteOfflineMarksRefresh === 'function') {
+                        window.poznoteOfflineMarksRefresh();
+                    }
+                });
+            }
         }).catch(function (err) {
             nmBulkActionSelect.disabled = false;
             alert(cfg.txtError + ': ' + err.message);

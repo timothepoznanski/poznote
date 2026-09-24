@@ -1908,7 +1908,8 @@
       "this_folder_only": "Ce dossier uniquement",
       "show_only": "Afficher seulement ce dossier",
       "keep_offline": "Garder hors ligne",
-      "stop_offline": "Ne plus garder hors ligne"
+      "stop_offline": "Ne plus garder hors ligne",
+      "kept_offline": "Gardé hors ligne dans ce navigateur"
     },
     "folder_filter": {
       "exit": "Quitter la vue du dossier"

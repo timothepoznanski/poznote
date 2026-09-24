@@ -532,3 +532,13 @@ html[data-theme='dark'] .folder-name-path {
         color: var(--pz-text-inverse);
     }
 }
+
+/* Kept offline in this browser (js/offline-marks.js) */
+.folder-name-text .offline-mark {
+    flex: 0 0 auto;
+    width: 13px;
+    height: 13px;
+    margin-left: 6px;
+    color: var(--pz-text-muted);
+    vertical-align: -1px;
+}

@@ -134,7 +134,8 @@
             name: button.getAttribute('data-folder-name') || '',
             noteCount: parseInt(button.getAttribute('data-note-count'), 10) || 0,
             shared: button.getAttribute('data-shared') === '1',
-            favorite: button.getAttribute('data-favorite') === '1'
+            favorite: button.getAttribute('data-favorite') === '1',
+            offline: button.getAttribute('data-offline') === '1'
         };
     }
 
@@ -164,6 +165,12 @@
         });
         menu.querySelectorAll('.favorite-state-not-favorite').forEach(function(item) {
             item.style.display = folder.favorite ? 'none' : '';
+        });
+        menu.querySelectorAll('.offline-state-kept').forEach(function(item) {
+            item.style.display = folder.offline ? '' : 'none';
+        });
+        menu.querySelectorAll('.offline-state-not-kept').forEach(function(item) {
+            item.style.display = folder.offline ? 'none' : '';
         });
     }
 
@@ -251,6 +258,9 @@
         'favorite-folder': function(folder) {
             toggleFolderFavoriteFromList(folder);
         },
+        'offline-folder': function(folder) {
+            toggleFolderOfflineFromList(folder);
+        },
         'rename-folder': function(folder) {
             callFn('editFolderName', folder.id, folder.name);
         },
@@ -290,6 +300,45 @@
                     showNotificationPopup('Error updating favorites', 'error');
                 }
                 console.error('Folder favorite toggle error:', error);
+            });
+    }
+
+    /**
+     * Keep a folder offline (its notes, subfolders included, stay in the
+     * browser whatever their date), or stop. No reload: the state goes onto
+     * the row's buttons, and the mark of the row follows once this browser's
+     * copies are up to date (js/offline-sync.js writes-only mode,
+     * js/offline-marks.js).
+     */
+    function toggleFolderOfflineFromList(folder) {
+        const keep = !folder.offline;
+        fetch('/api/v1/folders/' + encodeURIComponent(folder.id) + '/offline', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ offline: keep })
+        })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (!data.success) {
+                    throw new Error(data.error || data.message || 'Unknown error');
+                }
+                document.querySelectorAll('[data-folder-id="' + folder.id + '"][data-offline]').forEach(function(element) {
+                    element.setAttribute('data-offline', keep ? '1' : '0');
+                });
+                if (typeof window.poznoteOfflineSyncNow === 'function') {
+                    Promise.resolve(window.poznoteOfflineSyncNow()).then(function() {
+                        if (typeof window.poznoteOfflineMarksRefresh === 'function') {
+                            window.poznoteOfflineMarksRefresh();
+                        }
+                    });
+                }
+            })
+            .catch(function(error) {
+                if (typeof showNotificationPopup === 'function') {
+                    showNotificationPopup(window.t ? window.t('offline.keep.error', null, 'The offline setting could not be saved.') : 'The offline setting could not be saved.', 'error');
+                }
+                console.error('Folder offline toggle error:', error);
             });
     }
 

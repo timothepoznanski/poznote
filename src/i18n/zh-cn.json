@@ -1900,7 +1900,8 @@
       "paste_into_folder": "粘贴到文件夹",
       "change_note_icon": "更改笔记图标",
       "keep_offline": "离线保留",
-      "stop_offline": "停止离线保留"
+      "stop_offline": "停止离线保留",
+      "kept_offline": "已在此浏览器中离线保留"
     },
     "folder_filter": {
       "exit": "退出文件夹视图"

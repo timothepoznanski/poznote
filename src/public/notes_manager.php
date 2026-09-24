@@ -128,6 +128,8 @@ $currentLang = getUserLanguage();
 					<option value="remove-tag"><?php echo t_h('notes_manager.remove_tag', [], 'Remove tag'); ?></option>
 					<option value="add-favorite"><?php echo t_h('notes_manager.add_favorite', [], 'Add to favorites'); ?></option>
 					<option value="remove-favorite"><?php echo t_h('notes_manager.remove_favorite', [], 'Remove from favorites'); ?></option>
+					<option value="keep-offline"><?php echo t_h('notes_list.note_actions.keep_offline', [], 'Keep offline'); ?></option>
+					<option value="stop-offline"><?php echo t_h('notes_list.note_actions.stop_offline', [], 'Stop keeping offline'); ?></option>
 					<option value="trash"><?php echo t_h('notes_manager.move_to_trash', [], 'Move to trash'); ?></option>
 				</select>
 			</div>
@@ -205,6 +207,13 @@ $currentLang = getUserLanguage();
 	<script src="<?php echo poznoteAsset('js/navigation.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/date-time-format.js'); ?>"></script>
+	<?php // The bulk "Keep offline" actions bring this browser's copies up to date at once (writes-only mode) ?>
+	<script src="<?php echo poznoteAsset('js/offline-store.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/offline-sync.js'); ?>" data-offline-mode="writes"></script>
 	<script src="<?php echo poznoteAsset('js/notes-manager.js'); ?>"></script>
+	<?php // Marks the notes and folders kept offline in this browser ?>
+	<script src="<?php echo poznoteAsset('js/offline-marks.js'); ?>" defer
+		data-note-title="<?php echo t_h('notes_list.note_actions.available_offline', [], 'Available offline in this browser'); ?>"
+		data-folder-title="<?php echo t_h('notes_list.folder_actions.kept_offline', [], 'Kept offline in this browser'); ?>"></script>
 </body>
 </html>
