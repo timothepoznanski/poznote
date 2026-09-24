@@ -439,13 +439,15 @@ const POZNOTE_SNAPSHOTS_SAFETY_MAX_COUNT = 200;
 
 // Offline copies kept by the browser (api/v1/controllers/OfflineController.php,
 // js/offline-sync.js): the notes modified in the last offline_notes_days days,
-// most recent first, within these limits. The picture limits are applied by
-// the browser, which reads them from the manifest.
+// most recent first, within these limits. The file limits (PICTURE*: the
+// pictures the notes show, and every attachment of the notes kept with "Keep
+// offline" or as favorites) are applied by the browser, which reads them from
+// the manifest. 25 MB per file: a course PDF of 10 MB was refused at 8.
 const POZNOTE_OFFLINE_DEFAULT_DAYS = 5;
 const POZNOTE_OFFLINE_MAX_DAYS = 30;
 const POZNOTE_OFFLINE_MAX_NOTES = 300;
 const POZNOTE_OFFLINE_MAX_TEXT_MB = 50;
-const POZNOTE_OFFLINE_MAX_PICTURE_MB = 8;
+const POZNOTE_OFFLINE_MAX_PICTURE_MB = 25;
 const POZNOTE_OFFLINE_MAX_PICTURES = 400;
 const POZNOTE_OFFLINE_MAX_PICTURES_MB = 200;
 

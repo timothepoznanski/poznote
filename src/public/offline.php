@@ -81,9 +81,17 @@ $scripts = [
     poznoteAsset('js/tasklist-actions.js'),
     poznoteAsset('js/tasklist-edit-modal.js'),
     poznoteAsset('js/tasklist-order-drag.js'),
+    // The dialogs of the toolbar (link, videos) and the slash / right-click
+    // menu, which leaves out what needs the server on this page
+    poznoteAsset('js/ui.js'),
+    poznoteAsset('js/date-picker-popup.js'),
+    poznoteAsset('js/slash-command.js'),
     poznoteAsset('js/offline-store.js'),
     poznoteAsset('js/offline-app.js'),
 ];
+// The app's tab bar, loaded by js/offline-app.js once an account is open:
+// its tabs are that account's.
+$tabsScript = poznoteAsset('js/tabs.js');
 
 // What the page needs offline, stored next to it by js/offline-sync.js.
 // SortableJS is injected by js/tasklist-order-drag.js with the version of
@@ -94,6 +102,7 @@ $assets = array_merge(
     [poznoteAsset('js/theme-init.js'), $mobileStyle],
     $styles,
     $scripts,
+    [$tabsScript],
     [
         'js/Sortable.min.js' . ($globalsQuery !== '' ? '?' . $globalsQuery : ''),
         'webfonts/Inter/static/Inter_24pt-Regular.ttf',
@@ -224,7 +233,7 @@ $assets = array_merge(
     </div>
 
     <!-- RIGHT COLUMN -->
-    <div id="right_pane">
+    <div id="right_pane" data-tabs-script="<?php echo htmlspecialchars($tabsScript, ENT_QUOTES); ?>">
         <div id="right_col">
             <div class="offline-placeholder" id="offline-placeholder">
                 <i class="lucide lucide-file-text" aria-hidden="true"></i>

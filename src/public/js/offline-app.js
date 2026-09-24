@@ -10,6 +10,10 @@
  *    typed here (SSO, remember-me) has nothing to check: it continues
  *    directly, but only while it is the last account signed in on the device
  *    (its copies are forgotten at sign-out);
+ *  - tabs: the app's tab bar (js/tabs.js), loaded once the account is open,
+ *    with a window.loadNoteDirectly that opens the local copies and the two
+ *    hooks the app's note loader calls; double-click or middle-click opens
+ *    a note in a new tab, as in the app;
  *  - sign-out, from the Logout button or a logout.php that could not reach
  *    the server: the device forgets the account's copies at once, the
  *    server session is closed when the server answers;
@@ -54,6 +58,9 @@
         closedFolders: {},
         currentId: null,
         dirtyId: null,
+        tabsStarted: false,
+        lastOpen: null,
+        cachedFiles: {},
         saveTimer: null,
         online: false,
         pushing: false,
@@ -197,6 +204,27 @@
                 document.documentElement.style.setProperty(name, vars[name]);
             }
         });
+        // The slash menu (js/slash-command.js) reads its key from the page
+        // config and the hidden commands from UI Customization, as in the app
+        if (display.slashMenuTrigger) {
+            var configEl = byId('page-config-data');
+            try {
+                var config = JSON.parse(configEl.textContent || '{}') || {};
+                config.settings = config.settings || {};
+                config.settings.slash_menu_trigger = display.slashMenuTrigger;
+                configEl.textContent = JSON.stringify(config);
+            } catch (e) {
+                console.debug('offline-app: the slash menu setting could not be applied:', e);
+            }
+        }
+        if (Array.isArray(display.hiddenSlashCommands) && display.hiddenSlashCommands.length && !window.PoznoteUiCustomization) {
+            var hidden = Object.create(null);
+            display.hiddenSlashCommands.forEach(function (key) { hidden[key] = true; });
+            window.PoznoteUiCustomization = {
+                hiddenKeyMap: hidden,
+                isHidden: function (key) { return !!hidden[key]; }
+            };
+        }
     }
 
     // ---- Sign-in ---------------------------------------------------------------
@@ -405,10 +433,28 @@
 
     // ---- Data ------------------------------------------------------------------
 
+    // The files this browser holds for the account (js/offline-sync.js),
+    // so the note lists only the attachments that will open.
+    function loadCachedFiles(userId) {
+        if (!window.caches) {
+            return Promise.resolve({});
+        }
+        return window.caches.open(Store.mediaCacheName(userId)).then(function (cache) {
+            return cache.keys();
+        }).then(function (keys) {
+            var urls = {};
+            keys.forEach(function (request) { urls[request.url] = true; });
+            return urls;
+        }).catch(function () {
+            return {};
+        });
+    }
+
     function loadData() {
         var userId = state.userId;
-        return Promise.all([Store.getIndex(userId), Store.getNotes(userId), Store.getOutbox(userId)]).then(function (all) {
+        return Promise.all([Store.getIndex(userId), Store.getNotes(userId), Store.getOutbox(userId), loadCachedFiles(userId)]).then(function (all) {
             var index = all[0] || {};
+            state.cachedFiles = all[3] || {};
             state.index = {
                 notes: index.notes || [],
                 folders: index.folders || [],
@@ -545,6 +591,8 @@
         var link = el('a', 'links_arbo_left ' + (item.folderId ? 'note-in-folder' : 'note-without-folder'));
         link.href = 'index.php?note=' + item.id;
         link.setAttribute('data-note-id', String(item.id));
+        // What js/tabs.js looks for to hide the tabs a search filters out
+        link.setAttribute('data-action', 'load-note');
         link.setAttribute('data-note-type', item.type || 'note');
         if (state.currentId === item.id) {
             link.classList.add('selected-note');
@@ -590,7 +638,12 @@
             return;
         }
 
-        list.appendChild(el('p', 'offline-list-caption', days
+        // "Modified in the last N days" only while that is the whole story:
+        // favorites and notes kept with "Keep offline" can be older.
+        var onlyRecent = (state.index.notes || []).every(function (meta) {
+            return !meta.kept || meta.kept === 'recent';
+        });
+        list.appendChild(el('p', 'offline-list-caption', days && onlyRecent
             ? ot('list.recent', { days: days }, 'Modified in the last {{days}} days')
             : ot('list.available', null, 'Available offline')));
 
@@ -767,6 +820,78 @@
         return bar;
     }
 
+    // The note's files this browser holds (every attachment of a note kept
+    // whatever its date, js/offline-sync.js), as the app lists them under the
+    // title. Pictures shown in the text are not repeated; a file that was
+    // not copied (too big, no room) is left out rather than shown broken.
+    function buildAttachmentsRow(id, attachments, text) {
+        attachments = attachments || [];
+        if (!attachments.length) {
+            return null;
+        }
+        var content = String(text || '');
+        var list = el('span', 'note-attachments-list');
+        attachments.forEach(function (attachment) {
+            if (!attachment || !attachment.id) {
+                return;
+            }
+            var url = new URL('api/v1/notes/' + id + '/attachments/' + attachment.id, window.location.href).href;
+            if (!state.cachedFiles[url] || content.indexOf('attachments/' + attachment.id) !== -1) {
+                return;
+            }
+            var name = attachment.original_filename || String(attachment.id);
+            var link = el('a', 'attachment-link', name);
+            link.href = url;
+            link.target = '_blank';
+            link.rel = 'noopener';
+            link.title = t('attachments.actions.download', { filename: name }, 'Download {{filename}}');
+            if (list.childNodes.length) {
+                list.appendChild(document.createTextNode(' '));
+            }
+            list.appendChild(link);
+        });
+        if (!list.childNodes.length) {
+            return null;
+        }
+        var row = el('div', 'note-attachments-row');
+        row.appendChild(el('span', 'lucide lucide-paperclip icon_attachment'));
+        row.appendChild(list);
+        return row;
+    }
+
+    // The files the rules would have kept (every attachment of a note kept
+    // whatever its date, the pictures shown in any note) but that the
+    // per-file limit left online: named, so a missing PDF is not a mystery.
+    function buildTooBigNotice(id, attachments, text) {
+        var limitMb = Number(state.account && state.account.limits && state.account.limits.picture_mb) || 25;
+        var meta = (state.index.notes || []).filter(function (entry) { return Number(entry.id) === Number(id); })[0];
+        var keptWhole = !!(meta && meta.kept && meta.kept !== 'recent');
+        var content = String(text || '');
+        var names = [];
+        (attachments || []).forEach(function (attachment) {
+            if (!attachment || !attachment.id) {
+                return;
+            }
+            var size = Number(attachment.file_size) || 0;
+            var shown = content.indexOf('attachments/' + attachment.id) !== -1;
+            var url = new URL('api/v1/notes/' + id + '/attachments/' + attachment.id, window.location.href).href;
+            if ((keptWhole || shown) && size > limitMb * 1024 * 1024 && !state.cachedFiles[url]) {
+                names.push(ot('note.file_size', {
+                    name: attachment.original_filename || String(attachment.id),
+                    size: String(Math.round(size / 1024 / 1024))
+                }, '{{name}} ({{size}} MB)'));
+            }
+        });
+        if (!names.length) {
+            return null;
+        }
+        var notice = el('div', 'offline-note-notice');
+        notice.setAttribute('role', 'note');
+        notice.appendChild(icon('lucide-alert-triangle'));
+        notice.appendChild(el('span', null, ot('note.too_big', { limit: String(limitMb), files: names.join(', ') }, 'Not available offline, larger than {{limit}} MB: {{files}}')));
+        return notice;
+    }
+
     function buildTagsRow(item) {
         var row = el('div', 'note-tags-row');
         var folder = el('div', 'folder-wrapper');
@@ -850,6 +975,17 @@
         }
         inner.appendChild(header);
         inner.appendChild(buildTagsRow(item));
+        // The list of files comes with the server copy: a change made here
+        // (outbox) carries the text only.
+        var server = state.server[id];
+        var attachmentsRow = buildAttachmentsRow(id, server ? server.attachments : null, note.content);
+        if (attachmentsRow) {
+            inner.appendChild(attachmentsRow);
+        }
+        var tooBig = buildTooBigNotice(id, server ? server.attachments : null, note.content);
+        if (tooBig) {
+            inner.appendChild(tooBig);
+        }
 
         var tagsInput = el('input');
         tagsInput.type = 'hidden';
@@ -1011,19 +1147,25 @@
 
     function openNote(id) {
         id = Number(id);
+        tabsLoadStarted(id);
         return commitDirty().then(function () {
             state.currentId = id;
             document.body.classList.add('note-open');
-            if (id > 0) {
-                try {
-                    window.history.replaceState(null, '', 'index.php?note=' + id);
-                } catch (e) { /* ignore */ }
-            }
+            // A note written here has a temporary id: the address names no
+            // note then, and a reload reopens the active tab (js/tabs.js)
+            try {
+                window.history.replaceState(null, '', id > 0 ? 'index.php?note=' + id : 'index.php');
+            } catch (e) { /* ignore */ }
             if (!state.outbox[id] && !state.server[id]) {
                 clearNotePane();
                 renderUnavailable();
                 renderList();
                 showNoteColumn();
+                // A tab of a note no longer kept here still switches; no tab
+                // is made for it otherwise
+                if (tabs() && tabs().isNoteOpen(id)) {
+                    tabsLoaded(id);
+                }
                 return null;
             }
             return adoptMainAppDraft(id).then(function () {
@@ -1033,8 +1175,119 @@
                 renderNote(id);
                 renderList();
                 showNoteColumn();
+                tabsLoaded(id);
             });
         });
+    }
+
+    // ---- Tabs ------------------------------------------------------------------
+
+    function tabs() {
+        return window.tabManager || null;
+    }
+
+    function tabsEnabled() {
+        return !!tabs() && window.innerWidth > 800;
+    }
+
+    // What the app's note loader tells js/tabs.js (js/note-loader.js)
+    function tabsLoadStarted(id) {
+        if (tabs()) {
+            tabs()._onNoteLoadStarted(id);
+        }
+    }
+
+    function tabsLoaded(id) {
+        if (tabs()) {
+            tabs()._onNoteLoaded(id);
+            tabs().render();
+        }
+    }
+
+    // A note in a new tab, as a double-click does in the app; the note
+    // itself where tabs are off (phones). Resolves once it is on screen.
+    function openInTab(id, options) {
+        id = Number(id);
+        if (!tabsEnabled()) {
+            return openNote(id);
+        }
+        var item = findItem(id);
+        state.lastOpen = null;
+        tabs().openInNewTab(String(id), (item && item.heading) || t('index.note.new_note', null, 'New note'), options || {});
+        return state.lastOpen || Promise.resolve();
+    }
+
+    function tabsKey() {
+        return 'poznote_offline_tabs::u' + state.userId;
+    }
+
+    // The tabs open online in the account's last workspace (recorded by
+    // js/offline-sync.js), the first time and whenever they changed since:
+    // only the notes kept on this device. The online tabs are left alone.
+    function seedTabsFromOnline() {
+        var workspace = state.account && state.account.workspace;
+        if (!workspace) {
+            return;
+        }
+        var seedKey = 'poznote_offline_tabs_seed::u' + state.userId;
+        try {
+            var raw = window.localStorage.getItem('poznote_tabs_' + workspace + '::u' + state.userId);
+            if (!raw || raw === window.localStorage.getItem(seedKey)) {
+                return;
+            }
+            var online = JSON.parse(raw) || {};
+            var kept = (online.tabs || []).filter(function (tab) {
+                var noteId = tab && Number(tab.noteId);
+                return tab && (tab.type || 'note') === 'note' && noteId && (state.server[noteId] || state.outbox[noteId]);
+            });
+            var active = kept.some(function (tab) { return tab.id === online.activeTabId; })
+                ? online.activeTabId
+                : (kept[0] ? kept[0].id : null);
+            window.localStorage.setItem(tabsKey(), JSON.stringify({ tabs: kept, activeTabId: active }));
+            window.localStorage.setItem(seedKey, raw);
+        } catch (e) {
+            console.debug('offline-app: the online tabs could not be read:', e);
+        }
+    }
+
+    // js/tabs.js empties the pane once the last tab is closed: back to the
+    // placeholder, which lives in the same column.
+    window.poznoteClearNotePane = function () {
+        commitDirty();
+        state.currentId = null;
+        clearNotePane();
+        hidePanes();
+        byId('offline-placeholder').hidden = false;
+        document.body.classList.remove('note-open');
+        renderList();
+    };
+
+    // How js/tabs.js opens a tab's note
+    window.loadNoteDirectly = function (url, noteId) {
+        state.lastOpen = openNote(Number(noteId));
+        return state.lastOpen;
+    };
+
+    function startTabs() {
+        if (state.tabsStarted) {
+            return;
+        }
+        state.tabsStarted = true;
+        // One set of tabs per account, whatever the workspace shown
+        window.__poznoteTabsStorageKey = tabsKey;
+        seedTabsFromOnline();
+        // The note on screen, told to js/tabs.js the way index.php does
+        var id = state.currentId;
+        if (id !== null && (state.server[id] || state.outbox[id])) {
+            var config = el('script');
+            config.type = 'application/json';
+            config.id = 'current-note-data';
+            config.textContent = JSON.stringify({ noteId: id });
+            document.body.appendChild(config);
+        }
+        var script = document.createElement('script');
+        script.src = byId('right_pane').getAttribute('data-tabs-script');
+        document.body.appendChild(script);
     }
 
     // Only reached through the address (index.php?note=...): the list holds
@@ -1411,6 +1664,9 @@
         (result.events || []).forEach(function (event) {
             if (event.type === 'created' || event.type === 'recreated') {
                 state.idMap[event.previousId] = event.id;
+                if (tabs()) {
+                    tabs().renameNote(event.previousId, event.id);
+                }
                 if (current === event.previousId) {
                     reopen = event.id;
                 }
@@ -1428,6 +1684,7 @@
         if (reopen !== null) {
             state.currentId = reopen;
             renderNote(reopen);
+            tabsLoaded(reopen);
             try {
                 window.history.replaceState(null, '', 'index.php?note=' + reopen);
             } catch (e) { /* ignore */ }
@@ -1513,7 +1770,10 @@
         }).then(function (entry) {
             state.outbox[entry.id] = entry;
             updateStatus();
-            return openNote(entry.id);
+            // In a new tab, as in the app (js/utils-note-create.js). Without
+            // its isNewNote: that blank placeholder covers a server round
+            // trip, and it would empty this page's column.
+            return openInTab(entry.id);
         }).then(function () {
             var title = byId('inp' + state.currentId);
             if (title) {
@@ -1554,6 +1814,7 @@
             var wanted = requestedNoteId();
             return wanted ? openNote(wanted) : null;
         }).then(function () {
+            startTabs();
             checkConnection();
         }).catch(function (e) {
             console.error('offline-app: openAccount() failed:', e);
@@ -1571,6 +1832,9 @@
         byId('unified-search').addEventListener('input', function (event) {
             state.search = event.target.value || '';
             renderList();
+            if (tabs()) {
+                tabs().render();
+            }
         });
 
         byId('offline-new-btn').addEventListener('click', function (event) {
@@ -1619,7 +1883,32 @@
             var link = event.target.closest('a.links_arbo_left');
             if (link) {
                 event.preventDefault();
-                openNote(Number(link.getAttribute('data-note-id')));
+                var id = Number(link.getAttribute('data-note-id'));
+                // The note on screen is not opened again (the second click of
+                // a double-click, which js/tabs.js is about to sort out)
+                if (id === state.currentId && document.getElementById('inp' + id)) {
+                    showNoteColumn();
+                    return;
+                }
+                openNote(id);
+            }
+        });
+        // New tab: double-click (the first click already opened the note in
+        // the active tab, js/tabs.js sorts that out) or middle-click, as in
+        // the app (js/notes-list-events.js)
+        byId('offline-list').addEventListener('dblclick', function (event) {
+            var link = event.target.closest('a.links_arbo_left');
+            if (link) {
+                event.preventDefault();
+                openInTab(link.getAttribute('data-note-id'), { afterSidebarClick: true });
+            }
+        });
+        byId('offline-list').addEventListener('auxclick', function (event) {
+            var link = event.button === 1 && event.target.closest('a.links_arbo_left');
+            if (link) {
+                event.preventDefault();
+                event.stopPropagation();
+                openInTab(link.getAttribute('data-note-id'));
             }
         });
 

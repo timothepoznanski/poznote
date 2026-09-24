@@ -412,6 +412,11 @@ $router->post('/notes/{id}/favorite', function($params) use ($notesController) {
     $notesController->toggleFavorite($params['id']);
 });
 
+// Keep a note offline whatever its date, or stop (Offline Copies)
+$router->put('/notes/{id}/offline', function($params) use ($notesController) {
+    $notesController->updateOffline($params['id']);
+});
+
 // Pin/unpin a note (pinned notes sort first on the dashboard)
 $router->put('/notes/{id}/pinned', function($params) use ($notesController) {
     $notesController->updatePinned($params['id']);
@@ -650,6 +655,11 @@ $router->put('/folders/{id}/color', function($params) use ($foldersController) {
 // Pin/unpin a folder (pinned folders sort first on the dashboard)
 $router->put('/folders/{id}/pinned', function($params) use ($foldersController) {
     $foldersController->updatePinned($params['id']);
+});
+
+// Keep a folder's notes offline whatever their date, or stop (Offline Copies)
+$router->put('/folders/{id}/offline', function($params) use ($foldersController) {
+    $foldersController->updateOffline($params['id']);
 });
 
 // Mark/unmark a folder as favorite (listed in the Favorites section)

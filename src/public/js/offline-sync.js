@@ -25,6 +25,11 @@
     if (!Store || !Store.isSupported()) {
         return;
     }
+    // Loaded by another page than index.php with data-offline-mode="writes"
+    // (attachments.php): only the copy of the notes written there is
+    // refreshed. The full sync, the connection banner and the capture of the
+    // display belong to index.php.
+    var WRITES_ONLY = !!(document.currentScript && document.currentScript.getAttribute('data-offline-mode') === 'writes');
     // Signed out on the offline page while the server could not be reached
     // (js/offline-app.js): the session left open ends now, before anything
     // is kept again. The mark goes first, so a failure cannot loop.
@@ -57,7 +62,7 @@
     // Never more than half the room the browser has left, whatever they say.
     // The notes' text has its own budget on the server (OfflineController).
     var MB = 1024 * 1024;
-    var limits = { picture_mb: 8, pictures: 400, pictures_mb: 200 };
+    var limits = { picture_mb: 25, pictures: 400, pictures_mb: 200 };
     // Body classes of index.php that describe a moment, not a preference.
     var TRANSIENT_BODY_CLASS = /^(note-open|mobile-|modal-|ui-custom-panel-open|note-creation|left-col-resizing|has-background-image|has-internal-tabs|outline-collapsed|sidebar-collapsed|icon-sidebar-collapsed|focus-mode|dragging|is-)/;
     var ATTACHMENT_URL = /\/?api\/v1\/notes\/(\d+)\/attachments\/([A-Za-z0-9_.-]+)/g;
@@ -137,6 +142,8 @@
             tags: note.tags || '',
             updated: note.updated || null,
             version: note.version || '',
+            // Changes with the list of attachments, which the version ignores
+            files: note.files || '',
             content: note.content || '',
             attachments: note.attachments || [],
             needsRefresh: false,
@@ -175,27 +182,60 @@
         }, Promise.resolve());
     }
 
-    // ---- Pictures shown in the offline notes -------------------------------
+    // ---- Files of the offline notes ----------------------------------------
 
-    // The pictures the notes show, most recently modified note first.
-    function attachmentUrls(records) {
+    // Why each note is kept (manifest "kept": note, folder, favorite or
+    // recent), from the list stored with the copies.
+    function keptReasons(index) {
+        var reasons = {};
+        ((index && index.notes) || []).forEach(function (meta) {
+            reasons[Number(meta.id)] = meta.kept || 'recent';
+        });
+        return reasons;
+    }
+
+    // The files to keep: the pictures the notes show, and every attachment
+    // of the notes kept whatever their date (a course PDF is what one wants
+    // in class). Those notes first, then the most recently modified.
+    // Returns the URLs in priority order and the set of URLs that may be
+    // any type of file (the others must be pictures).
+    function attachmentUrls(records, reasons) {
         var urls = [];
         var seen = {};
+        var anyType = {};
+        var add = function (url, any) {
+            if (!seen[url]) {
+                seen[url] = true;
+                urls.push(url);
+            }
+            if (any) {
+                anyType[url] = true;
+            }
+        };
         records.slice().sort(function (a, b) {
+            var pinnedA = (reasons[a.id] || 'recent') !== 'recent';
+            var pinnedB = (reasons[b.id] || 'recent') !== 'recent';
+            if (pinnedA !== pinnedB) {
+                return pinnedA ? -1 : 1;
+            }
             return String(b.updated || '').localeCompare(String(a.updated || ''));
         }).forEach(function (record) {
+            var pinned = (reasons[record.id] || 'recent') !== 'recent';
             var content = String(record.content || '');
             var match;
             ATTACHMENT_URL.lastIndex = 0;
             while ((match = ATTACHMENT_URL.exec(content)) !== null) {
-                var url = new URL('/api/v1/notes/' + match[1] + '/attachments/' + match[2], window.location.origin).href;
-                if (!seen[url]) {
-                    seen[url] = true;
-                    urls.push(url);
-                }
+                add(new URL('/api/v1/notes/' + match[1] + '/attachments/' + match[2], window.location.origin).href, false);
+            }
+            if (pinned) {
+                (record.attachments || []).forEach(function (attachment) {
+                    if (attachment && attachment.id) {
+                        add(new URL('/api/v1/notes/' + record.id + '/attachments/' + attachment.id, window.location.origin).href, true);
+                    }
+                });
             }
         });
-        return urls.slice(0, limits.pictures);
+        return { urls: urls.slice(0, limits.pictures), anyType: anyType };
     }
 
     // Room for pictures: the fixed budget, or half of what the browser still
@@ -227,7 +267,15 @@
         if (!window.caches) {
             return Promise.resolve();
         }
-        var wanted = attachmentUrls(records);
+        return Store.getIndex(userId).catch(function () { return null; }).then(function (index) {
+            return cacheFiles(userId, records, keptReasons(index));
+        });
+    }
+
+    function cacheFiles(userId, records, reasons) {
+        var chosen = attachmentUrls(records, reasons);
+        var wanted = chosen.urls;
+        var anyType = chosen.anyType;
         var wantedSet = {};
         wanted.forEach(function (url) { wantedSet[url] = true; });
 
@@ -261,8 +309,9 @@
                             return fetch(url, { credentials: 'same-origin' }).then(function (response) {
                                 var type = response.headers.get('Content-Type') || '';
                                 var announced = Number(response.headers.get('Content-Length') || 0);
-                                // Only pictures are shown inline; big files stay online.
-                                if (!response.ok || type.indexOf('image/') !== 0 || announced > limits.picture_mb * MB) {
+                                // Pictures only, unless the note is kept whatever
+                                // its date; big files stay online either way.
+                                if (!response.ok || (type.indexOf('image/') !== 0 && !anyType[url]) || announced > limits.picture_mb * MB) {
                                     return null;
                                 }
                                 return response.blob().then(function (blob) {
@@ -303,10 +352,18 @@
                 rootVars[name] = value;
             }
         });
+        // The slash menu's preferences: its key, and the commands hidden
+        // in UI Customization
+        var slashTrigger = typeof window.getPoznoteInitialSetting === 'function' ? window.getPoznoteInitialSetting('slash_menu_trigger') : null;
+        var hiddenMap = (window.PoznoteUiCustomization && window.PoznoteUiCustomization.hiddenKeyMap) || {};
         return {
             bodyClasses: bodyClasses,
             markdownDefaultMode: document.body.getAttribute('data-markdown-default-mode') || '',
-            rootVars: rootVars
+            rootVars: rootVars,
+            slashMenuTrigger: slashTrigger ? String(slashTrigger) : '',
+            hiddenSlashCommands: Object.keys(hiddenMap).filter(function (key) {
+                return key.indexOf('slash:') === 0 && hiddenMap[key];
+            })
         };
     }
 
@@ -460,6 +517,10 @@
         account.lastSyncAt = Date.now();
         account.language = currentLanguage();
         account.display = captureDisplay();
+        // The offline page resumes the tabs open in this workspace (js/tabs.js)
+        if (window.selectedWorkspace) {
+            account.workspace = String(window.selectedWorkspace);
+        }
         offlineDays = account.days;
 
         // A password typed on the login page of this tab, for this account.
@@ -542,7 +603,7 @@
             wanted.forEach(function (note) {
                 wantedIds[note.id] = true;
                 var record = localById[note.id];
-                if (!record || record.version !== note.version || record.needsRefresh) {
+                if (!record || record.version !== note.version || (record.files || '') !== (note.files || '') || record.needsRefresh) {
                     toFetch.push(note.id);
                 }
             });
@@ -722,7 +783,7 @@
     // failure triggers one reachability check.
     var probeScheduled = null;
     function checkAfterFailure() {
-        if (probeScheduled || probeTimer) {
+        if (WRITES_ONLY || probeScheduled || probeTimer) {
             return;
         }
         probeScheduled = setTimeout(function () {
@@ -785,6 +846,8 @@
                         var list = (index.notes || []).filter(function (meta) {
                             return !byId[meta.id] && gone.indexOf(Number(meta.id)) === -1;
                         });
+                        var previous = {};
+                        (index.notes || []).forEach(function (meta) { previous[Number(meta.id)] = meta; });
                         kept.forEach(function (note) {
                             list.unshift({
                                 id: Number(note.id),
@@ -793,7 +856,11 @@
                                 workspace: note.workspace,
                                 folder_id: note.folder_id === undefined ? null : note.folder_id,
                                 updated: note.updated,
-                                version: note.version
+                                version: note.version,
+                                files: note.files || '',
+                                // Why it is kept is only known from the next
+                                // manifest: keep what the last one said.
+                                kept: (previous[Number(note.id)] || {}).kept || 'recent'
                             });
                         });
                         index.notes = list;
@@ -860,12 +927,39 @@
             return result;
         };
     }
+    // Same for XMLHttpRequest: the attachments page uploads with it (for the
+    // progress bar), and a file added there must reach the copy at once.
     if (window.XMLHttpRequest && XMLHttpRequest.prototype) {
+        var nativeOpen = XMLHttpRequest.prototype.open;
         var nativeSend = XMLHttpRequest.prototype.send;
+        XMLHttpRequest.prototype.open = function (method, url) {
+            this.__poznoteWrite = { method: String(method || 'GET').toUpperCase(), url: String(url || '') };
+            return nativeOpen.apply(this, arguments);
+        };
         XMLHttpRequest.prototype.send = function () {
-            this.addEventListener('error', checkAfterFailure);
+            var xhr = this;
+            xhr.addEventListener('error', checkAfterFailure);
+            xhr.addEventListener('load', function () {
+                var write = xhr.__poznoteWrite;
+                if (!write || write.method === 'GET' || write.method === 'HEAD' || xhr.status < 200 || xhr.status >= 300) {
+                    return;
+                }
+                onNoteWrite(write.method, xhr.responseURL || write.url, {
+                    clone: function () {
+                        return {
+                            json: function () {
+                                return Promise.resolve().then(function () { return JSON.parse(xhr.responseText); });
+                            }
+                        };
+                    }
+                });
+            });
             return nativeSend.apply(this, arguments);
         };
+    }
+
+    if (WRITES_ONLY) {
+        return;
     }
 
     // ---- Wiring ----------------------------------------------------------------
@@ -935,5 +1029,29 @@
 
     window.poznoteOfflineSyncNow = function () {
         return syncNow(true);
+    };
+
+    // The note's three-dot menu (js/utils-menus.js) asks whether this browser
+    // holds the note right now: the line is shown once the copies answer.
+    window.poznoteOfflineFillMenu = function (menu, noteId) {
+        var line = menu.querySelector('.offline-availability');
+        var userId = Number(readCookie('poznote_account') || 0);
+        var id = Number(noteId);
+        if (!line || !userId || !id) {
+            return;
+        }
+        Store.getNote(userId, id).then(function (record) {
+            if (menu.getAttribute('data-note-id') !== String(noteId)) {
+                return;
+            }
+            var available = !!record;
+            line.classList.toggle('is-available', available);
+            line.querySelectorAll('[data-available]').forEach(function (span) {
+                span.hidden = (span.getAttribute('data-available') === '1') !== available;
+            });
+            line.hidden = false;
+        }).catch(function () {
+            line.hidden = true;
+        });
     };
 })();

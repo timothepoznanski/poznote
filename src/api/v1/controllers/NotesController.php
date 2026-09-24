@@ -107,7 +107,8 @@ class NotesController {
      * OfflineController, whose copies must carry the very same token.
      */
     public function computeNoteVersion(string $updated, string $heading, string $content): string {
-        return md5($updated . '|' . $heading . '|' . md5($content));
+        require_once __DIR__ . '/../../../lib/offline.php';
+        return poznoteNoteVersion($updated, $heading, $content);
     }
 
     /**
@@ -1697,6 +1698,52 @@ class NotesController {
      * open at once cannot flip each other's result.
      * Pinning is board presentation state, so it is deliberately not pushed to Git.
      */
+    /**
+     * PUT /api/v1/notes/{id}/offline - keep the note in the browser whatever
+     * its date (lib/offline.php), or stop doing so. Body: {"offline": bool}.
+     */
+    public function updateOffline(string $id): void {
+        if (!is_numeric($id)) {
+            $this->sendError(400, 'Invalid note ID');
+            return;
+        }
+
+        $noteId = (int)$id;
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($input) || !array_key_exists('offline', $input)) {
+            $this->sendError(400, 'Invalid JSON in request body: expected an "offline" boolean');
+            return;
+        }
+
+        $offline = filter_var($input['offline'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        if ($offline === null) {
+            $this->sendError(400, 'Invalid value for "offline": expected a boolean');
+            return;
+        }
+
+        try {
+            $existsStmt = $this->con->prepare('SELECT id FROM entries WHERE id = ? AND trash = 0');
+            $existsStmt->execute([$noteId]);
+            if (!$existsStmt->fetchColumn()) {
+                $this->sendError(404, 'Note not found');
+                return;
+            }
+
+            $stmt = $this->con->prepare('UPDATE entries SET offline = ? WHERE id = ?');
+            if (!$stmt->execute([$offline ? 1 : 0, $noteId])) {
+                $this->sendError(500, 'Database error while updating offline state');
+                return;
+            }
+
+            $this->sendSuccess([
+                'message' => 'Note offline state updated successfully',
+                'offline' => $offline
+            ]);
+        } catch (Exception $e) {
+            $this->sendError(500, 'Database error occurred');
+        }
+    }
+
     public function updatePinned(string $id): void {
         if (!is_numeric($id)) {
             $this->sendError(400, 'Invalid note ID');

@@ -207,6 +207,25 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     background-color: var(--pz-surface-hover);
 }
 
+/* A line that only informs (the note's offline availability): no hover, no
+   pointer. The [hidden] attribute keeps it out until the state is known. */
+.note-actions-menu-item.menu-info {
+    color: var(--pz-text-muted);
+    cursor: default;
+}
+
+.note-actions-menu-item.menu-info:hover {
+    background-color: transparent;
+}
+
+.note-actions-menu-item.menu-info[hidden] {
+    display: none;
+}
+
+.note-actions-menu-item.offline-availability.is-available i {
+    color: var(--pz-success-text);
+}
+
 .folder-actions-menu-item i,
 .note-actions-menu-item i,
 .create-menu-item i {

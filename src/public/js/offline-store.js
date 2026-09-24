@@ -255,6 +255,15 @@
             });
         });
         return work.then(function () {
+            if (withOutbox) {
+                // The offline page's tabs name notes too (js/offline-app.js)
+                try {
+                    window.localStorage.removeItem('poznote_offline_tabs::u' + userId);
+                    window.localStorage.removeItem('poznote_offline_tabs_seed::u' + userId);
+                } catch (e) {
+                    console.debug('offline-store: the offline tabs could not be removed:', e);
+                }
+            }
             if (window.caches) {
                 return window.caches.delete(mediaCacheName(userId)).catch(function () { return false; });
             }

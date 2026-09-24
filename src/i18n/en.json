@@ -1378,7 +1378,9 @@
       "open_all_confirm": "Open all",
       "with_subfolders_message": "This folder contains notes, and its subfolders do too. Do you want to open only the notes of this folder ({{own}}) or all notes including subfolders ({{total}})?",
       "this_folder_only": "This folder only",
-      "show_only": "Show only this folder"
+      "show_only": "Show only this folder",
+      "keep_offline": "Keep offline",
+      "stop_offline": "Stop keeping offline"
     },
     "folder_filter": {
       "exit": "Exit folder view"
@@ -1396,7 +1398,11 @@
       "paste_note": "Paste here",
       "enter_note_name": "Please enter a note title",
       "attachments": "Attachments",
-      "convert_note": "Convert note"
+      "convert_note": "Convert note",
+      "keep_offline": "Keep offline",
+      "stop_offline": "Stop keeping offline",
+      "available_offline": "Available offline in this browser",
+      "not_available_offline": "Not available offline in this browser"
     }
   },
   "tree_history": {
@@ -4860,7 +4866,9 @@
       "back": "Back to the list",
       "modified": "Modified {{date}}",
       "saved_locally": "Saved on this device. It will be sent to the server when you are back online.",
-      "push_error": "Not sent yet: {{error}}"
+      "push_error": "Not sent yet: {{error}}",
+      "too_big": "Not available offline, larger than {{limit}} MB: {{files}}",
+      "file_size": "{{name}} ({{size}} MB)"
     },
     "unavailable": {
       "title": "This note is not available offline",
@@ -4895,16 +4903,21 @@
       "help": "Keep the notes you modified recently in your browser, to open and edit them without a network.",
       "badge": "Last {{days}} days",
       "description": "The notes you modified in the last days are kept in the browsers where you use Poznote, so they can be opened and edited without a network. Changes made offline are sent as soon as the connection is back. 0 keeps nothing offline.",
+      "kept_rules": "Your favorites, and the notes and folders marked \"Keep offline\" in their menu, are kept whatever their date, with all their attachments.",
       "unit": "days",
       "limits_title": "Limits:",
       "limits_notes": "{{notes}} notes and {{text}} MB of text in total, most recently modified first",
-      "limits_pictures": "Pictures: {{picture}} MB each, {{pictures}} and {{total}} MB in total, at most half the free space",
-      "limits_attachments": "Other attachments (PDF, audio, files): online only",
+      "limits_attachments": "Other attachments (PDF, audio, files): favorites and “Keep offline” notes only",
+      "limits_file_size": "Files up to {{size}} MB each: a larger file stays online only",
+      "limits_files_total": "{{count}} files and {{total}} MB in total, at most half the free space of the browser",
       "warning": "Signing out removes the offline notes from the browser. On a shared computer, sign out when you leave.",
       "device_status_one": "In this browser: 1 note available offline, updated {{date}}.",
       "device_status": "In this browser: {{count}} notes available offline, updated {{date}}.",
       "device_none": "Nothing is kept in this browser yet: open your notes once and they will be.",
       "device_unsupported": "This browser cannot keep notes offline (it needs a secure HTTPS connection)."
+    },
+    "keep": {
+      "error": "The offline setting could not be saved."
     }
   }
 }

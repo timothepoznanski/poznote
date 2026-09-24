@@ -10,12 +10,16 @@
  * js/offline-sync.js compares the versions of the manifest with the copies it
  * already holds and downloads only the notes that changed. The notes kept
  * offline are the ones modified in the last `offline_notes_days` days (user
- * setting, 5 by default, 0 turns the feature off for the account).
+ * setting, 5 by default, 0 turns the feature off for the account), the
+ * favorites, and the notes and folders marked "Keep offline" whatever their
+ * date; the rules are in lib/offline.php.
  *
  * Only the account's owner gets a copy: an account opened through a grant
  * (Admin > User Management) or a workspace shared with this login is not
  * theirs to keep on a device.
  */
+
+require_once __DIR__ . '/../../../lib/offline.php';
 
 class OfflineController {
     // A bulk import or a restore can touch thousands of notes at once: the
@@ -42,11 +46,7 @@ class OfflineController {
      */
     public static function getOfflineDays(): int {
         $raw = function_exists('getSetting') ? getSetting('offline_notes_days', null) : null;
-        if ($raw === null || $raw === false || trim((string)$raw) === '') {
-            return POZNOTE_OFFLINE_DEFAULT_DAYS;
-        }
-        $days = (int)$raw;
-        return max(0, min(POZNOTE_OFFLINE_MAX_DAYS, $days));
+        return poznoteOfflineDays($raw, POZNOTE_OFFLINE_DEFAULT_DAYS, POZNOTE_OFFLINE_MAX_DAYS);
     }
 
     private function refuseBorrowedAccount(): bool {
@@ -82,26 +82,51 @@ class OfflineController {
             $workspaces = $this->con->query('SELECT name FROM workspaces ORDER BY display_order, name COLLATE NOCASE')
                 ->fetchAll(PDO::FETCH_COLUMN);
 
-            // The notes kept offline: the most recently modified ones of the
-            // last $days days, of a type the offline page can open. Their
+            $allFolders = [];
+            $folderStmt = $this->con->query('SELECT id, name, parent_id, workspace, offline FROM folders');
+            while ($row = $folderStmt->fetch(PDO::FETCH_ASSOC)) {
+                $allFolders[(int)$row['id']] = [
+                    'id' => (int)$row['id'],
+                    'name' => (string)$row['name'],
+                    'parent_id' => $row['parent_id'] !== null ? (int)$row['parent_id'] : null,
+                    'workspace' => (string)($row['workspace'] ?? ''),
+                    'offline' => (int)($row['offline'] ?? 0),
+                ];
+            }
+
+            // The notes kept offline (lib/offline.php): the recent ones, the
+            // favorites and the notes and folders marked "Keep offline", of a
+            // type the offline page can open, within the budgets. Their
             // version token is computed from the content, as show() does, so
             // it can be sent back as "if_version".
             $notes = [];
-            $bytes = 0;
             if ($days > 0) {
                 $cutoff = gmdate('Y-m-d H:i:s', time() - $days * 86400);
-                $placeholders = implode(',', array_fill(0, count(self::OFFLINE_TYPES), '?'));
-                $stmt = $this->con->prepare(
-                    "SELECT id, heading, type, workspace, folder_id, updated FROM entries WHERE trash = 0 AND updated >= ? AND COALESCE(type, 'note') IN ($placeholders)"
-                    . ' ORDER BY updated DESC LIMIT ' . POZNOTE_OFFLINE_MAX_NOTES
-                );
-                $stmt->execute(array_merge([$cutoff], self::OFFLINE_TYPES));
+                $keptFolders = poznoteOfflineFolderIds($allFolders);
+                $typeList = implode(',', array_fill(0, count(self::OFFLINE_TYPES), '?'));
+                $where = "trash = 0 AND COALESCE(type, 'note') IN ($typeList) AND (updated >= ? OR favorite = 1 OR offline = 1";
+                $params = array_merge(self::OFFLINE_TYPES, [$cutoff]);
+                if (!empty($keptFolders)) {
+                    $where .= ' OR folder_id IN (' . implode(',', array_map('intval', array_keys($keptFolders))) . ')';
+                }
+                $where .= ')';
+                $stmt = $this->con->prepare("SELECT id, heading, type, workspace, folder_id, updated, favorite, offline, attachments FROM entries WHERE $where");
+                $stmt->execute($params);
+                $candidates = [];
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $row['reason'] = poznoteOfflineReason($row, $cutoff, $keptFolders);
+                    if ($row['reason'] !== null) {
+                        $candidates[] = $row;
+                    }
+                }
+
                 // The entry column repeats the file: selecting it for every
                 // note made SQLite read the whole text twice (80% of the time
                 // at 100 MB). Read only when the file is not the answer: task
                 // lists, notes without a file.
                 $entryStmt = $this->con->prepare('SELECT entry FROM entries WHERE id = ?');
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $contents = [];
+                $loadContent = function (array $row) use ($entryStmt, &$contents): string {
                     $noteId = (int)$row['id'];
                     $noteType = !empty($row['type']) ? (string)$row['type'] : 'note';
                     $content = $this->notes->loadNoteContentForVersion($noteId, $noteType, null);
@@ -111,39 +136,37 @@ class OfflineController {
                         $entryStmt->closeCursor();
                         $content = $this->notes->loadNoteContentForVersion($noteId, $noteType, is_string($entry) ? $entry : null);
                     }
-                    $bytes += strlen($content);
-                    if ($bytes > POZNOTE_OFFLINE_MAX_TEXT_MB * 1024 * 1024 && !empty($notes)) {
-                        break;
-                    }
+                    $contents[$noteId] = $content;
+                    return $content;
+                };
+                $kept = poznoteOfflineFit($candidates, POZNOTE_OFFLINE_MAX_NOTES, POZNOTE_OFFLINE_MAX_TEXT_MB * 1024 * 1024, function (array $row) use ($loadContent): int {
+                    return strlen($loadContent($row));
+                });
+                foreach ($kept as $row) {
+                    $noteId = (int)$row['id'];
                     $notes[] = [
                         'id' => $noteId,
                         'heading' => (string)($row['heading'] ?? ''),
-                        'type' => $noteType,
+                        'type' => !empty($row['type']) ? (string)$row['type'] : 'note',
                         'workspace' => (string)($row['workspace'] ?? ''),
                         'folder_id' => $row['folder_id'] !== null ? (int)$row['folder_id'] : null,
                         'updated' => $row['updated'] ?? null,
-                        'version' => $this->notes->computeNoteVersion((string)($row['updated'] ?? ''), (string)($row['heading'] ?? ''), $content),
+                        'kept' => $row['reason'],
+                        'version' => $this->notes->computeNoteVersion((string)($row['updated'] ?? ''), (string)($row['heading'] ?? ''), $contents[$noteId] ?? ''),
+                        'files' => poznoteOfflineFilesToken($row['attachments'] ?? ''),
                     ];
                 }
             }
 
             // Only the folders the offline page shows: those of these notes
             // and their parents, for the folder path under each title.
-            $allFolders = [];
-            $folderStmt = $this->con->query('SELECT id, name, parent_id, workspace FROM folders');
-            while ($row = $folderStmt->fetch(PDO::FETCH_ASSOC)) {
-                $allFolders[(int)$row['id']] = [
-                    'id' => (int)$row['id'],
-                    'name' => (string)$row['name'],
-                    'parent_id' => $row['parent_id'] !== null ? (int)$row['parent_id'] : null,
-                    'workspace' => (string)($row['workspace'] ?? ''),
-                ];
-            }
             $folders = [];
             foreach ($notes as $note) {
                 $folderId = $note['folder_id'];
                 while ($folderId !== null && isset($allFolders[$folderId]) && !isset($folders[$folderId])) {
-                    $folders[$folderId] = $allFolders[$folderId];
+                    $folder = $allFolders[$folderId];
+                    unset($folder['offline']);
+                    $folders[$folderId] = $folder;
                     $folderId = $allFolders[$folderId]['parent_id'];
                 }
             }
@@ -228,8 +251,8 @@ class OfflineController {
                 $noteType = !empty($row['type']) ? (string)$row['type'] : 'note';
                 $content = $this->notes->loadNoteContentForVersion($noteId, $noteType, $row['entry'] ?? null);
 
-                // Only what the offline page needs to decide which pictures
-                // of the note it can keep: id, type and size.
+                // What the offline page needs to keep the note's files and
+                // list them under the note: id, name, type and size.
                 $attachments = [];
                 $decoded = !empty($row['attachments']) ? json_decode((string)$row['attachments'], true) : null;
                 if (is_array($decoded)) {
@@ -239,6 +262,7 @@ class OfflineController {
                         }
                         $attachments[] = [
                             'id' => (string)$attachment['id'],
+                            'original_filename' => (string)($attachment['original_filename'] ?? ''),
                             'file_type' => (string)($attachment['file_type'] ?? ''),
                             'file_size' => (int)($attachment['file_size'] ?? 0),
                         ];
@@ -254,6 +278,7 @@ class OfflineController {
                     'tags' => (string)($row['tags'] ?? ''),
                     'updated' => $row['updated'] ?? null,
                     'version' => $this->notes->computeNoteVersion((string)($row['updated'] ?? ''), (string)($row['heading'] ?? ''), $content),
+                    'files' => poznoteOfflineFilesToken($row['attachments'] ?? ''),
                     'attachments' => $attachments,
                     'content' => $content,
                 ];

@@ -20,6 +20,7 @@ function populateFolderActionsMenu(menu, toggle) {
     var noteCount = parseInt(toggle.getAttribute('data-note-count'), 10) || 0;
     var isShared = toggle.getAttribute('data-shared') === '1';
     var isFavorite = toggle.getAttribute('data-favorite') === '1';
+    var isOffline = toggle.getAttribute('data-offline') === '1';
 
     menu.setAttribute('data-folder-id', folderId);
 
@@ -48,6 +49,14 @@ function populateFolderActionsMenu(menu, toggle) {
     });
     menu.querySelectorAll('.favorite-state-not-favorite').forEach(function (item) {
         item.style.display = isFavorite ? 'none' : '';
+    });
+
+    // Keep offline item: same pattern, from the folder's offline state
+    menu.querySelectorAll('.offline-state-kept').forEach(function (item) {
+        item.style.display = isOffline ? '' : 'none';
+    });
+    menu.querySelectorAll('.offline-state-not-kept').forEach(function (item) {
+        item.style.display = isOffline ? 'none' : '';
     });
 
     syncActionsMenuSeparators(menu);
@@ -441,6 +450,7 @@ function populateNoteActionsMenu(menu, toggle) {
     var folderId = toggle.getAttribute('data-folder-id') || '';
     var folderName = toggle.getAttribute('data-folder') || '';
     var isFavorite = toggle.getAttribute('data-favorite') === '1';
+    var isOffline = toggle.getAttribute('data-offline') === '1';
 
     menu.setAttribute('data-note-id', noteId);
 
@@ -458,6 +468,21 @@ function populateNoteActionsMenu(menu, toggle) {
     menu.querySelectorAll('.favorite-state-not-favorite').forEach(function (item) {
         item.style.display = isFavorite ? 'none' : '';
     });
+
+    // Keep offline item, and the line saying whether this browser holds the
+    // note: js/offline-sync.js answers that from the device's copies.
+    menu.querySelectorAll('.offline-state-kept').forEach(function (item) {
+        item.style.display = isOffline ? '' : 'none';
+    });
+    menu.querySelectorAll('.offline-state-not-kept').forEach(function (item) {
+        item.style.display = isOffline ? 'none' : '';
+    });
+    menu.querySelectorAll('.offline-availability').forEach(function (item) {
+        item.hidden = true;
+    });
+    if (typeof window.poznoteOfflineFillMenu === 'function') {
+        window.poznoteOfflineFillMenu(menu, noteId);
+    }
 
     // Copy note identity onto every action item (handlers read it there).
     // The names match what each existing handler expects:

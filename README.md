@@ -1210,19 +1210,20 @@ updated: 2024-01-20 15:45:00
 
 ## Offline
 
-Poznote keeps working without a network in two ways: the notes you modified recently stay available in your browser, ready to be read and edited, and a complete backup can be browsed anywhere as a read-only export.
+Poznote keeps working without a network in two ways: the notes you modified recently, your favorites and the notes or folders you choose to keep stay available in your browser, ready to be read and edited, and a complete backup can be browsed anywhere as a read-only export.
 
 <details>
 <summary><strong>Offline notes</strong></summary>
 <br>
 
-The notes you modified in the last 5 days are kept in each browser where you use Poznote, and this copy is refreshed after every save. In a classroom, on a train or anywhere without Wi-Fi, open the usual Poznote address: the browser shows the offline version of Poznote, with the same sidebar, editors, toolbar and search, listing only the notes kept offline.
+The notes you modified in the last 5 days are kept in each browser where you use Poznote, and this copy is refreshed after every save. In a classroom, on a train or anywhere without Wi-Fi, open the usual Poznote address: the browser shows the offline version of Poznote, with the same sidebar, editors, toolbar, search and tabs (a double-click or a middle-click opens a note in a new tab, and the tabs open online come back), listing only the notes kept offline.
 
 *   **Signing in:** type the password you last signed in with in this browser, it is checked without the server. If you never typed your password in this browser (SSO, automatic sign-in), the last account used there opens with a **Continue as** button.
-*   **Reading and editing:** HTML notes, Markdown notes and task lists open in their usual editor, and new notes can be created. Other note types, such as drawings, stay online only. Changes are kept in the browser until they are sent.
+*   **Reading and editing:** HTML notes, Markdown notes and task lists open in their usual editor, and new notes can be created. The / menu and the right-click menu work too, without the commands that need the server (pictures and files to upload, templates, drawings, links to other notes). Other note types, such as drawings, stay online only. Changes are kept in the browser until they are sent.
+*   **Keep offline:** favorites are always kept, and **Keep offline** in the menu of a note or of a folder (subfolders included) keeps it whatever its date, with all its attachments (PDF, audio, files) up to 25 MB each. The same menu of a note says whether it is available offline in this browser.
 *   **Back online:** the changes are sent automatically. If a note was also changed on the server in the meantime, both versions are merged when possible, otherwise your offline version is kept as a separate note named "... (offline copy)". A note deleted on the server in the meantime is created again.
 *   **Settings:** **Settings > Other > Offline notes** sets how many days of notes are kept (5 by default, up to 30, 0 turns offline notes off) and shows what the current browser holds.
-*   **Limits:** at most 300 notes and 50 MB of text, the most recently modified first. The pictures shown in these notes are kept too, up to 8 MB each, 400 pictures and 200 MB in total, and never more than half the free space of the browser. Other attachments (PDF, audio, files) open online only.
+*   **Limits:** at most 300 notes and 50 MB of text, the most recently modified first. Files are kept too: the pictures shown in these notes, and every attachment (PDF, audio, files) of the favorites and the notes kept with **Keep offline**, up to 25 MB each, 400 files and 200 MB in total, and never more than half the free space of the browser. A larger file stays online only, and the note says so when it is opened offline.
 *   **Requirements:** Poznote must be served over HTTPS (browsers keep pages offline only on a secure connection, `http://localhost` also works) and opened once online in the browser, after signing in, for the copy to be made.
 *   **Privacy:** only the notes of your own account are kept, not those of an account or a workspace shared with you. They are stored unencrypted in the browser. Signing out removes them from the browser (changes not sent yet too, after a warning that lists them): on a shared computer, sign out when you leave. Signing out also works without a network, from the offline page: the notes are removed at once, and the session on the server ends the next time Poznote opens online.
 

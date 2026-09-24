@@ -1873,7 +1873,9 @@
       "copy_folder": "Copiar",
       "cut_folder": "Cortar",
       "paste_into_folder": "Pegar en la carpeta",
-      "change_note_icon": "Cambiar el icono de la nota"
+      "change_note_icon": "Cambiar el icono de la nota",
+      "keep_offline": "Guardar sin conexión",
+      "stop_offline": "Dejar de guardar sin conexión"
     },
     "folder_filter": {
       "exit": "Salir de la vista de la carpeta"
@@ -1891,7 +1893,11 @@
       "convert_note": "Convertir nota",
       "copy_note": "Copiar",
       "cut_note": "Cortar",
-      "paste_note": "Pegar aquí"
+      "paste_note": "Pegar aquí",
+      "keep_offline": "Guardar sin conexión",
+      "stop_offline": "Dejar de guardar sin conexión",
+      "available_offline": "Disponible sin conexión en este navegador",
+      "not_available_offline": "No disponible sin conexión en este navegador"
     }
   },
   "tree_history": {
@@ -5041,7 +5047,9 @@
       "back": "Volver a la lista",
       "modified": "Modificada {{date}}",
       "saved_locally": "Guardada en este dispositivo. Se enviará al servidor cuando vuelva a tener conexión.",
-      "push_error": "Aún no enviada: {{error}}"
+      "push_error": "Aún no enviada: {{error}}",
+      "too_big": "No disponible sin conexión, más de {{limit}} MB: {{files}}",
+      "file_size": "{{name}} ({{size}} MB)"
     },
     "unavailable": {
       "title": "Esta nota no está disponible sin conexión",
@@ -5076,16 +5084,21 @@
       "help": "Guardar en el navegador las notas modificadas recientemente, para abrirlas y editarlas sin red.",
       "badge": "Últimos {{days}} días",
       "description": "Las notas modificadas en los últimos días se guardan en los navegadores donde usa Poznote, para poder abrirlas y editarlas sin red. Los cambios hechos sin conexión se envían en cuanto vuelve la conexión. 0 no guarda nada sin conexión.",
+      "kept_rules": "Tus favoritos, y las notas y carpetas marcadas con \"Guardar sin conexión\" en su menú, se guardan sea cual sea su fecha, con todos sus adjuntos.",
       "unit": "días",
       "limits_title": "Límites:",
       "limits_notes": "{{notes}} notas y {{text}} MB de texto en total, primero las modificadas más recientemente",
-      "limits_pictures": "Imágenes: {{picture}} MB cada una, {{pictures}} y {{total}} MB en total, como mucho la mitad del espacio libre",
-      "limits_attachments": "Otros adjuntos (PDF, audio, archivos): solo en línea",
+      "limits_attachments": "Otros adjuntos (PDF, audio, archivos): solo favoritos y notas con “Guardar sin conexión”",
+      "limits_file_size": "Archivos de hasta {{size}} MB cada uno: uno más grande solo está en línea",
+      "limits_files_total": "{{count}} archivos y {{total}} MB en total, como mucho la mitad del espacio libre del navegador",
       "warning": "Al cerrar sesión se eliminan las notas sin conexión del navegador. En un ordenador compartido, cierre sesión al irse.",
       "device_status_one": "En este navegador: 1 nota disponible sin conexión, actualizada el {{date}}.",
       "device_status": "En este navegador: {{count}} notas disponibles sin conexión, actualizadas el {{date}}.",
       "device_none": "Aún no hay nada guardado en este navegador: abra sus notas una vez y se guardarán.",
       "device_unsupported": "Este navegador no puede guardar notas sin conexión (necesita una conexión HTTPS segura)."
+    },
+    "keep": {
+      "error": "No se pudo guardar el ajuste sin conexión."
     }
   }
 }

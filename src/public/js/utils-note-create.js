@@ -614,6 +614,54 @@ function performFavoriteToggle(noteId) {
         });
 }
 
+// Keep a note or a folder offline whatever its date, or stop (Offline
+// Copies). The desired state is read from the three-dot toggle
+// (data-offline), sent explicitly (PUT .../offline), written back onto the
+// toggle, and the device's copies are refreshed at once so the note is there
+// before the network goes away.
+function setOfflineKeep(kind, id) {
+    var selector = kind === 'folder'
+        ? '.folder-actions-toggle[data-folder-id="' + id + '"]'
+        : '.note-actions-toggle[data-note-id="' + id + '"]';
+    var toggles = document.querySelectorAll(selector);
+    var keep = !(toggles[0] && toggles[0].getAttribute('data-offline') === '1');
+    var tr = window.t || function (key, vars, fallback) { return fallback; };
+
+    fetch('/api/v1/' + (kind === 'folder' ? 'folders' : 'notes') + '/' + encodeURIComponent(id) + '/offline', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ offline: keep })
+    })
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+            if (!data || !data.success) {
+                throw new Error((data && (data.error || data.message)) || 'Unknown error');
+            }
+            // No message: the menu entry itself shows the new state
+            toggles.forEach(function (toggle) {
+                toggle.setAttribute('data-offline', keep ? '1' : '0');
+            });
+            if (typeof window.poznoteOfflineSyncNow === 'function') {
+                window.poznoteOfflineSyncNow();
+            }
+        })
+        .catch(function (error) {
+            if (typeof showNotificationPopup === 'function') {
+                showNotificationPopup(tr('offline.keep.error', {}, 'The offline setting could not be saved.'), 'error');
+            }
+            console.error('Offline keep error:', error);
+        });
+}
+
+function toggleNoteOffline(noteId) {
+    setOfflineKeep('note', noteId);
+}
+
+function toggleFolderOffline(folderId) {
+    setOfflineKeep('folder', folderId);
+}
+
 // Mark/unmark a folder as favorite. The desired state is derived from the
 // folder's three-dot toggle (data-favorite) and sent explicitly, matching the
 // PUT /folders/{id}/favorite contract.

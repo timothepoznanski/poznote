@@ -1873,7 +1873,9 @@
       "copy_folder": "Kopieren",
       "cut_folder": "Ausschneiden",
       "paste_into_folder": "In Ordner einfügen",
-      "change_note_icon": "Notizsymbol ändern"
+      "change_note_icon": "Notizsymbol ändern",
+      "keep_offline": "Offline behalten",
+      "stop_offline": "Nicht mehr offline behalten"
     },
     "folder_filter": {
       "exit": "Ordneransicht verlassen"
@@ -1891,7 +1893,11 @@
       "convert_note": "Notiz konvertieren",
       "copy_note": "Kopieren",
       "cut_note": "Ausschneiden",
-      "paste_note": "Hier einfügen"
+      "paste_note": "Hier einfügen",
+      "keep_offline": "Offline behalten",
+      "stop_offline": "Nicht mehr offline behalten",
+      "available_offline": "In diesem Browser offline verfügbar",
+      "not_available_offline": "In diesem Browser nicht offline verfügbar"
     }
   },
   "tree_history": {
@@ -5040,7 +5046,9 @@
       "back": "Zurück zur Liste",
       "modified": "Geändert {{date}}",
       "saved_locally": "Auf diesem Gerät gespeichert. Die Notiz wird an den Server gesendet, sobald Sie wieder online sind.",
-      "push_error": "Noch nicht gesendet: {{error}}"
+      "push_error": "Noch nicht gesendet: {{error}}",
+      "too_big": "Offline nicht verfügbar, größer als {{limit}} MB: {{files}}",
+      "file_size": "{{name}} ({{size}} MB)"
     },
     "unavailable": {
       "title": "Diese Notiz ist offline nicht verfügbar",
@@ -5075,16 +5083,21 @@
       "help": "Die zuletzt geänderten Notizen im Browser behalten, um sie ohne Netzwerk zu öffnen und zu bearbeiten.",
       "badge": "Letzte {{days}} Tage",
       "description": "Die in den letzten Tagen geänderten Notizen werden in den Browsern gespeichert, in denen Sie Poznote verwenden, damit sie sich ohne Netzwerk öffnen und bearbeiten lassen. Offline gemachte Änderungen werden gesendet, sobald die Verbindung wieder besteht. 0 speichert nichts offline.",
+      "kept_rules": "Ihre Favoriten sowie die in ihrem Menü mit „Offline behalten“ markierten Notizen und Ordner werden unabhängig vom Datum aufbewahrt, mit allen Anhängen.",
       "unit": "Tage",
       "limits_title": "Grenzen:",
       "limits_notes": "{{notes}} Notizen und insgesamt {{text}} MB Text, die zuletzt geänderten zuerst",
-      "limits_pictures": "Bilder: je {{picture}} MB, insgesamt {{pictures}} und {{total}} MB, höchstens die Hälfte des freien Speichers",
-      "limits_attachments": "Andere Anhänge (PDF, Audio, Dateien): nur online",
+      "limits_attachments": "Andere Anhänge (PDF, Audio, Dateien): nur Favoriten und Notizen mit „Offline behalten“",
+      "limits_file_size": "Dateien bis {{size}} MB pro Datei: größere Dateien bleiben nur online",
+      "limits_files_total": "{{count}} Dateien und {{total}} MB insgesamt, höchstens die Hälfte des freien Speichers des Browsers",
       "warning": "Beim Abmelden werden die Offline-Notizen aus dem Browser entfernt. Melden Sie sich an einem gemeinsam genutzten Computer ab, wenn Sie gehen.",
       "device_status_one": "In diesem Browser: 1 Notiz offline verfügbar, aktualisiert am {{date}}.",
       "device_status": "In diesem Browser: {{count}} Notizen offline verfügbar, aktualisiert am {{date}}.",
       "device_none": "In diesem Browser ist noch nichts gespeichert: Öffnen Sie Ihre Notizen einmal, dann werden sie gespeichert.",
       "device_unsupported": "Dieser Browser kann keine Notizen offline speichern (dafür ist eine sichere HTTPS-Verbindung nötig)."
+    },
+    "keep": {
+      "error": "Die Offline-Einstellung konnte nicht gespeichert werden."
     }
   }
 }

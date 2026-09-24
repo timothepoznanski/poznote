@@ -259,6 +259,28 @@
     height: 13px;
 }
 
+/* A file of the note left online by the per-file limit */
+.offline-note-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 8px 0 4px;
+    padding: 6px 10px;
+    border-radius: var(--pz-radius);
+    background: var(--pz-warning-soft);
+    color: var(--pz-warning-strong);
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.offline-note-notice .lucide {
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+    margin-top: 3px;
+}
+
 /* Task actions that need the server */
 .offline-page .task-move-btn,
 .offline-page .task-due-btn {

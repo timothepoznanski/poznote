@@ -1127,6 +1127,47 @@ paths:
         '200':
           description: Icon updated
 
+  /notes/{id}/offline:
+    put:
+      tags: [Notes]
+      summary: Keep a note offline whatever its date, or stop
+      description: >
+        Keeps the note in the browsers where the account is used, with all
+        its attachments (see /offline/manifest), or stops doing so.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [offline]
+              properties:
+                offline:
+                  type: boolean
+                  example: true
+      responses:
+        '200':
+          description: Offline state updated
+        '400':
+          description: Invalid note ID, or missing/invalid "offline" boolean
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Note not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /notes/{id}/pinned:
     put:
       tags: [Notes]
@@ -1389,9 +1430,11 @@ paths:
       description: |
         Feeds the browser's offline copies (js/offline-sync.js). Returns the
         notes modified in the last `days` days (user setting
-        `offline_notes_days`, default 5, 0 = off), most recent first within
-        `limits`, without content, with their version token, and the
-        folders of those notes.
+        `offline_notes_days`, default 5, 0 = off), the favorites and the
+        notes and folders marked "Keep offline", within `limits` (the
+        recent ones dropped first), without content, with their version
+        token, why each is kept (`kept`: note, folder, favorite or
+        recent), and the folders of those notes.
         `limits` gives the limits in force. Answers 304 to
         a matching If-None-Match. Refused (403, `offline_unavailable`) on an
         account the session does not own.
@@ -3193,6 +3236,48 @@ paths:
           description: Pinned state updated
         '400':
           description: Invalid folder ID, or missing/invalid "pinned" boolean
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Folder not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /folders/{id}/offline:
+    put:
+      tags: [Folders]
+      summary: Keep a folder's notes offline whatever their date, or stop
+      description: >
+        Keeps the folder's notes, subfolders included, in the browsers where
+        the account is used, with all their attachments (see
+        /offline/manifest), or stops doing so.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [offline]
+              properties:
+                offline:
+                  type: boolean
+                  example: true
+      responses:
+        '200':
+          description: Offline state updated
+        '400':
+          description: Invalid folder ID, or missing/invalid "offline" boolean
           content:
             application/json:
               schema:

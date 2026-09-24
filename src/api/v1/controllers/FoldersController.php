@@ -1906,6 +1906,42 @@ class FoldersController {
     }
 
     /**
+     * PUT /api/v1/folders/{id}/offline - keep the folder's notes, subfolders
+     * included, in the browser whatever their date (lib/offline.php), or stop
+     * doing so. Body: {"offline": bool}.
+     */
+    public function updateOffline(string $id): void {
+        $folderId = (int)$id;
+        $data = $this->getInputData();
+        if (!array_key_exists('offline', $data)) {
+            $this->sendError('Invalid JSON in request body: expected an "offline" boolean', 400);
+            return;
+        }
+
+        $offline = filter_var($data['offline'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        if ($offline === null) {
+            $this->sendError('Invalid value for "offline": expected a boolean', 400);
+            return;
+        }
+
+        if (!$this->requireFolder($folderId)) {
+            return;
+        }
+
+        $stmt = $this->db->prepare("UPDATE folders SET offline = ? WHERE id = ?");
+        if (!$stmt->execute([$offline ? 1 : 0, $folderId])) {
+            $this->sendError('Database error while updating offline state', 500);
+            return;
+        }
+
+        $this->sendJson([
+            'success' => true,
+            'message' => 'Folder offline state updated successfully',
+            'offline' => $offline
+        ]);
+    }
+
+    /**
      * GET /api/v1/folders/{id}/notes - Get note count in folder
      */
     public function noteCount(string $id): void {

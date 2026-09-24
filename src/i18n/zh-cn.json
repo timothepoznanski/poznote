@@ -1871,7 +1871,9 @@
       "copy_folder": "复制",
       "cut_folder": "剪切",
       "paste_into_folder": "粘贴到文件夹",
-      "change_note_icon": "更改笔记图标"
+      "change_note_icon": "更改笔记图标",
+      "keep_offline": "离线保留",
+      "stop_offline": "停止离线保留"
     },
     "folder_filter": {
       "exit": "退出文件夹视图"
@@ -1889,7 +1891,11 @@
       "convert_note": "转换笔记",
       "copy_note": "复制",
       "cut_note": "剪切",
-      "paste_note": "粘贴到此处"
+      "paste_note": "粘贴到此处",
+      "keep_offline": "离线保留",
+      "stop_offline": "停止离线保留",
+      "available_offline": "此浏览器中可离线使用",
+      "not_available_offline": "此浏览器中不可离线使用"
     }
   },
   "tree_history": {
@@ -5140,7 +5146,9 @@
       "back": "返回列表",
       "modified": "修改于 {{date}}",
       "saved_locally": "已保存在此设备上。恢复联网后将发送到服务器。",
-      "push_error": "尚未发送：{{error}}"
+      "push_error": "尚未发送：{{error}}",
+      "too_big": "超过 {{limit}} MB，无法离线使用：{{files}}",
+      "file_size": "{{name}}（{{size}} MB）"
     },
     "unavailable": {
       "title": "此笔记不可离线使用",
@@ -5175,16 +5183,21 @@
       "help": "在浏览器中保存最近修改的笔记，以便在没有网络时打开和编辑。",
       "badge": "最近 {{days}} 天",
       "description": "最近几天修改过的笔记会保存在您使用 Poznote 的浏览器中，以便在没有网络时打开和编辑。离线时所做的更改会在恢复连接后立即发送。设为 0 则不离线保存任何内容。",
+      "kept_rules": "您的收藏，以及在菜单中标记为“离线保留”的笔记和文件夹，无论日期如何都会保留，并包含全部附件。",
       "unit": "天",
       "limits_title": "限制：",
       "limits_notes": "最多 {{notes}} 条笔记，文本合计 {{text}} MB，优先保留最近修改的",
-      "limits_pictures": "图片：每张最多 {{picture}} MB，合计 {{pictures}} 张、{{total}} MB，且不超过剩余空间的一半",
-      "limits_attachments": "其他附件（PDF、音频、文件）：仅在线可用",
+      "limits_attachments": "其他附件（PDF、音频、文件）：仅限收藏和“离线保留”的笔记",
+      "limits_file_size": "每个文件最多 {{size}} MB：更大的文件只能在线使用",
+      "limits_files_total": "合计 {{count}} 个文件、{{total}} MB，且不超过浏览器剩余空间的一半",
       "warning": "退出登录会从浏览器中删除离线笔记。在共用电脑上，离开时请退出登录。",
       "device_status_one": "此浏览器中：1 条笔记可离线使用，更新于 {{date}}。",
       "device_status": "此浏览器中：{{count}} 条笔记可离线使用，更新于 {{date}}。",
       "device_none": "此浏览器中尚未保存任何内容：打开一次您的笔记即可保存。",
       "device_unsupported": "此浏览器无法离线保存笔记（需要安全的 HTTPS 连接）。"
+    },
+    "keep": {
+      "error": "无法保存离线设置。"
     }
   }
 }

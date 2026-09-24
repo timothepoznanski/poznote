@@ -1873,7 +1873,9 @@
       "copy_folder": "Copiar",
       "cut_folder": "Recortar",
       "paste_into_folder": "Colar na pasta",
-      "change_note_icon": "Alterar ícone da nota"
+      "change_note_icon": "Alterar ícone da nota",
+      "keep_offline": "Manter offline",
+      "stop_offline": "Deixar de manter offline"
     },
     "folder_filter": {
       "exit": "Sair da vista da pasta"
@@ -1891,7 +1893,11 @@
       "convert_note": "Converter nota",
       "copy_note": "Copiar",
       "cut_note": "Recortar",
-      "paste_note": "Colar aqui"
+      "paste_note": "Colar aqui",
+      "keep_offline": "Manter offline",
+      "stop_offline": "Deixar de manter offline",
+      "available_offline": "Disponível offline neste navegador",
+      "not_available_offline": "Não disponível offline neste navegador"
     }
   },
   "tree_history": {
@@ -5041,7 +5047,9 @@
       "back": "Voltar à lista",
       "modified": "Modificada {{date}}",
       "saved_locally": "Salva neste dispositivo. Ela será enviada ao servidor quando você estiver online de novo.",
-      "push_error": "Ainda não enviada: {{error}}"
+      "push_error": "Ainda não enviada: {{error}}",
+      "too_big": "Não disponível offline, mais de {{limit}} MB: {{files}}",
+      "file_size": "{{name}} ({{size}} MB)"
     },
     "unavailable": {
       "title": "Esta nota não está disponível offline",
@@ -5076,16 +5084,21 @@
       "help": "Guardar no navegador as notas modificadas recentemente, para abri-las e editá-las sem rede.",
       "badge": "Últimos {{days}} dias",
       "description": "As notas modificadas nos últimos dias ficam guardadas nos navegadores onde você usa o Poznote, para poder abri-las e editá-las sem rede. As alterações feitas offline são enviadas assim que a conexão volta. 0 não guarda nada offline.",
+      "kept_rules": "Seus favoritos, e as notas e pastas marcadas com \"Manter offline\" no menu delas, são mantidos seja qual for a data, com todos os anexos.",
       "unit": "dias",
       "limits_title": "Limites:",
       "limits_notes": "{{notes}} notas e {{text}} MB de texto no total, primeiro as modificadas mais recentemente",
-      "limits_pictures": "Imagens: {{picture}} MB cada, {{pictures}} e {{total}} MB no total, no máximo metade do espaço livre",
-      "limits_attachments": "Outros anexos (PDF, áudio, arquivos): somente online",
+      "limits_attachments": "Outros anexos (PDF, áudio, arquivos): só favoritos e notas com “Manter offline”",
+      "limits_file_size": "Arquivos de até {{size}} MB cada: um arquivo maior fica apenas online",
+      "limits_files_total": "{{count}} arquivos e {{total}} MB no total, no máximo metade do espaço livre do navegador",
       "warning": "Sair da conta remove as notas offline do navegador. Em um computador compartilhado, saia da conta ao ir embora.",
       "device_status_one": "Neste navegador: 1 nota disponível offline, atualizada em {{date}}.",
       "device_status": "Neste navegador: {{count}} notas disponíveis offline, atualizadas em {{date}}.",
       "device_none": "Nada está guardado neste navegador ainda: abra suas notas uma vez e elas serão guardadas.",
       "device_unsupported": "Este navegador não consegue guardar notas offline (é preciso uma conexão HTTPS segura)."
+    },
+    "keep": {
+      "error": "Não foi possível salvar a configuração offline."
     }
   }
 }

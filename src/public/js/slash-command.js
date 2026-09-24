@@ -1985,9 +1985,31 @@
         return !!(config && config.hiddenKeyMap && config.hiddenKeyMap['slash:' + commandId]);
     }
 
+    // The offline page (offline.php, js/offline-app.js) has no server to
+    // reach: the commands that upload a file, or read other notes, their
+    // attachments, the templates or the journal from it, are left out there.
+    var OFFLINE_UNAVAILABLE_COMMANDS = {
+        'excalidraw': true,
+        'note-reference': true,
+        'image': true,
+        'take-photo': true,
+        'record-audio': true,
+        'template': true,
+        'journal-link': true,
+        'tasklist-embed': true,
+        'link-to-attachment': true,
+        'mp4-video': true,
+        'audio-file': true
+    };
+
+    function isOfflinePage() {
+        return !!(document.body && document.body.classList.contains('offline-page'));
+    }
+
     function filterSlashCommands(commands) {
+        var offline = isOfflinePage();
         return commands.reduce(function (filtered, command) {
-            if (!command || !command.id || isSlashCommandHidden(command.id)) {
+            if (!command || !command.id || isSlashCommandHidden(command.id) || (offline && OFFLINE_UNAVAILABLE_COMMANDS[command.id])) {
                 return filtered;
             }
 
@@ -2218,6 +2240,8 @@
 
     function refreshTemplateCache() {
         if (templateFetchPromise) return templateFetchPromise;
+        // No template offline, and nothing to ask the server
+        if (isOfflinePage()) return Promise.resolve([]);
 
         const workspace = getTemplateWorkspace();
         const url = '/api/v1/notes/templates' + (workspace ? '?workspace=' + encodeURIComponent(workspace) : '');

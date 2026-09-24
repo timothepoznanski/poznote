@@ -1879,7 +1879,9 @@
       "open_all_confirm": "Tout ouvrir",
       "with_subfolders_message": "Ce dossier contient des notes, et ses sous-dossiers aussi. Voulez-vous ouvrir uniquement les notes de ce dossier ({{own}}) ou toutes les notes, sous-dossiers compris ({{total}}) ?",
       "this_folder_only": "Ce dossier uniquement",
-      "show_only": "Afficher seulement ce dossier"
+      "show_only": "Afficher seulement ce dossier",
+      "keep_offline": "Garder hors ligne",
+      "stop_offline": "Ne plus garder hors ligne"
     },
     "folder_filter": {
       "exit": "Quitter la vue du dossier"
@@ -1897,7 +1899,11 @@
       "paste_note": "Coller ici",
       "enter_note_name": "Veuillez saisir un titre de note",
       "attachments": "Pièces jointes",
-      "convert_note": "Convertir la note"
+      "convert_note": "Convertir la note",
+      "keep_offline": "Garder hors ligne",
+      "stop_offline": "Ne plus garder hors ligne",
+      "available_offline": "Disponible hors ligne dans ce navigateur",
+      "not_available_offline": "Pas disponible hors ligne dans ce navigateur"
     }
   },
   "tree_history": {
@@ -5145,7 +5151,9 @@
       "back": "Retour à la liste",
       "modified": "Modifiée {{date}}",
       "saved_locally": "Enregistrée sur cet appareil. Elle sera envoyée au serveur dès que vous serez de nouveau en ligne.",
-      "push_error": "Pas encore envoyée : {{error}}"
+      "push_error": "Pas encore envoyée : {{error}}",
+      "too_big": "Pas disponible hors ligne, plus de {{limit}} Mo : {{files}}",
+      "file_size": "{{name}} ({{size}} Mo)"
     },
     "unavailable": {
       "title": "Cette note n'est pas disponible hors ligne",
@@ -5180,16 +5188,21 @@
       "help": "Conserver dans votre navigateur les notes modifiées récemment, pour les ouvrir et les modifier sans réseau.",
       "badge": "{{days}} derniers jours",
       "description": "Les notes modifiées ces derniers jours sont conservées dans les navigateurs où vous utilisez Poznote, pour pouvoir les ouvrir et les modifier sans réseau. Les modifications faites hors ligne sont envoyées dès le retour de la connexion. 0 ne conserve rien hors ligne.",
+      "kept_rules": "Vos favoris, ainsi que les notes et dossiers marqués « Garder hors ligne » dans leur menu, sont conservés quelle que soit leur date, avec toutes leurs pièces jointes.",
       "unit": "jours",
       "limits_title": "Limites :",
       "limits_notes": "{{notes}} notes et {{text}} Mo de texte au total, les plus récemment modifiées d'abord",
-      "limits_pictures": "Images : {{picture}} Mo chacune, {{pictures}} et {{total}} Mo au total, au plus la moitié de l'espace libre",
-      "limits_attachments": "Autres pièces jointes (PDF, audio, fichiers) : en ligne uniquement",
+      "limits_attachments": "Autres pièces jointes (PDF, audio, fichiers) : favoris et notes « Garder hors ligne » uniquement",
+      "limits_file_size": "Fichiers jusqu'à {{size}} Mo chacun : un fichier plus gros reste en ligne uniquement",
+      "limits_files_total": "{{count}} fichiers et {{total}} Mo au total, au plus la moitié de l'espace libre du navigateur",
       "warning": "La déconnexion supprime les notes hors ligne du navigateur. Sur un ordinateur partagé, déconnectez-vous en partant.",
       "device_status_one": "Dans ce navigateur : 1 note disponible hors ligne, mise à jour le {{date}}.",
       "device_status": "Dans ce navigateur : {{count}} notes disponibles hors ligne, mises à jour le {{date}}.",
       "device_none": "Rien n'est encore conservé dans ce navigateur : ouvrez vos notes une fois et elles le seront.",
       "device_unsupported": "Ce navigateur ne peut pas conserver de notes hors ligne (une connexion HTTPS sécurisée est nécessaire)."
+    },
+    "keep": {
+      "error": "Le réglage hors ligne n'a pas pu être enregistré."
     }
   }
 }
