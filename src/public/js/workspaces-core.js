@@ -135,6 +135,15 @@ function loadAndShowWorkspaceMenu(menu) {
     menu.innerHTML = '<div class="workspace-menu-item"><i class="lucide lucide-loader-2 lucide-spin"></i>' + wsTr('workspaces.menu.loading', {}, 'Loading workspaces...') + '</div>';
     menu.style.display = 'block';
 
+    // Inside a workspace shared with this login, /api/v1/workspaces answers
+    // for its owner's account, confined to that one workspace: the menu lists
+    // the login's own workspaces instead, each one a way back.
+    var homeAccount = getSharedScopeHomeAccount();
+    if (homeAccount) {
+        listAccountWorkspaces(menu, homeAccount);
+        return;
+    }
+
     fetch('/api/v1/workspaces', {
         method: 'GET',
         headers: { 'Accept': 'application/json' },
@@ -179,10 +188,13 @@ function displayWorkspaceMenu(menu, workspaces, username, actingAs) {
 // account is the wider scope, the workspace the narrower, and both are chosen
 // in the same place.
 //
-// An account that shares a single workspace with this login (workspaces.php >
-// Share) is listed among the accounts just the same; what it offers is then
-// that workspace alone, and opening it confines the session to it (auth.php,
-// shared workspace scope).
+// Workspaces other accounts share with this login (workspaces.php > Share)
+// are listed under "Shared with me", after the login's own ones, each with its
+// owner's name (discussion #1489: listed as an account, the owner hid the
+// workspace one click away). Opening one goes through switch_account.php too,
+// and confines the session to it (auth.php, shared workspace scope). Inside
+// such a workspace the Workspaces section lists the login's own workspaces,
+// the way back, and the shared one is ticked under "Shared with me".
 //
 // The management entries need the active account to be the login's own
 // (window.PoznoteActiveAccountIsOwn, icon_sidebar.php): creating a workspace
@@ -190,6 +202,21 @@ function displayWorkspaceMenu(menu, workspaces, username, actingAs) {
 // whether it was granted whole or shared one workspace at a time.
 function isOwnAccountActive() {
     return window.PoznoteActiveAccountIsOwn !== false;
+}
+
+// Rows of ownerId, ownerUsername, workspace and current (icon_sidebar.php).
+function getSharedWorkspaceRows() {
+    var accountSwitch = window.PoznoteAccountSwitch;
+    return accountSwitch && Array.isArray(accountSwitch.sharedWorkspaces) ? accountSwitch.sharedWorkspaces : [];
+}
+
+// The login's own account while the session is confined to a workspace shared
+// with it, null anywhere else.
+function getSharedScopeHomeAccount() {
+    var accountSwitch = window.PoznoteAccountSwitch;
+    if (!accountSwitch || !accountSwitch.ownId) return null;
+    var inScope = getSharedWorkspaceRows().some(function (row) { return !!row.current; });
+    return inScope ? { id: accountSwitch.ownId, own: true } : null;
 }
 
 function renderWorkspaceMenu(menu, state) {
@@ -231,7 +258,10 @@ function renderWorkspaceMenu(menu, state) {
     if (hasAccounts) {
         menuHtml += '<div class="workspace-menu-label">' + escapeWorkspaceMenuText(wsTr('workspaces.menu.accounts', {}, 'Accounts')) + '</div>';
         accounts.forEach(function (account) {
-            var selected = foreignAccount ? String(account.id) === String(foreignAccount.id) : !!account.current;
+            // From a shared workspace the login's own workspaces are listed
+            // while the active account is the owner's, absent from this list:
+            // nothing is ticked then.
+            var selected = foreignAccount ? String(account.id) === String(foreignAccount.id) && !account.own : !!account.current;
             var accountIcon = selected ? 'lucide-check-circle' : (account.own ? 'lucide-user' : 'lucide-users');
             menuHtml += '<div class="workspace-menu-item workspace-menu-account' + (selected ? ' current-workspace' : '') + '" data-account-id="' + escapeWorkspaceMenuText(account.id) + '"' + (account.current ? ' data-account-current="1"' : '') + '>'
                 + '<i class="' + accountIcon + '"></i>'
@@ -267,6 +297,21 @@ function renderWorkspaceMenu(menu, state) {
         menuHtml += mark;
         menuHtml += '<span>' + safeName + '</span>';
         menuHtml += '</div>';
+    }
+
+    // Workspaces other accounts share with this login, whatever account's
+    // list is shown above; the one the session is in right now is ticked.
+    var sharedWorkspaces = canSwitch ? getSharedWorkspaceRows() : [];
+    if (sharedWorkspaces.length > 0) {
+        menuHtml += '<div class="workspace-menu-divider"></div>';
+        menuHtml += '<div class="workspace-menu-label">' + escapeWorkspaceMenuText(wsTr('workspaces.menu.shared_with_me', {}, 'Shared with me')) + '</div>';
+        sharedWorkspaces.forEach(function (row, index) {
+            menuHtml += '<div class="workspace-menu-item workspace-menu-shared' + (row.current ? ' current-workspace' : '') + '" data-shared-index="' + index + '">'
+                + '<i class="' + (row.current ? 'lucide-check-circle' : 'lucide-layers') + '"></i>'
+                + '<span>' + escapeWorkspaceMenuText(row.workspace) + '</span>'
+                + '<span class="workspace-menu-shared-owner">' + escapeWorkspaceMenuText(row.ownerUsername) + '</span>'
+                + '</div>';
+        });
     }
 
     // Management entries, always the last ones: the menu opens even when the
@@ -317,6 +362,20 @@ function renderWorkspaceMenu(menu, state) {
         });
     });
 
+    menu.querySelectorAll('.workspace-menu-item[data-shared-index]').forEach(function (item) {
+        item.addEventListener('click', function () {
+            var row = sharedWorkspaces[parseInt(this.getAttribute('data-shared-index'), 10)];
+            if (!row) return;
+            if (row.current) {
+                closeWorkspaceMenus();
+                return;
+            }
+            var label = this.querySelector('span');
+            if (label) label.textContent = wsTr('profile.logout.switch_in_progress', {}, 'Switching account...');
+            window.poznoteSwitchAccount(row.ownerId, { workspace: row.workspace });
+        });
+    });
+
     menu.querySelectorAll('.workspace-menu-item[data-account-id]').forEach(function (item) {
         item.addEventListener('click', function (event) {
             // The menu re-renders under the pointer: without this the document
@@ -329,11 +388,8 @@ function renderWorkspaceMenu(menu, state) {
 }
 
 // Account picked in the menu: the login's own brings back its workspaces,
-// any other one lists what that account offers (name and colour only, from
-// account_tree.php: every workspace of an account granted whole, the shared
-// ones of an account that shares) so one of them can be opened in it. The
-// account a shared workspace belongs to is listed that way even while it is
-// the one open, since its other shared workspaces are reached from there.
+// any other one lists its workspaces (name and colour only, from
+// account_tree.php) so one of them can be opened in it.
 function chooseWorkspaceMenuAccount(menu, accountId) {
     var accountSwitch = window.PoznoteAccountSwitch;
     var accounts = accountSwitch && Array.isArray(accountSwitch.accounts) ? accountSwitch.accounts : [];
@@ -348,14 +404,21 @@ function chooseWorkspaceMenuAccount(menu, accountId) {
         return;
     }
 
-    // The login's own account, from an account that is not it: opened straight
-    // away, since its workspaces are not this menu's to list.
-    if (account.own) {
+    // The login's own account, from an account granted to it: opened straight
+    // away, since its workspaces are not this menu's to list. From a shared
+    // workspace they are (loadAndShowWorkspaceMenu), so they come back.
+    if (account.own && !getSharedScopeHomeAccount()) {
         closeWorkspaceMenus();
         window.poznoteSwitchAccount(account.id, {});
         return;
     }
 
+    listAccountWorkspaces(menu, account);
+}
+
+// Lists an account's workspaces in the menu, each one opened in that account
+// when picked.
+function listAccountWorkspaces(menu, account) {
     renderWorkspaceMenu(menu, { workspaces: [], account: account, loading: true });
     menu.setAttribute('data-menu-account', String(account.id));
 

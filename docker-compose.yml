@@ -1,6 +1,11 @@
 # Poznote Docker Compose Configuration
 # 
 # IMPORTANT: When updating Poznote, always follow instruction here https://github.com/timothepoznanski/poznote#update-application
+#
+# Beta versions: to try new features before the stable release, replace the
+# ":6" tag of both images below with ":latest-and-beta", which always points
+# to the newest version, beta or stable. Then run "docker compose pull" and
+# "docker compose up -d". Details: https://github.com/timothepoznanski/poznote#beta-versions
 
 services:
   webserver:

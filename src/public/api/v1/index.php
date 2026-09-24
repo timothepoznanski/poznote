@@ -110,6 +110,7 @@ require_once __DIR__ . '/../../../api/v1/controllers/GraphController.php';
 require_once __DIR__ . '/../../../api/v1/controllers/SnapshotsController.php';
 require_once __DIR__ . '/../../../api/v1/controllers/RemindersController.php';
 require_once __DIR__ . '/../../../api/v1/controllers/TasksController.php';
+require_once __DIR__ . '/../../../api/v1/controllers/OfflineController.php';
 
 /**
  * Simple Router class for handling RESTful routes
@@ -257,6 +258,7 @@ $graphController = new GraphController($con);
 $snapshotsController = new SnapshotsController($con);
 $remindersController = new RemindersController($con);
 $tasksController = new TasksController($con);
+$offlineController = new OfflineController($con, $notesController);
 
 // ======================
 // Notes Routes
@@ -334,6 +336,15 @@ $router->get('/changes', function($params) use ($notesController) {
     $notesController->changes();
 });
 
+// Offline copies kept by the browser (js/offline-sync.js)
+$router->get('/offline/manifest', function($params) use ($offlineController) {
+    $offlineController->manifest();
+});
+
+$router->get('/offline/notes', function($params) use ($offlineController) {
+    $offlineController->notes();
+});
+
 // Acquire an exclusive edit lock for a note
 $router->post('/notes/{id}/lock', function($params) use ($notesController) {
     $notesController->acquireLock($params['id']);
@@ -399,6 +410,11 @@ $router->put('/notes/{id}/color', function($params) use ($notesController) {
 // Toggle favorite status for a note
 $router->post('/notes/{id}/favorite', function($params) use ($notesController) {
     $notesController->toggleFavorite($params['id']);
+});
+
+// Keep a note offline whatever its date, or stop (Offline Copies)
+$router->put('/notes/{id}/offline', function($params) use ($notesController) {
+    $notesController->updateOffline($params['id']);
 });
 
 // Pin/unpin a note (pinned notes sort first on the dashboard)
@@ -639,6 +655,11 @@ $router->put('/folders/{id}/color', function($params) use ($foldersController) {
 // Pin/unpin a folder (pinned folders sort first on the dashboard)
 $router->put('/folders/{id}/pinned', function($params) use ($foldersController) {
     $foldersController->updatePinned($params['id']);
+});
+
+// Keep a folder's notes offline whatever their date, or stop (Offline Copies)
+$router->put('/folders/{id}/offline', function($params) use ($foldersController) {
+    $foldersController->updateOffline($params['id']);
 });
 
 // Mark/unmark a folder as favorite (listed in the Favorites section)
@@ -1010,6 +1031,15 @@ $router->patch('/admin/users/{id}', function($params) use ($usersController) {
 // Admin: Repair system (rebuild master registry)
 $router->post('/admin/repair', function($params) use ($usersController) {
     echo json_encode($usersController->repair());
+});
+
+// Admin: Attachment files no note references any more (scan, then delete)
+$router->get('/admin/orphan-attachments', function($params) use ($usersController) {
+    echo json_encode($usersController->orphanAttachments(false));
+});
+
+$router->delete('/admin/orphan-attachments', function($params) use ($usersController) {
+    echo json_encode($usersController->orphanAttachments(true));
 });
 
 // Admin: Delete a user profile

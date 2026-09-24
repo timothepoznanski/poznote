@@ -9,8 +9,9 @@
  * js/markdown-parser.js for window.parseMarkdown).
  */
 
-// The settings pages link back to the assistant (back_to_settings.php): tell
-// them which page the panel was opened on so the link returns there.
+// The settings pages link back to the assistant (poznoteSettingsShellOpen() in
+// settings_shell.php): tell them which page the panel was opened on so the
+// link returns there.
 $aiPanelSettingsQuery = 'from=ai-chat'
     . (basename((string)($_SERVER['SCRIPT_NAME'] ?? '')) === 'dashboard.php' ? '&back=dashboard' : '');
 

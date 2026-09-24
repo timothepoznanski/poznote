@@ -208,19 +208,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (backToNotesLink) {
         backToNotesLink.href = getBackToNotesUrl();
     }
-
-    // The rail's Home link is rendered server-side as a plain index.php link,
-    // where the note pane falls back to the last edited note. While every tab
-    // is closed that pane must stay empty (issue #1462), which only the
-    // browser knows about: carry the flag on the link.
-    var homeLink = document.getElementById('iconSidebarHomeBtn');
-    if (homeLink && homeLink.tagName === 'A' && hasEmptyStoredTabs(getEffectiveWorkspace(getPageWorkspace()))) {
-        try {
-            var homeUrl = new URL(homeLink.getAttribute('href') || 'index.php', window.location.href);
-            homeUrl.searchParams.set('blank', '1');
-            homeLink.setAttribute('href', homeUrl.pathname + homeUrl.search);
-        } catch (e) {
-            console.debug('navigation: home link update failed:', e);
-        }
-    }
+    // The rail's Home link is kept in step by js/icon-sidebar-toggle.js,
+    // which every page with the rail loads (issues #1462, #1488).
 });

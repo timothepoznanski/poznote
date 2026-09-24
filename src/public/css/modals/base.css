@@ -362,6 +362,46 @@ html[data-theme='dark'] .modal .modal-info-note {
     cursor: pointer;
 }
 
+.mdc-custom-row label > span {
+    flex: 1;
+}
+
+.mdc-custom-row .mdc-theme-hint {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+/* "Back to the theme colour", after the swatch so the label keeps the colour
+   input as its control. It keeps its room when hidden so every swatch sits in
+   the same column; js/settings-page.js sets .mdc-picked on the label. */
+.mdc-custom-row .mdc-reset {
+    flex: 0 0 auto;
+    visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    border-radius: var(--pz-radius-sm);
+    background: none;
+    color: var(--pz-text-muted);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.mdc-custom-row label.mdc-picked .mdc-reset {
+    visibility: visible;
+}
+
+.mdc-custom-row .mdc-reset:hover {
+    background: var(--pz-surface-hover);
+    color: var(--pz-text);
+}
+
 /* css/modals/responsive.css forces `padding: 12px !important` on all modal
    inputs (iOS zoom guard); with border-box that leaves the swatch 0px tall,
    so padding and margin must win with !important at higher specificity. */
@@ -526,6 +566,16 @@ html[data-theme='dark'] .modal .modal-info-note {
 
 #noteColorPaletteModal .modal-buttons button {
     white-space: nowrap;
+}
+
+/* Offline notes: wide enough for each limit to hold on one line. */
+#offlineNotesModal .modal-content {
+    max-width: 780px;
+}
+
+#offlineNotesModal .offline-limits {
+    margin: 0 0 16px;
+    padding-left: 20px;
 }
 
 @media (max-width: 480px) {

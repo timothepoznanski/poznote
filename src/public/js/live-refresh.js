@@ -200,6 +200,11 @@
         if (/\/api\/v1\/changes$/.test(path)) {
             return false;
         }
+        // Changes made on the offline page, pushed from this tab by
+        // js/offline-store.js: they come from outside what is on screen.
+        if (parsed.searchParams.get('offline_sync') === '1') {
+            return false;
+        }
         // Edit-lock traffic never changes note data
         if (/\/api\/v1\/(public\/)?notes(\/\d+)?\/lock(\/|$)/.test(path)) {
             return false;

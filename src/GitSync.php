@@ -1342,6 +1342,11 @@ class GitSync {
                                 $wsStmt = $this->con->prepare('INSERT OR IGNORE INTO workspaces (name) VALUES (?)');
                                 foreach (array_keys($uniqueWorkspaces) as $ws) {
                                     $wsStmt->execute([$ws]);
+                                    // One recreated here starts unshared (users/db_master.php)
+                                    if ($wsStmt->rowCount() > 0 && $this->userId !== null) {
+                                        require_once __DIR__ . '/users/db_master.php';
+                                        forgetStaleWorkspaceShares((int)$this->userId, $ws);
+                                    }
                                 }
                             } catch (Exception $e) {
                                 $results['debug'][] = '  WARNING: Could not recreate workspaces: ' . $e->getMessage();

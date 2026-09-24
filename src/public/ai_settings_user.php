@@ -15,6 +15,7 @@ requireActiveAccountOwner();
 
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../functions.php';
+require_once __DIR__ . '/../settings_shell.php';
 require_once __DIR__ . '/../version_helper.php';
 requireSettingsPassword();
 require_once __DIR__ . '/../db_connect.php';
@@ -102,9 +103,8 @@ $effective = poznoteResolveAiChatConfig($con, (int)(getAuthenticatedUserId() ?? 
 </head>
 <body class="home-page git-sync-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php $iconSidebarWorkspace = $pageWorkspace; include __DIR__ . '/../icon_sidebar.php'; ?>
+    <?php poznoteSettingsShellOpen(['section' => 'settings-actions-section-grid', 'title' => t('ai_settings_user.title', [], 'My AI Assistant')]); ?>
     <div class="home-container git-sync-container">
-    <?php include __DIR__ . '/../back_to_settings.php'; ?>
-    <h1 class="poznote-page-title"><i class="lucide lucide-bot"></i> <?php echo t_h('ai_settings_user.title', [], 'My AI Assistant'); ?></h1>
 
         <div class="git-sync-header">
             <p class="git-sync-description"><?php echo t_h('ai_settings_user.description', [], 'Connect the AI assistant to your own OpenAI-compatible server (Ollama, LM Studio, OpenAI, Anthropic, ...) with your own API key. Your configuration replaces the one set by the administrator.'); ?></p>
@@ -227,8 +227,9 @@ $effective = poznoteResolveAiChatConfig($con, (int)(getAuthenticatedUserId() ?? 
         </div>
 
     </div>
+    <?php poznoteSettingsShellClose(); ?>
 
-    <script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
     <?php if ($userKeysAllowed): ?>
     <script>

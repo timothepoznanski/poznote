@@ -4,9 +4,10 @@
  * the on-screen keyboard while the body of a note is being edited.
  *
  * A touch keyboard has no Tab, no Ctrl+Z and makes the "/" of the slash menu
- * hard to reach, so the bar carries those first. While it shows, a typed "/"
- * no longer opens the menu: the Insert button does. The formatting buttons reuse
- * the data-action values of the note toolbar (js/index-events.js); the others
+ * hard to reach, so the bar carries those first. The Insert button opens that
+ * menu whatever the mobile "Command menu shortcut" setting says. The
+ * formatting buttons reuse the data-action values of the note toolbar
+ * (js/index-events.js); the others
  * are handled by js/mobile-editor-bar.js, which also decides when the bar
  * shows. Styled in css/index-mobile.css, hidden everywhere else by
  * css/toolbar.css.

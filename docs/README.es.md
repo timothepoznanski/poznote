@@ -81,7 +81,7 @@ https://discord.gg/AWhWWSEkJ
 - [Copias de seguridad S3](#copias-de-seguridad-s3)
 - [Copia de seguridad / Exportar](#copia-de-seguridad--exportar)
 - [Restaurar / Importar](#restaurar--importar)
-- [Vista sin conexión](#vista-sin-conexión)
+- [Sin conexión](#sin-conexión)
 - [Varias instancias](#varias-instancias)
 - [Asistente IA](#asistente-ia)
 - [Transcripción (voz a texto)](#transcripción-voz-a-texto)
@@ -467,6 +467,33 @@ docker compose up -d
 
 Tus datos se conservan en el directorio `./data` y la actualización no les afecta.
 
+### Versiones beta
+
+Las versiones beta traen nuevas funciones antes de que salgan como versión estable, y aparecen como prelanzamientos en la [página de releases](https://github.com/timothepoznanski/poznote/releases). Se publican con la etiqueta `latest-and-beta`, que siempre apunta a la versión más reciente, beta o estable.
+
+Para usarlas, cambia las dos líneas `image` de tu `docker-compose.yml` y deja el resto del archivo tal como está:
+```yaml
+services:
+  webserver:
+    image: ghcr.io/timothepoznanski/poznote:latest-and-beta
+    ...
+  mcp-server:
+    image: ghcr.io/timothepoznanski/poznote-mcp:latest-and-beta
+    ...
+```
+
+Con la variante [rootless](#rootless), la imagen del webserver en `docker-compose.rootless.yml` pasa a ser `poznote:latest-and-beta-rootless`, y la imagen MCP sigue siendo la misma: `poznote-mcp:latest-and-beta`.
+
+Descarga las imágenes y reinicia los contenedores:
+```bash
+docker compose pull
+docker compose up -d
+```
+
+*   **Antes de cambiar:** una beta aún puede contener errores, así que haz primero una [copia de seguridad](#copia-de-seguridad--exportar). Los problemas se pueden informar en los [issues de GitHub](https://github.com/timothepoznanski/poznote/issues) o en [Discord](https://discord.gg/AWhWWSEkJ).
+*   **Actualizaciones:** a partir de entonces, cada `docker compose pull` obtiene la beta más reciente, o la versión estable cuando se publique. El procedimiento de actualización anterior descarga un nuevo `docker-compose.yml` que vuelve a usar las etiquetas estables, así que cambia de nuevo las dos líneas `image` después de ese paso.
+*   **Volver a la versión estable:** como una beta puede modificar la base de datos, volver a una versión estable más antigua puede no funcionar. Espera a la siguiente versión estable, que incluye los cambios de la beta, y luego sigue el procedimiento de actualización anterior.
+
 ## Autenticación
 
 Poznote admite varios métodos de autenticación, entre ellos las cuentas locales y los proveedores de identidad externos. Las aplicaciones y extensiones que se comunican con la API REST usan [contraseñas de aplicación](#contraseñas-de-aplicación), una credencial independiente que se describe en la sección siguiente.
@@ -656,7 +683,7 @@ Las instantáneas conservan versiones anteriores del contenido de una nota para 
 <summary><strong>Cómo funcionan las instantáneas</strong></summary>
 <br>
 
-*   **Automáticas:** se toma una instantánea la primera vez que se abre una nota cada día. Se conservan las 3 instantáneas automáticas más recientes por nota; este número puede cambiarse en **Configuración > Comportamiento > Instantáneas**.
+*   **Automáticas:** se toma una instantánea la primera vez que se abre una nota cada día. Se conservan las 3 instantáneas automáticas más recientes por nota; este número puede cambiarse en **Configuración > Acciones > Instantáneas**.
 *   **Manuales:** «Tomar instantánea ahora» añade una instantánea en cualquier momento, y también **Ctrl + Alt + S** (Cmd + Alt + S en Mac) con una nota abierta. Las instantáneas manuales son ilimitadas y no cuentan para ese número.
 *   **Antes de una edición por IA:** se toma automáticamente una instantánea justo antes de que el [Asistente IA](#asistente-ia) o el [servidor MCP](#servidor-mcp) cambien el contenido de una nota, así una reescritura que sale mal se deshace con un clic. Estas instantáneas aparecen en el historial como «Antes del cambio de la IA» o «Antes del cambio por MCP», se omiten cuando la última instantánea ya contiene el mismo contenido, y se conservan las 20 más recientes por nota, un número que puedes cambiar en **Configuración → Instantáneas** (de 1 a 200) si tu instancia edita muchas notas mediante IA o MCP.
 *   **Caducidad:** todas las instantáneas, automáticas o manuales, se eliminan 30 días después de tomarse. Una instantánea también puede eliminarse a mano desde la ventana de Instantáneas.
@@ -1208,9 +1235,34 @@ updated: 2024-01-20 15:45:00
 </details>
 
 
-## Vista sin conexión
+## Sin conexión
+
+Poznote sigue funcionando sin red de dos maneras: las notas que modificaste recientemente, tus favoritos y las notas o carpetas que elijas guardar siguen disponibles en tu navegador, listas para leerlas y editarlas, y una copia de seguridad completa puede consultarse en cualquier lugar como una exportación de solo lectura.
+
+<details>
+<summary><strong>Notas sin conexión</strong></summary>
+<br>
+
+Las notas que modificaste en los últimos 5 días se guardan en cada navegador donde usas Poznote, y esta copia se actualiza después de cada guardado. En clase, en el tren o en cualquier lugar sin Wi-Fi, abre la dirección habitual de Poznote: el navegador muestra la versión sin conexión de Poznote, con la misma barra lateral, los mismos editores, la misma barra de herramientas, la misma búsqueda y las mismas pestañas (un doble clic o un clic central abre una nota en una pestaña nueva, y se recuperan las pestañas abiertas en línea), y solo lista las notas guardadas sin conexión.
+
+*   **Inicio de sesión:** escribe la contraseña con la que iniciaste sesión por última vez en este navegador, se comprueba sin el servidor. Si nunca escribiste tu contraseña en este navegador (SSO, inicio de sesión automático), la última cuenta usada se abre con un botón **Continuar como**.
+*   **Lectura y edición:** las notas HTML, las notas Markdown y las listas de tareas se abren en su editor habitual, y puedes crear notas nuevas. El menú / y el menú del clic derecho también funcionan, sin los comandos que necesitan el servidor (imágenes y archivos que subir, plantillas, dibujos, enlaces a otras notas). Los demás tipos de notas, como los dibujos, solo están disponibles en línea. Los cambios se guardan en el navegador hasta que se envían.
+*   **Guardar sin conexión:** los favoritos siempre se guardan, y **Guardar sin conexión** en el menú de una nota o de una carpeta (subcarpetas incluidas) la guarda sea cual sea su fecha, con todos sus adjuntos (PDF, audio, archivos) de hasta 25 MB cada uno. El mismo menú de una nota indica si está disponible sin conexión en este navegador.
+*   **De vuelta en línea:** los cambios se envían automáticamente. Si una nota también se modificó en el servidor mientras tanto, las dos versiones se combinan cuando es posible; si no, tu versión sin conexión se guarda como una nota aparte llamada "... (copia sin conexión)". Una nota eliminada en el servidor mientras tanto se vuelve a crear.
+*   **Ajustes:** **Configuración > Acciones > Notas sin conexión** define cuántos días de notas se guardan (5 por defecto, hasta 30, 0 desactiva las notas sin conexión) y muestra lo que contiene el navegador actual.
+*   **Límites:** como máximo 300 notas y 50 MB de texto, primero las modificadas más recientemente. También se guardan archivos: las imágenes que muestran estas notas y todos los adjuntos (PDF, audio, archivos) de los favoritos y de las notas guardadas con **Guardar sin conexión**, hasta 25 MB cada uno, 400 archivos y 200 MB en total, y nunca más de la mitad del espacio libre del navegador. Un archivo más grande solo está en línea, y la nota lo indica cuando se abre sin conexión.
+*   **Requisitos:** Poznote debe servirse por HTTPS (los navegadores solo guardan páginas sin conexión en una conexión segura, `http://localhost` también funciona) y haberse abierto una vez en línea en el navegador, tras iniciar sesión, para que se haga la copia.
+*   **Privacidad:** solo se guardan las notas de tu propia cuenta, no las de una cuenta o un espacio de trabajo compartidos contigo. Se almacenan sin cifrar en el navegador. Cerrar sesión las elimina del navegador (también los cambios aún no enviados, tras un aviso que los enumera): en un ordenador compartido, cierra sesión al irte. Cerrar sesión también funciona sin red, desde la página sin conexión: las notas se eliminan al momento y la sesión en el servidor termina la próxima vez que Poznote se abra en línea.
+
+</details>
+
+<details>
+<summary><strong>Exportación sin conexión</strong></summary>
+<br>
 
 La **📦 Copia de seguridad completa** crea una versión independiente de tus notas para consultarla sin conexión. Solo tienes que extraer el ZIP y abrir `index.html` en cualquier navegador web. Así puedes leer tus notas sin conexión, pero sin todas las funciones de Poznote: es una exportación de solo lectura.
+
+</details>
 
 ## Varias instancias
 

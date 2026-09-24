@@ -21,6 +21,12 @@
 # 2. .env.template (compare with your .env):
 #    curl -o .env.template https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.template
 #    sdiff .env .env.template  # Add any new variables to your .env
+#
+# Beta versions: to try new features before the stable release, replace the
+# webserver image tag ":6-rootless" with ":latest-and-beta-rootless" and the
+# mcp-server image tag ":6" with ":latest-and-beta". Both always point to the
+# newest version, beta or stable.
+# Details: https://github.com/timothepoznanski/poznote#beta-versions
 
 services:
   webserver:

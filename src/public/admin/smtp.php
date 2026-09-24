@@ -9,6 +9,7 @@ require_once __DIR__ . '/../../auth.php';
 requireAuth();
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../functions.php';
+require_once __DIR__ . '/../../settings_shell.php';
 requireSettingsPassword();
 
 if (!isCurrentUserAdmin()) {
@@ -564,9 +565,8 @@ $notifyCandidates = listNewUserNotificationCandidates();
 </head>
 <body class="has-icon-sidebar" data-workspace="<?php echo smtp_h($pageWorkspace); ?>">
     <?php $iconSidebarBasePath = '../'; include __DIR__ . '/../../icon_sidebar.php'; ?>
+<?php poznoteSettingsShellOpen(['section' => 'admin-tools-grid', 'title' => t('settings.cards.smtp_config', [], 'SMTP / Email'), 'basePath' => '../']); ?>
 <div class="settings-container smtp-page">
-<?php $backToSettingsBasePath = '../'; include __DIR__ . '/../../back_to_settings.php'; ?>
-<h1 class="poznote-page-title"><i class="lucide lucide-mail"></i> <?php echo t_h('settings.cards.smtp_config', [], 'SMTP / Email'); ?></h1>
 
     <div class="workspaces-nav">
         <button type="submit" form="smtp-config-form" name="action" value="test" class="btn btn-primary smtp-test-button">
@@ -707,6 +707,7 @@ $notifyCandidates = listNewUserNotificationCandidates();
         </div>
     </form>
 </div>
+<?php poznoteSettingsShellClose(); ?>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     var securitySelect = document.getElementById('smtp_security');
@@ -752,6 +753,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
-    <script src="../js/icon-sidebar-toggle.js?v=<?php echo $v; ?>"></script>
+    <script src="../<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 </body>
 </html>

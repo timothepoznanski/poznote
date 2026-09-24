@@ -19,13 +19,26 @@ test('valid colours become --mdc-* declarations and invalid ones are skipped', f
 });
 
 test('a legacy single heading colour fans out to every level and code tints the block', function () {
-    $style = poznoteMarkdownColoredStyle('custom', json_encode(['heading' => '#007db8', 'h3' => '#8250df', 'code' => '#b34e00']));
+    $style = poznoteMarkdownColoredStyle('custom', json_encode(['heading' => '#123456', 'h3' => '#654321', 'code' => '#abcdef']));
     foreach (['h1', 'h2', 'h4', 'h5', 'h6'] as $level) {
-        assertContains("--mdc-$level: #007db8;", $style);
+        assertContains("--mdc-$level: #123456;", $style);
     }
-    assertContains('--mdc-h3: #8250df;', $style);
-    assertContains('--mdc-code: #b34e00;', $style);
-    assertContains('--mdc-codeblock: #b34e00;', $style);
+    assertContains('--mdc-h3: #654321;', $style);
+    assertContains('--mdc-code: #abcdef;', $style);
+    assertContains('--mdc-codeblock: #abcdef;', $style);
+});
+
+// Issue #1444: the defaults follow the theme (css/tokens.css). Saving the old
+// modal wrote its fixed default for all eleven elements, so a stored value
+// equal to that default must not pin a light-theme colour on every theme.
+test('an element still on its old fixed default follows the theme', function () {
+    $json = json_encode(['h1' => '#007DB8', 'h2' => '#1a7f37', 'h3' => '#112233', 'code' => '#b34e00', 'codeblock' => '#b34e00', 'hr' => '#007db8']);
+    assertSame('--mdc-h3: #112233;', poznoteMarkdownColoredStyle('custom', $json));
+});
+
+test('an element stored as "" follows the theme and is not refilled by the legacy expansion', function () {
+    $json = json_encode(['h1' => '', 'h2' => '#112233', 'code' => '#445566', 'codeblock' => '', 'quote' => '']);
+    assertSame('--mdc-h2: #112233; --mdc-code: #445566;', poznoteMarkdownColoredStyle('custom', $json));
 });
 
 test('nothing is declared when the setting is off or the stored value is not JSON', function () {

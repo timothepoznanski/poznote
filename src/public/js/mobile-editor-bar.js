@@ -14,9 +14,9 @@
  * (body.mobile-editor-bar-visible) and runs the buttons that have no
  * data-action of the note toolbar to reuse.
  *
- * While the Insert button is on screen a typed "/" is a plain character, the
- * button is the way into the slash menu (isTypedSlashTakenByMobileBar() in
- * js/slash-command.js).
+ * The Insert button opens the slash menu whatever the mobile "Command menu
+ * shortcut" setting says, so a typed "/" can be turned off on a phone
+ * (slash_menu_trigger_mobile, read by js/slash-command.js).
  */
 (function () {
     'use strict';

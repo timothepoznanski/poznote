@@ -119,66 +119,6 @@
 }
 
 /* ============================================
-   Note Width Modal (#noteWidthModal)
-   ============================================ */
-
-.note-width-input-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    padding: 0 0 30px 0;
-}
-
-.note-width-unit {
-    font-size: 1.2rem;
-    color: var(--pz-text-muted);
-}
-
-.note-width-input-container input {
-    width: 120px !important;
-    text-align: center;
-    font-size: 1.2rem !important;
-    padding: 10px !important;
-    margin-bottom: 0 !important;
-}
-
-.btn-full-width-footer {
-    background-color: var(--pz-surface-hover) !important;
-    color: var(--pz-text-secondary) !important;
-    border: 1px solid var(--pz-border-strong) !important;
-}
-
-.btn-full-width-footer:hover {
-    background-color: var(--pz-surface-sunken) !important;
-    color: var(--pz-text) !important;
-}
-
-.btn-full-width-footer.active {
-    background-color: var(--pz-accent) !important;
-    color: var(--pz-text-inverse) !important;
-    border-color: var(--pz-accent) !important;
-}
-
-#noteWidthModal .modal-buttons {
-    flex-wrap: nowrap !important;
-}
-
-@media (max-width: 480px) {
-    #noteWidthModal .modal-buttons {
-        flex-direction: row !important;
-        gap: 8px !important;
-    }
-
-    #noteWidthModal .modal-buttons button {
-        width: auto !important;
-        flex: 1 !important;
-        padding: 8px 5px !important;
-        font-size: 0.85rem !important;
-    }
-}
-
-/* ============================================
    Move Folder Files Modal (#moveFolderFilesModal)
    ============================================ */
 

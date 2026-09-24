@@ -67,8 +67,11 @@ if ($_POST) {
             $stmt->execute([$name, poznoteSerializeWorkspaceTags($tags)]);
 
             // OR IGNORE makes a duplicate name a silent no-op, so only log when
-            // a row was actually inserted.
+            // a row was actually inserted. A new workspace starts unshared
+            // (users/db_master.php).
             if ($stmt->rowCount() > 0) {
+                require_once __DIR__ . '/../users/db_master.php';
+                forgetStaleWorkspaceShares((int)$_SESSION['user_id'], $name);
                 require_once __DIR__ . '/../ActivityLog.php';
                 logActivity(ACTIVITY_WORKSPACE_CREATED, ['workspace' => $name]);
             }
@@ -447,9 +450,13 @@ if ($_POST) {
             if ($name === '' || $target === '') throw new Exception(t('workspaces.errors.name_and_target_required', [], 'Workspace name and target required', $currentLang));
             if ($name === $target) throw new Exception(t('workspaces.errors.source_target_must_differ', [], 'Source and target workspaces must differ', $currentLang));
 
-            // Ensure target exists
+            // Ensure target exists; one created here starts unshared
             $ins = $con->prepare('INSERT OR IGNORE INTO workspaces (name) VALUES (?)');
             $ins->execute([$target]);
+            if ($ins->rowCount() > 0) {
+                require_once __DIR__ . '/../users/db_master.php';
+                forgetStaleWorkspaceShares((int)$_SESSION['user_id'], $target);
+            }
 
             // Move non-trashed entries individually to preserve uniqueness of headings
             $moved = 0;
@@ -990,6 +997,6 @@ try {
     
     <?php include __DIR__ . '/../modals.php'; ?>
     
-    <script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 </body>
 </html>

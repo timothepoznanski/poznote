@@ -5165,3 +5165,25 @@
   background-image: none;
 }
 
+.lucide-wifi-off {
+  -webkit-mask-image: url("data:image/svg+xml,%3C%21--%20%40license%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-wifi-off%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Cpath%20d%3D%27M12%2020h.01%27%20%2F%3E%20%3Cpath%20d%3D%27M8.5%2016.429a5%205%200%200%201%207%200%27%20%2F%3E%20%3Cpath%20d%3D%27M5%2012.859a10%2010%200%200%201%205.17-2.69%27%20%2F%3E%20%3Cpath%20d%3D%27M19%2012.859a10%2010%200%200%200-2.007-1.523%27%20%2F%3E%20%3Cpath%20d%3D%27M2%208.82a15%2015%200%200%201%204.177-2.643%27%20%2F%3E%20%3Cpath%20d%3D%27M22%208.82a15%2015%200%200%200-11.288-3.764%27%20%2F%3E%20%3Cpath%20d%3D%27m2%202%2020%2020%27%20%2F%3E%20%3C%2Fsvg%3E");
+  mask-image: url("data:image/svg+xml,%3C%21--%20%40license%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-wifi-off%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Cpath%20d%3D%27M12%2020h.01%27%20%2F%3E%20%3Cpath%20d%3D%27M8.5%2016.429a5%205%200%200%201%207%200%27%20%2F%3E%20%3Cpath%20d%3D%27M5%2012.859a10%2010%200%200%201%205.17-2.69%27%20%2F%3E%20%3Cpath%20d%3D%27M19%2012.859a10%2010%200%200%200-2.007-1.523%27%20%2F%3E%20%3Cpath%20d%3D%27M2%208.82a15%2015%200%200%201%204.177-2.643%27%20%2F%3E%20%3Cpath%20d%3D%27M22%208.82a15%2015%200%200%200-11.288-3.764%27%20%2F%3E%20%3Cpath%20d%3D%27m2%202%2020%2020%27%20%2F%3E%20%3C%2Fsvg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  background-color: currentColor;
+  background-image: none;
+}
+
+.lucide-cloud-off {
+  -webkit-mask-image: url("data:image/svg+xml,%3C%21--%20%40license%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-cloud-off%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Cpath%20d%3D%27M10.94%205.274A7%207%200%200%201%2015.71%2010h1.79a4.5%204.5%200%200%201%204.222%206.057%27%20%2F%3E%20%3Cpath%20d%3D%27M18.796%2018.81A4.5%204.5%200%200%201%2017.5%2019H9A7%207%200%200%201%205.79%205.78%27%20%2F%3E%20%3Cpath%20d%3D%27m2%202%2020%2020%27%20%2F%3E%20%3C%2Fsvg%3E");
+  mask-image: url("data:image/svg+xml,%3C%21--%20%40license%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-cloud-off%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Cpath%20d%3D%27M10.94%205.274A7%207%200%200%201%2015.71%2010h1.79a4.5%204.5%200%200%201%204.222%206.057%27%20%2F%3E%20%3Cpath%20d%3D%27M18.796%2018.81A4.5%204.5%200%200%201%2017.5%2019H9A7%207%200%200%201%205.79%205.78%27%20%2F%3E%20%3Cpath%20d%3D%27m2%202%2020%2020%27%20%2F%3E%20%3C%2Fsvg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  background-color: currentColor;
+  background-image: none;
+}
+

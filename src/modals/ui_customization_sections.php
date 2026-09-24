@@ -48,7 +48,8 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:extension-card" checked><span><?php echo t_h('settings.cards.install_extension', [], 'Install extension'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:install-app-card" checked><span><?php echo t_h('settings.cards.install_app', [], 'Install application'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:spellcheck-html-notes-card" checked><span><?php echo t_h('display.cards.spellcheck_html_notes', [], 'Spell check'); ?></span></label>
-        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:slash-menu-trigger-card" checked><span><?php echo t_h('display.cards.slash_menu_trigger', [], 'Command menu shortcut'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:slash-menu-trigger-card" checked><span><?php echo t_h('display.cards.slash_menu_trigger', [], 'Command menu shortcut (computer)'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:slash-menu-trigger-mobile-card" checked><span><?php echo t_h('display.cards.slash_menu_trigger_mobile', [], 'Command menu shortcut (mobile)'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:login-display-card" checked><span><?php echo t_h('display.cards.login_display', [], 'Login page title'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:language-card" checked><span><?php echo t_h('settings.language.label', [], 'Language'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:main-font-card" checked><span><?php echo t_h('display.cards.main_font', [], 'App font'); ?></span></label>
@@ -60,6 +61,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:date-time-format-card" checked><span><?php echo t_h('display.cards.date_time_format', [], 'Date & time format'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-age-filter-card" checked><span><?php echo t_h('display.cards.note_age_filter', [], 'Note age filter'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:snapshots-card" checked><span><?php echo t_h('display.cards.snapshots', [], 'Snapshots'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:offline-notes-card" checked><span><?php echo t_h('offline.settings.card', [], 'Offline notes'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:tasklist-insert-order-card" checked><span><?php echo t_h('display.cards.tasklist_insert_order', [], 'Task list insert order'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:diary-note-type-card" checked><span><?php echo t_h('display.cards.diary_default_note_type', [], 'Diary entry format'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:diary-date-format-card" checked><span><?php echo t_h('display.cards.diary_date_format', [], 'Diary entry date format'); ?></span></label>
@@ -86,7 +88,6 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:ai-assistant-user-card" checked><span><?php echo t_h('ai_settings_user.card', [], 'My AI Assistant'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:stt-card" checked><span><?php echo t_h('settings.cards.stt', [], 'Transcription'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:stt-user-card" checked><span><?php echo t_h('stt_settings_user.card', [], 'My transcription server'); ?></span></label>
-        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:saas-card" checked><span><?php echo t_h('settings.cards.saas', [], 'SaaS mode'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:s3-storage-card" checked><span><?php echo t_h('settings.cards.s3_storage', [], 'S3 Attachments'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:s3-backup-card" checked><span><?php echo t_h('settings.cards.s3_backup', [], 'S3 Backups'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:git-sync-enabled-card" checked><span><?php echo t_h('settings.cards.git_sync_toggle', [], 'Git Sync'); ?></span></label>
@@ -275,7 +276,6 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGraphBtn" checked><span><?php echo t_h('home.graph', [], 'Graph'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGitPushBtn" checked><span>Push</span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGitPullBtn" checked><span>Pull</span></label>
-    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarProfileBtn" checked><span><?php echo t_h('profile.card', [], 'My Profile'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarThemeToggleBtn" checked><span><?php echo t_h('modals.ui_customization.theme_toggle', [], 'Theme toggle'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarAboutBtn" checked><span><?php echo t_h('settings.categories.documentation', [], 'About'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarLogoutBtn" checked><span><?php echo t_h('workspace_menu.logout', [], 'Logout'); ?></span></label>

@@ -82,6 +82,6 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/navigation.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/graph.js?v=<?php echo $cache_v; ?>"></script>
-    <script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 </body>
 </html>

@@ -401,8 +401,6 @@
       "upload_section_title": "Enviar Novo Anexo",
       "drag_drop_info": "Você pode arrastar e soltar seu arquivo abaixo:",
       "all_types_accepted": "Todos os tipos de arquivo aceitos (máx 200MB)",
-      "note_taking_notice": "O Poznote é um aplicativo de notas: pode guardar mídias, mas arquivos grandes enchem rapidamente o seu espaço.",
-      "note_taking_notice_link": "Ver meu armazenamento",
       "upload_button": "Anexar",
       "current_attachments": "Anexos Atuais",
       "loading_attachments": "Carregando anexos...",
@@ -518,14 +516,14 @@
       "backlinks_at_bottom": "Mostre a seção de backlinks na parte inferior das notas em vez do topo.",
       "default_image_border": "Exiba por padrão as imagens das notas com borda e sem preenchimento.",
       "spellcheck_html_notes": "Ative o corretor ortográfico do navegador nas notas HTML.",
-      "slash_menu_trigger": "Escolha se o menu de comandos abre digitando /, com Alt + / ou sem nenhuma tecla. Um clique com o botão direito numa nota abre-o seja qual for esta definição.",
+      "slash_menu_trigger": "No computador, escolha se o menu de comandos abre digitando /, com Alt + / ou sem nenhuma tecla. Um clique com o botão direito numa nota abre-o seja qual for esta definição.",
+      "slash_menu_trigger_mobile": "No telemóvel, escolha se o menu de comandos abre digitando /, com Alt + / a partir de um teclado físico ou sem nenhuma tecla.",
       "icon_sidebar_order": "Altere a ordem e a cor dos botões da barra de ícones e coloque separadores entre eles.",
       "users_admin": "Crie, edite e gerencie contas de usuário.",
       "oidc_config": "Configure o login único com um provedor OpenID Connect.",
       "smtp_config": "Configure o servidor SMTP usado para enviar e-mails como lembretes.",
       "webhooks": "Envie eventos da instância para serviços externos via webhooks.",
       "ai_assistant": "Configure o assistente de IA usado para conversar com suas notas.",
-      "saas": "Elementos de exibição para instâncias oferecidas como serviço hospedado (SaaS). Todos ocultos por padrão.",
       "git_sync_enabled": "Ative ou desative a sincronização Git nesta instância.",
       "import_limits": "Defina o número máximo de arquivos permitidos por importação.",
       "user_quotas": "Limite o número de notas e o armazenamento disponível por usuário.",
@@ -549,6 +547,9 @@
       "highlight_current_folder_tree": "Esbater, tanto quanto quiser, as notas e pastas que estão fora da hierarquia de pastas em que está a trabalhar.",
       "snapshots": "Escolha quantos instantâneos automáticos diários e quantos instantâneos de segurança (antes de uma edição por IA ou MCP) são guardados por nota.",
       "stt": "Configure o servidor de reconhecimento de voz usado para ditar notas e transcrever anexos de áudio."
+    },
+    "card_notes": {
+      "slash_menu_trigger_mobile": "No telemóvel, a barra de ferramentas acima do teclado tem um botão + que abre o mesmo menu, seja qual for esta definição."
     },
     "title": "Configurações",
     "collapse_section": "Recolher a seção",
@@ -577,7 +578,14 @@
       "integrations": "Integrações",
       "storage_limits": "Armazenamento e limites",
       "appearance": "Aparência",
-      "maintenance": "Manutenção"
+      "maintenance": "Manutenção",
+      "backup_sync": "Backups e sincronização",
+      "editing": "Edição",
+      "apps": "Aplicativos",
+      "profile_sign_in": "Perfil e login",
+      "language_region": "Idioma e região",
+      "storage": "Armazenamento",
+      "layout": "Layout"
     },
     "sections": {
       "account_display": "Conta e Exibição",
@@ -640,7 +648,6 @@
       "smtp_config": "SMTP / E-mail",
       "webhooks": "Webhooks de administrador",
       "ai_assistant": "Assistente IA",
-      "saas": "Modo SaaS",
       "s3_storage": "Anexos S3",
       "s3_backup": "Backups S3",
       "stt": "Transcrição",
@@ -663,6 +670,22 @@
         "unavailable": "Indisponível",
         "installed": "Já instalado"
       }
+    },
+    "value_help": {
+      "font_size_notes": "Conteúdo da nota",
+      "font_size_sidebar": "Barra lateral",
+      "font_size_code_blocks": "Blocos de código",
+      "font_size_settings": "Página de configurações"
+    },
+    "storage_summary": {
+      "error": "Não foi possível carregar o uso do armazenamento.",
+      "notes_detail": "{{active}} nas suas notas, {{trash}} na lixeira",
+      "local": "Espaço usado no servidor",
+      "database": "Banco de dados",
+      "note_files": "Arquivos das notas",
+      "attachments": "Anexos",
+      "s3_attachments": "Anexos no armazenamento S3",
+      "s3_backups": "Backups no armazenamento S3"
     }
   },
   "workspaces": {
@@ -726,7 +749,8 @@
       "edit_workspaces": "Editar espaços de trabalho",
       "new_workspace": "Novo espaço de trabalho",
       "accounts": "Contas",
-      "title": "Espaços de trabalho"
+      "title": "Espaços de trabalho",
+      "shared_with_me": "Compartilhados comigo"
     },
     "errors": {
       "already_exists": "Já existe um espaço de trabalho com este nome",
@@ -846,7 +870,8 @@
       "notes_dashboard": "Quadro de notas",
       "spellcheck_html_notes": "Verificação ortográfica",
       "note_color_palette": "Cores das notas",
-      "slash_menu_trigger": "Atalho do menu de comandos",
+      "slash_menu_trigger": "Atalho do menu de comandos (computador)",
+      "slash_menu_trigger_mobile": "Atalho do menu de comandos (telemóvel)",
       "snapshots": "Instantâneos",
       "show_note_icons": "Mostrar ícones das notas"
     },
@@ -1624,6 +1649,8 @@
         "off": "Desativado",
         "custom": "Personalizado"
       },
+      "theme_hint": "Cada cor segue o tema até a alterar. A seta ao lado de uma cor alterada repõe a cor do tema.",
+      "reset_element": "Usar a cor do tema",
       "elements": {
         "h1": "Título 1",
         "h2": "Título 2",
@@ -1873,7 +1900,9 @@
       "copy_folder": "Copiar",
       "cut_folder": "Recortar",
       "paste_into_folder": "Colar na pasta",
-      "change_note_icon": "Alterar ícone da nota"
+      "change_note_icon": "Alterar ícone da nota",
+      "keep_offline": "Manter offline",
+      "stop_offline": "Deixar de manter offline"
     },
     "folder_filter": {
       "exit": "Sair da vista da pasta"
@@ -1891,7 +1920,11 @@
       "convert_note": "Converter nota",
       "copy_note": "Copiar",
       "cut_note": "Recortar",
-      "paste_note": "Colar aqui"
+      "paste_note": "Colar aqui",
+      "keep_offline": "Manter offline",
+      "stop_offline": "Deixar de manter offline",
+      "available_offline": "Disponível offline neste navegador",
+      "not_available_offline": "Não disponível offline neste navegador"
     }
   },
   "tree_history": {
@@ -4815,16 +4848,6 @@
     "add_placeholder": "Adicionar uma tarefa...",
     "save_error": "Não foi possível salvar a lista de tarefas."
   },
-  "saas": {
-    "description": "Elementos de exibição úteis quando esta instância é oferecida como serviço hospedado (SaaS). Tudo fica oculto por padrão.",
-    "section_storage_notices": "Avisos de armazenamento",
-    "storage_notices_label": "Mostrar os avisos de armazenamento",
-    "storage_notices_description": "Lembra aos usuários que o Poznote é um aplicativo de notas, não um serviço de armazenamento de fotos ou vídeos, nas páginas de anexos, na página de estatísticas de armazenamento do usuário e nas configurações de anexos S3.",
-    "messages": {
-      "saved": "Configuração salva com sucesso.",
-      "save_error": "Falha ao salvar a configuração."
-    }
-  },
   "archive": {
     "menu_item": "Arquivar a nota",
     "confirm_title": "Arquivar a nota",
@@ -4981,5 +5004,118 @@
   },
   "focus_mode": {
     "button": "Modo foco"
+  },
+  "offline": {
+    "page_title": "Poznote (offline)",
+    "signout": {
+      "removes": "As notas mantidas offline serão removidas deste dispositivo.",
+      "done_title": "Você saiu da conta",
+      "done_text": "As notas mantidas offline foram removidas deste dispositivo.",
+      "loss_title": "Suas alterações serão perdidas",
+      "loss_text_one": "1 alteração feita offline não foi sincronizada com o servidor. Se você sair agora, ela será apagada deste dispositivo e perdida para sempre.",
+      "loss_text_other": "{{count}} alterações feitas offline não foram sincronizadas com o servidor. Se você sair agora, elas serão apagadas deste dispositivo e perdidas para sempre.",
+      "loss_more": "e mais {{count}}",
+      "loss_keep": "Para mantê-las, cancele e continue conectado: elas são enviadas sozinhas assim que a conexão funcionar.",
+      "loss_confirm": "Sair e perder as alterações"
+    },
+    "unsupported": "Este navegador não consegue guardar notas offline.",
+    "status": {
+      "offline": "Offline",
+      "online": "Online",
+      "syncing": "Sincronizando…",
+      "pending_one": "1 alteração pendente",
+      "pending_other": "{{count}} alterações pendentes"
+    },
+    "signin": {
+      "intro": "Você está offline. Entre para abrir as notas guardadas neste dispositivo.",
+      "username": "Usuário ou e-mail",
+      "password": "Senha",
+      "submit": "Entrar offline",
+      "checking": "Verificando…",
+      "unknown_account": "As notas desta conta não estão guardadas neste dispositivo.",
+      "wrong_password": "Senha incorreta. Use a senha do seu último login neste dispositivo.",
+      "continue_intro": "Você continua conectado neste dispositivo: suas notas recentes abrem sem senha.",
+      "continue": "Continuar como {{name}}",
+      "retry": "Tentar reconectar"
+    },
+    "empty": {
+      "title": "Nenhuma nota disponível offline",
+      "text": "Nenhuma nota está guardada neste dispositivo ainda. Conecte-se à internet e abra o Poznote uma vez: as notas modificadas nos últimos dias ficarão então disponíveis offline."
+    },
+    "list": {
+      "search": "Pesquisar notas",
+      "all_workspaces": "Todos os espaços de trabalho",
+      "available": "Disponíveis offline",
+      "recent": "Modificadas nos últimos {{days}} dias",
+      "no_results": "Nenhuma nota corresponde à sua pesquisa.",
+      "empty": "Nenhuma nota neste espaço de trabalho.",
+      "none": "Nenhuma nota foi modificada nos últimos {{days}} dias.",
+      "untitled": "Sem título",
+      "not_synced": "Ainda não sincronizada"
+    },
+    "new": {
+      "button": "Nova nota",
+      "note": "Nota",
+      "markdown": "Nota Markdown",
+      "tasklist": "Lista de tarefas"
+    },
+    "note": {
+      "placeholder": "Selecione uma nota para abri-la.",
+      "back": "Voltar à lista",
+      "modified": "Modificada {{date}}",
+      "saved_locally": "Salva neste dispositivo. Ela será enviada ao servidor quando você estiver online de novo.",
+      "push_error": "Ainda não enviada: {{error}}",
+      "too_big": "Não disponível offline, mais de {{limit}} MB: {{files}}",
+      "file_size": "{{name}} ({{size}} MB)"
+    },
+    "unavailable": {
+      "title": "Esta nota não está disponível offline",
+      "text": "Somente as notas modificadas nos últimos {{days}} dias ficam guardadas neste dispositivo. Esta vai abrir assim que você estiver online de novo.",
+      "text_generic": "Esta nota não está guardada neste dispositivo. Ela vai abrir assim que você estiver online de novo."
+    },
+    "online": {
+      "back": "Você está online de novo.",
+      "synced": "Você está online de novo e suas alterações foram sincronizadas.",
+      "return": "Voltar ao Poznote",
+      "open": "Abrir o Poznote",
+      "sign_in_needed": "Você está online de novo. Entre para enviar as alterações feitas offline.",
+      "sign_in": "Entrar",
+      "wrong_account": "Você está online de novo, mas o navegador está conectado a outra conta. Abra o Poznote como {{name}} para enviar as alterações feitas offline.",
+      "push_failed": "Algumas alterações ainda não puderam ser enviadas ({{error}}). Elas continuam guardadas neste dispositivo."
+    },
+    "sync": {
+      "copy_title": "{{title}} (cópia offline)",
+      "conflict_copy": "\"{{title}}\" também foi alterada em outro lugar enquanto você estava offline. Sua versão foi salva como \"{{copy}}\".",
+      "recreated": "\"{{title}}\" tinha sido excluída em outro lugar enquanto você estava offline. Sua versão foi salva como uma nova nota.",
+      "push_failed": "Suas alterações offline em \"{{title}}\" ainda não puderam ser salvas ({{error}}). Elas serão enviadas de novo.",
+      "synced_one": "1 nota alterada offline foi sincronizada.",
+      "synced_other": "{{count}} notas alteradas offline foram sincronizadas."
+    },
+    "banner": {
+      "open": "Abrir as notas offline",
+      "offline": "Você está offline. As notas modificadas recentemente ainda podem ser abertas e editadas no modo offline.",
+      "offline_no_copies": "Você está offline. As alterações serão salvas quando a conexão voltar."
+    },
+    "settings": {
+      "card": "Notas offline",
+      "help": "Guardar no navegador as notas modificadas recentemente, para abri-las e editá-las sem rede.",
+      "badge": "Últimos {{days}} dias",
+      "description": "As notas modificadas nos últimos dias ficam guardadas nos navegadores onde você usa o Poznote, para poder abri-las e editá-las sem rede. As alterações feitas offline são enviadas assim que a conexão volta. 0 não guarda nada offline.",
+      "kept_rules": "Seus favoritos, e as notas e pastas marcadas com \"Manter offline\" no menu delas, são mantidos seja qual for a data, com todos os anexos.",
+      "unit": "dias",
+      "limits_title": "Limites:",
+      "limits_notes": "{{notes}} notas e {{text}} MB de texto no total, primeiro as modificadas mais recentemente",
+      "limits_attachments": "Outros anexos (PDF, áudio, arquivos): só favoritos e notas com “Manter offline”",
+      "limits_file_size": "Arquivos de até {{size}} MB cada: um arquivo maior fica apenas online",
+      "limits_files_total": "{{count}} arquivos e {{total}} MB no total, no máximo metade do espaço livre do navegador",
+      "warning": "Sair da conta remove as notas offline do navegador. Em um computador compartilhado, saia da conta ao ir embora.",
+      "device_status_one": "Neste navegador: 1 nota disponível offline, atualizada em {{date}}.",
+      "device_status": "Neste navegador: {{count}} notas disponíveis offline, atualizadas em {{date}}.",
+      "device_none": "Nada está guardado neste navegador ainda: abra suas notas uma vez e elas serão guardadas.",
+      "device_unsupported": "Este navegador não consegue guardar notas offline (é preciso uma conexão HTTPS segura)."
+    },
+    "keep": {
+      "error": "Não foi possível salvar a configuração offline."
+    }
   }
 }

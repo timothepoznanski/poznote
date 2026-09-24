@@ -401,8 +401,6 @@
       "upload_section_title": "Subir nuevo adjunto",
       "drag_drop_info": "Puedes arrastrar y soltar tu archivo a continuación:",
       "all_types_accepted": "Todos los tipos de archivo aceptados (máx 200MB)",
-      "note_taking_notice": "Poznote es una aplicación de notas: puede guardar medios, pero los archivos grandes llenan rápido su espacio.",
-      "note_taking_notice_link": "Ver mi almacenamiento",
       "upload_button": "Adjuntar",
       "current_attachments": "Adjuntos actuales",
       "loading_attachments": "Cargando adjuntos...",
@@ -518,14 +516,14 @@
       "backlinks_at_bottom": "Muestra la sección de retroenlaces en la parte inferior de las notas en lugar de arriba.",
       "default_image_border": "Muestra por defecto las imágenes de las notas con borde y sin relleno.",
       "spellcheck_html_notes": "Activa el corrector ortográfico del navegador en las notas HTML.",
-      "slash_menu_trigger": "Elige si el menú de comandos se abre escribiendo /, con Alt + / o sin ninguna tecla. Un clic derecho en una nota lo abre sea cual sea este ajuste.",
+      "slash_menu_trigger": "En el ordenador, elige si el menú de comandos se abre escribiendo /, con Alt + / o sin ninguna tecla. Un clic derecho en una nota lo abre sea cual sea este ajuste.",
+      "slash_menu_trigger_mobile": "En el móvil, elige si el menú de comandos se abre escribiendo /, con Alt + / desde un teclado físico o sin ninguna tecla.",
       "icon_sidebar_order": "Cambie el orden y el color de los botones de la barra de iconos y coloque separadores entre ellos.",
       "users_admin": "Crea, edita y gestiona las cuentas de usuario.",
       "oidc_config": "Configura el inicio de sesión único con un proveedor OpenID Connect.",
       "smtp_config": "Configura el servidor SMTP usado para enviar correos como los recordatorios.",
       "webhooks": "Envía los eventos de la instancia a servicios externos mediante webhooks.",
       "ai_assistant": "Configura el asistente de IA usado para conversar con tus notas.",
-      "saas": "Elementos de visualización para instancias ofrecidas como servicio alojado (SaaS). Todos ocultos por defecto.",
       "git_sync_enabled": "Activa o desactiva la sincronización Git en esta instancia.",
       "import_limits": "Define el número máximo de archivos permitidos por importación.",
       "user_quotas": "Limita el número de notas y el almacenamiento disponible por usuario.",
@@ -549,6 +547,9 @@
       "highlight_current_folder_tree": "Atenuar, tanto como quieras, las notas y carpetas que están fuera de la jerarquía de carpetas en la que trabajas.",
       "snapshots": "Elija cuántas instantáneas automáticas diarias y cuántas instantáneas de seguridad (antes de una edición de IA o MCP) se conservan por nota.",
       "stt": "Configura el servidor de reconocimiento de voz que se usa para dictar notas y transcribir adjuntos de audio."
+    },
+    "card_notes": {
+      "slash_menu_trigger_mobile": "En el móvil, la barra de herramientas sobre el teclado tiene un botón + que abre el mismo menú, sea cual sea este ajuste."
     },
     "title": "Configuración",
     "collapse_section": "Contraer la sección",
@@ -577,7 +578,14 @@
       "integrations": "Integraciones",
       "storage_limits": "Almacenamiento y límites",
       "appearance": "Apariencia",
-      "maintenance": "Mantenimiento"
+      "maintenance": "Mantenimiento",
+      "backup_sync": "Copias de seguridad y sincronización",
+      "editing": "Edición",
+      "apps": "Aplicaciones",
+      "profile_sign_in": "Perfil e inicio de sesión",
+      "language_region": "Idioma y región",
+      "storage": "Almacenamiento",
+      "layout": "Diseño"
     },
     "sections": {
       "account_display": "Cuenta y Visualización",
@@ -640,7 +648,6 @@
       "smtp_config": "SMTP / Correo",
       "webhooks": "Webhooks de administrador",
       "ai_assistant": "Asistente IA",
-      "saas": "Modo SaaS",
       "s3_storage": "Adjuntos S3",
       "s3_backup": "Copias de seguridad S3",
       "stt": "Transcripción",
@@ -663,6 +670,22 @@
         "unavailable": "No disponible",
         "installed": "Ya instalada"
       }
+    },
+    "value_help": {
+      "font_size_notes": "Contenido de la nota",
+      "font_size_sidebar": "Barra lateral",
+      "font_size_code_blocks": "Bloques de código",
+      "font_size_settings": "Página de ajustes"
+    },
+    "storage_summary": {
+      "error": "No se pudo cargar el uso del almacenamiento.",
+      "notes_detail": "{{active}} en tus notas, {{trash}} en la papelera",
+      "local": "Espacio usado en el servidor",
+      "database": "Base de datos",
+      "note_files": "Archivos de notas",
+      "attachments": "Archivos adjuntos",
+      "s3_attachments": "Archivos adjuntos en el almacenamiento S3",
+      "s3_backups": "Copias de seguridad en el almacenamiento S3"
     }
   },
   "workspaces": {
@@ -726,7 +749,8 @@
       "edit_workspaces": "Editar espacios de trabajo",
       "new_workspace": "Nuevo espacio de trabajo",
       "accounts": "Cuentas",
-      "title": "Espacios de trabajo"
+      "title": "Espacios de trabajo",
+      "shared_with_me": "Compartidos conmigo"
     },
     "errors": {
       "already_exists": "Ya existe un espacio de trabajo con este nombre",
@@ -846,7 +870,8 @@
       "notes_dashboard": "Tablero de notas",
       "spellcheck_html_notes": "Corrector ortográfico",
       "note_color_palette": "Colores de notas",
-      "slash_menu_trigger": "Atajo del menú de comandos",
+      "slash_menu_trigger": "Atajo del menú de comandos (ordenador)",
+      "slash_menu_trigger_mobile": "Atajo del menú de comandos (móvil)",
       "snapshots": "Instantáneas",
       "show_note_icons": "Mostrar iconos de las notas"
     },
@@ -1624,6 +1649,8 @@
         "off": "Desactivado",
         "custom": "Personalizado"
       },
+      "theme_hint": "Cada color sigue el tema hasta que lo cambias. La flecha junto a un color cambiado lo devuelve al del tema.",
+      "reset_element": "Usar el color del tema",
       "elements": {
         "h1": "Título 1",
         "h2": "Título 2",
@@ -1873,7 +1900,9 @@
       "copy_folder": "Copiar",
       "cut_folder": "Cortar",
       "paste_into_folder": "Pegar en la carpeta",
-      "change_note_icon": "Cambiar el icono de la nota"
+      "change_note_icon": "Cambiar el icono de la nota",
+      "keep_offline": "Guardar sin conexión",
+      "stop_offline": "Dejar de guardar sin conexión"
     },
     "folder_filter": {
       "exit": "Salir de la vista de la carpeta"
@@ -1891,7 +1920,11 @@
       "convert_note": "Convertir nota",
       "copy_note": "Copiar",
       "cut_note": "Cortar",
-      "paste_note": "Pegar aquí"
+      "paste_note": "Pegar aquí",
+      "keep_offline": "Guardar sin conexión",
+      "stop_offline": "Dejar de guardar sin conexión",
+      "available_offline": "Disponible sin conexión en este navegador",
+      "not_available_offline": "No disponible sin conexión en este navegador"
     }
   },
   "tree_history": {
@@ -4815,16 +4848,6 @@
     "add_placeholder": "Añadir una tarea...",
     "save_error": "No se pudo guardar la lista de tareas."
   },
-  "saas": {
-    "description": "Elementos de visualización útiles cuando esta instancia se ofrece como servicio alojado (SaaS). Todo está oculto por defecto.",
-    "section_storage_notices": "Avisos de almacenamiento",
-    "storage_notices_label": "Mostrar los avisos de almacenamiento",
-    "storage_notices_description": "Recuerda a los usuarios que Poznote es una aplicación de toma de notas, no un servicio de almacenamiento de fotos o vídeos, en las páginas de adjuntos, la página de estadísticas de almacenamiento del usuario y los ajustes de adjuntos S3.",
-    "messages": {
-      "saved": "Configuración guardada correctamente.",
-      "save_error": "Error al guardar la configuración."
-    }
-  },
   "archive": {
     "menu_item": "Archivar la nota",
     "confirm_title": "Archivar la nota",
@@ -4981,5 +5004,118 @@
   },
   "focus_mode": {
     "button": "Modo enfoque"
+  },
+  "offline": {
+    "page_title": "Poznote (sin conexión)",
+    "signout": {
+      "removes": "Las notas guardadas sin conexión se eliminarán de este dispositivo.",
+      "done_title": "Has cerrado sesión",
+      "done_text": "Las notas guardadas sin conexión se han eliminado de este dispositivo.",
+      "loss_title": "Tus cambios se perderán",
+      "loss_text_one": "1 cambio hecho sin conexión no se ha sincronizado con el servidor. Si cierras sesión ahora, se borrará de este dispositivo y se perderá para siempre.",
+      "loss_text_other": "{{count}} cambios hechos sin conexión no se han sincronizado con el servidor. Si cierras sesión ahora, se borrarán de este dispositivo y se perderán para siempre.",
+      "loss_more": "y {{count}} más",
+      "loss_keep": "Para conservarlos, cancela y mantén la sesión iniciada: se envían solos en cuanto la conexión funcione.",
+      "loss_confirm": "Cerrar sesión y perder los cambios"
+    },
+    "unsupported": "Este navegador no puede guardar notas sin conexión.",
+    "status": {
+      "offline": "Sin conexión",
+      "online": "En línea",
+      "syncing": "Sincronizando…",
+      "pending_one": "1 cambio pendiente",
+      "pending_other": "{{count}} cambios pendientes"
+    },
+    "signin": {
+      "intro": "No tiene conexión. Inicie sesión para abrir las notas guardadas en este dispositivo.",
+      "username": "Usuario o correo",
+      "password": "Contraseña",
+      "submit": "Iniciar sesión sin conexión",
+      "checking": "Comprobando…",
+      "unknown_account": "Las notas de esta cuenta no están guardadas en este dispositivo.",
+      "wrong_password": "Contraseña incorrecta. Use la contraseña de su último inicio de sesión en este dispositivo.",
+      "continue_intro": "Sigue con la sesión iniciada en este dispositivo: sus notas recientes se abren sin contraseña.",
+      "continue": "Continuar como {{name}}",
+      "retry": "Volver a conectar"
+    },
+    "empty": {
+      "title": "No hay notas disponibles sin conexión",
+      "text": "Todavía no hay notas guardadas en este dispositivo. Conéctese a internet y abra Poznote una vez: las notas modificadas en los últimos días estarán entonces disponibles sin conexión."
+    },
+    "list": {
+      "search": "Buscar notas",
+      "all_workspaces": "Todos los espacios de trabajo",
+      "available": "Disponibles sin conexión",
+      "recent": "Modificadas en los últimos {{days}} días",
+      "no_results": "Ninguna nota coincide con su búsqueda.",
+      "empty": "No hay notas en este espacio de trabajo.",
+      "none": "No se ha modificado ninguna nota en los últimos {{days}} días.",
+      "untitled": "Sin título",
+      "not_synced": "Aún no sincronizada"
+    },
+    "new": {
+      "button": "Nueva nota",
+      "note": "Nota",
+      "markdown": "Nota Markdown",
+      "tasklist": "Lista de tareas"
+    },
+    "note": {
+      "placeholder": "Seleccione una nota para abrirla.",
+      "back": "Volver a la lista",
+      "modified": "Modificada {{date}}",
+      "saved_locally": "Guardada en este dispositivo. Se enviará al servidor cuando vuelva a tener conexión.",
+      "push_error": "Aún no enviada: {{error}}",
+      "too_big": "No disponible sin conexión, más de {{limit}} MB: {{files}}",
+      "file_size": "{{name}} ({{size}} MB)"
+    },
+    "unavailable": {
+      "title": "Esta nota no está disponible sin conexión",
+      "text": "Solo se guardan en este dispositivo las notas modificadas en los últimos {{days}} días. Esta se abrirá en cuanto vuelva a tener conexión.",
+      "text_generic": "Esta nota no está guardada en este dispositivo. Se abrirá en cuanto vuelva a tener conexión."
+    },
+    "online": {
+      "back": "Vuelve a tener conexión.",
+      "synced": "Vuelve a tener conexión y sus cambios se han sincronizado.",
+      "return": "Volver a Poznote",
+      "open": "Abrir Poznote",
+      "sign_in_needed": "Vuelve a tener conexión. Inicie sesión para enviar los cambios hechos sin conexión.",
+      "sign_in": "Iniciar sesión",
+      "wrong_account": "Vuelve a tener conexión, pero el navegador tiene abierta otra cuenta. Abra Poznote como {{name}} para enviar los cambios hechos sin conexión.",
+      "push_failed": "Algunos cambios aún no se han podido enviar ({{error}}). Se conservan en este dispositivo."
+    },
+    "sync": {
+      "copy_title": "{{title}} (copia sin conexión)",
+      "conflict_copy": "«{{title}}» también se modificó en otro lugar mientras estaba sin conexión. Su versión se guardó como «{{copy}}».",
+      "recreated": "«{{title}}» se había eliminado en otro lugar mientras estaba sin conexión. Su versión se guardó como una nota nueva.",
+      "push_failed": "Sus cambios sin conexión en «{{title}}» aún no se han podido guardar ({{error}}). Se volverán a enviar.",
+      "synced_one": "Se ha sincronizado 1 nota modificada sin conexión.",
+      "synced_other": "Se han sincronizado {{count}} notas modificadas sin conexión."
+    },
+    "banner": {
+      "open": "Abrir las notas sin conexión",
+      "offline": "No tiene conexión. Las notas modificadas recientemente se pueden seguir abriendo y editando en el modo sin conexión.",
+      "offline_no_copies": "No tiene conexión. Los cambios se guardarán cuando vuelva la conexión."
+    },
+    "settings": {
+      "card": "Notas sin conexión",
+      "help": "Guardar en el navegador las notas modificadas recientemente, para abrirlas y editarlas sin red.",
+      "badge": "Últimos {{days}} días",
+      "description": "Las notas modificadas en los últimos días se guardan en los navegadores donde usa Poznote, para poder abrirlas y editarlas sin red. Los cambios hechos sin conexión se envían en cuanto vuelve la conexión. 0 no guarda nada sin conexión.",
+      "kept_rules": "Tus favoritos, y las notas y carpetas marcadas con \"Guardar sin conexión\" en su menú, se guardan sea cual sea su fecha, con todos sus adjuntos.",
+      "unit": "días",
+      "limits_title": "Límites:",
+      "limits_notes": "{{notes}} notas y {{text}} MB de texto en total, primero las modificadas más recientemente",
+      "limits_attachments": "Otros adjuntos (PDF, audio, archivos): solo favoritos y notas con “Guardar sin conexión”",
+      "limits_file_size": "Archivos de hasta {{size}} MB cada uno: uno más grande solo está en línea",
+      "limits_files_total": "{{count}} archivos y {{total}} MB en total, como mucho la mitad del espacio libre del navegador",
+      "warning": "Al cerrar sesión se eliminan las notas sin conexión del navegador. En un ordenador compartido, cierre sesión al irse.",
+      "device_status_one": "En este navegador: 1 nota disponible sin conexión, actualizada el {{date}}.",
+      "device_status": "En este navegador: {{count}} notas disponibles sin conexión, actualizadas el {{date}}.",
+      "device_none": "Aún no hay nada guardado en este navegador: abra sus notas una vez y se guardarán.",
+      "device_unsupported": "Este navegador no puede guardar notas sin conexión (necesita una conexión HTTPS segura)."
+    },
+    "keep": {
+      "error": "No se pudo guardar el ajuste sin conexión."
+    }
   }
 }

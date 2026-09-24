@@ -313,13 +313,25 @@
 
     // Sub-headings inside a settings section (.settings-group-title, e.g.
     // "Attachments" in Note content): a heading whose cards are all hidden
-    // goes with them.
+    // goes with them. In a section split into panels (.settings-group, Admin
+    // Tools) the cards sit in the panel after the heading, and an empty panel
+    // goes too (a class, not an inline style: the filter hides panels through
+    // css/settings.css).
     function syncSettingsGroupTitles() {
+        document.querySelectorAll('.settings-group').forEach(function (group) {
+            // The storage figures of My Account are a block, not cards
+            var hasVisibleCard = Array.prototype.some.call(group.querySelectorAll('.home-card, .settings-storage-summary'), isVisibleElement);
+            group.classList.toggle('settings-group-empty', !hasVisibleCard);
+        });
         document.querySelectorAll('.settings-group-title').forEach(function (title) {
             var hasVisibleCard = false;
             var node = title.nextElementSibling;
             while (node && !node.classList.contains('settings-group-title')) {
                 if (node.classList.contains('home-card') && isVisibleElement(node)) {
+                    hasVisibleCard = true;
+                    break;
+                }
+                if (node.classList.contains('settings-group') && !node.classList.contains('settings-group-empty')) {
                     hasVisibleCard = true;
                     break;
                 }
@@ -343,10 +355,6 @@
 
     function syncSettingsDiarySection() {
         syncSectionVisibility('diary', 'settings-diary-section-grid');
-    }
-
-    function syncSettingsOtherSection() {
-        syncSectionVisibility('other', 'settings-other-section-grid');
     }
 
     function syncSettingsAdminToolsSection() {
@@ -377,7 +385,6 @@
             syncSettingsNoteContentSection();
             syncSettingsMarkdownSection();
             syncSettingsDiarySection();
-            syncSettingsOtherSection();
             syncSettingsAdminToolsSection();
             syncSettingsDocumentationSection();
         });

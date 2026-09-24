@@ -551,47 +551,22 @@ html[data-theme='dark'] #fontSizeModal .modal-header h2 {
     color: var(--pz-text);
 }
 
-html[data-theme='dark'] #fontSizeModal .modal-body p,
-html[data-theme='dark'] #noteWidthModal .modal-body p {
+html[data-theme='dark'] #fontSizeModal .modal-body p {
     color: var(--pz-text);
 }
 
-html[data-theme='dark'] #fontSizeModal .font-size-controls label,
-html[data-theme='dark'] #noteWidthModal .font-size-controls label {
+html[data-theme='dark'] #fontSizeModal .font-size-controls label {
     color: var(--pz-text-strong);
 }
 
-html[data-theme='dark'] #fontSizeModal .font-size-controls input,
-html[data-theme='dark'] #noteWidthModal .font-size-controls input {
+html[data-theme='dark'] #fontSizeModal .font-size-controls input {
     background-color: var(--pz-surface);
     color: var(--pz-text);
     border-color: var(--pz-border);
 }
 
-html[data-theme='dark'] #noteWidthModal .btn-full-width-footer {
-    background-color: var(--pz-surface) !important;
-    color: var(--pz-text) !important;
-    border-color: var(--pz-border) !important;
-}
-
-html[data-theme='dark'] #noteWidthModal .btn-full-width-footer:hover {
-    background-color: var(--pz-surface) !important;
-    border-color: var(--pz-border-strong) !important;
-}
-
-html[data-theme='dark'] #noteWidthModal .btn-full-width-footer.active {
-    background-color: var(--pz-accent) !important;
-    color: var(--pz-text-inverse) !important;
-    border-color: var(--pz-accent) !important;
-}
-
-html[data-theme='dark'] #fontSizeModal .font-size-controls input::placeholder,
-html[data-theme='dark'] #noteWidthModal .font-size-controls input::placeholder {
+html[data-theme='dark'] #fontSizeModal .font-size-controls input::placeholder {
     color: var(--pz-text-subtle);
-}
-
-html[data-theme='dark'] #noteWidthModal .note-width-unit {
-    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] #fontSizeModal .modal-footer .btn-primary {

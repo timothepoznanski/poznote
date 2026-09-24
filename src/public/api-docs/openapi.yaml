@@ -77,6 +77,34 @@ components:
       description: User profile ID to access. Required for account-password Basic Auth and internal service-token data requests. OIDC Bearer JWT and app-password requests default to their own profile when omitted. Account-access grants from the web UI do not allow non-admin API credentials to target another profile; use admin credentials or the internal service token for cross-profile API access. Use GET /users/profiles to list available profiles.
 
   schemas:
+    OrphanAttachmentsResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        users:
+          type: array
+          items:
+            type: object
+            properties:
+              user_id:
+                type: integer
+              total_files:
+                type: integer
+                description: Files in the account's local attachment folder
+              orphans_found:
+                type: integer
+              orphans_deleted:
+                type: integer
+                description: Always 0 for GET
+              files:
+                type: array
+                description: Names of the orphan files
+                items:
+                  type: string
+              error:
+                type: string
+                nullable: true
     AppPassword:
       type: object
       properties:
@@ -1127,6 +1155,47 @@ paths:
         '200':
           description: Icon updated
 
+  /notes/{id}/offline:
+    put:
+      tags: [Notes]
+      summary: Keep a note offline whatever its date, or stop
+      description: >
+        Keeps the note in the browsers where the account is used, with all
+        its attachments (see /offline/manifest), or stops doing so.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [offline]
+              properties:
+                offline:
+                  type: boolean
+                  example: true
+      responses:
+        '200':
+          description: Offline state updated
+        '400':
+          description: Invalid note ID, or missing/invalid "offline" boolean
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Note not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /notes/{id}/pinned:
     put:
       tags: [Notes]
@@ -1378,6 +1447,95 @@ paths:
           description: Lock released (or was not held)
         '404':
           description: Note not found
+
+  # ==================
+  # Offline Copies Endpoints
+  # ==================
+  /offline/manifest:
+    get:
+      tags: [Notes]
+      summary: Notes kept offline, with their versions
+      description: |
+        Feeds the browser's offline copies (js/offline-sync.js). Returns the
+        notes modified in the last `days` days (user setting
+        `offline_notes_days`, default 5, 0 = off), the favorites and the
+        notes and folders marked "Keep offline", within `limits` (the
+        recent ones dropped first), without content, with their version
+        token, why each is kept (`kept`: note, folder, favorite or
+        recent), and the folders of those notes.
+        `limits` gives the limits in force. Answers 304 to
+        a matching If-None-Match. Refused (403, `offline_unavailable`) on an
+        account the session does not own.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: If-None-Match
+          in: header
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Manifest
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  user:
+                    type: object
+                  days:
+                    type: integer
+                  limits:
+                    type: object
+                    properties:
+                      notes:
+                        type: integer
+                      text_mb:
+                        type: integer
+                      picture_mb:
+                        type: integer
+                      pictures:
+                        type: integer
+                      pictures_mb:
+                        type: integer
+                  workspaces:
+                    type: array
+                    items:
+                      type: string
+                  folders:
+                    type: array
+                    items:
+                      type: object
+                  notes:
+                    type: array
+                    items:
+                      type: object
+        '304':
+          description: Unchanged since the ETag sent
+        '403':
+          description: Offline copies are only kept for the account's owner
+
+  /offline/notes:
+    get:
+      tags: [Notes]
+      summary: Full content of up to 50 notes, for the offline copies
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: ids
+          in: query
+          required: true
+          description: Comma-separated note IDs (max 50)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notes with content, version and attachment list
+        '400':
+          description: Missing or too many ids
+        '403':
+          description: Offline copies are only kept for the account's owner
 
   # ==================
   # Snapshots Endpoints
@@ -3106,6 +3264,48 @@ paths:
           description: Pinned state updated
         '400':
           description: Invalid folder ID, or missing/invalid "pinned" boolean
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Folder not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /folders/{id}/offline:
+    put:
+      tags: [Folders]
+      summary: Keep a folder's notes offline whatever their date, or stop
+      description: >
+        Keeps the folder's notes, subfolders included, in the browsers where
+        the account is used, with all their attachments (see
+        /offline/manifest), or stops doing so.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [offline]
+              properties:
+                offline:
+                  type: boolean
+                  example: true
+      responses:
+        '200':
+          description: Offline state updated
+        '400':
+          description: Invalid folder ID, or missing/invalid "offline" boolean
           content:
             application/json:
               schema:
@@ -4899,6 +5099,39 @@ paths:
                           type: string
         '403':
           description: Admin access required
+
+  /admin/orphan-attachments:
+    get:
+      tags: [Users]
+      summary: List orphan attachment files (admin only)
+      description: |
+        Scan the local attachment folder of every account and list the files
+        no note of that account references any more. Files kept in S3 storage
+        are not listed. Requires admin privileges. Does NOT require X-User-ID header.
+      responses:
+        '200':
+          description: One row per account folder
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrphanAttachmentsResult'
+        '403':
+          description: Admin access required
+    delete:
+      tags: [Users]
+      summary: Delete orphan attachment files (admin only)
+      description: |
+        Same scan as GET, then delete every file it lists. Not available with
+        an app password. Requires admin privileges. Does NOT require X-User-ID header.
+      responses:
+        '200':
+          description: One row per account folder, with the number of files deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrphanAttachmentsResult'
+        '403':
+          description: Admin access required, or app password used
 
   # ==================
   # Public Tasks Endpoints (token-based, no Basic Auth)

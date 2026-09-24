@@ -48,13 +48,6 @@
                 }
                 break;
 
-            // Login display modal
-            case 'close-login-display-modal':
-                if (typeof closeLoginDisplayModal === 'function') {
-                    closeLoginDisplayModal();
-                }
-                break;
-
             // Confirm modal actions
             case 'close-confirm-modal':
                 if (typeof closeConfirmModal === 'function') {

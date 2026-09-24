@@ -642,9 +642,10 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
 }
 
 /* Colored markdown (the "Colored markdown" display setting).
-   One --mdc-* variable per element; the user's colors are inlined on <body>
-   by index.php, so they apply identically in light and dark mode (the values
-   below are only fallbacks, dark fallbacks in css/dark-mode/markdown.css).
+   One --mdc-* variable per element. The defaults come from the theme palette
+   (css/tokens.css, .markdown-colored), so they follow every theme; a colour
+   the user picked is inlined on <body> by index.php and applies identically
+   in light and dark mode.
    The colour declarations need BOTH the !important and the unmatched #id
    inside :is(): they fight the blanket
    `.noteentry * { color: var(--pz-text) !important }` rule in
@@ -653,19 +654,6 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
    dark and black themes only (issue #1347); with both, one set of rules serves
    every theme. Declarations the blanket does not touch (border and background
    colours) stay at ordinary weight. */
-body.markdown-colored {
-    --mdc-h1: var(--pz-accent);
-    --mdc-h2: #1a7f37;
-    --mdc-h3: #8250df;
-    --mdc-h4: #bf3989;
-    --mdc-h5: #1b7c83;
-    --mdc-h6: #656d76;
-    --mdc-code: #b34e00;
-    --mdc-codeblock: #b34e00;
-    --mdc-quote: var(--pz-accent);
-    --mdc-table: var(--pz-accent);
-    --mdc-hr: var(--pz-accent);
-}
 
 /* Editor: retint the CodeMirror heading and inline-code tokens with the
    chosen colors; links, markdown markers (quote/list/fence, the meta token)

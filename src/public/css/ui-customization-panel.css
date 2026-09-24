@@ -83,13 +83,12 @@ body.ui-custom-panel-open #edgeCustomizeBtn {
     color: var(--pz-accent-text);
 }
 
-/* Focus mode toggle (discussion 1482): two steps, then out
-   (js/icon-sidebar-toggle.js). The icon says what the next click does, so it
-   stays the "go in" arrows until everything is hidden and becomes the "come
-   out" ones on the last step. Lit as soon as either step is on. Desktop only,
-   like the chrome it hides. */
-html.focus-mode-full .pz-edge-focus-icon-on,
-html:not(.focus-mode-full) .pz-edge-focus-icon-off {
+/* Focus mode toggle (discussion 1482, js/icon-sidebar-toggle.js). The icon
+   says what the click does: the "go in" arrows while it is off, the "come out"
+   ones while it is on, and lit while it is on. Desktop only, like the chrome
+   it hides. */
+html.focus-mode .pz-edge-focus-icon-on,
+html:not(.focus-mode) .pz-edge-focus-icon-off {
     display: none;
 }
 

@@ -14,6 +14,9 @@
  * kept honest here: once UI Customization (or the git scope) has hidden every
  * entry on one side of a line, that line is hidden too.
  *
+ * So is the Home link, outside index.php: it names what the stored note tabs
+ * hold, so index.php does not render another note before switching to it.
+ *
  * Focus mode (discussion #1482) lives here too, because the rail is the one
  * piece of chrome every page shares: html.focus-mode hides the rail (and, on
  * the notes page, the notes column and the rows around the note's title, see
@@ -194,6 +197,92 @@
     // The overflow menu reads each entry's href when the copy is clicked, so
     // it picks the refreshed links up on its own.
     window.updateIconSidebarWorkspace = updateWorkspaceLinks;
+
+    // --- Home link ---------------------------------------------------------
+
+    // At this width and below index.php has no tabs and opens on the notes
+    // list, where a note named in the URL would slide the note pane in
+    // instead (js/tabs.js, js/index-events.js).
+    var TABS_MAX_MOBILE_WIDTH = 800;
+
+    /**
+     * The tab state js/tabs.js stored for a workspace, or null when there is
+     * none (a first visit) or it cannot be read.
+     *
+     * @param {string} workspace
+     * @returns {?{tabs: Array, activeTabId: ?string}}
+     */
+    function readStoredTabs(workspace) {
+        if (typeof window.__poznoteTabsStorageKey !== 'function') return null;
+
+        try {
+            var data = JSON.parse(localStorage.getItem(window.__poznoteTabsStorageKey(workspace)) || 'null');
+            return data && Array.isArray(data.tabs) ? data : null;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    /**
+     * Make the Home link ask index.php for what its tabs are about to show.
+     *
+     * Asked for nothing, index.php renders the last edited note and js/tabs.js
+     * then replaces it with what the stored tabs hold, so coming back from
+     * Settings flashed a note (issue #1488): one that vanished at once when
+     * every tab was closed (see #1462), or that gave way to the active tab's
+     * note. The link carries blank=1 while every tab is closed and, on
+     * desktop, the active tab's note or board otherwise. A workspace that
+     * never stored a tab state keeps the fallback, like any first visit.
+     *
+     * Not on index.php itself: js/tabs.js keeps the link in step there as
+     * tabs open and close.
+     */
+    function syncHomeLink() {
+        var link = document.getElementById('iconSidebarHomeBtn');
+        if (!link || link.tagName !== 'A' || link.getAttribute('aria-current') === 'page') return;
+
+        var url;
+        try {
+            url = new URL(link.getAttribute('href') || 'index.php', window.location.href);
+        } catch (error) {
+            return;
+        }
+        ['blank', 'note', 'kanban'].forEach(function (key) { url.searchParams.delete(key); });
+
+        var stored = readStoredTabs(url.searchParams.get('workspace') || 'default');
+        if (stored && stored.tabs.length === 0) {
+            url.searchParams.set('blank', '1');
+        } else if (stored && window.innerWidth > TABS_MAX_MOBILE_WIDTH) {
+            var active = null;
+            stored.tabs.forEach(function (tab) {
+                if (!active && tab && tab.id === stored.activeTabId) active = tab;
+            });
+            active = active || stored.tabs[0];
+
+            if (active && active.type === 'kanban' && active.folderId) {
+                url.searchParams.set('kanban', String(active.folderId));
+            } else if (active && active.noteId) {
+                url.searchParams.set('note', String(active.noteId));
+            }
+        }
+
+        link.setAttribute('href', url.pathname + url.search + url.hash);
+    }
+
+    function initHomeLink() {
+        syncHomeLink();
+
+        // A stale link would do worse than flash: naming a note whose tab was
+        // closed meanwhile reopens it. Tabs change in another browser tab...
+        window.addEventListener('storage', function (event) {
+            if (event.key === null || event.key.indexOf('poznote_tabs_') === 0) syncHomeLink();
+        });
+        // ...or while this page sat in the back/forward cache, which gets no
+        // storage events.
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) syncHomeLink();
+        });
+    }
 
     // --- Overflow menu -----------------------------------------------------
 
@@ -430,16 +519,10 @@
 
     // --- Focus mode ---------------------------------------------------------
 
-    // Two steps, then out. The first click clears what sits above the note
-    // (its folder and tags, its title, its date), which is all a wide screen
-    // needs; the second one also sends the rail and the notes column into the
-    // flyout. A third click brings everything back.
+    // On or off. On clears the rows around the note's title and sends the
+    // rail and the notes column into the flyout; off brings everything back.
     var FOCUS_STORAGE_KEY = 'focusMode';
-    var FOCUS_OFF = 0;
-    var FOCUS_TOP = 1;
-    var FOCUS_FULL = 2;
     var FOCUS_CLASS = 'focus-mode';
-    var FOCUS_FULL_CLASS = 'focus-mode-full';
     var FOCUS_PEEK_CLASS = 'focus-mode-peek';
     var FOCUS_EDGE_ZONE_ID = 'focusModeEdgeZone';
     // A pause before the flyout opens, so brushing the edge on the way to the
@@ -450,39 +533,31 @@
 
     var focusPeekTimer = null;
 
-    // 'true' is what the one-step version of focus mode stored: it hid
-    // everything, so it comes back as the second step.
-    function normalizeFocusLevel(stored) {
-        if (stored === 'true' || stored === '2') return FOCUS_FULL;
-        if (stored === '1') return FOCUS_TOP;
-        return FOCUS_OFF;
+    // '1' is on. 'true' (the first version) and '2' (the second step of the
+    // two-step cycle that followed) both meant focus mode was on, so they
+    // still read as on.
+    function isStoredOn(stored) {
+        return stored === '1' || stored === '2' || stored === 'true';
     }
 
     function readFocusMode() {
         try {
-            return normalizeFocusLevel(localStorage.getItem(FOCUS_STORAGE_KEY));
+            return isStoredOn(localStorage.getItem(FOCUS_STORAGE_KEY));
         } catch (error) {
-            return FOCUS_OFF;
+            return false;
         }
     }
 
-    function persistFocusMode(level) {
+    function persistFocusMode(on) {
         try {
-            localStorage.setItem(FOCUS_STORAGE_KEY, String(level));
+            localStorage.setItem(FOCUS_STORAGE_KEY, on ? '1' : '0');
         } catch (error) {
             console.debug('icon-sidebar-toggle: persistFocusMode() failed:', error);
         }
     }
 
-    function focusLevel() {
-        var classes = document.documentElement.classList;
-        if (classes.contains(FOCUS_FULL_CLASS)) return FOCUS_FULL;
-
-        return classes.contains(FOCUS_CLASS) ? FOCUS_TOP : FOCUS_OFF;
-    }
-
     function isFocusMode() {
-        return focusLevel() === FOCUS_FULL;
+        return document.documentElement.classList.contains(FOCUS_CLASS);
     }
 
     function isFocusPeek() {
@@ -511,8 +586,7 @@
 
     function setFocusPeek(open) {
         cancelFocusPeekTimer();
-        // Nothing is out of reach at the first step, so nothing to fly out
-        if (open && focusLevel() !== FOCUS_FULL) return;
+        if (open && !isFocusMode()) return;
         document.documentElement.classList.toggle(FOCUS_PEEK_CLASS, open);
     }
 
@@ -532,42 +606,38 @@
         }, open ? FOCUS_PEEK_OPEN_DELAY : FOCUS_PEEK_CLOSE_DELAY);
     }
 
-    // "mixed" is the ARIA value for a toggle that is on without being all the
-    // way on, which is exactly the first step.
-    function syncFocusButtons(level) {
-        var pressed = level === FOCUS_FULL ? 'true' : (level === FOCUS_TOP ? 'mixed' : 'false');
+    function syncFocusButtons(on) {
         Array.prototype.forEach.call(document.querySelectorAll('[data-action="toggle-focus-mode"]'), function (button) {
-            button.setAttribute('aria-pressed', pressed);
+            button.setAttribute('aria-pressed', on ? 'true' : 'false');
         });
     }
 
-    function applyFocusMode(level) {
-        document.documentElement.classList.toggle(FOCUS_CLASS, level >= FOCUS_TOP);
-        document.documentElement.classList.toggle(FOCUS_FULL_CLASS, level === FOCUS_FULL);
-        if (level !== FOCUS_FULL) {
+    function applyFocusMode(on) {
+        document.documentElement.classList.toggle(FOCUS_CLASS, on);
+        if (!on) {
             setFocusPeek(false);
         }
-        syncFocusButtons(level);
+        syncFocusButtons(on);
         // The split view sizes its panes from what is left under the title
         // rows (js/markdown-editor.js), so it has to measure again.
-        document.dispatchEvent(new CustomEvent('poznote:focus-mode', { detail: { level: level } }));
+        document.dispatchEvent(new CustomEvent('poznote:focus-mode', { detail: { enabled: on } }));
     }
 
-    function setFocusMode(level) {
-        level = normalizeFocusLevel(String(level === true ? FOCUS_FULL : (level === false ? FOCUS_OFF : level)));
-        if (level === focusLevel()) return;
-        applyFocusMode(level);
-        persistFocusMode(level);
+    function setFocusMode(on) {
+        on = !!on;
+        if (on === isFocusMode()) return;
+        applyFocusMode(on);
+        persistFocusMode(on);
     }
 
     function toggleFocusMode() {
-        setFocusMode((focusLevel() + 1) % 3);
+        setFocusMode(!isFocusMode());
     }
 
     // Strip along the left edge of the viewport that opens the flyout, with a
     // small handle in the middle of it so the flyout is something you see
     // rather than something you find by accident. Both are only shown by the
-    // CSS at the second step of focus mode (css/icon-sidebar.css).
+    // CSS while focus mode is on (css/icon-sidebar.css).
     function ensureFocusEdgeZone() {
         var zone = document.getElementById(FOCUS_EDGE_ZONE_ID);
         if (zone || !document.body) return;
@@ -632,18 +702,14 @@
             toggleFocusMode();
         });
 
-        // Another tab of the same account moving it a step
+        // Another tab of the same account turning it on or off
         window.addEventListener('storage', function (event) {
             if (event.key !== FOCUS_STORAGE_KEY) return;
-            applyFocusMode(normalizeFocusLevel(event.newValue));
+            applyFocusMode(isStoredOn(event.newValue));
         });
     }
 
     window.PoznoteFocusMode = {
-        OFF: FOCUS_OFF,
-        TOP: FOCUS_TOP,
-        FULL: FOCUS_FULL,
-        level: focusLevel,
         isEnabled: isFocusMode,
         set: setFocusMode,
         toggle: toggleFocusMode
@@ -652,6 +718,7 @@
     function init() {
         initOverflow();
         initFocusMode();
+        initHomeLink();
 
         var button = document.getElementById('iconSidebarToggle');
         if (!button) return;

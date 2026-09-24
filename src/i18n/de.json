@@ -401,8 +401,6 @@
       "upload_section_title": "Neuen Anhang hochladen",
       "drag_drop_info": "Sie können Ihre Datei unten ablegen:",
       "all_types_accepted": "Alle Dateitypen akzeptiert (max 200MB)",
-      "note_taking_notice": "Poznote ist eine Notiz-App: Sie können Medien speichern, aber große Dateien füllen Ihren Speicher schnell.",
-      "note_taking_notice_link": "Meinen Speicher ansehen",
       "upload_button": "Anhängen",
       "current_attachments": "Aktuelle Anhänge",
       "loading_attachments": "Anhänge werden geladen...",
@@ -518,14 +516,14 @@
       "backlinks_at_bottom": "Zeigen Sie den Backlink-Bereich unten statt oben in Notizen an.",
       "default_image_border": "Zeigen Sie Bilder in Notizen standardmäßig mit Rahmen und ohne Innenabstand an.",
       "spellcheck_html_notes": "Aktivieren Sie die Rechtschreibprüfung des Browsers in HTML-Notizen.",
-      "slash_menu_trigger": "Wählen Sie, ob sich das Befehlsmenü mit /, mit Alt + / oder gar nicht über die Tastatur öffnet. Ein Rechtsklick in einer Notiz öffnet es unabhängig von dieser Einstellung.",
+      "slash_menu_trigger": "Wählen Sie für den Computer, ob sich das Befehlsmenü mit /, mit Alt + / oder gar nicht über die Tastatur öffnet. Ein Rechtsklick in einer Notiz öffnet es unabhängig von dieser Einstellung.",
+      "slash_menu_trigger_mobile": "Wählen Sie für Mobilgeräte, ob sich das Befehlsmenü mit /, mit Alt + / auf einer Hardwaretastatur oder gar nicht über die Tastatur öffnet.",
       "icon_sidebar_order": "Ändern Sie die Reihenfolge und die Farbe der Schaltflächen in der Icon-Seitenleiste und setzen Sie Trennlinien dazwischen.",
       "users_admin": "Benutzerkonten erstellen, bearbeiten und verwalten.",
       "oidc_config": "Konfigurieren Sie Single Sign-On mit einem OpenID-Connect-Anbieter.",
       "smtp_config": "Konfigurieren Sie den SMTP-Server für den E-Mail-Versand, z. B. für Erinnerungen.",
       "webhooks": "Senden Sie Instanzereignisse per Webhooks an externe Dienste.",
       "ai_assistant": "Konfigurieren Sie den KI-Assistenten für den Chat mit Ihren Notizen.",
-      "saas": "Anzeigeelemente für Instanzen, die als gehosteter Dienst (SaaS) angeboten werden. Standardmäßig alle ausgeblendet.",
       "git_sync_enabled": "Aktivieren oder deaktivieren Sie die Git-Synchronisation auf dieser Instanz.",
       "import_limits": "Legen Sie die maximale Anzahl von Dateien pro Import fest.",
       "user_quotas": "Begrenzen Sie die Anzahl der Notizen und den Speicherplatz pro Benutzer.",
@@ -549,6 +547,9 @@
       "highlight_current_folder_tree": "Notizen und Ordner außerhalb der Ordnerhierarchie, in der Sie arbeiten, so stark abschwächen, wie Sie möchten.",
       "snapshots": "Wählen Sie, wie viele automatische tägliche Schnappschüsse und wie viele Sicherheits-Schnappschüsse (vor einer KI- oder MCP-Änderung) pro Notiz aufbewahrt werden.",
       "stt": "Den Spracherkennungsserver konfigurieren, mit dem Notizen diktiert und Audioanhänge transkribiert werden."
+    },
+    "card_notes": {
+      "slash_menu_trigger_mobile": "Auf Mobilgeräten hat die Leiste über der Tastatur eine +-Schaltfläche, die unabhängig von dieser Einstellung dasselbe Menü öffnet."
     },
     "title": "Einstellungen",
     "collapse_section": "Bereich einklappen",
@@ -577,7 +578,14 @@
       "integrations": "Integrationen",
       "storage_limits": "Speicher und Limits",
       "appearance": "Erscheinungsbild",
-      "maintenance": "Wartung"
+      "maintenance": "Wartung",
+      "backup_sync": "Sicherungen und Synchronisierung",
+      "editing": "Bearbeitung",
+      "apps": "Apps",
+      "profile_sign_in": "Profil und Anmeldung",
+      "language_region": "Sprache und Region",
+      "storage": "Speicher",
+      "layout": "Layout"
     },
     "sections": {
       "account_display": "Konto & Anzeige",
@@ -640,7 +648,6 @@
       "smtp_config": "SMTP / E-Mail",
       "webhooks": "Admin-Webhooks",
       "ai_assistant": "KI-Assistent",
-      "saas": "SaaS-Modus",
       "s3_storage": "S3-Anhänge",
       "s3_backup": "S3-Sicherungen",
       "stt": "Transkription",
@@ -663,6 +670,22 @@
         "unavailable": "Nicht verfügbar",
         "installed": "Bereits installiert"
       }
+    },
+    "value_help": {
+      "font_size_notes": "Notizinhalt",
+      "font_size_sidebar": "Seitenleiste",
+      "font_size_code_blocks": "Codeblöcke",
+      "font_size_settings": "Einstellungsseite"
+    },
+    "storage_summary": {
+      "error": "Die Speichernutzung konnte nicht geladen werden.",
+      "notes_detail": "{{active}} in Ihren Notizen, {{trash}} im Papierkorb",
+      "local": "Belegter Speicher auf dem Server",
+      "database": "Datenbank",
+      "note_files": "Notizdateien",
+      "attachments": "Anhänge",
+      "s3_attachments": "Anhänge im S3-Speicher",
+      "s3_backups": "Sicherungen im S3-Speicher"
     }
   },
   "workspaces": {
@@ -726,7 +749,8 @@
       "edit_workspaces": "Arbeitsbereiche bearbeiten",
       "new_workspace": "Neuer Arbeitsbereich",
       "accounts": "Konten",
-      "title": "Arbeitsbereiche"
+      "title": "Arbeitsbereiche",
+      "shared_with_me": "Mit mir geteilt"
     },
     "errors": {
       "already_exists": "Ein Arbeitsbereich mit diesem Namen existiert bereits",
@@ -846,7 +870,8 @@
       "notes_dashboard": "Notiz-Board",
       "spellcheck_html_notes": "Rechtschreibprüfung",
       "note_color_palette": "Notizfarben",
-      "slash_menu_trigger": "Tastenkürzel für das Befehlsmenü",
+      "slash_menu_trigger": "Tastenkürzel für das Befehlsmenü (Computer)",
+      "slash_menu_trigger_mobile": "Tastenkürzel für das Befehlsmenü (Mobilgerät)",
       "snapshots": "Schnappschüsse",
       "show_note_icons": "Notizsymbole anzeigen"
     },
@@ -1624,6 +1649,8 @@
         "off": "Aus",
         "custom": "Benutzerdefiniert"
       },
+      "theme_hint": "Jede Farbe folgt dem Theme, bis Sie sie ändern. Der Pfeil neben einer geänderten Farbe setzt sie auf die Farbe des Themes zurück.",
+      "reset_element": "Farbe des Themes verwenden",
       "elements": {
         "h1": "Überschrift 1",
         "h2": "Überschrift 2",
@@ -1873,7 +1900,9 @@
       "copy_folder": "Kopieren",
       "cut_folder": "Ausschneiden",
       "paste_into_folder": "In Ordner einfügen",
-      "change_note_icon": "Notizsymbol ändern"
+      "change_note_icon": "Notizsymbol ändern",
+      "keep_offline": "Offline behalten",
+      "stop_offline": "Nicht mehr offline behalten"
     },
     "folder_filter": {
       "exit": "Ordneransicht verlassen"
@@ -1891,7 +1920,11 @@
       "convert_note": "Notiz konvertieren",
       "copy_note": "Kopieren",
       "cut_note": "Ausschneiden",
-      "paste_note": "Hier einfügen"
+      "paste_note": "Hier einfügen",
+      "keep_offline": "Offline behalten",
+      "stop_offline": "Nicht mehr offline behalten",
+      "available_offline": "In diesem Browser offline verfügbar",
+      "not_available_offline": "In diesem Browser nicht offline verfügbar"
     }
   },
   "tree_history": {
@@ -4814,16 +4847,6 @@
     "add_placeholder": "Aufgabe hinzufügen...",
     "save_error": "Die Aufgabenliste konnte nicht gespeichert werden."
   },
-  "saas": {
-    "description": "Anzeigeelemente, die sinnvoll sind, wenn diese Instanz als gehosteter Dienst (SaaS) angeboten wird. Standardmäßig ist alles ausgeblendet.",
-    "section_storage_notices": "Speicherhinweise",
-    "storage_notices_label": "Speicherhinweise anzeigen",
-    "storage_notices_description": "Erinnert die Benutzer auf den Anhangseiten, der Speicherstatistik-Seite und den S3-Anhangseinstellungen daran, dass Poznote eine Notiz-App ist und kein Speicherdienst für Fotos oder Videos.",
-    "messages": {
-      "saved": "Konfiguration erfolgreich gespeichert.",
-      "save_error": "Konfiguration konnte nicht gespeichert werden."
-    }
-  },
   "archive": {
     "menu_item": "Notiz archivieren",
     "confirm_title": "Notiz archivieren",
@@ -4980,5 +5003,118 @@
   },
   "focus_mode": {
     "button": "Fokusmodus"
+  },
+  "offline": {
+    "page_title": "Poznote (offline)",
+    "signout": {
+      "removes": "Die offline aufbewahrten Notizen werden von diesem Gerät entfernt.",
+      "done_title": "Sie sind abgemeldet",
+      "done_text": "Die offline aufbewahrten Notizen wurden von diesem Gerät entfernt.",
+      "loss_title": "Ihre Änderungen gehen verloren",
+      "loss_text_one": "1 offline vorgenommene Änderung wurde nicht mit dem Server synchronisiert. Wenn Sie sich jetzt abmelden, wird sie von diesem Gerät gelöscht und ist endgültig verloren.",
+      "loss_text_other": "{{count}} offline vorgenommene Änderungen wurden nicht mit dem Server synchronisiert. Wenn Sie sich jetzt abmelden, werden sie von diesem Gerät gelöscht und sind endgültig verloren.",
+      "loss_more": "und {{count}} weitere",
+      "loss_keep": "Um sie zu behalten, brechen Sie ab und bleiben Sie angemeldet: Sie werden automatisch gesendet, sobald die Verbindung funktioniert.",
+      "loss_confirm": "Abmelden und Änderungen verlieren"
+    },
+    "unsupported": "Dieser Browser kann keine Notizen offline speichern.",
+    "status": {
+      "offline": "Offline",
+      "online": "Online",
+      "syncing": "Synchronisierung…",
+      "pending_one": "1 Änderung ausstehend",
+      "pending_other": "{{count}} Änderungen ausstehend"
+    },
+    "signin": {
+      "intro": "Sie sind offline. Melden Sie sich an, um die auf diesem Gerät gespeicherten Notizen zu öffnen.",
+      "username": "Benutzername oder E-Mail",
+      "password": "Passwort",
+      "submit": "Offline anmelden",
+      "checking": "Wird geprüft…",
+      "unknown_account": "Die Notizen dieses Kontos sind auf diesem Gerät nicht gespeichert.",
+      "wrong_password": "Falsches Passwort. Verwenden Sie das Passwort Ihrer letzten Anmeldung auf diesem Gerät.",
+      "continue_intro": "Sie sind auf diesem Gerät noch angemeldet: Ihre neuesten Notizen öffnen sich ohne Passwort.",
+      "continue": "Weiter als {{name}}",
+      "retry": "Erneut verbinden"
+    },
+    "empty": {
+      "title": "Keine Notizen offline verfügbar",
+      "text": "Auf diesem Gerät sind noch keine Notizen gespeichert. Verbinden Sie sich mit dem Internet und öffnen Sie Poznote einmal: Die in den letzten Tagen geänderten Notizen sind dann offline verfügbar."
+    },
+    "list": {
+      "search": "Notizen durchsuchen",
+      "all_workspaces": "Alle Arbeitsbereiche",
+      "available": "Offline verfügbar",
+      "recent": "In den letzten {{days}} Tagen geändert",
+      "no_results": "Keine Notiz entspricht Ihrer Suche.",
+      "empty": "Keine Notizen in diesem Arbeitsbereich.",
+      "none": "In den letzten {{days}} Tagen wurde keine Notiz geändert.",
+      "untitled": "Ohne Titel",
+      "not_synced": "Noch nicht synchronisiert"
+    },
+    "new": {
+      "button": "Neue Notiz",
+      "note": "Notiz",
+      "markdown": "Markdown-Notiz",
+      "tasklist": "Aufgabenliste"
+    },
+    "note": {
+      "placeholder": "Wählen Sie eine Notiz aus, um sie zu öffnen.",
+      "back": "Zurück zur Liste",
+      "modified": "Geändert {{date}}",
+      "saved_locally": "Auf diesem Gerät gespeichert. Die Notiz wird an den Server gesendet, sobald Sie wieder online sind.",
+      "push_error": "Noch nicht gesendet: {{error}}",
+      "too_big": "Offline nicht verfügbar, größer als {{limit}} MB: {{files}}",
+      "file_size": "{{name}} ({{size}} MB)"
+    },
+    "unavailable": {
+      "title": "Diese Notiz ist offline nicht verfügbar",
+      "text": "Nur die in den letzten {{days}} Tagen geänderten Notizen werden auf diesem Gerät gespeichert. Diese Notiz öffnet sich, sobald Sie wieder online sind.",
+      "text_generic": "Diese Notiz ist auf diesem Gerät nicht gespeichert. Sie öffnet sich, sobald Sie wieder online sind."
+    },
+    "online": {
+      "back": "Sie sind wieder online.",
+      "synced": "Sie sind wieder online und Ihre Änderungen wurden synchronisiert.",
+      "return": "Zurück zu Poznote",
+      "open": "Poznote öffnen",
+      "sign_in_needed": "Sie sind wieder online. Melden Sie sich an, um die offline gemachten Änderungen zu senden.",
+      "sign_in": "Anmelden",
+      "wrong_account": "Sie sind wieder online, aber der Browser ist bei einem anderen Konto angemeldet. Öffnen Sie Poznote als {{name}}, um die offline gemachten Änderungen zu senden.",
+      "push_failed": "Einige Änderungen konnten noch nicht gesendet werden ({{error}}). Sie bleiben auf diesem Gerät gespeichert."
+    },
+    "sync": {
+      "copy_title": "{{title}} (Offline-Kopie)",
+      "conflict_copy": "„{{title}}“ wurde auch an anderer Stelle geändert, während Sie offline waren. Ihre Version wurde als „{{copy}}“ gespeichert.",
+      "recreated": "„{{title}}“ wurde an anderer Stelle gelöscht, während Sie offline waren. Ihre Version wurde als neue Notiz gespeichert.",
+      "push_failed": "Ihre Offline-Änderungen an „{{title}}“ konnten noch nicht gespeichert werden ({{error}}). Sie werden erneut gesendet.",
+      "synced_one": "1 offline geänderte Notiz wurde synchronisiert.",
+      "synced_other": "{{count}} offline geänderte Notizen wurden synchronisiert."
+    },
+    "banner": {
+      "open": "Offline-Notizen öffnen",
+      "offline": "Sie sind offline. Kürzlich geänderte Notizen können im Offline-Modus weiterhin geöffnet und bearbeitet werden.",
+      "offline_no_copies": "Sie sind offline. Änderungen werden gespeichert, sobald die Verbindung wieder besteht."
+    },
+    "settings": {
+      "card": "Offline-Notizen",
+      "help": "Die zuletzt geänderten Notizen im Browser behalten, um sie ohne Netzwerk zu öffnen und zu bearbeiten.",
+      "badge": "Letzte {{days}} Tage",
+      "description": "Die in den letzten Tagen geänderten Notizen werden in den Browsern gespeichert, in denen Sie Poznote verwenden, damit sie sich ohne Netzwerk öffnen und bearbeiten lassen. Offline gemachte Änderungen werden gesendet, sobald die Verbindung wieder besteht. 0 speichert nichts offline.",
+      "kept_rules": "Ihre Favoriten sowie die in ihrem Menü mit „Offline behalten“ markierten Notizen und Ordner werden unabhängig vom Datum aufbewahrt, mit allen Anhängen.",
+      "unit": "Tage",
+      "limits_title": "Grenzen:",
+      "limits_notes": "{{notes}} Notizen und insgesamt {{text}} MB Text, die zuletzt geänderten zuerst",
+      "limits_attachments": "Andere Anhänge (PDF, Audio, Dateien): nur Favoriten und Notizen mit „Offline behalten“",
+      "limits_file_size": "Dateien bis {{size}} MB pro Datei: größere Dateien bleiben nur online",
+      "limits_files_total": "{{count}} Dateien und {{total}} MB insgesamt, höchstens die Hälfte des freien Speichers des Browsers",
+      "warning": "Beim Abmelden werden die Offline-Notizen aus dem Browser entfernt. Melden Sie sich an einem gemeinsam genutzten Computer ab, wenn Sie gehen.",
+      "device_status_one": "In diesem Browser: 1 Notiz offline verfügbar, aktualisiert am {{date}}.",
+      "device_status": "In diesem Browser: {{count}} Notizen offline verfügbar, aktualisiert am {{date}}.",
+      "device_none": "In diesem Browser ist noch nichts gespeichert: Öffnen Sie Ihre Notizen einmal, dann werden sie gespeichert.",
+      "device_unsupported": "Dieser Browser kann keine Notizen offline speichern (dafür ist eine sichere HTTPS-Verbindung nötig)."
+    },
+    "keep": {
+      "error": "Die Offline-Einstellung konnte nicht gespeichert werden."
+    }
   }
 }

@@ -399,10 +399,14 @@ if (isset($_GET['oidc_error'])) {
         // Template for the OIDC button when the last SSO account is remembered on
         // this device; {{account}} is replaced client-side with the stored email
         'oidcAccountButtonTemplate' => t('login.oidc_button_account', [], 'Continue with {{account}}', $currentLang ?? 'en'),
-        'redirectAfter' => $redirectAfter
+        'redirectAfter' => $redirectAfter,
+        // js/offline-login.js forgets this device's offline copies after a sign-out
+        'justLoggedOut' => $justLoggedOut
     ];
     ?>
     <script type="application/json" id="login-config"><?php echo json_encode($loginConfig); ?></script>
+    <script src="<?php echo poznoteAsset('js/offline-store.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/offline-login.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/login-page.js'); ?>"></script>
 </body>
 </html>

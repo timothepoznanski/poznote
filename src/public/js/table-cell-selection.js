@@ -9,6 +9,8 @@
  *   the pasted block overflows the table
  * - Pasting a single value into a cell inserts it inline, without adding
  *   line breaks to the cell
+ * - ArrowUp/ArrowDown on the first/last line of a cell move to the cell
+ *   above/below instead of the previous/next cell of the row
  */
 (function () {
     'use strict';
@@ -326,6 +328,295 @@
             clearSelection();
         }
     }, true);
+
+    // ─── ArrowUp/ArrowDown between rows ──────────────────────────────────────
+    //
+    // Chromium moves the caret off the last line of a cell to the next cell in
+    // DOM order, so ArrowDown walked right along the row instead of down the
+    // column (and ArrowUp walked left). Coming into a table from the line
+    // above (below), it also always lands in the first (last) cell. Take over
+    // those moves: go to the cell under the caret in the next row, or out of
+    // the table past its last/first row. Moves between the lines of a
+    // multi-line cell, and outside tables, stay native.
+
+    function getEditableNote(node) {
+        var el = node && (node.nodeType === 1 ? node : node.parentElement);
+        var note = el ? el.closest('.noteentry[contenteditable="true"]') : null;
+        return note && note.getAttribute('data-note-type') !== 'markdown' ? note : null;
+    }
+
+    function caretRangeAtPoint(x, y) {
+        if (document.caretRangeFromPoint) {
+            return document.caretRangeFromPoint(x, y);
+        }
+        if (document.caretPositionFromPoint) {
+            var pos = document.caretPositionFromPoint(x, y);
+            if (!pos || !pos.offsetNode) return null;
+            var range = document.createRange();
+            range.setStart(pos.offsetNode, pos.offset);
+            range.collapse(true);
+            return range;
+        }
+        return null;
+    }
+
+    /**
+     * Where the caret would go one line down (forward) or up: probes with
+     * Selection.modify, then puts the caret back. Null when it cannot move.
+     */
+    function probeLineMove(sel, forward) {
+        var saved = sel.getRangeAt(0).cloneRange();
+        sel.modify('move', forward ? 'forward' : 'backward', 'line');
+        var moved = sel.rangeCount ? sel.getRangeAt(0) : null;
+        var dest = moved && (moved.startContainer !== saved.startContainer || moved.startOffset !== saved.startOffset)
+            ? moved.startContainer
+            : null;
+        sel.removeAllRanges();
+        sel.addRange(saved);
+        return dest;
+    }
+
+    /** Horizontal position of the caret, used to pick the column. */
+    function getCaretX(range) {
+        var rect = range.getBoundingClientRect();
+        if (rect.height) return rect.left;
+        // A caret beside a lone <br> has no geometry: use the content edge of
+        // its container (the border edge of a cell is the column boundary)
+        var node = range.startContainer;
+        var el = node.nodeType === 1 ? node : node.parentElement;
+        var padding = parseFloat(window.getComputedStyle(el).paddingLeft) || 0;
+        return el.getBoundingClientRect().left + el.clientLeft + padding;
+    }
+
+    /**
+     * Cell of the given row under the horizontal position x, or the closest
+     * cell of that row. Rows fully covered by rowspans above have no cells of
+     * their own and are skipped. Null past the table edge.
+     */
+    function getCellInRow(table, index, x, forward) {
+        var row = table.rows[index];
+        while (row && row.cells.length === 0) {
+            index += forward ? 1 : -1;
+            row = table.rows[index];
+        }
+        if (!row) return null;
+
+        var best = null;
+        var bestDistance = Infinity;
+        for (var i = 0; i < row.cells.length; i++) {
+            var rect = row.cells[i].getBoundingClientRect();
+            var distance = x < rect.left ? rect.left - x : (x > rect.right ? x - rect.right : 0);
+            if (distance < bestDistance) {
+                best = row.cells[i];
+                bestDistance = distance;
+            }
+        }
+        return best;
+    }
+
+    /** Somewhere the caret can sit: visible text, a line break or an image. */
+    function isCaretStop(node) {
+        var el = node.nodeType === 3 ? node.parentElement : node;
+        if (!el || !el.isContentEditable) return false;
+        if (node.nodeType === 3) return /\S| /.test(node.data);
+        return node.nodeName === 'BR' || node.nodeName === 'IMG';
+    }
+
+    function lastDescendant(node) {
+        while (node.lastChild) node = node.lastChild;
+        return node;
+    }
+
+    /** Next (forward) or previous caret stop from the walker's current node. */
+    function walkToCaretStop(walker, forward) {
+        var node;
+        while ((node = forward ? walker.nextNode() : walker.previousNode())) {
+            if (isCaretStop(node)) return node;
+        }
+        return null;
+    }
+
+    /** First (forward) or last caret stop inside the element. */
+    function getCaretStopIn(el, forward) {
+        var walker = document.createTreeWalker(el, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
+        if (!forward) {
+            var last = lastDescendant(el);
+            if (last !== el && isCaretStop(last)) return last;
+            walker.currentNode = last;
+        }
+        return walkToCaretStop(walker, forward);
+    }
+
+    /**
+     * First caret stop after the table (forward) or last one before it,
+     * within `scope` (the note, or the cell holding a nested table).
+     */
+    function getCaretStopPast(table, scope, forward) {
+        var walker = document.createTreeWalker(scope, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
+        walker.currentNode = forward ? lastDescendant(table) : table;
+        return walkToCaretStop(walker, forward);
+    }
+
+    /** Viewport rect of the first (forward) or last line of a caret stop. */
+    function getStopLineRect(stop, forward) {
+        var rects;
+        if (stop.nodeType === 3) {
+            var range = document.createRange();
+            range.selectNodeContents(stop);
+            rects = range.getClientRects();
+        } else {
+            rects = [stop.getBoundingClientRect()];
+        }
+        var lines = Array.prototype.filter.call(rects, function (r) { return r.height > 0; });
+        return lines.length ? lines[forward ? 0 : lines.length - 1] : null;
+    }
+
+    /**
+     * Puts the caret on the first (forward) or last line of `stop`, at the
+     * horizontal position x kept inside `box`, when the position found there
+     * passes `accept`. Otherwise at the near edge of `stop`.
+     */
+    function placeCaretAtStop(sel, stop, x, forward, box, accept) {
+        var range = null;
+        var boxRect = box.getBoundingClientRect();
+        var inset = Math.min(4, boxRect.width / 2);
+        var px = Math.min(Math.max(x, boxRect.left + inset), boxRect.right - inset);
+        var line = getStopLineRect(stop, forward);
+        if (line) {
+            var py = line.top + line.height / 2;
+            var hit = document.elementFromPoint(px, py);
+            if (!hit || !accept(hit)) {
+                // Off screen, or under a toolbar: bring the line into view
+                box.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+                boxRect = box.getBoundingClientRect();
+                px = Math.min(Math.max(x, boxRect.left + inset), boxRect.right - inset);
+                line = getStopLineRect(stop, forward);
+                py = line ? line.top + line.height / 2 : py;
+                hit = document.elementFromPoint(px, py);
+            }
+            if (hit && accept(hit)) range = caretRangeAtPoint(px, py);
+        }
+        if (!range || !accept(range.startContainer)) {
+            range = document.createRange();
+            if (stop.nodeType === 3) {
+                range.setStart(stop, forward ? 0 : stop.length);
+            } else {
+                range.setStartBefore(stop);
+            }
+            range.collapse(true);
+        }
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }
+
+    function placeCaretInCell(sel, cell, x, forward) {
+        var stop = getCaretStopIn(cell, forward);
+        if (stop) {
+            placeCaretAtStop(sel, stop, x, forward, cell, function (node) {
+                return cell.contains(node);
+            });
+            return;
+        }
+        // Nothing in the cell (<td></td>)
+        cell.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        var range = document.createRange();
+        range.selectNodeContents(cell);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }
+
+    /**
+     * Moves the caret to the line after the table (forward) or before it,
+     * within `scope`. Returns false, caret untouched, when the table ends
+     * (starts) the scope.
+     */
+    function moveCaretPastTable(sel, table, scope, x, forward) {
+        var stop = getCaretStopPast(table, scope, forward);
+        if (!stop) return false;
+        var el = stop.nodeType === 3 ? stop.parentElement : stop;
+        var box = el.closest('p, div, li, h1, h2, h3, h4, h5, h6, blockquote, pre, td, th') || el;
+        placeCaretAtStop(sel, stop, x, forward, box, function (node) {
+            return scope.contains(node) && !table.contains(node);
+        });
+        return true;
+    }
+
+    /**
+     * Outermost table the node sits in that does not also hold `from`, i.e.
+     * the table a caret coming from `from` enters.
+     */
+    function getEnteredTable(node, from) {
+        var entered = null;
+        var el = node.nodeType === 1 ? node : node.parentElement;
+        var table = el ? el.closest('table') : null;
+        while (table && !table.contains(from)) {
+            entered = table;
+            table = table.parentElement ? table.parentElement.closest('table') : null;
+        }
+        return entered;
+    }
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+        // Open popups (slash menu, emoji picker...) handle the arrows first
+        if (e.defaultPrevented || e.isComposing) return;
+        if (e.shiftKey || e.ctrlKey || e.metaKey || e.altKey) return;
+        var sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0 || !sel.isCollapsed || typeof sel.modify !== 'function') return;
+        var caretNode = sel.getRangeAt(0).startContainer;
+        var note = getEditableNote(caretNode);
+        if (!note) return;
+
+        var forward = e.key === 'ArrowDown';
+        var dest = probeLineMove(sel, forward);
+        var entered = dest && note.contains(dest) ? getEnteredTable(dest, caretNode) : null;
+        // A table nested in another cell of the caret's table is not entered
+        // from here: that is the DOM-order jump to fix, handled below
+        var enteredFrom = entered && entered.parentElement.closest('td, th');
+        if (enteredFrom && !enteredFrom.contains(caretNode)) entered = null;
+        var info = entered ? null : getCaretCellInfo();
+        // Moving within the cell, or not near a table at all: native move
+        if (!entered && (!info || (dest && info.cell.contains(dest)))) return;
+
+        var x = getCaretX(sel.getRangeAt(0));
+        if (entered) {
+            var first = getCellInRow(entered, forward ? 0 : entered.rows.length - 1, x, forward);
+            if (!first) return;
+            e.preventDefault();
+            placeCaretInCell(sel, first, x, forward);
+            return;
+        }
+
+        e.preventDefault();
+
+        var cell = info.cell;
+        var table = info.table;
+        while (table) {
+            var row = cell.parentElement;
+            var index = forward ? row.rowIndex + Math.max(1, cell.rowSpan) : row.rowIndex - 1;
+            var target = getCellInRow(table, index, x, forward);
+            if (target) {
+                placeCaretInCell(sel, target, x, forward);
+                return;
+            }
+            // Past the edge row: the line after (before) the table, or, when
+            // the table is the last (first) thing of a cell of an outer
+            // table, the next row of that outer table
+            var outerCell = table.parentElement.closest('td, th');
+            if (outerCell && !note.contains(outerCell)) outerCell = null;
+            if (moveCaretPastTable(sel, table, outerCell || note, x, forward)) return;
+            cell = outerCell;
+            table = outerCell ? outerCell.closest('table') : null;
+        }
+        // Nothing past the table: go to the end (start) of the cell, like a
+        // textarea on its last (first) line
+        var range = document.createRange();
+        range.selectNodeContents(info.cell);
+        range.collapse(!forward);
+        sel.removeAllRanges();
+        sel.addRange(range);
+    });
 
     // ─── Paste into a table cell ─────────────────────────────────────────────
 

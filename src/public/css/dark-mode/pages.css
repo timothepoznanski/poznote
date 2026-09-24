@@ -70,14 +70,12 @@ html[data-theme='dark'] .settings-current-user-badge i {
     color: var(--pz-text);
 }
 
-html[data-theme='dark'] .poznote-back-to-note-btn,
-html[data-theme='dark'] .poznote-back-btn {
+html[data-theme='dark'] .poznote-back-to-note-btn {
     background-color: var(--pz-bg);
     border-color: var(--pz-border);
 }
 
-html[data-theme='dark'] .poznote-back-to-note-btn:hover,
-html[data-theme='dark'] .poznote-back-btn:hover {
+html[data-theme='dark'] .poznote-back-to-note-btn:hover {
     background-color: var(--pz-surface-hover);
     color: var(--pz-text);
 }

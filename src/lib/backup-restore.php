@@ -490,6 +490,22 @@ function restoreDatabaseFromFile($sqlFile, $alreadyValidated = false) {
     // Ensure proper permissions on restored database
     setFilePermissions($dbPath, 0664);
 
+    // Workspace shares live in master.db and outlive the swap: the ones whose
+    // workspace the restored database does not hold go, or recreating that
+    // name later would hand it to those accounts unasked (users/db_master.php).
+    if (isset($_SESSION['user_id'])) {
+        try {
+            $restoredCon = new PDO('sqlite:' . $dbPath);
+            $restoredCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $restoredNames = $restoredCon->query('SELECT name FROM workspaces')->fetchAll(PDO::FETCH_COLUMN);
+            $restoredCon = null;
+            require_once __DIR__ . '/../users/db_master.php';
+            pruneWorkspaceSharesToExisting((int)$_SESSION['user_id'], $restoredNames);
+        } catch (Exception $e) {
+            error_log('restoreDatabaseFromFile: could not prune workspace shares: ' . $e->getMessage());
+        }
+    }
+
     return ['success' => true];
 }
 

@@ -15,6 +15,7 @@ requireAuth();
 requireActiveAccountOwner();
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../functions.php';
+require_once __DIR__ . '/../../settings_shell.php';
 requireSettingsPassword();
 
 if (!isCurrentUserAdmin()) {
@@ -787,9 +788,8 @@ function activityExportUrl(string $action, string $search): string {
 </head>
 <body class="has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php $iconSidebarBasePath = '../'; include __DIR__ . '/../../icon_sidebar.php'; ?>
+<?php poznoteSettingsShellOpen(['section' => 'admin-tools-grid', 'title' => t('settings.cards.activity_log', [], 'Activity log'), 'basePath' => '../', 'wide' => true]); ?>
 <div class="admin-container">
-<?php $backToSettingsBasePath = '../'; include __DIR__ . '/../../back_to_settings.php'; ?>
-<h1 class="poznote-page-title"><i class="lucide lucide-clipboard-list"></i> <?php echo t_h('settings.cards.activity_log', [], 'Activity log'); ?></h1>
 
     <div class="admin-header">
         <div class="admin-nav" style="justify-content:center;">
@@ -974,6 +974,7 @@ function activityExportUrl(string $action, string $search): string {
         </div>
     </div>
 </div>
+<?php poznoteSettingsShellClose(); ?>
 
 <div class="modal" id="clearLogModal">
     <div class="modal-content">
@@ -1050,6 +1051,6 @@ window.addEventListener('resize', sizeActivityTableScroll);
     });
 })();
 </script>
-    <script src="../js/icon-sidebar-toggle.js?v=<?php echo $v; ?>"></script>
+    <script src="../<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 </body>
 </html>
