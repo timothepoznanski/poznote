@@ -1992,7 +1992,9 @@
       "close_all": "Fechar todas",
       "close_others": "Fechar todas exceto esta"
     },
-    "close_all_tabs": "Fechar todas as abas"
+    "close_all_tabs": "Fechar todas as abas",
+    "scroll_left": "Rolar as abas para a esquerda",
+    "scroll_right": "Rolar as abas para a direita"
   },
   "notes_manager": {
     "actions": "Ações em massa",
@@ -5046,7 +5048,6 @@
     "list": {
       "search": "Pesquisar notas",
       "all_workspaces": "Todos os espaços de trabalho",
-      "available": "Disponíveis offline",
       "recent": "Modificadas nos últimos {{days}} dias",
       "no_results": "Nenhuma nota corresponde à sua pesquisa.",
       "empty": "Nenhuma nota neste espaço de trabalho.",
@@ -5063,7 +5064,6 @@
     "note": {
       "placeholder": "Selecione uma nota para abri-la.",
       "back": "Voltar à lista",
-      "modified": "Modificada {{date}}",
       "saved_locally": "Salva neste dispositivo. Ela será enviada ao servidor quando você estiver online de novo.",
       "push_error": "Ainda não enviada: {{error}}",
       "too_big": "Não disponível offline, mais de {{limit}} MB: {{files}}",

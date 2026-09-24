@@ -1497,7 +1497,9 @@
       "close_all": "Close all",
       "close_others": "Close all except this one"
     },
-    "close_all_tabs": "Close all tabs"
+    "close_all_tabs": "Close all tabs",
+    "scroll_left": "Scroll tabs left",
+    "scroll_right": "Scroll tabs right"
   },
   "notes_manager": {
     "actions": "Bulk actions",
@@ -4865,7 +4867,6 @@
     "list": {
       "search": "Search notes",
       "all_workspaces": "All workspaces",
-      "available": "Available offline",
       "recent": "Modified in the last {{days}} days",
       "no_results": "No notes match your search.",
       "empty": "No notes in this workspace.",
@@ -4882,7 +4883,6 @@
     "note": {
       "placeholder": "Select a note to open it.",
       "back": "Back to the list",
-      "modified": "Modified {{date}}",
       "saved_locally": "Saved on this device. It will be sent to the server when you are back online.",
       "push_error": "Not sent yet: {{error}}",
       "too_big": "Not available offline, larger than {{limit}} MB: {{files}}",

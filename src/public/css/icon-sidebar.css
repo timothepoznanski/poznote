@@ -138,7 +138,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0;
+    gap: 4px;
     flex-shrink: 0;
     align-self: stretch;
     margin: 8px 4px 0;
@@ -146,8 +146,9 @@
     border-top: 1px solid var(--pz-border);
 }
 
-/* Tighter than the navigation entries above: five account actions at the
-   rail's full 40px pitch would eat a third of a laptop screen. */
+/* Tighter than the navigation entries above: 36px plus the 4px gap gives a
+   40px pitch against their 44, still on the 4px grid. Five account actions at
+   the full pitch would eat a third of a laptop screen. */
 .icon-sidebar-bottom .icon-sidebar-btn {
     height: 36px;
 }

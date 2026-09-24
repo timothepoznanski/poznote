@@ -3,20 +3,31 @@
  *
  * Shown while the server cannot be reached, with a button to the offline
  * page, and for a few seconds after changes made offline were synced.
+ * The same banner says "back online" on the offline page (offline.php).
  * Tokens only: the palette switches with the theme.
  */
 
+/* Zero-height box between the tab bar and #right_col: the banner hangs from
+   it over the note toolbar, centred on the note column. */
+.offline-banner-anchor {
+    position: relative;
+    z-index: 10050;
+    flex: 0 0 auto;
+    height: 0;
+}
+
 .offline-banner {
-    position: fixed;
+    position: absolute;
+    top: 8px;
     left: 50%;
-    bottom: 20px;
     transform: translateX(-50%);
     z-index: 10050;
     display: flex;
     align-items: center;
     gap: 12px;
     width: max-content;
-    max-width: min(640px, calc(100vw - 32px));
+    max-width: min(640px, calc(100% - 32px));
+    box-sizing: border-box;
     padding: 10px 10px 10px 16px;
     border: 1px solid var(--pz-border);
     border-radius: var(--pz-radius-lg);
@@ -75,17 +86,22 @@
     height: 16px;
 }
 
-/* Phone: the icon, the text and the close button on the first row, the
+/* Phone: at the top of the screen, the note or the list alike, clear of
+   both edges. The icon, the text and the close button on the first row, the
    button under the text, rather than each wrapping onto a line of its own */
 @media (max-width: 800px) {
     .offline-banner {
-        bottom: 12px;
+        position: fixed;
+        top: calc(var(--mobile-visual-viewport-top, 0px) + 8px);
+        left: 16px;
+        right: 16px;
+        transform: none;
         display: grid;
         grid-template-columns: auto minmax(0, 1fr) auto;
         align-items: start;
         column-gap: 10px;
         row-gap: 10px;
-        width: calc(100vw - 24px);
+        width: auto;
         max-width: none;
         padding: 12px 8px 12px 14px;
     }
