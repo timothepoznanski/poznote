@@ -312,6 +312,16 @@ class SettingsController {
             return (string) $intVal;
         }
 
+        // Days of recently modified notes kept offline in the browser, 0 = off
+        // (OfflineController::MAX_DAYS)
+        if ($key === 'offline_notes_days') {
+            $intVal = (int) $value;
+            if ($intVal < 0 || $intVal > 30) {
+                throw new InvalidArgumentException('value must be between 0 and 30', 400);
+            }
+            return (string) $intVal;
+        }
+
         if ($key === 'snapshots_keep_count') {
             $intVal = (int) $value;
             if ($intVal < POZNOTE_SNAPSHOTS_MIN_COUNT || $intVal > POZNOTE_SNAPSHOTS_MAX_COUNT) {

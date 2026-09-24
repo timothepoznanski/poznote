@@ -1380,6 +1380,80 @@ paths:
           description: Note not found
 
   # ==================
+  # Offline Copies Endpoints
+  # ==================
+  /offline/manifest:
+    get:
+      tags: [Notes]
+      summary: Note list and versions of the notes kept offline
+      description: |
+        Feeds the browser's offline copies (js/offline-sync.js). Returns the
+        account's note list (metadata only) and flags with `offline: 1` the
+        notes modified in the last `days` days (user setting
+        `offline_notes_days`, default 5, 0 = off), with their version token.
+        Answers 304 to a matching If-None-Match. Refused (403,
+        `offline_unavailable`) on an account the session does not own.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: If-None-Match
+          in: header
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Manifest
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  user:
+                    type: object
+                  days:
+                    type: integer
+                  max_notes:
+                    type: integer
+                  workspaces:
+                    type: array
+                    items:
+                      type: string
+                  folders:
+                    type: array
+                    items:
+                      type: object
+                  notes:
+                    type: array
+                    items:
+                      type: object
+        '304':
+          description: Unchanged since the ETag sent
+        '403':
+          description: Offline copies are only kept for the account's owner
+
+  /offline/notes:
+    get:
+      tags: [Notes]
+      summary: Full content of up to 50 notes, for the offline copies
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: ids
+          in: query
+          required: true
+          description: Comma-separated note IDs (max 50)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notes with content, version and attachment list
+        '400':
+          description: Missing or too many ids
+        '403':
+          description: Offline copies are only kept for the account's owner
+
+  # ==================
   # Snapshots Endpoints
   # ==================
   /notes/{id}/snapshot:

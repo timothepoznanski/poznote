@@ -4981,5 +4981,117 @@
   },
   "focus_mode": {
     "button": "Modo enfoque"
+  },
+  "offline": {
+    "page_title": "Poznote (sin conexión)",
+    "lock_hint": "Bloquear las notas sin conexión",
+    "unsupported": "Este navegador no puede guardar notas sin conexión.",
+    "status": {
+      "offline": "Sin conexión",
+      "online": "En línea",
+      "syncing": "Sincronizando…",
+      "pending_one": "1 cambio pendiente",
+      "pending_other": "{{count}} cambios pendientes"
+    },
+    "signin": {
+      "intro": "No tiene conexión. Inicie sesión para abrir las notas guardadas en este dispositivo.",
+      "username": "Usuario o correo",
+      "password": "Contraseña",
+      "submit": "Iniciar sesión sin conexión",
+      "checking": "Comprobando…",
+      "unknown_account": "Las notas de esta cuenta no están guardadas en este dispositivo.",
+      "wrong_password": "Contraseña incorrecta. Use la contraseña de su último inicio de sesión en este dispositivo.",
+      "continue_intro": "Sigue con la sesión iniciada en este dispositivo: sus notas recientes se abren sin contraseña.",
+      "continue": "Continuar como {{name}}",
+      "retry": "Volver a conectar"
+    },
+    "empty": {
+      "title": "No hay notas disponibles sin conexión",
+      "text": "Todavía no hay notas guardadas en este dispositivo. Conéctese a internet y abra Poznote una vez: las notas modificadas en los últimos días estarán entonces disponibles sin conexión."
+    },
+    "list": {
+      "label": "Notas",
+      "search": "Buscar notas",
+      "all_workspaces": "Todos los espacios de trabajo",
+      "available": "Disponibles sin conexión",
+      "other": "Otras notas",
+      "other_hint": "No disponibles sin conexión",
+      "more": "{{count}} notas más, use la búsqueda para encontrarlas",
+      "no_results": "Ninguna nota coincide con su búsqueda.",
+      "empty": "No hay notas en este espacio de trabajo.",
+      "untitled": "Sin título",
+      "not_synced": "Aún no sincronizada"
+    },
+    "new": {
+      "button": "Nueva nota",
+      "note": "Nota",
+      "markdown": "Nota Markdown",
+      "tasklist": "Lista de tareas",
+      "default_title": "Nueva nota"
+    },
+    "note": {
+      "placeholder": "Seleccione una nota para abrirla.",
+      "back": "Volver a la lista",
+      "title_placeholder": "Título",
+      "content": "Contenido de la nota",
+      "modified": "Modificada {{date}}",
+      "saved_locally": "Guardada en este dispositivo. Se enviará al servidor cuando vuelva a tener conexión.",
+      "push_error": "Aún no enviada: {{error}}",
+      "edit": "Editar",
+      "preview": "Vista previa"
+    },
+    "toolbar": {
+      "bold": "Negrita",
+      "italic": "Cursiva",
+      "underline": "Subrayado",
+      "strikethrough": "Tachado",
+      "heading": "Encabezado",
+      "bullet_list": "Lista con viñetas",
+      "numbered_list": "Lista numerada"
+    },
+    "tasks": {
+      "add_placeholder": "Escriba una tarea y pulse Intro",
+      "delete": "Eliminar tarea",
+      "empty": "Aún no hay tareas."
+    },
+    "unavailable": {
+      "text": "Solo se guardan en este dispositivo las notas modificadas en los últimos {{days}} días. Esta se abrirá en cuanto vuelva a tener conexión.",
+      "text_generic": "Esta nota no está guardada en este dispositivo. Se abrirá en cuanto vuelva a tener conexión.",
+      "unsupported_type": "Este tipo de nota (un dibujo, por ejemplo) no se puede abrir sin conexión. Se abrirá en cuanto vuelva a tener conexión."
+    },
+    "online": {
+      "back": "Vuelve a tener conexión.",
+      "synced": "Vuelve a tener conexión y sus cambios se han sincronizado.",
+      "return": "Volver a Poznote",
+      "open": "Abrir Poznote",
+      "sign_in_needed": "Vuelve a tener conexión. Inicie sesión para enviar los cambios hechos sin conexión.",
+      "sign_in": "Iniciar sesión",
+      "wrong_account": "Vuelve a tener conexión, pero el navegador tiene abierta otra cuenta. Abra Poznote como {{name}} para enviar los cambios hechos sin conexión.",
+      "push_failed": "Algunos cambios aún no se han podido enviar ({{error}}). Se conservan en este dispositivo."
+    },
+    "sync": {
+      "copy_title": "{{title}} (copia sin conexión)",
+      "conflict_copy": "«{{title}}» también se modificó en otro lugar mientras estaba sin conexión. Su versión se guardó como «{{copy}}».",
+      "recreated": "«{{title}}» se había eliminado en otro lugar mientras estaba sin conexión. Su versión se guardó como una nota nueva.",
+      "push_failed": "Sus cambios sin conexión en «{{title}}» aún no se han podido guardar ({{error}}). Se volverán a enviar.",
+      "synced_one": "Se ha sincronizado 1 nota modificada sin conexión.",
+      "synced_other": "Se han sincronizado {{count}} notas modificadas sin conexión."
+    },
+    "banner": {
+      "open": "Abrir las notas sin conexión",
+      "offline": "No tiene conexión. Las notas modificadas recientemente se pueden seguir abriendo y editando en el modo sin conexión.",
+      "offline_no_copies": "No tiene conexión. Los cambios se guardarán cuando vuelva la conexión."
+    },
+    "settings": {
+      "card": "Notas sin conexión",
+      "help": "Guardar en el navegador las notas modificadas recientemente, para abrirlas y editarlas sin red.",
+      "badge": "Últimos {{days}} días",
+      "description": "Las notas modificadas en los últimos días se guardan en los navegadores donde usa Poznote, para poder abrirlas y editarlas sin red. Los cambios hechos sin conexión se envían en cuanto vuelve la conexión. 0 no guarda nada sin conexión.",
+      "unit": "días",
+      "warning": "Al cerrar sesión se eliminan las notas sin conexión del navegador. En un ordenador compartido, cierre sesión al irse.",
+      "device_status": "En este navegador: {{count}} notas disponibles sin conexión, actualizadas el {{date}}.",
+      "device_none": "Aún no hay nada guardado en este navegador: abra sus notas una vez y se guardarán.",
+      "device_unsupported": "Este navegador no puede guardar notas sin conexión (necesita una conexión HTTPS segura)."
+    }
   }
 }

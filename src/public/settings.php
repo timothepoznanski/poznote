@@ -1021,6 +1021,16 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
+            <!-- Offline notes: kept in the browser by js/offline-sync.js -->
+            <div class="home-card" id="offline-notes-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('offline.settings.help', [], 'Keep the notes you modified recently in your browser, to open and edit them without a network.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-wifi-off"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('offline.settings.card', [], 'Offline notes'); ?></span>
+                    <span id="offline-notes-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
             <!-- Tasklist Insert Order -->
             <div class="home-card" id="tasklist-insert-order-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.tasklist_insert_order', [], 'Choose whether new tasks are added to the top or the bottom of task lists.'); ?>"><i class="lucide lucide-help-circle"></i></span>
@@ -1606,6 +1616,7 @@ if ($canUseUserWebhooks) {
     window.NOTE_COLOR_LOCALIZED_NAMES = <?php echo json_encode(getLocalizedNoteColorNames(), JSON_UNESCAPED_UNICODE); ?>;
     window.NOTE_COLOR_KNOWN_NAMES = <?php echo json_encode(getKnownNoteColorNames(), JSON_UNESCAPED_UNICODE); ?>;
     </script>
+    <script src="<?php echo poznoteAsset('js/offline-store.js'); ?>"></script>
     <script src="js/settings-page.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/settings-page.js') ?: time(); ?>"></script>
     <script src="js/ui-customization.js?v=<?php echo $cache_v; ?>"></script>
     <!-- Contextual UI Customization panel (see ui_customization_panel.php);

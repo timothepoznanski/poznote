@@ -4980,5 +4980,117 @@
   },
   "focus_mode": {
     "button": "Fokusmodus"
+  },
+  "offline": {
+    "page_title": "Poznote (offline)",
+    "lock_hint": "Offline-Notizen sperren",
+    "unsupported": "Dieser Browser kann keine Notizen offline speichern.",
+    "status": {
+      "offline": "Offline",
+      "online": "Online",
+      "syncing": "Synchronisierung…",
+      "pending_one": "1 Änderung ausstehend",
+      "pending_other": "{{count}} Änderungen ausstehend"
+    },
+    "signin": {
+      "intro": "Sie sind offline. Melden Sie sich an, um die auf diesem Gerät gespeicherten Notizen zu öffnen.",
+      "username": "Benutzername oder E-Mail",
+      "password": "Passwort",
+      "submit": "Offline anmelden",
+      "checking": "Wird geprüft…",
+      "unknown_account": "Die Notizen dieses Kontos sind auf diesem Gerät nicht gespeichert.",
+      "wrong_password": "Falsches Passwort. Verwenden Sie das Passwort Ihrer letzten Anmeldung auf diesem Gerät.",
+      "continue_intro": "Sie sind auf diesem Gerät noch angemeldet: Ihre neuesten Notizen öffnen sich ohne Passwort.",
+      "continue": "Weiter als {{name}}",
+      "retry": "Erneut verbinden"
+    },
+    "empty": {
+      "title": "Keine Notizen offline verfügbar",
+      "text": "Auf diesem Gerät sind noch keine Notizen gespeichert. Verbinden Sie sich mit dem Internet und öffnen Sie Poznote einmal: Die in den letzten Tagen geänderten Notizen sind dann offline verfügbar."
+    },
+    "list": {
+      "label": "Notizen",
+      "search": "Notizen durchsuchen",
+      "all_workspaces": "Alle Arbeitsbereiche",
+      "available": "Offline verfügbar",
+      "other": "Weitere Notizen",
+      "other_hint": "Nicht offline verfügbar",
+      "more": "{{count}} weitere Notizen, nutzen Sie die Suche, um sie zu finden",
+      "no_results": "Keine Notiz entspricht Ihrer Suche.",
+      "empty": "Keine Notizen in diesem Arbeitsbereich.",
+      "untitled": "Ohne Titel",
+      "not_synced": "Noch nicht synchronisiert"
+    },
+    "new": {
+      "button": "Neue Notiz",
+      "note": "Notiz",
+      "markdown": "Markdown-Notiz",
+      "tasklist": "Aufgabenliste",
+      "default_title": "Neue Notiz"
+    },
+    "note": {
+      "placeholder": "Wählen Sie eine Notiz aus, um sie zu öffnen.",
+      "back": "Zurück zur Liste",
+      "title_placeholder": "Titel",
+      "content": "Inhalt der Notiz",
+      "modified": "Geändert {{date}}",
+      "saved_locally": "Auf diesem Gerät gespeichert. Die Notiz wird an den Server gesendet, sobald Sie wieder online sind.",
+      "push_error": "Noch nicht gesendet: {{error}}",
+      "edit": "Bearbeiten",
+      "preview": "Vorschau"
+    },
+    "toolbar": {
+      "bold": "Fett",
+      "italic": "Kursiv",
+      "underline": "Unterstrichen",
+      "strikethrough": "Durchgestrichen",
+      "heading": "Überschrift",
+      "bullet_list": "Aufzählung",
+      "numbered_list": "Nummerierte Liste"
+    },
+    "tasks": {
+      "add_placeholder": "Aufgabe eingeben und Enter drücken",
+      "delete": "Aufgabe löschen",
+      "empty": "Noch keine Aufgaben."
+    },
+    "unavailable": {
+      "text": "Nur die in den letzten {{days}} Tagen geänderten Notizen werden auf diesem Gerät gespeichert. Diese Notiz öffnet sich, sobald Sie wieder online sind.",
+      "text_generic": "Diese Notiz ist auf diesem Gerät nicht gespeichert. Sie öffnet sich, sobald Sie wieder online sind.",
+      "unsupported_type": "Diese Art von Notiz (zum Beispiel eine Zeichnung) kann nicht offline geöffnet werden. Sie öffnet sich, sobald Sie wieder online sind."
+    },
+    "online": {
+      "back": "Sie sind wieder online.",
+      "synced": "Sie sind wieder online und Ihre Änderungen wurden synchronisiert.",
+      "return": "Zurück zu Poznote",
+      "open": "Poznote öffnen",
+      "sign_in_needed": "Sie sind wieder online. Melden Sie sich an, um die offline gemachten Änderungen zu senden.",
+      "sign_in": "Anmelden",
+      "wrong_account": "Sie sind wieder online, aber der Browser ist bei einem anderen Konto angemeldet. Öffnen Sie Poznote als {{name}}, um die offline gemachten Änderungen zu senden.",
+      "push_failed": "Einige Änderungen konnten noch nicht gesendet werden ({{error}}). Sie bleiben auf diesem Gerät gespeichert."
+    },
+    "sync": {
+      "copy_title": "{{title}} (Offline-Kopie)",
+      "conflict_copy": "„{{title}}“ wurde auch an anderer Stelle geändert, während Sie offline waren. Ihre Version wurde als „{{copy}}“ gespeichert.",
+      "recreated": "„{{title}}“ wurde an anderer Stelle gelöscht, während Sie offline waren. Ihre Version wurde als neue Notiz gespeichert.",
+      "push_failed": "Ihre Offline-Änderungen an „{{title}}“ konnten noch nicht gespeichert werden ({{error}}). Sie werden erneut gesendet.",
+      "synced_one": "1 offline geänderte Notiz wurde synchronisiert.",
+      "synced_other": "{{count}} offline geänderte Notizen wurden synchronisiert."
+    },
+    "banner": {
+      "open": "Offline-Notizen öffnen",
+      "offline": "Sie sind offline. Kürzlich geänderte Notizen können im Offline-Modus weiterhin geöffnet und bearbeitet werden.",
+      "offline_no_copies": "Sie sind offline. Änderungen werden gespeichert, sobald die Verbindung wieder besteht."
+    },
+    "settings": {
+      "card": "Offline-Notizen",
+      "help": "Die zuletzt geänderten Notizen im Browser behalten, um sie ohne Netzwerk zu öffnen und zu bearbeiten.",
+      "badge": "Letzte {{days}} Tage",
+      "description": "Die in den letzten Tagen geänderten Notizen werden in den Browsern gespeichert, in denen Sie Poznote verwenden, damit sie sich ohne Netzwerk öffnen und bearbeiten lassen. Offline gemachte Änderungen werden gesendet, sobald die Verbindung wieder besteht. 0 speichert nichts offline.",
+      "unit": "Tage",
+      "warning": "Beim Abmelden werden die Offline-Notizen aus dem Browser entfernt. Melden Sie sich an einem gemeinsam genutzten Computer ab, wenn Sie gehen.",
+      "device_status": "In diesem Browser: {{count}} Notizen offline verfügbar, aktualisiert am {{date}}.",
+      "device_none": "In diesem Browser ist noch nichts gespeichert: Öffnen Sie Ihre Notizen einmal, dann werden sie gespeichert.",
+      "device_unsupported": "Dieser Browser kann keine Notizen offline speichern (dafür ist eine sichere HTTPS-Verbindung nötig)."
+    }
   }
 }

@@ -4800,5 +4800,117 @@
   },
   "focus_mode": {
     "button": "Focus mode"
+  },
+  "offline": {
+    "page_title": "Poznote (offline)",
+    "lock_hint": "Lock the offline notes",
+    "unsupported": "This browser cannot keep notes offline.",
+    "status": {
+      "offline": "Offline",
+      "online": "Online",
+      "syncing": "Syncing…",
+      "pending_one": "1 change waiting",
+      "pending_other": "{{count}} changes waiting"
+    },
+    "signin": {
+      "intro": "You are offline. Sign in to open the notes kept on this device.",
+      "username": "Username or Email",
+      "password": "Password",
+      "submit": "Sign in offline",
+      "checking": "Checking…",
+      "unknown_account": "The notes of this account are not kept on this device.",
+      "wrong_password": "Incorrect password. Use the password you last signed in with on this device.",
+      "continue_intro": "You are still signed in on this device, so your recent notes open without a password.",
+      "continue": "Continue as {{name}}",
+      "retry": "Try to reconnect"
+    },
+    "empty": {
+      "title": "No notes available offline",
+      "text": "No notes are kept on this device yet. Connect to the internet and open Poznote once: the notes you modified in the last days will then be available offline."
+    },
+    "list": {
+      "label": "Notes",
+      "search": "Search notes",
+      "all_workspaces": "All workspaces",
+      "available": "Available offline",
+      "other": "Other notes",
+      "other_hint": "Not available offline",
+      "more": "{{count}} more notes, use the search to find them",
+      "no_results": "No notes match your search.",
+      "empty": "No notes in this workspace.",
+      "untitled": "Untitled",
+      "not_synced": "Not synced yet"
+    },
+    "new": {
+      "button": "New note",
+      "note": "Note",
+      "markdown": "Markdown note",
+      "tasklist": "Task list",
+      "default_title": "New note"
+    },
+    "note": {
+      "placeholder": "Select a note to open it.",
+      "back": "Back to the list",
+      "title_placeholder": "Title",
+      "content": "Note content",
+      "modified": "Modified {{date}}",
+      "saved_locally": "Saved on this device. It will be sent to the server when you are back online.",
+      "push_error": "Not sent yet: {{error}}",
+      "edit": "Edit",
+      "preview": "Preview"
+    },
+    "toolbar": {
+      "bold": "Bold",
+      "italic": "Italic",
+      "underline": "Underline",
+      "strikethrough": "Strikethrough",
+      "heading": "Heading",
+      "bullet_list": "Bulleted list",
+      "numbered_list": "Numbered list"
+    },
+    "tasks": {
+      "add_placeholder": "Add a task and press Enter",
+      "delete": "Delete task",
+      "empty": "No tasks yet."
+    },
+    "unavailable": {
+      "text": "Only the notes modified in the last {{days}} days are kept on this device. This one will open as soon as you are back online.",
+      "text_generic": "This note is not kept on this device. It will open as soon as you are back online.",
+      "unsupported_type": "This kind of note (a drawing, for instance) cannot be opened offline. It will open as soon as you are back online."
+    },
+    "online": {
+      "back": "You are back online.",
+      "synced": "You are back online and your changes have been synced.",
+      "return": "Return to Poznote",
+      "open": "Open Poznote",
+      "sign_in_needed": "You are back online. Sign in to send the changes made offline.",
+      "sign_in": "Sign in",
+      "wrong_account": "You are back online, but the browser is signed in to another account. Open Poznote as {{name}} to send the changes made offline.",
+      "push_failed": "Some changes could not be sent yet ({{error}}). They are kept on this device."
+    },
+    "sync": {
+      "copy_title": "{{title}} (offline copy)",
+      "conflict_copy": "\"{{title}}\" was also changed elsewhere while you were offline. Your version was saved as \"{{copy}}\".",
+      "recreated": "\"{{title}}\" had been deleted elsewhere while you were offline. Your version was saved again as a new note.",
+      "push_failed": "Your offline changes to \"{{title}}\" could not be saved yet ({{error}}). They will be sent again.",
+      "synced_one": "1 note changed offline has been synced.",
+      "synced_other": "{{count}} notes changed offline have been synced."
+    },
+    "banner": {
+      "open": "Open offline notes",
+      "offline": "You are offline. Notes modified recently can still be opened and edited in offline mode.",
+      "offline_no_copies": "You are offline. Changes will be saved when the connection is back."
+    },
+    "settings": {
+      "card": "Offline notes",
+      "help": "Keep the notes you modified recently in your browser, to open and edit them without a network.",
+      "badge": "Last {{days}} days",
+      "description": "The notes you modified in the last days are kept in the browsers where you use Poznote, so they can be opened and edited without a network. Changes made offline are sent as soon as the connection is back. 0 keeps nothing offline.",
+      "unit": "days",
+      "warning": "Signing out removes the offline notes from the browser. On a shared computer, sign out when you leave.",
+      "device_status": "In this browser: {{count}} notes available offline, updated {{date}}.",
+      "device_none": "Nothing is kept in this browser yet: open your notes once and they will be.",
+      "device_unsupported": "This browser cannot keep notes offline (it needs a secure HTTPS connection)."
+    }
   }
 }

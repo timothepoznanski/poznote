@@ -374,6 +374,15 @@ function poznoteCssManifest(): array
             '@icon-sidebar',
             '@theme',
         ],
+        // The page the service worker serves without a network (offline.php)
+        'offline' => [
+            'css/fonts.css',
+            'css/lucide.css',
+            '@components',
+            '@theme',
+            'css/markdown.css',
+            'css/offline.css',
+        ],
         'public_folder' => [
             'css/lucide.css',
             '@components',

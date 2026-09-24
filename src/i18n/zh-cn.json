@@ -5080,5 +5080,117 @@
   },
   "focus_mode": {
     "button": "专注模式"
+  },
+  "offline": {
+    "page_title": "Poznote（离线）",
+    "lock_hint": "锁定离线笔记",
+    "unsupported": "此浏览器无法离线保存笔记。",
+    "status": {
+      "offline": "离线",
+      "online": "在线",
+      "syncing": "正在同步…",
+      "pending_one": "1 项更改待发送",
+      "pending_other": "{{count}} 项更改待发送"
+    },
+    "signin": {
+      "intro": "您当前处于离线状态。登录以打开保存在此设备上的笔记。",
+      "username": "用户名或邮箱",
+      "password": "密码",
+      "submit": "离线登录",
+      "checking": "正在验证…",
+      "unknown_account": "此账户的笔记未保存在此设备上。",
+      "wrong_password": "密码错误。请使用您上次在此设备上登录时的密码。",
+      "continue_intro": "您在此设备上仍处于登录状态，因此无需密码即可打开最近的笔记。",
+      "continue": "以 {{name}} 身份继续",
+      "retry": "尝试重新连接"
+    },
+    "empty": {
+      "title": "没有可离线使用的笔记",
+      "text": "此设备上还没有保存任何笔记。请连接网络并打开一次 Poznote：最近几天修改过的笔记随后即可离线使用。"
+    },
+    "list": {
+      "label": "笔记",
+      "search": "搜索笔记",
+      "all_workspaces": "所有工作区",
+      "available": "可离线使用",
+      "other": "其他笔记",
+      "other_hint": "不可离线使用",
+      "more": "还有 {{count}} 条笔记，请使用搜索查找",
+      "no_results": "没有符合搜索条件的笔记。",
+      "empty": "此工作区中没有笔记。",
+      "untitled": "无标题",
+      "not_synced": "尚未同步"
+    },
+    "new": {
+      "button": "新建笔记",
+      "note": "笔记",
+      "markdown": "Markdown 笔记",
+      "tasklist": "任务列表",
+      "default_title": "新笔记"
+    },
+    "note": {
+      "placeholder": "选择一条笔记以打开。",
+      "back": "返回列表",
+      "title_placeholder": "标题",
+      "content": "笔记内容",
+      "modified": "修改于 {{date}}",
+      "saved_locally": "已保存在此设备上。恢复联网后将发送到服务器。",
+      "push_error": "尚未发送：{{error}}",
+      "edit": "编辑",
+      "preview": "预览"
+    },
+    "toolbar": {
+      "bold": "加粗",
+      "italic": "斜体",
+      "underline": "下划线",
+      "strikethrough": "删除线",
+      "heading": "标题",
+      "bullet_list": "无序列表",
+      "numbered_list": "有序列表"
+    },
+    "tasks": {
+      "add_placeholder": "输入任务并按回车",
+      "delete": "删除任务",
+      "empty": "暂无任务。"
+    },
+    "unavailable": {
+      "text": "此设备上只保存最近 {{days}} 天内修改过的笔记。恢复联网后即可打开此笔记。",
+      "text_generic": "此笔记未保存在此设备上。恢复联网后即可打开。",
+      "unsupported_type": "此类笔记（例如绘图）无法离线打开。恢复联网后即可打开。"
+    },
+    "online": {
+      "back": "您已恢复联网。",
+      "synced": "您已恢复联网，您的更改已同步。",
+      "return": "返回 Poznote",
+      "open": "打开 Poznote",
+      "sign_in_needed": "您已恢复联网。请登录以发送离线时所做的更改。",
+      "sign_in": "登录",
+      "wrong_account": "您已恢复联网，但浏览器当前登录的是另一个账户。请以 {{name}} 身份打开 Poznote 以发送离线时所做的更改。",
+      "push_failed": "部分更改暂时无法发送（{{error}}）。它们仍保存在此设备上。"
+    },
+    "sync": {
+      "copy_title": "{{title}}（离线副本）",
+      "conflict_copy": "您离线期间，“{{title}}”在其他地方也被修改了。您的版本已另存为“{{copy}}”。",
+      "recreated": "您离线期间，“{{title}}”已在其他地方被删除。您的版本已另存为新笔记。",
+      "push_failed": "您对“{{title}}”的离线更改暂时无法保存（{{error}}）。稍后将重新发送。",
+      "synced_one": "1 条离线修改的笔记已同步。",
+      "synced_other": "{{count}} 条离线修改的笔记已同步。"
+    },
+    "banner": {
+      "open": "打开离线笔记",
+      "offline": "您当前处于离线状态。最近修改的笔记仍可在离线模式下打开和编辑。",
+      "offline_no_copies": "您当前处于离线状态。恢复连接后将保存更改。"
+    },
+    "settings": {
+      "card": "离线笔记",
+      "help": "在浏览器中保存最近修改的笔记，以便在没有网络时打开和编辑。",
+      "badge": "最近 {{days}} 天",
+      "description": "最近几天修改过的笔记会保存在您使用 Poznote 的浏览器中，以便在没有网络时打开和编辑。离线时所做的更改会在恢复连接后立即发送。设为 0 则不离线保存任何内容。",
+      "unit": "天",
+      "warning": "退出登录会从浏览器中删除离线笔记。在共用电脑上，离开时请退出登录。",
+      "device_status": "此浏览器中：{{count}} 条笔记可离线使用，更新于 {{date}}。",
+      "device_none": "此浏览器中尚未保存任何内容：打开一次您的笔记即可保存。",
+      "device_unsupported": "此浏览器无法离线保存笔记（需要安全的 HTTPS 连接）。"
+    }
   }
 }

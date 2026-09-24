@@ -110,6 +110,7 @@ require_once __DIR__ . '/../../../api/v1/controllers/GraphController.php';
 require_once __DIR__ . '/../../../api/v1/controllers/SnapshotsController.php';
 require_once __DIR__ . '/../../../api/v1/controllers/RemindersController.php';
 require_once __DIR__ . '/../../../api/v1/controllers/TasksController.php';
+require_once __DIR__ . '/../../../api/v1/controllers/OfflineController.php';
 
 /**
  * Simple Router class for handling RESTful routes
@@ -257,6 +258,7 @@ $graphController = new GraphController($con);
 $snapshotsController = new SnapshotsController($con);
 $remindersController = new RemindersController($con);
 $tasksController = new TasksController($con);
+$offlineController = new OfflineController($con, $notesController);
 
 // ======================
 // Notes Routes
@@ -332,6 +334,15 @@ $router->get('/notes/{id}', function($params) use ($notesController) {
 // Change-detection probe for the web UI (sidebar tree + note version tokens)
 $router->get('/changes', function($params) use ($notesController) {
     $notesController->changes();
+});
+
+// Offline copies kept by the browser (js/offline-sync.js)
+$router->get('/offline/manifest', function($params) use ($offlineController) {
+    $offlineController->manifest();
+});
+
+$router->get('/offline/notes', function($params) use ($offlineController) {
+    $offlineController->notes();
 });
 
 // Acquire an exclusive edit lock for a note

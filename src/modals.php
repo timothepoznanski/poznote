@@ -1117,6 +1117,25 @@ $pzNoteInfoRows = [
     </div>
 </div>
 
+<!-- Offline notes settings modal (settings-page.js) -->
+<div id="offlineNotesModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('offline.settings.card', [], 'Offline notes'); ?></h3>
+        <div class="modal-body">
+            <p><?php echo t_h('offline.settings.description', [], 'The notes you modified in the last days are kept in the browsers where you use Poznote, so they can be opened and edited without a network. Changes made offline are sent as soon as the connection is back. 0 keeps nothing offline.'); ?></p>
+            <div class="radio-options">
+                <label><input type="number" id="offlineNotesDaysInput" min="0" max="30" step="1" value="5" style="width:80px; margin:0; padding:4px 8px;"> <?php echo t_h('offline.settings.unit', [], 'days'); ?></label>
+            </div>
+            <p id="offlineNotesDeviceStatus"></p>
+            <p><?php echo t_h('offline.settings.warning', [], 'Signing out removes the offline notes from the browser. On a shared computer, sign out when you leave.'); ?></p>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="offlineNotesModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveOfflineNotesModalBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Language selection modal -->
 <div id="languageModal" class="modal">
     <div class="modal-content">

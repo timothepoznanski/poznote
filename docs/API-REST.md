@@ -13,6 +13,7 @@ Poznote provides a comprehensive RESTful API v1 for programmatic access to notes
 - [Notes](#notes)
 - [Note Locks](#note-locks)
 - [Change Detection](#change-detection)
+- [Offline Copies](#offline-copies)
 - [Snapshots](#snapshots)
 - [Tasks](#tasks)
 - [Reminders](#reminders)
@@ -878,6 +879,75 @@ curl -u 'username:password' -H "X-User-ID: 1" \
 ```
 
 `tree_version` covers the workspace list, the folders and the note rows of the workspace (titles, folder, icons, order, tags, update time, trash state...). A note `version` covers its title, content, tags, folder, attachments and display attributes. `content_version` is the same token `GET /notes/{id}` and `PATCH /notes/{id}` return, so it can be sent back as `if_version` (see [Update Note](#update-note)); the web UI autosave does exactly that, so a save never silently overwrites an edit made elsewhere.
+
+## Offline Copies
+
+The web UI keeps the notes modified recently in the browser (IndexedDB) so they can be opened and edited without a network, and sends the changes made offline back through [Update Note](#update-note) and [Create Note](#create-note) once the connection is back. These two endpoints feed that copy. How many days of notes are kept is the `offline_notes_days` user setting (default `5`, `0` turns offline copies off, maximum `30`). Only the account's owner gets them: an account opened through a grant or a workspace shared with the session answers `403` with `"code": "offline_unavailable"`.
+
+### Get Offline Manifest
+
+```
+GET /offline/manifest
+```
+
+Returns the account's note list (metadata only, for the offline sidebar) and flags the notes kept offline: the most recently modified ones of the last `days` days (at most `max_notes`), of type `note`, `markdown` or `tasklist`. Those carry the same `version` token as [Get Note](#get-note), usable as `if_version`. The response has an `ETag`: send it back as `If-None-Match` to get `304 Not Modified` while nothing changed.
+
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  "https://your-poznote-instance.com/api/v1/offline/manifest"
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "user": { "id": 1, "username": "alice", "email": "alice@example.com", "display_name": "Alice" },
+  "days": 5,
+  "max_notes": 300,
+  "workspaces": ["Poznote"],
+  "folders": [{ "id": 3, "name": "Lectures", "parent_id": null, "workspace": "Poznote" }],
+  "notes": [
+    { "id": 42, "heading": "Physics", "type": "markdown", "workspace": "Poznote", "folder_id": 3, "updated": "2026-09-23 14:02:11", "offline": 1, "version": "8b03f2cfdfd041732b3534f0cddbb3e2" },
+    { "id": 7, "heading": "Old notes", "type": "note", "workspace": "Poznote", "folder_id": null, "updated": "2026-05-02 09:30:00" }
+  ]
+}
+```
+
+### Get Offline Notes
+
+```
+GET /offline/notes?ids={id,id,...}
+```
+
+Full content of up to 50 notes (not trashed), with their version token and the id, type and size of their attachments.
+
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  "https://your-poznote-instance.com/api/v1/offline/notes?ids=42,57"
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "notes": [
+    {
+      "id": 42,
+      "heading": "Physics",
+      "type": "markdown",
+      "workspace": "Poznote",
+      "folder_id": 3,
+      "tags": "school",
+      "updated": "2026-09-23 14:02:11",
+      "version": "8b03f2cfdfd041732b3534f0cddbb3e2",
+      "attachments": [{ "id": "69f45110e619f", "file_type": "image/png", "file_size": 350386 }],
+      "content": "# Physics\n..."
+    }
+  ]
+}
+```
 
 ## Snapshots
 
@@ -3533,6 +3603,12 @@ curl http://YOUR_SERVER/api_health.php
 | `GET` | `/notes/{id}/lock` | Lock status |
 | `POST` | `/notes/{id}/lock/heartbeat` | Refresh lock |
 | `POST` | `/notes/{id}/lock/release` | Release lock |
+
+### Offline Copies
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/offline/manifest` | Note list and versions of the notes kept offline |
+| `GET` | `/offline/notes?ids=` | Full content of up to 50 notes |
 
 ### Snapshots
 | Method | Endpoint | Description |

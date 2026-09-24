@@ -180,6 +180,12 @@ function setupPageUnloadWarning() {
                 }
             }
 
+            // Leaving for the offline page (js/offline-sync.js): what is on
+            // screen was just written to the draft that page opens.
+            if (window.__poznoteLeavingForOfflinePage) {
+                return;
+            }
+
             // Show browser warning
             const message = tr(
                 'autosave.beforeunload_warning',

@@ -127,6 +127,7 @@
             'note_age_filter_days',
             'snapshots_keep_count',
             'snapshots_safety_keep_count',
+            'offline_notes_days',
             'tasklist_insert_order',
             'diary_default_note_type',
             'diary_date_format',
@@ -886,6 +887,72 @@
                 if (safetyInput) safetyInput.value = String(getSafetySnapshotsKeepCount(safetyValue));
                 modal.style.display = 'flex';
             });
+        });
+    }
+
+    // Offline notes (js/offline-sync.js): days of recently modified notes kept
+    // in the browser, 5 when never set, 0 = none.
+    var OFFLINE_NOTES_DEFAULT_DAYS = 5;
+    var OFFLINE_NOTES_MAX_DAYS = 30;
+
+    function getOfflineNotesDays(value) {
+        if (value === null || value === undefined || String(value).trim() === '') {
+            return OFFLINE_NOTES_DEFAULT_DAYS;
+        }
+        var days = parseInt(value, 10);
+        return (days >= 0 && days <= OFFLINE_NOTES_MAX_DAYS) ? days : OFFLINE_NOTES_DEFAULT_DAYS;
+    }
+
+    function refreshOfflineNotesBadge() {
+        getSetting('offline_notes_days', function (value) {
+            var badge = document.getElementById('offline-notes-badge');
+            if (!badge) return;
+            var days = getOfflineNotesDays(value);
+            badge.textContent = days > 0
+                ? tr('offline.settings.badge', { days: days }, 'Last ' + days + ' days')
+                : tr('common.disabled', {}, 'Disabled');
+            badge.className = 'setting-status ' + (days > 0 ? 'enabled' : 'disabled');
+        });
+    }
+
+    // What this very browser holds, read from IndexedDB (js/offline-store.js).
+    function refreshOfflineNotesDeviceStatus() {
+        var status = document.getElementById('offlineNotesDeviceStatus');
+        if (!status) return;
+        var store = window.PoznoteOffline;
+        if (!store || !store.isSupported()) {
+            status.textContent = tr('offline.settings.device_unsupported', {}, 'This browser cannot keep notes offline (it needs a secure HTTPS connection).');
+            return;
+        }
+        var accountId = Number((document.cookie.match(/(?:^|;\s*)poznote_account=(\d+)/) || [])[1] || 0);
+        if (!accountId) {
+            status.textContent = '';
+            return;
+        }
+        Promise.all([store.getAccount(accountId), store.getNotes(accountId)]).then(function (both) {
+            var account = both[0];
+            var count = (both[1] || []).length;
+            if (!account || !account.lastSyncAt) {
+                status.textContent = tr('offline.settings.device_none', {}, 'Nothing is kept in this browser yet: open your notes once and they will be.');
+                return;
+            }
+            status.textContent = tr('offline.settings.device_status', {
+                count: count,
+                date: new Date(account.lastSyncAt).toLocaleString()
+            }, 'In this browser: ' + count + ' notes available offline, updated ' + new Date(account.lastSyncAt).toLocaleString() + '.');
+        }).catch(function () {
+            status.textContent = '';
+        });
+    }
+
+    function openOfflineNotesModal() {
+        var modal = document.getElementById('offlineNotesModal');
+        if (!modal) return;
+        getSetting('offline_notes_days', function (value) {
+            var input = document.getElementById('offlineNotesDaysInput');
+            if (input) input.value = String(getOfflineNotesDays(value));
+            refreshOfflineNotesDeviceStatus();
+            modal.style.display = 'flex';
         });
     }
 
@@ -2491,6 +2558,11 @@
             noteAgeFilterCard.addEventListener('click', openNoteAgeFilterModal);
         }
 
+        var offlineNotesCard = document.getElementById('offline-notes-card');
+        if (offlineNotesCard) {
+            offlineNotesCard.addEventListener('click', openOfflineNotesModal);
+        }
+
         var snapshotsCard = document.getElementById('snapshots-card');
         if (snapshotsCard) {
             snapshotsCard.addEventListener('click', openSnapshotsSettingsModal);
@@ -2909,6 +2981,25 @@
                         }
                         reloadOpener();
                         refreshNoteAgeFilterBadge();
+                    } else {
+                        alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                    }
+                });
+            });
+        }
+
+        var saveOfflineNotesBtn = document.getElementById('saveOfflineNotesModalBtn');
+        if (saveOfflineNotesBtn) {
+            saveOfflineNotesBtn.addEventListener('click', function () {
+                var input = document.getElementById('offlineNotesDaysInput');
+                var raw = input ? parseInt(input.value, 10) : OFFLINE_NOTES_DEFAULT_DAYS;
+                var days = isNaN(raw) ? OFFLINE_NOTES_DEFAULT_DAYS : Math.max(0, Math.min(OFFLINE_NOTES_MAX_DAYS, raw));
+                setSetting('offline_notes_days', String(days), function (success) {
+                    if (success) {
+                        try { closeModal('offlineNotesModal'); } catch (e) {
+                            console.debug('settings-page: closeModal(offlineNotesModal) failed:', e);
+                        }
+                        refreshOfflineNotesBadge();
                     } else {
                         alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
                     }
@@ -3411,6 +3502,7 @@
             refreshMarkdownFontBadge();
             refreshNoteAgeFilterBadge();
             refreshSnapshotsBadge();
+            refreshOfflineNotesBadge();
             refreshNoteColorPaletteBadge();
             refreshTasklistInsertOrderBadge();
             refreshDiaryNoteTypeBadge();
@@ -4023,6 +4115,7 @@
             refreshMarkdownFontBadge();
             refreshNoteAgeFilterBadge();
             refreshSnapshotsBadge();
+            refreshOfflineNotesBadge();
             refreshNoteColorPaletteBadge();
             refreshTasklistInsertOrderBadge();
             refreshDiaryNoteTypeBadge();

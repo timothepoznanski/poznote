@@ -103,9 +103,10 @@ class NotesController {
     /**
      * Optimistic-concurrency token for a note. Built from the last-write
      * timestamp, the heading and a hash of the content, so two writes landing
-     * within the same second still yield distinct tokens.
+     * within the same second still yield distinct tokens. Public for
+     * OfflineController, whose copies must carry the very same token.
      */
-    private function computeNoteVersion(string $updated, string $heading, string $content): string {
+    public function computeNoteVersion(string $updated, string $heading, string $content): string {
         return md5($updated . '|' . $heading . '|' . md5($content));
     }
 
@@ -114,7 +115,7 @@ class NotesController {
      * DB entry column as fallback, tasklist resolution), so version tokens
      * computed here and in show() always agree.
      */
-    private function loadNoteContentForVersion(int $noteId, string $noteType, ?string $entryColumn): string {
+    public function loadNoteContentForVersion(int $noteId, string $noteType, ?string $entryColumn): string {
         $content = '';
         $filename = getEntryFilename($noteId, $noteType);
         if (file_exists($filename) && is_readable($filename)) {
