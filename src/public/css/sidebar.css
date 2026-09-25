@@ -220,6 +220,32 @@
     opacity: 0.8;
 }
 
+/* Notes this browser holds offline (js/offline-marks.js, only loaded when
+   the sidebar_offline_marks setting is on): a small muted mark right after
+   the title, which keeps its ellipsis. Not an action, so no hover effect.
+   Flex beats the block !important of css/folders/content.css on these rows
+   only (the class is set by the script). */
+.note-list-item > a.links_arbo_left.has-offline-mark {
+    display: flex !important;
+    align-items: center;
+}
+
+.note-list-item > a.links_arbo_left.has-offline-mark .note-title {
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+.links_arbo_left .offline-mark,
+.links_arbo_left .offline-mark:hover {
+    flex: 0 0 auto;
+    width: 10px;
+    height: 10px;
+    margin-left: 5px;
+    color: var(--pz-text-muted);
+    opacity: 0.55;
+    transform: none;
+}
+
 /* Favorite folder shortcuts inside the Favorites section */
 .favorite-folder-item .favorite-folder-icon {
     font-size: 0.95em;

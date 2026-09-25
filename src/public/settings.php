@@ -112,6 +112,7 @@ $settingsPageUserKeys = [
     'highlight_current_folder_tree',
     'folder_tree_dim_level',
     'notes_without_folders_after_folders',
+    'sidebar_offline_marks',
     'markdown_split_card_view',
     'markdown_default_view_mode',
     'markdown_colored',
@@ -892,6 +893,16 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.notes_without_folders_after', [], 'Show notes after folders'); ?></span>
                     <span id="notes-without-folders-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Offline notes marked in the tree (js/offline-marks.js) -->
+            <div class="home-card" id="sidebar-offline-marks-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.sidebar_offline_marks', [], 'Show a small icon next to the notes available offline in this browser.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-wifi-off"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.sidebar_offline_marks', [], 'Show offline notes'); ?></span>
+                    <span id="sidebar-offline-marks-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
 

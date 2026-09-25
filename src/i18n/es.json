@@ -546,7 +546,8 @@
       "s3_backup": "Sube archivos de copia de seguridad completos a un bucket compatible con S3, manualmente o según una programación.",
       "highlight_current_folder_tree": "Atenuar, tanto como quieras, las notas y carpetas que están fuera de la jerarquía de carpetas en la que trabajas.",
       "snapshots": "Elija cuántas instantáneas automáticas diarias y cuántas instantáneas de seguridad (antes de una edición de IA o MCP) se conservan por nota.",
-      "stt": "Configura el servidor de reconocimiento de voz que se usa para dictar notas y transcribir adjuntos de audio."
+      "stt": "Configura el servidor de reconocimiento de voz que se usa para dictar notas y transcribir adjuntos de audio.",
+      "sidebar_offline_marks": "Muestra un pequeño icono junto a las notas disponibles sin conexión en este navegador."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "En el móvil, la barra de herramientas sobre el teclado tiene un botón + que abre el mismo menú, sea cual sea este ajuste."
@@ -873,7 +874,8 @@
       "slash_menu_trigger": "Atajo del menú de comandos (ordenador)",
       "slash_menu_trigger_mobile": "Atajo del menú de comandos (móvil)",
       "snapshots": "Instantáneas",
-      "show_note_icons": "Mostrar iconos de las notas"
+      "show_note_icons": "Mostrar iconos de las notas",
+      "sidebar_offline_marks": "Mostrar notas sin conexión"
     },
     "badges": {
       "font_size_default": "predeterminado ({{size}}px)",

@@ -222,7 +222,8 @@
       "s3_backup": "Upload complete backup archives to an S3-compatible bucket, manually or on a schedule.",
       "highlight_current_folder_tree": "Dim the notes and folders that sit outside the folder hierarchy you are working in, as much or as little as you like.",
       "snapshots": "Choose how many automatic daily snapshots and how many safety snapshots (before an AI or MCP edit) are kept per note.",
-      "stt": "Configure the speech-to-text server used to dictate notes and transcribe audio attachments."
+      "stt": "Configure the speech-to-text server used to dictate notes and transcribe audio attachments.",
+      "sidebar_offline_marks": "Show a small icon next to the notes available offline in this browser."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "On mobile, the toolbar above the keyboard has a + button that opens the same menu, whatever this is set to."
@@ -512,7 +513,8 @@
       "spellcheck_html_notes": "Spell check",
       "slash_menu_trigger": "Command menu shortcut (computer)",
       "slash_menu_trigger_mobile": "Command menu shortcut (mobile)",
-      "snapshots": "Snapshots"
+      "snapshots": "Snapshots",
+      "sidebar_offline_marks": "Show offline notes"
     },
     "badges": {
       "font_size_default": "default ({{size}}px)",

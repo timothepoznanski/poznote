@@ -101,6 +101,7 @@
             'highlight_current_folder_tree',
             'folder_tree_dim_level',
             'notes_without_folders_after_folders',
+            'sidebar_offline_marks',
             'markdown_split_card_view',
             'markdown_default_view_mode',
             'markdown_colored',
@@ -2820,6 +2821,7 @@
         // (panel:note-created-date, panel:note-icons, panel:folder-note-count).
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
+        setupToggleCard('sidebar-offline-marks-card', 'sidebar-offline-marks-status', 'sidebar_offline_marks', false);
         setupToggleCard('markdown-split-card-view-card', 'markdown-split-card-view-status', 'markdown_split_card_view', false, true);
         refreshMarkdownColoredBadge();
         setupToggleCard('code-wrap-card', 'code-wrap-status', 'code_block_word_wrap', false, true);

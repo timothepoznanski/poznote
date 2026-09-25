@@ -1,6 +1,7 @@
 /**
  * The notes and folders this browser keeps offline, marked on the pages that
- * list them (notes_manager.php, list_folders.php): a note it holds a copy of,
+ * list them (notes_manager.php, list_folders.php, and the notes tree of
+ * index.php when the sidebar_offline_marks setting is on): a note it holds a copy of,
  * a folder kept whole ("Keep offline", or under one). Read from the copies
  * of js/offline-store.js, so a mark says what opens here without a network,
  * as the "Available offline in this browser" line of a note's menu does.
@@ -33,6 +34,14 @@
     var folders = {};
 
     function markAll() {
+        // Notes tree of index.php (favorites included): after the title,
+        // inside the link, so a click on the mark opens the note
+        document.querySelectorAll('#left_col .note-list-item > a.links_arbo_left[data-note-id]').forEach(function (link) {
+            if (notes[link.getAttribute('data-note-id')] && !link.querySelector('.offline-mark')) {
+                link.appendChild(makeMark(NOTE_TITLE));
+                link.classList.add('has-offline-mark');
+            }
+        });
         // Notes manager: note rows, and the folder of each group
         document.querySelectorAll('.nm-note-row[data-note-id]').forEach(function (row) {
             var wrap = row.querySelector('.nm-note-title-wrap');
@@ -80,6 +89,7 @@
                 ((all[2] && all[2].keptFolders) || []).forEach(function (id) { folders[String(id)] = true; });
             }
             document.querySelectorAll('.offline-mark').forEach(function (mark) { mark.remove(); });
+            document.querySelectorAll('.has-offline-mark').forEach(function (link) { link.classList.remove('has-offline-mark'); });
             markAll();
         }).catch(function (e) {
             console.debug('offline-marks: the offline copies could not be read:', e);
@@ -88,6 +98,9 @@
 
     function start() {
         refresh().then(function () {
+            // index.php redraws only its notes tree (the editor next to it
+            // changes on every key)
+            var watched = document.getElementById('left_col') || document.body;
             var pending = false;
             new MutationObserver(function () {
                 if (pending) {
@@ -98,7 +111,7 @@
                     pending = false;
                     markAll();
                 });
-            }).observe(document.body, { childList: true, subtree: true });
+            }).observe(watched, { childList: true, subtree: true });
         });
     }
 

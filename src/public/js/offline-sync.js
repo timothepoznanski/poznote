@@ -634,6 +634,14 @@
         });
     }
 
+    // The offline marks of the page (js/offline-marks.js, when it is loaded)
+    // follow the copies: a note saved or synced gets its mark at once.
+    function refreshMarks() {
+        if (typeof window.poznoteOfflineMarksRefresh === 'function') {
+            window.poznoteOfflineMarksRefresh();
+        }
+    }
+
     function syncNow(force) {
         if (leaving) {
             return Promise.resolve();
@@ -651,6 +659,7 @@
             })
             .then(function () {
                 running = null;
+                refreshMarks();
             });
         return running;
     }
@@ -895,7 +904,7 @@
                         }) : null;
                     });
             });
-        }).catch(function (e) {
+        }).then(refreshMarks, function (e) {
             console.debug('offline-sync: refreshing the copy of a saved note failed:', e);
         });
     }

@@ -545,7 +545,8 @@
       "s3_backup": "将完整备份归档上传到 S3 兼容的存储桶,可手动或按计划执行。",
       "highlight_current_folder_tree": "按你喜欢的程度淡化当前所在文件夹层级之外的笔记和文件夹。",
       "snapshots": "选择每条笔记保留多少个每日自动快照，以及多少个安全快照（AI 或 MCP 编辑前）。",
-      "stt": "配置用于听写笔记和转录音频附件的语音识别服务器。"
+      "stt": "配置用于听写笔记和转录音频附件的语音识别服务器。",
+      "sidebar_offline_marks": "在此浏览器中可离线使用的笔记旁显示一个小图标。"
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "在移动设备上，键盘上方的工具栏有一个 + 按钮，无论此设置为何，它都会打开同一个菜单。"
@@ -872,7 +873,8 @@
       "slash_menu_trigger": "命令菜单快捷键（电脑）",
       "slash_menu_trigger_mobile": "命令菜单快捷键（移动设备）",
       "snapshots": "快照",
-      "show_note_icons": "显示笔记图标"
+      "show_note_icons": "显示笔记图标",
+      "sidebar_offline_marks": "显示离线笔记"
     },
     "badges": {
       "font_size_default": "默认 ({{size}}px)",

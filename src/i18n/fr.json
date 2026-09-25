@@ -545,7 +545,8 @@
       "s3_backup": "Envoie des archives de sauvegarde complètes vers un bucket compatible S3, manuellement ou selon une planification.",
       "highlight_current_folder_tree": "Estomper, autant que vous le souhaitez, les notes et les dossiers situés en dehors de la hiérarchie de dossiers dans laquelle vous travaillez.",
       "snapshots": "Choisissez combien de snapshots automatiques quotidiens et combien de snapshots de sécurité (avant une modification IA ou MCP) sont conservés par note.",
-      "stt": "Configurer le serveur de reconnaissance vocale utilisé pour dicter des notes et transcrire les pièces jointes audio."
+      "stt": "Configurer le serveur de reconnaissance vocale utilisé pour dicter des notes et transcrire les pièces jointes audio.",
+      "sidebar_offline_marks": "Affiche une petite icône à côté des notes disponibles hors ligne dans ce navigateur."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Sur mobile, la barre d'outils au-dessus du clavier a un bouton + qui ouvre le même menu, quel que soit ce réglage."
@@ -873,7 +874,8 @@
       "spellcheck_html_notes": "Vérification orthographique",
       "slash_menu_trigger": "Raccourci du menu de commandes (ordinateur)",
       "slash_menu_trigger_mobile": "Raccourci du menu de commandes (mobile)",
-      "snapshots": "Snapshots"
+      "snapshots": "Snapshots",
+      "sidebar_offline_marks": "Afficher les notes hors ligne"
     },
     "badges": {
       "font_size_default": "par défaut ({{size}}px)",

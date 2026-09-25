@@ -276,11 +276,12 @@ $settings = [
     'spellcheck_html_notes' => '0',
     'highlight_current_folder_tree' => '0',
     'folder_tree_dim_level' => '',
-    'markdown_default_view_mode' => 'preview'
+    'markdown_default_view_mode' => 'preview',
+    'sidebar_offline_marks' => '0'
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level', 'markdown_default_view_mode')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level', 'markdown_default_view_mode', 'sidebar_offline_marks')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -981,6 +982,12 @@ window.NOTIFICATIONS_TXT = {
 };
 </script>
 <script defer src="index_js.php?group=app&v=<?php echo $v; ?>"></script>
+<?php if (poznoteSettingEnabled($settings['sidebar_offline_marks'], false)): ?>
+<?php // Marks the notes of the tree this browser holds offline (after the app bundle, which loads offline-store.js) ?>
+<script src="<?php echo poznoteAsset('js/offline-marks.js'); ?>" defer
+    data-note-title="<?php echo t_h('notes_list.note_actions.available_offline', [], 'Available offline in this browser'); ?>"
+    data-folder-title="<?php echo t_h('notes_list.folder_actions.kept_offline', [], 'Kept offline in this browser'); ?>"></script>
+<?php endif; ?>
 
 <?php if ($note && is_numeric($note)): ?>
 <!-- Data for draft check (used by index-events.js) -->
