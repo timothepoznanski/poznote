@@ -1,7 +1,8 @@
 /**
  * The notes and folders this browser keeps offline, marked on the pages that
  * list them (notes_manager.php, list_folders.php, and the notes tree of
- * index.php, folders included, when the sidebar_offline_marks setting is on):
+ * index.php, folders included, while the sidebar_offline_marks setting is on,
+ * which the wifi-off button of the tree toggles without a reload):
  * a note it holds a copy of, a folder kept whole ("Keep offline", or under one). Read from the copies
  * of js/offline-store.js, so a mark says what opens here without a network,
  * as the "Available offline in this browser" line of a note's menu does.
@@ -15,6 +16,9 @@
     var script = document.currentScript;
     var NOTE_TITLE = (script && script.getAttribute('data-note-title')) || 'Available offline in this browser';
     var FOLDER_TITLE = (script && script.getAttribute('data-folder-title')) || 'Kept offline in this browser';
+    // The dots of index.php's tree (sidebar_offline_marks); the other pages
+    // always mark their lists
+    var sidebarShown = !script || script.getAttribute('data-sidebar') !== 'off';
 
     function readCookie(name) {
         var match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
@@ -35,10 +39,21 @@
     var folders = {};
 
     function markAll() {
-        // Notes tree of index.php (favorites included): after the title,
+        if (sidebarShown) {
+            markTree();
+        }
+        markPages();
+    }
+
+    // The Favorites section of the tree (notes_list.php): its rows repeat
+    // notes and folders shown further down, which carry the dot there
+    var FAVORITES_SECTION = '.folder-header.system-folder[data-folder="Favorites"]';
+
+    function markTree() {
+        // Notes tree of index.php, Favorites left out: after the title,
         // inside the link, so a click on the mark opens the note
         document.querySelectorAll('#left_col .note-list-item > a.links_arbo_left[data-note-id]').forEach(function (link) {
-            if (notes[link.getAttribute('data-note-id')] && !link.querySelector('.offline-mark')) {
+            if (notes[link.getAttribute('data-note-id')] && !link.querySelector('.offline-mark') && !link.closest(FAVORITES_SECTION)) {
                 link.appendChild(makeMark(NOTE_TITLE));
                 link.classList.add('has-offline-mark');
             }
@@ -51,13 +66,9 @@
                 name.insertAdjacentElement('afterend', makeMark(FOLDER_TITLE));
             }
         });
-        // Folder shortcuts of the Favorites section, like a note
-        document.querySelectorAll('#left_col .note-list-item > a.favorite-folder-link[data-folder-id]').forEach(function (link) {
-            if (folders[link.getAttribute('data-folder-id')] && !link.querySelector('.offline-mark')) {
-                link.appendChild(makeMark(FOLDER_TITLE));
-                link.classList.add('has-offline-mark');
-            }
-        });
+    }
+
+    function markPages() {
         // Notes manager: note rows, and the folder of each group
         document.querySelectorAll('.nm-note-row[data-note-id]').forEach(function (row) {
             var wrap = row.querySelector('.nm-note-title-wrap');
@@ -132,6 +143,57 @@
     }
 
     window.poznoteOfflineMarksRefresh = refresh;
+
+    // The wifi-off button of the tree (index.php): shows or hides the dots at
+    // once, then saves the setting; a failure puts the previous state back.
+    function paintDotsButton(button, shown) {
+        var title = button.getAttribute(shown ? 'data-title-hide' : 'data-title-show') || '';
+        button.classList.toggle('is-on', shown);
+        button.setAttribute('aria-pressed', shown ? 'true' : 'false');
+        button.setAttribute('title', title);
+        button.setAttribute('aria-label', title);
+    }
+
+    function setSidebarShown(shown) {
+        sidebarShown = shown;
+        document.querySelectorAll('[data-action="toggle-offline-dots"]').forEach(function (button) {
+            paintDotsButton(button, shown);
+        });
+        return refresh();
+    }
+
+    var savingDots = false;
+    document.addEventListener('click', function (event) {
+        var button = event.target && typeof event.target.closest === 'function'
+            ? event.target.closest('[data-action="toggle-offline-dots"]')
+            : null;
+        if (!button || savingDots) {
+            return;
+        }
+        event.preventDefault();
+        var previous = sidebarShown;
+        savingDots = true;
+        setSidebarShown(!previous);
+        fetch('/api/v1/settings/sidebar_offline_marks', {
+            method: 'PUT',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ value: previous ? '0' : '1' })
+        })
+            .then(function (response) { return response.json(); })
+            .then(function (result) {
+                if (!result || !result.success) {
+                    throw new Error('save rejected');
+                }
+            })
+            .catch(function (e) {
+                console.error('offline-marks: the offline dots setting could not be saved', e);
+                setSidebarShown(previous);
+            })
+            .then(function () {
+                savingDots = false;
+            });
+    });
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', start);

@@ -195,6 +195,35 @@
     font-size: 0.75em !important;
 }
 
+/* Offline dots toggle (index.php, js/offline-marks.js): two flat states,
+   accent while the dots show, the grey of its neighbours while hidden, and no
+   hover look, so the pointer resting on it after a click never disguises the
+   new state (as the search scope icons, css/searchbars.css). The icon's :hover
+   is restated because icons.css paints and scales every lucide icon on hover. */
+.notes-list-actions .offline-dots-toggle,
+.notes-list-actions .offline-dots-toggle:hover,
+.notes-list-actions .offline-dots-toggle:active {
+    background: transparent;
+}
+
+.notes-list-actions .offline-dots-toggle.is-on,
+.notes-list-actions .offline-dots-toggle.is-on:hover,
+.notes-list-actions .offline-dots-toggle.is-on:active {
+    color: var(--pz-accent) !important;
+}
+
+.notes-list-actions .offline-dots-toggle i[class*="lucide-"],
+.notes-list-actions .offline-dots-toggle i[class*="lucide-"]:hover {
+    color: inherit;
+    transform: none;
+}
+
+html[data-theme='dark'] .notes-list-actions .offline-dots-toggle.is-on,
+html[data-theme='dark'] .notes-list-actions .offline-dots-toggle.is-on:hover,
+html[data-theme='dark'] .notes-list-actions .offline-dots-toggle.is-on:active {
+    color: var(--pz-accent-text-hover) !important;
+}
+
 /* Make the unified search placeholder French when shown in left column */
 
 /* Folder header adjustments to match visual spacing */
@@ -248,7 +277,7 @@
     opacity: 0.8;
 }
 
-/* Notes and folders this browser holds offline (js/offline-marks.js, only loaded when
+/* Notes and folders this browser holds offline (js/offline-marks.js, while
    the sidebar_offline_marks setting is on): a small accent dot right after
    the title, which keeps its ellipsis. Not an action, so no hover effect.
    Flex beats the block !important of css/folders/content.css on these rows

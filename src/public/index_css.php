@@ -102,6 +102,7 @@ function poznoteGetIndexCssGroups(): array {
             'css/excalidraw-unified.css',
             'css/note-reference.css',
             'css/attachment-move.css',
+            'css/template-picker.css',
             'css/backlinks.css',
             'css/search-replace.css',
             'css/folder-icon-modal.css',

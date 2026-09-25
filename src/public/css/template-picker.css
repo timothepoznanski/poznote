@@ -1,0 +1,93 @@
+/* ============================================
+   Template picker
+   The dialog the "/template" slash command opens (js/template-picker.js).
+   ============================================ */
+
+.template-picker-content {
+    max-width: 520px;
+}
+
+.template-picker-search {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.template-picker-list {
+    max-height: 360px;
+    overflow-y: auto;
+    border: 1px solid var(--pz-border-light);
+    border-radius: var(--pz-radius-lg);
+}
+
+.template-picker-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--pz-border-light);
+}
+
+.template-picker-item:last-child {
+    border-bottom: none;
+}
+
+/* The pointer and the arrow keys move the same highlight */
+.template-picker-item.is-active {
+    background-color: var(--pz-surface);
+}
+
+.template-picker-item-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.template-picker-item-content {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    flex: 1;
+}
+
+.template-picker-item-title {
+    font-size: 0.9rem;
+    font-weight: var(--pz-weight-medium);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.template-picker-item-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    font-size: 0.78rem;
+    color: var(--pz-text-muted);
+}
+
+.template-picker-item-tag {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+}
+
+.template-picker-item-tag .lucide {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+}
+
+.template-picker-empty {
+    padding: 22px;
+    text-align: center;
+    color: var(--pz-text-muted);
+    font-size: 0.88rem;
+}
+
+.template-picker-empty-hint {
+    margin-top: 6px;
+    font-size: 0.8rem;
+}

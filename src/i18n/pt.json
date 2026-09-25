@@ -926,7 +926,9 @@
       "empty": "Sem notas",
       "open": "Abrir esta conta",
       "view_here": "Mostrar num separador, sem mudar de conta"
-    }
+    },
+    "show_offline_dots": "Mostrar os pontos offline",
+    "hide_offline_dots": "Ocultar os pontos offline"
   },
   "home": {
     "title": "Painel",
@@ -2154,6 +2156,10 @@
     "template_none": "Ainda não há modelos",
     "template_none_hint": "Coloque notas numa pasta ou num espaço de trabalho chamado \"Modelos\"",
     "template_insert_failed": "Não foi possível inserir o modelo",
+    "template_picker_title": "Inserir um modelo",
+    "template_filter_placeholder": "Filtrar modelos...",
+    "template_no_match": "Nenhum modelo corresponde a este filtro",
+    "template_load_failed": "Não foi possível carregar os modelos",
     "record_audio": "Gravar áudio",
     "insert": "Inserir",
     "media": "Mídia",

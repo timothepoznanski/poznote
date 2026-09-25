@@ -926,7 +926,9 @@
       "empty": "Keine Notizen",
       "open": "Dieses Konto öffnen",
       "view_here": "In einem Tab anzeigen, ohne das Konto zu wechseln"
-    }
+    },
+    "show_offline_dots": "Offline-Punkte anzeigen",
+    "hide_offline_dots": "Offline-Punkte ausblenden"
   },
   "home": {
     "title": "Dashboard",
@@ -2154,6 +2156,10 @@
     "template_none": "Noch keine Vorlagen",
     "template_none_hint": "Lege Notizen in einen Ordner oder einen Arbeitsbereich namens „Vorlagen“",
     "template_insert_failed": "Die Vorlage konnte nicht eingefügt werden",
+    "template_picker_title": "Vorlage einfügen",
+    "template_filter_placeholder": "Vorlagen filtern...",
+    "template_no_match": "Keine Vorlage entspricht diesem Filter",
+    "template_load_failed": "Die Vorlagen konnten nicht geladen werden",
     "record_audio": "Audio aufnehmen",
     "insert": "Einfügen",
     "media": "Medien",

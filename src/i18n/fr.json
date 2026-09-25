@@ -926,7 +926,9 @@
       "empty": "Aucune note",
       "open": "Ouvrir ce compte",
       "view_here": "Afficher dans un onglet, sans changer de compte"
-    }
+    },
+    "show_offline_dots": "Afficher les points hors ligne",
+    "hide_offline_dots": "Masquer les points hors ligne"
   },
   "home": {
     "title": "Tableau de bord",
@@ -2161,6 +2163,10 @@
     "template_none": "Aucun modèle pour l'instant",
     "template_none_hint": "Placez des notes dans un dossier ou un espace de travail nommé « Modèles »",
     "template_insert_failed": "Impossible d'insérer le modèle",
+    "template_picker_title": "Insérer un modèle",
+    "template_filter_placeholder": "Filtrer les modèles...",
+    "template_no_match": "Aucun modèle ne correspond à ce filtre",
+    "template_load_failed": "Impossible de charger les modèles",
     "record_audio": "Enregistrer un audio",
     "insert": "Insérer",
     "media": "Médias",

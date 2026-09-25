@@ -725,6 +725,22 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
             . '<i class="lucide ' . htmlspecialchars(poznoteNoteSortIcon($note_list_sort_type), ENT_QUOTES) . '"></i>'
             . '</button>'
         : '';
+
+    // Offline dots of the tree (sidebar_offline_marks, the "Show offline dot"
+    // card of Settings), left of the sort button: blue while shown, grey while
+    // hidden. js/offline-marks.js saves the setting and redraws the dots.
+    // Offline copies are kept for the login's own account only.
+    $offlineDotsShown = poznoteSettingEnabled($settings['sidebar_offline_marks'], true);
+    $offlineDotsTitle = $offlineDotsShown
+        ? t_h('sidebar.hide_offline_dots', [], 'Hide offline dots')
+        : t_h('sidebar.show_offline_dots', [], 'Show offline dots');
+    $offlineDotsButton = ($canWriteAccountSettings && poznoteOfflineModeEnabled())
+        ? '<button type="button" class="sidebar-folder-toggle offline-dots-toggle' . ($offlineDotsShown ? ' is-on' : '') . '" id="sidebarOfflineDotsBtn" data-action="toggle-offline-dots" aria-pressed="' . ($offlineDotsShown ? 'true' : 'false') . '"'
+            . ' data-title-show="' . t_h('sidebar.show_offline_dots', [], 'Show offline dots') . '" data-title-hide="' . t_h('sidebar.hide_offline_dots', [], 'Hide offline dots') . '"'
+            . ' title="' . $offlineDotsTitle . '" aria-label="' . $offlineDotsTitle . '">'
+            . '<i class="lucide lucide-wifi-off"></i>'
+            . '</button>'
+        : '';
     ?>
 
     <!-- MENU RIGHT COLUMN -->	 
@@ -1005,9 +1021,11 @@ window.NOTIFICATIONS_TXT = {
 };
 </script>
 <script defer src="index_js.php?group=app&v=<?php echo $v; ?>"></script>
-<?php if (poznoteOfflineModeEnabled() && poznoteSettingEnabled($settings['sidebar_offline_marks'], true)): ?>
-<?php // Marks the notes of the tree this browser holds offline (after the app bundle, which loads offline-store.js) ?>
+<?php if (poznoteOfflineModeEnabled()): ?>
+<?php // Marks the notes of the tree this browser holds offline (after the app bundle, which loads offline-store.js);
+      // loaded while the dots are hidden too, so the sidebar button shows them at once ?>
 <script src="<?php echo poznoteAsset('js/offline-marks.js'); ?>" defer
+    data-sidebar="<?php echo poznoteSettingEnabled($settings['sidebar_offline_marks'], true) ? 'on' : 'off'; ?>"
     data-note-title="<?php echo t_h('notes_list.note_actions.available_offline', [], 'Available offline in this browser'); ?>"
     data-folder-title="<?php echo t_h('notes_list.folder_actions.kept_offline', [], 'Kept offline in this browser'); ?>"></script>
 <?php endif; ?>

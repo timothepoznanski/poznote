@@ -1661,6 +1661,10 @@
     "template_none": "No templates yet",
     "template_none_hint": "Put notes in a folder or a workspace named \"Templates\"",
     "template_insert_failed": "Could not insert the template",
+    "template_picker_title": "Insert a template",
+    "template_filter_placeholder": "Filter templates...",
+    "template_no_match": "No template matches this filter",
+    "template_load_failed": "Could not load the templates",
     "record_audio": "Record audio",
     "insert": "Insert",
     "media": "Media",
@@ -2649,7 +2653,9 @@
       "empty": "No notes",
       "open": "Open this account",
       "view_here": "Show in a tab, without switching account"
-    }
+    },
+    "show_offline_dots": "Show offline dots",
+    "hide_offline_dots": "Hide offline dots"
   },
   "home": {
     "title": "Dashboard",

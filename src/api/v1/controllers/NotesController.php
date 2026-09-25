@@ -2701,27 +2701,30 @@ class NotesController {
             $conditions = [];
             $params = [];
             if ($templateFolderIds) {
-                $conditions[] = "folder_id IN (" . implode(',', array_fill(0, count($templateFolderIds), '?')) . ")";
+                $conditions[] = "e.folder_id IN (" . implode(',', array_fill(0, count($templateFolderIds), '?')) . ")";
                 $params = array_merge($params, $templateFolderIds);
             }
             if ($templateWorkspaces) {
-                $conditions[] = "workspace IN (" . implode(',', array_fill(0, count($templateWorkspaces), '?')) . ")";
+                $conditions[] = "e.workspace IN (" . implode(',', array_fill(0, count($templateWorkspaces), '?')) . ")";
                 $params = array_merge($params, $templateWorkspaces);
             }
 
-            $sql = "SELECT id, heading, type, workspace, folder_id, icon, icon_color
-                    FROM entries
-                    WHERE trash = 0
-                    AND (type IS NULL OR type = '' OR type IN ('note', 'markdown'))
+            // The folder name labels each template in the picker
+            $sql = "SELECT e.id, e.heading, e.type, e.workspace, e.folder_id, e.icon, e.icon_color,
+                           f.name AS folder_name
+                    FROM entries e
+                    LEFT JOIN folders f ON f.id = e.folder_id
+                    WHERE e.trash = 0
+                    AND (e.type IS NULL OR e.type = '' OR e.type IN ('note', 'markdown'))
                     AND (" . implode(' OR ', $conditions) . ")";
             // A session confined to a shared workspace (auth.php) takes its
             // templates from that workspace only.
             $scopeName = function_exists('getSharedWorkspaceScopeName') ? getSharedWorkspaceScopeName() : null;
             if ($scopeName !== null) {
-                $sql .= " AND workspace = ?";
+                $sql .= " AND e.workspace = ?";
                 $params[] = $scopeName;
             }
-            $sql .= " ORDER BY heading COLLATE NOCASE, id";
+            $sql .= " ORDER BY e.heading COLLATE NOCASE, e.id";
 
             $stmt = $this->con->prepare($sql);
             $stmt->execute($params);
@@ -2734,6 +2737,7 @@ class NotesController {
                     'type' => ($row['type'] === 'markdown') ? 'markdown' : 'note',
                     'workspace' => $row['workspace'] ?? null,
                     'folder_id' => $row['folder_id'] !== null ? (int)$row['folder_id'] : null,
+                    'folder' => $row['folder_name'] ?? null,
                     'icon' => $this->normalizeNoteIcon($row['icon'] ?? null) ?? self::DEFAULT_NOTE_ICON,
                     'icon_color' => $row['icon_color'] ?? null
                 ];

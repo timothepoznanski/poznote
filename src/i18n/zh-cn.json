@@ -925,7 +925,9 @@
       "empty": "没有笔记",
       "open": "打开此账户",
       "view_here": "在标签页中显示，不切换账户"
-    }
+    },
+    "show_offline_dots": "显示离线圆点",
+    "hide_offline_dots": "隐藏离线圆点"
   },
   "home": {
     "title": "仪表盘",
@@ -2152,6 +2154,10 @@
     "template_none": "暂无模板",
     "template_none_hint": "将笔记放入名为“模板”的文件夹或工作区",
     "template_insert_failed": "无法插入模板",
+    "template_picker_title": "插入模板",
+    "template_filter_placeholder": "筛选模板...",
+    "template_no_match": "没有符合此筛选条件的模板",
+    "template_load_failed": "无法加载模板",
     "record_audio": "录音",
     "insert": "插入",
     "media": "媒体",

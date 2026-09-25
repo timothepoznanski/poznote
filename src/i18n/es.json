@@ -926,7 +926,9 @@
       "empty": "Sin notas",
       "open": "Abrir esta cuenta",
       "view_here": "Mostrar en una pestaña, sin cambiar de cuenta"
-    }
+    },
+    "show_offline_dots": "Mostrar los puntos sin conexión",
+    "hide_offline_dots": "Ocultar los puntos sin conexión"
   },
   "home": {
     "title": "Panel",
@@ -2154,6 +2156,10 @@
     "template_none": "Aún no hay plantillas",
     "template_none_hint": "Coloca notas en una carpeta o un espacio de trabajo llamado «Plantillas»",
     "template_insert_failed": "No se pudo insertar la plantilla",
+    "template_picker_title": "Insertar una plantilla",
+    "template_filter_placeholder": "Filtrar plantillas...",
+    "template_no_match": "Ninguna plantilla coincide con este filtro",
+    "template_load_failed": "No se pudieron cargar las plantillas",
     "record_audio": "Grabar audio",
     "insert": "Insertar",
     "media": "Multimedia",

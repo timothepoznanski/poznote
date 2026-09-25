@@ -583,11 +583,11 @@ if ($favoritesFolder && ($favorites_count > 0 || (!empty($favorite_folders) && !
     }
 }
 
-// Sort mode and "Expand all folders", built by index.php, at the right end of a
-// thin rule between Favorites and the rest of the tree (at the top of the tree
-// when there are no favorites). With account rows the expand button heads the
-// active account's row instead.
-$notesListActions = ($noteSortButton ?? '') . (empty($showAccountRows) ? $expandFoldersButton : '');
+// Offline dots, sort mode and "Expand all folders", built by index.php, at the
+// right end of a thin rule between Favorites and the rest of the tree (at the
+// top of the tree when there are no favorites). With account rows the expand
+// button heads the active account's row instead.
+$notesListActions = ($offlineDotsButton ?? '') . ($noteSortButton ?? '') . (empty($showAccountRows) ? $expandFoldersButton : '');
 if ($notesListActions !== '') {
     echo '<div class="notes-list-actions">' . $notesListActions . '</div>';
 }

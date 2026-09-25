@@ -76,25 +76,34 @@
         }
     }
 
+    // Same toast as Ctrl+S and Ctrl+Alt+S: accent box at the top right, check
+    // mark, one at a time.
     function showToast(text) {
-        var toast = document.getElementById('note-sort-toast');
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.id = 'note-sort-toast';
-            toast.className = 'pz-toast';
-            toast.setAttribute('role', 'status');
-            document.body.appendChild(toast);
-        }
-
-        toast.textContent = text;
-        toast.classList.remove('pz-toast--hidden');
-        toast.classList.add('pz-toast--visible');
-
+        var existing = document.querySelector('.save-notification[data-sort-toast]');
+        if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
         clearTimeout(toastTimeout);
+
+        var toast = document.createElement('div');
+        toast.className = 'save-notification';
+        toast.setAttribute('data-sort-toast', 'true');
+        toast.setAttribute('role', 'status');
+        toast.innerHTML = '<div class="save-notification-inner"><div class="save-notification-check">✓</div><span></span></div>';
+        toast.querySelector('span').textContent = text;
+        document.body.appendChild(toast);
+
         toastTimeout = setTimeout(function () {
-            toast.classList.remove('pz-toast--visible');
-            toast.classList.add('pz-toast--hidden');
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
         }, TOAST_DURATION);
+    }
+
+    function showError(text) {
+        var existing = document.querySelector('.save-notification[data-sort-toast]');
+        if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
+        if (typeof window.showNotificationPopup === 'function') {
+            window.showNotificationPopup(text, 'error');
+        } else {
+            alert(text);
+        }
     }
 
     // The tree is built server side, so the new order comes from a rebuild of
@@ -123,7 +132,7 @@
 
         saving = true;
         paint(button, mode);
-        showToast(label(mode));
+        showToast(tr('sort.button_title', 'Sort by: {{mode}}', { mode: label(mode) }));
 
         fetch('/api/v1/settings/note_list_sort', {
             method: 'PUT',
@@ -139,7 +148,7 @@
             .catch(function (error) {
                 console.error('note-sort-cycle: could not save the sort mode', error);
                 paint(button, previous);
-                showToast(tr('sort.save_failed', 'Could not change the sort order'));
+                showError(tr('sort.save_failed', 'Could not change the sort order'));
             })
             .finally(function () { saving = false; });
     }
