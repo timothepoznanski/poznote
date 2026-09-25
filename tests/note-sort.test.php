@@ -169,3 +169,12 @@ test('the dashboard shares the placed-order rule on its own column', function ()
 
     assertSame(['unplaced', 'first', 'second'], array_column($rows, 'heading'));
 });
+
+test('Favorites has its own order, by name unless set, and no Custom', function () {
+    assertSame('heading_asc', POZNOTE_FAVORITES_SORT_DEFAULT);
+    assertSame(['heading_asc', 'updated_desc', 'created_desc', 'type_asc'], poznoteFavoritesSortModes());
+    assertSame('created_desc', poznoteNormalizeFavoritesSort(' created_desc '));
+    assertSame('heading_asc', poznoteNormalizeFavoritesSort('manual'));
+    assertSame('heading_asc', poznoteNormalizeFavoritesSort(''));
+    assertSame('heading_asc', poznoteNormalizeFavoritesSort(null));
+});

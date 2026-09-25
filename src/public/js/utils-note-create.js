@@ -615,16 +615,18 @@ function performFavoriteToggle(noteId) {
 }
 
 // Keep a note or a folder offline whatever its date, or stop (Offline
-// Copies). The desired state is read from the three-dot toggle
-// (data-offline), sent explicitly (PUT .../offline), written back onto the
-// toggle, and the device's copies are refreshed at once so the note is there
-// before the network goes away.
-function setOfflineKeep(kind, id) {
+// Copies). The desired state comes from the menu item clicked, or else is
+// read from the three-dot toggle (data-offline); it is sent explicitly
+// (PUT .../offline), written back onto the toggle, and the device's copies
+// are refreshed at once so the note is there before the network goes away.
+function setOfflineKeep(kind, id, keep) {
     var selector = kind === 'folder'
         ? '.folder-actions-toggle[data-folder-id="' + id + '"]'
         : '.note-actions-toggle[data-note-id="' + id + '"]';
     var toggles = document.querySelectorAll(selector);
-    var keep = !(toggles[0] && toggles[0].getAttribute('data-offline') === '1');
+    if (typeof keep !== 'boolean') {
+        keep = !(toggles[0] && toggles[0].getAttribute('data-offline') === '1');
+    }
     var tr = window.t || function (key, vars, fallback) { return fallback; };
 
     fetch('/api/v1/' + (kind === 'folder' ? 'folders' : 'notes') + '/' + encodeURIComponent(id) + '/offline', {
@@ -654,8 +656,8 @@ function setOfflineKeep(kind, id) {
         });
 }
 
-function toggleNoteOffline(noteId) {
-    setOfflineKeep('note', noteId);
+function toggleNoteOffline(noteId, keep) {
+    setOfflineKeep('note', noteId, keep);
 }
 
 function toggleFolderOffline(folderId) {

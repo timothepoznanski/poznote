@@ -54,6 +54,32 @@ function poznoteNormalizeNoteSort($value): string
     return in_array($value, poznoteNoteSortModes(), true) ? $value : POZNOTE_NOTE_SORT_DEFAULT;
 }
 
+/** Order of the Favorites section when its own setting is unset. */
+const POZNOTE_FAVORITES_SORT_DEFAULT = 'heading_asc';
+
+/**
+ * Orders the Favorites section offers (its right-click menu), kept apart from
+ * the tree's mode: the tree's sort button does not reorder Favorites. No
+ * Custom: notes are not dragged within Favorites.
+ *
+ * @return string[]
+ */
+function poznoteFavoritesSortModes(): array
+{
+    return ['heading_asc', 'updated_desc', 'created_desc', 'type_asc'];
+}
+
+/**
+ * Coerce the stored `favorites_sort` setting to one of those orders.
+ *
+ * @param mixed $value
+ */
+function poznoteNormalizeFavoritesSort($value): string
+{
+    $value = is_string($value) ? trim($value) : '';
+    return in_array($value, poznoteFavoritesSortModes(), true) ? $value : POZNOTE_FAVORITES_SORT_DEFAULT;
+}
+
 /**
  * The mode one click on the sidebar button leads to.
  *

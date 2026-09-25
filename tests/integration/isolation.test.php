@@ -86,6 +86,7 @@ function routeTable(): array
             'target_note_id' => '{other_note}', 'position' => 'before', 'workspace' => '{workspace}']],
         'GET /notes/resolve' => [OWNED, 'query' => ['reference' => '{marker}']],
         'GET /notes/search' => [SCOPED, 'query' => ['q' => '{marker}']],
+        'POST /notes/favorites/clear' => [SCOPED, 'query' => ['workspace' => '{workspace}']],
         'GET /notes/with-attachments' => [SCOPED],
         'GET /notes/templates' => [SCOPED],
         'GET /changes' => [SCOPED],

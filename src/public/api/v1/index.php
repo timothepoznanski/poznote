@@ -274,6 +274,11 @@ $router->post('/notes/reorder', function($params) use ($foldersController) {
     $foldersController->reorderNote();
 });
 
+// Empty the Favorites section of a workspace (must come before /notes/{id})
+$router->post('/notes/favorites/clear', function($params) use ($notesController) {
+    $notesController->clearFavorites();
+});
+
 // Search notes (must come before /notes/{id})
 $router->get('/notes/search', function($params) use ($notesController) {
     $notesController->search();

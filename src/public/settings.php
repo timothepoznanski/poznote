@@ -268,6 +268,16 @@ if ($isAdmin) {
     }
 }
 
+// Count workspaces (badge of the Workspaces card)
+$workspaces_count = 0;
+try {
+    if (isset($con)) {
+        $workspaces_count = (int)$con->query('SELECT COUNT(*) FROM workspaces')->fetchColumn();
+    }
+} catch (Exception $e) {
+    error_log('settings: cannot count workspaces: ' . $e->getMessage());
+}
+
 // Count users (for admin)
 $users_count = 0;
 $smtp_enabled = false;
@@ -571,6 +581,23 @@ if ($canUseUserWebhooks) {
              which copies of the notes are kept, and where. -->
         <h2 class="settings-category-title" id="settings-actions-section-title"><?php echo t_h('settings.categories.actions'); ?></h2>
         <div class="home-grid settings-grouped" id="settings-actions-section-grid">
+
+            <div class="settings-group-title"><?php echo t_h('settings.groups.organization', [], 'Organization'); ?></div>
+            <div class="settings-group">
+
+                <!-- Workspaces: an <a> card like Backup / Export, so the
+                     workspace the page is scoped to follows the link -->
+                <a href="workspaces.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="workspaces-card" title="<?php echo t_h('settings.cards.workspaces', [], 'Workspaces'); ?>">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.workspaces', [], 'Organize your notes into separate workspaces, each with its own folders and notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-layers"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.workspaces', [], 'Workspaces'); ?></span>
+                        <span id="workspaces-count-badge" class="setting-status enabled"><?php echo (int)$workspaces_count; ?></span>
+                    </div>
+                </a>
+            </div>
 
             <div class="settings-group-title"><?php echo t_h('settings.groups.backup_sync', [], 'Backups & sync'); ?></div>
             <div class="settings-group">

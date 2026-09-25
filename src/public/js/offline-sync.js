@@ -1070,26 +1070,18 @@
     };
 
     // The note's three-dot menu (js/utils-menus.js) asks whether this browser
-    // holds the note right now: the line is shown once the copies answer.
+    // holds a note not marked "Keep offline" (recent, favorite, in a folder
+    // kept offline): if so, it offers "Stop keeping offline" as well.
     window.poznoteOfflineFillMenu = function (menu, noteId) {
-        var line = menu.querySelector('.offline-availability');
         var userId = Number(readCookie('poznote_account') || 0);
         var id = Number(noteId);
-        if (!line || !userId || !id) {
+        if (!userId || !id || typeof window.setNoteActionsMenuOffline !== 'function') {
             return;
         }
         Store.getNote(userId, id).then(function (record) {
-            if (menu.getAttribute('data-note-id') !== String(noteId)) {
-                return;
+            if (record && menu.getAttribute('data-note-id') === String(noteId)) {
+                window.setNoteActionsMenuOffline(menu, true);
             }
-            var available = !!record;
-            line.classList.toggle('is-available', available);
-            line.querySelectorAll('[data-available]').forEach(function (span) {
-                span.hidden = (span.getAttribute('data-available') === '1') !== available;
-            });
-            line.hidden = false;
-        }).catch(function () {
-            line.hidden = true;
-        });
+        }).catch(function () {});
     };
 })();

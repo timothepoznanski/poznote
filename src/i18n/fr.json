@@ -585,7 +585,8 @@
       "profile_sign_in": "Profil et connexion",
       "language_region": "Langue et région",
       "storage": "Stockage",
-      "layout": "Mise en page"
+      "layout": "Mise en page",
+      "organization": "Organisation"
     },
     "sections": {
       "account_display": "Compte & Affichage",
@@ -835,6 +836,10 @@
       "shared": "Partagé",
       "shared_with": "Partagé avec",
       "tags": "Étiquettes"
+    },
+    "filter": {
+      "placeholder": "Filtrer par nom ou tag...",
+      "no_results": "Aucun espace de travail ne correspond à ce filtre."
     }
   },
   "display": {
@@ -1923,6 +1928,14 @@
       "stop_offline": "Ne plus garder hors ligne",
       "available_offline": "Disponible hors ligne dans ce navigateur",
       "not_available_offline": "Pas disponible hors ligne dans ce navigateur"
+    },
+    "favorites_menu": {
+      "title": "Actions des favoris",
+      "clear": "Tout retirer des favoris",
+      "clear_confirm_title": "Tout retirer des favoris ?",
+      "clear_confirm_message": "Toutes les notes et tous les dossiers de cet espace de travail sortent des favoris. Les notes et les dossiers eux-mêmes sont conservés.",
+      "clear_button": "Tout retirer",
+      "error": "Impossible de modifier les favoris"
     }
   },
   "tree_history": {

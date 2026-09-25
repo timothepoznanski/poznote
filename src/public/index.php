@@ -277,11 +277,13 @@ $settings = [
     'highlight_current_folder_tree' => '0',
     'folder_tree_dim_level' => '',
     'markdown_default_view_mode' => 'preview',
-    'sidebar_offline_marks' => '0'
+    'sidebar_offline_marks' => '0',
+    'favorites_sort' => POZNOTE_FAVORITES_SORT_DEFAULT,
+    'favorites_icon_color' => ''
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level', 'markdown_default_view_mode', 'sidebar_offline_marks')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level', 'markdown_default_view_mode', 'sidebar_offline_marks', 'favorites_sort', 'favorites_icon_color')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -489,6 +491,10 @@ $backlinks_at_bottom_setting = poznoteSettingEnabled($settings['backlinks_at_bot
 // comparators; the SQL below only pre-orders the rows, organizeNotesByFolder()
 // and sortFolders() decide what the sidebar shows.
 $note_list_sort_type = poznoteNormalizeNoteSort($settings['note_list_sort']);
+// Favorites keeps an order and a star colour of its own, set from its
+// right-click menu (notes_list.php, js/favorites-menu.js)
+$favorites_sort_type = poznoteNormalizeFavoritesSort($settings['favorites_sort']);
+$favorites_icon_color = preg_match('/^#[0-9a-f]{6}$/i', (string)$settings['favorites_icon_color']) ? (string)$settings['favorites_icon_color'] : '';
 $notes_without_folders_after = poznoteSettingEnabled($settings['notes_without_folders_after_folders'], true);
 
 $folder_null_case = $notes_without_folders_after ? '1' : '0';
@@ -807,7 +813,7 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
             $uncategorized_notes = $organized['uncategorized_notes'];
 
             // Handle favorites (including uncategorized notes)
-            $folders = handleFavorites($folders, $uncategorized_notes);
+            $folders = handleFavorites($folders, $uncategorized_notes, $favorites_sort_type);
 
             // Track folders with search results for favorites
             $folders_with_results = [];

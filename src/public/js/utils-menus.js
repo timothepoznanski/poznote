@@ -465,6 +465,16 @@ function syncActionsMenuSeparators(menu) {
     });
 }
 
+function setNoteActionsMenuOffline(menu, isOffline) {
+    menu.querySelectorAll('.offline-state-kept').forEach(function (item) {
+        item.style.display = isOffline ? '' : 'none';
+    });
+    menu.querySelectorAll('.offline-state-not-kept').forEach(function (item) {
+        item.style.display = isOffline ? 'none' : '';
+    });
+}
+window.setNoteActionsMenuOffline = setNoteActionsMenuOffline;
+
 function populateNoteActionsMenu(menu, toggle) {
     var noteId = toggle.getAttribute('data-note-id') || '';
     var noteTitle = toggle.getAttribute('data-note-title') || '';
@@ -473,6 +483,7 @@ function populateNoteActionsMenu(menu, toggle) {
     var folderName = toggle.getAttribute('data-folder') || '';
     var isFavorite = toggle.getAttribute('data-favorite') === '1';
     var isOffline = toggle.getAttribute('data-offline') === '1';
+    var isShared = toggle.getAttribute('data-shared') === '1';
 
     menu.setAttribute('data-note-id', noteId);
 
@@ -483,6 +494,14 @@ function populateNoteActionsMenu(menu, toggle) {
         item.style.display = isLinkedNote ? 'none' : '';
     });
 
+    // Share item: show the variant matching the note's shared state
+    menu.querySelectorAll('.share-state-shared').forEach(function (item) {
+        item.style.display = isShared ? '' : 'none';
+    });
+    menu.querySelectorAll('.share-state-not-shared').forEach(function (item) {
+        item.style.display = isShared ? 'none' : '';
+    });
+
     // Favorite item: show the variant matching the note's favorite state
     menu.querySelectorAll('.favorite-state-favorite').forEach(function (item) {
         item.style.display = isFavorite ? '' : 'none';
@@ -491,18 +510,11 @@ function populateNoteActionsMenu(menu, toggle) {
         item.style.display = isFavorite ? 'none' : '';
     });
 
-    // Keep offline item, and the line saying whether this browser holds the
-    // note: js/offline-sync.js answers that from the device's copies.
-    menu.querySelectorAll('.offline-state-kept').forEach(function (item) {
-        item.style.display = isOffline ? '' : 'none';
-    });
-    menu.querySelectorAll('.offline-state-not-kept').forEach(function (item) {
-        item.style.display = isOffline ? 'none' : '';
-    });
-    menu.querySelectorAll('.offline-availability').forEach(function (item) {
-        item.hidden = true;
-    });
-    if (typeof window.poznoteOfflineFillMenu === 'function') {
+    // Keep offline item: "Stop" for a note marked "Keep offline", and for
+    // one this browser holds anyway (recent, favorite, in a folder kept
+    // offline), which js/offline-sync.js answers from the device's copies.
+    setNoteActionsMenuOffline(menu, isOffline);
+    if (!isOffline && typeof window.poznoteOfflineFillMenu === 'function') {
         window.poznoteOfflineFillMenu(menu, noteId);
     }
 

@@ -1,8 +1,8 @@
 /**
  * The notes and folders this browser keeps offline, marked on the pages that
  * list them (notes_manager.php, list_folders.php, and the notes tree of
- * index.php when the sidebar_offline_marks setting is on): a note it holds a copy of,
- * a folder kept whole ("Keep offline", or under one). Read from the copies
+ * index.php, folders included, when the sidebar_offline_marks setting is on):
+ * a note it holds a copy of, a folder kept whole ("Keep offline", or under one). Read from the copies
  * of js/offline-store.js, so a mark says what opens here without a network,
  * as the "Available offline in this browser" line of a note's menu does.
  *
@@ -40,6 +40,21 @@
         document.querySelectorAll('#left_col .note-list-item > a.links_arbo_left[data-note-id]').forEach(function (link) {
             if (notes[link.getAttribute('data-note-id')] && !link.querySelector('.offline-mark')) {
                 link.appendChild(makeMark(NOTE_TITLE));
+                link.classList.add('has-offline-mark');
+            }
+        });
+        // Folders of the notes tree: between the name and the note count,
+        // outside the name, which scrolls on mobile
+        document.querySelectorAll('#left_col .folder-toggle[data-folder-id] > .folder-name').forEach(function (name) {
+            var next = name.nextElementSibling;
+            if (folders[name.parentNode.getAttribute('data-folder-id')] && !(next && next.classList.contains('offline-mark'))) {
+                name.insertAdjacentElement('afterend', makeMark(FOLDER_TITLE));
+            }
+        });
+        // Folder shortcuts of the Favorites section, like a note
+        document.querySelectorAll('#left_col .note-list-item > a.favorite-folder-link[data-folder-id]').forEach(function (link) {
+            if (folders[link.getAttribute('data-folder-id')] && !link.querySelector('.offline-mark')) {
+                link.appendChild(makeMark(FOLDER_TITLE));
                 link.classList.add('has-offline-mark');
             }
         });

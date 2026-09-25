@@ -303,6 +303,14 @@ html[data-theme='dark'] .btn-primary:hover {
     border-color: var(--pz-accent-hover);
 }
 
+/* The icon of a filled button takes the label's colour. The dark default in
+   dark-mode/icons.css paints every glyph with the icon grey, which all but
+   disappears on a light accent fill (Catppuccin). */
+html[data-theme='dark'] .btn-primary [class*="lucide-"],
+html[data-theme='dark'] .btn-primary [class*="lucide-"]:hover {
+    color: inherit;
+}
+
 html[data-theme='dark'] .btn-rename {
     background-color: var(--pz-warning-text);
     color: var(--pz-bg);

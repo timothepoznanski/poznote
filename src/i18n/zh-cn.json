@@ -585,7 +585,8 @@
       "profile_sign_in": "个人资料与登录",
       "language_region": "语言与地区",
       "storage": "存储",
-      "layout": "布局"
+      "layout": "布局",
+      "organization": "整理"
     },
     "sections": {
       "account_display": "账户与显示",
@@ -834,6 +835,10 @@
       "shared": "已分享",
       "shared_with": "分享给",
       "tags": "标签"
+    },
+    "filter": {
+      "placeholder": "按名称或标签筛选...",
+      "no_results": "没有符合此筛选条件的工作区。"
     }
   },
   "display": {
@@ -1915,6 +1920,14 @@
       "stop_offline": "停止离线保留",
       "available_offline": "此浏览器中可离线使用",
       "not_available_offline": "此浏览器中不可离线使用"
+    },
+    "favorites_menu": {
+      "title": "收藏操作",
+      "clear": "全部移出收藏",
+      "clear_confirm_title": "全部移出收藏？",
+      "clear_confirm_message": "此工作区的所有笔记和文件夹都将移出收藏。笔记和文件夹本身会保留。",
+      "clear_button": "全部移出",
+      "error": "无法更新收藏"
     }
   },
   "tree_history": {

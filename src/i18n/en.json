@@ -262,7 +262,8 @@
       "profile_sign_in": "Profile & sign-in",
       "language_region": "Language & region",
       "storage": "Storage",
-      "layout": "Layout"
+      "layout": "Layout",
+      "organization": "Organization"
     },
     "cards": {
       "tenant_isolation": "Tenant isolation",
@@ -474,6 +475,10 @@
         "empty": "No workspaces defined.",
         "title": "Existing workspaces"
       }
+    },
+    "filter": {
+      "placeholder": "Filter by name or tag...",
+      "no_results": "No workspace matches this filter."
     }
   },
   "display": {
@@ -1424,6 +1429,14 @@
       "stop_offline": "Stop keeping offline",
       "available_offline": "Available offline in this browser",
       "not_available_offline": "Not available offline in this browser"
+    },
+    "favorites_menu": {
+      "title": "Favorites actions",
+      "clear": "Remove all from favorites",
+      "clear_confirm_title": "Remove all from favorites?",
+      "clear_confirm_message": "Every note and folder of this workspace leaves Favorites. The notes and folders themselves are kept.",
+      "clear_button": "Remove all",
+      "error": "Could not update Favorites"
     }
   },
   "tree_history": {

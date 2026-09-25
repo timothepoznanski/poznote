@@ -248,7 +248,7 @@
     opacity: 0.8;
 }
 
-/* Notes this browser holds offline (js/offline-marks.js, only loaded when
+/* Notes and folders this browser holds offline (js/offline-marks.js, only loaded when
    the sidebar_offline_marks setting is on): a small accent dot right after
    the title, which keeps its ellipsis. Not an action, so no hover effect.
    Flex beats the block !important of css/folders/content.css on these rows
@@ -264,7 +264,9 @@
 }
 
 .links_arbo_left .offline-mark,
-.links_arbo_left .offline-mark:hover {
+.links_arbo_left .offline-mark:hover,
+.folder-toggle > .offline-mark,
+.folder-toggle > .offline-mark:hover {
     flex: 0 0 auto;
     width: 3px;
     height: 3px;

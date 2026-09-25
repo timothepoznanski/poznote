@@ -686,7 +686,7 @@ $currentLang = getUserLanguage();
 						<i class="lucide lucide-tag"></i>
 						<span><?php echo t_h('modals.tag_folder_notes.title', [], 'Tag all notes'); ?></span>
 					</div>
-					<div class="folder-actions-menu-item shared share-state-shared" data-action="share-folder">
+					<div class="folder-actions-menu-item active-state share-state-shared" data-action="share-folder">
 						<i class="lucide lucide-share-2"></i>
 						<span><?php echo t_h('notes_list.folder_actions.is_public', [], 'Is public'); ?></span>
 					</div>

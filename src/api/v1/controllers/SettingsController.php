@@ -451,6 +451,20 @@ class SettingsController {
             return substr(trim((string) $value), 0, 1000);
         }
 
+        // Order and star colour of the Favorites section (its right-click
+        // menu in the notes tree)
+        if ($key === 'favorites_sort') {
+            require_once __DIR__ . '/../../../lib/note-sort.php';
+            return poznoteNormalizeFavoritesSort($value);
+        }
+        if ($key === 'favorites_icon_color') {
+            $color = strtolower(trim((string) $value));
+            if ($color !== '' && !preg_match('/^#[0-9a-f]{6}$/', $color)) {
+                throw new InvalidArgumentException('favorites_icon_color must be #rrggbb or empty', 400);
+            }
+            return $color;
+        }
+
         // Button => #rrggbb maps painted on the icon rail
         // (poznoteNormalizeIconSidebarColors()) and the note toolbar
         // (poznoteNormalizeToolbarIconColors()).

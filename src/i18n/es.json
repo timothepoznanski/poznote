@@ -586,7 +586,8 @@
       "profile_sign_in": "Perfil e inicio de sesión",
       "language_region": "Idioma y región",
       "storage": "Almacenamiento",
-      "layout": "Diseño"
+      "layout": "Diseño",
+      "organization": "Organización"
     },
     "sections": {
       "account_display": "Cuenta y Visualización",
@@ -835,6 +836,10 @@
       "shared": "Compartido",
       "shared_with": "Compartido con",
       "tags": "Etiquetas"
+    },
+    "filter": {
+      "placeholder": "Filtrar por nombre o etiqueta...",
+      "no_results": "Ningún espacio de trabajo coincide con este filtro."
     }
   },
   "display": {
@@ -1917,6 +1922,14 @@
       "stop_offline": "Dejar de guardar sin conexión",
       "available_offline": "Disponible sin conexión en este navegador",
       "not_available_offline": "No disponible sin conexión en este navegador"
+    },
+    "favorites_menu": {
+      "title": "Acciones de favoritos",
+      "clear": "Quitar todo de favoritos",
+      "clear_confirm_title": "¿Quitar todo de favoritos?",
+      "clear_confirm_message": "Todas las notas y carpetas de este espacio de trabajo salen de favoritos. Las notas y carpetas se conservan.",
+      "clear_button": "Quitar todo",
+      "error": "No se pudieron modificar los favoritos"
     }
   },
   "tree_history": {

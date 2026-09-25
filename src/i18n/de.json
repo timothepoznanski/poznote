@@ -586,7 +586,8 @@
       "profile_sign_in": "Profil und Anmeldung",
       "language_region": "Sprache und Region",
       "storage": "Speicher",
-      "layout": "Layout"
+      "layout": "Layout",
+      "organization": "Organisation"
     },
     "sections": {
       "account_display": "Konto & Anzeige",
@@ -835,6 +836,10 @@
       "shared": "Geteilt",
       "shared_with": "Geteilt mit",
       "tags": "Tags"
+    },
+    "filter": {
+      "placeholder": "Nach Name oder Tag filtern...",
+      "no_results": "Kein Arbeitsbereich entspricht diesem Filter."
     }
   },
   "display": {
@@ -1917,6 +1922,14 @@
       "stop_offline": "Nicht mehr offline behalten",
       "available_offline": "In diesem Browser offline verfügbar",
       "not_available_offline": "In diesem Browser nicht offline verfügbar"
+    },
+    "favorites_menu": {
+      "title": "Favoriten-Aktionen",
+      "clear": "Alle aus Favoriten entfernen",
+      "clear_confirm_title": "Alle aus Favoriten entfernen?",
+      "clear_confirm_message": "Alle Notizen und Ordner dieses Arbeitsbereichs werden aus den Favoriten entfernt. Die Notizen und Ordner selbst bleiben erhalten.",
+      "clear_button": "Alle entfernen",
+      "error": "Favoriten konnten nicht geändert werden"
     }
   },
   "tree_history": {

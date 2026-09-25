@@ -689,6 +689,8 @@
         var target = event.target;
         if (!target || !target.closest) return;
 
+        if (typeof window.closeFavoritesMenu === 'function') window.closeFavoritesMenu();
+
         // Folder shortcuts in the Favorites section share the note row markup
         // but carry no toggle of their own (renderFavoriteFolderItems in
         // notes_list.php): open the folder menu through the folder's real
@@ -716,6 +718,15 @@
         var folderRow = target.closest('.folder-toggle');
         if (!folderRow) {
             openCreateMenuOnEmptySidebar(event);
+            return;
+        }
+
+        // Favorites is no folder: it has a menu of its own (js/favorites-menu.js)
+        if (folderRow.getAttribute('data-folder-id') === 'favorites') {
+            if (typeof window.openFavoritesMenuAtPoint === 'function' &&
+                window.openFavoritesMenuAtPoint(event.clientX, event.clientY)) {
+                event.preventDefault();
+            }
             return;
         }
 

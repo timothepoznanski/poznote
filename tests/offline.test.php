@@ -53,6 +53,7 @@ test('why a note is kept, most important reason first', function () {
     assertSame(null, poznoteOfflineReason(offlineNote(5, '2026-09-18 23:59:59'), $cutoff, $folders));
     assertSame(null, poznoteOfflineReason(offlineNote(6, '2026-01-01 00:00:00', ['folder_id' => 8]), $cutoff, $folders), 'another folder');
     assertSame(null, poznoteOfflineReason(offlineNote(7, ''), $cutoff, $folders), 'no date');
+    assertSame(null, poznoteOfflineReason(offlineNote(8, '2026-09-25 00:00:00', ['offline' => -1, 'favorite' => 1, 'folder_id' => 7]), $cutoff, $folders), 'stopped: kept out whatever the reason');
 });
 
 test('notes kept whatever their date come before the recent ones, newest first', function () {

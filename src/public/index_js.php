@@ -150,6 +150,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/table-cell-selection.js',
         'js/system-menu.js',
         'js/notes-list-events.js',
+        'js/favorites-menu.js',
         'js/other-accounts.js',
         'js/folder-icon.js',
         'js/folder-tree-highlight.js',
