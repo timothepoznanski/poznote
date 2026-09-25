@@ -51,9 +51,10 @@
     justify-content: center;
 }
 
-/* Reduce container height when collapsed */
+/* Reduce container height when collapsed: no vertical padding, the bar is
+   only there to reopen the calendar */
 .mini-calendar-container:has(.mini-calendar-collapsed) {
-    padding: 2px 16px;
+    padding: 0 16px;
 }
 
 .mini-calendar-month-year {

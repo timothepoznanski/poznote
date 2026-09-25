@@ -174,7 +174,7 @@ $search_combined_value = ($search_in_notes_value === '1' && $search_in_tags_valu
 <?php
 // $showAccountRows, $activeAccountProfile and $otherAccountProfiles are decided
 // by index.php before the sidebar header (the "Expand all folders" button
-// moves between the title row and the account row below).
+// moves between the row after Favorites and the account row below).
 $otherAccountProfiles = $otherAccountProfiles ?? [];
 $activeAccountProfile = $activeAccountProfile ?? null;
 $showAccountRows = !empty($showAccountRows);
@@ -222,7 +222,7 @@ $renderOtherAccounts = static function (array $profiles): void {
 // whole own tree), with the "Expand all folders" button at its end, where the
 // other rows carry their "Open this account" arrow. Only where several
 // accounts are reachable: with a single one no row names the tree and the
-// button stays in the title row (index.php).
+// button stays on the row after Favorites.
 if ($showAccountRows):
     $activeAccountName = htmlspecialchars((string)($activeAccountProfile['username'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 ?>
@@ -547,6 +547,15 @@ if ($favoritesFolder && ($favorites_count > 0 || (!empty($favorite_folders) && !
     foreach($favoritesFolder as $folderId => $folderData) {
         displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined, $displayUncategorizedFirst, $created_from, $created_to);
     }
+}
+
+// Sort mode and "Expand all folders", built by index.php, at the right end of a
+// thin rule between Favorites and the rest of the tree (at the top of the tree
+// when there are no favorites). With account rows the expand button heads the
+// active account's row instead.
+$notesListActions = ($noteSortButton ?? '') . (empty($showAccountRows) ? ($expandFoldersButton ?? '') : '');
+if ($notesListActions !== '') {
+    echo '<div class="notes-list-actions">' . $notesListActions . '</div>';
 }
 
 // Add drop zone for moving notes to root (no folder)

@@ -1,11 +1,11 @@
 // ============================================================================
 // Sidebar sort button (#1442)
 // ============================================================================
-// One global sort order for the whole tree, stepped through by the button in
-// the sidebar title row the way the theme button steps through themes: a click
-// moves to the next mode, the icon and the title name the mode now in use, and
-// a short label says which one it is, since a reordered list does not announce
-// itself.
+// One global sort order for the whole tree, stepped through by the button at
+// the top of the notes list the way the theme button steps through themes:
+// a click moves to the next mode, the icon and the title name the mode now in
+// use, and a short label says which one it is, since a reordered list does not
+// announce itself.
 //
 // The mode lives in the `note_list_sort` setting. index.php renders the button
 // from it, so a sidebar refresh brings the markup back in the right state and

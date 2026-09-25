@@ -23,6 +23,32 @@
     overflow: hidden;
 }
 
+/* The Poznote mark at the top of the rail, the Home link. Same 40px
+   box as the buttons, raised 4px into the rail's top padding; the bottom
+   margin gives those 4px back, so the entries below stay where they were. */
+.icon-sidebar-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    margin: -4px 0 8px;
+    border-radius: var(--pz-radius-lg);
+    text-decoration: none;
+    transition: background 0.15s ease;
+}
+
+.icon-sidebar-logo:hover,
+.icon-sidebar-logo:focus-visible {
+    background: rgba(var(--pz-accent-rgb), 0.08);
+}
+
+.icon-sidebar-logo .poznote-logo {
+    width: 26px;
+    height: 26px;
+}
+
 /* Navigation entries: the only part that scrolls when the rail runs out of
    room. min-height:0 lets it actually shrink inside the flex column instead of
    pushing the account group off the bottom. */

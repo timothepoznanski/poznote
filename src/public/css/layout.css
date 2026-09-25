@@ -66,7 +66,7 @@ body {
 }
 
 .sidebar-title {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: var(--pz-weight-bold);
     color: var(--pz-text);
     /* dark */

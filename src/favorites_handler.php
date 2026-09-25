@@ -29,6 +29,13 @@ function handleFavorites($folders, $uncategorized_notes = []) {
         }
     }
     
+    // Fixed order by title, whatever the tree's sort mode (#1442): the sort
+    // button acts on the tree below Favorites, and the favorite folders listed
+    // above these notes are ordered by name too (notes_list.php)
+    usort($favorites, function ($a, $b) {
+        return poznoteCompareNotes('heading_asc', $a, $b);
+    });
+
     // Add favorites as a special folder if there are any favorites
     // Use a special ID for Favorites (0 or negative to distinguish from real folders)
     if (!empty($favorites)) {

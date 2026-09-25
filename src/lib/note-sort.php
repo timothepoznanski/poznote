@@ -5,7 +5,7 @@
  * One setting, `note_list_sort`, decides how every folder and every note is
  * ordered in the sidebar. It used to be a global default that each folder
  * could override through its own `folders.sort_setting`; issue #1442 made it
- * global only, driven by the button in the sidebar title row which steps
+ * global only, driven by the button at the top of the notes list which steps
  * through the modes the same way the theme button steps through themes.
  *
  * Modes, in the order the button walks them:

@@ -484,10 +484,10 @@ if (poznoteMarkdownColoredEnabled($settings['markdown_colored'])) {
 $attachment_previews_in_note_setting = poznoteSettingEnabled($settings['attachment_previews_in_note'], false);
 $attachments_at_bottom_setting = poznoteSettingEnabled($settings['attachments_at_bottom'], false);
 $backlinks_at_bottom_setting = poznoteSettingEnabled($settings['backlinks_at_bottom'], false);
-// The one sort order of the tree (#1442), stepped through by the button in the
-// sidebar title row. src/lib/note-sort.php holds the modes and the comparators;
-// the SQL below only pre-orders the rows, organizeNotesByFolder() and
-// sortFolders() decide what the sidebar shows.
+// The one sort order of the tree (#1442), stepped through by the button at the
+// top of the notes list. src/lib/note-sort.php holds the modes and the
+// comparators; the SQL below only pre-orders the rows, organizeNotesByFolder()
+// and sortFolders() decide what the sidebar shows.
 $note_list_sort_type = poznoteNormalizeNoteSort($settings['note_list_sort']);
 $notes_without_folders_after = poznoteSettingEnabled($settings['notes_without_folders_after_folders'], true);
 
@@ -697,7 +697,7 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
             }
         }
     }
-    $expandFoldersButton = '<button class="sidebar-folder-toggle" id="sidebarExpandFoldersBtn" data-action="toggle-all-folders" title="' . t_h('sidebar.expand_all_folders', [], 'Expand all folders') . '" aria-label="' . t_h('sidebar.expand_all_folders', [], 'Expand all folders') . '">'
+    $expandFoldersButton = '<button type="button" class="sidebar-folder-toggle" id="sidebarExpandFoldersBtn" data-action="toggle-all-folders" title="' . t_h('sidebar.expand_all_folders', [], 'Expand all folders') . '" aria-label="' . t_h('sidebar.expand_all_folders', [], 'Expand all folders') . '">'
         . '<i class="lucide lucide-chevrons-up-down"></i>'
         . '</button>';
 
@@ -708,6 +708,13 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
     // the new mode on every sidebar refresh, so data-sort-mode stays true.
     [$noteSortLabelKey, $noteSortLabelFallback] = poznoteNoteSortLabel($note_list_sort_type);
     $noteSortTitle = t_h('sort.button_title', ['mode' => t($noteSortLabelKey, [], $noteSortLabelFallback)], 'Sort by: {{mode}}');
+    // The sort mode is a setting of the account being looked at. The button
+    // sits with "Expand all folders" on the row after Favorites (notes_list.php).
+    $noteSortButton = $canWriteAccountSettings
+        ? '<button type="button" class="sidebar-folder-toggle" id="sidebarSortBtn" data-action="cycle-note-sort" data-sort-mode="' . htmlspecialchars($note_list_sort_type, ENT_QUOTES) . '" title="' . $noteSortTitle . '" aria-label="' . $noteSortTitle . '">'
+            . '<i class="lucide ' . htmlspecialchars(poznoteNoteSortIcon($note_list_sort_type), ENT_QUOTES) . '"></i>'
+            . '</button>'
+        : '';
     ?>
 
     <!-- MENU RIGHT COLUMN -->	 
@@ -720,18 +727,10 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
             // workspace the way back to the person's own account.
             ?>
             <div class="sidebar-title" role="button" tabindex="0" data-action="toggle-workspace-menu">
-                <span class="poznote-logo workspace-title-icon" role="img" aria-label="Poznote"></span>
                 <span class="workspace-title-text" title="<?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?>"><?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?></span>
                 <i class="lucide lucide-caret-down workspace-dropdown-icon"></i>
             </div>
             <div class="sidebar-title-actions">
-                    <?php // The sort mode is a setting of the account being looked at ?>
-                    <?php if ($canWriteAccountSettings): ?>
-                    <button class="sidebar-folder-toggle" id="sidebarSortBtn" data-action="cycle-note-sort" data-sort-mode="<?php echo htmlspecialchars($note_list_sort_type, ENT_QUOTES); ?>" title="<?php echo $noteSortTitle; ?>" aria-label="<?php echo $noteSortTitle; ?>">
-                        <i class="lucide <?php echo htmlspecialchars(poznoteNoteSortIcon($note_list_sort_type), ENT_QUOTES); ?>"></i>
-                    </button>
-                    <?php endif; ?>
-                    <?php if (!$showAccountRows) echo $expandFoldersButton; ?>
                     <button class="sidebar-folder-toggle<?php echo $notifications_count > 0 ? ' has-notifications' : ''; ?>" id="sidebarNotificationsBtn" data-action="open-notifications-modal" title="<?php echo t_h('reminder.notifications', [], 'Notifications'); ?>" aria-label="<?php echo t_h('reminder.notifications', [], 'Notifications'); ?>"<?php echo $notifications_total > 0 ? '' : ' hidden'; ?>>
                         <i class="lucide lucide-bell"></i>
                     </button>

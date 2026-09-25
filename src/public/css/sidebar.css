@@ -167,6 +167,34 @@
     width: 100%;
 }
 
+/* Sort mode and "Expand all folders" (notes_list.php): small buttons at the
+   right end of a thin rule between Favorites and the rest of the tree. */
+.notes-list-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin: 2px 0;
+}
+
+.notes-list-actions::before {
+    content: "";
+    flex: 1 1 auto;
+    height: 1px;
+    margin-right: 6px;
+    background: var(--pz-border);
+}
+
+.notes-list-actions .sidebar-folder-toggle {
+    min-width: 24px;
+    min-height: 24px;
+    padding: 2px;
+}
+
+.notes-list-actions .sidebar-folder-toggle i,
+.notes-list-actions .sidebar-folder-toggle [class*="lucide-"] {
+    font-size: 0.75em !important;
+}
+
 /* Make the unified search placeholder French when shown in left column */
 
 /* Folder header adjustments to match visual spacing */

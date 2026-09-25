@@ -21,7 +21,7 @@
 }
 
 .searchbar-input {
-    padding: 10px 12px 10px 64px;
+    padding: 6px 12px 6px 64px;
     border-radius: var(--pz-radius-lg);
     border: 1px solid var(--pz-border-strong);
     background: var(--pz-bg);
@@ -34,7 +34,7 @@
     font-family: 'Inter', sans-serif !important;
     color: var(--pz-text-muted);
     caret-color: #6c7580;
-    height: 40px;
+    height: 34px;
     box-sizing: border-box;
 }
 
@@ -210,8 +210,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 36px;
-    width: 36px;
+    height: 30px;
+    width: 30px;
     border-radius: var(--pz-radius-circle);
     transition: background 0.2s, color 0.2s;
 }
@@ -221,8 +221,8 @@
     right: 8px;
     top: 50%;
     transform: translateY(-50%);
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
