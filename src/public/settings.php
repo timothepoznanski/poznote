@@ -950,7 +950,7 @@ if ($canUseUserWebhooks) {
 
                 <!-- Spellcheck in HTML notes -->
                 <div class="home-card" id="spellcheck-html-notes-card">
-                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.spellcheck_html_notes', [], 'Enable the browser spell checker in HTML notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.spellcheck_html_notes', [], 'Enable the browser spell checker in rich text notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                     <div class="home-card-icon"><i class="lucide lucide-list-check"></i></div>
                     <div class="home-card-content">
                         <span class="home-card-title"><?php echo t_h('display.cards.spellcheck_html_notes', [], 'Spell check'); ?></span>

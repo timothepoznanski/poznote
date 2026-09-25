@@ -81,7 +81,7 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
                     <span class="home-card-description"><?php
                         echo $diaryNoteTypeIsMarkdown
                             ? t_h('modals.create.markdown.title', [], 'Markdown note')
-                            : t_h('modals.create.note.title', [], 'HTML Note');
+                            : t_h('modals.create.note.title', [], 'Rich text note');
                     ?></span>
                 </div>
             </a>

@@ -118,12 +118,12 @@ function showConvertNoteModal(noteId, target) {
     if (!modal) return;
 
     if (target === 'html') {
-        titleEl.textContent = window.t ? window.t('modals.convert.to_html_title', null, 'Convert to HTML') : 'Convert to HTML';
-        messageEl.textContent = window.t ? window.t('modals.convert.to_html_message', null, 'This will convert your Markdown note to HTML format.') : 'This will convert your Markdown note to HTML format.';
+        titleEl.textContent = window.t ? window.t('modals.convert.to_html_title', null, 'Convert to rich text') : 'Convert to rich text';
+        messageEl.textContent = window.t ? window.t('modals.convert.to_html_message', null, 'This will convert your Markdown note to a rich text note.') : 'This will convert your Markdown note to a rich text note.';
         warningEl.textContent = window.t ? window.t('modals.convert.to_html_warning', null, 'Before converting this note, you may want to duplicate it to keep a copy in case the conversion doesn\'t meet your expectations.') : 'Before converting this note, you may want to duplicate it to keep a copy in case the conversion doesn\'t meet your expectations.';
     } else {
         titleEl.textContent = window.t ? window.t('modals.convert.to_markdown_title', null, 'Convert to Markdown') : 'Convert to Markdown';
-        messageEl.textContent = window.t ? window.t('modals.convert.to_markdown_message', null, 'This will convert your HTML note to Markdown format. Embedded images will be saved as attachments.') : 'This will convert your HTML note to Markdown format. Embedded images will be saved as attachments.';
+        messageEl.textContent = window.t ? window.t('modals.convert.to_markdown_message', null, 'This will convert your rich text note to Markdown format. Embedded images will be saved as attachments.') : 'This will convert your rich text note to Markdown format. Embedded images will be saved as attachments.';
         warningEl.textContent = window.t ? window.t('modals.convert.to_markdown_warning', null, 'Some complex HTML formatting may not convert perfectly to Markdown.') : 'Some complex HTML formatting may not convert perfectly to Markdown.';
     }
 

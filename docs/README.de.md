@@ -613,7 +613,7 @@ Die vollständige Liste der Einschränkungen und die Endpunkte zur Verwaltung de
 Poznote unterstützt zwei Hauptformate für Notizen, die jeweils auf unterschiedliche Arbeitsweisen zugeschnitten sind.
 
 <details>
-<summary><strong>HTML-Notizen</strong></summary>
+<summary><strong>Rich-Text-Notizen</strong></summary>
 &nbsp;
 
 *   **Editor:** Direkte WYSIWYG-Bearbeitung (What You See Is What You Get).
@@ -660,7 +660,7 @@ Poznote unterstützt zwei Hauptformate für Notizen, die jeweils auf unterschied
 
 *   **Funktion:** Verwenden Sie vorformulierte Inhalte wieder, um Ihre Dokumentation zu vereinheitlichen, von der vollständigen Notiz bis zum kurzen Textbaustein.
 *   **Einrichtung:** Legen Sie die Notizen, die Sie wiederverwenden möchten, in einen Ordner namens `Templates` (Unterordner sind erlaubt). Ein Arbeitsbereich namens `Templates` funktioniert ebenfalls und steht in jedem Arbeitsbereich zur Verfügung. Der Name wird auch in der Sprache der Oberfläche erkannt (`Modèles`, `Vorlagen`, `Plantillas`, `Modelos`, `Шаблоны`, `模板`).
-*   **In eine Notiz einfügen:** Tippen Sie in einer HTML- oder Markdown-Notiz `/template` (oder `/` gefolgt vom Titel der Vorlage) und wählen Sie eine Vorlage aus: Ihr Inhalt wird an der Cursorposition eingefügt und umgewandelt, falls Vorlage und Notiz nicht vom selben Typ sind.
+*   **In eine Notiz einfügen:** Tippen Sie in einer Rich-Text- oder Markdown-Notiz `/template` (oder `/` gefolgt vom Titel der Vorlage) und wählen Sie eine Vorlage aus: Ihr Inhalt wird an der Cursorposition eingefügt und umgewandelt, falls Vorlage und Notiz nicht vom selben Typ sind.
 *   **Neue Notiz aus einer Vorlage:** Duplizieren Sie die Vorlagennotiz, oder duplizieren Sie einen ganzen `Templates`-Ordner, um ein Projekt mit einer fertigen Ordnerstruktur zu beginnen.
 </details>
 
@@ -672,7 +672,7 @@ Poznote unterstützt zwei Hauptformate für Notizen, die jeweils auf unterschied
 *   **Arbeitsablauf:** Die Schaltfläche „Heutigen Eintrag erstellen“ legt die Notiz des heutigen Tages an (sobald sie existiert, heißt sie „Zum heutigen Eintrag“). Sie trägt das aktuelle Datum als Titel und wird automatisch in einer Ordnerstruktur `Diary/YYYY/MM` abgelegt.
 *   **Board-Ansicht:** Einträge werden als Karten angezeigt, nach Monat gruppiert und die neuesten zuerst, mit einem Filter, um frühere Einträge schnell zu finden.
 *   **Journalansicht:** Die Schriftrollen-Schaltfläche neben den Ansichtseinstellungen wechselt zu einer einzigen Lesespalte: jeder Eintrag mit seinem vollständigen Inhalt, die neuesten zuerst, nachgeladen beim Scrollen. Der Filter wirkt auch hier. Ein Klick auf einen Eintrag oder seinen Stift bearbeitet ihn direkt an Ort und Stelle; Änderungen werden beim Tippen gespeichert.
-*   **Format:** Neue Einträge werden als HTML- oder Markdown-Notizen angelegt, je nach der Einstellung „Format der Tagebucheinträge“ unter **Einstellungen > Verhalten**.
+*   **Format:** Neue Einträge werden als Rich-Text- oder Markdown-Notizen angelegt, je nach der Einstellung „Format der Tagebucheinträge“ unter **Einstellungen > Verhalten**.
 </details>
 
 ## Schnappschüsse
@@ -722,7 +722,7 @@ Unter **Einstellungen > Verhalten** können Sie Folgendes konfigurieren:
 - **Einfüge-Reihenfolge der Aufgaben:** festlegen, wo neue Aufgaben eingefügt werden
 - **Notizen nach Ordnern anzeigen:** Notizen ohne Ordner unterhalb der Ordnerliste anzeigen
 - **Codeblock-Zeilenumbruch:** den Zeilenumbruch in Codeblöcken ein- oder ausschalten
-- **Format der Tagebucheinträge:** Tagebucheinträge als HTML- oder Markdown-Notizen anlegen
+- **Format der Tagebucheinträge:** Tagebucheinträge als Rich-Text- oder Markdown-Notizen anlegen
 - Sprache der Oberfläche, Zeitzone und Datumsformat, Anhänge und Backlinks am Ende einer Notiz, Rechtschreibprüfung und die Tastenkürzel
 
 Unter **Einstellungen > Markdown** können Sie die Standardansicht, die Schriftart des Editors, Markdown mit Rahmen und farbiges Markdown sowie die Codeblock-Zeilennummern konfigurieren.
@@ -1043,7 +1043,7 @@ tar -czvf poznote-full-backup.tar.gz data/
 
 Exportieren Sie einzelne Notizen über die Schaltfläche **Exportieren** in der Werkzeugleiste der Notiz:
 
-  - **HTML-Notizen:** Export als HTML oder als einzelne HTML-Datei mit eingebetteten Bildern
+  - **Rich-Text-Notizen:** Export als HTML oder als einzelne HTML-Datei mit eingebetteten Bildern
   - **Markdown-Notizen:** Export als Markdown, als HTML oder als einzelne HTML-Datei mit eingebetteten Bildern
   - **Aufgabenlisten:** dieselben Optionen, dazu ein JSON-Rohexport der Liste
 
@@ -1246,7 +1246,7 @@ Poznote funktioniert auf zwei Arten auch ohne Netzwerk: Die zuletzt geänderten 
 Die in den letzten 5 Tagen geänderten Notizen werden in jedem Browser aufbewahrt, in dem Sie Poznote verwenden, und diese Kopie wird nach jedem Speichern aktualisiert. Im Unterricht, im Zug oder überall ohne WLAN öffnen Sie die gewohnte Poznote-Adresse: Der Browser zeigt die Offline-Version von Poznote mit derselben Seitenleiste, denselben Editoren, derselben Werkzeugleiste, derselben Suche und denselben Tabs (ein Doppelklick oder ein Mittelklick öffnet eine Notiz in einem neuen Tab, und die online geöffneten Tabs werden übernommen), listet aber nur die offline aufbewahrten Notizen auf.
 
 *   **Anmeldung:** Geben Sie das Passwort Ihrer letzten Anmeldung in diesem Browser ein, es wird ohne den Server geprüft. Haben Sie in diesem Browser nie Ihr Passwort eingegeben (SSO, automatische Anmeldung), öffnet sich das zuletzt verwendete Konto mit der Schaltfläche **Weiter als**.
-*   **Lesen und Bearbeiten:** HTML-Notizen, Markdown-Notizen und Aufgabenlisten öffnen sich in ihrem gewohnten Editor, und neue Notizen können erstellt werden. Das /-Menü und das Rechtsklick-Menü funktionieren ebenfalls, ohne die Befehle, die den Server brauchen (hochzuladende Bilder und Dateien, Vorlagen, Zeichnungen, Links zu anderen Notizen). Andere Notiztypen, etwa Zeichnungen, bleiben nur online verfügbar. Änderungen bleiben im Browser, bis sie gesendet sind.
+*   **Lesen und Bearbeiten:** Rich-Text-Notizen, Markdown-Notizen und Aufgabenlisten öffnen sich in ihrem gewohnten Editor, und neue Notizen können erstellt werden. Das /-Menü und das Rechtsklick-Menü funktionieren ebenfalls, ohne die Befehle, die den Server brauchen (hochzuladende Bilder und Dateien, Vorlagen, Zeichnungen, Links zu anderen Notizen). Andere Notiztypen, etwa Zeichnungen, bleiben nur online verfügbar. Änderungen bleiben im Browser, bis sie gesendet sind.
 *   **Offline behalten:** Favoriten werden immer aufbewahrt, und **Offline behalten** im Menü einer Notiz oder eines Ordners (Unterordner eingeschlossen) bewahrt sie unabhängig vom Datum auf, mit allen Anhängen (PDF, Audio, Dateien) bis 25 MB pro Datei. Dasselbe Menü einer Notiz zeigt an, ob sie in diesem Browser offline verfügbar ist, und die Seiten Notizen und Ordner markieren die in diesem Browser offline verfügbaren Notizen und Ordner. Auf der Seite Notizen lassen sich über die Sammelaktionen auch mehrere Notizen auf einmal offline behalten (oder nicht mehr), und die Seite Ordner bietet **Offline behalten** im Menü jedes Ordners.
 *   **Wieder online:** Die Änderungen werden automatisch gesendet. Wurde eine Notiz inzwischen auch auf dem Server geändert, werden beide Fassungen nach Möglichkeit zusammengeführt, andernfalls wird Ihre Offline-Fassung als eigene Notiz mit dem Namen „... (Offline-Kopie)“ behalten. Eine inzwischen auf dem Server gelöschte Notiz wird neu angelegt.
 *   **Einstellungen:** **Einstellungen > Aktionen > Offline-Notizen** legt fest, wie viele Tage an Notizen aufbewahrt werden (standardmäßig 5, bis zu 30, 0 schaltet Offline-Notizen aus), und zeigt, was der aktuelle Browser enthält.

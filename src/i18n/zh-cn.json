@@ -514,7 +514,7 @@
       "allow_executable_attachments": "允许本实例的所有账户将脚本和可执行文件（.sh、.ps1、.bat、.exe、.py 等）添加为附件。Poznote 从不运行它们，只负责存储和下载。Web 服务器可能执行的类型（如 .php）仍然被阻止。",
       "backlinks_at_bottom": "将反向链接区域显示在笔记底部而不是顶部。",
       "default_image_border": "默认以带边框且无内边距的方式显示笔记中的图片。",
-      "spellcheck_html_notes": "在 HTML 笔记中启用浏览器拼写检查。",
+      "spellcheck_html_notes": "在富文本笔记中启用浏览器拼写检查。",
       "slash_menu_trigger": "在电脑上，选择通过输入 /、Alt + / 还是完全不用键盘打开命令菜单。无论此设置为何，在笔记中点击右键都会打开它。",
       "slash_menu_trigger_mobile": "在移动设备上，选择通过输入 /、使用实体键盘按 Alt + / 还是完全不用键盘打开命令菜单。",
       "icon_sidebar_order": "更改图标侧边栏中按钮的顺序和颜色，并在按钮之间放置分隔线。",
@@ -1254,9 +1254,9 @@
   },
   "modals": {
     "paste_markdown": {
-      "title": "插入 HTML",
-      "menu_item": "插入 HTML",
-      "hint": "请将带格式的内容（网页、Word、电子邮件）粘贴到下方的框中。其中的 HTML，包括标题、链接、列表和表格，将被转换为 Markdown，你可以检查、编辑后再插入笔记。",
+      "title": "插入富文本",
+      "menu_item": "插入富文本",
+      "hint": "请将带格式的内容（网页、Word、电子邮件）粘贴到下方的框中。其中的格式，包括标题、链接、列表和表格，将被转换为 Markdown，你可以检查、编辑后再插入笔记。",
       "placeholder": "在此粘贴（Ctrl+V）",
       "preview_label": "Markdown 预览",
       "insert": "插入",
@@ -1268,7 +1268,7 @@
     "insert_markdown": {
       "title": "插入 Markdown",
       "menu_item": "插入 Markdown",
-      "hint": "请在下方的框中粘贴或输入 Markdown。它将被转换为 HTML，你可以预览后再插入笔记。",
+      "hint": "请在下方的框中粘贴或输入 Markdown。它将被转换为富文本，你可以预览后再插入笔记。",
       "placeholder": "在此粘贴或输入 Markdown",
       "preview_label": "预览",
       "insert": "插入",
@@ -1535,7 +1535,7 @@
       "title_in_folder": "在 {{folder}} 中创建",
       "folder_fallback": "文件夹",
       "note": {
-        "title": "HTML 笔记"
+        "title": "富文本笔记"
       },
       "markdown": {
         "title": "Markdown 笔记"
@@ -1595,11 +1595,11 @@
     "convert": {
       "title": "转换笔记",
       "message": "您确定要转换此笔记吗？",
-      "to_html_title": "转换为 HTML",
-      "to_html_message": "这将把您的 Markdown 笔记转换为 HTML 格式。",
+      "to_html_title": "转换为富文本",
+      "to_html_message": "这将把您的 Markdown 笔记转换为富文本笔记。",
       "to_html_warning": "在转换此笔记之前，您可以先复制一份以防转换不符合您的预期。",
       "to_markdown_title": "转换为 Markdown",
-      "to_markdown_message": "这将把您的 HTML 笔记转换为 Markdown 格式。嵌入的图片将保存为附件。",
+      "to_markdown_message": "这将把您的富文本笔记转换为 Markdown 格式。嵌入的图片将保存为附件。",
       "to_markdown_warning": "在转换此笔记之前，您可以先复制一份以防转换不符合您的预期。",
       "converting": "正在转换笔记...",
       "success": "笔记转换成功！",
@@ -2022,7 +2022,7 @@
     "age_recent": "仅近期",
     "all_types": "所有类型",
     "filter_type": "按类型筛选",
-    "type_html": "HTML",
+    "type_html": "富文本",
     "type_markdown": "Markdown",
     "type_tasklist": "任务列表",
     "type_excalidraw": "Excalidraw",
@@ -2252,7 +2252,7 @@
       "public_note": "共享笔记",
       "attachments_with_count": "附件 ({{count}})",
       "menu_actions": "菜单操作",
-      "convert_to_html": "转换为 HTML",
+      "convert_to_html": "转换为富文本",
       "note_width": "笔记宽度",
       "note_width_current": "笔记宽度：{{width}}",
       "note_width_default": "默认（{{width}}）",

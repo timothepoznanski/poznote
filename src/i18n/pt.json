@@ -515,7 +515,7 @@
       "allow_executable_attachments": "Permite anexar scripts e executáveis (.sh, .ps1, .bat, .exe, .py, ...), para todas as contas desta instância. O Poznote nunca os executa, apenas os armazena e os entrega. Os tipos que um servidor web poderia executar, como .php, continuam bloqueados.",
       "backlinks_at_bottom": "Mostre a seção de backlinks na parte inferior das notas em vez do topo.",
       "default_image_border": "Exiba por padrão as imagens das notas com borda e sem preenchimento.",
-      "spellcheck_html_notes": "Ative o corretor ortográfico do navegador nas notas HTML.",
+      "spellcheck_html_notes": "Ative o corretor ortográfico do navegador nas notas de texto formatado.",
       "slash_menu_trigger": "No computador, escolha se o menu de comandos abre digitando /, com Alt + / ou sem nenhuma tecla. Um clique com o botão direito numa nota abre-o seja qual for esta definição.",
       "slash_menu_trigger_mobile": "No telemóvel, escolha se o menu de comandos abre digitando /, com Alt + / a partir de um teclado físico ou sem nenhuma tecla.",
       "icon_sidebar_order": "Altere a ordem e a cor dos botões da barra de ícones e coloque separadores entre eles.",
@@ -1256,9 +1256,9 @@
   },
   "modals": {
     "paste_markdown": {
-      "title": "Inserir HTML",
-      "menu_item": "Inserir HTML",
-      "hint": "Cole conteúdo formatado (uma página web, Word, um e-mail) no campo abaixo. O seu HTML, títulos, ligações, listas e tabelas, é convertido em Markdown que pode rever, editar e depois inserir na sua nota.",
+      "title": "Inserir texto formatado",
+      "menu_item": "Inserir texto formatado",
+      "hint": "Cole conteúdo formatado (uma página web, Word, um e-mail) no campo abaixo. A sua formatação, títulos, ligações, listas e tabelas, é convertida em Markdown que pode rever, editar e depois inserir na sua nota.",
       "placeholder": "Cole aqui (Ctrl+V)",
       "preview_label": "Pré-visualização de Markdown",
       "insert": "Inserir",
@@ -1270,7 +1270,7 @@
     "insert_markdown": {
       "title": "Inserir Markdown",
       "menu_item": "Inserir Markdown",
-      "hint": "Cole ou escreva Markdown no campo abaixo. É convertido em HTML que pode pré-visualizar e depois inserir na sua nota.",
+      "hint": "Cole ou escreva Markdown no campo abaixo. É convertido em texto formatado que pode pré-visualizar e depois inserir na sua nota.",
       "placeholder": "Cole ou escreva Markdown aqui",
       "preview_label": "Pré-visualização",
       "insert": "Inserir",
@@ -1526,7 +1526,7 @@
       "title_in_folder": "Criar em {{folder}}",
       "folder_fallback": "pasta",
       "note": {
-        "title": "Nota HTML"
+        "title": "Nota de texto formatado"
       },
       "markdown": {
         "title": "Nota Markdown"
@@ -1586,11 +1586,11 @@
     "convert": {
       "title": "Converter nota",
       "message": "Tem certeza de que deseja converter esta nota?",
-      "to_html_title": "Converter para HTML",
-      "to_html_message": "Isso converterá sua nota Markdown para o formato HTML.",
+      "to_html_title": "Converter para texto formatado",
+      "to_html_message": "Isso converterá sua nota Markdown em uma nota de texto formatado.",
       "to_html_warning": "Antes de converter esta nota, você pode duplicá-la para manter uma cópia caso a conversão não atenda às suas expectativas.",
       "to_markdown_title": "Converter para Markdown",
-      "to_markdown_message": "Isso converterá sua nota HTML para o formato Markdown. Imagens incorporadas serão salvas como anexos.",
+      "to_markdown_message": "Isso converterá sua nota de texto formatado para o formato Markdown. Imagens incorporadas serão salvas como anexos.",
       "to_markdown_warning": "Antes de converter esta nota, você pode duplicá-la para manter uma cópia caso a conversão não atenda às suas expectativas.",
       "converting": "Convertendo nota...",
       "success": "Nota convertida com sucesso!",
@@ -2024,7 +2024,7 @@
     "age_recent": "Apenas recentes",
     "all_types": "Todos os tipos",
     "filter_type": "Filtrar por tipo",
-    "type_html": "HTML",
+    "type_html": "Texto formatado",
     "type_markdown": "Markdown",
     "type_tasklist": "Lista de tarefas",
     "type_excalidraw": "Excalidraw",
@@ -2254,7 +2254,7 @@
       "public_note": "Compartilhar nota",
       "attachments_with_count": "Anexos ({{count}})",
       "menu_actions": "Ações do menu",
-      "convert_to_html": "Converter para HTML",
+      "convert_to_html": "Converter para texto formatado",
       "note_width": "Largura da nota",
       "note_width_current": "Largura da nota: {{width}}",
       "note_width_default": "Padrão ({{width}})",

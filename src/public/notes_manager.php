@@ -28,7 +28,7 @@ $currentLang = getUserLanguage();
       data-txt-untitled="<?php echo t_h('common.untitled', [], 'Untitled'); ?>"
       data-txt-loading="<?php echo t_h('common.loading', [], 'Loading...'); ?>"
       data-txt-no-folder="<?php echo t_h('notes_list.system_folders.no_folder', [], 'No folder'); ?>"
-	data-txt-type-html="<?php echo t_h('notes_manager.type_html', [], 'HTML'); ?>"
+	data-txt-type-html="<?php echo t_h('notes_manager.type_html', [], 'Rich text'); ?>"
 	data-txt-type-markdown="<?php echo t_h('notes_manager.type_markdown', [], 'Markdown'); ?>"
 	data-txt-type-tasklist="<?php echo t_h('notes_manager.type_tasklist', [], 'Tasklist'); ?>"
 	data-txt-type-excalidraw="<?php echo t_h('notes_manager.type_excalidraw', [], 'Excalidraw'); ?>"
@@ -89,7 +89,7 @@ $currentLang = getUserLanguage();
 				aria-label="<?php echo t_h('notes_manager.filter_type', [], 'Filter by type'); ?>"
 			>
 				<option value=""><?php echo t_h('notes_manager.all_types', [], 'All types'); ?></option>
-				<option value="html"><?php echo t_h('notes_manager.type_html', [], 'HTML'); ?></option>
+				<option value="html"><?php echo t_h('notes_manager.type_html', [], 'Rich text'); ?></option>
 				<option value="markdown"><?php echo t_h('notes_manager.type_markdown', [], 'Markdown'); ?></option>
 				<option value="tasklist"><?php echo t_h('notes_manager.type_tasklist', [], 'Tasklist'); ?></option>
 			</select>

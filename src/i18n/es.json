@@ -515,7 +515,7 @@
       "allow_executable_attachments": "Permite adjuntar scripts y ejecutables (.sh, .ps1, .bat, .exe, .py, ...), para todas las cuentas de esta instancia. Poznote nunca los ejecuta, solo los almacena y los sirve. Los tipos que un servidor web podría ejecutar, como .php, siguen bloqueados.",
       "backlinks_at_bottom": "Muestra la sección de retroenlaces en la parte inferior de las notas en lugar de arriba.",
       "default_image_border": "Muestra por defecto las imágenes de las notas con borde y sin relleno.",
-      "spellcheck_html_notes": "Activa el corrector ortográfico del navegador en las notas HTML.",
+      "spellcheck_html_notes": "Activa el corrector ortográfico del navegador en las notas de texto enriquecido.",
       "slash_menu_trigger": "En el ordenador, elige si el menú de comandos se abre escribiendo /, con Alt + / o sin ninguna tecla. Un clic derecho en una nota lo abre sea cual sea este ajuste.",
       "slash_menu_trigger_mobile": "En el móvil, elige si el menú de comandos se abre escribiendo /, con Alt + / desde un teclado físico o sin ninguna tecla.",
       "icon_sidebar_order": "Cambie el orden y el color de los botones de la barra de iconos y coloque separadores entre ellos.",
@@ -1256,9 +1256,9 @@
   },
   "modals": {
     "paste_markdown": {
-      "title": "Insertar HTML",
-      "menu_item": "Insertar HTML",
-      "hint": "Pega contenido con formato (una página web, Word, un correo) en el campo de abajo. Su HTML, títulos, enlaces, listas y tablas, se convierte a Markdown que puedes revisar, editar e insertar en tu nota.",
+      "title": "Insertar texto enriquecido",
+      "menu_item": "Insertar texto enriquecido",
+      "hint": "Pega contenido con formato (una página web, Word, un correo) en el campo de abajo. Su formato, títulos, enlaces, listas y tablas, se convierte a Markdown que puedes revisar, editar e insertar en tu nota.",
       "placeholder": "Pega aquí (Ctrl+V)",
       "preview_label": "Vista previa de Markdown",
       "insert": "Insertar",
@@ -1270,7 +1270,7 @@
     "insert_markdown": {
       "title": "Insertar Markdown",
       "menu_item": "Insertar Markdown",
-      "hint": "Pega o escribe Markdown en el campo de abajo. Se convierte a HTML que puedes previsualizar e insertar en tu nota.",
+      "hint": "Pega o escribe Markdown en el campo de abajo. Se convierte a texto enriquecido que puedes previsualizar e insertar en tu nota.",
       "placeholder": "Pega o escribe Markdown aquí",
       "preview_label": "Vista previa",
       "insert": "Insertar",
@@ -1526,7 +1526,7 @@
       "title_in_folder": "Crear en {{folder}}",
       "folder_fallback": "carpeta",
       "note": {
-        "title": "Nota HTML"
+        "title": "Nota de texto enriquecido"
       },
       "markdown": {
         "title": "Nota Markdown"
@@ -1586,11 +1586,11 @@
     "convert": {
       "title": "Convertir nota",
       "message": "¿Estás seguro de que quieres convertir esta nota?",
-      "to_html_title": "Convertir a HTML",
-      "to_html_message": "Esto convertirá tu nota Markdown a formato HTML.",
+      "to_html_title": "Convertir a texto enriquecido",
+      "to_html_message": "Esto convertirá tu nota Markdown en una nota de texto enriquecido.",
       "to_html_warning": "Antes de convertir esta nota, puedes duplicarla para mantener una copia en caso de que la conversión no cumpla con tus expectativas.",
       "to_markdown_title": "Convertir a Markdown",
-      "to_markdown_message": "Esto convertirá tu nota HTML a formato Markdown. Las imágenes embebidas se guardarán como adjuntos.",
+      "to_markdown_message": "Esto convertirá tu nota de texto enriquecido a formato Markdown. Las imágenes embebidas se guardarán como adjuntos.",
       "to_markdown_warning": "Antes de convertir esta nota, puedes duplicarla para mantener una copia en caso de que la conversión no cumpla con tus expectativas.",
       "converting": "Convirtiendo nota...",
       "success": "¡Nota convertida con éxito!",
@@ -2024,7 +2024,7 @@
     "age_recent": "Solo recientes",
     "all_types": "Todos los tipos",
     "filter_type": "Filtrar por tipo",
-    "type_html": "HTML",
+    "type_html": "Texto enriquecido",
     "type_markdown": "Markdown",
     "type_tasklist": "Lista de tareas",
     "type_excalidraw": "Excalidraw",
@@ -2254,7 +2254,7 @@
       "public_note": "Compartir nota",
       "attachments_with_count": "Adjuntos ({{count}})",
       "menu_actions": "Acciones del menú",
-      "convert_to_html": "Convertir a HTML",
+      "convert_to_html": "Convertir a texto enriquecido",
       "note_width": "Ancho de la nota",
       "note_width_current": "Ancho de la nota: {{width}}",
       "note_width_default": "Predeterminado ({{width}})",
