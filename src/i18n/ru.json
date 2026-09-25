@@ -4,7 +4,7 @@
   },
   "welcome_note": {
     "title": "Добро пожаловать в Poznote",
-    "content": "<p>Poznote — персональная платформа для заметок и документации.</p>\n<br>\nОзнакомьтесь со <a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">всеми возможностями</a> Poznote.\n<br><br>\nНажмите кнопку <code>+</code>, чтобы создать первую заметку.\n<br><br>\nВ заметке введите <code>/</code>, чтобы открыть меню команд.\n<br><br>\nНадеюсь, вам понравится Poznote! ✨\n<br><br>\n<a href=\"https://ko-fi.com/timothepoznanski\" target=\"_blank\" style=\"text-decoration: none;\">Tim</a>"
+    "content": "<p>Poznote — платформа для заметок и документации.</p>\n<br>\nОзнакомьтесь со <a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">всеми возможностями</a> Poznote.\n<br><br>\nНажмите кнопку <code>+</code>, чтобы создать первую заметку.\n<br><br>\nВ заметке введите <code>/</code> или щёлкните правой кнопкой мыши, чтобы открыть меню команд."
   },
   "markdown_syntax": {
     "menu_item": "Синтаксис Markdown",
