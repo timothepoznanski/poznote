@@ -169,6 +169,12 @@
 
 .offline-page .searchbar-input-wrapper .searchbar-input {
     padding-left: 38px;
+    padding-right: 48px;
+}
+
+/* The clear button (css/searchbars.css) is display: flex */
+.offline-page .searchbar-clear[hidden] {
+    display: none;
 }
 
 /* The connection state before the list's title, in the Poznote logo's place.
@@ -226,40 +232,6 @@
 }
 
 /* ---- Note pane ---------------------------------------------------------------- */
-
-/* The note's subline only says that a change was just kept on the device,
-   or could not be sent (js/offline-app.js renderSubline): no line at all
-   otherwise */
-.offline-page .note-subline:empty {
-    display: none;
-}
-
-.offline-note-pending {
-    display: inline-flex;
-    align-items: flex-start;
-    gap: 6px;
-    color: var(--pz-warning-strong);
-}
-
-.offline-note-pending .lucide {
-    flex: 0 0 auto;
-    width: 13px;
-    height: 13px;
-    margin-top: 0.25em;
-}
-
-/* Phone: a panel of its own, like the notice of a file left online */
-@media (max-width: 800px) {
-    .offline-note-pending {
-        display: flex;
-        margin: 6px 0 0;
-        padding: 6px 10px;
-        border-radius: var(--pz-radius);
-        background: var(--pz-warning-soft);
-        font-size: 13px;
-        line-height: 1.45;
-    }
-}
 
 /* A file of the note left online by the per-file limit */
 .offline-note-notice {

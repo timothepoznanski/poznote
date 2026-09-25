@@ -4883,8 +4883,6 @@
     "note": {
       "placeholder": "Select a note to open it.",
       "back": "Back to the list",
-      "saved_locally": "Saved on this device. It will be sent to the server when you are back online.",
-      "push_error": "Not sent yet: {{error}}",
       "too_big": "Not available offline, larger than {{limit}} MB: {{files}}",
       "file_size": "{{name}} ({{size}} MB)"
     },

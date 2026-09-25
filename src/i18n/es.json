@@ -5064,8 +5064,6 @@
     "note": {
       "placeholder": "Seleccione una nota para abrirla.",
       "back": "Volver a la lista",
-      "saved_locally": "Guardada en este dispositivo. Se enviará al servidor cuando vuelva a tener conexión.",
-      "push_error": "Aún no enviada: {{error}}",
       "too_big": "No disponible sin conexión, más de {{limit}} MB: {{files}}",
       "file_size": "{{name}} ({{size}} MB)"
     },

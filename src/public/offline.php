@@ -226,6 +226,10 @@ $assets = array_merge(
                                class="search form-control searchbar-input"
                                placeholder="<?php echo $tr('offline.list.search', 'Search notes'); ?>"
                                aria-label="<?php echo $tr('offline.list.search', 'Search notes'); ?>">
+                        <!-- As in the app (notes_list.php): only while a search is typed -->
+                        <button type="button" class="searchbar-clear" id="offline-search-clear" hidden
+                                title="<?php echo $tr('search.clear', 'Clear search'); ?>"
+                                aria-label="<?php echo $tr('search.clear', 'Clear search'); ?>"><span class="clear-icon">×</span></button>
                     </div>
                 </div>
             </div>
