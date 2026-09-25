@@ -155,15 +155,20 @@
     function updateFilterTypeButtons() {
         var counts = { notes: offlineNotes.length, folders: offlineFolders.length };
         var buttons = document.querySelectorAll('.filter-type-btn');
+        // "All" only means something when there are folders to mix with the notes
+        var showAll = counts.folders > 0;
         buttons.forEach(function(btn) {
             var type = btn.getAttribute('data-filter');
-            btn.classList.toggle('initially-hidden', type !== 'all' && !counts[type]);
+            btn.classList.toggle('initially-hidden', type === 'all' ? !showAll : !counts[type]);
         });
-        // Back to "All" when the active category has nothing left to show
-        if (filterType !== 'all' && !counts[filterType]) {
-            filterType = 'all';
+        // Back to "All" (or "Notes" when "All" is hidden) when the active
+        // category has nothing left to show
+        var fallback = showAll ? 'all' : 'notes';
+        if ((counts.notes || counts.folders) && filterType !== fallback
+            && (filterType === 'all' ? !showAll : !counts[filterType])) {
+            filterType = fallback;
             buttons.forEach(function(btn) {
-                btn.classList.toggle('active', btn.getAttribute('data-filter') === 'all');
+                btn.classList.toggle('active', btn.getAttribute('data-filter') === fallback);
             });
             syncUrl();
         }
