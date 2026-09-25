@@ -173,6 +173,16 @@
                 }
                 break;
 
+            // Create menu opened on the empty notes column: hide the column
+            case 'hide-left-column':
+                if (typeof window.closeCreateMenu === 'function') {
+                    window.closeCreateMenu();
+                }
+                if (window.resizeColumn && !window.resizeColumn.isCollapsed()) {
+                    window.resizeColumn.toggleSidebar();
+                }
+                break;
+
             // Export modal - type selection
             case 'select-export-type':
                 if (type && typeof selectExportType === 'function') {

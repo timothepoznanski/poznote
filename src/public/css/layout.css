@@ -55,18 +55,32 @@ body {
     margin-bottom: 6px;
 }
 
+/* Three columns: the workspace title in the middle, the actions in the right
+   one, and an empty left one as wide as the right, so the title is centred on
+   the column. A long name takes the empty column's room before it ellipsizes. */
 .sidebar-title-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: space-between;
     gap: 8px;
     padding: 6px 2px;
     position: relative;
     /* anchor dropdown menus inside the title row */
 }
 
+.sidebar-title-row > .sidebar-title {
+    grid-row: 1;
+    grid-column: 2;
+}
+
+.sidebar-title-row > .sidebar-title-actions {
+    grid-row: 1;
+    grid-column: 3;
+    justify-self: end;
+}
+
 .sidebar-title {
-    font-size: 1.125rem;
+    font-size: 1.25rem;
     font-weight: var(--pz-weight-bold);
     color: var(--pz-text);
     /* dark */
@@ -95,6 +109,16 @@ body {
     vertical-align: middle;
     pointer-events: none;
     flex-shrink: 0;
+}
+
+/* Color dot of a colored workspace, before its name (index.php). Same
+   outline as the dot in the workspace menu (css/menus.css). */
+.workspace-title-dot {
+    width: 6px;
+    height: 6px;
+    flex-shrink: 0;
+    border-radius: var(--pz-radius-circle);
+    border: 1px solid rgba(var(--pz-shadow-rgb), 0.12);
 }
 
 .workspace-title-text {

@@ -21,9 +21,10 @@
         return match ? decodeURIComponent(match[1]) : '';
     }
 
+    // A small accent dot rather than an icon: discreet next to a title
     function makeMark(title) {
-        var mark = document.createElement('i');
-        mark.className = 'lucide lucide-wifi-off offline-mark';
+        var mark = document.createElement('span');
+        mark.className = 'offline-mark';
         mark.title = title;
         mark.setAttribute('role', 'img');
         mark.setAttribute('aria-label', title);

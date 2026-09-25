@@ -546,7 +546,7 @@
       "highlight_current_folder_tree": "按你喜欢的程度淡化当前所在文件夹层级之外的笔记和文件夹。",
       "snapshots": "选择每条笔记保留多少个每日自动快照，以及多少个安全快照（AI 或 MCP 编辑前）。",
       "stt": "配置用于听写笔记和转录音频附件的语音识别服务器。",
-      "sidebar_offline_marks": "在此浏览器中可离线使用的笔记旁显示一个小图标。"
+      "sidebar_offline_marks": "在此浏览器中可离线使用的笔记旁显示一个小圆点。"
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "在移动设备上，键盘上方的工具栏有一个 + 按钮，无论此设置为何，它都会打开同一个菜单。"
@@ -909,6 +909,7 @@
     "expand_all_folders": "展开所有文件夹",
     "collapse_all_folders": "折叠所有文件夹",
     "toggle": "显示/隐藏左侧边栏",
+    "hide_left_column": "隐藏左侧边栏",
     "toggle_icon_sidebar": "显示/隐藏图标侧边栏",
     "show_hidden_icons": "显示隐藏的图标",
     "other_accounts": {

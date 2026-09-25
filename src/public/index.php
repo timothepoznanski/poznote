@@ -726,8 +726,20 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
             // "New workspace" entries (js/workspaces-core.js), and in a shared
             // workspace the way back to the person's own account.
             ?>
+            <?php
+            // A colored workspace (workspaces.php > Color) leads its title with
+            // its dot, as in the workspace menu and on the secondary pages
+            $titleWorkspaceColors = poznoteGetWorkspaceColorsMap($con);
+            $titleWorkspaceHex = (string)($titleWorkspaceColors[(string)$workspace_filter]['hex'] ?? '');
+            if (!preg_match('/^#[0-9a-f]{3,8}$/i', $titleWorkspaceHex)) {
+                $titleWorkspaceHex = '';
+            }
+            ?>
             <div class="sidebar-title" role="button" tabindex="0" data-action="toggle-workspace-menu">
-                <span class="workspace-title-text" title="<?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?>"><?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?></span>
+                <?php if ($titleWorkspaceHex !== ''): ?>
+                <span class="workspace-title-dot" style="background-color: <?php echo htmlspecialchars($titleWorkspaceHex, ENT_QUOTES); ?>" aria-hidden="true"></span>
+                <?php endif; ?>
+                <span class="workspace-title-text" title="<?php echo $displayWorkspace; ?>"><?php echo $displayWorkspace; ?></span>
                 <i class="lucide lucide-caret-down workspace-dropdown-icon"></i>
             </div>
             <div class="sidebar-title-actions">

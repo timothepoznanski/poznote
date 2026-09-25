@@ -18,6 +18,10 @@ html[data-theme='dark'] .workspace-title-text {
     color: var(--pz-text);
 }
 
+html[data-theme='dark'] .workspace-title-dot {
+    border-color: rgba(var(--pz-highlight-rgb), 0.18);
+}
+
 /* ============================================
    Search Bar
    ============================================ */

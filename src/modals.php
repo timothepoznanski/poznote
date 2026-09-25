@@ -749,6 +749,16 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
         </div>
         <?php endif; ?>
     </div>
+
+    <!-- The notes column itself: only when the menu is opened by a right-click
+         on the empty part of that column (js/notes-list-events.js), same as the
+         chevron on its edge (js/resize-column.js) -->
+    <div class="create-section initially-hidden" id="columnSection">
+        <div class="create-menu-item" data-action="hide-left-column" role="menuitem">
+            <i class="lucide lucide-panel-left"></i>
+            <span><?php echo t_h('sidebar.hide_left_column', [], 'Hide left column'); ?></span>
+        </div>
+    </div>
 </div>
 
 <!-- Export Modal -->

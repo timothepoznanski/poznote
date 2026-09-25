@@ -546,7 +546,7 @@
       "highlight_current_folder_tree": "Estomper, autant que vous le souhaitez, les notes et les dossiers situés en dehors de la hiérarchie de dossiers dans laquelle vous travaillez.",
       "snapshots": "Choisissez combien de snapshots automatiques quotidiens et combien de snapshots de sécurité (avant une modification IA ou MCP) sont conservés par note.",
       "stt": "Configurer le serveur de reconnaissance vocale utilisé pour dicter des notes et transcrire les pièces jointes audio.",
-      "sidebar_offline_marks": "Affiche une petite icône à côté des notes disponibles hors ligne dans ce navigateur."
+      "sidebar_offline_marks": "Affiche une petite pastille à côté des notes disponibles hors ligne dans ce navigateur."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Sur mobile, la barre d'outils au-dessus du clavier a un bouton + qui ouvre le même menu, quel que soit ce réglage."
@@ -910,6 +910,7 @@
     "expand_all_folders": "Tout déplier",
     "collapse_all_folders": "Tout replier",
     "toggle": "Cacher/Afficher la colonne de gauche",
+    "hide_left_column": "Masquer la colonne de gauche",
     "toggle_icon_sidebar": "Cacher/Afficher la barre d'icônes",
     "show_hidden_icons": "Afficher les icônes masquées",
     "other_accounts": {

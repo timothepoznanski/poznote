@@ -547,7 +547,7 @@
       "highlight_current_folder_tree": "Atenuar, tanto como quieras, las notas y carpetas que están fuera de la jerarquía de carpetas en la que trabajas.",
       "snapshots": "Elija cuántas instantáneas automáticas diarias y cuántas instantáneas de seguridad (antes de una edición de IA o MCP) se conservan por nota.",
       "stt": "Configura el servidor de reconocimiento de voz que se usa para dictar notas y transcribir adjuntos de audio.",
-      "sidebar_offline_marks": "Muestra un pequeño icono junto a las notas disponibles sin conexión en este navegador."
+      "sidebar_offline_marks": "Muestra un pequeño punto junto a las notas disponibles sin conexión en este navegador."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "En el móvil, la barra de herramientas sobre el teclado tiene un botón + que abre el mismo menú, sea cual sea este ajuste."
@@ -910,6 +910,7 @@
     "expand_all_folders": "Expandir todas las carpetas",
     "collapse_all_folders": "Contraer todas las carpetas",
     "toggle": "Mostrar/Ocultar la columna izquierda",
+    "hide_left_column": "Ocultar la columna izquierda",
     "toggle_icon_sidebar": "Mostrar/Ocultar la barra de iconos",
     "show_hidden_icons": "Mostrar los iconos ocultos",
     "other_accounts": {

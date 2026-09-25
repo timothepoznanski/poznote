@@ -249,7 +249,7 @@
 }
 
 /* Notes this browser holds offline (js/offline-marks.js, only loaded when
-   the sidebar_offline_marks setting is on): a small muted mark right after
+   the sidebar_offline_marks setting is on): a small accent dot right after
    the title, which keeps its ellipsis. Not an action, so no hover effect.
    Flex beats the block !important of css/folders/content.css on these rows
    only (the class is set by the script). */
@@ -266,12 +266,12 @@
 .links_arbo_left .offline-mark,
 .links_arbo_left .offline-mark:hover {
     flex: 0 0 auto;
-    width: 10px;
-    height: 10px;
-    margin-left: 5px;
-    color: var(--pz-text-muted);
-    opacity: 0.55;
-    transform: none;
+    width: 3px;
+    height: 3px;
+    margin-left: 6px;
+    border-radius: var(--pz-radius-circle);
+    background-color: var(--pz-accent);
+    opacity: 0.7;
 }
 
 /* Favorite folder shortcuts inside the Favorites section */

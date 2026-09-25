@@ -547,7 +547,7 @@
       "highlight_current_folder_tree": "Notizen und Ordner außerhalb der Ordnerhierarchie, in der Sie arbeiten, so stark abschwächen, wie Sie möchten.",
       "snapshots": "Wählen Sie, wie viele automatische tägliche Schnappschüsse und wie viele Sicherheits-Schnappschüsse (vor einer KI- oder MCP-Änderung) pro Notiz aufbewahrt werden.",
       "stt": "Den Spracherkennungsserver konfigurieren, mit dem Notizen diktiert und Audioanhänge transkribiert werden.",
-      "sidebar_offline_marks": "Zeigt ein kleines Symbol neben den Notizen, die in diesem Browser offline verfügbar sind."
+      "sidebar_offline_marks": "Zeigt einen kleinen Punkt neben den Notizen, die in diesem Browser offline verfügbar sind."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Auf Mobilgeräten hat die Leiste über der Tastatur eine +-Schaltfläche, die unabhängig von dieser Einstellung dasselbe Menü öffnet."
@@ -910,6 +910,7 @@
     "expand_all_folders": "Alle Ordner aufklappen",
     "collapse_all_folders": "Alle Ordner zuklappen",
     "toggle": "Linke Spalte ein-/ausblenden",
+    "hide_left_column": "Linke Spalte ausblenden",
     "toggle_icon_sidebar": "Icon-Seitenleiste ein-/ausblenden",
     "show_hidden_icons": "Ausgeblendete Symbole anzeigen",
     "other_accounts": {

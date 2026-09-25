@@ -547,7 +547,7 @@
       "highlight_current_folder_tree": "Esbater, tanto quanto quiser, as notas e pastas que estão fora da hierarquia de pastas em que está a trabalhar.",
       "snapshots": "Escolha quantos instantâneos automáticos diários e quantos instantâneos de segurança (antes de uma edição por IA ou MCP) são guardados por nota.",
       "stt": "Configure o servidor de reconhecimento de voz usado para ditar notas e transcrever anexos de áudio.",
-      "sidebar_offline_marks": "Mostra um pequeno ícone ao lado das notas disponíveis offline neste navegador."
+      "sidebar_offline_marks": "Mostra um pequeno ponto ao lado das notas disponíveis offline neste navegador."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "No telemóvel, a barra de ferramentas acima do teclado tem um botão + que abre o mesmo menu, seja qual for esta definição."
@@ -910,6 +910,7 @@
     "expand_all_folders": "Expandir todas as pastas",
     "collapse_all_folders": "Recolher todas as pastas",
     "toggle": "Mostrar/Ocultar a coluna esquerda",
+    "hide_left_column": "Ocultar a coluna esquerda",
     "toggle_icon_sidebar": "Mostrar/Ocultar a barra de ícones",
     "show_hidden_icons": "Mostrar os ícones ocultos",
     "other_accounts": {

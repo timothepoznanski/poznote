@@ -223,7 +223,7 @@
       "highlight_current_folder_tree": "Dim the notes and folders that sit outside the folder hierarchy you are working in, as much or as little as you like.",
       "snapshots": "Choose how many automatic daily snapshots and how many safety snapshots (before an AI or MCP edit) are kept per note.",
       "stt": "Configure the speech-to-text server used to dictate notes and transcribe audio attachments.",
-      "sidebar_offline_marks": "Show a small icon next to the notes available offline in this browser."
+      "sidebar_offline_marks": "Show a small dot next to the notes available offline in this browser."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "On mobile, the toolbar above the keyboard has a + button that opens the same menu, whatever this is set to."
@@ -2625,6 +2625,7 @@
     "expand_all_folders": "Expand all folders",
     "collapse_all_folders": "Collapse all folders",
     "toggle": "Hide/Show left column",
+    "hide_left_column": "Hide left column",
     "toggle_icon_sidebar": "Hide/Show icon sidebar",
     "show_hidden_icons": "Show hidden icons",
     "other_accounts": {

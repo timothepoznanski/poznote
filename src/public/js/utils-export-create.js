@@ -105,6 +105,8 @@ var isCreatingInFolder = false;
  *               which is what the folder actions entry uses.
  *   folderId    creating inside this folder rather than at the root
  *   folderName  its name, for the note-creation helpers
+ *   columnActions  also offer to hide the notes column (right-click on its
+ *               empty part)
  *
  * Returns false when the menu is not on the page (secondary pages that include
  * neither modals.php nor these handlers).
@@ -126,6 +128,8 @@ function openCreateMenu(options) {
     var subfolderOption = document.getElementById('subfolderOption');
     if (otherSection) otherSection.style.display = isCreatingInFolder ? 'none' : 'block';
     if (subfolderOption) subfolderOption.style.display = isCreatingInFolder ? 'flex' : 'none';
+    var columnSection = document.getElementById('columnSection');
+    if (columnSection) columnSection.style.display = options.columnActions ? 'block' : 'none';
 
     closeFolderActionsMenu();
     closeNoteActionsMenu();
