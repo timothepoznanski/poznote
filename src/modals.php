@@ -1080,6 +1080,20 @@ $pzNoteInfoRows = [
     <div class="modal-content">
         <h3><?php echo t_h('offline.settings.card', [], 'Offline notes'); ?></h3>
         <div class="modal-body">
+            <?php // Off: nothing is kept and every offline option and indicator leaves the app ?>
+            <div class="offline-mode-option">
+                <label class="offline-mode-label" for="offlineModeEnabledInput">
+                    <span class="offline-mode-copy">
+                        <span class="offline-mode-title"><?php echo t_h('offline.settings.enable', [], 'Enable offline mode'); ?></span>
+                        <span class="offline-mode-hint"><?php echo t_h('offline.settings.enable_hint', [], 'When off, no note is kept in the browser and every offline option and indicator disappears from the app.'); ?></span>
+                    </span>
+                    <span class="toggle-switch">
+                        <input type="checkbox" id="offlineModeEnabledInput" checked>
+                        <span class="toggle-slider"></span>
+                    </span>
+                </label>
+            </div>
+            <div id="offlineNotesDetails">
             <p id="offlineNotesDeviceStatus" hidden></p>
             <p><?php echo t_h('offline.settings.description', [], 'The notes you modified in the last days are kept in the browsers where you use Poznote, so they can be opened and edited without a network. Changes made offline are sent as soon as the connection is back. 0 keeps nothing offline.'); ?></p>
             <p><?php echo t_h('offline.settings.kept_rules', [], 'Your favorites, and the notes and folders marked "Keep offline" in their menu, are kept whatever their date, with all their attachments.'); ?></p>
@@ -1094,6 +1108,7 @@ $pzNoteInfoRows = [
                 <li><?php echo t_h('offline.settings.limits_files_total', ['count' => POZNOTE_OFFLINE_MAX_PICTURES, 'total' => POZNOTE_OFFLINE_MAX_PICTURES_MB], '{{count}} files and {{total}} MB in total, at most half the free space of the browser'); ?></li>
             </ul>
             <p><?php echo t_h('offline.settings.warning', [], 'Signing out removes the offline notes from the browser. On a shared computer, sign out when you leave.'); ?></p>
+            </div>
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="offlineNotesModal"><?php echo t_h('common.cancel'); ?></button>

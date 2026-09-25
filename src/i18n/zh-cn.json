@@ -879,7 +879,7 @@
       "slash_menu_trigger_mobile": "命令菜单快捷键（移动设备）",
       "snapshots": "快照",
       "show_note_icons": "显示笔记图标",
-      "sidebar_offline_marks": "显示离线笔记"
+      "sidebar_offline_marks": "显示离线圆点"
     },
     "badges": {
       "font_size_default": "默认 ({{size}}px)",
@@ -5205,6 +5205,8 @@
       "offline_no_copies": "您当前处于离线状态。恢复连接后将保存更改。"
     },
     "settings": {
+      "enable": "启用离线模式",
+      "enable_hint": "关闭后，浏览器中不再保留任何笔记，所有离线选项和标识都会从应用中消失。",
       "card": "离线笔记",
       "help": "在浏览器中保存最近修改的笔记，以便在没有网络时打开和编辑。",
       "badge": "最近 {{days}} 天",

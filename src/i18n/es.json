@@ -880,7 +880,7 @@
       "slash_menu_trigger_mobile": "Atajo del menú de comandos (móvil)",
       "snapshots": "Instantáneas",
       "show_note_icons": "Mostrar iconos de las notas",
-      "sidebar_offline_marks": "Mostrar notas sin conexión"
+      "sidebar_offline_marks": "Mostrar el punto sin conexión"
     },
     "badges": {
       "font_size_default": "predeterminado ({{size}}px)",
@@ -5106,6 +5106,8 @@
       "offline_no_copies": "No tiene conexión. Los cambios se guardarán cuando vuelva la conexión."
     },
     "settings": {
+      "enable": "Activar el modo sin conexión",
+      "enable_hint": "Desactivado, no se guarda ninguna nota en el navegador y todas las opciones e indicadores sin conexión desaparecen de la aplicación.",
       "card": "Notas sin conexión",
       "help": "Guardar en el navegador las notas modificadas recientemente, para abrirlas y editarlas sin red.",
       "badge": "Últimos {{days}} días",

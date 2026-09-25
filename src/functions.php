@@ -440,6 +440,21 @@ const POZNOTE_OFFLINE_MAX_PICTURE_MB = 25;
 const POZNOTE_OFFLINE_MAX_PICTURES = 400;
 const POZNOTE_OFFLINE_MAX_PICTURES_MB = 200;
 
+/**
+ * Whether the account uses offline mode (offline_mode_enabled, on unless
+ * turned off in Settings > Offline notes). Off, the manifest keeps nothing,
+ * so the browsers forget their copies (js/offline-sync.js), and every offline
+ * option and indicator leaves the app: rail button, "Keep offline" menu
+ * items, marks, connection banner.
+ */
+function poznoteOfflineModeEnabled(): bool {
+    $raw = function_exists('getSetting') ? getSetting('offline_mode_enabled', null) : null;
+    if ($raw === null || $raw === false || trim((string)$raw) === '') {
+        return true;
+    }
+    return $raw !== '0' && $raw !== 'false';
+}
+
 
 
 

@@ -687,8 +687,8 @@ html[data-theme='dark'] .nm-modal {
 :is(.nm-note-title-wrap, .nm-folder-label) .offline-mark {
     display: inline-block;
     flex: 0 0 auto;
-    width: 4px;
-    height: 4px;
+    width: 5px;
+    height: 5px;
     margin-left: 6px;
     border-radius: var(--pz-radius-circle);
     background-color: var(--pz-accent);

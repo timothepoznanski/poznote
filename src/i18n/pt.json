@@ -880,7 +880,7 @@
       "slash_menu_trigger_mobile": "Atalho do menu de comandos (telemóvel)",
       "snapshots": "Instantâneos",
       "show_note_icons": "Mostrar ícones das notas",
-      "sidebar_offline_marks": "Mostrar notas offline"
+      "sidebar_offline_marks": "Mostrar o ponto offline"
     },
     "badges": {
       "font_size_default": "padrão ({{size}}px)",
@@ -5106,6 +5106,8 @@
       "offline_no_copies": "Você está offline. As alterações serão salvas quando a conexão voltar."
     },
     "settings": {
+      "enable": "Ativar o modo offline",
+      "enable_hint": "Desativado, nenhuma nota é guardada no navegador e todas as opções e indicadores offline desaparecem da aplicação.",
       "card": "Notas offline",
       "help": "Guardar no navegador as notas modificadas recentemente, para abri-las e editá-las sem rede.",
       "badge": "Últimos {{days}} dias",

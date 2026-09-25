@@ -485,15 +485,18 @@ function renderFolderActionsMenu($currentWorkspace = '') {
 
     // Keep offline: the folder's notes, subfolders included, stay in the
     // browser whatever their date (Offline Copies, lib/offline.php). Two
-    // variants like Favorite, from data-offline on the toggle.
-    $menu .= "<div class='folder-actions-menu-item offline-state-kept active-state' data-action='offline-folder'>";
-    $menu .= "<i class='lucide lucide-wifi-off'></i>";
-    $menu .= "<span>" . t_h('notes_list.folder_actions.stop_offline', [], 'Stop keeping offline') . "</span>";
-    $menu .= "</div>";
-    $menu .= "<div class='folder-actions-menu-item offline-state-not-kept' data-action='offline-folder'>";
-    $menu .= "<i class='lucide lucide-wifi-off'></i>";
-    $menu .= "<span>" . t_h('notes_list.folder_actions.keep_offline', [], 'Keep offline') . "</span>";
-    $menu .= "</div>";
+    // variants like Favorite, from data-offline on the toggle. Not offered
+    // while offline mode is off (Settings > Offline notes).
+    if (poznoteOfflineModeEnabled()) {
+        $menu .= "<div class='folder-actions-menu-item offline-state-kept active-state' data-action='offline-folder'>";
+        $menu .= "<i class='lucide lucide-wifi-off'></i>";
+        $menu .= "<span>" . t_h('notes_list.folder_actions.stop_offline', [], 'Stop keeping offline') . "</span>";
+        $menu .= "</div>";
+        $menu .= "<div class='folder-actions-menu-item offline-state-not-kept' data-action='offline-folder'>";
+        $menu .= "<i class='lucide lucide-wifi-off'></i>";
+        $menu .= "<span>" . t_h('notes_list.folder_actions.keep_offline', [], 'Keep offline') . "</span>";
+        $menu .= "</div>";
+    }
 
     // Rename folder action
     $menu .= "<div class='folder-actions-menu-item' data-action='rename-folder'>";
@@ -641,15 +644,18 @@ function renderNoteActionsMenu($currentWorkspace = '') {
     // Copies, lib/offline.php). Two variants like Favorite: "Stop" when the
     // note is marked (data-offline on the toggle) or when this browser holds
     // it anyway, as a recent note, a favorite or in a folder kept offline
-    // (js/offline-sync.js answers that when the menu opens).
-    $menu .= "<div class='note-actions-menu-item offline-state-kept active-state' data-action='toggle-offline'>";
-    $menu .= "<i class='lucide lucide-wifi-off'></i>";
-    $menu .= "<span>" . t_h('notes_list.note_actions.stop_offline', [], 'Stop keeping offline') . "</span>";
-    $menu .= "</div>";
-    $menu .= "<div class='note-actions-menu-item offline-state-not-kept' data-action='toggle-offline'>";
-    $menu .= "<i class='lucide lucide-wifi-off'></i>";
-    $menu .= "<span>" . t_h('notes_list.note_actions.keep_offline', [], 'Keep offline') . "</span>";
-    $menu .= "</div>";
+    // (js/offline-sync.js answers that when the menu opens). Not offered
+    // while offline mode is off (Settings > Offline notes).
+    if (poznoteOfflineModeEnabled()) {
+        $menu .= "<div class='note-actions-menu-item offline-state-kept active-state' data-action='toggle-offline'>";
+        $menu .= "<i class='lucide lucide-wifi-off'></i>";
+        $menu .= "<span>" . t_h('notes_list.note_actions.stop_offline', [], 'Stop keeping offline') . "</span>";
+        $menu .= "</div>";
+        $menu .= "<div class='note-actions-menu-item offline-state-not-kept' data-action='toggle-offline'>";
+        $menu .= "<i class='lucide lucide-wifi-off'></i>";
+        $menu .= "<span>" . t_h('notes_list.note_actions.keep_offline', [], 'Keep offline') . "</span>";
+        $menu .= "</div>";
+    }
 
     $menu .= "<div class='note-actions-menu-separator'></div>";
 

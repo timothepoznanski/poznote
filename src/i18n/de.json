@@ -880,7 +880,7 @@
       "slash_menu_trigger_mobile": "Tastenkürzel für das Befehlsmenü (Mobilgerät)",
       "snapshots": "Schnappschüsse",
       "show_note_icons": "Notizsymbole anzeigen",
-      "sidebar_offline_marks": "Offline-Notizen anzeigen"
+      "sidebar_offline_marks": "Offline-Punkt anzeigen"
     },
     "badges": {
       "font_size_default": "Standard ({{size}}px)",
@@ -5105,6 +5105,8 @@
       "offline_no_copies": "Sie sind offline. Änderungen werden gespeichert, sobald die Verbindung wieder besteht."
     },
     "settings": {
+      "enable": "Offline-Modus aktivieren",
+      "enable_hint": "Wenn deaktiviert, wird keine Notiz im Browser gespeichert und alle Offline-Optionen und -Anzeigen verschwinden aus der App.",
       "card": "Offline-Notizen",
       "help": "Die zuletzt geänderten Notizen im Browser behalten, um sie ohne Netzwerk zu öffnen und zu bearbeiten.",
       "badge": "Letzte {{days}} Tage",

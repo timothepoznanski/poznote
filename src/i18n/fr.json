@@ -880,7 +880,7 @@
       "slash_menu_trigger": "Raccourci du menu de commandes (ordinateur)",
       "slash_menu_trigger_mobile": "Raccourci du menu de commandes (mobile)",
       "snapshots": "Snapshots",
-      "sidebar_offline_marks": "Afficher les notes hors ligne"
+      "sidebar_offline_marks": "Afficher le point hors ligne"
     },
     "badges": {
       "font_size_default": "par défaut ({{size}}px)",
@@ -5210,6 +5210,8 @@
       "offline_no_copies": "Vous êtes hors ligne. Les modifications seront enregistrées au retour de la connexion."
     },
     "settings": {
+      "enable": "Activer le mode hors ligne",
+      "enable_hint": "Désactivé, aucune note n'est conservée dans le navigateur et toutes les options et indicateurs hors ligne disparaissent de l'application.",
       "card": "Notes hors ligne",
       "help": "Conserver dans votre navigateur les notes modifiées récemment, pour les ouvrir et les modifier sans réseau.",
       "badge": "{{days}} derniers jours",

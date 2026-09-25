@@ -277,7 +277,7 @@ $settings = [
     'highlight_current_folder_tree' => '0',
     'folder_tree_dim_level' => '',
     'markdown_default_view_mode' => 'preview',
-    'sidebar_offline_marks' => '0',
+    'sidebar_offline_marks' => '1',
     'favorites_sort' => POZNOTE_FAVORITES_SORT_DEFAULT,
     'favorites_icon_color' => ''
 ];
@@ -784,6 +784,8 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
             'defaultNoteSortType' => $note_list_sort_type,
             'isAdmin' => function_exists('isCurrentUserAdmin') && isCurrentUserAdmin(),
             'canUseSettingsApi' => !function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser(),
+            // Settings > Offline notes: off, js/offline-sync.js only empties this browser's copies
+            'offlineMode' => poznoteOfflineModeEnabled(),
             'settings' => [
                 'emoji_icons_enabled' => getSetting('emoji_icons_enabled', '1'),
                 'slash_menu_trigger' => getSetting('slash_menu_trigger', 'slash'),
@@ -999,7 +1001,7 @@ window.NOTIFICATIONS_TXT = {
 };
 </script>
 <script defer src="index_js.php?group=app&v=<?php echo $v; ?>"></script>
-<?php if (poznoteSettingEnabled($settings['sidebar_offline_marks'], false)): ?>
+<?php if (poznoteOfflineModeEnabled() && poznoteSettingEnabled($settings['sidebar_offline_marks'], true)): ?>
 <?php // Marks the notes of the tree this browser holds offline (after the app bundle, which loads offline-store.js) ?>
 <script src="<?php echo poznoteAsset('js/offline-marks.js'); ?>" defer
     data-note-title="<?php echo t_h('notes_list.note_actions.available_offline', [], 'Available offline in this browser'); ?>"

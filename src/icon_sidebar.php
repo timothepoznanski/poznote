@@ -112,8 +112,10 @@ if ($iconSidebarSharedScopeActive) {
     }));
 }
 
-// Offline copies are kept for the login's own account only (OfflineController)
-if (function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser()) {
+// Offline copies are kept for the login's own account only (OfflineController),
+// and only while offline mode is on (Settings > Offline notes)
+if ((function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser())
+    || (function_exists('poznoteOfflineModeEnabled') && !poznoteOfflineModeEnabled())) {
     $iconSidebarItems = array_values(array_filter($iconSidebarItems, static function (array $item): bool {
         return ($item['page'] ?? '') !== 'offline_notes.php';
     }));

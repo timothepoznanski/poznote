@@ -30,6 +30,12 @@
     // refreshed. The full sync, the connection banner and the capture of the
     // display belong to index.php.
     var WRITES_ONLY = !!(document.currentScript && document.currentScript.getAttribute('data-offline-mode') === 'writes');
+    // Offline mode turned off in Settings > Offline notes (index.php's page
+    // config): nothing is kept and nothing shows, no banner, no marks. What
+    // this browser still holds for the account goes, once the changes made
+    // offline were sent (the manifest then says 0 days).
+    var pageConfig = typeof window.getPoznotePageConfig === 'function' ? window.getPoznotePageConfig() : {};
+    var DISABLED = !WRITES_ONLY && pageConfig.offlineMode === false;
     // Signed out on the offline page while the server could not be reached
     // (js/offline-app.js): the session left open ends now, before anything
     // is kept again. The mark goes first, so a failure cannot loop.
@@ -775,6 +781,9 @@
     }
 
     function onConnectionLost() {
+        if (DISABLED) {
+            return;
+        }
         if (bannerEl && !bannerEl.hidden && !bannerEl.classList.contains('is-transient')) {
             return;
         }
@@ -939,6 +948,52 @@
                 }
             }).catch(function () {});
         }
+    }
+
+    // Offline mode off: one sync pushes the changes made offline and has the
+    // copies forgotten, then the offline page leaves the device once no
+    // account keeps anything here (the service worker has nothing to serve
+    // in its place). Nothing else runs.
+    function forgetDevice() {
+        var pageAccount = Number(readCookie('poznote_account') || 0);
+        if (!pageAccount) {
+            return Promise.resolve();
+        }
+        return Promise.all([Store.getAccount(pageAccount), Store.getOutbox(pageAccount)])
+            .then(function (both) {
+                return both[0] || both[1].length ? syncNow(true) : null;
+            })
+            .then(function () {
+                return Store.getOutbox(pageAccount);
+            })
+            .then(function (pending) {
+                // Changes the server did not take stay until they are sent
+                return pending.length ? null : Store.forgetAccount(pageAccount, { withOutbox: true });
+            })
+            .then(function () {
+                return Store.getAccounts();
+            })
+            .then(function (accounts) {
+                if (!accounts.length && window.caches) {
+                    return window.caches.delete(Store.SHELL_CACHE);
+                }
+                return null;
+            })
+            .catch(function (e) {
+                console.debug('offline-sync: forgetting the offline copies failed:', e);
+            });
+    }
+
+    if (DISABLED) {
+        Store.clearPendingVerifier();
+        // The logout dialog (js/profile.js) still sends pending changes first
+        window.poznoteOfflineSyncNow = function () {
+            return syncNow(true);
+        };
+        signingOut.then(function (leaving) {
+            return leaving ? null : forgetDevice();
+        });
+        return;
     }
 
     if (typeof window.fetch === 'function') {

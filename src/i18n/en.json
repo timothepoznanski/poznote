@@ -519,7 +519,7 @@
       "slash_menu_trigger": "Command menu shortcut (computer)",
       "slash_menu_trigger_mobile": "Command menu shortcut (mobile)",
       "snapshots": "Snapshots",
-      "sidebar_offline_marks": "Show offline notes"
+      "sidebar_offline_marks": "Show offline dot"
     },
     "badges": {
       "font_size_default": "default ({{size}}px)",
@@ -4925,6 +4925,8 @@
       "offline_no_copies": "You are offline. Changes will be saved when the connection is back."
     },
     "settings": {
+      "enable": "Enable offline mode",
+      "enable_hint": "When off, no note is kept in the browser and every offline option and indicator disappears from the app.",
       "card": "Offline notes",
       "help": "Keep the notes you modified recently in your browser, to open and edit them without a network.",
       "badge": "Last {{days}} days",

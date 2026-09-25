@@ -69,7 +69,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:folder-tree-highlight-card" checked><span><?php echo t_h('display.cards.highlight_current_folder_tree', [], 'Highlight current folder tree'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-color-palette-card" checked><span><?php echo t_h('display.cards.note_color_palette', [], 'Note colors'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:notes-without-folders-card" checked><span><?php echo t_h('display.cards.notes_without_folders_after', [], 'Notes without folders'); ?></span></label>
-        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebar-offline-marks-card" checked><span><?php echo t_h('display.cards.sidebar_offline_marks', [], 'Show offline notes'); ?></span></label>
+        <?php if (poznoteOfflineModeEnabled()): ?><label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebar-offline-marks-card" checked><span><?php echo t_h('display.cards.sidebar_offline_marks', [], 'Show offline dot'); ?></span></label><?php endif; ?>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-width-card" checked><span><?php echo t_h('display.cards.note_content_width', [], 'Note content width'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-split-card-view-card" checked><span><?php echo t_h('display.cards.markdown_split_card_view', [], 'Framed markdown'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-colored-card" checked><span><?php echo t_h('display.cards.markdown_colored', [], 'Colored markdown'); ?></span></label>
@@ -271,7 +271,7 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarTagsBtn" checked><span><?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarFoldersBtn" checked><span><?php echo t_h('home.folders', [], 'Folders'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarSharesBtn" checked><span><?php echo t_h('home.shares', [], 'Shares'); ?></span></label>
-    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarOfflineBtn" checked><span><?php echo t_h('offline.page.title', [], 'Offline'); ?></span></label>
+    <?php if (poznoteOfflineModeEnabled()): ?><label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarOfflineBtn" checked><span><?php echo t_h('offline.page.title', [], 'Offline'); ?></span></label><?php endif; ?>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarAttachmentsBtn" checked><span><?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarTrashBtn" checked><span><?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarDiaryBtn" checked><span><?php echo t_h('diary.title', [], 'Diary'); ?></span></label>

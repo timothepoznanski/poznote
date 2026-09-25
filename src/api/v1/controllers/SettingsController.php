@@ -315,6 +315,11 @@ class SettingsController {
             return (string) $intVal;
         }
 
+        // Offline mode as a whole (poznoteOfflineModeEnabled() in functions.php)
+        if ($key === 'offline_mode_enabled') {
+            return filter_var($value, FILTER_VALIDATE_BOOLEAN) ? '1' : '0';
+        }
+
         // Days of recently modified notes kept offline in the browser, 0 = off
         if ($key === 'offline_notes_days') {
             $intVal = (int) $value;

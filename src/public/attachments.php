@@ -181,9 +181,11 @@ if (!$note) {
         ], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP) ?: '{}';
     ?></script>
     <script src="js/error-handler.js?v=<?php echo $v; ?>"></script>
+    <?php if (poznoteOfflineModeEnabled()): ?>
     <?php // A file added or removed here reaches the note's offline copy at once (writes only) ?>
     <script src="<?php echo poznoteAsset('js/offline-store.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/offline-sync.js'); ?>" data-offline-mode="writes"></script>
+    <?php endif; ?>
     
     <?php
     // Built server-side rather than through navigation.js's goBackToNote():

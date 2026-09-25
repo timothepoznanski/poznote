@@ -587,7 +587,7 @@ if ($favoritesFolder && ($favorites_count > 0 || (!empty($favorite_folders) && !
 // thin rule between Favorites and the rest of the tree (at the top of the tree
 // when there are no favorites). With account rows the expand button heads the
 // active account's row instead.
-$notesListActions = ($noteSortButton ?? '') . (empty($showAccountRows) ? ($expandFoldersButton ?? '') : '');
+$notesListActions = ($noteSortButton ?? '') . (empty($showAccountRows) ? $expandFoldersButton : '');
 if ($notesListActions !== '') {
     echo '<div class="notes-list-actions">' . $notesListActions . '</div>';
 }
@@ -650,14 +650,15 @@ $renderOtherAccounts($otherAccountProfiles);
 // Single shared dropdown for the per-folder three-dot toggles (position:fixed,
 // populated and placed by toggleFolderActionsMenu in js/utils-menus.js). Kept
 // outside the scrollable container so no ancestor can clip or transform it.
-echo renderFolderActionsMenu($workspace_filter);
+$notesListWorkspace = (string)$workspace_filter;
+echo renderFolderActionsMenu($notesListWorkspace);
 
 // Menu of the Favorites section (js/favorites-menu.js): its own order and star
 // colour, which are settings of the account on screen and so only offered to
 // its owner, and a way to empty it.
 $favoritesMenuSort = $favorites_sort_type ?? POZNOTE_FAVORITES_SORT_DEFAULT;
 $favoritesMenuCanWrite = !function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser();
-echo "<div class='folder-actions-menu' id='favorites-actions-menu' role='menu' data-workspace='" . htmlspecialchars((string)$workspace_filter, ENT_QUOTES) . "' data-icon-color='" . htmlspecialchars((string)($favorites_icon_color ?? ''), ENT_QUOTES) . "'>";
+echo "<div class='folder-actions-menu' id='favorites-actions-menu' role='menu' data-workspace='" . htmlspecialchars($notesListWorkspace, ENT_QUOTES) . "' data-icon-color='" . htmlspecialchars((string)($favorites_icon_color ?? ''), ENT_QUOTES) . "'>";
 if ($favoritesMenuCanWrite) {
     echo "<div class='favorites-menu-label'>" . t_h('sort.header', [], 'Sort by') . "</div>";
     foreach (poznoteFavoritesSortModes() as $favoritesMode) {
@@ -676,7 +677,7 @@ if ($favoritesMenuCanWrite) {
 echo "<div class='folder-actions-menu-item danger' role='menuitem' data-favorites-action='clear'><i class='lucide lucide-eraser'></i><span>" . t_h('notes_list.favorites_menu.clear', [], 'Remove all from favorites') . "</span></div>";
 echo "</div>";
 // Same arrangement for the per-note three-dot toggles.
-echo renderNoteActionsMenu($workspace_filter);
+echo renderNoteActionsMenu($notesListWorkspace);
 ?>
 
 <!-- Mini Calendar Component -->

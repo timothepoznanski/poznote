@@ -73,7 +73,7 @@ function canArchiveFoldersFrom($workspace) {
  * @return array List of action descriptors
  */
 function folderListActions() {
-	return [
+	$actions = [
 		[
 			'action' => 'favorite-folder',
 			'icon' => 'lucide-star',
@@ -184,6 +184,13 @@ function folderListActions() {
 			'danger' => true,
 		],
 	];
+	// "Keep offline" is not offered while offline mode is off (Settings > Offline notes)
+	if (!poznoteOfflineModeEnabled()) {
+		$actions = array_values(array_filter($actions, static function (array $action): bool {
+			return $action['action'] !== 'offline-folder';
+		}));
+	}
+	return $actions;
 }
 
 /**
@@ -702,6 +709,7 @@ $currentLang = getUserLanguage();
 						<i class="lucide lucide-star"></i>
 						<span><?php echo t_h('notes_list.folder_actions.add_favorite', [], 'Add to favorites'); ?></span>
 					</div>
+					<?php if (poznoteOfflineModeEnabled()): ?>
 					<div class="folder-actions-menu-item offline-state-kept danger" data-action="offline-folder">
 						<i class="lucide lucide-wifi-off"></i>
 						<span><?php echo t_h('notes_list.folder_actions.stop_offline', [], 'Stop keeping offline'); ?></span>
@@ -710,6 +718,7 @@ $currentLang = getUserLanguage();
 						<i class="lucide lucide-wifi-off"></i>
 						<span><?php echo t_h('notes_list.folder_actions.keep_offline', [], 'Keep offline'); ?></span>
 					</div>
+					<?php endif; ?>
 					<div class="folder-actions-menu-item" data-action="rename-folder">
 						<i class="lucide lucide-pencil"></i>
 						<span><?php echo t_h('notes_list.folder_actions.rename_folder', [], 'Rename'); ?></span>
@@ -842,13 +851,18 @@ $currentLang = getUserLanguage();
 	<script src="<?php echo poznoteAsset('js/color-palette.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/folder-icon.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/modals-events.js'); ?>"></script>
+	<?php $listFoldersOfflineMode = poznoteOfflineModeEnabled(); ?>
+	<?php if ($listFoldersOfflineMode): ?>
 	<?php // "Keep offline" brings this browser's copies up to date at once (writes-only mode) ?>
 	<script src="<?php echo poznoteAsset('js/offline-store.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/offline-sync.js'); ?>" data-offline-mode="writes"></script>
+	<?php endif; ?>
 	<script src="<?php echo poznoteAsset('js/list_folders.js'); ?>"></script>
+	<?php if ($listFoldersOfflineMode): ?>
 	<?php // Marks the notes and folders kept offline in this browser ?>
 	<script src="<?php echo poznoteAsset('js/offline-marks.js'); ?>" defer
 		data-note-title="<?php echo t_h('notes_list.note_actions.available_offline', [], 'Available offline in this browser'); ?>"
 		data-folder-title="<?php echo t_h('notes_list.folder_actions.kept_offline', [], 'Kept offline in this browser'); ?>"></script>
+	<?php endif; ?>
 </body>
 </html>

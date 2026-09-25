@@ -44,9 +44,14 @@ class OfflineController {
     }
 
     /**
-     * Number of days of notes kept offline for this account, 0 when off.
+     * Number of days of notes kept offline for this account, 0 when off
+     * (offline mode turned off included: the browsers then forget their
+     * copies, js/offline-sync.js).
      */
     public static function getOfflineDays(): int {
+        if (function_exists('poznoteOfflineModeEnabled') && !poznoteOfflineModeEnabled()) {
+            return 0;
+        }
         $raw = function_exists('getSetting') ? getSetting('offline_notes_days', null) : null;
         return poznoteOfflineDays($raw, POZNOTE_OFFLINE_DEFAULT_DAYS, POZNOTE_OFFLINE_MAX_DAYS);
     }

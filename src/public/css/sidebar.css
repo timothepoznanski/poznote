@@ -268,12 +268,20 @@
 .folder-toggle > .offline-mark,
 .folder-toggle > .offline-mark:hover {
     flex: 0 0 auto;
-    width: 3px;
-    height: 3px;
+    width: 5px;
+    height: 5px;
     margin-left: 6px;
     border-radius: var(--pz-radius-circle);
     background-color: var(--pz-accent);
     opacity: 0.7;
+    /* Flex centres it on the line box, which sits above the middle of the
+       lowercase letters: lowered to their centre (measured, the note link
+       and the folder row do not sit the same) */
+    transform: translateY(0.05em);
+}
+
+.folder-toggle > .offline-mark {
+    transform: translateY(0.1em);
 }
 
 /* Favorite folder shortcuts inside the Favorites section */

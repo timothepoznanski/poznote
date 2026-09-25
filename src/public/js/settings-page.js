@@ -116,6 +116,7 @@
             'note_age_filter_days',
             'snapshots_keep_count',
             'snapshots_safety_keep_count',
+            'offline_mode_enabled',
             'offline_notes_days',
             'tasklist_insert_order',
             'diary_default_note_type',
@@ -1023,16 +1024,38 @@
         return (days >= 0 && days <= OFFLINE_NOTES_MAX_DAYS) ? days : OFFLINE_NOTES_DEFAULT_DAYS;
     }
 
+    // Offline mode as a whole (offline_mode_enabled, on unless turned off):
+    // off, nothing is kept and every offline option and indicator leaves the
+    // app (poznoteOfflineModeEnabled() in functions.php).
+    function isOfflineModeEnabled(value) {
+        if (value === null || value === undefined || String(value).trim() === '') {
+            return true;
+        }
+        return value !== '0' && value !== 'false';
+    }
+
     function refreshOfflineNotesBadge() {
-        getSetting('offline_notes_days', function (value) {
-            var badge = document.getElementById('offline-notes-badge');
-            if (!badge) return;
-            var days = getOfflineNotesDays(value);
-            badge.textContent = days > 0
-                ? tr('offline.settings.badge', { days: days }, 'Last ' + days + ' days')
-                : tr('common.disabled', {}, 'Disabled');
-            badge.className = 'setting-status ' + (days > 0 ? 'enabled' : 'disabled');
+        getSetting('offline_mode_enabled', function (enabledValue) {
+            getSetting('offline_notes_days', function (value) {
+                var badge = document.getElementById('offline-notes-badge');
+                if (!badge) return;
+                var days = isOfflineModeEnabled(enabledValue) ? getOfflineNotesDays(value) : 0;
+                badge.textContent = days > 0
+                    ? tr('offline.settings.badge', { days: days }, 'Last ' + days + ' days')
+                    : tr('common.disabled', {}, 'Disabled');
+                badge.className = 'setting-status ' + (days > 0 ? 'enabled' : 'disabled');
+            });
         });
+    }
+
+    // The days, the limits and this browser's status only matter while the
+    // mode is on.
+    function syncOfflineNotesDetails() {
+        var toggle = document.getElementById('offlineModeEnabledInput');
+        var details = document.getElementById('offlineNotesDetails');
+        if (toggle && details) {
+            details.hidden = !toggle.checked;
+        }
     }
 
     // What this very browser holds, read from IndexedDB (js/offline-store.js).
@@ -1082,11 +1105,19 @@
     function openOfflineNotesModal() {
         var modal = document.getElementById('offlineNotesModal');
         if (!modal) return;
-        getSetting('offline_notes_days', function (value) {
-            var input = document.getElementById('offlineNotesDaysInput');
-            if (input) input.value = String(getOfflineNotesDays(value));
-            refreshOfflineNotesDeviceStatus();
-            modal.style.display = 'flex';
+        getSetting('offline_mode_enabled', function (enabledValue) {
+            getSetting('offline_notes_days', function (value) {
+                var toggle = document.getElementById('offlineModeEnabledInput');
+                if (toggle) {
+                    toggle.checked = isOfflineModeEnabled(enabledValue);
+                    toggle.setAttribute('data-saved', toggle.checked ? '1' : '0');
+                }
+                syncOfflineNotesDetails();
+                var input = document.getElementById('offlineNotesDaysInput');
+                if (input) input.value = String(getOfflineNotesDays(value));
+                refreshOfflineNotesDeviceStatus();
+                modal.style.display = 'flex';
+            });
         });
     }
 
@@ -2711,7 +2742,7 @@
         // (panel:note-created-date, panel:note-icons, panel:folder-note-count).
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
-        setupToggleCard('sidebar-offline-marks-card', 'sidebar-offline-marks-status', 'sidebar_offline_marks', false);
+        setupToggleCard('sidebar-offline-marks-card', 'sidebar-offline-marks-status', 'sidebar_offline_marks', false, true);
         setupToggleCard('markdown-split-card-view-card', 'markdown-split-card-view-status', 'markdown_split_card_view', false, true);
         refreshMarkdownColoredBadge();
         setupToggleCard('code-wrap-card', 'code-wrap-status', 'code_block_word_wrap', false, true);
@@ -3069,21 +3100,44 @@
             });
         }
 
+        var offlineModeToggle = document.getElementById('offlineModeEnabledInput');
+        if (offlineModeToggle) {
+            offlineModeToggle.addEventListener('change', syncOfflineNotesDetails);
+        }
+
         var saveOfflineNotesBtn = document.getElementById('saveOfflineNotesModalBtn');
         if (saveOfflineNotesBtn) {
             saveOfflineNotesBtn.addEventListener('click', function () {
+                var toggle = document.getElementById('offlineModeEnabledInput');
+                var enabled = toggle ? toggle.checked : true;
+                var modeChanged = !!toggle && toggle.getAttribute('data-saved') !== (enabled ? '1' : '0');
                 var input = document.getElementById('offlineNotesDaysInput');
                 var raw = input ? parseInt(input.value, 10) : OFFLINE_NOTES_DEFAULT_DAYS;
                 var days = isNaN(raw) ? OFFLINE_NOTES_DEFAULT_DAYS : Math.max(0, Math.min(OFFLINE_NOTES_MAX_DAYS, raw));
-                setSetting('offline_notes_days', String(days), function (success) {
-                    if (success) {
+                var failed = function () {
+                    alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                };
+                setSetting('offline_mode_enabled', enabled ? '1' : '0', function (modeSaved) {
+                    if (!modeSaved) {
+                        failed();
+                        return;
+                    }
+                    setSetting('offline_notes_days', String(days), function (success) {
+                        if (!success) {
+                            failed();
+                            return;
+                        }
                         try { closeModal('offlineNotesModal'); } catch (e) {
                             console.debug('settings-page: closeModal(offlineNotesModal) failed:', e);
                         }
                         refreshOfflineNotesBadge();
-                    } else {
-                        alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
-                    }
+                        // The rail's Offline button and the "Show offline
+                        // notes" card come and go with the mode
+                        if (modeChanged) {
+                            reloadOpener();
+                            reloadCurrentSettingsPage();
+                        }
+                    });
                 });
             });
         }
