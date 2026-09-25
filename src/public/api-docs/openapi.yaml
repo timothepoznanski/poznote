@@ -1517,6 +1517,48 @@ paths:
         '403':
           description: Offline copies are only kept for the account's owner
 
+  /offline/list:
+    get:
+      tags: [Notes]
+      summary: Notes and folders kept offline, with why
+      description: |
+        Feeds the Offline page (offline_notes.php). The notes of the
+        manifest with why each is kept (`reason`: note, folder, favorite
+        or recent) and their folder path, and the folders kept whole
+        (`is_direct` when marked "Keep offline" themselves, otherwise kept
+        through a parent) with their number of notes kept offline. Refused
+        (403, `offline_unavailable`) on an account the session does not own.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: workspace
+          in: query
+          required: false
+          description: Only this workspace (every workspace when omitted)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notes and folders kept offline
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  days:
+                    type: integer
+                  notes:
+                    type: array
+                    items:
+                      type: object
+                  folders:
+                    type: array
+                    items:
+                      type: object
+        '403':
+          description: Offline copies are only kept for the account's owner
+
   /offline/notes:
     get:
       tags: [Notes]

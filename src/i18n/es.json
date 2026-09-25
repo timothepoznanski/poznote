@@ -5121,6 +5121,25 @@
     },
     "keep": {
       "error": "No se pudo guardar el ajuste sin conexión."
+    },
+    "page": {
+      "title": "Sin conexión",
+      "filter_placeholder": "Filtrar por nombre o carpeta...",
+      "column_reason": "Motivo",
+      "reason_note": "Guardada sin conexión",
+      "reason_folder": "En una carpeta guardada sin conexión",
+      "reason_favorite": "Favorito",
+      "reason_recent": "Modificada en los últimos {{days}} días",
+      "reason_recent_one": "Modificada en el último día",
+      "folder_direct": "Guardada sin conexión",
+      "folder_parent": "Mediante una carpeta superior",
+      "empty": "Todavía no hay nada disponible sin conexión.",
+      "empty_hint": "Elija «Guardar sin conexión» en el menú de una nota o de una carpeta. Sus favoritos y las notas modificadas en los últimos {{days}} días también se guardan.",
+      "disabled": "Las notas sin conexión están desactivadas.",
+      "disabled_hint": "Elija cuántos días de notas guardar en Ajustes, Notas sin conexión.",
+      "no_notes": "Ninguna nota disponible sin conexión.",
+      "no_folders": "Ninguna carpeta guardada sin conexión.",
+      "own_account_only": "Las copias sin conexión solo se guardan para su propia cuenta."
     }
   }
 }

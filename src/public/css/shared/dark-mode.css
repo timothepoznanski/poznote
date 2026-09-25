@@ -121,6 +121,14 @@ html[data-theme='dark'] .note-actions .btn-danger:hover {
     color: var(--pz-text-inverse);
 }
 
+/* The icon is the whole label of these chips: it takes the button's colour
+   above, not the --pz-icon / --pz-icon-hover every lucide icon gets from
+   dark-mode/icons.css, which vanishes on the full-colour hover. */
+html[data-theme='dark'] .note-actions .btn i[class*="lucide-"],
+html[data-theme='dark'] .note-actions .btn i[class*="lucide-"]:hover {
+    color: inherit;
+}
+
 html[data-theme='dark'] .indexable-label-text {
     color: var(--pz-text-strong);
 }
@@ -181,6 +189,14 @@ html[data-theme='dark'] .filter-type-btn.active {
     background: var(--pz-accent);
     color: var(--pz-text-inverse);
     border-color: var(--pz-accent);
+}
+
+/* The icon follows its label: dark-mode/icons.css paints every lucide icon
+   --pz-icon (and --pz-icon-hover under the pointer), which vanishes on the
+   accent fill of the active button. */
+html[data-theme='dark'] .filter-type-btn i[class*="lucide-"],
+html[data-theme='dark'] .filter-type-btn i[class*="lucide-"]:hover {
+    color: inherit;
 }
 
 html[data-theme='dark'] .shared-type-icon:not([data-icon-color]) {

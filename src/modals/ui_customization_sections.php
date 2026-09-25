@@ -269,6 +269,7 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarTagsBtn" checked><span><?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarFoldersBtn" checked><span><?php echo t_h('home.folders', [], 'Folders'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarSharesBtn" checked><span><?php echo t_h('home.shares', [], 'Shares'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarOfflineBtn" checked><span><?php echo t_h('offline.page.title', [], 'Offline'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarAttachmentsBtn" checked><span><?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarTrashBtn" checked><span><?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarDiaryBtn" checked><span><?php echo t_h('diary.title', [], 'Diary'); ?></span></label>

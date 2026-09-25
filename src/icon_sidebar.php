@@ -95,6 +95,7 @@ $iconSidebarItems = [
     ['id' => 'iconSidebarDiaryBtn', 'group' => 'content', 'url' => $iconSidebarUrl('diary.php'), 'page' => 'diary.php', 'icon' => 'lucide-book-open', 'label' => t('diary.title', [], 'Diary')],
     ['id' => 'iconSidebarTagsBtn', 'group' => 'collections', 'url' => $iconSidebarUrl('list_tags.php'), 'page' => 'list_tags.php', 'icon' => 'lucide-tags', 'label' => t('notes_list.system_folders.tags', [], 'Tags')],
     ['id' => 'iconSidebarSharesBtn', 'group' => 'collections', 'url' => $iconSidebarUrl('shared.php'), 'page' => 'shared.php', 'icon' => 'lucide-share-2', 'label' => t('home.shares', [], 'Shares')],
+    ['id' => 'iconSidebarOfflineBtn', 'group' => 'collections', 'url' => $iconSidebarUrl('offline_notes.php'), 'page' => 'offline_notes.php', 'icon' => 'lucide-wifi-off', 'label' => t('offline.page.title', [], 'Offline')],
     ['id' => 'iconSidebarAttachmentsBtn', 'group' => 'collections', 'url' => $iconSidebarUrl('attachments_list.php'), 'page' => 'attachments_list.php', 'icon' => 'lucide-paperclip', 'label' => t('notes_list.system_folders.attachments', [], 'Attachments')],
     ['id' => 'iconSidebarTrashBtn', 'group' => 'utility', 'url' => $iconSidebarUrl('trash.php'), 'page' => 'trash.php', 'icon' => 'lucide-trash-2', 'label' => t('notes_list.system_folders.trash', [], 'Trash')],
 ];
@@ -105,9 +106,16 @@ $iconSidebarItems = [
 // not offered either.
 $iconSidebarSharedScopeActive = function_exists('isSharedWorkspaceScopeActive') && isSharedWorkspaceScopeActive();
 if ($iconSidebarSharedScopeActive) {
-    $iconSidebarHiddenPages = ['notes_manager.php', 'shared.php', 'trash.php'];
+    $iconSidebarHiddenPages = ['notes_manager.php', 'shared.php', 'trash.php', 'offline_notes.php'];
     $iconSidebarItems = array_values(array_filter($iconSidebarItems, static function (array $item) use ($iconSidebarHiddenPages): bool {
         return !in_array($item['page'] ?? '', $iconSidebarHiddenPages, true);
+    }));
+}
+
+// Offline copies are kept for the login's own account only (OfflineController)
+if (function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser()) {
+    $iconSidebarItems = array_values(array_filter($iconSidebarItems, static function (array $item): bool {
+        return ($item['page'] ?? '') !== 'offline_notes.php';
     }));
 }
 

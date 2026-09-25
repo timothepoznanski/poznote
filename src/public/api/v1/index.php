@@ -341,6 +341,10 @@ $router->get('/offline/manifest', function($params) use ($offlineController) {
     $offlineController->manifest();
 });
 
+$router->get('/offline/list', function($params) use ($offlineController) {
+    $offlineController->listing();
+});
+
 $router->get('/offline/notes', function($params) use ($offlineController) {
     $offlineController->notes();
 });

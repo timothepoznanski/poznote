@@ -5220,6 +5220,25 @@
     },
     "keep": {
       "error": "无法保存离线设置。"
+    },
+    "page": {
+      "title": "离线",
+      "filter_placeholder": "按名称或文件夹筛选...",
+      "column_reason": "原因",
+      "reason_note": "离线保留",
+      "reason_folder": "位于离线保留的文件夹中",
+      "reason_favorite": "收藏",
+      "reason_recent": "最近 {{days}} 天内修改",
+      "reason_recent_one": "最近一天内修改",
+      "folder_direct": "离线保留",
+      "folder_parent": "通过上级文件夹",
+      "empty": "目前还没有可离线使用的内容。",
+      "empty_hint": "在笔记或文件夹的菜单中选择“离线保留”。收藏的笔记和最近 {{days}} 天内修改的笔记也会被保留。",
+      "disabled": "离线笔记已关闭。",
+      "disabled_hint": "在“设置 > 离线笔记”中选择保留多少天的笔记。",
+      "no_notes": "没有可离线使用的笔记。",
+      "no_folders": "没有离线保留的文件夹。",
+      "own_account_only": "离线副本只为您自己的账户保留。"
     }
   }
 }

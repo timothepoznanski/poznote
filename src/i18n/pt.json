@@ -5121,6 +5121,25 @@
     },
     "keep": {
       "error": "Não foi possível salvar a configuração offline."
+    },
+    "page": {
+      "title": "Offline",
+      "filter_placeholder": "Filtrar por nome ou pasta...",
+      "column_reason": "Motivo",
+      "reason_note": "Mantida offline",
+      "reason_folder": "Em uma pasta mantida offline",
+      "reason_favorite": "Favorito",
+      "reason_recent": "Modificada nos últimos {{days}} dias",
+      "reason_recent_one": "Modificada no último dia",
+      "folder_direct": "Mantida offline",
+      "folder_parent": "Por meio de uma pasta superior",
+      "empty": "Ainda não há nada disponível offline.",
+      "empty_hint": "Escolha \"Manter offline\" no menu de uma nota ou de uma pasta. Seus favoritos e as notas modificadas nos últimos {{days}} dias também são mantidos.",
+      "disabled": "As notas offline estão desativadas.",
+      "disabled_hint": "Escolha quantos dias de notas manter em Configurações, Notas offline.",
+      "no_notes": "Nenhuma nota disponível offline.",
+      "no_folders": "Nenhuma pasta mantida offline.",
+      "own_account_only": "As cópias offline só são mantidas para a sua própria conta."
     }
   }
 }

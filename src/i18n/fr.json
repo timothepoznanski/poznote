@@ -5225,6 +5225,25 @@
     },
     "keep": {
       "error": "Le réglage hors ligne n'a pas pu être enregistré."
+    },
+    "page": {
+      "title": "Hors ligne",
+      "filter_placeholder": "Filtrer par nom ou dossier...",
+      "column_reason": "Raison",
+      "reason_note": "Gardée hors ligne",
+      "reason_folder": "Dans un dossier gardé hors ligne",
+      "reason_favorite": "Favori",
+      "reason_recent": "Modifiée ces {{days}} derniers jours",
+      "reason_recent_one": "Modifiée ces dernières 24 heures",
+      "folder_direct": "Gardé hors ligne",
+      "folder_parent": "Via un dossier parent",
+      "empty": "Rien n'est encore disponible hors ligne.",
+      "empty_hint": "Choisissez « Garder hors ligne » dans le menu d'une note ou d'un dossier. Vos favoris et les notes modifiées ces {{days}} derniers jours sont gardés aussi.",
+      "disabled": "Les notes hors ligne sont désactivées.",
+      "disabled_hint": "Choisissez combien de jours de notes garder dans Paramètres, Notes hors ligne.",
+      "no_notes": "Aucune note disponible hors ligne.",
+      "no_folders": "Aucun dossier gardé hors ligne.",
+      "own_account_only": "Les copies hors ligne ne sont gardées que pour votre propre compte."
     }
   }
 }

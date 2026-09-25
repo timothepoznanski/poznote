@@ -4940,6 +4940,25 @@
     },
     "keep": {
       "error": "The offline setting could not be saved."
+    },
+    "page": {
+      "title": "Offline",
+      "filter_placeholder": "Filter by name or folder...",
+      "column_reason": "Reason",
+      "reason_note": "Kept offline",
+      "reason_folder": "In a folder kept offline",
+      "reason_favorite": "Favorite",
+      "reason_recent": "Modified in the last {{days}} days",
+      "reason_recent_one": "Modified in the last day",
+      "folder_direct": "Kept offline",
+      "folder_parent": "Via a parent folder",
+      "empty": "Nothing is available offline yet.",
+      "empty_hint": "Choose \"Keep offline\" in the menu of a note or a folder. Your favorites and the notes modified in the last {{days}} days are kept too.",
+      "disabled": "Offline notes are turned off.",
+      "disabled_hint": "Choose how many days of notes to keep in Settings, Offline notes.",
+      "no_notes": "No notes available offline.",
+      "no_folders": "No folders kept offline.",
+      "own_account_only": "Offline copies are only kept for your own account."
     }
   }
 }

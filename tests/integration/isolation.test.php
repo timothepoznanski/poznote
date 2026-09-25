@@ -89,6 +89,7 @@ function routeTable(): array
         'GET /notes/with-attachments' => [SCOPED],
         'GET /notes/templates' => [SCOPED],
         'GET /changes' => [SCOPED],
+        'GET /offline/list' => [SCOPED],
         'GET /graph' => [SCOPED],
         'POST /convert-html' => [SCOPED, 'body' => ['content' => '# heading']],
         'POST /convert-markdown' => [SCOPED, 'body' => ['content' => '<p>text</p>']],

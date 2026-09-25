@@ -5120,6 +5120,25 @@
     },
     "keep": {
       "error": "Die Offline-Einstellung konnte nicht gespeichert werden."
+    },
+    "page": {
+      "title": "Offline",
+      "filter_placeholder": "Nach Name oder Ordner filtern...",
+      "column_reason": "Grund",
+      "reason_note": "Offline behalten",
+      "reason_folder": "In einem offline behaltenen Ordner",
+      "reason_favorite": "Favorit",
+      "reason_recent": "In den letzten {{days}} Tagen geändert",
+      "reason_recent_one": "Am letzten Tag geändert",
+      "folder_direct": "Offline behalten",
+      "folder_parent": "Über einen übergeordneten Ordner",
+      "empty": "Noch ist nichts offline verfügbar.",
+      "empty_hint": "Wählen Sie „Offline behalten“ im Menü einer Notiz oder eines Ordners. Ihre Favoriten und die in den letzten {{days}} Tagen geänderten Notizen werden ebenfalls behalten.",
+      "disabled": "Offline-Notizen sind deaktiviert.",
+      "disabled_hint": "Legen Sie unter Einstellungen, Offline-Notizen fest, wie viele Tage an Notizen behalten werden.",
+      "no_notes": "Keine Notizen offline verfügbar.",
+      "no_folders": "Keine Ordner offline behalten.",
+      "own_account_only": "Offline-Kopien werden nur für Ihr eigenes Konto behalten."
     }
   }
 }
