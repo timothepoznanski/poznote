@@ -4,7 +4,7 @@
   },
   "welcome_note": {
     "title": "Welcome to Poznote",
-    "content": "<p>Poznote is a personal note-taking and documentation platform.</p>\n<br>\nDiscover <a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">all the features</a> included in Poznote.\n<br><br>\nClick the <code>+</code> button to create your first note.\n<br><br>\nInside a note, type <code>/</code> to open the commands menu.\n<br><br>\nI hope you will enjoy using Poznote! ✨\n<br><br>\n<a href=\"https://ko-fi.com/timothepoznanski\" target=\"_blank\" style=\"text-decoration: none;\">Tim</a>"
+    "content": "<p>Poznote is a note-taking and documentation platform.</p>\n<br>\nDiscover <a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">all the features</a> included in Poznote.\n<br><br>\nClick the <code>+</code> button to create your first note.\n<br><br>\nInside a note, type <code>/</code> or right click to open the commands menu."
   },
   "markdown_syntax": {
     "menu_item": "Markdown syntax",
@@ -191,7 +191,7 @@
       "allow_executable_attachments": "Allow scripts and executables (.sh, .ps1, .bat, .exe, .py, ...) to be attached to notes, for every account on this instance. Poznote never runs them, it only stores and serves them. File types a web server could execute, such as .php, stay blocked.",
       "backlinks_at_bottom": "Show the backlinks section at the bottom of notes instead of the top.",
       "default_image_border": "Display images in notes with a border and no padding by default.",
-      "spellcheck_html_notes": "Enable the browser spell checker in HTML notes.",
+      "spellcheck_html_notes": "Enable the browser spell checker in rich text notes.",
       "slash_menu_trigger": "On a computer, choose whether the command menu opens by typing /, with Alt + /, or not from the keyboard at all. A right-click in a note opens it whatever this is set to.",
       "slash_menu_trigger_mobile": "On mobile, choose whether the command menu opens by typing /, with Alt + / from a hardware keyboard, or not from the keyboard at all.",
       "icon_sidebar_order": "Change the order and the color of the buttons in the icon sidebar and place separators between them.",
@@ -761,9 +761,9 @@
   },
   "modals": {
     "paste_markdown": {
-      "title": "Insert HTML",
-      "menu_item": "Insert HTML",
-      "hint": "Paste formatted content (a web page, Word, an email) into the box below. Its HTML, headings, links, lists and tables, is converted to Markdown that you can review, edit, then insert into your note.",
+      "title": "Insert rich text",
+      "menu_item": "Insert rich text",
+      "hint": "Paste formatted content (a web page, Word, an email) into the box below. Its formatting, headings, links, lists and tables, is converted to Markdown that you can review, edit, then insert into your note.",
       "placeholder": "Paste here (Ctrl+V)",
       "preview_label": "Markdown preview",
       "insert": "Insert",
@@ -775,7 +775,7 @@
     "insert_markdown": {
       "title": "Insert Markdown",
       "menu_item": "Insert Markdown",
-      "hint": "Paste or type Markdown in the box below. It is converted to HTML that you can preview, then insert into your note.",
+      "hint": "Paste or type Markdown in the box below. It is converted to rich text that you can preview, then insert into your note.",
       "placeholder": "Paste or type Markdown here",
       "preview_label": "Preview",
       "insert": "Insert",
@@ -1042,7 +1042,7 @@
       "title_in_folder": "Create in {{folder}}",
       "folder_fallback": "folder",
       "note": {
-        "title": "HTML Note"
+        "title": "Rich text note"
       },
       "markdown": {
         "title": "Markdown note"
@@ -1102,11 +1102,11 @@
     "convert": {
       "title": "Convert Note",
       "message": "Are you sure you want to convert this note?",
-      "to_html_title": "Convert to HTML",
-      "to_html_message": "This will convert your Markdown note to HTML format.",
+      "to_html_title": "Convert to rich text",
+      "to_html_message": "This will convert your Markdown note to a rich text note.",
       "to_html_warning": "Before converting this note, you may want to duplicate it to keep a copy in case the conversion doesn't meet your expectations.",
       "to_markdown_title": "Convert to Markdown",
-      "to_markdown_message": "This will convert your HTML note to Markdown format. Embedded images will be saved as attachments.",
+      "to_markdown_message": "This will convert your rich text note to Markdown format. Embedded images will be saved as attachments.",
       "to_markdown_warning": "Before converting this note, you may want to duplicate it to keep a copy in case the conversion doesn't meet your expectations.",
       "converting": "Converting note...",
       "success": "Note converted successfully!",
@@ -1526,7 +1526,7 @@
     "filter_folders": "Filter folders...",
     "filter_placeholder": "Filter notes by title or tags...",
     "filter_type": "Filter by type",
-    "type_html": "HTML",
+    "type_html": "Rich text",
     "type_markdown": "Markdown",
     "type_tasklist": "Tasklist",
     "type_excalidraw": "Excalidraw",
@@ -1759,7 +1759,7 @@
       "public_note": "Share note",
       "attachments_with_count": "Attachments ({{count}})",
       "menu_actions": "Menu actions",
-      "convert_to_html": "Convert to HTML",
+      "convert_to_html": "Convert to rich text",
       "note_width": "Note width",
       "note_width_current": "Note width: {{width}}",
       "note_width_default": "Default ({{width}})",
@@ -4576,13 +4576,19 @@
   },
   "archive": {
     "menu_item": "Archive note",
+    "folder_menu_item": "Archive folder",
     "confirm_title": "Archive note",
     "confirm_message": "\"{{title}}\" will be moved to the \"{{workspace}}\" workspace, keeping its folder path. The workspace is created if it does not exist yet.",
     "confirm_button": "Archive",
     "already_archived": "This note is already in the \"{{workspace}}\" workspace.",
+    "folder_confirm_title": "Archive folder",
+    "folder_confirm_message": "The folder \"{{folder}}\", its subfolders and notes will be moved to the \"{{workspace}}\" workspace, keeping its folder path. The workspace is created if it does not exist yet.",
+    "folder_already_archived": "This folder is already in the \"{{workspace}}\" workspace.",
     "errors": {
       "duplicate_title": "A note with the same title is already archived in this folder.",
-      "archive_prefix": "Error archiving the note: {{error}}"
+      "archive_prefix": "Error archiving the note: {{error}}",
+      "folder_duplicate_titles": "Nothing was archived: these notes have the same title as a note already archived in the same folder: {{titles}}",
+      "folder_archive_prefix": "Error archiving the folder: {{error}}"
     }
   },
   "welcome_page": {
@@ -4934,6 +4940,25 @@
     },
     "keep": {
       "error": "The offline setting could not be saved."
+    },
+    "page": {
+      "title": "Offline",
+      "filter_placeholder": "Filter by name or folder...",
+      "column_reason": "Reason",
+      "reason_note": "Kept offline",
+      "reason_folder": "In a folder kept offline",
+      "reason_favorite": "Favorite",
+      "reason_recent": "Modified in the last {{days}} days",
+      "reason_recent_one": "Modified in the last day",
+      "folder_direct": "Kept offline",
+      "folder_parent": "Via a parent folder",
+      "empty": "Nothing is available offline yet.",
+      "empty_hint": "Choose \"Keep offline\" in the menu of a note or a folder. Your favorites and the notes modified in the last {{days}} days are kept too.",
+      "disabled": "Offline notes are turned off.",
+      "disabled_hint": "Choose how many days of notes to keep in Settings, Offline notes.",
+      "no_notes": "No notes available offline.",
+      "no_folders": "No folders kept offline.",
+      "own_account_only": "Offline copies are only kept for your own account."
     }
   }
 }

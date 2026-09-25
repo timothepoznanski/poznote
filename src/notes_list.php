@@ -607,7 +607,7 @@ $renderOtherAccounts($otherAccountProfiles);
 // Single shared dropdown for the per-folder three-dot toggles (position:fixed,
 // populated and placed by toggleFolderActionsMenu in js/utils-menus.js). Kept
 // outside the scrollable container so no ancestor can clip or transform it.
-echo renderFolderActionsMenu();
+echo renderFolderActionsMenu($workspace_filter);
 // Same arrangement for the per-note three-dot toggles.
 echo renderNoteActionsMenu($workspace_filter);
 ?>

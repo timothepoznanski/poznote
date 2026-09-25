@@ -859,12 +859,12 @@ $pzNoteInfoRows = [
 <!-- Paste as Markdown Modal -->
 <div id="pasteMarkdownModal" class="modal">
     <div class="modal-content paste-markdown-modal-content">
-        <h3><?php echo t_h('modals.paste_markdown.title', [], 'Insert HTML'); ?></h3>
+        <h3><?php echo t_h('modals.paste_markdown.title', [], 'Insert rich text'); ?></h3>
         <div class="modal-body">
-            <p class="paste-markdown-hint"><?php echo t_h('modals.paste_markdown.hint', [], 'Paste formatted content (a web page, Word, an email) into the box below. Its HTML, headings, links, lists and tables, is converted to Markdown that you can review, edit, then insert into your note.'); ?></p>
+            <p class="paste-markdown-hint"><?php echo t_h('modals.paste_markdown.hint', [], 'Paste formatted content (a web page, Word, an email) into the box below. Its formatting, headings, links, lists and tables, is converted to Markdown that you can review, edit, then insert into your note.'); ?></p>
             <!-- contenteditable, not a textarea: only a rich-text target receives
                  the clipboard's text/html flavour that carries the formatting. -->
-            <div id="pasteMarkdownDropzone" class="paste-markdown-dropzone" contenteditable="true" role="textbox" aria-multiline="true" aria-label="<?php echo t_h('modals.paste_markdown.title', [], 'Insert HTML'); ?>" data-placeholder="<?php echo t_h('modals.paste_markdown.placeholder', [], 'Paste here (Ctrl+V)'); ?>"></div>
+            <div id="pasteMarkdownDropzone" class="paste-markdown-dropzone" contenteditable="true" role="textbox" aria-multiline="true" aria-label="<?php echo t_h('modals.paste_markdown.title', [], 'Insert rich text'); ?>" data-placeholder="<?php echo t_h('modals.paste_markdown.placeholder', [], 'Paste here (Ctrl+V)'); ?>"></div>
             <div id="pasteMarkdownPreviewWrapper" class="paste-markdown-preview-wrapper is-hidden">
                 <label class="paste-markdown-preview-label" for="pasteMarkdownPreview"><?php echo t_h('modals.paste_markdown.preview_label', [], 'Markdown preview'); ?></label>
                 <textarea id="pasteMarkdownPreview" class="paste-markdown-preview" spellcheck="false" aria-label="<?php echo t_h('modals.paste_markdown.preview_label', [], 'Markdown preview'); ?>"></textarea>
@@ -883,7 +883,7 @@ $pzNoteInfoRows = [
     <div class="modal-content paste-markdown-modal-content">
         <h3><?php echo t_h('modals.insert_markdown.title', [], 'Insert Markdown'); ?></h3>
         <div class="modal-body">
-            <p class="paste-markdown-hint"><?php echo t_h('modals.insert_markdown.hint', [], 'Paste or type Markdown in the box below. It is converted to HTML that you can preview, then insert into your note.'); ?></p>
+            <p class="paste-markdown-hint"><?php echo t_h('modals.insert_markdown.hint', [], 'Paste or type Markdown in the box below. It is converted to rich text that you can preview, then insert into your note.'); ?></p>
             <!-- Markdown is plain text, so a textarea is enough to capture it. -->
             <textarea id="insertMarkdownSource" class="paste-markdown-preview" spellcheck="false" aria-label="<?php echo t_h('modals.insert_markdown.title', [], 'Insert Markdown'); ?>" placeholder="<?php echo t_h('modals.insert_markdown.placeholder', [], 'Paste or type Markdown here'); ?>"></textarea>
             <div id="insertMarkdownPreviewWrapper" class="paste-markdown-preview-wrapper is-hidden">

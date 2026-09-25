@@ -4,7 +4,7 @@
   },
   "welcome_note": {
     "title": "Willkommen bei Poznote",
-    "content": "<p>Poznote ist eine persönliche Plattform zum Erstellen von Notizen und Dokumentationen.</p>\n<br>\nEntdecken Sie <a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">alle Funktionen</a>, die Poznote bietet.\n<br><br>\nKlicken Sie auf die Schaltfläche <code>+</code>, um Ihre erste Notiz zu erstellen.\n<br><br>\nGeben Sie in einer Notiz <code>/</code> ein, um das Befehlsmenü zu öffnen.\n<br><br>\nViel Freude bei der Nutzung von Poznote! ✨\n<br><br>\n<a href=\"https://ko-fi.com/timothepoznanski\" target=\"_blank\" style=\"text-decoration: none;\">Tim</a>"
+    "content": "<p>Poznote ist eine Plattform zum Erstellen von Notizen und Dokumentationen.</p>\n<br>\nEntdecken Sie <a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">alle Funktionen</a>, die Poznote bietet.\n<br><br>\nKlicken Sie auf die Schaltfläche <code>+</code>, um Ihre erste Notiz zu erstellen.\n<br><br>\nGeben Sie in einer Notiz <code>/</code> ein oder klicken Sie mit der rechten Maustaste, um das Befehlsmenü zu öffnen."
   },
   "markdown_syntax": {
     "menu_item": "Markdown-Syntax",
@@ -515,7 +515,7 @@
       "allow_executable_attachments": "Erlaubt Skripte und ausführbare Dateien (.sh, .ps1, .bat, .exe, .py, ...) als Anhang, für alle Konten dieser Instanz. Poznote führt sie nie aus, es speichert und liefert sie nur aus. Dateitypen, die ein Webserver ausführen könnte, etwa .php, bleiben blockiert.",
       "backlinks_at_bottom": "Zeigen Sie den Backlink-Bereich unten statt oben in Notizen an.",
       "default_image_border": "Zeigen Sie Bilder in Notizen standardmäßig mit Rahmen und ohne Innenabstand an.",
-      "spellcheck_html_notes": "Aktivieren Sie die Rechtschreibprüfung des Browsers in HTML-Notizen.",
+      "spellcheck_html_notes": "Aktivieren Sie die Rechtschreibprüfung des Browsers in Rich-Text-Notizen.",
       "slash_menu_trigger": "Wählen Sie für den Computer, ob sich das Befehlsmenü mit /, mit Alt + / oder gar nicht über die Tastatur öffnet. Ein Rechtsklick in einer Notiz öffnet es unabhängig von dieser Einstellung.",
       "slash_menu_trigger_mobile": "Wählen Sie für Mobilgeräte, ob sich das Befehlsmenü mit /, mit Alt + / auf einer Hardwaretastatur oder gar nicht über die Tastatur öffnet.",
       "icon_sidebar_order": "Ändern Sie die Reihenfolge und die Farbe der Schaltflächen in der Icon-Seitenleiste und setzen Sie Trennlinien dazwischen.",
@@ -1256,9 +1256,9 @@
   },
   "modals": {
     "paste_markdown": {
-      "title": "HTML einfügen",
-      "menu_item": "HTML einfügen",
-      "hint": "Fügen Sie formatierten Inhalt (Webseite, Word, E-Mail) in das Feld unten ein. Das HTML, Überschriften, Links, Listen und Tabellen, wird in Markdown umgewandelt, das Sie prüfen, bearbeiten und dann in Ihre Notiz einfügen können.",
+      "title": "Rich Text einfügen",
+      "menu_item": "Rich Text einfügen",
+      "hint": "Fügen Sie formatierten Inhalt (Webseite, Word, E-Mail) in das Feld unten ein. Die Formatierung, Überschriften, Links, Listen und Tabellen, wird in Markdown umgewandelt, das Sie prüfen, bearbeiten und dann in Ihre Notiz einfügen können.",
       "placeholder": "Hier einfügen (Strg+V)",
       "preview_label": "Markdown-Vorschau",
       "insert": "Einfügen",
@@ -1270,7 +1270,7 @@
     "insert_markdown": {
       "title": "Markdown einfügen",
       "menu_item": "Markdown einfügen",
-      "hint": "Fügen Sie Markdown in das Feld unten ein oder geben Sie es ein. Es wird in HTML umgewandelt, das Sie in der Vorschau prüfen und dann in Ihre Notiz einfügen können.",
+      "hint": "Fügen Sie Markdown in das Feld unten ein oder geben Sie es ein. Es wird in Rich Text umgewandelt, den Sie in der Vorschau prüfen und dann in Ihre Notiz einfügen können.",
       "placeholder": "Markdown hier einfügen oder eingeben",
       "preview_label": "Vorschau",
       "insert": "Einfügen",
@@ -1526,7 +1526,7 @@
       "title_in_folder": "Erstellen in {{folder}}",
       "folder_fallback": "Ordner",
       "note": {
-        "title": "HTML-Notiz"
+        "title": "Rich-Text-Notiz"
       },
       "markdown": {
         "title": "Markdown-Notiz"
@@ -1586,11 +1586,11 @@
     "convert": {
       "title": "Notiz konvertieren",
       "message": "Sind Sie sicher, dass Sie diese Notiz konvertieren möchten?",
-      "to_html_title": "In HTML konvertieren",
-      "to_html_message": "Dies wird Ihre Markdown-Notiz in das HTML-Format konvertieren.",
+      "to_html_title": "In Rich Text konvertieren",
+      "to_html_message": "Dies wird Ihre Markdown-Notiz in eine Rich-Text-Notiz konvertieren.",
       "to_html_warning": "Bevor Sie diese Notiz konvertieren, können Sie sie duplizieren, um eine Kopie zu behalten, falls die Konvertierung nicht Ihren Erwartungen entspricht.",
       "to_markdown_title": "In Markdown konvertieren",
-      "to_markdown_message": "Dies wird Ihre HTML-Notiz in das Markdown-Format konvertieren. Eingebettete Bilder werden als Anhänge gespeichert.",
+      "to_markdown_message": "Dies wird Ihre Rich-Text-Notiz in das Markdown-Format konvertieren. Eingebettete Bilder werden als Anhänge gespeichert.",
       "to_markdown_warning": "Bevor Sie diese Notiz konvertieren, können Sie sie duplizieren, um eine Kopie zu behalten, falls die Konvertierung nicht Ihren Erwartungen entspricht.",
       "converting": "Notiz wird konvertiert...",
       "success": "Notiz erfolgreich konvertiert!",
@@ -2024,7 +2024,7 @@
     "age_recent": "Nur aktuelle",
     "all_types": "Alle Typen",
     "filter_type": "Nach Typ filtern",
-    "type_html": "HTML",
+    "type_html": "Rich Text",
     "type_markdown": "Markdown",
     "type_tasklist": "Aufgabenliste",
     "type_excalidraw": "Excalidraw",
@@ -2254,7 +2254,7 @@
       "public_note": "Notiz teilen",
       "attachments_with_count": "Anhänge ({{count}})",
       "menu_actions": "Menüaktionen",
-      "convert_to_html": "In HTML konvertieren",
+      "convert_to_html": "In Rich Text konvertieren",
       "note_width": "Notizbreite",
       "note_width_current": "Notizbreite: {{width}}",
       "note_width_default": "Standard ({{width}})",
@@ -4852,13 +4852,19 @@
   },
   "archive": {
     "menu_item": "Notiz archivieren",
+    "folder_menu_item": "Ordner archivieren",
     "confirm_title": "Notiz archivieren",
     "confirm_message": "„{{title}}“ wird in den Arbeitsbereich „{{workspace}}“ verschoben und behält dabei seinen Ordnerpfad. Der Arbeitsbereich wird angelegt, falls er noch nicht existiert.",
     "confirm_button": "Archivieren",
     "already_archived": "Diese Notiz liegt bereits im Arbeitsbereich „{{workspace}}“.",
+    "folder_confirm_title": "Ordner archivieren",
+    "folder_confirm_message": "Der Ordner „{{folder}}“ wird mit seinen Unterordnern und Notizen in den Arbeitsbereich „{{workspace}}“ verschoben und behält dabei seinen Ordnerpfad. Der Arbeitsbereich wird angelegt, falls er noch nicht existiert.",
+    "folder_already_archived": "Dieser Ordner liegt bereits im Arbeitsbereich „{{workspace}}“.",
     "errors": {
       "duplicate_title": "In diesem Ordner ist bereits eine Notiz mit demselben Titel archiviert.",
-      "archive_prefix": "Fehler beim Archivieren der Notiz: {{error}}"
+      "archive_prefix": "Fehler beim Archivieren der Notiz: {{error}}",
+      "folder_duplicate_titles": "Nichts wurde archiviert: Diese Notizen haben denselben Titel wie eine bereits im selben Ordner archivierte Notiz: {{titles}}",
+      "folder_archive_prefix": "Fehler beim Archivieren des Ordners: {{error}}"
     }
   },
   "welcome_page": {
@@ -5114,6 +5120,25 @@
     },
     "keep": {
       "error": "Die Offline-Einstellung konnte nicht gespeichert werden."
+    },
+    "page": {
+      "title": "Offline",
+      "filter_placeholder": "Nach Name oder Ordner filtern...",
+      "column_reason": "Grund",
+      "reason_note": "Offline behalten",
+      "reason_folder": "In einem offline behaltenen Ordner",
+      "reason_favorite": "Favorit",
+      "reason_recent": "In den letzten {{days}} Tagen geändert",
+      "reason_recent_one": "Am letzten Tag geändert",
+      "folder_direct": "Offline behalten",
+      "folder_parent": "Über einen übergeordneten Ordner",
+      "empty": "Noch ist nichts offline verfügbar.",
+      "empty_hint": "Wählen Sie „Offline behalten“ im Menü einer Notiz oder eines Ordners. Ihre Favoriten und die in den letzten {{days}} Tagen geänderten Notizen werden ebenfalls behalten.",
+      "disabled": "Offline-Notizen sind deaktiviert.",
+      "disabled_hint": "Legen Sie unter Einstellungen, Offline-Notizen fest, wie viele Tage an Notizen behalten werden.",
+      "no_notes": "Keine Notizen offline verfügbar.",
+      "no_folders": "Keine Ordner offline behalten.",
+      "own_account_only": "Offline-Kopien werden nur für Ihr eigenes Konto behalten."
     }
   }
 }

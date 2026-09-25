@@ -4,7 +4,7 @@
   },
   "welcome_note": {
     "title": "Bienvenido a Poznote",
-    "content": "<p>Poznote es una plataforma personal para tomar notas y documentar.</p>\n<br>\nDescubre <a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">todas las funciones</a> incluidas en Poznote.\n<br><br>\nHaz clic en el botón <code>+</code> para crear tu primera nota.\n<br><br>\nDentro de una nota, escribe <code>/</code> para abrir el menú de comandos.\n<br><br>\n¡Espero que disfrutes usando Poznote! ✨\n<br><br>\n<a href=\"https://ko-fi.com/timothepoznanski\" target=\"_blank\" style=\"text-decoration: none;\">Tim</a>"
+    "content": "<p>Poznote es una plataforma para tomar notas y documentar.</p>\n<br>\nDescubre <a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">todas las funciones</a> incluidas en Poznote.\n<br><br>\nHaz clic en el botón <code>+</code> para crear tu primera nota.\n<br><br>\nDentro de una nota, escribe <code>/</code> o haz clic derecho para abrir el menú de comandos."
   },
   "markdown_syntax": {
     "menu_item": "Sintaxis Markdown",
@@ -515,7 +515,7 @@
       "allow_executable_attachments": "Permite adjuntar scripts y ejecutables (.sh, .ps1, .bat, .exe, .py, ...), para todas las cuentas de esta instancia. Poznote nunca los ejecuta, solo los almacena y los sirve. Los tipos que un servidor web podría ejecutar, como .php, siguen bloqueados.",
       "backlinks_at_bottom": "Muestra la sección de retroenlaces en la parte inferior de las notas en lugar de arriba.",
       "default_image_border": "Muestra por defecto las imágenes de las notas con borde y sin relleno.",
-      "spellcheck_html_notes": "Activa el corrector ortográfico del navegador en las notas HTML.",
+      "spellcheck_html_notes": "Activa el corrector ortográfico del navegador en las notas de texto enriquecido.",
       "slash_menu_trigger": "En el ordenador, elige si el menú de comandos se abre escribiendo /, con Alt + / o sin ninguna tecla. Un clic derecho en una nota lo abre sea cual sea este ajuste.",
       "slash_menu_trigger_mobile": "En el móvil, elige si el menú de comandos se abre escribiendo /, con Alt + / desde un teclado físico o sin ninguna tecla.",
       "icon_sidebar_order": "Cambie el orden y el color de los botones de la barra de iconos y coloque separadores entre ellos.",
@@ -1256,9 +1256,9 @@
   },
   "modals": {
     "paste_markdown": {
-      "title": "Insertar HTML",
-      "menu_item": "Insertar HTML",
-      "hint": "Pega contenido con formato (una página web, Word, un correo) en el campo de abajo. Su HTML, títulos, enlaces, listas y tablas, se convierte a Markdown que puedes revisar, editar e insertar en tu nota.",
+      "title": "Insertar texto enriquecido",
+      "menu_item": "Insertar texto enriquecido",
+      "hint": "Pega contenido con formato (una página web, Word, un correo) en el campo de abajo. Su formato, títulos, enlaces, listas y tablas, se convierte a Markdown que puedes revisar, editar e insertar en tu nota.",
       "placeholder": "Pega aquí (Ctrl+V)",
       "preview_label": "Vista previa de Markdown",
       "insert": "Insertar",
@@ -1270,7 +1270,7 @@
     "insert_markdown": {
       "title": "Insertar Markdown",
       "menu_item": "Insertar Markdown",
-      "hint": "Pega o escribe Markdown en el campo de abajo. Se convierte a HTML que puedes previsualizar e insertar en tu nota.",
+      "hint": "Pega o escribe Markdown en el campo de abajo. Se convierte a texto enriquecido que puedes previsualizar e insertar en tu nota.",
       "placeholder": "Pega o escribe Markdown aquí",
       "preview_label": "Vista previa",
       "insert": "Insertar",
@@ -1526,7 +1526,7 @@
       "title_in_folder": "Crear en {{folder}}",
       "folder_fallback": "carpeta",
       "note": {
-        "title": "Nota HTML"
+        "title": "Nota de texto enriquecido"
       },
       "markdown": {
         "title": "Nota Markdown"
@@ -1586,11 +1586,11 @@
     "convert": {
       "title": "Convertir nota",
       "message": "¿Estás seguro de que quieres convertir esta nota?",
-      "to_html_title": "Convertir a HTML",
-      "to_html_message": "Esto convertirá tu nota Markdown a formato HTML.",
+      "to_html_title": "Convertir a texto enriquecido",
+      "to_html_message": "Esto convertirá tu nota Markdown en una nota de texto enriquecido.",
       "to_html_warning": "Antes de convertir esta nota, puedes duplicarla para mantener una copia en caso de que la conversión no cumpla con tus expectativas.",
       "to_markdown_title": "Convertir a Markdown",
-      "to_markdown_message": "Esto convertirá tu nota HTML a formato Markdown. Las imágenes embebidas se guardarán como adjuntos.",
+      "to_markdown_message": "Esto convertirá tu nota de texto enriquecido a formato Markdown. Las imágenes embebidas se guardarán como adjuntos.",
       "to_markdown_warning": "Antes de convertir esta nota, puedes duplicarla para mantener una copia en caso de que la conversión no cumpla con tus expectativas.",
       "converting": "Convirtiendo nota...",
       "success": "¡Nota convertida con éxito!",
@@ -2024,7 +2024,7 @@
     "age_recent": "Solo recientes",
     "all_types": "Todos los tipos",
     "filter_type": "Filtrar por tipo",
-    "type_html": "HTML",
+    "type_html": "Texto enriquecido",
     "type_markdown": "Markdown",
     "type_tasklist": "Lista de tareas",
     "type_excalidraw": "Excalidraw",
@@ -2254,7 +2254,7 @@
       "public_note": "Compartir nota",
       "attachments_with_count": "Adjuntos ({{count}})",
       "menu_actions": "Acciones del menú",
-      "convert_to_html": "Convertir a HTML",
+      "convert_to_html": "Convertir a texto enriquecido",
       "note_width": "Ancho de la nota",
       "note_width_current": "Ancho de la nota: {{width}}",
       "note_width_default": "Predeterminado ({{width}})",
@@ -4853,13 +4853,19 @@
   },
   "archive": {
     "menu_item": "Archivar la nota",
+    "folder_menu_item": "Archivar la carpeta",
     "confirm_title": "Archivar la nota",
     "confirm_message": "«{{title}}» se moverá al espacio de trabajo «{{workspace}}», conservando su ruta de carpetas. El espacio de trabajo se crea si aún no existe.",
     "confirm_button": "Archivar",
     "already_archived": "Esta nota ya está en el espacio de trabajo «{{workspace}}».",
+    "folder_confirm_title": "Archivar la carpeta",
+    "folder_confirm_message": "La carpeta «{{folder}}», sus subcarpetas y sus notas se moverán al espacio de trabajo «{{workspace}}», conservando su ruta de carpetas. El espacio de trabajo se crea si aún no existe.",
+    "folder_already_archived": "Esta carpeta ya está en el espacio de trabajo «{{workspace}}».",
     "errors": {
       "duplicate_title": "Ya hay archivada una nota con el mismo título en esta carpeta.",
-      "archive_prefix": "Error al archivar la nota: {{error}}"
+      "archive_prefix": "Error al archivar la nota: {{error}}",
+      "folder_duplicate_titles": "No se archivó nada: estas notas tienen el mismo título que una nota ya archivada en la misma carpeta: {{titles}}",
+      "folder_archive_prefix": "Error al archivar la carpeta: {{error}}"
     }
   },
   "welcome_page": {
@@ -5115,6 +5121,25 @@
     },
     "keep": {
       "error": "No se pudo guardar el ajuste sin conexión."
+    },
+    "page": {
+      "title": "Sin conexión",
+      "filter_placeholder": "Filtrar por nombre o carpeta...",
+      "column_reason": "Motivo",
+      "reason_note": "Guardada sin conexión",
+      "reason_folder": "En una carpeta guardada sin conexión",
+      "reason_favorite": "Favorito",
+      "reason_recent": "Modificada en los últimos {{days}} días",
+      "reason_recent_one": "Modificada en el último día",
+      "folder_direct": "Guardada sin conexión",
+      "folder_parent": "Mediante una carpeta superior",
+      "empty": "Todavía no hay nada disponible sin conexión.",
+      "empty_hint": "Elija «Guardar sin conexión» en el menú de una nota o de una carpeta. Sus favoritos y las notas modificadas en los últimos {{days}} días también se guardan.",
+      "disabled": "Las notas sin conexión están desactivadas.",
+      "disabled_hint": "Elija cuántos días de notas guardar en Ajustes, Notas sin conexión.",
+      "no_notes": "Ninguna nota disponible sin conexión.",
+      "no_folders": "Ninguna carpeta guardada sin conexión.",
+      "own_account_only": "Las copias sin conexión solo se guardan para su propia cuenta."
     }
   }
 }

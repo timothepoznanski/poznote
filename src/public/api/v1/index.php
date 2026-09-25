@@ -341,6 +341,10 @@ $router->get('/offline/manifest', function($params) use ($offlineController) {
     $offlineController->manifest();
 });
 
+$router->get('/offline/list', function($params) use ($offlineController) {
+    $offlineController->listing();
+});
+
 $router->get('/offline/notes', function($params) use ($offlineController) {
     $offlineController->notes();
 });
@@ -630,6 +634,11 @@ $router->post('/folders/{id}/move', function($params) use ($foldersController) {
 // Duplicate a folder with all its notes and subfolders
 $router->post('/folders/{id}/duplicate', function($params) use ($foldersController) {
     $foldersController->duplicate($params['id']);
+});
+
+// Archive a folder, subfolders and notes included, into the Archives workspace
+$router->post('/folders/{id}/archive', function($params) use ($foldersController) {
+    $foldersController->archiveFolder($params['id']);
 });
 
 // Empty folder (move notes to trash)

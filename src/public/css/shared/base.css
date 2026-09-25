@@ -161,9 +161,11 @@ body.shared-page {
     font-weight: var(--pz-weight-medium);
     font-family: inherit;
     white-space: nowrap;
-    border: 1px solid rgba(148, 163, 184, 0.34);
+    border: 1px solid var(--pz-border);
     border-radius: var(--pz-radius-sm);
-    background: rgba(var(--pz-highlight-rgb), 0.76);
+    /* Theme surface, not a white glaze: a custom theme may paint a dark
+       palette on a light theme id (Catppuccin Lavender) */
+    background: var(--pz-surface);
     color: var(--text-muted, var(--pz-text-muted));
     box-shadow: none;
 }
@@ -198,8 +200,8 @@ body.shared-page {
     .shared-filter-tree-actions .btn:not(:disabled):hover,
     .shared-filter-tree-actions .btn:not(:disabled):active,
     .shared-filter-tree-actions .btn:not(:disabled):focus {
-        border-color: rgba(148, 163, 184, 0.34);
-        background: rgba(var(--pz-highlight-rgb), 0.76);
+        border-color: var(--pz-border);
+        background: var(--pz-surface);
         color: var(--text-muted, var(--pz-text-muted));
         box-shadow: none;
         outline: none;
@@ -207,8 +209,8 @@ body.shared-page {
 }
 
 .shared-filter-tree-actions .btn:disabled {
-    border-color: rgba(148, 163, 184, 0.2);
-    background: rgba(248, 250, 252, 0.72);
+    border-color: var(--pz-border-light);
+    background: var(--pz-surface);
     color: var(--pz-text-subtle);
     opacity: 1;
 }

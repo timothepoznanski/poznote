@@ -613,7 +613,7 @@ La lista completa de límites y los endpoints que gestionan las contraseñas de 
 Poznote admite dos formatos principales de notas, cada uno adaptado a una forma de trabajar distinta.
 
 <details>
-<summary><strong>Notas HTML</strong></summary>
+<summary><strong>Notas de texto enriquecido</strong></summary>
 &nbsp;
 
 *   **Editor:** edición WYSIWYG (lo que ves es lo que obtienes) directa.
@@ -660,7 +660,7 @@ Poznote admite dos formatos principales de notas, cada uno adaptado a una forma 
 
 *   **Funcionalidad:** reutiliza contenido ya escrito para estandarizar tu documentación, desde una nota completa hasta un fragmento breve.
 *   **Configuración:** coloca las notas que quieres reutilizar en una carpeta llamada `Templates` (las subcarpetas también sirven). Un espacio de trabajo llamado `Templates` también funciona y se ofrece desde todos los espacios de trabajo. El nombre también se reconoce en el idioma de la interfaz (`Modèles`, `Vorlagen`, `Plantillas`, `Modelos`, `Шаблоны`, `模板`).
-*   **Insertar en una nota:** escribe `/template` (o `/` seguido del título de la plantilla) en una nota HTML o Markdown y elige una plantilla: su contenido se pega en la posición del cursor, convertido si la plantilla y la nota no son del mismo tipo.
+*   **Insertar en una nota:** escribe `/template` (o `/` seguido del título de la plantilla) en una nota de texto enriquecido o Markdown y elige una plantilla: su contenido se pega en la posición del cursor, convertido si la plantilla y la nota no son del mismo tipo.
 *   **Nueva nota a partir de una plantilla:** duplica la nota de la plantilla, o duplica una carpeta `Templates` completa para empezar un proyecto con una estructura de carpetas ya preparada.
 </details>
 
@@ -672,7 +672,7 @@ Poznote admite dos formatos principales de notas, cada uno adaptado a una forma 
 *   **Flujo de trabajo:** el botón «Crear la entrada de hoy» crea la nota del día (pasa a llamarse «Ir a la entrada de hoy» cuando ya existe), con la fecha actual como título y guardada automáticamente en una estructura de carpetas `Diary/YYYY/MM`.
 *   **Vista de tablero:** las entradas se muestran como tarjetas agrupadas por mes, de la más reciente a la más antigua, con un filtro para encontrar rápidamente entradas pasadas.
 *   **Vista continua:** el botón con forma de pergamino, junto a los controles de vista, cambia a una sola columna de lectura: cada entrada con su contenido completo, de la más reciente a la más antigua, cargadas a medida que te desplazas. El filtro también funciona ahí. Haz clic en una entrada, o en su lápiz, para editarla ahí mismo; los cambios se guardan mientras escribes.
-*   **Formato:** las nuevas entradas se crean como notas HTML o Markdown, según el ajuste «Formato de las entradas del diario» de **Configuración > Comportamiento**.
+*   **Formato:** las nuevas entradas se crean como notas de texto enriquecido o Markdown, según el ajuste «Formato de las entradas del diario» de **Configuración > Comportamiento**.
 </details>
 
 ## Instantáneas
@@ -722,7 +722,7 @@ En **Configuración > Comportamiento** puedes configurar:
 - **Orden de inserción de tareas:** controla dónde se insertan las nuevas tareas
 - **Mostrar notas después de las carpetas:** muestra las notas sin carpeta debajo de la lista de carpetas
 - **Ajuste de línea en bloques de código:** activa o desactiva el ajuste de línea en los bloques de código
-- **Formato de las entradas del diario:** crea las entradas del diario como notas HTML o Markdown
+- **Formato de las entradas del diario:** crea las entradas del diario como notas de texto enriquecido o Markdown
 - El idioma de la interfaz, la zona horaria y el formato de fecha, los adjuntos y backlinks al final de una nota, el corrector ortográfico y los atajos de teclado
 
 En **Configuración > Markdown** puedes configurar el modo de apertura, la fuente del editor, el Markdown con marco y a color, y los números de línea en los bloques de código.
@@ -1043,7 +1043,7 @@ tar -czvf poznote-full-backup.tar.gz data/
 
 Exporta notas individuales con el botón **Exportar** de la barra de herramientas de la nota:
 
-  - **Notas HTML:** exportar a HTML, o a un único archivo HTML con las imágenes integradas
+  - **Notas de texto enriquecido:** exportar a HTML, o a un único archivo HTML con las imágenes integradas
   - **Notas Markdown:** exportar a Markdown, a HTML, o a un único archivo HTML con las imágenes integradas
   - **Listas de tareas:** las mismas opciones, más una exportación JSON en bruto de la lista
 
@@ -1246,8 +1246,9 @@ Poznote sigue funcionando sin red de dos maneras: las notas que modificaste reci
 Las notas que modificaste en los últimos 5 días se guardan en cada navegador donde usas Poznote, y esta copia se actualiza después de cada guardado. En clase, en el tren o en cualquier lugar sin Wi-Fi, abre la dirección habitual de Poznote: el navegador muestra la versión sin conexión de Poznote, con la misma barra lateral, los mismos editores, la misma barra de herramientas, la misma búsqueda y las mismas pestañas (un doble clic o un clic central abre una nota en una pestaña nueva, y se recuperan las pestañas abiertas en línea), y solo lista las notas guardadas sin conexión.
 
 *   **Inicio de sesión:** escribe la contraseña con la que iniciaste sesión por última vez en este navegador, se comprueba sin el servidor. Si nunca escribiste tu contraseña en este navegador (SSO, inicio de sesión automático), la última cuenta usada se abre con un botón **Continuar como**.
-*   **Lectura y edición:** las notas HTML, las notas Markdown y las listas de tareas se abren en su editor habitual, y puedes crear notas nuevas. El menú / y el menú del clic derecho también funcionan, sin los comandos que necesitan el servidor (imágenes y archivos que subir, plantillas, dibujos, enlaces a otras notas). Los demás tipos de notas, como los dibujos, solo están disponibles en línea. Los cambios se guardan en el navegador hasta que se envían.
+*   **Lectura y edición:** las notas de texto enriquecido, las notas Markdown y las listas de tareas se abren en su editor habitual, y puedes crear notas nuevas. El menú / y el menú del clic derecho también funcionan, sin los comandos que necesitan el servidor (imágenes y archivos que subir, plantillas, dibujos, enlaces a otras notas). Los demás tipos de notas, como los dibujos, solo están disponibles en línea. Los cambios se guardan en el navegador hasta que se envían.
 *   **Guardar sin conexión:** los favoritos siempre se guardan, y **Guardar sin conexión** en el menú de una nota o de una carpeta (subcarpetas incluidas) la guarda sea cual sea su fecha, con todos sus adjuntos (PDF, audio, archivos) de hasta 25 MB cada uno. El mismo menú de una nota indica si está disponible sin conexión en este navegador, y las páginas Notas y Carpetas señalan las notas y carpetas disponibles sin conexión en este navegador. La página Notas también permite guardar varias notas sin conexión a la vez (o dejar de hacerlo) desde sus acciones en bloque, y la página Carpetas ofrece **Guardar sin conexión** en el menú de cada carpeta.
+*   **Página Sin conexión:** el botón **Sin conexión** de la barra de iconos muestra las notas y carpetas guardadas sin conexión, como la página Compartidos: las carpetas en árbol con sus notas, por qué se guarda cada nota (guardada sin conexión, en una carpeta guardada sin conexión, favorito, modificada recientemente), un filtro y un botón para guardar una nota sin conexión o dejar de hacerlo. Un icono de advertencia señala una nota que este navegador aún no tiene.
 *   **De vuelta en línea:** los cambios se envían automáticamente. Si una nota también se modificó en el servidor mientras tanto, las dos versiones se combinan cuando es posible; si no, tu versión sin conexión se guarda como una nota aparte llamada "... (copia sin conexión)". Una nota eliminada en el servidor mientras tanto se vuelve a crear.
 *   **Ajustes:** **Configuración > Acciones > Notas sin conexión** define cuántos días de notas se guardan (5 por defecto, hasta 30, 0 desactiva las notas sin conexión) y muestra lo que contiene el navegador actual.
 *   **Límites:** como máximo 300 notas y 50 MB de texto, primero las modificadas más recientemente. También se guardan archivos: las imágenes que muestran estas notas y todos los adjuntos (PDF, audio, archivos) de los favoritos y de las notas guardadas con **Guardar sin conexión**, hasta 25 MB cada uno, 400 archivos y 200 MB en total, y nunca más de la mitad del espacio libre del navegador. Un archivo más grande solo está en línea, y la nota lo indica cuando se abre sin conexión.

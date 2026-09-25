@@ -8,7 +8,7 @@
         txtError:       body.getAttribute('data-txt-error') || 'Error',
         txtUntitled:    body.getAttribute('data-txt-untitled') || 'Untitled',
         txtNoFolder:    body.getAttribute('data-txt-no-folder') || 'No folder',
-        txtTypeHtml:    body.getAttribute('data-txt-type-html') || 'HTML',
+        txtTypeHtml:    body.getAttribute('data-txt-type-html') || 'Rich text',
         txtTypeMarkdown: body.getAttribute('data-txt-type-markdown') || 'Markdown',
         txtTypeTasklist: body.getAttribute('data-txt-type-tasklist') || 'Tasklist',
         txtTypeExcalidraw: body.getAttribute('data-txt-type-excalidraw') || 'Excalidraw',

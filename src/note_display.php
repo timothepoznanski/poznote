@@ -63,13 +63,11 @@
                         }
                     }
 
-                    // Decode the attachments JSON once for the whole rendering pass
+                    // Decode the attachments JSON once for the whole rendering pass,
+                    // without the ones only a snapshot still keeps on disk
                     $attachments_data = null;
                     if (!empty($row['attachments'])) {
-                        $decoded_attachments = json_decode($row['attachments'], true);
-                        if (is_array($decoded_attachments)) {
-                            $attachments_data = $decoded_attachments;
-                        }
+                        $attachments_data = poznoteFilterVisibleAttachments($row['attachments']);
                     }
                     // Shared indirectly through a shared (ancestor) folder? Only relevant
                     // when there is no direct share, which always takes precedence.
@@ -327,7 +325,7 @@
                     echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="'.t_h('common.download', [], 'Download').'" data-action="show-export-modal" data-note-id="'.$row['id'].'" data-filename="'.htmlspecialchars($filename, ENT_QUOTES).'" data-title="'.htmlspecialchars($title_safe, ENT_QUOTES).'" data-note-type="'.$note_type.'"><i class="lucide lucide-download"></i></button>';
 
                     if ($note_type === 'markdown') {
-                        echo '<button type="button" class="toolbar-btn btn-convert note-action-btn" data-action="show-convert-modal" data-note-id="'.$row['id'].'" data-convert-to="html" title="'.t_h('index.toolbar.convert_to_html', [], 'Convert to HTML').'"><i class="lucide lucide-refresh-cw-alt"></i></button>';
+                        echo '<button type="button" class="toolbar-btn btn-convert note-action-btn" data-action="show-convert-modal" data-note-id="'.$row['id'].'" data-convert-to="html" title="'.t_h('index.toolbar.convert_to_html', [], 'Convert to rich text').'"><i class="lucide lucide-refresh-cw-alt"></i></button>';
                     } elseif ($note_type === 'note') {
                         echo '<button type="button" class="toolbar-btn btn-convert note-action-btn" data-action="show-convert-modal" data-note-id="'.$row['id'].'" data-convert-to="markdown" title="'.t_h('index.toolbar.convert_to_markdown', [], 'Convert to Markdown').'"><i class="lucide lucide-refresh-cw-alt"></i></button>';
                     }
@@ -361,7 +359,7 @@
                     echo '<div class="dropdown-menu mobile-toolbar-menu" hidden role="menu" aria-label="'.t_h('index.toolbar.menu_actions', [], 'Menu actions').'">';
 
                     if ($note_type === 'markdown') {
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="show-paste-markdown-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-clipboard"></i> '.t_h('modals.paste_markdown.menu_item', [], 'Insert HTML').'</button>';
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="show-paste-markdown-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-clipboard"></i> '.t_h('modals.paste_markdown.menu_item', [], 'Insert rich text').'</button>';
                     }
 
                     // HTML notes get the mirror action: paste Markdown, insert it as HTML.
@@ -402,7 +400,7 @@
 
                     // Convert button (only for markdown and note types, with appropriate icon)
                     if ($note_type === 'markdown') {
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-convert"><i class="lucide lucide-refresh-cw-alt"></i> '.t_h('index.toolbar.convert_to_html', [], 'Convert to HTML').'</button>';
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-convert"><i class="lucide lucide-refresh-cw-alt"></i> '.t_h('index.toolbar.convert_to_html', [], 'Convert to rich text').'</button>';
                     } elseif ($note_type === 'note') {
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-convert"><i class="lucide lucide-refresh-cw-alt"></i> '.t_h('index.toolbar.convert_to_markdown', [], 'Convert to Markdown').'</button>';
                     }

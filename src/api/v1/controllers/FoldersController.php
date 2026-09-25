@@ -25,6 +25,7 @@
  *   POST   /api/v1/folders/{id}/tags   - Add tags to every note of a folder
  *   POST   /api/v1/notes/{id}/folder    - Move note to folder (in NotesController)
  *   POST   /api/v1/notes/{id}/archive   - Move note to the Archives workspace
+ *   POST   /api/v1/folders/{id}/archive - Move folder, subfolders and notes to the Archives workspace
  *   POST   /api/v1/notes/{id}/kanban-completed - Mark a Kanban card completed/active
  */
 
@@ -2564,20 +2565,10 @@ class FoldersController {
             return;
         }
 
-        // Folder path of the note in its current workspace, root first. Bounded
-        // like computeFolderPath() so a corrupted parent chain cannot loop.
-        $sourcePath = [];
-        $cursor = ($note['folder_id'] !== null && $note['folder_id'] !== '') ? (int)$note['folder_id'] : null;
-        $depth = 0;
-        while ($cursor !== null && $depth < 50) {
-            $folderStmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, color FROM folders WHERE id = ?');
-            $folderStmt->execute([$cursor]);
-            $folderRow = $folderStmt->fetch(PDO::FETCH_ASSOC);
-            if (!$folderRow) break;
-            array_unshift($sourcePath, $folderRow);
-            $cursor = $folderRow['parent_id'] !== null ? (int)$folderRow['parent_id'] : null;
-            $depth++;
-        }
+        // Folder path of the note in its current workspace, root first
+        $sourcePath = $this->archiveSourcePath(
+            ($note['folder_id'] !== null && $note['folder_id'] !== '') ? (int)$note['folder_id'] : null
+        );
 
         $ownsTransaction = !$this->db->inTransaction();
         if ($ownsTransaction) {
@@ -2585,47 +2576,12 @@ class FoldersController {
         }
 
         try {
-            $workspaceStmt = $this->db->prepare('SELECT COUNT(*) FROM workspaces WHERE name = ?');
-            $workspaceStmt->execute([$archiveWorkspace]);
-            $workspaceCreated = ((int)$workspaceStmt->fetchColumn() === 0);
-            if ($workspaceCreated) {
-                $createWorkspaceStmt = $this->db->prepare('INSERT INTO workspaces (name) VALUES (?)');
-                $createWorkspaceStmt->execute([$archiveWorkspace]);
-                // A new workspace starts unshared (users/db_master.php)
-                require_once dirname(__DIR__, 3) . '/users/db_master.php';
-                forgetStaleWorkspaceShares((int)(getCurrentUserId() ?? 0), $archiveWorkspace);
-            }
+            $workspaceCreated = $this->ensureArchiveWorkspace();
 
             // Mirror the path, reusing any level already archived before
-            $parentId = null;
-            $targetFolderId = null;
-            $targetFolderName = null;
             $createdFolders = [];
-
-            foreach ($sourcePath as $segment) {
-                $findStmt = $this->db->prepare('SELECT id FROM folders WHERE name = ? AND workspace = ? AND parent_id IS ?');
-                $findStmt->execute([$segment['name'], $archiveWorkspace, $parentId]);
-                $existing = $findStmt->fetch(PDO::FETCH_ASSOC);
-
-                if ($existing) {
-                    $parentId = (int)$existing['id'];
-                } else {
-                    $insertStmt = $this->db->prepare("INSERT INTO folders (name, workspace, parent_id, icon, icon_color, color, created) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))");
-                    $insertStmt->execute([
-                        $segment['name'],
-                        $archiveWorkspace,
-                        $parentId,
-                        $segment['icon'],
-                        $segment['icon_color'],
-                        $segment['color']
-                    ]);
-                    $parentId = (int)$this->db->lastInsertId();
-                    $createdFolders[] = ['id' => $parentId, 'name' => $segment['name']];
-                }
-
-                $targetFolderId = $parentId;
-                $targetFolderName = $segment['name'];
-            }
+            $targetFolderId = $this->mirrorArchivePath($sourcePath, $createdFolders);
+            $targetFolderName = !empty($sourcePath) ? $sourcePath[count($sourcePath) - 1]['name'] : null;
 
             // Same rule as a regular move: two notes cannot share a title in
             // the same folder, so refuse instead of shadowing what is archived
@@ -2662,20 +2618,7 @@ class FoldersController {
             return;
         }
 
-        // Same cleanup as moveNoteToFolder: drop the implicit shares old folder
-        // sharing used to create, which no longer describe where the note is.
-        $sharedStmt = $this->db->prepare("SELECT token FROM shared_notes WHERE note_id = ? AND access_mode IS NULL LIMIT 1");
-        $sharedStmt->execute([(int)$note['id']]);
-        if ($sharedStmt->fetchColumn()) {
-            require_once dirname(__DIR__, 3) . '/users/db_master.php';
-            $tokenStmt = $this->db->prepare("SELECT token FROM shared_notes WHERE note_id = ? AND access_mode IS NULL");
-            $tokenStmt->execute([(int)$note['id']]);
-            foreach ($tokenStmt->fetchAll(PDO::FETCH_COLUMN) as $token) {
-                unregisterSharedLink($token);
-            }
-            $deleteShareStmt = $this->db->prepare("DELETE FROM shared_notes WHERE note_id = ? AND access_mode IS NULL");
-            $deleteShareStmt->execute([(int)$note['id']]);
-        }
+        $this->dropImplicitNoteShares((int)$note['id']);
 
         if ($workspaceCreated) {
             require_once dirname(__DIR__, 3) . '/ActivityLog.php';
@@ -2696,6 +2639,324 @@ class FoldersController {
             'folder_path' => implode('/', array_column($sourcePath, 'name')),
             'created_folders' => $createdFolders
         ]);
+    }
+
+    /**
+     * POST /api/v1/folders/{id}/archive - Move a folder to the Archives workspace
+     *
+     * Same idea as archiveNote(), for a whole branch: the folder goes with its
+     * subfolders and notes, under a mirror of its parent path (each missing
+     * level created, icon and colors copied). The parent folders stay in the
+     * source workspace, since their other content is still there.
+     *
+     * When the Archives workspace already holds a folder with the same name at
+     * that spot (notes archived one by one earlier, for instance), the branch
+     * is merged into it level by level instead of sitting next to a twin: the
+     * notes join the existing folder and the emptied source folders are
+     * removed. A note whose title is already archived in the folder it would
+     * join aborts the whole operation with a 409, nothing moved.
+     *
+     * Archiving ends public sharing: the folder and its subfolders lose their
+     * public links. Notes shared on their own keep theirs, as archiveNote()
+     * does.
+     *
+     * Like archiveNote(), 'updated' is left alone on every note.
+     */
+    public function archiveFolder(string $id): void {
+        // Same confinement as archiveNote(): the Archives workspace is the
+        // owner's, outside the one a shared-workspace session may reach.
+        if (function_exists('isSharedWorkspaceScopeActive') && isSharedWorkspaceScopeActive()) {
+            $this->sendError('Folders cannot leave a workspace shared with you', 403);
+            return;
+        }
+
+        if (!is_numeric($id)) {
+            $this->sendError('Invalid folder ID', 400);
+            return;
+        }
+
+        $archiveWorkspace = POZNOTE_ARCHIVE_WORKSPACE;
+
+        $stmt = $this->db->prepare('SELECT id, name, workspace, parent_id FROM folders WHERE id = ?');
+        $stmt->execute([(int)$id]);
+        $folder = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$folder) {
+            $this->sendError('Folder not found', 404);
+            return;
+        }
+
+        $folderId = (int)$folder['id'];
+        $sourceWorkspace = (string)$folder['workspace'];
+
+        if ($sourceWorkspace === $archiveWorkspace) {
+            $this->sendJson([
+                'success' => true,
+                'already_archived' => true,
+                'workspace' => $archiveWorkspace,
+                'message' => 'Folder is already archived'
+            ]);
+            return;
+        }
+
+        // Path of the folder's parent in the source workspace, root first
+        $parentPath = $this->archiveSourcePath($folder['parent_id'] !== null ? (int)$folder['parent_id'] : null);
+
+        // Every note of the branch, trashed ones included since they follow
+        // their folder too; the client uses the ids to tell whether the note
+        // on screen just left the workspace.
+        $branchFolderIds = $this->getAllFolderIds($folderId, $sourceWorkspace);
+        $placeholders = implode(',', array_fill(0, count($branchFolderIds), '?'));
+        $notesStmt = $this->db->prepare("SELECT id FROM entries WHERE trash = 0 AND folder_id IN ($placeholders)");
+        $notesStmt->execute($branchFolderIds);
+        $noteIds = array_map('intval', $notesStmt->fetchAll(PDO::FETCH_COLUMN));
+
+        $ownsTransaction = !$this->db->inTransaction();
+        if ($ownsTransaction) {
+            $this->db->beginTransaction();
+        }
+
+        try {
+            $workspaceCreated = $this->ensureArchiveWorkspace();
+
+            $createdFolders = [];
+            $archiveParentId = $this->mirrorArchivePath($parentPath, $createdFolders);
+
+            $conflicts = [];
+            $emptiedFolderIds = [];
+            $targetFolderId = $this->mergeFolderIntoArchive(
+                $folderId, $archiveParentId, $sourceWorkspace, $conflicts, $emptiedFolderIds
+            );
+
+            if (!empty($conflicts)) {
+                if ($ownsTransaction) {
+                    $this->db->rollBack();
+                }
+                $this->sendJson([
+                    'success' => false,
+                    'error' => 'Some notes have the same title as a note already archived in the same folder',
+                    'conflicts' => $conflicts
+                ], 409);
+                return;
+            }
+
+            // An archived folder is no longer public: free the links of the
+            // whole branch in the master registry and drop its share rows.
+            // This also covers the source folders emptied by a merge, removed
+            // just below.
+            require_once dirname(__DIR__, 3) . '/users/db_master.php';
+            unregisterSharedLinksForFolders($this->db, $branchFolderIds);
+            $unshareStmt = $this->db->prepare("DELETE FROM shared_folders WHERE folder_id IN ($placeholders)");
+            $unshareStmt->execute($branchFolderIds);
+
+            if (!empty($emptiedFolderIds)) {
+                $emptiedPlaceholders = implode(',', array_fill(0, count($emptiedFolderIds), '?'));
+                $deleteStmt = $this->db->prepare("DELETE FROM folders WHERE id IN ($emptiedPlaceholders)");
+                $deleteStmt->execute($emptiedFolderIds);
+            }
+
+            if ($ownsTransaction) {
+                $this->db->commit();
+            }
+        } catch (Exception $e) {
+            if ($ownsTransaction && $this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            $this->sendError('Error archiving folder: ' . $e->getMessage(), 500);
+            return;
+        }
+
+        // The implicit note shares old folder sharing used to create go with
+        // the folder shares, as when a folder is unshared (FolderShareController).
+        // A note shared on its own keeps its link, like an archived note.
+        foreach ($noteIds as $archivedNoteId) {
+            $this->dropImplicitNoteShares($archivedNoteId);
+        }
+
+        if ($workspaceCreated) {
+            require_once dirname(__DIR__, 3) . '/ActivityLog.php';
+            logActivity(ACTIVITY_WORKSPACE_CREATED, ['workspace' => $archiveWorkspace], 'api');
+        }
+
+        $pathNames = array_column($parentPath, 'name');
+        $pathNames[] = (string)$folder['name'];
+
+        $this->sendJson([
+            'success' => true,
+            'message' => 'Folder archived successfully',
+            'workspace' => $archiveWorkspace,
+            'workspace_created' => $workspaceCreated,
+            'old_workspace' => $sourceWorkspace,
+            'old_folder_id' => $folderId,
+            'folder_id' => $targetFolderId,
+            'folder_path' => implode('/', $pathNames),
+            'merged' => $targetFolderId !== $folderId,
+            'created_folders' => $createdFolders,
+            'note_ids' => $noteIds
+        ]);
+    }
+
+    /**
+     * Put a source folder, with everything under it, at $archiveParentId in
+     * the Archives workspace. Moves the folder as is when that spot is free,
+     * otherwise merges it into the archived folder of the same name.
+     *
+     * @param array $conflicts       Receives the titles that clash with an archived note
+     * @param array $emptiedFolderIds Receives the source folders left empty by a merge, deepest first
+     * @return int The folder the source ended up as (itself, or the one it merged into)
+     */
+    private function mergeFolderIntoArchive(int $sourceId, ?int $archiveParentId, string $sourceWorkspace, array &$conflicts, array &$emptiedFolderIds): int {
+        $archiveWorkspace = POZNOTE_ARCHIVE_WORKSPACE;
+
+        $nameStmt = $this->db->prepare('SELECT name FROM folders WHERE id = ?');
+        $nameStmt->execute([$sourceId]);
+        $name = (string)$nameStmt->fetchColumn();
+
+        $findStmt = $this->db->prepare('SELECT id FROM folders WHERE name = ? AND workspace = ? AND parent_id IS ?');
+        $findStmt->execute([$name, $archiveWorkspace, $archiveParentId]);
+        $existingId = $findStmt->fetchColumn();
+
+        if ($existingId === false) {
+            // Free spot: the folder moves in one piece, same updates as move()
+            $branchIds = $this->getAllFolderIds($sourceId, $sourceWorkspace);
+            foreach ($branchIds as $fid) {
+                if ($fid === $sourceId) {
+                    $uStmt = $this->db->prepare('UPDATE folders SET parent_id = ?, workspace = ?, display_order = 0 WHERE id = ?');
+                    $uStmt->execute([$archiveParentId, $archiveWorkspace, $fid]);
+                } else {
+                    $uStmt = $this->db->prepare('UPDATE folders SET workspace = ? WHERE id = ?');
+                    $uStmt->execute([$archiveWorkspace, $fid]);
+                }
+                $nStmt = $this->db->prepare('UPDATE entries SET workspace = ? WHERE folder_id = ?');
+                $nStmt->execute([$archiveWorkspace, $fid]);
+            }
+            return $sourceId;
+        }
+
+        $targetId = (int)$existingId;
+
+        // Same rule as archiveNote(): no two live notes with one title in a folder
+        $notesStmt = $this->db->prepare('SELECT id, heading, trash FROM entries WHERE folder_id = ?');
+        $notesStmt->execute([$sourceId]);
+        $dupStmt = $this->db->prepare('SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND workspace = ? AND folder_id = ?');
+        foreach ($notesStmt->fetchAll(PDO::FETCH_ASSOC) as $note) {
+            if ((int)$note['trash'] === 0) {
+                $dupStmt->execute([$note['heading'], $archiveWorkspace, $targetId]);
+                if ((int)$dupStmt->fetchColumn() > 0) {
+                    $conflicts[] = (string)$note['heading'];
+                }
+            }
+        }
+
+        $moveStmt = $this->db->prepare('UPDATE entries SET folder = ?, folder_id = ?, workspace = ? WHERE folder_id = ?');
+        $moveStmt->execute([$name, $targetId, $archiveWorkspace, $sourceId]);
+
+        $childStmt = $this->db->prepare('SELECT id FROM folders WHERE parent_id = ? AND workspace = ?');
+        $childStmt->execute([$sourceId, $sourceWorkspace]);
+        foreach ($childStmt->fetchAll(PDO::FETCH_COLUMN) as $childId) {
+            $this->mergeFolderIntoArchive((int)$childId, $targetId, $sourceWorkspace, $conflicts, $emptiedFolderIds);
+        }
+
+        $emptiedFolderIds[] = $sourceId;
+        return $targetId;
+    }
+
+    /**
+     * Folder path from the root down to $folderId, as rows carrying what
+     * mirrorArchivePath() copies. Bounded like computeFolderPath() so a
+     * corrupted parent chain cannot loop.
+     */
+    private function archiveSourcePath(?int $folderId): array {
+        $path = [];
+        $cursor = $folderId;
+        $depth = 0;
+        while ($cursor !== null && $depth < 50) {
+            $folderStmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, color FROM folders WHERE id = ?');
+            $folderStmt->execute([$cursor]);
+            $folderRow = $folderStmt->fetch(PDO::FETCH_ASSOC);
+            if (!$folderRow) break;
+            array_unshift($path, $folderRow);
+            $cursor = $folderRow['parent_id'] !== null ? (int)$folderRow['parent_id'] : null;
+            $depth++;
+        }
+        return $path;
+    }
+
+    /**
+     * Create the Archives workspace when it does not exist yet
+     *
+     * @return bool Whether it was created
+     */
+    private function ensureArchiveWorkspace(): bool {
+        $archiveWorkspace = POZNOTE_ARCHIVE_WORKSPACE;
+        $workspaceStmt = $this->db->prepare('SELECT COUNT(*) FROM workspaces WHERE name = ?');
+        $workspaceStmt->execute([$archiveWorkspace]);
+        if ((int)$workspaceStmt->fetchColumn() > 0) {
+            return false;
+        }
+        $createWorkspaceStmt = $this->db->prepare('INSERT INTO workspaces (name) VALUES (?)');
+        $createWorkspaceStmt->execute([$archiveWorkspace]);
+        // A new workspace starts unshared (users/db_master.php)
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
+        forgetStaleWorkspaceShares((int)(getCurrentUserId() ?? 0), $archiveWorkspace);
+        return true;
+    }
+
+    /**
+     * Recreate a folder path inside the Archives workspace, reusing any level
+     * already archived before, and copying icon and colors onto new levels
+     *
+     * @param array $sourcePath     Rows from archiveSourcePath(), root first
+     * @param array $createdFolders Receives ['id', 'name'] of each new level
+     * @return int|null Id of the deepest level, null for an empty path (root)
+     */
+    private function mirrorArchivePath(array $sourcePath, array &$createdFolders): ?int {
+        $archiveWorkspace = POZNOTE_ARCHIVE_WORKSPACE;
+        $parentId = null;
+
+        foreach ($sourcePath as $segment) {
+            $findStmt = $this->db->prepare('SELECT id FROM folders WHERE name = ? AND workspace = ? AND parent_id IS ?');
+            $findStmt->execute([$segment['name'], $archiveWorkspace, $parentId]);
+            $existing = $findStmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($existing) {
+                $parentId = (int)$existing['id'];
+            } else {
+                $insertStmt = $this->db->prepare("INSERT INTO folders (name, workspace, parent_id, icon, icon_color, color, created) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))");
+                $insertStmt->execute([
+                    $segment['name'],
+                    $archiveWorkspace,
+                    $parentId,
+                    $segment['icon'],
+                    $segment['icon_color'],
+                    $segment['color']
+                ]);
+                $parentId = (int)$this->db->lastInsertId();
+                $createdFolders[] = ['id' => $parentId, 'name' => $segment['name']];
+            }
+        }
+
+        return $parentId;
+    }
+
+    /**
+     * Drop the implicit shares old folder sharing used to create on a note
+     * (access_mode NULL), which no longer describe where a moved note is.
+     * Same cleanup as moveNoteToFolder.
+     */
+    private function dropImplicitNoteShares(int $noteId): void {
+        $sharedStmt = $this->db->prepare("SELECT token FROM shared_notes WHERE note_id = ? AND access_mode IS NULL");
+        $sharedStmt->execute([$noteId]);
+        $tokens = $sharedStmt->fetchAll(PDO::FETCH_COLUMN);
+        if (empty($tokens)) {
+            return;
+        }
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
+        foreach ($tokens as $token) {
+            unregisterSharedLink($token);
+        }
+        $deleteShareStmt = $this->db->prepare("DELETE FROM shared_notes WHERE note_id = ? AND access_mode IS NULL");
+        $deleteShareStmt->execute([$noteId]);
     }
 
     /**

@@ -542,3 +542,24 @@ html[data-theme='dark'] .folder-name-path {
     color: var(--pz-text-muted);
     vertical-align: -1px;
 }
+
+/* Offline page (offline_notes.php): the middle column says why a note is
+   kept, in the text font rather than the token's monospace. */
+.offline-reason-cell .note-token {
+    font-family: inherit;
+}
+
+/* A note the rules keep that this browser holds no copy of yet */
+.offline-missing-icon {
+    flex: 0 0 auto;
+    font-size: 14px;
+    color: var(--pz-warning-text);
+}
+
+.offline-list-notice {
+    max-width: var(--shared-content-max-width, 980px);
+    margin: 0 auto 12px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--pz-text-muted);
+}

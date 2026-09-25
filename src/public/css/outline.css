@@ -378,6 +378,15 @@ body.kanban-active .toggle-outline-btn {
     display: none !important;
 }
 
+/* Same when no note is open: nothing to outline (issue #1494).
+   js/outline-panel.js sets the class, index.php before the first paint */
+html.outline-no-note #outline-panel,
+html.outline-no-note .outline-resize-handle,
+html.outline-no-note .toggle-outline-btn,
+html.outline-no-note .outline-mobile-backdrop {
+    display: none !important;
+}
+
 html[data-theme='dark'] #outline-panel {
     background: var(--pz-chrome-bg);
     border-left: none;

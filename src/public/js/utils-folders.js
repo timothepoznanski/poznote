@@ -294,6 +294,129 @@ function executeDeleteFolderOperation(folderId, folderName) {
 }
 
 /**
+ * Ask for confirmation before archiving a folder, subfolders and notes included
+ *
+ * Folder counterpart of archiveNote() (notes.js). The destination workspace is
+ * decided server-side; its name is read from the page (index.php config, or
+ * data-archive-workspace on the folders page body) only so the confirmation
+ * can name it.
+ */
+function archiveFolder(folderId, folderName) {
+    if (!folderId) return;
+
+    var workspace = (window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.archiveWorkspace)
+        || (document.body && document.body.getAttribute('data-archive-workspace'))
+        || 'Archives';
+    var name = folderName || '';
+
+    showConfirmModal(
+        (window.t ? window.t('archive.folder_confirm_title', null, 'Archive folder') : 'Archive folder'),
+        (window.t
+            ? window.t('archive.folder_confirm_message', { folder: name, workspace: workspace },
+                'The folder "{{folder}}", its subfolders and notes will be moved to the "{{workspace}}" workspace, keeping its folder path.')
+            : ('The folder "' + name + '", its subfolders and notes will be moved to the "' + workspace + '" workspace, keeping its folder path.')),
+        function () {
+            executeArchiveFolder(folderId, name, workspace);
+        },
+        {
+            confirmText: (window.t ? window.t('archive.confirm_button', null, 'Archive') : 'Archive'),
+            hideSaveAndExit: true
+        }
+    );
+}
+
+/**
+ * Move a folder branch to the archive workspace
+ * @private
+ */
+function executeArchiveFolder(folderId, folderName, workspace) {
+    fetch('/api/v1/folders/' + encodeURIComponent(folderId) + '/archive', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'same-origin',
+        body: '{}'
+    })
+        .then(function (response) {
+            return response.json().then(function (data) {
+                return { status: response.status, data: data || {} };
+            });
+        })
+        .then(function (result) {
+            var data = result.data;
+
+            if (!data.success) {
+                showNotificationPopup(archiveFolderErrorMessage(result.status, data), 'error');
+                return;
+            }
+
+            if (data.already_archived) {
+                showNotificationPopup(
+                    (window.t
+                        ? window.t('archive.folder_already_archived', { workspace: workspace },
+                            'This folder is already in the "{{workspace}}" workspace.')
+                        : ('This folder is already in the "' + workspace + '" workspace.')),
+                    'error'
+                );
+                return;
+            }
+
+            if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                window.setNeedsAutoPush(true);
+            }
+
+            var noteIds = Array.isArray(data.note_ids) ? data.note_ids : [];
+            var noteOnScreenLeft = false;
+            noteIds.forEach(function (noteId) {
+                if (typeof window.invalidateNoteDomCache === 'function') {
+                    window.invalidateNoteDomCache(noteId);
+                }
+                if (window.tabManager && typeof window.tabManager.closeTabByNoteId === 'function') {
+                    window.tabManager.closeTabByNoteId(noteId);
+                }
+                if (document.getElementById('note' + noteId)) {
+                    noteOnScreenLeft = true;
+                }
+            });
+
+            // Reloading would ask for what just left the workspace: a note of
+            // the folder, or the folder itself through ?folder= / ?kanban=
+            var params = new URLSearchParams(window.location.search);
+            var folderOnScreen = params.get('kanban') === String(folderId)
+                || (folderName !== '' && params.get('folder') === folderName);
+
+            if ((noteOnScreenLeft || folderOnScreen) && typeof window.redirectToWorkspace === 'function') {
+                window.redirectToWorkspace();
+            } else {
+                window.location.reload();
+            }
+        })
+        .catch(function (error) {
+            showNotificationPopup(archiveFolderErrorMessage(0, { error: error.message }), 'error');
+        });
+}
+
+/**
+ * Build the message shown when archiving a folder fails
+ * @private
+ */
+function archiveFolderErrorMessage(status, data) {
+    // 409: some notes would land next to an archived note with the same
+    // title. Nothing moved; name them so the user can rename one side.
+    if (status === 409 && data && Array.isArray(data.conflicts) && data.conflicts.length) {
+        var titles = data.conflicts.map(function (title) { return '"' + title + '"'; }).join(', ');
+        return window.t
+            ? window.t('archive.errors.folder_duplicate_titles', { titles: titles },
+                'Nothing was archived: these notes have the same title as a note already archived in the same folder: {{titles}}')
+            : ('Nothing was archived: these notes have the same title as a note already archived in the same folder: ' + titles);
+    }
+
+    var err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';
+    return window.t
+        ? window.t('archive.errors.folder_archive_prefix', { error: err }, 'Error archiving the folder: {{error}}')
+        : ('Error archiving the folder: ' + err);
+}
+
+/**
  * Duplicate a folder with all its notes and subfolders.
  *
  * The copy lands next to the original under a unique name; the page reloads

@@ -4,7 +4,7 @@
   },
   "welcome_note": {
     "title": "Bienvenue sur Poznote",
-    "content": "<p>Poznote est une plateforme personnelle de prise de notes et de documentation.</p>\n<br>\nDécouvrez <a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">toutes les fonctionnalités</a> incluses dans Poznote.\n<br><br>\nCliquez sur le bouton <code>+</code> pour créer votre première note.\n<br><br>\nDans une note, saisissez <code>/</code> pour ouvrir le menu des commandes.\n<br><br>\nJ’espère que vous apprécierez l’utilisation de Poznote ! ✨\n<br><br>\n<a href=\"https://ko-fi.com/timothepoznanski\" target=\"_blank\" style=\"text-decoration: none;\">Tim</a>"
+    "content": "<p>Poznote est une plateforme de prise de notes et de documentation.</p>\n<br>\nDécouvrez <a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">toutes les fonctionnalités</a> incluses dans Poznote.\n<br><br>\nCliquez sur le bouton <code>+</code> pour créer votre première note.\n<br><br>\nDans une note, saisissez <code>/</code> ou faites un clic droit pour ouvrir le menu des commandes."
   },
   "markdown_syntax": {
     "menu_item": "Syntaxe Markdown",
@@ -514,7 +514,7 @@
       "allow_executable_attachments": "Autorise les scripts et exécutables (.sh, .ps1, .bat, .exe, .py, ...) en pièce jointe, pour tous les comptes de cette instance. Poznote ne les exécute jamais, il ne fait que les stocker et les servir. Les types qu'un serveur web pourrait exécuter, comme .php, restent bloqués.",
       "backlinks_at_bottom": "Affichez la section des rétroliens en bas des notes plutôt qu'en haut.",
       "default_image_border": "Affichez par défaut les images des notes avec une bordure et sans marge intérieure.",
-      "spellcheck_html_notes": "Activez le correcteur orthographique du navigateur dans les notes HTML.",
+      "spellcheck_html_notes": "Activez le correcteur orthographique du navigateur dans les notes en texte enrichi.",
       "slash_menu_trigger": "Sur ordinateur, choisissez si le menu de commandes s'ouvre en tapant /, avec Alt + /, ou avec aucune touche. Un clic droit dans une note l'ouvre quel que soit ce réglage.",
       "slash_menu_trigger_mobile": "Sur mobile, choisissez si le menu de commandes s'ouvre en tapant /, avec Alt + / depuis un clavier physique, ou avec aucune touche.",
       "icon_sidebar_order": "Modifiez l'ordre et la couleur des boutons de la barre d'icônes et placez des séparateurs entre eux.",
@@ -1256,9 +1256,9 @@
   },
   "modals": {
     "paste_markdown": {
-      "title": "Insérer du HTML",
-      "menu_item": "Insérer du HTML",
-      "hint": "Collez du contenu mis en forme (page web, Word, e-mail) dans le champ ci-dessous. Son HTML, titres, liens, listes et tableaux, est converti en Markdown que vous pouvez relire, modifier, puis insérer dans votre note.",
+      "title": "Insérer du texte enrichi",
+      "menu_item": "Insérer du texte enrichi",
+      "hint": "Collez du contenu mis en forme (page web, Word, e-mail) dans le champ ci-dessous. Sa mise en forme, titres, liens, listes et tableaux, est convertie en Markdown que vous pouvez relire, modifier, puis insérer dans votre note.",
       "placeholder": "Collez ici (Ctrl+V)",
       "preview_label": "Aperçu Markdown",
       "insert": "Insérer",
@@ -1270,7 +1270,7 @@
     "insert_markdown": {
       "title": "Insérer du Markdown",
       "menu_item": "Insérer du Markdown",
-      "hint": "Collez ou saisissez du Markdown dans le champ ci-dessous. Il est converti en HTML que vous pouvez prévisualiser, puis insérer dans votre note.",
+      "hint": "Collez ou saisissez du Markdown dans le champ ci-dessous. Il est converti en texte enrichi que vous pouvez prévisualiser, puis insérer dans votre note.",
       "placeholder": "Collez ou saisissez du Markdown ici",
       "preview_label": "Aperçu",
       "insert": "Insérer",
@@ -1531,7 +1531,7 @@
       "title_in_folder": "Créer dans {{folder}}",
       "folder_fallback": "dossier",
       "note": {
-        "title": "Note HTML"
+        "title": "Note en texte enrichi"
       },
       "markdown": {
         "title": "Note Markdown"
@@ -1628,11 +1628,11 @@
     "convert": {
       "title": "Convertir la note",
       "message": "Êtes-vous sûr de vouloir convertir cette note ?",
-      "to_html_title": "Convertir en HTML",
-      "to_html_message": "Cela convertira votre note Markdown en format HTML.",
+      "to_html_title": "Convertir en texte enrichi",
+      "to_html_message": "Cela convertira votre note Markdown en note en texte enrichi.",
       "to_html_warning": "Avant de convertir cette note, vous pouvez la dupliquer pour conserver une copie au cas où la conversion ne serait pas satisfaisante.",
       "to_markdown_title": "Convertir en Markdown",
-      "to_markdown_message": "Cela convertira votre note HTML en format Markdown. Les images intégrées seront enregistrées comme pièces jointes.",
+      "to_markdown_message": "Cela convertira votre note en texte enrichi en format Markdown. Les images intégrées seront enregistrées comme pièces jointes.",
       "to_markdown_warning": "Avant de convertir cette note, vous pouvez la dupliquer pour conserver une copie au cas où la conversion ne serait pas satisfaisante.",
       "converting": "Conversion en cours...",
       "success": "Note convertie avec succès !",
@@ -2027,7 +2027,7 @@
     "filter_folders": "Filtrer les dossiers...",
     "filter_placeholder": "Filtrer les notes par titre ou tags...",
     "filter_type": "Filtrer par type",
-    "type_html": "HTML",
+    "type_html": "Texte enrichi",
     "type_markdown": "Markdown",
     "type_tasklist": "Tasklist",
     "type_excalidraw": "Excalidraw",
@@ -2260,7 +2260,7 @@
       "public_note": "Partager la note",
       "attachments_with_count": "Pièces jointes ({{count}})",
       "menu_actions": "Actions du menu",
-      "convert_to_html": "Convertir en HTML",
+      "convert_to_html": "Convertir en texte enrichi",
       "note_width": "Largeur de la note",
       "note_width_current": "Largeur de la note : {{width}}",
       "note_width_default": "Par défaut ({{width}})",
@@ -4957,13 +4957,19 @@
   },
   "archive": {
     "menu_item": "Archiver la note",
+    "folder_menu_item": "Archiver le dossier",
     "confirm_title": "Archiver la note",
     "confirm_message": "« {{title}} » sera déplacée vers l'espace de travail « {{workspace}} », en conservant son arborescence de dossiers. L'espace de travail est créé s'il n'existe pas encore.",
     "confirm_button": "Archiver",
     "already_archived": "Cette note est déjà dans l'espace de travail « {{workspace}} ».",
+    "folder_confirm_title": "Archiver le dossier",
+    "folder_confirm_message": "Le dossier « {{folder}} », ses sous-dossiers et ses notes seront déplacés vers l'espace de travail « {{workspace}} », en conservant leur arborescence de dossiers. L'espace de travail est créé s'il n'existe pas encore.",
+    "folder_already_archived": "Ce dossier est déjà dans l'espace de travail « {{workspace}} ».",
     "errors": {
       "duplicate_title": "Une note portant le même titre est déjà archivée dans ce dossier.",
-      "archive_prefix": "Erreur lors de l'archivage de la note : {{error}}"
+      "archive_prefix": "Erreur lors de l'archivage de la note : {{error}}",
+      "folder_duplicate_titles": "Rien n'a été archivé : ces notes portent le même titre qu'une note déjà archivée dans le même dossier : {{titles}}",
+      "folder_archive_prefix": "Erreur lors de l'archivage du dossier : {{error}}"
     }
   },
   "welcome_page": {
@@ -5219,6 +5225,25 @@
     },
     "keep": {
       "error": "Le réglage hors ligne n'a pas pu être enregistré."
+    },
+    "page": {
+      "title": "Hors ligne",
+      "filter_placeholder": "Filtrer par nom ou dossier...",
+      "column_reason": "Raison",
+      "reason_note": "Gardée hors ligne",
+      "reason_folder": "Dans un dossier gardé hors ligne",
+      "reason_favorite": "Favori",
+      "reason_recent": "Modifiée ces {{days}} derniers jours",
+      "reason_recent_one": "Modifiée ces dernières 24 heures",
+      "folder_direct": "Gardé hors ligne",
+      "folder_parent": "Via un dossier parent",
+      "empty": "Rien n'est encore disponible hors ligne.",
+      "empty_hint": "Choisissez « Garder hors ligne » dans le menu d'une note ou d'un dossier. Vos favoris et les notes modifiées ces {{days}} derniers jours sont gardés aussi.",
+      "disabled": "Les notes hors ligne sont désactivées.",
+      "disabled_hint": "Choisissez combien de jours de notes garder dans Paramètres, Notes hors ligne.",
+      "no_notes": "Aucune note disponible hors ligne.",
+      "no_folders": "Aucun dossier gardé hors ligne.",
+      "own_account_only": "Les copies hors ligne ne sont gardées que pour votre propre compte."
     }
   }
 }

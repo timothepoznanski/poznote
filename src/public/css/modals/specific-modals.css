@@ -1147,6 +1147,20 @@
    has nowhere to wrap. */
 #noteInfoModal .note-info-modal-content {
     max-width: 640px;
+    /* The blanket `.modal-content { margin: 5% auto 0 }` from responsive.css
+       is 5% of the screen width, ~96px on a wide screen, which pushed the
+       twelve rows below the bottom edge. Sit at the overlay's top padding
+       instead and cap the dialog to the screen: the rows scroll, the Close
+       button stays visible. */
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+}
+
+#noteInfoModal .modal-body {
+    min-height: 0;
+    overflow-y: auto;
 }
 
 #noteInfoModal h3 {

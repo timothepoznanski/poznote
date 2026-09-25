@@ -613,7 +613,7 @@ La liste complète des limites et les endpoints qui permettent de gérer les mot
 Poznote prend en charge deux formats de notes principaux, chacun adapté à une façon de travailler.
 
 <details>
-<summary><strong>Notes HTML</strong></summary>
+<summary><strong>Notes en texte enrichi</strong></summary>
 &nbsp;
 
 *   **Éditeur :** édition WYSIWYG (What You See Is What You Get) directe.
@@ -660,7 +660,7 @@ Poznote prend en charge deux formats de notes principaux, chacun adapté à une 
 
 *   **Fonctionnalité :** réutilisez du contenu déjà rédigé pour uniformiser votre documentation, qu'il s'agisse d'une note complète ou d'un court extrait.
 *   **Mise en place :** placez les notes à réutiliser dans un dossier nommé `Templates` (les sous-dossiers sont acceptés). Un espace de travail nommé `Templates` fonctionne aussi et il est proposé depuis tous les espaces de travail. Le nom est également reconnu dans la langue de l'interface (`Modèles`, `Vorlagen`, `Plantillas`, `Modelos`, `Шаблоны`, `模板`).
-*   **Insérer dans une note :** tapez `/template` (ou `/` suivi du titre du modèle) dans une note HTML ou Markdown et choisissez un modèle : son contenu est collé à l'emplacement du curseur, et converti si le modèle et la note ne sont pas du même type.
+*   **Insérer dans une note :** tapez `/template` (ou `/` suivi du titre du modèle) dans une note en texte enrichi ou Markdown et choisissez un modèle : son contenu est collé à l'emplacement du curseur, et converti si le modèle et la note ne sont pas du même type.
 *   **Nouvelle note à partir d'un modèle :** dupliquez la note modèle, ou dupliquez un dossier `Templates` entier pour démarrer un projet avec une arborescence de dossiers toute prête.
 </details>
 
@@ -672,7 +672,7 @@ Poznote prend en charge deux formats de notes principaux, chacun adapté à une 
 *   **Fonctionnement :** le bouton « Créer la note du jour » crée la note du jour (il devient « Aller à la note du jour » une fois la note créée), avec la date du jour pour titre, et la range automatiquement dans une arborescence de dossiers `Diary/YYYY/MM`.
 *   **Vue tableau :** les entrées s'affichent sous forme de cartes regroupées par mois, les plus récentes en premier, avec un filtre pour retrouver rapidement les entrées passées.
 *   **Vue en fil continu :** le bouton en forme de parchemin, à côté des réglages d'affichage, passe à une seule colonne de lecture : chaque entrée avec son contenu complet, les plus récentes en premier, chargées au fil du défilement. Le filtre s'y applique aussi. Cliquez sur une entrée, ou sur son crayon, pour la modifier sur place : les changements sont enregistrés au fil de la frappe.
-*   **Format :** les nouvelles entrées sont créées en notes HTML ou Markdown, selon le réglage « Format des entrées de journal » dans **Paramètres > Comportement**.
+*   **Format :** les nouvelles entrées sont créées en notes en texte enrichi ou Markdown, selon le réglage « Format des entrées de journal » dans **Paramètres > Comportement**.
 </details>
 
 ## Snapshots
@@ -722,7 +722,7 @@ Dans **Paramètres > Comportement**, vous pouvez configurer :
 - **Ordre d'insertion des tâches :** définissez où les nouvelles tâches sont insérées
 - **Afficher les notes après les dossiers :** affichez les notes sans dossier sous la liste des dossiers
 - **Retour à la ligne des blocs de code :** activez ou désactivez le retour à la ligne automatique dans les blocs de code
-- **Format des entrées de journal :** créez les entrées de journal en notes HTML ou Markdown
+- **Format des entrées de journal :** créez les entrées de journal en notes en texte enrichi ou Markdown
 - La langue de l'interface, le fuseau horaire et le format de date, les pièces jointes et les backlinks en bas de note, la vérification orthographique et les raccourcis clavier
 
 Dans **Paramètres > Markdown**, vous pouvez configurer le mode d'ouverture, la police de l'éditeur, le Markdown encadré et coloré, et les numéros de ligne des blocs de code.
@@ -1043,7 +1043,7 @@ tar -czvf poznote-full-backup.tar.gz data/
 
 Exportez des notes individuelles avec le bouton **Exporter** de la barre d'outils de la note :
 
-  - **Notes HTML :** export en HTML, ou en un fichier HTML unique avec les images intégrées
+  - **Notes en texte enrichi :** export en HTML, ou en un fichier HTML unique avec les images intégrées
   - **Notes Markdown :** export en Markdown, en HTML, ou en un fichier HTML unique avec les images intégrées
   - **Listes de tâches :** les mêmes options, plus un export JSON brut de la liste
 
@@ -1246,8 +1246,9 @@ Poznote continue de fonctionner sans réseau de deux façons : les notes modifi�
 Les notes modifiées ces 5 derniers jours sont conservées dans chaque navigateur où vous utilisez Poznote, et cette copie est mise à jour après chaque enregistrement. En classe, dans le train ou partout sans Wi-Fi, ouvrez l'adresse habituelle de Poznote : le navigateur affiche la version hors ligne de Poznote, avec la même barre latérale, les mêmes éditeurs, la même barre d'outils, la même recherche et les mêmes onglets (un double-clic ou un clic du milieu ouvre une note dans un nouvel onglet, et les onglets ouverts en ligne sont repris), en ne listant que les notes conservées hors ligne.
 
 *   **Connexion :** saisissez le mot de passe utilisé lors de votre dernière connexion dans ce navigateur, il est vérifié sans le serveur. Si vous n'avez jamais saisi votre mot de passe dans ce navigateur (SSO, connexion automatique), le dernier compte utilisé s'ouvre avec un bouton **Continuer en tant que**.
-*   **Lecture et modification :** les notes HTML, les notes Markdown et les listes de tâches s'ouvrent dans leur éditeur habituel, et vous pouvez créer de nouvelles notes. Le menu / et le menu du clic droit fonctionnent aussi, sans les commandes qui ont besoin du serveur (images et fichiers à envoyer, modèles, dessins, liens vers d'autres notes). Les autres types de notes, comme les dessins, restent accessibles en ligne uniquement. Les modifications sont gardées dans le navigateur jusqu'à leur envoi.
+*   **Lecture et modification :** les notes en texte enrichi, les notes Markdown et les listes de tâches s'ouvrent dans leur éditeur habituel, et vous pouvez créer de nouvelles notes. Le menu / et le menu du clic droit fonctionnent aussi, sans les commandes qui ont besoin du serveur (images et fichiers à envoyer, modèles, dessins, liens vers d'autres notes). Les autres types de notes, comme les dessins, restent accessibles en ligne uniquement. Les modifications sont gardées dans le navigateur jusqu'à leur envoi.
 *   **Garder hors ligne :** les favoris sont toujours conservés, et **Garder hors ligne** dans le menu d'une note ou d'un dossier (sous-dossiers compris) la conserve quelle que soit sa date, avec toutes ses pièces jointes (PDF, audio, fichiers) jusqu'à 25 Mo chacune. Le même menu d'une note indique si elle est disponible hors ligne dans ce navigateur, et les pages Notes et Dossiers signalent les notes et dossiers disponibles hors ligne dans ce navigateur. La page Notes permet aussi de garder plusieurs notes hors ligne d'un coup (ou d'arrêter), depuis ses actions groupées, et la page Dossiers propose **Garder hors ligne** dans le menu de chaque dossier.
+*   **Page Hors ligne :** le bouton **Hors ligne** de la barre d'icônes liste les notes et dossiers gardés hors ligne, comme la page Partages : les dossiers en arborescence avec leurs notes, la raison pour laquelle chaque note est gardée (gardée hors ligne, dans un dossier gardé hors ligne, favori, modifiée récemment), un filtre, et un bouton pour garder une note hors ligne ou arrêter. Une icône d'avertissement signale une note que ce navigateur ne détient pas encore.
 *   **Retour du réseau :** les modifications sont envoyées automatiquement. Si une note a aussi été modifiée sur le serveur entre-temps, les deux versions sont fusionnées quand c'est possible, sinon votre version hors ligne est gardée dans une note à part nommée « ... (copie hors ligne) ». Une note supprimée sur le serveur entre-temps est recréée.
 *   **Réglages :** **Paramètres > Actions > Notes hors ligne** définit combien de jours de notes sont conservés (5 par défaut, jusqu'à 30, 0 désactive les notes hors ligne) et indique ce que contient le navigateur utilisé.
 *   **Limites :** 300 notes et 50 Mo de texte au plus, les plus récemment modifiées d'abord. Les fichiers sont conservés aussi : les images affichées dans ces notes, et toutes les pièces jointes (PDF, audio, fichiers) des favoris et des notes gardées avec **Garder hors ligne**, jusqu'à 25 Mo chacun, 400 fichiers et 200 Mo au total, et jamais plus de la moitié de l'espace libre du navigateur. Un fichier plus gros reste en ligne uniquement, et la note le signale quand elle est ouverte hors ligne.

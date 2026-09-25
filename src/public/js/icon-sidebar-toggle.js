@@ -9,6 +9,9 @@
  * scrollbar is hidden, so on a short screen the last few icons are simply
  * invisible above the account group's divider. #iconSidebarOverflowBtn appears
  * in that case and opens a labelled menu of whatever is currently out of view.
+ * When only one entry is out of view, a menu would be a detour: the button
+ * takes that entry's place instead (its icon, label and active state) and a
+ * click on it acts as the entry itself.
  *
  * The group separators icon_sidebar.php draws between the entries are also
  * kept honest here: once UI Customization (or the git scope) has hidden every
@@ -319,12 +322,29 @@
         var button = document.getElementById('iconSidebarOverflowBtn');
 
         if (menu) menu.classList.remove(OVERFLOW_MENU_OPEN_CLASS);
-        if (button) button.setAttribute('aria-expanded', 'false');
+        // Standing in for an entry, the button has no popup to report on.
+        if (button && !overflowProxyEntry) button.setAttribute('aria-expanded', 'false');
     }
 
     function isMenuOpen() {
         var menu = document.getElementById('iconSidebarOverflowMenu');
         return !!menu && menu.classList.contains(OVERFLOW_MENU_OPEN_CLASS);
+    }
+
+    function getEntryLabel(entry) {
+        return entry.getAttribute('aria-label') || entry.getAttribute('title') || '';
+    }
+
+    // Links navigate; the action buttons (notifications, git sync, ...) keep
+    // their handlers on the original element, so replay the click there rather
+    // than duplicating what each one does.
+    function activateEntry(entry) {
+        var href = entry.getAttribute('href');
+        if (entry.tagName === 'A' && href) {
+            window.location.href = href;
+        } else {
+            entry.click();
+        }
     }
 
     // The rail entries are icon-only, so the label comes from their title /
@@ -347,21 +367,12 @@
         }
 
         var label = document.createElement('span');
-        label.textContent = entry.getAttribute('aria-label') || entry.getAttribute('title') || '';
+        label.textContent = getEntryLabel(entry);
         item.appendChild(label);
 
         item.addEventListener('click', function () {
             closeMenu();
-
-            // Links navigate; the action buttons (notifications, git sync, ...)
-            // keep their handlers on the original element, so replay the click
-            // there rather than duplicating what each one does.
-            var href = entry.getAttribute('href');
-            if (entry.tagName === 'A' && href) {
-                window.location.href = href;
-            } else {
-                entry.click();
-            }
+            activateEntry(entry);
         });
 
         return item;
@@ -418,6 +429,72 @@
         positionMenu(menu, button);
     }
 
+    // The entry the overflow button currently stands in for, null while it is
+    // the plain "Show hidden icons" button. overflowButtonDefault keeps that
+    // button's own content and label to put back.
+    var overflowProxyEntry = null;
+    var overflowButtonDefault = null;
+
+    function setOverflowProxy(button, entry) {
+        if (!overflowButtonDefault) {
+            overflowButtonDefault = {
+                children: Array.prototype.map.call(button.childNodes, function (node) {
+                    return node.cloneNode(true);
+                }),
+                label: button.getAttribute('aria-label') || ''
+            };
+        }
+
+        var children = entry ? entry.childNodes : overflowButtonDefault.children;
+        var label = entry ? getEntryLabel(entry) : overflowButtonDefault.label;
+
+        // Icon (its colour rides on the <i>) and badges, ids dropped so the
+        // copy never answers for the original.
+        button.textContent = '';
+        Array.prototype.forEach.call(children, function (node) {
+            var clone = node.cloneNode(true);
+            if (clone.nodeType === 1) {
+                clone.removeAttribute('id');
+                Array.prototype.forEach.call(clone.querySelectorAll('[id]'), function (el) {
+                    el.removeAttribute('id');
+                });
+            }
+            button.appendChild(clone);
+        });
+
+        button.setAttribute('title', label);
+        button.setAttribute('aria-label', label);
+        button.classList.toggle('icon-sidebar-btn-active', !!entry && entry.classList.contains('icon-sidebar-btn-active'));
+
+        if (entry) {
+            button.removeAttribute('aria-haspopup');
+            button.removeAttribute('aria-expanded');
+            button.removeAttribute('aria-controls');
+        } else {
+            button.setAttribute('aria-haspopup', 'true');
+            button.setAttribute('aria-expanded', isMenuOpen() ? 'true' : 'false');
+            button.setAttribute('aria-controls', 'iconSidebarOverflowMenu');
+        }
+
+        overflowProxyEntry = entry;
+    }
+
+    function syncOverflowProxy() {
+        var scrollArea = getScrollArea();
+        var button = document.getElementById('iconSidebarOverflowBtn');
+        if (!scrollArea || !button) return;
+
+        var entry = null;
+        if (button.classList.contains(OVERFLOW_BTN_VISIBLE_CLASS)) {
+            var hidden = getHiddenEntries(scrollArea);
+            if (hidden.length === 1) entry = hidden[0];
+        }
+
+        if (!entry && !overflowProxyEntry) return;
+        if (entry) closeMenu();
+        setOverflowProxy(button, entry);
+    }
+
     function syncOverflowButton() {
         var scrollArea = getScrollArea();
         var button = document.getElementById('iconSidebarOverflowBtn');
@@ -435,6 +512,10 @@
         }
 
         if (!overflows && isMenuOpen()) closeMenu();
+
+        // The button sits outside the scroll area, so rewriting it does not
+        // wake the MutationObserver below.
+        syncOverflowProxy();
     }
 
     function initOverflow() {
@@ -444,6 +525,10 @@
 
         button.addEventListener('click', function (event) {
             event.stopPropagation();
+            if (overflowProxyEntry) {
+                activateEntry(overflowProxyEntry);
+                return;
+            }
             if (isMenuOpen()) {
                 closeMenu();
             } else {
@@ -452,8 +537,9 @@
         });
 
         // Reopening rather than repositioning: what is out of view changes as
-        // the entries scroll.
+        // the entries scroll, and so does the entry the button may stand in for.
         scrollArea.addEventListener('scroll', function () {
+            syncOverflowProxy();
             if (isMenuOpen()) openMenu();
         });
 

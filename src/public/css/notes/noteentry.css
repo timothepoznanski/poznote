@@ -150,7 +150,7 @@ p.code-block-placeholder-after[data-ph]:empty:before {
        customization panel) declares its width in one of these on <html> or
        <body>; the fixed controls add them up instead of listing every
        combination. css/ui-customization-panel.css reads them too. */
-    html:not(.outline-collapsed) {
+    html:not(.outline-collapsed):not(.outline-no-note) {
         --pz-docked-outline: var(--outline-width, 280px);
     }
 

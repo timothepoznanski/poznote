@@ -352,6 +352,10 @@ function setDesktopOutlineCollapsedState(isCollapsed) {
     document.body.classList.toggle('outline-collapsed', isCollapsed);
 }
 
+function setOutlineNoNoteState(hasNoNote) {
+    document.documentElement.classList.toggle('outline-no-note', hasNoNote);
+}
+
 /**
  * Initialize the outline panel
  */
@@ -508,6 +512,11 @@ function initToggleOutline() {
 function toggleOutline() {
     // Prevent opening outline in Kanban view
     if (window._isKanbanViewActive) {
+        return;
+    }
+
+    // Nothing to outline: the panel is hidden, do not flip the stored choice
+    if (!getCurrentOutlineNoteElement()) {
         return;
     }
 
@@ -1406,13 +1415,21 @@ function updateOutlineForCurrentNote(forceUpdate = false) {
     // Find the currently visible note
     const visibleNote = getCurrentOutlineNoteElement();
 
+    // No note on screen (every tab closed, only a folder opened in the
+    // tree): the outline goes away with the note and comes back with the
+    // next one, the reader's open/closed choice untouched (issue #1494)
+    setOutlineNoNoteState(!visibleNote);
+
     if (!visibleNote) {
         updateOutlineToggleAvailability(null);
         currentNoteId = null;
         markdownOutlineCache = null;
         currentOutlineHeadings = null;
-        if (currentOutlineSignature !== null) {
-            currentOutlineSignature = null;
+        // '' is what an empty outline signs, see headingsSignature().
+        // refreshOutline() resets the signature to null, so testing null here
+        // kept the closed note's headings on screen
+        if (currentOutlineSignature !== '') {
+            currentOutlineSignature = '';
             renderOutline([]);
         }
         return;

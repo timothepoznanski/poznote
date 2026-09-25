@@ -913,7 +913,7 @@ curl -u 'username:password' -H "X-User-ID: 1" \
 
 ## Offline Copies
 
-The web UI keeps the notes modified recently in the browser (IndexedDB) so they can be opened and edited without a network, and sends the changes made offline back through [Update Note](#update-note) and [Create Note](#create-note) once the connection is back. These two endpoints feed that copy. How many days of notes are kept is the `offline_notes_days` user setting (default `5`, `0` turns offline copies off, maximum `30`). The favorites, and the notes and folders marked "Keep offline" ([Keep Note Offline](#keep-note-offline), [Keep Folder Offline](#keep-folder-offline)), are kept whatever their date, with all their attachments. Only the account's owner gets them: an account opened through a grant or a workspace shared with the session answers `403` with `"code": "offline_unavailable"`.
+The web UI keeps the notes modified recently in the browser (IndexedDB) so they can be opened and edited without a network, and sends the changes made offline back through [Update Note](#update-note) and [Create Note](#create-note) once the connection is back. The manifest and the notes endpoints feed that copy, the list endpoint feeds the Offline page. How many days of notes are kept is the `offline_notes_days` user setting (default `5`, `0` turns offline copies off, maximum `30`). The favorites, and the notes and folders marked "Keep offline" ([Keep Note Offline](#keep-note-offline), [Keep Folder Offline](#keep-folder-offline)), are kept whatever their date, with all their attachments. Only the account's owner gets them: an account opened through a grant or a workspace shared with the session answers `403` with `"code": "offline_unavailable"`.
 
 ### Get Offline Manifest
 
@@ -940,6 +940,34 @@ curl -u 'username:password' -H "X-User-ID: 1" \
   "folders": [{ "id": 3, "name": "Lectures", "parent_id": null, "workspace": "Poznote" }],
   "notes": [
     { "id": 42, "heading": "Physics", "type": "markdown", "workspace": "Poznote", "folder_id": 3, "updated": "2026-09-23 14:02:11", "kept": "recent", "version": "8b03f2cfdfd041732b3534f0cddbb3e2", "files": "" }
+  ]
+}
+```
+
+### List Offline Notes and Folders
+
+```
+GET /offline/list?workspace={name}
+```
+
+The notes and folders kept offline in a workspace (every workspace without `workspace`), for the Offline page: the same notes as the manifest, with why each one is kept (`reason`: `note`, `folder`, `favorite` or `recent`) and its folder path, and the folders kept whole, `is_direct` when the folder itself is marked "Keep offline" (otherwise it is kept through a parent), with the number of its notes kept offline.
+
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  "https://your-poznote-instance.com/api/v1/offline/list?workspace=Poznote"
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "days": 5,
+  "notes": [
+    { "note_id": 42, "heading": "Physics", "type": "markdown", "workspace": "Poznote", "folder_id": 3, "folder_path": "Lectures", "updated": "2026-09-23 14:02:11", "reason": "folder", "icon": "", "icon_color": "" }
+  ],
+  "folders": [
+    { "folder_id": 3, "folder_name": "Lectures", "parent_id": null, "workspace": "Poznote", "folder_path": "Lectures", "is_direct": true, "note_count": 1, "icon": "", "icon_color": "" }
   ]
 }
 ```
@@ -2157,6 +2185,39 @@ curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"offline": true}' \
   http://YOUR_SERVER/api/v1/folders/12/offline
+```
+
+### Archive Folder
+
+```
+POST /folders/{id}/archive
+```
+
+Move a folder, with its subfolders and notes, to the `Archives` workspace. The workspace is created on first use, and the folder's parent path is mirrored inside it so the folder keeps its place in the tree. The parent folders are left in the source workspace and the notes' `updated` dates are preserved. Archiving ends public sharing: the folder and its subfolders lose their public links, while notes shared on their own keep theirs.
+
+When `Archives` already holds a folder with the same name at that place (for example after notes were archived one by one), the folder is merged into it level by level: its notes join the existing folder and the emptied source folders are removed. Returns `409` with a `conflicts` list of titles, and nothing moved, when a note would join an archived folder that already has a note with the same title.
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/folders/12/archive
+```
+
+**Response (200):**
+
+```json
+{
+  "success": true,
+  "message": "Folder archived successfully",
+  "workspace": "Archives",
+  "workspace_created": false,
+  "old_workspace": "Personal",
+  "old_folder_id": 12,
+  "folder_id": 12,
+  "folder_path": "Projects/2025",
+  "merged": false,
+  "created_folders": [{"id": 57, "name": "Projects"}],
+  "note_ids": [101, 102, 103]
+}
 ```
 
 ### Empty Folder
@@ -3693,6 +3754,7 @@ curl http://YOUR_SERVER/api_health.php
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/offline/manifest` | Notes kept offline, with their versions |
+| `GET` | `/offline/list` | Notes and folders kept offline, with why |
 | `GET` | `/offline/notes?ids=` | Full content of up to 50 notes |
 
 ### Snapshots
@@ -3757,6 +3819,7 @@ curl http://YOUR_SERVER/api_health.php
 | `DELETE` | `/folders/{id}` | Delete folder |
 | `POST` | `/folders/{id}/move` | Move folder |
 | `POST` | `/folders/{id}/duplicate` | Duplicate folder with notes and subfolders |
+| `POST` | `/folders/{id}/archive` | Archive folder, subfolders and notes into the Archives workspace |
 | `POST` | `/folders/{id}/empty` | Empty folder |
 | `PUT` | `/folders/{id}/icon` | Update icon |
 | `PUT` | `/folders/{id}/color` | Update card color |

@@ -613,7 +613,7 @@ A lista completa de limites e os endpoints que gerenciam as senhas de aplicativo
 O Poznote oferece dois formatos principais de nota, cada um pensado para um fluxo de trabalho diferente.
 
 <details>
-<summary><strong>Notas HTML</strong></summary>
+<summary><strong>Notas de texto formatado</strong></summary>
 &nbsp;
 
 *   **Editor:** edição WYSIWYG (What You See Is What You Get) direta.
@@ -660,7 +660,7 @@ O Poznote oferece dois formatos principais de nota, cada um pensado para um flux
 
 *   **Funcionalidade:** reutilize conteúdo já escrito para padronizar sua documentação, de uma nota inteira a um pequeno trecho.
 *   **Configuração:** coloque as notas que deseja reutilizar em uma pasta chamada `Templates` (subpastas são aceitas). Um espaço de trabalho chamado `Templates` também funciona e fica disponível a partir de todos os espaços de trabalho. O nome também é reconhecido no idioma da interface (`Modèles`, `Vorlagen`, `Plantillas`, `Modelos`, `Шаблоны`, `模板`).
-*   **Inserir em uma nota:** digite `/template` (ou `/` seguido do título do modelo) em uma nota HTML ou Markdown e escolha um modelo: o conteúdo dele é colado no cursor, convertido se o modelo e a nota não forem do mesmo tipo.
+*   **Inserir em uma nota:** digite `/template` (ou `/` seguido do título do modelo) em uma nota de texto formatado ou Markdown e escolha um modelo: o conteúdo dele é colado no cursor, convertido se o modelo e a nota não forem do mesmo tipo.
 *   **Nova nota a partir de um modelo:** duplique a nota do modelo, ou duplique uma pasta `Templates` inteira para começar um projeto com uma estrutura de pastas pronta.
 </details>
 
@@ -672,7 +672,7 @@ O Poznote oferece dois formatos principais de nota, cada um pensado para um flux
 *   **Fluxo de trabalho:** o botão "Criar a entrada de hoje" cria a nota do dia (ele passa a se chamar "Ir para a entrada de hoje" quando a nota já existe), com a data atual como título e armazenada automaticamente em uma estrutura de pastas `Diary/YYYY/MM`.
 *   **Visualização em quadro:** as entradas são exibidas como cartões agrupados por mês, das mais recentes para as mais antigas, com um filtro para encontrar rapidamente entradas anteriores.
 *   **Vista contínua:** o botão em forma de pergaminho, ao lado dos controles de visualização, muda para uma única coluna de leitura: cada entrada com seu conteúdo completo, das mais recentes para as mais antigas, carregadas conforme você rola a página. O filtro também funciona ali. Clique em uma entrada, ou em seu lápis, para editá-la ali mesmo; as alterações são salvas enquanto você digita.
-*   **Formato:** novas entradas são criadas como notas HTML ou Markdown, conforme a configuração "Formato das entradas do diário" em **Configurações > Comportamento**.
+*   **Formato:** novas entradas são criadas como notas de texto formatado ou Markdown, conforme a configuração "Formato das entradas do diário" em **Configurações > Comportamento**.
 </details>
 
 ## Instantâneos
@@ -722,7 +722,7 @@ Em **Configurações > Comportamento**, você pode configurar:
 - **Ordem de inserção das tarefas:** controle onde as novas tarefas são inseridas
 - **Mostrar notas após as pastas:** liste as notas sem pasta abaixo da lista de pastas
 - **Quebra de linha em blocos de código:** ative ou desative a quebra de linha nos blocos de código
-- **Formato das entradas do diário:** crie as entradas do diário como notas HTML ou Markdown
+- **Formato das entradas do diário:** crie as entradas do diário como notas de texto formatado ou Markdown
 - Idioma da interface, fuso horário e formato de data, anexos e backlinks no fim da nota, verificação ortográfica e atalhos de teclado
 
 Em **Configurações > Markdown**, você pode configurar o modo de visualização padrão, a fonte do editor, o Markdown emoldurado e colorido e a numeração de linhas dos blocos de código.
@@ -1043,7 +1043,7 @@ tar -czvf poznote-full-backup.tar.gz data/
 
 Exporte notas individuais com o botão **Exportar** da barra de ferramentas da nota:
 
-  - **Notas HTML:** exportação para HTML, ou para um único arquivo HTML com as imagens incorporadas
+  - **Notas de texto formatado:** exportação para HTML, ou para um único arquivo HTML com as imagens incorporadas
   - **Notas Markdown:** exportação para Markdown, para HTML, ou para um único arquivo HTML com as imagens incorporadas
   - **Listas de tarefas:** as mesmas opções, além de uma exportação JSON bruta da lista
 
@@ -1246,8 +1246,9 @@ O Poznote continua funcionando sem rede de duas formas: as notas que você modif
 As notas que você modificou nos últimos 5 dias são mantidas em cada navegador onde você usa o Poznote, e essa cópia é atualizada após cada salvamento. Na sala de aula, no trem ou em qualquer lugar sem Wi-Fi, abra o endereço de sempre do Poznote: o navegador mostra a versão offline do Poznote, com a mesma barra lateral, os mesmos editores, a mesma barra de ferramentas, a mesma busca e as mesmas abas (um clique duplo ou um clique do meio abre uma nota em uma nova aba, e as abas abertas online são retomadas), listando apenas as notas mantidas offline.
 
 *   **Login:** digite a senha com que você entrou pela última vez neste navegador, ela é verificada sem o servidor. Se você nunca digitou sua senha neste navegador (SSO, login automático), a última conta usada abre com um botão **Continuar como**.
-*   **Leitura e edição:** notas HTML, notas Markdown e listas de tarefas abrem no editor de sempre, e é possível criar notas novas. O menu / e o menu do clique direito também funcionam, sem os comandos que precisam do servidor (imagens e arquivos para enviar, modelos, desenhos, links para outras notas). Os outros tipos de nota, como os desenhos, ficam disponíveis apenas online. As alterações ficam guardadas no navegador até serem enviadas.
+*   **Leitura e edição:** notas de texto formatado, notas Markdown e listas de tarefas abrem no editor de sempre, e é possível criar notas novas. O menu / e o menu do clique direito também funcionam, sem os comandos que precisam do servidor (imagens e arquivos para enviar, modelos, desenhos, links para outras notas). Os outros tipos de nota, como os desenhos, ficam disponíveis apenas online. As alterações ficam guardadas no navegador até serem enviadas.
 *   **Manter offline:** os favoritos são sempre mantidos, e **Manter offline** no menu de uma nota ou de uma pasta (subpastas incluídas) a mantém seja qual for a data, com todos os anexos (PDF, áudio, arquivos) de até 25 MB cada. O mesmo menu de uma nota indica se ela está disponível offline neste navegador, e as páginas Notas e Pastas marcam as notas e pastas disponíveis offline neste navegador. A página Notas também permite manter várias notas offline de uma vez (ou deixar de manter) pelas ações em lote, e a página Pastas oferece **Manter offline** no menu de cada pasta.
+*   **Página Offline:** o botão **Offline** da barra de ícones lista as notas e pastas mantidas offline, como a página Compartilhamentos: as pastas em árvore com suas notas, o motivo pelo qual cada nota é mantida (mantida offline, em uma pasta mantida offline, favorito, modificada recentemente), um filtro e um botão para manter uma nota offline ou deixar de o fazer. Um ícone de aviso assinala uma nota que este navegador ainda não tem.
 *   **De volta online:** as alterações são enviadas automaticamente. Se uma nota também foi alterada no servidor nesse meio-tempo, as duas versões são mescladas quando possível; caso contrário, sua versão offline é mantida como uma nota separada chamada "... (cópia offline)". Uma nota excluída no servidor nesse meio-tempo é criada novamente.
 *   **Configuração:** **Configurações > Ações > Notas offline** define quantos dias de notas são mantidos (5 por padrão, até 30, 0 desativa as notas offline) e mostra o que o navegador atual contém.
 *   **Limites:** no máximo 300 notas e 50 MB de texto, primeiro as modificadas mais recentemente. Os arquivos também são mantidos: as imagens exibidas nessas notas e todos os anexos (PDF, áudio, arquivos) dos favoritos e das notas mantidas com **Manter offline**, até 25 MB cada, 400 arquivos e 200 MB no total, e nunca mais da metade do espaço livre do navegador. Um arquivo maior fica apenas online, e a nota avisa quando é aberta offline.

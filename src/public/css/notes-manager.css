@@ -1,5 +1,12 @@
 /* Notes Manager page styles */
 
+/* The body only grows as tall as the list, so the canvas below it shows the
+   html ground: in dark mode that is --dm-content-bg while the body takes
+   --pz-chrome-bg. Paint the canvas with the body's colour. */
+html:has(body.notes-manager-page) {
+    background-color: var(--bg-color, var(--pz-bg));
+}
+
 body.notes-manager-page {
     margin: 0;
     padding: 20px;

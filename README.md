@@ -613,7 +613,7 @@ The full list of limits and the endpoints that manage app passwords are in the [
 Poznote supports two primary note formats, each tailored for different workflows.
 
 <details>
-<summary><strong>HTML Notes</strong></summary>
+<summary><strong>Rich Text Notes</strong></summary>
 &nbsp;
 
 *   **Editor:** Direct WYSIWYG (What You See Is What You Get) editing.
@@ -660,7 +660,7 @@ Poznote supports two primary note formats, each tailored for different workflows
 
 *   **Functionality:** Reuse pre-written content to standardize your documentation, from a full note to a short snippet.
 *   **Setup:** Put the notes you want to reuse in a folder named `Templates` (sub-folders are fine). A workspace named `Templates` works too and is offered from every workspace. The name is also recognized in the language of the interface (`Modèles`, `Vorlagen`, `Plantillas`, `Modelos`, `Шаблоны`, `模板`).
-*   **Insert into a note:** Type `/template` (or `/` followed by the template's title) in an HTML or Markdown note and pick a template: its content is pasted at the cursor, converted if the template and the note are not of the same type.
+*   **Insert into a note:** Type `/template` (or `/` followed by the template's title) in a rich text or Markdown note and pick a template: its content is pasted at the cursor, converted if the template and the note are not of the same type.
 *   **New note from a template:** Duplicate the template note, or duplicate a whole `Templates` folder to start a project with a ready-made folder structure.
 </details>
 
@@ -672,7 +672,7 @@ Poznote supports two primary note formats, each tailored for different workflows
 *   **Workflow:** The "Create today's entry" button creates today's note (it reads "Go to today's entry" once the note exists), titled with the current date and stored automatically in a `Diary/YYYY/MM` folder structure.
 *   **Board View:** Entries are displayed as cards grouped by month, newest first, with a filter to quickly find past entries.
 *   **Journal View:** The scroll button next to the view controls switches to one reading column: every entry with its full content, newest first, loaded as you scroll. The filter works there too. Click an entry, or its pencil, to edit it right there; changes are saved as you type.
-*   **Format:** New entries are created as HTML or Markdown notes, depending on the "Diary entry format" setting under **Settings > Behavior**.
+*   **Format:** New entries are created as rich text or Markdown notes, depending on the "Diary entry format" setting under **Settings > Behavior**.
 </details>
 
 ## Snapshots
@@ -722,7 +722,7 @@ Under **Settings > Behavior**, you can configure:
 - **Task list insert order:** control where new tasks are inserted
 - **Show notes after folders:** list notes without folders below the folder list
 - **Code block word wrap:** enable or disable word wrap in code blocks
-- **Diary entry format:** create diary entries as HTML or Markdown notes
+- **Diary entry format:** create diary entries as rich text or Markdown notes
 - Interface language, timezone and date format, attachments and backlinks at the bottom of a note, spell check, and the keyboard shortcuts
 
 Under **Settings > Markdown**, you can configure the default view mode, the editor font, framed and coloured Markdown, and code block line numbers.
@@ -1043,7 +1043,7 @@ tar -czvf poznote-full-backup.tar.gz data/
 
 Export individual notes using the **Export** button in the note toolbar:
 
-  - **HTML notes:** Export to HTML, or to a single HTML file with the images embedded
+  - **Rich text notes:** Export to HTML, or to a single HTML file with the images embedded
   - **Markdown notes:** Export to Markdown, to HTML, or to a single HTML file with the images embedded
   - **Task lists:** the same options, plus a raw JSON export of the list
 
@@ -1246,8 +1246,9 @@ Poznote keeps working without a network in two ways: the notes you modified rece
 The notes you modified in the last 5 days are kept in each browser where you use Poznote, and this copy is refreshed after every save. In a classroom, on a train or anywhere without Wi-Fi, open the usual Poznote address: the browser shows the offline version of Poznote, with the same sidebar, editors, toolbar, search and tabs (a double-click or a middle-click opens a note in a new tab, and the tabs open online come back), listing only the notes kept offline.
 
 *   **Signing in:** type the password you last signed in with in this browser, it is checked without the server. If you never typed your password in this browser (SSO, automatic sign-in), the last account used there opens with a **Continue as** button.
-*   **Reading and editing:** HTML notes, Markdown notes and task lists open in their usual editor, and new notes can be created. The / menu and the right-click menu work too, without the commands that need the server (pictures and files to upload, templates, drawings, links to other notes). Other note types, such as drawings, stay online only. Changes are kept in the browser until they are sent.
+*   **Reading and editing:** Rich text notes, Markdown notes and task lists open in their usual editor, and new notes can be created. The / menu and the right-click menu work too, without the commands that need the server (pictures and files to upload, templates, drawings, links to other notes). Other note types, such as drawings, stay online only. Changes are kept in the browser until they are sent.
 *   **Keep offline:** favorites are always kept, and **Keep offline** in the menu of a note or of a folder (subfolders included) keeps it whatever its date, with all its attachments (PDF, audio, files) up to 25 MB each. The same menu of a note says whether it is available offline in this browser, and the Notes and Folders pages mark the notes and folders available offline in this browser. The Notes page can also keep several notes offline at once (or stop), from its bulk actions, and the Folders page has **Keep offline** in the menu of each folder.
+*   **Offline page:** the **Offline** button of the icon sidebar lists the notes and folders kept offline, like the Shares page: folders as a tree with their notes, why each note is kept (kept offline, in a folder kept offline, favorite, modified recently), a filter, and a button to keep a note offline or stop. A warning icon marks a note this browser does not hold yet.
 *   **Back online:** the changes are sent automatically. If a note was also changed on the server in the meantime, both versions are merged when possible, otherwise your offline version is kept as a separate note named "... (offline copy)". A note deleted on the server in the meantime is created again.
 *   **Settings:** **Settings > Actions > Offline notes** sets how many days of notes are kept (5 by default, up to 30, 0 turns offline notes off) and shows what the current browser holds.
 *   **Limits:** at most 300 notes and 50 MB of text, the most recently modified first. Files are kept too: the pictures shown in these notes, and every attachment (PDF, audio, files) of the favorites and the notes kept with **Keep offline**, up to 25 MB each, 400 files and 200 MB in total, and never more than half the free space of the browser. A larger file stays online only, and the note says so when it is opened offline.
