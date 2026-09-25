@@ -376,6 +376,11 @@ if ($center_note_content_enabled && $width_value !== '1' && $width_value !== 'tr
                 if (shouldCollapseOutline) {
                     document.documentElement.classList.add('outline-collapsed');
                 }
+<?php if (!$res_right): ?>
+                // No note in the pane: no outline either (issue #1494),
+                // js/outline-panel.js keeps the class in step afterwards
+                document.documentElement.classList.add('outline-no-note');
+<?php endif; ?>
 
                 // Docked AI chat panel, same idea: restore its open state and
                 // width before the first paint so the note does not render
