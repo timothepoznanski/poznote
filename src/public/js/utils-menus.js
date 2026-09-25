@@ -128,36 +128,15 @@ function adjustMenuPosition(menu, toggleButton) {
     }
 
     var toggleRect = toggleButton.getBoundingClientRect();
-    var viewportHeight = window.innerHeight;
     var viewportWidth = window.innerWidth;
 
-    // Position menu below the toggle button by default (fixed positioning)
-    var topPosition = toggleRect.bottom + 4;
+    // Below the toggle button by default (fixed positioning), above it or
+    // slid up when there is no room
     var leftPosition = toggleRect.left;
-
-    menu.style.top = topPosition + 'px';
     menu.style.left = leftPosition + 'px';
+    placeMenuVertically(menu, toggleRect.bottom + 4, toggleRect.top - 4);
 
-    // Now get the menu's dimensions after positioning
     var rect = menu.getBoundingClientRect();
-
-    // Check vertical overflow
-    if (rect.bottom > viewportHeight) {
-        // Try positioning above instead
-        var topAltPosition = toggleRect.top - rect.height - 4;
-
-        if (topAltPosition >= 0) {
-            // Fits above
-            menu.style.top = topAltPosition + 'px';
-            rect = menu.getBoundingClientRect();
-        } else {
-            // Doesn't fit above either, constrain height below
-            var availableHeight = viewportHeight - topPosition - 10;
-            menu.style.maxHeight = Math.max(100, availableHeight) + 'px';
-            menu.style.overflowY = 'auto';
-            rect = menu.getBoundingClientRect();
-        }
-    }
 
     // Check horizontal overflow
     var leftCol = document.getElementById('left_col');
@@ -180,6 +159,57 @@ function adjustMenuPosition(menu, toggleButton) {
     if (rect.left < 0) {
         menu.style.left = '10px';
     }
+
+    keepMenuPlaced(menu, function () {
+        if (toggleButton.isConnected) adjustMenuPosition(menu, toggleButton);
+    });
+}
+
+var MENU_VIEWPORT_MARGIN = 8;
+
+/**
+ * Vertical half of the menu placement. `below` is where the menu's top goes
+ * when it opens downwards, `above` where its bottom goes when it opens
+ * upwards. A menu that fits on neither side slides up until its bottom edge
+ * is inside the viewport (covering the anchor rather than being cut off), and
+ * only scrolls when it is taller than the viewport itself.
+ */
+function placeMenuVertically(menu, below, above) {
+    var viewportHeight = window.innerHeight;
+    var margin = MENU_VIEWPORT_MARGIN;
+    var height = menu.getBoundingClientRect().height;
+    var top;
+
+    if (below + height <= viewportHeight - margin) {
+        top = below;
+    } else if (above - height >= margin) {
+        top = above - height;
+    } else if (height <= viewportHeight - 2 * margin) {
+        top = viewportHeight - margin - height;
+    } else {
+        top = margin;
+        menu.style.maxHeight = (viewportHeight - 2 * margin) + 'px';
+        menu.style.overflowY = 'auto';
+    }
+    menu.style.top = Math.max(margin, top) + 'px';
+}
+
+/**
+ * Re-place an open menu whenever its size changes: some items only appear
+ * after it is shown (the note menu's offline availability line is filled from
+ * IndexedDB by js/offline-sync.js), and a menu measured before that grows past
+ * the bottom of the window. One observer per menu element; each placement
+ * swaps in its own reposition callback.
+ */
+function keepMenuPlaced(menu, reposition) {
+    menu._pzReposition = reposition;
+    if (menu._pzResizeObserver || typeof ResizeObserver !== 'function') return;
+    menu._pzResizeObserver = new ResizeObserver(function () {
+        if (menu.classList.contains('show') && menu._pzReposition) {
+            menu._pzReposition();
+        }
+    });
+    menu._pzResizeObserver.observe(menu);
 }
 
 /**
@@ -198,23 +228,11 @@ function positionMenuAtPoint(menu, x, y) {
     menu.style.maxHeight = '';
     menu.style.overflowY = '';
 
-    menu.style.top = y + 'px';
     menu.style.left = x + 'px';
+    placeMenuVertically(menu, y, y);
 
     var rect = menu.getBoundingClientRect();
-    var viewportHeight = window.innerHeight;
     var viewportWidth = window.innerWidth;
-
-    if (rect.bottom > viewportHeight) {
-        var topAbove = y - rect.height;
-        if (topAbove >= 0) {
-            menu.style.top = topAbove + 'px';
-        } else {
-            menu.style.maxHeight = Math.max(100, viewportHeight - y - 10) + 'px';
-            menu.style.overflowY = 'auto';
-        }
-        rect = menu.getBoundingClientRect();
-    }
 
     if (rect.right > viewportWidth) {
         menu.style.left = Math.max(0, viewportWidth - rect.width - 10) + 'px';
@@ -224,6 +242,10 @@ function positionMenuAtPoint(menu, x, y) {
     if (rect.left < 0) {
         menu.style.left = '10px';
     }
+
+    keepMenuPlaced(menu, function () {
+        positionMenuAtPoint(menu, x, y);
+    });
 }
 
 /**
