@@ -546,6 +546,7 @@
         var label = state.workspace
             || (names.length === 1 ? names[0] : (names.length ? ot('list.all_workspaces', null, 'All workspaces') : 'Poznote'));
         byId('offline-workspace-name').textContent = label;
+        byId('offline-workspace-name').title = label;
         byId('offline-workspace-caret').hidden = names.length < 2;
 
         var menu = byId('offline-workspace-menu');

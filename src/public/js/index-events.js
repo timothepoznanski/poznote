@@ -932,6 +932,7 @@
                         // Use the display map to get the proper label
                         var displayName = window.workspaceDisplayMap[currentWs] || currentWs;
                         titleElement.textContent = displayName;
+                        titleElement.title = displayName;
                     }
                 }
             } catch (e) {

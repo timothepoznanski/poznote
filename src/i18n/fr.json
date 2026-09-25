@@ -960,9 +960,7 @@
     "confirm_navigation": "⚠️ Modifications non enregistrées\n\nVous avez des modifications non enregistrées qui seront perdues.\nEnregistrer avant de quitter la page ?",
     "notification": {
       "saving": "Enregistrement des modifications…",
-      "saved": "Enregistré !",
-      "not_saved_yet": "Vos dernières modifications n'ont pas encore pu être enregistrées. Elles sont conservées sur cet appareil et Poznote réessaie.",
-      "kept_as_draft": "Pas encore enregistré, vos modifications sont conservées sur cet appareil"
+      "saved": "Enregistré !"
     },
     "draft": {
       "found_conflict": "Cette note contient des modifications non enregistrées de votre dernière visite, mais elle a aussi été modifiée ailleurs depuis. La version que vous ne gardez pas reste dans l'historique de la note.",

@@ -73,6 +73,9 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    /* Lets a long workspace name shrink to an ellipsis instead of wrapping
+       and pushing the action buttons around */
+    min-width: 0;
 }
 
 .workspace-dropdown-icon {
@@ -80,6 +83,7 @@ body {
     font-size: 0.9rem;
     color: var(--pz-text-muted);
     pointer-events: none;
+    flex-shrink: 0;
     transition: transform 0.2s ease;
     position: relative;
     top: 2px;
@@ -90,11 +94,17 @@ body {
     height: 20px;
     vertical-align: middle;
     pointer-events: none;
+    flex-shrink: 0;
 }
 
 .workspace-title-text {
     vertical-align: middle;
     flex: 1;
+    /* One line, the full name in the title attribute shows on hover */
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sidebar-title[role="button"] {
@@ -106,6 +116,7 @@ body {
     align-items: center;
     gap: 6px;
     position: relative;
+    flex-shrink: 0;
 }
 
 .sidebar-howto{

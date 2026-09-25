@@ -721,7 +721,7 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
             ?>
             <div class="sidebar-title" role="button" tabindex="0" data-action="toggle-workspace-menu">
                 <span class="poznote-logo workspace-title-icon" role="img" aria-label="Poznote"></span>
-                <span class="workspace-title-text"><?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?></span>
+                <span class="workspace-title-text" title="<?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?>"><?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?></span>
                 <i class="lucide lucide-caret-down workspace-dropdown-icon"></i>
             </div>
             <div class="sidebar-title-actions">
