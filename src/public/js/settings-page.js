@@ -2002,115 +2002,6 @@
         });
     }
 
-    // ========== About links (Contact, GitHub discussions, Discord) ==========
-    // The three cards link to the Poznote project by default; administrators
-    // get a pencil on each card that opens #aboutLinkModal to point it
-    // elsewhere. The value is a global setting (contact_email, discussions_url,
-    // discord_url), an empty one restores the default, and the card is updated
-    // in place after a save so no reload is needed.
-    function initAboutLinkEditors() {
-        var modal = document.getElementById('aboutLinkModal');
-        var input = document.getElementById('aboutLinkInput');
-        var saveBtn = document.getElementById('aboutLinkSaveBtn');
-        var titleEl = document.getElementById('aboutLinkModalTitle');
-        var defaultEl = document.getElementById('aboutLinkModalDefault');
-        var errorEl = document.getElementById('aboutLinkError');
-        var editButtons = document.querySelectorAll('[data-about-link-edit]');
-        if (!modal || !input || !saveBtn || editButtons.length === 0) return;
-
-        var currentCard = null;
-
-        var showError = function (message) {
-            if (!errorEl) return;
-            errorEl.textContent = message || '';
-            errorEl.hidden = !message;
-        };
-
-        var isValid = function (kind, value) {
-            if (value === '') return true;
-            if (kind === 'email') {
-                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-            }
-            return /^https?:\/\/\S+$/i.test(value);
-        };
-
-        // Reflects a saved value on the card: href, stored value, shown value
-        var applyToCard = function (card, value) {
-            var kind = card.getAttribute('data-about-link-kind');
-            var effective = value !== '' ? value : (card.getAttribute('data-about-link-default') || '');
-            card.setAttribute('data-about-link-value', value);
-            card.setAttribute('href', kind === 'email' ? 'mailto:' + effective : effective);
-            var valueEl = card.querySelector('.about-link-value');
-            if (valueEl) valueEl.textContent = effective;
-        };
-
-        var openFor = function (card) {
-            currentCard = card;
-            if (titleEl) titleEl.textContent = card.getAttribute('data-about-link-title') || '';
-            if (defaultEl) defaultEl.textContent = card.getAttribute('data-about-link-default') || '';
-            input.value = card.getAttribute('data-about-link-value') || '';
-            input.placeholder = card.getAttribute('data-about-link-default') || '';
-            showError('');
-            modal.style.display = 'flex';
-            setTimeout(function () { input.focus(); }, 50);
-        };
-
-        editButtons.forEach(function (btn) {
-            var card = btn.closest('[data-about-link]');
-            if (!card) return;
-            // The card is a link, so the pencil must never reach it
-            var open = function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-                openFor(card);
-            };
-            btn.addEventListener('click', open);
-            btn.addEventListener('keydown', function (e) {
-                if (e.key === 'Enter' || e.key === ' ') open(e);
-            });
-        });
-
-        var save = function () {
-            if (!currentCard) return;
-            var key = currentCard.getAttribute('data-about-link');
-            var kind = currentCard.getAttribute('data-about-link-kind');
-            var value = input.value.trim();
-            if (!isValid(kind, value)) {
-                showError(input.getAttribute(kind === 'email' ? 'data-invalid-email' : 'data-invalid-url') || '');
-                input.focus();
-                return;
-            }
-            var card = currentCard;
-            saveBtn.disabled = true;
-            setSetting(key, value, function (success) {
-                saveBtn.disabled = false;
-                if (!success) {
-                    showError(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
-                    return;
-                }
-                applyToCard(card, value);
-                // The pinned clone of the card, if any, mirrors it
-                document.querySelectorAll('[data-pin-clone-of="' + card.id + '"]').forEach(function (clone) {
-                    clone.setAttribute('href', card.getAttribute('href'));
-                    var cloneValue = clone.querySelector('.about-link-value');
-                    var cardValue = card.querySelector('.about-link-value');
-                    if (cloneValue && cardValue) cloneValue.textContent = cardValue.textContent;
-                });
-                try { closeModal('aboutLinkModal'); } catch (e) {
-                    console.debug('settings-page: closeModal(aboutLinkModal) failed:', e);
-                }
-            });
-        };
-
-        saveBtn.addEventListener('click', save);
-        input.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                save();
-            }
-        });
-    }
-
     // Colored markdown: an element follows the theme (css/tokens.css,
     // .markdown-colored) until the user picks a colour for it; the stored JSON
     // holds "" for the ones that follow. These are the fixed colours the modal
@@ -2757,7 +2648,6 @@
             });
         }
 
-        initAboutLinkEditors();
         initMaintenanceModals();
         loadStorageSummary();
 

@@ -1299,15 +1299,6 @@
       "description": "Establece el nombre mostrado en la pantalla de inicio de sesión.",
       "placeholder": "Nombre de pantalla"
     },
-    "about_link": {
-      "title_contact_email": "Dirección de contacto",
-      "title_discussions_url": "Enlace de las discusiones de GitHub",
-      "title_discord_url": "Enlace de Discord",
-      "description": "Se muestra a todos los usuarios de esta instancia en la sección Acerca de. Deja el campo vacío para volver al valor predeterminado:",
-      "edit": "Cambiar",
-      "invalid_email": "Introduce una dirección de correo válida.",
-      "invalid_url": "Introduce una dirección válida que empiece por http:// o https://."
-    },
     "custom_css": {
       "title": "CSS personalizado",
       "description": "Sube archivos CSS para personalizar la apariencia de Poznote. Se guardan en tu volumen de datos y el que selecciones se aplica a todos los usuarios.",

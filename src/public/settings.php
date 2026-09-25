@@ -1520,35 +1520,22 @@ if ($canUseUserWebhooks) {
             </div>
 
             <!-- Contact, GitHub discussions and Discord: links every user sees,
-                 pointing to the Poznote project unless an administrator
-                 changed them (pencil on the card, global settings, empty
-                 value = default, see poznoteAboutLink()). -->
+                 pointing to the Poznote project unless the global setting
+                 says otherwise (see poznoteAboutLink()). -->
             <?php
-            $aboutLinkDefaults = poznoteAboutLinkDefaults();
             $aboutLinks = [];
-            $aboutLinkValues = [];
-            foreach ($aboutLinkDefaults as $aboutLinkKey => $aboutLinkDefault) {
+            foreach (array_keys(poznoteAboutLinkDefaults()) as $aboutLinkKey) {
                 $aboutLinks[$aboutLinkKey] = poznoteAboutLink($aboutLinkKey);
-                $aboutLinkValues[$aboutLinkKey] = $aboutLinks[$aboutLinkKey] === $aboutLinkDefault ? '' : $aboutLinks[$aboutLinkKey];
             }
             ?>
-            <a href="mailto:<?php echo htmlspecialchars($aboutLinks['contact_email'], ENT_QUOTES); ?>" class="home-card" id="contact-card"
-               data-about-link="contact_email" data-about-link-kind="email"
-               data-about-link-value="<?php echo htmlspecialchars($aboutLinkValues['contact_email'], ENT_QUOTES); ?>"
-               data-about-link-default="<?php echo htmlspecialchars($aboutLinkDefaults['contact_email'], ENT_QUOTES); ?>"
-               data-about-link-title="<?php echo t_h('modals.about_link.title_contact_email', [], 'Contact address'); ?>">
+            <a href="mailto:<?php echo htmlspecialchars($aboutLinks['contact_email'], ENT_QUOTES); ?>" class="home-card" id="contact-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.contact', [], 'Send an email to the contact address of this instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <?php if ($isAdmin): ?>
-                <span class="settings-card-edit" role="button" tabindex="0" data-about-link-edit="contact_email"
-                      title="<?php echo t_h('modals.about_link.edit', [], 'Change'); ?>"
-                      aria-label="<?php echo t_h('modals.about_link.edit', [], 'Change'); ?>"><i class="lucide lucide-pencil"></i></span>
-                <?php endif; ?>
                 <div class="home-card-icon">
                     <i class="lucide lucide-mail"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.contact', [], 'Contact'); ?></span>
-                    <span class="setting-status enabled about-link-value"><?php echo htmlspecialchars($aboutLinks['contact_email']); ?></span>
+                    <span class="setting-status enabled"><?php echo htmlspecialchars($aboutLinks['contact_email']); ?></span>
                 </div>
             </a>
 
@@ -1563,17 +1550,8 @@ if ($canUseUserWebhooks) {
                 </div>
             </a>
 
-            <a href="<?php echo htmlspecialchars($aboutLinks['discussions_url'], ENT_QUOTES); ?>" target="_blank" rel="noopener noreferrer" class="home-card" id="discussions-card"
-               data-about-link="discussions_url" data-about-link-kind="url"
-               data-about-link-value="<?php echo htmlspecialchars($aboutLinkValues['discussions_url'], ENT_QUOTES); ?>"
-               data-about-link-default="<?php echo htmlspecialchars($aboutLinkDefaults['discussions_url'], ENT_QUOTES); ?>"
-               data-about-link-title="<?php echo t_h('modals.about_link.title_discussions_url', [], 'GitHub discussions link'); ?>">
+            <a href="<?php echo htmlspecialchars($aboutLinks['discussions_url'], ENT_QUOTES); ?>" target="_blank" rel="noopener noreferrer" class="home-card" id="discussions-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.discussions', [], 'Ask a question or share an idea in the GitHub discussions.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <?php if ($isAdmin): ?>
-                <span class="settings-card-edit" role="button" tabindex="0" data-about-link-edit="discussions_url"
-                      title="<?php echo t_h('modals.about_link.edit', [], 'Change'); ?>"
-                      aria-label="<?php echo t_h('modals.about_link.edit', [], 'Change'); ?>"><i class="lucide lucide-pencil"></i></span>
-                <?php endif; ?>
                 <div class="home-card-icon">
                     <i class="lucide lucide-message-circle"></i>
                 </div>
@@ -1617,17 +1595,8 @@ if ($canUseUserWebhooks) {
                 </div>
             </a>
 
-            <a href="<?php echo htmlspecialchars($aboutLinks['discord_url'], ENT_QUOTES); ?>" target="_blank" rel="noopener noreferrer" class="home-card" id="discord-card"
-               data-about-link="discord_url" data-about-link-kind="url"
-               data-about-link-value="<?php echo htmlspecialchars($aboutLinkValues['discord_url'], ENT_QUOTES); ?>"
-               data-about-link-default="<?php echo htmlspecialchars($aboutLinkDefaults['discord_url'], ENT_QUOTES); ?>"
-               data-about-link-title="<?php echo t_h('modals.about_link.title_discord_url', [], 'Discord link'); ?>">
+            <a href="<?php echo htmlspecialchars($aboutLinks['discord_url'], ENT_QUOTES); ?>" target="_blank" rel="noopener noreferrer" class="home-card" id="discord-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.discord', [], 'Join the Poznote community on Discord.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <?php if ($isAdmin): ?>
-                <span class="settings-card-edit" role="button" tabindex="0" data-about-link-edit="discord_url"
-                      title="<?php echo t_h('modals.about_link.edit', [], 'Change'); ?>"
-                      aria-label="<?php echo t_h('modals.about_link.edit', [], 'Change'); ?>"><i class="lucide lucide-pencil"></i></span>
-                <?php endif; ?>
                 <div class="home-card-icon">
                     <i class="lucide pz-icon-discord"></i>
                 </div>
@@ -1655,24 +1624,6 @@ if ($canUseUserWebhooks) {
     </div>
 
     <?php if ($isAdmin): ?>
-    <!-- Edits one of the About section links (Contact, GitHub discussions,
-         Discord); title and current value come from the card, see
-         initAboutLinkEditors() in js/settings-page.js -->
-    <div id="aboutLinkModal" class="modal">
-        <div class="modal-content">
-            <h3 id="aboutLinkModalTitle"></h3>
-            <p><?php echo t_h('modals.about_link.description', [], 'Shown to every user of this instance in the About section. Leave the field empty to go back to the default:'); ?> <span id="aboutLinkModalDefault" class="about-link-default"></span></p>
-            <input type="text" id="aboutLinkInput" maxlength="255" autocomplete="off"
-                   data-invalid-email="<?php echo t_h('modals.about_link.invalid_email', [], 'Enter a valid email address.'); ?>"
-                   data-invalid-url="<?php echo t_h('modals.about_link.invalid_url', [], 'Enter a valid address starting with http:// or https://.'); ?>" />
-            <p id="aboutLinkError" class="about-link-error" hidden></p>
-            <div class="modal-buttons">
-                <button type="button" class="btn-cancel" data-action="close-modal" data-modal="aboutLinkModal"><?php echo t_h('common.cancel'); ?></button>
-                <button type="button" class="btn-primary" id="aboutLinkSaveBtn"><?php echo t_h('common.save'); ?></button>
-            </div>
-        </div>
-    </div>
-
     <div id="apiRestModal" class="modal">
         <div class="modal-content">
             <h3><?php echo t_h('modals.api_rest.title', [], 'API REST'); ?></h3>

@@ -1299,15 +1299,6 @@
       "description": "Legen Sie den Namen fest, der auf dem Login-Bildschirm angezeigt wird.",
       "placeholder": "Anzeigename"
     },
-    "about_link": {
-      "title_contact_email": "Kontaktadresse",
-      "title_discussions_url": "Link zu den GitHub-Diskussionen",
-      "title_discord_url": "Discord-Link",
-      "description": "Wird allen Benutzern dieser Instanz im Bereich Über angezeigt. Lassen Sie das Feld leer, um zum Standard zurückzukehren:",
-      "edit": "Ändern",
-      "invalid_email": "Geben Sie eine gültige E-Mail-Adresse ein.",
-      "invalid_url": "Geben Sie eine gültige Adresse ein, die mit http:// oder https:// beginnt."
-    },
     "custom_css": {
       "title": "Benutzerdefiniertes CSS",
       "description": "Laden Sie CSS-Dateien hoch, um das Aussehen von Poznote anzupassen. Sie werden in Ihrem Daten-Volume gespeichert, und die ausgewählte Datei gilt für alle Benutzer.",

@@ -804,15 +804,6 @@
       "description": "Set the name shown on the login screen.",
       "placeholder": "Display name"
     },
-    "about_link": {
-      "title_contact_email": "Contact address",
-      "title_discussions_url": "GitHub discussions link",
-      "title_discord_url": "Discord link",
-      "description": "Shown to every user of this instance in the About section. Leave the field empty to go back to the default:",
-      "edit": "Change",
-      "invalid_email": "Enter a valid email address.",
-      "invalid_url": "Enter a valid address starting with http:// or https://."
-    },
     "custom_css": {
       "title": "Custom CSS",
       "description": "Upload CSS files to customise Poznote's appearance. They are stored in your data volume, and the one you select is applied to all users.",

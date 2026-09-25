@@ -1297,15 +1297,6 @@
       "description": "设置在登录界面显示的名称。",
       "placeholder": "显示名称"
     },
-    "about_link": {
-      "title_contact_email": "联系地址",
-      "title_discussions_url": "GitHub 讨论链接",
-      "title_discord_url": "Discord 链接",
-      "description": "向此实例的所有用户显示在“关于”部分。留空即恢复默认值：",
-      "edit": "修改",
-      "invalid_email": "请输入有效的电子邮件地址。",
-      "invalid_url": "请输入以 http:// 或 https:// 开头的有效地址。"
-    },
     "custom_css": {
       "title": "自定义 CSS",
       "description": "上传 CSS 文件以自定义 Poznote 的外观。文件保存在你的数据卷中，所选的那个会应用于所有用户。",

@@ -359,9 +359,8 @@ function getPageTitle() {
 /**
  * The three contact cards of the About section (settings.php): a contact
  * email, the GitHub discussions and the Discord server. Each points to the
- * Poznote project by default; an administrator can point it elsewhere from
- * the card itself (PUT /api/v1/settings/{key}, a global setting), and an
- * empty value means "back to the default".
+ * Poznote project by default; a global setting (PUT /api/v1/settings/{key})
+ * can point it elsewhere, and an empty value means "back to the default".
  */
 function poznoteAboutLinkDefaults(): array {
     return [
