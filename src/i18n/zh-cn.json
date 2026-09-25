@@ -968,7 +968,6 @@
       "found_error": "此笔记有您上次访问时未保存的更改。它们暂时无法保存。",
       "restore": "保留我未保存的更改",
       "discard": "保留当前版本",
-      "restored": "您最近的更改已恢复并保存。",
       "restore_failed": "无法保存您的更改。请检查网络连接后重试。"
     },
     "unsaved_changes_title": "未保存的更改",

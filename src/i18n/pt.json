@@ -969,7 +969,6 @@
       "found_error": "Esta nota tem alterações não salvas da sua última visita. Elas ainda não puderam ser salvas.",
       "restore": "Manter minhas alterações não salvas",
       "discard": "Manter a versão atual",
-      "restored": "Suas últimas alterações foram recuperadas e salvas.",
       "restore_failed": "Suas alterações não puderam ser salvas. Verifique sua conexão e tente novamente."
     },
     "unsaved_changes_title": "Alterações não salvas",

@@ -969,7 +969,6 @@
       "found_error": "Diese Notiz enthält ungespeicherte Änderungen von Ihrem letzten Besuch. Sie konnten noch nicht gespeichert werden.",
       "restore": "Meine ungespeicherten Änderungen behalten",
       "discard": "Aktuelle Version behalten",
-      "restored": "Ihre letzten Änderungen wurden wiederhergestellt und gespeichert.",
       "restore_failed": "Ihre Änderungen konnten nicht gespeichert werden. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut."
     },
     "unsaved_changes_title": "Ungespeicherte Änderungen",

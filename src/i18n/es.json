@@ -969,7 +969,6 @@
       "found_error": "Esta nota tiene cambios sin guardar de tu última visita. Aún no se han podido guardar.",
       "restore": "Conservar mis cambios sin guardar",
       "discard": "Conservar la versión actual",
-      "restored": "Tus últimos cambios se han recuperado y guardado.",
       "restore_failed": "No se han podido guardar tus cambios. Comprueba tu conexión e inténtalo de nuevo."
     },
     "unsaved_changes_title": "Cambios sin guardar",

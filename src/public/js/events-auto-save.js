@@ -1230,13 +1230,12 @@ function finishDraftRecovery(noteId) {
 }
 
 // Show the recovered content the way the server renders it (markdown, task
-// lists...): reload the note in place, with a notice above it
+// lists...): reload the note in place, silently
 function reloadNoteAfterDraftRecovery(noteId, attempt) {
     if (getDisplayedNoteId() !== String(noteId)) {
         return;
     }
-    const notice = draftText('autosave.draft.restored', {}, 'Your latest changes were recovered and saved.');
-    if (typeof window.liveRefreshReloadNote === 'function' && window.liveRefreshReloadNote(noteId, notice)) {
+    if (typeof window.liveRefreshReloadNote === 'function' && window.liveRefreshReloadNote(noteId, false)) {
         return;
     }
     if (attempt < 10) {

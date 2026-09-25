@@ -4358,7 +4358,6 @@
       "found_error": "This note has unsaved changes from your last visit. They could not be saved yet.",
       "restore": "Keep my unsaved changes",
       "discard": "Keep the current version",
-      "restored": "Your latest changes were recovered and saved.",
       "restore_failed": "Your changes could not be saved. Check your connection and try again."
     },
     "beforeunload_warning": "⚠️ You have unsaved changes. Are you sure you want to leave?",
