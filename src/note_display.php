@@ -63,13 +63,11 @@
                         }
                     }
 
-                    // Decode the attachments JSON once for the whole rendering pass
+                    // Decode the attachments JSON once for the whole rendering pass,
+                    // without the ones only a snapshot still keeps on disk
                     $attachments_data = null;
                     if (!empty($row['attachments'])) {
-                        $decoded_attachments = json_decode($row['attachments'], true);
-                        if (is_array($decoded_attachments)) {
-                            $attachments_data = $decoded_attachments;
-                        }
+                        $attachments_data = poznoteFilterVisibleAttachments($row['attachments']);
                     }
                     // Shared indirectly through a shared (ancestor) folder? Only relevant
                     // when there is no direct share, which always takes precedence.
