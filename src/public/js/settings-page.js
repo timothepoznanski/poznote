@@ -103,6 +103,7 @@
             'notes_without_folders_after_folders',
             'sidebar_offline_marks',
             'markdown_split_card_view',
+            'markdown_split_preview_left',
             'markdown_default_view_mode',
             'markdown_colored',
             'markdown_colored_custom',
@@ -2744,6 +2745,7 @@
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
         setupToggleCard('sidebar-offline-marks-card', 'sidebar-offline-marks-status', 'sidebar_offline_marks', false, true);
         setupToggleCard('markdown-split-card-view-card', 'markdown-split-card-view-status', 'markdown_split_card_view', false, true);
+        setupToggleCard('markdown-split-preview-left-card', 'markdown-split-preview-left-status', 'markdown_split_preview_left', false, false);
         refreshMarkdownColoredBadge();
         setupToggleCard('code-wrap-card', 'code-wrap-status', 'code_block_word_wrap', false, true);
         setupToggleCard('code-line-numbers-card', 'code-line-numbers-status', 'code_block_line_numbers', false, false);

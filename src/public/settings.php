@@ -114,6 +114,7 @@ $settingsPageUserKeys = [
     'notes_without_folders_after_folders',
     'sidebar_offline_marks',
     'markdown_split_card_view',
+    'markdown_split_preview_left',
     'markdown_default_view_mode',
     'markdown_colored',
     'markdown_colored_custom',
@@ -1146,6 +1147,16 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.markdown_split_card_view', [], 'Framed markdown'); ?></span>
                     <span id="markdown-split-card-view-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Markdown Split: preview on the left (discussion 1502) -->
+            <div class="home-card" id="markdown-split-preview-left-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_split_preview_left', [], 'In split mode, show the preview on the left and the editor on the right.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-flip-horizontal"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_split_preview_left', [], 'Preview on the left'); ?></span>
+                    <span id="markdown-split-preview-left-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
 
