@@ -5168,8 +5168,6 @@
     "note": {
       "placeholder": "Sélectionnez une note pour l'ouvrir.",
       "back": "Retour à la liste",
-      "saved_locally": "Enregistrée sur cet appareil. Elle sera envoyée au serveur dès que vous serez de nouveau en ligne.",
-      "push_error": "Pas encore envoyée : {{error}}",
       "too_big": "Pas disponible hors ligne, plus de {{limit}} Mo : {{files}}",
       "file_size": "{{name}} ({{size}} Mo)"
     },

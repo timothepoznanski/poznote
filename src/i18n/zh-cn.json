@@ -5163,8 +5163,6 @@
     "note": {
       "placeholder": "选择一条笔记以打开。",
       "back": "返回列表",
-      "saved_locally": "已保存在此设备上。恢复联网后将发送到服务器。",
-      "push_error": "尚未发送：{{error}}",
       "too_big": "超过 {{limit}} MB，无法离线使用：{{files}}",
       "file_size": "{{name}}（{{size}} MB）"
     },

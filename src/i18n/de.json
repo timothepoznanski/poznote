@@ -5063,8 +5063,6 @@
     "note": {
       "placeholder": "Wählen Sie eine Notiz aus, um sie zu öffnen.",
       "back": "Zurück zur Liste",
-      "saved_locally": "Auf diesem Gerät gespeichert. Die Notiz wird an den Server gesendet, sobald Sie wieder online sind.",
-      "push_error": "Noch nicht gesendet: {{error}}",
       "too_big": "Offline nicht verfügbar, größer als {{limit}} MB: {{files}}",
       "file_size": "{{name}} ({{size}} MB)"
     },

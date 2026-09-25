@@ -39,7 +39,6 @@
     var SAVE_DELAY_MS = 400;
     var PUSH_DELAY_MS = 3000;
     var PROBE_INTERVAL_MS = 20000;
-    var SAVED_NOTICE_MS = 3000;
     var NOTE_ICONS = { note: 'lucide-file-text', markdown: 'lucide-file-code', tasklist: 'lucide-list-todo' };
 
     var state = {
@@ -899,34 +898,6 @@
         return row;
     }
 
-    // "Saved on this device" answers a save (justSaved): a few seconds, the
-    // dot in the list keeps saying the change waits. A change the server
-    // refused stays said until it goes.
-    var savedNoticeTimer = null;
-    function renderSubline(id, justSaved) {
-        var subline = byId('offline-subline-' + id);
-        if (!subline) {
-            return;
-        }
-        clearTimeout(savedNoticeTimer);
-        subline.textContent = '';
-        var entry = state.outbox[id];
-        if (!entry || (!entry.lastError && !justSaved)) {
-            return;
-        }
-        var status = el('span', 'offline-note-pending');
-        status.appendChild(icon('lucide-cloud-off'));
-        status.appendChild(el('span', '', entry.lastError
-            ? ot('note.push_error', { error: entry.lastError }, 'Not sent yet: {{error}}')
-            : ot('note.saved_locally', null, 'Saved on this device. It will be sent to the server when you are back online.')));
-        subline.appendChild(status);
-        if (!entry.lastError) {
-            savedNoticeTimer = setTimeout(function () {
-                status.remove();
-            }, SAVED_NOTICE_MS);
-        }
-    }
-
     function hidePanes() {
         byId('offline-placeholder').hidden = true;
         byId('offline-unavailable').hidden = true;
@@ -1004,10 +975,6 @@
         heading.appendChild(title);
         inner.appendChild(heading);
 
-        var subline = el('div', 'note-subline');
-        subline.id = 'offline-subline-' + id;
-        inner.appendChild(subline);
-
         var entry = el('div', 'noteentry');
         entry.id = 'entry' + id;
         entry.setAttribute('data-note-id', String(id));
@@ -1035,7 +1002,6 @@
         inner.appendChild(el('div', 'note-bottom-space'));
 
         byId('offline-note-host').appendChild(card);
-        renderSubline(id);
 
         window.noteid = id;
         window.selectedWorkspace = item.workspace || window.selectedWorkspace || '';
@@ -1419,7 +1385,6 @@
             if (state.currentId === id && state.dirtyId === null) {
                 setSaveButtonState(false);
             }
-            renderSubline(id, true);
             renderList();
             updateStatus();
             schedulePush();
@@ -1681,8 +1646,6 @@
             } catch (e) { /* ignore */ }
         } else if (rerender) {
             renderNote(current);
-        } else if (current !== null) {
-            renderSubline(current);
         }
         renderList();
 
@@ -1820,12 +1783,21 @@
         byId('offline-logout-btn').addEventListener('click', confirmSignOut);
         byId('offline-unavailable-back').addEventListener('click', backToList);
 
-        byId('unified-search').addEventListener('input', function (event) {
-            state.search = event.target.value || '';
+        var searchInput = byId('unified-search');
+        var searchClear = byId('offline-search-clear');
+        function applySearch() {
+            state.search = searchInput.value || '';
+            searchClear.hidden = state.search === '';
             renderList();
             if (tabs()) {
                 tabs().render();
             }
+        }
+        searchInput.addEventListener('input', applySearch);
+        searchClear.addEventListener('click', function () {
+            searchInput.value = '';
+            applySearch();
+            searchInput.focus();
         });
 
         byId('offline-new-btn').addEventListener('click', function (event) {
