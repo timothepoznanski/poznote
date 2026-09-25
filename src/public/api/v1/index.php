@@ -632,6 +632,11 @@ $router->post('/folders/{id}/duplicate', function($params) use ($foldersControll
     $foldersController->duplicate($params['id']);
 });
 
+// Archive a folder, subfolders and notes included, into the Archives workspace
+$router->post('/folders/{id}/archive', function($params) use ($foldersController) {
+    $foldersController->archiveFolder($params['id']);
+});
+
 // Empty folder (move notes to trash)
 $router->post('/folders/{id}/empty', function($params) use ($foldersController) {
     $foldersController->empty($params['id']);

@@ -3194,6 +3194,35 @@ paths:
         '409':
           description: Conflict (e.g., folder with same name exists or move would create a cycle)
 
+  /folders/{id}/archive:
+    post:
+      tags: [Folders]
+      summary: Archive a folder, subfolders and notes into the Archives workspace
+      description: >
+        Moves the folder with everything under it to the "Archives" workspace,
+        creating it on first use and mirroring the folder's parent path inside
+        it. The parent folders are left in the source workspace, and the notes'
+        `updated` dates are preserved. When "Archives" already holds a folder
+        with the same name at that place, the folder is merged into it level
+        by level and the emptied source folders are removed. The folder and its
+        subfolders lose their public links; notes shared on their own keep theirs.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Folder archived (or already in the Archives workspace)
+        '403':
+          description: The folder belongs to a workspace shared with this account
+        '404':
+          description: Folder not found
+        '409':
+          description: Some notes have the same title as a note already archived in the folder they would join (listed in `conflicts`); nothing was moved
+
   /folders/{id}/empty:
     post:
       tags: [Folders]

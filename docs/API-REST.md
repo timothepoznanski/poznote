@@ -2159,6 +2159,39 @@ curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/folders/12/offline
 ```
 
+### Archive Folder
+
+```
+POST /folders/{id}/archive
+```
+
+Move a folder, with its subfolders and notes, to the `Archives` workspace. The workspace is created on first use, and the folder's parent path is mirrored inside it so the folder keeps its place in the tree. The parent folders are left in the source workspace and the notes' `updated` dates are preserved. Archiving ends public sharing: the folder and its subfolders lose their public links, while notes shared on their own keep theirs.
+
+When `Archives` already holds a folder with the same name at that place (for example after notes were archived one by one), the folder is merged into it level by level: its notes join the existing folder and the emptied source folders are removed. Returns `409` with a `conflicts` list of titles, and nothing moved, when a note would join an archived folder that already has a note with the same title.
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/folders/12/archive
+```
+
+**Response (200):**
+
+```json
+{
+  "success": true,
+  "message": "Folder archived successfully",
+  "workspace": "Archives",
+  "workspace_created": false,
+  "old_workspace": "Personal",
+  "old_folder_id": 12,
+  "folder_id": 12,
+  "folder_path": "Projects/2025",
+  "merged": false,
+  "created_folders": [{"id": 57, "name": "Projects"}],
+  "note_ids": [101, 102, 103]
+}
+```
+
 ### Empty Folder
 
 ```
@@ -3757,6 +3790,7 @@ curl http://YOUR_SERVER/api_health.php
 | `DELETE` | `/folders/{id}` | Delete folder |
 | `POST` | `/folders/{id}/move` | Move folder |
 | `POST` | `/folders/{id}/duplicate` | Duplicate folder with notes and subfolders |
+| `POST` | `/folders/{id}/archive` | Archive folder, subfolders and notes into the Archives workspace |
 | `POST` | `/folders/{id}/empty` | Empty folder |
 | `PUT` | `/folders/{id}/icon` | Update icon |
 | `PUT` | `/folders/{id}/color` | Update card color |

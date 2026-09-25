@@ -369,9 +369,11 @@ function generateFolderActions($folderId, $folderName, $con, $workspace_filter, 
  * in js/utils-menus.js, so an empty group (no notes in the folder, or items
  * unchecked in UI customization) never leaves a stray rule behind.
  *
+ * @param string $currentWorkspace Workspace being displayed, used to drop the
+ *                                 archive entry inside the archive workspace
  * @return string HTML for the shared dropdown menu
  */
-function renderFolderActionsMenu() {
+function renderFolderActionsMenu($currentWorkspace = '') {
     $menu = "<div class='folder-actions-menu' id='folder-actions-menu'>";
 
     // Create note action
@@ -500,6 +502,17 @@ function renderFolderActionsMenu() {
     $menu .= "</div>";
 
     $menu .= "<div class='folder-actions-menu-separator'></div>";
+
+    // Archive folder: moves it, subfolders and notes included, to the archive
+    // workspace under the same parent path. Dropped in the places the note
+    // menu drops "Archive note" (see renderNoteActionsMenu()).
+    if (trim((string)$currentWorkspace) !== POZNOTE_ARCHIVE_WORKSPACE
+        && (!function_exists('isSharedWorkspaceScopeActive') || !isSharedWorkspaceScopeActive())) {
+        $menu .= "<div class='folder-actions-menu-item' data-action='archive-folder'>";
+        $menu .= "<i class='lucide lucide-archive'></i>";
+        $menu .= "<span>" . t_h('archive.folder_menu_item', [], 'Archive folder') . "</span>";
+        $menu .= "</div>";
+    }
 
     // Delete folder action
     $menu .= "<div class='folder-actions-menu-item danger' data-action='delete-folder'>";

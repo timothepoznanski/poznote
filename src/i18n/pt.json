@@ -4853,13 +4853,19 @@
   },
   "archive": {
     "menu_item": "Arquivar a nota",
+    "folder_menu_item": "Arquivar a pasta",
     "confirm_title": "Arquivar a nota",
     "confirm_message": "\"{{title}}\" será movida para a área de trabalho \"{{workspace}}\", mantendo o seu caminho de pastas. A área de trabalho é criada se ainda não existir.",
     "confirm_button": "Arquivar",
     "already_archived": "Esta nota já está na área de trabalho \"{{workspace}}\".",
+    "folder_confirm_title": "Arquivar a pasta",
+    "folder_confirm_message": "A pasta \"{{folder}}\", as suas subpastas e notas serão movidas para a área de trabalho \"{{workspace}}\", mantendo o seu caminho de pastas. A área de trabalho é criada se ainda não existir.",
+    "folder_already_archived": "Esta pasta já está na área de trabalho \"{{workspace}}\".",
     "errors": {
       "duplicate_title": "Já existe uma nota arquivada com o mesmo título nesta pasta.",
-      "archive_prefix": "Erro ao arquivar a nota: {{error}}"
+      "archive_prefix": "Erro ao arquivar a nota: {{error}}",
+      "folder_duplicate_titles": "Nada foi arquivado: estas notas têm o mesmo título que uma nota já arquivada na mesma pasta: {{titles}}",
+      "folder_archive_prefix": "Erro ao arquivar a pasta: {{error}}"
     }
   },
   "welcome_page": {

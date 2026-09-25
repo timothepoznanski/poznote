@@ -252,6 +252,11 @@
                     window.editFolderName(folderData.id, folderData.name);
                 }
             },
+            'archive-folder': function () {
+                if (typeof window.archiveFolder === 'function') {
+                    window.archiveFolder(folderData.id, folderData.name);
+                }
+            },
             'delete-folder': function () {
                 if (typeof window.deleteFolder === 'function') {
                     window.deleteFolder(folderData.id, folderData.name);
@@ -421,7 +426,7 @@
         // Folder menu actions
         var folderMenuActions = [
             'create-note-in-folder', 'move-folder-files', 'move-entire-folder',
-            'duplicate-folder', 'download-folder', 'tag-folder-notes', 'rename-folder', 'delete-folder',
+            'duplicate-folder', 'download-folder', 'tag-folder-notes', 'rename-folder', 'archive-folder', 'delete-folder',
             'change-folder-icon', 'share-folder', 'favorite-folder', 'offline-folder',
             'show-only-folder'
         ];

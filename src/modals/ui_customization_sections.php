@@ -312,6 +312,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:download-folder" checked><span><?php echo t_h('notes_list.folder_actions.download_folder', [], 'Download folder'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:share-folder" checked><span><?php echo t_h('notes_list.folder_actions.share_folder', [], 'Make public'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:rename-folder" checked><span><?php echo t_h('notes_list.folder_actions.rename_folder', [], 'Rename'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:archive-folder" checked><span><?php echo t_h('archive.folder_menu_item', [], 'Archive folder'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:delete-folder" checked><span><?php echo t_h('notes_list.folder_actions.delete_folder', [], 'Delete'); ?></span></label>
 </div>
 </div>

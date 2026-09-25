@@ -4852,13 +4852,19 @@
   },
   "archive": {
     "menu_item": "Notiz archivieren",
+    "folder_menu_item": "Ordner archivieren",
     "confirm_title": "Notiz archivieren",
     "confirm_message": "„{{title}}“ wird in den Arbeitsbereich „{{workspace}}“ verschoben und behält dabei seinen Ordnerpfad. Der Arbeitsbereich wird angelegt, falls er noch nicht existiert.",
     "confirm_button": "Archivieren",
     "already_archived": "Diese Notiz liegt bereits im Arbeitsbereich „{{workspace}}“.",
+    "folder_confirm_title": "Ordner archivieren",
+    "folder_confirm_message": "Der Ordner „{{folder}}“ wird mit seinen Unterordnern und Notizen in den Arbeitsbereich „{{workspace}}“ verschoben und behält dabei seinen Ordnerpfad. Der Arbeitsbereich wird angelegt, falls er noch nicht existiert.",
+    "folder_already_archived": "Dieser Ordner liegt bereits im Arbeitsbereich „{{workspace}}“.",
     "errors": {
       "duplicate_title": "In diesem Ordner ist bereits eine Notiz mit demselben Titel archiviert.",
-      "archive_prefix": "Fehler beim Archivieren der Notiz: {{error}}"
+      "archive_prefix": "Fehler beim Archivieren der Notiz: {{error}}",
+      "folder_duplicate_titles": "Nichts wurde archiviert: Diese Notizen haben denselben Titel wie eine bereits im selben Ordner archivierte Notiz: {{titles}}",
+      "folder_archive_prefix": "Fehler beim Archivieren des Ordners: {{error}}"
     }
   },
   "welcome_page": {

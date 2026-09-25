@@ -142,6 +142,7 @@ function routeTable(): array
         'PATCH /folders/{id}' => [OWNED, 'body' => ['name' => 'renamed by the wrong account']],
         'DELETE /folders/{id}' => [OWNED],
         'POST /folders/{id}/duplicate' => [OWNED, 'body' => []],
+        'POST /folders/{id}/archive' => [OWNED, 'body' => []],
         'POST /folders/{id}/empty' => [OWNED, 'body' => []],
         'POST /folders/{id}/move' => [OWNED, 'body' => ['parent_id' => null]],
         'POST /folders/{id}/tags' => [OWNED, 'body' => ['tags' => ['hijacked']]],

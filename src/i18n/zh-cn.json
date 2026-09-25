@@ -4952,13 +4952,19 @@
   },
   "archive": {
     "menu_item": "归档笔记",
+    "folder_menu_item": "归档文件夹",
     "confirm_title": "归档笔记",
     "confirm_message": "“{{title}}”将移动到工作区“{{workspace}}”，并保留其文件夹层级。若该工作区尚不存在，将自动创建。",
     "confirm_button": "归档",
     "already_archived": "该笔记已位于工作区“{{workspace}}”。",
+    "folder_confirm_title": "归档文件夹",
+    "folder_confirm_message": "文件夹“{{folder}}”及其子文件夹和笔记将移动到工作区“{{workspace}}”，并保留其文件夹层级。若该工作区尚不存在，将自动创建。",
+    "folder_already_archived": "该文件夹已位于工作区“{{workspace}}”。",
     "errors": {
       "duplicate_title": "该文件夹中已归档同名笔记。",
-      "archive_prefix": "归档笔记时出错：{{error}}"
+      "archive_prefix": "归档笔记时出错：{{error}}",
+      "folder_duplicate_titles": "未归档任何内容：以下笔记与同一文件夹中已归档的笔记同名：{{titles}}",
+      "folder_archive_prefix": "归档文件夹时出错：{{error}}"
     }
   },
   "welcome_page": {

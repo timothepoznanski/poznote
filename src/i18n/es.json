@@ -4853,13 +4853,19 @@
   },
   "archive": {
     "menu_item": "Archivar la nota",
+    "folder_menu_item": "Archivar la carpeta",
     "confirm_title": "Archivar la nota",
     "confirm_message": "«{{title}}» se moverá al espacio de trabajo «{{workspace}}», conservando su ruta de carpetas. El espacio de trabajo se crea si aún no existe.",
     "confirm_button": "Archivar",
     "already_archived": "Esta nota ya está en el espacio de trabajo «{{workspace}}».",
+    "folder_confirm_title": "Archivar la carpeta",
+    "folder_confirm_message": "La carpeta «{{folder}}», sus subcarpetas y sus notas se moverán al espacio de trabajo «{{workspace}}», conservando su ruta de carpetas. El espacio de trabajo se crea si aún no existe.",
+    "folder_already_archived": "Esta carpeta ya está en el espacio de trabajo «{{workspace}}».",
     "errors": {
       "duplicate_title": "Ya hay archivada una nota con el mismo título en esta carpeta.",
-      "archive_prefix": "Error al archivar la nota: {{error}}"
+      "archive_prefix": "Error al archivar la nota: {{error}}",
+      "folder_duplicate_titles": "No se archivó nada: estas notas tienen el mismo título que una nota ya archivada en la misma carpeta: {{titles}}",
+      "folder_archive_prefix": "Error al archivar la carpeta: {{error}}"
     }
   },
   "welcome_page": {

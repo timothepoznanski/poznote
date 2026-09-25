@@ -55,6 +55,14 @@ try {
 }
 
 /**
+ * Whether the "Archive folder" action applies to folders of $workspace
+ */
+function canArchiveFoldersFrom($workspace) {
+	return trim((string)$workspace) !== POZNOTE_ARCHIVE_WORKSPACE
+		&& (!function_exists('isSharedWorkspaceScopeActive') || !isSharedWorkspaceScopeActive());
+}
+
+/**
  * The folder actions, in the order they appear.
  *
  * On desktop the 'inline' ones are icon buttons of each row and the others
@@ -161,6 +169,14 @@ function folderListActions() {
 			'icon' => 'lucide-palette',
 			'label' => t_h('notes_list.folder_actions.change_icon', [], 'Change icon'),
 		],
+		// Archive folder, dropped where index.php's folder menu drops it
+		// (renderFolderActionsMenu): inside the archive workspace, and in a
+		// session confined to a workspace shared with it
+		...(canArchiveFoldersFrom($GLOBALS['workspace'] ?? '') ? [[
+			'action' => 'archive-folder',
+			'icon' => 'lucide-archive',
+			'label' => t_h('archive.folder_menu_item', [], 'Archive folder'),
+		]] : []),
 		[
 			'action' => 'delete-folder',
 			'icon' => 'lucide-trash-2',
@@ -558,7 +574,7 @@ $currentLang = getUserLanguage();
 	<script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
-<body class="shared-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>">
+<body class="shared-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>" data-archive-workspace="<?php echo htmlspecialchars(POZNOTE_ARCHIVE_WORKSPACE, ENT_QUOTES, 'UTF-8'); ?>">
 	<?php $iconSidebarWorkspace = $workspace; include __DIR__ . '/../icon_sidebar.php'; ?>
 	<div class="shared-container">
 		<h1 class="poznote-page-title"><i class="lucide lucide-folder-open"></i> <?php echo t_h('home.folders', [], 'Folders'); ?> <?php echo poznoteRenderPageTitleWorkspace($workspace); ?></h1>
@@ -702,6 +718,12 @@ $currentLang = getUserLanguage();
 						<i class="lucide lucide-palette"></i>
 						<span><?php echo t_h('notes_list.folder_actions.change_icon', [], 'Change icon'); ?></span>
 					</div>
+					<?php if (canArchiveFoldersFrom($workspace)): ?>
+					<div class="folder-actions-menu-item" data-action="archive-folder">
+						<i class="lucide lucide-archive"></i>
+						<span><?php echo t_h('archive.folder_menu_item', [], 'Archive folder'); ?></span>
+					</div>
+					<?php endif; ?>
 					<div class="folder-actions-menu-item danger folder-actions-danger" data-action="delete-folder">
 						<i class="lucide lucide-trash-2"></i>
 						<span><?php echo t_h('notes_list.folder_actions.delete_folder', [], 'Delete'); ?></span>

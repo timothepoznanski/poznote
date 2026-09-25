@@ -4576,13 +4576,19 @@
   },
   "archive": {
     "menu_item": "Archive note",
+    "folder_menu_item": "Archive folder",
     "confirm_title": "Archive note",
     "confirm_message": "\"{{title}}\" will be moved to the \"{{workspace}}\" workspace, keeping its folder path. The workspace is created if it does not exist yet.",
     "confirm_button": "Archive",
     "already_archived": "This note is already in the \"{{workspace}}\" workspace.",
+    "folder_confirm_title": "Archive folder",
+    "folder_confirm_message": "The folder \"{{folder}}\", its subfolders and notes will be moved to the \"{{workspace}}\" workspace, keeping its folder path. The workspace is created if it does not exist yet.",
+    "folder_already_archived": "This folder is already in the \"{{workspace}}\" workspace.",
     "errors": {
       "duplicate_title": "A note with the same title is already archived in this folder.",
-      "archive_prefix": "Error archiving the note: {{error}}"
+      "archive_prefix": "Error archiving the note: {{error}}",
+      "folder_duplicate_titles": "Nothing was archived: these notes have the same title as a note already archived in the same folder: {{titles}}",
+      "folder_archive_prefix": "Error archiving the folder: {{error}}"
     }
   },
   "welcome_page": {

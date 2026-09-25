@@ -267,6 +267,9 @@
         'change-folder-icon': function(folder) {
             callFn('showChangeFolderIconModal', folder.id, folder.name);
         },
+        'archive-folder': function(folder) {
+            callFn('archiveFolder', folder.id, folder.name);
+        },
         'delete-folder': function(folder) {
             callFn('deleteFolder', folder.id, folder.name);
         }
