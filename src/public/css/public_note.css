@@ -930,16 +930,14 @@ html[data-theme='dark'] .public-note .content [style*="color:black"] {
     border-color: #999;
 }
 
+/* No frame around the rich-text editor: it keeps the read view's layout
+   (it also carries .content), so entering edit mode does not shift text. */
 .public-note-editor-html {
     min-height: 40vh;
-    padding: 12px;
-    border: 1px dashed var(--pz-border-strong);
-    border-radius: var(--pz-radius);
 }
 
 .public-note-editor-html:focus {
     outline: none;
-    border-color: #999;
 }
 
 .public-edit-save-btn {
@@ -958,10 +956,6 @@ html[data-theme='dark'] .public-note .content [style*="color:black"] {
 html[data-theme='dark'] .public-note-editor-markdown {
     background: var(--pz-surface, var(--pz-bg));
     color: var(--pz-text, var(--pz-text-strong));
-    border-color: var(--pz-border, var(--pz-border-strong));
-}
-
-html[data-theme='dark'] .public-note-editor-html {
     border-color: var(--pz-border, var(--pz-border-strong));
 }
 
