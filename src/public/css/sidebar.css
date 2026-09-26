@@ -167,12 +167,13 @@
     width: 100%;
 }
 
-/* Sort mode and "Expand all folders" (notes_list.php): small buttons at the
-   right end of a thin rule between Favorites and the rest of the tree. */
+/* Offline dots, sort mode and "Expand all folders" (notes_list.php): small
+   buttons at the right end of a thin rule between Favorites and the rest of
+   the tree. */
 .notes-list-actions {
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 8px;
     margin: 2px 0;
 }
 
@@ -180,14 +181,32 @@
     content: "";
     flex: 1 1 auto;
     height: 1px;
-    margin-right: 6px;
+    /* Up to the first button, as the pieces between the buttons below */
+    margin-right: -8px;
     background: var(--pz-border);
 }
 
 .notes-list-actions .sidebar-folder-toggle {
+    position: relative;
     min-width: 24px;
     min-height: 24px;
     padding: 2px;
+}
+
+/* Between two neighbouring buttons, the rule carries on across the gap,
+   outside the button so its hover background never covers it. A button hidden
+   by UI Customization still counts as a sibling: the piece it leaves before
+   the next button lies on the rule above, which reaches that button too. */
+.notes-list-actions .sidebar-folder-toggle ~ .sidebar-folder-toggle::before {
+    content: "";
+    position: absolute;
+    left: -8px;
+    /* Where flex puts the 1px rule: (row height - 1px) / 2, not 50% */
+    top: calc(50% - 0.5px);
+    width: 8px;
+    height: 1px;
+    background: var(--pz-border);
+    pointer-events: none;
 }
 
 .notes-list-actions .sidebar-folder-toggle i,
@@ -196,16 +215,12 @@
 }
 
 /* Offline dots toggle (index.php, js/offline-marks.js): two flat states,
-   accent while the dots show, the grey of its neighbours while hidden, and no
-   hover look, so the pointer resting on it after a click never disguises the
-   new state (as the search scope icons, css/searchbars.css). The icon's :hover
-   is restated because icons.css paints and scales every lucide icon on hover. */
-.notes-list-actions .offline-dots-toggle,
-.notes-list-actions .offline-dots-toggle:hover,
-.notes-list-actions .offline-dots-toggle:active {
-    background: transparent;
-}
-
+   accent while the dots show, the grey of its neighbours while hidden. On
+   hover it takes the same tinted background as its neighbours, but the icon
+   keeps its colour and size, so the pointer resting on it after a click never
+   disguises the new state (as the search scope icons, css/searchbars.css).
+   The icon's :hover is restated because icons.css paints and scales every
+   lucide icon on hover. */
 .notes-list-actions .offline-dots-toggle.is-on,
 .notes-list-actions .offline-dots-toggle.is-on:hover,
 .notes-list-actions .offline-dots-toggle.is-on:active {

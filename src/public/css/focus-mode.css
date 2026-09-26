@@ -4,9 +4,9 @@
  * html.focus-mode, set before the first paint (icon_sidebar.php) and owned
  * by js/icon-sidebar-toggle.js, is on or off. On:
  *
- *   - the rows around the title (tags, date, attachments, backlinks) go, so
- *     only the toolbar and the title sit over the content. In the split view
- *     the two panes are sized from what is left under those rows
+ *   - the title and the rows around it (tags, date, attachments, backlinks)
+ *     go, so only the toolbar sits over the content. In the split view the
+ *     two panes are sized from what is left under those rows
  *     (js/markdown-editor.js), and on a laptop that was not much;
  *   - the notes column goes into a flyout, opened from a hot zone on the left
  *     edge of the viewport (html.focus-mode-peek). css/icon-sidebar.css does
@@ -54,24 +54,20 @@
         display: none;
     }
 
-    /* Rows around the title: folder and tags, creation date, and the
-       attachments and backlinks rows when they sit up there rather than under
-       the note (attachments_at_bottom, backlinks_at_bottom). The title stays,
-       it says which note this is and it is where the note is renamed. So does
-       the toolbar, it is how the note is saved, shared and left. */
+    /* The title and the rows around it: folder and tags, creation date, and
+       the attachments and backlinks rows when they sit up there rather than
+       under the note (attachments_at_bottom, backlinks_at_bottom). The tab
+       already names the note, and the tab bar is always there on desktop
+       (js/tabs.js); renaming is left to the tree, in the flyout. A new note
+       keeps its default name unless it is renamed there: its title field is
+       hidden, so focusCreatedNoteTitle() (js/utils-note-create.js) finds
+       nothing to focus. The toolbar stays, it is how the note is saved,
+       shared and left. */
+    html.focus-mode #right_col .innernote > .note-title-heading,
     html.focus-mode #right_col .innernote > .note-tags-row,
     html.focus-mode #right_col .innernote > .note-subline,
     html.focus-mode #right_col .innernote > .note-attachments-row:has(~ .noteentry),
     html.focus-mode #right_col .innernote > .backlinks-row:has(~ .noteentry) {
         display: none !important;
-    }
-
-    /* The title is then the first row under the toolbar. Its 15px top margin
-       (css/notes/editor.css) parts it from the tags row, and with that row
-       gone it only widened the gap under the toolbar. The note icon gives up
-       the same 15px so the two stay aligned on the row. */
-    html.focus-mode #right_col .innernote > .note-title-heading .css-title,
-    html.focus-mode #right_col .innernote > .note-title-heading .note-title-icon {
-        margin-top: 0;
     }
 }

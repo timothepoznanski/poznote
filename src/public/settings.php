@@ -928,7 +928,7 @@ if ($canUseUserWebhooks) {
             <!-- Offline notes marked in the tree (js/offline-marks.js) -->
             <div class="home-card" id="sidebar-offline-marks-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.sidebar_offline_marks', [], 'Show a small dot next to the notes available offline in this browser.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-wifi-off"></i></div>
+                <div class="home-card-icon"><i class="lucide lucide-circle-dot"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.sidebar_offline_marks', [], 'Show offline dot'); ?></span>
                     <span id="sidebar-offline-marks-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>

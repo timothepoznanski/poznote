@@ -738,7 +738,7 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
         ? '<button type="button" class="sidebar-folder-toggle offline-dots-toggle' . ($offlineDotsShown ? ' is-on' : '') . '" id="sidebarOfflineDotsBtn" data-action="toggle-offline-dots" aria-pressed="' . ($offlineDotsShown ? 'true' : 'false') . '"'
             . ' data-title-show="' . t_h('sidebar.show_offline_dots', [], 'Show offline dots') . '" data-title-hide="' . t_h('sidebar.hide_offline_dots', [], 'Hide offline dots') . '"'
             . ' title="' . $offlineDotsTitle . '" aria-label="' . $offlineDotsTitle . '">'
-            . '<i class="lucide lucide-wifi-off"></i>'
+            . '<i class="lucide lucide-circle-dot"></i>'
             . '</button>'
         : '';
     ?>
