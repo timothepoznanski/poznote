@@ -249,6 +249,8 @@ docker compose up -d
 
 Don't want to manage a server? A hosting company can run Poznote for you and keep it online. See the available hosts and how to choose between them [here](https://poznote.com/hosting.html).
 
+[![Deploy on RepoCloud](https://d16t0pc4846x52.cloudfront.net/deploylobe.svg)](https://repocloud.io/details/Poznote/)
+
 </details>
 
 <a id="proxmox"></a>
