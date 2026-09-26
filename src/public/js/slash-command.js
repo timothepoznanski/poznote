@@ -173,7 +173,6 @@
     let savedNoteEntry = null;
     let savedEditableElement = null;
     let activeCommands = null;
-    let activeCommandsBuilder = null;  // rebuilds activeCommands, for a menu already open when the template list arrives
     let codeMirrorSlashEditor = null;
     let codeMirrorSlashFrom = -1;
     let slashInsertedByButton = false; // the '/' came from a right-click or the Insert button, not the keyboard
@@ -2211,13 +2210,8 @@
     //
     // A template is an ordinary note kept in a folder named "Templates" or in
     // a workspace named "Templates" (GET /api/v1/notes/templates decides). The
-    // menu is built synchronously when "/" is typed, so the list lives in a
-    // cache refreshed in the background: once at startup, then every time the
-    // menu opens. That refresh serves the next opening, and re-renders the
-    // current one if the list changed meanwhile.
-
-    let templateCache = { workspace: null, items: [] };
-    let templateFetchPromise = null;
+    // command opens a picker (js/template-picker.js) rather than a submenu, so
+    // the list is fetched when it opens and can be filtered.
 
     function getTemplateWorkspace() {
         try {
@@ -2233,75 +2227,71 @@
         return '';
     }
 
-    function refreshTemplateCache() {
-        if (templateFetchPromise) return templateFetchPromise;
-        // No template offline, and nothing to ask the server
-        if (isOfflinePage()) return Promise.resolve([]);
-
-        const workspace = getTemplateWorkspace();
-        const url = '/api/v1/notes/templates' + (workspace ? '?workspace=' + encodeURIComponent(workspace) : '');
-
-        templateFetchPromise = fetch(url, { credentials: 'same-origin' })
-            .then(response => (response.ok ? response.json() : null))
-            .then(data => {
-                const items = (data && data.success && Array.isArray(data.notes)) ? data.notes : [];
-                const changed = workspace !== templateCache.workspace
-                    || JSON.stringify(items) !== JSON.stringify(templateCache.items);
-                templateCache = { workspace, items };
-                if (changed) rebuildOpenMenuCommands();
-            })
-            .catch(e => {
-                console.debug('slash-command: refreshTemplateCache() failed:', e);
-            })
-            .then(() => {
-                templateFetchPromise = null;
-            });
-
-        return templateFetchPromise;
-    }
-
-    // Re-render the main menu with fresh commands. Left alone while a submenu
-    // is open: replacing the list under the user's pointer would close it.
-    function rebuildOpenMenuCommands() {
-        if (!slashMenuElement || submenuElement || typeof activeCommandsBuilder !== 'function') return;
-        activeCommands = activeCommandsBuilder();
-        updateMenuContent();
-    }
-
     function getTemplateSlashCommand() {
         const t = window.t || ((key, params, fallback) => fallback);
-        const currentNoteId = savedNoteEntry && savedNoteEntry.getAttribute
-            ? String(savedNoteEntry.getAttribute('data-note-id') || '')
-            : '';
-
-        // A template cannot be pasted into itself
-        const items = templateCache.items
-            .filter(note => String(note.id) !== currentNoteId)
-            .map(note => ({
-                id: 'template-' + note.id,
-                icon: note.icon || 'lucide-file-text',
-                iconColor: (window.poznoteIconColorCss ? window.poznoteIconColorCss(note.icon_color) : '') || null,
-                label: note.heading || t('note_reference.untitled', null, 'Untitled'),
-                action: function () { insertTemplate(note); }
-            }));
-
-        if (!items.length) {
-            items.push({
-                id: 'template-none',
-                icon: 'lucide-info',
-                label: t('slash_menu.template_none', null, 'No templates yet'),
-                hint: t('slash_menu.template_none_hint', null, 'Put notes in a folder or a workspace named "Templates"'),
-                disabled: true
-            });
-        }
-
         return {
             id: 'template',
             icon: 'lucide-stamp',
             label: t('slash_menu.template', null, 'Template'),
             aliases: ['template', 'tpl', 'snippet'],
-            submenu: items
+            // The picker takes the focus; the editor gets it back on pick or cancel
+            noRefocus: true,
+            action: openTemplatePicker
         };
+    }
+
+    // Runs from executeCommand, while the caret the menu was opened from is
+    // still known: it is captured here because the pick comes later.
+    function openTemplatePicker() {
+        const context = getEditorContext();
+        if (!context) return;
+
+        const insertionContext = captureEditorInsertionContext();
+        const targetType = context.noteType === 'markdown' ? 'markdown' : 'note';
+        const noteEntry = insertionContext.noteEntry || context.noteEntry;
+        const currentNoteId = noteEntry && noteEntry.getAttribute
+            ? String(noteEntry.getAttribute('data-note-id') || '')
+            : '';
+
+        if (typeof window.openTemplatePickerDialog !== 'function') return;
+        window.openTemplatePickerDialog({
+            workspace: getTemplateWorkspace(),
+            // A template cannot be pasted into itself
+            excludeNoteId: currentNoteId,
+            onPick: function (note) {
+                restoreInsertionFocus(insertionContext);
+                insertTemplate(note, insertionContext, targetType);
+            },
+            onCancel: function () { restoreInsertionFocus(insertionContext); }
+        });
+    }
+
+    // Put the caret back where the menu was opened, after the picker closed
+    // without a pick
+    function restoreInsertionFocus(context) {
+        const editable = context && context.editableElement;
+        if (!editable) return;
+        focusEditableElement(editable);
+
+        const snapshot = context.codeMirrorSelection;
+        const api = getMarkdownCodeMirrorApi();
+        if (isMarkdownCodeMirrorEditor(editable)) {
+            if (snapshot && api && typeof api.setSelection === 'function') {
+                api.setSelection(snapshot.editor, snapshot.start, snapshot.end);
+            }
+            return;
+        }
+
+        if (!context.savedRange || !editable.contains(context.savedRange.commonAncestorContainer)) return;
+        try {
+            const selection = window.getSelection();
+            if (selection) {
+                selection.removeAllRanges();
+                selection.addRange(context.savedRange);
+            }
+        } catch (e) {
+            console.debug('slash-command: restoreInsertionFocus() failed:', e);
+        }
     }
 
     function convertTemplateContent(content, sourceType, targetType) {
@@ -2392,14 +2382,11 @@
         }
     }
 
-    // Paste a template note's content at the caret. The caret is captured now
-    // because the content arrives asynchronously, after the menu is gone.
-    function insertTemplate(note) {
-        const context = getEditorContext();
-        if (!context || !note) return;
+    // Paste a template note's content at the caret captured when the picker
+    // opened: the content arrives asynchronously, after the menu is gone.
+    function insertTemplate(note, insertionContext, targetType) {
+        if (!note || !insertionContext) return;
 
-        const targetType = context.noteType === 'markdown' ? 'markdown' : 'note';
-        const insertionContext = captureEditorInsertionContext();
         const t = window.t || ((key, params, fallback) => fallback);
 
         fetch('/api/v1/notes/' + encodeURIComponent(note.id), { credentials: 'same-origin' })
@@ -3536,8 +3523,7 @@
         savedEditableElement = context.editor;
         savedNoteEntry = context.editor.closest('.noteentry');
 
-        activeCommandsBuilder = () => getSelectionSlashCommands(context.markdown);
-        activeCommands = activeCommandsBuilder();
+        activeCommands = getSelectionSlashCommands(context.markdown);
         filterText = '';
         selectedIndex = 0;
         filteredCommands = getFilteredCommands('');
@@ -3971,7 +3957,6 @@
         const isTaskInput = isTaskInputElement(input);
         const ctx = { noteType: isTaskInput ? 'tasklist' : 'title', noteEntry: savedNoteEntry, editableElement: input };
 
-        activeCommandsBuilder = null;
         activeCommands = isTaskInput ? getTaskSlashCommands() : getTitleSlashCommands();
         filterText = '';
         selectedIndex = 0;
@@ -5049,9 +5034,7 @@
         savedEditableElement = editor;
         savedNoteEntry = editor.closest && editor.closest('.noteentry');
 
-        activeCommandsBuilder = getMarkdownSlashCommands;
-        activeCommands = activeCommandsBuilder();
-        refreshTemplateCache();
+        activeCommands = getMarkdownSlashCommands();
         filterText = '';
         selectedIndex = 0;
         filteredCommands = getFilteredCommands('');
@@ -5149,9 +5132,7 @@
             return;
         }
 
-        activeCommandsBuilder = ctx.noteType === 'markdown' ? getMarkdownSlashCommands : getSlashCommands;
-        activeCommands = activeCommandsBuilder();
-        refreshTemplateCache();
+        activeCommands = ctx.noteType === 'markdown' ? getMarkdownSlashCommands() : getSlashCommands();
 
         filterText = '';
         selectedIndex = 0;
@@ -5435,11 +5416,6 @@
     // Initialize slash menu system (event listeners)
     function init() {
         document.addEventListener('input', handleInput, true);
-
-        // Warm the template list so the first "/" already shows it
-        if (document.querySelector('.noteentry')) {
-            setTimeout(refreshTemplateCache, 1500);
-        }
         document.addEventListener('keydown', handleSelectionSlashKeydown, true);
         document.addEventListener('beforeinput', handleSelectionSlashBeforeInput, true);
         document.addEventListener('contextmenu', handleSelectionContextMenu);

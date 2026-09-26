@@ -165,11 +165,7 @@ function showSaveInProgressNotification(onCompleteCallback) {
         if (typeof window.keepUnsavedChangesAsDraft === 'function') {
             window.keepUnsavedChangesAsDraft(currentNoteId);
         }
-        notification.innerHTML =
-            '<div class="save-notification-inner">' +
-                '<span>' + tr('autosave.notification.kept_as_draft', {}, 'Not saved yet, your changes are kept on this device') + '</span>' +
-            '</div>';
-        setTimeout(removeNotification, 2500);
+        removeNotification();
         if (typeof onCompleteCallback === 'function') {
             onCompleteCallback();
         }

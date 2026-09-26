@@ -91,6 +91,28 @@ body {
     margin-top: 20px;
 }
 
+/* Filter above the list (js/workspaces-page.js): the Settings filter field,
+   across the section instead of centred */
+.workspace-list .ws-filter {
+    max-width: none;
+    margin: 0 0 12px;
+}
+
+.workspace-list ul li.ws-row[hidden] {
+    display: none;
+}
+
+/* No reordering while filtered: see applyWorkspaceFilter() */
+.workspace-list ul.is-filtering .ws-drag-handle {
+    visibility: hidden;
+}
+
+.ws-filter-empty {
+    margin: 8px 0 0;
+    color: var(--pz-text-muted);
+    font-size: 14px;
+}
+
 .workspace-item {
     display: flex;
     align-items: center;
@@ -200,16 +222,65 @@ html[data-theme='dark'] .ws-drag-handle:focus-visible {
     gap: 4px;
 }
 
-/* Narrow screens only: the actions that no longer fit on the row move behind
-   this kebab, at the right of the workspace name (or of its tags when it has
-   some). On desktop every action fits, so neither is ever shown. */
-.ws-actions-toggle,
-.ws-actions-menu {
-    display: none;
+/* Share stays on the row; every other action sits behind the "..." button,
+   in a menu that hangs under it (absolute inside .ws-col-actions). */
+.ws-col-actions {
+    position: relative;
+    align-items: center;
+    gap: 4px;
 }
 
-/* Action labels: invisible next to the icons on the row, printed next to the
-   icon once the button has been moved into the overflow menu. */
+.ws-actions-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--pz-radius);
+    background: transparent;
+    color: var(--pz-text-secondary);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.ws-actions-toggle .lucide {
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+}
+
+.ws-actions-toggle:hover,
+.ws-actions-toggle:focus-visible,
+.ws-col-actions.is-open .ws-actions-toggle {
+    background: var(--pz-surface-hover);
+    border-color: var(--pz-border);
+    color: var(--pz-accent-text);
+}
+
+.ws-actions-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 2px);
+    right: 0;
+    z-index: 50;
+    flex-direction: column;
+    align-items: stretch;
+    min-width: 190px;
+    padding: 4px 0;
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border-strong);
+    border-radius: var(--pz-radius);
+    box-shadow: 0 4px 6px -1px rgba(var(--pz-shadow-rgb), 0.1), 0 2px 4px -1px rgba(var(--pz-shadow-rgb), 0.06);
+}
+
+.ws-col-actions.is-open .ws-actions-menu {
+    display: flex;
+}
+
+/* Action labels: hidden next to the Share icon on the row, printed next to
+   the icon in the menu. */
 .ws-icon-btn-text {
     display: none;
 }
@@ -286,6 +357,80 @@ html[data-theme='dark'] .ws-icon-btn.ws-icon-btn-danger:hover,
 html[data-theme='dark'] .ws-icon-btn.ws-icon-btn-danger:focus-visible {
     color: var(--pz-danger-text);
     background: color-mix(in srgb, var(--pz-danger-text) 12%, transparent);
+}
+
+/* The same buttons inside the menu: labelled rows. */
+.workspace-list .ws-actions-menu .ws-icon-btn {
+    width: 100%;
+    height: auto;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 0;
+    border-radius: 0;
+    color: var(--pz-text);
+    font-size: 15px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.workspace-list .ws-actions-menu .ws-icon-btn[disabled] {
+    color: var(--pz-text-muted);
+}
+
+.workspace-list .ws-actions-menu .ws-icon-btn .lucide {
+    flex: 0 0 auto;
+    color: var(--pz-text-muted);
+}
+
+.workspace-list .ws-actions-menu .ws-icon-btn:hover,
+.workspace-list .ws-actions-menu .ws-icon-btn:focus-visible {
+    border-color: transparent;
+    color: var(--pz-text);
+}
+
+.workspace-list .ws-actions-menu .ws-icon-btn.is-shared .lucide {
+    color: var(--pz-warning-hover);
+}
+
+.workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger,
+.workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger .lucide,
+.workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger:hover,
+.workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger:focus-visible {
+    color: var(--pz-danger-text);
+}
+
+.workspace-list .ws-actions-menu .ws-icon-btn-text {
+    display: inline;
+}
+
+html[data-theme='dark'] .workspace-list .ws-actions-menu {
+    background: var(--pz-chrome-bg);
+    border-color: var(--pz-border);
+}
+
+html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn {
+    color: var(--pz-text);
+}
+
+html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn .lucide {
+    color: var(--pz-text-muted);
+}
+
+html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn:hover,
+html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn:focus-visible {
+    color: var(--pz-text);
+}
+
+html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn.is-shared .lucide {
+    color: var(--pz-warning-text);
+}
+
+html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger,
+html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger .lucide,
+html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger:hover,
+html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger:focus-visible {
+    color: var(--pz-danger-text);
 }
 
 .workspace-info-modal-content {
@@ -725,25 +870,19 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
         margin-bottom: 30px !important;
     }
     
-    /* The row stays on one line: the name (and its tags) on the left, as many
-       action icons as fit on the right. layoutWorkspaceRowActions() moves the
-       ones that no longer fit into the kebab menu at the end of the strip. */
+    /* The row stays on one line: the name (and its tags) on the left, Share
+       and the "..." menu on the right. */
     .workspace-list ul li {
         flex-direction: row !important;
         gap: 8px !important;
-        padding: 15px 0 !important;
+        padding: 8px 0 !important;
         border-bottom: 1px solid var(--pz-border);
     }
 
     .workspace-list .ws-col-name {
         flex: 1 1 auto !important;
         width: auto !important;
-        /* The floor the overflow measurement works against: the icons have
-           stopped fitting as soon as they push the name column past this.
-           layoutWorkspaceRowActions() replaces the fallback with the width the
-           name and its tags actually need, so a short name leaves room for more
-           icons on the line. */
-        min-width: var(--ws-name-reserve, 140px) !important;
+        min-width: 0 !important;
     }
 
     .workspace-list .workspace-name-item,
@@ -756,12 +895,10 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
     }
 
     .workspace-list .ws-col-actions {
-        position: relative;
         flex: 0 0 auto !important;
         width: auto !important;
         flex-basis: auto !important;
         justify-content: flex-end;
-        gap: 4px;
     }
 
     .workspace-list .ws-icon-btn {
@@ -769,129 +906,6 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
         height: 36px;
     }
 
-    /* The kebab only appears once something has actually been moved into it. */
-    .workspace-list .ws-col-actions.has-overflow .ws-actions-toggle {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 36px;
-        height: 36px;
-        padding: 0;
-        border: 1px solid transparent;
-        border-radius: var(--pz-radius);
-        background: transparent;
-        color: var(--pz-text-secondary);
-        cursor: pointer;
-    }
-
-    .workspace-list .ws-actions-toggle .lucide {
-        width: 18px;
-        height: 18px;
-        pointer-events: none;
-    }
-
-    .workspace-list .ws-col-actions.is-open .ws-actions-toggle {
-        background: var(--pz-surface-hover);
-        border-color: var(--pz-border);
-        color: var(--pz-accent-text);
-    }
-
-    /* The overflow menu: absolute inside .ws-col-actions, so it hangs under the
-       kebab and stays inside the horizontally clipped settings container. */
-    .workspace-list .ws-actions-menu {
-        display: none;
-        position: absolute;
-        top: calc(100% + 2px);
-        right: 0;
-        z-index: 50;
-        flex-direction: column;
-        align-items: stretch;
-        min-width: 190px;
-        padding: 4px 0;
-        background: var(--pz-bg);
-        border: 1px solid var(--pz-border-strong);
-        border-radius: var(--pz-radius);
-        box-shadow: 0 4px 6px -1px rgba(var(--pz-shadow-rgb), 0.1), 0 2px 4px -1px rgba(var(--pz-shadow-rgb), 0.06);
-    }
-
-    .workspace-list .ws-col-actions.is-open .ws-actions-menu {
-        display: flex;
-    }
-
-    /* Same buttons, moved: inside the menu they render as labelled rows. */
-    .workspace-list .ws-actions-menu .ws-icon-btn {
-        width: 100%;
-        height: auto;
-        justify-content: flex-start;
-        gap: 10px;
-        padding: 10px 14px;
-        border: 0;
-        border-radius: 0;
-        color: var(--pz-text);
-        font-size: 15px;
-        text-align: left;
-        white-space: nowrap;
-    }
-
-    .workspace-list .ws-actions-menu .ws-icon-btn[disabled] {
-        color: var(--pz-text-muted);
-    }
-
-    .workspace-list .ws-actions-menu .ws-icon-btn .lucide {
-        flex: 0 0 auto;
-        color: var(--pz-text-muted);
-    }
-
-    .workspace-list .ws-actions-menu .ws-icon-btn:hover,
-    .workspace-list .ws-actions-menu .ws-icon-btn:focus-visible {
-        border-color: transparent;
-        color: var(--pz-text);
-    }
-
-    .workspace-list .ws-actions-menu .ws-icon-btn.is-shared .lucide {
-        color: var(--pz-warning-hover);
-    }
-
-    .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger,
-    .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger .lucide,
-    .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger:hover,
-    .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger:focus-visible {
-        color: var(--pz-danger-text);
-    }
-
-    .workspace-list .ws-actions-menu .ws-icon-btn-text {
-        display: inline;
-    }
-
-    html[data-theme='dark'] .workspace-list .ws-actions-menu {
-        background: var(--pz-chrome-bg);
-        border-color: var(--pz-border);
-    }
-
-    html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn {
-        color: var(--pz-text);
-    }
-
-    html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn .lucide {
-        color: var(--pz-text-muted);
-    }
-
-    html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn:hover,
-    html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn:focus-visible {
-        color: var(--pz-text);
-    }
-
-    html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn.is-shared .lucide {
-        color: var(--pz-warning-text);
-    }
-
-    html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger,
-    html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger .lucide,
-    html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger:hover,
-    html[data-theme='dark'] .workspace-list .ws-actions-menu .ws-icon-btn.ws-icon-btn-danger:focus-visible {
-        color: var(--pz-danger-text);
-    }
-    
     .workspace-list .btn {
         width: 100% !important;
         min-width: unset !important;
@@ -925,18 +939,22 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
         font-size: 16px !important;
     }
 
-    /* Default workspace selector: stack + add spacing above Save button */
-    #defaultWorkspaceSelect {
-        width: 100% !important;
-        margin-right: 0 !important;
-        display: block !important;
-        box-sizing: border-box !important;
+    /* Default workspace selector: stacked above its Save button */
+    .default-workspace-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    /* The base rule comes later in the file, hence the row in the selector */
+    .default-workspace-row .default-workspace-select {
+        padding: 11px 36px 11px 12px;
+        font-size: 16px;
     }
 
     #saveDefaultWorkspaceBtn {
         width: 100% !important;
         display: block !important;
-        margin-top: 10px !important;
     }
     
     /* Back button mobile styling */
@@ -1025,12 +1043,44 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
     margin-top: 12px;
 }
 
-/* Default workspace select */
+/* Default workspace: the select and its button on one row, the select
+   drawn like the text fields above it and with the Lucide chevron of the
+   Git Sync selects (css/git-sync.css) */
+.default-workspace-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .default-workspace-select {
-    width: 450px;
-    padding: 12px;
-    font-size: 16px;
-    margin-right: 10px;
+    flex: 1 1 auto;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 10px 36px 10px 10px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm);
+    background-color: var(--pz-bg);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px 16px;
+    color: var(--pz-text);
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    appearance: none;
+}
+
+.default-workspace-select:focus {
+    outline: none;
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
+}
+
+html[data-theme='dark'] .default-workspace-select {
+    background-color: var(--pz-surface);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    border-color: var(--pz-border-strong);
 }
 
 /* Default workspace status message */

@@ -543,6 +543,7 @@ function poznoteCssManifest(): array
             'css/modals/responsive.css',
             'css/background-image.css',
             'css/modal-alerts.css',
+            '@settings-shell',
             '@theme',
             'css/workspaces-inline.css',
             '@icon-sidebar',

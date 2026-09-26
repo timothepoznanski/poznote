@@ -578,6 +578,41 @@ html[data-theme='dark'] .modal .modal-info-note {
     padding-left: 20px;
 }
 
+/* "Enable offline mode" row, first of the modal (same card as the reminder
+   email option, css/modals/reminders.css) */
+#offlineNotesModal .offline-mode-option {
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-surface);
+    padding: 10px 12px;
+    margin-bottom: 16px;
+}
+
+#offlineNotesModal .offline-mode-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    cursor: pointer;
+}
+
+#offlineNotesModal .offline-mode-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+#offlineNotesModal .offline-mode-title {
+    font-size: 14px;
+}
+
+#offlineNotesModal .offline-mode-hint {
+    color: var(--pz-text-muted);
+    font-size: 12px;
+    line-height: 1.35;
+}
+
 @media (max-width: 480px) {
     #noteColorPaletteModal .modal-buttons {
         flex-wrap: wrap;

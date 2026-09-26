@@ -677,6 +677,11 @@ function markShareIconShared(noteId, shared) {
                 }
             }
         });
+        // Tree rows: the note actions menu picks its share variant from
+        // data-shared on the row's toggle (js/utils-menus.js)
+        document.querySelectorAll('.note-actions-toggle[data-note-id="' + noteId + '"]').forEach(toggle => {
+            toggle.setAttribute('data-shared', shared ? '1' : '0');
+        });
     } catch (error) {
         console.error('Error marking share icon:', error);
     }

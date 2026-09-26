@@ -458,7 +458,7 @@ function renderFolderActionsMenu($currentWorkspace = '') {
     // the folder's shared state (data-shared on the toggle). Not in a
     // workspace shared with this login, where public links are the owner's.
     if (!function_exists('isSharedWorkspaceScopeActive') || !isSharedWorkspaceScopeActive()) {
-        $menu .= "<div class='folder-actions-menu-item shared share-state-shared' data-action='share-folder'>";
+        $menu .= "<div class='folder-actions-menu-item active-state share-state-shared' data-action='share-folder'>";
         $menu .= "<i class='lucide lucide-share-2'></i>";
         $menu .= "<span>" . t_h('notes_list.folder_actions.is_public', [], 'Is public') . "</span>";
         $menu .= "</div>";
@@ -472,9 +472,9 @@ function renderFolderActionsMenu($currentWorkspace = '') {
 
     // Favorite folder action: two variants, the client shows the one matching
     // the folder's favorite state (data-favorite on the toggle). Removing is
-    // shown in red (.danger) like the other "undo" entries, so the current
-    // state reads at a glance.
-    $menu .= "<div class='folder-actions-menu-item favorite-state-favorite danger' data-action='favorite-folder'>";
+    // shown in the accent colour (.active-state), so the current state reads
+    // at a glance without looking destructive.
+    $menu .= "<div class='folder-actions-menu-item favorite-state-favorite active-state' data-action='favorite-folder'>";
     $menu .= "<i class='lucide lucide-star'></i>";
     $menu .= "<span>" . t_h('notes_list.folder_actions.remove_favorite', [], 'Remove from favorites') . "</span>";
     $menu .= "</div>";
@@ -485,15 +485,18 @@ function renderFolderActionsMenu($currentWorkspace = '') {
 
     // Keep offline: the folder's notes, subfolders included, stay in the
     // browser whatever their date (Offline Copies, lib/offline.php). Two
-    // variants like Favorite, from data-offline on the toggle.
-    $menu .= "<div class='folder-actions-menu-item offline-state-kept danger' data-action='offline-folder'>";
-    $menu .= "<i class='lucide lucide-wifi-off'></i>";
-    $menu .= "<span>" . t_h('notes_list.folder_actions.stop_offline', [], 'Stop keeping offline') . "</span>";
-    $menu .= "</div>";
-    $menu .= "<div class='folder-actions-menu-item offline-state-not-kept' data-action='offline-folder'>";
-    $menu .= "<i class='lucide lucide-wifi-off'></i>";
-    $menu .= "<span>" . t_h('notes_list.folder_actions.keep_offline', [], 'Keep offline') . "</span>";
-    $menu .= "</div>";
+    // variants like Favorite, from data-offline on the toggle. Not offered
+    // while offline mode is off (Settings > Offline notes).
+    if (poznoteOfflineModeEnabled()) {
+        $menu .= "<div class='folder-actions-menu-item offline-state-kept active-state' data-action='offline-folder'>";
+        $menu .= "<i class='lucide lucide-wifi-off'></i>";
+        $menu .= "<span>" . t_h('notes_list.folder_actions.stop_offline', [], 'Stop keeping offline') . "</span>";
+        $menu .= "</div>";
+        $menu .= "<div class='folder-actions-menu-item offline-state-not-kept' data-action='offline-folder'>";
+        $menu .= "<i class='lucide lucide-wifi-off'></i>";
+        $menu .= "<span>" . t_h('notes_list.folder_actions.keep_offline', [], 'Keep offline') . "</span>";
+        $menu .= "</div>";
+    }
 
     // Rename folder action
     $menu .= "<div class='folder-actions-menu-item' data-action='rename-folder'>";
@@ -539,9 +542,12 @@ function renderFolderActionsMenu($currentWorkspace = '') {
  * @param string $folderName Containing folder name
  * @param bool $isFavorite Whether the note is marked as favorite, which picks
  *                         the favorite variant shown by the menu
+ * @param bool $isOffline Whether the note is marked "Keep offline"
+ * @param bool $isShared Whether the note has its own public link, which picks
+ *                       the share variant shown by the menu
  * @return string HTML for the note actions toggle
  */
-function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderName, $isFavorite = false, $isOffline = false) {
+function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderName, $isFavorite = false, $isOffline = false, $isShared = false) {
     $htmlNoteId = htmlspecialchars((string)$noteId, ENT_QUOTES);
     $htmlNoteTitle = htmlspecialchars((string)$noteTitle, ENT_QUOTES);
     $htmlNoteType = htmlspecialchars((string)$noteType, ENT_QUOTES);
@@ -558,6 +564,7 @@ function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderN
         . " data-folder-id='$htmlFolderId' data-folder='$htmlFolderName'"
         . " data-favorite='" . ($isFavorite ? '1' : '0') . "'"
         . " data-offline='" . ($isOffline ? '1' : '0') . "'"
+        . " data-shared='" . ($isShared ? '1' : '0') . "'"
         . " title='" . t_h('notes_list.note_actions.menu', [], 'Note actions') . "'"
         . " aria-label='" . t_h('notes_list.note_actions.menu', [], 'Note actions') . "'>"
         . "<i class='lucide lucide-more-vertical'></i>"
@@ -582,10 +589,11 @@ function renderNoteActionsMenu($currentWorkspace = '') {
 
     // Tree-organization actions only: opening the note, naming it, placing it
     // and removing it. Everything that acts on the note's content or exposes
-    // it elsewhere (attachments, share, snapshots, search and replace,
-    // information, print, download, convert, reminder) stays in the opened
-    // note's toolbar and its own three-dot menu. Favorite stays here because
-    // it decides where the note shows up in the tree (the Favorites section).
+    // it elsewhere (attachments, snapshots, search and replace, information,
+    // print, download, convert, reminder) stays in the opened note's toolbar
+    // and its own three-dot menu. Favorite stays here because it decides where
+    // the note shows up in the tree (the Favorites section), and Share because
+    // the folder menu offers it too.
     //
     // The groups below are separated by .note-actions-menu-separator; a
     // separator left with no visible item on one side is hidden on open by
@@ -603,10 +611,27 @@ function renderNoteActionsMenu($currentWorkspace = '') {
     $menu .= "<span>" . t_h('notes_list.note_actions.rename_note', [], 'Rename note') . "</span>";
     $menu .= "</div>";
 
+    // Share: two variants, populateNoteActionsMenu() shows the one matching
+    // the note's shared state (data-shared on the toggle), like the folder
+    // menu. Same handler as the toolbar's share button, minus its
+    // data-shared-via-folder attribute: from the tree, a note inside a shared
+    // folder still goes straight to creating its own link. Not in a workspace
+    // shared with this login, where public links are the owner's.
+    if (!function_exists('isSharedWorkspaceScopeActive') || !isSharedWorkspaceScopeActive()) {
+        $menu .= "<div class='note-actions-menu-item active-state share-state-shared' data-action='open-share-modal'>";
+        $menu .= "<i class='lucide lucide-share-2'></i>";
+        $menu .= "<span>" . t_h('notes_list.note_actions.is_shared', [], 'Is shared') . "</span>";
+        $menu .= "</div>";
+        $menu .= "<div class='note-actions-menu-item share-state-not-shared' data-action='open-share-modal'>";
+        $menu .= "<i class='lucide lucide-share-2'></i>";
+        $menu .= "<span>" . t_h('notes_list.note_actions.share_note', [], 'Share note') . "</span>";
+        $menu .= "</div>";
+    }
+
     // Favorite: two variants, populateNoteActionsMenu() shows the one matching
     // the note's favorite state (data-favorite on the toggle). Removing is
-    // shown in red (.danger), same as the folder menu.
-    $menu .= "<div class='note-actions-menu-item favorite-state-favorite danger' data-action='toggle-favorite'>";
+    // shown in the accent colour (.active-state), same as the folder menu.
+    $menu .= "<div class='note-actions-menu-item favorite-state-favorite active-state' data-action='toggle-favorite'>";
     $menu .= "<i class='lucide lucide-star'></i>";
     $menu .= "<span>" . t_h('notes_list.folder_actions.remove_favorite', [], 'Remove from favorites') . "</span>";
     $menu .= "</div>";
@@ -616,22 +641,21 @@ function renderNoteActionsMenu($currentWorkspace = '') {
     $menu .= "</div>";
 
     // Keep offline: the note stays in the browser whatever its date (Offline
-    // Copies, lib/offline.php). Two variants like Favorite, from data-offline
-    // on the toggle, and a line that says whether this browser holds the note
-    // right now (js/offline-sync.js fills it when the menu opens).
-    $menu .= "<div class='note-actions-menu-item offline-state-kept danger' data-action='toggle-offline'>";
-    $menu .= "<i class='lucide lucide-wifi-off'></i>";
-    $menu .= "<span>" . t_h('notes_list.note_actions.stop_offline', [], 'Stop keeping offline') . "</span>";
-    $menu .= "</div>";
-    $menu .= "<div class='note-actions-menu-item offline-state-not-kept' data-action='toggle-offline'>";
-    $menu .= "<i class='lucide lucide-wifi-off'></i>";
-    $menu .= "<span>" . t_h('notes_list.note_actions.keep_offline', [], 'Keep offline') . "</span>";
-    $menu .= "</div>";
-    $menu .= "<div class='note-actions-menu-item menu-info offline-availability' hidden>";
-    $menu .= "<i class='lucide lucide-check'></i>";
-    $menu .= "<span data-available='1'>" . t_h('notes_list.note_actions.available_offline', [], 'Available offline in this browser') . "</span>";
-    $menu .= "<span data-available='0'>" . t_h('notes_list.note_actions.not_available_offline', [], 'Not available offline in this browser') . "</span>";
-    $menu .= "</div>";
+    // Copies, lib/offline.php). Two variants like Favorite: "Stop" when the
+    // note is marked (data-offline on the toggle) or when this browser holds
+    // it anyway, as a recent note, a favorite or in a folder kept offline
+    // (js/offline-sync.js answers that when the menu opens). Not offered
+    // while offline mode is off (Settings > Offline notes).
+    if (poznoteOfflineModeEnabled()) {
+        $menu .= "<div class='note-actions-menu-item offline-state-kept active-state' data-action='toggle-offline'>";
+        $menu .= "<i class='lucide lucide-wifi-off'></i>";
+        $menu .= "<span>" . t_h('notes_list.note_actions.stop_offline', [], 'Stop keeping offline') . "</span>";
+        $menu .= "</div>";
+        $menu .= "<div class='note-actions-menu-item offline-state-not-kept' data-action='toggle-offline'>";
+        $menu .= "<i class='lucide lucide-wifi-off'></i>";
+        $menu .= "<span>" . t_h('notes_list.note_actions.keep_offline', [], 'Keep offline') . "</span>";
+        $menu .= "</div>";
+    }
 
     $menu .= "<div class='note-actions-menu-separator'></div>";
 

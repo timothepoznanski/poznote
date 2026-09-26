@@ -8,7 +8,7 @@
  * Now works with folder arrays containing 'id', 'name', and 'notes'
  * Also checks uncategorized notes (notes without folder)
  */
-function handleFavorites($folders, $uncategorized_notes = []) {
+function handleFavorites($folders, $uncategorized_notes = [], $sort_mode = POZNOTE_FAVORITES_SORT_DEFAULT) {
     $favorites = [];
     
     // Parcourir tous les dossiers pour extraire les favoris
@@ -29,6 +29,14 @@ function handleFavorites($folders, $uncategorized_notes = []) {
         }
     }
     
+    // Favorites keeps its own order (favorites_sort, set from its right-click
+    // menu), by title unless changed: the tree's sort button acts on the tree
+    // below Favorites only
+    $sort_mode = poznoteNormalizeFavoritesSort($sort_mode);
+    usort($favorites, function ($a, $b) use ($sort_mode) {
+        return poznoteCompareNotes($sort_mode, $a, $b);
+    });
+
     // Add favorites as a special folder if there are any favorites
     // Use a special ID for Favorites (0 or negative to distinguish from real folders)
     if (!empty($favorites)) {

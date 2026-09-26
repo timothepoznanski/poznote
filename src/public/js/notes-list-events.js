@@ -689,6 +689,8 @@
         var target = event.target;
         if (!target || !target.closest) return;
 
+        if (typeof window.closeFavoritesMenu === 'function') window.closeFavoritesMenu();
+
         // Folder shortcuts in the Favorites section share the note row markup
         // but carry no toggle of their own (renderFavoriteFolderItems in
         // notes_list.php): open the folder menu through the folder's real
@@ -714,11 +716,45 @@
         }
 
         var folderRow = target.closest('.folder-toggle');
-        if (!folderRow) return;
+        if (!folderRow) {
+            openCreateMenuOnEmptySidebar(event);
+            return;
+        }
+
+        // Favorites is no folder: it has a menu of its own (js/favorites-menu.js)
+        if (folderRow.getAttribute('data-folder-id') === 'favorites') {
+            if (typeof window.openFavoritesMenuAtPoint === 'function' &&
+                window.openFavoritesMenuAtPoint(event.clientX, event.clientY)) {
+                event.preventDefault();
+            }
+            return;
+        }
 
         var folderId = parseInt(folderRow.getAttribute('data-folder-id'), 10);
         if (folderId && typeof window.openFolderActionsMenuAtPoint === 'function' &&
             window.openFolderActionsMenuAtPoint(folderId, event.clientX, event.clientY)) {
+            event.preventDefault();
+        }
+    }
+
+    // Right-click on the empty part of the notes column: below the tree, or
+    // beside it. Opens the menu of the sidebar + button at the pointer, plus an
+    // entry hiding the column. Anywhere inside a folder (its rows, the gaps
+    // between them) or on a control keeps the browser's own menu, as does a
+    // column without the + button (another account looked at read-only).
+    var EMPTY_SIDEBAR_EXCLUDED = '.folder-header, .note-list-item, .other-accounts, .other-account-header, ' +
+        '.notes-list-actions, .folder-filter-banner, a, button, input, textarea, select, [contenteditable="true"]';
+
+    function openCreateMenuOnEmptySidebar(event) {
+        var target = event.target;
+        var leftCol = document.getElementById('left_col');
+        if (!leftCol || !document.getElementById('sidebarCreateBtn')) return;
+
+        var inEmptyArea = target === leftCol || !!target.closest('#left_col .notes-list-scrollable-content');
+        if (!inEmptyArea || target.closest(EMPTY_SIDEBAR_EXCLUDED)) return;
+
+        if (typeof window.openCreateMenu === 'function' &&
+            window.openCreateMenu({ x: event.clientX, y: event.clientY, columnActions: true })) {
             event.preventDefault();
         }
     }

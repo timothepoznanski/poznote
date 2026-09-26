@@ -535,12 +535,15 @@ html[data-theme='dark'] .folder-name-path {
 
 /* Kept offline in this browser (js/offline-marks.js) */
 .folder-name-text .offline-mark {
+    display: inline-block;
     flex: 0 0 auto;
-    width: 13px;
-    height: 13px;
+    width: 5px;
+    height: 5px;
     margin-left: 6px;
-    color: var(--pz-text-muted);
-    vertical-align: -1px;
+    border-radius: var(--pz-radius-circle);
+    background-color: var(--pz-accent);
+    opacity: 0.7;
+    vertical-align: middle;
 }
 
 /* Offline page (offline_notes.php): the middle column says why a note is

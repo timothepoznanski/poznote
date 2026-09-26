@@ -315,6 +315,11 @@ class SettingsController {
             return (string) $intVal;
         }
 
+        // Offline mode as a whole (poznoteOfflineModeEnabled() in functions.php)
+        if ($key === 'offline_mode_enabled') {
+            return filter_var($value, FILTER_VALIDATE_BOOLEAN) ? '1' : '0';
+        }
+
         // Days of recently modified notes kept offline in the browser, 0 = off
         if ($key === 'offline_notes_days') {
             $intVal = (int) $value;
@@ -449,6 +454,20 @@ class SettingsController {
 
         if (in_array($key, ['smtp_host', 'smtp_username', 'smtp_password', 'smtp_from_name', 'smtp_reminder_cutoff_at'], true)) {
             return substr(trim((string) $value), 0, 1000);
+        }
+
+        // Order and star colour of the Favorites section (its right-click
+        // menu in the notes tree)
+        if ($key === 'favorites_sort') {
+            require_once __DIR__ . '/../../../lib/note-sort.php';
+            return poznoteNormalizeFavoritesSort($value);
+        }
+        if ($key === 'favorites_icon_color') {
+            $color = strtolower(trim((string) $value));
+            if ($color !== '' && !preg_match('/^#[0-9a-f]{6}$/', $color)) {
+                throw new InvalidArgumentException('favorites_icon_color must be #rrggbb or empty', 400);
+            }
+            return $color;
         }
 
         // Button => #rrggbb maps painted on the icon rail

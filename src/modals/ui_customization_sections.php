@@ -41,6 +41,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:two-factor-card" checked><span><?php echo t_h('settings.cards.two_factor', [], 'Two-factor authentication'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:app-passwords-card" checked><span><?php echo t_h('settings.cards.app_passwords', [], 'App passwords'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:delete-account-card" checked><span><?php echo t_h('settings.cards.delete_account', [], 'Delete Account'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:workspaces-card" checked><span><?php echo t_h('settings.cards.workspaces', [], 'Workspaces'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:git-sync-card" checked><span><?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:backup-export-card" checked><span><?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:restore-import-card" checked><span><?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?></span></label>
@@ -68,8 +69,10 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:folder-tree-highlight-card" checked><span><?php echo t_h('display.cards.highlight_current_folder_tree', [], 'Highlight current folder tree'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-color-palette-card" checked><span><?php echo t_h('display.cards.note_color_palette', [], 'Note colors'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:notes-without-folders-card" checked><span><?php echo t_h('display.cards.notes_without_folders_after', [], 'Notes without folders'); ?></span></label>
+        <?php if (poznoteOfflineModeEnabled()): ?><label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebar-offline-marks-card" checked><span><?php echo t_h('display.cards.sidebar_offline_marks', [], 'Show offline dot'); ?></span></label><?php endif; ?>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-width-card" checked><span><?php echo t_h('display.cards.note_content_width', [], 'Note content width'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-split-card-view-card" checked><span><?php echo t_h('display.cards.markdown_split_card_view', [], 'Framed markdown'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-split-preview-left-card" checked><span><?php echo t_h('display.cards.markdown_split_preview_left', [], 'Preview on the left'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-colored-card" checked><span><?php echo t_h('display.cards.markdown_colored', [], 'Colored markdown'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:code-wrap-card" checked><span><?php echo t_h('display.cards.code_block_word_wrap', [], 'Code block word wrap'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:code-line-numbers-card" checked><span><?php echo t_h('display.cards.code_block_line_numbers', [], 'Code block line numbers'); ?></span></label>
@@ -269,7 +272,7 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarTagsBtn" checked><span><?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarFoldersBtn" checked><span><?php echo t_h('home.folders', [], 'Folders'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarSharesBtn" checked><span><?php echo t_h('home.shares', [], 'Shares'); ?></span></label>
-    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarOfflineBtn" checked><span><?php echo t_h('offline.page.title', [], 'Offline'); ?></span></label>
+    <?php if (poznoteOfflineModeEnabled()): ?><label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarOfflineBtn" checked><span><?php echo t_h('offline.page.title', [], 'Offline'); ?></span></label><?php endif; ?>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarAttachmentsBtn" checked><span><?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarTrashBtn" checked><span><?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarDiaryBtn" checked><span><?php echo t_h('diary.title', [], 'Diary'); ?></span></label>
@@ -325,6 +328,7 @@
 <div class="ui-custom-items">
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-actions-toggle" checked><span><?php echo t_h('modals.ui_customization.note_actions_toggle', [], 'Menu button (⋮) on notes'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:rename-note" checked><span><?php echo t_h('notes_list.note_actions.rename_note', [], 'Rename note'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:open-share-modal" checked><span><?php echo t_h('notes_list.note_actions.share_note', [], 'Share note'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:toggle-favorite" checked><span><?php echo t_h('notes_list.folder_actions.add_favorite', [], 'Add to favorites'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:duplicate-note" checked><span><?php echo t_h('common.duplicate', [], 'Duplicate'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:create-note-shortcut" checked><span><?php echo t_h('editor.toolbar.create_linked_note', [], 'Create shortcut'); ?></span></label>

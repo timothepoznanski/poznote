@@ -28,6 +28,7 @@
 (function () {
     var POLL_INTERVAL_MS = 5000;
     var MAX_BACKOFF_MS = 60000;
+    var POLL_TIMEOUT_MS = 20000;
     var MIN_POLL_GAP_MS = 800;
     var LOCAL_WRITE_REBASE_DELAY_MS = 300;
     var NOTICE_DURATION_MS = 4000;
@@ -380,10 +381,18 @@
             pollTimer = null;
         }
 
+        // A poll the network swallows (VPN without Wi-Fi, captive portal)
+        // would otherwise keep inFlight set and stop every poll after it.
+        var controller = window.AbortController ? new AbortController() : null;
+        var abortTimer = controller
+            ? window.setTimeout(function () { controller.abort(); }, POLL_TIMEOUT_MS)
+            : null;
+
         fetch(url, {
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
             cache: 'no-store',
-            credentials: 'same-origin'
+            credentials: 'same-origin',
+            signal: controller ? controller.signal : undefined
         }).then(function (response) {
             if (!response.ok) {
                 // Prefer the message the server sent over a bare status code:
@@ -408,6 +417,7 @@
         }).catch(function () {
             backoffMs = Math.min(MAX_BACKOFF_MS, backoffMs * 2);
         }).then(function () {
+            window.clearTimeout(abortTimer);
             inFlight = false;
             if (queuedPoll) {
                 var queued = queuedPoll;

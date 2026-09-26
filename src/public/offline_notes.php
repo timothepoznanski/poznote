@@ -8,6 +8,12 @@
  */
 require_once __DIR__ . '/../page_bootstrap.php';
 
+// Offline mode turned off (Settings > Offline notes): the page is not offered
+if (!poznoteOfflineModeEnabled()) {
+	header('Location: index.php');
+	exit;
+}
+
 $pageWorkspace = trim(getWorkspaceFilter());
 if ($pageWorkspace === '__last_opened__') {
 	$pageWorkspace = '';

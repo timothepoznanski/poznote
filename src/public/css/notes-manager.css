@@ -685,12 +685,15 @@ html[data-theme='dark'] .nm-modal {
 /* Kept offline in this browser (js/offline-marks.js), right after the name:
    the title link stops stretching to the date when a mark follows it */
 :is(.nm-note-title-wrap, .nm-folder-label) .offline-mark {
+    display: inline-block;
     flex: 0 0 auto;
-    width: 13px;
-    height: 13px;
+    width: 5px;
+    height: 5px;
     margin-left: 6px;
-    color: var(--pz-text-muted);
-    vertical-align: -1px;
+    border-radius: var(--pz-radius-circle);
+    background-color: var(--pz-accent);
+    opacity: 0.7;
+    vertical-align: middle;
 }
 
 .nm-note-title-wrap .offline-mark {

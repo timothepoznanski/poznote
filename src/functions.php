@@ -359,9 +359,8 @@ function getPageTitle() {
 /**
  * The three contact cards of the About section (settings.php): a contact
  * email, the GitHub discussions and the Discord server. Each points to the
- * Poznote project by default; an administrator can point it elsewhere from
- * the card itself (PUT /api/v1/settings/{key}, a global setting), and an
- * empty value means "back to the default".
+ * Poznote project by default; a global setting (PUT /api/v1/settings/{key})
+ * can point it elsewhere, and an empty value means "back to the default".
  */
 function poznoteAboutLinkDefaults(): array {
     return [
@@ -440,6 +439,21 @@ const POZNOTE_OFFLINE_MAX_TEXT_MB = 50;
 const POZNOTE_OFFLINE_MAX_PICTURE_MB = 25;
 const POZNOTE_OFFLINE_MAX_PICTURES = 400;
 const POZNOTE_OFFLINE_MAX_PICTURES_MB = 200;
+
+/**
+ * Whether the account uses offline mode (offline_mode_enabled, on unless
+ * turned off in Settings > Offline notes). Off, the manifest keeps nothing,
+ * so the browsers forget their copies (js/offline-sync.js), and every offline
+ * option and indicator leaves the app: rail button, "Keep offline" menu
+ * items, marks, connection banner.
+ */
+function poznoteOfflineModeEnabled(): bool {
+    $raw = function_exists('getSetting') ? getSetting('offline_mode_enabled', null) : null;
+    if ($raw === null || $raw === false || trim((string)$raw) === '') {
+        return true;
+    }
+    return $raw !== '0' && $raw !== 'false';
+}
 
 
 

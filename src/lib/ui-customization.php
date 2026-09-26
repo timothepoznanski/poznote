@@ -22,8 +22,8 @@ function poznoteGetNonHideableUiKeys() {
         // The mobile "back to notes" toolbar button is the way back to the
         // note list on small screens, so it is no longer offered for hiding.
         'toolbar:btn-home' => true,
-        // Sorting became one global mode with its own button in the sidebar
-        // title row (#1442): the per-folder "Sort by" submenu and the Settings
+        // Sorting became one global mode with its own button in the notes
+        // list (#1442): the per-folder "Sort by" submenu and the Settings
         // card that held the global default are both gone. The sidebar button
         // is hideable under card:sidebarSortBtn.
         'folder:toggle-sort-submenu' => true,

@@ -136,8 +136,7 @@ body #right_col .notecard[data-content-width] {
 }
 
 /* Transient label for a control that cycles through states: the reflow alone
-   does not say which step you just landed on. Used by the toolbar width toggle
-   and by the sidebar sort button (#1442). */
+   does not say which step you just landed on. Used by the toolbar width toggle. */
 #note-width-toast,
 .pz-toast {
     position: fixed;

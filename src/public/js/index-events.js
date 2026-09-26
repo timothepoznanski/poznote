@@ -612,8 +612,10 @@
                 }
                 break;
             case 'toggle-offline':
+                // The variant clicked says what to do: "Stop" also shows for
+                // a note this browser keeps on its own (recent, favorite...)
                 if (noteId && typeof toggleNoteOffline === 'function') {
-                    toggleNoteOffline(noteId);
+                    toggleNoteOffline(noteId, !target.classList.contains('offline-state-kept'));
                 }
                 break;
             case 'open-share-modal':
@@ -932,6 +934,7 @@
                         // Use the display map to get the proper label
                         var displayName = window.workspaceDisplayMap[currentWs] || currentWs;
                         titleElement.textContent = displayName;
+                        titleElement.title = displayName;
                     }
                 }
             } catch (e) {

@@ -1138,6 +1138,41 @@ body.markdown-split-card-view .noteentry.markdown-split-mode > .markdown-split-r
     border-right-color: transparent;
 }
 
+/* Preview on the left (discussion 1502, setting markdown_split_preview_left).
+ *
+ * The DOM keeps the editor first, the panes only swap places on screen: the
+ * preview and the handle move to the front, whatever else the note entry
+ * holds stays where it was. --markdown-split-left is still the width of the
+ * left pane, whichever pane that is, so the drag, the arrow keys and the
+ * presets of js/markdown-split-resize.js read the same in both layouts.
+ */
+body.markdown-split-preview-left .noteentry.markdown-split-mode > .markdown-preview {
+    order: -2;
+    flex: 0 0 calc(var(--markdown-split-left, 50%) - var(--markdown-split-gutter, 0px)) !important;
+}
+
+body.markdown-split-preview-left .noteentry.markdown-split-mode > .markdown-split-resizer {
+    order: -1;
+}
+
+body.markdown-split-preview-left .noteentry.markdown-split-mode > .markdown-editor-container {
+    flex: 1 1 0% !important;
+}
+
+/* The unframed panes pad the seam side more than the column edge: mirror it.
+   Framed panes pad all four sides alike and need nothing. */
+body.markdown-split-preview-left:not(.markdown-split-card-view) .noteentry.markdown-split-mode .markdown-preview {
+    padding: 10px 24px 44px 10px !important;
+}
+
+body.markdown-split-preview-left:not(.markdown-split-card-view) .noteentry.markdown-split-mode .markdown-editor:not(.markdown-codemirror-host) {
+    padding: 10px 10px 44px 20px !important;
+}
+
+body.markdown-split-preview-left:not(.markdown-split-card-view) .noteentry.markdown-split-mode .markdown-codemirror-host .cm-content {
+    padding: 10px 10px 44px 20px;
+}
+
 /* Scrollbar styling for split view columns */
 .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar,
 .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar,

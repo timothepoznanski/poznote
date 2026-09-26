@@ -112,7 +112,9 @@ $settingsPageUserKeys = [
     'highlight_current_folder_tree',
     'folder_tree_dim_level',
     'notes_without_folders_after_folders',
+    'sidebar_offline_marks',
     'markdown_split_card_view',
+    'markdown_split_preview_left',
     'markdown_default_view_mode',
     'markdown_colored',
     'markdown_colored_custom',
@@ -265,6 +267,16 @@ if ($isAdmin) {
         // Keep the page usable if the master database is temporarily unavailable.
         error_log('settings: failed: ' . $e->getMessage());
     }
+}
+
+// Count workspaces (badge of the Workspaces card)
+$workspaces_count = 0;
+try {
+    if (isset($con)) {
+        $workspaces_count = (int)$con->query('SELECT COUNT(*) FROM workspaces')->fetchColumn();
+    }
+} catch (Exception $e) {
+    error_log('settings: cannot count workspaces: ' . $e->getMessage());
 }
 
 // Count users (for admin)
@@ -570,6 +582,23 @@ if ($canUseUserWebhooks) {
              which copies of the notes are kept, and where. -->
         <h2 class="settings-category-title" id="settings-actions-section-title"><?php echo t_h('settings.categories.actions'); ?></h2>
         <div class="home-grid settings-grouped" id="settings-actions-section-grid">
+
+            <div class="settings-group-title"><?php echo t_h('settings.groups.organization', [], 'Organization'); ?></div>
+            <div class="settings-group">
+
+                <!-- Workspaces: an <a> card like Backup / Export, so the
+                     workspace the page is scoped to follows the link -->
+                <a href="workspaces.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="workspaces-card" title="<?php echo t_h('settings.cards.workspaces', [], 'Workspaces'); ?>">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.workspaces', [], 'Organize your notes into separate workspaces, each with its own folders and notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-layers"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.workspaces', [], 'Workspaces'); ?></span>
+                        <span id="workspaces-count-badge" class="setting-status enabled"><?php echo (int)$workspaces_count; ?></span>
+                    </div>
+                </a>
+            </div>
 
             <div class="settings-group-title"><?php echo t_h('settings.groups.backup_sync', [], 'Backups & sync'); ?></div>
             <div class="settings-group">
@@ -895,6 +924,18 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
+            <?php if (poznoteOfflineModeEnabled()): ?>
+            <!-- Offline notes marked in the tree (js/offline-marks.js) -->
+            <div class="home-card" id="sidebar-offline-marks-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.sidebar_offline_marks', [], 'Show a small dot next to the notes available offline in this browser.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-circle-dot"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.sidebar_offline_marks', [], 'Show offline dot'); ?></span>
+                    <span id="sidebar-offline-marks-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
+                </div>
+            </div>
+            <?php endif; ?>
+
         </div>
 
         <!-- NOTE CONTENT CATEGORY -->
@@ -1106,6 +1147,16 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.markdown_split_card_view', [], 'Framed markdown'); ?></span>
                     <span id="markdown-split-card-view-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Markdown Split: preview on the left (discussion 1502) -->
+            <div class="home-card" id="markdown-split-preview-left-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_split_preview_left', [], 'In split mode, show the preview on the left and the editor on the right.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-flip-horizontal"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_split_preview_left', [], 'Preview on the left'); ?></span>
+                    <span id="markdown-split-preview-left-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
 
@@ -1509,35 +1560,22 @@ if ($canUseUserWebhooks) {
             </div>
 
             <!-- Contact, GitHub discussions and Discord: links every user sees,
-                 pointing to the Poznote project unless an administrator
-                 changed them (pencil on the card, global settings, empty
-                 value = default, see poznoteAboutLink()). -->
+                 pointing to the Poznote project unless the global setting
+                 says otherwise (see poznoteAboutLink()). -->
             <?php
-            $aboutLinkDefaults = poznoteAboutLinkDefaults();
             $aboutLinks = [];
-            $aboutLinkValues = [];
-            foreach ($aboutLinkDefaults as $aboutLinkKey => $aboutLinkDefault) {
+            foreach (array_keys(poznoteAboutLinkDefaults()) as $aboutLinkKey) {
                 $aboutLinks[$aboutLinkKey] = poznoteAboutLink($aboutLinkKey);
-                $aboutLinkValues[$aboutLinkKey] = $aboutLinks[$aboutLinkKey] === $aboutLinkDefault ? '' : $aboutLinks[$aboutLinkKey];
             }
             ?>
-            <a href="mailto:<?php echo htmlspecialchars($aboutLinks['contact_email'], ENT_QUOTES); ?>" class="home-card" id="contact-card"
-               data-about-link="contact_email" data-about-link-kind="email"
-               data-about-link-value="<?php echo htmlspecialchars($aboutLinkValues['contact_email'], ENT_QUOTES); ?>"
-               data-about-link-default="<?php echo htmlspecialchars($aboutLinkDefaults['contact_email'], ENT_QUOTES); ?>"
-               data-about-link-title="<?php echo t_h('modals.about_link.title_contact_email', [], 'Contact address'); ?>">
+            <a href="mailto:<?php echo htmlspecialchars($aboutLinks['contact_email'], ENT_QUOTES); ?>" class="home-card" id="contact-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.contact', [], 'Send an email to the contact address of this instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <?php if ($isAdmin): ?>
-                <span class="settings-card-edit" role="button" tabindex="0" data-about-link-edit="contact_email"
-                      title="<?php echo t_h('modals.about_link.edit', [], 'Change'); ?>"
-                      aria-label="<?php echo t_h('modals.about_link.edit', [], 'Change'); ?>"><i class="lucide lucide-pencil"></i></span>
-                <?php endif; ?>
                 <div class="home-card-icon">
                     <i class="lucide lucide-mail"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.contact', [], 'Contact'); ?></span>
-                    <span class="setting-status enabled about-link-value"><?php echo htmlspecialchars($aboutLinks['contact_email']); ?></span>
+                    <span class="setting-status enabled"><?php echo htmlspecialchars($aboutLinks['contact_email']); ?></span>
                 </div>
             </a>
 
@@ -1552,17 +1590,8 @@ if ($canUseUserWebhooks) {
                 </div>
             </a>
 
-            <a href="<?php echo htmlspecialchars($aboutLinks['discussions_url'], ENT_QUOTES); ?>" target="_blank" rel="noopener noreferrer" class="home-card" id="discussions-card"
-               data-about-link="discussions_url" data-about-link-kind="url"
-               data-about-link-value="<?php echo htmlspecialchars($aboutLinkValues['discussions_url'], ENT_QUOTES); ?>"
-               data-about-link-default="<?php echo htmlspecialchars($aboutLinkDefaults['discussions_url'], ENT_QUOTES); ?>"
-               data-about-link-title="<?php echo t_h('modals.about_link.title_discussions_url', [], 'GitHub discussions link'); ?>">
+            <a href="<?php echo htmlspecialchars($aboutLinks['discussions_url'], ENT_QUOTES); ?>" target="_blank" rel="noopener noreferrer" class="home-card" id="discussions-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.discussions', [], 'Ask a question or share an idea in the GitHub discussions.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <?php if ($isAdmin): ?>
-                <span class="settings-card-edit" role="button" tabindex="0" data-about-link-edit="discussions_url"
-                      title="<?php echo t_h('modals.about_link.edit', [], 'Change'); ?>"
-                      aria-label="<?php echo t_h('modals.about_link.edit', [], 'Change'); ?>"><i class="lucide lucide-pencil"></i></span>
-                <?php endif; ?>
                 <div class="home-card-icon">
                     <i class="lucide lucide-message-circle"></i>
                 </div>
@@ -1606,17 +1635,8 @@ if ($canUseUserWebhooks) {
                 </div>
             </a>
 
-            <a href="<?php echo htmlspecialchars($aboutLinks['discord_url'], ENT_QUOTES); ?>" target="_blank" rel="noopener noreferrer" class="home-card" id="discord-card"
-               data-about-link="discord_url" data-about-link-kind="url"
-               data-about-link-value="<?php echo htmlspecialchars($aboutLinkValues['discord_url'], ENT_QUOTES); ?>"
-               data-about-link-default="<?php echo htmlspecialchars($aboutLinkDefaults['discord_url'], ENT_QUOTES); ?>"
-               data-about-link-title="<?php echo t_h('modals.about_link.title_discord_url', [], 'Discord link'); ?>">
+            <a href="<?php echo htmlspecialchars($aboutLinks['discord_url'], ENT_QUOTES); ?>" target="_blank" rel="noopener noreferrer" class="home-card" id="discord-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.discord', [], 'Join the Poznote community on Discord.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <?php if ($isAdmin): ?>
-                <span class="settings-card-edit" role="button" tabindex="0" data-about-link-edit="discord_url"
-                      title="<?php echo t_h('modals.about_link.edit', [], 'Change'); ?>"
-                      aria-label="<?php echo t_h('modals.about_link.edit', [], 'Change'); ?>"><i class="lucide lucide-pencil"></i></span>
-                <?php endif; ?>
                 <div class="home-card-icon">
                     <i class="lucide pz-icon-discord"></i>
                 </div>
@@ -1644,24 +1664,6 @@ if ($canUseUserWebhooks) {
     </div>
 
     <?php if ($isAdmin): ?>
-    <!-- Edits one of the About section links (Contact, GitHub discussions,
-         Discord); title and current value come from the card, see
-         initAboutLinkEditors() in js/settings-page.js -->
-    <div id="aboutLinkModal" class="modal">
-        <div class="modal-content">
-            <h3 id="aboutLinkModalTitle"></h3>
-            <p><?php echo t_h('modals.about_link.description', [], 'Shown to every user of this instance in the About section. Leave the field empty to go back to the default:'); ?> <span id="aboutLinkModalDefault" class="about-link-default"></span></p>
-            <input type="text" id="aboutLinkInput" maxlength="255" autocomplete="off"
-                   data-invalid-email="<?php echo t_h('modals.about_link.invalid_email', [], 'Enter a valid email address.'); ?>"
-                   data-invalid-url="<?php echo t_h('modals.about_link.invalid_url', [], 'Enter a valid address starting with http:// or https://.'); ?>" />
-            <p id="aboutLinkError" class="about-link-error" hidden></p>
-            <div class="modal-buttons">
-                <button type="button" class="btn-cancel" data-action="close-modal" data-modal="aboutLinkModal"><?php echo t_h('common.cancel'); ?></button>
-                <button type="button" class="btn-primary" id="aboutLinkSaveBtn"><?php echo t_h('common.save'); ?></button>
-            </div>
-        </div>
-    </div>
-
     <div id="apiRestModal" class="modal">
         <div class="modal-content">
             <h3><?php echo t_h('modals.api_rest.title', [], 'API REST'); ?></h3>

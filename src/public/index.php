@@ -267,6 +267,7 @@ $settings = [
     'code_block_word_wrap' => '1',
     'code_block_line_numbers' => '0',
     'markdown_split_card_view' => '1',
+    'markdown_split_preview_left' => '0',
     'markdown_colored' => '0',
     'markdown_colored_custom' => '',
     'attachment_previews_in_note' => '0',
@@ -276,11 +277,14 @@ $settings = [
     'spellcheck_html_notes' => '0',
     'highlight_current_folder_tree' => '0',
     'folder_tree_dim_level' => '',
-    'markdown_default_view_mode' => 'preview'
+    'markdown_default_view_mode' => 'preview',
+    'sidebar_offline_marks' => '1',
+    'favorites_sort' => POZNOTE_FAVORITES_SORT_DEFAULT,
+    'favorites_icon_color' => ''
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level', 'markdown_default_view_mode')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_split_preview_left', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level', 'markdown_default_view_mode', 'sidebar_offline_marks', 'favorites_sort', 'favorites_icon_color')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -465,6 +469,9 @@ if (poznoteSettingEnabled($settings['highlight_current_folder_tree'], false)) {
 if (poznoteSettingEnabled($settings['markdown_split_card_view'], true)) {
     $extra_body_classes .= ' markdown-split-card-view';
 }
+if (poznoteSettingEnabled($settings['markdown_split_preview_left'], false)) {
+    $extra_body_classes .= ' markdown-split-preview-left';
+}
 // Mode markdown notes with content open in (js/markdown-view-modes.js reads
 // it from <body data-markdown-default-mode>). 'last' follows the mode last
 // used on any note, which is how every note opened before this setting.
@@ -483,11 +490,15 @@ if (poznoteMarkdownColoredEnabled($settings['markdown_colored'])) {
 $attachment_previews_in_note_setting = poznoteSettingEnabled($settings['attachment_previews_in_note'], false);
 $attachments_at_bottom_setting = poznoteSettingEnabled($settings['attachments_at_bottom'], false);
 $backlinks_at_bottom_setting = poznoteSettingEnabled($settings['backlinks_at_bottom'], false);
-// The one sort order of the tree (#1442), stepped through by the button in the
-// sidebar title row. src/lib/note-sort.php holds the modes and the comparators;
-// the SQL below only pre-orders the rows, organizeNotesByFolder() and
-// sortFolders() decide what the sidebar shows.
+// The one sort order of the tree (#1442), stepped through by the button at the
+// top of the notes list. src/lib/note-sort.php holds the modes and the
+// comparators; the SQL below only pre-orders the rows, organizeNotesByFolder()
+// and sortFolders() decide what the sidebar shows.
 $note_list_sort_type = poznoteNormalizeNoteSort($settings['note_list_sort']);
+// Favorites keeps an order and a star colour of its own, set from its
+// right-click menu (notes_list.php, js/favorites-menu.js)
+$favorites_sort_type = poznoteNormalizeFavoritesSort($settings['favorites_sort']);
+$favorites_icon_color = preg_match('/^#[0-9a-f]{6}$/i', (string)$settings['favorites_icon_color']) ? (string)$settings['favorites_icon_color'] : '';
 $notes_without_folders_after = poznoteSettingEnabled($settings['notes_without_folders_after_folders'], true);
 
 $folder_null_case = $notes_without_folders_after ? '1' : '0';
@@ -696,7 +707,7 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
             }
         }
     }
-    $expandFoldersButton = '<button class="sidebar-folder-toggle" id="sidebarExpandFoldersBtn" data-action="toggle-all-folders" title="' . t_h('sidebar.expand_all_folders', [], 'Expand all folders') . '" aria-label="' . t_h('sidebar.expand_all_folders', [], 'Expand all folders') . '">'
+    $expandFoldersButton = '<button type="button" class="sidebar-folder-toggle" id="sidebarExpandFoldersBtn" data-action="toggle-all-folders" title="' . t_h('sidebar.expand_all_folders', [], 'Expand all folders') . '" aria-label="' . t_h('sidebar.expand_all_folders', [], 'Expand all folders') . '">'
         . '<i class="lucide lucide-chevrons-up-down"></i>'
         . '</button>';
 
@@ -707,6 +718,29 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
     // the new mode on every sidebar refresh, so data-sort-mode stays true.
     [$noteSortLabelKey, $noteSortLabelFallback] = poznoteNoteSortLabel($note_list_sort_type);
     $noteSortTitle = t_h('sort.button_title', ['mode' => t($noteSortLabelKey, [], $noteSortLabelFallback)], 'Sort by: {{mode}}');
+    // The sort mode is a setting of the account being looked at. The button
+    // sits with "Expand all folders" on the row after Favorites (notes_list.php).
+    $noteSortButton = $canWriteAccountSettings
+        ? '<button type="button" class="sidebar-folder-toggle" id="sidebarSortBtn" data-action="cycle-note-sort" data-sort-mode="' . htmlspecialchars($note_list_sort_type, ENT_QUOTES) . '" title="' . $noteSortTitle . '" aria-label="' . $noteSortTitle . '">'
+            . '<i class="lucide ' . htmlspecialchars(poznoteNoteSortIcon($note_list_sort_type), ENT_QUOTES) . '"></i>'
+            . '</button>'
+        : '';
+
+    // Offline dots of the tree (sidebar_offline_marks, the "Show offline dot"
+    // card of Settings), left of the sort button: blue while shown, grey while
+    // hidden. js/offline-marks.js saves the setting and redraws the dots.
+    // Offline copies are kept for the login's own account only.
+    $offlineDotsShown = poznoteSettingEnabled($settings['sidebar_offline_marks'], true);
+    $offlineDotsTitle = $offlineDotsShown
+        ? t_h('sidebar.hide_offline_dots', [], 'Hide offline dots')
+        : t_h('sidebar.show_offline_dots', [], 'Show offline dots');
+    $offlineDotsButton = ($canWriteAccountSettings && poznoteOfflineModeEnabled())
+        ? '<button type="button" class="sidebar-folder-toggle offline-dots-toggle' . ($offlineDotsShown ? ' is-on' : '') . '" id="sidebarOfflineDotsBtn" data-action="toggle-offline-dots" aria-pressed="' . ($offlineDotsShown ? 'true' : 'false') . '"'
+            . ' data-title-show="' . t_h('sidebar.show_offline_dots', [], 'Show offline dots') . '" data-title-hide="' . t_h('sidebar.hide_offline_dots', [], 'Hide offline dots') . '"'
+            . ' title="' . $offlineDotsTitle . '" aria-label="' . $offlineDotsTitle . '">'
+            . '<i class="lucide lucide-circle-dot"></i>'
+            . '</button>'
+        : '';
     ?>
 
     <!-- MENU RIGHT COLUMN -->	 
@@ -718,19 +752,23 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
             // "New workspace" entries (js/workspaces-core.js), and in a shared
             // workspace the way back to the person's own account.
             ?>
+            <?php
+            // A colored workspace (workspaces.php > Color) leads its title with
+            // its dot, as in the workspace menu and on the secondary pages
+            $titleWorkspaceColors = poznoteGetWorkspaceColorsMap($con);
+            $titleWorkspaceHex = (string)($titleWorkspaceColors[(string)$workspace_filter]['hex'] ?? '');
+            if (!preg_match('/^#[0-9a-f]{3,8}$/i', $titleWorkspaceHex)) {
+                $titleWorkspaceHex = '';
+            }
+            ?>
             <div class="sidebar-title" role="button" tabindex="0" data-action="toggle-workspace-menu">
-                <span class="poznote-logo workspace-title-icon" role="img" aria-label="Poznote"></span>
-                <span class="workspace-title-text"><?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?></span>
+                <?php if ($titleWorkspaceHex !== ''): ?>
+                <span class="workspace-title-dot" style="background-color: <?php echo htmlspecialchars($titleWorkspaceHex, ENT_QUOTES); ?>" aria-hidden="true"></span>
+                <?php endif; ?>
+                <span class="workspace-title-text" title="<?php echo $displayWorkspace; ?>"><?php echo $displayWorkspace; ?></span>
                 <i class="lucide lucide-caret-down workspace-dropdown-icon"></i>
             </div>
             <div class="sidebar-title-actions">
-                    <?php // The sort mode is a setting of the account being looked at ?>
-                    <?php if ($canWriteAccountSettings): ?>
-                    <button class="sidebar-folder-toggle" id="sidebarSortBtn" data-action="cycle-note-sort" data-sort-mode="<?php echo htmlspecialchars($note_list_sort_type, ENT_QUOTES); ?>" title="<?php echo $noteSortTitle; ?>" aria-label="<?php echo $noteSortTitle; ?>">
-                        <i class="lucide <?php echo htmlspecialchars(poznoteNoteSortIcon($note_list_sort_type), ENT_QUOTES); ?>"></i>
-                    </button>
-                    <?php endif; ?>
-                    <?php if (!$showAccountRows) echo $expandFoldersButton; ?>
                     <button class="sidebar-folder-toggle<?php echo $notifications_count > 0 ? ' has-notifications' : ''; ?>" id="sidebarNotificationsBtn" data-action="open-notifications-modal" title="<?php echo t_h('reminder.notifications', [], 'Notifications'); ?>" aria-label="<?php echo t_h('reminder.notifications', [], 'Notifications'); ?>"<?php echo $notifications_total > 0 ? '' : ' hidden'; ?>>
                         <i class="lucide lucide-bell"></i>
                     </button>
@@ -766,6 +804,8 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
             'defaultNoteSortType' => $note_list_sort_type,
             'isAdmin' => function_exists('isCurrentUserAdmin') && isCurrentUserAdmin(),
             'canUseSettingsApi' => !function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser(),
+            // Settings > Offline notes: off, js/offline-sync.js only empties this browser's copies
+            'offlineMode' => poznoteOfflineModeEnabled(),
             'settings' => [
                 'emoji_icons_enabled' => getSetting('emoji_icons_enabled', '1'),
                 'slash_menu_trigger' => getSetting('slash_menu_trigger', 'slash'),
@@ -795,7 +835,7 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
             $uncategorized_notes = $organized['uncategorized_notes'];
 
             // Handle favorites (including uncategorized notes)
-            $folders = handleFavorites($folders, $uncategorized_notes);
+            $folders = handleFavorites($folders, $uncategorized_notes, $favorites_sort_type);
 
             // Track folders with search results for favorites
             $folders_with_results = [];
@@ -981,6 +1021,14 @@ window.NOTIFICATIONS_TXT = {
 };
 </script>
 <script defer src="index_js.php?group=app&v=<?php echo $v; ?>"></script>
+<?php if (poznoteOfflineModeEnabled()): ?>
+<?php // Marks the notes of the tree this browser holds offline (after the app bundle, which loads offline-store.js);
+      // loaded while the dots are hidden too, so the sidebar button shows them at once ?>
+<script src="<?php echo poznoteAsset('js/offline-marks.js'); ?>" defer
+    data-sidebar="<?php echo poznoteSettingEnabled($settings['sidebar_offline_marks'], true) ? 'on' : 'off'; ?>"
+    data-note-title="<?php echo t_h('notes_list.note_actions.available_offline', [], 'Available offline in this browser'); ?>"
+    data-folder-title="<?php echo t_h('notes_list.folder_actions.kept_offline', [], 'Kept offline in this browser'); ?>"></script>
+<?php endif; ?>
 
 <?php if ($note && is_numeric($note)): ?>
 <!-- Data for draft check (used by index-events.js) -->

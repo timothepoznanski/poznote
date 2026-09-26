@@ -1701,6 +1701,8 @@ class NotesController {
     /**
      * PUT /api/v1/notes/{id}/offline - keep the note in the browser whatever
      * its date (lib/offline.php), or stop doing so. Body: {"offline": bool}.
+     * Stopping a note the browser would still keep on its own (recent,
+     * favorite, in a folder kept offline) marks it -1, which keeps it out.
      */
     public function updateOffline(string $id): void {
         if (!is_numeric($id)) {
@@ -1722,15 +1724,21 @@ class NotesController {
         }
 
         try {
-            $existsStmt = $this->con->prepare('SELECT id FROM entries WHERE id = ? AND trash = 0');
+            $existsStmt = $this->con->prepare('SELECT id, folder_id, favorite, updated FROM entries WHERE id = ? AND trash = 0');
             $existsStmt->execute([$noteId]);
-            if (!$existsStmt->fetchColumn()) {
+            $note = $existsStmt->fetch(PDO::FETCH_ASSOC);
+            if (!$note) {
                 $this->sendError(404, 'Note not found');
                 return;
             }
 
+            $mark = 1;
+            if (!$offline) {
+                $mark = $this->offlineReasonWithoutMark($note) !== null ? -1 : 0;
+            }
+
             $stmt = $this->con->prepare('UPDATE entries SET offline = ? WHERE id = ?');
-            if (!$stmt->execute([$offline ? 1 : 0, $noteId])) {
+            if (!$stmt->execute([$mark, $noteId])) {
                 $this->sendError(500, 'Database error while updating offline state');
                 return;
             }
@@ -1742,6 +1750,23 @@ class NotesController {
         } catch (Exception $e) {
             $this->sendError(500, 'Database error occurred');
         }
+    }
+
+    /**
+     * Why the browser would keep the note offline if it were not marked
+     * either way (lib/offline.php): 'folder', 'favorite', 'recent' or null.
+     */
+    private function offlineReasonWithoutMark(array $note): ?string {
+        require_once __DIR__ . '/../../../lib/offline.php';
+        $raw = function_exists('getSetting') ? getSetting('offline_notes_days', null) : null;
+        $days = poznoteOfflineDays($raw, POZNOTE_OFFLINE_DEFAULT_DAYS, POZNOTE_OFFLINE_MAX_DAYS);
+        if ($days <= 0) {
+            return null;
+        }
+        $folders = $this->con->query('SELECT id, parent_id, offline FROM folders')->fetchAll(PDO::FETCH_ASSOC);
+        $cutoff = gmdate('Y-m-d H:i:s', time() - $days * 86400);
+        $note['offline'] = 0;
+        return poznoteOfflineReason($note, $cutoff, poznoteOfflineFolderIds($folders));
     }
 
     public function updatePinned(string $id): void {
@@ -2326,6 +2351,44 @@ class NotesController {
     }
     
     /**
+     * POST /api/v1/notes/favorites/clear?workspace=X
+     * Empty the Favorites section of a workspace: every note and every folder
+     * of it loses its favorite flag. The workspace is required, since the
+     * section is per workspace; in a shared workspace auth.php pins it to that
+     * workspace.
+     */
+    public function clearFavorites() {
+        $workspace = $_GET['workspace'] ?? null;
+        if (!is_string($workspace) || trim($workspace) === '') {
+            $input = json_decode(file_get_contents('php://input'), true);
+            $workspace = is_array($input) && isset($input['workspace']) && is_string($input['workspace']) ? $input['workspace'] : '';
+        }
+        $workspace = trim((string)$workspace);
+        if ($workspace === '') {
+            $this->sendError(400, 'workspace is required');
+            return;
+        }
+
+        try {
+            $this->con->beginTransaction();
+            $notes = $this->con->prepare("UPDATE entries SET favorite = 0 WHERE favorite = 1 AND workspace = ?");
+            $notes->execute([$workspace]);
+            $folders = $this->con->prepare("UPDATE folders SET favorite = 0 WHERE favorite = 1 AND workspace = ?");
+            $folders->execute([$workspace]);
+            $this->con->commit();
+            $this->sendSuccess([
+                'notes' => $notes->rowCount(),
+                'folders' => $folders->rowCount(),
+            ]);
+        } catch (Exception $e) {
+            if ($this->con->inTransaction()) {
+                $this->con->rollBack();
+            }
+            $this->sendError(500, 'Error clearing favorites: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Clone a note with optional overrides for folder, heading prefix, etc.
      * Backs duplicate().
      *
@@ -2638,27 +2701,30 @@ class NotesController {
             $conditions = [];
             $params = [];
             if ($templateFolderIds) {
-                $conditions[] = "folder_id IN (" . implode(',', array_fill(0, count($templateFolderIds), '?')) . ")";
+                $conditions[] = "e.folder_id IN (" . implode(',', array_fill(0, count($templateFolderIds), '?')) . ")";
                 $params = array_merge($params, $templateFolderIds);
             }
             if ($templateWorkspaces) {
-                $conditions[] = "workspace IN (" . implode(',', array_fill(0, count($templateWorkspaces), '?')) . ")";
+                $conditions[] = "e.workspace IN (" . implode(',', array_fill(0, count($templateWorkspaces), '?')) . ")";
                 $params = array_merge($params, $templateWorkspaces);
             }
 
-            $sql = "SELECT id, heading, type, workspace, folder_id, icon, icon_color
-                    FROM entries
-                    WHERE trash = 0
-                    AND (type IS NULL OR type = '' OR type IN ('note', 'markdown'))
+            // The folder name labels each template in the picker
+            $sql = "SELECT e.id, e.heading, e.type, e.workspace, e.folder_id, e.icon, e.icon_color,
+                           f.name AS folder_name
+                    FROM entries e
+                    LEFT JOIN folders f ON f.id = e.folder_id
+                    WHERE e.trash = 0
+                    AND (e.type IS NULL OR e.type = '' OR e.type IN ('note', 'markdown'))
                     AND (" . implode(' OR ', $conditions) . ")";
             // A session confined to a shared workspace (auth.php) takes its
             // templates from that workspace only.
             $scopeName = function_exists('getSharedWorkspaceScopeName') ? getSharedWorkspaceScopeName() : null;
             if ($scopeName !== null) {
-                $sql .= " AND workspace = ?";
+                $sql .= " AND e.workspace = ?";
                 $params[] = $scopeName;
             }
-            $sql .= " ORDER BY heading COLLATE NOCASE, id";
+            $sql .= " ORDER BY e.heading COLLATE NOCASE, e.id";
 
             $stmt = $this->con->prepare($sql);
             $stmt->execute($params);
@@ -2671,6 +2737,7 @@ class NotesController {
                     'type' => ($row['type'] === 'markdown') ? 'markdown' : 'note',
                     'workspace' => $row['workspace'] ?? null,
                     'folder_id' => $row['folder_id'] !== null ? (int)$row['folder_id'] : null,
+                    'folder' => $row['folder_name'] ?? null,
                     'icon' => $this->normalizeNoteIcon($row['icon'] ?? null) ?? self::DEFAULT_NOTE_ICON,
                     'icon_color' => $row['icon_color'] ?? null
                 ];

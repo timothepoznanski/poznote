@@ -79,14 +79,14 @@ $iconSidebarCurrentPage = $iconSidebarBasePath === '' ? basename($iconSidebarScr
 // over to the About button to keep the rail matching the cleaned URL.
 $iconSidebarIsAboutView = $iconSidebarCurrentPage === 'settings.php' && (($_GET['open'] ?? '') === 'about');
 
-// Four groups, top to bottom: the entry points into the app (Home, Dashboard,
+// Four groups, top to bottom: the entry points into the app (Dashboard,
 // Graph), the views that hold the content itself (Notes, Tasks, Folders,
 // Diary), the collections derived from that content (Tags, Shares,
 // Attachments), and the Trash on its own. A separator is drawn between two
 // consecutive entries of different groups. Favorites has no entry: it is a
-// dashboard filter, reached from the notes list's system folder.
+// dashboard filter, reached from the notes list's system folder. Home has no
+// entry either: the Poznote mark at the top of the rail is the Home link.
 $iconSidebarItems = [
-    ['id' => 'iconSidebarHomeBtn', 'group' => 'home', 'url' => $iconSidebarUrl('index.php'), 'page' => 'index.php', 'icon' => 'lucide-home', 'label' => t('common.home', [], 'Home')],
     ['id' => 'iconSidebarDashboardBtn', 'group' => 'home', 'url' => $iconSidebarUrl('dashboard.php'), 'page' => 'dashboard.php', 'icon' => 'lucide-layout-dashboard', 'label' => t('common.back_to_home', [], 'Dashboard')],
     ['id' => 'iconSidebarGraphBtn', 'group' => 'home', 'url' => $iconSidebarUrl('graph.php'), 'page' => 'graph.php', 'icon' => 'lucide-network', 'label' => t('home.graph', [], 'Graph')],
     ['id' => 'iconSidebarNotesBtn', 'group' => 'content', 'url' => $iconSidebarUrl('notes_manager.php'), 'page' => 'notes_manager.php', 'icon' => 'lucide-sticky-note', 'label' => t('common.notes', [], 'Notes')],
@@ -112,8 +112,10 @@ if ($iconSidebarSharedScopeActive) {
     }));
 }
 
-// Offline copies are kept for the login's own account only (OfflineController)
-if (function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser()) {
+// Offline copies are kept for the login's own account only (OfflineController),
+// and only while offline mode is on (Settings > Offline notes)
+if ((function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser())
+    || (function_exists('poznoteOfflineModeEnabled') && !poznoteOfflineModeEnabled())) {
     $iconSidebarItems = array_values(array_filter($iconSidebarItems, static function (array $item): bool {
         return ($item['page'] ?? '') !== 'offline_notes.php';
     }));
@@ -470,6 +472,18 @@ try {
 }
 </script>
 <nav id="icon_sidebar">
+    <?php
+    // The Poznote mark, fixed above the entries, is the Home link. It keeps the
+    // id the Home entry had: js/icon-sidebar-toggle.js (syncHomeLink) and
+    // js/tabs.js (_syncHomeLink) point its href at what the tabs will show
+    // (issues #1462, #1488). Not an .icon-sidebar-btn, so the ordering, the
+    // overflow menu and the right-click menu skip it.
+    $iconSidebarHomeLabel = t_h('common.home', [], 'Home');
+    $iconSidebarHomeIsCurrent = $iconSidebarCurrentPage === 'index.php';
+    ?>
+    <a href="<?php echo htmlspecialchars($iconSidebarUrl('index.php'), ENT_QUOTES, 'UTF-8'); ?>" id="iconSidebarHomeBtn" class="icon-sidebar-logo" title="<?php echo $iconSidebarHomeLabel; ?>" aria-label="<?php echo $iconSidebarHomeLabel; ?>"<?php echo $iconSidebarHomeIsCurrent ? ' aria-current="page"' : ''; ?>>
+        <span class="poznote-logo" aria-hidden="true"></span>
+    </a>
     <div class="icon-sidebar-scroll">
     <?php foreach ($iconSidebarItems as $iconSidebarItem): ?>
     <?php if (!empty($iconSidebarItem['divider'])): ?>

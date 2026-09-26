@@ -506,6 +506,7 @@
       "notes_without_folders": "Affichez les notes sans dossier après la liste des dossiers plutôt qu'avant.",
       "note_width": "Ajustez la largeur maximale du contenu des notes, en pourcentage de la colonne de note.",
       "markdown_split_card_view": "Affichez les notes markdown dans une vue scindée encadrée avec éditeur et aperçu.",
+      "markdown_split_preview_left": "En mode scindé, affiche l'aperçu à gauche et l'éditeur à droite.",
       "markdown_colored": "Colorez les notes markdown : choisissez une couleur pour chaque niveau de titre, le code en ligne, le fond des blocs de code, les citations, les en-têtes de tableaux et les séparateurs.",
       "code_wrap": "Renvoyez à la ligne les longues lignes des blocs de code au lieu de défiler horizontalement.",
       "code_line_numbers": "Affichez les numéros de ligne dans les blocs de code de l'aperçu markdown.",
@@ -545,7 +546,8 @@
       "s3_backup": "Envoie des archives de sauvegarde complètes vers un bucket compatible S3, manuellement ou selon une planification.",
       "highlight_current_folder_tree": "Estomper, autant que vous le souhaitez, les notes et les dossiers situés en dehors de la hiérarchie de dossiers dans laquelle vous travaillez.",
       "snapshots": "Choisissez combien de snapshots automatiques quotidiens et combien de snapshots de sécurité (avant une modification IA ou MCP) sont conservés par note.",
-      "stt": "Configurer le serveur de reconnaissance vocale utilisé pour dicter des notes et transcrire les pièces jointes audio."
+      "stt": "Configurer le serveur de reconnaissance vocale utilisé pour dicter des notes et transcrire les pièces jointes audio.",
+      "sidebar_offline_marks": "Affiche une petite pastille à côté des notes disponibles hors ligne dans ce navigateur."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Sur mobile, la barre d'outils au-dessus du clavier a un bouton + qui ouvre le même menu, quel que soit ce réglage."
@@ -584,7 +586,8 @@
       "profile_sign_in": "Profil et connexion",
       "language_region": "Langue et région",
       "storage": "Stockage",
-      "layout": "Mise en page"
+      "layout": "Mise en page",
+      "organization": "Organisation"
     },
     "sections": {
       "account_display": "Compte & Affichage",
@@ -834,6 +837,10 @@
       "shared": "Partagé",
       "shared_with": "Partagé avec",
       "tags": "Étiquettes"
+    },
+    "filter": {
+      "placeholder": "Filtrer par nom ou tag...",
+      "no_results": "Aucun espace de travail ne correspond à ce filtre."
     }
   },
   "display": {
@@ -861,6 +868,7 @@
       "index_icon_scale": "Taille des icônes (Index)",
       "note_content_width": "Largeur du contenu de la note",
       "markdown_split_card_view": "Markdown encadré",
+      "markdown_split_preview_left": "Aperçu à gauche",
       "markdown_colored": "Markdown coloré",
       "code_block_word_wrap": "Retour à la ligne des blocs de code",
       "code_block_line_numbers": "Numéros de ligne des blocs de code",
@@ -873,7 +881,8 @@
       "spellcheck_html_notes": "Vérification orthographique",
       "slash_menu_trigger": "Raccourci du menu de commandes (ordinateur)",
       "slash_menu_trigger_mobile": "Raccourci du menu de commandes (mobile)",
-      "snapshots": "Snapshots"
+      "snapshots": "Snapshots",
+      "sidebar_offline_marks": "Afficher le point hors ligne"
     },
     "badges": {
       "font_size_default": "par défaut ({{size}}px)",
@@ -908,6 +917,7 @@
     "expand_all_folders": "Tout déplier",
     "collapse_all_folders": "Tout replier",
     "toggle": "Cacher/Afficher la colonne de gauche",
+    "hide_left_column": "Masquer la colonne de gauche",
     "toggle_icon_sidebar": "Cacher/Afficher la barre d'icônes",
     "show_hidden_icons": "Afficher les icônes masquées",
     "other_accounts": {
@@ -916,7 +926,9 @@
       "empty": "Aucune note",
       "open": "Ouvrir ce compte",
       "view_here": "Afficher dans un onglet, sans changer de compte"
-    }
+    },
+    "show_offline_dots": "Afficher les points hors ligne",
+    "hide_offline_dots": "Masquer les points hors ligne"
   },
   "home": {
     "title": "Tableau de bord",
@@ -958,16 +970,13 @@
     "confirm_navigation": "⚠️ Modifications non enregistrées\n\nVous avez des modifications non enregistrées qui seront perdues.\nEnregistrer avant de quitter la page ?",
     "notification": {
       "saving": "Enregistrement des modifications…",
-      "saved": "Enregistré !",
-      "not_saved_yet": "Vos dernières modifications n'ont pas encore pu être enregistrées. Elles sont conservées sur cet appareil et Poznote réessaie.",
-      "kept_as_draft": "Pas encore enregistré, vos modifications sont conservées sur cet appareil"
+      "saved": "Enregistré !"
     },
     "draft": {
       "found_conflict": "Cette note contient des modifications non enregistrées de votre dernière visite, mais elle a aussi été modifiée ailleurs depuis. La version que vous ne gardez pas reste dans l'historique de la note.",
       "found_error": "Cette note contient des modifications non enregistrées de votre dernière visite. Elles n'ont pas encore pu être enregistrées.",
       "restore": "Garder mes modifications non enregistrées",
       "discard": "Garder la version actuelle",
-      "restored": "Vos dernières modifications ont été récupérées et enregistrées.",
       "restore_failed": "Vos modifications n'ont pas pu être enregistrées. Vérifiez votre connexion et réessayez."
     },
     "unsaved_changes_title": "Modifications non enregistrées",
@@ -1296,15 +1305,6 @@
       "title": "Nom affiché à la connexion",
       "description": "Définissez le nom affiché sur l’écran de connexion.",
       "placeholder": "Nom affiché"
-    },
-    "about_link": {
-      "title_contact_email": "Adresse de contact",
-      "title_discussions_url": "Lien des discussions GitHub",
-      "title_discord_url": "Lien Discord",
-      "description": "Affiché pour tous les utilisateurs de cette instance dans la section À propos. Laissez le champ vide pour revenir à la valeur par défaut :",
-      "edit": "Modifier",
-      "invalid_email": "Saisissez une adresse e-mail valide.",
-      "invalid_url": "Saisissez une adresse valide commençant par http:// ou https://."
     },
     "custom_css": {
       "title": "CSS personnalisé",
@@ -1932,6 +1932,14 @@
       "stop_offline": "Ne plus garder hors ligne",
       "available_offline": "Disponible hors ligne dans ce navigateur",
       "not_available_offline": "Pas disponible hors ligne dans ce navigateur"
+    },
+    "favorites_menu": {
+      "title": "Actions des favoris",
+      "clear": "Tout retirer des favoris",
+      "clear_confirm_title": "Tout retirer des favoris ?",
+      "clear_confirm_message": "Toutes les notes et tous les dossiers de cet espace de travail sortent des favoris. Les notes et les dossiers eux-mêmes sont conservés.",
+      "clear_button": "Tout retirer",
+      "error": "Impossible de modifier les favoris"
     }
   },
   "tree_history": {
@@ -2155,6 +2163,10 @@
     "template_none": "Aucun modèle pour l'instant",
     "template_none_hint": "Placez des notes dans un dossier ou un espace de travail nommé « Modèles »",
     "template_insert_failed": "Impossible d'insérer le modèle",
+    "template_picker_title": "Insérer un modèle",
+    "template_filter_placeholder": "Filtrer les modèles...",
+    "template_no_match": "Aucun modèle ne correspond à ce filtre",
+    "template_load_failed": "Impossible de charger les modèles",
     "record_audio": "Enregistrer un audio",
     "insert": "Insérer",
     "media": "Médias",
@@ -5206,6 +5218,8 @@
       "offline_no_copies": "Vous êtes hors ligne. Les modifications seront enregistrées au retour de la connexion."
     },
     "settings": {
+      "enable": "Activer le mode hors ligne",
+      "enable_hint": "Désactivé, aucune note n'est conservée dans le navigateur et toutes les options et indicateurs hors ligne disparaissent de l'application.",
       "card": "Notes hors ligne",
       "help": "Conserver dans votre navigateur les notes modifiées récemment, pour les ouvrir et les modifier sans réseau.",
       "badge": "{{days}} derniers jours",

@@ -207,25 +207,6 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     background-color: var(--pz-surface-hover);
 }
 
-/* A line that only informs (the note's offline availability): no hover, no
-   pointer. The [hidden] attribute keeps it out until the state is known. */
-.note-actions-menu-item.menu-info {
-    color: var(--pz-text-muted);
-    cursor: default;
-}
-
-.note-actions-menu-item.menu-info:hover {
-    background-color: transparent;
-}
-
-.note-actions-menu-item.menu-info[hidden] {
-    display: none;
-}
-
-.note-actions-menu-item.offline-availability.is-available i {
-    color: var(--pz-success-text);
-}
-
 .folder-actions-menu-item i,
 .note-actions-menu-item i,
 .create-menu-item i {
@@ -241,26 +222,57 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     color: var(--pz-text);
 }
 
-/* Destructive and "already shared" items */
+/* Destructive items */
 .folder-actions-menu-item.danger,
-.folder-actions-menu-item.shared,
-.note-actions-menu-item.danger,
-.note-actions-menu-item.shared {
+.note-actions-menu-item.danger {
     color: var(--pz-danger-text);
 }
 
 .folder-actions-menu-item.danger:hover,
-.folder-actions-menu-item.shared:hover,
-.note-actions-menu-item.danger:hover,
-.note-actions-menu-item.shared:hover {
+.note-actions-menu-item.danger:hover {
     background-color: var(--pz-danger-soft);
 }
 
 .folder-actions-menu-item.danger i,
-.folder-actions-menu-item.shared i,
-.note-actions-menu-item.danger i,
-.note-actions-menu-item.shared i {
+.note-actions-menu-item.danger i {
     color: var(--pz-danger-text);
+}
+
+/* Items that show a state the folder or note is in (Is shared, Remove from
+   favorites, Stop keeping offline): in the accent colour, so the current
+   state reads at a glance without looking destructive */
+.folder-actions-menu-item.active-state,
+.note-actions-menu-item.active-state,
+.folder-actions-menu-item.active-state i,
+.note-actions-menu-item.active-state i {
+    color: var(--pz-accent-text);
+}
+
+.folder-actions-menu-item.active-state:hover,
+.note-actions-menu-item.active-state:hover {
+    background-color: var(--pz-accent-soft);
+}
+
+/* Favorites menu (notes_list.php, js/favorites-menu.js): the "Sort by"
+   heading over its orders, the current one in the accent colour (active-state)
+   with a check at the end of the row */
+.favorites-menu-label {
+    padding: 6px 14px 2px;
+    font-size: 11px;
+    font-weight: var(--pz-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--pz-text-muted);
+}
+
+.folder-actions-menu-item .favorites-sort-check {
+    margin-left: auto;
+    padding-left: 12px;
+    visibility: hidden;
+}
+
+.folder-actions-menu-item.favorites-sort-active .favorites-sort-check {
+    visibility: visible;
 }
 
 /* Separator in menu */

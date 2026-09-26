@@ -174,7 +174,7 @@ $search_combined_value = ($search_in_notes_value === '1' && $search_in_tags_valu
 <?php
 // $showAccountRows, $activeAccountProfile and $otherAccountProfiles are decided
 // by index.php before the sidebar header (the "Expand all folders" button
-// moves between the title row and the account row below).
+// moves between the row after Favorites and the account row below).
 $otherAccountProfiles = $otherAccountProfiles ?? [];
 $activeAccountProfile = $activeAccountProfile ?? null;
 $showAccountRows = !empty($showAccountRows);
@@ -222,7 +222,7 @@ $renderOtherAccounts = static function (array $profiles): void {
 // whole own tree), with the "Expand all folders" button at its end, where the
 // other rows carry their "Open this account" arrow. Only where several
 // accounts are reachable: with a single one no row names the tree and the
-// button stays in the title row (index.php).
+// button stays on the row after Favorites.
 if ($showAccountRows):
     $activeAccountName = htmlspecialchars((string)($activeAccountProfile['username'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 ?>
@@ -238,6 +238,32 @@ if ($showAccountRows):
 <?php endif; ?>
 
 <?php
+
+/**
+ * Whether a note has its own public link, which picks the share variant of
+ * the note actions menu.
+ *
+ * Pre-loads shared_notes on first call so the tree costs one query instead of
+ * one per note, mirroring the shared-folders cache in generateFolderActions().
+ */
+function isNoteShared($noteId) {
+    global $con;
+    static $sharedNotesCache = null;
+
+    if ($sharedNotesCache === null) {
+        $sharedNotesCache = [];
+        try {
+            $stmt = $con->query('SELECT note_id FROM shared_notes');
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $sharedNotesCache[(int)$row['note_id']] = true;
+            }
+        } catch (Exception $e) {
+            $sharedNotesCache = [];
+        }
+    }
+
+    return isset($sharedNotesCache[(int)$noteId]);
+}
 
 function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $folderName) {
     global $show_note_icons_setting;
@@ -274,7 +300,7 @@ function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $f
     echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . htmlspecialchars((string)$noteDbId, ENT_QUOTES) . "' data-note-db-id='" . htmlspecialchars((string)$noteDbId, ENT_QUOTES) . "' data-note-type='" . $htmlNoteType . "'" . $linkedNoteIdAttr . " data-folder-id='$htmlFolderId' data-folder='$htmlFolderName' data-created='" . $htmlCreated . "' data-updated='" . $htmlUpdated . "' draggable='true' data-action='load-note' data-dblaction='open-note-new-tab'>";
     echo "<span class='note-title'>" . $noteIcon . $noteTypeIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
     echo "</a>";
-    echo generateNoteActions($noteDbId, $noteTitle, $noteType, $folderId, $folderName, !empty($row1['favorite']), !empty($row1['offline']));
+    echo generateNoteActions($noteDbId, $noteTitle, $noteType, $folderId, $folderName, !empty($row1['favorite']), (int)($row1['offline'] ?? 0) > 0, isNoteShared($noteDbId));
     echo "</div>";
     echo "<div class='pxbetweennotes'></div>";
 }
@@ -331,7 +357,7 @@ function findFolderPathByName($nodes, $name, $path = []) {
 }
 
 function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined = false, $displayUncategorizedFirst = true, $created_from = '', $created_to = '') {
-    global $selected_linked_note_id, $favorite_folders, $folder_tree_active_id, $folder_tree_ancestors;
+    global $selected_linked_note_id, $favorite_folders, $folder_tree_active_id, $folder_tree_ancestors, $favorites_icon_color;
     $folderName = $folderData['name'];
     $notes = $folderData['notes'];
 
@@ -397,7 +423,11 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         
         // Use an empty star icon for the Favorites pseudo-folder
         if ($folderName === 'Favorites') {
-            echo "<i class='lucide lucide-star folder-icon'></i>";
+            // Its colour is a setting (favorites_icon_color), set from the
+            // Favorites right-click menu
+            $favoritesIconCss = poznoteIconColorCss($favorites_icon_color ?? '');
+            $favoritesIconStyle = $favoritesIconCss !== '' ? " style='color: " . htmlspecialchars($favoritesIconCss, ENT_QUOTES) . " !important;'" : "";
+            echo "<i class='lucide lucide-star folder-icon'$favoritesIconStyle></i>";
         } else {
             $changeIconTitle = t_h('notes_list.folder_actions.change_icon', [], 'Change icon');
             $customIconColorCss = poznoteIconColorCss($customIconColor);
@@ -420,6 +450,10 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         $noteCount = countNotesRecursively($folderData);
         echo "<span class='folder-note-count' id='count-" . $folderId . "'>(" . $noteCount . ")</span>";
         echo "<span class='folder-actions'>";
+        // Favorites has a menu of its own (#favorites-actions-menu below)
+        if ($isFavoritesSection) {
+            echo "<div class='folder-actions-toggle' data-action='toggle-favorites-menu' title='" . t_h('notes_list.favorites_menu.title', [], 'Favorites actions') . "'><i class='lucide lucide-more-vertical'></i></div>";
+        }
         
         // Generate folder actions
         echo generateFolderActions($folderId, $folderName, $con, $workspace_filter, $noteCount, !empty($folderData['favorite']), !empty($folderData['offline']));
@@ -549,6 +583,15 @@ if ($favoritesFolder && ($favorites_count > 0 || (!empty($favorite_folders) && !
     }
 }
 
+// Offline dots, sort mode and "Expand all folders", built by index.php, at the
+// right end of a thin rule between Favorites and the rest of the tree (at the
+// top of the tree when there are no favorites). With account rows the expand
+// button heads the active account's row instead.
+$notesListActions = ($offlineDotsButton ?? '') . ($noteSortButton ?? '') . (empty($showAccountRows) ? $expandFoldersButton : '');
+if ($notesListActions !== '') {
+    echo '<div class="notes-list-actions">' . $notesListActions . '</div>';
+}
+
 // Add drop zone for moving notes to root (no folder)
 if (empty($folder_filter)) {
     echo '<div id="root-drop-zone" class="root-drop-zone initially-hidden">';
@@ -607,9 +650,34 @@ $renderOtherAccounts($otherAccountProfiles);
 // Single shared dropdown for the per-folder three-dot toggles (position:fixed,
 // populated and placed by toggleFolderActionsMenu in js/utils-menus.js). Kept
 // outside the scrollable container so no ancestor can clip or transform it.
-echo renderFolderActionsMenu($workspace_filter);
+$notesListWorkspace = (string)$workspace_filter;
+echo renderFolderActionsMenu($notesListWorkspace);
+
+// Menu of the Favorites section (js/favorites-menu.js): its own order and star
+// colour, which are settings of the account on screen and so only offered to
+// its owner, and a way to empty it.
+$favoritesMenuSort = $favorites_sort_type ?? POZNOTE_FAVORITES_SORT_DEFAULT;
+$favoritesMenuCanWrite = !function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser();
+echo "<div class='folder-actions-menu' id='favorites-actions-menu' role='menu' data-workspace='" . htmlspecialchars($notesListWorkspace, ENT_QUOTES) . "' data-icon-color='" . htmlspecialchars((string)($favorites_icon_color ?? ''), ENT_QUOTES) . "'>";
+if ($favoritesMenuCanWrite) {
+    echo "<div class='favorites-menu-label'>" . t_h('sort.header', [], 'Sort by') . "</div>";
+    foreach (poznoteFavoritesSortModes() as $favoritesMode) {
+        [$favoritesLabelKey, $favoritesLabelFallback] = poznoteNoteSortLabel($favoritesMode);
+        $favoritesActive = $favoritesMode === $favoritesMenuSort;
+        echo "<div class='folder-actions-menu-item" . ($favoritesActive ? ' favorites-sort-active active-state' : '') . "' role='menuitemradio' aria-checked='" . ($favoritesActive ? 'true' : 'false') . "' data-favorites-action='sort' data-sort-mode='" . htmlspecialchars($favoritesMode, ENT_QUOTES) . "'>"
+            . "<i class='lucide " . htmlspecialchars(poznoteNoteSortIcon($favoritesMode), ENT_QUOTES) . "'></i>"
+            . "<span>" . t_h($favoritesLabelKey, [], $favoritesLabelFallback) . "</span>"
+            . "<i class='lucide lucide-check favorites-sort-check'></i>"
+            . "</div>";
+    }
+    echo "<div class='folder-actions-menu-separator'></div>";
+    echo "<div class='folder-actions-menu-item' role='menuitem' data-favorites-action='color'><i class='lucide lucide-palette'></i><span>" . t_h('modals.icon_sidebar_order.change_color', [], 'Change icon color') . "</span></div>";
+    echo "<div class='folder-actions-menu-separator'></div>";
+}
+echo "<div class='folder-actions-menu-item danger' role='menuitem' data-favorites-action='clear'><i class='lucide lucide-eraser'></i><span>" . t_h('notes_list.favorites_menu.clear', [], 'Remove all from favorites') . "</span></div>";
+echo "</div>";
 // Same arrangement for the per-note three-dot toggles.
-echo renderNoteActionsMenu($workspace_filter);
+echo renderNoteActionsMenu($notesListWorkspace);
 ?>
 
 <!-- Mini Calendar Component -->

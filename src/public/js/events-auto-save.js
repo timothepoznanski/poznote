@@ -976,17 +976,10 @@ let autosaveFailureNoticed = false;
 /**
  * A save did not reach the server (network down, server busy, proxy error).
  * Nothing alarming: the text is kept on this device (the draft), the save
- * icon stays blue, a short notice says so once, and the save is retried on
- * its own until it goes through.
+ * icon stays blue, and the save is retried on its own until it goes through.
  */
 function noteSaveFailed(noteId) {
-    if (!autosaveFailureNoticed) {
-        autosaveFailureNoticed = true;
-        if (typeof window.liveRefreshShowNotice === 'function') {
-            window.liveRefreshShowNotice(noteId, draftText('autosave.notification.not_saved_yet', {},
-                'Your latest changes could not be saved yet. They are kept on this device and Poznote keeps trying.'));
-        }
-    }
+    autosaveFailureNoticed = true;
     clearTimeout(autosaveRetryTimer);
     autosaveRetryTimer = setTimeout(function () {
         autosaveRetryTimer = null;
@@ -1230,13 +1223,12 @@ function finishDraftRecovery(noteId) {
 }
 
 // Show the recovered content the way the server renders it (markdown, task
-// lists...): reload the note in place, with a notice above it
+// lists...): reload the note in place, silently
 function reloadNoteAfterDraftRecovery(noteId, attempt) {
     if (getDisplayedNoteId() !== String(noteId)) {
         return;
     }
-    const notice = draftText('autosave.draft.restored', {}, 'Your latest changes were recovered and saved.');
-    if (typeof window.liveRefreshReloadNote === 'function' && window.liveRefreshReloadNote(noteId, notice)) {
+    if (typeof window.liveRefreshReloadNote === 'function' && window.liveRefreshReloadNote(noteId, false)) {
         return;
     }
     if (attempt < 10) {

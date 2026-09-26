@@ -8,10 +8,12 @@
  * config, so it can be exercised on plain arrays.
  *
  * A note is kept offline for one of four reasons, in this order of priority:
- *   note      it is marked "Keep offline" (entries.offline)
+ *   note      it is marked "Keep offline" (entries.offline = 1)
  *   folder    it sits in a folder marked "Keep offline", or under one
  *   favorite  it is a favorite (entries.favorite)
  *   recent    it was modified in the last offline_notes_days days
+ * A note whose "Stop keeping offline" was chosen while one of the last three
+ * held it (entries.offline = -1) is never kept, whatever the reason.
  * The first three are kept whatever their date; the budgets (a number of
  * notes, a size of text) drop the "recent" ones first, oldest first, then
  * the others, oldest first.
@@ -85,7 +87,11 @@ function poznoteOfflineFolderIds(array $folders): array {
  * @param array<int, true> $folderIds
  */
 function poznoteOfflineReason(array $note, string $cutoff, array $folderIds): ?string {
-    if (!empty($note['offline'])) {
+    $mark = (int)($note['offline'] ?? 0);
+    if ($mark < 0) {
+        return null;
+    }
+    if ($mark > 0) {
         return 'note';
     }
     $folderId = isset($note['folder_id']) && $note['folder_id'] !== null ? (int)$note['folder_id'] : 0;

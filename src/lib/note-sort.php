@@ -5,7 +5,7 @@
  * One setting, `note_list_sort`, decides how every folder and every note is
  * ordered in the sidebar. It used to be a global default that each folder
  * could override through its own `folders.sort_setting`; issue #1442 made it
- * global only, driven by the button in the sidebar title row which steps
+ * global only, driven by the button at the top of the notes list which steps
  * through the modes the same way the theme button steps through themes.
  *
  * Modes, in the order the button walks them:
@@ -52,6 +52,32 @@ function poznoteNormalizeNoteSort($value): string
 {
     $value = is_string($value) ? trim($value) : '';
     return in_array($value, poznoteNoteSortModes(), true) ? $value : POZNOTE_NOTE_SORT_DEFAULT;
+}
+
+/** Order of the Favorites section when its own setting is unset. */
+const POZNOTE_FAVORITES_SORT_DEFAULT = 'heading_asc';
+
+/**
+ * Orders the Favorites section offers (its right-click menu), kept apart from
+ * the tree's mode: the tree's sort button does not reorder Favorites. No
+ * Custom: notes are not dragged within Favorites.
+ *
+ * @return string[]
+ */
+function poznoteFavoritesSortModes(): array
+{
+    return ['heading_asc', 'updated_desc', 'created_desc', 'type_asc'];
+}
+
+/**
+ * Coerce the stored `favorites_sort` setting to one of those orders.
+ *
+ * @param mixed $value
+ */
+function poznoteNormalizeFavoritesSort($value): string
+{
+    $value = is_string($value) ? trim($value) : '';
+    return in_array($value, poznoteFavoritesSortModes(), true) ? $value : POZNOTE_FAVORITES_SORT_DEFAULT;
 }
 
 /**

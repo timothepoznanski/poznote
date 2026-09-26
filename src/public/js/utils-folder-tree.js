@@ -78,11 +78,14 @@ function saveFolderName() {
         });
 }
 
-// Every folder of the tree, the Favorites section included: it folds like any
-// other folder, so "Collapse all folders" folds it too (it used to be skipped
-// and stayed open over a fully collapsed tree).
+// Every folder of the tree except the Favorites section: "Expand/Collapse all
+// folders" sits on the rule under it (notes_list.php) and acts on the tree
+// below only. Favorites still folds on its own when its header is clicked.
 function getFolderContentElements() {
-    return Array.prototype.slice.call(document.querySelectorAll('#left_col .folder-content[id]'));
+    return Array.prototype.slice.call(document.querySelectorAll('#left_col .folder-content[id]')).filter(function (content) {
+        var header = content.parentElement;
+        return !(header && header.classList.contains('folder-header') && header.getAttribute('data-folder') === 'Favorites');
+    });
 }
 
 function isFolderContentOpen(content) {

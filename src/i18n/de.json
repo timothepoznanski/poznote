@@ -507,6 +507,7 @@
       "notes_without_folders": "Zeigen Sie Notizen ohne Ordner nach der Ordnerliste statt davor an.",
       "note_width": "Passen Sie die maximale Breite des Notizinhalts an, als Prozentsatz der Notizspalte.",
       "markdown_split_card_view": "Zeigen Sie Markdown-Notizen in einer gerahmten geteilten Ansicht mit Editor und Vorschau an.",
+      "markdown_split_preview_left": "Zeigt in der geteilten Ansicht die Vorschau links und den Editor rechts an.",
       "markdown_colored": "Färben Sie Markdown-Notizen: Wählen Sie eine Farbe für jede Überschriftenebene, Inline-Code, Codeblock-Hintergrund, Zitate, Tabellenköpfe und Trennlinien.",
       "code_wrap": "Lange Zeilen in Codeblöcken umbrechen statt horizontal zu scrollen.",
       "code_line_numbers": "Zeilennummern in Codeblöcken in der Markdown-Vorschau anzeigen.",
@@ -546,7 +547,8 @@
       "s3_backup": "Lädt vollständige Sicherungsarchive in einen S3-kompatiblen Bucket hoch, manuell oder nach Zeitplan.",
       "highlight_current_folder_tree": "Notizen und Ordner außerhalb der Ordnerhierarchie, in der Sie arbeiten, so stark abschwächen, wie Sie möchten.",
       "snapshots": "Wählen Sie, wie viele automatische tägliche Schnappschüsse und wie viele Sicherheits-Schnappschüsse (vor einer KI- oder MCP-Änderung) pro Notiz aufbewahrt werden.",
-      "stt": "Den Spracherkennungsserver konfigurieren, mit dem Notizen diktiert und Audioanhänge transkribiert werden."
+      "stt": "Den Spracherkennungsserver konfigurieren, mit dem Notizen diktiert und Audioanhänge transkribiert werden.",
+      "sidebar_offline_marks": "Zeigt einen kleinen Punkt neben den Notizen, die in diesem Browser offline verfügbar sind."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Auf Mobilgeräten hat die Leiste über der Tastatur eine +-Schaltfläche, die unabhängig von dieser Einstellung dasselbe Menü öffnet."
@@ -585,7 +587,8 @@
       "profile_sign_in": "Profil und Anmeldung",
       "language_region": "Sprache und Region",
       "storage": "Speicher",
-      "layout": "Layout"
+      "layout": "Layout",
+      "organization": "Organisation"
     },
     "sections": {
       "account_display": "Konto & Anzeige",
@@ -834,6 +837,10 @@
       "shared": "Geteilt",
       "shared_with": "Geteilt mit",
       "tags": "Tags"
+    },
+    "filter": {
+      "placeholder": "Nach Name oder Tag filtern...",
+      "no_results": "Kein Arbeitsbereich entspricht diesem Filter."
     }
   },
   "display": {
@@ -859,6 +866,7 @@
       "index_icon_scale": "Skalierung der Index-Symbole",
       "note_content_width": "Breite des Notizinhalts",
       "markdown_split_card_view": "Markdown mit Rahmen",
+      "markdown_split_preview_left": "Vorschau links",
       "markdown_colored": "Farbiges Markdown",
       "code_block_word_wrap": "Codeblock-Zeilenumbruch",
       "code_block_line_numbers": "Codeblock-Zeilennummern",
@@ -873,7 +881,8 @@
       "slash_menu_trigger": "Tastenkürzel für das Befehlsmenü (Computer)",
       "slash_menu_trigger_mobile": "Tastenkürzel für das Befehlsmenü (Mobilgerät)",
       "snapshots": "Schnappschüsse",
-      "show_note_icons": "Notizsymbole anzeigen"
+      "show_note_icons": "Notizsymbole anzeigen",
+      "sidebar_offline_marks": "Offline-Punkt anzeigen"
     },
     "badges": {
       "font_size_default": "Standard ({{size}}px)",
@@ -908,6 +917,7 @@
     "expand_all_folders": "Alle Ordner aufklappen",
     "collapse_all_folders": "Alle Ordner zuklappen",
     "toggle": "Linke Spalte ein-/ausblenden",
+    "hide_left_column": "Linke Spalte ausblenden",
     "toggle_icon_sidebar": "Icon-Seitenleiste ein-/ausblenden",
     "show_hidden_icons": "Ausgeblendete Symbole anzeigen",
     "other_accounts": {
@@ -916,7 +926,9 @@
       "empty": "Keine Notizen",
       "open": "Dieses Konto öffnen",
       "view_here": "In einem Tab anzeigen, ohne das Konto zu wechseln"
-    }
+    },
+    "show_offline_dots": "Offline-Punkte anzeigen",
+    "hide_offline_dots": "Offline-Punkte ausblenden"
   },
   "home": {
     "title": "Dashboard",
@@ -958,16 +970,13 @@
     "confirm_navigation": "⚠️ Ungespeicherte Änderungen\n\nSie haben ungespeicherte Änderungen, die verloren gehen.\nVor dem Navigieren speichern?",
     "notification": {
       "saving": "Änderungen werden gespeichert...",
-      "saved": "Gespeichert!",
-      "not_saved_yet": "Ihre letzten Änderungen konnten noch nicht gespeichert werden. Sie bleiben auf diesem Gerät erhalten und Poznote versucht es weiter.",
-      "kept_as_draft": "Noch nicht gespeichert, Ihre Änderungen bleiben auf diesem Gerät erhalten"
+      "saved": "Gespeichert!"
     },
     "draft": {
       "found_conflict": "Diese Notiz enthält ungespeicherte Änderungen von Ihrem letzten Besuch, wurde seitdem aber auch woanders geändert. Die Version, die Sie nicht behalten, bleibt im Verlauf der Notiz.",
       "found_error": "Diese Notiz enthält ungespeicherte Änderungen von Ihrem letzten Besuch. Sie konnten noch nicht gespeichert werden.",
       "restore": "Meine ungespeicherten Änderungen behalten",
       "discard": "Aktuelle Version behalten",
-      "restored": "Ihre letzten Änderungen wurden wiederhergestellt und gespeichert.",
       "restore_failed": "Ihre Änderungen konnten nicht gespeichert werden. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut."
     },
     "unsaved_changes_title": "Ungespeicherte Änderungen",
@@ -1296,15 +1305,6 @@
       "title": "Login-Anzeigename",
       "description": "Legen Sie den Namen fest, der auf dem Login-Bildschirm angezeigt wird.",
       "placeholder": "Anzeigename"
-    },
-    "about_link": {
-      "title_contact_email": "Kontaktadresse",
-      "title_discussions_url": "Link zu den GitHub-Diskussionen",
-      "title_discord_url": "Discord-Link",
-      "description": "Wird allen Benutzern dieser Instanz im Bereich Über angezeigt. Lassen Sie das Feld leer, um zum Standard zurückzukehren:",
-      "edit": "Ändern",
-      "invalid_email": "Geben Sie eine gültige E-Mail-Adresse ein.",
-      "invalid_url": "Geben Sie eine gültige Adresse ein, die mit http:// oder https:// beginnt."
     },
     "custom_css": {
       "title": "Benutzerdefiniertes CSS",
@@ -1926,6 +1926,14 @@
       "stop_offline": "Nicht mehr offline behalten",
       "available_offline": "In diesem Browser offline verfügbar",
       "not_available_offline": "In diesem Browser nicht offline verfügbar"
+    },
+    "favorites_menu": {
+      "title": "Favoriten-Aktionen",
+      "clear": "Alle aus Favoriten entfernen",
+      "clear_confirm_title": "Alle aus Favoriten entfernen?",
+      "clear_confirm_message": "Alle Notizen und Ordner dieses Arbeitsbereichs werden aus den Favoriten entfernt. Die Notizen und Ordner selbst bleiben erhalten.",
+      "clear_button": "Alle entfernen",
+      "error": "Favoriten konnten nicht geändert werden"
     }
   },
   "tree_history": {
@@ -2148,6 +2156,10 @@
     "template_none": "Noch keine Vorlagen",
     "template_none_hint": "Lege Notizen in einen Ordner oder einen Arbeitsbereich namens „Vorlagen“",
     "template_insert_failed": "Die Vorlage konnte nicht eingefügt werden",
+    "template_picker_title": "Vorlage einfügen",
+    "template_filter_placeholder": "Vorlagen filtern...",
+    "template_no_match": "Keine Vorlage entspricht diesem Filter",
+    "template_load_failed": "Die Vorlagen konnten nicht geladen werden",
     "record_audio": "Audio aufnehmen",
     "insert": "Einfügen",
     "media": "Medien",
@@ -5101,6 +5113,8 @@
       "offline_no_copies": "Sie sind offline. Änderungen werden gespeichert, sobald die Verbindung wieder besteht."
     },
     "settings": {
+      "enable": "Offline-Modus aktivieren",
+      "enable_hint": "Wenn deaktiviert, wird keine Notiz im Browser gespeichert und alle Offline-Optionen und -Anzeigen verschwinden aus der App.",
       "card": "Offline-Notizen",
       "help": "Die zuletzt geänderten Notizen im Browser behalten, um sie ohne Netzwerk zu öffnen und zu bearbeiten.",
       "badge": "Letzte {{days}} Tage",

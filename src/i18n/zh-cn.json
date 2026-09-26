@@ -506,6 +506,7 @@
       "notes_without_folders": "将没有文件夹的笔记显示在文件夹列表之后而不是之前。",
       "note_width": "调整笔记内容的最大宽度，以笔记栏宽度的百分比表示。",
       "markdown_split_card_view": "以带边框的分栏视图（编辑器和预览）显示 Markdown 笔记。",
+      "markdown_split_preview_left": "在分栏模式下，将预览显示在左侧，编辑器显示在右侧。",
       "markdown_colored": "为 Markdown 笔记上色：为每级标题、行内代码、代码块背景、引用、表格表头和分隔线分别选择颜色。",
       "code_wrap": "代码块中的长行自动换行，而不是水平滚动。",
       "code_line_numbers": "在 markdown 预览的代码块中显示行号。",
@@ -545,7 +546,8 @@
       "s3_backup": "将完整备份归档上传到 S3 兼容的存储桶,可手动或按计划执行。",
       "highlight_current_folder_tree": "按你喜欢的程度淡化当前所在文件夹层级之外的笔记和文件夹。",
       "snapshots": "选择每条笔记保留多少个每日自动快照，以及多少个安全快照（AI 或 MCP 编辑前）。",
-      "stt": "配置用于听写笔记和转录音频附件的语音识别服务器。"
+      "stt": "配置用于听写笔记和转录音频附件的语音识别服务器。",
+      "sidebar_offline_marks": "在此浏览器中可离线使用的笔记旁显示一个小圆点。"
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "在移动设备上，键盘上方的工具栏有一个 + 按钮，无论此设置为何，它都会打开同一个菜单。"
@@ -584,7 +586,8 @@
       "profile_sign_in": "个人资料与登录",
       "language_region": "语言与地区",
       "storage": "存储",
-      "layout": "布局"
+      "layout": "布局",
+      "organization": "整理"
     },
     "sections": {
       "account_display": "账户与显示",
@@ -833,6 +836,10 @@
       "shared": "已分享",
       "shared_with": "分享给",
       "tags": "标签"
+    },
+    "filter": {
+      "placeholder": "按名称或标签筛选...",
+      "no_results": "没有符合此筛选条件的工作区。"
     }
   },
   "display": {
@@ -858,6 +865,7 @@
       "index_icon_scale": "索引页图标缩放",
       "note_content_width": "笔记内容宽度",
       "markdown_split_card_view": "带边框的 Markdown",
+      "markdown_split_preview_left": "预览在左侧",
       "markdown_colored": "彩色 Markdown",
       "code_block_word_wrap": "代码块自动换行",
       "code_block_line_numbers": "代码块行号",
@@ -872,7 +880,8 @@
       "slash_menu_trigger": "命令菜单快捷键（电脑）",
       "slash_menu_trigger_mobile": "命令菜单快捷键（移动设备）",
       "snapshots": "快照",
-      "show_note_icons": "显示笔记图标"
+      "show_note_icons": "显示笔记图标",
+      "sidebar_offline_marks": "显示离线圆点"
     },
     "badges": {
       "font_size_default": "默认 ({{size}}px)",
@@ -907,6 +916,7 @@
     "expand_all_folders": "展开所有文件夹",
     "collapse_all_folders": "折叠所有文件夹",
     "toggle": "显示/隐藏左侧边栏",
+    "hide_left_column": "隐藏左侧边栏",
     "toggle_icon_sidebar": "显示/隐藏图标侧边栏",
     "show_hidden_icons": "显示隐藏的图标",
     "other_accounts": {
@@ -915,7 +925,9 @@
       "empty": "没有笔记",
       "open": "打开此账户",
       "view_here": "在标签页中显示，不切换账户"
-    }
+    },
+    "show_offline_dots": "显示离线圆点",
+    "hide_offline_dots": "隐藏离线圆点"
   },
   "home": {
     "title": "仪表盘",
@@ -957,16 +969,13 @@
     "confirm_navigation": "⚠️ 未保存的更改\n\n您有未保存的更改，这些更改将会丢失。\n要在离开前保存吗？",
     "notification": {
       "saving": "正在保存更改...",
-      "saved": "已保存！",
-      "not_saved_yet": "您最近的更改暂时无法保存。它们已保留在此设备上，Poznote 会继续尝试。",
-      "kept_as_draft": "尚未保存，您的更改已保留在此设备上"
+      "saved": "已保存！"
     },
     "draft": {
       "found_conflict": "此笔记有您上次访问时未保存的更改，但此后它也在其他地方被修改过。您不保留的版本会留在笔记历史中。",
       "found_error": "此笔记有您上次访问时未保存的更改。它们暂时无法保存。",
       "restore": "保留我未保存的更改",
       "discard": "保留当前版本",
-      "restored": "您最近的更改已恢复并保存。",
       "restore_failed": "无法保存您的更改。请检查网络连接后重试。"
     },
     "unsaved_changes_title": "未保存的更改",
@@ -1294,15 +1303,6 @@
       "title": "登录显示名称",
       "description": "设置在登录界面显示的名称。",
       "placeholder": "显示名称"
-    },
-    "about_link": {
-      "title_contact_email": "联系地址",
-      "title_discussions_url": "GitHub 讨论链接",
-      "title_discord_url": "Discord 链接",
-      "description": "向此实例的所有用户显示在“关于”部分。留空即恢复默认值：",
-      "edit": "修改",
-      "invalid_email": "请输入有效的电子邮件地址。",
-      "invalid_url": "请输入以 http:// 或 https:// 开头的有效地址。"
     },
     "custom_css": {
       "title": "自定义 CSS",
@@ -1924,6 +1924,14 @@
       "stop_offline": "停止离线保留",
       "available_offline": "此浏览器中可离线使用",
       "not_available_offline": "此浏览器中不可离线使用"
+    },
+    "favorites_menu": {
+      "title": "收藏操作",
+      "clear": "全部移出收藏",
+      "clear_confirm_title": "全部移出收藏？",
+      "clear_confirm_message": "此工作区的所有笔记和文件夹都将移出收藏。笔记和文件夹本身会保留。",
+      "clear_button": "全部移出",
+      "error": "无法更新收藏"
     }
   },
   "tree_history": {
@@ -2146,6 +2154,10 @@
     "template_none": "暂无模板",
     "template_none_hint": "将笔记放入名为“模板”的文件夹或工作区",
     "template_insert_failed": "无法插入模板",
+    "template_picker_title": "插入模板",
+    "template_filter_placeholder": "筛选模板...",
+    "template_no_match": "没有符合此筛选条件的模板",
+    "template_load_failed": "无法加载模板",
     "record_audio": "录音",
     "insert": "插入",
     "media": "媒体",
@@ -5201,6 +5213,8 @@
       "offline_no_copies": "您当前处于离线状态。恢复连接后将保存更改。"
     },
     "settings": {
+      "enable": "启用离线模式",
+      "enable_hint": "关闭后，浏览器中不再保留任何笔记，所有离线选项和标识都会从应用中消失。",
       "card": "离线笔记",
       "help": "在浏览器中保存最近修改的笔记，以便在没有网络时打开和编辑。",
       "badge": "最近 {{days}} 天",

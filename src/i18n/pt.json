@@ -507,6 +507,7 @@
       "notes_without_folders": "Mostre as notas sem pasta depois da lista de pastas em vez de antes.",
       "note_width": "Ajuste a largura máxima do conteúdo das notas, como porcentagem da coluna da nota.",
       "markdown_split_card_view": "Exiba notas markdown em uma visão dividida emoldurada com editor e pré-visualização.",
+      "markdown_split_preview_left": "No modo dividido, mostra a pré-visualização à esquerda e o editor à direita.",
       "markdown_colored": "Adicione cor às notas markdown: escolha uma cor para cada nível de título, código embutido, fundo dos blocos de código, citações, cabeçalhos de tabela e separadores.",
       "code_wrap": "Quebre linhas longas nos blocos de código em vez de rolar horizontalmente.",
       "code_line_numbers": "Mostre os números de linha nos blocos de código na pré-visualização de markdown.",
@@ -546,7 +547,8 @@
       "s3_backup": "Envia arquivos de backup completos para um bucket compatível com S3, manualmente ou conforme um agendamento.",
       "highlight_current_folder_tree": "Esbater, tanto quanto quiser, as notas e pastas que estão fora da hierarquia de pastas em que está a trabalhar.",
       "snapshots": "Escolha quantos instantâneos automáticos diários e quantos instantâneos de segurança (antes de uma edição por IA ou MCP) são guardados por nota.",
-      "stt": "Configure o servidor de reconhecimento de voz usado para ditar notas e transcrever anexos de áudio."
+      "stt": "Configure o servidor de reconhecimento de voz usado para ditar notas e transcrever anexos de áudio.",
+      "sidebar_offline_marks": "Mostra um pequeno ponto ao lado das notas disponíveis offline neste navegador."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "No telemóvel, a barra de ferramentas acima do teclado tem um botão + que abre o mesmo menu, seja qual for esta definição."
@@ -585,7 +587,8 @@
       "profile_sign_in": "Perfil e login",
       "language_region": "Idioma e região",
       "storage": "Armazenamento",
-      "layout": "Layout"
+      "layout": "Layout",
+      "organization": "Organização"
     },
     "sections": {
       "account_display": "Conta e Exibição",
@@ -834,6 +837,10 @@
       "shared": "Compartilhado",
       "shared_with": "Compartilhado com",
       "tags": "Etiquetas"
+    },
+    "filter": {
+      "placeholder": "Filtrar por nome ou etiqueta...",
+      "no_results": "Nenhum espaço de trabalho corresponde a este filtro."
     }
   },
   "display": {
@@ -859,6 +866,7 @@
       "index_icon_scale": "Escala de ícones do índice",
       "note_content_width": "Largura do conteúdo da nota",
       "markdown_split_card_view": "Markdown com moldura",
+      "markdown_split_preview_left": "Pré-visualização à esquerda",
       "markdown_colored": "Markdown colorido",
       "code_block_word_wrap": "Quebra de linha em blocos de código",
       "code_block_line_numbers": "Números de linha em blocos de código",
@@ -873,7 +881,8 @@
       "slash_menu_trigger": "Atalho do menu de comandos (computador)",
       "slash_menu_trigger_mobile": "Atalho do menu de comandos (telemóvel)",
       "snapshots": "Instantâneos",
-      "show_note_icons": "Mostrar ícones das notas"
+      "show_note_icons": "Mostrar ícones das notas",
+      "sidebar_offline_marks": "Mostrar o ponto offline"
     },
     "badges": {
       "font_size_default": "padrão ({{size}}px)",
@@ -908,6 +917,7 @@
     "expand_all_folders": "Expandir todas as pastas",
     "collapse_all_folders": "Recolher todas as pastas",
     "toggle": "Mostrar/Ocultar a coluna esquerda",
+    "hide_left_column": "Ocultar a coluna esquerda",
     "toggle_icon_sidebar": "Mostrar/Ocultar a barra de ícones",
     "show_hidden_icons": "Mostrar os ícones ocultos",
     "other_accounts": {
@@ -916,7 +926,9 @@
       "empty": "Sem notas",
       "open": "Abrir esta conta",
       "view_here": "Mostrar num separador, sem mudar de conta"
-    }
+    },
+    "show_offline_dots": "Mostrar os pontos offline",
+    "hide_offline_dots": "Ocultar os pontos offline"
   },
   "home": {
     "title": "Painel",
@@ -958,16 +970,13 @@
     "confirm_navigation": "⚠️ Alterações Não Salvas\n\nVocê tem alterações não salvas que serão perdidas.\nSalvar antes de navegar?",
     "notification": {
       "saving": "Salvando alterações...",
-      "saved": "Salvo!",
-      "not_saved_yet": "Suas últimas alterações ainda não puderam ser salvas. Elas ficam guardadas neste dispositivo e o Poznote continua tentando.",
-      "kept_as_draft": "Ainda não salvo, suas alterações ficam guardadas neste dispositivo"
+      "saved": "Salvo!"
     },
     "draft": {
       "found_conflict": "Esta nota tem alterações não salvas da sua última visita, mas também foi modificada em outro lugar desde então. A versão que você não mantiver fica no histórico da nota.",
       "found_error": "Esta nota tem alterações não salvas da sua última visita. Elas ainda não puderam ser salvas.",
       "restore": "Manter minhas alterações não salvas",
       "discard": "Manter a versão atual",
-      "restored": "Suas últimas alterações foram recuperadas e salvas.",
       "restore_failed": "Suas alterações não puderam ser salvas. Verifique sua conexão e tente novamente."
     },
     "unsaved_changes_title": "Alterações não salvas",
@@ -1296,15 +1305,6 @@
       "title": "Nome de exibição do login",
       "description": "Defina o nome mostrado na tela de login.",
       "placeholder": "Nome de exibição"
-    },
-    "about_link": {
-      "title_contact_email": "Endereço de contato",
-      "title_discussions_url": "Link das discussões do GitHub",
-      "title_discord_url": "Link do Discord",
-      "description": "Exibido para todos os usuários desta instância na seção Sobre. Deixe o campo vazio para voltar ao padrão:",
-      "edit": "Alterar",
-      "invalid_email": "Digite um endereço de e-mail válido.",
-      "invalid_url": "Digite um endereço válido começando com http:// ou https://."
     },
     "custom_css": {
       "title": "CSS personalizado",
@@ -1926,6 +1926,14 @@
       "stop_offline": "Deixar de manter offline",
       "available_offline": "Disponível offline neste navegador",
       "not_available_offline": "Não disponível offline neste navegador"
+    },
+    "favorites_menu": {
+      "title": "Ações dos favoritos",
+      "clear": "Remover tudo dos favoritos",
+      "clear_confirm_title": "Remover tudo dos favoritos?",
+      "clear_confirm_message": "Todas as notas e pastas deste espaço de trabalho saem dos favoritos. As notas e pastas são mantidas.",
+      "clear_button": "Remover tudo",
+      "error": "Não foi possível alterar os favoritos"
     }
   },
   "tree_history": {
@@ -2148,6 +2156,10 @@
     "template_none": "Ainda não há modelos",
     "template_none_hint": "Coloque notas numa pasta ou num espaço de trabalho chamado \"Modelos\"",
     "template_insert_failed": "Não foi possível inserir o modelo",
+    "template_picker_title": "Inserir um modelo",
+    "template_filter_placeholder": "Filtrar modelos...",
+    "template_no_match": "Nenhum modelo corresponde a este filtro",
+    "template_load_failed": "Não foi possível carregar os modelos",
     "record_audio": "Gravar áudio",
     "insert": "Inserir",
     "media": "Mídia",
@@ -5102,6 +5114,8 @@
       "offline_no_copies": "Você está offline. As alterações serão salvas quando a conexão voltar."
     },
     "settings": {
+      "enable": "Ativar o modo offline",
+      "enable_hint": "Desativado, nenhuma nota é guardada no navegador e todas as opções e indicadores offline desaparecem da aplicação.",
       "card": "Notas offline",
       "help": "Guardar no navegador as notas modificadas recentemente, para abri-las e editá-las sem rede.",
       "badge": "Últimos {{days}} dias",

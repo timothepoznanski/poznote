@@ -55,14 +55,28 @@ body {
     margin-bottom: 6px;
 }
 
+/* Three columns: the workspace title in the middle, the actions in the right
+   one, and an empty left one as wide as the right, so the title is centred on
+   the column. A long name takes the empty column's room before it ellipsizes. */
 .sidebar-title-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: space-between;
     gap: 8px;
     padding: 6px 2px;
     position: relative;
     /* anchor dropdown menus inside the title row */
+}
+
+.sidebar-title-row > .sidebar-title {
+    grid-row: 1;
+    grid-column: 2;
+}
+
+.sidebar-title-row > .sidebar-title-actions {
+    grid-row: 1;
+    grid-column: 3;
+    justify-self: end;
 }
 
 .sidebar-title {
@@ -73,6 +87,9 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    /* Lets a long workspace name shrink to an ellipsis instead of wrapping
+       and pushing the action buttons around */
+    min-width: 0;
 }
 
 .workspace-dropdown-icon {
@@ -80,6 +97,7 @@ body {
     font-size: 0.9rem;
     color: var(--pz-text-muted);
     pointer-events: none;
+    flex-shrink: 0;
     transition: transform 0.2s ease;
     position: relative;
     top: 2px;
@@ -90,11 +108,27 @@ body {
     height: 20px;
     vertical-align: middle;
     pointer-events: none;
+    flex-shrink: 0;
+}
+
+/* Color dot of a colored workspace, before its name (index.php). Same
+   outline as the dot in the workspace menu (css/menus.css). */
+.workspace-title-dot {
+    width: 6px;
+    height: 6px;
+    flex-shrink: 0;
+    border-radius: var(--pz-radius-circle);
+    border: 1px solid rgba(var(--pz-shadow-rgb), 0.12);
 }
 
 .workspace-title-text {
     vertical-align: middle;
     flex: 1;
+    /* One line, the full name in the title attribute shows on hover */
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sidebar-title[role="button"] {
@@ -106,6 +140,7 @@ body {
     align-items: center;
     gap: 6px;
     position: relative;
+    flex-shrink: 0;
 }
 
 .sidebar-howto{

@@ -30,6 +30,12 @@
     // refreshed. The full sync, the connection banner and the capture of the
     // display belong to index.php.
     var WRITES_ONLY = !!(document.currentScript && document.currentScript.getAttribute('data-offline-mode') === 'writes');
+    // Offline mode turned off in Settings > Offline notes (index.php's page
+    // config): nothing is kept and nothing shows, no banner, no marks. What
+    // this browser still holds for the account goes, once the changes made
+    // offline were sent (the manifest then says 0 days).
+    var pageConfig = typeof window.getPoznotePageConfig === 'function' ? window.getPoznotePageConfig() : {};
+    var DISABLED = !WRITES_ONLY && pageConfig.offlineMode === false;
     // Signed out on the offline page while the server could not be reached
     // (js/offline-app.js): the session left open ends now, before anything
     // is kept again. The mark goes first, so a failure cannot loop.
@@ -634,6 +640,14 @@
         });
     }
 
+    // The offline marks of the page (js/offline-marks.js, when it is loaded)
+    // follow the copies: a note saved or synced gets its mark at once.
+    function refreshMarks() {
+        if (typeof window.poznoteOfflineMarksRefresh === 'function') {
+            window.poznoteOfflineMarksRefresh();
+        }
+    }
+
     function syncNow(force) {
         if (leaving) {
             return Promise.resolve();
@@ -651,6 +665,7 @@
             })
             .then(function () {
                 running = null;
+                refreshMarks();
             });
         return running;
     }
@@ -659,7 +674,7 @@
 
     function probeServer() {
         var controller = window.AbortController ? new AbortController() : null;
-        var timer = controller ? setTimeout(function () { controller.abort(); }, 5000) : null;
+        var timer = controller ? setTimeout(function () { controller.abort(); }, 2500) : null;
         return fetch('api_health.php', { cache: 'no-store', credentials: 'same-origin', signal: controller ? controller.signal : undefined })
             .then(function (response) {
                 return response.status > 0 && response.status < 500;
@@ -766,6 +781,9 @@
     }
 
     function onConnectionLost() {
+        if (DISABLED) {
+            return;
+        }
         if (bannerEl && !bannerEl.hidden && !bannerEl.classList.contains('is-transient')) {
             return;
         }
@@ -800,7 +818,10 @@
 
     // A dead Wi-Fi fires no "offline" event: the app's own requests failing
     // (live refresh polls every few seconds) is what tells. Any network
-    // failure triggers one reachability check.
+    // failure triggers one reachability check, and so does a read the server
+    // leaves unanswered: a VPN tunnel left up without Wi-Fi, or a captive
+    // portal, swallows requests without ever failing them.
+    var STALLED_READ_MS = 3 * 1000;
     var probeScheduled = null;
     function checkAfterFailure() {
         if (WRITES_ONLY || probeScheduled || probeTimer) {
@@ -895,7 +916,7 @@
                         }) : null;
                     });
             });
-        }).catch(function (e) {
+        }).then(refreshMarks, function (e) {
             console.debug('offline-sync: refreshing the copy of a saved note failed:', e);
         });
     }
@@ -932,12 +953,67 @@
         }
     }
 
+    // Offline mode off: one sync pushes the changes made offline and has the
+    // copies forgotten, then the offline page leaves the device once no
+    // account keeps anything here (the service worker has nothing to serve
+    // in its place). Nothing else runs.
+    function forgetDevice() {
+        var pageAccount = Number(readCookie('poznote_account') || 0);
+        if (!pageAccount) {
+            return Promise.resolve();
+        }
+        return Promise.all([Store.getAccount(pageAccount), Store.getOutbox(pageAccount)])
+            .then(function (both) {
+                return both[0] || both[1].length ? syncNow(true) : null;
+            })
+            .then(function () {
+                return Store.getOutbox(pageAccount);
+            })
+            .then(function (pending) {
+                // Changes the server did not take stay until they are sent
+                return pending.length ? null : Store.forgetAccount(pageAccount, { withOutbox: true });
+            })
+            .then(function () {
+                return Store.getAccounts();
+            })
+            .then(function (accounts) {
+                if (!accounts.length && window.caches) {
+                    return window.caches.delete(Store.SHELL_CACHE);
+                }
+                return null;
+            })
+            .catch(function (e) {
+                console.debug('offline-sync: forgetting the offline copies failed:', e);
+            });
+    }
+
+    if (DISABLED) {
+        Store.clearPendingVerifier();
+        // The logout dialog (js/profile.js) still sends pending changes first
+        window.poznoteOfflineSyncNow = function () {
+            return syncNow(true);
+        };
+        signingOut.then(function (leaving) {
+            return leaving ? null : forgetDevice();
+        });
+        return;
+    }
+
     if (typeof window.fetch === 'function') {
         var nativeFetch = window.fetch;
         window.fetch = function (input, init) {
             var result = nativeFetch.apply(this, arguments);
             var method = String((init && init.method) || (input && typeof input === 'object' && input.method) || 'GET').toUpperCase();
             var url = (input && typeof input === 'object' && input.url) || String(input);
+            // Reads only: a large upload on a slow line is legitimately long.
+            var stalled = (method === 'GET' || method === 'HEAD')
+                ? setTimeout(checkAfterFailure, STALLED_READ_MS)
+                : null;
+            result.then(function () {
+                clearTimeout(stalled);
+            }, function () {
+                clearTimeout(stalled);
+            });
             result.then(function (response) {
                 if (method !== 'GET' && method !== 'HEAD' && response && response.ok) {
                     onNoteWrite(method, url, response);
@@ -1061,26 +1137,18 @@
     };
 
     // The note's three-dot menu (js/utils-menus.js) asks whether this browser
-    // holds the note right now: the line is shown once the copies answer.
+    // holds a note not marked "Keep offline" (recent, favorite, in a folder
+    // kept offline): if so, it offers "Stop keeping offline" as well.
     window.poznoteOfflineFillMenu = function (menu, noteId) {
-        var line = menu.querySelector('.offline-availability');
         var userId = Number(readCookie('poznote_account') || 0);
         var id = Number(noteId);
-        if (!line || !userId || !id) {
+        if (!userId || !id || typeof window.setNoteActionsMenuOffline !== 'function') {
             return;
         }
         Store.getNote(userId, id).then(function (record) {
-            if (menu.getAttribute('data-note-id') !== String(noteId)) {
-                return;
+            if (record && menu.getAttribute('data-note-id') === String(noteId)) {
+                window.setNoteActionsMenuOffline(menu, true);
             }
-            var available = !!record;
-            line.classList.toggle('is-available', available);
-            line.querySelectorAll('[data-available]').forEach(function (span) {
-                span.hidden = (span.getAttribute('data-available') === '1') !== available;
-            });
-            line.hidden = false;
-        }).catch(function () {
-            line.hidden = true;
-        });
+        }).catch(function () {});
     };
 })();

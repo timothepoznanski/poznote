@@ -314,21 +314,11 @@ function saveDefaultWorkspaceSetting() {
         });
 }
 
-// ========== ROW ACTIONS OVERFLOW ==========
+// ========== ROW ACTIONS MENU ==========
 
-// A workspace row keeps its name (and tags) on the left and its action icons on
-// the right. On a narrow screen the icons stop fitting, so the ones that would
-// squeeze the name below the width it actually needs are moved, in reverse
-// order, into the kebab menu at the end of the strip. They are moved rather
-// than duplicated, so the delegated handlers above keep firing from either
-// place.
-var WS_ACTIONS_NARROW_QUERY = '(max-width: 800px)';
-
-// Floor and ceiling for the space the name column keeps for itself: never less
-// than a couple of characters, never more than this share of the row, so a long
-// name or a pile of tags still leaves the kebab somewhere to sit.
-var WS_NAME_MIN_RESERVE = 60;
-var WS_NAME_MAX_SHARE = 0.55;
+// Share stays on the row; the other actions sit in the "..." menu next to it
+// (workspaces.php). The buttons carry the same classes in either place, so the
+// delegated handlers above fire from the menu too.
 
 function closeWorkspaceActionsMenus(except) {
     var open = document.querySelectorAll('.ws-col-actions.is-open');
@@ -337,87 +327,6 @@ function closeWorkspaceActionsMenus(except) {
         col.classList.remove('is-open');
         var toggle = col.querySelector('.ws-actions-toggle');
         if (toggle) toggle.setAttribute('aria-expanded', 'false');
-    });
-}
-
-function layoutWorkspaceRowActions() {
-    var isNarrow = window.matchMedia(WS_ACTIONS_NARROW_QUERY).matches;
-    var columns = document.querySelectorAll('.ws-col-actions');
-
-    Array.prototype.forEach.call(columns, function (col) {
-        var strip = col.querySelector('.ws-icon-actions');
-        var menu = col.querySelector('.ws-actions-menu');
-        var toggle = col.querySelector('.ws-actions-toggle');
-        var row = col.parentElement;
-        if (!strip || !menu || !toggle || !row) return;
-
-        // Always start from every icon back on the row, then trim.
-        while (menu.firstChild) {
-            strip.appendChild(menu.firstChild);
-        }
-        col.classList.remove('is-open', 'has-overflow');
-        toggle.setAttribute('aria-expanded', 'false');
-
-        var nameCol = row.querySelector('.ws-col-name');
-        if (!isNarrow) {
-            if (nameCol) nameCol.style.removeProperty('--ws-name-reserve');
-            return;
-        }
-        if (nameCol) {
-            nameCol.style.setProperty('--ws-name-reserve', measureWorkspaceNameReserve(row, nameCol) + 'px');
-        }
-
-        // One pass per icon, plus one for the kebab appearing.
-        var guard = strip.children.length + 2;
-        while (guard-- > 0 && workspaceRowActionsOverflow(row, col)) {
-            if (!col.classList.contains('has-overflow')) {
-                // The kebab takes room of its own, so measure again with it.
-                col.classList.add('has-overflow');
-                continue;
-            }
-            if (!strip.lastElementChild) break;
-            menu.insertBefore(strip.lastElementChild, menu.firstChild);
-        }
-
-        if (!menu.firstChild) {
-            col.classList.remove('has-overflow');
-        }
-    });
-}
-
-// What the name and its tags need to sit on one line, clamped to the floor and
-// ceiling above. Neutralising the reserve and pinning the column to its
-// max-content width is what makes the column report that natural width instead
-// of the width the flex line happens to give it.
-function measureWorkspaceNameReserve(row, nameCol) {
-    nameCol.style.setProperty('--ws-name-reserve', '0px');
-    nameCol.style.setProperty('flex', '0 0 max-content', 'important');
-    var needed = nameCol.getBoundingClientRect().width;
-    nameCol.style.removeProperty('flex');
-
-    var reserve = Math.max(needed, WS_NAME_MIN_RESERVE);
-    var rowWidth = row.clientWidth;
-    if (rowWidth > 0) {
-        reserve = Math.min(reserve, rowWidth * WS_NAME_MAX_SHARE);
-    }
-    return Math.round(reserve);
-}
-
-// The action column runs past the right edge of the row: whatever is in it no
-// longer fits on the line.
-function workspaceRowActionsOverflow(row, col) {
-    var rowRect = row.getBoundingClientRect();
-    var colRect = col.getBoundingClientRect();
-    if (!rowRect.width || !colRect.width) return false;
-    return colRect.right > rowRect.right + 1;
-}
-
-function scheduleWorkspaceRowActionsLayout() {
-    if (scheduleWorkspaceRowActionsLayout.pending) return;
-    scheduleWorkspaceRowActionsLayout.pending = true;
-    window.requestAnimationFrame(function () {
-        scheduleWorkspaceRowActionsLayout.pending = false;
-        layoutWorkspaceRowActions();
     });
 }
 
@@ -446,6 +355,71 @@ function handleWorkspaceActionsToggleClick(event) {
 function handleWorkspaceActionsMenuKeydown(event) {
     if (event.key !== 'Escape' && event.key !== 'Esc') return;
     closeWorkspaceActionsMenus(null);
+}
+
+// ========== LIST FILTER ==========
+
+// Lower case, accents dropped: "ecole" finds "École".
+function normalizeWorkspaceFilterText(text) {
+    var value = String(text || '').toLowerCase();
+    if (typeof value.normalize === 'function') {
+        value = value.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+    return value;
+}
+
+// Hides the rows whose name and tags do not contain the term. While a term is
+// typed the drag handles go too: a row moved among the visible ones would land
+// next to hidden ones, in an order the user never saw.
+function applyWorkspaceFilter() {
+    var input = document.getElementById('workspace-filter-input');
+    var list = document.querySelector('.workspace-list ul');
+    if (!input || !list) return;
+
+    var term = normalizeWorkspaceFilterText(input.value.trim());
+    var wrapper = input.closest('.ws-filter');
+    if (wrapper) wrapper.classList.toggle('has-value', input.value !== '');
+    list.classList.toggle('is-filtering', term !== '');
+
+    var shown = 0;
+    Array.prototype.forEach.call(list.querySelectorAll('.ws-row'), function (row) {
+        var haystack = row.getAttribute('data-ws') || '';
+        Array.prototype.forEach.call(row.querySelectorAll('.ws-tag-chip'), function (chip) {
+            haystack += ' ' + chip.textContent;
+        });
+        var match = term === '' || normalizeWorkspaceFilterText(haystack).indexOf(term) !== -1;
+        row.hidden = !match;
+        if (match) shown++;
+    });
+
+    var empty = document.getElementById('workspace-filter-empty');
+    if (empty) empty.hidden = shown > 0;
+}
+
+function initWorkspaceFilter() {
+    var input = document.getElementById('workspace-filter-input');
+    if (!input) return;
+
+    input.addEventListener('input', applyWorkspaceFilter);
+    input.addEventListener('keydown', function (event) {
+        if ((event.key === 'Escape' || event.key === 'Esc') && input.value !== '') {
+            event.preventDefault();
+            input.value = '';
+            applyWorkspaceFilter();
+        }
+    });
+
+    var clear = document.getElementById('workspace-filter-clear');
+    if (clear) {
+        clear.addEventListener('click', function () {
+            input.value = '';
+            applyWorkspaceFilter();
+            input.focus();
+        });
+    }
+
+    // A value the browser restored on back/forward navigation
+    applyWorkspaceFilter();
 }
 
 // ========== PAGE INITIALIZATION ==========
@@ -477,7 +451,6 @@ function initializeWorkspacesPage() {
     // Add event listeners for buttons
     document.addEventListener('click', handleWorkspaceActionsToggleClick);
     document.addEventListener('keydown', handleWorkspaceActionsMenuKeydown);
-    window.addEventListener('resize', scheduleWorkspaceRowActionsLayout);
     document.addEventListener('click', handleRenameButtonClick);
     document.addEventListener('click', handleWorkspaceTagsButtonClick);
     document.addEventListener('click', handleWorkspaceColorButtonClick);
@@ -511,15 +484,10 @@ function initializeWorkspacesPage() {
         backLink.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(ws));
     }
 
-    // Split the row actions between the line and the kebab menu, then again
-    // once the webfont has settled since it changes how wide the names are.
-    layoutWorkspaceRowActions();
-    if (document.fonts && document.fonts.ready && typeof document.fonts.ready.then === 'function') {
-        document.fonts.ready.then(scheduleWorkspaceRowActionsLayout).catch(function () {});
-    }
-
     // Dragging the rows by their handle to reorder the workspaces
     initWorkspaceOrderSortable();
+
+    initWorkspaceFilter();
 
     // Initialize default workspace dropdown
     loadDefaultWorkspaceSetting();

@@ -263,6 +263,7 @@ curl -u 'username:password' -H "X-User-ID: 1" \
       "type": "note",
       "workspace": "Poznote",
       "folder_id": 3,
+      "folder": "Templates",
       "icon": "lucide-file-text",
       "icon_color": null
     }

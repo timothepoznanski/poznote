@@ -7,6 +7,7 @@ require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../functions.php';
 require_once __DIR__ . '/../version_helper.php';
+require_once __DIR__ . '/../settings_shell.php';
 requireSettingsPassword();
 
 $currentLang = getUserLanguage();
@@ -792,8 +793,8 @@ try {
       data-clear-workspace="<?php echo htmlspecialchars(json_encode($workspaces[0] ?? ''), ENT_QUOTES, 'UTF-8'); ?>"
       <?php endif; ?>>
     <?php include __DIR__ . '/../icon_sidebar.php'; ?>
+    <?php poznoteSettingsShellOpen(['section' => 'settings-actions-section-grid', 'title' => t('settings.cards.workspaces', [], 'Workspaces')]); ?>
     <div class="settings-container">
-    <h1 class="poznote-page-title"><i class="lucide lucide-layers"></i> <?php echo t_h('settings.cards.workspaces', [], 'Workspaces'); ?></h1>
 
 
         <!-- Top alert area: used for both server-side and client-side messages -->
@@ -833,6 +834,16 @@ try {
                         $showWorkspaceOrder = count($workspaceRows) > 1;
                         $dragHandleLabel = t_h('workspaces.order.handle', [], 'Drag to reorder', $currentLang);
                     ?>
+                    <?php if (count($workspaceRows) > 1): ?>
+                    <!-- Filters the rows below by name and tag (js/workspaces-page.js) -->
+                    <div class="home-search-wrapper ws-filter">
+                        <i class="lucide lucide-search home-search-icon"></i>
+                        <input type="text" id="workspace-filter-input" class="home-search-input" autocomplete="off" placeholder="<?php echo t_h('workspaces.filter.placeholder', [], 'Filter by name or tag...', $currentLang); ?>" aria-label="<?php echo t_h('workspaces.filter.placeholder', [], 'Filter by name or tag...', $currentLang); ?>">
+                        <button type="button" id="workspace-filter-clear" class="home-search-clear" aria-label="<?php echo t_h('search.clear', [], 'Clear search', $currentLang); ?>" title="<?php echo t_h('search.clear', [], 'Clear search', $currentLang); ?>">
+                            <i class="lucide lucide-x"></i>
+                        </button>
+                    </div>
+                    <?php endif; ?>
                     <ul>
                         <?php foreach ($workspaceRows as $workspaceRow): ?>
                                 <?php
@@ -904,6 +915,13 @@ try {
                                             <i class="lucide lucide-share-2"></i><span class="ws-icon-btn-text"><?php echo $shareLabel; ?></span>
                                         </button>
                                         <?php endif; ?>
+                                    </div>
+                                    <!-- Every other action sits behind the "..." button, as labelled
+                                         rows (js/workspaces-page.js opens and closes it). -->
+                                    <button type="button" class="ws-actions-toggle" aria-haspopup="true" aria-expanded="false" title="<?php echo $actionsMenuLabel; ?>" aria-label="<?php echo $actionsMenuLabel; ?>">
+                                        <i class="lucide lucide-more-horizontal"></i>
+                                    </button>
+                                    <div class="ws-actions-menu">
                                         <button type="button" class="ws-icon-btn workspace-rename-action" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo $renameLabel; ?>" aria-label="<?php echo $renameLabel; ?>">
                                             <i class="lucide lucide-pencil"></i><span class="ws-icon-btn-text"><?php echo $renameLabel; ?></span>
                                         </button>
@@ -919,11 +937,6 @@ try {
                                         <button type="button" class="ws-icon-btn btn-move" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo $moveLabel; ?>" aria-label="<?php echo $moveLabel; ?>" <?php echo ($cnt === 0 || count($workspaces) <= 1) ? 'disabled' : ''; ?>>
                                             <i class="lucide lucide-folder-output"></i><span class="ws-icon-btn-text"><?php echo $moveLabel; ?></span>
                                         </button>
-                                        <?php if (count($workspaces) > 1): ?>
-                                            <button type="button" class="ws-icon-btn ws-icon-btn-danger btn-delete" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo $deleteLabel; ?>" aria-label="<?php echo $deleteLabel; ?>">
-                                                <i class="lucide lucide-trash-2"></i><span class="ws-icon-btn-text"><?php echo $deleteLabel; ?></span>
-                                            </button>
-                                        <?php endif; ?>
                                         <button type="button" class="ws-icon-btn workspace-info-action"
                                                 data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"
                                                 data-notes-count="<?php echo $cnt; ?>"
@@ -934,17 +947,17 @@ try {
                                                 title="<?php echo $infoLabel; ?>" aria-label="<?php echo $infoLabel; ?>">
                                             <i class="lucide lucide-info"></i><span class="ws-icon-btn-text"><?php echo $infoLabel; ?></span>
                                         </button>
+                                        <?php if (count($workspaces) > 1): ?>
+                                            <button type="button" class="ws-icon-btn ws-icon-btn-danger btn-delete" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo $deleteLabel; ?>" aria-label="<?php echo $deleteLabel; ?>">
+                                                <i class="lucide lucide-trash-2"></i><span class="ws-icon-btn-text"><?php echo $deleteLabel; ?></span>
+                                            </button>
+                                        <?php endif; ?>
                                     </div>
-                                    <!-- Narrow screens: layoutWorkspaceRowActions() moves the buttons
-                                         that no longer fit on the line into this menu. -->
-                                    <button type="button" class="ws-actions-toggle" aria-haspopup="true" aria-expanded="false" title="<?php echo $actionsMenuLabel; ?>" aria-label="<?php echo $actionsMenuLabel; ?>">
-                                        <i class="lucide lucide-more-vertical"></i>
-                                    </button>
-                                    <div class="ws-actions-menu"></div>
                                 </div>
                             </li>
                         <?php endforeach; ?>
                     </ul>
+                    <p class="ws-filter-empty" id="workspace-filter-empty" hidden><?php echo t_h('workspaces.filter.no_results', [], 'No workspace matches this filter.', $currentLang); ?></p>
                 <?php endif; ?>
             </div>
         </div>
@@ -955,7 +968,7 @@ try {
             <p>
                 <?php echo t_h('workspaces.default.description_1', [], 'Choose which workspace opens when you start Poznote.', $currentLang); ?>
             </p>
-            <div class="form-group">
+            <div class="default-workspace-row">
                 <select id="defaultWorkspaceSelect" class="default-workspace-select">
                     <option value=""><?php echo t_h('common.loading', [], 'Loading...', $currentLang); ?></option>
                 </select>
@@ -967,6 +980,7 @@ try {
     <div id="ajaxAlert" class="initially-hidden alert-with-margin"></div>
     <div class="section-bottom-spacer"></div>
     </div>
+    <?php poznoteSettingsShellClose(); ?>
 
     <div id="workspaceInfoModal" class="modal initially-hidden">
         <div class="modal-content workspace-info-modal-content">
