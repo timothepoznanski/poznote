@@ -13,6 +13,9 @@
  *     (no connection, or a reverse proxy answering 502/503/504), the offline
  *     page (offline.php, stored by js/offline-sync.js) is served in its place:
  *     opening Poznote without a network shows the notes kept on the device.
+ *     A network that swallows requests without failing them (a VPN tunnel
+ *     left up without Wi-Fi, a captive portal, a dying signal) gets the
+ *     offline page too: a slow page has the server's health checked.
  *  3. Note attachments (api/v1/notes/{id}/attachments/{id}): network first,
  *     then the pictures js/offline-sync.js keeps for the offline notes.
  *
@@ -29,6 +32,20 @@ const ATTACHMENT_PATTERN = /\/api\/v1\/notes\/\d+\/attachments\/[^/]+$/;
 // server does get the offline page, which signs out on the device
 // (js/offline-app.js) and has the server session closed later.
 const NO_FALLBACK_PAGES = ['oidc_login.php', 'oidc_callback.php'];
+
+// A page slower than this has the server asked directly whether it is there
+// (api_health.php, answered in milliseconds). A server that answers is only
+// slow and the page is awaited; one that does not answer in time is out of
+// reach, and the offline page stands in when one is stored.
+const SLOW_NAVIGATION_MS = 1500;
+const HEALTH_TIMEOUT_MS = 2500;
+// Once the server was found silent, the assets of the offline page come
+// straight from the cache for a while instead of each waiting for the network.
+const SILENT_SERVER_MEMORY_MS = 30000;
+// The same wait for an asset when the worker has not seen the server silent
+// (it was restarted in between): the stored copy of that same version answers.
+const ASSET_TIMEOUT_MS = 3000;
+let serverSilentAt = 0;
 
 function scopeUrl(path) {
   return new URL(path, self.registration.scope).href;
@@ -83,10 +100,21 @@ async function dropOtherVersions(cache, url) {
   }));
 }
 
+async function cachedAsset(cache, request) {
+  return await cache.match(request)
+    // The offline page's own assets live in the shell cache.
+    || await caches.match(request, { cacheName: SHELL_CACHE });
+}
+
 async function handleStaticAsset(request, requestUrl) {
   const cache = await caches.open(STATIC_CACHE);
-  try {
-    const networkResponse = await fetch(request);
+  if (Date.now() - serverSilentAt < SILENT_SERVER_MEMORY_MS) {
+    const cachedResponse = await cachedAsset(cache, request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+  }
+  const network = fetch(request).then(async (networkResponse) => {
     if (networkResponse.ok) {
       // Assets are versioned with a ?v= query string, so each release stores
       // a brand-new entry. Drop the other versions of the same path first,
@@ -95,14 +123,31 @@ async function handleStaticAsset(request, requestUrl) {
       cache.put(request, networkResponse.clone());
     }
     return networkResponse;
+  });
+  network.catch(() => {});
+
+  // A server that stays silent would leave the offline page without its
+  // scripts (see ASSET_TIMEOUT_MS).
+  let timer = null;
+  const silentServer = new Promise((resolve) => {
+    timer = setTimeout(async () => {
+      const cachedResponse = await cachedAsset(cache, request);
+      if (cachedResponse) {
+        serverSilentAt = Date.now();
+        resolve(cachedResponse);
+      }
+    }, ASSET_TIMEOUT_MS);
+  });
+  try {
+    return await Promise.race([network, silentServer]);
   } catch (error) {
-    const cachedResponse = await cache.match(request)
-      // The offline page's own assets live in the shell cache.
-      || await caches.match(request, { cacheName: SHELL_CACHE });
+    const cachedResponse = await cachedAsset(cache, request);
     if (cachedResponse) {
       return cachedResponse;
     }
     throw error;
+  } finally {
+    clearTimeout(timer);
   }
 }
 
@@ -143,25 +188,67 @@ async function networkResponse(event) {
   return fetch(event.request);
 }
 
+async function serverAnswers() {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), HEALTH_TIMEOUT_MS);
+  try {
+    const response = await fetch(scopeUrl('api_health.php'), { cache: 'no-store', signal: controller.signal });
+    return response.status > 0 && response.status < 500;
+  } catch (e) {
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function handleNavigation(event, allowFallback) {
   if (!allowFallback) {
     return networkResponse(event);
   }
-  try {
-    const response = await networkResponse(event);
+  const requestUrl = new URL(event.request.url);
+  const method = event.request.method;
+  const network = networkResponse(event).then(async (response) => {
     if (response.status === 502 || response.status === 503 || response.status === 504) {
-      const shell = await offlineShellResponse(new URL(event.request.url));
+      const shell = await offlineShellResponse(requestUrl);
       if (shell) {
         return shell;
       }
     }
     return response;
-  } catch (error) {
-    const shell = await offlineShellResponse(new URL(event.request.url));
+  }, async (error) => {
+    const shell = await offlineShellResponse(requestUrl);
     if (shell) {
       return shell;
     }
     throw error;
+  });
+  // The request is not cancelled when the timeout wins: its late failure
+  // must not surface as an unhandled rejection.
+  network.catch(() => {});
+
+  // A form submission keeps waiting: the offline page must not answer a
+  // POST that may still land on the server.
+  if (method !== 'GET' && method !== 'HEAD') {
+    return network;
+  }
+
+  let timer = null;
+  let settled = false;
+  const silentServer = new Promise((resolve) => {
+    timer = setTimeout(async () => {
+      const shell = await offlineShellResponse(requestUrl);
+      if (!shell || await serverAnswers() || settled) {
+        return;
+      }
+      serverSilentAt = Date.now();
+      resolve(shell);
+    }, SLOW_NAVIGATION_MS);
+  });
+  try {
+    return await Promise.race([network, silentServer]);
+  } finally {
+    settled = true;
+    clearTimeout(timer);
   }
 }
 

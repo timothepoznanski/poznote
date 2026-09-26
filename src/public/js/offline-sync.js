@@ -674,7 +674,7 @@
 
     function probeServer() {
         var controller = window.AbortController ? new AbortController() : null;
-        var timer = controller ? setTimeout(function () { controller.abort(); }, 5000) : null;
+        var timer = controller ? setTimeout(function () { controller.abort(); }, 2500) : null;
         return fetch('api_health.php', { cache: 'no-store', credentials: 'same-origin', signal: controller ? controller.signal : undefined })
             .then(function (response) {
                 return response.status > 0 && response.status < 500;
@@ -818,7 +818,10 @@
 
     // A dead Wi-Fi fires no "offline" event: the app's own requests failing
     // (live refresh polls every few seconds) is what tells. Any network
-    // failure triggers one reachability check.
+    // failure triggers one reachability check, and so does a read the server
+    // leaves unanswered: a VPN tunnel left up without Wi-Fi, or a captive
+    // portal, swallows requests without ever failing them.
+    var STALLED_READ_MS = 3 * 1000;
     var probeScheduled = null;
     function checkAfterFailure() {
         if (WRITES_ONLY || probeScheduled || probeTimer) {
@@ -1002,6 +1005,15 @@
             var result = nativeFetch.apply(this, arguments);
             var method = String((init && init.method) || (input && typeof input === 'object' && input.method) || 'GET').toUpperCase();
             var url = (input && typeof input === 'object' && input.url) || String(input);
+            // Reads only: a large upload on a slow line is legitimately long.
+            var stalled = (method === 'GET' || method === 'HEAD')
+                ? setTimeout(checkAfterFailure, STALLED_READ_MS)
+                : null;
+            result.then(function () {
+                clearTimeout(stalled);
+            }, function () {
+                clearTimeout(stalled);
+            });
             result.then(function (response) {
                 if (method !== 'GET' && method !== 'HEAD' && response && response.ok) {
                     onNoteWrite(method, url, response);
