@@ -2952,13 +2952,19 @@
       "token_or_folder_auth_missing": "Falta el enlace o la autorización de carpeta",
       "link_in_use": "Este enlace personalizado ya está en uso",
       "link_invalid": "Enlace personalizado no válido. Caracteres permitidos: letras, números, -, _, . (4 a 128 caracteres)",
-      "shared_folder_not_found": "Carpeta compartida no encontrada.\n\nEsto puede ocurrir después de una restauración.\n\nEs posible que un administrador deba reconstruir la base de datos maestra en Configuración > Herramientas de administración para reparar los enlaces compartidos.",
-      "shared_note_not_found_or_denied": "No se encontró la nota compartida o se denegó el acceso.\n\nEsto puede ocurrir después de una restauración.\n\nEs posible que un administrador deba reconstruir la base de datos maestra en Configuración > Herramientas de administración para reparar los enlaces compartidos.",
-      "folder_not_found": "Carpeta no encontrada.\n\nEsto puede ocurrir después de una restauración.\n\nEs posible que un administrador deba reconstruir la base de datos maestra en Configuración > Herramientas de administración para reparar los enlaces compartidos.",
+      "shared_folder_not_found": "Carpeta compartida no encontrada",
+      "shared_folder_not_found_message": "Ninguna carpeta compartida corresponde a este enlace. Puede que su propietario haya eliminado el recurso compartido, o que el enlace sea incorrecto. Si crees que deberías tener acceso, contacta con el propietario o con el administrador.",
+      "shared_note_not_found": "Nota compartida no encontrada",
+      "shared_note_not_found_message": "Ninguna nota compartida corresponde a este enlace. Puede que su propietario haya eliminado el recurso compartido, o que el enlace sea incorrecto. Si crees que deberías tener acceso, contacta con el propietario o con el administrador.",
+      "note_unavailable_message": "Esta nota ya no está disponible. Puede que su propietario la haya eliminado. Contacta con el propietario o con el administrador si crees que se trata de un error.",
+      "link_incomplete_message": "Este enlace está incompleto, por lo que no se puede identificar el contenido compartido. Comprueba el enlace que recibiste o pide uno nuevo a la persona que lo compartió.",
+      "folder_not_found": "Carpeta no encontrada",
+      "folder_unavailable_message": "Esta carpeta ya no está disponible. Puede que su propietario la haya eliminado. Contacta con el propietario o con el administrador si crees que se trata de un error.",
       "note_not_found": "Nota no encontrada",
       "server_error": "Error del servidor",
       "share_disabled_title": "Este recurso compartido está inaccesible",
-      "share_disabled_message": "El propietario ha hecho inaccesible este recurso compartido."
+      "share_disabled_message": "El propietario ha hecho inaccesible este recurso compartido. Contacta con el propietario o con el administrador si necesitas acceder de nuevo.",
+      "registry_admin_hint": "Has iniciado sesión como administrador. Si el propietario sigue viendo este recurso compartido en su cuenta, el registro de enlaces compartidos está desincronizado: reconstruye la base de datos principal desde Configuración > Herramientas de administración."
     },
     "edit": {
       "button": "Editar",
@@ -2969,7 +2975,7 @@
     },
     "tree_tools": "Árbol de carpetas",
     "tree_search_hint": "Los resultados de búsqueda se muestran desplegados automáticamente.",
-    "shared_note_not_found_or_denied": "Nota compartida no encontrada o acceso denegado. Puede ocurrir tras una restauración. Es posible que un administrador tenga que reconstruir la base de datos principal en Ajustes > Herramientas de administración para reparar los enlaces compartidos.",
+    "access_denied_hint": "Solo las cuentas elegidas por el propietario pueden abrir este recurso compartido. Contacta con el propietario o con el administrador si necesitas acceso.",
     "token_update_failed": "No se pudo actualizar el token"
   },
   "public_folder": {
@@ -3521,10 +3527,11 @@
       "maintenance": {
         "title": "Reconstruir la base de datos principal",
         "subtitle": "Restaurar perfiles de usuario y enlaces públicos compartidos",
-        "description": "La base de datos principal (master.db) guarda la información de los usuarios, sus enlaces públicos y los ajustes globales de Poznote. Si este archivo se pierde o se daña, o si algunos enlaces públicos dejan de funcionar tras una restauración, esta herramienta recorre tus carpetas «data/users» para volver a registrar las cuentas automáticamente, recuperar sus nombres reales desde sus bases de datos personales y restaurar todos los enlaces públicos compartidos.",
+        "description": "La base de datos principal (master.db) guarda la información de los usuarios, sus enlaces públicos y los ajustes globales de Poznote. Si este archivo se pierde o se daña, o si algunos enlaces públicos dejan de funcionar tras copiar a mano las carpetas de usuario, esta herramienta recorre tus carpetas «data/users» para volver a registrar las cuentas automáticamente, recuperar sus nombres reales desde sus bases de datos personales y restaurar todos los enlaces públicos compartidos.",
         "repair_registry": "Reconstruir",
         "repair_registry_confirm": "Se recorrerán todas las carpetas de usuario y se reconstruirá la base de datos principal. ¿Continuar?",
         "repair_registry_success": "Base de datos principal reconstruida correctamente:\n\n- {{scanned}} carpetas analizadas\n- {{added}} usuarios restaurados\n- {{links}} enlaces compartidos reconstruidos",
+        "repair_registry_skipped": "- {{skipped}} enlaces compartidos conservados por otra cuenta",
         "repair_registry_error": "Error en la reconstrucción: {{error}}"
       },
       "confirm_admin": {

@@ -29,6 +29,14 @@ function poznoteSessionCookieIsSecure(): bool {
 }
 
 /**
+ * Name of the session cookie. It carries the configured port so several
+ * instances on one host keep separate sessions.
+ */
+function poznoteSessionName(): string {
+    return 'POZNOTE_SESSION_' . ($_ENV['HTTP_WEB_PORT'] ?? '8040');
+}
+
+/**
  * Start the shared session, configured the way auth.php always did. Does
  * nothing when a session is already open.
  */
@@ -48,7 +56,7 @@ function poznoteStartSession(): void {
     ]);
 
     // Configure session name based on configured port to allow multiple instances
-    $sessionName = 'POZNOTE_SESSION_' . ($_ENV['HTTP_WEB_PORT'] ?? '8040');
+    $sessionName = poznoteSessionName();
     session_name($sessionName);
 
     // Sessions live in the data volume, not in the container's /tmp: recreating

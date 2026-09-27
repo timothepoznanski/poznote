@@ -2481,6 +2481,81 @@ function unregisterSharedLinksForFolders(PDO $userCon, array $folderIds): void {
 }
 
 /**
+ * Re-register every share token of one account from that account's own
+ * database (shared_notes + shared_folders). The registry is what routes a
+ * public link to the owner's database, and it is not part of a user backup:
+ * without this, a restored share stays unreachable ("not found") until an
+ * administrator rebuilds the master database by hand.
+ *
+ * The account's stale registry rows go first, so a share the backup predates
+ * stops resolving. A token another account already holds is left to that
+ * account (its share is live, the restored one would silently steal it) and
+ * counted in 'skipped'. Per-note block rows (access_mode NULL) are never
+ * published, so they are not registered either.
+ */
+function syncSharedLinksFromUserDatabase(int $userId, PDO $userCon): array {
+    $stats = ['registered' => 0, 'skipped' => 0];
+    $rows = [];
+    $sources = [
+        'note' => ['shared_notes', 'note_id', 'AND access_mode IS NOT NULL'],
+        'folder' => ['shared_folders', 'folder_id', ''],
+    ];
+    foreach ($sources as $targetType => [$table, $idColumn, $extraWhere]) {
+        $exists = $userCon->query("SELECT name FROM sqlite_master WHERE type = 'table' AND name = '$table'")->fetchColumn();
+        if (!$exists) {
+            continue;
+        }
+        $columns = array_column($userCon->query("PRAGMA table_info($table)")->fetchAll(PDO::FETCH_ASSOC), 'name');
+        if ($extraWhere !== '' && !in_array('access_mode', $columns, true)) {
+            $extraWhere = '';
+        }
+        $stmt = $userCon->query("SELECT token, $idColumn AS target_id FROM $table WHERE token IS NOT NULL AND token != '' $extraWhere");
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $rows[] = [(string)$row['token'], $targetType, (int)$row['target_id']];
+        }
+    }
+
+    $con = getMasterConnection();
+    $ownsTransaction = !$con->inTransaction();
+    if ($ownsTransaction) {
+        $con->beginTransaction();
+    }
+    try {
+        $con->prepare("DELETE FROM shared_links WHERE user_id = ?")->execute([$userId]);
+        // Ownership is checked here rather than left to the table's key: some
+        // master.db files carry a (token, user_id) key, where an ignored
+        // insert would give one token two owners.
+        $heldElsewhere = $con->prepare("SELECT 1 FROM shared_links WHERE token = ? AND user_id != ? LIMIT 1");
+        $insert = $con->prepare("INSERT INTO shared_links (token, user_id, target_type, target_id) VALUES (?, ?, ?, ?)");
+        $seen = [];
+        foreach ($rows as [$token, $targetType, $targetId]) {
+            if (isset($seen[$token])) {
+                continue;
+            }
+            $seen[$token] = true;
+            $heldElsewhere->execute([$token, $userId]);
+            $taken = $heldElsewhere->fetchColumn();
+            $heldElsewhere->closeCursor();
+            if ($taken) {
+                $stats['skipped']++;
+                continue;
+            }
+            $insert->execute([$token, $userId, $targetType, $targetId]);
+            $stats['registered']++;
+        }
+        if ($ownsTransaction) {
+            $con->commit();
+        }
+    } catch (Exception $e) {
+        if ($ownsTransaction) {
+            $con->rollBack();
+        }
+        throw $e;
+    }
+    return $stats;
+}
+
+/**
  * Unregister a shared link from the global registry
  */
 function unregisterSharedLink(string $token): bool {

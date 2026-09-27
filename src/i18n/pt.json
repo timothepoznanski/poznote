@@ -2952,13 +2952,19 @@
       "token_or_folder_auth_missing": "Link ou autorização da pasta ausente",
       "link_in_use": "Este link personalizado já está em uso",
       "link_invalid": "Link personalizado inválido. Caracteres permitidos: letras, números, -, _, . (4 a 128 caracteres)",
-      "shared_folder_not_found": "Pasta compartilhada não encontrada.\n\nIsso pode acontecer após uma restauração.\n\nUm administrador talvez precise reconstruir o banco de dados mestre em Configurações > Ferramentas de administração para reparar os links de compartilhamento.",
-      "shared_note_not_found_or_denied": "Nota compartilhada não encontrada ou acesso negado.\n\nIsso pode acontecer após uma restauração.\n\nUm administrador talvez precise reconstruir o banco de dados mestre em Configurações > Ferramentas de administração para reparar os links de compartilhamento.",
-      "folder_not_found": "Pasta não encontrada.\n\nIsso pode acontecer após uma restauração.\n\nUm administrador talvez precise reconstruir o banco de dados mestre em Configurações > Ferramentas de administração para reparar os links de compartilhamento.",
+      "shared_folder_not_found": "Pasta compartilhada não encontrada",
+      "shared_folder_not_found_message": "Nenhuma pasta compartilhada corresponde a este link. O compartilhamento pode ter sido removido pelo proprietário, ou o link pode estar errado. Se você acha que deveria ter acesso, entre em contato com o proprietário ou com o administrador.",
+      "shared_note_not_found": "Nota compartilhada não encontrada",
+      "shared_note_not_found_message": "Nenhuma nota compartilhada corresponde a este link. O compartilhamento pode ter sido removido pelo proprietário, ou o link pode estar errado. Se você acha que deveria ter acesso, entre em contato com o proprietário ou com o administrador.",
+      "note_unavailable_message": "Esta nota não está mais disponível. O proprietário pode tê-la excluído. Entre em contato com o proprietário ou com o administrador se você acha que isso é um erro.",
+      "link_incomplete_message": "Este link está incompleto, por isso o conteúdo compartilhado não pode ser identificado. Verifique o link que você recebeu ou peça um novo à pessoa que o compartilhou.",
+      "folder_not_found": "Pasta não encontrada",
+      "folder_unavailable_message": "Esta pasta não está mais disponível. O proprietário pode tê-la excluído. Entre em contato com o proprietário ou com o administrador se você acha que isso é um erro.",
       "note_not_found": "Nota não encontrada",
       "server_error": "Erro do servidor",
       "share_disabled_title": "Este compartilhamento está inacessível",
-      "share_disabled_message": "O proprietário tornou este compartilhamento inacessível."
+      "share_disabled_message": "O proprietário tornou este compartilhamento inacessível. Entre em contato com o proprietário ou com o administrador se precisar de acesso novamente.",
+      "registry_admin_hint": "Você está conectado como administrador. Se o proprietário ainda vê este compartilhamento em sua conta, o registro de links compartilhados está dessincronizado: reconstrua o banco de dados principal em Configurações > Ferramentas de administração."
     },
     "edit": {
       "button": "Editar",
@@ -2969,7 +2975,7 @@
     },
     "tree_tools": "Árvore de pastas",
     "tree_search_hint": "Os resultados da pesquisa são exibidos expandidos automaticamente.",
-    "shared_note_not_found_or_denied": "Nota compartilhada não encontrada ou acesso negado. Isso pode acontecer após uma restauração. Um administrador talvez precise reconstruir o banco de dados principal em Configurações > Ferramentas de administração para reparar os links compartilhados.",
+    "access_denied_hint": "Somente as contas escolhidas pelo proprietário podem abrir este compartilhamento. Entre em contato com o proprietário ou com o administrador se precisar de acesso.",
     "token_update_failed": "Falha ao atualizar o token"
   },
   "public_folder": {
@@ -3521,10 +3527,11 @@
       "maintenance": {
         "title": "Reconstruir o banco de dados principal",
         "subtitle": "Restaurar perfis de usuário e links públicos de compartilhamento",
-        "description": "O banco de dados principal (master.db) armazena as informações dos usuários, seus links públicos e as configurações globais do Poznote. Se esse arquivo for perdido ou corrompido, ou se alguns links públicos pararem de funcionar após uma restauração, esta ferramenta percorre suas pastas \"data/users\" para registrar novamente as contas automaticamente, recuperar seus nomes reais a partir dos bancos de dados pessoais e restaurar todos os links públicos de compartilhamento.",
+        "description": "O banco de dados principal (master.db) armazena as informações dos usuários, seus links públicos e as configurações globais do Poznote. Se esse arquivo for perdido ou corrompido, ou se alguns links públicos pararem de funcionar após copiar manualmente as pastas de usuários, esta ferramenta percorre suas pastas \"data/users\" para registrar novamente as contas automaticamente, recuperar seus nomes reais a partir dos bancos de dados pessoais e restaurar todos os links públicos de compartilhamento.",
         "repair_registry": "Reconstruir",
         "repair_registry_confirm": "Todas as pastas de usuários serão analisadas e o banco de dados principal será reconstruído. Continuar?",
         "repair_registry_success": "Banco de dados principal reconstruído com sucesso:\n\n- {{scanned}} pastas analisadas\n- {{added}} usuários restaurados\n- {{links}} links compartilhados reconstruídos",
+        "repair_registry_skipped": "- {{skipped}} links compartilhados mantidos por outra conta",
         "repair_registry_error": "Erro na reconstrução: {{error}}"
       },
       "confirm_admin": {

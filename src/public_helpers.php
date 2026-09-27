@@ -422,7 +422,7 @@ function renderAccessDeniedPage($currentLang) {
         'badge' => t_h('public.access_denied_title', [], 'Access Denied', $currentLang),
         'title' => t_h('public.access_denied_title', [], 'Access Denied', $currentLang),
         'message' => t_h('public.access_denied_message', [], 'You do not have permission to view this content.', $currentLang),
-        'hint' => t_h('public.shared_note_not_found_or_denied', [], 'Shared note not found or access denied. This can happen after a restore. An administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.', $currentLang),
+        'hint' => t_h('public.access_denied_hint', [], 'Only the accounts chosen by the owner can open this share. Contact the owner or the administrator if you need access.', $currentLang),
         'actions' => [
             [
                 'href' => '/index.php',
@@ -442,7 +442,7 @@ function renderPublicShareDisabledPage($currentLang) {
         'icon' => '🚫',
         'badge' => '403',
         'title' => t_h('public.errors.share_disabled_title', [], 'This share is inaccessible', $currentLang),
-        'message' => t_h('public.errors.share_disabled_message', [], 'The owner has made this share inaccessible.', $currentLang),
+        'message' => t_h('public.errors.share_disabled_message', [], 'The owner has made this share inaccessible. Contact the owner or the administrator if you need access again.', $currentLang),
         'actions' => [
             [
                 'href' => '/index.php',
@@ -450,6 +450,29 @@ function renderPublicShareDisabledPage($currentLang) {
             ],
         ],
     ]);
+}
+
+/**
+ * Extra line for the "share not found" pages, shown only to a signed-in
+ * administrator: a visitor can do nothing about a registry gap, while the
+ * administrator has the Rebuild tool. A restore re-registers its own links
+ * (lib/backup-restore.php), so this is left for user folders copied by hand.
+ */
+function getPublicShareNotFoundAdminHint($currentLang) {
+    // Only a browser that already holds a Poznote session can belong to a
+    // signed-in administrator. Opening one for anybody else would hand every
+    // visitor of a dead link a new session cookie and a session file.
+    if (session_status() !== PHP_SESSION_ACTIVE && empty($_COOKIE[poznoteSessionName()])) {
+        return '';
+    }
+    // Same session fields auth.php's getAuthenticatedUser() reads; auth.php
+    // itself is not loaded on the public pages.
+    poznoteStartSession();
+    $user = $_SESSION['login_user'] ?? $_SESSION['user'] ?? null;
+    if (!is_array($user) || empty($user['is_admin'])) {
+        return '';
+    }
+    return t_h('public.errors.registry_admin_hint', [], 'You are signed in as an administrator. If the owner still lists this share in their account, the shared links registry is out of sync: rebuild the master database from Settings > Admin Tools.', $currentLang);
 }
 
 /**

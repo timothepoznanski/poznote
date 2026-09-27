@@ -2951,13 +2951,19 @@
       "token_or_folder_auth_missing": "Link oder Ordnerberechtigung fehlt",
       "link_in_use": "Dieser individuelle Link wird bereits verwendet",
       "link_invalid": "Ungültiger individueller Link. Erlaubte Zeichen: Buchstaben, Zahlen, -, _, . (4 bis 128 Zeichen)",
-      "shared_folder_not_found": "Geteilter Ordner nicht gefunden.\n\nDas kann nach einer Wiederherstellung passieren.\n\nEin Administrator muss möglicherweise die Master-Datenbank unter Einstellungen > Administrationstools neu aufbauen, um die Freigabelinks zu reparieren.",
-      "shared_note_not_found_or_denied": "Geteilte Notiz nicht gefunden oder Zugriff verweigert.\n\nDas kann nach einer Wiederherstellung passieren.\n\nEin Administrator muss möglicherweise die Master-Datenbank unter Einstellungen > Administrationstools neu aufbauen, um die Freigabelinks zu reparieren.",
-      "folder_not_found": "Ordner nicht gefunden.\n\nDas kann nach einer Wiederherstellung passieren.\n\nEin Administrator muss möglicherweise die Master-Datenbank unter Einstellungen > Administrationstools neu aufbauen, um die Freigabelinks zu reparieren.",
+      "shared_folder_not_found": "Geteilter Ordner nicht gefunden",
+      "shared_folder_not_found_message": "Zu diesem Link gehört kein geteilter Ordner. Die Freigabe wurde möglicherweise vom Besitzer entfernt, oder der Link ist falsch. Wenn Sie glauben, Zugriff haben zu müssen, wenden Sie sich an den Besitzer oder den Administrator.",
+      "shared_note_not_found": "Geteilte Notiz nicht gefunden",
+      "shared_note_not_found_message": "Zu diesem Link gehört keine geteilte Notiz. Die Freigabe wurde möglicherweise vom Besitzer entfernt, oder der Link ist falsch. Wenn Sie glauben, Zugriff haben zu müssen, wenden Sie sich an den Besitzer oder den Administrator.",
+      "note_unavailable_message": "Diese Notiz ist nicht mehr verfügbar. Ihr Besitzer hat sie möglicherweise gelöscht. Wenden Sie sich an den Besitzer oder den Administrator, wenn Sie das für einen Fehler halten.",
+      "link_incomplete_message": "Dieser Link ist unvollständig, der geteilte Inhalt lässt sich daher nicht ermitteln. Prüfen Sie den erhaltenen Link oder bitten Sie die Person, die ihn geteilt hat, um einen neuen.",
+      "folder_not_found": "Ordner nicht gefunden",
+      "folder_unavailable_message": "Dieser Ordner ist nicht mehr verfügbar. Sein Besitzer hat ihn möglicherweise gelöscht. Wenden Sie sich an den Besitzer oder den Administrator, wenn Sie das für einen Fehler halten.",
       "note_not_found": "Notiz nicht gefunden",
       "server_error": "Serverfehler",
       "share_disabled_title": "Diese Freigabe ist unzugänglich",
-      "share_disabled_message": "Der Besitzer hat diese Freigabe unzugänglich gemacht."
+      "share_disabled_message": "Der Besitzer hat diese Freigabe unzugänglich gemacht. Wenden Sie sich an den Besitzer oder den Administrator, wenn Sie wieder Zugriff benötigen.",
+      "registry_admin_hint": "Sie sind als Administrator angemeldet. Wenn der Besitzer diese Freigabe in seinem Konto noch sieht, ist das Verzeichnis der Freigabelinks nicht mehr synchron: Bauen Sie die Hauptdatenbank unter Einstellungen > Admin-Werkzeuge neu auf."
     },
     "edit": {
       "button": "Bearbeiten",
@@ -2968,7 +2974,7 @@
     },
     "tree_tools": "Ordnerbaum",
     "tree_search_hint": "Suchergebnisse werden automatisch aufgeklappt angezeigt.",
-    "shared_note_not_found_or_denied": "Geteilte Notiz nicht gefunden oder Zugriff verweigert. Das kann nach einer Wiederherstellung passieren. Ein Administrator muss eventuell unter Einstellungen > Administrationswerkzeuge die Hauptdatenbank neu aufbauen, um die Freigabelinks zu reparieren.",
+    "access_denied_hint": "Nur die vom Besitzer ausgewählten Konten können diese Freigabe öffnen. Wenden Sie sich an den Besitzer oder den Administrator, wenn Sie Zugriff benötigen.",
     "token_update_failed": "Token konnte nicht aktualisiert werden"
   },
   "public_folder": {
@@ -3520,10 +3526,11 @@
       "maintenance": {
         "title": "Hauptdatenbank neu aufbauen",
         "subtitle": "Benutzerprofile und öffentliche Freigabelinks wiederherstellen",
-        "description": "Die Hauptdatenbank (master.db) speichert die Benutzerinformationen, ihre öffentlichen Links und die globalen Einstellungen von Poznote. Geht diese Datei verloren oder wird sie beschädigt, oder funktionieren nach einer Wiederherstellung einige öffentliche Links nicht mehr, durchsucht dieses Werkzeug Ihre Ordner „data/users“, um die Konten automatisch neu zu registrieren, ihre echten Namen aus den persönlichen Datenbanken wiederherzustellen und alle öffentlichen Freigabelinks wiederherzustellen.",
+        "description": "Die Hauptdatenbank (master.db) speichert die Benutzerinformationen, ihre öffentlichen Links und die globalen Einstellungen von Poznote. Geht diese Datei verloren oder wird sie beschädigt, oder funktionieren einige öffentliche Links nicht mehr, nachdem Benutzerordner von Hand kopiert wurden, durchsucht dieses Werkzeug Ihre Ordner „data/users“, um die Konten automatisch neu zu registrieren, ihre echten Namen aus den persönlichen Datenbanken wiederherzustellen und alle öffentlichen Freigabelinks wiederherzustellen.",
         "repair_registry": "Neu aufbauen",
         "repair_registry_confirm": "Alle Benutzerordner werden durchsucht und die Hauptdatenbank wird neu aufgebaut. Fortfahren?",
         "repair_registry_success": "Hauptdatenbank erfolgreich neu aufgebaut:\n\n- {{scanned}} Ordner durchsucht\n- {{added}} Benutzer wiederhergestellt\n- {{links}} Freigabelinks neu aufgebaut",
+        "repair_registry_skipped": "- {{skipped}} Freigabelinks bei einem anderen Konto belassen",
         "repair_registry_error": "Fehler beim Neuaufbau: {{error}}"
       },
       "confirm_admin": {

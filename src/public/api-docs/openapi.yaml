@@ -5164,6 +5164,9 @@ paths:
                         type: integer
                       links_rebuilt:
                         type: integer
+                      links_skipped:
+                        type: integer
+                        description: Links left with another account that already uses the same token
                       errors:
                         type: array
                         items:

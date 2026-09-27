@@ -128,7 +128,7 @@ if (empty($token) && (empty($folderToken) || empty($noteIdParam))) {
             'icon' => '⚠️',
             'badge' => '400',
             'title' => t_h('public.errors.token_or_folder_auth_missing', [], 'Token or folder authorization missing', $currentLang),
-            'message' => t_h('public.errors.shared_note_not_found_or_denied', [], 'Shared note not found or access denied. This can happen after a restore. An administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.', $currentLang),
+            'message' => t_h('public.errors.link_incomplete_message', [], 'This link is incomplete, so the shared content cannot be identified. Check the link you received, or ask the person who shared it for a new one.', $currentLang),
             'hint' => t_h('public.token_help', [], 'The token is the unique part you choose in the public link. For example, using project-2026 gives https://your-domain.example/project-2026 for a note, or https://your-domain.example/folder/project-2026 for a folder.', $currentLang),
             'actions' => [
                 [
@@ -279,14 +279,17 @@ try {
 
 
     if (!$sharedNote) {
-        $noteMsg = t_h('public.errors.shared_note_not_found_or_denied', [], "Shared note not found or access denied.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.", $currentLang);
-        [, $noteDetail] = array_pad(explode("\n\n", $noteMsg, 2), 2, '');
+        // No share carries this token: the owner removed it, the link is
+        // wrong, or (user folders copied by hand) the registry never heard of
+        // it. The visitor cannot tell these apart, so the message names the
+        // people who can; a signed-in administrator also gets the Rebuild hint.
         renderPublicStatusPage($currentLang, [
             'status' => 404,
             'icon' => '🧭',
             'badge' => '404',
-            'title' => t_h('public.errors.note_not_found', [], 'Note not found', $currentLang),
-            'message' => $noteDetail,
+            'title' => t_h('public.errors.shared_note_not_found', [], 'Shared note not found', $currentLang),
+            'message' => t_h('public.errors.shared_note_not_found_message', [], 'No shared note matches this link. The share may have been removed by its owner, or the link may be wrong. If you think you should have access, contact the owner or the administrator.', $currentLang),
+            'hint' => getPublicShareNotFoundAdminHint($currentLang),
             'actions' => [
                 [
                     'href' => '/index.php',
@@ -509,14 +512,13 @@ try {
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$note) {
-        $noteMsg = t_h('public.errors.shared_note_not_found_or_denied', [], "Shared note not found or access denied.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.", $currentLang);
-        [, $noteDetail] = array_pad(explode("\n\n", $noteMsg, 2), 2, '');
+        // The share exists but its note is gone (deleted, or in the trash)
         renderPublicStatusPage($currentLang, [
             'status' => 404,
             'icon' => '🗒️',
             'badge' => '404',
             'title' => t_h('public.errors.note_not_found', [], 'Note not found', $currentLang),
-            'message' => $noteDetail,
+            'message' => t_h('public.errors.note_unavailable_message', [], 'This note is no longer available. Its owner may have deleted it. Contact the owner or the administrator if you think this is a mistake.', $currentLang),
             'actions' => [
                 [
                     'href' => '/index.php',
