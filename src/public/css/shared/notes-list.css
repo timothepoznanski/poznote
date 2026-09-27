@@ -12,6 +12,8 @@
     --shared-name-width: 220px;
     --shared-token-width: 210px;
     --shared-actions-width: 228px;
+    /* Indent of one tree level; its guide lines are drawn at the same step */
+    --shared-indent-step: 32px;
     max-width: var(--shared-content-max-width, 980px);
     margin: 0 auto;
 }
@@ -134,9 +136,9 @@
     background-image: repeating-linear-gradient(
         to right,
         rgba(13, 110, 253, 0.22) 0 2px,
-        transparent 2px 32px
+        transparent 2px var(--shared-indent-step)
     );
-    background-size: calc(var(--shared-indent-level, 0) * 32px) 100%;
+    background-size: calc(var(--shared-indent-level, 0) * var(--shared-indent-step)) 100%;
     background-position: 22px 0;
     background-repeat: no-repeat;
     pointer-events: none;
@@ -198,7 +200,7 @@
 }
 
 .shared-note-item.shared-hierarchy-item .note-name-container {
-    padding-left: calc(8px + var(--shared-indent-level, 0) * 32px);
+    padding-left: calc(8px + var(--shared-indent-level, 0) * var(--shared-indent-step));
 }
 
 .note-name {
@@ -495,42 +497,43 @@ html[data-theme='dark'] .folder-name-path {
         padding-left: 34px;
         padding-right: 18px;
     }
+}
 
-    /* Soft action buttons: tinted background with a colored icon, full color
-       on hover. Much lighter than a saturated chip on every row. */
-    .note-actions .btn {
-        border-radius: var(--pz-radius-sm);
-    }
+/* Soft action buttons: tinted background with a colored icon, full color
+   on hover. Much lighter than a saturated chip on every row. Every width:
+   the mobile table (shared/responsive.css) keeps the desktop look. */
+.note-actions .btn {
+    border-radius: var(--pz-radius-sm);
+}
 
-    .note-actions .btn-success {
-        background: rgba(46, 125, 50, 0.13);
-        color: var(--pz-success-hover);
-    }
+.note-actions .btn-success {
+    background: rgba(46, 125, 50, 0.13);
+    color: var(--pz-success-hover);
+}
 
-    .note-actions .btn-success:hover {
-        background: var(--pz-success-text-hover);
-        color: var(--pz-text-inverse);
-    }
+.note-actions .btn-success:hover {
+    background: var(--pz-success-text-hover);
+    color: var(--pz-text-inverse);
+}
 
-    .note-actions .btn-primary {
-        background: rgba(var(--pz-accent-rgb), 0.13);
-        color: var(--pz-accent-text);
-    }
+.note-actions .btn-primary {
+    background: rgba(var(--pz-accent-rgb), 0.13);
+    color: var(--pz-accent-text);
+}
 
-    .note-actions .btn-primary:hover {
-        background: var(--pz-accent-text);
-        color: var(--pz-text-inverse);
-    }
+.note-actions .btn-primary:hover {
+    background: var(--pz-accent-text);
+    color: var(--pz-text-inverse);
+}
 
-    .note-actions .btn-danger {
-        background: rgba(224, 75, 75, 0.13);
-        color: var(--pz-danger-text);
-    }
+.note-actions .btn-danger {
+    background: rgba(224, 75, 75, 0.13);
+    color: var(--pz-danger-text);
+}
 
-    .note-actions .btn-danger:hover {
-        background: var(--pz-danger);
-        color: var(--pz-text-inverse);
-    }
+.note-actions .btn-danger:hover {
+    background: var(--pz-danger);
+    color: var(--pz-text-inverse);
 }
 
 /* Kept offline in this browser (js/offline-marks.js) */

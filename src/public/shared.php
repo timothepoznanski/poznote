@@ -109,7 +109,7 @@ usort($shared_folders, function($a, $b) {
 	<script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
-<body class="shared-page has-icon-sidebar"
+<body class="shared-page shared-table-page has-icon-sidebar"
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
       data-current-user-id="<?php echo (int)$_SESSION['user_id']; ?>"
       data-txt-error="<?php echo t_h('common.error', [], 'Error'); ?>"

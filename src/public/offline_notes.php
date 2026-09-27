@@ -34,7 +34,7 @@ $currentLang = getUserLanguage();
 	<script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
-<body class="shared-page offline-list-page has-icon-sidebar"
+<body class="shared-page shared-table-page offline-list-page has-icon-sidebar"
 	data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
 	data-txt-error="<?php echo t_h('common.error', [], 'Error'); ?>"
 	data-txt-untitled="<?php echo t_h('common.untitled', [], 'Untitled'); ?>"

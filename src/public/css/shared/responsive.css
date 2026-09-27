@@ -79,6 +79,24 @@
         background-color: var(--pz-surface-hover);
     }
 
+    /* Shares and Offline pages: no forced scrollbar. The rules above keep
+       a styled track along the right edge even when nothing scrolls; here
+       the page scrolls on the root, with the browser's own scrollbar, only
+       when the list is taller than the screen. */
+    html:has(> body.shared-table-page) {
+        overflow-y: auto !important;
+    }
+
+    body.shared-table-page {
+        overflow: visible !important;
+    }
+
+    html:has(> body.shared-table-page)::-webkit-scrollbar,
+    body.shared-table-page::-webkit-scrollbar {
+        width: auto !important;
+        background-color: transparent;
+    }
+
     /* Fix pour iOS Safari */
     .shared-container {
         position: relative !important;
@@ -135,16 +153,10 @@
         justify-content: flex-start !important;
     }
 
-    /* Simplified mobile layout */
-    .shared-note-item {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr);
-        grid-template-areas:
-            "name"
-            "folder"
-            "token"
-            "actions";
-        align-items: start;
+    /* Folders page (list_folders.php): rows kept apart as tiles. :where()
+       keeps the weight of the plain class selectors these rules had before
+       the Shares and Offline pages switched to the table below. */
+    :where(#foldersList) .shared-note-item {
         gap: 10px 12px;
         padding: 16px;
         border-radius: var(--pz-radius-xl);
@@ -153,124 +165,176 @@
         box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
     }
 
-    .shared-note-item.shared-hierarchy-item {
-        margin-left: calc(var(--shared-indent-level, 0) * 12px);
-        padding-left: calc(12px + var(--shared-indent-level, 0) * 6px);
-    }
-
-    .shared-note-item.shared-hierarchy-item::before {
-        display: none;
-    }
-
-    .shared-note-item.shared-hierarchy-item .note-name-container {
-        padding-left: 0;
-    }
-
-    .shared-notes-header {
-        display: none;
-    }
-
-    .note-name {
-        min-width: auto;
-        max-width: 100%;
-        font-size: 16px;
-        line-height: 1.35;
-        white-space: normal;
-    }
-
-    .note-name-container,
-    .note-folder-container,
-    .note-token-wrap,
-    .note-actions {
+    :where(#foldersList) .note-name-container {
         min-width: 0;
         width: 100%;
         max-width: 100%;
         flex: 1 1 auto;
-    }
-
-    .note-folder-container,
-    .note-token-wrap,
-    .note-actions {
-        border-left: none;
-        padding-left: 0;
-    }
-
-    .note-name-container {
-        grid-area: name;
         align-items: flex-start;
-        width: 100%;
     }
 
-    .shared-folder-toggle {
+    :where(#foldersList) .shared-folder-toggle {
         width: 26px;
         height: 26px;
         border-radius: var(--pz-radius-lg);
     }
 
-    .folder-badge {
-        font-size: 14px;
-        line-height: 1.4;
-        white-space: normal;
-    }
-
-    .note-token-wrap {
-        grid-area: token;
-        width: 100%;
-        min-width: 0;
-        padding: 10px 12px;
-        border-radius: var(--pz-radius-lg);
-        background: transparent;
-        border: none;
-    }
-
-    .note-token {
-        width: 100%;
-        font-size: 12px;
-        line-height: 1.45;
-        white-space: normal;
-        overflow-wrap: anywhere;
-    }
-
-    .note-actions {
-        grid-area: actions;
-        width: 100%;
-        min-width: 0;
-        justify-content: flex-end;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-top: 2px;
-    }
-
-    .note-actions .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        flex: 0 0 auto;
-        width: 32px;
-        min-width: 32px;
-        height: 32px;
-        padding: 0;
-    }
-
-    .note-actions .btn i {
-        font-size: 13px;
-        line-height: 1;
-    }
-
-    .note-actions-placeholder {
-        width: 100%;
-        text-align: right;
-    }
-
-    html[data-theme='dark'] .shared-note-item {
-        background: var(--pz-bg);
+    html[data-theme='dark'] :where(#foldersList) .shared-note-item {
+        border-color: var(--pz-border-strong);
+        background-color: rgba(var(--pz-highlight-rgb), 0.05);
         box-shadow: 0 8px 20px rgba(var(--pz-shadow-rgb), 0.22);
     }
 
-    html[data-theme='dark'] .note-token-wrap {
-        background: transparent;
-        border-color: transparent;
+    /* Shares and Offline pages (body.shared-table-page): narrower page
+       margins leave the table room for its three columns, and the list lines
+       up with the filter bar. */
+    body.shared-table-page {
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+
+    .shared-table-page .shared-container {
+        padding-left: 6px !important;
+        padding-right: 6px !important;
+    }
+
+    .shared-table-page .shared-content {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    /* Shares and Offline pages: the desktop table, compacted. One grid for
+       the whole list, the header and every row are subgrids of it, so the
+       three columns line up without the JS measurement (skipped at this
+       width). Names, links and paths ellipsize; the path stays in the
+       row's title. */
+    #sharedItemsContainer .shared-notes-list {
+        --shared-indent-step: 18px;
+        --shared-column-gap: 8px;
+        display: grid;
+        /* fit-content: four buttons fit, a wordy placeholder wraps instead
+           of widening the column over the names */
+        grid-template-columns: minmax(0, 5fr) minmax(0, 2fr) fit-content(116px);
+        column-gap: var(--shared-column-gap);
+        max-width: 100%;
+        padding: 0;
+    }
+
+    /* Offline: one button, and the middle column holds words */
+    .offline-list-page #sharedItemsContainer .shared-notes-list {
+        grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) fit-content(116px);
+    }
+
+    #sharedItemsContainer .shared-notes-header,
+    #sharedItemsContainer .shared-note-item {
+        display: grid;
+        grid-column: 1 / -1;
+        grid-template-columns: subgrid;
+        align-items: center;
+        padding: 0 4px;
+        margin: 0;
+    }
+
+    #sharedItemsContainer .shared-notes-header {
+        padding-bottom: 6px;
+    }
+
+    #sharedItemsContainer .shared-notes-header-cell {
+        width: auto;
+        min-width: 0;
+        padding: 0;
+        font-size: 11px;
+    }
+
+    #sharedItemsContainer .shared-notes-header-note {
+        text-align: left;
+    }
+
+    #sharedItemsContainer .shared-notes-header-actions {
+        text-align: right;
+    }
+
+    /* The help tooltip must stay on a phone screen */
+    #sharedItemsContainer .shared-header-help-tooltip {
+        min-width: 0;
+        width: 240px;
+        max-width: calc(100vw - 32px);
+    }
+
+    #sharedItemsContainer .note-name-container,
+    #sharedItemsContainer .note-token-wrap,
+    #sharedItemsContainer .note-actions {
+        width: auto;
+        min-width: 0;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    #sharedItemsContainer .note-name-container {
+        gap: 6px;
+    }
+
+    /* Type, lock and restriction icons keep their size; the name gives way */
+    #sharedItemsContainer .note-name-container > i,
+    #sharedItemsContainer .shared-folder-toggle {
+        flex: 0 0 auto;
+    }
+
+    #sharedItemsContainer .shared-hierarchy-item::before {
+        background-position: 14px 0;
+    }
+
+    #sharedItemsContainer .shared-hierarchy-item .note-name-container {
+        padding-left: calc(var(--shared-indent-level, 0) * var(--shared-indent-step));
+    }
+
+    #sharedItemsContainer .note-name {
+        font-size: 14px;
+    }
+
+    #sharedItemsContainer .note-token-wrap,
+    #sharedItemsContainer .note-token-wrap.read-only {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    #sharedItemsContainer .note-token {
+        flex: 0 1 auto;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    /* A reason is words, not a token: it may take a second line */
+    #sharedItemsContainer .offline-reason-cell .note-token {
+        white-space: normal;
+        line-height: 1.3;
+    }
+
+    #sharedItemsContainer .note-actions {
+        justify-content: flex-end;
+        gap: 3px;
+    }
+
+    #sharedItemsContainer .note-actions .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        min-width: 26px;
+        height: 26px;
+        padding: 0;
+    }
+
+    #sharedItemsContainer .note-actions-placeholder {
+        font-size: 11px;
+        line-height: 1.3;
+        white-space: normal;
+    }
+
+    #sharedItemsContainer .note-actions .btn i {
+        font-size: 13px;
+        line-height: 1;
     }
 
     .empty-message {
@@ -302,18 +366,18 @@
     html[data-theme='dark'] .indexable-label-text {
         color: var(--pz-text-strong);
     }
+}
 
-    html[data-theme='dark'] .shared-note-item {
-        border-color: var(--pz-border-strong);
-        background-color: rgba(var(--pz-highlight-rgb), 0.05);
+/* Below 360px the Shares table cannot hold the link beside four buttons and
+   a readable name: the link column goes, the copy button still gives it. */
+@media (max-width: 359px) {
+    body:not(.offline-list-page) #sharedItemsContainer .shared-notes-list {
+        grid-template-columns: minmax(0, 1fr) fit-content(116px);
     }
 
-    html[data-theme='dark'] .note-name {
-        color: var(--pz-accent-text);
-    }
-
-    html[data-theme='dark'] .note-token {
-        color: var(--pz-text);
+    body:not(.offline-list-page) #sharedItemsContainer .shared-notes-header-token,
+    body:not(.offline-list-page) #sharedItemsContainer .note-token-wrap {
+        display: none;
     }
 }
 
