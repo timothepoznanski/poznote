@@ -102,7 +102,7 @@ function showSaveInProgressNotification(onCompleteCallback) {
             '<span>' + tr('autosave.notification.saving', {}, 'Saving changes...') + '</span>' +
         '</div>';
 
-    document.body.appendChild(notification);
+    (window.poznoteToastStack ? window.poznoteToastStack() : document.body).appendChild(notification);
 
     // Force immediate save
     var currentNoteId = window.noteid;

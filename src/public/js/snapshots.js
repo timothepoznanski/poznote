@@ -778,6 +778,9 @@
     }
 
     function ensureSnapshotToastContainer() {
+        // Shared with the "Saved!" toast so both stack (issue 1508)
+        if (typeof window.poznoteToastStack === 'function') return window.poznoteToastStack();
+
         var id = 'snapshot-toast-container';
         var container = document.getElementById(id);
         if (container) return container;

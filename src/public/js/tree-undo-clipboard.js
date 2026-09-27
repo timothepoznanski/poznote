@@ -232,7 +232,7 @@
         el.setAttribute('data-tree-toast', 'true');
         el.innerHTML = '<div class="save-notification-inner"><div class="save-notification-check">✓</div><span></span></div>';
         el.querySelector('span').textContent = message;
-        document.body.appendChild(el);
+        (window.poznoteToastStack ? window.poznoteToastStack() : document.body).appendChild(el);
 
         toastTimeout = setTimeout(function () {
             if (el.parentNode) el.parentNode.removeChild(el);

@@ -89,7 +89,7 @@
         toast.setAttribute('role', 'status');
         toast.innerHTML = '<div class="save-notification-inner"><div class="save-notification-check">✓</div><span></span></div>';
         toast.querySelector('span').textContent = text;
-        document.body.appendChild(toast);
+        (window.poznoteToastStack ? window.poznoteToastStack() : document.body).appendChild(toast);
 
         toastTimeout = setTimeout(function () {
             if (toast.parentNode) toast.parentNode.removeChild(toast);

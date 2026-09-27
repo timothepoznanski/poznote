@@ -126,6 +126,9 @@
 
     // Lightweight accessible toast helper
     function ensureToastContainer() {
+        // Shared with the other top-right toasts so they stack (issue 1508);
+        // public notes do not load js/ui.js and keep their own column.
+        if (typeof window.poznoteToastStack === 'function') return window.poznoteToastStack();
         var id = 'copy-toast-container';
         var container = document.getElementById(id);
         if (container) return container;

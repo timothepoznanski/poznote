@@ -81,7 +81,7 @@
         notification.querySelector('span').textContent =
             (typeof window.t === 'function') ? window.t('autosave.notification.saved', null, 'Saved!') : 'Saved!';
 
-        document.body.appendChild(notification);
+        (window.poznoteToastStack ? window.poznoteToastStack() : document.body).appendChild(notification);
         savedToastTimeoutId = setTimeout(function () {
             if (notification.parentNode) {
                 notification.parentNode.removeChild(notification);

@@ -349,6 +349,13 @@ img.img-with-border-no-padding {
     max-width: 300px;
     animation: slideInRight 0.3s ease;
 }
+/* Inside the shared top-right column (js/ui.js poznoteToastStack) the column
+   places it, so a second toast lands below instead of on top (issue 1508). */
+#pz-toast-stack > .save-notification {
+    position: static;
+    margin-top: 8px;
+    pointer-events: auto;
+}
 .save-notification-inner {
     display: flex;
     align-items: center;

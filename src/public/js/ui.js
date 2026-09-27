@@ -7,6 +7,28 @@
 // NOTIFICATIONS
 // ============================================================================
 
+// The one column the top-right toasts share ("Saved!", "Snapshot added",
+// "Copied"...), so that two at once stack instead of covering each other
+// (issue 1508). Each toast still owns its timer and removes itself.
+window.poznoteToastStack = function () {
+    var stack = document.getElementById('pz-toast-stack');
+    if (stack) return stack;
+
+    stack = document.createElement('div');
+    stack.id = 'pz-toast-stack';
+    stack.setAttribute('aria-live', 'polite');
+    stack.style.position = 'fixed';
+    stack.style.top = '12px';
+    stack.style.right = '20px';
+    stack.style.zIndex = '2147483647';
+    stack.style.display = 'flex';
+    stack.style.flexDirection = 'column';
+    stack.style.alignItems = 'flex-end';
+    stack.style.pointerEvents = 'none';
+    document.body.appendChild(stack);
+    return stack;
+};
+
 function showNotificationPopup(message, type) {
     type = type || 'success';
 
