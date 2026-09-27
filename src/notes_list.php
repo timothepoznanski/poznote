@@ -265,6 +265,58 @@ function isNoteShared($noteId) {
     return isset($sharedNotesCache[(int)$noteId]);
 }
 
+/**
+ * Name of the nearest shared folder among a folder and its ancestors, or null
+ * when none is shared. A note in there is publicly reachable through the
+ * folder link, so its menu shows the "Is shared" variant like the toolbar
+ * button (note_display.php runs the same lookup for the opened note).
+ *
+ * Loads the folder tree and shared_folders once, like isNoteShared().
+ */
+function getSharedAncestorFolderName($folderId) {
+    global $con;
+    static $folders = null;
+    static $sharedFolderIds = null;
+
+    if ($folders === null) {
+        $folders = [];
+        $sharedFolderIds = [];
+        try {
+            $stmt = $con->query('SELECT id, parent_id, name FROM folders');
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $folders[(int)$row['id']] = [
+                    'parent_id' => $row['parent_id'] !== null ? (int)$row['parent_id'] : null,
+                    'name' => (string)$row['name'],
+                ];
+            }
+            $stmt = $con->query('SELECT folder_id FROM shared_folders');
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $sharedFolderIds[(int)$row['folder_id']] = true;
+            }
+        } catch (Exception $e) {
+            $folders = [];
+            $sharedFolderIds = [];
+        }
+    }
+
+    if (empty($sharedFolderIds)) {
+        return null;
+    }
+
+    // $seen guards against a parent_id cycle in a damaged database
+    $seen = [];
+    $currentId = (int)$folderId;
+    while ($currentId > 0 && isset($folders[$currentId]) && !isset($seen[$currentId])) {
+        if (isset($sharedFolderIds[$currentId])) {
+            return $folders[$currentId]['name'];
+        }
+        $seen[$currentId] = true;
+        $currentId = (int)($folders[$currentId]['parent_id'] ?? 0);
+    }
+
+    return null;
+}
+
 function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $folderName) {
     global $show_note_icons_setting;
 
@@ -300,7 +352,7 @@ function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $f
     echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . htmlspecialchars((string)$noteDbId, ENT_QUOTES) . "' data-note-db-id='" . htmlspecialchars((string)$noteDbId, ENT_QUOTES) . "' data-note-type='" . $htmlNoteType . "'" . $linkedNoteIdAttr . " data-folder-id='$htmlFolderId' data-folder='$htmlFolderName' data-created='" . $htmlCreated . "' data-updated='" . $htmlUpdated . "' draggable='true' data-action='load-note' data-dblaction='open-note-new-tab'>";
     echo "<span class='note-title'>" . $noteIcon . $noteTypeIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
     echo "</a>";
-    echo generateNoteActions($noteDbId, $noteTitle, $noteType, $folderId, $folderName, !empty($row1['favorite']), (int)($row1['offline'] ?? 0) > 0, isNoteShared($noteDbId));
+    echo generateNoteActions($noteDbId, $noteTitle, $noteType, $folderId, $folderName, !empty($row1['favorite']), (int)($row1['offline'] ?? 0) > 0, isNoteShared($noteDbId), getSharedAncestorFolderName($folderId));
     echo "</div>";
     echo "<div class='pxbetweennotes'></div>";
 }
