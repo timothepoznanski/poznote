@@ -2034,13 +2034,14 @@
             if (options.onDelete) options.onDelete();
         });
 
-        actions.appendChild(cancelBtn);
+        // One action per line, Cancel last.
         if (options.onToggle) {
             actions.appendChild(toggleBtn);
         }
         if (options.onDelete) {
             actions.appendChild(deleteBtn);
         }
+        actions.appendChild(cancelBtn);
         content.appendChild(actions);
         modal.appendChild(content);
         document.body.appendChild(modal);
