@@ -1904,7 +1904,9 @@
                 closeMenus();
                 closeTasklistMenus();
             }
-            if ((event.ctrlKey || event.metaKey) && (event.key === 's' || event.key === 'S')) {
+            // The Latin letter even on a Cyrillic or Greek layout (js/shortcut-key.js)
+            var key = window.poznoteShortcutKey ? window.poznoteShortcutKey(event) : (event.key || '').toLowerCase();
+            if ((event.ctrlKey || event.metaKey) && key === 's') {
                 event.preventDefault();
                 markDirty();
                 commitDirty();

@@ -309,7 +309,8 @@
             clearSelection();
             return;
         }
-        var key = e.key ? e.key.toLowerCase() : '';
+        // The Latin letter even on a Cyrillic or Greek layout (js/shortcut-key.js)
+        var key = window.poznoteShortcutKey ? window.poznoteShortcutKey(e) : (e.key || '').toLowerCase();
         var mod = e.ctrlKey || e.metaKey;
 
         if (mod && key === 'c') {

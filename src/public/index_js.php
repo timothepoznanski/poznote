@@ -66,6 +66,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/error-handler.js',
         'js/panel-back.js',
         'js/globals.js',
+        'js/shortcut-key.js',
         'js/workspaces-core.js',
         'js/workspaces-create.js',
         'js/workspaces-share.js',

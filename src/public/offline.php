@@ -90,6 +90,8 @@ $scripts = [
     // kept on the device (sw.js)
     poznoteAsset('js/note-attachment-menu.js'),
     poznoteAsset('js/offline-store.js'),
+    // Ctrl+S on a Cyrillic or Greek layout (#1507)
+    poznoteAsset('js/shortcut-key.js'),
     poznoteAsset('js/offline-app.js'),
 ];
 // The app's tab bar, loaded by js/offline-app.js once an account is open:

@@ -256,7 +256,9 @@
 
     document.addEventListener('keydown', function (e) {
         if (!editing) return;
-        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+        // The Latin letter even on a Cyrillic or Greek layout (js/shortcut-key.js)
+        var key = window.poznoteShortcutKey ? window.poznoteShortcutKey(e) : (e.key || '').toLowerCase();
+        if ((e.ctrlKey || e.metaKey) && key === 's') {
             e.preventDefault();
             save();
         } else if (e.key === 'Escape' && editorEl && document.activeElement === editorEl) {

@@ -988,6 +988,7 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
 <script src="<?php echo poznoteAsset('js/mermaid-theme.js'); ?>"></script>
 <script src="<?php echo poznoteAsset('js/public-note.js'); ?>"></script>
 <?php if ($noteBodyEditable): ?>
+<script src="<?php echo poznoteAsset('js/shortcut-key.js'); ?>"></script>
 <script src="<?php echo poznoteAsset('js/public-note-edit.js'); ?>"></script>
 <?php endif; ?>
 </html>

@@ -1045,8 +1045,10 @@ function handleNoteEntryKeydown(e) {
         var checkNode = container ? (container.nodeType === 3 ? container.parentElement : container) : null;
         var inMarkdownEditor = checkNode && checkNode.closest && checkNode.closest('.markdown-editor');
         var noteEditor = checkNode && checkNode.closest && checkNode.closest('.noteentry[contenteditable="true"], .markdown-editor');
+        // The Latin letter even on a Cyrillic or Greek layout (js/shortcut-key.js)
+        var shortcutKey = window.poznoteShortcutKey ? window.poznoteShortcutKey(e) : (e.key || '').toLowerCase();
 
-        if (e.key.toLowerCase() === 'k' && noteEditor) {
+        if (shortcutKey === 'k' && noteEditor) {
             e.preventDefault();
             if (typeof window.addLinkToNote === 'function') {
                 window.addLinkToNote();
@@ -1056,7 +1058,7 @@ function handleNoteEntryKeydown(e) {
             return;
         }
 
-        if (e.shiftKey && e.key.toLowerCase() === 's' && noteEditor) {
+        if (e.shiftKey && shortcutKey === 's' && noteEditor) {
             e.preventDefault();
             if (inMarkdownEditor) {
                 if (typeof window.applyMarkdownStrikethrough === 'function') {
@@ -1071,7 +1073,7 @@ function handleNoteEntryKeydown(e) {
         }
 
 
-        if (e.key.toLowerCase() === 'u' && noteEditor) {
+        if (shortcutKey === 'u' && noteEditor) {
             e.preventDefault();
             if (inMarkdownEditor) {
                 if (typeof window.applyMarkdownUnderline === 'function') {
@@ -1088,7 +1090,7 @@ function handleNoteEntryKeydown(e) {
         // Ctrl+Shift+B toggles a code block (overrides Chrome's bookmarks bar
         // shortcut while the caret is in a note). toggleCodeBlock handles both
         // the rich-text note and the markdown editor.
-        if (e.shiftKey && e.key.toLowerCase() === 'b' && noteEditor) {
+        if (e.shiftKey && shortcutKey === 'b' && noteEditor) {
             e.preventDefault();
             if (typeof window.toggleCodeBlock === 'function') {
                 window.toggleCodeBlock();
@@ -1099,7 +1101,7 @@ function handleNoteEntryKeydown(e) {
             return;
         }
 
-        if (e.key.toLowerCase() === 'b' && !e.shiftKey && noteEditor) {
+        if (shortcutKey === 'b' && !e.shiftKey && noteEditor) {
             e.preventDefault();
             if (inMarkdownEditor) {
                 if (typeof window.applyMarkdownBold === 'function') {
@@ -1113,7 +1115,7 @@ function handleNoteEntryKeydown(e) {
             return;
         }
 
-        if (e.key.toLowerCase() === 'i' && noteEditor) {
+        if (shortcutKey === 'i' && noteEditor) {
             e.preventDefault();
             if (inMarkdownEditor) {
                 if (typeof window.applyMarkdownItalic === 'function') {
