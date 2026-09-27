@@ -849,8 +849,8 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 				<p class="note-color-modal-subtitle" id="noteColorModalNoteTitle"></p>
 				<div class="note-color-grid" id="noteColorGrid"></div>
 				<div class="modal-buttons">
-					<button type="button" class="note-color-manage-btn" onclick="window.location.href='settings.php?open=note-colors#note-color-palette-card'"><i class="lucide lucide-palette"></i> <?php echo t_h('note_color.manage_button', [], 'Manage colors'); ?></button>
-					<button type="button" class="btn-danger" id="noteColorClearBtn"><?php echo t_h('note_color.remove', [], 'Remove color'); ?></button>
+					<button type="button" class="note-color-manage-btn" onclick="window.location.href='settings.php?open=note-colors#note-color-palette-card'" title="<?php echo t_h('note_color.manage_button', [], 'Manage colors'); ?>" aria-label="<?php echo t_h('note_color.manage_button', [], 'Manage colors'); ?>"><i class="lucide lucide-palette"></i> <span class="note-color-btn-label"><?php echo t_h('note_color.manage_button', [], 'Manage colors'); ?></span></button>
+					<button type="button" class="btn-danger" id="noteColorClearBtn" title="<?php echo t_h('note_color.remove', [], 'Remove color'); ?>" aria-label="<?php echo t_h('note_color.remove', [], 'Remove color'); ?>"><i class="lucide lucide-eraser"></i> <span class="note-color-btn-label"><?php echo t_h('note_color.remove', [], 'Remove color'); ?></span></button>
 					<button type="button" class="btn-cancel" data-action="close-note-color-modal"><?php echo t_h('common.cancel'); ?></button>
 					<button type="button" class="btn-primary" id="noteColorApplyBtn"><?php echo t_h('common.apply', [], 'Apply'); ?></button>
 				</div>
