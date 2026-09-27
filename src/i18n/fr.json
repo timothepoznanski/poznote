@@ -5226,7 +5226,8 @@
     "banner": {
       "open": "Ouvrir les notes hors ligne",
       "offline": "Vous êtes hors ligne. Les notes modifiées récemment restent consultables et modifiables en mode hors ligne.",
-      "offline_no_copies": "Vous êtes hors ligne. Les modifications seront enregistrées au retour de la connexion."
+      "offline_no_copies": "Vous êtes hors ligne. Les modifications seront enregistrées au retour de la connexion.",
+      "stuck": "Les notes hors ligne ne se sont pas ouvertes : ce navigateur attend toujours le serveur. Si un VPN est actif, le désactiver permet de les ouvrir."
     },
     "settings": {
       "enable": "Activer le mode hors ligne",

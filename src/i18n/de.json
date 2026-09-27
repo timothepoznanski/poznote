@@ -5121,7 +5121,8 @@
     "banner": {
       "open": "Offline-Notizen öffnen",
       "offline": "Sie sind offline. Kürzlich geänderte Notizen können im Offline-Modus weiterhin geöffnet und bearbeitet werden.",
-      "offline_no_copies": "Sie sind offline. Änderungen werden gespeichert, sobald die Verbindung wieder besteht."
+      "offline_no_copies": "Sie sind offline. Änderungen werden gespeichert, sobald die Verbindung wieder besteht.",
+      "stuck": "Die Offline-Notizen wurden nicht geöffnet: Dieser Browser wartet noch auf den Server. Wenn ein VPN aktiv ist, lassen sie sich nach dem Ausschalten öffnen."
     },
     "settings": {
       "enable": "Offline-Modus aktivieren",

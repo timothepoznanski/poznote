@@ -5122,7 +5122,8 @@
     "banner": {
       "open": "Abrir as notas offline",
       "offline": "Você está offline. As notas modificadas recentemente ainda podem ser abertas e editadas no modo offline.",
-      "offline_no_copies": "Você está offline. As alterações serão salvas quando a conexão voltar."
+      "offline_no_copies": "Você está offline. As alterações serão salvas quando a conexão voltar.",
+      "stuck": "As notas offline não abriram: este navegador ainda está à espera do servidor. Se houver uma VPN ativa, desativá-la permite abri-las."
     },
     "settings": {
       "enable": "Ativar o modo offline",

@@ -4941,7 +4941,8 @@
     "banner": {
       "open": "Open offline notes",
       "offline": "You are offline. Notes modified recently can still be opened and edited in offline mode.",
-      "offline_no_copies": "You are offline. Changes will be saved when the connection is back."
+      "offline_no_copies": "You are offline. Changes will be saved when the connection is back.",
+      "stuck": "The offline notes did not open: this browser is still waiting for the server. If a VPN is on, turning it off lets them open."
     },
     "settings": {
       "enable": "Enable offline mode",

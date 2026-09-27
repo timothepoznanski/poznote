@@ -5122,7 +5122,8 @@
     "banner": {
       "open": "Abrir las notas sin conexión",
       "offline": "No tiene conexión. Las notas modificadas recientemente se pueden seguir abriendo y editando en el modo sin conexión.",
-      "offline_no_copies": "No tiene conexión. Los cambios se guardarán cuando vuelva la conexión."
+      "offline_no_copies": "No tiene conexión. Los cambios se guardarán cuando vuelva la conexión.",
+      "stuck": "Las notas sin conexión no se abrieron: este navegador sigue esperando al servidor. Si hay una VPN activa, desactivarla permite abrirlas."
     },
     "settings": {
       "enable": "Activar el modo sin conexión",
