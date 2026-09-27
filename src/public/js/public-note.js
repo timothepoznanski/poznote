@@ -10,6 +10,52 @@
     window.isPublicNotePage = true;
 
     /**
+     * Wraps every table of the note in a horizontal scroller, so a wide table
+     * keeps its layout and scrolls sideways instead of being squeezed to the
+     * screen width. Display only: the public editor is rebuilt from the
+     * server HTML, so the wrapper can never be saved into the note.
+     */
+    function wrapTablesForScroll() {
+        const content = document.querySelector('.public-note .content');
+        if (!content) return;
+        const contentRect = content.getBoundingClientRect();
+        content.querySelectorAll('table').forEach(function (table) {
+            const parent = table.parentElement;
+            if (!parent || parent.closest('table') || parent.classList.contains('public-table-scroll')) return;
+            const wrapper = document.createElement('div');
+            wrapper.className = 'public-table-scroll';
+            // A table that may spread over the page width (CSS) must start
+            // where the note text does: directly in the note, or in plain
+            // blocks spanning it exactly (pasted content arrives in <div>s)
+            if (spansNoteWidth(parent, content, contentRect)) {
+                wrapper.classList.add('public-table-scroll-page');
+            }
+            parent.insertBefore(wrapper, table);
+            wrapper.appendChild(table);
+        });
+    }
+
+    function spansNoteWidth(el, content, contentRect) {
+        for (let node = el; node && node !== content; node = node.parentElement) {
+            const rect = node.getBoundingClientRect();
+            const style = window.getComputedStyle(node);
+            const inset = ['paddingLeft', 'paddingRight', 'borderLeftWidth', 'borderRightWidth']
+                .some(function (prop) { return parseFloat(style[prop]) > 0; });
+            if (inset || style.display !== 'block' ||
+                Math.abs(rect.left - contentRect.left) > 1 || Math.abs(rect.right - contentRect.right) > 1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', wrapTablesForScroll, { once: true });
+    } else {
+        wrapTablesForScroll();
+    }
+
+    /**
      * Get Mermaid configuration for the given theme
      * Uses 'base' theme for dark mode with custom colors for better integration
      */

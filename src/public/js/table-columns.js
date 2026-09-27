@@ -4,7 +4,9 @@
  * - Hovering the border between two columns shows a resize guide; dragging
  *   it moves that border only (the two neighbouring columns trade width)
  * - Double-clicking a column border fits the column on its left to its widest
- *   cell content (the column on its right takes up the difference)
+ *   cell content (the column on its right takes up the difference); the
+ *   column then keeps its lines unbroken, so it still fits its text where the
+ *   table is narrower or the font larger (public page, other device)
  * - Column, row and cell alignment (left / center / right), driven by the
  *   table menu
  *
@@ -17,6 +19,11 @@
 
     var EDGE_TOLERANCE = 5;   // px on each side of a border that grab it
     var MIN_COLUMN_WIDTH = 32; // px
+
+    // Marks a column fitted to its content: its lines never wrap, so the
+    // column cannot get narrower than its text. Only wrapping is switched off,
+    // the line breaks of the cell (white-space: pre-line) still apply.
+    var FIT_PROPERTY = 'text-wrap-mode';
 
     var guide = null;
     var hover = null;          // {table, note, border} under the pointer
@@ -171,21 +178,37 @@
         percents[col] = left / total * 100;
         percents[col + 1] = (pair - left) / total * 100;
         applyWidths(grid, percents);
+        // Only when the whole text fits: a squeezed column must still wrap
+        setColumnFit(grid, col, left >= wanted);
         return true;
+    }
+
+    function setColumnFit(grid, col, fit) {
+        columnCells(grid, col, true).forEach(function (cell) {
+            if (fit) {
+                cell.style.setProperty(FIT_PROPERTY, 'nowrap');
+            } else {
+                cell.style.removeProperty(FIT_PROPERTY);
+            }
+        });
     }
 
     function hasColumnWidths(table) {
         var grid = buildGrid(table);
         return grid.some(function (row) {
-            return row.some(function (cell) { return cell && !!cell.style.width; });
+            return row.some(function (cell) {
+                return cell && (!!cell.style.width || !!cell.style.getPropertyValue(FIT_PROPERTY));
+            });
         });
     }
 
     function resetColumnWidths(table) {
         var changed = false;
         Array.prototype.forEach.call(table.querySelectorAll('td, th'), function (cell) {
-            if (cell.closest('table') !== table || !cell.style.width) return;
+            if (cell.closest('table') !== table) return;
+            if (!cell.style.width && !cell.style.getPropertyValue(FIT_PROPERTY)) return;
             cell.style.removeProperty('width');
+            cell.style.removeProperty(FIT_PROPERTY);
             changed = true;
         });
         return changed;
@@ -241,6 +264,8 @@
         if (!from || !to) return;
         if (from.style.textAlign) to.style.textAlign = from.style.textAlign;
         if (from.style.width && (from.colSpan || 1) === 1) to.style.width = from.style.width;
+        var fit = from.style.getPropertyValue(FIT_PROPERTY);
+        if (fit && (from.colSpan || 1) === 1) to.style.setProperty(FIT_PROPERTY, fit);
     }
 
     // ─── Resize guide ────────────────────────────────────────────────────────
@@ -319,6 +344,11 @@
             percents[drag.border] = left / drag.total * 100;
             percents[drag.border + 1] = (pair - left) / drag.total * 100;
             applyWidths(drag.grid, percents);
+            if (!drag.changed) {
+                // A width picked by hand replaces the fit on both sides
+                setColumnFit(drag.grid, drag.border, false);
+                setColumnFit(drag.grid, drag.border + 1, false);
+            }
             drag.changed = true;
             var x = borderX(drag.grid, drag.border);
             if (x !== null) showGuide(drag.table, x);

@@ -320,6 +320,10 @@ body.outline-collapsed .toggle-outline-btn i {
         position: fixed;
         right: 0;
         top: 0;
+        /* Pinned to both edges like the backdrop: 100vh is not the visible
+           height on mobile (collapsing address bar), it left a gap at the bottom */
+        bottom: 0;
+        height: auto;
         z-index: 2147483003;
         width: 80% !important;
         max-width: 320px !important;
@@ -336,6 +340,8 @@ body.outline-collapsed .toggle-outline-btn i {
         position: fixed;
         right: 0;
         top: 0;
+        bottom: 0;
+        height: auto;
         z-index: 2147483003;
         box-shadow: -4px 0 8px rgba(var(--pz-shadow-rgb), 0.2);
         width: 80% !important;

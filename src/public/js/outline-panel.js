@@ -1620,6 +1620,13 @@ function initTouchSupport() {
             return codeBlock;
         }
 
+        // A swipe across a table is meant for the table (reading along a row,
+        // selecting cells), never for the outline
+        const table = target.closest('table');
+        if (table) {
+            return table;
+        }
+
         const interactionRoot = isPublicOutlinePage()
             ? target.closest('#publicNoteMain, .public-note')
             : target.closest('#right_col');
