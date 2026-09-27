@@ -584,7 +584,7 @@ $currentLang = getUserLanguage();
 <body class="shared-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>" data-archive-workspace="<?php echo htmlspecialchars(POZNOTE_ARCHIVE_WORKSPACE, ENT_QUOTES, 'UTF-8'); ?>">
 	<?php $iconSidebarWorkspace = $workspace; include __DIR__ . '/../icon_sidebar.php'; ?>
 	<div class="shared-container">
-		<h1 class="poznote-page-title"><i class="lucide lucide-folder-open"></i> <?php echo t_h('home.folders', [], 'Folders'); ?> <?php echo poznoteRenderPageTitleWorkspace($workspace); ?></h1>
+		<h1 class="poznote-page-title"><span class="poznote-page-title-name"><i class="lucide lucide-folder-open"></i> <?php echo t_h('home.folders', [], 'Folders'); ?></span> <?php echo poznoteRenderPageTitleWorkspace($workspace); ?></h1>
 
 		
 		<div class="shared-filter-bar">

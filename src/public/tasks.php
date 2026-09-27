@@ -45,7 +45,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<?php include __DIR__ . '/../icon_sidebar.php'; ?>
 	<div class="tasks-container">
 
-		<h1 class="poznote-page-title"><i class="lucide lucide-list-todo"></i> <?php echo t_h('tasks_page.title', [], 'Tasks'); ?> <?php echo poznoteRenderPageTitleWorkspace($pageWorkspace); ?></h1>
+		<h1 class="poznote-page-title"><span class="poznote-page-title-name"><i class="lucide lucide-list-todo"></i> <?php echo t_h('tasks_page.title', [], 'Tasks'); ?></span> <?php echo poznoteRenderPageTitleWorkspace($pageWorkspace); ?></h1>
 
 		<div id="tasksProgressSection" class="tasks-progress-section initially-hidden">
 			<div class="tasks-progress-header">

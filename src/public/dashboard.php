@@ -740,7 +740,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 				'button_title' => t('dashboard.scope.title', [], 'Scope'),
 			]);
 			?>
-			<h1 class="poznote-page-title"><i class="lucide lucide-layout-dashboard"></i> <?php echo t_h('common.back_to_home', [], 'Dashboard'); ?> <?php echo $dashboardTitleWorkspace; ?></h1>
+			<h1 class="poznote-page-title"><span class="poznote-page-title-name"><i class="lucide lucide-layout-dashboard"></i> <?php echo t_h('common.back_to_home', [], 'Dashboard'); ?></span> <?php echo $dashboardTitleWorkspace; ?></h1>
 
 			<header class="dashboard-topbar">
 				<div class="board-filter-row">

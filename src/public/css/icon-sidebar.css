@@ -483,12 +483,16 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
 
 /* Page title used by the pages whose Notes / Dashboard buttons were replaced by
    the rail (settings.php, notes_manager.php, ...). Lives here rather than in
-   css/settings.css because that file is not loaded on every such page. */
+   css/settings.css because that file is not loaded on every such page.
+   Wraps on a narrow window: the workspace chip drops to a second line rather
+   than squeezing the page name. */
 .poznote-page-title {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px 10px;
+    text-align: center;
     font-size: 24px;
     font-weight: var(--pz-weight-semibold);
     color: var(--pz-text);
@@ -497,6 +501,19 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
 
 .poznote-page-title i {
     color: var(--pz-accent-text);
+}
+
+/* The page's icon and name, one flex item so the icon never wraps away from
+   the name; a name too long for the line breaks beside its icon. */
+.poznote-page-title-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.poznote-page-title-name > i {
+    flex-shrink: 0;
 }
 
 /* The book glyph's ink sits high in its box, so a box-centred icon still reads
@@ -521,10 +538,10 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     border: 1px solid var(--pz-border);
     border-radius: var(--pz-radius-pill);
     background: var(--pz-surface);
-    /* A long workspace name must not push the page name off screen: cap it and
-       let the ellipsis take over (the full name is readable in the menu). */
+    /* The title wraps the chip to its own line; a workspace name wider than
+       that line ends in an ellipsis (the full name is readable in the menu). */
     min-width: 0;
-    max-width: 40vw;
+    max-width: 100%;
     font: inherit;
     font-size: 13px;
     font-weight: var(--pz-weight-medium);
