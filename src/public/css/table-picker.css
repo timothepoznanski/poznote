@@ -131,6 +131,72 @@
     margin: 4px 0;
 }
 
+/* Align column: label + three icon buttons on one row */
+.table-context-menu-align-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 8px 4px 16px;
+    color: var(--pz-text-strong);
+}
+
+.table-context-menu-align-buttons {
+    display: flex;
+    gap: 2px;
+}
+
+.table-context-menu-align-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: var(--pz-radius-sm);
+    background: transparent;
+    cursor: pointer;
+}
+
+.table-context-menu-align-btn:hover {
+    background: var(--pz-surface-hover);
+}
+
+.table-context-menu-align-btn [class*="lucide-"],
+.table-context-menu-align-btn [class*="lucide-"]:hover {
+    font-size: 16px;
+    color: var(--pz-icon);
+    transform: none;
+}
+
+.table-context-menu-align-btn.active [class*="lucide-"] {
+    color: var(--pz-accent);
+}
+
+/* ── Column resize (HTML notes) ─────────────────────────────────────────── */
+
+.noteentry table.pz-col-resize-hover,
+.noteentry table.pz-col-resize-hover td,
+.noteentry table.pz-col-resize-hover th,
+html.pz-col-resizing,
+html.pz-col-resizing * {
+    cursor: col-resize !important;
+}
+
+html.pz-col-resizing .noteentry {
+    user-select: none;
+}
+
+.pz-col-resize-guide {
+    position: fixed;
+    display: none;
+    width: 2px;
+    background: var(--pz-accent);
+    pointer-events: none;
+    z-index: 900;
+}
+
 /* ── Table cell selection (copy/paste of cell ranges) ───────────────────── */
 
 .noteentry table.pz-cell-selecting {

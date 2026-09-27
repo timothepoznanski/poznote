@@ -147,6 +147,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/excalidraw.js',
         'js/copy-code-on-focus.js',
         'js/code-block-language.js',
+        'js/table-columns.js',
         'js/table-context-menu.js',
         'js/table-cell-selection.js',
         'js/system-menu.js',

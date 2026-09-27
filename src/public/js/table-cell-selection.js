@@ -696,7 +696,12 @@
         while (table.rows.length < neededRows) {
             var tr = document.createElement('tr');
             var cols = Math.max(tableCols, neededCols);
-            for (var j = 0; j < cols; j++) tr.appendChild(makeCell());
+            for (var j = 0; j < cols; j++) {
+                var newCell = makeCell();
+                // Same alignment and width as the column it lands in
+                if (window.pzTableColumns) window.pzTableColumns.copyColumnFormat(lastRow.cells[j], newCell);
+                tr.appendChild(newCell);
+            }
             section.appendChild(tr);
         }
 
