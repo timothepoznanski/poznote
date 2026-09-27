@@ -77,22 +77,25 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 				<button type="button" class="tasks-filter-chip" data-filter="dated"><?php echo t_h('tasks_page.filter_dated', [], 'With due date'); ?></button>
 				<button type="button" class="tasks-filter-chip" data-filter="completed"><?php echo t_h('tasks_page.filter_completed', [], 'Completed'); ?></button>
 			</div>
-			<div class="filter-input-wrapper">
-				<input
-					type="text"
-					id="filterInput"
-					class="filter-input"
-					placeholder="<?php echo t_h('tasks_page.filter_placeholder', [], 'Filter by task, title or folder name...'); ?>"
-				/>
-				<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
-					<i class="lucide lucide-x"></i>
-				</button>
-			</div>
-			<div class="tasks-collapse-actions">
-				<button type="button" id="toggleAllNotesBtn" class="tasks-collapse-btn" aria-expanded="true" title="<?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?>">
-					<i class="lucide lucide-chevron-up"></i>
-					<span id="toggleAllNotesLabel"><?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?></span>
-				</button>
+			<?php // Filter input + collapse/expand toggle: one row, desktop and mobile ?>
+			<div class="tasks-filter-search">
+				<div class="filter-input-wrapper">
+					<input
+						type="text"
+						id="filterInput"
+						class="filter-input"
+						placeholder="<?php echo t_h('tasks_page.filter_placeholder', [], 'Filter by task, title or folder name...'); ?>"
+					/>
+					<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
+						<i class="lucide lucide-x"></i>
+					</button>
+				</div>
+				<div class="tasks-collapse-actions">
+					<button type="button" id="toggleAllNotesBtn" class="tasks-collapse-btn" aria-expanded="true" title="<?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?>">
+						<i class="lucide lucide-chevron-up"></i>
+						<span id="toggleAllNotesLabel"><?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?></span>
+					</button>
+				</div>
 			</div>
 		</div>
 

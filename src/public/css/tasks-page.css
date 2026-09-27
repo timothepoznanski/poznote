@@ -125,6 +125,14 @@ body.tasks-page {
     color: var(--pz-text-inverse);
 }
 
+/* Filter input and the collapse/expand toggle stay together on one row */
+.tasks-filter-search {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .filter-input-wrapper {
     position: relative;
     flex: 1;
@@ -869,23 +877,27 @@ html[data-theme='dark'] .tasks-note-source-badge {
         margin-bottom: 14px;
     }
 
-    /* Filter input first (full width, right below the progress bar), then
-       one wrapping row where the collapse/expand toggle flows right after
-       the filter chips (display: contents merges both groups into the bar) */
+    /* Filter input first (full width, right below the progress bar) with
+       the collapse/expand toggle on its right, then one wrapping row of
+       filter chips (display: contents merges them into the bar) */
     .tasks-filter-bar {
         flex-wrap: wrap;
         gap: 8px;
     }
 
-    .filter-input-wrapper {
+    .tasks-filter-search {
         order: -1;
         flex-basis: 100%;
+        gap: 8px;
         /* With the 8px bar gap: 14px below the input, same as above it */
         margin-bottom: 6px;
     }
 
-    .tasks-filter-chips,
-    .tasks-collapse-actions {
+    .filter-input-wrapper {
+        min-width: 0;
+    }
+
+    .tasks-filter-chips {
         display: contents;
     }
 

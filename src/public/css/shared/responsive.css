@@ -116,12 +116,13 @@
         border-radius: 0;
     }
 
-    .shared-filter-tree-actions {
+    /* Shares page: Expand all / Collapse all on its own full-width row */
+    body.shared-table-page:not(.offline-list-page) .shared-filter-tree-actions {
         width: 100%;
         justify-content: stretch;
     }
 
-    .shared-filter-tree-actions .btn {
+    body.shared-table-page:not(.offline-list-page) .shared-filter-tree-actions .btn {
         flex: 1 1 0;
         justify-content: center;
     }
@@ -135,6 +136,18 @@
         align-items: center;
         gap: 8px;
         flex-wrap: wrap;
+    }
+
+    /* Folders and Offline pages: the button stays right of the search field,
+       which shrinks to leave it room */
+    .folders-filter-row,
+    .offline-list-page .filter-search-row {
+        flex-wrap: nowrap;
+    }
+
+    .folders-filter-row .filter-input-wrapper,
+    .offline-list-page .filter-search-row .filter-input-wrapper {
+        min-width: 0;
     }
 
     .filter-type-btn {
