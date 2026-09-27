@@ -100,18 +100,6 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
                 </div>
             </a>
 
-            <!-- Workspace: for the owner of the account on screen -->
-            <?php if ((!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser())): ?>
-            <a href="#" class="home-card" id="create-workspace-card" data-create-type="workspace" title="<?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?>">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-layers"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?></span>
-                </div>
-            </a>
-            <?php endif; ?>
-
         </div>
 
     </div>
@@ -163,7 +151,7 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
                 
                 // Execute create action
                 if (typeof executeCreateAction === 'function') {
-                    const immediateExitTypes = ['html', 'markdown', 'list', 'workspace', 'diary'];
+                    const immediateExitTypes = ['html', 'markdown', 'list', 'diary'];
                     if (immediateExitTypes.includes(createType) && typeof showNoteCreationLoading === 'function') {
                         showNoteCreationLoading(this);
                         window.setTimeout(executeCreateAction, 80);

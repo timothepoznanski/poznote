@@ -28,7 +28,6 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-diary-entry-card" checked><span><?php echo t_h('diary.create_card_title', [], 'Diary entry'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-folder-card" checked><span><?php echo t_h('modals.create.folder.title', [], 'Folder'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-subfolder-card" checked><span><?php echo t_h('modals.create.subfolder.title', [], 'Subfolder'); ?></span></label>
-    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-workspace-card" checked><span><?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?></span></label>
 </div>
 </div>
 

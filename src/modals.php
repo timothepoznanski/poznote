@@ -735,19 +735,12 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
         </div>
     </div>
 
-    <!-- Containers: dropped when the menu is opened on a folder -->
+    <!-- Folder: dropped when the menu is opened on a folder -->
     <div class="create-section" id="otherSection">
         <div class="create-menu-item create-note-option" data-type="folder" data-action="select-create-type" role="menuitem">
             <i class="lucide lucide-folder"></i>
             <span><?php echo t_h('modals.create.folder.title', [], 'Folder'); ?></span>
         </div>
-        <?php // Creating a workspace is for the owner of the account on screen ?>
-        <?php if ((!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser())): ?>
-        <div class="create-menu-item create-note-option" data-type="workspace" data-action="select-create-type" role="menuitem">
-            <i class="lucide lucide-layers"></i>
-            <span><?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?></span>
-        </div>
-        <?php endif; ?>
     </div>
 
     <!-- The notes column itself: only when the menu is opened by a right-click
