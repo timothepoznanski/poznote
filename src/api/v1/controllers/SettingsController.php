@@ -15,7 +15,6 @@ class SettingsController {
     private $globalSettings = [
         'hidden_ui_elements_global',
         'login_display_name',
-        'contact_email',
         'discussions_url',
         'discord_url',
         'custom_css_path',
@@ -122,14 +121,6 @@ class SettingsController {
         }
 
         // About section links (settings.php): empty restores the default
-        if ($key === 'contact_email') {
-            $normalized = trim((string) $value);
-            if ($normalized !== '' && !filter_var($normalized, FILTER_VALIDATE_EMAIL)) {
-                throw new InvalidArgumentException('invalid email address', 400);
-            }
-            return $normalized;
-        }
-
         if ($key === 'discussions_url' || $key === 'discord_url') {
             $normalized = trim((string) $value);
             if ($normalized !== '' && (!filter_var($normalized, FILTER_VALIDATE_URL) || !preg_match('#^https?://#i', $normalized))) {

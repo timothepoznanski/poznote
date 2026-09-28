@@ -357,14 +357,13 @@ function getPageTitle() {
 
 
 /**
- * The three contact cards of the About section (settings.php): a contact
- * email, the GitHub discussions and the Discord server. Each points to the
- * Poznote project by default; a global setting (PUT /api/v1/settings/{key})
- * can point it elsewhere, and an empty value means "back to the default".
+ * The two community cards of the About section (settings.php): the GitHub
+ * discussions and the Discord server. Each points to the Poznote project by
+ * default; a global setting (PUT /api/v1/settings/{key}) can point it
+ * elsewhere, and an empty value means "back to the default".
  */
 function poznoteAboutLinkDefaults(): array {
     return [
-        'contact_email'   => 'contact@poznote.com',
         'discussions_url' => 'https://github.com/timothepoznanski/poznote/discussions',
         'discord_url'     => 'https://discord.gg/AWhWWSEkJ',
     ];
