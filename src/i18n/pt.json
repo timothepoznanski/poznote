@@ -4468,6 +4468,13 @@
       "empty": "Nenhuma tag neste painel.",
       "search": "Filtrar tags...",
       "no_match": "Nenhuma tag corresponde."
+    },
+    "filters": {
+      "button": "Filtros",
+      "color": "Cor",
+      "modified": "Última modificação",
+      "tags": "Tags",
+      "reset": "Redefinir filtros"
     }
   },
   "graph": {

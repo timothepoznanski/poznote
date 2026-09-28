@@ -4467,6 +4467,13 @@
       "empty": "Keine Tags auf diesem Board.",
       "search": "Tags filtern...",
       "no_match": "Kein passender Tag."
+    },
+    "filters": {
+      "button": "Filter",
+      "color": "Farbe",
+      "modified": "Zuletzt geändert",
+      "tags": "Tags",
+      "reset": "Filter zurücksetzen"
     }
   },
   "graph": {

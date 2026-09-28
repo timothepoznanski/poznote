@@ -4093,6 +4093,13 @@
       "empty": "No tags on this board.",
       "search": "Filter tags...",
       "no_match": "No matching tag."
+    },
+    "filters": {
+      "button": "Filters",
+      "color": "Color",
+      "modified": "Last modified",
+      "tags": "Tags",
+      "reset": "Reset filters"
     }
   },
   "graph": {

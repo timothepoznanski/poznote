@@ -4468,6 +4468,13 @@
       "empty": "No hay etiquetas en este tablero.",
       "search": "Filtrar etiquetas...",
       "no_match": "Ninguna etiqueta coincide."
+    },
+    "filters": {
+      "button": "Filtros",
+      "color": "Color",
+      "modified": "Última modificación",
+      "tags": "Etiquetas",
+      "reset": "Restablecer filtros"
     }
   },
   "graph": {

@@ -12,6 +12,11 @@
  * are applied as view-size-* / view-layout-* classes on .dashboard-container,
  * the column cap as a --dash-col-max custom property on the same element;
  * all visual differences live in dashboard.css.
+ *
+ * Controls marked data-auto-grid (the dashboard) have no column setting,
+ * like Google Keep: --dash-col-max is the number of cards of the current
+ * size (--dash-col-min wide) that fit the container, recomputed whenever the
+ * container is resized or the size changes.
  */
 (function () {
     'use strict';
@@ -31,6 +36,7 @@
         var columnsBtn = root.querySelector('.board-view-columns-btn');
         var container = document.querySelector('.dashboard-container');
         if (!viewBtn || !container) return;
+        var autoGrid = root.hasAttribute('data-auto-grid');
 
         function readSetting(key, allowed, fallback) {
             var value = null;
@@ -44,7 +50,26 @@
         // back to the default like any other invalid value.
         var columns = readSetting('ViewColumns', COLUMNS, DEFAULT_COLUMNS);
 
+        // As many cards as fit side by side: N cards take N widths plus N-1
+        // gaps. The width and gap come from the view-size-* rules of
+        // dashboard.css (the fallbacks are the medium size's).
+        function fitColumns() {
+            var style = getComputedStyle(container);
+            var card = parseFloat(style.getPropertyValue('--dash-col-min')) || 190;
+            var gap = parseFloat(style.getPropertyValue('--dash-col-gap')) || 14;
+            var width = container.clientWidth -
+                (parseFloat(style.paddingLeft) || 0) - (parseFloat(style.paddingRight) || 0);
+            var fit = String(Math.max(1, Math.floor((width + gap) / (card + gap))));
+            if (container.style.getPropertyValue('--dash-col-max') !== fit) {
+                container.style.setProperty('--dash-col-max', fit);
+            }
+        }
+
         function applyColumns() {
+            if (autoGrid) {
+                fitColumns();
+                return;
+            }
             // Desktop-only: the mobile breakpoint ignores this and keeps its
             // own fixed 2-column layout.
             container.style.setProperty('--dash-col-max', columns);
@@ -76,6 +101,14 @@
         apply();
         applyColumns();
 
+        if (autoGrid) {
+            if (typeof ResizeObserver === 'function') {
+                new ResizeObserver(fitColumns).observe(container);
+            } else {
+                window.addEventListener('resize', fitColumns);
+            }
+        }
+
         if (columnsBtn) {
             columnsBtn.addEventListener('click', function () {
                 columns = COLUMNS[(COLUMNS.indexOf(columns) + 1) % COLUMNS.length];
@@ -98,6 +131,8 @@
                 localStorage.setItem(prefix + 'ViewSize', size);
             } catch (e) { /* storage unavailable */ }
             apply();
+            // A new size is a new card width, so a new column count
+            if (autoGrid) fitColumns();
         });
     }
 

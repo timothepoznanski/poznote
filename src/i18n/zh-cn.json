@@ -4567,6 +4567,13 @@
       "empty": "此看板上没有标签。",
       "search": "筛选标签...",
       "no_match": "没有匹配的标签。"
+    },
+    "filters": {
+      "button": "筛选",
+      "color": "颜色",
+      "modified": "最后修改",
+      "tags": "标签",
+      "reset": "重置筛选"
     }
   },
   "graph": {

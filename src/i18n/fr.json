@@ -4572,6 +4572,13 @@
       "empty": "Aucun tag sur ce tableau.",
       "search": "Filtrer les tags...",
       "no_match": "Aucun tag ne correspond."
+    },
+    "filters": {
+      "button": "Filtres",
+      "color": "Couleur",
+      "modified": "Dernière modification",
+      "tags": "Tags",
+      "reset": "Réinitialiser les filtres"
     }
   },
   "graph": {

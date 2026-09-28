@@ -212,7 +212,8 @@ body.dashboard-page {
 .dashboard-grid-container {
     display: grid;
     /* --dash-col-min is the card width (set per view-size-* variant) and
-       --dash-col-max the chosen maximum column count (default 4).
+       --dash-col-max the column count: the chosen maximum (default 4) on the
+       diary, the number that fits on the dashboard (board-view-menu.js).
        The count is capped by width, not by a fixed track count: auto-fit still
        drops to fewer columns when the screen is too narrow, so cards keep
        their width instead of being squeezed. minmax(0, …) keeps the floor at 0
@@ -713,6 +714,148 @@ html[data-theme='dark'] .note-color-swatch-empty {
     background: repeating-linear-gradient(45deg, var(--pz-surface-hover) 0 4px, var(--pz-bg) 4px 8px);
 }
 
+/* ---------- Filter panel (color, last modified, tags) ----------
+   One topbar button opens a panel with a section per filter (initFilterPanel
+   in js/dashboard-page.js). It reuses the fixed dropdown of
+   .dashboard-color-filter-menu; the button counts the active criteria. */
+
+.dashboard-filter-btn {
+    position: relative;
+}
+
+.dashboard-filter-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    box-sizing: border-box;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    border-radius: var(--pz-radius-pill);
+    background: var(--pz-accent);
+    color: var(--pz-text-inverse);
+    font-size: 10.5px;
+    font-weight: var(--pz-weight-semibold);
+    line-height: 17px;
+    text-align: center;
+    pointer-events: none;
+}
+
+.dashboard-filter-badge[hidden] {
+    display: none;
+}
+
+.dashboard-filter-panel {
+    box-sizing: border-box;
+    width: 320px;
+    max-width: calc(100vw - 16px);
+    padding: 12px;
+    overflow-x: hidden;
+}
+
+.dashboard-filter-section + .dashboard-filter-section {
+    margin-top: 16px;
+}
+
+.dashboard-filter-section-title {
+    margin: 0 0 8px;
+    font-size: 12px;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text-muted);
+}
+
+.dashboard-filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.dashboard-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-pill);
+    background: var(--pz-bg);
+    color: var(--pz-text);
+    font-size: 12.5px;
+    line-height: 1.3;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.dashboard-filter-chip:hover {
+    border-color: var(--pz-accent);
+}
+
+.dashboard-filter-chip.active {
+    border-color: var(--pz-accent);
+    background: color-mix(in srgb, var(--pz-accent) 10%, var(--pz-bg));
+    color: var(--pz-accent-text);
+}
+
+.dashboard-filter-chip .note-color-swatch {
+    width: 12px;
+    height: 12px;
+}
+
+html[data-theme='dark'] .dashboard-filter-chip {
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
+    color: var(--pz-text);
+}
+
+html[data-theme='dark'] .dashboard-filter-chip:hover,
+html[data-theme='dark'] .dashboard-filter-chip.active {
+    border-color: var(--pz-accent);
+}
+
+html[data-theme='dark'] .dashboard-filter-chip.active {
+    background: color-mix(in srgb, var(--pz-accent) 18%, var(--pz-surface));
+    color: var(--pz-accent-text);
+}
+
+/* The tag list scrolls on its own, so a long list never pushes the other
+   sections out of the panel */
+.dashboard-filter-tag-list {
+    max-height: 200px;
+    margin-top: 6px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.dashboard-filter-footer {
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid var(--pz-border);
+}
+
+.dashboard-filter-footer[hidden] {
+    display: none;
+}
+
+.dashboard-filter-reset {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 2px;
+    border: none;
+    background: none;
+    color: var(--pz-accent-text);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.dashboard-filter-reset:hover {
+    color: var(--pz-accent-text-hover);
+}
+
+.dashboard-filter-reset .lucide {
+    width: 14px;
+    height: 14px;
+}
+
 /* ---------- Note color picker modal ---------- */
 
 .note-color-modal-subtitle {
@@ -1110,6 +1253,75 @@ html[data-theme='dark'] body.dashboard-page .modal-buttons button.dashboard-scop
 
 .view-layout-list .dash-note-card.drop-after::after {
     bottom: 0;
+}
+
+/* ---------- Touch: selected card and dragged card ----------
+   A long press selects a card and a move then drags it (initTouchCards in
+   js/dashboard-page.js). The long press must not select text or open the
+   link preview of iOS / the context menu of Android. */
+@media (hover: none) {
+    #dashboardGrid .dash-card {
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+    }
+
+    /* A card selected by a long press never keeps the lifted hover look */
+    #dashboardGrid .dash-card:hover {
+        transform: none;
+    }
+}
+
+/* The id outweighs the dark theme's card and note color rules */
+#dashboardGrid .dash-card.is-selected,
+#dashboardGrid .dash-card.is-selected:hover {
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 1.5px var(--pz-accent);
+}
+
+/* Copy of the card that follows the finger, fixed over the page. It sits in
+   the grid, so the list layout styles still apply to it. It is a copy of the
+   selected card, so it keeps the selection ring under its lifted shadow. */
+#dashboardGrid .dash-card.dash-card-ghost {
+    position: fixed;
+    z-index: 1000;
+    margin: 0;
+    pointer-events: none;
+    opacity: 0.94;
+    box-shadow: 0 0 0 1.5px var(--pz-accent), 0 10px 28px rgba(var(--pz-shadow-rgb), 0.28);
+    transition: none;
+}
+
+/* ---------- Selection bar (touch) ----------
+   Replaces the filter row while a card is selected: close, the card's name,
+   and the color button that opens the color picker. */
+.dashboard-topbar.is-selecting .board-filter-row {
+    display: none;
+}
+
+.dashboard-selection-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 560px;
+    min-height: 33px;
+    margin: 0 auto;
+}
+
+.dashboard-selection-bar[hidden] {
+    display: none;
+}
+
+.dashboard-selection-title {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 14px;
+    font-weight: var(--pz-weight-medium);
+    color: var(--pz-text);
 }
 
 .dash-note-icon {
@@ -1747,13 +1959,6 @@ html[data-theme='dark'] .dash-ws-dot {
     color: var(--pz-text-subtle);
 }
 
-/* Tag filter: a checklist, so the menu stays open while tags are combined */
-.dashboard-tag-filter-menu {
-    min-width: 220px;
-    max-width: min(320px, calc(100vw - 16px));
-    overflow-x: hidden;
-}
-
 /* Rows are labels, so they need the border-box a <button> gets for free
    (width: 100% plus padding would otherwise overflow sideways) */
 .dashboard-tag-filter-item {
@@ -1766,17 +1971,6 @@ html[data-theme='dark'] .dash-ws-dot {
 .dashboard-tag-filter-item[hidden],
 .dashboard-tag-filter-empty[hidden] {
     display: none;
-}
-
-/* Search box pinned at the top while the list scrolls; the negative margin
-   cancels the menu padding so it sits flush against the edge */
-.dashboard-tag-filter-search-wrap {
-    position: sticky;
-    top: -6px;
-    z-index: 1;
-    margin: -6px 0 4px;
-    padding: 6px 0;
-    background: var(--pz-bg);
 }
 
 .dashboard-tag-filter-search {
@@ -1796,10 +1990,6 @@ html[data-theme='dark'] .dash-ws-dot {
 
 .dashboard-tag-filter-search:focus {
     border-color: var(--pz-accent-text);
-}
-
-html[data-theme='dark'] .dashboard-tag-filter-search-wrap {
-    background: var(--pz-surface);
 }
 
 html[data-theme='dark'] .dashboard-tag-filter-search {

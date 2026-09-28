@@ -304,9 +304,7 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardTopbarFilter" checked><span><?php echo t_h('modals.ui_customization.dashboard_filter_bar', [], 'Filter bar'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardViewLayoutBtn" checked><span><?php echo t_h('modals.ui_customization.view_layout_toggle', [], 'View toggle (grid / list, card size)'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardViewColumnsBtn" checked><span><?php echo t_h('dashboard.view.columns', [], 'Maximum columns'); ?></span></label>
-    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardColorFilterBtn" checked><span><?php echo t_h('note_color.filter', [], 'Filter by color'); ?></span></label>
-    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardModifiedFilterBtn" checked><span><?php echo t_h('dashboard.modified.button', [], 'Filter by last modification'); ?></span></label>
-    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardTagFilterBtn" checked><span><?php echo t_h('dashboard.tag_filter.button', [], 'Filter by tag'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardFilterBtn" checked><span><?php echo t_h('dashboard.filters.button', [], 'Filters'); ?></span></label>
 </div>
 </div>
 
