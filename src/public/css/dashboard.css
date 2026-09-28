@@ -212,8 +212,8 @@ body.dashboard-page {
 .dashboard-grid-container {
     display: grid;
     /* --dash-col-min is the card width (set per view-size-* variant) and
-       --dash-col-max the column count: the chosen maximum (default 4) on the
-       diary, the number that fits on the dashboard (board-view-menu.js).
+       --dash-col-max the column count, the number that fits
+       (board-view-menu.js).
        The count is capped by width, not by a fixed track count: auto-fit still
        drops to fewer columns when the screen is too narrow, so cards keep
        their width instead of being squeezed. minmax(0, …) keeps the floor at 0
@@ -338,24 +338,6 @@ html[data-theme='dark'] .dash-section-title {
 .board-view-controls.is-list .board-view-layout-toggle .lucide-grid,
 .board-view-controls.is-list .board-view-layout-toggle .board-view-size-letter {
     display: none;
-}
-
-/* Column count is a grid-only setting: hide it in list layout too */
-.board-view-controls.is-list .board-view-columns-btn {
-    display: none;
-}
-
-/* Phones keep the fixed 2-column layout, so the setting has nothing to act on */
-@media (max-width: 800px) {
-    .board-view-columns-btn {
-        display: none;
-    }
-}
-
-.board-view-columns-value {
-    font-size: 12px;
-    font-weight: var(--pz-weight-bold);
-    line-height: 1;
 }
 
 .board-view-size-letter {
