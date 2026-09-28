@@ -1343,10 +1343,17 @@ function parseMarkdown(text) {
             return (typeof code !== 'undefined') ? '<code>' + escapeHtml(code) + '</code>' : match;
         });
 
-        // Restore protected elements (images, links, spans, tags, iframes, videos, audio, and Excalidraw)
-        text = text.replace(/\x00P(IMG|LNK|SPAN|TAG|IFRAME|VIDEO|AUDIO|EXCALIDRAW)(\d+)\x00/g, function (match, type, index) {
-            return protectedElements[parseInt(index)] || match;
-        });
+        // Restore protected elements (images, links, spans, tags, iframes, videos, audio, and Excalidraw).
+        // A link around an image ([![alt](src)](url)) holds the image's placeholder
+        // in its text, so the restore runs again until nothing nested is left.
+        const protectedElementPattern = /\x00P(IMG|LNK|SPAN|TAG|IFRAME|VIDEO|AUDIO|EXCALIDRAW)(\d+)\x00/g;
+        for (let pass = 0; pass < 3; pass++) {
+            const restored = text.replace(protectedElementPattern, function (match, type, index) {
+                return protectedElements[parseInt(index)] || match;
+            });
+            if (restored === text) break;
+            text = restored;
+        }
 
         text = text.replace(/\x00RAWCODE(\d+)\x00/g, function (match, index) {
             var code = protectedRawCode[parseInt(index, 10)];
