@@ -1529,6 +1529,8 @@
                         placeholderImg = noteEntry.querySelector('[data-upload-placeholder-id="' + placeholderId + '"]');
                     }
 
+                    showUploadPlaceholderPreview(placeholderImg, file);
+
                     // Upload the file as attachment
                     const formData = new FormData();
                     formData.append('note_id', noteId);
@@ -1548,12 +1550,7 @@
                                 const imgSrc = '/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id;
 
                                 if (placeholderImg) {
-                                    placeholderImg.src = imgSrc;
-                                    placeholderImg.alt = file.name;
-                                    placeholderImg.classList.remove('image-uploading-placeholder');
-                                    placeholderImg.removeAttribute('data-upload-placeholder-id');
-                                    placeholderImg.setAttribute('loading', 'lazy');
-                                    placeholderImg.setAttribute('decoding', 'async');
+                                    finishUploadPlaceholder(placeholderImg, imgSrc, file.name);
                                 }
 
                                 window.noteid = noteId;
@@ -1579,18 +1576,14 @@
                                     }
                                 }, 100);
                             } else {
-                                if (placeholderImg) {
-                                    placeholderImg.remove();
-                                }
+                                discardUploadPlaceholder(placeholderImg);
                                 if (typeof showNotificationPopup === 'function') {
                                     showNotificationPopup('Upload failed: ' + data.message, 'error');
                                 }
                             }
                         })
                         .catch(error => {
-                            if (placeholderImg) {
-                                placeholderImg.remove();
-                            }
+                            discardUploadPlaceholder(placeholderImg);
                             if (typeof showNotificationPopup === 'function') {
                                 showNotificationPopup('Upload failed: ' + error.message, 'error');
                             }

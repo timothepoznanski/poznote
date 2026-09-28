@@ -916,6 +916,14 @@ function stripSearchHighlights(element) {
         parent.normalize();
     }
 
+    // An image still uploading shows its file through a blob: URL that only
+    // this page can read (js/attachments.js): stored as is, it would be a
+    // broken picture on the next load
+    var uploadPreviews = clonedElement.querySelectorAll('img.image-uploading-placeholder[src^="blob:"]');
+    for (var u = 0; u < uploadPreviews.length; u++) {
+        uploadPreviews[u].setAttribute('src', '');
+    }
+
     return clonedElement;
 }
 

@@ -21,7 +21,9 @@ foreach (ALLOWED_IFRAME_DOMAINS as $domain) {
 // Content-Security-Policy: Restrict where scripts can be loaded from
 // Note: 'unsafe-inline' is needed for the rich text editor, but we sanitize all user input
 // to prevent XSS. In the future, consider using nonces for inline scripts.
-header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-src {$frameSrcDomains}; frame-ancestors 'self'; form-action 'self';");
+// img-src blob: shows a pasted image from the file while it uploads
+// (js/attachments.js); only this page's own scripts can mint a blob: URL.
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self'; frame-src {$frameSrcDomains}; frame-ancestors 'self'; form-action 'self';");
 
 // X-XSS-Protection: explicitly disabled — the legacy browser filter is deprecated
 // and could itself introduce vulnerabilities; the CSP above handles XSS mitigation
