@@ -2181,7 +2181,10 @@
     "bilibili_modal_title": "Insertar vídeo de Bilibili",
     "video_insert": "Insertar",
     "copy": "Copiar",
-    "cut": "Cortar"
+    "cut": "Cortar",
+    "paste": "Pegar",
+    "paste_plain": "Pegar sin formato",
+    "paste_blocked": "El navegador no permite que Poznote lea el portapapeles aquí. Usa {{shortcut}} para pegar."
   },
   "api": {
     "settings": {

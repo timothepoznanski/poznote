@@ -1682,7 +1682,10 @@
     "bilibili_modal_title": "Insert Bilibili Video",
     "video_insert": "Insert",
     "copy": "Copy",
-    "cut": "Cut"
+    "cut": "Cut",
+    "paste": "Paste",
+    "paste_plain": "Paste without formatting",
+    "paste_blocked": "The browser does not let Poznote read the clipboard here. Use {{shortcut}} to paste."
   },
   "api": {
     "settings": {

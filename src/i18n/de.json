@@ -2181,7 +2181,10 @@
     "bilibili_modal_title": "Bilibili-Video einfügen",
     "video_insert": "Einfügen",
     "copy": "Kopieren",
-    "cut": "Ausschneiden"
+    "cut": "Ausschneiden",
+    "paste": "Einfügen",
+    "paste_plain": "Ohne Formatierung einfügen",
+    "paste_blocked": "Der Browser erlaubt Poznote hier keinen Zugriff auf die Zwischenablage. Mit {{shortcut}} einfügen."
   },
   "api": {
     "settings": {

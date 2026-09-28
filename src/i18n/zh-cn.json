@@ -2179,7 +2179,10 @@
     "bilibili_modal_title": "插入 Bilibili 视频",
     "video_insert": "插入",
     "copy": "复制",
-    "cut": "剪切"
+    "cut": "剪切",
+    "paste": "粘贴",
+    "paste_plain": "无格式粘贴",
+    "paste_blocked": "浏览器不允许 Poznote 在此读取剪贴板。请使用 {{shortcut}} 粘贴。"
   },
   "api": {
     "settings": {

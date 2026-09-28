@@ -2181,7 +2181,10 @@
     "bilibili_modal_title": "Inserir vídeo do Bilibili",
     "video_insert": "Inserir",
     "copy": "Copiar",
-    "cut": "Recortar"
+    "cut": "Recortar",
+    "paste": "Colar",
+    "paste_plain": "Colar sem formatação",
+    "paste_blocked": "O navegador não permite que o Poznote leia a área de transferência aqui. Use {{shortcut}} para colar."
   },
   "api": {
     "settings": {

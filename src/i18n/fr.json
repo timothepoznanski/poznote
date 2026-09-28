@@ -2187,7 +2187,10 @@
     "bilibili_modal_title": "Insérer une vidéo Bilibili",
     "video_insert": "Insérer",
     "copy": "Copier",
-    "cut": "Couper"
+    "cut": "Couper",
+    "paste": "Coller",
+    "paste_plain": "Coller sans mise en forme",
+    "paste_blocked": "Le navigateur ne laisse pas Poznote lire le presse-papiers ici. Utilisez {{shortcut}} pour coller."
   },
   "api": {
     "settings": {
