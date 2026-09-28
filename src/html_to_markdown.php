@@ -203,6 +203,17 @@ function poznoteHtmlToMarkdown(string $html): string {
     // Horizontal rule
     $md = preg_replace('/<hr\s*\/?>/i', "\n\n---\n\n", $md);
     
+    // Aligned paragraphs (text-align on a <p> or <div> holding no other block)
+    // become <p align="…"> lines, the syntax the Markdown parsers read back.
+    // Markers keep the text in the stream for the inline rules below; they are
+    // turned into tags at the end, one per line.
+    $md = preg_replace_callback('/<(p|div)\b([^>]*)>((?:(?!<\/?(?:p|div)\b).)*)<\/\1>/is', function($matches) {
+        if (!preg_match('/\bstyle\s*=\s*(["\'])[^"\']*\btext-align\s*:\s*(center|right|justify)\b[^"\']*\1/i', $matches[2], $align)) {
+            return $matches[0];
+        }
+        return "\n\n\x01ALIGN:" . strtolower($align[2]) . "\x01" . $matches[3] . "\x01/ALIGN\x01\n\n";
+    }, $md);
+
     // Line breaks
     $md = preg_replace('/<br\s*\/?>/i', "\n", $md);
     
@@ -360,6 +371,17 @@ function poznoteHtmlToMarkdown(string $html): string {
     // Remove zero-width spaces
     $md = str_replace("\xE2\x80\x8B", '', $md);
     
+    $md = preg_replace_callback('/\x01ALIGN:(center|right|justify)\x01(.*?)\x01\/ALIGN\x01/s', function($matches) {
+        $lines = [];
+        foreach (explode("\n", $matches[2]) as $line) {
+            $line = trim($line);
+            if ($line !== '') {
+                $lines[] = '<p align="' . $matches[1] . '">' . $line . '</p>';
+            }
+        }
+        return implode("\n", $lines);
+    }, $md);
+
     // Clean up lines that are only whitespace
     $md = preg_replace('/^[ \t]+$/m', '', $md);
     

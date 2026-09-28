@@ -454,6 +454,9 @@ function _mdSanitizeTaskListEmbedHtml(html) {
         + '<a class="tasklist-embed-link" href="index.php?note=' + embedNoteId + '">' + _mdEscapeHtml(label) + '</a></div>';
 }
 
+// <p align="…">text</p> on a line of its own, once HTML-escaped
+var _MD_ALIGNED_LINE_REGEX = /^ {0,3}&lt;p\s+align\s*=\s*(?:"|'|&quot;|&#0?39;)?(left|center|right|justify)(?:"|'|&quot;|&#0?39;)?\s*&gt;(.*?)&lt;\/p&gt;\s*$/i;
+
 // Attributes kept on raw <details>/<summary>/<u> tags: only `class`
 // (safe token characters) and, for <details>, the boolean `open`. Inline
 // event handlers, style, id, ... are dropped before the tag is re-emitted
@@ -1653,6 +1656,25 @@ function parseMarkdown(text) {
             for (let bl = 0; bl < placeholdersToAdd; bl++) {
                 result.push('<p class="blank-line">&nbsp;</p>');
             }
+            continue;
+        }
+
+        // A line aligned the GitHub README way, <p align="center">text</p>
+        // (js/markdown-formatting.js applyMarkdownAlignment), the text inside
+        // still Markdown. The tag is escaped here. Consecutive lines with the
+        // same alignment are one paragraph, like consecutive plain lines.
+        var alignedMatch = line.match(_MD_ALIGNED_LINE_REGEX);
+        if (alignedMatch) {
+            flushParagraph();
+            var alignValue = alignedMatch[1].toLowerCase();
+            var alignedStartLine = sourceLineOf(i);
+            var alignedLines = [applyInlineStyles(alignedMatch[2])];
+            var nextAligned;
+            while (i + 1 < lines.length && (nextAligned = lines[i + 1].match(_MD_ALIGNED_LINE_REGEX)) && nextAligned[1].toLowerCase() === alignValue) {
+                alignedLines.push(applyInlineStyles(nextAligned[2]));
+                i++;
+            }
+            result.push('<p data-line="' + alignedStartLine + '" style="text-align: ' + alignValue + ';">' + alignedLines.join('<br>') + '</p>');
             continue;
         }
 

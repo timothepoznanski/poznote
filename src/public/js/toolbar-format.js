@@ -139,8 +139,9 @@ function changeFontSize() {
   setupPopupDismiss(popup, '.btn-text-height');
 }
 
-// Paragraph alignment picker of rich-text notes, same look as the text style
-// popup above; the pick goes through applyHtmlAlignment()
+// Paragraph alignment picker, same look as the text style popup above; the
+// pick goes through applyHtmlAlignment(), or applyMarkdownAlignment() in a
+// Markdown note
 function changeAlignment(triggerButton) {
   const existingPopup = document.querySelector('.align-popup');
   if (existingPopup) {
@@ -154,6 +155,7 @@ function changeAlignment(triggerButton) {
   const editor = savedRange ? getEditorFromRange(savedRange) : null;
   const button = triggerButton && triggerButton.closest ? triggerButton.closest('.btn-align') : document.querySelector('.btn-align');
   if (!editor || !button) return;
+  const isMarkdown = typeof isInMarkdownEditor === 'function' && isInMarkdownEditor();
 
   const t = window.t || ((key, params, fallback) => fallback);
   const options = [
@@ -199,7 +201,11 @@ function changeAlignment(triggerButton) {
     const sel = window.getSelection();
     sel.removeAllRanges();
     sel.addRange(savedRange);
-    applyHtmlAlignment(item.dataset.align);
+    if (isMarkdown) {
+      if (typeof applyMarkdownAlignment === 'function') applyMarkdownAlignment(item.dataset.align);
+    } else {
+      applyHtmlAlignment(item.dataset.align);
+    }
     requestAnimationFrame(() => restoreScrollState(scrollState));
     close();
   });

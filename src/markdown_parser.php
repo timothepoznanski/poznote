@@ -923,6 +923,24 @@ function parseMarkdown($text) {
             continue;
         }
         
+        // A line aligned the GitHub README way, <p align="center">text</p>
+        // (js/markdown-formatting.js applyMarkdownAlignment), the text inside
+        // still Markdown. The tag is escaped here. Consecutive lines with the
+        // same alignment are one paragraph, like consecutive plain lines.
+        $alignedLineRegex = '/^ {0,3}&lt;p\s+align\s*=\s*(?:&quot;|&#0?39;|"|\')?(left|center|right|justify)(?:&quot;|&#0?39;|"|\')?\s*&gt;(.*?)&lt;\/p&gt;\s*$/i';
+        if (preg_match($alignedLineRegex, $line, $matches)) {
+            $flushParagraph();
+            $alignValue = strtolower($matches[1]);
+            $alignedStartLine = $i;
+            $alignedLines = [$applyInlineStyles($matches[2])];
+            while ($i + 1 < count($lines) && preg_match($alignedLineRegex, $lines[$i + 1], $next) && strtolower($next[1]) === $alignValue) {
+                $alignedLines[] = $applyInlineStyles($next[2]);
+                $i++;
+            }
+            $result[] = '<p data-line="' . $alignedStartLine . '" style="text-align: ' . $alignValue . ';">' . implode('<br>', $alignedLines) . '</p>';
+            continue;
+        }
+
         // Headers. CommonMark, GitHub and Obsidian all allow up to three
         // spaces of indentation before the hashes (four spaces makes the line
         // an indented code block instead), and notes written elsewhere do

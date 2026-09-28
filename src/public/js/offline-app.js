@@ -729,7 +729,7 @@
             add(toolbarButton('btn-task-remove ' + fmt, t('editor.toolbar.remove_checklist', null, 'Remove checkboxes'), 'exec-task-remove', 'lucide-minus-square'));
         }
         add(toolbarButton('btn-text-height ' + fmt, t('slash_menu.title', null, 'Title'), 'change-font-size', 'lucide-type-height'));
-        if (type === 'note') {
+        if (type === 'note' || type === 'markdown') {
             add(toolbarButton('btn-align ' + fmt, t('slash_menu.align', null, 'Align'), 'change-alignment', 'lucide-align-center'));
         }
         add(toolbarButton('btn-code ' + fmt, t('editor.toolbar.code_block', null, 'Code block'), 'toggle-code-block', 'lucide-code'));

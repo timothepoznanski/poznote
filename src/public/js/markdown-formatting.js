@@ -906,6 +906,57 @@
         }
     }
 
+    // A line aligned the GitHub README way, the one syntax Markdown renderers
+    // keep (GitHub drops style attributes): <p align="center">text</p>. The
+    // parsers (js/markdown-parser.js, markdown_parser.php) render it one line
+    // at a time.
+    var MARKDOWN_ALIGNED_LINE = /^( {0,3})<p\s+align\s*=\s*["']?(left|center|right|justify)["']?\s*>(.*)<\/p>\s*$/i;
+    // Lines that already are another block: never wrapped
+    var MARKDOWN_NON_PARAGRAPH_LINE = /^\s*(?:#{1,6}\s|[-*+]\s|\d+(?:\.\d+)*\.\s|>|\||```|\$\$|<\/?(?:details|summary)\b)|^\s*(?:\*{3,}|-{3,}|_{3,})\s*$/;
+
+    /**
+     * Aligns the lines under the selection (or the caret's line). Left is the
+     * default, so it removes the alignment instead of writing it.
+     */
+    function applyMarkdownAlignment(align) {
+        if (!/^(left|center|right|justify)$/.test(align)) return;
+        var context = getCurrentMarkdownEditContext();
+        var editor = context.editor;
+        var offsets = context.offsets;
+        if (!editor || !offsets) return;
+
+        var fullText = getMarkdownEditorValue(editor);
+        var start = Math.min(offsets.start, offsets.end);
+        var end = Math.max(offsets.start, offsets.end);
+        // A selection ending at the start of a line leaves that line alone
+        if (end > start && fullText.charAt(end - 1) === '\n') end--;
+        var lineStart = fullText.lastIndexOf('\n', start - 1) + 1;
+        var lineEnd = fullText.indexOf('\n', end);
+        if (lineEnd === -1) lineEnd = fullText.length;
+
+        var inFence = false;
+        fullText.slice(0, lineStart).split('\n').forEach(function (line) {
+            if (/^\s*```/.test(line)) inFence = !inFence;
+        });
+
+        var original = fullText.slice(lineStart, lineEnd);
+        var updated = original.split('\n').map(function (line) {
+            if (/^\s*```/.test(line)) {
+                inFence = !inFence;
+                return line;
+            }
+            if (inFence || line.trim() === '') return line;
+            var aligned = line.match(MARKDOWN_ALIGNED_LINE);
+            var indent = aligned ? aligned[1] : '';
+            var inner = aligned ? aligned[3] : line;
+            if (!aligned && MARKDOWN_NON_PARAGRAPH_LINE.test(line)) return line;
+            return align === 'left' ? indent + inner : indent + '<p align="' + align + '">' + inner + '</p>';
+        }).join('\n');
+
+        if (updated === original) return;
+        replaceMarkdownRangeAndSelect(editor, lineStart, lineEnd, updated, lineStart, lineStart + updated.length);
+    }
+
     /**
      * Apply text color using HTML inline in markdown
      */
@@ -1032,6 +1083,7 @@
     window.applyMarkdownLink = applyMarkdownLink;
     window.applyMarkdownHeading = applyMarkdownHeading;
     window.applyMarkdownHeadingLevel = applyMarkdownHeadingLevel;
+    window.applyMarkdownAlignment = applyMarkdownAlignment;
     window.toggleMarkdownList = toggleMarkdownList;
     window.applyMarkdownColor = applyMarkdownColor;
     window.applyMarkdownHighlight = applyMarkdownHighlight;

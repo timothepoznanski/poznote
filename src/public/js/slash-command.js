@@ -2407,9 +2407,19 @@
             });
     }
 
-    // Aligns the paragraph under the caret, or every paragraph of the selection
+    // Aligns the paragraph under the caret, or every paragraph of the selection.
+    // The note is read from the editable element executeCommand() kept.
     function applyAlignment(align) {
-        if (typeof window.applyHtmlAlignment === 'function') window.applyHtmlAlignment(align);
+        const editable = window._slashCommandSavedEditableElement;
+        const noteEntry = editable && editable.closest ? editable.closest('.noteentry') : null;
+        const isMarkdown = noteEntry
+            ? noteEntry.getAttribute('data-note-type') === 'markdown'
+            : (typeof window.isInMarkdownEditor === 'function' && window.isInMarkdownEditor());
+        if (isMarkdown) {
+            if (typeof window.applyMarkdownAlignment === 'function') window.applyMarkdownAlignment(align);
+        } else if (typeof window.applyHtmlAlignment === 'function') {
+            window.applyHtmlAlignment(align);
+        }
     }
 
     // Return slash commands common between HTML and Markdown modes
@@ -2486,7 +2496,7 @@
                     }
                 }
             },
-            // Rich-text notes only: Markdown has no paragraph alignment
+            // Rich-text notes: an inline text-align; Markdown: <p align="…">
             align: {
                 id: 'align',
                 icon: 'lucide-align-center',
@@ -2887,6 +2897,7 @@
                     { id: 'strikethrough', icon: 'lucide-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => wrapMarkdownSelection('~~', '~~', 2) }
                 ]
             },
+            common.align,
             {
                 id: 'code',
                 icon: 'lucide-code',
@@ -3392,7 +3403,7 @@
                 label: t('slash_menu.format_text', null, 'Format text'),
                 submenu: format
             },
-            isMarkdown ? null : common.align,
+            common.align,
             list,
             color,
             highlight,
