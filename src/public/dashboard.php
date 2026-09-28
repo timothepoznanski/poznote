@@ -744,7 +744,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 
 			<header class="dashboard-topbar">
 				<div class="board-filter-row">
-				<?php renderBoardViewMenu('dashboard', true); ?>
+				<?php renderBoardViewMenu('dashboard'); ?>
 				<?php // One button for the color, last-modified and tag filters: a panel with a section each (initFilterPanel in js/dashboard-page.js) ?>
 				<div class="dashboard-color-filter-wrap">
 					<button type="button" id="dashboardFilterBtn" class="dashboard-color-filter-btn dashboard-filter-btn" title="<?php echo t_h('dashboard.filters.button', [], 'Filters'); ?>" aria-label="<?php echo t_h('dashboard.filters.button', [], 'Filters'); ?>" aria-haspopup="true" aria-expanded="false">

@@ -1561,6 +1561,11 @@
     "heading_5": "Heading 5",
     "heading_6": "Heading 6",
     "format_text": "Format text",
+    "align": "Align",
+    "align_left": "Left",
+    "align_center": "Center",
+    "align_right": "Right",
+    "align_justify": "Justify",
     "red": "Red",
     "bold": "Bold",
     "italic": "Italic",
@@ -1677,7 +1682,10 @@
     "bilibili_modal_title": "Insert Bilibili Video",
     "video_insert": "Insert",
     "copy": "Copy",
-    "cut": "Cut"
+    "cut": "Cut",
+    "paste": "Paste",
+    "paste_plain": "Paste without formatting",
+    "paste_blocked": "The browser does not let Poznote read the clipboard here. Use {{shortcut}} to paste."
   },
   "api": {
     "settings": {
@@ -1926,7 +1934,8 @@
       "go_back": "Go back",
       "go_forward": "Go forward",
       "switch_to_edit": "Switch to edit mode",
-      "switch_to_preview": "Switch to preview mode"
+      "switch_to_preview": "Switch to preview mode",
+      "more": "More"
     },
     "link": {
       "add_title": "Add link",
@@ -4053,7 +4062,6 @@
       "size_medium": "Medium",
       "size_large": "Large",
       "size_wide": "Wide",
-      "columns": "Maximum columns",
       "layout": "Layout",
       "layout_grid": "Grid",
       "layout_list": "List"

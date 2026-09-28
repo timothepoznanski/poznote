@@ -173,6 +173,7 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-task-list" checked><span><?php echo t_h('editor.toolbar.toggle_checklist', [], 'Toggle checklist'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-task-remove" checked><span><?php echo t_h('editor.toolbar.remove_checklist', [], 'Remove checkboxes'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-text-height" checked><span><?php echo t_h('slash_menu.title', [], 'Title'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-align" checked><span><?php echo t_h('slash_menu.align', [], 'Align'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-code" checked><span><?php echo t_h('editor.toolbar.code_block', [], 'Code block'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-inline-code" checked><span><?php echo t_h('editor.toolbar.inline_code', [], 'Inline code'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-eraser" checked><span><?php echo t_h('editor.toolbar.clear_formatting', [], 'Clear formatting'); ?></span></label>
@@ -206,6 +207,7 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:normal" checked><span><?php echo t_h('slash_menu.back_to_normal', [], 'Back to normal text'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:title" checked><span><?php echo t_h('slash_menu.title', [], 'Title'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:format" checked><span><?php echo t_h('slash_menu.format_text', [], 'Format text'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:align" checked><span><?php echo t_h('slash_menu.align', [], 'Align'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:color" checked><span><?php echo t_h('slash_menu.color', [], 'Color'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:highlight" checked><span><?php echo t_h('slash_menu.highlight', [], 'Highlight'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:code" checked><span><?php echo t_h('slash_menu.code', [], 'Code'); ?></span></label>
@@ -302,7 +304,6 @@
 <div class="ui-custom-items">
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardTopbarFilter" checked><span><?php echo t_h('modals.ui_customization.dashboard_filter_bar', [], 'Filter bar'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardViewLayoutBtn" checked><span><?php echo t_h('modals.ui_customization.view_layout_toggle', [], 'View toggle (grid / list, card size)'); ?></span></label>
-    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardViewColumnsBtn" checked><span><?php echo t_h('dashboard.view.columns', [], 'Maximum columns'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardFilterBtn" checked><span><?php echo t_h('dashboard.filters.button', [], 'Filters'); ?></span></label>
 </div>
 </div>

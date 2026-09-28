@@ -102,6 +102,12 @@ body.public-note-page {
     cursor: default !important;
 }
 
+/* Same as the editor: a pasted fixed-width block (OneNote) stays inside the
+   page, and its pictures with it (#1514) */
+.public-note div[style*="width"] {
+    max-width: 100%;
+}
+
 .public-note .content .excalidraw-container {
     display: block;
     max-width: 100%;

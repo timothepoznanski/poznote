@@ -402,6 +402,15 @@ function handleRichTextPaste(htmlData) {
             el.style.fontSize = '';
             el.style.lineHeight = '';
 
+            // A fixed width sized for the source page, wider than the note
+            // (OneNote wraps every outline in <div style="width:15.1in">):
+            // the pictures inside overflowed with it (#1514). Media keep
+            // their size, table columns their layout.
+            if (!/^(IMG|VIDEO|IFRAME|TABLE|COLGROUP|COL|TR|TD|TH)$/.test(el.tagName)) {
+                el.style.width = '';
+                el.style.minWidth = '';
+            }
+
             // Clean up empty style attribute
             var styleAttr = el.getAttribute('style').trim();
             if (styleAttr === '' || el.style.length === 0 || /^;+$/.test(styleAttr)) {

@@ -331,6 +331,15 @@ textarea:focus {
     height: auto;
 }
 
+/* A block pasted with a fixed width (OneNote wraps every outline in a
+   <div style="width:15.1in">) is wider than the note, and the max-width above
+   then lets its pictures overflow too, taking their resize handle out of
+   reach (#1514). Notes pasted before the paste cleanup dropped that width
+   still carry it. */
+.noteentry div[style*="width"] {
+    max-width: 100%;
+}
+
 .noteentry img {
     content-visibility: auto;
     contain-intrinsic-size: 300px 200px;

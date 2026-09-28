@@ -4,19 +4,16 @@
  *   list, showing the grid icon plus the size letter in grid layout and the
  *   list icon in list layout (wide: the width beyond large at the medium
  *   height)
- * - a column button cycling 1..8, capping how many columns the grid splits
- *   the width into, hidden in list layout
  * Settings persist in localStorage (separate ViewLayout / ViewSize keys, so
  * older stored preferences keep working), namespaced by the controls'
  * data-view-prefix so each page keeps its own preferences. Size and layout
- * are applied as view-size-* / view-layout-* classes on .dashboard-container,
- * the column cap as a --dash-col-max custom property on the same element;
+ * are applied as view-size-* / view-layout-* classes on .dashboard-container;
  * all visual differences live in dashboard.css.
  *
- * Controls marked data-auto-grid (the dashboard) have no column setting,
- * like Google Keep: --dash-col-max is the number of cards of the current
- * size (--dash-col-min wide) that fit the container, recomputed whenever the
- * container is resized or the size changes.
+ * There is no column setting, like Google Keep: --dash-col-max (on the same
+ * element) is the number of cards of the current size (--dash-col-min wide)
+ * that fit the container, recomputed whenever the container is resized or
+ * the size changes.
  */
 (function () {
     'use strict';
@@ -25,18 +22,12 @@
     var LAYOUTS = ['grid', 'list'];
     // The single toggle walks through every view: the four grid sizes, then list.
     var VIEWS = ['small', 'medium', 'large', 'wide', 'list'];
-    // Maximum columns: the grid still drops to fewer when the width can't fit
-    // that many, so cards keep their width instead of being squeezed.
-    var COLUMNS = ['1', '2', '3', '4', '5', '6', '7', '8'];
-    var DEFAULT_COLUMNS = '4';
 
     function initControls(root) {
         var prefix = root.getAttribute('data-view-prefix') || 'board';
         var viewBtn = root.querySelector('.board-view-layout-toggle');
-        var columnsBtn = root.querySelector('.board-view-columns-btn');
         var container = document.querySelector('.dashboard-container');
         if (!viewBtn || !container) return;
-        var autoGrid = root.hasAttribute('data-auto-grid');
 
         function readSetting(key, allowed, fallback) {
             var value = null;
@@ -46,9 +37,6 @@
 
         var size = readSetting('ViewSize', SIZES, 'medium');
         var layout = readSetting('ViewLayout', LAYOUTS, 'grid');
-        // A previously stored 'auto' is not in COLUMNS any more, so it falls
-        // back to the default like any other invalid value.
-        var columns = readSetting('ViewColumns', COLUMNS, DEFAULT_COLUMNS);
 
         // As many cards as fit side by side: N cards take N widths plus N-1
         // gaps. The width and gap come from the view-size-* rules of
@@ -65,21 +53,6 @@
             }
         }
 
-        function applyColumns() {
-            if (autoGrid) {
-                fitColumns();
-                return;
-            }
-            // Desktop-only: the mobile breakpoint ignores this and keeps its
-            // own fixed 2-column layout.
-            container.style.setProperty('--dash-col-max', columns);
-            if (!columnsBtn) return;
-            var title = columnsBtn.getAttribute('data-label-columns') || 'Maximum columns';
-            columnsBtn.title = title + ': ' + columns;
-            var value = columnsBtn.querySelector('.board-view-columns-value');
-            if (value) value.textContent = columns;
-        }
-
         function apply() {
             SIZES.forEach(function (s) {
                 container.classList.toggle('view-size-' + s, s === size);
@@ -87,7 +60,7 @@
             LAYOUTS.forEach(function (l) {
                 container.classList.toggle('view-layout-' + l, l === layout);
             });
-            // is-list swaps the toggle icon and hides the columns button (CSS)
+            // is-list swaps the toggle icon (CSS)
             root.classList.toggle('is-list', layout === 'list');
             var sizeLabel = viewBtn.getAttribute('data-label-' + size) || size;
             var letter = viewBtn.querySelector('.board-view-size-letter');
@@ -99,22 +72,12 @@
         }
 
         apply();
-        applyColumns();
+        fitColumns();
 
-        if (autoGrid) {
-            if (typeof ResizeObserver === 'function') {
-                new ResizeObserver(fitColumns).observe(container);
-            } else {
-                window.addEventListener('resize', fitColumns);
-            }
-        }
-
-        if (columnsBtn) {
-            columnsBtn.addEventListener('click', function () {
-                columns = COLUMNS[(COLUMNS.indexOf(columns) + 1) % COLUMNS.length];
-                try { localStorage.setItem(prefix + 'ViewColumns', columns); } catch (e) { /* storage unavailable */ }
-                applyColumns();
-            });
+        if (typeof ResizeObserver === 'function') {
+            new ResizeObserver(fitColumns).observe(container);
+        } else {
+            window.addEventListener('resize', fitColumns);
         }
 
         viewBtn.addEventListener('click', function () {
@@ -132,7 +95,7 @@
             } catch (e) { /* storage unavailable */ }
             apply();
             // A new size is a new card width, so a new column count
-            if (autoGrid) fitColumns();
+            fitColumns();
         });
     }
 

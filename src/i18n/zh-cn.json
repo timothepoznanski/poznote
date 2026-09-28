@@ -1210,7 +1210,8 @@
       "switch_to_preview": "切换到预览模式",
       "save_now": "立即保存",
       "go_back": "后退",
-      "go_forward": "前进"
+      "go_forward": "前进",
+      "more": "更多"
     },
     "link": {
       "add_title": "添加链接",
@@ -2057,6 +2058,11 @@
     "heading_5": "五级标题",
     "heading_6": "六级标题",
     "format_text": "文本格式",
+    "align": "对齐",
+    "align_left": "左对齐",
+    "align_center": "居中",
+    "align_right": "右对齐",
+    "align_justify": "两端对齐",
     "red": "红色",
     "bold": "加粗",
     "italic": "斜体",
@@ -2173,7 +2179,10 @@
     "bilibili_modal_title": "插入 Bilibili 视频",
     "video_insert": "插入",
     "copy": "复制",
-    "cut": "剪切"
+    "cut": "剪切",
+    "paste": "粘贴",
+    "paste_plain": "无格式粘贴",
+    "paste_blocked": "浏览器不允许 Poznote 在此读取剪贴板。请使用 {{shortcut}} 粘贴。"
   },
   "api": {
     "settings": {
@@ -4527,7 +4536,6 @@
       "size_medium": "中",
       "size_large": "大",
       "size_wide": "宽",
-      "columns": "最大列数",
       "layout": "布局",
       "layout_grid": "网格",
       "layout_list": "列表"

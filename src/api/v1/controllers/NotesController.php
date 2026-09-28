@@ -1557,8 +1557,11 @@ class NotesController {
 
                 // Attachment addresses rewritten by adoptForeignAttachments():
                 // the editor still holds the old ones (js/attachment-adoption.js).
-                if (!empty($this->adoptedAttachments)) {
-                    $response['adopted_attachments'] = $this->adoptedAttachments;
+                // Same list for the data: images stored as attachments, so the
+                // next save does not send (and store) them again (#1471).
+                $swappedAddresses = array_merge($this->convertedDataImages, $this->adoptedAttachments);
+                if (!empty($swappedAddresses)) {
+                    $response['adopted_attachments'] = $swappedAddresses;
                 }
 
                 // If git_push was explicitly requested, do synchronous push and include result
@@ -3150,15 +3153,11 @@ class NotesController {
         return implode(', ', $validTags);
     }
     
-    /**
-     * Convert base64 images in HTML content to attachments
-     * @param string $content HTML content with potential base64 images
-     * @param int $noteId Note ID for attachment URLs
-     * @param array $existingAttachments Existing attachments array
-     * @return array ['content' => modified HTML, 'new_attachments' => array of new attachments]
-     */
     /** Addresses rewritten by the last adoptForeignAttachments() call, for the response. */
     private $adoptedAttachments = [];
+
+    /** data: images the last convertBase64ImagesToAttachments() call stored, for the response. */
+    private $convertedDataImages = [];
 
     /**
      * Makes the note own the attachments its content points at: a reference
@@ -3195,59 +3194,108 @@ class NotesController {
         }
     }
 
+    /**
+     * Store the base64 images of an HTML note as attachments and point their
+     * src at them.
+     *
+     * The editor kept the data: address after the save, so every later save
+     * of the same note stored the same pictures again: a paste from OneNote
+     * with two images ended up with four attachments (#1471). The save answer
+     * now lists what was converted so the editor swaps the addresses, and a
+     * picture this note already holds is reused rather than stored twice
+     * (content_sha1), which also covers a save sent before that answer came.
+     * Only the src changes: width, height and alt of the pasted image stay.
+     *
+     * @param string $content HTML content with potential base64 images
+     * @param int $noteId Note ID for attachment URLs
+     * @param array $existingAttachments Existing attachments array
+     * @return array ['content' => modified HTML, 'new_attachments' => array of new attachments]
+     */
     private function convertBase64ImagesToAttachments(string $content, int $noteId, array $existingAttachments): array {
         $newAttachments = [];
-        $attachmentsDir = getAttachmentsPath();
-        
-        // Pattern 1: src before alt - <img src="data:image/...;base64,..." alt="...">
+        $this->convertedDataImages = [];
+        if (stripos($content, 'data:image/') === false) {
+            return ['content' => $content, 'new_attachments' => []];
+        }
+
+        $knownHashes = [];
+        foreach ($existingAttachments as $attachment) {
+            if (is_array($attachment) && !empty($attachment['content_sha1']) && !empty($attachment['id'])) {
+                $knownHashes[$attachment['content_sha1']] = (string)$attachment['id'];
+            }
+        }
+
         $content = preg_replace_callback(
-            '/<img[^>]*src=["\']data:image\/([a-zA-Z0-9+]+);base64,([^"\']+)["\'][^>]*(?:alt=["\']([^"\']*)["\'])?[^>]*\/?>/is',
-            function($matches) use ($noteId, $attachmentsDir, &$newAttachments) {
-                return $this->processBase64Image($matches[1], $matches[2], $matches[3] ?? '', $noteId, $attachmentsDir, $newAttachments);
+            '/<img\b[^>]*>/i',
+            function ($tagMatch) use ($noteId, &$newAttachments, &$knownHashes) {
+                $tag = $tagMatch[0];
+                if (!preg_match('/\ssrc\s*=\s*(["\'])(data:image\/([a-zA-Z0-9+.-]+);base64,([^"\']+))\1/i', $tag, $src, PREG_OFFSET_CAPTURE)) {
+                    return $tag;
+                }
+
+                $altText = '';
+                if (preg_match('/\salt\s*=\s*(["\'])(.*?)\1/is', $tag, $alt)) {
+                    $altText = html_entity_decode($alt[2], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                }
+
+                $attachmentId = $this->processBase64Image($src[3][0], $src[4][0], $altText, $newAttachments, $knownHashes);
+                if ($attachmentId === null) {
+                    return $tag;
+                }
+
+                $this->convertedDataImages[] = [
+                    'url' => html_entity_decode($src[2][0], ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+                    'id' => $attachmentId,
+                ];
+
+                $newSrc = ' src="/api/v1/notes/' . $noteId . '/attachments/' . $attachmentId . '"';
+                $tag = substr_replace($tag, $newSrc, $src[0][1], strlen($src[0][0]));
+                foreach (['loading' => 'lazy', 'decoding' => 'async'] as $name => $value) {
+                    if (!preg_match('/\s' . $name . '\s*=/i', $tag)) {
+                        $tag = preg_replace('/\s*\/?>$/', ' ' . $name . '="' . $value . '">', $tag, 1);
+                    }
+                }
+                return $tag;
             },
             $content
         );
-        
-        // Pattern 2: alt before src - <img alt="..." src="data:image/...;base64,...">
-        $content = preg_replace_callback(
-            '/<img[^>]*alt=["\']([^"\']*)["\'][^>]*src=["\']data:image\/([a-zA-Z0-9+]+);base64,([^"\']+)["\'][^>]*\/?>/is',
-            function($matches) use ($noteId, $attachmentsDir, &$newAttachments) {
-                return $this->processBase64Image($matches[2], $matches[3], $matches[1], $noteId, $attachmentsDir, $newAttachments);
-            },
-            $content
-        );
-        
+
         return [
             'content' => $content,
             'new_attachments' => $newAttachments
         ];
     }
-    
+
     /**
-     * Process a single base64 image and convert to attachment
+     * Store one base64 image as an attachment, or find the attachment of the
+     * note that already holds the same bytes. Returns its id, null when the
+     * data cannot be decoded or stored (the data: address is then kept).
      */
-    private function processBase64Image(string $imageType, string $base64Data, string $altText, int $noteId, string $attachmentsDir, array &$newAttachments): string {
+    private function processBase64Image(string $imageType, string $base64Data, string $altText, array &$newAttachments, array &$knownHashes): ?string {
         $imageType = strtolower($imageType);
-        
+
         $extensionMap = [
             'jpeg' => 'jpg', 'png' => 'png', 'gif' => 'gif',
             'webp' => 'webp', 'svg+xml' => 'svg', 'bmp' => 'bmp'
         ];
         $extension = $extensionMap[$imageType] ?? 'png';
         $mimeType = 'image/' . ($imageType === 'svg+xml' ? 'svg+xml' : $imageType);
-        
+
         $imageData = base64_decode($base64Data);
-        if ($imageData === false) {
-            // Return original if decode fails
-            return '<img src="data:image/' . $imageType . ';base64,' . $base64Data . '" alt="' . htmlspecialchars($altText) . '">';
+        if ($imageData === false || $imageData === '') {
+            return null;
         }
-        
+
+        $hash = sha1($imageData);
+        if (isset($knownHashes[$hash])) {
+            return $knownHashes[$hash];
+        }
+
         $attachmentId = uniqid();
         $filename = $attachmentId . '_' . time() . '.' . $extension;
 
         if (!poznoteStoreAttachmentContent($imageData, $filename, $mimeType)) {
-            // Return original if write fails
-            return '<img src="data:image/' . $imageType . ';base64,' . $base64Data . '" alt="' . htmlspecialchars($altText) . '">';
+            return null;
         }
 
         $originalFilename = !empty($altText) ? $altText . '.' . $extension : $filename;
@@ -3257,10 +3305,12 @@ class NotesController {
             'original_filename' => $originalFilename,
             'file_size' => strlen($imageData),
             'file_type' => $mimeType,
-            'uploaded_at' => date('Y-m-d H:i:s')
+            'uploaded_at' => date('Y-m-d H:i:s'),
+            'content_sha1' => $hash
         ];
-        
-        return '<img src="/api/v1/notes/' . $noteId . '/attachments/' . $attachmentId . '" alt="' . htmlspecialchars($altText) . '" loading="lazy" decoding="async">';
+        $knownHashes[$hash] = $attachmentId;
+
+        return $attachmentId;
     }
 
     /**

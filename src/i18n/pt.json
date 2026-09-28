@@ -1212,7 +1212,8 @@
       "go_back": "Voltar",
       "go_forward": "Avançar",
       "switch_to_edit": "Mudar para o modo de edição",
-      "switch_to_preview": "Mudar para a pré-visualização"
+      "switch_to_preview": "Mudar para a pré-visualização",
+      "more": "Mais"
     },
     "link": {
       "add_title": "Adicionar Link",
@@ -2059,6 +2060,11 @@
     "heading_5": "Cabeçalho 5",
     "heading_6": "Cabeçalho 6",
     "format_text": "Formatar texto",
+    "align": "Alinhar",
+    "align_left": "À esquerda",
+    "align_center": "Centralizado",
+    "align_right": "À direita",
+    "align_justify": "Justificado",
     "red": "Vermelho",
     "bold": "Negrito",
     "italic": "Itálico",
@@ -2175,7 +2181,10 @@
     "bilibili_modal_title": "Inserir vídeo do Bilibili",
     "video_insert": "Inserir",
     "copy": "Copiar",
-    "cut": "Recortar"
+    "cut": "Recortar",
+    "paste": "Colar",
+    "paste_plain": "Colar sem formatação",
+    "paste_blocked": "O navegador não permite que o Poznote leia a área de transferência aqui. Use {{shortcut}} para colar."
   },
   "api": {
     "settings": {
@@ -4428,7 +4437,6 @@
       "size_medium": "Médios",
       "size_large": "Grandes",
       "size_wide": "Largos",
-      "columns": "Colunas máximas",
       "layout": "Disposição",
       "layout_grid": "Grelha",
       "layout_list": "Lista"

@@ -33,6 +33,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/color-palette.js',
         'js/mermaid-theme.js',
         'js/toolbar-popups.js',
+        'js/toolbar-overflow.js',
         'js/toolbar-editor-utils.js',
         'js/toolbar-format.js',
         'js/toolbar-md-offsets.js',

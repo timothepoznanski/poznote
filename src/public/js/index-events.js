@@ -125,6 +125,8 @@
         closeTasklistActionsMenus();
 
         if (isHidden) {
+            // The toolbar scrolls sideways and would clip the menu
+            if (typeof window.positionToolbarDropdown === 'function') window.positionToolbarDropdown(menu, triggerEl);
             menu.hidden = false;
             if (triggerEl) triggerEl.setAttribute('aria-expanded', 'true');
 
@@ -485,6 +487,11 @@
             case 'change-font-size':
                 if (typeof changeFontSize === 'function') {
                     changeFontSize();
+                }
+                break;
+            case 'change-alignment':
+                if (typeof changeAlignment === 'function') {
+                    changeAlignment(target);
                 }
                 break;
             case 'toggle-code-block':

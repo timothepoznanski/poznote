@@ -1203,7 +1203,8 @@
       "go_back": "Retour",
       "go_forward": "Suivant",
       "switch_to_edit": "Passer en mode édition",
-      "switch_to_preview": "Passer en mode aperçu"
+      "switch_to_preview": "Passer en mode aperçu",
+      "more": "Plus"
     },
     "link": {
       "add_title": "Ajouter un lien",
@@ -2065,6 +2066,11 @@
     "heading_5": "Titre 5",
     "heading_6": "Titre 6",
     "format_text": "Formater le texte",
+    "align": "Aligner",
+    "align_left": "À gauche",
+    "align_center": "Centré",
+    "align_right": "À droite",
+    "align_justify": "Justifié",
     "red": "Rouge",
     "bold": "Gras",
     "italic": "Italique",
@@ -2181,7 +2187,10 @@
     "bilibili_modal_title": "Insérer une vidéo Bilibili",
     "video_insert": "Insérer",
     "copy": "Copier",
-    "cut": "Couper"
+    "cut": "Couper",
+    "paste": "Coller",
+    "paste_plain": "Coller sans mise en forme",
+    "paste_blocked": "Le navigateur ne laisse pas Poznote lire le presse-papiers ici. Utilisez {{shortcut}} pour coller."
   },
   "api": {
     "settings": {
@@ -4532,7 +4541,6 @@
       "size_medium": "Moyennes",
       "size_large": "Grandes",
       "size_wide": "Larges",
-      "columns": "Colonnes maximum",
       "layout": "Disposition",
       "layout_grid": "Grille",
       "layout_list": "Liste"

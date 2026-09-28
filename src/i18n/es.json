@@ -1212,7 +1212,8 @@
       "go_back": "Atrás",
       "go_forward": "Adelante",
       "switch_to_edit": "Cambiar al modo edición",
-      "switch_to_preview": "Cambiar a la vista previa"
+      "switch_to_preview": "Cambiar a la vista previa",
+      "more": "Más"
     },
     "link": {
       "add_title": "Agregar enlace",
@@ -2059,6 +2060,11 @@
     "heading_5": "Encabezado 5",
     "heading_6": "Encabezado 6",
     "format_text": "Formatear texto",
+    "align": "Alinear",
+    "align_left": "A la izquierda",
+    "align_center": "Centrado",
+    "align_right": "A la derecha",
+    "align_justify": "Justificado",
     "red": "Rojo",
     "bold": "Negrita",
     "italic": "Cursiva",
@@ -2175,7 +2181,10 @@
     "bilibili_modal_title": "Insertar vídeo de Bilibili",
     "video_insert": "Insertar",
     "copy": "Copiar",
-    "cut": "Cortar"
+    "cut": "Cortar",
+    "paste": "Pegar",
+    "paste_plain": "Pegar sin formato",
+    "paste_blocked": "El navegador no permite que Poznote lea el portapapeles aquí. Usa {{shortcut}} para pegar."
   },
   "api": {
     "settings": {
@@ -4428,7 +4437,6 @@
       "size_medium": "Medianas",
       "size_large": "Grandes",
       "size_wide": "Anchas",
-      "columns": "Columnas máximas",
       "layout": "Disposición",
       "layout_grid": "Cuadrícula",
       "layout_list": "Lista"

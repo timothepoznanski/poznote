@@ -12,7 +12,11 @@
 .slash-command-menu {
     position: fixed;
     z-index: 9999;
-    width: 280px;
+    /* Grows past 280px only for a row that would wrap, "Paste without
+       formatting" and its Ctrl+Shift+V among them */
+    width: max-content;
+    min-width: 280px;
+    max-width: 360px;
     overflow: visible;
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
@@ -65,6 +69,14 @@
     font-weight: var(--pz-weight-semibold);
 }
 
+/* Ctrl+C, Ctrl+V... beside the clipboard entries, as in the browser menu */
+.slash-command-shortcut {
+    margin-left: 12px;
+    font-size: 12px;
+    color: var(--pz-text-subtle);
+    white-space: nowrap;
+}
+
 .slash-command-submenu-indicator {
     margin-left: auto;
     font-size: 12px;
@@ -73,6 +85,7 @@
 
 .slash-command-submenu {
     width: 200px;
+    min-width: 0;
     max-height: 70vh;
     overflow-y: auto;
 }

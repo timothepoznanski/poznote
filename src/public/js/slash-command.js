@@ -2407,6 +2407,21 @@
             });
     }
 
+    // Aligns the paragraph under the caret, or every paragraph of the selection.
+    // The note is read from the editable element executeCommand() kept.
+    function applyAlignment(align) {
+        const editable = window._slashCommandSavedEditableElement;
+        const noteEntry = editable && editable.closest ? editable.closest('.noteentry') : null;
+        const isMarkdown = noteEntry
+            ? noteEntry.getAttribute('data-note-type') === 'markdown'
+            : (typeof window.isInMarkdownEditor === 'function' && window.isInMarkdownEditor());
+        if (isMarkdown) {
+            if (typeof window.applyMarkdownAlignment === 'function') window.applyMarkdownAlignment(align);
+        } else if (typeof window.applyHtmlAlignment === 'function') {
+            window.applyHtmlAlignment(align);
+        }
+    }
+
     // Return slash commands common between HTML and Markdown modes
     function getCommonSlashCommands() {
         var t = window.t || (function (key, params, fallback) { return fallback; });
@@ -2481,6 +2496,18 @@
                     }
                 }
             },
+            // Rich-text notes: an inline text-align; Markdown: <p align="…">
+            align: {
+                id: 'align',
+                icon: 'lucide-align-center',
+                label: t('slash_menu.align', null, 'Align'),
+                submenu: [
+                    { id: 'align-left', icon: 'lucide-align-left', label: t('slash_menu.align_left', null, 'Left'), action: () => applyAlignment('left') },
+                    { id: 'align-center', icon: 'lucide-align-center', label: t('slash_menu.align_center', null, 'Center'), action: () => applyAlignment('center') },
+                    { id: 'align-right', icon: 'lucide-align-right', label: t('slash_menu.align_right', null, 'Right'), action: () => applyAlignment('right') },
+                    { id: 'align-justify', icon: 'lucide-align-justify', label: t('slash_menu.align_justify', null, 'Justify'), action: () => applyAlignment('justify') }
+                ]
+            },
             cancel: {
                 id: 'cancel',
                 icon: 'lucide-times-circle',
@@ -2536,6 +2563,7 @@
                     { id: 'strikethrough', icon: 'lucide-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => insertStrikethrough() }
                 ]
             },
+            common.align,
             {
                 id: 'color',
                 icon: 'lucide-palette',
@@ -2869,6 +2897,7 @@
                     { id: 'strikethrough', icon: 'lucide-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => wrapMarkdownSelection('~~', '~~', 2) }
                 ]
             },
+            common.align,
             {
                 id: 'code',
                 icon: 'lucide-code',
@@ -3374,6 +3403,7 @@
                 label: t('slash_menu.format_text', null, 'Format text'),
                 submenu: format
             },
+            common.align,
             list,
             color,
             highlight,
@@ -3426,19 +3456,151 @@
                 id: 'copy',
                 icon: 'lucide-copy',
                 label: t('slash_menu.copy', null, 'Copy'),
+                shortcut: formatClipboardShortcut('C'),
                 action: () => document.execCommand('copy')
             },
             {
                 id: 'cut',
                 icon: 'lucide-scissors',
                 label: t('slash_menu.cut', null, 'Cut'),
+                shortcut: formatClipboardShortcut('X'),
                 action: function () {
                     document.execCommand('cut');
                     if (!isMarkdown && savedNoteEntry) savedNoteEntry.dispatchEvent(new Event('input', { bubbles: true }));
                 }
-            },
-            common.cancel
-        ]);
+            }
+        ].concat(getClipboardPasteCommands(isMarkdown), [common.cancel]));
+    }
+
+    // Paste for the menu that replaces the browser one on a right-click (issue
+    // #1515). Markdown notes only ever take the plain text, so one entry is
+    // enough there; rich-text notes also get the Ctrl+Shift+V flavour.
+    function getClipboardPasteCommands(isMarkdown) {
+        const t = window.t || ((key, params, fallback) => fallback);
+        const commands = [
+            {
+                id: 'paste',
+                icon: 'lucide-clipboard-paste',
+                label: t('slash_menu.paste', null, 'Paste'),
+                shortcut: formatClipboardShortcut('V'),
+                action: () => pasteFromClipboard(false)
+            }
+        ];
+        if (!isMarkdown) {
+            commands.push({
+                id: 'paste-plain',
+                icon: 'lucide-clipboard',
+                label: t('slash_menu.paste_plain', null, 'Paste without formatting'),
+                shortcut: formatClipboardShortcut('V', true),
+                aliases: ['plain text', 'unformatted'],
+                action: () => pasteFromClipboard(true)
+            });
+        }
+        return commands;
+    }
+
+    // The keyboard equivalent shown beside Copy, Cut and Paste, the way the
+    // browser menu lists it: Ctrl+Shift+V, or ⇧⌘V on a Mac
+    function formatClipboardShortcut(key, withShift) {
+        const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent || '');
+        if (isMac) return (withShift ? '⇧' : '') + '⌘' + key;
+        return 'Ctrl+' + (withShift ? 'Shift+' : '') + key;
+    }
+
+    // execCommand('paste') is refused to web pages, so the clipboard is read
+    // through the async Clipboard API and handed to the note as a paste event:
+    // the handlers of a Ctrl+V (image upload, rich text cleanup, code blocks,
+    // URLs, CodeMirror) then run exactly as they would. Chrome puts only the
+    // plain text on the event of a Ctrl+Shift+V, which is what plainOnly does.
+    // A paste nothing took is inserted as text, the browser's own fallback.
+    async function pasteFromClipboard(plainOnly) {
+        const editable = savedEditableElement || window._slashCommandSavedEditableElement;
+        if (!editable) return;
+
+        // The caret the menu left, put back once the clipboard answered: the
+        // browser may show a permission prompt or a Paste button meanwhile
+        const api = getMarkdownCodeMirrorApi();
+        const codeMirrorEditor = isMarkdownCodeMirrorEditor(editable) ? editable : null;
+        const offsets = codeMirrorEditor && api && typeof api.getSelectionOffsets === 'function'
+            ? api.getSelectionOffsets(codeMirrorEditor)
+            : null;
+        const sel = window.getSelection();
+        const range = !codeMirrorEditor && sel && sel.rangeCount ? sel.getRangeAt(0).cloneRange() : null;
+
+        const data = new DataTransfer();
+        try {
+            if (!navigator.clipboard) throw new Error('Clipboard API unavailable');
+            if (plainOnly || typeof navigator.clipboard.read !== 'function') {
+                data.setData('text/plain', await navigator.clipboard.readText());
+            } else {
+                const items = await navigator.clipboard.read();
+                for (const item of items) {
+                    for (const type of item.types) {
+                        const blob = await item.getType(type);
+                        if (type.indexOf('image/') === 0) {
+                            data.items.add(new File([blob], 'pasted-image.' + type.slice(6).replace(/\W.*$/, ''), { type: type }));
+                        } else if (type === 'text/plain' || type === 'text/html') {
+                            data.setData(type, await blob.text());
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            // Plain HTTP (no Clipboard API) or a refused permission
+            console.debug('slash-command: pasteFromClipboard() failed:', e);
+            showClipboardBlockedToast(plainOnly);
+            focusEditableElement(editable);
+            return;
+        }
+
+        focusEditableElement(editable);
+        if (codeMirrorEditor && offsets && typeof api.setSelection === 'function') {
+            api.setSelection(codeMirrorEditor, offsets.start, offsets.end);
+        } else if (range && sel) {
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+
+        const active = document.activeElement;
+        const target = active && editable.contains(active) ? active : editable;
+        const event = new ClipboardEvent('paste', { clipboardData: data, bubbles: true, cancelable: true });
+        target.dispatchEvent(event);
+        if (event.defaultPrevented) return;
+
+        const text = (data.getData('text/plain') || '').replace(/\r\n?/g, '\n');
+        if (!text) return;
+        if (codeMirrorEditor && api && typeof api.getSelectionOffsets === 'function' && typeof api.replaceRange === 'function') {
+            const current = api.getSelectionOffsets(codeMirrorEditor);
+            if (current) api.replaceRange(codeMirrorEditor, current.start, current.end, text);
+        } else {
+            document.execCommand('insertText', false, text);
+        }
+    }
+
+    // The keyboard still pastes where the menu cannot read the clipboard
+    function showClipboardBlockedToast(plainOnly) {
+        const t = window.t || ((key, params, fallback) => fallback);
+        const shortcut = formatClipboardShortcut('V', plainOnly);
+        const fallback = 'The browser does not let Poznote read the clipboard here. Use {{shortcut}} to paste.';
+        const message = t('slash_menu.paste_blocked', { shortcut: shortcut }, fallback).replace('{{shortcut}}', shortcut);
+
+        let toast = document.getElementById('slash-paste-blocked-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'slash-paste-blocked-toast';
+            toast.className = 'pz-toast pz-toast--message';
+            toast.setAttribute('role', 'status');
+            document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        toast.classList.remove('pz-toast--hidden');
+        toast.classList.add('pz-toast--visible');
+
+        clearTimeout(showClipboardBlockedToast.timer);
+        showClipboardBlockedToast.timer = setTimeout(function () {
+            toast.classList.remove('pz-toast--visible');
+            toast.classList.add('pz-toast--hidden');
+        }, 6000);
     }
 
     // Where the selection ends: the menu opens there, as it would under a typed "/"
@@ -3715,6 +3877,7 @@
                     '<div class="slash-command-item' + selectedClass + '" data-command-id="' + cmd.id + '" data-has-submenu="' + hasSubmenu + '">' +
                     '<i class="slash-command-icon ' + cmd.icon + '"' + iconStyle + '></i>' +
                     '<span class="slash-command-label">' + escapeHtml(cmd.label) + '</span>' +
+                    (cmd.shortcut ? '<span class="slash-command-shortcut">' + escapeHtml(cmd.shortcut) + '</span>' : '') +
                     submenuIndicator +
                     '</div>'
                 );
@@ -5324,6 +5487,15 @@
             // without running a command
             slashInsertedByButton = !!slashMenuElement;
             e.preventDefault();
+
+            // Paste leads the menu here, where the browser menu used to offer
+            // it (issue #1515); the typed "/" menu stays as it was
+            if (slashMenuElement) {
+                const isMarkdown = !!codeMirrorSlashEditor
+                    || !!(savedNoteEntry && savedNoteEntry.getAttribute('data-note-type') === 'markdown');
+                activeCommands = getClipboardPasteCommands(isMarkdown).concat(activeCommands || []);
+                updateMenuContent();
+            }
         }
     }
 
