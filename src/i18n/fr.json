@@ -5276,6 +5276,8 @@
       "title": "Hors ligne",
       "filter_placeholder": "Filtrer par nom ou dossier...",
       "column_reason": "Raison",
+      "filter_reason": "Filtrer par raison",
+      "reason_all": "Toutes les raisons",
       "reason_note": "Gardée hors ligne",
       "reason_folder": "Dans un dossier gardé hors ligne",
       "reason_favorite": "Favori",

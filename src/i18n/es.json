@@ -5172,6 +5172,8 @@
       "title": "Sin conexión",
       "filter_placeholder": "Filtrar por nombre o carpeta...",
       "column_reason": "Motivo",
+      "filter_reason": "Filtrar por motivo",
+      "reason_all": "Todos los motivos",
       "reason_note": "Guardada sin conexión",
       "reason_folder": "En una carpeta guardada sin conexión",
       "reason_favorite": "Favorito",

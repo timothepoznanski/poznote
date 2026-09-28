@@ -5172,6 +5172,8 @@
       "title": "Offline",
       "filter_placeholder": "Filtrar por nome ou pasta...",
       "column_reason": "Motivo",
+      "filter_reason": "Filtrar por motivo",
+      "reason_all": "Todos os motivos",
       "reason_note": "Mantida offline",
       "reason_folder": "Em uma pasta mantida offline",
       "reason_favorite": "Favorito",

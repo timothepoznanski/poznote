@@ -59,6 +59,9 @@
     var filteredItems = [];
     var filterText = '';
     var filterType = 'all';
+    // '' or one of the note reasons (note, folder, favorite, recent)
+    var filterReason = '';
+    var REASONS = ['note', 'folder', 'favorite', 'recent'];
     // Note ids this browser holds a copy of; null while unknown
     var deviceNoteIds = null;
     var COLLAPSED_FOLDERS_STORAGE_KEY = 'poznote.offline.collapsedFolders';
@@ -109,10 +112,45 @@
         }
     }
 
+    // Every reason a note is kept for, the most important first
+    function noteReasons(note) {
+        return note.reasons && note.reasons.length ? note.reasons : [note.reason];
+    }
+
+    function isFiltering() {
+        return !!(filterText || filterReason);
+    }
+
+    // Folders shown under a reason: every kept folder for "folder", otherwise
+    // the ones holding a note kept for that reason, so the tree keeps its shape
+    function foldersForReason() {
+        var keep = {};
+        if (!filterReason) return keep;
+        var parentById = {};
+        offlineFolders.forEach(function(folder) {
+            if (filterReason === 'folder') keep[String(folder.folder_id)] = true;
+            parentById[String(folder.folder_id)] = folder.parent_id != null ? String(folder.parent_id) : '';
+        });
+        offlineNotes.forEach(function(note) {
+            if (noteReasons(note).indexOf(filterReason) === -1 || note.folder_id == null) return;
+            var key = String(note.folder_id);
+            while (key && parentById.hasOwnProperty(key) && !keep[key]) {
+                keep[key] = true;
+                key = parentById[key];
+            }
+        });
+        return keep;
+    }
+
     function applyFilter() {
+        var reasonFolders = foldersForReason();
         filteredItems = allItems.filter(function(item) {
             if (filterType === 'notes' && item._type !== 'note') return false;
             if (filterType === 'folders' && item._type !== 'folder') return false;
+            if (filterReason) {
+                if (item._type === 'note' && noteReasons(item).indexOf(filterReason) === -1) return false;
+                if (item._type === 'folder' && !reasonFolders[String(item.folder_id)]) return false;
+            }
             if (!filterText) return true;
             var name = item._type === 'note' ? (item.heading || config.txtUntitled) : (item.folder_name || '');
             return name.toLowerCase().indexOf(filterText) !== -1
@@ -148,6 +186,11 @@
         } else {
             params.delete('type');
         }
+        if (filterReason) {
+            params.set('reason', filterReason);
+        } else {
+            params.delete('reason');
+        }
         var search = params.toString();
         window.history.replaceState(null, '', window.location.pathname + (search ? '?' + search : ''));
     }
@@ -172,6 +215,33 @@
             });
             syncUrl();
         }
+    }
+
+    // The reasons the notes have, each with its count; the list only offers a
+    // choice when there are at least two, and falls back to all reasons when
+    // the chosen one has no note left.
+    function updateReasonSelect() {
+        var select = document.getElementById('reasonFilter');
+        if (!select) return;
+        var counts = {};
+        offlineNotes.forEach(function(note) {
+            noteReasons(note).forEach(function(reason) {
+                counts[reason] = (counts[reason] || 0) + 1;
+            });
+        });
+        var present = REASONS.filter(function(reason) { return counts[reason]; });
+        Array.prototype.forEach.call(select.options, function(option) {
+            if (!option.value) return;
+            var count = counts[option.value] || 0;
+            option.hidden = option.disabled = count === 0;
+            option.textContent = reasonText(option.value) + ' (' + count + ')';
+        });
+        if (filterReason && !counts[filterReason]) {
+            filterReason = '';
+            syncUrl();
+        }
+        select.value = filterReason;
+        select.classList.toggle('initially-hidden', present.length < 2 && !filterReason);
     }
 
     // ========== Tree ==========
@@ -248,7 +318,7 @@
     function buildPresentation(items) {
         var branchMeta = {};
         var ancestors = [];
-        var collapseEnabled = !filterText;
+        var collapseEnabled = !isFiltering();
         var visible = [];
         var collapsedDepth = null;
 
@@ -318,7 +388,7 @@
     }
 
     function setAllFoldersCollapsed(collapsed) {
-        if (filterText) return;
+        if (isFiltering()) return;
         currentCollapsibleFolderIds.forEach(function(folderId) {
             if (collapsed) {
                 collapsedFolderIds[String(folderId)] = true;
@@ -381,6 +451,7 @@
                 if (filterBar) filterBar.classList.toggle('initially-hidden', allItems.length === 0);
                 if (emptyMessage) emptyMessage.style.display = 'none';
                 updateFilterTypeButtons();
+                updateReasonSelect();
                 if (allItems.length === 0) {
                     document.getElementById('sharedItemsContainer').innerHTML = '';
                     if (offlineDays > 0) {
@@ -463,8 +534,8 @@
 
     // ========== Rendering ==========
 
-    function reasonText(note) {
-        switch (note.reason) {
+    function reasonText(reason) {
+        switch (reason) {
             case 'note': return config.txtReasonNote;
             case 'folder': return config.txtReasonFolder;
             case 'favorite': return config.txtReasonFavorite;
@@ -544,7 +615,7 @@
         }
         item.appendChild(nameContainer);
 
-        item.appendChild(renderReasonCell(reasonText(note)));
+        item.appendChild(renderReasonCell(noteReasons(note).map(reasonText).join(' · ')));
 
         var actions = document.createElement('div');
         actions.className = 'note-actions';
@@ -556,7 +627,7 @@
     function renderFolderItem(folder) {
         var key = String(folder.folder_id);
         var isCollapsible = (currentBranchMeta[key] || { descendantCount: 0 }).descendantCount > 0;
-        var isCollapsed = isCollapsible && !filterText && isFolderCollapsed(key);
+        var isCollapsed = isCollapsible && !isFiltering() && isFolderCollapsed(key);
 
         var item = document.createElement('div');
         item.className = 'shared-item shared-note-item shared-folder-row';
@@ -638,7 +709,7 @@
 
         if (filteredItems.length === 0) {
             updateTreeToolbar(null);
-            var message = filterText ? config.txtNoFilterResults
+            var message = isFiltering() ? config.txtNoFilterResults
                 : (filterType === 'folders' ? config.txtNoFolders : config.txtNoNotes);
             var empty = document.createElement('div');
             empty.className = 'empty-message';
@@ -734,6 +805,7 @@
         var filterInput = document.getElementById('filterInput');
         var clearFilterBtn = document.getElementById('clearFilterBtn');
         var toggleAllBtn = document.getElementById('toggleAllFoldersBtn');
+        var reasonSelect = document.getElementById('reasonFilter');
 
         var urlParams = new URLSearchParams(window.location.search);
         var initialFilter = urlParams.get('filter');
@@ -748,6 +820,11 @@
             filterBtns.forEach(function(btn) {
                 btn.classList.toggle('active', btn.getAttribute('data-filter') === filterType);
             });
+        }
+
+        var initialReason = urlParams.get('reason');
+        if (REASONS.indexOf(initialReason) !== -1) {
+            filterReason = initialReason;
         }
 
         filterBtns.forEach(function(btn) {
@@ -784,6 +861,13 @@
                 filterInput.value = '';
                 setFilterText('');
                 filterInput.focus();
+            });
+        }
+        if (reasonSelect) {
+            reasonSelect.addEventListener('change', function() {
+                filterReason = reasonSelect.value;
+                applyFilter();
+                syncUrl();
             });
         }
         if (toggleAllBtn) {

@@ -5271,6 +5271,8 @@
       "title": "离线",
       "filter_placeholder": "按名称或文件夹筛选...",
       "column_reason": "原因",
+      "filter_reason": "按原因筛选",
+      "reason_all": "所有原因",
       "reason_note": "离线保留",
       "reason_folder": "位于离线保留的文件夹中",
       "reason_favorite": "收藏",

@@ -115,7 +115,8 @@ class OfflineController {
         $stmt->execute($params);
         $candidates = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $row['reason'] = poznoteOfflineReason($row, $cutoff, $keptFolders);
+            $row['reasons'] = poznoteOfflineReasons($row, $cutoff, $keptFolders);
+            $row['reason'] = $row['reasons'][0] ?? null;
             if ($row['reason'] !== null) {
                 $candidates[] = $row;
             }
@@ -153,6 +154,7 @@ class OfflineController {
                 'folder_id' => $row['folder_id'] !== null ? (int)$row['folder_id'] : null,
                 'updated' => $row['updated'] ?? null,
                 'reason' => $row['reason'],
+                'reasons' => $row['reasons'],
                 'icon' => (string)($row['icon'] ?? ''),
                 'icon_color' => (string)($row['icon_color'] ?? ''),
                 'version' => $this->notes->computeNoteVersion((string)($row['updated'] ?? ''), (string)($row['heading'] ?? ''), $contents[$noteId] ?? ''),
@@ -304,6 +306,7 @@ class OfflineController {
                     'folder_path' => $folderPath($note['folder_id']),
                     'updated' => $note['updated'],
                     'reason' => $note['reason'],
+                    'reasons' => $note['reasons'],
                     'icon' => $note['icon'],
                     'icon_color' => $note['icon_color'],
                 ];

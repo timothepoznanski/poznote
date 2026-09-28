@@ -150,6 +150,17 @@
         min-width: 0;
     }
 
+    /* Offline page: the reason filter goes to its own full-width line under
+       the search field, which keeps the button on its right */
+    .offline-list-page .filter-search-row:has(.offline-reason-select:not(.initially-hidden)) {
+        flex-wrap: wrap;
+    }
+
+    .offline-list-page .offline-reason-select {
+        order: 1;
+        flex: 1 1 100%;
+    }
+
     .filter-type-btn {
         padding: 6px 12px;
         font-size: 12px;

@@ -4991,6 +4991,8 @@
       "title": "Offline",
       "filter_placeholder": "Filter by name or folder...",
       "column_reason": "Reason",
+      "filter_reason": "Filter by reason",
+      "reason_all": "All reasons",
       "reason_note": "Kept offline",
       "reason_folder": "In a folder kept offline",
       "reason_favorite": "Favorite",

@@ -4992,6 +4992,8 @@
       "title": "Офлайн",
       "filter_placeholder": "Фильтр по названию или папке...",
       "column_reason": "Причина",
+      "filter_reason": "Фильтр по причине",
+      "reason_all": "Все причины",
       "reason_note": "Хранится офлайн",
       "reason_folder": "В папке, хранимой офлайн",
       "reason_favorite": "Избранное",

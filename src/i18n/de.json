@@ -5171,6 +5171,8 @@
       "title": "Offline",
       "filter_placeholder": "Nach Name oder Ordner filtern...",
       "column_reason": "Grund",
+      "filter_reason": "Nach Grund filtern",
+      "reason_all": "Alle Gründe",
       "reason_note": "Offline behalten",
       "reason_folder": "In einem offline behaltenen Ordner",
       "reason_favorite": "Favorit",

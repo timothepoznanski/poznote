@@ -56,6 +56,16 @@ test('why a note is kept, most important reason first', function () {
     assertSame(null, poznoteOfflineReason(offlineNote(8, '2026-09-25 00:00:00', ['offline' => -1, 'favorite' => 1, 'folder_id' => 7]), $cutoff, $folders), 'stopped: kept out whatever the reason');
 });
 
+test('a note kept for several reasons lists them all, most important first, recent alone', function () {
+    $cutoff = '2026-09-19 00:00:00';
+    $folders = [7 => true];
+    assertSame(['note', 'folder', 'favorite'], poznoteOfflineReasons(offlineNote(1, '2026-09-25 00:00:00', ['offline' => 1, 'favorite' => 1, 'folder_id' => 7]), $cutoff, $folders), 'recent only when nothing else keeps it');
+    assertSame(['note', 'favorite'], poznoteOfflineReasons(offlineNote(2, '2026-01-01 00:00:00', ['offline' => 1, 'favorite' => 1]), $cutoff, $folders), 'a favorite marked Keep offline');
+    assertSame(['recent'], poznoteOfflineReasons(offlineNote(3, '2026-09-25 00:00:00', ['folder_id' => 8]), $cutoff, $folders));
+    assertSame([], poznoteOfflineReasons(offlineNote(4, '2026-01-01 00:00:00'), $cutoff, $folders));
+    assertSame([], poznoteOfflineReasons(offlineNote(5, '2026-09-25 00:00:00', ['offline' => -1, 'favorite' => 1]), $cutoff, $folders), 'stopped');
+});
+
 test('notes kept whatever their date come before the recent ones, newest first', function () {
     $notes = [
         offlineNote(1, '2026-09-24 10:00:00') + ['reason' => 'recent'],
