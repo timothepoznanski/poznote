@@ -68,7 +68,6 @@ function poznoteGetIndexCssGroups(): array {
             'css/folders/search.css',
             'css/folders/animations.css',
             'css/folders/toolbar-icons.css',
-            'css/folders/table-picker.css',
             'css/folders/system-folders.css',
             'css/emoji-picker.css',
             'css/calendar.css',

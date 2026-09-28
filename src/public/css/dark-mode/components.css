@@ -497,39 +497,18 @@ html[data-theme='dark'] .table-picker-popup {
     border-color: var(--pz-border);
 }
 
-html[data-theme='dark'] .table-picker-header {
-    color: var(--pz-text);
-}
-
-html[data-theme='dark'] .table-picker-input-section {
-    border-top-color: var(--pz-border);
-}
-
-html[data-theme='dark'] .table-picker-input-field-label {
-    color: var(--pz-text);
-}
-
+html[data-theme='dark'] .table-picker-cell,
 html[data-theme='dark'] .table-picker-input-field {
     background-color: var(--pz-chrome-bg);
-    border-color: var(--pz-border);
-    color: var(--pz-text);
+}
+
+html[data-theme='dark'] .table-picker-cell.active {
+    background-color: rgba(var(--pz-accent-rgb), 0.3);
+    border-color: var(--pz-accent-text-hover);
 }
 
 html[data-theme='dark'] .table-picker-input-field:focus {
     border-color: var(--pz-accent-text-hover);
-    box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.15);
-}
-
-html[data-theme='dark'] .table-picker-input-field:hover {
-    border-color: var(--pz-border-strong);
-}
-
-html[data-theme='dark'] .table-picker-insert-btn {
-    background: var(--pz-accent-text);
-}
-
-html[data-theme='dark'] .table-picker-insert-btn:hover {
-    background: var(--pz-accent-text);
 }
 
 /* Color palette popup */
