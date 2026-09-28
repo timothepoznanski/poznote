@@ -428,9 +428,11 @@ document.addEventListener('click', function(e) {
     }
 });
 
-// Close reminder modal on Escape
+// Close reminder modal on Escape. Only while it is open: closing blurs the
+// focused element, which would otherwise steal focus on every Escape in the app.
 document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
+    const modal = document.getElementById('reminderModal');
+    if (e.key === 'Escape' && modal && modal.style.display === 'flex') {
         closeReminderModal();
     }
 });

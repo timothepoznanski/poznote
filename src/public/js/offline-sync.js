@@ -758,26 +758,84 @@
         }
     }
 
-    // The same URL as now (note included): with the server unreachable the
-    // service worker answers it with the offline page, which opens that note.
-    // If the network is in fact back, this is just a reload.
-    function openOfflinePage() {
-        var target = 'index.php';
-        var noteId = window.noteid;
-        var hasNote = noteId && noteId !== -1 && noteId !== 'search';
-        if (hasNote) {
-            target += '?note=' + encodeURIComponent(noteId);
-            // Text typed since the last save goes into the note's draft, which
-            // the offline page takes over (js/offline-app.js), so leaving does
-            // not need the "unsaved changes" prompt.
-            if (typeof window.hasUnsavedChangesOnScreen === 'function'
-                && window.hasUnsavedChangesOnScreen(noteId)
-                && typeof window.snapshotNoteStateForSave === 'function') {
-                window.snapshotNoteStateForSave(noteId);
-                window.__poznoteLeavingForOfflinePage = true;
-            }
+    // Whether the service worker can show the offline page: without a worker
+    // or a stored copy, going there only waits for the server.
+    function offlinePageReady() {
+        if (!navigator.serviceWorker || !window.caches) {
+            return Promise.resolve(false);
         }
-        window.location.href = target;
+        var pageUrl = new URL('offline.php', window.location.href).href;
+        return Promise.all([
+            navigator.serviceWorker.getRegistration(),
+            window.caches.match(pageUrl, { cacheName: Store.SHELL_CACHE })
+        ]).then(function (both) {
+            return !!(both[0] && both[0].active && both[1]);
+        }, function () {
+            return false;
+        });
+    }
+
+    function hideOpenButton() {
+        showMessage(tr('offline.banner.offline_no_copies', {}, 'You are offline. Changes will be saved when the connection is back.'), false);
+        bannerEl.querySelector('.offline-banner-open').hidden = true;
+    }
+
+    // On a full page load window.noteid waits for the note to be focused;
+    // the address names the note on screen meanwhile.
+    function noteOnScreen() {
+        var noteId = window.noteid;
+        if (noteId && noteId !== -1 && noteId !== 'search') {
+            return String(noteId);
+        }
+        var fromUrl = Number(new URLSearchParams(window.location.search).get('note') || 0);
+        return fromUrl > 0 ? String(fromUrl) : null;
+    }
+
+    // The offline page by name, which the service worker answers from its
+    // stored copy without asking the network (sw.js): the button is only
+    // shown once the server was found out of reach. It opens the note on
+    // screen (offline.php?note=).
+    var OPEN_OFFLINE_TIMEOUT_MS = 10 * 1000;
+    var pageLeft = false;
+    window.addEventListener('pagehide', function () {
+        pageLeft = true;
+    });
+
+    function openOfflinePage() {
+        offlinePageReady().then(function (ready) {
+            if (!ready) {
+                hideOpenButton();
+                return;
+            }
+            var target = 'offline.php';
+            var noteId = noteOnScreen();
+            if (noteId) {
+                target += '?note=' + encodeURIComponent(noteId);
+                // Text typed since the last save goes into the note's draft,
+                // which the offline page takes over (js/offline-app.js), so
+                // leaving does not need the "unsaved changes" prompt.
+                if (typeof window.hasUnsavedChangesOnScreen === 'function'
+                    && window.hasUnsavedChangesOnScreen(noteId)
+                    && typeof window.snapshotNoteStateForSave === 'function') {
+                    window.snapshotNoteStateForSave(noteId);
+                    window.__poznoteLeavingForOfflinePage = true;
+                }
+            }
+            window.location.href = target;
+            // Still here: the browser keeps the page waiting on the network
+            // instead of taking the worker's answer. Stop the endless loading
+            // and say what unblocks it (issue 1500).
+            setTimeout(function () {
+                if (pageLeft) {
+                    return;
+                }
+                window.__poznoteLeavingForOfflinePage = false;
+                if (typeof window.stop === 'function') {
+                    window.stop();
+                }
+                showMessage(tr('offline.banner.stuck', {}, 'The offline notes did not open: this browser is still waiting for the server. If a VPN is on, turning it off lets them open.'), false);
+            }, OPEN_OFFLINE_TIMEOUT_MS);
+        });
     }
 
     function onConnectionLost() {
@@ -793,6 +851,12 @@
         showMessage(text, false);
         if (offlineDays === 0) {
             bannerEl.querySelector('.offline-banner-open').hidden = true;
+        } else {
+            offlinePageReady().then(function (ready) {
+                if (!ready && !bannerEl.hidden && !bannerEl.classList.contains('is-transient')) {
+                    hideOpenButton();
+                }
+            });
         }
         if (!probeTimer) {
             probeTimer = setInterval(function () {

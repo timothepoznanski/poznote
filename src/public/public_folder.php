@@ -60,14 +60,17 @@ try {
     }
 
     if (!$row) {
-        $statusMsg = t_h('public.errors.shared_folder_not_found', [], "Shared folder not found.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.", $currentLang);
-        [$statusTitle, $statusDetail] = array_pad(explode("\n\n", $statusMsg, 2), 2, '');
+        // No share carries this token (removed by the owner, wrong link, or a
+        // registry gap after user folders were copied by hand): the visitor
+        // is told whom to ask, a signed-in administrator also gets the
+        // Rebuild hint (public_helpers.php).
         renderPublicStatusPage($currentLang, [
             'status' => 404,
             'icon' => '🧭',
             'badge' => '404',
-            'title' => rtrim(trim($statusTitle), '.'),
-            'message' => $statusDetail,
+            'title' => t_h('public.errors.shared_folder_not_found', [], 'Shared folder not found', $currentLang),
+            'message' => t_h('public.errors.shared_folder_not_found_message', [], 'No shared folder matches this link. The share may have been removed by its owner, or the link may be wrong. If you think you should have access, contact the owner or the administrator.', $currentLang),
+            'hint' => getPublicShareNotFoundAdminHint($currentLang),
             'actions' => [
                 [
                     'href' => '/index.php',
@@ -141,14 +144,13 @@ try {
     $stmt->execute([$folder_id]);
     $folder = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$folder) {
-        $folderMsg = t_h('public.errors.folder_not_found', [], "Folder not found.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.", $currentLang);
-        [$folderTitle, $folderDetail] = array_pad(explode("\n\n", $folderMsg, 2), 2, '');
+        // The share exists but its folder is gone
         renderPublicStatusPage($currentLang, [
             'status' => 404,
             'icon' => '🧭',
             'badge' => '404',
-            'title' => rtrim(trim($folderTitle), '.'),
-            'message' => $folderDetail,
+            'title' => t_h('public.errors.folder_not_found', [], 'Folder not found', $currentLang),
+            'message' => t_h('public.errors.folder_unavailable_message', [], 'This folder is no longer available. Its owner may have deleted it. Contact the owner or the administrator if you think this is a mistake.', $currentLang),
             'actions' => [
                 [
                     'href' => '/index.php',

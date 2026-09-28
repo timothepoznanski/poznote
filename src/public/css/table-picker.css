@@ -1,79 +1,142 @@
 /**
  * Table Picker Styles
  * 
- * Complete table picker popup including grid selection, hover highlighting,
- * dimension label, and direct input section.
+ * Table picker popup (size grid, live size label, number fields), table context
+ * menu, column resize and cell selection.
  */
 
 /* Table picker styles */
 .table-picker-popup {
     position: fixed;
+    box-sizing: border-box;
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
     border-radius: var(--pz-radius-lg);
     box-shadow: 0 8px 25px rgba(var(--pz-shadow-rgb), 0.15);
     z-index: 1000;
-    padding: 20px;
+    padding: 14px 16px 16px;
     opacity: 0;
-    transform: translateY(-10px);
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    transform: translateY(-6px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
     font-family: 'Inter', sans-serif;
 }
 
-.table-picker-input-section {
-    margin-top: 16px;
-    padding-top: 16px;
+.table-picker-popup.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.table-picker-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.table-picker-title {
+    font-size: 14px;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text);
+}
+
+.table-picker-size {
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    color: var(--pz-text-secondary);
+    white-space: nowrap;
+}
+
+/* Grid: the cell count comes from the script (--table-picker-cols). No focus
+   ring, the highlighted cells already show where the arrow keys are. */
+.table-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--table-picker-cols, 10), 1fr);
+    gap: 4px;
+    padding: 2px;
+    border-radius: var(--pz-radius-sm);
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.table-picker-grid:focus {
+    outline: none;
+}
+
+.table-picker-cell {
+    aspect-ratio: 1;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm);
+    background: var(--pz-bg);
+    transition: background-color 0.08s ease, border-color 0.08s ease;
+}
+
+.table-picker-cell.active {
+    background: rgba(var(--pz-accent-rgb), 0.18);
+    border-color: var(--pz-accent);
+}
+
+/* Number fields + insert button */
+.table-picker-fields {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 14px;
     border-top: 1px solid var(--pz-border);
 }
 
-.table-picker-input-container {
+.table-picker-field {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    justify-content: center;
-}
-
-.table-picker-input-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
 }
 
 .table-picker-input-field-label {
     font-size: 12px;
     color: var(--pz-text-secondary);
     font-weight: var(--pz-weight-medium);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .table-picker-input-field {
-    width: 50px;
-    padding: 6px 8px;
+    box-sizing: border-box;
+    width: 100%;
+    height: 32px;
+    padding: 0 8px;
     border: 1px solid var(--pz-border);
     border-radius: var(--pz-radius-sm);
+    background: var(--pz-bg);
+    color: var(--pz-text);
     font-size: 13px;
-    text-align: center;
     font-family: 'Inter', sans-serif;
     transition: border-color 0.2s ease;
+}
+
+.table-picker-input-field:hover {
+    border-color: var(--pz-border-strong);
 }
 
 .table-picker-input-field:focus {
     outline: none;
     border-color: var(--pz-accent);
-    box-shadow: 0 0 0 2px rgba(var(--pz-accent-rgb), 0.1);
-}
-
-.table-picker-input-field:hover {
-    border-color: #bbb;
+    box-shadow: 0 0 0 2px rgba(var(--pz-accent-rgb), 0.15);
 }
 
 .table-picker-insert-btn {
-    padding: 6px 14px;
-    background: var(--pz-accent-text);
+    flex: 0 0 auto;
+    height: 32px;
+    padding: 0 14px;
+    background: var(--pz-accent);
     color: var(--pz-text-inverse);
     border: none;
     border-radius: var(--pz-radius-sm);
     font-size: 13px;
-    font-weight: var(--pz-weight-normal);
+    font-weight: var(--pz-weight-medium);
     cursor: pointer;
     transition: background-color 0.2s ease;
     font-family: 'Inter', sans-serif;
@@ -129,6 +192,72 @@
     height: 1px;
     background: var(--pz-surface-sunken);
     margin: 4px 0;
+}
+
+/* Align column: label + three icon buttons on one row */
+.table-context-menu-align-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 8px 4px 16px;
+    color: var(--pz-text-strong);
+}
+
+.table-context-menu-align-buttons {
+    display: flex;
+    gap: 2px;
+}
+
+.table-context-menu-align-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: var(--pz-radius-sm);
+    background: transparent;
+    cursor: pointer;
+}
+
+.table-context-menu-align-btn:hover {
+    background: var(--pz-surface-hover);
+}
+
+.table-context-menu-align-btn [class*="lucide-"],
+.table-context-menu-align-btn [class*="lucide-"]:hover {
+    font-size: 16px;
+    color: var(--pz-icon);
+    transform: none;
+}
+
+.table-context-menu-align-btn.active [class*="lucide-"] {
+    color: var(--pz-accent);
+}
+
+/* ── Column resize (HTML notes) ─────────────────────────────────────────── */
+
+.noteentry table.pz-col-resize-hover,
+.noteentry table.pz-col-resize-hover td,
+.noteentry table.pz-col-resize-hover th,
+html.pz-col-resizing,
+html.pz-col-resizing * {
+    cursor: col-resize !important;
+}
+
+html.pz-col-resizing .noteentry {
+    user-select: none;
+}
+
+.pz-col-resize-guide {
+    position: fixed;
+    display: none;
+    width: 2px;
+    background: var(--pz-accent);
+    pointer-events: none;
+    z-index: 900;
 }
 
 /* ── Table cell selection (copy/paste of cell ranges) ───────────────────── */

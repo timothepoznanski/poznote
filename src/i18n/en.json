@@ -1061,9 +1061,6 @@
       },
       "folder": {
         "title": "Folder"
-      },
-      "workspace": {
-        "title": "Workspace"
       }
     },
     "folder_icon": {
@@ -1741,6 +1738,13 @@
       "insert_row_below": "Insert row below",
       "insert_column_left": "Insert column left",
       "insert_column_right": "Insert column right",
+      "align_column": "Align column",
+      "align_row": "Align row",
+      "align_cell": "Align cell",
+      "align_left": "Left",
+      "align_center": "Center",
+      "align_right": "Right",
+      "reset_column_widths": "Reset column widths",
       "delete_row": "Delete row",
       "delete_column": "Delete column",
       "delete_table": "Delete table",
@@ -2566,13 +2570,19 @@
       "token_or_folder_auth_missing": "Link or folder authorization missing",
       "link_in_use": "This custom link is already in use",
       "link_invalid": "Invalid custom link. Allowed characters: letters, numbers, -, _, . (4 to 128 characters)",
-      "shared_folder_not_found": "Shared folder not found.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.",
-      "shared_note_not_found_or_denied": "Shared note not found or access denied.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.",
-      "folder_not_found": "Folder not found.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.",
+      "shared_folder_not_found": "Shared folder not found",
+      "shared_folder_not_found_message": "No shared folder matches this link. The share may have been removed by its owner, or the link may be wrong. If you think you should have access, contact the owner or the administrator.",
+      "shared_note_not_found": "Shared note not found",
+      "shared_note_not_found_message": "No shared note matches this link. The share may have been removed by its owner, or the link may be wrong. If you think you should have access, contact the owner or the administrator.",
+      "note_unavailable_message": "This note is no longer available. Its owner may have deleted it. Contact the owner or the administrator if you think this is a mistake.",
+      "link_incomplete_message": "This link is incomplete, so the shared content cannot be identified. Check the link you received, or ask the person who shared it for a new one.",
+      "folder_not_found": "Folder not found",
+      "folder_unavailable_message": "This folder is no longer available. Its owner may have deleted it. Contact the owner or the administrator if you think this is a mistake.",
       "note_not_found": "Note not found",
       "server_error": "Server error",
       "share_disabled_title": "This share is inaccessible",
-      "share_disabled_message": "The owner has made this share inaccessible."
+      "share_disabled_message": "The owner has made this share inaccessible. Contact the owner or the administrator if you need access again.",
+      "registry_admin_hint": "You are signed in as an administrator. If the owner still lists this share in their account, the shared links registry is out of sync: rebuild the master database from Settings > Admin Tools."
     },
     "edit": {
       "button": "Edit",
@@ -2581,7 +2591,7 @@
       "locked": "Someone else is currently editing this note. Please try again later.",
       "lock_lost": "Someone else is now editing this note. Your latest changes cannot be saved."
     },
-    "shared_note_not_found_or_denied": "Shared note not found or access denied. This can happen after a restore. An administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.",
+    "access_denied_hint": "Only the accounts chosen by the owner can open this share. Contact the owner or the administrator if you need access.",
     "token_update_failed": "Failed to update token"
   },
   "public_folder": {
@@ -3427,10 +3437,11 @@
       "maintenance": {
         "title": "Rebuild Master Database",
         "subtitle": "Restore user profiles and public sharing links",
-        "description": "The main database (master.db) stores user information, their public links, and Poznote's global settings. If this file is lost or corrupted, or if some public links stop working after a restore, this tool scans your 'data/users' folders to automatically re-register accounts, recover their real names from their personal databases, and restore all public sharing links.",
+        "description": "The main database (master.db) stores user information, their public links, and Poznote's global settings. If this file is lost or corrupted, or if some public links stop working after user folders were copied or moved by hand, this tool scans your 'data/users' folders to automatically re-register accounts, recover their real names from their personal databases, and restore all public sharing links.",
         "repair_registry": "Rebuild",
         "repair_registry_confirm": "This will scan all user folders and rebuild the master database. Continue?",
         "repair_registry_success": "Master database rebuilt successfully:\n\n- {{scanned}} folders scanned\n- {{added}} users restored\n- {{links}} shared links rebuilt",
+        "repair_registry_skipped": "- {{skipped}} shared links kept by another account",
         "repair_registry_error": "Rebuild error: {{error}}"
       },
       "id": "ID",
@@ -4930,7 +4941,8 @@
     "banner": {
       "open": "Open offline notes",
       "offline": "You are offline. Notes modified recently can still be opened and edited in offline mode.",
-      "offline_no_copies": "You are offline. Changes will be saved when the connection is back."
+      "offline_no_copies": "You are offline. Changes will be saved when the connection is back.",
+      "stuck": "The offline notes did not open: this browser is still waiting for the server. If a VPN is on, turning it off lets them open."
     },
     "settings": {
       "enable": "Enable offline mode",

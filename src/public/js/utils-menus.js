@@ -483,7 +483,9 @@ function populateNoteActionsMenu(menu, toggle) {
     var folderName = toggle.getAttribute('data-folder') || '';
     var isFavorite = toggle.getAttribute('data-favorite') === '1';
     var isOffline = toggle.getAttribute('data-offline') === '1';
-    var isShared = toggle.getAttribute('data-shared') === '1';
+    var isSharedDirectly = toggle.getAttribute('data-shared') === '1';
+    var isSharedViaFolder = !isSharedDirectly && toggle.getAttribute('data-shared-via-folder') === '1';
+    var isShared = isSharedDirectly || isSharedViaFolder;
 
     menu.setAttribute('data-note-id', noteId);
 
@@ -494,9 +496,18 @@ function populateNoteActionsMenu(menu, toggle) {
         item.style.display = isLinkedNote ? 'none' : '';
     });
 
-    // Share item: show the variant matching the note's shared state
+    // Share item: show the variant matching the note's shared state. A note
+    // shared only through a (parent) folder shows "Is shared" too, carrying
+    // the attributes openPublicShareModal() reads to explain the folder share.
     menu.querySelectorAll('.share-state-shared').forEach(function (item) {
         item.style.display = isShared ? '' : 'none';
+        if (isSharedViaFolder) {
+            item.setAttribute('data-shared-via-folder', '1');
+            item.setAttribute('data-shared-folder-name', toggle.getAttribute('data-shared-folder-name') || '');
+        } else {
+            item.removeAttribute('data-shared-via-folder');
+            item.removeAttribute('data-shared-folder-name');
+        }
     });
     menu.querySelectorAll('.share-state-not-shared').forEach(function (item) {
         item.style.display = isShared ? 'none' : '';

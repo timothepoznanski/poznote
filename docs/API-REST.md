@@ -3517,11 +3517,20 @@ curl -u 'username:password' \
 POST /admin/repair
 ```
 
-Scan and rebuild the master database registry.
+Scan every `data/users/<id>` folder and rebuild the master database registry: accounts missing from `master.db` are re-registered, and the public share links of every account are re-registered from its own database. A backup restore already does this for the restored account, so this is for user folders copied or moved by hand. A link two accounts both claim stays with the first account scanned and is counted in `links_skipped`.
 
 ```bash
 curl -X POST -u 'username:password' \
   http://YOUR_SERVER/api/v1/admin/repair
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "System registry repaired successfully",
+  "stats": {"users_scanned": 3, "users_added": 0, "links_rebuilt": 12, "links_skipped": 0, "errors": []}
+}
 ```
 
 ### Orphan Attachments

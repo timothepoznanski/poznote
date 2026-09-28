@@ -536,7 +536,8 @@ async function getPublicShare(noteId) {
 /**
  * Open the share modal for a note (checks existing share first)
  * @param {string} noteId - The note ID
- * @param {Element} [sourceEl] - The clicked element; the toolbar button carries
+ * @param {Element} [sourceEl] - The clicked element; the toolbar button and the
+ *                              tree menu's "Is shared" item carry
  *                              data-shared-via-folder when the note is only
  *                              shared through a shared folder
  */
@@ -558,10 +559,8 @@ async function openPublicShareModal(noteId, sourceEl) {
         return;
     }
 
-    // No direct share, but the toolbar icon is blue because an ancestor folder
-    // is shared: explain that instead of offering to create another share URL.
-    // (The note actions menu keeps the normal share flow: its menu item does
-    // not carry the attribute.)
+    // No direct share, but the icon is blue because an ancestor folder is
+    // shared: explain that instead of offering to create another share URL.
     if (sourceEl && sourceEl.getAttribute && sourceEl.getAttribute('data-shared-via-folder') === '1') {
         showSharedViaFolderModal(noteId, sourceEl.getAttribute('data-shared-folder-name') || '');
         return;

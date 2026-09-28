@@ -81,7 +81,7 @@
         notification.querySelector('span').textContent =
             (typeof window.t === 'function') ? window.t('autosave.notification.saved', null, 'Saved!') : 'Saved!';
 
-        document.body.appendChild(notification);
+        (window.poznoteToastStack ? window.poznoteToastStack() : document.body).appendChild(notification);
         savedToastTimeoutId = setTimeout(function () {
             if (notification.parentNode) {
                 notification.parentNode.removeChild(notification);
@@ -94,12 +94,14 @@
 
     function handleShortcutKeydown(e) {
         if (e.defaultPrevented) return;
+        // The Latin letter even on a Cyrillic or Greek layout (js/shortcut-key.js)
+        var key = window.poznoteShortcutKey ? window.poznoteShortcutKey(e) : (e.key || '').toLowerCase();
 
         // Ctrl+Alt+S / Cmd+Alt+S takes a snapshot of the current note. Keyed on
         // e.key so a layout where AltGr+S types a letter (Polish "ś") is left
         // alone; on a Mac, Option+S reports "ß", hence the physical key check.
-        if ((e.ctrlKey || e.metaKey) && e.altKey && !e.shiftKey && e.key
-            && (e.key.toLowerCase() === 's' || (e.metaKey && e.code === 'KeyS'))) {
+        if ((e.ctrlKey || e.metaKey) && e.altKey && !e.shiftKey
+            && (key === 's' || (e.metaKey && e.code === 'KeyS'))) {
             if (typeof window.takeSnapshotShortcut !== 'function') return;
             if (window.takeSnapshotShortcut()) {
                 e.preventDefault();
@@ -108,7 +110,7 @@
         }
 
         // Ctrl+S / Cmd+S saves the current note (Ctrl+Shift+S stays strikethrough)
-        if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && e.key && e.key.toLowerCase() === 's') {
+        if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && key === 's') {
             e.preventDefault();
             if (typeof window.saveNoteImmediately === 'function') {
                 // The toast only once the server confirmed the save

@@ -52,6 +52,9 @@
             { label: tr('table.context_menu.insert_column_left', 'Insert column left'), action: 'insertColLeft', icon: '←' },
             { label: tr('table.context_menu.insert_column_right', 'Insert column right'), action: 'insertColRight', icon: '→' },
             { separator: true },
+            { align: true },
+            { label: tr('table.context_menu.reset_column_widths', 'Reset column widths'), action: 'resetColumnWidths', icon: '↔', id: 'resetColumnWidths' },
+            { separator: true },
             { label: tr('table.context_menu.delete_row', 'Delete row'), action: 'deleteRow', icon: '🗑️', danger: true },
             { label: tr('table.context_menu.delete_column', 'Delete column'), action: 'deleteCol', icon: '🗑️', danger: true },
             { separator: true },
@@ -59,13 +62,18 @@
         ];
 
         menuItems.forEach(item => {
-            if (item.separator) {
+            if (item.align) {
+                contextMenu.appendChild(createAlignRow('column', pickAlignment));
+                contextMenu.appendChild(createAlignRow('row', pickAlignment));
+                contextMenu.appendChild(createAlignRow('cell', pickAlignment));
+            } else if (item.separator) {
                 const separator = document.createElement('div');
                 separator.className = 'table-context-menu-separator';
                 contextMenu.appendChild(separator);
             } else {
                 const menuItem = document.createElement('div');
                 menuItem.className = 'table-context-menu-item' + (item.danger ? ' danger' : '');
+                if (item.id) menuItem.dataset.item = item.id;
                 menuItem.innerHTML = `<span style="width:20px;text-align:center">${item.icon}</span><span>${item.label}</span>`;
 
                 menuItem.addEventListener('click', (e) => {
@@ -83,6 +91,78 @@
         return contextMenu;
     }
 
+    function pickAlignment(scope, align) {
+        executeTableAction('align', { scope: scope, align: align });
+        hideTableContextMenu();
+    }
+
+    /**
+     * Builds the "Align column" / "Align row" / "Align cell" line: one button per alignment,
+     * each click handed to onPick(scope, align)
+     */
+    function createAlignRow(scope, onPick) {
+        const row = document.createElement('div');
+        row.className = 'table-context-menu-align-row';
+        row.dataset.scope = scope;
+
+        const label = document.createElement('span');
+        label.className = 'table-context-menu-align-label';
+        label.textContent = {
+            column: tr('table.context_menu.align_column', 'Align column'),
+            row: tr('table.context_menu.align_row', 'Align row'),
+            cell: tr('table.context_menu.align_cell', 'Align cell')
+        }[scope];
+        row.appendChild(label);
+
+        const buttons = document.createElement('div');
+        buttons.className = 'table-context-menu-align-buttons';
+        [
+            { align: 'left', icon: 'lucide-align-left', title: tr('table.context_menu.align_left', 'Left') },
+            { align: 'center', icon: 'lucide-align-center', title: tr('table.context_menu.align_center', 'Center') },
+            { align: 'right', icon: 'lucide-align-right', title: tr('table.context_menu.align_right', 'Right') }
+        ].forEach(option => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'table-context-menu-align-btn';
+            button.dataset.align = option.align;
+            button.title = option.title;
+            button.setAttribute('aria-label', option.title);
+            button.innerHTML = `<i class="lucide ${option.icon}"></i>`;
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onPick(scope, option.align);
+            });
+            buttons.appendChild(button);
+        });
+        row.appendChild(buttons);
+        return row;
+    }
+
+    /**
+     * Reflects the table under the pointer in the menu (current alignment,
+     * width reset only offered when some width was set)
+     */
+    function refreshAlignButtons(menu, table, cell) {
+        const columns = window.pzTableColumns;
+        menu.querySelectorAll('.table-context-menu-align-row').forEach(row => {
+            // Highlighted only when the whole column / row shares it
+            const current = columns ? columns.readLineAlignment(table, cell, row.dataset.scope) : null;
+            row.querySelectorAll('.table-context-menu-align-btn').forEach(button => {
+                button.classList.toggle('active', button.dataset.align === current);
+            });
+        });
+    }
+
+    function refreshTableContextMenu(menu, table, cell) {
+        const columns = window.pzTableColumns;
+        refreshAlignButtons(menu, table, cell);
+        const reset = menu.querySelector('[data-item="resetColumnWidths"]');
+        if (reset) {
+            reset.style.display = columns && columns.hasColumnWidths(table) ? '' : 'none';
+        }
+    }
+
     /**
      * Shows the context menu at the mouse position
      */
@@ -91,6 +171,7 @@
         activeCell = cell;
         
         const menu = createTableContextMenu();
+        refreshTableContextMenu(menu, table, cell);
         menu.style.display = 'block';
         
         // Menu position
@@ -134,7 +215,7 @@
     /**
      * Executes the context menu action
      */
-    function executeTableAction(action) {
+    function executeTableAction(action, value) {
         if (!activeTable || !activeCell) return;
 
         const { rowIndex, cellIndex } = getCellIndex(activeCell);
@@ -160,6 +241,13 @@
             case 'deleteCol':
                 deleteColumn(rows, cellIndex);
                 break;
+            case 'align':
+                if (!window.pzTableColumns) return;
+                window.pzTableColumns.alignCells(activeTable, activeCell, value.scope, value.align);
+                break;
+            case 'resetColumnWidths':
+                if (!window.pzTableColumns || !window.pzTableColumns.resetColumnWidths(activeTable)) return;
+                break;
             case 'deleteTable':
                 // Asynchronous (styled confirmation): it saves the note itself
                 deleteTable();
@@ -181,11 +269,14 @@
         const referenceRow = rows[index];
         const numCols = referenceRow.querySelectorAll('td, th').length;
         
+        const referenceCells = referenceRow.querySelectorAll('td, th');
         const newRow = document.createElement('tr');
         for (let i = 0; i < numCols; i++) {
             const cell = document.createElement('td');
             cell.style.cssText = 'border: 1px solid #ddd; padding: 8px; min-width: 50px;';
             cell.innerHTML = '&nbsp;';
+            // Same alignment and width as the column it lands in
+            if (window.pzTableColumns) window.pzTableColumns.copyColumnFormat(referenceCells[i], cell);
             newRow.appendChild(cell);
         }
 
@@ -206,6 +297,15 @@
             const newCell = document.createElement(referenceCell.tagName);
             newCell.style.cssText = 'border: 1px solid #ddd; padding: 8px; min-width: 50px;';
             newCell.innerHTML = '&nbsp;';
+
+            // A sized column shares its width with the new one, so the
+            // other columns keep theirs
+            const width = referenceCell.style.width;
+            if (width && width.endsWith('%')) {
+                const half = (Math.round(parseFloat(width) / 2 * 100) / 100) + '%';
+                referenceCell.style.width = half;
+                newCell.style.width = half;
+            }
 
             if (after) {
                 referenceCell.parentNode.insertBefore(newCell, referenceCell.nextSibling);
@@ -241,6 +341,12 @@
         rows.forEach(row => {
             const cells = Array.from(row.querySelectorAll('td, th'));
             if (cells[index]) {
+                // A sized column hands its width over to its neighbour
+                const width = cells[index].style.width;
+                const neighbour = cells[index + 1] || cells[index - 1];
+                if (width && width.endsWith('%') && neighbour && neighbour.style.width.endsWith('%')) {
+                    neighbour.style.width = (Math.round((parseFloat(neighbour.style.width) + parseFloat(width)) * 100) / 100) + '%';
+                }
                 cells[index].remove();
             }
         });
@@ -359,6 +465,9 @@
         menuItems.push({ label: tr('table.context_menu.insert_column_left', 'Insert column left'), action: 'insertColLeft', icon: '←' });
         menuItems.push({ label: tr('table.context_menu.insert_column_right', 'Insert column right'), action: 'insertColRight', icon: '→' });
         menuItems.push({ separator: true });
+        // Markdown only knows column alignment (the separator row), not rows
+        menuItems.push({ align: true });
+        menuItems.push({ separator: true });
         if (!isHeader) {
             menuItems.push({ label: tr('table.context_menu.delete_row', 'Delete row'), action: 'deleteRow', icon: '🗑️', danger: true });
         }
@@ -367,7 +476,9 @@
         menuItems.push({ label: tr('table.context_menu.delete_table', 'Delete table'), action: 'deleteTable', icon: '🗑️', danger: true });
 
         menuItems.forEach(item => {
-            if (item.separator) {
+            if (item.align) {
+                mdContextMenu.appendChild(createAlignRow('column', (scope, align) => runMdTableAction('align', align)));
+            } else if (item.separator) {
                 const sep = document.createElement('div');
                 sep.className = 'table-context-menu-separator';
                 mdContextMenu.appendChild(sep);
@@ -397,6 +508,7 @@
         const isHeader = rowIndex === 0;
 
         const menu = createMdTableContextMenu(isHeader);
+        refreshAlignButtons(menu, table, cell);
         menu.style.display = 'block';
 
         let left = x, top = y;
@@ -513,9 +625,9 @@
     /**
      * Runs a menu action, asking for confirmation first when the whole table goes
      */
-    function runMdTableAction(action) {
+    function runMdTableAction(action, value) {
         if (action !== 'deleteTable') {
-            executeMdTableAction(action);
+            executeMdTableAction(action, value);
             hideMdTableContextMenu();
             return;
         }
@@ -536,7 +648,7 @@
         });
     }
 
-    function executeMdTableAction(action) {
+    function executeMdTableAction(action, value) {
         if (!mdActiveTable || !mdActiveCell || !mdActiveNoteEntry) return;
 
         const startLine = parseInt(mdActiveTable.getAttribute('data-start-line'), 10);
@@ -661,6 +773,15 @@
                     cells.splice(cellIndex, 1);
                     lines[li] = '| ' + cells.join(' | ') + ' |';
                 }
+                break;
+            }
+            case 'align': {
+                // The separator row carries the alignment: :--- / :---: / ---:
+                const sepLine = tableStart + separatorIdx;
+                const cells = getMarkdownTableCells(lines[sepLine]);
+                if (cellIndex >= cells.length) return;
+                cells[cellIndex] = value === 'center' ? ':---:' : (value === 'right' ? '---:' : ':---');
+                lines[sepLine] = '| ' + cells.join(' | ') + ' |';
                 break;
             }
             case 'deleteTable': {

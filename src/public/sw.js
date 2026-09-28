@@ -15,7 +15,8 @@
  *     opening Poznote without a network shows the notes kept on the device.
  *     A network that swallows requests without failing them (a VPN tunnel
  *     left up without Wi-Fi, a captive portal, a dying signal) gets the
- *     offline page too: a slow page has the server's health checked.
+ *     offline page too: a slow page has the server's health checked. The
+ *     offline page asked for by name (offline.php) comes from the cache.
  *  3. Note attachments (api/v1/notes/{id}/attachments/{id}): network first,
  *     then the pictures js/offline-sync.js keeps for the offline notes.
  *
@@ -207,6 +208,21 @@ async function handleNavigation(event, allowFallback) {
   }
   const requestUrl = new URL(event.request.url);
   const method = event.request.method;
+  // The offline page asked for by name (the "Open offline notes" button of
+  // js/offline-sync.js, which has just found the server out of reach): the
+  // stored copy answers at once, whatever the network does. Waiting for the
+  // network there leaves the page loading for as long as a request can hang.
+  if (method === 'GET' && requestUrl.pathname.split('/').pop() === 'offline.php') {
+    const shell = await offlineShellResponse(requestUrl);
+    if (shell) {
+      // The preload the browser started is not used: its late failure must
+      // not surface as an unhandled rejection.
+      Promise.resolve(event.preloadResponse).catch(() => {});
+      // Its assets come from the cache too, not after ASSET_TIMEOUT_MS each.
+      serverSilentAt = Date.now();
+      return shell;
+    }
+  }
   const network = networkResponse(event).then(async (response) => {
     if (response.status === 502 || response.status === 503 || response.status === 504) {
       const shell = await offlineShellResponse(requestUrl);

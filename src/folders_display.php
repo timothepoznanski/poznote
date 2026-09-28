@@ -545,9 +545,13 @@ function renderFolderActionsMenu($currentWorkspace = '') {
  * @param bool $isOffline Whether the note is marked "Keep offline"
  * @param bool $isShared Whether the note has its own public link, which picks
  *                       the share variant shown by the menu
+ * @param string|null $sharedViaFolderName Nearest shared ancestor folder when
+ *                       the note has no link of its own: the menu then shows
+ *                       "Is shared" too, and clicking it explains the folder
+ *                       share like the toolbar button does
  * @return string HTML for the note actions toggle
  */
-function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderName, $isFavorite = false, $isOffline = false, $isShared = false) {
+function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderName, $isFavorite = false, $isOffline = false, $isShared = false, $sharedViaFolderName = null) {
     $htmlNoteId = htmlspecialchars((string)$noteId, ENT_QUOTES);
     $htmlNoteTitle = htmlspecialchars((string)$noteTitle, ENT_QUOTES);
     $htmlNoteType = htmlspecialchars((string)$noteType, ENT_QUOTES);
@@ -565,6 +569,9 @@ function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderN
         . " data-favorite='" . ($isFavorite ? '1' : '0') . "'"
         . " data-offline='" . ($isOffline ? '1' : '0') . "'"
         . " data-shared='" . ($isShared ? '1' : '0') . "'"
+        . (!$isShared && $sharedViaFolderName !== null
+            ? " data-shared-via-folder='1' data-shared-folder-name='" . htmlspecialchars((string)$sharedViaFolderName, ENT_QUOTES) . "'"
+            : '')
         . " title='" . t_h('notes_list.note_actions.menu', [], 'Note actions') . "'"
         . " aria-label='" . t_h('notes_list.note_actions.menu', [], 'Note actions') . "'>"
         . "<i class='lucide lucide-more-vertical'></i>"
@@ -612,11 +619,12 @@ function renderNoteActionsMenu($currentWorkspace = '') {
     $menu .= "</div>";
 
     // Share: two variants, populateNoteActionsMenu() shows the one matching
-    // the note's shared state (data-shared on the toggle), like the folder
-    // menu. Same handler as the toolbar's share button, minus its
-    // data-shared-via-folder attribute: from the tree, a note inside a shared
-    // folder still goes straight to creating its own link. Not in a workspace
-    // shared with this login, where public links are the owner's.
+    // the note's shared state (data-shared on the toggle, or
+    // data-shared-via-folder for a note inside a shared folder), like the
+    // folder menu. Same handler as the toolbar's share button: the menu copies
+    // the via-folder attributes onto "Is shared", so a note shared through its
+    // folder gets the same explanation popup. Not in a workspace shared with
+    // this login, where public links are the owner's.
     if (!function_exists('isSharedWorkspaceScopeActive') || !isSharedWorkspaceScopeActive()) {
         $menu .= "<div class='note-actions-menu-item active-state share-state-shared' data-action='open-share-modal'>";
         $menu .= "<i class='lucide lucide-share-2'></i>";

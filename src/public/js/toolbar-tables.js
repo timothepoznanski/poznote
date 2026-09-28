@@ -100,7 +100,11 @@ function toggleTablePicker(triggerElement) {
   const existingPicker = document.querySelector('.table-picker-popup');
 
   if (existingPicker) {
-    existingPicker.remove();
+    if (typeof existingPicker._close === 'function') {
+      existingPicker._close();
+    } else {
+      existingPicker.remove();
+    }
     window.savedCodeMirrorTable = null;
     window.savedRanges.table = null;
     return;
@@ -124,71 +128,113 @@ function toggleTablePicker(triggerElement) {
     window.savedRanges.table = null;
   }
 
-  // Create table picker popup
+  // Grid of cells picked with the mouse (or the arrow keys), backed by two number
+  // fields for sizes the grid does not show.
+  const GRID_ROWS = 8;
+  const GRID_COLS = 10;
+  const MAX_SIZE = 20;
+  const clampSize = (value) => {
+    const n = parseInt(value, 10);
+    if (isNaN(n) || n < 1) return 1;
+    return Math.min(n, MAX_SIZE);
+  };
+
+  const titleText = tr('editor.table_picker.title', 'Insert table');
+  let size = { rows: 3, cols: 3 };
+  let inserted = false;
+
   const picker = document.createElement('div');
   picker.className = 'table-picker-popup';
+  picker.setAttribute('role', 'dialog');
+  picker.setAttribute('aria-label', titleText);
 
-  // Create header
+  // Header: title + live size
   const header = document.createElement('div');
   header.className = 'table-picker-header';
-  header.textContent = tr('editor.table_picker.title', 'Insert Table');
+
+  const title = document.createElement('span');
+  title.className = 'table-picker-title';
+  title.textContent = titleText;
+  header.appendChild(title);
+
+  const sizeLabel = document.createElement('span');
+  sizeLabel.className = 'table-picker-size';
+  sizeLabel.setAttribute('aria-live', 'polite');
+  header.appendChild(sizeLabel);
+
   picker.appendChild(header);
 
-  // Create direct input section
-  const inputSection = document.createElement('div');
-  inputSection.className = 'table-picker-input-section';
+  // Grid
+  const grid = document.createElement('div');
+  grid.className = 'table-picker-grid';
+  grid.tabIndex = 0;
+  grid.setAttribute('aria-label', titleText);
+  grid.style.setProperty('--table-picker-cols', GRID_COLS);
 
-  const inputContainer = document.createElement('div');
-  inputContainer.className = 'table-picker-input-container';
+  const cells = [];
+  for (let r = 1; r <= GRID_ROWS; r++) {
+    for (let c = 1; c <= GRID_COLS; c++) {
+      const cell = document.createElement('span');
+      cell.className = 'table-picker-cell';
+      cell.dataset.row = r;
+      cell.dataset.col = c;
+      grid.appendChild(cell);
+      cells.push(cell);
+    }
+  }
+  picker.appendChild(grid);
 
-  // Rows input
-  const rowsWrapper = document.createElement('div');
-  rowsWrapper.className = 'table-picker-input-wrapper';
+  // Number fields + insert button
+  const fields = document.createElement('div');
+  fields.className = 'table-picker-fields';
 
-  const rowsLabel = document.createElement('label');
-  rowsLabel.textContent = tr('editor.table_picker.rows_label', 'Rows:');
-  rowsLabel.className = 'table-picker-input-field-label';
-  rowsWrapper.appendChild(rowsLabel);
+  const createField = (labelText, value) => {
+    const field = document.createElement('label');
+    field.className = 'table-picker-field';
 
-  const rowsInput = document.createElement('input');
-  rowsInput.type = 'number';
-  rowsInput.className = 'table-picker-input-field';
-  rowsInput.min = '1';
-  rowsInput.max = '20';
-  rowsInput.value = '3';
-  rowsInput.placeholder = tr('editor.table_picker.rows_placeholder', 'Rows');
-  rowsWrapper.appendChild(rowsInput);
+    const label = document.createElement('span');
+    label.className = 'table-picker-input-field-label';
+    label.textContent = labelText;
+    field.appendChild(label);
 
-  inputContainer.appendChild(rowsWrapper);
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.className = 'table-picker-input-field';
+    input.min = '1';
+    input.max = String(MAX_SIZE);
+    input.value = String(value);
+    field.appendChild(input);
 
-  // Columns input
-  const colsWrapper = document.createElement('div');
-  colsWrapper.className = 'table-picker-input-wrapper';
+    fields.appendChild(field);
+    return input;
+  };
 
-  const colsLabel = document.createElement('label');
-  colsLabel.textContent = tr('editor.table_picker.cols_label', 'Cols:');
-  colsLabel.className = 'table-picker-input-field-label';
-  colsWrapper.appendChild(colsLabel);
+  const rowsInput = createField(tr('editor.table_picker.rows_placeholder', 'Rows'), size.rows);
+  const colsInput = createField(tr('editor.table_picker.cols_placeholder', 'Columns'), size.cols);
 
-  const colsInput = document.createElement('input');
-  colsInput.type = 'number';
-  colsInput.className = 'table-picker-input-field';
-  colsInput.min = '1';
-  colsInput.max = '20';
-  colsInput.value = '3';
-  colsInput.placeholder = tr('editor.table_picker.cols_placeholder', 'Cols');
-  colsWrapper.appendChild(colsInput);
-
-  inputContainer.appendChild(colsWrapper);
-
-  // Insert button
   const insertBtn = document.createElement('button');
+  insertBtn.type = 'button';
   insertBtn.className = 'table-picker-insert-btn';
   insertBtn.textContent = tr('editor.table_picker.insert', 'Insert');
-  inputContainer.appendChild(insertBtn);
+  fields.appendChild(insertBtn);
 
-  inputSection.appendChild(inputContainer);
-  picker.appendChild(inputSection);
+  picker.appendChild(fields);
+
+  const paint = (rows, cols) => {
+    cells.forEach((cell) => {
+      cell.classList.toggle('active', +cell.dataset.row <= rows && +cell.dataset.col <= cols);
+    });
+    sizeLabel.textContent = rows + ' × ' + cols;
+  };
+
+  const setSize = (rows, cols) => {
+    size = { rows: clampSize(rows), cols: clampSize(cols) };
+    rowsInput.value = String(size.rows);
+    colsInput.value = String(size.cols);
+    paint(size.rows, size.cols);
+  };
+
+  paint(size.rows, size.cols);
 
   // Append to body
   document.body.appendChild(picker);
@@ -205,7 +251,7 @@ function toggleTablePicker(triggerElement) {
     if (rects && rects.length) return rects[rects.length - 1];
 
     const marker = document.createElement('span');
-    marker.textContent = '\u200b';
+    marker.textContent = '​';
     marker.setAttribute('data-table-picker-caret', '1');
     marker.style.display = 'inline-block';
     marker.style.width = '0px';
@@ -237,7 +283,7 @@ function toggleTablePicker(triggerElement) {
   const vpOffT = vp ? vp.offsetTop : 0;
 
   const isMobile = isMobileDevice();
-  const pickerWidth = isMobile ? Math.min(280, vpW - 40) : 320;
+  const pickerWidth = Math.min(292, vpW - 24);
 
   picker.style.position = 'fixed';
   picker.style.width = pickerWidth + 'px';
@@ -273,42 +319,99 @@ function toggleTablePicker(triggerElement) {
     picker.classList.add('show');
   }, 10);
 
-  // Handle insert button click
-  insertBtn.addEventListener('click', function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    let rows = parseInt(rowsInput.value);
-    let cols = parseInt(colsInput.value);
-
-    // Validate inputs
-    if (isNaN(rows) || rows < 1) rows = 1;
-    if (isNaN(cols) || cols < 1) cols = 1;
-    if (rows > 20) rows = 20;
-    if (cols > 20) cols = 20;
-
-    insertTable(rows, cols);
-    picker.classList.remove('show');
-    setTimeout(() => {
-      picker.remove();
-    }, 200);
-  });
-
-  // Handle Enter key in input fields
-  const handleInputEnter = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      insertBtn.click();
+  // Put the caret back where it was when the picker is dismissed from inside
+  // (Escape while the grid or a field has focus).
+  const restoreEditorFocus = () => {
+    const cmApi = window.PoznoteMarkdownCodeMirror;
+    const cmContext = window.savedCodeMirrorTable;
+    if (cmContext && cmApi && typeof cmApi.setSelection === 'function') {
+      cmApi.setSelection(cmContext.editor, cmContext.start, cmContext.end);
+      return;
     }
+    const range = window.savedRanges.table;
+    const noteEntry = range ? getNodeNoteEntry(range.commonAncestorContainer) : null;
+    if (!noteEntry) return;
+    noteEntry.focus({ preventScroll: true });
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
   };
 
-  rowsInput.addEventListener('keydown', handleInputEnter);
-  colsInput.addEventListener('keydown', handleInputEnter);
-
-  setupPopupDismiss(picker, '.btn-table', function () {
+  const close = setupPopupDismiss(picker, '.btn-table', function () {
+    if (!inserted && picker.contains(document.activeElement)) {
+      restoreEditorFocus();
+    }
     window.savedCodeMirrorTable = null;
     window.savedRanges.table = null;
   });
+  picker._close = close;
+
+  const commit = (rows, cols) => {
+    inserted = true;
+    insertTable(clampSize(rows), clampSize(cols));
+    close();
+  };
+
+  // Grid: hover previews, click inserts, leaving shows the fields' size again
+  grid.addEventListener('pointerover', (e) => {
+    const cell = e.target.closest('.table-picker-cell');
+    if (cell) paint(+cell.dataset.row, +cell.dataset.col);
+  });
+  grid.addEventListener('pointerleave', () => paint(size.rows, size.cols));
+  grid.addEventListener('mousedown', (e) => e.preventDefault());
+  grid.addEventListener('click', (e) => {
+    const cell = e.target.closest('.table-picker-cell');
+    if (!cell) return;
+    e.preventDefault();
+    e.stopPropagation();
+    commit(+cell.dataset.row, +cell.dataset.col);
+  });
+
+  grid.addEventListener('keydown', (e) => {
+    const moves = {
+      ArrowUp: [-1, 0],
+      ArrowDown: [1, 0],
+      ArrowLeft: [0, -1],
+      ArrowRight: [0, 1]
+    };
+    if (moves[e.key]) {
+      e.preventDefault();
+      setSize(size.rows + moves[e.key][0], size.cols + moves[e.key][1]);
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      commit(size.rows, size.cols);
+    }
+  });
+
+  // Fields: typing updates the grid, leaving a field normalises its value
+  const syncFromFields = () => {
+    size = { rows: clampSize(rowsInput.value), cols: clampSize(colsInput.value) };
+    paint(size.rows, size.cols);
+  };
+  [rowsInput, colsInput].forEach((input) => {
+    input.addEventListener('input', syncFromFields);
+    input.addEventListener('change', () => setSize(rowsInput.value, colsInput.value));
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        syncFromFields();
+        commit(size.rows, size.cols);
+      }
+    });
+  });
+
+  insertBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    syncFromFields();
+    commit(size.rows, size.cols);
+  });
+
+  // Keyboard users land on the grid; on touch devices moving focus would close
+  // the virtual keyboard and shift the page under the picker.
+  if (!isMobile) {
+    grid.focus({ preventScroll: true });
+  }
 }
 
 function insertTable(rows, cols) {

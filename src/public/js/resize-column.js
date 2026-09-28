@@ -34,6 +34,7 @@ function initResizableColumn() {
     initToggleSidebar();
 
     resizeHandle.addEventListener('mousedown', startResizing);
+    resizeHandle.addEventListener('dblclick', resetColumnWidth);
     document.addEventListener('mousemove', handleResize);
     document.addEventListener('mouseup', stopResizing);
 
@@ -90,6 +91,22 @@ function stopResizing() {
         const currentWidth = leftCol.offsetWidth;
         localStorage.setItem('leftColWidth', currentWidth);
     }
+}
+
+// Double-click on the border: back to the default width (--left-col-width
+// in css/tokens.css)
+function resetColumnWidth(e) {
+    if (e.target.closest('.toggle-sidebar-btn')) {
+        return;
+    }
+
+    e.preventDefault();
+    document.documentElement.style.removeProperty('--left-col-width');
+    const leftCol = document.getElementById('left_col');
+    if (leftCol) {
+        leftCol.style.width = '';
+    }
+    localStorage.removeItem('leftColWidth');
 }
 
 // Initialize resizable column when DOM is ready

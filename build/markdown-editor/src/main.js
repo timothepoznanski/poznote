@@ -23,7 +23,7 @@ import { highlightSelectionMatches, searchKeymap } from '@codemirror/search'
 // searchKeymap includes Mod-f (Ctrl+F) which would intercept the browser's native find.
 // We filter it out so Ctrl+F opens the browser find dialog instead of CodeMirror's panel.
 const filteredSearchKeymap = searchKeymap.filter(binding => binding.key !== 'Mod-f')
-import { Compartment, EditorSelection, EditorState, RangeSetBuilder, StateEffect, StateField } from '@codemirror/state'
+import { CharCategory, Compartment, EditorSelection, EditorState, MapMode, RangeSet, RangeSetBuilder, RangeValue, StateEffect, StateField } from '@codemirror/state'
 import { Decoration, EditorView, ViewPlugin, WidgetType, drawSelection, highlightActiveLine, keymap, placeholder } from '@codemirror/view'
 import { tags as syntaxTags } from '@lezer/highlight'
 
@@ -436,6 +436,15 @@ function markdownCompletionSource(context) {
   const languageMatch = before.match(/^(\s*```)([\w#+.-]*)$/)
 
   if (languageMatch) {
+    // The list only opens once a letter is typed (or on Ctrl+Space), and never
+    // on a closing fence: open on a bare "```", it made Enter insert the first
+    // language instead of a line break (issue #1505). It also closes once the
+    // name is complete, so Enter moves on to the code.
+    const block = findEnclosingFencedCode(context.state, line.from, line.from)
+    const typed = languageMatch[2]
+    if ((block && block.from < line.from) || (!context.explicit && (!typed || CODE_BLOCK_LANGUAGES.indexOf(typed) !== -1))) {
+      return null
+    }
     const from = line.from + languageMatch[1].length
     return {
       from,
@@ -444,7 +453,7 @@ function markdownCompletionSource(context) {
         type: 'keyword',
         detail: 'Code block language'
       })),
-      validFor: /^[\w#+.-]*$/
+      validFor: text => /^[\w#+.-]*$/.test(text) && CODE_BLOCK_LANGUAGES.indexOf(text) === -1
     }
   }
 
@@ -609,6 +618,190 @@ function openLinkModal() {
 function EditorSelectionRange(anchor, head) {
   return EditorSelection.range(anchor, head)
 }
+
+// --- #1505 Markdown marker pairs (start) ---
+// Typing * _ ~ or ` inserts its closing twin, like closeBrackets does for
+// brackets. The closers the editor added are remembered (on the current line
+// only) so that typing the same marker right in front of one steps over it
+// instead of leaving a stray character: "`code`", "**bold**", "* item" and
+// "```sql" all come out exactly as typed (issue #1505).
+const MARKDOWN_PAIR_MARKERS = '*_~`'
+const CODE_NODES = ['FencedCode', 'CodeBlock', 'InlineCode', 'CodeText']
+
+const addAutoCloserEffect = StateEffect.define({
+  map(pos, mapping) {
+    const mapped = mapping.mapPos(pos, -1, MapMode.TrackAfter)
+    return mapped == null ? undefined : mapped
+  }
+})
+
+const autoCloserMark = new class extends RangeValue {}()
+autoCloserMark.startSide = 1
+autoCloserMark.endSide = -1
+
+const autoCloserField = StateField.define({
+  create() {
+    return RangeSet.empty
+  },
+  update(value, tr) {
+    value = value.map(tr.changes)
+    if (tr.selection) {
+      const line = tr.state.doc.lineAt(tr.selection.main.head)
+      value = value.update({ filter: from => from >= line.from && from <= line.to })
+    }
+    for (const effect of tr.effects) {
+      if (effect.is(addAutoCloserEffect)) {
+        value = value.update({ add: [autoCloserMark.range(effect.value, effect.value + 1)] })
+      }
+    }
+    return value
+  }
+})
+
+function isAutoCloserAt(state, pos, marker) {
+  if (state.doc.sliceString(pos, pos + 1) !== marker) return false
+  let found = false
+  state.field(autoCloserField).between(pos, pos + 1, from => {
+    if (from === pos) found = true
+  })
+  return found
+}
+
+function countAutoClosersAfter(state, pos, marker) {
+  let count = 0
+  while (isAutoCloserAt(state, pos + count, marker)) count++
+  return count
+}
+
+function countMarkersBefore(state, pos, marker) {
+  const line = state.doc.lineAt(pos)
+  let count = 0
+  while (pos - count > line.from && state.doc.sliceString(pos - count - 1, pos - count) === marker) count++
+  return count
+}
+
+function isWordChar(state, pos, ch) {
+  return !!ch && state.charCategorizer(pos)(ch) === CharCategory.Word
+}
+
+function isInsideCode(state, pos) {
+  for (let node = syntaxTree(state).resolveInner(pos, -1); node; node = node.parent) {
+    if (CODE_NODES.indexOf(node.name) !== -1) return true
+  }
+  return false
+}
+
+// Caret sits between markers the editor paired and nothing was typed in
+// between yet ("*|*", "**|**"): the run before the caret opens emphasis, which
+// CommonMark only allows when it does not follow a word character
+function isEmptyMarkerPair(state, pos, marker) {
+  const opening = countMarkersBefore(state, pos, marker)
+  if (!opening || !isAutoCloserAt(state, pos, marker)) return false
+  const before = state.doc.sliceString(pos - opening - 1, pos - opening)
+  return !isWordChar(state, pos - opening, before)
+}
+
+function pairMarkerTransaction(state, spec) {
+  return state.update({ ...spec, scrollIntoView: true, userEvent: 'input.type' })
+}
+
+function handleMarkerInput(state, from, to, marker) {
+  const doc = state.doc
+
+  // A selection gets wrapped rather than replaced
+  if (from !== to) {
+    const range = state.selection.main
+    return pairMarkerTransaction(state, {
+      changes: [{ from, insert: marker }, { from: to, insert: marker }],
+      selection: EditorSelection.range(range.anchor + 1, range.head + 1),
+      effects: addAutoCloserEffect.of(to + 1)
+    })
+  }
+
+  const pos = from
+  if (isAutoCloserAt(state, pos, marker)) {
+    if (isEmptyMarkerPair(state, pos, marker)) {
+      // A marker-only line reaching three markers is a code fence or a
+      // horizontal rule ("```", "~~~", "***", "___"), not a pair: drop the
+      // closers so the fence line holds exactly what was typed
+      const line = doc.lineAt(pos)
+      const opening = countMarkersBefore(state, pos, marker)
+      const closing = countAutoClosersAfter(state, pos, marker)
+      const lineStart = !/\S/.test(doc.sliceString(line.from, pos - opening))
+      const lineEnd = !/\S/.test(doc.sliceString(pos + closing, line.to))
+      if (lineStart && lineEnd && opening + 1 >= 3) {
+        return pairMarkerTransaction(state, {
+          changes: { from: pos, to: pos + closing, insert: marker },
+          selection: EditorSelection.cursor(pos + 1)
+        })
+      }
+      // Grow the empty pair: "*|*" becomes "**|**"
+      return pairMarkerTransaction(state, {
+        changes: { from: pos, insert: marker + marker },
+        selection: EditorSelection.cursor(pos + 1),
+        effects: addAutoCloserEffect.of(pos + 1)
+      })
+    }
+    // Closing the pair: step over the closer the editor added
+    return pairMarkerTransaction(state, { selection: EditorSelection.cursor(pos + 1) })
+  }
+
+  const prev = doc.sliceString(pos - 1, pos)
+  const next = doc.sliceString(pos, pos + 1)
+  // No closer when extending a run typed by hand ("``" then "`"), inside a
+  // word (snake_case, a*b), in front of a word, or inside code (SELECT *)
+  if (prev === marker || isWordChar(state, pos, prev) || isWordChar(state, pos, next) || isInsideCode(state, pos)) {
+    return null
+  }
+  return pairMarkerTransaction(state, {
+    changes: { from: pos, insert: marker + marker },
+    selection: EditorSelection.cursor(pos + 1),
+    effects: addAutoCloserEffect.of(pos + 1)
+  })
+}
+
+const markdownMarkerPairInput = EditorView.inputHandler.of((view, from, to, insert) => {
+  const state = view.state
+  if (view.composing || view.compositionStarted || state.readOnly) return false
+  const range = state.selection.main
+  if (state.selection.ranges.length !== 1 || from !== range.from || to !== range.to) return false
+
+  let tr = null
+  if (insert.length === 1 && MARKDOWN_PAIR_MARKERS.indexOf(insert) !== -1) {
+    tr = handleMarkerInput(state, from, to, insert)
+  } else if (insert === ' ' && from === to) {
+    // A marker followed by a space never opens emphasis: "* " starts a list
+    // item and "2 * 3" is maths, so the closers of an empty pair go away
+    const marker = state.doc.sliceString(from - 1, from)
+    if (marker && marker !== '`' && MARKDOWN_PAIR_MARKERS.indexOf(marker) !== -1 && isEmptyMarkerPair(state, from, marker)) {
+      tr = pairMarkerTransaction(state, {
+        changes: { from, to: from + countAutoClosersAfter(state, from, marker), insert },
+        selection: EditorSelection.cursor(from + 1)
+      })
+    }
+  }
+  if (!tr) return false
+  view.dispatch(tr)
+  return true
+})
+
+// Backspace inside an empty pair removes one marker on each side
+function deleteMarkerPair({ state, dispatch }) {
+  if (state.readOnly || state.selection.ranges.length !== 1 || !state.selection.main.empty) return false
+  const pos = state.selection.main.head
+  const marker = state.doc.sliceString(pos - 1, pos)
+  if (!marker || MARKDOWN_PAIR_MARKERS.indexOf(marker) === -1 || !isEmptyMarkerPair(state, pos, marker)) return false
+  dispatch(state.update({
+    changes: { from: pos - 1, to: pos + 1 },
+    selection: EditorSelection.cursor(pos - 1),
+    scrollIntoView: true,
+    userEvent: 'delete.backward'
+  }))
+  return true
+}
+
+const markdownMarkerPairs = [markdownMarkerPairInput, autoCloserField]
+// --- #1505 Markdown marker pairs (end) ---
 
 // --- #1422 Enter: break the line at column 0 (start) ---
 // CodeMirror's default Enter (insertNewlineAndIndent) asks the language how far
@@ -1120,18 +1313,7 @@ function createEditor(host, options = {}) {
       closeBrackets({
         brackets: ['(', '[', '{', "'", '"']
       }),
-      EditorView.inputHandler.of((view, from, to, insert) => {
-        if (insert !== '*' && insert !== '_' && insert !== '~' && insert !== '`') return false
-        const doc = view.state.doc
-        const charAfter = to < doc.length ? doc.sliceString(to, to + 1) : ''
-        // Skip if next char is same (avoid tripling on existing pair)
-        if (charAfter === insert) return false
-        view.dispatch({
-          changes: { from, to, insert: insert + insert },
-          selection: { anchor: from + 1 }
-        })
-        return true
-      }),
+      markdownMarkerPairs,
       markdown({
         base: markdownLanguage,
         codeLanguages,
@@ -1165,6 +1347,7 @@ function createEditor(host, options = {}) {
         { key: 'Ctrl-Space', run: startCompletion },
         { key: 'Mod-Shift-b', run: toggleFencedCodeBlock },
         { key: 'Mod-b', run: wrapSelection('**', '**') },
+        { key: 'Backspace', run: deleteMarkerPair },
         ...closeBracketsKeymap,
         ...completionKeymap,
         { key: 'Mod-i', run: wrapSelection('*', '*') },

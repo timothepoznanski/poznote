@@ -7,6 +7,28 @@
 // NOTIFICATIONS
 // ============================================================================
 
+// The one column the top-right toasts share ("Saved!", "Snapshot added",
+// "Copied"...), so that two at once stack instead of covering each other
+// (issue 1508). Each toast still owns its timer and removes itself.
+window.poznoteToastStack = function () {
+    var stack = document.getElementById('pz-toast-stack');
+    if (stack) return stack;
+
+    stack = document.createElement('div');
+    stack.id = 'pz-toast-stack';
+    stack.setAttribute('aria-live', 'polite');
+    stack.style.position = 'fixed';
+    stack.style.top = '12px';
+    stack.style.right = '20px';
+    stack.style.zIndex = '2147483647';
+    stack.style.display = 'flex';
+    stack.style.flexDirection = 'column';
+    stack.style.alignItems = 'flex-end';
+    stack.style.pointerEvents = 'none';
+    document.body.appendChild(stack);
+    return stack;
+};
+
 function showNotificationPopup(message, type) {
     type = type || 'success';
 
@@ -183,6 +205,9 @@ function closeModal(modalId) {
     if (modalId === 'attachmentModal') {
         hideAttachmentError();
         resetAttachmentForm();
+    }
+    if (modalId === 'linkModal') {
+        restoreLinkModalFocus();
     }
 }
 
@@ -396,6 +421,7 @@ function executeInputModalAction() {
 
 // Link modal functionality
 var linkModalCallback = null;
+var linkModalReturnFocus = null;
 
 // Helper function for removing modal after delay
 function removeModalWithDelay(modalId, delay) {
@@ -445,11 +471,38 @@ function showLinkModal(defaultUrl, defaultText, callback) {
         }
     }
 
+    // Remember where the user was typing so Cancel and Escape can hand the focus back
+    if (!modal.contains(document.activeElement)) {
+        var sel = window.getSelection();
+        linkModalReturnFocus = {
+            element: document.activeElement,
+            range: sel && sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null
+        };
+    }
+
     modal.style.display = 'flex';
-    /* setTimeout(function () {
-        urlInput.focus();
-        urlInput.select();
-    }, 100); */
+
+    // Take the focus at once, otherwise the keystrokes keep landing in the editor
+    // behind the overlay and overwrite the selected text (#1510). Callers keep
+    // the selection themselves (markdown offsets, window.savedRanges.link).
+    try { urlInput.focus({ preventScroll: true }); } catch (e) { urlInput.focus(); }
+    urlInput.select();
+}
+
+function restoreLinkModalFocus() {
+    var saved = linkModalReturnFocus;
+    linkModalReturnFocus = null;
+    if (!saved || !saved.element || !saved.element.isConnected || typeof saved.element.focus !== 'function') return;
+
+    try { saved.element.focus({ preventScroll: true }); } catch (e) { saved.element.focus(); }
+
+    // CodeMirror restores its own selection on focus; a contenteditable note needs the range back
+    if (saved.range && saved.element.isContentEditable && !saved.element.closest('.cm-editor') &&
+        saved.element.contains(saved.range.commonAncestorContainer)) {
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(saved.range);
+    }
 }
 
 function createLinkModal() {
@@ -534,6 +587,9 @@ function executeLinkModalAction() {
     // Reset callback BEFORE calling it to avoid re-entry
     linkModalCallback = null;
 
+    // Give the editor its focus and selection back before the callback edits it
+    restoreLinkModalFocus();
+
     if (callback && url) {
         var finalText = text || url;
         callback(url, finalText);
@@ -547,6 +603,8 @@ function executeLinkModalRemove() {
 
     // Reset callback BEFORE calling it to avoid re-entry
     linkModalCallback = null;
+
+    restoreLinkModalFocus();
 
     // Call the callback with null to signal link removal
     if (callback) {

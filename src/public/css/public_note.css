@@ -252,6 +252,59 @@ body.public-note-page {
     font-weight: var(--pz-weight-semibold);
 }
 
+/* Tables sit in a horizontal scroller (js/public-note.js): a table wider than
+   the screen scrolls sideways instead of being clipped or squeezed */
+:where(.public-note .content) .public-table-scroll {
+    overflow-x: auto;
+    margin: 12px 0;
+}
+
+/* !important: inserted tables carry an inline margin, the scroller owns it */
+:where(.public-note .content) .public-table-scroll > table {
+    margin: 0 !important;
+}
+
+/* Size reference (cqw) for the tables allowed to outgrow the note */
+.public-note-main {
+    container-type: inline-size;
+}
+
+@media screen and (min-width: 801px) {
+    /* A table that needs more room than the note spreads up to the width of
+       the page (the outline panel excluded), centred on the note; a table
+       that fits keeps the note width. The scroller spans the page minus the
+       note's side padding (2 x 24px), shifted left by half the difference.
+       Only for tables starting at the note's left edge (js/public-note.js). */
+    :where(.public-note .content) .public-table-scroll-page {
+        width: calc(100cqw - 48px);
+        margin-left: calc((100% + 48px - 100cqw) / 2);
+    }
+
+    :where(.public-note .content) .public-table-scroll-page > table {
+        width: max-content !important;
+        min-width: min(100%, 900px);
+        max-width: 100%;
+        margin: 0 auto !important;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    /* A phone does not squeeze the table: it takes the width its content
+       needs (never less than the screen) and scrolls sideways. The column
+       widths saved in the note are percentages of the author's screen and
+       would squeeze short cells here, so the content sizes the columns; only
+       text longer than 18em wraps (fitted columns keep their text-wrap-mode). */
+    :where(.public-note .content) .public-table-scroll > table {
+        width: max-content !important;
+        min-width: 100%;
+    }
+
+    :where(.public-note .content) .public-table-scroll > table :is(td, th) {
+        width: auto !important;
+        max-width: 18em;
+    }
+}
+
 /* Code block styles for public notes */
 .public-note .content code {
     background-color: transparent;

@@ -484,7 +484,7 @@ pre code.hljs,
     /* Put it last in the toolbar */
 }
 
-/* Mobile title horizontal scroll instead of ellipsis */
+/* Mobile tree rows: long titles end with an ellipsis */
 .folder-toggle,
 .note-list-item {
     display: flex !important;
@@ -494,17 +494,16 @@ pre code.hljs,
     box-sizing: border-box !important;
 }
 
-/* Allow name parts to scroll horizontally, but NOT push everything to the right if short */
+/* Names shrink to the row and end with an ellipsis, but do NOT push everything to the right if short */
 .folder-name,
 .note-title {
     flex: 0 1 auto !important;
     min-width: 0 !important;
-    overflow-x: auto !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
     white-space: nowrap !important;
-    text-overflow: clip !important;
+    text-overflow: ellipsis !important;
     display: inline-block !important; /* Ensure block-level properties inside flex container */
-    -ms-overflow-style: none;
-    scrollbar-width: none;
 }
 
 /* Note count should stay pinned next to folder name */
@@ -534,9 +533,18 @@ pre code.hljs,
     overflow: visible !important;
 }
 
-/* Specific overrides for notes inside folders and the editor title */
+/* Specific overrides for notes inside folders */
 .note-in-folder a.links_arbo_left .note-title,
-a.links_arbo_left .note-title,
+a.links_arbo_left .note-title {
+    display: inline-block !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+    width: auto !important;
+    max-width: 100% !important;
+}
+
+/* The editor title scrolls horizontally */
 .css-title {
     display: inline-block !important;
     overflow-x: auto !important;
@@ -547,9 +555,7 @@ a.links_arbo_left .note-title,
 }
 
 a.links_arbo_left::-webkit-scrollbar,
-.folder-toggle::-webkit-scrollbar,
-.folder-name::-webkit-scrollbar,
-.note-title::-webkit-scrollbar {
+.folder-toggle::-webkit-scrollbar {
     display: none !important;
 }
 

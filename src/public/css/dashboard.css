@@ -782,8 +782,9 @@ html[data-theme='dark'] .note-color-name {
 }
 
 /* Four footer buttons: widen the modal so they fit on one row (same
-   recipe as #userSettingsInfoModal in css/modals/base.css), stacking
-   them on small screens. */
+   recipe as #userSettingsInfoModal in css/modals/base.css). On small
+   screens the two secondary actions shrink to their icon (the label
+   stays in title/aria-label) so the row still fits. */
 #noteColorModal .modal-content {
     max-width: 560px;
 }
@@ -796,9 +797,53 @@ html[data-theme='dark'] .note-color-name {
     white-space: nowrap;
 }
 
+#noteColorClearBtn .lucide {
+    display: none;
+}
+
 @media (max-width: 480px) {
+    #noteColorModal .modal-content {
+        width: 94%;
+        padding: 24px 20px;
+    }
+
     #noteColorModal .modal-buttons {
-        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    #noteColorModal .modal-buttons .note-color-btn-label {
+        display: none;
+    }
+
+    #noteColorModal .modal-buttons button.note-color-manage-btn,
+    #noteColorModal .modal-buttons button#noteColorClearBtn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    #noteColorClearBtn .lucide {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+    }
+
+    #noteColorModal .modal-buttons .note-color-manage-btn .lucide {
+        width: 16px;
+        height: 16px;
+    }
+
+    /* Cancel and Apply share what is left of the row. */
+    #noteColorModal .modal-buttons button.btn-cancel,
+    #noteColorModal .modal-buttons button.btn-primary {
+        flex: 1 1 auto;
+        padding-left: 10px;
+        padding-right: 10px;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 }
 

@@ -1,7 +1,7 @@
 // Note export and the create menu for Poznote.
 // 
 // Exporting a note (HTML, Markdown, JSON, print) and the "+" menu that creates notes,
-// task lists, diary entries, folders and workspaces.
+// task lists, diary entries and folders.
 
 // Function to download a note (handles markdown and HTML)
 // Store current export note info
@@ -122,8 +122,8 @@ function openCreateMenu(options) {
     var menu = document.getElementById('create-menu');
     if (!menu) return false;
 
-    // Inside a folder the menu offers notes and a subfolder; a new folder or
-    // workspace only makes sense from the sidebar button.
+    // Inside a folder the menu offers notes and a subfolder; a new top-level
+    // folder only makes sense from the sidebar button.
     var otherSection = document.getElementById('otherSection');
     var subfolderOption = document.getElementById('subfolderOption');
     if (otherSection) otherSection.style.display = isCreatingInFolder ? 'none' : 'block';
@@ -245,9 +245,6 @@ function executeCreateAction() {
             break;
         case 'folder':
             newFolder();
-            break;
-        case 'workspace':
-            createWorkspace();
             break;
         case 'diary':
             createDiaryEntryForToday();
@@ -482,22 +479,6 @@ function createTaskListNoteInUtils() {
 
 function createMarkdownNoteInUtils() {
     createNoteOfType('markdown', ['createMarkdownNote']);
-}
-
-function createWorkspace() {
-    // Same small modal as the sidebar workspace menu (js/workspaces-create.js), so
-    // both entry points create a workspace the same way. Pages that do not
-    // include modals.php fall back to the workspaces page.
-    if (typeof window.openCreateWorkspaceModal === 'function') {
-        window.openCreateWorkspaceModal();
-        return;
-    }
-
-    if (typeof window.showNoteCreationLoading === 'function') {
-        window.showNoteCreationLoading();
-    }
-
-    window.location = 'workspaces.php?new=1';
 }
 
 // Legacy function for backwards compatibility

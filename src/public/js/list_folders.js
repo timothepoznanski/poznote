@@ -8,53 +8,164 @@
 
     const workspace = document.body.getAttribute('data-workspace') || '';
 
-    // Search/filter functionality
+    // Search/filter and fold/unfold
+    //
+    // Rows are flat siblings carrying their nesting level in data-depth, so
+    // a row's ancestors are the nearest preceding rows of strictly decreasing
+    // depth and its subfolders the following rows of greater depth.
     const filterInput = document.getElementById('filterInput');
     const clearFilterBtn = document.getElementById('clearFilterBtn');
-    const folderItems = document.querySelectorAll('.folder-item');
+    const folderItems = Array.from(document.querySelectorAll('.folder-item'));
     const filterStats = document.getElementById('filterStats');
+    const treeToolbar = document.getElementById('foldersTreeToolbar');
+    const toggleAllBtn = document.getElementById('toggleAllFoldersBtn');
+    const bodyData = document.body.dataset;
+    const txt = {
+        expandFolder: bodyData.txtExpandFolder || 'Expand folder',
+        collapseFolder: bodyData.txtCollapseFolder || 'Collapse folder',
+        expandAll: bodyData.txtExpandAll || 'Expand all',
+        collapseAll: bodyData.txtCollapseAll || 'Collapse all'
+    };
 
-    if (filterInput) {
-        filterInput.addEventListener('input', function() {
-            const query = this.value.toLowerCase().trim();
-            let visibleCount = 0;
+    const depthOf = item => parseInt(item.getAttribute('data-depth'), 10) || 0;
+    const collapsibleItems = folderItems.filter(item => item.getAttribute('data-has-children') === '1');
 
-            // Rows are flat siblings carrying their nesting level in
-            // data-depth, so a row's ancestors are the nearest preceding rows
-            // of strictly decreasing depth. Keep them visible around a match,
-            // otherwise a matching subfolder would appear detached from the
-            // hierarchy the list is meant to show.
-            const matched = new Set();
+    // Folded folders, remembered per account in this browser. Ids of folders
+    // that no longer have subfolders are dropped on load.
+    const COLLAPSED_STORAGE_KEY = 'poznote.folders.collapsedFolders';
+    const folderStorage = window.__poznoteUserStorage || window.localStorage;
+    const collapsedIds = new Set();
+    try {
+        const stored = JSON.parse(folderStorage.getItem(COLLAPSED_STORAGE_KEY) || '[]');
+        const collapsibleIds = new Set(collapsibleItems.map(item => item.getAttribute('data-folder-id')));
+        if (Array.isArray(stored)) {
+            stored.map(String).forEach(id => { if (collapsibleIds.has(id)) collapsedIds.add(id); });
+        }
+    } catch (error) {
+        // No storage: every folder starts unfolded
+    }
+
+    function saveCollapsedIds() {
+        try {
+            folderStorage.setItem(COLLAPSED_STORAGE_KEY, JSON.stringify(Array.from(collapsedIds)));
+        } catch (error) {
+            // The fold state just won't survive a reload
+        }
+    }
+
+    function updateToggleButton(item, collapsed) {
+        const button = item.querySelector('[data-action="toggle-folder-collapse"]');
+        if (!button) return;
+        const label = collapsed ? txt.expandFolder : txt.collapseFolder;
+        button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        button.title = label;
+        button.setAttribute('aria-label', label);
+        const icon = button.querySelector('.lucide');
+        if (icon) {
+            icon.classList.toggle('lucide-chevron-right', collapsed);
+            icon.classList.toggle('lucide-chevron-down', !collapsed);
+        }
+    }
+
+    function applyFolderVisibility() {
+        const query = filterInput ? filterInput.value.toLowerCase().trim() : '';
+        const filtering = query.length > 0;
+        const visible = new Set();
+        let visibleCount = 0;
+
+        if (filtering) {
+            // Folding is set aside while filtering: a match shows with its
+            // ancestors, otherwise a matching subfolder would appear detached
+            // from the hierarchy the list is meant to show
             folderItems.forEach((item, index) => {
                 const name = item.getAttribute('data-folder-name').toLowerCase();
                 if (!name.includes(query)) return;
 
-                matched.add(index);
+                visible.add(index);
                 visibleCount++;
 
-                let depth = parseInt(item.getAttribute('data-depth'), 10) || 0;
+                let depth = depthOf(item);
                 for (let i = index - 1; i >= 0 && depth > 0; i--) {
-                    const ancestorDepth = parseInt(folderItems[i].getAttribute('data-depth'), 10) || 0;
+                    const ancestorDepth = depthOf(folderItems[i]);
                     if (ancestorDepth < depth) {
-                        matched.add(i);
+                        visible.add(i);
                         depth = ancestorDepth;
                     }
                 }
             });
-
+        } else {
+            // A row is hidden while it sits below a folded folder
+            let hiddenBelowDepth = null;
             folderItems.forEach((item, index) => {
-                item.style.display = matched.has(index) ? 'flex' : 'none';
+                const depth = depthOf(item);
+                if (hiddenBelowDepth !== null && depth > hiddenBelowDepth) return;
+                hiddenBelowDepth = collapsedIds.has(item.getAttribute('data-folder-id')) ? depth : null;
+                visible.add(index);
             });
+        }
 
-            if (query.length > 0) {
-                clearFilterBtn.classList.remove('initially-hidden');
-                filterStats.classList.remove('initially-hidden');
-                filterStats.textContent = visibleCount + ' ' + (visibleCount > 1 ? 'folders' : 'folder');
-            } else {
-                clearFilterBtn.classList.add('initially-hidden');
-                filterStats.classList.add('initially-hidden');
-            }
+        folderItems.forEach((item, index) => {
+            item.style.display = visible.has(index) ? 'flex' : 'none';
+            const collapsed = !filtering && collapsedIds.has(item.getAttribute('data-folder-id'));
+            item.classList.toggle('is-collapsed', collapsed);
+            updateToggleButton(item, collapsed);
         });
+
+        if (filtering) {
+            clearFilterBtn.classList.remove('initially-hidden');
+            filterStats.classList.remove('initially-hidden');
+            filterStats.textContent = visibleCount + ' ' + (visibleCount > 1 ? 'folders' : 'folder');
+        } else if (clearFilterBtn && filterStats) {
+            clearFilterBtn.classList.add('initially-hidden');
+            filterStats.classList.add('initially-hidden');
+        }
+
+        updateTreeToolbar(filtering);
+    }
+
+    // "Expand all" while any folder is folded, "Collapse all" otherwise
+    function updateTreeToolbar(filtering) {
+        if (!treeToolbar || !toggleAllBtn) return;
+        treeToolbar.classList.toggle('initially-hidden', collapsibleItems.length === 0);
+
+        const expand = collapsedIds.size > 0;
+        toggleAllBtn.disabled = filtering;
+        toggleAllBtn.setAttribute('aria-expanded', expand ? 'false' : 'true');
+        const label = document.getElementById('toggleAllFoldersLabel');
+        if (label) label.textContent = expand ? txt.expandAll : txt.collapseAll;
+        const icon = toggleAllBtn.querySelector('.lucide');
+        if (icon) {
+            icon.classList.toggle('lucide-chevron-down', expand);
+            icon.classList.toggle('lucide-chevron-up', !expand);
+        }
+    }
+
+    function toggleFolderCollapse(item) {
+        const id = item.getAttribute('data-folder-id');
+        if (!id) return;
+        if (collapsedIds.has(id)) {
+            collapsedIds.delete(id);
+        } else {
+            collapsedIds.add(id);
+        }
+        saveCollapsedIds();
+        applyFolderVisibility();
+    }
+
+    if (toggleAllBtn) {
+        toggleAllBtn.addEventListener('click', function() {
+            if (collapsedIds.size > 0) {
+                collapsedIds.clear();
+            } else {
+                collapsibleItems.forEach(item => collapsedIds.add(item.getAttribute('data-folder-id')));
+            }
+            saveCollapsedIds();
+            applyFolderVisibility();
+        });
+    }
+
+    if (filterInput) {
+        filterInput.addEventListener('input', applyFolderVisibility);
     }
 
     if (clearFilterBtn) {
@@ -64,6 +175,8 @@
             filterInput.focus();
         });
     }
+
+    applyFolderVisibility();
 
     // Folder actions
     //
@@ -368,6 +481,16 @@
             } else if (clickedRowMenuButton !== actionElement) {
                 openRowMenu(actionElement);
             }
+            return;
+        }
+
+        // Chevron of a folder with subfolders: fold or unfold it, without
+        // opening the row's Kanban board
+        if (action === 'toggle-folder-collapse') {
+            event.preventDefault();
+            event.stopPropagation();
+            const item = actionElement.closest('.folder-item');
+            if (item) toggleFolderCollapse(item);
             return;
         }
 

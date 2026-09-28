@@ -29,7 +29,7 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 <body class="graph-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php include __DIR__ . '/../icon_sidebar.php'; ?>
 	<div class="graph-container">
-		<h1 class="poznote-page-title"><i class="lucide lucide-network"></i> <?php echo t_h('home.graph', [], 'Graph'); ?> <?php echo poznoteRenderPageTitleWorkspace($workspace); ?></h1>
+		<h1 class="poznote-page-title"><span class="poznote-page-title-name"><i class="lucide lucide-network"></i> <?php echo t_h('home.graph', [], 'Graph'); ?></span> <?php echo poznoteRenderPageTitleWorkspace($workspace); ?></h1>
 
 		<div class="graph-toolbar">
 			<div class="graph-search-wrapper">

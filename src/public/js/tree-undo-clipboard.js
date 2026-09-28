@@ -232,7 +232,7 @@
         el.setAttribute('data-tree-toast', 'true');
         el.innerHTML = '<div class="save-notification-inner"><div class="save-notification-check">✓</div><span></span></div>';
         el.querySelector('span').textContent = message;
-        document.body.appendChild(el);
+        (window.poznoteToastStack ? window.poznoteToastStack() : document.body).appendChild(el);
 
         toastTimeout = setTimeout(function () {
             if (el.parentNode) el.parentNode.removeChild(el);
@@ -1524,7 +1524,8 @@
         }
         if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
 
-        var key = (e.key || '').toLowerCase();
+        // The Latin letter even on a Cyrillic or Greek layout (js/shortcut-key.js)
+        var key = window.poznoteShortcutKey ? window.poznoteShortcutKey(e) : (e.key || '').toLowerCase();
         var isUndo = key === 'z' && !e.shiftKey;
         var isRedo = (key === 'z' && e.shiftKey) || (key === 'y' && !e.shiftKey);
         var isCopy = key === 'c' && !e.shiftKey;

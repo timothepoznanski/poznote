@@ -66,7 +66,7 @@ $currentLang = getUserLanguage();
 
 	<div class="notes-manager-container">
 
-		<h1 class="poznote-page-title"><i class="lucide lucide-sticky-note"></i> <?php echo t_h('common.back_to_notes', [], 'Notes'); ?> <?php echo poznoteRenderPageTitleWorkspace($pageWorkspace); ?></h1>
+		<h1 class="poznote-page-title"><span class="poznote-page-title-name"><i class="lucide lucide-sticky-note"></i> <?php echo t_h('common.back_to_notes', [], 'Notes'); ?></span> <?php echo poznoteRenderPageTitleWorkspace($pageWorkspace); ?></h1>
 
 		<!-- Filter bar -->
 		<div class="nm-filter-bar">

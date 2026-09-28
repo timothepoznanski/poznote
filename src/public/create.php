@@ -37,7 +37,7 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
     <?php include __DIR__ . '/../icon_sidebar.php'; ?>
     <div class="home-container">
 
-        <h1 class="poznote-page-title"><i class="lucide lucide-plus-circle"></i> <?php echo t_h('sidebar.create', [], 'Create'); ?> <?php echo poznoteRenderPageTitleWorkspace($pageWorkspace); ?></h1>
+        <h1 class="poznote-page-title"><span class="poznote-page-title-name"><i class="lucide lucide-plus-circle"></i> <?php echo t_h('sidebar.create', [], 'Create'); ?></span> <?php echo poznoteRenderPageTitleWorkspace($pageWorkspace); ?></h1>
 
         <div class="home-grid">
 
@@ -100,18 +100,6 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
                 </div>
             </a>
 
-            <!-- Workspace: for the owner of the account on screen -->
-            <?php if ((!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser())): ?>
-            <a href="#" class="home-card" id="create-workspace-card" data-create-type="workspace" title="<?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?>">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-layers"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?></span>
-                </div>
-            </a>
-            <?php endif; ?>
-
         </div>
 
     </div>
@@ -163,7 +151,7 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
                 
                 // Execute create action
                 if (typeof executeCreateAction === 'function') {
-                    const immediateExitTypes = ['html', 'markdown', 'list', 'workspace', 'diary'];
+                    const immediateExitTypes = ['html', 'markdown', 'list', 'diary'];
                     if (immediateExitTypes.includes(createType) && typeof showNoteCreationLoading === 'function') {
                         showNoteCreationLoading(this);
                         window.setTimeout(executeCreateAction, 80);

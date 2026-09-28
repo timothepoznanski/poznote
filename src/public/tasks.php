@@ -45,7 +45,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<?php include __DIR__ . '/../icon_sidebar.php'; ?>
 	<div class="tasks-container">
 
-		<h1 class="poznote-page-title"><i class="lucide lucide-list-todo"></i> <?php echo t_h('tasks_page.title', [], 'Tasks'); ?> <?php echo poznoteRenderPageTitleWorkspace($pageWorkspace); ?></h1>
+		<h1 class="poznote-page-title"><span class="poznote-page-title-name"><i class="lucide lucide-list-todo"></i> <?php echo t_h('tasks_page.title', [], 'Tasks'); ?></span> <?php echo poznoteRenderPageTitleWorkspace($pageWorkspace); ?></h1>
 
 		<div id="tasksProgressSection" class="tasks-progress-section initially-hidden">
 			<div class="tasks-progress-header">
@@ -77,22 +77,25 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 				<button type="button" class="tasks-filter-chip" data-filter="dated"><?php echo t_h('tasks_page.filter_dated', [], 'With due date'); ?></button>
 				<button type="button" class="tasks-filter-chip" data-filter="completed"><?php echo t_h('tasks_page.filter_completed', [], 'Completed'); ?></button>
 			</div>
-			<div class="filter-input-wrapper">
-				<input
-					type="text"
-					id="filterInput"
-					class="filter-input"
-					placeholder="<?php echo t_h('tasks_page.filter_placeholder', [], 'Filter by task, title or folder name...'); ?>"
-				/>
-				<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
-					<i class="lucide lucide-x"></i>
-				</button>
-			</div>
-			<div class="tasks-collapse-actions">
-				<button type="button" id="toggleAllNotesBtn" class="tasks-collapse-btn" aria-expanded="true" title="<?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?>">
-					<i class="lucide lucide-chevron-up"></i>
-					<span id="toggleAllNotesLabel"><?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?></span>
-				</button>
+			<?php // Filter input + collapse/expand toggle: one row, desktop and mobile ?>
+			<div class="tasks-filter-search">
+				<div class="filter-input-wrapper">
+					<input
+						type="text"
+						id="filterInput"
+						class="filter-input"
+						placeholder="<?php echo t_h('tasks_page.filter_placeholder', [], 'Filter by task, title or folder name...'); ?>"
+					/>
+					<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
+						<i class="lucide lucide-x"></i>
+					</button>
+				</div>
+				<div class="tasks-collapse-actions">
+					<button type="button" id="toggleAllNotesBtn" class="tasks-collapse-btn" aria-expanded="true" title="<?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?>">
+						<i class="lucide lucide-chevron-up"></i>
+						<span id="toggleAllNotesLabel"><?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?></span>
+					</button>
+				</div>
 			</div>
 		</div>
 

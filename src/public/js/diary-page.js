@@ -621,7 +621,9 @@
                 finishJournalEdit(state);
                 return;
             }
-            if ((e.ctrlKey || e.metaKey) && !e.altKey && (e.key === 's' || e.key === 'S')) {
+            // The Latin letter even on a Cyrillic or Greek layout (js/shortcut-key.js)
+            var key = window.poznoteShortcutKey ? window.poznoteShortcutKey(e) : (e.key || '').toLowerCase();
+            if ((e.ctrlKey || e.metaKey) && !e.altKey && key === 's') {
                 e.preventDefault();
                 saveJournalEdit(state);
                 return;

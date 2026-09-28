@@ -34,7 +34,7 @@ $currentLang = getUserLanguage();
 	<script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
-<body class="shared-page offline-list-page has-icon-sidebar"
+<body class="shared-page shared-table-page offline-list-page has-icon-sidebar"
 	data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
 	data-txt-error="<?php echo t_h('common.error', [], 'Error'); ?>"
 	data-txt-untitled="<?php echo t_h('common.untitled', [], 'Untitled'); ?>"
@@ -69,7 +69,7 @@ $currentLang = getUserLanguage();
 	<?php include __DIR__ . '/../icon_sidebar.php'; ?>
 
 	<div class="shared-container">
-		<h1 class="poznote-page-title"><i class="lucide lucide-wifi-off"></i> <?php echo t_h('offline.page.title', [], 'Offline'); ?> <?php echo poznoteRenderPageTitleWorkspace($pageWorkspace); ?></h1>
+		<h1 class="poznote-page-title"><span class="poznote-page-title-name"><i class="lucide lucide-wifi-off"></i> <?php echo t_h('offline.page.title', [], 'Offline'); ?></span> <?php echo poznoteRenderPageTitleWorkspace($pageWorkspace); ?></h1>
 
 		<div class="shared-filter-bar initially-hidden" id="sharedFilterBar">
 			<div class="filter-type-buttons">

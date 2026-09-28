@@ -327,12 +327,11 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-modal-actions > .bt
     white-space: nowrap;
 }
 
-/* Revoke modal: delete for good, or toggle public accessibility. The width
-   follows the action row so the three buttons stay on one line. */
+/* Revoke modal: delete for good, or toggle public accessibility. The
+   actions stack one per line, all at the width of the dialog. */
 body.shared-page .shared-revoke-modal .shared-revoke-modal-content {
-    width: fit-content;
-    min-width: min(440px, calc(100vw - 32px));
-    max-width: min(680px, calc(100vw - 32px));
+    width: min(440px, calc(100vw - 32px));
+    max-width: none;
     box-sizing: border-box;
     padding: 18px 20px 20px;
     border: 1px solid rgba(var(--pz-shadow-rgb), 0.08);
@@ -347,28 +346,22 @@ body.shared-page .shared-revoke-modal .shared-revoke-modal-text {
 
 body.shared-page .shared-revoke-modal .shared-revoke-modal-actions {
     display: flex;
-    flex-wrap: nowrap;
-    justify-content: flex-end;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
     gap: 8px;
     margin-top: 16px;
 }
 
-@media (max-width: 680px) {
-    body.shared-page .shared-revoke-modal .shared-revoke-modal-actions {
-        flex-wrap: wrap;
-    }
-}
-
 body.shared-page .shared-revoke-modal .shared-revoke-modal-actions > .btn {
-    width: auto !important;
-    min-width: 110px;
+    width: 100% !important;
     margin: 0 !important;
+    padding-top: 10px;
+    padding-bottom: 10px;
     display: inline-flex !important;
     align-items: center;
     justify-content: center !important;
     height: auto !important;
-    white-space: nowrap;
+    white-space: normal;
 }
 
 @media (max-width: 680px) {

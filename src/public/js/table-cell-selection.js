@@ -309,7 +309,8 @@
             clearSelection();
             return;
         }
-        var key = e.key ? e.key.toLowerCase() : '';
+        // The Latin letter even on a Cyrillic or Greek layout (js/shortcut-key.js)
+        var key = window.poznoteShortcutKey ? window.poznoteShortcutKey(e) : (e.key || '').toLowerCase();
         var mod = e.ctrlKey || e.metaKey;
 
         if (mod && key === 'c') {
@@ -696,7 +697,12 @@
         while (table.rows.length < neededRows) {
             var tr = document.createElement('tr');
             var cols = Math.max(tableCols, neededCols);
-            for (var j = 0; j < cols; j++) tr.appendChild(makeCell());
+            for (var j = 0; j < cols; j++) {
+                var newCell = makeCell();
+                // Same alignment and width as the column it lands in
+                if (window.pzTableColumns) window.pzTableColumns.copyColumnFormat(lastRow.cells[j], newCell);
+                tr.appendChild(newCell);
+            }
             section.appendChild(tr);
         }
 

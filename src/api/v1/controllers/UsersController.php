@@ -1214,6 +1214,7 @@ class UsersController {
             'users_scanned' => 0,
             'users_added' => 0,
             'links_rebuilt' => 0,
+            'links_skipped' => 0,
             'errors' => []
         ];
         
@@ -1269,28 +1270,13 @@ class UsersController {
                         $stats['users_added']++;
                     }
                     
-                    // Collect shared notes
-                    // Check if table exists first
-                    $tableCheck = $userCon->query("SELECT name FROM sqlite_master WHERE type='table' AND name='shared_notes'");
-                    if ($tableCheck->fetch()) {
-                        $stmt = $userCon->query("SELECT token, note_id FROM shared_notes");
-                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                            $st = $masterCon->prepare("INSERT OR REPLACE INTO shared_links (token, user_id, target_type, target_id) VALUES (?, ?, 'note', ?)");
-                            $st->execute([$row['token'], $userId, (int)$row['note_id']]);
-                            $stats['links_rebuilt']++;
-                        }
-                    }
-                    
-                    // Collect shared folders
-                    $tableCheck = $userCon->query("SELECT name FROM sqlite_master WHERE type='table' AND name='shared_folders'");
-                    if ($tableCheck->fetch()) {
-                        $stmt = $userCon->query("SELECT token, folder_id FROM shared_folders");
-                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                            $st = $masterCon->prepare("INSERT OR REPLACE INTO shared_links (token, user_id, target_type, target_id) VALUES (?, ?, 'folder', ?)");
-                            $st->execute([$row['token'], $userId, (int)$row['folder_id']]);
-                            $stats['links_rebuilt']++;
-                        }
-                    }
+                    // Re-register this account's note and folder share tokens
+                    // (same routine a backup restore runs for the restored
+                    // account, see users/db_master.php). A token two accounts
+                    // both claim stays with the first one scanned.
+                    $linkStats = syncSharedLinksFromUserDatabase($userId, $userCon);
+                    $stats['links_rebuilt'] += $linkStats['registered'];
+                    $stats['links_skipped'] += $linkStats['skipped'];
 
                     $userCon = null; // Close connection
                     

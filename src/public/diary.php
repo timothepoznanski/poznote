@@ -200,7 +200,7 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
 	<?php include __DIR__ . '/../icon_sidebar.php'; ?>
 
 	<div class="favorites-container dashboard-container">
-		<h1 class="poznote-page-title"><i class="lucide lucide-book-open"></i> <?php echo t_h('diary.title', [], 'Diary'); ?> <?php echo poznoteRenderPageTitleWorkspace($diaryWorkspace); ?></h1>
+		<h1 class="poznote-page-title"><span class="poznote-page-title-name"><i class="lucide lucide-book-open"></i> <?php echo t_h('diary.title', [], 'Diary'); ?></span> <?php echo poznoteRenderPageTitleWorkspace($diaryWorkspace); ?></h1>
 
 		<header class="dashboard-topbar">
 			<div class="diary-actions">
@@ -337,6 +337,7 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
 	<script src="<?php echo poznoteAsset('js/navigation.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 	<script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
+	<script src="<?php echo poznoteAsset('js/shortcut-key.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/diary-page.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/board-view-menu.js'); ?>"></script>
 </body>

@@ -27,8 +27,7 @@
         'card:create-task-list-card': '.create-note-option[data-type="list"]',
         'card:create-folder-card': '.create-note-option[data-type="folder"]',
         'card:create-subfolder-card': '.create-note-option[data-type="subfolder"]',
-        'card:create-diary-entry-card': '.create-note-option[data-type="diary"]',
-        'card:create-workspace-card': '.create-note-option[data-type="workspace"]'
+        'card:create-diary-entry-card': '.create-note-option[data-type="diary"]'
     };
 
     var syncScheduled = false;

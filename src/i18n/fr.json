@@ -1550,9 +1550,6 @@
       },
       "folder": {
         "title": "Dossier"
-      },
-      "workspace": {
-        "title": "Espace de travail"
       }
     },
     "folder_icon": {
@@ -2242,6 +2239,13 @@
       "insert_row_below": "Insérer une ligne en dessous",
       "insert_column_left": "Insérer une colonne à gauche",
       "insert_column_right": "Insérer une colonne à droite",
+      "align_column": "Aligner la colonne",
+      "align_row": "Aligner la ligne",
+      "align_cell": "Aligner la cellule",
+      "align_left": "Gauche",
+      "align_center": "Centrer",
+      "align_right": "Droite",
+      "reset_column_widths": "Réinitialiser la largeur des colonnes",
       "delete_row": "Supprimer la ligne",
       "delete_column": "Supprimer la colonne",
       "delete_table": "Supprimer le tableau",
@@ -2961,13 +2965,19 @@
       "token_or_folder_auth_missing": "Lien ou autorisation du dossier manquant",
       "link_in_use": "Ce lien personnalisé est déjà utilisé",
       "link_invalid": "Lien personnalisé invalide. Caractères autorisés : lettres, chiffres, -, _, . (4 à 128 caractères)",
-      "shared_folder_not_found": "Dossier partagé introuvable.\n\nCela peut arriver après une restauration.\n\nUn administrateur doit peut-être reconstruire la base master dans Paramètres > Outils d'administration afin de réparer les liens de partage.",
-      "shared_note_not_found_or_denied": "Note partagée introuvable ou accès refusé.\n\nCela peut arriver après une restauration.\n\nUn administrateur doit peut-être reconstruire la base master dans Paramètres > Outils d'administration afin de réparer les liens de partage.",
-      "folder_not_found": "Dossier introuvable.\n\nCela peut arriver après une restauration.\n\nUn administrateur doit peut-être reconstruire la base master dans Paramètres > Outils d'administration afin de réparer les liens de partage.",
+      "shared_folder_not_found": "Dossier partagé introuvable",
+      "shared_folder_not_found_message": "Aucun dossier partagé ne correspond à ce lien. Le partage a peut-être été supprimé par son propriétaire, ou le lien est erroné. Si vous pensez devoir y avoir accès, contactez le propriétaire ou l'administrateur.",
+      "shared_note_not_found": "Note partagée introuvable",
+      "shared_note_not_found_message": "Aucune note partagée ne correspond à ce lien. Le partage a peut-être été supprimé par son propriétaire, ou le lien est erroné. Si vous pensez devoir y avoir accès, contactez le propriétaire ou l'administrateur.",
+      "note_unavailable_message": "Cette note n'est plus disponible. Son propriétaire l'a peut-être supprimée. Contactez le propriétaire ou l'administrateur si vous pensez qu'il s'agit d'une erreur.",
+      "link_incomplete_message": "Ce lien est incomplet, le contenu partagé ne peut donc pas être identifié. Vérifiez le lien que vous avez reçu, ou demandez un nouveau lien à la personne qui l'a partagé.",
+      "folder_not_found": "Dossier introuvable",
+      "folder_unavailable_message": "Ce dossier n'est plus disponible. Son propriétaire l'a peut-être supprimé. Contactez le propriétaire ou l'administrateur si vous pensez qu'il s'agit d'une erreur.",
       "note_not_found": "Note introuvable",
       "server_error": "Erreur serveur",
       "share_disabled_title": "Ce partage est inaccessible",
-      "share_disabled_message": "Le propriétaire a rendu ce partage inaccessible."
+      "share_disabled_message": "Le propriétaire a rendu ce partage inaccessible. Contactez le propriétaire ou l'administrateur si vous avez de nouveau besoin d'y accéder.",
+      "registry_admin_hint": "Vous êtes connecté en tant qu'administrateur. Si le propriétaire voit toujours ce partage dans son compte, le registre des liens partagés est désynchronisé : reconstruisez la base master depuis Paramètres > Outils d'administration."
     },
     "edit": {
       "button": "Modifier",
@@ -2976,7 +2986,7 @@
       "locked": "Quelqu'un d'autre est en train de modifier cette note. Réessayez plus tard.",
       "lock_lost": "Quelqu'un d'autre modifie maintenant cette note. Vos dernières modifications ne peuvent pas être enregistrées."
     },
-    "shared_note_not_found_or_denied": "Note partagée introuvable ou accès refusé. Cela peut arriver après une restauration. Un administrateur devra peut-être reconstruire la base principale dans Réglages > Outils d'administration pour réparer les liens partagés.",
+    "access_denied_hint": "Seuls les comptes choisis par le propriétaire peuvent ouvrir ce partage. Contactez le propriétaire ou l'administrateur si vous avez besoin d'y accéder.",
     "token_update_failed": "Impossible de mettre à jour le jeton"
   },
   "public_folder": {
@@ -3546,10 +3556,11 @@
       "maintenance": {
         "title": "Reconstruire la base Master",
         "subtitle": "",
-        "description": "La base de données principale (master.db) contient les informations des utilisateurs, leurs liens publics et les réglages globaux de Poznote. Si ce fichier est perdu ou corrompu, ou si certains liens publics ne fonctionnent plus après une restauration, cet outil scanne vos dossiers 'data/users' pour réinscrire automatiquement les comptes, récupérer leurs vrais noms depuis leurs bases personnelles et rétablir tous les liens de partage publics.",
+        "description": "La base de données principale (master.db) contient les informations des utilisateurs, leurs liens publics et les réglages globaux de Poznote. Si ce fichier est perdu ou corrompu, ou si certains liens publics ne fonctionnent plus après une copie manuelle des dossiers utilisateurs, cet outil scanne vos dossiers 'data/users' pour réinscrire automatiquement les comptes, récupérer leurs vrais noms depuis leurs bases personnelles et rétablir tous les liens de partage publics.",
         "repair_registry": "Reconstruction",
         "repair_registry_confirm": "Cela va scanner tous les dossiers utilisateurs et reconstruire la base de données master.",
         "repair_registry_success": "Base de données master reconstruite avec succès :\n\n- {{scanned}} dossiers scannés\n- {{added}} utilisateurs restaurés\n- {{links}} liens de partage reconstruits",
+        "repair_registry_skipped": "- {{skipped}} liens partagés conservés par un autre compte",
         "repair_registry_error": "Erreur de reconstruction : {{error}}"
       },
       "administrator": "Administrateur",
@@ -5215,7 +5226,8 @@
     "banner": {
       "open": "Ouvrir les notes hors ligne",
       "offline": "Vous êtes hors ligne. Les notes modifiées récemment restent consultables et modifiables en mode hors ligne.",
-      "offline_no_copies": "Vous êtes hors ligne. Les modifications seront enregistrées au retour de la connexion."
+      "offline_no_copies": "Vous êtes hors ligne. Les modifications seront enregistrées au retour de la connexion.",
+      "stuck": "Les notes hors ligne ne se sont pas ouvertes : ce navigateur attend toujours le serveur. Si un VPN est actif, le désactiver permet de les ouvrir."
     },
     "settings": {
       "enable": "Activer le mode hors ligne",

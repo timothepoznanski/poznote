@@ -1554,9 +1554,6 @@
       },
       "folder": {
         "title": "文件夹"
-      },
-      "workspace": {
-        "title": "工作区"
       }
     },
     "folder_icon": {
@@ -2234,6 +2231,13 @@
       "insert_row_below": "在下方插入行",
       "insert_column_left": "在左侧插入列",
       "insert_column_right": "在右侧插入列",
+      "align_column": "列对齐",
+      "align_row": "行对齐",
+      "align_cell": "单元格对齐",
+      "align_left": "左对齐",
+      "align_center": "居中",
+      "align_right": "右对齐",
+      "reset_column_widths": "重置列宽",
       "delete_row": "删除行",
       "delete_column": "删除列",
       "delete_table": "删除表格",
@@ -2956,13 +2960,19 @@
       "token_or_folder_auth_missing": "缺少链接或文件夹授权",
       "link_in_use": "此自定义链接已被使用",
       "link_invalid": "自定义链接无效。允许的字符：字母、数字、-、_、.（4 到 128 个字符）",
-      "shared_folder_not_found": "未找到共享文件夹。\n\n这可能发生在恢复之后。\n\n管理员可能需要在“设置 > 管理工具”中重建主数据库，以修复共享链接。",
-      "shared_note_not_found_or_denied": "未找到共享笔记或访问被拒绝。\n\n这可能发生在恢复之后。\n\n管理员可能需要在“设置 > 管理工具”中重建主数据库，以修复共享链接。",
-      "folder_not_found": "未找到文件夹。\n\n这可能发生在恢复之后。\n\n管理员可能需要在“设置 > 管理工具”中重建主数据库，以修复共享链接。",
+      "shared_folder_not_found": "未找到共享文件夹",
+      "shared_folder_not_found_message": "没有与此链接对应的共享文件夹。分享可能已被所有者删除，或链接有误。如果您认为自己应该有访问权限，请联系所有者或管理员。",
+      "shared_note_not_found": "未找到分享的笔记",
+      "shared_note_not_found_message": "没有与此链接对应的分享笔记。分享可能已被所有者删除，或链接有误。如果您认为自己应该有访问权限，请联系所有者或管理员。",
+      "note_unavailable_message": "此笔记已不可用，可能已被所有者删除。如果您认为这是一个错误，请联系所有者或管理员。",
+      "link_incomplete_message": "此链接不完整，无法识别所分享的内容。请检查您收到的链接，或向分享者索取新链接。",
+      "folder_not_found": "未找到文件夹",
+      "folder_unavailable_message": "此文件夹已不可用，可能已被所有者删除。如果您认为这是一个错误，请联系所有者或管理员。",
       "note_not_found": "未找到笔记",
       "server_error": "服务器错误",
       "share_disabled_title": "此分享不可访问",
-      "share_disabled_message": "所有者已将此分享设为不可访问。"
+      "share_disabled_message": "所有者已将此分享设为不可访问。如果您需要再次访问，请联系所有者或管理员。",
+      "registry_admin_hint": "您当前以管理员身份登录。如果所有者的账户中仍然存在此分享，说明共享链接登记表已不同步：请在“设置 > 管理工具”中重建主数据库。"
     },
     "edit": {
       "button": "编辑",
@@ -2973,7 +2983,7 @@
     },
     "tree_tools": "文件夹树",
     "tree_search_hint": "搜索结果会自动展开显示。",
-    "shared_note_not_found_or_denied": "未找到分享的笔记或访问被拒绝。这可能发生在恢复之后。管理员可能需要在“设置 > 管理工具”中重建主数据库来修复分享链接。",
+    "access_denied_hint": "只有所有者选定的账户才能打开此分享。如果您需要访问权限，请联系所有者或管理员。",
     "token_update_failed": "更新令牌失败"
   },
   "public_folder": {
@@ -3550,10 +3560,11 @@
       "maintenance": {
         "title": "重建主数据库",
         "subtitle": "",
-        "description": "主数据库（master.db）包含用户信息、他们的公开链接以及 Poznote 的全局设置。如果此文件丢失或损坏，或者某些公开链接在恢复后不再工作，此工具会扫描您的 'data/users' 目录，自动重新登记账户，从各自的个人数据库中恢复真实名称，并重建所有公开分享链接。",
+        "description": "主数据库（master.db）包含用户信息、他们的公开链接以及 Poznote 的全局设置。如果此文件丢失或损坏，或者某些公开链接在手动复制用户目录后不再工作，此工具会扫描您的 'data/users' 目录，自动重新登记账户，从各自的个人数据库中恢复真实名称，并重建所有公开分享链接。",
         "repair_registry": "重建",
         "repair_registry_confirm": "这将扫描所有用户文件夹并重建主数据库注册表。",
         "repair_registry_success": "主数据库重建成功：\n\n- 扫描了 {{scanned}} 个文件夹\n- 恢复了 {{added}} 个用户\n- 重建了 {{links}} 个共享链接",
+        "repair_registry_skipped": "- {{skipped}} 个共享链接由其他账户保留",
         "repair_registry_error": "重建出错: {{error}}"
       },
       "processing": "正在处理...",
@@ -5210,7 +5221,8 @@
     "banner": {
       "open": "打开离线笔记",
       "offline": "您当前处于离线状态。最近修改的笔记仍可在离线模式下打开和编辑。",
-      "offline_no_copies": "您当前处于离线状态。恢复连接后将保存更改。"
+      "offline_no_copies": "您当前处于离线状态。恢复连接后将保存更改。",
+      "stuck": "离线笔记未能打开：此浏览器仍在等待服务器。如果开启了 VPN，关闭后即可打开。"
     },
     "settings": {
       "enable": "启用离线模式",

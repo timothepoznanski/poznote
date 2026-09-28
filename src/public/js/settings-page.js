@@ -2492,6 +2492,9 @@
                             added: stats.users_added,
                             links: stats.links_rebuilt
                         }, 'Master database rebuilt.');
+                        if (stats.links_skipped > 0) {
+                            text += '\n' + tr('multiuser.admin.maintenance.repair_registry_skipped', { skipped: stats.links_skipped }, '- ' + stats.links_skipped + ' shared links kept by another account');
+                        }
                         if (Array.isArray(stats.errors) && stats.errors.length > 0) {
                             text += '\n\n' + tr('multiuser.admin.errors_label', {}, 'Errors:') + '\n' + stats.errors.join('\n');
                         }

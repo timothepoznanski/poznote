@@ -315,6 +315,16 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
                 $dbSummary = '';
             }
             $results[] = 'Database: Restored ' . ($dbLabel !== '' ? $dbLabel : 'successfully') . $dbSummary;
+            // The public links were re-registered with the database: say so,
+            // this used to need a manual "Rebuild master database"
+            $sharedLinks = $dbResult['shared_links'] ?? null;
+            if (is_array($sharedLinks) && ($sharedLinks['registered'] > 0 || $sharedLinks['skipped'] > 0)) {
+                $linksMessage = 'Public links: ' . $sharedLinks['registered'] . ' shared link' . ($sharedLinks['registered'] === 1 ? '' : 's') . ' active again';
+                if ($sharedLinks['skipped'] > 0) {
+                    $linksMessage .= ', ' . $sharedLinks['skipped'] . ' skipped because another account now uses the same link';
+                }
+                $results[] = $linksMessage;
+            }
         } else {
             $results[] = 'Database: Failed - ' . $dbResult['error'];
         }
@@ -493,20 +503,38 @@ function restoreDatabaseFromFile($sqlFile, $alreadyValidated = false) {
     // Workspace shares live in master.db and outlive the swap: the ones whose
     // workspace the restored database does not hold go, or recreating that
     // name later would hand it to those accounts unasked (users/db_master.php).
+    $sharedLinks = null;
     if (isset($_SESSION['user_id'])) {
+        require_once __DIR__ . '/../users/db_master.php';
+        $restoredCon = null;
         try {
             $restoredCon = new PDO('sqlite:' . $dbPath);
             $restoredCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $restoredNames = $restoredCon->query('SELECT name FROM workspaces')->fetchAll(PDO::FETCH_COLUMN);
-            $restoredCon = null;
-            require_once __DIR__ . '/../users/db_master.php';
             pruneWorkspaceSharesToExisting((int)$_SESSION['user_id'], $restoredNames);
         } catch (Exception $e) {
             error_log('restoreDatabaseFromFile: could not prune workspace shares: ' . $e->getMessage());
         }
+        // Public links resolve through the shared_links registry in master.db,
+        // which the backup does not contain: re-register the restored shares
+        // now, or every public link of this account answers "not found" until
+        // an administrator rebuilds the master database by hand.
+        try {
+            if ($restoredCon === null) {
+                $restoredCon = new PDO('sqlite:' . $dbPath);
+                $restoredCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            }
+            $sharedLinks = syncSharedLinksFromUserDatabase((int)$_SESSION['user_id'], $restoredCon);
+            if ($sharedLinks['skipped'] > 0) {
+                error_log('restoreDatabaseFromFile: ' . $sharedLinks['skipped'] . ' public link(s) kept by another account, not re-registered');
+            }
+        } catch (Exception $e) {
+            error_log('restoreDatabaseFromFile: could not re-register public links: ' . $e->getMessage());
+        }
+        $restoredCon = null;
     }
 
-    return ['success' => true];
+    return ['success' => true, 'shared_links' => $sharedLinks];
 }
 
 /**

@@ -215,9 +215,20 @@ function renderFolderListRow($folderId, $folder, $depth, $workspace, $sharedFold
 
 	$kanban_url = 'index.php?kanban=' . $folder_id . '&workspace=' . urlencode($workspace);
 
-	echo '<div class="shared-note-item folder-item" data-action="open-folder-kanban" data-kanban-url="' . htmlspecialchars($kanban_url, ENT_QUOTES) . '" data-folder-name="' . $folder_name . '" data-depth="' . (int)$depth . '" style="cursor: pointer; padding: 6px 15px; padding-left: ' . (15 + $depth * 22) . 'px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; box-shadow: none !important;">';
+	$has_children = !empty($folder['children']);
+
+	echo '<div class="shared-note-item folder-item" data-action="open-folder-kanban" data-kanban-url="' . htmlspecialchars($kanban_url, ENT_QUOTES) . '" data-folder-name="' . $folder_name . '" data-folder-id="' . $folder_id . '" data-depth="' . (int)$depth . '" data-has-children="' . ($has_children ? '1' : '0') . '" style="cursor: pointer; padding: 6px 15px; padding-left: ' . (15 + $depth * 22) . 'px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; box-shadow: none !important;">';
 
 	echo '<div class="note-name-container" style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">';
+	// Fold/unfold chevron, same button as the tree of shared.php. A folder
+	// without subfolders keeps an invisible one so the icons stay aligned.
+	// Rows render unfolded; list_folders.js applies the folded state.
+	if ($has_children) {
+		$collapse_label = t_h('public.collapse_folder', [], 'Collapse folder');
+		echo '<button type="button" class="shared-folder-toggle" data-action="toggle-folder-collapse" aria-expanded="true" title="' . $collapse_label . '" aria-label="' . $collapse_label . '"><i class="lucide lucide-chevron-down"></i></button>';
+	} else {
+		echo '<span class="shared-folder-toggle is-placeholder" aria-hidden="true"></span>';
+	}
 	$icon_style = 'style="' . ($icon_color ? 'color: ' . $icon_color . ' !important; ' : '') . 'filter: none !important;"';
 	echo '<div class="shared-folder-icon" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: transparent !important; border-radius: 8px; flex: 0 0 auto;">';
 	echo '<i class="' . $folder_icon . '" ' . $icon_style . '></i>';
@@ -268,7 +279,7 @@ function renderFolderListRow($folderId, $folder, $depth, $workspace, $sharedFold
 
 	echo '</div>';
 
-	if (!empty($folder['children'])) {
+	if ($has_children) {
 		foreach ($folder['children'] as $childId => $childFolder) {
 			renderFolderListRow($childId, $childFolder, $depth + 1, $workspace, $sharedFolderIds);
 		}
@@ -426,6 +437,27 @@ $currentLang = getUserLanguage();
 				padding-right: 0;
 			}
 		}
+		/* Search field and the Expand all / Collapse all button share one
+		   row: the field takes what the button leaves (shared/responsive.css
+		   caps it at 480px for shared.php, which would push the button below) */
+		.folders-filter-row {
+			margin-top: 0;
+		}
+		@media (min-width: 801px) {
+			.folders-filter-row {
+				flex-wrap: nowrap;
+			}
+			.folders-filter-row .filter-input-wrapper {
+				flex: 1 1 auto;
+				min-width: 0;
+			}
+		}
+		/* The fold chevron sits between the depth guide and the folder icon;
+		   the row gap is too wide for that pair */
+		.folder-item .shared-folder-toggle {
+			margin-right: -4px;
+		}
+
 		/* Nested folders: the row keeps a guide line at each depth level */
 		.folder-item[data-depth]:not([data-depth="0"]) .note-name-container::before {
 			content: '';
@@ -581,23 +613,36 @@ $currentLang = getUserLanguage();
 	<script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
-<body class="shared-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>" data-archive-workspace="<?php echo htmlspecialchars(POZNOTE_ARCHIVE_WORKSPACE, ENT_QUOTES, 'UTF-8'); ?>">
+<body class="shared-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>" data-archive-workspace="<?php echo htmlspecialchars(POZNOTE_ARCHIVE_WORKSPACE, ENT_QUOTES, 'UTF-8'); ?>"
+	data-txt-expand-folder="<?php echo t_h('public.expand_folder', [], 'Expand folder'); ?>"
+	data-txt-collapse-folder="<?php echo t_h('public.collapse_folder', [], 'Collapse folder'); ?>"
+	data-txt-expand-all="<?php echo t_h('public.expand_all', [], 'Expand all'); ?>"
+	data-txt-collapse-all="<?php echo t_h('public.collapse_all', [], 'Collapse all'); ?>">
 	<?php $iconSidebarWorkspace = $workspace; include __DIR__ . '/../icon_sidebar.php'; ?>
 	<div class="shared-container">
-		<h1 class="poznote-page-title"><i class="lucide lucide-folder-open"></i> <?php echo t_h('home.folders', [], 'Folders'); ?> <?php echo poznoteRenderPageTitleWorkspace($workspace); ?></h1>
+		<h1 class="poznote-page-title"><span class="poznote-page-title-name"><i class="lucide lucide-folder-open"></i> <?php echo t_h('home.folders', [], 'Folders'); ?></span> <?php echo poznoteRenderPageTitleWorkspace($workspace); ?></h1>
 
 		
 		<div class="shared-filter-bar">
-			<div class="filter-input-wrapper">
-				<input 
-					type="text" 
-					id="filterInput"
-					class="filter-input"
-					placeholder="<?php echo t_h('folders.filter_placeholder', [], 'Filter by folder name...'); ?>"
-				/>
-				<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
-					<i class="lucide lucide-x"></i>
-				</button>
+			<div class="filter-search-row folders-filter-row">
+				<div class="filter-input-wrapper">
+					<input 
+						type="text" 
+						id="filterInput"
+						class="filter-input"
+						placeholder="<?php echo t_h('folders.filter_placeholder', [], 'Filter by folder name...'); ?>"
+					/>
+					<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
+						<i class="lucide lucide-x"></i>
+					</button>
+				</div>
+				<?php // Shown by list_folders.js when at least one folder has subfolders ?>
+				<div class="shared-filter-tree-actions initially-hidden" id="foldersTreeToolbar">
+					<button type="button" id="toggleAllFoldersBtn" class="btn btn-secondary" aria-expanded="true">
+						<i class="lucide lucide-chevron-up"></i>
+						<span id="toggleAllFoldersLabel"><?php echo t_h('public.collapse_all', [], 'Collapse all'); ?></span>
+					</button>
+				</div>
 			</div>
 			<div id="filterStats" class="filter-stats initially-hidden"></div>
 		</div>
