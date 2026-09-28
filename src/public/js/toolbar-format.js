@@ -66,7 +66,7 @@ function changeFontSize() {
   // Position near the button, clamp to viewport. Right-align the popup on the
   // button, but never past the left edge: a fixed -220px offset put it fully
   // off-screen on narrow (mobile) viewports, where the button sits near x=220.
-  const btnRect = fontSizeButton.getBoundingClientRect();
+  const btnRect = typeof window.getToolbarButtonRect === 'function' ? window.getToolbarButtonRect(fontSizeButton) : fontSizeButton.getBoundingClientRect();
   const popupWidth = popup.offsetWidth || 220;
   popup.style.left = Math.max(8, btnRect.right - popupWidth) + 'px';
   popup.style.top = (btnRect.bottom + 8) + 'px';
@@ -137,6 +137,72 @@ function changeFontSize() {
   });
 
   setupPopupDismiss(popup, '.btn-text-height');
+}
+
+// Paragraph alignment picker of rich-text notes, same look as the text style
+// popup above; the pick goes through applyHtmlAlignment()
+function changeAlignment(triggerButton) {
+  const existingPopup = document.querySelector('.align-popup');
+  if (existingPopup) {
+    if (existingPopup._close) existingPopup._close();
+    else existingPopup.remove();
+    return;
+  }
+
+  const selection = window.getSelection();
+  const savedRange = selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null;
+  const editor = savedRange ? getEditorFromRange(savedRange) : null;
+  const button = triggerButton && triggerButton.closest ? triggerButton.closest('.btn-align') : document.querySelector('.btn-align');
+  if (!editor || !button) return;
+
+  const t = window.t || ((key, params, fallback) => fallback);
+  const options = [
+    { value: 'left', icon: 'lucide-align-left', key: 'slash_menu.align_left', fallback: 'Left' },
+    { value: 'center', icon: 'lucide-align-center', key: 'slash_menu.align_center', fallback: 'Center' },
+    { value: 'right', icon: 'lucide-align-right', key: 'slash_menu.align_right', fallback: 'Right' },
+    { value: 'justify', icon: 'lucide-align-justify', key: 'slash_menu.align_justify', fallback: 'Justify' }
+  ];
+
+  const popup = document.createElement('div');
+  popup.className = 'font-size-popup align-popup';
+  options.forEach(option => {
+    const item = document.createElement('div');
+    item.className = 'font-size-item';
+    item.dataset.align = option.value;
+    const label = document.createElement('span');
+    label.className = 'size-label';
+    label.textContent = t(option.key, null, option.fallback);
+    const icon = document.createElement('i');
+    icon.className = 'lucide ' + option.icon;
+    item.appendChild(icon);
+    item.appendChild(label);
+    popup.appendChild(item);
+  });
+
+  // Fixed, under the button (or the menu listing it): the toolbar clips
+  document.body.appendChild(popup);
+  popup.style.position = 'fixed';
+  const btnRect = typeof window.getToolbarButtonRect === 'function' ? window.getToolbarButtonRect(button) : button.getBoundingClientRect();
+  popup.style.left = Math.max(8, btnRect.right - (popup.offsetWidth || 180)) + 'px';
+  popup.style.top = (btnRect.bottom + 8) + 'px';
+  clampToViewport(popup, 8);
+  setTimeout(() => popup.classList.add('show'), 10);
+
+  const close = setupPopupDismiss(popup, '.btn-align');
+  popup._close = close;
+  popup.addEventListener('click', (e) => {
+    const item = e.target.closest('.font-size-item');
+    if (!item) return;
+    e.stopPropagation();
+    const scrollState = captureScrollState(editor);
+    focusEditorWithoutScroll(editor, scrollState);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(savedRange);
+    applyHtmlAlignment(item.dataset.align);
+    requestAnimationFrame(() => restoreScrollState(scrollState));
+    close();
+  });
 }
 
 function toggleCodeBlock() {

@@ -45,6 +45,33 @@ function applyHtmlBlockStyle(style) {
   }
 }
 
+// Aligns the paragraphs under the selection (left, center, right, justify),
+// as an inline text-align on their block. Firefox writes <div align> when
+// styleWithCSS is off, and the sanitizer drops that attribute on save, so
+// CSS output is forced and any align attribute left behind is converted.
+function applyHtmlAlignment(align) {
+  var commands = { left: 'justifyLeft', center: 'justifyCenter', right: 'justifyRight', justify: 'justifyFull' };
+  var sel = window.getSelection();
+  if (!commands[align] || !sel || sel.rangeCount === 0) return;
+  var editor = getEditorFromRange(sel.getRangeAt(0));
+  if (!editor || editor.classList.contains('markdown-editor')) return;
+
+  try {
+    document.execCommand('styleWithCSS', false, true);
+    document.execCommand(commands[align], false, null);
+  } catch (e) {
+    console.debug('toolbar-editor-utils: applyHtmlAlignment() failed:', e);
+  } finally {
+    try { document.execCommand('styleWithCSS', false, false); } catch (e) { /* unsupported */ }
+  }
+
+  Array.prototype.forEach.call(editor.querySelectorAll('div[align], p[align], h1[align], h2[align], h3[align], h4[align], h5[align], h6[align], li[align], blockquote[align]'), function (el) {
+    el.style.textAlign = el.getAttribute('align');
+    el.removeAttribute('align');
+  });
+  editor.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
 function getEditorFromRange(range) {
   if (!range) return null;
 

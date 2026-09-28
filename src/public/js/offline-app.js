@@ -729,6 +729,9 @@
             add(toolbarButton('btn-task-remove ' + fmt, t('editor.toolbar.remove_checklist', null, 'Remove checkboxes'), 'exec-task-remove', 'lucide-minus-square'));
         }
         add(toolbarButton('btn-text-height ' + fmt, t('slash_menu.title', null, 'Title'), 'change-font-size', 'lucide-type-height'));
+        if (type === 'note') {
+            add(toolbarButton('btn-align ' + fmt, t('slash_menu.align', null, 'Align'), 'change-alignment', 'lucide-align-center'));
+        }
         add(toolbarButton('btn-code ' + fmt, t('editor.toolbar.code_block', null, 'Code block'), 'toggle-code-block', 'lucide-code'));
         add(toolbarButton('btn-inline-code ' + fmt, t('editor.toolbar.inline_code', null, 'Inline code'), 'toggle-inline-code', 'lucide-terminal'));
         if (type !== 'markdown') {
@@ -1443,6 +1446,9 @@
             case 'toggle-red-color': call('toggleRedColor', target); break;
             case 'toggle-yellow-highlight': call('toggleYellowHighlight', target); break;
             case 'change-font-size': call('changeFontSize'); break;
+            case 'change-alignment': call('changeAlignment', target); break;
+            // An entry of the toolbar's overflow menu (js/toolbar-overflow.js)
+            case 'trigger-mobile-action': call('triggerMobileToolbarAction', target, target.getAttribute('data-selector')); return;
             case 'toggle-code-block': call('toggleCodeBlock'); break;
             case 'toggle-inline-code': call('toggleInlineCode'); break;
             case 'insert-checklist': call('insertChecklist'); break;
@@ -1456,6 +1462,7 @@
                 if (menu) {
                     var opening = menu.hidden;
                     closeTasklistMenus();
+                    if (opening) call('positionToolbarDropdown', menu, target);
                     menu.hidden = !opening;
                     target.setAttribute('aria-expanded', opening ? 'true' : 'false');
                 }

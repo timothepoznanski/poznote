@@ -1212,7 +1212,8 @@
       "go_back": "Voltar",
       "go_forward": "Avançar",
       "switch_to_edit": "Mudar para o modo de edição",
-      "switch_to_preview": "Mudar para a pré-visualização"
+      "switch_to_preview": "Mudar para a pré-visualização",
+      "more": "Mais"
     },
     "link": {
       "add_title": "Adicionar Link",
@@ -2059,6 +2060,11 @@
     "heading_5": "Cabeçalho 5",
     "heading_6": "Cabeçalho 6",
     "format_text": "Formatar texto",
+    "align": "Alinhar",
+    "align_left": "À esquerda",
+    "align_center": "Centralizado",
+    "align_right": "À direita",
+    "align_justify": "Justificado",
     "red": "Vermelho",
     "bold": "Negrito",
     "italic": "Itálico",

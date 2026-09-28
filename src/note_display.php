@@ -187,6 +187,9 @@
                         echo '<button type="button" class="toolbar-btn btn-task-remove text-format-btn" title="' . t_h('editor.toolbar.remove_checklist', [], 'Remove checkboxes') . '" data-action="exec-task-remove"><i class="lucide lucide-minus-square"></i></button>';
                     }
                     echo '<button type="button" class="toolbar-btn btn-text-height text-format-btn" title="' . t_h('slash_menu.title', [], 'Title') . '" data-action="change-font-size"><i class="lucide lucide-type-height"></i></button>';
+                    if ($note_type === 'note') {
+                        echo '<button type="button" class="toolbar-btn btn-align text-format-btn" title="' . t_h('slash_menu.align', [], 'Align') . '" data-action="change-alignment"><i class="lucide lucide-align-center"></i></button>';
+                    }
                     echo '<button type="button" class="toolbar-btn btn-code text-format-btn" title="' . t_h('editor.toolbar.code_block') . '" data-action="toggle-code-block"><i class="lucide lucide-code"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-inline-code text-format-btn" title="' . t_h('editor.toolbar.inline_code') . '" data-action="toggle-inline-code"><i class="lucide lucide-terminal"></i></button>';
                     if ($note_type !== 'markdown') {

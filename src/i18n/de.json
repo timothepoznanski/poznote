@@ -1212,7 +1212,8 @@
       "go_back": "Zurück",
       "go_forward": "Vorwärts",
       "switch_to_edit": "In den Bearbeitungsmodus wechseln",
-      "switch_to_preview": "In die Vorschau wechseln"
+      "switch_to_preview": "In die Vorschau wechseln",
+      "more": "Mehr"
     },
     "link": {
       "add_title": "Link hinzufügen",
@@ -2059,6 +2060,11 @@
     "heading_5": "Überschrift 5",
     "heading_6": "Überschrift 6",
     "format_text": "Text formatieren",
+    "align": "Ausrichten",
+    "align_left": "Linksbündig",
+    "align_center": "Zentriert",
+    "align_right": "Rechtsbündig",
+    "align_justify": "Blocksatz",
     "red": "Rot",
     "bold": "Fett",
     "italic": "Kursiv",

@@ -182,6 +182,20 @@
     background: var(--pz-surface);
 }
 
+/* Alignment picker (changeAlignment): icon then label, as wide as its text.
+   The script sets left, so the base right: 0 would stretch it. */
+.font-size-popup.align-popup {
+    right: auto;
+    min-width: 0;
+    gap: 2px;
+}
+
+.font-size-popup.align-popup .font-size-item {
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 6px 12px 6px 10px;
+}
+
 .font-size-popup .style-normal {
     font-size: 0.95rem;
     font-weight: var(--pz-weight-normal);
@@ -267,12 +281,16 @@ body:not(.has-background-image) .note-header {
     background: var(--pz-bg);
 }
 
+/* Always one line of icons: the buttons that do not fit go to the ⋮ menu,
+   or to a "…" menu while ⋮ is hidden (js/toolbar-overflow.js). Menus opened
+   from the toolbar are position: fixed, so the clipping does not reach them. */
 .note-edit-toolbar {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    overflow: hidden;
     width: 100%;
     box-sizing: border-box;
     scrollbar-width: none;
@@ -285,6 +303,27 @@ body:not(.has-background-image) .note-header {
 
 .note-edit-toolbar::-webkit-scrollbar {
     display: none;
+}
+
+/* Out of the row, listed in the overflow menu instead. Outweighs the
+   !important display of the selection buttons in css/index-mobile.css. */
+html .note-edit-toolbar .toolbar-btn.is-toolbar-overflowed {
+    display: none !important;
+}
+
+.note-edit-toolbar .toolbar-overflow-anchor {
+    position: relative;
+    display: inline-flex;
+}
+
+.note-edit-toolbar .toolbar-overflow-anchor[hidden],
+.note-edit-toolbar .toolbar-overflow-menu[hidden] {
+    display: none !important;
+}
+
+.note-edit-toolbar .toolbar-overflow-menu {
+    min-width: 220px;
+    z-index: 2147483001;
 }
 
 .note-header>#lastupdated {
@@ -346,12 +385,9 @@ html[data-theme='dark'] .toolbar-btn.is-format-active {
 }
 
 /* Toolbar adjustment for desktop screens */
-/* Use flex-wrap to allow toolbar buttons to wrap on multiple lines if needed */
 .note-edit-toolbar {
     gap: 2px;
-    justify-content: center;
     align-items: center;
-    flex-wrap: wrap;
     /* Fixed height based on button size: padding (6px*2) + font-size (1.4em ≈ ~22px) + gap = ~38px */
     min-height: calc(1.4em + 12px + 6px);
 }

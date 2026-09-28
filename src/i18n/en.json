@@ -1561,6 +1561,11 @@
     "heading_5": "Heading 5",
     "heading_6": "Heading 6",
     "format_text": "Format text",
+    "align": "Align",
+    "align_left": "Left",
+    "align_center": "Center",
+    "align_right": "Right",
+    "align_justify": "Justify",
     "red": "Red",
     "bold": "Bold",
     "italic": "Italic",
@@ -1926,7 +1931,8 @@
       "go_back": "Go back",
       "go_forward": "Go forward",
       "switch_to_edit": "Switch to edit mode",
-      "switch_to_preview": "Switch to preview mode"
+      "switch_to_preview": "Switch to preview mode",
+      "more": "More"
     },
     "link": {
       "add_title": "Add link",

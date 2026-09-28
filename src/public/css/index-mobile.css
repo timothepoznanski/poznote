@@ -411,11 +411,8 @@ body.mobile-keyboard-open.has-background-image #right_col .note-header {
 
 #right_col .note-edit-toolbar {
     flex-wrap: nowrap;
-    justify-content: safe center;
-    overflow-x: auto;
-    overflow-y: visible;
+    justify-content: center;
     padding: 0 4px;
-    scroll-padding-left: 4px;
 }
 
 .css-title,
@@ -595,7 +592,8 @@ a.links_arbo_left::-webkit-scrollbar,
 .note-edit-toolbar .btn-reminder:not(.hide-on-selection),
 .note-edit-toolbar .btn-trash:not(.hide-on-selection),
 .note-edit-toolbar .markdown-view-mode-btn:not(.hide-on-selection),
-.note-edit-toolbar .mobile-more-btn:not(.hide-on-selection) {
+.note-edit-toolbar .mobile-more-btn:not(.hide-on-selection),
+.note-edit-toolbar .btn-toolbar-overflow {
     display: flex !important;
 }
 

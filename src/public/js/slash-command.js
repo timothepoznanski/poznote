@@ -2407,6 +2407,11 @@
             });
     }
 
+    // Aligns the paragraph under the caret, or every paragraph of the selection
+    function applyAlignment(align) {
+        if (typeof window.applyHtmlAlignment === 'function') window.applyHtmlAlignment(align);
+    }
+
     // Return slash commands common between HTML and Markdown modes
     function getCommonSlashCommands() {
         var t = window.t || (function (key, params, fallback) { return fallback; });
@@ -2481,6 +2486,18 @@
                     }
                 }
             },
+            // Rich-text notes only: Markdown has no paragraph alignment
+            align: {
+                id: 'align',
+                icon: 'lucide-align-center',
+                label: t('slash_menu.align', null, 'Align'),
+                submenu: [
+                    { id: 'align-left', icon: 'lucide-align-left', label: t('slash_menu.align_left', null, 'Left'), action: () => applyAlignment('left') },
+                    { id: 'align-center', icon: 'lucide-align-center', label: t('slash_menu.align_center', null, 'Center'), action: () => applyAlignment('center') },
+                    { id: 'align-right', icon: 'lucide-align-right', label: t('slash_menu.align_right', null, 'Right'), action: () => applyAlignment('right') },
+                    { id: 'align-justify', icon: 'lucide-align-justify', label: t('slash_menu.align_justify', null, 'Justify'), action: () => applyAlignment('justify') }
+                ]
+            },
             cancel: {
                 id: 'cancel',
                 icon: 'lucide-times-circle',
@@ -2536,6 +2553,7 @@
                     { id: 'strikethrough', icon: 'lucide-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => insertStrikethrough() }
                 ]
             },
+            common.align,
             {
                 id: 'color',
                 icon: 'lucide-palette',
@@ -3374,6 +3392,7 @@
                 label: t('slash_menu.format_text', null, 'Format text'),
                 submenu: format
             },
+            isMarkdown ? null : common.align,
             list,
             color,
             highlight,

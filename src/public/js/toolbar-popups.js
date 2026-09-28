@@ -362,7 +362,12 @@ window.savedRanges = {};
 
   function positionColorPopup(popup, btn) {
     const margin = 8;
-    const btnRect = btn ? btn.getBoundingClientRect() : { left: margin, right: margin + 30, bottom: 40, width: 30 };
+    // Measured out of the page flow, where it stretched to the page height
+    // and the clamp below pinned it to the top of the screen
+    popup.style.position = 'fixed';
+    const btnRect = btn
+      ? (typeof window.getToolbarButtonRect === 'function' ? window.getToolbarButtonRect(btn) : btn.getBoundingClientRect())
+      : { left: margin, right: margin + 30, bottom: 40, width: 30 };
     const popupRect = popup.getBoundingClientRect();
     const viewport = getViewportBounds();
     const viewportWidth = viewport.right - viewport.left;
