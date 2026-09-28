@@ -617,7 +617,6 @@
 }
 
 /* Red star icon for important tasks */
-.task-item.important .task-icon-star,
 .task-item.important .lucide-star {
     color: var(--pz-danger-text);
 }
@@ -628,7 +627,6 @@
 
 
 /* Tasklist note styles - Hide separator and table buttons for tasklist notes */
-.innernote[data-tasklist-note="true"] .btn-separator,
 .innernote[data-tasklist-note="true"] .btn-table,
 .innernote[data-tasklist-note="true"] .btn-checklist {
     display: none !important;

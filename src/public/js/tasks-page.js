@@ -335,6 +335,86 @@
         if (bar) bar.setAttribute('aria-valuenow', String(percent));
     }
 
+    // Status filter: one button opens a panel with the chips (tasks.php).
+    // Fixed rather than absolute so it stays inside the viewport on a phone,
+    // where the button sits close to the right edge.
+    function positionFilterPanel() {
+        var btn = document.getElementById('tasksFilterBtn');
+        var panel = document.getElementById('tasksFilterPanel');
+        if (!btn || !panel || panel.hidden) return;
+        var rect = btn.getBoundingClientRect();
+        panel.style.top = (rect.bottom + 6) + 'px';
+        var width = panel.offsetWidth || 280;
+        panel.style.left = Math.max(8, Math.min(rect.left, window.innerWidth - width - 8)) + 'px';
+    }
+
+    function closeFilterPanel() {
+        var btn = document.getElementById('tasksFilterBtn');
+        var panel = document.getElementById('tasksFilterPanel');
+        if (panel) panel.hidden = true;
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+
+    // The button turns blue with a badge while a status other than All is picked
+    function updateFilterButton() {
+        var btn = document.getElementById('tasksFilterBtn');
+        if (!btn) return;
+        var active = filterMode !== 'all';
+        btn.classList.toggle('active', active);
+        var badge = btn.querySelector('.tasks-filter-badge');
+        if (badge) {
+            badge.hidden = !active;
+            badge.textContent = active ? '1' : '';
+        }
+    }
+
+    function initFilterPanel() {
+        var btn = document.getElementById('tasksFilterBtn');
+        var panel = document.getElementById('tasksFilterPanel');
+        var chips = document.getElementById('tasksFilterChips');
+        if (!btn || !panel || !chips) return;
+
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (panel.hidden) {
+                panel.hidden = false;
+                positionFilterPanel();
+                btn.setAttribute('aria-expanded', 'true');
+            } else {
+                closeFilterPanel();
+            }
+        });
+
+        // One status at a time, so a pick also closes the panel
+        chips.addEventListener('click', function (e) {
+            var chip = e.target.closest('.tasks-filter-chip');
+            if (!chip) return;
+            filterMode = chip.getAttribute('data-filter') || 'all';
+            chips.querySelectorAll('.tasks-filter-chip').forEach(function (el) {
+                el.classList.toggle('active', el === chip);
+            });
+            updateFilterButton();
+            closeFilterPanel();
+            render();
+        });
+
+        document.addEventListener('click', function (e) {
+            if (panel.hidden) return;
+            if (!panel.contains(e.target) && !btn.contains(e.target)) closeFilterPanel();
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && !panel.hidden) {
+                closeFilterPanel();
+                btn.focus();
+            }
+        });
+
+        window.addEventListener('resize', positionFilterPanel);
+        window.addEventListener('scroll', positionFilterPanel, true);
+    }
+
     function taskMatchesMode(task) {
         switch (filterMode) {
             case 'open': return !task.completed;
@@ -1214,18 +1294,7 @@
             });
         }
 
-        var chips = document.getElementById('tasksFilterChips');
-        if (chips) {
-            chips.addEventListener('click', function (e) {
-                var chip = e.target.closest('.tasks-filter-chip');
-                if (!chip) return;
-                filterMode = chip.getAttribute('data-filter') || 'all';
-                chips.querySelectorAll('.tasks-filter-chip').forEach(function (el) {
-                    el.classList.toggle('active', el === chip);
-                });
-                render();
-            });
-        }
+        initFilterPanel();
 
         var filterInput = document.getElementById('filterInput');
         if (filterInput) {

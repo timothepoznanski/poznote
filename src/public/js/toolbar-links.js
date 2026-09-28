@@ -7,9 +7,7 @@ function addLinkToNote() {
     const inMarkdown = typeof isInMarkdownEditor === 'function' && isInMarkdownEditor();
 
     const sel = window.getSelection();
-    const currentRange = sel && sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null;
-    const toolbarSavedRange = !currentRange && savedMobileToolbarRange ? savedMobileToolbarRange.cloneRange() : null;
-    const activeRange = currentRange || toolbarSavedRange;
+    const activeRange = sel && sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null;
     const hasSelection = activeRange && !activeRange.collapsed;
     let selectedText = hasSelection ? getNormalizedRangeText(activeRange) : '';
 

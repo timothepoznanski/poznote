@@ -150,6 +150,17 @@
         min-width: 0;
     }
 
+    /* Offline page: the reason filter goes to its own full-width line under
+       the search field, which keeps the button on its right */
+    .offline-list-page .filter-search-row:has(.offline-reason-select:not(.initially-hidden)) {
+        flex-wrap: wrap;
+    }
+
+    .offline-list-page .offline-reason-select {
+        order: 1;
+        flex: 1 1 100%;
+    }
+
     .filter-type-btn {
         padding: 6px 12px;
         font-size: 12px;
@@ -223,19 +234,15 @@
        row's title. */
     #sharedItemsContainer .shared-notes-list {
         --shared-indent-step: 18px;
-        --shared-column-gap: 8px;
+        --shared-column-gap: 12px;
         display: grid;
         /* fit-content: four buttons fit, a wordy placeholder wraps instead
-           of widening the column over the names */
-        grid-template-columns: minmax(0, 5fr) minmax(0, 2fr) fit-content(116px);
+           of widening the column over the names. 3fr/2fr keeps the link
+           column off the buttons, near the middle of the row. */
+        grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) fit-content(116px);
         column-gap: var(--shared-column-gap);
         max-width: 100%;
         padding: 0;
-    }
-
-    /* Offline: one button, and the middle column holds words */
-    .offline-list-page #sharedItemsContainer .shared-notes-list {
-        grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) fit-content(116px);
     }
 
     #sharedItemsContainer .shared-notes-header,
@@ -365,11 +372,6 @@
     .modal-content {
         width: 95%;
         margin: 10px;
-    }
-
-    /* Dark mode on mobile */
-    html[data-theme='dark'] .shared-header {
-        color: var(--pz-text-inverse);
     }
 
     html[data-theme='dark'] body.shared-page {

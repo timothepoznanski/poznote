@@ -154,6 +154,8 @@ function poznoteGetIndexJsGroups(): array {
         'js/system-menu.js',
         'js/notes-list-events.js',
         'js/favorites-menu.js',
+        'js/favorites-scroll.js',
+        'js/tree-options-menu.js',
         'js/other-accounts.js',
         'js/folder-icon.js',
         'js/folder-tree-highlight.js',

@@ -69,15 +69,13 @@ html[data-theme='dark'] .modal-buttons button.btn-primary:hover {
     border-color: var(--pz-accent-hover);
 }
 
-html[data-theme='dark'] .modal-buttons button.btn-danger,
-html[data-theme='dark'] .modal-buttons button.btn-delete-ws {
+html[data-theme='dark'] .modal-buttons button.btn-danger {
     background-color: var(--pz-danger);
     color: var(--pz-text-inverse);
     border-color: var(--pz-danger);
 }
 
-html[data-theme='dark'] .modal-buttons button.btn-danger:hover,
-html[data-theme='dark'] .modal-buttons button.btn-delete-ws:hover {
+html[data-theme='dark'] .modal-buttons button.btn-danger:hover {
     background-color: var(--pz-danger-text-hover);
     border-color: var(--pz-danger-text-hover);
 }
@@ -625,20 +623,6 @@ html[data-theme='dark'] #folderShareModal h3 {
 /* ============================================
    Folder Options (Move Dialog)
    ============================================ */
-
-html[data-theme='dark'] .folder-option {
-    color: var(--pz-text);
-    border-color: var(--pz-border);
-}
-
-html[data-theme='dark'] .folder-option:hover {
-    background-color: var(--pz-surface);
-}
-
-html[data-theme='dark'] .folder-option.selected {
-    background-color: var(--pz-active-bg);
-    color: var(--pz-text-strong);
-}
 
 /* ============================================
    Import/Alert Modal Content

@@ -540,7 +540,6 @@
       "website": "Öffnen Sie die offizielle Poznote-Website.",
       "tips": "Entdecken Sie Tipps und Tricks, um das Beste aus Poznote herauszuholen.",
       "discord": "Der Poznote-Community auf Discord beitreten.",
-      "contact": "Senden Sie eine E-Mail an die Kontaktadresse dieser Instanz.",
       "discussions": "Stellen Sie eine Frage oder teilen Sie eine Idee in den GitHub-Diskussionen.",
       "support": "Unterstützen Sie die Entwicklung von Poznote mit einer Spende.",
       "s3_storage": "Notiz-Anhänge in einem S3-kompatiblen Objektspeicher statt auf der lokalen Festplatte speichern.",
@@ -617,7 +616,6 @@
       "git_sync": "Git-Synchronisierung",
       "check_updates": "Nach Updates suchen",
       "version": "Version",
-      "contact": "Kontakt",
       "api_docs": "API-Dokumentation",
       "documentation": "Documentation GitHub",
       "discussions": "GitHub-Diskussionen",
@@ -928,7 +926,12 @@
       "view_here": "In einem Tab anzeigen, ohne das Konto zu wechseln"
     },
     "show_offline_dots": "Offline-Punkte anzeigen",
-    "hide_offline_dots": "Offline-Punkte ausblenden"
+    "hide_offline_dots": "Offline-Punkte ausblenden",
+    "view_options": "Ansichtsoptionen",
+    "expand_all_folders_hint": "Alle Ordner des Baums öffnen",
+    "collapse_all_folders_hint": "Alle Ordner des Baums schließen",
+    "customize": "Seitenleiste anpassen",
+    "customize_hint": "Auswählen, welche Elemente der Seitenleiste angezeigt werden"
   },
   "home": {
     "title": "Dashboard",
@@ -1174,9 +1177,7 @@
     },
     "table_picker": {
       "title": "Tabelle einfügen",
-      "rows_label": "Zeilen:",
       "rows_placeholder": "Zeilen",
-      "cols_label": "Spalten:",
       "cols_placeholder": "Spalten",
       "insert": "Einfügen"
     },
@@ -1379,11 +1380,12 @@
         "slash_menu": "Slash-Menü",
         "panels": "Sonstiges",
         "dashboard_toolbar": "Dashboard",
-        "icon_sidebar": "Icon-Seitenleiste",
+        "icon_sidebar": "Symbolleiste",
         "folder_actions": "Ordneraktionen",
         "workspace_menu": "Workspace-Menü",
         "note_actions": "Notizaktionen",
-        "mobile_editor_bar": "Mobile Editorleiste"
+        "mobile_editor_bar": "Mobile Editorleiste",
+        "sidebar": "Seitenleiste"
       },
       "check_all": "Alle auswählen",
       "uncheck_all": "Alle abwählen",
@@ -1409,7 +1411,9 @@
       "panel_saved": "Gespeichert",
       "panel_save_error": "Speichern nicht möglich, bitte erneut versuchen.",
       "mobile_editor_bar_hint": "Leiste über der Bildschirmtastatur, während eine Notiz auf einem Smartphone oder Tablet bearbeitet wird.",
-      "mobile_editor_bar_show": "Leiste anzeigen"
+      "mobile_editor_bar_show": "Leiste anzeigen",
+      "sidebar_hint": "Spalte mit dem Notizbaum, zwischen der Symbolleiste und der Notiz.",
+      "icon_rail_hint": "Schmale Symbolspalte ganz links auf jeder Seite."
     },
     "icon_sidebar_order": {
       "title": "Layout der Icon-Seitenleiste",
@@ -1812,8 +1816,8 @@
       },
       "badge": "{{count}} automatische pro Notiz",
       "badge_with_safety": "{{count}} automatische, {{safety}} Sicherheits- pro Notiz",
-      "warning_title": "Schnappschüsse speichern nur den Text der Notiz. Anhänge werden nie kopiert.",
-      "warning": "Anhänge und Bilder bleiben auch nach dem Entfernen aus einer Notiz auf der Festplatte, solange einer ihrer Schnappschüsse sie noch enthält. Sie werden erst freigegeben, wenn der letzte Schnappschuss, der sie enthält, abläuft (spätestens nach {{days}} Tagen) oder die Notiz endgültig gelöscht wird."
+      "warning_title": "Schnappschüsse speichern nur den Text der Notiz. Anhänge und Bilder werden nie kopiert.",
+      "warning": "Anhänge und Bilder bleiben auch nach dem Entfernen aus einer Notiz auf der Festplatte, solange einer ihrer Schnappschüsse sie noch enthält. Sie werden erst freigegeben, wenn der letzte Schnappschuss, der sie enthält, gelöscht wird oder abläuft (spätestens nach {{days}} Tagen) oder die Notiz endgültig gelöscht wird."
     },
     "api_rest": {
       "github_option": "GitHub",
@@ -3692,6 +3696,20 @@
       "date_created": "Erstellungsdatum",
       "type": "Typ",
       "custom": "Benutzerdefiniert"
+    },
+    "hints": {
+      "name": "Notizen nach Titel und Ordner nach Name, von A bis Z",
+      "date_modified": "Zuletzt geänderte Notizen zuerst",
+      "date_created": "Zuletzt erstellte Notizen und Ordner zuerst",
+      "type": "Notizen nach Typ gruppiert (Notiz, Markdown, Aufgabenliste, Zeichnung, Link), dann nach Titel",
+      "custom": "Die Reihenfolge, die Sie durch Ziehen von Notizen und Ordnern festgelegt haben"
+    },
+    "menu_items": {
+      "name": "Nach Name sortieren",
+      "date_modified": "Nach Änderungsdatum sortieren",
+      "date_created": "Nach Erstellungsdatum sortieren",
+      "type": "Nach Typ sortieren",
+      "custom": "Eigene Reihenfolge"
     }
   },
   "calendar": {
@@ -4447,6 +4465,13 @@
       "empty": "Keine Tags auf diesem Board.",
       "search": "Tags filtern...",
       "no_match": "Kein passender Tag."
+    },
+    "filters": {
+      "button": "Filter",
+      "color": "Farbe",
+      "modified": "Zuletzt geändert",
+      "tags": "Tags",
+      "reset": "Filter zurücksetzen"
     }
   },
   "graph": {
@@ -4737,6 +4762,7 @@
     "filter_overdue": "Überfällig",
     "filter_dated": "Mit Datum",
     "filter_completed": "Erledigt",
+    "filters": "Filter",
     "filter_placeholder": "Nach Aufgabe, Titel oder Ordner filtern...",
     "empty": "Noch keine Aufgaben. Erstellen Sie eine Aufgabenlisten-Notiz oder fügen Sie einer Notiz eine Checkliste hinzu, um zu beginnen.",
     "empty_filtered": "Keine Aufgaben entsprechen diesem Filter.",
@@ -5151,6 +5177,8 @@
       "title": "Offline",
       "filter_placeholder": "Nach Name oder Ordner filtern...",
       "column_reason": "Grund",
+      "filter_reason": "Nach Grund filtern",
+      "reason_all": "Alle Gründe",
       "reason_note": "Offline behalten",
       "reason_folder": "In einem offline behaltenen Ordner",
       "reason_favorite": "Favorit",

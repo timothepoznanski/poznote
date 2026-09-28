@@ -87,20 +87,6 @@ html[data-theme='dark'] .settings-container h1 {
     margin-bottom: 16px;
 }
 
-html[data-theme='dark'] .settings-card {
-    border-color: var(--pz-border);
-    border-bottom: var(--pz-border);
-}
-
-html[data-theme='dark'] .settings-card:hover {
-    background-color: var(--pz-surface);
-    border-color: var(--pz-accent-text);
-}
-
-html[data-theme='dark'] .settings-card h3 {
-    color: var(--pz-text);
-}
-
 html[data-theme='dark'] .settings-section {
     background-color: var(--pz-surface);
     border-color: var(--pz-border);
@@ -126,19 +112,6 @@ html[data-theme='dark'] .settings-section .btn:enabled:not(.btn-primary):not(.bt
 /* ============================================
    Info Page
    ============================================ */
-
-html[data-theme='dark'] .info-label {
-    background-color: var(--pz-bg);
-    color: var(--pz-text);
-}
-
-html[data-theme='dark'] .info-value {
-    background-color: var(--pz-bg);
-}
-
-html[data-theme='dark'] .info-row {
-    border-color: var(--pz-border);
-}
 
 /* ============================================
    Login Page
@@ -169,37 +142,12 @@ html[data-theme='dark'] .workspace-list ul li {
     border-bottom-color: var(--pz-border);
 }
 
-html[data-theme='dark'] .action-btn {
-    background-color: var(--pz-surface);
-    border-color: var(--pz-border);
-    color: var(--pz-text);
-}
-
-html[data-theme='dark'] .action-btn:hover {
-    background-color: var(--pz-border);
-    border-color: var(--pz-border-strong);
-}
-
 html[data-theme='dark'] .workspace-list {
     border-color: var(--pz-border);
 }
 
-html[data-theme='dark'] .locked-icon {
-    color: var(--pz-text-muted);
-}
-
 html[data-theme='dark'] #defaultWorkspaceStatus {
     color: var(--pz-success-text);
-}
-
-html[data-theme='dark'] .workspace-item {
-    background-color: var(--pz-chrome-bg);
-    border-color: var(--pz-border);
-}
-
-html[data-theme='dark'] .workspace-item:hover {
-    background-color: var(--pz-surface);
-    box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.4);
 }
 
 /* ============================================
@@ -398,10 +346,6 @@ html[data-theme='dark'] .card-header {
 
 html[data-theme='dark'] .card-header:hover {
     background: linear-gradient(135deg, var(--pz-surface) 0%, var(--pz-surface) 100%);
-}
-
-html[data-theme='dark'] .card-header h3 i.card-icon {
-    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .card-header h3 i.chevron {

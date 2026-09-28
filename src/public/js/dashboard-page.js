@@ -255,10 +255,11 @@
                 ' style="--note-color:' + esc(note.colorHex) + '"';
         }
 
-        // Draggable only where the order can be saved (see cardsReorderable).
+        // Draggable only where the order can be saved with a mouse (see
+        // cardsMouseDraggable; touch drags go through initTouchCards).
         // The link and the thumbnail are natively draggable and would start a
         // link or image drag instead of the card's, hence draggable="false".
-        var dragAttr = cardsReorderable() ? ' draggable="true"' : '';
+        var dragAttr = cardsMouseDraggable() ? ' draggable="true"' : '';
 
         // The pin button sits outside .dash-card-link so clicking it never
         // navigates to the note.
@@ -378,6 +379,7 @@
         }
         grid.classList.toggle('dash-grid-sectioned', sectioned);
         grid.innerHTML = html;
+        syncCardSelection();
     }
 
     function renderBreadcrumb() {
@@ -521,18 +523,16 @@
         if (activeColorFilter) {
             activeColorFilter = null;
             saveColorFilter();
-            updateColorFilterButtonState();
         }
         if (activeModifiedFilter) {
             activeModifiedFilter = null;
             saveModifiedFilter();
-            updateModifiedFilterButtonState();
         }
         if (activeTagFilter.length) {
             activeTagFilter = [];
             saveTagFilter();
-            updateTagFilterButtonState();
         }
+        updateFilterButtonState();
         navStack = path;
         saveNavigationPath();
         renderAll();
@@ -614,7 +614,7 @@
         } catch (e) {
             activeModifiedFilter = null;
         }
-        updateModifiedFilterButtonState();
+        updateFilterButtonState();
     }
 
     // Unix time (seconds) a note must have been modified after to pass
@@ -657,7 +657,7 @@
         } catch (e) {
             activeTagFilter = [];
         }
-        updateTagFilterButtonState();
+        updateFilterButtonState();
     }
 
     function noteMatchesTags(note) {
@@ -697,7 +697,7 @@
         } catch (e) {
             activeColorFilter = null;
         }
-        updateColorFilterButtonState();
+        updateFilterButtonState();
     }
 
     function noteMatchesColor(note) {
@@ -809,9 +809,9 @@
     // arranging the board never touches the sidebar's manual order and the
     // sidebar's sort setting never rearranges the board. The filtered views
     // mix cards from the whole tree, where a rank among siblings has no
-    // meaning, so dragging is only offered on the plain folder view. Desktop
-    // only: on touch, the long press that starts an HTML5 drag fights the tap
-    // that opens the note, as in the sidebar.
+    // meaning, so dragging is only offered on the plain folder view. The HTML5
+    // drag is for a mouse: on touch, the long press that starts it fights the
+    // tap that opens the note, so touch screens drag through initTouchCards.
 
     var cardDrag = null; // { noteId, level, pinned } while a card is dragged
 
@@ -820,7 +820,12 @@
     }
 
     function cardsReorderable() {
-        return window.innerWidth > 800 && !isFilteredView();
+        return !isFilteredView();
+    }
+
+    function cardsMouseDraggable() {
+        var coarse = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+        return !coarse && cardsReorderable();
     }
 
     // Level (root, workspace group or folder) whose .notes holds the note
@@ -992,7 +997,7 @@
             var noteId = card.getAttribute('data-note-id');
             var note = noteId ? findNoteById(noteId) : null;
             var level = noteId ? findNoteLevel(noteId) : null;
-            if (!note || !level || !cardsReorderable()) {
+            if (!note || !level || !cardsMouseDraggable()) {
                 e.preventDefault();
                 return;
             }
@@ -1038,6 +1043,288 @@
 
         // Cancelled drags (Escape, drop outside the grid)
         grid.addEventListener('dragend', endCardDrag);
+    }
+
+    // --- Touch: long press selects a card, moving drags it ---
+    //
+    // Touch has no right-click to open the color picker and no mouse for the
+    // HTML5 drag, so a long press on a card selects it, as in Google Keep: the
+    // filter row gives way to a selection bar whose palette button opens the
+    // picker. Moving the finger once the card is selected drags it among its
+    // siblings, with the same rules, indicators and saving as the mouse drag.
+    // While a card is selected, a tap on another card selects that one
+    // instead of opening it; a tap elsewhere, the bar's close button or
+    // Escape clears the selection.
+
+    var LONG_PRESS_MS = 450;
+    // How far the finger may wander before a press counts as a scroll, and
+    // how far a selected card must move before it is dragged
+    var TOUCH_SLOP = 8;
+    var cardSelection = null; // { type: 'note' | 'folder', id } while a card is selected
+    var touchPress = null;    // the finger currently down on a card
+
+    function cardKey(card) {
+        return card.classList.contains('dash-note-card')
+            ? { type: 'note', id: card.getAttribute('data-note-id') }
+            : { type: 'folder', id: card.getAttribute('data-folder-id') };
+    }
+
+    function isSelectedCard(card) {
+        if (!cardSelection || !card) return false;
+        var key = cardKey(card);
+        return key.type === cardSelection.type && key.id === cardSelection.id;
+    }
+
+    function findSelectedCard() {
+        if (!cardSelection) return null;
+        var cards = document.querySelectorAll('#dashboardGrid .dash-card:not(.dash-card-ghost)');
+        for (var i = 0; i < cards.length; i++) {
+            if (isSelectedCard(cards[i])) return cards[i];
+        }
+        return null;
+    }
+
+    // Marks the selected card and shows the bar. Runs after every render, so
+    // the selection survives a redraw, and ends when its card left the board
+    // (filtered out, or another folder opened).
+    function syncCardSelection() {
+        Array.prototype.forEach.call(document.querySelectorAll('#dashboardGrid .dash-card.is-selected'), function (card) {
+            card.classList.remove('is-selected');
+        });
+        var card = findSelectedCard();
+        if (card) {
+            card.classList.add('is-selected');
+        } else {
+            cardSelection = null;
+        }
+
+        var topbar = document.querySelector('.dashboard-topbar');
+        if (topbar) topbar.classList.toggle('is-selecting', !!cardSelection);
+        var bar = document.getElementById('dashboardSelectionBar');
+        if (!bar) return;
+        bar.hidden = !cardSelection;
+        if (!cardSelection) return;
+
+        var isFolder = cardSelection.type === 'folder';
+        var target = isFolder ? findFolderById(cardSelection.id) : findNoteById(cardSelection.id);
+        var title = document.getElementById('dashboardSelectionTitle');
+        if (title) title.textContent = target ? ((isFolder ? target.name : target.heading) || '') : '';
+        var colorBtn = document.getElementById('dashboardSelectionColorBtn');
+        if (colorBtn) {
+            var txt = window.NOTE_COLOR_TXT || {};
+            var label = isFolder ? (txt.folderModalTitle || 'Folder color') : (txt.modalTitle || 'Note color');
+            colorBtn.title = label;
+            colorBtn.setAttribute('aria-label', label);
+        }
+    }
+
+    function selectCard(card) {
+        cardSelection = card ? cardKey(card) : null;
+        syncCardSelection();
+    }
+
+    function clearCardSelection() {
+        if (!cardSelection) return;
+        cardSelection = null;
+        syncCardSelection();
+    }
+
+    // The press became a long press: select its card. Also called from the
+    // contextmenu event, which Android fires for a long press and which may
+    // come before the timer.
+    function activateTouchPress() {
+        if (!touchPress || touchPress.active) return;
+        clearTimeout(touchPress.timer);
+        touchPress.active = true;
+        selectCard(touchPress.card);
+        if (navigator.vibrate) {
+            try { navigator.vibrate(10); } catch (e) { /* not allowed */ }
+        }
+    }
+
+    function startTouchDrag(press) {
+        var card = press.card;
+        var noteId = card.getAttribute('data-note-id');
+        var note = noteId ? findNoteById(noteId) : null;
+        var level = noteId ? findNoteLevel(noteId) : null;
+        // Folders and the cards of a filtered view stay put, as with the mouse
+        if (!note || !level || !cardsReorderable()) {
+            press.noDrag = true;
+            return;
+        }
+        cardDrag = { noteId: noteId, level: level, pinned: !!note.pinned };
+
+        var rect = card.getBoundingClientRect();
+        var ghost = card.cloneNode(true);
+        ghost.classList.add('dash-card-ghost');
+        ghost.removeAttribute('title');
+        ghost.style.left = rect.left + 'px';
+        ghost.style.top = rect.top + 'px';
+        ghost.style.width = rect.width + 'px';
+        ghost.style.height = rect.height + 'px';
+        card.parentNode.appendChild(ghost);
+        card.classList.add('is-dragging');
+        press.drag = { ghost: ghost, target: null, frame: 0 };
+        press.drag.frame = requestAnimationFrame(function () { touchAutoScroll(press); });
+    }
+
+    function updateTouchDropTarget(press) {
+        var el = document.elementFromPoint(press.x, press.y);
+        var target = el ? findCardDropTarget({ target: el, clientX: press.x, clientY: press.y }) : null;
+        press.drag.target = target;
+        if (target) {
+            showCardDropIndicator(target);
+        } else {
+            clearCardDropIndicators();
+        }
+    }
+
+    function moveTouchDrag(press) {
+        press.drag.ghost.style.transform = 'translate(' + (press.x - press.startX) + 'px, ' +
+            (press.y - press.startY) + 'px)';
+        updateTouchDropTarget(press);
+    }
+
+    // Scrolls the page while the finger holds a card near the top (under the
+    // sticky top bar) or the bottom of the screen, faster closer to the edge
+    function touchAutoScroll(press) {
+        if (touchPress !== press || !press.drag) return;
+        var edge = 64;
+        var topbar = document.querySelector('.dashboard-topbar');
+        var top = topbar ? Math.max(0, topbar.getBoundingClientRect().bottom) : 0;
+        var speed = 0;
+        if (press.y < top + edge) {
+            speed = -Math.ceil((top + edge - press.y) / 5);
+        } else if (press.y > window.innerHeight - edge) {
+            speed = Math.ceil((press.y - (window.innerHeight - edge)) / 5);
+        }
+        if (speed) {
+            var scroller = document.scrollingElement || document.documentElement;
+            var before = scroller.scrollTop;
+            scroller.scrollTop = before + speed;
+            if (scroller.scrollTop !== before) updateTouchDropTarget(press);
+        }
+        press.drag.frame = requestAnimationFrame(function () { touchAutoScroll(press); });
+    }
+
+    function finishTouchDrag(press, drop) {
+        var drag = press.drag;
+        if (!drag) return;
+        cancelAnimationFrame(drag.frame);
+        if (drag.ghost.parentNode) drag.ghost.parentNode.removeChild(drag.ghost);
+        var target = drop ? drag.target : null;
+        var dragged = cardDrag && cardDrag.noteId;
+        endCardDrag();
+        if (target && dragged) reorderCard(dragged, target.card.getAttribute('data-note-id'), target.position);
+    }
+
+    function endTouchPress() {
+        var press = touchPress;
+        if (!press) return null;
+        clearTimeout(press.timer);
+        touchPress = null;
+        return press;
+    }
+
+    function initTouchCards() {
+        var grid = document.getElementById('dashboardGrid');
+        if (!grid) return;
+
+        grid.addEventListener('touchstart', function (e) {
+            var previous = endTouchPress();
+            if (previous) finishTouchDrag(previous, false);
+            if (e.touches.length !== 1 || !e.target.closest) return;
+            var card = e.target.closest('.dash-card');
+            if (!card || e.target.closest('.dash-card-pin')) return;
+            var touch = e.touches[0];
+            touchPress = {
+                card: card,
+                startX: touch.clientX,
+                startY: touch.clientY,
+                x: touch.clientX,
+                y: touch.clientY,
+                active: false,
+                drag: null,
+                noDrag: false,
+                timer: 0
+            };
+            touchPress.timer = setTimeout(activateTouchPress, LONG_PRESS_MS);
+        }, { passive: true });
+
+        grid.addEventListener('touchmove', function (e) {
+            var press = touchPress;
+            if (!press || !e.touches.length) return;
+            press.x = e.touches[0].clientX;
+            press.y = e.touches[0].clientY;
+            var moved = Math.abs(press.x - press.startX) > TOUCH_SLOP || Math.abs(press.y - press.startY) > TOUCH_SLOP;
+
+            if (!press.active) {
+                // Moving before the long press is a scroll, and so is any
+                // move the browser no longer lets us cancel
+                if (moved || !e.cancelable) endTouchPress();
+                return;
+            }
+            // Selected: the finger now moves the card instead of the page
+            if (e.cancelable) e.preventDefault();
+            if (press.noDrag) return;
+            if (!press.drag) {
+                if (!moved) return;
+                startTouchDrag(press);
+                if (!press.drag) return;
+            }
+            moveTouchDrag(press);
+        }, { passive: false });
+
+        grid.addEventListener('touchend', function (e) {
+            var press = endTouchPress();
+            if (!press || !press.active) return;
+            // The long press already acted: no click must open the card
+            if (e.cancelable) e.preventDefault();
+            finishTouchDrag(press, true);
+        });
+
+        grid.addEventListener('touchcancel', function () {
+            var press = endTouchPress();
+            if (press) finishTouchDrag(press, false);
+        });
+
+        // While a card is selected, taps choose another card rather than
+        // opening one. Capture phase, ahead of the link and of the folder and
+        // pin handlers. Taps outside the board (icon rail, panels) keep their
+        // action and just end the selection.
+        document.addEventListener('click', function (e) {
+            if (!cardSelection || !e.target.closest) return;
+            if (e.target.closest('#dashboardSelectionBar, .modal')) return;
+            var container = e.target.closest('.dashboard-container');
+            if (!container) {
+                clearCardSelection();
+                return;
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            var card = e.target.closest('#dashboardGrid .dash-card');
+            if (card && !isSelectedCard(card)) {
+                selectCard(card);
+            } else {
+                clearCardSelection();
+            }
+        }, true);
+
+        var closeBtn = document.querySelector('[data-action="clear-card-selection"]');
+        if (closeBtn) closeBtn.addEventListener('click', clearCardSelection);
+
+        var colorBtn = document.getElementById('dashboardSelectionColorBtn');
+        if (colorBtn) {
+            colorBtn.addEventListener('click', function () {
+                if (cardSelection) openNoteColorModal(cardSelection.id, cardSelection.type);
+            });
+        }
+
+        // Capture phase, so an Escape that closes the color modal is seen
+        // while the modal is still open and leaves the selection alone
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && cardSelection && colorTargetNoteId === null) clearCardSelection();
+        }, true);
     }
 
     function toggleNotePinned(noteId) {
@@ -1242,10 +1529,46 @@
         });
     }
 
-    function buildColorFilterMenu() {
-        var menu = document.getElementById('dashboardColorFilterMenu');
-        if (!menu) return;
-        menu.innerHTML = '';
+    // --- Filter panel (color, last modified, tags) ---
+    //
+    // One topbar button opens a panel with a section per filter. Choosing an
+    // entry filters right away and keeps the panel open, so the three can be
+    // combined in one go; the button turns blue and counts the active
+    // criteria. State, storage and matching are the per-filter code above.
+
+    function activeFilterCount() {
+        return (activeColorFilter ? 1 : 0) + (activeModifiedFilter ? 1 : 0) + activeTagFilter.length;
+    }
+
+    function updateFilterButtonState() {
+        var btn = document.getElementById('dashboardFilterBtn');
+        if (!btn) return;
+        var count = activeFilterCount();
+        btn.classList.toggle('active', count > 0);
+        var badge = btn.querySelector('.dashboard-filter-badge');
+        if (badge) {
+            badge.hidden = count === 0;
+            badge.textContent = count > 0 ? String(count) : '';
+        }
+        var footer = document.querySelector('#dashboardFilterMenu .dashboard-filter-footer');
+        if (footer) footer.hidden = count === 0;
+    }
+
+    // A pill of the color and last-modified sections
+    function buildFilterChip(label, active, onPick, leading) {
+        var chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'dashboard-filter-chip' + (active ? ' active' : '');
+        chip.setAttribute('aria-pressed', active ? 'true' : 'false');
+        chip.innerHTML = (leading || '') + '<span>' + esc(label) + '</span>';
+        chip.addEventListener('click', onPick);
+        return chip;
+    }
+
+    function buildColorFilterSection() {
+        var section = document.getElementById('dashboardFilterColorSection');
+        if (!section) return;
+        section.innerHTML = '';
 
         var txt = window.NOTE_COLOR_TXT || {};
 
@@ -1280,7 +1603,7 @@
             });
 
             // Custom colors belong to no palette entry, so they would otherwise
-            // be unfilterable. Sorted so the menu order stays stable.
+            // be unfilterable. Sorted so the order stays stable.
             Object.keys(usedColors).filter(function (value) {
                 return value.charAt(0) === '#';
             }).sort().forEach(function (hex) {
@@ -1289,7 +1612,7 @@
         }
 
         // A filter restored from a previous visit may target a color nothing
-        // carries any more; keep its entry so the menu still shows what is on.
+        // carries any more; keep its entry so the panel still shows what is on.
         if (activeColorFilter && !entries.some(function (entry) { return entry.value === activeColorFilter; })) {
             var stale = null;
             getPalette().forEach(function (entry) {
@@ -1303,68 +1626,23 @@
         }
 
         entries.forEach(function (entry) {
-            var item = document.createElement('button');
-            item.type = 'button';
-            item.className = 'dashboard-color-filter-item' +
-                (activeColorFilter === entry.value ? ' active' : '');
-            item.innerHTML = (entry.hex
-                    ? '<span class="note-color-swatch" style="background-color:' + esc(entry.hex) + '"></span>'
-                    : '<span class="note-color-swatch note-color-swatch-empty"></span>') +
-                '<span>' + esc(entry.label) + '</span>';
-            item.addEventListener('click', function () {
+            var swatch = entry.hex
+                ? '<span class="note-color-swatch" style="background-color:' + esc(entry.hex) + '"></span>'
+                : '';
+            section.appendChild(buildFilterChip(entry.label, activeColorFilter === entry.value, function () {
                 activeColorFilter = entry.value;
                 saveColorFilter();
-                closeColorFilterMenu();
-                updateColorFilterButtonState();
+                buildColorFilterSection();
+                updateFilterButtonState();
                 renderAll();
-            });
-            menu.appendChild(item);
+            }, swatch));
         });
     }
 
-    // The menus are position:fixed (the topbar clips absolute children), so
-    // they are anchored to their button here and kept inside the viewport.
-    function positionFilterMenu(btn, menu) {
-        if (!btn || !menu || menu.hidden) return;
-
-        var rect = btn.getBoundingClientRect();
-        var top = rect.bottom + 6;
-        menu.style.top = top + 'px';
-        // Cap to the space actually left below the button so every entry stays
-        // reachable by scrolling instead of being cut off by the viewport.
-        menu.style.maxHeight = Math.max(160, window.innerHeight - top - 12) + 'px';
-
-        var width = menu.offsetWidth || 180;
-        var left = Math.min(rect.left, window.innerWidth - width - 8);
-        menu.style.left = Math.max(8, left) + 'px';
-    }
-
-    function positionColorFilterMenu() {
-        positionFilterMenu(document.getElementById('dashboardColorFilterBtn'),
-            document.getElementById('dashboardColorFilterMenu'));
-    }
-
-    function positionModifiedFilterMenu() {
-        positionFilterMenu(document.getElementById('dashboardModifiedFilterBtn'),
-            document.getElementById('dashboardModifiedFilterMenu'));
-    }
-
-    function updateModifiedFilterButtonState() {
-        var btn = document.getElementById('dashboardModifiedFilterBtn');
-        if (btn) btn.classList.toggle('active', !!activeModifiedFilter);
-    }
-
-    function closeModifiedFilterMenu() {
-        var menu = document.getElementById('dashboardModifiedFilterMenu');
-        var btn = document.getElementById('dashboardModifiedFilterBtn');
-        if (menu) menu.hidden = true;
-        if (btn) btn.setAttribute('aria-expanded', 'false');
-    }
-
-    function buildModifiedFilterMenu() {
-        var menu = document.getElementById('dashboardModifiedFilterMenu');
-        if (!menu) return;
-        menu.innerHTML = '';
+    function buildModifiedFilterSection() {
+        var section = document.getElementById('dashboardFilterModifiedSection');
+        if (!section) return;
+        section.innerHTML = '';
 
         var txt = window.DASHBOARD_MODIFIED_TXT || {};
         var entries = [
@@ -1377,80 +1655,23 @@
         ];
 
         entries.forEach(function (entry) {
-            var item = document.createElement('button');
-            item.type = 'button';
-            item.className = 'dashboard-color-filter-item dashboard-modified-filter-item' +
-                (activeModifiedFilter === entry.value ? ' active' : '');
-            item.innerHTML = '<i class="lucide ' + (entry.value ? 'lucide-clock' : 'lucide-infinity') + '"></i>' +
-                '<span>' + esc(entry.label) + '</span>';
-            item.addEventListener('click', function () {
+            section.appendChild(buildFilterChip(entry.label, activeModifiedFilter === entry.value, function () {
                 activeModifiedFilter = entry.value;
                 saveModifiedFilter();
-                closeModifiedFilterMenu();
-                updateModifiedFilterButtonState();
+                buildModifiedFilterSection();
+                updateFilterButtonState();
                 renderAll();
-            });
-            menu.appendChild(item);
+            }));
         });
     }
 
-    function initModifiedFilter() {
-        var btn = document.getElementById('dashboardModifiedFilterBtn');
-        var menu = document.getElementById('dashboardModifiedFilterMenu');
-        if (!btn || !menu) return;
-
-        btn.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            if (menu.hidden) {
-                closeColorFilterMenu();
-                closeTagFilterMenu();
-                buildModifiedFilterMenu();
-                menu.hidden = false;
-                positionModifiedFilterMenu();
-                btn.setAttribute('aria-expanded', 'true');
-            } else {
-                closeModifiedFilterMenu();
-            }
-        });
-
-        document.addEventListener('click', function (e) {
-            if (!menu.hidden && !menu.contains(e.target) && !btn.contains(e.target)) {
-                closeModifiedFilterMenu();
-            }
-        });
-
-        window.addEventListener('resize', positionModifiedFilterMenu);
-        window.addEventListener('scroll', positionModifiedFilterMenu, true);
-    }
-
-    function updateTagFilterButtonState() {
-        var btn = document.getElementById('dashboardTagFilterBtn');
-        if (!btn) return;
-        btn.classList.toggle('active', activeTagFilter.length > 0);
-        var base = btn.getAttribute('data-title') || btn.getAttribute('title') || '';
-        if (!btn.getAttribute('data-title')) btn.setAttribute('data-title', base);
-        btn.title = activeTagFilter.length ? base + ': ' + activeTagFilter.join(', ') : base;
-    }
-
-    function closeTagFilterMenu() {
-        var menu = document.getElementById('dashboardTagFilterMenu');
-        var btn = document.getElementById('dashboardTagFilterBtn');
-        if (menu) menu.hidden = true;
-        if (btn) btn.setAttribute('aria-expanded', 'false');
-    }
-
-    function positionTagFilterMenu() {
-        positionFilterMenu(document.getElementById('dashboardTagFilterBtn'),
-            document.getElementById('dashboardTagFilterMenu'));
-    }
-
-    // Checklist of the board's tags. Checking one filters right away and keeps
-    // the menu open so several tags can be combined (a note matches any of them).
-    function buildTagFilterMenu() {
-        var menu = document.getElementById('dashboardTagFilterMenu');
-        if (!menu) return;
-        menu.innerHTML = '';
+    // Checklist of the board's tags: a note matches any checked tag. The
+    // search box narrows the list, which scrolls on its own so a long list
+    // never pushes the other sections away.
+    function buildTagFilterSection() {
+        var section = document.getElementById('dashboardFilterTagSection');
+        if (!section) return;
+        section.innerHTML = '';
 
         var txt = window.DASHBOARD_TAG_FILTER_TXT || {};
         var index = collectBoardTags();
@@ -1460,39 +1681,38 @@
         });
         var keys = Object.keys(index).sort(function (a, b) { return a.localeCompare(b); });
 
-        // Search box pinned at the top: narrows the list as you type
-        var searchWrap = document.createElement('div');
-        searchWrap.className = 'dashboard-tag-filter-search-wrap';
+        if (!keys.length) {
+            var empty = document.createElement('div');
+            empty.className = 'dashboard-tag-filter-empty';
+            empty.textContent = txt.empty || 'No tags on this board.';
+            section.appendChild(empty);
+            return;
+        }
+
         var search = document.createElement('input');
         search.type = 'text';
         search.className = 'dashboard-tag-filter-search';
         search.placeholder = txt.search || 'Filter tags...';
         search.setAttribute('autocomplete', 'off');
         search.setAttribute('aria-label', txt.search || 'Filter tags...');
-        searchWrap.appendChild(search);
-        if (keys.length) menu.appendChild(searchWrap);
+        section.appendChild(search);
+
+        var list = document.createElement('div');
+        list.className = 'dashboard-filter-tag-list';
+        section.appendChild(list);
 
         var all = document.createElement('button');
         all.type = 'button';
         all.className = 'dashboard-color-filter-item' + (activeTagFilter.length ? '' : ' active');
-        all.innerHTML = '<span class="note-color-swatch note-color-swatch-empty"></span>' +
-            '<span>' + esc(txt.all || 'All tags') + '</span>';
+        all.innerHTML = '<span>' + esc(txt.all || 'All tags') + '</span>';
         all.addEventListener('click', function () {
             activeTagFilter = [];
             saveTagFilter();
-            closeTagFilterMenu();
-            updateTagFilterButtonState();
+            buildTagFilterSection();
+            updateFilterButtonState();
             renderAll();
         });
-        menu.appendChild(all);
-
-        if (!keys.length) {
-            var empty = document.createElement('div');
-            empty.className = 'dashboard-tag-filter-empty';
-            empty.textContent = txt.empty || 'No tags on this board.';
-            menu.appendChild(empty);
-            return;
-        }
+        list.appendChild(all);
 
         var rows = [];
         var noMatch = document.createElement('div');
@@ -1509,12 +1729,6 @@
                 if (match) visible++;
             });
             noMatch.hidden = visible > 0;
-        });
-        search.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') {
-                e.preventDefault();
-                closeTagFilterMenu();
-            }
         });
 
         keys.forEach(function (key) {
@@ -1534,7 +1748,7 @@
                     activeTagFilter = activeTagFilter.filter(function (tag) { return tag !== key; });
                 }
                 saveTagFilter();
-                updateTagFilterButtonState();
+                updateFilterButtonState();
                 item.classList.toggle('active', box.checked);
                 all.classList.toggle('active', activeTagFilter.length === 0);
                 renderAll();
@@ -1560,84 +1774,94 @@
             item.appendChild(count);
 
             rows.push({ item: item, text: normalizeSearchText(entry.label) });
-            menu.appendChild(item);
+            list.appendChild(item);
         });
-        menu.appendChild(noMatch);
+        list.appendChild(noMatch);
     }
 
-    function initTagFilter() {
-        var btn = document.getElementById('dashboardTagFilterBtn');
-        var menu = document.getElementById('dashboardTagFilterMenu');
-        if (!btn || !menu) return;
-
-        btn.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            if (menu.hidden) {
-                closeColorFilterMenu();
-                closeModifiedFilterMenu();
-                buildTagFilterMenu();
-                menu.hidden = false;
-                positionTagFilterMenu();
-                btn.setAttribute('aria-expanded', 'true');
-                // Desktop only: on mobile the keyboard would cover the list
-                var search = menu.querySelector('.dashboard-tag-filter-search');
-                if (search && window.innerWidth > 800) search.focus();
-            } else {
-                closeTagFilterMenu();
-            }
-        });
-
-        document.addEventListener('click', function (e) {
-            if (!menu.hidden && !menu.contains(e.target) && !btn.contains(e.target)) {
-                closeTagFilterMenu();
-            }
-        });
-
-        window.addEventListener('resize', positionTagFilterMenu);
-        window.addEventListener('scroll', positionTagFilterMenu, true);
+    function buildFilterPanel() {
+        buildColorFilterSection();
+        buildModifiedFilterSection();
+        buildTagFilterSection();
+        updateFilterButtonState();
     }
 
-    function updateColorFilterButtonState() {
-        var btn = document.getElementById('dashboardColorFilterBtn');
-        if (btn) btn.classList.toggle('active', !!activeColorFilter);
+    // The panel is position:fixed (the topbar clips absolute children), so
+    // it is anchored to its button here and kept inside the viewport.
+    function positionFilterPanel() {
+        var btn = document.getElementById('dashboardFilterBtn');
+        var menu = document.getElementById('dashboardFilterMenu');
+        if (!btn || !menu || menu.hidden) return;
+
+        var rect = btn.getBoundingClientRect();
+        var top = rect.bottom + 6;
+        menu.style.top = top + 'px';
+        // Cap to the space actually left below the button so every entry stays
+        // reachable by scrolling instead of being cut off by the viewport.
+        menu.style.maxHeight = Math.max(160, window.innerHeight - top - 12) + 'px';
+
+        var width = menu.offsetWidth || 300;
+        var left = Math.min(rect.left, window.innerWidth - width - 8);
+        menu.style.left = Math.max(8, left) + 'px';
     }
 
-    function closeColorFilterMenu() {
-        var menu = document.getElementById('dashboardColorFilterMenu');
-        var btn = document.getElementById('dashboardColorFilterBtn');
+    function closeFilterPanel() {
+        var menu = document.getElementById('dashboardFilterMenu');
+        var btn = document.getElementById('dashboardFilterBtn');
         if (menu) menu.hidden = true;
         if (btn) btn.setAttribute('aria-expanded', 'false');
     }
 
-    function initColorFilter() {
-        var btn = document.getElementById('dashboardColorFilterBtn');
-        var menu = document.getElementById('dashboardColorFilterMenu');
+    function initFilterPanel() {
+        var btn = document.getElementById('dashboardFilterBtn');
+        var menu = document.getElementById('dashboardFilterMenu');
         if (!btn || !menu) return;
 
         btn.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
             if (menu.hidden) {
-                closeModifiedFilterMenu();
-                closeTagFilterMenu();
-                buildColorFilterMenu();
+                buildFilterPanel();
                 menu.hidden = false;
-                positionColorFilterMenu();
+                positionFilterPanel();
                 btn.setAttribute('aria-expanded', 'true');
             } else {
-                closeColorFilterMenu();
+                closeFilterPanel();
             }
         });
 
+        var reset = document.getElementById('dashboardFilterResetBtn');
+        if (reset) {
+            reset.addEventListener('click', function () {
+                activeColorFilter = null;
+                activeModifiedFilter = null;
+                activeTagFilter = [];
+                saveColorFilter();
+                saveModifiedFilter();
+                saveTagFilter();
+                buildFilterPanel();
+                renderAll();
+            });
+        }
+
+        // The path is taken when the click is dispatched: a chip rebuilds
+        // its section on click, so by now e.target is detached and
+        // menu.contains() would take it for a click outside the panel
         document.addEventListener('click', function (e) {
-            if (!menu.hidden && !menu.contains(e.target) && !btn.contains(e.target)) {
-                closeColorFilterMenu();
+            if (menu.hidden) return;
+            var path = e.composedPath ? e.composedPath() : [e.target];
+            if (path.indexOf(menu) === -1 && path.indexOf(btn) === -1) closeFilterPanel();
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && !menu.hidden) {
+                closeFilterPanel();
+                btn.focus();
             }
         });
 
-        window.addEventListener('resize', positionColorFilterMenu);
-        window.addEventListener('scroll', positionColorFilterMenu, true);
+        window.addEventListener('resize', positionFilterPanel);
+        window.addEventListener('scroll', positionFilterPanel, true);
     }
 
     function initNoteColorPicker() {
@@ -1646,6 +1870,16 @@
             if (!e.target.closest) return;
             // The pin button keeps the browser's own menu rather than the picker.
             if (e.target.closest('.dash-card-pin')) return;
+
+            // A long press on touch selects the card instead (initTouchCards):
+            // the picker is then one tap away in the selection bar.
+            if (touchPress || e.pointerType === 'touch') {
+                if (e.target.closest('#dashboardGrid .dash-card')) {
+                    e.preventDefault();
+                    activateTouchPress();
+                }
+                return;
+            }
 
             var noteCard = e.target.closest('.dash-note-card');
             if (noteCard) {
@@ -1964,10 +2198,9 @@
         restoreTagFilter();
         renderAll();
         initNoteColorPicker();
-        initColorFilter();
-        initModifiedFilter();
-        initTagFilter();
+        initFilterPanel();
         initCardReorder();
+        initTouchCards();
         window.addEventListener('pagehide', saveNavigationPath);
 
         var filterInput     = document.getElementById('filterInput');

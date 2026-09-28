@@ -51,7 +51,6 @@ function poznoteGetIndexCssGroups(): array {
             'css/menus.css',
             'css/searchbars.css',
             'css/notes/subline.css',
-            'css/notes/sidebar.css',
             'css/notes/tags.css',
             'css/notes/attachments-row.css',
             'css/notes/noteentry.css',

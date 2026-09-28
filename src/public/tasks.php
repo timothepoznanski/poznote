@@ -69,13 +69,22 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 					<i class="lucide lucide-calendar"></i>
 				</button>
 			</div>
-			<div class="tasks-filter-chips" id="tasksFilterChips">
-				<button type="button" class="tasks-filter-chip active" data-filter="all"><?php echo t_h('tasks_page.filter_all', [], 'All'); ?></button>
-				<button type="button" class="tasks-filter-chip" data-filter="open"><?php echo t_h('tasks_page.filter_open', [], 'To do'); ?></button>
-				<button type="button" class="tasks-filter-chip" data-filter="important"><?php echo t_h('tasks_page.filter_important', [], 'Important'); ?></button>
-				<button type="button" class="tasks-filter-chip" data-filter="overdue"><?php echo t_h('tasks_page.filter_overdue', [], 'Overdue'); ?></button>
-				<button type="button" class="tasks-filter-chip" data-filter="dated"><?php echo t_h('tasks_page.filter_dated', [], 'With due date'); ?></button>
-				<button type="button" class="tasks-filter-chip" data-filter="completed"><?php echo t_h('tasks_page.filter_completed', [], 'Completed'); ?></button>
+			<?php // The status chips sit in a panel behind one button, like the dashboard's filters (js/tasks-page.js) ?>
+			<div class="tasks-filter-wrap">
+				<button type="button" id="tasksFilterBtn" class="tasks-filter-btn" title="<?php echo t_h('tasks_page.filters', [], 'Filters'); ?>" aria-label="<?php echo t_h('tasks_page.filters', [], 'Filters'); ?>" aria-haspopup="true" aria-expanded="false" aria-controls="tasksFilterPanel">
+					<i class="lucide lucide-filter"></i>
+					<span class="tasks-filter-badge" hidden></span>
+				</button>
+				<div id="tasksFilterPanel" class="tasks-filter-panel" hidden>
+					<div class="tasks-filter-chips" id="tasksFilterChips">
+						<button type="button" class="tasks-filter-chip active" data-filter="all"><?php echo t_h('tasks_page.filter_all', [], 'All'); ?></button>
+						<button type="button" class="tasks-filter-chip" data-filter="open"><?php echo t_h('tasks_page.filter_open', [], 'To do'); ?></button>
+						<button type="button" class="tasks-filter-chip" data-filter="important"><?php echo t_h('tasks_page.filter_important', [], 'Important'); ?></button>
+						<button type="button" class="tasks-filter-chip" data-filter="overdue"><?php echo t_h('tasks_page.filter_overdue', [], 'Overdue'); ?></button>
+						<button type="button" class="tasks-filter-chip" data-filter="dated"><?php echo t_h('tasks_page.filter_dated', [], 'With due date'); ?></button>
+						<button type="button" class="tasks-filter-chip" data-filter="completed"><?php echo t_h('tasks_page.filter_completed', [], 'Completed'); ?></button>
+					</div>
+				</div>
 			</div>
 			<?php // Filter input + collapse/expand toggle: one row, desktop and mobile ?>
 			<div class="tasks-filter-search">
@@ -144,6 +153,6 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<script src="js/date-time-format.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/date-picker-popup.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/task-due-modal.js?v=<?php echo $cache_v; ?>"></script>
-	<script src="js/tasks-page.js?v=<?php echo $cache_v; ?>"></script>
+	<script src="<?php echo poznoteAsset('js/tasks-page.js'); ?>"></script>
 </body>
 </html>

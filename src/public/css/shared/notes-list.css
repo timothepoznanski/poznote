@@ -555,6 +555,29 @@ html[data-theme='dark'] .folder-name-path {
     font-family: inherit;
 }
 
+/* Reason filter, beside the search field and drawn like it */
+.offline-reason-select {
+    flex: 0 0 auto;
+    max-width: 100%;
+    /* The search field's 38px: a select's own line box would make it 40 */
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid var(--border-color, var(--pz-border));
+    border-radius: var(--pz-radius-lg);
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text-color, var(--pz-text));
+    background-color: var(--input-bg, var(--pz-bg));
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.offline-reason-select:focus {
+    outline: none;
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
+}
+
 /* A note the rules keep that this browser holds no copy of yet */
 .offline-missing-icon {
     flex: 0 0 auto;

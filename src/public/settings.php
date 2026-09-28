@@ -1559,7 +1559,7 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
-            <!-- Contact, GitHub discussions and Discord: links every user sees,
+            <!-- GitHub discussions and Discord: links every user sees,
                  pointing to the Poznote project unless the global setting
                  says otherwise (see poznoteAboutLink()). -->
             <?php
@@ -1568,16 +1568,6 @@ if ($canUseUserWebhooks) {
                 $aboutLinks[$aboutLinkKey] = poznoteAboutLink($aboutLinkKey);
             }
             ?>
-            <a href="mailto:<?php echo htmlspecialchars($aboutLinks['contact_email'], ENT_QUOTES); ?>" class="home-card" id="contact-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.contact', [], 'Send an email to the contact address of this instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-mail"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.contact', [], 'Contact'); ?></span>
-                    <span class="setting-status enabled"><?php echo htmlspecialchars($aboutLinks['contact_email']); ?></span>
-                </div>
-            </a>
 
             <!-- GitHub documentation -->
             <a href="https://github.com/timothepoznanski/poznote" target="_blank" rel="noopener noreferrer" class="home-card" id="github-card">

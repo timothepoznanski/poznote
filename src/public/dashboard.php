@@ -744,24 +744,30 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 
 			<header class="dashboard-topbar">
 				<div class="board-filter-row">
-				<?php renderBoardViewMenu('dashboard'); ?>
+				<?php renderBoardViewMenu('dashboard', true); ?>
+				<?php // One button for the color, last-modified and tag filters: a panel with a section each (initFilterPanel in js/dashboard-page.js) ?>
 				<div class="dashboard-color-filter-wrap">
-					<button type="button" id="dashboardColorFilterBtn" class="dashboard-color-filter-btn" title="<?php echo t_h('note_color.filter', [], 'Filter by color'); ?>" aria-label="<?php echo t_h('note_color.filter', [], 'Filter by color'); ?>" aria-haspopup="true" aria-expanded="false">
-						<i class="lucide lucide-palette"></i>
+					<button type="button" id="dashboardFilterBtn" class="dashboard-color-filter-btn dashboard-filter-btn" title="<?php echo t_h('dashboard.filters.button', [], 'Filters'); ?>" aria-label="<?php echo t_h('dashboard.filters.button', [], 'Filters'); ?>" aria-haspopup="true" aria-expanded="false">
+						<i class="lucide lucide-filter"></i>
+						<span class="dashboard-filter-badge" hidden></span>
 					</button>
-					<div id="dashboardColorFilterMenu" class="dashboard-color-filter-menu" hidden></div>
-				</div>
-				<div class="dashboard-color-filter-wrap">
-					<button type="button" id="dashboardModifiedFilterBtn" class="dashboard-color-filter-btn" title="<?php echo t_h('dashboard.modified.button', [], 'Filter by last modification'); ?>" aria-label="<?php echo t_h('dashboard.modified.button', [], 'Filter by last modification'); ?>" aria-haspopup="true" aria-expanded="false">
-						<i class="lucide lucide-clock"></i>
-					</button>
-					<div id="dashboardModifiedFilterMenu" class="dashboard-color-filter-menu" hidden></div>
-				</div>
-				<div class="dashboard-color-filter-wrap">
-					<button type="button" id="dashboardTagFilterBtn" class="dashboard-color-filter-btn" title="<?php echo t_h('dashboard.tag_filter.button', [], 'Filter by tag'); ?>" aria-label="<?php echo t_h('dashboard.tag_filter.button', [], 'Filter by tag'); ?>" aria-haspopup="true" aria-expanded="false">
-						<i class="lucide lucide-tag"></i>
-					</button>
-					<div id="dashboardTagFilterMenu" class="dashboard-color-filter-menu dashboard-tag-filter-menu" hidden></div>
+					<div id="dashboardFilterMenu" class="dashboard-color-filter-menu dashboard-filter-panel" hidden>
+						<div class="dashboard-filter-section">
+							<div class="dashboard-filter-section-title"><?php echo t_h('dashboard.filters.color', [], 'Color'); ?></div>
+							<div id="dashboardFilterColorSection" class="dashboard-filter-chips"></div>
+						</div>
+						<div class="dashboard-filter-section">
+							<div class="dashboard-filter-section-title"><?php echo t_h('dashboard.filters.modified', [], 'Last modified'); ?></div>
+							<div id="dashboardFilterModifiedSection" class="dashboard-filter-chips"></div>
+						</div>
+						<div class="dashboard-filter-section">
+							<div class="dashboard-filter-section-title"><?php echo t_h('dashboard.filters.tags', [], 'Tags'); ?></div>
+							<div id="dashboardFilterTagSection"></div>
+						</div>
+						<div class="dashboard-filter-footer" hidden>
+							<button type="button" id="dashboardFilterResetBtn" class="dashboard-filter-reset"><i class="lucide lucide-x"></i> <?php echo t_h('dashboard.filters.reset', [], 'Reset filters'); ?></button>
+						</div>
+					</div>
 				</div>
 				<div id="dashboardTopbarFilter" class="dashboard-topbar-filter">
 					<i class="lucide lucide-search dashboard-filter-icon"></i>
@@ -776,6 +782,16 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 						<i class="lucide lucide-x"></i>
 					</button>
 				</div>
+				</div>
+				<?php // Touch: a long press on a card selects it and swaps the filter row for this bar (initTouchCards in js/dashboard-page.js) ?>
+				<div id="dashboardSelectionBar" class="dashboard-selection-bar" hidden>
+					<button type="button" class="board-view-btn" data-action="clear-card-selection" title="<?php echo t_h('common.close'); ?>" aria-label="<?php echo t_h('common.close'); ?>">
+						<i class="lucide lucide-x"></i>
+					</button>
+					<span id="dashboardSelectionTitle" class="dashboard-selection-title"></span>
+					<button type="button" id="dashboardSelectionColorBtn" class="board-view-btn" title="<?php echo t_h('note_color.modal_title', [], 'Note color'); ?>" aria-label="<?php echo t_h('note_color.modal_title', [], 'Note color'); ?>">
+						<i class="lucide lucide-palette"></i>
+					</button>
 				</div>
 			</header>
 

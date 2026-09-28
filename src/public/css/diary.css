@@ -69,6 +69,30 @@
     white-space: nowrap;
 }
 
+/* Phones keep both buttons on one row: a long label wraps inside its
+   button instead, and the two stretch to the same height. */
+@media (max-width: 600px) {
+    .diary-actions {
+        flex-wrap: nowrap;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .diary-actions .btn {
+        flex: 0 1 auto;
+        min-width: 0;
+        justify-content: center;
+        text-align: center;
+        padding: 8px 10px;
+        line-height: 1.25;
+        white-space: normal;
+    }
+
+    .diary-actions .btn .lucide {
+        flex-shrink: 0;
+    }
+}
+
 /* favorites.css provides .btn/.btn-secondary but not .btn-primary
    (dark mode is covered by css/dark-mode/components.css) */
 .diary-page .btn-primary {

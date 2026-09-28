@@ -98,7 +98,6 @@ html[data-theme='dark'] .excalidraw-container {
 
 /* Global rule to prevent any image from overflowing note content area */
 .note-content img,
-.entry-content img,
 [id^="entry"] img,
 .noteentry img {
     max-width: 100% !important;

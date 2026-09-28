@@ -1,8 +1,10 @@
 /**
  * Image context menu inside a note.
  * 
- * Click handling on images in note content, and the menu it opens: view larger,
- * download, and the entries that delegate to the image actions module.
+ * Mouse handling on images in note content, and the menu it opens: view larger,
+ * download, and the entries that delegate to the image actions module. The menu
+ * opens on right click (a tap on touch screens); a left click on an image that
+ * carries a link opens that link in a new tab.
  */
 
 /**
@@ -18,14 +20,10 @@ function reinitializeImageClickHandlers() {
 
     // Use event delegation on document level (only set once)
     if (!imageClickHandlerInitialized) {
-        document.addEventListener('click', function (event) {
-            // Check if the click target or any parent is an image
-            const img = event.target.tagName === 'IMG' ? event.target : event.target.closest('img');
-
-            if (img && img.tagName === 'IMG') {
-                handleImageClick(event);
-            }
-        }, true); // Use capture phase
+        // Capture phase, ahead of the attachment, table and insert menus that
+        // also listen on the document
+        document.addEventListener('click', handleImageClick, true);
+        document.addEventListener('contextmenu', handleImageContextMenu, true);
 
         imageClickHandlerInitialized = true;
     }
@@ -164,18 +162,21 @@ function buildImageMenuHTML(img) {
         ` + menuHTML;
     }
 
-    // Add link option for all images
+    // Link options for HTML images only: in a Markdown note they would change the
+    // rendered preview and never the source, so the link would be lost on save.
+    // A link written in the Markdown source still opens on left click.
+    const canEditLink = !isMarkdownNote;
     const existingLink = img.closest('a');
 
-    // If no existing link, show direct "Add Link" button
-    if (!existingLink) {
+    if (canEditLink && !existingLink) {
+        // If no existing link, show direct "Add Link" button
         menuHTML += `
             <div class="image-menu-item" data-action="add-link">
                 <i class="lucide lucide-link"></i>
                 ${t('image_menu.add_link', null, 'Ajouter un lien')}
             </div>
         `;
-    } else {
+    } else if (canEditLink) {
         // If link exists, create submenu with multiple options
         let linkSubmenuHTML = '';
 
@@ -409,26 +410,82 @@ function handleImageMenuAction(action, img, e) {
 }
 
 /**
- * Handle image click to show popup with options
+ * The image under an event target that the menu applies to, or null.
+ * @param {EventTarget} target
+ * @returns {HTMLImageElement|null}
+ */
+function getMenuImageFromTarget(target) {
+    const img = target && target.closest ? target.closest('img') : null;
+    if (!img || !img.src || img.src.trim() === '') return null;
+    // Attachment cards have their own menu (js/note-attachment-menu.js)
+    if (img.closest('.note-attachment-previews')) return null;
+    return img;
+}
+
+/**
+ * Touch screens have no right click, so a tap opens the menu there.
+ */
+function isTouchOnlyPointer() {
+    return !!(window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches);
+}
+
+/**
+ * Open an image's link in a new tab. Only web and mail links are followed.
+ * @param {string} href
+ */
+function openImageLink(href) {
+    let url;
+    try {
+        url = new URL(href, window.location.href);
+    } catch (e) {
+        return;
+    }
+    if (!/^(https?|mailto):$/.test(url.protocol)) return;
+    window.open(url.href, '_blank', 'noopener');
+}
+
+/**
+ * Left click on an image: follow its link in a new tab. Without a link the
+ * click goes on like any other click, except on touch screens where it opens
+ * the menu.
  */
 function handleImageClick(event) {
-    const img = event.target;
+    if (event.button !== 0) return;
 
-    // Check if image has a valid src
-    if (!img.src || img.src.trim() === '') {
+    const img = getMenuImageFromTarget(event.target);
+    if (!img) return;
+
+    const link = img.closest('a[href]');
+    if (link) {
+        // Keeps the editor's link handling (and the browser) from acting on it too
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        openImageLink(link.href);
         return;
     }
 
-    if (img.closest('.note-attachment-previews')) {
-        return;
+    if (isTouchOnlyPointer()) {
+        showImageMenu(event, img);
     }
+}
 
-    // On public pages, if image is in a link, let the link work
-    if (window.isPublicNotePage && img.closest('a')) {
-        return;
-    }
+/**
+ * Right click on an image: open the image menu instead of the browser's.
+ */
+function handleImageContextMenu(event) {
+    const img = getMenuImageFromTarget(event.target);
+    if (!img) return;
 
-    // Always show the custom menu on left-click, even if image is in a link
+    showImageMenu(event, img);
+}
+
+/**
+ * Show the image menu at the pointer
+ * @param {MouseEvent} event - The click or contextmenu event
+ * @param {HTMLImageElement} img - The image element
+ */
+function showImageMenu(event, img) {
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation();
@@ -479,15 +536,22 @@ function handleImageClick(event) {
         e.stopPropagation();
     });
 
-    // Close menu when clicking elsewhere
-    setTimeout(() => {
-        document.addEventListener('click', function closeMenu(e) {
-            if (!menu.contains(e.target) && e.target !== img) {
-                removeImageMenu(menu);
-                document.removeEventListener('click', closeMenu);
-            }
-        });
-    }, 10);
+    // Keep the browser menu away from the image menu itself
+    menu.addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+    });
+
+    // Close on any press outside the menu (a right click elsewhere included) or Escape
+    function closeMenu(e) {
+        if (e.type === 'keydown' && e.key !== 'Escape') return;
+        const submenu = menu._associatedSubmenu;
+        if (e.type === 'mousedown' && (menu.contains(e.target) || (submenu && submenu.contains(e.target)))) return;
+        removeImageMenu(menu);
+        document.removeEventListener('mousedown', closeMenu, true);
+        document.removeEventListener('keydown', closeMenu, true);
+    }
+    document.addEventListener('mousedown', closeMenu, true);
+    document.addEventListener('keydown', closeMenu, true);
 }
 
 /**

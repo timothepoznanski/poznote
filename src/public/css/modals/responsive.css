@@ -160,8 +160,7 @@
     }
 
     /* Modal footers: stacked */
-    .modal-footer,
-    .link-modal-footer {
+    .modal-footer {
         flex-direction: column-reverse !important;
         gap: 10px !important;
     }

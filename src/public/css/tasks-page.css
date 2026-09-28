@@ -96,11 +96,90 @@ body.tasks-page {
     gap: 12px;
 }
 
+/* Status filter: one button opening a panel with the chips (js/tasks-page.js).
+   Same height as the view toggle and the filter input on the row. */
+.tasks-filter-wrap {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+}
+
+.tasks-filter-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 31px;
+    height: 29px;
+    padding: 0;
+    border: 1px solid var(--border-color, var(--pz-border));
+    border-radius: var(--pz-radius-lg);
+    background: transparent;
+    color: var(--text-color, var(--pz-text));
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tasks-filter-btn:hover {
+    border-color: var(--pz-accent);
+    color: var(--pz-accent-text);
+}
+
+.tasks-filter-btn.active {
+    border-color: var(--pz-accent);
+    color: var(--pz-accent-text);
+    background: color-mix(in srgb, var(--pz-accent) 5%, var(--pz-bg));
+}
+
+.tasks-filter-btn .lucide {
+    width: 16px;
+    height: 16px;
+}
+
+.tasks-filter-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    box-sizing: border-box;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    border-radius: var(--pz-radius-pill);
+    background: var(--pz-accent);
+    color: var(--pz-text-inverse);
+    font-size: 10.5px;
+    font-weight: var(--pz-weight-semibold);
+    line-height: 17px;
+    text-align: center;
+    pointer-events: none;
+}
+
+.tasks-filter-badge[hidden] {
+    display: none;
+}
+
+/* Fixed, placed under the button by JS, so it never runs off a phone screen */
+.tasks-filter-panel {
+    position: fixed;
+    z-index: 1200;
+    box-sizing: border-box;
+    width: 280px;
+    max-width: calc(100vw - 16px);
+    padding: 12px;
+    background: var(--pz-bg);
+    border: 1.5px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 6px 20px rgba(var(--pz-shadow-rgb), 0.12);
+}
+
+.tasks-filter-panel[hidden] {
+    display: none;
+}
+
 .tasks-filter-chips {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    flex-shrink: 0;
 }
 
 .tasks-filter-chip {
@@ -877,28 +956,29 @@ html[data-theme='dark'] .tasks-note-source-badge {
         margin-bottom: 14px;
     }
 
-    /* Filter input first (full width, right below the progress bar) with
-       the collapse/expand toggle on its right, then one wrapping row of
-       filter chips (display: contents merges them into the bar) */
+    /* One row: view toggle, filter button, filter input, then the
+       collapse/expand toggle as an icon only (its label moves to the title) */
     .tasks-filter-bar {
-        flex-wrap: wrap;
         gap: 8px;
     }
 
     .tasks-filter-search {
-        order: -1;
-        flex-basis: 100%;
+        min-width: 0;
         gap: 8px;
-        /* With the 8px bar gap: 14px below the input, same as above it */
-        margin-bottom: 6px;
     }
 
     .filter-input-wrapper {
         min-width: 0;
     }
 
-    .tasks-filter-chips {
-        display: contents;
+    .tasks-collapse-btn {
+        width: 31px;
+        height: 29px;
+        padding: 0;
+    }
+
+    #toggleAllNotesLabel {
+        display: none;
     }
 
     .tasks-progress-header {
@@ -946,6 +1026,27 @@ html[data-theme='dark'] .tasks-filter-chip.active {
     background-color: var(--pz-accent);
     border-color: var(--pz-accent);
     color: var(--pz-text-inverse);
+}
+
+html[data-theme='dark'] .tasks-filter-btn {
+    border-color: var(--pz-border);
+    color: var(--pz-text);
+}
+
+html[data-theme='dark'] .tasks-filter-btn:hover,
+html[data-theme='dark'] .tasks-filter-btn.active {
+    border-color: var(--pz-accent);
+    color: var(--pz-accent-text);
+}
+
+html[data-theme='dark'] .tasks-filter-btn.active {
+    background: var(--pz-surface-hover);
+}
+
+html[data-theme='dark'] .tasks-filter-panel {
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
+    box-shadow: 0 6px 20px rgba(var(--pz-shadow-rgb), 0.5);
 }
 
 html[data-theme='dark'] .tasks-collapse-btn {

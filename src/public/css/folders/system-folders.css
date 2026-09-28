@@ -63,6 +63,18 @@
     font-size: 1em !important;
 }
 
+/* Favorites shows ten rows, the rest scroll inside the section without a
+   scrollbar; js/favorites-scroll.js sets the max-height from the rows. */
+.system-folder[data-folder="Favorites"] > .folder-content.favorites-capped {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+}
+
+.system-folder[data-folder="Favorites"] > .folder-content.favorites-capped::-webkit-scrollbar {
+    display: none;
+}
+
 /* Afficher le compteur à droite de l'icône - toujours visible */
 .system-folder:not([data-folder="Favorites"]) .folder-note-count {
     display: inline-block !important;

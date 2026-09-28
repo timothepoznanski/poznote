@@ -1369,6 +1369,9 @@
             return;
         }
 
+        // Before the new tab becomes the active one
+        _saveScrollPosition();
+
         var newTab = { id: _generateId(), type: 'note', noteId: noteId, title: title || _getDefaultTitle() };
         if (options.insertAfterActive && activeTabId) {
             var activeIndex = _indexById(activeTabId);
@@ -1490,6 +1493,9 @@
         if (!activeTabId) return;
         var currentTab = _findTabById(activeTabId);
         if (!currentTab || !_isNoteTab(currentTab)) return;
+        // Once a new tab is active, the pane still shows the note being left:
+        // it is not that tab's content
+        if (_getRenderedNoteId() !== String(currentTab.noteId)) return;
         var rightCol = document.getElementById('right_col');
         if (!rightCol) return;
         var positions = { main: rightCol.scrollTop };
@@ -1497,8 +1503,142 @@
         if (cmScroller) positions.cmScroller = cmScroller.scrollTop;
         var mdPreview = rightCol.querySelector('.markdown-preview');
         if (mdPreview) positions.mdPreview = mdPreview.scrollTop;
+        var markdown = _captureMarkdownState(rightCol);
+        if (markdown) positions.markdown = markdown;
         _scrollPositions[activeTabId] = positions;
     }
+
+    function _markdownApi() {
+        return window.PoznoteMarkdownCodeMirror || null;
+    }
+
+    function _markdownEditorIn(rightCol) {
+        var noteEntry = rightCol && rightCol.querySelector('.noteentry[data-note-type="markdown"]');
+        var editorDiv = noteEntry && noteEntry.querySelector('.markdown-editor');
+        var api = _markdownApi();
+        if (!editorDiv || !api || !api.isCodeMirrorEditor(editorDiv)) return null;
+        return { noteEntry: noteEntry, editorDiv: editorDiv, api: api };
+    }
+
+    function _markdownEditorVisible(noteEntry) {
+        var container = noteEntry.querySelector('.markdown-editor-container');
+        return !!container && container.style.display !== 'none';
+    }
+
+    // Read from what is shown: the split class can outlive a rebuild in
+    // another mode
+    function _markdownMode(noteEntry) {
+        var preview = noteEntry.querySelector('.markdown-preview');
+        var previewShown = !!preview && preview.style.display !== 'none';
+        if (!_markdownEditorVisible(noteEntry)) return 'preview';
+        return previewShown ? 'split' : 'edit';
+    }
+
+    /**
+     * The place and caret of the markdown note being left. Coming back, the
+     * note is rebuilt in the mode of the "Default view mode" setting with the
+     * caret at the top: when that mode shows the editor, the caret is put back,
+     * and when it is not the mode the note was left in, the source line the
+     * reader was on is scrolled back into place. Kept for the tab only, like
+     * its scroll, never remembered for the note.
+     */
+    function _captureMarkdownState(rightCol) {
+        var md = _markdownEditorIn(rightCol);
+        if (!md) return null;
+        var mode = _markdownMode(md.noteEntry);
+        var place = null;
+        if (mode !== 'preview' && typeof window.captureMarkdownEditorPosition === 'function') {
+            place = window.captureMarkdownEditorPosition(md.noteEntry);
+        } else if (mode === 'preview' && typeof window.captureMarkdownPreviewPosition === 'function') {
+            place = window.captureMarkdownPreviewPosition(md.noteEntry);
+        }
+        return {
+            noteId: String(md.noteEntry.getAttribute('data-note-id') || ''),
+            // Left in, to compare with the mode the note comes back in: it
+            // never decides that mode
+            mode: mode,
+            place: place,
+            selection: md.api.getSelectionOffsets(md.editorDiv),
+            // Only a caret the user put there is given back the focus
+            hadFocus: md.api.getLastActiveEditor() === md.editorDiv
+        };
+    }
+
+    /** Caret waiting for the note to become editable, see _applyPendingMarkdownCaret(). */
+    var _pendingMarkdownCaret = null;
+
+    /**
+     * A note back in another mode than the one it was left in: its pixel
+     * scroll points somewhere else there, so the source line the reader was on
+     * is put back at the same height instead, as for a mode switch
+     * (markdown-position.js). Returns true when that took over.
+     */
+    function _restoreMarkdownPlace(tab, markdown) {
+        if (!markdown || !markdown.place || markdown.noteId !== String(tab.noteId)) return false;
+        var md = _markdownEditorIn(document.getElementById('right_col'));
+        if (!md || _markdownMode(md.noteEntry) === markdown.mode) return false;
+        var options = { placeCaret: false, marker: false };
+        if (_markdownEditorVisible(md.noteEntry)) {
+            return typeof window.restoreMarkdownEditorPosition === 'function'
+                && window.restoreMarkdownEditorPosition(md.noteEntry, markdown.place, options);
+        }
+        return typeof window.restoreMarkdownPreviewPosition === 'function'
+            && window.restoreMarkdownPreviewPosition(md.noteEntry, markdown.place, options);
+    }
+
+    /** How long after the return a rebuilt editor still gets the caret back. */
+    var _MARKDOWN_CARET_REBUILD_MS = 3000;
+
+    /**
+     * Put the caret back where it was, once per return to the tab. A note
+     * brought back from the DOM cache is rebuilt right after
+     * (initializeMarkdownNote(), which calls back here): the new editor gets
+     * it again.
+     */
+    function _restoreMarkdownCaret(tab, markdown, applyScroll) {
+        if (!markdown || !markdown.hadFocus || !markdown.selection || markdown.noteId !== String(tab.noteId)) return;
+        var md = _markdownEditorIn(document.getElementById('right_col'));
+        if (!md) return; // not built yet, initializeMarkdownNote() calls back
+        if (markdown.caretEditor === md.editorDiv) return;
+        if (markdown.caretAt && Date.now() - markdown.caretAt > _MARKDOWN_CARET_REBUILD_MS) return;
+        markdown.caretEditor = md.editorDiv;
+        markdown.caretAt = markdown.caretAt || Date.now();
+        _pendingMarkdownCaret = null;
+        // Focusing the editor on a phone opens the keyboard
+        try {
+            if (window.matchMedia && window.matchMedia('(max-width: 800px)').matches) return;
+        } catch (e) { /* ignore */ }
+        _pendingMarkdownCaret = { tabId: tab.id, noteId: markdown.noteId, selection: markdown.selection, applyScroll: applyScroll };
+        _applyPendingMarkdownCaret();
+    }
+
+    // A note that just loaded is read-only while its edit lock is checked
+    // (note-edit-lock.js), and that check takes the focus away from the
+    // editor: the caret waits for the noteEditUnlocked that ends it.
+    function _applyPendingMarkdownCaret() {
+        var pending = _pendingMarkdownCaret;
+        if (!pending) return;
+        var md = _markdownEditorIn(document.getElementById('right_col'));
+        if (activeTabId !== pending.tabId || !md || String(md.noteEntry.getAttribute('data-note-id')) !== pending.noteId) {
+            _pendingMarkdownCaret = null;
+            return;
+        }
+        if (typeof window.isNoteEditLockSettled === 'function' && !window.isNoteEditLockSettled(pending.noteId)) return;
+        _pendingMarkdownCaret = null;
+        if (!_markdownEditorVisible(md.noteEntry) || md.editorDiv.classList.contains('markdown-editor-readonly')) return;
+        if (typeof window.isNoteEditingLocked === 'function' && window.isNoteEditingLocked(pending.noteId)) return;
+        // Not over a field the user started typing in meanwhile
+        var active = document.activeElement;
+        if (active && !md.editorDiv.contains(active) && (active.isContentEditable
+            || active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT')) return;
+        if (md.api.setSelection(md.editorDiv, pending.selection.start, pending.selection.end)) {
+            // setSelection() brings the caret into view on CodeMirror's next
+            // measure: put the tab's scroll back once it ran
+            requestAnimationFrame(pending.applyScroll);
+        }
+    }
+
+    document.addEventListener('noteEditUnlocked', _applyPendingMarkdownCaret);
 
     function _restoreScrollPosition(tab) {
         if (!tab) return;
@@ -1528,7 +1668,13 @@
             }
         }
 
+        if (_restoreMarkdownPlace(tab, saved.markdown)) {
+            _restoreMarkdownCaret(tab, saved.markdown, function () {});
+            return;
+        }
+
         applyScroll();
+        _restoreMarkdownCaret(tab, saved.markdown, applyScroll);
 
         // Watch for layout shifts caused by images loading and re-apply scroll each time.
         // Stop watching after 3 seconds to avoid interfering with user scrolling.

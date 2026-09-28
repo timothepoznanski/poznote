@@ -760,22 +760,6 @@ body.public-note-page {
     margin-bottom: 14px;
 }
 
-.public-note-attachments {
-    margin-bottom: 24px;
-    padding-bottom: 18px;
-    border-bottom: 1px solid var(--pz-border);
-}
-
-.public-note-attachments h2 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0 0 12px;
-    color: var(--pz-text-strong);
-    font-size: 1rem;
-    font-weight: var(--pz-weight-semibold);
-}
-
 /* Theme toggle button */
 .public-note-header {
     display: flex;
@@ -864,14 +848,6 @@ html[data-theme='dark'] .public-note .content pre code:not([class*="hljs"]):not(
 html[data-theme='dark'] .public-note .content pre code[class*="language-"],
 html[data-theme='dark'] .public-note .content code[class*="language-"] {
     color: var(--pz-text-muted);
-}
-
-html[data-theme='dark'] .public-note-attachments {
-    border-bottom-color: var(--pz-border);
-}
-
-html[data-theme='dark'] .public-note-attachments h2 {
-    color: var(--pz-text-strong);
 }
 
 /* Dark mode styles for important tasks */

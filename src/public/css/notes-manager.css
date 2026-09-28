@@ -473,54 +473,52 @@ html[data-theme='dark'] .nm-folder-option-selected {
         width: 100%;
     }
 
-    /* Two lines instead of one: the title beside the checkbox, then the tags
-       and the date under it. A grid on the row itself, because the tags are a
-       sibling of the title, not a child, so only the row can place them on a
-       second line while keeping the checkbox column empty there. */
-    .nm-note-row {
-        display: grid;
-        grid-template-columns: auto minmax(0, 1fr) auto;
-        grid-template-areas:
-            "checkbox title meta"
-            ".        tags  tags";
-        align-items: center;
-        column-gap: 10px;
-        row-gap: 3px;
+    /* The type dropdown shares the filter input's row, the age one wraps below */
+    .nm-filter-bar .filter-input-wrapper {
+        flex: 1 1 0;
+        min-width: 0;
     }
 
-    .nm-note-checkbox {
-        grid-area: checkbox;
-        align-self: start;
-        margin-top: 2px;
+    .nm-filter-bar #nmTypeFilter {
+        width: auto;
+        min-width: 0;
+        max-width: 45%;
     }
 
+    /* One line per note: the title keeps its width and ends in an ellipsis
+       when it runs out, the tags take what is left (always room for one
+       chip) and show only the chips that fit: they wrap inside a box one
+       chip high, so the ones that do not fit drop out of sight. */
     .nm-note-title-wrap {
-        grid-area: title;
-        align-items: flex-start;
-    }
-
-    /* Long titles run over two lines rather than being cut after a word. */
-    .nm-note-link {
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-        white-space: normal;
-        line-height: 1.35;
+        flex: 0 1 auto;
     }
 
     .nm-note-tags {
-        grid-area: tags;
+        flex: 1 1 0;
         flex-wrap: wrap;
-        max-width: 100%;
-        overflow: visible;
-        row-gap: 4px;
+        justify-content: flex-end;
+        max-width: none;
+        min-width: min(30%, 100px);
+        height: 18px;
     }
 
-    .nm-note-meta {
-        grid-area: meta;
-        justify-self: end;
-        align-self: start;
-        margin-top: 2px;
+    .nm-note-tags:empty {
+        min-width: 0;
+    }
+
+    .nm-tag-chip {
+        max-width: min(100px, 100%);
+        box-sizing: border-box;
+        line-height: 16px;
+    }
+
+    /* No three-chip cap here: the width decides */
+    .nm-note-tags:has(.nm-tag-chip:nth-child(4)) .nm-tag-chip:nth-child(n+4) {
+        display: inline-block;
+    }
+
+    .nm-note-tags:has(.nm-tag-chip:nth-child(4))::after {
+        content: none;
     }
 }
 
@@ -646,10 +644,6 @@ html[data-theme='dark'] .nm-folder-option-selected {
     color: var(--selected-color, var(--pz-text-strong));
 }
 
-html[data-theme='dark'] .nm-modal {
-    background: var(--pz-bg);
-}
-
 /* ── Responsive ───────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
     body.notes-manager-page    { padding: 10px; }
@@ -668,17 +662,9 @@ html[data-theme='dark'] .nm-modal {
 
     .nm-bulk-select            { width: 100%; }
 
-    /* No room for the date on a phone: the tags take the whole second line,
-       and a note without tags stays on a single line. */
+    /* No room for the date on a phone */
     .nm-note-meta {
         display: none;
-    }
-
-    .nm-note-row {
-        grid-template-columns: auto minmax(0, 1fr);
-        grid-template-areas:
-            "checkbox title"
-            ".        tags";
     }
 }
 

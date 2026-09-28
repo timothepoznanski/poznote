@@ -9,10 +9,6 @@
     display: none !important;
 }
 
-.mobile-only {
-    display: block !important;
-}
-
 /* Mobile browsers can keep :hover after a tap. Keep the folder expand button neutral. */
 .sidebar-folder-toggle {
     -webkit-tap-highlight-color: transparent !important;
@@ -38,7 +34,6 @@
 }
 
 /* Prevent folder headers from being highlighted when clicking on notes in mobile */
-.folder-header.selected-folder,
 .folder-header.selected,
 .folder-header:active,
 .folder-header:focus {
@@ -600,7 +595,6 @@ a.links_arbo_left::-webkit-scrollbar,
 .note-edit-toolbar .btn-reminder:not(.hide-on-selection),
 .note-edit-toolbar .btn-trash:not(.hide-on-selection),
 .note-edit-toolbar .markdown-view-mode-btn:not(.hide-on-selection),
-.note-edit-toolbar .markdown-help-btn:not(.hide-on-selection),
 .note-edit-toolbar .mobile-more-btn:not(.hide-on-selection) {
     display: flex !important;
 }

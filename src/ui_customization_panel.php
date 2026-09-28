@@ -114,8 +114,8 @@ require_once __DIR__ . '/markdown_syntax_content.php';
 ?>
     <!-- Floating stack at the bottom-right of the page: split view, customize
          this page, AI assistant, focus mode, then the "..." menu (on the notes
-         page the open note: note width, information; keyboard shortcuts,
-         Markdown syntax). On the notes page the note's scroll-to-edge arrows
+         page the note width; keyboard shortcuts, Markdown syntax, then the
+         open note's information). On the notes page the note's scroll-to-edge arrows
          (note_display.php) sit under it, see css/ui-customization-panel.css. -->
     <div class="pz-edge-stack">
         <?php if ($uiCustomizationPanelPage === 'notes'): ?>
@@ -158,9 +158,10 @@ require_once __DIR__ . '/markdown_syntax_content.php';
                     <span><?php echo $uiCustomizationPanelTitle; ?></span>
                 </button>
                 <?php if ($uiCustomizationPanelPage === 'notes'): ?>
-                <!-- The open note (discussion 1482). Both used to be toolbar
-                     buttons; js/ui-customization-panel.js shows them for the
-                     note that is open and keeps the menu open while the width
+                <!-- The open note (discussion 1482). Width and Information
+                     (at the end of the menu) used to be toolbar buttons;
+                     js/ui-customization-panel.js shows them for the note that
+                     is open and keeps the menu open while the width
                      cycles. The width is desktop only, like the layout it
                      changes. Inside the dual pane view the same entry cycles
                      the ratio of the two panes instead (discussion 1483), which
@@ -171,10 +172,6 @@ require_once __DIR__ . '/markdown_syntax_content.php';
                     <i class="lucide lucide-move-horizontal"></i>
                     <span><span class="page-more-menu-label"><?php echo t_h('index.toolbar.note_width', [], 'Note width'); ?></span><span class="page-more-menu-state"></span></span>
                 </button>
-                <button type="button" id="edgeMenuNoteInfo" class="page-more-menu-item" role="menuitem" data-action="show-note-info" hidden>
-                    <i class="lucide lucide-info"></i>
-                    <span><?php echo t_h('common.information', [], 'Information'); ?></span>
-                </button>
                 <?php endif; ?>
                 <button type="button" id="edgeMenuShortcuts" class="page-more-menu-item" role="menuitem" data-action="open-keyboard-shortcuts" aria-controls="keyboardShortcutsModal">
                     <i class="lucide lucide-keyboard"></i>
@@ -184,6 +181,13 @@ require_once __DIR__ . '/markdown_syntax_content.php';
                     <i class="lucide lucide-book-open"></i>
                     <span><?php echo t_h('markdown_syntax.menu_item', [], 'Markdown syntax'); ?></span>
                 </button>
+                <?php if ($uiCustomizationPanelPage === 'notes'): ?>
+                <!-- Information on the open note, last in the menu -->
+                <button type="button" id="edgeMenuNoteInfo" class="page-more-menu-item" role="menuitem" data-action="show-note-info" hidden>
+                    <i class="lucide lucide-info"></i>
+                    <span><?php echo t_h('common.information', [], 'Information'); ?></span>
+                </button>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -287,6 +291,11 @@ require_once __DIR__ . '/markdown_syntax_content.php';
         <div class="ui-custom-panel-body">
             <p class="ui-custom-description ui-custom-panel-hint"><?php echo t_h('modals.ui_customization.panel_hint', [], 'Only the elements of this page are listed. Hide or show any element by checking or unchecking below.'); ?></p>
             <div class="ui-custom-filter ui-custom-panel-filter">
+                <button type="button" id="uiCustomizationPanelCollapseAll" class="ui-custom-collapse-all ui-custom-collapsed" aria-expanded="false"
+                    data-label-collapse="<?php echo t_h('modals.ui_customization.collapse_all', [], 'Collapse all'); ?>"
+                    data-label-expand="<?php echo t_h('modals.ui_customization.expand_all', [], 'Expand all'); ?>"
+                    title="<?php echo t_h('modals.ui_customization.expand_all', [], 'Expand all'); ?>"
+                    aria-label="<?php echo t_h('modals.ui_customization.expand_all', [], 'Expand all'); ?>"><i class="lucide lucide-chevron-down"></i></button>
                 <input type="search" id="uiCustomizationPanelFilter" class="ui-custom-filter-input"
                     placeholder="<?php echo t_h('modals.ui_customization.filter_placeholder', [], 'Filter items...'); ?>" autocomplete="off">
             </div>

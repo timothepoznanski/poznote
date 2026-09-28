@@ -87,25 +87,41 @@ function poznoteOfflineFolderIds(array $folders): array {
  * @param array<int, true> $folderIds
  */
 function poznoteOfflineReason(array $note, string $cutoff, array $folderIds): ?string {
+    return poznoteOfflineReasons($note, $cutoff, $folderIds)[0] ?? null;
+}
+
+/**
+ * Every reason a note is kept offline for, the most important first (the one
+ * poznoteOfflineReason() gives): a favorite marked "Keep offline" is both.
+ * "recent" only comes alone, for the notes the date rule alone keeps (a
+ * recent date says nothing more about a note kept anyway). Empty when the
+ * note is not kept. Same arguments as poznoteOfflineReason().
+ *
+ * @param array<string, mixed> $note
+ * @param array<int, true> $folderIds
+ * @return list<string>
+ */
+function poznoteOfflineReasons(array $note, string $cutoff, array $folderIds): array {
     $mark = (int)($note['offline'] ?? 0);
     if ($mark < 0) {
-        return null;
+        return [];
     }
+    $reasons = [];
     if ($mark > 0) {
-        return 'note';
+        $reasons[] = 'note';
     }
     $folderId = isset($note['folder_id']) && $note['folder_id'] !== null ? (int)$note['folder_id'] : 0;
     if ($folderId > 0 && isset($folderIds[$folderId])) {
-        return 'folder';
+        $reasons[] = 'folder';
     }
     if (!empty($note['favorite'])) {
-        return 'favorite';
+        $reasons[] = 'favorite';
     }
     $updated = (string)($note['updated'] ?? '');
-    if ($updated !== '' && strcmp($updated, $cutoff) >= 0) {
-        return 'recent';
+    if (!$reasons && $updated !== '' && strcmp($updated, $cutoff) >= 0) {
+        $reasons[] = 'recent';
     }
-    return null;
+    return $reasons;
 }
 
 /**

@@ -29,12 +29,9 @@
 /* Hide specific toolbar buttons on desktop only (keep on mobile) */
 @media (min-width: 800px) {
 
-    .btn-excalidraw,
     .btn-emoji,
     .btn-table,
-    .btn-checklist,
-    .btn-separator,
-    .btn-note-reference {
+    .btn-checklist {
         display: none !important;
     }
 

@@ -540,7 +540,6 @@
       "website": "Abre el sitio web oficial de Poznote.",
       "tips": "Descubre consejos y trucos para sacar el máximo partido a Poznote.",
       "discord": "Únete a la comunidad de Poznote en Discord.",
-      "contact": "Envía un correo a la dirección de contacto de esta instancia.",
       "discussions": "Haz una pregunta o comparte una idea en las discusiones de GitHub.",
       "support": "Apoya el desarrollo de Poznote con una donación.",
       "s3_storage": "Almacenar los adjuntos de las notas en un almacenamiento de objetos compatible con S3 en lugar del disco local.",
@@ -617,7 +616,6 @@
       "git_sync": "Sincronización Git",
       "check_updates": "Buscar actualizaciones",
       "version": "Versión",
-      "contact": "Contacto",
       "api_docs": "Documentación de API",
       "documentation": "Documentation GitHub",
       "discussions": "Discusiones de GitHub",
@@ -928,7 +926,12 @@
       "view_here": "Mostrar en una pestaña, sin cambiar de cuenta"
     },
     "show_offline_dots": "Mostrar los puntos sin conexión",
-    "hide_offline_dots": "Ocultar los puntos sin conexión"
+    "hide_offline_dots": "Ocultar los puntos sin conexión",
+    "view_options": "Opciones de vista",
+    "expand_all_folders_hint": "Abrir todas las carpetas del árbol",
+    "collapse_all_folders_hint": "Cerrar todas las carpetas del árbol",
+    "customize": "Personalizar la barra lateral",
+    "customize_hint": "Elegir qué elementos de la barra lateral se muestran"
   },
   "home": {
     "title": "Panel",
@@ -1174,9 +1177,7 @@
     },
     "table_picker": {
       "title": "Insertar tabla",
-      "rows_label": "Filas:",
       "rows_placeholder": "Filas",
-      "cols_label": "Columnas:",
       "cols_placeholder": "Columnas",
       "insert": "Insertar"
     },
@@ -1383,7 +1384,8 @@
         "folder_actions": "Acciones de carpeta",
         "workspace_menu": "Menú del espacio de trabajo",
         "note_actions": "Acciones de las notas",
-        "mobile_editor_bar": "Barra de edición móvil"
+        "mobile_editor_bar": "Barra de edición móvil",
+        "sidebar": "Barra lateral"
       },
       "check_all": "Marcar todo",
       "uncheck_all": "Desmarcar todo",
@@ -1409,7 +1411,9 @@
       "panel_saved": "Guardado",
       "panel_save_error": "No se pudo guardar, inténtalo de nuevo.",
       "mobile_editor_bar_hint": "Barra que aparece sobre el teclado en pantalla mientras se edita una nota en un teléfono o una tableta.",
-      "mobile_editor_bar_show": "Mostrar la barra"
+      "mobile_editor_bar_show": "Mostrar la barra",
+      "sidebar_hint": "Columna del árbol de notas, entre la barra de iconos y la nota.",
+      "icon_rail_hint": "Columna estrecha de iconos a la izquierda de cada página."
     },
     "icon_sidebar_order": {
       "title": "Diseño de la barra de iconos",
@@ -1812,8 +1816,8 @@
       },
       "badge": "{{count}} automáticas por nota",
       "badge_with_safety": "{{count}} automáticas, {{safety}} de seguridad por nota",
-      "warning_title": "Las instantáneas solo guardan el texto de la nota. Los archivos adjuntos nunca se copian.",
-      "warning": "Los archivos adjuntos y las imágenes se conservan en el disco incluso después de eliminarlos de una nota, mientras alguna de sus instantáneas todavía los contenga. Solo se liberan cuando caduca la última instantánea que los contiene (como máximo a los {{days}} días) o cuando la nota se elimina definitivamente."
+      "warning_title": "Las instantáneas solo guardan el texto de la nota. Los archivos adjuntos y las imágenes nunca se copian.",
+      "warning": "Los archivos adjuntos y las imágenes se conservan en el disco incluso después de eliminarlos de una nota, mientras alguna de sus instantáneas todavía los contenga. Solo se liberan cuando la última instantánea que los contiene se elimina o caduca (como máximo a los {{days}} días) o cuando la nota se elimina definitivamente."
     },
     "api_rest": {
       "github_option": "GitHub",
@@ -3693,6 +3697,20 @@
       "date_created": "Fecha de creación",
       "type": "Tipo",
       "custom": "Personalizado"
+    },
+    "hints": {
+      "name": "Notas por título y carpetas por nombre, de la A a la Z",
+      "date_modified": "Primero las notas modificadas más recientemente",
+      "date_created": "Primero las notas y carpetas creadas más recientemente",
+      "type": "Notas agrupadas por tipo (nota, markdown, lista de tareas, dibujo, enlace), luego por título",
+      "custom": "El orden que definiste arrastrando notas y carpetas"
+    },
+    "menu_items": {
+      "name": "Ordenar por nombre",
+      "date_modified": "Ordenar por fecha de modificación",
+      "date_created": "Ordenar por fecha de creación",
+      "type": "Ordenar por tipo",
+      "custom": "Orden personalizado"
     }
   },
   "calendar": {
@@ -4448,6 +4466,13 @@
       "empty": "No hay etiquetas en este tablero.",
       "search": "Filtrar etiquetas...",
       "no_match": "Ninguna etiqueta coincide."
+    },
+    "filters": {
+      "button": "Filtros",
+      "color": "Color",
+      "modified": "Última modificación",
+      "tags": "Etiquetas",
+      "reset": "Restablecer filtros"
     }
   },
   "graph": {
@@ -4738,6 +4763,7 @@
     "filter_overdue": "Atrasadas",
     "filter_dated": "Con fecha",
     "filter_completed": "Completadas",
+    "filters": "Filtros",
     "filter_placeholder": "Filtrar por tarea, título o carpeta...",
     "empty": "Aún no hay tareas. Crea una nota de lista de tareas o añade una lista de verificación a una nota para empezar.",
     "empty_filtered": "Ninguna tarea coincide con este filtro.",
@@ -5152,6 +5178,8 @@
       "title": "Sin conexión",
       "filter_placeholder": "Filtrar por nombre o carpeta...",
       "column_reason": "Motivo",
+      "filter_reason": "Filtrar por motivo",
+      "reason_all": "Todos los motivos",
       "reason_note": "Guardada sin conexión",
       "reason_folder": "En una carpeta guardada sin conexión",
       "reason_favorite": "Favorito",

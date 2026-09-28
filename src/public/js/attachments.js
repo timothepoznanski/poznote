@@ -1055,6 +1055,61 @@ function createUploadPlaceholderId(prefix) {
     return (prefix || 'upload') + '-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
 }
 
+// A pasted or dropped picture shows at once, straight from the file (a blob:
+// URL), dimmed until the upload answers. The placeholder used to be an empty
+// plate: the file went up, then came back down from the server before
+// anything showed, and on a remote instance that wait read as a paste that
+// had not worked. The blob: URL only lives in this page, so the save puts the
+// empty src back (stripSearchHighlights in js/notes.js).
+function showUploadPlaceholderPreview(img, file) {
+    if (!img || !file || !window.URL || typeof URL.createObjectURL !== 'function') return;
+
+    try {
+        var previewUrl = URL.createObjectURL(file);
+        img._pzUploadPreviewUrl = previewUrl;
+        img.src = previewUrl;
+    } catch (e) {
+        console.debug('attachments: showUploadPlaceholderPreview() failed:', e);
+    }
+}
+
+// Point the placeholder at the uploaded file. The browser keeps painting the
+// local preview until the server copy has loaded, so nothing blinks out in
+// between; the blob: URL is released once the swap is over.
+function finishUploadPlaceholder(img, src, alt) {
+    if (!img) return;
+
+    var previewUrl = img._pzUploadPreviewUrl;
+    if (previewUrl) {
+        delete img._pzUploadPreviewUrl;
+        var release = function () {
+            img.removeEventListener('load', release);
+            img.removeEventListener('error', release);
+            URL.revokeObjectURL(previewUrl);
+        };
+        img.addEventListener('load', release);
+        img.addEventListener('error', release);
+    }
+
+    img.src = src;
+    img.alt = alt;
+    img.classList.remove('image-uploading-placeholder');
+    img.removeAttribute('data-upload-placeholder-id');
+    img.setAttribute('loading', 'lazy');
+    img.setAttribute('decoding', 'async');
+}
+
+// The upload failed: take the placeholder out and let go of its preview.
+function discardUploadPlaceholder(img) {
+    if (!img) return;
+
+    if (img._pzUploadPreviewUrl) {
+        URL.revokeObjectURL(img._pzUploadPreviewUrl);
+        delete img._pzUploadPreviewUrl;
+    }
+    img.remove();
+}
+
 // dropPoint is an optional {x, y} in viewport coordinates (the drop
 // location); when present the image is inserted there instead of at the
 // current cursor position.
@@ -1510,6 +1565,8 @@ function handleHTMLImageInsert(file, dropTarget, dropPoint) {
         placeholderImg = dropTarget.querySelector('[data-upload-placeholder-id="' + placeholderId + '"]');
     }
 
+    showUploadPlaceholderPreview(placeholderImg, file);
+
     // Upload the file as attachment
     var formData = new FormData();
     formData.append('note_id', noteId);
@@ -1539,12 +1596,7 @@ function handleHTMLImageInsert(file, dropTarget, dropPoint) {
                 var imgSrc = '/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id;
 
                 if (placeholderImg) {
-                    placeholderImg.src = imgSrc;
-                    placeholderImg.alt = file.name;
-                    placeholderImg.classList.remove('image-uploading-placeholder');
-                    placeholderImg.removeAttribute('data-upload-placeholder-id');
-                    placeholderImg.setAttribute('loading', 'lazy');
-                    placeholderImg.setAttribute('decoding', 'async');
+                    finishUploadPlaceholder(placeholderImg, imgSrc, file.name);
                     if (window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.defaultImageBorderNoPadding) {
                         placeholderImg.classList.add('img-with-border-no-padding');
                     }
@@ -1581,9 +1633,7 @@ function handleHTMLImageInsert(file, dropTarget, dropPoint) {
                 }, 100);
             } else {
                 // Remove placeholder on error
-                if (placeholderImg) {
-                    placeholderImg.remove();
-                }
+                discardUploadPlaceholder(placeholderImg);
                 if (typeof showNotificationPopup === 'function') {
                     showNotificationPopup('Upload failed: ' + data.message, 'error');
                 }
@@ -1591,9 +1641,7 @@ function handleHTMLImageInsert(file, dropTarget, dropPoint) {
         })
         .catch(function (error) {
             // Remove placeholder on error
-            if (placeholderImg) {
-                placeholderImg.remove();
-            }
+            discardUploadPlaceholder(placeholderImg);
             if (typeof showNotificationPopup === 'function') {
                 showNotificationPopup('Upload failed: ' + error.message, 'error');
             }

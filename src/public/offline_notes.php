@@ -98,6 +98,14 @@ $currentLang = getUserLanguage();
 						<i class="lucide lucide-x"></i>
 					</button>
 				</div>
+				<?php // Reasons no note has are hidden by js/offline-list.js, which also puts the day count in the recent one ?>
+				<select id="reasonFilter" class="offline-reason-select initially-hidden" aria-label="<?php echo t_h('offline.page.filter_reason', [], 'Filter by reason'); ?>">
+					<option value=""><?php echo t_h('offline.page.reason_all', [], 'All reasons'); ?></option>
+					<option value="note"><?php echo t_h('offline.page.reason_note', [], 'Kept offline'); ?></option>
+					<option value="folder"><?php echo t_h('offline.page.reason_folder', [], 'In a folder kept offline'); ?></option>
+					<option value="favorite"><?php echo t_h('offline.page.reason_favorite', [], 'Favorite'); ?></option>
+					<option value="recent"></option>
+				</select>
 				<div id="filterStats" class="filter-stats initially-hidden"></div>
 				<div class="shared-filter-tree-actions initially-hidden" id="sharedTreeToolbar">
 					<button type="button" id="toggleAllFoldersBtn" class="btn btn-secondary">

@@ -357,14 +357,13 @@ function getPageTitle() {
 
 
 /**
- * The three contact cards of the About section (settings.php): a contact
- * email, the GitHub discussions and the Discord server. Each points to the
- * Poznote project by default; a global setting (PUT /api/v1/settings/{key})
- * can point it elsewhere, and an empty value means "back to the default".
+ * The two community cards of the About section (settings.php): the GitHub
+ * discussions and the Discord server. Each points to the Poznote project by
+ * default; a global setting (PUT /api/v1/settings/{key}) can point it
+ * elsewhere, and an empty value means "back to the default".
  */
 function poznoteAboutLinkDefaults(): array {
     return [
-        'contact_email'   => 'contact@poznote.com',
         'discussions_url' => 'https://github.com/timothepoznanski/poznote/discussions',
         'discord_url'     => 'https://discord.gg/AWhWWSEkJ',
     ];
@@ -778,13 +777,6 @@ function requireSettingsPassword() {
 
 
 
-/**
- * Render the view controls used by the dashboard and diary boards, next to
- * the filter bar. $prefix namespaces the localStorage keys so each page
- * remembers its own settings. A single toggle cycles through the views
- * (grid small/medium/large, then list); the columns button caps the grid
- * width and is hidden in list layout (board-view-menu.js drives both).
- */
 // ============================================================================
 // Workspace tags and multi-workspace scope
 // ============================================================================
@@ -799,9 +791,20 @@ function requireSettingsPassword() {
 
 
 
-function renderBoardViewMenu(string $prefix) {
+/**
+ * Render the view controls used by the dashboard and diary boards, next to
+ * the filter bar. $prefix namespaces the localStorage keys so each page
+ * remembers its own settings. A single toggle cycles through the views
+ * (grid small/medium/large/wide, then list); the columns button caps the grid
+ * width and is hidden in list layout (board-view-menu.js drives both).
+ *
+ * With $autoGrid the page has no column setting: the grid fits as many
+ * cards of the chosen size as the width allows (the dashboard, like Google
+ * Keep), so only the view toggle is rendered.
+ */
+function renderBoardViewMenu(string $prefix, bool $autoGrid = false) {
     $idPrefix = htmlspecialchars($prefix, ENT_QUOTES, 'UTF-8');
-    echo '<div class="board-view-controls" data-view-prefix="' . $idPrefix . '">' .
+    echo '<div class="board-view-controls" data-view-prefix="' . $idPrefix . '"' . ($autoGrid ? ' data-auto-grid="1"' : '') . '>' .
         '<button type="button" id="' . $idPrefix . 'ViewLayoutBtn" class="board-view-btn board-view-layout-toggle"' .
             ' data-label-grid="' . t_h('dashboard.view.layout_grid', [], 'Grid') . '"' .
             ' data-label-list="' . t_h('dashboard.view.layout_list', [], 'List') . '"' .
@@ -813,10 +816,11 @@ function renderBoardViewMenu(string $prefix) {
             '<i class="lucide lucide-layout-list"></i>' .
             '<span class="board-view-size-letter"></span>' .
         '</button>' .
+        ($autoGrid ? '' :
         '<button type="button" id="' . $idPrefix . 'ViewColumnsBtn" class="board-view-btn board-view-columns-btn"' .
             ' data-label-columns="' . t_h('dashboard.view.columns', [], 'Maximum columns') . '">' .
             '<span class="board-view-columns-value"></span>' .
-        '</button>' .
+        '</button>') .
     '</div>';
 }
 

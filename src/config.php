@@ -67,7 +67,6 @@ function poznoteGetThemeAssetVersion() {
         'css/attachments_list.css',
         'css/home/dark-mode.css',
         'css/shared/dark-mode.css',
-        'css/notes/sidebar.css',
     ];
 
     $version = 0;

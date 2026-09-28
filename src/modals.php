@@ -1057,8 +1057,8 @@ $pzNoteInfoRows = [
                 <label><input type="number" id="snapshotsSafetyKeepCountInput" min="<?php echo POZNOTE_SNAPSHOTS_SAFETY_MIN_COUNT; ?>" max="<?php echo POZNOTE_SNAPSHOTS_SAFETY_MAX_COUNT; ?>" step="1" value="<?php echo POZNOTE_SNAPSHOTS_SAFETY_DEFAULT_COUNT; ?>" style="width:80px; margin:0; padding:4px 8px;"> <?php echo t_h('modals.snapshots.options.safety_unit', [], 'safety snapshots'); ?></label>
             </div>
             <div class="delete-warning-box">
-                <p class="delete-warning"><?php echo t_h('modals.snapshots.warning_title', [], 'Snapshots only store the note text. Attachments are never copied.'); ?></p>
-                <p class="delete-warning-recovery"><?php echo t_h('modals.snapshots.warning', ['days' => POZNOTE_SNAPSHOTS_MAX_AGE_DAYS], 'Attachments and images are kept on disk even after you remove them from a note, as long as one of its snapshots still contains them. They are only freed when the last snapshot containing them expires (after {{days}} days at most) or when the note is permanently deleted.'); ?></p>
+                <p class="delete-warning"><?php echo t_h('modals.snapshots.warning_title', [], 'Snapshots only store the note text. Attachments and images are never copied.'); ?></p>
+                <p class="delete-warning-recovery"><?php echo t_h('modals.snapshots.warning', ['days' => POZNOTE_SNAPSHOTS_MAX_AGE_DAYS], 'Attachments and images are kept on disk even after you remove them from a note, as long as one of its snapshots still contains them. They are only freed when the last snapshot containing them is deleted or expires (after {{days}} days at most) or when the note is permanently deleted.'); ?></p>
             </div>
         </div>
         <div class="modal-buttons">
@@ -1563,6 +1563,7 @@ $iconSidebarOrderDividerRow = static function (): string {
                     </div>
                     <div class="modal-buttons snapshot-modal-actions">
                         <button type="button" id="snapshotMarkdownPreviewToggle" class="btn-cancel snapshot-markdown-preview-btn" onclick="toggleSnapshotMarkdownPreview()" hidden data-preview-label="<?php echo t_h('snapshot.modal.markdown_preview', [], 'Preview'); ?>" data-source-label="<?php echo t_h('snapshot.modal.markdown_source', [], 'Source view'); ?>"><?php echo t_h('snapshot.modal.markdown_preview', [], 'Preview'); ?></button>
+                        <button type="button" class="btn-cancel snapshot-copy-btn" onclick="copySnapshotContent()"><i class="lucide lucide-copy"></i><span><?php echo t_h('snapshot.modal.copy_content', [], 'Copy content'); ?></span></button>
                         <button type="button" class="btn-danger snapshot-delete-btn" onclick="deleteSnapshot()"><i class="lucide lucide-trash-2"></i><span><?php echo t_h('snapshot.modal.delete', [], 'Delete this snapshot'); ?></span></button>
                         <button type="button" class="btn-cancel snapshot-take-btn" onclick="takeSnapshotNow()"><i class="lucide lucide-camera"></i><span><?php echo t_h('snapshot.modal.take_now', [], 'Take snapshot now'); ?></span></button>
                         <button type="button" class="btn-primary snapshot-restore-btn" onclick="restoreSnapshot()"><i class="lucide lucide-rotate-ccw"></i><span><?php echo t_h('snapshot.modal.restore_state', [], 'Restore this state'); ?></span></button>

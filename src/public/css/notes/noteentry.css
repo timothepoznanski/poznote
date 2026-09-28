@@ -351,6 +351,15 @@ textarea:focus {
     border: 2px dashed var(--pz-border-strong);
 }
 
+/* Once the file itself shows (a blob: preview, same scripts) the plate goes:
+   the picture holds its own space, dimmed until the upload answers. */
+.image-uploading-placeholder[src^="blob:"] {
+    min-width: 0;
+    min-height: 0;
+    background: none;
+    border: 0;
+}
+
 .noteentry iframe {
     aspect-ratio: 16 / 9;
     border: none;

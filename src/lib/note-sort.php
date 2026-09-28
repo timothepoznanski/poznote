@@ -133,6 +133,42 @@ function poznoteNoteSortLabel(string $mode): array
 }
 
 /**
+ * i18n key and English fallback of a mode's item in the tree's view options
+ * menu, worded as an action like the items of the note and folder menus.
+ *
+ * @return array{0:string,1:string}
+ */
+function poznoteNoteSortMenuLabel(string $mode): array
+{
+    $labels = [
+        'heading_asc' => ['sort.menu_items.name', 'Sort by name'],
+        'updated_desc' => ['sort.menu_items.date_modified', 'Sort by date modified'],
+        'created_desc' => ['sort.menu_items.date_created', 'Sort by date created'],
+        'type_asc' => ['sort.menu_items.type', 'Sort by type'],
+        'manual' => ['sort.menu_items.custom', 'Custom order'],
+    ];
+    return $labels[poznoteNormalizeNoteSort($mode)];
+}
+
+/**
+ * i18n key and English fallback of the line that explains a mode, shown on
+ * hover in the "Sort by" group of the tree's view options menu.
+ *
+ * @return array{0:string,1:string}
+ */
+function poznoteNoteSortHint(string $mode): array
+{
+    $hints = [
+        'heading_asc' => ['sort.hints.name', 'Notes by title and folders by name, from A to Z'],
+        'updated_desc' => ['sort.hints.date_modified', 'Most recently modified notes first'],
+        'created_desc' => ['sort.hints.date_created', 'Most recently created notes and folders first'],
+        'type_asc' => ['sort.hints.type', 'Notes grouped by type (note, markdown, task list, drawing, link), then by title'],
+        'manual' => ['sort.hints.custom', 'The order you set by dragging notes and folders'],
+    ];
+    return $hints[poznoteNormalizeNoteSort($mode)];
+}
+
+/**
  * Rank of a note kind under the Type mode.
  *
  * A fixed list rather than the alphabetical order of the internal names, so

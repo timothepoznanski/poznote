@@ -101,10 +101,6 @@
     color: var(--pz-text-muted);
 }
 
-.text-small {
-    font-size: 14px;
-}
-
 .text-small-muted {
     color: var(--pz-text-muted);
     font-size: 14px;

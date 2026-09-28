@@ -308,10 +308,7 @@ html[data-theme='dark'] .note-actions-menu-item.active i {
 }
 
 /* Folder action buttons */
-.folder-edit-btn,
-.folder-delete-btn,
-.folder-empty-btn,
-.folder-move-files-btn {
+.folder-delete-btn {
     color: var(--pz-accent-text);
     margin-left: 8px;
     cursor: pointer;

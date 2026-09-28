@@ -661,7 +661,6 @@ html[data-theme='dark'] .settings-collapse-all:hover {
 
     /* Status badges move to the right edge of the row */
     .settings-with-nav .home-card-content > .setting-status,
-    .settings-with-nav .home-card-content > .home-card-count,
     .settings-with-nav .home-card-content > div {
         margin-left: auto;
     }
@@ -1055,7 +1054,6 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
 
     /* Badges sit at the right edge of the row */
     .home-container.settings-with-nav .home-card-content > .setting-status,
-    .home-container.settings-with-nav .home-card-content > .home-card-count,
     .home-container.settings-with-nav .home-card-content > div {
         margin-left: auto;
     }

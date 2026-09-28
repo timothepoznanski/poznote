@@ -319,8 +319,7 @@ body.view-kanban .public-folder-body {
     max-width: 1400px;
 }
 
-html[data-theme='dark'] .public-folder-body,
-html[data-theme='dark'].public-folder-html {
+html[data-theme='dark'] .public-folder-body {
     --bg-color: var(--pz-chrome-bg, var(--pz-bg));
     --text-color: var(--pz-text);
     --link-color: #6db3f2;
@@ -331,8 +330,7 @@ html[data-theme='dark'].public-folder-html {
     --hover-bg: rgba(var(--pz-highlight-rgb), 0.06);
 }
 
-html[data-theme='light'] .public-folder-body,
-html[data-theme='light'].public-folder-html {
+html[data-theme='light'] .public-folder-body {
     --bg-color: #ffffff;
     --text-color: #333;
     --link-color: rgb(49, 130, 206);
@@ -705,14 +703,6 @@ html[data-theme='dark'] .kanban-public-card {
     color: var(--muted-color);
 }
 
-/* Alternate styles for card layout */
-.public-folder {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    min-height: 100vh;
-}
-
 .note-item {
     background: var(--note-bg);
     border: 1px solid var(--border-color);
@@ -729,37 +719,6 @@ html[data-theme='dark'] .kanban-public-card {
     margin: 0 0 10px 0;
     color: var(--text-color);
     font-size: 1.5rem;
-}
-
-.note-meta {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 15px;
-    font-size: 0.9rem;
-    color: var(--text-muted);
-}
-
-.note-meta i {
-    margin-right: 5px;
-}
-
-.note-type {
-    display: inline-flex;
-    align-items: center;
-    padding: 2px 8px;
-    background: var(--tag-bg);
-    border-radius: var(--pz-radius-sm);
-}
-
-.note-preview {
-    margin-bottom: 15px;
-    color: var(--text-color);
-    line-height: 1.6;
-}
-
-.note-preview p {
-    margin: 0;
-    color: var(--text-muted);
 }
 
 .empty-folder {
@@ -857,10 +816,6 @@ html[data-theme='light'] {
         font-size: 1.1rem;
     }
 
-    .public-folder {
-        padding: 15px;
-    }
-
     .public-folder-filter {
         flex-wrap: nowrap;
         align-items: center;
@@ -876,11 +831,6 @@ html[data-theme='light'] {
 
     .note-item h2 {
         font-size: 1.25rem;
-    }
-
-    .note-meta {
-        flex-direction: column;
-        gap: 8px;
     }
 
     .public-folder-group-title,

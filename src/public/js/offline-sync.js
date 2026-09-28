@@ -797,8 +797,17 @@
     // screen (offline.php?note=).
     var OPEN_OFFLINE_TIMEOUT_MS = 10 * 1000;
     var pageLeft = false;
+    var stuckTimer = null;
     window.addEventListener('pagehide', function () {
         pageLeft = true;
+    });
+    // Back from the offline page through the back/forward cache: this page
+    // is live again, and its unsaved changes warning with it
+    window.addEventListener('pageshow', function (e) {
+        if (e.persisted) {
+            pageLeft = false;
+            window.__poznoteLeavingForOfflinePage = false;
+        }
     });
 
     function openOfflinePage() {
@@ -825,7 +834,8 @@
             // Still here: the browser keeps the page waiting on the network
             // instead of taking the worker's answer. Stop the endless loading
             // and say what unblocks it (issue 1500).
-            setTimeout(function () {
+            clearTimeout(stuckTimer);
+            stuckTimer = setTimeout(function () {
                 if (pageLeft) {
                     return;
                 }

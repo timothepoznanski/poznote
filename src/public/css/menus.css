@@ -238,40 +238,4 @@
     display: none;
 }
 
-.actions-menu-item {
-    display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    cursor: pointer;
-    font-size: 14px;
-    color: var(--pz-text);
-    border-bottom: 1px solid var(--pz-border-light);
-    transition: background-color 0.2s;
-    font-family: 'Inter', sans-serif;
-}
-
-.actions-menu-item:last-child {
-    border-bottom: none;
-}
-
-.actions-menu-item:hover {
-    background-color: var(--pz-surface);
-    color: var(--pz-accent-text);
-}
-
-.actions-menu-item i {
-    margin-right: 10px;
-    width: 16px;
-    text-align: center;
-    color: var(--pz-accent-text);
-    width: 24px !important;
-    font-size: 20px !important;
-}
-
-/* Make delete icon red in actions menu */
-.actions-menu-item .lucide-trash-2 {
-    color: var(--pz-danger-text);
-    filter: none;
-}
-
 /* .actions-dropdown.mobile .actions-menu { min-width: 120px; padding: 6px 0; } */

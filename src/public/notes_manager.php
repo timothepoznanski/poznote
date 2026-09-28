@@ -216,8 +216,9 @@ $currentLang = getUserLanguage();
 	<script src="<?php echo poznoteAsset('js/offline-sync.js'); ?>" data-offline-mode="writes"></script>
 	<?php endif; ?>
 	<script src="<?php echo poznoteAsset('js/notes-manager.js'); ?>"></script>
-	<?php if ($notesManagerOfflineMode): ?>
-	<?php // Marks the notes and folders kept offline in this browser ?>
+	<?php // Marks the notes and folders kept offline in this browser, unless the
+	      // offline dots are hidden (sidebar_offline_marks, the tree's view options menu) ?>
+	<?php if ($notesManagerOfflineMode && !in_array(getSetting('sidebar_offline_marks', '1'), ['0', 'false'], true)): ?>
 	<script src="<?php echo poznoteAsset('js/offline-marks.js'); ?>" defer
 		data-note-title="<?php echo t_h('notes_list.note_actions.available_offline', [], 'Available offline in this browser'); ?>"
 		data-folder-title="<?php echo t_h('notes_list.folder_actions.kept_offline', [], 'Kept offline in this browser'); ?>"></script>

@@ -9,7 +9,8 @@
  * physical key (e.code "KeyS" -> "s"), as the browser does for its own
  * shortcuts. A Latin letter is kept as typed: Dvorak's Ctrl+O stays O even
  * though it sits on the S key, and AltGr+S typing "ś" on a Polish layout is
- * not taken for Ctrl+Alt+S.
+ * not taken for Ctrl+Alt+S. For the same reason a letter typed with AltGr
+ * held is never read from the physical key.
  */
 (function () {
     'use strict';
@@ -23,7 +24,10 @@
 
     window.poznoteShortcutKey = function (e) {
         var key = e && typeof e.key === 'string' ? e.key : '';
-        if (nonLatinLetter && nonLatinLetter.test(key)
+        // AltGr reports ctrlKey + altKey on Windows: a letter it types
+        // (Ukrainian AltGr+U types "ґ") is text, not Ctrl+U
+        var altGraph = typeof e.getModifierState === 'function' && e.getModifierState('AltGraph');
+        if (nonLatinLetter && !altGraph && nonLatinLetter.test(key)
             && typeof e.code === 'string' && /^Key[A-Z]$/.test(e.code)) {
             return e.code.charAt(3).toLowerCase();
         }

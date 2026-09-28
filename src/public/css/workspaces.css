@@ -113,21 +113,6 @@ body {
     font-size: 14px;
 }
 
-.workspace-item {
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    border: 1px solid var(--pz-border);
-    border-radius: var(--pz-radius);
-    margin-bottom: 10px;
-    background-color: var(--pz-bg);
-    transition: box-shadow 0.2s;
-}
-
-.workspace-item:hover {
-    box-shadow: 0 2px 4px rgba(var(--pz-shadow-rgb), 0.1);
-}
-
 /* Colonnes de la liste des workspaces */
 .ws-col {
     display: flex;
@@ -718,19 +703,6 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
     color: var(--pz-danger-text);
 }
 
-/* Boutons d'action */
-.action-btn {
-    padding: 6px 12px;
-    font-size: 12px;
-    border-radius: var(--pz-radius-sm);
-    border: 1px solid var(--pz-border);
-    background-color: var(--pz-bg);
-    color: var(--pz-text-inverse);
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-left: 0;
-}
-
 @media (max-width: 640px) {
     .shared-edit-token-modal .shared-edit-token-modal-actions {
         flex-direction: column-reverse;
@@ -739,11 +711,6 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
     .shared-edit-token-modal .shared-edit-token-modal-actions .btn {
         width: 100%;
     }
-}
-
-.action-btn:hover {
-    background-color: var(--pz-surface);
-    border-color: var(--pz-text-subtle);
 }
 
 .btn-rename {
@@ -816,15 +783,10 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
     border-color: var(--pz-danger-text);
 }
 
-.workspace-list .action-btn:active { transform: translateY(1px); }
-
 /* The disabled look belongs to components/buttons.css. This file used to
    restate it on a bare .btn, which reached the five pages it loads on and
    overrode the base's deliberate "a locked destructive action stays red"
    rule; border-color and box-shadow were no-ops, the base sets neither. */
-
-/* Lock icon for default workspace */
-.locked-icon { color: var(--pz-text-muted); margin-left: 8px; font-size: 0.9rem; }
 
 .form-group input[type="text"], 
 .form-group input[type="password"] {
