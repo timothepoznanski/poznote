@@ -773,18 +773,15 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
         . '<span>' . t_h('sidebar.customize', [], 'Customize sidebar') . '</span>'
         . '</div>';
 
-    $treeOptionsButton = '';
-    $treeOptionsMenu = '';
-    if (!empty($treeOptionsGroups)) {
-        $treeOptionsTitle = t_h('sidebar.view_options', [], 'View options');
-        // The three-dot toggle of the folder rows (.folder-actions-toggle)
-        $treeOptionsButton = '<button type="button" class="folder-actions-toggle" id="sidebarTreeOptionsBtn" data-action="toggle-tree-options-menu" aria-haspopup="menu" aria-expanded="false" title="' . $treeOptionsTitle . '" aria-label="' . $treeOptionsTitle . '">'
-            . '<i class="lucide lucide-more-vertical"></i>'
-            . '</button>';
-        $treeOptionsMenu = '<div class="folder-actions-menu" id="tree-options-menu" role="menu" aria-label="' . $treeOptionsTitle . '">'
-            . implode('<div class="folder-actions-menu-separator"></div>', $treeOptionsGroups)
-            . '</div>';
-    }
+    // Never empty: the Customize sidebar item is always there.
+    $treeOptionsTitle = t_h('sidebar.view_options', [], 'View options');
+    // The three-dot toggle of the folder rows (.folder-actions-toggle)
+    $treeOptionsButton = '<button type="button" class="folder-actions-toggle" id="sidebarTreeOptionsBtn" data-action="toggle-tree-options-menu" aria-haspopup="menu" aria-expanded="false" title="' . $treeOptionsTitle . '" aria-label="' . $treeOptionsTitle . '">'
+        . '<i class="lucide lucide-more-vertical"></i>'
+        . '</button>';
+    $treeOptionsMenu = '<div class="folder-actions-menu" id="tree-options-menu" role="menu" aria-label="' . $treeOptionsTitle . '">'
+        . implode('<div class="folder-actions-menu-separator"></div>', $treeOptionsGroups)
+        . '</div>';
     ?>
 
     <!-- MENU RIGHT COLUMN -->	 

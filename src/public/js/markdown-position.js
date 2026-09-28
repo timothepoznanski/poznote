@@ -25,7 +25,7 @@
 
 var _MD_POSITION_HOLD_MS = 1600;
 var _MD_POSITION_RETRY_DELAYS = [0, 60, 150, 300, 600, 1000, 1500];
-var _MD_POSITION_MARKER_MS = 1400;
+var _MD_POSITION_MARKER_MS = 3000;
 
 function _mdPositionIsTouchLayout() {
     try {
@@ -453,7 +453,8 @@ function restoreMarkdownPreviewPosition(noteEntry, position, options) {
 
 /**
  * Scroll the now visible editor so position.position sits where the reader
- * saw it, move the caret there (unless told to keep it), and point at it.
+ * saw it, move the caret there (unless told to keep it), and point at it
+ * (unless options.marker is false).
  */
 function restoreMarkdownEditorPosition(noteEntry, position, options) {
     options = options || {};
@@ -504,7 +505,7 @@ function restoreMarkdownEditorPosition(noteEntry, position, options) {
         if (Math.abs(delta) >= 1) scroller.scrollTop += delta;
         _mdPositionRemember(noteEntry, 'editor', position, targetY, scroller, editorDiv);
         return true;
-    }, function () {
+    }, options.marker === false ? null : function () {
         _mdPositionShowMarker(noteEntry, getMarkdownEditorScrollContainer(editorDiv), function () {
             var spot = locate();
             return spot ? { top: spot.top, height: spot.height, left: _mdPositionEditorContentLeft(editorDiv) } : null;

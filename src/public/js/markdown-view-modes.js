@@ -499,6 +499,13 @@ function initializeMarkdownNote(noteId) {
         document.execCommand('insertText', false, text);
     });
 
+    // A note rebuilt in place, back from the DOM cache, still carries the
+    // split class of a split it was left in: it is laid out as a half pane
+    if (!startInSplitMode) {
+        _mdSetMarkdownSplitClass(noteEntry, false);
+        clearMarkdownSplitPaneHeight(noteEntry);
+    }
+
     // Set initial display states using setProperty to override any CSS !important rules
     if (startInSplitMode) {
         // Split mode: show both editor and preview side by side

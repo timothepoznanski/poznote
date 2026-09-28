@@ -1243,13 +1243,13 @@ html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview {
     background: var(--pz-accent);
     pointer-events: none;
     opacity: 0;
-    animation: markdown-position-marker-fade 1.4s ease-out forwards;
+    animation: markdown-position-marker-fade 3s ease-out forwards;
 }
 
 @keyframes markdown-position-marker-fade {
     0% { opacity: 0; }
-    12% { opacity: 1; }
-    65% { opacity: 1; }
+    6% { opacity: 1; }
+    80% { opacity: 1; }
     100% { opacity: 0; }
 }
 
