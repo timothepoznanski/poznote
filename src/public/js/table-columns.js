@@ -18,7 +18,7 @@
     'use strict';
 
     var EDGE_TOLERANCE = 5;   // px on each side of a border that grab it
-    var MIN_COLUMN_WIDTH = 32; // px
+    var MIN_COLUMN_WIDTH = 50; // px, the min-width inserted cells carry
 
     // Marks a column fitted to its content: its lines never wrap, so the
     // column cannot get narrower than its text. Only wrapping is switched off,
@@ -28,6 +28,7 @@
     var guide = null;
     var hover = null;          // {table, note, border} under the pointer
     var drag = null;           // active resize
+    var lastTouch = 0;         // a tap also sends mousemove/mousedown
 
     // ─── Table grid ──────────────────────────────────────────────────────────
 
@@ -335,6 +336,17 @@
 
     // ─── Events ──────────────────────────────────────────────────────────────
 
+    // Resizing is mouse only: without this, a tap near a border would start an
+    // empty drag instead of placing the caret
+    function fromTouch() {
+        return Date.now() - lastTouch < 1000;
+    }
+    ['touchstart', 'touchend'].forEach(function (type) {
+        document.addEventListener(type, function () {
+            lastTouch = Date.now();
+        }, { capture: true, passive: true });
+    });
+
     document.addEventListener('mousemove', function (e) {
         if (drag) {
             var dx = e.clientX - drag.startX;
@@ -357,7 +369,7 @@
         }
 
         // Plain hover only: a button held down belongs to a text or cell selection
-        if (e.buttons) {
+        if (e.buttons || fromTouch()) {
             if (hover) setHover(null);
             return;
         }
@@ -374,7 +386,7 @@
 
     // Capture phase: runs before the caret placement and the cell selection
     document.addEventListener('mousedown', function (e) {
-        if (e.button !== 0 || !hover) return;
+        if (e.button !== 0 || !hover || fromTouch()) return;
         var info = getEditableTableInfo(e.target);
         if (!info || info.table !== hover.table || findBorder(info, e.clientX) !== hover.border) return;
 
@@ -411,6 +423,7 @@
 
     // Double-click on a border: fit the column on its left to its content
     document.addEventListener('dblclick', function (e) {
+        if (fromTouch()) return;
         var info = getEditableTableInfo(e.target);
         var border = info ? findBorder(info, e.clientX) : -1;
         if (border === -1) return;

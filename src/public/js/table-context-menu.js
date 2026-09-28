@@ -305,6 +305,8 @@
                 const half = (Math.round(parseFloat(width) / 2 * 100) / 100) + '%';
                 referenceCell.style.width = half;
                 newCell.style.width = half;
+                // A fitted column would keep its text unwrapped and refuse the half
+                referenceCell.style.removeProperty('text-wrap-mode');
             }
 
             if (after) {

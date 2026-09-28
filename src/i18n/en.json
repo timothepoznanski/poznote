@@ -884,11 +884,12 @@
         "slash_menu": "Slash Menu",
         "panels": "Other",
         "dashboard_toolbar": "Dashboard",
-        "icon_sidebar": "Icon sidebar",
+        "icon_sidebar": "Icon rail",
         "folder_actions": "Folder Actions",
         "workspace_menu": "Workspace Menu",
         "note_actions": "Note Actions",
-        "mobile_editor_bar": "Mobile editor bar"
+        "mobile_editor_bar": "Mobile editor bar",
+        "sidebar": "Sidebar"
       },
       "badge_all_visible": "All visible",
       "badge_hidden_count_admin": "{{count}} hidden ({{admin}} by the administrator)",
@@ -914,7 +915,9 @@
       "panel_saved": "Saved",
       "panel_save_error": "Could not save, try again.",
       "mobile_editor_bar_hint": "Bar shown above the on-screen keyboard while a note is being edited on a phone or tablet.",
-      "mobile_editor_bar_show": "Show the bar"
+      "mobile_editor_bar_show": "Show the bar",
+      "sidebar_hint": "Column of the notes tree, between the icon rail and the note.",
+      "icon_rail_hint": "Narrow column of icons on the far left of every page."
     },
     "icon_sidebar_order": {
       "title": "Icon sidebar layout",
@@ -1317,8 +1320,8 @@
       },
       "badge": "{{count}} automatic per note",
       "badge_with_safety": "{{count}} automatic, {{safety}} safety per note",
-      "warning_title": "Snapshots only store the note text. Attachments are never copied.",
-      "warning": "Attachments and images are kept on disk even after you remove them from a note, as long as one of its snapshots still contains them. They are only freed when the last snapshot containing them expires (after {{days}} days at most) or when the note is permanently deleted."
+      "warning_title": "Snapshots only store the note text. Attachments and images are never copied.",
+      "warning": "Attachments and images are kept on disk even after you remove them from a note, as long as one of its snapshots still contains them. They are only freed when the last snapshot containing them is deleted or expires (after {{days}} days at most) or when the note is permanently deleted."
     },
     "api_rest": {
       "github_option": "GitHub",
@@ -1890,9 +1893,7 @@
     },
     "table_picker": {
       "title": "Insert table",
-      "rows_label": "Rows:",
       "rows_placeholder": "Rows",
-      "cols_label": "Columns:",
       "cols_placeholder": "Columns",
       "insert": "Insert"
     },
@@ -2665,7 +2666,12 @@
       "view_here": "Show in a tab, without switching account"
     },
     "show_offline_dots": "Show offline dots",
-    "hide_offline_dots": "Hide offline dots"
+    "hide_offline_dots": "Hide offline dots",
+    "view_options": "View options",
+    "expand_all_folders_hint": "Open every folder of the tree",
+    "collapse_all_folders_hint": "Close every folder of the tree",
+    "customize": "Customize sidebar",
+    "customize_hint": "Choose which elements of the sidebar are shown"
   },
   "home": {
     "title": "Dashboard",
@@ -3185,6 +3191,20 @@
       "date_created": "Date created",
       "type": "Type",
       "custom": "Custom"
+    },
+    "hints": {
+      "name": "Notes by title and folders by name, from A to Z",
+      "date_modified": "Most recently modified notes first",
+      "date_created": "Most recently created notes and folders first",
+      "type": "Notes grouped by type (note, markdown, task list, drawing, link), then by title",
+      "custom": "The order you set by dragging notes and folders"
+    },
+    "menu_items": {
+      "name": "Sort by name",
+      "date_modified": "Sort by date modified",
+      "date_created": "Sort by date created",
+      "type": "Sort by type",
+      "custom": "Custom order"
     }
   },
   "calendar": {

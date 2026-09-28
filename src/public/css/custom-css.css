@@ -157,20 +157,6 @@ html[data-theme='dark'] .custom-css-theme input[type='radio'] {
     accent-color: var(--pz-accent-text);
 }
 
-
-/* The modal has two blocks: the stored stylesheets, then the theme list the
-   rail's button walks through. */
-.custom-css-block-head {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.custom-css-block-title {
-    font-size: 0.95rem;
-    color: var(--pz-text);
-}
-
 .custom-css-block-help {
     font-size: 0.82rem;
     line-height: 1.4;

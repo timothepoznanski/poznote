@@ -375,9 +375,6 @@ body.outline-mobile-open .outline-mobile-backdrop {
 }
 
 /* Hide outline panel, resize handle and toggle button in Kanban view */
-.kanban-page #outline-panel,
-.kanban-page .outline-resize-handle,
-.kanban-page .toggle-outline-btn,
 body.kanban-active #outline-panel,
 body.kanban-active .outline-resize-handle,
 body.kanban-active .toggle-outline-btn {

@@ -711,36 +711,80 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
         . '<i class="lucide lucide-chevrons-up-down"></i>'
         . '</button>';
 
-    // Sort mode button (#1442): one click steps to the next mode, the way the
-    // theme button steps to the next theme. The icon and the title name the
-    // mode in use, not the one the next click brings. js/note-sort-cycle.js
-    // saves the setting and rebuilds the list; the markup is re-rendered with
-    // the new mode on every sidebar refresh, so data-sort-mode stays true.
-    [$noteSortLabelKey, $noteSortLabelFallback] = poznoteNoteSortLabel($note_list_sort_type);
-    $noteSortTitle = t_h('sort.button_title', ['mode' => t($noteSortLabelKey, [], $noteSortLabelFallback)], 'Sort by: {{mode}}');
-    // The sort mode is a setting of the account being looked at. The button
-    // sits with "Expand all folders" on the row after Favorites (notes_list.php).
-    $noteSortButton = $canWriteAccountSettings
-        ? '<button type="button" class="sidebar-folder-toggle" id="sidebarSortBtn" data-action="cycle-note-sort" data-sort-mode="' . htmlspecialchars($note_list_sort_type, ENT_QUOTES) . '" title="' . $noteSortTitle . '" aria-label="' . $noteSortTitle . '">'
-            . '<i class="lucide ' . htmlspecialchars(poznoteNoteSortIcon($note_list_sort_type), ENT_QUOTES) . '"></i>'
-            . '</button>'
-        : '';
+    // View options menu of the tree: one vertical three-dot toggle at the right end of
+    // the rule after Favorites (notes_list.php) opens #tree-options-menu, which
+    // gathers the sort mode, "Expand all folders" and the offline dots
+    // (js/tree-options-menu.js). The menu is rendered with the state of the
+    // page, and re-rendered on every sidebar refresh.
+    $treeOptionsGroups = [];
+
+    // The items look like those of the note and folder menus: an action per
+    // row, the state the tree is in shown by the accent colour (active-state).
+    //
+    // Sort mode (#1442): the five modes, the one in use in the accent colour.
+    // js/note-sort-cycle.js saves the setting and rebuilds the list.
+    // The sort mode is a setting of the account being looked at. The group
+    // carries the card:sidebarSortBtn id of UI Customization.
+    if ($canWriteAccountSettings) {
+        $noteSortItems = '';
+        foreach (poznoteNoteSortModes() as $noteSortMode) {
+            [$noteSortLabelKey, $noteSortLabelFallback] = poznoteNoteSortMenuLabel($noteSortMode);
+            [$noteSortHintKey, $noteSortHintFallback] = poznoteNoteSortHint($noteSortMode);
+            $noteSortActive = $noteSortMode === $note_list_sort_type;
+            $noteSortItems .= '<div class="folder-actions-menu-item' . ($noteSortActive ? ' active-state' : '') . '" role="menuitemradio" aria-checked="' . ($noteSortActive ? 'true' : 'false') . '" data-action="set-note-sort" data-sort-mode="' . htmlspecialchars($noteSortMode, ENT_QUOTES) . '" title="' . t_h($noteSortHintKey, [], $noteSortHintFallback) . '">'
+                . '<i class="lucide ' . htmlspecialchars(poznoteNoteSortIcon($noteSortMode), ENT_QUOTES) . '"></i>'
+                . '<span>' . t_h($noteSortLabelKey, [], $noteSortLabelFallback) . '</span>'
+                . '</div>';
+        }
+        $treeOptionsGroups[] = '<div id="sidebarSortBtn" role="group" data-note-sort-mode="' . htmlspecialchars($note_list_sort_type, ENT_QUOTES) . '">' . $noteSortItems . '</div>';
+    }
+
+    // "Expand all folders": in the menu, unless account rows are shown, where
+    // $expandFoldersButton heads the active account's row instead. Label, hover
+    // line and icon follow the tree (updateToggleAllFoldersButton,
+    // utils-folder-tree.js).
+    if (empty($showAccountRows)) {
+        $treeOptionsGroups[] = '<div class="folder-actions-menu-item" role="menuitem" id="sidebarExpandFoldersBtn" data-action="toggle-all-folders" title="' . t_h('sidebar.expand_all_folders_hint', [], 'Open every folder of the tree') . '">'
+            . '<i class="lucide lucide-chevrons-up-down"></i>'
+            . '<span class="menu-item-label">' . t_h('sidebar.expand_all_folders', [], 'Expand all folders') . '</span>'
+            . '</div>';
+    }
 
     // Offline dots of the tree (sidebar_offline_marks, the "Show offline dot"
-    // card of Settings), left of the sort button: blue while shown, grey while
-    // hidden. js/offline-marks.js saves the setting and redraws the dots.
-    // Offline copies are kept for the login's own account only.
-    $offlineDotsShown = poznoteSettingEnabled($settings['sidebar_offline_marks'], true);
-    $offlineDotsTitle = $offlineDotsShown
-        ? t_h('sidebar.hide_offline_dots', [], 'Hide offline dots')
-        : t_h('sidebar.show_offline_dots', [], 'Show offline dots');
-    $offlineDotsButton = ($canWriteAccountSettings && poznoteOfflineModeEnabled())
-        ? '<button type="button" class="sidebar-folder-toggle offline-dots-toggle' . ($offlineDotsShown ? ' is-on' : '') . '" id="sidebarOfflineDotsBtn" data-action="toggle-offline-dots" aria-pressed="' . ($offlineDotsShown ? 'true' : 'false') . '"'
-            . ' data-title-show="' . t_h('sidebar.show_offline_dots', [], 'Show offline dots') . '" data-title-hide="' . t_h('sidebar.hide_offline_dots', [], 'Hide offline dots') . '"'
-            . ' title="' . $offlineDotsTitle . '" aria-label="' . $offlineDotsTitle . '">'
+    // card of Settings): "Hide offline dots" in the accent colour while they
+    // show, as "Stop keeping offline" in the note menu. js/offline-marks.js
+    // saves the setting, redraws the dots and swaps the label. Offline copies are kept for the login's
+    // own account only.
+    if ($canWriteAccountSettings && poznoteOfflineModeEnabled()) {
+        $offlineDotsShown = poznoteSettingEnabled($settings['sidebar_offline_marks'], true);
+        $treeOptionsGroups[] = '<div class="folder-actions-menu-item' . ($offlineDotsShown ? ' active-state' : '') . '" role="menuitemcheckbox" aria-checked="' . ($offlineDotsShown ? 'true' : 'false') . '" data-action="toggle-offline-dots" title="' . t_h('settings.card_help.sidebar_offline_marks', [], 'Show a small dot next to the notes available offline in this browser.') . '">'
             . '<i class="lucide lucide-circle-dot"></i>'
-            . '</button>'
-        : '';
+            . '<span data-label-show="' . t_h('sidebar.show_offline_dots', [], 'Show offline dots') . '" data-label-hide="' . t_h('sidebar.hide_offline_dots', [], 'Hide offline dots') . '">'
+            . ($offlineDotsShown ? t_h('sidebar.hide_offline_dots', [], 'Hide offline dots') : t_h('sidebar.show_offline_dots', [], 'Show offline dots'))
+            . '</span>'
+            . '</div>';
+    }
+
+    // Opens the Element visibility panel (ui_customization_panel.php) on its
+    // Sidebar section (data-ui-section, js/ui-customization-panel.js). Not
+    // hideable itself: it is the way back to what was hidden.
+    $treeOptionsGroups[] = '<div class="folder-actions-menu-item" role="menuitem" data-action="toggle-ui-customization-panel" data-ui-section="sidebar" aria-controls="uiCustomizationPanel" title="' . t_h('sidebar.customize_hint', [], 'Choose which elements of the sidebar are shown') . '">'
+        . '<i class="lucide lucide-eye-off"></i>'
+        . '<span>' . t_h('sidebar.customize', [], 'Customize sidebar') . '</span>'
+        . '</div>';
+
+    $treeOptionsButton = '';
+    $treeOptionsMenu = '';
+    if (!empty($treeOptionsGroups)) {
+        $treeOptionsTitle = t_h('sidebar.view_options', [], 'View options');
+        // The three-dot toggle of the folder rows (.folder-actions-toggle)
+        $treeOptionsButton = '<button type="button" class="folder-actions-toggle" id="sidebarTreeOptionsBtn" data-action="toggle-tree-options-menu" aria-haspopup="menu" aria-expanded="false" title="' . $treeOptionsTitle . '" aria-label="' . $treeOptionsTitle . '">'
+            . '<i class="lucide lucide-more-vertical"></i>'
+            . '</button>';
+        $treeOptionsMenu = '<div class="folder-actions-menu" id="tree-options-menu" role="menu" aria-label="' . $treeOptionsTitle . '">'
+            . implode('<div class="folder-actions-menu-separator"></div>', $treeOptionsGroups)
+            . '</div>';
+    }
     ?>
 
     <!-- MENU RIGHT COLUMN -->	 

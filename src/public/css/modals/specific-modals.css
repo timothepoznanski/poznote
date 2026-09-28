@@ -717,8 +717,7 @@
    Rename Modal (#renameModal)
    ============================================ */
 
-#renameModal.modal,
-.rename-modal {
+#renameModal.modal {
     display: none;
     position: fixed;
     z-index: 1050;
@@ -731,8 +730,7 @@
     justify-content: center;
 }
 
-#renameModal .modal-content,
-.rename-modal-content {
+#renameModal .modal-content {
     background-color: var(--pz-bg);
     padding: 20px;
     border-radius: var(--pz-radius);
@@ -853,10 +851,6 @@
 /* ============================================
    Workspace List & Delete Forms
    ============================================ */
-
-.workspace-list ul li>.ws-col .action-btn {
-    margin: 0;
-}
 
 .workspace-list .btn-danger {
     background: var(--pz-danger);

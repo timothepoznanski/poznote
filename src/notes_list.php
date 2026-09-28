@@ -173,8 +173,8 @@ $search_combined_value = ($search_in_notes_value === '1' && $search_in_tags_valu
 
 <?php
 // $showAccountRows, $activeAccountProfile and $otherAccountProfiles are decided
-// by index.php before the sidebar header (the "Expand all folders" button
-// moves between the row after Favorites and the account row below).
+// by index.php before the sidebar header ("Expand all folders" moves between
+// the view options menu and the account row below).
 $otherAccountProfiles = $otherAccountProfiles ?? [];
 $activeAccountProfile = $activeAccountProfile ?? null;
 $showAccountRows = !empty($showAccountRows);
@@ -222,7 +222,7 @@ $renderOtherAccounts = static function (array $profiles): void {
 // whole own tree), with the "Expand all folders" button at its end, where the
 // other rows carry their "Open this account" arrow. Only where several
 // accounts are reachable: with a single one no row names the tree and the
-// button stays on the row after Favorites.
+// action stays in the view options menu.
 if ($showAccountRows):
     $activeAccountName = htmlspecialchars((string)($activeAccountProfile['username'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 ?>
@@ -500,7 +500,11 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         echo "<span class='folder-name' data-action='toggle-folder' data-folder-dom-id='$folderDomId' data-folder-id='$folderDomId'$dblActionAttr>" . htmlspecialchars($folderDisplayName, ENT_QUOTES) . "</span>";
         // Count notes recursively (includes all subfolder notes)
         $noteCount = countNotesRecursively($folderData);
-        echo "<span class='folder-note-count' id='count-" . $folderId . "'>(" . $noteCount . ")</span>";
+        // Favorites shows no count: its rows repeat notes and folders counted
+        // further down the tree
+        if (!$isFavoritesSection) {
+            echo "<span class='folder-note-count' id='count-" . $folderId . "'>(" . $noteCount . ")</span>";
+        }
         echo "<span class='folder-actions'>";
         // Favorites has a menu of its own (#favorites-actions-menu below)
         if ($isFavoritesSection) {
@@ -635,13 +639,12 @@ if ($favoritesFolder && ($favorites_count > 0 || (!empty($favorite_folders) && !
     }
 }
 
-// Offline dots, sort mode and "Expand all folders", built by index.php, at the
-// right end of a thin rule between Favorites and the rest of the tree (at the
-// top of the tree when there are no favorites). With account rows the expand
-// button heads the active account's row instead.
-$notesListActions = ($offlineDotsButton ?? '') . ($noteSortButton ?? '') . (empty($showAccountRows) ? $expandFoldersButton : '');
-if ($notesListActions !== '') {
-    echo '<div class="notes-list-actions">' . $notesListActions . '</div>';
+// View options toggle (sort mode, "Expand all folders", offline dots), built by
+// index.php, at the right end of a thin rule between Favorites and the rest of
+// the tree (at the top of the tree when there are no favorites). Its menu is
+// rendered below, with the other shared menus.
+if (!empty($treeOptionsButton)) {
+    echo '<div class="notes-list-actions">' . $treeOptionsButton . '</div>';
 }
 
 // Add drop zone for moving notes to root (no folder)
@@ -728,6 +731,8 @@ if ($favoritesMenuCanWrite) {
 }
 echo "<div class='folder-actions-menu-item danger' role='menuitem' data-favorites-action='clear'><i class='lucide lucide-eraser'></i><span>" . t_h('notes_list.favorites_menu.clear', [], 'Remove all from favorites') . "</span></div>";
 echo "</div>";
+// View options menu of the tree (index.php, js/tree-options-menu.js)
+echo $treeOptionsMenu ?? '';
 // Same arrangement for the per-note three-dot toggles.
 echo renderNoteActionsMenu($notesListWorkspace);
 ?>

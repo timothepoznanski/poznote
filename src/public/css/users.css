@@ -64,12 +64,6 @@ html[data-theme='dark'] {
     margin-bottom: 5px;
 }
 
-
-.btn-small {
-    padding: 6px 12px;
-    font-size: 12px;
-}
-
 .btn-margin-right {
     margin-right: 10px;
 }
@@ -276,10 +270,6 @@ html[data-theme='dark'] .users-table td {
     align-items: center;
     gap: 12px;
     color: inherit;
-}
-
-.user-name {
-    font-weight: var(--pz-weight-medium);
 }
 
 .user-username {
@@ -832,12 +822,6 @@ input:checked+.slider:before {
 
 input:disabled+.slider {
     background-color: var(--pz-disabled);
-}
-
-.btn-maintenance {
-    margin-top: 25px;
-    margin-bottom: 40px !important;
-    padding: 12px 30px;
 }
 
 /* Responsive Table Wrapper */

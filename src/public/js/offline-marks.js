@@ -2,7 +2,7 @@
  * The notes and folders this browser keeps offline, marked on the pages that
  * list them (notes_manager.php, list_folders.php, and the notes tree of
  * index.php, folders included, while the sidebar_offline_marks setting is on,
- * which the dot button of the tree toggles without a reload):
+ * which the tree's view options menu toggles without a reload):
  * a note it holds a copy of, a folder kept whole ("Keep offline", or under one). Read from the copies
  * of js/offline-store.js, so a mark says what opens here without a network,
  * as the "Available offline in this browser" line of a note's menu does.
@@ -144,20 +144,20 @@
 
     window.poznoteOfflineMarksRefresh = refresh;
 
-    // The dot button of the tree (index.php): shows or hides the dots at
-    // once, then saves the setting; a failure puts the previous state back.
-    function paintDotsButton(button, shown) {
-        var title = button.getAttribute(shown ? 'data-title-hide' : 'data-title-show') || '';
-        button.classList.toggle('is-on', shown);
-        button.setAttribute('aria-pressed', shown ? 'true' : 'false');
-        button.setAttribute('title', title);
-        button.setAttribute('aria-label', title);
+    // "Show offline dots" of the tree's view options menu (index.php): shows
+    // or hides the dots at once, then saves the setting; a failure puts the
+    // previous state back.
+    function paintDotsItem(item, shown) {
+        item.classList.toggle('active-state', shown);
+        item.setAttribute('aria-checked', shown ? 'true' : 'false');
+        var label = item.querySelector('[data-label-show]');
+        if (label) label.textContent = label.getAttribute(shown ? 'data-label-hide' : 'data-label-show') || '';
     }
 
     function setSidebarShown(shown) {
         sidebarShown = shown;
-        document.querySelectorAll('[data-action="toggle-offline-dots"]').forEach(function (button) {
-            paintDotsButton(button, shown);
+        document.querySelectorAll('[data-action="toggle-offline-dots"]').forEach(function (item) {
+            paintDotsItem(item, shown);
         });
         return refresh();
     }

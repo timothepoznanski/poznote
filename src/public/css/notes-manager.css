@@ -646,10 +646,6 @@ html[data-theme='dark'] .nm-folder-option-selected {
     color: var(--selected-color, var(--pz-text-strong));
 }
 
-html[data-theme='dark'] .nm-modal {
-    background: var(--pz-bg);
-}
-
 /* ── Responsive ───────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
     body.notes-manager-page    { padding: 10px; }

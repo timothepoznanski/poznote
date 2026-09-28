@@ -135,6 +135,32 @@
         if (title) title.classList.toggle('ui-custom-section-collapsed', collapsed);
         var toggle = section.querySelector('.ui-custom-section-toggle');
         if (toggle) toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        updateCollapseAllButton();
+    }
+
+    // The sections the panel shows on this page and viewport (pruneForPage
+    // hides the others, css/ui-customization-panel.css the phone-only ones)
+    function shownSections() {
+        return Array.prototype.filter.call(panel.querySelectorAll('.ui-custom-section'), function (section) {
+            return !section.hidden && window.getComputedStyle(section).display !== 'none';
+        });
+    }
+
+    // The button next to the filter folds every section while one is open,
+    // unfolds them all once all are folded; its chevron points right then,
+    // like a folded section (same button as the Settings page's list)
+    function updateCollapseAllButton() {
+        var btn = document.getElementById('uiCustomizationPanelCollapseAll');
+        if (!btn || !panel) return;
+        var sections = shownSections();
+        var allCollapsed = sections.length > 0 && sections.every(isSectionCollapsed);
+        var label = allCollapsed
+            ? (btn.getAttribute('data-label-expand') || 'Expand all')
+            : (btn.getAttribute('data-label-collapse') || 'Collapse all');
+        btn.classList.toggle('ui-custom-collapsed', allCollapsed);
+        btn.setAttribute('aria-expanded', allCollapsed ? 'false' : 'true');
+        btn.setAttribute('aria-label', label);
+        btn.title = label;
     }
 
     // Unfolds one section (data-ui-section-id) and folds the others
@@ -676,6 +702,13 @@
         });
 
         panel.addEventListener('click', function (e) {
+            if (e.target.closest('#uiCustomizationPanelCollapseAll')) {
+                var sections = shownSections();
+                var collapse = !sections.every(isSectionCollapsed);
+                sections.forEach(function (section) { setSectionCollapsed(section, collapse); });
+                return;
+            }
+
             var toggleAll = e.target.closest('.ui-custom-toggle-all');
             if (toggleAll) {
                 var section = toggleAll.closest('.ui-custom-section');

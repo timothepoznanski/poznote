@@ -927,7 +927,12 @@
       "view_here": "在标签页中显示，不切换账户"
     },
     "show_offline_dots": "显示离线圆点",
-    "hide_offline_dots": "隐藏离线圆点"
+    "hide_offline_dots": "隐藏离线圆点",
+    "view_options": "视图选项",
+    "expand_all_folders_hint": "展开树中的所有文件夹",
+    "collapse_all_folders_hint": "折叠树中的所有文件夹",
+    "customize": "自定义侧边栏",
+    "customize_hint": "选择侧边栏中显示的元素"
   },
   "home": {
     "title": "仪表盘",
@@ -1172,9 +1177,7 @@
     },
     "table_picker": {
       "title": "插入表格",
-      "rows_label": "行:",
       "rows_placeholder": "行",
-      "cols_label": "列:",
       "cols_placeholder": "列",
       "insert": "插入"
     },
@@ -1377,11 +1380,12 @@
         "slash_menu": "斜杠菜单",
         "panels": "其他",
         "dashboard_toolbar": "仪表盘",
-        "icon_sidebar": "图标侧边栏",
+        "icon_sidebar": "图标栏",
         "folder_actions": "文件夹操作",
         "workspace_menu": "工作区菜单",
         "note_actions": "笔记操作",
-        "mobile_editor_bar": "移动端编辑栏"
+        "mobile_editor_bar": "移动端编辑栏",
+        "sidebar": "侧边栏"
       },
       "check_all": "全选",
       "uncheck_all": "取消全选",
@@ -1407,7 +1411,9 @@
       "panel_saved": "已保存",
       "panel_save_error": "无法保存，请重试。",
       "mobile_editor_bar_hint": "在手机或平板上编辑笔记时显示在屏幕键盘上方的工具栏。",
-      "mobile_editor_bar_show": "显示编辑栏"
+      "mobile_editor_bar_show": "显示编辑栏",
+      "sidebar_hint": "笔记树所在的栏，位于图标栏和笔记之间。",
+      "icon_rail_hint": "每个页面最左侧的窄图标栏。"
     },
     "icon_sidebar_order": {
       "title": "图标侧边栏布局",
@@ -1810,8 +1816,8 @@
       },
       "badge": "每条笔记 {{count}} 个自动快照",
       "badge_with_safety": "每条笔记 {{count}} 个自动快照、{{safety}} 个安全快照",
-      "warning_title": "快照只保存笔记的文本，附件不会被复制。",
-      "warning": "附件和图片即使已从笔记中移除，只要仍被某个快照包含，就会继续保留在磁盘上。只有在包含它们的最后一个快照过期（最多 {{days}} 天）或笔记被永久删除后才会释放。"
+      "warning_title": "快照只保存笔记的文本，附件和图片不会被复制。",
+      "warning": "附件和图片即使已从笔记中移除，只要仍被某个快照包含，就会继续保留在磁盘上。只有在包含它们的最后一个快照被删除或过期（最多 {{days}} 天）或笔记被永久删除后才会释放。"
     },
     "api_rest": {
       "github_option": "GitHub",
@@ -3792,6 +3798,20 @@
       "date_created": "创建日期",
       "type": "类型",
       "custom": "自定义"
+    },
+    "hints": {
+      "name": "笔记按标题、文件夹按名称，从 A 到 Z",
+      "date_modified": "最近修改的笔记在前",
+      "date_created": "最近创建的笔记和文件夹在前",
+      "type": "笔记按类型分组（笔记、Markdown、任务列表、绘图、链接），再按标题",
+      "custom": "你通过拖动笔记和文件夹设定的顺序"
+    },
+    "menu_items": {
+      "name": "按名称排序",
+      "date_modified": "按修改日期排序",
+      "date_created": "按创建日期排序",
+      "type": "按类型排序",
+      "custom": "自定义顺序"
     }
   },
   "calendar": {

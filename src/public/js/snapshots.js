@@ -490,15 +490,30 @@
         var content = modal.dataset.snapshotContent || '';
         var type = modal.dataset.snapshotType || 'note';
 
-        // For HTML notes, try to get text content
+        // Markdown copies its source. Other notes copy the text as rendered in
+        // the preview (innerText keeps the line breaks between blocks), and
+        // HTML notes also carry their markup so pasting into a note keeps
+        // the formatting.
         var textContent = content;
-        if (type === 'note' || type === 'tasklist') {
-            var temp = document.createElement('div');
-            temp.innerHTML = content;
-            textContent = temp.textContent || temp.innerText || content;
+        var htmlContent = '';
+        if (type !== 'markdown') {
+            var contentEl = document.getElementById('snapshotContent');
+            textContent = contentEl ? contentEl.innerText : content;
+            if (type !== 'tasklist') {
+                htmlContent = content;
+            }
         }
 
-        if (navigator.clipboard && navigator.clipboard.writeText) {
+        if (htmlContent && navigator.clipboard && navigator.clipboard.write && typeof window.ClipboardItem === 'function') {
+            navigator.clipboard.write([new window.ClipboardItem({
+                'text/html': new Blob([htmlContent], { type: 'text/html' }),
+                'text/plain': new Blob([textContent], { type: 'text/plain' })
+            })]).then(function () {
+                showSnapshotToast(tr('snapshot.messages.content_copied', 'Content copied'));
+            }).catch(function () {
+                fallbackCopy(textContent);
+            });
+        } else if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(textContent).then(function () {
                 showSnapshotToast(tr('snapshot.messages.content_copied', 'Content copied'));
             }).catch(function () {

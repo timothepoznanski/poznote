@@ -2490,7 +2490,7 @@ function unregisterSharedLinksForFolders(PDO $userCon, array $folderIds): void {
  * The account's stale registry rows go first, so a share the backup predates
  * stops resolving. A token another account already holds is left to that
  * account (its share is live, the restored one would silently steal it) and
- * counted in 'skipped'. Per-note block rows (access_mode NULL) are never
+ * counted in 'skipped', unless that account's share no longer exists. Per-note block rows (access_mode NULL) are never
  * published, so they are not registered either.
  */
 function syncSharedLinksFromUserDatabase(int $userId, PDO $userCon): array {
@@ -2525,7 +2525,8 @@ function syncSharedLinksFromUserDatabase(int $userId, PDO $userCon): array {
         // Ownership is checked here rather than left to the table's key: some
         // master.db files carry a (token, user_id) key, where an ignored
         // insert would give one token two owners.
-        $heldElsewhere = $con->prepare("SELECT 1 FROM shared_links WHERE token = ? AND user_id != ? LIMIT 1");
+        $heldElsewhere = $con->prepare("SELECT user_id, target_type FROM shared_links WHERE token = ? AND user_id != ? LIMIT 1");
+        $dropStale = $con->prepare("DELETE FROM shared_links WHERE token = ? AND user_id = ?");
         $insert = $con->prepare("INSERT INTO shared_links (token, user_id, target_type, target_id) VALUES (?, ?, ?, ?)");
         $seen = [];
         foreach ($rows as [$token, $targetType, $targetId]) {
@@ -2534,11 +2535,16 @@ function syncSharedLinksFromUserDatabase(int $userId, PDO $userCon): array {
             }
             $seen[$token] = true;
             $heldElsewhere->execute([$token, $userId]);
-            $taken = $heldElsewhere->fetchColumn();
+            $holder = $heldElsewhere->fetch(PDO::FETCH_ASSOC);
             $heldElsewhere->closeCursor();
-            if ($taken) {
-                $stats['skipped']++;
-                continue;
+            if ($holder) {
+                // Same self-heal as isTokenAvailable(): a row whose share was
+                // deleted does not keep the token from the restored account.
+                if (sharedLinkTargetStillExists((int)$holder['user_id'], (string)$holder['target_type'], $token) !== false) {
+                    $stats['skipped']++;
+                    continue;
+                }
+                $dropStale->execute([$token, (int)$holder['user_id']]);
             }
             $insert->execute([$token, $userId, $targetType, $targetId]);
             $stats['registered']++;

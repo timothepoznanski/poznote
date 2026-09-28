@@ -928,7 +928,12 @@
       "view_here": "Afficher dans un onglet, sans changer de compte"
     },
     "show_offline_dots": "Afficher les points hors ligne",
-    "hide_offline_dots": "Masquer les points hors ligne"
+    "hide_offline_dots": "Masquer les points hors ligne",
+    "view_options": "Options d'affichage",
+    "expand_all_folders_hint": "Ouvrir tous les dossiers de l'arborescence",
+    "collapse_all_folders_hint": "Fermer tous les dossiers de l'arborescence",
+    "customize": "Personnaliser la barre latérale",
+    "customize_hint": "Choisir les éléments affichés dans la barre latérale"
   },
   "home": {
     "title": "Tableau de bord",
@@ -1165,9 +1170,7 @@
     },
     "table_picker": {
       "title": "Insérer un tableau",
-      "rows_label": "Lignes :",
       "rows_placeholder": "Lignes",
-      "cols_label": "Colonnes :",
       "cols_placeholder": "Colonnes",
       "insert": "Insérer"
     },
@@ -1379,11 +1382,12 @@
         "slash_menu": "Menu slash",
         "panels": "Autre",
         "dashboard_toolbar": "Tableau de bord",
-        "icon_sidebar": "Barre d'icônes",
+        "icon_sidebar": "Rail d'icônes",
         "folder_actions": "Actions des dossiers",
         "workspace_menu": "Menu du workspace",
         "note_actions": "Actions des notes",
-        "mobile_editor_bar": "Barre d’édition mobile"
+        "mobile_editor_bar": "Barre d’édition mobile",
+        "sidebar": "Barre latérale"
       },
       "badge_all_visible": "Tout visible",
       "badge_hidden_count_admin": "{{count}} masqué(s), dont {{admin}} par l'administrateur",
@@ -1409,7 +1413,9 @@
       "panel_saved": "Enregistré",
       "panel_save_error": "Enregistrement impossible, réessayez.",
       "mobile_editor_bar_hint": "Barre affichée au-dessus du clavier virtuel pendant l’édition d’une note sur téléphone ou tablette.",
-      "mobile_editor_bar_show": "Afficher la barre"
+      "mobile_editor_bar_show": "Afficher la barre",
+      "sidebar_hint": "Colonne de l'arborescence des notes, entre le rail d'icônes et la note.",
+      "icon_rail_hint": "Colonne étroite d'icônes tout à gauche de chaque page."
     },
     "icon_sidebar_order": {
       "title": "Disposition de la barre d'icônes",
@@ -1818,8 +1824,8 @@
       },
       "badge": "{{count}} automatiques par note",
       "badge_with_safety": "{{count}} automatiques, {{safety}} de sécurité par note",
-      "warning_title": "Les snapshots ne stockent que le texte de la note. Les pièces jointes ne sont jamais copiées.",
-      "warning": "Les pièces jointes et les images sont conservées sur le disque même après leur suppression de la note, tant qu'un de ses snapshots les contient encore. Elles ne sont libérées que lorsque le dernier snapshot qui les contient expire (au plus tard après {{days}} jours) ou lorsque la note est définitivement supprimée."
+      "warning_title": "Les snapshots ne stockent que le texte de la note. Les pièces jointes et les images ne sont jamais copiées.",
+      "warning": "Les pièces jointes et les images sont conservées sur le disque même après leur suppression de la note, tant qu'un de ses snapshots les contient encore. Elles ne sont libérées que lorsque le dernier snapshot qui les contient est supprimé ou expire (au plus tard après {{days}} jours) ou lorsque la note est définitivement supprimée."
     },
     "api_rest": {
       "github_option": "GitHub",
@@ -3797,6 +3803,20 @@
       "date_created": "Date de création",
       "type": "Type",
       "custom": "Personnalisé"
+    },
+    "hints": {
+      "name": "Notes par titre et dossiers par nom, de A à Z",
+      "date_modified": "Les notes modifiées le plus récemment d'abord",
+      "date_created": "Les notes et dossiers créés le plus récemment d'abord",
+      "type": "Notes regroupées par type (note, markdown, liste de tâches, dessin, lien), puis par titre",
+      "custom": "L'ordre que vous avez défini en glissant notes et dossiers"
+    },
+    "menu_items": {
+      "name": "Trier par nom",
+      "date_modified": "Trier par date de modification",
+      "date_created": "Trier par date de création",
+      "type": "Trier par type",
+      "custom": "Ordre personnalisé"
     }
   },
   "calendar": {

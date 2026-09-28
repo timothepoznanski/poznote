@@ -51,16 +51,8 @@
     margin-left: 0;
 }
 
-.locked-icon {
-    font-size: 0.95em;
-    color: var(--pz-text-muted);
-    margin-left: 4px;
-}
-
 /* Action buttons */
-.workspace-list .ws-col-actions,
-.workspace-list .ws-col-move,
-.workspace-list .ws-col-delete {
+.workspace-list .ws-col-actions {
     flex: 0 0 auto;
 }
 

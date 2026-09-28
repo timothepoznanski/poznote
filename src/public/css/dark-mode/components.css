@@ -324,7 +324,6 @@ html[data-theme='dark'] .btn-rename:disabled {
     opacity: 0.6;
 }
 
-html[data-theme='dark'] .btn-warning:hover,
 html[data-theme='dark'] .btn-rename:hover {
     background-color: var(--pz-warning-text-hover);
     border-color: var(--pz-warning-text-hover);
@@ -341,15 +340,13 @@ html[data-theme='dark'] .btn-background:hover {
     border-color: var(--pz-border-strong);
 }
 
-html[data-theme='dark'] .btn-danger,
-html[data-theme='dark'] .btn-delete-ws {
+html[data-theme='dark'] .btn-danger {
     background-color: var(--pz-danger);
     color: var(--pz-text-inverse);
     border-color: var(--pz-danger);
 }
 
-html[data-theme='dark'] .btn-danger:hover,
-html[data-theme='dark'] .btn-delete-ws:hover {
+html[data-theme='dark'] .btn-danger:hover {
     background-color: var(--pz-danger-text-hover);
     border-color: var(--pz-danger-text-hover);
 }

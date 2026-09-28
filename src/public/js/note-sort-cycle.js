@@ -1,35 +1,22 @@
 // ============================================================================
-// Sidebar sort button (#1442)
+// Sort mode of the notes tree (#1442)
 // ============================================================================
-// One global sort order for the whole tree, stepped through by the button at
-// the top of the notes list the way the theme button steps through themes:
-// a click moves to the next mode, the icon and the title name the mode now in
-// use, and a short label says which one it is, since a reordered list does not
-// announce itself.
+// One global sort order for the whole tree, picked in the "Sort by" group of
+// the view options menu (#tree-options-menu, rendered by index.php, opened by
+// js/tree-options-menu.js): the mode in use is checked in the accent colour.
 //
-// The mode lives in the `note_list_sort` setting. index.php renders the button
-// from it, so a sidebar refresh brings the markup back in the right state and
-// nothing here has to be re-bound: the click listener sits on the document.
+// The mode lives in the `note_list_sort` setting. index.php renders the group
+// from it (data-note-sort-mode on #sidebarSortBtn), so a sidebar refresh
+// brings the markup back in the right state and nothing here has to be
+// re-bound: the click listener sits on the document.
 //
-// The order of MODES and the icons mirror poznoteNoteSortModes() and
-// poznoteNoteSortIcon() in src/lib/note-sort.php. Keep the two in step.
-//
-// The five icons share their left half, the down arrow of lucide-arrow-down-a-z,
-// and change only the mark on its right, so the button stays one control; the
-// four composed classes are defined at the end of css/lucide.css.
+// The order of MODES mirrors poznoteNoteSortModes() in src/lib/note-sort.php.
+// Keep the two in step.
 
 (function () {
     'use strict';
 
     var MODES = ['heading_asc', 'updated_desc', 'created_desc', 'type_asc', 'manual'];
-
-    var ICONS = {
-        heading_asc: 'lucide-arrow-down-a-z',
-        updated_desc: 'lucide-sort-date-modified',
-        created_desc: 'lucide-sort-date-created',
-        type_asc: 'lucide-sort-type',
-        manual: 'lucide-sort-custom'
-    };
 
     var LABELS = {
         heading_asc: ['sort.modes.name', 'Name'],
@@ -56,28 +43,25 @@
         return tr(entry[0], entry[1]);
     }
 
-    function nextMode(mode) {
-        return MODES[(MODES.indexOf(normalize(mode)) + 1) % MODES.length];
+    function getGroup() {
+        return document.querySelector('[data-note-sort-mode]');
     }
 
-    // Paint the button before the request answers: the click has to feel like
-    // the theme button, and a failure puts the previous mode back.
-    function paint(button, mode) {
+    // Check the mode before the request answers, a failure puts the previous
+    // mode back
+    function paint(group, mode) {
         mode = normalize(mode);
-        var title = tr('sort.button_title', 'Sort by: {{mode}}', { mode: label(mode) });
-
-        button.setAttribute('data-sort-mode', mode);
-        button.setAttribute('title', title);
-        button.setAttribute('aria-label', title);
-
-        var icon = button.querySelector('i');
-        if (icon) {
-            icon.className = 'lucide ' + ICONS[mode];
-        }
+        group.setAttribute('data-note-sort-mode', mode);
+        group.querySelectorAll('[data-action="set-note-sort"]').forEach(function (item) {
+            var active = item.getAttribute('data-sort-mode') === mode;
+            item.classList.toggle('active-state', active);
+            item.setAttribute('aria-checked', active ? 'true' : 'false');
+        });
     }
 
     // Same toast as Ctrl+S and Ctrl+Alt+S: accent box at the top right, check
-    // mark, one at a time.
+    // mark, one at a time. Only for the switch to Custom a drop makes, which
+    // nothing else announces.
     function showToast(text) {
         var existing = document.querySelector('.save-notification[data-sort-toast]');
         if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
@@ -124,15 +108,16 @@
         window.location.reload();
     }
 
-    function cycle(button) {
-        if (saving) return;
+    function setMode(mode) {
+        var group = getGroup();
+        if (saving || !group) return;
 
-        var previous = normalize(button.getAttribute('data-sort-mode'));
-        var mode = nextMode(previous);
+        var previous = normalize(group.getAttribute('data-note-sort-mode'));
+        mode = normalize(mode);
+        if (mode === previous) return;
 
         saving = true;
-        paint(button, mode);
-        showToast(tr('sort.button_title', 'Sort by: {{mode}}', { mode: label(mode) }));
+        paint(group, mode);
 
         fetch('/api/v1/settings/note_list_sort', {
             method: 'PUT',
@@ -147,20 +132,21 @@
             })
             .catch(function (error) {
                 console.error('note-sort-cycle: could not save the sort mode', error);
-                paint(button, previous);
+                var current = getGroup();
+                if (current) paint(current, previous);
                 showError(tr('sort.save_failed', 'Could not change the sort order'));
             })
             .finally(function () { saving = false; });
     }
 
-    // The mode the tree follows right now. The button carries it, and is
+    // The mode the tree follows right now. The menu group carries it, and is
     // repainted by markCustom() without waiting for a reload, so it is a
     // truer source than the setting the page was rendered with. Callers use
     // it to tell a drop that places a row (Custom only) from a drop that just
     // moves it somewhere else (#1441).
     function currentMode() {
-        var button = document.querySelector('[data-action="cycle-note-sort"]');
-        if (button) return normalize(button.getAttribute('data-sort-mode'));
+        var group = getGroup();
+        if (group) return normalize(group.getAttribute('data-note-sort-mode'));
         return normalize(window.defaultNoteSortType);
     }
 
@@ -168,18 +154,18 @@
 
     // A drop that reorders rows switches the tree to Custom server side
     // (enableManualNoteSort). Where the drop is applied in the DOM instead of
-    // reloading the list, the button has to follow, or it keeps naming the
+    // reloading the list, the menu has to follow, or it keeps checking the
     // mode the tree just left.
     function markCustom() {
-        // Kept in step for the pages where the button is hidden: it is what
-        // currentMode() falls back to
+        // Kept in step for the pages where the menu group is absent: it is
+        // what currentMode() falls back to
         window.defaultNoteSortType = 'manual';
 
-        var button = document.querySelector('[data-action="cycle-note-sort"]');
-        if (!button || button.getAttribute('data-sort-mode') === 'manual') return;
+        var group = getGroup();
+        if (!group || group.getAttribute('data-note-sort-mode') === 'manual') return;
 
-        paint(button, 'manual');
-        showToast(label('manual'));
+        paint(group, 'manual');
+        showToast(tr('sort.button_title', 'Sort by: {{mode}}', { mode: label('manual') }));
     }
 
     window.markNoteSortCustom = markCustom;
@@ -188,10 +174,10 @@
         var target = event.target;
         if (!target || typeof target.closest !== 'function') return;
 
-        var button = target.closest('[data-action="cycle-note-sort"]');
-        if (!button) return;
+        var item = target.closest('[data-action="set-note-sort"]');
+        if (!item) return;
 
         event.preventDefault();
-        cycle(button);
+        setMode(item.getAttribute('data-sort-mode'));
     });
 })();

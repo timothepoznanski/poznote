@@ -367,11 +367,6 @@
         margin: 10px;
     }
 
-    /* Dark mode on mobile */
-    html[data-theme='dark'] .shared-header {
-        color: var(--pz-text-inverse);
-    }
-
     html[data-theme='dark'] body.shared-page {
         background: var(--pz-chrome-bg);
     }

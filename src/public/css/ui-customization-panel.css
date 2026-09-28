@@ -202,18 +202,6 @@ body:has(#ai-chat-panel.ai-chat-open) #edgeAiChatBtn {
     color: var(--pz-text);
 }
 
-/* Entries that carry a state: the split view's check mark while it is on,
-   the note width's current step after its label (js/ui-customization-panel.js) */
-.page-more-menu-check {
-    display: none;
-    margin-left: auto;
-    color: var(--pz-accent-text) !important;
-}
-
-.page-more-menu-item[aria-checked="true"] .page-more-menu-check {
-    display: inline-block;
-}
-
 .page-more-menu-state {
     color: var(--pz-text-muted);
 }
@@ -684,8 +672,37 @@ html[data-theme='dark'] .keyboard-shortcuts-keys kbd {
     margin: 0 0 14px;
 }
 
+/* One column that never grows past the panel: a long name wraps onto more
+   lines instead of widening the list, so the body never scrolls sideways
+   (the Settings list keeps its two columns and ellipsis) */
+#uiCustomizationPanel .ui-custom-panel-body {
+    overflow-x: hidden;
+}
+
 #uiCustomizationPanel .ui-custom-items {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+}
+
+#uiCustomizationPanel .ui-custom-item {
+    align-items: flex-start;
+}
+
+#uiCustomizationPanel .ui-custom-item span {
+    min-width: 0;
+    line-height: 1.35;
+    white-space: normal;
+    overflow: visible;
+    overflow-wrap: anywhere;
+}
+
+/* On the first line of a wrapped name: (1.35em line - 16px box) / 2 */
+#uiCustomizationPanel .ui-custom-item input[type="checkbox"] {
+    margin-top: calc((1.35em - 16px) / 2);
+}
+
+#uiCustomizationPanel .ui-custom-section-title > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 .ui-custom-panel-status {

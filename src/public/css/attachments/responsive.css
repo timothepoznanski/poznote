@@ -69,14 +69,11 @@
     }
 
     /* Attachment indicators (use app blue) */
-    .btn-settings.has-attachments i,
     .btn-attachment.has-attachments i {
         filter: none;
         color: var(--pz-accent-text);
     }
 
-    .btn-settings.has-attachments:hover i,
-    .btn-settings.has-attachments:focus i,
     .btn-attachment.has-attachments:hover i,
     .btn-attachment.has-attachments:focus i {
         filter: none;
