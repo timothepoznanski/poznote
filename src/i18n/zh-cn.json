@@ -4864,6 +4864,7 @@
     "filter_overdue": "已逾期",
     "filter_dated": "有日期",
     "filter_completed": "已完成",
+    "filters": "筛选",
     "filter_placeholder": "按任务、标题或文件夹筛选...",
     "empty": "还没有任务。创建一个任务清单笔记或在笔记中添加清单开始吧。",
     "empty_filtered": "没有符合此筛选条件的任务。",

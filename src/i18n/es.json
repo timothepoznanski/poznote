@@ -4765,6 +4765,7 @@
     "filter_overdue": "Atrasadas",
     "filter_dated": "Con fecha",
     "filter_completed": "Completadas",
+    "filters": "Filtros",
     "filter_placeholder": "Filtrar por tarea, título o carpeta...",
     "empty": "Aún no hay tareas. Crea una nota de lista de tareas o añade una lista de verificación a una nota para empezar.",
     "empty_filtered": "Ninguna tarea coincide con este filtro.",

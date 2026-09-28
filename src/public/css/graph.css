@@ -375,6 +375,23 @@ html[data-theme='dark'] .graph-tooltip-meta {
         padding: 8px 10px;
     }
 
+    /* Search and folder dropdown share the first row, options go below */
+    .graph-search-wrapper {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+    .graph-folder-select {
+        flex: 0 1 auto;
+        align-self: stretch;
+        max-width: 45%;
+        min-width: 0;
+    }
+
+    .graph-options {
+        flex-basis: 100%;
+    }
+
     /* Keyboard-modifier hint is meaningless on touch screens */
     .graph-hint {
         display: none;

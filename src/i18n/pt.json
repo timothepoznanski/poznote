@@ -4765,6 +4765,7 @@
     "filter_overdue": "Atrasadas",
     "filter_dated": "Com data",
     "filter_completed": "Concluídas",
+    "filters": "Filtros",
     "filter_placeholder": "Filtrar por tarefa, título ou pasta...",
     "empty": "Ainda não há tarefas. Crie uma nota de lista de tarefas ou adicione uma lista de verificação a uma nota para começar.",
     "empty_filtered": "Nenhuma tarefa corresponde a este filtro.",

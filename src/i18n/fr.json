@@ -4869,6 +4869,7 @@
     "filter_overdue": "En retard",
     "filter_dated": "Avec date",
     "filter_completed": "Terminées",
+    "filters": "Filtres",
     "filter_placeholder": "Filtrer par tâche, titre ou dossier...",
     "empty": "Aucune tâche pour le moment. Créez une note de type liste de tâches ou ajoutez une checklist dans une note pour commencer.",
     "empty_filtered": "Aucune tâche ne correspond à ce filtre.",

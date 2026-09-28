@@ -4431,6 +4431,7 @@
     "filter_overdue": "Overdue",
     "filter_dated": "With due date",
     "filter_completed": "Completed",
+    "filters": "Filters",
     "filter_placeholder": "Filter by task, title or folder name...",
     "empty": "No tasks yet. Create a task list note or add a checklist to a note to get started.",
     "empty_filtered": "No tasks match this filter.",

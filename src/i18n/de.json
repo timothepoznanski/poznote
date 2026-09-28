@@ -4764,6 +4764,7 @@
     "filter_overdue": "Überfällig",
     "filter_dated": "Mit Datum",
     "filter_completed": "Erledigt",
+    "filters": "Filter",
     "filter_placeholder": "Nach Aufgabe, Titel oder Ordner filtern...",
     "empty": "Noch keine Aufgaben. Erstellen Sie eine Aufgabenlisten-Notiz oder fügen Sie einer Notiz eine Checkliste hinzu, um zu beginnen.",
     "empty_filtered": "Keine Aufgaben entsprechen diesem Filter.",
