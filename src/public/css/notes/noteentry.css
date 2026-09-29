@@ -335,8 +335,10 @@ textarea:focus {
    <div style="width:15.1in">) is wider than the note, and the max-width above
    then lets its pictures overflow too, taking their resize handle out of
    reach (#1514). Notes pasted before the paste cleanup dropped that width
-   still carry it. */
-.noteentry div[style*="width"] {
+   still carry it. Not inside CodeMirror: its selection rectangles are divs
+   with an inline width in a 0-wide layer, 100% of it hid the Markdown
+   selection. */
+.noteentry div[style*="width"]:not(.cm-editor *) {
     max-width: 100%;
 }
 

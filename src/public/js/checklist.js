@@ -1044,7 +1044,17 @@
         break;
       }
     }
-    if (!blocks.length) return;
+    // Caret on an empty line (the mobile editor bar, where the button shows
+    // with no selection): a new checklist takes that line's place
+    if (range.collapsed && blocks.length === 1 && blocks[0].nodeType === 1
+        && blocks[0].tagName !== 'UL' && blocks[0].tagName !== 'OL' && isBlankBlock(blocks[0])) {
+      insertChecklist();
+      return;
+    }
+    if (!blocks.length) {
+      if (range.collapsed && isBlankBlock(noteentry)) insertChecklist();
+      return;
+    }
 
     const allChecklists = blocks.every(function(block) {
       return block.nodeType === 1 && block.classList && block.classList.contains(CHECKLIST_CLASS);

@@ -487,15 +487,17 @@ function initTextSelectionHandlers() {
         );
 
         var formats = [
-            { selector: '.btn-bold',          md: ['**', '**'],    rte: 'bold'          },
-            { selector: '.btn-italic',        md: ['*',  '*' ],    rte: 'italic'        },
-            { selector: '.btn-underline',     md: ['<u>', '</u>'], rte: 'underline'     },
-            { selector: '.btn-strikethrough', md: ['~~', '~~'],    rte: 'strikeThrough' },
+            { selector: '.btn-bold',          action: 'exec-bold',          md: ['**', '**'],    rte: 'bold'          },
+            { selector: '.btn-italic',        action: 'exec-italic',        md: ['*',  '*' ],    rte: 'italic'        },
+            { selector: '.btn-underline',     action: 'exec-underline',     md: ['<u>', '</u>'], rte: 'underline'     },
+            { selector: '.btn-strikethrough', action: 'exec-strikethrough', md: ['~~', '~~'],    rte: 'strikeThrough' },
         ];
 
         formats.forEach(function (fmt) {
             var btn = document.querySelector(fmt.selector + '.show-on-selection');
-            if (!btn) return;
+            // Its twin in the mobile editor bar (mobile_editor_bar.php)
+            var barButton = document.querySelector('#mobileEditorBar [data-action="' + fmt.action + '"]');
+            if (!btn && !(barButton && isMobileFormattingViewport())) return;
 
             var isActive = false;
             if (isMarkdown && typeof window.isMarkdownSelectionWrapped === 'function') {
@@ -508,13 +510,318 @@ function initTextSelectionHandlers() {
                 try { isActive = document.queryCommandState(fmt.rte); } catch (e) { /* ignore */ }
             }
 
-            btn.classList.toggle('is-format-active', isActive);
+            if (btn) btn.classList.toggle('is-format-active', isActive);
+            if (barButton) barButton.classList.toggle('is-format-active', isActive);
         });
     }
 
     function clearFormatActiveStates() {
-        document.querySelectorAll('.btn-bold, .btn-italic, .btn-underline, .btn-strikethrough')
+        document.querySelectorAll('.btn-bold, .btn-italic, .btn-underline, .btn-strikethrough, #mobileEditorBar .is-format-active')
             .forEach(function (btn) { btn.classList.remove('is-format-active'); });
+    }
+
+    // Floating formatting toolbar (format_toolbar_mode = 'floating', #1420).
+    // On a computer the formatting buttons of a note leave the toolbar row for
+    // a menu floating above the selection, and the note actions stay in place.
+    // The wrapper sits where the buttons were, inside .note-edit-toolbar, so
+    // their handlers, the Customize hiding rules and the icon colours still
+    // apply, and the show-on-selection classes pick the buttons as before.
+    // It stays on one line: the buttons that do not fit, keeping FLOATING_EDGE
+    // free on each side of the note column, are listed in its own "…" menu,
+    // whose entries click the hidden button like the toolbar's (trigger-mobile-action).
+    var FLOATING_GAP = 8;               // px between the selection and the menu
+    var FLOATING_EDGE = 16;             // px kept free on each side of the column
+    var FLOATING_OVERFLOWED = 'floating-format-overflowed';
+    var floatingFormatToolbar = null;   // the wrapper on screen
+    var isPointerSelecting = false;     // left button held down in a note
+    var floatingRepositionQueued = false;
+    var floatingRelayoutQueued = false;
+
+    function isFloatingFormatToolbarMode() {
+        if (isMobileFormattingViewport()) return false;
+        var value = typeof window.getPoznoteInitialSetting === 'function'
+            ? window.getPoznoteInitialSetting('format_toolbar_mode')
+            : null;
+        return value === 'floating';
+    }
+
+    function getFloatingFormatToolbar(editableElement) {
+        var noteCard = editableElement && editableElement.closest ? editableElement.closest('.notecard') : null;
+        var toolbar = noteCard ? noteCard.querySelector('.note-edit-toolbar') : null;
+        if (!toolbar) return null;
+
+        var bar = toolbar.querySelector(':scope > .floating-format-toolbar');
+        var buttons = toolbar.querySelectorAll(':scope > .text-format-btn');
+        if (!bar) {
+            if (!buttons.length) return null;
+            bar = document.createElement('div');
+            bar.className = 'floating-format-toolbar';
+            bar.setAttribute('role', 'toolbar');
+            bar.hidden = true;
+            // Keep the selection and the editor focus: the buttons act on them
+            bar.addEventListener('mousedown', function (e) { e.preventDefault(); });
+            toolbar.insertBefore(bar, buttons[0]);
+        }
+        var moreAnchor = bar.querySelector(':scope > .floating-format-more');
+        Array.prototype.forEach.call(buttons, function (button) {
+            button.classList.remove('is-toolbar-overflowed');
+            bar.insertBefore(button, moreAnchor);
+        });
+        return bar;
+    }
+
+    // Back to the toolbar row, where the wrapper stands: the window got narrow
+    // enough for the mobile bar
+    function restoreFloatingFormatButtons() {
+        document.querySelectorAll('.note-edit-toolbar > .floating-format-toolbar').forEach(function (bar) {
+            Array.prototype.forEach.call(bar.querySelectorAll(':scope > .text-format-btn'), function (button) {
+                button.classList.remove(FLOATING_OVERFLOWED);
+                bar.parentNode.insertBefore(button, bar);
+            });
+            bar.remove();
+        });
+        floatingFormatToolbar = null;
+    }
+
+    function translate(key, fallback) {
+        return typeof window.t === 'function' ? window.t(key, null, fallback) : fallback;
+    }
+
+    function setFloatingMoreMenuOpen(bar, open) {
+        var anchor = bar ? bar.querySelector(':scope > .floating-format-more') : null;
+        if (!anchor) return;
+        var button = anchor.querySelector('.btn-floating-format-more');
+        var menu = anchor.querySelector('.floating-format-more-menu');
+        menu.hidden = !open;
+        button.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) fitFloatingMoreMenu(menu, button);
+    }
+
+    // Under the "…" button, scrolling inside when the window is too short
+    // for every entry
+    function fitFloatingMoreMenu(menu, button) {
+        var MENU_MARGIN = 8;
+        if (typeof window.positionToolbarDropdown === 'function') {
+            window.positionToolbarDropdown(menu, button);
+        }
+        var top = parseFloat(menu.style.top) || button.getBoundingClientRect().bottom;
+        menu.style.maxHeight = Math.max(0, window.innerHeight - top - MENU_MARGIN) + 'px';
+    }
+
+    function ensureFloatingMoreAnchor(bar) {
+        var anchor = bar.querySelector(':scope > .floating-format-more');
+        if (anchor) return anchor;
+
+        anchor = document.createElement('div');
+        anchor.className = 'floating-format-more';
+        anchor.hidden = true;
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'toolbar-btn btn-floating-format-more';
+        button.title = translate('editor.toolbar.more', 'More');
+        button.setAttribute('aria-haspopup', 'true');
+        button.setAttribute('aria-expanded', 'false');
+        button.innerHTML = '<i class="lucide lucide-more-horizontal"></i>';
+        var menu = document.createElement('div');
+        menu.className = 'dropdown-menu floating-format-more-menu';
+        menu.setAttribute('role', 'menu');
+        menu.hidden = true;
+        anchor.appendChild(button);
+        anchor.appendChild(menu);
+
+        button.addEventListener('click', function (e) {
+            e.stopPropagation();
+            setFloatingMoreMenuOpen(bar, menu.hidden);
+        });
+        // An entry runs its action through the document handler, after this
+        menu.addEventListener('click', function (e) {
+            if (e.target.closest('.dropdown-item')) setFloatingMoreMenuOpen(bar, false);
+        });
+
+        bar.appendChild(anchor);
+        return anchor;
+    }
+
+    function floatingMoreEntry(button) {
+        var key = Array.prototype.find.call(button.classList, function (cls) {
+            return cls.indexOf('btn-') === 0;
+        });
+        if (!key) return null;
+        var entry = document.createElement('button');
+        entry.type = 'button';
+        entry.className = 'dropdown-item mobile-toolbar-item';
+        entry.setAttribute('role', 'menuitem');
+        entry.setAttribute('data-action', 'trigger-mobile-action');
+        entry.setAttribute('data-selector', '.' + key);
+        var icon = button.querySelector('i');
+        if (icon) entry.appendChild(icon.cloneNode(false));
+        entry.appendChild(document.createTextNode(' ' + (button.getAttribute('title') || button.getAttribute('aria-label') || '')));
+        return entry;
+    }
+
+    // The note column, less what the note toolbar covers at its top
+    function getFloatingArea(bar) {
+        var toolbar = bar.parentElement;
+        var column = (toolbar && toolbar.closest('#right_col')) || document.documentElement;
+        var columnRect = column.getBoundingClientRect();
+        return {
+            top: Math.max(columnRect.top, toolbar ? toolbar.getBoundingClientRect().bottom : 0, 0),
+            bottom: Math.min(columnRect.bottom, window.innerHeight),
+            left: Math.max(columnRect.left, 0),
+            right: Math.min(columnRect.right, window.innerWidth)
+        };
+    }
+
+    // One line: the buttons past the room left in the column go to "…"
+    function layoutFloatingFormatToolbar(bar) {
+        var anchor = ensureFloatingMoreAnchor(bar);
+        var menu = anchor.querySelector('.floating-format-more-menu');
+
+        setFloatingMoreMenuOpen(bar, false);
+        Array.prototype.forEach.call(bar.querySelectorAll('.' + FLOATING_OVERFLOWED), function (button) {
+            button.classList.remove(FLOATING_OVERFLOWED);
+        });
+        menu.textContent = '';
+        anchor.hidden = true;
+
+        var area = getFloatingArea(bar);
+        var available = area.right - area.left - 2 * FLOATING_EDGE;
+        var style = getComputedStyle(bar);
+        var gap = parseFloat(style.columnGap) || 0;
+        var frame = (parseFloat(style.paddingLeft) || 0) + (parseFloat(style.paddingRight) || 0)
+            + (parseFloat(style.borderLeftWidth) || 0) + (parseFloat(style.borderRightWidth) || 0);
+        var buttons = Array.prototype.filter.call(bar.children, function (el) {
+            return el !== anchor && el.offsetWidth > 0;
+        });
+        var total = frame + buttons.reduce(function (sum, el) {
+            return sum + el.getBoundingClientRect().width;
+        }, 0) + gap * Math.max(0, buttons.length - 1);
+        if (total <= available + 0.5) return;
+
+        anchor.hidden = false;
+        var budget = available - frame - anchor.getBoundingClientRect().width;
+        var used = 0;
+        var overflowing = false;
+        buttons.forEach(function (button) {
+            var width = button.getBoundingClientRect().width + gap;
+            if (!overflowing && used + width <= budget + 0.5) {
+                used += width;
+                return;
+            }
+            overflowing = true;
+            button.classList.add(FLOATING_OVERFLOWED);
+            var entry = floatingMoreEntry(button);
+            if (entry) menu.appendChild(entry);
+        });
+    }
+
+    function getSelectionClientRects(range) {
+        var rects = Array.prototype.filter.call(range.getClientRects(), function (rect) {
+            return rect.width > 0 || rect.height > 0;
+        });
+        if (!rects.length) {
+            var box = range.getBoundingClientRect();
+            if (!box.width && !box.height) return null;
+            rects = [box];
+        }
+        var bounds = range.getBoundingClientRect();
+        return { first: rects[0], last: rects[rects.length - 1], bounds: bounds };
+    }
+
+    function positionFloatingFormatToolbar() {
+        var bar = floatingFormatToolbar;
+        if (!bar || bar.hidden) return;
+
+        var selection = window.getSelection ? window.getSelection() : null;
+        if (!selection || selection.rangeCount === 0) return;
+        var rects = getSelectionClientRects(selection.getRangeAt(0));
+        if (!rects) return;
+
+        var area = getFloatingArea(bar);
+
+        // Selection scrolled out of the note: out of sight until it comes back
+        var inView = rects.bounds.bottom > area.top && rects.bounds.top < area.bottom;
+        bar.style.visibility = inView ? '' : 'hidden';
+        if (!inView) {
+            setFloatingMoreMenuOpen(bar, false);
+            return;
+        }
+
+        var width = bar.offsetWidth;
+        var height = bar.offsetHeight;
+
+        // Above the first line, under the last one when there is no room
+        var top = rects.first.top - height - FLOATING_GAP;
+        if (top < area.top + FLOATING_GAP) {
+            top = rects.last.bottom + FLOATING_GAP;
+        }
+        top = Math.max(area.top + FLOATING_GAP, Math.min(top, area.bottom - height - FLOATING_GAP));
+
+        var left = rects.bounds.left + (rects.bounds.width / 2) - (width / 2);
+        left = Math.max(area.left + FLOATING_EDGE, Math.min(left, area.right - width - FLOATING_EDGE));
+
+        bar.style.top = Math.round(top) + 'px';
+        bar.style.left = Math.round(left) + 'px';
+
+        var menu = bar.querySelector('.floating-format-more-menu');
+        if (menu && !menu.hidden) setFloatingMoreMenuOpen(bar, true);
+    }
+
+    // Scrolling moves the menu, a resize may also change what fits in it
+    function queueFloatingFormatToolbarPosition(relayout) {
+        if (!floatingFormatToolbar) return;
+        if (relayout === true) floatingRelayoutQueued = true;
+        if (floatingRepositionQueued) return;
+        floatingRepositionQueued = true;
+        requestAnimationFrame(function () {
+            floatingRepositionQueued = false;
+            if (floatingRelayoutQueued && floatingFormatToolbar) {
+                layoutFloatingFormatToolbar(floatingFormatToolbar);
+            }
+            floatingRelayoutQueued = false;
+            positionFloatingFormatToolbar();
+        });
+    }
+
+    function hideFloatingFormatToolbar() {
+        if (floatingFormatToolbar) {
+            setFloatingMoreMenuOpen(floatingFormatToolbar, false);
+            floatingFormatToolbar.hidden = true;
+        }
+        floatingFormatToolbar = null;
+    }
+
+    function showFloatingFormatToolbar(editableElement) {
+        var bar = getFloatingFormatToolbar(editableElement);
+        if (floatingFormatToolbar && floatingFormatToolbar !== bar) hideFloatingFormatToolbar();
+        // Still dragging the selection: shown once the button is released
+        if (!bar || isPointerSelecting) {
+            hideFloatingFormatToolbar();
+            return;
+        }
+
+        bar.hidden = false;
+        // Every button hidden (Customize, list-only selection in a code block...)
+        var hasButton = Array.prototype.some.call(bar.querySelectorAll(':scope > .text-format-btn'), function (button) {
+            return button.offsetWidth > 0;
+        });
+        if (!hasButton) {
+            bar.hidden = true;
+            if (floatingFormatToolbar === bar) floatingFormatToolbar = null;
+            return;
+        }
+        floatingFormatToolbar = bar;
+        layoutFloatingFormatToolbar(bar);
+        positionFloatingFormatToolbar();
+    }
+
+    // Which formatting buttons of the mobile editor bar suit the selection
+    // (js/mobile-editor-bar.js): a test on the matching note toolbar button,
+    // or null for every button the note type has
+    function setMobileEditorBarSelectionRule(rule) {
+        if (typeof window.setMobileEditorBarSelectionRule === 'function') {
+            window.setMobileEditorBarSelectionRule(rule);
+        }
     }
 
     function handleSelectionChange() {
@@ -522,9 +829,24 @@ function initTextSelectionHandlers() {
         selectionTimeout = setTimeout(function () {
             var selection = window.getSelection();
 
-            // Desktop handling (existing code)
+            var floatingMode = isFloatingFormatToolbarMode();
+            if (!floatingMode && document.querySelector('.floating-format-toolbar')) {
+                restoreFloatingFormatButtons();
+            }
+
+            // On a phone the formatting buttons live in the bar above the
+            // keyboard (js/mobile-editor-bar.js): the note toolbar stays as it is
+            var mobileMode = isMobileFormattingViewport();
+            var keepNoteToolbar = floatingMode || mobileMode;
+
             var textFormatButtons = document.querySelectorAll('.text-format-btn');
-            var noteActionButtons = document.querySelectorAll('.note-action-btn');
+            // The floating toolbar and the mobile bar leave the note actions where they are
+            var noteActionButtons = keepNoteToolbar ? [] : document.querySelectorAll('.note-action-btn');
+            if (keepNoteToolbar) {
+                document.querySelectorAll('.note-action-btn.hide-on-selection').forEach(function (button) {
+                    button.classList.remove('hide-on-selection');
+                });
+            }
 
             // Check if the selection contains text
             if (selection && selection.rangeCount > 0 && selection.toString().trim().length > 0) {
@@ -625,9 +947,15 @@ function initTextSelectionHandlers() {
                     for (var i = 0; i < noteActionButtons.length; i++) {
                         noteActionButtons[i].classList.remove('hide-on-selection');
                     }
+                    hideFloatingFormatToolbar();
+                    // A language code block takes no formatting, from the bar either
+                    setMobileEditorBarSelectionRule(isLanguageCodeSelection && mobileMode
+                        ? function () { return false; }
+                        : null);
                     setMobileFormattingToolbarActive(false);
                 } else if (editableElement) {
                     // Text selected in an editable area: show formatting buttons, hide actions
+                    // (a computer with the classic toolbar only)
                     // With CodeMirror the walk stops on .cm-content, so resolve the host editor
                     var listSelectionEditor = editableElement.closest
                         ? editableElement.closest('.markdown-editor')
@@ -639,23 +967,27 @@ function initTextSelectionHandlers() {
                     // Words picked inside one item get the full toolbar (#1420), whole
                     // lines or several items get the list-only one
                     var isListOnlySelection = !!listSelection && !listSelection.insideItemText;
+                    var isButtonForSelection = function (button) {
+                        if (isPlainCodeSelection && isPlainCodeBlockedButton(button)) return false;
+                        // List-only selection: keep just the list conversion/toggle buttons
+                        if (isListOnlySelection && !isListSelectionAllowedButton(button, listSelectionType)) return false;
+                        // Remove-checkboxes only makes sense on a checkbox selection
+                        if (listSelectionType !== 'task' && button.classList.contains('btn-task-remove')) return false;
+                        return true;
+                    };
                     for (var i = 0; i < textFormatButtons.length; i++) {
-                        if (isPlainCodeSelection && isPlainCodeBlockedButton(textFormatButtons[i])) {
-                            textFormatButtons[i].classList.remove('show-on-selection');
-                        } else if (isListOnlySelection && !isListSelectionAllowedButton(textFormatButtons[i], listSelectionType)) {
-                            // List-only selection: keep just the list conversion/toggle buttons
-                            textFormatButtons[i].classList.remove('show-on-selection');
-                        } else if (listSelectionType !== 'task' && textFormatButtons[i].classList.contains('btn-task-remove')) {
-                            // Remove-checkboxes only makes sense on a checkbox selection
-                            textFormatButtons[i].classList.remove('show-on-selection');
-                        } else {
-                            textFormatButtons[i].classList.add('show-on-selection');
-                        }
+                        textFormatButtons[i].classList.toggle('show-on-selection',
+                            !mobileMode && isButtonForSelection(textFormatButtons[i]));
                     }
+                    // On a phone the same choice applies to the bar above the keyboard
+                    setMobileEditorBarSelectionRule(mobileMode ? isButtonForSelection : null);
                     for (var i = 0; i < noteActionButtons.length; i++) {
                         noteActionButtons[i].classList.add('hide-on-selection');
                     }
                     updateFormatActiveStates(editableElement);
+                    if (floatingMode) {
+                        showFloatingFormatToolbar(editableElement);
+                    }
                     setMobileFormattingToolbarActive(true);
                 } else {
                     // Text selected but not in an editable area: hide everything
@@ -666,6 +998,8 @@ function initTextSelectionHandlers() {
                         noteActionButtons[i].classList.add('hide-on-selection');
                     }
                     clearFormatActiveStates();
+                    hideFloatingFormatToolbar();
+                    setMobileEditorBarSelectionRule(null);
                     setMobileFormattingToolbarActive(false);
                 }
             } else {
@@ -677,6 +1011,8 @@ function initTextSelectionHandlers() {
                     noteActionButtons[i].classList.remove('hide-on-selection');
                 }
                 clearFormatActiveStates();
+                hideFloatingFormatToolbar();
+                setMobileEditorBarSelectionRule(null);
                 setMobileFormattingToolbarActive(false);
             }
 
@@ -691,6 +1027,32 @@ function initTextSelectionHandlers() {
         // Wait a bit for the selection to be updated
         setTimeout(handleSelectionChange, 10);
     });
+
+    // The floating toolbar waits for the end of a mouse selection, then
+    // follows the selection while the note scrolls or the window resizes
+    document.addEventListener('mousedown', function (e) {
+        if (e.button !== 0) return;
+        if (e.target && e.target.closest && e.target.closest('.floating-format-toolbar')) return;
+        if (floatingFormatToolbar) setFloatingMoreMenuOpen(floatingFormatToolbar, false);
+        isPointerSelecting = true;
+    }, true);
+    document.addEventListener('mouseup', function () {
+        if (!isPointerSelecting) return;
+        isPointerSelecting = false;
+        handleSelectionChange();
+    }, true);
+    window.addEventListener('scroll', function (e) {
+        // The "…" menu scrolling its own entries moves nothing
+        var target = e.target;
+        if (target && target.closest && target.closest('.floating-format-toolbar')) return;
+        queueFloatingFormatToolbarPosition(false);
+    }, true);
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape' || !floatingFormatToolbar) return;
+        var menu = floatingFormatToolbar.querySelector('.floating-format-more-menu');
+        if (menu && !menu.hidden) setFloatingMoreMenuOpen(floatingFormatToolbar, false);
+    });
+    window.addEventListener('resize', function () { queueFloatingFormatToolbarPosition(true); });
 
     initializeMobileViewportToolbarState();
 }

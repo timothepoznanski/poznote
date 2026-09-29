@@ -1555,7 +1555,7 @@ function handleHTMLImageInsert(file, dropTarget, dropPoint) {
             container.parentElement.closest('.noteentry');
 
         if (noteEntry === dropTarget) {
-            inserted = insertHTMLAtSelection(placeholderHtml);
+            inserted = insertImagePlaceholderAtSelection(placeholderHtml);
             placeholderImg = dropTarget.querySelector('[data-upload-placeholder-id="' + placeholderId + '"]');
         }
     }
@@ -1646,6 +1646,19 @@ function handleHTMLImageInsert(file, dropTarget, dropPoint) {
                 showNotificationPopup('Upload failed: ' + error.message, 'error');
             }
         });
+}
+
+// Put an upload placeholder at the caret, on a line of its own, with an
+// empty line after it to take the caret. execCommand records the insertion
+// on the browser's undo stack, so Ctrl+Z takes a pasted or dropped picture
+// back out like any other paste. The direct DOM insertion, which Ctrl+Z
+// cannot see, is only the fallback.
+function insertImagePlaceholderAtSelection(placeholderHtml) {
+    if (isCursorInEditableNote() &&
+        document.execCommand('insertHTML', false, '<div>' + placeholderHtml + '</div><div><br></div>')) {
+        return true;
+    }
+    return insertHTMLAtSelection(placeholderHtml);
 }
 
 function insertHTMLAtSelection(html) {

@@ -62,6 +62,10 @@
     var SYNC_INTERVAL_MS = 2 * 60 * 1000;
     var MIN_GAP_MS = 20 * 1000;
     var PROBE_INTERVAL_MS = 15 * 1000;
+    // A phone pauses a tab left in the background and cuts its network, then
+    // takes a few seconds to bring the connection back when the tab returns:
+    // what fails meanwhile says nothing about the server (see onWake).
+    var WAKE_GRACE_MS = 4 * 1000;
     var BATCH_SIZE = 50;
     // Pictures of the offline notes: limits sent by the server with the
     // manifest (POZNOTE_OFFLINE_* in functions.php), these values until then.
@@ -80,6 +84,8 @@
     var offlineDays = null;
     var bannerEl = null;
     var probeTimer = null;
+    var visibleSince = document.visibilityState === 'visible' ? Date.now() : 0;
+    var recheckOnWake = false;
 
     function tr(key, vars, fallback) {
         return typeof window.t === 'function' ? window.t(key, vars || {}, fallback) : fallback;
@@ -807,6 +813,7 @@
         if (e.persisted) {
             pageLeft = false;
             window.__poznoteLeavingForOfflinePage = false;
+            onWake();
         }
     });
 
@@ -850,6 +857,10 @@
 
     function onConnectionLost() {
         if (DISABLED) {
+            return;
+        }
+        if (document.visibilityState === 'hidden') {
+            recheckOnWake = true;
             return;
         }
         if (bannerEl && !bannerEl.hidden && !bannerEl.classList.contains('is-transient')) {
@@ -901,14 +912,60 @@
         if (WRITES_ONLY || probeScheduled || probeTimer) {
             return;
         }
+        // A tab in the background has no say: its network may be cut
+        if (document.visibilityState === 'hidden') {
+            recheckOnWake = true;
+            return;
+        }
         probeScheduled = setTimeout(function () {
-            probeServer().then(function (reachable) {
+            confirmConnectionLost().then(function () {
                 probeScheduled = null;
-                if (!reachable) {
-                    onConnectionLost();
-                }
             });
         }, 1000);
+    }
+
+    // The server out of reach, told only on a visible page, and not while the
+    // connection may still be waking up: a failed check in the first seconds
+    // after the tab came back is checked again once they are over.
+    function confirmConnectionLost() {
+        if (document.visibilityState === 'hidden') {
+            recheckOnWake = true;
+            return Promise.resolve();
+        }
+        return probeServer().then(function (reachable) {
+            if (reachable) {
+                return null;
+            }
+            var wait = visibleSince + WAKE_GRACE_MS - Date.now();
+            if (wait > 0) {
+                return new Promise(function (resolve) {
+                    setTimeout(resolve, wait);
+                }).then(confirmConnectionLost);
+            }
+            onConnectionLost();
+            return null;
+        });
+    }
+
+    // Back to the tab: a doubt left from the background, or a banner shown
+    // before it, is settled at once instead of on the next 15 s check.
+    function onWake() {
+        visibleSince = Date.now();
+        var bannerUp = !!(bannerEl && !bannerEl.hidden && !bannerEl.classList.contains('is-transient'));
+        if (WRITES_ONLY || DISABLED || !(recheckOnWake || bannerUp)) {
+            return;
+        }
+        recheckOnWake = false;
+        probeServer().then(function (reachable) {
+            if (reachable) {
+                if (bannerUp || probeTimer) {
+                    onConnectionBack();
+                    syncNow(true);
+                }
+            } else if (!bannerUp) {
+                checkAfterFailure();
+            }
+        });
     }
 
     // ---- The copy follows every save ---------------------------------------------
@@ -1144,11 +1201,7 @@
     // ---- Wiring ----------------------------------------------------------------
 
     window.addEventListener('offline', function () {
-        probeServer().then(function (reachable) {
-            if (!reachable) {
-                onConnectionLost();
-            }
-        });
+        confirmConnectionLost();
     });
 
     window.addEventListener('online', function () {
@@ -1157,6 +1210,9 @@
     });
 
     document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible') {
+            onWake();
+        }
         // Leaving the tab (or closing the laptop) is the last chance to take
         // the latest edits along before the network goes away.
         if (document.visibilityState === 'hidden' || Date.now() - lastRunAt > SYNC_INTERVAL_MS) {

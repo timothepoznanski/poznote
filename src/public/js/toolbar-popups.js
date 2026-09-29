@@ -387,10 +387,19 @@ window.savedRanges = {};
 
     const caretX = (btnRect.left + (btnRect.width / 2)) - left;
     popup.style.setProperty('--caret-x', Math.max(8, Math.min(caretX, popupRect.width - 8)) + 'px');
+
+    // Opened from the mobile editor bar: above it, clear of the keyboard
+    if (typeof window.placePopupAboveMobileEditorBar === 'function') {
+      window.placePopupAboveMobileEditorBar(popup, btn);
+    }
   }
 
   function getColorTriggerButton(triggerButton, selector) {
     if (triggerButton && triggerButton.classList && triggerButton.classList.contains(selector.slice(1))) {
+      return triggerButton;
+    }
+    // Its twin in the mobile editor bar (mobile_editor_bar.php)
+    if (triggerButton && triggerButton.closest && triggerButton.closest('.mobile-editor-bar')) {
       return triggerButton;
     }
 

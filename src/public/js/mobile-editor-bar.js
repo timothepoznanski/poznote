@@ -2,9 +2,11 @@
  * Mobile editor bar (discussion #1465).
  *
  * A row of editing buttons pinned above the on-screen keyboard while the body
- * of a note is being edited: slash menu, audio recording, undo/redo,
- * bold/italic, lists and indentation, none of which a touch keyboard can
- * reach by shortcut.
+ * of a note is being edited or has text selected: slash menu, audio
+ * recording, undo/redo, every formatting button of the note toolbar, lists
+ * and indentation, none of which a touch keyboard can reach by shortcut. On a
+ * phone the note toolbar no longer switches to its formatting buttons on a
+ * selection (js/events-text-selection.js): they are all here.
  *
  * Markup: mobile_editor_bar.php. Styles: css/index-mobile.css.
  *
@@ -39,13 +41,70 @@
     // of an HTML note. Titles, tags and task inputs get no bar.
     function getActiveNoteEditor() {
         var active = document.activeElement;
-        if (!active || !active.closest) return null;
+        if (active && active.closest) {
+            var markdownEditor = active.closest('.markdown-editor');
+            if (markdownEditor) return markdownEditor;
 
-        var markdownEditor = active.closest('.markdown-editor');
-        if (markdownEditor) return markdownEditor;
+            if (active.isContentEditable && active.closest('.noteentry')) return active;
+        }
 
-        if (active.isContentEditable && active.closest('.noteentry')) return active;
-        return null;
+        // Text selected with the keyboard closed (a long press closes it on
+        // many phones): the note holding the selection
+        if (!document.body.classList.contains('mobile-formatting-toolbar-active')) return null;
+        var selection = window.getSelection ? window.getSelection() : null;
+        var node = selection && selection.rangeCount > 0 ? selection.anchorNode : null;
+        var element = node && node.nodeType === 3 ? node.parentElement : node;
+        if (!element || !element.closest) return null;
+        var selectionMarkdown = element.closest('.markdown-editor');
+        if (selectionMarkdown) return selectionMarkdown;
+        var selectionEditable = element.closest('.noteentry [contenteditable="true"], .noteentry[contenteditable="true"]');
+        return selectionEditable || null;
+    }
+
+    // The formatting buttons of the bar are those of the note toolbar, which
+    // the server renders for the note type (note_display.php): a button whose
+    // twin is not in the toolbar of the note being edited is left out. With
+    // text selected, the rule set by js/events-text-selection.js leaves out
+    // the ones the selection does not take (code block, whole list items,
+    // checkboxes), as the classic toolbar does.
+    var selectionRule = null;
+
+    window.setMobileEditorBarSelectionRule = function (rule) {
+        selectionRule = typeof rule === 'function' ? rule : null;
+        syncButtons();
+    };
+
+    function syncButtons() {
+        if (!bar) return;
+        var editor = getActiveNoteEditor();
+        var noteCard = editor && editor.closest ? editor.closest('.notecard') : null;
+        var toolbar = noteCard ? noteCard.querySelector('.note-edit-toolbar') : null;
+        if (!toolbar) return;
+
+        bar.querySelectorAll('.mobile-editor-bar-btn[data-action]:not([data-mobile-bar-action])').forEach(function (button) {
+            var twin = toolbar.querySelector('.text-format-btn[data-action="' + button.getAttribute('data-action') + '"]');
+            var available = !!twin && (!selectionRule || selectionRule(twin));
+            button.classList.toggle('mobile-editor-bar-unavailable', !available);
+        });
+
+        // A separator only between two groups that still have a button
+        var scroll = bar.querySelector('.mobile-editor-bar-scroll');
+        var items = scroll ? Array.prototype.slice.call(scroll.children) : [];
+        var shownBefore = false;
+        var pendingSeparator = null;
+        items.forEach(function (item) {
+            if (item.classList.contains('mobile-editor-bar-sep')) {
+                item.classList.add('is-redundant');
+                if (shownBefore) pendingSeparator = item;
+                return;
+            }
+            if (getComputedStyle(item).display === 'none') return;
+            if (pendingSeparator) {
+                pendingSeparator.classList.remove('is-redundant');
+                pendingSeparator = null;
+            }
+            shownBefore = true;
+        });
     }
 
     function isCodeMirrorEditor(editor) {
@@ -66,10 +125,17 @@
     function syncVisibility() {
         if (!bar || !document.body) return;
 
+        // Up while typing, and while text is selected in the note: the bar
+        // holds the formatting buttons on a phone (the note toolbar keeps its
+        // actions, js/events-text-selection.js)
+        var editor = getActiveNoteEditor();
         var visible = isMobileViewport()
-            && document.body.classList.contains('mobile-keyboard-open')
-            && !!getActiveNoteEditor()
+            && (document.body.classList.contains('mobile-keyboard-open')
+                || document.body.classList.contains('mobile-formatting-toolbar-active'))
+            && !!editor
             && !isDialogOpen();
+
+        if (visible) syncButtons();
 
         if (visible === document.body.classList.contains('mobile-editor-bar-visible')) return;
         document.body.classList.toggle('mobile-editor-bar-visible', visible);
@@ -141,7 +207,53 @@
         if (active && typeof active.blur === 'function') active.blur();
     }
 
+    // The note the bar edits, for the actions that name it (search and replace)
+    function getActiveNoteId() {
+        var editor = getActiveNoteEditor();
+        var noteCard = editor && editor.closest ? editor.closest('.notecard') : null;
+        var match = noteCard && noteCard.id ? noteCard.id.match(/^note(\d+)$/) : null;
+        return match ? match[1] : '';
+    }
+
+    // A popup opened from the bar (colour, title, alignment) goes above it,
+    // not under the button where the keyboard is. Called by the popups once
+    // they are placed (js/toolbar-popups.js, js/toolbar-format.js).
+    window.placePopupAboveMobileEditorBar = function (popup, trigger) {
+        if (!popup || !trigger || !trigger.closest || !bar || !bar.contains(trigger)) return false;
+
+        var margin = 8;
+        var viewport = window.visualViewport;
+        var viewportTop = viewport ? viewport.offsetTop : 0;
+        var viewportLeft = viewport ? viewport.offsetLeft : 0;
+        var viewportWidth = viewport ? viewport.width : window.innerWidth;
+        var barTop = bar.getBoundingClientRect().top;
+        var buttonRect = trigger.getBoundingClientRect();
+        var popupRect = popup.getBoundingClientRect();
+
+        var room = Math.max(0, barTop - margin - (viewportTop + margin));
+        if (popupRect.height > room) {
+            popup.style.maxHeight = room + 'px';
+            popup.style.overflowY = 'auto';
+        }
+        var height = Math.min(popupRect.height, room);
+        var left = buttonRect.left + (buttonRect.width / 2) - (popupRect.width / 2);
+        left = Math.max(viewportLeft + margin, Math.min(left, viewportLeft + viewportWidth - popupRect.width - margin));
+
+        popup.style.position = 'fixed';
+        popup.style.top = Math.round(barTop - margin - height) + 'px';
+        popup.style.left = Math.round(left) + 'px';
+        popup.style.setProperty('--caret-x', Math.max(8, Math.min(buttonRect.left + (buttonRect.width / 2) - left, popupRect.width - 8)) + 'px');
+        return true;
+    };
+
     function handleClick(e) {
+        // Before the document handler reads it (js/index-events.js)
+        var noteButton = e.target.closest ? e.target.closest('[data-mobile-bar-note-id]') : null;
+        if (noteButton && bar.contains(noteButton)) {
+            noteButton.setAttribute('data-note-id', getActiveNoteId());
+            return;
+        }
+
         var button = e.target.closest ? e.target.closest('[data-mobile-bar-action]') : null;
         if (!button || !bar.contains(button)) return;
 

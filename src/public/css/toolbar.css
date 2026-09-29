@@ -396,6 +396,61 @@ html[data-theme='dark'] .toolbar-btn.is-format-active {
     display: none !important;
 }
 
+/* Floating formatting toolbar (format_toolbar_mode = 'floating', #1420):
+   the formatting buttons of the note, in a menu above the selection placed
+   by js/events-text-selection.js. Out of the toolbar row while hidden. */
+.floating-format-toolbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1001;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 2px;
+    padding: 4px;
+    box-sizing: border-box;
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.15);
+}
+
+.floating-format-toolbar[hidden] {
+    display: none;
+}
+
+/* One line: what does not fit is listed in its "…" menu instead */
+.floating-format-toolbar > * {
+    flex-shrink: 0;
+}
+
+.floating-format-toolbar .toolbar-btn {
+    margin: 0;
+}
+
+html .floating-format-toolbar .toolbar-btn.floating-format-overflowed {
+    display: none !important;
+}
+
+.floating-format-toolbar .floating-format-more {
+    position: relative;
+    display: inline-flex;
+}
+
+.floating-format-toolbar .floating-format-more[hidden],
+.floating-format-toolbar .floating-format-more-menu[hidden] {
+    display: none !important;
+}
+
+.floating-format-toolbar .floating-format-more-menu {
+    min-width: 220px;
+    z-index: 2147483001;
+    /* max-height set by js/events-text-selection.js from the room left */
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
 /* Note action buttons, toolbar adjustments, and related styles */
 
 .note-header-spacer {

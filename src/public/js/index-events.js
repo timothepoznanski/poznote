@@ -486,7 +486,7 @@
                 break;
             case 'change-font-size':
                 if (typeof changeFontSize === 'function') {
-                    changeFontSize();
+                    changeFontSize(target);
                 }
                 break;
             case 'change-alignment':

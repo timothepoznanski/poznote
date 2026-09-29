@@ -178,12 +178,56 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 50);
     };
 
+    // The attachment of a picture taken out of a note is deleted from the
+    // server once the note is left, not straight away: Ctrl+Z puts a deleted
+    // picture back (or a pasted one, taken out, back in with Ctrl+Y) and its
+    // file has to still be there. Keyed by attachment id.
+    const pendingImageDeletions = new Map();
+
+    // The note left may sit in the DOM cache with the picture put back in it
+    function isImageStillInNote(pending) {
+        const selector = 'img[src*="' + pending.attachmentId + '"]';
+        return !!(document.querySelector(selector) || pending.noteEntry.querySelector(selector));
+    }
+
+    // leftNotesOnly: only the notes no longer on screen, whose undo history
+    // is gone. pageHidden: the page is going away, a keepalive request is
+    // the only one that still goes out.
+    function flushPendingImageDeletions(leftNotesOnly, pageHidden) {
+        pendingImageDeletions.forEach(function (pending, attachmentId) {
+            if (leftNotesOnly && pending.noteEntry.isConnected) return;
+            pendingImageDeletions.delete(attachmentId);
+            if (isImageStillInNote(pending)) return;
+
+            if (pageHidden) {
+                fetch('/api/v1/notes/' + pending.noteId + '/attachments/' + attachmentId, {
+                    method: 'DELETE',
+                    headers: { 'Accept': 'application/json' },
+                    credentials: 'same-origin',
+                    keepalive: true
+                }).catch(function () { /* the page is gone, nothing to tell */ });
+            } else if (typeof window.deleteAttachment === 'function') {
+                window.deleteAttachment(attachmentId, pending.noteId);
+            }
+        });
+    }
+
+    window.addEventListener('pagehide', function () {
+        flushPendingImageDeletions(false, true);
+    });
+
     // Listen for note content changes via mutation observer (e.g., for checklists and image deletions)
     const rightCol = document.getElementById('right_col');
     if (rightCol) {
         const observer = new MutationObserver(function (mutations) {
             // Restore checklist values when new content loads (via existing helper)
             handleNoteLoad();
+
+            // A note left (another note or tab opened in its place): its
+            // removed pictures can no longer come back through Ctrl+Z
+            if (pendingImageDeletions.size) {
+                flushPendingImageDeletions(true, false);
+            }
 
             // Detect image deletions from DOM (keyboard or external)
             if (window.isLoadingNote) return;
@@ -219,16 +263,17 @@ document.addEventListener('DOMContentLoaded', function () {
                                     const activeNoteId = noteIdMatch ? noteIdMatch[1] : null;
 
                                     if (activeNoteId && noteId === activeNoteId) {
+                                        pendingImageDeletions.set(attachmentId, {
+                                            attachmentId: attachmentId,
+                                            noteId: noteId,
+                                            noteEntry: noteEntry
+                                        });
+
                                         // Defer execution a brief moment to check if the browser simply re-inserted it
                                         // (e.g., during a paragraph split or rich text operation that moves elements)
                                         setTimeout(function () {
                                             const stillExists = document.querySelector('img[src*="' + attachmentId + '"]');
                                             if (!stillExists) {
-                                                // Call the existing deleteAttachment function if available
-                                                if (typeof window.deleteAttachment === 'function') {
-                                                    window.deleteAttachment(attachmentId, noteId);
-                                                }
-
                                                 // A diagram deleted from the keyboard leaves its placeholder lines behind
                                                 if (node.classList.contains('excalidraw-container') && typeof window.removeExcalidrawPlaceholdersAround === 'function') {
                                                     window.removeExcalidrawPlaceholdersAround(mutation.previousSibling, mutation.nextSibling);

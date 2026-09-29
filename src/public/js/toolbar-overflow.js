@@ -138,8 +138,10 @@
     });
     var available = toolbar.clientWidth - (parseFloat(style.paddingLeft) || 0) - (parseFloat(style.paddingRight) || 0) - 2 * reserve;
 
+    // The floating formatting toolbar (position: fixed) is out of the row too
     var inRow = Array.prototype.filter.call(toolbar.children, function (el) {
-      return isShown(el) && getComputedStyle(el).position !== 'absolute';
+      var position = getComputedStyle(el).position;
+      return isShown(el) && position !== 'absolute' && position !== 'fixed';
     });
     var total = inRow.reduce(function (sum, el) { return sum + outerWidth(el); }, 0) + gap * Math.max(0, inRow.length - 1);
     if (total <= available + 0.5) {
@@ -249,8 +251,12 @@
   window.getToolbarButtonRect = function (button) {
     var rect = button ? button.getBoundingClientRect() : null;
     if (rect && (rect.width || rect.height)) return rect;
+    // A button of the floating formatting toolbar opens under its own "…"
+    var floating = button && button.closest ? button.closest('.floating-format-toolbar') : null;
     var toolbar = button && button.closest ? button.closest('.note-edit-toolbar') : null;
-    var candidates = toolbar ? toolbar.querySelectorAll('.btn-toolbar-overflow, .mobile-more-btn') : [];
+    var candidates = floating
+      ? floating.querySelectorAll('.btn-floating-format-more')
+      : (toolbar ? toolbar.querySelectorAll('.btn-toolbar-overflow, .mobile-more-btn') : []);
     for (var i = 0; i < candidates.length; i++) {
       var r = candidates[i].getBoundingClientRect();
       if (r.width || r.height) return r;

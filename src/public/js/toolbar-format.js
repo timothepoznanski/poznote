@@ -1,6 +1,6 @@
 // Toolbar: font size and code blocks.
 
-function changeFontSize() {
+function changeFontSize(triggerButton) {
   // Close any existing font size popup
   const existingPopup = document.querySelector('.font-size-popup');
   if (existingPopup) {
@@ -23,8 +23,10 @@ function changeFontSize() {
   // Detect if we're in markdown BEFORE opening the popup
   const savedIsMarkdown = typeof isInMarkdownEditor === 'function' && isInMarkdownEditor();
 
-  // Find the font size button to position the popup
-  const fontSizeButton = document.querySelector('.btn-text-height');
+  // Find the font size button to position the popup: the one clicked (note
+  // toolbar, floating toolbar or mobile editor bar), else the toolbar's
+  const fontSizeButton = (triggerButton && triggerButton.closest && triggerButton.closest('.btn-text-height, .mobile-editor-bar-btn'))
+    || document.querySelector('.btn-text-height');
   if (!fontSizeButton) return;
 
   // Create the popup
@@ -71,6 +73,9 @@ function changeFontSize() {
   popup.style.left = Math.max(8, btnRect.right - popupWidth) + 'px';
   popup.style.top = (btnRect.bottom + 8) + 'px';
   clampToViewport(popup, 8);
+  if (typeof window.placePopupAboveMobileEditorBar === 'function') {
+    window.placePopupAboveMobileEditorBar(popup, fontSizeButton);
+  }
 
   // Show popup with animation
   setTimeout(() => {
@@ -153,7 +158,8 @@ function changeAlignment(triggerButton) {
   const selection = window.getSelection();
   const savedRange = selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null;
   const editor = savedRange ? getEditorFromRange(savedRange) : null;
-  const button = triggerButton && triggerButton.closest ? triggerButton.closest('.btn-align') : document.querySelector('.btn-align');
+  const button = (triggerButton && triggerButton.closest ? triggerButton.closest('.btn-align, .mobile-editor-bar-btn') : null)
+    || document.querySelector('.btn-align');
   if (!editor || !button) return;
   const isMarkdown = typeof isInMarkdownEditor === 'function' && isInMarkdownEditor();
 
@@ -188,6 +194,9 @@ function changeAlignment(triggerButton) {
   popup.style.left = Math.max(8, btnRect.right - (popup.offsetWidth || 180)) + 'px';
   popup.style.top = (btnRect.bottom + 8) + 'px';
   clampToViewport(popup, 8);
+  if (typeof window.placePopupAboveMobileEditorBar === 'function') {
+    window.placePopupAboveMobileEditorBar(popup, button);
+  }
   setTimeout(() => popup.classList.add('show'), 10);
 
   const close = setupPopupDismiss(popup, '.btn-align');

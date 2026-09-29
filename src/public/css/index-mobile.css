@@ -219,6 +219,20 @@ body.mobile-editor-bar-visible .mobile-editor-bar {
     color: var(--pz-accent-text);
 }
 
+/* Bold, italic, underline or strikethrough already applied at the selection
+   (js/events-text-selection.js) */
+.mobile-editor-bar-btn.is-format-active {
+    background: var(--pz-accent-soft);
+    color: var(--pz-accent-text);
+}
+
+/* A formatting button the note type or the selection does not take, and a
+   separator left with no button on one side (js/mobile-editor-bar.js) */
+.mobile-editor-bar .mobile-editor-bar-unavailable,
+.mobile-editor-bar .mobile-editor-bar-sep.is-redundant {
+    display: none !important;
+}
+
 /* The icon follows its button. :hover is named because it sticks after a tap
    on a touch screen: the global icon hover (css/icons.css) would leave the last
    tapped icon enlarged and accent-coloured. */
@@ -248,8 +262,10 @@ body.mobile-editor-bar-visible .mobile-editor-bar {
     border-left: 1px solid var(--pz-border);
 }
 
-/* The pane gives up the height of the bar so the caret never types under it */
-body.mobile-keyboard-open.mobile-editor-bar-visible #right_pane {
+/* The pane gives up the height of the bar so the caret never types under it,
+   nor the selection sits under it with the keyboard closed */
+body.mobile-keyboard-open.mobile-editor-bar-visible #right_pane,
+body.mobile-formatting-toolbar-active.mobile-editor-bar-visible #right_pane {
     height: calc(var(--mobile-visual-viewport-height, 100vh) - var(--mobile-editor-bar-height)) !important;
 }
 
@@ -258,6 +274,12 @@ body.mobile-keyboard-open.mobile-editor-bar-visible #right_pane {
 body.mobile-editor-bar-visible .pz-edge-stack,
 body.mobile-editor-bar-visible .note-scroll-edge-btn {
     display: none !important;
+}
+
+/* The popups of its buttons (colour, title, alignment) open above the bar */
+body.mobile-editor-bar-visible .color-palette-popup,
+body.mobile-editor-bar-visible .font-size-popup {
+    z-index: 2147483002;
 }
 
 #right_col {
@@ -597,14 +619,8 @@ a.links_arbo_left::-webkit-scrollbar,
     display: flex !important;
 }
 
-body.mobile-formatting-toolbar-active #right_col .note-edit-toolbar .mobile-home-btn {
-    display: none !important;
-}
-
-/* When text is selected inside a note, show formatting buttons on mobile too */
-.note-edit-toolbar .text-format-btn.show-on-selection {
-    display: inline-flex !important;
-}
+/* The formatting buttons of a selection live in the mobile editor bar on a
+   phone: the note toolbar keeps its own buttons (js/events-text-selection.js) */
 
 /* Mobile toolbar dropdown menu */
 .note-edit-toolbar .mobile-toolbar-menu {

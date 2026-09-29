@@ -223,7 +223,8 @@
       "highlight_current_folder_tree": "Dim the notes and folders that sit outside the folder hierarchy you are working in, as much or as little as you like.",
       "snapshots": "Choose how many automatic daily snapshots and how many safety snapshots (before an AI or MCP edit) are kept per note.",
       "stt": "Configure the speech-to-text server used to dictate notes and transcribe audio attachments.",
-      "sidebar_offline_marks": "Show a small dot next to the notes available offline in this browser."
+      "sidebar_offline_marks": "Show a small dot next to the notes available offline in this browser.",
+      "format_toolbar_mode": "On a computer, choose where the formatting buttons show when you select text in a note: in the note toolbar, in place of the note actions, or in a menu floating above the selection, which leaves the note toolbar as it is."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "On mobile, the toolbar above the keyboard has a + button that opens the same menu, whatever this is set to."
@@ -519,7 +520,8 @@
       "slash_menu_trigger": "Command menu shortcut (computer)",
       "slash_menu_trigger_mobile": "Command menu shortcut (mobile)",
       "snapshots": "Snapshots",
-      "sidebar_offline_marks": "Show offline dot"
+      "sidebar_offline_marks": "Show offline dot",
+      "format_toolbar_mode": "Formatting toolbar"
     },
     "badges": {
       "font_size_default": "default ({{size}}px)",
@@ -534,7 +536,9 @@
         "both": "Toolbar icons + slash command menu",
         "full": "Toolbar only",
         "slash": "Slash command only"
-      }
+      },
+      "format_toolbar_mode_toolbar": "In the note toolbar",
+      "format_toolbar_mode_floating": "Floating above the selection"
     },
     "alerts": {
       "error_saving_preference": "Error saving preference"

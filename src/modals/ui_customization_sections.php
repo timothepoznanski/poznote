@@ -50,6 +50,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:spellcheck-html-notes-card" checked><span><?php echo t_h('display.cards.spellcheck_html_notes', [], 'Spell check'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:slash-menu-trigger-card" checked><span><?php echo t_h('display.cards.slash_menu_trigger', [], 'Command menu shortcut (computer)'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:slash-menu-trigger-mobile-card" checked><span><?php echo t_h('display.cards.slash_menu_trigger_mobile', [], 'Command menu shortcut (mobile)'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:format-toolbar-mode-card" checked><span><?php echo t_h('display.cards.format_toolbar_mode', [], 'Formatting toolbar'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:login-display-card" checked><span><?php echo t_h('display.cards.login_display', [], 'Login page title'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:language-card" checked><span><?php echo t_h('settings.language.label', [], 'Language'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:main-font-card" checked><span><?php echo t_h('display.cards.main_font', [], 'App font'); ?></span></label>
@@ -255,11 +256,22 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarRedo" checked><span><?php echo t_h('mobile_editor_bar.redo', [], 'Redo'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarBold" checked><span><?php echo t_h('editor.toolbar.bold', [], 'Bold'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarItalic" checked><span><?php echo t_h('editor.toolbar.italic', [], 'Italic'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarUnderline" checked><span><?php echo t_h('editor.toolbar.underline', [], 'Underline'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarStrikethrough" checked><span><?php echo t_h('editor.toolbar.strikethrough', [], 'Strikethrough'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarLink" checked><span><?php echo t_h('editor.toolbar.link', [], 'Link'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarColor" checked><span><?php echo t_h('editor.toolbar.text_color', [], 'Text color'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarHighlight" checked><span><?php echo t_h('editor.toolbar.highlight', [], 'Highlight'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarTitle" checked><span><?php echo t_h('slash_menu.title', [], 'Title'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarAlign" checked><span><?php echo t_h('slash_menu.align', [], 'Align'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarListUl" checked><span><?php echo t_h('editor.toolbar.bullet_list', [], 'Bullet list'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarListOl" checked><span><?php echo t_h('editor.toolbar.numbered_list', [], 'Numbered list'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarChecklist" checked><span><?php echo t_h('editor.toolbar.toggle_checklist', [], 'Toggle checklist'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarOutdent" checked><span><?php echo t_h('mobile_editor_bar.outdent', [], 'Outdent'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarIndent" checked><span><?php echo t_h('mobile_editor_bar.indent', [], 'Indent'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarCodeBlock" checked><span><?php echo t_h('editor.toolbar.code_block', [], 'Code block'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarInlineCode" checked><span><?php echo t_h('editor.toolbar.inline_code', [], 'Inline code'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarClearFormat" checked><span><?php echo t_h('editor.toolbar.clear_formatting', [], 'Clear formatting'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarSearchReplace" checked><span><?php echo t_h('editor.toolbar.search_replace', [], 'Search and replace'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarHideKeyboard" checked><span><?php echo t_h('mobile_editor_bar.hide_keyboard', [], 'Hide keyboard'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarCustomize" checked><span><?php echo t_h('modals.ui_customization.panel_title', [], 'Element visibility'); ?></span></label>
 </div>

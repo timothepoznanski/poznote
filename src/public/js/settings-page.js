@@ -130,7 +130,8 @@
             'settings_pinned_cards',
             'spellcheck_html_notes',
             'slash_menu_trigger',
-            'slash_menu_trigger_mobile'
+            'slash_menu_trigger_mobile',
+            'format_toolbar_mode'
         ];
 
         if (document.getElementById('login-display-input')) {
@@ -637,6 +638,14 @@
         initInlineControl('slash-menu-trigger-mobile-select', {
             load: loadSettingValue('slash_menu_trigger_mobile', normalizeSlashMenuTrigger),
             save: saveSettingValue('slash_menu_trigger_mobile')
+        });
+
+        // Read by js/events-text-selection.js on a computer
+        initInlineControl('format-toolbar-mode-select', {
+            load: loadSettingValue('format_toolbar_mode', function (value) {
+                return value === 'floating' ? 'floating' : 'toolbar';
+            }),
+            save: saveSettingValue('format_toolbar_mode')
         });
 
         initInlineControl('tasklist-insert-order-select', {

@@ -652,7 +652,7 @@ html[data-theme='dark'] .nm-folder-option-selected {
 
     .nm-folder-header          { padding: 10px; }
 
-    .nm-note-row               { padding: 10px; }
+    .nm-note-row               { padding: 5px 10px; }
 
     .nm-bulk-bar               { align-items: stretch; }
 

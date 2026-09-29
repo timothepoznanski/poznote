@@ -547,7 +547,8 @@
       "highlight_current_folder_tree": "Notizen und Ordner außerhalb der Ordnerhierarchie, in der Sie arbeiten, so stark abschwächen, wie Sie möchten.",
       "snapshots": "Wählen Sie, wie viele automatische tägliche Schnappschüsse und wie viele Sicherheits-Schnappschüsse (vor einer KI- oder MCP-Änderung) pro Notiz aufbewahrt werden.",
       "stt": "Den Spracherkennungsserver konfigurieren, mit dem Notizen diktiert und Audioanhänge transkribiert werden.",
-      "sidebar_offline_marks": "Zeigt einen kleinen Punkt neben den Notizen, die in diesem Browser offline verfügbar sind."
+      "sidebar_offline_marks": "Zeigt einen kleinen Punkt neben den Notizen, die in diesem Browser offline verfügbar sind.",
+      "format_toolbar_mode": "Wählen Sie auf einem Computer, wo die Formatierungsschaltflächen erscheinen, wenn Sie Text in einer Notiz markieren: in der Notiz-Symbolleiste anstelle der Notizaktionen oder in einem schwebenden Menü über der Auswahl, das die Notiz-Symbolleiste unverändert lässt."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Auf Mobilgeräten hat die Leiste über der Tastatur eine +-Schaltfläche, die unabhängig von dieser Einstellung dasselbe Menü öffnet."
@@ -880,7 +881,8 @@
       "slash_menu_trigger_mobile": "Tastenkürzel für das Befehlsmenü (Mobilgerät)",
       "snapshots": "Schnappschüsse",
       "show_note_icons": "Notizsymbole anzeigen",
-      "sidebar_offline_marks": "Offline-Punkt anzeigen"
+      "sidebar_offline_marks": "Offline-Punkt anzeigen",
+      "format_toolbar_mode": "Formatierungsleiste"
     },
     "badges": {
       "font_size_default": "Standard ({{size}}px)",
@@ -895,7 +897,9 @@
       "note_font_size": "{{size}}px",
       "sidebar_font_size": "{{size}}px",
       "code_block_font_size": "{{size}}px",
-      "settings_font_size": "{{size}}px"
+      "settings_font_size": "{{size}}px",
+      "format_toolbar_mode_toolbar": "In der Notiz-Symbolleiste",
+      "format_toolbar_mode_floating": "Schwebend über der Auswahl"
     },
     "alerts": {
       "error_saving_preference": "Fehler beim Speichern der Einstellung"

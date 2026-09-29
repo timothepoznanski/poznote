@@ -853,6 +853,7 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
                 'emoji_icons_enabled' => getSetting('emoji_icons_enabled', '1'),
                 'slash_menu_trigger' => getSetting('slash_menu_trigger', 'slash'),
                 'slash_menu_trigger_mobile' => getSetting('slash_menu_trigger_mobile', 'slash'),
+                'format_toolbar_mode' => getSetting('format_toolbar_mode', 'toolbar'),
                 $currentWorkspaceOpacityKey => getSetting($currentWorkspaceOpacityKey, '25')
             ]
         ];
