@@ -377,11 +377,18 @@ function handleRichTextPaste(htmlData) {
     // Same for pictures the browser cannot fetch from here: an Office or
     // mail clipboard points them at the source machine, and the sanitizer
     // stores such a src happily, leaving a broken image in the note forever.
+    // The pictures that stay get the default border, as an uploaded or
+    // dropped image does (#1517), unless they already carry one.
     var droppedImages = 0;
+    var defaultImageBorder = !!(window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.defaultImageBorderNoPadding);
     doc.body.querySelectorAll('img').forEach(function (el) {
         if (!isLoadableImageSrc(el.getAttribute('src'))) {
             el.remove();
             droppedImages++;
+        } else if (defaultImageBorder &&
+            !el.classList.contains('img-with-border') &&
+            !el.classList.contains('img-with-border-no-padding')) {
+            el.classList.add('img-with-border-no-padding');
         }
     });
 
