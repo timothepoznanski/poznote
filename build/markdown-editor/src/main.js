@@ -57,6 +57,32 @@ const searchHighlightField = StateField.define({
   provide: field => EditorView.decorations.from(field)
 })
 
+// The '/' a right-click or the mobile Insert button puts in to open the slash
+// menu (js/slash-command.js) was not typed: it is hidden, taking no width, and
+// so is the filter typed right after it (inclusiveEnd grows the range), until
+// the menu closes and clears it.
+const setHiddenRangeEffect = StateEffect.define()
+const hiddenRangeDecoration = Decoration.replace({ inclusiveEnd: true })
+
+const hiddenRangeField = StateField.define({
+  create() {
+    return Decoration.none
+  },
+  update(value, transaction) {
+    value = value.map(transaction.changes)
+    for (const effect of transaction.effects) {
+      if (effect.is(setHiddenRangeEffect)) {
+        const range = effect.value
+        value = range && range.to > range.from
+          ? Decoration.set([hiddenRangeDecoration.range(range.from, range.to)])
+          : Decoration.none
+      }
+    }
+    return value
+  },
+  provide: field => EditorView.decorations.from(field)
+})
+
 // Table rows are padded with spaces so their pipes line up in the raw source (see
 // formatMarkdownTableBlockLines in markdown-lists-tables.js). That alignment is only
 // visible in a fixed-width font, so lines that look like table rows are tagged with
@@ -1229,6 +1255,17 @@ function setSearchMatches(host, matches, activeIndex) {
   return true
 }
 
+// from === to (or null) shows everything again
+function setHiddenRange(host, from, to) {
+  const instance = getInstance(host)
+  if (!instance) return false
+  const length = instance.view.state.doc.length
+  const start = Math.max(0, Math.min(Number(from) || 0, length))
+  const end = Math.max(start, Math.min(Number(to) || 0, length))
+  instance.view.dispatch({ effects: setHiddenRangeEffect.of({ from: start, to: end }) })
+  return true
+}
+
 function clearSearch(host) {
   const instance = getInstance(host)
   if (!instance) return false
@@ -1329,6 +1366,7 @@ function createEditor(host, options = {}) {
       }),
       highlightSelectionMatches(),
       searchHighlightField,
+      hiddenRangeField,
       excalidrawPlaceholderField,
       placeholder(placeholderText),
       EditorView.lineWrapping,
@@ -1444,6 +1482,7 @@ window.PoznoteMarkdownCodeMirror = {
   findMatches,
   setSearchMatches,
   clearSearch,
+  setHiddenRange,
   isCodeMirrorEditor(host) {
     return !!getInstance(host)
   }

@@ -35,6 +35,18 @@
     transition: opacity 0.12s ease, transform 0.12s ease;
 }
 
+/* The '/' a right-click or the mobile Insert button puts in a rich text note
+   to open the menu was not typed: no room taken, with the filter typed after
+   it (js/slash-command.js releaseHiddenButtonSlash) */
+/* Width, not font-size: css/notes/noteentry.css forces the note font size on
+   every element with !important */
+.noteentry .slash-button-hidden {
+    display: inline-block;
+    width: 0;
+    overflow: hidden;
+    vertical-align: top;
+}
+
 .slash-command-menu.show {
     opacity: 1;
     transform: translateY(0);

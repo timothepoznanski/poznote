@@ -4086,6 +4086,7 @@
         slashOffset = -1;
         filterText = '';
         selectionSlashContext = null;
+        syncHiddenButtonSlash();
         slashInsertedByButton = false;
         slashMenuAnchorRect = null;
         resetCodeMirrorSlashState();
@@ -4380,6 +4381,63 @@
         sel.addRange(outside);
     }
 
+    // A '/' put in by a right-click or the Insert button was not typed: it
+    // takes no room in the note while the menu is open, nor does the filter
+    // typed after it. In a rich text note it sits in a span.slash-button-hidden
+    // (css/slash-commands.css), let go of before a command inserts anything
+    // (releaseHiddenButtonSlash); in CodeMirror the bridge hides the range
+    // (setHiddenRange, which grows with the typed filter). Every command still
+    // finds and removes the '/' as before.
+    const HIDDEN_SLASH_CLASS = 'slash-button-hidden';
+    let hiddenSlashCodeMirrorEditor = null;
+
+    function setCodeMirrorHiddenSlash(editor, from, to) {
+        const api = getMarkdownCodeMirrorApi();
+        if (!editor || !api || typeof api.setHiddenRange !== 'function') return;
+        // Not during an update of the editor (the filter follows its input)
+        queueMicrotask(() => api.setHiddenRange(editor, from, to));
+    }
+
+    function syncHiddenButtonSlash() {
+        if (slashInsertedByButton && slashMenuElement && codeMirrorSlashEditor && codeMirrorSlashFrom >= 0) {
+            if (hiddenSlashCodeMirrorEditor === codeMirrorSlashEditor) return;
+            hiddenSlashCodeMirrorEditor = codeMirrorSlashEditor;
+            setCodeMirrorHiddenSlash(codeMirrorSlashEditor, codeMirrorSlashFrom, codeMirrorSlashFrom + 1 + filterText.length);
+            return;
+        }
+        if (hiddenSlashCodeMirrorEditor) {
+            setCodeMirrorHiddenSlash(hiddenSlashCodeMirrorEditor, 0, 0);
+            hiddenSlashCodeMirrorEditor = null;
+        }
+        if (!slashMenuElement) releaseHiddenButtonSlash();
+    }
+
+    // The '/' of a rich text note leaves its hidden span, keeping its text node
+    // (slashTextNode stays valid) and the caret
+    function releaseHiddenButtonSlash() {
+        document.querySelectorAll('.noteentry span.' + HIDDEN_SLASH_CLASS).forEach(span => {
+            const parent = span.parentNode;
+            if (!parent) return;
+            const sel = window.getSelection();
+            let caret = null;
+            if (sel && sel.rangeCount) {
+                const range = sel.getRangeAt(0);
+                if (range.collapsed && range.startContainer.nodeType === 3 && span.contains(range.startContainer)) {
+                    caret = { node: range.startContainer, offset: range.startOffset };
+                }
+            }
+            while (span.firstChild) parent.insertBefore(span.firstChild, span);
+            span.remove();
+            if (caret && caret.node.parentNode) {
+                const range = document.createRange();
+                range.setStart(caret.node, Math.min(caret.offset, caret.node.length));
+                range.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+        });
+    }
+
     // Takes back the '/' a right-click or the Insert button of the mobile bar
     // put in when the menu closes without running a command (Cancel, Escape,
     // click outside): nobody typed it.
@@ -4389,6 +4447,8 @@
     function removeButtonSlash(restoreCaret) {
         if (!slashInsertedByButton) return;
         slashInsertedByButton = false;
+        syncHiddenButtonSlash();
+        releaseHiddenButtonSlash();
         const typed = '/' + filterText;
 
         const api = getMarkdownCodeMirrorApi();
@@ -4431,6 +4491,8 @@
     }
 
     function deleteSlashText() {
+        // What the command inserts must not land in the hidden span
+        releaseHiddenButtonSlash();
         try {
             const api = getMarkdownCodeMirrorApi();
             if (codeMirrorSlashEditor && api && typeof api.replaceRange === 'function') {
@@ -5383,8 +5445,11 @@
     // Opens the menu at the caret of `target` without a typed '/': the Alt + /
     // shortcut, a right-click and the mobile editor bar. Returns true when the
     // menu opened.
-    function openSlashMenuAtCaret(target) {
+    // options.hideSlash: the '/' takes no room while the menu is open (a
+    // right-click and the mobile Insert button, not Alt + /)
+    function openSlashMenuAtCaret(target, options) {
         if (!target) return false;
+        const hideSlash = !!(options && options.hideSlash);
 
         // Title inputs and task inputs
         if (target.tagName === 'INPUT'
@@ -5432,7 +5497,14 @@
         const range = sel.getRangeAt(0);
         range.deleteContents();
         const slashNode = document.createTextNode('/');
-        range.insertNode(slashNode);
+        if (hideSlash) {
+            const hiddenSpan = document.createElement('span');
+            hiddenSpan.className = HIDDEN_SLASH_CLASS;
+            hiddenSpan.appendChild(slashNode);
+            range.insertNode(hiddenSpan);
+        } else {
+            range.insertNode(slashNode);
+        }
         range.setStart(slashNode, 1);
         range.collapse(true);
         sel.removeAllRanges();
@@ -5488,6 +5560,7 @@
             // The '/' was not typed, so it is taken back when the menu closes
             // without running a command
             slashInsertedByButton = !!slashMenuElement;
+            syncHiddenButtonSlash();
             e.preventDefault();
 
             // Paste leads the menu here, where the browser menu used to offer
@@ -5522,7 +5595,7 @@
             if (typeof position !== 'number') return false;
 
             api.setSelection(codeMirrorEditor, position, position);
-            return openSlashMenuAtCaret(codeMirrorEditor);
+            return openSlashMenuAtCaret(codeMirrorEditor, { hideSlash: true });
         }
 
         // The body of a note only: the title and task inputs keep the browser
@@ -5532,7 +5605,7 @@
         if (!noteEntry || noteEntry.getAttribute('data-note-type') === 'tasklist') return false;
         if (!placeCaretAtPoint(editable, e.clientX, e.clientY)) return false;
 
-        return openSlashMenuAtCaret(editable);
+        return openSlashMenuAtCaret(editable, { hideSlash: true });
     }
 
     // Moves the caret to viewport coordinates inside `editable`, so the menu
@@ -6311,8 +6384,9 @@
     window.openSlashMenuAtCaret = function (target) {
         if (slashMenuElement) return false;
         if (showSlashMenuForSelection(target)) return true;
-        if (!openSlashMenuAtCaret(target)) return false;
+        if (!openSlashMenuAtCaret(target, { hideSlash: true })) return false;
         slashInsertedByButton = !!slashMenuElement;
+        syncHiddenButtonSlash();
         return true;
     };
 
