@@ -17,7 +17,13 @@
     width: max-content;
     min-width: 280px;
     max-width: 360px;
-    overflow: visible;
+    /* Never taller than the window: the rest scrolls (the submenus are
+       separate elements, nothing is clipped). 30px = the 8px positionMenuAtRect()
+       (js/slash-command.js) keeps free above and below, plus the 6px padding
+       and 1px border max-height does not count. */
+    max-height: calc(100vh - 30px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
     background: var(--pz-bg);
     border: 1px solid var(--pz-border);
     border-radius: var(--pz-radius-lg);

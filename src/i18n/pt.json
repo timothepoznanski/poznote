@@ -547,7 +547,8 @@
       "highlight_current_folder_tree": "Esbater, tanto quanto quiser, as notas e pastas que estão fora da hierarquia de pastas em que está a trabalhar.",
       "snapshots": "Escolha quantos instantâneos automáticos diários e quantos instantâneos de segurança (antes de uma edição por IA ou MCP) são guardados por nota.",
       "stt": "Configure o servidor de reconhecimento de voz usado para ditar notas e transcrever anexos de áudio.",
-      "sidebar_offline_marks": "Mostra um pequeno ponto ao lado das notas disponíveis offline neste navegador."
+      "sidebar_offline_marks": "Mostra um pequeno ponto ao lado das notas disponíveis offline neste navegador.",
+      "format_toolbar_mode": "Num computador, escolha onde aparecem os botões de formatação quando seleciona texto numa nota: na barra de ferramentas da nota, no lugar das ações da nota, ou num menu flutuante acima da seleção, que deixa a barra de ferramentas da nota como está."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "No telemóvel, a barra de ferramentas acima do teclado tem um botão + que abre o mesmo menu, seja qual for esta definição."
@@ -880,7 +881,8 @@
       "slash_menu_trigger_mobile": "Atalho do menu de comandos (telemóvel)",
       "snapshots": "Instantâneos",
       "show_note_icons": "Mostrar ícones das notas",
-      "sidebar_offline_marks": "Mostrar o ponto offline"
+      "sidebar_offline_marks": "Mostrar o ponto offline",
+      "format_toolbar_mode": "Barra de formatação"
     },
     "badges": {
       "font_size_default": "padrão ({{size}}px)",
@@ -895,7 +897,9 @@
       "note_font_size": "{{size}}px",
       "sidebar_font_size": "{{size}}px",
       "code_block_font_size": "{{size}}px",
-      "settings_font_size": "{{size}}px"
+      "settings_font_size": "{{size}}px",
+      "format_toolbar_mode_toolbar": "Na barra de ferramentas da nota",
+      "format_toolbar_mode_floating": "Flutuante acima da seleção"
     },
     "alerts": {
       "error_saving_preference": "Erro ao salvar preferência"

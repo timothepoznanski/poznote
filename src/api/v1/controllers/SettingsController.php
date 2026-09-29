@@ -261,6 +261,14 @@ class SettingsController {
             return $normalized;
         }
 
+        if ($key === 'format_toolbar_mode') {
+            $normalized = trim((string) $value);
+            if (!in_array($normalized, ['toolbar', 'floating'], true)) {
+                throw new InvalidArgumentException('invalid format toolbar mode', 400);
+            }
+            return $normalized;
+        }
+
         if ($key === 'allow_executable_attachments') {
             return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
         }

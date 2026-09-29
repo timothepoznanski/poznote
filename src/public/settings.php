@@ -140,6 +140,7 @@ $settingsPageUserKeys = [
     'spellcheck_html_notes',
     'slash_menu_trigger',
     'slash_menu_trigger_mobile',
+    'format_toolbar_mode',
 ];
 
 foreach ($settingsPageUserKeys as $settingsPageKey) {
@@ -1031,6 +1032,23 @@ if ($canUseUserWebhooks) {
                             <option value="disabled"><?php echo t_h('common.disabled', [], 'Disabled'); ?></option>
                         </select>
                         <span class="settings-card-note"><?php echo t_h('settings.card_notes.slash_menu_trigger_mobile', [], 'On mobile, the toolbar above the keyboard has a + button that opens the same menu, whatever this is set to.'); ?></span>
+                    </div>
+                </div>
+
+                <!-- Formatting toolbar (format_toolbar_mode): where the formatting
+                     buttons show when text is selected in a note on a computer,
+                     in the note toolbar in place of the note actions ('toolbar')
+                     or in a menu floating above the selection ('floating'), read
+                     by js/events-text-selection.js. Mobile keeps its own bar. -->
+                <div class="home-card settings-inline-card settings-card-stacks" id="format-toolbar-mode-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.format_toolbar_mode', [], 'On a computer, choose where the formatting buttons show when you select text in a note: in the note toolbar, in place of the note actions, or in a menu floating above the selection, which leaves the note toolbar as it is.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon"><i class="lucide lucide-bold"></i></div>
+                    <div class="home-card-content">
+                        <label class="home-card-title" for="format-toolbar-mode-select"><?php echo t_h('display.cards.format_toolbar_mode', [], 'Formatting toolbar'); ?></label>
+                        <select id="format-toolbar-mode-select" class="settings-inline-control settings-inline-select" data-control="format-toolbar-mode-select">
+                            <option value="toolbar"><?php echo t_h('display.badges.format_toolbar_mode_toolbar', [], 'In the note toolbar'); ?></option>
+                            <option value="floating"><?php echo t_h('display.badges.format_toolbar_mode_floating', [], 'Floating above the selection'); ?></option>
+                        </select>
                     </div>
                 </div>
 

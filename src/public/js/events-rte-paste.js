@@ -54,6 +54,16 @@ function isTrustedEmbedSrc(src) {
 }
 
 /**
+ * Put pasted HTML in place of the selection through execCommand, which
+ * records the change on the browser's undo stack. Inserting with
+ * range.insertNode() instead left Ctrl+Z with nothing to undo.
+ * @param {string} html - The HTML to insert
+ */
+function insertPastedHtml(html) {
+    document.execCommand('insertHTML', false, html);
+}
+
+/**
  * Check if pasted content is iframe HTML (YouTube, Bilibili)
  * @param {string} plainText - The pasted plain text
  * @returns {boolean} True if iframe is allowed and inserted
@@ -79,30 +89,20 @@ function handleIframePaste(plainText) {
     var iframeElement = tempContainer.querySelector('iframe');
     if (!iframeElement) return false;
 
-    // Insert iframe at cursor
+    // Insert iframe at cursor, with spacing around it
     var selection = window.getSelection();
     if (selection.rangeCount === 0) return false;
 
-    var range = selection.getRangeAt(0);
-    range.deleteContents();
-
-    var fragment = document.createDocumentFragment();
-
-    // Add spacing around iframe
+    var container = document.createElement('div');
     var lineBefore = document.createElement('div');
     lineBefore.innerHTML = '<br>';
-    fragment.appendChild(lineBefore);
-    fragment.appendChild(iframeElement);
-
+    container.appendChild(lineBefore);
+    container.appendChild(iframeElement);
     var lineAfter = document.createElement('div');
     lineAfter.innerHTML = '<br>';
-    fragment.appendChild(lineAfter);
+    container.appendChild(lineAfter);
 
-    range.insertNode(fragment);
-    range.collapse(false);
-    selection.removeAllRanges();
-    selection.addRange(range);
-
+    insertPastedHtml(container.innerHTML);
     triggerNoteSave();
     return true;
 }
@@ -135,27 +135,9 @@ function handleCodePaste(htmlData, plainText) {
     var selection = window.getSelection();
     if (selection.rangeCount === 0) return false;
 
-    var range = selection.getRangeAt(0);
-    range.deleteContents();
-
-    // Split into lines and create monospace structure
-    var lines = (plainText || '').split('\n');
-    var fragment = document.createDocumentFragment();
-
-    lines.forEach(function (line, index) {
-        // Just use text nodes for "normal text" as requested by user
-        fragment.appendChild(document.createTextNode(line));
-
-        if (index < lines.length - 1) {
-            fragment.appendChild(document.createElement('br'));
-        }
-    });
-
-    range.insertNode(fragment);
-    range.collapse(false);
-    selection.removeAllRanges();
-    selection.addRange(range);
-
+    // Normal text, one line per line, as a plain text paste would give.
+    // insertText keeps the paste on the browser's undo stack.
+    document.execCommand('insertText', false, plainText || '');
     triggerNoteSave();
     return true;
 }
@@ -184,19 +166,8 @@ function handleUrlPaste(plainText, htmlData) {
     var selection = window.getSelection();
     if (selection.rangeCount === 0) return false;
 
-    var range = selection.getRangeAt(0);
-    range.deleteContents();
-    range.insertNode(link);
-
-    // Add space after link
-    var space = document.createTextNode(' ');
-    range.setStartAfter(link);
-    range.insertNode(space);
-    range.setStartAfter(space);
-    range.collapse(true);
-    selection.removeAllRanges();
-    selection.addRange(range);
-
+    // Space after the link, so typing on does not extend it
+    insertPastedHtml(link.outerHTML + '&nbsp;');
     triggerNoteSave();
     return true;
 }

@@ -546,7 +546,8 @@
       "highlight_current_folder_tree": "Estomper, autant que vous le souhaitez, les notes et les dossiers situés en dehors de la hiérarchie de dossiers dans laquelle vous travaillez.",
       "snapshots": "Choisissez combien de snapshots automatiques quotidiens et combien de snapshots de sécurité (avant une modification IA ou MCP) sont conservés par note.",
       "stt": "Configurer le serveur de reconnaissance vocale utilisé pour dicter des notes et transcrire les pièces jointes audio.",
-      "sidebar_offline_marks": "Affiche une petite pastille à côté des notes disponibles hors ligne dans ce navigateur."
+      "sidebar_offline_marks": "Affiche une petite pastille à côté des notes disponibles hors ligne dans ce navigateur.",
+      "format_toolbar_mode": "Sur ordinateur, choisissez où s'affichent les boutons de mise en forme quand vous sélectionnez du texte dans une note : dans la barre d'outils de la note, à la place des actions de la note, ou dans un menu flottant au-dessus de la sélection, qui laisse la barre d'outils de la note telle quelle."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Sur mobile, la barre d'outils au-dessus du clavier a un bouton + qui ouvre le même menu, quel que soit ce réglage."
@@ -880,7 +881,8 @@
       "slash_menu_trigger": "Raccourci du menu de commandes (ordinateur)",
       "slash_menu_trigger_mobile": "Raccourci du menu de commandes (mobile)",
       "snapshots": "Snapshots",
-      "sidebar_offline_marks": "Afficher le point hors ligne"
+      "sidebar_offline_marks": "Afficher le point hors ligne",
+      "format_toolbar_mode": "Barre de mise en forme"
     },
     "badges": {
       "font_size_default": "par défaut ({{size}}px)",
@@ -895,7 +897,9 @@
         "both": "Icônes de la barre d’outils + menu de commandes slash"
       },
       "slash_menu_alt_slash": "Alt + /",
-      "slash_menu_slash": "/"
+      "slash_menu_slash": "/",
+      "format_toolbar_mode_toolbar": "Dans la barre d'outils de la note",
+      "format_toolbar_mode_floating": "Flottante au-dessus de la sélection"
     },
     "alerts": {
       "error_saving_preference": "Erreur lors de l’enregistrement de la préférence"

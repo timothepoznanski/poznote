@@ -1521,7 +1521,7 @@
                         selection.removeAllRanges();
                         selection.addRange(range);
                     }
-                    const inserted = insertHTMLAtSelection(placeholderHtml);
+                    const inserted = insertImagePlaceholderAtSelection(placeholderHtml);
                     let placeholderImg = noteEntry.querySelector('[data-upload-placeholder-id="' + placeholderId + '"]');
 
                     if (!inserted) {
@@ -4190,6 +4190,8 @@
         items.forEach((el, idx) => {
             if (idx === selectedIndex) {
                 el.classList.add('selected');
+                // The menu scrolls in a short window
+                scrollMenuItemIntoView(slashMenuElement, el);
             } else {
                 el.classList.remove('selected');
             }
@@ -4210,7 +4212,7 @@
         });
     }
 
-    // The submenu scrolls once it is longer than the viewport allows, and
+    // A menu scrolls once it is longer than the viewport allows, and
     // scrollIntoView() on a fixed menu would scroll the page as well
     function scrollMenuItemIntoView(container, el) {
         if (!container || !el || container.scrollHeight <= container.clientHeight) return;

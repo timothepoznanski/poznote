@@ -455,6 +455,22 @@
 
         var modified = false;
 
+        // Caret on an empty line (the mobile editor bar, where the buttons
+        // show with no selection): start that list item there
+        if (startLine === endLine && lines[startLine].trim() === '' && listType !== 'task-remove') {
+            var emptyIndent = lines[startLine];
+            var itemMarker = listType === 'task' ? '- [ ] ' : '- ';
+            if (listType === 'ol') {
+                // Carry on the numbered list right above, 1. otherwise
+                var previous = startLine > 0 ? lines[startLine - 1].match(/^(\s*)(\d+)\.\s/) : null;
+                itemMarker = (previous && previous[1] === emptyIndent ? parseInt(previous[2], 10) + 1 : 1) + '. ';
+            }
+            var itemLine = emptyIndent + itemMarker;
+            replaceMarkdownRangeAndSelect(editor, blockStart, blockEnd, itemLine,
+                blockStart + itemLine.length, blockStart + itemLine.length);
+            return;
+        }
+
         if (listType === 'task' || listType === 'task-remove') {
             var taskLinePattern = /^(\s*[-*+]\s+)\[[ xX]\]/;
             var nonEmptyLines = [];
