@@ -899,6 +899,27 @@
         return null;
     }
 
+    // A task list saved from the modal (js/dashboard-note-modal.js): its
+    // card shows the new tasks, and it counts as modified today for the
+    // "modified since" filter
+    function applyNoteEdit(note, preview) {
+        note.text = preview.text;
+        note.tasks = preview.tasks;
+        note.image = preview.image;
+        var now = new Date();
+        note.updated = now.getFullYear() + '-' +
+            String(now.getMonth() + 1).padStart(2, '0') + '-' +
+            String(now.getDate()).padStart(2, '0');
+        note.updatedAt = Math.floor(now.getTime() / 1000);
+        // Server matches of the old content no longer hold
+        contentSearch.cache = {};
+        if (activeFilterTerm) {
+            var filterInput = document.getElementById('filterInput');
+            scheduleContentSearch(filterInput ? filterInput.value.trim() : activeFilterTerm, activeFilterTerm);
+        }
+        renderAll();
+    }
+
     // --- Pinning ---
     //
     // Pinned notes sort ahead of the rest inside their own folder. The server
@@ -2420,6 +2441,22 @@
 
             if (e.target.closest('.dash-show-more-btn')) {
                 showMoreCards();
+                return;
+            }
+
+            // A task list opens in the board's modal (js/dashboard-note-modal.js),
+            // any other note in index.php. A modified or middle click keeps
+            // the link's own behaviour (index.php, new tab).
+            var noteLink = e.target.closest('.dash-note-card .dash-card-link');
+            if (noteLink && !e.defaultPrevented && e.button === 0 &&
+                !e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey) {
+                var noteCard = noteLink.closest('.dash-note-card');
+                var modalNote = findNoteById(noteCard.getAttribute('data-note-id'));
+                var noteModal = window.poznoteDashboardNoteModal;
+                if (modalNote && noteModal && noteModal.canOpen(modalNote)) {
+                    e.preventDefault();
+                    noteModal.open(modalNote, { onSaved: function (preview) { applyNoteEdit(modalNote, preview); } });
+                }
                 return;
             }
 

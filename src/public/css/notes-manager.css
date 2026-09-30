@@ -680,13 +680,22 @@ html[data-theme='dark'] .nm-folder-option-selected {
 }
 
 /* Kept offline in this browser (js/offline-marks.js), right after the name:
-   the title link stops stretching to the date when a mark follows it */
+   the title link stops stretching to the date when a mark follows it. The
+   mark is a line box of the title's font, centred in the row like the title,
+   and the dot is centred on the lowercase letters in it: flex centring alone
+   put it on the line box, above them (about 2px with Segoe UI on Windows). */
 :is(.nm-note-title-wrap, .nm-folder-label) .offline-mark {
-    display: inline-block;
     flex: 0 0 auto;
+    margin-left: 6px;
+    font-size: 14px;
+    line-height: normal;
+}
+
+:is(.nm-note-title-wrap, .nm-folder-label) .offline-mark::before {
+    content: '';
+    display: inline-block;
     width: 5px;
     height: 5px;
-    margin-left: 6px;
     border-radius: var(--pz-radius-circle);
     background-color: var(--pz-accent);
     opacity: 0.7;

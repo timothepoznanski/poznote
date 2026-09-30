@@ -4114,6 +4114,13 @@
       "modified": "Last modified",
       "tags": "Tags",
       "reset": "Reset filters"
+    },
+    "note_modal": {
+      "open_editor": "Open in the editor",
+      "save_error": "Could not save this note.",
+      "load_error": "Could not load this note.",
+      "conflict": "This note was changed elsewhere. Your latest changes here were not saved: reload the page to see the current version.",
+      "empty_tasks": "No tasks yet."
     }
   },
   "graph": {

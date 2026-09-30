@@ -4489,6 +4489,13 @@
       "modified": "Última modificação",
       "tags": "Tags",
       "reset": "Redefinir filtros"
+    },
+    "note_modal": {
+      "open_editor": "Abrir no editor",
+      "save_error": "Não foi possível guardar esta nota.",
+      "load_error": "Não foi possível carregar esta nota.",
+      "conflict": "Esta nota foi alterada noutro local. As suas últimas alterações aqui não foram guardadas: recarregue a página para ver a versão atual.",
+      "empty_tasks": "Ainda não há tarefas."
     }
   },
   "graph": {

@@ -4593,6 +4593,13 @@
       "modified": "Dernière modification",
       "tags": "Tags",
       "reset": "Réinitialiser les filtres"
+    },
+    "note_modal": {
+      "open_editor": "Ouvrir dans l'éditeur",
+      "save_error": "Impossible d'enregistrer cette note.",
+      "load_error": "Impossible de charger cette note.",
+      "conflict": "Cette note a été modifiée ailleurs. Vos dernières modifications ici n'ont pas été enregistrées : rechargez la page pour voir la version actuelle.",
+      "empty_tasks": "Aucune tâche pour le moment."
     }
   },
   "graph": {
