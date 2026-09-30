@@ -2437,7 +2437,7 @@
       }
     },
     "buttons": {
-      "download_complete_backup": "Télécharger la sauvegarde complète (ZIP)",
+      "download_complete_backup": "Créer une sauvegarde complète (ZIP)",
       "download_structured_export": "Télécharger l'export structuré (ZIP)",
       "download_attachments_export": "Télécharger les pièces jointes (ZIP)"
     },

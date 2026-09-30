@@ -2037,7 +2037,7 @@
       }
     },
     "buttons": {
-      "download_complete_backup": "Скачать полную резервную копию (ZIP)",
+      "download_complete_backup": "Создать полную резервную копию (ZIP)",
       "download_structured_export": "Скачать структурированный экспорт (ZIP)",
       "download_attachments_export": "Скачать вложения (ZIP)"
     },

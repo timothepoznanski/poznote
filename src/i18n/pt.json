@@ -2432,7 +2432,7 @@
       }
     },
     "buttons": {
-      "download_complete_backup": "Baixar Backup Completo (ZIP)",
+      "download_complete_backup": "Criar Backup Completo (ZIP)",
       "download_structured_export": "Baixar Exportação Estruturada (ZIP)",
       "download_attachments_export": "Baixar anexos (ZIP)"
     },

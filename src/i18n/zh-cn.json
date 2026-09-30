@@ -2433,7 +2433,7 @@
       }
     },
     "buttons": {
-      "download_complete_backup": "下载完整备份 (ZIP)",
+      "download_complete_backup": "创建完整备份 (ZIP)",
       "download_structured_export": "下载结构化导出 (ZIP)",
       "download_attachments_export": "下载附件(ZIP)"
     },

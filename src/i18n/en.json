@@ -2037,7 +2037,7 @@
       }
     },
     "buttons": {
-      "download_complete_backup": "Download complete backup (ZIP)",
+      "download_complete_backup": "Create complete backup (ZIP)",
       "download_structured_export": "Download structured export (ZIP)",
       "download_attachments_export": "Download attachments (ZIP)"
     },
