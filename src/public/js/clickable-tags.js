@@ -93,6 +93,16 @@ function convertTagsToEditable(noteId) {
     const editableContainer = document.createElement('div');
     editableContainer.className = 'editable-tags-container';
 
+    // The tags scroll sideways on one line in their own strip, and the input
+    // sits after it, outside the strip, so "Add tag" stays in view however
+    // many tags the note has (#1519). On desktop a chevron on each side scrolls
+    // the strip once it overflows, disabled while that side has nothing hidden.
+    const tagsList = document.createElement('div');
+    tagsList.className = 'editable-tags-list';
+    editableContainer.appendChild(createTagsScrollButton(tagsList, -1));
+    editableContainer.appendChild(tagsList);
+    editableContainer.appendChild(createTagsScrollButton(tagsList, 1));
+
     // Add existing tags as clickable elements
     if (tagsValue) {
         const tags = tagsValue.split(/[,\s]+/).filter(tag => tag.trim() !== '');
@@ -172,6 +182,7 @@ function convertTagsToEditable(noteId) {
     // Add the editable container to the name_tags element
     nameTagsContainer.appendChild(editableContainer);
     nameTagsContainer.classList.add('showing-editable-tags');
+    wireTagsListScroll(tagsList);
     notesWithClickableTags.add(noteId);
 }
 
@@ -551,6 +562,7 @@ function applyTagSuggestion(container, inputEl, tag, noteId, dd) {
 
     if (!tagExistsInContainer(container, tag)) {
         addTagElement(container, tag, noteId);
+        revealLastTag(container);
     }
     // Tags are auto-saved directly via updateTagsInput, no need to mark as modified
     updateTagsInput(noteId, container);
@@ -633,9 +645,82 @@ function addTagElement(container, tagText, noteId) {
     tagWrapper.appendChild(tagElement);
     tagWrapper.appendChild(deleteButton);
 
-    // Insert before the input field
-    const inputField = container.querySelector('.tag-input');
-    container.insertBefore(tagWrapper, inputField);
+    container.querySelector('.editable-tags-list').appendChild(tagWrapper);
+}
+
+/**
+ * A chevron that scrolls the tag strip by most of its width. Mouse-only, like
+ * the wheel: the tags stay in the page for keyboard and screen reader users.
+ * @param {HTMLElement} list - The .editable-tags-list strip
+ * @param {number} direction - -1 scrolls back to the start, 1 towards the end
+ * @returns {HTMLElement} The chevron
+ */
+function createTagsScrollButton(list, direction) {
+    const button = document.createElement('span');
+    button.className = 'tags-scroll-btn ' + (direction < 0 ? 'tags-scroll-prev' : 'tags-scroll-next');
+    button.setAttribute('aria-hidden', 'true');
+    const icon = document.createElement('i');
+    icon.className = 'lucide ' + (direction < 0 ? 'lucide-chevron-left' : 'lucide-chevron-right');
+    button.appendChild(icon);
+    // Keep the caret in the tag input when it has it
+    button.addEventListener('mousedown', e => e.preventDefault());
+    button.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        list.scrollBy({ left: direction * Math.max(80, list.clientWidth * 0.8), behavior: 'smooth' });
+    });
+    return button;
+}
+
+/**
+ * Wire the sideways scrolling of a note's tag strip. It has no scrollbar, so
+ * a mouse wheel scrolls it too (trackpads and touch scroll it natively).
+ * @param {HTMLElement} list - The .editable-tags-list strip
+ */
+function wireTagsListScroll(list) {
+    list.addEventListener('scroll', () => updateTagsListFade(list), { passive: true });
+
+    list.addEventListener('wheel', function (e) {
+        // Pinch-zoom and sideways trackpad gestures keep their own behaviour.
+        if (e.ctrlKey || Math.abs(e.deltaX) >= Math.abs(e.deltaY)) return;
+        const max = list.scrollWidth - list.clientWidth;
+        if (max <= 0) return;
+        // At either end the wheel goes back to scrolling the page.
+        if ((e.deltaY < 0 && list.scrollLeft <= 0) || (e.deltaY > 0 && list.scrollLeft >= max - 1)) return;
+        e.preventDefault();
+        list.scrollLeft += e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+    }, { passive: false });
+
+    if (typeof ResizeObserver === 'function') {
+        new ResizeObserver(() => updateTagsListFade(list)).observe(list);
+    }
+    updateTagsListFade(list);
+}
+
+/**
+ * Mark on its container whether the tag strip overflows, and each side that has
+ * tags scrolled out of view: css/notes/tags.css shows the chevrons when it
+ * overflows, then fades each such edge and enables its chevron.
+ * @param {HTMLElement|null} list - The .editable-tags-list strip
+ */
+function updateTagsListFade(list) {
+    const container = list && list.parentElement;
+    if (!container) return;
+    const max = list.scrollWidth - list.clientWidth;
+    container.classList.toggle('has-overflow', max > 1);
+    container.classList.toggle('can-scroll-start', list.scrollLeft > 1);
+    container.classList.toggle('can-scroll-end', max > 1 && list.scrollLeft < max - 1);
+}
+
+/**
+ * Scroll the tag strip to its end, where a tag the user just added lands.
+ * @param {HTMLElement} container - The editable tags container
+ */
+function revealLastTag(container) {
+    const list = container && container.querySelector('.editable-tags-list');
+    if (!list) return;
+    list.scrollLeft = list.scrollWidth;
+    updateTagsListFade(list);
 }
 
 /**
@@ -647,6 +732,7 @@ function removeTagElement(tagWrapper, noteId) {
     const container = tagWrapper.closest('.editable-tags-container');
     tagWrapper.remove();
     updateTagsInput(noteId, container);
+    updateTagsListFade(container && container.querySelector('.editable-tags-list'));
 }
 
 /**
@@ -677,7 +763,8 @@ function closeNoteTagMenu() {
 
 /**
  * Right-click menu on a tag in a note: rename it in this note, pick its
- * color, or open the tags page.
+ * color, list all the note's tags (the dialog the tag icon opens, handy when
+ * some are scrolled out of the tag strip), or open the tags page.
  * @param {HTMLElement} tagElement - The right-clicked .clickable-tag
  * @param {number} x - Pointer position (viewport)
  * @param {number} y - Pointer position (viewport)
@@ -701,6 +788,9 @@ function openNoteTagMenu(tagElement, x, y) {
     const items = [
         canRename ? ['rename', 'lucide-pencil', window.t ? window.t('tags.action.rename', null, 'Rename') : 'Rename'] : null,
         ['color', 'lucide-palette', window.t ? window.t('tags.action.color', null, 'Color') : 'Color'],
+        noteId && typeof window.showNoteTagsModal === 'function'
+            ? ['note-tags', 'lucide-tag', window.t ? window.t('tags.manage_note_tags', null, 'Manage note tags') : 'Manage note tags']
+            : null,
         ['list', 'lucide-tags', window.t ? window.t('tags.list_all', null, 'List all tags') : 'List all tags']
     ];
     items.filter(Boolean).forEach(([action, icon, label]) => {
@@ -727,6 +817,7 @@ function openNoteTagMenu(tagElement, x, y) {
         const action = item.getAttribute('data-action');
         if (action === 'rename') renameTagFromMenu(tagElement, noteId);
         else if (action === 'color') colorTagFromMenu(tagName);
+        else if (action === 'note-tags') window.showNoteTagsModal(noteId);
         else if (action === 'list') openTagsListPage();
     });
 
@@ -772,7 +863,7 @@ function renameTagFromMenu(tagElement, noteId) {
         } else {
             addTagElement(container, newName, noteId);
             const added = container.querySelectorAll('.clickable-tag-wrapper');
-            container.insertBefore(added[added.length - 1], wrapper);
+            wrapper.before(added[added.length - 1]);
             wrapper.remove();
         }
         updateTagsInput(noteId, container);
@@ -873,6 +964,7 @@ function handleTagInput(e, noteId, container) {
             });
 
             input.value = '';
+            revealLastTag(container);
             updateTagsInput(noteId, container);
 
             // Keep focus on input to continue typing
@@ -919,6 +1011,7 @@ function handleTagInputBlur(e, noteId, container) {
         });
 
         input.value = '';
+        revealLastTag(container);
         updateTagsInput(noteId, container);
     }
 }
