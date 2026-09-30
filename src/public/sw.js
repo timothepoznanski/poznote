@@ -7,8 +7,10 @@
  * the network exactly as without a service worker.
  *
  *  1. Static assets (js, css, images, fonts, and the concatenated bundles
- *     index_css.php / index_js.php / dark_mode_css.php): network first, the
- *     cached copy when the network fails.
+ *     index_css.php / index_js.php / dark_mode_css.php). A versioned one
+ *     (?v=, served immutable for a year) comes from the cache once stored:
+ *     that exact URL never changes. The others go network first, the cached
+ *     copy when the network fails.
  *  2. Page navigations: always the network. When the server cannot be reached
  *     (no connection, or a reverse proxy answering 502/503/504), the offline
  *     page (offline.php, stored by js/offline-sync.js) is served in its place:
@@ -107,21 +109,40 @@ async function cachedAsset(cache, request) {
     || await caches.match(request, { cacheName: SHELL_CACHE });
 }
 
-async function handleStaticAsset(request, requestUrl) {
+async function handleStaticAsset(event, request, requestUrl) {
   const cache = await caches.open(STATIC_CACHE);
-  if (Date.now() - serverSilentAt < SILENT_SERVER_MEMORY_MS) {
+  // A versioned URL is immutable (the server says so for a year), so the
+  // stored copy is the file itself. Asking the network first put every
+  // script and stylesheet of a page through a fetch, a scan of the whole
+  // cache and a disk write on each view switch: close to a second on a
+  // phone whose memory cache had been dropped.
+  // A request told to skip the caches (DevTools' "Disable cache") still
+  // reaches the network, as it would without a worker.
+  const versioned = requestUrl.searchParams.has('v')
+    && (request.cache === 'default' || request.cache === 'force-cache');
+  if (versioned || Date.now() - serverSilentAt < SILENT_SERVER_MEMORY_MS) {
     const cachedResponse = await cachedAsset(cache, request);
     if (cachedResponse) {
       return cachedResponse;
     }
   }
-  const network = fetch(request).then(async (networkResponse) => {
+  const network = fetch(request).then((networkResponse) => {
     if (networkResponse.ok) {
-      // Assets are versioned with a ?v= query string, so each release stores
-      // a brand-new entry. Drop the other versions of the same path first,
-      // otherwise the cache keeps every build ever fetched.
-      await dropOtherVersions(cache, requestUrl);
-      cache.put(request, networkResponse.clone());
+      // Each release stores a brand-new entry: drop the other versions of
+      // the same path, otherwise the cache keeps every build ever fetched.
+      // Off the response's path, which it would only slow down.
+      const copy = networkResponse.clone();
+      const store = (async () => {
+        if (versioned) {
+          await dropOtherVersions(cache, requestUrl);
+        }
+        await cache.put(request, copy);
+      })().catch(() => {});
+      try {
+        event.waitUntil(store);
+      } catch (e) {
+        // The stored copy answered first (silent server): the event is over.
+      }
     }
     return networkResponse;
   });
@@ -328,6 +349,6 @@ self.addEventListener('fetch', (event) => {
   }
 
   if (request.method === 'GET' && STATIC_ASSET_PATTERN.test(requestUrl.pathname)) {
-    event.respondWith(handleStaticAsset(request, requestUrl));
+    event.respondWith(handleStaticAsset(event, request, requestUrl));
   }
 });
