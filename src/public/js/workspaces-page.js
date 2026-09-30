@@ -228,20 +228,33 @@ function updateBackToNotesLinks(workspaceName) {
 
 // ========== DEFAULT WORKSPACE SETTINGS ==========
 // Manage default workspace selection
+var DEFAULT_WORKSPACE_SPECIAL_VALUES = ['__last_opened__', '__last_opened_device__'];
+
+function defaultWorkspaceOptionLabel(value) {
+    if (value === '__last_opened__') {
+        return document.body.getAttribute('data-txt-last-opened') || 'Last workspace opened (all devices)';
+    }
+    if (value === '__last_opened_device__') {
+        return document.body.getAttribute('data-txt-last-opened-device') || 'Last workspace opened on this device';
+    }
+    return value;
+}
+
 function loadDefaultWorkspaceSetting() {
     var select = document.getElementById('defaultWorkspaceSelect');
     if (!select) return;
 
-    var lastOpenedLabel = document.body.getAttribute('data-txt-last-opened') || 'Last workspace opened';
-
     // Populate select with workspaces from data attribute
     select.innerHTML = '';
 
-    // Add special option for last workspace opened
-    var optLast = document.createElement('option');
-    optLast.value = '__last_opened__';
-    optLast.textContent = lastOpenedLabel;
-    select.appendChild(optLast);
+    // Special options: the last workspace opened on any device, or on this
+    // one (a cookie per browser, lib/workspaces.php, discussion #1526)
+    DEFAULT_WORKSPACE_SPECIAL_VALUES.forEach(function (value) {
+        var opt = document.createElement('option');
+        opt.value = value;
+        opt.textContent = defaultWorkspaceOptionLabel(value);
+        select.appendChild(opt);
+    });
 
     var workspacesList = [];
     try {
@@ -282,7 +295,6 @@ function saveDefaultWorkspaceSetting() {
     var status = document.getElementById('defaultWorkspaceStatus');
     if (!select) return;
 
-    var lastOpenedLabel = document.body.getAttribute('data-txt-last-opened') || 'Last workspace opened';
     var selectedWorkspace = select.value;
 
     fetch('/api/v1/settings/default_workspace', {
@@ -295,9 +307,7 @@ function saveDefaultWorkspaceSetting() {
         .then(function (result) {
             if (result && result.success) {
                 if (status) {
-                    var displayText = selectedWorkspace === '__last_opened__'
-                        ? lastOpenedLabel
-                        : selectedWorkspace;
+                    var displayText = defaultWorkspaceOptionLabel(selectedWorkspace);
                     status.textContent = wsTr('workspaces.default.status_set_to', { workspace: displayText }, '✓ Default workspace set to: {{workspace}}');
                     status.style.display = 'block';
                     setTimeout(function () {

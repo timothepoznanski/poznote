@@ -719,7 +719,8 @@
       "title": "启动工作区",
       "description_1": "选择启动 Poznote 时打开的工作区。",
       "description_2": "选择 \"{{last}}\" 以始终打开您上次使用的工作区。",
-      "last_opened": "上次打开的工作区",
+      "last_opened": "上次打开的工作区（所有设备）",
+      "last_opened_device": "在此设备上上次打开的工作区",
       "save_button": "保存",
       "status_set_to": "✓ 启动工作区已设置为: {{workspace}}",
       "error_saving": "保存启动工作区出错"

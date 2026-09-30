@@ -455,7 +455,8 @@
     },
     "default": {
       "description_1": "Choose which workspace opens when you start Poznote.",
-      "last_opened": "Last workspace opened",
+      "last_opened": "Last workspace opened (all devices)",
+      "last_opened_device": "Last workspace opened on this device",
       "save_button": "Save Default",
       "title": "Default Workspace"
     },

@@ -720,7 +720,8 @@
       "title": "Startup-Arbeitsbereich",
       "description_1": "Wählen Sie aus, welcher Arbeitsbereich beim Starten von Poznote geöffnet wird.",
       "description_2": "Wählen Sie \"{{last}}\" aus, um immer den Arbeitsbereich zu öffnen, in dem Sie zuletzt gearbeitet haben.",
-      "last_opened": "Zuletzt geöffneter Arbeitsbereich",
+      "last_opened": "Zuletzt geöffneter Arbeitsbereich (alle Geräte)",
+      "last_opened_device": "Zuletzt geöffneter Arbeitsbereich auf diesem Gerät",
       "save_button": "Speichern",
       "status_set_to": "✓ Startup-Arbeitsbereich gesetzt auf: {{workspace}}",
       "error_saving": "Fehler beim Speichern des Startup-Arbeitsbereichs"

@@ -720,7 +720,8 @@
       "title": "Espaço de Trabalho Inicial",
       "description_1": "Escolha qual espaço de trabalho abrir ao iniciar o Poznote.",
       "description_2": "Selecione \"{{last}}\" para sempre abrir o espaço de trabalho que você estava usando anteriormente.",
-      "last_opened": "Último espaço de trabalho aberto",
+      "last_opened": "Último espaço de trabalho aberto (todos os dispositivos)",
+      "last_opened_device": "Último espaço de trabalho aberto neste dispositivo",
       "save_button": "Salvar",
       "status_set_to": "✓ Espaço de trabalho inicial definido para: {{workspace}}",
       "error_saving": "Erro ao salvar espaço de trabalho inicial"
