@@ -1516,7 +1516,7 @@
       "prompt_prefix": "Déplacer tous les fichiers depuis",
       "prompt_suffix": "vers :",
       "select_target": "Sélectionner le dossier cible...",
-      "hint_move_single": "Pour déplacer une seule note vers un autre espace de travail, utilisez le bouton \"Déplacer la note\" dans la barre d’outils",
+      "target_folder": "Dossier cible",
       "hint_move_all": "Pour déplacer toutes les notes d’un espace de travail à un autre, allez dans Paramètres → Espaces de travail",
       "move_all": "Déplacer tous les fichiers"
     },

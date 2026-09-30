@@ -1511,7 +1511,7 @@
       "prompt_prefix": "Alle Dateien verschieben von",
       "prompt_suffix": "zu:",
       "select_target": "Zielordner auswählen...",
-      "hint_move_single": "Um eine einzelne Notiz in einen anderen Arbeitsbereich zu verschieben, verwenden Sie die Schaltfläche \"Notiz verschieben\" in der Symbolleiste",
+      "target_folder": "Zielordner",
       "hint_move_all": "Um alle Notizen von einem Arbeitsbereich in einen anderen zu verschieben, gehen Sie zu Einstellungen → Arbeitsbereiche",
       "move_all": "Alle Dateien verschieben"
     },

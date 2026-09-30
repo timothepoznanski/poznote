@@ -1509,7 +1509,7 @@
       "prompt_prefix": "移动所有文件，从",
       "prompt_suffix": "至:",
       "select_target": "选择目标文件夹...",
-      "hint_move_single": "要将单篇笔记移动到另一个工作区，请使用工具栏中的“移动笔记”按钮",
+      "target_folder": "目标文件夹",
       "hint_move_all": "要将一个工作区的所有笔记移动到另一个工作区，请前往 设置 → 工作区",
       "move_all": "移动所有文件"
     },

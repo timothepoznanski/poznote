@@ -3126,10 +3126,13 @@ paths:
                   description: Source folder ID
                 target_folder_id:
                   type: integer
-                  description: Target folder ID (0 moves notes to root)
+                  description: Target folder ID (0 moves notes to the root of the target workspace)
                 workspace:
                   type: string
-                  description: Workspace context
+                  description: Workspace of the source folder
+                target_workspace:
+                  type: string
+                  description: Workspace to move the notes to (defaults to workspace); the target folder must belong to it
       responses:
         '200':
           description: Files moved

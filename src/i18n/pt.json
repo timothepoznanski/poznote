@@ -1511,7 +1511,7 @@
       "prompt_prefix": "Mover todos os arquivos de",
       "prompt_suffix": "para:",
       "select_target": "Selecionar pasta de destino...",
-      "hint_move_single": "Para mover uma única nota para outro espaço de trabalho, use o botão \"Mover nota\" na barra de ferramentas",
+      "target_folder": "Pasta de destino",
       "hint_move_all": "Para mover todas as notas de um espaço de trabalho para outro, vá para Configurações → Espaços de trabalho",
       "move_all": "Mover Todos os Arquivos"
     },

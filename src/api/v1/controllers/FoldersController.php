@@ -2154,9 +2154,17 @@ class FoldersController {
         $sourceFolderId = isset($data['source_folder_id']) ? (int)$data['source_folder_id'] : null;
         $targetFolderId = isset($data['target_folder_id']) ? (int)$data['target_folder_id'] : null;
         $workspace = isset($data['workspace']) ? trim((string)$data['workspace']) : '';
+        $targetWorkspace = isset($data['target_workspace']) ? trim((string)$data['target_workspace']) : '';
         
         if (empty($workspace)) {
             $workspace = $this->getFirstWorkspaceName();
+        }
+        if ($targetWorkspace === '') {
+            $targetWorkspace = $workspace;
+        }
+        if (!$this->validateWorkspace($targetWorkspace)) {
+            $this->sendError('Target workspace not found', 404);
+            return;
         }
         
         if ($sourceFolderId === null || $sourceFolderId === 0) {
@@ -2193,7 +2201,7 @@ class FoldersController {
                 $this->sendError('Target folder not found', 404);
                 return;
             }
-            if ($targetFolderData['workspace'] !== $workspace) {
+            if ($targetFolderData['workspace'] !== $targetWorkspace) {
                 $this->sendError('Target folder belongs to a different workspace', 400);
                 return;
             }
@@ -2217,21 +2225,21 @@ class FoldersController {
             return;
         }
         
-        // Move notes
+        // Move notes. "No folder" in another workspace is that workspace's root.
         $movedCount = 0;
         if ($targetFolderId === 0) {
-            $updateStmt = $this->db->prepare("UPDATE entries SET folder_id = NULL, folder = NULL, updated = CURRENT_TIMESTAMP WHERE id = ?");
+            $updateStmt = $this->db->prepare("UPDATE entries SET folder_id = NULL, folder = NULL, workspace = ?, updated = CURRENT_TIMESTAMP WHERE id = ?");
         } else {
-            $updateStmt = $this->db->prepare("UPDATE entries SET folder_id = ?, folder = ?, updated = CURRENT_TIMESTAMP WHERE id = ?");
+            $updateStmt = $this->db->prepare("UPDATE entries SET folder_id = ?, folder = ?, workspace = ?, updated = CURRENT_TIMESTAMP WHERE id = ?");
         }
         
         foreach ($notes as $note) {
             if ($targetFolderId === 0) {
-                if ($updateStmt->execute([$note['id']])) {
+                if ($updateStmt->execute([$targetWorkspace, $note['id']])) {
                     $movedCount++;
                 }
             } else {
-                if ($updateStmt->execute([$targetFolderId, $targetFolderName, $note['id']])) {
+                if ($updateStmt->execute([$targetFolderId, $targetFolderName, $targetWorkspace, $note['id']])) {
                     $movedCount++;
                 }
             }
@@ -2256,7 +2264,8 @@ class FoldersController {
             'success' => true,
             'message' => "Moved $movedCount files successfully",
             'moved_count' => $movedCount,
-            'share_delta' => $shareDelta
+            'share_delta' => $shareDelta,
+            'target_workspace' => $targetWorkspace
         ]);
     }
 

@@ -1511,7 +1511,7 @@
       "prompt_prefix": "Mover todos los archivos de",
       "prompt_suffix": "a:",
       "select_target": "Seleccionar carpeta de destino...",
-      "hint_move_single": "Para mover una sola nota a otro espacio de trabajo, usa el botón \"Mover nota\" en la barra de herramientas",
+      "target_folder": "Carpeta de destino",
       "hint_move_all": "Para mover todas las notas de un espacio de trabajo a otro, ve a Configuración → Espacios de trabajo",
       "move_all": "Mover todos los archivos"
     },

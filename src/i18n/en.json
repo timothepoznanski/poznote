@@ -1012,7 +1012,7 @@
       "prompt_prefix": "Move all files from",
       "prompt_suffix": "to:",
       "select_target": "Select target folder...",
-      "hint_move_single": "To move a single note to another workspace, use the \"Move note\" button in the toolbar",
+      "target_folder": "Target Folder",
       "hint_move_all": "To move all notes from one workspace to another, go to Settings -> Workspaces",
       "move_all": "Move All Files"
     },
