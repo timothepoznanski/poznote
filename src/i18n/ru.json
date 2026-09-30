@@ -77,7 +77,8 @@
     "notes": "Заметки",
     "saved": "сохранено",
     "unknown_error": "Неизвестная ошибка",
-    "none": "Нет"
+    "none": "Нет",
+    "show_more_notes": "Показать ещё (осталось {{count}})"
   },
   "snapshot": {
     "menu_item": "Снимки",

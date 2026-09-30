@@ -56,3 +56,8 @@ test('plain prose passes through untouched', function () {
     $prose = "# Zebrafish\n\nThe *zebrafish* is a **model** organism.";
     assertSame($prose, poznoteMarkdownVisibleText($prose));
 });
+
+test('folding lowercases and drops accents, ligatures included', function () {
+    assertSame('reparer le velo a zanzibar', poznoteFoldAccents('Réparer le VÉLO à Zanzibar'));
+    assertSame('coeur ecole', poznoteFoldAccents('Cœur ÉCOLE'));
+});

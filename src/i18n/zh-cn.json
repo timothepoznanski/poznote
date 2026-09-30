@@ -94,7 +94,8 @@
       "yesterday": "昨天"
     },
     "network_error": "网络错误",
-    "none": "无"
+    "none": "无",
+    "show_more_notes": "显示更多（还剩 {{count}} 条）"
   },
   "snapshot": {
     "menu_item": "快照",

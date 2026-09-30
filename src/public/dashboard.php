@@ -63,7 +63,10 @@ function dashboardBuildNoteData(array $note, string $pageWorkspace): array {
         'tasks'     => $preview['tasks'],
         'image'     => $preview['image'] ?? null,
         'tags'      => $tags,
-        'search'    => trim($heading . ' ' . implode(' ', $tags) . ' ' . ($preview['search'] ?? '')),
+        // No full-text 'search' field: the board filters on the title, tags
+        // and excerpt it carries and asks GET /api/v1/notes/search/ids for
+        // the rest of the content (js/dashboard-page.js). Embedding every
+        // note's text made the page weigh megabytes on a large workspace.
         'updated'   => convertUtcToUserTimezone((string)($note['updated'] ?? ''), 'Y-m-d'),
         // Unix time of the last change, for the "modified since" filter
         'updatedAt' => (int)(strtotime((string)($note['updated'] ?? '') . ' UTC') ?: 0),
@@ -894,6 +897,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 		window.DASHBOARD_REORDER_TXT = {
 			error: <?php echo json_encode(t('dashboard.reorder_error', [], 'Could not save the card order.')); ?>
 		};
+		window.DASHBOARD_SHOW_MORE_TXT = <?php echo json_encode(t('common.show_more_notes', ['count' => '{count}'], 'Show more ({count} remaining)')); ?>;
 		window.DASHBOARD_SCOPE_TXT = {
 			all: <?php echo json_encode(t('dashboard.scope.all', [], 'All workspaces')); ?>,
 			byTag: <?php echo json_encode(t('dashboard.scope.by_tag', [], 'By tag')); ?>,

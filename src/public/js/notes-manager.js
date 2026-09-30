@@ -30,6 +30,7 @@
         txtMoving:      body.getAttribute('data-txt-moving') || 'Moving...',
         txtMoved:       body.getAttribute('data-txt-moved') || 'Moved successfully',
         txtRoot:        body.getAttribute('data-txt-root') || 'Root (no folder)',
+        txtShowMore:    body.getAttribute('data-txt-show-more') || 'Show more ({count} remaining)',
         ageLabels:      (function() { try { return JSON.parse(body.getAttribute('data-txt-age-labels') || '{}'); } catch(e) { return {}; } })(),
         ageCustom:      body.getAttribute('data-txt-age-custom') || 'Last {days} days',
     };
@@ -45,6 +46,13 @@
     var noteAgeFilterDays = 0; // loaded from settings
     var movingToFolderId = null; // null = root; number = folder id
     var currentTagAction = '';
+
+    // Rows drawn at a time. Drawing thousands of rows in one go took seconds;
+    // the next batch follows when the "Show more" button under the list comes
+    // into view, or is clicked. Filters, counts and selections still work on
+    // every note (filteredNotes), drawn or not.
+    var ROW_BATCH_SIZE = 200;
+    var renderQueue = null; // {groups, groupIndex, noteIndex, notesList, remaining, folderById}
 
     // ── DOM refs ─────────────────────────────────────────────────────────────
     var nmSpinner        = document.getElementById('nmSpinner');
@@ -70,6 +78,8 @@
     var nmTagInput       = document.getElementById('nmTagInput');
     var nmConfirmTag     = document.getElementById('nmConfirmTag');
     var nmCancelTag      = document.getElementById('nmCancelTag');
+    var nmShowMore       = document.getElementById('nmShowMore');
+    var nmShowMoreBtn    = document.getElementById('nmShowMoreBtn');
 
     // ── Helpers ───────────────────────────────────────────────────────────────
     function apiUrl(path) {
@@ -325,9 +335,11 @@
     // ── Render notes grouped by folder ───────────────────────────────────────
     function renderNotes() {
         nmContainer.innerHTML = '';
+        renderQueue = null;
 
         if (filteredNotes.length === 0) {
             show(nmEmptyMessage);
+            updateShowMore();
             return;
         }
         hide(nmEmptyMessage);
@@ -354,98 +366,149 @@
         });
         if (groups['__none__']) groupKeys.push('__none__');
 
+        renderQueue = {
+            groups: groupKeys.map(function (key) { return { key: key, notes: groups[key] }; }),
+            groupIndex: 0,
+            noteIndex: 0,
+            notesList: null,
+            remaining: filteredNotes.length,
+            folderById: folderById
+        };
+        renderMoreRows(ROW_BATCH_SIZE);
+    }
+
+    // Draw the next rows of the queue, opening a folder section wherever a
+    // group starts. A group cut by the batch goes on in the same section.
+    function renderMoreRows(count) {
+        var queue = renderQueue;
+        if (!queue) return;
+
         var frag = document.createDocumentFragment();
-
-        groupKeys.forEach(function (key) {
-            var notes = groups[key];
-            var section = document.createElement('div');
-            section.className = 'nm-folder-section';
-
-            // Folder header
-            var header = document.createElement('div');
-            header.className = 'nm-folder-header';
-
-            var chevron = document.createElement('span');
-            chevron.className = 'nm-folder-chevron nm-open';
-            chevron.innerHTML = '<i class="lucide lucide-chevron-down"></i>';
-
-            var folderLabel = document.createElement('span');
-            folderLabel.className = 'nm-folder-label';
-
-            var groupSelectAll = document.createElement('button');
-            groupSelectAll.className = 'nm-group-select-btn';
-            groupSelectAll.title = 'Select all in this folder';
-            groupSelectAll.innerHTML = '<i class="lucide lucide-check-square"></i>';
-
-            if (key === '__none__') {
-                folderLabel.innerHTML = '<i class="lucide lucide-folder-open" style="color: var(--icon-color, #94a3b8);"></i> '
-                    + '<span class="nm-folder-name">' + escHtml(cfg.txtNoFolder) + '</span>';
-                header.setAttribute('data-folder-id', '');
-            } else {
-                var f = folderById[key];
-                var icon   = (f && f.icon)   ? f.icon   : 'lucide-folder';
-                var color  = (f && f.icon_color) ? iconColorCss(f.icon_color) : '';
-                var path   = (f && f.path)   ? f.path   : (f ? f.name : cfg.txtNoFolder);
-                var style  = color ? ' style="color:' + escHtml(color) + '"' : '';
-                folderLabel.innerHTML = '<i class="lucide ' + escHtml(icon) + '"' + style + '></i> '
-                    + '<span class="nm-folder-name">' + escHtml(path) + '</span>';
-                header.setAttribute('data-folder-id', key);
+        while (count > 0 && queue.groupIndex < queue.groups.length) {
+            var group = queue.groups[queue.groupIndex];
+            if (queue.noteIndex === 0) {
+                var section = buildFolderSection(group.key, group.notes, queue.folderById);
+                frag.appendChild(section.element);
+                queue.notesList = section.notesList;
             }
+            var end = Math.min(group.notes.length, queue.noteIndex + count);
+            for (var i = queue.noteIndex; i < end; i++) {
+                queue.notesList.appendChild(buildNoteRow(group.notes[i]));
+            }
+            count -= end - queue.noteIndex;
+            queue.remaining -= end - queue.noteIndex;
+            queue.noteIndex = end;
+            if (queue.noteIndex >= group.notes.length) {
+                queue.groupIndex++;
+                queue.noteIndex = 0;
+            }
+        }
+        nmContainer.appendChild(frag);
+        updateShowMore();
+    }
 
-            var notesInGroup = notes;
-            groupSelectAll.addEventListener('click', function (e) {
-                e.stopPropagation();
-                var allChecked = notesInGroup.every(function (n) { return selectedIds.has(n.id); });
-                notesInGroup.forEach(function (n) {
-                    if (allChecked) selectedIds.delete(n.id);
-                    else            selectedIds.add(n.id);
-                });
-                // Sync checkboxes
-                section.querySelectorAll('.nm-note-checkbox').forEach(function (cb) {
-                    cb.checked = !allChecked;
-                });
-                updateBulkBar();
+    function updateShowMore() {
+        var remaining = renderQueue ? renderQueue.remaining : 0;
+        nmShowMore.hidden = remaining <= 0;
+        if (remaining > 0) {
+            nmShowMoreBtn.textContent = cfg.txtShowMore.replace('{count}', remaining);
+        }
+    }
+
+    nmShowMoreBtn.addEventListener('click', function () {
+        renderMoreRows(ROW_BATCH_SIZE);
+    });
+
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+            if (entries.some(function (entry) { return entry.isIntersecting; })) {
+                renderMoreRows(ROW_BATCH_SIZE);
+            }
+        }, { rootMargin: '0px 0px 400px 0px' }).observe(nmShowMore);
+    }
+
+    // Header (name, select-all, count, collapse) and row list of one folder group.
+    // The count and the select-all button cover the whole group, drawn or not.
+    function buildFolderSection(key, notes, folderById) {
+        var section = document.createElement('div');
+        section.className = 'nm-folder-section';
+
+        // Folder header
+        var header = document.createElement('div');
+        header.className = 'nm-folder-header';
+
+        var chevron = document.createElement('span');
+        chevron.className = 'nm-folder-chevron nm-open';
+        chevron.innerHTML = '<i class="lucide lucide-chevron-down"></i>';
+
+        var folderLabel = document.createElement('span');
+        folderLabel.className = 'nm-folder-label';
+
+        var groupSelectAll = document.createElement('button');
+        groupSelectAll.className = 'nm-group-select-btn';
+        groupSelectAll.title = 'Select all in this folder';
+        groupSelectAll.innerHTML = '<i class="lucide lucide-check-square"></i>';
+
+        if (key === '__none__') {
+            folderLabel.innerHTML = '<i class="lucide lucide-folder-open" style="color: var(--icon-color, #94a3b8);"></i> '
+                + '<span class="nm-folder-name">' + escHtml(cfg.txtNoFolder) + '</span>';
+            header.setAttribute('data-folder-id', '');
+        } else {
+            var f = folderById[key];
+            var icon   = (f && f.icon)   ? f.icon   : 'lucide-folder';
+            var color  = (f && f.icon_color) ? iconColorCss(f.icon_color) : '';
+            var path   = (f && f.path)   ? f.path   : (f ? f.name : cfg.txtNoFolder);
+            var style  = color ? ' style="color:' + escHtml(color) + '"' : '';
+            folderLabel.innerHTML = '<i class="lucide ' + escHtml(icon) + '"' + style + '></i> '
+                + '<span class="nm-folder-name">' + escHtml(path) + '</span>';
+            header.setAttribute('data-folder-id', key);
+        }
+
+        var notesInGroup = notes;
+        groupSelectAll.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var allChecked = notesInGroup.every(function (n) { return selectedIds.has(n.id); });
+            notesInGroup.forEach(function (n) {
+                if (allChecked) selectedIds.delete(n.id);
+                else            selectedIds.add(n.id);
             });
-
-            header.appendChild(chevron);
-            header.appendChild(folderLabel);
-            header.appendChild(groupSelectAll);
-
-            // Note count badge
-            var badge = document.createElement('span');
-            badge.className = 'nm-folder-count';
-            badge.textContent = notes.length;
-            header.appendChild(badge);
-
-            // Collapse/expand on click
-            var notesList = document.createElement('div');
-            notesList.className = 'nm-notes-list';
-            header.addEventListener('click', function (e) {
-                if (e.target.closest('.nm-group-select-btn') || e.target.closest('input')) return;
-                var isOpen = chevron.classList.contains('nm-open');
-                if (isOpen) {
-                    chevron.classList.remove('nm-open');
-                    chevron.innerHTML = '<i class="lucide lucide-chevron-right"></i>';
-                    notesList.style.display = 'none';
-                } else {
-                    chevron.classList.add('nm-open');
-                    chevron.innerHTML = '<i class="lucide lucide-chevron-down"></i>';
-                    notesList.style.display = '';
-                }
+            // Sync checkboxes
+            section.querySelectorAll('.nm-note-checkbox').forEach(function (cb) {
+                cb.checked = !allChecked;
             });
-
-            // Notes rows
-            notes.forEach(function (note) {
-                var row = buildNoteRow(note);
-                notesList.appendChild(row);
-            });
-
-            section.appendChild(header);
-            section.appendChild(notesList);
-            frag.appendChild(section);
+            updateBulkBar();
         });
 
-        nmContainer.appendChild(frag);
+        header.appendChild(chevron);
+        header.appendChild(folderLabel);
+        header.appendChild(groupSelectAll);
+
+        // Note count badge
+        var badge = document.createElement('span');
+        badge.className = 'nm-folder-count';
+        badge.textContent = notes.length;
+        header.appendChild(badge);
+
+        // Collapse/expand on click
+        var notesList = document.createElement('div');
+        notesList.className = 'nm-notes-list';
+        header.addEventListener('click', function (e) {
+            if (e.target.closest('.nm-group-select-btn') || e.target.closest('input')) return;
+            var isOpen = chevron.classList.contains('nm-open');
+            if (isOpen) {
+                chevron.classList.remove('nm-open');
+                chevron.innerHTML = '<i class="lucide lucide-chevron-right"></i>';
+                notesList.style.display = 'none';
+            } else {
+                chevron.classList.add('nm-open');
+                chevron.innerHTML = '<i class="lucide lucide-chevron-down"></i>';
+                notesList.style.display = '';
+            }
+        });
+
+        section.appendChild(header);
+        section.appendChild(notesList);
+        return { element: section, notesList: notesList };
     }
 
     function buildNoteRow(note) {
@@ -905,7 +968,9 @@
     });
 
     // ── Utils ─────────────────────────────────────────────────────────────────
-    function show(el) { if (el) el.style.display = ''; }
+    // The empty message and the filter stats start out with .initially-hidden,
+    // whose display: none an empty inline display does not override
+    function show(el) { if (el) { el.classList.remove('initially-hidden'); el.style.display = ''; } }
     function hide(el) { if (el) el.style.display = 'none'; }
 
     // A stored icon colour as the theme token it stands for (js/color-palette.js).

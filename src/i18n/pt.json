@@ -95,7 +95,8 @@
       "yesterday": "Ontem"
     },
     "network_error": "Erro de rede",
-    "none": "Nenhum"
+    "none": "Nenhum",
+    "show_more_notes": "Mostrar mais ({{count}} restantes)"
   },
   "snapshot": {
     "menu_item": "Instantâneos",

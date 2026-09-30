@@ -95,7 +95,8 @@
       "yesterday": "Gestern"
     },
     "network_error": "Netzwerkfehler",
-    "none": "Keine"
+    "none": "Keine",
+    "show_more_notes": "Mehr anzeigen (noch {{count}})"
   },
   "snapshot": {
     "menu_item": "Schnappschüsse",

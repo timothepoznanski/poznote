@@ -95,7 +95,8 @@
       "yesterday": "Ayer"
     },
     "network_error": "Error de red",
-    "none": "Ninguno"
+    "none": "Ninguno",
+    "show_more_notes": "Mostrar más ({{count}} restantes)"
   },
   "snapshot": {
     "menu_item": "Instantáneas",

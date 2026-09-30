@@ -291,6 +291,11 @@ $router->get('/notes/search', function($params) use ($notesController) {
     $notesController->search();
 });
 
+// Ids of the notes holding every word of q, for the dashboard filter (must come before /notes/{id})
+$router->get('/notes/search/ids', function($params) use ($notesController) {
+    $notesController->searchIds();
+});
+
 // Backlinks for a note (must come before /notes/{id})
 $router->get('/notes/{id}/backlinks', function($params) use ($backlinksController) {
     $backlinksController->index($params['id']);

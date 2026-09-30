@@ -77,7 +77,8 @@
     "notes": "Notes",
     "saved": "saved",
     "unknown_error": "Unknown error",
-    "none": "None"
+    "none": "None",
+    "show_more_notes": "Show more ({{count}} remaining)"
   },
   "snapshot": {
     "menu_item": "Snapshots",

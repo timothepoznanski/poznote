@@ -270,6 +270,14 @@ html[data-theme='dark'] .dash-section-title {
     color: var(--pz-text-muted);
 }
 
+/* "Show more" under a list cut at the card limit (renderGrid in
+   js/dashboard-page.js), centred below the cards */
+.dash-show-more {
+    display: flex;
+    justify-content: center;
+    margin: 18px 0 6px;
+}
+
 /* ---------- View menu (card size + layout) ---------- */
 
 /* Row holding the View button and the filter bar, centered like the filter */

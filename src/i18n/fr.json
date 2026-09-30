@@ -94,7 +94,8 @@
       "yesterday": "Hier"
     },
     "network_error": "Erreur réseau",
-    "none": "Aucun"
+    "none": "Aucun",
+    "show_more_notes": "Afficher plus ({{count}} restantes)"
   },
   "snapshot": {
     "menu_item": "Snapshots",

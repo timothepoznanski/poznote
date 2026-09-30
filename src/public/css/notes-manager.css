@@ -260,6 +260,17 @@ html[data-theme='dark'] .nm-folder-option-selected {
     margin: 0 auto;
 }
 
+/* "Show more" under the rows drawn so far (renderMoreRows in js/notes-manager.js) */
+.nm-show-more {
+    display: flex;
+    justify-content: center;
+    margin: 16px 0;
+}
+
+.nm-show-more[hidden] {
+    display: none;
+}
+
 /* ── Folder section ──────────────────────────────────────────────────── */
 .nm-folder-section {
     margin-bottom: 8px;
