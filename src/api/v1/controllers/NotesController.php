@@ -836,12 +836,12 @@ class NotesController {
             if ($id !== null && is_numeric($id)) {
                 $noteId = (int)$id;
                 if ($useWorkspaceFilter) {
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, favorite, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
                     $params = [$noteId, $workspace];
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
                 } else {
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE id = ? AND trash = 0";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, favorite, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE id = ? AND trash = 0";
                     $params = [$noteId];
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
@@ -858,12 +858,12 @@ class NotesController {
                 
                 if (is_numeric($reference)) {
                     $refId = (int)$reference;
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, favorite, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
                     $params = [$refId, $workspace];
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
                 } else {
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ?";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, favorite, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ?";
                     $params = ['%' . $reference . '%', $workspace];
                     $sql .= " ORDER BY updated DESC LIMIT 1";
                     $stmt = $this->con->prepare($sql);
@@ -921,6 +921,7 @@ class NotesController {
                     'tags' => $row['tags'] ?? '',
                     'folder' => $row['folder'] ?? null,
                     'folder_id' => $row['folder_id'] ? (int)$row['folder_id'] : null,
+                    'favorite' => (int)($row['favorite'] ?? 0),
                     'linked_note_id' => $row['linked_note_id'] ? (int)$row['linked_note_id'] : null,
                     'icon' => $this->normalizeNoteIcon($row['icon'] ?? null) ?? self::DEFAULT_NOTE_ICON,
                     'icon_color' => $row['icon_color'] ?? null,

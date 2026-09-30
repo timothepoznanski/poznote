@@ -131,6 +131,9 @@ components:
           type: boolean
     Note:
       type: object
+      description: >
+        GET /notes/{id} returns the note with its content. GET /notes lists
+        metadata only, without content or version.
       properties:
         id:
           type: integer
@@ -138,23 +141,26 @@ components:
         heading:
           type: string
           example: "My Note Title"
-        entrycontent:
+        content:
           type: string
+          description: Note body. Only returned by GET /notes/{id}.
           example: "# Hello World\n\nThis is my note content."
         tags:
           type: string
+          nullable: true
           example: "work,important"
         folder:
           type: string
           nullable: true
           example: "Projects"
+        folder_id:
+          type: integer
+          nullable: true
+          example: 12
         workspace:
           type: string
           example: "Personal"
         favorite:
-          type: integer
-          enum: [0, 1]
-        trash:
           type: integer
           enum: [0, 1]
         type:
@@ -213,9 +219,21 @@ components:
         name:
           type: string
           example: "Personal"
-        note_count:
-          type: integer
-          example: 42
+        created:
+          type: string
+          example: "2026-01-15 09:30:00"
+        tags:
+          type: array
+          items:
+            type: string
+        color:
+          type: string
+          nullable: true
+          description: Stored color, a palette id or a custom hex.
+        color_hex:
+          type: string
+          nullable: true
+          description: Resolved color, null when the workspace has none.
 
     Attachment:
       type: object
@@ -593,8 +611,14 @@ paths:
                 properties:
                   success:
                     type: boolean
-                  note:
-                    $ref: '#/components/schemas/Note'
+                  id:
+                    type: integer
+                  heading:
+                    type: string
+                  workspace:
+                    type: string
+        '404':
+          description: Note not found
 
   /notes/search:
     get:
@@ -644,10 +668,36 @@ paths:
                 properties:
                   success:
                     type: boolean
-                  notes:
+                  query:
+                    type: string
+                  count:
+                    type: integer
+                  results:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Note'
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        heading:
+                          type: string
+                        tags:
+                          type: string
+                        folder:
+                          type: string
+                          nullable: true
+                        folder_id:
+                          type: integer
+                          nullable: true
+                        workspace:
+                          type: string
+                        excerpt:
+                          type: string
+                          description: Plain-text extract of the note content
+                        updated:
+                          type: string
+                        created:
+                          type: string
 
   /notes/with-attachments:
     get:
@@ -814,6 +864,10 @@ paths:
                         type: string
                       content:
                         type: string
+        '423':
+          description: >
+            Note is locked for editing by another user or session. Without an
+            editor_session_id, only a lock held by someone else blocks the write.
     delete:
       tags: [Notes]
       summary: Delete a note (move to trash)
@@ -833,6 +887,8 @@ paths:
       responses:
         '200':
           description: Note deleted
+        '423':
+          description: Note is being edited by another user or session
 
   /notes/{id}/restore:
     post:
@@ -1391,8 +1447,10 @@ paths:
       responses:
         '200':
           description: Lock acquired
-        '409':
-          description: Note is locked by another session
+        '423':
+          description: >
+            Note is locked by another session. The body carries the current
+            lock (holder_username, expires_at).
 
   /notes/{id}/lock/heartbeat:
     post:
@@ -1419,8 +1477,10 @@ paths:
           description: Lock refreshed
         '404':
           description: Note not found
-        '409':
-          description: Note is locked by another session
+        '423':
+          description: >
+            Note is locked by another session. The body carries the current
+            lock (holder_username, expires_at).
 
   /notes/{id}/lock/release:
     post:
@@ -2959,11 +3019,11 @@ paths:
           in: query
           schema:
             type: string
-        - name: tree
+        - name: hierarchical
           in: query
           schema:
             type: boolean
-          description: Return as nested tree structure
+          description: Return a nested tree, each folder with its children
       responses:
         '200':
           description: >
@@ -3570,6 +3630,16 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Workspace'
+                  username:
+                    type: string
+                    nullable: true
+                    description: Username of the account whose workspaces are listed
+                  acting_as:
+                    type: string
+                    nullable: true
+                    description: >
+                      Name of the signed-in user when they act on an account
+                      they do not own, null otherwise
     post:
       tags: [Workspaces]
       summary: Create a new workspace
@@ -4717,7 +4787,7 @@ paths:
               required: [current_password, code]
               properties:
                 current_password: { type: string }
-                code: { type: string, description: 6-digit code from the app, or a recovery code }
+                code: { type: string, description: "6-digit code from the app, or a recovery code" }
       responses:
         '200':
           description: Two-factor is off

@@ -28,11 +28,18 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
 // Set content type for all responses
 header('Content-Type: application/json; charset=utf-8');
 
+// CORS, so a client served from another origin (a web build of a mobile
+// client, for instance) can call the API with its own credentials. The
+// wildcard origin never comes with Access-Control-Allow-Credentials, so a
+// browser does not let another site read a response sent with the user's
+// session cookie or cached Basic credentials.
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Expose-Headers: ETag, Content-Disposition');
+
 // Handle CORS preflight requests
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    header('Access-Control-Allow-Origin: *');
     header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type, Authorization');
+    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-User-ID, X-Editor-Session-ID, X-Poznote-OTP, If-Match, If-None-Match');
     header('Access-Control-Max-Age: 86400');
     http_response_code(204);
     exit;
