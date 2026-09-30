@@ -823,9 +823,19 @@ $currentLang = getUserLanguage();
 		<div class="modal-content">
 			<h3><?php echo t_h('modals.move_folder_files.title', [], 'Move All Files'); ?></h3>
 			<p><?php echo t_h('modals.move_folder_files.prompt_prefix', [], 'Move all files from'); ?> "<span id="sourceFolderName"></span>" <?php echo t_h('modals.move_folder_files.prompt_suffix', [], 'to:'); ?></p>
-			<select id="moveFolderFilesTargetSelect">
-				<option value=""><?php echo t_h('modals.move_folder_files.select_target', [], 'Select target folder...'); ?></option>
-			</select>
+
+			<div class="form-group" style="margin-bottom: 15px;">
+				<label for="moveFolderFilesWorkspaceSelect" style="display: block; margin-bottom: 5px; font-weight: 500; font-size: 0.9em;"><?php echo t_h('modals.move_folder.workspace', [], 'Target Workspace'); ?></label>
+				<select id="moveFolderFilesWorkspaceSelect" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: var(--card-bg, #fff); color: var(--text-color, #333); display: block; -webkit-appearance: menulist; -moz-appearance: menulist; appearance: menulist;">
+				</select>
+			</div>
+
+			<div class="form-group" style="margin-bottom: 15px;">
+				<label for="moveFolderFilesTargetSelect" style="display: block; margin-bottom: 5px; font-weight: 500; font-size: 0.9em;"><?php echo t_h('modals.move_folder_files.target_folder', [], 'Target Folder'); ?></label>
+				<select id="moveFolderFilesTargetSelect" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: var(--card-bg, #fff); color: var(--text-color, #333); display: block; -webkit-appearance: menulist; -moz-appearance: menulist; appearance: menulist;">
+					<option value=""><?php echo t_h('modals.move_folder_files.select_target', [], 'Select target folder...'); ?></option>
+				</select>
+			</div>
 			<div id="folderFilesCount" class="modal-info-message">
 				<span id="filesCountText"></span>
 			</div>

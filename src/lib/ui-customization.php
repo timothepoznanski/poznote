@@ -414,6 +414,25 @@ function poznoteTidyIconSidebarDividers(array $items) {
     return $tidy;
 }
 
+/**
+ * Entries of the note's ⋮ menu (note_display.php) that no data-selector ties
+ * to a toolbar button, keyed by the toolbar key that hides them. Mirrored by
+ * TOOLBAR_MENU_ACTIONS in js/ui-customization.js.
+ */
+function poznoteGetToolbarMenuActions() {
+    return [
+        'btn-snapshot' => ['show-snapshot'],
+        'btn-audio' => ['insert-audio-file'],
+        'btn-clear-completed' => ['clear-completed-tasks'],
+        'btn-uncheck-all' => ['uncheck-all-tasks'],
+        'btn-print' => ['print-note'],
+        'btn-archive' => ['archive-note'],
+        // Markdown notes offer "Insert rich text", HTML notes "Insert Markdown"
+        'btn-paste-markdown' => ['show-paste-markdown-modal', 'show-insert-markdown-modal'],
+        'btn-open-tasks-page' => ['open-tasks-page'],
+    ];
+}
+
 function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
     $createMenuOptionSelectors = [
         'card:create-note-card' => '.create-note-option[data-type="html"]',
@@ -442,18 +461,11 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
         } elseif ($type === 'toolbar') {
             $rules[] = '.note-edit-toolbar .' . $id . ', .note-edit-toolbar .' . $id . ':not(.hide-on-selection) { display: none !important; }';
             $rules[] = '.mobile-toolbar-menu [data-selector=".' . $id . '"] { display: none !important; }';
-            if ($id === 'btn-snapshot') {
-                $rules[] = '.mobile-toolbar-menu [data-action="show-snapshot"] { display: none !important; }';
-            } elseif ($id === 'btn-tasklist-actions') {
+            foreach (poznoteGetToolbarMenuActions()[$id] ?? [] as $action) {
+                $rules[] = '.mobile-toolbar-menu [data-action="' . $action . '"] { display: none !important; }';
+            }
+            if ($id === 'btn-tasklist-actions') {
                 $rules[] = '.tasklist-actions-dropdown { display: none !important; }';
-            } elseif ($id === 'btn-audio') {
-                $rules[] = '.mobile-toolbar-menu [data-action="insert-audio-file"] { display: none !important; }';
-            } elseif ($id === 'btn-clear-completed') {
-                $rules[] = '.mobile-toolbar-menu [data-action="clear-completed-tasks"] { display: none !important; }';
-            } elseif ($id === 'btn-uncheck-all') {
-                $rules[] = '.mobile-toolbar-menu [data-action="uncheck-all-tasks"] { display: none !important; }';
-            } elseif ($id === 'btn-print') {
-                $rules[] = '.mobile-toolbar-menu [data-action="print-note"] { display: none !important; }';
             }
         } elseif ($type === 'wsmenu') {
             $rules[] = '.workspace-menu-item[data-action="' . $id . '"] { display: none !important; }';
@@ -482,6 +494,10 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
                 // note header. Both are rendered by renderEditableNoteIcon(),
                 // which always emits .note-icon.
                 $rules[] = '.note-icon { display: none !important; }';
+            } elseif ($id === 'favorites-folder') {
+                // The Favorites section at the top of the notes tree
+                // (notes_list.php), header and rows together.
+                $rules[] = '.favorites-section { display: none !important; }';
             } elseif ($id === 'folder-note-count') {
                 // The (n) after a folder name, always shown unless hidden here
                 // (the legacy hide_folder_counts hover-reveal is gone).
@@ -490,6 +506,9 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
                 $rules[] = '#outline-panel { display: none !important; }';
                 $rules[] = '#outlineResizeHandle { display: none !important; }';
                 $rules[] = '#outlineMobileBackdrop { display: none !important; }';
+                // The floating stack and the scroll arrows sit left of the
+                // outline column (css/notes/noteentry.css): give them the edge.
+                $rules[] = 'html { --pz-docked-outline: 0px !important; }';
             } elseif ($id === 'tasklist-progress') {
                 $rules[] = '.tasklist-progress { display: none !important; }';
             } elseif ($id === 'preview-code-block-delete') {

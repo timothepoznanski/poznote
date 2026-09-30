@@ -114,13 +114,10 @@
     font-size: 15px;
 }
 
-/* Editable Tags Container
-   Tags wrap onto extra lines so the "Add tag" input always stays reachable:
-   on one scrolling line with a hidden scrollbar, many tags pushed it out of
-   view (#1519). index-mobile.css keeps the single swipeable line on mobile. */
+/* Editable Tags Container: the tag strip, then the input */
 .editable-tags-container {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 6px;
     align-items: center;
     min-height: 24px;
@@ -129,6 +126,86 @@
     padding: 4px;
     transition: border-color 0.2s ease;
     white-space: nowrap;
+}
+
+/* The tags: one line that scrolls sideways (wheel, trackpad, swipe) with no
+   scrollbar. It shrinks before the input does, so "Add tag" stays in view
+   however many tags there are (#1519). js/clickable-tags.js sets
+   can-scroll-start / can-scroll-end on the container for each side that has
+   tags cut off: that edge fades, and on desktop its chevron shows. */
+.editable-tags-list {
+    --tags-fade-start: 0px;
+    --tags-fade-end: 0px;
+    display: flex;
+    flex: 0 1 auto;
+    gap: 6px;
+    align-items: center;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+}
+
+.editable-tags-list:empty {
+    display: none;
+}
+
+.editable-tags-list::-webkit-scrollbar {
+    display: none;
+}
+
+.can-scroll-start > .editable-tags-list {
+    --tags-fade-start: 24px;
+}
+
+.can-scroll-end > .editable-tags-list {
+    --tags-fade-end: 24px;
+}
+
+.can-scroll-start > .editable-tags-list,
+.can-scroll-end > .editable-tags-list {
+    mask-image: linear-gradient(to right, transparent, currentColor var(--tags-fade-start), currentColor calc(100% - var(--tags-fade-end)), transparent);
+}
+
+/* Chevrons, desktop only (mobile swipes): both show once the strip overflows,
+   and the one whose side has nothing more to show is disabled. The icon is a
+   mask painted with background-color, since .name_tags * forces the colour. */
+.tags-scroll-btn {
+    display: none;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 24px;
+    pointer-events: none;
+}
+
+.tags-scroll-btn .lucide {
+    font-size: 14px;
+    background-color: var(--pz-text-muted);
+    opacity: 0.35;
+}
+
+.can-scroll-start > .tags-scroll-prev,
+.can-scroll-end > .tags-scroll-next {
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.can-scroll-start > .tags-scroll-prev .lucide,
+.can-scroll-end > .tags-scroll-next .lucide {
+    opacity: 1;
+}
+
+.can-scroll-start > .tags-scroll-prev:hover .lucide,
+.can-scroll-end > .tags-scroll-next:hover .lucide {
+    background-color: var(--pz-text);
+}
+
+@media (min-width: 801px) {
+    .has-overflow > .tags-scroll-btn {
+        display: inline-flex;
+    }
 }
 
 /* Clickable Tag Wrapper */
@@ -228,6 +305,11 @@
     color: var(--pz-text);
     min-width: 60px;
     max-width: 150px;
+    /* As wide as the placeholder or the typed text rather than the full
+       150px, so the tag strip gets the room back. width: auto undoes the
+       global input { width: 100% }; browsers without field-sizing keep 150px. */
+    width: auto;
+    field-sizing: content;
     flex-shrink: 0;
     white-space: nowrap;
     overflow: hidden;

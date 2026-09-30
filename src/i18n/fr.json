@@ -719,7 +719,8 @@
       "title": "Espace de travail de démarrage",
       "description_1": "Choisissez l’espace de travail qui s’ouvre au démarrage de Poznote.",
       "description_2": "Sélectionnez \"{{last}}\" pour toujours ouvrir l’espace de travail que vous utilisiez précédemment.",
-      "last_opened": "Dernier espace de travail ouvert",
+      "last_opened": "Dernier espace de travail ouvert (tous les appareils)",
+      "last_opened_device": "Dernier espace de travail ouvert sur cet appareil",
       "save_button": "Enregistrer",
       "status_set_to": "✓ Espace de travail de démarrage défini sur : {{workspace}}",
       "error_saving": "Erreur lors de l'enregistrement de l'espace de travail de démarrage"
@@ -1515,7 +1516,7 @@
       "prompt_prefix": "Déplacer tous les fichiers depuis",
       "prompt_suffix": "vers :",
       "select_target": "Sélectionner le dossier cible...",
-      "hint_move_single": "Pour déplacer une seule note vers un autre espace de travail, utilisez le bouton \"Déplacer la note\" dans la barre d’outils",
+      "target_folder": "Dossier cible",
       "hint_move_all": "Pour déplacer toutes les notes d’un espace de travail à un autre, allez dans Paramètres → Espaces de travail",
       "move_all": "Déplacer tous les fichiers"
     },

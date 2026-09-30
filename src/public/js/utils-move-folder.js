@@ -40,11 +40,71 @@ function showMoveFolderFilesDialog(sourceFolderId, sourceFolderName) {
                 : 'Unable to count files';
         });
 
-    // Populate target folder dropdown
-    populateTargetFolderDropdown(sourceFolderId, sourceFolderName);
+    // Populate the workspace dropdown, then the target folders of the chosen workspace
+    populateMoveFilesWorkspaceSelect(function () {
+        populateTargetFolderDropdown(sourceFolderId, sourceFolderName);
+    });
+
+    var wsSelect = document.getElementById('moveFolderFilesWorkspaceSelect');
+    if (wsSelect) {
+        wsSelect.onchange = function () {
+            populateTargetFolderDropdown(sourceFolderId, sourceFolderName);
+        };
+    }
 
     // Show modal
     document.getElementById('moveFolderFilesModal').style.display = 'block';
+}
+
+// Fills the workspace dropdown of the "move all files" modal with the current
+// workspace preselected, then calls done (also when the list cannot be loaded,
+// so the folders of the current workspace still show).
+function populateMoveFilesWorkspaceSelect(done) {
+    var wsSelect = document.getElementById('moveFolderFilesWorkspaceSelect');
+    if (!wsSelect) {
+        done();
+        return;
+    }
+
+    var current = getMoveFallbackWorkspace();
+    wsSelect.innerHTML = '';
+    var currentOption = document.createElement('option');
+    currentOption.value = current;
+    currentOption.textContent = current;
+    wsSelect.appendChild(currentOption);
+
+    fetch('/api/v1/workspaces')
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+            if (data.success && data.workspaces) {
+                wsSelect.innerHTML = '';
+                data.workspaces.forEach(function (ws) {
+                    var option = document.createElement('option');
+                    option.value = ws.name;
+                    option.textContent = ws.name;
+                    if (ws.name === current) {
+                        option.selected = true;
+                    }
+                    wsSelect.appendChild(option);
+                });
+                if (!findSelectOptionByValue(wsSelect, current)) {
+                    wsSelect.insertBefore(currentOption, wsSelect.firstChild);
+                    wsSelect.value = current;
+                }
+            }
+        })
+        .catch(function (error) {
+            console.error('Error loading workspaces:', error);
+        })
+        .then(done);
+}
+
+function getMoveFilesModalWorkspace() {
+    var wsSelect = document.getElementById('moveFolderFilesWorkspaceSelect');
+    if (wsSelect && wsSelect.value) {
+        return wsSelect.value;
+    }
+    return getMoveFallbackWorkspace();
 }
 
 function populateTargetFolderDropdown(excludeFolderId, excludeFolderName, selectId, preselectFolderId) {
@@ -53,7 +113,9 @@ function populateTargetFolderDropdown(excludeFolderId, excludeFolderName, select
     selectId = selectId || 'moveFolderFilesTargetSelect';
     var select = document.getElementById(selectId);
     if (!select) return;
-    var workspace = isMoveNoteTargetSelect(selectId) ? getMoveModalWorkspace() : getMoveFallbackWorkspace();
+    var workspace = isMoveNoteTargetSelect(selectId)
+        ? getMoveModalWorkspace()
+        : (selectId === 'moveFolderFilesTargetSelect' ? getMoveFilesModalWorkspace() : getMoveFallbackWorkspace());
     if (isMoveNoteTargetSelect(selectId)) {
         clearMoveNoteRecentFolders();
     }
@@ -63,10 +125,15 @@ function populateTargetFolderDropdown(excludeFolderId, excludeFolderName, select
     defaultOption.textContent = window.t ? window.t('modals.folder.no_folder', null, 'No folder') : 'No folder';
     select.appendChild(defaultOption);
 
+    // Switching workspace twice quickly must not merge two folder lists
+    var loadToken = String(Date.now()) + Math.random();
+    select.dataset.loadToken = loadToken;
+
     // Get all folders using RESTful API
     fetch('/api/v1/notes?get_folders=1&workspace=' + encodeURIComponent(workspace))
         .then(function (response) { return response.json(); })
         .then(function (data) {
+            if (select.dataset.loadToken !== loadToken) return;
             if (data.success && data.folders) {
                 for (var folderId in data.folders) {
                     if (!data.folders.hasOwnProperty(folderId)) continue;
@@ -276,6 +343,7 @@ function executeMoveAllFiles() {
     var sourceFolderElement = document.getElementById('sourceFolderName');
     var sourceFolderId = sourceFolderElement.dataset.folderId;
     var targetFolderId = document.getElementById('moveFolderFilesTargetSelect').value;
+    var targetWorkspace = getMoveFilesModalWorkspace();
 
     // Allow empty value for "No folder" (value will be "" or "0")
     // Only check if source and target are the same
@@ -310,7 +378,8 @@ function executeMoveAllFiles() {
         body: JSON.stringify({
             source_folder_id: parseInt(sourceFolderId),
             target_folder_id: parseInt(targetId),
-            workspace: selectedWorkspace
+            workspace: selectedWorkspace,
+            target_workspace: targetWorkspace
         })
     })
         .then(function (response) {
@@ -343,9 +412,12 @@ function executeMoveAllFiles() {
                 }
                 // Successfully moved files - no notification needed
                 closeModal('moveFolderFilesModal');
-                // Show where the notes went, and keep them selected (#1441)
-                markFolderPathOpen(targetId === '0' ? null : targetId);
-                keepTreeSelection(movedNotes, true);
+                // Show where the notes went, and keep them selected (#1441),
+                // unless they left for another workspace
+                if (targetWorkspace === getMoveFallbackWorkspace()) {
+                    markFolderPathOpen(targetId === '0' ? null : targetId);
+                    keepTreeSelection(movedNotes, true);
+                }
                 // Refresh the page to reflect changes
                 location.reload();
             } else {

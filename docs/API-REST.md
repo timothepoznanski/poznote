@@ -1993,7 +1993,9 @@ Move all files from one folder to another.
 | Field | Type | Description |
 |-------|------|-------------|
 | `source_folder_id` | integer | Source folder ID |
-| `target_folder_id` | integer | Target folder ID |
+| `target_folder_id` | integer | Target folder ID (`0` moves the notes to the root of the target workspace) |
+| `workspace` | string | Workspace of the source folder (optional) |
+| `target_workspace` | string | Workspace to move the notes to (optional, defaults to `workspace`). The target folder must belong to it |
 
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \

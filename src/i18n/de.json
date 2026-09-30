@@ -720,7 +720,8 @@
       "title": "Startup-Arbeitsbereich",
       "description_1": "Wählen Sie aus, welcher Arbeitsbereich beim Starten von Poznote geöffnet wird.",
       "description_2": "Wählen Sie \"{{last}}\" aus, um immer den Arbeitsbereich zu öffnen, in dem Sie zuletzt gearbeitet haben.",
-      "last_opened": "Zuletzt geöffneter Arbeitsbereich",
+      "last_opened": "Zuletzt geöffneter Arbeitsbereich (alle Geräte)",
+      "last_opened_device": "Zuletzt geöffneter Arbeitsbereich auf diesem Gerät",
       "save_button": "Speichern",
       "status_set_to": "✓ Startup-Arbeitsbereich gesetzt auf: {{workspace}}",
       "error_saving": "Fehler beim Speichern des Startup-Arbeitsbereichs"
@@ -1510,7 +1511,7 @@
       "prompt_prefix": "Alle Dateien verschieben von",
       "prompt_suffix": "zu:",
       "select_target": "Zielordner auswählen...",
-      "hint_move_single": "Um eine einzelne Notiz in einen anderen Arbeitsbereich zu verschieben, verwenden Sie die Schaltfläche \"Notiz verschieben\" in der Symbolleiste",
+      "target_folder": "Zielordner",
       "hint_move_all": "Um alle Notizen von einem Arbeitsbereich in einen anderen zu verschieben, gehen Sie zu Einstellungen → Arbeitsbereiche",
       "move_all": "Alle Dateien verschieben"
     },

@@ -748,6 +748,12 @@ class SettingsController {
                 $stmt = $this->con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
                 $stmt->execute([$key, $value]);
 
+                // The browser switching workspace also becomes this device's
+                // last opened one (default_workspace '__last_opened_device__').
+                if ($key === 'last_opened_workspace' && function_exists('poznoteRememberDeviceWorkspace')) {
+                    poznoteRememberDeviceWorkspace($value);
+                }
+
                 if ($key === 'diary_date_format' && strpos((string) $value, 'custom:') === 0) {
                     // Remember the pattern so entries titled with it stay
                     // recognized after the user switches to another format.

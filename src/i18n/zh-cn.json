@@ -719,7 +719,8 @@
       "title": "启动工作区",
       "description_1": "选择启动 Poznote 时打开的工作区。",
       "description_2": "选择 \"{{last}}\" 以始终打开您上次使用的工作区。",
-      "last_opened": "上次打开的工作区",
+      "last_opened": "上次打开的工作区（所有设备）",
+      "last_opened_device": "在此设备上上次打开的工作区",
       "save_button": "保存",
       "status_set_to": "✓ 启动工作区已设置为: {{workspace}}",
       "error_saving": "保存启动工作区出错"
@@ -1508,7 +1509,7 @@
       "prompt_prefix": "移动所有文件，从",
       "prompt_suffix": "至:",
       "select_target": "选择目标文件夹...",
-      "hint_move_single": "要将单篇笔记移动到另一个工作区，请使用工具栏中的“移动笔记”按钮",
+      "target_folder": "目标文件夹",
       "hint_move_all": "要将一个工作区的所有笔记移动到另一个工作区，请前往 设置 → 工作区",
       "move_all": "移动所有文件"
     },

@@ -428,6 +428,8 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
     if ($showFolderHeader) {
         $folderClass = 'folder-header';
         if ($depth > 0) $folderClass .= ' subfolder subfolder-level-' . $depth;
+        // Hideable from the Element visibility panel (panel:favorites-folder)
+        if ($isFavoritesSection) $folderClass .= ' favorites-section';
         // Folder hierarchy the user is working in: the folder itself carries
         // .folder-tree-active, its ancestors .folder-tree-branch. Everything
         // else is dimmed by css/folders/tree-highlight.css when the

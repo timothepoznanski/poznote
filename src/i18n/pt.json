@@ -720,7 +720,8 @@
       "title": "Espaço de Trabalho Inicial",
       "description_1": "Escolha qual espaço de trabalho abrir ao iniciar o Poznote.",
       "description_2": "Selecione \"{{last}}\" para sempre abrir o espaço de trabalho que você estava usando anteriormente.",
-      "last_opened": "Último espaço de trabalho aberto",
+      "last_opened": "Último espaço de trabalho aberto (todos os dispositivos)",
+      "last_opened_device": "Último espaço de trabalho aberto neste dispositivo",
       "save_button": "Salvar",
       "status_set_to": "✓ Espaço de trabalho inicial definido para: {{workspace}}",
       "error_saving": "Erro ao salvar espaço de trabalho inicial"
@@ -1510,7 +1511,7 @@
       "prompt_prefix": "Mover todos os arquivos de",
       "prompt_suffix": "para:",
       "select_target": "Selecionar pasta de destino...",
-      "hint_move_single": "Para mover uma única nota para outro espaço de trabalho, use o botão \"Mover nota\" na barra de ferramentas",
+      "target_folder": "Pasta de destino",
       "hint_move_all": "Para mover todas as notas de um espaço de trabalho para outro, vá para Configurações → Espaços de trabalho",
       "move_all": "Mover Todos os Arquivos"
     },

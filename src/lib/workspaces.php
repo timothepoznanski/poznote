@@ -85,6 +85,9 @@ function getFirstWorkspaceName() {
  * 1. GET/POST parameter (highest priority)
  * 2. Database setting 'default_workspace' (if set to a specific workspace name)
  *    Special value '__last_opened__' means use last_opened_workspace from database
+ *    Special value '__last_opened_device__' means use the workspace this
+ *    browser last opened (poznoteDeviceWorkspaceCookieName()), then fall
+ *    through to last_opened_workspace on a device that has none yet
  * 3. Database setting 'last_opened_workspace' (the last workspace the user opened)
  * 4. Fallback to first available workspace
  * 
@@ -118,8 +121,23 @@ function getWorkspaceFilter() {
             $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
             $stmt->execute(['default_workspace']);
             $defaultWorkspace = $stmt->fetchColumn();
-            // Only use defaultWorkspace if it's a real workspace name (not __last_opened__ or empty)
-            if ($defaultWorkspace !== false && $defaultWorkspace !== '' && $defaultWorkspace !== '__last_opened__') {
+            if ($defaultWorkspace === POZNOTE_DEFAULT_WORKSPACE_LAST_OPENED_DEVICE) {
+                $cookieName = poznoteDeviceWorkspaceCookieName();
+                $deviceWorkspace = $cookieName !== null ? (string)($_COOKIE[$cookieName] ?? '') : '';
+                if ($deviceWorkspace !== '') {
+                    $checkStmt = $con->prepare('SELECT COUNT(*) FROM workspaces WHERE name = ?');
+                    $checkStmt->execute([$deviceWorkspace]);
+                    if ((int)$checkStmt->fetchColumn() > 0) {
+                        $cached = $deviceWorkspace;
+                        return $cached;
+                    }
+                }
+            }
+
+            // Only use defaultWorkspace if it's a real workspace name (not a
+            // "last opened" choice or empty)
+            if ($defaultWorkspace !== false && $defaultWorkspace !== '' && $defaultWorkspace !== '__last_opened__'
+                && $defaultWorkspace !== POZNOTE_DEFAULT_WORKSPACE_LAST_OPENED_DEVICE) {
                 // Verify workspace exists
                 $checkStmt = $con->prepare('SELECT COUNT(*) FROM workspaces WHERE name = ?');
                 $checkStmt->execute([$defaultWorkspace]);
@@ -328,6 +346,51 @@ function getWorkspaceBackgroundSegment($workspace) {
 }
 
 /**
+ * default_workspace value opening the workspace this browser opened last,
+ * instead of the last one opened on any device (discussion #1526). The
+ * server needs the answer before it renders index.php, so the browser keeps
+ * it in a cookie rather than in localStorage.
+ */
+const POZNOTE_DEFAULT_WORKSPACE_LAST_OPENED_DEVICE = '__last_opened_device__';
+
+/**
+ * Cookie holding the workspace this browser opened last, named after the
+ * active account: workspace names repeat from one account to the next, and
+ * two accounts used in the same browser each keep their own.
+ *
+ * @return string|null Null when no account is signed in.
+ */
+function poznoteDeviceWorkspaceCookieName(): ?string {
+    $userId = function_exists('getCurrentUserId') ? (int)(getCurrentUserId() ?? 0) : 0;
+    return $userId > 0 ? 'poznote_last_ws_u' . $userId : null;
+}
+
+/**
+ * Remember $workspace as the one this browser opened last. Always written,
+ * whatever default_workspace says, so switching to the per-device choice
+ * starts from where each device already is.
+ */
+function poznoteRememberDeviceWorkspace($workspace): void {
+    $workspace = (string)$workspace;
+    $cookieName = poznoteDeviceWorkspaceCookieName();
+    if ($cookieName === null || $workspace === '' || headers_sent()) {
+        return;
+    }
+    if (($_COOKIE[$cookieName] ?? null) === $workspace) {
+        return;
+    }
+    $_COOKIE[$cookieName] = $workspace;
+    setcookie($cookieName, $workspace, [
+        'expires'  => time() + 400 * 86400,
+        'path'     => '/',
+        'domain'   => '',
+        'secure'   => $GLOBALS['isSecure'] ?? false,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+}
+
+/**
  * Save the last opened workspace to the database
  * This is called when a workspace is opened/selected
  * 
@@ -345,6 +408,8 @@ function saveLastOpenedWorkspace($workspace) {
     if (!isset($con) || empty($workspace)) {
         return false;
     }
+
+    poznoteRememberDeviceWorkspace($workspace);
     
     try {
         $stmt = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');

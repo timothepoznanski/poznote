@@ -715,19 +715,6 @@ a.links_arbo_left::-webkit-scrollbar,
     flex-wrap: wrap;
 }
 
-.editable-tags-container {
-    flex-wrap: nowrap !important;
-    overflow-x: auto;
-    overflow-y: visible;
-    max-height: 40px;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.editable-tags-container::-webkit-scrollbar {
-    display: none;
-}
-
 .folder-wrapper {
     flex-basis: 100%;
     margin-bottom: 8px;
