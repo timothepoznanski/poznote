@@ -1,0 +1,83 @@
+/**
+ * Tag dialogs - color picker and rename input
+ *
+ * Built by js/tag-actions.js, opened from the tags page and from the
+ * right-click menu on a tag inside a note.
+ */
+
+/* Color picker grid inside the tag color modal */
+.tag-color-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    padding: 10px 0;
+}
+
+.tag-color-swatch {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--pz-radius-circle);
+    border: 2px solid transparent;
+    box-shadow: inset 0 0 0 1px rgba(var(--pz-shadow-rgb), 0.12);
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.15s, border-color 0.15s;
+}
+
+.tag-color-swatch:hover {
+    transform: scale(1.12);
+}
+
+.tag-color-swatch.selected {
+    border-color: #1e293b;
+    transform: scale(1.12);
+}
+
+/* The custom color input renders as one more round swatch */
+input[type="color"].tag-color-custom {
+    appearance: none;
+    -webkit-appearance: none;
+    background: conic-gradient(var(--pz-danger), var(--pz-warning-hover), var(--pz-success), var(--pz-accent), #a855f7, var(--pz-danger));
+    overflow: hidden;
+}
+
+input[type="color"].tag-color-custom::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+input[type="color"].tag-color-custom::-webkit-color-swatch {
+    border: none;
+    opacity: 0;
+}
+
+html[data-theme='dark'] .tag-color-swatch.selected {
+    border-color: #ffffff;
+}
+
+/* Rename input inside the modal */
+.tag-rename-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--pz-border-strong);
+    border-radius: var(--pz-radius);
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.tag-rename-input:focus {
+    border-color: var(--pz-accent);
+}
+
+html[data-theme='dark'] .tag-rename-input {
+    background: var(--pz-surface);
+    border-color: var(--pz-border-strong);
+    color: var(--pz-text-strong);
+}
+
+html[data-theme='dark'] .tag-rename-input:focus {
+    border-color: var(--pz-accent-text-hover);
+}

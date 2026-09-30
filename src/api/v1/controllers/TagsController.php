@@ -112,8 +112,9 @@ class TagsController {
         }
 
         $newName = trim($input['new_name']);
-        // Spaces → underscores to match the existing tag normalisation convention
-        $newName = str_replace(' ', '_', $newName);
+        // Spaces → underscores to match the existing tag normalisation convention.
+        // Commas too: a tag list is split on them, so one would make two tags.
+        $newName = preg_replace('/[\s,]+/u', '_', $newName);
         $workspace = $input['workspace'] ?? null;
         // Without a workspace the tag is renamed everywhere, except for a
         // session confined to a workspace shared with it (auth.php).
@@ -156,6 +157,8 @@ class TagsController {
                 unset($t);
 
                 if ($changed) {
+                    // Renamed into a tag the note already had: keep one
+                    $tags = array_values(array_unique($tags));
                     $newTagsStr = implode(', ', $tags);
                     $updateStmt = $this->con->prepare(
                         "UPDATE entries SET tags = ?, updated = CURRENT_TIMESTAMP WHERE id = ?"

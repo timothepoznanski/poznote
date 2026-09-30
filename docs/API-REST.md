@@ -1738,7 +1738,7 @@ List all folders in a workspace.
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `workspace` | string | Workspace whose folders to list. When omitted, the workspace that sorts first is used, which changes as workspaces are added: always pass it from a script |
-| `tree` | boolean | Return hierarchical tree structure |
+| `hierarchical` | boolean | Return a nested tree, each folder with its children |
 
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \
@@ -1748,7 +1748,7 @@ curl -u 'username:password' -H "X-User-ID: 1" \
 Get folder tree (nested structure):
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \
-  "http://YOUR_SERVER/api/v1/folders?workspace=Personal&tree=true"
+  "http://YOUR_SERVER/api/v1/folders?workspace=Personal&hierarchical=true"
 ```
 
 Each folder carries its `path` and `is_diary`, true for the diary roots of the workspace.

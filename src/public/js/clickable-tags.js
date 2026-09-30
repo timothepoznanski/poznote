@@ -569,23 +569,32 @@ document.addEventListener('click', function (e) {
 // ============================================
 
 /**
- * Resolve a tag's color to a hex value, mirroring resolveTagHex() in
- * js/list_tags.js: window.TAG_COLORS maps a lowercased tag name to either a
- * note palette id or a literal '#rrggbb'. Returns '' when the tag has no color.
+ * Resolve a tag's color to a hex value (js/tag-actions.js). Returns '' when
+ * the tag has no color.
  * @param {string} tagName - The tag to look up
  * @returns {string} A hex color, or '' when the tag is uncolored
  */
 function resolveNoteTagHex(tagName) {
-    const map = window.TAG_COLORS;
-    if (!map || typeof map !== 'object') return '';
+    return window.PoznoteTagActions ? window.PoznoteTagActions.resolveHex(tagName) : '';
+}
 
-    const value = map[String(tagName || '').trim().toLowerCase()];
-    if (typeof value !== 'string' || value === '') return '';
-    if (value.charAt(0) === '#') return value;
-
-    const palette = Array.isArray(window.NOTE_COLOR_PALETTE) ? window.NOTE_COLOR_PALETTE : [];
-    const entry = palette.find(color => color.id === value.toLowerCase());
-    return entry ? entry.hex : '';
+/**
+ * Show, update or drop the color dot at the start of a tag chip.
+ * @param {HTMLElement} tagElement - The .clickable-tag element
+ */
+function applyNoteTagDot(tagElement) {
+    const hex = resolveNoteTagHex(tagElement.getAttribute('data-tag'));
+    let dot = tagElement.querySelector('.tag-color-dot');
+    if (!hex) {
+        if (dot) dot.remove();
+        return;
+    }
+    if (!dot) {
+        dot = document.createElement('span');
+        dot.className = 'tag-color-dot';
+        tagElement.insertBefore(dot, tagElement.firstChild);
+    }
+    dot.style.background = hex;
 }
 
 /**
@@ -603,13 +612,7 @@ function addTagElement(container, tagText, noteId) {
     tagElement.textContent = tagText;
     tagElement.setAttribute('data-tag', tagText);
 
-    const tagHex = resolveNoteTagHex(tagText);
-    if (tagHex) {
-        const dot = document.createElement('span');
-        dot.className = 'tag-color-dot';
-        dot.style.background = tagHex;
-        tagElement.insertBefore(dot, tagElement.firstChild);
-    }
+    applyNoteTagDot(tagElement);
 
     tagElement.addEventListener('click', function (e) {
         e.preventDefault();
@@ -658,6 +661,170 @@ function tagExistsInContainer(container, tagText) {
         (tag.getAttribute('data-tag') || tag.textContent).trim().toLowerCase() === tagText.trim().toLowerCase()
     );
 }
+
+// ============================================
+// Tag Right-Click Menu
+// ============================================
+
+let noteTagMenu = null;
+
+function closeNoteTagMenu() {
+    if (noteTagMenu) {
+        noteTagMenu.remove();
+        noteTagMenu = null;
+    }
+}
+
+/**
+ * Right-click menu on a tag in a note: rename it in this note, pick its
+ * color, or open the tags page.
+ * @param {HTMLElement} tagElement - The right-clicked .clickable-tag
+ * @param {number} x - Pointer position (viewport)
+ * @param {number} y - Pointer position (viewport)
+ */
+function openNoteTagMenu(tagElement, x, y) {
+    const tagName = tagElement.getAttribute('data-tag') || tagElement.textContent.trim();
+    const nameTags = tagElement.closest('.name_tags');
+    const tagsInput = nameTags ? nameTags.querySelector('input[id^="tags"]') : null;
+    const noteId = tagsInput ? tagsInput.id.replace('tags', '') : null;
+    // Renaming saves the note, which a note being edited elsewhere refuses
+    const canRename = !!noteId && !(typeof window.isNoteEditingLocked === 'function' && window.isNoteEditingLocked(noteId));
+
+    closeNoteTagMenu();
+
+    const menu = document.createElement('div');
+    menu.className = 'image-menu note-tag-menu';
+    menu.setAttribute('role', 'menu');
+    menu.style.position = 'fixed';
+    menu.style.zIndex = '10000';
+
+    const items = [
+        canRename ? ['rename', 'lucide-pencil', window.t ? window.t('tags.action.rename', null, 'Rename') : 'Rename'] : null,
+        ['color', 'lucide-palette', window.t ? window.t('tags.action.color', null, 'Color') : 'Color'],
+        ['list', 'lucide-tags', window.t ? window.t('tags.list_all', null, 'List all tags') : 'List all tags']
+    ];
+    items.filter(Boolean).forEach(([action, icon, label]) => {
+        const item = document.createElement('div');
+        item.className = 'image-menu-item';
+        item.setAttribute('role', 'menuitem');
+        item.setAttribute('data-action', action);
+        const i = document.createElement('i');
+        i.className = 'lucide ' + icon;
+        item.appendChild(i);
+        item.appendChild(document.createTextNode(label));
+        menu.appendChild(item);
+    });
+
+    menu.addEventListener('mousedown', function (e) {
+        // Keep the focus where it is until an entry is picked
+        e.preventDefault();
+    });
+    menu.addEventListener('click', function (e) {
+        const item = e.target.closest('.image-menu-item');
+        if (!item) return;
+        e.stopPropagation();
+        closeNoteTagMenu();
+        const action = item.getAttribute('data-action');
+        if (action === 'rename') renameTagFromMenu(tagElement, noteId);
+        else if (action === 'color') colorTagFromMenu(tagName);
+        else if (action === 'list') openTagsListPage();
+    });
+
+    document.body.appendChild(menu);
+
+    // Keep the menu on screen
+    const padding = 8;
+    const rect = menu.getBoundingClientRect();
+    let left = (x + rect.width > window.innerWidth - padding) ? x - rect.width : x;
+    let top = (y + rect.height > window.innerHeight - padding) ? y - rect.height : y;
+    menu.style.left = Math.max(padding, Math.min(left, window.innerWidth - rect.width - padding)) + 'px';
+    menu.style.top = Math.max(padding, Math.min(top, window.innerHeight - rect.height - padding)) + 'px';
+
+    noteTagMenu = menu;
+}
+
+/**
+ * Rename a tag in this note only: the chip takes the new name and the note is
+ * saved like after any tag edit. The other notes keep theirs (renaming a tag
+ * everywhere is done from the tags page).
+ * @param {HTMLElement} tagElement - The .clickable-tag to rename
+ * @param {string} noteId - The note it belongs to
+ */
+function renameTagFromMenu(tagElement, noteId) {
+    const actions = window.PoznoteTagActions;
+    if (!actions) return;
+    const oldName = tagElement.getAttribute('data-tag') || tagElement.textContent.trim();
+    actions.openRenameDialog(oldName).then(typed => {
+        const newName = actions.normalizeName(typed);
+        if (!newName || newName === oldName) return;
+
+        const wrapper = tagElement.closest('.clickable-tag-wrapper');
+        const container = tagElement.closest('.editable-tags-container');
+        if (!wrapper || !container || !wrapper.isConnected) return;
+
+        // Already on the note (a typo fixed into the right tag): keep one.
+        // The renamed chip itself does not count, so a case-only fix is kept.
+        const duplicate = Array.from(container.querySelectorAll('.clickable-tag')).some(el =>
+            el !== tagElement && (el.getAttribute('data-tag') || el.textContent).trim().toLowerCase() === newName.toLowerCase()
+        );
+        if (duplicate) {
+            wrapper.remove();
+        } else {
+            addTagElement(container, newName, noteId);
+            const added = container.querySelectorAll('.clickable-tag-wrapper');
+            container.insertBefore(added[added.length - 1], wrapper);
+            wrapper.remove();
+        }
+        updateTagsInput(noteId, container);
+    });
+}
+
+function colorTagFromMenu(tagName) {
+    const actions = window.PoznoteTagActions;
+    if (!actions) return;
+    actions.openColorDialog(tagName).then(saved => {
+        if (!saved) return;
+        const key = tagName.trim().toLowerCase();
+        document.querySelectorAll('.editable-tags-container .clickable-tag').forEach(tagElement => {
+            if ((tagElement.getAttribute('data-tag') || '').trim().toLowerCase() === key) {
+                applyNoteTagDot(tagElement);
+            }
+        });
+    });
+}
+
+function openTagsListPage() {
+    const workspace = _tagSuggestionWorkspace();
+    window.location.href = 'list_tags.php' + (workspace ? ('?workspace=' + encodeURIComponent(workspace)) : '');
+}
+
+document.addEventListener('contextmenu', function (e) {
+    if (noteTagMenu && noteTagMenu.contains(e.target)) {
+        e.preventDefault();
+        return;
+    }
+    const tagElement = e.target.closest ? e.target.closest('.editable-tags-container .clickable-tag') : null;
+    if (!tagElement || !window.PoznoteTagActions) {
+        closeNoteTagMenu();
+        return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    openNoteTagMenu(tagElement, e.clientX, e.clientY);
+}, true);
+
+document.addEventListener('mousedown', function (e) {
+    if (noteTagMenu && !noteTagMenu.contains(e.target)) closeNoteTagMenu();
+}, true);
+
+document.addEventListener('keydown', function (e) {
+    if (noteTagMenu && e.key === 'Escape') closeNoteTagMenu();
+});
+
+window.addEventListener('resize', function () { closeNoteTagMenu(); });
+document.addEventListener('scroll', function (e) {
+    if (noteTagMenu && !noteTagMenu.contains(e.target)) closeNoteTagMenu();
+}, true);
 
 // ============================================
 // Tag Input Handling

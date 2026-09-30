@@ -114,10 +114,13 @@
     font-size: 15px;
 }
 
-/* Editable Tags Container */
+/* Editable Tags Container
+   Tags wrap onto extra lines so the "Add tag" input always stays reachable:
+   on one scrolling line with a hidden scrollbar, many tags pushed it out of
+   view (#1519). index-mobile.css keeps the single swipeable line on mobile. */
 .editable-tags-container {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: 6px;
     align-items: center;
     min-height: 24px;
@@ -125,17 +128,7 @@
     border-radius: var(--pz-radius-sm);
     padding: 4px;
     transition: border-color 0.2s ease;
-    overflow-x: auto;
-    overflow-y: hidden;
     white-space: nowrap;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.editable-tags-container::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-    display: none;
 }
 
 /* Clickable Tag Wrapper */
@@ -328,6 +321,36 @@
 #tagsModalInput:focus {
     border-color: var(--pz-accent-text);
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+/* Existing-tag suggestions under #tagsModalInput (js/tags-modal.js). The list
+   hangs off the .modal overlay because .modal-content clips its overflow; the
+   dark look comes from the shared .tag-suggestions rules. */
+.tags-modal-suggestions {
+    position: absolute;
+    z-index: 10001;
+    max-height: 200px;
+    overflow-y: auto;
+    box-sizing: border-box;
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border-light);
+    border-radius: var(--pz-radius);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.12);
+    font-size: 14px;
+}
+
+.tags-modal-suggestions .tag-suggestion-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    color: var(--pz-text-strong);
+}
+
+.tags-modal-suggestions .tag-suggestion-item:hover {
+    background: var(--pz-surface);
+}
+
+.tags-modal-suggestions .tag-suggestion-item.highlighted {
+    background: rgba(var(--pz-accent-rgb), 0.1);
 }
 
 /* Dark Mode support for Tags Modal */

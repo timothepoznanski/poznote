@@ -2263,6 +2263,8 @@
       "align_center": "Centrer",
       "align_right": "Droite",
       "reset_column_widths": "Réinitialiser la largeur des colonnes",
+      "fit_to_content": "Ajuster le tableau au contenu",
+      "full_width": "Tableau pleine largeur",
       "delete_row": "Supprimer la ligne",
       "delete_column": "Supprimer la colonne",
       "delete_table": "Supprimer le tableau",

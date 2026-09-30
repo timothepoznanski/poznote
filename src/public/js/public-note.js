@@ -26,8 +26,9 @@
             wrapper.className = 'public-table-scroll';
             // A table that may spread over the page width (CSS) must start
             // where the note text does: directly in the note, or in plain
-            // blocks spanning it exactly (pasted content arrives in <div>s)
-            if (spansNoteWidth(parent, content, contentRect)) {
+            // blocks spanning it exactly (pasted content arrives in <div>s).
+            // A table fitted to its content keeps that size (#1522).
+            if (table.style.width !== 'auto' && spansNoteWidth(parent, content, contentRect)) {
                 wrapper.classList.add('public-table-scroll-page');
             }
             parent.insertBefore(wrapper, table);

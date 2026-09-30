@@ -337,6 +337,7 @@ function poznoteCssManifest(): array
             'css/home/dark-mode.css',
             'css/home/responsive.css',
             'css/list_tags.css',
+            'css/tag-dialogs.css',
             '@icon-sidebar',
             'css/modals/base.css',
             'css/modals/specific-modals.css',

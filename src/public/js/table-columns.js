@@ -159,7 +159,8 @@
 
     /**
      * Sizes a column to its widest cell; the column on its right gives or
-     * takes the difference so the rest of the table does not move.
+     * takes the difference so the rest of the table does not move (a table
+     * narrower than the note grows or shrinks instead).
      */
     function fitColumn(table, col) {
         var grid = buildGrid(table);
@@ -172,13 +173,17 @@
         columnCells(grid, col, true).forEach(function (cell) {
             wanted = Math.max(wanted, naturalCellWidth(cell));
         });
-        var pair = widths[col] + widths[col + 1];
-        var left = Math.min(wanted, pair - MIN_COLUMN_WIDTH);
-
-        var percents = widths.map(function (w) { return w / total * 100; });
-        percents[col] = left / total * 100;
-        percents[col + 1] = (pair - left) / total * 100;
-        applyWidths(grid, percents);
+        var left;
+        if (canGrow(table, total)) {
+            left = resizeGrowingColumn(table, grid, widths, col, wanted);
+        } else {
+            var pair = widths[col] + widths[col + 1];
+            left = Math.min(wanted, pair - MIN_COLUMN_WIDTH);
+            var percents = widths.map(function (w) { return w / total * 100; });
+            percents[col] = left / total * 100;
+            percents[col + 1] = (pair - left) / total * 100;
+            applyWidths(grid, percents);
+        }
         // Only when the whole text fits: a squeezed column must still wrap
         setColumnFit(grid, col, left >= wanted);
         return true;
@@ -213,6 +218,63 @@
             changed = true;
         });
         return changed;
+    }
+
+    // ─── Table width ─────────────────────────────────────────────────────────
+
+    /**
+     * 'full' (the note width, the default), 'fit' (the width of its content,
+     * inline width:auto) or 'sized' (any other width of its own).
+     */
+    function getTableWidthMode(table) {
+        var width = table.style.width;
+        if (!width || width === '100%') return 'full';
+        return width === 'auto' ? 'fit' : 'sized';
+    }
+
+    function setTableWidthMode(table, mode) {
+        if (getTableWidthMode(table) === mode) return false;
+        if (mode === 'fit') {
+            table.style.width = 'auto';
+            // Percentages would be read against the content width they shape
+            resetColumnWidths(table);
+        } else {
+            table.style.removeProperty('width');
+            if (!table.getAttribute('style').trim()) table.removeAttribute('style');
+        }
+        return true;
+    }
+
+    /** Width (px) a table may take: the content box of its container. */
+    function availableWidth(table) {
+        var parent = table.parentElement;
+        if (!parent) return 0;
+        var style = window.getComputedStyle(parent);
+        return parent.clientWidth - (parseFloat(style.paddingLeft) || 0) - (parseFloat(style.paddingRight) || 0);
+    }
+
+    /**
+     * A table narrower than the note (fitted to its content, or given a width
+     * of its own) grows or shrinks with the column being resized; a
+     * full-width table trades width between the two neighbouring columns.
+     */
+    function canGrow(table, total) {
+        return getTableWidthMode(table) !== 'full' && total < availableWidth(table) - 1;
+    }
+
+    /**
+     * Sets one column of a growing table to `width` px, the others keep
+     * theirs: the table takes the new total as a width of its own, a
+     * percentage of the note like the columns. Returns the width applied.
+     */
+    function resizeGrowingColumn(table, grid, widths, col, width) {
+        var available = availableWidth(table);
+        var others = widths.reduce(function (sum, w, c) { return c === col ? sum : sum + w; }, 0);
+        width = Math.max(MIN_COLUMN_WIDTH, Math.min(width, available - others));
+        var total = others + width;
+        table.style.width = (Math.round(Math.min(100, total / available * 100) * 100) / 100) + '%';
+        applyWidths(grid, widths.map(function (w, c) { return (c === col ? width : w) / total * 100; }));
+        return width;
     }
 
     // ─── Alignment ───────────────────────────────────────────────────────────
@@ -350,12 +412,16 @@
     document.addEventListener('mousemove', function (e) {
         if (drag) {
             var dx = e.clientX - drag.startX;
-            var pair = drag.widths[drag.border] + drag.widths[drag.border + 1];
-            var left = Math.min(Math.max(drag.widths[drag.border] + dx, MIN_COLUMN_WIDTH), pair - MIN_COLUMN_WIDTH);
-            var percents = drag.percents.slice();
-            percents[drag.border] = left / drag.total * 100;
-            percents[drag.border + 1] = (pair - left) / drag.total * 100;
-            applyWidths(drag.grid, percents);
+            if (drag.grow) {
+                resizeGrowingColumn(drag.table, drag.grid, drag.widths, drag.border, drag.widths[drag.border] + dx);
+            } else {
+                var pair = drag.widths[drag.border] + drag.widths[drag.border + 1];
+                var left = Math.min(Math.max(drag.widths[drag.border] + dx, MIN_COLUMN_WIDTH), pair - MIN_COLUMN_WIDTH);
+                var percents = drag.percents.slice();
+                percents[drag.border] = left / drag.total * 100;
+                percents[drag.border + 1] = (pair - left) / drag.total * 100;
+                applyWidths(drag.grid, percents);
+            }
             if (!drag.changed) {
                 // A width picked by hand replaces the fit on both sides
                 setColumnFit(drag.grid, drag.border, false);
@@ -407,6 +473,7 @@
             widths: widths,
             total: total,
             percents: widths.map(function (w) { return w / total * 100; }),
+            grow: canGrow(hover.table, total),
             changed: false
         };
         document.documentElement.classList.add('pz-col-resizing');
@@ -445,6 +512,8 @@
         readLineAlignment: readLineAlignment,
         hasColumnWidths: hasColumnWidths,
         resetColumnWidths: resetColumnWidths,
+        getTableWidthMode: getTableWidthMode,
+        setTableWidthMode: setTableWidthMode,
         copyColumnFormat: copyColumnFormat
     };
 })();

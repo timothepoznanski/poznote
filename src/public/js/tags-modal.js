@@ -31,8 +31,52 @@ function showNoteTagsModal(noteId) {
     // Show modal
     modal.style.display = 'block';
     
+    // Suggest the workspace's existing tags while typing (discussion #1520),
+    // from the cache the inline tag editor shares (js/clickable-tags.js).
+    hideTagsModalSuggestions();
+    if (typeof prefetchAllTags === 'function') {
+        prefetchAllTags(_tagSuggestionWorkspace());
+    }
+
+    tagInput.oninput = function() {
+        showTagsModalSuggestions(noteId);
+    };
+    tagInput.onblur = function() {
+        hideTagsModalSuggestions();
+    };
+
     // Setup input handler
     tagInput.onkeydown = function(e) {
+        const dd = document.getElementById('tagsModalSuggestions');
+        const items = (dd && dd.style.display !== 'none') ? dd.querySelectorAll('.tag-suggestion-item') : [];
+
+        if (items.length > 0) {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                const step = e.key === 'ArrowDown' ? 1 : -1;
+                const current = Array.prototype.findIndex.call(items, it => it.classList.contains('highlighted'));
+                const next = current === -1
+                    ? (step === 1 ? 0 : items.length - 1)
+                    : Math.max(0, Math.min(items.length - 1, current + step));
+                items.forEach((it, i) => it.classList.toggle('highlighted', i === next));
+                items[next].scrollIntoView({ block: 'nearest' });
+                return;
+            }
+            if (e.key === 'Escape') {
+                // Close the list only; the modal's own Escape handler skips a
+                // prevented event, so the dialog stays open.
+                e.preventDefault();
+                hideTagsModalSuggestions();
+                return;
+            }
+            const highlighted = dd.querySelector('.tag-suggestion-item.highlighted');
+            if (highlighted && (e.key === 'Enter' || e.key === 'Tab')) {
+                e.preventDefault();
+                pickTagsModalSuggestion(noteId, highlighted.textContent);
+                return;
+            }
+        }
+
         if (e.key === 'Enter' || e.key === ',' || e.key === ' ') {
             e.preventDefault();
             const tagValue = tagInput.value.trim();
@@ -40,6 +84,7 @@ function showNoteTagsModal(noteId) {
                 addTagToModal(noteId, tagValue);
                 tagInput.value = '';
             }
+            hideTagsModalSuggestions();
         }
     };
 
@@ -47,6 +92,103 @@ function showNoteTagsModal(noteId) {
     setTimeout(() => {
         tagInput.focus();
     }, 100);
+}
+
+/**
+ * Show the existing tags matching what is typed in the modal input, minus the
+ * tags the note already has. Matching mirrors the inline tag editor.
+ * @param {string} noteId - The ID of the note
+ */
+function showTagsModalSuggestions(noteId) {
+    const tagInput = document.getElementById('tagsModalInput');
+    if (!tagInput || typeof fetchAllTags !== 'function') return;
+
+    const value = tagInput.value.trim().toLowerCase();
+    if (!value) {
+        hideTagsModalSuggestions();
+        return;
+    }
+
+    fetchAllTags(_tagSuggestionWorkspace()).then(allTags => {
+        // A slow response must not answer a prefix the user has already changed
+        if (tagInput.value.trim().toLowerCase() !== value) return;
+
+        const originalTagsInput = document.getElementById('tags' + noteId);
+        const existing = (originalTagsInput ? originalTagsInput.value : '')
+            .split(/[,\s]+/).filter(t => t !== '').map(t => t.toLowerCase());
+        const matches = allTags.filter(t => t.toLowerCase().includes(value) && !existing.includes(t.toLowerCase()));
+
+        if (matches.length === 0) {
+            hideTagsModalSuggestions();
+            return;
+        }
+
+        const dd = getTagsModalSuggestions();
+        dd.innerHTML = '';
+        matches.slice(0, 50).forEach(tag => {
+            const item = document.createElement('div');
+            item.className = 'tag-suggestion-item';
+            item.textContent = tag;
+            // mousedown, not click: keep the focus in the input so the next tag
+            // can be typed straight away.
+            item.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                pickTagsModalSuggestion(noteId, tag);
+            });
+            dd.appendChild(item);
+        });
+
+        // The modal body clips overflow, so the list hangs off the overlay
+        // (the positioned, scrolling ancestor) right under the input.
+        const modal = document.getElementById('tagsModal');
+        const modalRect = modal.getBoundingClientRect();
+        const inputRect = tagInput.getBoundingClientRect();
+        dd.style.left = (inputRect.left - modalRect.left + modal.scrollLeft) + 'px';
+        dd.style.top = (inputRect.bottom - modalRect.top + modal.scrollTop + 4) + 'px';
+        dd.style.width = inputRect.width + 'px';
+        dd.style.display = 'block';
+        dd.scrollTop = 0;
+    });
+}
+
+/**
+ * Create or reuse the suggestions list of the tags modal
+ * @returns {HTMLElement} The suggestions list element
+ */
+function getTagsModalSuggestions() {
+    let dd = document.getElementById('tagsModalSuggestions');
+    if (!dd) {
+        dd = document.createElement('div');
+        dd.id = 'tagsModalSuggestions';
+        // tag-suggestions picks up the dark-mode look of the inline editor's list
+        dd.className = 'tag-suggestions tags-modal-suggestions';
+        dd.style.display = 'none';
+        document.getElementById('tagsModal').appendChild(dd);
+    }
+    return dd;
+}
+
+/**
+ * Hide the suggestions list of the tags modal
+ */
+function hideTagsModalSuggestions() {
+    const dd = document.getElementById('tagsModalSuggestions');
+    if (dd) {
+        dd.style.display = 'none';
+        dd.innerHTML = '';
+    }
+}
+
+/**
+ * Add the suggestion the user picked and clear the input for the next tag
+ * @param {string} noteId - The ID of the note
+ * @param {string} tag - The picked tag
+ */
+function pickTagsModalSuggestion(noteId, tag) {
+    const tagInput = document.getElementById('tagsModalInput');
+    if (tagInput) tagInput.value = '';
+    hideTagsModalSuggestions();
+    addTagToModal(noteId, tag);
 }
 
 /**
@@ -201,6 +343,11 @@ function updateAndSaveTags(noteId, tagsArray) {
     
     const newValue = tagsArray.join(' ');
     originalTagsInput.value = newValue;
+
+    // A tag created here is suggested from now on, here and in the inline editor
+    if (typeof rememberTagsForSuggestions === 'function') {
+        rememberTagsForSuggestions(tagsArray);
+    }
     
     // Update modal display
     renderTagsList(noteId, newValue);
