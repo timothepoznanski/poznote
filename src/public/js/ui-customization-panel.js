@@ -428,6 +428,23 @@
                     : '';
             }
         }
+
+        syncMoreMenuButton();
+    }
+
+    // The "..." button goes when none of its entries is left, hidden from the
+    // Element visibility panel or not offered for the open note. The entries
+    // are read through their own computed display, which the closed menu
+    // around them does not change.
+    function syncMoreMenuButton() {
+        if (!moreMenu || !moreButton) return;
+        var anchor = moreButton.closest('.pz-edge-menu-anchor');
+        if (!anchor) return;
+        var hasItem = Array.prototype.some.call(moreMenu.querySelectorAll('.page-more-menu-item'), function (item) {
+            return window.getComputedStyle(item).display !== 'none';
+        });
+        anchor.style.display = hasItem ? '' : 'none';
+        if (!hasItem && isMoreMenuOpen()) setMoreMenuOpen(false);
     }
 
     // js/markdown-view-modes.js calls this when the note switches between
@@ -587,6 +604,17 @@
         moreButton = document.getElementById('pageMoreMenuBtn');
         moreMenu = document.getElementById('pageMoreMenu');
         if (!moreButton || !moreMenu) return;
+
+        syncMoreMenuButton();
+        // The runtime announces a new set before it rewrites its <style>, and
+        // the phone layout swaps the entries shown (css/ui-customization-panel.css)
+        document.addEventListener('poznote-ui-customization-updated', function () {
+            window.requestAnimationFrame(syncMoreMenuButton);
+        });
+        if (window.matchMedia) {
+            var mobileQuery = window.matchMedia('(max-width: 800px)');
+            if (mobileQuery.addEventListener) mobileQuery.addEventListener('change', syncMoreMenuButton);
+        }
 
         // Before the filters read the text, so a search matches what is shown
         if (isMacPlatform) {

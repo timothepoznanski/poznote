@@ -30,6 +30,21 @@
         'card:create-diary-entry-card': '.create-note-option[data-type="diary"]'
     };
 
+    // Entries of the note's ⋮ menu (note_display.php) that no data-selector
+    // ties to a toolbar button, keyed by the toolbar key that hides them.
+    // Mirrors poznoteGetToolbarMenuActions() in lib/ui-customization.php.
+    var TOOLBAR_MENU_ACTIONS = {
+        'btn-snapshot': ['show-snapshot'],
+        'btn-audio': ['insert-audio-file'],
+        'btn-clear-completed': ['clear-completed-tasks'],
+        'btn-uncheck-all': ['uncheck-all-tasks'],
+        'btn-print': ['print-note'],
+        'btn-archive': ['archive-note'],
+        // Markdown notes offer "Insert rich text", HTML notes "Insert Markdown"
+        'btn-paste-markdown': ['show-paste-markdown-modal', 'show-insert-markdown-modal'],
+        'btn-open-tasks-page': ['open-tasks-page']
+    };
+
     var syncScheduled = false;
     var observerStarted = false;
 
@@ -148,24 +163,10 @@
             }
 
             var action = item.getAttribute('data-action');
-            if (action === 'show-snapshot' && hiddenKeyMap['toolbar:btn-snapshot']) {
-                return false;
-            }
-
-            if (action === 'insert-audio-file' && hiddenKeyMap['toolbar:btn-audio']) {
-                return false;
-            }
-
-            if (action === 'clear-completed-tasks' && hiddenKeyMap['toolbar:btn-clear-completed']) {
-                return false;
-            }
-
-            if (action === 'uncheck-all-tasks' && hiddenKeyMap['toolbar:btn-uncheck-all']) {
-                return false;
-            }
-
-            if (action === 'print-note' && hiddenKeyMap['toolbar:btn-print']) {
-                return false;
+            for (var id in TOOLBAR_MENU_ACTIONS) {
+                if (hiddenKeyMap['toolbar:' + id] && TOOLBAR_MENU_ACTIONS[id].indexOf(action) !== -1) {
+                    return false;
+                }
             }
         }
 
@@ -189,17 +190,14 @@
             var menu = toolbar.querySelector('.mobile-toolbar-menu');
             if (!anchor || !moreButton || !menu) return;
 
-            var visibleButtons = Array.prototype.some.call(
-                toolbar.querySelectorAll('.toolbar-btn:not(.mobile-more-btn)'),
-                isVisibleElement
-            );
-
+            // The menu holds entries of its own (archive, print...), so it
+            // stays as long as one of them does, whatever the buttons beside it
             var visibleMenuItems = Array.prototype.some.call(
                 menu.querySelectorAll('.dropdown-item'),
                 isToolbarMenuItemVisible
             );
 
-            if (!visibleButtons || !visibleMenuItems) {
+            if (!visibleMenuItems) {
                 anchor.style.display = 'none';
                 menu.hidden = true;
                 moreButton.setAttribute('aria-expanded', 'false');
@@ -423,21 +421,14 @@
             } else if (type === 'toolbar') {
                 rules.push('.note-edit-toolbar .' + id + ', .note-edit-toolbar .' + id + ':not(.hide-on-selection) { display: none !important; }');
                 rules.push('.mobile-toolbar-menu [data-selector=".' + id + '"] { display: none !important; }');
-                if (id === 'btn-snapshot') {
-                    rules.push('.mobile-toolbar-menu [data-action="show-snapshot"] { display: none !important; }');
-                } else if (id === 'btn-search-replace') {
+                (TOOLBAR_MENU_ACTIONS[id] || []).forEach(function (action) {
+                    rules.push('.mobile-toolbar-menu [data-action="' + action + '"] { display: none !important; }');
+                });
+                if (id === 'btn-search-replace') {
                     // The selection formatting toolbar has its own copy of the button
                     rules.push('.note-edit-toolbar .btn-search-replace-format, .note-edit-toolbar .btn-search-replace-format.show-on-selection { display: none !important; }');
                 } else if (id === 'btn-tasklist-actions') {
                     rules.push('.tasklist-actions-dropdown { display: none !important; }');
-                } else if (id === 'btn-audio') {
-                    rules.push('.mobile-toolbar-menu [data-action="insert-audio-file"] { display: none !important; }');
-                } else if (id === 'btn-clear-completed') {
-                    rules.push('.mobile-toolbar-menu [data-action="clear-completed-tasks"] { display: none !important; }');
-                } else if (id === 'btn-uncheck-all') {
-                    rules.push('.mobile-toolbar-menu [data-action="uncheck-all-tasks"] { display: none !important; }');
-                } else if (id === 'btn-print') {
-                    rules.push('.mobile-toolbar-menu [data-action="print-note"] { display: none !important; }');
                 }
             } else if (type === 'wsmenu') {
                 rules.push('.workspace-menu-item[data-action="' + id + '"] { display: none !important; }');
@@ -463,12 +454,17 @@
                     rules.push('.note-subline { display: none !important; }');
                 } else if (id === 'note-icons') {
                     rules.push('.note-icon { display: none !important; }');
+                } else if (id === 'favorites-folder') {
+                    rules.push('.favorites-section { display: none !important; }');
                 } else if (id === 'folder-note-count') {
                     rules.push('.folder-note-count { display: none !important; }');
                 } else if (id === 'outline-panel') {
                     rules.push('#outline-panel { display: none !important; }');
                     rules.push('#outlineResizeHandle { display: none !important; }');
                     rules.push('#outlineMobileBackdrop { display: none !important; }');
+                    // The floating stack and the scroll arrows sit left of the
+                    // outline column (css/notes/noteentry.css): give them the edge.
+                    rules.push('html { --pz-docked-outline: 0px !important; }');
                 } else if (id === 'tasklist-progress') {
                     rules.push('.tasklist-progress { display: none !important; }');
                 } else if (id === 'preview-code-block-delete') {
